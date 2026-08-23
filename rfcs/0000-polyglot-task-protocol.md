@@ -19,8 +19,9 @@ and answers with the last JSON line of stdout parsed into `TaskResult { success:
 black-box runner contract — while a JS job handler gets
 `correlationId`/`traceparent`/`reportProgress` in its `JobContext`. NTP replaces that gap with:
 
-- a **closed, versioned envelope** (Zod-defined) delivered to every task, carrying payload, trace
-  context, attempt, deadline, and retry history;
+- a **closed-vocabulary, versioned envelope** (Zod-defined; open-world on the wire per the framing
+  rules) delivered to every task, carrying payload, trace context, attempt, deadline, and retry
+  history;
 - **sentinel-framed NDJSON events** on stdout (`started`/`progress`/`log`/`result`) with a
   byte-stream demux, so results are structured and logs can never corrupt them;
 - an **authenticated loopback citizen surface** (oRPC over `127.0.0.1`) through which any task in
@@ -31,15 +32,18 @@ black-box runner contract — while a JS job handler gets
 - a **port/adapter package architecture** following the `plugin-auth-core` blueprint, and a staged
   five-wave engine integration plan that structurally retires defect classes D-1..D-9, D-12, D-13,
   and D-14 from the engine audit (D-10 buffer capping and D-11 slot accounting stay supervisor-side
-  engine fixes outside the wave plan).
+  engine fixes outside the wave plan; D-5's increment-on-retry half rides the named post-v1
+  `retry-driver` work item).
 
 Every quantitative claim traces to the run directory
 `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc/` (32-file ratified
 corpus, engine audit, six pre-registered spikes K1–K6 — all resolved on their primary criteria; see
-[Appendix A](#appendix-a--measured-evidence)). Headline cost: the full T1 contract adds **+0.41 ms**
-to the 7.6 ms exec-wall p50 of a Go task through the production dispatch path, with host-side
-validation + demux at 0.06–0.10 ms. **No TaskType vocabulary changes** — the series precedent holds
-a fifth time.
+[Appendix A](#appendix-a--measured-evidence)). Headline cost: the host-side protocol work (envelope
+validate + sentinel demux + result validate) measures a tight **0.06–0.10 ms p50** in the dispatch
+path; the end-to-end exec-wall delta of the full T1 contract is **within measurement noise, bounded
+≤ ~1 ms at 95% CI** on the c=1 Go series (point estimate +0.41 ms, CI contains zero; the
+pre-registered ≤1.0 ms bar is a c=1 statement). **No TaskType vocabulary changes** — the series
+precedent holds a fifth time.
 
 ## Motivation
 
@@ -79,7 +83,9 @@ added with zero engine change.
 ### Goals
 
 1. One wire protocol + one HTTP citizen surface any language can implement with stdlib tools.
-2. Total backward compatibility: every existing task remains valid forever (Tier 0).
+2. Total backward compatibility: every existing task remains valid forever (Tier 0) — with one
+   deliberate, migration-managed exception: the W2 env allowlist ends supervisor-env inheritance
+   behind the `envPassthrough` escape hatch (see Breaking changes).
 3. Structural retirement of the audit defect classes, not spot fixes.
 4. Protocol cost that does not erode the runs-1–4 execution wins (measured bar: ≤1 ms).
 5. Type safety end-to-end: payload/result schemas declared once (Zod), enforced at the boundary,
@@ -107,6 +113,7 @@ added with zero engine change.
 | **Citizen surface** | The authenticated loopback oRPC HTTP surface exposing ecosystem verbs (enqueue, KV, streams, status, async completion, artifacts).      |
 | **Attempt token**   | Opaque per-execution-attempt bearer credential, invalidated on retry, resolving server-side to a capability record.                     |
 | **Tier (T0/T1/T2)** | A named conformance profile computed from conformance-case outcomes.                                                                    |
+| **Lease**           | The engine's exclusive claim to run one attempt of one execution; requeued when a T2 worker exhausts its missed-ping budget.            |
 | **Terminal frame**  | Exactly-one `result` frame per attempt; exit without one ⇒ engine-synthesized `unknown-failure`.                                        |
 | **Shim**            | A ~100-line per-language helper implementing frame writing, envelope parsing, and the control reader. Convenience, not contract.        |
 
@@ -310,7 +317,13 @@ export const TaskFrameV1 = z.discriminatedUnion('t', [
     ...FrameBase,
     t: z.literal('result'), // TERMINAL
     outcome: z.enum(['ok', 'error', 'cancelled']),
-    value: z.unknown().optional(), // validated against resultSchema when 'ok'
+    value: z.unknown().optional(), // inline result — the whole frame must fit the frame budget
+    valueRef: z.looseObject({ // detached result (see size ladder below): exactly one of
+      via: z.enum(['file', 'artifact']), //   value | valueRef when 'ok'
+      ref: z.string().optional(), // artifact ref ('artifact') — absent for 'file'
+      sha256: z.string().length(64),
+      bytes: z.int().positive(),
+    }).optional(),
     error: StructuredErrorV1.optional(), // required when 'error'
     checkpoint: z.unknown().optional(),
   }), // persisted for redelivery when 'cancelled'
@@ -330,8 +343,9 @@ export const HostFrameV1 = z.discriminatedUnion('t', [
     ...FrameBase,
     t: z.literal('pong'),
     cancelRequested: z.boolean().default(false), // Temporal: control rides the ping reply
-    deadlineMs: z.int().optional(),
-  }), // deadline extension delivery
+    deadlineMs: z.int().optional(), // deadline extension delivery
+    taskToken: z.string().optional(), // rotated attempt token riding the extension
+  }), //   (credential refresh — see Security model)
 ]);
 ```
 
@@ -340,9 +354,28 @@ Framing constants and the write rule (normative):
 ```ts
 // packages/plugin-workers-core/src/protocol/frames.ts
 export const SENTINEL = new Uint8Array([0x00, 0x4e, 0x53, 0x46, 0x00]); // "\0NSF\0"
-export const FRAME_MAX_BYTES = 4096; // PIPE_BUF: a frame MUST be one write(2) ≤ this budget,
-// which makes it atomic on POSIX pipes.
+export const FRAME_MAX_BYTES = 4096; // stdio transport: a frame MUST be one write(2) ≤ this
+// budget, which makes it atomic on POSIX pipes. Frame limits are PER-TRANSPORT: the T2 peer
+// channel bound is PEER_FRAME_MAX_BYTES = 262_144 (matches the checkpoint tier ceiling).
+export const RESULT_MAX_IN_FRAME = 3072; // max serialized `value` bytes carried inline in a
+// terminal result frame on stdio; larger results MUST use the detached-result route (below).
+// SDKs/shims MUST enforce this client-side and spill automatically.
+export const ENVELOPE_MAX_BYTES = 24_576; // env-delivered envelope budget (T0/T1): binding OS
+// constraint is the 32,767-char Windows environment block (Linux MAX_ARG_STRLEN 128 KiB is
+// looser). Payloads over budget spill to `payloadRef` (artifact ref inside the envelope),
+// mirroring the checkpoint size ladder. The T2 dispatch frame uses PEER_FRAME_MAX_BYTES.
+export const PROGRESS_FLUSH_MS = 100; // latest-wins progress persistence flush interval —
+// the constant spike K6 measured (92/93.9 ms p50/p95 delivery at 10 ev/s).
 ```
+
+**Detached results (normative size ladder, mirroring checkpoints):** a terminal `result` with
+`outcome: 'ok'` carries exactly one of `value` (inline, ≤ `RESULT_MAX_IN_FRAME` serialized) or
+`valueRef`. `valueRef.via: 'file'` means the task wrote the JSON value to the host-provided
+`NETSCRIPT_RESULT_PATH` file (write-then-atomic-rename; zero-infrastructure, works offline — the
+host reads it after the terminal frame or exit); `via: 'artifact'` uses the artifacts capability
+when granted. The host verifies `sha256`/`bytes`, then validates the **resolved** value against
+`resultSchema` exactly as an inline value. This closes the T0 inversion: T0's last-JSON-line
+fallback has no frame budget, so T1 must not represent less than T0 does.
 
 **Demux rule (normative, from spike K1):** the engine MUST scan the raw byte stream for the sentinel
 and treat sentinel→newline spans as frame candidates — it MUST NOT split lines first. A frame may be
@@ -412,9 +445,9 @@ export function createTaskProtocolRegistry(
 
 `ProtocolOperationUnsupportedError` and `ProtocolViolationError` are typed (`errors.ts`), with
 stable `errtype` constants (`Protocol.Unsupported`, `Protocol.BadEnvelope`,
-`Protocol.MalformedFrame`, `Protocol.TerminalMissing`, `Protocol.FrameOverflow`) — protocol
-violations are a distinct error lane from task-domain failures and are never retry-eligible by
-default.
+`Protocol.MalformedFrame`, `Protocol.TerminalMissing`, `Protocol.TerminalDuplicate`,
+`Protocol.FrameOverflow`, `Protocol.BadResult`) — protocol violations are a distinct error lane from
+task-domain failures and are never retry-eligible by default.
 
 ### Engine integration — exact seams, what is refactored, what is preserved
 
@@ -443,20 +476,20 @@ export function withTaskProtocol(
 
 Per-seam plan (every touched file, with its defect linkage):
 
-| Seam (file:line today)                                                                                      | Change                                                                                                                                                                                                                                                                                    | Defects retired |
-| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| `plugins/workers/worker/job-dispatcher.ts:234-240`                                                          | `processWorkerTask` threads `correlationId`, `traceparent`, `tracestate`, `signal`, `attempt`, `executionId`, `deadlineMs` from the message/record into `TaskExecutionOptions` (fields mostly exist; three are added — see type diff below)                                               | D-1, D-5        |
-| `plugins/workers/worker/job-execution.ts:24`                                                                | polyglot-job path forwards `correlationId`                                                                                                                                                                                                                                                | D-2             |
-| `packages/plugin-workers-core/src/executor/adapters/dax-process-runner.ts:89-98`                            | `buildEnvironment()` **replaced** by `constructTaskEnv()`: allowlisted base (no `Deno.env.toObject()` spread), reserved `NETSCRIPT_*` namespace injected, user-set reserved keys rejected at registry time. `clearEnv`-equivalent delivery proven leak-free in spike K2                   | D-9             |
-| `dax-process-runner.ts:171-189`                                                                             | `parseJsonLastLine` **demoted, not deleted**: it becomes the T0 fallback _inside_ `interpretOutcome()` — run only when the demux saw no `result` frame; its parse is Zod-checked with the bounded raw line kept beside it (`resultRaw`)                                                   | D-3, D-4, D-13  |
-| `dax-process-runner.ts:39-49`                                                                               | abort wiring: post-spawn `signal.aborted` sends `cancel` frame (T1+), then SIGTERM after `graceMs`, then SIGKILL; child handle actually killed                                                                                                                                            | D-6             |
-| `dax-process-runner.ts:84` + `job-dispatcher.ts:247,315`                                                    | timeout/cancel classified by **error type**, not message sniffing; `KvExecutionState.complete()` persists `timeout`/`cancelled`/`paused`/`unknown-failure` as distinct statuses; runner-measured duration wins                                                                            | D-7, D-8, D-14  |
-| `packages/plugin-workers-core/src/state/execution-state.ts`                                                 | NEW `progress(executionId, {percent, message, atMs})` mutation → `#save(record,'updated')` → existing `setMutationHook` → `createStreamMutationHook` → `/workers/executions` stream → SSE. Latest-wins throttle (min(0.8×timeout, 30 s), Temporal shape) lives in the sink, not the state | D-12            |
-| `plugins/workers/worker/worker.ts:163-169`                                                                  | `ctx.reportProgress` rewired from `console.log` to the same `progress()` mutation — JS and polyglot citizenship converge on one sink                                                                                                                                                      | D-12            |
-| `packages/plugin-workers-core/src/domain/task.ts:177` (`TaskDefinitionSchema`) + `builders/task-builder.ts` | additive fields: `payloadSchema?`, `resultSchema?` (serialized JSON Schema in the registry; Zod at the builder), `capabilities?: string[]`. `registerTask` validation extends accordingly                                                                                                 | D-4             |
-| `plugins/workers/services/src/routers/` + `router.ts:11-18`                                                 | NEW `citizen.ts` router assembled from `citizen.contracts.ts` via the existing `assemblePluginContractRouter` seam; bound to `127.0.0.1:<random>` with a per-boot SSRF bearer (spike K3 pattern)                                                                                          | —               |
-| `packages/plugin-workers-core/src/executor/executor-types.ts:60-73`                                         | `TaskExecutionOptions` gains `attempt?: number`, `executionId?: string`, `deadlineMs?: number` (additive, optional — no adapter breaks)                                                                                                                                                   | D-1, D-5        |
-| `executor-types.ts:90-104` (`TaskResult`)                                                                   | additive: `outcome?: TaskOutcomeV1` (typed union below), `resultRaw?: string` (bounded), `status` widened to the new vocabulary. Existing fields untouched — every current consumer keeps compiling                                                                                       | D-8, D-13       |
+| Seam (file:line today)                                                                                      | Change                                                                                                                                                                                                                                                                                                                                                                                                                 | Defects retired |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| `plugins/workers/worker/job-dispatcher.ts:234-240`                                                          | `processWorkerTask` threads `correlationId`, `traceparent`, `tracestate`, `signal`, `attempt`, `executionId`, `deadlineMs` from the message/record into `TaskExecutionOptions` (fields mostly exist; three are added — see type diff below)                                                                                                                                                                            | D-1, D-5        |
+| `plugins/workers/worker/job-execution.ts:24`                                                                | polyglot-job path forwards `correlationId`                                                                                                                                                                                                                                                                                                                                                                             | D-2             |
+| `packages/plugin-workers-core/src/executor/adapters/dax-process-runner.ts:89-98`                            | `buildEnvironment()` **replaced** by `constructTaskEnv()`: allowlisted base (no `Deno.env.toObject()` spread), reserved `NETSCRIPT_*` namespace injected, user-set reserved keys rejected at registry time. `clearEnv`-equivalent delivery proven leak-free in spike K2                                                                                                                                                | D-9             |
+| `dax-process-runner.ts:171-189`                                                                             | `parseJsonLastLine` **demoted, not deleted**: it becomes the T0 fallback _inside_ `interpretOutcome()` — run only when the demux saw no `result` frame; its parse is Zod-checked with the bounded raw line kept beside it (`resultRaw`)                                                                                                                                                                                | D-3, D-4, D-13  |
+| `dax-process-runner.ts:39-49`                                                                               | abort wiring: post-spawn `signal.aborted` sends `cancel` frame (T1+), then SIGTERM after `graceMs`, then SIGKILL; child handle actually killed                                                                                                                                                                                                                                                                         | D-6             |
+| `dax-process-runner.ts:84` + `job-dispatcher.ts:247,315`                                                    | timeout/cancel classified by **error type**, not message sniffing; `KvExecutionState.complete()` persists `timeout`/`cancelled`/`paused`/`unknown-failure` as distinct statuses; runner-measured duration wins                                                                                                                                                                                                         | D-7, D-8, D-14  |
+| `packages/plugin-workers-core/src/state/execution-state.ts`                                                 | NEW `progress(executionId, {percent, message, atMs})` mutation → `#save(record,'updated')` → existing `setMutationHook` → `createStreamMutationHook` → `/workers/executions` stream → SSE. Latest-wins throttle at `PROGRESS_FLUSH_MS` (100 ms — the constant K6 measured) lives in the sink, not the state. Terminal state transitions become atomic CAS on current status (first-terminal-wins across both channels) | D-12            |
+| `plugins/workers/worker/worker.ts:163-169`                                                                  | `ctx.reportProgress` rewired from `console.log` to the same `progress()` mutation — JS and polyglot citizenship converge on one sink                                                                                                                                                                                                                                                                                   | D-12            |
+| `packages/plugin-workers-core/src/domain/task.ts:177` (`TaskDefinitionSchema`) + `builders/task-builder.ts` | additive fields: `payloadSchema?`, `resultSchema?` (serialized JSON Schema in the registry; Zod at the builder), `capabilities?: string[]`. `registerTask` validation extends accordingly                                                                                                                                                                                                                              | D-4             |
+| `plugins/workers/services/src/routers/` + `router.ts:11-18`                                                 | NEW `citizen.ts` router assembled from `citizen.contracts.ts` via the existing `assemblePluginContractRouter` seam; bound to `127.0.0.1:<random>` with a per-boot transport-layer SSRF bearer (spike K3 pattern); task credentials are per-execution (see Security model)                                                                                                                                              | —               |
+| `packages/plugin-workers-core/src/executor/executor-types.ts:60-73`                                         | `TaskExecutionOptions` gains `attempt?: number`, `executionId?: string`, `deadlineMs?: number` (additive, optional — no adapter breaks)                                                                                                                                                                                                                                                                                | D-1, D-5        |
+| `executor-types.ts:90-104` (`TaskResult`)                                                                   | additive: `outcome?: TaskOutcomeV1` (typed union below), `resultRaw?: string` (bounded), `status` widened to the new vocabulary. Existing fields untouched — every current consumer keeps compiling                                                                                                                                                                                                                    | D-8, D-13       |
 
 **Preserved unchanged:** `MultiRuntimeTaskExecutor` and its adapter map
 (`packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts:195-205`), every
@@ -508,15 +541,15 @@ export const CitizenEnqueueInput = z.object({
 });
 ```
 
-| Route                                           | Verb             | Capability required            | Notes                                                                                                    |
-| ----------------------------------------------- | ---------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| `GET /v1/credentials`                           | credential fetch | bootstrap token                | env carries the pointer + bootstrap token; real material stays server-side (Lambda pattern, spike K2/K3) |
-| `POST /v1/enqueue`                              | enqueue task     | `enqueue:<taskId               | prefix>`                                                                                                 |
-| `GET/PUT /v1/kv/*`                              | scoped KV        | `kv:<prefix>`                  | prefix-jailed onto `getKv()`                                                                             |
-| `POST /v1/streams/publish`                      | stream publish   | `stream:<topic>`               | topic-scoped                                                                                             |
-| `GET /v1/executions/:id`                        | status query     | own-execution or `status:read` | `KvExecutionState.get/listBy*`                                                                           |
-| `POST /v1/executions/:id/complete\|fail`        | async completion | own attempt token only         | Temporal detached-handle; **no ID-tuple bypass**                                                         |
-| `POST /v1/artifacts` / `GET /v1/artifacts/:ref` | binary channel   | `artifacts`                    | optional capability                                                                                      |
+| Route                                           | Verb             | Capability required            | Notes                                                                                                                                                                                                                 |
+| ----------------------------------------------- | ---------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /v1/credentials`                           | credential fetch | bootstrap token                | the refresh path (see Security model): fencing-checked, resolves only to the presenting execution's attempt; env carries the pointer + bootstrap token; real material stays server-side (Lambda pattern, spike K2/K3) |
+| `POST /v1/enqueue`                              | enqueue task     | `enqueue:<taskId               | prefix>`                                                                                                                                                                                                              |
+| `GET/PUT /v1/kv/*`                              | scoped KV        | `kv:<prefix>`                  | prefix-jailed onto `getKv()`                                                                                                                                                                                          |
+| `POST /v1/streams/publish`                      | stream publish   | `stream:<topic>`               | topic-scoped                                                                                                                                                                                                          |
+| `GET /v1/executions/:id`                        | status query     | own-execution or `status:read` | `KvExecutionState.get/listBy*`                                                                                                                                                                                        |
+| `POST /v1/executions/:id/complete\|fail`        | async completion | own attempt token only         | Temporal detached-handle; **no ID-tuple bypass**                                                                                                                                                                      |
+| `POST /v1/artifacts` / `GET /v1/artifacts/:ref` | binary channel   | `artifacts`                    | optional capability                                                                                                                                                                                                   |
 
 Transport: TCP `127.0.0.1` with a per-boot random port, canonical for **all tiers** (T-4 lock;
 in-band T2 citizen reads are a fenced v2 extension). For deno-type tasks, exact-port
@@ -533,6 +566,7 @@ registration):
 NETSCRIPT_PROTOCOL=1            NETSCRIPT_TASK_ID           NETSCRIPT_EXECUTION_ID
 NETSCRIPT_ATTEMPT               NETSCRIPT_DEADLINE_MS       NETSCRIPT_PAYLOAD   (the envelope)
 NETSCRIPT_CALLBACK_URL          NETSCRIPT_BOOT_TOKEN        NETSCRIPT_TASK_TOKEN (T0/T1)
+NETSCRIPT_RESULT_PATH           (detached-result file target; host-provided, attempt-scoped)
 ```
 
 The base env is a **constructed document** (allowlist + task-declared `env` + these), never an
@@ -548,7 +582,8 @@ export const CapabilityRecordV1 = z.looseObject({
   aud: z.string(), // supervisor instance binding
   executionId: z.string(),
   attempt: z.int().min(0),
-  exp: z.int(), // TTL floor 600 s, default 3600 s
+  exp: z.int(), // = max(deadlineMs + graceMs, floor 600 s) — bound to the attempt's
+  //   deadline, NEVER a fixed TTL (task timeouts are unbounded)
   caps: z.array(z.string()), // 'progress' | 'enqueue:x' | 'kv:p/' |
 }); // 'stream:t' | 'artifacts' | 'status:read'
 ```
@@ -562,9 +597,30 @@ export const CapabilityRecordV1 = z.looseObject({
 6. No identification fallback: mutating verbs accept the token only.
 7. Audit log per request — enabling later tightening of declared scopes to observed usage.
 
-T2 changes only delivery: env carries the **worker-identity bootstrap** token; each dispatch frame
-carries a fresh attempt token (env is fixed at spawn; a duplex worker serves many attempts). RFC
-8693 token exchange is the reserved delegation verb.
+**Bootstrap-token binding (normative):** bootstrap tokens are **per-execution-attempt**, minted with
+the attempt token and invalidated with it — never per-boot or shared across tasks (the router's
+per-boot loopback bearer at the transport layer is a separate, additive gate). The credential
+exchange (`GET /v1/credentials`) is subject to the same verification steps 1–4 (including step 3's
+liveness + fencing) and resolves **exclusively to the presenting execution's
+`(executionId, attempt)` record server-side** — no client-supplied identity is accepted. A task can
+therefore never obtain another task's capabilities, even holding a same-uid-read env pointer.
+Conformance case: `t1.citizen.cross_task_credentials_rejected`.
+
+**Credential refresh (normative):** because `exp` follows the deadline, refresh is only needed when
+the engine extends a deadline. The extension delivery carries it: a `pong` frame extending
+`deadlineMs` MAY carry a rotated attempt token (`pong.taskToken`, additive — Temporal's
+heartbeat-carried-credentials shape); T1 tasks without a control channel re-fetch via
+`GET /v1/credentials` (that refresh is this route's lifecycle purpose), which re-runs the fencing
+check and returns the current attempt's material only.
+
+**Token invalidation triggers (normative, exhaustive):** retry/re-dispatch of the execution, lease
+requeue after a missed-ping budget, deadline kill, cancel finalization, and terminal-outcome
+persistence. Invalidation is never keyed on `behavior: RETRY` alone.
+
+T2 changes only delivery: env carries the **worker-identity bootstrap** token (per-worker-process,
+identity-scoped: it authorizes `init` and credential fetch for attempts currently leased to that
+worker, nothing else); each dispatch frame carries a fresh attempt token (env is fixed at spawn; a
+duplex worker serves many attempts). RFC 8693 token exchange is the reserved delegation verb.
 
 ### Lifecycle and error semantics
 
@@ -573,26 +629,62 @@ Attempt state machine (engine-side, persisted vocabulary in parentheses):
 ```text
 dispatched ──▶ running ──▶ completed        (completed)
                  │  │
-                 │  ├─ result{error,behavior:RETRY} ─▶ retrying → new attempt (failed + retry)
+                 │  ├─ result{error,behavior:RETRY} ─▶ retrying → new attempt (failed + retry —
+                 │  │                                   transition reserved until retry-driver)
                  │  ├─ result{error,behavior:FAIL}  ─▶ failed
-                 │  ├─ result{error,behavior:PAUSE} ─▶ paused        (park for operator)
+                 │  ├─ result{error,behavior:PAUSE} ─▶ paused        (park for operator; resume
+                 │  │                                   verb reserved until retry-driver)
                  │  ├─ result{cancelled}            ─▶ cancelled
                  │  ├─ deadline exceeded            ─▶ timeout       (grace → SIGKILL ladder)
                  │  └─ exit w/o terminal frame      ─▶ unknown-failure (exitCode as detail)
 ```
 
 - Terminal-frame discipline: exactly one `result` per attempt; extras are protocol violations (first
-  wins, violation logged). Exit-without-terminal is **engine-synthesized** `unknown-failure` — never
-  inferred success/failure soup (Restate, double-attested).
-- Retry is decided by the **engine** (budget + per-`errtype` disposition hook), informed by the task
-  (`behavior`, `nextRetryDelayMs`). Protocol violations are never retry-eligible by default.
+  wins, `Protocol.TerminalDuplicate` logged, ignored). Exit-without-terminal is
+  **engine-synthesized** `unknown-failure` — never inferred success/failure soup (Restate,
+  double-attested).
+- **First-terminal-wins across both terminal channels**: the in-band `result` frame and the citizen
+  `POST /v1/executions/:id/complete|fail` API are the two ways an attempt can end; whichever the
+  engine records first is the outcome, and the later channel is rejected with
+  `Protocol.TerminalDuplicate`. The execution-state transition MUST be an atomic compare-and-swap on
+  the current status — never a read-modify-write merge.
+- **Retry semantics in v1 (normative scope):** the vocabulary is fully specified; its executor is
+  staged. `behavior` is consumed in v1 for outcome classification and persisted disposition
+  (`failed` vs `paused`), and `attempt`/`retry.*` are propagated and exposed — but **no component in
+  waves W1–W5 executes `behavior: RETRY`**: the retry driver (behavior consumption,
+  `retry.remaining` accounting, attempt increment, `nextRetryDelayMs` scheduling,
+  checkpoint-into-next-envelope, `paused` resume verb) is the named **post-v1 `retry-driver` work
+  item** outside the five waves. Until it lands: `behavior: RETRY` persists as `failed` with the
+  retry intent recorded, `retry.remaining` is a reserved field, `attempt` increments only on queue
+  redelivery (below), and the `retrying`/`paused → resume` transitions in the state machine are
+  reserved. A host MUST NOT invent its own retry loop for `behavior: RETRY`; SDK authors MUST NOT
+  assume RETRY re-executes. When the driver lands, retry is decided by the **engine** (budget +
+  per-`errtype` disposition hook), informed by the task. Protocol violations are never
+  retry-eligible by default.
+- **Attempt arithmetic (normative):** attempts are 0-based; `attempt` increments on **every dispatch
+  of the same logical execution** — queue redelivery included, retry-driver re-dispatch included.
+  `retry.remaining` is the budget left _after_ the current attempt.
+- **Delivery semantics (normative):** dispatch is **at-least-once** across engine crashes. The
+  terminal frame is best-effort until persisted: if the engine crashes between reading a terminal
+  frame and persisting the outcome, the attempt is re-delivered and the task re-runs. Tasks with
+  external side effects SHOULD pass `idempotencyKey` on citizen enqueue (their citizen-surface
+  writes are durable and survive the re-run). W3 additionally persists the accepted terminal frame's
+  hash before process teardown to shrink the crash window.
 - Cancellation ladder: `cancel` frame (T1+, acked 3.5 ms p50 Go / 30 ms python3 — K5) → SIGTERM at
-  `graceMs` → SIGKILL. T0 tasks are signal-only **by design** (a non-duplex channel provably cannot
-  deliver in-band cancel mid-flight — Restate request/response precedent).
+  `graceMs` (**default 5000 ms** when the frame omits it) → SIGKILL **2000 ms** after SIGTERM. The
+  deadline path reuses the same SIGTERM→SIGKILL tail. T0 tasks are signal-only **by design** (a
+  non-duplex channel provably cannot deliver in-band cancel mid-flight — Restate request/response
+  precedent).
+- **Drain rule (normative):** before finalizing any kill-initiated outcome (deadline, cancel), the
+  engine MUST drain the task channel to EOF. A valid terminal frame read during the drain **wins**
+  over the synthesized `timeout`/`cancelled` outcome — a task that finished in time is `completed`
+  even if the engine's kill raced its buffered result.
 - Deadlines are absolute epoch ms; the engine delivers extensions via `pong.deadlineMs` (Hatchet
   RefreshTimeout, additive).
-- Checkpoints: ≤ 8 KB rides `retry.checkpoint` in the next envelope; 8–256 KB via inbound frame (T2)
-  or artifact ref (T1); > 256 KB artifacts-only (T-5 caps, protocol constants).
+- Checkpoints (per-transport size ladder): ≤ 8 KB rides `retry.checkpoint` in the next envelope;
+  8–256 KB via the T2 peer channel (whose frame bound is `PEER_FRAME_MAX_BYTES` = 256 KiB — the
+  stdio 4096-byte budget does not apply to the peer transport) or artifact ref (T1); > 256 KB
+  artifacts-only (T-5 caps, protocol constants).
 
 ### T2 — long-lived worker mode
 
@@ -602,11 +694,19 @@ specifies:
 
 1. `init` handshake: worker sends `hello { pv, capabilities: string[] }`; engine replies with
    accepted capabilities (LSP semantics: unknown optional notifications ignored; unknown requests
-   get structured `MethodNotFound`). **Version negotiation**: engine declares `pv`; worker echoes;
-   no echo ⇒ T0/T1 detection. The version registry carries a `yanked` bit.
-2. Dispatch: each task is an envelope frame with a fresh attempt token.
+   get structured `MethodNotFound`). **Version negotiation**: engine declares `pv`; worker echoes.
+   **Detection timeout (normative): 2000 ms** — no `hello` within it ⇒ the process is demoted to
+   T0/T1 semantics for its lifetime (no dispatch is sent during detection). The zombie rule below
+   applies to a worker that _starts_ `init` and fails it — silence is demotion, failure is death.
+   The version registry carries a `yanked` bit.
+2. Dispatch: each task is an envelope frame with a fresh attempt token. **Frame↔attempt binding
+   (normative):** the oRPC `{i,t,p}` correlation id of the dispatch frame binds every subsequent
+   frame exchanged under it to that dispatch's `(executionId, attempt)` — this is how a duplex
+   channel multiplexing many attempts fences a stale attempt's frames (the task-channel analogue of
+   verification step 3).
 3. Liveness: `ping`/`pong` with control bits; missed-ping budget (4×15 s default) marks the worker
-   suspect and re-queues its leases.
+   suspect and re-queues its leases (see Terminology; lease requeue invalidates the affected attempt
+   tokens — a GC-paused worker that wakes later holds only dead credentials).
 4. Shutdown: two-phase `shutdown` → drain → exit-0 witness; **zombie rule** (BullMQ): a worker that
    fails `init` must exit, be killed, and never be pooled; released back to a pool only if
    verifiably alive.
@@ -620,7 +720,9 @@ the same peer shape over a different channel).
   set `t0.*` ∪ … ∪ `tN.*`). D-register seeds the first fix-gate cases:
   `t0.result.log_line_not_hijacked` (D-3), `t0.env.no_supervisor_inheritance` (D-9),
   `t1.cancel.acked_during_blocking_compute` (D-6/K5), `t1.exit.timeout_status_distinct` (D-7/D-8),
-  `t1.trace.envelope_context_survives_queue` (D-1).
+  `t1.trace.envelope_context_survives_queue` (D-1), `t1.citizen.cross_task_credentials_rejected`
+  (bootstrap-token binding), `t1.env.envelope_within_os_bounds` (the `ENVELOPE_MAX_BYTES` spill rule
+  against the Windows env-block and Linux `MAX_ARG_STRLEN` limits).
 - **Dual verdict** per case: `behavior` + `behaviorExit`
   (OK/NON-STRICT/FAILED/UNIMPLEMENTED/INFORMATIONAL) — the exit axis is where D-6/7/8 lived.
 - **Mode inversion**: `deno task conformance:tasks -- --testee-task "<cmd>"` (reference host drives
@@ -628,7 +730,10 @@ the same peer shape over a different channel).
   (reference task drives a host implementation) — only the inversion gates the host-side defects.
 - The capability matrix is **generated** from verdicts (double-indexed JSON + JUnit for CI);
   declared-vs-probed-vs-observed drift is a first-class finding. Tier N is achieved iff all
-  non-excluded `t0..tN.*` cases pass. CI: PR lane runs t0/t1 + host inversion; nightly runs the full
+  non-excluded `t0..tN.*` cases pass. **Exclusion authority (normative):** a case is excluded only
+  by observed capability absence in the generated matrix (the driver probed and the capability is
+  not present) — a testee's own declaration or assertion never excludes a case, so a testee cannot
+  self-exclude its way to a tier. CI: PR lane runs t0/t1 + host inversion; nightly runs the full
   testee×tier×version matrix with an N/N-1 version window.
 
 ### Extension model
@@ -649,36 +754,43 @@ the same peer shape over a different channel).
 
 ### Edge cases (normative resolutions)
 
-| Case                                                      | Resolution                                                                                                                   |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Crash mid-frame (partial sentinel span at EOF)            | span counted `malformed-sentinel`; attempt ends `unknown-failure` (no terminal frame)                                        |
-| Duplicate `result` frames                                 | first wins; subsequent ⇒ `Protocol.TerminalMissing` violation logged, ignored                                                |
-| `result` frame + non-zero exit                            | frame wins (it is the contract); exit code recorded as corroborating detail                                                  |
-| Log line containing the exact sentinel + valid frame JSON | indistinguishable by design (in-band framing residual); documented; binary-log-heavy tasks should use T2/socket transport    |
-| Frame > `FRAME_MAX_BYTES`                                 | overflow ⇒ logged as `Protocol.FrameOverflow`, content demoted to log; writers must chunk via progress `detail` or artifacts |
-| Queue redelivery races a live attempt                     | attempt tokens fence: the stale attempt's mutations are rejected at verification step 3                                      |
-| Clock skew on absolute deadlines                          | deadlines are host-authored and host-enforced; tasks treat them as advisory; skew cannot extend a lease                      |
-| Malformed `traceparent`                                   | ignored, never fatal (W3C rule); execution proceeds untraced                                                                 |
-| `payloadSchema` validation failure                        | dispatch fails **before spawn** with `Protocol.BadEnvelope` (`behavior: FAIL`) — an authoring error, not a retryable fault   |
-| T0 task that emits no frames and no JSON line             | `outcome: ok` with `value: null` iff exit 0 (today's semantics, preserved verbatim)                                          |
+| Case                                                      | Resolution                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Crash mid-frame (partial sentinel span at EOF)            | span counted `malformed-sentinel`; attempt ends `unknown-failure` (no terminal frame)                                                                                                                                                                                                                                                                                                                                                               |
+| Duplicate `result` frames                                 | first wins; subsequent ⇒ `Protocol.TerminalMissing` violation logged, ignored                                                                                                                                                                                                                                                                                                                                                                       |
+| `result` frame + non-zero exit                            | frame wins (it is the contract); exit code recorded as corroborating detail                                                                                                                                                                                                                                                                                                                                                                         |
+| Log line containing the exact sentinel + valid frame JSON | indistinguishable by design (in-band framing residual); documented; binary-log-heavy tasks should use T2/socket transport                                                                                                                                                                                                                                                                                                                           |
+| Non-terminal frame > transport frame budget               | overflow ⇒ logged as `Protocol.FrameOverflow`, content demoted to log; writers chunk via progress `detail` or artifacts                                                                                                                                                                                                                                                                                                                             |
+| `ok` result larger than `RESULT_MAX_IN_FRAME`             | MUST use the detached-result route (`valueRef` → `NETSCRIPT_RESULT_PATH` file or artifact ref); an oversize inline terminal frame from a non-compliant writer overflows like any frame and the attempt ends `unknown-failure` — which is why shims enforce the spill client-side                                                                                                                                                                    |
+| Queue redelivery of a live/incomplete execution           | redelivery **reuses the `executionId`** and increments `attempt`; the prior attempt's tokens (attempt + bootstrap) are invalidated at that moment. The queue idempotency claim (pending claim ⇒ skip) remains the normative first barrier against duplicate concurrent runs; where a redelivered attempt does start, fencing holds because both attempts share one execution record — there is never a second record for the same logical execution |
+| Fenced-out attempt inside its kill grace window           | citizen-surface mutations are **absolutely rejected** (verification step 3); task-channel output is accepted as diagnostics (logs) only — its frames can no longer change the outcome                                                                                                                                                                                                                                                               |
+| Race between `result` frame and completion API            | first-terminal-wins across both channels (atomic CAS); the later terminal is rejected with `Protocol.TerminalDuplicate`                                                                                                                                                                                                                                                                                                                             |
+| Clock skew on absolute deadlines                          | deadlines are host-authored and host-enforced; tasks treat them as advisory; skew cannot extend a lease                                                                                                                                                                                                                                                                                                                                             |
+| Malformed `traceparent`                                   | ignored, never fatal (W3C rule); execution proceeds untraced                                                                                                                                                                                                                                                                                                                                                                                        |
+| `payloadSchema` validation failure                        | dispatch fails **before spawn** with `Protocol.BadEnvelope` (`behavior: FAIL`) — an authoring error, not a retryable fault                                                                                                                                                                                                                                                                                                                          |
+| `resultSchema` validation failure                         | attempt ends `failed` with `Protocol.BadResult` (`behavior: FAIL` — authoring error, never retry-eligible; mirrors the payload rule); raw value kept in `resultRaw`. Validation applies **only when the definition declares a schema** — adding one later never retroactively fails schema-less legacy output                                                                                                                                       |
+| T0 task that emits no frames and no JSON line             | `outcome: ok` with `value: null` iff exit 0 (today's semantics, preserved verbatim)                                                                                                                                                                                                                                                                                                                                                                 |
 
 ### Staged implementation plan and issue decomposition
 
 Each wave is one run/PR with its own gates; the protocol core (schemas/demux/env/ports) lands first
 and is consumed incrementally. Bars cite the spike numbers they must reproduce.
 
-| Wave                     | Scope                                                                                                                                     | Retires                             | Acceptance bar                                                                                                                 |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| W1 `protocol-core`       | `protocol/` module (schemas, frames, demux, env, ports, errors, versions) + unit/property tests; no engine wiring                         | —                                   | K1 demux corpus replayed as unit fixtures: 200/200 frames, misroute 0; fmt/lint/quality/arch gates                             |
-| W2 `dispatch-context`    | options threading (D-1/D-2/D-5 seams), `constructTaskEnv`, envelope emission, `withTaskProtocol` decorator mounted; T0 fallback preserved | D-1, D-2, D-5, D-9                  | K4 bar re-run in-plugin: ≤1.0 ms exec-wall delta on the Go subject; `t0.*` conformance green incl. `no_supervisor_inheritance` |
-| W3 `structured-outcomes` | demux in `interpretOutcome`, outcome union, status vocabulary, abort/kill ladder, error cleanse caps                                      | D-3, D-4, D-6, D-7, D-8, D-13, D-14 | `t1.*` result/exit cases green; K5 cancel bar (<100 ms p95) reproduced in-plugin                                               |
-| W4 `citizen-surface`     | citizen contracts + router, token store (mint/verify/fence), progress mutation + throttle + stream chain, `reportProgress` rewire         | D-12                                | K6 chain re-measured **in-plugin incl. SSE** (replica caveat discharged); K3 auth cases green; scoped-KV jail property tests   |
-| W5 `t2-worker`           | peer channel, init/negotiation, ping control, two-phase shutdown, pool integration with #1684                                             | —                                   | `t2.*` cases green; zombie-rule fault injection; soak: 24 h worker, zero leaked processes (`agentic:leak-check` clean)         |
+| Wave                     | Scope                                                                                                                                     | Retires                                                         | Acceptance bar                                                                                                                                                                                                                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W1 `protocol-core`       | `protocol/` module (schemas, frames, demux, env, ports, errors, versions) + unit/property tests; no engine wiring                         | —                                                               | K1 demux corpus replayed as unit fixtures: 200/200 frames, misroute 0; fmt/lint/quality/arch gates — incl. confirming `arch:check` tolerates the `testing/` conformance module in a published package (auth-core keeps testing utilities off the public surface; follow that precedent) |
+| W2 `dispatch-context`    | options threading (D-1/D-2/D-5 seams), `constructTaskEnv`, envelope emission, `withTaskProtocol` decorator mounted; T0 fallback preserved | D-1, D-2, D-9; D-5 (propagation/exposure half — see note below) | K4 bar re-run in-plugin: ≤1.0 ms exec-wall delta on the Go subject (c=1 statement); `t0.*` conformance green incl. `no_supervisor_inheritance`; loopback + env-delivery measured on a Windows/Aspire host (discharges R5-D-5 and exercises the OS env bounds)                           |
+| W3 `structured-outcomes` | demux in `interpretOutcome`, outcome union, status vocabulary, abort/kill ladder, error cleanse caps                                      | D-3, D-4, D-6, D-7, D-8, D-13, D-14                             | `t1.*` result/exit cases green; K5 cancel bar (<100 ms p95) reproduced in-plugin                                                                                                                                                                                                        |
+| W4 `citizen-surface`     | citizen contracts + router, token store (mint/verify/fence), progress mutation + throttle + stream chain, `reportProgress` rewire         | D-12                                                            | K6 chain re-measured **in-plugin incl. SSE** at the normative `PROGRESS_FLUSH_MS` = 100 ms constant, against the same ≤500 ms p95 bar (replica caveat discharged); K3 auth cases green incl. `cross_task_credentials_rejected`; scoped-KV jail property tests                           |
+| W5 `t2-worker`           | peer channel, init/negotiation, ping control, two-phase shutdown, pool integration with #1684                                             | —                                                               | `t2.*` cases green; zombie-rule fault injection; soak: 24 h worker, zero leaked processes (`agentic:leak-check` clean)                                                                                                                                                                  |
 
 Deliberately outside the five-wave retirement: **D-10** (unbounded runner stdout buffering — the
 frame cap and artifacts route reduce exposure, but the buffer-capping fix itself is a
-supervisor-side engine bug) and **D-11** (slot accounting — out-of-scope register item 10). Both
-remain tracked engine issues.
+supervisor-side engine bug), **D-11** (slot accounting — out-of-scope register item 10), and the
+**increment-on-retry half of D-5**, which lands with the named post-v1 **`retry-driver`** work item
+(behavior consumption, retry budget, attempt increment on driver re-dispatch, `nextRetryDelayMs`
+scheduling, checkpoint handoff, `paused` resume verb — see "Retry semantics in v1" in Lifecycle).
+All remain tracked engine issues/work items.
 
 Cross-wave: conformance harness grows with each wave (it is each wave's acceptance instrument);
 shims (`plugins/workers/shims/*`) land with W3 and are CI-gated from then on; the D-register issues
@@ -690,9 +802,12 @@ are filed at RFC Discussion so waves close them with `Fixes #N`.
    ongoing maintenance the two-env-var contract never needed. Mitigation: the conformance suite is
    the contract; shims are deliberately ~100 lines and CI-gated, not published SDKs.
 2. **In-band framing residual**: a task that deliberately echoes raw bytes containing the exact
-   sentinel + valid frame JSON forges frames. Accepted and documented (NUL never occurs in text
-   logs); T2/socket is the escape hatch. Every in-band protocol in the corpus carries the same
-   residual.
+   sentinel + valid frame JSON forges frames — an **integrity** residual, not mere noise (worst
+   case: a forged `result{ok}` flips a failing task; the forger controls only its own stdout, so the
+   blast radius is its own outcome). Accepted and documented (NUL never occurs in text logs);
+   T2/socket is the escape hatch. Every in-band protocol in the corpus carries the same residual.
+   Related cost note: sentinel demux is CPU-bound at ~127 MB/s per core — log-heavy tasks at
+   GB/s-class output rates spend a measurable fraction of a core on demux.
 3. **The supervisor becomes an HTTP server per host** (loopback only, bearer-gated, per-task
    net-scoped — measured; but still new operational surface and new audit duty).
 4. **T1 in-band cancel needs a reader thread** in the task — a real per-language shim burden;
@@ -768,8 +883,6 @@ baselines.
   not bootable in-container). W4 discharges the caveat, SSE included.
 - T2 conformance-case granularity (one long-lived session hosting many cases vs process-per-case) —
   no corpus precedent; decide in W5's plan.
-- Grace-window semantics for fenced-out attempts (absolute rejection vs bounded final diagnostic
-  flush; K8s's 60 s deletion grace is the nearest analogue).
 - Exact `capabilities` string grammar for KV prefixes and enqueue patterns (glob vs literal prefix)
   — decide in W4 with the jail property tests.
 - UNVERIFIED register carried from research (research.md §7): Restate V5–V7 prose restatements,
@@ -796,14 +909,14 @@ baselines.
 All spikes pre-registered in `plan.md` L8 with iff-branched criteria; **no fallback branch fired**.
 Script-generated detail: `results/results-spikes.md`; raw: `results/raw/k*.jsonl`.
 
-| Spike | Question                                     | Result (criterion)                                                                                                                                              |
-| ----- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| K1    | Frame transport under adversarial logs       | 200/200 frames, 10/10 reps, Go+python3, 1.25 GB/rep hostile output, ~127 MB/s; sentinel-scan rule derived; fd-3 infeasible on Deno host (bar: misroute 0 — met) |
-| K2    | Token delivery + constructed env             | allowlist exact, canary secret contained, `/proc` environ 0400; stdin-frame verified (bar: same-uid-only exposure — met)                                        |
-| K3    | Loopback transport                           | sandboxed deno 0.49 ms p50 under exact-port scoping; wrong scope NotCapable-denied; python3 0.67 ms; UDS demoted (bar: sandbox-reachable — met)                 |
-| K4    | Protocol overhead through REAL dispatch path | +0.41 ms exec-wall worst case (bar ≤1.0); host validate+demux 0.06–0.10 ms (bar ≤0.5); e2e c=16 delta negative (bar ≤5%); 1920/1920, exact result identity      |
-| K5    | In-band cancel during blocking compute       | Go 3.5/5.8 ms p50/p95, python3 30.2/43.1 ms, 60/60 cancelled, no special flags (bar <100 ms p95 — met)                                                          |
-| K6    | Progress chain (replica)                     | 93.9 ms p95 steady @10 ev/s (bar ≤500); 9.5× burst coalescing; 82–84 B bounded record; MEASURED-ON-REPLICA (W4 discharges)                                      |
+| Spike | Question                                     | Result (criterion)                                                                                                                                                                                                                                                                                                                   |
+| ----- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| K1    | Frame transport under adversarial logs       | 200/200 frames, 10/10 reps, Go+python3, 1.25 GB/rep hostile output, ~127 MB/s; sentinel-scan rule derived; fd-3 infeasible on Deno host (bar: misroute 0 — met)                                                                                                                                                                      |
+| K2    | Token delivery + constructed env             | allowlist exact, canary secret contained, `/proc` environ 0400; stdin-frame verified (bar: same-uid-only exposure — met)                                                                                                                                                                                                             |
+| K3    | Loopback transport                           | sandboxed deno 0.49 ms p50 under exact-port scoping; wrong scope NotCapable-denied; python3 0.67 ms; UDS demoted (bar: sandbox-reachable — met)                                                                                                                                                                                      |
+| K4    | Protocol overhead through REAL dispatch path | host validate+demux 0.06–0.10 ms p50 (bar ≤0.5 — the tight, causal number); exec-wall delta within noise, ≤ ~1 ms at 95% CI on the c=1 series (point +0.41 ms, CI contains zero; bar ≤1.0 is a c=1 statement); c=16 deltas not statistically separable (noise-dominated, not an improvement claim); 1920/1920, exact result identity |
+| K5    | In-band cancel during blocking compute       | Go 3.5/5.8 ms p50/p95, python3 30.2/43.1 ms, 60/60 cancelled, no special flags (bar <100 ms p95 — met)                                                                                                                                                                                                                               |
+| K6    | Progress chain (replica)                     | 93.9 ms p95 steady @10 ev/s (bar ≤500); 9.5× burst coalescing; 82–84 B bounded record; MEASURED-ON-REPLICA (W4 discharges)                                                                                                                                                                                                           |
 
 Engine audit: `research-sources/netscript-engine-audit.md` (defect register D-1..D-14, file:line).
 Research synthesis + tension register + UNVERIFIED register: `research.md`.

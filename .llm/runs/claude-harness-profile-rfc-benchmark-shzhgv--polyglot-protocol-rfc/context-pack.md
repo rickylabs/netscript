@@ -1,12 +1,13 @@
 # Context pack — polyglot-protocol-rfc (run 5)
 
-Resume point: **S10 revision cycle — owner review R5-D-7 rejected the S9 report-shaped RFC;
-S10 rewrote it as a full architectural design (803 lines: wire Zod schemas, ports, package
-map, per-seam integration table, five-wave plan). IMPL-EVAL history: PASS on 70d101a
-(superseded, covered pre-revision head only) → re-dispatch on 45b134a returned FAIL_FIX
-(4 doc fixes: corpus count 34→32, this context-pack refresh, PR body staleness, full-path
-seam cite) → fixes applied, cycle-3 re-dispatch requested. Close routine re-runs on the
-cycle-3 verdict; owner's Codex Sol Max adversarial pass follows the re-eval.**
+Resume point: **S11 complete — awaiting re-verification verdict on the S11 head. Chain: S10
+redesign (owner review R5-D-7) → IMPL-EVAL cycles 2/3 FAIL_FIX (doc fixes applied; two-failure
+limit → owner escalation) → owner-commissioned adversarial pass (qwen3.8-max via OpenHands after
+the Grok allowlist rejection, R5-D-8): of-record attempt 1 CONCERNS/FAIL_FIX (4 MAJOR + 4 MINOR)
+plus supplementary attempt 2 (novel A2-A5, M1-M7) — all supervisor-verified, consolidated, and
+owner-approved ("approved proceed") → S11 applied the full set (RFC 803→922 lines, fmt-clean).
+Close routine on a PASS verdict: evaluate.md record, DoD tick citing the escalation ruling + the
+adversarial chain + owner approval, status:ready-merge, bookkeeping push to re-green close-gate.**
 
 - Branch `claude/harness-profile-rfc-benchmark-shzhgv` restarted on post-#1686 main; draft PR
   **#1687** (labels type:docs area:plugins area:docs rfc ci:skip-e2e ci:skip-scaffold
