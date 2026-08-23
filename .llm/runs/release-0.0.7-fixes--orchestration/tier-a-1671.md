@@ -909,3 +909,91 @@ touches only the generated path, since the staleness is repo-wide and owned by `
 
 No merge, readiness flip, label, checkbox, metadata, or `#1348`/`#1466` mutation. No runtime lease. All
 probe work in disposable detached worktrees, all removed.
+
+---
+
+# Tier-A — S6 at `bcc9f393d993cd5468015c883c8b0dc6a5b6dc62` (PR #1692). **PASS**
+
+| Field | Value |
+| --- | --- |
+| Head | `bcc9f393d993cd5468015c883c8b0dc6a5b6dc62` — local == remote == PR `headRefOid`, clean, draft, sole `status:impl` |
+| Base | `main@61bfd858d20f3bf61e7ee45b5646537af567f247` (the #1691 merge) |
+| PR | **#1692** — replacement for #1671, `Closes #1350` |
+| Commits | `b427e0354 chore(mcp): refresh SDK export signatures`; `bcc9f393d docs(harness): record S6 export corpus receipt` |
+| Author route | **observed** `openai` · `gpt-5.6-sol` · **high**, thread `01a006f3-…` |
+| Verdict | **PASS** |
+
+**Route correction.** This topic previously reported the S5/S6 resume as inheriting `medium`. The
+observed effort is **high**. The earlier claim was asserted without checking `agentic:codex-status`;
+`high` is the accurate record.
+
+## Scope — exact
+
+S6 touches **4** paths: one product (`export-surface-corpus.generated.ts`) and three existing run
+artifacts. **Exactly one product path**, as contracted. Zero suppressions or unsafe casts in added lines.
+
+Full leaf surface against new main is **7** paths: four source/test
+(`contract-primitives.ts`, `errors.ts`, `service-client.ts`, `readme-doctest_test.ts`), one derived
+artifact (the corpus), and two `docs/site/services-sdk/` pages landed at S3. `public/mod.ts` untouched;
+no `docs/site/reference/` page; no `#1348`/`#1466` mutation.
+
+## The corpus artifact — verified by identity, not by assertion
+
+The author's committed corpus is **byte-identical to the artifact Tier-A independently generated** —
+sha256 `f7bbc8925481e8682f84f9057263387030838e6bc7ee366c56e98a9b2829f904` on both sides. Not "the
+numbers agree": the same file.
+
+Decoded delta on the committed object (`9cdba6321` → `b427e0354`):
+
+| | Result |
+| --- | --- |
+| Added exports | **0** |
+| Removed exports | **0** |
+| Changed signatures | **5**, all `@netscript/sdk`: `SafeFailure`, `SafeResult`, `ServiceClientMethod`, `isDefinedError`, `safe` |
+| `schemaVersion` / `frameworkVersion` / `surfaces` | unchanged |
+
+That is the coordinator's original criterion — only already-approved public signature changes, no new
+exports — satisfied **at the commit**, where at `2d806b245` it failed because nine foreign exports rode
+along. #1691 removed those from the equation; this delta is purely leaf-owned.
+
+## Gates — all executed at this exact head
+
+| Gate | Result |
+| --- | --- |
+| `check:mcp-export-corpus` | **PASS exit 0** — was exit 1; `symbolCount 7611` |
+| `contracts` doc-lint (4 entrypoints) | **9** — base 9, **exact parity** |
+| `sdk` doc-lint (all entrypoints) | **3** — base 3, **exact parity, 0 new** |
+| `baseContract` private refs | **only `oc`**, the pinned baseline reference |
+| `docs:exports-drift` | **PASS exit 0** |
+| `check:netscript-jsr-specifiers` | **PASS** — scanned 2361, allowances 1, ranges 0, failures 0 |
+| `deno check` `contracts/mod.ts`, `contracts/crud.ts`, `sdk/mod.ts` | **0 errors** |
+| `packages/contracts` + `packages/sdk` suites | **78 / 0** |
+| `packages/mcp` suites | **136 / 0** |
+| `deno publish --dry-run` contracts / sdk | **exit 0 / exit 0** (slow-types) |
+| lint contracts / sdk | 0 / 0 |
+| fmt contracts / sdk | 0 findings, **0 failed batches** |
+
+**`docs:exports-drift` is now an executed receipt at the exact head**, not a reconstruction. Before the
+rebase the task did not exist in the leaf worktree (it arrived with #1666, which post-dated the old base
+`0ef48c2ec`), so it had to be run on `main` + the leaf's paths. Rebasing onto `61bfd858d` brought the
+task into the tree, so it runs natively. The docs lane flagged exactly this transition; it is
+re-confirmed here rather than carried over.
+
+## Known pre-existing red — attributed, not inherited
+
+The `packages/mcp` fmt/lint batch exits 1 with **0 findings**. Verified on the **pristine tree before any
+change in this lane** by reverting the file and re-running: identical behaviour. It is a tooling failure
+over a ~300 KB single-line generated file, not a formatting difference, and **not attributable to this
+leaf**. `packages/contracts` and `packages/sdk` fmt both report 0 findings and **0 failed batches**, so
+the leaf's own quality surface is clean.
+
+## Outcome
+
+**S6 Tier-A PASS at `bcc9f393d`.** The withheld gate set is discharged in full: JSR specifier guard,
+both publish dry-runs, `docs:exports-drift`, the export-corpus guard, and doc-lint parity in both
+packages. No gate remains `NOT_RUN`, and the single formerly-blocking red is now **green**.
+
+**IMPL-EVAL is now requested** at this exact head — the head is final, the corpus question is settled,
+and no authorized change remains that would move it, so a verdict bound here cannot be stranded.
+
+No merge, readiness flip, label, checkbox, metadata, or `#1348`/`#1466` mutation. No runtime lease.
