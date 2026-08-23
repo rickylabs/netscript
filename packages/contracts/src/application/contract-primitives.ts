@@ -3,10 +3,18 @@ import type {
   AnySchema,
   ContractProcedureBuilderWithInputOutput,
   ContractProcedureBuilderWithOutput,
-  ErrorMap,
   MergedErrorMap,
   Schema,
 } from '@orpc/contract';
+import type { ContractObjectSchema } from '../domain/schema-types.ts';
+import type {
+  ForbiddenError,
+  NotFoundError,
+  RateLimitError,
+  ServiceUnavailableError,
+  UnauthorizedError,
+  ValidationError,
+} from '../domain/schemas.ts';
 import {
   forbiddenErrorSchema,
   notFoundErrorSchema,
@@ -16,9 +24,40 @@ import {
   validationErrorSchema,
 } from '../domain/schemas.ts';
 
-type OrpcErrorMap = Parameters<typeof oc.errors>[0];
+type CommonErrorMap = Readonly<{
+  NOT_FOUND: Readonly<{
+    status: 404;
+    message: 'Resource not found';
+    data: typeof notFoundErrorSchema;
+  }>;
+  VALIDATION_ERROR: Readonly<{
+    status: 422;
+    message: 'Validation failed';
+    data: typeof validationErrorSchema;
+  }>;
+  UNAUTHORIZED: Readonly<{
+    status: 401;
+    message: 'Authentication required';
+    data: typeof unauthorizedErrorSchema;
+  }>;
+  FORBIDDEN: Readonly<{
+    status: 403;
+    message: 'Access denied';
+    data: typeof forbiddenErrorSchema;
+  }>;
+  RATE_LIMITED: Readonly<{
+    status: 429;
+    message: 'Too many requests';
+    data: typeof rateLimitErrorSchema;
+  }>;
+  SERVICE_UNAVAILABLE: Readonly<{
+    status: 503;
+    message: 'Service temporarily unavailable';
+    data: typeof serviceUnavailableErrorSchema;
+  }>;
+}>;
 
-const commonErrorMap = {
+const commonErrorMap: CommonErrorMap = {
   NOT_FOUND: {
     status: 404,
     message: 'Resource not found',
@@ -49,7 +88,7 @@ const commonErrorMap = {
     message: 'Service temporarily unavailable',
     data: serviceUnavailableErrorSchema,
   },
-} as const satisfies OrpcErrorMap;
+};
 
 /**
  * Common oRPC contract primitive with NetScript's standard error map applied.
@@ -78,7 +117,54 @@ const commonErrorMap = {
  *   .output(z.object({ items: z.array(z.unknown()) }));
  * ```
  */
-export const baseContract: ReturnType<typeof oc.errors> = oc.errors(commonErrorMap);
+export const baseContract: ReturnType<
+  typeof oc.errors<
+    Readonly<{
+      NOT_FOUND: Readonly<
+        {
+          status: 404;
+          message: 'Resource not found';
+          data: ContractObjectSchema<NotFoundError, NotFoundError>;
+        }
+      >;
+      VALIDATION_ERROR: Readonly<
+        {
+          status: 422;
+          message: 'Validation failed';
+          data: ContractObjectSchema<ValidationError, ValidationError>;
+        }
+      >;
+      UNAUTHORIZED: Readonly<
+        {
+          status: 401;
+          message: 'Authentication required';
+          data: ContractObjectSchema<UnauthorizedError, UnauthorizedError>;
+        }
+      >;
+      FORBIDDEN: Readonly<
+        {
+          status: 403;
+          message: 'Access denied';
+          data: ContractObjectSchema<ForbiddenError, ForbiddenError>;
+        }
+      >;
+      RATE_LIMITED: Readonly<
+        {
+          status: 429;
+          message: 'Too many requests';
+          data: ContractObjectSchema<RateLimitError, RateLimitError>;
+        }
+      >;
+      SERVICE_UNAVAILABLE: Readonly<
+        {
+          status: 503;
+          message: 'Service temporarily unavailable';
+          data: ContractObjectSchema<ServiceUnavailableError, ServiceUnavailableError>;
+        }
+      >;
+    }>
+  >
+> = oc.errors(commonErrorMap);
 
 /**
  * Concrete type of {@link baseContract} — the real oRPC contract builder with
@@ -95,7 +181,7 @@ export type BaseContract = typeof baseContract;
  * vocabulary merged onto an empty map. Mirrors the `BaseErrors` alias used by
  * the first-party `@netscript/plugin-*-core` contract definitions.
  */
-export type BaseContractErrors = MergedErrorMap<Record<never, never>, ErrorMap>;
+export type BaseContractErrors = MergedErrorMap<Record<never, never>, typeof commonErrorMap>;
 
 /**
  * Sound type of a route built via
