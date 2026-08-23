@@ -5174,3 +5174,64 @@ Brief: `slices/impl-1355-f8.md`, staged at `/home/codex/ns1355-f8-brief.md`. Two
 compiler-proven, and the full prohibition set including attempt 7 and `scaffold.runtime`. The author
 runs only the focused deterministic file; this supervisor collects the four exact-head receipts after
 the explicit push.
+
+## 2026-08-23 — F8 implemented, corrected, and Tier-A ACCEPTED; green head reported
+
+Full review: `slices/tier-a-review-1355-f8.md`. Author brief: `slices/impl-1355-f8.md`.
+
+| Field | Value |
+| --- | --- |
+| Content head (attested by every gate) | `4f50b5a026120b5a3b0195fa1b6f495f08e2b46c` |
+| Final head (supervisor evidence only) | `388f2b642a0d6e0ece4e346ea60f857928409beb` |
+| PR #1664 | OPEN, **draft**, local == remote == PR |
+| Author | Codex `gpt-5.6-sol · high`, thread `01a004f9-f033-7592-a0bc-63927753fb43` |
+
+Dispatched to the original F8 author thread, which already owned the leaf worktree's sender —
+avoiding the `duplicate_sender_risk` that correctly refused a second sender there on 2026-08-15.
+Generator ≠ evaluator held (author ≠ Minimax M3); the supervisor neither authored nor self-certified.
+
+### Two slices, one returned
+
+`3299992e4` implemented the contract correctly and was still **returned**. All four contracted gates
+were `PASS` at that head and the named set recomputed `SUFFICIENT` — yet under
+`--root packages/cli/e2e` the probe had picked up a `prefer-const` occurrence (`:101`) and one `deno
+fmt` finding, both **clean at `20337441788`** under the identical command. `deno task lint` and
+`fmt:check` exclude `^(packages/(cli)|…)`, so CI and the contracted four could not have caught it.
+Green gates plus `SUFFICIENT` did not mean clean code.
+
+Returned rather than self-fixed: the author owns this worktree's commits, and a supervisor writing
+product bytes into an author-signed slice is the exact defect that cost this leaf a cycle on
+2026-08-15. `4f50b5a02` fixed it in 8 insertions / 10 deletions, source file only, with both
+diagnostic strings byte-identical and every contract row re-verified.
+
+### Evidence at `4f50b5a02`
+
+Focused probe file **25 passed / 0 failed**. `check`, `test` (4,240 passed / 0 failed),
+`publish-dry-run`, `arch-check`, `lint`, `fmt-check` all `PASS`; scoped lint/fmt on
+`packages/cli/e2e` both zero. Sufficiency recomputed over the **explicitly named** four-receipt
+attempt-2 set: `SUFFICIENT`, zero reasons, every receipt `gitHead == actualGitHead == 4f50b5a02`.
+No `any`, `deno-lint-ignore`, or `as unknown as` anywhere in the diff. Attempt-1 receipts retained
+append-only. Twelve receipts are supervisor-owned and committed under this supervisor's signature in
+`388f2b642`, not folded into an author commit.
+
+Carried, none blocking: **R1** `terminateBrowserProcess :448-449` still unbounded (F6-owned, out of
+scope, only now reachable); **R3** a 20 s bound on `Runtime.evaluate` narrows one theoretical
+slow-but-successful case, which is the intended trade; **R4** `pendingCommandCountForTest` is a
+contained test-only accessor — `e2e/` is excluded from the `@netscript/cli` publish set,
+`@netscript/cli-e2e` is `"publish": false`, and `e2e/mod.ts` does not re-export the probe.
+
+### Resource state
+
+No `scaffold.runtime`, browser, Aspire apphost, Docker container, or lease at any point. `docker ps
+-a` empty; no `apphost`/`chrome`/`chromium` process; the only Aspire processes are `aspire mcp start`
+MCP servers, not run-owned. The temporary baseline worktree used to prove the regression was created
+read-only at `20337441788`, removed, and pruned. All four quarantines, the six S5 attempt histories,
+`f6-test.json`, and `f7-test.json` untouched.
+
+### Handoff
+
+**Attempt 7 not granted and not requested** — prohibited for this leaf and not this supervisor's to
+grant. No merge, publish, readiness flip, relabel, or issue mutation. The green reviewed content head
+`4f50b5a02` is reported to the coordinator for the singleton runtime-lease decision; a later
+`scaffold.runtime` still requires a coordinator-owned lease and preflight at the immutable evidence
+head.
