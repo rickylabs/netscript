@@ -823,3 +823,71 @@ The two wrapper failures are the #1604/#1618 defect itself: the deliberately mal
 
 Property 2 is the one that had no baseline before this run, which is precisely how the top-level
 `exclude` defect survived two evaluation cycles undetected.
+
+## 2026-08-23 — #1663 S1 Tier-A slice review: PASS; supervisor sign-off at `4b988a381`
+
+| Field           | Value                                                                         |
+| --------------- | ----------------------------------------------------------------------------- |
+| Slice           | S1 — marker semantics, nearest-config batching, fixture normalization, barrel  |
+| Commit          | `4b988a381ea9278bcf1b1bc43cf73c0f8691d87a` (local = remote = PR head)          |
+| Author          | preserved Codex thread `01a004ec-…`, idle at review time, turn complete        |
+| Review method   | `git archive 4b988a381` copy under supervisor job tmp; checkout never touched  |
+
+### Bounds
+
+Eleven files: the **eight authorized S1 paths** plus three run artifacts. No ninth product path, no
+fourteenth surface path, no `plan-eval*` file touched, no `deno.lock` churn. Tree clean, pushed by
+explicit refspec, PR draft at `status:impl`.
+
+### Deltas against the baselines I measured before the slice landed
+
+| Property                             | Baseline `62811a9dd` (mine)          | After `4b988a381` (mine)                          |
+| ------------------------------------ | ------------------------------------ | -------------------------------------------------- |
+| Exact fmt wrapper, no extra flags    | **EXIT 1**, workspace parse crash    | **EXIT 0**, `filesSelected:114, batches:2, failedBatches:0, findings:0` |
+| Exact lint wrapper, no extra flags   | **EXIT 1**, identical crash          | **EXIT 0**, `114/2/0`, zero occurrences            |
+| `deno check` over all 5 doctor files | 5 `Check` lines, EXIT 0              | **5 `Check` lines, EXIT 0 — unchanged**            |
+| Scoped check wrapper on doctor dir   | not baselined                        | `filesSelected:5, batches:1, failedBatches:0`, EXIT 0 |
+
+The third row is the cycle-3 regression guard and it holds: the `fmt.exclude` key preserves check
+coverage where top-level `exclude` destroyed it. Both wrappers moved from crash to green without
+losing a single healthy file.
+
+### Traps — each checked, none tripped
+
+- **Exclusion key.** Top-level `exclude` is still exactly `[".llm/tmp/"]` — the doctor family was
+  **not** added there. It is appended to the existing `fmt.exclude` list, and the `fmt` block
+  contains exactly **one** `"exclude"` key, so nothing is shadowed. The `fmt:check` task's
+  doctor-family `--exclude` is gone. `lint.exclude` retains its doctor entry as planned.
+- **Child-only marker.** 115 → 114: exactly one file left selection. Proven positively rather than
+  by arithmetic — I injected a formatting defect into each of the four healthy TS files and the
+  wrapper reported **findings 4**, naming all four individually, then restored them byte-exactly
+  (`sha256 c1c2431f…d92fb`, equal to the committed blob). No parent-family or blanket skip.
+- **Malformed fixture.** `broken/deno.json` sha256 still
+  `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361` — byte-identical.
+- **Healthy fixture formatting-only.** Diff is quote style plus object expansion; parsed value is
+  still `{"plugins":["workers"]}`. No semantic, schema, or behavioral change.
+- **Barrel canonical.** I re-ran `deno task gen:assets-barrel` on my copy: the regenerated
+  `agent-tools.generated.ts` reproduces the committed bytes exactly (`sha256 d201847b…3cbe8`), which
+  proves regeneration rather than a hand edit, and **all six other generated assets are byte-identical**
+  — exactly `check:assets-barrel`'s passing condition.
+- **No escape hatches.** The wrapper and test diffs introduce no `deno-lint-ignore`, no `: any`, no
+  `as unknown as`/`as any`. A green wrapper bought with a suppression would have been review-blocking.
+
+### Gates I ran myself
+
+- Wrapper tests: **20 passed, 0 failed** (baseline 16 — four new, covering marked-skip,
+  unmarked-sibling selection, and batch membership). Includes a fail-closed case, "CLI fails when
+  Deno config excludes every selected lint target", which is the right guard for this change.
+- `deno task quality:scan` → `ok: true`, findings `[]`, **`allowCount: 7`** — unchanged, so S1 added
+  no new allowance to the #1276 T3 rail.
+- `deno task arch:check` → EXIT 0; warnings are pre-existing baseline (`export default`, A9, A13) on
+  paths S1 does not touch.
+
+The author's `[PHASE: IMPL]` comment matches my measurements on every number; nothing was reported
+that I could not reproduce.
+
+### Verdict
+
+**Tier-A PASS.** This sign-off commit is the supervisor's, not the implementer's — no lane
+self-certifies. S2 (the three cwd-independent CLI tests) is cleared to dispatch. `scaffold.runtime`
+remains coordinator-waived `n/a`; mandatory separate-session IMPL-EVAL still applies after S4.
