@@ -858,3 +858,13 @@ with `/remote-control`, preserving docs/internals/fixes/features ownership and l
 queues. Lanes may proceed concurrently. The primary coordinator remains GPT-5.6-SOL/high, never max.
 Aspire is empty, the runtime/evaluator/writer leases are free, and only proven stale Docker/worktree
 resources may be removed. Preserve and archive the unique dirty 0.0.6 harness worktree before removal.
+
+## Resume checkpoint — 2026-08-23T07:38:31Z
+
+Docs is exhausted/parked at pushed topic `2609a9d899`; internals is owner-blocked at pushed topic
+`11a33d95f` after #1663's third/final `FAIL_PLAN`. Features is active at topic `2f5ffa13ba` while the
+original #1664 author corrects only scoped lint/format cleanliness on top of product head
+`3299992e4`; the earlier receipts remain bound to that superseded content and runtime attempt 7 is
+not leased. Fixes is active at topic `e3c446fadc`; the initial #1671 public-export correction was
+execution-refuted and withdrawn, and an instantiated generic return annotation is the current
+bounded probe. Aspire and Docker are empty and the singleton runtime lease is free.

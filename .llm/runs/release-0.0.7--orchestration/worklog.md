@@ -1596,3 +1596,27 @@
   fmt/lint, and add an exact five-file check-coverage proof. This was the explicitly final cycle;
   #1663 returns to the owner boundary and no fourth evaluator is authorized. No product mutation
   occurred. #1664 and #1671 continue independently.
+
+## 2026-08-23T07:38:31Z — independent lanes advance; #1671 ruling corrected by execution
+
+- Docs completed its post-main compatibility audit at pushed topic head `2609a9d899`. The four RFC
+  merges touched only `.llm/` and `rfcs/`; no package, generated-reference, or CI compatibility
+  intake belongs to the frozen cut. The #1671 exports-drift gate passes on the existing six paths,
+  and the SDK reference rows remain accurate verbatim JSDoc. Docs is exhausted/parked without a
+  scope expansion.
+- Internals pushed terminal checkpoint `11a33d95f` and remains parked at the final #1663 owner
+  boundary. No fourth evaluator or product mutation was inferred.
+- #1664's canonical author pushed the two approved CDP paths at `3299992e4`. Four repository-wide
+  structured receipts passed, but fresh Tier-A found that the broad lint/format tasks omit the CLI
+  subtree and therefore cannot certify the changed source. The same author is applying only the
+  scoped cleanliness correction; the initial receipts remain evidence bound to their original head,
+  and attempt 7 remains prohibited until replacement exact-head receipts and second Tier-A pass.
+- Execution refuted the coordinator's initial #1671 public-export correction: contracts doc-lint
+  rises 10 to 21 and blocking `docs:exports-drift` reports three new public symbols, whose repair
+  would incorrectly publish oRPC's builder algebra as NetScript-owned. The ruling is withdrawn.
+  Fixes is now testing an instantiated generic return annotation that already preserves the exact
+  six-code union and returns the contracts lint distribution to baseline parity. No product leaf
+  mutation has occurred; withheld gates and IMPL-EVAL remain downstream of the completed probe and
+  fresh Tier-A.
+- Rechecked the singleton-runtime preflight: Aspire `[]`, Docker empty, no relevant AppHost/DCP,
+  browser, runtime-probe processes, or listeners. The lease remains free rather than pre-granted.

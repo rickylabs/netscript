@@ -817,3 +817,13 @@ implementation thread.
 - **Cleanup requires two kinds of proof:** stopped five-day-old run helpers with no Aspire resources
   are disposable; a dirty old worktree containing unique harness history is not. Archive its unique
   content to a recoverable branch before removing the registration.
+- **A public export is not a safe fix for a private-signature lint finding by default:** #1671's
+  executed probe doubled the contracts diagnostics and made `docs:exports-drift` correctly reject
+  three newly claimed symbols. Prefer a bounded public-signature spelling that preserves the type
+  contract without transferring ownership of a dependency's builder algebra; prove lint-baseline,
+  exact-union, and export-surface parity before authorizing product mutation.
+- **Repository-wide receipts do not certify paths their tasks exclude:** #1664's structured check,
+  test, publish, and architecture receipts were green while direct scoped lint/format review found a
+  changed CLI source defect. Exact-head evidence must include path-selection proof for the changed
+  subtree; regenerate receipts after the correction rather than carrying forward green JSON from an
+  earlier content head.
