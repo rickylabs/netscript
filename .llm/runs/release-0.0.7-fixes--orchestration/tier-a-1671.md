@@ -1275,3 +1275,22 @@ already cost this lane one PR.
 No readiness flip, no label change, no issue checkbox tick, no merge, no runtime lease. `#1350`'s seven
 boxes remain unticked — the mapping is evidence for the coordinator's close-gate, not a substitute for
 it. `#1348` / `#1466` untouched.
+
+## Fence correction — `2026-08-23`
+
+Coordinator contract requires the acceptance mapping's fenced block to carry the language
+`acceptance-evidence`, not `text`. Corrected in the PR body **in place**, one line, nothing else.
+
+Verified live rather than assumed:
+
+- `grep -n '^```'` on the live body → line 82 `acceptance-evidence`, line 122 close. Exactly two fences.
+- Byte delta **+15**, exactly `len("acceptance-evidence") − len("text")`.
+- Pre/post diff → **one line changed** (`82c82`), no other line touched.
+- Invariants re-checked on the live body: closing-keyword scan still exactly `Closes #1350`; DoD **9
+  checked / 0 unchecked**; **7** `BOX` entries; **0** stale head references.
+- PR state unchanged: head `587ade9f30e619410a4192daadab137b0548eb88`, **draft**, `OPEN`, labels
+  untouched.
+
+Recorded for accuracy: a byte comparison of the intended file against the live body reported a
+difference of exactly **one trailing newline**, which `gh --jq '.body'` appends on extraction. Content
+is identical; this is an artifact of the read, not of the write.
