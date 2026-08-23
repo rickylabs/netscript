@@ -272,3 +272,50 @@ coordinator's.
 Standing arrangement confirmed with the fixes lane: nothing currently live changes either package's
 published surface, and this lane hears from them before any readiness attempt if an exposure variant
 is revived.
+
+### PR #1691 export-surface review — accepted, plus an unpoliced-drift finding, 2026-08-23
+
+Reviewed at the fixes lane's invitation (`ce3c21a1`, one generated path). Read-only; this lane
+authored nothing and filed nothing.
+
+**Their attribution independently corroborated.** They flagged that the `@netscript/sdk` `CacheQuery`
+signature change (`startInflight()`/`readCachedEntry()`) superficially looks like #1671's but is not.
+Confirmed from this lane's own main audit: `packages/sdk/src/cache/cache-query.ts` is in the
+`baf1cdf67..9634735bc` range via #1665 `3e8e146a4` / #1669 `0ef48c2ec`, and #1671's 14 paths touch no
+cache file. Attribution holds on evidence gathered before their message. Their correction to the
+briefing they were given — nine exports **plus** eleven changed signatures, not "exactly the nine
+exports" — matches what the corpus can carry, and reporting it as measured rather than as briefed is
+the right call.
+
+**Finding: the five new symbols have drifted, and no gate can ever catch them.** The 9 added export
+entries are 5 distinct symbols — `McpReadResourceResult`, `McpResourceContent`, `McpServerStatus`,
+`McpTransportPoolSnapshot` (`@netscript/ai`, each across `./mcp` and `./ports`) and
+`PrismaMySqlTransactionOptions` (`@netscript/prisma-adapter-mysql`). Checked against their reference
+pages at main `9634735bc`:
+
+```
+McpReadResourceResult          docs/site/reference/ai/index.md                   0 occurrences
+McpResourceContent             docs/site/reference/ai/index.md                   0
+McpServerStatus                docs/site/reference/ai/index.md                   0
+McpTransportPoolSnapshot       docs/site/reference/ai/index.md                   0
+PrismaMySqlTransactionOptions  docs/site/reference/prisma-adapter-mysql/index.md 0
+```
+
+Both pages exist. **Neither package is in `AUTHORITATIVE_MAPPING`**, so `docs:exports-drift` cannot
+flag this — not now, not ever. The structural shape: **36 reference pages under
+`docs/site/reference/`, 8 packages policed** (`fresh-ui`, `plugin`, `config`, `contracts`, `queue`,
+`sdk`, `service`, `telemetry`). #1666 built a real gate and covered a quarter of the surface; the
+other 28 pages drift silently, and this is the first concrete instance caught.
+
+Checked and **clear**, so it is not part of the finding: the `sdk` `CacheQuery` row
+(`reference/sdk/index.md:86`) is a one-line class description with no method list, so
+`startInflight()`/`readCachedEntry()` do not make it false — and `sdk` runs entrypoints-only anyway.
+
+**This is pre-existing main drift, not #1691's.** #1691 is the honest regeneration that made it
+visible, and it should **not** be widened to fix it — that would repeat the exact scope error the
+fixes lane correctly refused on #1671's reference rows. No objection to #1691 from this lane.
+
+**Not filed.** The milestone is frozen and this lane does not add scope to it. Surfaced to the
+coordinator as a **post-0.0.7 / Backlog** candidate — extend `AUTHORITATIVE_MAPPING` toward the
+remaining reference pages, or record deliberately which pages are out of scope and why. The
+coordinator decides whether it becomes an issue; this lane will not open one.
