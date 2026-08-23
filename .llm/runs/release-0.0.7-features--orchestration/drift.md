@@ -377,3 +377,44 @@ author's evidence as if it belonged there.
 
 Related: [[eval-verdict-head-must-equal-merge-head]] and D-17 are the same concern at different
 layers — what a commit or a lease *claims* must be exactly what it *contains*.
+
+## D-20
+
+**Two green cleanup signals concealed three run-owned orphaned processes.** Severity: significant.
+
+After S5 attempt 7, the inter-gate audit read empty and was wrong. Both of the signals a supervisor
+would normally trust said clean:
+
+- the suite's own `cleanup.aspire-stop` gate reported **PASS** in 506 ms, and
+- `.llm/tools/agentic/teardown/leak-check.ts` reported `probes.aspire: ok`, `probes.docker: ok`,
+  `survivors: []`.
+
+Three `aspire-managed` processes (`646406`, `646408`, `646415`) were nevertheless still alive, all
+with cwd inside the run's own worktree at
+`…/netscript-s5-a7-388f2b642/.llm/tmp/cli-e2e/plugin-smoke-20260823-095547/aspire`, reparented to the
+WSL `/init` relay when the run's Aspire CLI exited. They were found **only** by a manual sweep of
+`/proc/*/cwd` for path containment.
+
+**Why the tools missed them.** `leak-check` probes Aspire and Docker *resource* state; it does not
+enumerate processes by working directory. `cleanup.aspire-stop` proves the stop command succeeded,
+not that every managed sidecar it spawned was reaped. Neither is wrong about what it measures —
+both are silent about a class neither measures.
+
+**Consequence for this lane.** A supervisor must not treat `cleanup.aspire-stop` PASS plus
+`leak-check survivors: []` as a complete residue verdict after a runtime gate. The minimum audit
+also includes a cwd-containment process sweep and an unreadable-directory scan, both of which found
+real residue here that the tools did not.
+
+**Second-order finding.** All three orphans **ignored SIGTERM** and required SIGKILL. That is the
+same hazard as carried observation R1 — `terminateBrowserProcess` awaits `child.status` after
+SIGTERM with no timer, so a signal-indifferent child would hang it. R1 was theoretical when recorded
+during the F8 plan review; attempt 7 supplies a live instance of the class in the same subsystem. It
+remains out of F8 scope and is now better-evidenced input for whichever leaf picks it up.
+
+Ownership discipline held: containment was re-verified immediately before each signal, and foreign
+children of the same relay — `tmux`, `claude`, `codex`, `browser_crashpad` — were left untouched.
+The unreadable residue was **moved, not deleted**, to a recoverable quarantine.
+
+Related: D-19 (supervisor audits must not write into the leaf) — the same principle that
+`leak-check` be pointed at a supervisor-owned `--slice-dir`, which was honored throughout attempt 7,
+so the leaf's `leak-report.md` was never regenerated.

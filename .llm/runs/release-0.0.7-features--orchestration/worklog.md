@@ -5235,3 +5235,63 @@ grant. No merge, publish, readiness flip, relabel, or issue mutation. The green 
 `4f50b5a02` is reported to the coordinator for the singleton runtime-lease decision; a later
 `scaffold.runtime` still requires a coordinator-owned lease and preflight at the immutable evidence
 head.
+
+## 2026-08-23 — #1664 lane PARKED at terminal FAIL_FIX; no retry, no IMPL-EVAL
+
+Coordinator decision recorded: **no IMPL-EVAL while `scaffold.runtime` is red.** Attempt 7 is
+centrally closed and released at `164c39241` (`chore(harness): close #1664 runtime attempt 7`), the
+PR body is corrected in place, and **no retry is authorized.**
+
+### Terminal checkpoint
+
+| Field | Value |
+| --- | --- |
+| Parked evidence head | `a257807d883ac9cd8d692d441bba1760290d4dab` |
+| Product content head | `4f50b5a026120b5a3b0195fa1b6f495f08e2b46c` |
+| Central close/release | `164c39241` |
+| PR #1664 | OPEN, **draft**, local == remote == PR, tree clean |
+| Verdict | **FAIL_FIX** — runtime red, cheap evidence green |
+| Retry | **not authorized** |
+| `fresh-browser` | **NOT_RUN** — lease conditioned it on a `scaffold.runtime` PASS |
+| IMPL-EVAL | **withheld** by coordinator decision |
+
+### What is green and stays green
+
+F8 changed exactly the two approved CDP probe paths. Focused deterministic file **25 passed / 0
+failed**. `check`, `test`, `publish-dry-run`, `arch-check`, `lint`, `fmt-check` all exact-head PASS
+at `4f50b5a02`; sufficiency recomputed `SUFFICIENT` over the explicitly named four-receipt set. Two
+fresh Tier-A reviews passed, the second after returning one slice for a non-gated scoped lint/fmt
+regression that CI and the contracted four could not see.
+
+### What is red, stated without inflation
+
+`scaffold.runtime` exit `1`, **68 passed / 1 failed / 0 skipped**, sole red
+`behavior.service-client-refetch` at **60,134 ms** — against attempt 6's exit `143` at `900,030 ms`
+with empty stderr. Attempt 7 names its stopping point: `waitUntil :623` → `waitForExpression :610` →
+`collectBrowserRefetchEvidence :286`, on the optimistic row `Seed User*` after the Rename click.
+
+**Neither CDP bound fired.** F8 therefore delivered *attributability*, which was its stated purpose,
+and is **not** credited with fixing attempt 6's hang — no evidence supports that claim, and the
+corrected PR body preserves the caveat. The remaining stop is attributable to page behavior rather
+than transport, and is not classified as a pass or fail of the refetch feature.
+
+### Resource state at park
+
+All classes empty: unreadable `0`, processes rooted in the execution worktree `0`, Docker containers
+`0`, occupied runtime ports `0`, `leak-check` aspire `ok` / docker `ok` / survivors `[]`. The
+execution worktree was clean at the pushed head and has been removed and pruned. The one run-owned
+unreadable residue is **quarantined, not deleted**, at
+`/tmp/netscript-s5-a7-quarantine.Cy2tNS/plugin-smoke-20260823-095547` (843 MB, recoverable).
+
+The audit that got there was not the one the tools gave me — see **D-20**: `cleanup.aspire-stop` PASS
+and `leak-check survivors: []` both missed three orphaned `aspire-managed` processes that only a
+cwd-containment sweep found, and all three ignored SIGTERM.
+
+### Standing prohibitions at park
+
+No retry of `scaffold.runtime`, no `fresh-browser`, no evaluator or IMPL-EVAL dispatch, no product or
+test mutation, no label, readiness, merge, publish, metadata, or issue mutation, no lease, and no
+next features leaf started from this lane. All prior quarantines, the seven S5 attempt histories,
+`receipts/f6-test.json`, and `receipts/f7-test.json` remain append-only.
+
+**The #1664 lane is parked at `a257807d8` and awaits a coordinator decision to resume.**
