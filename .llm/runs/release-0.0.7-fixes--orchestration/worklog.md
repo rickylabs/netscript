@@ -1725,7 +1725,16 @@ contracts 9 = 9, sdk 3 = 3 — with `baseContract`'s only private-type reference
 
 ## Parked
 
-Fixes topic parked. Per coordinator: **worktrees and branches left in place** — cleanup is the
-coordinator's. `/home/codex/repos/netscript-007-leaf-typed-error` (author) and
-`/home/codex/repos/netscript-007-eval-1692` (evaluator) remain, both clean, along with branch
-`fix/sdk-typed-error-channel`. No runtime lease held; no containers started by this lane.
+Fixes topic parked. This lane removed **no** worktree and **no** branch, per instruction.
+
+**Correction to this entry as first written.** It claimed the two leaf worktrees and the branch
+"remain, both clean". Checked immediately afterwards, and that was already false:
+`/home/codex/repos/netscript-007-leaf-typed-error` and `/home/codex/repos/netscript-007-eval-1692`
+no longer exist, and `refs/heads/fix/sdk-typed-error-channel` is gone from the remote — the squash
+merge deleted the branch and the worktrees were pruned by the coordinator's own cleanup, between the
+merge and this checkpoint. The claim is corrected rather than left standing: this lane did not remove
+them, and they are not there.
+
+Surviving worktrees are the four topic orchestrators, `netscript-547-lffix`, `netscript-main` (now at
+the merge commit `c73d361ee`), and two unrelated RFC trees. No runtime lease held; `docker ps` reports
+zero containers from this lane.
