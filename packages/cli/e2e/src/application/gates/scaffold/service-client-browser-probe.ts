@@ -59,26 +59,70 @@ interface CdpEvent {
   readonly params: Record<string, unknown>;
 }
 
-class CdpClient {
-  readonly #socket: WebSocket;
+interface CdpSocket {
+  onopen: ((event: Event) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onmessage: ((event: MessageEvent) => void) | null;
+  send(data: string): void;
+  close(): void;
+}
+
+interface CdpConnectOptions {
+  readonly timeoutMs?: number;
+  readonly createSocket?: (url: string) => CdpSocket;
+}
+
+interface PendingCdpCommand {
+  readonly resolve: (value: unknown) => void;
+  readonly reject: (error: Error) => void;
+  readonly timeoutId: ReturnType<typeof setTimeout>;
+}
+
+/** Minimal CDP client used only by the CLI runtime E2E probe and its focused tests. */
+export class CdpClient {
+  readonly #socket: CdpSocket;
   readonly #pending = new Map<
     number,
-    { resolve(value: unknown): void; reject(error: Error): void }
+    PendingCdpCommand
   >();
   readonly #events: CdpEvent[] = [];
   readonly #observers: Array<(event: CdpEvent) => void> = [];
   #nextId = 1;
 
-  private constructor(socket: WebSocket) {
+  private constructor(socket: CdpSocket) {
     this.#socket = socket;
     socket.onmessage = (message) => this.#receive(String(message.data));
   }
 
-  static async connect(url: string): Promise<CdpClient> {
-    const socket = new WebSocket(url);
+  static async connect(url: string, options: CdpConnectOptions = {}): Promise<CdpClient> {
+    const timeoutMs = options.timeoutMs ?? TIMEOUT_MS;
+    const socket = (options.createSocket ?? ((candidate) => new WebSocket(candidate)))(url);
     await new Promise<void>((resolve, reject) => {
-      socket.onopen = () => resolve();
-      socket.onerror = () => reject(new Error(`failed to connect to ${url}`));
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      const settle = (action: () => void) => {
+        clearTimeout(timeoutId);
+        socket.onopen = null;
+        socket.onerror = null;
+        action();
+      };
+      timeoutId = setTimeout(() => {
+        socket.onopen = null;
+        socket.onerror = null;
+        const timeoutMessage =
+          `CDP WebSocket connection to ${url} timed out after ${timeoutMs} ms`;
+        try {
+          socket.close();
+          reject(new Error(timeoutMessage));
+        } catch (error) {
+          reject(
+            new Error(`${timeoutMessage}; socket close failed: ${errorMessage(error)}`, {
+              cause: error,
+            }),
+          );
+        }
+      }, timeoutMs);
+      socket.onopen = () => settle(resolve);
+      socket.onerror = () => settle(() => reject(new Error(`failed to connect to ${url}`)));
     });
     return new CdpClient(socket);
   }
@@ -87,10 +131,35 @@ class CdpClient {
     this.#observers.push(observer);
   }
 
-  send(method: string, params: Record<string, unknown> = {}): Promise<unknown> {
+  send(
+    method: string,
+    params: Record<string, unknown> = {},
+    timeoutMs = TIMEOUT_MS,
+  ): Promise<unknown> {
     const id = this.#nextId++;
     this.#socket.send(JSON.stringify({ id, method, params }));
-    return new Promise((resolve, reject) => this.#pending.set(id, { resolve, reject }));
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        if (!this.#pending.delete(id)) return;
+        reject(new Error(`CDP response to ${method} timed out after ${timeoutMs} ms`));
+      }, timeoutMs);
+      this.#pending.set(id, {
+        resolve: (value) => {
+          clearTimeout(timeoutId);
+          resolve(value);
+        },
+        reject: (error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        },
+        timeoutId,
+      });
+    });
+  }
+
+  /** Expose pending transport state only to the focused same-module E2E tests. */
+  get pendingCommandCountForTest(): number {
+    return this.#pending.size;
   }
 
   async waitFor(
@@ -125,6 +194,7 @@ class CdpClient {
       const pending = this.#pending.get(message.id);
       if (!pending) return;
       this.#pending.delete(message.id);
+      clearTimeout(pending.timeoutId);
       if (message.error) pending.reject(new Error(message.error.message ?? 'CDP command failed'));
       else pending.resolve(message.result);
       return;

@@ -12,6 +12,7 @@ import {
   awaitBrowserStartup,
   BROWSER_EXECUTABLE_ENV,
   captureBoundedText,
+  CdpClient,
   probeBrowserVersion,
   selectBrowserExecutable,
   terminateBrowserProcess,
@@ -38,6 +39,80 @@ import { resolveSuite } from '../../../src/presentation/cli/suites/registry.ts';
 
 const USERS_INPUT = { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' } as const;
 const PAYMENTS_INPUT = { limit: 3, offset: 0 } as const;
+const CDP_TEST_TIMEOUT_MS = 25;
+const CDP_TEST_WATCHDOG_MS = 1_000;
+
+interface FakeCdpSocket {
+  onopen: ((event: Event) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onmessage: ((event: MessageEvent) => void) | null;
+  readonly sent: string[];
+  readonly closeCount: number;
+  send(data: string): void;
+  close(): void;
+  emitOpen(): void;
+  emitError(): void;
+  emitMessage(message: Record<string, unknown>): void;
+}
+
+function createFakeCdpSocket(): FakeCdpSocket {
+  let closeCount = 0;
+  return {
+    onopen: null,
+    onerror: null,
+    onmessage: null,
+    sent: [],
+    get closeCount() {
+      return closeCount;
+    },
+    send(data) {
+      this.sent.push(data);
+    },
+    close() {
+      closeCount += 1;
+    },
+    emitOpen() {
+      this.onopen?.(new Event('open'));
+    },
+    emitError() {
+      this.onerror?.(new Event('error'));
+    },
+    emitMessage(message) {
+      this.onmessage?.(
+        new MessageEvent('message', { data: JSON.stringify(message) }),
+      );
+    },
+  };
+}
+
+async function withTestWatchdog<T>(operation: Promise<T>, label: string): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const watchdog = new Promise<never>((_resolve, reject) => {
+    timeoutId = setTimeout(
+      () => reject(new Error(`test watchdog expired waiting for ${label}`)),
+      CDP_TEST_WATCHDOG_MS,
+    );
+  });
+  try {
+    return await Promise.race([operation, watchdog]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function connectFakeCdpClient(
+  socket: FakeCdpSocket,
+  url: string,
+): Promise<CdpClient> {
+  queueMicrotask(() => socket.emitOpen());
+  return await withTestWatchdog(
+    CdpClient.connect(url, {
+      timeoutMs: CDP_TEST_TIMEOUT_MS,
+      createSocket: () => socket,
+    }),
+    `CDP connection to ${url}`,
+  );
+}
 
 function keyEvidence(): ServiceKeyEvidence {
   return {
@@ -273,6 +348,109 @@ Deno.test('quiet baseline rejects a late initial request before accepting the co
 
   assertEquals(baseline, 2);
   assertEquals(observation, 5);
+});
+
+Deno.test('CDP connection timeout names the URL and closes an inert socket', async () => {
+  const url = 'ws://connection-never-opens.invalid/devtools';
+  const socket = createFakeCdpSocket();
+  const error = await assertRejects(
+    () =>
+      withTestWatchdog(
+        CdpClient.connect(url, {
+          timeoutMs: CDP_TEST_TIMEOUT_MS,
+          createSocket: () => socket,
+        }),
+        `inert CDP connection to ${url}`,
+      ),
+    Error,
+  );
+
+  assertStringIncludes(error.message, 'CDP WebSocket connection');
+  assertStringIncludes(error.message, url);
+  assertStringIncludes(error.message, `${CDP_TEST_TIMEOUT_MS} ms`);
+  assertEquals(error.message.includes('CDP response'), false);
+  assertEquals(error.message.includes('Page.enable'), false);
+  assertEquals(socket.closeCount, 1);
+  assertEquals(socket.onopen, null);
+  assertEquals(socket.onerror, null);
+});
+
+Deno.test('CDP response timeout removes its id and ignores a late matching response', async () => {
+  const url = 'ws://send-response-test.invalid/devtools';
+  const socket = createFakeCdpSocket();
+  const client = await connectFakeCdpClient(socket, url);
+  let resolvedCount = 0;
+  const response = client.send('Page.enable', {}, CDP_TEST_TIMEOUT_MS).then((value) => {
+    resolvedCount += 1;
+    return value;
+  });
+  const error = await assertRejects(
+    () => withTestWatchdog(response, 'Page.enable response'),
+    Error,
+  );
+
+  assertStringIncludes(error.message, 'CDP response');
+  assertStringIncludes(error.message, 'Page.enable');
+  assertStringIncludes(error.message, `${CDP_TEST_TIMEOUT_MS} ms`);
+  assertEquals(error.message.includes('CDP WebSocket connection'), false);
+  assertEquals(error.message.includes(url), false);
+  assertEquals(client.pendingCommandCountForTest, 0);
+  assertEquals(resolvedCount, 0);
+
+  const timedOutCommand = JSON.parse(socket.sent[0]) as { id: number };
+  socket.emitMessage({ id: timedOutCommand.id, result: 'late-result' });
+  await Promise.resolve();
+  assertEquals(client.pendingCommandCountForTest, 0);
+  assertEquals(resolvedCount, 0);
+
+  const nextResponse = client.send('Runtime.enable', {}, CDP_TEST_TIMEOUT_MS * 4);
+  const nextCommand = JSON.parse(socket.sent[1]) as { id: number };
+  socket.emitMessage({ id: nextCommand.id, result: 'next-result' });
+  assertEquals(await withTestWatchdog(nextResponse, 'Runtime.enable response'), 'next-result');
+  assertEquals(client.pendingCommandCountForTest, 0);
+  client.close();
+});
+
+Deno.test('CDP connection and response preserve normal result and error settlement', async () => {
+  const url = 'ws://normal-cdp-settlement.invalid/devtools';
+  const socket = createFakeCdpSocket();
+  const client = await connectFakeCdpClient(socket, url);
+
+  const result = client.send('Runtime.enable', {}, CDP_TEST_TIMEOUT_MS * 4);
+  const resultCommand = JSON.parse(socket.sent[0]) as { id: number };
+  socket.emitMessage({ id: resultCommand.id, result: { enabled: true } });
+  assertEquals(await withTestWatchdog(result, 'Runtime.enable result'), { enabled: true });
+  assertEquals(client.pendingCommandCountForTest, 0);
+
+  const failed = client.send('Runtime.evaluate', {}, CDP_TEST_TIMEOUT_MS * 4);
+  const failedCommand = JSON.parse(socket.sent[1]) as { id: number };
+  socket.emitMessage({ id: failedCommand.id, error: { message: 'existing CDP error' } });
+  await assertRejects(
+    () => withTestWatchdog(failed, 'Runtime.evaluate error'),
+    Error,
+    'existing CDP error',
+  );
+  assertEquals(client.pendingCommandCountForTest, 0);
+
+  await new Promise((resolve) => setTimeout(resolve, CDP_TEST_TIMEOUT_MS * 5));
+  assertEquals(client.pendingCommandCountForTest, 0);
+  client.close();
+
+  const errorSocket = createFakeCdpSocket();
+  queueMicrotask(() => errorSocket.emitError());
+  await assertRejects(
+    () =>
+      withTestWatchdog(
+        CdpClient.connect(url, {
+          timeoutMs: CDP_TEST_TIMEOUT_MS * 4,
+          createSocket: () => errorSocket,
+        }),
+        'CDP socket error',
+      ),
+    Error,
+    `failed to connect to ${url}`,
+  );
+  assertEquals(errorSocket.closeCount, 0);
 });
 
 Deno.test('browser executable override is exclusive and preserves validated selection metadata', async () => {

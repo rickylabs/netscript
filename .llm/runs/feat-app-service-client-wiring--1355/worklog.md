@@ -961,3 +961,41 @@ The repair is append-only and was made by a separate corrective owner in a dedic
 worktree. `d8d5ee619` is not amended, reset, rebased, or rewritten; it stands as an intermediate
 contaminated plan head. F8 plan content is untouched. No gate, audit, leak-check, browser, Aspire,
 Docker, lease, evaluator, readiness, metadata, issue, label, lockfile, or docs action occurred.
+
+## F8 implementation — bounded and attributable CDP transport waits
+
+Tier-A accepted the F8 plan at `20337441788b4e2341b0474d6297bec1ddd33b80`; implementation began
+from that exact clean local/remote head. Product/test scope stayed inside the reviewed two-path
+ceiling:
+
+1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
+2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
+
+`CdpClient` is now an E2E-internal exported test seam only; no package barrel or publish surface
+changed. `connect` accepts an injected structural socket factory and timeout while production keeps
+`new WebSocket(url)` and the existing 20,000 ms default. An inert connection now detaches open/error
+handlers, closes the socket, and rejects with the exact URL, operation, and elapsed bound. `send`
+uses the same default, names the CDP method on timeout, removes the command id before rejection, and
+clears timers on result/error settlement. Unknown late ids still return early.
+
+Three focused tests make the formerly silent paths executable without a browser or network:
+
+- an inert socket loses to the production connection timeout, not the larger test watchdog, and is
+  detached/closed with URL-specific diagnostics;
+- a missing `Page.enable` response loses to the production response timeout, its pending entry is
+  zero before and after a late matching response, and a following `Runtime.enable` response still
+  settles normally;
+- normal result, normal CDP error, and socket-error behavior remain unchanged, with an observation
+  beyond the configured command bound proving no later timeout effect.
+
+The focused wrapper command completed with **25 passed / 0 failed / 0 ignored**:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts
+```
+
+All pre-existing F6 natural-exit/active-SIGTERM/three-negative/delegation proofs and F7 strict
+selection/startup/bounded-drain/no-cache-literal proofs ran in that same file and remain green. No
+proof was omitted. No third code path, stage logging, retry, reconnect, runtime attempt, browser,
+Aspire, Docker, lease, binding gate, evaluator, readiness, metadata, issue, quarantine, lockfile, or
+docs mutation occurred. The Tier-A supervisor owns the four post-push binding receipts.
