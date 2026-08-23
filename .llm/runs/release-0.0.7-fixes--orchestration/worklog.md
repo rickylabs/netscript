@@ -1457,3 +1457,53 @@ path, since the staleness is repo-wide and owned by other packages. #1671 then n
 stays `2d806b245`.
 
 No merge, readiness, label, checkbox, metadata, or `#1348`/`#1466` mutation; no runtime lease.
+
+## 2026-08-23 — prerequisite corpus leaf created and pushed; PR #1691 open
+
+Coordinator ruling after the failed S6 proof: do not make #1671 carry unrelated generated exports;
+execute a serial prerequisite inside the fixes lane. Executed, no owner pause.
+
+**Clean leaf from exact main.** Worktree `/home/codex/repos/netscript-007-leaf-corpus`, branch
+`chore/mcp-export-corpus-regen` created from `9634735bc0`, no branch/worktree/PR collision. Dedicated
+to exactly one path: `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`.
+
+**Determinism proven.** Two independent regenerations from a clean tree produced byte-identical output,
+sha256 `098ee8c412626edcc2e4a05eefe0f5554055a6d0a0c23a3d12f85f534ab60a5d` both runs. `git status` shows
+exactly one mutated path. No source or API change.
+
+**Delta measured by decoding, not by file diff** — the corpus is gzip/base64, so the raw diff is opaque:
+
+| | Count |
+| --- | --- |
+| Added exports | **9** — `@netscript/ai` ×8 (`McpReadResourceResult`, `McpResourceContent`, `McpServerStatus`, `McpTransportPoolSnapshot`, each across `./mcp` and `./ports`), `@netscript/prisma-adapter-mysql` ×1 (`PrismaMySqlTransactionOptions`) |
+| Changed signatures | **11** — `@netscript/ai` ×8, `@netscript/prisma-adapter-mysql` ×2, `@netscript/sdk` ×1 |
+| Removed | **0** |
+| `schemaVersion` / `frameworkVersion` / `surfaces` | unchanged |
+
+**Correction to the brief, recorded rather than smoothed.** The ruling described the delta as "exactly
+the nine already-existing exports". It is nine exports **plus eleven changed signatures**, and one of
+those is `@netscript/sdk` `CacheQuery` (gains `startInflight()`, `readCachedEntry()`). That superficially
+looks like it could be #1671's, and provably is not: #1671's diff has **zero** `CacheQuery` matches, and
+this branch contains no #1671 content — it is pure `main`. All eleven are additive or narrowing and all
+reflect source already merged.
+
+**Receipts:** `check:mcp-export-corpus` **PASS exit 0** (`symbolCount 7611`, content sha256
+`458428529a12cfb1…`) where it was exit 1 before; `deno check packages/mcp` **0** occurrences;
+`packages/mcp` suites **136 / 0**.
+
+Recorded honestly: the `packages/mcp` **fmt/lint batch exits 1 with 0 findings**, and does so identically
+on the **pristine tree before this change** — verified by reverting the file and re-running. Pre-existing
+tooling failure over a ~300 KB single-line generated file, not a formatting difference, not introduced
+here. Per AGENTS.md, package-quality fmt gates must exclude generated output; this batch does not.
+
+**Pushed** `ce3c21a1498d1a3b6ef74a245c98be66095f812a` by explicit refspec. **PR #1691** opened, ready
+(not draft), narrowly described with the decoded delta and the determinism proof, labels `type:chore`
+`area:tooling` `priority:p1` sole `status:impl`, milestone `0.0.7`. No closing keyword — it does not
+resolve #1671, which it only references.
+
+Docs lane notified under its standing published-surface offer, explicitly informational and not a scope
+request; silence will not be treated as review. CI is the gate.
+
+Next: merge #1691 when checks are green and it is eligible, then update main, rebase #1671, confirm its
+four source/test paths plus run artifacts only, rerun the withheld gates and fresh Tier-A at the new
+head, and request one fresh opposite-family IMPL-EVAL.
