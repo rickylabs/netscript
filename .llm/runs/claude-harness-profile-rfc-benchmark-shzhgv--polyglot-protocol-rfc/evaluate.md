@@ -1,5 +1,21 @@
 # IMPL-EVAL — claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc
 
+## Re-verification cycle 2 — PASS on the S11b head (2026-08-23) — CLOSING VERDICT
+
+| Field | Value |
+| --- | --- |
+| Evaluator session | OpenHands cloud run 32625339098 (separate session; formal IMPL-EVAL via draft→ready automation) |
+| Model / route | `openrouter/deepseek/deepseek-v4-flash-0731` |
+| Evaluated head | 797a27d (S11b) |
+| Verdict | `OPENHANDS_VERDICT: PASS` — finding 1 confirmed fixed; fmt-clean, zero TBD; seam cites + corpus verified; docs-only surface confirmed; plan gate + commit trail + false-done audit clean; no blocking findings |
+
+This head-pinned PASS is the closing verification for the run. Full chain: PLAN-EVAL PASS →
+IMPL-EVAL cycles 1–3 (PASS superseded; 2× FAIL_FIX doc fixes; two-failure limit → owner
+escalation) → owner-commissioned adversarial pass (qwen3.8-max ×2, CONCERNS/FAIL_FIX, all
+findings verified + consolidated) → owner approval ("approved proceed") → S11/S11b revision →
+re-verification cycle 1 FAIL_FIX (one stale constant) → fix → **cycle 2 PASS**. DoD ticked and
+`status:ready-merge` applied on this record.
+
 ## Re-verification cycle 1 on the S11 head — FAIL_FIX (2026-08-23)
 
 | Field | Value |
