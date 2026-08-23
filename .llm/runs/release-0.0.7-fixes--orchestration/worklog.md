@@ -1296,3 +1296,35 @@ withheld gate covers **10** new SDK diagnostics, not 3 — adding `ThrowableErro
 
 No change to the § S5 verdict: implementation remains unauthorized pending a fresh ruling on the
 refuted exposure mechanism. No merge, readiness flip, label, checkbox, or product/docs mutation.
+
+## 2026-08-23 — ruled correction fails a second, independent gate (docs-lane hypothesis, executed)
+
+The docs supervisor, accepting the cross-lane audit and correcting its own record at `39c0c1bac`,
+raised one forward-looking point this topic had not measured: a ruling that changes what
+`@netscript/contracts` publishes lands on `docs:exports-drift` with contracts in **`complete`** mode.
+Correct, and now executed rather than predicted.
+
+Probe at `9634735bc0` + the leaf's six paths + exactly the three ruled type-only re-exports, nothing
+else: **FAIL, exit 1**, three `Symbol Drift Error [contracts]` entries — `index.md` OMITS exported
+symbol `BaseContractErrors` / `ContractBuilder` / `Schema`. The identical probe without the
+re-exports is PASS/exit 0, so the failures are attributable to the ruled correction alone.
+
+The ruled mechanism therefore has **three** independent failure modes: doc-lint 10 → 21; a
+**merge-blocking** `docs:exports-drift` red at `pages.yml:143-145`; and a repair for the second that
+is worse than the second — clearing it means documenting `ContractBuilder` and `Schema` as rows in
+`docs/site/reference/contracts/index.md`, a seventh path that commits NetScript's published reference
+surface to carrying **oRPC's builder class and standard-schema alias as NetScript's own symbols**.
+That is a doctrine decision about what the package claims to publish, not a lint fix — the same
+"wider barrel growth" the ruling forbids, reached from the opposite direction.
+
+This strengthens rather than supplements the § S5 recommendation: the exposure route is not merely
+costlier than the residue, it is **not landable** without that doctrine decision. Recommendation (2)
+stands and is now the only option clearing both gates.
+
+Also carried: `sdk` runs `entrypoints-only`, so its reference-page symbol rows are never checked.
+Advisory findings 1 and 2 are one fact from two sides — the gate proving #1671 green is green
+*because* it does not inspect the rows finding 2 concerns. That is why finding 2 is real debt and
+simultaneously not a gate risk.
+
+Docs lane confirms EXHAUSTED/PARKED at allocation [1551], withdrew its finding-2 recommendation, and
+takes no scope. No merge, readiness flip, label, checkbox, or product/docs mutation from this lane.

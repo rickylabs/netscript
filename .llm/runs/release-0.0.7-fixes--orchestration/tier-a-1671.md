@@ -591,3 +591,56 @@ None of the three changes the § S5 verdict. Finding 1 removes a proof gap and r
 Finding 2 becomes a coordinator follow-up rather than leaf scope; Finding 3 was already inside the
 withheld-gate scope. No merge, readiness flip, label, checkbox, or product/docs mutation from this
 lane. Probe worktree `netscript-007-probe-gate` removed; leaf and PR unmodified at `bd97a7c03a`.
+
+---
+
+# F1 addendum — the ruled correction fails a **second, independent** gate (docs lane hypothesis, executed)
+
+The docs supervisor, on accepting the § Cross-lane audit, raised one forward-looking point this topic
+had not measured: if a ruling changes what `@netscript/contracts` publishes, that lands on
+`docs:exports-drift` with **contracts in `complete` mode**. Offered as input, not a position. It is
+correct, and it is now executed rather than predicted.
+
+Probe: detached worktree at `9634735bc0`, leaf's six paths applied, plus exactly the three ruled
+type-only re-exports in `packages/contracts/src/public/mod.ts`. Nothing else.
+
+```text
+Coverage [contracts]: mode=complete; omitted-symbol-groups=0; documented-non-export-groups=0
+Symbol Drift Error [contracts]: Document at docs/site/reference/contracts/index.md OMITS exported symbol 'BaseContractErrors'
+Symbol Drift Error [contracts]: Document at docs/site/reference/contracts/index.md OMITS exported symbol 'ContractBuilder'
+Symbol Drift Error [contracts]: Document at docs/site/reference/contracts/index.md OMITS exported symbol 'Schema'
+Exports & Symbols drift check: FAIL   (exit 1)
+```
+
+Compare the identical probe **without** the three re-exports: `PASS`, exit 0. The three symbol-drift
+errors are attributable to the ruled correction alone.
+
+So the ruled mechanism now has **three independent failure modes**, not one:
+
+1. **`deno doc --lint`** — `packages/contracts/mod.ts` goes **10 → 21** private-type-ref diagnostics
+   (§ S5 F1).
+2. **`docs:exports-drift`** — **red, exit 1**, blocking the Pages workflow at
+   `pages.yml:143-145`. This is a *merge-blocking CI gate*, not an advisory count.
+3. **The repair for (2) is worse than (2).** Clearing those three errors means documenting
+   `ContractBuilder`, `Schema`, and `BaseContractErrors` as rows in
+   `docs/site/reference/contracts/index.md` — a **seventh path**, and substantively a commitment that
+   NetScript's published reference surface now documents **oRPC's builder class and standard-schema
+   alias as NetScript's own published symbols**. That is a doctrine question about what
+   `@netscript/contracts` claims to publish, not a lint fix, and it is exactly the "wider barrel
+   growth" the ruling itself forbids — arrived at from the opposite direction.
+
+Recorded because it changes the strength of the § S5 recommendation rather than merely adding to it:
+the exposure route is not "more expensive than the residue", it is **not landable** without a
+doctrine decision about publishing a dependency's internals under NetScript's name. Recommendation
+(2) — withdraw the exposure ruling, land #11 plus the ten SDK corrections under the existing
+three-file ceiling, file a follow-up for the residual — stands and is now the only option that clears
+both gates.
+
+Also carried from the docs lane, and worth stating because it explains the § Cross-lane finding-2
+disposition: `sdk` runs `entrypoints-only`, so its reference-page symbol rows are never checked at
+all. Advisory findings 1 and 2 are the same fact from two sides — the gate that proves #1671 green is
+green *because* it does not look at the rows finding 2 is about. That is why finding 2 is real debt
+and simultaneously not a gate risk.
+
+Probe worktree `netscript-007-probe-drift` removed. No product/docs mutation; leaf and PR unmodified
+at `bd97a7c03a`.
