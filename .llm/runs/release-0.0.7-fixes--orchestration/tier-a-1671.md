@@ -499,3 +499,95 @@ No evaluator requested, no runtime lease, no label/issue/checkbox/readiness/merg
 `#1348`/`#1466` mutation, no product file touched. All probe work was performed in disposable
 detached worktrees (`netscript-007-probe-1671`, `netscript-007-baseline-9634735`), both removed; the
 leaf worktree and PR remain at `bd97a7c03a`, unmodified.
+
+---
+
+# Cross-lane advisory from the docs topic supervisor — audited 2026-08-23
+
+Received read-only, no action taken on the docs lane. Audited rather than accepted; two of three
+findings are upheld, one is a subset of work already executed, and one framing is corrected.
+
+## Finding 1 — new blocking Pages gate never ran against this branch: **UPHELD, and now proven green**
+
+Confirmed at `9634735bc0`: `.github/workflows/pages.yml:143-145` carries a
+`Check documentation exports drift` step (`deno task docs:exports-drift`) immediately ahead of
+`docs:snippets`, gated only on `env.RUN == 'true'` with no `continue-on-error`. It arrived with
+`2dd1a75ef` (#1666), which post-dates this leaf's merge-base `0ef48c2ec`. The sequencing concern is
+real: the step has never executed against #1671, and #1671 does edit two `docs/site/` pages.
+
+The advisory reasoned the gate would pass by reading the tool. This topic **ran it** instead. Applied
+the leaf's six product/docs paths onto a detached worktree at `9634735bc0` and executed the gate:
+
+```text
+Coverage [contracts]: mode=complete;        omitted-symbol-groups=0; documented-non-export-groups=0
+Coverage [sdk]:       mode=entrypoints-only; omitted-symbol-groups=0; documented-non-export-groups=0
+Exports & Symbols drift check: PASS      (exit 0)
+```
+
+**PASS, exit 0.** The mechanism is slightly more specific than the advisory stated: `sdk` runs in
+`entrypoints-only` mode, so its reference page is checked for entrypoint coverage and **not** for
+symbol rows at all; `contracts` runs `complete`, and the leaf changes no exported symbol name there.
+Both halves have to hold, and both do.
+
+Two by-products worth recording. First, the six leaf paths **apply cleanly onto current `main`** — the
+only cherry-pick conflicts were `DU` markers on run artifacts from plan commits deliberately outside
+the replay range, with zero product conflict. That independently corroborates the § S5 rebaseline
+finding. Second, this closes a real proof gap for whoever eventually claims readiness: the gate is now
+executed evidence at rebased content, not an argument from reading the checker.
+
+## Finding 2 — reference/guide divergence: **UPHELD as debt, framing corrected, and out of scope**
+
+The gap is real and the advisory found it correctly. `docs/site/reference/sdk/index.md` is the third
+page documenting this API, #1671 does not touch it, and nothing catches the divergence: symbol names
+are unchanged so `docs:exports-drift` is silent (and `sdk` is `entrypoints-only` regardless), while
+`docs:snippets` compiles fenced code, not table rows.
+
+**But the framing "the reference and the guide teach two different contracts" overstates it.** Checked
+against source at the leaf head, all three flagged rows remain **factually true**:
+
+| Row | Still accurate? | Evidence |
+| --- | --- | --- |
+| `SafeResult` — "Tuple/object result returned by `safe`" | **yes** | `errors.ts:49-66` — both failure arms remain tuple-and-object intersections |
+| `SafeFailure` — "Failure branch returned by `safe`" | **yes** | `errors.ts:71` — unchanged role |
+| `isDefinedError` — "Narrow an unknown error to an oRPC defined error" | **yes** | still exported, still narrowing |
+
+Nothing on the reference page is wrong. The guide stopped *showcasing* tuple destructuring and
+`isDefinedError`; the reference still frames the API around them. That is **cross-page emphasis debt**,
+the same class as #1669's adjacent-page debt — and this topic must be explicit that it made the
+**opposite** error on that leaf, characterising accurate adjacent pages as "the same false-narrative
+class" and being corrected by the coordinator and evaluator. The distinction is what keeps a passed
+gate from being reopened to widen a PR.
+
+A second, sharper reason not to fold the three rows in: those row descriptions are **verbatim the
+package's own JSDoc** — `errors.ts:68-70` reads "Failure branch returned by {@link safe}" and
+`:75-77` reads "Tuple/object result returned by {@link safe}". Editing the reference rows without
+editing the JSDoc would *create* source-to-reference drift where none exists today. The suggested
+"~3 rows" is therefore not a 3-row change; it is a rows-plus-JSDoc change touching a seventh **and**
+eighth path.
+
+Disposition: **declined at this lane, routed to the coordinator.** `plan.md:146` sets an exact
+six-path ceiling — "A seventh product, test, or docs path is a rescope requiring a fresh coordinator
+ruling" — and `docs/site/reference/sdk/index.md` is a seventh. Same disposition as #1669 → #1670: a
+tracked non-blocking follow-up with explicit "these rows are not wrong" framing, filed by the
+coordinator, not folded into #1671 and not filed by this lane.
+
+## Finding 3 — three unexported types in published signatures: **already measured; scope is broader**
+
+Upheld and already covered. All three named references appear in this topic's own § S5 measurement:
+`SafeFailure → NonDefinedSafeFailure`, `SafeFailure → DefinedSafeFailure`, and
+`isDefinedError → NarrowDefined`. The advisory's "current main has ZERO such references in that
+module" matches the § S5 base measurement exactly — SDK baseline is **3** diagnostics
+(`QueryClientPort → QueryClient`, `createNetScriptQueryClient → QueryClient`, one in
+`plugin-streams-core`), none in `client/errors.ts`.
+
+The withheld gate's scope is **wider than the advisory's three**: the leaf introduces **10** new SDK
+private-type-ref diagnostics, adding `ThrowableError` (×4), `ClientPromiseResult` (×2) and
+`ProcedureErrorFromNode` to the three named. The advisory's `@orpc/contract`-in-a-published-signature
+parallel to `baseContract → ContractBuilder` is also correct and is the § S5 F1/F4 subject.
+
+## Net effect on this lane
+
+None of the three changes the § S5 verdict. Finding 1 removes a proof gap and returns **green**;
+Finding 2 becomes a coordinator follow-up rather than leaf scope; Finding 3 was already inside the
+withheld-gate scope. No merge, readiness flip, label, checkbox, or product/docs mutation from this
+lane. Probe worktree `netscript-007-probe-gate` removed; leaf and PR unmodified at `bd97a7c03a`.

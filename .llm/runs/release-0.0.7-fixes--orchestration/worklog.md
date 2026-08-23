@@ -1263,3 +1263,36 @@ Withheld gates (`contracts-jsr-audit`, `sdk-jsr-audit`, `netscript-jsr-specifier
 remain `NOT_RUN` — they are downstream of a repair that is not yet authorized. No IMPL-EVAL requested;
 no evaluator, no runtime lease, no label/issue/checkbox/readiness/merge action, no `#1348`/`#1466`
 mutation, no product file touched. Probe worktrees removed; leaf and PR unmodified at `bd97a7c03a`.
+
+## 2026-08-23 — docs-lane advisory audited: Pages gate proven green; reference-row debt routed to coordinator
+
+Read-only advisory received from the docs topic supervisor on #1671. Audited, not accepted. Full
+record in `tier-a-1671.md` § Cross-lane advisory.
+
+**Finding 1 upheld and now proven.** `.github/workflows/pages.yml:143-145` gained a blocking
+`docs:exports-drift` step in `2dd1a75ef` (#1666), which post-dates this leaf's merge-base — so it has
+never run against #1671, which does edit two `docs/site/` pages. The advisory reasoned it would pass;
+this topic **executed** it instead, applying the six leaf paths onto a detached worktree at
+`9634735bc0`: `Exports & Symbols drift check: PASS`, **exit 0**. Mechanism is more specific than
+stated — `sdk` runs `entrypoints-only` (symbol rows unchecked entirely) while `contracts` runs
+`complete` and no exported symbol name changed; both halves must hold and both do. By-product: the six
+leaf paths **apply cleanly onto current `main`**, independently corroborating the § S5 rebaseline.
+
+**Finding 2 upheld as debt, framing corrected, declined as scope.** The divergence is real and nothing
+catches it. But all three flagged rows in `docs/site/reference/sdk/index.md` are **factually accurate**
+at the leaf head — both `SafeFailure` arms remain tuple-and-object intersections, so "Tuple/object
+result returned by `safe`" still holds. This is cross-page emphasis debt, not two contradictory
+contracts. Recorded plainly: this topic made the **opposite** error on #1669, calling accurate adjacent
+pages a false-narrative class and being corrected by the coordinator and evaluator. Additional reason
+not to fold it in: those row descriptions are **verbatim the package's own JSDoc** (`errors.ts:68-70`,
+`:75-77`), so editing rows without editing JSDoc would *create* drift — making the suggested "~3 rows"
+a seventh **and** eighth path. Declined under `plan.md:146`'s exact six-path ceiling and routed to the
+coordinator on the #1669 → #1670 precedent.
+
+**Finding 3 already covered; this lane's scope is wider.** All three named references are in the § S5
+measurement, and the advisory's "zero on current main" matches the § S5 SDK baseline of 3 exactly. The
+withheld gate covers **10** new SDK diagnostics, not 3 — adding `ThrowableError` (×4),
+`ClientPromiseResult` (×2) and `ProcedureErrorFromNode`.
+
+No change to the § S5 verdict: implementation remains unauthorized pending a fresh ruling on the
+refuted exposure mechanism. No merge, readiness flip, label, checkbox, or product/docs mutation.
