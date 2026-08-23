@@ -4,11 +4,7 @@
  * @module
  */
 
-import {
-  type ClientPromiseResult,
-  isDefinedError as orpcIsDefinedError,
-  type ThrowableError,
-} from '@orpc/client';
+import { isDefinedError as orpcIsDefinedError } from '@orpc/client';
 
 /**
  * Public shape of an oRPC defined error.
@@ -68,14 +64,68 @@ type DefinedSafeFailure<TError> = [NarrowDefined<TError>, undefined, true, false
 /**
  * Failure branch returned by {@link safe}.
  */
-export type SafeFailure<TError = ThrowableError> =
-  | NonDefinedSafeFailure<TError>
-  | DefinedSafeFailure<TError>;
+export type SafeFailure<TError = Error> =
+  | ([
+    Exclude<
+      TError,
+      Error & {
+        readonly defined: boolean;
+        readonly code: string;
+        readonly status: number;
+        readonly data: unknown;
+      }
+    >,
+    undefined,
+    false,
+    false,
+  ] & {
+    error: Exclude<
+      TError,
+      Error & {
+        readonly defined: boolean;
+        readonly code: string;
+        readonly status: number;
+        readonly data: unknown;
+      }
+    >;
+    data: undefined;
+    isDefined: false;
+    isSuccess: false;
+  })
+  | ([
+    Extract<
+      TError,
+      Error & {
+        readonly defined: boolean;
+        readonly code: string;
+        readonly status: number;
+        readonly data: unknown;
+      }
+    > & DefinedError,
+    undefined,
+    true,
+    false,
+  ] & {
+    error:
+      & Extract<
+        TError,
+        Error & {
+          readonly defined: boolean;
+          readonly code: string;
+          readonly status: number;
+          readonly data: unknown;
+        }
+      >
+      & DefinedError;
+    data: undefined;
+    isDefined: true;
+    isSuccess: false;
+  });
 
 /**
  * Tuple/object result returned by {@link safe}.
  */
-export type SafeResult<TOutput, TError = ThrowableError> =
+export type SafeResult<TOutput, TError = Error> =
   | SafeSuccess<TOutput>
   | SafeFailure<TError>;
 
@@ -112,7 +162,17 @@ function createSafeFailure<TError>(error: TError): SafeFailure<TError> {
  * @param error - Unknown thrown value.
  * @returns `true` when the error is an oRPC defined error.
  */
-export function isDefinedError<T>(error: T): error is NarrowDefined<T> {
+export function isDefinedError<T>(error: T): error is
+  & Extract<
+    T,
+    Error & {
+      readonly defined: boolean;
+      readonly code: string;
+      readonly status: number;
+      readonly data: unknown;
+    }
+  >
+  & DefinedError {
   return orpcIsDefinedError(error);
 }
 
@@ -123,8 +183,8 @@ export function isDefinedError<T>(error: T): error is NarrowDefined<T> {
  * @param promise - Promise to resolve safely.
  * @returns Safe tuple/object result.
  */
-export async function safe<TOutput, TError = ThrowableError>(
-  promise: ClientPromiseResult<TOutput, TError>,
+export async function safe<TOutput, TError = Error>(
+  promise: Promise<TOutput> & { __error?: { type: TError } },
 ): Promise<SafeResult<TOutput, TError>> {
   try {
     return createSafeSuccess(await promise);

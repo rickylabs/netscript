@@ -1,12 +1,20 @@
 import { oc } from '@orpc/contract';
 import type {
   AnySchema,
-  ContractBuilder,
   ContractProcedureBuilderWithInputOutput,
   ContractProcedureBuilderWithOutput,
   MergedErrorMap,
   Schema,
 } from '@orpc/contract';
+import type { ContractObjectSchema } from '../domain/schema-types.ts';
+import type {
+  ForbiddenError,
+  NotFoundError,
+  RateLimitError,
+  ServiceUnavailableError,
+  UnauthorizedError,
+  ValidationError,
+} from '../domain/schemas.ts';
 import {
   forbiddenErrorSchema,
   notFoundErrorSchema,
@@ -109,11 +117,53 @@ const commonErrorMap: CommonErrorMap = {
  *   .output(z.object({ items: z.array(z.unknown()) }));
  * ```
  */
-export const baseContract: ContractBuilder<
-  Schema<unknown, unknown>,
-  Schema<unknown, unknown>,
-  BaseContractErrors,
-  Record<never, never>
+export const baseContract: ReturnType<
+  typeof oc.errors<
+    Readonly<{
+      NOT_FOUND: Readonly<
+        {
+          status: 404;
+          message: 'Resource not found';
+          data: ContractObjectSchema<NotFoundError, NotFoundError>;
+        }
+      >;
+      VALIDATION_ERROR: Readonly<
+        {
+          status: 422;
+          message: 'Validation failed';
+          data: ContractObjectSchema<ValidationError, ValidationError>;
+        }
+      >;
+      UNAUTHORIZED: Readonly<
+        {
+          status: 401;
+          message: 'Authentication required';
+          data: ContractObjectSchema<UnauthorizedError, UnauthorizedError>;
+        }
+      >;
+      FORBIDDEN: Readonly<
+        {
+          status: 403;
+          message: 'Access denied';
+          data: ContractObjectSchema<ForbiddenError, ForbiddenError>;
+        }
+      >;
+      RATE_LIMITED: Readonly<
+        {
+          status: 429;
+          message: 'Too many requests';
+          data: ContractObjectSchema<RateLimitError, RateLimitError>;
+        }
+      >;
+      SERVICE_UNAVAILABLE: Readonly<
+        {
+          status: 503;
+          message: 'Service temporarily unavailable';
+          data: ContractObjectSchema<ServiceUnavailableError, ServiceUnavailableError>;
+        }
+      >;
+    }>
+  >
 > = oc.errors(commonErrorMap);
 
 /**
