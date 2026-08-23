@@ -79,6 +79,21 @@
 - **Scope:** A correction necessarily returns to already-landed product paths and therefore needs a
   fresh authorized implementation slice; no seventh path is implied or authorized here.
 
+## 2026-08-23 — S5 export-corpus guard requires a fifth product path
+
+- **Observed at:** immutable S5 content head
+  `622218ac38150a2e3345149ca5b11bf823256734`.
+- **Evidence:** canonical read-only `deno task check:mcp-export-corpus` exited `1` with
+  `MCP export-surface corpus is stale; run deno task gen:mcp-export-corpus`.
+- **Required correction path:**
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`.
+- **Conflict:** S5 authorizes exactly four product/test paths and says a fifth product path is a
+  rescope that must stop. The generated export corpus is not one of those paths.
+- **Action:** did not run the generator, did not edit the generated corpus, and stopped the remaining
+  gate matrix. Recorded already-executed receipts and unreached gates honestly. Coordinator must
+  either authorize the generated path in a separate slice or rule the export-corpus guard
+  inapplicable; this implementation session does not choose between those outcomes.
+
 ## 2026-08-15 — S4-R amends the stop with a finding→correction mapping; one finding unresolved
 
 - **What:** A separate, plan-only Claude session (native route, quota-exhausted Codex route excluded
