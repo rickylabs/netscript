@@ -140,3 +140,20 @@
   coordinator-declared pre-existing tooling red rather than attributed to the generated content.
 - **Scope:** The four S5 source/test files, `deno.lock`, public barrels, docs, #1348, and #1466 were
   untouched. No second S6 product path was introduced.
+
+## 2026-08-23 — S8 amendment review finds two under-claims and two precision corrections
+
+- **Source:** Focused opposite-family amendment review at `7b0024967`, recorded by the supervisor at
+  S8 starting head `34eb1f5245d578dce01c88046aa22f8f6deabf02`.
+- **A1:** The S7 tables disclosed the payload change but omitted the breaking change from one
+  `SafeFailure` arm with `isDefined: boolean` to two literal `false`/`true` arms.
+- **A2:** The S7 tables omitted the intentional `baseContract` key-space tightening from an open
+  error map to the exact six declared codes.
+- **A3:** The SDK F4 explanation leaked two private implementation names and a test-file path into
+  consumer documentation.
+- **A4:** The S7 default-error row incorrectly said old `safe()` defaulted a `TError` parameter;
+  old `safe<TOutput>` had no such parameter and inherited `unknown` through `SafeResult<TOutput>`.
+- **Action:** Correct both pages within the already-authorized docs surface. Express F4 only through
+  exported `SafeFailure`, `safe`, `isDefinedError`, and `DefinedError` vocabulary. Do not edit the
+  supervisor-owned PR body/comment or any package/plugin/test/generated/lock path.
+- **Severity:** documentation precision; no product-contract change.
