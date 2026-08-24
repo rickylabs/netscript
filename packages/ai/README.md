@@ -163,6 +163,64 @@ handler yields an `error`-state `ToolResult` rather than throwing; on abort the 
 returns — nothing leaks. An injected `TelemetryPort` turns each run into a `gen_ai.chat` span with
 per-turn spans and tool-call events.
 
+## Request context (never reaches the model)
+
+Some state belongs to one run but must stay invisible to the model — the ids of documents just
+ingested, the tenant or auth subject, a correlation id. `AgentLoopInput.context` is the supported
+channel for it. Anything else you might reach for is a path *to* the provider:
+`GenerationOptions.providerOptions` merges verbatim into the adapter's `modelOptions`, and message
+text is, of course, exactly what the model reads.
+
+```typescript
+import { createAgentLoop } from '@netscript/ai/agent';
+import type { ChatModelProviderPort, ToolRegistryPort } from '@netscript/ai/agent';
+import type { Message } from '@netscript/ai/contracts';
+
+declare const modelProvider: ChatModelProviderPort;
+declare const tools: ToolRegistryPort;
+declare const messages: Message[];
+
+for await (
+  const chunk of createAgentLoop({ modelProvider, tools }).run({
+    model: 'anthropic:claude-sonnet-4-5',
+    messages,
+    context: { documentIds: ['doc_41', 'doc_42'], tenantId: 'acme' },
+  })
+) {
+  if (chunk.type === 'done') break;
+}
+```
+
+The bag is opaque to the engine — it reads no key and serializes it nowhere. It is delivered to
+exactly two places:
+
+| Consumer                | How it arrives                                                                      |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| TanStack AI middleware  | `chat({ context, metadata })` — `metadata` is documented as never forwarded onto the provider wire request |
+| Tool handlers           | `ToolInvocationOptions.context` on a `ToolHandler`; `AiToolInvocationContext.metadata` on a `defineAiTool(...).server()` definition |
+
+```typescript
+import { createToolRegistry, defineAiTool } from '@netscript/ai/tools';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
+
+declare const schema: StandardSchemaV1<unknown, { query: string }>;
+
+const search = defineAiTool('search')
+  .describe('Search the documents attached to this request')
+  .input(schema)
+  .server((input, context) => {
+    // The run's context — the model never saw any of this.
+    const documentIds = context.metadata?.['documentIds'];
+    return { query: input.query, documentIds };
+  });
+
+const registry = createToolRegistry([search]);
+```
+
+`messages`, `system`, `tools`, and `modelOptions` remain the only four things a provider adapter
+puts on the wire; `packages/ai/tests/request_context_test.ts` pins that with a sentinel value
+checked against a stubbed provider transport.
+
 ## MCP client stack
 
 ```typescript
@@ -233,7 +291,7 @@ connection is closed rather than inserted into `readyClients`.
 | Entry                 | What it gives you                                                                                 |
 | --------------------- | ------------------------------------------------------------------------------------------------- |
 | `.`                   | `createAiRuntime` / `getAiRuntime`, model + embeddings + vision registries, `composeSystemPrompt` |
-| `./contracts`         | Domain types (`Message`, `ToolDescriptor`, `Usage`, …) and the typed error hierarchy              |
+| `./contracts`         | Domain types (`Message`, `ToolDescriptor`, `Usage`, `RequestContext`, …) and the typed error hierarchy |
 | `./ports`             | Capability seams (`TelemetryPort`, `AgentMemoryPort`, `McpTransportPort`, …) with safe defaults   |
 | `./tools`             | `defineAiTool`, `createToolRegistry`, the `renderUiTool` wire contract                            |
 | `./agent`             | `createAgentLoop`, `slidingWindowHistory`, the loop's port seams                                  |

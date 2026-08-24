@@ -108,6 +108,7 @@ source of truth via `deno doc packages/ai/src/contracts/mod.ts`.
 | Agent stream chunks | `AgentChunk`, `AgentChunkType`, `TextChunk`, `ToolCallChunk`, `ToolResultChunk`, `MessageChunk`, `UsageChunk`, `ErrorChunk`, `DoneChunk` |
 | Tools | `ToolDescriptor`, `ToolParameters`, `ToolCall`, `ToolResult`, `ToolCallState`, `ToolResultState`, `ToolInputIssue`, `JsonSchema`, `RenderUiToolDescriptor`, `RenderUiResult`, `UiResource` |
 | Usage | `Usage`, `UsageCostBreakdown`, `PromptTokensDetails`, `CompletionTokensDetails`, `ProviderUsageDetails` |
+| Request context | `RequestContext` — opaque, request-local app state a run carries. Reaches middleware and tool handlers; never a provider wire request. |
 | Errors | `AiError`, `AiNotConfiguredError`, `InvalidModelRefError`, `ModelProviderNotFoundError`, `ToolNotFoundError`, `ToolInputValidationError` |
 
 ## Capability ports (`@netscript/ai/ports`)
@@ -119,10 +120,10 @@ model/embedding/vision registries. Primary surface:
 | --- | --- |
 | Model registry | `registerModelProvider`, `getModelProvider`, `getModel`, `parseModelRef`, `listModelProviders`, `isModelProviderRegistered`, `resetModelRegistry`, `ModelProviderPort`, `ModelProviderFactory`, `ModelProviderConfig` |
 | Embedding / vision registries | `registerEmbeddingProvider`, `getEmbeddingProvider`, `listEmbeddingProviders`, `isEmbeddingProviderRegistered`, `resetEmbeddingRegistry`, `registerVisionProvider`, `getVisionProvider`, `listVisionProviders`, `isVisionProviderRegistered`, `resetVisionRegistry` |
-| Chat | `ChatClientPort`, `ChatModelProviderPort`, `ChatClientRequest`, `ChatClientCallOptions`, `ChatClientEvent`, `ChatTextEvent`, `ChatToolCallEvent`, `ChatFinishEvent`, `ChatErrorEvent`, `ChatFinishReason` |
+| Chat | `ChatClientPort`, `ChatModelProviderPort`, `ChatClientRequest` (incl. the provider-invisible `context`), `ChatClientCallOptions`, `ChatClientEvent`, `ChatTextEvent`, `ChatToolCallEvent`, `ChatFinishEvent`, `ChatErrorEvent`, `ChatFinishReason` |
 | Embeddings / vision | `EmbeddingProviderPort`, `EmbeddingCallOptions`, `EmbeddingResponse`, `VisionProviderPort`, `VisionCallOptions`, `VisionResponse` |
-| Agent | `AgentLoopPort`, `AgentLoopInput`, `AgentLoopOptions`, `AgentMemoryPort`, `MemoryRecord`, `RecallQuery`, `RecallResult` |
-| Tools / skills / telemetry | `ToolRegistryPort`, `ToolHandler`, `SkillLoaderPort`, `SkillDescriptor`, `TelemetryPort`, `TelemetrySpan`, `TelemetryAttributes`, `TelemetryAttributeValue` |
+| Agent | `AgentLoopPort`, `AgentLoopInput` (incl. the provider-invisible `context`), `AgentLoopOptions`, `AgentMemoryPort`, `MemoryRecord`, `RecallQuery`, `RecallResult` |
+| Tools / skills / telemetry | `ToolRegistryPort`, `ToolHandler`, `ToolInvocationOptions`, `SkillLoaderPort`, `SkillDescriptor`, `TelemetryPort`, `TelemetrySpan`, `TelemetryAttributes`, `TelemetryAttributeValue` |
 | MCP | `McpTransportPort`, `McpTransportKind`, `McpConnectorConfig`, `McpClientConnection`, `McpConnectOptions`, `McpConnectionState`, `McpAuthConfig`, `McpAuthMode`, `McpToolRegistry`, `McpToolDescriptor`, `McpToolResult` |
 | Retrieval | `RetrieverPort`, `RetrievalResult`, `CitationProvenance`, `CitationSpan`, `RetrievalMatchKind`, `RETRIEVAL_MATCH_KINDS` |
 | Reachability | `ReachabilityPort`, `ReachabilityCheckOptions`, `ReachabilityResult`, `createAssumeReachablePort` |
@@ -256,7 +257,7 @@ takes no `@netscript/*` dependency.
 | `AiToolBuilder` / `AiToolBuilderWithInput` | interface | Typestate builder surfaces. |
 | `AiToolDefinition` | interface | A defined tool (input/output typed). |
 | `AiToolExecutionResult` | interface | Result of a dispatch (`output`, or `deferred` for client tools). |
-| `AiToolInvocationContext` | interface | Context passed to a server handler. |
+| `AiToolInvocationContext` | interface | Context passed to a server handler. Its `metadata` carries the run's `RequestContext` when dispatched through the agent loop. |
 | `AiToolServerHandler` | type alias | The server execution function. |
 | `AiToolExecutionKind` | type alias | `"server" \| "client"`. |
 | `RenderUiToolInput` | interface | Input shape of the `render_ui` contract. |
