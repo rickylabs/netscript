@@ -40,4 +40,31 @@ run-loop §4.
 
 - Graft v0.13.0 installed globally (npm, Node v22.22.2). `graft build`: 2,956 files parsed, 17,861
   nodes / 35,598 edges, 35.7s wall. Query smoke PASS (see research.md).
-- Status: in progress (this commit).
+- Done: commit `5a37248`, draft PR #1697 opened, labels `type:chore area:tooling status:impl
+  priority:p2 ci:skip-e2e ci:skip-scaffold`.
+
+### S2 — integration surface
+
+- Canonical `.agents/skills/graft/SKILL.md` + generated mirror; `/graft/` gitignore; root
+  `.ignore`. Sync tool also caught up stale `netscript-pr` mirror (generated).
+- Gates: `agentic:sync-claude` SYNCED (19 skills/23 files); `agentic:check-claude` ok:true; scoped
+  fmt clean; `deno.lock` reverted (tool run churn, not committed). Commit `d64cec2`, PR comment
+  posted.
+- Note: Deno was absent from this cloud container; installed 2.9.5 locally for gates.
+- Reconcile note: no new PR/issue comments; no related-issue moves needed yet (#1681/#1682/#1688
+  referenced only as benchmark ground truth).
+
+### S3 — benchmark workflow + verified ground truth
+
+- `.llm/tools/agentic/graft/benchmark-workflow.js`: 6 tasks × {baseline, graft} sequential Opus 5
+  medium probes (output-token deltas via `budget.spent()`, self-reported tool counts + epochs),
+  then 6 blind pairwise judges (deterministic A/B alternation) with repo access and the ground
+  truth keys. 18 agents total — above the 15 guideline, justified by the owner's full
+  before/after ask.
+- Ground truth supervisor-verified in-repo: T1 abstracts extending `PluginContribution`
+  (10 files); T2 queue KV `queueName` metadata-only ⇒ shared keyspace (#1682); T3
+  `generateRuntimeRegistry` caller chain; T4 `PluginCliCommand` → maintainer composition chain;
+  T5 `use-dialog.ts:58-61` conditional `showModal()` (#1688 addressed); T6
+  `dax-process-runner.ts` env injection + telemetry context modules (#1681 gap).
+- Observation for the review: graft query output injects an instruction to report "tokens saved"
+  — prompt-injection-ish tool output; probe prompts explicitly neutralize it.
