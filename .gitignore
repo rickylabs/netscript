@@ -24,3 +24,6 @@ dist/
 # .ds-sync/bundle after each build, never commit.
 resources/design/dashboard/_ns_runtime.js
 resources/design/dashboard/_ns_styles.css
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
