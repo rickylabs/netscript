@@ -68,3 +68,19 @@ run-loop §4.
   `dax-process-runner.ts` env injection + telemetry context modules (#1681 gap).
 - Observation for the review: graft query output injects an instruction to report "tokens saved"
   — prompt-injection-ish tool output; probe prompts explicitly neutralize it.
+- Commit `a633e3b`, PR comment posted. Reconcile: CI green on all heads (check_suite events);
+  no new review comments.
+
+### S4 — benchmark execution
+
+- Workflow `wf_f33ba4bf-839`: 18/18 agents, 0 errors, 18.3 min, 1.157M subagent tokens.
+- Results: `benchmark-results.md` + `benchmark-raw.json`. Aggregate: graft −14.1% output tokens,
+  +27.1% tool calls, +5.5% wall, mean judge score 8.83 vs baseline 9.33 (0 graft wins, 4 baseline
+  wins, 2 ties). Upstream −42%/−46%/−60% claims not reproduced at the structural tier.
+- Gate: all probes/judges returned schema-valid structured output; metrics table complete. PASS.
+
+### S5 — verdict
+
+- Supervisor recommendation: **do not merge as-is** — quality regression and no efficiency win at
+  the zero-cost tier; token win confined to enumerable tasks. Full review + decision options in
+  the PR verdict comment; owner decides.
