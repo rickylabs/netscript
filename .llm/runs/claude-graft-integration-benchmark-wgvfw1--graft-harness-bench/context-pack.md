@@ -13,3 +13,11 @@
 - If owner says merge: flip DoD boxes, `status:ready-merge`. If close: close PR #1697 unmerged;
   no repo cleanup needed beyond the branch (graft/ is local-only).
 - Standing: send_later check-in trig_015syijxyyhPBj88bXKvGuY9 (cancel when PR settled).
+
+## Close (2026-08-25)
+
+Owner closed PR #1697 unmerged — decision matches the supervisor recommendation (structural-tier
+Graft: no efficiency win, slight quality regression). Graft is NOT adopted. The branch preserves
+the full evaluation (integration surface, benchmark workflow, raw results) for any future
+re-evaluation of the `--deep` tier. Check-in triggers cancelled; no repo cleanup needed
+(graft/ was local-only, never committed).
