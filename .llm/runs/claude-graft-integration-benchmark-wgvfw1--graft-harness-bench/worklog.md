@@ -1,0 +1,43 @@
+# Worklog — graft-harness-bench
+
+## Design
+
+1. **Public surface**
+   - `.agents/skills/graft/SKILL.md` (canonical) + `.claude/skills/graft/SKILL.md` (mirror): when
+     and how agents use `graft ask|grep|callers|skeleton|map` before broad file reads.
+   - `.gitignore` `/graft/` entry + root `.ignore` (Graft-generated, kept).
+   - `.llm/tools/agentic/graft/benchmark-workflow.js`: the committed benchmark workflow script
+     (tasks, conditions, metrics, judge).
+   - `.llm/runs/<run-id>/benchmark-results.md`: raw per-agent metrics + judged quality.
+2. **Domain vocabulary** — benchmark `Task {id, prompt, groundTruth}`, `Condition = baseline |
+   graft`, `ProbeResult {toolCalls, graftCommands, startedAt, endedAt, answer}`, judge
+   `Verdict {winner, groundedness scores, rationale}`.
+3. **Ports** — none; the workflow uses the harness `agent()` seam only.
+4. **Constants** — task ids `T1..T6`; conditions; probe schema in the workflow script.
+5. **Commit slices**
+   - S1: run scaffolding (supervisor/research/plan/worklog/context-pack/drift) + draft PR opened.
+     Gate: PR exists, artifacts pushed.
+   - S2: Graft integration surface (`.gitignore`, `.ignore`, skill canonical + mirror). Gate:
+     validate-claude-surface + scoped fmt on new md.
+   - S3: benchmark workflow script + task set with verified ground truth. Gate: script parses;
+     ground truth verified by supervisor against the repo.
+   - S4: benchmark execution (12 probes + judge) + `benchmark-results.md`. Gate: all agents
+     returned structured output; metrics table complete.
+   - S5: verdict + complete benchmark/review PR comment; close artifacts. Gate: PR comment posted.
+6. **Deferred scope** — see plan.md.
+7. **Contributor path** — read the skill file, run `graft build`, copy a task row in
+   `benchmark-workflow.js` to extend the benchmark.
+
+## PLAN-EVAL
+
+`PLAN-EVAL: N/A` — bounded agent-tooling evaluation; no framework source; owner fixed the
+acceptance protocol in chat (before/after Opus 5 medium benchmark decides merge). Recorded per
+run-loop §4.
+
+## Slices
+
+### S1 — scaffolding + draft PR
+
+- Graft v0.13.0 installed globally (npm, Node v22.22.2). `graft build`: 2,956 files parsed, 17,861
+  nodes / 35,598 edges, 35.7s wall. Query smoke PASS (see research.md).
+- Status: in progress (this commit).
