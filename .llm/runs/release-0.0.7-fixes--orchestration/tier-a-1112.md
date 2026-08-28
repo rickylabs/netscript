@@ -368,3 +368,50 @@ folded in.
 
 **Next gate:** fresh Tier-A on the repaired plan head. **Cycle 2 is prepared but NOT launched** until
 the coordinator grants it.
+
+## Pre-established evidence boundary for the forthcoming Tier-A — instrument validated before use
+
+The coordinator's boundary: do not accept a plan whose checks pass only while **untracked** generated
+output sits in the worktree. `basic-usage.ts` is selected by the ordinary wrapper, so after scratch
+cleanup its literal generated-client import must still resolve **in a clean exact-head checkout**, or
+the plan must explicitly STOP with the minimum additional path(s).
+
+This topic built and **validated the proof instrument in advance**, so the eventual verdict rests on an
+executable test rather than on reading the plan.
+
+**Method.** `git archive <exact head> | tar -x` into a scratch directory — tracked files only, no
+untracked residue by construction — then run the ordinary structured wrapper there.
+
+**Both directions proven** at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`:
+
+| Scratch state | Result |
+| --- | --- |
+| Pristine, as checked in | `filesSelected: 12`, `failedBatches: 0`, `totalOccurrences: 0`, **exit 0** — green control |
+| Same, with `import { PrismaClient } from './.generated/client.ts'` appended to `basic-usage.ts` | **exit 1**, `failedBatches: 1`, **`TS2307 Cannot find module`** |
+
+The scratch example was restored immediately; the archive is disposable and the leaf worktree was never
+touched.
+
+**Two facts this settles, which were previously assumption:**
+
+1. **`examples/basic-usage.ts` is genuinely selected** by the ordinary wrapper. A near-miss is recorded:
+   `packages/prisma-adapter-mysql/deno.json` does carry `"exclude": ["examples/**", …]`, which looked
+   like the example being excluded from checking — but that block lives under **`publish`**, and the
+   file has **no top-level `exclude`**. It excludes examples from *publishing*, not *type-checking*.
+   Reporting that as a contradiction of the coordinator's premise would have been wrong; checking the
+   parent key settled it.
+2. **A literal `./.generated/client.ts` import fails in a clean checkout** when the generated output is
+   not committed — `TS2307`. So the plan cannot claim an executable example on that specifier while
+   leaving generated output untracked.
+
+**Verified at the current head:** the leaf worktree is clean including untracked files
+(`git status --untracked-files=all` empty), no `.generated` directory exists anywhere under the package,
+and no `.gitignore` entry hides one. The author cleaned its earlier scratch probe correctly.
+
+**Application at the repaired head — no PASS without this:** re-run the archive-based check at the exact
+pushed head. If `basic-usage.ts`'s literal import fails there, the plan must either name the minimum
+additional path(s) with proof, or have explicitly STOPPED. **No silent eighth path, and no downgrading
+the executable claim to make the gate green.** A green obtained only because untracked output survived
+in the author's worktree is not a pass.
+
+Author `01a047f1-…` remains `working` on the repair. Cycle 2 remains withheld.
