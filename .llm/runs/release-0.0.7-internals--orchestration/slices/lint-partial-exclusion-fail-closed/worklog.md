@@ -128,6 +128,7 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | 2026-08-28           | implement | S1 doctor coverage       | Removed only the root lint task's obsolete doctor wrapper exclusion. Shipped `2037/35/0` and corrected `2041/36/0` both exit 0; corrected per-file proof is `2041/2041/0`, exit 0; focused doctor selection is exactly `4/4/0`. |
 | 2026-08-28           | implement | S2 lint fail-closed       | Added terminal `Checked N` coverage accounting, mismatch-only probes through the existing runner seam, shared coverage JSON, and refusal ≥ crash ≥ finding. Focused suite 14/14 and two-file structured check pass; root lint is `2041/2041` processed at default and batch size 1. |
 | 2026-08-28           | implement | S3 fmt fail-closed        | Introduced the local injectable fmt runner, three mode-aware completion forms, write-mode `--check` probes, and the same coverage contract/precedence. Focused suite 17/17 and two-file structured check pass; root fmt is `2041/2041` processed at default and batch size 1 with zero findings. |
+| 2026-08-28           | implement | S4 canonical asset        | Ran `gen:assets-barrel` twice. Both passes left the same diff hash; the only generated delta is `agent-tools.generated.ts`, driven by the embedded lint wrapper and bundle hash. Fmt remains absent from `consumer-tools.json`. |
 
 ## Decisions
 
@@ -194,6 +195,10 @@ the slice verdicts.
 | S3 | Root `fmt:check` at default batching | PASS — exit 0, `2041 selected / 2041 processed`, 36 batches, 0 failed, 0 findings |
 | S3 | Root fmt check at `--batch-size 1` | PASS — exit 0, `2041 selected / 2041 processed`, 2041 batches, 0 failed, 0 findings |
 | S3 | Scope inspection | PASS — only fmt wrapper/test plus leaf evidence after S2; lint/deno config unchanged in this slice; no generated/evaluator/workflow path touched |
+| S4 | Canonical `gen:assets-barrel`, first pass | PASS — only `packages/cli/src/kernel/assets/agent-tools.generated.ts` changed; 2 insertions/2 deletions |
+| S4 | Canonical `gen:assets-barrel`, second pass | PASS — complete diff SHA-256 remained `13049ed995c29a7da844bb01d40e989dba32957683b0b04e720489b9960e968b` |
+| S4 | Consumer/publish boundary | PASS — manifest contains `run-deno-lint.ts` and not `run-deno-fmt.ts`; embedded body and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` delta are lint-only |
+| S4 | Generated scope inspection | PASS — no second generated path, source path, lock, cache, config, or workflow file changed |
 
 ## Post-slice reconcile notes
 
@@ -210,6 +215,11 @@ the slice verdicts.
   open with exactly one `status:impl`; PR remains open/draft at the pushed S2
   head. The only new comment is the run-owned S2 record; no reviewer finding,
   issue-state change, or plan/drift readjustment appeared.
+- **S4:** Swept issue #1709 and draft PR #1710 after the S3 publication. Issue
+  remains open with exactly one `status:impl`; PR remains open/draft at pushed
+  S3 head `20898a07477ae2dd8519b1750fab1eba99807211`. The only new comment is the
+  run-owned S3 record; no reviewer finding, issue-state change, or plan/drift
+  readjustment appeared.
 
 ## Handoff notes
 

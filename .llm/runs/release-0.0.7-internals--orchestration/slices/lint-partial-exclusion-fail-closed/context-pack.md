@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
-| Current phase  | bounded implementation; S1-S3 proven; S4 next                                    |
+| Current phase  | bounded implementation; S1-S4 proven; final validation next                      |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
 | Author thread  | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                             |
@@ -73,21 +73,27 @@ implementation ceiling remains exactly six paths, with no seventh path.
   JSON/precedence matches lint, the focused suite is 17/17, the two-file check
   is green, and root fmt proves `2041 selected / 2041 processed` with zero
   findings at default and batch size 1.
+- Completed S4 through the canonical generator only. The first and second
+  passes produced the identical complete-diff SHA-256
+  `13049ed995c29a7da844bb01d40e989dba32957683b0b04e720489b9960e968b`;
+  the only generated delta is `agent-tools.generated.ts`. The embedded body and
+  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` change are lint-driven; fmt has no consumer
+  manifest entry or publish claim.
 
 ## Active slice boundary
 
-- S1-S2 are pushed/commented. S3 is complete and recorded in the commit
-  containing this context pack. S4 may begin only after the S3 commit is
-  explicitly pushed and commented on draft PR #1710.
+- S1-S3 are pushed/commented. S4 is complete and recorded in the commit
+  containing this context pack. The locked 14-row final-head validation may
+  begin only after the S4 commit is explicitly pushed and commented on draft
+  PR #1710.
 
 ## Next steps
 
-1. Commit, explicitly push, and post S3 scope/hash/gate evidence to draft PR
+1. Commit, explicitly push, and post S4 scope/hash/gate evidence to draft PR
    #1710.
-2. Run S4 canonical lint-only asset regeneration twice; stop if any generated
-   path other than `agent-tools.generated.ts` changes.
-3. Then run all 14 rows at the final pushed
-   head and hand off to separate-session IMPL-EVAL.
+2. Run all 14 rows, record the consolidated evidence, then rerun every receipt
+   at the final pushed evidence head before the PR handoff.
+3. Hand off that immutable exact head to separate-session IMPL-EVAL.
 4. Any seventh implementation path remains an immediate rescope stop.
 
 ## Key decisions
@@ -116,6 +122,7 @@ implementation ceiling remains exactly six paths, with no seventh path.
 | S1 root lint correction       | PASS                                | `2037/35/0 → 2041/36/0`; per-file `2041/2041/0`; doctor `4/4/0`; exit 0 |
 | S2 lint coverage contract     | PASS                                | focused 14/14; structured check; default/per-file root `2041 processed`; exact 1/2/200 controls |
 | S3 fmt coverage contract      | PASS                                | focused 17/17; structured check; default/per-file root `2041 processed`, zero findings; check/write controls |
+| S4 canonical embedded asset   | PASS                                | generator twice; identical diff hash; only `agent-tools.generated.ts`; lint-only consumer delta |
 | Frozen proving gates          | NOT_RUN for implementation        | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` |
 | Root drop-free baseline       | PASS in evaluator scratch archive | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0           |
 | Quality                       | NOT_RUN for implementation        | `allowCount` must remain 7                                               |
@@ -142,9 +149,8 @@ implementation ceiling remains exactly six paths, with no seventh path.
 - Cycle-2 evaluator verdict: `f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad`.
 - F4-amended plan head: the commit containing this context pack; PR #1710 head
   and the amendment phase comment are the plan authority.
-- S1 implementation: the commit containing this updated context pack; exact SHA
-  is recorded by the draft PR commit and per-slice comment.
-- S2 implementation: the commit containing this updated context pack; exact SHA
-  is recorded by the draft PR commit and per-slice comment.
-- S3 implementation: the commit containing this updated context pack; exact SHA
+- S1 implementation: `fe4e4eec617a1b083f3633e026fe88f6b6be960a`.
+- S2 implementation: `78d9d008ededac20dd5da73f189fa5c7f69807c3`.
+- S3 implementation: `20898a07477ae2dd8519b1750fab1eba99807211`.
+- S4 canonical asset: the commit containing this updated context pack; exact SHA
   is recorded by the draft PR commit and per-slice comment.
