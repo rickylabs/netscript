@@ -1633,3 +1633,64 @@ Docker, browser, or `e2e:cli`.
 
 It was told an honest `FAIL_PLAN` is a correct outcome and **not to soften because supervisor Tier-A
 already passed — Tier-A is a lighter, different gate and not a substitute** for the formal one.
+
+## 2026-08-28 — #1709 PLAN-EVAL cycle 1 verdict: **`FAIL_PLAN`** at `59b79ccd8`
+
+| Field              | Value                                                        |
+| ------------------ | ------------------------------------------------------------ |
+| Verdict            | **`FAIL_PLAN`** — cycle 1 of the ordinary two                |
+| Evaluated head     | `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c`                   |
+| Verdict commit     | `59b79ccd899ab02a2377e48bba2fdf9dbc866200` (only `plan-eval.md`) |
+| Branch/PR head now | `59b79ccd8` — local = remote = PR `headRefOid`               |
+| Evaluator          | `1b7a1305-a353-4c1d-a415-34ee8869ff6b`, bridge `cse_012Nz3aE9mhoeyfaiGpKGvse`, CLI `2.1.250` |
+| Route / family     | native Anthropic **Fable 5 · medium · RC**, `providerEnv {}` — requested == observed; **opposite family** to the Codex author |
+| PR comment         | `[PHASE: PLAN-EVAL] [VERDICT: CHANGES_REQUESTED]`            |
+
+Bounds clean: the commit touches only `plan-eval.md`; tree clean; no product/tooling/config/workflow
+mutation; no label, ready, merge, checkbox, acceptance-evidence, or central-state change; no lease or
+runtime gate.
+
+### What it confirmed (everything the brief demanded be re-derived)
+
+Adapter shapes including singular/plural and ANSI, the anti-inference rule, probe forms, both
+refusals in both wrappers, `allowCount: 7`, the lint-only publish surface, generator idempotence,
+`2037/35/0 → 2041/36/0` with the malformed sibling unexposed, and **no seventh path forced**. It
+found the root-task correction *stronger* than the plan claimed.
+
+### The two blocking findings — I verified both independently
+
+**F1 — the plan states a fact about existing code that is wrong.** It assumes an injectable runner
+seam in both wrappers. Executed at the evaluated head:
+
+- `.llm/tools/run-deno-lint.ts` — `export type BatchRunner` at `:430`, `denoLintRunner` at `:436`,
+  and an injectable `runner: BatchRunner = denoLintRunner` parameter at `:472`.
+- `.llm/tools/run-deno-fmt.ts` — **zero matches.** No injectable runner exists.
+
+So S3 must *introduce* an equivalent seam inside `run-deno-fmt.ts`. Because it is inside an
+already-authorized path and creates no new file, **this does not force a seventh path** — but the
+plan's "decisions locked" box is genuinely unchecked while it asserts a seam that is not there.
+
+**F2 — crash-batch coverage semantics are undefined**, and the failure-precedence table has no crash
+row. I verified the premise underlying the recommended fix: **Deno still emits a completion summary
+on a parse-error batch.** With a syntactically broken `bad.ts` beside a good file, `deno lint`
+printed `Checked 2 files` (exit 1) and `deno fmt --check` printed
+`Found 1 not formatted file in 2 files` (exit 1). Coverage *can* therefore be evaluated on crash
+batches, which makes the evaluator's proposed precedence (refusal ≥ crash ≥ ordinary finding)
+workable — but the plan must choose and pin a rule either way, or S2/S3's crash controls have no
+defined expected exit or `coverage` shape.
+
+**F3** (also required): tighten validation row 8 to "exit 0 for both root tasks" and add per-file
+drop-free evidence to S1 and S2/S3.
+
+Three advisories are explicitly non-blocking: `coverage` omitted in lint `--input` mode, `--check`
+probes in write mode, and a CRLF summary fixture.
+
+### Assessment
+
+This is a **specification-gap** failure, not a design failure. The architecture, envelope, adapters
+and publish reasoning all survived independent re-derivation; what is missing is a crash-precedence
+rule and a corrected statement about the fmt seam. Both are cheap now and, as the evaluator notes,
+expensive once S2's tests exist. Cycle 2 of the ordinary allowance remains available — **no
+exceptional authorization is required**, unlike #1663's third cycle.
+
+Implementation remains ungranted and unrecommended.
