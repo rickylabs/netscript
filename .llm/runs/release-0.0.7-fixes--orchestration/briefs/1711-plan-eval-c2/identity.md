@@ -27,3 +27,24 @@ untracked, **zero** active `#1711`/`#1112` evaluator sessions, Docker **0**, no 
 
 Observed route recorded below after launch, proven from the registered job state — not from the
 `--remote-control` flag, which is what made cycle 1's first attempt wrong.
+
+## Observed route — after launch. **ATTACHED**
+
+| Field | Value |
+| --- | --- |
+| Background job id | **`18b66c8f`** |
+| Session id | **`18b66c8f-ebab-441e-9707-0d31a507dff8`** |
+| Bridge session id | **`cse_01EQXNxAuAuhDuRKvGYBx5iY`** |
+| Remote Control URL | **`https://claude.ai/code/cse_01EQXNxAuAuhDuRKvGYBx5iY`** |
+| `bridgeOutboundOnly` | **`false`** — mandatory attachment gate satisfied |
+| Backend / PID / State | `daemon` / `363143` / `working` |
+| cwd | `/home/codex/repos/netscript-007-eval-1711-c2` — the distinct cycle-2 worktree |
+| `providerEnv` | **`{}`** — empty |
+| `respawnFlags` | `--effort medium --remote-control --permission-mode bypassPermissions --model claude-fable-5` |
+| Route verdict | **matched** — native Claude Fable 5 · medium · Remote Control |
+
+Attachment claimed on `bridgeOutboundOnly: false` **plus** non-empty `bridgeSessionId` **plus** matching
+cwd — the evidence `claude-manager` requires — not on the `--remote-control` flag alone.
+
+Exactly one evaluator is live (`claude agents --json` shows a single `#1711` session). The cycle-1
+worktree is preserved untouched so its verdict artifact `5b58738ab` remains reachable.
