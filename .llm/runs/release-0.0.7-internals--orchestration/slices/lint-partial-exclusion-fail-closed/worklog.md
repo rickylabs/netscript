@@ -8,7 +8,7 @@
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
-| Authorization  | Owner-accepted F4 plan-artifact amendment only; no third PLAN-EVAL                 |
+| Authorization  | Coordinator-authorized bounded implementation; strict S1 → S2 → S3 → S4           |
 
 ## Design
 
@@ -124,6 +124,8 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | 2026-08-28           | plan-eval | cycle 2                | `FAIL_PLAN` at evaluator commit `f2b3fc8b3`: F1, F3, and A1-A3 closed; F2 closed except for single F4 write-mode completion extension. Ordinary allowance exhausted. |
 | 2026-08-28           | research  | F4 signal measurement  | Independently measured Deno 2.9.5 write crashes outside the checkout: `1 of 1 checked file`, `1 of 2 checked files`, and `2 of 3 checked files`, ANSI-prefixed, exit 1. |
 | 2026-08-28           | plan      | owner F4 amendment      | Admitted the write-only third form, extended exact crash controls to fmt write mode at 1/2/200, preserved precedence/F1-F3/A1-A3/six paths; no third PLAN-EVAL. |
+| 2026-08-28           | plan-gate | fresh Tier-A             | Topic-supervisor independently returned `PASS` on exact plan head `fc00aed0f`; coordinator then granted bounded implementation. |
+| 2026-08-28           | implement | S1 doctor coverage       | Removed only the root lint task's obsolete doctor wrapper exclusion. Shipped `2037/35/0` and corrected `2041/36/0` both exit 0; corrected per-file proof is `2041/2041/0`, exit 0; focused doctor selection is exactly `4/4/0`. |
 
 ## Decisions
 
@@ -167,8 +169,27 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | Root drop-free evaluator baseline     | cycle-1 §7 batch-size-1 lint/fmt                                        | PASS baseline proof         | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0              |
 | PLAN-EVAL cycle 2                     | evaluator artifact / `f2b3fc8b3`                                        | `FAIL_PLAN` / F4 only       | F1, F3, A1-A3 closed; F2 needs only write extension; no third PLAN-EVAL     |
 
-Implementation gates are intentionally NOT_RUN. Disposable raw commands
-establish parser evidence; they are not implementation verdicts.
+Full final-head implementation gates remain NOT_RUN until S4. Disposable raw
+commands establish parser evidence only; the structured wrapper rows below are
+the slice verdicts.
+
+## Implementation slice evidence
+
+| Slice | Evidence | Result |
+| ----- | -------- | ------ |
+| S1 | Shipped `deno task lint` before edit | PASS — exit 0, `filesSelected: 2037`, `batches: 35`, `failedBatches: 0` |
+| S1 | Corrected `deno task lint` | PASS — exit 0, `filesSelected: 2041`, `batches: 36`, `failedBatches: 0` |
+| S1 | Corrected root wrapper with `--batch-size 1` | PASS — exit 0, `filesSelected: 2041`, `batches: 2041`, `failedBatches: 0` |
+| S1 | Focused doctor root with `--batch-size 1` | PASS — exit 0, exactly `filesSelected: 4`, `batches: 4`, `failedBatches: 0`; malformed marker-owned sibling absent |
+| S1 | Scope inspection | PASS — only `deno.json` plus this leaf's harness evidence; separate root `lint.exclude` and fmt exclusions unchanged |
+
+## Post-slice reconcile notes
+
+- **S1:** Swept issue #1709 and draft PR #1710 after the gate. Issue remains open
+  with the correct milestone/type/area and one `status:plan`; PR remains draft at
+  the plan head. Read the latest topic-supervisor Tier-A `PASS`; no reviewer
+  objection or scope readjustment appeared. Publish S1 with `status:impl`, retain
+  `Closes #1709`, and make no plan/drift change.
 
 ## Handoff notes
 
@@ -190,6 +211,5 @@ establish parser evidence; they are not implementation verdicts.
   idempotent.
 - Confirm no seventh path, new allowance, evaluator/runtime lease, or N/A gate
   is requested.
-- No third PLAN-EVAL exists. After the exact amended head is pushed, the
-  coordinator runs a fresh Tier-A; on `PASS`, the leaf stops for a separate
-  implementation grant.
+- Plan gate is closed and bounded implementation is active. S1 is proven; S2 is
+  next. Formal IMPL-EVAL remains a separate later session after the final push.

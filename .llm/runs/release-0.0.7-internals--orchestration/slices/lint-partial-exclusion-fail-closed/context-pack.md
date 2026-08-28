@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
-| Current phase  | owner-accepted F4 plan amendment after cycle-2 `FAIL_PLAN`; implementation blocked |
+| Current phase  | bounded implementation; S1 proven; S2 next                                      |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
 | Author thread  | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                             |
@@ -38,9 +38,9 @@ summaries. F4 adds only the write-scoped
 `^error: Failed to format (\d+) of (\d+) checked files?$` completion form,
 using the second integer as processed, and write-mode crash-only/crash+drop
 controls at 1, 2, and 200. A complete write crash remains exit 1; a simultaneous
-coverage refusal exits 2. No product/tool/config/workflow/generated source has
-changed. The implementation ceiling remains exactly six paths, with no seventh
-path.
+coverage refusal exits 2. Fresh topic-supervisor Tier-A passed exact head
+`fc00aed0f`, and the coordinator granted bounded implementation. The
+implementation ceiling remains exactly six paths, with no seventh path.
 
 ## Completed
 
@@ -57,20 +57,25 @@ path.
 - Extended the existing fmt adapter and exact crash matrix to write mode without
   changing the common coverage contract or precedence.
 - Kept the frozen proving gates and all N/A surfaces unchanged.
+- Completed S1 first: removed only the root lint task's obsolete doctor-family
+  wrapper exclusion. Shipped root lint was `2037/35/0`, corrected root lint is
+  `2041/36/0`, corrected per-file lint is `2041/2041/0`, and the focused doctor
+  selection is exactly `4/4/0`; every command exited 0.
 
-## Publication boundary
+## Active slice boundary
 
-- The amended plan head is the commit containing this context pack; resolve it
-  with `git rev-parse HEAD`. Draft PR #1710 remains the immutable record after
-  the explicit-refspec push and phase comment.
+- S1 is complete and recorded in the commit containing this context pack. S2
+  may begin only after the S1 commit is explicitly pushed and commented on draft
+  PR #1710.
 
 ## Next steps
 
-1. Author stops after publishing the immutable F4-amended head and PLAN comment.
-2. No third PLAN-EVAL is launched or requested. The coordinator runs a fresh
-   Tier-A on the exact pushed head.
-3. On Tier-A `PASS`, the leaf stops for a separate coordinator implementation
-   grant; implementation does not begin in this turn.
+1. Commit, explicitly push, and post S1 scope/hash/gate evidence to draft PR
+   #1710.
+2. Implement S2 only in the lint wrapper and focused lint test, then prove and
+   publish it before S3.
+3. Continue strict S3 → S4 ordering, then run all 14 rows at the final pushed
+   head and hand off to separate-session IMPL-EVAL.
 4. Any seventh implementation path remains an immediate rescope stop.
 
 ## Key decisions
@@ -95,6 +100,8 @@ path.
 | Plan repair                   | authoring / publication           | `plan.md`, `research.md`, `worklog.md`, `context-pack.md`, `drift.md`    |
 | PLAN-EVAL cycle 2             | `FAIL_PLAN`, F4 only               | evaluator commit `f2b3fc8b3`; ordinary allowance exhausted               |
 | Owner F4 amendment            | accepted / authored                | third write form plus check/write 1/2/200 controls; no third PLAN-EVAL   |
+| Fresh plan Tier-A             | PASS at `fc00aed0f`                 | plan gate closed; coordinator implementation grant received              |
+| S1 root lint correction       | PASS                                | `2037/35/0 → 2041/36/0`; per-file `2041/2041/0`; doctor `4/4/0`; exit 0 |
 | Frozen proving gates          | NOT_RUN for implementation        | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` |
 | Root drop-free baseline       | PASS in evaluator scratch archive | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0           |
 | Quality                       | NOT_RUN for implementation        | `allowCount` must remain 7                                               |
@@ -120,5 +127,6 @@ path.
 - Cycle-1 repaired plan head: `3e934e2de1ed758f7182ad1eebf027750bcfb976`.
 - Cycle-2 evaluator verdict: `f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad`.
 - F4-amended plan head: the commit containing this context pack; PR #1710 head
-  and the amendment phase comment are the authority. No implementation commit
-  exists.
+  and the amendment phase comment are the plan authority.
+- S1 implementation: the commit containing this updated context pack; exact SHA
+  is recorded by the draft PR commit and per-slice comment.
