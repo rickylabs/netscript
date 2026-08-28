@@ -857,3 +857,17 @@ implementation thread.
   evaluator left helpers whose cwd pointed into a removed evaluator tree. Those exact PIDs were
   stopped after containment proof while all four topic supervisors and their Remote Control bridges
   were preserved.
+- **A terminal central checkpoint can become stale while an explicitly authorized recovery proceeds:**
+  #1663's PR and leaf advanced from final PLAN-EVAL failure to verified S1-S5 and two passing
+  implementation evaluations under a documented owner grant, while the central JSON still claimed
+  no product mutation. Reconcile live PR commits, comments, branch identity, and evaluator artifacts
+  before treating a persisted terminal label as current truth.
+- **Supervisor attachment metadata is per-process evidence, not durable identity:** all four recorded
+  Claude processes had expired even though their clean topic checkpoints and ownership remained
+  valid. Restore one-for-one from the exact worktrees, verify native `/remote-control`, and update
+  only transport metadata; never infer permission to relaunch work, change ownership, or retry a
+  terminal gate from transport repair alone.
+- **Issue acceptance sweeps must be explicit even when the focused fix is complete:** #1618's request
+  to scan sibling package configs was absent from the evidence trail. The closeout audit performed
+  the cheap sweep, separated auto-discovered configs from custom-named non-candidates, and found no
+  additional blind spot before the PR acceptance map is rewritten.

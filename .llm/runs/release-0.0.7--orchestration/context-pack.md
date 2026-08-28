@@ -930,3 +930,27 @@ terminal evaluator and its exact deleted-cwd helpers are stopped, the clean #169
 worktrees and topic branches are removed, the audited `netscript-006-fixes` tree is absent, and no
 harness run on main is older than 21 days. Nine registered worktrees remain because each is a live
 supervisor, open-PR, central, main, or unrelated owned workspace.
+
+## 2026-08-28 recovery checkpoint
+
+Live GitHub and repository state supersede the stale 2026-08-23 terminal description for #1663.
+After the third/final PLAN-EVAL failure, the owner explicitly authorized the focused F1 amendment
+and Tier-A substitution, with no fourth evaluator. The canonical author then completed S1-S5;
+formal IMPL-EVAL passed at `e52c2f0e6`, the bounded delta evaluation passed at `b456f53f7`, and the
+clean local/remote/PR head is `e764be162`. The remaining work is exact-main rebase and closeout, not
+new implementation. A missing #1618 sibling-package sweep was recovered: two discoverable configs
+parse successfully and two custom-named configs are outside Deno auto-discovery, so no sibling blind
+spot was found. Pre-existing MCP export-map private-type-ref debt is registered separately as #1708
+and is not added to the frozen leaf.
+
+All four Claude Opus 5/high topic supervisors have new native Remote Control attachments while
+retaining their accepted topic ownership. Internals is active on #1663 closeout; docs and fixes are
+parked at their shipped clean heads; features remains parked at #1664 attempt 7 with no retry,
+fresh-browser, or evaluator authority. The coordinator remains GPT-5.6-SOL/high, never max. Docker
+and Aspire are empty; ten registered worktrees remain because the #1663 leaf has been restored for
+authorized closeout.
+
+Internals committed and explicitly pushed its closeout-only checkpoint at `d3ca2128d` and repaired
+PR #1663's durable pre-rebase record in place (comment `5450662110`). Slice rows S1-S5 and stable
+acceptance-comment URLs are present; final DoD and issue boxes remain intentionally unticked until
+the rebase produces the final head. The coordinator now owns rebase authorization.

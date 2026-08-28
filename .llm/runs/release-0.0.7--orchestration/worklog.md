@@ -1688,3 +1688,27 @@
   cwd ownership, removed the clean #1692 leaf/evaluator worktrees and branches, and confirmed the
   audited old `netscript-006-fixes` tree is absent. Docker is empty, Aspire reports `[]`, main has no
   harness run older than 21 days, and the remaining nine worktrees are live-owned.
+
+## 2026-08-28T09:09:22Z — supervisor transport recovery and #1663 closeout reconciliation
+
+- Reverified the coordinator route as GPT-5.6-SOL/high in the existing Codex Desktop task; max is
+  still forbidden. The repository capability probe cannot currently see a Codex app-server/mobile
+  endpoint, so that probe is recorded as unavailable rather than used as false transport evidence.
+- Restored docs, internals, fixes, and features one-for-one as native Claude Opus 5/high Remote
+  Control supervisors. Verified each `/remote-control` attachment and preserved every topic's
+  accepted ownership; no supervisor became an author or evaluator and no terminal lane was retried.
+- Reconciled the live #1663 history that had advanced beyond the stale central checkpoint under the
+  documented owner grant. The owner-directed cycle-3 F1 amendment used Tier-A instead of a fourth
+  PLAN-EVAL. S1-S5, formal IMPL-EVAL `e52c2f0e6`, delta IMPL-EVAL `b456f53f7`, and final evidence
+  `e764be162` are complete and pushed.
+- Registered pre-existing MCP export-map private-type-ref debt as #1708 rather than expanding the
+  frozen thirteen-path #1663 surface. Recovered the missing #1618 sibling-package sweep and found no
+  additional auto-discovered config with the blind spot.
+- Docker remains at zero containers and Aspire reports no applications. The #1663 leaf is restored,
+  so ten live-owned registered worktrees remain. Next gate is a canonical history-preserving rebase
+  onto `c73d361eea`, followed by fresh exact-head Tier-A, binding receipts, acceptance-record repair,
+  close gate, CI, and coordinator merge authority.
+- Internals then committed and explicitly pushed its topic-only closeout checkpoint `d3ca2128d` and
+  repaired PR #1663's durable pre-rebase record in place, with comment `5450662110`. It correctly
+  left final boxes unticked because the rebase will rewrite leaf SHAs, and stopped for coordinator
+  rebase authority without touching product source.

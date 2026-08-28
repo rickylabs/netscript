@@ -1019,3 +1019,21 @@ and documentation consequences without silently taking new milestone scope.
 
 The primary coordinator transport is this GPT-5.6-SOL/high Remote Control task; max effort is not
 authorized. No supervisor may grant itself an expensive-runtime, evaluator, or release-writer lease.
+
+## Active recovery checkpoint — 2026-08-28T09:09:22Z
+
+The coordinator remains the same Codex Desktop task on GPT-5.6-SOL/high; `max` remains forbidden.
+All four accepted topic owners are restored one-for-one as native Claude Opus 5/high Remote Control
+sessions: docs `da71d759` / `session_01BvQ7MLkdfUFi6mVBycozGY`, internals `c9c0e954` /
+`session_0179hsVs5Df7UzovHUP1wuC4`, fixes `ea346a9a` /
+`session_01Y1YKBnzUJVuXB5akcxeRT6`, and features `6a137926` /
+`session_01G8JdKBR2UymUYsvDYGX6W4`. Their topic boundaries did not change.
+
+#1663 is no longer at an owner boundary. The owner-directed cycle-3 F1 amendment at `62811a9dd`
+used fresh internals Tier-A as the replacement plan gate, explicitly without a fourth PLAN-EVAL.
+S1-S5, the formal IMPL-EVAL, and the delta IMPL-EVAL passed; the leaf is clean and pushed at
+`e764be162`. Internals owns closeout review only: preserve the thirteen-path product boundary,
+rebase through the canonical author route, renew exact-head evidence, repair the PR/issue acceptance
+record, and stop before readiness or merge for coordinator authority. `scaffold.runtime` remains
+coordinator-waived N/A. #1664 stays terminal at attempt 7; fixes and docs stay parked without new
+scope. Per-lane serial queues remain independent of one another.
