@@ -634,3 +634,30 @@ unchanged at `da769cd7c`. Docker **0**, no runtime lease, no other lane touched.
 
 PLAN-EVAL cycle count for this leaf: **2 of 2 — exhausted**. Awaiting the owner decision on the bounded
 path above.
+
+## Owner acceptance of the bounded F1-b correction — 2026-08-28
+
+Owner accepts PLAN-EVAL cycle-2 finding F1-b and authorizes a bounded **plan-only** amendment.
+Framing recorded by owner instruction: Prisma 8 is imminent and the Prisma-next RFC will rewrite the
+database layer, so this is a **temporary Prisma 7 correctness measure** — not new architecture and
+not expanded investment.
+
+- Terminal verdict reconciled from evaluator artifact `60cf79ee54ca17dfaa7d62c609290993040539f9`
+  (`refs/heads/eval/plan-eval-1711-cycle-2`), comment `5454993523`, evaluated head `da769cd7c`.
+- Supervisor verdict checkpoint at acceptance: `062ca663700c6894f4d5a7b3c6f7d283a0fd2496`.
+- Canonical author `01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8` resumed — same thread, no rival author.
+- Authorized scope: literal `await import('./.generated/client.ts')`; gate 5 structured-checks the
+  actual `examples/basic-usage.ts` with scratch config and generated client present; D17 wrapper may
+  remain if useful; gate-1 untyped wording preserved plus a note that gate 5 types the actual
+  example; connected-adapter risk bound to that check; advisories A1 (import-map wording), A2
+  (generated-window note), A3 (`import.meta.main` smoke guard) folded in.
+- Ceiling unchanged at seven product paths. No implementation during the amendment. No third
+  PLAN-EVAL.
+- Brief: `.llm/runs/release-0.0.7-fixes--orchestration/briefs/1112-planeval-c2-amendment.md`.
+- Owner policy applied going forward: formal PLAN-EVAL is selected only for genuinely
+  critical/complex or decision-heavy work; after two consecutive terminal IMPL-EVAL failures, release
+  the evaluator, keep the author available, and surface the exact owner decision — never freeze the
+  author and never launch a third cycle.
+
+After the author's clean explicit push, the supervisor runs a fresh focused Tier-A only. If PASS, the
+result is reported for a coordinator implementation grant.
