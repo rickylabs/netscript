@@ -1,9 +1,9 @@
 # Leaf Author Identity — lint-partial-exclusion-fail-closed
 
-This file records the identity of the plan author session. The milestone
-supervisor remains the coordinator. After the ordinary two PLAN-EVAL cycles,
-the coordinator will run a fresh Tier-A against the owner-accepted F4-amended
-head; there is no third PLAN-EVAL.
+This file records the identity of the plan and implementation author session.
+The milestone supervisor remains the coordinator. The owner-accepted F4 plan
+passed fresh Tier-A, bounded implementation was granted, and formal IMPL-EVAL
+remains a separate opposite-family session; there was no third PLAN-EVAL.
 
 | Field    | Value                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -21,25 +21,28 @@ head; there is no third PLAN-EVAL.
 
 | Task lane               | Provider / model / effort                              | Role in this run                                                                                            |
 | ----------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `normal_implementation` | OpenAI / `gpt-5.6-sol` / medium (requested)            | Reused only for research and plan authoring under this plan-only authorization; no implementation performed |
+| `normal_implementation` | OpenAI / `gpt-5.6-sol` / medium (requested)            | Authored research/plan and executed the later coordinator-granted bounded S1→S4 implementation |
 | `eval_plan`             | Supervisor-selected fresh opposite-family Tier-A route | Two evaluator cycles are complete; no third PLAN-EVAL exists. Fresh coordinator Tier-A is not launched by this author. |
+| `eval_impl`             | Supervisor-selected fresh opposite-family Tier-A route | Required after the exact-head push; not launched and no verdict issued by this author |
 
 ## Authorization boundary
 
-- This turn may create or update only the eight harness artifacts named in the
-  brief and the draft PR metadata/comments required by the harness.
-- Coordinator rescope expands the later implementation plan to exactly six
-  non-harness paths: lint/fmt wrappers and tests, `deno.json`, and canonical
-  `agent-tools.generated.ts`. No seventh path is authorized.
-- Product, tooling, configuration, workflow, lock, and generated-source mutation
-  is prohibited.
+- The coordinator granted implementation of exactly six non-harness paths:
+  lint/fmt wrappers and tests, `deno.json`, and canonical
+  `agent-tools.generated.ts`, plus leaf harness evidence. No seventh path is
+  authorized.
+- No other product, tooling, configuration, workflow, lock, cache, or generated
+  path may change. The generated barrel is canonical-generator-only.
 - PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `59b79ccd8`; the repair closed
   F1-F3 and folded A1-A3. PLAN-EVAL cycle 2 returned `FAIL_PLAN` at
   `f2b3fc8b3` on F4 only. Both evaluator-owned artifacts are immutable.
 - The owner accepted only the recommended F4 amendment: admit the write-only
   `Failed to format M of N checked file(s)` adapter and extend the fmt write
   crash controls at 1/2/200. This does not reopen or restructure the plan.
-- The ordinary two-cycle allowance is exhausted. No third PLAN-EVAL is granted,
-  launched, or requested. Implementation remains blocked; after fresh
-  coordinator Tier-A `PASS`, the leaf stops for a separate implementation
-  grant.
+- The ordinary two-cycle allowance is exhausted. No third PLAN-EVAL was
+  granted, launched, or requested. Fresh coordinator Tier-A passed the amended
+  plan, and the later bounded implementation grant is now complete through
+  S1→S4 and the locked validation matrix.
+- The author must stop after a clean exact-head push and PR phase handoff. The
+  author does not merge, publish, flip readiness, close #1709, take a runtime or
+  evaluator lease, or issue an IMPL-EVAL verdict.

@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
-| Current phase  | bounded implementation; S1-S4 proven; final validation next                      |
+| Current phase  | implementation evidence recorded; exact-head receipt rerun next                  |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
 | Author thread  | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                             |
@@ -79,22 +79,27 @@ implementation ceiling remains exactly six paths, with no seventh path.
   the only generated delta is `agent-tools.generated.ts`. The embedded body and
   `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` change are lint-driven; fmt has no consumer
   manifest entry or publish claim.
+- Completed the locked 14-row matrix at pushed S4 head `14c4d7349`: focused
+  suites 14/14 and 17/17, check/test/root wrappers/quality/architecture/assets/
+  publish all exit 0, quality retains `allowCount: 7`, the CLI audit retains
+  exactly 19 existing WARN findings, and scope is six authorized paths plus
+  nine leaf artifacts.
 
 ## Active slice boundary
 
-- S1-S3 are pushed/commented. S4 is complete and recorded in the commit
-  containing this context pack. The locked 14-row final-head validation may
-  begin only after the S4 commit is explicitly pushed and commented on draft
-  PR #1710.
+- S1-S4 are separately committed, explicitly pushed, and commented. The full
+  validation pass is green. This evidence commit becomes the immutable
+  candidate; every receipt must be rerun after it is explicitly pushed, with
+  no subsequent repository edit.
 
 ## Next steps
 
-1. Commit, explicitly push, and post S4 scope/hash/gate evidence to draft PR
-   #1710.
-2. Run all 14 rows, record the consolidated evidence, then rerun every receipt
-   at the final pushed evidence head before the PR handoff.
-3. Hand off that immutable exact head to separate-session IMPL-EVAL.
-4. Any seventh implementation path remains an immediate rescope stop.
+1. Commit and explicitly push this consolidated evidence.
+2. Rerun every locked receipt at that exact pushed SHA without editing files.
+3. Post the exact-head implementation handoff and move only the phase status to
+   `status:impl-eval`; keep the PR draft and issue open.
+4. Hand off that immutable exact head to separate-session IMPL-EVAL.
+5. Any seventh implementation path remains an immediate rescope stop.
 
 ## Key decisions
 
@@ -123,9 +128,9 @@ implementation ceiling remains exactly six paths, with no seventh path.
 | S2 lint coverage contract     | PASS                                | focused 14/14; structured check; default/per-file root `2041 processed`; exact 1/2/200 controls |
 | S3 fmt coverage contract      | PASS                                | focused 17/17; structured check; default/per-file root `2041 processed`, zero findings; check/write controls |
 | S4 canonical embedded asset   | PASS                                | generator twice; identical diff hash; only `agent-tools.generated.ts`; lint-only consumer delta |
-| Frozen proving gates          | NOT_RUN for implementation        | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` |
+| Frozen proving gates          | PASS at pushed S4 head             | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` all exit 0 |
 | Root drop-free baseline       | PASS in evaluator scratch archive | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0           |
-| Quality                       | NOT_RUN for implementation        | `allowCount` must remain 7                                               |
+| Quality                       | PASS at pushed S4 head             | `allowCount: 7`; no allowance/ignore added                               |
 | Runtime/E2E/docs-site/MCP JSR | N/A                               | no evaluator/runtime lease; no scaffold/Aspire/Docker/browser/E2E        |
 
 ## Open questions
@@ -152,5 +157,6 @@ implementation ceiling remains exactly six paths, with no seventh path.
 - S1 implementation: `fe4e4eec617a1b083f3633e026fe88f6b6be960a`.
 - S2 implementation: `78d9d008ededac20dd5da73f189fa5c7f69807c3`.
 - S3 implementation: `20898a07477ae2dd8519b1750fab1eba99807211`.
-- S4 canonical asset: the commit containing this updated context pack; exact SHA
-  is recorded by the draft PR commit and per-slice comment.
+- S4 canonical asset: `14c4d7349b856b5dd07ed55ba0156504fb8fdef5`.
+- Final implementation evidence: the commit containing this context pack; its
+  exact pushed SHA is the separate-session IMPL-EVAL input.

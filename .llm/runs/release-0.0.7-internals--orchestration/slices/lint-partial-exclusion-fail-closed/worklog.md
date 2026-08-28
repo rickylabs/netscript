@@ -129,6 +129,7 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | 2026-08-28           | implement | S2 lint fail-closed       | Added terminal `Checked N` coverage accounting, mismatch-only probes through the existing runner seam, shared coverage JSON, and refusal ≥ crash ≥ finding. Focused suite 14/14 and two-file structured check pass; root lint is `2041/2041` processed at default and batch size 1. |
 | 2026-08-28           | implement | S3 fmt fail-closed        | Introduced the local injectable fmt runner, three mode-aware completion forms, write-mode `--check` probes, and the same coverage contract/precedence. Focused suite 17/17 and two-file structured check pass; root fmt is `2041/2041` processed at default and batch size 1 with zero findings. |
 | 2026-08-28           | implement | S4 canonical asset        | Ran `gen:assets-barrel` twice. Both passes left the same diff hash; the only generated delta is `agent-tools.generated.ts`, driven by the embedded lint wrapper and bundle hash. Fmt remains absent from `consumer-tools.json`. |
+| 2026-08-28           | validate  | locked 14-row matrix      | Complete pass at pushed S4 head `14c4d7349`: all rows green; quality retains 7 allowances; CLI audit retains its existing 19-WARN baseline; scope is exactly six authorized paths plus leaf evidence. |
 
 ## Decisions
 
@@ -172,9 +173,10 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | Root drop-free evaluator baseline     | cycle-1 §7 batch-size-1 lint/fmt                                        | PASS baseline proof         | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0              |
 | PLAN-EVAL cycle 2                     | evaluator artifact / `f2b3fc8b3`                                        | `FAIL_PLAN` / F4 only       | F1, F3, A1-A3 closed; F2 needs only write extension; no third PLAN-EVAL     |
 
-Full final-head implementation gates remain NOT_RUN until S4. Disposable raw
-commands establish parser evidence only; the structured wrapper rows below are
-the slice verdicts.
+The complete validation matrix passed at pushed S4 head `14c4d7349`. The
+structured wrapper rows below are the slice verdicts. After this evidence is
+committed, every receipt is rerun at the final pushed evidence head; that exact
+SHA and rerun are recorded in the PR handoff without another repository edit.
 
 ## Implementation slice evidence
 
@@ -200,6 +202,25 @@ the slice verdicts.
 | S4 | Consumer/publish boundary | PASS — manifest contains `run-deno-lint.ts` and not `run-deno-fmt.ts`; embedded body and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` delta are lint-only |
 | S4 | Generated scope inspection | PASS — no second generated path, source path, lock, cache, config, or workflow file changed |
 
+## Locked 14-row validation — evidence-recording pass
+
+| Row | Gate | Result |
+| --- | ---- | ------ |
+| 1 | Root lint coverage, default and per-file | PASS — default `2041 selected / 2041 processed / 36 batches / 0 failed`; batch size 1 `2041/2041/2041/0`; exit 0; S1 separately proves healthy +4 and malformed sibling absent |
+| 2 | Focused lint test | PASS — structured 14/14, including exact mixed/crash 1/2/200, CRLF/ANSI, refusals, and input omission |
+| 3 | Focused fmt test | PASS — structured 17/17, including seam fixtures, all three completion forms, check/write crash controls, non-mutating probes, and cross-wrapper contract |
+| 4 | Focused four-file check | PASS — 4 selected, 1 batch, 0 failures, 0 occurrences; no seventh dependency |
+| 5 | Frozen `check` | PASS — 2,925 selected, 25 batches, 0 failures/occurrences |
+| 6 | Frozen `test` | PASS — 4,233 passed, 19 ignored, 0 failed, 4,252 total |
+| 7 | Behavioral batch invariant | PASS — dedicated structured lint and fmt mixed-selection controls pass at 1/2/200 with exit 2 and `partial-exclusion` |
+| 8 | Root `lint` and `fmt:check` | PASS — both exit 0; each `2041 selected / 2041 processed / 36 batches`; lint 0 failures, fmt 0 findings |
+| 9 | `quality:scan` and `arch:check` | PASS — both exit 0; quality `allowCount: 7`, no allowance or ignore added |
+| 10 | Canonical regeneration twice | PASS — clean before/after each pass; committed generated delta remains lint-only and limited to `agent-tools.generated.ts` |
+| 11 | `check:assets-barrel` | PASS — exit 0 |
+| 12 | CLI publish dry run | PASS — exit 0, dry run complete; embedded lint text/hash included, no export/API or fmt publish claim |
+| 13 | Per-member CLI JSR audit | PASS with baseline debt — exit 0, internal dry run OK, exactly 19 existing WARN findings; not warning-free and no new leaf finding |
+| 14 | Scope/idempotence | PASS — raw diff contains exactly six authorized product/tool/config/generated paths plus nine leaf artifacts; no lock, cache, workflow, evaluator mutation, or seventh path |
+
 ## Post-slice reconcile notes
 
 - **S1:** Swept issue #1709 and draft PR #1710 after the gate. Issue remains open
@@ -220,6 +241,11 @@ the slice verdicts.
   S3 head `20898a07477ae2dd8519b1750fab1eba99807211`. The only new comment is the
   run-owned S3 record; no reviewer finding, issue-state change, or plan/drift
   readjustment appeared.
+- **Final validation:** Swept issue #1709 and draft PR #1710 after S4
+  publication. Issue remains open and PR remains open/draft with exactly one
+  `status:impl`; PR head is pushed S4 `14c4d7349b856b5dd07ed55ba0156504fb8fdef5`.
+  The only new comment is the run-owned S4 record; no reviewer finding,
+  acceptance block, readiness change, or scope readjustment appeared.
 
 ## Handoff notes
 
@@ -241,6 +267,7 @@ the slice verdicts.
   idempotent.
 - Confirm no seventh path, new allowance, evaluator/runtime lease, or N/A gate
   is requested.
-- Plan gate is closed and bounded implementation is active. S1-S3 are proven;
-  S4 canonical regeneration is next. Formal IMPL-EVAL remains a separate later
-  session after the final push.
+- Plan gate is closed and bounded implementation S1-S4 is proven. The complete
+  14-row matrix passed at the pushed S4 head; after this evidence commit it is
+  rerun at the final immutable head. Formal IMPL-EVAL remains a separate later
+  session after that push.

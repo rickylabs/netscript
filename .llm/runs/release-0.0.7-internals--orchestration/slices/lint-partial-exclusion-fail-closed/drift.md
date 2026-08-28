@@ -104,3 +104,21 @@ below.
 - **Next:** commit and explicitly push the amended head, update draft PR #1710,
   then stop. The coordinator runs a fresh Tier-A; on `PASS`, the leaf waits for
   a separate implementation grant.
+
+## 2026-08-28 — bounded implementation conforms to the locked plan
+
+- **What:** S1→S4 and the locked 14-row validation completed without an
+  implementation divergence or new rescope finding.
+- **Actual:** Both adapters exposed reconcilable terminal processed counts;
+  root lint retained `2041/2041` coverage at default and per-file batching;
+  fmt did the same with zero findings; quality retained exactly 7 allowances;
+  the CLI audit retained its 19-WARN baseline; canonical generation touched
+  only `agent-tools.generated.ts`; the raw scope diff contains exactly the six
+  authorized paths plus leaf harness evidence.
+- **Severity:** none / conformance record
+- **Action:** no plan amendment, allowance, seventh path, workflow/config
+  expansion, or coordinator rescope required. Commit the harness evidence,
+  rerun all receipts at that exact pushed head, and hand it to a separate
+  opposite-family IMPL-EVAL session.
+- **Preserved bounds:** no runtime/evaluator lease, publish, merge, ready flip,
+  issue closure, E2E, Docker, Aspire, browser, MCP JSR audit, or docs-site gate.
