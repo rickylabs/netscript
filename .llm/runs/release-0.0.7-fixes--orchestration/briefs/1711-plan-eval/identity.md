@@ -73,3 +73,40 @@ Stopped exactly `247931` and its exact wrapper `247929`, plus this topic's own s
 
 The pre-launch identity and brief commits are **preserved unchanged**; this section is appended, not
 substituted. The immutable plan head is untouched.
+
+## Attempt 2 — relaunched via the supported daemon/background route. **ATTACHED**
+
+Relaunched with `claude --bg` from `.agents/skills/claude-manager/SKILL.md:36`, in the same detached
+evaluator worktree, against the same immutable head, with the identical brief.
+
+| Field | Value |
+| --- | --- |
+| Background job id | **`29284a3f`** |
+| Session id | **`29284a3f-3d87-4614-a616-13a7babbbdf0`** |
+| Bridge session id | **`cse_01KHPgQNFFkjAYxeFbkRKfbW`** |
+| Remote Control URL | **`https://claude.ai/code/cse_01KHPgQNFFkjAYxeFbkRKfbW`** |
+| `bridgeOutboundOnly` | **`false`** — the mandatory attachment gate is satisfied |
+| Backend | `daemon` |
+| PID | `192628` |
+| State | `working` |
+| cwd | `/home/codex/repos/netscript-007-eval-1711` |
+| `providerEnv` | **`{}` — empty**, as required |
+| `respawnFlags` | `--effort medium --remote-control --permission-mode bypassPermissions --model claude-fable-5` |
+| Route verdict | **matched** — native Claude Fable 5 · medium · Remote Control |
+| Head under evaluation | `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a` — unchanged, worktree clean |
+
+Attachment is claimed only on `bridgeOutboundOnly: false` **plus** a non-empty `bridgeSessionId`
+**plus** matching cwd — the evidence `claude-manager` requires. It is not claimed from the
+`--remote-control` flag, which is what made attempt 1 wrong.
+
+`detail` at first poll read *"Inspecting package export surface, TLS source, example, site page"* —
+the evaluator is independently checking source rather than reading the plan's self-description.
+
+**Exactly one evaluator.** Attempt 1's process, its wrapper, and this topic's stale watcher were all
+stopped before relaunch, and no `#1711 PLAN-EVAL` process survived that cleanup. Docker remains 0.
+
+Recorded because it nearly misled this topic again: a `pgrep -x claude` scan for the brief text
+returned **nothing** for the running evaluator, because the daemon backend does not carry the prompt in
+a direct child's argv. That negative was a **false negative** — `claude agents --json` is authoritative
+for daemon-backed jobs, and the raw process scan is not. Attempt 1's argv-based proof worked only
+because a `nohup` child does carry it.
