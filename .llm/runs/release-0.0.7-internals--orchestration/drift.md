@@ -220,3 +220,31 @@ artifacts.
   release the evaluator lease, do not dispatch a third, do not re-task the author, and escalate with
   the exact decision the owner must make. Recorded here as the binding rule for internals.
 - **Evidence:** No IMPL-EVAL loop is currently open in this lane; #1709 is at plan stage.
+
+## 2026-08-28 — Owner accepted F4; bounded plan amendment authorized, no third PLAN-EVAL
+
+- **What:** PLAN-EVAL cycle 2 returned `FAIL_PLAN` on the single finding F4 (fmt write-mode crash
+  completion form unmeasured). The ordinary two-cycle allowance is exhausted. The owner **accepted
+  the recommended fix** — admit `error: Failed to format M of N checked files` as the third write
+  completion form, plus write-mode crash-only and crash-and-drop controls at 1/2/200 — and
+  authorized a **bounded plan-only amendment** by the same canonical author.
+- **Source:** Owner acceptance, 2026-08-28, following evaluator `14cfb576-…` verdict `f2b3fc8b3`.
+- **Expected:** A second `FAIL_PLAN` ordinarily returns the leaf to the owner with no further cycle.
+- **Actual:** It did return to the owner, who disposed it by accepting the recommendation rather than
+  parking the leaf. **No third PLAN-EVAL exists**; the plan gate is closed out by supervisor Tier-A.
+- **Severity:** authorized process disposition
+- **Action:** Resume canonical author `01a047f0-…` under `briefs/1709-f4-amendment.md` for the
+  bounded amendment; then fresh Tier-A only. On PASS the leaf stops for the coordinator's
+  implementation grant; on FAIL the author stays available and the exact finding returns.
+- **Evidence:** `plan-eval.md` at `f2b3fc8b3`; supervisor reproduction of the write-mode form.
+
+## 2026-08-28 — Hygiene at the terminal cycle-2 verdict
+
+- Evaluators `1b7a1305-…` (cycle 1) and `14cfb576-…` (cycle 2) both **`stopped`**; no evaluator lease
+  held or outstanding.
+- **0 processes** hold the leaf worktree; all supervisor monitors have ended.
+- Leaf `f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad` — **local = remote = PR #1710**, tree clean,
+  plan-only across the whole arc.
+- **0 Docker containers**; no Aspire application process started by this lane; no runtime lease taken
+  at any point in this leaf.
+- Canonical author `01a047f0-…` idle and **available, not frozen**.
