@@ -1862,3 +1862,15 @@
 - Reaffirmed the owner IMPL-EVAL boundary: after two consecutive terminal failures, release the
   evaluator and surface the exact decision in this task; do not create a third loop or freeze the
   canonical author.
+
+## 2026-08-28T16:19:38Z — #1709 owner boundary released without a third evaluator
+
+- Applied the owner's “approved proceed” verdict to the previously surfaced recommended F4 option.
+  Internals pushed checkpoint `f9a9af9b38d79b707f5d93bd6d9aa67bfdc8155e` after re-verifying both
+  evaluators stopped, no leaf holder/container, exact `f2b3fc8b3` local/remote/PR identity, and a
+  clean tree.
+- Resumed the same canonical Codex author `01a047f0-f17e-7692-b6f0-83a6d22888c9` with a plan-only
+  scope: third fmt write completion form, second-integer processed count, and write crash/drop
+  controls at 1/2/200. All accepted F1-F3/A1-A3 boundaries and six-path ceiling remain frozen.
+- No PLAN-EVAL cycle 3 exists. After explicit author push, fresh internals Tier-A is the final plan
+  gate and a PASS returns for coordinator implementation grant.

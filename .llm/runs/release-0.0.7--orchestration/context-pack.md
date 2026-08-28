@@ -1088,3 +1088,8 @@ F1 plus the five fresh Tier-A claims. No implementation or runtime lease exists.
 author available. Formal PLAN-EVAL is reserved for critical/complex work. Two consecutive terminal
 IMPL-EVAL failures release the evaluator and return an exact owner decision instead of freezing the
 author or inferring a third loop.
+
+Follow-on owner verdict: recommended #1709 F4 is accepted. Internals pushed clean checkpoint
+`f9a9af9b3` and resumed the same author `01a047f0-…` for only the write-mode completion/control
+amendment. Fresh Tier-A follows; no third PLAN-EVAL exists. #1112's independent final plan evaluator
+continues concurrently because serial ordering is per orchestrator, not global.

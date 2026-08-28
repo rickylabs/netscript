@@ -1170,3 +1170,15 @@ runtime lease is granted in either lane.
 - The evaluator is artifact-only and delta-scoped to repaired F1 plus the five Tier-A claims. PASS
   returns for coordinator implementation grant. FAIL_PLAN exhausts the ordinary allowance: release
   evaluator, keep author available, surface the exact decision, and do not launch cycle 3.
+
+## 2026-08-28 16:19Z — owner accepted #1709 F4; same author resumed
+
+The owner accepted the recommended bounded F4 amendment. Internals verified both prior evaluators
+stopped, zero leaf worktree holders, zero containers, exact leaf/remote/PR equality at `f2b3fc8b3`,
+and a clean tree. It recorded and pushed acceptance checkpoint `f9a9af9b38d79b707f5d93bd6d9aa67bfdc8155e`,
+then resumed the preserved Codex author thread `01a047f0-f17e-7692-b6f0-83a6d22888c9`.
+
+The amendment is plan-only: add the fmt write crash completion, use its second integer as processed
+count, and pin write crash-only plus crash-and-drop controls at 1/2/200 while preserving the locked
+precedence and accepted F1-F3/A1-A3 scope. Fresh internals Tier-A is the final plan gate. No third
+PLAN-EVAL, product mutation, runtime lease, or topic ownership change is authorized.

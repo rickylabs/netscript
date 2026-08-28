@@ -987,3 +987,8 @@ implementation thread.
   artifact-only. A PASS returns for implementation grant; a FAIL_PLAN consumes the second ordinary
   cycle and releases the evaluator with no third loop. The same two-failure release/escalation rule
   applies later to IMPL-EVAL, where the owner receives the exact blocking decision.
+
+- **Owner boundary resolved:** “approved proceed” accepted #1709's recommended F4 rather than
+  authorizing another evaluator. The same author resumed from exact `f2b3fc8b3` under pushed topic
+  checkpoint `f9a9af9b3`; only the third write-mode completion form and 1/2/200 crash/drop controls
+  may change in plan artifacts. Fresh Tier-A substitutes for any third PLAN-EVAL.
