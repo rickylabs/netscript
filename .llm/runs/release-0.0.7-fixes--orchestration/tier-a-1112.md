@@ -208,3 +208,78 @@ branches with characterization rather than correction. One open item: the `super
 which is this topic's error.
 
 **STOPPED before PLAN-EVAL.**
+
+---
+
+# Tier-A — #1112 `supervisor.md` control-plane correction at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`. **PASS**
+
+| Field | Value |
+| --- | --- |
+| Plan head | `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a` — local == remote == PR `headRefOid`, clean, **draft** |
+| Base | `main@cf648f1ff973d74c213bb125a6f5f5b9328e693b` |
+| Commit | `069fd3e91 docs(harness): restore prisma mysql supervisor record` |
+| Verdict | **PASS** |
+
+## Scope — exactly one added path
+
+Run dir now holds **six** harness artifacts. `git diff --name-only cf648f1ff HEAD` adds only
+`.llm/runs/fix-prisma-mysql-honest-example--0.0.7/supervisor.md` to the previous five. **Zero**
+`packages/`, **zero** `docs/`, **zero** `deno.lock`. The seven-path product envelope is unchanged, and
+`supervisor.md` states in its own text that it is control-plane, not an eighth product path.
+
+**Settled product scope was not rewritten.** `git diff --stat 34a6e3d98 HEAD` over the five originals
+touches only `context-pack.md`, `drift.md`, `worklog.md` — the omission-resolution surface.
+**`plan.md` and `research.md` are byte-unchanged**, so the TLS ruling and the seven-path plan carried
+forward untouched.
+
+## `supervisor.md` — verified against the supplied facts, field by field
+
+Topic ownership (fixes, Opus 5 / high, Remote Control, session `ea346a9a-…`, branch), leaf identity
+(#1112, PR #1711, branch, worktree, base `cf648f1ff`), author route (`01a047f1-…`, `openai`,
+`gpt-5.6-sol`, high, `agentic:launch-codex-slice`, one-sender invariant), the seven paths with an
+eighth declared a rescope, plan-only state with the stop line before PLAN-EVAL, the non-breaking TLS
+ruling with both legacy branches stated exactly, and the source-only seam boundary — all correct.
+
+Two things worth recording as done **well**, not merely done:
+
+- **It refused to invent the one fact it was not given.** The Host row reads "Not supplied in the
+  coordinator ruling; no host identity is inferred." A plausible fabricated hostname would have been
+  undetectable later.
+- **It did not launder the gate history.** Both Tier-A passes are recorded, and the first is described
+  with its finding intact — that D12 once proposed setting `ssl.verifyIdentity: true` and that
+  `research.md:130` claimed a coordinator authorization that never existed — followed by the plain
+  sentence "The first pass was not clean." A record showing two clean passes would have been more
+  comfortable and false.
+
+The reverted `deno.lock` probe is also carried forward in its own section.
+
+## Omission resolved, not erased
+
+`drift.md:64-82` preserves the original entry verbatim (What / Source / Expected / Actual at discovery /
+Severity / Initial action) and appends **Coordinator ruling**, **Resolution**, and **Current evidence**.
+`context-pack.md:127-129` now reads "Resolved process variance", replacing "not overridden". The record
+shows the omission happening and being closed, which is the point.
+
+## Invariants re-checked at this head
+
+`coordinator-authorized` → **0 occurrences**. Seven-path envelope intact.
+
+A naive sweep for surviving runtime-change intent returned two hits, both inside `supervisor.md`, and
+**both are correct in context**: `:90` is the historical Tier-A row recording what D12 *once* proposed,
+and `:67` is the prohibition **"Do not set `ssl.verifyIdentity`"** — a negation matched by the pattern.
+That is the **third** naive-pattern false positive this milestone; reading settled it, as it has every
+time. The count is not the finding.
+
+## Prohibitions — held
+
+No product mutation, no implementation, no `deno.lock`, no runtime/Aspire/Docker/browser/`e2e:cli`, no
+PLAN-EVAL dispatched, no other lane touched. PR #1711 remains **draft**, sole `status:plan`, milestone
+`0.0.7`, no closing keyword.
+
+## Outcome
+
+**Tier-A PASS at `069fd3e91`.** The harness-mandatory supervisor record now exists and is truthful,
+including the parts that are unflattering. The recorded omission — which originated in this topic's own
+brief — is closed. No open findings.
+
+**STOPPED before PLAN-EVAL.**
