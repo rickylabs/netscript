@@ -1153,3 +1153,20 @@ runtime lease is granted in either lane.
 - Formal PLAN-EVAL remains risk-selected only for critical/complex work. Two consecutive terminal
   IMPL-EVAL failures release that evaluator and return the exact decision to the owner while other
   lanes continue.
+
+## 2026-08-28 16:15Z — #1112 repair passed Tier-A; final risk-selected PLAN-EVAL active
+
+- The canonical author completed and pushed plan-only head `da769cd7c8e0438f2317ed761ec10bce15692d03`;
+  local, remote, and PR #1711 agree and the leaf is clean. The seven product paths remain frozen.
+- Fresh fixes Tier-A passed at topic checkpoint `d0205087afb648c0ce23ff5e3644ffcb455a0fa4`.
+  It independently proved clean tracked-archive root selection before generation and after cleanup,
+  the real Prisma 7.8 current RED and prospective D17 GREEN, guarded import smoke without MySQL,
+  honest separation of root-shell and semantic evidence, and absence of exclusion/stub/eighth-path
+  shortcuts.
+- Coordinator selected one final PLAN-EVAL because the published Prisma integration and generated-
+  client compatibility boundary is critical/complex under the narrowed owner policy. Fresh native
+  Claude Fable 5/medium Remote Control evaluator `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge
+  `cse_01EQXNxAuAuhDuRKvGYBx5iY`, is active from clean pushed dispatch checkpoint `4f2e263e2`.
+- The evaluator is artifact-only and delta-scoped to repaired F1 plus the five Tier-A claims. PASS
+  returns for coordinator implementation grant. FAIL_PLAN exhausts the ordinary allowance: release
+  evaluator, keep author available, surface the exact decision, and do not launch cycle 3.

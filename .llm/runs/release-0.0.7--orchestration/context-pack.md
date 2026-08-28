@@ -1073,3 +1073,18 @@ supervisors. No implementation or runtime lease is active.
   seven-path ceiling; exclusion and untyped stubs are forbidden.
 - Current supervisor topic heads: internals `81a3f99f8`, fixes `74f21062b`. Remote Control topic
   ownership remains unchanged. Docker/Aspire/runtime leases remain absent.
+
+## Resume checkpoint — 2026-08-28T16:15:14Z
+
+#1112 / PR #1711 is now at clean plan-only head `da769cd7c8e0438f2317ed761ec10bce15692d03`.
+Fresh fixes Tier-A passed all five repaired architecture claims at topic `d0205087a`; the initial
+clean-checkout false green is closed without excluding the example or adding an eighth product path.
+Final risk-selected PLAN-EVAL cycle 2 is active in distinct native Claude Fable 5/medium Remote
+Control session `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge
+`cse_01EQXNxAuAuhDuRKvGYBx5iY`, dispatched from clean pushed topic `4f2e263e2`. Scope is only repaired
+F1 plus the five fresh Tier-A claims. No implementation or runtime lease exists.
+
+#1709 remains independently parked at the already-surfaced F4 choice with evaluator released and
+author available. Formal PLAN-EVAL is reserved for critical/complex work. Two consecutive terminal
+IMPL-EVAL failures release the evaluator and return an exact owner decision instead of freezing the
+author or inferring a third loop.

@@ -972,3 +972,18 @@ implementation thread.
 - **Policy:** Formal PLAN-EVAL is not a routine ceremony. It stays limited to critical/complex
   topics, while Tier-A and mandatory IMPL-EVAL remain. A leaf returns to the owner after two
   consecutive terminal IMPL-EVAL failures rather than consuming a third loop.
+
+## 2026-08-28 — dynamic-import proof and proportionate evaluation selection
+
+- **Observed:** The #1112 canonical author replaced the clean-checkout-breaking literal generated
+  import with a non-literal runtime import and compensated for lost static evidence with a real
+  Prisma-generated structural wrapper plus guarded import smoke. Fresh Tier-A reproduced both the
+  current TS2322 RED and prospective D17 GREEN, then proved the clean ordinary root gate before and
+  after scratch cleanup.
+- **Action:** Kept the seven-path ceiling, rejected exclusion/stub/suppression shortcuts, reconciled
+  plan head `da769cd7c` and Tier-A topic `d0205087a`, and opened exactly one final delta-focused
+  PLAN-EVAL because consumer-facing generated-client compatibility is genuinely complex.
+- **Guardrail:** The active evaluator `18b66c8f-…` is distinct, bidirectional Remote Control, and
+  artifact-only. A PASS returns for implementation grant; a FAIL_PLAN consumes the second ordinary
+  cycle and releases the evaluator with no third loop. The same two-failure release/escalation rule
+  applies later to IMPL-EVAL, where the owner receives the exact blocking decision.

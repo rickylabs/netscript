@@ -1844,3 +1844,21 @@
 - Rejected a top-level example exclusion because it would remove the evidence. Sent the existing
   author a plan-only proof obligation for a dynamic runtime import plus separate real generated
   client structural/import smoke; cycle 2 remains withheld.
+
+## 2026-08-28T16:15:14Z — #1112 architecture repair advanced through final plan-eval dispatch
+
+- Verified author plan head `da769cd7c8e0438f2317ed761ec10bce15692d03` local == remote == PR
+  #1711, clean, with exactly the authorized harness plan surface and no generated/temp/product residue.
+- Reconciled fresh fixes Tier-A `PASS` at pushed topic checkpoint
+  `d0205087afb648c0ce23ff5e3644ffcb455a0fa4`: clean archive root gate selected all 12 files and was
+  green before generation and after cleanup; real Prisma 7.8 reproduced TS2322 on current source and
+  passed with the planned D17 `SqlResultSet['columnTypes']` narrowing; guarded dynamic import printed
+  `dynamic-import-smoke:ok` without contacting MySQL; evidence claims and forbidden shortcuts held.
+- Applied the narrowed evaluation policy explicitly. #1112 remains selected only because its
+  published integration/generated-client architecture is complex; routine leaves will record
+  `PLAN-EVAL: N/A`. Launched final cycle 2 through fresh Fable 5/medium Remote Control evaluator
+  `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `cse_01EQXNxAuAuhDuRKvGYBx5iY`, from pushed fixes
+  dispatch checkpoint `4f2e263e2a663be3bdbdfeac2be736962d292d72`. No implementation/runtime lease was granted.
+- Reaffirmed the owner IMPL-EVAL boundary: after two consecutive terminal failures, release the
+  evaluator and surface the exact decision in this task; do not create a third loop or freeze the
+  canonical author.
