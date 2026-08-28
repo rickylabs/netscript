@@ -1,3 +1,14 @@
+use harness
+
+## SKILL
+
+Use the repository `netscript-harness`, `netscript-pr`, `netscript-tools`,
+`netscript-deno-toolchain`, and `rtk` skills. Read `AGENTS.md`, the harness workflow files under
+`.llm/harness/`, the plan gate at `.llm/harness/gates/plan-gate.md`, issue
+https://github.com/rickylabs/netscript/issues/1709, and the supervisor research artifact
+`.llm/runs/release-0.0.7-internals--orchestration/research/l2-lint-exclusion-false-green.md`
+before acting.
+
 # Brief — #1709 `lint-partial-exclusion-fail-closed` — RESEARCH + PLAN ONLY
 
 You are the harness **author** for this leaf. You are not the evaluator and not the supervisor.

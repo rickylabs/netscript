@@ -1447,3 +1447,69 @@ fail, and should. **Recommendation: bind by equivalence, not by re-evaluation** 
 evaluated head to its rebased counterpart (`cf31de902` → `cd3ca1bdb`, `cfa055bb8` → `afb43f12f`).
 That is mechanically checkable, whereas a re-run evaluator would merely restate it. The choice is
 the coordinator's because it touches merge-gate trust.
+
+## 2026-08-28 — #1709 `lint-partial-exclusion-fail-closed` dispatched: RESEARCH + PLAN ONLY
+
+Coordinator granted the next per-topic serial leaf. Supervisor role preserved: reviewer/orchestrator,
+not author, not evaluator. No product mutation by this lane; no readiness, merge, or release-writer
+authority claimed.
+
+### Intake reconciliation
+
+| Ref                          | Observed                                                             |
+| ---------------------------- | -------------------------------------------------------------------- |
+| Central intake head          | `4686fab3306acf4c345310a32a6dee13647a20c0` (`chore/release-0.0.7-orchestration`) |
+| `currentMainSha`             | `cf648f1ff973d74c213bb125a6f5f5b9328e693b` — equals the dispatch base |
+| Topic head at start          | `6de5395cf4284e4b33b02df161c56e0b22585b80`, clean                    |
+| Research checkpoint consumed | `d682db680b28f224fdc2761390b1d37f537d15be`                           |
+| Issue                        | #1709, OPEN, `0.0.7`, `type:fix`/`area:tooling`/`priority:p1`, `status:triage` |
+| `expensiveGates`             | every entry `state: complete` — **no active lease to contend with**   |
+| `releaseWriters`             | `[]`                                                                  |
+
+Central leaf entry `lint-partial-exclusion-fail-closed`: lane internals, wave 3, phase `planned`,
+`researchState: complete_needs_plan`, `implementerAgentId: null`, `prNumber: null`, branch
+`fix/lint-partial-exclusion-fail-closed`.
+
+### Frozen contract (central `leaf-contracts.json` @ `4686fab33`)
+
+`fileSurfaces` are exactly four — `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts`,
+`deno.json`, `packages/cli/src/kernel/assets/agent-tools.generated.ts` (regeneration only).
+`provingGates`: `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel`. Archetype
+`6-cli-tooling`, no overlays. Unlike #1663 this contract carries **no duplicate or wildcard entries**,
+so the plan does not need to narrow it.
+
+### Leaf created
+
+`git worktree add -b fix/lint-partial-exclusion-fail-closed /home/codex/repos/netscript-007-lint-fail-closed cf648f1ff`
+→ HEAD `cf648f1ff`, tree clean, **no upstream by design** (explicit-refspec push rule, the discipline
+that made #1663's worktree loss a non-event).
+
+### Launch
+
+First attempt failed cleanly: `agentic:launch-codex-slice` rejected `--message` (it takes a
+`--brief` **file**, staged into the worktree host). Nothing was launched and the worktree was
+untouched — a validation refusal, not a partial dispatch. The brief also had to satisfy the launcher's
+contract (`use harness` first line plus a `## SKILL` chapter), which it now does.
+
+Dry-run before the real launch reported `DRY-RUN ok`, `brief valid`, and
+`git-safety {"branch":"fix/lint-partial-exclusion-fail-closed","head":"cf648f1ff","upstream":"NONE","dirty":0}`.
+
+| Field    | Value                                                             |
+| -------- | ----------------------------------------------------------------- |
+| Route    | `normal_implementation` — Codex · OpenAI · **gpt-5.6-sol · medium**, the lane's canonical author binding |
+| Brief    | `briefs/1709-research-plan.md`, staged to `/home/codex/lint-fail-closed-brief.md` |
+| Launch   | `nohup … & disown` — never a harness background task on an attached launch |
+
+### Bounds given to the author
+
+Harness artifacts and an optional draft PR **only**; no product, tooling, config, or workflow
+mutation — explicitly including the change the plan will prescribe. Accepted architecture is stated
+as decided, not open: fail closed on any silently dropped selected file, a report-only green is
+rejected, and the root doctor-exclusion removal sequences **first**. The plan must specify all eight
+named elements, with selected-vs-processed identity proof called out as the crux. `run-deno-fmt.ts`
+is a **mandatory read-only audit**: recorded either way, never edited, and any mutation requires
+explicit coordinator rescope. Runtime/Aspire/Docker/browser/E2E/MCP-JSR/docs gates and evaluator or
+runtime leases are N/A and must not be requested.
+
+Stop condition: commit, explicit-refspec push, opening phase comment if a PR is opened, then stop for
+fresh independent Tier-A. PLAN-EVAL and implementation are separate later authorizations.
