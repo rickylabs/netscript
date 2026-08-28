@@ -987,3 +987,27 @@ record correction: #1293 row 1 must describe the exported `PrismaMySql` factory 
 five frozen paths, including package module prose and the site example. Fixes may plan that leaf in
 parallel with internals because serial ordering applies within each topic only. Lifecycle labels are
 normalized; Docker/Aspire are empty; main and the nine live-owned worktrees are clean.
+
+## Resume checkpoint — 2026-08-28T11:15:19Z
+
+#1709 is now a durable six-path plan at `d437db44d`: lint and fmt keep one coverage/refusal contract
+but use separate parser adapters because their completion signals differ. Only lint is a published
+consumer tool, so canonical asset/hash and CLI publish evidence remain lint-owned. Fresh internals
+Tier-A passed at `7f252d44c`; issue #1709 and draft PR #1710 are `status:plan`. The next internals
+gate is a fresh opposite-family formal PLAN-EVAL on that immutable head; implementation is blocked.
+
+#1112 is a fixes-owned seven-path plan. It adds the real package example and existing
+`connection_errors_test.ts`, keeps option translation source-internal, and forbids a public
+translator or runtime injection port. Current pushed head `7a3639969` is plan-only and clean. Fresh
+fixes Tier-A returned only the ungranted D12 runtime TLS flip. Coordinator disposition is
+non-breaking deprecation and truthful mapping evidence for legacy `verify_identity`; no behavior
+change, new mode, or eighth path. The same author must amend before fresh fixes Tier-A and any
+formal PLAN-EVAL.
+
+Environment stabilization found zero Docker containers, zero Aspire applications, and no
+database/browser/AppHost runtime. One unused Aspire network and nine unlinked zero-byte volumes were
+removed. Eight Aspire MCP helpers remain because they belong to live Claude/Codex tool transports;
+they are not runtime leaks. Eleven worktrees are registered because the two active planned leaves
+join the nine previously owned trees. Open follow-ups #1690 and #1693 remain outside accepted 0.0.7
+inventory. PR #1696's surface-diff skip is current release/label policy, with policy debt already in
+#309.

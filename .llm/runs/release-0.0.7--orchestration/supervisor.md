@@ -1068,3 +1068,22 @@ red. The only features owner boundary is truthful replacement wording for #1293 
 adapter remains intentionally outside the root export surface. #1112 is not transferred to features
 or docs: the frozen five-path leaf remains fixes-owned and may advance independently through its
 normal research/plan gate. Docs remains parked. Serialization is per topic, never cluster-wide.
+
+## Active queue — 2026-08-28T11:15:19Z
+
+Internals is ready for formal PLAN-EVAL. The six-path #1709 plan is clean/pushed at `d437db44d` and
+fresh Tier-A passed at topic `7f252d44c`; issue #1709 and draft PR #1710 were rewritten in place.
+The plan keeps one structured coverage contract, separate lint/fmt signal adapters, and lint-only
+published-asset evidence. No runtime or implementation lease applies.
+
+Fixes remains independently active in plan repair. Its seven-path #1112 plan is clean/pushed at
+`7a3639969`, and Tier-A checkpoint `ca507dadc` returned only the ungranted breaking D12 TLS flip.
+Coordinator ruling is non-breaking deprecation and exact documentation/tests for legacy
+`verify_identity`, with no semantic change, new mode, or eighth path. The same author amends before
+fresh fixes Tier-A and any PLAN-EVAL. Docs remains parked; features #1664 remains terminal red and
+#1293 row 1 remains the sole owner-only wording boundary.
+
+Docker and Aspire application inventories are empty after stabilization. Eight Aspire MCP helpers
+are retained because they are owned by live supervisor/tool transports, not AppHost runtimes. One
+unused Aspire network and nine unlinked zero-byte volumes were removed. Coordinator stays Codex
+Desktop GPT-5.6-SOL/high, never max; all Claude Opus 5/high topic ownership remains unchanged.

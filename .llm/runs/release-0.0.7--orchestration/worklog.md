@@ -1758,3 +1758,30 @@
   `e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14`. #1664 remains terminal red with no retry,
   fresh-browser, or evaluator authority. Docker is empty, Aspire reports `[]`, main is clean at
   `cf648f1ff973d74c213bb125a6f5f5b9328e693b`, and all nine registered worktrees remain live-owned.
+
+## 2026-08-28T11:15:19Z — two planned leaves, Tier-A scope rulings, and WSL stabilization
+
+- #1709's mandatory formatter audit reproduced the same mixed-batch partial-exclusion false green as
+  lint. The coordinator accepted that evidence into one coherent six-path leaf. The same canonical
+  author amended and explicitly pushed plan head `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c`;
+  PR #1710 and issue #1709 were rewritten in place to describe lint and fmt as the actual scope.
+  Fresh internals Tier-A passed at pushed topic checkpoint `7f252d44c82b7642957cde2a590e5329b968dd24`.
+- #1112's exact-main audit expanded its five-path starting envelope to seven paths by adding the
+  checked-in executable example and the existing connection-error test. The same author produced a
+  49-row stale-claim census and explicitly pushed plan head
+  `7a3639969ae8319d501244b6658ade303ac3392f`; a one-line `deno.lock` probe side effect was reverted
+  byte-identically before any commit and then recorded at `7a3639969`.
+- Fresh fixes Tier-A passed the seven-path architecture but returned the plan's ungranted D12 TLS
+  behavior flip. The coordinator chose the narrow non-breaking disposition: deprecate
+  `verify_identity`, document and test its exact legacy conditional behavior, add no new mode, and
+  make no runtime TLS change. The same author is amending plan artifacts only before a second fresh
+  fixes Tier-A. No PLAN-EVAL or implementation has started in that lane.
+- Stabilization disproved hidden Docker runtime load: Docker had zero containers and Aspire returned
+  `[]`. Removed one unused Aspire network and nine unlinked zero-byte volumes while retaining images
+  as useful test cache. No database, AppHost, browser-test process, or runtime port survived. The
+  eight `aspire mcp start` helpers are owned by live tool sessions, not application runtimes. After
+  both temporary authors exited, WSL load fell to `3.04 / 5.00 / 8.06` with 8.2 GiB available.
+- Recorded open backlog #1690 alongside #1693 as a post-#1692 follow-up record. It is not accepted
+  0.0.7 inventory or an active milestone leaf. Read-only PR #1696 audit confirmed its skipped
+  surface-diff job follows the current release/label policy; backlog #309 already owns that policy
+  debt, so no duplicate issue or silent milestone intake was created.

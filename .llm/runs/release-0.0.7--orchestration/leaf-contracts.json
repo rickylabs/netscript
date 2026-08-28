@@ -374,9 +374,11 @@
       "fileSurfaces": [
         "docs/site/reference/prisma-adapter-mysql/index.md",
         "packages/prisma-adapter-mysql/README.md",
+        "packages/prisma-adapter-mysql/examples/basic-usage.ts",
         "packages/prisma-adapter-mysql/src/adapter.ts",
         "packages/prisma-adapter-mysql/src/mod.ts",
-        "packages/prisma-adapter-mysql/src/types.ts"
+        "packages/prisma-adapter-mysql/src/types.ts",
+        "packages/prisma-adapter-mysql/tests/connection_errors_test.ts"
       ],
       "provingGates": [
         "check",
@@ -386,6 +388,12 @@
         "docs-source-format",
         "docs-accuracy"
       ],
+      "coordinatorDecision": {
+        "authorizedAt": "2026-08-28T11:15:19.000Z",
+        "testSeam": "export the existing pure option translator from its source module for direct tests only; never root-export it or add a runtime injection port",
+        "tlsBoundary": "deprecate verify_identity and document/test its exact legacy conditional mapping; do not change runtime TLS semantics or add a replacement mode in this leaf",
+        "hardCeiling": "exactly seven product paths; an eighth path requires a new coordinator rescope"
+      },
       "jsrAudit": {
         "applicable": true,
         "risks": [
@@ -1504,6 +1512,8 @@
       "archetype": "6-cli-tooling",
       "overlays": [],
       "fileSurfaces": [
+        ".llm/tools/run-deno-fmt.ts",
+        ".llm/tools/run-deno-fmt_test.ts",
         ".llm/tools/run-deno-lint.ts",
         ".llm/tools/run-deno-lint_test.ts",
         "deno.json",
@@ -1520,7 +1530,7 @@
         "authorizedAt": "2026-08-28T10:22:00.000Z",
         "repair": "fail closed when Deno silently drops any selected file; a report-only green result is rejected",
         "sequence": "remove the root lint task's doctor exclusion before enabling the stricter partial-exclusion refusal",
-        "fmtBoundary": "audit run-deno-fmt.ts during planning; any fmt mutation requires explicit coordinator rescope"
+        "fmtBoundary": "the mandatory planning audit reproduced the symmetric partial-exclusion false green, so the coordinator expanded this coherent leaf from four to six paths; fmt remains outside the published consumer-tool bundle and has no generated asset body"
       },
       "jsrAudit": {
         "applicable": true,

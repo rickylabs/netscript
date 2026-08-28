@@ -900,3 +900,24 @@ implementation thread.
 - **Closed-unmerged is not shipped:** stale lifecycle labels were removed from #1671 without adding
   `status:shipped`; only verified merged PRs and completed issues were normalized to shipped. This
   preserves truthful lifecycle reporting while eliminating false active-work signals.
+- **A mandatory symmetry audit may justify one coherent rescope:** #1709 proved fmt has the same
+  batch-size-dependent partial-exclusion false green as lint, but its finding completion signal is
+  different. Expand the leaf to six paths, share the coverage wire contract, and retain separate
+  parser adapters rather than assuming identical command output.
+- **Acceptance wording does not authorize a silent breaking runtime fix:** #1112 row 4 exposed that
+  `verify_identity` is misleading, but changing it to enforced TLS/hostname verification would break
+  plaintext and mismatched-certificate deployments. The bounded 0.0.7 disposition is truthful
+  deprecation plus exact legacy mapping tests; any semantic replacement is a separately scoped
+  breaking change.
+- **Read-only dependency probes can dirty the lockfile:** `deno info npm:mysql2@3.22.5` added one
+  exact-pin resolution beside the existing range. The author-owned no-lock-churn gate caught it,
+  restored the base blob before commit, and recorded the transient so a future plan run does not
+  mistake it for product scope.
+- **High WSL load is not evidence of hidden containers:** direct Docker and Aspire inventories were
+  empty. One unused network and nine unlinked zero-byte volumes were safe to prune, while the eight
+  Aspire MCP helpers belonged to live agent tool transports and had to remain. Process ownership and
+  pressure metrics, not process-name matching, distinguish useful control-plane helpers from leaks.
+- **Post-merge follow-ups are not implicit milestone intake:** #1690 and #1693 are open backlog
+  records discovered after #1692. Record them for continuity without adding them to the 0.0.7 DAG or
+  dispatching a topic. Likewise, #1696's surface-diff skip follows current release/label policy and
+  should not create duplicate debt while #309 remains open.
