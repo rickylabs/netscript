@@ -970,3 +970,20 @@ previously deferred L-2 mixed lint-batch exclusion scope audit as its next seria
 fixes remain parked. Serial ordering is per topic, so this internals release does not hold or modify
 the other supervisors. The primary coordinator remains Codex Desktop Remote Control on
 GPT-5.6-SOL/high, never max; all Claude topic ownership remains unchanged.
+
+## Resume checkpoint — 2026-08-28T10:22:00Z
+
+Internals L-2 is now issue #1709 and a frozen planned leaf. Research at `d682db680` proved the mixed
+batch partial-exclusion false green and the shipped CLI embedding boundary. Coordinator decision is
+fail closed on any silently dropped selected file, remove the obsolete root doctor exclusion first,
+keep the initial source/test/config/generated-asset envelope, and audit formatting only during plan.
+The canonical author must produce research/plan artifacts before fresh supervisor Tier-A; no runtime
+or evaluator lease applies.
+
+Features read-only audit `e1a6a2c4f` leaves #1664 terminal red and identifies one true owner-only
+record correction: #1293 row 1 must describe the exported `PrismaMySql` factory and
+`PrismaMySqlConnectedAdapter`, while retaining the deliberate non-export of concrete
+`PrismaMySqlAdapter`. #1112 remains the fixes-owned `prisma-mysql-honest-example` leaf across all
+five frozen paths, including package module prose and the site example. Fixes may plan that leaf in
+parallel with internals because serial ordering applies within each topic only. Lifecycle labels are
+normalized; Docker/Aspire are empty; main and the nine live-owned worktrees are clean.

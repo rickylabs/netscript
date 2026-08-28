@@ -1492,6 +1492,43 @@
         "applicable": false,
         "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
       }
+    },
+    {
+      "key": "lint-partial-exclusion-fail-closed",
+      "issues": [
+        1709
+      ],
+      "lane": "internals",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [],
+      "fileSurfaces": [
+        ".llm/tools/run-deno-lint.ts",
+        ".llm/tools/run-deno-lint_test.ts",
+        "deno.json",
+        "packages/cli/src/kernel/assets/agent-tools.generated.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "check:assets-barrel"
+      ],
+      "coordinatorDecision": {
+        "authorizedAt": "2026-08-28T10:22:00.000Z",
+        "repair": "fail closed when Deno silently drops any selected file; a report-only green result is rejected",
+        "sequence": "remove the root lint task's doctor exclusion before enabling the stricter partial-exclusion refusal",
+        "fmtBoundary": "audit run-deno-fmt.ts during planning; any fmt mutation requires explicit coordinator rescope"
+      },
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "canonically regenerate the embedded CLI consumer-tool barrel and disclose its text/hash delta without claiming an export/API change",
+          "run isolated-declaration publish dry-run and the per-member @netscript/cli JSR audit"
+        ]
+      }
     }
   ]
 }

@@ -62,7 +62,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active_post_merge_queue",
+        "state": "active_planning",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -70,14 +70,14 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "c9c0e954",
-        "sessionId": "c9c0e954-f1ad-4d15-a21c-d52f9a3859bc",
-        "pid": 11026,
-        "bridgeSessionId": "session_0179hsVs5Df7UzovHUP1wuC4",
-        "remoteControlUrl": "https://claude.ai/code/session_0179hsVs5Df7UzovHUP1wuC4",
-        "topicHeadSha": "6de5395cf4284e4b33b02df161c56e0b22585b80",
-        "queueState": "1663_shipped_l2_scope_audit_released",
-        "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
+        "backgroundAgentId": "c2a905f0",
+        "sessionId": "c2a905f0-e655-4dd7-8f9f-8eea563126a6",
+        "pid": null,
+        "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
+        "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
+        "topicHeadSha": "d682db680b28f224fdc2761390b1d37f537d15be",
+        "queueState": "1709_research_complete_fail_closed_option_accepted_plan_author_next",
+        "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
@@ -90,6 +90,16 @@
           "route": "native claude-opus-5 / high / Remote Control",
           "topicCheckpointSha": "6de5395cf4284e4b33b02df161c56e0b22585b80",
           "verdict": "PASS"
+        },
+        "latestResearchReview": {
+          "backgroundAgentId": "c2a905f0",
+          "sessionId": "c2a905f0-e655-4dd7-8f9f-8eea563126a6",
+          "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
+          "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
+          "route": "native claude-opus-5 / high / Remote Control",
+          "topicCheckpointSha": "d682db680b28f224fdc2761390b1d37f537d15be",
+          "verdict": "NEEDS_SCOPE_DECISION",
+          "coordinatorDisposition": "option_1_fail_closed_accepted_issue_1709_registered"
         }
       },
       "issueNumbers": [
@@ -108,7 +118,8 @@
         1613,
         1618,
         1621,
-        1622
+        1622,
+        1709
       ]
     },
     {
@@ -171,7 +182,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "parked_terminal",
+        "state": "parked_terminal_owner_wording",
         "worktree": "/home/codex/repos/netscript-007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -179,18 +190,27 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "6a137926",
-        "sessionId": "6a137926-f959-4a94-a7cd-c37fdae9ea72",
-        "pid": 11917,
-        "bridgeSessionId": "session_01G8JdKBR2UymUYsvDYGX6W4",
-        "remoteControlUrl": "https://claude.ai/code/session_01G8JdKBR2UymUYsvDYGX6W4",
-        "topicHeadSha": "5c5589ee51b483bc4830f6c379513be70f284c01",
-        "queueState": "terminal_1664_attempt_7_behavior_red_no_retry_or_evaluator",
-        "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
+        "backgroundAgentId": "d424d28b",
+        "sessionId": "d424d28b-1da1-49a6-a587-2a77475b3d7d",
+        "pid": null,
+        "bridgeSessionId": "cse_01F8yPoUNC56gdZ9KsbRmiWu",
+        "remoteControlUrl": "https://claude.ai/code/session_01F8yPoUNC56gdZ9KsbRmiWu",
+        "topicHeadSha": "e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14",
+        "queueState": "1664_terminal_red_1293_row1_owner_wording_pending_1112_confirmed_fixes_owned",
+        "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
-        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active",
+        "latestAcceptanceAudit": {
+          "backgroundAgentId": "d424d28b",
+          "sessionId": "d424d28b-1da1-49a6-a587-2a77475b3d7d",
+          "bridgeSessionId": "cse_01F8yPoUNC56gdZ9KsbRmiWu",
+          "remoteControlUrl": "https://claude.ai/code/session_01F8yPoUNC56gdZ9KsbRmiWu",
+          "route": "native claude-opus-5 / high / Remote Control",
+          "topicCheckpointSha": "e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14",
+          "finding": "1293 row 1 requires truthful owner rewrite; 1112 remains fixes-owned under the frozen prisma-mysql-honest-example contract"
+        }
       },
       "issueNumbers": [
         1293,
@@ -414,7 +434,7 @@
     },
     {
       "number": 1604,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1609,
@@ -438,7 +458,7 @@
     },
     {
       "number": 1618,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1619,
@@ -454,7 +474,7 @@
     },
     {
       "number": 1622,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1623,
@@ -463,9 +483,35 @@
     {
       "number": 1637,
       "state": "closed"
+    },
+    {
+      "number": 1709,
+      "state": "open"
     }
   ],
   "leaves": [
+    {
+      "id": "lint-partial-exclusion-fail-closed",
+      "lane": "internals",
+      "phase": "planned",
+      "baseBranch": "main",
+      "headSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+      "currentPrHeadSha": null,
+      "issueNumbers": [1709],
+      "implementerAgentId": null,
+      "branch": "fix/lint-partial-exclusion-fail-closed",
+      "worktree": null,
+      "prNumber": null,
+      "researchState": "complete_needs_plan",
+      "researchTopicCheckpointSha": "d682db680b28f224fdc2761390b1d37f537d15be",
+      "researchRemoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
+      "coordinatorDecision": "option_1_fail_closed_four_path_initial_envelope_fmt_audit_requires_rescope",
+      "implementationState": "not_started",
+      "planEvaluationState": "not_started_pending_plan_and_tier_a",
+      "expensiveGateContract": "scaffold.runtime, Aspire, Docker, browser, and e2e are n/a; no runtime lease may be requested",
+      "nextGate": "delegate research-and-plan-only to the canonical author, then fresh internals Tier-A before deciding whether formal PLAN-EVAL is required",
+      "receiptRefs": []
+    },
     {
       "id": "comparison-docs-programme",
       "lane": "docs",
@@ -1908,7 +1954,9 @@
       "issueCompletionState": "PR 1662 shipped; issue 1293 remains open with acceptance boxes 2 and 3 checked and boxes 1 and 4 open",
       "planEvaluatorTerminalMetadata": "stale working state; terminal response and exact pushed verdict commit independently verified by coordinator",
       "splitCloseContract": "product PR uses Part of #1293 and may merge on product gates while #1293 remains open; #1112 must rewrite and verify the docs example before box 4 and issue closure",
-      "docsFollowUp": "#1112 and the prisma-adapter-mysql reference remain docs-owned and are not part of this product leaf",
+      "acceptanceAuditTopicCheckpointSha": "e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14",
+      "ownerWordingBoundary": "issue 1293 acceptance row 1 must truthfully describe the public PrismaMySql factory and PrismaMySqlConnectedAdapter while preserving the intentional exclusion of concrete driver-bound PrismaMySqlAdapter from the root export map",
+      "docsFollowUp": "#1112 and all five frozen prisma-mysql-honest-example paths remain fixes-owned; the site example and package module documentation must be corrected together before issue closure",
       "receiptRefs": []
     },
     {
@@ -3585,5 +3633,5 @@
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
     "verifiedAt": "2026-08-28T10:10:08.000Z"
   },
-  "updatedAt": "2026-08-28T10:10:08.000Z"
+  "updatedAt": "2026-08-28T10:22:00.000Z"
 }

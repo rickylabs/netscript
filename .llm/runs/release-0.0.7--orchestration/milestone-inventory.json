@@ -4,8 +4,8 @@
   "milestone": "0.0.7",
   "capturedAt": "2026-08-13T21:12:00.000Z",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "ownerRatifiedAt": "2026-08-13T21:12:00.000Z",
-  "targetIssueCount": 64,
+  "ownerRatifiedAt": "2026-08-28T10:22:00.000Z",
+  "targetIssueCount": 65,
   "issues": [
     {
       "number": 1093,
@@ -811,6 +811,17 @@
         "https://github.com/rickylabs/netscript/issues/1637",
         "https://github.com/rickylabs/netscript/issues/1637#issuecomment-5285236378",
         "packages/sdk/src/cache/cache-query.ts:234-248"
+      ]
+    },
+    {
+      "number": 1709,
+      "title": "fix(tooling): lint wrapper reports green when Deno drops part of a selected batch",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1709",
+        "Exact-main two-file reproduction: one root-config-excluded .llm lint defect plus one included .github/scripts peer exits 0 in one batch, while the identical selection with batch-size 1 exits 2.",
+        "Internals research checkpoint d682db680b28f224fdc2761390b1d37f537d15be records the wrapper/config/CI/published-consumer boundary and the coordinator-selected fail-closed repair."
       ]
     }
   ]

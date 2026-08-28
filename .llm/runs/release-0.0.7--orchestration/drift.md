@@ -883,3 +883,20 @@ implementation thread.
   existing Codex Desktop Remote Control coordinator on GPT-5.6-SOL/high; `max` remains unauthorized.
   The fresh Claude Opus 5/high Remote Control Tier-A turn reviewed the internals topic only and did
   not inherit coordinator merge authority or change any other Claude supervisor's ownership.
+- **A partial tool exclusion is different from an all-excluded invocation:** L-2 reproduced the same
+  selected files returning green in one batch but red when split to batch size one. The existing
+  guard only catches the all-excluded case, so #1709 must compare selected and actually processed
+  files and fail closed when any selected input disappears. Removing a broad, now-unnecessary root
+  exclusion before enabling the guard avoids turning known configuration debt into a surprise red.
+- **Published embedded tools extend the change boundary:** `run-deno-lint.ts` is generated into the
+  CLI agent-tool asset. A wrapper repair therefore owns canonical regeneration and CLI JSR/publish
+  verification even when no package export changes. The formatting wrapper remains audit-only until
+  evidence justifies an explicit rescope.
+- **Acceptance wording must not reverse an intentional API boundary:** #1293's unchecked first row
+  asks for a concrete driver-bound class that formal review deliberately kept out of the root export
+  map. Treat this as an owner wording decision, not a product regression. The independently observed
+  stale MySQL documentation still belongs to the already-frozen fixes #1112 leaf; finding it from
+  features does not silently transfer ownership to features or docs.
+- **Closed-unmerged is not shipped:** stale lifecycle labels were removed from #1671 without adding
+  `status:shipped`; only verified merged PRs and completed issues were normalized to shipped. This
+  preserves truthful lifecycle reporting while eliminating false active-work signals.

@@ -422,6 +422,13 @@
       "issueNumber": 1637,
       "lane": "fixes",
       "title": "fix(sdk): cache write limits must not fail successful query results"
+    },
+    {
+      "id": "issue:1709",
+      "kind": "issue",
+      "issueNumber": 1709,
+      "lane": "internals",
+      "title": "fix(tooling): lint wrapper reports green when Deno drops part of a selected batch"
     }
   ],
   "edges": [
@@ -616,6 +623,14 @@
       "evidence": [
         "#1455 registry payload map consumes the generated-registry metadata plumbing #1451 introduces."
       ]
+    },
+    {
+      "from": "issue:1618",
+      "to": "issue:1709",
+      "kind": "cross-epic-order",
+      "evidence": [
+        "#1663/#1618 nearest-config batching and doctor-fixture coverage must ship before the narrower partial-exclusion false green is repaired."
+      ]
     }
   ],
   "waves": [
@@ -674,7 +689,8 @@
         "issue:1619",
         "issue:1620",
         "issue:1623",
-        "issue:1637"
+        "issue:1637",
+        "issue:1709"
       ]
     },
     {

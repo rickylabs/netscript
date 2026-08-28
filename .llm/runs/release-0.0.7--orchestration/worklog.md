@@ -1733,3 +1733,28 @@
   process-ownership checks. Docker remains empty, Aspire reports `[]`, and nine registered
   live-owned worktrees remain. L-2's mixed lint-batch exclusion audit is now released as the next
   internals serial item; this release does not alter another topic's queue.
+
+## 2026-08-28T10:22:00Z — lifecycle normalization and next-leaf intake
+
+- Normalized stale shipped lifecycle metadata after direct GitHub verification: merged PRs #1644
+  and #1691 now carry only `status:shipped`; completed issues #1561, #1563, and #1621 were moved from
+  triage to shipped. Closed-unmerged predecessor #1671 had the stale implementation label removed
+  without being falsely represented as shipped. No merged milestone PR retains a non-shipped
+  lifecycle label.
+- Internals L-2 research reproduced a real wrapper false green: Deno may silently drop only part of
+  a selected mixed lint batch, while the wrapper's existing all-excluded guard still exits zero.
+  The coordinator accepted the narrow fail-closed option, registered issue #1709, and froze an
+  initial four-path implementation envelope. The root doctor-family exclusion is removed first;
+  `run-deno-fmt.ts` is plan-audit-only unless separately rescoped. The published CLI's embedded
+  agent-tool copy makes canonical generation plus the CLI JSR/publish audit mandatory.
+- The features acceptance audit proved #1293's first row is stale wording, not an implementation
+  regression: the public factory and connected-adapter type are exported, while the concrete
+  driver-bound adapter is intentionally private by an evaluated architecture decision. That row is
+  an owner-only wording correction. The audit also found stale MySQL module/site prose, but the
+  coordinator rejected an ownership split: all five paths remain in the frozen fixes-owned #1112
+  `prisma-mysql-honest-example` leaf.
+- Native Opus 5/high Remote Control research checkpoints were explicitly pushed at internals
+  `d682db680b28f224fdc2761390b1d37f537d15be` and features
+  `e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14`. #1664 remains terminal red with no retry,
+  fresh-browser, or evaluator authority. Docker is empty, Aspire reports `[]`, main is clean at
+  `cf648f1ff973d74c213bb125a6f5f5b9328e693b`, and all nine registered worktrees remain live-owned.

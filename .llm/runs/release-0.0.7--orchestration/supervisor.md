@@ -1053,3 +1053,18 @@ leaf contract, and do not consume an evaluator or runtime lease. The other three
 their accepted checkpoints. Coordinator route/transport stays GPT-5.6-SOL/high on Codex Desktop
 Remote Control (`max` forbidden); the Claude internals supervisor remains Opus 5/high with native
 Remote Control and has no coordinator-owned readiness or merge authority.
+
+## Active queue — 2026-08-28T10:22:00Z
+
+Internals completed the authorized L-2 research-only audit using native Opus 5/high Remote Control
+and pushed topic checkpoint `d682db680b28f224fdc2761390b1d37f537d15be`. The coordinator accepted
+the fail-closed architecture and registered #1709. Its next per-topic serial step is canonical-author
+research/plan only at exact main, followed by a fresh internals Tier-A; no product mutation,
+evaluator, runtime, or PR merge is yet authorized.
+
+Features completed a read-only #1293/#1112 acceptance audit at topic checkpoint
+`e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14`. #1664 remains untouched at its attempt-7 terminal
+red. The only features owner boundary is truthful replacement wording for #1293 row 1; the concrete
+adapter remains intentionally outside the root export surface. #1112 is not transferred to features
+or docs: the frozen five-path leaf remains fixes-owned and may advance independently through its
+normal research/plan gate. Docs remains parked. Serialization is per topic, never cluster-wide.
