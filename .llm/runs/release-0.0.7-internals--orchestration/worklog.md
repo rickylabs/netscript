@@ -1927,3 +1927,69 @@ owner; the evaluator explicitly recommends no third cycle. A third PLAN-EVAL is 
 
 **No action taken:** nothing dispatched, no third cycle requested or assumed, no labels, readiness,
 checkboxes, or central state touched, and no other lane approached. Escalated to the owner.
+
+## 2026-08-28 — #1709 F4 amendment Tier-A: **PASS** at `fc00aed0f`
+
+| Field       | Value                                                          |
+| ----------- | ---------------------------------------------------------------- |
+| Amended head | `fc00aed0f507ae2fac1d9ce03972a80d246b3611` — local = remote = PR |
+| Prior head  | `f2b3fc8b3` (cycle-2 verdict)                                   |
+| Author      | preserved thread `01a047f0-…` — no second author, no third PLAN-EVAL |
+
+### Bounds
+
+Seven files, all in the leaf slice run dir. **Both evaluator artifacts preserved** — `plan-eval.md`
+and `plan-eval-cycle-1.md` untouched. Across the whole arc `cf648f1ff → fc00aed0f` the diff excluding
+`.llm/runs/` is **empty**: still plan-only. Tree clean, explicit-refspec push.
+
+### I measured the whole signal matrix this time
+
+The lesson from my missed F4 was that a repair extending coverage into a new mode needs that mode
+*measured*, not inferred. So rather than re-checking only the stated forms, I enumerated every
+mode × outcome on Deno 2.9.5:
+
+| Mode / outcome                     | Summary                                        | Exit |
+| ---------------------------------- | ------------------------------------------------ | ---- |
+| fmt write — clean                  | `Checked 1 file`                                | 0    |
+| fmt write — reformattable          | `Checked 1 file`                                | 0    |
+| fmt write — **crash only**         | **`error: Failed to format 1 of 1 checked file`** | 1  |
+| fmt write — clean + crash          | `error: Failed to format 1 of 2 checked files`  | 1    |
+| fmt write — reformattable + crash  | `error: Failed to format 1 of 2 checked files`  | 1    |
+| fmt check — clean                  | `Checked 1 file`                                | 0    |
+| fmt check — dirty                  | `error: Found 1 not formatted file in 1 file`   | 1    |
+| fmt check — **crash only**         | `error: Found 1 not formatted file in 1 file`   | 1    |
+| fmt check — clean + crash          | `error: Found 1 not formatted file in 2 files`  | 1    |
+| lint — clean / crash / clean+crash | `Checked N file(s)` in all three                | 0/1/1 |
+
+**This closes the enumeration at exactly three forms.** Two findings fall out that matter:
+
+1. The **singular** variant `1 of 1 checked file` is real, so the regex must tolerate it — the plan's
+   `^error: Failed to format (\d+) of (\d+) checked files?$` does, via `files?`.
+2. **fmt check mode counts a crashing file as "not formatted"** and includes it in `N`, so check mode
+   needs no new form — which is exactly why the amendment correctly scopes the third form
+   **write-only**. Had it been applied to check mode too, it would never match.
+
+### Amendment content — verified against the contract
+
+- **Third form admitted**, write-scoped, second integer as processed count, singular/plural pinned
+  (`plan.md:109`).
+- **Propagated to all six named places**: D8 (`:85`), the *Completion adapters* list (`:109`),
+  must-not-regress (`:264`), the S3 slice row (`:324`), the risk-register write row (`:361`), and the
+  open-decision sweep (`:345`, "resolved now / owner accepted"); `research.md` carries the
+  finding-10 correction.
+- **Controls added**: "check-mode and write-mode crash+drop/crash-only controls at **1/2/200** with
+  the exact exit/JSON above".
+- **Precedence preserved** — `refusal ≥ crash ≥ ordinary finding` still locked at D6 and `:207`, and
+  the plan states twice (`:267`, `:312`) that **a write-mode crash without a drop stays exit 1**,
+  which is the specific misclassification F4 exposed.
+- **Six-path ceiling** unchanged; no seventh path.
+- The author **independently measured** the write-mode form rather than taking it from my brief, and
+  says so in `drift.md` — the check I asked for precisely because inference-instead-of-measurement
+  caused F4.
+
+### Verdict — **Tier-A PASS**
+
+The plan gate for #1709 is now closed out by Tier-A, since the ordinary PLAN-EVAL allowance is spent
+and **no third cycle exists**. **Stopping for the coordinator's implementation grant.** No
+implementation performed or recommended; no merge; no runtime or evaluator lease; no change to any
+Claude topic ownership.
