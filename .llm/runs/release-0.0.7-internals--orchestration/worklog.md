@@ -1753,3 +1753,58 @@ Cycle-2 PLAN-EVAL is **prepared and deliberately not launched**:
 bit-identical as `plan-eval-cycle-1.md`, and requiring a fresh session independent of the cycle-1
 evaluator `1b7a1305-…`. It launches only on the coordinator's grant after reconciling the new
 immutable head.
+
+## 2026-08-28 — #1709 PLAN-EVAL cycle 2 launched on coordinator grant
+
+### Pre-launch reconciliation (state unchanged since the Tier-A PASS)
+
+| Check                                    | Observed                                                |
+| ---------------------------------------- | -------------------------------------------------------- |
+| Leaf local / remote / PR #1710           | all three `3e934e2de1ed758f7182ad1eebf027750bcfb976`     |
+| Leaf tree                                | clean                                                    |
+| Artifacts changed vs cycle-1 verdict head | **7**, matching the coordinator's statement             |
+| Plan-only                                | `cf648f1ff → 3e934e2de` excluding `.llm/runs/` is empty  |
+| Topic head                               | `bf3635eb5f85a6909495b2870e5766c7657b01fa`, local = remote, clean |
+| Worktree holders                         | 0 — no rival agent                                       |
+
+The fresh independent Tier-A the grant asked for had already been performed **last turn** against the
+F1–F3 / A1–A3 repair contract, verdict **PASS**, recorded at topic checkpoint `bf3635eb5` and PR
+comment `5454456503`, with the root numbers independently re-measured. It was not repeated; the
+reconciliation above confirms nothing moved in between.
+
+### Cycle-2 evaluator identity
+
+| Field                     | Value                                                                                                    |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Session                   | `14cfb576-de3f-40a5-b23a-d9e8e8d018e4`                                                                   |
+| Backend / `providerEnv`   | `daemon` / `{}` — native Anthropic, not a gateway                                                         |
+| cwd                       | `/home/codex/repos/netscript-007-lint-fail-closed`                                                       |
+| Requested route           | `formal_plan_evaluation` — native opposite family, Claude **Fable 5 · medium** · `--remote-control`       |
+| Observed (`respawnFlags`) | `--model claude-fable-5 --effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1709 PLAN-EVAL c2"` |
+| Route verdict             | **matched**                                                                                               |
+| Family                    | Anthropic evaluator vs OpenAI/Codex author — **opposite family**                                          |
+
+**Distinctness confirmed** against all three prohibited identities: author `01a047f0-…`, supervisor
+`f7691917-…`, and **cycle-1 evaluator `1b7a1305-…`**. `14cfb576-…` is none of them.
+
+### Bounds briefed
+
+Delta-focused: cycle 1's confirmations are carried forward and must be *named*, not silently reused —
+spot-check only what the repair could have disturbed. Judge F1/F2/F3 closure and whether A1–A3 were
+folded or defensibly skipped, then run the **full plan gate** plus an evaluator-run open-decision
+sweep, with a newly introduced gap as blocking as an unclosed one. Cycle 1 must be preserved
+**bit-identical** as `plan-eval-cycle-1.md`, verified by hash.
+
+Run artifacts only; no product mutation or checkout prototyping; no lease, `scaffold.runtime`,
+Aspire, Docker, browser, `e2e:cli`; no merge/ready/relabel/checkbox/acceptance-evidence/central-state
+edit. **No implementation grant exists** — it must neither implement nor recommend starting.
+
+It was told explicitly that **a second `FAIL_PLAN` exhausts the ordinary allowance and returns the
+leaf to the owner**, and not to assume or recommend a third cycle; and not to soften because a
+supervisor Tier-A passed.
+
+### Standing exit rule for this cycle
+
+On **PASS** — stop for the coordinator's implementation grant. On **`FAIL_PLAN`** — release the
+evaluator, keep the canonical author `01a047f0-…` available (not frozen, per the recorded owner
+policy), and surface the exact unresolved decision to the coordinator. **No cycle 3 is inferred.**
