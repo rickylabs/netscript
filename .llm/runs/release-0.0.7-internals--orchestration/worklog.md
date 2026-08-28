@@ -1586,3 +1586,50 @@ No rescope finding beyond the granted fmt expansion; the plan takes no seventh p
 publish consequence it does not have. **Stopping before PLAN-EVAL and implementation**, both of which
 remain separate later authorizations. This lane holds no evaluator or runtime lease, requested none,
 and touched no other queue.
+
+## 2026-08-28 — #1709 formal PLAN-EVAL cycle 1 dispatched; identity recorded before any mutation
+
+### Reconciliation before dispatch
+
+| Ref                   | Observed                                                              |
+| --------------------- | --------------------------------------------------------------------- |
+| Central checkpoint    | `73f9b5aabab9ad65963b1314fba5e63619f013f6` — local **=** remote, remote-exact |
+| Topic head            | `7f252d44c82b7642957cde2a590e5329b968dd24`, tree clean                |
+| Live `origin/main`    | `cf648f1ff973d74c213bb125a6f5f5b9328e693b` — unchanged                |
+| Plan head             | `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c` — local = remote = PR `headRefOid` |
+| Leaf `merge-base`     | `cf648f1ff` exactly — parented on main, not a merge                   |
+| PR #1710              | OPEN, draft, `MERGEABLE`/`CLEAN`, `status:plan`                       |
+| Leaf tree             | clean; plan-only (diff from base excluding `.llm/runs/` is empty)     |
+| Author thread         | `01a047f0-…` **idle** 931s; **no process holds the leaf worktree**    |
+
+### Evaluator identity
+
+| Field                           | Value                                                                                                       |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Session                         | `1b7a1305-a353-4c1d-a415-34ee8869ff6b`                                                                      |
+| Backend / `providerEnv`         | `daemon` / `{}` — native Anthropic, not a gateway                                                            |
+| cwd                             | `/home/codex/repos/netscript-007-lint-fail-closed`                                                          |
+| Requested route                 | `formal_plan_evaluation` (`lane-policy.md:45`) — native opposite family, Claude **Fable 5 · medium** · `--remote-control` |
+| Observed (`respawnFlags`)       | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1709 PLAN-EVAL" --model claude-fable-5` |
+| Route verdict                   | **matched**                                                                                                  |
+| **Family**                      | **Anthropic evaluator vs OpenAI/Codex author — opposite family confirmed**                                   |
+
+Independent of the parked Codex author `01a047f0-…` and of this supervisor `f7691917-…`.
+
+### Bounds briefed
+
+Judge the plan gate only; the accepted architecture and the six-path envelope are **settled and not
+reopenable** — the fmt pair is authorized rescope history, not scope creep. A **seventh path is not
+granted**, and the evaluator is asked to judge whether the plan forces one, including any shared
+helper module. Crux to re-derive: the lint/fmt completion adapters, the anti-inference rule, batch
+invariance, probe reconciliation and fail-closed failure modes, must-not-regress in both wrappers,
+the lint-only publish claim, and the `2037 → 2041` root correction.
+
+Run artifacts only; no product/tooling/config/workflow mutation and no prototyping in the checkout;
+reproductions on archive copies only. **No implementation grant exists** — it must neither implement
+nor recommend starting before separate coordinator authorization. No merge, ready flip, relabel,
+checkbox or acceptance-evidence mutation, central-state edit, lease, `scaffold.runtime`, Aspire,
+Docker, browser, or `e2e:cli`.
+
+It was told an honest `FAIL_PLAN` is a correct outcome and **not to soften because supervisor Tier-A
+already passed — Tier-A is a lighter, different gate and not a substitute** for the formal one.
