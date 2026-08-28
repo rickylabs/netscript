@@ -1206,3 +1206,88 @@ that both verdicts are preserved. Leaf head is now `e764be162`, pushed.
 `PASS` at `cf31de902` and delta `PASS` at `cfa055bb8`. Remaining before `status:ready-merge`, none of
 it this lane's: register the unchanged-baseline MCP `deno doc --lint` debt (owner/coordinator), then
 draft→ready, close-gate acceptance mirrors, and merge.
+
+## 2026-08-23 — #1663 closeout reconciliation; rebase + revalidation plan; public-record audit
+
+Resumed as internals topic supervisor for **closeout coordination only**. No source authored, no
+self-certification, no merge/ready/relabel/close, no runtime lease. Docker and Aspire untouched.
+
+### Head reconciliation — all four match the brief exactly
+
+| Ref                     | Expected     | Observed                                   |
+| ----------------------- | ------------ | ------------------------------------------ |
+| Topic head (this lane)  | `37f3ae80e`  | `37f3ae80e91255f8ee7f117e6d8a582962ba0b19`, tree clean |
+| Leaf head / PR #1663    | `e764be162`  | `e764be1620076bc19af09c07768e3c3306048a42`, tree clean, PR `headRefOid` equal |
+| Live `origin/main`      | `c73d361ee`  | `c73d361eea14a7f40702638638e492f2ca961a59` |
+| Central checkpoint      | `148d30026`  | `148d3002618404fefd8f5e6059228129eba0fc7b` |
+
+PR #1663: OPEN, draft, base `main`, `MERGEABLE`/`CLEAN`, milestone `0.0.7`, labels `type:fix` +
+`area:tooling` + `status:impl`.
+
+### Main drift since the leaf base `05fc3132b` — 11 commits
+
+**Only one of the leaf's thirteen paths is touched by main: `deno.json`**, and only by #1666
+(`2dd1a75ef`), which adds a single `docs:exports-drift` task line in the `tasks` block. The leaf's
+`deno.json` edits are the `fmt:check` task command and the `fmt.exclude` list — textually distant
+regions. Low collision risk, consistent with GitHub reporting `MERGEABLE`/`CLEAN`.
+
+Impact assessment on the recorded evidence:
+
+| Input                                  | Main's effect                                                                 | Revalidation |
+| -------------------------------------- | ----------------------------------------------------------------------------- | ------------- |
+| `packages/mcp` file count (114/115)    | 2 files **modified**, none added/removed (`export-surface-corpus.generated.ts`, `publish-assets.generated.ts`) | expect stable, must confirm |
+| Barrel embed inputs                    | `.llm/tools` changes are to `check-accuracy…`, `check-exports-drift{,_test}.ts`; **`check-exports-drift` is not in `consumer-tools.json`**, and `run-deno-lint.ts`/`run-deno-fmt.ts` untouched | leaf's barrel delta stays isolated |
+| `agent-docs.generated.ts`              | **regenerated on main** — a different barrel output than the leaf's `agent-tools.generated.ts`; `check:assets-barrel` diffs both | must prove both fresh together post-rebase |
+| Root `fmt:check` 2,038 / check 2,922   | main adds docs/RFC/source files                                                | **counts will rise — expected, not a regression** |
+| `closeScoreGap` sweep, doctor 5-file check | untouched                                                                  | expect identical |
+| `deno task --cwd packages/cli test` 828 | main touched `packages/sdk`, `ai`, `contracts`, `prisma-adapter-mysql`        | count may shift — expected |
+
+### Public-record audit — three defects found
+
+1. **PR `## Slices`** — S0 checked; **S1–S4 unchecked despite being landed and signed off, and there
+   is no S5 row at all.** The body understates completed work.
+2. **PR `## Definition of Done`** — all fourteen boxes unchecked. Most are satisfied by evidence
+   already posted; DoD line 59 (issue acceptance mirrors) is genuinely outstanding.
+3. **All three issues still carry `status:triage`** and zero checked acceptance boxes. The label is
+   stale for implemented-and-evaluated work. Relabelling issues is *not* in this lane's closeout
+   authority, so it is reported, not done.
+
+### Acceptance-box gap found: #1618 box 4 was never performed
+
+> "Any other package carrying an intentionally-invalid config fixture is checked for the same blind
+> spot, and the result recorded either way."
+
+No sweep is recorded anywhere in the leaf run dir — S1 never did it and no evidence exists. This
+would have failed the close gate. **Performed the sweep now** (read-only, supervisor-recordable, no
+product change):
+
+| Fixture config                                                  | Auto-discoverable name? | Parses? | Blind spot? |
+| ---------------------------------------------------------------- | ----------------------- | ------- | ----------- |
+| `packages/cli/e2e/fixtures/desktop-native/deno.json`             | yes                     | yes, no `workspace` key | **no** |
+| `packages/mcp/tests/fixtures/doctor/healthy/deno.json`           | yes                     | yes, `workspace: ["packages/*","plugins/*"]` | **no** (already in scope) |
+| `packages/fresh/tests/type-fixtures/streamdb-consumer-deno.json` | no — custom filename    | yes     | **structurally impossible** — Deno never auto-discovers it |
+| `packages/plugin-streams-core/tests/type-fixtures/producer-consumer-deno.json` | no — custom filename | yes | **structurally impossible** |
+
+**Result: `packages/mcp/tests/fixtures/doctor/broken/` is the only instance of the blind spot in the
+repository.** Recorded either way, as the box requires.
+
+### Rebase + exact-head revalidation plan (to be delegated, not self-authored)
+
+1. Delegate to the **preserved canonical Codex author** `01a004ec-86a6-7c21-8886-81c09de099f5`:
+   rebase `fix/package-gate-honesty` onto `c73d361ee`, resolving the single `deno.json` region
+   overlap by **keeping both** main's `docs:exports-drift` task line and the leaf's `fmt:check` /
+   `fmt.exclude` edits. No squash, no history rewrite beyond the rebase, force-with-lease push by
+   explicit refspec.
+2. Revalidate **at the exact rebased head**, re-recording every number rather than carrying the old
+   ones: MCP wrappers `114/2/failedBatches:0`; doctor check exactly 5 / 0 failed; `closeScoreGap`
+   sweep (`0.5` green, `0.5625`/`0.6`/`0.75`/`5` red, `0.49`/`0.4` red); `gen:assets-barrel` +
+   `check:assets-barrel` proving **both** `agent-tools.generated.ts` and main's regenerated
+   `agent-docs.generated.ts` fresh together; `deno task --cwd packages/cli test`; `quality:scan`
+   `allowCount: 7`; root check/fmt with the **new, higher** counts stated as expected drift.
+3. Fresh Tier-A on the rebased head, then a delta IMPL-EVAL bounded to "rebase did not change
+   behaviour" — the S1–S5 substance is already twice evaluated.
+4. `scaffold.runtime` stays coordinator-waived `n/a`. No Aspire, Docker, `e2e:cli`, or lease.
+
+**Rebase rewrites the S1–S5 SHAs**, so slice checkboxes and evidence must be restamped afterwards.
+That is why this pass repairs only rebase-durable parts of the public record and binds acceptance
+evidence to **stable PR-comment URLs** rather than SHAs.
