@@ -415,3 +415,80 @@ the executable claim to make the gate green.** A green obtained only because unt
 in the author's worktree is not a pass.
 
 Author `01a047f1-…` remains `working` on the repair. Cycle 2 remains withheld.
+
+---
+
+# Tier-A — #1112 PLAN-EVAL cycle-1 repair at `3e0f2223ac7bed9068ecc033c92da7ffbed83711`. **FAIL**
+
+| Field | Value |
+| --- | --- |
+| Repaired plan head | `3e0f2223ac7bed9068ecc033c92da7ffbed83711` — local == remote == PR, clean incl. untracked |
+| Verdict | **FAIL** — F1 is relocated, not resolved |
+
+## Scope — correct
+
+Plan-only: six harness artifacts, **zero** `packages/`, **zero** `docs/`, **zero** `deno.lock`. Seven-path
+envelope intact. F2, F3 (author half), and F4 are addressed. The failure is F1 alone.
+
+## F1 — the executable-example claim does not survive scratch cleanup
+
+**The plan's strategy (D3, gate 1):** the checked-in `examples/basic-usage.ts` imports exactly
+`./.generated/client.ts`; gate 1 creates an uncommitted `.llm/tmp` schema/config, generates a real
+Prisma 7 client into that location, checks the actual file with
+`--deno-arg --config=.llm/tmp/prisma-example-check-deno.json`, then **removes the output before
+handoff**.
+
+**Proven at this exact head** — `git archive 3e0f2223a` into scratch (tracked files only, so untracked
+residue is impossible), the planned literal import applied, no generated output present, then the
+**ordinary** package-root wrapper:
+
+```text
+run-deno-check.ts --root packages/prisma-adapter-mysql --ext ts,tsx
+filesSelected: 12 | failedBatches: 1 | occurrences: 1 | exit 1
+TS2307 Cannot find module '…/packages/prisma-adapter-mysql/examples/.generated/client.ts'
+```
+
+The instrument was validated in both directions beforehand: the same pristine archive **without** the
+import returns `failedBatches: 0`, `occurrences: 0`, exit 0. So the red is caused by the planned import,
+not by the harness.
+
+**Why the plan's own gates do not catch this:**
+
+- **Gate 1** passes only inside the scratch window — a scratch `--config` plus a scratch-generated
+  client, both deleted before handoff.
+- **Gate 5 "Package check"** is scoped `--file packages/prisma-adapter-mysql/mod.ts`, so it **never
+  selects the example**.
+- Post-cleanup resolvability is addressed **nowhere**: a search across `plan.md`, `research.md`, and
+  `drift.md` for *clean checkout*, *post-cleanup*, *TS2307*, *unresolvable*, or *`deno task check`*
+  returns **zero** hits.
+
+The consequence is a **permanent `TS2307` introduced into the repository** by the implementation: the
+checked-in example would import a path that exists only during a scratch window. That is precisely the
+boundary the coordinator drew — direct/root/package checks passing only while untracked generated output
+remains.
+
+The plan neither keeps the import resolvable in a clean checkout **nor** STOPs to report the minimum
+additional path. It marks the open decision "Resolved: exact scratch-generated". It is not resolved.
+
+## Minimum additional path — measured, not asserted; and neither is granted here
+
+`packages/prisma-adapter-mysql/deno.json` is **not** among the seven paths (the ceiling lists paths 1–7;
+`deno.json` is absent), so **every** candidate below is an eighth path requiring a coordinator ruling.
+
+| Candidate | Result | Cost |
+| --- | --- | --- |
+| **A** — add top-level `"exclude": ["examples/**"]` to `packages/prisma-adapter-mysql/deno.json` | **exit 0**, `failedBatches: 0` — measured | Makes the ordinary gate green by **no longer type-checking the example at all**. That weakens the executable claim rather than supporting it, and is arguably the downgrade the coordinator forbade. |
+| **B** — commit a generated client fixture | not measured | The plan's own Deferred item 3 |
+| **C** — add an `imports` entry mapping the specifier | not measured | Also `deno.json`; PLAN-EVAL already showed the ungenerated `@prisma/client` stub types `PrismaClient` as `any`, so this risks a green that is not semantic evidence |
+
+**No eighth path is granted by this review**, and candidate A is not recommended on its measurement
+alone: passing by exclusion is not the same as passing by resolution.
+
+## Outcome
+
+**Tier-A FAIL at `3e0f2223a`.** Returned to the coordinator for a rescope ruling on the minimum
+additional path, with the proof above. **Cycle 2 remains withheld** — it would be withheld on this
+verdict regardless of the standing instruction.
+
+No product mutation, no eighth path granted, no runtime, no lease, no other lane. Scratch archives
+removed; the leaf worktree was never touched. PLAN-EVAL failure counter for this lane: **1**.
