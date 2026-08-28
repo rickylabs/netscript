@@ -7,7 +7,7 @@
 | Run ID          | `fix-prisma-mysql-honest-example--0.0.7`                   |
 | Branch          | `fix/prisma-mysql-honest-example`                          |
 | Base            | `cf648f1ff973d74c213bb125a6f5f5b9328e693b`                 |
-| Current phase   | `plan` / cycle-1 `FAIL_PLAN` repaired; cycle 2 not granted |
+| Current phase   | `plan` / Tier-A F1 repair; fresh Tier-A pending            |
 | Archetype       | `2 — Integration` (doctrine verdict Keep)                  |
 | Scope overlays  | `docs`                                                     |
 | Product ceiling | Seven named paths; an eighth product path requires rescope |
@@ -15,8 +15,10 @@
 ## Current State
 
 Research and planning only are complete; no product file changed. PLAN-EVAL cycle 1 returned
-`FAIL_PLAN` at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`; its import finding has been resolved by
-an exact detached scratch probe, but cycle 2 has not been granted or launched. The
+`FAIL_PLAN` at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`. Fresh Tier-A failed the first repair head
+`3e0f2223ac7bed9068ecc033c92da7ffbed83711` on F1 alone because the literal generated-client import
+became a permanent `TS2307` after scratch cleanup; F2-F4 were accepted. The repaired plan now has
+separate clean-shell and real-generated-client gates. Cycle 2 remains unlaunched. The
 coordinator-amended plan owns seven paths: site, README, adapter source, module docs/exports, public
 types, the checked-in `basic-usage.ts`, and existing `connection_errors_test.ts`.
 
@@ -24,8 +26,9 @@ The census now contains 50 relevant occurrences/dispositions. It is the authorit
 claim sweep; no hard-coded count may substitute for applying every `Correct`/`Delete` row. The added
 example is materially false: it calls the package a Deno MySQL adapter, comments out the entire
 Prisma flow, and substitutes a connected-adapter raw query plus manual disposal. The corrected flow
-imports a real generated client from exact `./.generated/client.ts`, passes the `PrismaMySql`
-factory, makes one Prisma query, and calls `$disconnect()` in `finally`.
+dynamically loads a real generated client at module scope from a non-literal URL targeting
+`./.generated/client.ts`, passes the `PrismaMySql` factory, makes one Prisma query, and calls
+`$disconnect()` in `finally`.
 
 ## Seven-Path Ceiling
 
@@ -41,19 +44,20 @@ An eighth product path is a hard rescope.
 
 ## Key Decisions
 
-| Decision                                   | Source                                         | Notes                                                                                                                                                                                    |
-| ------------------------------------------ | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dynamic driver is npm `mysql2/promise`     | `adapter.ts:23,634`                            | Requires Deno npm resolution, Node-compatible socket APIs, and `--allow-net`.                                                                                                            |
-| Factory goes to Prisma                     | Prisma 7 declarations; `PrismaMySql.connect()` | Do not pass a connected adapter to `PrismaClient`.                                                                                                                                       |
-| Generated client is real                   | Exact detached scratch probe                   | Package example imports `./.generated/client.ts`; scratch-only Prisma 7.8 generation plus the wrapper checks the actual file. No ambient declaration, ignore, or ungenerated `any` stub. |
-| Prisma adapter types are compatible        | Real generated-client wrapper probe            | Narrow `PrismaMySqlResultSet.columnTypes` to `SqlResultSet['columnTypes']`; runtime conversion is unchanged.                                                                             |
-| Structured fields only                     | `MySqlConnectionConfig`; translator            | No direct connection string in this package.                                                                                                                                             |
-| Hook wording comes from `types.ts:39-42`   | #1662 shipped source                           | Remove the stale unsupported warning.                                                                                                                                                    |
-| Legacy TLS mode is deprecated, not changed | Coordinator TLS ruling; current translator     | State and characterize plaintext with no CAs and joined `ssl.ca` only with non-empty CAs; no hostname verification.                                                                      |
-| Translator seam is source-internal         | Coordinator authorization                      | Export from `src/adapter.ts` only; no barrel export and no runtime injection.                                                                                                            |
-| Existing test owns evidence                | `connection_errors_test.ts`                    | Extend its `FakePoolClient` mapping/cleanup coverage; no second test.                                                                                                                    |
-| Legacy Deno-driver types are deleted       | Symbol-use census                              | Unused/stale types and root exports are removed in implementation.                                                                                                                       |
-| Debug namespace remains                    | `adapter.ts:30`                                | Observable `DEBUG=` compatibility behavior.                                                                                                                                              |
+| Decision                                   | Source                                         | Notes                                                                                                                                                                              |
+| ------------------------------------------ | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dynamic driver is npm `mysql2/promise`     | `adapter.ts:23,634`                            | Requires Deno npm resolution, Node-compatible socket APIs, and `--allow-net`.                                                                                                      |
+| Factory goes to Prisma                     | Prisma 7 declarations; `PrismaMySql.connect()` | Do not pass a connected adapter to `PrismaClient`.                                                                                                                                 |
+| Stable example shell remains resolvable    | Pristine tracked-files archive                 | Non-literal URL dynamic import keeps all 12 package files selected and green before generation and after cleanup; no exclusion. Root check leaves `PrismaClient`/`prisma` untyped. |
+| Generated client is real                   | Specialized scratch static/import probe        | Real Prisma 7.8 client is statically checked through a compatibility wrapper; importing the actual example executes the dynamic import and prints `dynamic-import-smoke:ok`.       |
+| Prisma adapter types are compatible        | Real generated-client wrapper probe            | Narrow `PrismaMySqlResultSet.columnTypes` to `SqlResultSet['columnTypes']`; runtime conversion is unchanged.                                                                       |
+| Structured fields only                     | `MySqlConnectionConfig`; translator            | No direct connection string in this package.                                                                                                                                       |
+| Hook wording comes from `types.ts:39-42`   | #1662 shipped source                           | Remove the stale unsupported warning.                                                                                                                                              |
+| Legacy TLS mode is deprecated, not changed | Coordinator TLS ruling; current translator     | State and characterize plaintext with no CAs and joined `ssl.ca` only with non-empty CAs; no hostname verification.                                                                |
+| Translator seam is source-internal         | Coordinator authorization                      | Export from `src/adapter.ts` only; no barrel export and no runtime injection.                                                                                                      |
+| Existing test owns evidence                | `connection_errors_test.ts`                    | Extend its `FakePoolClient` mapping/cleanup coverage; no second test.                                                                                                              |
+| Legacy Deno-driver types are deleted       | Symbol-use census                              | Unused/stale types and root exports are removed in implementation.                                                                                                                 |
+| Debug namespace remains                    | `adapter.ts:30`                                | Observable `DEBUG=` compatibility behavior.                                                                                                                                        |
 
 ## Option Findings
 
@@ -95,8 +99,10 @@ change.
 
 ## Planned New Evidence
 
-- Scratch-generate a real Prisma 7.8 client from `.llm/tmp`, then directly structured-check the live
-  `examples/basic-usage.ts` import `./.generated/client.ts` and remove all generated output.
+- Ordinary structured package-root check with no generated output, selecting all 12 files including
+  the dynamic example shell; repeat it after specialized-gate cleanup.
+- Scratch-generate a real Prisma 7.8 client, statically check factory/query/disconnect compatibility
+  through a scratch wrapper, then import the actual example module to execute its dynamic import.
 - Structural proof that the factory is accepted by real Prisma types after the in-envelope
   `SqlResultSet['columnTypes']` declaration correction.
 - Exact structured/default translation and legacy TLS characterization assertions through the
@@ -119,14 +125,15 @@ Only harness artifacts are amended. Product paths remain untouched:
 
 ## Next Steps
 
-1. Coordinator decides whether to grant PLAN-EVAL cycle 2; this generator does not launch it.
-2. If granted, the topic orchestrator dispatches the final fresh independent cycle. #1112 remains
+1. Fresh Tier-A reviews the pushed repair head; this generator does not self-certify it.
+2. Only after Tier-A passes does the coordinator decide whether to grant PLAN-EVAL cycle 2.
+3. If granted, the topic orchestrator dispatches the final fresh independent cycle. #1112 remains
    selected under the critical/complex/decision-heavy policy because it coordinates published
    integration docs, a real generated-client import, lifecycle, public option truth, and TLS
    compatibility; routine/mechanical leaves instead record `PLAN-EVAL: N/A` plus Tier-A.
-3. After terminal PLAN-EVAL PASS, obtain a separate implementation grant.
-4. Implement the two planned slices within the exact seven-path ceiling.
-5. Run all wrapper-sourced gates and mandatory independent IMPL-EVAL before readiness.
+4. After terminal PLAN-EVAL PASS, obtain a separate implementation grant.
+5. Implement the two planned slices within the exact seven-path ceiling.
+6. Run all wrapper-sourced gates and mandatory independent IMPL-EVAL before readiness.
 
 ## Drift and Debt
 
@@ -135,9 +142,10 @@ Only harness artifacts are amended. Product paths remain untouched:
 - Significant product finding: advertised TLS identity verification is not implemented at base; this
   leaf owns deprecation/documentation/characterization, while runtime change or removal is deferred
   to a separately scoped breaking change.
-- PLAN-EVAL cycle-1 finding repaired: the exact generated-client import and scratch validation setup
-  are now locked, and the probe exposed a type-only result-set declaration correction within the
-  existing seven paths. No eighth path is required.
+- PLAN-EVAL/Tier-A F1 repaired: the tracked example uses a stable dynamic shell, ordinary root
+  checking remains green after cleanup, and specialized static/import evidence owns the real
+  generated-client contract. The probe also retains the type-only result-set declaration correction
+  within the existing seven paths. No eighth path is required.
 - Resolved process variance: the original artifact allowlist omitted mandatory `supervisor.md`. The
   coordinator ruled no waiver and amended the allowlist by exactly that control-plane path; the
   seven-path product ceiling is unchanged.

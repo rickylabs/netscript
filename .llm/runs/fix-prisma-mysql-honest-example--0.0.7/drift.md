@@ -112,3 +112,34 @@ explicitly directed; it does not leave the superseded envelope as the current pl
 - **Stop line:** Cycle 2 has not been launched. Formal PLAN-EVAL remains selected for #1112 under
   the critical/complex/decision-heavy policy, pending a separate coordinator grant; no product
   implementation is authorized.
+
+## 2026-08-28 — Tier-A found permanent post-cleanup `TS2307` in the first F1 repair
+
+- **What:** Fresh Tier-A failed plan head `3e0f2223ac7bed9068ecc033c92da7ffbed83711` on F1 alone.
+  The literal checked-in `./.generated/client.ts` import passed only during the scratch generation
+  window. After cleanup, ordinary package-root checking selected 12 files and failed `TS2307`. Gate
+  5 selected only `mod.ts`, so the plan had no post-cleanup resolvability evidence.
+- **Accepted from that head:** F2 census authority, F3 PR phase trail, and F4 full JSR tool path.
+- **Rejected alternative:** Adding `"exclude": ["examples/**"]` to package `deno.json` is both an
+  eighth path and a false green: it stops checking the example rather than resolving it.
+- **Severity:** significant plan defect; no product mutation had occurred.
+- **Re-derivation:** Created a pristine tracked-files-only `git archive` at the failed head and
+  applied the prospective dynamic shell there. With no generated output, the ordinary structured
+  root wrapper selected all 12 package files, reported zero failed batches/diagnostics, and exited
+  0. No exclusion or scratch config was used. After the specialized gate and removal of generated
+  output, the same command again selected 12 and exited 0.
+- **Resolution design:** The checked-in example computes
+  `new URL('./.generated/client.ts', import.meta.url).href` and dynamically imports that non-literal
+  URL. Gate 1 proves only the stable tracked shell—adapter construction and query/`finally` cleanup
+  control flow. `PrismaClient` and `prisma` are untyped in that gate; the plan must not call it full
+  generated-client type checking.
+- **Specialized evidence:** Gate 5 generates a real Prisma 7.8 Deno client, statically checks a
+  scratch-only compatibility wrapper covering factory construction, `$queryRawUnsafe`, and
+  `$disconnect()` in `finally`, then imports the actual example module. The import smoke exited 0
+  and printed `dynamic-import-smoke:ok`. Since `import.meta.main` was false, no query or MySQL
+  connection ran.
+- **Scope result:** Both jobs pass inside the existing seven product paths. No eighth path,
+  generated artifact, config, schema, lockfile, ambient declaration, ignore, or package exclusion is
+  planned.
+- **Stop line:** Fresh Tier-A must pass the pushed repair before any PLAN-EVAL cycle-2 grant or
+  dispatch. No implementation is authorized.

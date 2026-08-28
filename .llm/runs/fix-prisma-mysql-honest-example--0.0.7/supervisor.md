@@ -58,9 +58,11 @@ control-plane artifact, not an eighth product path.
 
 - Phase: **RESEARCH + PLAN only**.
 - No product mutation has occurred or is authorized.
-- Stop line: **after PLAN-EVAL cycle-1 repair and before any cycle 2 dispatch**. Cycle 2 requires a
-  separate coordinator grant; no implementation may begin from this run state.
-- No runtime, Aspire, Docker, browser, `e2e:cli`, or expensive-gate lease is authorized.
+- Stop line: **after Tier-A F1 repair and before fresh Tier-A**. Cycle 2 cannot be granted or
+  dispatched until that Tier-A passes; no implementation may begin from this run state.
+- No live backend/service runtime, Aspire, Docker, browser, `e2e:cli`, or expensive-gate lease is
+  authorized. The plan's bounded scratch import-only smoke loads the actual module after generation
+  without running its query or contacting MySQL.
 
 ## TLS ruling
 
@@ -90,6 +92,7 @@ contract in another test file.
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `7a3639969ae8319d501244b6658ade303ac3392f` | Tier-A **PASS**, with one finding returned: plan D12 proposed setting mysql2 `ssl.verifyIdentity: true`, a breaking runtime change, and `research.md:130` called that proposal “coordinator-authorized” although no such grant existed. |
 | `34a6e3d9897dd7d9880686c3c2734b24a5591af6` | Tier-A **PASS** on the repaired plan: the false authorization claim was removed and all 13 flagged locations were amended to deprecation and characterization.                                                                          |
+| `3e0f2223ac7bed9068ecc033c92da7ffbed83711` | Tier-A **FAIL** on F1 alone: literal `./.generated/client.ts` became permanent `TS2307` after scratch cleanup, while gate 5 selected only `mod.ts` and could not see it. F2-F4 were accepted.                                           |
 
 The first pass was not clean. Its finding and the repaired second pass are both part of the durable
 record. These Tier-A reviews did not replace formal PLAN-EVAL.
@@ -104,8 +107,8 @@ Owner policy selects formal PLAN-EVAL only for genuinely critical, complex, or d
 topics; routine/mechanical leaves record `PLAN-EVAL: N/A` plus Tier-A. #1112 remains selected for
 one final cycle because it coordinates published integration docs, an executable real
 generated-client import, adapter lifecycle and type compatibility, public option truth, and TLS
-compatibility. The generator has repaired cycle 1 but must not launch cycle 2 without the
-coordinator's grant.
+compatibility. The generator has repaired the Tier-A F1 finding but must obtain a fresh Tier-A pass
+before the coordinator may grant or dispatch cycle 2.
 
 ## Lock hygiene history
 
