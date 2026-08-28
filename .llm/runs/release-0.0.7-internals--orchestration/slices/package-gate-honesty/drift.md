@@ -254,3 +254,22 @@ documentation.
   or blocks the later IMPL-EVAL.
 - **Evidence:** commit-bound receipt plus raw base-archive reproduction; MCP isolated-declaration
   check and member/root publish dry-runs independently pass.
+
+## 2026-08-28 — live-main rebase changed commit identities, not leaf patches
+
+- **What:** The coordinator authorized a history-preserving rebase from branch/PR head
+  `e764be1620076bc19af09c07768e3c3306048a42` onto live main
+  `c73d361eea14a7f40702638638e492f2ca961a59`.
+- **Expected:** Preserve all frozen product paths and evaluator/run artifacts while combining main's
+  `docs:exports-drift` task with the leaf's bounded `deno.json` formatter changes.
+- **Actual:** Rebase replayed 17 commits without a textual conflict. `range-diff` reports every
+  commit patch-equivalent; the resulting pre-evidence head is
+  `995ac2ee83fdebe316f0c12fbbb28c5784839115`. The `deno.json` semantic union contains all three
+  required facts and the diff remains the frozen thirteen product/config paths plus this run dir.
+- **Severity:** expected history drift only.
+- **Action:** record the old-to-new head mapping and commit-bound revalidation, then use the
+  coordinator-authorized explicit force-with-lease push. No product repair or scope change.
+- **Evidence:** identical pre/post run-tree digest
+  `aeca3a2d9bdc43c9dfe7bff04b35c98efa70620bb5a8c8297e2c5abc5b7beb34`; structured receipt matrix in
+  `worklog.md`. The MCP doc-lint 1/1/0 red remains a disclosed baseline whose responsible blobs are
+  byte-identical to live main, not new rebase drift.

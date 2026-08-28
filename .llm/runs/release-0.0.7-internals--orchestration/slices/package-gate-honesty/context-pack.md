@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
 | Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | S4 evidence recorded; pending final Tier-A slice review              |
+| Current phase  | Rebased exact head validated; pending fresh internals Tier-A         |
 | Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
 | Scope overlays | `docs`                                                               |
 
@@ -148,8 +148,9 @@ fixture config. A fourteenth path is rescope.
 
 ## Open questions
 
-- Topic-supervisor disposition of the unchanged-base MCP export-map doc-lint failure before the
-  mandatory separate-session IMPL-EVAL. S4 did not repair it because product edits were forbidden.
+- Fresh internals Tier-A disposition of the rebased branch. The already-disclosed MCP export-map
+  doc-lint baseline remains red at 1/1/0; the responsible source/config blobs are byte-identical to
+  live `origin/main`, so this rebase pass did not repair or deepen it.
 
 ## Drift and debt
 
@@ -176,11 +177,37 @@ fixture config. A fourteenth path is rescope.
   which lands at `>= 0.575`, inside the detected region.
 - Gates: MCP tests 136/0; `quality:scan` `allowCount: 7`; `guidance-index.ts` restored byte-exact
   after every mutation.
-- Tier-A PASS (supervisor). **Delta IMPL-EVAL `PASS`** at `b456f53f7`, session
-  `117c4b77`, written to `evaluate-delta.md`; the prior full IMPL-EVAL `PASS` at `cf31de902`
-  remains preserved in `evaluate.md`.
+- Tier-A PASS (supervisor). **Delta IMPL-EVAL `PASS`** at `b456f53f7`, session `117c4b77`, written
+  to `evaluate-delta.md`; the prior full IMPL-EVAL `PASS` at `cf31de902` remains preserved in
+  `evaluate.md`.
 
 **Latest slice is S5, not S4.** Branch head after the delta verdict is `b456f53f7`.
+
+## 2026-08-28 — exact-main rebase handoff
+
+- Authorized pre-rebase identity: local branch, `origin/fix/package-gate-honesty`, and PR head all
+  `e764be1620076bc19af09c07768e3c3306048a42`; live `origin/main` and the remote main ref both
+  `c73d361eea14a7f40702638638e492f2ca961a59`.
+- `git rebase origin/main` replayed all 17 leaf commits without a textual conflict. `git range-diff`
+  maps every old commit to a patch-equivalent rebased commit; the rebased implementation/evaluator
+  head before this evidence update is `995ac2ee83fdebe316f0c12fbbb28c5784839115`.
+- The semantic `deno.json` union was checked explicitly: main's `docs:exports-drift` task remains;
+  the leaf's bounded `fmt:check` command remains; the doctor path appears in the one existing
+  `fmt.exclude` key and not in top-level `exclude`.
+- The frozen diff remains exactly thirteen product/config paths plus the leaf run directory. The
+  complete run-artifact tree hash is unchanged across the rebase
+  (`aeca3a2d9bdc43c9dfe7bff04b35c98efa70620bb5a8c8297e2c5abc5b7beb34`), preserving all plan and
+  implementation evaluator artifacts byte-for-byte.
+- Commit-bound revalidation at `995ac2ee8` passed root check (2,925/25/0), doctor check coverage
+  (5/1/0), focused tests (37/0), MCP tests (136/0), exact CLI package tests (828 passed, 533 steps),
+  `ci:quality`, `quality:gate`, `quality:scan` (`allowCount: 7`), generated-asset freshness,
+  docs-source-format, docs accuracy, exact JSR specifiers, CLI doc lint, and root publish dry-run.
+  The exact no-extra-flag MCP fmt/lint wrappers remain green at 114 files / 2 batches / 0 failed.
+- MCP export-map doc lint remains the disclosed baseline red (`./cli.ts` 1, `./mod.ts` 1,
+  `./openapi-projection.ts` 0). Its entrypoints, package config, and diagnostic source blobs are
+  identical to `origin/main`; no out-of-scope repair was attempted.
+- `scaffold.runtime` remains coordinator-waived `n/a`; Aspire, Docker, `e2e:cli`, an evaluator, and
+  all PR/issue mutations were not invoked.
 
 ## Commits
 

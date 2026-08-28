@@ -520,14 +520,14 @@ Head `cfa055bb8`. One line in `packages/mcp/tests/guidance-retrieval_test.ts`: o
 
 Supervisor mutation sweep, `guidance-index.ts` restored byte-exact after:
 
-| `closeScoreGap` | exit | note                                         |
-| --------------- | ---- | -------------------------------------------- |
-| `0.5`           | 0    | correct value                                |
-| `0.51`, `0.55`  | 0    | residual blind band, disclosed               |
-| `0.5625`        | 1    | new detection edge                           |
-| `0.6`           | 1    | **passed before S5 — F1 hole closed**        |
-| `0.75`, `5`     | 1    | still detected                               |
-| `0.49`, `0.4`   | 1    | narrowing still pinned exactly               |
+| `closeScoreGap` | exit | note                                  |
+| --------------- | ---- | ------------------------------------- |
+| `0.5`           | 0    | correct value                         |
+| `0.51`, `0.55`  | 0    | residual blind band, disclosed        |
+| `0.5625`        | 1    | new detection edge                    |
+| `0.6`           | 1    | **passed before S5 — F1 hole closed** |
+| `0.75`, `5`     | 1    | still detected                        |
+| `0.49`, `0.4`   | 1    | narrowing still pinned exactly        |
 
 MCP tests 136/0; `quality:scan` `ok`, `allowCount: 7`. Tier-A PASS; delta IMPL-EVAL `PASS` at
 `b456f53f7` (`evaluate-delta.md`), prior full verdict preserved in `evaluate.md`.
@@ -535,3 +535,70 @@ MCP tests 136/0; `quality:scan` `ok`, `allowCount: 7`. Tier-A PASS; delta IMPL-E
 Backfilled per delta-eval advisory A1: `cfa055bb8` itself carried no run-artifact update because the
 supervisor traded that for speed at owner request, leaving `context-pack.md` one slice behind the
 branch. Corrected here and in `context-pack.md`.
+
+## 2026-08-28 — history-preserving rebase onto live main
+
+Coordinator authority named the exact endpoints before mutation:
+
+| Ref                                                    | SHA                                        |
+| ------------------------------------------------------ | ------------------------------------------ |
+| Local / remote branch / PR head before rebase          | `e764be1620076bc19af09c07768e3c3306048a42` |
+| Authorized live `origin/main`                          | `c73d361eea14a7f40702638638e492f2ca961a59` |
+| Rebased implementation/evaluator head used by receipts | `995ac2ee83fdebe316f0c12fbbb28c5784839115` |
+
+`git rebase origin/main` replayed all 17 commits without a textual conflict. The required
+`deno.json` resolution was nevertheless verified semantically rather than inferred from rebase exit:
+main's `docs:exports-drift` task is present; the leaf's task-level doctor exclusion remains removed
+from `fmt:check`; the doctor family remains appended to the single existing `fmt.exclude` array; and
+top-level `exclude` contains only main's `.llm/tmp/`, not the doctor family. `git range-diff`
+classified every pre/post commit pair as patch-equivalent.
+
+Pre/post preservation checks:
+
+- `git diff --name-only origin/main..995ac2ee8` is the frozen thirteen product/config paths plus the
+  twelve files in this leaf run directory—no fourteenth product path.
+- The run directory's `git ls-tree` digest is
+  `aeca3a2d9bdc43c9dfe7bff04b35c98efa70620bb5a8c8297e2c5abc5b7beb34` before and after rebase, so
+  `plan-eval.md`, both preserved cycle files, `evaluate.md`, and `evaluate-delta.md` are unchanged.
+- `deno.lock` remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`;
+  deliberately malformed `broken/deno.json` remains
+  `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361`.
+
+### Cheap exact-head revalidation
+
+All receipt commands named `--git-head 995ac2ee83fdebe316f0c12fbbb28c5784839115`; receipt exit codes
+were read directly. Receipts are atomic scratch JSON under
+`.llm/tmp/gate-receipts/package-gate-honesty-rebase/` and are not hand-authored verdicts.
+
+| Gate / obligation       | Result              | Receipt ID and evidence                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Root check              | PASS                | `package-gate-honesty-rebase-check-root-995ac2ee`; 2,925 selected / 25 batches / 0 failed.                                                                                                                                                                          |
+| Doctor check coverage   | PASS                | `package-gate-honesty-rebase-check-doctor-five-995ac2ee`; exactly 5 selected / 1 batch / 0 failed.                                                                                                                                                                  |
+| Focused tests           | PASS                | `package-gate-honesty-rebase-test-targeted-995ac2ee`; 37 passed / 0 failed / 0 ignored.                                                                                                                                                                             |
+| MCP package tests       | PASS                | `package-gate-honesty-rebase-test-mcp-995ac2ee`; 136 passed / 0 failed.                                                                                                                                                                                             |
+| Exact CLI acceptance    | PASS                | `package-gate-honesty-rebase-test-cli-exact-995ac2ee`; 828 passed (533 steps) / 0 failed.                                                                                                                                                                           |
+| Quality job             | PASS                | `package-gate-honesty-rebase-quality-job-995ac2ee`; root check 2,925/25/0, fmt 2,041/36/0 with 0 findings, lint 2,037/35/0.                                                                                                                                         |
+| Quality/doctrine gate   | PASS                | `package-gate-honesty-rebase-quality-gate-995ac2ee`; zero failing doctrine findings.                                                                                                                                                                                |
+| Allowance scan          | PASS                | `package-gate-honesty-rebase-quality-scan-995ac2ee`; findings empty and `allowCount: 7`.                                                                                                                                                                            |
+| Generated assets        | PASS                | `package-gate-honesty-rebase-assets-barrel-995ac2ee`; canonical generation followed by the diff gate, exit 0 and no checkout delta.                                                                                                                                 |
+| Docs source format      | PASS                | `package-gate-honesty-rebase-docs-source-format-995ac2ee`; `Docs source format: OK`.                                                                                                                                                                                |
+| Docs accuracy           | PASS                | `package-gate-honesty-rebase-docs-accuracy-995ac2ee`; 199 pages, 181 corpus files, 91/91 commands, exit 0.                                                                                                                                                          |
+| Exact JSR specifiers    | PASS                | `package-gate-honesty-rebase-jsr-specifiers-995ac2ee`; 2,361 scanned / 1 registered allowance / 0 ranges / 0 failures.                                                                                                                                              |
+| CLI export-map doc lint | PASS                | `package-gate-honesty-rebase-doc-lint-cli-995ac2ee`; all three entrypoints exit 0.                                                                                                                                                                                  |
+| MCP export-map doc lint | **FAIL — BASELINE** | `package-gate-honesty-rebase-doc-lint-mcp-995ac2ee`; entrypoint exits 1/1/0, the previously disclosed `private-type-ref` debt. The five responsible source/config blobs are identical between live `origin/main` and this head, so this is not a rebase regression. |
+| Root publish dry run    | PASS                | `package-gate-honesty-rebase-publish-dry-run-995ac2ee`; all workspace members completed, exit 0.                                                                                                                                                                    |
+| `scaffold.runtime`      | **N/A**             | Existing coordinator waiver; not invoked and no mutex requested.                                                                                                                                                                                                    |
+
+The two exact no-extra-flag acceptance commands were also executed directly through their structured
+wrappers: MCP fmt selected 114 files / 2 config batches / 0 failed / 0 findings, and MCP lint
+selected 114 / 2 / 0 with 0 occurrences. Generated assets left the checkout clean; the two read-only
+docs sources retain SHA-256 `bcb945f1ac93eb67…` and `de948fb2b31beca10…`.
+
+No product/config edit, PR or issue mutation, evaluator launch, runtime smoke, Aspire, Docker,
+`e2e:cli`, cache reload, or lock churn occurred in this rebase pass. Fresh internals Tier-A owns the
+next decision.
+
+The first final-clean receipt request supplied the abbreviated commit id `fc626e099`; the receipt
+tool refused it before firing because exact-head attestation requires the full SHA. No pass was
+claimed for that refusal. The request was rerun with the full commit id and passed; the eventual
+amended evidence commit receives its own exact-head clean receipt after commit.
