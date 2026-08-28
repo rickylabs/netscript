@@ -1102,3 +1102,24 @@ repair and mandatory `supervisor.md` restoration. Dispatch a fresh opposite-fami
 grant implementation, Aspire, Docker, browser, scaffold runtime, or e2e work before its terminal
 verdict. Docs remains parked. Features remains terminal at #1664 attempt 7, with #1293 row 1 still
 the sole owner-only wording boundary.
+
+## 2026-08-28 owner evaluation-policy correction and active repairs
+
+The owner narrowed formal PLAN-EVAL selection: it is now reserved for genuinely critical or
+complex topics. Routine documentation corrections, mechanical fixes, generated refreshes, and
+bounded gate/test work record `PLAN-EVAL: N/A` with a concrete risk-selection reason and retain
+Tier-A plus final IMPL-EVAL. This changes gate selection, not model routing or evaluator
+independence. After two consecutive terminal IMPL-EVAL failures on one leaf, the supervisor stops
+and releases the evaluator, keeps the canonical author available, and surfaces the exact decision
+to the owner in the primary coordinator task; no third loop or frozen author is inferred.
+
+#1709 cycle 1 completed `FAIL_PLAN` at evaluator/PR head `59b79ccd8`, comment `5452167852`, and
+internals checkpoint `dcf8e2b35`. It remains PLAN-EVAL-selected because repository fail-closed
+coverage, crash/refusal precedence, and the published embedded tool are critical/complex. The same
+canonical author is repairing only F1-F3; fresh Tier-A precedes a coordinator-granted final cycle 2.
+
+#1112 cycle 1 completed `FAIL_PLAN` at evaluator head `5b58738ab`, comment `5452181794`; the leaf
+remains at plan head `069fd3e91` and fixes transport checkpoint `ceeb139bc`. The same canonical
+author is proving the minimum honest generated-client import/check strategy before plan repair.
+Any required eighth product path returns to the coordinator before mutation. No implementation or
+runtime lease is granted in either lane.

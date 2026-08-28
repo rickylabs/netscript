@@ -1800,3 +1800,23 @@
   clean/pushed plan head `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`; fresh fixes Tier-A passed
   at `2eeef41ab381a612af0c6945054a628fa04e716b`. Product scope remains exactly seven paths and the
   lane is ready for formal PLAN-EVAL.
+
+## 2026-08-28T15:17:28Z — terminal plan verdicts reconciled; evaluation policy narrowed
+
+- Reconciled #1709 PLAN-EVAL cycle 1 as `FAIL_PLAN`: leaf/PR evaluator head `59b79ccd899ab02a2377e48bba2fdf9dbc866200`,
+  internals checkpoint `dcf8e2b359e1e022e89e88cbdf887231fe47fbd1`, public comment `5452167852`.
+  The same canonical author is repairing F1-F3 in plan artifacts only. The leaf remains formally
+  selected because fail-closed repository tooling, cross-wrapper crash/coverage semantics, and the
+  published embedded consumer asset are critical/complex. No implementation is granted.
+- Reconciled #1112 PLAN-EVAL cycle 1 as `FAIL_PLAN`: immutable plan `069fd3e91`, evaluator artifact
+  `5b58738abfd38e859a331e5f5fa47ce968d7d9ef`, fixes checkpoint `ceeb139bc756b2aafb6d6edbf2e8cade67139834`,
+  public comment `5452181794`. The same canonical author is proving an actual generated-client
+  import/check strategy before plan repair. Seven paths remain frozen unless the coordinator
+  accepts a minimum exact additional path; no silent rescope.
+- Applied the owner's evaluation policy to the canonical harness: PLAN-EVAL is risk-selected only
+  for genuinely critical/complex topics, while routine docs/mechanical/generated/bounded-gate work
+  records N/A and retains Tier-A plus IMPL-EVAL. After two consecutive terminal IMPL-EVAL failures,
+  stop/release the evaluator and surface the exact decision to the owner here; do not infer a third
+  loop or freeze the canonical author. Independent lanes continue.
+- Reattached both preserved Claude topic supervisors and delivered plan-only repair briefs to the
+  existing Codex author threads. Docker and Aspire remain empty; no expensive-gate lease was taken.

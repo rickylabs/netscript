@@ -932,3 +932,17 @@ implementation thread.
   evaluator enumerated thousands of one-file invocations to prove no selected file disappears. Run
   that proof only in evaluator scratch, retain structured summaries, and never interpret its
   sustained CPU use as an orphan while its owning job and progress records remain live.
+- **Formal evaluation had drifted toward ceremony:** the owner reasserted on 2026-08-28 that
+  PLAN-EVAL is only for genuinely critical/complex work. Generic desire for adversarial advice is
+  not selection evidence; routine docs/mechanical/generated/bounded-gate leaves record N/A plus
+  Tier-A. #1709 and #1112 remain selected because their current public-contract and architecture
+  decisions are actually complex, not because every leaf receives a formal plan phase.
+- **Two IMPL-EVAL failures are an owner-facing terminal boundary:** after the second consecutive
+  failure on one leaf, release the evaluator, preserve both verdicts, leave the canonical author
+  available, and surface the exact decision in the primary coordinator task. Parking a live author
+  indefinitely or silently launching a third loop violates the owner ruling; unrelated lanes keep
+  moving.
+- **Terminal evaluator state must beat stale central prose:** #1709's job stopped only after its
+  committed/public `FAIL_PLAN`, and #1112's daemon reported "awaiting generator revision" only
+  after it had committed and posted `FAIL_PLAN`. The immutable artifacts and public comments are
+  authoritative; the central `active`/`ready` fields were reconciliation lag, not live gates.

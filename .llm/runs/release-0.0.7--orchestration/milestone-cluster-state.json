@@ -17,8 +17,14 @@
     "transport": "codex-desktop-remote-control",
     "remoteControlEnabled": true,
     "routeCorrection": "owner-corrected coordinator route is GPT-5.6-SOL/high; max is never authorized",
-    "verifiedAt": "2026-08-28T10:10:08.000Z",
-    "runtimeProbeState": "current Codex Desktop coordinator task is active; the repository agentic codex-app-server capability probe is unavailable and is not used as evidence for Claude topic attachment"
+    "verifiedAt": "2026-08-28T15:17:28.000Z",
+    "runtimeProbeState": "current Codex Desktop coordinator task is active; the repository agentic codex-app-server capability probe is unavailable and is not used as evidence for Claude topic attachment",
+    "evaluationPolicy": {
+      "ownerAuthorizedAt": "2026-08-28T15:17:28.000Z",
+      "planEvaluation": "risk-selected only for genuinely critical or complex topics; routine docs, mechanical, generated, and bounded gate/test work records PLAN-EVAL N/A with a concrete reason and retains Tier-A",
+      "implementationEvaluation": "after two consecutive terminal failures on one leaf, stop and release the evaluator, keep the canonical author available, and surface the exact decision to the owner in the primary coordinator task; no third loop is inferred",
+      "independentLanesContinue": true
+    }
   },
   "limits": {
     "activeImplementationSlicesPerLane": 2,
@@ -62,7 +68,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "plan_eval_active",
+        "state": "plan_repair_active",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -75,8 +81,8 @@
         "pid": 11026,
         "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
-        "topicHeadSha": "7c164674212eeaffcc1974c11bfeceeb3d7dc7dd",
-        "queueState": "1709_formal_plan_eval_cycle_1_active_on_d437db44d",
+        "topicHeadSha": "dcf8e2b359e1e022e89e88cbdf887231fe47fbd1",
+        "queueState": "1709_plan_repair_after_cycle_1_fail_plan_on_d437db44d",
         "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
@@ -102,7 +108,7 @@
           "coordinatorDisposition": "option_1_fail_closed_accepted_issue_1709_registered"
         },
         "latestPlanEvaluation": {
-          "state": "active",
+          "state": "complete",
           "cycle": 1,
           "sourceHead": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
           "backgroundAgentId": "1b7a1305",
@@ -111,7 +117,12 @@
           "route": "native claude-fable-5 / medium / Remote Control",
           "topicDispatchCheckpointSha": "7c164674212eeaffcc1974c11bfeceeb3d7dc7dd",
           "grantedAt": "2026-08-28T11:23:38.628Z",
-          "latestProgress": "fmt batch-size-1 exact coverage PASS for 2041 files; lint batch-size-1 exact coverage remains active"
+          "completedAt": "2026-08-28T11:51:40.000Z",
+          "verdict": "FAIL_PLAN",
+          "evaluatorCommitSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
+          "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5452167852",
+          "blockingFindings": "add the missing fmt runner seam; lock refusal/crash/finding precedence and crash-batch coverage at sizes 1/2/200; bind root exit-zero to per-file drop-free evidence",
+          "next": "same canonical author repairs plan artifacts only; fresh Tier-A; cycle 2 remains selected because this fail-closed published-tooling topic is critical/complex"
         }
       },
       "issueNumbers": [
@@ -139,7 +150,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "ready_for_plan_eval",
+        "state": "plan_repair_active",
         "worktree": "/home/codex/repos/netscript-007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -152,8 +163,8 @@
         "pid": 11903,
         "bridgeSessionId": "session_01Y1YKBnzUJVuXB5akcxeRT6",
         "remoteControlUrl": "https://claude.ai/code/session_01Y1YKBnzUJVuXB5akcxeRT6",
-        "topicHeadSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
-        "queueState": "1112_seven_path_repaired_plan_tier_a_pass_ready_for_formal_plan_eval",
+        "topicHeadSha": "ceeb139bc756b2aafb6d6edbf2e8cade67139834",
+        "queueState": "1112_plan_repair_after_cycle_1_fail_plan_on_069fd3e91",
         "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle",
@@ -164,7 +175,23 @@
           "sourceHead": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
           "topicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
           "review": "fresh fixes Tier-A after the non-breaking TLS amendment and mandatory supervisor.md restoration",
-          "nextGate": "fresh opposite-family formal PLAN-EVAL"
+          "nextGate": "superseded by formal PLAN-EVAL cycle 1 FAIL_PLAN; exact generated-client import/resolution repair is active"
+        },
+        "latestPlanEvaluation": {
+          "state": "complete",
+          "cycle": 1,
+          "sourceHead": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+          "backgroundAgentId": "29284a3f",
+          "sessionId": "29284a3f-3d87-4614-a616-13a7babbbdf0",
+          "bridgeSessionId": "cse_01KHPgQNFFkjAYxeFbkRKfbW",
+          "route": "native claude-fable-5 / medium / Remote Control",
+          "topicDispatchCheckpointSha": "ceeb139bc756b2aafb6d6edbf2e8cade67139834",
+          "completedAt": "2026-08-28T11:53:14.000Z",
+          "verdict": "FAIL_PLAN",
+          "evaluatorCommitSha": "5b58738abfd38e859a331e5f5fa47ce968d7d9ef",
+          "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5452181794",
+          "blockingFinding": "the plan does not lock a real generated PrismaClient import that the checked-in example can resolve and compile-check inside the declared seven-path envelope",
+          "next": "same canonical author proves the minimum honest import/generation strategy and repairs plan artifacts only; any eighth product path returns to coordinator before mutation"
         }
       },
       "issueNumbers": [
@@ -514,8 +541,8 @@
       "lane": "internals",
       "phase": "planned",
       "baseBranch": "main",
-      "headSha": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
-      "currentPrHeadSha": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
+      "headSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
+      "currentPrHeadSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
       "issueNumbers": [1709],
       "implementerAgentId": "01a047f0-f17e-7692-b6f0-83a6d22888c9",
       "branch": "fix/lint-partial-exclusion-fail-closed",
@@ -529,19 +556,23 @@
       "planHeadSha": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "7f252d44c82b7642957cde2a590e5329b968dd24",
-      "planEvaluationState": "active_cycle_1",
+      "planEvaluationState": "complete_fail_cycle_1_plan_repair_active",
       "planEvaluator": {
-        "state": "active",
+        "state": "complete",
         "cycle": 1,
         "sourceHead": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
         "backgroundAgentId": "1b7a1305",
         "sessionId": "1b7a1305-a353-4c1d-a415-34ee8869ff6b",
         "bridgeSessionId": "cse_012Nz3aE9mhoeyfaiGpKGvse",
         "route": "native claude-fable-5 / medium / Remote Control",
-        "grantedAt": "2026-08-28T11:23:38.628Z"
+        "grantedAt": "2026-08-28T11:23:38.628Z",
+        "completedAt": "2026-08-28T11:51:40.000Z",
+        "verdict": "FAIL_PLAN",
+        "evaluatorCommitSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
+        "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5452167852"
       },
       "expensiveGateContract": "scaffold.runtime, Aspire, Docker, browser, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "formal PLAN-EVAL cycle 1 terminal verdict on immutable plan head d437db44d, then coordinator disposition before any implementation",
+      "nextGate": "same-author plan-only repair of cycle-1 F1-F3, then fresh internals Tier-A; critical/complex selection retains one final PLAN-EVAL cycle 2 before implementation",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1709",
         "https://github.com/rickylabs/netscript/pull/1710"
@@ -565,7 +596,20 @@
       "planHeadSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
-      "planEvaluationState": "selected_ready_for_formal_dispatch",
+      "planEvaluationState": "complete_fail_cycle_1_plan_repair_active",
+      "planEvaluator": {
+        "state": "complete",
+        "cycle": 1,
+        "sourceHead": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+        "backgroundAgentId": "29284a3f",
+        "sessionId": "29284a3f-3d87-4614-a616-13a7babbbdf0",
+        "bridgeSessionId": "cse_01KHPgQNFFkjAYxeFbkRKfbW",
+        "route": "native claude-fable-5 / medium / Remote Control",
+        "completedAt": "2026-08-28T11:53:14.000Z",
+        "verdict": "FAIL_PLAN",
+        "evaluatorCommitSha": "5b58738abfd38e859a331e5f5fa47ce968d7d9ef",
+        "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5452181794"
+      },
       "planRepairHistory": {
         "initialHead": "7a3639969ae8319d501244b6658ade303ac3392f",
         "initialTierATopicCheckpointSha": "ca507dadc2fd081ed1dd4f49e510c00fa1e0487c",
@@ -577,7 +621,7 @@
         "finalTierATopicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b"
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "fresh opposite-family formal PLAN-EVAL on immutable repaired plan head 069fd3e91, then coordinator disposition before implementation",
+      "nextGate": "same-author plan-only repair locking an executable generated PrismaClient import and actual-file check; fresh fixes Tier-A, then coordinator risk-selection confirmation before any final PLAN-EVAL",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -3413,7 +3457,7 @@
     },
     {
       "id": "lint-partial-exclusion-fail-closed-plan-eval-cycle-1",
-      "state": "active",
+      "state": "complete",
       "lane": "internals",
       "leafId": "lint-partial-exclusion-fail-closed",
       "phase": "plan-eval",
@@ -3430,7 +3474,37 @@
       },
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-28T11:23:38.628Z",
-      "evaluationFocus": "six-path lint/fmt fail-closed architecture, separate command signal adapters over one structured coverage contract, lint-only consumer publication, exact batch-size-1 coverage probes, no runtime mutation"
+      "completedAt": "2026-08-28T11:51:40.000Z",
+      "evaluationFocus": "six-path lint/fmt fail-closed architecture, separate command signal adapters over one structured coverage contract, lint-only consumer publication, exact batch-size-1 coverage probes, no runtime mutation",
+      "verdict": "FAIL_PLAN",
+      "evaluatorCommitSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5452167852"
+    },
+    {
+      "id": "prisma-mysql-honest-example-plan-eval-cycle-1",
+      "state": "complete",
+      "lane": "fixes",
+      "leafId": "prisma-mysql-honest-example",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "sourceHead": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+      "evaluatorAgentId": "29284a3f-3d87-4614-a616-13a7babbbdf0",
+      "backgroundAgentId": "29284a3f",
+      "bridgeSessionId": "cse_01KHPgQNFFkjAYxeFbkRKfbW",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-28T11:43:00.000Z",
+      "completedAt": "2026-08-28T11:53:14.000Z",
+      "evaluationFocus": "seven-path published integration example, source-only translator seam, non-breaking legacy TLS disposition, real generated-client import, static gate integrity, and no runtime mutation",
+      "verdict": "FAIL_PLAN",
+      "evaluatorCommitSha": "5b58738abfd38e859a331e5f5fa47ce968d7d9ef",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5452181794",
+      "transportRecovery": "attempt 1 raw nohup route never registered a Remote Control bridge and was interrupted with no artifact/comment/mutation; attempt 2 used the supported daemon background route and attached bidirectionally"
     }
   ],
   "expensiveGates": [
@@ -3729,5 +3803,5 @@
     "wslLoadAfterAuthorExit": "3.04 5.00 8.06",
     "verifiedAt": "2026-08-28T11:09:14.000Z"
   },
-  "updatedAt": "2026-08-28T11:38:11.000Z"
+  "updatedAt": "2026-08-28T15:17:28.000Z"
 }

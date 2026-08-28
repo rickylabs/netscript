@@ -1032,3 +1032,20 @@ non-breaking TLS disposition. Fresh fixes Tier-A passed at topic checkpoint `2ee
 post-pass correction restored mandatory `supervisor.md` as a control-plane-only allowlist amendment;
 it did not expand product scope. #1112 is now ready for a fresh opposite-family formal PLAN-EVAL,
 independently of the active internals evaluation.
+
+## Recovery checkpoint — 2026-08-28T15:17:28Z
+
+Both evaluations are now terminal and centrally reconciled. #1709 is `FAIL_PLAN` cycle 1 at
+`59b79ccd8` / internals `dcf8e2b35`; repair must add the fmt runner seam, lock
+refusal/crash/finding precedence and crash coverage at 1/2/200, and bind root exit-zero to per-file
+drop-free evidence. #1112 is `FAIL_PLAN` cycle 1 at evaluator `5b58738ab`, public comment
+`5452181794`; repair must prove a real generated `PrismaClient` import that the actual checked-in
+example can compile-check. Its PR/leaf remains `069fd3e91`; any eighth product path is a coordinator
+rescope boundary.
+
+Owner policy now makes PLAN-EVAL risk-selected only for critical/complex topics. Routine work uses
+`PLAN-EVAL: N/A` with a concrete reason, Tier-A, and IMPL-EVAL. Two consecutive terminal IMPL-EVAL
+failures stop/release the evaluator and create an owner-facing decision in the primary coordinator
+task; no third loop or frozen canonical author. The preserved authors `01a047f0-...` (#1709) and
+`01a047f1-...` (#1112) have been resumed for plan-only repair through their existing topic
+supervisors. No implementation or runtime lease is active.
