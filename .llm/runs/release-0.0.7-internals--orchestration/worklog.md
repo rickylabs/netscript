@@ -1694,3 +1694,62 @@ expensive once S2's tests exist. Cycle 2 of the ordinary allowance remains avail
 exceptional authorization is required**, unlike #1663's third cycle.
 
 Implementation remains ungranted and unrecommended.
+
+## 2026-08-28 — #1709 plan repair Tier-A: **PASS** at `3e934e2de`
+
+| Field         | Value                                                          |
+| ------------- | -------------------------------------------------------------- |
+| Repair head   | `3e934e2de1ed758f7182ad1eebf027750bcfb976` — local = remote = PR |
+| Prior head    | `59b79ccd8` (cycle-1 verdict)                                  |
+| Author        | preserved thread `01a047f0-…`, resumed — **no second author**  |
+
+### Bounds
+
+Seven files, all in the leaf slice run dir. **`plan-eval.md` untouched** — the evaluator's artifact
+and all history preserved. Across the whole arc `cf648f1ff → 3e934e2de` the diff excluding
+`.llm/runs/` is **empty**: still plan-only, no product mutation. Tree clean, pushed by explicit
+refspec.
+
+### Required fixes — all three closed
+
+**F1 closed.** D4 now reads "Lint reuses its existing injectable `BatchRunner`; S3 introduces an
+equivalent injectable runner seam locally in `run-deno-fmt.ts`", justified as achieving the unit
+fixtures "without a seventh file". Plan step 3, the S3 slice row, and the open-decision sweep row
+("no new module/path") all agree.
+
+**F2 closed.** A dedicated *Failure precedence* section states precedence is **locked as
+`coverage refusal ≥ crash ≥ ordinary finding`** — any refusal exits 2, else any crash exits 1, else
+any ordinary finding exits 1. D5 defines crash-batch coverage and cites the same fact I verified
+(Deno still emits `Checked N` / `Found M … in N` on parse-error batches). S2 and S3 both carry
+"mixed and exact crash-plus-drop controls at 1/2/200 with exit/JSON above".
+
+**F3 closed.** Validation row 8 now reads "exit 0 for both root tasks; no rule weakened", and
+per-file drop-free evidence (`2041/2041/0` at `--batch-size 1`) is present in S1, S2 and S3. The
+evaluator's cycle-1 §7 numbers are cited as the pre-implementation baseline.
+
+**A1–A3 all folded**, not skipped: D7 omits `coverage` in lint `--input` mode; D8 uses non-mutating
+`--check` probes in write mode; LF/CRLF/ANSI summary fixtures appear in the S2 and S3 gate rows.
+
+**Six-path ceiling intact** — "only six non-harness paths", a seventh declared an immediate rescope
+stop, and non-scope still forbids a shared seventh module. D10 records the cycle-1 `FAIL_PLAN` and
+that the author neither grants nor launches cycle 2.
+
+### Numbers verified independently at the repair head
+
+| Measurement                              | Observed        |
+| ---------------------------------------- | --------------- |
+| Root lint as shipped (doctor term present) | **2037 / 35 / 0** |
+| Root lint with doctor term removed (S1 after-state) | **2041 / 36 / 0** |
+| Root `fmt:check` at main                 | **2041 / 36 / 0**, findings 0 |
+
+The plan's numbers are exact. The third row is a useful confirmation of *why* S1 exists: **fmt is
+already at 2041 because #1663 corrected the fmt side, while lint is still at 2037** — S1 closes
+precisely that residual asymmetry, which is a stronger justification than "coverage gain".
+
+### Verdict — **Tier-A PASS**
+
+Cycle-2 PLAN-EVAL is **prepared and deliberately not launched**:
+`briefs/1709-plan-eval-cycle2.md`, targeting `3e934e2de`, delta-focused, requiring cycle 1 preserved
+bit-identical as `plan-eval-cycle-1.md`, and requiring a fresh session independent of the cycle-1
+evaluator `1b7a1305-…`. It launches only on the coordinator's grant after reconciling the new
+immutable head.
