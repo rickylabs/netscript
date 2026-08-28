@@ -418,3 +418,75 @@ The unreadable residue was **moved, not deleted**, to a recoverable quarantine.
 Related: D-19 (supervisor audits must not write into the leaf) — the same principle that
 `leak-check` be pointed at a supervisor-owned `--slice-dir`, which was honored throughout attempt 7,
 so the leaf's `leak-report.md` was never regenerated.
+
+## D-21
+
+**The parked lane's local checkout and its quarantine were lost to a host reboot and a worktree
+sweep. All durable evidence survived.** Severity: minor — recorded so a resume is not surprised.
+
+On resuming at topic head `5c5589ee5` on 2026-08-28, two artifacts recorded at park no longer exist:
+
+| Artifact | State |
+| --- | --- |
+| `/home/codex/repos/netscript-007-features-1355` (leaf worktree) | **absent** — no longer in `git worktree list` |
+| `/tmp/netscript-s5-a7-quarantine.Cy2tNS` (843 MB) | **absent** |
+
+**Cause.** The host rebooted `2026-08-28 10:44` (uptime 22 minutes at the time of this check), which
+cleared `/tmp` and therefore the quarantine. The leaf worktree's removal is a separate filesystem
+deletion — a reboot does not remove `/home` — and is consistent with the stale-branch/worktree
+cleanup the coordinator lane was planning. The sibling `netscript-007-leaf-typed-error` worktree is
+also gone. Neither removal is challenged here; neither is this lane's to reverse.
+
+**Evidence integrity is unaffected, and that is the point.** Everything durable was pushed before
+park:
+
+- `refs/heads/feat/app-service-client-wiring` on origin = `a257807d883ac9cd8d692d441bba1760290d4dab`
+- PR #1664 head = the same sha, `draft`, `OPEN`, `mergeStateStatus: CLEAN`, labels unchanged
+- commit `a257807d8` carries `s5-attempt7-runtime-failure.md`, the raw `.log`, and the raw `.ndjson`
+  (507 insertions across 4 files)
+
+**Correction to the park record.** The parked worklog/context-pack describe the quarantine as
+"recoverable". That is no longer true: it was reaped with `/tmp`. It was never deleted by this
+supervisor, and it held only regenerable scaffold data — a generated smoke project's Postgres data
+directory — with no unique evidence. The claim is corrected here rather than left to mislead.
+
+**Consequence for resume.** Any resumption of this lane must first recreate a checkout of
+`feat/app-service-client-wiring` at `a257807d8`; there is no local worktree to return to.
+
+## D-22
+
+**`main` has advanced past the attempt-7 evidence base, and three of the commits land squarely on the
+subsystem the attempt-7 red implicates.** Severity: significant — this is decision-relevant.
+
+Attempt 7's evidence was taken at merge-base `3fc0f2f9221a8246f0d26a26189bafb2647be08a` (the base the
+central `milestone-status.md` also records for #1664). Live `main` is now
+`c73d361eea14a7f40702638638e492f2ca961a59`: the leaf is **10 commits behind**, 60 ahead.
+
+Three of those ten touch `packages/sdk`, and the leaf modified **none** of those files — the entire
+delta is `main` moving forward:
+
+| Commit | Change | Files |
+| --- | --- | --- |
+| `3e8e146a4` | isolate cache write failures, settle cache telemetry contracts (#1665) | `cache-query.ts`, `cache-provider.ts`, `cache-telemetry.ts`, `ports/cache-store.ts` |
+| `0ef48c2ec` | **make cached-entry fast path honor stale policy** (#1669) | `cache-query.ts` (105/98), `cache-query_test.ts`, `query-factory_test.ts` |
+| `c73d361ee` | preserve contract errors through `safe()` / `isDefinedError` (#1692) | `client/errors.ts`, `ports/service-client.ts` |
+
+Net difference between the leaf and `main` on that surface: `cache-query.ts` 141/95,
+`client/errors.ts` 117/15, `ports/service-client.ts` 27/4, plus provider and telemetry.
+
+**Why this matters.** Attempt 7's sole red is that the optimistic `Seed User*` row never appears
+after the Rename click — a query-cache invalidation/refetch behavior. `0ef48c2ec` changes precisely
+when a cached entry is served from the fast path versus treated as stale, which is the decision that
+governs whether a list refetches. The failing behavior and the landed fixes are in the same
+mechanism.
+
+**What is NOT claimed.** There is no evidence that any of these three commits causes or cures the
+attempt-7 red. Establishing that requires a rebase and another runtime attempt, and **no retry is
+authorized** — so the question is deliberately left open rather than guessed at. This is the same
+discipline applied to attempt 7 itself, where neither CDP bound fired and F8 was therefore credited
+with attributability rather than a fix.
+
+**What follows from it.** The attempt-7 red is evidence about the leaf's base, **not** about current
+`main`. Treating it as a verdict on today's code would overstate it. Whether a rebase onto
+`c73d361ee` and a fresh lease are warranted before any further work on the refetch path is a
+coordinator decision; this lane has neither taken it nor requested it.

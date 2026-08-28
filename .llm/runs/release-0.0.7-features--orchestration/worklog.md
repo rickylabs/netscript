@@ -5295,3 +5295,60 @@ next features leaf started from this lane. All prior quarantines, the seven S5 a
 `receipts/f6-test.json`, and `receipts/f7-test.json` remain append-only.
 
 **The #1664 lane is parked at `a257807d8` and awaits a coordinator decision to resume.**
+
+## 2026-08-28 — Resumed and reconciled; lane remains parked, no action taken
+
+Resumed as features topic supervisor at clean topic head `5c5589ee51b483bc4830f6c379513be70f284c01`.
+Features ownership and the serial queue are preserved; no other lane was touched.
+
+### Identity verification — all three references reconciled
+
+| Check | Result |
+| --- | --- |
+| Topic local == remote | `5c5589ee5` == `5c5589ee5`, clean |
+| Leaf `feat/app-service-client-wiring` on origin | `a257807d883ac9cd8d692d441bba1760290d4dab` |
+| PR #1664 | head `a257807d8`, `draft`, `OPEN`, `mergeStateStatus: CLEAN`, labels unchanged |
+| Live `main` | `c73d361eea14a7f40702638638e492f2ca961a59` — matches the coordinator's reference |
+| Central checkpoint | `148d3002618404fefd8f5e6059228129eba0fc7b` — resolves; `164c39241` (attempt-7 close) is its parent-line |
+| Central `milestone-status.md` | #1664 `blocked`, base `3fc0f2f92…`, "attempt 7 terminal behavior red at 68/1/0" — agrees with this lane |
+
+### Resource state — clean
+
+Docker `0` containers, `0` running. No `aspire-managed`, `apphost`, `chrome`, `chromium`, or `dcp`
+process. The 5 `aspire mcp start` processes are pre-existing foreign MCP servers, not run-owned.
+
+### Two real drift items recorded
+
+**D-21 — parked local artifacts lost; evidence intact.** The host rebooted `2026-08-28 10:44`,
+clearing `/tmp` and with it the attempt-7 quarantine. Separately, the leaf worktree
+`/home/codex/repos/netscript-007-features-1355` was swept (a reboot does not delete `/home`), as was
+the sibling `netscript-007-leaf-typed-error`. Neither removal is challenged or reversed here. **All
+durable evidence survived**: `a257807d8` is the origin branch head and the PR head, carrying the
+attempt-7 report plus the raw `.log` and `.ndjson`. The park record's "recoverable" description of
+the quarantine is **corrected** — it was reaped, not deleted by this lane, and held only regenerable
+scaffold data.
+
+**D-22 — `main` has moved past the evidence base, onto the implicated subsystem.** The leaf is 10
+commits behind `main` from merge-base `3fc0f2f92`. Three of those ten touch `packages/sdk`, and the
+leaf modified none of them:
+
+- `3e8e146a4` isolate cache write failures / cache telemetry contracts (#1665)
+- `0ef48c2ec` **make cached-entry fast path honor stale policy** (#1669) — `cache-query.ts` 105/98
+- `c73d361ee` preserve contract errors through `safe()`/`isDefinedError` (#1692)
+
+Attempt 7's sole red is that the optimistic `Seed User*` row never appears after Rename — a
+query-cache invalidation/refetch behavior. `0ef48c2ec` changes exactly when a cached entry is served
+from the fast path versus treated as stale, which is the decision governing whether a list refetches.
+The red and the landed fixes are in the same mechanism.
+
+**No causation is claimed.** Establishing whether those commits cause or cure the red requires a
+rebase and another runtime attempt, and no retry is authorized — so the question is left open rather
+than guessed. Same discipline as attempt 7, where neither CDP bound fired and F8 was credited with
+attributability rather than a fix. The operative consequence: **attempt 7 is evidence about base
+`3fc0f2f92`, not about current `main`**, and should not be read as a verdict on today's code.
+
+### Actions deliberately not taken
+
+No runtime retry, no `fresh-browser`, no evaluator or IMPL-EVAL launch, no rebase, no other lane
+touched, no merge, publish, readiness, label, metadata, or issue mutation, no lease, and no new scope
+admitted. The lane remains parked at `a257807d8` awaiting explicit coordinator instruction.

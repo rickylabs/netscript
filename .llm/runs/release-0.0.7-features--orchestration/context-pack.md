@@ -11,7 +11,7 @@ Resume by reading this file, then `worklog.md` (2026-08-23 entries) and `drift.m
 | Active leaf | PR **#1664**, `feat/app-service-client-wiring`, OPEN **draft** |
 | Parked evidence head | `a257807d883ac9cd8d692d441bba1760290d4dab` |
 | Product content head | `4f50b5a026120b5a3b0195fa1b6f495f08e2b46c` |
-| Leaf worktree | `/home/codex/repos/netscript-007-features-1355` — clean, local == remote == PR |
+| Leaf worktree | **GONE** (D-21) — swept after park; recreate at `a257807d8` to resume |
 | Central close/release | `164c39241` `chore(harness): close #1664 runtime attempt 7` |
 | Verdict | **FAIL_FIX** — cheap evidence green, runtime red |
 | Closes | `#1355`, `#1360` |
@@ -57,10 +57,12 @@ features leaf from this lane. All prior quarantines, the seven S5 attempt histor
 unreadable `0` · processes in execution worktree `0` · Docker containers `0` · runtime ports `0` ·
 `leak-check` aspire `ok` / docker `ok` / survivors `[]`. Execution worktree removed and pruned.
 
-Quarantine, **moved not deleted**, recoverable:
-`/tmp/netscript-s5-a7-quarantine.Cy2tNS/plugin-smoke-20260823-095547` (843 MB).
+Quarantine `/tmp/netscript-s5-a7-quarantine.Cy2tNS` is **gone** — reaped by the 2026-08-28 10:44
+host reboot, not deleted by this lane (D-21). It held only regenerable scaffold data; no unique
+evidence was lost. The "recoverable" claim in the park record is corrected in D-21.
 
-Four earlier quarantines from prior attempts remain intact.
+Re-verified 2026-08-28: Docker `0` containers / `0` running, no `aspire-managed`/`apphost`/`chrome`/
+`dcp` process. The 5 `aspire mcp start` processes are pre-existing foreign MCP servers.
 
 ## Carried observations — none blocking, all for a later leaf
 
@@ -77,6 +79,11 @@ Four earlier quarantines from prior attempts remain intact.
 ## Open drift
 
 D-1, D-2, D-3, D-5, D-6, D-7, D-8, D-10, D-12 carried from earlier phases.
+**D-22** — `main` is now `c73d361ee`; the leaf is 10 behind. Three landed SDK commits touch the
+cache/query/service-client surface the attempt-7 red implicates (notably `0ef48c2ec`, cached-entry
+fast path vs stale policy). Attempt 7 is evidence about base `3fc0f2f92`, **not** about current
+`main`. Causation is unproven and untestable without an unauthorized retry.
+**D-21** — leaf worktree and quarantine lost to reboot/sweep; all durable evidence intact on origin.
 **D-19** — supervisor host audits must not write into the leaf worktree; point `--slice-dir` at a
 supervisor-owned path. Honored throughout attempt 7; the leaf's `leak-report.md` was never
 regenerated.
@@ -86,6 +93,11 @@ D-4, D-11 closed.
 
 ## If you resume this lane
 
-The next question is a product one, not a probe one: why the optimistic `Seed User*` row never
-appears after the Rename click in the generated app. That needs a plan, a PLAN-EVAL, and a fresh
-lease — none of which exist yet, and none of which this supervisor may grant itself.
+1. **Recreate a checkout** — the leaf worktree is gone (D-21). `git worktree add <path>
+   feat/app-service-client-wiring`, expect `a257807d8`.
+2. **Settle the rebase question first** (D-22). The attempt-7 red predates three SDK cache/query
+   fixes on `main`, one of which governs stale-vs-fastpath — the same mechanism the red implicates.
+   Re-running the old base would answer a question nobody is asking.
+3. The open product question is why the optimistic `Seed User*` row never appears after Rename. That
+   needs a plan, a PLAN-EVAL, and a fresh lease — none of which exist, and none of which this
+   supervisor may grant itself.
