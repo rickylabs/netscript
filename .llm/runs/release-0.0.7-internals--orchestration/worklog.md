@@ -1321,3 +1321,129 @@ Closeout comment: PR #1663 comment `5450662110`.
 
 **Next gate is the coordinator's: authorize the rebase.** This lane holds no lease, ran no runtime
 gate, left Docker and Aspire empty, and stops here.
+
+## 2026-08-28 — #1663 fresh Tier-A closeout review at rebased head `a188c7c73`: **PASS**
+
+Independent audit. No product source edited, no runtime launched, nothing merged, relabelled,
+closed, or taken from another lane. Docker untouched.
+
+### Head reconciliation
+
+Local `HEAD` = `git ls-remote` = PR `headRefOid` = `a188c7c730be1f71c255057514d5d8d43c10e594`, tree
+clean, PR `MERGEABLE`/`CLEAN`, `status:impl`. `git merge-base HEAD origin/main` = `c73d361ee`
+exactly, so this is a true rebase onto main, not a merge.
+
+### Range equivalence — verified by `git range-diff`, not asserted
+
+All **17** original commits map 1:1 with `=` (identical patches) onto their rebased counterparts.
+There is, however, an **18th commit not present in the original range**: `a188c7c73`
+`docs(harness): record package gate main rebase`. I inspected it rather than accepting
+"patch-equivalent" at face value — it touches **only three leaf run artifacts**
+(`context-pack.md`, `drift.md`, `worklog.md`) and no product path.
+
+**Precise statement: the product delta is patch-equivalent; the branch additionally carries one
+artifact-only record commit.** That is a more accurate description than the handoff's
+"patch-equivalently rebased", and it is benign.
+
+| Old SHA     | New SHA     | Slice / role                 |
+| ----------- | ----------- | ---------------------------- |
+| `25c29575c` | `df42e2111` | S0 bootstrap                 |
+| `4b988a381` | `58826bb53` | S1                           |
+| `22dc3906e` | `33f2376c8` | S2                           |
+| `fd508978c` | `5cb87072b` | S3                           |
+| `cf31de902` | `cd3ca1bdb` | S4 — **IMPL-EVAL evaluated head** |
+| `e52c2f0e6` | `1e0652f9c` | IMPL-EVAL verdict            |
+| `cfa055bb8` | `afb43f12f` | S5 — **delta-eval evaluated head** |
+| `b456f53f7` | `af02babd7` | delta IMPL-EVAL verdict      |
+
+### Frozen thirteen paths — held
+
+`git diff --name-only c73d361ee a188c7c73` excluding the run dir returns **exactly thirteen** paths,
+identical to the contract. No fourteenth. **Twelve of the thirteen blobs are byte-identical to the
+pre-rebase head** `e764be162` (blob-hash comparison, not diff inspection).
+
+`deno.json` is the only one that legitimately differs, and its delta versus its *new* base is exactly
+the two intended hunks. Critically, the properties the three plan-eval cycles were spent on all
+survive: top-level `exclude` is still `[".llm/tmp/"]` — the doctor family was **not** added there
+(cycle-3 F1 intact); `fmt.exclude` carries the doctor entry with exactly **one** `"exclude"` key in
+the `fmt` block (no shadowing); `fmt:check` no longer skips the doctor family (A1 intact); and main's
+`docs:exports-drift` task line from #1666 is retained.
+
+### Artifacts
+
+Twelve leaf run artifacts present. All five evaluator artifacts —
+`plan-eval-cycle-1.md`, `plan-eval-cycle-2.md`, `plan-eval.md`, `evaluate.md`, `evaluate-delta.md` —
+are **byte-identical** to pre-rebase by blob hash. The full verdict history survived the rebase.
+
+### Exact-head structured receipts
+
+Seventeen receipts under `.llm/tmp/gate-receipts/package-gate-honesty-rebase/`. All attest
+`gitHead` `995ac2ee8` — commit 17, the **product-identical parent** of the final head — which is the
+same evidence shape S4 and #1644 established and is legitimate precisely because commit 18 is
+artifact-only. Every gate exits 0 except `doc-lint-mcp` at exit 1, the disclosed baseline.
+
+One receipt named an unexplained SHA `fc626e099`. I chased it: it is the **pre-amend** version of the
+same record commit, orphaned by the amend that produced `a188c7c73`, and the author re-verified with
+`clean-final-amended.json` at the true final head rather than leaving the stale receipt as proof.
+Both clean-worktree receipts exit 0. Honest trail.
+
+### Independent reruns at the rebased head (archive copy; checkout untouched)
+
+| Check                                    | Result                                                        |
+| ---------------------------------------- | ------------------------------------------------------------- |
+| Exact fmt wrapper `--root packages/mcp`  | `114/2/failedBatches:0`, **exit 0** — #1618 acceptance holds  |
+| Exact lint wrapper                       | `114/2/0`, exit 0                                             |
+| Scoped doctor check                      | `filesSelected:5, failedBatches:0`, exit 0 — **cycle-3 F1 guard intact** |
+| `closeScoreGap` sweep                    | `0.5` green; `0.55` green (disclosed band); `0.5625`/`0.6`/`5` exit 1; `0.49` exit 1 — S5 property intact; restored byte-exact |
+| `gen:assets-barrel` → all seven assets   | **all FRESH**, including main's regenerated `agent-docs.generated.ts` alongside the leaf's `agent-tools.generated.ts` — the flagged rebase risk is clear |
+| `quality:scan`                           | `ok: true`, findings `[]`, **`allowCount: 7`**                |
+
+### Sibling-config sweep, re-verified at the new head
+
+Three auto-discoverable fixture configs exist: `doctor/broken/deno.json` (the deliberate malform),
+`doctor/healthy/deno.json`, and `packages/cli/e2e/fixtures/desktop-native/deno.json`. Main introduced
+none. Combined with the two custom-named `*-deno.json` type-fixtures Deno never auto-discovers,
+**`broken/` remains the only instance of the blind spot.** #1618 box 4 stands.
+
+### `scaffold.runtime` waiver
+
+Verified by inspecting every receipt's **command**, not its captured output: no receipt invokes
+`scaffold.runtime`, `e2e:cli`, Aspire, or Docker. Three receipts merely *mention* those words inside
+captured output, which is not an invocation. The record states `N/A — existing coordinator waiver;
+not invoked and no mutex requested.`
+
+### Disclosed MCP doc-lint baseline
+
+`doc-lint-mcp` exit 1 is the unchanged pre-existing baseline, now owned by **issue #1708**
+(`docs(mcp): clear baseline private-type-ref errors across the export map`, OPEN, milestone
+**0.0.8**, `type:fix`/`area:tooling`). My earlier escalation is discharged — it is registered rather
+than implicitly waived. **Evidence-quality note:** the receipt JSON records the raw exit but does not
+itself name `private-type-ref` or #1708; the classification lives only in the worklog and PR. A
+receipt proves its command, so this is acceptable, but a reader of the receipt alone cannot tell it
+is baseline.
+
+### One record defect found — not repaired, outside this mandate
+
+The PR body's `## Slices` still carries **pre-rebase SHAs** (`4b988a381`, `22dc3906e`, `fd508978c`,
+`cf31de902`, `cfa055bb8`) and a note in the future tense saying the rebase "will rewrite them". Those
+SHAs are no longer on the branch. This mandate authorizes a PR **review comment**, not a body edit,
+so it is reported with the exact restamp mapping above rather than fixed.
+
+### Verdict — **PASS**
+
+### Is a separate delta IMPL-EVAL still required?
+
+**No — and a fresh one would add no information.** The two standing verdicts evaluated
+implementation content that is now proven byte-identical: `range-diff` shows `=` for all 17 commits,
+twelve of thirteen product blobs hash-match pre-rebase, `deno.json`'s delta is exactly the two
+intended hunks, and every load-bearing behaviour re-derives identically at the rebased head. A third
+evaluation would re-read the same bytes.
+
+**But the verdict-to-head binding is genuinely broken and must be repaired before merge.**
+`evaluate.md` names evaluated head `cf31de902` and `evaluate-delta.md` names `cfa055bb8`; **neither
+SHA exists on the branch any more.** A merge gate that checks "evaluator head == merge head" will
+fail, and should. **Recommendation: bind by equivalence, not by re-evaluation** — record the
+`range-diff` proof plus the blob-identity table above as the binding artifact, mapping each old
+evaluated head to its rebased counterpart (`cf31de902` → `cd3ca1bdb`, `cfa055bb8` → `afb43f12f`).
+That is mechanically checkable, whereas a re-run evaluator would merely restate it. The choice is
+the coordinator's because it touches merge-gate trust.
