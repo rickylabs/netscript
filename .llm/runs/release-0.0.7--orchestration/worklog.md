@@ -1712,3 +1712,24 @@
   repaired PR #1663's durable pre-rebase record in place, with comment `5450662110`. It correctly
   left final boxes unticked because the rebase will rewrite leaf SHAs, and stopped for coordinator
   rebase authority without touching product source.
+
+## 2026-08-28T10:10:08Z — #1663 exact-head closeout passed and shipped
+
+- The preserved canonical author rebased all 17 commits onto exact main `c73d361eea` without losing
+  a patch. Twelve product blobs are byte-identical and `deno.json` is the verified semantic union;
+  evidence-only final head `a188c7c730be1f71c255057514d5d8d43c10e594` was explicitly pushed.
+- Fresh independent internals Tier-A passed at topic checkpoint `6de5395cf`. The original evaluator
+  judgments remain bound by range equivalence (`cf31de902` → `cd3ca1bdb`, `cfa055bb8` →
+  `afb43f12f`), so no redundant evaluator was launched. Native Claude Opus 5/high Remote Control was
+  verified at `session_01GzHzk2qGfTJDL2uxh3kWVq`; topic ownership did not change.
+- The PR body and all acceptance evidence were rewritten in place, the eleven issue boxes were
+  mirrored, local and GitHub close gates passed, and PR-check aggregation reported zero current
+  failures. Ready CI run `33161327616` first encountered an infrastructure-only deno.land HTTP/2
+  load refusal while downloading `deno_dom`; a failed-job-only retry passed at the unchanged head.
+- Squash merge `cf648f1ff973d74c213bb125a6f5f5b9328e693b` shipped #1663 and closed #1604,
+  #1618, and #1622. PR and issues now carry `status:shipped`. The final public checkpoint is comment
+  `5451251321`.
+- The clean terminal worktree and local/remote `fix/package-gate-honesty` branches were removed after
+  process-ownership checks. Docker remains empty, Aspire reports `[]`, and nine registered
+  live-owned worktrees remain. L-2's mixed lint-batch exclusion audit is now released as the next
+  internals serial item; this release does not alter another topic's queue.

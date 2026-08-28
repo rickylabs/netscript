@@ -954,3 +954,19 @@ Internals committed and explicitly pushed its closeout-only checkpoint at `d3ca2
 PR #1663's durable pre-rebase record in place (comment `5450662110`). Slice rows S1-S5 and stable
 acceptance-comment URLs are present; final DoD and issue boxes remain intentionally unticked until
 the rebase produces the final head. The coordinator now owns rebase authorization.
+
+## Shipped checkpoint — 2026-08-28T10:10:08Z
+
+#1663 is terminal and shipped. Its exact-main rebased head is `a188c7c730be1f71c255057514d5d8d43c10e594`;
+fresh internals Tier-A passed at topic `6de5395cf`, evaluator equivalence was explicitly bound, all
+acceptance/close gates passed, and current-head CI run `33161327616` is green after one
+infrastructure-only failed-job retry. Squash merge `cf648f1ff973d74c213bb125a6f5f5b9328e693b`
+closed #1604, #1618, and #1622. Their lifecycle labels are normalized to `status:shipped`.
+
+The clean terminal leaf worktree and its local/remote branch are removed. Docker is empty, Aspire is
+empty, and nine registered worktrees remain under live ownership. Internals may now begin only the
+previously deferred L-2 mixed lint-batch exclusion scope audit as its next serial item. Features
+#1664 remains terminal red with no runtime retry, browser gate, or evaluator authority; docs and
+fixes remain parked. Serial ordering is per topic, so this internals release does not hold or modify
+the other supervisors. The primary coordinator remains Codex Desktop Remote Control on
+GPT-5.6-SOL/high, never max; all Claude topic ownership remains unchanged.

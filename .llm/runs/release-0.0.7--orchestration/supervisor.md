@@ -1037,3 +1037,19 @@ rebase through the canonical author route, renew exact-head evidence, repair the
 record, and stop before readiness or merge for coordinator authority. `scaffold.runtime` remains
 coordinator-waived N/A. #1664 stays terminal at attempt 7; fixes and docs stay parked without new
 scope. Per-lane serial queues remain independent of one another.
+
+## Active checkpoint — 2026-08-28T10:10:08Z
+
+#1663 completed the coordinator-only readiness and merge gates. Exact leaf head `a188c7c73`, fresh
+internals Tier-A topic `6de5395cf`, acceptance mirror, close gate, and current-head CI all passed;
+the one initial CI red was an attributable deno.land download refusal and the failed-job-only retry
+passed without changing the head. Squash merge `cf648f1ff` closed #1604/#1618/#1622 and their
+status labels are shipped. The terminal worktree and both topic branches were removed cleanly.
+
+Internals' next serial instruction is the previously deferred **L-2 mixed lint-batch exclusion scope
+audit**. Begin with research and a bounded scope recommendation only; do not fold it retrospectively
+into #1663, do not mutate product or open/close/merge a PR until the coordinator accepts a concrete
+leaf contract, and do not consume an evaluator or runtime lease. The other three topics remain at
+their accepted checkpoints. Coordinator route/transport stays GPT-5.6-SOL/high on Codex Desktop
+Remote Control (`max` forbidden); the Claude internals supervisor remains Opus 5/high with native
+Remote Control and has no coordinator-owned readiness or merge authority.

@@ -871,3 +871,15 @@ implementation thread.
   to scan sibling package configs was absent from the evidence trail. The closeout audit performed
   the cheap sweep, separated auto-discovered configs from custom-named non-candidates, and found no
   additional blind spot before the PR acceptance map is rewritten.
+- **A dependency-download refusal is not generated-content drift:** #1663 ready CI initially failed
+  `agent-docs-prose`, but its structured JSON receipt attributed the nonzero exit to deno.land
+  rejecting a `deno_dom` HTTP/2 stream for excessive load. The exact failed job passed on retry with
+  no head movement. Diagnose from the receipt before widening a frozen generated-asset surface.
+- **Patch-equivalent rebases can preserve formal verdicts when identity is measured:** #1663's 17
+  commits range-diff one-for-one, twelve product blobs are byte-identical, and the only configuration
+  delta is an audited semantic union. Binding the two evaluator heads to their rebased counterparts
+  avoided a redundant formal cycle while retaining independent fresh Tier-A at the final head.
+- **Coordinator transport remains a distinct ownership axis:** this checkpoint was directed by the
+  existing Codex Desktop Remote Control coordinator on GPT-5.6-SOL/high; `max` remains unauthorized.
+  The fresh Claude Opus 5/high Remote Control Tier-A turn reviewed the internals topic only and did
+  not inherit coordinator merge authority or change any other Claude supervisor's ownership.

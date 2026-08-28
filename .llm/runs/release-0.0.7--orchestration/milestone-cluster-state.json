@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "c73d361eea14a7f40702638638e492f2ca961a59",
+  "currentMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -17,7 +17,7 @@
     "transport": "codex-desktop-remote-control",
     "remoteControlEnabled": true,
     "routeCorrection": "owner-corrected coordinator route is GPT-5.6-SOL/high; max is never authorized",
-    "verifiedAt": "2026-08-28T09:09:22.000Z",
+    "verifiedAt": "2026-08-28T10:10:08.000Z",
     "runtimeProbeState": "current Codex Desktop coordinator task is active; the repository agentic codex-app-server capability probe is unavailable and is not used as evidence for Claude topic attachment"
   },
   "limits": {
@@ -62,7 +62,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active_closeout",
+        "state": "active_post_merge_queue",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -75,13 +75,22 @@
         "pid": 11026,
         "bridgeSessionId": "session_0179hsVs5Df7UzovHUP1wuC4",
         "remoteControlUrl": "https://claude.ai/code/session_0179hsVs5Df7UzovHUP1wuC4",
-        "topicHeadSha": "d3ca2128df83e170acaf3a263e661a35471da48d",
-        "queueState": "1663_public_record_reconciled_waiting_for_coordinator_authorized_exact_main_rebase",
+        "topicHeadSha": "6de5395cf4284e4b33b02df161c56e0b22585b80",
+        "queueState": "1663_shipped_l2_scope_audit_released",
         "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
-        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active",
+        "latestCloseoutReview": {
+          "backgroundAgentId": "bfc1e248",
+          "sessionId": "bfc1e248-32f7-4245-87d9-cd9b7784ed12",
+          "bridgeSessionId": "cse_01GzHzk2qGfTJDL2uxh3kWVq",
+          "remoteControlUrl": "https://claude.ai/code/session_01GzHzk2qGfTJDL2uxh3kWVq",
+          "route": "native claude-opus-5 / high / Remote Control",
+          "topicCheckpointSha": "6de5395cf4284e4b33b02df161c56e0b22585b80",
+          "verdict": "PASS"
+        }
       },
       "issueNumbers": [
         1296,
@@ -918,20 +927,20 @@
     {
       "id": "package-gate-honesty",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "05fc3132b6800a85eb6152691a961b658962571b",
-      "currentPrHeadSha": "e764be1620076bc19af09c07768e3c3306048a42",
+      "currentPrHeadSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
       "issueNumbers": [1604, 1618, 1622],
       "implementerAgentId": "01a004ec-86a6-7c21-8886-81c09de099f5",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/package-gate-honesty",
       "worktree": "/home/codex/repos/netscript-007-package-gate",
       "prNumber": 1663,
-      "blocker": "closeout pending: rebase the verified implementation onto exact main, rerun exact-head gates, repair the PR and issue evidence record, and pass the close gate",
+      "blocker": null,
       "bootstrapHeadSha": "25c29575c",
       "planHeadSha": "df1d7a96d7fd4ecca0bd61710ba90ff67449da0b",
-      "implementationState": "s1_s5_complete_tier_a_signed_formal_impl_eval_and_delta_impl_eval_pass_closeout_rebase_pending",
+      "implementationState": "merged_after_exact_main_rebase_tier_a_equivalence_binding_close_gate_and_exact_head_ci_pass",
       "dispatchTopicHeadSha": "b5f72901d0f30d56046c7f7241e09fb8cb3bfcad",
       "expensiveGateContract": "scaffold.runtime is matrix n/a and coordinator-waived for this surface; no lease may be requested and no runtime gate is executed",
       "planGate": "author must stop after bounded plan and report whether a fresh PLAN-EVAL is required",
@@ -1034,13 +1043,35 @@
         "state": "complete_pass",
         "evaluatorCommitSha": "b456f53f7"
       },
-      "finalEvidenceHeadSha": "e764be1620076bc19af09c07768e3c3306048a42",
-      "finalSupervisorCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5387685529",
+      "finalEvidenceHeadSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
+      "finalSupervisorCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5451066711",
       "closeoutAudit": {
-        "topicCheckpointSha": "d3ca2128df83e170acaf3a263e661a35471da48d",
-        "commentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5450662110",
-        "state": "pre_rebase_public_record_repaired_slice_and_acceptance_evidence_stable_urls_added_final_boxes_intentionally_held"
+        "preRebaseTopicCheckpointSha": "d3ca2128df83e170acaf3a263e661a35471da48d",
+        "preRebaseCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5450662110",
+        "finalTopicCheckpointSha": "6de5395cf4284e4b33b02df161c56e0b22585b80",
+        "finalReviewCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5451066711",
+        "coordinatorEquivalenceDecisionUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5451094857",
+        "state": "complete_pass_exact_head_public_record_and_acceptance_mirror_reconciled"
       },
+      "exactMainRebase": {
+        "baseSha": "c73d361eea14a7f40702638638e492f2ca961a59",
+        "headSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
+        "rangeDiff": "all_17_original_commits_patch_equivalent",
+        "productIdentity": "12_blobs_byte_identical_deno_json_semantic_union_verified",
+        "evaluatorBinding": "cf31de902_to_cd3ca1bdb_and_cfa055bb8_to_afb43f12f"
+      },
+      "readyCi": {
+        "state": "PASS",
+        "runId": 33161327616,
+        "url": "https://github.com/rickylabs/netscript/actions/runs/33161327616",
+        "headSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
+        "prChecksCurrentFailures": 0,
+        "firstAttemptFinding": "infrastructure-only deno.land HTTP/2 excessive-load refusal while downloading deno_dom; failed-job-only retry passed without a head move"
+      },
+      "mergeCommitSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+      "mergedAt": "2026-08-28T10:08:41.000Z",
+      "mergeCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5451251321",
+      "issueCompletionState": "1604_1618_1622_closed_completed_status_shipped",
       "siblingPackageBlindSpotSweep": {
         "state": "complete_no_additional_blind_spot",
         "finding": "two discoverable sibling configs parse successfully; two custom-named configs are not Deno auto-discovery candidates",
@@ -1051,9 +1082,9 @@
         "url": "https://github.com/rickylabs/netscript/issues/1708",
         "scope": "pre-existing MCP export-map private-type-ref diagnostics kept outside the frozen 0.0.7 leaf"
       },
-      "closeoutState": "draft_clean_mergeable_at_e764be162_rebase_and_exact_head_gates_pending",
-      "nextGate": "delegate history-preserving rebase onto main c73d361eea, then fresh exact-head Tier-A and binding closeout gates before PR readiness",
-      "nextSerialLeaf": "reference-export-drift-gate (#1296)",
+      "closeoutState": "shipped_terminal_worktree_and_topic_branch_removed",
+      "nextGate": "none_leaf_terminal",
+      "nextSerialLeaf": "L-2 mixed lint-batch exclusion scope audit",
       "receiptRefs": []
     },
     {
@@ -3548,11 +3579,11 @@
   "environmentState": {
     "dockerContainers": 0,
     "aspireApplications": 0,
-    "registeredWorktrees": 10,
+    "registeredWorktrees": 9,
     "terminalTypedErrorWorktreesRemoved": true,
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
-    "verifiedAt": "2026-08-28T09:09:22.000Z"
+    "verifiedAt": "2026-08-28T10:10:08.000Z"
   },
-  "updatedAt": "2026-08-28T09:09:22.000Z"
+  "updatedAt": "2026-08-28T10:10:08.000Z"
 }
