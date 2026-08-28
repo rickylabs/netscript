@@ -59,15 +59,24 @@ explicitly directed; it does not leave the superseded envelope as the current pl
 - **Prevention:** Keep gate 15 as written and run future exact dependency probes with lock writes
   disabled or from an isolated scratch context.
 
-## 2026-08-28 — Explicit artifact allowlist overrides harness supervisor bootstrap
+## 2026-08-28 — Artifact allowlist omitted harness supervisor bootstrap, then was amended
 
-- **What:** Harness activation normally requires `supervisor.md`, but the leaf grant allows creation
-  of only `research.md`, `plan.md`, `context-pack.md`, `worklog.md`, and `drift.md` in this run dir.
+- **What:** Harness activation requires `supervisor.md`, but the original leaf grant allowed
+  creation of only `research.md`, `plan.md`, `context-pack.md`, `worklog.md`, and `drift.md` in this
+  run dir.
 - **Source:** user task artifact allowlist versus `.llm/harness/workflow/activation.md` mandatory
   artifact list.
 - **Expected:** Activated run includes `supervisor.md`.
-- **Actual:** Creating it would violate the explicit turn contract.
+- **Actual at discovery:** Creating it would have violated the explicit turn contract, so the file
+  was not created and the omission was recorded here and in `context-pack.md`.
 - **Severity:** significant
-- **Action:** accept
-- **Evidence:** the run directory contains exactly the five authorized harness artifacts. Evaluator
-  routing is stated in plan/worklog instead; this generator does not launch PLAN-EVAL.
+- **Initial action:** Preserve the five-file allowlist and record the activation variance rather
+  than silently exceeding scope or claiming a waiver.
+- **Coordinator ruling:** No waiver. The allowlist was amended by exactly one control-plane path,
+  `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/supervisor.md`. This is not an eighth product
+  path and does not widen the seven-path product envelope.
+- **Resolution:** Resolved by the bounded allowlist amendment. `supervisor.md` now pins topic and
+  leaf ownership, author route, seven-path ceiling, stop line, TLS ruling, seam boundary, both
+  Tier-A passes, and the reverted lock-probe history.
+- **Current evidence:** the run directory contains the six authorized harness artifacts, including
+  the mandatory supervisor identity record. No product path or `deno.lock` was changed.

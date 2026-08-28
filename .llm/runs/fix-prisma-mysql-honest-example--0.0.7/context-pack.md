@@ -103,6 +103,7 @@ change.
 
 Only harness artifacts are amended. Product paths remain untouched:
 
+- `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/supervisor.md`
 - `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/research.md`
 - `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/plan.md`
 - `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/context-pack.md`
@@ -123,8 +124,9 @@ Only harness artifacts are amended. Product paths remain untouched:
 - Significant product finding: advertised TLS identity verification is not implemented at base; this
   leaf owns deprecation/documentation/characterization, while runtime change or removal is deferred
   to a separately scoped breaking change.
-- Process variance: the explicit artifact allowlist omits mandatory `supervisor.md`; recorded in
-  `drift.md` and not overridden.
+- Resolved process variance: the original artifact allowlist omitted mandatory `supervisor.md`. The
+  coordinator ruled no waiver and amended the allowlist by exactly that control-plane path; the
+  seven-path product ceiling is unchanged.
 - No new architecture debt accepted.
 
 ## Commits

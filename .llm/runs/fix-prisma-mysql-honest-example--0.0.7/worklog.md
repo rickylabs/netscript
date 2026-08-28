@@ -102,12 +102,12 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 
 ## Drift
 
-| Drift                                                                      | Severity                      | Logged in drift.md |
-| -------------------------------------------------------------------------- | ----------------------------- | ------------------ |
-| Current TLS `verify_identity` mode overstates its unchanged legacy mapping | significant                   | yes                |
-| Coordinator widened the product envelope 5 → 7 and prescribed the seam     | significant                   | yes                |
-| Exact-pin mysql2 probe transiently added one `deno.lock` resolution        | transient process side effect | yes                |
-| User's five-artifact allowlist excludes harness-mandatory `supervisor.md`  | significant process variance  | yes                |
+| Drift                                                                                   | Severity                      | Logged in drift.md |
+| --------------------------------------------------------------------------------------- | ----------------------------- | ------------------ |
+| Current TLS `verify_identity` mode overstates its unchanged legacy mapping              | significant                   | yes                |
+| Coordinator widened the product envelope 5 → 7 and prescribed the seam                  | significant                   | yes                |
+| Exact-pin mysql2 probe transiently added one `deno.lock` resolution                     | transient process side effect | yes                |
+| Original five-artifact allowlist omitted `supervisor.md`; bounded amendment resolved it | resolved process variance     | yes                |
 
 ## Gate Results — immutable base
 
