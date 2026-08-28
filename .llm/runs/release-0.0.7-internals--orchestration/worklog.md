@@ -1808,3 +1808,65 @@ supervisor Tier-A passed.
 On **PASS** — stop for the coordinator's implementation grant. On **`FAIL_PLAN`** — release the
 evaluator, keep the canonical author `01a047f0-…` available (not frozen, per the recorded owner
 policy), and surface the exact unresolved decision to the coordinator. **No cycle 3 is inferred.**
+
+## 2026-08-28 — #1709 PLAN-EVAL cycle 2: **`FAIL_PLAN`** at `f2b3fc8b3` — ordinary allowance exhausted
+
+| Field              | Value                                                             |
+| ------------------ | ------------------------------------------------------------------- |
+| Verdict            | **`FAIL_PLAN`** — cycle 2 of the ordinary 2, allowance **exhausted** |
+| Evaluated head     | `3e934e2de1ed758f7182ad1eebf027750bcfb976`                        |
+| Verdict commit     | `f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad` — local = remote = PR   |
+| Evaluator          | `14cfb576-de3f-40a5-b23a-d9e8e8d018e4`, bridge `cse_012pKzuP1udDquhyyjdGBeG6`, CLI `2.1.250` |
+| Route / family     | native Anthropic **Fable 5 · medium · RC**, `providerEnv {}` — matched; opposite family; distinct from author, supervisor and cycle-1 evaluator |
+| Evaluator state    | **released** (`stopped`)                                          |
+| Author             | `01a047f0-…` **idle and available — not frozen**                  |
+
+### Bounds — verified
+
+Two files only: the new canonical `plan-eval.md` and `plan-eval-cycle-1.md`. **Cycle 1 preserved
+bit-identical** — sha256 `c59bbe64…f443d` on both the pre-existing `plan-eval.md` at `3e934e2de` and
+the preserved copy at `f2b3fc8b3`. Still plan-only across the whole arc; tree clean.
+
+### What closed and what did not
+
+**F1, F3 and A1–A3 are closed** and need no further author action. **F2 is closed except for one
+extension.** The verdict is a *single, narrow* finding.
+
+### F4 — the fmt **write-mode crash** completion form was never measured
+
+The plan's fmt adapter admits two forms: `Checked N file(s)`, and
+`error: Found M not formatted file(s) in N file(s)` for check-mode findings. Write mode with a
+crashing file emits a **third** form the adapter does not know.
+
+**I verified it independently** on Deno 2.9.5:
+
+| Invocation                        | Output                                        | Exit |
+| --------------------------------- | ----------------------------------------------- | ---- |
+| `deno fmt good.ts bad.ts` (write) | **`error: Failed to format 1 of 2 checked files`** | 1  |
+| `deno fmt good.ts` (write, clean) | `Checked 1 file`                                | 0    |
+| `deno fmt --check good.ts bad.ts` | `Found 1 not formatted file in 2 files`         | 1    |
+
+`1 of 2 checked files` — the **second** integer is the processed count, matching the evaluator's
+proposed `^error: Failed to format (\d+) of (\d+) checked files?$`.
+
+**Why this is genuinely blocking, not cosmetic.** The plan's must-not-regress row asserts "fmt write
+mode retains a verified original `Checked N` count". That is false whenever a write-mode batch
+contains a crash. The adapter would then find *no admissible summary*, and by the plan's own
+fail-closed rules that becomes a **coverage refusal at exit 2** — on what is really an ordinary
+crash that the locked precedence says should exit 1. So the defect both misclassifies and violates
+`refusal ≥ crash ≥ ordinary finding` in the one mode the plan extended coverage into.
+
+### Correction to my own Tier-A
+
+**My Tier-A PASS on this head missed F4.** The evaluator says so plainly and is right: Tier-A is a
+lighter gate and I did not measure Deno's write-mode signals. I verified the *stated* adapter forms
+and the root numbers, but never exercised `deno fmt` in **write** mode against a crashing file — the
+one combination the repair newly brought into scope via D8. That is the lesson: when a repair
+*extends* coverage into a new mode, the new mode's signal must be measured, not inferred from the
+modes already proven.
+
+### Disposition — allowance exhausted, decision returns to the owner
+
+Per the plan gate's two-cycle rule and the standing instruction for this cycle: evaluator
+**released**; canonical author `01a047f0-…` **kept available and not frozen**; **no cycle 3 inferred
+or recommended**; no implementation grant sought. The leaf sits clean and plan-only at `f2b3fc8b3`.
