@@ -283,3 +283,88 @@ including the parts that are unflattering. The recorded omission — which origi
 brief — is closed. No open findings.
 
 **STOPPED before PLAN-EVAL.**
+
+---
+
+# PLAN-EVAL cycle 1 — terminal `FAIL_PLAN`; reconciliation
+
+| Field | Value |
+| --- | --- |
+| Verdict | **CHANGES_REQUESTED / `FAIL_PLAN`**, cycle **1 of 2** |
+| Evaluated leaf head | `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a` — unchanged; the evaluator did not push over the leaf |
+| Evaluator artifact head | `5b58738abfd38e859a331e5f5fa47ce968d7d9ef` (its own detached worktree) |
+| Public comment | `5452181794` — `2026-08-28T11:53:14Z`, 5112 bytes |
+| Evaluator | native Claude Fable 5 · medium, job `29284a3f`, session `29284a3f-3d87-4614-a616-13a7babbbdf0`, bridge `cse_01KHPgQNFFkjAYxeFbkRKfbW`, `bridgeOutboundOnly: false` |
+
+## Transport history — both attempts recorded
+
+**Attempt 1 interrupted, no verdict.** Raw `nohup claude` starts a session but never registers a
+background job, so job id, bridge id, and Remote Control URL cannot exist on that route; the attachment
+gate was unsatisfiable, not merely slow. Verified before stopping: no `plan-eval.md`, clean worktree,
+**zero** PR comments. Stopped exactly PID `247931`, wrapper `247929`, and this topic's stale watcher.
+
+**Attempt 2 attached and produced the verdict** via `claude --bg` (`claude-manager` SKILL:36), with
+`providerEnv: {}`. Attachment claimed only on `bridgeOutboundOnly: false` **plus** non-empty bridge
+**plus** matching cwd — never on the `--remote-control` flag alone, which is what made attempt 1 wrong.
+
+Evaluator lease **released** after the terminal verdict (`claude stop 29284a3f`; `claude agents --json`
+→ 0 remaining `#1711` evaluators), so no lease is held while cycle 2 is ungranted.
+
+## Findings — all four judged well-founded
+
+**F1 BLOCKING** — the example's `PrismaClient` import cannot type-check as planned. Proven, not
+asserted: no generated client exists; `@prisma/client` is in root `deno.json` `"catalog"` only, never
+`"imports"`, and the package `deno.json` has no `imports` — probe returned
+`TS2307 … not a dependency and not in import map`, exit 1. Even if mapped, Prisma 7's ungenerated stub
+types `PrismaClient` as `any`, so a green `deno check` through it would not be the semantic evidence
+gate 1 claims. The plan's open-decision sweep marks this "Resolved: owned"; it is not.
+
+The evaluator ran its probe in a scratch file placed beside the example, deleted it immediately, and
+left the worktree clean — the right way to establish this.
+
+**F2 ADVISORY** — the "exactly eight" census count under-counts its own 49-row table (`README.md:7`,
+site `:100`/`:104` are dispositioned but excluded from the eight). Gate 13's hard-coded count is
+satisfiable while leaving those untouched.
+
+**F3 ADVISORY** — no PR phase-comment trail; `gh pr view 1711 --json comments` returned **0**.
+
+**F4 ADVISORY** — gate 12 names `audit-jsr-package.ts` without its path
+(`.llm/tools/fitness/audit-jsr-package.ts`).
+
+## F3 is partly this topic's own defect, and is partly repaired
+
+The missing trail is not solely the author's: **this topic never required phase comments on #1711 and
+never posted its own Tier-A records.** Backfilled now as comment `5454328918`, covering all three Tier-A
+passes with the first one's finding stated plainly rather than presented as clean. The author is asked
+for the research and plan comments only; the Tier-A comments were supervisor-owned and were mine to
+post.
+
+## Owner policy amendment — recorded
+
+Formal PLAN-EVAL is selected **only for genuinely critical, complex, or decision-heavy topics**.
+Routine or mechanical leaves record **`PLAN-EVAL: N/A` plus Tier-A**.
+
+**#1112 remains selected** for one final cycle: it coordinates published integration docs, an executable
+generated-client import, adapter lifecycle, public option truth, and TLS compatibility. That is a
+decision-heavy surface, not a mechanical one.
+
+## Evaluator-failure policy — recorded for this lane
+
+After **two consecutive IMPL-EVAL failures**: stop and release evaluator leases, and surface the owner
+decision in the primary coordinator task. **No third loop, and no frozen author.** This lane holds one
+PLAN-EVAL failure; the counter is at one.
+
+## Dispatched
+
+Repair delivered to the preserved canonical Codex author `01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8` in
+`/home/codex/repos/netscript-007-leaf-prisma-mysql` — **plan-artifact repair only, no product
+implementation**, and no new author. It is required to run the cheapest exact probes to lock an honest
+import strategy, preferring a real explicit generated-client path or scratch-only generation that
+compile-checks the actual example without committing generated output; ambient declarations,
+`@ts-ignore`, and the ungenerated `any` stub are all forbidden. If the seven paths cannot make it
+executable honestly it must **STOP before rescope** and report the minimum exact additional path with
+proof — never a silent eighth path. F1's six dependent locations must be amended together; F2/F3/F4
+folded in.
+
+**Next gate:** fresh Tier-A on the repaired plan head. **Cycle 2 is prepared but NOT launched** until
+the coordinator grants it.
