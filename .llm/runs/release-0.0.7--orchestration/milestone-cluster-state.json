@@ -68,7 +68,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "plan_repair_active",
+        "state": "plan_eval_cycle_2_fail_owner_decision",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -81,8 +81,8 @@
         "pid": 11026,
         "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
-        "topicHeadSha": "dcf8e2b359e1e022e89e88cbdf887231fe47fbd1",
-        "queueState": "1709_plan_repair_after_cycle_1_fail_plan_on_d437db44d",
+        "topicHeadSha": "81a3f99f883ba252e40e8df67174652835662f6f",
+        "queueState": "1709_cycle_2_fail_plan_f4_owner_decision_pending_evaluator_released_author_available",
         "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
@@ -122,7 +122,27 @@
           "evaluatorCommitSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
           "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5452167852",
           "blockingFindings": "add the missing fmt runner seam; lock refusal/crash/finding precedence and crash-batch coverage at sizes 1/2/200; bind root exit-zero to per-file drop-free evidence",
-          "next": "same canonical author repairs plan artifacts only; fresh Tier-A; cycle 2 remains selected because this fail-closed published-tooling topic is critical/complex"
+          "next": "superseded by same-author repair 3e934e2de and fresh Tier-A PASS at bf3635eb5; critical/complex selection granted final delta-focused cycle 2"
+        },
+        "currentPlanEvaluation": {
+          "state": "complete",
+          "cycle": 2,
+          "sourceHead": "3e934e2de1ed758f7182ad1eebf027750bcfb976",
+          "backgroundAgentId": "14cfb576",
+          "sessionId": "14cfb576-de3f-40a5-b23a-d9e8e8d018e4",
+          "bridgeSessionId": "session_01EBeJtKdeuAZAiWt5PGJvPH",
+          "remoteControlUrl": "https://claude.ai/code/session_01EBeJtKdeuAZAiWt5PGJvPH",
+          "route": "native claude-fable-5 / medium / Remote Control",
+          "topicDispatchCheckpointSha": "fe9e23c03d6274dd1196533c8f175ade0e48d8e6",
+          "grantedAt": "2026-08-28T15:33:00.000Z",
+          "completedAt": "2026-08-28T15:45:00.000Z",
+          "verdict": "FAIL_PLAN",
+          "evaluatorCommitSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
+          "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5454608917",
+          "selectionReason": "critical/complex fail-closed published tooling contract after a substantive cycle-1 specification-gap verdict",
+          "evaluationFocus": "delta-focused closure of cycle-1 F1-F3 and A1-A3 plus a fresh open-decision sweep; cycle 1 preserved bit-identical",
+          "blockingFinding": "F4: lock fmt write-mode crash completion as Failed to format M of N checked files and add write-mode crash-only plus crash-and-drop controls at batch sizes 1/2/200, or explicitly refuse write-mode crashes",
+          "next": "ordinary two-cycle allowance exhausted; evaluator released and canonical author available; owner chooses recommended bounded write-mode parsing amendment or parks the leaf; no cycle 3"
         }
       },
       "issueNumbers": [
@@ -163,8 +183,8 @@
         "pid": 11903,
         "bridgeSessionId": "session_01Y1YKBnzUJVuXB5akcxeRT6",
         "remoteControlUrl": "https://claude.ai/code/session_01Y1YKBnzUJVuXB5akcxeRT6",
-        "topicHeadSha": "ceeb139bc756b2aafb6d6edbf2e8cade67139834",
-        "queueState": "1112_plan_repair_after_cycle_1_fail_plan_on_069fd3e91",
+        "topicHeadSha": "74f21062b86399e81ff01d83f97e65ffff803aee",
+        "queueState": "1112_cycle_1_repair_tier_a_fail_dynamic_import_proof_with_same_author",
         "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle",
@@ -192,6 +212,13 @@
           "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5452181794",
           "blockingFinding": "the plan does not lock a real generated PrismaClient import that the checked-in example can resolve and compile-check inside the declared seven-path envelope",
           "next": "same canonical author proves the minimum honest import/generation strategy and repairs plan artifacts only; any eighth product path returns to coordinator before mutation"
+        },
+        "latestRepairReview": {
+          "state": "FAIL",
+          "sourceHead": "3e0f2223ac7bed9068ecc033c92da7ffbed83711",
+          "topicCheckpointSha": "74f21062b86399e81ff01d83f97e65ffff803aee",
+          "finding": "ordinary root check from a clean exact-head checkout fails TS2307 after scratch cleanup; excluding the example is rejected as a false green",
+          "next": "same author proves dynamic generated-client runtime import plus separate real-client structural/import smoke inside the existing seven paths, then fresh Tier-A"
         }
       },
       "issueNumbers": [
@@ -541,8 +568,8 @@
       "lane": "internals",
       "phase": "planned",
       "baseBranch": "main",
-      "headSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
-      "currentPrHeadSha": "59b79ccd899ab02a2377e48bba2fdf9dbc866200",
+      "headSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
+      "currentPrHeadSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
       "issueNumbers": [1709],
       "implementerAgentId": "01a047f0-f17e-7692-b6f0-83a6d22888c9",
       "branch": "fix/lint-partial-exclusion-fail-closed",
@@ -553,10 +580,10 @@
       "researchRemoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
       "coordinatorDecision": "option_1_fail_closed_six_path_envelope_after_symmetric_fmt_defect_reproduced",
       "implementationState": "not_started",
-      "planHeadSha": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
+      "planHeadSha": "3e934e2de1ed758f7182ad1eebf027750bcfb976",
       "tierAState": "PASS",
-      "tierATopicCheckpointSha": "7f252d44c82b7642957cde2a590e5329b968dd24",
-      "planEvaluationState": "complete_fail_cycle_1_plan_repair_active",
+      "tierATopicCheckpointSha": "bf3635eb5f85a6909495b2870e5766c7657b01fa",
+      "planEvaluationState": "complete_fail_cycle_2_owner_decision_pending",
       "planEvaluator": {
         "state": "complete",
         "cycle": 1,
@@ -572,7 +599,24 @@
         "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5452167852"
       },
       "expensiveGateContract": "scaffold.runtime, Aspire, Docker, browser, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "same-author plan-only repair of cycle-1 F1-F3, then fresh internals Tier-A; critical/complex selection retains one final PLAN-EVAL cycle 2 before implementation",
+      "planEvaluatorCycle2": {
+        "state": "complete",
+        "cycle": 2,
+        "sourceHead": "3e934e2de1ed758f7182ad1eebf027750bcfb976",
+        "backgroundAgentId": "14cfb576",
+        "sessionId": "14cfb576-de3f-40a5-b23a-d9e8e8d018e4",
+        "bridgeSessionId": "session_01EBeJtKdeuAZAiWt5PGJvPH",
+        "remoteControlUrl": "https://claude.ai/code/session_01EBeJtKdeuAZAiWt5PGJvPH",
+        "route": "native claude-fable-5 / medium / Remote Control",
+        "grantedAt": "2026-08-28T15:33:00.000Z",
+        "completedAt": "2026-08-28T15:45:00.000Z",
+        "topicDispatchCheckpointSha": "fe9e23c03d6274dd1196533c8f175ade0e48d8e6",
+        "topicVerdictCheckpointSha": "828f101b6e57f57e76431877fb7213d158be96be",
+        "verdict": "FAIL_PLAN",
+        "evaluatorCommitSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
+        "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5454608917"
+      },
+      "nextGate": "owner decision on recommended bounded F4 write-mode crash amendment; evaluator released, author available, no cycle 3",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1709",
         "https://github.com/rickylabs/netscript/pull/1710"
@@ -583,8 +627,8 @@
       "lane": "fixes",
       "phase": "planned",
       "baseBranch": "main",
-      "headSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
-      "currentPrHeadSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+      "headSha": "3e0f2223ac7bed9068ecc033c92da7ffbed83711",
+      "currentPrHeadSha": "3e0f2223ac7bed9068ecc033c92da7ffbed83711",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -593,10 +637,10 @@
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
       "implementationState": "not_started",
-      "planHeadSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
-      "tierAState": "PASS",
-      "tierATopicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
-      "planEvaluationState": "complete_fail_cycle_1_plan_repair_active",
+      "planHeadSha": "3e0f2223ac7bed9068ecc033c92da7ffbed83711",
+      "tierAState": "FAIL",
+      "tierATopicCheckpointSha": "74f21062b86399e81ff01d83f97e65ffff803aee",
+      "planEvaluationState": "cycle_1_repair_tier_a_fail_dynamic_import_proof_active",
       "planEvaluator": {
         "state": "complete",
         "cycle": 1,
@@ -620,8 +664,15 @@
         "finalControlPlaneCorrection": "mandatory supervisor.md restored as the sole allowlist amendment",
         "finalTierATopicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b"
       },
+      "cycle1RepairTierAFailure": {
+        "sourceHead": "3e0f2223ac7bed9068ecc033c92da7ffbed83711",
+        "topicCheckpointSha": "74f21062b86399e81ff01d83f97e65ffff803aee",
+        "finding": "clean exact-head checkout fails ordinary root check with TS2307 after scratch-generated client cleanup; gate 1 was green only inside the scratch window and the mod.ts-only package gate never selected the example",
+        "rejectedShortcut": "top-level exclusion of examples would pass by dropping the evidence and is not authorized",
+        "activeRepair": "same author must prove a clean-checkout-safe dynamic generated-client runtime import plus separate real generated-client structural and import smoke gates inside the seven paths, or return the measured minimum eighth path"
+      },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "same-author plan-only repair locking an executable generated PrismaClient import and actual-file check; fresh fixes Tier-A, then coordinator risk-selection confirmation before any final PLAN-EVAL",
+      "nextGate": "same-author plan-only dynamic-import proof; fresh fixes Tier-A must prove clean root plus real generated-client structural/import evidence before any final PLAN-EVAL",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -3481,6 +3532,33 @@
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5452167852"
     },
     {
+      "id": "lint-partial-exclusion-fail-closed-plan-eval-cycle-2",
+      "state": "complete",
+      "lane": "internals",
+      "leafId": "lint-partial-exclusion-fail-closed",
+      "phase": "plan-eval",
+      "cycle": 2,
+      "sourceHead": "3e934e2de1ed758f7182ad1eebf027750bcfb976",
+      "evaluatorAgentId": "14cfb576-de3f-40a5-b23a-d9e8e8d018e4",
+      "backgroundAgentId": "14cfb576",
+      "bridgeSessionId": "session_01EBeJtKdeuAZAiWt5PGJvPH",
+      "remoteControlUrl": "https://claude.ai/code/session_01EBeJtKdeuAZAiWt5PGJvPH",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-28T15:33:00.000Z",
+      "completedAt": "2026-08-28T15:45:00.000Z",
+      "evaluationFocus": "delta-focused closure of cycle-1 F1-F3 and A1-A3 plus a fresh open-decision sweep; preserve cycle 1 bit-identical",
+      "selectionReason": "critical/complex fail-closed published tooling contract after a substantive cycle-1 specification-gap verdict",
+      "verdict": "FAIL_PLAN",
+      "evaluatorCommitSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1710#issuecomment-5454608917"
+    },
+    {
       "id": "prisma-mysql-honest-example-plan-eval-cycle-1",
       "state": "complete",
       "lane": "fixes",
@@ -3803,5 +3881,5 @@
     "wslLoadAfterAuthorExit": "3.04 5.00 8.06",
     "verifiedAt": "2026-08-28T11:09:14.000Z"
   },
-  "updatedAt": "2026-08-28T15:17:28.000Z"
+  "updatedAt": "2026-08-28T15:47:26.000Z"
 }

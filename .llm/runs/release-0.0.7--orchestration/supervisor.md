@@ -1123,3 +1123,33 @@ remains at plan head `069fd3e91` and fixes transport checkpoint `ceeb139bc`. The
 author is proving the minimum honest generated-client import/check strategy before plan repair.
 Any required eighth product path returns to the coordinator before mutation. No implementation or
 runtime lease is granted in either lane.
+
+## 2026-08-28 15:35Z — #1709 repaired plan passed Tier-A; final risk-selected PLAN-EVAL active
+
+- Reconciled leaf local, remote, and PR #1710 at immutable plan-only head
+  `3e934e2de1ed758f7182ad1eebf027750bcfb976`; the same canonical Codex author repaired only seven
+  harness artifacts and left the tree clean.
+- Internals Tier-A independently closed cycle-1 F1-F3 and folded A1-A3, reproduced root lint
+  `2037/35/0 -> 2041/36/0`, and measured root fmt `2041/36/0`; PASS checkpoint
+  `bf3635eb5f85a6909495b2870e5766c7657b01fa` is pushed.
+- Coordinator retained PLAN-EVAL because the fail-closed published-tooling contract is genuinely
+  critical/complex after a substantive specification-gap verdict. Final cycle 2 is active in fresh
+  opposite-family Claude Fable 5/medium Remote Control session `14cfb576-...` against only the
+  repaired delta; dispatch checkpoint `fe9e23c03d6274dd1196533c8f175ade0e48d8e6` is pushed.
+- PASS returns for an implementation grant. FAIL_PLAN exhausts the ordinary plan allowance; no
+  cycle 3 is inferred and the canonical author remains available rather than frozen.
+
+## 2026-08-28 15:47Z — #1709 final plan verdict and #1112 clean-checkout boundary
+
+- #1709 cycle 2 returned `FAIL_PLAN` at exact leaf/remote/PR head `f2b3fc8b3`; internals reconciled
+  and pushed verdict checkpoint `828f101b6`, then advanced its topic-only inbound record to
+  `81a3f99f8`. The evaluator is released and the canonical author remains available. The single F4
+  owner decision is whether to accept the recommended fmt write-mode crash completion adapter and
+  1/2/200 controls; no third PLAN-EVAL is inferred.
+- #1112 repaired plan head `3e0f2223a` failed fresh fixes Tier-A at topic checkpoint `74f21062b`:
+  a clean exact-head checkout reports `TS2307` after scratch client cleanup. Excluding the example
+  was rejected as a false green. The same author is proving a dynamic generated-client runtime
+  import plus separate real-client structural/import smoke within the existing seven paths.
+- Formal PLAN-EVAL remains risk-selected only for critical/complex work. Two consecutive terminal
+  IMPL-EVAL failures release that evaluator and return the exact decision to the owner while other
+  lanes continue.

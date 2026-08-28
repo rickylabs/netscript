@@ -1820,3 +1820,27 @@
   loop or freeze the canonical author. Independent lanes continue.
 - Reattached both preserved Claude topic supervisors and delivered plan-only repair briefs to the
   existing Codex author threads. Docker and Aspire remain empty; no expensive-gate lease was taken.
+
+## 2026-08-28 15:35Z — #1709 repair integrated through final PLAN-EVAL dispatch
+
+- Leaf `3e934e2de` verified local == remote == PR #1710, clean, plan-only, seven harness artifacts.
+- Fresh internals Tier-A PASS at topic `bf3635eb5`: F1 missing fmt runner seam corrected as an
+  in-file introduction; F2 locks refusal >= crash >= ordinary finding with exact crash/drop
+  coverage at 1/2/200; F3 binds root exit zero to per-file drop-free evidence; A1-A3 folded.
+- Exact supervisor measurements: lint `2037/35/0 -> 2041/36/0`; fmt `2041/36/0`.
+- Granted one final, delta-focused PLAN-EVAL because this topic meets the narrowed critical/complex
+  threshold. Fresh native Fable 5/medium Remote Control evaluator `14cfb576-...` is active;
+  dispatch/topic checkpoint `fe9e23c03` is pushed. No product or runtime lease exists.
+
+## 2026-08-28 15:47Z — terminal plan evidence reconciled without freezing authors
+
+- Verified #1709 cycle-2 evaluator artifact `f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad`
+  equals local, remote, and PR #1710 head. Verdict `FAIL_PLAN`; public comment `5454608917`;
+  internals verdict checkpoint `828f101b6e57f57e76431877fb7213d158be96be`. F4 is limited to
+  fmt write-mode crash completion and its 1/2/200 controls. Evaluator released; author available.
+- Verified #1112 repair head `3e0f2223ac7bed9068ecc033c92da7ffbed83711` equals local, remote,
+  and PR #1711 head. Fresh Tier-A checkpoint `74f21062b86399e81ff01d83f97e65ffff803aee`
+  correctly reproduced clean-checkout `TS2307`; no product path or generated output survived.
+- Rejected a top-level example exclusion because it would remove the evidence. Sent the existing
+  author a plan-only proof obligation for a dynamic runtime import plus separate real generated
+  client structural/import smoke; cycle 2 remains withheld.

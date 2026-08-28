@@ -946,3 +946,29 @@ implementation thread.
   committed/public `FAIL_PLAN`, and #1112's daemon reported "awaiting generator revision" only
   after it had committed and posted `FAIL_PLAN`. The immutable artifacts and public comments are
   authoritative; the central `active`/`ready` fields were reconciliation lag, not live gates.
+
+## 2026-08-28 15:35Z — repaired lint plan and Prisma clean-checkout boundary
+
+- **Observed:** #1709 same-author repair `3e934e2de` closed every cycle-1 finding and passed fresh
+  Tier-A at `bf3635eb5`; the central ledger still described repair as pending.
+- **Action:** reconciled the immutable head and granted only the justified delta-focused final
+  PLAN-EVAL cycle 2, active through fresh Fable 5/medium Remote Control session `14cfb576-...` and
+  pushed topic checkpoint `fe9e23c03`.
+- **Observed:** #1112 scratch generation can resolve `./.generated/client.ts` and exposes a real
+  adapter type mismatch, but this alone does not prove an ordinary clean-checkout root check after
+  generated output is removed.
+- **Action:** bound fixes Tier-A to reproduce the post-cleanup clean-checkout gate; no silent eighth
+  path and no downgrade of the executable example claim.
+## 2026-08-28 — final plan-evaluation allowance and clean-checkout correction
+
+- **#1709:** Cycle 2 found a real fmt write-mode signal omitted by both the repaired plan and Tier-A.
+  The ordinary allowance is exhausted, so no cycle 3 is inferred. The owner is asked only whether
+  to accept the evaluator's bounded recommended F4 form; evaluator release and author availability
+  prevent a frozen lane.
+- **#1112:** A scratch-only generated client made a gate locally green but left a permanent
+  clean-checkout `TS2307`. The supervisor's exact archive proof corrected that false positive.
+  Excluding the example is disallowed; the same author is testing a dynamic prerequisite import
+  with separate real-client semantic evidence before any rescope.
+- **Policy:** Formal PLAN-EVAL is not a routine ceremony. It stays limited to critical/complex
+  topics, while Tier-A and mandatory IMPL-EVAL remain. A leaf returns to the owner after two
+  consecutive terminal IMPL-EVAL failures rather than consuming a third loop.

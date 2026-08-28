@@ -1049,3 +1049,27 @@ failures stop/release the evaluator and create an owner-facing decision in the p
 task; no third loop or frozen canonical author. The preserved authors `01a047f0-...` (#1709) and
 `01a047f1-...` (#1112) have been resumed for plan-only repair through their existing topic
 supervisors. No implementation or runtime lease is active.
+
+## 2026-08-28 15:35Z delta
+
+- #1709 repaired plan head is `3e934e2de` (local = remote = PR #1710, clean, plan-only).
+- Fresh Tier-A is PASS at internals topic `bf3635eb5`, with exact lint/fmt counts independently
+  reproduced and all cycle-1 findings closed.
+- Narrowed policy still selects one final plan evaluation here because fail-closed published
+  tooling and structured error semantics are critical/complex. Cycle 2 is active in fresh native
+  Fable 5/medium Remote Control session `14cfb576-...`; dispatch checkpoint `fe9e23c03`.
+- #1112 remains same-author plan repair. Its Tier-A must prove the checked-in example remains
+  resolvable under the ordinary clean-checkout root gate after scratch-generated output is removed;
+  a temporary green bought by untracked generated files is not acceptable.
+## Recovery checkpoint — 2026-08-28T15:47:26Z
+
+- Main remains `cf648f1ff973d74c213bb125a6f5f5b9328e693b`.
+- #1709 / PR #1710 is plan-only at evaluator artifact `f2b3fc8b3`; cycle 2 is terminal
+  `FAIL_PLAN`, the evaluator is released, and the same author is available pending the owner-only
+  F4 choice. Recommended choice: admit Deno's fmt write crash form and pin crash-only plus
+  crash-and-drop behavior at batch sizes 1/2/200; no third evaluator cycle.
+- #1112 / PR #1711 is plan-only at `3e0f2223a`; fresh Tier-A is red because the real generated
+  import disappears after scratch cleanup. Same-author dynamic-import proof is active inside the
+  seven-path ceiling; exclusion and untyped stubs are forbidden.
+- Current supervisor topic heads: internals `81a3f99f8`, fixes `74f21062b`. Remote Control topic
+  ownership remains unchanged. Docker/Aspire/runtime leases remain absent.
