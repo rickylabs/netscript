@@ -424,3 +424,54 @@ Contracts/SDK doc-lint plus the four `NOT_RUN` gates (`contracts-jsr-audit`, `sd
 
 **Coordinator decision:** purchase credits, wait for the 2026-08-20 05:31 reset, or authorize an
 alternative implementation lane — the last is a lane-policy escalation, not a supervisor call.
+
+## 2026-08-23 — reconciliation at topic head `f9886386280ac8090e3cc4b73e70f0a61527a45b`
+
+Reconciled against live `main c73d361eea14a7f40702638638e492f2ca961a59` and central checkpoint
+`148d3002618404fefd8f5e6059228129eba0fc7b`. **One real drift found**, recorded for the coordinator.
+
+### DRIFT — follow-up issue #1690 is absent from the central 0.0.7 record
+
+This lane filed **two** follow-ups; the central checkpoint records **one**.
+
+- `#1693` appears in three central files (`context-pack.md`, `milestone-cluster-state.json`,
+  `worklog.md`) at `148d30026`.
+- `#1690` appears **zero** times anywhere under `.llm/runs/release-0.0.7--orchestration/` at that
+  commit. `milestone-cluster-state.json` reads `"follow-up issue 1693 filed"` — singular.
+
+`#1690` (`docs(reference/sdk): align error-handling emphasis between the reference page and package
+JSDoc`) is live and `OPEN`, milestone `Backlog / Triage`, labels `type:docs` `area:sdk` `priority:p3`
+`status:triage`. It was filed under the coordinator's own ruling on the #1671 docs-lane finding
+("include that same narrow follow-up or a separate exact follow-up, not a scope expansion"), and it
+carries the deliberate "these rows are not wrong" framing so it cannot later be misread as a #1350
+acceptance failure.
+
+**Classification: record gap, not a work gap.** The issue exists, is correctly labelled and milestoned,
+and nothing depends on it for 0.0.7. The central cluster state simply does not carry it, so a later
+reader of the central record alone would believe the fixes lane left one follow-up rather than two.
+
+**Not repaired by this lane.** `.llm/runs/release-0.0.7--orchestration/` is the coordinator's artifact;
+editing it from here would be modifying another lane. Reported for the coordinator to fold in.
+
+### Everything else reconciles exactly — no drift
+
+| Claim | Verified |
+| --- | --- |
+| Topic head clean, local == remote | `f9886386280ac8090e3cc4b73e70f0a61527a45b` both sides, `git status` empty |
+| `main` | `c73d361eea14a7f40702638638e492f2ca961a59`; merge commit confirmed an ancestor of `origin/main` |
+| Central checkpoint | `148d30026` reachable; its fixes entries match this lane field-for-field — `queueState: parked_after_1692_shipped_and_1350_closed_completed`, `prNumber 1692`, `supersededPrNumber 1671`, IMPL-EVAL comment `5385128267`, the closing-token replacement reason, and `issueCompletionState` |
+| `#1692` | `MERGED` `2026-08-23T09:58:53Z`, merge `c73d361ee`, sole `status:shipped` |
+| `#1350` | `CLOSED` / `COMPLETED`, **7/7** boxes, sole `status:shipped` |
+| Docker | **0** containers (`docker ps -aq`) |
+| Aspire runtime | **empty** — no apphost, no `dotnet run`, no `dotnet`/`deno`/`aspire` listening ports |
+
+**Recorded precisely rather than as a bare "Aspire empty":** four `aspire mcp start` processes are
+running (PIDs `11140`, `12214`, `12259`, `12316`). These are the Aspire **MCP tool servers** attached to
+the four topic supervisor Claude sessions — not app hosts, not distributed-application runtimes. They
+hold no containers and no ports. An initial `pgrep -af aspire` returned 12 matches, but eight were other
+sessions' Claude command lines containing the word "Aspire" in their briefs; the count was noise, and
+the genuine set is those four MCP servers.
+
+No runtime lease held by this lane. No leaf worktree or branch remains — the squash merge deleted
+`fix/sdk-typed-error-channel` and the coordinator's cleanup pruned both leaf worktrees; this lane
+removed neither.
