@@ -5352,3 +5352,45 @@ attributability rather than a fix. The operative consequence: **attempt 7 is evi
 No runtime retry, no `fresh-browser`, no evaluator or IMPL-EVAL launch, no rebase, no other lane
 touched, no merge, publish, readiness, label, metadata, or issue mutation, no lease, and no new scope
 admitted. The lane remains parked at `a257807d8` awaiting explicit coordinator instruction.
+
+## 2026-08-28 — Read-only research: #1293 rows 1 and 4 vs live main; #1664 untouched
+
+Coordinator released one independent read-only research item. #1664 remains terminal-parked and
+quiescent — not recreated, rebased, retried, evaluated, or mutated. Full findings:
+`research-1293-1112.md`. Verdict: **NEEDS_COORDINATOR_DECISION**.
+
+**Row 1 is un-checkable as worded, by design.** `PrismaMySqlAdapter` exists at
+`src/adapter.ts:351` but the public barrel does not re-export it, and `tests/surface_test.ts:17`
+(`assertFalse('PrismaMySqlAdapter' in publicApi)`) actively enforces the exclusion. PLAN-EVAL R2.1
+ruled the narrowing (`plan-eval.md:176-183`) because exporting the class would leak `MysqlPoolClient`
+/`MySqlQueryable` into the surface; R2.2 states plainly that box 1 is not satisfied by that choice.
+#1662's own acceptance evidence says the same and flags "Issue wording remains an owner action".
+The stated *need* is met: `examples/basic-usage.ts:21,37,48` constructs public `PrismaMySql` and
+receives the publicly exported `PrismaMySqlConnectedAdapter`. **Resolution is an owner acceptance
+rewrite, not an implementation leaf** — and not mine to make.
+
+**Row 4 is correctly blocked on #1112** (`OPEN`, `type:docs`, `status:triage`). The docs site page is
+already largely correct (`index.md:8,14,16,17` name `mysql2/promise`, pooling ownership, `dispose()`,
+timeout mapping). Two items remain: `index.md:23` is now **actively false** — it claims
+`onConnectionError` is unsupported and blocked on #1293, but the option is published at
+`src/types.ts:44` and was wired by #1662 — and the executable example still needs writing/verifying.
+
+**One unowned gap found.** The package's own published module docs still carry the false Deno-native
+claim that #1112 exists to correct: `src/mod.ts:4-5` and `src/adapter.ts:4-7`, against ground truth
+`src/adapter.ts:24` importing from `mysql2/promise`. `deno.json` publishes `mod.ts` and `src/**/*.ts`,
+so it ships to JSR and renders in `deno doc`. These are `packages/**` files, and CLAUDE.md's
+doc-authoring exception forbids the docs lane from touching package source — **so this needs a
+product lane, and no issue currently owns it.**
+
+**Dependency order:** (1) coordinator rewords #1293 row 1; (2) fixes lane takes one tiny comment-only
+leaf correcting the two module-doc blocks; (3) docs lane takes #1112 (`index.md:23` + executable
+example); (4) then row 4 checks and both issues close. (2) and (3) are parallel; (1) blocks only
+closure.
+
+**Features takes nothing from this** — the product work shipped in #1662; what remains is owner
+wording plus docs, and the single code item is a prose-accuracy defect belonging to **fixes**. The
+features lane has no next leaf and stays parked.
+
+Read-only throughout: no issue, PR, box, label, milestone, or product file mutated; no author or
+evaluator launched; no lease consumed; no other topic touched. The shared `netscript-main` worktree
+was detached to `cf648f1ff` for inspection and restored to `main`, clean.
