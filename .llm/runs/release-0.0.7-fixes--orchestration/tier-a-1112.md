@@ -127,3 +127,84 @@ ruling: the `verify_identity` remedy in D12 is a breaking runtime change carryin
 "coordinator-authorized" label in `research.md:130`.
 
 **STOPPED before PLAN-EVAL**, per instruction. No PLAN-EVAL dispatched, no implementation authorized.
+
+---
+
+# Tier-A — #1112 TLS repair at `34a6e3d9897dd7d9880686c3c2734b24a5591af6`. **PASS**
+
+| Field | Value |
+| --- | --- |
+| Plan head | `34a6e3d9897dd7d9880686c3c2734b24a5591af6` — local == remote == PR `headRefOid`, clean, **draft** |
+| Base | `main@cf648f1ff973d74c213bb125a6f5f5b9328e693b` |
+| Commit | `34a6e3d98 docs(prisma-mysql): plan legacy TLS deprecation` |
+| Verdict | **PASS** |
+
+## Scope and lockfile
+
+Four commits, `git diff --name-only cf648f1ff HEAD` = **five paths, all under the run dir**. Zero
+`packages/`, zero `docs/`, zero `deno.lock`. `git log --all -- deno.lock` on this branch returns only
+pre-existing `main` release cuts — the lockfile never entered this branch's history at any point.
+Seven-path envelope intact; `plan.md:26` and `:77` declare an eighth path a rescope.
+
+## The 13-location sweep — verified by reading, not counting
+
+| Check | Result |
+| --- | --- |
+| `coordinator-authorized` claim | **0 occurrences** — deleted, not softened, and not replaced with another authorization assertion |
+| Runtime-change intent (`set/forward verifyIdentity`, `always set`, `implement identity verification`) | **0 occurrences** |
+| Surviving `verifyIdentity` / `verify_identity` / `identity verification` mentions | **20**, every one read individually |
+
+All 20 describe deprecation, legacy behaviour, or characterization. Nothing implements. The count alone
+would not have established this — two greps in this milestone returned false results — so each hit was
+read in context.
+
+**`D12` as repaired** (`plan.md:109`): add a JSDoc `@deprecated` tag to the **existing**
+`verify_identity` member in `src/types.ts`, mark it deprecated everywhere it is documented, state the
+exact legacy behaviour for both branches, **"Do not change the translator"**, and pin both branches with
+characterization tests. Its stated rationale is the correct one: *"Tightening either branch would break
+connections that currently succeed."*
+
+**Exact legacy behaviour, stated consistently** across `plan.md:66,:69`, `context-pack.md:61,:64`,
+`drift.md:27,:35`, `research.md:132,:136`, `worklog.md:36-38`:
+
+- no non-empty `caCerts` → `ssl` left unset → **plaintext, no TLS requested**
+- non-empty `caCerts` → forwards **only** joined `ssl.ca`; mysql2 hostname **identity verification is
+  not enabled**
+
+**Deferral present** — `plan.md:216` item 7 and `worklog.md:69`: any TLS behaviour change, replacement
+mode, or removal requires a separately scoped breaking change. **No new mode introduced.**
+
+## PR #1711 — rewritten in place
+
+Body reflects the deprecation (5 mentions), carries **no** implementation or `verifyIdentity` intent,
+**no** closing keyword, and the seven-path envelope. Still draft, single PR — no second PR opened.
+
+## FINDING — a defect in this topic's own brief, caught by the author
+
+`supervisor.md` is **absent** from the leaf run dir. The harness requires it ("every run dir carries
+`supervisor.md`"), and **this topic's brief omitted it** from the artifact allowlist, listing only
+`research`/`plan`/`context-pack`/`worklog`/`drift`.
+
+The author handled this exactly right: it did **not** silently create the file outside its allowlist,
+and did **not** ignore the requirement. It recorded the variance in `drift.md:64-68` and surfaced it in
+`context-pack.md:126-127` as "the explicit artifact allowlist omits mandatory `supervisor.md`; recorded
+in `drift.md` and not overridden."
+
+**Not repaired here.** The coordinator specified Tier-A on an **immutable** repaired plan head and a stop;
+adding an artifact would move that head after the verdict. Returned as a one-artifact gap to close on
+instruction — either the author adds it under an amended allowlist, or it is explicitly waived. The
+defect is this topic's, not the author's.
+
+## Prohibitions — held
+
+No product mutation, no implementation, no runtime/Aspire/Docker/browser/`e2e:cli`, no PLAN-EVAL
+dispatched, no extra path, `#1664` and `#1293` untouched, no other lane's artifacts modified.
+
+## Outcome
+
+**Tier-A PASS at `34a6e3d98`.** The TLS ruling is fully absorbed across all five artifacts and the PR
+body; the false authorization claim is gone; the deprecation carries the exact legacy behaviour for both
+branches with characterization rather than correction. One open item: the `supervisor.md` allowlist gap,
+which is this topic's error.
+
+**STOPPED before PLAN-EVAL.**
