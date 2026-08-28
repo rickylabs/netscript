@@ -2059,3 +2059,58 @@ Formal separate-session **IMPL-EVAL** on the author's exact pushed head — requ
 this is a critical fail-closed tooling contract, not a mechanical leaf. Owner policy applies: after
 **two consecutive terminal IMPL-EVAL failures**, release the evaluator immediately, keep the author
 available, and surface the exact decision to the coordinator — no cycle 3, no frozen author.
+
+## 2026-08-29 — #1709 implementation delivered; IMPL-EVAL cycle 1 launched
+
+### Author delivery — S1→S4 complete
+
+| Slice | Commit | Non-harness paths |
+| --- | --- | --- |
+| S1 | `fe4e4eec617a1b083f3633e026fe88f6b6be960a` | `deno.json` |
+| S2 | `78d9d008ededac20dd5da73f189fa5c7f69807c3` | `run-deno-lint.ts`, `run-deno-lint_test.ts` |
+| S3 | `20898a07477ae2dd8519b1750fab1eba99807211` | `run-deno-fmt.ts`, `run-deno-fmt_test.ts` |
+| S4 | `14c4d7349b856b5dd07ed55ba0156504fb8fdef5` | `agent-tools.generated.ts` |
+| Evidence | `5c4eaf0a38a505ac0d9cad2419230ba986c6bd2d` | harness only |
+
+Strict S1→S4 ordering was honored, one commit per slice.
+
+### Supervisor bounds check at the final head (executed, not accepted)
+
+- Head equality: local == remote == PR #1710 `headRefOid` == `5c4eaf0a38a505ac0d9cad2419230ba986c6bd2d`; tree clean.
+- `cf648f1ff…5c4eaf0a3` = **exactly the six authorized product paths plus nine leaf artifacts**. No seventh source, generated, config, or workflow path.
+- **No lock, cache, or workflow churn.**
+- Both evaluator artifacts (`plan-eval.md`, `plan-eval-cycle-1.md`) unchanged since `fc00aed0f`.
+- **`plan.md` was not edited during implementation** — the contract was not moved to fit the code. This is the check that makes the other receipts meaningful.
+- Per-push scope checks caught no envelope breach at any of the five pushes.
+- Spot check on S3 after ambiguous author reasoning ("commenting out S3 code"): no `deno-lint-ignore`, `@ts-ignore`, skipped or ignored tests in any of the four wrapper/test files; `--max-allow 7` retained in both `quality:scan` tasks. The phrasing referred to posting a PR comment. The F4 third form is implemented as anchored `^error: Failed to format (\d+) of (\d+) checked files?$` taking the **second** integer, with ANSI/CRLF/singular-plural fixtures and an explicit assertion rejecting the form under `check` mode — the write-only scoping guard.
+- Author flipped `status:plan` → `status:impl-eval`; PR still OPEN/draft, milestone `0.0.7`. No merge, readiness flip, issue closure, lease, or publish.
+
+Author-claimed gate numbers are recorded but **not adopted** — they are the evaluator's to reproduce.
+
+### IMPL-EVAL cycle 1 launched
+
+Mandatory here per lane policy and the coordinator's instruction: a critical fail-closed tooling
+contract, not a mechanical leaf.
+
+| Field | Value |
+| --- | --- |
+| Session | `4336958e-2b02-4896-a6f6-936e30fa262a` |
+| Bridge | `cse_01XZn956TmyWBwiTy3nWMZEk` |
+| Route | `--model claude-fable-5 --effort medium --permission-mode bypassPermissions --remote-control`, `providerEnv: {}` (native) |
+| cwd | `/home/codex/repos/netscript-007-eval-1709-impl` @ `5c4eaf0a3` |
+| Brief | 6,207 chars in the first user record, exact head present |
+| CLI | 2.1.251 |
+
+Route verified from `~/.claude/jobs/4336958e/state.json`, not argv. Generator/evaluator separation
+holds: author Codex `gpt-5.6-sol`/high vs evaluator native Claude Fable 5/medium.
+
+**Mislaunch caught and corrected before any work.** The first attempt (`75886b34`) inherited
+`cwd = /home/codex/repos/netscript-007-internals` — the topic worktree — because `--add-dir` grants
+directory access but does **not** set cwd. An evaluator there would have run its gates against the
+topic branch, which does not contain the implementation at all, and could have mutated supervisor
+state. Stopped at `state: stopped` before it acted; the topic worktree was untouched at `837ad9ca3`
+(sole untracked file was this supervisor's own brief). Relaunched from inside the evaluator
+worktree. Lesson for this lane: **`--add-dir` is not a cwd; launch from within the target worktree.**
+
+Owner policy armed: two consecutive terminal IMPL-EVAL failures release the evaluator, keep the
+author available, and surface the exact decision to the coordinator — no cycle 3, no frozen author.
