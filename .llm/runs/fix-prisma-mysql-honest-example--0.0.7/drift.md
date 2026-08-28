@@ -80,3 +80,35 @@ explicitly directed; it does not leave the superseded envelope as the current pl
   Tier-A passes, and the reverted lock-probe history.
 - **Current evidence:** the run directory contains the six authorized harness artifacts, including
   the mandatory supervisor identity record. No product path or `deno.lock` was changed.
+
+## 2026-08-28 — PLAN-EVAL cycle 1 rejected the unresolved generated-client import
+
+- **What:** PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`. D3
+  named a “real generated client” but neither fixed the package example's import specifier nor
+  proved that the actual file could resolve it without an eighth committed path.
+- **Source:** fresh opposite-family evaluator comment on draft PR #1711, F1; evaluator also returned
+  F2 (hard-coded driver-claim count), F3 (missing research/plan PR comments), and F4 (incomplete JSR
+  audit path).
+- **Severity:** blocking plan defect for F1; advisory record/gate defects for F2-F4.
+- **Probe:** In a detached scratch worktree at the evaluated head, the prospective actual example
+  imported exactly `./.generated/client.ts`. An uncommitted `.llm/tmp` schema generated a real
+  Prisma 7.8.0 Deno client into that location, and the structured actual-file checker was used as
+  the verdict source. No ambient declaration, `// @ts-ignore`, or ungenerated `@prisma/client` `any`
+  stub was used.
+- **Finding inside F1:** The real client rejected `PrismaMySqlAdapterFactory` because
+  `PrismaMySqlResultSet.columnTypes` was declared as `number[]`, wider than Prisma's
+  `SqlResultSet.columnTypes`. The implementation already maps to Prisma column types.
+- **Resolution design:** Keep exact `./.generated/client.ts`; generate it only as uncommitted gate
+  output from `.llm/tmp`; narrow the declaration in approved `src/adapter.ts` to
+  `SqlResultSet['columnTypes']`. The same structured check then exited 0 with one selected file and
+  zero diagnostics. No runtime behavior changes.
+- **Scope result:** The seven approved paths are sufficient. No schema, generated client, import
+  map, config, or other eighth product path is added. The detached scratch worktree and generated
+  output were removed, and the leaf worktree/lock remained clean.
+- **Other repairs:** Census acceptance now applies every `Correct`/`Delete` table row and permits
+  only the legacy debug namespace to remain; the JSR gate names
+  `.llm/tools/fitness/audit-jsr-package.ts`; research and plan PR comments are required on the
+  repaired head.
+- **Stop line:** Cycle 2 has not been launched. Formal PLAN-EVAL remains selected for #1112 under
+  the critical/complex/decision-heavy policy, pending a separate coordinator grant; no product
+  implementation is authorized.

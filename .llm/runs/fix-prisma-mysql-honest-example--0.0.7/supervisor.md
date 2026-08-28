@@ -58,7 +58,8 @@ control-plane artifact, not an eighth product path.
 
 - Phase: **RESEARCH + PLAN only**.
 - No product mutation has occurred or is authorized.
-- Stop line: **before PLAN-EVAL**. No implementation may begin from this run state.
+- Stop line: **after PLAN-EVAL cycle-1 repair and before any cycle 2 dispatch**. Cycle 2 requires a
+  separate coordinator grant; no implementation may begin from this run state.
 - No runtime, Aspire, Docker, browser, `e2e:cli`, or expensive-gate lease is authorized.
 
 ## TLS ruling
@@ -91,7 +92,20 @@ contract in another test file.
 | `34a6e3d9897dd7d9880686c3c2734b24a5591af6` | Tier-A **PASS** on the repaired plan: the false authorization claim was removed and all 13 flagged locations were amended to deprecation and characterization.                                                                          |
 
 The first pass was not clean. Its finding and the repaired second pass are both part of the durable
-record. These Tier-A reviews do not move the leaf past its stop line before formal PLAN-EVAL.
+record. These Tier-A reviews did not replace formal PLAN-EVAL.
+
+## Formal PLAN-EVAL history
+
+| Head                                       | Verdict                                                                                                                                                                                                                                                    |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a` | Cycle 1 **CHANGES_REQUESTED / `FAIL_PLAN`**. Blocking F1 proved the generated-client import was unresolved and exposed a real `number[]` versus Prisma `ColumnType[]` adapter mismatch; advisories required census-gate, PR-comment, and JSR-path repairs. |
+
+Owner policy selects formal PLAN-EVAL only for genuinely critical, complex, or decision-heavy
+topics; routine/mechanical leaves record `PLAN-EVAL: N/A` plus Tier-A. #1112 remains selected for
+one final cycle because it coordinates published integration docs, an executable real
+generated-client import, adapter lifecycle and type compatibility, public option truth, and TLS
+compatibility. The generator has repaired cycle 1 but must not launch cycle 2 without the
+coordinator's grant.
 
 ## Lock hygiene history
 
