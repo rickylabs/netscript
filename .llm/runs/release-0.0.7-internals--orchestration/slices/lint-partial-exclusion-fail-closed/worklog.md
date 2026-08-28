@@ -8,7 +8,7 @@
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
-| Authorization  | Cycle-1 `FAIL_PLAN` repair artifacts only; cycle 2 not granted                     |
+| Authorization  | Owner-accepted F4 plan-artifact amendment only; no third PLAN-EVAL                 |
 
 ## Design
 
@@ -56,8 +56,12 @@ coordinator-approved six-path rescope and before PLAN-EVAL.
 
 - Existing `NO_TARGET_FILES_MESSAGE` remains the dropped/all-excluded marker.
 - Lint processed summary: anchored `^Checked (\d+) files?$`.
-- Fmt processed summaries: the same clean/write form plus anchored
-  `^error: Found (\d+) not formatted files? in (\d+) files?$`, using final `N`.
+- Fmt processed summaries: clean check/successful write use the lint `Checked`
+  form; check findings/crashes use anchored
+  `^error: Found (\d+) not formatted files? in (\d+) files?$`; write crashes
+  use anchored
+  `^error: Failed to format (\d+) of (\d+) checked files?$`. Both error forms
+  use the second integer as processed count; the third form is write-only.
 - Shared causes: `empty-selection`, `all-excluded`, `partial-exclusion`,
   `processed-count-unavailable`, `processed-count-inconsistent`.
 - Locked precedence: coverage refusal ≥ crash ≥ ordinary finding. Exit 2 wins
@@ -82,7 +86,7 @@ coordinator-approved six-path rescope and before PLAN-EVAL.
 | -- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | S1 | Restore four healthy doctor files before either guard and prove every corrected root-lint path is processed.                                | default `2037/35/0 → 2041/36/0`; per-file `2041/2041/0`, exit 0; broken absent            | `deno.json`                                                       |
 | S2 | Establish lint coverage on clean/finding/crash batches with refusal ≥ crash ≥ finding, exact crash+drop JSON, CRLF, and `--input` omission. | focused lint test/check; mixed and crash 1/2/200; per-file root lint                      | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` |
-| S3 | Introduce fmt's injectable runner seam and apply the same coverage/crash contract, including non-mutating write probes.                     | seam-based malformed/inconsistent units; mixed and crash 1/2/200; CRLF; per-file root fmt | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   |
+| S3 | Introduce fmt's injectable runner seam and apply the same coverage/crash contract, including the third write-crash completion form and non-mutating write probes. | seam-based malformed/inconsistent units; all three forms; check/write crash-only and crash+drop 1/2/200; CRLF/ANSI; per-file root fmt | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   |
 | S4 | Canonically regenerate and prove only the lint-driven consumer text/hash delta.                                                             | generator twice, name-only delta, `check:assets-barrel`, CLI dry run/audit                | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         |
 
 Every later implementation commit must update this worklog/context pack, but
@@ -99,7 +103,8 @@ those harness updates do not widen the exact six-path implementation surface.
 
 A contributor starts with the common `coverage` wire contract in `plan.md`, then
 edits the relevant wrapper's batch runner and focused test. Lint parses terminal
-`Checked N`; fmt additionally parses terminal `Found M … in N`. Mismatch probes
+`Checked N`; fmt also parses check-mode `Found M … in N` and write-crash
+`Failed to format M of N checked`, always using final `N`. Mismatch probes
 classify paths through the existing process seam, while the original batch alone
 supplies diagnostics. Only lint changes trigger canonical asset generation.
 
@@ -116,6 +121,9 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | 2026-08-28           | plan      | amended design         | One coverage contract, separate ordered lint/fmt adapters, symmetrical JSON causes, four slices, lint-only publish effect, and unchanged gates locked.        |
 | 2026-08-28           | plan-eval | cycle 1                | `FAIL_PLAN` at evaluator commit `59b79ccd8`: specification gaps F1-F3; architecture, signals, envelope, publish bound, and no-seventh-path finding confirmed. |
 | 2026-08-28           | plan      | repair                 | Corrected fmt seam premise; locked crash coverage/precedence and exact 1/2/200 JSON; strengthened root drop-free gates; folded A1-A3. Cycle 2 not launched.   |
+| 2026-08-28           | plan-eval | cycle 2                | `FAIL_PLAN` at evaluator commit `f2b3fc8b3`: F1, F3, and A1-A3 closed; F2 closed except for single F4 write-mode completion extension. Ordinary allowance exhausted. |
+| 2026-08-28           | research  | F4 signal measurement  | Independently measured Deno 2.9.5 write crashes outside the checkout: `1 of 1 checked file`, `1 of 2 checked files`, and `2 of 3 checked files`, ANSI-prefixed, exit 1. |
+| 2026-08-28           | plan      | owner F4 amendment      | Admitted the write-only third form, extended exact crash controls to fmt write mode at 1/2/200, preserved precedence/F1-F3/A1-A3/six paths; no third PLAN-EVAL. |
 
 ## Decisions
 
@@ -131,7 +139,8 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | Fold A1: omit lint `--input` coverage                      | Saved logs have no selected identity set                       | cycle-1 advisory A1                          |
 | Fold A2: fmt write probes use `--check`                    | Same classification with no second mutation                    | cycle-1 advisory A2                          |
 | Fold A3: pin CRLF summaries                                | Cheap Windows-runner parser insurance                          | cycle-1 advisory A3                          |
-| PLAN-EVAL cycle 2 not granted or launched                  | Coordinator must reconcile immutable repair head               | repair brief / harness gate                  |
+| F4 third fmt write completion form                         | Write crashes state processed `N` in a distinct terminal form   | Deno 2.9.5 measurement / cycle-2 F4          |
+| No third PLAN-EVAL                                         | Owner accepted bounded F4 fix after ordinary allowance exhausted | owner amendment brief / harness gate         |
 
 ## Drift
 
@@ -140,6 +149,7 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | Mandatory audit proved the fmt analogue outside the original four-path envelope.                         | significant           | yes                |
 | Coordinator accepted the evidence-triggered six-path rescope; fmt is now first-class in-scope plan work. | significant / granted | yes                |
 | Cycle-1 `FAIL_PLAN` found three specification gaps without rejecting the design or widening scope.       | material / repair     | yes                |
+| Cycle-2 `FAIL_PLAN` left only F4; owner accepted its bounded in-envelope fix and no third cycle exists.   | material / accepted amendment | yes          |
 
 ## Gate results (planning phase only)
 
@@ -150,12 +160,12 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | Root doctor coverage                  | direct wrapper commands                                                 | PASS baseline proof         | `2037/35/0 → 2041/36/0`, both exit 0                                        |
 | Mixed fmt                             | disposable excluded+clean selection, default vs batch size 1            | RED reproduced / accepted   | exit 0 vs exit 2; included dirty control exits 1                            |
 | Raw lint completion                   | clean and ordinary diagnostic controls                                  | SIGNAL PROVEN               | both terminate in `Checked N file(s)`                                       |
-| Raw fmt completion                    | clean, dirty, dirty+clean, excluded+clean, all-excluded, write controls | SIGNAL PROVEN / DIFFERENT   | clean/write `Checked N`; dirty check `Found M … in N`; excluded loses count |
+| Raw fmt completion                    | clean, check finding/crash, write success/crash, singular/plural controls | SIGNAL PROVEN / THREE FORMS | write crashes use ANSI `Failed to format M of N checked file(s)`; second integer is processed |
 | CLI JSR baseline                      | per-member audit `--text`                                               | PASS with baseline warnings | exit 0, dry run OK, 19 existing WARN findings                               |
 | Product/tool/config/workflow mutation | raw git status and diff paths                                           | PASS                        | none; only permitted harness artifacts changed                              |
 | PLAN-EVAL cycle 1                     | fresh independent Tier-A session / `59b79ccd8`                          | `FAIL_PLAN`                 | F1-F3 repaired in author artifacts; evaluator file preserved                |
 | Root drop-free evaluator baseline     | cycle-1 §7 batch-size-1 lint/fmt                                        | PASS baseline proof         | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0              |
-| PLAN-EVAL cycle 2                     | coordinator authorization required                                      | NOT_LAUNCHED / NOT_GRANTED  | author must stop after immutable repair head and PR record                  |
+| PLAN-EVAL cycle 2                     | evaluator artifact / `f2b3fc8b3`                                        | `FAIL_PLAN` / F4 only       | F1, F3, A1-A3 closed; F2 needs only write extension; no third PLAN-EVAL     |
 
 Implementation gates are intentionally NOT_RUN. Disposable raw commands
 establish parser evidence; they are not implementation verdicts.
@@ -166,8 +176,10 @@ establish parser evidence; they are not implementation verdicts.
   adapter details.
 - Confirm S1 is independently landed before separate S2 lint and S3 fmt refusal
   slices.
-- Confirm lint parser uses `Checked N`, while fmt check findings use final `N`
-  from `Found M not formatted … in N`; fmt clean/write still use `Checked N`.
+- Confirm lint parser uses `Checked N`; fmt check findings/crashes use final
+  `N` from `Found M not formatted … in N`; fmt successful writes use `Checked
+  N`; and fmt write crashes use final `N` from `Failed to format M of N
+  checked`, scoped to write mode.
 - Confirm both wrappers pin mixed RED, 1/2/200 invariant, all-excluded, empty,
   diagnostics-once, crash+drop exact JSON/exit, and inconsistent evidence.
 - Confirm S3 adds the missing fmt runner seam in-file, with malformed-summary
@@ -178,4 +190,6 @@ establish parser evidence; they are not implementation verdicts.
   idempotent.
 - Confirm no seventh path, new allowance, evaluator/runtime lease, or N/A gate
   is requested.
-- Cycle 2 is not launched by this author; coordinator reconciliation comes next.
+- No third PLAN-EVAL exists. After the exact amended head is pushed, the
+  coordinator runs a fresh Tier-A; on `PASS`, the leaf stops for a separate
+  implementation grant.

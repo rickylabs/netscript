@@ -73,3 +73,34 @@ below.
   N/A gate request.
 - **Next:** commit/push immutable repaired head and update draft PR #1710. Cycle
   2 is prepared externally but not granted or launched by this author.
+
+## 2026-08-28 — owner accepts bounded F4 amendment after cycle 2
+
+- **What:** PLAN-EVAL cycle 2 at `f2b3fc8b3` found one remaining specification
+  gap: fmt write-mode crashes emit a third processed-count completion form not
+  admitted by the two-form adapter plan.
+- **Source:** Evaluator-owned `plan-eval.md` F4 and the owner-accepted brief
+  `1709-f4-amendment.md`, both read in full. The author independently measured
+  Deno 2.9.5 outside the checkout.
+- **Actual signal:** ANSI-prefixed
+  `error: Failed to format M of N checked file(s)`, with the second integer as
+  processed count. Measurements pinned `1 of 1 checked file`, `1 of 2 checked
+  files`, and `2 of 3 checked files`, all exit 1.
+- **Cycle status:** F1, F3, and A1-A3 are closed; F2 needs only this write-mode
+  extension. The ordinary two-cycle allowance is exhausted and there is no
+  third PLAN-EVAL.
+- **Owner decision:** accept the recommended in-envelope form, scoped to write
+  mode. Extend fmt write crash-only and crash+drop controls to batch sizes 1, 2,
+  and 200 with the same exit and coverage JSON as check mode.
+- **Preserved contract:** refusal ≥ crash ≥ ordinary finding; a complete
+  write-mode crash exits 1, and a write crash plus any coverage refusal exits 2.
+  F1-F3, A1-A3, S1→S4 ordering, six-path ceiling, frozen gates, N/A gates, and
+  lint-only publish consequence remain unchanged.
+- **Severity:** material / owner-accepted bounded amendment; no architecture or
+  scope change
+- **Bounds:** author-owned harness artifacts and draft PR record only. Both
+  evaluator artifacts are immutable; no implementation, seventh path, lease,
+  central-state edit, or N/A gate request.
+- **Next:** commit and explicitly push the amended head, update draft PR #1710,
+  then stop. The coordinator runs a fresh Tier-A; on `PASS`, the leaf waits for
+  a separate implementation grant.

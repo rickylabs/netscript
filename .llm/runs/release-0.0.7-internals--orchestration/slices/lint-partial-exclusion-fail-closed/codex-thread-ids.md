@@ -42,3 +42,16 @@ _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
   repair only. All advisories A1-A3 are folded without source mutation.
 - Cycle 2 is not granted or launched here. The author stops after committing,
   explicitly pushing, and recording the repaired PR head.
+
+## Owner-accepted F4 amendment boundary
+
+- PLAN-EVAL cycle 2 returned `FAIL_PLAN` at evaluator commit `f2b3fc8b3` on the
+  single F4 fmt write-completion gap. F1, F3, A1-A3, and the rest of F2 remain
+  closed; the architecture and six-path envelope stand.
+- Owner steering resumed this same author thread for the bounded F4 plan
+  amendment only. The author independently measured Deno 2.9.5's ANSI-prefixed
+  `Failed to format M of N checked file(s)` form outside the checkout.
+- The two-cycle allowance is exhausted and there is no third PLAN-EVAL. After
+  the amended head is explicitly pushed and recorded on draft PR #1710, the
+  coordinator runs a fresh Tier-A. Implementation still requires a separate
+  later grant.

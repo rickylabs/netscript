@@ -1,8 +1,9 @@
 # Leaf Author Identity — lint-partial-exclusion-fail-closed
 
 This file records the identity of the plan author session. The milestone
-supervisor remains the coordinator and will launch a fresh, separate PLAN-EVAL
-session against the committed plan head.
+supervisor remains the coordinator. After the ordinary two PLAN-EVAL cycles,
+the coordinator will run a fresh Tier-A against the owner-accepted F4-amended
+head; there is no third PLAN-EVAL.
 
 | Field    | Value                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -21,7 +22,7 @@ session against the committed plan head.
 | Task lane               | Provider / model / effort                              | Role in this run                                                                                            |
 | ----------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `normal_implementation` | OpenAI / `gpt-5.6-sol` / medium (requested)            | Reused only for research and plan authoring under this plan-only authorization; no implementation performed |
-| `eval_plan`             | Supervisor-selected fresh opposite-family Tier-A route | Required later; must be a separate session and is not launched by this author                               |
+| `eval_plan`             | Supervisor-selected fresh opposite-family Tier-A route | Two evaluator cycles are complete; no third PLAN-EVAL exists. Fresh coordinator Tier-A is not launched by this author. |
 
 ## Authorization boundary
 
@@ -32,9 +33,13 @@ session against the committed plan head.
   `agent-tools.generated.ts`. No seventh path is authorized.
 - Product, tooling, configuration, workflow, lock, and generated-source mutation
   is prohibited.
-- PLAN-EVAL cycle 1 returned `FAIL_PLAN` at evaluator commit `59b79ccd8`. This
-  turn is authorized only to repair author-owned plan artifacts; evaluator-owned
-  `plan-eval.md` is immutable.
-- Cycle 2 is not granted or launched by this author. Implementation remains
-  blocked until a later separate evaluator returns `PASS` and the coordinator
-  separately authorizes implementation.
+- PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `59b79ccd8`; the repair closed
+  F1-F3 and folded A1-A3. PLAN-EVAL cycle 2 returned `FAIL_PLAN` at
+  `f2b3fc8b3` on F4 only. Both evaluator-owned artifacts are immutable.
+- The owner accepted only the recommended F4 amendment: admit the write-only
+  `Failed to format M of N checked file(s)` adapter and extend the fmt write
+  crash controls at 1/2/200. This does not reopen or restructure the plan.
+- The ordinary two-cycle allowance is exhausted. No third PLAN-EVAL is granted,
+  launched, or requested. Implementation remains blocked; after fresh
+  coordinator Tier-A `PASS`, the leaf stops for a separate implementation
+  grant.

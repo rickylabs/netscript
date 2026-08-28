@@ -12,7 +12,10 @@
     at topic checkpoint `d682db680`;
   - accepted rescope brief
     `/home/codex/repos/netscript-007-internals/.llm/runs/release-0.0.7-internals--orchestration/briefs/1709-rescope-six-path.md`,
-    read in full before this amendment.
+    read in full before the six-path amendment;
+  - owner-accepted F4 amendment brief
+    `/home/codex/repos/netscript-007-internals/.llm/runs/release-0.0.7-internals--orchestration/briefs/1709-f4-amendment.md`,
+    read in full before this bounded amendment.
 - Re-derived against exact `main` baseline
   `cf648f1ff973d74c213bb125a6f5f5b9328e693b` on Deno 2.9.5.
 - The coordinator accepted the formatter finding into this leaf. The
@@ -34,7 +37,7 @@
 | 7  | The current gate catalog maps `lint` to `deno task lint`, whose wrapper roots are only `packages` and `plugins`; `.llm` and `tools` are not selected. This defect is not a current CI false green, though the lint wrapper ships to consumers.                                                                                                                                                                  | `deno.json` root task; `.llm/tools/gates/catalog.ts`; `.llm/tools/consumer-tools.json`.                                     |
 | 8  | `run-deno-lint.ts` is embedded as text in the CLI agent-tool bundle. Changing it changes `agent-tools.generated.ts` and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` without changing a CLI export or API.                                                                                                                                                                                                                 | `.llm/tools/generate-cli-assets-barrel.ts`; generated barrel constants.                                                     |
 | 9  | **Formatter defect, now in scope.** With `fmt.exclude: ["generated/"]`, an excluded unformatted `generated/bad.ts` mixed with clean `clean.ts` reports `filesSelected: 2`, one batch, zero findings, exit 0. The identical selection at batch size 1 exits 2. An included copy of the same bad text exits 1 with a genuine formatting finding.                                                                  | `.llm/tools/run-deno-fmt.ts:420-602`; disposable mixed/split/included controls.                                             |
-| 10 | Fmt completion output is not symmetric with lint. Clean `deno fmt --check clean.ts` emits `Checked 1 file`; dirty-only emits `error: Found 1 not formatted file in 1 file`; dirty+clean emits `error: Found 1 not formatted file in 2 files`; excluded+clean emits `Checked 1 file`; all-excluded emits only `No target files found.`. Write mode emits `Checked N file(s)`, including when it rewrites a file. | Raw Deno 2.9.5 commands in disposable directories; ANSI-stripped stderr lines recorded during this amendment.               |
+| 10 | Fmt completion output is not symmetric with lint and has three admissible mode-specific forms. Clean check and successful write emit `Checked N file(s)`; check findings/crashes emit `error: Found M not formatted file(s) in N file(s)`; write crashes emit ANSI-prefixed `error: Failed to format M of N checked file(s)`, with the second integer as processed count. Independently measured write controls: good+syntax exit 1 with `1 of 2 checked files`; syntax-only exit 1 with `1 of 1 checked file`; two syntax+good exit 1 with `2 of 3 checked files`. All-excluded still emits only `No target files found.`. | Raw Deno 2.9.5 commands in `Deno.makeTempDir()` directories outside the checkout; stdout/stderr captured separately and temp roots removed in `finally`. |
 | 11 | The lint and fmt completion parsers therefore differ, but both yield the same primitive: Deno's processed-file count. Separate parser adapters are necessary; the selected-vs-processed identity rule and refusal wire schema can remain one shared contract.                                                                                                                                                   | Findings 4 and 10.                                                                                                          |
 | 12 | The coordinator granted the exact six-path rescope because finding 9 met the frozen evidence condition. This supersedes the earlier deferral; no seventh path is authorized.                                                                                                                                                                                                                                    | Accepted rescope brief; `drift.md` append-only acceptance entry.                                                            |
 | 13 | Publish consequence is lint-only. The coordinator verified at exact base that `.llm/tools/consumer-tools.json` includes `run-deno-lint.ts` but not `run-deno-fmt.ts`; only lint changes the generated consumer-tool text/hash. The fmt repair has no barrel, bundle-hash, publish, or export claim of its own.                                                                                                  | Settled coordinator finding in the accepted rescope brief; do not re-derive.                                                |
@@ -43,6 +46,7 @@
 | 16 | PLAN-EVAL cycle 1 confirmed only lint currently has an injectable runner seam (`BatchRunner`/`denoLintRunner`/optional `runner`). Fmt's private `runBatch` directly calls `Deno.Command`; S3 must introduce an equivalent local seam for malformed-summary and inconsistent-probe unit fixtures.                                                                                                                | Evaluator `plan-eval.md` F1 at commit `59b79ccd8`; wrapper lines cited there.                                               |
 | 17 | Deno emits processed-count summaries even on parse-error batches: lint parse-error + good ends `Checked 2 files`; fmt check parse-error + good ends `Found 1 not formatted file in 2 files`; both exit 1 through today's crash classification. Coverage can and must be evaluated before crash precedence.                                                                                                      | Evaluator re-derivation §§1, 3 and F2.                                                                                      |
 | 18 | Per-file evaluator controls prove the root selections are already drop-free: corrected lint is `2041/2041/0`, exit 0 at batch size 1; root fmt is `2041/2041/0`, findings 0, exit 0. These are stronger than default-batch `failedBatches: 0`.                                                                                                                                                                  | Evaluator `plan-eval.md` §7.                                                                                                |
+| 19 | PLAN-EVAL cycle 2 closed F1, F3, and A1-A3 and left only F4 as the write-mode extension of F2. The owner accepted the recommended third fmt form; the ordinary two-cycle allowance is exhausted and no third PLAN-EVAL exists.                                                                                                                                                                                               | Evaluator `plan-eval.md` at `f2b3fc8b3`; owner amendment brief.                                                             |
 
 ## One selected-vs-processed identity contract
 
@@ -57,7 +61,10 @@ different notions of coverage.
    - fmt clean/write success: anchored `Checked N file(s)`;
    - fmt check with formatting findings or parse-error crash classification:
      anchored `error: Found M not formatted file(s) in N file(s)`, taking the
-     final `N` as processed.
+     final `N` as processed;
+   - fmt write with a parse-error crash: anchored
+     `error: Failed to format M of N checked file(s)`, taking the final `N` as
+     processed. This third form is write-only.
 2. Compare Deno's `N` with the number of selected files handed to that batch.
    Equality proves coverage for the batch.
 3. If `N` is smaller, probe each selected member through an injectable runner
@@ -133,7 +140,8 @@ exercise the boundary sizes 1, 2, and 200.
 - Original-batch diagnostics remain the only diagnostics. Probe output is never
   copied into JSON or stderr, so ordinary lint/fmt findings still appear once.
 - Parser fixtures pin LF and CRLF termination plus ANSI-wrapped fmt `error:`
-  prefixes.
+  prefixes, including singular/plural `Failed to format M of N checked
+  file(s)` write-crash summaries.
 
 ## Persistent REDs and controls
 
@@ -174,8 +182,11 @@ In a disposable project with `fmt.exclude: ["generated/"]`:
 - Crash-only controls remain exit 1 with complete coverage; crash+drop controls
   exit 2 with the same `partial-exclusion` JSON at batch sizes 1, 2, and 200;
   diagnostics render once.
-- Fmt write mode continues to use Deno's `Checked N` summary and does not lose
-  coverage proof; mismatch probes use non-mutating `--check`.
+- Fmt write mode proves original-batch coverage through `Checked N` on success
+  or `Failed to format M of N checked file(s)` on a crash, using `N`; mismatch
+  probes use non-mutating `--check`. Write crash-only and crash+drop controls at
+  1, 2, and 200 have the same exit/coverage JSON as their check-mode peers, so a
+  complete write crash remains exit 1.
 - No Deno rule, formatter rule, inline ignore, or allowance is weakened.
   `quality:scan --max-allow 7` must still report `allowCount: 7`.
 
@@ -197,9 +208,10 @@ In a disposable project with `fmt.exclude: ["generated/"]`:
 
 ## Open questions
 
-- **Must resolve now:** none after the cycle-1 repair. The missing fmt seam,
-  crash/coverage precedence, crash JSON controls, drop-free root proof, and
-  advisories A1-A3 are now locked.
+- **Must resolve now:** none after the owner-accepted F4 amendment. The missing
+  fmt seam, crash/coverage precedence, check/write crash JSON controls,
+  drop-free root proof, advisories A1-A3, and the third fmt write completion
+  form are locked.
 - **Safe to defer:** local helper/type names and exact internal parser function
   names. They do not change the common JSON/exit contract and can be reviewed
   during the later implementation phase.
