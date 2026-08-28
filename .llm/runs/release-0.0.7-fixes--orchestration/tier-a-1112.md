@@ -492,3 +492,83 @@ verdict regardless of the standing instruction.
 
 No product mutation, no eighth path granted, no runtime, no lease, no other lane. Scratch archives
 removed; the leaf worktree was never touched. PLAN-EVAL failure counter for this lane: **1**.
+
+---
+
+# Tier-A — #1112 dynamic-import repair at `da769cd7c8e0438f2317ed761ec10bce15692d03`. **PASS**
+
+| Field | Value |
+| --- | --- |
+| Plan head | `da769cd7c8e0438f2317ed761ec10bce15692d03` — local == remote == PR #1711, clean incl. untracked |
+| Commit | `da769cd7c docs(plan): repair prisma example import gates` |
+| Verdict | **PASS** |
+
+## Scope
+
+`git diff --name-only cf648f1ff..HEAD` = **exactly six** paths, all under
+`.llm/runs/fix-prisma-mysql-honest-example--0.0.7/`. Filtering that list for anything outside the run
+dir returns **empty** — no product, generated, or temp diff. Seven-path envelope intact.
+
+## Claims re-derived independently — all five
+
+Every executable claim was re-run from a `git archive` of this exact head (tracked files only, so
+untracked residue is impossible by construction), applying the plan's **prescribed** forms rather than
+trusting its account.
+
+**(1) Clean archive, ordinary root, all 12 files, green before generation and after cleanup**
+
+| State | Result |
+| --- | --- |
+| Pristine archive, unmodified | `filesSelected: 12`, `failedBatches: 0`, `occurrences: 0`, exit 0 |
+| Plus the plan's **module-scope** D3 dynamic import, **no** generated output | `12 / 0 / 0`, exit 0 |
+| After `.generated` + all scratch removed, with D3 **and** D17 applied | `12 / 0 / 0`, exit 0 |
+
+The example is **selected and checked** in all three — this is resolution, not exclusion. The earlier
+deliberate-red control (literal specifier → `TS2307`, exit 1) is what proves the wrapper genuinely sees
+that file.
+
+**(2) Real Prisma 7.8.0 generated-client static compatibility wrapper**
+
+`deno run -A --no-lock npm:prisma@7.8.0 generate` produced a real client (`client.ts`, `enums.ts`,
+`internal/`, …) into `examples/.generated`, exit 0. Then the plan's exact scratch wrapper:
+
+| Source state | Result |
+| --- | --- |
+| **Unmodified** | exit 1 — `TS2322 'PrismaMySqlAdapterFactory' is not assignable to 'SqlDriverAdapterFactory'` |
+| With the planned **D17** one-line narrowing `columnTypes: SqlResultSet['columnTypes']` | **`filesSelected: 1`, `failedBatches: 0`, `occurrences: 0`, exit 0** |
+
+So the plan's prospective claim is **true**, and it is true for the stated reason. `SqlResultSet` is
+already imported at `adapter.ts:18`, so the correction needs no new import. Recorded precisely because
+the wrapper does **not** pass at today's source — it passes only with D17, exactly as the plan says.
+
+**(3) Import-only smoke, no MySQL**
+
+`deno eval … await import(<example url>); console.log("dynamic-import-smoke:ok")` →
+**`dynamic-import-smoke:ok`, exit 0**. Structurally safe: the example guards execution behind
+`if (import.meta.main)`, so importing runs the generated-client dynamic import without invoking
+`main()` or contacting MySQL.
+
+**(4) Evidence split stated honestly** — `plan.md:62`, `:65` ("The root check does not type
+`PrismaClient` or `prisma`"), `:158`, and gate 1's expected result, which says in full that it
+"validates adapter construction and the stable query/`finally`/disconnect shell, but `PrismaClient` and
+`prisma` are untyped because the dynamic import is non-literal." Untyped root-shell evidence and
+specialized semantic evidence are not conflated anywhere.
+
+**(5) Prohibitions retained** — D3 forbids ambient declarations, `// @ts-ignore`, the ungenerated
+`@prisma/client` stub, **and excluding the example**; gate 1 adds "No exclusion is permitted"; the
+eighth-path rescope line stands at `:26`.
+
+## Version consistency
+
+Catalog pins `^7.8.0`; the plan's scratch import map pins exact `7.8.0` and generation uses
+`npm:prisma@7.8.0`. Consistent. PLAN-EVAL's earlier sighting of `7.9.1` was a second cached version, not
+a discrepancy.
+
+## Outcome
+
+**Tier-A PASS at `da769cd7c`.** F1 is resolved by architecture rather than relocated: the clean root
+check is genuinely green with the example checked, and the generated-client evidence is preserved in a
+specialized gate with its scope stated honestly. No eighth path granted, no exclusion, no stub.
+
+**PLAN-EVAL cycle 2 NOT launched** — it awaits an explicit coordinator grant. No implementation.
+Scratch archives removed; the leaf worktree was never touched. Docker 0, no lease, no other lane.
