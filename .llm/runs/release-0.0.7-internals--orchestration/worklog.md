@@ -1513,3 +1513,76 @@ runtime leases are N/A and must not be requested.
 
 Stop condition: commit, explicit-refspec push, opening phase comment if a PR is opened, then stop for
 fresh independent Tier-A. PLAN-EVAL and implementation are separate later authorizations.
+
+## 2026-08-28 — #1709 six-path rescope delivered; fresh Tier-A on amended plan `d437db44d`: **PASS**
+
+### Rescope delivery
+
+The coordinator accepted the formatter defect after the author's mandatory audit reproduced it. I
+delivered the amendment to the **same** thread `01a047f0-f17e-7692-b6f0-83a6d22888c9` — no second
+author. The thread was mid-turn when the rescope arrived, so I **held it until idle** rather than
+firing a concurrent turn, and confirmed before sending that of five live sender processes **none had
+this worktree as cwd**. Sent detached via `nohup … & disown`.
+
+The author's four-path plan had already landed at `f01c1fb59` with draft PR **#1710**; the rescope
+therefore became an amendment rather than a redirect. That is a cycle spent, not work lost.
+
+### Bounds — verified
+
+`f01c1fb59 → d437db44d` is seven files, all in the leaf slice run dir. Across the **whole leaf arc**
+`cf648f1ff → d437db44d`, `git diff --name-only` excluding `.llm/runs/` is **empty** — the leaf is
+plan-only end to end, exactly as the stage requires. Tree clean, pushed by explicit refspec.
+
+### The crux — signals were proven to differ, not assumed
+
+The amendment did the thing the brief refused to let it assume in either direction. Executed
+adapters:
+
+- **lint** — anchored `^Checked (\d+) files?$` on both clean and finding results.
+- **fmt** — `^Checked (\d+) files?$` when clean or writing, **and**
+  `^error: Found (\d+) not formatted files? in (\d+) files?$` when check finds work, taking the
+  **second** integer.
+
+**I verified this independently** on Deno 2.9.5: `deno fmt --check clean.ts` → `Checked 1 file`;
+`deno fmt --check clean.ts dirty.ts` → `error: Found 1 not formatted file in 2 files`, exit 1;
+singular form `Found 1 not formatted file in 1 file`; lint clean → `Checked 1 file`. The shapes
+genuinely differ, so the S2/S3 split is evidence-driven.
+
+The plan's warning that fmt's processed count must **not** be inferred from the count of
+`from <path>:` findings is likewise validated by my run: the two-file case yields one finding over
+two processed files, so finding-count inference would undercount and manufacture a false drop.
+
+### Other Tier-A checks
+
+- **Six paths exactly**, with "any seventh … is an immediate rescope stop", and non-scope explicitly
+  refuses a shared helper module — which would itself have been a seventh path.
+- **Ordering strict S1 → S4** with the root doctor coverage correction **first**, as sequenced.
+- **Batch-size invariant** operationalised: mixed RED at sizes 1/2/200 in both wrappers, plus the
+  design statement that cause and verdict "cannot change merely because a dropped path moved into
+  its own child batch".
+- **Must-not-regress** all-excluded and empty-selection refusals present for both wrappers.
+- **Probe output is classification-only** — never fed into occurrence/finding parsers, crash
+  structures, JSON diagnostics, or stderr — so the single-diagnostic-source requirement holds.
+- **Publish claim correct and narrow:** S4 ties the barrel, hash, dry-run and JSR audit to the **lint**
+  change alone and states "fmt creates no publish delta or claim"; idempotence is proven by running
+  `gen:assets-barrel` twice with no diff on the second. This matches the coordinator's verified
+  `consumer-tools.json` finding and the author's own research finding 8.
+- Existing 19 CLI JSR warnings are disclosed as **baseline**, not silently greened.
+
+### Durable record updates
+
+- **#1709 rewritten in place**: title now *"Deno lint and fmt wrappers report green when Deno drops
+  part of a selected batch"*; body describes **both** wrappers as the actual scope with the fmt
+  reproduction inline, the six-path envelope, the differing completion signals, and acceptance boxes
+  rewritten to require both wrappers. Label moved `status:triage` → **`status:plan`** now that the
+  planned state is durable (committed and pushed), not before.
+- Draft PR **#1710** — draft, base `main`, head `d437db44d`, milestone `0.0.7`, labels `type:fix`,
+  `area:tooling`, exactly one `status:` (`status:plan`), plus `ci:skip-e2e`/`ci:skip-scaffold` which
+  are correct for an artifacts-only diff.
+
+### Verdict — **Tier-A PASS**
+
+No rescope finding beyond the granted fmt expansion; the plan takes no seventh path and claims no
+publish consequence it does not have. **Stopping before PLAN-EVAL and implementation**, both of which
+remain separate later authorizations. This lane holds no evaluator or runtime lease, requested none,
+and touched no other queue.
