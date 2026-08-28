@@ -184,3 +184,39 @@ artifacts.
   The IMPL-EVAL brief must name this as known-red baseline with the base-vs-head proof so the
   evaluator does not score it a regression.
 - **Evidence:** supervisor base-vs-head table in `worklog.md`; S4 commit-bound receipt.
+
+## 2026-08-28 — Owner policy amendment: formal PLAN-EVAL is risk-selected, not universal
+
+- **What:** Formal PLAN-EVAL is now **risk-selected**. It is required only for genuinely
+  critical/complex or decision-heavy topics. **Routine or mechanical leaves must record
+  `PLAN-EVAL: N/A` with a justification, plus Tier-A** — they do not spend an evaluator cycle.
+- **Source:** Owner/coordinator authorization, 2026-08-28.
+- **Expected:** Prior practice treated formal PLAN-EVAL as the default for most leaves, which spent
+  evaluator capacity on mechanical work.
+- **Actual:** Selection is now a judgement recorded per leaf. `PLAN-EVAL: N/A` is a first-class
+  outcome that must be *justified in writing*, not a silent skip — the harness already required a
+  justified N/A for small/mechanical work, and this amendment makes risk-selection the governing
+  rule rather than the exception.
+- **Severity:** process amendment, lane-wide
+- **Action:** Apply to every future internals leaf at plan stage. **#1709 remains selected** —
+  fail-closed repository tooling, published embedded consumer text, cross-wrapper crash/coverage
+  precedence, and generated-asset consequences make it critical/complex on all four counts.
+  Promotion of this rule into `.llm/harness/` doctrine is **coordinator-owned**; this lane records it
+  and applies it, but does not edit shared harness doctrine.
+
+## 2026-08-28 — Owner policy: two consecutive IMPL-EVAL failures halt the loop
+
+- **What:** After **two consecutive IMPL-EVAL failures in any lane**, the lane must **stop, release
+  evaluator leases, and surface the exact owner decision in the primary coordinator task**. There is
+  **no third loop and no frozen author**.
+- **Source:** Owner/coordinator authorization, 2026-08-28.
+- **Expected:** Repair-and-re-evaluate loops could otherwise continue while an author thread sat
+  frozen and an evaluator lease stayed held.
+- **Actual:** The cap is now explicit and symmetric with the plan gate's two-cycle allowance. "No
+  frozen author" means the author thread is not left parked mid-loop awaiting a third attempt — the
+  decision returns to the owner instead.
+- **Severity:** process amendment, lane-wide
+- **Action:** Applies to this lane's future IMPL-EVAL loops. On the second consecutive failure:
+  release the evaluator lease, do not dispatch a third, do not re-task the author, and escalate with
+  the exact decision the owner must make. Recorded here as the binding rule for internals.
+- **Evidence:** No IMPL-EVAL loop is currently open in this lane; #1709 is at plan stage.
