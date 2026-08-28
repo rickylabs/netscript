@@ -661,3 +661,62 @@ not expanded investment.
 
 After the author's clean explicit push, the supervisor runs a fresh focused Tier-A only. If PASS, the
 result is reported for a coordinator implementation grant.
+
+## Tier-A (fresh, focused) at `6ae7113eb4636972ef1df80fc08e6e3a0390d3fb` — PASS
+
+Scope: the owner-accepted bounded F1-b amendment only. Reviewer = topic supervisor, not evaluator and
+not author. All executable probes ran in a pristine tracked-files-only `git archive` of the exact
+head (no `.git`, no untracked residue), never in a worktree. Toolchain deno 2.9.5, Prisma 7.8.0.
+
+### Scope and hygiene
+
+| Check | Result |
+| --- | --- |
+| Author identity | canonical thread `01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8`, cwd = leaf worktree — resumed, not forked |
+| Branch head local == remote | `6ae7113eb` == `refs/heads/fix/prisma-mysql-honest-example` |
+| Working tree | clean |
+| Diff vs base `cf648f1ff` | 6 files, **all** under `.llm/runs/…`; nothing outside |
+| `deno.lock` | untouched |
+| Product envelope | exactly 7 paths, unchanged |
+| Prohibitions | every `exclude`/ambient/`ts-ignore`/stub/eighth-path hit read individually; all are prohibitions or deferrals, none a permission |
+
+### Executed re-derivation of the amended claims
+
+| # | Claim as written in the plan | Command | Result |
+| - | --- | --- | --- |
+| 1 | Literal dynamic import, `.generated` absent, ordinary root wrapper | `run-deno-check.ts --root packages/prisma-adapter-mysql --ext ts,tsx` | `filesSelected:12, failedBatches:0, occurrences:0`, exit 0 |
+| 2 | The example is genuinely selected, not skipped | appended `const deliberateRed: number = 'not-a-number';` | `failedBatches:1`, `TS2322` at `examples/basic-usage.ts:31:7`; restored → clean again |
+| 3 | Gate 5 checks the **actual example**, client present, scratch config | `run-deno-check.ts --file packages/prisma-adapter-mysql/examples/basic-usage.ts --ext ts --deno-arg --config=.llm/tmp/prisma-example-check-deno.json` | before D17: `TS2322 Type 'PrismaMySqlAdapterFactory' is not assignable to type 'SqlDriverAdapterFactory'` at `basic-usage.ts:18:37`; after D17: `filesSelected:1, failedBatches:0`, exit 0 |
+| 4 | Risk row — connected-adapter mistake is now a compiler error | `new PrismaClient({ adapter: await adapter.connect() })` in the actual example | `TS2741 Property 'connect' is missing in type 'PrismaMySqlConnectedAdapter' but required in type 'SqlDriverAdapterFactory'` |
+| 5 | Guarded import-only smoke | plan's `deno eval` line verbatim | `dynamic-import-smoke:ok`, exit 0 |
+| A3 | The guard, not the network, is what keeps the smoke off MySQL | same file run **as main**, `MYSQL_HOST=127.0.0.1` | Prisma error thrown from `basic-usage.ts:21` (the `$queryRawUnsafe` line), exit 1 — the query path is live |
+| A1 | Root `catalog:` is not an import map | client present, **no** scratch config, `deno check --unstable-kv` | `TS2307 Import "@prisma/client/runtime/client" not a dependency and not in import map`; `deno.json` → `imports:` False, `catalog:` True |
+| A2 | Gate 1 is undefined during the generated window | ordinary root wrapper with `.generated` present | `filesSelected:21, failedBatches:1`, 50 occurrences across `TS2307`/`TS9010`/`TS9027`, all from generated code |
+| 6 | Post-cleanup state (owner evidence boundary) | `rm -rf` generated + scratch, then repeat gate 1 | zero residue found; `filesSelected:12, failedBatches:0, occurrences:0`, exit 0 |
+
+### Necessity, not just sufficiency
+
+The defect in the supervisor's earlier PASS was verifying that a form *worked* without asking whether
+it was *necessary*. Applied here: static import fails `TS2307` when output is absent; the non-literal
+URL form loses real typing when output is present; the literal dynamic import is green in the first
+state and typed in the second, so it dominates both. A form that is typed while output is absent
+would require a stub or ambient declaration, both forbidden, and making the scratch config permanent
+would be an eighth path. The literal dynamic import is therefore the maximum evidence obtainable
+inside the stated constraints, not merely one option that passes.
+
+### Advisory (non-blocking, and explicitly permitted)
+
+The scratch D17 compatibility wrapper is now **provably redundant**. Claim 3 shows the actual-example
+check catches the D17 defect with the identical code and message (`TS2322`,
+`PrismaMySqlAdapterFactory` → `SqlDriverAdapterFactory`) that the wrapper was written to catch, and
+the wrapper exercises exactly the same four operations the example already does — factory
+construction, `new PrismaClient({ adapter })`, `$queryRawUnsafe`, `$disconnect()` in `finally`.
+Keeping it is within both the cycle-2 finding ("may stay as a D17 probe or be dropped") and the
+supervisor brief, so this is reported, not charged. Dropping it at implementation time would remove
+one scratch file and one drift surface at no evidence cost.
+
+### Verdict
+
+`PASS`. All four authorized amendment points and all three advisories are present in the plan text
+and reproduce as executed behaviour. Amendment is plan-only, seven-path ceiling intact, lock clean,
+no self-certification. Reported for coordinator implementation grant.
