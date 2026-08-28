@@ -2114,3 +2114,69 @@ worktree. Lesson for this lane: **`--add-dir` is not a cwd; launch from within t
 
 Owner policy armed: two consecutive terminal IMPL-EVAL failures release the evaluator, keep the
 author available, and surface the exact decision to the coordinator — no cycle 3, no frozen author.
+
+## 2026-08-29 — #1709 IMPL-EVAL cycle 1 TERMINAL: `PASS_IMPL`
+
+Evaluator commit `30df7b9ff8e3370a7420e5da1c46476253c05b0d`; session
+`4336958e-2b02-4896-a6f6-936e30fa262a`; bridge `cse_01XZn956TmyWBwiTy3nWMZEk`; 41,066 tokens;
+`state: done`. The evaluator pushed to the leaf branch itself, so PR #1710's head is now the
+verdict commit and the author's exact-head receipts sit at its parent `5c4eaf0a3`.
+
+### Verdict integrity — verified independently, not relayed
+
+- **Exactly one** verdict token in `impl-eval.md` (line 5, `PASS_IMPL`); no second or negated token.
+- Evaluator commit adds **exactly one file**, `impl-eval.md`; **zero product paths touched**.
+- Clean fast-forward: `30df7b9ff^` == `5c4eaf0a3` == the head the author delivered.
+- Four-way head equality asserted in the artifact (`rev-parse`, remote, `FETCH_HEAD`, `gh pr view`).
+- Opposite-family separation holds: author Codex `gpt-5.6-sol`/high vs evaluator native Claude
+  Fable 5/medium, `providerEnv: {}`.
+
+### What the evaluation actually did
+
+It built its own disposable project and ran a coverage matrix at batch sizes **1, 2, 200** across
+lint, fmt check, and fmt write, including cases my brief did not name — symlink dedup, a vanished
+path, `deno-fmt-ignore-file`, a broken `deno.json`, and a duplicated summary. It captured the raw
+Deno 2.9.5 signals itself rather than trusting the plan's table, and noted that lint and fmt emit
+diagnostics *and* the completion summary on stderr, so the wrapper's stdout+stderr concatenation
+cannot reorder the terminal summary.
+
+Its central result: **no selection was found in which either wrapper reports exit 0 while a
+selected path was absent from Deno's processed count** — including the adversarial pairing where a
+dropped path shares a size-2 child batch with a crashing file. The F4 case is confirmed directly:
+fmt write, crash without drop, **exit 1** with `2/2` and empty refusals.
+
+### Two informational findings — both checked, neither a leaf defect
+
+1. **`deno task test` flake.** First run at this head returned exit 1 (4,232/1/19) on
+   `plugins/streams/services/src/proxy_test.ts:79`, a live-poll timing test using
+   `getAvailablePort()`. It overlapped the 2,041-spawn `--batch-size 1` root lint. Outside the
+   six-path envelope (`git diff --stat cf648f1ff...HEAD -- plugins/streams` is empty); passed 3/3
+   isolated and the full rerun returned 4,233/0/19. Correctly **disclosed rather than hidden** —
+   the brief required any executed-vs-claimed discrepancy to be stated.
+2. **`summary.failedBatches` varies by batch size** for the same selection (1 at size 1, 0 at
+   2/200) because a wholly-excluded child batch is counted through `noTargetBatches`. The
+   evaluator judged this outside the contract and pre-existing. **I verified that claim rather than
+   accepting it:** the summary arithmetic `failedBatches: effectiveFailedBatches + noTargetBatches`
+   is byte-identical at `cf648f1ff` (line 568) and at the leaf head (line 847); this leaf changed
+   only how `noTargetBatches` is computed (threaded counter instead of `results.filter`), not the
+   summary. The variance predates the change, and the plan's invariance clause enumerates exit,
+   cause, processed/dropped identities, and diagnostic multiplicity — not `failedBatches`. The
+   judgment stands.
+
+Also confirmed by the evaluator: no new `deno-lint-ignore`, `quality-allow`, `as unknown as`, or
+`any` in the product diff — the single grep hit is a lint-probe string fixture inside
+`run-deno-lint_test.ts`.
+
+### Hygiene
+
+`leak-check` on the evaluator worktree: `aspire ok`, `docker ok`, `survivors: []`. Evaluator
+worktree removed and branch `eval/impl-eval-1709` deleted after the verdict was durable on the leaf
+branch. Docker containers **0**. Evaluator `done`; the corrected-cwd mislaunch `75886b34` remains
+`stopped`. Canonical author `01a047f0` idle and available, not frozen. No runtime or evaluator
+lease was ever taken in this leaf.
+
+### Stop
+
+Plan gate and implementation gate are both closed for #1709. One IMPL-EVAL cycle, no failures, so
+the two-consecutive-failure policy was never engaged. **Stopping for the coordinator**: readiness
+flip, merge, and issue closure are not mine. PR #1710 remains OPEN/draft at `status:impl-eval`.
