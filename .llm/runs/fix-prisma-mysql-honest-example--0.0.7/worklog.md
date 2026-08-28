@@ -75,12 +75,13 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 
 ## Progress Log
 
-| Date       | Slice    | Step       | Notes                                                                                                                                       |
-| ---------- | -------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-28 | planning | Bootstrap  | Read live issue, verified exact base/branch/clean tree, loaded requested harness/doctrine/tooling/JSR/PR guidance.                          |
-| 2026-08-28 | planning | Research   | Rendered `deno doc`, searched/read all seven paths, traced options, inspected Prisma/mysql2 declarations, and audited the prescribed seams. |
-| 2026-08-28 | planning | Base gates | Ran only allowed non-runtime gates; tree remained clean.                                                                                    |
-| 2026-08-28 | planning | Design     | Locked the seven-path plan, source-only translator seam, existing-test ownership, and TLS correction. No product mutation.                  |
+| Date       | Slice    | Step         | Notes                                                                                                                                                                 |
+| ---------- | -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-28 | planning | Bootstrap    | Read live issue, verified exact base/branch/clean tree, loaded requested harness/doctrine/tooling/JSR/PR guidance.                                                    |
+| 2026-08-28 | planning | Research     | Rendered `deno doc`, searched/read all seven paths, traced options, inspected Prisma/mysql2 declarations, and audited the prescribed seams.                           |
+| 2026-08-28 | planning | Base gates   | Ran only allowed non-runtime gates; tree remained clean.                                                                                                              |
+| 2026-08-28 | planning | Design       | Locked the seven-path plan, source-only translator seam, existing-test ownership, and TLS correction. No product mutation.                                            |
+| 2026-08-28 | planning | Lock hygiene | Exact-pin mysql2 probing added one transient `deno.lock` resolution; gate 15 caught it before staging, and the targeted reversal restored a byte-identical base lock. |
 
 ## Decisions
 
@@ -96,11 +97,12 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 
 ## Drift
 
-| Drift                                                                     | Severity                     | Logged in drift.md |
-| ------------------------------------------------------------------------- | ---------------------------- | ------------------ |
-| Current TLS `verify_identity` mode does not set mysql2 `verifyIdentity`   | significant                  | yes                |
-| Coordinator widened the product envelope 5 → 7 and prescribed the seam    | significant                  | yes                |
-| User's five-artifact allowlist excludes harness-mandatory `supervisor.md` | significant process variance | yes                |
+| Drift                                                                     | Severity                      | Logged in drift.md |
+| ------------------------------------------------------------------------- | ----------------------------- | ------------------ |
+| Current TLS `verify_identity` mode does not set mysql2 `verifyIdentity`   | significant                   | yes                |
+| Coordinator widened the product envelope 5 → 7 and prescribed the seam    | significant                   | yes                |
+| Exact-pin mysql2 probe transiently added one `deno.lock` resolution       | transient process side effect | yes                |
+| User's five-artifact allowlist excludes harness-mandatory `supervisor.md` | significant process variance  | yes                |
 
 ## Gate Results — immutable base
 
@@ -124,6 +126,12 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 | Gate                                               | Result  | Notes                                                                   |
 | -------------------------------------------------- | ------- | ----------------------------------------------------------------------- |
 | Live MySQL / Aspire / Docker / browser / `e2e:cli` | NOT RUN | Explicitly prohibited. Focused seam tests are the required future path. |
+
+### Planning hygiene receipt
+
+| Existing gate                 | Detection                                                                                                      | Remediation                                                        | Final evidence                                                                                                                              |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gate 15 — git/lock/path truth | Direct status/diff found the transient `"npm:mysql2@3.22.5": "3.22.5_@types+node@25.9.3",` line before staging | Removed only that probe-generated line; no lockfile/cache deletion | `git diff --exit-code cf648f1ff973d74c213bb125a6f5f5b9328e693b -- deno.lock` returned zero before commit; `deno.lock` never entered history |
 
 ### New gates required on implementation head
 

@@ -37,6 +37,23 @@ explicitly directed; it does not leave the superseded envelope as the current pl
   supplied; direct-test the pure translator through a source-only export.
 - **Boundary:** no public-barrel export and no runtime injection port.
 
+## 2026-08-28 — Exact-pin mysql2 probe transiently modified `deno.lock`
+
+- **What:** The explicit exact-pin mysql2 import probe transiently added this resolution beside the
+  existing `npm:mysql2@^3.22.5` entry: `"npm:mysql2@3.22.5": "3.22.5_@types+node@25.9.3",`.
+- **Cause:** The worktree was clean before probing; `deno info npm:mysql2@3.22.5` requested the
+  exact specifier represented by the added lock entry. This side effect was caused by this research
+  turn, not carried in from another owner.
+- **Detection:** Existing gate 15, the direct git/lock/path truth check, reported `deno.lock` in
+  `git status` and `git diff --name-only` before staging or commit.
+- **Action:** Inspected the one-line diff, removed only that generated exact-pin entry, and reran
+  the direct comparison against immutable base `cf648f1ff973d74c213bb125a6f5f5b9328e693b`.
+- **Final state:** `deno.lock` was byte-identical to base before every commit and never entered the
+  branch history. No lockfile or cache was deleted.
+- **Severity:** transient process side effect
+- **Prevention:** Keep gate 15 as written and run future exact dependency probes with lock writes
+  disabled or from an isolated scratch context.
+
 ## 2026-08-28 — Explicit artifact allowlist overrides harness supervisor bootstrap
 
 - **What:** Harness activation normally requires `supervisor.md`, but the leaf grant allows creation
