@@ -8,7 +8,7 @@
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
-| Authorization  | Research + amended plan only                                                       |
+| Authorization  | Cycle-1 `FAIL_PLAN` repair artifacts only; cycle 2 not granted                     |
 
 ## Design
 
@@ -42,8 +42,13 @@ coordinator-approved six-path rescope and before PLAN-EVAL.
 
 ### Ports / seams
 
-- Reuse each wrapper's existing process seam for original batches and mismatch
-  probes. No new architecture port or shared module is justified.
+- Lint already exposes an injectable `BatchRunner` used by `runLint`; S2 reuses
+  it for original batches and mismatch probes.
+- Fmt has no equivalent seam today: private `runBatch` directly invokes
+  `Deno.Command`. S3 introduces an equivalent injectable runner seam inside
+  `run-deno-fmt.ts`, routes original batches and probes through it, and uses
+  that seam for malformed-summary/inconsistent-probe unit fixtures. No shared
+  module or seventh path is introduced.
 - Deno CLI output is the external protocol. Lint and fmt have different adapters
   feeding one fail-closed coverage contract.
 
@@ -55,8 +60,10 @@ coordinator-approved six-path rescope and before PLAN-EVAL.
   `^error: Found (\d+) not formatted files? in (\d+) files?$`, using final `N`.
 - Shared causes: `empty-selection`, `all-excluded`, `partial-exclusion`,
   `processed-count-unavailable`, `processed-count-inconsistent`.
-- Exit meanings: 0 complete+clean, 1 complete+ordinary finding or existing
-  recognized crash behavior, 2 selection/coverage refusal.
+- Locked precedence: coverage refusal ≥ crash ≥ ordinary finding. Exit 2 wins
+  for any refusal; otherwise crash/finding exits 1; complete+clean exits 0.
+- Lint `--input` omits `coverage`; fmt write mismatch probes use non-mutating
+  `--check`; both parser suites pin CRLF summaries.
 
 ### Archetype-6 checkpoint applicability
 
@@ -71,12 +78,12 @@ coordinator-approved six-path rescope and before PLAN-EVAL.
 
 ### Commit slices
 
-| #  | Slice                                                                                                                                        | Gate                                                                       | Files                                                             |
-| -- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| S1 | Restore four healthy doctor files to root lint selection before either guard tightens.                                                       | direct structured `2037/35/0 → 2041/36/0`, exit 0; broken subtree absent   | `deno.json`                                                       |
-| S2 | Establish the common coverage contract through the lint completion adapter, refusal JSON, batch invariant, and lint regression controls.     | focused lint test/check; mixed 1/2/200; root lint                          | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` |
-| S3 | Apply the same contract through fmt's distinct clean/write and finding completion adapters, including cross-wrapper cause/schema assertions. | focused fmt test/check; mixed 1/2/200; check/write and refusal controls    | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   |
-| S4 | Canonically regenerate and prove only the lint-driven consumer text/hash delta.                                                              | generator twice, name-only delta, `check:assets-barrel`, CLI dry run/audit | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         |
+| #  | Slice                                                                                                                                       | Gate                                                                                      | Files                                                             |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| S1 | Restore four healthy doctor files before either guard and prove every corrected root-lint path is processed.                                | default `2037/35/0 → 2041/36/0`; per-file `2041/2041/0`, exit 0; broken absent            | `deno.json`                                                       |
+| S2 | Establish lint coverage on clean/finding/crash batches with refusal ≥ crash ≥ finding, exact crash+drop JSON, CRLF, and `--input` omission. | focused lint test/check; mixed and crash 1/2/200; per-file root lint                      | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` |
+| S3 | Introduce fmt's injectable runner seam and apply the same coverage/crash contract, including non-mutating write probes.                     | seam-based malformed/inconsistent units; mixed and crash 1/2/200; CRLF; per-file root fmt | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   |
+| S4 | Canonically regenerate and prove only the lint-driven consumer text/hash delta.                                                             | generator twice, name-only delta, `check:assets-barrel`, CLI dry run/audit                | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         |
 
 Every later implementation commit must update this worklog/context pack, but
 those harness updates do not widen the exact six-path implementation surface.
@@ -98,26 +105,33 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 
 ## Progress Log
 
-| Time (Europe/Zurich) | Phase     | Step                   | Notes                                                                                                                                                  |
-| -------------------- | --------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-08-28           | bootstrap | identity/scope         | Exact base, branch, no-upstream rule, frozen contract, and author-only boundary verified.                                                              |
-| 2026-08-28           | research  | lint re-baseline       | Mixed exit 0 vs batch-size-1 exit 2 reproduced; root `2037/35 → 2041/36`, both green.                                                                  |
-| 2026-08-28           | research  | mandatory fmt audit    | Symmetric mixed false green reproduced with excluded/clean/included controls; no mutation.                                                             |
-| 2026-08-28           | plan      | original design        | Four-path lint plan authored, committed, pushed, and recorded on draft PR #1710.                                                                       |
-| 2026-08-28           | rescope   | coordinator acceptance | Evidence condition satisfied; exact envelope expanded to six paths by accepted brief.                                                                  |
-| 2026-08-28           | research  | fmt signal shape       | Raw controls prove clean/write use `Checked N`; check findings use `Found M … in N`; all-excluded has no completion line.                              |
-| 2026-08-28           | plan      | amended design         | One coverage contract, separate ordered lint/fmt adapters, symmetrical JSON causes, four slices, lint-only publish effect, and unchanged gates locked. |
+| Time (Europe/Zurich) | Phase     | Step                   | Notes                                                                                                                                                         |
+| -------------------- | --------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-28           | bootstrap | identity/scope         | Exact base, branch, no-upstream rule, frozen contract, and author-only boundary verified.                                                                     |
+| 2026-08-28           | research  | lint re-baseline       | Mixed exit 0 vs batch-size-1 exit 2 reproduced; root `2037/35 → 2041/36`, both green.                                                                         |
+| 2026-08-28           | research  | mandatory fmt audit    | Symmetric mixed false green reproduced with excluded/clean/included controls; no mutation.                                                                    |
+| 2026-08-28           | plan      | original design        | Four-path lint plan authored, committed, pushed, and recorded on draft PR #1710.                                                                              |
+| 2026-08-28           | rescope   | coordinator acceptance | Evidence condition satisfied; exact envelope expanded to six paths by accepted brief.                                                                         |
+| 2026-08-28           | research  | fmt signal shape       | Raw controls prove clean/write use `Checked N`; check findings use `Found M … in N`; all-excluded has no completion line.                                     |
+| 2026-08-28           | plan      | amended design         | One coverage contract, separate ordered lint/fmt adapters, symmetrical JSON causes, four slices, lint-only publish effect, and unchanged gates locked.        |
+| 2026-08-28           | plan-eval | cycle 1                | `FAIL_PLAN` at evaluator commit `59b79ccd8`: specification gaps F1-F3; architecture, signals, envelope, publish bound, and no-seventh-path finding confirmed. |
+| 2026-08-28           | plan      | repair                 | Corrected fmt seam premise; locked crash coverage/precedence and exact 1/2/200 JSON; strengthened root drop-free gates; folded A1-A3. Cycle 2 not launched.   |
 
 ## Decisions
 
-| Decision                                                   | Reason                                             | Source                                       |
-| ---------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------- |
-| Fail closed on any dropped selected path in either wrapper | Green must prove actual coverage                   | coordinator / issue #1709 / accepted rescope |
-| One coverage/JSON contract, two parser adapters            | Semantics are shared, raw completion forms differ  | executed lint/fmt signal controls            |
-| Keep lint and fmt as separate ordered slices               | Parser difference is proven, not assumed           | research findings 4, 10-11                   |
-| S1 doctor correction precedes S2/S3                        | Accepted sequencing and clean +4 proof             | coordinator contract                         |
-| Publish and generated hash claims are lint-only            | Consumer manifest embeds lint, not fmt             | settled coordinator finding                  |
-| PLAN-EVAL required and pending                             | Separate adversarial judgement; no self-evaluation | harness plan gate                            |
+| Decision                                                   | Reason                                                         | Source                                       |
+| ---------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------- |
+| Fail closed on any dropped selected path in either wrapper | Green must prove actual coverage                               | coordinator / issue #1709 / accepted rescope |
+| One coverage/JSON contract, two parser adapters            | Semantics are shared, raw completion forms differ              | executed lint/fmt signal controls            |
+| Keep lint and fmt as separate ordered slices               | Parser difference is proven, not assumed                       | research findings 4, 10-11                   |
+| S1 doctor correction precedes S2/S3                        | Accepted sequencing and clean +4 proof                         | coordinator contract                         |
+| Publish and generated hash claims are lint-only            | Consumer manifest embeds lint, not fmt                         | settled coordinator finding                  |
+| Fmt S3 introduces a local injectable runner seam           | None exists today; unit fixtures need it                       | cycle-1 F1                                   |
+| Refusal ≥ crash ≥ ordinary finding                         | Crash batches expose processed counts; coverage integrity wins | cycle-1 F2                                   |
+| Fold A1: omit lint `--input` coverage                      | Saved logs have no selected identity set                       | cycle-1 advisory A1                          |
+| Fold A2: fmt write probes use `--check`                    | Same classification with no second mutation                    | cycle-1 advisory A2                          |
+| Fold A3: pin CRLF summaries                                | Cheap Windows-runner parser insurance                          | cycle-1 advisory A3                          |
+| PLAN-EVAL cycle 2 not granted or launched                  | Coordinator must reconcile immutable repair head               | repair brief / harness gate                  |
 
 ## Drift
 
@@ -125,6 +139,7 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | -------------------------------------------------------------------------------------------------------- | --------------------- | ------------------ |
 | Mandatory audit proved the fmt analogue outside the original four-path envelope.                         | significant           | yes                |
 | Coordinator accepted the evidence-triggered six-path rescope; fmt is now first-class in-scope plan work. | significant / granted | yes                |
+| Cycle-1 `FAIL_PLAN` found three specification gaps without rejecting the design or widening scope.       | material / repair     | yes                |
 
 ## Gate results (planning phase only)
 
@@ -138,7 +153,9 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | Raw fmt completion                    | clean, dirty, dirty+clean, excluded+clean, all-excluded, write controls | SIGNAL PROVEN / DIFFERENT   | clean/write `Checked N`; dirty check `Found M … in N`; excluded loses count |
 | CLI JSR baseline                      | per-member audit `--text`                                               | PASS with baseline warnings | exit 0, dry run OK, 19 existing WARN findings                               |
 | Product/tool/config/workflow mutation | raw git status and diff paths                                           | PASS                        | none; only permitted harness artifacts changed                              |
-| PLAN-EVAL                             | fresh independent Tier-A session                                        | NOT_RUN / REQUIRED          | supervisor's next action on exact amended plan head                         |
+| PLAN-EVAL cycle 1                     | fresh independent Tier-A session / `59b79ccd8`                          | `FAIL_PLAN`                 | F1-F3 repaired in author artifacts; evaluator file preserved                |
+| Root drop-free evaluator baseline     | cycle-1 §7 batch-size-1 lint/fmt                                        | PASS baseline proof         | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0              |
+| PLAN-EVAL cycle 2                     | coordinator authorization required                                      | NOT_LAUNCHED / NOT_GRANTED  | author must stop after immutable repair head and PR record                  |
 
 Implementation gates are intentionally NOT_RUN. Disposable raw commands
 establish parser evidence; they are not implementation verdicts.
@@ -152,8 +169,13 @@ establish parser evidence; they are not implementation verdicts.
 - Confirm lint parser uses `Checked N`, while fmt check findings use final `N`
   from `Found M not formatted … in N`; fmt clean/write still use `Checked N`.
 - Confirm both wrappers pin mixed RED, 1/2/200 invariant, all-excluded, empty,
-  diagnostics-once, and inconsistent evidence.
+  diagnostics-once, crash+drop exact JSON/exit, and inconsistent evidence.
+- Confirm S3 adds the missing fmt runner seam in-file, with malformed-summary
+  and inconsistent-probe unit fixtures through it.
+- Confirm A1-A3 are folded: lint input omission, non-mutating fmt write probes,
+  and CRLF fixtures.
 - Confirm S4 and all publish/JSR claims are lint-only, generator-only, and
   idempotent.
 - Confirm no seventh path, new allowance, evaluator/runtime lease, or N/A gate
   is requested.
+- Cycle 2 is not launched by this author; coordinator reconciliation comes next.

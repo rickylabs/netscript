@@ -43,3 +43,33 @@ below.
   coordinator rescope.
 - **Evidence:** `research.md` findings 9-13, `plan.md` exact surface and ordered
   S1-S4, and amended worklog signal controls.
+
+## 2026-08-28 — PLAN-EVAL cycle 1 returns specification-gap `FAIL_PLAN`
+
+- **What:** Fresh Tier-A PLAN-EVAL at commit `59b79ccd8` against plan head
+  `d437db44d` returned `FAIL_PLAN` on the decisions-locked and open-decision
+  checklist boxes.
+- **Source:** Evaluator-owned `plan-eval.md` F1-F3 and repair brief
+  `1709-plan-repair.md`.
+- **Confirmed, not rejected:** adapter shapes, anti-inference rule, probe forms,
+  both wrapper refusals, root correction, `allowCount: 7`, lint-only publish
+  surface, generator idempotence, exact six-path ceiling, and no seventh path.
+- **F1 actual:** only lint has an injectable runner seam. Fmt's private
+  `runBatch` directly invokes Deno, so S3 must introduce an equivalent seam
+  inside `run-deno-fmt.ts` for malformed-summary/inconsistent-probe units.
+- **F2 actual:** Deno emits processed-count summaries on parse-error crash
+  batches, but the plan did not lock crash accounting or refusal-vs-crash
+  precedence.
+- **F3 actual:** default-batch green wording was weaker than evaluator §7's
+  per-file proof: corrected lint and root fmt are each `2041/2041/0`, exit 0
+  (fmt findings 0).
+- **Severity:** material specification repair; no architecture or scope change
+- **Action:** lock refusal ≥ crash ≥ ordinary finding; evaluate coverage on
+  crash batches; specify exact crash+drop/crash-only JSON and exit at 1/2/200;
+  add the fmt seam to S3; demand exit 0 and per-file root gates. Fold A1-A3:
+  lint input omission, fmt write `--check` probes, and CRLF fixtures.
+- **Bounds:** author-owned harness artifacts only. Preserve `plan-eval.md`; no
+  implementation, seventh path, central-state edit, evaluator/runtime lease, or
+  N/A gate request.
+- **Next:** commit/push immutable repaired head and update draft PR #1710. Cycle
+  2 is prepared externally but not granted or launched by this author.

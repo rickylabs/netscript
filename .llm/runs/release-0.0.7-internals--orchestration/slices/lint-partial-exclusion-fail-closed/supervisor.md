@@ -32,6 +32,9 @@ session against the committed plan head.
   `agent-tools.generated.ts`. No seventh path is authorized.
 - Product, tooling, configuration, workflow, lock, and generated-source mutation
   is prohibited.
-- PLAN-EVAL is selected and pending. Implementation is blocked until a separate
-  evaluator returns `PASS` and a later authorization starts the implementation
-  phase.
+- PLAN-EVAL cycle 1 returned `FAIL_PLAN` at evaluator commit `59b79ccd8`. This
+  turn is authorized only to repair author-owned plan artifacts; evaluator-owned
+  `plan-eval.md` is immutable.
+- Cycle 2 is not granted or launched by this author. Implementation remains
+  blocked until a later separate evaluator returns `PASS` and the coordinator
+  separately authorizes implementation.

@@ -32,3 +32,13 @@ _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
 - Fresh independent Tier-A PLAN-EVAL must run on the amended pushed head. This
   thread must not implement until PLAN-EVAL passes and the coordinator
   separately authorizes implementation.
+
+## Cycle-1 plan repair boundary
+
+- PLAN-EVAL cycle 1 returned `FAIL_PLAN` at evaluator commit `59b79ccd8` against
+  author plan head `d437db44d`; evaluator identity/history remain in immutable
+  `plan-eval.md`.
+- Coordinator steering resumed this same author thread for F1-F3 plan-artifact
+  repair only. All advisories A1-A3 are folded without source mutation.
+- Cycle 2 is not granted or launched here. The author stops after committing,
+  explicitly pushing, and recording the repaired PR head.

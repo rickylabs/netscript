@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
-| Phase          | amended `plan` → fresh independent `plan-eval` pending                             |
+| Phase          | cycle-1 `FAIL_PLAN` → authorized plan repair; cycle 2 not yet granted              |
 | Target         | Structured lint and fmt wrappers plus lint-driven CLI consumer embedding           |
 | Issue          | [#1709](https://github.com/rickylabs/netscript/issues/1709)                        |
 | Lane / wave    | internals / wave 3                                                                 |
@@ -73,18 +73,18 @@ metadata/comments; it performs no implementation.
 
 ## Locked Decisions
 
-| ID  | Decision                                                                                                                                                                                          | Rationale                                                                                                                                                                                  |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| D1  | Remove only `packages/mcp/tests/fixtures/doctor/` from the root lint task's wrapper `--exclude` as the first implementation slice.                                                                | Accepted sequencing requires the coverage correction before either stricter guard. Baseline proves `2037/35/0 → 2041/36/0`, still green.                                                   |
-| D2  | One selected-vs-processed identity rule applies to lint and fmt: complete coverage exists only when Deno's processed count equals the selected batch membership.                                  | Green has one meaning across both wrappers; batch construction cannot change the verdict.                                                                                                  |
-| D3  | Use separate ordered lint and fmt parser-adapter slices.                                                                                                                                          | Evidence proves the signals differ: lint always ends in `Checked N`; fmt check findings end in `Found M not formatted file(s) in N file(s)`. Merging adapters would assume false symmetry. |
-| D4  | Parse Deno's anchored terminal summaries as the primary processed-count proof; on a short count, use same-command/config per-file probes only to identify paths.                                  | Deno does not list all clean paths. Its count plus mismatch-only probes proves identity without duplicating diagnostics.                                                                   |
-| D5  | Missing, contradictory, overlarge, or unreconcilable ordinary-result coverage evidence refuses with exit 2. Recognized existing crashes remain non-zero with their existing diagnostic records.   | Output drift or races may never default to complete coverage; existing crash semantics must not be hidden or duplicated.                                                                   |
-| D6  | Coverage refusal takes precedence over ordinary rule/format findings, while the original batch remains the sole diagnostic source.                                                                | A mixed batch can contain both a real finding and a silently dropped file. Exit 2 signals gate-integrity failure without losing or repeating the finding.                                  |
-| D7  | Both reports gain the same additive top-level `coverage` object and the same finite refusal causes. Existing lint `selection`, fmt `summary`, diagnostic, and crash structures remain compatible. | One machine consumer must handle dropped-file refusal identically for both wrappers.                                                                                                       |
-| D8  | Apply the fmt coverage contract to check and write modes. Check findings use the fmt-specific `Found … in N` adapter; clean/write successes use `Checked N`.                                      | `run-deno-fmt.ts` exposes both modes, and raw controls prove both provide a trustworthy processed count.                                                                                   |
-| D9  | Regenerate assets only with `deno task gen:assets-barrel`; never hand-edit the generated file. The embedded lint text and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` delta are lint-driven only.           | The consumer manifest embeds lint but not fmt; canonical generation preserves embedded-text/hash integrity.                                                                                |
-| D10 | PLAN-EVAL is required and pending in a fresh independent Tier-A session on the amended plan head.                                                                                                 | The common contract, two parser adapters, ordering, and shipped lint asset warrant adversarial review; the author cannot self-evaluate.                                                    |
+| ID  | Decision                                                                                                                                                                                                                                                                                     | Rationale                                                                                                                                                                                                                               |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Remove only `packages/mcp/tests/fixtures/doctor/` from the root lint task's wrapper `--exclude` as the first implementation slice.                                                                                                                                                           | Accepted sequencing requires the coverage correction before either stricter guard. Baseline proves `2037/35/0 → 2041/36/0`, still green.                                                                                                |
+| D2  | One selected-vs-processed identity rule applies to lint and fmt: complete coverage exists only when Deno's processed count equals the selected batch membership.                                                                                                                             | Green has one meaning across both wrappers; batch construction cannot change the verdict.                                                                                                                                               |
+| D3  | Use separate ordered lint and fmt parser-adapter slices.                                                                                                                                                                                                                                     | Evidence proves the signals differ: lint always ends in `Checked N`; fmt check findings end in `Found M not formatted file(s) in N file(s)`. Merging adapters would assume false symmetry.                                              |
+| D4  | Parse Deno's anchored terminal summaries as the primary processed-count proof; on a short count, use same-config per-file probes only to identify paths. Lint reuses its existing injectable `BatchRunner`; S3 introduces an equivalent injectable runner seam locally in `run-deno-fmt.ts`. | Deno does not list all clean paths. Its count plus mismatch-only probes proves identity without duplicating diagnostics, and the new fmt seam makes malformed-summary/inconsistent-probe unit fixtures possible without a seventh file. |
+| D5  | Evaluate coverage on clean, ordinary-finding, and recognized crash batches. Missing, contradictory, overlarge, or unreconcilable completion evidence is a coverage refusal even when the batch also crashes.                                                                                 | Deno 2.9.5 still emits `Checked N` (lint) or `Found M … in N` (fmt) on parse-error batches, so their selected/processed identity is knowable and must participate in the invariant.                                                     |
+| D6  | Lock precedence as **coverage refusal ≥ crash ≥ ordinary finding**. Any refusal exits 2; otherwise any crash exits 1; otherwise any ordinary finding exits 1. The original batch remains the sole diagnostic source.                                                                         | A run may contain a drop and a parse-error crash. Coverage integrity wins, while existing crash/finding diagnostics still render once and coverage never copies their text.                                                             |
+| D7  | Both command-mode reports gain the same additive top-level `coverage` object and finite causes. Lint `--input` mode omits `coverage`, matching its existing omission of `selection`; existing diagnostic/crash structures remain compatible.                                                 | Saved lint logs do not carry a selected-file identity set. One command-mode consumer still handles dropped-file refusal identically for both wrappers.                                                                                  |
+| D8  | Apply fmt coverage to check and write modes. Original write batches use `Checked N`, but any mismatch probes run non-mutating `deno fmt --check` with the same cwd/config/path.                                                                                                              | `--check` probes classify processed versus dropped paths without a second mutating formatting pass; both accepted one-file completion forms are already part of the fmt adapter.                                                        |
+| D9  | Regenerate assets only with `deno task gen:assets-barrel`; never hand-edit the generated file. The embedded lint text and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` delta are lint-driven only.                                                                                                      | The consumer manifest embeds lint but not fmt; canonical generation preserves embedded-text/hash integrity.                                                                                                                             |
+| D10 | PLAN-EVAL cycle 1 returned `FAIL_PLAN` for specification gaps at evaluator commit `59b79ccd8`; this repair closes F1-F3 and folds A1-A3. Cycle 2 is not granted or launched by the author.                                                                                                   | Evaluator history is preserved in `plan-eval.md`; the coordinator reconciles the new immutable repair head before authorizing any fresh Tier-A evaluation.                                                                              |
 
 ## One selected-vs-processed identity contract
 
@@ -94,9 +94,9 @@ the identity rule, refusal causes, JSON shape, or exit semantics.
 
 ### Completion adapters
 
-For every nearest-config batch, keep the original Deno result, ANSI-strip
-combined output, and require exactly one admissible terminal completion summary
-for an otherwise clean/ordinary result:
+For every nearest-config batch, including a result that the existing diagnostic
+logic classifies as a crash, keep the original Deno result, ANSI-strip combined
+output, and require exactly one admissible terminal completion summary:
 
 - **Lint adapter:** anchored `^Checked (\d+) files?$` on clean and ordinary
   lint-finding results.
@@ -107,22 +107,26 @@ for an otherwise clean/ordinary result:
     second integer.
 
 The fmt adapter must not infer processed count from the number of `from <path>:`
-findings: that would omit clean peers. Parser tests pin singular/plural, clean,
-ordinary diagnostic, and ANSI forms.
+findings: that would omit clean peers and parse-error paths. Parser tests pin
+singular/plural, clean, ordinary diagnostic, parse-error, ANSI, and
+CRLF-terminated summary forms for both adapters.
 
 ### Identity proof and probes
 
 1. Compare the adapter's `processedCount` with `batch.files.length`.
 2. Equality verifies the batch. Sum verified counts into the run's
    `coverage.filesProcessed`.
-3. A smaller count triggers one-file classifications through the wrapper's
-   existing injectable process seam using the same executable, command/mode,
-   `cwd`, effective config, and explicit path:
+3. A smaller count triggers one-file classifications through an injectable
+   runner using the same executable, `cwd`, effective config, and explicit path.
+   Lint already has `BatchRunner`; S3 introduces the equivalent seam inside
+   `run-deno-fmt.ts` and routes both original batches and probes through it:
    - lint processed: `Checked 1 file` (including lint-finding output that
      terminates that way);
    - fmt processed in check mode: `Checked 1 file` or
      `Found 1 not formatted file in 1 file`;
-   - fmt processed in write mode: `Checked 1 file`;
+   - fmt processed after an original write batch: probe with non-mutating
+     `deno fmt --check`; accept `Checked 1 file` or
+     `Found 1 not formatted file in 1 file`;
    - either tool dropped: `No target files found.`.
 4. Classifications must reconcile exactly to the original processed count. Known
    dropped paths are normalized, sorted, and deduplicated. Unreconciled
@@ -134,6 +138,11 @@ ordinary diagnostic, and ANSI forms.
    processed+dropped mix is `partial-exclusion`. Unavailable/inconsistent
    evidence uses its corresponding cause. Cause and verdict therefore cannot
    change merely because a dropped path moved into its own child batch.
+7. Run the same coverage accounting on a recognized crash batch. Its completion
+   count contributes to `filesProcessed`; a short count is probed and reconciled
+   normally. Missing/invalid/inconsistent crash-batch evidence creates the same
+   typed coverage refusal and exit 2. Crash classification and rendering remain
+   in the existing failure path and occur once.
 
 Probe output is classification-only. It is never fed into lint occurrence
 parsing, fmt finding parsing, crash structures, JSON diagnostic arrays, or human
@@ -167,6 +176,9 @@ interface CoverageReport {
 
 - Fully covered runs emit `droppedFiles: []`, `refusals: []`, and exact
   `filesProcessed`.
+- Lint `--input`/saved-log mode omits the entire `coverage` property because it
+  has no wrapper selection to prove; its existing parse-only report is
+  unchanged.
 - Partial and all-excluded runs name every proven dropped path and the same
   cause strings in lint and fmt.
 - Empty selection emits `filesSelected: 0`, `filesProcessed: 0`, and
@@ -187,12 +199,57 @@ interface CoverageReport {
 
 ### Failure precedence
 
-| State                                                                  | Exit                             | Report behavior                                                                                |
-| ---------------------------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Complete coverage, no finding                                          | 0                                | Coverage counts equal; no refusals.                                                            |
-| Complete coverage, ordinary lint/fmt finding                           | 1                                | Original diagnostic once; no coverage refusal.                                                 |
-| Empty, all-excluded, partial-excluded, or unverifiable ordinary result | 2                                | Common coverage refusal plus any original finding once.                                        |
-| Recognized existing process/config/parse crash                         | existing non-zero crash behavior | Existing structured/human crash diagnostics remain; never green or duplicated as probe output. |
+Precedence is locked as **coverage refusal ≥ crash ≥ ordinary finding**.
+
+| State                                                           | Exit | Coverage and diagnostic behavior                                                                                                                                                       |
+| --------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Complete coverage, no finding                                   | 0    | Counts equal; `droppedFiles: []`; `refusals: []`.                                                                                                                                      |
+| Complete coverage, ordinary lint/fmt finding                    | 1    | Counts equal; original finding once; no refusal.                                                                                                                                       |
+| Complete coverage, recognized process/config/parse crash        | 1    | Crash-batch completion count is included; `droppedFiles: []`; `refusals: []`; existing crash diagnostics render once.                                                                  |
+| Empty, all-excluded, partial-excluded, or unverifiable coverage | 2    | Refusal wins even if another batch crashes or has findings; coverage holds only identities/counts/causes, while original crash/finding diagnostics render once through existing paths. |
+
+### Exact crash-plus-drop invariant
+
+For each wrapper, a disposable three-file selection contains `clean.ts`, a
+parse-error `syntax.ts`, and config-excluded `excluded/dropped.ts`. At batch
+sizes 1, 2, and 200 the exact expected command-mode outcome is exit 2 and:
+
+```json
+{
+  "coverage": {
+    "filesSelected": 3,
+    "filesProcessed": 2,
+    "droppedFiles": ["excluded/dropped.ts"],
+    "refusals": [
+      {
+        "cause": "partial-exclusion",
+        "filesSelected": 3,
+        "filesProcessed": 2,
+        "droppedFiles": ["excluded/dropped.ts"]
+      }
+    ]
+  }
+}
+```
+
+There is no `unverifiedFiles`. Lint's existing `failures` path and fmt's
+existing crash renderer each report the parse error exactly once at every batch
+size; `coverage` contains no crash text. Companion crash-without-drop selections
+contain `clean.ts` and `syntax.ts`; at 1, 2, and 200 they exit 1 with exactly:
+
+```json
+{
+  "coverage": {
+    "filesSelected": 2,
+    "filesProcessed": 2,
+    "droppedFiles": [],
+    "refusals": []
+  }
+}
+```
+
+Each companion control also renders one existing crash diagnostic and no crash
+text inside `coverage`.
 
 ## Persistent semantic controls
 
@@ -231,9 +288,11 @@ Create a disposable project with `fmt.exclude: ["generated/"]`:
   processed count.
 - Ordinary lint rule findings and fmt differences stay exit 1; original
   diagnostics occur once.
-- Existing crash-without-finding/occurrence behavior stays non-zero and
-  diagnostic.
-- Fmt write mode retains a verified `Checked N` count.
+- Existing crash-without-finding/occurrence behavior stays exit 1 when coverage
+  is complete and becomes exit 2 only when a coverage refusal is also present;
+  crash diagnostics remain once.
+- Fmt write mode retains a verified original `Checked N` count and uses
+  non-mutating `--check` mismatch probes.
 - No Deno lint/fmt rule, config allowance, inline ignore, or diagnostic parser
   is weakened.
 - `deno task quality:scan` must retain `--max-allow 7` and report
@@ -241,12 +300,12 @@ Create a disposable project with `fmt.exclude: ["generated/"]`:
 
 ## Ordered commit slices
 
-| #  | What the slice proves                                                                                                                                                                                                                         | Non-harness files                                                 | Proving gates for the slice                                                                                                                                                                                                                         |
-| -- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| S1 | Root coverage correction lands first: four healthy doctor files join root lint while the malformed marker-owned sibling remains hidden and lint stays green.                                                                                  | `deno.json`                                                       | Exact direct lint-wrapper before/after evidence `2037/35/0 → 2041/36/0`, exit 0; focused doctor-root selection proves exactly four healthy TS files and excludes broken; structured check of `deno.json`.                                           |
-| S2 | The common coverage contract is established through the lint adapter: mixed selection fails closed, verdict is batch-size invariant, JSON names dropped paths/cause without duplicate diagnostics, and lint refusals regressions stay closed. | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` | Focused structured test/check; raw lint completion fixtures; mixed RED at 1/2/200; all-excluded, empty, clean, finding, finding+drop, malformed-summary, inconsistent-probe, and crash controls; root lint stays green after S1.                    |
-| S3 | The fmt-specific completion adapter applies the same coverage contract: both clean/write `Checked N` and check-finding `Found … in N` forms are handled, with symmetrical causes and batch invariance.                                        | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   | Focused structured test/check; raw fmt completion fixtures; mixed RED at 1/2/200; all-excluded, empty, clean, dirty, dirty+drop, write-mode, malformed-summary, inconsistent-probe, crash controls; cross-wrapper coverage-schema/cause assertions. |
-| S4 | The published CLI consumer bundle contains the repaired lint wrapper text and refreshed hash through idempotent canonical generation only; fmt creates no publish delta or claim.                                                             | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         | `deno task gen:assets-barrel` only, twice; second run no diff; generated delta limited to this file; `deno task check:assets-barrel`; CLI publish dry run and per-member CLI JSR audit tied to lint.                                                |
+| #  | What the slice proves                                                                                                                                                                                                          | Non-harness files                                                 | Proving gates for the slice                                                                                                                                                                                                                                                                                                                                                              |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S1 | Root coverage correction lands first: four healthy doctor files join root lint while the malformed marker-owned sibling remains hidden and lint stays green.                                                                   | `deno.json`                                                       | Exact direct lint-wrapper before/after evidence `2037/35/0 → 2041/36/0`, exit 0; corrected root lint at `--batch-size 1` is `2041/2041/0`, exit 0, proving every selected path is accepted by Deno; focused doctor selection proves exactly four healthy TS files and excludes broken; structured check of `deno.json`.                                                                  |
+| S2 | The common coverage contract is established through the lint adapter: coverage is evaluated on crash batches, refusal ≥ crash ≥ finding, mixed/crash selections are batch invariant, and diagnostics remain single-sourced.    | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` | Focused structured test/check; LF/CRLF/ANSI lint summaries; mixed and exact crash-plus-drop controls at 1/2/200 with exit/JSON above; all-excluded, empty, `--input` omission, clean, finding, malformed-summary, inconsistent-probe, and crash-without-drop controls; corrected root lint `--batch-size 1` remains `2041/2041/0`, exit 0.                                               |
+| S3 | The fmt adapter applies the same contract and introduces an equivalent injectable runner seam inside `run-deno-fmt.ts`; original write coverage uses `Checked N`, while write-mode mismatch probes use non-mutating `--check`. | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   | Focused structured test/check; LF/CRLF/ANSI fmt summaries; mixed and exact crash-plus-drop controls at 1/2/200 with exit/JSON above; malformed-summary and inconsistent-probe unit fixtures through the new seam; all-excluded, empty, clean, dirty, write, crash-without-drop, and cross-wrapper cause/schema controls; root fmt `--batch-size 1` is `2041/2041/0`, findings 0, exit 0. |
+| S4 | The published CLI consumer bundle contains the repaired lint wrapper text and refreshed hash through idempotent canonical generation only; fmt creates no publish delta or claim.                                              | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         | `deno task gen:assets-barrel` only, twice; second run no diff; generated delta limited to this file; `deno task check:assets-barrel`; CLI publish dry run and per-member CLI JSR audit tied to lint.                                                                                                                                                                                     |
 
 Ordering is strict: S1 → S2 → S3 → S4. The parser evidence forces distinct S2/S3
 rather than a merged assumption of symmetry. S2 defines the common wire contract
@@ -258,52 +317,65 @@ coordinator separately authorizes implementation.
 
 ## Open-decision sweep
 
-| Decision                                                                                                                                                    | Status               | Notes                                                                             |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------- |
-| Six-path scope, ordering, common identity/JSON contract, two parser adapters, refusal precedence, persistent controls, asset/publish consequence, and gates | resolved now         | Locked above; none can be deferred without rework.                                |
-| Exact local helper/type/function names                                                                                                                      | safe to defer        | They cannot alter the locked wire contract or cause vocabulary.                   |
-| A shared seventh helper file                                                                                                                                | resolved: prohibited | The common contract is tested across local adapters inside the six-path envelope. |
+| Decision                                                                                                                                                    | Status                | Notes                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Six-path scope, ordering, common identity/JSON contract, two parser adapters, refusal precedence, persistent controls, asset/publish consequence, and gates | resolved now          | Locked above; none can be deferred without rework.                                                                                  |
+| Crash-vs-coverage precedence and crash-batch accounting                                                                                                     | resolved now          | Refusal ≥ crash ≥ finding; completion counts are evaluated on crash batches; exact 1/2/200 JSON and exit controls are locked above. |
+| Fmt injectable runner seam                                                                                                                                  | resolved now          | S3 introduces it inside `run-deno-fmt.ts`; no new module/path.                                                                      |
+| Lint `--input` coverage behavior (A1)                                                                                                                       | resolved now / folded | Omit `coverage`, matching parse-only `selection` omission.                                                                          |
+| Fmt write-mode probe command (A2)                                                                                                                           | resolved now / folded | Use non-mutating `deno fmt --check` for mismatch probes.                                                                            |
+| CRLF parser fixture (A3)                                                                                                                                    | resolved now / folded | Both lint and fmt parser suites pin CRLF-terminated summaries.                                                                      |
+| Exact local helper/type/function names                                                                                                                      | safe to defer         | They cannot alter the locked wire contract or cause vocabulary.                                                                     |
+| A shared seventh helper file                                                                                                                                | resolved: prohibited  | The common contract is tested across local adapters inside the six-path envelope.                                                   |
 
 ## Risk register
 
-| Risk                                                         | Mitigation                                                                                                                                                           |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Deno changes human completion text.                          | Anchored tool-specific adapters, persistent real-output fixtures, and fail-closed unavailable/inconsistent causes; never default missing output to full coverage.    |
-| Fmt findings are mistaken for processed identities.          | Parse terminal `Found M … in N files`, using final `N`; never count `from` blocks. Pin dirty+clean where `M != N`.                                                   |
-| Per-file probes duplicate lint/fmt diagnostics.              | Probes are classification-only; original batch alone feeds diagnostic parsers/renderers; assert single occurrence/finding in mixed controls.                         |
-| Batch/probe file or config race.                             | Require exact reconciliation; inconsistency exits 2 with unverified candidates rather than guessed identity.                                                         |
-| Common JSON semantics drift between local implementations.   | One contract/cause table in this plan plus cross-wrapper focused assertions; stop rather than add a seventh helper.                                                  |
-| New refusals red a legitimate root selection.                | Land S1 first, run root lint and fmt checks after relevant slices, and treat any drop as a coverage defect or explicit rescope—not an allowance.                     |
-| Fmt write mode is accidentally broken by check-only parsing. | Pin raw `Checked N` write-mode controls, including a rewritten file, and keep the adapter mode-aware.                                                                |
-| Generator changes unrelated output.                          | Capture state, invoke only `deno task gen:assets-barrel`, require the only generated delta to be `agent-tools.generated.ts`, run twice, and stop on any other delta. |
-| Publish claims incorrectly include fmt.                      | Tie S4, CLI dry run, JSR audit, embedded text, and hash only to lint; state explicitly that fmt is not in `consumer-tools.json`.                                     |
-| Audit exits 0 while warnings remain.                         | Record and compare the full 19-WARN CLI baseline; never report the audit as warning-free.                                                                            |
-| Severity is overstated as current CI exposure.               | Preserve the verified bound: current root CI lint selects packages/plugins only; risk remains wrapper/consumer correctness.                                          |
+| Risk                                                             | Mitigation                                                                                                                                                           |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deno changes human completion text.                              | Anchored tool-specific adapters, persistent real-output fixtures, and fail-closed unavailable/inconsistent causes; never default missing output to full coverage.    |
+| Fmt findings are mistaken for processed identities.              | Parse terminal `Found M … in N files`, using final `N`; never count `from` blocks. Pin dirty+clean where `M != N`.                                                   |
+| Per-file probes duplicate lint/fmt diagnostics.                  | Probes are classification-only; original batch alone feeds diagnostic parsers/renderers; assert single occurrence/finding in mixed controls.                         |
+| Batch/probe file or config race.                                 | Require exact reconciliation; inconsistency exits 2 with unverified candidates rather than guessed identity.                                                         |
+| Common JSON semantics drift between local implementations.       | One contract/cause table in this plan plus cross-wrapper focused assertions; stop rather than add a seventh helper.                                                  |
+| Fmt tests cannot inject malformed output or probe inconsistency. | S3 introduces a local injectable runner seam in `run-deno-fmt.ts`; unit fixtures use it without a seventh file.                                                      |
+| A crash hides a refusal or changes verdict with batching.        | Parse completion counts on crash batches, aggregate identities before precedence, and pin exact crash+drop/crash-only outcomes at 1/2/200.                           |
+| New refusals red a legitimate root selection.                    | Land S1 first, run root lint and fmt checks after relevant slices, and treat any drop as a coverage defect or explicit rescope—not an allowance.                     |
+| Fmt write mode is accidentally broken by check-only parsing.     | Pin raw `Checked N` write-mode controls, including a rewritten file, and keep the adapter mode-aware.                                                                |
+| Generator changes unrelated output.                              | Capture state, invoke only `deno task gen:assets-barrel`, require the only generated delta to be `agent-tools.generated.ts`, run twice, and stop on any other delta. |
+| Publish claims incorrectly include fmt.                          | Tie S4, CLI dry run, JSR audit, embedded text, and hash only to lint; state explicitly that fmt is not in `consumer-tools.json`.                                     |
+| Audit exits 0 while warnings remain.                             | Record and compare the full 19-WARN CLI baseline; never report the audit as warning-free.                                                                            |
+| Severity is overstated as current CI exposure.                   | Preserve the verified bound: current root CI lint selects packages/plugins only; risk remains wrapper/consumer correctness.                                          |
 
 ## Validation plan
 
-| Order | Gate                         | Command or check                                                                                                              | Expected result                                                                                                            |
-| ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| 1     | S1 root coverage             | Direct `.llm/tools/run-deno-lint.ts` command matching root `lint` after doctor term removal                                   | exit 0; `filesSelected: 2041`, `batches: 36`, `failedBatches: 0`; healthy +4 present, malformed sibling absent             |
-| 2     | Lint focused test            | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/run-deno-lint_test.ts` | structured exit 0; lint mixed RED and all identity/refusal controls pass                                                   |
-| 3     | Fmt focused test             | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/run-deno-fmt_test.ts`  | structured exit 0; both fmt summary forms, mixed RED, shared causes, and refusal controls pass                             |
-| 4     | Focused check                | `.llm/tools/run-deno-check.ts` over the four wrapper/test files with `--ext ts`                                               | structured exit 0; no seventh dependency                                                                                   |
-| 5     | Frozen `check`               | `deno task check`                                                                                                             | structured exit 0                                                                                                          |
-| 6     | Frozen `test`                | `deno task test`                                                                                                              | structured exit 0                                                                                                          |
-| 7     | Behavioral batch invariant   | Exact lint and fmt mixed selections at batch sizes 1, 2, 200                                                                  | both wrappers exit 2 at every size with identical per-tool dropped set and common `partial-exclusion` cause                |
-| 8     | Root wrapper behavior        | `deno task lint` and non-mutating `deno task fmt:check`                                                                       | root tasks remain non-zero only for real baseline/coverage state; no rule weakened                                         |
-| 9     | Frozen `quality-job`         | `deno task quality:scan` and `deno task arch:check`                                                                           | exit 0; `allowCount: 7`; no allowance/ignore added                                                                         |
-| 10    | Canonical regeneration       | `deno task gen:assets-barrel`, inspect name-only diff, run the same task again                                                | only `packages/cli/src/kernel/assets/agent-tools.generated.ts` changes; second run no delta; text/hash change is lint-only |
-| 11    | Frozen `check:assets-barrel` | `deno task check:assets-barrel`                                                                                               | exit 0                                                                                                                     |
-| 12    | Frozen CLI `publish-dry-run` | `deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish-dry-run.ts --root . --member packages/cli`    | exit 0; lint embedded text/hash included; no export/API change; no fmt publish claim                                       |
-| 13    | Per-member CLI JSR audit     | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`            | exit 0 and internal dry run OK; 19 existing WARN baseline disclosed; no new leaf warning                                   |
-| 14    | Scope/idempotence            | Raw `git diff --name-only cf648f1ff...HEAD` plus clean second generator state                                                 | product/tool/config/generated delta exactly the six authorized paths; no lock/cache/workflow churn                         |
+| Order | Gate                         | Command or check                                                                                                              | Expected result                                                                                                                                                                  |
+| ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | S1 root coverage             | Direct root lint wrapper after doctor term removal at default and `--batch-size 1`                                            | default exit 0 at `2041/36/0`; per-file exit 0 at `2041/2041/0`; healthy +4 present, malformed sibling absent                                                                    |
+| 2     | Lint focused test            | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/run-deno-lint_test.ts` | structured exit 0; exact mixed/crash 1/2/200 JSON, CRLF, `--input` omission, and refusal controls pass; per-file root lint remains `2041/2041/0`                                 |
+| 3     | Fmt focused test             | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/run-deno-fmt_test.ts`  | structured exit 0; new seam fixtures, exact mixed/crash 1/2/200 JSON, CRLF, non-mutating write probes, and refusal controls pass; per-file root fmt is `2041/2041/0`, findings 0 |
+| 4     | Focused check                | `.llm/tools/run-deno-check.ts` over the four wrapper/test files with `--ext ts`                                               | structured exit 0; no seventh dependency                                                                                                                                         |
+| 5     | Frozen `check`               | `deno task check`                                                                                                             | structured exit 0                                                                                                                                                                |
+| 6     | Frozen `test`                | `deno task test`                                                                                                              | structured exit 0                                                                                                                                                                |
+| 7     | Behavioral batch invariant   | Exact lint and fmt mixed selections at batch sizes 1, 2, 200                                                                  | both wrappers exit 2 at every size with identical per-tool dropped set and common `partial-exclusion` cause                                                                      |
+| 8     | Root wrapper behavior        | `deno task lint` and non-mutating `deno task fmt:check`                                                                       | exit 0 for both root tasks; no rule weakened                                                                                                                                     |
+| 9     | Frozen `quality-job`         | `deno task quality:scan` and `deno task arch:check`                                                                           | exit 0; `allowCount: 7`; no allowance/ignore added                                                                                                                               |
+| 10    | Canonical regeneration       | `deno task gen:assets-barrel`, inspect name-only diff, run the same task again                                                | only `packages/cli/src/kernel/assets/agent-tools.generated.ts` changes; second run no delta; text/hash change is lint-only                                                       |
+| 11    | Frozen `check:assets-barrel` | `deno task check:assets-barrel`                                                                                               | exit 0                                                                                                                                                                           |
+| 12    | Frozen CLI `publish-dry-run` | `deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish-dry-run.ts --root . --member packages/cli`    | exit 0; lint embedded text/hash included; no export/API change; no fmt publish claim                                                                                             |
+| 13    | Per-member CLI JSR audit     | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`            | exit 0 and internal dry run OK; 19 existing WARN baseline disclosed; no new leaf warning                                                                                         |
+| 14    | Scope/idempotence            | Raw `git diff --name-only cf648f1ff...HEAD` plus clean second generator state                                                 | product/tool/config/generated delta exactly the six authorized paths; no lock/cache/workflow churn                                                                               |
 
 The frozen proving-gate set is unchanged: `check`, `test`, `publish-dry-run`,
 `quality-job`, and `check:assets-barrel`. Focused wrapper controls are slice
 evidence, not a widened gate class. The CLI dry run and per-member JSR audit are
 lint-driven; fmt carries no publish gate claim. Dependency evidence is N/A
 because no dependency decision exists.
+
+Pre-implementation drop-free baseline is evaluator cycle 1 §7 at `59b79ccd8`:
+root lint `2037/35/0` exit 0; corrected lint `2041/36/0` exit 0; corrected lint
+at batch size 1 `2041/2041/0` exit 0; root fmt at batch size 1 `2041/2041/0`,
+findings 0, exit 0. Later slice evidence must reproduce these per-file rows
+rather than infer coverage from a default-batch green.
 
 ## Fitness and publish implications
 
@@ -331,8 +403,9 @@ gains a new finding, or the current CI-root/publish-consumer bound changes.
 
 ## PLAN-EVAL judgement and stop
 
-**Selected: REQUIRED; author judgement: PENDING INDEPENDENT REVIEW.** The
-milestone supervisor must perform a fresh independent Tier-A PLAN-EVAL on the
-exact committed/pushed amended plan head. This author does not create
-`plan-eval.md`, issue a verdict, request an evaluator/runtime lease, or begin
-implementation.
+**Cycle 1: `FAIL_PLAN` at evaluator commit `59b79ccd8`; repair authorized.**
+F1-F3 are addressed in author-owned artifacts and A1-A3 are all folded. Cycle 2
+is prepared externally but **not granted or launched** by this author. The
+coordinator first reconciles the exact committed/pushed repair head. This author
+does not edit `plan-eval.md`, issue an evaluator verdict, request an
+evaluator/runtime lease, or begin implementation.

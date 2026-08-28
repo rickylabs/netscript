@@ -40,6 +40,9 @@
 | 13 | Publish consequence is lint-only. The coordinator verified at exact base that `.llm/tools/consumer-tools.json` includes `run-deno-lint.ts` but not `run-deno-fmt.ts`; only lint changes the generated consumer-tool text/hash. The fmt repair has no barrel, bundle-hash, publish, or export claim of its own.                                                                                                  | Settled coordinator finding in the accepted rescope brief; do not re-derive.                                                |
 | 14 | Baseline per-member CLI JSR audit exits 0 and its internal dry-run is OK, but it reports 19 existing WARN findings (helper vocabulary, folder cardinality, and the known slow-types banner match).                                                                                                                                                                                                              | `audit-jsr-package.ts --root packages/cli --text`.                                                                          |
 | 15 | The CLI doctrine verdict is `Keep`; existing warnings/debt are baseline. The generated constant preserves the registry-safe embedded-asset design.                                                                                                                                                                                                                                                              | Doctrine verdict, debt registry, generated asset.                                                                           |
+| 16 | PLAN-EVAL cycle 1 confirmed only lint currently has an injectable runner seam (`BatchRunner`/`denoLintRunner`/optional `runner`). Fmt's private `runBatch` directly calls `Deno.Command`; S3 must introduce an equivalent local seam for malformed-summary and inconsistent-probe unit fixtures.                                                                                                                | Evaluator `plan-eval.md` F1 at commit `59b79ccd8`; wrapper lines cited there.                                               |
+| 17 | Deno emits processed-count summaries even on parse-error batches: lint parse-error + good ends `Checked 2 files`; fmt check parse-error + good ends `Found 1 not formatted file in 2 files`; both exit 1 through today's crash classification. Coverage can and must be evaluated before crash precedence.                                                                                                      | Evaluator re-derivation §§1, 3 and F2.                                                                                      |
+| 18 | Per-file evaluator controls prove the root selections are already drop-free: corrected lint is `2041/2041/0`, exit 0 at batch size 1; root fmt is `2041/2041/0`, findings 0, exit 0. These are stronger than default-batch `failedBatches: 0`.                                                                                                                                                                  | Evaluator `plan-eval.md` §7.                                                                                                |
 
 ## One selected-vs-processed identity contract
 
@@ -49,18 +52,21 @@ different notions of coverage.
 
 1. For each nearest-config batch, ANSI-strip the original Deno output and parse
    exactly one admissible completion summary:
-   - lint: anchored `Checked N file(s)` for clean and ordinary finding runs;
+   - lint: anchored `Checked N file(s)` for clean, finding, and parse-error
+     crash runs;
    - fmt clean/write success: anchored `Checked N file(s)`;
-   - fmt check with formatting findings: anchored
-     `error: Found M not formatted file(s) in N file(s)`, taking the final `N`
-     as processed.
+   - fmt check with formatting findings or parse-error crash classification:
+     anchored `error: Found M not formatted file(s) in N file(s)`, taking the
+     final `N` as processed.
 2. Compare Deno's `N` with the number of selected files handed to that batch.
    Equality proves coverage for the batch.
-3. If `N` is smaller, probe each selected member separately with the same Deno
-   executable, command mode, `cwd`, effective `--config`, and explicit path.
-   Lint accepts `Checked 1 file`; fmt accepts either `Checked 1 file` or the
-   singular dirty summary ending `in 1 file`; either wrapper treats
-   `No target files found.` as dropped.
+3. If `N` is smaller, probe each selected member through an injectable runner
+   with the same Deno executable, `cwd`, effective `--config`, and explicit
+   path. Lint reuses its existing seam. S3 introduces the missing equivalent
+   inside `run-deno-fmt.ts`. Lint accepts `Checked 1 file`; fmt probes accept
+   either `Checked 1 file` or the singular summary ending `in 1 file`; either
+   wrapper treats `No target files found.` as dropped. After an original fmt
+   write batch, probes deliberately use non-mutating `deno fmt --check`.
 4. Reconcile probe identities to the original processed count. Probes classify
    coverage only; their output never enters lint occurrence parsing, fmt finding
    parsing, crash rendering, or human diagnostics.
@@ -69,6 +75,10 @@ different notions of coverage.
    batches, derive the run-level cause from the selected set: zero selected is
    `empty-selection`; zero processed is `all-excluded`; any mix of processed and
    dropped is `partial-exclusion`. This keeps the cause independent of batching.
+6. Evaluate completion counts and mismatch probes on recognized crash batches as
+   well as clean/finding batches. Lock precedence as refusal ≥ crash ≥ ordinary
+   finding: any coverage refusal exits 2; a completely covered crash exits 1 and
+   retains its existing diagnostic once.
 
 The common machine shape is one top-level `coverage` object in both reports:
 
@@ -99,6 +109,9 @@ seventh shared source module is justified or authorized, so each wrapper uses a
 local adapter while focused tests assert identical keys and causes across both
 JSON reports.
 
+Lint `--input` mode omits `coverage` entirely because a saved log has no wrapper
+selection identity to prove; this matches its existing omission of `selection`.
+
 The batch-size invariant is semantic and run-level: for any positive batch size,
 an identical selected set must produce the same coverage exit, cause,
 processed/dropped identities, and diagnostic multiplicity. Persistent controls
@@ -107,19 +120,20 @@ exercise the boundary sizes 1, 2, and 200.
 ### Trust and failure modes
 
 - Trust comes from Deno's own terminal processed-count statement plus
-  same-command per-file classification only on mismatches, not from wrapper
-  enumeration.
+  same-config per-file classification only on mismatches, not from wrapper
+  enumeration. Fmt write-mode probes are non-mutating `--check` classifications.
 - Missing, duplicate, malformed, negative, overlarge, or mutually contradictory
-  completion summaries on a result otherwise classed as clean or an ordinary
-  finding refuse with exit 2.
+  completion summaries on a clean, finding, or crash batch refuse with exit 2.
 - A mismatch whose probes do not reconcile, an ambiguous probe, or a file/config
   race refuses with exit 2 and lists known dropped paths plus unreconciled
   candidates.
-- A recognized existing crash remains non-zero and keeps its existing diagnostic
-  record; it cannot become green. Coverage metadata must not duplicate crash
-  output.
+- A recognized existing crash participates in coverage accounting. Complete
+  coverage keeps exit 1; a simultaneous refusal wins with exit 2. Its existing
+  diagnostic renders once, and coverage metadata never copies crash output.
 - Original-batch diagnostics remain the only diagnostics. Probe output is never
   copied into JSON or stderr, so ordinary lint/fmt findings still appear once.
+- Parser fixtures pin LF and CRLF termination plus ANSI-wrapped fmt `error:`
+  prefixes.
 
 ## Persistent REDs and controls
 
@@ -157,9 +171,11 @@ In a disposable project with `fmt.exclude: ["generated/"]`:
   processed count.
 - Ordinary lint findings and ordinary fmt differences remain exit 1; their
   diagnostics appear once.
-- Existing crash handling remains non-zero and diagnostic.
+- Crash-only controls remain exit 1 with complete coverage; crash+drop controls
+  exit 2 with the same `partial-exclusion` JSON at batch sizes 1, 2, and 200;
+  diagnostics render once.
 - Fmt write mode continues to use Deno's `Checked N` summary and does not lose
-  coverage proof.
+  coverage proof; mismatch probes use non-mutating `--check`.
 - No Deno rule, formatter rule, inline ignore, or allowance is weakened.
   `quality:scan --max-allow 7` must still report `allowCount: 7`.
 
@@ -181,9 +197,9 @@ In a disposable project with `fmt.exclude: ["generated/"]`:
 
 ## Open questions
 
-- **Must resolve now:** none. Signals, shared coverage contract, exact six-path
-  envelope, ordering, refusal semantics, publish consequence, and gates are
-  locked.
+- **Must resolve now:** none after the cycle-1 repair. The missing fmt seam,
+  crash/coverage precedence, crash JSON controls, drop-free root proof, and
+  advisories A1-A3 are now locked.
 - **Safe to defer:** local helper/type names and exact internal parser function
   names. They do not change the common JSON/exit contract and can be reviewed
   during the later implementation phase.
