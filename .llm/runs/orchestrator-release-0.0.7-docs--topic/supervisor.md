@@ -329,3 +329,78 @@ fixes lane correctly refused on #1671's reference rows. No objection to #1691 fr
 coordinator as a **post-0.0.7 / Backlog** candidate — extend `AUTHORITATIVE_MAPPING` toward the
 remaining reference pages, or record deliberately which pages are out of scope and why. The
 coordinator decides whether it becomes an issue; this lane will not open one.
+
+## Reconciliation — live main `c73d361ee`, central `148d30026`, 2026-08-23
+
+Resumed at topic head `f836bdc96`. **Verified:** working tree clean; local `f836bdc96` **==** remote
+`refs/heads/orchestrator/release-0.0.7-docs`; **Docker zero containers**. Aspire holds no AppHost —
+the only `aspire` processes are three `aspire mcp start` instances, one bound to each live supervisor
+session (internals, fixes, docs), which are agent MCP tooling, not application runtime. No `dotnet`
+and no product `deno` processes. Consistent with the central checkpoint's "Docker has zero containers,
+Aspire reports `[]`". No runtime work started, no lease requested, no scope admitted.
+
+Main advanced `9634735bc` → `c73d361ee` by exactly two commits, **both already reviewed by this lane
+in-session**: `61bfd858d` (#1691, the one-file corpus regeneration — reviewed, no objection, kept at
+one file) and `c73d361ee` (#1692). Per the central record, #1671 was accidentally closed by a literal
+closing token in prerequisite prose and its bounded work continued as replacement PR #1692.
+
+### CORRECTION — a factually wrong statement in this lane's own pushed record
+
+Commit `2609a9d89` asserted: *"`provenance.json` carries no `comparisons/*` entries, but that is by
+design, not staleness."* **Both halves are wrong.**
+
+- On main at `9634735bc`, `provenance.json` carried **3** `comparisons/*` entries
+  (`sourceCommit 0d4c82d6e`). The "no entries" reading came from **this worktree's own copy**
+  (`sourceCommit 6f9620c0c`, 0 entries) — a parked checkpoint artifact then ~7 commits behind main.
+- "By design" was the wrong explanation. The comparison pages are corpus-**eligible** and were
+  present; they were never excluded. `c73d361ee`'s regeneration carries the same three entries.
+
+The *conclusion* (no alarm needed) was right, but it rested on a false fact, and a reader could take
+it as evidence the corpus deliberately excludes comparison pages — which would misinform any future
+coverage decision. Corrected here rather than left standing.
+
+**Root cause, and a rule this lane now owns: read main-state facts from main, never from this parked
+worktree.** Use `git show origin/main:<path>`. The topic worktree is a checkpoint, not a mirror of
+main — the same class of error as the context-pack staleness this lane already paid for, arriving
+through a different door. My "gate green on `729386c56` proves exclusion" inference was also invalid:
+a green freshness gate says the corpus matched at that build, not that a page is out of corpus.
+
+### All three #1671 findings closed out at the merged head
+
+- **Finding 1 (base predated the blocking `docs:exports-drift` step) — resolved.** #1692 shipped from
+  a current base; the central record has all 21 exact-head checks green at `686bae07b`.
+- **Finding 2 (reference/guide emphasis debt) — live on main, and tracked.** #1692 changed
+  `services-sdk/sdk.md` and `discover-services.md` but not `docs/site/reference/sdk/index.md`, exactly
+  as predicted. Tracked as **#1690** (`docs(reference/sdk): align error-handling emphasis between the
+  reference page and package JSDoc`), **Backlog / Triage**, `type:docs`/`p3` — *not* in the frozen
+  milestone. Re-verified at `c73d361ee` that **no row is false**: exported names `DefinedError`,
+  `SafeSuccess`, `SafeFailure`, `SafeResult`, `isDefinedError`, `safe` are all present on the page,
+  and `SafeResult` is still `SafeSuccess | SafeFailure` over tuple-and-object intersections, so rows
+  39/40/57/58/59/60 all hold. Emphasis debt only — the characterization after the fixes lane's
+  correction was right, and the original "two contradictory contracts" framing would have been wrong
+  about main too.
+- **Finding 3 (three unexported types in published signatures) — resolved, not shipped.** At
+  `c73d361ee`, `NarrowDefined`, `NonDefinedSafeFailure` and `DefinedSafeFailure` appear only at their
+  own definitions (`:43`, `:45`, `:57`) and in internal `as` casts inside function bodies (`:143`,
+  `:151`). Exported `SafeFailure` (`:67`) and `isDefinedError` (`:165`) now **inline** the structural
+  shapes instead of naming the aliases, so the published surface names no private type. The default
+  also moved `ThrowableError` → `Error`, whose consequence is recorded as #1693 (Backlog / Triage).
+
+The exposure route this lane argued against was not taken: the central record confirms the final
+architecture "does not transfer ContractBuilder, Schema, BaseContractErrors, public-barrel, metadata,
+or export-corpus ownership."
+
+### Lane rule 5 confirmed on a live case
+
+#1692's docs edit invalidated the derived layers and the PR regenerated all four in-slice:
+`prose.json.gz`, `provenance.json`, `packages/cli/.../agent-docs.generated.ts`,
+`packages/mcp/src/publish-assets.generated.ts`. Provenance moved `0d4c82d6e` → `587ade9f3`, version
+still `0.0.6` matching `packages/cli`. This is the lane's rule 5 firing exactly as written and it
+supports the recorded release-cut sequencing note: the prose regen must follow docs settling.
+
+### Standing
+
+The unpoliced-drift finding is unchanged — **8 of 36 package reference pages policed, 28 uncovered**,
+still a post-0.0.7 candidate, still filed by neither lane. Nothing was added to the frozen milestone:
+#1690 and #1693 are both Backlog / Triage. Lane remains **EXHAUSTED / PARKED** at allocation `[1551]`,
+attached with Remote Control, awaiting explicit coordinator instruction.
