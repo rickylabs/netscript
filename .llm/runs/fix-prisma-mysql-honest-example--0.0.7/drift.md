@@ -1,37 +1,41 @@
 # Drift Log: prisma-mysql-honest-example (#1112)
 
-Drift is append-only. No other lane's artifact was edited.
+No other lane's artifact was edited. This record incorporates the coordinator amendment in place as
+explicitly directed; it does not leave the superseded envelope as the current plan.
+
+## 2026-08-28 — Coordinator widened the product envelope 5 → 7
+
+- **What:** The coordinator added `packages/prisma-adapter-mysql/examples/basic-usage.ts` and
+  `packages/prisma-adapter-mysql/tests/connection_errors_test.ts` to the frozen product envelope.
+- **Source:** coordinator exact-main audit at `cf648f1ff973d74c213bb125a6f5f5b9328e693b`.
+- **Reason:** The checked-in example repeats the false Deno-driver story, comments out every Prisma
+  operation, substitutes a connected-adapter raw query, and manually disposes it. The existing
+  connection-error test already owns injected `FakePoolClient` cleanup behavior and is therefore the
+  non-duplicative home for mapping and successful-close evidence.
+- **Previous constraint:** The example and focused test were outside the authorized product set, so
+  acceptance rows 2 and 5 could not be completed honestly.
+- **Current constraint:** Exactly seven named product paths are authorized. An eighth product path
+  is still a hard rescope.
+- **Severity:** significant
+- **Action:** accepted and incorporated
+- **Evidence:** `research.md` rows 39-49; direct base example check selected 1 file with zero
+  diagnostics while Prisma code remained comments; focused base test passed 33/33 without mapping or
+  positive close-count assertions.
 
 ## 2026-08-28 — TLS identity mode is accepted but not implemented as named
 
-- **What:** `MySqlConnectionConfig.tls.mode` accepts `'verify_identity'`, but translation only adds
-  `ssl.ca` when custom CAs are non-empty and never sets mysql2 `ssl.verifyIdentity: true`.
+- **What:** `MySqlConnectionConfig.tls.mode` accepts `'verify_identity'`, but base translation only
+  adds `ssl.ca` when custom CAs are non-empty and never sets mysql2 `ssl.verifyIdentity: true`.
 - **Source:** `packages/prisma-adapter-mysql/src/types.ts:23-29`;
-  `packages/prisma-adapter-mysql/src/adapter.ts:725-743`; installed mysql2 3.22.5 `SslOptions`
-  declaration says `verifyIdentity` defaults false for backwards compatibility.
+  `packages/prisma-adapter-mysql/src/adapter.ts:725-743`; installed mysql2 3.22.5 `SslOptions`.
 - **Expected:** Every advertised option has observable behavior matching its name.
-- **Actual:** The mode name over-promises identity verification; without a non-empty CA list it is a
+- **Actual at base:** The mode over-promises identity verification; without non-empty CAs it is a
   silent no-op.
 - **Severity:** significant
-- **Action:** rescope
-- **Evidence:** `research.md` public option audit. Coordinator must authorize product correction or
-  removal/deprecation plus focused tests before implementation.
-
-## 2026-08-28 — Frozen path ceiling excludes required focused evidence
-
-- **What:** Acceptance row 5 requires a compiled full example and focused option-translation/
-  cleanup tests. Existing test files are outside the five-path ceiling.
-- **Source:** live #1112; `docs/site/reference/prisma-adapter-mysql/examples_test.ts:1-19`;
-  `packages/prisma-adapter-mysql/tests/connection_errors_test.ts`;
-  `adapter.ts:353-358,634-642,725-743`.
-- **Expected:** Focused tests run without live MySQL where seams exist.
-- **Actual:** Cleanup has constructor injection but lacks an exactly-once-close assertion.
-  Translation is private/hard-wired and has no injection/export seam. The current docs test checks
-  only factory construction.
-- **Severity:** significant
-- **Action:** rescope
-- **Evidence:** structured base check selected one docs test; package suite passed 46 tests without
-  option-translation coverage. Any changed test file would be a sixth product path.
+- **Action:** owned by amended plan
+- **Resolution design:** always set `verifyIdentity: true` for the mode; add joined `ca` only when
+  supplied; direct-test the pure translator through a source-only export.
+- **Boundary:** no public-barrel export and no runtime injection port.
 
 ## 2026-08-28 — Explicit artifact allowlist overrides harness supervisor bootstrap
 
@@ -43,5 +47,5 @@ Drift is append-only. No other lane's artifact was edited.
 - **Actual:** Creating it would violate the explicit turn contract.
 - **Severity:** significant
 - **Action:** accept
-- **Evidence:** this run directory contains exactly the five authorized artifacts. Evaluator routing
-  is stated in plan/worklog instead; this generator does not launch PLAN-EVAL.
+- **Evidence:** the run directory contains exactly the five authorized harness artifacts. Evaluator
+  routing is stated in plan/worklog instead; this generator does not launch PLAN-EVAL.
