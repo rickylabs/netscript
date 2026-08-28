@@ -143,3 +143,35 @@ explicitly directed; it does not leave the superseded envelope as the current pl
   planned.
 - **Stop line:** Fresh Tier-A must pass the pushed repair before any PLAN-EVAL cycle-2 grant or
   dispatch. No implementation is authorized.
+
+## 2026-08-28 — PLAN-EVAL cycle 2 rejected the unnecessary non-literal import
+
+- **What:** PLAN-EVAL cycle 2 evaluated plan head `da769cd7c8e0438f2317ed761ec10bce15692d03` as
+  terminal `FAIL_PLAN` on F1-b. The second repair's non-literal URL kept clean-root checking green
+  but made the generated `PrismaClient` and `prisma` `any` in the actual checked-in example.
+- **Source:** evaluator artifact commit `60cf79ee54ca17dfaa7d62c609290993040539f9`,
+  `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/plan-eval-cycle-2.md`, and public comment
+  `5454993523`; the supervisor independently reproduced the load-bearing behavior on Deno 2.9.5.
+- **Terminology correction:** The preceding Tier-A entry's “literal checked-in import” was a static
+  import. Static import with generated output absent produces `TS2307`. Literal _dynamic_
+  `await import('./.generated/client.ts')` is deferred to runtime and stays green when output is
+  absent.
+- **Measured correction:** With generated output absent, the ordinary root wrapper selected 12 files
+  with zero failures before generation and after cleanup. With the real Prisma 7.8 client present
+  under the scratch config, a deliberate assignment of `PrismaClient` to `number` produced `TS2322`,
+  proving the actual example retained the generated type rather than `any`. Passing the connected
+  adapter instead of the factory produced `TS2741`.
+- **Owner ruling:** Replace the non-literal URL with the literal dynamic import; gate 5 checks the
+  actual example under the scratch config, while the compatibility wrapper remains focused D17
+  evidence and the import-only smoke remains. Gate 1 continues to leave client values untyped while
+  output is absent and is undefined during the generated window.
+- **Advisories folded:** Owned example/README prose states that generated output needs
+  `@prisma/client` resolvable through the consumer import map or an `npm:` specifier. The smoke pins
+  `import.meta.main` as a precondition and requires `main()` invocation to stay exclusively inside
+  that guard.
+- **Architecture framing:** This is a temporary Prisma 7 correctness measure ahead of imminent
+  Prisma 8 and the Prisma-next database-layer rewrite. It adds no abstraction, architecture
+  commitment, runtime behavior, or product path.
+- **Scope/stop result:** Exactly five run artifacts are amended; `supervisor.md`, all seven product
+  paths, and `deno.lock` remain untouched. There is no cycle 3 or third evaluator. The generator
+  stops before fresh focused Tier-A and does not self-certify or implement.
