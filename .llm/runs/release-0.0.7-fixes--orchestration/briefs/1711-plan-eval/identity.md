@@ -24,3 +24,25 @@ Docker **0** containers, no runtime lease held by this lane.
 Observed route will be recorded below after launch, proven from process argv rather than from the
 session registry — the registry has been observed reporting `model: null` / `effort: null` while argv
 carried the correct flags, so argv is the authority here.
+
+## Observed route — after launch
+
+| Field | Value |
+| --- | --- |
+| Evaluator OS PID | `247931` |
+| Session id | `f3d30077-c9a7-4727-9d55-c391c1a08604` |
+| cwd | `/home/codex/repos/netscript-007-eval-1711` — the dedicated evaluator worktree |
+| Name | `NetScript 0.0.7 #1711 PLAN-EVAL c1` |
+| Observed argv | `--model claude-fable-5 --effort medium --remote-control --permission-mode bypassPermissions` |
+| Route verdict | **matched** — requested `claude-fable-5` · medium · Remote Control |
+| Brief delivery | verified **present in argv** as the positional prompt, not swallowed by a variadic flag |
+| providerEnv | launched with `OPENROUTER_API_KEY` and `OPENAI_API_KEY` unset — **empty**, no relay transport |
+
+Route was proven from `/proc/247931/cmdline`, **not** from the session registry. That distinction is
+load-bearing in this lane: the registry has been observed reporting `model: null` / `effort: null` while
+argv carried the correct flags, so a registry read alone would not have established the route.
+
+**Remote Control bridge: not yet attached at the time of this record.** `bridgeSessionId` is still
+`null` after ~30 s of polling. The `--remote-control` flag is present and proven in argv; the bridge
+session had not registered yet. This is reported as observed rather than assumed, and the bridge id and
+Remote Control URL are appended below once the bridge registers.
