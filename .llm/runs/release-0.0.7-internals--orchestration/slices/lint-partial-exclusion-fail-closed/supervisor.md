@@ -1,11 +1,12 @@
 # Leaf Author Identity — lint-partial-exclusion-fail-closed
 
-This file records the identity of the plan author session. The milestone supervisor remains the
-coordinator and will launch a fresh, separate PLAN-EVAL session against the committed plan head.
+This file records the identity of the plan author session. The milestone
+supervisor remains the coordinator and will launch a fresh, separate PLAN-EVAL
+session against the committed plan head.
 
 | Field    | Value                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Role     | Harness author for issue #1709; not evaluator or milestone supervisor                                                    |
+| Role     | Harness author for issue #1709 six-path rescope; not evaluator or milestone supervisor                                   |
 | Model    | Requested route: OpenAI Codex, `gpt-5.6-sol`, medium effort; exact model telemetry is not exposed inside the author turn |
 | Session  | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                                                                   |
 | Host     | WSL2 · Ubuntu 24.04 · user `codex` · Codex Desktop origin                                                                |
@@ -24,8 +25,13 @@ coordinator and will launch a fresh, separate PLAN-EVAL session against the comm
 
 ## Authorization boundary
 
-- This turn may create or update only the eight harness artifacts named in the brief and the draft
-  PR metadata/comments required by the harness.
-- Product, tooling, configuration, workflow, lock, and generated-source mutation is prohibited.
-- PLAN-EVAL is selected and pending. Implementation is blocked until a separate evaluator returns
-  `PASS` and a later authorization starts the implementation phase.
+- This turn may create or update only the eight harness artifacts named in the
+  brief and the draft PR metadata/comments required by the harness.
+- Coordinator rescope expands the later implementation plan to exactly six
+  non-harness paths: lint/fmt wrappers and tests, `deno.json`, and canonical
+  `agent-tools.generated.ts`. No seventh path is authorized.
+- Product, tooling, configuration, workflow, lock, and generated-source mutation
+  is prohibited.
+- PLAN-EVAL is selected and pending. Implementation is blocked until a separate
+  evaluator returns `PASS` and a later authorization starts the implementation
+  phase.

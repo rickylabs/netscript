@@ -1,4 +1,4 @@
-# Context Pack: #1709 lint partial-exclusion fail-closed
+# Context Pack: #1709 lint/fmt partial-exclusion fail-closed
 
 ## Run Metadata
 
@@ -6,80 +6,107 @@
 | -------------- | ---------------------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
-| Current phase  | `plan-eval` pending; implementation blocked                                        |
+| Current phase  | amended plan; fresh independent PLAN-EVAL pending; implementation blocked          |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
 | Thread         | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                             |
 | Baseline       | `cf648f1ff973d74c213bb125a6f5f5b9328e693b`                                         |
 
-## Current State
+## Current state
 
-Research and plan are complete under the plan-only authorization. No product/tool/config/workflow
-source has been changed. The selected repair parses Deno's own `Checked N file(s)` summary and uses
-same-config per-file probes only to identify a short batch's dropped paths; ambiguity fails closed.
-The root doctor task correction is S1, before guard tightening in S2. Canonical CLI asset generation
-is S3.
+The coordinator accepted the mandatory fmt audit's evidence-triggered rescope.
+The plan envelope is exactly six implementation paths: lint/fmt wrappers and
+focused tests, `deno.json`, and canonical lint-driven
+`agent-tools.generated.ts`. No repository source has been changed.
 
-PLAN-EVAL is required and not performed by the author. The supervisor must evaluate the exact
-committed/pushed plan head in a fresh Tier-A session before any implementation authorization.
+One common selected-vs-processed coverage contract applies to both reports. The
+adapters and later implementation slices are separate because the signals
+differ: lint clean/diagnostic runs terminate in `Checked N file(s)`; fmt check
+findings terminate in `Found M not formatted file(s) in N file(s)`, while fmt
+clean/write runs use `Checked N`. Both adapters feed identical `coverage` JSON
+keys and refusal causes. Mismatch-only per-file probes identify dropped paths
+and never supply diagnostics.
+
+PLAN-EVAL remains required and unperformed by the author. The supervisor must
+evaluate the exact committed/pushed amended plan head in a fresh Tier-A session
+before any later implementation authorization.
 
 ## Completed
 
-- Read the required skills, harness workflow/plan gate, Archetype 6, doctrine/JSR rubric, issue,
-  frozen leaf contract, and supervisor research.
-- Reproduced lint mixed-batch exit 0 versus batch-size-1 exit 2.
-- Reconfirmed root lint `2037/35/0 → 2041/36/0`, both exit 0.
-- Audited `run-deno-fmt.ts`; analogous defect proven and deferred behind explicit rescope.
-- Captured CLI per-member audit baseline: exit 0/dry-run OK, 19 existing WARN findings.
-- Locked signal, JSON/refusal semantics, semantic controls, three ordered slices, risks, and gates.
+- Re-read the accepted six-path rescope brief, required skills, harness
+  workflow, and plan gate.
+- Preserved the exact `cf648f1ff` re-baseline and prior lint/root-count
+  evidence.
+- Promoted the fmt defect from deferred escalation to first-class in-scope
+  research.
+- Proved raw fmt signal forms for clean, dirty, mixed included, partial
+  excluded, all-excluded, and write cases; established that lint/fmt adapters
+  differ.
+- Locked one coverage wire contract, common cause vocabulary, symmetrical
+  refusal output, diagnostics-once rule, and batch-size invariant across both
+  wrappers.
+- Ordered S1 doctor correction before separate S2 lint and S3 fmt guards,
+  followed by S4 lint-only canonical asset regeneration.
+- Kept the frozen proving-gate set and all explicit N/A surfaces unchanged.
 
-## In Progress
+## In progress
 
-- Independent Tier-A PLAN-EVAL handoff on the exact pushed plan head.
+- Commit/push/PR record for the amended plan, followed by independent PLAN-EVAL
+  handoff.
 
-## Next Steps
+## Next steps
 
-1. Supervisor runs fresh independent Tier-A PLAN-EVAL on the reported plan head.
-2. If and only if verdict is `PASS`, coordinator separately authorizes implementation.
-3. Later implement S1 → S2 → S3, each with gate evidence, supervisor review, commit, push, and PR
-   phase comment.
-4. Separately decide whether to rescope the format-wrapper defect; do not mix it into this leaf.
+1. Supervisor performs fresh independent Tier-A PLAN-EVAL on the reported
+   amended plan head.
+2. If and only if verdict is `PASS`, coordinator separately authorizes
+   implementation.
+3. Later implement S1 → S2 → S3 → S4, with named gates, supervisor review,
+   commit/push, and phase evidence per slice.
+4. Stop and rescope if any seventh implementation path becomes necessary.
 
-## Key Decisions
+## Key decisions
 
-| Decision                                                        | Source                            | Notes                                          |
-| --------------------------------------------------------------- | --------------------------------- | ---------------------------------------------- |
-| Any silently dropped selected lint file forces exit 2.          | frozen coordinator decision       | Report-only green rejected.                    |
-| `Checked N` + mismatch-only per-file probes establish identity. | `plan.md` D3-D5                   | Probe output never duplicates diagnostics.     |
-| Doctor task exclusion removed first.                            | frozen sequencing                 | Exact expected transition `2037 → 2041`.       |
-| Generated asset via canonical task only.                        | JSR/asset contract                | Embedded text/hash delta, no export/API delta. |
-| Fmt mutation deferred.                                          | frozen surface + research finding | Explicit rescope required.                     |
+| Decision                                                       | Source                | Notes                                                     |
+| -------------------------------------------------------------- | --------------------- | --------------------------------------------------------- |
+| Any silently dropped selected lint or fmt file forces exit 2.  | coordinator           | Report-only green rejected.                               |
+| One common coverage object/cause set applies to both wrappers. | amended plan          | Tool-specific adapters cannot redefine coverage.          |
+| Lint and fmt adapters/slices are separate and ordered.         | executed raw controls | Signals differ; evidence decides the split.               |
+| Doctor task exclusion is removed first.                        | frozen sequencing     | Expected `2037 → 2041`; malformed sibling remains hidden. |
+| Generated text/hash and publish gates are lint-only.           | settled rescope brief | Fmt absent from consumer manifest.                        |
+| Generated asset uses canonical task only.                      | asset contract        | Idempotent, one-file generated delta.                     |
 
-## Files Changed
+## Files changed
 
-Only permitted harness artifacts in this leaf run directory are changed in the planning phase. The
-planned later product surface is exactly the four paths listed in `plan.md`.
+Current turn: only permitted leaf harness artifacts. The later implementation
+surface is exactly the six paths listed in `plan.md`; no seventh path is
+authorized.
 
 ## Gates
 
-| Gate family        | Current status                         | Evidence                                                                       |
-| ------------------ | -------------------------------------- | ------------------------------------------------------------------------------ |
-| Plan gate          | READY FOR INDEPENDENT EVALUATION       | `research.md`, `plan.md`, `worklog.md` Design section                          |
-| Static / test      | NOT_RUN for implementation             | Planned commands locked; planning repros recorded separately                   |
-| Quality            | NOT_RUN for implementation             | Must retain `allowCount: 7`                                                    |
-| Consumer / publish | Baseline captured, after-state NOT_RUN | CLI audit baseline is 19 WARN findings; generated asset/member dry-run planned |
-| Runtime / E2E      | N/A                                    | Frozen contract explicitly excludes these surfaces                             |
+| Gate family                   | Current status                                              | Evidence / bound                                                         |
+| ----------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Plan gate                     | READY FOR FRESH INDEPENDENT EVALUATION after amendment push | `research.md`, `plan.md`, `worklog.md` Design section                    |
+| Frozen proving gates          | NOT_RUN for implementation                                  | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` |
+| Behavioral controls           | RED/signal baselines captured                               | lint+fmt mixed default vs batch-size-1; raw completion forms             |
+| Quality                       | NOT_RUN for implementation                                  | must retain `allowCount: 7`                                              |
+| Consumer/publish              | baseline captured; after-state NOT_RUN                      | lint-only CLI audit baseline 19 WARN; fmt no publish consequence         |
+| Runtime/E2E/docs-site/MCP JSR | N/A                                                         | explicitly excluded; no evaluator/runtime lease                          |
 
-## Open Questions
+## Open questions
 
-- Leaf: none.
-- Coordinator rescope outside leaf: whether to repair the proven format-wrapper analogue.
+- Must resolve now: none.
+- Safe to defer: local helper/type names only.
 
-## Drift and Debt
+## Drift and debt
 
-- Drift: significant fmt analogue recorded in `drift.md`; deferred, no mutation.
-- Debt: no new architecture debt planned; existing CLI warnings/doc debt remain baseline.
+- Drift: fmt analogue discovered under mandatory audit, then explicitly accepted
+  as a significant six-path rescope; both entries are append-only in `drift.md`.
+- Debt: no new architecture debt planned; existing CLI warnings/doc debt remain
+  baseline.
 
 ## Commits
 
-- See the draft PR's commit list and phase comments after push. No implementation commit exists.
+- Original four-path plan head: `f01c1fb593312926d24ad226c45a25f206d772db`.
+- Amended six-path plan head: pending commit/push in this turn.
+- Draft PR #1710 commit list and phase comments are the durable trail. No
+  implementation commit exists.

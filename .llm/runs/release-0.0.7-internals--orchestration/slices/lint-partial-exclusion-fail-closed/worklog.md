@@ -1,4 +1,4 @@
-# Worklog: #1709 lint partial-exclusion fail-closed
+# Worklog: #1709 lint/fmt partial-exclusion fail-closed
 
 ## Run Metadata
 
@@ -8,125 +8,152 @@
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
-| Authorization  | Research + plan only                                                               |
+| Authorization  | Research + amended plan only                                                       |
 
 ## Design
 
-Recorded before any implementation file is changed.
+Recorded before any implementation file is changed; amended after
+coordinator-approved six-path rescope and before PLAN-EVAL.
 
-### Public Surface
+### Public surface
 
-- No TypeScript export, CLI command, help text, or package entrypoint changes.
-- Shipped behavior surface: embedded `run-deno-lint.ts` consumer tool and
-  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` inside the generated CLI asset.
-- Machine contract: structured lint JSON gains processed-coverage/refusal data while retaining
-  existing diagnostic groups and failures.
+- No TypeScript export, CLI command, help text, package entrypoint, or version
+  changes.
+- Shipped behavior surface: embedded `run-deno-lint.ts` consumer text and
+  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` in the generated CLI asset.
+- Repository-tool behavior: both lint and fmt structured reports gain the same
+  additive top-level `coverage` contract. Fmt is not embedded and has no
+  publish/API consequence.
 
-### Domain Vocabulary
+### Domain vocabulary
 
-- `selected file` — a normalized file path the wrapper intentionally handed to Deno.
-- `processed file` — a selected path counted by Deno's `Checked N file(s)` summary.
-- `dropped file` — a selected path whose same-config explicit probe returns
-  `No target files found.`.
-- `coverage failure` — typed refusal metadata for partial exclusion or unverifiable/inconsistent
-  selected-vs-processed evidence.
-- `coverage refusal` — exit 2; it takes precedence over an ordinary lint-finding exit 1.
+- `selected file` — normalized path the wrapper intentionally hands to Deno.
+- `processed file` — selected path included in Deno's terminal processed count.
+- `dropped file` — selected path whose same-command/config explicit probe
+  returns `No target files found.`.
+- `completion adapter` — tool-specific parser that converts Deno's terminal
+  lint/fmt summary into a processed count; it does not define coverage
+  semantics.
+- `coverage refusal` — common typed metadata for empty, all-excluded,
+  partial-excluded, unavailable, or inconsistent identity proof; exit 2 for
+  ordinary-result coverage failures.
+- `diagnostic source` — original batch only. Probe output is never a diagnostic
+  source.
 
 ### Ports / seams
 
-- Existing injectable `BatchRunner` remains the Deno process seam and is reused for mismatch probes.
-  No new architecture port or adapter is justified.
-- Deno CLI output is the external protocol. The parser is fail-closed at the boundary.
+- Reuse each wrapper's existing process seam for original batches and mismatch
+  probes. No new architecture port or shared module is justified.
+- Deno CLI output is the external protocol. Lint and fmt have different adapters
+  feeding one fail-closed coverage contract.
 
 ### Constants
 
-- Existing `NO_TARGET_FILES_MESSAGE` remains the all-excluded/dropped marker.
-- Planned anchored checked-count pattern: `^Checked (\d+) files?$` after ANSI stripping.
-- Planned finite refusal causes: `partial-exclusion`, `coverage-summary-missing`,
-  `coverage-summary-invalid`, and `coverage-probe-inconsistent` (exact internal names may be refined
-  without changing semantics).
-- Exit codes: 0 complete+clean, 1 ordinary lint findings/crash semantics as already defined, 2
-  wrapper coverage/selection refusal.
+- Existing `NO_TARGET_FILES_MESSAGE` remains the dropped/all-excluded marker.
+- Lint processed summary: anchored `^Checked (\d+) files?$`.
+- Fmt processed summaries: the same clean/write form plus anchored
+  `^error: Found (\d+) not formatted files? in (\d+) files?$`, using final `N`.
+- Shared causes: `empty-selection`, `all-excluded`, `partial-exclusion`,
+  `processed-count-unavailable`, `processed-count-inconsistent`.
+- Exit meanings: 0 complete+clean, 1 complete+ordinary finding or existing
+  recognized crash behavior, 2 selection/coverage refusal.
 
 ### Archetype-6 checkpoint applicability
 
-- Five spine abstracts, layer-2 abstracts, vertical feature catalog, registries, ports, command
-  names, composition declarativity, and contributor flows for new CLI features are unchanged and
-  therefore N/A to this bounded tool/asset leaf.
-- Generated output impact is limited to one canonical embedded-tool constant.
-- Permission requirements do not change (`read` + `run` remain sufficient for the consumer tool).
-- Semantic test strategy uses temporary projects and exact JSON/exit assertions, not generated
+- CLI spine abstracts, registries, ports, command names, composition
+  declarativity, and contributor flows for new commands are unchanged and N/A to
+  this bounded tooling/asset leaf.
+- Generated impact is one canonical embedded-tool constant driven only by lint.
+- Permission requirements do not change (`read` + `run`; test fixtures also use
+  existing write).
+- Semantic tests use disposable projects and exact JSON/exit assertions, not
   barrel snapshots.
 
-### Commit Slices
+### Commit slices
 
-| #  | Slice                                                                                                               | Gate                                                                               | Files                                                             |
-| -- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| S1 | Restore four healthy doctor files to root lint selection before guard tightening.                                   | direct structured root lint proof `2041/36/0`, exit 0                              | `deno.json`                                                       |
-| S2 | Add selected-vs-processed proof, exact dropped-file refusal JSON, batch-size invariant, and must-not-regress tests. | focused structured test/check plus mixed 1/2/200 controls                          | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` |
-| S3 | Regenerate and prove the shipped consumer-tool asset and hash idempotently.                                         | generator twice, name-only delta, `check:assets-barrel`, member dry-run, CLI audit | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         |
+| #  | Slice                                                                                                                                        | Gate                                                                       | Files                                                             |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| S1 | Restore four healthy doctor files to root lint selection before either guard tightens.                                                       | direct structured `2037/35/0 → 2041/36/0`, exit 0; broken subtree absent   | `deno.json`                                                       |
+| S2 | Establish the common coverage contract through the lint completion adapter, refusal JSON, batch invariant, and lint regression controls.     | focused lint test/check; mixed 1/2/200; root lint                          | `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-lint_test.ts` |
+| S3 | Apply the same contract through fmt's distinct clean/write and finding completion adapters, including cross-wrapper cause/schema assertions. | focused fmt test/check; mixed 1/2/200; check/write and refusal controls    | `.llm/tools/run-deno-fmt.ts`, `.llm/tools/run-deno-fmt_test.ts`   |
+| S4 | Canonically regenerate and prove only the lint-driven consumer text/hash delta.                                                              | generator twice, name-only delta, `check:assets-barrel`, CLI dry run/audit | `packages/cli/src/kernel/assets/agent-tools.generated.ts`         |
 
-Every later implementation commit must also update this worklog/context pack, but those harness
-updates do not widen the frozen product file surface.
+Every later implementation commit must update this worklog/context pack, but
+those harness updates do not widen the exact six-path implementation surface.
 
-### Deferred Scope
+### Deferred scope
 
-- Analogous `run-deno-fmt.ts` defect — proven in research; explicit coordinator rescope required.
-- Existing CLI audit/doctrine warnings — baseline, unrelated.
-- Runtime/release/E2E surfaces — not applicable by frozen contract.
+- Any seventh shared coverage helper/module; cross-wrapper tests pin the common
+  local wire contract.
+- Existing CLI audit/doctrine warnings; baseline, unrelated.
+- Runtime/release/E2E surfaces and leases; explicitly N/A.
 
-### Contributor Path
+### Contributor path
 
-A future contributor changing lint coverage semantics starts at `runLint` and its focused test, uses
-the existing `BatchRunner` seam, validates normalized structured JSON with a temporary project, then
-runs canonical asset regeneration and CLI publishability gates. They do not edit the generated asset
-directly.
+A contributor starts with the common `coverage` wire contract in `plan.md`, then
+edits the relevant wrapper's batch runner and focused test. Lint parses terminal
+`Checked N`; fmt additionally parses terminal `Found M … in N`. Mismatch probes
+classify paths through the existing process seam, while the original batch alone
+supplies diagnostics. Only lint changes trigger canonical asset generation.
 
 ## Progress Log
 
-| Time (Europe/Zurich) | Phase     | Step              | Notes                                                                                               |
-| -------------------- | --------- | ----------------- | --------------------------------------------------------------------------------------------------- |
-| 2026-08-28           | bootstrap | identity/scope    | Exact base, branch, no-upstream rule, frozen contract, and author-only boundary verified.           |
-| 2026-08-28           | research  | lint re-baseline  | Mixed exit 0 vs batch-size-1 exit 2 reproduced; root counts `2037/35 → 2041/36`, both green.        |
-| 2026-08-28           | research  | fmt audit         | Analogous mixed-batch false green reproduced; recorded as significant rescope finding, no mutation. |
-| 2026-08-28           | research  | JSR baseline      | CLI audit exit 0/dry-run OK with 19 existing WARN findings; baseline retained honestly.             |
-| 2026-08-28           | plan      | design checkpoint | Signal, JSON/refusal contract, slices, risks, gates, deferrals, and PLAN-EVAL stop locked.          |
+| Time (Europe/Zurich) | Phase     | Step                   | Notes                                                                                                                                                  |
+| -------------------- | --------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-28           | bootstrap | identity/scope         | Exact base, branch, no-upstream rule, frozen contract, and author-only boundary verified.                                                              |
+| 2026-08-28           | research  | lint re-baseline       | Mixed exit 0 vs batch-size-1 exit 2 reproduced; root `2037/35 → 2041/36`, both green.                                                                  |
+| 2026-08-28           | research  | mandatory fmt audit    | Symmetric mixed false green reproduced with excluded/clean/included controls; no mutation.                                                             |
+| 2026-08-28           | plan      | original design        | Four-path lint plan authored, committed, pushed, and recorded on draft PR #1710.                                                                       |
+| 2026-08-28           | rescope   | coordinator acceptance | Evidence condition satisfied; exact envelope expanded to six paths by accepted brief.                                                                  |
+| 2026-08-28           | research  | fmt signal shape       | Raw controls prove clean/write use `Checked N`; check findings use `Found M … in N`; all-excluded has no completion line.                              |
+| 2026-08-28           | plan      | amended design         | One coverage contract, separate ordered lint/fmt adapters, symmetrical JSON causes, four slices, lint-only publish effect, and unchanged gates locked. |
 
 ## Decisions
 
-| Decision                                 | Reason                                                                               | Source                              |
-| ---------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------- |
-| Fail closed on any dropped selected path | Green must prove actual coverage                                                     | coordinator decision / issue #1709  |
-| Parse `Checked N`, probe only mismatch   | Deno count is authoritative; probes recover identities without duplicate diagnostics | re-baseline / plan D3-D4            |
-| S1 doctor correction before S2 guard     | Accepted sequencing and clean +4 proof                                               | frozen contract / executed baseline |
-| Do not touch fmt                         | Defect is outside exact four-path envelope                                           | brief / drift entry                 |
-| PLAN-EVAL required and pending           | Separate adversarial judgement needed; no self-evaluation                            | harness plan gate                   |
+| Decision                                                   | Reason                                             | Source                                       |
+| ---------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------- |
+| Fail closed on any dropped selected path in either wrapper | Green must prove actual coverage                   | coordinator / issue #1709 / accepted rescope |
+| One coverage/JSON contract, two parser adapters            | Semantics are shared, raw completion forms differ  | executed lint/fmt signal controls            |
+| Keep lint and fmt as separate ordered slices               | Parser difference is proven, not assumed           | research findings 4, 10-11                   |
+| S1 doctor correction precedes S2/S3                        | Accepted sequencing and clean +4 proof             | coordinator contract                         |
+| Publish and generated hash claims are lint-only            | Consumer manifest embeds lint, not fmt             | settled coordinator finding                  |
+| PLAN-EVAL required and pending                             | Separate adversarial judgement; no self-evaluation | harness plan gate                            |
 
 ## Drift
 
-| Drift                                                                                     | Severity    | Logged in drift.md |
-| ----------------------------------------------------------------------------------------- | ----------- | ------------------ |
-| Mandatory audit proves `run-deno-fmt.ts` has the analogous partial-exclusion false green. | significant | yes                |
+| Drift                                                                                                    | Severity              | Logged in drift.md |
+| -------------------------------------------------------------------------------------------------------- | --------------------- | ------------------ |
+| Mandatory audit proved the fmt analogue outside the original four-path envelope.                         | significant           | yes                |
+| Coordinator accepted the evidence-triggered six-path rescope; fmt is now first-class in-scope plan work. | significant / granted | yes                |
 
-## Gate Results (planning phase only)
+## Gate results (planning phase only)
 
-| Check                        | Command / evidence                          | Result                      | Notes                                                         |
-| ---------------------------- | ------------------------------------------- | --------------------------- | ------------------------------------------------------------- |
-| Exact base/branch            | raw git identity                            | PASS                        | `cf648f1ff`; correct branch; no upstream                      |
-| Current mixed lint           | two explicit files, default vs batch size 1 | RED reproduced              | exit 0 vs exit 2; planned test must turn the default case red |
-| Root doctor coverage         | direct wrapper commands                     | PASS baseline proof         | `2037/35/0` and `2041/36/0`, both exit 0                      |
-| Mandatory fmt audit          | temporary project mixed/split controls      | DEFECT / RESCOPE            | exit 0 vs exit 2; no fmt mutation authorized                  |
-| CLI JSR baseline             | per-member audit `--text`                   | PASS with baseline warnings | process exit 0, dry-run OK, 19 existing WARN findings         |
-| Product/tool source mutation | raw git status                              | PASS                        | none; only leaf harness directory is untracked/changed        |
-| PLAN-EVAL                    | separate Tier-A session                     | NOT_RUN / REQUIRED          | supervisor's next action on exact plan head                   |
+| Check                                 | Command / evidence                                                      | Result                      | Notes                                                                       |
+| ------------------------------------- | ----------------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------- |
+| Exact base/branch                     | raw git identity                                                        | PASS                        | `cf648f1ff`; correct branch; no upstream by design                          |
+| Current mixed lint                    | exact two files, default vs batch size 1                                | RED reproduced              | exit 0 vs exit 2                                                            |
+| Root doctor coverage                  | direct wrapper commands                                                 | PASS baseline proof         | `2037/35/0 → 2041/36/0`, both exit 0                                        |
+| Mixed fmt                             | disposable excluded+clean selection, default vs batch size 1            | RED reproduced / accepted   | exit 0 vs exit 2; included dirty control exits 1                            |
+| Raw lint completion                   | clean and ordinary diagnostic controls                                  | SIGNAL PROVEN               | both terminate in `Checked N file(s)`                                       |
+| Raw fmt completion                    | clean, dirty, dirty+clean, excluded+clean, all-excluded, write controls | SIGNAL PROVEN / DIFFERENT   | clean/write `Checked N`; dirty check `Found M … in N`; excluded loses count |
+| CLI JSR baseline                      | per-member audit `--text`                                               | PASS with baseline warnings | exit 0, dry run OK, 19 existing WARN findings                               |
+| Product/tool/config/workflow mutation | raw git status and diff paths                                           | PASS                        | none; only permitted harness artifacts changed                              |
+| PLAN-EVAL                             | fresh independent Tier-A session                                        | NOT_RUN / REQUIRED          | supervisor's next action on exact amended plan head                         |
 
-Implementation gates are intentionally NOT_RUN. A planning repro is evidence for the plan, not an
-implementation verdict.
+Implementation gates are intentionally NOT_RUN. Disposable raw commands
+establish parser evidence; they are not implementation verdicts.
 
-## Handoff Notes
+## Handoff notes
 
-- Evaluator should challenge the `Checked N` parser/probe reconciliation, coverage-exit precedence,
-  diagnostic single-sourcing, and batch-size invariant first.
-- Confirm S1 is independently committed before S2 and S3 is generator-only.
-- Confirm the format defect stays deferred absent explicit coordinator rescope.
-- Confirm the JSR plan reports the existing 19 warnings rather than flattening exit 0 to clean.
+- Challenge the one common coverage JSON/cause/exit contract before reviewing
+  adapter details.
+- Confirm S1 is independently landed before separate S2 lint and S3 fmt refusal
+  slices.
+- Confirm lint parser uses `Checked N`, while fmt check findings use final `N`
+  from `Found M not formatted … in N`; fmt clean/write still use `Checked N`.
+- Confirm both wrappers pin mixed RED, 1/2/200 invariant, all-excluded, empty,
+  diagnostics-once, and inconsistent evidence.
+- Confirm S4 and all publish/JSR claims are lint-only, generator-only, and
+  idempotent.
+- Confirm no seventh path, new allowance, evaluator/runtime lease, or N/A gate
+  is requested.
