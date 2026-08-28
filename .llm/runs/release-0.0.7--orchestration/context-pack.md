@@ -1011,3 +1011,24 @@ they are not runtime leaks. Eleven worktrees are registered because the two acti
 join the nine previously owned trees. Open follow-ups #1690 and #1693 remain outside accepted 0.0.7
 inventory. PR #1696's surface-diff skip is current release/label policy, with policy debt already in
 #309.
+
+## Resume checkpoint — 2026-08-28T11:38:11Z
+
+Central checkpoint `73f9b5aab` is authoritative on the remote branch. The apparently divergent
+`origin/...` value was a five-day-old local remote-tracking ref; authoritative `git ls-remote`
+returned `73f9b5aab`, and an explicit ref fetch reconciled the local tracking ref without changing
+any branch content.
+
+#1709 formal PLAN-EVAL cycle 1 is active on immutable plan head `d437db44d`. The fresh opposite-
+family evaluator is native Claude Fable 5/medium with Remote Control (`1b7a1305`, bridge
+`cse_012Nz3aE9mhoeyfaiGpKGvse`), dispatched from internals topic checkpoint `7c1646742`. Its exact
+batch-size-1 formatter probe passed 2041 selected files with zero findings; the 2037-file lint probe
+is still live and CPU-active, so it is not a stalled process. No implementation or runtime lease
+has been granted.
+
+#1112's same-author repair is complete and explicitly pushed. Final immutable plan head
+`069fd3e91` preserves the seven product paths, the source-only translation seam, and the bounded
+non-breaking TLS disposition. Fresh fixes Tier-A passed at topic checkpoint `2eeef41ab`. The one
+post-pass correction restored mandatory `supervisor.md` as a control-plane-only allowlist amendment;
+it did not expand product scope. #1112 is now ready for a fresh opposite-family formal PLAN-EVAL,
+independently of the active internals evaluation.

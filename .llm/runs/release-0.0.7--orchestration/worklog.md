@@ -1785,3 +1785,18 @@
   0.0.7 inventory or an active milestone leaf. Read-only PR #1696 audit confirmed its skipped
   surface-diff job follows the current release/label policy; backlog #309 already owns that policy
   debt, so no duplicate issue or silent milestone intake was created.
+- Reconciled the authoritative central remote after a stale local remote-tracking ref briefly
+  appeared divergent: `git ls-remote` proved the server was already at `73f9b5aab`, then an explicit
+  fetch updated only the tracking ref. No rebase, force push, or content replacement occurred.
+- #1709 formal PLAN-EVAL cycle 1 was dispatched through the preserved internals supervisor at topic
+  checkpoint `7c164674212eeaffcc1974c11bfeceeb3d7dc7dd`. The opposite-family evaluator is native Claude
+  Fable 5/medium with Remote Control, background job `1b7a1305`, session
+  `1b7a1305-a353-4c1d-a415-34ee8869ff6b`, and bridge `cse_012Nz3aE9mhoeyfaiGpKGvse` against
+  immutable source `d437db44d`. Its formatter batch-size-1 probe passed 2041/2041; the lint probe is
+  still actively processing 2037 files.
+- #1112's same-author D12 amendment reached repaired head `34a6e3d9897`; a mandatory-run-artifact
+  audit then found that `supervisor.md` had been omitted from the initial allowlist. The coordinator
+  denied a waiver. The same author restored exactly that one control-plane artifact, yielding final
+  clean/pushed plan head `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`; fresh fixes Tier-A passed
+  at `2eeef41ab381a612af0c6945054a628fa04e716b`. Product scope remains exactly seven paths and the
+  lane is ready for formal PLAN-EVAL.

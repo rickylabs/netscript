@@ -62,7 +62,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "ready_for_plan_eval",
+        "state": "plan_eval_active",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -75,8 +75,8 @@
         "pid": 11026,
         "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
-        "topicHeadSha": "7f252d44c82b7642957cde2a590e5329b968dd24",
-        "queueState": "1709_six_path_plan_tier_a_pass_ready_for_formal_plan_eval",
+        "topicHeadSha": "7c164674212eeaffcc1974c11bfeceeb3d7dc7dd",
+        "queueState": "1709_formal_plan_eval_cycle_1_active_on_d437db44d",
         "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
@@ -100,6 +100,18 @@
           "topicCheckpointSha": "d682db680b28f224fdc2761390b1d37f537d15be",
           "verdict": "NEEDS_SCOPE_DECISION",
           "coordinatorDisposition": "option_1_fail_closed_accepted_issue_1709_registered"
+        },
+        "latestPlanEvaluation": {
+          "state": "active",
+          "cycle": 1,
+          "sourceHead": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
+          "backgroundAgentId": "1b7a1305",
+          "sessionId": "1b7a1305-a353-4c1d-a415-34ee8869ff6b",
+          "bridgeSessionId": "cse_012Nz3aE9mhoeyfaiGpKGvse",
+          "route": "native claude-fable-5 / medium / Remote Control",
+          "topicDispatchCheckpointSha": "7c164674212eeaffcc1974c11bfeceeb3d7dc7dd",
+          "grantedAt": "2026-08-28T11:23:38.628Z",
+          "latestProgress": "fmt batch-size-1 exact coverage PASS for 2041 files; lint batch-size-1 exact coverage remains active"
         }
       },
       "issueNumbers": [
@@ -127,7 +139,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active_plan_repair",
+        "state": "ready_for_plan_eval",
         "worktree": "/home/codex/repos/netscript-007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -140,13 +152,20 @@
         "pid": 11903,
         "bridgeSessionId": "session_01Y1YKBnzUJVuXB5akcxeRT6",
         "remoteControlUrl": "https://claude.ai/code/session_01Y1YKBnzUJVuXB5akcxeRT6",
-        "topicHeadSha": "ca507dadc2fd081ed1dd4f49e510c00fa1e0487c",
-        "queueState": "1112_seven_path_plan_tier_a_pass_tls_d12_narrow_deprecation_amendment_active",
+        "topicHeadSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
+        "queueState": "1112_seven_path_repaired_plan_tier_a_pass_ready_for_formal_plan_eval",
         "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
-        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active",
+        "latestPlanReview": {
+          "state": "PASS",
+          "sourceHead": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+          "topicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
+          "review": "fresh fixes Tier-A after the non-breaking TLS amendment and mandatory supervisor.md restoration",
+          "nextGate": "fresh opposite-family formal PLAN-EVAL"
+        }
       },
       "issueNumbers": [
         1093,
@@ -510,9 +529,19 @@
       "planHeadSha": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "7f252d44c82b7642957cde2a590e5329b968dd24",
-      "planEvaluationState": "selected_ready_for_formal_dispatch",
+      "planEvaluationState": "active_cycle_1",
+      "planEvaluator": {
+        "state": "active",
+        "cycle": 1,
+        "sourceHead": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
+        "backgroundAgentId": "1b7a1305",
+        "sessionId": "1b7a1305-a353-4c1d-a415-34ee8869ff6b",
+        "bridgeSessionId": "cse_012Nz3aE9mhoeyfaiGpKGvse",
+        "route": "native claude-fable-5 / medium / Remote Control",
+        "grantedAt": "2026-08-28T11:23:38.628Z"
+      },
       "expensiveGateContract": "scaffold.runtime, Aspire, Docker, browser, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "fresh opposite-family formal PLAN-EVAL on immutable plan head d437db44d, then coordinator disposition before any implementation",
+      "nextGate": "formal PLAN-EVAL cycle 1 terminal verdict on immutable plan head d437db44d, then coordinator disposition before any implementation",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1709",
         "https://github.com/rickylabs/netscript/pull/1710"
@@ -523,8 +552,8 @@
       "lane": "fixes",
       "phase": "planned",
       "baseBranch": "main",
-      "headSha": "7a3639969ae8319d501244b6658ade303ac3392f",
-      "currentPrHeadSha": "7a3639969ae8319d501244b6658ade303ac3392f",
+      "headSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+      "currentPrHeadSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -533,12 +562,22 @@
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
       "implementationState": "not_started",
-      "planHeadSha": "7a3639969ae8319d501244b6658ade303ac3392f",
-      "tierAState": "PASS_WITH_COORDINATOR_SCOPE_RETURN",
-      "tierATopicCheckpointSha": "ca507dadc2fd081ed1dd4f49e510c00fa1e0487c",
-      "planEvaluationState": "blocked_pending_same_author_tls_deprecation_amendment_and_fresh_tier_a",
+      "planHeadSha": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+      "tierAState": "PASS",
+      "tierATopicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b",
+      "planEvaluationState": "selected_ready_for_formal_dispatch",
+      "planRepairHistory": {
+        "initialHead": "7a3639969ae8319d501244b6658ade303ac3392f",
+        "initialTierATopicCheckpointSha": "ca507dadc2fd081ed1dd4f49e510c00fa1e0487c",
+        "returnedFinding": "ungranted breaking D12 verify_identity runtime behavior flip",
+        "coordinatorDisposition": "non-breaking deprecation with exact legacy conditional mapping evidence; no runtime semantic change or new mode",
+        "repairedHead": "34a6e3d9897ec7fa872733b3e6a6ec7f99c944f3",
+        "finalHead": "069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a",
+        "finalControlPlaneCorrection": "mandatory supervisor.md restored as the sole allowlist amendment",
+        "finalTierATopicCheckpointSha": "2eeef41ab381a612af0c6945054a628fa04e716b"
+      },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "same-author plan-only D12 repair, explicit push and PR rewrite, then fresh fixes Tier-A before formal PLAN-EVAL",
+      "nextGate": "fresh opposite-family formal PLAN-EVAL on immutable repaired plan head 069fd3e91, then coordinator disposition before implementation",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -3371,6 +3410,27 @@
       "evaluatorCommitSha": "65c5e1ac47646328a54d553c838a9059928139c3",
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5384846259",
       "blockingFinding": "planned top-level exclude produces silent deno check coverage loss; use existing fmt.exclude instead and explicitly prove five-file check coverage"
+    },
+    {
+      "id": "lint-partial-exclusion-fail-closed-plan-eval-cycle-1",
+      "state": "active",
+      "lane": "internals",
+      "leafId": "lint-partial-exclusion-fail-closed",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "sourceHead": "d437db44d40d4dd3e7149ebf98187f3d3fcbb53c",
+      "evaluatorAgentId": "1b7a1305-a353-4c1d-a415-34ee8869ff6b",
+      "backgroundAgentId": "1b7a1305",
+      "bridgeSessionId": "cse_012Nz3aE9mhoeyfaiGpKGvse",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-28T11:23:38.628Z",
+      "evaluationFocus": "six-path lint/fmt fail-closed architecture, separate command signal adapters over one structured coverage contract, lint-only consumer publication, exact batch-size-1 coverage probes, no runtime mutation"
     }
   ],
   "expensiveGates": [
@@ -3669,5 +3729,5 @@
     "wslLoadAfterAuthorExit": "3.04 5.00 8.06",
     "verifiedAt": "2026-08-28T11:09:14.000Z"
   },
-  "updatedAt": "2026-08-28T11:15:19.000Z"
+  "updatedAt": "2026-08-28T11:38:11.000Z"
 }

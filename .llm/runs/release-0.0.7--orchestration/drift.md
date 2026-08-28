@@ -921,3 +921,14 @@ implementation thread.
   records discovered after #1692. Record them for continuity without adding them to the 0.0.7 DAG or
   dispatching a topic. Likewise, #1696's surface-diff skip follows current release/label policy and
   should not create duplicate debt while #309 remains open.
+- **Mandatory run artifacts belong in the initial allowlist:** #1112's repaired seven-product-path
+  plan passed its substantive review but omitted `supervisor.md`, which the harness requires for the
+  run. The correct response was a one-file control-plane amendment with preserved omission history,
+  not a waiver or an eighth product path.
+- **Text-search counts are discovery evidence, not semantic verdicts:** plan audits can count a
+  historical or explicitly negated phrase as if it were a live promise. Read the surrounding record
+  before returning scope; preserve real history rather than rewriting it to satisfy a raw grep.
+- **Exact batch-size-1 coverage is intentionally expensive and scratch-bound:** #1709's formal
+  evaluator enumerated thousands of one-file invocations to prove no selected file disappears. Run
+  that proof only in evaluator scratch, retain structured summaries, and never interpret its
+  sustained CPU use as an orphan while its owning job and progress records remain live.

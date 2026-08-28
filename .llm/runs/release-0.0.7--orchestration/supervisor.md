@@ -1087,3 +1087,18 @@ Docker and Aspire application inventories are empty after stabilization. Eight A
 are retained because they are owned by live supervisor/tool transports, not AppHost runtimes. One
 unused Aspire network and nine unlinked zero-byte volumes were removed. Coordinator stays Codex
 Desktop GPT-5.6-SOL/high, never max; all Claude Opus 5/high topic ownership remains unchanged.
+
+## Active queue — 2026-08-28T11:38:11Z
+
+Internals independently owns one active formal PLAN-EVAL. Cycle 1 for #1709 is evaluating immutable
+head `d437db44d` via native Claude Fable 5/medium Remote Control job `1b7a1305`; topic dispatch
+checkpoint is `7c1646742`. Exact formatter coverage passed 2041 files, while the exact lint
+batch-size-1 probe remains live across 2037 files. Do not grant implementation until its terminal
+verdict is reconciled centrally.
+
+Fixes is independently ready for formal PLAN-EVAL. #1112 final plan head `069fd3e91` and fixes
+checkpoint `2eeef41ab` are clean, explicitly pushed, and fresh Tier-A PASS after both the bounded TLS
+repair and mandatory `supervisor.md` restoration. Dispatch a fresh opposite-family evaluator; do not
+grant implementation, Aspire, Docker, browser, scaffold runtime, or e2e work before its terminal
+verdict. Docs remains parked. Features remains terminal at #1664 attempt 7, with #1293 row 1 still
+the sole owner-only wording boundary.
