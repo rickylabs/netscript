@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
 | Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
-| Current phase  | bounded implementation; S1 and S2 proven; S3 next                               |
+| Current phase  | bounded implementation; S1-S3 proven; S4 next                                    |
 | Archetype      | `6-cli-tooling`                                                                    |
 | Scope overlays | none                                                                               |
 | Author thread  | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                             |
@@ -67,20 +67,26 @@ implementation ceiling remains exactly six paths, with no seventh path.
   refusal ≥ crash ≥ finding. The focused suite is 14/14, the two-file check is
   green, and root lint proves `2041 selected / 2041 processed` at default and
   batch size 1.
+- Completed S3 with an equivalent injectable runner inside `run-deno-fmt.ts`.
+  Both original batches and probes use it; write mismatches probe through
+  non-mutating check mode. The three completion forms are mode-aware, coverage
+  JSON/precedence matches lint, the focused suite is 17/17, the two-file check
+  is green, and root fmt proves `2041 selected / 2041 processed` with zero
+  findings at default and batch size 1.
 
 ## Active slice boundary
 
-- S1 is pushed/commented. S2 is complete and recorded in the commit containing
-  this context pack. S3 may begin only after the S2 commit is explicitly pushed
-  and commented on draft PR #1710.
+- S1-S2 are pushed/commented. S3 is complete and recorded in the commit
+  containing this context pack. S4 may begin only after the S3 commit is
+  explicitly pushed and commented on draft PR #1710.
 
 ## Next steps
 
-1. Commit, explicitly push, and post S2 scope/hash/gate evidence to draft PR
+1. Commit, explicitly push, and post S3 scope/hash/gate evidence to draft PR
    #1710.
-2. Implement S3 only in the fmt wrapper and focused fmt test, including the
-   local runner seam, three completion forms, and check/write controls.
-3. Continue strict S4 ordering, then run all 14 rows at the final pushed
+2. Run S4 canonical lint-only asset regeneration twice; stop if any generated
+   path other than `agent-tools.generated.ts` changes.
+3. Then run all 14 rows at the final pushed
    head and hand off to separate-session IMPL-EVAL.
 4. Any seventh implementation path remains an immediate rescope stop.
 
@@ -109,6 +115,7 @@ implementation ceiling remains exactly six paths, with no seventh path.
 | Fresh plan Tier-A             | PASS at `fc00aed0f`                 | plan gate closed; coordinator implementation grant received              |
 | S1 root lint correction       | PASS                                | `2037/35/0 → 2041/36/0`; per-file `2041/2041/0`; doctor `4/4/0`; exit 0 |
 | S2 lint coverage contract     | PASS                                | focused 14/14; structured check; default/per-file root `2041 processed`; exact 1/2/200 controls |
+| S3 fmt coverage contract      | PASS                                | focused 17/17; structured check; default/per-file root `2041 processed`, zero findings; check/write controls |
 | Frozen proving gates          | NOT_RUN for implementation        | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` |
 | Root drop-free baseline       | PASS in evaluator scratch archive | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0           |
 | Quality                       | NOT_RUN for implementation        | `allowCount` must remain 7                                               |
@@ -138,4 +145,6 @@ implementation ceiling remains exactly six paths, with no seventh path.
 - S1 implementation: the commit containing this updated context pack; exact SHA
   is recorded by the draft PR commit and per-slice comment.
 - S2 implementation: the commit containing this updated context pack; exact SHA
+  is recorded by the draft PR commit and per-slice comment.
+- S3 implementation: the commit containing this updated context pack; exact SHA
   is recorded by the draft PR commit and per-slice comment.

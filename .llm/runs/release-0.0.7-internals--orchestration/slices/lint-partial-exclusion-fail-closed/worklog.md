@@ -127,6 +127,7 @@ supplies diagnostics. Only lint changes trigger canonical asset generation.
 | 2026-08-28           | plan-gate | fresh Tier-A             | Topic-supervisor independently returned `PASS` on exact plan head `fc00aed0f`; coordinator then granted bounded implementation. |
 | 2026-08-28           | implement | S1 doctor coverage       | Removed only the root lint task's obsolete doctor wrapper exclusion. Shipped `2037/35/0` and corrected `2041/36/0` both exit 0; corrected per-file proof is `2041/2041/0`, exit 0; focused doctor selection is exactly `4/4/0`. |
 | 2026-08-28           | implement | S2 lint fail-closed       | Added terminal `Checked N` coverage accounting, mismatch-only probes through the existing runner seam, shared coverage JSON, and refusal ≥ crash ≥ finding. Focused suite 14/14 and two-file structured check pass; root lint is `2041/2041` processed at default and batch size 1. |
+| 2026-08-28           | implement | S3 fmt fail-closed        | Introduced the local injectable fmt runner, three mode-aware completion forms, write-mode `--check` probes, and the same coverage contract/precedence. Focused suite 17/17 and two-file structured check pass; root fmt is `2041/2041` processed at default and batch size 1 with zero findings. |
 
 ## Decisions
 
@@ -188,6 +189,11 @@ the slice verdicts.
 | S2 | Corrected root lint at default batching | PASS — exit 0, `2041 selected / 2041 processed`, 36 batches, 0 failed, no refusals |
 | S2 | Corrected root lint at `--batch-size 1` | PASS — exit 0, `2041 selected / 2041 processed`, 2041 batches, 0 failed, no refusals |
 | S2 | Scope inspection | PASS — only lint wrapper/test plus leaf evidence after S1; no fmt/generated/evaluator/workflow path touched |
+| S3 | Focused fmt suite through `run-deno-test.ts` | PASS — 17/17; three completion forms and wrong-mode rejection, seam-based malformed/inconsistent controls, non-mutating write probes, mixed RED, check/write crash-only and crash+drop at 1/2/200, cross-wrapper keys/causes |
+| S3 | Structured check over fmt wrapper + test | PASS — 2 selected, 1 batch, 0 failed, 0 occurrences |
+| S3 | Root `fmt:check` at default batching | PASS — exit 0, `2041 selected / 2041 processed`, 36 batches, 0 failed, 0 findings |
+| S3 | Root fmt check at `--batch-size 1` | PASS — exit 0, `2041 selected / 2041 processed`, 2041 batches, 0 failed, 0 findings |
+| S3 | Scope inspection | PASS — only fmt wrapper/test plus leaf evidence after S2; lint/deno config unchanged in this slice; no generated/evaluator/workflow path touched |
 
 ## Post-slice reconcile notes
 
@@ -200,6 +206,10 @@ the slice verdicts.
   with exactly one `status:impl`; PR is open/draft at the pushed S1 head. The
   only new comment is the run-owned S1 record; no reviewer finding, issue-state
   change, or plan/drift readjustment appeared.
+- **S3:** Swept issue #1709 and draft PR #1710 after the gate. Issue remains
+  open with exactly one `status:impl`; PR remains open/draft at the pushed S2
+  head. The only new comment is the run-owned S2 record; no reviewer finding,
+  issue-state change, or plan/drift readjustment appeared.
 
 ## Handoff notes
 
@@ -221,6 +231,6 @@ the slice verdicts.
   idempotent.
 - Confirm no seventh path, new allowance, evaluator/runtime lease, or N/A gate
   is requested.
-- Plan gate is closed and bounded implementation is active. S1 and S2 are
-  proven; S3 is next. Formal IMPL-EVAL remains a separate later session after
-  the final push.
+- Plan gate is closed and bounded implementation is active. S1-S3 are proven;
+  S4 canonical regeneration is next. Formal IMPL-EVAL remains a separate later
+  session after the final push.
