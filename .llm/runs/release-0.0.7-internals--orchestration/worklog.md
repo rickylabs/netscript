@@ -1993,3 +1993,69 @@ The plan gate for #1709 is now closed out by Tier-A, since the ordinary PLAN-EVA
 and **no third cycle exists**. **Stopping for the coordinator's implementation grant.** No
 implementation performed or recommended; no merge; no runtime or evaluator lease; no change to any
 Claude topic ownership.
+
+## 2026-08-28 — #1709 bounded IMPLEMENTATION grant dispatched
+
+Coordinator recovery instruction received; internals topic ownership and per-orchestrator serial
+queue preserved unchanged.
+
+### Reconciliation before dispatch (all verified, not assumed)
+
+| Fact | Verified value |
+| --- | --- |
+| Topic checkpoint | `531a6dbe11905f9c534cfddb0d6835f6652e54f1` — local == `refs/heads/orchestrator/release-0.0.7-internals` on origin |
+| Leaf amended head | `fc00aed0f507ae2fac1d9ce03972a80d246b3611` — local == remote == PR #1710 `headRefOid` |
+| Leaf branch | `fix/lint-partial-exclusion-fail-closed`, tree clean |
+| PR #1710 | OPEN, draft, milestone `0.0.7`, labels `type:fix` `area:tooling` `status:plan` `ci:skip-e2e` `ci:skip-scaffold` |
+| Evaluator artifacts | `plan-eval.md` and `plan-eval-cycle-1.md` both present and untouched |
+| Canonical author | `01a047f0-f17e-7692-b6f0-83a6d22888c9`, gpt-5.6-sol/high, idle at dispatch, not frozen |
+
+No third PLAN-EVAL exists. The plan gate is closed by owner acceptance of F4 plus the fresh
+internals Tier-A PASS recorded at `531a6dbe1`.
+
+### Remote Control transport reconciliation
+
+`agentic:runtime doctor` reports overall `degraded` with two diagnostics: `probe_failed`
+(`codex-app-server` unavailable) and `mobile_disconnected`. Scoped repair was attempted as a dry
+run and **correctly refused**:
+
+```
+repair codex-remote --worktree /home/codex/repos/netscript-007-lint-fail-closed --dry-run
+{"status":"blocked","changed":false,"state":"absent",
+ "diagnostics":[{"code":"active_session","category":"safety",
+   "message":"Codex remote repair refused because active sessions or child commands were observed"}]}
+```
+
+Decision: **do not repair.** The guard fires because unrelated lanes hold live codex sessions;
+forcing the repair would restart a shared app-server and disturb lanes this topic does not own.
+What is degraded is *mobile visibility only* — the resume/exec transport is proven functional, both
+by other lanes executing turns and by this dispatch's own measured liveness below. Recorded as
+drift rather than silently repaired. Escalate to the coordinator if mobile visibility becomes a
+required condition for this leaf.
+
+### Dispatch
+
+Brief `.llm/runs/release-0.0.7-internals--orchestration/briefs/1709-implementation.md` (103 lines)
+delivered to the same canonical author thread via `agentic:codex-resume --message-file`, dry-run
+verified first (6000 bytes, quoting intact), then launched detached with `nohup … & disown` — never
+a harness background task, which SIGTERMs an attached resume on stop.
+
+Granted: strict S1 → S2 → S3 → S4 under the locked six-path envelope and the F4-amended
+three-form fmt adapter. Required of the author: atomic clean explicit-refspec push;
+**receipts produced at the final pushed head, not at an intermediate slice commit**; honest drift
+on the plan's named stop conditions; exact 40-char SHA in the handoff. Withheld: merge, readiness
+flip, issue closure, runtime lease, publish, self-certification. `scaffold.runtime`, `e2e:cli`,
+Aspire, Docker, and browser remain coordinator-waived N/A.
+
+### Liveness proof
+
+Rollout `…01a047f0….jsonl` baseline mtime `1787934419` / 3 520 832 B. Six 12 s samples after
+launch advanced monotonically to `1787947646` / 3 690 070 B (+169 KB in 72 s); pid `14560` attached
+with the full brief. The thread is working, not idle-launched.
+
+### Next gate
+
+Formal separate-session **IMPL-EVAL** on the author's exact pushed head — required here because
+this is a critical fail-closed tooling contract, not a mechanical leaf. Owner policy applies: after
+**two consecutive terminal IMPL-EVAL failures**, release the evaluator immediately, keep the author
+available, and surface the exact decision to the coordinator — no cycle 3, no frozen author.

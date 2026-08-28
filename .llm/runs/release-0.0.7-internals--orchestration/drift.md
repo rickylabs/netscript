@@ -248,3 +248,16 @@ artifacts.
 - **0 Docker containers**; no Aspire application process started by this lane; no runtime lease taken
   at any point in this leaf.
 - Canonical author `01a047f0-…` idle and **available, not frozen**.
+
+## 2026-08-28 — codex-app-server unavailable; mobile visibility degraded for #1709 implementation
+
+`agentic:runtime doctor` = `degraded`; `codex-app-server` `unavailable`; `capabilities.codex`
+`blocked`; diagnostics `probe_failed` + `mobile_disconnected`. Scoped `repair codex-remote`
+dry-run returned `status: blocked` / `active_session` because other lanes hold live codex sessions.
+
+Not repaired, deliberately: the repair would restart a shared app-server and disturb lanes outside
+this topic's ownership. Resume/exec transport is unaffected and was proven live by advancing
+rollout mtime across six samples immediately after dispatch. The #1709 implementation slice
+therefore runs with **degraded mobile visibility**; supervisor observation is via rollout mtime and
+`codex-status` instead. Coordinator decision needed only if mobile visibility is a hard condition
+for this leaf.
