@@ -46,3 +46,30 @@ argv carried the correct flags, so a registry read alone would not have establis
 `null` after ~30 s of polling. The `--remote-control` flag is present and proven in argv; the bridge
 session had not registered yet. This is reported as observed rather than assumed, and the bridge id and
 Remote Control URL are appended below once the bridge registers.
+
+## Attempt 1 — INTERRUPTED, no verdict produced
+
+The Remote Control bridge never registered. `bridgeSessionId` stayed `null` past two minutes, so the
+mandatory attachment gate was **not** satisfied. The `--remote-control` argv flag alone does not
+satisfy it — that was this topic's error in treating a proven flag as proven attachment.
+
+**Root cause:** attempt 1 was launched with a raw `nohup claude …`. That starts a session but does
+**not** register a background job, which is what produces the job id, bridge session id, and Remote
+Control URL. `.agents/skills/claude-manager/SKILL.md:36` specifies `claude --bg` for non-blocking
+launches, and `:49-50` requires "the launcher's registry evidence (matching PID and cwd plus a
+non-empty `bridgeSessionId`) before claiming attachment". The nohup route cannot produce that evidence.
+
+**Verified before stopping — no work was lost:**
+
+| Check | Result |
+| --- | --- |
+| PID `247931` identity | argv and `--name` matched the #1711 evaluator exactly; parent `247929` was this topic's own wrapper |
+| Verdict artifact | **none** — `plan-eval.md` absent from the evaluator worktree |
+| Worktree state | **clean** at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`, nothing written or committed |
+| PR #1711 comments | **zero** — nothing posted |
+
+Stopped exactly `247931` and its exact wrapper `247929`, plus this topic's own stale bridge-watcher
+`250224`. Confirmed no other `#1711 PLAN-EVAL` process survives, so two evaluators never coexisted.
+
+The pre-launch identity and brief commits are **preserved unchanged**; this section is appended, not
+substituted. The immutable plan head is untouched.
