@@ -39,6 +39,8 @@ export const GUIDANCE_RANKING_POLICY: GuidanceRankingPolicy = Object.freeze({
   exactPhraseBoost: 10,
   conceptBoost: 8,
   linkBoost: 2,
+  // Tuned from observed headroom, not derived from the score scale: the measured candidate gap was
+  // ≈0.3019801982 (≈0.1980198018 headroom), while regeneration moved scores by ≈0.0748587452.
   closeScoreGap: 0.5,
   graphDepth: 1,
 });
