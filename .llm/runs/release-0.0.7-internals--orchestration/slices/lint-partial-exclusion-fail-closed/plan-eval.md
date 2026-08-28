@@ -1,265 +1,193 @@
 # PLAN-EVAL — release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed
 
-- Plan evaluator session: `1b7a1305-a353-4c1d-a415-34ee8869ff6b` / 2026-08-28
+- Plan evaluator session: `14cfb576-de3f-40a5-b23a-d9e8e8d018e4` / 2026-08-28
 - Run: `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed`
 - Surface / archetype: `.llm/tools` lint/fmt wrappers + lint-driven CLI consumer asset /
   `6-cli-tooling`
 - Scope overlays: none
-- **Cycle: 1 of the ordinary two**
+- **Cycle: 2 of the ordinary 2** (cycle 1 = `FAIL_PLAN` at `59b79ccd8`, preserved bit-identical in
+  `plan-eval-cycle-1.md`)
 
 ## Identity, route, family, independence
 
-| Field                    | Observed                                                                                                                                                   |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Session id               | `1b7a1305-a353-4c1d-a415-34ee8869ff6b` (`CLAUDE_CODE_SESSION_ID`; job `state.json` `sessionId` identical)                                                  |
-| bridgeSessionId          | `cse_012Nz3aE9mhoeyfaiGpKGvse` (non-empty; env `CLAUDE_CODE_BRIDGE_SESSION_ID=session_012Nz3aE9mhoeyfaiGpKGvse`)                                           |
-| Job `state.json` backend | `daemon`; `template: bg`                                                                                                                                   |
-| respawnFlags             | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1709 PLAN-EVAL" --model claude-fable-5`                     |
-| providerEnv              | `{}` — native Anthropic, no gateway                                                                                                                        |
-| cwd                      | `/home/codex/repos/netscript-007-lint-fail-closed`                                                                                                         |
-| CLI version              | Claude Code `2.1.250`; Deno `2.9.5 (stable, x86_64-unknown-linux-gnu)`                                                                                     |
-| Requested route          | `formal_plan_evaluation` for a Codex GPT-5.6 Sol plan → native Claude · Anthropic · Fable 5 · medium · remote-control (`lane-policy.md` "Local PLAN-EVAL") |
-| Observed route           | model `claude-fable-5`, effort `medium`, `--remote-control`, `providerEnv {}` → **requested == observed**                                                  |
-| Family vs author         | Author = OpenAI Codex `gpt-5.6-sol` (`supervisor.md`, `codex-thread-ids.md`) → evaluator Anthropic family is **opposite**                                  |
-| Independence             | Fresh bg Claude job; not thread `01a047f0-f17e-7692-b6f0-83a6d22888c9` (Codex author) nor `f7691917-0be2-4bcd-8839-43d3fc809c34` (topic supervisor)        |
+| Field                    | Observed                                                                                                                                                                                                       |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Session id               | `14cfb576-de3f-40a5-b23a-d9e8e8d018e4` (`CLAUDE_CODE_SESSION_ID`; job dir `/home/codex/.claude/jobs/14cfb576`)                                                                                                |
+| bridgeSessionId          | `session_012pKzuP1udDquhyyjdGBeG6` (non-empty; `CLAUDE_CODE_BRIDGE_SESSION_ID`)                                                                                                                                |
+| Job `state.json` backend | `daemon`; `template: bg`                                                                                                                                                                                       |
+| respawnFlags             | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1709 PLAN-EVAL c2" --model claude-fable-5`                                                                     |
+| providerEnv              | `{}` — native Anthropic, no gateway                                                                                                                                                                            |
+| cwd                      | `/home/codex/repos/netscript-007-lint-fail-closed`                                                                                                                                                             |
+| CLI version              | Claude Code `2.1.250`; Deno `2.9.5 (stable, x86_64-unknown-linux-gnu)`                                                                                                                                         |
+| Requested route          | `formal_plan_evaluation` for a Codex GPT-5.6 Sol plan → native Claude · Anthropic · Fable 5 · medium · remote-control (`lane-policy.md` "Local PLAN-EVAL"; brief `1709-plan-eval-cycle2.md`)                    |
+| Observed route           | model `claude-fable-5`, effort `medium`, `--remote-control`, `providerEnv {}` → **requested == observed**                                                                                                      |
+| Family vs author         | Author = OpenAI Codex `gpt-5.6-sol` (`supervisor.md`, `codex-thread-ids.md`) → evaluator Anthropic family is **opposite**                                                                                      |
+| Independence             | Fresh bg Claude job. Not the Codex author `01a047f0-f17e-7692-b6f0-83a6d22888c9`, not the topic supervisor `f7691917-0be2-4bcd-8839-43d3fc809c34`, not the cycle-1 evaluator `1b7a1305-a353-4c1d-a415-34ee8869ff6b` |
 
 ## Target verification (before any evaluation)
 
-- Local `HEAD` = `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c`.
-- `git ls-remote origin refs/heads/fix/lint-partial-exclusion-fail-closed` =
-  `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c`.
-- PR #1710 `headRefOid` = `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c`, `isDraft: true`, base `main`,
-  labels `type:fix area:tooling status:plan ci:skip-e2e ci:skip-scaffold`.
-- `git diff --stat cf648f1ff…d437db44d -- . ':!.llm/runs'` → empty (plan-only leaf confirmed).
+- Local `HEAD` = `3e934e2de1ed758f7182ad1eebf027750bcfb976`, branch
+  `fix/lint-partial-exclusion-fail-closed`, no upstream (by design).
+- `git ls-remote origin refs/heads/fix/lint-partial-exclusion-fail-closed` = `3e934e2de…`.
+- PR #1710 `headRefOid` = `3e934e2de…`, `isDraft: true`, base `main`, milestone `0.0.7`, labels
+  `type:fix area:tooling status:plan ci:skip-e2e ci:skip-scaffold`.
+- `git diff --stat cf648f1ff…3e934e2de -- . ':!.llm/runs'` → empty (plan-only leaf confirmed);
   `git status --short` empty at start.
-- All reproductions ran on a `git archive d437db44d` copy under `$CLAUDE_JOB_DIR/tmp/repo` and
-  scratch projects under `$CLAUDE_JOB_DIR/tmp/sig`; the checkout was not mutated.
+- Cycle-1 preservation: `plan-eval.md` was untouched by the repair commit (`git diff --quiet
+  59b79ccd8 3e934e2de -- …/plan-eval.md`); copied to `plan-eval-cycle-1.md`; sha256
+  `c59bbe646da4b644743026e609fddefe8dbf02423cbd2ddf7c8a0a68338f443d` on the copy, on the working
+  file before overwrite, and on the `59b79ccd8` blob — **byte-identical**.
+- Reproductions ran on a `git archive 3e934e2de` copy under `$CLAUDE_JOB_DIR/tmp/repo` and scratch
+  projects under `$CLAUDE_JOB_DIR/tmp/sig*`; the checkout was not mutated.
 
-## Checklist results
+## Carried forward from cycle 1 (not re-derived, and why)
 
-| Plan-Gate item                          | Result | Evidence / location                                                                                                                                                                                                                                                                                                                                                                                           |
-| --------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Research present and current            | PASS   | `research.md` re-baselined at `cf648f1ff` on Deno 2.9.5; load-bearing findings 2, 4, 5, 9, 10, 13 re-derived below and confirmed.                                                                                                                                                                                                                                                                             |
-| Decisions locked                        | FAIL   | D1–D10 carry rationale, but D4/§"Identity proof and probes" step 3 and the worklog Design "Ports / seams" rest on a false premise for fmt: `run-deno-fmt.ts` has **no** injectable process seam (`runBatch` is private and calls `Deno.Command` directly, `run-deno-fmt.ts:419-439`; `main` calls it unconditionally, `:543-546`). Only lint has `runLint(..., runner)` (`run-deno-lint.ts:469-473`). See F1. |
-| Open-decision sweep                     | FAIL   | The plan lists "must resolve now: none". Evaluator sweep found one unflagged decision that forces rework if deferred: crash-vs-coverage precedence and crash-batch coverage accounting (F2). The plan's absolute batch-size invariant cannot be satisfied for a reachable crash+drop mix without it, and the S2/S3 "crash controls" at sizes 1/2/200 cannot be written without it.                            |
-| Commit slices (< 30, gate + files each) | PASS   | S1→S4 ordered, four slices, each names proof, gates, and files (`plan.md` "Ordered commit slices"). Six-path envelope respected; no seventh path is forced (verified below).                                                                                                                                                                                                                                  |
-| Risk register                           | PASS   | Eleven risks with mitigations (`plan.md` "Risk register"). The "new refusals red a legitimate root selection" risk is now closed by evaluator evidence (root lint and fmt selections are drop-free at batch size 1, below); the plan should cite that class of proof rather than `failedBatches: 0` (F3).                                                                                                     |
-| Gate set selected                       | PASS   | Frozen set `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` plus F-6/F-7/F-10/F-19 from the Arch-6 column of `archetype-gate-matrix.md`; runtime/browser/e2e explicitly N/A, consistent with Arch-6 `optional`/`n/a` rows.                                                                                                                                                            |
-| Deferred scope explicit                 | PASS   | `plan.md` "Non-scope and deferrals"; worklog "Deferred scope".                                                                                                                                                                                                                                                                                                                                                |
-| jsr-audit surface scan (pkg/plugin)     | PASS   | `plan.md` "Fitness and publish implications" + `research.md` "Publish / JSR surface scan": lint-only embedded text/hash delta, exports unchanged, 19-WARN baseline disclosed. Verified lint-only claim below.                                                                                                                                                                                                 |
+The product/tooling diff from base is empty at both `d437db44d` and `3e934e2de`, so every cycle-1
+re-derivation against code and Deno 2.9.5 is unchanged by construction: completion-adapter shapes,
+the anti-inference rule, probe forms, both refusals in both wrappers, `allowCount: 7`, the lint-only
+publish surface, generator idempotence, the unexposed malformed doctor sibling, and the seventh-path
+sweep. Spot-checks run this cycle on what the repair leans on:
 
-## Re-derivations (executed by the evaluator, Deno 2.9.5)
+| Spot-check (archive copy / scratch, Deno 2.9.5)                                                         | Result                                                                                               |
+| ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Fmt seam premise: `runBatch` private, direct `Deno.Command` (`run-deno-fmt.ts:419-426`); `main` `:526+` | Confirmed — no injectable runner exists in fmt; lint has `BatchRunner`/`runLint(..., runner)` `:430-472` |
+| Root `lint` as shipped                                                                                  | `filesSelected 2037 / batches 35 / failedBatches 0`, exit 0                                          |
+| Root `lint` with `packages/mcp/tests/fixtures/doctor/\|` removed from the `--exclude` alternation       | `2041 / 36 / 0`, exit 0                                                                              |
+| Root `fmt:check`                                                                                        | `2041 / 36 / 0`, `findings 0`, exit 0                                                                |
+| Healthy doctor fixtures at `--batch-size 1`                                                             | `filesSelected 4 / batches 4 / failedBatches 0`, exit 0 (the +4; `broken/` stays outside selection)  |
+| Crash+drop lint signal `deno lint clean.ts syntax.ts excluded/dropped.ts`                               | `Error linting …` / `Checked 2 files`, exit 1 (count present on crash batch, as D5 assumes)          |
+| Crash+drop fmt **check** signal `deno fmt --check clean.ts syntax.ts excluded/dropped.ts`               | `error: Found 1 not formatted file in 2 files`, exit 1 (as D5 assumes)                               |
+| Crash fmt **write** signal `deno fmt syntax.ts clean.ts` / `deno fmt syntax.ts`                         | **`error: Failed to format 1 of 2 checked files`** / **`… 1 of 1 checked file`**, exit 1 — a third form |
 
-### 1. Completion adapters — the crux — **confirmed**
+The supervisor-verified numbers reproduce exactly. The last row is new evidence; see F4.
 
-Raw shapes captured with `cat -A` on separately redirected stdout/stderr (all summary lines are on
-**stderr**; stdout is empty in every case):
+## Do the three cycle-1 findings close?
 
-| Command                                                       | exit | Terminal line(s)                                                                          |
-| ------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------- |
-| `deno lint clean.ts`                                          | 0    | `Checked 1 file`                                                                          |
-| `deno lint clean.ts other-clean.ts`                           | 0    | `Checked 2 files`                                                                         |
-| `deno lint bad.ts` (no-explicit-any)                          | 1    | diagnostic … `Found 1 problem` / `Checked 1 file`                                         |
-| `deno lint bad.ts clean.ts`                                   | 1    | `Found 1 problem` / `Checked 2 files`                                                     |
-| `deno lint bad.ts clean.ts syntax.ts`                         | 1    | `Error linting: …syntax.ts` … `Found 1 problem` / `Checked 3 files`                       |
-| `deno lint syntax.ts` (parse error only)                      | 1    | `Error linting: …` / `Checked 1 file` (no `error[rule]` occurrence → today's crash class) |
-| `deno lint excluded.ts`                                       | 1    | `error: No target files found.` (`error` word ANSI-wrapped even when piped)               |
-| `deno lint excluded.ts clean.ts`                              | 0    | `Checked 1 file` ← the defect                                                             |
-| `deno lint --config deno.json excluded.ts bad.ts clean.ts`    | 1    | `Found 1 problem` / `Checked 2 files`                                                     |
-| `deno fmt --check clean.ts`                                   | 0    | `Checked 1 file`                                                                          |
-| `deno fmt --check clean.ts clean2.ts`                         | 0    | `Checked 2 files`                                                                         |
-| `deno fmt --check dirty.ts`                                   | 1    | `from …dirty.ts:` diff … `error: Found 1 not formatted file in 1 file`                    |
-| `deno fmt --check dirty.ts clean.ts`                          | 1    | one `from` block … `error: Found 1 not formatted file in 2 files`                         |
-| `deno fmt --check dirty.ts dirty2.ts clean.ts`                | 1    | two `from` blocks … `error: Found 2 not formatted files in 3 files`                       |
-| `deno fmt --check excluded.ts`                                | 1    | `error: No target files found.`                                                           |
-| `deno fmt --check excluded.ts clean.ts`                       | 0    | `Checked 1 file` ← the symmetric defect                                                   |
-| `deno fmt --check excluded.ts dirty.ts clean.ts`              | 1    | `error: Found 1 not formatted file in 2 files`                                            |
-| `deno fmt --check syntax.ts clean.ts`                         | 1    | `Error checking: …` / `error: Found 1 not formatted file in 2 files` (no `from` block)    |
-| `deno fmt --check syntax.ts`                                  | 1    | `Error checking: …` / `error: Found 1 not formatted file in 1 file`                       |
-| `deno fmt dirty.ts clean.ts` (write)                          | 0    | `/abs/dirty.ts` / `Checked 2 files`; second run `Checked 2 files`                         |
-| `deno fmt excluded.ts clean.ts` (write)                       | 0    | `Checked 1 file`                                                                          |
-| `deno fmt excluded.ts` (write)                                | 1    | `error: No target files found.`                                                           |
-| `deno lint ignore-file.ts clean.ts` (`deno-lint-ignore-file`) | 0    | `Checked 2 files` (ignored files still count as processed)                                |
-| top-level `"exclude"` (not `lint.exclude`)                    | —    | identical drop behaviour for lint and fmt                                                 |
+| Finding | Closed? | Evidence in the repair head                                                                                                                                                                                                                                                                                                                                            |
+| ------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1      | **Yes** | D4 now says lint reuses `BatchRunner`, S3 "introduces an equivalent injectable runner seam locally in `run-deno-fmt.ts`"; identity step 3 routes both original batches and probes through it; S3 slice row, risk register ("Fmt tests cannot inject…"), open-decision sweep ("no new module/path"), worklog "Ports / seams" (rewritten: fmt "has no equivalent seam today … S3 introduces…"), research finding 16. No new file. |
+| F2      | **Partly** | Precedence locked as refusal ≥ crash ≥ finding (D6, "Failure precedence" table with a crash row and a refusal-wins row). Crash-batch accounting defined (D5, identity step 7: count contributes to `filesProcessed`, short count probed, missing/invalid evidence → refusal). Exact crash+drop control: exit 2 and full `coverage` JSON (`3/2/["excluded/dropped.ts"]`, one `partial-exclusion` refusal, no `unverifiedFiles`) at 1/2/200; crash-only companion: exit 1 and `2/2/[]/[]` at 1/2/200; diagnostics once; S2/S3 rows reference them. I re-walked the three batchings for both wrappers in check mode, including the `[clean, dropped] + [syntax]` ordering, and the stated JSON is reachable at every size. **But** the closure extended coverage to crash batches without measuring the fmt write-mode crash signal, which is a third form the locked adapter does not admit — F4 below. |
+| F3      | **Yes** | Validation row 8 reads "exit 0 for both root tasks; no rule weakened". S1 gate: default `2041/36/0` plus `--batch-size 1` `2041/2041/0`, exit 0. S2 gate: per-file root lint `2041/2041/0`. S3 gate: per-file root fmt `2041/2041/0`, findings 0. The pre-implementation baseline cites cycle-1 §7 and forbids inferring coverage from a default-batch green. |
 
-Conclusions: lint terminates in `Checked N file(s)` on clean, finding, **and parse-error** runs; fmt
-uses `Checked N file(s)` when clean or writing and
-`error: Found M not formatted file(s) in N file(s)` on check findings, with the **second** integer
-being the processed count. Singular/plural forms are exactly `file`/`files` on both integers. ANSI:
-the `Checked …` and `Found N problem(s)` lines are plain; the `error:` prefix is ANSI-wrapped
-(`\e[0m\e[1m\e[31merror\e[0m: …`) even on piped stderr, so the plan's "ANSI-strip first, then anchor
-`^error: Found …$`" ordering is necessary and correct; the existing `ANSI_PATTERN` covers the
-observed `[0m [1m [31m [38;5;12m` sequences. A pty run shows `\r\n` endings only from the terminal
-driver; piped output is `\n`. The S2/S3 split and the identity proof stand.
+Advisories: A1 folded (D7, JSON contract: `--input` omits `coverage`); A2 folded (D8, step 3:
+write-mode mismatch probes use `deno fmt --check`); A3 folded (adapter section and S2/S3 gates pin
+CRLF-terminated summaries; research "Trust and failure modes"). All three are also rows in the
+open-decision sweep. No advisory was skipped.
 
-### 2. Anti-inference rule — **confirmed and honourable**
+## Plan-Gate checklist (full gate on the repaired plan)
 
-`dirty.ts clean.ts` yields one `from` block but `in 2 files`; `syntax.ts clean.ts` yields **zero**
-`from` blocks but `in 2 files`. Counting `from` blocks would under-count in both. The plan's adapter
-reads the second integer of the anchored summary, which the parser can do independently of
-`parseFindings`; the rule is honourable as designed.
-
-### 3. Batch-size invariance — **delivered for ordinary results; unspecified for crash mixes (F2)**
-
-At size 1 a dropped file is its own wholly-excluded batch (`No target files found.`); at size 200 it
-is a short `Checked N` inside a mixed batch and is identified by probes. The plan's run-level cause
-derivation (aggregate → empty / all-excluded / partial) makes cause and dropped set independent of
-batching for clean and ordinary-finding runs, and probe output never enters the parsers, so
-diagnostic multiplicity is preserved. Sizes 1/2/200 cover the three boundary shapes (singleton
-batches, minimal mixed batch, default). **However**, for a selected set containing a parse-error
-file and a dropped file, size 200 produces one crash batch (`Error linting` + `Checked 1 file`, exit
-1, no occurrence → existing crash class) while size 1 produces one crash batch plus one
-wholly-excluded batch (refusal, exit 2). The precedence table has no crash-vs-refusal row, and
-coverage accounting for a crashed batch's files is undefined, so exit code and `coverage.refusals`
-would differ by batch size — violating the invariant as stated.
-
-### 4. Probe soundness — **sound as specified**
-
-Probe forms verified: lint processed `Checked 1 file` (including finding and parse-error output
-ending that way); fmt check processed `Checked 1 file` or `Found 1 not formatted file in 1 file`
-(also on a single parse-error file); fmt write processed `Checked 1 file`; dropped
-`error: No target files found.` for both. Exact reconciliation (processed classifications ==
-original `N`, dropped + processed == batch size) with `unverifiedFiles` on any unreconciled or
-ambiguous probe is fail-closed. Missing/duplicate/malformed/overlarge summaries →
-`processed-count-unavailable`/`-inconsistent`, exit 2; negative counts cannot match `\d+` and fall
-into "missing". Write-mode probes re-run `deno fmt <file>` (mutating) but only on files already
-formatted by the batch or dropped identically by the same config, so no additional mutation occurs;
-using `--check` for write-mode probes would be strictly safer (advisory A2).
-
-### 5. Must-not-regress — **confirmed against current code**
-
-- Lint: empty selection exit 2 (`run-deno-lint.ts:737-740`); wholly excluded batch →
-  `noTargetBatches`, exit 2 (`:495-499`). Existing tests pin both (`run-deno-lint_test.ts` "CLI
-  refuses an empty lint selection", "CLI fails when Deno config excludes every selected lint
-  target").
-- Fmt: empty selection exit 2 (`run-deno-fmt.ts:587-590`); `noTargetBatches > 0` exit 2
-  (`:591-596`). Existing tests pin both.
-- Note for S2: today `runLint` lets a later ordinary-finding batch overwrite `exitCode = 2` with `1`
-  (`:497` then `:501`), so the size-1 mixed verdict is order-dependent; D6's refusal precedence
-  corrects this and the finding+drop control at 1/2/200 will pin it.
-- `quality:scan` executed on the archive copy: `check-root-coverage` `ok: true`; scanner `ok: true`,
-  **`allowCount: 7`** with `--max-allow 7`. `check-root-coverage.ts` only inspects `quality:scan*`
-  `--root` coverage, so S1's edit to the `lint` task cannot affect it.
-
-### 6. Publish claim — **confirmed lint-only**
-
-- `.llm/tools/consumer-tools.json` lists `run-deno-lint.ts` (and check/doc-lint/etc.);
-  `run-deno-fmt.ts` is absent.
-- `packages/cli/src/kernel/assets/agent-tools.generated.ts` contains the embedded `run-deno-lint.ts`
-  text (lines 15–16, 44) and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` (line 54); `grep -c run-deno-fmt`
-  → 0.
-- Hash consumers: `packages/cli/src/public/features/agent/init/init-agent.ts:7,73` read the
-  constant; `init-agent_test.ts` uses a fake hash and a name list only — nothing pins the literal
-  hash, so S4 forces no seventh path.
-- Generator idempotence at base: `deno run --no-lock … generate-cli-assets-barrel.ts` on the archive
-  copy left all seven `check:assets-barrel` targets byte-identical (sha256 before/after equal). S4's
-  "only one file changes" claim is therefore testable as planned.
-
-### 7. Root-task correction — **confirmed, and stronger than the plan claims**
-
-| Run (archive copy, exact root task args)                           | filesSelected | batches | failedBatches  | exit |
-| ------------------------------------------------------------------ | ------------- | ------- | -------------- | ---- |
-| Baseline root `lint` command                                       | 2037          | 35      | 0              | 0    |
-| Root `lint` without the `packages/mcp/tests/fixtures/doctor/` term | 2041          | 36      | 0              | 0    |
-| Corrected `lint` selection at `--batch-size 1`                     | 2041          | 2041    | 0              | 0    |
-| Root `fmt:check` selection at `--batch-size 1`                     | 2041          | 2041    | 0 (findings 0) | 0    |
-
-The +4 are
-`packages/mcp/tests/fixtures/doctor/healthy/{netscript.config.ts, .netscript/generated/plugin-ai/agents.registry.ts, .netscript/generated/plugin-ai/tools.registry.ts, .netscript/generated/plugin-workers/job-registry.ts}`;
-`doctor/broken/` carries `.deno-fmt-lint-ignore` and stays outside selection. The batch-size-1 rows
-are the evidence the plan lacks: because the defect makes `failedBatches: 0` at size 200
-meaningless, only a per-file run proves that **no** selected root file is silently dropped. Both
-root selections are drop-free, so S2/S3 will keep `deno task lint` and `deno task fmt:check` green
-with no config change and no seventh path.
-
-### 8. Seventh-path sweep — **none forced**
-
-No shared module is needed (duplicated local types are within the two wrapper files); the fmt
-cross-wrapper assertion can spawn/import `run-deno-lint.ts` from `run-deno-fmt_test.ts`; nothing
-pins the bundle hash; `check-root-coverage.ts`, `.github/workflows/*`, `ci-classify-changes.ts`, and
-docs only invoke the wrappers or describe them, and the `coverage` key is additive. The missing fmt
-seam (F1) is added inside `run-deno-fmt.ts` itself.
+| Plan-Gate item                          | Result | Evidence / location                                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Research present and current            | PASS   | `research.md` still baselined at `cf648f1ff` (= live `main`); findings 16-18 record cycle-1 evidence. Finding 10's write-mode claim is incomplete (F4) but the baseline itself is current.                                                                                                                                                                                       |
+| Decisions locked                        | FAIL   | D1-D10 carry rationale and F1's false premise is gone. A new false premise remains in D8 / "Completion adapters" / must-not-regress / research finding 10: "original write batches use `Checked N`" and "existing crash … stays exit 1 when coverage is complete" cannot both hold, because a write-mode parse-error batch emits `error: Failed to format M of N checked file(s)`, which the locked adapter does not admit. See F4. |
+| Open-decision sweep                     | FAIL   | The plan lists "must resolve now: none after F1-F3 repair". Evaluator sweep found one unflagged decision that forces rework if deferred: the fmt write-mode crash completion form and its expected exit/JSON (F4).                                                                                                                                                                 |
+| Commit slices (< 30, gate + files each) | PASS   | S1→S4, each names proof, gates, files; six-path envelope; the fmt seam lands inside path 3.                                                                                                                                                                                                                                                                                      |
+| Risk register                           | PASS   | Thirteen risks with mitigations; the two cycle-1 gaps became rows ("Fmt tests cannot inject…", "A crash hides a refusal…").                                                                                                                                                                                                                                                     |
+| Gate set selected                       | PASS   | Frozen set unchanged: `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` + F-6/F-7/F-10/F-19; runtime/browser/e2e N/A per Arch-6.                                                                                                                                                                                                                         |
+| Deferred scope explicit                 | PASS   | `plan.md` "Non-scope and deferrals"; worklog "Deferred scope".                                                                                                                                                                                                                                                                                                                  |
+| jsr-audit surface scan (pkg/plugin)     | PASS   | Unchanged from cycle 1: lint-only embedded text/hash delta, exports unchanged, 19-WARN baseline disclosed.                                                                                                                                                                                                                                                                       |
 
 ## Findings
 
-**F1 — False premise: fmt has no "existing injectable process seam".** `plan.md` §"Identity proof
-and probes" step 3 ("through the wrapper's existing injectable process seam") and `worklog.md`
-§Design "Ports / seams" ("Reuse each wrapper's existing process seam … No new … port") are true for
-lint (`runLint(files, options, runner: BatchRunner)`, `run-deno-lint.ts:430-434, 469-473`) and false
-for fmt (`runBatch` private, direct `Deno.Command`, `run-deno-fmt.ts:419-439`; `main` `:543-546`;
-the fmt tests inject only at the `BatchResult[]` level into `crashedBatches`/`formatFailedBatches`).
-S3's listed gates "malformed-summary, inconsistent-probe" controls are unit-level fixtures that
-cannot be produced by a real disposable project and therefore require a runner seam that does not
-exist. In-envelope fix, but the plan must say S3 introduces it.
+**F4 — Unmeasured third fmt completion form makes the write-mode crash contract unsatisfiable as
+locked.** Reproduction (scratch project, Deno 2.9.5, `cat -A` on stderr, stdout empty):
 
-**F2 — Unflagged open decision: crash-vs-coverage precedence and crash-batch coverage accounting.**
-Reproduction: `deno lint syntax.ts` prints `Error linting: …` then `Checked 1 file`, exit 1, zero
-`error[rule]` occurrences → today's crash class (`run-deno-lint.ts:503-513`);
-`deno fmt --check syntax.ts clean.ts` prints `error: Found 1 not formatted file in 2 files` with no
-`from` block → today's fmt crash class (`crashedBatches`, `run-deno-fmt.ts:490-496`). Deno therefore
-still emits a processed count on crash batches. The plan's failure-precedence table (`plan.md`
-§"Failure precedence") defines refusal-over-ordinary-finding (D6) but not refusal-vs-crash, and
-never states what `coverage.filesProcessed`/`droppedFiles`/`refusals` contain for a crashed batch's
-files. For a selected set {parse-error file, dropped file}: size 200 → one crash batch, exit 1, no
-refusal; size 1 → crash batch + wholly-excluded batch, exit 2 with `partial-exclusion`. The
-run-level invariant "same exit, cause, processed/dropped identities" (`plan.md` §"Shared structured
-JSON contract") is thus unsatisfiable as written, and the S2/S3 "crash controls" at 1/2/200 cannot
-be authored without this decision. Deferring it forces rework of both wrappers' exit logic and their
-1/2/200 test matrices.
+| Command                                     | exit | Terminal line                                                              |
+| ------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| `deno fmt syntax.ts clean.ts` (write)       | 1    | `error: Failed to format 1 of 2 checked files`                             |
+| `deno fmt syntax.ts dirty2.ts` (write)      | 1    | `/abs/dirty2.ts` (rewritten) then `error: Failed to format 1 of 2 checked files` |
+| `deno fmt syntax.ts` (write)                | 1    | `error: Failed to format 1 of 1 checked file`                              |
+| `deno fmt syntax.ts excluded/dropped.ts`    | 1    | `error: Failed to format 1 of 1 checked file` (dropped path not counted)   |
+| `deno fmt --check syntax.ts clean.ts`       | 1    | `error: Found 1 not formatted file in 2 files` (check mode, as the plan says) |
 
-**F3 — Soft validation wording and missing drop-free proof.** Validation row 8 ("root tasks remain
-non-zero only for real baseline/coverage state") tolerates a red root gate, which contradicts the
-must-not-regress section. The evaluator's batch-size-1 evidence (§7) shows both root selections are
-drop-free, so the row can and should demand exit 0, and S1/S2 evidence should include a per-file
-(batch-size-1 or per-batch `Checked N` sum) proof rather than `failedBatches: 0`.
+Today's wrapper classifies the write-mode parse error as a crash: `deno run … run-deno-fmt.ts --root
+<dir> --ext ts --write` → `filesSelected 2 / batches 1 / failedBatches 1 / findings 0`, exit 1,
+`Failed to format` rendered once. The repaired plan locks (D5, identity step 7) that coverage is
+evaluated on crash batches and that missing admissible completion evidence is a
+`processed-count-unavailable` refusal with exit 2 "even when the batch also crashes"; it locks the
+fmt adapter to exactly two forms (`Checked N`, `Found M … in N`); and it simultaneously guarantees
+(D8, S3 row, must-not-regress) that "original write batches use `Checked N`" and that a crash
+"stays exit 1 when coverage is complete". A literal S3 implementation therefore turns every
+`deno task fmt` run that contains a parse-error file from today's exit 1 crash into exit 2
+`processed-count-unavailable` with every file of that batch (up to 200) listed in
+`unverifiedFiles` — although Deno stated the processed count (`N checked`) and identity is fully
+knowable. The plan's write-mode controls ("pin raw `Checked N` write-mode controls, including a
+rewritten file") never exercise a parse error, so the S3 test matrix would pass and the defect
+would land; fixing it afterwards reworks the S3 adapter, its fixtures, and the locked adapter
+section. Neither `plan.md` nor `research.md` (finding 10: "Write mode emits `Checked N file(s)`")
+mentions `Failed to format`; cycle 1 did not measure write-mode parse errors either, but before the
+repair crash batches were outside coverage, so the form was not load-bearing. D5 made it
+load-bearing. This is the F1 pattern — a locked decision resting on an unmeasured premise — so it
+fails the same box by the same standard.
+
+In-envelope fix (no seventh path, no wire-contract change): admit a third fmt form for write mode,
+anchored `^error: Failed to format (\d+) of (\d+) checked files?$`, taking the second integer as
+processed (singular/plural verified above: `1 of 1 checked file`, `1 of 2 checked files`). With it,
+write-mode crash+drop reconciles exactly like check mode (`1 of 1 checked` on a 2-file batch is a
+short count → `--check` probes → `syntax.ts` processed via `Found 1 not formatted file in 1 file`,
+`excluded/dropped.ts` dropped) and the locked JSON at 1/2/200 becomes reachable in write mode.
+
+**A4 (advisory, not gate-blocking) — pre-existing fmt check-mode diagnostic loss contradicts the
+universal wording of the diagnostic-multiplicity invariant.** `deno fmt --check syntax.ts dirty.ts`
+emits one `from dirty.ts:` block and `Found 2 not formatted files in 2 files`; `crashedBatches`
+(`run-deno-fmt.ts:490-496`) classes the batch as an ordinary finding because a finding parsed, so
+the `SyntaxError` for `syntax.ts` is rendered nowhere. Wrapper run at batch size 200: exit 1,
+findings `[dirty.ts]`, stderr `SyntaxError` count 0; at batch size 1: exit 1, findings
+`[dirty.ts]`, `SyntaxError` count 1. Coverage is correct at both sizes (`2 == 2`), so #1709's
+contract is unaffected, but the plan's "identical … diagnostic multiplicity for any selected set"
+is false for this set today and the plan does not touch the classifier. Either scope the invariant
+to coverage identities plus the named controls, or record the pre-existing classifier limitation in
+the risk register / deferred scope.
 
 ## Open-decision sweep (evaluator-run)
 
-| Decision                                                                   | Verdict                      | Notes                                                                                                     |
-| -------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Crash-vs-coverage precedence; coverage accounting for crashed batches (F2) | **must resolve now**         | Not flagged by the plan; forces rework of exit logic and 1/2/200 tests if deferred.                       |
-| S3 must add a runner seam to `run-deno-fmt.ts` (F1)                        | must resolve now (plan text) | No scope change; correct the premise and the S3 slice/gate description.                                   |
-| `coverage` object in lint `--input` (saved-log) mode                       | safe to defer                | `selection` is already omitted there; state that `coverage` is omitted in file mode. Advisory A1.         |
-| Write-mode probes via `--check` instead of mutating `deno fmt <file>`      | safe to defer                | Current design is side-effect-free in the steady state; `--check` probes are strictly safer. Advisory A2. |
-| Pin a CRLF-terminated summary fixture in parser tests                      | safe to defer                | Piped Deno output is `\n`; cheap insurance for Windows runners. Advisory A3.                              |
-| Local helper/type names                                                    | safe to defer                | Agrees with the plan.                                                                                     |
+| Decision                                                                      | Verdict              | Notes                                                                                                                       |
+| ----------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Fmt write-mode crash completion form; expected exit/JSON in write mode (F4)   | **must resolve now** | Not flagged by the plan; a literal S3 regresses `deno task fmt` crash exits and forces adapter/fixture/plan rework.         |
+| Crash-vs-coverage precedence; crash-batch accounting (cycle-1 F2)             | resolved             | Locked for lint and fmt check mode; reachable at 1/2/200 (re-walked, including alternate batch orderings).                 |
+| Fmt runner seam inside `run-deno-fmt.ts` (cycle-1 F1)                         | resolved             | Text, slice row, risk row, worklog all corrected; no new module.                                                            |
+| Root tasks exit 0 + per-file drop-free evidence (cycle-1 F3)                  | resolved             | Row 8, S1/S2/S3 gates, baseline paragraph.                                                                                  |
+| A1 `--input` omission / A2 `--check` probes / A3 CRLF fixtures                | resolved / folded    | Present in D7, D8, adapter section, sweep table.                                                                            |
+| Diagnostic-multiplicity wording vs. pre-existing fmt classifier (A4)          | safe to defer        | Coverage unaffected; wording or a deferred-scope note suffices.                                                             |
+| Existing fmt test crash fixture without a summary (`Failed to parse "workspace"…`) | safe to defer   | Under D5 it becomes a `processed-count-unavailable` refusal; the fixture lives in path 4 and is S3's to update — consistent with D5, no plan change needed. |
+| Local helper/type/function names                                              | safe to defer        | Agrees with the plan.                                                                                                       |
 
 ## Verdict
 
 `FAIL_PLAN`
 
-### If FAIL_PLAN — required fixes
+**Cycle 2 of the ordinary 2.** This second `FAIL_PLAN` exhausts the ordinary allowance and returns
+the leaf to the owner; no third cycle is assumed or recommended here.
 
-1. **F2 (open-decision sweep box)** — Add a crash row to the failure-precedence table and define
-   crash-batch coverage semantics. Recommended, and supported by the evidence above: because Deno
-   emits `Checked N` (lint) / `Found M … in N` (fmt) even on parse-error batches, evaluate coverage
-   on crash batches too; a run containing any coverage refusal exits 2 regardless of crash batches
-   (refusal ≥ crash ≥ ordinary finding), crash diagnostics still render once via the existing
-   `failures`/crash paths, and `coverage` never copies crash text. If the author instead scopes
-   crash batches out of coverage, the invariant must be explicitly restated as applying to non-crash
-   runs, crash files must be reported as neither processed nor dropped (e.g. an explicit
-   `unverifiedFiles` refusal), and the 1/2/200 crash controls must pin whichever rule is chosen.
-   Either way the S2 and S3 "crash controls" rows must name the expected exit and `coverage` shape.
-2. **F1 (decisions-locked box)** — Correct `plan.md` step 3 and the worklog "Ports / seams" text:
-   only lint has an injectable `BatchRunner`; S3 introduces an equivalent injectable runner seam
-   inside `run-deno-fmt.ts` (no new file), and the fmt malformed-summary / inconsistent-probe
-   controls are unit fixtures through that seam. Update the S3 slice row accordingly.
-3. **F3** — Tighten validation row 8 to "exit 0 for both root tasks" and add per-file drop-free
-   evidence (batch-size-1 root lint/fmt, or summed per-batch `Checked N == filesSelected`) to the S1
-   and S2/S3 proving gates; cite this evaluation's §7 numbers as the pre-implementation baseline.
+### Required fix (single, narrow)
 
-Advisories (not gate-blocking): A1 state `coverage` is omitted in lint `--input` mode; A2 consider
-`--check` probes in write mode; A3 pin a CRLF summary fixture.
+1. **F4 (decisions-locked + open-decision-sweep boxes)** — Measure and lock the fmt write-mode
+   crash completion form. Recommended: add
+   `^error: Failed to format (\d+) of (\d+) checked files?$` (second integer = processed) as the
+   third admissible fmt form, scoped to write mode; correct D8, the "Completion adapters" list,
+   must-not-regress ("Fmt write mode retains a verified original `Checked N` count" →
+   `Checked N` or `Failed to format M of N checked`), the S3 slice row, the risk-register write
+   row, and research finding 10; add write-mode crash-only and crash+drop controls at 1/2/200 with
+   the same exit/JSON as the check-mode controls. If the author instead chooses to refuse
+   write-mode crashes, must-not-regress and the precedence table's crash row must be restated as
+   check-mode-only and the S3 controls must pin exit 2 / `processed-count-unavailable` in write
+   mode — I do not recommend that path, since Deno provides the count.
+
+Advisory A4 as above. F1, F3, A1-A3 are closed and need no further author action; F2 needs only
+the write-mode extension in item 1.
 
 ## Notes
 
-- Everything the brief asked to be re-derived was re-derived and confirmed: adapter shapes
-  (singular/plural/ANSI), anti-inference, probe forms, both refusals in both wrappers,
-  `allowCount: 7`, lint-only publish surface, generator idempotence, `2037/35/0 → 2041/36/0`,
-  malformed sibling unexposed, no seventh path. The two failing boxes are specification gaps that
-  are cheap to close now and expensive after S2's tests exist.
+- Carried forward from cycle 1 without re-derivation (rationale above): adapter shapes, anti-
+  inference, probe forms, both refusals, `allowCount: 7`, lint-only publish surface, generator
+  idempotence, malformed sibling unexposed, no seventh path. Spot-checked this cycle: seam premise,
+  `2037/35/0 → 2041/36/0`, fmt `2041/36/0` findings 0, healthy doctor +4 per-file, crash+drop
+  signals in both wrappers, and the new write-mode crash signal.
+- The topic supervisor's Tier-A `PASS` on this head is a lighter gate and did not measure Deno
+  signals; it does not change this verdict.
 - No implementation grant exists and none is recommended before a separate coordinator
   authorization; this evaluation does not authorize implementation.
 - Hard bounds honoured: no product/tooling/config/workflow mutation; reproductions in
   `$CLAUDE_JOB_DIR/tmp`; no runtime lease, Aspire, Docker, browser, or `e2e:cli`; no label, ready,
-  merge, checkbox, or acceptance-evidence mutation.
+  merge, checkbox, acceptance-evidence, or central-state mutation. Run-dir edits: this file and the
+  byte-identical `plan-eval-cycle-1.md` only.
