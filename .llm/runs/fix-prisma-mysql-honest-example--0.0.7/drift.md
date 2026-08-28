@@ -25,17 +25,22 @@ explicitly directed; it does not leave the superseded envelope as the current pl
 ## 2026-08-28 — TLS identity mode is accepted but not implemented as named
 
 - **What:** `MySqlConnectionConfig.tls.mode` accepts `'verify_identity'`, but base translation only
-  adds `ssl.ca` when custom CAs are non-empty and never sets mysql2 `ssl.verifyIdentity: true`.
+  adds joined `ssl.ca` when custom CAs are non-empty and does not enable mysql2 hostname identity
+  verification.
 - **Source:** `packages/prisma-adapter-mysql/src/types.ts:23-29`;
   `packages/prisma-adapter-mysql/src/adapter.ts:725-743`; installed mysql2 3.22.5 `SslOptions`.
 - **Expected:** Every advertised option has observable behavior matching its name.
-- **Actual at base:** The mode over-promises identity verification; without non-empty CAs it is a
-  silent no-op.
+- **Actual at base:** Without non-empty `caCerts`, `ssl` is left unset, so the connection is
+  plaintext and no TLS is requested. With non-empty `caCerts`, only joined `ssl.ca` is forwarded;
+  mysql2 hostname identity verification is not enabled.
 - **Severity:** significant
-- **Action:** owned by amended plan
-- **Resolution design:** always set `verifyIdentity: true` for the mode; add joined `ca` only when
-  supplied; direct-test the pure translator through a source-only export.
+- **Action:** deprecate the existing public member and document/characterize its exact legacy
+  behavior without changing runtime semantics.
+- **Resolution design:** add a JSDoc `@deprecated` tag in the existing `src/types.ts` surface and
+  aligned documentation; direct-test both legacy translator branches through the source-only export.
+  Do not add a replacement mode or change the generated mysql2 options.
 - **Boundary:** no public-barrel export and no runtime injection port.
+- **Deferred:** any behavior change or removal requires a separately scoped breaking change.
 
 ## 2026-08-28 — Exact-pin mysql2 probe transiently modified `deno.lock`
 

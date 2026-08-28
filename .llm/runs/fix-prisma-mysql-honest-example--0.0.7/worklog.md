@@ -33,8 +33,10 @@ Recorded before any implementation file. This turn has no implementation grant.
 - **Structured config** — host/port/user/password/db/pool/timeout/TLS fields; no direct URL form.
 - **Initial-connect timeout** — mysql2 `connectTimeout`, not an operation deadline.
 - **Connection-error observer** — contained callback selected by the shipped closed classifier.
-- **Identity verification mode** — amended plan maps it to mysql2 `ssl.verifyIdentity: true` and
-  adds custom CA material only when supplied; base implementation does not satisfy the name.
+- **Deprecated legacy TLS mode** — `verify_identity` does not satisfy its name: without non-empty
+  CAs it requests no TLS, while with non-empty CAs it forwards only joined `ssl.ca` and does not
+  enable mysql2 hostname identity verification. This leaf documents and characterizes, but does not
+  change, that behavior.
 
 ### Ports
 
@@ -52,10 +54,10 @@ Recorded before any implementation file. This turn has no implementation grant.
 
 ### Commit Slices
 
-| # | Slice                                                                               | Gate                                                                     | Files                                                                                |
-| - | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| 1 | Honest option translation, internal-source seam, and cleanup evidence               | focused structured tests; package check/lint/fmt; quality/arch           | `src/adapter.ts`, `src/types.ts`, `tests/connection_errors_test.ts`, run artifacts   |
-| 2 | One live factory/query/finally-disconnect story across all consumer-facing surfaces | direct example check; docs format/accuracy; doc lint; publish/JSR/census | `src/mod.ts`, `README.md`, `examples/basic-usage.ts`, site `index.md`, run artifacts |
+| # | Slice                                                                                       | Gate                                                                     | Files                                                                                |
+| - | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| 1 | Legacy TLS deprecation/mapping characterization, internal-source seam, and cleanup evidence | focused structured tests; package check/lint/fmt; quality/arch           | `src/adapter.ts`, `src/types.ts`, `tests/connection_errors_test.ts`, run artifacts   |
+| 2 | One live factory/query/finally-disconnect story across all consumer-facing surfaces         | direct example check; docs format/accuracy; doc lint; publish/JSR/census | `src/mod.ts`, `README.md`, `examples/basic-usage.ts`, site `index.md`, run artifacts |
 
 ### Deferred Scope
 
@@ -64,6 +66,8 @@ Recorded before any implementation file. This turn has no implementation grant.
 - Public-barrel translator/adapter exports and runtime pool injection — forbidden by the authorized
   seam shape.
 - Connection-string support — different/higher-level surface.
+- TLS runtime behavior changes, a replacement mode, or removal of `verify_identity` — separately
+  scoped breaking change.
 - Live backend/runtime verification and `e2e:cli` — prohibited for this leaf.
 - #1664 and #1293 issue wording/state — explicitly untouched.
 
@@ -80,29 +84,30 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 | 2026-08-28 | planning | Bootstrap    | Read live issue, verified exact base/branch/clean tree, loaded requested harness/doctrine/tooling/JSR/PR guidance.                                                    |
 | 2026-08-28 | planning | Research     | Rendered `deno doc`, searched/read all seven paths, traced options, inspected Prisma/mysql2 declarations, and audited the prescribed seams.                           |
 | 2026-08-28 | planning | Base gates   | Ran only allowed non-runtime gates; tree remained clean.                                                                                                              |
-| 2026-08-28 | planning | Design       | Locked the seven-path plan, source-only translator seam, existing-test ownership, and TLS correction. No product mutation.                                            |
+| 2026-08-28 | planning | Design       | Locked the seven-path plan, source-only translator seam, existing-test ownership, and legacy TLS deprecation/characterization. No product mutation.                   |
 | 2026-08-28 | planning | Lock hygiene | Exact-pin mysql2 probing added one transient `deno.lock` resolution; gate 15 caught it before staging, and the targeted reversal restored a byte-identical base lock. |
 
 ## Decisions
 
-| Decision                                   | Reason                                                                             | Source                          |
-| ------------------------------------------ | ---------------------------------------------------------------------------------- | ------------------------------- |
-| PLAN-EVAL selected but not launched        | Product/test scope and TLS semantics need independent review; topic owns evaluator | user brief; harness separation  |
-| No implementation                          | Explicit research+plan-only grant                                                  | user brief                      |
-| No eighth path                             | Amended frozen envelope is a hard ceiling                                          | coordinator amendment           |
-| Translator stays source-internal           | Direct test visibility without new published API or runtime injection              | coordinator amendment; doctrine |
-| Extend existing connection-error test      | It already owns `FakePoolClient` cleanup behavior                                  | coordinator amendment           |
-| Internal stale comments are in scope later | False maintenance guidance should not survive a systemic honesty sweep             | `adapter.ts:173,216`            |
-| Debug namespace stays                      | Observable compatibility, not prose                                                | `adapter.ts:30`                 |
+| Decision                                   | Reason                                                                                            | Source                          |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------- |
+| PLAN-EVAL selected but not launched        | Product/test scope and the TLS deprecation contract need independent review; topic owns evaluator | user brief; harness separation  |
+| No implementation                          | Explicit research+plan-only grant                                                                 | user brief                      |
+| No eighth path                             | Amended frozen envelope is a hard ceiling                                                         | coordinator amendment           |
+| Translator stays source-internal           | Direct test visibility without new published API or runtime injection                             | coordinator amendment; doctrine |
+| Extend existing connection-error test      | It already owns `FakePoolClient` cleanup behavior                                                 | coordinator amendment           |
+| Internal stale comments are in scope later | False maintenance guidance should not survive a systemic honesty sweep                            | `adapter.ts:173,216`            |
+| Debug namespace stays                      | Observable compatibility, not prose                                                               | `adapter.ts:30`                 |
+| TLS runtime mapping stays unchanged        | Tightening either legacy branch is breaking; deprecate/document/characterize instead              | coordinator TLS ruling          |
 
 ## Drift
 
-| Drift                                                                     | Severity                      | Logged in drift.md |
-| ------------------------------------------------------------------------- | ----------------------------- | ------------------ |
-| Current TLS `verify_identity` mode does not set mysql2 `verifyIdentity`   | significant                   | yes                |
-| Coordinator widened the product envelope 5 → 7 and prescribed the seam    | significant                   | yes                |
-| Exact-pin mysql2 probe transiently added one `deno.lock` resolution       | transient process side effect | yes                |
-| User's five-artifact allowlist excludes harness-mandatory `supervisor.md` | significant process variance  | yes                |
+| Drift                                                                      | Severity                      | Logged in drift.md |
+| -------------------------------------------------------------------------- | ----------------------------- | ------------------ |
+| Current TLS `verify_identity` mode overstates its unchanged legacy mapping | significant                   | yes                |
+| Coordinator widened the product envelope 5 → 7 and prescribed the seam     | significant                   | yes                |
+| Exact-pin mysql2 probe transiently added one `deno.lock` resolution        | transient process side effect | yes                |
+| User's five-artifact allowlist excludes harness-mandatory `supervisor.md`  | significant process variance  | yes                |
 
 ## Gate Results — immutable base
 
@@ -136,7 +141,8 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 ### New gates required on implementation head
 
 - Direct check of the actual example after its Prisma path becomes live.
-- Exact option-translation and successful exactly-once pool-close assertions in the existing test.
+- Exact option-translation characterization—including plaintext with no CAs and CA-only forwarding
+  with non-empty CAs—and successful exactly-once pool-close assertions in the existing test.
 - Structured package lint/fmt, quality gate, internal-seam boundary check, and final seven-path
   falsehood census.
 - Repeat all base static/publish/JSR gates.
@@ -145,6 +151,7 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 
 - Evaluator should inspect `research.md` option table and rows 8-11 of the falsehood census first.
 - The highest-risk false-done is accepting the green existing doctest as example compilation.
-- The TLS defect is owned by the amended plan; prose-only correction remains insufficient.
+- The TLS defect is owned through public deprecation, exact documentation, and characterization
+  tests. Runtime change or removal remains deferred to a separately scoped breaking change.
 - An eighth product path is still a rescope.
 - Fresh independent Tier-A follows. This generator has not self-reviewed or self-certified.

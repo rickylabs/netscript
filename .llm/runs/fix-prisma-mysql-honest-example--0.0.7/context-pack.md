@@ -14,8 +14,8 @@
 
 ## Current State
 
-Research and planning only are complete; no product file changed. The coordinator-authorized plan
-owns seven paths: site, README, adapter source, module docs/exports, public types, the checked-in
+Research and planning only are complete; no product file changed. The coordinator-amended plan owns
+seven paths: site, README, adapter source, module docs/exports, public types, the checked-in
 `basic-usage.ts`, and existing `connection_errors_test.ts`.
 
 The census now contains 49 relevant occurrences/dispositions and exactly eight Deno-native driver
@@ -38,18 +38,18 @@ An eighth product path is a hard rescope.
 
 ## Key Decisions
 
-| Decision                                 | Source                                         | Notes                                                                                         |
-| ---------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Dynamic driver is npm `mysql2/promise`   | `adapter.ts:23,634`                            | Requires Deno npm resolution, Node-compatible socket APIs, and `--allow-net`.                 |
-| Factory goes to Prisma                   | Prisma 7 declarations; `PrismaMySql.connect()` | Do not pass a connected adapter to `PrismaClient`.                                            |
-| Generated client is real                 | Generator convention plus example prerequisite | No ambient declarations or fictional imports; the actual package example is directly checked. |
-| Structured fields only                   | `MySqlConnectionConfig`; translator            | No direct connection string in this package.                                                  |
-| Hook wording comes from `types.ts:39-42` | #1662 shipped source                           | Remove the stale unsupported warning.                                                         |
-| TLS identity mode is implemented         | mysql2 `SslOptions` plus current translator    | Set `verifyIdentity: true`; add custom `ca` only when present.                                |
-| Translator seam is source-internal       | Coordinator authorization                      | Export from `src/adapter.ts` only; no barrel export and no runtime injection.                 |
-| Existing test owns evidence              | `connection_errors_test.ts`                    | Extend its `FakePoolClient` mapping/cleanup coverage; no second test.                         |
-| Legacy Deno-driver types are deleted     | Symbol-use census                              | Unused/stale types and root exports are removed in implementation.                            |
-| Debug namespace remains                  | `adapter.ts:30`                                | Observable `DEBUG=` compatibility behavior.                                                   |
+| Decision                                   | Source                                         | Notes                                                                                                               |
+| ------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Dynamic driver is npm `mysql2/promise`     | `adapter.ts:23,634`                            | Requires Deno npm resolution, Node-compatible socket APIs, and `--allow-net`.                                       |
+| Factory goes to Prisma                     | Prisma 7 declarations; `PrismaMySql.connect()` | Do not pass a connected adapter to `PrismaClient`.                                                                  |
+| Generated client is real                   | Generator convention plus example prerequisite | No ambient declarations or fictional imports; the actual package example is directly checked.                       |
+| Structured fields only                     | `MySqlConnectionConfig`; translator            | No direct connection string in this package.                                                                        |
+| Hook wording comes from `types.ts:39-42`   | #1662 shipped source                           | Remove the stale unsupported warning.                                                                               |
+| Legacy TLS mode is deprecated, not changed | Coordinator TLS ruling; current translator     | State and characterize plaintext with no CAs and joined `ssl.ca` only with non-empty CAs; no hostname verification. |
+| Translator seam is source-internal         | Coordinator authorization                      | Export from `src/adapter.ts` only; no barrel export and no runtime injection.                                       |
+| Existing test owns evidence                | `connection_errors_test.ts`                    | Extend its `FakePoolClient` mapping/cleanup coverage; no second test.                                               |
+| Legacy Deno-driver types are deleted       | Symbol-use census                              | Unused/stale types and root exports are removed in implementation.                                                  |
+| Debug namespace remains                    | `adapter.ts:30`                                | Observable `DEBUG=` compatibility behavior.                                                                         |
 
 ## Option Findings
 
@@ -58,10 +58,12 @@ defaults `connectionLimit` to 1. `PrismaMySqlOptions.database` affects Prisma `s
 driver database. `onConnectionError` is an adapter callback and is observable across classified
 boundaries.
 
-The only current option defect is `tls.mode: 'verify_identity'`: base code sets `ssl.ca` only when
-custom CAs exist and never enables mysql2 identity verification. The plan corrects that behavior and
-tests mappings with no TLS, disabled TLS, identity verification with platform roots, and identity
-verification with joined custom CAs.
+The only current option defect is `tls.mode: 'verify_identity'`. The plan deprecates that existing
+member without changing runtime semantics. Without non-empty `caCerts`, `ssl` remains unset, so the
+connection is plaintext and no TLS is requested. With non-empty `caCerts`, only joined `ssl.ca` is
+forwarded; mysql2 hostname identity verification is not enabled. Focused characterization tests pin
+both legacy branches. A behavior change or removal is deferred to a separately scoped breaking
+change.
 
 ## Test Seams
 
@@ -71,7 +73,8 @@ verification with joined custom CAs.
 - Authorized minimum: export that pure function from `src/adapter.ts` for direct test import only.
 - Forbidden: package-root re-export, public barrel exposure, `PrismaMySqlAdapter` public exposure,
   or a runtime pool-factory injection port.
-- Extend `connection_errors_test.ts` with exact mapping and successful close-count assertions.
+- Extend `connection_errors_test.ts` with exact mapping characterization—including the unchanged
+  plaintext/CA-only TLS branches—and successful close-count assertions.
 
 ## Base Gates
 
@@ -89,7 +92,8 @@ verification with joined custom CAs.
 ## Planned New Evidence
 
 - Direct structured check of the live `examples/basic-usage.ts` Prisma path.
-- Exact structured/default/TLS translation assertions through the source-only seam.
+- Exact structured/default translation and legacy TLS characterization assertions through the
+  source-only seam.
 - Successful `FakePoolClient.close()` invocation exactly once.
 - Source search proving all eight Deno-native prose locations are corrected while the debug
   namespace remains unchanged.
@@ -116,8 +120,9 @@ Only harness artifacts are amended. Product paths remain untouched:
 
 - Significant authorized rescope: the coordinator added the package example and existing connection
   test, and prescribed the source-only translator seam.
-- Significant product finding: advertised TLS identity verification is not implemented at base; it
-  is now owned rather than deferred.
+- Significant product finding: advertised TLS identity verification is not implemented at base; this
+  leaf owns deprecation/documentation/characterization, while runtime change or removal is deferred
+  to a separately scoped breaking change.
 - Process variance: the explicit artifact allowlist omits mandatory `supervisor.md`; recorded in
   `drift.md` and not overridden.
 - No new architecture debt accepted.
