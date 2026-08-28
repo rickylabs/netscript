@@ -1291,3 +1291,33 @@ repository.** Recorded either way, as the box requires.
 **Rebase rewrites the S1–S5 SHAs**, so slice checkboxes and evidence must be restamped afterwards.
 That is why this pass repairs only rebase-durable parts of the public record and binds acceptance
 evidence to **stable PR-comment URLs** rather than SHAs.
+
+### Public record repaired; gate state captured (closeout, same session)
+
+PR #1663 body repaired in place: S1–S5 ticked with pre-rebase SHAs and the **missing S5 row added**;
+Harness phase corrected from "amendment pending Tier-A" to impl-complete-awaiting-rebase; Validation
+rewritten to carry the Tier-A stand-in gate, both IMPL-EVAL verdicts, the known-red doc-lint
+baseline, and the box-4 sweep; Drift/Debt carries the unregistered MCP doc-lint escalation and the
+pending rebase. Three fenced `acceptance-evidence` blocks added for #1604/#1618/#1622, bound to
+**stable PR-comment URLs rather than commit SHAs** so they survive the rebase.
+
+**DoD and issue acceptance boxes deliberately left unticked.** Ticking them now would bind evidence
+to heads the rebase is about to rewrite — precisely the stale-evidence failure the close-gate mirror
+exists to prevent. This is a considered deviation from a literal "repair the record now" reading and
+is stated openly on the PR.
+
+Gate state, both read-only:
+
+| Tool                                   | Result                                                                 |
+| -------------------------------------- | ----------------------------------------------------------------------- |
+| `mirror-acceptance-evidence --dry-run` | skipped — live PR labels lack `status:ready-merge`; blocks parsed with no format error |
+| `check-close-gate`                     | **exit 1** — 11 issue acceptance boxes + 14 PR DoD boxes unchecked; correct for `status:impl` |
+
+Full box-text matching cannot be validated until `status:ready-merge` is applied, which is
+coordinator-owned; the mirror's own message names the sequence (label, then `gh run rerun <id>` so
+live reads observe the label without moving the evaluated head).
+
+Closeout comment: PR #1663 comment `5450662110`.
+
+**Next gate is the coordinator's: authorize the rebase.** This lane holds no lease, ran no runtime
+gate, left Docker and Aspire empty, and stops here.
