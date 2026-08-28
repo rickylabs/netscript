@@ -62,6 +62,28 @@ interface BatchFailure {
   stdout: string;
 }
 
+export type CoverageRefusalCause =
+  | 'empty-selection'
+  | 'all-excluded'
+  | 'partial-exclusion'
+  | 'processed-count-unavailable'
+  | 'processed-count-inconsistent';
+
+export interface CoverageRefusal {
+  cause: CoverageRefusalCause;
+  filesSelected: number;
+  filesProcessed?: number;
+  droppedFiles: string[];
+  unverifiedFiles?: string[];
+}
+
+export interface CoverageReport {
+  filesSelected: number;
+  filesProcessed?: number;
+  droppedFiles: string[];
+  refusals: CoverageRefusal[];
+}
+
 interface OutputReport {
   source: {
     mode: 'file' | 'command';
@@ -75,6 +97,7 @@ interface OutputReport {
     failedBatches: number;
     excludedBatches?: number;
   };
+  coverage?: CoverageReport;
   summary: {
     totalOccurrences: number;
     uniqueOccurrences: number;
@@ -98,6 +121,7 @@ const SKIP_DIRS = new Set([
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 const RULE_HEADER = /^(?:error\[([^\]]+)\]:\s*(.+)|\(([^)]+)\)\s+(.+))$/;
 const LOCATION_LINE = /^\s*(?:-->|at)\s+(?:file:\/\/)?(.+?):(\d+):(\d+)/;
+const LINT_COMPLETION_LINE = /^Checked (\d+) files?$/;
 const NO_TARGET_FILES_MESSAGE = 'No target files found.';
 const IGNORE_MARKER = '.deno-fmt-lint-ignore';
 const DENO_CONFIG_NAMES = ['deno.json', 'deno.jsonc'] as const;
@@ -453,9 +477,56 @@ export interface LintRunResult {
   text: string;
   exitCode: number;
   failures: BatchFailure[];
+  coverage: CoverageReport;
   noTargetBatches: number;
   batches: number;
   failedBatches: number;
+}
+
+type CompletionEvidence =
+  | { processedCount: number }
+  | { cause: 'processed-count-unavailable' | 'processed-count-inconsistent' };
+
+/** Parse Deno's terminal lint completion summary into its processed-file count. */
+export function parseLintCompletion(text: string): CompletionEvidence {
+  const lines = stripAnsi(text).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const matches = lines.flatMap((line) => {
+    const match = line.match(LINT_COMPLETION_LINE);
+    return match ? [{ line, processedCount: Number(match[1]) }] : [];
+  });
+  const summaryLike = lines.filter((line) => line.startsWith('Checked'));
+
+  if (matches.length === 0) return { cause: 'processed-count-unavailable' };
+  if (
+    matches.length !== 1 || summaryLike.length !== 1 ||
+    lines.at(-1) !== matches[0].line
+  ) {
+    return { cause: 'processed-count-inconsistent' };
+  }
+
+  return { processedCount: matches[0].processedCount };
+}
+
+function sortedPaths(paths: Iterable<string>): string[] {
+  return [...new Set([...paths].map(normalizePath))].sort((left, right) =>
+    left.localeCompare(right)
+  );
+}
+
+function makeCoverageRefusal(
+  cause: CoverageRefusalCause,
+  filesSelected: number,
+  droppedFiles: string[],
+  filesProcessed?: number,
+  unverifiedFiles: string[] = [],
+): CoverageRefusal {
+  return {
+    cause,
+    filesSelected,
+    ...(filesProcessed === undefined ? {} : { filesProcessed }),
+    droppedFiles,
+    ...(unverifiedFiles.length > 0 ? { unverifiedFiles } : {}),
+  };
 }
 
 /**
@@ -472,10 +543,17 @@ export async function runLint(
   runner: BatchRunner = denoLintRunner,
 ): Promise<LintRunResult> {
   let text = '';
-  let exitCode = 0;
   const failures: BatchFailure[] = [];
   let noTargetBatches = 0;
   let failedBatches = 0;
+  let hasFinding = false;
+  let processedCount = 0;
+  let evidenceCause:
+    | 'processed-count-unavailable'
+    | 'processed-count-inconsistent'
+    | undefined;
+  const droppedFiles = new Set<string>();
+  const unverifiedFiles = new Set<string>();
   const batches = await buildConfigBatches(
     files,
     options.cwd,
@@ -484,24 +562,73 @@ export async function runLint(
     new Map(),
   );
 
+  const recordEvidenceCause = (
+    cause: 'processed-count-unavailable' | 'processed-count-inconsistent',
+  ): void => {
+    if (cause === 'processed-count-inconsistent' || !evidenceCause) evidenceCause = cause;
+  };
+
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
     const batch = batches[batchIndex];
     const result = await runner(batch.files, options.cwd, batch.config);
     const output = result.stdout + result.stderr;
     text += output;
 
-    if (result.code === 0) continue;
-    failedBatches++;
-    if (output.includes(NO_TARGET_FILES_MESSAGE)) {
+    const whollyExcluded = output.includes(NO_TARGET_FILES_MESSAGE);
+    if (result.code !== 0) failedBatches++;
+
+    if (whollyExcluded) {
       noTargetBatches++;
-      exitCode = 2;
+      for (const file of batch.files) droppedFiles.add(normalizePath(file));
       continue;
     }
 
-    exitCode = result.code;
+    const completion = parseLintCompletion(output);
+    if ('cause' in completion) {
+      recordEvidenceCause(completion.cause);
+      for (const file of batch.files) unverifiedFiles.add(normalizePath(file));
+    } else if (completion.processedCount > batch.files.length) {
+      recordEvidenceCause('processed-count-inconsistent');
+      for (const file of batch.files) unverifiedFiles.add(normalizePath(file));
+    } else if (completion.processedCount === batch.files.length) {
+      processedCount += completion.processedCount;
+    } else {
+      let probedProcessed = 0;
+      const probeUnverified = new Set<string>();
+
+      for (const file of batch.files) {
+        const probe = await runner([file], options.cwd, batch.config);
+        const probeOutput = probe.stdout + probe.stderr;
+        if (probeOutput.includes(NO_TARGET_FILES_MESSAGE)) {
+          droppedFiles.add(normalizePath(file));
+          continue;
+        }
+
+        const probeCompletion = parseLintCompletion(probeOutput);
+        if ('processedCount' in probeCompletion && probeCompletion.processedCount === 1) {
+          probedProcessed++;
+        } else {
+          probeUnverified.add(normalizePath(file));
+        }
+      }
+
+      if (probeUnverified.size === 0 && probedProcessed === completion.processedCount) {
+        processedCount += completion.processedCount;
+      } else {
+        recordEvidenceCause('processed-count-inconsistent');
+        for (const file of batch.files) {
+          if (!droppedFiles.has(normalizePath(file))) {
+            unverifiedFiles.add(normalizePath(file));
+          }
+        }
+      }
+    }
+
+    if (result.code === 0) continue;
 
     // A non-zero batch with no parseable occurrence is a crash, not a lint finding.
-    if (parseOccurrences(output).length === 0) {
+    const batchOccurrences = parseOccurrences(output);
+    if (batchOccurrences.length === 0) {
       failures.push({
         batchIndex,
         exitCode: result.code,
@@ -510,13 +637,90 @@ export async function runLint(
         stderr: stripAnsi(result.stderr).trimEnd(),
         stdout: stripAnsi(result.stdout).trimEnd(),
       });
+    } else {
+      hasFinding = true;
     }
   }
+
+  const normalizedDropped = sortedPaths(droppedFiles);
+  const normalizedUnverified = sortedPaths(unverifiedFiles);
+  let coverage: CoverageReport;
+
+  if (files.length === 0) {
+    coverage = {
+      filesSelected: 0,
+      filesProcessed: 0,
+      droppedFiles: [],
+      refusals: [makeCoverageRefusal('empty-selection', 0, [], 0)],
+    };
+  } else if (evidenceCause) {
+    coverage = {
+      filesSelected: files.length,
+      droppedFiles: normalizedDropped,
+      refusals: [
+        makeCoverageRefusal(
+          evidenceCause,
+          files.length,
+          normalizedDropped,
+          undefined,
+          normalizedUnverified,
+        ),
+      ],
+    };
+  } else if (processedCount + normalizedDropped.length !== files.length) {
+    const candidates = sortedPaths(
+      files.filter((file) => !droppedFiles.has(normalizePath(file))),
+    );
+    coverage = {
+      filesSelected: files.length,
+      droppedFiles: normalizedDropped,
+      refusals: [
+        makeCoverageRefusal(
+          'processed-count-inconsistent',
+          files.length,
+          normalizedDropped,
+          undefined,
+          candidates,
+        ),
+      ],
+    };
+  } else if (processedCount === 0) {
+    coverage = {
+      filesSelected: files.length,
+      filesProcessed: 0,
+      droppedFiles: normalizedDropped,
+      refusals: [makeCoverageRefusal('all-excluded', files.length, normalizedDropped, 0)],
+    };
+  } else if (normalizedDropped.length > 0) {
+    coverage = {
+      filesSelected: files.length,
+      filesProcessed: processedCount,
+      droppedFiles: normalizedDropped,
+      refusals: [
+        makeCoverageRefusal(
+          'partial-exclusion',
+          files.length,
+          normalizedDropped,
+          processedCount,
+        ),
+      ],
+    };
+  } else {
+    coverage = {
+      filesSelected: files.length,
+      filesProcessed: processedCount,
+      droppedFiles: [],
+      refusals: [],
+    };
+  }
+
+  const exitCode = coverage.refusals.length > 0 ? 2 : failures.length > 0 || hasFinding ? 1 : 0;
 
   return {
     text,
     exitCode,
     failures,
+    coverage,
     noTargetBatches,
     batches: batches.length,
     failedBatches,
@@ -660,6 +864,7 @@ async function main(): Promise<void> {
   let files: string[] | undefined;
   let batches: number | undefined;
   let failures: BatchFailure[] = [];
+  let coverage: CoverageReport | undefined;
   let noTargetBatches = 0;
   let failedBatches = 0;
 
@@ -671,6 +876,7 @@ async function main(): Promise<void> {
     text = result.text;
     exitCode = result.exitCode;
     failures = result.failures;
+    coverage = result.coverage;
     noTargetBatches = result.noTargetBatches;
     batches = result.batches;
     failedBatches = result.failedBatches;
@@ -700,6 +906,7 @@ async function main(): Promise<void> {
         excludedBatches: noTargetBatches || undefined,
       }
       : undefined,
+    coverage,
     summary: {
       totalOccurrences: occurrences.length,
       uniqueOccurrences: uniqueOccurrences.length,
@@ -719,24 +926,24 @@ async function main(): Promise<void> {
   }
 
   if (failures.length > 0) console.error(formatFailures(failures));
-  if (noTargetBatches > 0) {
-    console.error(
-      `${noTargetBatches} deno lint batch(es) matched the wrapper selection but were excluded by Deno; refusing a false-green gate.`,
-    );
+  if (coverage && coverage.refusals.length > 0) {
+    const [refusal] = coverage.refusals;
+    const dropped = refusal.droppedFiles.length > 0
+      ? ` Dropped: ${refusal.droppedFiles.join(', ')}.`
+      : '';
+    console.error(`deno lint coverage refusal: ${refusal.cause}.${dropped}`);
   }
 
   // Invariant: a non-zero exit must never be silent. If a batch failed but we captured neither an
   // occurrence nor a failure record, say so loudly rather than exiting 1 with an empty report.
-  if (exitCode && exitCode !== 0 && groups.length === 0 && failures.length === 0) {
+  if (
+    exitCode && exitCode !== 0 && groups.length === 0 && failures.length === 0 &&
+    coverage?.refusals.length === 0
+  ) {
     console.error(
       `deno lint exited ${exitCode} but produced no lint occurrences and no captured batch error. ` +
         'Re-run with --batch-size 1 to isolate the offending file.',
     );
-  }
-
-  if (!options.input && files?.length === 0) {
-    console.error('deno lint selection matched zero files; refusing a false-green gate.');
-    Deno.exit(2);
   }
 
   if (exitCode && exitCode !== 0) Deno.exit(exitCode);
