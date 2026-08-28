@@ -572,3 +572,65 @@ specialized gate with its scope stated honestly. No eighth path granted, no excl
 
 **PLAN-EVAL cycle 2 NOT launched** — it awaits an explicit coordinator grant. No implementation.
 Scratch archives removed; the leaf worktree was never touched. Docker 0, no lease, no other lane.
+
+---
+
+# PLAN-EVAL cycle 2 — terminal `FAIL_PLAN`; reconciliation only
+
+| Field | Value |
+| --- | --- |
+| Verdict | **CHANGES_REQUESTED / `FAIL_PLAN`**, cycle **2 of 2** |
+| Evaluated plan head | `da769cd7c8e0438f2317ed761ec10bce15692d03` — unchanged; local == PR |
+| Evaluator artifact | `60cf79ee54ca17dfaa7d62c609290993040539f9`, pushed to `refs/heads/eval/plan-eval-1711-cycle-2` |
+| Public comment | `5454993523` — `2026-08-28T16:23:40Z`, 4881 bytes |
+| Evaluator | Fable 5 · medium, job `18b66c8f`, session `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `cse_01EQXNxAuAuhDuRKvGYBx5iY` — **released** |
+
+The evaluator pushed its artifact to a real branch rather than leaving it in a detached worktree, so
+unlike cycle 1's `5b58738ab` it cannot be orphaned.
+
+## F1-b — verified independently, and it corrects this topic's own Tier-A PASS
+
+**The finding:** on Deno 2.9.5 a **literal** dynamic import `await import('./.generated/client.ts')`
+stays green with the client absent **and** restores static typing when it exists. The non-literal URL
+form therefore makes the shipped example `any` for no benefit, leaving only a copied scratch wrapper
+typed.
+
+Re-derived here from a `git archive` of the exact head, on `deno 2.9.5`:
+
+| Test | Result |
+| --- | --- |
+| Literal dynamic import, generated output **absent**, ordinary root wrapper | `filesSelected: 12`, `failedBatches: 0`, `occurrences: 0`, **exit 0** |
+| Same, client **present**, deliberate misuse probe under the scratch config | **`TS2322 — Type 'PrismaClient<never, GlobalOmitConfig \| undefined, DefaultArgs>' is not assignable to type 'number'`** |
+
+That second line is the real generated type, not `any`. Under the non-literal URL form the same probe
+passes silently. **Both halves of F1-b hold.**
+
+**This is a defect in my own review.** My Tier-A PASS at `da769cd7c` verified that the non-literal form
+*worked* against the coordinator's clean-checkout boundary. It never asked whether the non-literal form
+was *necessary* — whether a strictly better option existed inside the same constraints. It did. I tested
+the proposal rather than the design space, and a cheaper, more honest architecture was one probe away.
+The evaluator asked the better question.
+
+Recorded as a by-product: with generated output present, the **ordinary root wrapper goes red for
+unrelated reasons** — 51 `TS9010`/`TS9027` `isolatedDeclarations` diagnostics from the generated client
+itself. That is why gate 5 needs its scratch config, and it is the state advisory **A2** concerns.
+
+## Required bounded path if the owner accepts — recorded, not executed
+
+Literal dynamic import; gate 5 types the **actual example** with the scratch config and client present;
+preserve gate-1's untyped wording and note that gate 5 types the example; bind the connected-adapter
+risk row to that example check. **No new product path.**
+
+Advisories: **A1** import-map wording, **A2** gate-1 behaviour during the generated window, **A3** pin
+the `import.meta.main` smoke guard.
+
+**Not executed.** This is reconciliation only — no repair, no cycle 3, no implementation.
+
+## State
+
+Evaluator **released**; `claude agents --json` shows **0** active `#1711`/`#1112` sessions. Canonical
+author `01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8` **kept available and not resumed**; the leaf head is
+unchanged at `da769cd7c`. Docker **0**, no runtime lease, no other lane touched.
+
+PLAN-EVAL cycle count for this leaf: **2 of 2 — exhausted**. Awaiting the owner decision on the bounded
+path above.
