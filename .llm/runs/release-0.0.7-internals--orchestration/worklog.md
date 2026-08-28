@@ -1870,3 +1870,60 @@ modes already proven.
 Per the plan gate's two-cycle rule and the standing instruction for this cycle: evaluator
 **released**; canonical author `01a047f0-…` **kept available and not frozen**; **no cycle 3 inferred
 or recommended**; no implementation grant sought. The leaf sits clean and plan-only at `f2b3fc8b3`.
+
+## 2026-08-28 — #1663 SHIPPED; inbound #1709 cycle-2 `FAIL_PLAN` escalation received
+
+### #1663 closed out and merged at the exact head I passed
+
+| Field            | Value                                                        |
+| ---------------- | ------------------------------------------------------------ |
+| Merged           | 2026-08-28T10:08:41Z                                          |
+| Merged head      | `a188c7c730be1f71c255057514d5d8d43c10e594` — **the exact head of my Tier-A closeout PASS** |
+| Merge commit     | `cf648f1ff973d74c213bb125a6f5f5b9328e693b`, now `origin/main` |
+| PR labels        | `status:shipped`, plus `gate:jsr` and `impl-eval:skip`        |
+| #1604            | CLOSED/COMPLETED, `status:shipped`                            |
+| #1618            | CLOSED/COMPLETED, `status:shipped`                            |
+| #1622            | CLOSED/COMPLETED, `status:shipped`                            |
+
+The coordinator merged on my PASS and adopted the **equivalence binding** rather than ordering a
+re-evaluation — visible as the `impl-eval:skip` label, which is the recorded form of "the two
+standing verdicts bind to the rebased SHAs by proven patch-equivalence". That matches the
+recommendation in my closeout review; recording it as the coordinator's decision, not mine.
+
+The leaf worktree `/home/codex/repos/netscript-007-package-gate` was removed again by host cleanup
+and the branch deleted post-merge. **Zero loss** — everything was pushed, and the merge commit
+carries it. Same non-event as the earlier removal, for the same reason: explicit-refspec pushes.
+
+Five slices, three `FAIL_PLAN` cycles, an owner-granted Tier-A stand-in gate, a full IMPL-EVAL, a
+delta IMPL-EVAL, a patch-equivalent rebase and a closeout Tier-A — all landed.
+
+### Inbound: #1709 / PR #1710 PLAN-EVAL cycle 2 `FAIL_PLAN` — internals lane, owner escalation
+
+Received from evaluator session `14cfb576-de3f-40a5-b23a-d9e8e8d018e4` (Fable 5 medium, native,
+requested == observed; distinct from author `01a047f0`, this supervisor, and cycle-1 evaluator
+`1b7a1305`). **Verified independently rather than relayed on trust:**
+
+- Issue **#1709** is real and in this lane: "Deno lint and fmt wrappers report green when Deno drops
+  part of a selected batch" — `type:fix`/`area:tooling`, **p1**, milestone `0.0.7`, `status:plan`.
+- PR **#1710** `fix(tooling): fail closed on partial lint/fmt exclusions`, draft, base `main`, head
+  **`f2b3fc8b3`** — equals the reported verdict commit.
+- Branch history matches the reported cycle structure exactly: `59b79ccd8` cycle-1 verdict →
+  `3e934e2de` repair (the reported evaluated head) → `f2b3fc8b3` cycle-2 verdict.
+
+Reported substance: F1/F3 closed, A1–A3 folded, F2 closed for lint and fmt **check** mode. New
+blocking **F4** — write-mode `deno fmt a.ts b.ts` can end in
+`error: Failed to format 1 of 2 checked files`, a **third completion form** the locked two-form fmt
+adapter does not admit, so a literal S3 would turn `deno task fmt` parse-error runs from an exit-1
+crash into exit-2 processed-count-unavailable with up to 200 unverified files — contradicting
+D8/must-not-regress, with no write-mode control exercising it. Advisory A4 notes pre-existing
+check-mode diagnostic loss at batch 200 vs 1.
+
+This is the **same false-green class** #1618 and the deferred L-2 item belong to, which is why it sits
+in this lane.
+
+**The ordinary two-cycle allowance is exhausted.** By `gates/plan-gate.md:40` the leaf returns to the
+owner; the evaluator explicitly recommends no third cycle. A third PLAN-EVAL is **owner-only** — the
+#1663 precedent required an explicit owner grant, and this lane cannot self-authorize one.
+
+**No action taken:** nothing dispatched, no third cycle requested or assumed, no labels, readiness,
+checkboxes, or central state touched, and no other lane approached. Escalated to the owner.
