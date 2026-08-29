@@ -142,3 +142,22 @@
   empty); the receipt records `get_integration_docs` as a documented-but-absent tool (upstream doc
   discrepancy §11 item 6) and treats its later appearance as `info`, not `fail`. Issue #1721 gets a
   comment; `research.md` C16/C27 get an errata line at the next research-dir edit.
+
+## D-16 — Isolated starts reuse the generated Postgres host port (S2 V3)
+
+- Severity: significant (product; S5 scope)
+- Observation: two consecutive `aspire start --isolated` runs of the same generated project both
+  bound Postgres to host port 14428; `verify-live-db-endpoint` exited 1.
+  `DcpPublisher__RandomizePorts` does not cover the generated infrastructure `withHostPort`/endpoint
+  pins.
+- Action: S5 (#1717) must include infrastructure host-port pins in the literal-port removal / opt-in
+  policy; S10 keeps the gate; noted on #1717.
+
+## D-17b — Cold start 38.6 s and web readiness timeout on 13.5.3 (S2 V2)
+
+- Severity: minor (evidence)
+- Observation: time-to-`dashboardUrl` 38.6 s cold / 24.8 s warm on this host (skill baseline 13 s on
+  13.4.6, different machine state); web readiness timed out because Prisma/Zod generated output was
+  absent until `db generate` ran; browser-log child `NotStarted`.
+- Action: S9 replaces the skill timing claim with measured ranges; S10 orders db codegen before the
+  readiness wait; not an Aspire regression claim without a same-host 13.4.6 control.
