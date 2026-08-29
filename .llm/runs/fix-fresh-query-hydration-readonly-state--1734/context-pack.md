@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `fix-fresh-query-hydration-readonly-state--1734` |
 | Branch | `fix/fresh-query-hydration-readonly-state` |
-| Current phase | `plan` |
+| Current phase | `gate` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` (contract-only) |
 
 ## Current State
 
-S2 is implemented and focused-green. Private guards validate readonly unknown cache records before
-copying them into TanStack's mutable input. Exact 5.101.0 and 5.102.8 checks pass; public types,
-exports, and the ^5.101.0 range remain unchanged.
+Implementation and the preliminary complete static suite are green. Private guards validate
+readonly unknown cache records before copying them into TanStack's mutable input. Exact 5.101.0
+and 5.102.8 checks pass; public types, exports, and the `^5.101.0` range remain unchanged.
 
 ## Completed
 
@@ -25,16 +25,18 @@ exports, and the ^5.101.0 range remain unchanged.
 - S1 RED fixture/test added and proven failing before implementation.
 - S2 private boundary correction and behavior tests implemented.
 - Focused tests/check/lint/fmt, quality scan (`allowCount: 7`), and arch check pass.
+- Root check/test/lint/fmt, quality scan, arch check, and Fresh publish dry-run pass.
+- Fresh doc-lint and JSR audit remain at their recorded inherited baselines.
 
 ## In Progress
 
-- S2 commit and push.
+- S3 final run-state commit and exact-head receipt rerun.
 
 ## Next Steps
 
-1. Commit/push S2 and post its PR phase comment.
-2. Run the final exact-head requested static suite.
-3. Push the receipt commit and leave the PR draft for external Tier-A/IMPL-EVAL.
+1. Commit/push S3 run-state artifacts.
+2. Rerun every owner-required receipt without modifying files.
+3. Update the draft PR body/comment with exact-head evidence and hand off to Tier-A/IMPL-EVAL.
 
 ## Key Decisions
 
@@ -58,10 +60,10 @@ exports, and the ^5.101.0 range remain unchanged.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | focused PASS | 4 tests; 3-file check/lint; 5-file fmt |
-| Fitness | focused PASS | quality scan and arch check |
+| Static | preliminary full PASS | root check; 4,246/0 tests; 2,045-file lint/fmt |
+| Fitness | preliminary full PASS | quality scan allowCount 7; arch check; Fresh publish dry-run |
 | Runtime | N/A | no lease |
-| Consumer | pending | S2 |
+| Consumer | PASS | exact 5.101.0 and 5.102.8 no-lock checks |
 
 ## Open Questions
 
