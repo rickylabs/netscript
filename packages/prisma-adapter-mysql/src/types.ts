@@ -22,9 +22,19 @@ export interface MySqlConnectionConfig {
   timeout?: number;
   /** TLS configuration */
   tls?: {
-    /** TLS verification mode. */
+    /**
+     * Legacy TLS selector.
+     *
+     * `verify_identity` is deprecated because its name does not match its behavior. Without
+     * non-empty `caCerts`, `ssl` is left unset and the connection is plaintext. With non-empty
+     * `caCerts`, only the joined `ssl.ca` value is forwarded; mysql2 hostname identity verification
+     * is not enabled. Runtime behavior is unchanged for compatibility.
+     *
+     * @deprecated Do not select `verify_identity`; changing or removing its legacy behavior requires
+     * a separately scoped breaking change.
+     */
     mode?: 'disabled' | 'verify_identity';
-    /** CA certificates used by TLS verification. */
+    /** CA certificates forwarded only for the deprecated `verify_identity` legacy branch. */
     caCerts?: string[];
   };
 }

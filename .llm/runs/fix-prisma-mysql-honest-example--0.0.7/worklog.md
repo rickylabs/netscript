@@ -103,6 +103,27 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 | 2026-08-28 | planning  | F1 repair       | Re-derived a non-literal URL dynamic import in a tracked-files archive. Ordinary root checking selected 12 files and passed before generation and after cleanup. A static scratch wrapper passed real Prisma factory/query/disconnect types, and importing the actual example printed `dynamic-import-smoke:ok` without contacting MySQL.                             |
 | 2026-08-28 | plan gate | Cycle 2         | Fresh PLAN-EVAL returned terminal `FAIL_PLAN` at `da769cd7c8e0438f2317ed761ec10bce15692d03` on F1-b. Deno 2.9.5 literal dynamic import preserved both clean-root behavior and real generated typing, proving the non-literal premise unnecessary; advisories required consumer import-map wording, generated-window semantics, and a pinned `import.meta.main` guard. |
 | 2026-08-28 | planning  | Owner amendment | Owner accepted F1-b and authorized only the literal-dynamic-import correction inside the existing seven paths. No cycle 3, third evaluator, implementation, architecture expansion, or product mutation is authorized; focused Tier-A follows this pushed artifact head.                                                                                              |
+| 2026-08-29 | impl      | Grant           | Coordinator granted implementation at Tier-A-passed plan head `6ae7113eb4636972ef1df80fc08e6e3a0390d3fb`; the seven-path ceiling and two-slice order remain fixed. |
+| 2026-08-29 | slice 1   | Load-bearing D17 check | Generated a real Prisma 7.8 client in scratch and checked the actual edited example. Before D17 it failed once with `TS2322` (`PrismaMySqlAdapterFactory` not assignable to `SqlDriverAdapterFactory`); after narrowing `columnTypes` it selected one file with zero diagnostics. The guarded import-only smoke printed `dynamic-import-smoke:ok`. |
+| 2026-08-29 | slice 1   | Source contract | Added the source-only translator seam, exact structured-to-mysql2 characterization (including both legacy TLS branches), deprecated the misleading mode without runtime change, and asserted successful pool cleanup exactly once. Focused tests passed 38/38. |
+| 2026-08-29 | slice 1   | D17 wrapper choice | Dropped the optional scratch compatibility wrapper. The actual-example check exercises the same factory construction, Prisma client construction, query, and `finally` disconnect with the real generated client, and caught the identical D17 defect; retaining a second scratch program would duplicate evidence and add drift surface. |
+| 2026-08-29 | slice 1   | Scratch cleanup | Removed `examples/.generated` and all `.llm/tmp/prisma-example*` inputs after the green actual-file check and smoke. The ordinary package-root wrapper then selected 12 files with zero diagnostics; `deno.lock` remained unchanged. |
+
+## Implementation Evidence
+
+### Slice 1 — source contract and characterization
+
+| Evidence | Result |
+| --- | --- |
+| Actual example before D17 | Structured real-client check exited 1 with one `TS2322` at `new PrismaClient({ adapter })`. |
+| Actual example after D17 | Structured real-client check selected 1 file, 0 diagnostics, exit 0. |
+| Guarded import-only smoke | Exit 0; printed `dynamic-import-smoke:ok`; `main()` remained exclusively under `import.meta.main`. |
+| Focused adapter test | 38 passed, 0 failed, including exact option mapping, both legacy TLS branches, and exactly-once successful close. |
+| Clean package check | 12 selected, 0 failed batches, 0 diagnostics after scratch cleanup. |
+| Package lint / format | 12 selected with zero lint findings; 12 selected with zero format findings after targeted formatting. |
+| Code quality / doctrine | `deno task quality:gate` exit 0; repository scan had no findings and doctrine reported only existing warnings. |
+
+This is generator-run evidence, not Tier-A review or self-certification.
 
 ## Decisions
 
@@ -117,7 +138,7 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 | Debug namespace stays                                                         | Observable compatibility, not prose                                                                                                                                                                                            | `adapter.ts:30`                                   |
 | TLS runtime mapping stays unchanged                                           | Tightening either legacy branch is breaking; deprecate/document/characterize instead                                                                                                                                           | coordinator TLS ruling                            |
 | Package example uses literal dynamic `await import('./.generated/client.ts')` | On Deno 2.9.5, unresolved dynamic imports defer to runtime, keeping gate 1 green; with the client present, gate 5 gives the actual shipped example real generated types.                                                       | cycle-2 F1-b; owner ruling                        |
-| Root shell and generated-client gates make different claims                   | With output absent, gate 1 validates tracked shell/control flow but leaves `PrismaClient`/`prisma` untyped. With output present, gate 5 checks the actual example, retains the D17 wrapper, and runs the guarded import smoke. | cycle-2 F1-b                                      |
+| Root shell and generated-client gates make different claims                   | With output absent, gate 1 validates tracked shell/control flow but leaves `PrismaClient`/`prisma` untyped. With output present, gate 5 checks the actual example and runs the guarded import smoke. The optional duplicate D17 wrapper was dropped during implementation. | cycle-2 F1-b; implementation discretion           |
 | Generated client needs consumer dependency resolution                         | Root `catalog:` is not an import map; owned example/README prose must require `@prisma/client` resolution through a consumer import map or `npm:` specifier.                                                                   | cycle-2 advisory A1                               |
 | Result-set declaration narrows to Prisma type                                 | Real generated-client checking exposed `number[]` as the sole adapter structural mismatch; `SqlResultSet['columnTypes']` passes without runtime change                                                                         | cycle-1 repair probe                              |
 
@@ -195,7 +216,7 @@ bounded plan correction but are not this generator's Tier-A verdict.
   after specialized-gate cleanup. No exclusion is allowed, and gate 1 is undefined while
   `.generated` exists.
 - Scratch-generate a real Prisma 7.8 client, check the actual example under the scratch config,
-  statically check D17 through the compatibility wrapper, then import the actual module and require
+  then import the actual module and require
   `dynamic-import-smoke:ok`. `main()` invocation must stay exclusively inside `import.meta.main`, so
   the smoke cannot contact MySQL.
 - Prove the source declaration uses Prisma's `SqlResultSet['columnTypes']` contract so the real
@@ -211,7 +232,7 @@ bounded plan correction but are not this generator's Tier-A verdict.
 - Evaluator should inspect `research.md` option table and rows 8-11 of the falsehood census first.
 - The highest-risk false-done is calling gate 1 a full client type check. With output absent, it
   validates the stable tracked shell while `PrismaClient`/`prisma` remain untyped. Gate 5 checks the
-  actual example itself with real generated types, retains the D17 wrapper, and executes the guarded
+  actual example itself with real generated types and executes the guarded
   dynamic import.
 - The TLS defect is owned through public deprecation, exact documentation, and characterization
   tests. Runtime change or removal remains deferred to a separately scoped breaking change.

@@ -7,14 +7,16 @@
 | Run ID          | `fix-prisma-mysql-honest-example--0.0.7`                         |
 | Branch          | `fix/prisma-mysql-honest-example`                                |
 | Base            | `cf648f1ff973d74c213bb125a6f5f5b9328e693b`                       |
-| Current phase   | `plan` / owner-authorized cycle-2 F1-b amendment; Tier-A pending |
+| Current phase   | `implementation` / slice 1 in progress                          |
 | Archetype       | `2 — Integration` (doctrine verdict Keep)                        |
 | Scope overlays  | `docs`                                                           |
 | Product ceiling | Seven named paths; an eighth product path requires rescope       |
 
 ## Current State
 
-Research and planning only are complete; no product file changed. PLAN-EVAL cycle 1 returned
+Research and planning are complete, and implementation was granted at focused Tier-A-passed plan
+head `6ae7113eb4636972ef1df80fc08e6e3a0390d3fb`. Slice 1 is implementing the source contract and
+focused characterization inside the fixed seven-path ceiling. PLAN-EVAL cycle 1 returned
 `FAIL_PLAN` at `069fd3e9175d28aaaf1b8c836e35d1f9bbbaa42a`. Fresh Tier-A failed the first repair head
 `3e0f2223ac7bed9068ecc033c92da7ffbed83711` on F1 alone because the static generated-client import
 became a permanent `TS2307` after scratch cleanup; F2-F4 were accepted. PLAN-EVAL cycle 2 evaluated
@@ -51,9 +53,9 @@ An eighth product path is a hard rescope.
 | Dynamic driver is npm `mysql2/promise`     | `adapter.ts:23,634`                            | Requires Deno npm resolution, Node-compatible socket APIs, and `--allow-net`.                                                                                                                            |
 | Factory goes to Prisma                     | Prisma 7 declarations; `PrismaMySql.connect()` | Do not pass a connected adapter to `PrismaClient`.                                                                                                                                                       |
 | Stable example shell remains resolvable    | Cycle-2 Deno 2.9.5 archive probe               | Literal dynamic import keeps all 12 package files selected and green before generation and after cleanup; no exclusion. With output absent, root checking leaves `PrismaClient`/`prisma` untyped.        |
-| Generated client is real                   | Gate-5 actual-file check + D17 wrapper + smoke | With a real Prisma 7.8 client present, the actual example is checked with real generated types; the D17 wrapper remains focused evidence, and the guarded import smoke prints `dynamic-import-smoke:ok`. |
+| Generated client is real                   | Gate-5 actual-file check + smoke               | With a real Prisma 7.8 client present, the actual example is checked with real generated types, and the guarded import smoke prints `dynamic-import-smoke:ok`. The optional redundant D17 wrapper was dropped during implementation. |
 | Generated runtime dependency is explicit   | Root catalog/import-map audit                  | Owned example/README prose says the generated client needs `@prisma/client` in the consumer import map or via an `npm:` specifier; root `catalog:` alone is not resolution.                              |
-| Prisma adapter types are compatible        | Real generated-client wrapper probe            | Narrow `PrismaMySqlResultSet.columnTypes` to `SqlResultSet['columnTypes']`; runtime conversion is unchanged.                                                                                             |
+| Prisma adapter types are compatible        | Real generated-client actual-file check        | Narrow `PrismaMySqlResultSet.columnTypes` to `SqlResultSet['columnTypes']`; runtime conversion is unchanged.                                                                                             |
 | Structured fields only                     | `MySqlConnectionConfig`; translator            | No direct connection string in this package.                                                                                                                                                             |
 | Hook wording comes from `types.ts:39-42`   | #1662 shipped source                           | Remove the stale unsupported warning.                                                                                                                                                                    |
 | Legacy TLS mode is deprecated, not changed | Coordinator TLS ruling; current translator     | State and characterize plaintext with no CAs and joined `ssl.ca` only with non-empty CAs; no hostname verification.                                                                                      |
@@ -106,7 +108,7 @@ change.
   the dynamic example shell; repeat it after specialized-gate cleanup. Gate 1 is undefined while
   `.generated` exists.
 - Scratch-generate a real Prisma 7.8 client, check the actual example under the scratch config,
-  retain the static D17 compatibility wrapper, then import the actual module with `main()`
+  check the actual example against D17, then import the actual module with `main()`
   invocation exclusively guarded by `import.meta.main`.
 - Structural proof that the factory is accepted by real Prisma types after the in-envelope
   `SqlResultSet['columnTypes']` declaration correction.
@@ -145,7 +147,7 @@ Only harness artifacts are amended. Product paths remain untouched:
   to a separately scoped breaking change.
 - PLAN-EVAL cycle-2 F1-b amended by owner ruling: literal dynamic import keeps the clean shell green
   on Deno 2.9.5 and lets gate 5 type the actual example when generated output exists. The D17
-  wrapper and guarded smoke remain; no architecture or product path was added. No eighth path is
+  actual-file check and guarded smoke remain; no architecture or product path was added. No eighth path is
   required.
 - Resolved process variance: the original artifact allowlist omitted mandatory `supervisor.md`. The
   coordinator ruled no waiver and amended the allowlist by exactly that control-plane path; the
