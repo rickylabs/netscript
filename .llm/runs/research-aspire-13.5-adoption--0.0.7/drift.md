@@ -128,3 +128,17 @@
   13.5.3.
 - Action: surfaced to the primary coordinator for the 0.0.7 fixes lane; S1 stays draft until the
   baseline is green or the coordinator admits S1 on the Aspire-specific evidence.
+
+## D-15 — Aspire MCP 13.5.3 exposes 14 tools; `get_integration_docs` is documented but absent
+
+- Severity: plan-shaping (S-09 acceptance)
+- Observation (S2 V8, exact host CLI 13.5.3+b5f1433, stdio `aspire agent mcp` from the generated
+  project root, 2026-08-29T22:47Z): `tools/list` = the same 14 tools as the committed 13.4.6
+  baseline (`refresh_tools` present); `get_integration_docs` — listed by
+  `sources/aspiredev-get-started_aspire-mcp-server.md` — is **not** exposed. Receipts:
+  `.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v8-*` on
+  `test/aspire-13-5-s2-runtime-verification`.
+- Action: S-09's smoke expectation becomes the **executed** 13.5.3 set (14 tools; `baselineDiff`
+  empty); the receipt records `get_integration_docs` as a documented-but-absent tool (upstream doc
+  discrepancy §11 item 6) and treats its later appearance as `info`, not `fail`. Issue #1721 gets a
+  comment; `research.md` C16/C27 get an errata line at the next research-dir edit.
