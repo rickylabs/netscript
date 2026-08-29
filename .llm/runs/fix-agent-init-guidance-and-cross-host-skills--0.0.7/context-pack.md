@@ -12,9 +12,10 @@
 
 ## Current State
 
-Implementation is complete within the five-path ceiling. The generated barrel is current, focused
-tests pass 22/22, scoped check/lint pass, and the real fresh-scaffold consumer proof passes. Slice 2
-is ready to commit; durable asset/quality/publish gates then run against its immutable SHA.
+Implementation is complete within the five-path ceiling and pushed as
+`2f4b8c00d664f0c03f22946d1e0315cb7819303e`. The generated barrel, focused tests (22/22), scoped
+check/lint, fresh-scaffold consumer proof, durable quality/doctrine gate, and CLI publish dry-run all
+pass. The structured formatter exception and behavioural decisions remain for Tier-A disposition.
 
 ## Completed
 
@@ -30,14 +31,13 @@ is ready to commit; durable asset/quality/publish gates then run against its imm
 
 ## In Progress
 
-- Slice 2 implementation commit and durable validation.
+- Slice 3 evidence commit, PR update, and Tier-A stop.
 
 ## Next Steps
 
-1. Commit/push Slice 2 with an explicit full refspec.
-2. Run durable asset freshness and quality/architecture gates against that SHA plus CLI publish dry-run.
-3. Record the formatter-policy exception and final receipts in Slice 3.
-4. Push, update draft PR evidence, and stop for Tier-A.
+1. Commit/push the run-only evidence update with an explicit full refspec.
+2. Update draft PR #1729 with Slice 2/3 evidence without closing keywords or readiness changes.
+3. Report exact final head and stop for Tier-A.
 
 ## Key Decisions
 
@@ -64,7 +64,7 @@ is ready to commit; durable asset/quality/publish gates then run against its imm
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | PASS with format exception pending Tier-A | Test 22/22, check/lint clean; CLI is excluded from authoritative root fmt config. |
-| Fitness | PENDING | Durable `quality:gate` after Slice 2 commit. |
+| Fitness | PASS | Durable `quality-gate.json` and `cli-publish-dry-run.json` at `2f4b8c00d...`. |
 | Runtime | N/A | E2E/Aspire/Docker unauthorized. |
 | Consumer | PASS | `scaffold-proof.json`: fresh 150-file workspace, host-all docs output and mirror equality. |
 
@@ -81,3 +81,5 @@ is ready to commit; durable asset/quality/publish gates then run against its imm
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
+- Slice 1: `83c605b9dae1238e44f59be8feb8e6f5ec21990f` — harness research/plan.
+- Slice 2: `2f4b8c00d664f0c03f22946d1e0315cb7819303e` — product implementation.
