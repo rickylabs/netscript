@@ -2402,3 +2402,62 @@ dashboard `:42413`. Containers created and destroyed by it: `redis-begjcewu`, `g
 `aspire stop` clean; containers **0**; `leak-check --owned-root /home/codex/repos/ns-verify-1371` →
 `aspire ok`, `docker ok`, `survivors: []`. Seven foreign `aspire mcp start` servers and a foreign
 lane's `deno publish` were identified in the baseline and left untouched.
+
+## 2026-08-29 — #1371 admitted: emitted fail-fast; implementation leaf launched
+
+Coordinator admitted the **emitted fail-fast** remedy over generator-time validation and over a
+warning. Rationale recorded on the issue rather than left to be inferred from code: a declared
+reference is a *required* dependency, and resolvability is only knowable once the resource maps and
+endpoints are assembled — which is the emitted wiring boundary. A warning cannot satisfy box 6,
+because box 6 is precisely about a misconfigured processor still starting.
+
+### Issue lifecycle
+
+- Body amended with an **Admitted design** section: throw a deterministic configuration error naming
+  processor + reference kind + reference name when `_services.get(ref)` / `_plugins.get(ref)` is
+  absent or its `http` endpoint cannot resolve, **before** the processor is registered; raw env-key
+  contract `services__<ref>__http__0` preserved verbatim; background only.
+- Boxes 1–3 remain checked on verification evidence; 4–7 remain open — verified unchanged by the
+  edit (3 checked / 4 unchecked before and after).
+- `status:research` → `status:impl`, exactly one `status:` label.
+- Admission comment `5464905516` records the decision, the rejected alternatives and why, what is
+  explicitly preserved, and that **#1365 is neither absorbed nor implicated** — with the honest
+  restatement that the browser path for a hyphenated resource remains unexercised.
+
+### Leaf and routing
+
+Worktree `/home/codex/repos/netscript-007-leaf-1371`, branch
+`fix/aspire-declared-reference-fail-fast`, base `3b32d1628584749af4dd6e97fd331c24e84f0b9e`, clean.
+
+Routed as **`normal_implementation`** — a bounded correction with an admitted design and a precise
+file target. Author: Codex · OpenAI · **GPT-5.6 Sol · medium**, launched through the pinned
+`agentic:launch-codex-slice` with explicit `--provider/--model/--effort` and `--expect-base
+3b32d1628`; dry-run validated first (brief `use harness=true ## SKILL=true`, staged 6807 bytes,
+git-safety `dirty:0`). Thread **`01a04f5d-7af1-7280-bf0f-adf2a43edb3e`**. Launched detached with
+`nohup … & disown`.
+
+**Reviewer pre-routed and it is not the #1709 route.** Lane policy effort-pairs adversarial review
+to the implementation lane: `normal_implementation` (Sol · medium) pairs with `review_codex` =
+**Fable 5 · low** (fallback Opus 5 · low). #1709 used Fable 5 · medium because it was
+`complex_implementation` (Sol · high). Carrying that route over would have been wrong.
+
+### Contract given to the author
+
+RED-first, boxes 4 and 6 landing together. Box 4 pins the emitted env key for both reference kinds
+including a **hyphenated** name, asserted against the consumer-read shape so emitted and read keys
+cannot drift apart silently. Box 6 drives the **emitted module** with stub `_services`/`_plugins`
+maps: resolvable service and resolvable plugin still set the env var; missing service, missing
+plugin, and present-but-unresolvable-endpoint each throw naming processor + kind + name; and the
+throw precedes registration. Positive cases retained, not replaced.
+
+Noted for the author rather than left to discovery: both the `ServiceReferences` and
+`PluginReferences` blocks carry the identical silent guard, so a service-only fix is incomplete; and
+`generate-register-background-1.ts.template` is a **slotted scaffold**, not an emission snapshot, so
+it is not expected to change — to be verified via `check:assets-barrel`, not assumed.
+
+**No runtime lease.** `scaffold.runtime`, `e2e:cli`, Aspire, Docker and browser are unavailable and
+must not be attempted; static and emitted-module tests only. The author must leave the PR **draft** —
+marking ready is this repo's IMPL-EVAL dispatch trigger, the trap that cost a close-gate cycle on
+#1710.
+
+Next: author push → fresh internals Tier-A → independent opposite-family IMPL-EVAL (Fable 5 · low).
