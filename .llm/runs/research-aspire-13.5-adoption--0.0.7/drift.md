@@ -109,3 +109,22 @@
   deprecated compat export; truncated rows reconstructed; deployment owned by S4 (D-15); D-17
   default locked. Every scripted edit was re-verified by grep before commit. No third ordinary
   PLAN-EVAL; next step is coordinator ratification.
+
+## D-13 — Resume turns drop the requested effort
+
+- Severity: minor (route)
+- Observation: `launch-codex-slice` matched openai · gpt-5.6-sol · medium for S1, but
+  `run-codex-slice` → `codex-resume` (`codex exec resume`) carries no `--effort`, so `codex-status`
+  reports the later turns at the profile default `high`.
+- Action: recorded; review pairing unchanged (Fable, medium+); agentic-suite follow-up to propagate
+  effort on resume (not an S1 concern).
+
+## D-14 — Baseline Fresh type error blocks the CI runtime verdict
+
+- Severity: significant (blocker for S1 draft→ready; not S1-caused)
+- Observation: `packages/fresh/src/application/query/hydration.ts:43` TS2345 fails generated-project
+  `deno task check` (`generated.quality-negative`, `generated.service-check`) at base `3b32d1628`;
+  blob identical at S1 head. Aspire-specific gates through `runtime.aspire-restore` are green on
+  13.5.3.
+- Action: surfaced to the primary coordinator for the 0.0.7 fixes lane; S1 stays draft until the
+  baseline is green or the coordinator admits S1 on the Aspire-specific evidence.
