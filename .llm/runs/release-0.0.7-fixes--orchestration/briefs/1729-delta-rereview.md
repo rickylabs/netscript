@@ -1,6 +1,12 @@
 # Bounded delta re-review — #1729 ADVISORY-1 repair
 
-You issued `PASS_IMPL` for #1729 at `9abc76d48cb7bf63ee25b413fb72160362bc2e8c` with two advisories.
+You are an **independent delta reviewer**. A prior evaluator (separate session) issued `PASS_IMPL`
+for #1729 at `9abc76d48cb7bf63ee25b413fb72160362bc2e8c` with two advisories; its artifact is
+`907cce4147d999f1ea0f145ca02731307cf680d4` on `eval/impl-eval-1729-cycle-1` — read it first for
+context. You are distinct from that evaluator, from the author (Codex `gpt-5.6-sol`, thread
+`01a04f8b-…`), and from the topic supervisor.
+
+Your worktree: `/home/codex/repos/netscript-007-eval-1729-delta` (detached at the repair head).
 Supervisor disposition: **ADVISORY-1 taken before merge**; **ADVISORY-2 filed as issue #1737**
 (outside the five-path ceiling, correctly not fixed in this leaf).
 
@@ -48,9 +54,9 @@ The corrected sentence now reads:
 
 ## Deliverable
 
-Append a `## Delta re-review — ADVISORY-1 repair at 608f68b07` section to your existing
-`impl-eval-cycle-1.md`, with the four checks, exact commands and results, and a verdict of
-**`DELTA_PASS`** (cycle-1 `PASS_IMPL` remains valid at `608f68b07`) or **`DELTA_FAIL`** naming what
-broke. Keep it short. Commit and push to the same branch
-(`git push origin HEAD:refs/heads/eval/impl-eval-1729-cycle-1`), report the artifact SHA, post a
-brief PR comment on #1729, and stop.
+Write `.llm/runs/fix-agent-init-guidance-and-cross-host-skills--0.0.7/delta-review-advisory1.md`
+with the four checks, exact commands and results, and a verdict of **`DELTA_PASS`** (the cycle-1
+`PASS_IMPL` remains valid at `608f68b07`) or **`DELTA_FAIL`** naming what broke. Keep it short — this
+is a receipt, not an essay. Commit and **push to a real branch**
+(`git push origin HEAD:refs/heads/eval/delta-review-1729`) so the artifact cannot be orphaned. Report
+the artifact SHA and branch, post a brief summary as a PR comment on #1729, and stop.
