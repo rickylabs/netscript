@@ -5752,3 +5752,67 @@ rulings on T-1…T-3 plus the plan's two open decisions, stating that handing an
 failure of the gate.
 
 Queue unchanged: #1387 and #1730 remain queued behind #1466; #1664 parked at `20337441788b`.
+
+## 2026-08-30 — #1466 PLAN-EVAL `FAIL_PLAN`; bounded docs-only repair dispatched
+
+| Field | Value |
+| --- | --- |
+| Verdict | **`FAIL_PLAN`** (`plan-eval.md:297-305`) |
+| Evaluated plan head | `9e70b30a3` |
+| Verdict commit | `a3452650d` — **1 file, +333**, `plan-eval.md` only |
+| Evaluator | native Claude **Fable 5 · medium**, session `5cd50ad0`, bridge `cse_01JNV9EuywznGgoufYQizqBU`, detached worktree |
+| PR comment | `[PHASE: PLAN-EVAL] [VERDICT: FAIL_PLAN]`, posted by the evaluator |
+
+### This is the useful kind of FAIL
+
+The gate ruled on **everything** routed to it and handed nothing back. All three Tier-A requirements
+**upheld**; both of the author's open questions **resolved**, and in the author's favour where a
+direction was proposed:
+
+- **R-1** runtime metadata port in Stage 1b → **no**; the author's deferral to S3 stands.
+- **R-2** extractor name and location → **fixed by the evaluator**, not returned as a question.
+- **T-1 / T-2 / T-3** → upheld, each with the concrete evidence or naming now required.
+
+`FAIL_PLAN` is because the rulings are not yet *in* `plan.md`, and `plan.md` is the contract the
+implementation is held to. The evaluator scoped the next cycle itself: docs-only, and
+re-evaluation is "confirm `plan.md` carries A-1…A-8 as written". A verdict that bounds its own
+remediation is worth more than a conditional PASS that leaves the transcription optional.
+
+### I verified the crux rather than relaying it
+
+T-1's whole force rests on the claim that a plain cast is ungated. Checked at source:
+`scan-code-quality.ts:75` matches **only** `\bas\s+unknown\s+as\b`, `\bas\s+any\b`, `\bas\s+never\b`.
+A plain `x as T` is caught by nothing — and that is precisely the form of `performIO(query as
+SqlQuery)`, the #1293 S1 defect that type-checked, skipped a conversion path, and survived review.
+The evaluator's remedy is an **assertion-budget test** under the `test` catalog gate (so it lands in
+`test-final.json`) that strips comments and strings, counts assertion tokens, and asserts equality
+with baselines pinned per file — measured `0` for the four metadata-boundary files, `1` for
+`define-services.ts` and `client/service-client.ts`, `5` for `query/query-factory.ts`. It also
+demotes "changed-line cast/`any` review" to review, explicitly not evidence.
+
+Its §3 finding matches the concern I could not make mechanical in Tier-A: the independence rule was
+enforceable only by reading. The evaluator supplied the missing tool — a `deno doc --json` test over
+both entrypoints asserting no `@orpc`/`npm:` string appears in the named types' JSON subtrees — and
+correctly noted that `BaseContractRoute` naming oRPC builder types is the accepted public builder
+surface, not a violation.
+
+It also checked a citation I had taken on trust: **AP-14 is "Re-exporting upstream packages"**
+(`09-anti-patterns-and-fitness-functions.md:104-106`), and the plan's use at `plan.md:81` is correct.
+
+### Repair dispatched — same thread, bounded, docs-only
+
+Resumed `01a04f84` (GPT-5.6 Sol · high, same worktree) with A-1…A-8 as a transcription task, plus:
+
+- **fast-forward first** — the author's local branch was at `9e70b30a3` while the remote had moved to
+  the evaluator's `a3452650d`;
+- **re-measure the assertion baselines with the scanner you commit**, and pin what you measure — do
+  not copy the evaluator's numbers on faith; a discrepancy is itself the finding;
+- no `packages/**` in this cycle, stop and report, no implementation before re-evaluation.
+
+Thread confirmed awake: rollout `3,754,481 → 4,147,461` bytes, idle 27 s.
+
+Re-evaluation will resume evaluator session `5cd50ad0` for the bounded check rather than launching a
+fresh one — the scope is "did the transcription land", the ruling session already holds the context,
+and generator ≠ evaluator still holds because the author is Codex.
+
+Queue unchanged: #1387 and #1730 queued behind #1466; #1664 parked at `20337441788b`.
