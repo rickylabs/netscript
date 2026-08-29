@@ -72,6 +72,11 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 | `2026-08-29T22:29:17Z` | 1         | scaffold        | Local-source PostgreSQL project created under the owned `.llm/tmp/` root; exit 0.                                                        |
 | `2026-08-29T22:30:12Z` | 1         | restore         | Exact generated-only S1 train restored on Aspire 13.5.3 in 18.13 s; exit 0.                                                              |
 | `2026-08-29T22:32:09Z` | 1         | compile         | Initial compile exposed unmaterialized `zod`; after disposable-root `deno install` materialized npm deps, AppHost `tsc --noEmit` passed. |
+| `2026-08-29T22:36:11Z` | 2         | start 1         | Isolated AppHost start exited 0 in 38.62 s; web stayed Unhealthy and browser-log child stayed NotStarted.                                |
+| `2026-08-29T22:40:09Z` | 2         | telemetry       | Bare detached OTEL exited 12 in 0.34 s; explicit dashboard URL exited 0 in 0.62 s.                                                       |
+| `2026-08-29T22:40:56Z` | 2         | force cleanup   | Exact-path force stop exited 0 in 4.42 s and removed both run-created containers.                                                        |
+| `2026-08-29T22:41:50Z` | 2         | start 2         | Second isolated start exited 0 in 24.80 s; SDK remained 13.5.3.                                                                          |
+| `2026-08-29T22:52:23Z` | 2         | orphan cleanup  | Validated launcher PID alone received SIGTERM; `aspire ps` emptied in 385 ms and exact-path stop returned in 374 ms.                     |
 
 ## Decisions
 
@@ -79,12 +84,17 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 | ------------------------------------- | ------------------------------------------------------- | ------------------------------- |
 | Generated-project train override only | Main still emits 13.4.6 and S1 owns generator pins      | Coordinator brief / issue #1714 |
 | No self-certification                 | Implementation evidence is reviewed by Fable supervisor | Harness lane policy             |
+| Preserve real gate failure            | Both isolated starts reused Postgres port 14428         | V3 direct gate receipt          |
 
 ## Drift
 
-| Drift             | Severity | Logged in drift.md |
-| ----------------- | -------- | ------------------ |
-| None at bootstrap | minor    | yes                |
+| Drift                                         | Severity    | Logged in drift.md |
+| --------------------------------------------- | ----------- | ------------------ |
+| Bootstrap help mismatch                       | minor       | yes                |
+| V2 startup/readiness differs from skill input | significant | yes                |
+| V3 DB allocation gate fails                   | significant | yes                |
+| V4 discovery remains broken                   | significant | yes                |
+| V6 orphan cleanup is sub-second               | significant | yes                |
 
 ## Gate Results
 
@@ -103,10 +113,11 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 
 ### Runtime Gates
 
-| Gate                     | Result  | Evidence                               | Notes                                                                 |
-| ------------------------ | ------- | -------------------------------------- | --------------------------------------------------------------------- |
-| V1–V12                   | PENDING | `receipts/aspire-13.5-verification.md` | Filled as probes execute; final table will contain no unexecuted row. |
-| Slice 1 scaffold/restore | PASS    | `receipts/01-scaffold-restore.md`      | Restore exit 0; regenerated 13.5.3 module; AppHost compile exit 0.    |
+| Gate                     | Result   | Evidence                               | Notes                                                                              |
+| ------------------------ | -------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
+| V1–V12                   | PENDING  | `receipts/aspire-13.5-verification.md` | Filled as probes execute; final table will contain no unexecuted row.              |
+| Slice 1 scaffold/restore | PASS     | `receipts/01-scaffold-restore.md`      | Restore exit 0; regenerated 13.5.3 module; AppHost compile exit 0.                 |
+| Slice 2 V1–V7            | RECORDED | `receipts/02-runtime-lifecycle.md`     | Implementation evidence captured; contains real failures and no evaluator verdict. |
 
 ### Consumer Gates
 
@@ -121,3 +132,7 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 - Slice 1 reconcile: issue #1714 remains open and fully owned by this resolving branch; required
   closing keyword will be placed in the draft PR body. No new issue/PR comments existed at
   bootstrap.
+- Slice 1 commit `71a14e3b98fe1dad5d9294fe53f45b706f6f11c2` pushed with
+  `git push origin HEAD:refs/heads/test/aspire-13-5-s2-runtime-verification`; remote line:
+  `HEAD -> test/aspire-13-5-s2-runtime-verification`. Draft PR #1735 opened with the assigned
+  taxonomy, milestone, closing keyword, and receipts-only E2E skip rationale.

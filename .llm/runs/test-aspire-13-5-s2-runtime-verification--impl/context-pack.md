@@ -12,10 +12,11 @@
 
 ## Current State
 
-The required issue/research/skill/cleanup/harness inputs are read. The assigned worktree began clean
-at `21d516224`; lease preflight found no running AppHosts or visible containers. Slice 1 generated
-the owned PostgreSQL project, applied S1's exact train only there, restored Aspire 13.5.3, and
-proved the generated AppHost compiles after normal generated-workspace dependency materialization.
+The assigned worktree began clean at `21d516224`. Slice 1 generated the owned PostgreSQL project,
+applied S1's exact train only there, restored Aspire 13.5.3, and proved the generated AppHost
+compiles. Slice 2 completed two isolated starts, V1–V7 inspection, exact-path force cleanup, and
+launcher-orphan cleanup. The live evidence includes real 13.5 divergences rather than repaired or
+suppressed outcomes.
 
 ## Completed
 
@@ -23,16 +24,18 @@ proved the generated AppHost compiles after normal generated-workspace dependenc
 - Exact branch/head and clean shared-host preflight.
 - PLAN-EVAL N/A justification and external Fable IMPL-EVAL route recorded.
 - Slice 1 scaffold/restore/module/compile receipts.
+- Draft PR #1735 with commit-1 evidence trail.
+- V1–V7 runtime, proxyless endpoint, telemetry, shape, force-stop, and orphan receipts.
 
 ## In Progress
 
-- Slice 1 commit/push and required draft PR opening.
+- Slice 2 scope/diff validation, commit, push, and PR trail comment.
 
 ## Next Steps
 
-1. Run diff/lock hygiene checks and commit/push slice 1.
-2. Open the required draft PR, apply labels/milestone, and post slice evidence.
-3. Start the exact AppHost with `--isolated` and capture V1–V7.
+1. Commit/push slice 2 and post its PR evidence.
+2. Consolidate V8–V12 MCP, toolkit, doctor, deploy, and regression evidence.
+3. Run final ownership-aware cleanup and complete the verification matrix.
 
 ## Key Decisions
 
@@ -49,13 +52,14 @@ proved the generated AppHost compiles after normal generated-workspace dependenc
 
 ## Gates
 
-| Gate family     | Current status              | Evidence                          |
-| --------------- | --------------------------- | --------------------------------- |
-| Static          | bootstrap PASS              | worklog preflight                 |
-| Fitness         | pending manual scope checks | plan/worklog                      |
-| Runtime         | pending V1–V12              | receipts table                    |
-| Runtime slice 1 | PASS                        | `receipts/01-scaffold-restore.md` |
-| Consumer        | N/A                         | no product surface                |
+| Gate family     | Current status                       | Evidence                           |
+| --------------- | ------------------------------------ | ---------------------------------- |
+| Static          | bootstrap PASS                       | worklog preflight                  |
+| Fitness         | pending manual scope checks          | plan/worklog                       |
+| Runtime         | V1–V7 recorded; V8–V12 consolidating | receipts table                     |
+| Runtime slice 1 | PASS                                 | `receipts/01-scaffold-restore.md`  |
+| Runtime slice 2 | RECORDED                             | `receipts/02-runtime-lifecycle.md` |
+| Consumer        | N/A                                  | no product surface                 |
 
 ## Open Questions
 
@@ -63,9 +67,10 @@ proved the generated AppHost compiles after normal generated-workspace dependenc
 
 ## Drift and Debt
 
-- Drift: none at bootstrap.
-- Debt: append V4 outcome to `aspire-otel-cli-discovery` after the live probe.
+- Drift: V2 readiness/timing, V3 allocation reuse, V4 discovery, and V6 timing are recorded.
+- Debt: V4 reproduced the detached OTEL failure; append-only debt update remains for slice 4.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after slice 1.
+- `71a14e3b98fe1dad5d9294fe53f45b706f6f11c2` — scaffold/restore proof.
+- See draft PR #1735 for per-slice comments.

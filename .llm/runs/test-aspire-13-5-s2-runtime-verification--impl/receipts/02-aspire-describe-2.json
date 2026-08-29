@@ -1,0 +1,632 @@
+{
+  "resources": [
+    {
+      "name": "aspire-13-5-postgres-db",
+      "displayName": "aspire-13-5-postgres-db",
+      "resourceType": "PostgresDatabaseResource",
+      "state": "Running",
+      "startTimestamp": "2026-08-29T22:41:41.009873+00:00",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:42501/?resource=aspire-13-5-postgres-db",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "postgres-f5c10f81"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.connectionString": null,
+        "resource.parentName": "postgres-f5c10f81"
+      },
+      "environment": {},
+      "healthReports": {
+        "aspire-13-5-postgres-db_check": {
+          "status": "Healthy"
+        },
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {}
+    },
+    {
+      "name": "aspire-13-5-postgres-web-browser-logs",
+      "displayName": "aspire-13-5-postgres-web-browser-logs",
+      "resourceType": "BrowserLogs",
+      "state": "NotStarted",
+      "creationTimestamp": "2026-08-29T22:41:31.0162451+00:00",
+      "source": "aspire-13-5-postgres-web",
+      "dashboardUrl": "https://localhost:42501/?resource=aspire-13-5-postgres-web-browser-logs",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "aspire-13-5-postgres-web-ujngmpkt"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "Active session count": 0,
+        "Active sessions": "None",
+        "Browser": "chrome",
+        "Browser sessions": "[]",
+        "resource.parentName": "aspire-13-5-postgres-web-ujngmpkt",
+        "resource.source": "aspire-13-5-postgres-web",
+        "Total sessions launched": 0,
+        "User data mode": "Shared"
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "configure-tracked-browser": {
+          "displayName": "Configure tracked browser",
+          "description": "Choose the browser, profile, user data mode, and scope used by tracked browser sessions.",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "scope",
+              "label": "Scope",
+              "inputType": "Choice",
+              "required": true,
+              "value": "resource",
+              "options": {
+                "resource": "This resource only (aspire-13-5-postgres-web)",
+                "global": "All BrowserLogs resources"
+              }
+            },
+            {
+              "name": "browser",
+              "label": "Browser",
+              "description": "Choose an installed Chromium-based browser or enter an executable path.",
+              "inputType": "Choice",
+              "required": true,
+              "options": {},
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "userDataMode",
+              "label": "User data mode",
+              "inputType": "Choice",
+              "required": true,
+              "options": {
+                "Shared": "Shared",
+                "Isolated": "Isolated"
+              },
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "profile",
+              "label": "Profile",
+              "description": "Choose a Chromium profile from the Aspire-managed browser hive, or enter a profile directory/name.",
+              "inputType": "Choice",
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "browser",
+                  "userDataMode"
+                ]
+              }
+            },
+            {
+              "name": "saveToUserSecrets",
+              "label": "Save to AppHost user secrets",
+              "description": "Save these settings to [user secrets](https://aka.ms/aspire/user-secrets) so future AppHost runs use them.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "aspire-13-5-postgres-web-ujngmpkt",
+      "displayName": "aspire-13-5-postgres-web",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-29T22:41:35+00:00",
+      "startTimestamp": "2026-08-29T22:41:34.85+00:00",
+      "source": "deno",
+      "healthStatus": "Unhealthy",
+      "dashboardUrl": "https://localhost:42501/?resource=aspire-13-5-postgres-web-ujngmpkt",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "users-yvbcumea"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "users-yvbcumea"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "users-yvbcumea"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:42095"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 997745,
+        "executable.workDir": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/apps/aspire-13-5-postgres-web",
+        "resource.appArgs": [
+          "task",
+          "dev"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:42043",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=ujngmpkt",
+        "OTEL_SERVICE_NAME": "aspire-13-5-postgres-web",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "42837",
+        "services__users__http__0": "http://localhost:3001",
+        "SSL_CERT_DIR": "/tmp/aspire-dcp07pRaa/aspire-13-5-postgres-web-ujngmpkt/certs:/usr/lib/ssl/certs:/home/codex/.aspnet/dev-certs/trust",
+        "VITE_services__users__http__0": "http://localhost:3001",
+        "VITE_USERS_URL": "http://localhost:3001"
+      },
+      "healthReports": {
+        "aspire-13-5-postgres-web_http_/health_200_check": {
+          "status": "Unhealthy",
+          "description": "Request to http://localhost:42095/health timed out",
+          "exceptionMessage": "System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.IO.IOException: Unable to read data from the transport connection: Operation canceled.\n ---> System.Net.Sockets.SocketException (125): Operation canceled\n   --- End of inner exception stack trace ---\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)\n   at System.Net.Http.HttpConnection.InitialFillAsync(Boolean async)\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)\n   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.SocketsHttpHandler.<SendAsync>g__CreateHandlerAndSendAsync|115_0(HttpRequestMessage request, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "netscript-db-postgres-ewwxdurc",
+      "displayName": "netscript-db-postgres",
+      "resourceType": "Executable",
+      "state": "NotStarted",
+      "source": "deno",
+      "dashboardUrl": "https://localhost:42501/?resource=netscript-db-postgres-ewwxdurc",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-13-5-postgres-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": null,
+        "executable.workDir": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres",
+        "resource.appArgs": null,
+        "resource.appArgsSensitivity": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "postgres-f5c10f81",
+      "displayName": "postgres",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-29T22:41:35+00:00",
+      "startTimestamp": "2026-08-29T22:41:41.009873+00:00",
+      "source": "docker.io/library/postgres:18.3",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:42501/?resource=postgres-f5c10f81",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:14428"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/.data/postgres",
+          "target": "/var/lib/postgresql",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "790117a5e93eebc352085f7ca22ba098a4b440d31fbcd1fd63d0b62fa4ee8b7b",
+        "container.image": "docker.io/library/postgres:18.3",
+        "container.lifetime": "Persistent",
+        "container.ports": [
+          5432
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": [],
+        "resource.connectionString": null
+      },
+      "environment": {
+        "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+        "POSTGRES_PASSWORD": "REDACTED",
+        "POSTGRES_USER": "postgres",
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "postgres-password",
+      "displayName": "postgres-password",
+      "resourceType": "Parameter",
+      "state": "Running",
+      "source": "Parameters:postgres-password",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:42501/?resource=postgres-password",
+      "relationships": [],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.source": "Parameters:postgres-password",
+        "Value": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "delete-parameter": {
+          "displayName": "Delete parameter",
+          "description": "Delete parameter value",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "DeleteFromUserSecrets",
+              "label": "Delete from user secrets",
+              "description": "Delete a value that is saved in [user secrets](https://aka.ms/aspire/user-secrets).",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            }
+          ]
+        },
+        "set-parameter": {
+          "displayName": "Set parameter",
+          "description": "Set parameter value",
+          "state": "Enabled",
+          "sortOrder": 0,
+          "argumentInputs": [
+            {
+              "name": "Value",
+              "label": "postgres-password",
+              "inputType": "SecretText",
+              "required": true,
+              "placeholder": "Enter value for postgres-password",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "SaveToUserSecrets",
+              "label": "Save to user secrets",
+              "description": "Save value to [user secrets](https://aka.ms/aspire/user-secrets) for future use.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "Value"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "prisma-studio-xaeekezn",
+      "displayName": "prisma-studio",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-29T22:41:42+00:00",
+      "startTimestamp": "2026-08-29T22:41:41.82+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:42501/?resource=prisma-studio-xaeekezn",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-13-5-postgres-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 998657,
+        "executable.workDir": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres",
+        "resource.appArgs": [
+          "run",
+          "--allow-run",
+          "--allow-write",
+          "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/aspire/.helpers/run-tool.mts",
+          "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres/.netscript-prisma-studio.error",
+          "db:studio"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ASPIRE_13_5_POSTGRES_DB_DATABASENAME": "aspire-13-5-postgres-db",
+        "ASPIRE_13_5_POSTGRES_DB_HOST": "localhost",
+        "ASPIRE_13_5_POSTGRES_DB_JDBCCONNECTIONSTRING": "REDACTED",
+        "ASPIRE_13_5_POSTGRES_DB_PASSWORD": "REDACTED",
+        "ASPIRE_13_5_POSTGRES_DB_PORT": "14428",
+        "ASPIRE_13_5_POSTGRES_DB_URI": "REDACTED",
+        "ASPIRE_13_5_POSTGRES_DB_USERNAME": "postgres",
+        "ConnectionStrings__aspire-13-5-postgres-db": "REDACTED",
+        "DATABASE_URL": "REDACTED",
+        "POSTGRES_URI": "REDACTED",
+        "SSL_CERT_DIR": "/tmp/aspire-dcp07pRaa/prisma-studio-xaeekezn/certs:/usr/lib/ssl/certs:/home/codex/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "redis-fuytsrzx",
+      "displayName": "redis",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-29T22:41:35+00:00",
+      "startTimestamp": "2026-08-29T22:41:40.791403+00:00",
+      "source": "docker.io/library/redis:7",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:42501/?resource=redis-fuytsrzx",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:43715"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/.data/redis",
+          "target": "/data",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "4bf2e10793677eee45ce7ad0e9c50b75321b043c1258d9051cefc5946d72c1a4",
+        "container.image": "docker.io/library/redis:7",
+        "container.lifetime": "Session",
+        "container.ports": [
+          6379
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": []
+      },
+      "environment": {
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "users-yvbcumea",
+      "displayName": "users",
+      "resourceType": "Executable",
+      "state": "Finished",
+      "creationTimestamp": "2026-08-29T22:41:42+00:00",
+      "startTimestamp": "2026-08-29T22:41:41.83+00:00",
+      "stopTimestamp": "2026-08-29T22:41:43.483362+00:00",
+      "source": "deno",
+      "exitCode": 1,
+      "dashboardUrl": "https://localhost:42501/?resource=users-yvbcumea",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-13-5-postgres-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-13-5-postgres-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 998659,
+        "executable.workDir": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/services/users",
+        "resource.appArgs": [
+          "run",
+          "--minimum-dependency-age=0",
+          "--node-modules-dir=none",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-sys",
+          "src/main.ts"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ASPIRE_13_5_POSTGRES_DB_DATABASENAME": "aspire-13-5-postgres-db",
+        "ASPIRE_13_5_POSTGRES_DB_HOST": "localhost",
+        "ASPIRE_13_5_POSTGRES_DB_JDBCCONNECTIONSTRING": "REDACTED",
+        "ASPIRE_13_5_POSTGRES_DB_PASSWORD": "REDACTED",
+        "ASPIRE_13_5_POSTGRES_DB_PORT": "14428",
+        "ASPIRE_13_5_POSTGRES_DB_URI": "REDACTED",
+        "ASPIRE_13_5_POSTGRES_DB_USERNAME": "postgres",
+        "ConnectionStrings__aspire-13-5-postgres-db": "REDACTED",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "REDACTED",
+        "DB_PROVIDER": "postgres",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:42043",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=yvbcumea",
+        "OTEL_SERVICE_NAME": "users",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "42591",
+        "POSTGRES_URI": "REDACTED",
+        "SSL_CERT_DIR": "/tmp/aspire-dcp07pRaa/users-yvbcumea/certs:/usr/lib/ssl/certs:/home/codex/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "users_http_/health_200_check": {
+          "status": "Unhealthy",
+          "description": "Health check for http://localhost:3001/health was canceled",
+          "exceptionMessage": "System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.IO.IOException: Unable to read data from the transport connection: Operation canceled.\n ---> System.Net.Sockets.SocketException (125): Operation canceled\n   --- End of inner exception stack trace ---\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)\n   at System.Net.Http.HttpConnection.InitialFillAsync(Boolean async)\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)\n   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.SocketsHttpHandler.<SendAsync>g__CreateHandlerAndSendAsync|115_0(HttpRequestMessage request, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351"
+        }
+      },
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    }
+  ]
+}
