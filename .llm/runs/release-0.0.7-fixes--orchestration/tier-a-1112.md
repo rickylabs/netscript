@@ -787,3 +787,36 @@ reviewer's artifact, not the author's defect, and must not be reported as a find
 `PASS` on substance — all fifteen gates re-derived, gate 5 proven load-bearing, envelope and lock
 clean, no new quality finding. **Not yet dispatchable to IMPL-EVAL** pending the one artifact-coherence
 correction above.
+
+## Tier-A closure at `cd69eb7cbb35fffdd16dba3f68dc26311a45699b` — clear for IMPL-EVAL
+
+Two artifact-only follow-ups after the verified implementation head `30cc8d084`:
+
+- `dd91bf1b4` — gate-5 table row, `worklog.md:68`, plus a new dated `drift.md` entry that supersedes
+  the historical line 165 rather than rewriting it.
+- `cd69eb7cb` — the remaining live-prescriptive references in `plan.md` (scope bullet, slice
+  proving-gates, protocol prose and its code block, risk row) and `research.md`.
+
+**Product paths are byte-identical to `30cc8d084`**, so every gate receipt recorded above still
+applies at this head. Gate 15 re-checked: exactly 7 product paths against base `cf648f1ff`,
+`deno.lock` identical to base.
+
+Independent re-sweep of `compatibility wrapper` / `prisma-example-compatibility` / `D17 wrapper` /
+`D17 probe` across all six artifacts: 8 hits remain, all read individually and all historical
+narrative (`drift.md:137,165,205`; `worklog.md:109,161,211`; `research.md:238`) plus
+`context-pack.md:56`, which the author proactively updated to record the drop. The gate-5 protocol
+now reads generate → actual-example check → guarded smoke → cleanup, with no orphaned step.
+
+### Supervisor error recorded
+
+The first coherence brief named 3 of the 8 defect sites; the author fixed exactly those and the
+contradiction survived in the plan's prose, including the imperative "Then run the structured check
+on the scratch D17 compatibility wrapper" at the old `plan.md:257`. Cause: the supervisor swept the
+gate table and worklog but not the plan prose — the same partial-sweep failure the supervisor had
+warned the author against for the non-literal rationale. Cost: one extra author round-trip. Rule
+adopted: before sending a coherence correction, grep every artifact for the term and read every hit,
+then hand over the complete classified list in one brief.
+
+### Verdict
+
+Implementation Tier-A `PASS`. Clear to dispatch IMPL-EVAL to a separate opposite-family session.
