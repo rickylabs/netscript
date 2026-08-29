@@ -2526,3 +2526,68 @@ returned map rather than infer ordering from source, to attack identifier collis
 backslashes in a reference name, and — learning from #1710 — to **post its own
 `[PHASE: IMPL-EVAL] [VERDICT: …]` PR comment**, which my #1709 brief omitted and had to be repaired
 afterwards.
+
+## 2026-08-30 — #1728 merged; #1734 hydration leaf running under a borrowed-lease constraint
+
+### #1371 / #1728 closed out
+
+Merged at main **`8b1e42f725919457c64781d5973fd419017fab13`**; #1371 `CLOSED/COMPLETED`.
+Final PR head `1b67b03b4`, `pr-checks` PASS 79 checks / 0 failures, close-gate green, #1371
+acceptance mirrored 7/7 with provenance. CI monitor stopped.
+
+Closeout corrections I made, recorded rather than glossed:
+
+- **JSR WARN count 4 → 19.** I re-measured instead of swapping one unverified number for another:
+  `audit-jsr-package.ts --root packages/cli --text` exits 0 with exactly **19** WARN. The original
+  "four" omitted the `F-DOCT-5` directory-cardinality findings. The body now states it is a
+  baseline, explicitly not a warning-free claim, and names the earlier undercount.
+- **Box 7 was real work.** "Recorded on the roadmap's verify-first ledger" required updating the
+  T4-07 row, not ticking a box; done in commit `1b67b03b4`.
+- **Ledger commit raced the evaluator artifact.** My first push was rejected as non-fast-forward
+  because the evaluator's `impl-eval.md` (`61fca0931`) had landed. **Rebased onto it** rather than
+  force-pushing, and verified `impl-eval.md` still present at HEAD. Force would have destroyed the
+  verdict artifact.
+- **Head provenance stated in the body:** IMPL-EVAL evaluated `68482a13a`; the two later commits are
+  run-artifacts only and `git diff 68482a13a..HEAD` excluding `.llm/runs/` is empty.
+- **The label strip was not a repeat of my #1710 error.** Timeline: `ready_for_review` fired at
+  22:22:52 — **not by me**, I never readied #1728 — and my `impl-eval:skip` landed at 22:22:56, four
+  seconds too late to be in that event's payload, so the dispatcher stripped `status:ready-merge` at
+  22:23:06. Restored and stable. The correct rule stands: the hatch must precede the ready
+  transition, and here the transition was not mine to sequence.
+- **#1733 was my duplicate** of the coordinator's #1732, created before their message arrived.
+  Closed `NOT_PLANNED` with the `status:` label removed per taxonomy, and the few details unique to
+  my draft carried across in a comment rather than lost.
+
+### Owner policy persisted
+
+Recorded to durable memory: **a public canary requires at least one merged user-facing
+package/runtime feature; internal-only batches stay on `main` under CI.** The operational
+consequence for this lane is that an internal fix must never be blocked waiting on a canary that
+should not be published — verify through CI instead.
+
+### #1734 — Fresh hydration, in flight
+
+Issue **#1734** (p1, `0.0.7`, `area:fresh`, `status:impl`), branch
+`fix/fresh-query-hydration-readonly-state`, worktree `/home/codex/repos/netscript-007-leaf-hydration`
+at base `21d516224`, author thread **`01a04fa4-8970-79d1-a899-6290bf3585cb`**, GPT-5.6 Sol · **high**.
+
+**I was wrong on first analysis and corrected it.** I initially reported the defect could not exist
+because `hydrate`'s second parameter is `unknown`. That was true only of the lockfile-pinned
+5.101.x. Upstream changed it in 5.102.x to `Partial<DehydratedState>`, and the repo's open
+`^5.101.0` range means CI resolves the pin and stays green while consumers resolve 5.102.8 and fail.
+Reproduced exactly at `21d516224` — `TS2345 … 'readonly unknown[]' … cannot be assigned to the
+mutable type 'DehydratedMutation[]'` at `hydration.ts:43:24` — then restored the range, leaving the
+worktree clean.
+
+The lesson worth keeping: **checking one cached version is not checking a declared range.** A green
+check that only holds for the locked version is exactly the hole that hid this, which is why the
+brief makes the range decision a deliverable rather than a side effect.
+
+### Runtime constraint — queued, not waived
+
+The host runtime lease is held by **Aspire S2**. This lane does not wait on it. All RED/fix/gate/PR
+work proceeds statically, and the brief already barred Aspire, Docker, browser, `scaffold.runtime`
+and `e2e:cli`. The issue's `scaffold.runtime` restoration claim is therefore **CI-verified**, and the
+bounded local runtime proof is **queued behind S2 cleanup** — recorded here so it is not silently
+dropped at merge. I did not interrupt the working author to say so; it will be applied at Tier-A and
+stated in the PR body.
