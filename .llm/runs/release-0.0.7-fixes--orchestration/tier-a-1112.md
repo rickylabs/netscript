@@ -912,3 +912,41 @@ change is two JSDoc comment lines in `examples/basic-usage.ts`; `git diff -U0` o
 
 `PASS`. Ready for a **new independent exact-head IMPL-EVAL**. No ready flip, no label change, no
 merge — PR stays draft / `status:impl` until that verdict returns PASS.
+
+## Main-integration refresh Tier-A at `07e12efacf3cd23672395507cbf77ecf620cd454` — PASS
+
+`main` advanced to `21d516224` (#1696) and #1711 went `CONFLICTING`, exclusively in shared generated
+assets. Author merged (not rebased, so the evaluated commits survive) and resolved by regeneration.
+
+### The coordinator's acceptance conditions, each proved
+
+| Condition | Result |
+| --- | --- |
+| Seven authored product paths byte-identical to `067193acf` | `git diff --stat 067193acf 07e12efac -- packages/prisma-adapter-mysql docs/site/reference/prisma-adapter-mysql` → **empty** |
+| Delta is only main integration + authoritative generated output | Every path in the delta that is not identical to `21d516224` is one of five generated files: `prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`, `export-surface-corpus.generated.ts`, `publish-assets.generated.ts`. Nothing else. |
+| Leaf-attributable paths vs current main | the 7 authored paths + 3 generated derivatives — no eighth authored path |
+| `deno.lock` | identical to current `main`; the leaf contributes none |
+| Generated files are authoritative, not hand-merged | `gen:assets-barrel`, `gen:mcp-export-corpus`, `gen:publish-assets` re-run on the merged tree each **reproduce the committed bytes exactly** |
+| `check:agent-docs-prose` | `fresh: true`, `stalePaths: []`, exit 0 |
+| Focused package gates | check `12/0` · lint `12/0` · fmt `12/0` · tests exit 0, **51 passed / 0 failed** |
+| `mergeable` | `MERGEABLE` (was `CONFLICTING`) |
+
+### Two false positives caught before they became findings
+
+1. **Conflict markers.** A repo-wide grep matched
+   `.llm/runs/fix-1025-aspire-otel-discovery--otel-discovery/implement-rebase.md`. That file exists
+   on `main` at `21d516224`, is byte-identical there, and legitimately contains marker text because
+   it is another leaf's rebase-instructions document. Not this leaf's, and not a real conflict.
+2. **`gen:agent-docs-prose` exit 1 in the archive.** The generator calls `git rev-parse` to record
+   corpus provenance, which cannot work in a `.git`-less `git archive` extraction. This is an
+   artifact of the review method, not a defect: the *write* path needs git, the *check* path does
+   not. It also means the provenance "reproduces" comparison was vacuous — the generator aborted
+   before writing — so that claim is withdrawn and replaced by `check:agent-docs-prose` exit 0 on a
+   clean archive. The other three generators ran to completion and their reproduction claims stand.
+
+### Verdict
+
+`PASS`. The refresh is mechanical. No authored or product-semantic path changed, so the leaf does not
+return to full evaluation. Bounded independent delta receipt dispatched as the acceptance gate
+(job `d6e05f50`, Claude Fable 5 · medium, worktree `netscript-007-eval-1711-delta`, detached at the
+exact refresh head).
