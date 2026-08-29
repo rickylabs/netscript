@@ -1,10 +1,10 @@
 /**
  * Prisma MySQL Driver Adapter for Deno
  *
- * This adapter allows Prisma to use a Deno-compatible MySQL driver
- * instead of the npm mariadb package which has compatibility issues with Deno.
+ * This adapter allows Prisma to use the dynamically imported npm
+ * `mysql2/promise` driver instead of the npm `mariadb` package.
  *
- * Based on @prisma/adapter-mariadb but adapted for Deno-compatible MySQL access.
+ * It runs on Deno deployments that provide npm resolution and Node-compatible socket APIs.
  *
  * @module
  */
@@ -170,9 +170,8 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
       // Map arguments to appropriate MySQL format
       const values = args.map((arg: unknown, i: number) => mapArg(arg, argTypes[i]));
 
-      // deno_mysql uses different methods for different query types:
-      // - query() for SELECT returns rows
-      // - execute() for INSERT/UPDATE/DELETE returns affectedRows
+      // The normalized client uses query() for result-returning statements and
+      // execute() for statements that report affected rows.
 
       const sqlUpper = sql.trim().toUpperCase();
       const isSelect = sqlUpper.startsWith('SELECT') ||
@@ -213,8 +212,8 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
 
   /**
    * Infer field information from row data.
-   * This is a workaround since deno_mysql doesn't expose full field metadata
-   * in the standard query interface.
+   * This fallback is used when the normalized mysql2 wrapper has only row data
+   * and no field metadata.
    */
   protected inferFieldsFromRows(
     rows: Record<string, unknown>[],
@@ -330,23 +329,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
 /**
  * Main MySQL driver adapter for Prisma.
  *
- * This adapter wraps the deno_mysql client and implements Prisma's
- * SqlDriverAdapter interface.
- *
- * @example
- * ```typescript
- * import { PrismaClient } from "@prisma/client";
- * import { PrismaMySqlAdapterFactory } from "@netscript/prisma-adapter-mysql";
- *
- * const adapter = new PrismaMySqlAdapterFactory({
- *   hostname: "localhost",
- *   username: "root",
- *   password: "password",
- *   db: "mydb",
- * });
- *
- * const prisma = new PrismaClient({ adapter });
- * ```
+ * This adapter wraps the normalized mysql2 pool client and implements Prisma's
+ * `SqlDriverAdapter` interface. Applications receive it through
+ * {@linkcode PrismaMySqlAdapterFactory.connect} rather than constructing it directly.
  */
 export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
   implements SqlDriverAdapter {
@@ -466,23 +451,7 @@ export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
 }
 
 /**
- * Factory for creating PrismaMySqlAdapter instances.
- *
- * This implements SqlDriverAdapterFactory and handles connection
- * creation and capability detection.
- *
- * @example
- * ```typescript
- * const adapter = new PrismaMySql({
- *   hostname: "localhost",
- *   username: "root",
- *   password: "password",
- *   db: "mydb",
- *   poolSize: 5,
- * });
- *
- * const prisma = new PrismaClient({ adapter });
- * ```
+ * Query shape accepted by the Prisma MySQL adapter.
  */
 export interface PrismaMySqlQuery {
   /** SQL statement to execute. */
@@ -518,8 +487,41 @@ export interface PrismaMySqlQuery {
 export interface PrismaMySqlResultSet {
   /** Column names in result order. */
   columnNames: string[];
-  /** Prisma column type numbers in result order. */
-  columnTypes: number[];
+  /** Prisma 7 column types in result order. */
+  columnTypes: Array<
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 64
+    | 65
+    | 66
+    | 67
+    | 68
+    | 69
+    | 70
+    | 71
+    | 72
+    | 73
+    | 74
+    | 75
+    | 76
+    | 77
+    | 78
+    | 128
+  >;
   /** Result rows in column order. */
   rows: unknown[][];
   /** Last inserted ID when reported by MySQL. */
@@ -641,7 +643,7 @@ export class PrismaMySqlAdapterFactory {
       }
       client = createMysql2Client(pool);
     } catch (error) {
-      // Check for connection string parsing errors
+      // Add context to pool construction and connection configuration errors.
       if (error instanceof Error && error.message.includes('connect')) {
         throw new Error(
           `Failed to connect to MySQL database: ${error.message}`,
@@ -722,7 +724,12 @@ function createMysql2Connection(connection: TypedMysql2PoolConnection): MysqlQue
   };
 }
 
-function toMysql2PoolOptions(config: MySqlConnectionConfig): PoolOptions {
+/**
+ * Translate the public structured connection config to mysql2 pool options.
+ *
+ * This export is an internal source-level test seam and is not re-exported from the package root.
+ */
+export function toMysql2PoolOptions(config: MySqlConnectionConfig): PoolOptions {
   const options: PoolOptions = {
     host: config.hostname,
     port: config.port,

@@ -109,3 +109,33 @@ Seed run `plan-fable5-remediation-roadmap--seed`, PR #1347, 2026-08-08. The coun
 was produced by reading the generator at worktree baseline `fac9e339042c` during this drafting pass;
 it contradicts the wave-6 R2 claim as stated and is the reason this draft is verify-first rather
 than a defect.
+
+## Verify-first ledger outcome (2026-08-30, live issue #1371)
+
+**Verified on the published canary `0.0.7-canary.1`** via the installed-consumer surface, under a
+globally serialized runtime lease. AppHost PID 429229; teardown clean, `survivors: []`.
+
+**The wave-6 R2 claim is REFUTED.** `ServiceReferences` are injected. With
+`workers.ServiceReferences = ["users"]`, the running child held
+`services__users__http__0=http://localhost:43277` (read from `/proc/431303/environ`), and the Aspire
+receipt independently showed a first-class `Reference` relationship to `users-mvtsykxw`.
+
+**Why it survived unrefuted:** a stock scaffold emits **no `ServiceReferences` at all** — the
+official plugins declare peer *plugin* references only. Hypothesis (c) from the draft, but as
+configuration shape, not defect. Secondary trap: `generate plugins` does not regenerate AppHost
+helpers; only `generate aspire` does.
+
+**Normalization hypothesis REFUTED on this path.** Aspire exports the raw name, hyphens verbatim
+(`services__workers-api__http__0`); no normalized variant exists in any child. Emitted key ==
+exported key == the key `packages/sdk/src/discovery/service-url.ts:55-61` reads. **Stated limit:**
+the browser path was not exercised for a hyphenated resource, so `build-vite-env-var-name.ts`
+normalization is neither confirmed nor refuted, and remains **T4-01 / #1365**. Nothing was absorbed
+from it.
+
+**One real gap found, and fixed.** A *declared but unresolvable* reference was silently dropped —
+no env var, no log line, no failure; the child started and reported healthy. Located at
+`packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts:191`
+(and the identical guard in the `PluginReferences` block). Coordinator admitted **emitted
+fail-fast**; corrected in PR #1728 with RED-first tests, independent IMPL-EVAL `PASS_IMPL`.
+
+Row status: **not reproducible as claimed; adjacent defect found, fixed, and regression-pinned.**

@@ -47,6 +47,10 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     const defaultPermissions = entryPermissions
       ? denoDefaults.Permissions
       : withDatabasePermissions(denoDefaults.Permissions, databaseEngine);
+    const serviceRefs = [
+      ...(entry.ServiceReferences ?? []),
+    ];
+    const pluginRefs = entry.PluginReferences ?? [];
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);
@@ -71,6 +75,36 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    const ${id}_bootstrapModule = new URL('../../services/_shared/plugin-service-context.ts', import.meta.url).href;`,
     );
+
+    // Resolve every declared reference before registering the processor. A
+    // declared reference is required configuration, so missing resources and
+    // resources without an HTTP endpoint are equally fatal.
+    if (serviceRefs.length > 0 || pluginRefs.length > 0) {
+      lines.push(``);
+      lines.push(`    // Declared reference preflight — fail before processor registration`);
+      for (const [index, ref] of serviceRefs.entries()) {
+        const endpointId = `${safeIdentifier(ref)}ServiceEndpoint${index}`;
+        const message =
+          `Background processor configuration error: '${name}' could not resolve service reference '${ref}' HTTP endpoint.`;
+        lines.push(
+          `    const ${endpointId} = await _services.get('${ref}')?.getEndpoint('http');`,
+        );
+        lines.push(`    if (!${endpointId}) {`);
+        lines.push(`      throw new Error(${JSON.stringify(message)});`);
+        lines.push(`    }`);
+      }
+      for (const [index, ref] of pluginRefs.entries()) {
+        const endpointId = `${safeIdentifier(ref)}PluginEndpoint${index}`;
+        const message =
+          `Background processor configuration error: '${name}' could not resolve plugin reference '${ref}' HTTP endpoint.`;
+        lines.push(
+          `    const ${endpointId} = await _plugins.get('${ref}')?.getEndpoint('http');`,
+        );
+        lines.push(`    if (!${endpointId}) {`);
+        lines.push(`      throw new Error(${JSON.stringify(message)});`);
+        lines.push(`    }`);
+      }
+    }
 
     // Register via addExecutable
     lines.push(
@@ -176,44 +210,26 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     }
 
     // Service references — wired via endpoint env vars (executable→executable)
-    const serviceRefs = [
-      ...(entry.ServiceReferences ?? []),
-    ];
     if (serviceRefs.length > 0) {
       lines.push(``);
       lines.push(`    // Service references — wired via endpoint env vars`);
-      for (const ref of serviceRefs) {
-        const refId = safeIdentifier(ref);
-        lines.push(`    {`);
+      for (const [index, ref] of serviceRefs.entries()) {
+        const endpointId = `${safeIdentifier(ref)}ServiceEndpoint${index}`;
         lines.push(
-          `      const ${refId}Endpoint = await _services.get('${ref}')?.getEndpoint('http');`,
+          `    await ${id}.withEnvironment('services__${ref}__http__0', ${endpointId});`,
         );
-        lines.push(`      if (${refId}Endpoint) {`);
-        lines.push(
-          `        await ${id}.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
-        );
-        lines.push(`      }`);
-        lines.push(`    }`);
       }
     }
 
     // Plugin references — wired via endpoint env vars (executable→executable)
-    const pluginRefs = entry.PluginReferences ?? [];
     if (pluginRefs.length > 0) {
       lines.push(``);
       lines.push(`    // Plugin references — wired via endpoint env vars`);
-      for (const ref of pluginRefs) {
-        const refId = safeIdentifier(ref);
-        lines.push(`    {`);
+      for (const [index, ref] of pluginRefs.entries()) {
+        const endpointId = `${safeIdentifier(ref)}PluginEndpoint${index}`;
         lines.push(
-          `      const ${refId}Endpoint = await _plugins.get('${ref}')?.getEndpoint('http');`,
+          `    await ${id}.withEnvironment('services__${ref}__http__0', ${endpointId});`,
         );
-        lines.push(`      if (${refId}Endpoint) {`);
-        lines.push(
-          `        await ${id}.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
-        );
-        lines.push(`      }`);
-        lines.push(`    }`);
       }
     }
 

@@ -58,6 +58,34 @@
   provider SDK type never escapes. Model ids cross the boundary as owned `ModelId` strings, narrowed
   to the TanStack catalog union inside the adapter (never in a public type).
 
+## Request context (provider-invisible channel)
+
+`RequestContext` (`src/contracts/context.ts`) is an opaque `Readonly<Record<string, unknown>>` that
+an app attaches to one run via `AgentLoopInput.context`. It exists because the alternative — putting
+app state in message text — hands the model instructions it was never meant to read, and message
+text is persisted, so the mistake replays on every later turn of the session.
+
+The engine reads no key and serializes the bag nowhere. It travels one way, to two terminals:
+
+```text
+AgentLoopInput.context
+  ├─▶ ChatClientRequest.context ─▶ toTanstackChatClient ─▶ chat({ context, metadata })
+  │                                                          (middleware / devtools only —
+  │                                                           never the provider wire request)
+  └─▶ ToolInvocationOptions.context ─▶ bridgeHandler ─▶ AiToolInvocationContext.metadata
+```
+
+- **The gate is the bridge.** `messages`, `systemPrompts`, `tools`, and `modelOptions` are the only
+  four `chat()` keys that reach a provider; the context is passed to `context`/`metadata` and folded
+  into none of them. TanStack documents `TextOptions.metadata` as "Adapters never forward this field
+  onto the provider wire request".
+- **The contrast is `GenerationOptions`.** That type *is* a path to the provider
+  (`providerOptions` merges verbatim into `modelOptions`), which is precisely why it cannot serve as
+  the app-context carrier.
+- **`ToolHandler` gained an optional second parameter** (`ToolInvocationOptions`) rather than a new
+  port method, so every existing `(call) => result` handler stays assignable and no
+  `ToolRegistryPort` implementation needs a change.
+
 ## Agent-loop typestate (E3)
 
 The loop is a single-writer typestate machine. `AgentLoop.state` exposes the current state; it is
