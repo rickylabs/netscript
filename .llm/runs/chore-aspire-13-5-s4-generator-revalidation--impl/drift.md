@@ -22,3 +22,20 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept as owner-authorized route override; preserve separate-session IMPL-EVAL.
 - **Evidence:** `supervisor.md`.
+
+## 2026-08-30 — Pre-slice-5 rebase and force-push (supervisor sign-off entry)
+
+- **What:** The four landed slices were rebased from base `8b1e42f72` onto `origin/main`
+  `13878a80a` before slice 5, and the branch was force-pushed (`--force-with-lease`).
+- **Source:** `git reflog` (`rebase (pick)` ×4, `rebase (finish)`), PR #1738 reconciliation comment
+  2026-08-29T23:40Z, `worklog.md` progress log.
+- **Expected:** Slices land on the recorded baseline; SHAs cited in per-slice PR comments stay
+  reachable.
+- **Actual:** SHAs remapped `079fbb0a2→ca80c26b4`, `ef102fd34→ab2318fb2`, `84b1aa124→aec266d4e`,
+  `f382cce70→eff0548a2`; slice 5 landed as `f128e51e5`, amended to `c2cceba00` (run-dir only).
+  Gates were rerun post-rebase (worklog Gate Results, slice 5 rows).
+- **Severity:** minor
+- **Action:** accept; the PR comment map plus this entry keep the commit trail complete. Recorded
+  by the Tier-A supervisor at sign-off (IMPL-EVAL PASS finding 1, `slices/s4/evaluate.md`).
+- **Evidence:** `slices/s4/review-tier-a.md` and `slices/s4/evaluate.md` on
+  `origin/research/aspire-13.5-0.0.7`.
