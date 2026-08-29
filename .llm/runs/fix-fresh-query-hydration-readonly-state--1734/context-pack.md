@@ -12,9 +12,9 @@
 
 ## Current State
 
-S1 RED is present and independently pinned to query-core 5.102.8. Its structured focused test exits
-1 with only the expected TS2345 at the untouched production hydration call. The public readonly
-contract and open range remain locked unchanged.
+S2 is implemented and focused-green. Private guards validate readonly unknown cache records before
+copying them into TanStack's mutable input. Exact 5.101.0 and 5.102.8 checks pass; public types,
+exports, and the ^5.101.0 range remain unchanged.
 
 ## Completed
 
@@ -23,16 +23,18 @@ contract and open range remain locked unchanged.
 - Dependency latest/why evidence and JSR/doc-lint baselines captured.
 - S0 pushed and draft PR #1736 opened with required metadata.
 - S1 RED fixture/test added and proven failing before implementation.
+- S2 private boundary correction and behavior tests implemented.
+- Focused tests/check/lint/fmt, quality scan (`allowCount: 7`), and arch check pass.
 
 ## In Progress
 
-- S1 RED commit and push.
+- S2 commit and push.
 
 ## Next Steps
 
-1. Implement the private validated mutable conversion.
-2. Run exact dual-version and requested static gates.
-3. Push exact head and leave the PR draft for external Tier-A/IMPL-EVAL.
+1. Commit/push S2 and post its PR phase comment.
+2. Run the final exact-head requested static suite.
+3. Push the receipt commit and leave the PR draft for external Tier-A/IMPL-EVAL.
 
 ## Key Decisions
 
@@ -47,14 +49,17 @@ contract and open range remain locked unchanged.
 | --- | --- | --- |
 | `.llm/runs/fix-fresh-query-hydration-readonly-state--1734/*` | new | Harness evidence only. |
 | `packages/fresh/tests/query-hydration-version-compat_test.ts` | new | RED child-check regression. |
-| `packages/fresh/tests/type-fixtures/query-hydration-5.102-deno.json` | new | Exact 5.102.8 no-lock config. |
+| `packages/fresh/tests/type-fixtures/query-hydration-5.102.8-deno.json` | new | Exact 5.102.8 no-lock config. |
+| `packages/fresh/tests/type-fixtures/query-hydration-5.101.0-deno.json` | new | Exact 5.101.0 no-lock config. |
+| `packages/fresh/src/application/query/hydration.ts` | changed | Private validated mutable conversion. |
+| `packages/fresh/tests/query-hydration_test.ts` | new | Valid readonly hydration and invalid-entry behavior. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline RED reproduced | worklog |
-| Fitness | inherited baseline captured | JSR/doc-lint commands |
+| Static | focused PASS | 4 tests; 3-file check/lint; 5-file fmt |
+| Fitness | focused PASS | quality scan and arch check |
 | Runtime | N/A | no lease |
 | Consumer | pending | S2 |
 
@@ -64,7 +69,8 @@ contract and open range remain locked unchanged.
 
 ## Drift and Debt
 
-- Drift: historical Fresh doc-lint resolution no longer matches current 45-diagnostic baseline.
+- Drift: historical Fresh doc-lint resolution no longer matches current 45-diagnostic baseline;
+  a transient F-16 warning from colocated test placement was fixed before commit.
 - Debt: no new debt; inherited findings remain outside issue #1734.
 
 ## Commits
