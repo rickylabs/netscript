@@ -76,3 +76,18 @@ documentation.
 - **Action:** Merge, do not rebase; regenerate all four shared derivative families in order; retain
   the five-path product ceiling. Regeneration was idempotent and no conflict required resolution.
 - **Evidence:** Merge parents, four exit-0 shared checks, and byte-identical five-path comparison.
+
+## 2026-08-30 — Linked app guide covers fewer topics than the root pointer claimed
+
+- **What:** Independent IMPL-EVAL reproduced that generated `apps/evalapp-web/AGENTS.md` contains
+  `definePage`, `withResource`, and `withForm`, but not `defineRouteContract`, `staleTime`,
+  dehydration, or optimistic UI; the generated root sentence attributed all seven topics to it.
+- **Source:** IMPL-EVAL cycle 1 artifact `907cce4147d999f1ea0f145ca02731307cf680d4` and a fresh
+  consumer scaffold reproduced by the author.
+- **Expected:** The guaranteed-read root pointer would describe the linked guide's actual coverage.
+- **Actual:** Four deeper topics were assigned to a file that does not teach them.
+- **Severity:** minor advisory
+- **Action:** Keep the app-guide link and pre-app-work instruction, limit its claimed ownership to
+  the three observed composition conventions, and route the deeper topics to MCP `find_guidance` or
+  installed offline docs. Tighten the #1674 test to the complete sentence and regenerate the barrel.
+- **Evidence:** `.llm/tmp/gate-receipts/agent-init-guidance-advisory-1/scaffold-proof.json`.

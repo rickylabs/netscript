@@ -66,6 +66,7 @@ Recorded before product implementation.
 | 2 | Ship canonical cross-host skills and composed root guidance | Focused unit test, scoped wrappers, asset freshness, fresh CLI scaffold proof | Product ceiling + run artifacts |
 | 3 | Record final gate evidence and Tier-A handoff | Quality/arch, publishability, clean diff/head checks | Run artifacts only |
 | 4 | Integrate current `main` and rebuild shared derivatives | Four shared derivative checks, refreshed product wrappers, fresh scaffold proof | Merge commit + run artifacts; product ceiling unchanged |
+| 5 | Repair IMPL-EVAL ADVISORY-1 pointer routing | Asset freshness, focused installer suite, scoped check, fresh scaffold proof | Existing guidance template, generated barrel, test, and run artifacts only |
 
 ### Deferred Scope
 
@@ -96,6 +97,9 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | 2026-08-30 | 4 | Shared derivatives | Ran the four generators in mandated order; the merged tree already contained their exact output, so regeneration was idempotent and left no derivative diff. All four `check:` tasks exited 0. |
 | 2026-08-30 | 4 | Refreshed product gates | Merged-tree tests passed 22/22; scoped check/lint passed; structured fmt reproduced the accepted legacy-style result (exit 1, three whole-file findings); fresh scaffold proof passed with exit 0. |
 | 2026-08-30 | 4 | Semantic reconcile | `git diff --exit-code 83d24ba57..a04e505f4 -- <five product paths>` exited 0; product bytes and semantics are unchanged by the integration. `deno.lock` is also unchanged. |
+| 2026-08-30 | 5 | External evaluation | Opposite-family IMPL-EVAL cycle 1 returned `PASS_IMPL` at artifact `907cce4147d999f1ea0f145ca02731307cf680d4`, with one in-scope pointer-routing advisory and one separately filed out-of-scope advisory. |
+| 2026-08-30 | 5 | ADVISORY-1 repair | Corrected the generated root pointer so the linked app guide owns only its observed `definePage`/`withResource`/`withForm` conventions and MCP/offline docs own the four deeper topics; tightened the #1674 assertion to the complete routing sentence and regenerated the shipped barrel. |
+| 2026-08-30 | 5 | Repair gates | `check:assets-barrel` passed after staging the proposed generated tree; installer tests passed 22/22; scoped check reported zero findings; fresh 155-file scaffold command and consumer assertions exited 0. |
 
 ## Decisions
 
@@ -147,6 +151,16 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | Product semantic comparison | PASS, exit 0 | Five product paths are byte-identical between accepted head `83d24ba57...` and merge `a04e505f4...` |
 | Lock hygiene | PASS, exit 0 | `deno.lock` identical between `83d24ba57...` and `a04e505f4...` |
 
+### IMPL-EVAL ADVISORY-1 Repair Gates
+
+| Gate | Repair-tree result | Evidence |
+| --- | --- | --- |
+| `check:assets-barrel` | PASS, exit 0 | Generator idempotence against the staged proposed tree; no worktree derivative delta |
+| Focused `init-agent_test.ts` | PASS, exit 0 | `.llm/tmp/gate-receipts/agent-init-guidance-advisory-1/scoped-test.json`: 22 passed, 0 failed |
+| Scoped check | PASS, exit 0 | `.llm/tmp/gate-receipts/agent-init-guidance-advisory-1/scoped-check.json`: four files, zero findings |
+| Fresh scaffold consumer proof | PASS, exit 0 | `.llm/tmp/gate-receipts/agent-init-guidance-advisory-1/scaffold-proof.json`: 155-file scaffold; corrected sentence present; old overclaim absent; app-guide coverage reproduced; 6 canonical files and 6 byte-identical mirrors; offline docs present |
+| Lock hygiene | PASS | No staged or unstaged `deno.lock` diff |
+
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
@@ -178,3 +192,6 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
   commit is expected to advance the reported branch head without changing product bytes.
 - Current-main integration preserves those product bytes exactly; shared derivative regeneration
   was generator-only and idempotent. The structured formatter result remains visible for evaluator review.
+- IMPL-EVAL cycle 1 is externally `PASS_IMPL`; this author repaired ADVISORY-1 without touching
+  ADVISORY-2 or adding a sixth product path. The same independent evaluator owns the bounded delta
+  re-review; this author does not self-certify it.

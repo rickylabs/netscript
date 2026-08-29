@@ -128,7 +128,7 @@ Deno.test("#1674 root guidance points to the build spine and app guide", async (
     for (
       const expected of [
         "database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands",
-        "`apps/<app>/AGENTS.md` explains the local examples",
+        "The app build guide at `apps/<app>/AGENTS.md` explains the local examples and the project's `definePage`, `withResource`, and `withForm` composition conventions; read it before app work instead of inventing a parallel pattern, and use MCP `find_guidance` or the installed offline docs for `defineRouteContract`, `staleTime`, dehydration, and optimistic UI.",
         "`netscript ui:add page <path> --island`",
         "`netscript ui:add island <Name> --query`",
       ]

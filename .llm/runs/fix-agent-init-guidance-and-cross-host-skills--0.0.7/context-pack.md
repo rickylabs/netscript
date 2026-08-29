@@ -14,10 +14,11 @@
 
 Tier-A accepted the checkpoint and selected `[post-merge]` for all three behavioural boxes. Exact
 current `main` `8b1e42f725919457c64781d5973fd419017fab13` is merged without rebasing at
-`a04e505f4bd837c4237cd98e55d143f61f11816a`. All four shared derivatives regenerate idempotently,
-all four shared checks exit 0, focused tests/check/lint and fresh scaffold proof pass, and the five
-product paths are byte-identical to accepted head `83d24ba57...`. Structured fmt retains the
-previous accepted legacy-style exception (exit 1, three whole-file findings).
+`a04e505f4bd837c4237cd98e55d143f61f11816a`. Opposite-family IMPL-EVAL cycle 1 returned
+`PASS_IMPL` at artifact `907cce4147d999f1ea0f145ca02731307cf680d4`. Its in-scope ADVISORY-1
+pointer-routing repair is implemented inside the existing ceiling and passes asset freshness,
+22/22 installer tests, scoped check, and a fresh 155-file consumer proof. ADVISORY-2 remains outside
+this leaf. Structured fmt retains the previous accepted legacy-style exception.
 
 ## Completed
 
@@ -33,17 +34,19 @@ previous accepted legacy-style exception (exit 1, three whole-file findings).
 - Merged current `main` without rewriting the attested author commits.
 - Regenerated agent-doc prose, assets barrel, MCP export corpus, and publish assets in the required order.
 - Re-ran all shared and product evidence against the merged tree.
+- Received independent `PASS_IMPL` and repaired its bounded ADVISORY-1 without touching a sixth product path.
+- Regenerated the shipped barrel and reproduced the corrected routing in a fresh host-all/docs scaffold.
 
 ## In Progress
 
-- Final integration evidence commit, PR closing-keyword update, and explicit push.
+- ADVISORY-1 repair commit, explicit push, and PR slice receipt.
 
 ## Next Steps
 
-1. Commit the integration evidence without changing product paths.
+1. Commit the bounded repair and evidence.
 2. Push with the explicit full feature-branch refspec.
-3. Add the three authorized closing keywords and `[post-merge]` follow-up statement to draft PR #1729.
-4. Report exact final head and stop for the fresh opposite-family IMPL-EVAL.
+3. Post the repair slice receipt on draft PR #1729.
+4. Report exact final head and stop for the same independent evaluator's bounded delta re-review.
 
 ## Key Decisions
 
@@ -54,6 +57,7 @@ previous accepted legacy-style exception (exit 1, three whole-file findings).
 | Universal root guidance | #1672/#1674/#1675 / D3-D7 | Pointer surface, existing marked upsert. |
 | Behavioural acceptance | Tier-A decision | All three are `[post-merge]`; one unfamiliar-agent wave measures them together. |
 | Current-main integration | Tier-A integration brief | Merge, never rebase; regenerate shared derivatives only through generators. |
+| Advisory pointer split | IMPL-EVAL cycle 1 | Linked app guide owns its observed composition conventions; deeper topics route to MCP/offline docs. |
 
 ## Files Changed
 
@@ -70,20 +74,21 @@ previous accepted legacy-style exception (exit 1, three whole-file findings).
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS with retained format exception | Merged-tree test 22/22 and check/lint clean; fmt reports the same three legacy whole-file findings. |
+| Static | PASS with retained format exception | Repair-tree test 22/22 and scoped check clean; fmt retains the prior accepted exception. |
 | Fitness | PASS | Durable `quality-gate.json` and `cli-publish-dry-run.json` at `2f4b8c00d...`. |
 | Runtime | N/A | E2E/Aspire/Docker unauthorized. |
 | Shared derivatives | PASS | Four required `check:` tasks each exited 0 after ordered regeneration. |
-| Consumer | PASS | Fresh merged-tree 150-file workspace, host-all docs output and mirror equality; complete command exited 0. |
+| Consumer | PASS | Fresh repair-tree 155-file workspace; corrected pointer and host-all docs/mirror output verified; command exited 0. |
 
 ## Open Questions
 
-- None for the author lane. Fresh opposite-family IMPL-EVAL remains external.
+- None for the author lane. The same independent evaluator's bounded delta re-review remains external.
 
 ## Drift and Debt
 
 - Drift: two significant older-comment/re-intake conflicts, CLI formatter-policy mismatch, local
-  scaffold docs-evidence normalization, and live-base advance recorded in `drift.md`.
+  scaffold docs-evidence normalization, live-base advance, and the advisory pointer overclaim are
+  recorded in `drift.md`.
 - Debt: no new debt; existing CLI public-doc completeness debt is not deepened.
 
 ## Commits

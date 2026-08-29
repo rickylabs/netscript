@@ -3,7 +3,7 @@
 
 ### Build in the framework's order
 
-Use the architectural spine: database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands. The app build guide at `apps/<app>/AGENTS.md` explains the local examples, `defineRouteContract`, `withResource`, `staleTime`, dehydration, optimistic UI, and `withForm`; read it before app work instead of inventing a parallel pattern.
+Use the architectural spine: database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands. The app build guide at `apps/<app>/AGENTS.md` explains the local examples and the project's `definePage`, `withResource`, and `withForm` composition conventions; read it before app work instead of inventing a parallel pattern, and use MCP `find_guidance` or the installed offline docs for `defineRouteContract`, `staleTime`, dehydration, and optimistic UI.
 
 Use the CLI for mutations: `netscript contract`, `netscript service`, `netscript db`, and `netscript generate`. Create UI through `netscript ui:add page <path> --island`, `netscript ui:add island <Name> --query`, or `netscript ui:add data-table` rather than hand-building generated seams.
 
