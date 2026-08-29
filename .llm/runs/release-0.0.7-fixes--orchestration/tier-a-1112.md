@@ -820,3 +820,35 @@ then hand over the complete classified list in one brief.
 ### Verdict
 
 Implementation Tier-A `PASS`. Clear to dispatch IMPL-EVAL to a separate opposite-family session.
+
+## IMPL-EVAL cycle 1 — `PASS_IMPL` — reconciled
+
+| | |
+| --- | --- |
+| Verdict | `PASS_IMPL`, **no blocking findings** |
+| Evaluated head | `cd69eb7cbb35fffdd16dba3f68dc26311a45699b` — equals the PR head at evaluation time |
+| Artifact | `06e38089123923baea3c3b67410a351b69049c72` on `refs/heads/eval/impl-eval-1711-cycle-1` (durable branch, verified via `git ls-remote`) |
+| Comment | `5462050873`, formatted `[PHASE: IMPL-EVAL] [VERDICT: PASS]` |
+| Evaluator | Claude Fable 5 · medium, job `9a0630fd`, opposite-family, distinct from author, supervisor, and both PLAN-EVAL evaluators |
+
+The evaluator independently re-derived the gate set, confirmed the seven-path envelope and untouched
+`deno.lock`, and — as required by the brief — probed whether gate 5 is load-bearing rather than
+merely green.
+
+### Advisory triage
+
+| # | Advisory | Disposition |
+| --- | --- | --- |
+| A1 | `@deprecated` sits on the whole `tls.mode` property, striking through the still-valid `'disabled'` | **No action.** A union literal cannot carry JSDoc, so this is the closest expressible form and the tag text scopes the deprecation. The evaluator itself states no action is required in this leaf; a future breaking-change slice owns the granularity. Churning accepted product for it is not warranted. |
+| A2 | The example header promises a client at `examples/.generated/client.ts` but its `prisma generate` line omits `provider = "prisma-client"`, `runtime = "deno"`, and the `output` path — a reader with a default schema does not get that file | **Required, dispatched.** This leaf exists to make the published story reproducible; an instruction a reader cannot follow is the defect class the leaf is fixing. Bounded to the header comment of one owned path. |
+| A2 sub-note | Site page uses `../../schema/...`, README uses `./schema/...` | **No action.** The evaluator confirms both are correct at their respective depths. Cosmetic. |
+| A3 | PR still labelled `status:plan` | **Supervisor action**, taken as part of readiness advance below. |
+| A4 | Evaluator's own probe moved `main()` outside the guard, causing one failed `connect()` against an absent local server | **Not a leaf defect.** Self-reported deviation; the product file was restored byte-for-byte and re-verified. No MySQL, Docker, or Aspire resource existed or was started. |
+
+### Head movement disclosed
+
+Fixing A2 moves the branch head past the evaluated head `cd69eb7cb`. Per the netscript-pr close-gate
+guidance a push invalidates an existing IMPL-EVAL verdict, so this is recorded explicitly rather than
+merged silently: the `PASS_IMPL` covers `cd69eb7cb`, and the supervisor separately verifies that the
+delta beyond it is comment-only and re-runs every gate the delta could affect. That verification is
+recorded below before any merge.
