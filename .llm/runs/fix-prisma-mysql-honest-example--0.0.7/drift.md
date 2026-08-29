@@ -199,3 +199,19 @@ explicitly directed; it does not leave the superseded envelope as the current pl
   seven-path result matches D9 and the census; no stale or broken intermediate public barrel is
   committed.
 - **Severity:** minor sequencing drift; product scope and two-slice order are unchanged.
+
+## 2026-08-29 — Optional D17 scratch wrapper dropped during implementation
+
+- **Planned evidence:** Gate 5 retained `.llm/tmp/prisma-example-compatibility.ts` as a focused D17
+  wrapper alongside the structured check of the actual example and the guarded import-only smoke.
+  This supersedes the historical statement at line 165 that the wrapper remained D17 evidence; that
+  statement accurately records the earlier owner amendment and is intentionally preserved.
+- **Implemented evidence:** The optional wrapper was dropped. The structured check of the actual
+  `examples/basic-usage.ts` caught the identical D17 defect with the same `TS2322` and exercised the
+  same factory construction, `new PrismaClient({ adapter })`, `$queryRawUnsafe`, and `finally`
+  disconnect path against the real generated Prisma 7 client.
+- **Measured justification:** Keeping a second scratch program would duplicate the load-bearing
+  actual-file evidence without increasing coverage. Gate 5 therefore consists of the structured
+  actual-example check under the scratch config followed by the guarded import-only smoke.
+- **Boundary:** Evidence-neutral implementation-versus-plan drift only. No product behavior, product
+  path, generated output, configuration, or lockfile changed as a result.
