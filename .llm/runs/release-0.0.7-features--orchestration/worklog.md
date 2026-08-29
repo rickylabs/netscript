@@ -5495,3 +5495,62 @@ inherit whatever vocabulary S2 defines.
 
 No merge, publish, relabel, milestone change, readiness flip, issue close, `#1348` mutation, or
 expensive-gate lease was performed or requested. No release authority claimed.
+
+## 2026-08-30 — #1696 IMPL-EVAL terminal `PASS`, verdict self-committed by the evaluator
+
+| Field | Value |
+| --- | --- |
+| Verdict | **`PASS`** (`evaluate.md:258-266`) |
+| Evaluated head | `414a52ba807683cbe87aa25ca07e344f16731b6d` |
+| Verdict commit | `2a0a5608629cc2793233507c8449d9316ffeb2ee` — `eval(ai): IMPL-EVAL PASS for PR #1696 at 414a52ba8 (Claude Fable 5)` |
+| Verdict scope | **1 file, +266** — `.llm/runs/feat-ai-request-context--1694/evaluate.md` only, verified by diff |
+| Evaluator | native Claude **Fable 5 · medium** · Remote Control, session `321b426c`, bridge `cse_01UgH3wjzJmy8qB7rBdFHoLm` |
+| PR comment | `[PHASE: IMPL-EVAL] [VERDICT: PASS]`, posted, naming the head move as artifact-only |
+| local == remote == PR | all `2a0a5608629cc2793233507c8449d9316ffeb2ee` |
+
+The explicit commit/push wording worked: the evaluator committed and pushed its own verdict and
+posted its own comment without a supervisor prompt, unlike the preceding #1664 cycle. It also
+pre-empted the head-move confusion in its own comment, stating that its commit moves the branch past
+the evaluated head and that the delta is one artifact file — so the next reader does not need to
+re-derive that.
+
+### The barrel question was answered properly
+
+I asked whether the three-commit repair was complete or whether a fourth derived artifact went
+unstamped. The evaluator did not answer from the commit messages: it ran `check:assets-barrel`,
+which **regenerates** `agent-docs.generated.ts` and six siblings and then `git diff --exit-code`s
+them — exit **0**, tree clean after regeneration. Its conclusion, which is the useful part: a corpus
+fresh on disk but stale in the barrel *would* be caught, **by the second gate, not the first** — so
+the two gates are not redundant, and there is no fourth derived artifact. That is a better answer
+than the one I was fishing for.
+
+### Findings — none blocking
+
+- **S-1 (substantive, follow-up).** No test guards the loop layer against serializing `context` into
+  provider-bound request fields — the evaluator mutated the source and **9 of 9 tests still
+  passed**. The product is correct at this head by inspection, but the negative invariant that is
+  the entire point of #1694 is not held by an executable guard. This is exactly the "can the test
+  fail?" question the brief asked, and the honest answer was no. It should become a follow-up issue.
+- **E-1** narrower-annotation incompatibility disclosed but not `@ts-expect-error`-pinned — and the
+  prior OpenHands INFO-3 **over-stated** it. **E-2** `signal` propagation tested for type only, not
+  identity/abort. **E-3** PR body stale in two places (says 14 files, now 18). **E-4**
+  `deno doc --lint packages/ai/mod.ts` has 26 errors — **identical at base**, so outside this leaf.
+- **P-1 (process, orchestrator-owned).** No leaf run artifacts and no PLAN-EVAL record before
+  implementation. I accept this against the lane rather than the author: #1696 was dispatched before
+  this supervision window, and the absence of a leaf run dir is why the evaluator had to create
+  `.llm/runs/feat-ai-request-context--1694/` itself.
+
+### Merge-readiness — one qualification, and it is not yet satisfied
+
+The verdict commit moved the PR head to `2a0a56086`, so exact-head CI is **re-running**:
+`build`, `code-quality`, `close-gate`, both `classify` jobs are green at the new head, while
+`check-test` and `quality` are still `IN_PROGRESS`. `mergeStateStatus` therefore reads **BLOCKED**
+— on pending checks, not on a failure.
+
+I will not report merge-ready on the strength of green CI at `414a52ba8`, because that is no longer
+the merge head. The content delta between the two heads is one run-artifact file and nothing else —
+I verified that by diff — so the re-run is expected to reproduce, but "expected to" is not a receipt.
+Merge-ready goes to the coordinator when `check-test` and `quality` are green **at `2a0a56086`**.
+
+No merge, publish, relabel, readiness flip, milestone change, or issue filed. No release authority
+claimed.
