@@ -1822,3 +1822,51 @@ receipts keep their commit correspondence.
 Next after this: supervisor Tier-A, then a **fresh opposite-family IMPL-EVAL**; on PASS, ready it and
 report merge coordinates. **#1673** (plugin doctor validates the registry against itself) is dispatched
 immediately once #1729 clears — serial within the fixes queue.
+
+## 2026-08-30 — #1729 shipped; #1673 dispatched
+
+**#1729 merged** as `main@13878a80a50c55b9662099fed64555f2310ae4a3`. Issues **#1672, #1674, #1675 all
+CLOSED**, relabeled `status:shipped`; PR relabeled `status:shipped`. Final head
+`608f68b076bfb724d111bdaf075fd4111703d937`.
+
+Evidence chain, all durable on real branches:
+
+- IMPL-EVAL cycle 1 `PASS_IMPL` — `907cce4147d999f1ea0f145ca02731307cf680d4` on
+  `eval/impl-eval-1729-cycle-1`
+- ADVISORY-1 repair `DELTA_PASS` — `c1b15bbd978647fca6d91e3883b58a8890893cb3` on
+  `eval/delta-review-1729`, from a third session independent of both the cycle-1 evaluator and the
+  author
+
+Close-gate green at the exact head with 4/5 boxes mirrored per issue and the `[post-merge]` box
+excluded by the gate itself, exactly as the disposition intended.
+
+### `[post-merge]` obligation is tracked, not forgotten
+
+A tracking comment is posted on each of #1672/#1674/#1675 naming the merge commit, quoting the
+close-gate's own exclusion notice, and stating that one follow-up wave measures all three signals
+together — `deno doc` usage, `ui:add`/`find_guidance` usage, skill invocation — after which the box is
+ticked from that record or an explicit reasoned rejection is written. The issues' own wording governs:
+silence is a harness failure, not an agent failure. Without this the `[post-merge]` marker would
+degrade into a way to close an issue on an unmet criterion.
+
+### Supervisor errors on this leaf
+
+1. **Acceptance evidence repeated an overstatement.** The #1674 box-2 entry was written from the
+   guidance text rather than from the file the guidance points at, so it asserted the same false claim
+   ADVISORY-1 identified. Rule: evidence quoting a pointer must be verified against what the pointer
+   resolves to.
+2. **Cross-session dispatch is not a reliable transport.** A `SendMessage` to the cycle-1 evaluator was
+   held for the recipient user's approval and never delivered; a wait-loop on its artifact branch
+   would have hung indefinitely. Rule: for evaluator work this session depends on, spawn a session
+   this session owns.
+3. **Double `status:` label.** Readying the PR left `status:impl-eval` (added by phase-eval automation)
+   alongside `status:ready-merge`. Always re-read the label set after a readiness flip.
+
+### Queue
+
+**#1673** dispatched now — `plugin doctor` validates the generated registry against itself, so registry
+drift reports healthy while the durable layer never loads. Route: Codex **GPT-5.6-SOL · high**. The
+brief makes the regression test the deliverable: author a saga after `generate plugins`, do not
+regenerate, assert `doctor` goes red — and record the red-before output against unmodified `main`
+before touching product code. That discipline is the whole point here, since this issue exists because
+a green signal was trusted over reality.
