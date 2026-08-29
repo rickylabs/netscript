@@ -90,6 +90,8 @@ mandatory in a fresh opposite-family session.
 | --- | --- | --- | --- |
 | 2026-08-29T23:29Z | 1 | Research/plan | Re-baselined issue #1673 at `origin/main` `13878a80a`; selected A6 and locked six product/test paths. |
 | 2026-08-29T23:32Z | 1 | Issue evidence contract | Preserved the five target-contract statements and converted them to `## Acceptance` checkboxes; no labels, milestone, or state changed. |
+| 2026-08-29T23:35Z | 2 | Regression authored | Generated a real saga registry with `registered-saga.ts`, then authored `sagas/late-saga.ts` without regeneration and invoked the real doctor command. No product source had changed. |
+| 2026-08-29T23:35Z | 2 | Red-before | Structured wrapper exited `1`: `passed=0 failed=1`; sole failure was `AssertionError: Expected function to reject.` Doctor incorrectly exited zero, exactly reproducing #1673. |
 
 ## Decisions
 
@@ -111,7 +113,7 @@ mandatory in a fresh opposite-family session.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Red-before regression | focused structured test wrapper | NOT_RUN | Must run after the test is authored and before product edits. |
+| Red-before regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --pretty -- --allow-all packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts` | EXPECTED_FAIL | Exit `1`; `passed=0 failed=1`; `AssertionError: Expected function to reject.` This is the required baseline defect evidence, not a product-gate failure. |
 | Scoped check/lint/fmt | structured wrappers | NOT_RUN | Planned exact-file selections. |
 
 ### Fitness Gates
@@ -131,7 +133,7 @@ mandatory in a fresh opposite-family session.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `netscript plugin doctor` focused temp workspace | NOT_RUN | planned regression | No live backend required. |
+| `netscript plugin doctor` focused temp workspace | RED_BASELINE | structured wrapper output recorded above | Doctor succeeded after `sagas/late-saga.ts` was added without regeneration. No live backend used. |
 
 ## Handoff Notes
 

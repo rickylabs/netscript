@@ -6,17 +6,17 @@
 | --- | --- |
 | Run ID | `fix-plugin-doctor-registry-drift--0.0.7` |
 | Branch | `fix/plugin-doctor-registry-drift` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Issue #1673 is re-baselined at `origin/main` `13878a80a`. Research confirms saga/worker doctor
-checks compare registry syntax to itself, while the installed runtime generator already owns the
-manifest-based source discovery needed for a generic bidirectional check. The exact six-path product
-ceiling and all applicable gates are locked before implementation. PLAN-EVAL is justified N/A;
-independent IMPL-EVAL remains pending.
+Issue #1673 is re-baselined at `origin/main` `13878a80a`. The late-saga regression has been authored
+and run against unchanged product code: the structured wrapper exited `1` only because
+`assertRejects` observed doctor incorrectly succeed (`passed=0 failed=1`). The exact six-path
+product ceiling and all gates remain locked. Product implementation has not started; independent
+IMPL-EVAL remains pending.
 
 ## Completed
 
@@ -28,17 +28,18 @@ independent IMPL-EVAL remains pending.
   is valid. Labels, milestone, state, and all other content were unchanged.
 - Research, path ceiling, plan, design checkpoint, context pack, worklog, drift, and supervisor
   identity created.
+- Red-before regression: generated a registry, added `sagas/late-saga.ts`, did not regenerate, and
+  captured `AssertionError: Expected function to reject.` from the focused structured test.
 
 ## In Progress
 
-- Bootstrap commit, explicit-refspec push, and draft PR creation.
+- Slice-2 regression commit/push and PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push Slice 1 and open the draft PR with `Closes #1673`.
-2. Author the late-saga regression only; run it against unchanged product code and record the
-   structured red output.
-3. Implement within the six-path ceiling, run focused green/reverse tests and selected gates.
+1. Commit/push the red-before regression slice.
+2. Implement within the six-path ceiling, then add reverse/aligned assertions and run focused green.
+3. Run selected scoped gates and collect final-head receipts.
 4. Push final implementation/evidence commits, comment phase evidence, and stop for Tier-A.
 
 ## Key Decisions
@@ -60,7 +61,7 @@ independent IMPL-EVAL remains pending.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS (authoring completeness only) | `research.md`, `plan.md`, `worklog.md`; PLAN-EVAL N/A, not self-certification |
-| Static | NOT_RUN | implementation not started |
+| Static | RED_BASELINE | focused test exit `1`; expected assertion failure proves current doctor stayed green |
 | Fitness | NOT_RUN | implementation not started |
 | Runtime | N/A | prohibited live surfaces |
 | Consumer | NOT_RUN | focused temp-workspace regression planned |
@@ -77,4 +78,5 @@ independent IMPL-EVAL remains pending.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after bootstrap.
+- Bootstrap: `d37b278b6` (pushed; draft PR #1739 opened).
+- Red-before regression: pending commit.
