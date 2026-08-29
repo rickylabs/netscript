@@ -2338,3 +2338,67 @@ continuously since the verdict commit. Every repair was metadata only, re-verifi
 
 Merge-ready evidence posted as PR comment `5461903998`. **Stopping: not merged.** Merge authority
 remains the coordinator's; readiness is proven, not exercised.
+
+## 2026-08-29 — #1371 aspire-service-reference-verification: claim REFUTED, one real gap returned
+
+Reconciled first: remote main `3b32d1628584749af4dd6e97fd331c24e84f0b9e` matches the coordinator's
+value; PR #1710 `MERGED` at 11:09:02Z with its **merge commit equal to the main head**; #1709
+`CLOSED`/`COMPLETED`; `0.0.7-canary.1` present on JSR; central checkpoint `59af627d9` resolves.
+Serial queue released to #1371.
+
+PLAN-EVAL **N/A** under the narrowed policy — verify-first evidence task; no architectural
+correction was proposed, so the exception did not trigger.
+
+### Method
+
+Installed-consumer repro per closed #1343: clean root `/home/codex/repos/ns-verify-1371` outside the
+framework checkout, `jsr:@netscript/cli@0.0.7-canary.1`, no local-source fallback. Stock scaffold
+plus workers/sagas/triggers/streams. Two references added to exercise paths the stock scaffold never
+produces: `workers.ServiceReferences=["users"]` (resolvable) and
+`triggers.ServiceReferences=["ghost-service"]` (unresolvable).
+
+### Verdict
+
+**The wave-6 claim is refuted, by two independent signals.** The running `workers` child holds
+`services__users__http__0=http://localhost:43277` (read from `/proc/431303/environ`), and the Aspire
+receipt shows `workers-eptnxjtf` with a first-class `Reference` relationship to `users-mvtsykxw`.
+
+**Why it survived unrefuted:** a stock scaffold emits **no `ServiceReferences` at all** — the
+official plugins declare peer *plugin* references only. Issue hypothesis (c), but as configuration
+shape, not defect. A second trap: `generate plugins` does not regenerate AppHost helpers; only
+`generate aspire` does. Editing appsettings and running the wrong generator leaves a stale
+`register-background.mts` that looks exactly like "never injected".
+
+**Raw vs underscore: raw.** Aspire exports hyphens verbatim
+(`services__workers-api__http__0`); no normalized variant exists in any child. Emitted key ==
+exported key == the key `service-url.ts:55-61` reads. The normalization-mismatch hypothesis does not
+hold on the background path. **Stated limit:** the browser path was not exercised for a hyphenated
+resource (`web` references only `users`, which has no hyphen), so `build-vite-env-var-name.ts` is
+neither confirmed nor refuted here — that stays #1365's. **Nothing was absorbed from #1365**, and
+this evidence creates no requirement for its normalization fix on this path.
+
+**Box 6 fails, and it is a genuine gap.** `ghost-service` appears 0 times in the triggers
+environment and 0/0 times in the AppHost and Aspire CLI logs; the child is `Running` with
+`health_reports: {}` and no ghost relationship. It starts and looks healthy while a declared
+dependency does not exist — the precise opposite of what box 6 requires.
+
+**Precise location at main `3b32d1628`:**
+`packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts:191` —
+the generated `if (<ref>Endpoint) {` guard has no `else`. The `PluginReferences` block below repeats
+the pattern. Correct for *optional* wiring, wrong for a *declared* dependency.
+
+### Lifecycle actions
+
+Acceptance boxes 1, 2 and 3 ticked with linked evidence; boxes 4–7 left unchecked. Board column
+moved `status:triage` → `status:research` (exactly one `status:`). Issue comment `5462080110`
+carries the full verdict. Scope **returned** — no implementation proposed, box 4's regression test
+deliberately not landed, and the box 6 remedy needs a design decision (generator-time validation vs
+emitted fail-fast vs AppHost warning) that sizes the work.
+
+### Runtime lease and ownership
+
+One AppHost, mine: `apphost.mts` PID `429229`, CLI PID `429144`, isolated with randomized ports,
+dashboard `:42413`. Containers created and destroyed by it: `redis-begjcewu`, `garnet-fxhgnyfx`.
+`aspire stop` clean; containers **0**; `leak-check --owned-root /home/codex/repos/ns-verify-1371` →
+`aspire ok`, `docker ok`, `survivors: []`. Seven foreign `aspire mcp start` servers and a foreign
+lane's `deno publish` were identified in the baseline and left untouched.

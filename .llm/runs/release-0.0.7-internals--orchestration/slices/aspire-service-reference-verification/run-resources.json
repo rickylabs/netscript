@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "worktreeRoot": "/home/codex/repos/netscript-007-internals",
+  "appHosts": [],
+  "containers": [],
+  "ownedRoots": [
+    "/home/codex/repos/ns-verify-1371"
+  ]
+}
