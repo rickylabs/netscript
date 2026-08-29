@@ -12,10 +12,12 @@
 
 ## Current State
 
-Implementation is complete within the five-path ceiling and pushed as
-`2f4b8c00d664f0c03f22946d1e0315cb7819303e`. The generated barrel, focused tests (22/22), scoped
-check/lint, fresh-scaffold consumer proof, durable quality/doctrine gate, and CLI publish dry-run all
-pass. The structured formatter exception and behavioural decisions remain for Tier-A disposition.
+Tier-A accepted the checkpoint and selected `[post-merge]` for all three behavioural boxes. Exact
+current `main` `8b1e42f725919457c64781d5973fd419017fab13` is merged without rebasing at
+`a04e505f4bd837c4237cd98e55d143f61f11816a`. All four shared derivatives regenerate idempotently,
+all four shared checks exit 0, focused tests/check/lint and fresh scaffold proof pass, and the five
+product paths are byte-identical to accepted head `83d24ba57...`. Structured fmt retains the
+previous accepted legacy-style exception (exit 1, three whole-file findings).
 
 ## Completed
 
@@ -28,16 +30,20 @@ pass. The structured formatter exception and behavioural decisions remain for Ti
 - Implemented one composed root guidance asset with issue-separated semantic assertions.
 - Installed canonical `.agents/skills` for every host and derived Claude mirrors from canonical bytes.
 - Proved a fresh scaffold emits the contracted guidance, configs, offline docs, and byte-identical mirrors.
+- Merged current `main` without rewriting the attested author commits.
+- Regenerated agent-doc prose, assets barrel, MCP export corpus, and publish assets in the required order.
+- Re-ran all shared and product evidence against the merged tree.
 
 ## In Progress
 
-- Slice 3 evidence commit, PR update, and Tier-A stop.
+- Final integration evidence commit, PR closing-keyword update, and explicit push.
 
 ## Next Steps
 
-1. Commit/push the run-only evidence update with an explicit full refspec.
-2. Update draft PR #1729 with Slice 2/3 evidence without closing keywords or readiness changes.
-3. Report exact final head and stop for Tier-A.
+1. Commit the integration evidence without changing product paths.
+2. Push with the explicit full feature-branch refspec.
+3. Add the three authorized closing keywords and `[post-merge]` follow-up statement to draft PR #1729.
+4. Report exact final head and stop for the fresh opposite-family IMPL-EVAL.
 
 ## Key Decisions
 
@@ -46,7 +52,8 @@ pass. The structured formatter exception and behavioural decisions remain for Ti
 | Five-path product ceiling | `research.md` / `plan.md` | Any extra product path is rescope. |
 | Canonical `.agents`, conditional derived `.claude` | #1675 / D1-D2 | Canonical emitted for every host. |
 | Universal root guidance | #1672/#1674/#1675 / D3-D7 | Pointer surface, existing marked upsert. |
-| Behavioural acceptance deferred to supervisor | grouped brief | Recommended `[post-merge]`; not decided locally. |
+| Behavioural acceptance | Tier-A decision | All three are `[post-merge]`; one unfamiliar-agent wave measures them together. |
+| Current-main integration | Tier-A integration brief | Merge, never rebase; regenerate shared derivatives only through generators. |
 
 ## Files Changed
 
@@ -63,14 +70,15 @@ pass. The structured formatter exception and behavioural decisions remain for Ti
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS with format exception pending Tier-A | Test 22/22, check/lint clean; CLI is excluded from authoritative root fmt config. |
+| Static | PASS with retained format exception | Merged-tree test 22/22 and check/lint clean; fmt reports the same three legacy whole-file findings. |
 | Fitness | PASS | Durable `quality-gate.json` and `cli-publish-dry-run.json` at `2f4b8c00d...`. |
 | Runtime | N/A | E2E/Aspire/Docker unauthorized. |
-| Consumer | PASS | `scaffold-proof.json`: fresh 150-file workspace, host-all docs output and mirror equality. |
+| Shared derivatives | PASS | Four required `check:` tasks each exited 0 after ordered regeneration. |
+| Consumer | PASS | Fresh merged-tree 150-file workspace, host-all docs output and mirror equality; complete command exited 0. |
 
 ## Open Questions
 
-- Supervisor: `[post-merge]` markers or explicit rejection for the three behavioural boxes?
+- None for the author lane. Fresh opposite-family IMPL-EVAL remains external.
 
 ## Drift and Debt
 
@@ -83,3 +91,4 @@ pass. The structured formatter exception and behavioural decisions remain for Ti
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
 - Slice 1: `83c605b9dae1238e44f59be8feb8e6f5ec21990f` — harness research/plan.
 - Slice 2: `2f4b8c00d664f0c03f22946d1e0315cb7819303e` — product implementation.
+- Integration merge: `a04e505f4bd837c4237cd98e55d143f61f11816a` — exact current `main`, no rebase.

@@ -94,7 +94,7 @@ not product scope.
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Behavioural boxes: `[post-merge]` measurement or explicit rejection | safe to defer to Tier-A supervisor | Recommendation: mark all three `[post-merge]` and schedule one unfamiliar-agent wave against the merged artifact. If the owner rejects that cost, record a reasoned rejection on each issue. No closing keywords until decided. |
+| Behavioural boxes: `[post-merge]` measurement or explicit rejection | resolved by Tier-A supervisor on 2026-08-30 | All three boxes are marked `[post-merge]`; one unfamiliar-agent wave will measure the three signals together. Closing keywords are now authorized. |
 
 No open decision would force implementation rework if deferred.
 
@@ -106,10 +106,10 @@ The implementation author will leave all three unresolved and will not fabricate
 2. #1672 acceptance 4 — non-zero `deno doc`, or recorded rejection.
 3. #1675 acceptance 5 — non-zero skill use, or recorded rejection.
 
-Proposed disposition: add `[post-merge]` to these three issue boxes and run one versioned unfamiliar-
-agent wave that measures all three signals together. Alternative: explicit recorded rejection per
-issue with reasoning. This is a supervisor/owner decision, not a leaf-author decision. The draft PR
-therefore references `#1672`, `#1674`, and `#1675` without closing keywords.
+Tier-A disposition (2026-08-30): all three issue boxes are marked `[post-merge]`, and one versioned
+unfamiliar-agent wave will measure all three signals together against the merged artifact. The
+supervisor authorized `Closes #1672`, `Closes #1674`, and `Closes #1675` in the draft PR body; the
+boxes themselves remain unchecked until that follow-up wave runs.
 
 ## Risk Register
 

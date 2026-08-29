@@ -63,3 +63,16 @@ documentation.
 - **Severity:** minor
 - **Action:** Do not rebase without supervisor direction; report the exact head and fixed base.
 - **Evidence:** PR #1729 metadata and raw git ancestry verification.
+
+## 2026-08-30 — Tier-A authorizes exact current-main integration
+
+- **What:** Tier-A resolved the earlier stale-base hold by requiring an ordinary merge of exact
+  `origin/main` `8b1e42f725919457c64781d5973fd419017fab13`, explicitly preserving the attested commits.
+- **Source:** Supervisor integration brief after accepting checkpoint `83d24ba57...`.
+- **Expected:** The earlier run stopped without rebasing or integrating until supervisor direction.
+- **Actual:** Direction is now explicit; merge commit `a04e505f4bd837c4237cd98e55d143f61f11816a`
+  has accepted head and current main as its two parents.
+- **Severity:** minor
+- **Action:** Merge, do not rebase; regenerate all four shared derivative families in order; retain
+  the five-path product ceiling. Regeneration was idempotent and no conflict required resolution.
+- **Evidence:** Merge parents, four exit-0 shared checks, and byte-identical five-path comparison.

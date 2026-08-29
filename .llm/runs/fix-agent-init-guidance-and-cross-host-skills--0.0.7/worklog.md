@@ -65,10 +65,11 @@ Recorded before product implementation.
 | 1 | Activate/re-baseline harness and lock issue-separated design | Plan checklist; raw git baseline | Run artifacts only |
 | 2 | Ship canonical cross-host skills and composed root guidance | Focused unit test, scoped wrappers, asset freshness, fresh CLI scaffold proof | Product ceiling + run artifacts |
 | 3 | Record final gate evidence and Tier-A handoff | Quality/arch, publishability, clean diff/head checks | Run artifacts only |
+| 4 | Integrate current `main` and rebuild shared derivatives | Four shared derivative checks, refreshed product wrappers, fresh scaffold proof | Merge commit + run artifacts; product ceiling unchanged |
 
 ### Deferred Scope
 
-- Behavioural unfamiliar-agent wave — supervisor chooses `[post-merge]` or explicit rejection.
+- Behavioural unfamiliar-agent wave — Tier-A selected `[post-merge]`; one follow-up wave measures all three signals.
 - Older #1674 one-root consolidation proposal — superseded for this run by current re-intake.
 - Internal Deno skill expansion and MCP/docs changes — explicitly prohibited.
 
@@ -90,6 +91,11 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | 2026-08-30 | 2 | Consumer proof | Fresh local scaffold + real `agent init --host all --editor vscode --with-docs` emitted eight required guidance cues, six canonical skills, six byte-identical Claude mirrors, configs, and offline docs. |
 | 2026-08-30 | 2 | Commit | Product slice committed/pushed as `2f4b8c00d664f0c03f22946d1e0315cb7819303e` using the required explicit branch refspec. |
 | 2026-08-30 | 3 | Durable gates | Assets barrel, quality/doctrine, and CLI publish dry-run all passed at the immutable product SHA. |
+| 2026-08-30 | 4 | Tier-A decision | #1672 acceptance 4, #1674 acceptance 4, and #1675 acceptance 5 are `[post-merge]`; closing keywords are authorized without ticking the behavioural boxes. |
+| 2026-08-30 | 4 | Main integration | Merged exact `origin/main` `8b1e42f725919457c64781d5973fd419017fab13` without rebasing; merge commit `a04e505f4bd837c4237cd98e55d143f61f11816a` has parents `83d24ba57...` and `8b1e42f72...`. No conflict occurred. |
+| 2026-08-30 | 4 | Shared derivatives | Ran the four generators in mandated order; the merged tree already contained their exact output, so regeneration was idempotent and left no derivative diff. All four `check:` tasks exited 0. |
+| 2026-08-30 | 4 | Refreshed product gates | Merged-tree tests passed 22/22; scoped check/lint passed; structured fmt reproduced the accepted legacy-style result (exit 1, three whole-file findings); fresh scaffold proof passed with exit 0. |
+| 2026-08-30 | 4 | Semantic reconcile | `git diff --exit-code 83d24ba57..a04e505f4 -- <five product paths>` exited 0; product bytes and semantics are unchanged by the integration. `deno.lock` is also unchanged. |
 
 ## Decisions
 
@@ -99,6 +105,7 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | Always install canonical skills and root guidance | Both are cross-host workspace contracts. | #1672/#1675 contract |
 | Claude mirror reads canonical bytes | Proves derivation rather than coincidental duplicate writes. | #1675 acceptance |
 | Template + generated barrel for guidance | Published JSR modules cannot rely on runtime asset reads; asset freshness is gated. | JSR audit / asset generator |
+| Mark all three behavioural boxes `[post-merge]` and measure them in one wave | The signals are structurally impossible before merge; the marker is the close-gate mechanism for that case. | Tier-A supervisor decision, 2026-08-30 |
 
 ## Drift
 
@@ -109,6 +116,7 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | Root formatter policy excludes `packages/cli`; wrapper cannot give a clean CLI verdict without imposing an ad hoc whole-file rewrite | significant | yes |
 | Local-source scaffold lacks root import evidence required by the existing offline-doc resolver | minor | yes |
 | Draft PR's live `main` base advanced after the exact intake baseline | minor | yes |
+| Tier-A superseded the temporary stale-base hold and authorized an exact merge of current `main` | minor | yes |
 
 ## Gate Results
 
@@ -122,6 +130,22 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | Scoped format | `scoped-fmt.json` | BASELINE_BLOCKED | Root config excludes all of `packages/cli`; an explicit neutral config processes the files but reports legacy whole-file style, so Tier-A must disposition rather than accepting review-noise rewrites. |
 | Changed-line whitespace | `git diff-tree --check 2f4b8c00d^ 2f4b8c00d` | PASS | No whitespace errors in the committed slice. |
 | Asset barrel | `assets-barrel.json` | PASS | SHA `2f4b8c00d...`; request `6c612bd52779...`; generated output is current. |
+
+### Current-main Integration Gates
+
+| Gate | Merged-tree result | Evidence |
+| --- | --- | --- |
+| `check:agent-docs-prose` | PASS, exit 0 | `fresh: true`, no stale paths |
+| `check:assets-barrel` | PASS, exit 0 | Generator plus checked-in derivative diff gate |
+| `check:mcp-export-corpus` | PASS, exit 0 | 35 packages, 270 subpaths, 7,614 symbols |
+| `check:publish-assets` | PASS, exit 0 | Generated publish asset check |
+| Focused `init-agent_test.ts` | PASS, exit 0 | `.llm/tmp/gate-receipts/agent-init-guidance-main-integration/scoped-test.json`: 22 passed, 0 failed |
+| Scoped check | PASS, exit 0 | `scoped-check.json`: four files, zero findings |
+| Scoped lint | PASS, exit 0 | `scoped-lint.json`: three files processed, zero findings |
+| Scoped format | BASELINE_BLOCKED, exit 1 | `scoped-fmt.json`: the same three legacy whole-file style findings; no mutation |
+| Fresh scaffold consumer proof | PASS, exit 0 | `scaffold-proof.json`: 150-file scaffold, 8 cues, 6 canonical skills, 6 byte-identical mirrors, configs and offline docs |
+| Product semantic comparison | PASS, exit 0 | Five product paths are byte-identical between accepted head `83d24ba57...` and merge `a04e505f4...` |
+| Lock hygiene | PASS, exit 0 | `deno.lock` identical between `83d24ba57...` and `a04e505f4...` |
 
 ### Fitness Gates
 
@@ -143,13 +167,14 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Fresh `agent init --host all --with-docs` workspace | PASS | `.llm/tmp/gate-receipts/agent-init-guidance/scaffold-proof.json` | 150-file fresh scaffold; 8 cues, 6 canonical files, 6 byte-identical mirrors, configs and offline docs. Disposable local-source fixture added `@netscript/cli: workspace:` because the existing scaffold root carries no docs-version import evidence. |
-| Behavioural unfamiliar-agent wave | NOT_RUN | supervisor decision pending | Cannot be produced by this leaf. |
+| Behavioural unfamiliar-agent wave | `[post-merge]` | Tier-A decision recorded on all three issues | One follow-up wave will measure #1672/#1674/#1675 signals together; boxes remain unchecked. |
 
 ## Handoff Notes
 
-- Tier-A should inspect the product ceiling, canonical→mirror readback, issue-separated assertions,
-  formatter-policy exception, and the three unresolved behavioural acceptance boxes first.
+- Tier-A accepted the author checkpoint and resolved all three behavioural boxes as `[post-merge]`.
 - IMPL-EVAL must be a fresh opposite-family session after Tier-A review; this author will not fill
   `evaluate.md` or claim PASS.
 - Product gate receipts attest `2f4b8c00d664f0c03f22946d1e0315cb7819303e`; the final evidence-only
   commit is expected to advance the reported branch head without changing product bytes.
+- Current-main integration preserves those product bytes exactly; shared derivative regeneration
+  was generator-only and idempotent. The structured formatter result remains visible for evaluator review.
