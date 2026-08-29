@@ -331,3 +331,49 @@ scope is: confirm `plan.md` carries A-1…A-8 as written.
 - No implementation, package, docs, RFC, lock, or author-worktree change was made by this session.
   One scratch `_type.ts` was compiled in-tree and deleted; the tree is clean apart from this file.
 - Methods used: `git`, `gh`, `deno check`, `deno lint --rules`, source reads at `9e70b30a3`.
+
+---
+
+# PLAN-EVAL cycle 2 — feat-sdk-procedure-meta--1466
+
+- Evaluator: same native Claude Fable 5 · medium · Remote Control session as cycle 1 (session
+  `5cd50ad0-3de4-4997-b60e-9dc73e76caaf`, bridge `cse_01JNV9EuywznGgoufYQizqBU`, cwd
+  `/home/codex/worktrees/ns1466-planeval`), 2026-08-30.
+- Subject: `plan.md` + `worklog.md` at **`7db3954bf3f6f7a59d09fa53435db5252edb4ccb`**
+  (`docs(harness): transcribe #1466 plan-eval rulings`), on top of evaluator commit `a3452650d`.
+- Identity: `git rev-parse HEAD` = `git ls-remote origin refs/heads/feat/sdk-procedure-meta` = PR
+  #1731 `headRefOid` = `7db3954bf…`; tree clean; PR still draft, one `status:` label.
+- Scope confirmed docs-only: `git diff --stat a3452650d..HEAD` = `plan.md` (+217/−52), `worklog.md`
+  (+58); no `packages/**`, no `deno.lock`.
+- Re-evaluation scope, as set in cycle 1: confirm `plan.md` carries A-1…A-8 as written. No ruling is
+  re-opened and no new design finding is raised.
+
+## Transcription check
+
+| Fix | Required (cycle 1)                                                                                                                                                                                                                                                                                        | Found at `7db3954bf`                                                                                                                                                                                                            | Result |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| A-1 | Position 4 exactly `NetScriptProcedureMeta & Record<never, never>`, single-sourced as public `BaseContractMeta`, used in the `baseContract` annotation and both route aliases, exported from `public/mod.ts`; exact-equality fixture                                                                      | `plan.md:52-70` (L2): alias spelled verbatim at `:59`, export at `:62`, annotation + both aliases at `:62-64`, position 3 unchanged at `:64`, `Equal` fixture at `:67-68`                                                       | PASS   |
+| A-2 | R-2(a) `ProcedureMetaFromNode` after `ProcedureOutputFromNode`, exported from `./ports` only; R-2(b) `ProcedureMeta` beside `ProcedureInput`/`ProcedureOutput`, exported from `./ports` and `./query`; R-2(c) `ActionMethod` marker in slice 2 files; R-2(d) structural, no `@netscript/contracts` import | `plan.md:74-99` (both type bodies verbatim, export sites `:84-86`, `:96-97`, marker `:97-99`), structural rule `:101-102`, fixture bar `:104-106`; slice 2 files `:169-171` list `ports/mod.ts`, `query/mod.ts`, and the marker | PASS   |
+| A-3 | Runtime port → resolved **no** with the R-1 storage test in slice 1; extractor row resolved; new row "SDK imports `NetScriptProcedureMeta` from contracts: no"                                                                                                                                            | `plan.md:145-147`; slice 1 proves/files/gate carry the storage test `:155-157`, `:160-163`                                                                                                                                      | PASS   |
+| A-4 | Per-member public-surface delta: contracts +3 exports / 3 changed declarations; sdk +2 types / 1 changed interface; root unchanged                                                                                                                                                                        | `plan.md:130-137`, identical to cycle-1 §5 bullet 1                                                                                                                                                                             | PASS   |
+| A-5 | Doc-JSON independence test as a named gate under `test` (entrypoints, five symbols, no `@orpc`/`npm:`), replacing the tool-less "declaration scan"                                                                                                                                                        | `plan.md:197-201`; risk register row `:259` now names that test                                                                                                                                                                 | PASS   |
+| A-6 | Assertion-budget tests with pinned baselines as a named gate under `test`; zero-import and no-`any` clauses; changed-line review demoted to review-only                                                                                                                                                   | `plan.md:202-214` (baselines 0/0/0/0/1/1/5 match my measurement; discrepancy = finding, not auto-adjust `:213-214`); review-only at `:175-176` and `:255`                                                                       | PASS   |
+| A-7 | Eight-row receipt table, `expectedGateIds`, supplemental-evidence rule, sufficiency over the eight files only                                                                                                                                                                                             | `plan.md:227-245`, slice 3 `:183-185`. Eight `gateId`s are distinct catalog names; invocation ids `1466-<gateId>-final`                                                                                                         | PASS   |
+| A-8 | `worklog.md` with `## Design` before slice 1                                                                                                                                                                                                                                                              | `worklog.md:3-50` (Design) + progress log `:52-58`; no implementation commit exists yet                                                                                                                                         | PASS   |
+
+Also checked, unchanged from cycle 1 and still true: `origin/main` has no diff in
+`packages/contracts`, `packages/sdk`, `rfcs`, or `deno.lock` since `21d516224`, so the baselines and
+citations the transcription relies on remain current.
+
+## Notes (non-blocking)
+
+- `plan.md:220-221` still lists a per-member isolated-declaration dry-run in the prose gate list;
+  `:242-244` correctly classifies any `--member` dry-run as supplemental, so the named set is
+  unaffected. No change required.
+
+## Verdict (cycle 2)
+
+`PASS`
+
+Every Plan-Gate box is now satisfied in `plan.md` as committed at `7db3954bf`. Implementation may
+begin at slice 1 under the contract as transcribed; IMPL-EVAL evaluates against this `plan.md`.
