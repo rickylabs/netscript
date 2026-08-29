@@ -19,37 +19,53 @@ aspire agent init [options]
 
 ## Description
 
-The `aspire agent init` command initializes Aspire skills, companion tools, and MCP (Model Context Protocol) server configuration for your development environment. It presents an interactive multi-step flow to configure AI coding agent support:
+The `aspire agent init` command initializes Aspire skills, companion tools, and MCP (Model Context
+Protocol) server configuration for your development environment. It presents an interactive
+multi-step flow to configure AI coding agent support:
 
-1. **Select skill locations** — choose where skill files are installed (Standard `.agents/skills/`, Claude Code `.claude/skills/`, GitHub Skills `.github/skills/`, OpenCode `.opencode/skill/`). The **Standard** location is the only option that defaults as pre-selected.
-2. **Select skills and tools** — choose which Aspire workflow skills and companion tools to install. The Aspire workflow skills come from the Aspire skills bundle; optional companion tools such as `playwright-cli` and `dotnet-inspect` can be selected explicitly.
-3. **Apply selections** — installs the chosen skills into each selected location and sets up the MCP server connection.
+1. **Select skill locations** — choose where skill files are installed (Standard `.agents/skills/`,
+   Claude Code `.claude/skills/`, GitHub Skills `.github/skills/`, OpenCode `.opencode/skill/`). The
+   **Standard** location is the only option that defaults as pre-selected.
+2. **Select skills and tools** — choose which Aspire workflow skills and companion tools to install.
+   The Aspire workflow skills come from the Aspire skills bundle; optional companion tools such as
+   `playwright-cli` and `dotnet-inspect` can be selected explicitly.
+3. **Apply selections** — installs the chosen skills into each selected location and sets up the MCP
+   server connection.
 
-The command also removes skill files from any locations that were deselected, keeping your workspace clean.
+The command also removes skill files from any locations that were deselected, keeping your workspace
+clean.
 
 **Aspire workflow skills bundle:** Aspire workflow skills are distributed through the
-  [`microsoft/aspire-skills`](https://github.com/microsoft/aspire-skills) GitHub
-  release assets. Aspire 13.4 includes an embedded snapshot for default
-  installs, and the optional remote fetch path can download matching release
-  assets. The CLI verifies bundle integrity before installing selected files.
-  The `playwright-cli` and `dotnet-inspect` companion options aren't part of
-  that bundle and are installed separately when selected.
+[`microsoft/aspire-skills`](https://github.com/microsoft/aspire-skills) GitHub release assets.
+Aspire 13.4 includes an embedded snapshot for default installs, and the optional remote fetch path
+can download matching release assets. The CLI verifies bundle integrity before installing selected
+files. The `playwright-cli` and `dotnet-inspect` companion options aren't part of that bundle and
+are installed separately when selected.
 
 ### Skills catalog and defaults
 
-The Aspire skills bundle includes six workflow skills: `aspire`, `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and `aspireify`. The CLI reads the bundle catalog, so bundle-provided skills are available in the interactive prompt and through `--skills` by name.
+The Aspire skills bundle includes six workflow skills: `aspire`, `aspire-init`,
+`aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and `aspireify`. The CLI reads the
+bundle catalog, so bundle-provided skills are available in the interactive prompt and through
+`--skills` by name.
 
-Standalone `aspire agent init` pre-selects the bundle skills that are safe to add to an existing workspace: `aspire`, `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and `aspire-deployment`. The `aspireify` skill remains available but opt-in because it's a one-time AppHost wiring workflow. When `aspire init` chains into agent setup, `aspireify` is pre-selected because it is the natural follow-up after adding an AppHost skeleton to an existing repository.
+Standalone `aspire agent init` pre-selects the bundle skills that are safe to add to an existing
+workspace: `aspire`, `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and
+`aspire-deployment`. The `aspireify` skill remains available but opt-in because it's a one-time
+AppHost wiring workflow. When `aspire init` chains into agent setup, `aspireify` is pre-selected
+because it is the natural follow-up after adding an AppHost skeleton to an existing repository.
 
 ### Bundle integrity verification
 
-The CLI verifies the embedded and remotely-fetched Aspire skills bundle using
-SHA-512 checksums. Per-file hashes recorded in bundles published before the
-SHA-512 switch continue to validate against SHA-256.
+The CLI verifies the embedded and remotely-fetched Aspire skills bundle using SHA-512 checksums.
+Per-file hashes recorded in bundles published before the SHA-512 switch continue to validate against
+SHA-256.
 
 ### Installation summary
 
-When one or more skill files are installed or updated, the command prints a single compact summary instead of one message per skill. For example, a standalone install of the default Aspire workflow skills into the standard workspace and user-level locations reports:
+When one or more skill files are installed or updated, the command prints a single compact summary
+instead of one message per skill. For example, a standalone install of the default Aspire workflow
+skills into the standard workspace and user-level locations reports:
 
 ```text title="Output"
 🤖 Installed Aspire agent skills:
@@ -58,7 +74,9 @@ When one or more skill files are installed or updated, the command prints a sing
 ✅ Agent environment configuration complete.
 ```
 
-If a skill install fails, the error message includes the exact skill path that failed. No-op runs, where every selected skill is already up to date, skip the skills and locations summary and print only the final completion message.
+If a skill install fails, the error message includes the exact skill path that failed. No-op runs,
+where every selected skill is already up to date, skip the skills and locations summary and print
+only the final completion message.
 
 <LearnMore>
   If bundle validation fails before skill installation, see [Troubleshoot skill
@@ -71,15 +89,23 @@ The following options are available:
 
 - **`--workspace-root <workspace-root>`**
 
-  Path to the workspace root directory. When not specified, the current directory is used as the workspace root.
+  Path to the workspace root directory. When not specified, the current directory is used as the
+  workspace root.
 
 - **`--skill-locations <skill-locations>`**
 
-  Comma-separated list of skill locations to configure, such as `standard`, `claudecode`, `github`, or `opencode`. Use `all` to configure all supported locations or `none` to skip skill location configuration. When not specified, the command prompts interactively.
+  Comma-separated list of skill locations to configure, such as `standard`, `claudecode`, `github`,
+  or `opencode`. Use `all` to configure all supported locations or `none` to skip skill location
+  configuration. When not specified, the command prompts interactively.
 
 - **`--skills <skills>`**
 
-  Comma-separated list of skills to install. Aspire 13.4 includes the Aspire workflow skills `aspire`, `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and `aspireify`; companion options can include `playwright-cli` and, for .NET AppHosts, `dotnet-inspect`. The available list can vary by Aspire CLI version and project type. Use `all` to install all available skills or `none` to skip skill installation. When not specified, the command prompts interactively.
+  Comma-separated list of skills to install. Aspire 13.4 includes the Aspire workflow skills
+  `aspire`, `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`, and
+  `aspireify`; companion options can include `playwright-cli` and, for .NET AppHosts,
+  `dotnet-inspect`. The available list can vary by Aspire CLI version and project type. Use `all` to
+  install all available skills or `none` to skip skill installation. When not specified, the command
+  prompts interactively.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 

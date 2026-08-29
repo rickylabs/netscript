@@ -1,6 +1,9 @@
 # Health checks
 
-Health checks provide availability and state information about an app. Health checks are often exposed as HTTP endpoints, but can also be used internally by the app to write logs or perform other tasks based on the current health. Health checks are typically used in combination with an external monitoring service or container orchestrator to check the status of an app.
+Health checks provide availability and state information about an app. Health checks are often
+exposed as HTTP endpoints, but can also be used internally by the app to write logs or perform other
+tasks based on the current health. Health checks are typically used in combination with an external
+monitoring service or container orchestrator to check the status of an app.
 
 ## Two types of health checks
 
@@ -12,44 +15,59 @@ Aspire uses health checks in two distinct contexts. Understanding the difference
 | **Service endpoint checks** | Your application | "Am I healthy?"           | Load balancers, Kubernetes probes  |
 
 **Key insight:** AppHost health checks answer: "Should I start services that depend on this
-  resource?" Service endpoint health checks answer: "Should traffic be sent to
-  this instance?"
+resource?" Service endpoint health checks answer: "Should traffic be sent to this instance?"
 
 ## Readiness vs. Liveness
 
 The two endpoint types serve different purposes:
 
-- **Readiness (`/health`)** - "Am I ready to receive traffic?" Checks that dependencies are connected, initialization is complete, and the service can handle requests. A failing readiness check means "don't send me traffic yet."
+- **Readiness (`/health`)** - "Am I ready to receive traffic?" Checks that dependencies are
+  connected, initialization is complete, and the service can handle requests. A failing readiness
+  check means "don't send me traffic yet."
 
-- **Liveness (`/alive`)** - "Am I still running?" Checks that the process hasn't deadlocked or crashed. A failing liveness check means "restart me."
+- **Liveness (`/alive`)** - "Am I still running?" Checks that the process hasn't deadlocked or
+  crashed. A failing liveness check means "restart me."
 
 ## Aspire health check endpoints
 
-Aspire exposes two default health check HTTP endpoints in **Development** environments when the `AddServiceDefaults` and `MapDefaultEndpoints` methods are called from the _Program.cs_ file:
+Aspire exposes two default health check HTTP endpoints in **Development** environments when the
+`AddServiceDefaults` and `MapDefaultEndpoints` methods are called from the _Program.cs_ file:
 
-- The `/health` endpoint indicates if the app is running normally where it's ready to receive requests. All health checks must pass for app to be considered ready to accept traffic after starting.
+- The `/health` endpoint indicates if the app is running normally where it's ready to receive
+  requests. All health checks must pass for app to be considered ready to accept traffic after
+  starting.
 
   ```http title="HTTP"
   GET /health
   ```
 
-  The `/health` endpoint returns an HTTP status code 200 and a `text/plain` value of `Healthy` when the app is _healthy_.
+  The `/health` endpoint returns an HTTP status code 200 and a `text/plain` value of `Healthy` when
+  the app is _healthy_.
 
-- The `/alive` indicates if an app is running or has crashed and must be restarted. Only health checks tagged with the _live_ tag must pass for app to be considered alive.
+- The `/alive` indicates if an app is running or has crashed and must be restarted. Only health
+  checks tagged with the _live_ tag must pass for app to be considered alive.
 
   ```http title="HTTP"
   GET /alive
   ```
 
-  The `/alive` endpoint returns an HTTP status code 200 and a `text/plain` value of `Healthy` when the app is _alive_.
+  The `/alive` endpoint returns an HTTP status code 200 and a `text/plain` value of `Healthy` when
+  the app is _alive_.
 
-The `AddServiceDefaults` and `MapDefaultEndpoints` methods also apply various configurations to your app beyond just health checks, such as OpenTelemetry and [service discovery](/fundamentals/service-discovery/) configurations.
+The `AddServiceDefaults` and `MapDefaultEndpoints` methods also apply various configurations to your
+app beyond just health checks, such as OpenTelemetry and
+[service discovery](/fundamentals/service-discovery/) configurations.
 
 ### Non-development environments
 
-In non-development environments, the `/health` and `/alive` endpoints are disabled by default. If you need to enable them, its recommended to protect these endpoints with various routing features, such as host filtering and/or authorization. For more information, see [Health checks in ASP.NET Core](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks#use-health-checks-routing).
+In non-development environments, the `/health` and `/alive` endpoints are disabled by default. If
+you need to enable them, its recommended to protect these endpoints with various routing features,
+such as host filtering and/or authorization. For more information, see
+[Health checks in ASP.NET Core](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks#use-health-checks-routing).
 
-Additionally, it may be advantageous to configure request timeouts and output caching for these endpoints to prevent abuse or denial-of-service attacks. To do so, consider the following modified `AddDefaultHealthChecks` method:
+Additionally, it may be advantageous to configure request timeouts and output caching for these
+endpoints to prevent abuse or denial-of-service attacks. To do so, consider the following modified
+`AddDefaultHealthChecks` method:
 
 ```csharp title="Extensions.cs"
 public static IHostApplicationBuilder AddDefaultHealthChecks(
@@ -204,9 +222,11 @@ The preceding code:
 - Groups the health check endpoints under the `/` path.
 - Caches the output and specifies a request time with the corresponding `HealthChecks` policy.
 
-In addition to the updated `AddDefaultHealthChecks` and `MapDefaultEndpoints` methods, you must also add the corresponding services for both request timeouts and output caching.
+In addition to the updated `AddDefaultHealthChecks` and `MapDefaultEndpoints` methods, you must also
+add the corresponding services for both request timeouts and output caching.
 
-In the appropriate consuming app's entry point (usually the _Program.cs_ file), add the following code:
+In the appropriate consuming app's entry point (usually the _Program.cs_ file), add the following
+code:
 
 ```csharp
 // Wherever your services are being registered.
@@ -256,11 +276,16 @@ app.use('/health', timeout('5s'));
 app.use('/alive', timeout('5s'));
 ```
 
-For more information, see [Request timeouts middleware in ASP.NET Core](https://learn.microsoft.com/aspnet/core/performance/timeouts) and [Output caching middleware in ASP.NET Core](https://learn.microsoft.com/aspnet/core/performance/caching/output).
+For more information, see
+[Request timeouts middleware in ASP.NET Core](https://learn.microsoft.com/aspnet/core/performance/timeouts)
+and
+[Output caching middleware in ASP.NET Core](https://learn.microsoft.com/aspnet/core/performance/caching/output).
 
 ## Integration health checks
 
-Aspire integrations can also register additional health checks for your app. These health checks contribute to the returned status of the `/health` and `/alive` endpoints. For example, the Aspire PostgreSQL integration automatically adds a health check to verify the following conditions:
+Aspire integrations can also register additional health checks for your app. These health checks
+contribute to the returned status of the `/health` and `/alive` endpoints. For example, the Aspire
+PostgreSQL integration automatically adds a health check to verify the following conditions:
 
 - A database connection could be established.
 - A database query could be executed successfully.
@@ -269,7 +294,10 @@ If either of these operations fail, the corresponding health check also fails.
 
 ### Configure health checks
 
-You can disable health checks for a given integration using one of the available configuration options. Aspire integrations support [Microsoft.Extensions.Configurations](https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration) to apply settings through config files such as _appsettings.json_:
+You can disable health checks for a given integration using one of the available configuration
+options. Aspire integrations support
+[Microsoft.Extensions.Configurations](https://learn.microsoft.com/dotnet/api/microsoft.extensions.configuration)
+to apply settings through config files such as _appsettings.json_:
 
 ```json title="appsettings.json"
 {
@@ -336,24 +364,29 @@ import express from 'express';
 const app = express();
 
 const pool = new pg.Pool({
-    connectionString: process.env.ConnectionStrings__postgresdb,
+  connectionString: process.env.ConnectionStrings__postgresdb,
 });
 
 // Health endpoint returns healthy without checking
 // the database. In TypeScript, health checks are explicit —
 // omit a database ping to disable them.
 app.get('/health', (req, res) => {
-    res.type('text/plain').send('Healthy');
+  res.type('text/plain').send('Healthy');
 });
 ```
 
 ## AppHost resource health checks
 
-AppHost resource health checks are different from the health check endpoints described earlier. These health checks are configured in the AppHost project and determine the readiness of resources from the orchestrator's perspective. They're particularly important for controlling when dependent resources start via the `WaitFor` functionality and are displayed in the Aspire dashboard.
+AppHost resource health checks are different from the health check endpoints described earlier.
+These health checks are configured in the AppHost project and determine the readiness of resources
+from the orchestrator's perspective. They're particularly important for controlling when dependent
+resources start via the `WaitFor` functionality and are displayed in the Aspire dashboard.
 
 ### Resource readiness with health checks
 
-When a resource has health checks configured, the AppHost uses them to determine if the resource is ready before starting dependent resources. If no health checks are registered for a resource, the AppHost waits for the resource to be in the `Running` state.
+When a resource has health checks configured, the AppHost uses them to determine if the resource is
+ready before starting dependent resources. If no health checks are registered for a resource, the
+AppHost waits for the resource to be in the `Running` state.
 
 ### HTTP health checks for resources
 
@@ -414,7 +447,8 @@ await frontend.waitFor(backend);
 
 ### Custom resource health checks
 
-You can create custom health checks for more complex readiness scenarios. Start by defining the health check in the AppHost's service collection, then associate it with resources:
+You can create custom health checks for more complex readiness scenarios. Start by defining the
+health check in the AppHost's service collection, then associate it with resources:
 
 ```csharp title="AppHost.cs"
 var builder = DistributedApplication.CreateBuilder(args);
@@ -438,13 +472,17 @@ builder.AddProject<Projects.MyApp>("myapp")
 ```
 
 **Note:** TypeScript AppHost support for registering custom health checks with
-  `builder.Services.AddHealthChecks()` is not yet available.
+`builder.Services.AddHealthChecks()` is not yet available.
 
-The `AddCheck` method registers the health check, and `WithHealthCheck` associates it with specific resources. For more details about creating and registering custom health checks, see [Create health checks](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks#create-health-checks).
+The `AddCheck` method registers the health check, and `WithHealthCheck` associates it with specific
+resources. For more details about creating and registering custom health checks, see
+[Create health checks](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks#create-health-checks).
 
 ### Dashboard integration
 
-Resource health check status is displayed in the Aspire dashboard, providing real-time visibility into resource readiness. When resources are waiting for health checks to pass, the dashboard shows the current status and any failure details.
+Resource health check status is displayed in the Aspire dashboard, providing real-time visibility
+into resource readiness. When resources are waiting for health checks to pass, the dashboard shows
+the current status and any failure details.
 
 <Image
   src={healthChecksDashboardStatus}

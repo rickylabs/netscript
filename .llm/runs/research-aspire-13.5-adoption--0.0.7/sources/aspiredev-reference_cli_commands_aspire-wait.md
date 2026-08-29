@@ -12,24 +12,34 @@ aspire wait <resource> [options]
 
 ## Description
 
-The `aspire wait` command blocks until a named resource within a running AppHost reaches a target status. This is useful for CI/CD pipelines and automation workflows where you need to wait for resources to be ready after starting an AppHost with `aspire run --detach`.
+The `aspire wait` command blocks until a named resource within a running AppHost reaches a target
+status. This is useful for CI/CD pipelines and automation workflows where you need to wait for
+resources to be ready after starting an AppHost with `aspire run --detach`.
 
-The `--timeout` option here controls how long to wait for a *resource* to reach its target status. It's separate from the `ASPIRE_CLI_START_TIMEOUT` environment variable, which controls how long `aspire run` and `aspire start` wait for the *AppHost itself* to finish starting up. See [aspire run](/reference/cli/commands/aspire-run/#configuring-the-startup-timeout) for details.
+The `--timeout` option here controls how long to wait for a _resource_ to reach its target status.
+It's separate from the `ASPIRE_CLI_START_TIMEOUT` environment variable, which controls how long
+`aspire run` and `aspire start` wait for the _AppHost itself_ to finish starting up. See
+[aspire run](/reference/cli/commands/aspire-run/#configuring-the-startup-timeout) for details.
 
-The command connects to a running AppHost via the backchannel and streams resource state changes in real-time. It validates that the specified resource exists before entering the wait loop, so typos in resource names are caught immediately rather than causing a silent timeout.
+The command connects to a running AppHost via the backchannel and streams resource state changes in
+real-time. It validates that the specified resource exists before entering the wait loop, so typos
+in resource names are caught immediately rather than causing a silent timeout.
 
 When executed without the `--apphost` option, the command:
 
 1. Scans for all running AppHost processes.
-2. If multiple AppHosts are running within the current directory scope, prompts you to select which one to target.
+2. If multiple AppHosts are running within the current directory scope, prompts you to select which
+   one to target.
 3. If only one AppHost is running in scope, connects to it directly.
-4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts for selection.
+4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts
+   for selection.
 
 ## Arguments
 
 - **`<resource>`**
 
-  The name of the resource to wait for. This must match the name of a resource defined in the running AppHost.
+  The name of the resource to wait for. This must match the name of a resource defined in the
+  running AppHost.
 
 ## Options
 
@@ -49,11 +59,13 @@ The following options are available:
 
 - **`--timeout <seconds>`**
 
-  The maximum number of seconds to wait for the resource to reach the target status. Defaults to `120`. Must be a positive integer.
+  The maximum number of seconds to wait for the resource to reach the target status. Defaults to
+  `120`. Must be a positive integer.
 
 - **`--apphost <apphost>`**
 
-  The path to the Aspire AppHost project file. When specified, the command connects to the AppHost running from that apphost without prompting for selection.
+  The path to the Aspire AppHost project file. When specified, the command connects to the AppHost
+  running from that apphost without prompting for selection.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 

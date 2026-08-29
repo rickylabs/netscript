@@ -1,33 +1,56 @@
 # AI coding agents and the Aspire Dashboard
 
-AI coding agents can use the [Aspire CLI](/reference/cli/overview/) and [Aspire MCP server](/get-started/aspire-mcp-server/) to fetch logs and telemetry from the Aspire dashboard. This gives agents the same observability data that developers see in the dashboard UI — structured logs, distributed traces, resource status, and console output — so they can diagnose issues, verify fixes, and add new features with full context.
+AI coding agents can use the [Aspire CLI](/reference/cli/overview/) and
+[Aspire MCP server](/get-started/aspire-mcp-server/) to fetch logs and telemetry from the Aspire
+dashboard. This gives agents the same observability data that developers see in the dashboard UI —
+structured logs, distributed traces, resource status, and console output — so they can diagnose
+issues, verify fixes, and add new features with full context.
 
 ## How agents use dashboard data
 
-When an Aspire app is running, the dashboard collects OpenTelemetry data from all resources. AI coding agents access this data through two channels:
+When an Aspire app is running, the dashboard collects OpenTelemetry data from all resources. AI
+coding agents access this data through two channels:
 
-- **Aspire CLI** — Commands like [`aspire logs`](/reference/cli/commands/aspire-logs/), [`aspire otel logs`](/reference/cli/commands/aspire-otel-logs/), [`aspire otel traces`](/reference/cli/commands/aspire-otel-traces/), and [`aspire describe`](/reference/cli/commands/aspire-describe/) retrieve resource status, console logs, and telemetry directly from the terminal. All commands support `--format Json` for structured output that agents can parse.
-- **Aspire MCP server** — The [MCP server](/get-started/aspire-mcp-server/) exposes tools such as `list_resources`, `list_structured_logs`, `list_traces`, and `list_console_logs` that agents call directly through the Model Context Protocol.
+- **Aspire CLI** — Commands like [`aspire logs`](/reference/cli/commands/aspire-logs/),
+  [`aspire otel logs`](/reference/cli/commands/aspire-otel-logs/),
+  [`aspire otel traces`](/reference/cli/commands/aspire-otel-traces/), and
+  [`aspire describe`](/reference/cli/commands/aspire-describe/) retrieve resource status, console
+  logs, and telemetry directly from the terminal. All commands support `--format Json` for
+  structured output that agents can parse.
+- **Aspire MCP server** — The [MCP server](/get-started/aspire-mcp-server/) exposes tools such as
+  `list_resources`, `list_structured_logs`, `list_traces`, and `list_console_logs` that agents call
+  directly through the Model Context Protocol.
 
-Both channels draw from the same underlying dashboard data. Whether an agent reads logs via the CLI or through MCP tools, it sees the same information as the dashboard UI.
+Both channels draw from the same underlying dashboard data. Whether an agent reads logs via the CLI
+or through MCP tools, it sees the same information as the dashboard UI.
 
 ### Typical agent workflow
 
-The following workflow is an example — [Aspire skills](/get-started/aspire-skills/) teach agents the best patterns to run and debug Aspire apps automatically. A typical agent-driven debugging session looks like this:
+The following workflow is an example — [Aspire skills](/get-started/aspire-skills/) teach agents the
+best patterns to run and debug Aspire apps automatically. A typical agent-driven debugging session
+looks like this:
 
-1. The agent starts the Aspire app with `aspire start` and waits for resources to become healthy with `aspire wait`.
+1. The agent starts the Aspire app with `aspire start` and waits for resources to become healthy
+   with `aspire wait`.
 1. The agent runs `aspire describe` to check resource status and identify any unhealthy services.
-1. The agent fetches structured logs with `aspire otel logs` or the `list_structured_logs` MCP tool, filtering by resource name to find errors.
-1. The agent retrieves distributed traces with `aspire otel traces` to understand cross-service request flow and identify latency issues.
-1. Using the collected data, the agent makes code changes, restarts the affected resource, and verifies the fix by checking logs and traces again.
+1. The agent fetches structured logs with `aspire otel logs` or the `list_structured_logs` MCP tool,
+   filtering by resource name to find errors.
+1. The agent retrieves distributed traces with `aspire otel traces` to understand cross-service
+   request flow and identify latency issues.
+1. Using the collected data, the agent makes code changes, restarts the affected resource, and
+   verifies the fix by checking logs and traces again.
 
 ## Get started
 
-The fastest way to set up AI coding agents with Aspire is the `aspire agent init` command. See [Use AI coding agents](/get-started/ai-coding-agents/) for the full setup guide, including skill files, MCP server configuration, and supported AI assistants.
+The fastest way to set up AI coding agents with Aspire is the `aspire agent init` command. See
+[Use AI coding agents](/get-started/ai-coding-agents/) for the full setup guide, including skill
+files, MCP server configuration, and supported AI assistants.
 
 ## Standalone mode
 
-The Aspire CLI and MCP server work with the [standalone dashboard](/dashboard/standalone/) — you don't need an Aspire AppHost project. This is useful when monitoring any application that sends OpenTelemetry data to the dashboard.
+The Aspire CLI and MCP server work with the [standalone dashboard](/dashboard/standalone/) — you
+don't need an Aspire AppHost project. This is useful when monitoring any application that sends
+OpenTelemetry data to the dashboard.
 
 ### Start the standalone dashboard
 
@@ -43,9 +66,10 @@ The dashboard starts with the following defaults:
 - **OTLP/gRPC** endpoint at `http://localhost:4317`
 - **OTLP/HTTP** endpoint at `http://localhost:4318`
 
-:::caution
-The `--allow-anonymous` flag starts the dashboard without authentication. Only use this on your local machine. See [Dashboard security considerations](/dashboard/security-considerations/#anonymous-access) for more information.
-:::
+:::caution The `--allow-anonymous` flag starts the dashboard without authentication. Only use this
+on your local machine. See
+[Dashboard security considerations](/dashboard/security-considerations/#anonymous-access) for more
+information. :::
 
 ### Use Aspire CLI with the standalone dashboard
 
@@ -65,13 +89,19 @@ Start the MCP server in dashboard-only mode using `--dashboard-url`:
 aspire agent mcp --dashboard-url "http://localhost:18888"
 ```
 
-This exposes the dashboard's telemetry tools (structured logs, traces, and resource data) to any MCP-compatible AI assistant.
+This exposes the dashboard's telemetry tools (structured logs, traces, and resource data) to any
+MCP-compatible AI assistant.
 
-Configuration is required in the agent to use the MCP server. For configuration details, see [Aspire MCP server configuration](/get-started/aspire-mcp-server/#configuration). The `--dashboard-url` must be passed as a command line argument when configuring the MCP server for standalone use.
+Configuration is required in the agent to use the MCP server. For configuration details, see
+[Aspire MCP server configuration](/get-started/aspire-mcp-server/#configuration). The
+`--dashboard-url` must be passed as a command line argument when configuring the MCP server for
+standalone use.
 
 ### Sample skill for standalone dashboard
 
-The following is a sample skill file that teaches an AI coding agent how to start the standalone dashboard and query its data. Save it as `.github/skills/aspire-standalone/SKILL.md` (for GitHub Copilot) or `.claude/skills/aspire-standalone/SKILL.md` (for Claude Code):
+The following is a sample skill file that teaches an AI coding agent how to start the standalone
+dashboard and query its data. Save it as `.github/skills/aspire-standalone/SKILL.md` (for GitHub
+Copilot) or `.claude/skills/aspire-standalone/SKILL.md` (for Claude Code):
 
 ````markdown title="SKILL.md"
 ---
@@ -87,8 +117,8 @@ description: Use the Aspire standalone dashboard for observability. Start the da
 aspire dashboard run --allow-anonymous
 ```
 
-The dashboard UI is at http://localhost:18888.
-Apps should send OpenTelemetry to http://localhost:4317 (gRPC) or http://localhost:4318 (HTTP).
+The dashboard UI is at http://localhost:18888. Apps should send OpenTelemetry to
+http://localhost:4317 (gRPC) or http://localhost:4318 (HTTP).
 
 ## Query telemetry
 

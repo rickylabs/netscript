@@ -12,18 +12,25 @@ aspire describe [<resource>] [options]
 
 ## Description
 
-The `aspire describe` command displays resource details for a running Aspire AppHost. It shows a table of resources with their name, type, state, health status, and URLs. Hidden resources are excluded by default; use the `--include-hidden` option to show them. Use the `--follow` option to continuously stream resource state changes in real time.
+The `aspire describe` command displays resource details for a running Aspire AppHost. It shows a
+table of resources with their name, type, state, health status, and URLs. Hidden resources are
+excluded by default; use the `--include-hidden` option to show them. Use the `--follow` option to
+continuously stream resource state changes in real time.
 
-When a specific resource name is provided, only matching resources are displayed. If no matching resource is found, the command returns an error.
+When a specific resource name is provided, only matching resources are displayed. If no matching
+resource is found, the command returns an error.
 
 When executed without the `--apphost` option, the command:
 
 1. Scans for all running AppHost processes.
-2. If multiple AppHosts are running within the current directory scope, prompts you to select which one to target.
+2. If multiple AppHosts are running within the current directory scope, prompts you to select which
+   one to target.
 3. If only one AppHost is running in scope, connects to it directly.
-4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts for selection.
+4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts
+   for selection.
 
-**Tip:** The `aspire resources` command is a backward-compatible alias for `aspire describe`. Both names invoke the same command.
+**Tip:** The `aspire resources` command is a backward-compatible alias for `aspire describe`. Both
+names invoke the same command.
 
 ## Arguments
 
@@ -37,17 +44,24 @@ The following options are available:
 
 - **`-f, --follow`**
 
-  Continuously stream resource state changes. In table mode, each update prints a line showing the resource name, state, health, and endpoints. In JSON mode, each update emits a single JSON object per line ([Newline Delimited JSON (NDJSON)](https://github.com/ndjson/ndjson-spec) format).
+  Continuously stream resource state changes. In table mode, each update prints a line showing the
+  resource name, state, health, and endpoints. In JSON mode, each update emits a single JSON object
+  per line ([Newline Delimited JSON (NDJSON)](https://github.com/ndjson/ndjson-spec) format).
 
 - **`--apphost <path>`**
 
-  The path to the Aspire AppHost project file. When specified, the command connects to the AppHost running from that project file without prompting for selection.
+  The path to the Aspire AppHost project file. When specified, the command connects to the AppHost
+  running from that project file without prompting for selection.
 
 - **`--format <Json|Table>`**
 
-  Output format. Use `Json` for machine-readable output suitable for scripting and automation. Defaults to `Table`. Values are case-insensitive.
+  Output format. Use `Json` for machine-readable output suitable for scripting and automation.
+  Defaults to `Table`. Values are case-insensitive.
 
-  In snapshot mode (without `--follow`), JSON output wraps resources in a `{ "resources": [...] }` object. In follow mode, JSON output uses [Newline Delimited JSON (NDJSON)](https://github.com/ndjson/ndjson-spec) for streaming, emitting one JSON object per line.
+  In snapshot mode (without `--follow`), JSON output wraps resources in a `{ "resources": [...] }`
+  object. In follow mode, JSON output uses
+  [Newline Delimited JSON (NDJSON)](https://github.com/ndjson/ndjson-spec) for streaming, emitting
+  one JSON object per line.
 
 - <Include relativePath="reference/cli/includes/option-include-hidden.md" />
 

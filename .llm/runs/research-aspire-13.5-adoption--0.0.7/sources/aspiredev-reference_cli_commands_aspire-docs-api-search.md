@@ -12,9 +12,13 @@ aspire docs api search <query> [options]
 
 ## Description
 
-The `aspire docs api search` command performs a keyword-based search across the Aspire API reference index from [aspire.dev](https://aspire.dev). Use it to find types, methods, extension methods, or other API members by name or concept, without needing to know the exact package hierarchy.
+The `aspire docs api search` command performs a keyword-based search across the Aspire API reference
+index from [aspire.dev](https://aspire.dev). Use it to find types, methods, extension methods, or
+other API members by name or concept, without needing to know the exact package hierarchy.
 
-Results are ranked by relevance and include the identifier and display name for each match. Use the identifier returned in search results with the [`aspire docs api get`](../aspire-docs-api-get/) command to retrieve the full content of an API reference entry.
+Results are ranked by relevance and include the identifier and display name for each match. Use the
+identifier returned in search results with the [`aspire docs api get`](../aspire-docs-api-get/)
+command to retrieve the full content of an API reference entry.
 
 Optionally filter results to a specific language using the `--language` option.
 
@@ -22,7 +26,8 @@ Optionally filter results to a specific language using the `--language` option.
 
 - **`<query>`**
 
-  The search query. Use type names, method names, or keywords to describe the API you are looking for. For example, `AddRedis`, `IResourceBuilder`, or `WithReference`.
+  The search query. Use type names, method names, or keywords to describe the API you are looking
+  for. For example, `AddRedis`, `IResourceBuilder`, or `WithReference`.
 
 ## Options
 
@@ -30,11 +35,13 @@ The following options are available:
 
 - **`--language <language>`**
 
-  Filter results to a specific language. Supported values are `csharp` and `typescript`. When omitted, results from all supported languages are returned.
+  Filter results to a specific language. Supported values are `csharp` and `typescript`. When
+  omitted, results from all supported languages are returned.
 
 - **`--format <Table|Json>`**
 
-  Output format. Choose `Table` for a human-readable table or `Json` for machine-readable JSON output. Defaults to `Table`.
+  Output format. Choose `Table` for a human-readable table or `Json` for machine-readable JSON
+  output. Defaults to `Table`.
 
 - **`-n, --limit <limit>`**
 

@@ -6,12 +6,13 @@
 - Role: harness research orchestrator
 - Route: native Claude / Anthropic / Fable 5 / medium
 - Route reason: explicit owner override for this architectural research epic
-- Remote Control: required. Observed session URL: <https://claude.ai/code/session_011Ng6hnMLyY8vzM8EJo2XKg>
-  (the session is registered on claude.ai/code; `/rc` is a user-side slash command that the
-  orchestrator cannot toggle from inside the turn — the owner keeps it enabled on this session).
+- Remote Control: required. Observed session URL:
+  <https://claude.ai/code/session_011Ng6hnMLyY8vzM8EJo2XKg> (the session is registered on
+  claude.ai/code; `/rc` is a user-side slash command that the orchestrator cannot toggle from inside
+  the turn — the owner keeps it enabled on this session).
 - Requested identity: Claude · Anthropic · Fable 5 · medium (owner override, drift D-1).
-- Observed identity: model id `claude-fable-5` (reported by the runtime environment on
-  2026-08-29); effort is not introspectable from inside the session — verify with `/status`.
+- Observed identity: model id `claude-fable-5` (reported by the runtime environment on 2026-08-29);
+  effort is not introspectable from inside the session — verify with `/status`.
 - Host: WSL2 (Linux 6.18.33.2-microsoft-standard-WSL2), Aspire CLI 13.4.6 on PATH, Deno workspace.
 - Worktree: `/home/codex/repos/netscript-007-aspire-13-5-research`
 - Branch: `research/aspire-13.5-0.0.7`
@@ -31,12 +32,14 @@ the primary coordinator ratifies and publishes the issue graph.
 
 - Primary release source: <https://aspire.dev/whats-new/aspire-13-5/>.
 - Prefer official Markdown/agent pages over scraping rendered HTML.
-- For every relevant documentation page, select the TypeScript view using
-  `?aspire-lang=typescript` (or the page's equivalent parameter) and retrieve its Markdown form.
-- Use `aspire docs search`, `aspire docs get`, and `aspire docs api search ... --language
-  typescript` where available. Never infer TypeScript support from C# samples.
-- Record the exact upstream page, retrieval date, version, and whether the claim is TypeScript,
-  CLI, MCP, dashboard, deployment, orchestration, or general.
+- For every relevant documentation page, select the TypeScript view using `?aspire-lang=typescript`
+  (or the page's equivalent parameter) and retrieve its Markdown form.
+- Use `aspire docs search`, `aspire docs get`, and
+  `aspire docs api search ... --language
+  typescript` where available. Never infer TypeScript
+  support from C# samples.
+- Record the exact upstream page, retrieval date, version, and whether the claim is TypeScript, CLI,
+  MCP, dashboard, deployment, orchestration, or general.
 
 ## Required coverage
 
@@ -49,13 +52,13 @@ the primary coordinator ratifies and publishes the issue graph.
    telemetry, deterministic teardown, container ownership, and structured receipts.
 5. Dashboard/OTel/log/trace/export improvements relevant to generated projects and harness gates.
 6. Deployment/publish changes that affect generated NetScript workspaces or docs.
-7. Every canonical skill, embedded/static resource, generated agent-doc corpus, MCP corpus,
-   scaffold template, example, workflow, and public doc that mentions Aspire. Identify the
-   generator and the derived-artifact regeneration chain; no hand-edited mirrors.
+7. Every canonical skill, embedded/static resource, generated agent-doc corpus, MCP corpus, scaffold
+   template, example, workflow, and public doc that mentions Aspire. Identify the generator and the
+   derived-artifact regeneration chain; no hand-edited mirrors.
 8. Existing 0.0.7/0.0.8 issues, especially Aspire/plugin discovery, ports, health, MCP, CI, and
    agent-init work. State exact close/supersede/dependency relationships.
-9. A test and canary strategy for each slice, including which changes justify an additional
-   0.0.7 canary before stable.
+9. A test and canary strategy for each slice, including which changes justify an additional 0.0.7
+   canary before stable.
 
 ## Deliverables
 
@@ -66,8 +69,8 @@ the primary coordinator ratifies and publishes the issue graph.
   regeneration, related existing issues, and milestone recommendation.
 - `existing-issue-map.md`: close/supersede/unblock/dependency matrix against live GitHub issues.
 - `worklog.md`, `context-pack.md`, and `drift.md`: resumable evidence and corrections.
-- Commit and explicitly push the research artifacts to the branch; end with the exact commit SHA
-  and a concise ratification recommendation.
+- Commit and explicitly push the research artifacts to the branch; end with the exact commit SHA and
+  a concise ratification recommendation.
 
 ## Safety and scope
 
@@ -77,4 +80,3 @@ the primary coordinator ratifies and publishes the issue graph.
 - Do not edit generated `.aspire/modules/` or derived static resources directly.
 - Do not create or modify product code, PRs, releases, milestone assignments, or GitHub issues.
 - Preserve the primary 0.0.7 coordinator and all existing topic supervisors.
-

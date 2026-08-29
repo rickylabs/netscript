@@ -12,11 +12,16 @@ aspire ps [options]
 
 ## Description
 
-The `aspire ps` command lists all running Aspire AppHost processes. The output includes the AppHost project path, process IDs, and dashboard URLs for each running instance.
+The `aspire ps` command lists all running Aspire AppHost processes. The output includes the AppHost
+project path, process IDs, and dashboard URLs for each running instance.
 
-The command scans for running AppHosts by checking the backchannel connections in the `~/.aspire/backchannels/` directory. This approach is fast because it doesn't need to recursively search for project files.
+The command scans for running AppHosts by checking the backchannel connections in the
+`~/.aspire/backchannels/` directory. This approach is fast because it doesn't need to recursively
+search for project files.
 
-`aspire ps` provides AppHost-level information. Use `--follow` to continuously stream AppHost lifecycle updates. To inspect per-resource details or stream resource state changes within a specific AppHost, use [`aspire describe --follow`](/reference/cli/commands/aspire-describe/).
+`aspire ps` provides AppHost-level information. Use `--follow` to continuously stream AppHost
+lifecycle updates. To inspect per-resource details or stream resource state changes within a
+specific AppHost, use [`aspire describe --follow`](/reference/cli/commands/aspire-describe/).
 
 The default output is a human-readable table with the following columns:
 
@@ -28,13 +33,16 @@ The default output is a human-readable table with the following columns:
 | `CLI_PID`   | The process ID of the CLI that started the AppHost |
 | `DASHBOARD` | The dashboard URL with login token                 |
 
-:::note
-Log file paths are not shown in the table output. Use `aspire ps --format Json` to retrieve log file paths programmatically.
-:::
+:::note Log file paths are not shown in the table output. Use `aspire ps --format Json` to retrieve
+log file paths programmatically. :::
 
-In-scope AppHosts (those within the current directory) are displayed first, followed by out-of-scope AppHosts.
+In-scope AppHosts (those within the current directory) are displayed first, followed by out-of-scope
+AppHosts.
 
-Before listing, `aspire ps` also detects and stops any orphaned AppHosts whose launching CLI process has died (for example, after a crash or a hard kill) so the output reflects only AppHosts that are actually running. This cleanup is best effort: if it fails for a given AppHost, `aspire ps` still proceeds with listing the rest.
+Before listing, `aspire ps` also detects and stops any orphaned AppHosts whose launching CLI process
+has died (for example, after a crash or a hard kill) so the output reflects only AppHosts that are
+actually running. This cleanup is best effort: if it fails for a given AppHost, `aspire ps` still
+proceeds with listing the rest.
 
 ## Options
 
@@ -42,11 +50,18 @@ The following options are available:
 
 - **`-f, --follow`**
 
-  Continuously stream AppHost lifecycle updates. Requires `--format Json`. Output is emitted as one compact JSON object per line in [Newline Delimited JSON (NDJSON)](https://github.com/ndjson/ndjson-spec) format whenever an AppHost starts, stops, or changes state. Each line follows the same schema as a single AppHost entry from snapshot JSON output, plus a `status` field (`running` or `stopped`).
+  Continuously stream AppHost lifecycle updates. Requires `--format Json`. Output is emitted as one
+  compact JSON object per line in
+  [Newline Delimited JSON (NDJSON)](https://github.com/ndjson/ndjson-spec) format whenever an
+  AppHost starts, stops, or changes state. Each line follows the same schema as a single AppHost
+  entry from snapshot JSON output, plus a `status` field (`running` or `stopped`).
 
 - **`--format <Json|Table>`**
 
-  Output result format. Use `Json` for machine-readable output suitable for scripting and automation. The JSON output includes an array of AppHost objects with `appHostPath`, `appHostPid`, `cliPid`, `logFilePath`, and `dashboardUrl` properties. The `logFilePath` field is `null` when no log path is available. Defaults to `Table`.
+  Output result format. Use `Json` for machine-readable output suitable for scripting and
+  automation. The JSON output includes an array of AppHost objects with `appHostPath`, `appHostPid`,
+  `cliPid`, `logFilePath`, and `dashboardUrl` properties. The `logFilePath` field is `null` when no
+  log path is available. Defaults to `Table`.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 

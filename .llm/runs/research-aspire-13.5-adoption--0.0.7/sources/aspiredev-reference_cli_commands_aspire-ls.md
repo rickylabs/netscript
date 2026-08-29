@@ -12,27 +12,39 @@ aspire ls [options]
 
 ## Description
 
-The `aspire ls` command discovers and lists [AppHost project](/get-started/app-host/) candidates in the current working directory and its subdirectories. It performs parallel discovery and reports results along with each candidate's programming language and build status.
+The `aspire ls` command discovers and lists [AppHost project](/get-started/app-host/) candidates in
+the current working directory and its subdirectories. It performs parallel discovery and reports
+results along with each candidate's programming language and build status.
 
 The default output is a human-readable table with the following columns:
 
-| Column     | Description                                                                       |
-| ---------- | --------------------------------------------------------------------------------- |
-| `PATH`     | The file path to the AppHost project                                              |
-| `LANGUAGE` | The raw AppHost language ID, such as `csharp` or `typescript/nodejs`              |
-| `STATUS`   | Build status of the AppHost candidate: `buildable` or `possibly-unbuildable`      |
+| Column     | Description                                                                  |
+| ---------- | ---------------------------------------------------------------------------- |
+| `PATH`     | The file path to the AppHost project                                         |
+| `LANGUAGE` | The raw AppHost language ID, such as `csharp` or `typescript/nodejs`         |
+| `STATUS`   | Build status of the AppHost candidate: `buildable` or `possibly-unbuildable` |
 
-The `STATUS` value is `buildable` when the project validates as an AppHost candidate. It is `possibly-unbuildable` when the project looks like an AppHost but may not build in the current environment.
+The `STATUS` value is `buildable` when the project validates as an AppHost candidate. It is
+`possibly-unbuildable` when the project looks like an AppHost but may not build in the current
+environment.
 
 ### Discovery and configuration
 
-If a configuration file (for example `aspire.config.json` with `appHost.path` or a legacy `.aspire/settings.json` with `appHostPath`) points to an AppHost project, that path is included as a candidate. When a configured AppHost path points to a missing file, `aspire ls` displays a warning. When the configuration file is invalid JSON, has an invalid shape, or the configured AppHost path is empty, contains invalid characters, or isn't a JSON string, `aspire ls` displays an error. When no configuration file is present, discovery continues silently.
+If a configuration file (for example `aspire.config.json` with `appHost.path` or a legacy
+`.aspire/settings.json` with `appHostPath`) points to an AppHost project, that path is included as a
+candidate. When a configured AppHost path points to a missing file, `aspire ls` displays a warning.
+When the configuration file is invalid JSON, has an invalid shape, or the configured AppHost path is
+empty, contains invalid characters, or isn't a JSON string, `aspire ls` displays an error. When no
+configuration file is present, discovery continues silently.
 
 ### Output ordering
 
-**Non-streaming mode** (`--format json` without `--stream`): results are sorted by path before output.
+**Non-streaming mode** (`--format json` without `--stream`): results are sorted by path before
+output.
 
-**Streaming mode** (`--format json --stream`): results are emitted in arrival order from parallel discovery and are **not sorted**. If you need a deterministic order for streamed output, pipe through a sort step. For example:
+**Streaming mode** (`--format json --stream`): results are emitted in arrival order from parallel
+discovery and are **not sorted**. If you need a deterministic order for streamed output, pipe
+through a sort step. For example:
 
 ```bash title="Aspire CLI"
 aspire ls --format json --stream | jq -s 'sort_by(.path)'
@@ -46,15 +58,22 @@ The following options are available:
 
 - **`--format <Json|Table>`**
 
-  Output result format. Use `Json` for machine-readable output suitable for scripting and automation. Defaults to `Table`.
+  Output result format. Use `Json` for machine-readable output suitable for scripting and
+  automation. Defaults to `Table`.
 
 - **`--stream`**
 
-  Output discovered AppHosts as newline-delimited JSON (NDJSON), emitting each candidate as soon as it is discovered. Requires `--format json`.
+  Output discovered AppHosts as newline-delimited JSON (NDJSON), emitting each candidate as soon as
+  it is discovered. Requires `--format json`.
 
 - **`--all`**
 
-  Include all candidate AppHosts by disabling Git filtering and the built-in skip list for common dependency, build-output, and tooling directories such as `bin`, `obj`, `node_modules`, `.venv`, `.git`, and `.vs`. This also includes AppHost snippet files under agent-skill directories, such as `.agents`, `.claude`, `.github/skills`, and `.opencode/skill`, which are excluded from default discovery because they're code samples rather than runnable AppHosts. The NuGet package cache is still excluded.
+  Include all candidate AppHosts by disabling Git filtering and the built-in skip list for common
+  dependency, build-output, and tooling directories such as `bin`, `obj`, `node_modules`, `.venv`,
+  `.git`, and `.vs`. This also includes AppHost snippet files under agent-skill directories, such as
+  `.agents`, `.claude`, `.github/skills`, and `.opencode/skill`, which are excluded from default
+  discovery because they're code samples rather than runnable AppHosts. The NuGet package cache is
+  still excluded.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 
@@ -113,14 +132,16 @@ The following options are available:
   aspire ls --format json --stream
   ```
 
-  Example output (each line is a JSON object emitted as candidates are discovered; your line order may vary):
+  Example output (each line is a JSON object emitted as candidates are discovered; your line order
+  may vary):
 
   ```text title="Output"
   {"path":"./src/OtherApp.AppHost/apphost.ts","language":"typescript/nodejs","status":"buildable"}
   {"path":"./src/MyApp.AppHost/MyApp.AppHost.csproj","language":"csharp","status":"buildable"}
   ```
 
-  Note: lines are emitted in discovery arrival order and are not sorted. To sort streamed output by path:
+  Note: lines are emitted in discovery arrival order and are not sorted. To sort streamed output by
+  path:
 
   ```bash title="Aspire CLI"
   aspire ls --format json --stream | jq -s 'sort_by(.path)'

@@ -2,7 +2,9 @@
 
 ## Name
 
-`aspire agent mcp` - Start the <abbr title="Model Context Protocol" data-tooltip-placement="top">MCP</abbr> (Model Context Protocol) server.
+`aspire agent mcp` - Start the
+<abbr title="Model Context Protocol" data-tooltip-placement="top">MCP</abbr> (Model Context
+Protocol) server.
 
 ## Synopsis
 
@@ -12,7 +14,9 @@ aspire agent mcp [options]
 
 ## Description
 
-The `aspire agent mcp` command starts the MCP (Model Context Protocol) server, which enables AI assistants and development tools to interact with your Aspire AppHost. The MCP server provides a standardized interface for resource management, diagnostics, and observability operations.
+The `aspire agent mcp` command starts the MCP (Model Context Protocol) server, which enables AI
+assistants and development tools to interact with your Aspire AppHost. The MCP server provides a
+standardized interface for resource management, diagnostics, and observability operations.
 
 When the server is running, MCP-compatible clients can connect to it to:
 
@@ -21,7 +25,11 @@ When the server is running, MCP-compatible clients can connect to it to:
 - Execute resource commands (start, stop, restart)
 - Query integration information
 
-By default, the server discovers running AppHosts from the current workspace. You can also connect directly to a standalone Aspire Dashboard (one not managed by an AppHost) by providing `--dashboard-url`. In this dashboard-only mode, only the three telemetry tools (`list_structured_logs`, `list_traces`, `list_trace_structured_logs`) are exposed; AppHost-specific tools are not available.
+By default, the server discovers running AppHosts from the current workspace. You can also connect
+directly to a standalone Aspire Dashboard (one not managed by an AppHost) by providing
+`--dashboard-url`. In this dashboard-only mode, only the three telemetry tools
+(`list_structured_logs`, `list_traces`, `list_trace_structured_logs`) are exposed; AppHost-specific
+tools are not available.
 
 ## Options
 
@@ -29,11 +37,16 @@ The following options are available:
 
 - **`--dashboard-url <dashboard-url>`**
 
-  The URL of a standalone Aspire Dashboard to connect to instead of discovering one from an AppHost. Accepts a base URL (for example, `http://localhost:18888`) or a full login URL including a browser token (for example, `http://localhost:18888/login?t=<token>`). When a login URL is provided, the token is automatically exchanged for an API key.
+  The URL of a standalone Aspire Dashboard to connect to instead of discovering one from an AppHost.
+  Accepts a base URL (for example, `http://localhost:18888`) or a full login URL including a browser
+  token (for example, `http://localhost:18888/login?t=<token>`). When a login URL is provided, the
+  token is automatically exchanged for an API key.
 
 - **`--api-key <api-key>`**
 
-  The API key used to authenticate with the dashboard's Telemetry API. Only required when `--dashboard-url` is specified and the dashboard is configured with `ApiKey` authentication and no login URL is provided.
+  The API key used to authenticate with the dashboard's Telemetry API. Only required when
+  `--dashboard-url` is specified and the dashboard is configured with `ApiKey` authentication and no
+  login URL is provided.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 

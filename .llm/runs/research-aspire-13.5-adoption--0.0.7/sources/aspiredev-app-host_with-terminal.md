@@ -1,6 +1,10 @@
 # Test TUI and shell apps using WithTerminal
 
-If you have a terminal user interface (TUI) application or a shell-based experience that you want to exercise while it runs under Aspire, add `WithTerminal(...)` to the resource. Aspire then exposes an interactive terminal session that you can attach to from the [Aspire dashboard](/dashboard/overview/) or from the [`aspire terminal`](/reference/cli/commands/aspire-terminal/) CLI command.
+If you have a terminal user interface (TUI) application or a shell-based experience that you want to
+exercise while it runs under Aspire, add `WithTerminal(...)` to the resource. Aspire then exposes an
+interactive terminal session that you can attach to from the
+[Aspire dashboard](/dashboard/overview/) or from the
+[`aspire terminal`](/reference/cli/commands/aspire-terminal/) CLI command.
 
 ```csharp title="AppHost.cs"
 #pragma warning disable ASPIRETERMINAL001
@@ -17,49 +21,71 @@ import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const agent = await builder.addExecutable("agent", "my-agent", ".")
-    .withTerminal();
+const agent = await builder.addExecutable('agent', 'my-agent', '.')
+  .withTerminal();
 
 await builder.build().run();
 ```
 
-Once the app is running, open the resource's terminal page in the dashboard—or run `aspire terminal attach agent`—to interact with the process just as you would in a local shell.
+Once the app is running, open the resource's terminal page in the dashboard—or run
+`aspire terminal attach agent`—to interact with the process just as you would in a local shell.
 
-**Experimental:** `WithTerminal` is an experimental API. Calling it in C# produces the `ASPIRETERMINAL001` diagnostic, which you must acknowledge for your AppHost to build. Suppress it inline with `#pragma warning disable ASPIRETERMINAL001` (as shown in the C# example above), or add `ASPIRETERMINAL001` to `<NoWarn>` in your project file. The shape of the API and its options may change in a future release.
+**Experimental:** `WithTerminal` is an experimental API. Calling it in C# produces the
+`ASPIRETERMINAL001` diagnostic, which you must acknowledge for your AppHost to build. Suppress it
+inline with `#pragma warning disable ASPIRETERMINAL001` (as shown in the C# example above), or add
+`ASPIRETERMINAL001` to `<NoWarn>` in your project file. The shape of the API and its options may
+change in a future release.
 
 ## When to use WithTerminal
 
 Reach for `WithTerminal` when a resource is interactive rather than a plain background service:
 
-- A **TUI application**—for example, an agent, a diagnostics console, or a curses-style tool—that draws a full-screen interface you want to see and drive.
-- A **shell-based experience** where you want an interactive prompt inside a container or executable while it runs as part of your app model.
-- Any resource you want to **poke at live** during development without leaving the Aspire dashboard or CLI.
+- A **TUI application**—for example, an agent, a diagnostics console, or a curses-style tool—that
+  draws a full-screen interface you want to see and drive.
+- A **shell-based experience** where you want an interactive prompt inside a container or executable
+  while it runs as part of your app model.
+- Any resource you want to **poke at live** during development without leaving the Aspire dashboard
+  or CLI.
 
 ## The debugger is not attached automatically
 
-When you apply `WithTerminal`, Aspire runs the resource as a plain process and **does not automatically attach the debugger**. If you need to debug the resource, attach the debugger manually to the running process from your IDE.
+When you apply `WithTerminal`, Aspire runs the resource as a plain process and **does not
+automatically attach the debugger**. If you need to debug the resource, attach the debugger manually
+to the running process from your IDE.
 
-**Note:** This is a temporary limitation while the implementation is completed. The orchestrator (DCP) cannot yet run a process under the debugger and a pseudo-terminal (PTY) at the same time, so for now Aspire favors a working interactive terminal over automatic IDE execution. Once both can run together, the debugger will attach automatically as usual.
+**Note:** This is a temporary limitation while the implementation is completed. The orchestrator
+(DCP) cannot yet run a process under the debugger and a pseudo-terminal (PTY) at the same time, so
+for now Aspire favors a working interactive terminal over automatic IDE execution. Once both can run
+together, the debugger will attach automatically as usual.
 
 ## Attach from multiple places at once
 
-Terminal sessions support multiple simultaneous viewers. You can open **two browser tabs pointing at the same terminal**—or a browser tab and the CLI together—and both stay responsive: input and output are mirrored to every attached peer.
+Terminal sessions support multiple simultaneous viewers. You can open **two browser tabs pointing at
+the same terminal**—or a browser tab and the CLI together—and both stay responsive: input and output
+are mirrored to every attached peer.
 
-One peer holds the **primary** role and drives the terminal's dimensions, while the others attach as **viewers**. From the CLI you can join as a passive viewer with `aspire terminal attach <resource> --viewer`, and take control later with the `Ctrl+B T` hotkey.
+One peer holds the **primary** role and drives the terminal's dimensions, while the others attach as
+**viewers**. From the CLI you can join as a passive viewer with
+`aspire terminal attach <resource> --viewer`, and take control later with the `Ctrl+B T` hotkey.
 
 ## Configure the terminal
 
 The terminal session is described by a set of options with sensible defaults:
 
-| Option              | Default | Description                                                                                                                                                     |
-| ------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Columns`           | `120`   | The initial number of columns for the terminal grid.                                                                                                            |
-| `Rows`              | `30`    | The initial number of rows for the terminal grid.                                                                                                               |
-| `ShowTerminalHost`  | `false` | Whether the hidden per-replica terminal host resources appear in the dashboard and CLI resource lists. Set to `true` to diagnose terminal-host startup or connectivity issues. |
+| Option             | Default | Description                                                                                                                                                                    |
+| ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Columns`          | `120`   | The initial number of columns for the terminal grid.                                                                                                                           |
+| `Rows`             | `30`    | The initial number of rows for the terminal grid.                                                                                                                              |
+| `ShowTerminalHost` | `false` | Whether the hidden per-replica terminal host resources appear in the dashboard and CLI resource lists. Set to `true` to diagnose terminal-host startup or connectivity issues. |
 
-**Tip:** `Columns` and `Rows` must each be `1` or greater. Configuring either with zero or a negative value in the `WithTerminal(...)` callback throws an `ArgumentOutOfRangeException` immediately instead of failing later during terminal-host startup.
+**Tip:** `Columns` and `Rows` must each be `1` or greater. Configuring either with zero or a
+negative value in the `WithTerminal(...)` callback throws an `ArgumentOutOfRangeException`
+immediately instead of failing later during terminal-host startup.
 
-**Note:** The resource being run is always the terminal program: for executables that's the process itself, and for containers it's the container's own process. There's no way to select a different shell to launch for the session—an earlier `Shell` option that appeared to do this was removed because it was never wired up to the underlying pseudo-terminal and had no effect.
+**Note:** The resource being run is always the terminal program: for executables that's the process
+itself, and for containers it's the container's own process. There's no way to select a different
+shell to launch for the session—an earlier `Shell` option that appeared to do this was removed
+because it was never wired up to the underlying pseudo-terminal and had no effect.
 
 In C#, pass a callback to override any of these options:
 
@@ -82,17 +108,21 @@ import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const agent = await builder.addExecutable("agent", "my-agent", ".")
-    .withTerminal();
+const agent = await builder.addExecutable('agent', 'my-agent', '.')
+  .withTerminal();
 
 await builder.build().run();
 ```
 
-**Note:** In TypeScript AppHosts, `withTerminal()` currently applies the default options shown above. Configurable options are coming to the non-C# API as `WithTerminal` is finalized (tracked by [microsoft/aspire#18105](https://github.com/microsoft/aspire/issues/18105)).
+**Note:** In TypeScript AppHosts, `withTerminal()` currently applies the default options shown
+above. Configurable options are coming to the non-C# API as `WithTerminal` is finalized (tracked by
+[microsoft/aspire#18105](https://github.com/microsoft/aspire/issues/18105)).
 
 ## Terminals and replicas
 
-Each replica of a resource gets its own independent terminal session. Aspire creates one terminal host per parent replica, so requesting three replicas yields three separate terminals. The order of `WithReplicas` and `WithTerminal` does not matter—the final replica count is always honored:
+Each replica of a resource gets its own independent terminal session. Aspire creates one terminal
+host per parent replica, so requesting three replicas yields three separate terminals. The order of
+`WithReplicas` and `WithTerminal` does not matter—the final replica count is always honored:
 
 ```csharp title="AppHost.cs"
 #pragma warning disable ASPIRETERMINAL001
@@ -111,41 +141,68 @@ import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const agent = await builder.addExecutable("agent", "my-agent", ".")
-    .withReplicas(3)
-    .withTerminal();
+const agent = await builder.addExecutable('agent', 'my-agent', '.')
+  .withReplicas(3)
+  .withTerminal();
 
 await builder.build().run();
 ```
 
-When a resource has more than one replica, choose which one to attach to with `aspire terminal attach <resource> --replica <index>` (indices are 0-based), or pick interactively when prompted.
+When a resource has more than one replica, choose which one to attach to with
+`aspire terminal attach <resource> --replica <index>` (indices are 0-based), or pick interactively
+when prompted.
 
-**Note:** Add a terminal to a resource only once. Calling `WithTerminal()` more than once on the same resource throws an exception.
+**Note:** Add a terminal to a resource only once. Calling `WithTerminal()` more than once on the
+same resource throws an exception.
 
 ## View terminals in the dashboard
 
-When a resource has `WithTerminal` applied, its **Console Logs** page in the [Aspire dashboard](/dashboard/overview/) gains a live terminal session alongside the usual console log stream. You can drive the running process directly in the browser without leaving the dashboard. For example, you can type commands, scroll the scrollback buffer, and switch between replicas. Each replica appears as its own entry (for example, `agent-r0`, `agent-r1`, `agent-r2`) with an independent session.
+When a resource has `WithTerminal` applied, its **Console Logs** page in the
+[Aspire dashboard](/dashboard/overview/) gains a live terminal session alongside the usual console
+log stream. You can drive the running process directly in the browser without leaving the dashboard.
+For example, you can type commands, scroll the scrollback buffer, and switch between replicas. Each
+replica appears as its own entry (for example, `agent-r0`, `agent-r1`, `agent-r2`) with an
+independent session.
 
 The page picks a default view based on the resource's state at the moment you navigate to it:
 
-- **Running** (the PTY is live) → the page defaults to the **Terminal** view, so the interactive session is the first thing you see.
-- **Waiting**/**Starting** or already **Exited**/**Finished**/**FailedToStart** → the page defaults to the **Console logs** view, so hosting messages—such as "Waiting for resource X to become healthy..." or a startup failure—and post-exit output remain visible immediately.
+- **Running** (the PTY is live) → the page defaults to the **Terminal** view, so the interactive
+  session is the first thing you see.
+- **Waiting**/**Starting** or already **Exited**/**Finished**/**FailedToStart** → the page defaults
+  to the **Console logs** view, so hosting messages—such as "Waiting for resource X to become
+  healthy..." or a startup failure—and post-exit output remain visible immediately.
 
-Open the toolbar's options (⋯) menu and choose **Terminal** or **Console logs** to switch views manually at any time. Both views stay live while you're on the page: switching between them never tears down the terminal session or loses console log scrollback, and a later state transition (for example, `Waiting` → `Running`) doesn't auto-switch the view once you've navigated to the page. Selecting a different resource re-evaluates the default for that resource.
+Open the toolbar's options (⋯) menu and choose **Terminal** or **Console logs** to switch views
+manually at any time. Both views stay live while you're on the page: switching between them never
+tears down the terminal session or loses console log scrollback, and a later state transition (for
+example, `Waiting` → `Running`) doesn't auto-switch the view once you've navigated to the page.
+Selecting a different resource re-evaluates the default for that resource.
 
-**Note:** The view you pick only affects what's currently displayed—it doesn't change what's captured. Console logs keep streaming, and the terminal session keeps running, regardless of which view is active.
+**Note:** The view you pick only affects what's currently displayed—it doesn't change what's
+captured. Console logs keep streaming, and the terminal session keeps running, regardless of which
+view is active.
 
 ## Access terminals from VS Code
 
-In the [Aspire VS Code extension](/get-started/aspire-vscode-extension/), any resource configured with `WithTerminal()` gains an **Open terminal** entry in its right-click context menu. Selecting **Open terminal** runs `aspire terminal attach <resource>` and opens the session as an editor-style terminal tab directly in VS Code—no separate shell window needed.
+In the [Aspire VS Code extension](/get-started/aspire-vscode-extension/), any resource configured
+with `WithTerminal()` gains an **Open terminal** entry in its right-click context menu. Selecting
+**Open terminal** runs `aspire terminal attach <resource>` and opens the session as an editor-style
+terminal tab directly in VS Code—no separate shell window needed.
 
-For multi-replica resources, the extension automatically passes `--replica <index>` so the correct instance is attached. The `--apphost` flag is included when the current AppHost connection information is available, so the command connects without requiring you to specify the AppHost separately.
+For multi-replica resources, the extension automatically passes `--replica <index>` so the correct
+instance is attached. The `--apphost` flag is included when the current AppHost connection
+information is available, so the command connects without requiring you to specify the AppHost
+separately.
 
-**Note:** The **Open terminal** context-menu item is only visible for resources that have `terminal.enabled` set, which is the case for any resource where `WithTerminal()` was called in the AppHost. Resources without `WithTerminal()` do not show this menu entry.
+**Note:** The **Open terminal** context-menu item is only visible for resources that have
+`terminal.enabled` set, which is the case for any resource where `WithTerminal()` was called in the
+AppHost. Resources without `WithTerminal()` do not show this menu entry.
 
 ## Work with terminals from the CLI
 
-The `aspire terminal` command group lets you list and attach to terminal sessions from your shell. Because `WithTerminal` is experimental, these commands are hidden behind a feature flag. Enable them with:
+The `aspire terminal` command group lets you list and attach to terminal sessions from your shell.
+Because `WithTerminal` is experimental, these commands are hidden behind a feature flag. Enable them
+with:
 
 ```bash title="Enable the aspire terminal commands"
 aspire config set features.terminalCommandsEnabled true
@@ -153,8 +210,10 @@ aspire config set features.terminalCommandsEnabled true
 
 Then:
 
-- [`aspire terminal ps`](/reference/cli/commands/aspire-terminal-ps/) lists every terminal-enabled resource in the running AppHost, with grid size, attached-peer count, and per-replica health.
-- [`aspire terminal attach`](/reference/cli/commands/aspire-terminal-attach/) attaches your local terminal to a resource's interactive PTY session.
+- [`aspire terminal ps`](/reference/cli/commands/aspire-terminal-ps/) lists every terminal-enabled
+  resource in the running AppHost, with grid size, attached-peer count, and per-replica health.
+- [`aspire terminal attach`](/reference/cli/commands/aspire-terminal-attach/) attaches your local
+  terminal to a resource's interactive PTY session.
 
 ## See also
 

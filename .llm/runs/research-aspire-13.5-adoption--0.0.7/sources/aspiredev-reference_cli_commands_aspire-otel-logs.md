@@ -12,13 +12,16 @@ aspire otel logs [resource] [options]
 
 ## Description
 
-The `aspire otel logs` command retrieves and displays structured logs collected by the Aspire Dashboard. You can filter logs by resource name, trace ID, severity level, or a full-text search expression. Use `--follow` to stream logs in real-time as they arrive.
+The `aspire otel logs` command retrieves and displays structured logs collected by the Aspire
+Dashboard. You can filter logs by resource name, trace ID, severity level, or a full-text search
+expression. Use `--follow` to stream logs in real-time as they arrive.
 
 ## Arguments
 
 - **`[resource]`**
 
-  Filter by resource name. When specified, only logs from the matching resource are shown. Supports both exact instance names and base resource names (which match all replicas).
+  Filter by resource name. When specified, only logs from the matching resource are shown. Supports
+  both exact instance names and base resource names (which match all replicas).
 
 ## Options
 
@@ -30,11 +33,16 @@ The following options are available:
 
 - **`--dashboard-url <url>`**
 
-  The URL of a standalone Aspire Dashboard to query instead of discovering one from an AppHost. Accepts a base URL (for example, `http://localhost:18888`) or a full login URL including a browser token (for example, `http://localhost:18888/login?t=<token>`). When a login URL is provided, the token is automatically exchanged for an API key. Mutually exclusive with `--apphost`.
+  The URL of a standalone Aspire Dashboard to query instead of discovering one from an AppHost.
+  Accepts a base URL (for example, `http://localhost:18888`) or a full login URL including a browser
+  token (for example, `http://localhost:18888/login?t=<token>`). When a login URL is provided, the
+  token is automatically exchanged for an API key. Mutually exclusive with `--apphost`.
 
 - **`--api-key <key>`**
 
-  The API key used to authenticate with the dashboard's Telemetry API. Only required when `--dashboard-url` is specified and the dashboard is configured with `ApiKey` authentication and no login URL is provided.
+  The API key used to authenticate with the dashboard's Telemetry API. Only required when
+  `--dashboard-url` is specified and the dashboard is configured with `ApiKey` authentication and no
+  login URL is provided.
 
 - **`-f, --follow`**
 
@@ -58,18 +66,21 @@ The following options are available:
 
 - **`--search <search>`**
 
-  Full-text search across log text fields, such as log messages, attribute values, scope, and IDs. Supports plain free-text fragments and structured `field:value` qualifiers. For more information, see [Search and filter](/reference/cli/search-filter/).
+  Full-text search across log text fields, such as log messages, attribute values, scope, and IDs.
+  Supports plain free-text fragments and structured `field:value` qualifiers. For more information,
+  see [Search and filter](/reference/cli/search-filter/).
 
-  | Syntax | Meaning |
-  |--------|---------|
-  | `word` | Free-text fragment — matches any searchable field |
-  | `"quoted phrase"` | Single fragment containing spaces |
-  | `field:value` | Field qualifier — value must match the named field |
-  | `-field:value` | Negated qualifier — excludes matches |
-  | `field:>value` / `field:>=value` / `field:<value` / `field:<=value` | Comparison for supported timestamp fields |
-  | `@attr:value` | Attribute qualifier — matches custom log attributes |
+  | Syntax                                                              | Meaning                                             |
+  | ------------------------------------------------------------------- | --------------------------------------------------- |
+  | `word`                                                              | Free-text fragment — matches any searchable field   |
+  | `"quoted phrase"`                                                   | Single fragment containing spaces                   |
+  | `field:value`                                                       | Field qualifier — value must match the named field  |
+  | `-field:value`                                                      | Negated qualifier — excludes matches                |
+  | `field:>value` / `field:>=value` / `field:<value` / `field:<=value` | Comparison for supported timestamp fields           |
+  | `@attr:value`                                                       | Attribute qualifier — matches custom log attributes |
 
-  Supported fields for structured logs: `severity`, `resource`, `scope`, `message`, `trace-id`, `span-id`, `event`, `timestamp`.
+  Supported fields for structured logs: `severity`, `resource`, `scope`, `message`, `trace-id`,
+  `span-id`, `event`, `timestamp`.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 
@@ -133,7 +144,8 @@ The following options are available:
   aspire otel logs --search "timestamp:>=2026-06-01T12:00:00 severity:error"
   ```
 
-- View logs from a standalone dashboard using the login URL (token is automatically exchanged for an API key):
+- View logs from a standalone dashboard using the login URL (token is automatically exchanged for an
+  API key):
 
   ```bash title="Aspire CLI"
   aspire otel logs --dashboard-url "http://localhost:18888/login?t=<token>"

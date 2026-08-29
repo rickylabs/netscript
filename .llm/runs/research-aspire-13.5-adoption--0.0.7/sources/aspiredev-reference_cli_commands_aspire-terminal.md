@@ -12,15 +12,20 @@ aspire terminal [command] [options]
 
 ## Description
 
-The `aspire terminal` command provides subcommands for working with interactive terminal sessions exposed by resources that were registered using [`WithTerminal()`](/app-host/with-terminal/) in the AppHost. You can list which resources have a terminal and attach your local terminal to a running session.
+The `aspire terminal` command provides subcommands for working with interactive terminal sessions
+exposed by resources that were registered using [`WithTerminal()`](/app-host/with-terminal/) in the
+AppHost. You can list which resources have a terminal and attach your local terminal to a running
+session.
 
-Because `WithTerminal` is experimental, the `aspire terminal` command group is hidden behind a feature flag. Enable it before use:
+Because `WithTerminal` is experimental, the `aspire terminal` command group is hidden behind a
+feature flag. Enable it before use:
 
 ```bash title="Enable the aspire terminal commands"
 aspire config set features.terminalCommandsEnabled true
 ```
 
-The connected AppHost must advertise the `terminals.v1` capability (Aspire.Hosting 13.4 or later). Against an older AppHost the subcommands report that terminals are not supported.
+The connected AppHost must advertise the `terminals.v1` capability (Aspire.Hosting 13.4 or later).
+Against an older AppHost the subcommands report that terminals are not supported.
 
 ## Options
 
@@ -42,10 +47,10 @@ The following options are available:
 
 The following commands are available:
 
-| Command                                                    | Function                                                       |
-| ---------------------------------------------------------- | -------------------------------------------------------------- |
-| [`aspire terminal attach`](../aspire-terminal-attach/)     | Attach the local terminal to a resource's interactive session. |
-| [`aspire terminal ps`](../aspire-terminal-ps/)             | List interactive terminal sessions in the connected AppHost.   |
+| Command                                                | Function                                                       |
+| ------------------------------------------------------ | -------------------------------------------------------------- |
+| [`aspire terminal attach`](../aspire-terminal-attach/) | Attach the local terminal to a resource's interactive session. |
+| [`aspire terminal ps`](../aspire-terminal-ps/)         | List interactive terminal sessions in the connected AppHost.   |
 
 ## See also
 

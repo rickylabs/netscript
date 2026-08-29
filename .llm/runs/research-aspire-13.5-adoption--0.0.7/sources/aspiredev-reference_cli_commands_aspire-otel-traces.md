@@ -12,15 +12,19 @@ aspire otel traces [resource] [options]
 
 ## Description
 
-The `aspire otel traces` command retrieves and displays distributed traces collected by the Aspire Dashboard. A trace represents a complete request as it flows through your distributed application. The command shows trace summaries including timestamp, name, span count, duration, and status.
+The `aspire otel traces` command retrieves and displays distributed traces collected by the Aspire
+Dashboard. A trace represents a complete request as it flows through your distributed application.
+The command shows trace summaries including timestamp, name, span count, duration, and status.
 
-You can view a summary of all traces, or provide a specific trace ID with `--trace-id` to view a detailed span tree for that trace. Use `--search` to filter traces by a full-text search expression.
+You can view a summary of all traces, or provide a specific trace ID with `--trace-id` to view a
+detailed span tree for that trace. Use `--search` to filter traces by a full-text search expression.
 
 ## Arguments
 
 - **`[resource]`**
 
-  Filter by resource name. When specified, only traces involving the matching resource are shown. Supports both exact instance names and base resource names (which match all replicas).
+  Filter by resource name. When specified, only traces involving the matching resource are shown.
+  Supports both exact instance names and base resource names (which match all replicas).
 
 ## Options
 
@@ -32,11 +36,16 @@ The following options are available:
 
 - **`--dashboard-url <url>`**
 
-  The URL of a standalone Aspire Dashboard to query instead of discovering one from an AppHost. Accepts a base URL (for example, `http://localhost:18888`) or a full login URL including a browser token (for example, `http://localhost:18888/login?t=<token>`). When a login URL is provided, the token is automatically exchanged for an API key. Mutually exclusive with `--apphost`.
+  The URL of a standalone Aspire Dashboard to query instead of discovering one from an AppHost.
+  Accepts a base URL (for example, `http://localhost:18888`) or a full login URL including a browser
+  token (for example, `http://localhost:18888/login?t=<token>`). When a login URL is provided, the
+  token is automatically exchanged for an API key. Mutually exclusive with `--apphost`.
 
 - **`--api-key <key>`**
 
-  The API key used to authenticate with the dashboard's Telemetry API. Only required when `--dashboard-url` is specified and the dashboard is configured with `ApiKey` authentication and no login URL is provided.
+  The API key used to authenticate with the dashboard's Telemetry API. Only required when
+  `--dashboard-url` is specified and the dashboard is configured with `ApiKey` authentication and no
+  login URL is provided.
 
 - **`--format <Table|Json>`**
 
@@ -48,7 +57,8 @@ The following options are available:
 
 - **`-t, --trace-id <trace-id>`**
 
-  Filter by trace ID. When specified, displays a detailed span tree for the given trace instead of a summary list.
+  Filter by trace ID. When specified, displays a detailed span tree for the given trace instead of a
+  summary list.
 
 - **`--has-error <true|false>`**
 
@@ -56,16 +66,18 @@ The following options are available:
 
 - **`--search <search>`**
 
-  Full-text search across trace and span text fields, such as names, attribute values, source, and IDs. Supports plain free-text fragments and structured `field:value` qualifiers. For more information, see [Search and filter](/reference/cli/search-filter/).
+  Full-text search across trace and span text fields, such as names, attribute values, source, and
+  IDs. Supports plain free-text fragments and structured `field:value` qualifiers. For more
+  information, see [Search and filter](/reference/cli/search-filter/).
 
-  | Syntax | Meaning |
-  |--------|---------|
-  | `word` | Free-text fragment — matches any searchable field |
-  | `"quoted phrase"` | Single fragment containing spaces |
-  | `field:value` | Field qualifier — value must match the named field |
-  | `-field:value` | Negated qualifier — excludes matches |
+  | Syntax                                                              | Meaning                                                    |
+  | ------------------------------------------------------------------- | ---------------------------------------------------------- |
+  | `word`                                                              | Free-text fragment — matches any searchable field          |
+  | `"quoted phrase"`                                                   | Single fragment containing spaces                          |
+  | `field:value`                                                       | Field qualifier — value must match the named field         |
+  | `-field:value`                                                      | Negated qualifier — excludes matches                       |
   | `field:>value` / `field:>=value` / `field:<value` / `field:<=value` | Comparison for supported `duration` and `timestamp` fields |
-  | `@attr:value` | Attribute qualifier — matches custom span attributes |
+  | `@attr:value`                                                       | Attribute qualifier — matches custom span attributes       |
 
   Supported fields for traces: `resource`, `name`, `trace-id`, `status`, `duration`, `timestamp`.
 
@@ -131,7 +143,8 @@ The following options are available:
   aspire otel traces --search "timestamp:>2026-01-15T09:30:00 status:error"
   ```
 
-- View traces from a standalone dashboard using the login URL (token is automatically exchanged for an API key):
+- View traces from a standalone dashboard using the login URL (token is automatically exchanged for
+  an API key):
 
   ```bash title="Aspire CLI"
   aspire otel traces --dashboard-url "http://localhost:18888/login?t=<token>"

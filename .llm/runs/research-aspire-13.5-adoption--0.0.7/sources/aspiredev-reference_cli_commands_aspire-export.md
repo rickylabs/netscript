@@ -12,16 +12,21 @@ aspire export [<resource>] [options]
 
 ## Description
 
-The `aspire export` command packages telemetry and resource data from a running AppHost into a zip file. Use it when you need to collect diagnostics for troubleshooting, share runtime state with a teammate, or preserve data from a running app for later analysis. Hidden resources are excluded from the export by default; use the `--include-hidden` option to include their data.
+The `aspire export` command packages telemetry and resource data from a running AppHost into a zip
+file. Use it when you need to collect diagnostics for troubleshooting, share runtime state with a
+teammate, or preserve data from a running app for later analysis. Hidden resources are excluded from
+the export by default; use the `--include-hidden` option to include their data.
 
 When a resource name is provided, the export is limited to data for that resource.
 
 When executed without the `--apphost` option, the command:
 
 1. Scans for all running AppHost processes.
-2. If multiple AppHosts are running within the current directory scope, prompts you to select which one to target.
+2. If multiple AppHosts are running within the current directory scope, prompts you to select which
+   one to target.
 3. If only one AppHost is running in scope, connects to it directly.
-4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts for selection.
+4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts
+   for selection.
 
 ## Arguments
 
@@ -55,17 +60,22 @@ The following options are available:
 
 ## Zip file contents
 
-The exported zip archive (default name `aspire-export-<timestamp>.zip`) can contain up to four directories, depending on available data:
+The exported zip archive (default name `aspire-export-<timestamp>.zip`) can contain up to four
+directories, depending on available data:
 
-- **`resources/`** — One JSON file per resource containing resource details such as name, type, state, endpoints, and environment variables.
+- **`resources/`** — One JSON file per resource containing resource details such as name, type,
+  state, endpoints, and environment variables.
 - **`consolelogs/`** — One plain-text `*.txt` file per resource with raw console output lines.
-- **`structuredlogs/`** — One JSON file per resource with structured log entries serialized in [OTLP format](https://opentelemetry.io/docs/specs/otlp/).
-- **`traces/`** — One JSON file per resource with distributed traces and spans serialized in [OTLP format](https://opentelemetry.io/docs/specs/otlp/).
+- **`structuredlogs/`** — One JSON file per resource with structured log entries serialized in
+  [OTLP format](https://opentelemetry.io/docs/specs/otlp/).
+- **`traces/`** — One JSON file per resource with distributed traces and spans serialized in
+  [OTLP format](https://opentelemetry.io/docs/specs/otlp/).
 
-When a resource name is provided, only data for that resource is included in the archive. When no resource is specified, data for all visible resources is exported.
+When a resource name is provided, only data for that resource is included in the archive. When no
+resource is specified, data for all visible resources is exported.
 
-:::tip
-When analyzing an export, start with the `resources/` directory for an overview of resource state, then drill into `consolelogs/`, `structuredlogs/`, and `traces/` for detailed diagnostics.
+:::tip When analyzing an export, start with the `resources/` directory for an overview of resource
+state, then drill into `consolelogs/`, `structuredlogs/`, and `traces/` for detailed diagnostics.
 :::
 
 ## Examples

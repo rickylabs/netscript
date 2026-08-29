@@ -2,7 +2,9 @@
 
 ## Name
 
-`aspire mcp` - Interact with <abbr title="Model Context Protocol" data-tooltip-placement="top">MCP</abbr> tools exposed by Aspire resources.
+`aspire mcp` - Interact with
+<abbr title="Model Context Protocol" data-tooltip-placement="top">MCP</abbr> tools exposed by Aspire
+resources.
 
 ## Synopsis
 
@@ -12,9 +14,11 @@ aspire mcp [command] [options]
 
 ## Description
 
-The `aspire mcp` command lets you discover and call MCP (Model Context Protocol) tools exposed by resources in a running AppHost. Use it to inspect available tools and invoke them from the terminal.
+The `aspire mcp` command lets you discover and call MCP (Model Context Protocol) tools exposed by
+resources in a running AppHost. Use it to inspect available tools and invoke them from the terminal.
 
-**Note:** The `aspire mcp` command interacts with tools exposed by running resources. To start the MCP server used by compatible AI agents, use [`aspire agent mcp`](../aspire-agent-mcp/).
+**Note:** The `aspire mcp` command interacts with tools exposed by running resources. To start the
+MCP server used by compatible AI agents, use [`aspire agent mcp`](../aspire-agent-mcp/).
 
 ## Options
 
@@ -36,10 +40,10 @@ The following options are available:
 
 The following commands are available:
 
-| Command                                     | Function                                       |
-| ------------------------------------------- | ---------------------------------------------- |
-| [`aspire mcp tools`](../aspire-mcp-tools/)  | List MCP tools exposed by running resources.   |
-| [`aspire mcp call`](../aspire-mcp-call/)    | Call an MCP tool on a running resource.        |
+| Command                                    | Function                                     |
+| ------------------------------------------ | -------------------------------------------- |
+| [`aspire mcp tools`](../aspire-mcp-tools/) | List MCP tools exposed by running resources. |
+| [`aspire mcp call`](../aspire-mcp-call/)   | Call an MCP tool on a running resource.      |
 
 ## Examples
 

@@ -1,13 +1,21 @@
 # Resource MCP servers
 
-Aspire resources can expose their own <abbr title="Model Context Protocol" data-tooltip-placement="top">MCP</abbr> (Model Context Protocol) servers, enabling AI coding agents to interact directly with databases, APIs, and other services. For example, a PostgreSQL resource can expose SQL query tools, allowing an agent to run queries without leaving the conversation.
+Aspire resources can expose their own
+<abbr title="Model Context Protocol" data-tooltip-placement="top">MCP</abbr> (Model Context
+Protocol) servers, enabling AI coding agents to interact directly with databases, APIs, and other
+services. For example, a PostgreSQL resource can expose SQL query tools, allowing an agent to run
+queries without leaving the conversation.
 
 ## How it works
 
-When a resource is annotated with `WithMcpServer()` in the AppHost, Aspire discovers the MCP endpoint and makes its tools available in two ways:
+When a resource is annotated with `WithMcpServer()` in the AppHost, Aspire discovers the MCP
+endpoint and makes its tools available in two ways:
 
-- **Through the Aspire MCP server** — resource tools are automatically proxied alongside the built-in [Aspire MCP server](/get-started/aspire-mcp-server/) tools. AI agents see them in their tool list without any extra configuration.
-- **Through the CLI** — use `aspire mcp tools` and `aspire mcp call` to discover and invoke resource tools directly from the terminal.
+- **Through the Aspire MCP server** — resource tools are automatically proxied alongside the
+  built-in [Aspire MCP server](/get-started/aspire-mcp-server/) tools. AI agents see them in their
+  tool list without any extra configuration.
+- **Through the CLI** — use `aspire mcp tools` and `aspire mcp call` to discover and invoke resource
+  tools directly from the terminal.
 
 ## Add an MCP server to a resource
 
@@ -26,21 +34,24 @@ db.WithPostgresMcp();
 
 builder.Build().Run();
 ```
+
 ```typescript title="apphost.mts" twoslash
 import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
 const db = await builder
-  .addPostgres("db")
-  .addDatabase("appdata");
+  .addPostgres('db')
+  .addDatabase('appdata');
 
 // Expose PostgreSQL MCP tools (SQL queries, schema inspection, etc.)
 await db.withPostgresMcp();
 
 await builder.build().run();
 ```
-**Note:** `WithMcpServer()` and `WithPostgresMcp()` are experimental APIs. Suppress the `ASPIREMCP001` or `ASPIREPOSTGRES001` diagnostic to use them.
+
+**Note:** `WithMcpServer()` and `WithPostgresMcp()` are experimental APIs. Suppress the
+`ASPIREMCP001` or `ASPIREPOSTGRES001` diagnostic to use them.
 
 <ContainerImages package="Aspire.Hosting.PostgreSQL" only="Postgres MCP" />
 
@@ -74,7 +85,8 @@ aspire mcp call appdata query --input '{"sql": "SELECT * FROM users LIMIT 5"}'
 
 ## Custom MCP server resources
 
-You can add any container that implements the MCP protocol as an MCP-enabled resource. Use `WithMcpServer()` to tell Aspire where the MCP endpoint lives:
+You can add any container that implements the MCP protocol as an MCP-enabled resource. Use
+`WithMcpServer()` to tell Aspire where the MCP endpoint lives:
 
 ```csharp title="AppHost.cs"
 #pragma warning disable ASPIREMCP001
@@ -88,6 +100,7 @@ var myMcpServer = builder.AddContainer("my-mcp", "myregistry/my-mcp-server")
 
 builder.Build().Run();
 ```
+
 ```typescript title="apphost.mts" twoslash
 import { createBuilder } from './.aspire/modules/aspire.mjs';
 
@@ -95,12 +108,13 @@ const builder = await createBuilder();
 
 // Add a custom MCP server container
 const myMcpServer = await builder
-  .addContainer("my-mcp", { image: "myregistry/my-mcp-server", tag: "latest" })
+  .addContainer('my-mcp', { image: 'myregistry/my-mcp-server', tag: 'latest' })
   .withHttpEndpoint({ targetPort: 8080 })
-  .withMcpServer("/mcp");
+  .withMcpServer('/mcp');
 
 await builder.build().run();
 ```
+
 The `WithMcpServer()` method accepts an optional path and endpoint name:
 
 - `WithMcpServer()` — uses the default HTTP endpoint at the root path
@@ -112,4 +126,5 @@ The `WithMcpServer()` method accepts an optional path and endpoint name:
 - [Use AI coding agents](/get-started/ai-coding-agents/) — set up your project for AI agents
 - [Aspire MCP server](/get-started/aspire-mcp-server/) — the built-in MCP server tools
 - [ASPIREMCP001 diagnostic](/diagnostics/aspiremcp001/) — experimental MCP server API warning
-- [ASPIREPOSTGRES001 diagnostic](/diagnostics/aspirepostgres001/) — experimental PostgreSQL MCP warning
+- [ASPIREPOSTGRES001 diagnostic](/diagnostics/aspirepostgres001/) — experimental PostgreSQL MCP
+  warning

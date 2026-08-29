@@ -12,17 +12,24 @@ aspire start [options] [[--] <additional arguments>...]
 
 ## Description
 
-The `aspire start` command starts an AppHost in the background and exits after the AppHost reaches a stable running state. Use it when you want a detached AppHost that you can inspect later with commands such as `aspire ps`, `aspire describe`, `aspire logs`, and `aspire stop`.
+The `aspire start` command starts an AppHost in the background and exits after the AppHost reaches a
+stable running state. Use it when you want a detached AppHost that you can inspect later with
+commands such as `aspire ps`, `aspire describe`, `aspire logs`, and `aspire stop`.
 
 <Include relativePath="reference/cli/includes/project-search-logic-description.md" />
 
-You can output detached startup details as a table or JSON, and you can pass additional arguments through to the AppHost by using the `--` delimiter.
+You can output detached startup details as a table or JSON, and you can pass additional arguments
+through to the AppHost by using the `--` delimiter.
 
 ### Startup readiness and failure diagnostics
 
-`aspire start` waits for the AppHost to report that it has reached a stable running state before detaching. This means that early startup failures — such as TypeScript syntax errors in a non-C# AppHost or C# compile errors in a .NET AppHost — are surfaced in the parent terminal instead of being silently lost in the background.
+`aspire start` waits for the AppHost to report that it has reached a stable running state before
+detaching. This means that early startup failures — such as TypeScript syntax errors in a non-C#
+AppHost or C# compile errors in a .NET AppHost — are surfaced in the parent terminal instead of
+being silently lost in the background.
 
-When the AppHost fails to start, `aspire start` displays a curated excerpt of the startup output that filters out noise such as package install logs and highlights the relevant error messages:
+When the AppHost fails to start, `aspire start` displays a curated excerpt of the startup output
+that filters out noise such as package install logs and highlights the relevant error messages:
 
 ```bash title="Aspire CLI"
 Starting Aspire AppHost in the background...
@@ -49,32 +56,46 @@ Build FAILED.
 📄 See logs at <log-path>
 ```
 
-The parent log also captures the replayed child output under `DetachedAppHost/...` log categories so the log file is self-contained.
+The parent log also captures the replayed child output under `DetachedAppHost/...` log categories so
+the log file is self-contained.
 
-Pressing <Kbd windows="Ctrl+C" mac="⌃+C" linux="Ctrl+C" /> while `aspire start` is waiting for the AppHost to start will terminate the startup process.
+Pressing <Kbd windows="Ctrl+C" mac="⌃+C" linux="Ctrl+C" /> while `aspire start` is waiting for the
+AppHost to start will terminate the startup process.
 
 ### Configuring the startup timeout
 
-`aspire start` waits up to 120 seconds by default for the AppHost to reach a stable running state. If the AppHost build or startup takes longer than that—for example on a slow machine or in a CI environment—set the `ASPIRE_CLI_START_TIMEOUT` environment variable to a higher number of seconds:
+`aspire start` waits up to 120 seconds by default for the AppHost to reach a stable running state.
+If the AppHost build or startup takes longer than that—for example on a slow machine or in a CI
+environment—set the `ASPIRE_CLI_START_TIMEOUT` environment variable to a higher number of seconds:
 
 ```bash title="Aspire CLI"
 export ASPIRE_CLI_START_TIMEOUT=300
 aspire start
 ```
 
-If `ASPIRE_CLI_START_TIMEOUT` is set to a value that isn't a positive whole number of seconds, `aspire start` displays an error and exits without starting the AppHost. This behavior also applies to `aspire run`, including `aspire run --detach`.
+If `ASPIRE_CLI_START_TIMEOUT` is set to a value that isn't a positive whole number of seconds,
+`aspire start` displays an error and exits without starting the AppHost. This behavior also applies
+to `aspire run`, including `aspire run --detach`.
 
 ## Hot Reload and watch behavior
 
-By default, `aspire start` starts the AppHost as a detached background process. It doesn't watch the AppHost or resource source files. After you change AppHost code, restart the detached AppHost by running `aspire start` again. For individual resource changes, keep the AppHost running and restart or rebuild the resource from the Aspire CLI or dashboard when needed.
+By default, `aspire start` starts the AppHost as a detached background process. It doesn't watch the
+AppHost or resource source files. After you change AppHost code, restart the detached AppHost by
+running `aspire start` again. For individual resource changes, keep the AppHost running and restart
+or rebuild the resource from the Aspire CLI or dashboard when needed.
 
-Aspire also has an opt-in `defaultWatchEnabled` feature flag. When enabled, Aspire uses watch mode by default and automatically restarts the Aspire application after file changes:
+Aspire also has an opt-in `defaultWatchEnabled` feature flag. When enabled, Aspire uses watch mode
+by default and automatically restarts the Aspire application after file changes:
 
 ```bash title="Aspire CLI"
 aspire config set features.defaultWatchEnabled true
 ```
 
-Use Aspire watch mode when you want Aspire to restart the AppHost-managed application for you after AppHost changes. It supports both C# and TypeScript AppHosts; C# project resources are also controlled by this setting today. Other resource hot reload behavior depends on the framework or runtime backing the resource. For more information, see [Hot Reload and watch](/app-host/hot-reload-and-watch/).
+Use Aspire watch mode when you want Aspire to restart the AppHost-managed application for you after
+AppHost changes. It supports both C# and TypeScript AppHosts; C# project resources are also
+controlled by this setting today. Other resource hot reload behavior depends on the framework or
+runtime backing the resource. For more information, see
+[Hot Reload and watch](/app-host/hot-reload-and-watch/).
 
 ## Options
 
@@ -82,21 +103,25 @@ The following options are available:
 
 - **`--`**
 
-  Delimits arguments to `aspire start` from arguments for the AppHost being run. All arguments after this delimiter are passed to the application.
+  Delimits arguments to `aspire start` from arguments for the AppHost being run. All arguments after
+  this delimiter are passed to the application.
 
 - **`--no-build`**
 
-  Do not build or restore the project before running. Use this option when you have already built the project and want to skip the restore and build step.
+  Do not build or restore the project before running. Use this option when you have already built
+  the project and want to skip the restore and build step.
 
 - <Include relativePath="reference/cli/includes/option-project.md" />
 
 - **`--format <Json|Table>`**
 
-  Output format for detached AppHost results. Use `Json` for machine-readable output suitable for scripting and automation.
+  Output format for detached AppHost results. Use `Json` for machine-readable output suitable for
+  scripting and automation.
 
 - **`--isolated`**
 
-  Run in isolated mode with randomized ports and isolated user secrets, allowing multiple instances of the same AppHost to run simultaneously.
+  Run in isolated mode with randomized ports and isolated user secrets, allowing multiple instances
+  of the same AppHost to run simultaneously.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 

@@ -1,19 +1,30 @@
 # Container files
 
-Aspire provides APIs to inject files and directories into containers, enabling you to configure containerized resources with custom configuration files, scripts, certificates, and other assets. There are two complementary APIs:
+Aspire provides APIs to inject files and directories into containers, enabling you to configure
+containerized resources with custom configuration files, scripts, certificates, and other assets.
+There are two complementary APIs:
 
-- **`WithContainerFiles`**: Injects files into containers at development time when they start during `aspire run`.
-- **`PublishWithContainerFiles`**: Copies files from one resource's container into another resource's container as build artifacts at publish time during `aspire publish`.
+- **`WithContainerFiles`**: Injects files into containers at development time when they start during
+  `aspire run`.
+- **`PublishWithContainerFiles`**: Copies files from one resource's container into another
+  resource's container as build artifacts at publish time during `aspire publish`.
 
 ## Inject files at development time
 
-The `WithContainerFiles` extension method creates or updates files and directories inside a container at a specified destination path. It supports three approaches depending on your needs: inline entries for declarative file definitions, a source path for copying from the host file system, and an async callback for dynamic file generation.
+The `WithContainerFiles` extension method creates or updates files and directories inside a
+container at a specified destination path. It supports three approaches depending on your needs:
+inline entries for declarative file definitions, a source path for copying from the host file
+system, and an async callback for dynamic file generation.
 
-**Caution:** `WithContainerFiles` is primarily intended for development-time configuration and is not supported at publish time. To inject files into containers during publish, use [`PublishWithContainerFiles`](#inject-files-at-publish-time) instead.
+**Caution:** `WithContainerFiles` is primarily intended for development-time configuration and is
+not supported at publish time. To inject files into containers during publish, use
+[`PublishWithContainerFiles`](#inject-files-at-publish-time) instead.
 
 ### Inline entries
 
-Use the inline entries overload to declaratively define files and directories using `ContainerFileSystemItem` objects. This is useful when file contents are known at build time or can be expressed as string literals.
+Use the inline entries overload to declaratively define files and directories using
+`ContainerFileSystemItem` objects. This is useful when file contents are known at build time or can
+be expressed as string literals.
 
 ```csharp title="AppHost.cs"
 var builder = DistributedApplication.CreateBuilder(args);
@@ -51,17 +62,19 @@ builder.AddContainer("myapp", "myapp:latest")
 
 builder.Build().Run();
 ```
-:::note
-The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK.
-:::
-In the preceding example:
 
-- A JSON configuration file is created at `/app/config/appsettings.json` with the specified contents.
-- A nested `scripts` directory is created at `/app/config/scripts/` containing an executable shell script.
+:::note The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK. ::: In the
+preceding example:
+
+- A JSON configuration file is created at `/app/config/appsettings.json` with the specified
+  contents.
+- A nested `scripts` directory is created at `/app/config/scripts/` containing an executable shell
+  script.
 
 ### Source path
 
-Use the source path overload to copy files from a directory on the host machine into the container. This is useful when you have existing configuration files or assets on disk.
+Use the source path overload to copy files from a directory on the host machine into the container.
+This is useful when you have existing configuration files or assets on disk.
 
 ```csharp title="AppHost.cs"
 var builder = DistributedApplication.CreateBuilder(args);
@@ -71,24 +84,30 @@ builder.AddContainer("myapp", "myapp:latest")
 
 builder.Build().Run();
 ```
+
 ```typescript title="apphost.mts"
 import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const frontend = await builder.addViteApp("frontend", "../frontend");
-await frontend.withContainerFilesSource("/app/dist");
+const frontend = await builder.addViteApp('frontend', '../frontend');
+await frontend.withContainerFilesSource('/app/dist');
 
-const api = await builder.addProject("api", "../Api/Api.csproj");
-await api.publishWithContainerFiles(frontend, "./wwwroot");
+const api = await builder.addProject('api', '../Api/Api.csproj');
+await api.publishWithContainerFiles(frontend, './wwwroot');
 
 await builder.build().run();
 ```
-Unless the source path is a rooted (absolute) path, it's interpreted as relative to the AppHost project directory. All files in the source directory are copied to the destination path in the container at startup.
+
+Unless the source path is a rooted (absolute) path, it's interpreted as relative to the AppHost
+project directory. All files in the source directory are copied to the destination path in the
+container at startup.
 
 ### Async callback
 
-Use the callback overload to generate files dynamically when the container starts. The callback receives a `ContainerFileSystemCallbackContext` that provides access to the `IServiceProvider` and the resource's `IResource` model, enabling you to resolve services or inspect the app model.
+Use the callback overload to generate files dynamically when the container starts. The callback
+receives a `ContainerFileSystemCallbackContext` that provides access to the `IServiceProvider` and
+the resource's `IResource` model, enabling you to resolve services or inspect the app model.
 
 ```csharp title="AppHost.cs"
 var builder = DistributedApplication.CreateBuilder(args);
@@ -115,18 +134,20 @@ builder.AddContainer("worker", "worker:latest")
 
 builder.Build().Run();
 ```
-:::note
-The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK.
-:::
-The callback is invoked each time the container starts, so the generated files always reflect the current state.
+
+:::note The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK. ::: The
+callback is invoked each time the container starts, so the generated files always reflect the
+current state.
 
 ## File types
 
-The `WithContainerFiles` API uses a type hierarchy rooted at the abstract `ContainerFileSystemItem` class. Each type represents a different kind of file system entry.
+The `WithContainerFiles` API uses a type hierarchy rooted at the abstract `ContainerFileSystemItem`
+class. Each type represents a different kind of file system entry.
 
 ### ContainerFile
 
-`ContainerFile` represents a standard file. Set either `Contents` (a string) or `SourcePath` (an absolute path on the host) to provide the file data — the two are mutually exclusive.
+`ContainerFile` represents a standard file. Set either `Contents` (a string) or `SourcePath` (an
+absolute path on the host) to provide the file data — the two are mutually exclusive.
 
 ```csharp title="AppHost.cs"
 // File with inline contents
@@ -144,7 +165,8 @@ var dataCsv = new ContainerFile
 };
 ```
 
-Set `ContinueOnError` to `true` to allow the container to start even if creating this particular file fails:
+Set `ContinueOnError` to `true` to allow the container to start even if creating this particular
+file fails:
 
 ```csharp title="AppHost.cs"
 var optionalJson = new ContainerFile
@@ -157,7 +179,8 @@ var optionalJson = new ContainerFile
 
 ### ContainerDirectory
 
-`ContainerDirectory` represents a directory that can contain nested `ContainerFileSystemItem` entries, allowing you to build arbitrary directory trees.
+`ContainerDirectory` represents a directory that can contain nested `ContainerFileSystemItem`
+entries, allowing you to build arbitrary directory trees.
 
 ```csharp title="AppHost.cs"
 var certsDir = new ContainerDirectory
@@ -185,7 +208,8 @@ var certsDir = new ContainerDirectory
 };
 ```
 
-You can also populate a `ContainerDirectory` from files on disk using the static `GetFileSystemItemsFromPath` method:
+You can also populate a `ContainerDirectory` from files on disk using the static
+`GetFileSystemItemsFromPath` method:
 
 ```csharp title="AppHost.cs"
 var assetsDir = new ContainerDirectory
@@ -199,7 +223,11 @@ var assetsDir = new ContainerDirectory
 
 ### ContainerOpenSSLCertificateFile
 
-`ContainerOpenSSLCertificateFile` represents a PEM-encoded public certificate. In addition to placing the certificate file in the container, Aspire automatically creates an OpenSSL-compatible symlink (`[subject hash].[n]`) in the same directory — equivalent to running `openssl rehash`. This enables containers that use OpenSSL for certificate validation to discover the certificate automatically.
+`ContainerOpenSSLCertificateFile` represents a PEM-encoded public certificate. In addition to
+placing the certificate file in the container, Aspire automatically creates an OpenSSL-compatible
+symlink (`[subject hash].[n]`) in the same directory — equivalent to running `openssl rehash`. This
+enables containers that use OpenSSL for certificate validation to discover the certificate
+automatically.
 
 ```csharp title="AppHost.cs"
 builder.AddContainer("myapp", "myapp:latest")
@@ -211,16 +239,19 @@ builder.AddContainer("myapp", "myapp:latest")
         }
     ]);
 ```
-:::note
-The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK.
-:::
+
+:::note The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK. :::
+
 ## File permissions and ownership
 
-All `WithContainerFiles` overloads accept optional parameters to control file ownership and permissions.
+All `WithContainerFiles` overloads accept optional parameters to control file ownership and
+permissions.
 
 ### Owner and group
 
-The `defaultOwner` and `defaultGroup` parameters set the default UID and GID applied to all created files and directories. Both default to `0` (root) when not specified. You can override ownership on individual items using the `Owner` and `Group` properties on any `ContainerFileSystemItem`.
+The `defaultOwner` and `defaultGroup` parameters set the default UID and GID applied to all created
+files and directories. Both default to `0` (root) when not specified. You can override ownership on
+individual items using the `Owner` and `Group` properties on any `ContainerFileSystemItem`.
 
 ```csharp title="AppHost.cs"
 builder.AddContainer("myapp", "myapp:latest")
@@ -242,14 +273,15 @@ builder.AddContainer("myapp", "myapp:latest")
         defaultOwner: 33,   // www-data
         defaultGroup: 33);
 ```
-:::note
-The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK.
-:::
-In this example, `shared.txt` inherits the default owner/group of `33`, while `user-only.txt` overrides with UID/GID `1000`.
+
+:::note The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK. ::: In this
+example, `shared.txt` inherits the default owner/group of `33`, while `user-only.txt` overrides with
+UID/GID `1000`.
 
 ### Umask
 
-The `umask` parameter controls default permissions by subtracting (masking) permission bits from the base defaults. Without an explicit `Mode` set on an item:
+The `umask` parameter controls default permissions by subtracting (masking) permission bits from the
+base defaults. Without an explicit `Mode` set on an item:
 
 - **Directories** start with `0777` (read/write/execute for all) and have the umask subtracted
 - **Files** start with `0666` (read/write for all) and have the umask subtracted
@@ -278,18 +310,28 @@ builder.AddContainer("myapp", "myapp:latest")
             | UnixFileMode.OtherWrite
             | UnixFileMode.OtherExecute);
 ```
-:::note
-The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK.
-:::
+
+:::note The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK. :::
+
 ### Persistent containers
 
-For containers with `ContainerLifetime.Persistent`, changing the contents of container file entries causes the container to be recreated. Ensure any data written through `WithContainerFiles` is idempotent for a given app model configuration to avoid unintended container restarts.
+For containers with `ContainerLifetime.Persistent`, changing the contents of container file entries
+causes the container to be recreated. Ensure any data written through `WithContainerFiles` is
+idempotent for a given app model configuration to avoid unintended container restarts.
 
 ## Inject files at publish time
 
-The `PublishWithContainerFiles` method copies files from one resource's container into another resource's container during `aspire publish`. This is the preferred approach for injecting files into containers at publish time.
+The `PublishWithContainerFiles` method copies files from one resource's container into another
+resource's container during `aspire publish`. This is the preferred approach for injecting files
+into containers at publish time.
 
-A key use case is embedding single-page application (SPA) or static JavaScript frontends into a reverse proxy or web server container for production deployment. During development, frontend apps like Vite or React typically run as standalone dev servers. In production, however, the compiled static assets are often served by a backend API or a dedicated web server like Nginx. `PublishWithContainerFiles` bridges this gap by copying the built frontend output into the serving container as part of the publish process — no manual file copying or multi-stage Dockerfile required.
+A key use case is embedding single-page application (SPA) or static JavaScript frontends into a
+reverse proxy or web server container for production deployment. During development, frontend apps
+like Vite or React typically run as standalone dev servers. In production, however, the compiled
+static assets are often served by a backend API or a dedicated web server like Nginx.
+`PublishWithContainerFiles` bridges this gap by copying the built frontend output into the serving
+container as part of the publish process — no manual file copying or multi-stage Dockerfile
+required.
 
 ### Embed a frontend in a backend
 
@@ -303,23 +345,28 @@ var api = builder.AddProject<Projects.Api>("api")
 
 builder.Build().Run();
 ```
+
 ```typescript title="apphost.mts" twoslash
 import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const frontend = await builder.addViteApp("frontend", "../frontend");
+const frontend = await builder.addViteApp('frontend', '../frontend');
 
-const api = await builder.addProject("api", "./Api/Api.csproj")
-    .publishWithContainerFiles(frontend, "./wwwroot");
+const api = await builder.addProject('api', './Api/Api.csproj')
+  .publishWithContainerFiles(frontend, './wwwroot');
 
 await builder.build().run();
 ```
+
 In this example:
 
-1. The `frontend` resource builds inside its container, producing compiled JavaScript, CSS, and HTML.
-2. During publish, Aspire copies those files from the `frontend` container into the `api` container at `./wwwroot`.
-3. The resulting `api` container includes both the API code and the frontend static assets, ready to serve the full application.
+1. The `frontend` resource builds inside its container, producing compiled JavaScript, CSS, and
+   HTML.
+2. During publish, Aspire copies those files from the `frontend` container into the `api` container
+   at `./wwwroot`.
+3. The resulting `api` container includes both the API code and the frontend static assets, ready to
+   serve the full application.
 
 ### Serve a frontend from YARP
 
@@ -335,25 +382,32 @@ var nginx = builder.AddYarp("gateway")
 
 builder.Build().Run();
 ```
+
 ```typescript title="apphost.mts" twoslash
 import { createBuilder } from './.aspire/modules/aspire.mjs';
 
 const builder = await createBuilder();
 
-const frontend = await builder.addViteApp("frontend", "../frontend");
+const frontend = await builder.addViteApp('frontend', '../frontend');
 
-const nginx = await builder.addYarp("gateway")
-    .publishWithStaticFiles(frontend);
+const nginx = await builder.addYarp('gateway')
+  .publishWithStaticFiles(frontend);
 
 await builder.build().run();
 ```
-This produces a self-contained Nginx container that serves the frontend application, with no external volume mounts or runtime file copying needed.
 
-`PublishWithContainerFiles` only applies in publish mode — it has no effect during `aspire run`. The destination resource must implement `IContainerFilesDestinationResource` (such as `ProjectResource`), and the source resource must implement `IResourceWithContainerFiles`.
+This produces a self-contained Nginx container that serves the frontend application, with no
+external volume mounts or runtime file copying needed.
+
+`PublishWithContainerFiles` only applies in publish mode — it has no effect during `aspire run`. The
+destination resource must implement `IContainerFilesDestinationResource` (such as
+`ProjectResource`), and the source resource must implement `IResourceWithContainerFiles`.
 
 ### Customize the source path
 
-By default, the source resource exports files from its container based on its configured output paths. Use `WithContainerFilesSource` to specify which path inside the source container to copy from:
+By default, the source resource exports files from its container based on its configured output
+paths. Use `WithContainerFilesSource` to specify which path inside the source container to copy
+from:
 
 ```csharp title="AppHost.cs"
 var frontend = builder.AddViteApp("frontend", "../frontend")
@@ -362,10 +416,10 @@ var frontend = builder.AddViteApp("frontend", "../frontend")
 var api = builder.AddProject<Projects.Api>("api")
     .PublishWithContainerFiles(frontend, "./wwwroot");
 ```
-:::note
-The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK.
-:::
-Use `ClearContainerFilesSources` to remove any previously configured source paths before adding new ones.
+
+:::note The `withContainerFiles` API is not yet available in the TypeScript AppHost SDK. ::: Use
+`ClearContainerFilesSources` to remove any previously configured source paths before adding new
+ones.
 
 ## See also
 

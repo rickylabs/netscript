@@ -13,19 +13,22 @@ aspire resource <resource> <command> -- [command-options]
 
 ## Description
 
-The `aspire resource` command executes a command exposed by a resource in a running AppHost. Use it to trigger actions such as `start`, `stop`, or `restart` without opening the dashboard.
+The `aspire resource` command executes a command exposed by a resource in a running AppHost. Use it
+to trigger actions such as `start`, `stop`, or `restart` without opening the dashboard.
 
-The available command names depend on the selected resource. If a resource doesn't expose the command you specify, Aspire returns an error.
+The available command names depend on the selected resource. If a resource doesn't expose the
+command you specify, Aspire returns an error.
 
-**Note:** `aspire resource` doesn't expose a fixed set of CLI subcommands in `--help`.
-Instead, `<command>` is a positional argument whose valid values come from the
-selected resource at runtime. This is why the CLI reference documents
-`aspire resource` as a single command page instead of separate pages such as
-`aspire resource start`.
+**Note:** `aspire resource` doesn't expose a fixed set of CLI subcommands in `--help`. Instead,
+`<command>` is a positional argument whose valid values come from the selected resource at runtime.
+This is why the CLI reference documents `aspire resource` as a single command page instead of
+separate pages such as `aspire resource start`.
 
 ### Command arguments as named options
 
-When a resource command defines arguments, those arguments are passed as **named options** on the command line. Named options make it easier to supply only the arguments you need, skip optional ones, and pass values in any order.
+When a resource command defines arguments, those arguments are passed as **named options** on the
+command line. Named options make it easier to supply only the arguments you need, skip optional
+ones, and pass values in any order.
 
 To see what arguments a specific command accepts, use the command-specific `--help` flag:
 
@@ -33,7 +36,8 @@ To see what arguments a specific command accepts, use the command-specific `--he
 aspire resource <resource> <command> --help
 ```
 
-The help output lists each argument with its type, whether it's required, its default value (if any), and the set of allowed values for choice arguments. For example:
+The help output lists each argument with its type, whether it's required, its default value (if
+any), and the set of allowed values for choice arguments. For example:
 
 ```console
 Echo a message with text, number, boolean, choice, and secret command arguments.
@@ -56,7 +60,8 @@ Options:
 
 #### Handling option name collisions
 
-If a command argument name conflicts with an Aspire CLI option (such as `--apphost`), use `--` to separate Aspire CLI options from command-specific options:
+If a command argument name conflicts with an Aspire CLI option (such as `--apphost`), use `--` to
+separate Aspire CLI options from command-specific options:
 
 ```bash title="Aspire CLI"
 aspire resource <resource> <command> --apphost './MyApp.AppHost.cs' -- --apphost myvalue
@@ -66,7 +71,9 @@ Everything after `--` is treated as command argument options and is not parsed a
 
 ### Discovering available resource commands
 
-Running `aspire resource <resource> --help` with a specific resource name queries the running AppHost and appends an **Available resource commands** section to the help output. This lets you discover what commands a resource supports without opening the dashboard.
+Running `aspire resource <resource> --help` with a specific resource name queries the running
+AppHost and appends an **Available resource commands** section to the help output. This lets you
+discover what commands a resource supports without opening the dashboard.
 
 ```text title="Example output"
 Available resource commands:
@@ -75,9 +82,11 @@ Available resource commands:
   stop       Stop the resource.
 ```
 
-If no single in-scope AppHost can be determined without an explicit `--apphost`, the resource-scoped help is shown without the commands section rather than prompting for AppHost selection.
+If no single in-scope AppHost can be determined without an explicit `--apphost`, the resource-scoped
+help is shown without the commands section rather than prompting for AppHost selection.
 
-To pass `--help` as an argument to the resource command itself (rather than as a CLI help flag), separate it with `--`:
+To pass `--help` as an argument to the resource command itself (rather than as a CLI help flag),
+separate it with `--`:
 
 ```bash title="Aspire CLI"
 aspire resource myresource mycommand -- --help
@@ -88,9 +97,11 @@ aspire resource myresource mycommand -- --help
 When executed without the `--apphost` option, the command:
 
 1. Scans for all running AppHost processes.
-2. If multiple AppHosts are running within the current directory scope, prompts you to select which one to target.
+2. If multiple AppHosts are running within the current directory scope, prompts you to select which
+   one to target.
 3. If only one AppHost is running in scope, connects to it directly.
-4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts for selection.
+4. If no in-scope AppHosts are found but out-of-scope AppHosts exist, displays all running AppHosts
+   for selection.
 
 ## Arguments
 
@@ -100,19 +111,26 @@ When executed without the `--apphost` option, the command:
 
 - **`<command>`**
 
-  The name of the resource command to execute, such as `start`, `stop`, `restart`, `set-parameter`, or `delete-parameter`.
+  The name of the resource command to execute, such as `start`, `stop`, `restart`, `set-parameter`,
+  or `delete-parameter`.
 
 ## Built-in parameter commands
 
-Aspire provides two built-in resource commands for managing parameter resources at runtime. These commands accept named options and can be used non-interactively (for example, in scripts or automation). The examples in this section assume an AppHost parameter resource named `mydb-password`; for details on defining parameter resources, see [External parameters](/fundamentals/external-parameters/).
+Aspire provides two built-in resource commands for managing parameter resources at runtime. These
+commands accept named options and can be used non-interactively (for example, in scripts or
+automation). The examples in this section assume an AppHost parameter resource named
+`mydb-password`; for details on defining parameter resources, see
+[External parameters](/fundamentals/external-parameters/).
 
-Boolean options for these commands require an explicit `true` or `false` value. For example, `--save-to-user-secrets true` requests saving the value to user secrets.
+Boolean options for these commands require an explicit `true` or `false` value. For example,
+`--save-to-user-secrets true` requests saving the value to user secrets.
 
-- **`set-parameter`** — Set the value of a parameter resource. The legacy name `parameter-set` is also accepted.
+- **`set-parameter`** — Set the value of a parameter resource. The legacy name `parameter-set` is
+  also accepted.
 
-  | Option | Description |
-  | --- | --- |
-  | `--value <value>` | Required. The value to assign to the parameter. |
+  | Option                                 | Description                                                                                                                                  |
+  | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `--value <value>`                      | Required. The value to assign to the parameter.                                                                                              |
   | `--save-to-user-secrets [true\|false]` | Optional. Save the value to the .NET user secrets store in addition to the running AppHost. Defaults to preserving any existing saved state. |
 
   ```bash title="Aspire CLI"
@@ -120,10 +138,11 @@ Boolean options for these commands require an explicit `true` or `false` value. 
   aspire resource mydb-password set-parameter --value "MyStr0ngP@ssword" --save-to-user-secrets true
   ```
 
-- **`delete-parameter`** — Delete the current value of a parameter resource. The legacy name `parameter-delete` is also accepted.
+- **`delete-parameter`** — Delete the current value of a parameter resource. The legacy name
+  `parameter-delete` is also accepted.
 
-  | Option | Description |
-  | --- | --- |
+  | Option                                     | Description                                                                                                                           |
+  | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
   | `--delete-from-user-secrets [true\|false]` | Optional. Also remove the value from the .NET user secrets store. The value is removed only when this option is supplied with `true`. |
 
   ```bash title="Aspire CLI"
@@ -137,17 +156,24 @@ Boolean options for these commands require an explicit `true` or `false` value. 
   aspire resource mydb-password set-parameter --help
   ```
 
-**Note:** The canonical command names changed in Aspire 13.4. `parameter-set` was renamed to `set-parameter` and `parameter-delete` was renamed to `delete-parameter`. The old names are accepted as aliases and continue to work.
+**Note:** The canonical command names changed in Aspire 13.4. `parameter-set` was renamed to
+`set-parameter` and `parameter-delete` was renamed to `delete-parameter`. The old names are accepted
+as aliases and continue to work.
 
 ### Azure resource location command
 
-Locally provisioned Azure resources also expose a `change-location` command for moving an existing resource to a different Azure region. Some Azure resource types are location-immutable, so changing their location requires Aspire to delete and recreate the live resource — which can permanently lose any data it holds. Pass `--confirm-delete true` to acknowledge this before Aspire proceeds:
+Locally provisioned Azure resources also expose a `change-location` command for moving an existing
+resource to a different Azure region. Some Azure resource types are location-immutable, so changing
+their location requires Aspire to delete and recreate the live resource — which can permanently lose
+any data it holds. Pass `--confirm-delete true` to acknowledge this before Aspire proceeds:
 
 ```bash title="Aspire CLI"
 aspire resource my-storage change-location --location westus2 --confirm-delete true
 ```
 
-Without `--confirm-delete true`, the command fails before any deletion, override persistence, reset, or reprovisioning occurs. For details, see [Change a resource's Azure location](/integrations/cloud/azure/local-provisioning/#change-a-resources-azure-location).
+Without `--confirm-delete true`, the command fails before any deletion, override persistence, reset,
+or reprovisioning occurs. For details, see
+[Change a resource's Azure location](/integrations/cloud/azure/local-provisioning/#change-a-resources-azure-location).
 
 ## Options
 
@@ -161,7 +187,9 @@ The following options are available:
 
 - **`--include-hidden`**
 
-  Includes resource commands that are marked as hidden. By default, hidden commands are not shown in help output or executed. Use this option to expose and run commands that are intentionally hidden from the default command listing.
+  Includes resource commands that are marked as hidden. By default, hidden commands are not shown in
+  help output or executed. Use this option to expose and run commands that are intentionally hidden
+  from the default command listing.
 
 - <Include relativePath="reference/cli/includes/option-log-level.md" />
 

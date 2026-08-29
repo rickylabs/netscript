@@ -12,51 +12,56 @@ aspire doctor [options]
 
 ## Description
 
-The `aspire doctor` command runs a series of diagnostic checks to verify that your development environment is properly configured for Aspire development. It checks prerequisites such as the .NET SDK, container runtime, and environment settings.
+The `aspire doctor` command runs a series of diagnostic checks to verify that your development
+environment is properly configured for Aspire development. It checks prerequisites such as the .NET
+SDK, container runtime, and environment settings.
 
-**Note:** The `aspire doctor` command replaces the hidden `aspire setup` command. If you
-  previously used `aspire setup` or `aspire setup --force`, use `aspire doctor`
-  instead. The `aspire setup` command is still available for backward
-  compatibility but is hidden from help output.
+**Note:** The `aspire doctor` command replaces the hidden `aspire setup` command. If you previously
+used `aspire setup` or `aspire setup --force`, use `aspire doctor` instead. The `aspire setup`
+command is still available for backward compatibility but is hidden from help output.
 
-This command is useful for troubleshooting when you encounter issues with Aspire or when setting up a new development environment. The checks are grouped by category:
+This command is useful for troubleshooting when you encounter issues with Aspire or when setting up
+a new development environment. The checks are grouped by category:
 
-- **Aspire checks**: Reports the current Aspire CLI version and whether a newer CLI version is available, and suggests running `aspire update` when a newer one is available
-- **AppHost checks**: Reports the AppHost Aspire SDK version when an AppHost project is present in the current directory
+- **Aspire checks**: Reports the current Aspire CLI version and whether a newer CLI version is
+  available, and suggests running `aspire update` when a newer one is available
+- **AppHost checks**: Reports the AppHost Aspire SDK version when an AppHost project is present in
+  the current directory
 - **SDK checks**: Verifies .NET SDK installation and version requirements
-- **Container checks**: Validates container runtime (Docker and/or Podman) availability, running status, and version. Reports which runtime is active and why (explicit configuration, auto-detected default, or auto-detected only runtime running)
-- **Environment checks**: Reports operating system information (type, version, and Linux distro details when available) and validates environment variables and other settings, including the JavaScript toolchain required by TypeScript AppHosts (npm, pnpm, Yarn, or Bun)
-- **Development tools checks**: When VS Code is detected, reports whether the [Aspire VS Code extension](https://aka.ms/aspire/vscode-extension) is installed
+- **Container checks**: Validates container runtime (Docker and/or Podman) availability, running
+  status, and version. Reports which runtime is active and why (explicit configuration,
+  auto-detected default, or auto-detected only runtime running)
+- **Environment checks**: Reports operating system information (type, version, and Linux distro
+  details when available) and validates environment variables and other settings, including the
+  JavaScript toolchain required by TypeScript AppHosts (npm, pnpm, Yarn, or Bun)
+- **Development tools checks**: When VS Code is detected, reports whether the
+  [Aspire VS Code extension](https://aka.ms/aspire/vscode-extension) is installed
 
-**Note:** The development tools check only runs when VS Code is detected, using the
-  same signals the CLI already relies on: the `TERM_PROGRAM=vscode`
-  environment variable (VS Code's integrated terminal) or `code`/`code-insiders`
-  on `PATH`. If VS Code isn't detected, the check is skipped and adds no
-  output. When VS Code is detected but the Aspire extension
-  (`microsoft-aspire.aspire-vscode`) isn't installed, `aspire doctor` reports a
-  warning with a link to install it from the Marketplace. When the extension is
-  already installed, the check passes.
+**Note:** The development tools check only runs when VS Code is detected, using the same signals the
+CLI already relies on: the `TERM_PROGRAM=vscode` environment variable (VS Code's integrated
+terminal) or `code`/`code-insiders` on `PATH`. If VS Code isn't detected, the check is skipped and
+adds no output. When VS Code is detected but the Aspire extension (`microsoft-aspire.aspire-vscode`)
+isn't installed, `aspire doctor` reports a warning with a link to install it from the Marketplace.
+When the extension is already installed, the check passes.
 
-**Note:** On Linux, `aspire doctor` reports a warning when `certutil` is unavailable.
-  Aspire uses `certutil` to query and update the NSS certificate databases used
-  by Firefox and Chromium browsers, so without it browser certificate trust may
-  be incomplete. Install `certutil` from your distribution's NSS tools package,
-  for example `libnss3-tools`, to resolve the warning.
+**Note:** On Linux, `aspire doctor` reports a warning when `certutil` is unavailable. Aspire uses
+`certutil` to query and update the NSS certificate databases used by Firefox and Chromium browsers,
+so without it browser certificate trust may be incomplete. Install `certutil` from your
+distribution's NSS tools package, for example `libnss3-tools`, to resolve the warning.
 
-**Note:** On Linux, `aspire doctor` also checks the OpenSSL development certificate
-  cache under the dev-certs trust directory. It reports a warning when the
-  cache is missing the current HTTPS development certificate, is missing the
-  subject-hash link OpenSSL uses to look up certificates by directory, or
-  contains certificate files that can't be read (for example, because they're
-  corrupt). In each case, `aspire doctor` recommends running `aspire certs
-  clean` followed by `aspire certs trust` to remove stale or corrupt
-  certificates and regenerate trusted development certificates. If the
-  `openssl` command isn't installed, the fix suggestion also tells you to
-  install it first.
+**Note:** On Linux, `aspire doctor` also checks the OpenSSL development certificate cache under the
+dev-certs trust directory. It reports a warning when the cache is missing the current HTTPS
+development certificate, is missing the subject-hash link OpenSSL uses to look up certificates by
+directory, or contains certificate files that can't be read (for example, because they're corrupt).
+In each case, `aspire doctor` recommends running `aspire certs
+  clean` followed by
+`aspire certs trust` to remove stale or corrupt certificates and regenerate trusted development
+certificates. If the `openssl` command isn't installed, the fix suggestion also tells you to install
+it first.
 
-**Note:** Environment checks time out after 30 seconds each or two minutes in aggregate,
-  and installation discovery times out after 30 seconds. If a timeout occurs,
-  the `aspire doctor` result includes a warning.
+**Note:** Environment checks time out after 30 seconds each or two minutes in aggregate, and
+installation discovery times out after 30 seconds. If a timeout occurs, the `aspire doctor` result
+includes a warning.
 
 The command displays results with clear status indicators:
 
@@ -64,7 +69,8 @@ The command displays results with clear status indicators:
 - ⚠️ (yellow) - Warning (non-blocking issue)
 - ❌ (red) - Check failed (blocking issue)
 
-If any checks fail, the command provides suggestions for how to fix the issues and links to relevant documentation.
+If any checks fail, the command provides suggestions for how to fix the issues and links to relevant
+documentation.
 
 ## Options
 
@@ -72,7 +78,8 @@ The following options are available:
 
 - **`--format <Table|Json>`**
 
-  Output format (Table or Json). Use `Json` for automation scenarios or when you need to parse the results programmatically. Defaults to `Table`.
+  Output format (Table or Json). Use `Json` for automation scenarios or when you need to parse the
+  results programmatically. Defaults to `Table`.
 
 - <Include relativePath="reference/cli/includes/option-help.md" />
 
@@ -102,7 +109,8 @@ The following options are available:
 
 ## Sample output
 
-When you run `aspire doctor` from a directory containing an AppHost project, you see output similar to the following:
+When you run `aspire doctor` from a directory containing an AppHost project, you see output similar
+to the following:
 
 ```bash title="Aspire CLI"
 Checking Aspire environment...
@@ -129,11 +137,11 @@ Environment
 Summary: 6 passed, 0 warnings, 0 failed
 ```
 
-After the summary, table output also includes an `Aspire CLI Installations`
-table that lists discovered CLI binaries with their path, version, channel,
-install route, and PATH status.
+After the summary, table output also includes an `Aspire CLI Installations` table that lists
+discovered CLI binaries with their path, version, channel, install route, and PATH status.
 
-When the CLI is out of date, the Aspire section shows a warning with the latest available version and a suggestion to run `aspire update`:
+When the CLI is out of date, the Aspire section shows a warning with the latest available version
+and a suggestion to run `aspire update`:
 
 ```bash title="Aspire CLI"
 Aspire
@@ -144,14 +152,14 @@ AppHost
   ✅ AppHost version 13.5.0 (MyApp.AppHost.csproj)
 ```
 
-This warning snippet is abbreviated. In complete table output, a summary follows
-the check results. When any warning or failure is present, Aspire also prints
-`For detailed prerequisites: https://aka.ms/aspire-prerequisites`. Some CLI and
-AppHost version messages include an inline `(channel: <name>)` suffix; the same
-channel data appears in JSON metadata as `identityChannel`,
-`latestVersionChannel`, or `pinnedChannel` when available.
+This warning snippet is abbreviated. In complete table output, a summary follows the check results.
+When any warning or failure is present, Aspire also prints
+`For detailed prerequisites: https://aka.ms/aspire-prerequisites`. Some CLI and AppHost version
+messages include an inline `(channel: <name>)` suffix; the same channel data appears in JSON
+metadata as `identityChannel`, `latestVersionChannel`, or `pinnedChannel` when available.
 
-On Linux, when `certutil` is not installed, the Environment section reports a warning instead of failing the check:
+On Linux, when `certutil` is not installed, the Environment section reports a warning instead of
+failing the check:
 
 ```bash title="Aspire CLI"
 Environment
@@ -160,10 +168,9 @@ Environment
        Install certutil from your distribution's NSS tools package (for example, libnss3-tools).
 ```
 
-On Linux, when the OpenSSL development certificate cache is stale, missing the
-current certificate, or contains unreadable certificate files, the Environment
-section reports a warning with a suggestion to clean and re-trust the
-certificate:
+On Linux, when the OpenSSL development certificate cache is stale, missing the current certificate,
+or contains unreadable certificate files, the Environment section reports a warning with a
+suggestion to clean and re-trust the certificate:
 
 ```bash title="Aspire CLI"
 Environment
@@ -180,8 +187,8 @@ Container Runtime
   ❌ Docker is not installed
 ```
 
-When you set `ASPIRE_CONTAINER_RUNTIME=podman`, Aspire honors the explicit
-configuration and Podman becomes active even when Docker is also running:
+When you set `ASPIRE_CONTAINER_RUNTIME=podman`, Aspire honors the explicit configuration and Podman
+becomes active even when Docker is also running:
 
 ```bash title="Aspire CLI"
 Container Runtime
@@ -189,10 +196,11 @@ Container Runtime
   ✅ Docker v27.3.1: running (available)
 ```
 
-The active runtime is annotated with `← active`. Other detected runtimes are
-shown with `(available)`.
+The active runtime is annotated with `← active`. Other detected runtimes are shown with
+`(available)`.
 
-When VS Code is detected but the Aspire extension isn't installed, the Development tools section reports a warning:
+When VS Code is detected but the Aspire extension isn't installed, the Development tools section
+reports a warning:
 
 ```bash title="Aspire CLI"
 Development tools
@@ -211,7 +219,10 @@ The command returns the following exit codes:
 
 ## JSON output format
 
-When using the `--format Json` option, the output includes a structured response with all check results, a summary, and discovered Aspire CLI installations. The following example is abbreviated to focus on selected checks; actual output includes an entry for every check and can include additional metadata, such as `updateCommand`, `identityChannel`, `latestVersionChannel`, and `pinnedChannel`.
+When using the `--format Json` option, the output includes a structured response with all check
+results, a summary, and discovered Aspire CLI installations. The following example is abbreviated to
+focus on selected checks; actual output includes an entry for every check and can include additional
+metadata, such as `updateCommand`, `identityChannel`, `latestVersionChannel`, and `pinnedChannel`.
 
 ```json title="JSON output"
 {
@@ -262,7 +273,11 @@ When using the `--format Json` option, the output includes a structured response
 }
 ```
 
-When VS Code is detected, the checks include a `devtools` category entry named `vscode-extension`. It reports `"status": "warning"` when the [Aspire VS Code extension](https://aka.ms/aspire/vscode-extension) isn't installed, and `"status": "pass"` when it is. Its `metadata` includes `vsCodeInstalled`, `extensionInstalled`, and `extensionId`:
+When VS Code is detected, the checks include a `devtools` category entry named `vscode-extension`.
+It reports `"status": "warning"` when the
+[Aspire VS Code extension](https://aka.ms/aspire/vscode-extension) isn't installed, and
+`"status": "pass"` when it is. Its `metadata` includes `vsCodeInstalled`, `extensionInstalled`, and
+`extensionId`:
 
 ```json title="JSON output"
 {
@@ -282,7 +297,8 @@ When VS Code is detected, the checks include a `devtools` category entry named `
 
 This check is omitted entirely when VS Code isn't detected on the machine.
 
-When the CLI is out of date, the `cli-version` check has `"status": "warning"` and the `metadata` includes the latest available version:
+When the CLI is out of date, the `cli-version` check has `"status": "warning"` and the `metadata`
+includes the latest available version:
 
 ```json title="JSON output"
 {
@@ -298,7 +314,8 @@ When the CLI is out of date, the `cli-version` check has `"status": "warning"` a
 }
 ```
 
-The `apphost-version` check is only present in the JSON output when an AppHost project is discovered in the current directory.
+The `apphost-version` check is only present in the JSON output when an AppHost project is discovered
+in the current directory.
 
 The `operating-system` check is always present and includes the following metadata fields:
 
