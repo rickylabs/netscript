@@ -54,7 +54,12 @@ export type {
 } from './src/tools/domain/definition.ts';
 export { createToolRegistry } from './src/tools/adapters/in-memory-registry.ts';
 export type { AiToolRegistry } from './src/tools/application/registry.ts';
-export type { ToolHandler, ToolRegistryPort } from './src/ports/tool-registry.ts';
+export type {
+  ToolHandler,
+  ToolInvocationOptions,
+  ToolRegistryPort,
+} from './src/ports/tool-registry.ts';
+export type { RequestContext } from './src/contracts/context.ts';
 export { renderUiTool } from './src/tools/application/render-ui.ts';
 export type { RenderUiToolInput } from './src/tools/domain/render-ui.ts';
 export { type ToolInputIssue, ToolInputValidationError } from './src/contracts/errors.ts';
