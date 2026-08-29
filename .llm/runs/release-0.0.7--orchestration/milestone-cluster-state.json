@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
+  "currentMainSha": "8b1e42f725919457c64781d5973fd419017fab13",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -32,8 +32,8 @@
       "canary2Disposition": "allowed to finish because publication was already in progress; do not repeat an internals-only cut"
     },
     "latestCheckpoint": {
-      "at": "2026-08-29T22:13:00.000Z",
-      "mainSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
+      "at": "2026-08-29T22:33:04.000Z",
+      "mainSha": "8b1e42f725919457c64781d5973fd419017fab13",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
       "aspireFiledIssues": [
@@ -53,8 +53,12 @@
         1726
       ],
       "aspireS1": "pr1727_draft_remote_equal_head_68b0aef87_coordinator_tier_a_hold_for_two_fail_closed_parity_repairs_e2e_dispatch_exposed_unrelated_baseline_fresh_type_drift_without_local_runtime_lease",
-      "issue1371": "red_first_commit_099370709_preserved_after_transport_recovery_implementation_full_structured_test_active_without_runtime_lease",
-      "pr1711": "067193acf_pass_impl_and_all_ci_green_but_shared_generated_assets_conflict_after_pr1696_merge_bounded_refresh_and_cheap_exact_head_delta_receipt_active",
+      "issue1371": "pr1728_merged_as_8b1e42f72_after_pass_impl_mechanical_evidence_append_and_exact_head_ci_green_issue_closed",
+      "pr1711": "merged_as_3561bb648_after_pass_impl_current_main_refresh_mechanical_delta_pass_and_exact_head_ci_green_issue1112_closed",
+      "pr1729": "product_and_evidence_commits_live_on_draft_pr_grouping_1672_1674_1675_current_main_refresh_tier_a_and_impl_eval_active",
+      "pr1731": "phase_1_plan_live_on_draft_pr_for_1466_features_tier_a_then_single_risk_selected_plan_eval_active",
+      "aspireS2": "runtime_lease_granted_to_issue1714_same_fable_research_supervisor_dispatched_gpt_5_6_sol_high_v1_v12_receipts_active_on_cli_13_5_3",
+      "freshHydration": "issue1734_open_and_gpt_5_6_sol_high_red_first_repair_active_non_runtime_work_does_not_wait_for_aspire_s2_lease",
       "pr1696": "merged_as_21d516224_after_fresh_fable5_impl_eval_pass_and_exact_head_ci_green_issue1694_closed",
       "canary2": "v0.0.7-canary.2_published_from_5bb112dd3_release_commit_2481b57d1_with_oidc_and_pinned_production_e2e_green",
       "parallelLaneRule": "feature_and_fix_queues_ship_independently; docs_internals_aspire_never_hold_them"
@@ -102,7 +106,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "1371_canary_verification_dispatching_after_1709_merge",
+        "state": "1371_merged_1734_red_first_implementation_active",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -116,7 +120,7 @@
         "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "topicHeadSha": "7ce1516f7222acfa193a72b2ae11b3c1997d3a8b",
-        "queueState": "1709_merged_at_3b32d1628; reintake_1371_foundations_canary_verification_dispatching",
+        "queueState": "1371_merged_as_8b1e42f72; 1734_readonly_hydration_repair_active; 1732_queued_after_current_leaf",
         "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
@@ -213,7 +217,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "1112_owner_accepted_implementation_active",
+        "state": "1112_merged_1729_grouped_agent_init_active",
         "worktree": "/home/codex/repos/netscript-007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -227,7 +231,7 @@
         "bridgeSessionId": "session_01Y1YKBnzUJVuXB5akcxeRT6",
         "remoteControlUrl": "https://claude.ai/code/session_01Y1YKBnzUJVuXB5akcxeRT6",
         "topicHeadSha": "b08a3d96c5c4bd786448972242ae5b5cc7de388e",
-        "queueState": "1112_seven_path_implementation_granted; reintake_wave_A_queued_after_foundations_canary",
+        "queueState": "1112_merged_as_3561bb648; 1672_1674_1675_grouped_pr1729_current_main_refresh_review_and_evaluation_active; 1673_next_serially",
         "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle",
@@ -323,7 +327,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "parked_terminal_owner_wording",
+        "state": "1466_phase_1_plan_review_and_plan_eval_active",
         "worktree": "/home/codex/repos/netscript-007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -331,14 +335,14 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "d424d28b",
-        "sessionId": "d424d28b-1da1-49a6-a587-2a77475b3d7d",
-        "pid": null,
+        "backgroundAgentId": "19621a0b",
+        "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
+        "pid": 848067,
         "bridgeSessionId": "cse_01F8yPoUNC56gdZ9KsbRmiWu",
         "remoteControlUrl": "https://claude.ai/code/session_01F8yPoUNC56gdZ9KsbRmiWu",
         "topicHeadSha": "e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14",
-        "queueState": "1664_terminal_red_1293_row1_owner_wording_pending_1112_confirmed_fixes_owned",
-        "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
+        "queueState": "1664_remains_terminal_parked; 1466_pr1731_tier_a_and_single_complex_plan_eval_active; 1387_then_1730_serially",
+        "attachmentVerifiedAt": "2026-08-29T22:33:04.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
@@ -787,10 +791,10 @@
     {
       "id": "prisma-mysql-honest-example",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "067193acff68254b4bd4c6e5d7824f80a9db2b26",
-      "currentPrHeadSha": "067193acff68254b4bd4c6e5d7824f80a9db2b26",
+      "headSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
+      "currentPrHeadSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -798,7 +802,7 @@
       "prNumber": 1711,
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
-      "implementationState": "cycle_2_pass_and_ci_green_but_shared_generated_assets_conflict_after_1696_merge_bounded_refresh_active",
+      "implementationState": "merged_after_cycle_2_pass_current_main_refresh_mechanical_delta_pass_and_exact_head_ci_green",
       "planHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "c36eaf340db2bb6df18f1d7b2149af12e9b9fe1f",
@@ -875,9 +879,16 @@
       "postMainAdvanceRefresh": {
         "trigger": "PR #1696 merged first and changed the same generated agent-doc assets",
         "mainSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
-        "state": "active",
+        "state": "complete",
         "scope": "bounded base refresh plus authoritative regeneration of shared generated assets; preserve product semantics",
-        "evaluation": "cheap independent exact-head delta receipt only; no PLAN-EVAL and no repeat full evaluation unless the delta ceases to be mechanical"
+        "evaluation": "cheap independent exact-head delta receipt only; no PLAN-EVAL and no repeat full evaluation unless the delta ceases to be mechanical",
+        "refreshedHeadSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
+        "deltaVerdict": "MECHANICAL_PASS",
+        "deltaEvaluatorSessionId": "d6e05f50-4113-44f9-9879-72c6e5aec343",
+        "deltaArtifactCommitSha": "2df8d9962",
+        "deltaCommentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5465242813",
+        "ciWorkflowRunId": 33278346090,
+        "ciState": "success"
       },
       "postEvaluationAmendment": {
         "headSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
@@ -897,7 +908,9 @@
         "coordinatorContainment": "PR converted to draft and status:impl at a727c7565; no merge occurred; new exact-head IMPL-EVAL required before readiness"
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "finish bounded current-main refresh, run focused gates and Tier-A, push, collect cheap exact-head delta receipt, restore ready-merge, pass close-gate/CI, and merge immediately",
+      "mergeCommitSha": "3561bb64820602e065bf6df0afeed82b39062e42",
+      "mergedAt": "2026-08-29T22:20:00.000Z",
+      "nextGate": "terminal; issue #1112 closed by merged PR #1711",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -2726,6 +2739,68 @@
       "branch": "docs/rfc-plugin-cli-contribution",
       "worktree": "/home/codex/repos/netscript-007-features-1502",
       "receiptRefs": []
+    },
+    {
+      "id": "aspire-declared-reference-fail-fast",
+      "lane": "internals",
+      "phase": "merged",
+      "baseBranch": "main",
+      "headSha": "1b67b03b4ee7e488c8da266b686bd3b72d479071",
+      "currentPrHeadSha": "1b67b03b4ee7e488c8da266b686bd3b72d479071",
+      "issueNumbers": [1371],
+      "branch": "fix/aspire-declared-reference-fail-fast",
+      "prNumber": 1728,
+      "implementationEvaluationState": "complete_cycle_1",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "68482a13adf13c9e53bf49d335bd361305a284de",
+      "evaluationArtifactHeadSha": "61fca0931b9669a10adfabc8c8c099f2fdc23149",
+      "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1728#issuecomment-5465209898",
+      "ciWorkflowRunId": 33278449272,
+      "ciState": "success",
+      "mergeCommitSha": "8b1e42f725919457c64781d5973fd419017fab13",
+      "mergedAt": "2026-08-29T22:30:08.000Z",
+      "nextGate": "terminal; issue #1371 closed by merged PR #1728"
+    },
+    {
+      "id": "agent-init-guidance-and-cross-host-skills",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "83d24ba57d4e2b6f1d3905ebe508cdc3016a3b0b",
+      "currentPrHeadSha": "83d24ba57d4e2b6f1d3905ebe508cdc3016a3b0b",
+      "issueNumbers": [1672, 1674, 1675],
+      "branch": "fix/agent-init-guidance-and-cross-host-skills",
+      "worktree": "/home/codex/repos/netscript-007-leaf-agent-init",
+      "prNumber": 1729,
+      "implementationState": "product_and_evidence_committed; current-main integration, authoritative regeneration, Tier-A, and opposite-family IMPL-EVAL active",
+      "nextGate": "integrate main@8b1e42f72 safely, regenerate shared derivatives, Tier-A, fresh IMPL-EVAL, exact-head CI, ready and merge"
+    },
+    {
+      "id": "sdk-procedure-meta",
+      "lane": "features",
+      "phase": "planned",
+      "baseBranch": "main",
+      "headSha": "9e70b30a3fef798a02a376888603ef42ee3828b9",
+      "currentPrHeadSha": "9e70b30a3fef798a02a376888603ef42ee3828b9",
+      "issueNumbers": [1466],
+      "branch": "feat/sdk-procedure-meta",
+      "worktree": "/home/codex/repos/netscript-007-features-1466",
+      "prNumber": 1731,
+      "planEvaluationState": "risk_selected_after_fresh_tier_a",
+      "selectionReason": "complex public cross-consumer procedure metadata and error vocabulary boundary",
+      "nextGate": "fresh features Tier-A, one Fable 5 medium PLAN-EVAL, then same-author implementation if PASS"
+    },
+    {
+      "id": "fresh-readonly-dehydrated-state",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
+      "issueNumbers": [],
+      "branch": "fix/fresh-query-hydration-readonly-state",
+      "worktree": "/home/codex/repos/netscript-007-leaf-hydration",
+      "implementationState": "exact generated-project reproduction and RED-first bounded repair active on GPT-5.6-SOL high",
+      "nextGate": "finish non-runtime implementation and cheap gates now; queue only exact runtime proof behind Aspire S2 cleanup"
     }
   ],
   "evaluatorLeases": [
@@ -3815,7 +3890,7 @@
     },
     {
       "id": "prisma-mysql-honest-example-plan-eval-cycle-2",
-      "state": "active",
+      "state": "running",
       "lane": "fixes",
       "leafId": "prisma-mysql-honest-example",
       "phase": "plan-eval",
@@ -4080,6 +4155,20 @@
         "quarantine": "/tmp/netscript-s5-a7-quarantine.Cy2tNS",
         "freshBrowser": "NOT_RUN"
       }
+    },
+    {
+      "id": "aspire-13-5-s2-runtime-verification",
+      "state": "active",
+      "lane": "aspire-research",
+      "leafId": "aspire-13-5-s2-runtime-verification",
+      "gateId": "aspire_13_5_v1_v12",
+      "preGateHead": "21d516224fe35e92957f0998ee848bbf2024eda0",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-29T22:24:00.000Z",
+      "scope": "one isolated generated AppHost at a time for #1714 V1-V12 receipts on Aspire CLI 13.5.3; exact own-resource stop, leak-check, teardown, and zero Aspire/Docker/process postcondition mandatory",
+      "supervisorRoute": "same Claude Fable 5 medium research supervisor with Remote Control",
+      "implementationRoute": "GPT-5.6-SOL high thread 01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1",
+      "worktree": "/home/codex/repos/netscript-aspire-13-5-s2"
     }
   ],
   "canaryCheckpoints": [
@@ -4192,5 +4281,5 @@
     "wslLoadAfterAuthorExit": "stable; no local runtime gate active",
     "verifiedAt": "2026-08-29T21:12:29.000Z"
   },
-  "updatedAt": "2026-08-29T22:13:00.000Z"
+  "updatedAt": "2026-08-29T22:33:04.000Z"
 }

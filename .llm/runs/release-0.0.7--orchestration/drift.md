@@ -1103,3 +1103,16 @@ implementation thread.
   regenerate shared agent-doc/publish assets. Merge the first verified leaf, then refresh and
   regenerate the second from the authoritative generator; use a cheap exact-head delta review when
   the product semantics are unchanged instead of repeating broad plan evaluation.
+
+## 2026-08-29 — an idle prompt is a coordinator interrupt
+
+- A topic supervisor finishing a checkpoint does not satisfy the coordinator mandate. Before the
+  supervisor can remain at a prompt, the coordinator must either supply the next gate/leaf, record a
+  real exclusive-resource queue position while non-resource work continues, or prove that the
+  frozen allocation is exhausted.
+- This rule re-armed fixes (#1729 then #1673), features (#1731 then #1387/#1730), and internals
+  (#1734 then #1732) immediately after #1711/#1728 merged. Aspire S2 received the bounded runtime
+  lease instead of remaining at its request. Docs alone stays parked because its only frozen issue
+  is shipped and Aspire S11 is explicitly epic-owned.
+- Runtime serialization blocks only the exact runtime probe. It must not block research, RED tests,
+  implementation, cheap gates, PR preparation, or review in another orchestrator.

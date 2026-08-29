@@ -2028,3 +2028,19 @@
 - Corrected release policy: docs/internals/Aspire advance in parallel and cannot block feature or
   fix queues; public canaries are now triggered only by coherent consumer-facing payload. #1466
   and #1672/#1674/#1675 remain concurrent active product trains.
+
+## 2026-08-29T22:33:04Z — two user-facing fixes merged; four independent queues executing
+
+- Merged #1711 after exact-head CI `33278346090` and independent mechanical-delta verdict; merge
+  `3561bb648`, issue #1112 closed. Merged #1728 after exact-head CI `33278449272`; merge
+  `8b1e42f72`, issue #1371 closed. Main fast-forwarded cleanly to `8b1e42f72`.
+- Re-armed fixes on #1729 (#1672/#1674/#1675) through current-main integration, derivative
+  regeneration, Tier-A, IMPL-EVAL, and exact-head CI, with #1673 next. Re-armed internals on #1734
+  and queued only its runtime proof behind the active Aspire lease. Features is reviewing #1731
+  (#1466) with the single justified complex PLAN-EVAL; #1387/#1730 remain queued.
+- Granted Aspire S2 / #1714 the single runtime lease after an empty preflight. Same Fable research
+  supervisor dispatched Sol/high thread `01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1`; first scaffold,
+  generated-config, and restore receipts are present under the S2 run directory.
+- Audited the absent docs process against its durable checkpoint. Its only allocation `[1551]` is
+  shipped and its queue is genuinely exhausted; Aspire S11 is epic-owned. No release-driving lane
+  waits on docs, internals, or Aspire.

@@ -1224,3 +1224,22 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Orchestrator isolation is mandatory: features (#1466, then #1387) and fixes
   (#1672/#1674/#1675, then #1673) advance independently. Docs, internals (#1728/#1371), and Aspire
   continue concurrently and are never global barriers.
+
+## Resume checkpoint — main `8b1e42f72`; all independent queues active
+
+- #1711/#1112 is terminal merged at `3561bb648` after cycle-2 `PASS_IMPL`, current-main refresh,
+  independent `MECHANICAL_PASS`, and exact-head CI. #1728/#1371 is terminal merged at
+  `8b1e42f72` after `PASS_IMPL` and exact-head CI.
+- Fixes: #1729 groups #1672/#1674/#1675 and has authored product/evidence commits; current-main
+  integration, generated derivatives, Tier-A, IMPL-EVAL, and CI are the active gates. #1673 is next.
+- Features: #1731/#1466 phase-1 plan is under fresh Tier-A and one justified Fable 5/medium
+  PLAN-EVAL. #1387 then #1730 are queued; #1664 stays terminal-parked outside the queue.
+- Internals: #1734 exact generated-project RED/repair is active on Sol/high; #1732 follows. Only
+  #1734's exact runtime proof waits for the current host lease, never its non-runtime work.
+- Aspire: S2/#1714 owns the single runtime lease and is executing V1-V12 on Aspire CLI 13.5.3 via
+  Sol/high thread `01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1`, supervised by the same Fable research
+  session. Release only after exact owned cleanup and zero postconditions.
+- Docs is deliberately exhausted, not forgotten: frozen allocation `[1551]` is shipped; S11 remains
+  with the Aspire epic supervisor. Future public canary selection is now consumer-eligible from
+  #1696 + #1711 + #1728, but should wait for the nearest coherent bundle boundary such as #1729
+  rather than interrupting a near-ready user-facing leaf.

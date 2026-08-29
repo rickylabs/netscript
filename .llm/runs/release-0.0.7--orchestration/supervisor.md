@@ -1311,3 +1311,29 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   created a shared generated-asset conflict, so fixes owns a bounded current-main refresh plus
   authoritative regeneration and a cheap exact-head delta receipt while its grouped
   #1672/#1674/#1675 implementation continues independently.
+
+## 2026-08-29T22:33:04Z — coordinator cleared merge gates and re-armed every queue
+
+- PR #1711 completed its current-main refresh at `07e12efacf`, earned the bounded independent
+  `MECHANICAL_PASS`, passed exact-head CI run `33278346090`, and merged as
+  `3561bb64820602e065bf6df0afeed82b39062e42`; #1112 is closed.
+- PR #1728 completed exact-head CI run `33278449272` and merged as
+  `8b1e42f725919457c64781d5973fd419017fab13`; #1371 is closed. Internals immediately dispatched
+  #1734 through GPT-5.6-SOL/high for exact generated-project RED and a bounded Fresh hydration
+  repair. It must finish all non-runtime work while Aspire owns the host lease; only its exact
+  runtime proof queues behind S2 cleanup. #1732 remains the next internals leaf.
+- Fixes PR #1729 now carries the authored cross-host `agent init` product commit and gate-evidence
+  commit for #1672/#1674/#1675. The supervisor was explicitly instructed to integrate
+  `main@8b1e42f72`, regenerate shared derivatives, run Tier-A, dispatch the opposite-family
+  IMPL-EVAL, and then move directly to #1673.
+- Features PR #1731 records the #1466 phase-1 plan. Fresh Tier-A is active and this public
+  cross-consumer metadata/error vocabulary receives one risk-selected Fable 5/medium PLAN-EVAL;
+  #1387 and #1730 stay serially queued behind it. #1664 remains parked and consumes no queue slot.
+- Aspire S2 / #1714 holds the single bounded runtime lease. The same Fable 5/medium research
+  supervisor dispatched GPT-5.6-SOL/high thread `01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1`; Aspire
+  CLI 13.5.3 scaffold and restore receipts are already landing. Exact cleanup to Aspire, Docker,
+  and owned-process zero is mandatory before the lease releases.
+- The docs supervisor is not silently stalled: its frozen allocation is exactly `[1551]`, already
+  shipped, with no unowned docs leaf available. Aspire S11 remains owned by the same Aspire research
+  supervisor per the epic contract. Docs is therefore deliberately exhausted/parked, not a global
+  barrier.
