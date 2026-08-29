@@ -5678,3 +5678,77 @@ rejected twice before.
 
 No merge, publish, relabel, milestone change, readiness flip, `#1348` mutation, or lease. No release
 authority claimed.
+
+## 2026-08-30 — #1466 Tier-A `PASS` at `9e70b30a3`; PLAN-EVAL dispatched
+
+Full review: `slices/tier-a-plan-review-1466.md` (commit `5cd0b069c`). PR comment
+`5465246343`.
+
+### Phase-1 stop
+
+local == remote == PR head `9e70b30a3`, clean, base `21d516224` (current main), diff **artifact-only**
+(2 files, +402), `Closes #1466` with a keyword-free `Part of #1348`, exactly one `status:` label,
+draft. The recovered author delivered the checkpoint the resume message demanded.
+
+### I verified the plan's central claim instead of accepting it
+
+The whole design rests on threading `$meta` without an assertion while leaving #1350's repaired error
+channel untouched. Checked against the locked upstream declarations:
+
+| Claim | Evidence | Holds |
+| --- | --- | --- |
+| Re-baseline changed no source fact | `git diff 5bb112dd3 21d516224 -- packages/contracts packages/sdk` → **0 lines** | yes |
+| `$meta` exists | `@orpc/contract@1.14.6/dist/index.d.mts:216` → `ContractBuilder<…, U & Record<never, never>>` | yes |
+| `.errors()` preserves `TMeta` | `dist/index.d.mts:237` → `MergedErrorMap<TErrorMap, U>`, `TMeta` untouched | yes |
+| `ContractBuilder` publicly exported | export list — so the annotation is nameable under `isolatedDeclarations: true` (`deno.json:175`) | yes |
+| Real-specifier fixtures resolve | workspace `packages/*`; precedent `packages/sdk/tests/readme-doctest_test.ts` | yes |
+
+`oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap)` therefore leaves generic position 3
+**identical** to today's `BaseContractErrors` and makes position 4
+`NetScriptProcedureMeta & Record<never, never>`. Implementable with zero assertions — which is the
+question the review existed to answer.
+
+### The three requirements I carried forward
+
+- **T-1 (required).** Acceptance says "without casts or `any`". I found that `any` is **already**
+  mechanically gated — `deno lint` `recommended` includes `no-explicit-any` and neither package is
+  lint-excluded, a credit the plan did not claim. But **casts are gated by nothing**: the plan's only
+  verification is a changed-line human review. That is the precise shape that cost this lane #1293
+  S1, where `performIO(query as SqlQuery)` silenced a real incompatibility and survived review.
+- **T-2.** Pin position 4 exactly rather than hedging "any upstream-required empty-record
+  intersection". Vagueness there is what later justifies the `as` that L3 forbids.
+- **T-3.** Fix the receipt filenames and distinct per-package `gateId`s in `plan.md`;
+  `evidence-set.ts` scores a repeated `gateId` as duplicate/contradictory → INSUFFICIENT.
+
+I passed rather than requested changes because none of the three invalidates the design, all three
+are evidence/precision items the PLAN-EVAL must rule on anyway, and implementation is blocked until
+that gate returns — so a round-trip would have bought delay, not safety. They are binding items in
+the evaluator's brief, not suggestions.
+
+### What the plan gets right
+
+The independence rule (`research.md:120-126`) is written so a reviewer can **reject** something —
+`extends Meta`, `InferContractRouterMeta<…>`, an upstream re-export, a bridging `as` — instead of the
+unactionable "must remain independent". The versioning commitment is decided, argued from the RFC's
+`{}` normalization, and costed for S3–S8 rather than deferred. Finding 4 answers by finding nothing
+and says so: no CLI generator owns this declaration output. And the stage boundary against S3's
+runtime port is left open as a genuine fork rather than pre-decided.
+
+### PLAN-EVAL dispatched
+
+| Field | Value |
+| --- | --- |
+| Session | `5cd50ad0-3de4-4997-b60e-9dc73e76caaf` |
+| Requested route | native Claude **Fable 5 · medium** · Remote Control (`lane-policy.md:84`, `review_codex_complex`) |
+| Observed route | `respawnFlags: ['--effort','medium',…,'--model','fable']` — **requested == observed** |
+| Auth | `providerEnv: {}` — native Anthropic |
+| Remote Control | bridge `cse_01JNV9EuywznGgoufYQizqBU` |
+| Worktree | `/home/codex/worktrees/ns1466-planeval` — **detached** at `9e70b30a3`, deliberately not the author's |
+| Brief | `slices/plan-eval-1466.md` |
+
+The detached worktree is deliberate: an evaluator writing into the author's worktree is what produced
+D-19's cross-owner contamination. The brief carries explicit commit-and-push wording and requires
+rulings on T-1…T-3 plus the plan's two open decisions, stating that handing any of them back is a
+failure of the gate.
+
+Queue unchanged: #1387 and #1730 remain queued behind #1466; #1664 parked at `20337441788b`.
