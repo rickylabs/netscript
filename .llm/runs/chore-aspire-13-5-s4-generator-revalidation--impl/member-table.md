@@ -45,6 +45,13 @@ No row is `changed` or `removed`; therefore this table authorizes no SDK-member 
 
 ## Deploy adapter command contract
 
-This section is completed and re-sourced in slice 4 from S2 V12 verbatim help receipts. Initial
-finding: all three commands retain `--apphost`, `--output-path`, `--environment`, and
-`--non-interactive`; only `destroy` retains `--yes`.
+S2 captured the verbatim Aspire 13.5.3 help output in
+`.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v12-*.raw.txt`. All three
+commands advertise `--apphost`, `--output-path`, `--environment`, and `--non-interactive`; only
+`destroy` advertises `--yes`.
+
+| Command          | Adapter call site(s)                                                          | 13.5.3 help contract                                                                                                       | Verdict                                                                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `aspire publish` | `AspireCloudDeployTarget.#publish`; `AspireComposeDeployTarget.#publish`      | V12 `publish --help`: `--apphost`, `--output-path`, `--environment`, `--non-interactive`; no `--yes`                       | unchanged — cloud supplies AppHost/output/non-interactive; compose supplies output and requested common flags                              |
+| `aspire deploy`  | `AspireCloudDeployTarget.up`; Docker branch of `AspireComposeDeployTarget.up` | V12 `deploy --help`: `--apphost`, `--output-path`, `--environment`, `--non-interactive`; no `--yes` (also `--clear-cache`) | unchanged — emitted argv uses only supported deploy flags and never adds destroy-only `--yes`                                              |
+| `aspire destroy` | AppHost branch of `AspireCloudDeployTarget.down`                              | V12 `destroy --help`: `--apphost`, `--output-path`, `--environment`, `--non-interactive`, and `--yes`                      | unchanged — the non-interactive adapter already supplies both `--yes` and `--non-interactive`; the new exact-argv test prevents regression |

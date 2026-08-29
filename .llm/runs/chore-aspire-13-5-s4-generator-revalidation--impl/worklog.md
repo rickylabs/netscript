@@ -96,6 +96,8 @@ decision remains open.
 | 2026-08-30 | 2     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 | 2026-08-30 | 3     | implementation  | Re-anchored Deno comments and the single debt entry to 13.5/S12 facts.        |
 | 2026-08-30 | 3     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
+| 2026-08-30 | 4     | implementation  | Pinned publish/deploy/destroy argv to the verbatim 13.5.3 help receipts.      |
+| 2026-08-30 | 4     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 
 ## Decisions
 
@@ -124,6 +126,10 @@ decision remains open.
 | 3     | Aspire config generator tests       | PASS (5/5)   | Structured wrapper on `generate-aspire-config_test.ts`                                           |
 | 3     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
 | 3     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
+| 4     | Aspire deploy adapter tests         | PASS (17/17) | Structured wrapper on the cloud and compose adapter tests                                        |
+| 4     | Raw touched-file format/lint        | PASS         | `--no-config` with repository formatting options because root config excludes `packages/cli`     |
+| 4     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
+| 4     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
 
 ## Handoff Notes
 
