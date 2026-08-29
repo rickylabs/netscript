@@ -44,15 +44,12 @@ export function generateAspireConfig(options?: AspireConfigOptions): string {
  *
  * ### Deno orchestration — intentionally no NuGet
  *
- * We deliberately do NOT emit `CommunityToolkit.Aspire.Hosting.Deno`. Its
- * `addDenoApp(...)` extension is `[AspireExport]`-annotated, but in Aspire
- * 13.2 the export decorator is only honoured for types declared inside the
- * AppHost project itself — external NuGet packages are skipped. Shipping
- * the beta NuGet in the scaffold would therefore surface as a dead import.
- * Instead every generated `.helpers/register-*.ts` uses the SDK primitive
- * `builder.addExecutable('deno', ...)`, which works today and needs no
- * integration package. Revisit when Aspire 13.3 lands (GH aspire#15119 /
- * aspire#16220).
+ * Aspire 13.5 can project the CommunityToolkit Deno integration's
+ * `addDenoApp(...)` and `addDenoTask(...)` APIs after restore. NetScript 0.0.7
+ * deliberately keeps the SDK primitive `builder.addExecutable('deno', ...)`
+ * until the S12 adoption slice proves the projected integration through the
+ * full scaffold runtime gate. First-party Deno hosting is scheduled upstream
+ * for Aspire 13.6 (aspire#18627, aspire#18628, and aspire#16218).
  */
 export interface TsAspireConfigOptions {
   /** Selected database engine (drives Postgres/MySql packages). */

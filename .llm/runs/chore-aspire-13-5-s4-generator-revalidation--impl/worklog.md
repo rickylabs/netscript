@@ -94,6 +94,8 @@ decision remains open.
 | 2026-08-30 | 1     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 | 2026-08-30 | 2     | implementation  | Modern AppHost default tested; #1728 background-reference coverage confirmed. |
 | 2026-08-30 | 2     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
+| 2026-08-30 | 3     | implementation  | Re-anchored Deno comments and the single debt entry to 13.5/S12 facts.        |
+| 2026-08-30 | 3     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 
 ## Decisions
 
@@ -118,6 +120,10 @@ decision remains open.
 | 2     | Config + background generator tests | PASS (18/18) | Structured test wrapper on `netscript_config_test.ts` and `generate-register-background_test.ts` |
 | 2     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
 | 2     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
+| 3     | Stale-anchor grep                   | PASS         | No retired issue anchors in template or Aspire asset-source trees                                |
+| 3     | Aspire config generator tests       | PASS (5/5)   | Structured wrapper on `generate-aspire-config_test.ts`                                           |
+| 3     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
+| 3     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
 
 ## Handoff Notes
 
