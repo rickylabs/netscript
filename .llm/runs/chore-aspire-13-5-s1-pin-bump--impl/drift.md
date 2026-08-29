@@ -29,3 +29,32 @@
 - **Severity:** minor
 - **Action:** accept — consume the exact current draft-of-record manifest and do not edit or regenerate it in S1.
 - **Evidence:** `wc -l` = 814 including the header; RED receipt `receipts/parity-phase1-red.json`.
+
+## 2026-08-29 — CI runtime is blocked after Aspire restore by unchanged Fresh hydration typing
+
+- **What:** Both CI runtime tiers install and preflight Aspire CLI 13.5.3 and pass
+  `runtime.aspire-restore`, but stop at the generated quality gate with TS2345 in the copied Fresh
+  hydration source.
+- **Source:** Actions run `33276629736`, jobs `99164403085` and `99164403126`.
+- **Expected:** Both runtime tiers reach their complete behavior verdict.
+- **Actual:** `packages/fresh/src/application/query/hydration.ts:43` passes a readonly
+  `DehydratedState` to a mutable TanStack `hydrate()` parameter. Its blob
+  `87c8df1bbbe41ada6499fdc76a4db697c599aac5` is identical at the S1 baseline and final pre-repair
+  head.
+- **Severity:** significant
+- **Action:** escalate — do not expand #1713 into the forbidden Fresh package surface; rerun runtime
+  after the owning Fresh fix lands.
+- **Evidence:** https://github.com/rickylabs/netscript/actions/runs/33276629736
+
+## 2026-08-29 — Tier-A review found two fail-closed parity gaps
+
+- **What:** Missing required rows and unauthorized 13.5.x patch changes could false-green phase 1.
+- **Source:** coordinator Tier-A hold on PR #1727.
+- **Expected:** A required manifest path is present and every S1 pin matches its locked exact value.
+- **Actual:** Missing paths were counted but did not affect `ok`; stale detection covered only
+  13.0–13.4.
+- **Severity:** significant
+- **Action:** repair — missing non-archival paths now produce `fail`; a per-path exact-version policy
+  covers all seven pin-bearing phase-1 files, including accepted 13.5.0, Browsers preview, and cache
+  suffix variants. All 66 currently missing paths are archival and remain non-failing.
+- **Evidence:** 6/6 repaired parity tests; `receipts/parity-phase1-green.json`.

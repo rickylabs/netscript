@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `chore-aspire-13-5-s1-pin-bump--impl` |
 | Branch | `chore/aspire-13-5-s1-pin-bump` |
-| Current phase | implement — slice 2 ready to commit |
+| Current phase | Tier-A repair complete — supervisor re-review pending |
 | Archetype | `6 — CLI/tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The RED gate slice is pushed on draft PR #1727. The atomic Aspire train now uses SDK/CLI/official integrations 13.5.3, Browsers 13.5.3-preview.1.26425.3, and CommunityToolkit Deno/SQLite 13.5.0. The phase-1 GREEN receipt has fail=0 with 20 owner-tagged, non-archival deferred findings.
+The atomic Aspire train is implemented on draft PR #1727. Coordinator Tier-A review found two parity false-green gaps; the bounded repair now fails on missing non-archival manifest paths and unauthorized 13.5.x versions across all seven pin-bearing phase-1 paths. The repaired phase-1 receipt is GREEN with fail=0; all 66 missing paths are archival.
 
 ## Completed
 
@@ -21,16 +21,20 @@ The RED gate slice is pushed on draft PR #1727. The atomic Aspire train now uses
 - Phase-aware parity tool/test, task/catalog wiring, immutable manifest input, and RED receipt completed.
 - Slice 1 commit `95680776…` pushed; draft PR and commit-trail comment created.
 - Atomic pin edits, CI phase-1 wiring, scoped validation, quality/architecture checks, assets freshness, and GREEN receipt completed.
+- Slice 2 commit `4e30264fa…` pushed with its commit-trail comment.
+- Accepted Browsers preview debt appended; handoff artifacts finalized for independent evaluation.
+- CI run `33276629736` proved Aspire CLI 13.5.3 install/preflight and `runtime.aspire-restore` in both tiers before an unchanged Fresh hydration TS2345 blocked generated quality checking.
+- Test-first Tier-A repair completed: 6/6 parity tests plus scoped check/lint/fmt and repaired GREEN receipt.
 
 ## In Progress
 
-- Slice 2: commit, push, and commit-trail comment.
+- Third commit is being amended with the bounded Tier-A repair; supervisor re-review remains external.
 
 ## Next Steps
 
-1. Commit and push the atomic pin slice, then post its evidence.
-2. Append the Browsers preview debt entry and finalize the handoff artifacts.
-3. Push slice 3, post its comment, and leave the PR draft for independent evaluation.
+1. Supervisor reruns fresh exact-head Tier-A review of the bounded repair.
+2. Owning Fresh fix clears the generated hydration baseline, then CI runtime tiers rerun.
+3. A separate Fable session performs IMPL-EVAL; coordinator owns readiness and merge.
 
 ## Key Decisions
 
@@ -56,7 +60,7 @@ The RED gate slice is pushed on draft PR #1727. The atomic Aspire train now uses
 | --- | --- | --- |
 | Static | slice 1 PASS | focused test/check/fmt; RED parity receipt expected FAIL |
 | Fitness | PASS | scoped owned-file wrappers, `quality:scan`, `arch:check` |
-| Runtime | CI-owned | Draft PR checks |
+| Runtime | BLOCKED_BASELINE | Actions run `33276629736`; Aspire setup passed, Fresh generated check failed |
 | Consumer | PASS | asset generation/freshness and generator assertions |
 
 ## Open Questions
@@ -71,4 +75,5 @@ The RED gate slice is pushed on draft PR #1727. The atomic Aspire train now uses
 ## Commits
 
 - `95680776…` — RED parity contract and receipt.
-- Slice 2 pending commit; exact GREEN receipt is in `receipts/parity-phase1-green.json`.
+- `4e30264fa…` — atomic 13.5 train and exact GREEN receipt.
+- Third commit at current branch HEAD: accepted preview debt, Tier-A parity repair, and evaluator handoff.
