@@ -61,9 +61,9 @@ cleanup without a live MySQL instance.
   example and stays green before generation and after cleanup; a static import would fail `TS2307`.
 - Split evidence honestly: the ordinary root check validates the stable example shell, while a
   gate-5 check of the actual example with a scratch-generated client validates its real
-  `PrismaClient` factory, query, and disconnect types. Keep the scratch-only compatibility wrapper
-  as D17 evidence and the import-only smoke as runtime-resolution evidence. With generated output
-  absent, the root check still does not type `PrismaClient` or `prisma`.
+  `PrismaClient` factory, query, and disconnect types and supplies the D17 evidence. Keep the
+  import-only smoke as runtime-resolution evidence. With generated output absent, the root check
+  still does not type `PrismaClient` or `prisma`.
 - Narrow `PrismaMySqlResultSet.columnTypes` to Prisma's `SqlResultSet['columnTypes']` contract so
   the factory is structurally accepted by a real Prisma 7 generated client; this is a type-only
   compatibility correction in the already-approved `src/adapter.ts` path.
@@ -131,7 +131,7 @@ cleanup without a live MySQL instance.
 
 | Decision                             | Status                                               | Notes                                                                                                                                                                                                                                                                   |
 | ------------------------------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Actual example import                | Resolved: literal dynamic import + actual-file proof | Deno 2.9.5 leaves the literal dynamic import unresolved while generated output is absent, so the clean root check selects all 12 files and remains green. With the client present, gate 5 types the actual example, retains the D17 wrapper, and runs the import smoke. |
+| Actual example import                | Resolved: literal dynamic import + actual-file proof | Deno 2.9.5 leaves the literal dynamic import unresolved while generated output is absent, so the clean root check selects all 12 files and remains green. With the client present, gate 5 types the actual example, supplies the D17 evidence, and runs the import smoke. |
 | Translation seam                     | Resolved: internal-source export                     | No package-root export and no runtime injection.                                                                                                                                                                                                                        |
 | Focused test location                | Resolved: extend existing file                       | `connection_errors_test.ts` owns mapping and cleanup assertions.                                                                                                                                                                                                        |
 | TLS behavior                         | Resolved: deprecate and characterize                 | D12 documents and pins the exact legacy mapping without changing runtime semantics.                                                                                                                                                                                     |
@@ -165,15 +165,15 @@ The package example's Prisma block becomes live code. It does not call `factory.
 a rare direct-connect caller owns `dispose()`. With generated output absent, the checked-in literal
 dynamic import still leaves `PrismaClient` and `prisma` untyped during the ordinary root check. That
 gate proves the stable shell and its control-flow shape, not generated-client compatibility. With
-the client present, gate 5 checks the actual example itself against real generated types; the
-scratch wrapper remains focused D17 evidence and the smoke proves guarded runtime import.
+the client present, gate 5 checks the actual example itself against real generated types, supplies
+the D17 evidence, and proves guarded runtime import through the smoke.
 
 ## Commit slices
 
 | # | What the slice proves                                                                                                                                                                                                                                                   | Seven-path files                                                                     | Proving gates                                                                                                                                                                                                                                                                                               |
 | - | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | The source contract deprecates the misleading TLS member, narrows the result-set declaration to Prisma's real `SqlResultSet` contract, documents every accepted structured option honestly, and has a narrow non-public test seam with legacy-mapping/cleanup evidence. | `src/adapter.ts`, `src/types.ts`, `tests/connection_errors_test.ts`; run artifacts   | Focused characterization tests; generated-client compatibility probe; package check/lint/fmt; quality/architecture gate; debug-namespace assertion.                                                                                                                                                         |
-| 2 | The package example and every published explanation use the same factory/query/cleanup and mysql2/runtime story without leaving the tracked tree permanently unresolved.                                                                                                | `src/mod.ts`, `README.md`, `examples/basic-usage.ts`, site `index.md`; run artifacts | Ordinary clean root check before generation and after cleanup; gate-5 structured check of the actual example with a generated client; scratch D17 compatibility wrapper; guarded actual-module import smoke; docs source/accuracy; full export-map doc lint; publish dry-run; JSR audit; seven-path census. |
+| 2 | The package example and every published explanation use the same factory/query/cleanup and mysql2/runtime story without leaving the tracked tree permanently unresolved.                                                                                                | `src/mod.ts`, `README.md`, `examples/basic-usage.ts`, site `index.md`; run artifacts | Ordinary clean root check before generation and after cleanup; gate-5 structured check of the actual example with a generated client; guarded actual-module import smoke; docs source/accuracy; full export-map doc lint; publish dry-run; JSR audit; seven-path census. |
 
 No implementation slice starts in this planning turn. Cycle 2 is terminal and no further evaluator
 is authorized. Focused Tier-A reviews this amendment; implementation still requires a separate later
@@ -223,38 +223,11 @@ The exact `.llm/tmp/prisma-example-check-deno.json` is:
 Disabling `isolatedDeclarations` here matches a generated-client consumer rather than applying the
 workspace's library-publication setting to generated code.
 
-The exact `.llm/tmp/prisma-example-compatibility.ts` remains a focused D17 probe rather than the
-sole evidence for the shipped example:
-
-```ts
-import { PrismaClient } from '../../packages/prisma-adapter-mysql/examples/.generated/client.ts';
-import { PrismaMySql } from '../../packages/prisma-adapter-mysql/mod.ts';
-
-const adapter = new PrismaMySql({
-  hostname: 'localhost',
-  username: 'root',
-  db: 'test',
-});
-
-async function verifyGeneratedClientCompatibility(): Promise<void> {
-  const prisma = new PrismaClient({ adapter });
-
-  try {
-    await prisma.$queryRawUnsafe('SELECT 1 + 1 AS result');
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-void verifyGeneratedClientCompatibility;
-```
-
 Run generation with
 `deno run -A --no-lock npm:prisma@7.8.0 generate --schema .llm/tmp/prisma-example/schema.prisma`.
 With the client present, first check the actual example through the structured wrapper:
 `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/prisma-adapter-mysql/examples/basic-usage.ts --ext ts --deno-arg --config=.llm/tmp/prisma-example-check-deno.json`.
-It must select one file with zero diagnostics. Then run the structured check on the scratch D17
-compatibility wrapper. Next run the import-only smoke
+It must select one file with zero diagnostics. Next run the import-only smoke
 `deno eval --no-lock --config=.llm/tmp/prisma-example-check-deno.json 'await import(new URL("./packages/prisma-adapter-mysql/examples/basic-usage.ts", import.meta.url).href); console.log("dynamic-import-smoke:ok")'`.
 The smoke precondition is the example's `import.meta.main` guard: the `main()` invocation must
 remain exclusively inside that guard. Importing the module therefore executes its generated-client
@@ -290,7 +263,7 @@ remaining evidence is static/unit evidence, and this leaf does not alter scaffol
 | Risk                                                                          | Mitigation                                                                                                                                                                                                                                                                       |
 | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Driver prose is corrected in only one surface                                 | Apply every `Correct`/`Delete` census row, rerun the seven-path search, and require only the allowlisted debug namespace to remain.                                                                                                                                              |
-| Dynamic example shell passes while generated-client compatibility is unproved | Keep the two jobs separate and named: gate 1 selects the tracked shell before generation and after cleanup while leaving client values untyped; gate 5 checks the actual example with the real generated client, retains the D17 wrapper, and executes the guarded import smoke. |
+| Dynamic example shell passes while generated-client compatibility is unproved | Keep the two jobs separate and named: gate 1 selects the tracked shell before generation and after cleanup while leaving client values untyped; gate 5 checks the actual example with the real generated client, supplies the D17 evidence, and executes the guarded import smoke. |
 | Package root is green only because the example was excluded                   | Gate 1 uses the ordinary package root with no `--exclude`, requires 12 selected files, and is repeated after cleanup. A `deno.json` exclusion is forbidden and outside the seven-path ceiling.                                                                                   |
 | Example recreates the connected-adapter mistake                               | Gate 5 checks the actual example under real generated types; the evaluator observed `TS2741` (“Property 'connect' is missing”) when a connected adapter was passed instead of the factory.                                                                                       |
 | `$disconnect()` and manual `dispose()` both run                               | Use only `$disconnect()` in Prisma flow; document direct-connect ownership separately.                                                                                                                                                                                           |
