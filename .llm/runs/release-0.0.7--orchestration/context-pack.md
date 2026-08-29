@@ -1194,3 +1194,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
   export corpus, publish-assets mirror). After explicit push: fresh exact-head Tier-A/CI and a new
   independent IMPL-EVAL are mandatory. This race/cancellation is not an IMPL-EVAL failure cycle.
 - Docker 0, Aspire 0, and no expensive/runtime lease.
+
+## Resume checkpoint — 2026-08-29T21:45:00Z
+
+- S1 / PR #1727 is clean and remote-equal at `68b0aef878a45ae4460b1625679040faab0f6a72`,
+  but coordinator Tier-A is held on two exact fail-closed repairs: missing non-lockfile manifest
+  paths must fail `ok`, and exact-current-train mismatches must be exhaustively negative-tested for
+  every phase-1 fail-class pin. The same author repairs; no S2, readiness flip, or evaluator yet.
+- Exact-head e2e run `33276629736` completed: desktop passed; scaffold lanes found a common
+  pre-existing Fresh/TanStack `DehydratedState` readonly mismatch outside S1 scope. Preserve this as
+  separate baseline drift, not as permission to waive S1 findings.
+- #1711 is draft / `status:impl`, clean and remote/PR-equal at `067193acf`. Its complete generated
+  cascade and harness receipt are pushed; fixes owns a pristine exact-head Tier-A, followed by a new
+  independent opposite-family IMPL-EVAL only if Tier-A passes.
+- #1371 is still active in the existing recovered author lane at RED `099370709`; no remote branch
+  exists yet. Local environment remains Docker 0 / Aspire 0.

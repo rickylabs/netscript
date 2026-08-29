@@ -1075,3 +1075,17 @@ implementation thread.
 - **A stale evaluator should be cancelled once head drift is proven.** Run `33275424854` could not
   authorize #1711 after `bbaf70d64` advanced to `a727c7565`; cancelling it avoided further spend and
   is a control-plane containment action, not a terminal IMPL-EVAL failure.
+
+## 2026-08-29 — S1 parity fail-closed review and unrelated e2e baseline drift
+
+- A summary counter is not a gate verdict: S1 counted missing manifest paths separately but derived
+  `ok` only from `fail === 0`. Every required missing row must participate in failure semantics and
+  have a negative test.
+- A stale-version regex limited to older minors cannot prove an exact current patch train. Each
+  phase-1 fail-class pin needs an exhaustive exact-value assertion or equivalent companion policy
+  gate; otherwise a wrong 13.5.x patch can be present yet unselected.
+- Exact-head workflow dispatch runs all e2e lanes when no diff is classified. Run `33276629736`
+  therefore consumed the desktop and scaffold tiers; desktop passed, while all scaffold failures
+  converged on an unrelated generated Fresh/TanStack hydration type mismatch. Keep baseline drift
+  separate from branch-owned S1 acceptance and retain the owner's release-cut/explicit-label policy
+  for expensive non-critical lanes.

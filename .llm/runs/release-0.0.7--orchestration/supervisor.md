@@ -1273,3 +1273,24 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - #1371 remains healthy and CPU-active in the same recovered author thread. Its focused 69/69 proof,
   root lint, and root format are green; the existing root check/test processes continue without a
   duplicate launch. Docker and Aspire remain empty and no expensive-gate lease exists.
+
+## 2026-08-29T21:45:00Z — exact-head holds enforced while lanes continue
+
+- Aspire S1 is clean and remote-equal at amended evidence head `68b0aef878a45ae4460b1625679040faab0f6a72`.
+  Coordinator review withheld Tier-A sign-off because missing required manifest paths do not affect
+  `ok`, and the 13.0–13.4 stale selector does not prove exact-current-train mismatches for every
+  phase-1 fail-class pin. The bounded same-author repair is mandatory; hold comment:
+  <https://github.com/rickylabs/netscript/pull/1727#issuecomment-5465054608>. PR #1727 stays draft;
+  no S2 dispatch or local runtime lease.
+- Dispatched exact-head e2e run `33276629736` completed with desktop success and three scaffold
+  failures. The common `packages/fresh` `DehydratedState` readonly mismatch is outside S1's changed
+  paths and was independently classified as baseline drift; it cannot waive the two branch-owned
+  parity defects or authorize sign-off.
+- #1711 is now clean, explicitly pushed, and PR-equal at
+  `067193acff68254b4bd4c6e5d7824f80a9db2b26`. Commits `361feca71` and `067193acf` carry the exact
+  three generated derivatives and harness cascade receipt. Fixes is running fresh Tier-A from a
+  pristine archive; the PR remains draft / `status:impl` until a new independent exact-head
+  IMPL-EVAL returns PASS.
+- #1371 continues in the preserved implementation thread at RED commit `099370709`; its production
+  fail-fast and harness records remain the only dirty paths while exact-head review completes.
+  Docker and Aspire application counts remain zero.

@@ -1996,3 +1996,20 @@
 - #1371 focused neighborhood tests are 69/69, root lint/fmt are green, and the same root check/test
   processes are still progressing. No runtime command or lease was used. Environment audit remains
   Docker 0 / Aspire 0.
+
+## 2026-08-29T21:45:00Z — coordinator review prevents S1 false-green; #1711 reaches Tier-A
+
+- Reconciled S1's amended pushed head `68b0aef878a45ae4460b1625679040faab0f6a72`. Direct review
+  proved two branch-owned false-green paths in the parity checker: missing required manifest rows
+  increment `missing` without failing `ok`, and a wrong 13.5.x patch is outside the 13.0–13.4 stale
+  selector unless every phase-1 fail-class pin has an exhaustive companion assertion. Posted the
+  exact bounded repair hold on PR #1727 and kept the PR draft.
+- Run `33276629736` exercised the exact S1 head. Desktop passed. Static and both runtime scaffold
+  jobs exposed the same generated Fresh/TanStack hydration type drift, including the readonly
+  `DehydratedState.mutations` mismatch in `packages/fresh`; this is outside S1's pin-only product
+  delta and is recorded separately from the required parity correction.
+- Verified #1711 local, remote, and PR equality at `067193acff68254b4bd4c6e5d7824f80a9db2b26`.
+  The same author committed the three proven generated derivatives at `361feca71`, then the durable
+  cascade record at `067193acf`. Fixes began fresh exact-head Tier-A in a tracked-only archive.
+- #1371 remains active without a duplicate implementation launch. Local Docker count is 0 and
+  `aspire ps --format Json` returns `[]`.
