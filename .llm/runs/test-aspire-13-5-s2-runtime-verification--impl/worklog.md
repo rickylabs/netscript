@@ -81,6 +81,8 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 | `2026-08-29T22:53:25Z` | 3         | Toolkit restore | Deno toolkit 13.5.0 restored in scratch; `addDenoApp` and `addDenoTask` projected.                                                       |
 | `2026-08-29T22:53:33Z` | 3         | doctor          | JSON doctor exited 0 with 6 pass, 4 warning, 0 failure.                                                                                  |
 | `2026-08-29T22:53:36Z` | 3         | deploy help     | Publish/deploy/destroy help all exited 0 and retained adapter-required flags.                                                            |
+| `2026-08-29T23:02:18Z` | 4         | owned teardown  | Reporter proved the lone persistent Postgres container owned; apply removed exactly it with no escalation.                               |
+| `2026-08-29T23:02:28Z` | 4         | final leak gate | Leak report clean; `aspire ps` empty; Docker empty.                                                                                      |
 
 ## Decisions
 
@@ -111,21 +113,23 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 | ------------------------- | ----------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
 | branch/head preflight     | raw git status/rev-parse                                    | PASS   | Clean branch at assigned baseline.                                                                       |
 | generated AppHost compile | `./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json` | PASS   | Exit 0 after generated workspace dependency materialization; options-object health-check calls accepted. |
+| harness tooling receipt   | `run-gate.ts --gate harness-tooling-check ...`              | PASS   | Atomic JSON receipt; 9 checked tooling entrypoints, exit 0, 2.939 s.                                     |
 
 ### Fitness Gates
 
-| Gate                              | Result         | Evidence  | Notes                        |
-| --------------------------------- | -------------- | --------- | ---------------------------- |
-| Source alignment/scope separation | PENDING_SCRIPT | `plan.md` | Manual review at each slice. |
+| Gate                              | Result   | Evidence                           | Notes                                                            |
+| --------------------------------- | -------- | ---------------------------------- | ---------------------------------------------------------------- |
+| Source alignment/scope separation | RECORDED | `receipts/04-cleanup-and-scope.md` | Final diff limited to run evidence and append-only debt outcome. |
 
 ### Runtime Gates
 
-| Gate                     | Result   | Evidence                                         | Notes                                                                              |
-| ------------------------ | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| V1–V12                   | PENDING  | `receipts/aspire-13.5-verification.md`           | Filled as probes execute; final table will contain no unexecuted row.              |
-| Slice 1 scaffold/restore | PASS     | `receipts/01-scaffold-restore.md`                | Restore exit 0; regenerated 13.5.3 module; AppHost compile exit 0.                 |
-| Slice 2 V1–V7            | RECORDED | `receipts/02-runtime-lifecycle.md`               | Implementation evidence captured; contains real failures and no evaluator verdict. |
-| Slice 3 V8–V12           | RECORDED | `receipts/03-v8-mcp.md`; `03-v11-regressions.md` | MCP/toolkit/doctor/deploy/regression evidence captured without product edits.      |
+| Gate                     | Result   | Evidence                                         | Notes                                                                                                       |
+| ------------------------ | -------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| V1–V12                   | RECORDED | `receipts/aspire-13.5-verification.md`           | Every row has observed behavior, command/exit/timestamp, and evidence; external evaluation remains pending. |
+| Slice 1 scaffold/restore | PASS     | `receipts/01-scaffold-restore.md`                | Restore exit 0; regenerated 13.5.3 module; AppHost compile exit 0.                                          |
+| Slice 2 V1–V7            | RECORDED | `receipts/02-runtime-lifecycle.md`               | Implementation evidence captured; contains real failures and no evaluator verdict.                          |
+| Slice 3 V8–V12           | RECORDED | `receipts/03-v8-mcp.md`; `03-v11-regressions.md` | MCP/toolkit/doctor/deploy/regression evidence captured without product edits.                               |
+| Slice 4 cleanup          | PASS     | `receipts/04-cleanup-and-scope.md`               | Exact owned survivor removed; final leak report has no Aspire resources.                                    |
 
 ### Consumer Gates
 
@@ -138,8 +142,7 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 - Fable supervisor should inspect exact ownership/cleanup evidence and every deviation from the
   13.4.6 shipped skill before any sign-off.
 - Slice 1 reconcile: issue #1714 remains open and fully owned by this resolving branch; required
-  closing keyword will be placed in the draft PR body. No new issue/PR comments existed at
-  bootstrap.
+  closing keyword is in the draft PR body. No new issue/PR comments existed at bootstrap.
 - Slice 1 commit `71a14e3b98fe1dad5d9294fe53f45b706f6f11c2` pushed with
   `git push origin HEAD:refs/heads/test/aspire-13-5-s2-runtime-verification`; remote line:
   `HEAD -> test/aspire-13-5-s2-runtime-verification`. Draft PR #1735 opened with the assigned
@@ -147,3 +150,9 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 - Slice 2 commit `0956b2d3d` pushed with the same explicit refspec; remote line:
   `71a14e3b9..0956b2d3d HEAD -> test/aspire-13-5-s2-runtime-verification`. PR comment `5465379259`
   records scope, SHA, evidence, divergences, and evaluator separation.
+- Slice 3 commit `cef4ec83b` pushed with the same explicit refspec; remote line:
+  `0956b2d3d..cef4ec83b HEAD -> test/aspire-13-5-s2-runtime-verification`. PR comment `5465385856`
+  records scope, SHA, evidence, divergences, and evaluator separation.
+- Final push command: `git push origin HEAD:refs/heads/test/aspire-13-5-s2-runtime-verification`.
+- Implementation handoff intentionally leaves PR #1735 draft with `status:impl`; Fable owns
+  IMPL-EVAL, any acceptance-checkbox mirroring, and readiness.

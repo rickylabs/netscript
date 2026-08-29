@@ -974,6 +974,11 @@ finding into a debt entry.
 - **Status:** open. Slice 5 records `PASS_WITH_CLI_DEBT` evidence in
   `.llm/tmp/run/feat-cli-aspire-otel-parity/baseline-csharp-trace.md`; slice 6 may compare trace
   shape through the Dashboard API, but final PR must not claim the `aspire otel` CLI path passed.
+- **Aspire 13.5.3 re-verification (2026-08-30, #1714):** The generated-project runtime pass
+  reproduced the same discovery boundary: bare `aspire otel logs --format Json -n 10` exited 12 in
+  0.34 s with `dashboard unavailable`, while the same probe with the exact `--dashboard-url` exited
+  0 in 0.62 s. The debt remains open and the generated telemetry fallback remains required.
+  Evidence: `.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v4-*`.
 - **Gate:** runtime - C# baseline, runtime - telemetry
 
 ## packages/cli — legacy C# scaffold plugin-add incompatibility (`legacy-csharp-scaffold-plugin-add`)
