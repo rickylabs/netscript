@@ -27,6 +27,18 @@
   (OF-1).
 - Pins live in 14 places; `e2e-cli-prod` already on a 13.5 preview; new parity gate proposed (D-2).
 
+## Implementation phase (from 2026-08-29)
+
+- Ratified on `0ba8c2fcf`; GitHub is now the source of truth: epic #1712; S1 #1713, S2 #1714, S3
+  #1715, S4 #1716, S5 #1717, S6 #1718, S7 #1719, S8 #1720, S9 #1721, S10 #1722, S11 #1723, S13 #1724
+  (0.0.7); S12 #1725, S6b #1726 (0.0.8). `FILING-LOG.md` has labels/milestones/actions.
+- Supervisor: this Fable 5 medium session (serial Sol implementation agents, one child at a time,
+  Tier-A review before sign-off, independent IMPL-EVAL). Coordinator keeps milestone authority,
+  runtime/expensive leases, merges, canary admission, ledger.
+- Slice worktrees: S1 → `/home/codex/repos/netscript-aspire-13-5-s1` on
+  `chore/aspire-13-5-s1-pin-bump` off `origin/main` `3b32d1628`, no upstream. Slice state under
+  `slices/s1/`.
+
 ## Repair state (PLAN-EVAL cycles 1 and 2)
 
 Cycle 2 (`plan-eval-cycle-2.md`, head `1bfe60b05`) = FAIL_PLAN on six consistency findings; all six
