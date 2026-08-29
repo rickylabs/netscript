@@ -2246,3 +2246,58 @@ but its label guard makes that true only once the label is applied. Ordering use
 No push was made at any point — a push would move the head and invalidate the IMPL-EVAL verdict.
 Head remained `30df7b9ff8e3370a7420e5da1c46476253c05b0d` across every body, label, and draft change,
 verified after each.
+
+### Close-gate cycle 1: `FAILURE` — root-caused to my own ordering error
+
+`pr-checks` classification: `current-fail close-gate`, `currentFailures=1`, head still `30df7b9ff`.
+Not a stale or superseded red — a real current failure, so worth reading.
+
+Local `check-close-gate.ts` reproduced it exactly: all **seven** #1709 acceptance boxes still
+unchecked. Job step outcomes showed why: step 4 *Mirror structured acceptance evidence* =
+**`success`**, step 5 *Referenced issue acceptance gate* = `failure`. A mirror that succeeds while
+changing nothing is the documented self-skip — exit 0 when live labels lack `status:ready-merge`.
+
+The PR timeline gave the mechanism:
+
+```
+10:39:08  labeled    status:ready-merge     (me)
+10:39:54  ready_for_review                  (me)
+10:39:58  close-gate job starts
+10:40:04  unlabeled  status:ready-merge     (automation)
+10:40:04  labeled    status:impl-eval       (automation)
+10:40:07  close-gate job fails
+```
+
+**Root cause.** `openhands-phase-eval.yml` triggers on `ready_for_review` and owns the harness state
+machine: making a draft PR ready **is** the documented trigger to start an IMPL-EVAL. Its dispatch
+job ran *Enter IMPL-EVAL status on ready transition* — stripping the `status:ready-merge` I had just
+applied — and *Resolve and dispatch exactly one evaluator*, posting the trigger comment that started
+two OpenHands cloud runs. The mirror then read live labels mid-job, found no ready label, skipped,
+and the checker correctly failed on seven unchecked boxes.
+
+Nothing here is a defect in the gate. **The gate behaved exactly as designed; my ordering was
+wrong.** The sanctioned escape hatch `impl-eval:skip` (`.github/labels.yml:170` — "Skip automatic
+ready-for-review IMPL-EVAL with attributed evidence") belongs *before* the ready transition, and I
+undrafted without it.
+
+### Repair
+
+- Cancelled both redundant cloud evaluator runs my transition started — `33248357360` and
+  `33248374215`, both now `completed/cancelled`. A second automatic IMPL-EVAL would have duplicated
+  the native `PASS_IMPL`, not added to it, and would have spent cloud credit doing so.
+- Posted an attributed `impl-eval:skip` comment (`5461873432`) stating the native opposite-family
+  IMPL-EVAL result, that this skips the *automatic dispatch* rather than waiving the evaluation
+  gate, and recording my ordering error plainly.
+- Applied `impl-eval:skip`; restored `status:ready-merge` and removed `status:impl-eval`. Verified
+  exactly one `status:` label. Adding `impl-eval:skip` and `status:ready-merge` matches none of the
+  dispatcher's `labeled` conditions, and the PR is already non-draft, so no further
+  `ready_for_review` can fire — the revert cannot recur.
+- Re-validated the mirror by dry-run afterwards: it **did not skip**, which is live proof the ready
+  label is in effect. Mapping still `ok`.
+
+Head remained `30df7b9ff8e3370a7420e5da1c46476253c05b0d` throughout; no push, no head movement, so
+the IMPL-EVAL verdict remains bound to the evaluated head.
+
+`gh run rerun --failed` was refused with "This workflow is already running" — `check-test` was still
+in flight. Waiting for the run to settle before rerunning the close-gate job, rather than pushing to
+force a fresh run, which would move the head and void the verdict.
