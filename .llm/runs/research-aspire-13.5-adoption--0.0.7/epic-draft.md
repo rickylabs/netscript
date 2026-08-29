@@ -41,10 +41,19 @@ breaking-change exposure — none at source level — pin inventory, regeneratio
    health checks; typed resource commands (S4–S6, S8).
 4. **CI/E2E/teardown determinism** — `stop --force`, doctor receipts, `describe --follow` evidence,
    descendant-aware leak-check (S7, S10).
-5. **Agent surface alignment** — skills, corpora, Aspire MCP wiring, upstream skill install policy,
-   all regenerated through their generators, no hand-edited mirrors (S9).
+5. **Agent surface alignment, proven** — skills, corpora, Aspire MCP wiring, upstream skill install
+   policy, all regenerated through their generators, no hand-edited mirrors, plus an exact-13.5 MCP
+   smoke receipt (server from the generated `.mcp.json`, 15 tools incl. `get_integration_docs` and
+   `refresh_tools`, doctor pass, resource visibility) diffed against the committed 13.4.6 baseline
+   (S9).
 6. **Public docs** — every Aspire-mentioning page re-read against 13.5 (S11).
-7. **Next-wave spikes** — `addDenoApp` through the CommunityToolkit TS projection,
+7. **Whole-ecosystem stale-surface cleanup** — every Aspire-bound surface (MCP server/client,
+   bundled and static resources, generated references/snapshots/schemas, project-local and
+   distributed skills/corpora/prompts, CI workflows and fixtures, examples/templates,
+   dashboard/telemetry bridge, every public/internal document) has one authoritative current-version
+   source and one repo-path disposition in `stale-surface-inventory.md`; the parity gate carries an
+   explicit archival exemption list so historical design evidence is never rewritten (S13).
+8. **Next-wave spikes** — `addDenoApp` through the CommunityToolkit TS projection,
    `withPostgresMcp`, NetScript MCP as a resource MCP server (S12, 0.0.8).
 
 ## Sub-issues
@@ -60,17 +69,19 @@ breaking-change exposure — none at source level — pin inventory, regeneratio
 - [ ] S7 — Teardown/leak-check on 13.5: orphan cleanup, `stop --force`, descendant tracking (closes
       #1429) (p1)
 - [ ] S8 — Typed resource commands for db-cli-mode resources (closes #863 with S6) (p1)
-- [ ] S9 — Skills, corpora, and Aspire MCP alignment (depends on #1675) (p1)
+- [ ] S9 — Skills, corpora, and Aspire MCP alignment + exact-13.5 MCP smoke receipt (depends on S1,
+      S2, #1675) (p1)
 - [ ] S10 — E2E gate upgrades: doctor receipt, `describe --follow` evidence, `stop --force` cleanup,
       resource-command gate class (p1)
 - [ ] S11 — Public docs + README refresh for Aspire 13.5 (closes #1642, #1000) (p2)
+- [ ] S13 — Stale version-bound surface cleanup + parity-gate archival exemption list (p2)
 - [ ] S12 — 0.0.8 spikes: `addDenoApp` projection proof, `withPostgresMcp` opt-in, NetScript MCP as
       resource MCP server (0.0.8, p2)
 
 ## Sequencing and canaries
 
 ```text
-S1 → S2 → { S3, S4 → S5 → S6 → S8, S7, S9 } → S10 → S11 ;  S12 after canary B (0.0.8)
+S1 → S2 → { S3, S4 → S5 → S6 → S8, S7, S9 } → S10 → S11 → S13 ;  S12 after canary B (0.0.8)
 canary A after S1–S4 (pin train)   ·   canary B after S5, S6, S8 (generated-output train)   ·   stable after S9–S11 + IMPL-EVAL
 ```
 
@@ -96,6 +107,7 @@ debt); OF-3 pull #979 into 0.0.7 (default: yes); OF-4 docs lane (default:
 
 ## Definition of done
 
-- All S1–S11 merged to `main`; canary A and canary B published and green on `e2e-cli-prod`;
-  IMPL-EVAL PASS recorded; `check:aspire-version-parity` green; no `13.4.6` literal remains outside
-  version-suffixed fixtures and changelog prose; S12 filed in 0.0.8 with its restore proof attached.
+- All S1–S11 and S13 merged to `main`; `receipts/aspire-13.5-mcp-smoke.json` committed and green;
+  canary A and canary B published and green on `e2e-cli-prod`; IMPL-EVAL PASS recorded;
+  `check:aspire-version-parity` green; no `13.4.6` literal remains outside version-suffixed fixtures
+  and changelog prose; S12 filed in 0.0.8 with its restore proof attached.

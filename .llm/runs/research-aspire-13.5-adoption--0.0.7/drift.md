@@ -57,3 +57,29 @@
   from external NuGets is not projected into the TS SDK; the aspire.dev TS API reference lists
   `CommunityToolkit.Aspire.Hosting.Deno` (`addDenoApp`, `addDenoTask`).
 - Action: not adopted in 0.0.7 (D-4); S2 V9 proves it at restore time, S12 spikes it in 0.0.8.
+
+## D-8 — Coordinator scope expansion to whole-ecosystem alignment
+
+- Severity: plan-shaping
+- Owner/coordinator correction (2026-08-29): audit and dispose every Aspire-bound surface (MCP
+  server/client, static resources, generated snapshots/schemas, skills/corpora/prompts, CI
+  workflows/fixtures, examples/templates, dashboard/telemetry bridge, all docs) with one
+  authoritative source and one repo-path disposition; include cleanup in the issue graph.
+- Action: `stale-surface-inventory.md` (7 surface classes, archival exemption list), research
+  C26–C31 + §12a, plan D-11/D-12, new slice S-13, epic pillar 7.
+
+## D-9 — S-09 acceptance was prose-only
+
+- Severity: acceptance
+- Correction: S-09 must prove the MCP upgrade behaviour with a structured receipt tied to S-01/S-02.
+- Action: `sub-issues/09` rewritten (Part A smoke gate `agent.aspire-mcp-smoke`, JSON receipt path
+  `.llm/tmp/gate-receipts/<job>/agent.aspire-mcp-smoke.json`, committed copy
+  `receipts/aspire-13.5-mcp-smoke.json`); 13.4.6 baseline captured now in
+  `receipts/aspire-13.4.6-mcp-baseline.json` (executed via the session's Aspire MCP server —
+  `doctor` + tool discovery; no AppHost started).
+
+## D-10 — Shipped skill's 13.4.6 MCP table is already incomplete
+
+- Severity: minor (evidence)
+- Observation: the 13.4.6 server exposes `refresh_tools`, which the "verified tool set on 13.4.6"
+  table in `skills/aspire/SKILL.md` omits. Not a 13.5 change; S-09's receipt-driven table fixes it.

@@ -6,8 +6,9 @@
   `/home/codex/repos/netscript-007-aspire-13-5-research`), baseline `cf648f1ff`. Orchestrator Fable
   5 medium, session `session_011Ng6hnMLyY8vzM8EJo2XKg`.
 - **All research deliverables are complete and pushed**: `research.md`, `plan.md`, `epic-draft.md`,
-  `sub-issues/01…12`, `existing-issue-map.md`, `sources/` (verbatim upstream Markdown), `drift.md`
-  D-1…D-7, `worklog.md`.
+  `sub-issues/01…13`, `existing-issue-map.md`, `stale-surface-inventory.md` (whole-ecosystem
+  surfaces + archival exemption list), `receipts/aspire-13.4.6-mcp-baseline.json`, `sources/`
+  (verbatim upstream Markdown), `drift.md` D-1…D-10, `worklog.md`.
 - Nothing was created on GitHub; no product code, generated file, or static resource was touched.
 - Local Aspire CLI is still 13.4.6 (not upgraded); no AppHost was started.
 

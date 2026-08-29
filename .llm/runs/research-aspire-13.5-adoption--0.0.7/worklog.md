@@ -39,4 +39,14 @@ files the epic and PLAN-EVAL passes.
 Required (multi-PR wave, three architecture decisions, owner forks). Evaluator route per
 `lane-policy.md`: fresh native opposite-family session — Codex · GPT-5.6 Sol · high — reading
 `research.md`, `plan.md`, `existing-issue-map.md`, `epic-draft.md`, `sub-issues/`. Not launched by
-this orchestrator (coordinator owns dispatch).
+this orchestrator (coordinator owns dispatch). | 2026-08-29 | Coordinator amendment (scope
+expansion + S-09 acceptance correction). Repo-wide version-bound sweep (`rtk grep` pattern in
+research §12a) → `stale-surface-inventory.md` with 7 surface classes, authoritative-source
+vocabulary, per-path dispositions, and an explicit archival exemption list. |
+`stale-surface-inventory.md` | | 2026-08-29 | Executed cheap MCP baseline via the session's Aspire
+MCP server (`doctor`, `list_apphosts`, tool discovery): CLI 13.4.6, 14 tools, `refresh_tools`
+present, `get_integration_docs` absent. No AppHost started. |
+`receipts/aspire-13.4.6-mcp-baseline.json` | | 2026-08-29 | S-09 rewritten with the
+`agent.aspire-mcp-smoke` gate + JSON receipt schema tied to S-01/S-02; new S-13 stale-surface
+cleanup; plan D-11/D-12, DAG, rollback, archival section; epic pillar 7 + checklist; research
+C26–C31 + §12a; drift D-8…D-10. | run dir |
