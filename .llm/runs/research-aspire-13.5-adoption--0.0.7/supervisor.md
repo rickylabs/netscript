@@ -91,3 +91,10 @@ the primary coordinator ratifies and publishes the issue graph.
   supervisor (serial Sol implementation agents per slice in owned worktrees; the primary Sol high
   coordinator keeps milestone authority, leases, merges, canary admission, ledger;
   PLAN-EVAL/IMPL-EVAL agents stay independent).
+
+## Runtime lease (2026-08-30)
+
+- Granted by the primary coordinator for S2 (#1714): host Aspire CLI upgraded 13.4.6 → 13.5.3
+  (dotnet global tool), one isolated generated AppHost at a time, V1–V12 probes, owned cleanup.
+  Safety rule in `supervisor.md` "Research is read-only against Aspire/AppHost runtime" is
+  superseded for this lease only; S1/S3+ remain non-runtime unless the coordinator grants again.
