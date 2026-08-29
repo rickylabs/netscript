@@ -54,6 +54,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | --- | --- | --- | --- |
 | 2026-08-30T00:34:50+02:00 | S0 | research | Exact 5.102.8 reproduction failed with TS2345; range restored cleanly. |
 | 2026-08-30T00:34:50+02:00 | S0 | plan gate | `PLAN-EVAL: N/A` — small mechanical issue with fixed contract, explicit acceptance, exact reproduction, locked two-version gate, and no public-surface decision remaining. |
+| 2026-08-30T00:41:00+02:00 | S1 | RED | Structured focused test exited 1 with the single expected TS2345 readonly/mutable incompatibility under exact query-core 5.102.8. Production source was still untouched. |
 
 ## Decisions
 
@@ -75,6 +76,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Baseline reproduction | exact no-lock check with temporary 5.102.8 pin | FAIL (expected) | TS2345 at `hydration.ts:43`; package range restored |
+| S1 RED regression | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-version-compat_test.ts` | FAIL (expected), exit 1 | 0 passed / 1 failed; child check reports only TS2345 at `hydration.ts:43` |
 
 ### Fitness Gates
 
