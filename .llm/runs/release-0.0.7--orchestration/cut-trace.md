@@ -16,3 +16,21 @@ production E2E.
   - `9634735bc0` — #1686
 - This is not a publication membership record. Canary membership remains unset until the documented
   release publication phase begins.
+
+## Foundations canary qualification — 2026-08-29
+
+- Declared content boundary: `checkpoint-foundations` at exact first-parent `main`
+  `cf648f1ff973d74c213bb125a6f5f5b9328e693b`, before any re-intake leaf merge.
+- Main is clean and `origin/main` resolves to the same SHA.
+- Fresh local evidence on that SHA:
+  - structured `check`: PASS, 2,925 files, 25 batches, 0 failed batches/findings;
+  - structured `test`: PASS, 4,222 passed / 0 failed / 19 ignored;
+  - `release:preflight`: PASS for text imports, import attributes, file URLs, and self imports;
+  - `publish:readiness`: PASS for 35 effective members, reference coverage, version pins,
+    specifiers, first-publish/provisioning, and import-attribute preflight;
+  - quality/architecture: PASS (`quality:gate`, 25.5 s); doctrine warnings remain advisory with zero
+    failures.
+- Actual publication remains workflow-only through `release-canary.yml`. The workflow must record
+  the JSR attempt-budget check before minting, derive the immutable canary identity, publish via
+  OIDC, label the actual first-parent payload, and complete exact canary-pinned production E2E.
+- No pending leaf may merge until the workflow captures this content SHA.

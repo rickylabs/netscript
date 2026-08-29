@@ -373,16 +373,16 @@ implementation thread.
 
 - **#1661 cancellation lifetime false green:** Tier-A verified that a signal was forwarded but did
   not execute the lifetime contract. `registerMcpTools` captured its registration options inside
-  every registered call handler, while the README supplied `AbortSignal.timeout(1_500)` as a
-  startup bound and the test asserted the resulting post-timeout rejection. The formal evaluator's
-  before/after-deadline reproduction exposed the defect. New standing rule: cancellation plumbing
-  is not evidence of correct signal scope; lifetime contracts require a time-separated behavioral
-  test, and a test encoding the defect cannot make the gate green.
+  every registered call handler, while the README supplied `AbortSignal.timeout(1_500)` as a startup
+  bound and the test asserted the resulting post-timeout rejection. The formal evaluator's
+  before/after-deadline reproduction exposed the defect. New standing rule: cancellation plumbing is
+  not evidence of correct signal scope; lifetime contracts require a time-separated behavioral test,
+  and a test encoding the defect cannot make the gate green.
 - **#1658 Fable availability failure:** probe `e58c5f01` failed before inference with null tokens,
   no output artifact, and no repository mutation. It consumes zero formal cycles. The coordinator
   explicitly amended the route to the internals lane's established native Opus 5/medium Remote
-  Control fallback, rather than silently substituting or relaunching Fable. Replacement identity
-  was recorded before evaluator mutation.
+  Control fallback, rather than silently substituting or relaunching Fable. Replacement identity was
+  recorded before evaluator mutation.
 - **Autonomy interpretation:** a terminal `FAIL_FIX` inside an already-authorized surface does not
   require another one-word coordinator grant. The fixes supervisor's pause was corrected using the
   owner's standing full-autonomy mandate; only a genuine rescope or owner-only decision should stop
@@ -406,19 +406,19 @@ implementation thread.
 - **#1662 split-close is intentional:** the shipped product surface can merge after exact-head CI,
   while #1293 stays open. Neither the issue's concrete-class wording nor its docs-owned #1112
   criterion is silently rewritten or falsely checked.
-- **The next internals leaf declares an expensive gate before implementation:** `package-gate-honesty`
-  may plan `scaffold.runtime`, but cannot execute Aspire/Docker/Postgres without the coordinator's
-  cluster-wide mutex. The mutex is currently free; a future grant will be tied to a reviewed slice,
-  pre-gate head, and mandatory cleanup proof.
+- **The next internals leaf declares an expensive gate before implementation:**
+  `package-gate-honesty` may plan `scaffold.runtime`, but cannot execute Aspire/Docker/Postgres
+  without the coordinator's cluster-wide mutex. The mutex is currently free; a future grant will be
+  tied to a reviewed slice, pre-gate head, and mandatory cleanup proof.
 
 ## 2026-08-15T10:39:55Z — canonical model token and repair-delta authority
 
 - **Claude model aliases are not interchangeable:** the #1663 supervisor launched `fable-5` from
   `/tmp` without Remote Control; it failed before inference with no artifact or mutation. It then
   started an unauthorized Opus fallback, which the coordinator stopped before mutation. The known
-  working canonical token is `claude-fable-5`; the corrected exact-worktree Remote Control launch
-  is the sole evaluation cycle. Future supervisors must copy canonical tokens from a proven launch,
-  not abbreviate them.
+  working canonical token is `claude-fable-5`; the corrected exact-worktree Remote Control launch is
+  the sole evaluation cycle. Future supervisors must copy canonical tokens from a proven launch, not
+  abbreviate them.
 - **A full product re-evaluation is not required for a bounded post-PASS repair:** #1661 cycle 2
   remains authoritative for the ten-file product contract. The one-file computed-import restoration
   gets a fresh, proportionate formal evaluation over its actual CLI/publish blast radius plus the
@@ -431,17 +431,17 @@ implementation thread.
   command when the structured wrapper has already enumerated and passed files explicitly. For an
   intentionally invalid nested config, the tool family needs one explicit, tested fixture-boundary
   mechanism shared by fmt and lint; configuration prose alone is not evidence. The contract now
-  requires non-empty selection and real-source negative controls so the repair cannot become a
-  broad fixture false green.
+  requires non-empty selection and real-source negative controls so the repair cannot become a broad
+  fixture false green.
 - **Exact-head reruns inspect the full PR:** #1661's evaluator-only final commit caused another
   repo-wide CI run because the PR still contains product changes. The classifier already maps
   `.llm/runs/**` to no capabilities when that is the whole diff; it correctly did not pretend the
   full PR was artifact-only. Redundant elapsed time is not sufficient reason to weaken exact-head
   attestation.
-- **Release gates are not static catalog gates:** #1664's plan treated the absent
-  `scaffold.runtime` catalog entry as missing plumbing. The absence is deliberate: the harness
-  owns it as a suite-run release-gate class. Its exact-head output and central cleanup lease are the
-  evidence; only `fresh-browser` receives a normal run-gate receipt.
+- **Release gates are not static catalog gates:** #1664's plan treated the absent `scaffold.runtime`
+  catalog entry as missing plumbing. The absence is deliberate: the harness owns it as a suite-run
+  release-gate class. Its exact-head output and central cleanup lease are the evidence; only
+  `fresh-browser` receives a normal run-gate receipt.
 
 - **A narrow marker cannot license parent-family suppression:** #1663's first repaired-plan draft
   made a marker inside `doctor/broken` suppress `doctor/healthy` as well. The arithmetic exposed the
@@ -468,8 +468,8 @@ implementation thread.
   already-published typed `clientKey()` surface is both narrower and compatible with 0.0.6-pinned
   consumer apps.
 - **Existing verbs need migration contracts when their owned output expands:** adding client-module
-  regeneration to `service generate` changes what a familiar Aspire-oriented command overwrites.
-  The plan must state owned paths and whether dry-run/force cover both halves before implementation;
+  regeneration to `service generate` changes what a familiar Aspire-oriented command overwrites. The
+  plan must state owned paths and whether dry-run/force cover both halves before implementation;
   naming deterministic output without that compatibility answer is incomplete.
 - **Plan-only PRs now prove the skip classifier live:** #1663, #1664, and #1665 run-artifact-only
   heads skipped check-test, quality, desktop, scaffold runtime/static, dependency, surface, and
@@ -486,12 +486,12 @@ implementation thread.
   expansion; the publish/hash behavior delta and freshness gate are binding evidence.
 - **A task skip and a formatter boundary serve different purposes:** the task-level doctor-family
   exclusion would keep healthy fixtures invisible after the child-only marker repair and must go.
-  The root formatter exclusion remains necessary to prevent root style from rewriting a fixture
-  that is intentionally judged under its nearest local/default formatting boundary.
-- **Baseline red must stay named red:** #1664 S1 did not touch the two `QueryClient` private-type-ref
-  diagnostics, and they reproduce before the slice. The leaf records those exact failures as
-  pre-existing supplemental evidence; it neither calls the doc-lint invocation green nor silently
-  widens the feature slice to fix them.
+  The root formatter exclusion remains necessary to prevent root style from rewriting a fixture that
+  is intentionally judged under its nearest local/default formatting boundary.
+- **Baseline red must stay named red:** #1664 S1 did not touch the two `QueryClient`
+  private-type-ref diagnostics, and they reproduce before the slice. The leaf records those exact
+  failures as pre-existing supplemental evidence; it neither calls the doc-lint invocation green nor
+  silently widens the feature slice to fix them.
 - **Dynamic runtime identity needs a normalized documentation contract:** #1665 cannot quote a
   per-install `import.meta.url` byte-for-byte as a fixed machine string. The accepted boundary uses
   one `<resolved import.meta.url>` token in the published single-line template, then normalizes only
@@ -502,24 +502,24 @@ implementation thread.
   calls plus the function definition. The topic artifact was corrected before implementation; the
   mechanism, paths, and verdict were unchanged.
 - **Two failed plan cycles create an owner boundary even after a sound repair:** #1663's second
-  evaluator exposed a real generated publish consumer and the repaired plan now passes fresh
-  Tier-A. The coordinator cannot silently invent cycle three; one exceptional final evaluator is an
-  explicit owner decision, while product mutation remains prohibited and independent lanes proceed.
+  evaluator exposed a real generated publish consumer and the repaired plan now passes fresh Tier-A.
+  The coordinator cannot silently invent cycle three; one exceptional final evaluator is an explicit
+  owner decision, while product mutation remains prohibited and independent lanes proceed.
 - **Component atomicity does not compose through a mutating caller:** #1664's generator validated
   all contracts before its own writes, but `addService` had already mutated appsettings, workspace,
   and Aspire helpers. A true add-path zero-write test and shared preflight were required; a green
   generator-only atomicity test could not prove the caller contract.
 - **A proven product correction can make an old test the false positive:** after #1664 correctly
   removed `bridgeInvalidation`, the full CLI suite—not the focused service suites—found a template
-  test still demanding that forbidden import. The assertion was repaired in the same slice to
-  prove exact import-set equality, absence, and literal order. A later slice label cannot justify
+  test still demanding that forbidden import. The assertion was repaired in the same slice to prove
+  exact import-set equality, absence, and literal order. A later slice label cannot justify
   knowingly carrying a red suite or a stale already-disproven contract.
-- **A gate command is not evidence that its planned scenario exists:** #1664 reached four cheap
-  PASS receipts and requested the runtime lease, but the accepted pre-lease contract required a
-  concrete second-service `payments` flow, cross-resource key isolation, idempotent regeneration,
-  and a live Rename with exactly one settled refetch. The branch only added a gate to the suite;
-  none of those assertions existed. Lease review must inspect scenario presence, not infer it from
-  suite membership or a future command name.
+- **A gate command is not evidence that its planned scenario exists:** #1664 reached four cheap PASS
+  receipts and requested the runtime lease, but the accepted pre-lease contract required a concrete
+  second-service `payments` flow, cross-resource key isolation, idempotent regeneration, and a live
+  Rename with exactly one settled refetch. The branch only added a gate to the suite; none of those
+  assertions existed. Lease review must inspect scenario presence, not infer it from suite
+  membership or a future command name.
 - **Structured formatter correctness can depend on batching as well as config:** the CLI format
   proof needs an absolute neutral same-style config and a single 1000-file batch. The same config
   with default batching produces non-zero `failedBatches` and zero findings. That result is a
@@ -572,12 +572,12 @@ implementation thread.
   dependency-free (or live in an app-resolvable package), and that boundary must be exercised before
   the expensive scaffold gate. The author pushed `c4a900adc` to name the isolated internal module
   before creating it.
-- **An unchanged diagnostic can still be made red by shared-batch type pollution:** #1664 F3's
-  first exact-head root-check receipt failed an old explicit `number` timer assignment only after
-  the proof code changed from `@std/path` to `node:path`. Node imports can introduce a different
-  timer return type into a Deno check batch; file ownership alone cannot establish non-causality.
-  Preserve the original failed receipt, prove the import/batch effect with an isolated before/after,
-  and require amendment-before-repair plus a distinct replacement receipt if the leaf caused it.
+- **An unchanged diagnostic can still be made red by shared-batch type pollution:** #1664 F3's first
+  exact-head root-check receipt failed an old explicit `number` timer assignment only after the
+  proof code changed from `@std/path` to `node:path`. Node imports can introduce a different timer
+  return type into a Deno check batch; file ownership alone cannot establish non-causality. Preserve
+  the original failed receipt, prove the import/batch effect with an isolated before/after, and
+  require amendment-before-repair plus a distinct replacement receipt if the leaf caused it.
 - **Lease records must follow terminal truth, not session attachment metadata:** #1663 cycle 2 had
   already committed `FAIL_PLAN`, but central `evaluatorLeases` still said `active`. That stale bit
   could falsely consume the lane evaluator limit or invite an unsafe resume. The record is now
@@ -586,10 +586,10 @@ implementation thread.
   at artifact head `8940e9266`, not merely product head `193e665ba`, so the preserved first FAIL,
   replacement receipts, and Tier-A provenance are immutable inputs to the gate. The runtime probe
   executes product content, but coordinator authorization binds the complete reviewed evidence tree.
-- **Fail-closed gate semantics need durable negative tests:** #1666's tenth path is justified because
-  one-off terminal probes cannot fail a future CI run. Empty/malformed reasons, unknown coverage
-  modes, invented symbols, and omitted symbols must remain persistent assertions even though that
-  adds one test-only file to the originally frozen surface.
+- **Fail-closed gate semantics need durable negative tests:** #1666's tenth path is justified
+  because one-off terminal probes cannot fail a future CI run. Empty/malformed reasons, unknown
+  coverage modes, invented symbols, and omitted symbols must remain persistent assertions even
+  though that adds one test-only file to the originally frozen surface.
 - **A corrected example must close its duplicate prose claims:** #1461's exact stale-loader snippet
   lives in `services-sdk/sdk.md`, but the live-dashboard tutorial separately says a pure
   `getCachedEntry` read refreshes stale data in the background. Regenerating the same four mirrors
@@ -615,10 +615,10 @@ implementation thread.
   the same demonstrated loader story misleading without being individually false. A docs plan must
   give every nearby mechanism claim an explicit retain/correct disposition and explain the composed
   narrative; fixing the quoted sentence alone is not sufficient acceptance.
-- **Lease readiness is an immutable evidence state, not an intent:** #1664 attempt 3 was granted only
-  after all F4 receipts, the author report, and independent Tier-A were committed and pushed at
-  `6f813b0db`. No preflight artifact may be appended between this grant and execution. This makes the
-  exact authorized tree reproducible and prevents the attempt-2 grant/run head mismatch.
+- **Lease readiness is an immutable evidence state, not an intent:** #1664 attempt 3 was granted
+  only after all F4 receipts, the author report, and independent Tier-A were committed and pushed at
+  `6f813b0db`. No preflight artifact may be appended between this grant and execution. This makes
+  the exact authorized tree reproducible and prevents the attempt-2 grant/run head mismatch.
 - **One baseline witness cannot classify a multi-file gate red:** #1664 attempt 3 found twelve
   unformatted generated paths. Proving one unchanged Aspire helper fails at the pre-implementation
   template does not classify leaf-owned users/payments client and payments service/contract outputs.
@@ -648,28 +648,28 @@ implementation thread.
   the contract question more reliably than assuming the help surface from recollection.
 - **A retry lease must bind the reviewed evidence tree, not merely repaired source:** #1664 attempt
   4 is authorized only at evidence `1263f655b`, whose parent content is `fda78ee43` and whose four
-  binding receipts plus final Tier-A are already pushed. The clean-host preflight precedes the grant,
-  so any subsequent head movement invalidates the lease before runtime execution.
+  binding receipts plus final Tier-A are already pushed. The clean-host preflight precedes the
+  grant, so any subsequent head movement invalidates the lease before runtime execution.
 - **Nonzero is not proof of the named refusal:** #1666's committed policy tests initially asserted
   only exit 1. A missing fixture could produce that exit after the reason/mode branch was removed,
   and OMITS could preserve it after INVENTS was removed. Durable negative tests must assert the
   specific cause and mutation-prove that removing only that branch makes the named test red.
-- **A cleanup exception cannot stand in for the behavior verdict:** #1664's live refetch probe reached
-  a browser child that had already terminated, then failed while sending SIGTERM. The gate stays red,
-  but attribution must distinguish successful child completion, early failure, and idempotent cleanup
-  before treating this as evidence for or against the settled-refetch contract.
+- **A cleanup exception cannot stand in for the behavior verdict:** #1664's live refetch probe
+  reached a browser child that had already terminated, then failed while sending SIGTERM. The gate
+  stays red, but attribution must distinguish successful child completion, early failure, and
+  idempotent cleanup before treating this as evidence for or against the settled-refetch contract.
 - **`aspire ps []` is not a complete host-cleanliness proof:** attempt 4 left four stopped
   `aspire-managed nuget search` utility children whose AppHost/resource inventory was empty. The
   coordinator must pair Aspire and Docker state with an explicit process/listener audit, remove only
   exact attributable PIDs, then re-audit while preserving foreign `aspire mcp start` helpers.
-- **A failed receipt can remain truthful beside its replacement:** #1666's first root-test receipt at
-  the repaired head failed because a temporary mutation archive itself contained forbidden command
-  strings. Removing the scratch input and writing a distinct `test-attempt2` PASS preserves both the
-  environmental failure and the clean-tree verdict; overwriting the first receipt would launder the
-  trail.
-- **Termination idempotence must still fail precisely:** #1664 F6 does not permit a broad catch around
-  child teardown. The plan tolerates only Deno's exact already-terminated `TypeError`, still awaits
-  status and stderr drain, and requires unrelated kill and drain failures to propagate.
+- **A failed receipt can remain truthful beside its replacement:** #1666's first root-test receipt
+  at the repaired head failed because a temporary mutation archive itself contained forbidden
+  command strings. Removing the scratch input and writing a distinct `test-attempt2` PASS preserves
+  both the environmental failure and the clean-tree verdict; overwriting the first receipt would
+  launder the trail.
+- **Termination idempotence must still fail precisely:** #1664 F6 does not permit a broad catch
+  around child teardown. The plan tolerates only Deno's exact already-terminated `TypeError`, still
+  awaits status and stderr drain, and requires unrelated kill and drain failures to propagate.
 - **Brief templating must replace short and full immutable SHAs:** #1666's cycle-2 brief correctly
   bound content `423867017` and evidence `010da98a2` in its table and repair section, but two copied
   cycle-1 sentences still named short `47ca22abe` for receipt sufficiency because only the full SHA
@@ -677,10 +677,10 @@ implementation thread.
   none; future brief assembly must assert there is no contradictory stale source-head token before
   dispatch.
 - **A passing evaluator does not excuse a later generated-freshness red:** #1666's evaluator
-  correctly judged the declared source/evidence head, but ready CI then proved that the changed Fresh
-  UI reference page had not propagated into the tracked agent-docs corpus. Readiness was revoked;
-  generated closure must be verified and explicitly included before the next content head, followed
-  by fresh Tier-A and delta IMPL-EVAL.
+  correctly judged the declared source/evidence head, but ready CI then proved that the changed
+  Fresh UI reference page had not propagated into the tracked agent-docs corpus. Readiness was
+  revoked; generated closure must be verified and explicitly included before the next content head,
+  followed by fresh Tier-A and delta IMPL-EVAL.
 - **Close-gate races and product reds require different recovery:** #1666's mirror saw the old label
   and safely mutated nothing, so that same workflow may be rerun after readiness is restored. The
   simultaneous corpus-freshness red is owned and cannot be retried away. Keep both classifications
@@ -691,9 +691,9 @@ implementation thread.
   audits, and use a distinct unchanged-head receipt for the environmental retry.
 - **Apply readiness labels before the ready event and prove live visibility:** #1669 applied both
   `status:ready-merge` and the attributed `impl-eval:skip` while still draft, fetched them back from
-  GitHub, and passed a live acceptance-mirror dry-run before `ready_for_review`. This ordering avoids
-  the label race observed on #1666 and keeps automatic phase evaluation from duplicating a completed
-  native evaluator.
+  GitHub, and passed a live acceptance-mirror dry-run before `ready_for_review`. This ordering
+  avoids the label race observed on #1666 and keeps automatic phase evaluation from duplicating a
+  completed native evaluator.
 - **Lifecycle probes may briefly create their own helper:** the #1664 attempt-5 preflight observed
   `aspire ps []`, then caught the query's transient `aspire-managed nuget search` child in the same
   instant. Lease decisions require a separate post-query process audit; that audit was empty. Do not
@@ -708,33 +708,34 @@ implementation thread.
   claim or acceptance failure. Preserve PASS, avoid post-evaluation scope creep, and file one
   explicitly non-blocking follow-up with both exact contracts rather than silently losing the debt.
 - **A generated output can change only in provenance and still be a publish delta:** #1666's MCP
-  bounded prose selection excludes Fresh UI, so its prose bytes stay fixed, but the canonical publish
-  asset advances the corpus `sourceCommit`. The path is still an owned generated/published change and
-  belongs in scope, idempotence proof, JSR reasoning, and delta evaluation.
+  bounded prose selection excludes Fresh UI, so its prose bytes stay fixed, but the canonical
+  publish asset advances the corpus `sourceCommit`. The path is still an owned generated/published
+  change and belongs in scope, idempotence proof, JSR reasoning, and delta evaluation.
 - **A red generator is not automatically part of the current cascade:** isolated #1666 controls
-  proved `gen:mcp-export-corpus` produces the same rewritten bytes at base and leaf while its check is
-  already red at base. Preserve and report that red; do not regenerate it merely because another MCP
-  generated asset legitimately changes.
+  proved `gen:mcp-export-corpus` produces the same rewritten bytes at base and leaf while its check
+  is already red at base. Preserve and report that red; do not regenerate it merely because another
+  MCP generated asset legitimately changes.
 - **Fixing cleanup can reveal the first real behavior verdict:** #1664 attempt 4 ended in teardown
-  before the refetch probe could report. F6 removed only that mask; attempt 5 then honestly failed on
-  DevTools target discovery. Treat this as new measured causality, not as failure of the teardown fix
-  or permission to retry unchanged.
+  before the refetch probe could report. F6 removed only that mask; attempt 5 then honestly failed
+  on DevTools target discovery. Treat this as new measured causality, not as failure of the teardown
+  fix or permission to retry unchanged.
 - **Terminal leaf and evaluator-lease state must agree:** #1669's leaf, evaluator artifact, verdict
   comment, CI, merge, and issue lifecycle were all terminal while its separate evaluator-lease entry
-  remained `active`. Reconcile the lease from those independent facts and distinguish a native Claude
-  background spare from a live evaluator before considering process cleanup.
+  remained `active`. Reconcile the lease from those independent facts and distinguish a native
+  Claude background spare from a live evaluator before considering process cleanup.
 - **Searching an allowlist is not searching the host:** #1664's probe found no Linux path in its six
   candidates and fell through to Windows Chrome, but two managed Linux Chromium 151 binaries existed
   and executed. Selection must validate runnability, provide a strict portable override, and retain
   early status/stderr; an allowlist miss cannot be promoted into an environment-capability claim.
 - **Supervisor prose can become scanner input:** #1666's ignored unscoped hook transcript captured a
-  supervisor explanation containing a prohibited command literal, so the repository scanner correctly
-  failed unchanged generated content. Preserve the red, quarantine the exact transcript recoverably
-  without weakening the scanner, hash before/after, and allow only one unchanged-head retry.
-- **A checked umbrella item may conflict with its normative ownership header:** the first #1350 brief
-  copied a checked metadata sentence from #1348 but missed that the accepted amendment, target owner
-  comment, and live #1466 assign metadata vocabulary elsewhere. Formal planning must reconcile all live
-  authority surfaces before converting a checkbox into leaf ownership.
+  supervisor explanation containing a prohibited command literal, so the repository scanner
+  correctly failed unchanged generated content. Preserve the red, quarantine the exact transcript
+  recoverably without weakening the scanner, hash before/after, and allow only one unchanged-head
+  retry.
+- **A checked umbrella item may conflict with its normative ownership header:** the first #1350
+  brief copied a checked metadata sentence from #1348 but missed that the accepted amendment, target
+  owner comment, and live #1466 assign metadata vocabulary elsewhere. Formal planning must reconcile
+  all live authority surfaces before converting a checkbox into leaf ownership.
 
 - **A passed delta evaluator cannot resolve a later generated merge conflict by choosing a side:**
   #1666 and main both legitimately advanced the same four publication outputs from different source
@@ -763,8 +764,8 @@ implementation thread.
   from an unreconciled `active` string in the control plane.
 - **A broad quality PASS cannot overrule a narrower changed-source red:** #1666's core `quality` job
   passed while the dedicated scanner correctly found an explicit `any` and unsafe cast in the leaf's
-  changed checker. Treat the narrower evidence as owned and blocking, revoke readiness, and repair the
-  code rather than rerunning or weakening the scanner.
+  changed checker. Treat the narrower evidence as owned and blocking, revoke readiness, and repair
+  the code rather than rerunning or weakening the scanner.
 - **Acceptance mirroring may precede a later independent CI red:** #1666's close-gate truthfully
   checked all five #1296 boxes before the separate code-quality workflow failed. Preserve those
   evidence-backed boxes and the open issue, return the PR to draft, and let `Closes #1296` close the
@@ -782,19 +783,19 @@ implementation thread.
   and selected paths exposed the false green; only the corrected non-empty `changed-files` selection
   over both `.llm/tools` files counts as repair evidence.
 - **Pinned baseline-red counts still require base/head identity attribution:** #1671 correctly kept
-  raw doc-lint red, then proved its counts changed from Contracts 9→11 and SDK 3→13. A known-red gate
-  is not permission to absorb new leaf-owned findings; stop the matrix, preserve later gates as
+  raw doc-lint red, then proved its counts changed from Contracts 9→11 and SDK 3→13. A known-red
+  gate is not permission to absorb new leaf-owned findings; stop the matrix, preserve later gates as
   NOT_RUN, and repair only after a bounded amendment and fresh review.
 - **Supervisor verification must not write into an author-owned leaf:** the #1664 features Tier-A
   audit regenerated the leaf leak report after the author commit. Its host result remains valid in
   central state, but the bytes are supervisor-caused contamination and must be restored from the
   author head before F8; future supervisor audits use supervisor-owned paths.
 - **A thread-local quota probe cannot establish account scope:** both affected leaves used one fresh
-  detached Codex session after preserving the original sender. Threads `01a00766-…` and
-  `01a00767-…` failed before inference with `usageLimitExceeded`, `hasCredits:false`, and zero
-  balance, proving the boundary is account-wide until `2026-08-20 05:31`. Stop retries once that
-  evidence exists; distinguish executable canonical plan-artifact chores from product implementation
-  that truly has no in-plan fallback.
+  detached Codex session after preserving the original sender. Threads `01a00766-…` and `01a00767-…`
+  failed before inference with `usageLimitExceeded`, `hasCredits:false`, and zero balance, proving
+  the boundary is account-wide until `2026-08-20 05:31`. Stop retries once that evidence exists;
+  distinguish executable canonical plan-artifact chores from product implementation that truly has
+  no in-plan fallback.
 - **Quota fallback still preserves generator/evaluator separation:** #1664's provenance restoration
   uses a fresh Claude Opus 5/medium `chore_code` generator and #1671's run-artifact-only amendment
   uses a fresh Claude Sonnet 5/high `documentation_review` generator. Neither supervisor authors.
@@ -802,12 +803,12 @@ implementation thread.
   fallback; no lane self-certifies and no outside-plan product implementation is inferred.
 - **Readiness re-entry repeats all live preflights after any repair:** cycle-5 PASS did not inherit
   the earlier readiness snapshot. #1666 refreshed the final body, review threads, acceptance mirror,
-  close-gate, status ordering, and exact-head CI at `92988da30`; the earlier broad green cannot stand
-  in for the new changed-source quality run.
-- **A persisted controller is not a live supervisor:** all four topic checkpoints remained clean, but
-  their recorded PIDs and Remote Control transports had disappeared. Recovery must mark the stale
-  attachments explicitly, relaunch at the same ownership boundary, and record new transport IDs
-  before dispatching more work.
+  close-gate, status ordering, and exact-head CI at `92988da30`; the earlier broad green cannot
+  stand in for the new changed-source quality run.
+- **A persisted controller is not a live supervisor:** all four topic checkpoints remained clean,
+  but their recorded PIDs and Remote Control transports had disappeared. Recovery must mark the
+  stale attachments explicitly, relaunch at the same ownership boundary, and record new transport
+  IDs before dispatching more work.
 - **Elapsed quota boundaries must be re-probed, not inherited:** the Codex capacity proof expired on
   2026-08-20. It remains historical evidence for the earlier stop, but cannot block work resumed on
   2026-08-23 without a fresh probe.
@@ -838,47 +839,49 @@ implementation thread.
   are required before a runtime lease is released.
 - **A generated-corpus red is not automatically leaf-owned:** #1671's one-file regeneration was
   deterministic, but the nine additions reproduced on main and belonged to existing AI/MySQL export
-  changes. Carrying them inside #1671 would hide cross-package debt. Repair the corpus in a standalone
-  single-generated-file prerequisite, merge it, then rebase and evaluate the typed-error leaf.
+  changes. Carrying them inside #1671 would hide cross-package debt. Repair the corpus in a
+  standalone single-generated-file prerequisite, merge it, then rebase and evaluate the typed-error
+  leaf.
 - **Literal issue-closing prose can mutate PR state:** #1671 was closed without merge when a
   prerequisite description used a literal closing keyword. Continue preserved work in a replacement
-  PR, repair the public record in place, and keep closing syntax only where the intended issue is the
-  merge target.
+  PR, repair the public record in place, and keep closing syntax only where the intended issue is
+  the merge target.
 - **A docs-source edit owns its deterministic generated cascade:** #1692's human docs correction
-  made the agent-docs prose corpus stale. Regenerate the four canonical derived files, prove a second
-  run byte-identical, and move all exact-head acceptance evidence to the regenerated head.
+  made the agent-docs prose corpus stale. Regenerate the four canonical derived files, prove a
+  second run byte-identical, and move all exact-head acceptance evidence to the regenerated head.
 - **Exact-head acceptance evidence expires after even deterministic repair:** the S8 receipts were
-  valid for `587ade9f3`, but S9 changed the head. The close gate, mirror dry-run, thread audit, full CI,
-  and public acceptance map were therefore rerun at `686bae07b` before merge.
-- **Verify remote merge before treating local cleanup errors as merge failure:** #1692's squash merge
-  succeeded even though automatic deletion of the locally checked-out branch failed. Query PR and
-  main state first, then remove the proven-terminal worktree and branches explicitly.
+  valid for `587ade9f3`, but S9 changed the head. The close gate, mirror dry-run, thread audit, full
+  CI, and public acceptance map were therefore rerun at `686bae07b` before merge.
+- **Verify remote merge before treating local cleanup errors as merge failure:** #1692's squash
+  merge succeeded even though automatic deletion of the locally checked-out branch failed. Query PR
+  and main state first, then remove the proven-terminal worktree and branches explicitly.
 - **Cleanup terminal evaluators by exact ownership, not supervisor-wide process names:** the formal
   evaluator left helpers whose cwd pointed into a removed evaluator tree. Those exact PIDs were
   stopped after containment proof while all four topic supervisors and their Remote Control bridges
   were preserved.
-- **A terminal central checkpoint can become stale while an explicitly authorized recovery proceeds:**
-  #1663's PR and leaf advanced from final PLAN-EVAL failure to verified S1-S5 and two passing
-  implementation evaluations under a documented owner grant, while the central JSON still claimed
-  no product mutation. Reconcile live PR commits, comments, branch identity, and evaluator artifacts
-  before treating a persisted terminal label as current truth.
-- **Supervisor attachment metadata is per-process evidence, not durable identity:** all four recorded
-  Claude processes had expired even though their clean topic checkpoints and ownership remained
-  valid. Restore one-for-one from the exact worktrees, verify native `/remote-control`, and update
-  only transport metadata; never infer permission to relaunch work, change ownership, or retry a
-  terminal gate from transport repair alone.
-- **Issue acceptance sweeps must be explicit even when the focused fix is complete:** #1618's request
-  to scan sibling package configs was absent from the evidence trail. The closeout audit performed
-  the cheap sweep, separated auto-discovered configs from custom-named non-candidates, and found no
-  additional blind spot before the PR acceptance map is rewritten.
+- **A terminal central checkpoint can become stale while an explicitly authorized recovery
+  proceeds:** #1663's PR and leaf advanced from final PLAN-EVAL failure to verified S1-S5 and two
+  passing implementation evaluations under a documented owner grant, while the central JSON still
+  claimed no product mutation. Reconcile live PR commits, comments, branch identity, and evaluator
+  artifacts before treating a persisted terminal label as current truth.
+- **Supervisor attachment metadata is per-process evidence, not durable identity:** all four
+  recorded Claude processes had expired even though their clean topic checkpoints and ownership
+  remained valid. Restore one-for-one from the exact worktrees, verify native `/remote-control`, and
+  update only transport metadata; never infer permission to relaunch work, change ownership, or
+  retry a terminal gate from transport repair alone.
+- **Issue acceptance sweeps must be explicit even when the focused fix is complete:** #1618's
+  request to scan sibling package configs was absent from the evidence trail. The closeout audit
+  performed the cheap sweep, separated auto-discovered configs from custom-named non-candidates, and
+  found no additional blind spot before the PR acceptance map is rewritten.
 - **A dependency-download refusal is not generated-content drift:** #1663 ready CI initially failed
   `agent-docs-prose`, but its structured JSON receipt attributed the nonzero exit to deno.land
   rejecting a `deno_dom` HTTP/2 stream for excessive load. The exact failed job passed on retry with
   no head movement. Diagnose from the receipt before widening a frozen generated-asset surface.
 - **Patch-equivalent rebases can preserve formal verdicts when identity is measured:** #1663's 17
-  commits range-diff one-for-one, twelve product blobs are byte-identical, and the only configuration
-  delta is an audited semantic union. Binding the two evaluator heads to their rebased counterparts
-  avoided a redundant formal cycle while retaining independent fresh Tier-A at the final head.
+  commits range-diff one-for-one, twelve product blobs are byte-identical, and the only
+  configuration delta is an audited semantic union. Binding the two evaluator heads to their rebased
+  counterparts avoided a redundant formal cycle while retaining independent fresh Tier-A at the
+  final head.
 - **Coordinator transport remains a distinct ownership axis:** this checkpoint was directed by the
   existing Codex Desktop Remote Control coordinator on GPT-5.6-SOL/high; `max` remains unauthorized.
   The fresh Claude Opus 5/high Remote Control Tier-A turn reviewed the internals topic only and did
@@ -943,8 +946,8 @@ implementation thread.
   indefinitely or silently launching a third loop violates the owner ruling; unrelated lanes keep
   moving.
 - **Terminal evaluator state must beat stale central prose:** #1709's job stopped only after its
-  committed/public `FAIL_PLAN`, and #1112's daemon reported "awaiting generator revision" only
-  after it had committed and posted `FAIL_PLAN`. The immutable artifacts and public comments are
+  committed/public `FAIL_PLAN`, and #1112's daemon reported "awaiting generator revision" only after
+  it had committed and posted `FAIL_PLAN`. The immutable artifacts and public comments are
   authoritative; the central `active`/`ready` fields were reconciliation lag, not live gates.
 
 ## 2026-08-28 15:35Z — repaired lint plan and Prisma clean-checkout boundary
@@ -959,16 +962,17 @@ implementation thread.
   generated output is removed.
 - **Action:** bound fixes Tier-A to reproduce the post-cleanup clean-checkout gate; no silent eighth
   path and no downgrade of the executable example claim.
+
 ## 2026-08-28 — final plan-evaluation allowance and clean-checkout correction
 
-- **#1709:** Cycle 2 found a real fmt write-mode signal omitted by both the repaired plan and Tier-A.
-  The ordinary allowance is exhausted, so no cycle 3 is inferred. The owner is asked only whether
-  to accept the evaluator's bounded recommended F4 form; evaluator release and author availability
-  prevent a frozen lane.
+- **#1709:** Cycle 2 found a real fmt write-mode signal omitted by both the repaired plan and
+  Tier-A. The ordinary allowance is exhausted, so no cycle 3 is inferred. The owner is asked only
+  whether to accept the evaluator's bounded recommended F4 form; evaluator release and author
+  availability prevent a frozen lane.
 - **#1112:** A scratch-only generated client made a gate locally green but left a permanent
   clean-checkout `TS2307`. The supervisor's exact archive proof corrected that false positive.
-  Excluding the example is disallowed; the same author is testing a dynamic prerequisite import
-  with separate real-client semantic evidence before any rescope.
+  Excluding the example is disallowed; the same author is testing a dynamic prerequisite import with
+  separate real-client semantic evidence before any rescope.
 - **Policy:** Formal PLAN-EVAL is not a routine ceremony. It stays limited to critical/complex
   topics, while Tier-A and mandatory IMPL-EVAL remain. A leaf returns to the owner after two
   consecutive terminal IMPL-EVAL failures rather than consuming a third loop.
@@ -992,3 +996,18 @@ implementation thread.
   authorizing another evaluator. The same author resumed from exact `f2b3fc8b3` under pushed topic
   checkpoint `f9a9af9b3`; only the third write-mode completion form and 1/2/200 crash/drop controls
   may change in plan artifacts. Fresh Tier-A substitutes for any third PLAN-EVAL.
+
+## 2026-08-29 — canary cadence, live intake, and Aspire 13.5 opportunity
+
+- **Stale assumption:** the prior ledger treated the feature-complete checkpoint as the next
+  publication boundary. **Correction:** owner restored the milestone profile's canary-first train;
+  foundations publishes from exact `cf648f1ff` before remaining issue waves.
+- **Scope drift:** twelve live 0.0.7 issues were absent from the frozen inventory. **Action:** read
+  their current contracts, admitted each to exactly one topic, added dependency-valid waves, and
+  admitted #979 from 0.0.8 because #1370 explicitly cannot land first.
+- **Verify-first constraint:** #1371 is not a presumed defect. It runs only against a published
+  current canary and either closes as refuted with evidence or names the real failing mechanism.
+- **Research opportunity:** Aspire 13.5 may widen 0.0.7 after the first canary. The owner explicitly
+  selected Fable 5 medium as a standalone research orchestrator (an intentional override from the
+  default Opus planning route) and expanded scope to MCP plus every canonical/derived static
+  resource and doc. Product implementation waits for coordinator ratification of its issue graph.

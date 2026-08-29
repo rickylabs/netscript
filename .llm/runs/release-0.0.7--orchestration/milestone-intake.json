@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-13T21:12:00.000Z",
-  "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "ownerRatifiedAt": "2026-08-13T21:12:00.000Z",
+  "capturedAt": "2026-08-29T10:35:00.000Z",
+  "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+  "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
   "sources": {
     "targetMilestone": true,
     "unmilestoned": true,
@@ -729,6 +729,125 @@
       "admissionPredicate": "high-value-coherent",
       "targetMilestone": "0.0.7",
       "movedAt": "2026-08-13T21:12:00.000Z"
+    },
+    {
+      "number": 979,
+      "source": "laterMilestone",
+      "decision": "include",
+      "reason": "Dependency-required by #1370's explicit prerequisite contract; moved from 0.0.8 before dispatch.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/979",
+        "https://github.com/rickylabs/netscript/issues/1370"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "dependency-required",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T10:35:00.000Z"
+    },
+    {
+      "number": 1365,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; P0 saga publication correctness.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1365"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1368,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; saga telemetry is currently deletable without a red gate.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1368"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1370,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; blocked until admitted prerequisite #979 lands.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1370",
+        "https://github.com/rickylabs/netscript/issues/979"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1371,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake as a verify-first canary-backed claim.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1371"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1387,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; complex typed principal/policy public contract.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1387",
+        "https://github.com/rickylabs/netscript/issues/884"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1672,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; grouped on the agent-init guidance surface.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1672"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1673,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; plugin-doctor false-green correctness.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1673"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1674,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; P0 guaranteed-read guidance gap.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1674"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1675,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; cross-host skill discovery gap.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1675"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1677,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; owned usage fields are structurally discarded.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1677"],
+      "ownerRatified": true
+    },
+    {
+      "number": 1694,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; existing PR #1696 is adopted only through normal gates.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1694",
+        "https://github.com/rickylabs/netscript/pull/1696"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1695,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; deliberate TanStack compatibility pass grouped with #1677.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1695"],
+      "ownerRatified": true
     }
   ]
 }

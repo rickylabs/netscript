@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAt": "2026-08-13T22:42:00.000Z",
+  "capturedAt": "2026-08-29T10:35:00.000Z",
   "leafGroups": [
     {
       "key": "rfc-a-stage0-ratification-board",
@@ -491,6 +491,86 @@
       "splitCandidates": [
         1551
       ]
+    },
+    {
+      "key": "aspire-service-reference-verification",
+      "lane": "internals",
+      "issues": [1371],
+      "wave": 9,
+      "rationale": "Verify-first leaf against the published foundations canary; close with evidence if refuted, or return the named mechanism before any fix.",
+      "splitCandidates": []
+    },
+    {
+      "key": "agent-init-guidance-and-cross-host-skills",
+      "lane": "fixes",
+      "issues": [1672, 1674, 1675],
+      "wave": 9,
+      "rationale": "One generated root-guidance and canonical-skill-install surface; separate PRs would collide and duplicate the same behavioral smoke.",
+      "splitCandidates": []
+    },
+    {
+      "key": "plugin-doctor-source-registry-truth",
+      "lane": "fixes",
+      "issues": [1673],
+      "wave": 9,
+      "rationale": "Focused source-tree versus generated-registry truth gate with a red-first stale-registry fixture.",
+      "splitCandidates": []
+    },
+    {
+      "key": "ai-request-context-adoption",
+      "lane": "features",
+      "issues": [1694],
+      "wave": 9,
+      "rationale": "Adopt existing PR #1696 through exact-head harness/evaluation/close gates; provider-invisibility is the load-bearing contract.",
+      "splitCandidates": []
+    },
+    {
+      "key": "ai-tanstack-usage-and-upgrade",
+      "lane": "fixes",
+      "issues": [1677, 1695],
+      "wave": 10,
+      "rationale": "The latest dependency shape decides whether the local mapper is still needed; one compatibility leaf prevents implementing against the stale 0.39 API.",
+      "splitCandidates": [1695]
+    },
+    {
+      "key": "saga-publisher-honesty",
+      "lane": "fixes",
+      "issues": [1365],
+      "wave": 10,
+      "rationale": "P0 non-ignorable receipt and endpoint-resolution correctness after canary discovery-key evidence.",
+      "splitCandidates": [1365]
+    },
+    {
+      "key": "service-principal-policy-contract",
+      "lane": "features",
+      "issues": [1387],
+      "wave": 10,
+      "rationale": "Complex public contract slice; compatibility with #884 and the RFC-0001 metadata/contribution chain is a formal plan gate.",
+      "splitCandidates": [1387]
+    },
+    {
+      "key": "aspire-plugin-endpoint-prerequisite",
+      "lane": "fixes",
+      "issues": [979],
+      "wave": 11,
+      "rationale": "Dependency-required prerequisite for #1370; owns host-port pins, generated runtime-gate endpoint resolution, grants, and tutorial prerequisites.",
+      "splitCandidates": [979]
+    },
+    {
+      "key": "aspire-randomized-plugin-endpoints",
+      "lane": "fixes",
+      "issues": [1370],
+      "wave": 12,
+      "rationale": "Contribution and generated-browser endpoint truth after #979; never dispatch before the prerequisite leaf is green.",
+      "splitCandidates": []
+    },
+    {
+      "key": "saga-telemetry-call-sites",
+      "lane": "fixes",
+      "issues": [1368],
+      "wave": 11,
+      "rationale": "Saga cascade/compensation telemetry and Flow-B correlation proof after #1365 settles the correlation contract.",
+      "splitCandidates": [1368]
     }
   ]
 }

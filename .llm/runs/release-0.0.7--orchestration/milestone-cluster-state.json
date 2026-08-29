@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "milestone": "0.0.7",
-  "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "currentMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
@@ -68,7 +68,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "owner_accepted_f4_plan_amendment_active",
+        "state": "1709_close_gate_active_after_impl_eval_pass",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -78,11 +78,11 @@
         "observedEffort": "high",
         "backgroundAgentId": "c2a905f0",
         "sessionId": "c2a905f0-e655-4dd7-8f9f-8eea563126a6",
-        "pid": 11026,
+        "pid": 6174,
         "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
-        "topicHeadSha": "f9a9af9b38d79b707f5d93bd6d9aa67bfdc8155e",
-        "queueState": "1709_owner_accepted_f4_same_author_plan_amendment_active_no_cycle_3",
+        "topicHeadSha": "767479fbc78bfe87112b2021f01c51889e557559",
+        "queueState": "1709_impl_eval_pass_exact_head_close_gate_active; reintake_1371_queued_after_foundations_canary",
         "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
@@ -155,6 +155,7 @@
       },
       "issueNumbers": [
         1296,
+        1371,
         1378,
         1429,
         1533,
@@ -178,7 +179,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "plan_eval_cycle_2_active",
+        "state": "1112_owner_accepted_implementation_active",
         "worktree": "/home/codex/repos/netscript-007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -188,11 +189,11 @@
         "observedEffort": "high",
         "backgroundAgentId": "ea346a9a",
         "sessionId": "ea346a9a-21b5-4d4b-ba74-0071f7179998",
-        "pid": 11903,
+        "pid": 6164,
         "bridgeSessionId": "session_01Y1YKBnzUJVuXB5akcxeRT6",
         "remoteControlUrl": "https://claude.ai/code/session_01Y1YKBnzUJVuXB5akcxeRT6",
-        "topicHeadSha": "4f2e263e2a663be3bdbdfeac2be736962d292d72",
-        "queueState": "1112_final_risk_selected_plan_eval_cycle_2_active_author_available",
+        "topicHeadSha": "b08a3d96c5c4bd786448972242ae5b5cc7de388e",
+        "queueState": "1112_seven_path_implementation_granted; reintake_wave_A_queued_after_foundations_canary",
         "attachmentVerifiedAt": "2026-08-28T09:09:22.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle",
@@ -245,6 +246,7 @@
         }
       },
       "issueNumbers": [
+        979,
         1093,
         1112,
         1243,
@@ -256,6 +258,9 @@
         1353,
         1357,
         1358,
+        1365,
+        1368,
+        1370,
         1448,
         1461,
         1462,
@@ -270,7 +275,13 @@
         1619,
         1620,
         1623,
-        1637
+        1637,
+        1672,
+        1673,
+        1674,
+        1675,
+        1677,
+        1695
       ]
     },
     {
@@ -316,6 +327,7 @@
         1354,
         1355,
         1360,
+        1387,
         1451,
         1452,
         1455,
@@ -325,7 +337,8 @@
         1502,
         1590,
         1591,
-        1592
+        1592,
+        1694
       ]
     }
   ],
@@ -583,16 +596,68 @@
     {
       "number": 1709,
       "state": "open"
+    },
+    {
+      "number": 979,
+      "state": "open"
+    },
+    {
+      "number": 1365,
+      "state": "open"
+    },
+    {
+      "number": 1368,
+      "state": "open"
+    },
+    {
+      "number": 1370,
+      "state": "open"
+    },
+    {
+      "number": 1371,
+      "state": "open"
+    },
+    {
+      "number": 1387,
+      "state": "open"
+    },
+    {
+      "number": 1672,
+      "state": "open"
+    },
+    {
+      "number": 1673,
+      "state": "open"
+    },
+    {
+      "number": 1674,
+      "state": "open"
+    },
+    {
+      "number": 1675,
+      "state": "open"
+    },
+    {
+      "number": 1677,
+      "state": "open"
+    },
+    {
+      "number": 1694,
+      "state": "open"
+    },
+    {
+      "number": 1695,
+      "state": "open"
     }
   ],
   "leaves": [
     {
       "id": "lint-partial-exclusion-fail-closed",
       "lane": "internals",
-      "phase": "planned",
+      "phase": "gating",
       "baseBranch": "main",
-      "headSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
-      "currentPrHeadSha": "f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad",
+      "headSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
+      "currentPrHeadSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
       "issueNumbers": [1709],
       "implementerAgentId": "01a047f0-f17e-7692-b6f0-83a6d22888c9",
       "branch": "fix/lint-partial-exclusion-fail-closed",
@@ -602,11 +667,12 @@
       "researchTopicCheckpointSha": "d682db680b28f224fdc2761390b1d37f537d15be",
       "researchRemoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
       "coordinatorDecision": "option_1_fail_closed_six_path_envelope_after_symmetric_fmt_defect_reproduced",
-      "implementationState": "not_started",
-      "planHeadSha": "3e934e2de1ed758f7182ad1eebf027750bcfb976",
+      "implementationState": "complete",
+      "implementationHeadSha": "5c4eaf0a38a505ac0d9cad2419230ba986c6bd2d",
+      "planHeadSha": "fc00aed0f507ae2fac1d9ce03972a80d246b3611",
       "tierAState": "PASS",
-      "tierATopicCheckpointSha": "bf3635eb5f85a6909495b2870e5766c7657b01fa",
-      "planEvaluationState": "owner_accepted_f4_plan_amendment_active_no_cycle_3",
+      "tierATopicCheckpointSha": "531a6dbe11905f9c534cfddb0d6835f6652e54f1",
+      "planEvaluationState": "owner_accepted_final_amendment_complete_no_cycle_3",
       "planEvaluator": {
         "state": "complete",
         "cycle": 1,
@@ -645,7 +711,11 @@
         "topicCheckpointSha": "f9a9af9b38d79b707f5d93bd6d9aa67bfdc8155e",
         "scope": "third fmt write completion form plus write-mode crash-only and crash-and-drop controls at 1/2/200; preserve precedence and prior accepted scope"
       },
-      "nextGate": "same-author bounded F4 plan-only amendment, explicit push, then fresh internals Tier-A; no third PLAN-EVAL",
+      "implementationEvaluationState": "complete_cycle_1",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedHeadSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
+      "implementationEvaluationTopicCheckpointSha": "767479fbc78bfe87112b2021f01c51889e557559",
+      "nextGate": "full exact-remote-head PR close/readiness gate; coordinator merges only after the foundations canary captures cf648f1ff",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1709",
         "https://github.com/rickylabs/netscript/pull/1710"
@@ -654,10 +724,10 @@
     {
       "id": "prisma-mysql-honest-example",
       "lane": "fixes",
-      "phase": "planned",
+      "phase": "implementing",
       "baseBranch": "main",
-      "headSha": "da769cd7c8e0438f2317ed761ec10bce15692d03",
-      "currentPrHeadSha": "da769cd7c8e0438f2317ed761ec10bce15692d03",
+      "headSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
+      "currentPrHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -665,11 +735,11 @@
       "prNumber": 1711,
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
-      "implementationState": "not_started",
-      "planHeadSha": "da769cd7c8e0438f2317ed761ec10bce15692d03",
+      "implementationState": "active_owner_granted",
+      "planHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
       "tierAState": "PASS",
-      "tierATopicCheckpointSha": "d0205087afb648c0ce23ff5e3644ffcb455a0fa4",
-      "planEvaluationState": "final_risk_selected_cycle_2_active",
+      "tierATopicCheckpointSha": "c36eaf340db2bb6df18f1d7b2149af12e9b9fe1f",
+      "planEvaluationState": "cycle_2_fail_owner_accepted_literal_import_no_cycle_3",
       "planEvaluator": {
         "state": "complete",
         "cycle": 1,
@@ -707,7 +777,7 @@
         "claims": "clean tracked archive selects all 12 and is green before generation and after cleanup; real Prisma 7.8 exposes current TS2322 and prospective D17 narrowing passes; import smoke prints dynamic-import-smoke:ok without MySQL; root-shell and specialized semantic evidence remain explicitly separate; exclusion, stubs, suppression, and eighth path remain forbidden"
       },
       "planEvaluatorCycle2": {
-        "state": "active",
+        "state": "complete",
         "cycle": 2,
         "sourceHead": "da769cd7c8e0438f2317ed761ec10bce15692d03",
         "backgroundAgentId": "18b66c8f",
@@ -718,10 +788,12 @@
         "topicDispatchCheckpointSha": "4f2e263e2a663be3bdbdfeac2be736962d292d72",
         "grantedAt": "2026-08-28T16:14:28.758Z",
         "selectionReason": "critical/complex published Prisma integration and generated-client boundary",
-        "evaluationFocus": "repaired F1 architecture and five Tier-A claims only; final ordinary cycle"
+        "evaluationFocus": "repaired F1 architecture and five Tier-A claims only; final ordinary cycle",
+        "verdict": "FAIL_PLAN",
+        "coordinatorDisposition": "owner accepted the bounded literal dynamic-import correction as temporary Prisma 7 correctness pending the Prisma-next/Prisma 8 rewrite; no cycle 3"
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "terminal cycle-2 PLAN-EVAL verdict; PASS returns for implementation grant, FAIL_PLAN releases evaluator and surfaces the exact decision with no cycle 3",
+      "nextGate": "same canonical author completes the seven-path implementation, fresh exact-head Tier-A, then normal IMPL-EVAL",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -1289,11 +1361,15 @@
         "canonicalCorrection": "relaunched once with canonical token claude-fable-5, medium, Remote Control, and exact worktree"
       },
       "implementationSlices": {
-        "s1": {"state": "complete", "headSha": "4b988a381"},
-        "s2": {"state": "complete", "headSha": "22dc3906e"},
-        "s3": {"state": "complete", "headSha": "fd508978c"},
-        "s4": {"state": "complete", "evidenceHeadSha": "cf31de902", "commentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5387191370"},
-        "s5": {"state": "complete_after_focused_fix", "headSha": "cfa055bb8"}
+        "s1": { "state": "complete", "headSha": "4b988a381" },
+        "s2": { "state": "complete", "headSha": "22dc3906e" },
+        "s3": { "state": "complete", "headSha": "fd508978c" },
+        "s4": {
+          "state": "complete",
+          "evidenceHeadSha": "cf31de902",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5387191370"
+        },
+        "s5": { "state": "complete_after_focused_fix", "headSha": "cfa055bb8" }
       },
       "implementationEvaluation": {
         "state": "complete_pass",
@@ -3906,6 +3982,30 @@
     {
       "id": "checkpoint-foundations",
       "rationale": "Publish only after CI correctness and shared SDK/tooling foundations form a coherent, independently green main checkpoint.",
+      "state": "publishing",
+      "contentSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+      "receiptRefs": [
+        "/home/codex/repos/netscript-main/.llm/tmp/gate-receipts/canary-0.0.7-foundations/check.json",
+        "/home/codex/repos/netscript-main/.llm/tmp/gate-receipts/canary-0.0.7-foundations/test.json",
+        "/home/codex/repos/netscript-main/.llm/tmp/gate-receipts/canary-0.0.7-foundations/quality-gate.json",
+        "coordinator terminal: release:preflight and publish:readiness PASS at cf648f1ff"
+      ],
+      "localEvidence": [
+        "structured check PASS",
+        "structured test PASS: 4222 passed, 0 failed, 19 ignored",
+        "quality:gate PASS",
+        "release:preflight PASS",
+        "publish:readiness PASS"
+      ]
+    },
+    {
+      "id": "checkpoint-consumer-tooling",
+      "rationale": "Publish after #1709/#1112 and the coherent re-intake wave-A consumer/tooling repairs land.",
+      "state": "planned"
+    },
+    {
+      "id": "checkpoint-runtime-integration",
+      "rationale": "Publish when Aspire/saga or ratified Aspire 13.5 work changes generated AppHosts, endpoint discovery, MCP, runtime gates, or telemetry.",
       "state": "planned"
     },
     {
@@ -3915,7 +4015,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "baf1cdf67a4e931af17b4772ddf6101f36152184",
+    "gitHead": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -3944,7 +4044,7 @@
   "environmentState": {
     "dockerContainers": 0,
     "aspireApplications": 0,
-    "registeredWorktrees": 11,
+    "registeredWorktrees": 12,
     "terminalTypedErrorWorktreesRemoved": true,
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
@@ -3952,7 +4052,7 @@
     "aspireMcpHelpers": "eight active helpers are owned by live Claude/Codex tool sessions and are not AppHost runtimes",
     "wslAvailableMemoryGiB": 8.2,
     "wslLoadAfterAuthorExit": "3.04 5.00 8.06",
-    "verifiedAt": "2026-08-28T11:09:14.000Z"
+    "verifiedAt": "2026-08-29T10:35:00.000Z"
   },
-  "updatedAt": "2026-08-28T16:19:38.000Z"
+  "updatedAt": "2026-08-29T10:35:00.000Z"
 }

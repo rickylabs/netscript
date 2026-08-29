@@ -242,37 +242,37 @@ serialization only inside each topic.
 Resume from the newer authoritative `2026-08-15T09:08:30Z` checkpoint. Main remains
 `284dda90a17a13a7e5e8e9834e5411b58887131b`. Docs #1660 is ready at exact head `e35824d41` after a
 fresh exclusive-owner Tier-A PASS and all eight #1659 boxes; merge only after its current readiness
-CI is terminal green, then close/lifecycle-normalize #1659 and remove `impl-eval:skip`. The disclosed
-stash incident is fully recovered at exact object `7eb4ed16d…`; no data loss occurred. Internals
-#1658 has S3 signed off at `d3d31b3d0` and S4 local at `9b71e1bd2`, still before its required
-receipt/push/Tier-A stop. Fixes #1661 is implementing amendment 2 through pushed `099067c6b`, with
-both published transport wrappers and a Fresh cross-package check now binding. Features #1293
-PLAN-EVAL passed at `7780ba49e`; the evaluator job's terminal metadata stayed stale, so the
-coordinator verified the final response directly and woke the existing features supervisor to amend
-the plan and resume the original Codex author. Do not launch a duplicate evaluator. Preserve all
-four native Opus 5/high Remote Control supervisors, serialize only inside each topic, and keep the
-runtime mutex free unless a real resource-heavy gate requests it.
+CI is terminal green, then close/lifecycle-normalize #1659 and remove `impl-eval:skip`. The
+disclosed stash incident is fully recovered at exact object `7eb4ed16d…`; no data loss occurred.
+Internals #1658 has S3 signed off at `d3d31b3d0` and S4 local at `9b71e1bd2`, still before its
+required receipt/push/Tier-A stop. Fixes #1661 is implementing amendment 2 through pushed
+`099067c6b`, with both published transport wrappers and a Fresh cross-package check now binding.
+Features #1293 PLAN-EVAL passed at `7780ba49e`; the evaluator job's terminal metadata stayed stale,
+so the coordinator verified the final response directly and woke the existing features supervisor to
+amend the plan and resume the original Codex author. Do not launch a duplicate evaluator. Preserve
+all four native Opus 5/high Remote Control supervisors, serialize only inside each topic, and keep
+the runtime mutex free unless a real resource-heavy gate requests it.
 
 Resume from the newer authoritative `2026-08-15T09:28:54Z` checkpoint. Current main is
 `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`: docs #1660 is merged, #1659 is closed 8/8 and shipped,
-Pages push run `31876977060` passed, and both `/comparisons/frontend/` and
-`/comparisons/backend/` are live with HTTP 200. The readiness failure was a stale exact-corpus
-snapshot, repaired at `615786c1a` into stable named invariants and freshly Tier-A reviewed in comment
-`5301575337`; never revert it to total-count pinning. Internals #1658 has final S5 evidence at
-`704c067e8` with all three receipts green and is in final Tier-A. Fixes #1661 is Tier-A PASS at
-`e3c74d7aa`; one fresh opposite-family IMPL-EVAL lease is granted and launching. Features #1293 is
-implementing S1 after the verified plan amendment `feb8b0355`. Preserve the original author threads,
-all four native Opus 5/high Remote Control supervisors, per-topic serialization, and the free
-expensive-gate mutex.
+Pages push run `31876977060` passed, and both `/comparisons/frontend/` and `/comparisons/backend/`
+are live with HTTP 200. The readiness failure was a stale exact-corpus snapshot, repaired at
+`615786c1a` into stable named invariants and freshly Tier-A reviewed in comment `5301575337`; never
+revert it to total-count pinning. Internals #1658 has final S5 evidence at `704c067e8` with all
+three receipts green and is in final Tier-A. Fixes #1661 is Tier-A PASS at `e3c74d7aa`; one fresh
+opposite-family IMPL-EVAL lease is granted and launching. Features #1293 is implementing S1 after
+the verified plan amendment `feb8b0355`. Preserve the original author threads, all four native Opus
+5/high Remote Control supervisors, per-topic serialization, and the free expensive-gate mutex.
 
-#1661's active evaluator is Fable 5/medium Remote Control session `cb917802-ee26-4b89-86b9-0eee33c7de1b`
-with bridge `session_01Kwmr8XjoznnQsHUnkmfcnV`, exact source `e3c74d7aa`. Its route/identity/lease
-were recorded before mutation at fixes topic head `57680baf3`; do not launch a duplicate.
+#1661's active evaluator is Fable 5/medium Remote Control session
+`cb917802-ee26-4b89-86b9-0eee33c7de1b` with bridge `session_01Kwmr8XjoznnQsHUnkmfcnV`, exact source
+`e3c74d7aa`. Its route/identity/lease were recorded before mutation at fixes topic head `57680baf3`;
+do not launch a duplicate.
 
 Resume from the authoritative `2026-08-15T09:41:25Z` checkpoint. Docs is exhausted and parked at
-topic `0ca4c489f`. Internals #1658 has final Tier-A PASS at `f46d84630` and exactly one active native
-Opus 5/medium Remote Control IMPL-EVAL, session `740d2a3a-1677-459c-a6b1-a39398649d1a`, bridge
-`cse_01NVeBmZE7SwH3Nvu3ep51zV`. Its preceding Fable probe `e58c5f01` was a zero-token,
+topic `0ca4c489f`. Internals #1658 has final Tier-A PASS at `f46d84630` and exactly one active
+native Opus 5/medium Remote Control IMPL-EVAL, session `740d2a3a-1677-459c-a6b1-a39398649d1a`,
+bridge `cse_01NVeBmZE7SwH3Nvu3ep51zV`. Its preceding Fable probe `e58c5f01` was a zero-token,
 pre-inference availability failure and is not an evaluation cycle. Fixes #1661 cycle 1 is terminal
 `FAIL_FIX` at evaluator commit `8d6b4726c`; Tier-A was withdrawn at `1bdb09e13`, and the original
 Codex author is performing the bounded registration-signal lifetime repair before fresh Tier-A and
@@ -288,39 +288,39 @@ Opus evaluator remains active independently. Do not serialize these three topics
 
 Resume from the authoritative `2026-08-15T10:20:00Z` checkpoint. Main is
 `05fc3132b6800a85eb6152691a961b658962571b`: #1658 is merged and #1611/#1613 are closed with sole
-`status:shipped`. Internals has released `package-gate-honesty` (#1604/#1618/#1622) on Codex
-thread `01a004ec-…`, bootstrap/research/plan only; its eventual `scaffold.runtime` requires the
-coordinator mutex. Fixes #1661 cycle-2 evaluation passed but exact-head CI found the optional
-`@tanstack` computed-import invariant was regressed; the preserved original author is restoring it
-in one file before fresh Tier-A and a proportionate fresh evaluator. Features #1662 IMPL-EVAL passed
-at `f52aa471c`; it is non-draft/`status:ready-merge` with exact-head CI active, while #1293 stays
-open and unchanged for the owner-worded concrete-class criterion plus docs #1112. Preserve every
-topic supervisor and author thread, serialize only within topics, and keep the runtime mutex free
-until a documented gate asks for it.
+`status:shipped`. Internals has released `package-gate-honesty` (#1604/#1618/#1622) on Codex thread
+`01a004ec-…`, bootstrap/research/plan only; its eventual `scaffold.runtime` requires the coordinator
+mutex. Fixes #1661 cycle-2 evaluation passed but exact-head CI found the optional `@tanstack`
+computed-import invariant was regressed; the preserved original author is restoring it in one file
+before fresh Tier-A and a proportionate fresh evaluator. Features #1662 IMPL-EVAL passed at
+`f52aa471c`; it is non-draft/`status:ready-merge` with exact-head CI active, while #1293 stays open
+and unchanged for the owner-worded concrete-class criterion plus docs #1112. Preserve every topic
+supervisor and author thread, serialize only within topics, and keep the runtime mutex free until a
+documented gate asks for it.
 
 Resume from the newer authoritative `2026-08-15T10:39:55Z` checkpoint. Main is
-`3fc0f2f9221a8246f0d26a26189bafb2647be08a`: #1662 is merged/shipped, while #1293 remains open
-with only boxes 2 and 3 checked. Features has released #1355/#1360 research/plan on original Codex
-thread `01a004f9-…`, exact base `3fc0f2f92`; do not implement or run `scaffold.runtime` or
-`fresh-browser` before plan review and a coordinator lease. Internals #1663 is at immutable plan
-head `72d5aca66` under the sole real Fable 5/medium Remote Control PLAN-EVAL `9078ecb6-…`; invalid
-probe `bd8b4f90` and stopped Opus fallback `02d8d823` caused no mutation and consume no cycle.
-Fixes #1661 is at Tier-A head `de8944011` after one-file computed-import repair `45aca4adc` and
-root test 4152/0/19; fresh repair-delta evaluator `8a0ff845-…` is active. Preserve all native topic
-supervisors and authors, serialize only within each topic, and keep the runtime mutex free.
+`3fc0f2f9221a8246f0d26a26189bafb2647be08a`: #1662 is merged/shipped, while #1293 remains open with
+only boxes 2 and 3 checked. Features has released #1355/#1360 research/plan on original Codex thread
+`01a004f9-…`, exact base `3fc0f2f92`; do not implement or run `scaffold.runtime` or `fresh-browser`
+before plan review and a coordinator lease. Internals #1663 is at immutable plan head `72d5aca66`
+under the sole real Fable 5/medium Remote Control PLAN-EVAL `9078ecb6-…`; invalid probe `bd8b4f90`
+and stopped Opus fallback `02d8d823` caused no mutation and consume no cycle. Fixes #1661 is at
+Tier-A head `de8944011` after one-file computed-import repair `45aca4adc` and root test 4152/0/19;
+fresh repair-delta evaluator `8a0ff845-…` is active. Preserve all native topic supervisors and
+authors, serialize only within each topic, and keep the runtime mutex free.
 
 Newer gate disposition at `2026-08-15T10:46:30Z`: #1663 cycle 1 is `FAIL_PLAN` at `be2b18728`.
 Coordinator rescope admits `.llm/tools/run-deno-{fmt,lint}.ts` plus their tests and at most one
-narrow marker under the broken fixture; the malformed config is immutable, broad fixture skipping
-is forbidden, both no-flag scoped commands and negative controls are binding. `scaffold.runtime`
-is waived as matrix-`n/a`. The same Codex author repairs only the plan before cycle 2. #1661's
+narrow marker under the broken fixture; the malformed config is immutable, broad fixture skipping is
+forbidden, both no-flag scoped commands and negative controls are binding. `scaffold.runtime` is
+waived as matrix-`n/a`. The same Codex author repairs only the plan before cycle 2. #1661's
 repair-delta evaluation is `PASS` at `f74695bc4`; await terminal exact-head CI and corrected PR
 metadata, then coordinator merge/lifecycle normalization and only then release the next fixes leaf.
 
 Resume from the newer `2026-08-15T10:56:30Z` transition. Main is
 `baf1cdf67a4e931af17b4772ddf6101f36152184`: #1661/#1448 are shipped and the fixes supervisor must
-release `sdk-cache-surface-and-telemetry` only after durable reconciliation. #1664 is draft at
-clean head `6aea4a5ea`; PLAN-EVAL is required, but its author is first repairing the Tier-A evidence
+release `sdk-cache-surface-and-telemetry` only after durable reconciliation. #1664 is draft at clean
+head `6aea4a5ea`; PLAN-EVAL is required, but its author is first repairing the Tier-A evidence
 class: `scaffold.runtime` is suite-owned release-gate evidence and never a catalog/run-gate receipt,
 while `fresh-browser` is a catalog gate. Both remain lease-blocked and load-bearing after cheap
 convergence. #1663 remains on the same Codex plan-repair turn after its marker prototype revealed a
@@ -343,9 +343,9 @@ the six plan-text findings, with direct `clientKey()` emission ruled and no SDK 
 reviewed surface now includes exactly one twelfth path,
 `packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts`, formatting-only; actual product
 mutation remains forbidden before Tier-A and cycle-2 PASS. Fixes has independently released
-`sdk-cache-surface-and-telemetry` on Sol/medium thread
-`01a00516-2033-7ed3-936a-a616cee47447`, base main `baf1cdf67`, research/plan and draft-PR only.
-Preserve all three authors and native topic supervisors; serialize only inside each topic.
+`sdk-cache-surface-and-telemetry` on Sol/medium thread `01a00516-2033-7ed3-936a-a616cee47447`, base
+main `baf1cdf67`, research/plan and draft-PR only. Preserve all three authors and native topic
+supervisors; serialize only inside each topic.
 
 Resume from the authoritative `2026-08-15T11:25:08Z` transition. Main remains `baf1cdf67`. #1664
 cycle 2 is terminal `PASS` at `c53726c69`; its original Codex author may execute only the next
@@ -382,21 +382,21 @@ clean at `194e22a3d`, Tier-A PASS at `b2e0529be`, but implementation remains blo
 owner boundary because both ordinary plan-evaluation cycles failed; a single exceptional final
 PLAN-EVAL was recommended and requested. #1664 S2 remains active independently. No runtime lease.
 
-Resume from the authoritative `2026-08-15T12:21:00Z` transition. Main remains `baf1cdf67`. #1664
-S2 is Tier-A PASS at leaf `3669e9b87`, features topic `3eab955b1`, after two real FAIL_FIX rounds:
+Resume from the authoritative `2026-08-15T12:21:00Z` transition. Main remains `baf1cdf67`. #1664 S2
+is Tier-A PASS at leaf `3669e9b87`, features topic `3eab955b1`, after two real FAIL_FIX rounds:
 pre-write add-path contract validation and the stale `bridgeInvalidation` template assertion. The
 same author is executing S3 only; neither `fresh-browser` nor `scaffold.runtime` is leased or
 authorized. #1665 S1 is Tier-A PASS at `0e4e26c51`, fixes topic `f6f8f0fcb`; the same author is
 executing S2 only with a real in-memory Deno KV RED/GREEN proof and awaited singleton teardown.
-#1663 remains unchanged at its exceptional-final-evaluator owner boundary. Preserve all native
-topic supervisors and original Codex authors; serialization remains per topic only.
+#1663 remains unchanged at its exceptional-final-evaluator owner boundary. Preserve all native topic
+supervisors and original Codex authors; serialization remains per topic only.
 
 Resume from the newer `2026-08-15T12:36:26Z` transition. Main remains `baf1cdf67`. #1664 S3 is
 Tier-A PASS at leaf `1df8a5274`, features topic `c91c2084a`; full CLI 598/0, Fresh cheap gates,
 asset freshness, both cache-age omission guards, and all earlier generator constraints were
-independently rechecked. The same Sol/high author is now running S4 artifact-only convergence:
-three per-member public/publish audit sets and the four immutable-head cheap receipts. Any red gate
-must stop for attribution and scoped review. No runtime lease exists and `scaffold.runtime`,
+independently rechecked. The same Sol/high author is now running S4 artifact-only convergence: three
+per-member public/publish audit sets and the four immutable-head cheap receipts. Any red gate must
+stop for attribution and scoped review. No runtime lease exists and `scaffold.runtime`,
 `fresh-browser`, Aspire, Docker, S5, and evaluation remain forbidden. #1665 is independently
 rerunning the full root check/test after tightening KV initialization inside the mandatory
 `try/finally`; its earlier green receipts were correctly invalidated rather than reused. #1663
@@ -429,14 +429,14 @@ independent work does not wait on it.
 Resume from the authoritative `2026-08-15T15:34:28Z` transition. Main remains `baf1cdf67`; Docker,
 Aspire application ownership, and the singleton runtime lease remain empty. #1665's formal product
 IMPL-EVAL PASS stands, but readiness run `31892668157` failed quality job `95031217843` because the
-authorized query-bridge edit invalidated exactly two checked-in agent-docs bundle assets. Fixes topic
-`ef396767a` authorizes only those assets plus run artifacts; the preserved Sol/medium author is
-regenerating and verifying them, followed by fresh Tier-A and a focused fidelity delta evaluation.
-#1664 pushed exact transport-split plan amendment `93fb5532d` before product head `787cfa928`, but
-features topic `37372cbae` intercepted the wrong response-stage CDP resume and an unproven fixed-sleep
-request baseline. The same Sol/high author is repairing additively and must renew all four receipts
-before fresh Tier-A. No runtime lease or evaluator is permitted. #1663's owner-only decision is
-unchanged; independent lanes continue.
+authorized query-bridge edit invalidated exactly two checked-in agent-docs bundle assets. Fixes
+topic `ef396767a` authorizes only those assets plus run artifacts; the preserved Sol/medium author
+is regenerating and verifying them, followed by fresh Tier-A and a focused fidelity delta
+evaluation. #1664 pushed exact transport-split plan amendment `93fb5532d` before product head
+`787cfa928`, but features topic `37372cbae` intercepted the wrong response-stage CDP resume and an
+unproven fixed-sleep request baseline. The same Sol/high author is repairing additively and must
+renew all four receipts before fresh Tier-A. No runtime lease or evaluator is permitted. #1663's
+owner-only decision is unchanged; independent lanes continue.
 
 Resume from the authoritative `2026-08-15T15:50:53Z` transition. Main remains `baf1cdf67`; runtime
 ownership is empty. #1665 two-asset corpus repair `7549d9fc0` passed fresh Tier-A `7fe2f433e` and
@@ -449,9 +449,9 @@ artifacts; same-author generation, fresh Tier-A, and a focused asset-chain delta
 driven completed/stable baseline, response-stage `Fetch.continueResponse`, and shared negative late-
 initial-request proof. No runtime lease before fresh Tier-A. #1663 owner boundary is unchanged.
 
-Resume from the authoritative `2026-08-15T15:57:31Z` transition. Main remains `baf1cdf67`.
-#1664 evidence head `b14975af7` has four PASS/SUFFICIENT receipts and fresh features Tier-A PASS at
-topic `63d190d4b`. The features lane owns the singleton S5 runtime lease on a clean host and must run
+Resume from the authoritative `2026-08-15T15:57:31Z` transition. Main remains `baf1cdf67`. #1664
+evidence head `b14975af7` has four PASS/SUFFICIENT receipts and fresh features Tier-A PASS at topic
+`63d190d4b`. The features lane owns the singleton S5 runtime lease on a clean host and must run
 `scaffold.runtime` then `fresh-browser` serially with cleanup and audits; the PR stays draft and no
 evaluator is authorized yet. #1665 link-3 author remains active. Fixes checkpoint `92ea9f829` proves
 the branch-caused generated closure is exactly four paths and authorizes only
@@ -465,20 +465,20 @@ consumer with one missing canonical DB-Zod module and two real payments-input ty
 cleanup is proven clean and `fresh-browser` is NOT_RUN. Features topic `d2e83f690` releases the
 lease. F3 must be scoped/pushed before same-author mutation, cover all three diagnostics and the
 false equal-tail assumption, then pass fresh Tier-A before requesting a new lease. #1665 link 3 is
-clean/pushed at `27a64ea4c`; fixes topic `a9176278a` is serially dispatching the same original author
-for only `packages/mcp/src/publish-assets.generated.ts`. No fixes Tier-A/evaluator/readiness until
-that fourth link lands. #1663's owner-only decision remains unchanged.
+clean/pushed at `27a64ea4c`; fixes topic `a9176278a` is serially dispatching the same original
+author for only `packages/mcp/src/publish-assets.generated.ts`. No fixes Tier-A/evaluator/readiness
+until that fourth link lands. #1663's owner-only decision remains unchanged.
 
 Resume from the authoritative `2026-08-15T16:14:20Z` transition. Runtime ownership remains empty.
 #1665 is clean/pushed at final cascade head `9a2c74c41`; fixes Tier-A PASS checkpoint `cbd32230e`
 independently proves all three freshness gates pass simultaneously and leave a clean generated tree.
-Fresh Fable 5/medium Remote Control evaluator `262ef8e1-…`, bridge
-`cse_01E3QfD1wkvb1naZKS6m7bp2`, is active over only the full four-link asset-chain delta. Do not
-resume readiness until its artifact-only terminal verdict. #1664 pushed dependency-isolation plan
-amendment `c4a900adc` before creating the newly authorized internal primitive after generated-app
-replay proved the parent probe cannot be imported through the app's import map. Same author remains
-active on cheap tests and four receipts; no new lease before fresh features Tier-A. #1663's exact
-owner-only decision remains unchanged.
+Fresh Fable 5/medium Remote Control evaluator `262ef8e1-…`, bridge `cse_01E3QfD1wkvb1naZKS6m7bp2`,
+is active over only the full four-link asset-chain delta. Do not resume readiness until its
+artifact-only terminal verdict. #1664 pushed dependency-isolation plan amendment `c4a900adc` before
+creating the newly authorized internal primitive after generated-app replay proved the parent probe
+cannot be imported through the app's import map. Same author remains active on cheap tests and four
+receipts; no new lease before fresh features Tier-A. #1663's exact owner-only decision remains
+unchanged.
 
 Resume from the authoritative `2026-08-15T16:27:03Z` transition. Runtime ownership remains empty.
 #1665's final four-link chain delta evaluator is terminal `PASS` at artifact-only head `ac274a464`,
@@ -517,40 +517,41 @@ PASS/SUFFICIENT while the original FAIL stays append-only. It owns the singleton
 `app-service-client-wiring-f3-runtime`: run suite-owned `scaffold.runtime` first, mandatory
 Aspire/Docker cleanup plus empty-host audit; only on PASS run catalog-backed `fresh-browser`
 serially, then browser/runtime cleanup and final audit. No evaluator before both runtime gates and
-topic reconciliation. Coordinator route remains GPT-5.6-SOL/high through Codex Remote Control,
-never max. Preserve every native Claude topic supervisor and the #1651 option-1 adapter boundary.
+topic reconciliation. Coordinator route remains GPT-5.6-SOL/high through Codex Remote Control, never
+max. Preserve every native Claude topic supervisor and the #1651 option-1 adapter boundary.
 
 Newer checkpoint `2026-08-15T16:49:14Z`: #1666 Tier-A PASS is pushed at topic `d5f5ea55a` and its
 single authorized native Fable 5/medium Remote Control PLAN-EVAL is active as job `68c31fcc`, bridge
 `cse_01DcmCJnvESF3a4nVDvUR8u8`, source `a3f6b87b5`, artifact-only. #1461 opened draft PR #1669 at
-plan head `7e5be1514`; before PLAN-EVAL, fixes Tier-A must reconcile the raw doc-lint count and amend
-scope to include the second demonstrably false cache-refresh claim at
+plan head `7e5be1514`; before PLAN-EVAL, fixes Tier-A must reconcile the raw doc-lint count and
+amend scope to include the second demonstrably false cache-refresh claim at
 `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`. No product mutation yet. #1664
 continues to own the only runtime lease and is running scaffold first.
 
 Newer runtime truth `2026-08-15T16:53:06Z`: #1664 evidence head `e1dcb726b` records
-`scaffold.runtime` FAIL (20/1/0) at `generated.service-client-contract`; fresh-browser is NOT_RUN and
-the singleton lease is released after a verified empty Aspire/Docker/browser host. The leaf's probe
-mistook the first reconciliation after plugin configuration changed for a same-input idempotency
-rerun. Require an immutable F4 plan amendment before repair, then one allowed reconciliation plus a
-second identical invocation that writes zero clients and zero helpers, fresh cheap receipts and
-features Tier-A before any new lease. Preserve every prior FAIL and do not launch an evaluator.
+`scaffold.runtime` FAIL (20/1/0) at `generated.service-client-contract`; fresh-browser is NOT_RUN
+and the singleton lease is released after a verified empty Aspire/Docker/browser host. The leaf's
+probe mistook the first reconciliation after plugin configuration changed for a same-input
+idempotency rerun. Require an immutable F4 plan amendment before repair, then one allowed
+reconciliation plus a second identical invocation that writes zero clients and zero helpers, fresh
+cheap receipts and features Tier-A before any new lease. Preserve every prior FAIL and do not launch
+an evaluator.
 
 Newer checkpoint `2026-08-15T16:57:59Z`: no evaluator or expensive lease is active. #1666 cycle-1
-PLAN-EVAL is terminal `FAIL_PLAN` at `5d229e0f3`; leaf artifact head `cb91b225d`, topic
-`818575d18`. SA-2 authorizes only three JSDoc import-line paths—Contracts transform helper to the
-transform subpath, filter and pagination schemas to the query subpath—plus plan/run artifacts. The
-plan must correct the false claim that docs-accuracy lacks CI enforcement, address N1-N5, pass fresh
-Tier-A, then use one fresh Fable 5/medium Remote Control cycle-2 evaluator. #1663 stays parked.
-#1664 F4 is active on the original Sol/high author after exact consecutive-run/hash proof confirmed
-the gate premise was false. #1461 is plan-only at `ebf8977c1`; its second docs-source amendment is
-being delivered on the preserved author before Tier-A/evaluation.
+PLAN-EVAL is terminal `FAIL_PLAN` at `5d229e0f3`; leaf artifact head `cb91b225d`, topic `818575d18`.
+SA-2 authorizes only three JSDoc import-line paths—Contracts transform helper to the transform
+subpath, filter and pagination schemas to the query subpath—plus plan/run artifacts. The plan must
+correct the false claim that docs-accuracy lacks CI enforcement, address N1-N5, pass fresh Tier-A,
+then use one fresh Fable 5/medium Remote Control cycle-2 evaluator. #1663 stays parked. #1664 F4 is
+active on the original Sol/high author after exact consecutive-run/hash proof confirmed the gate
+premise was false. #1461 is plan-only at `ebf8977c1`; its second docs-source amendment is being
+delivered on the preserved author before Tier-A/evaluation.
 
-Newer checkpoint `2026-08-15T17:11:14Z`: #1664 is clean and immutable at evidence head
-`6f813b0db`, content `7876aa109`; four exact-content-head receipts are PASS/SUFFICIENT and fresh
-features Tier-A passed at topic `35f3a6975`. The singleton attempt-3 lease is active only for
-suite-owned `scaffold.runtime`, followed by mandatory cleanup/audit; `fresh-browser` may run serially
-only if scaffold passes, followed by final cleanup/audit. No evaluator yet. Unlike attempt 2, every
+Newer checkpoint `2026-08-15T17:11:14Z`: #1664 is clean and immutable at evidence head `6f813b0db`,
+content `7876aa109`; four exact-content-head receipts are PASS/SUFFICIENT and fresh features Tier-A
+passed at topic `35f3a6975`. The singleton attempt-3 lease is active only for suite-owned
+`scaffold.runtime`, followed by mandatory cleanup/audit; `fresh-browser` may run serially only if
+scaffold passes, followed by final cleanup/audit. No evaluator yet. Unlike attempt 2, every
 preflight artifact was committed before lease grant, so the leased head must not move. #1461 scope
 amendment `eadd672d0` is plan-only but fixes Tier-A is `FAIL_FIX` at `9e9d02ebb`: repair the same
 authorized page's five additional SWR narrative lines explicitly, re-review, then PLAN-EVAL only on
@@ -561,21 +562,21 @@ Claude supervisors and #1651 option 1.
 Newer attachment checkpoint `2026-08-15T17:18:10Z`: #1666 plan-only SA-2 head `80046696e` passed
 fresh Tier-A at internals topic `bb8c12f56`. Final ordinary PLAN-EVAL cycle 2 is active as fresh
 native Fable 5/medium session `580832d7-53e8-4828-ad41-e2f9219c9340`, PID 379716, launched with
-Remote Control and bound to that exact head. Bridge metadata is truthfully pending until emitted.
-Do not begin the three JSDoc edits or any product work before a terminal PASS; a FAIL returns to the
+Remote Control and bound to that exact head. Bridge metadata is truthfully pending until emitted. Do
+not begin the three JSDoc edits or any product work before a terminal PASS; a FAIL returns to the
 owner boundary. #1664 runtime attempt 3 continues independently under its existing singleton lease.
 
 Newer runtime truth `2026-08-15T17:19:55Z`: #1664 attempt 3 is terminal `FAIL_FIX`, 32 passed / 1
-failed / 0 skipped at `generated.deno-fmt-check`; the repaired service-client contract passed.
-Suite cleanup, run-owned teardown, and independent leak audit leave Aspire/Docker empty with zero
+failed / 0 skipped at `generated.deno-fmt-check`; the repaired service-client contract passed. Suite
+cleanup, run-owned teardown, and independent leak audit leave Aspire/Docker empty with zero
 survivors, so the singleton lease is free. `fresh-browser` remains NOT_RUN. Preserve the raw log and
 complete generated-format attribution before any amendment or retry; no product mutation is
 authorized under the released lease. #1666 cycle-2 evaluator remains active independently.
 
 Newer checkpoint `2026-08-15T17:29:40Z`: #1461 repaired plan `23db20f30` passed fixes Tier-A at
-`f71e860f9`; PLAN-EVAL job `01f0eda8`, bridge `cse_01SWnk7LwvoLaamvEwR5WLfX`, is active native
-Fable 5/medium Remote Control. #1666 cycle-2's initial session was interrupted after verification
-but before artifact/verdict; the same history is recovered as job `0e2d1e57`, bridge
+`f71e860f9`; PLAN-EVAL job `01f0eda8`, bridge `cse_01SWnk7LwvoLaamvEwR5WLfX`, is active native Fable
+5/medium Remote Control. #1666 cycle-2's initial session was interrupted after verification but
+before artifact/verdict; the same history is recovered as job `0e2d1e57`, bridge
 `cse_01K6SbsotG5MyjyjTd11SrfK`, without consuming another cycle. #1664 evidence is pushed at
 `09a771c8e`; do not accept its blanket baseline attribution until fresh features Tier-A classifies
 all twelve unformatted generated paths, several of which are leaf-owned. No runtime lease is active.
@@ -589,21 +590,23 @@ outputs formatter-clean. No runtime retry, fresh-browser, or F5 product mutation
 
 Newer checkpoint `2026-08-15T17:36:05Z`: #1669 PLAN-EVAL is terminal `PASS` at evaluator commit
 `d555cc971`, comment `5303412171`; fixes topic `370ff6eba` dispatched S1 only to the preserved
-Sol/medium author. Carry evaluator advisories A2/A3 in product/tests and A1/A4 into S2; require fresh
-Tier-A before S2. #1664's corrected features record is `f5f75adc8`: all twelve format failures share
-the post-init canonicalization gap. F5 is authorized only as a same-author plan amendment with exact
-paths and formatted-against-formatted equality; a post-write-only call to current `formatOutput`
-would regress proven F4 and is not authorized. No runtime lease or fresh-browser run is active.
+Sol/medium author. Carry evaluator advisories A2/A3 in product/tests and A1/A4 into S2; require
+fresh Tier-A before S2. #1664's corrected features record is `f5f75adc8`: all twelve format failures
+share the post-init canonicalization gap. F5 is authorized only as a same-author plan amendment with
+exact paths and formatted-against-formatted equality; a post-write-only call to current
+`formatOutput` would regress proven F4 and is not authorized. No runtime lease or fresh-browser run
+is active.
 
 Newer checkpoint `2026-08-15T17:55:29Z`: #1666 S1 `678840603` passed fresh internals Tier-A at
 `6c183ef16`; the preserved author is active on S2 only, with S3 held. #1664 F5 plan amendment
-`3204ffa98` received honest Tier-A `FAIL_FIX` at features topic `c8d3acb92`; the same author is adding
-three stdin/extension safety proofs and one composition-path justification before another plan
-review, with no product mutation. #1669 pushed S1 head `e05a54145`, but coordinator rejected its
-499-line result because it removed useful JSDoc/spacing solely to suppress F-1. The same author is
-restoring that content and must reduce structurally inside the two-file scope or propose one exact
-internal helper before any scope widening. No runtime lease, Aspire application, Docker container,
-or browser gate is active. #1663 remains untouched at its owner-only third-evaluator boundary.
+`3204ffa98` received honest Tier-A `FAIL_FIX` at features topic `c8d3acb92`; the same author is
+adding three stdin/extension safety proofs and one composition-path justification before another
+plan review, with no product mutation. #1669 pushed S1 head `e05a54145`, but coordinator rejected
+its 499-line result because it removed useful JSDoc/spacing solely to suppress F-1. The same author
+is restoring that content and must reduce structurally inside the two-file scope or propose one
+exact internal helper before any scope widening. No runtime lease, Aspire application, Docker
+container, or browser gate is active. #1663 remains untouched at its owner-only third-evaluator
+boundary.
 
 Newer checkpoint `2026-08-15T18:00:45Z`: #1666 S2 is clean/pushed at `47ca22abe`; fresh internals
 Tier-A is active and S3 stays held. #1664 plan repair `630185e2c` passed fresh features Tier-A at
@@ -622,7 +625,8 @@ continues independently inside the accepted 15-product/12-test ceiling. No runti
 
 Delivery update `2026-08-15T18:11:19Z`: #1669 S2 is now verified active on the original author with
 the exact two docs pages, one factory regression, four generated mirrors, and run artifacts. It must
-stop for fresh fixes Tier-A before IMPL-EVAL; no runtime lease or out-of-scope tooling change exists.
+stop for fresh fixes Tier-A before IMPL-EVAL; no runtime lease or out-of-scope tooling change
+exists.
 
 Newer stop `2026-08-15T18:17:33Z`: #1669 S2 exposed the pre-existing fresh-entry bug in
 `preferFreshOnStale` and stopped before generation/commit. A plan-only amendment may add exactly
@@ -644,23 +648,25 @@ processes, no relevant listeners, and no competing lease. Attempt 4 now owns the
 lease: `scaffold.runtime` first, mandatory cleanup/audit, then `fresh-browser` only on PASS and a
 second cleanup/audit. #1666 IMPL-EVAL is active under native Fable 5/medium Remote Control session
 `3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, artifact-only over
-implementation `47ca22abe` and evidence `d095c1260`. #1669 has applied exactly the approved predicate
-correction while its two docs pages and query-factory test remain in the bounded S2 author turn.
+implementation `47ca22abe` and evidence `d095c1260`. #1669 has applied exactly the approved
+predicate correction while its two docs pages and query-factory test remain in the bounded S2 author
+turn.
 
-Newer transition `2026-08-15T18:41:18Z`: #1666 cycle-1 IMPL-EVAL returned `FAIL_FIX` at
-`4c09e9203`, comment `5303665087`, with exactly one test-quality defect. Three refusal tests can pass
-for an unrelated NotFound or a masking OMITS result; the checker itself and every other re-derived
-judgment hold. Internals topic `3c8db8178` returned only the authorized test path to the same original
-Sol/medium author, requiring specific-cause assertions, four independent mutation reds, and all seven
-receipts re-cut on one new head before fresh Tier-A and cycle-2 IMPL-EVAL. #1664 attempt-4 runtime
-continues independently under its immutable lease; #1669 S2 continues independently.
+Newer transition `2026-08-15T18:41:18Z`: #1666 cycle-1 IMPL-EVAL returned `FAIL_FIX` at `4c09e9203`,
+comment `5303665087`, with exactly one test-quality defect. Three refusal tests can pass for an
+unrelated NotFound or a masking OMITS result; the checker itself and every other re-derived judgment
+hold. Internals topic `3c8db8178` returned only the authorized test path to the same original
+Sol/medium author, requiring specific-cause assertions, four independent mutation reds, and all
+seven receipts re-cut on one new head before fresh Tier-A and cycle-2 IMPL-EVAL. #1664 attempt-4
+runtime continues independently under its immutable lease; #1669 S2 continues independently.
 
-Newer stop `2026-08-15T18:48:52Z`: #1664 attempt-4 `scaffold.runtime` is terminal red at 69/1/0.
-The previously failing generated format gate passed; `behavior.service-client-refetch` instead threw
+Newer stop `2026-08-15T18:48:52Z`: #1664 attempt-4 `scaffold.runtime` is terminal red at 69/1/0. The
+previously failing generated format gate passed; `behavior.service-client-refetch` instead threw
 when cleanup called `kill(SIGTERM)` on an already-terminated browser child. Raw log hash is
 `b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`. Suite cleanup passed and an
 independent Aspire/Docker/process/port audit is empty, so the lease is released and `fresh-browser`
-is `NOT_RUN`. Preserve evidence and attribute before any repair; no retry or evaluator is authorized.
+is `NOT_RUN`. Preserve evidence and attribute before any repair; no retry or evaluator is
+authorized.
 
 Newer transition `2026-08-15T19:03:12Z`: #1664 plan-only F6 is pushed at `36da13fa1` and undergoing
 fresh features Tier-A; only the existing browser probe plus test may later change, with no attempt-5
@@ -674,12 +680,12 @@ attempt-4 `aspire-managed` utility children missed by `aspire ps`; Aspire, Docke
 browser, and port state is now empty. #1663 remains owner-only and #1651 option 1 is preserved.
 
 Follow-on `2026-08-15T19:05Z`: #1666 repair evidence `010da98a2` is now local == remote == PR with
-comment `5303770640`; fresh internals Tier-A is active. #1664 F6 plan Tier-A passed at features topic
-`f436df086`, releasing the same author for exactly two paths and four new binding receipts before a
-second Tier-A. No runtime lease exists.
+comment `5303770640`; fresh internals Tier-A is active. #1664 F6 plan Tier-A passed at features
+topic `f436df086`, releasing the same author for exactly two paths and four new binding receipts
+before a second Tier-A. No runtime lease exists.
 
-Newer transition `2026-08-15T19:08:30Z`: #1666 repair Tier-A passed at `0646f429f` and final
-cycle-2 Fable 5/medium Remote Control IMPL-EVAL job `7a3b4645` is active at
+Newer transition `2026-08-15T19:08:30Z`: #1666 repair Tier-A passed at `0646f429f` and final cycle-2
+Fable 5/medium Remote Control IMPL-EVAL job `7a3b4645` is active at
 `session_01MDMbe68iYvjHBLuUGKZqBS` over `423867017`/`010da98a2`. #1669 final S2 Tier-A passed at
 `a374977d8`; its Fable 5/medium Remote Control IMPL-EVAL job `f40814ce` is active at
 `session_01CMrdm9P2YwHxiNCT49C4Hf` over `eba0b0924`/`9aa54ae2d`. #1664's two-path repair continues
@@ -687,38 +693,42 @@ in parallel under its topic-local serial queue; the runtime mutex is free.
 
 Newer terminal `2026-08-15T19:14:29Z`: #1666 final cycle-2 IMPL-EVAL passed at `ee67d12b4`, comment
 `5303804773`, over repaired content `423867017` and evidence `010da98a2`. The artifact correctly
-binds all eight physical fix1 receipts to the repaired content head and treats the first test receipt
-as preserved red. Two stale brief sentences named old `47ca22abe`, but the correct binding section
-and the entire evaluator output use `423867017`, so the contradiction is recorded as non-impacting
-brief drift. Internals is preparing coordinator readiness; no merge or issue-box edit has occurred.
+binds all eight physical fix1 receipts to the repaired content head and treats the first test
+receipt as preserved red. Two stale brief sentences named old `47ca22abe`, but the correct binding
+section and the entire evaluator output use `423867017`, so the contradiction is recorded as
+non-impacting brief drift. Internals is preparing coordinator readiness; no merge or issue-box edit
+has occurred.
 
 Newer transition `2026-08-15T19:18:20Z`: #1666 is non-draft at `status:ready-merge`, unchanged head
-`ee67d12b4`. All nine PR DoD boxes are current/checked; comment `5303825255` contains the sole five-row
-#1296 acceptance mapping; the live dry-run passed before readiness. Current CI run `31903523137` is
-active and must produce a real mirror mutation plus green close-gate/core visibility before merge.
+`ee67d12b4`. All nine PR DoD boxes are current/checked; comment `5303825255` contains the sole
+five-row #1296 acceptance mapping; the live dry-run passed before readiness. Current CI run
+`31903523137` is active and must produce a real mirror mutation plus green close-gate/core
+visibility before merge.
 
 Newer rollback `2026-08-15T19:24:31Z`: #1666 is draft again with `status:impl`; its close-gate red
-was a ready-label race and mutated no #1296 box, while quality found a real omitted agent-docs corpus
-regeneration caused by the changed Fresh UI reference page. Internals owns a same-original-author,
-plan-first exact cascade rescope, fresh Tier-A before generation, renewed exact-head receipts, a
-second Tier-A, and a fresh delta IMPL-EVAL before readiness. #1664 is at evidence `4c7792f20` over
-product `7fa29ad3e`: the first root-test receipt remains red because an ignored root-owned Postgres
-temp tree was traversed. That exact tree is recoverably quarantined under
-`/tmp/netscript-f6-quarantine.7kXcDX`; a distinct unchanged-head attempt 2 is active. Runtime leases
-remain free; #1663 and #1651 option 1 are unchanged.
+was a ready-label race and mutated no #1296 box, while quality found a real omitted agent-docs
+corpus regeneration caused by the changed Fresh UI reference page. Internals owns a
+same-original-author, plan-first exact cascade rescope, fresh Tier-A before generation, renewed
+exact-head receipts, a second Tier-A, and a fresh delta IMPL-EVAL before readiness. #1664 is at
+evidence `4c7792f20` over product `7fa29ad3e`: the first root-test receipt remains red because an
+ignored root-owned Postgres temp tree was traversed. That exact tree is recoverably quarantined
+under `/tmp/netscript-f6-quarantine.7kXcDX`; a distinct unchanged-head attempt 2 is active. Runtime
+leases remain free; #1663 and #1651 option 1 are unchanged.
 
 Newer transition `2026-08-15T19:31:02Z`: #1669 IMPL-EVAL is `PASS` at artifact-only `313cc08d5`,
 comment `5303850473`, with no review threads and exact local/remote/PR equality. All eleven PR DoD
 rows are current. Sole acceptance mapping comment `5303873817` covers all six live #1461 boxes; the
-live mirror dry-run passed. `impl-eval:skip` and `status:ready-merge` were verified while draft before
-the ready flip, avoiding #1666's label race. Exact-head CI run `31904125478` is active. Do not merge
-or release the serial #1350 leaf until mirror/close-gate/required checks are terminal green.
+live mirror dry-run passed. `impl-eval:skip` and `status:ready-merge` were verified while draft
+before the ready flip, avoiding #1666's label race. Exact-head CI run `31904125478` is active. Do
+not merge or release the serial #1350 leaf until mirror/close-gate/required checks are terminal
+green.
 
 Newer lease `2026-08-15T19:39:00Z`: #1664 final F6 Tier-A passed at `a4224dbb1`; evidence
-`a8a160285` is clean/pushed over product `7fa29ad3e`, with four selected PASS/SUFFICIENT receipts and
-the environmental red preserved. Host preflight is empty after an explicit post-`aspire ps` audit.
-Attempt 5 owns the singleton runtime lease: one `scaffold.runtime`, cleanup/audit, `fresh-browser`
-only after PASS, then final cleanup/audit. Stop on any red; no retry or evaluator yet.
+`a8a160285` is clean/pushed over product `7fa29ad3e`, with four selected PASS/SUFFICIENT receipts
+and the environmental red preserved. Host preflight is empty after an explicit post-`aspire ps`
+audit. Attempt 5 owns the singleton runtime lease: one `scaffold.runtime`, cleanup/audit,
+`fresh-browser` only after PASS, then final cleanup/audit. Stop on any red; no retry or evaluator
+yet.
 
 Newer ship `2026-08-15T19:40:10Z`: #1669 merged as main `0ef48c2ec` after exact-head close-gate,
 mirror, quality, check-test, and core visibility passed; #1461 is closed with six boxes checked and
@@ -729,76 +739,76 @@ ratified Stage-0 prerequisite is satisfied and does not block #1350.
 Newer dispatch `2026-08-15T19:44:30Z`: #1666 SA-3 plan `f98cfabac` passed fresh internals Tier-A;
 the same author is generating exactly four approved corpus/publish outputs before a second Tier-A
 and fresh delta IMPL-EVAL. Non-blocking docs debt is filed as #1670. #1350 is active plan-only in
-`/home/codex/repos/netscript-007-leaf-typed-error` on exact main `0ef48c2ec`, Codex Sol/medium thread
-`01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`; keep #1348 open.
+`/home/codex/repos/netscript-007-leaf-typed-error` on exact main `0ef48c2ec`, Codex Sol/medium
+thread `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`; keep #1348 open.
 
 Newer stop `2026-08-15T19:47:30Z`: #1664 attempt 5 is red at 69/1/0 because Chrome never exposed a
 DevTools target; F6 teardown no longer masks the verdict. Raw log SHA is `ff349b40…e062b`.
 `fresh-browser` is `NOT_RUN`; suite cleanup plus exact-PID orphan cleanup left Aspire, Docker,
-application/browser/runtime processes and ports empty, so the lease is released. Same-author measured
-attribution and a plan-only amendment precede mutation, Tier-A, or any later retry.
+application/browser/runtime processes and ports empty, so the lease is released. Same-author
+measured attribution and a plan-only amendment precede mutation, Tier-A, or any later retry.
 
-Newer reconciliation `2026-08-15T19:57:21Z`: the #1669 evaluator lease record is terminal `PASS`
-at artifact `313cc08d5`/comment `5303850473`, matching its already-terminal leaf and shipped GitHub
+Newer reconciliation `2026-08-15T19:57:21Z`: the #1669 evaluator lease record is terminal `PASS` at
+artifact `313cc08d5`/comment `5303850473`, matching its already-terminal leaf and shipped GitHub
 lifecycle. Cluster `currentMainSha` is corrected to live remote main `0ef48c2ec`. The remaining
-Claude PID is a background spare, not an evaluator, and is preserved. No lane or runtime lease moved.
+Claude PID is a background spare, not an evaluator, and is preserved. No lane or runtime lease
+moved.
 
-Newer transition `2026-08-15T20:17:10Z`: #1664 F7-C1 is corrected/pushed at `a2e9515f5`, Tier-A
-PASS at features topic `8ec20d606`, and the same Sol/high author is implementing only the reviewed
-probe/test paths before four cheap receipts and another Tier-A; no runtime lease or attempt 6.
-#1666 recovery `b67414f4f` preserves the 4202/1/19 supervisor-hook red and records the sole
-unchanged-head retry PASS at 4203/0/19; the exact hook event is recoverably quarantined outside the
-repo with identical `d0251bc2…ab2` hashes, and second internals Tier-A is active. #1671 amended plan
+Newer transition `2026-08-15T20:17:10Z`: #1664 F7-C1 is corrected/pushed at `a2e9515f5`, Tier-A PASS
+at features topic `8ec20d606`, and the same Sol/high author is implementing only the reviewed
+probe/test paths before four cheap receipts and another Tier-A; no runtime lease or attempt 6. #1666
+recovery `b67414f4f` preserves the 4202/1/19 supervisor-hook red and records the sole unchanged-head
+retry PASS at 4203/0/19; the exact hook event is recoverably quarantined outside the repo with
+identical `d0251bc2…ab2` hashes, and second internals Tier-A is active. #1671 amended plan
 `2fa2f71dc` passed fixes Tier-A at `6c9486004`; native Fable 5/medium Remote Control PLAN-EVAL job
 `50898ac7` is active at `session_015RuDy1h3UiCkLzo1PLk5Sc`. No product mutation before its PASS.
 
 Newer transition `2026-08-15T20:23:15Z`: #1671 PLAN-EVAL passed at artifact-only `f76a3c45b`,
-comment `5304059808`; S1 alone is active on the preserved Sol/medium author with both RED signatures,
-contracts-exported schemas, retained type default, empty metadata slot, and no seventh path. #1666
-second Tier-A passed at `8933f58f2`; fresh Fable 5/medium Remote Control delta IMPL-EVAL job
-`f281b8cf` is active at `session_01UDGunAVYYPRC6KBNxEwZWA` over `46528ae4c`/`b67414f4f`, with
+comment `5304059808`; S1 alone is active on the preserved Sol/medium author with both RED
+signatures, contracts-exported schemas, retained type default, empty metadata slot, and no seventh
+path. #1666 second Tier-A passed at `8933f58f2`; fresh Fable 5/medium Remote Control delta IMPL-EVAL
+job `f281b8cf` is active at `session_01UDGunAVYYPRC6KBNxEwZWA` over `46528ae4c`/`b67414f4f`, with
 independent idempotence re-derivation load-bearing. No readiness or runtime lease.
 
-
 Newer transition `2026-08-15T20:38:42Z`: #1666 delta IMPL-EVAL passed at `0d4c82d6e` / comment
-`5304103041`, but current main creates a deterministic four-generated-output conflict via #1665.
-The original Sol/medium author is integrating `0ef48c2ec` and rerunning the canonical cascade under
+`5304103041`, but current main creates a deterministic four-generated-output conflict via #1665. The
+original Sol/medium author is integrating `0ef48c2ec` and rerunning the canonical cascade under
 internals checkpoint `268544516`; fresh Tier-A and a fresh delta evaluator precede readiness. #1671
 S1 `dc034d680` passed fresh fixes Tier-A at `7281cebac`; S2 only is active in `errors.ts`,
-`service-client.ts`, and the doctest, with positive exact-union assertions and no metadata/docs scope.
-#1664 F7 content `e45144db6` has focused 22/0 and exact-head check PASS; its 4236/1/19 root red is
-environmental unreadable attempt-5 residue, preserved at evidence `885f352e7`. The run-owned tree is
-recoverably quarantined at `/tmp/netscript-f7-quarantine.iXF6fb`; one exact-content test retry and
-the remaining two cheap gates are active before fresh Tier-A. No runtime lease or readiness action.
-
+`service-client.ts`, and the doctest, with positive exact-union assertions and no metadata/docs
+scope. #1664 F7 content `e45144db6` has focused 22/0 and exact-head check PASS; its 4236/1/19 root
+red is environmental unreadable attempt-5 residue, preserved at evidence `885f352e7`. The run-owned
+tree is recoverably quarantined at `/tmp/netscript-f7-quarantine.iXF6fb`; one exact-content test
+retry and the remaining two cheap gates are active before fresh Tier-A. No runtime lease or
+readiness action.
 
 Newer lease `2026-08-15T20:56:25Z`: #1664 F7 evidence `ed3f78e0d` passed fresh features Tier-A at
 `4a65a2670`; four exact-content receipts are PASS/SUFFICIENT and the environmental red remains.
 Preflight is empty after three older readable run workspaces moved recoverably to
 `/tmp/netscript-preattempt6-quarantine.9mNpwE`. Attempt 6 holds the singleton runtime lease at topic
-`ac1ec35cf`: run one scaffold.runtime with managed Chrome 151, audit, then fresh-browser only on PASS
-plus clean audit; no retry/evaluator. #1671 S2 `ca7ade409` passed fixes Tier-A at `ac0b2c4c3`; S3 is
-active on exactly the two docs pages, with S4, metadata, #1348, and #1466 untouched. #1666 merged-main
-content `8c03d8629` has twelve exact-head PASS receipts and remains unpushed until its append-only
-integration evidence is complete.
+`ac1ec35cf`: run one scaffold.runtime with managed Chrome 151, audit, then fresh-browser only on
+PASS plus clean audit; no retry/evaluator. #1671 S2 `ca7ade409` passed fixes Tier-A at `ac0b2c4c3`;
+S3 is active on exactly the two docs pages, with S4, metadata, #1348, and #1466 untouched. #1666
+merged-main content `8c03d8629` has twelve exact-head PASS receipts and remains unpushed until its
+append-only integration evidence is complete.
 
 Newer transition `2026-08-15T21:03:30Z`: #1666 current-main refresh is now clean/pushed at evidence
 `021c7ffc6` over merge content `8c03d8629`, with PR comment `5304205247`. Fresh internals Tier-A
-passed at `6658ad9c0`; one native Fable 5/medium Remote Control integration-delta evaluator is active
-as job `be3774eb`, bridge `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The prior `f281b8cf` lease is terminal
-PASS and was reconciled from stale active state. Hold readiness, acceptance mirroring, close-gate,
-and merge until the integration evaluator is terminal. #1664 attempt 6 and #1671 S3 remain active
-independently; #1663 remains at the owner-only exceptional third-evaluator boundary.
+passed at `6658ad9c0`; one native Fable 5/medium Remote Control integration-delta evaluator is
+active as job `be3774eb`, bridge `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The prior `f281b8cf` lease is
+terminal PASS and was reconciled from stale active state. Hold readiness, acceptance mirroring,
+close-gate, and merge until the integration evaluator is terminal. #1664 attempt 6 and #1671 S3
+remain active independently; #1663 remains at the owner-only exceptional third-evaluator boundary.
 
 Newer transition `2026-08-15T21:18:24Z`: #1666 integration-delta IMPL-EVAL passed at artifact-only
 `05ac90d00`, comment `5304256350`, with native Fable 5/medium Remote Control proven at
 `session_01RQ7Eb4N4NaQEuAA6zPtpxV`; its lease is terminal. Readiness attempt 2 then passed live
 acceptance mirroring and close-gate run `31908897973`, checking all five #1296 rows, but dedicated
 changed-source run `31908898023` failed on two leaf-owned type-safety findings in
-`check-exports-drift.ts`. #1666 is therefore draft again at `status:impl`, unmerged. The same original
-Sol/medium author owns one focused repair; fresh internals Tier-A and a fresh delta evaluator precede
-any later ready flip. #1664's bounded attempt 6 and #1671 S4 continue independently; #1663 remains
-untouched at its owner-only exceptional evaluator boundary.
+`check-exports-drift.ts`. #1666 is therefore draft again at `status:impl`, unmerged. The same
+original Sol/medium author owns one focused repair; fresh internals Tier-A and a fresh delta
+evaluator precede any later ready flip. #1664's bounded attempt 6 and #1671 S4 continue
+independently; #1663 remains untouched at its owner-only exceptional evaluator boundary.
 
 Newer transition `2026-08-15T21:31:49Z`: #1664 attempt 6 is terminal red at evidence `2385cdb72`,
 comment `5304325367`: valid managed Chrome 151 selection, 69 PASS / 1 FAIL / 0 skipped, exit 143 at
@@ -817,38 +827,39 @@ Remote Control evaluator `dc433b8d` is active at bridge `cse_016v2se871QD9Q9Rd6Y
 `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`; transport flags and bidirectional bridge
 are proven. Readiness remains held. #1664 F8 attribution and #1671 S4 continue independently.
 
-Newer transition `2026-08-15T21:42:53Z`: #1671 S3 `c7cba6d9b` passed fixes Tier-A at `580bd8ec0`.
-S4 evidence `db8aadd95` / comment `5304357008` preserves its green matrix and exact authorized +15
+Newer transition `2026-08-15T21:42:53Z`: #1671 S3 `c7cba6d9b` passed fixes Tier-A at `580bd8ec0`. S4
+evidence `db8aadd95` / comment `5304357008` preserves its green matrix and exact authorized +15
 surface attribution but stops on real private-type doc-lint deltas: Contracts 9→11, SDK 3→13; later
 JSR/specifier/export guards are `NOT_RUN`. Coordinator authorizes a plan-only S4-R amendment on the
 same author within only `contract-primitives.ts`, `errors.ts`, `service-client.ts`, and existing run
-artifacts, followed by fresh fixes Tier-A before product repair. #1666 cycle 5 and #1664 F8 continue.
+artifacts, followed by fresh fixes Tier-A before product repair. #1666 cycle 5 and #1664 F8
+continue.
 
 Newer transition `2026-08-15T21:54:00Z`: #1666 cycle-5 IMPL-EVAL passed at evaluator commit
-`92988da30`, comment `5304391856`, Remote Control
-`session_016v2se871QD9Q9Rd6YADAKC`. The final PR head is the same evaluator artifact commit; body,
-review threads, acceptance mirror, and local close-gate are current and green. #1666 is non-draft at
-`status:ready-merge` with exact-head CI `31910676720` plus changed-source quality `31910676700`
-active. Do not merge until all current-head checks are terminal and truthful.
+`92988da30`, comment `5304391856`, Remote Control `session_016v2se871QD9Q9Rd6YADAKC`. The final PR
+head is the same evaluator artifact commit; body, review threads, acceptance mirror, and local
+close-gate are current and green. #1666 is non-draft at `status:ready-merge` with exact-head CI
+`31910676720` plus changed-source quality `31910676700` active. Do not merge until all current-head
+checks are terminal and truthful.
 
 Codex capacity is account-wide exhausted until `2026-08-20 05:31`, proven by fresh detached threads
 `01a00766-…` (#1664) and `01a00767-…` (#1671); do not retry it. Continue the two executable
 artifact-only routes: #1664 F8 provenance correction via fresh canonical Claude Opus 5/medium
 `chore_code`, then fresh Minimax M3/high PLAN-EVAL; #1671 S4-R via fresh Claude Sonnet 5/high
 `documentation_review`, then fresh Minimax PLAN-EVAL. Supervisors do not author or self-certify.
-#1671 product repair waits for canonical Codex capacity; #1663 remains the sole owner-only exceptional
-third-evaluator boundary.
+#1671 product repair waits for canonical Codex capacity; #1663 remains the sole owner-only
+exceptional third-evaluator boundary.
 
 ## Recovery continuation — 2026-08-23T06:59:37Z
 
-The live recovery baseline is `origin/main` `9634735bc09123b0e69e7438ea4ec763462aa072`.
-#1666 is merged through `2dd1a75ef55637816b80e04462cc26fa89631b12`, with exact leaf head
-`92988da30` and #1296 closed. Its stale shipped labels still need normalization. Four subsequent RFC
-merges are external drift and do not silently expand the frozen milestone scope.
+The live recovery baseline is `origin/main` `9634735bc09123b0e69e7438ea4ec763462aa072`. #1666 is
+merged through `2dd1a75ef55637816b80e04462cc26fa89631b12`, with exact leaf head `92988da30` and
+#1296 closed. Its stale shipped labels still need normalization. Four subsequent RFC merges are
+external drift and do not silently expand the frozen milestone scope.
 
-The executable lane fronts are: #1663 exact plan head `194e22a3d` with one owner-authorized third and
-final Fable 5/medium Remote Control PLAN-EVAL; #1664 F8 PASS head `20337441788…`, followed by fresh
-Tier-A and the two approved CDP paths only; #1671 remote S4-R head `bd97a7c03a…`, where the
+The executable lane fronts are: #1663 exact plan head `194e22a3d` with one owner-authorized third
+and final Fable 5/medium Remote Control PLAN-EVAL; #1664 F8 PASS head `20337441788…`, followed by
+fresh Tier-A and the two approved CDP paths only; #1671 remote S4-R head `bd97a7c03a…`, where the
 coordinator must resolve the sole `ContractBuilder` reference and then complete withheld JSR/export
 gates plus IMPL-EVAL. The #1664 and #1671 PR descriptions and #1671 comment `5304357008` require
 truthful in-place repair before their next public checkpoint.
@@ -857,13 +868,14 @@ All former supervisor PIDs are absent. Relaunch exactly four Claude Opus 5/high 
 with `/remote-control`, preserving docs/internals/fixes/features ownership and lane-local serial
 queues. Lanes may proceed concurrently. The primary coordinator remains GPT-5.6-SOL/high, never max.
 Aspire is empty, the runtime/evaluator/writer leases are free, and only proven stale Docker/worktree
-resources may be removed. Preserve and archive the unique dirty 0.0.6 harness worktree before removal.
+resources may be removed. Preserve and archive the unique dirty 0.0.6 harness worktree before
+removal.
 
 ## Resume checkpoint — 2026-08-23T07:38:31Z
 
 Docs is exhausted/parked at pushed topic `2609a9d899`; internals is owner-blocked at pushed topic
-`11a33d95f` after #1663's third/final `FAIL_PLAN`. Features is active at topic `2f5ffa13ba` while the
-original #1664 author corrects only scoped lint/format cleanliness on top of product head
+`11a33d95f` after #1663's third/final `FAIL_PLAN`. Features is active at topic `2f5ffa13ba` while
+the original #1664 author corrects only scoped lint/format cleanliness on top of product head
 `3299992e4`; the earlier receipts remain bound to that superseded content and runtime attempt 7 is
 not leased. Fixes is active at topic `e3c446fadc`; the initial #1671 public-export correction was
 execution-refuted and withdrawn, and an instantiated generic return annotation is the current
@@ -876,51 +888,52 @@ bounded probe. Aspire and Docker are empty and the singleton runtime lease is fr
 scoped CLI lint, and scoped CLI formatting all pass; the named binding set is SUFFICIENT and second
 fresh features Tier-A is PASS. After an empty Aspire/Docker/process/listener audit and recoverable
 quarantine of three proven-stale unregistered plugin-smoke trees, the coordinator granted the sole
-runtime lease for one attempt 7. Run `scaffold.runtime` once with the managed Chromium override;
-run `fresh-browser` once only after scaffold PASS plus an empty inter-gate audit; never retry.
+runtime lease for one attempt 7. Run `scaffold.runtime` once with the managed Chromium override; run
+`fresh-browser` once only after scaffold PASS plus an empty inter-gate audit; never retry.
 
 #1671's canonical existing author is active from exact remote head `bd97a7c03a` under the verified
-three-product/one-test S5 brief. The public-barrel ruling stays withdrawn. Next is author push, fresh
-fixes Tier-A, withheld contracts/sdk JSR plus specifier/export gates, then fresh opposite-family
-IMPL-EVAL. #1663 stays parked at its final evaluator boundary; docs stays exhausted.
+three-product/one-test S5 brief. The public-barrel ruling stays withdrawn. Next is author push,
+fresh fixes Tier-A, withheld contracts/sdk JSR plus specifier/export gates, then fresh
+opposite-family IMPL-EVAL. #1663 stays parked at its final evaluator boundary; docs stays exhausted.
 
 ## Resume checkpoint — 2026-08-23T08:11:10Z
 
 #1664 attempt 7 is terminal red and its singleton lease is released. Exact evidence head is
-`a257807d883`: `68/1/0`, exit 1, sole failure `behavior.service-client-refetch` after 60,134 ms while
-waiting for optimistic `Seed User*` DOM state. Managed Chrome and CDP connect/send succeeded; neither
-F8 bound fired. `fresh-browser`, retry, IMPL-EVAL, readiness, and merge remain withheld. Three
-run-owned orphaned Aspire helpers missed by both standard cleanups were reaped by exact PID after cwd
-ownership proof; the 843 MB residue moved recoverably to `/tmp/netscript-s5-a7-quarantine.Cy2tNS`;
-all final environment audits are empty.
+`a257807d883`: `68/1/0`, exit 1, sole failure `behavior.service-client-refetch` after 60,134 ms
+while waiting for optimistic `Seed User*` DOM state. Managed Chrome and CDP connect/send succeeded;
+neither F8 bound fired. `fresh-browser`, retry, IMPL-EVAL, readiness, and merge remain withheld.
+Three run-owned orphaned Aspire helpers missed by both standard cleanups were reaped by exact PID
+after cwd ownership proof; the 843 MB residue moved recoverably to
+`/tmp/netscript-s5-a7-quarantine.Cy2tNS`; all final environment audits are empty.
 
-#1671 stays at clean pushed evidence `2d806b245` with its exact four source/test paths. Its generated
-export-corpus guard is red for nine already-existing AI/MySQL exports that reproduce on main, so the
-leaf must not carry them. The fixes supervisor is executing a serial prerequisite from exact main
-that may change only the single generated corpus path; deterministic, focused checks and normal
-review precede merge. Then rebase #1671, rerun withheld JSR/specifier/export/publish gates plus fresh
-Tier-A, and request one fresh opposite-family IMPL-EVAL. No owner pause or runtime lease applies.
+#1671 stays at clean pushed evidence `2d806b245` with its exact four source/test paths. Its
+generated export-corpus guard is red for nine already-existing AI/MySQL exports that reproduce on
+main, so the leaf must not carry them. The fixes supervisor is executing a serial prerequisite from
+exact main that may change only the single generated corpus path; deterministic, focused checks and
+normal review precede merge. Then rebase #1671, rerun withheld JSR/specifier/export/publish gates
+plus fresh Tier-A, and request one fresh opposite-family IMPL-EVAL. No owner pause or runtime lease
+applies.
 
 ## Atomic recovery closure — 2026-08-23T10:02:00Z
 
-The coordinator transport is reconciled to Codex Desktop Remote Control on GPT-5.6-SOL/high;
-`max` is explicitly forbidden. The four accepted Claude topic supervisors remain alive, parked at
-their clean checkpoints, and retain their original ownership: docs `f836bdc96`, internals
-`11a33d95f`, features `5c5589ee5`, and fixes `f98863862`. No topic supervisor was relaunched or
-repurposed during transport repair.
+The coordinator transport is reconciled to Codex Desktop Remote Control on GPT-5.6-SOL/high; `max`
+is explicitly forbidden. The four accepted Claude topic supervisors remain alive, parked at their
+clean checkpoints, and retain their original ownership: docs `f836bdc96`, internals `11a33d95f`,
+features `5c5589ee5`, and fixes `f98863862`. No topic supervisor was relaunched or repurposed during
+transport repair.
 
 #1666 is reconciled as merged at `2dd1a75ef55637816b80e04462cc26fa89631b12` and #1296 is closed.
 #1663 used the owner-authorized third and final exceptional PLAN-EVAL and is terminal `FAIL_PLAN` at
-evaluator `65c5e1ac47646328a54d553c838a9059928139c3`; a fourth cycle is forbidden. #1664 attempt 7 is
-terminal behavior red at evidence `a257807d8` with `68/1/0`; the CDP bounds worked, the fresh-browser
-gate stayed withheld, and the runtime lease was released after exact cleanup.
+evaluator `65c5e1ac47646328a54d553c838a9059928139c3`; a fourth cycle is forbidden. #1664 attempt 7
+is terminal behavior red at evidence `a257807d8` with `68/1/0`; the CDP bounds worked, the
+fresh-browser gate stayed withheld, and the runtime lease was released after exact cleanup.
 
 #1671 was accidentally closed by a literal closing token in prerequisite prose, so its bounded work
 continued as replacement PR #1692. The final architecture uses an instantiated
 `ReturnType<typeof oc.errors<...>>` boundary and does not transfer ContractBuilder, Schema,
 BaseContractErrors, public-barrel, metadata, or export-corpus ownership. Tier-A, contracts/sdk JSR,
-specifier, export, publish, docs, amendment, delta-review, and formal IMPL-EVAL gates passed. A final
-deterministic generated-agent-docs cascade moved the exact head to
+specifier, export, publish, docs, amendment, delta-review, and formal IMPL-EVAL gates passed. A
+final deterministic generated-agent-docs cascade moved the exact head to
 `686bae07b2bc66353b2eec9dd56baa0779a63a20`; all 21 exact-head checks were green. #1692 was squash
 merged as `c73d361eea14a7f40702638638e492f2ca961a59`, #1350 closed completed, and #1693 records the
 accepted residual evaluator follow-up.
@@ -935,13 +948,13 @@ supervisor, open-PR, central, main, or unrelated owned workspace.
 
 Live GitHub and repository state supersede the stale 2026-08-23 terminal description for #1663.
 After the third/final PLAN-EVAL failure, the owner explicitly authorized the focused F1 amendment
-and Tier-A substitution, with no fourth evaluator. The canonical author then completed S1-S5;
-formal IMPL-EVAL passed at `e52c2f0e6`, the bounded delta evaluation passed at `b456f53f7`, and the
-clean local/remote/PR head is `e764be162`. The remaining work is exact-main rebase and closeout, not
-new implementation. A missing #1618 sibling-package sweep was recovered: two discoverable configs
-parse successfully and two custom-named configs are outside Deno auto-discovery, so no sibling blind
-spot was found. Pre-existing MCP export-map private-type-ref debt is registered separately as #1708
-and is not added to the frozen leaf.
+and Tier-A substitution, with no fourth evaluator. The canonical author then completed S1-S5; formal
+IMPL-EVAL passed at `e52c2f0e6`, the bounded delta evaluation passed at `b456f53f7`, and the clean
+local/remote/PR head is `e764be162`. The remaining work is exact-main rebase and closeout, not new
+implementation. A missing #1618 sibling-package sweep was recovered: two discoverable configs parse
+successfully and two custom-named configs are outside Deno auto-discovery, so no sibling blind spot
+was found. Pre-existing MCP export-map private-type-ref debt is registered separately as #1708 and
+is not added to the frozen leaf.
 
 All four Claude Opus 5/high topic supervisors have new native Remote Control attachments while
 retaining their accepted topic ownership. Internals is active on #1663 closeout; docs and fixes are
@@ -957,11 +970,12 @@ the rebase produces the final head. The coordinator now owns rebase authorizatio
 
 ## Shipped checkpoint — 2026-08-28T10:10:08Z
 
-#1663 is terminal and shipped. Its exact-main rebased head is `a188c7c730be1f71c255057514d5d8d43c10e594`;
-fresh internals Tier-A passed at topic `6de5395cf`, evaluator equivalence was explicitly bound, all
-acceptance/close gates passed, and current-head CI run `33161327616` is green after one
-infrastructure-only failed-job retry. Squash merge `cf648f1ff973d74c213bb125a6f5f5b9328e693b`
-closed #1604, #1618, and #1622. Their lifecycle labels are normalized to `status:shipped`.
+#1663 is terminal and shipped. Its exact-main rebased head is
+`a188c7c730be1f71c255057514d5d8d43c10e594`; fresh internals Tier-A passed at topic `6de5395cf`,
+evaluator equivalence was explicitly bound, all acceptance/close gates passed, and current-head CI
+run `33161327616` is green after one infrastructure-only failed-job retry. Squash merge
+`cf648f1ff973d74c213bb125a6f5f5b9328e693b` closed #1604, #1618, and #1622. Their lifecycle labels
+are normalized to `status:shipped`.
 
 The clean terminal leaf worktree and its local/remote branch are removed. Docker is empty, Aspire is
 empty, and nine registered worktrees remain under live ownership. Internals may now begin only the
@@ -1023,25 +1037,24 @@ any branch content.
 family evaluator is native Claude Fable 5/medium with Remote Control (`1b7a1305`, bridge
 `cse_012Nz3aE9mhoeyfaiGpKGvse`), dispatched from internals topic checkpoint `7c1646742`. Its exact
 batch-size-1 formatter probe passed 2041 selected files with zero findings; the 2037-file lint probe
-is still live and CPU-active, so it is not a stalled process. No implementation or runtime lease
-has been granted.
+is still live and CPU-active, so it is not a stalled process. No implementation or runtime lease has
+been granted.
 
-#1112's same-author repair is complete and explicitly pushed. Final immutable plan head
-`069fd3e91` preserves the seven product paths, the source-only translation seam, and the bounded
-non-breaking TLS disposition. Fresh fixes Tier-A passed at topic checkpoint `2eeef41ab`. The one
-post-pass correction restored mandatory `supervisor.md` as a control-plane-only allowlist amendment;
-it did not expand product scope. #1112 is now ready for a fresh opposite-family formal PLAN-EVAL,
+#1112's same-author repair is complete and explicitly pushed. Final immutable plan head `069fd3e91`
+preserves the seven product paths, the source-only translation seam, and the bounded non-breaking
+TLS disposition. Fresh fixes Tier-A passed at topic checkpoint `2eeef41ab`. The one post-pass
+correction restored mandatory `supervisor.md` as a control-plane-only allowlist amendment; it did
+not expand product scope. #1112 is now ready for a fresh opposite-family formal PLAN-EVAL,
 independently of the active internals evaluation.
 
 ## Recovery checkpoint — 2026-08-28T15:17:28Z
 
 Both evaluations are now terminal and centrally reconciled. #1709 is `FAIL_PLAN` cycle 1 at
-`59b79ccd8` / internals `dcf8e2b35`; repair must add the fmt runner seam, lock
-refusal/crash/finding precedence and crash coverage at 1/2/200, and bind root exit-zero to per-file
-drop-free evidence. #1112 is `FAIL_PLAN` cycle 1 at evaluator `5b58738ab`, public comment
-`5452181794`; repair must prove a real generated `PrismaClient` import that the actual checked-in
-example can compile-check. Its PR/leaf remains `069fd3e91`; any eighth product path is a coordinator
-rescope boundary.
+`59b79ccd8` / internals `dcf8e2b35`; repair must add the fmt runner seam, lock refusal/crash/finding
+precedence and crash coverage at 1/2/200, and bind root exit-zero to per-file drop-free evidence.
+#1112 is `FAIL_PLAN` cycle 1 at evaluator `5b58738ab`, public comment `5452181794`; repair must
+prove a real generated `PrismaClient` import that the actual checked-in example can compile-check.
+Its PR/leaf remains `069fd3e91`; any eighth product path is a coordinator rescope boundary.
 
 Owner policy now makes PLAN-EVAL risk-selected only for critical/complex topics. Routine work uses
 `PLAN-EVAL: N/A` with a concrete reason, Tier-A, and IMPL-EVAL. Two consecutive terminal IMPL-EVAL
@@ -1055,19 +1068,20 @@ supervisors. No implementation or runtime lease is active.
 - #1709 repaired plan head is `3e934e2de` (local = remote = PR #1710, clean, plan-only).
 - Fresh Tier-A is PASS at internals topic `bf3635eb5`, with exact lint/fmt counts independently
   reproduced and all cycle-1 findings closed.
-- Narrowed policy still selects one final plan evaluation here because fail-closed published
-  tooling and structured error semantics are critical/complex. Cycle 2 is active in fresh native
-  Fable 5/medium Remote Control session `14cfb576-...`; dispatch checkpoint `fe9e23c03`.
+- Narrowed policy still selects one final plan evaluation here because fail-closed published tooling
+  and structured error semantics are critical/complex. Cycle 2 is active in fresh native Fable
+  5/medium Remote Control session `14cfb576-...`; dispatch checkpoint `fe9e23c03`.
 - #1112 remains same-author plan repair. Its Tier-A must prove the checked-in example remains
   resolvable under the ordinary clean-checkout root gate after scratch-generated output is removed;
   a temporary green bought by untracked generated files is not acceptable.
+
 ## Recovery checkpoint — 2026-08-28T15:47:26Z
 
 - Main remains `cf648f1ff973d74c213bb125a6f5f5b9328e693b`.
-- #1709 / PR #1710 is plan-only at evaluator artifact `f2b3fc8b3`; cycle 2 is terminal
-  `FAIL_PLAN`, the evaluator is released, and the same author is available pending the owner-only
-  F4 choice. Recommended choice: admit Deno's fmt write crash form and pin crash-only plus
-  crash-and-drop behavior at batch sizes 1/2/200; no third evaluator cycle.
+- #1709 / PR #1710 is plan-only at evaluator artifact `f2b3fc8b3`; cycle 2 is terminal `FAIL_PLAN`,
+  the evaluator is released, and the same author is available pending the owner-only F4 choice.
+  Recommended choice: admit Deno's fmt write crash form and pin crash-only plus crash-and-drop
+  behavior at batch sizes 1/2/200; no third evaluator cycle.
 - #1112 / PR #1711 is plan-only at `3e0f2223a`; fresh Tier-A is red because the real generated
   import disappears after scratch cleanup. Same-author dynamic-import proof is active inside the
   seven-path ceiling; exclusion and untyped stubs are forbidden.
@@ -1076,13 +1090,13 @@ supervisors. No implementation or runtime lease is active.
 
 ## Resume checkpoint — 2026-08-28T16:15:14Z
 
-#1112 / PR #1711 is now at clean plan-only head `da769cd7c8e0438f2317ed761ec10bce15692d03`.
-Fresh fixes Tier-A passed all five repaired architecture claims at topic `d0205087a`; the initial
+#1112 / PR #1711 is now at clean plan-only head `da769cd7c8e0438f2317ed761ec10bce15692d03`. Fresh
+fixes Tier-A passed all five repaired architecture claims at topic `d0205087a`; the initial
 clean-checkout false green is closed without excluding the example or adding an eighth product path.
 Final risk-selected PLAN-EVAL cycle 2 is active in distinct native Claude Fable 5/medium Remote
-Control session `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge
-`cse_01EQXNxAuAuhDuRKvGYBx5iY`, dispatched from clean pushed topic `4f2e263e2`. Scope is only repaired
-F1 plus the five fresh Tier-A claims. No implementation or runtime lease exists.
+Control session `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `cse_01EQXNxAuAuhDuRKvGYBx5iY`,
+dispatched from clean pushed topic `4f2e263e2`. Scope is only repaired F1 plus the five fresh Tier-A
+claims. No implementation or runtime lease exists.
 
 #1709 remains independently parked at the already-surfaced F4 choice with evaluator released and
 author available. Formal PLAN-EVAL is reserved for critical/complex work. Two consecutive terminal
@@ -1093,3 +1107,18 @@ Follow-on owner verdict: recommended #1709 F4 is accepted. Internals pushed clea
 `f9a9af9b3` and resumed the same author `01a047f0-…` for only the write-mode completion/control
 amendment. Fresh Tier-A follows; no third PLAN-EVAL exists. #1112's independent final plan evaluator
 continues concurrently because serial ordering is per orchestrator, not global.
+
+## Resume checkpoint — 2026-08-29T10:47:00Z
+
+- First canary source is immutable `cf648f1ff...`; local check/test/quality/preflight/readiness are
+  green. Dispatch only `release-canary.yml` on `main` while remote main remains that SHA; the
+  workflow owns JSR quota check, canary minting, OIDC publish, label/note, and exact canary-pinned
+  production E2E.
+- Live re-intake is validated at 78 inventory records, 74 active issue nodes, and 13 waves. Wave A:
+  #1371 canary verification, #1672/#1674/#1675 agent-init, #1673 plugin-doctor, #1694/PR #1696. #979
+  is now 0.0.7 dependency-required and must precede #1370.
+- #1709 is IMPL-EVAL PASS at `30df7b9ff`, close-gating but merge-held until canary capture. #1112
+  implementation is granted at `6ae7113eb` through the existing fixes supervisor.
+- Separate Aspire 13.5 research: `/home/codex/repos/netscript-007-aspire-13-5-research`, branch
+  `research/aspire-13.5-0.0.7`, Fable 5 medium, Remote Control `session_011Ng6hnMLyY8vzM8EJo2XKg`.
+  It drafts issues only; coordinator ratifies/publishes them.
