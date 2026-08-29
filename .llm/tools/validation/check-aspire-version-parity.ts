@@ -57,10 +57,37 @@ interface EvaluateOptions {
 }
 
 const STALE_PATTERNS = [/13\.[0-4]\.[0-9]+/g, /Aspire 13\.[0-4]/g] as const;
+const VERSION_LITERAL_PATTERN = /13\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?/g;
+
+const PHASE_ONE_EXACT_VERSIONS: Readonly<Record<string, readonly string[]>> = {
+  'packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts': ['13.5.3', '13.5.0'],
+  'packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts': [
+    '13.5.3',
+    '13.5.0',
+    '13.5.3-preview.1.26425.3',
+  ],
+  '.github/toolchain.env': ['13.5.3'],
+  '.github/scripts/aspire-nuget-cache-policy.test.ts': ['13.5.3', '13.5.3-v1'],
+  '.github/workflows/e2e-cli.yml': ['13.5.3', '13.5.3-v1'],
+  '.github/workflows/e2e-cli-prod.yml': ['13.5.3', '13.5.3-v1'],
+  '.github/workflows/e2e-cli-prod-local.yml': ['13.5.3', '13.5.3-v1'],
+};
 
 function staleMatches(source: string): string[] {
   return [
     ...new Set(STALE_PATTERNS.flatMap((pattern) => [...source.matchAll(pattern)].map((m) => m[0]))),
+  ];
+}
+
+function unexpectedPhaseOneVersions(path: string, source: string): string[] {
+  const allowed = PHASE_ONE_EXACT_VERSIONS[path];
+  if (!allowed) return [];
+  return [
+    ...new Set(
+      [...source.matchAll(VERSION_LITERAL_PATTERN)]
+        .map((match) => match[0])
+        .filter((version) => !allowed.includes(version)),
+    ),
   ];
 }
 
@@ -118,9 +145,18 @@ export async function evaluateAspireVersionParity(
     const source = await options.readText(row.path);
     if (source === null) {
       missing.push(row.path);
+      if (row.owner !== 'archival') {
+        findings.push(parityFinding(
+          row,
+          'fail',
+          [],
+          'required manifest path is missing',
+        ));
+      }
       continue;
     }
-    const matches = staleMatches(source);
+    const exactMismatches = options.phase === 1 ? unexpectedPhaseOneVersions(row.path, source) : [];
+    const matches = [...new Set([...staleMatches(source), ...exactMismatches])];
 
     if (row.owner === 'archival') {
       if (matches.length > 0) {
@@ -150,7 +186,9 @@ export async function evaluateAspireVersionParity(
       row,
       fail ? 'fail' : 'deferred',
       matches,
-      fail
+      exactMismatches.length > 0
+        ? 'Aspire literal is outside the locked phase-1 pin policy'
+        : fail
         ? `stale Aspire literal conflicts with ${options.expectedVersion}`
         : `stale Aspire literal is deferred to manifest owner ${row.owner}`,
     ));

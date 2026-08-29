@@ -2332,3 +2332,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Evidence:**
   `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
   records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
+
+## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
+
+- **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
+  but `Aspire.Hosting.Browsers` has no stable 13.5.x package. The accepted OF-2a fallback is
+  `13.5.3-preview.1.26425.3`, preserving a single 13.5 train without holding back the stable surface.
+- **Owner:** CLI Aspire scaffold maintainers.
+- **Target:** Replace the preview pin as soon as a stable 13.5.x `Aspire.Hosting.Browsers` package
+  is available.
+- **Linked plan:** Issue #1713; epic #1712; PR #1727;
+  `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/`.
+- **Created:** 2026-08-29.
+- **Status:** open, DEBT_ACCEPTED for #1713 under research decision D-1 / OF-2a.
+- **Gate:** Drop when a stable 13.5.x Browsers package exists. Until then,
+  `check:scaffold-versions`, `check:aspire-version-parity`, the config-generator assertions, and
+  both CI-owned `scaffold.runtime` tiers must retain the exact accepted preview pin and remain
+  green.
