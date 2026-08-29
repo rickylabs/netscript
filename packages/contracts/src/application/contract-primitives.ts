@@ -1,20 +1,13 @@
 import { oc } from '@orpc/contract';
 import type {
   AnySchema,
+  ContractBuilder,
   ContractProcedureBuilderWithInputOutput,
   ContractProcedureBuilderWithOutput,
   MergedErrorMap,
   Schema,
 } from '@orpc/contract';
-import type { ContractObjectSchema } from '../domain/schema-types.ts';
-import type {
-  ForbiddenError,
-  NotFoundError,
-  RateLimitError,
-  ServiceUnavailableError,
-  UnauthorizedError,
-  ValidationError,
-} from '../domain/schemas.ts';
+import type { NetScriptProcedureMeta } from '../domain/procedure-meta.ts';
 import {
   forbiddenErrorSchema,
   notFoundErrorSchema,
@@ -91,15 +84,33 @@ const commonErrorMap: CommonErrorMap = {
 };
 
 /**
+ * Metadata carried by {@link baseContract} and every route derived from it.
+ *
+ * The empty-record intersection is the exact public type produced by oRPC's metadata initializer.
+ * NetScript owns {@link NetScriptProcedureMeta}; the upstream representation is not re-exported.
+ */
+export type BaseContractMeta = NetScriptProcedureMeta & Record<never, never>;
+
+/**
+ * Error map carried by every route built from {@link baseContract}.
+ *
+ * `baseContract` applies `.errors(...)`, so each route's error map is the base vocabulary merged
+ * onto an empty map. Mirrors the `BaseErrors` alias used by the first-party
+ * `@netscript/plugin-*-core` contract definitions.
+ */
+export type BaseContractErrors = MergedErrorMap<Record<never, never>, typeof commonErrorMap>;
+
+/**
  * Common oRPC contract primitive with NetScript's standard error map applied.
  *
- * Built with the real oRPC **contract** builder (`oc`) and wired to the shared
+ * Built with the real oRPC **contract** builder (`oc`), initialized with the
+ * NetScript-owned {@link BaseContractMeta}, and wired to the shared
  * {@link commonErrorMap}. Because {@link commonErrorMap} uses real Zod schemas,
- * `oc.errors(...)` type-checks with no cast — the builder's `~orpc` marker is
- * genuinely typed rather than erased to `any`. Every route composed from this
- * value (`baseContract.route(...).input(...).output(...)`) therefore carries its
- * precise input/output schema types through to `implement<typeof contract>()`,
- * so handler bodies are type-checked against the contract.
+ * `oc.errors(...)` type-checks with no cast — the builder's `~orpc` marker is genuinely typed rather
+ * than erased to `any`. Every route composed from this value
+ * (`baseContract.route(...).input(...).output(...)`) therefore carries its precise metadata,
+ * input/output schemas, and error map through to `implement<typeof contract>()`, so handler bodies
+ * are type-checked against the contract.
  *
  * Annotate composed routes with {@link BaseContractRoute} (input + output) or
  * {@link BaseContractOutputRoute} (output only) to keep JSR
@@ -113,58 +124,17 @@ const commonErrorMap: CommonErrorMap = {
  *
  * export const listItems = baseContract
  *   .route({ method: 'GET', path: '/items' })
+ *   .meta({ access: { authentication: 'required' } })
  *   .input(z.object({ limit: z.number() }))
  *   .output(z.object({ items: z.array(z.unknown()) }));
  * ```
  */
-export const baseContract: ReturnType<
-  typeof oc.errors<
-    Readonly<{
-      NOT_FOUND: Readonly<
-        {
-          status: 404;
-          message: 'Resource not found';
-          data: ContractObjectSchema<NotFoundError, NotFoundError>;
-        }
-      >;
-      VALIDATION_ERROR: Readonly<
-        {
-          status: 422;
-          message: 'Validation failed';
-          data: ContractObjectSchema<ValidationError, ValidationError>;
-        }
-      >;
-      UNAUTHORIZED: Readonly<
-        {
-          status: 401;
-          message: 'Authentication required';
-          data: ContractObjectSchema<UnauthorizedError, UnauthorizedError>;
-        }
-      >;
-      FORBIDDEN: Readonly<
-        {
-          status: 403;
-          message: 'Access denied';
-          data: ContractObjectSchema<ForbiddenError, ForbiddenError>;
-        }
-      >;
-      RATE_LIMITED: Readonly<
-        {
-          status: 429;
-          message: 'Too many requests';
-          data: ContractObjectSchema<RateLimitError, RateLimitError>;
-        }
-      >;
-      SERVICE_UNAVAILABLE: Readonly<
-        {
-          status: 503;
-          message: 'Service temporarily unavailable';
-          data: ContractObjectSchema<ServiceUnavailableError, ServiceUnavailableError>;
-        }
-      >;
-    }>
-  >
-> = oc.errors(commonErrorMap);
+export const baseContract: ContractBuilder<
+  Schema<unknown, unknown>,
+  Schema<unknown, unknown>,
+  BaseContractErrors,
+  BaseContractMeta
+> = oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap);
 
 /**
  * Concrete type of {@link baseContract} — the real oRPC contract builder with
@@ -173,15 +143,6 @@ export const baseContract: ReturnType<
  * oc.errors>`.
  */
 export type BaseContract = typeof baseContract;
-
-/**
- * Error map carried by every route built from {@link baseContract}.
- *
- * `baseContract` applies `.errors(...)`, so each route's error map is the base
- * vocabulary merged onto an empty map. Mirrors the `BaseErrors` alias used by
- * the first-party `@netscript/plugin-*-core` contract definitions.
- */
-export type BaseContractErrors = MergedErrorMap<Record<never, never>, typeof commonErrorMap>;
 
 /**
  * Sound type of a route built via
@@ -213,7 +174,7 @@ export type BaseContractRoute<TIn extends AnySchema, TOut extends AnySchema> =
     TIn,
     TOut,
     BaseContractErrors,
-    Record<never, never>
+    BaseContractMeta
   >;
 
 /**
@@ -241,5 +202,5 @@ export type BaseContractOutputRoute<TOut extends AnySchema> = ContractProcedureB
   Schema<unknown, unknown>,
   TOut,
   BaseContractErrors,
-  Record<never, never>
+  BaseContractMeta
 >;
