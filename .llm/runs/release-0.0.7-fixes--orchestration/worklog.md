@@ -1780,3 +1780,45 @@ Two things carried forward into the brief from the #1112 leaf's cost:
 
 **#1673** (plugin doctor validates the registry against itself) remains next, serially, after this
 grouped leaf. No public canary is justified by docs/internals alone.
+
+## 2026-08-30 — #1711 merged; lane 2 (#1729) integrating current main
+
+**#1711 shipped.** Merged to `main@3561bb64820602e065bf6df0afeed82b39062e42`; issue **#1112 closed**.
+Final leaf head `07e12efacf3cd23672395507cbf77ecf620cd454`. Evidence chain, all durable on real
+branches: IMPL-EVAL cycle 2 `PASS_IMPL` (`f5fd84254…` on `eval/impl-eval-1711-cycle-2`) and the
+bounded main-integration delta receipt `MECHANICAL_PASS` (`2df8d9962…` on `eval/delta-receipt-1711`).
+Close-gate SUCCESS with 5/5 issue boxes mirrored.
+
+**Cost record for this leaf, so the next one is cheaper.** Two terminal `FAIL_PLAN` cycles, one
+supervisor Tier-A that passed a defective design, one premature readiness flip, and two incomplete
+sweeps. The two structural lessons now carried into every fixes brief:
+
+1. **Generated cascades are part of the gate set.** A doc-corpus or public-surface edit obliges
+   `check:agent-docs-prose`, `check:assets-barrel`, `check:mcp-export-corpus`, and
+   `check:publish-assets`. Missing them cost #1711 two review rounds and a coordinator correction.
+2. **Ask whether a design is necessary, not merely whether it works.** The Tier-A that passed the
+   non-literal dynamic import verified the form functioned and never probed the alternative that
+   dominated it.
+
+**Lane 2 — #1729** (`fix(cli): improve agent init guidance and cross-host skills`, grouped
+#1674 p0 + #1672 + #1675). Author checkpoint landed at `83d24ba57d4e2b6f1d3905ebe508cdc3016a3b0b`
+with well-formed gate evidence, `embedded.generated.ts` regenerated rather than a template-only fix,
+per-issue separated assertions, and no self-certification. Labels applied
+(`type:fix`, `area:cli`, `area:agentic`, `priority:p0`, `status:impl`) plus milestone `0.0.7`.
+
+**Behavioural close-gate decision — resolved by the supervisor.** The author's recommendation is
+adopted: #1672 acceptance 4, #1674 acceptance 4, and #1675 acceptance 5 each require a *measured
+unfamiliar-agent* signal that cannot exist before merge, so all three are now marked `[post-merge]`
+on the issue bodies. One follow-up wave measures `deno doc` usage, `ui:add`/`find_guidance` usage, and
+skill invocation together against the merged artifact. This unblocks closing keywords — per
+netscript-pr, a structurally impossible pre-merge check is exactly what `[post-merge]` is for, and
+dropping the keyword to dodge it is the wrong move.
+
+Dispatched: merge `origin/main@8b1e42f725919457c64781d5973fd419017fab13` (through #1711 and #1728),
+regenerate every shared derivative from that exact base, re-run product gates and the fresh-scaffold
+consumer proof on the merged tree, and add the three closing keywords. Merge, not rebase, so the gate
+receipts keep their commit correspondence.
+
+Next after this: supervisor Tier-A, then a **fresh opposite-family IMPL-EVAL**; on PASS, ready it and
+report merge coordinates. **#1673** (plugin doctor validates the registry against itself) is dispatched
+immediately once #1729 clears — serial within the fixes queue.
