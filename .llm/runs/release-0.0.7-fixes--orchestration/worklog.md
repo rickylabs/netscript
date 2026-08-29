@@ -1738,3 +1738,45 @@ them, and they are not there.
 Surviving worktrees are the four topic orchestrators, `netscript-547-lffix`, `netscript-main` (now at
 the merge commit `c73d361ee`), and two unrelated RFC trees. No runtime lease held; `docker ps` reports
 zero containers from this lane.
+
+## 2026-08-30 — Lane split: grouped wave-A leaf dispatched concurrently with #1711 evaluator
+
+Coordinator correction: the #1711 IMPL-EVAL cycle-2 evaluator is independent and must not idle the
+fixes implementation queue. Aspire is not a global barrier.
+
+**Lane 1 — #1711, protected, monitor only.** PR stays draft / `status:impl`, head
+`067193acff68254b4bd4c6e5d7824f80a9db2b26`. IMPL-EVAL cycle 2 running as job `3ba2ef08`
+(Claude Fable 5 · medium) in `/home/codex/repos/netscript-007-eval-1711-impl2`. On PASS, report the
+exact head for coordinator merge immediately. On a second consecutive terminal failure, release the
+evaluator, keep the author available, and surface to coordinator/owner — never a third cycle.
+
+**Lane 2 — grouped re-intake wave-A leaf `agent-init-guidance-and-cross-host-skills`.** Issues
+**#1674 (p0)**, **#1672 (p1)**, **#1675 (p1)**, milestone 0.0.7, all three landing in the single
+`netscript agent init` generated surface while keeping three distinct acceptance sets.
+
+- Branch `fix/agent-init-guidance-and-cross-host-skills`, worktree
+  `/home/codex/repos/netscript-007-leaf-agent-init`, base `5bb112dd35f94fc8435672e2cabff1f9a447aa0b`
+  (`origin/main`).
+- Route: Codex **GPT-5.6-SOL · high**, provider `openai`, launched through
+  `launch-codex-slice.ts` with `--expect-base` and push-safety enforced (upstream unset so no bare
+  push can reach `origin/main`).
+- Run dir `.llm/runs/fix-agent-init-guidance-and-cross-host-skills--0.0.7/`.
+
+Two things carried forward into the brief from the #1112 leaf's cost:
+
+1. **The generated cascade is named up front.** CLI asset/template edits require
+   `check:assets-barrel`; a docs-corpus or public-surface change extends to `check:agent-docs-prose`,
+   `check:mcp-export-corpus`, and `check:publish-assets`. The sibling leaf lost two review cycles to
+   that omission, so the plan must list every applicable gate before implementation.
+2. **A close-gate problem the author must surface rather than decide.** Acceptance boxes across all
+   three issues require a *measured unfamiliar-agent smoke* (non-zero `deno doc`, non-zero `ui:add`
+   or MCP `find_guidance`, non-zero skill invocation), each with an "or an explicit recorded
+   rejection" clause. An implementation leaf cannot produce a behavioural wave measurement. The
+   author must identify those boxes in `plan.md` and propose a disposition — `[post-merge]` marker or
+   recorded rejection — as a supervisor decision, not tick them. The PR opens draft and **without**
+   closing keywords until that is resolved.
+
+`e2e:cli`, Aspire, and Docker gates are not authorized for lane 2 without an explicit request.
+
+**#1673** (plugin doctor validates the registry against itself) remains next, serially, after this
+grouped leaf. No public canary is justified by docs/internals alone.
