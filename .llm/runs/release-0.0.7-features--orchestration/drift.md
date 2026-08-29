@@ -510,3 +510,32 @@ well-evidenced.
 the head whenever scope is reported. A clean textual merge is also not a semantic one — whether
 anything landed on `main` since the merge base interacts with the change is a separate question, and
 is now asked explicitly in the #1696 evaluator brief.
+
+## D-21 — this Codex thread stalls at the commit boundary, twice, with work already on disk
+
+**Observed.** Thread `01a04f84` (GPT-5.6 Sol · high) has stalled twice in the same shape:
+
+| Stall | Last recorded action | Idle before intervention | State on disk |
+| --- | --- | --- | --- |
+| 1 | research reads | 1,129 s | worktree clean, nothing produced |
+| 2 | a **completed** `deno fmt` | 494 s | slice 1 materially built, **12 uncommitted paths** |
+
+The second is the more instructive: `procedure-meta.ts`, three tests including the assertion-budget
+and independence gates, a type-fixtures directory, four modified files and a `drift.md` all existed
+and none of it was committed, pushed, or visible to any reviewer.
+
+**Detection rule that works.** Rollout **size unchanged over a bounded window** is the signal, not
+elapsed time. A working agent appends continuously; a stalled one does not. Confirm with two samples
+≥100 s apart plus a check that no gate process is actually running, then act. Elapsed-time thresholds
+are the wrong instrument — I proposed a 30-minute one earlier and it was correctly rejected: at stall
+1 the size-unchanged evidence was already conclusive at ~19 minutes and waiting would have bought
+nothing.
+
+**Recovery that works.** `agentic:codex-resume --message-file` on the **same thread and worktree** —
+never a second sender, never a fresh author. Both recoveries took effect within ~20-40 s.
+
+**Standing instruction now in every resume.** Land what exists before continuing: commit, push, post
+the slice comment, report — and *a red gate is still the deliverable*. Uncommitted work is invisible
+to review, and a stall at the commit boundary destroys exactly the evidence the harness runs on. Also
+state explicitly that a failing pinned baseline is a finding to report, not a number to adjust,
+because an agent nudged to "land it" can otherwise make a test pass by moving the target.
