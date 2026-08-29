@@ -1234,3 +1234,14 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   to `bbaf70d6411fb794895af50b010a66cd475aeb7e`. The fixes supervisor correctly dispatched a fresh
   exact-head IMPL-EVAL rather than merging on the stale receipt. PR readiness/close-gate remains
   withheld until that exact-head verdict and issue/DoD evidence are green.
+
+## 2026-08-29T21:21:00Z — live queue steering and #1711 freshness hold
+
+- Aspire S1 and #1371 are both confirmed `working` under their existing supervisors; their first
+  authored artifacts are the required harness bootstrap and RED-first emitted-module tests. Preserve
+  per-orchestrator serialization only; these two supervisors continue concurrently.
+- Do not merge or mark #1711 ready at `bbaf70d64`. CI found a real branch-owned stale agent-docs
+  corpus while exact-head OpenHands run `33275424854` is still active. After it terminates, route
+  the canonical generated-corpus repair through the existing author, recut all exact-head evidence,
+  and evaluate the amendment again. The CI red is not an IMPL-EVAL failure-cycle count.
+- Runtime state is clean: Docker 0, Aspire 0; no expensive-gate lease exists.

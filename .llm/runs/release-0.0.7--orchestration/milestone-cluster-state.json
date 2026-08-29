@@ -26,7 +26,7 @@
       "independentLanesContinue": true
     },
     "latestCheckpoint": {
-      "at": "2026-08-29T21:12:29.000Z",
+      "at": "2026-08-29T21:21:00.000Z",
       "mainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
@@ -46,9 +46,9 @@
         1725,
         1726
       ],
-      "aspireS1": "dispatching_from_clean_main_without_runtime_lease",
-      "issue1371": "emitted_fail_fast_implementation_dispatching_without_runtime_lease",
-      "pr1711": "exact_head_bbaf70d64_impl_eval_dispatched_close_gate_withheld"
+      "aspireS1": "sol_medium_active_building_red_first_phase_1_parity_gate_without_runtime_lease",
+      "issue1371": "sol_medium_active_with_red_first_emitted_module_tests_without_runtime_lease",
+      "pr1711": "exact_head_bbaf70d64_impl_eval_active_real_agent_docs_corpus_freshness_red_merge_withheld"
     }
   },
   "limits": {
@@ -755,8 +755,8 @@
       "lane": "fixes",
       "phase": "implementing",
       "baseBranch": "main",
-      "headSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
-      "currentPrHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
+      "headSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
+      "currentPrHeadSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -764,7 +764,7 @@
       "prNumber": 1711,
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
-      "implementationState": "active_owner_granted",
+      "implementationState": "exact_head_amendment_impl_eval_active_quality_repair_withheld",
       "planHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "c36eaf340db2bb6df18f1d7b2149af12e9b9fe1f",
@@ -821,8 +821,28 @@
         "verdict": "FAIL_PLAN",
         "coordinatorDisposition": "owner accepted the bounded literal dynamic-import correction as temporary Prisma 7 correctness pending the Prisma-next/Prisma 8 rewrite; no cycle 3"
       },
+      "implementationEvaluationCycle1": {
+        "state": "complete",
+        "verdict": "PASS_IMPL",
+        "evaluatedHeadSha": "cd69eb7cbb35fffdd16dba3f68dc26311a45699b",
+        "artifactCommitSha": "06e38089123923baea3c3b67410a351b69049c72",
+        "commentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5462050873"
+      },
+      "postEvaluationAmendment": {
+        "headSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
+        "scope": "accepted A2 prerequisite wording in the published example",
+        "exactHeadEvaluationRunId": 33275424854,
+        "exactHeadEvaluationState": "active",
+        "qualityRunId": 33275411339,
+        "qualityJobId": 99161160224,
+        "qualityState": "FAIL",
+        "qualityFinding": "agent-docs prose corpus freshness: prose.json.gz and provenance.json are stale after the branch's docs reference changes",
+        "localReceipt": "/home/codex/repos/netscript-007-leaf-prisma-mysql/.llm/tmp/gate-receipts/local-repro-agent-docs-prose.json",
+        "failureClassification": "branch-owned CI freshness failure; not a terminal IMPL-EVAL verdict and does not advance the owner two-failure threshold",
+        "mergeAuthority": "withheld"
+      },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "same canonical author completes the seven-path implementation, fresh exact-head Tier-A, then normal IMPL-EVAL",
+      "nextGate": "allow the in-flight bbaf70d64 evaluator to terminate without racing its target; then the same canonical author regenerates the verified derived agent-docs cascade, pushes an explicit new head, reruns exact-head Tier-A/CI, and receives a fresh amendment IMPL-EVAL before readiness",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"

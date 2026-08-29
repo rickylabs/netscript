@@ -1151,3 +1151,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   head. Fresh exact-head IMPL-EVAL is dispatched and close-gate remains red/pending by design. Do
   not merge until the new exact-head verdict and issue/DoD checklist are green.
 - Current main stays `3b32d1628584749af4dd6e97fd331c24e84f0b9e`; Docker/AppHost counts are zero.
+
+## Resume checkpoint — active S1/#1371 authors; #1711 corpus repair pending
+
+- Aspire S1 author thread `01a04f5f-fa42-7f73-8752-c58baea47ee0` is working on the RED-first phase-1
+  parity gate. #1371 author thread `01a04f5d-7af1-7280-bf0f-adf2a43edb3e` is working on the
+  emitted-module service/plugin fail-fast tests. Both are GPT-5.6-SOL/medium, supervised by their
+  preserved Claude topic sessions, and hold no runtime lease.
+- #1711 is still `bbaf70d6411fb794895af50b010a66cd475aeb7e`. OpenHands run `33275424854` is active,
+  but CI quality job `99161160224` has already exposed a real stale agent-docs prose corpus; local
+  structured receipt is
+  `/home/codex/repos/netscript-007-leaf-prisma-mysql/.llm/tmp/gate-receipts/local-repro-agent-docs-prose.json`.
+- Do not race the active evaluator with a push. When it terminates, resume the same canonical author
+  for the verified derived-corpus regeneration, explicit push, exact-head gates, and new amendment
+  evaluation. This CI freshness red does not consume an IMPL-EVAL failure cycle.

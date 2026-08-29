@@ -1043,3 +1043,14 @@ implementation thread.
 - **A PASS receipt is head-bound:** #1711's `PASS_IMPL` at `cd69eb7cb` did not authorize merging
   later amendment `bbaf70d64`. Fixes dispatched fresh exact-head IMPL-EVAL and kept close-gate red
   until acceptance evidence catches up.
+
+## 2026-08-29 — generated docs freshness is part of the authored branch contract
+
+- #1711's changed docs reference source made the checked-in agent-docs prose corpus stale. The CI
+  quality failure reproduces locally through the structured gate and names `prose.json.gz` plus
+  `provenance.json`; it is not safe to dismiss as unrelated infrastructure noise.
+- Derived generated outputs may extend the seven authored-source envelope only as an explicitly
+  recorded generator-owned cascade. They require their own exact-head Tier-A/CI evidence and a new
+  amendment evaluation; the earlier `cd69eb7cb` PASS cannot be reused.
+- A CI gate failure and a formal IMPL-EVAL verdict are distinct control-plane events. Only terminal
+  evaluator failures advance the owner's two-consecutive-failure escalation threshold.

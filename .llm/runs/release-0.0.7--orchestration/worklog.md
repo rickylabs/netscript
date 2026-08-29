@@ -1941,3 +1941,22 @@
   exact-head evaluator. The red close-gate is intentionally retained until the new verdict and
   acceptance/DoD receipts are complete.
 - Environment rechecked: Docker 0, Aspire applications 0, no release/runtime lease.
+
+## 2026-08-29T21:21:00Z — active implementation verified; #1711 merge authority revoked on real CI red
+
+- Verified both newly dispatched authors through the structured agent status surface. Aspire S1 is
+  `working` on GPT-5.6-SOL/medium in `/home/codex/repos/netscript-aspire-13-5-s1`, has bootstrapped
+  its harness run, and is building the phase-1 parity gate RED-first. #1371 is independently
+  `working` on GPT-5.6-SOL/medium and has added the emitted-module regression test before changing
+  production wiring. Neither lane holds a runtime lease.
+- PR #1711 remains open at `bbaf70d6411fb794895af50b010a66cd475aeb7e`; OpenHands exact-head
+  IMPL-EVAL run `33275424854` is still executing. CI quality run `33275411339`, job `99161160224`,
+  independently failed the agent-docs prose freshness gate.
+- Reproduced the failure locally through `run-gate.ts`: `prose.json.gz` and `provenance.json` are
+  stale relative to the branch's docs reference source. This is a branch-owned freshness failure,
+  not a terminal evaluator verdict, and therefore does not count toward the owner's two-consecutive
+  IMPL-EVAL failure boundary.
+- Withheld merge/readiness. The fixes supervisor received the exact receipt path and was instructed
+  to let the in-flight evaluator terminate before the same canonical author regenerates the verified
+  derived cascade, reruns exact-head Tier-A/CI, and obtains a fresh amendment evaluation.
+- Environment remains Docker 0 / Aspire applications 0.
