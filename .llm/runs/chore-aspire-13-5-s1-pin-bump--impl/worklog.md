@@ -68,6 +68,7 @@ Update the manifest in its owning research/generator workflow, then extend the t
 | 2026-08-29 | 3 | push | `4e30264fa..5b42e92e1  HEAD -> chore/aspire-13-5-s1-pin-bump`; recorded here by amending the same third commit, then repushed with lease |
 | 2026-08-29 | 3 | CI runtime | Run `33276629736` installed/preflighted Aspire CLI 13.5.3 and passed `runtime.aspire-restore` in both tiers, then both stopped at the unchanged Fresh hydration TS2345 baseline |
 | 2026-08-29 | 3 | Tier-A repair | Coordinator hold found missing-required-path and 13.5.x patch-drift false-green gaps; test-first repair now fails closed on both classes |
+| 2026-08-30 | evidence | IMPL-EVAL cycle 1 follow-up | `FAIL_FIX` at evaluated head `69b2ebaf6` requires no S1 code change; this evidence commit corrects the E-12 gap note and supplies the exact cold restore timings for the PR comment, while the warm figure remains pending the next cache-hit run |
 
 ## Decisions
 
@@ -154,5 +155,6 @@ predate this slice and the test itself passes.
 - RED receipt attests baseline HEAD `3b32d162…`; as documented by `run-gate.ts`, it does not attest source-tree cleanliness. The committed slice contains the tested gate implementation and copied receipt.
 - GREEN receipt records committed HEAD `95680776…` while executing the slice-2 dirty tree; the receipt therefore proves the command/result, while commit 2 makes that exact source state reviewable.
 - The repaired GREEN receipt records pre-amend HEAD `68b0aef87…` while executing the bounded Tier-A repair; the amended third commit makes that exact source state reviewable.
+- E-12 (`check:scaffold-versions`) scans `SCAFFOLD_VERSIONS` only and never sees `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; phase 1 guards the preview pin through the `check:aspire-version-parity` exact-pin allow-list and `generate-aspire-config_test.ts`, while S13 owns any widening.
 - Coordinator must rerun fresh exact-head Tier-A review after the repair. This implementation lane still does not self-certify or initiate IMPL-EVAL.
 - This implementation lane does not perform Tier-A sign-off or IMPL-EVAL.

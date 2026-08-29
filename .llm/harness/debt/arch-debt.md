@@ -2345,7 +2345,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/`.
 - **Created:** 2026-08-29.
 - **Status:** open, DEBT_ACCEPTED for #1713 under research decision D-1 / OF-2a.
-- **Gate:** Drop when a stable 13.5.x Browsers package exists. Until then,
-  `check:scaffold-versions`, `check:aspire-version-parity`, the config-generator assertions, and
-  both CI-owned `scaffold.runtime` tiers must retain the exact accepted preview pin and remain
-  green.
+- **Gate:** Drop when a stable 13.5.x Browsers package exists. E-12
+  (`check:scaffold-versions`) scans `SCAFFOLD_VERSIONS` only and never sees
+  `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; until then, `check:aspire-version-parity` (exact-pin
+  allow-list), `generate-aspire-config_test.ts`, and both CI-owned `scaffold.runtime` tiers must
+  retain the exact accepted preview pin and remain green.
