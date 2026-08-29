@@ -261,3 +261,41 @@ rollout mtime across six samples immediately after dispatch. The #1709 implement
 therefore runs with **degraded mobile visibility**; supervisor observation is via rollout mtime and
 `codex-status` instead. Coordinator decision needed only if mobile visibility is a hard condition
 for this leaf.
+
+## 2026-08-29 — #1371 author killed mid-slice by shared Codex app-server exit
+
+Thread `01a04f5d-7af1-7280-bf0f-adf2a43edb3e` reached `state: dead`, `failure: "interrupted"`, with
+**no push and no commits**. Evidence from the launch log, in order: the turn completed normally
+(`status: completed`, 163.7 s) reporting its RED result, then
+`exec_command failed … UnknownProcessId { process_id: 58154 }`, then
+`[codex app-server exited: exit status: 0]`.
+
+Cause: contention on the **shared** Codex app-server. A different lane
+(`netscript-007-aspire-13-5-research`, the Aspire 13.5 epic #1712/#1713) launched its own
+`launch-codex-slice` concurrently; the app-server this lane's thread was attached to exited under it.
+This is the same shared-transport fragility recorded earlier today when `runtime doctor` reported
+`codex-app-server: unavailable` and the scoped repair was refused because other lanes held active
+sessions — the guard was right then, and this is the cost of that shared component being degraded.
+
+**Nothing was lost.** The RED artifacts survived on disk uncommitted and were verified before
+resuming: `generate-register-background_test.ts` (11,511 bytes) and the leaf run dir, worktree
+otherwise clean at base `3b32d1628`. Resumed the **same thread** with `codex-resume` (context
+preserved, no rival author, no restart of the shared app-server). Liveness confirmed by four
+monotonic rollout samples (+50 KB / 80 s) and `state: working`.
+
+**Lesson for this lane:** a `dead` state with `failure: "interrupted"` is not an agent failure and
+must not be treated as one — check for a completed final turn plus an app-server exit before
+concluding anything about the agent's work, and check the worktree for surviving uncommitted
+artifacts before relaunching. Relaunching instead of resuming would have discarded a completed RED
+pass and created a duplicate author.
+
+**Two brief defects of mine, caught by the author and owned here:**
+
+1. The brief cited `.llm/harness/gates/implementation-gate.md`, which does not exist; the canonical
+   file is `.llm/harness/gates/static-gates.md`. The author recorded it as drift and used the right
+   one. Its drift entry is correct and stays.
+2. The brief did not mention that `packages/cli/src/kernel/templates/aspire/helpers/tests/` already
+   contains `generators-background-app_test.ts` and `service-environment-runtime_test.ts`, which
+   cover neighbouring ground. Corrected on resume with an explicit instruction: if an existing test
+   asserts the *silent* behaviour now being made fatal, update it deliberately and say so — never
+   quietly delete a contradicting expectation.
