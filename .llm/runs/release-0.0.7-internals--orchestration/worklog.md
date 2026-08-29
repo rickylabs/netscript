@@ -2461,3 +2461,68 @@ marking ready is this repo's IMPL-EVAL dispatch trigger, the trap that cost a cl
 #1710.
 
 Next: author push → fresh internals Tier-A → independent opposite-family IMPL-EVAL (Fable 5 · low).
+
+## 2026-08-30 — #1371 implementation delivered; Tier-A PASS; IMPL-EVAL launched
+
+### Delivery
+
+| Commit | Proves |
+| --- | --- |
+| `099370709` | `test(cli): prove background references fail fast` — RED |
+| `68482a13adf13c9e53bf49d335bd361305a284de` | `fix(cli): fail fast on background references` — GREEN |
+
+Draft **PR #1728**, `Closes #1371`, milestone `0.0.7`, exactly one `status:` label, DoD 9/10 with
+the only open box being the independent IMPL-EVAL — correctly not self-certified.
+
+### Tier-A — **PASS** at `68482a13a`
+
+Head equality local == remote == PR, tree clean. Product delta is exactly the two authorized files
+plus leaf run artifacts; no seventh path, no lock/cache/workflow churn, and **no pre-existing test
+modified or deleted**.
+
+**RED-first re-executed rather than accepted.** I checked out the test-only commit `099370709` in a
+throwaway worktree and ran the same focused suite: exit **1**, **3 passed / 6 failed** — the four
+`Expected function to reject` negative paths, the preflight-emission assertion, and the suite
+aggregate — with the generator there still carrying **2** silent guards. At the fix commit the same
+suite is **9/9, exit 0**. A real RED→GREEN transition, independently reproduced.
+
+Contract conformance: preflight emitted **before** `builder.addExecutable(...)`; both reference
+kinds covered; deterministic message naming processor, kind and reference name, emitted through
+`JSON.stringify` so quoting is safe; missing resource and unresolvable endpoint both fatal via one
+`if (!endpoint) throw`; raw `services__<ref>__http__0` unchanged.
+
+**Detail the RED output exposed:** the fixture declares `workers-api` as *both* a service and a
+plugin reference. The old code emitted two `const workers_apiEndpoint` that were legal only because
+each sat in its own `{}` block. Hoisting resolution into a single preflight scope would have
+collided; the author's `ServiceEndpoint<i>` / `PluginEndpoint<i>` suffixes prevent it. The base
+assertion `_services.get('users')?.getEndpoint('http')` in `generators-background-app_test.ts` still
+matches the new emission, so no neighbouring expectation was broken.
+
+Gates I executed at this head: focused suite 9/0 exit 0; the same suite red at the RED commit;
+`quality:scan` exit 0 with **`allowCount: 7`**; `check:assets-barrel` exit 0 — confirming the
+prediction that the slotted `-1.ts.template` scaffold does not change, verified rather than assumed.
+
+Recorded as PR comment `5465122659`. Observation logged and deliberately **not acted on**: apps
+registration resolves references via a `getResourceEndpoint(...)` helper while background uses
+inline `?.getEndpoint('http')`. Pre-existing asymmetry, outside this envelope.
+
+### IMPL-EVAL launched
+
+| Field | Value |
+| --- | --- |
+| Session | `2e81752d-ec38-4970-9b87-90de125ff0b7` |
+| Bridge | `cse_01CvtwnbPgmwb6ef2aAw4JBr` |
+| Route | `--model claude-fable-5 --effort low --remote-control`, `providerEnv: {}` (native) |
+| cwd | `/home/codex/repos/netscript-007-eval-1371` @ `68482a13a` |
+
+Route read from the job registry, not argv. **Fable 5 · low** is the lane-policy pairing for
+`normal_implementation` (Sol · medium); #1710 used Fable 5 · medium because it was
+`complex_implementation` (Sol · high). Launched from **inside** the eval worktree — the `--add-dir`
+is not a cwd lesson from the #1710 mislaunch, applied rather than repeated.
+
+The brief requires the evaluator to re-execute RED itself, to prove the processor is absent from the
+returned map rather than infer ordering from source, to attack identifier collisions
+(`workers-api` vs `workers_api`, duplicates within one list), to test escaping with quotes and
+backslashes in a reference name, and — learning from #1710 — to **post its own
+`[PHASE: IMPL-EVAL] [VERDICT: …]` PR comment**, which my #1709 brief omitted and had to be repaired
+afterwards.
