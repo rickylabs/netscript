@@ -5554,3 +5554,47 @@ Merge-ready goes to the coordinator when `check-test` and `quality` are green **
 
 No merge, publish, relabel, readiness flip, milestone change, or issue filed. No release authority
 claimed.
+
+### Merge-ready — reported to coordinator
+
+All checks are green at the **merge head** `2a0a5608629cc2793233507c8449d9316ffeb2ee`, not merely at
+the evaluated head:
+
+| Check | Result |
+| --- | --- |
+| `check-test` | pass (8m15s) |
+| `quality` | pass (1m50s) |
+| `build`, `code-quality`, `close-gate`, both `classify`, `core CI lane visibility` | pass |
+| Run provenance | runs `33277553650` / `33277553668` / `33277553642` all report `headSha == 2a0a56086` — asserted, not assumed |
+| Merge state | observed **`CLEAN`** at this head once CI settled |
+
+`mergeStateStatus` subsequently reverted to `UNKNOWN`. That is GitHub's lazy recomputation after the
+label change below, not a regression — no check is failing or pending, and `CLEAN` was observed at
+this exact head.
+
+**Verdict: PR #1696 is merge-ready.** Merge authority is the coordinator's; this lane holds none and
+performed no merge.
+
+### Label change — not this lane, and not the evaluator
+
+The PR moved `status:impl` → **`status:ready-merge`** at `2026-08-29T22:05:02Z`, 2.5 minutes after
+the evaluator's PASS comment. I did not do it, and my brief explicitly forbade the evaluator from
+relabeling.
+
+Because every agent here acts through the same `rickylabs` token, the timeline API cannot name the
+actor, so I checked the evaluator's own transcript rather than infer from timing — which had pointed
+straight at it. It issued **zero** mutating GitHub commands: `gh pr edit` 0, `--add-label` 0,
+`gh pr merge` 0, `gh pr ready` 0. Its four `ready-merge` mentions are all quotations of close-gate
+rules inside the verdict text. The evaluator stayed inside its authority; the relabel came from the
+coordinator acting on the PASS.
+
+Recording this because timing evidence alone would have produced a false authority-violation finding
+against a session that behaved correctly — the same "narrow measurement, broad words" failure this
+lane keeps catching. Exactly one `status:` label is present, so the single-status law holds.
+
+### Follow-up owed to the coordinator
+
+**S-1 should become an issue**: no executable guard holds the provider-invisibility invariant — the
+evaluator mutated the loop layer to serialize `context` into a provider-bound field and **9 of 9
+tests still passed**. #1694's whole purpose is that negative property. Filing issues is outside this
+lane's authority, so it is handed up rather than acted on.
