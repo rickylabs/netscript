@@ -12,25 +12,27 @@
 
 ## Current State
 
-Clean exact-base branch; issue reproduced against 5.102.8; public readonly contract and open range
-are locked unchanged. PLAN-EVAL is N/A for this small mechanical correction.
+S1 RED is present and independently pinned to query-core 5.102.8. Its structured focused test exits
+1 with only the expected TS2345 at the untouched production hydration call. The public readonly
+contract and open range remain locked unchanged.
 
 ## Completed
 
 - Required skills, harness workflow, static gates, doctrine, archetype, overlay, and issue read.
 - Exact 5.102.8 failure reproduced and declared range restored.
 - Dependency latest/why evidence and JSR/doc-lint baselines captured.
+- S0 pushed and draft PR #1736 opened with required metadata.
+- S1 RED fixture/test added and proven failing before implementation.
 
 ## In Progress
 
-- S0 bootstrap commit and draft PR.
+- S1 RED commit and push.
 
 ## Next Steps
 
-1. Add and commit the exact-version RED regression.
-2. Implement the private validated mutable conversion.
-3. Run exact dual-version and requested static gates.
-4. Push exact head and leave the PR draft for external Tier-A/IMPL-EVAL.
+1. Implement the private validated mutable conversion.
+2. Run exact dual-version and requested static gates.
+3. Push exact head and leave the PR draft for external Tier-A/IMPL-EVAL.
 
 ## Key Decisions
 
@@ -44,6 +46,8 @@ are locked unchanged. PLAN-EVAL is N/A for this small mechanical correction.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-fresh-query-hydration-readonly-state--1734/*` | new | Harness evidence only. |
+| `packages/fresh/tests/query-hydration-version-compat_test.ts` | new | RED child-check regression. |
+| `packages/fresh/tests/type-fixtures/query-hydration-5.102-deno.json` | new | Exact 5.102.8 no-lock config. |
 
 ## Gates
 
