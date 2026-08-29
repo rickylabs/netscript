@@ -31,6 +31,28 @@ interface FormatFinding {
   reason: string;
 }
 
+export type CoverageRefusalCause =
+  | 'empty-selection'
+  | 'all-excluded'
+  | 'partial-exclusion'
+  | 'processed-count-unavailable'
+  | 'processed-count-inconsistent';
+
+export interface CoverageRefusal {
+  cause: CoverageRefusalCause;
+  filesSelected: number;
+  filesProcessed?: number;
+  droppedFiles: string[];
+  unverifiedFiles?: string[];
+}
+
+export interface CoverageReport {
+  filesSelected: number;
+  filesProcessed?: number;
+  droppedFiles: string[];
+  refusals: CoverageRefusal[];
+}
+
 export interface BatchResult {
   files: string[];
   config?: string;
@@ -42,6 +64,21 @@ export interface ConfigBatch {
   files: string[];
   config?: string;
 }
+
+export interface FmtRunnerOptions {
+  cwd: string;
+  check: boolean;
+}
+
+export interface FmtRunOptions extends FmtRunnerOptions {
+  batchSize: number;
+  config?: string;
+}
+
+export type BatchRunner = (
+  batch: ConfigBatch,
+  options: FmtRunnerOptions,
+) => Promise<BatchResult>;
 
 export type NearestConfigCache = Map<string, string | null>;
 
@@ -56,6 +93,7 @@ interface OutputReport {
     findings: number;
     ignoredFindings: number;
   };
+  coverage: CoverageReport;
   findings: FormatFinding[];
   ignoredFindings?: FormatFinding[];
 }
@@ -70,6 +108,9 @@ const SKIP_DIRS = new Set([
   'vendor',
 ]);
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+const FMT_CHECKED_LINE = /^Checked (\d+) files?$/;
+const FMT_CHECK_FINDING_LINE = /^error: Found (\d+) not formatted files? in (\d+) files?$/;
+const FMT_WRITE_CRASH_LINE = /^error: Failed to format (\d+) of (\d+) checked files?$/;
 const NO_TARGET_FILES_MESSAGE = 'No target files found.';
 const IGNORE_MARKER = '.deno-fmt-lint-ignore';
 const DENO_CONFIG_NAMES = ['deno.json', 'deno.jsonc'] as const;
@@ -416,7 +457,7 @@ export async function buildConfigBatches(
   );
 }
 
-async function runBatch(batch: ConfigBatch, options: Options): Promise<BatchResult> {
+const denoFmtRunner: BatchRunner = async (batch, options) => {
   const args = [
     'fmt',
     ...(options.check ? ['--check'] : []),
@@ -436,6 +477,255 @@ async function runBatch(batch: ConfigBatch, options: Options): Promise<BatchResu
     exitCode: result.code,
     output: new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr),
   };
+};
+
+type CompletionEvidence =
+  | { processedCount: number }
+  | { cause: 'processed-count-unavailable' | 'processed-count-inconsistent' };
+
+function stripAnsi(text: string): string {
+  return text.replaceAll(ANSI_PATTERN, '');
+}
+
+/** Parse a mode-specific terminal fmt completion summary into its processed-file count. */
+export function parseFmtCompletion(
+  text: string,
+  mode: 'check' | 'write',
+): CompletionEvidence {
+  const lines = stripAnsi(text).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const matches: Array<{ line: string; processedCount: number; valid: boolean }> = [];
+
+  for (const line of lines) {
+    const checked = line.match(FMT_CHECKED_LINE);
+    if (checked) {
+      matches.push({ line, processedCount: Number(checked[1]), valid: true });
+      continue;
+    }
+
+    const checkFinding = mode === 'check' ? line.match(FMT_CHECK_FINDING_LINE) : null;
+    if (checkFinding) {
+      const findings = Number(checkFinding[1]);
+      const processed = Number(checkFinding[2]);
+      matches.push({ line, processedCount: processed, valid: findings <= processed });
+      continue;
+    }
+
+    const writeCrash = mode === 'write' ? line.match(FMT_WRITE_CRASH_LINE) : null;
+    if (writeCrash) {
+      const failures = Number(writeCrash[1]);
+      const processed = Number(writeCrash[2]);
+      matches.push({ line, processedCount: processed, valid: failures <= processed });
+    }
+  }
+
+  const summaryLike = lines.filter((line) =>
+    line.startsWith('Checked') || line.startsWith('error: Found') ||
+    line.startsWith('error: Failed to format')
+  );
+
+  if (matches.length === 0) return { cause: 'processed-count-unavailable' };
+  if (
+    matches.length !== 1 || summaryLike.length !== 1 || !matches[0].valid ||
+    lines.at(-1) !== matches[0].line
+  ) {
+    return { cause: 'processed-count-inconsistent' };
+  }
+
+  return { processedCount: matches[0].processedCount };
+}
+
+function sortedPaths(paths: Iterable<string>): string[] {
+  return [...new Set([...paths].map(normalizePath))].sort((left, right) =>
+    left.localeCompare(right)
+  );
+}
+
+function makeCoverageRefusal(
+  cause: CoverageRefusalCause,
+  filesSelected: number,
+  droppedFiles: string[],
+  filesProcessed?: number,
+  unverifiedFiles: string[] = [],
+): CoverageRefusal {
+  return {
+    cause,
+    filesSelected,
+    ...(filesProcessed === undefined ? {} : { filesProcessed }),
+    droppedFiles,
+    ...(unverifiedFiles.length > 0 ? { unverifiedFiles } : {}),
+  };
+}
+
+export interface FmtRunResult {
+  results: BatchResult[];
+  batches: number;
+  noTargetBatches: number;
+  coverage: CoverageReport;
+}
+
+/** Run mode-aware fmt batches and prove selected-versus-processed identity. */
+export async function runFmt(
+  files: string[],
+  options: FmtRunOptions,
+  runner: BatchRunner = denoFmtRunner,
+): Promise<FmtRunResult> {
+  const batches = await buildConfigBatches(
+    files,
+    options.cwd,
+    options.batchSize,
+    options.config,
+    new Map(),
+  );
+  const results: BatchResult[] = [];
+  const droppedFiles = new Set<string>();
+  const unverifiedFiles = new Set<string>();
+  let noTargetBatches = 0;
+  let processedCount = 0;
+  let evidenceCause:
+    | 'processed-count-unavailable'
+    | 'processed-count-inconsistent'
+    | undefined;
+
+  const recordEvidenceCause = (
+    cause: 'processed-count-unavailable' | 'processed-count-inconsistent',
+  ): void => {
+    if (cause === 'processed-count-inconsistent' || !evidenceCause) evidenceCause = cause;
+  };
+
+  for (const batch of batches) {
+    if (batch.files.length === 0) continue;
+    const original = await runner(batch, { cwd: options.cwd, check: options.check });
+    const result: BatchResult = {
+      ...original,
+      files: batch.files,
+      config: batch.config,
+    };
+    results.push(result);
+
+    if (isNoTargetFilesResult(result)) {
+      noTargetBatches++;
+      for (const file of batch.files) droppedFiles.add(normalizePath(file));
+      continue;
+    }
+
+    const mode = options.check ? 'check' : 'write';
+    const completion = parseFmtCompletion(result.output, mode);
+    if ('cause' in completion) {
+      recordEvidenceCause(completion.cause);
+      for (const file of batch.files) unverifiedFiles.add(normalizePath(file));
+    } else if (completion.processedCount > batch.files.length) {
+      recordEvidenceCause('processed-count-inconsistent');
+      for (const file of batch.files) unverifiedFiles.add(normalizePath(file));
+    } else if (completion.processedCount === batch.files.length) {
+      processedCount += completion.processedCount;
+    } else {
+      let probedProcessed = 0;
+      const probeUnverified = new Set<string>();
+
+      for (const file of batch.files) {
+        const probe = await runner(
+          { files: [file], config: batch.config },
+          { cwd: options.cwd, check: true },
+        );
+        if (isNoTargetFilesResult(probe)) {
+          droppedFiles.add(normalizePath(file));
+          continue;
+        }
+
+        const probeCompletion = parseFmtCompletion(probe.output, 'check');
+        if ('processedCount' in probeCompletion && probeCompletion.processedCount === 1) {
+          probedProcessed++;
+        } else {
+          probeUnverified.add(normalizePath(file));
+        }
+      }
+
+      if (probeUnverified.size === 0 && probedProcessed === completion.processedCount) {
+        processedCount += completion.processedCount;
+      } else {
+        recordEvidenceCause('processed-count-inconsistent');
+        for (const file of batch.files) {
+          if (!droppedFiles.has(normalizePath(file))) {
+            unverifiedFiles.add(normalizePath(file));
+          }
+        }
+      }
+    }
+  }
+
+  const normalizedDropped = sortedPaths(droppedFiles);
+  const normalizedUnverified = sortedPaths(unverifiedFiles);
+  let coverage: CoverageReport;
+
+  if (files.length === 0) {
+    coverage = {
+      filesSelected: 0,
+      filesProcessed: 0,
+      droppedFiles: [],
+      refusals: [makeCoverageRefusal('empty-selection', 0, [], 0)],
+    };
+  } else if (evidenceCause) {
+    coverage = {
+      filesSelected: files.length,
+      droppedFiles: normalizedDropped,
+      refusals: [
+        makeCoverageRefusal(
+          evidenceCause,
+          files.length,
+          normalizedDropped,
+          undefined,
+          normalizedUnverified,
+        ),
+      ],
+    };
+  } else if (processedCount + normalizedDropped.length !== files.length) {
+    const candidates = sortedPaths(
+      files.filter((file) => !droppedFiles.has(normalizePath(file))),
+    );
+    coverage = {
+      filesSelected: files.length,
+      droppedFiles: normalizedDropped,
+      refusals: [
+        makeCoverageRefusal(
+          'processed-count-inconsistent',
+          files.length,
+          normalizedDropped,
+          undefined,
+          candidates,
+        ),
+      ],
+    };
+  } else if (processedCount === 0) {
+    coverage = {
+      filesSelected: files.length,
+      filesProcessed: 0,
+      droppedFiles: normalizedDropped,
+      refusals: [makeCoverageRefusal('all-excluded', files.length, normalizedDropped, 0)],
+    };
+  } else if (normalizedDropped.length > 0) {
+    coverage = {
+      filesSelected: files.length,
+      filesProcessed: processedCount,
+      droppedFiles: normalizedDropped,
+      refusals: [
+        makeCoverageRefusal(
+          'partial-exclusion',
+          files.length,
+          normalizedDropped,
+          processedCount,
+        ),
+      ],
+    };
+  } else {
+    coverage = {
+      filesSelected: files.length,
+      filesProcessed: processedCount,
+      droppedFiles: [],
+      refusals: [],
+    };
+  }
+
+  return { results, batches: batches.length, noTargetBatches, coverage };
 }
 
 function parseFindings(results: BatchResult[]): FormatFinding[] {
@@ -531,19 +821,8 @@ async function main(): Promise<void> {
   );
 
   const files = await collectFiles(options);
-  const batches = await buildConfigBatches(
-    files,
-    options.cwd,
-    options.batchSize,
-    options.config,
-    new Map(),
-  );
-  const results: BatchResult[] = [];
-
-  for (const batch of batches) {
-    if (batch.files.length === 0) continue;
-    results.push(await runBatch(batch, options));
-  }
+  const run = await runFmt(files, options);
+  const results = run.results;
 
   const allFindings = parseFindings(results);
   const ignoredFindings = options.ignoreLineEndings ? allFindings.filter(isLineEndingFinding) : [];
@@ -552,7 +831,7 @@ async function main(): Promise<void> {
     : allFindings;
   const failedBatches =
     results.filter((result) => result.exitCode !== 0 && !isNoTargetFilesResult(result)).length;
-  const noTargetBatches = results.filter(isNoTargetFilesResult).length;
+  const noTargetBatches = run.noTargetBatches;
   // Crashes are judged PER BATCH. A batch that failed with no parseable finding of its own is a
   // crash even if some other batch produced findings, and even if the only findings in the run are
   // line-ending ones we ignore. Judging this globally is a false-green (see crashedBatches).
@@ -564,11 +843,12 @@ async function main(): Promise<void> {
     mode: options.check ? 'check' : 'write',
     summary: {
       filesSelected: files.length,
-      batches: batches.length,
+      batches: run.batches,
       failedBatches: effectiveFailedBatches + noTargetBatches,
       findings: findings.length,
       ignoredFindings: ignoredFindings.length,
     },
+    coverage: run.coverage,
     findings,
   };
 
@@ -584,20 +864,18 @@ async function main(): Promise<void> {
     await Deno.stdout.write(new TextEncoder().encode(json));
   }
 
-  if (files.length === 0) {
-    console.error('deno fmt selection matched zero files; refusing a false-green gate.');
-    Deno.exit(2);
-  }
-  if (noTargetBatches > 0) {
-    console.error(
-      `${noTargetBatches} deno fmt batch(es) matched the wrapper selection but were excluded by Deno; refusing a false-green gate.`,
-    );
-    Deno.exit(2);
-  }
-
   // A batch that failed without any parseable finding of its own is a crash. Never let it exit
   // silently, and never let it pass just because another batch had findings.
   if (crashed.length > 0) console.error(formatFailedBatches(results));
+
+  if (run.coverage.refusals.length > 0) {
+    const [refusal] = run.coverage.refusals;
+    const dropped = refusal.droppedFiles.length > 0
+      ? ` Dropped: ${refusal.droppedFiles.join(', ')}.`
+      : '';
+    console.error(`deno fmt coverage refusal: ${refusal.cause}.${dropped}`);
+    Deno.exit(2);
+  }
 
   if (findings.length > 0 || crashed.length > 0) Deno.exit(1);
 }

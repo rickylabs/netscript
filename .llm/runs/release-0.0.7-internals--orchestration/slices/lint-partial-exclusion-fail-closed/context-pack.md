@@ -1,0 +1,162 @@
+# Context Pack: #1709 lint/fmt partial-exclusion fail-closed
+
+## Run Metadata
+
+| Field          | Value                                                                              |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Run ID         | `release-0.0.7-internals--orchestration/slices/lint-partial-exclusion-fail-closed` |
+| Branch         | `fix/lint-partial-exclusion-fail-closed`                                           |
+| Current phase  | implementation evidence recorded; exact-head receipt rerun next                  |
+| Archetype      | `6-cli-tooling`                                                                    |
+| Scope overlays | none                                                                               |
+| Author thread  | `01a047f0-f17e-7692-b6f0-83a6d22888c9`                                             |
+| Baseline       | `cf648f1ff973d74c213bb125a6f5f5b9328e693b`                                         |
+
+## Current state
+
+PLAN-EVAL cycle 1 returned `FAIL_PLAN` at evaluator commit `59b79ccd8` against
+plan head `d437db44d`. The repair closed F1-F3 and folded A1-A3. PLAN-EVAL cycle
+2 then returned `FAIL_PLAN` at evaluator commit `f2b3fc8b3` on one narrow
+extension, F4. It explicitly closed F1, F3, A1-A3, and all of F2 except the fmt
+write-mode crash signal. The ordinary two-cycle allowance is exhausted; the
+owner accepted the recommended bounded F4 fix and there is no third PLAN-EVAL.
+
+The standing repaired decisions remain unchanged:
+
+- F1: S3 now explicitly introduces the missing injectable fmt runner seam inside
+  `run-deno-fmt.ts`; malformed-summary and inconsistent-probe tests use that
+  seam.
+- F2: coverage is evaluated on crash batches and precedence is locked as refusal
+  ≥ crash ≥ ordinary finding. Crash+drop and crash-only exit/JSON/diagnostic
+  outcomes are exact at batch sizes 1, 2, and 200.
+- F3: root lint and fmt must both exit 0, with per-file drop-free gates using
+  the evaluator §7 baselines (`2041/2041/0` for each; fmt findings 0).
+
+All advisories A1-A3 remain folded: lint `--input` omits `coverage`; fmt write
+mismatch probes use non-mutating `--check`; both adapter suites pin CRLF
+summaries. F4 adds only the write-scoped
+`^error: Failed to format (\d+) of (\d+) checked files?$` completion form,
+using the second integer as processed, and write-mode crash-only/crash+drop
+controls at 1, 2, and 200. A complete write crash remains exit 1; a simultaneous
+coverage refusal exits 2. Fresh topic-supervisor Tier-A passed exact head
+`fc00aed0f`, and the coordinator granted bounded implementation. The
+implementation ceiling remains exactly six paths, with no seventh path.
+
+## Completed
+
+- Preserved evaluator-owned `plan-eval.md` unchanged and retained cycle-1
+  history.
+- Corrected the false fmt-seam premise in plan, design, and S3 gates.
+- Defined crash-batch coverage accounting, exact precedence, and invariant JSON.
+- Strengthened S1/S2/S3 with batch-size-1 root evidence and row 8 with exit 0
+  for both root tasks.
+- Folded A1, A2, and A3 explicitly.
+- Independently measured Deno 2.9.5's ANSI-prefixed write-crash form outside the
+  checkout, including singular `1 of 1 checked file` and plural `1 of 2` / `2
+  of 3 checked files`, all exit 1.
+- Extended the existing fmt adapter and exact crash matrix to write mode without
+  changing the common coverage contract or precedence.
+- Kept the frozen proving gates and all N/A surfaces unchanged.
+- Completed S1 first: removed only the root lint task's obsolete doctor-family
+  wrapper exclusion. Shipped root lint was `2037/35/0`, corrected root lint is
+  `2041/36/0`, corrected per-file lint is `2041/2041/0`, and the focused doctor
+  selection is exactly `4/4/0`; every command exited 0.
+- Completed S2 through the existing lint `BatchRunner`: command-mode reports
+  now prove `Checked N` processed identity, probe only short counts, emit the
+  shared coverage/refusal shape, keep `--input` coverage-free, and enforce
+  refusal ≥ crash ≥ finding. The focused suite is 14/14, the two-file check is
+  green, and root lint proves `2041 selected / 2041 processed` at default and
+  batch size 1.
+- Completed S3 with an equivalent injectable runner inside `run-deno-fmt.ts`.
+  Both original batches and probes use it; write mismatches probe through
+  non-mutating check mode. The three completion forms are mode-aware, coverage
+  JSON/precedence matches lint, the focused suite is 17/17, the two-file check
+  is green, and root fmt proves `2041 selected / 2041 processed` with zero
+  findings at default and batch size 1.
+- Completed S4 through the canonical generator only. The first and second
+  passes produced the identical complete-diff SHA-256
+  `13049ed995c29a7da844bb01d40e989dba32957683b0b04e720489b9960e968b`;
+  the only generated delta is `agent-tools.generated.ts`. The embedded body and
+  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` change are lint-driven; fmt has no consumer
+  manifest entry or publish claim.
+- Completed the locked 14-row matrix at pushed S4 head `14c4d7349`: focused
+  suites 14/14 and 17/17, check/test/root wrappers/quality/architecture/assets/
+  publish all exit 0, quality retains `allowCount: 7`, the CLI audit retains
+  exactly 19 existing WARN findings, and scope is six authorized paths plus
+  nine leaf artifacts.
+
+## Active slice boundary
+
+- S1-S4 are separately committed, explicitly pushed, and commented. The full
+  validation pass is green. This evidence commit becomes the immutable
+  candidate; every receipt must be rerun after it is explicitly pushed, with
+  no subsequent repository edit.
+
+## Next steps
+
+1. Commit and explicitly push this consolidated evidence.
+2. Rerun every locked receipt at that exact pushed SHA without editing files.
+3. Post the exact-head implementation handoff and move only the phase status to
+   `status:impl-eval`; keep the PR draft and issue open.
+4. Hand off that immutable exact head to separate-session IMPL-EVAL.
+5. Any seventh implementation path remains an immediate rescope stop.
+
+## Key decisions
+
+| Decision                                     | Source             | Notes                                           |
+| -------------------------------------------- | ------------------ | ----------------------------------------------- |
+| Fmt injectable runner is introduced in S3.   | cycle-1 F1         | Same file; no seventh module.                   |
+| Refusal ≥ crash ≥ ordinary finding.          | cycle-1 F2         | Refusal exits 2; crash diagnostics remain once. |
+| Crash batches participate in coverage.       | evaluator evidence | Deno emits completion counts on parse errors.   |
+| Root lint and fmt must both remain exit 0.   | cycle-1 §7 / F3    | Per-file baselines prove drop-free selection.   |
+| A1 folded: lint `--input` omits coverage.    | advisory           | No selection identity exists in saved-log mode. |
+| A2 folded: fmt write probes use `--check`.   | advisory           | Non-mutating classification.                    |
+| A3 folded: CRLF fixtures in both parsers.    | advisory           | Cheap Windows-runner insurance.                 |
+| F4: third write-crash completion form.       | cycle-2 / owner    | Write-only; use second integer; crash-only stays exit 1. |
+| Publish and generated hash remain lint-only. | rescope brief      | Fmt has no consumer body/API claim.             |
+
+## Gates
+
+| Gate family                   | Current status                    | Evidence / bound                                                         |
+| ----------------------------- | --------------------------------- | ------------------------------------------------------------------------ |
+| PLAN-EVAL cycle 1             | `FAIL_PLAN`, preserved            | evaluator commit `59b79ccd8`; F1-F3 specification gaps                   |
+| Plan repair                   | authoring / publication           | `plan.md`, `research.md`, `worklog.md`, `context-pack.md`, `drift.md`    |
+| PLAN-EVAL cycle 2             | `FAIL_PLAN`, F4 only               | evaluator commit `f2b3fc8b3`; ordinary allowance exhausted               |
+| Owner F4 amendment            | accepted / authored                | third write form plus check/write 1/2/200 controls; no third PLAN-EVAL   |
+| Fresh plan Tier-A             | PASS at `fc00aed0f`                 | plan gate closed; coordinator implementation grant received              |
+| S1 root lint correction       | PASS                                | `2037/35/0 → 2041/36/0`; per-file `2041/2041/0`; doctor `4/4/0`; exit 0 |
+| S2 lint coverage contract     | PASS                                | focused 14/14; structured check; default/per-file root `2041 processed`; exact 1/2/200 controls |
+| S3 fmt coverage contract      | PASS                                | focused 17/17; structured check; default/per-file root `2041 processed`, zero findings; check/write controls |
+| S4 canonical embedded asset   | PASS                                | generator twice; identical diff hash; only `agent-tools.generated.ts`; lint-only consumer delta |
+| Frozen proving gates          | PASS at pushed S4 head             | `check`, `test`, `publish-dry-run`, `quality-job`, `check:assets-barrel` all exit 0 |
+| Root drop-free baseline       | PASS in evaluator scratch archive | lint `2041/2041/0`; fmt `2041/2041/0`, findings 0; both exit 0           |
+| Quality                       | PASS at pushed S4 head             | `allowCount: 7`; no allowance/ignore added                               |
+| Runtime/E2E/docs-site/MCP JSR | N/A                               | no evaluator/runtime lease; no scaffold/Aspire/Docker/browser/E2E        |
+
+## Open questions
+
+- Must resolve now: none after the owner-accepted F4 amendment.
+- Safe to defer: local helper/type/function names only.
+
+## Drift and debt
+
+- Drift: cycle-1 repair and cycle-2 F4 owner amendment are appended in
+  `drift.md`; architecture/scope were not rejected or widened.
+- Debt: no new architecture debt; existing CLI warnings/doc debt remain
+  baseline.
+
+## Commits
+
+- Original plan: `f01c1fb593312926d24ad226c45a25f206d772db`.
+- Six-path amended plan: `d437db44d40d4dd3e7149ebf98187f3d3fcbb53c`.
+- Cycle-1 evaluator verdict: `59b79ccd899ab02a2377e48bba2fdf9dbc866200`.
+- Cycle-1 repaired plan head: `3e934e2de1ed758f7182ad1eebf027750bcfb976`.
+- Cycle-2 evaluator verdict: `f2b3fc8b3bcbf8720e4967bec7a8d31ad42200ad`.
+- F4-amended plan head: the commit containing this context pack; PR #1710 head
+  and the amendment phase comment are the plan authority.
+- S1 implementation: `fe4e4eec617a1b083f3633e026fe88f6b6be960a`.
+- S2 implementation: `78d9d008ededac20dd5da73f189fa5c7f69807c3`.
+- S3 implementation: `20898a07477ae2dd8519b1750fab1eba99807211`.
+- S4 canonical asset: `14c4d7349b856b5dd07ed55ba0156504fb8fdef5`.
+- Final implementation evidence: the commit containing this context pack; its
+  exact pushed SHA is the separate-session IMPL-EVAL input.
