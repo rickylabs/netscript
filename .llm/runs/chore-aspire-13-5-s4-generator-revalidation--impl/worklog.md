@@ -98,6 +98,9 @@ decision remains open.
 | 2026-08-30 | 3     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 | 2026-08-30 | 4     | implementation  | Pinned publish/deploy/destroy argv to the verbatim 13.5.3 help receipts.      |
 | 2026-08-30 | 4     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
+| 2026-08-30 | 5     | rebase          | Rebased four slices onto `13878a80a`; regenerated without reverting #1729.    |
+| 2026-08-30 | 5     | implementation  | Regenerated the asset barrel and completed the full local gate set.           |
+| 2026-08-30 | 5     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 
 ## Decisions
 
@@ -116,22 +119,34 @@ decision remains open.
 
 ## Gate Results
 
-| Slice | Gate                                | Result       | Evidence                                                                                         |
-| ----- | ----------------------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
-| 1     | Run-artifact formatting             | PASS         | `deno fmt --check` on the seven run Markdown files                                               |
-| 2     | Config + background generator tests | PASS (18/18) | Structured test wrapper on `netscript_config_test.ts` and `generate-register-background_test.ts` |
-| 2     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
-| 2     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
-| 3     | Stale-anchor grep                   | PASS         | No retired issue anchors in template or Aspire asset-source trees                                |
-| 3     | Aspire config generator tests       | PASS (5/5)   | Structured wrapper on `generate-aspire-config_test.ts`                                           |
-| 3     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
-| 3     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
-| 4     | Aspire deploy adapter tests         | PASS (17/17) | Structured wrapper on the cloud and compose adapter tests                                        |
-| 4     | Raw touched-file format/lint        | PASS         | `--no-config` with repository formatting options because root config excludes `packages/cli`     |
-| 4     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
-| 4     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
+| Slice | Gate                                        | Result         | Evidence                                                                                         |
+| ----- | ------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------ |
+| 1     | Run-artifact formatting                     | PASS           | `deno fmt --check` on the seven run Markdown files                                               |
+| 2     | Config + background generator tests         | PASS (18/18)   | Structured test wrapper on `netscript_config_test.ts` and `generate-register-background_test.ts` |
+| 2     | `quality:scan`                              | PASS           | Repository scanner returned no findings; seven pre-existing allowances                           |
+| 2     | `arch:check`                                | PASS           | Exit 0; existing doctrine warnings only, no failures                                             |
+| 3     | Stale-anchor grep                           | PASS           | No retired issue anchors in template or Aspire asset-source trees                                |
+| 3     | Aspire config generator tests               | PASS (5/5)     | Structured wrapper on `generate-aspire-config_test.ts`                                           |
+| 3     | `quality:scan`                              | PASS           | Repository scanner returned no findings; seven pre-existing allowances                           |
+| 3     | `arch:check`                                | PASS           | Exit 0; existing doctrine warnings only, no failures                                             |
+| 4     | Aspire deploy adapter tests                 | PASS (17/17)   | Structured wrapper on the cloud and compose adapter tests                                        |
+| 4     | Raw touched-file format/lint                | PASS           | `--no-config` with repository formatting options because root config excludes `packages/cli`     |
+| 4     | `quality:scan`                              | PASS           | Repository scanner returned no findings; seven pre-existing allowances                           |
+| 4     | `arch:check`                                | PASS           | Exit 0; existing doctrine warnings only, no failures                                             |
+| 5     | `gen:assets-barrel` / `check:assets-barrel` | PASS           | Regenerated `embedded.generated.ts`; freshness rechecked after upstream rebase                   |
+| 5     | Scoped check wrapper                        | PASS           | 65 files across Aspire generator/adapter and config schema roots; zero diagnostics               |
+| 5     | Scoped lint/format wrappers                 | PASS           | Seven touched TS files processed with a temporary no-exclusion config; zero findings             |
+| 5     | Raw touched-file format/lint                | PASS           | Seven touched TS files; repository formatting options supplied with `--no-config`                |
+| 5     | Generator/config/adapter tests              | PASS (300/300) | Structured test wrapper; rerun after rebase                                                      |
+| 5     | CLI JSR + publish dry-run audit             | PASS           | Audit exit 0; known doctrine/slow-type warnings only                                             |
+| 5     | `quality:scan`                              | PASS           | Final post-rebase scan; no findings and seven pre-existing allowances                            |
+| 5     | `arch:check`                                | PASS           | Final post-rebase check; exit 0 with existing warnings and no failures                           |
+| 5     | `scaffold.plugins`                          | PASS (17/17)   | `deno task e2e:cli run scaffold.plugins --format pretty`; no Aspire runtime                      |
+| 5     | Lock hygiene                                | PASS           | No staged or unstaged `deno.lock` change                                                         |
 
 ## Handoff Notes
 
 The separate evaluator should inspect `member-table.md`, the exact deploy argv assertions, the
-single edited debt entry, asset-barrel freshness, and the final structured gate evidence first.
+single edited debt entry, asset-barrel freshness, and the final structured gate evidence first. An
+extra non-blocking config-package audit found the unchanged `src/paths/mod.ts` module-tag baseline
+failure; S4 does not touch that entrypoint, while the required CLI JSR audit exits 0.

@@ -131,8 +131,7 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
         applicationUrl:
           `https://localhost:${ASPIRE_EPHEMERAL_PORT};http://localhost:${ASPIRE_EPHEMERAL_PORT}`,
         environmentVariables: {
-          ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL:
-            `http://localhost:${ASPIRE_EPHEMERAL_PORT}`,
+          ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL: `http://localhost:${ASPIRE_EPHEMERAL_PORT}`,
           ASPIRE_ALLOW_UNSECURED_TRANSPORT: 'true',
           ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true',
           ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL: `https://localhost:${ASPIRE_EPHEMERAL_PORT}`,

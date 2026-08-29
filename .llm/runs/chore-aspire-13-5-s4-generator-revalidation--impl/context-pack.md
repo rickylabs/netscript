@@ -12,10 +12,10 @@
 
 ## Current State
 
-Baseline is `8b1e42f72`. Research/design are locked; PLAN-EVAL is N/A. The 13.5 SDK member table is
-committed with no changed/removed member, and draft PR #1738 carries the full table. Slices 2–4
-prove the TypeScript AppHost default, existing #1371 coverage, current 13.5/S12 Deno anchors, and
-exact Aspire 13.5.3 deploy argv; their focused tests and fitness gates pass.
+The branch was re-based from its original `8b1e42f72` baseline onto current `origin/main` at
+`13878a80a` before final regeneration. Research/design are locked; PLAN-EVAL is N/A. The 13.5 SDK
+member table has no changed/removed member, and draft PR #1738 carries the full table. All five
+slices and their local gates are complete; external IMPL-EVAL remains intentionally separate.
 
 ## Completed
 
@@ -23,23 +23,25 @@ exact Aspire 13.5.3 deploy argv; their focused tests and fitness gates pass.
   archetype/gate docs, and current source were read.
 - #1371 is confirmed closed by the baseline and its required env-key test exists.
 - Run artifacts and member table created.
-- Slice 1 committed/pushed as `079fbb0a2`; draft PR #1738 opened with required metadata and comment.
+- Slice 1 opened draft PR #1738 with the required metadata and full member-table comment.
 - Existing `generate-register-background_test.ts` proves the #1371 service-reference environment
   key, positive injection, and fail-fast paths, so no duplicate case is needed.
 - Retired Aspire issue anchors are absent from the template and Aspire asset-source trees; only the
   approved CommunityToolkit Deno/SQLite debt entry was updated.
 - The cloud adapter already emitted non-interactive `destroy` with both `--yes` and
   `--non-interactive`; an exact regression test now pins it. Publish/deploy remain free of `--yes`.
+- Asset regeneration, 65-file type-check, seven-file lint/format, 300 tests, CLI JSR audit,
+  `quality:scan`, `arch:check`, and `scaffold.plugins` (17/17) all pass after the upstream rebase.
 
 ## In Progress
 
-- Slice 4 commit/push/commit-trail comment.
+- External Fable slice review and separate-session IMPL-EVAL handoff.
 
 ## Next Steps
 
-1. Regenerate assets and run the complete local gate set.
-2. Reconcile the five-commit trail and draft PR metadata.
-3. Hand the draft PR to the separate Fable supervisor/evaluator without marking ready.
+1. Run the external Fable slice review and separate-session IMPL-EVAL.
+2. Resolve any evaluator findings with new evidence before changing PR status.
+3. Let the supervisor own any later ready transition; this implementation session does not.
 
 ## Key Decisions
 
@@ -63,15 +65,16 @@ exact Aspire 13.5.3 deploy argv; their focused tests and fitness gates pass.
 | `packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts`   | modified | Exact non-interactive destroy argv.            |
 | `packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts`      | modified | Shared 13.5 flag provenance.                   |
 | `packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts` | modified | Publish/deploy contract names and exact argv.  |
+| `packages/cli/src/kernel/assets/embedded.generated.ts`                         | modified | Regenerated compatibility asset.               |
 
 ## Gates
 
-| Gate family | Current status    | Evidence                              |
-| ----------- | ----------------- | ------------------------------------- |
-| Static      | PASS (slices 2–4) | 40 focused tests; stale-anchor grep   |
-| Fitness     | PASS (slices 2–4) | `quality:scan`; `arch:check`          |
-| Runtime     | N/A locally       | no lease; S2 receipts + PR CI runtime |
-| Consumer    | NOT_RUN           | final `scaffold.plugins`              |
+| Gate family | Current status | Evidence                              |
+| ----------- | -------------- | ------------------------------------- |
+| Static      | PASS           | 65-file check; lint/fmt; 300 tests    |
+| Fitness     | PASS           | CLI JSR; `quality:scan`; `arch:check` |
+| Runtime     | N/A locally    | no lease; S2 receipts + PR CI runtime |
+| Consumer    | PASS           | `scaffold.plugins` 17/17              |
 
 ## Open Questions
 
@@ -84,4 +87,5 @@ None.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- Rebased slice SHAs: `ca80c26b4`, `ab2318fb2`, `aec266d4e`, `eff0548a2`; see the draft PR's
+  reconciliation and per-slice comments.

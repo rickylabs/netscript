@@ -131,7 +131,7 @@ five reviewable commits and trustworthy gate evidence.
 
 ## Dependencies
 
-- Baseline #1728 (`8b1e42f72`) and S2 branch receipts.
+- Baseline #1728 (`8b1e42f72`), final upstream rebase `13878a80a`, and S2 branch receipts.
 - S1 pin bump is separate and intentionally absent from this branch.
 
 ## Drift Watch

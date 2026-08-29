@@ -2,16 +2,16 @@
 
 Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
-| Field    | Value                                                                      |
-| -------- | -------------------------------------------------------------------------- |
-| Model    | Claude Fable 5 supervisor; GPT-5.6 Sol implementation agent                |
-| Session  | External Fable 5 supervisor session; implementation session ID not exposed |
-| Host     | Linux/WSL native ext4 worktree                                             |
-| Checkout | `/home/codex/repos/netscript-aspire-13-5-s4`                               |
-| Worktree | `/home/codex/repos/netscript-aspire-13-5-s4`                               |
-| Branch   | `chore/aspire-13-5-s4-generator-revalidation`                              |
-| Baseline | `8b1e42f725919457c64781d5973fd419017fab13` (`origin/main`, 2026-08-30)     |
-| Run ID   | `chore-aspire-13-5-s4-generator-revalidation--impl`                        |
+| Field    | Value                                                                            |
+| -------- | -------------------------------------------------------------------------------- |
+| Model    | Claude Fable 5 supervisor; GPT-5.6 Sol implementation agent                      |
+| Session  | External Fable 5 supervisor session; implementation session ID not exposed       |
+| Host     | Linux/WSL native ext4 worktree                                                   |
+| Checkout | `/home/codex/repos/netscript-aspire-13-5-s4`                                     |
+| Worktree | `/home/codex/repos/netscript-aspire-13-5-s4`                                     |
+| Branch   | `chore/aspire-13-5-s4-generator-revalidation`                                    |
+| Baseline | `13878a80a` (`origin/main` after final pre-handoff rebase; original `8b1e42f72`) |
+| Run ID   | `chore-aspire-13-5-s4-generator-revalidation--impl`                              |
 
 ## Routes in force
 
