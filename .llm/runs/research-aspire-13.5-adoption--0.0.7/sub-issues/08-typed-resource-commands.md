@@ -23,8 +23,8 @@ CLI and dashboard) — and S9's MCP smoke proves it.
   `arguments` (`--timeout <s>`, `--confirm true` for destructive ops), `Visibility`, `IconName`;
   execution wraps the existing tool runner; results map to `{ success, message }`. Emit
   `.excludeFromMcp()` on every db-cli-mode helper resource (constant
-  `RESOURCE_DEFAULTS.DbCliModeMcpHidden = true`, named so S9 can assert the hidden set by name:
-  `<db>-cli` resources). The 13.4 `WithProcessCommand` seam behind `PROCESS_COMMANDS_FLAG`
+  `RESOURCE_DEFAULTS.DbCliModeExcludeFromMcp = true`, named so S9 can assert the MCP-excluded set by
+  name: `<db>-cli` resources). The 13.4 `WithProcessCommand` seam behind `PROCESS_COMMANDS_FLAG`
   (`generate-register-tools-1.ts.template:108-123`) is replaced by the typed `withCommand` path or
   deleted; its version-bound comment goes with it.
 - `packages/cli/src/kernel/adapters/database/{aspire-command-executor,operation-runner}.ts`: when a
