@@ -57,3 +57,47 @@ keywords rather than dropping them to dodge an impossible check.
 
 `PASS`. Ready for a **fresh opposite-family IMPL-EVAL**. PR remains draft / `status:impl`; no
 readiness flip or merge until that verdict returns PASS.
+
+## ADVISORY-1 repair Tier-A at `608f68b076bfb724d111bdaf075fd4111703d937`
+
+IMPL-EVAL cycle 1 returned **`PASS_IMPL`** at `9abc76d48` (artifact
+`907cce4147d999f1ea0f145ca02731307cf680d4` on `eval/impl-eval-1729-cycle-1`) with two advisories.
+
+**ADVISORY-1 taken.** The guaranteed-read root file claimed the app guide explains
+`defineRouteContract`, `staleTime`, dehydration and optimistic UI; the evaluator's `grep -c` of the
+generated `apps/evalapp-web/AGENTS.md` returned **0** for each. Advisory rather than blocking because
+#1674's boxes were still met — but this leaf exists to stop the guaranteed-read file misdirecting an
+agent, so shipping a pointer that overstates its own target would reproduce the defect in a new place.
+
+Corrected sentence now claims only `definePage`, `withResource`, `withForm` — each counted 1 in the
+generated target — and routes the other four to MCP `find_guidance` and the offline docs. The link and
+its "read it before app work instead of inventing a parallel pattern" instruction are preserved;
+#1674 acceptance box 2 rests on those.
+
+| Check | Result |
+| --- | --- |
+| Product delta since evaluated head | exactly three files: `guidance.md.template`, `embedded.generated.ts`, `init-agent_test.ts` — no sixth path |
+| Barrel regenerated | `gen:assets-barrel` **reproduces committed bytes** |
+| Installer suite | exit 0, **22 passed / 0 failed** |
+
+**ADVISORY-2 filed as issue #1737** (`type:fix`, `area:cli`, `area:agentic`, `p2`, milestone 0.0.7):
+`skills/netscript/SKILL.md:43` and `skills/netscript-operate/SKILL.md:50` still reference
+`.claude/skills/help.md`, contradicting the canonical-tree convention this leaf establishes. `skills/`
+is outside the five-path ceiling, so the evaluator correctly declined to fix it and so did this leaf.
+The follow-up states the barrel-regeneration requirement so it does not repeat the template-only trap.
+
+### Supervisor evidence correction
+
+The PR's `acceptance-evidence` entry for #1674 box 2 had **repeated the overstatement** — it cited the
+guidance as promising `defineRouteContract`, `staleTime`, dehydration and optimistic UI from the app
+guide. That was written from the guidance text rather than checked against the link target. Corrected
+in the PR body to match the repaired wording. Lesson: evidence quoting a pointer must be verified
+against what the pointer resolves to, not against the pointer's own claim.
+
+### Next
+
+Bounded delta re-review dispatched to the **same independent evaluator** (it holds full cycle-1
+context and is independent of the author): confirm the claim is now accurate in both directions, the
+link and instruction survive, the barrel reproduces, and nothing else moved. Verdict `DELTA_PASS` or
+`DELTA_FAIL`. On `DELTA_PASS`: `status:ready-merge`, rerun CI so close-gate reads live labels, merge
+when green, then dispatch #1673.
