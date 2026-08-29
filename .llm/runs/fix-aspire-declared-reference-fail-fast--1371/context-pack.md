@@ -6,28 +6,30 @@
 | --- | --- |
 | Run ID | `fix-aspire-declared-reference-fail-fast--1371` |
 | Branch | `fix/aspire-declared-reference-fail-fast` |
-| Current phase | `implement` |
+| Current phase | `gate` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service` |
 
 ## Current State
 
-The branch began clean at `3b32d1628584749af4dd6e97fd331c24e84f0b9e`. Research confirms both reference kinds silently drop missing/unresolved endpoints. PLAN-EVAL is N/A by admitted design. Slice 1 tests are now RED through the structured wrapper: 3 passed, 6 failed as expected.
+Slice 1 is committed as `099370709` with the expected RED evidence (3 passed / 6 failed). Slice 2 now emits required reference preflight before `addExecutable`; the new suite is green 9/9 and the three-suite neighborhood proof is green 69/69. The preliminary full gate set is green, including quality `allowCount: 7`, unchanged assets, and disclosed CLI publish/JSR WARN baselines.
 
 ## Completed
 
 - Harness/skill/doctrine bootstrap and base verification.
 - Bounded research, locked design, gate selection, and drift note.
 - RED emitted-module tests covering raw-key parity, positive service/plugin binding, missing resources, unresolved endpoints, and pre-registration ordering.
+- Emitted service/plugin preflight and deterministic configuration error before processor registration.
+- Preliminary full static/fitness/publish gate pass.
 
 ## In Progress
 
-- Fresh Tier-A review of the RED-first test slice.
+- Implementation sign-off commit, followed by final-head receipt production.
 
 ## Next Steps
 
-1. Obtain fresh Tier-A slice review, commit/push/comment, and open the draft PR.
-2. Implement fail-fast, run all final-head gates, review, commit, atomically push, and update the draft PR.
+1. Commit the implementation/harness sign-off slice.
+2. Rerun every required receipt at that exact head, atomically push, and open/update the draft PR without marking it ready.
 
 ## Key Decisions
 
@@ -42,15 +44,17 @@ The branch began clean at `3b32d1628584749af4dd6e97fd331c24e84f0b9e`. Research c
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-aspire-declared-reference-fail-fast--1371/` | new | Harness state and evidence. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts` | new | RED-first emitted-module contract and runtime-style matrix. |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts` | changed | Pre-registration service/plugin endpoint fail-fast. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | EXPECTED RED | Focused wrapper exit 1; 3 passed / 6 failed. |
-| Fitness | NOT_RUN | Final-head gate set pending. |
+| Static | preliminary PASS | Focused 9/9; neighborhood 69/69; root test 4,242 pass / 19 ignored; root check/lint/fmt green. |
+| Fitness | preliminary PASS | `quality:scan` allowCount 7; arch/assets/publish/audit exit 0 with baseline warnings disclosed. |
 | Runtime | N/A | No runtime lease; emitted-module execution only. |
-| Consumer | RED test passes | Emitted service/plugin key equals SDK `createServerServiceEnvKey('workers-api')`; underscore form absent. |
+| Consumer | PASS | Emitted service/plugin key equals SDK `createServerServiceEnvKey('workers-api')`; underscore form absent. |
 
 ## Open Questions
 
