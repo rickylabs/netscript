@@ -14,7 +14,8 @@ dashboard. Use it to give the generated db-cli-mode resources (`generate-db-cli-
 `withExplicitStart`) typed `migrate`/`seed`/`reset` commands with a bounded wait, so `netscript db`
 no longer spawns ad-hoc AppHosts or blocks indefinitely (#863, #1011/#1196 lineage). The same
 generator marks those internal helper resources `excludeFromMcp()` so agents do not see NetScript
-tooling in `list_resources` — and S9's MCP smoke proves it.
+tooling in the Aspire MCP server's `list_resources`/log/telemetry tools (they stay visible to the
+CLI and dashboard) — and S9's MCP smoke proves it.
 
 ## Scope
 
@@ -46,8 +47,9 @@ vocabulary follows; not implemented here. S9 owns the MCP receipt that _proves_ 
 - [ ] `aspire resource <db>-cli migrate --timeout 60` succeeds; `reset` without `--confirm true`
       fails before mutation.
 - [ ] Generated output for a postgres scaffold contains `.excludeFromMcp()` exactly on the
-      `<db>-cli` resources and on no user-facing resource (generator test), and
-      `aspire describe --include-hidden` still lists them.
+      `<db>-cli` resources and on no user-facing resource (generator test). `excludeFromMcp()`
+      affects **Aspire MCP exposure only**: default `aspire describe --format Json` still lists
+      `<db>-cli` (they are not `withHidden()` — that API is deliberately not adopted).
 - [ ] `netscript db init` against an Unhealthy-but-Running Postgres exits within the timeout with
       the actionable message (#863) — `Closes #863`.
 - [ ] `scaffold.runtime` green on both tiers; no second AppHost is spawned during `db` ops when one

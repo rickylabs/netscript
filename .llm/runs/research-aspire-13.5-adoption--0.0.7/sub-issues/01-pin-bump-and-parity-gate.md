@@ -34,11 +34,16 @@ repo currently carries 13.4.6 in 14 places and 13.5.0-preview.1.26404.10 in one
   `nuget-aspire-${{ runner.os }}-13.5.3-v1`.
 - `.github/scripts/aspire-nuget-cache-policy.test.ts` — single train, no `FIXED_PUBLISHED_E2E_CLI`.
 - New `.llm/tools/validation/check-aspire-version-parity.ts` +
-  `deno task check:aspire-version-parity` wired into `ci.yml` quality gates via `run-gate.ts`: reads
-  `SCAFFOLD_VERSIONS.ASPIRE_SDK` and asserts equality in `toolchain.env`, the three workflows, the
-  policy test, `skills/aspire/SKILL.md` + `skills/help.md` "verified against" markers, and
-  `docs/site/explanation/aspire.md` /
-  `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md` snippets.
+  `deno task check:aspire-version-parity` wired into `ci.yml` quality gates via `run-gate.ts`.
+  **Phase 1 (this slice):** row source = repo-relative
+  `.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv` (header skipped).
+  **Fail** on a stale literal in classes `scaffold-constants`, `ci:*`, `root-config` (scaffold
+  constants, `.github/toolchain.env`, the three workflows — install version, preflight pattern,
+  NuGet cache key — the policy test, `.openhands/setup.sh`). **Report `deferred`** (non-failing,
+  owner-tagged) for every other non-archival row that carries a stale literal. Owner `archival` rows
+  (this entire research run dir, the debt registry, design corpus, docs plan, RFCs, version-suffixed
+  fixtures, migration fixture, root notes) are `info` only; class `lockfile` is skipped. **Phase 2**
+  (complete enforcement) is flipped by S13 (D-13).
 - Arch-debt: add "Aspire.Hosting.Browsers preview pin (13.5 train)" with gate "drop when a stable
   13.5.x Browsers package exists".
 
@@ -52,8 +57,10 @@ repo currently carries 13.4.6 in 14 places and 13.5.0-preview.1.26404.10 in one
 
 - [ ] Phase-1 scoped sweep is clean:
       `git grep -n '13\.4\.6' -- packages/cli/src/kernel/constants/scaffold .github .openhands packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts`
-      returns nothing; the gate's `deferred` report lists exactly the S9/S11/S13 rows (skills, docs
-      snippets, generated corpora, telemetry example) and no other path.
+      returns nothing; the gate's phase-1 **fail set is empty**. The `deferred` report is non-empty
+      and every entry carries its manifest owner (at the plan head: S1/S4 generator tests, S3 compat
+      fixtures, S4 generator comments/templates, S9 skills + dogfood bundle, S11 dedicated docs, S13
+      internal skill, `derived` barrels/snapshots); no `archival` row appears in it.
 - [ ] `deno task check:aspire-version-parity` passes locally and in `ci.yml`.
 - [ ] `deno task check:scaffold-versions` passes (no prerelease in `SCAFFOLD_VERSIONS`).
 - [ ] `.github/scripts/aspire-nuget-cache-policy.test.ts` passes with the single 13.5.3 train.
@@ -69,9 +76,7 @@ Scoped check/lint/fmt wrappers on `packages/cli`; `deno task quality:scan`; `den
 ## Docs / static asset regeneration
 
 `deno task gen:assets-barrel` (embedded.generated.ts carries the generator assets); no skill/docs
-changes here (parity gate will fail on the skill markers until S9/S11 land → wire the gate to
-**warn** for `skills/` and `docs/` paths until those slices close, then flip to fail; record the
-flip in the PR).
+changes here — their rows are phase-1 `deferred` by design and become enforce in S13 (phase 2).
 
 ## Related
 

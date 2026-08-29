@@ -16,7 +16,10 @@ tests to the new fixtures while keeping the 13.4.6 files for the adapter's backw
   `packages/mcp/tests/telemetry-live-fixture_test.ts:15,34`.
 - `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.4.6.json` → add `aspire-ps-13.5.3.json`;
   teardown tests run against both.
-- `packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts:132` comment + sample.
+- `packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts:132` comment + sample,
+  `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts:65`
+  (banner), `.llm/tools/agentic/teardown/probes_test.ts` — **compat-fixture class**: keep the 13.4.6
+  case, add a 13.5.3 case beside it (parity phase 2 asserts the 13.5.3 case exists).
 - `packages/telemetry/src/adapters/aspire-query/aspire-telemetry-normalize.ts` only if the 13.5
   envelope differs (S2 V5 decides).
 
@@ -27,6 +30,8 @@ commit in this PR with its own test.
 
 ## Acceptance
 
+- [ ] Every `compat-fixture` manifest row has a `13.5.3` case (grep test) beside its kept 13.4.6
+      case.
 - [ ] Every fixture file name carries the Aspire version it was captured from; a `README.md` in each
       fixtures folder states capture command + date + CLI version.
 - [ ] `deno task test` for `packages/mcp`, `packages/telemetry`, `.llm/tools/agentic/teardown`

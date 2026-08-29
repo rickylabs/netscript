@@ -19,12 +19,18 @@ manifest's archival classes as the exclusion set.
   the `Aspire CLI 13.3.0` toolchain snapshot with a reference to `.github/toolchain.env`.
 - `packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts:81`: "Aspire 13.4 validates…" →
   "Aspire ≥ 13.4 validates…".
-- Dashboard-port assumption (`ASPIRE_DASHBOARD_PORT ?? 18888`) — one decision applied to
-  `assets/app/routes/examples/telemetry/(_shared)/telemetry-trace.ts.template:70`,
-  `adapters/windows/environment/env-file-{values,content}.ts:213,293`, and the precedence prose in
-  `packages/mcp/README.md:318` / `docs/site/reference/mcp/index.md:194`: resolve through the same
-  `aspire ps --format Json` fallback `.netscript/aspire-cli.ts` uses **or** document the env var as
-  the only override under the ephemeral-port model. Recorded as decision D-17 at filing.
+- **D-17 (locked default in `plan.md`; coordinator ratifies before this slice):** one resolver,
+  `packages/mcp/src/domain/telemetry-endpoint.ts` `resolveTelemetryEndpoint` — explicit →
+  `NETSCRIPT_TELEMETRY_ENDPOINT` → `ASPIRE_DASHBOARD_PORT` → **new** `aspire_ps` step (running
+  AppHost `dashboardUrl` from `aspire ps --format Json`, the `.netscript/aspire-cli.ts` logic
+  extracted to a shared helper) → the named compatibility constant `DEFAULT_TELEMETRY_ENDPOINT`
+  (`http://localhost:18888`, upstream standalone-dashboard default, `source: 'default'`). Apply to
+  `assets/app/routes/examples/telemetry/(_shared)/telemetry-trace.ts.template:70` (no bare `18888`;
+  read env → running AppHost → render "dashboard unavailable — run `aspire ps`") and
+  `adapters/windows/environment/env-file-{values,content}.ts:213,293` (emit `ASPIRE_DASHBOARD_PORT`
+  only when configured; never a magic default). Focused tests for the resolver step and both
+  templates; one precedence line in `packages/mcp/README.md:318` and
+  `docs/site/reference/mcp/index.md:194` (S11 prose).
 - `scaffold-aspire.ts:9-12` `SCAFFOLD_COMMUNITY_TOOLKIT` (`13.2.1-beta.532`, unused): delete or
   re-pin to 13.5.0 with a consumer.
 - Consumer CI template `assets/workspace/github/workflows/deploy-compose-ghcr.yml.template:51`: emit
@@ -42,9 +48,12 @@ manifest's archival classes as the exclusion set.
   version-suffixed `*-13.4.6-*` fixtures, `prior-release.mcp.json`, this run's
   `sources/`+`receipts/`, `notes.md`, harness docs) plus the git-ignored
   `.llm/runs/**`/`.llm/tmp/**` trees.
-- The gate reads `aspire-surface-manifest.tsv` (committed with this epic's run dir) as its row
-  source and fails if the manifest is stale (`tools/aspire-surface-manifest.ts` re-run produces a
-  diff) — the manifest is regenerated in the same PR.
+- The gate reads the repo-relative
+  `.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv` (header skipped) as
+  its row source and fails if the manifest is stale (`tools/aspire-surface-manifest.ts` re-run
+  produces a diff) — the manifest is regenerated in the same PR. Rows with owner `archival`
+  (including this research run dir and the debt registry) are `info`; class `compat-fixture` asserts
+  the 13.5.3 case; class `lockfile` is skipped.
 - `ci.yml` quality gate switches to phase 2 (`run-gate.ts` receipt).
 
 ## Boundaries
@@ -54,13 +63,14 @@ archival rows.
 
 ## Acceptance
 
-- [ ] `git grep -nE '13\.[0-4]\.[0-9]|Aspire 13\.[0-4]' -- $(cut -f1 aspire-surface-manifest.tsv | grep -v <archival rows>)`
-      returns nothing (the gate's own scoped grep, phase 2).
+- [ ] Phase-2 sweep is clean:
+      `M=.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv; git grep -nE '13\.[0-4]\.[0-9]|Aspire 13\.[0-4]' -- $(awk -F'\t' 'NR>1 && $3!="archival" && $2!="compat-fixture" && $2!="lockfile" {print $1}' "$M")`
+      returns nothing, and every `compat-fixture` row contains a `13.5.3` case.
 - [ ] `deno task check:aspire-version-parity` (phase 2) green in `ci.yml`; archival hits reported as
       `info` only.
 - [ ] `tools/aspire-surface-manifest.ts` re-run yields no diff against the committed manifest.
-- [ ] Template tests updated (`deploy-compose-ghcr` emits the pinned install; telemetry example
-      resolves the dashboard per D-17).
+- [ ] Template tests updated (`deploy-compose-ghcr` emits the pinned install; telemetry example and
+      Windows env file follow D-17; resolver `aspire_ps` step tested).
 - [ ] `check:assets-barrel`, `agentic:sync-claude:check` green.
 
 ## Rollback

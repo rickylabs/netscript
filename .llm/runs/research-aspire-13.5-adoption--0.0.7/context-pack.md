@@ -27,6 +27,19 @@
   (OF-1).
 - Pins live in 14 places; `e2e-cli-prod` already on a 13.5 preview; new parity gate proposed (D-2).
 
+## Repair state (PLAN-EVAL cycles 1 and 2)
+
+Cycle 2 (`plan-eval-cycle-2.md`, head `1bfe60b05`) = FAIL_PLAN on six consistency findings; all six
+corrected in the cycle-2 repair commit (matrix in `worklog.md`): one 13-slice/three-canary program
+in every authoritative surface (D-10, slice table, rollback, risks, ratification);
+`excludeFromMcp()` = MCP exposure only (D-6, `withHidden()` not adopted); parity phases with the
+entire run dir + debt registry archival and compat fixtures special-cased (D-13, D-16); manifest
+rules extended (810 rows, idempotent); `SAGAS_API_DEFAULT_PORT` retained as `@deprecated` compat
+export (D-14); C16/C17/C20–C22 + inventory rows reconstructed and deployment owned by S4 (D-15);
+D-17 default locked for coordinator ratification before S13. **No third ordinary PLAN-EVAL exists;
+next step is coordinator ratification, then this session receives the implementation-supervisor
+mandate.**
+
 ## Repair state (PLAN-EVAL cycle 1)
 
 F1–F7 corrected (mapping in `worklog.md`): listener-readiness health contract (D-5), three mandatory
@@ -38,7 +51,7 @@ owner authorization.
 ## Next for the coordinator
 
 1. Answer OF-1…OF-5 (defaults in `plan.md`).
-2. Authorize and dispatch PLAN-EVAL cycle 2 (Codex Sol high) on this branch.
+2. Final coordinator ratification of D-1…D-17 (no further ordinary PLAN-EVAL).
 3. On PASS: add `epic:aspire-13-5` to `.github/labels.yml`, file epic + S1–S11 (0.0.7) + S12 (0.0.8)
    from the drafts, comment/relabel per `existing-issue-map.md`.
 4. Start S1 (mechanical) and S2 (runtime lease) immediately; cut canary A after S1–S3, canary B

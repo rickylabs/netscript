@@ -61,7 +61,8 @@ breaking-change exposure — none at source level — pin inventory, regeneratio
 - [ ] S1 — Atomic Aspire 13.5.3 pin bump + `check:aspire-version-parity` gate (p0)
 - [ ] S2 — 13.5 runtime verification pass with receipts (p0, runtime lease)
 - [ ] S3 — Re-capture 13.5 fixtures: dashboard telemetry, `aspire describe`, `aspire ps` (p1)
-- [ ] S4 — Generator re-validation against the 13.5 TypeScript API (closes #1371) (p1)
+- [ ] S4 — Generator re-validation against the 13.5 TypeScript API + deploy-adapter CLI contract
+      verification (closes #1371) (p1)
 - [ ] S5 — Remove every literal pre-randomization port from plugin contributions and E2E probes
       (closes #1365, #1370, #979) (p0)
 - [ ] S6 — Real health checks for backing services via TS `addHealthCheck`/`withHealthCheck` (closes

@@ -51,9 +51,11 @@ and **before** cleanup, on both CI tiers.
 4. **AppHost scope**: as in the lifecycle table.
 5. **Visibility (mandatory, no N/A)**: `list_resources` must include the named **visible** user
    resources `postgres` (or the tier's DB), the scaffold app, and the `users` example service; and
-   must **exclude** the named **hidden** helper resources emitted with `excludeFromMcp()` by S8
-   (`<db>-cli`). Cross-check: `aspire describe --include-hidden --format Json` lists the hidden
-   names, `aspire describe --format Json` (default) also hides them. Both halves recorded.
+   must **not include** the named **MCP-excluded** helper resources emitted with `excludeFromMcp()`
+   by S8 (`<db>-cli`); `list_console_logs { resourceName: "<db>-cli" }` must return the server's
+   not-found/empty result. Existence cross-check (independent of MCP): default
+   `aspire describe --format Json` **does** list `<db>-cli` — `excludeFromMcp()` controls MCP
+   exposure only and the resource is not `withHidden()`. All three observations recorded.
 6. **Console/telemetry reach**: `list_console_logs { resourceName: "users" }` returns ≥1 line;
    `list_structured_logs` returns without error (count `info`).
 7. **Dashboard-only mode** (`info`): a second spawn of
@@ -88,9 +90,10 @@ and **before** cleanup, on both CI tiers.
   },
   "visibility": {
     "expectedVisible": ["postgres", "app", "users"],
-    "expectedHidden": ["postgres-cli"],
-    "observedVisible": ["…"],
-    "observedHidden": ["…"],
+    "expectedMcpExcluded": ["postgres-cli"],
+    "observedMcpVisible": ["…"],
+    "observedMcpExcluded": ["…"],
+    "describeListsExcluded": true,
     "ok": true
   },
   "redaction": { "secretParamsNull": true, "plaintextLeak": false },
@@ -142,7 +145,7 @@ asserts it.
       `doctor.cliVersion:
       "pass"`, `entryPoint.source: ".mcp.json"`, `serverInfo.version` and
       `cliVersion` starting with `scaffoldPin`, `visibility.ok: true` with non-empty
-      `expectedHidden`, `redaction.plaintextLeak: false`.
+      `expectedMcpExcluded` and `describeListsExcluded: true`, `redaction.plaintextLeak: false`.
 - [ ] `receipts/aspire-13.5-mcp-smoke.json` committed in the epic run dir.
 - [ ] `git grep -n '13\.4\.6' -- skills .agents/skills .claude/skills packages/cli/src/kernel/assets`
       → 0 hits (parity phase 2 rows `skill:*`, `generated:barrel` become enforce-ready).
@@ -155,7 +158,7 @@ asserts it.
 ## Rollback
 
 Revert + `gen:assets-barrel` + `agentic:sync-claude` + `agentic:dogfood-skills`; the smoke gate is
-removed with the PR (S8's hidden set stays hidden; nothing asserts it until re-landed).
+removed with the PR (S8's MCP-excluded set stays excluded; nothing asserts it until re-landed).
 
 ## Tests / gates
 

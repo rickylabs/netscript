@@ -8,7 +8,11 @@
  * Every matching tracked path is then assigned exactly one owner/disposition by the FIRST matching
  * rule below (rules are ordered; a path never gets two rows). `.llm/runs/**` and `.llm/tmp/**` are
  * archival by definition (prior run evidence) and are excluded from the grep rather than listed
- * row-by-row; this run's own directory is the one exception and is listed under `archival:this-run`.
+ * row-by-row; this run's own directory is listed row-by-row under `archival:this-run` (protected
+ * evidence: plan/research/drafts/sources/receipts/verdicts) so the parity gate can report it as info.
+ * Parity semantics per class: owner `archival` → info only; class `compat-fixture` → phase 2 checks
+ * that a 13.5.3 case exists beside the kept 13.4.6 case; class `lockfile` → excluded from literal
+ * sweeps; every other row → phase 2 fail on a stale literal.
  *
  * Run from the repository root:
  *   deno run --allow-run=git --allow-write=.llm/runs/research-aspire-13.5-adoption--0.0.7 \
@@ -31,6 +35,13 @@ const re = (r: RegExp) => (p: string) => r.test(p);
 /** Ordered rules — first match wins. */
 const RULES: readonly Rule[] = [
   // ---- archival exemptions (never rewritten by the epic) ----
+  {
+    test: re(/(^|\/)deno\.lock$/),
+    cls: 'lockfile',
+    owner: 'N/A',
+    disposition:
+      'dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)',
+  },
   {
     test: starts('resources/design/'),
     cls: 'archival:design-corpus',
@@ -62,23 +73,27 @@ const RULES: readonly Rule[] = [
     disposition: 'exempt — tests migration from a release without the aspire MCP entry',
   },
   {
-    test: starts(RUN_DIR + '/sources/', RUN_DIR + '/receipts/'),
+    test: starts(RUN_DIR + '/'),
     cls: 'archival:this-run',
     owner: 'archival',
-    disposition: 'exempt — verbatim upstream sources / executed receipts',
-  },
-  {
-    test: starts(RUN_DIR + '/'),
-    cls: 'run-artifact',
-    owner: 'research',
-    disposition: 'this run dir (plan/research/drafts); not a product surface',
+    disposition:
+      'exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only',
   },
   {
     test: starts('.llm/harness/debt/'),
-    cls: 'debt-registry',
-    owner: 'S1/S2/S4',
+    cls: 'archival:debt-registry',
+    owner: 'archival',
     disposition:
-      'update only the three affected entries (Browsers preview, CommunityToolkit Deno, otel discovery)',
+      'exempt — dated debt entries are historical evidence; S1/S2/S4 append/update their own entries (Browsers preview, CommunityToolkit Deno, otel discovery) without rewriting older ones',
+  },
+  {
+    test: re(
+      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|\.llm\/tools\/agentic\/teardown\/probes_test\.ts)$/,
+    ),
+    cls: 'compat-fixture',
+    owner: 'S3',
+    disposition:
+      'inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
   },
   {
     test: re(/^notes\.md$/),
@@ -165,14 +180,24 @@ const RULES: readonly Rule[] = [
     disposition: 'ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)',
   },
   {
-    test: starts(
-      'packages/cli/src/kernel/adapters/aspire/',
-      'packages/cli/src/kernel/adapters/database/',
-    ),
-    cls: 'cli-adapter:aspire',
-    owner: 'S8',
+    test: re(/^packages\/cli\/src\/kernel\/adapters\/aspire\/aspire-(cloud|compose)-deploy-target/),
+    cls: 'cli-adapter:deploy',
+    owner: 'S4',
     disposition:
-      'typed resource commands replace ad-hoc AppHost spawn for db ops; aspire ps parsing unchanged',
+      'verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)',
+  },
+  {
+    test: starts('packages/cli/src/kernel/adapters/aspire/'),
+    cls: 'cli-adapter:doctor',
+    owner: 'S4',
+    disposition:
+      'aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table',
+  },
+  {
+    test: starts('packages/cli/src/kernel/adapters/database/'),
+    cls: 'cli-adapter:database',
+    owner: 'S8',
+    disposition: 'typed resource commands replace ad-hoc AppHost spawn for db ops',
   },
   {
     test: starts('packages/cli/src/public/features/agent/'),

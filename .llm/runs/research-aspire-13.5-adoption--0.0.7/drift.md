@@ -94,3 +94,18 @@
   D-5/D-6/D-10 revised, D-13/D-14 added, D-17 opened (dashboard-port assumption, resolve before
   S-13); S6b (protocol-level readiness) deferred to 0.0.8; `aspire-surface-manifest.tsv` + generator
   committed. No second evaluation cycle was launched.
+
+## D-12 — PLAN-EVAL cycle 2 (final) FAIL_PLAN and consistency repair
+
+- Severity: plan-shaping
+- Verdict: `plan-eval-cycle-2.md` (head `1bfe60b05`) — six consistency findings; root cause of most
+  of them: the cycle-1 repair's scripted `plan.md` replacements silently missed after `deno fmt`
+  re-padded table cells (the exact `fmt-rewrap-breaks-string-patches` trap), so D-10/slice table/
+  rollback/risk/ratification stayed on the two-canary/12-slice text while the DAG and canary table
+  were already correct.
+- Action: `plan.md` rewritten in full; MCP semantics corrected (`excludeFromMcp()` ≠
+  `withHidden()`); parity phases made executable with the run dir + debt registry archival and
+  compat fixtures / lock files special-cased; S13 everywhere; `SAGAS_API_DEFAULT_PORT` retained as
+  deprecated compat export; truncated rows reconstructed; deployment owned by S4 (D-15); D-17
+  default locked. Every scripted edit was re-verified by grep before commit. No third ordinary
+  PLAN-EVAL; next step is coordinator ratification.

@@ -17,8 +17,20 @@ probes to `aspire describe --format Json` URLs.
 - `plugins/sagas/src/aspire/sagas-contribution.ts`, `plugins/triggers/src/aspire/*`,
   `plugins/streams/src/aspire/*`, `plugins/workers/src/aspire/*`: URLs and health probes derive from
   `ctx.port(...)`/`ctx.serviceReference(...)` results only (#1370).
-- Sagas publisher (#1365): `SagaPublisherResult` becomes a discriminated result; no `127.0.0.1:8092`
-  fallback; sample job + docs updated.
+- Sagas publisher (#1365): `SagaPublisherResult` is **already**
+  `SagaPublisherReceipt |
+  SagaPublisherRejected`
+  (`@netscript/plugin-sagas-core/integration/publisher`, re-exported by
+  `@netscript/plugin-sagas/runtime`) and `SagaPublisherRejected.reason` is `string` — so
+  `resolveServiceUrl` (`plugins/sagas/src/runtime/saga-publisher.ts:295-307`) returns
+  `{ published: false, reason: 'no-endpoint', retryable: false }` instead of defaulting to
+  `http://127.0.0.1:8092`; **no core type change**. Runtime readers of the default port go:
+  `src/cli/adapters/runtime-api-client.ts:27`, e2e `probe-context.ts:3`, `scaffold.plugin.json`
+  `servicePort`/`backgroundPort` (opt-in per #979); sample job + docs updated. **Public
+  compatibility (D-14, locked):** `SAGAS_API_DEFAULT_PORT` (`src/constants.ts:11`) stays exported
+  from root `mod.ts`, `./public`, `./runtime`, and `./aspire` with its value unchanged and a
+  `@deprecated` JSDoc ("not a runtime fallback; removed in 0.0.8 — see <deprecation issue>").
+  Pre-slice jsr-audit record: `research.md` §15.
 - Plugin API resource host-port pinning becomes opt-in like #952 did for app/service (#979);
   `check:aspire-host-ports` extended to plugin registrations.
 - `packages/cli/e2e/src/application/gates/scaffold/*` gates that live-probe 8091–8094: resolve the
@@ -30,8 +42,11 @@ No health-check registration (S6) and no resource commands (S8). Do not touch `_
 
 ## Acceptance
 
-- [ ] `rtk grep -rnE '809[1-4]|4437|127\.0\.0\.1:80' plugins packages/cli/src packages/cli/e2e`
-      returns nothing outside tests that assert the _absence_ of literals.
+- [ ] `git grep -nE '809[1-4]|4437|127\.0\.0\.1:80' -- plugins packages/cli/src packages/cli/e2e`
+      returns hits **only** in `plugins/sagas/src/constants.ts` (the deprecated constant) and in
+      tests asserting the deprecation/absence; any hit in a runtime path fails.
+- [ ] `SAGAS_API_DEFAULT_PORT` still exported from all four entry points (export-map test) with
+      `@deprecated` visible in `deno doc --json`; a 0.0.8 deprecation-removal issue is referenced.
 - [ ] `deno task check:aspire-host-ports` covers plugin resources and passes.
 - [ ] Two concurrent `aspire start --isolated` of the same generated project both reach healthy
       plugin resources (receipt in PR).
@@ -41,20 +56,24 @@ No health-check registration (S6) and no resource commands (S8). Do not touch `_
 ## Tests / gates
 
 Plugin unit tests; `scaffold.runtime`; `scaffold.plugins`; scoped wrappers; `quality:scan`
-(hard-coded plugin-name/host-side coupling check); `arch:check`; **jsr-audit gates (mandatory, from
-`research.md` §15):** `deno publish --dry-run` for `plugins/sagas` and, if the union gains a
-variant, `packages/plugin-sagas-core`; `deno doc --lint plugins/sagas/mod.ts` must not add errors
-beyond the pre-existing `private-type-ref` on `sagasPlugin` (#1708); consumer-import gate
-(`deps:prod-install` of `@netscript/plugin-sagas@canary` +
-`import { SagaPublisherResult } from
-'@netscript/plugin-sagas/runtime'` type-checks); consumer
-migration note for `plugins/workers/src/cli/official-sample-configuration.ts` and the CLI tests that
-pin the 8092 default.
+(hard-coded plugin-name/host-side coupling check); `arch:check`; **jsr-audit gates (mandatory,
+research §15):** `deno publish --dry-run --allow-dirty` for `plugins/sagas` (no new slow-type or
+dynamic-import warnings beyond the three pre-existing), `deno doc --lint plugins/sagas/mod.ts` adds
+no error beyond the pre-existing `private-type-ref` (#1708, not pulled into this wave),
+consumer-import gate on canary B (`deps:prod-install` `@netscript/plugin-sagas@canary` + type-check
+a fixture importing `SagaPublisherResult` and `SAGAS_API_DEFAULT_PORT` from `./runtime`), consumer
+migration for `plugins/workers/src/cli/official-sample-configuration.ts` and the CLI tests pinning
+8092.
 
 ## Docs / static asset regeneration
 
 `deno task gen:assets-barrel` (generated helpers snapshot), `gen:publish-assets` if plugin READMEs
 change; `check:publish-assets`.
+
+## Rollback
+
+Revert + `gen:assets-barrel`; the runtime 8092 fallback returns. The public constant never changed
+value or export path, so consumers are unaffected either way.
 
 ## Related
 

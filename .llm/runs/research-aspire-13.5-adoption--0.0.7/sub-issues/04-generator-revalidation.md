@@ -31,6 +31,14 @@ with a generator test.
   `services__<ref>__http__0` (`generate-register-background.ts`); fix if it does not.
 - Arch-debt "CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred": update the
   evidence paragraph (TS projection exists) and the gate (S12 restore proof).
+- **Deploy adapters (D-15)**:
+  `packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target.ts` and
+  `aspire-compose-deploy-target.ts` (+ `_test.ts`): verify the emitted argv (`publish`/`deploy`/
+  `destroy`, `--apphost`, `--output-path`, `--environment`, `--non-interactive`) against
+  `sources/aspiredev-reference_cli_commands_aspire-{publish,deploy,destroy}.md` and S2 V12 `--help`
+  receipts; decide whether `deploy`/`destroy` must add `--yes` for non-interactive confirmation;
+  update the adapter tests to the 13.5 contract; record a sourced verdict (changed / no-change) in
+  the PR member table.
 
 ## Boundaries
 
@@ -41,7 +49,10 @@ generated-output train covered by **canary B** (plan §canary).
 
 ## Acceptance
 
-- [ ] PR comment contains the member-by-member table (emitted member → 13.5 API page → status).
+- [ ] PR comment contains the member-by-member table (emitted member → 13.5 API page → status)
+      **including the deploy-adapter argv rows with their sourced verdict**.
+- [ ] Deploy adapter tests assert the 13.5 argv contract
+      (`aspire-{cloud,compose}-deploy-target_test.ts` green).
 - [ ] No stale upstream-issue reference remains in `packages/cli/src/kernel/templates/aspire/**` or
       `assets/aspire/**` (grep for `aspire#15119|aspire#16220|aspire#15812`).
 - [ ] #1371 resolved with a named test; `Closes #1371` in the PR body.

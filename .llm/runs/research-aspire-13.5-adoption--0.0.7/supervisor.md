@@ -80,3 +80,14 @@ the primary coordinator ratifies and publishes the issue graph.
 - Do not edit generated `.aspire/modules/` or derived static resources directly.
 - Do not create or modify product code, PRs, releases, milestone assignments, or GitHub issues.
 - Preserve the primary 0.0.7 coordinator and all existing topic supervisors.
+
+## Evaluation history and routing (2026-08-29)
+
+- PLAN-EVAL cycle 1 (`plan-eval.md`, head `d8caa507e`) → FAIL_PLAN F1–F7; repaired at `1bfe60b05`.
+- PLAN-EVAL cycle 2 (`plan-eval-cycle-2.md`, head `1bfe60b05`) → FAIL_PLAN, six consistency
+  findings; repaired in the cycle-2 repair commit (matrix in `worklog.md`). No third ordinary
+  PLAN-EVAL under owner policy; remaining ratification is coordinator-owned.
+- Owner routing: after coordinator ratification this same session becomes the epic implementation
+  supervisor (serial Sol implementation agents per slice in owned worktrees; the primary Sol high
+  coordinator keeps milestone authority, leases, merges, canary admission, ledger;
+  PLAN-EVAL/IMPL-EVAL agents stay independent).
