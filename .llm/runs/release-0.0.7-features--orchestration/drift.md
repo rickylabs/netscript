@@ -490,3 +490,23 @@ with attributability rather than a fix.
 `main`. Treating it as a verdict on today's code would overstate it. Whether a rebase onto
 `c73d361ee` and a fresh lease are warranted before any further work on the refetch path is a
 coordinator decision; this lane has neither taken it nor requested it.
+
+## D-20 — `main..head` misreports a PR whose branch is behind main
+
+**Observed.** On PR #1696, `git diff --stat 5bb112dd3 414a52ba8` reported **123 files, +792/−28,585**,
+including the deletion of `rfcs/0000-polyglot-task-protocol.md` (922 lines) and edits across
+`packages/mcp/**` and `packages/cli/**` fixtures. None of that is the PR's work. The branch is based
+on `c73d361ee`, and `main` has advanced 15+ commits since; everything `main` gained appears as a
+deletion in that direction.
+
+**True delta.** `git diff $(git merge-base main head) head` — **18 files, +709/−30**.
+
+**Why it matters.** GitHub reported `MERGEABLE` / `CLEAN`, so nothing signals the staleness. A
+reviewer or evaluator who measures scope from `main..head` will attribute another lane's landed work
+to this leaf, and a scope-violation finding written from that reading would be false and would look
+well-evidenced.
+
+**Rule.** Always measure a leaf's scope from the **merge base**, and state the merge base alongside
+the head whenever scope is reported. A clean textual merge is also not a semantic one — whether
+anything landed on `main` since the merge base interacts with the change is a separate question, and
+is now asked explicitly in the #1696 evaluator brief.

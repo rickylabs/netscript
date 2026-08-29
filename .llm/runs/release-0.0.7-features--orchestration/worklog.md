@@ -5394,3 +5394,104 @@ features lane has no next leaf and stays parked.
 Read-only throughout: no issue, PR, box, label, milestone, or product file mutated; no author or
 evaluator launched; no lease consumed; no other topic touched. The shared `netscript-main` worktree
 was detached to `cf648f1ff` for inspection and restored to `main`, clean.
+
+## 2026-08-29 — resume from checkpoint: #1696 exact-head IMPL-EVAL dispatched, #1466 opened as the next leaf
+
+Coordinator delivery correction accepted: **Aspire is a parallel lane and does not block features.**
+The whole `epic:aspire-13-5` block (#1712–#1724, several p0) is therefore excluded from this lane's
+queue selection, including its in-flight #1727.
+
+### Reconciliation
+
+| Fact | Verified value |
+| --- | --- |
+| `origin/main` | `5bb112dd35f94fc8435672e2cabff1f9a447aa0b` — matches the coordinator tuple exactly |
+| PR #1696 head | `414a52ba807683cbe87aa25ca07e344f16731b6d` — matches |
+| PR #1696 state | open, **non-draft**, `MERGEABLE` / `CLEAN`, milestone `0.0.7`, `status:impl` |
+| Exact-head CI | `check-test`, `quality`, `code-quality`, `build`, `close-gate`, `core CI lane visibility` all **pass** |
+| CI provenance | all three run `headSha` values equal the PR head — checked, not assumed |
+| Lock hygiene | `deno.lock` absent from the diff |
+
+**The `main..head` diff is a trap here and I nearly recorded it.** It reports 123 files and 28,585
+deletions, including an entire RFC removal, because the branch is based on `c73d361ee` and `main`
+has moved 15+ commits since. The true delta is `git diff c73d361ee 414a52ba8` — **18 files,
++709/−30**. Anyone reviewing this PR from `main..head` will see another lane's work as this leaf's
+deletions. Recorded as **D-20** because it is a general reporting hazard, not a one-off.
+
+### The prior FAIL_FIX and what actually repaired it
+
+The OpenHands/DeepSeek IMPL-EVAL failed at head `265dd8760` on **one HIGH finding**: editing
+`docs/site/reference/ai/index.md` without regenerating the committed agent-docs corpus, so the
+`quality` gate step `check:agent-docs-prose` was green at base and red at head. Three commits
+answer it — `8c7c67a05` regenerate corpus, `c34fe15ec` re-embed into the generated barrel,
+`414a52ba8` re-stamp publish-assets provenance.
+
+That three-commit shape is itself the interesting signal, and I put it in the evaluator's brief
+rather than resolving it myself: regenerating the corpus was **not** sufficient, two further
+generated artifacts had to be re-stamped, so the live question is whether the set is now complete or
+whether a fourth derived artifact went unstamped. My own stored lesson is that
+`embedded.generated.ts` is what actually ships to a scaffolded user, so a corpus fresh on disk but
+stale in the barrel is a real defect a green freshness gate need not catch.
+
+### Evaluator dispatched — fresh, opposite-family, exact head
+
+| Field | Value |
+| --- | --- |
+| Session | `321b426c-f617-477e-88c0-1f9b9cdb7c50` |
+| Requested route | native Claude **Fable 5 · medium** · Remote Control |
+| Observed route | `respawnFlags: ['--effort','medium','--permission-mode','bypassPermissions','--model','fable']` — **requested == observed** |
+| Auth | `providerEnv: {}` — native Anthropic, no API-key override |
+| Remote Control | bridge `cse_01UgH3wjzJmy8qB7rBdFHoLm` — non-empty, so attachment is proven |
+| Worktree | `/home/codex/repos/netscript-007-features-1694`, created at `414a52ba8`, clean |
+| Brief | `slices/impl-eval-1696.md` |
+
+Route note: `lane-policy.md:84` pairs `complex_implementation` (Sol · high) with
+`review_codex_complex` = **Fable 5 · medium**. The coordinator's specified evaluator route is
+therefore the policy pairing, not an ad-hoc choice.
+
+**The brief carries explicit commit-and-push wording.** The immediately preceding cycle on #1664
+ended with a correct verdict stranded untracked in a working tree because my brief said "write the
+verdict file" and never said commit it. That cost a full resume cycle. The instruction is now
+written into the brief as a numbered git sequence, together with the reason an uncommitted verdict is
+not evidence and the note that the evaluator's own commit will move the branch head past
+`414a52ba8` — expected, and to be stated in its PR comment so no reader mistakes it for a content
+change.
+
+### #1664 stays parked, and does not consume the queue
+
+No action taken on #1664. It remains a draft at `20337441788b4e2341b0474d6297bec1ddd33b80` with its
+F8 plan reviewed `PASS` and its F8 implementation unwritten. Per the coordinator it does not occupy
+the serial slot.
+
+### Next leaf selected: #1466 — [sdk-client S2]
+
+Selection is defensible on four independent grounds rather than priority alone:
+
+- **No features-owned p0 exists** outside Aspire. The remaining p0s are #1365 and #1674 (both
+  `type:fix`, fixes lane) and the excluded Aspire epic. So p1 is the real ceiling.
+- **It unblocks the most.** #1466 is the entry slice of `epic:sdk-client-contrib`; S3–S8 (#1349,
+  #1351, #1352, #1353, #1467, #1093) all sit behind it — the largest single block of features-owned
+  p1 work left in the milestone.
+- **Its one dependency is discharged.** S1 (#1350) is **CLOSED**; I verified the state rather than
+  inferring it from the epic ordering.
+- **It collides with nothing in flight.** Open PRs are #1727 (Aspire lane), #1711 (docs #1112),
+  #1696 and #1664 (mine), #1641 (coordinator), #1640/#1522 (docs), #822/#780 (stale). Nothing claims
+  `packages/sdk` contract metadata. It is also independent of the parked #1664's scaffold/template
+  surface — which is why I did **not** take #1354 or #1357, whose generator surface overlaps #1355
+  directly.
+
+| Field | Value |
+| --- | --- |
+| Route | Codex · OpenAI · **GPT-5.6 Sol · high** (`complex_implementation`, `lane-policy.md:28`) |
+| Worktree | `/home/codex/repos/netscript-007-features-1466` at base `5bb112dd3`, clean |
+| Branch | `feat/sdk-procedure-meta` |
+| Brief | `slices/impl-1466.md` — Phase 1 research+plan then STOP at a Tier-A |
+
+The brief names the two traps this lane has already paid for: an `as` cast bridging a package-owned
+public type to an upstream contract (the #1293 S1-F1 defect class, in a slice whose acceptance
+literally says "without casts or `any`"), and reporting a narrower command as the contracted gate.
+It also forces the versioning commitment to be stated in Phase 1, because six downstream slices
+inherit whatever vocabulary S2 defines.
+
+No merge, publish, relabel, milestone change, readiness flip, issue close, `#1348` mutation, or
+expensive-gate lease was performed or requested. No release authority claimed.
