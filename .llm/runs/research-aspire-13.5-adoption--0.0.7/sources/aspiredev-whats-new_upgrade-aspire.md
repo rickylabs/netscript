@@ -1,0 +1,67 @@
+# Upgrade Aspire to the latest version
+
+Upgrade Aspire by updating the **Aspire CLI** and the Aspire packages used by your app. The `aspire update` command handles most package updates for supported AppHost configurations, but you should also review breaking changes and update tooling extensions.
+
+**Note:** If you're new to Aspire, there's no reason to upgrade anything. See [prerequisites](/get-started/prerequisites/) and [install Aspire CLI](/get-started/install-cli/) to get started.
+
+## Upgrade with the Aspire CLI
+
+1. **Update the Aspire CLI** to the latest version:
+
+   ```bash title="Update the Aspire CLI"
+    aspire update --self
+    ```
+
+    If you installed the CLI from npm or as a .NET tool, `aspire update --self` prints the matching package-manager command to run (for example, `npm install -g @microsoft/aspire-cli@latest`) instead of replacing a package-manager-owned binary. See [Updating the CLI based on how it was installed](/reference/cli/commands/aspire-update/#updating-the-cli-based-on-how-it-was-installed).
+
+2. **Update your Aspire app** by running:
+
+   ```bash title="Update your Aspire app"
+    aspire update
+    ```
+
+    This command automatically:
+
+    - Detects outdated Aspire integrations, templates, and SDK version
+    - Updates the SDK version and Aspire integration versions for the configured Aspire channel
+    - Handles versions declared inline, in `aspire.config.json`, or in supported centralized version files
+
+<LearnMore>
+For more information, see [`aspire update` command reference](/reference/cli/commands/aspire-update/).
+</LearnMore>
+
+## Update the VS Code extension (optional)
+
+If you have the Aspire extension installed, you can update it to get the latest tooling support:
+
+1. Open VS Code
+2. Go to **Extensions** (<Kbd windows="Ctrl+Shift+X" mac="Command+Shift+X" />)
+3. Search for **Aspire**
+4. Click **Update** if an update is available
+
+<LearnMore>
+For more information, see [Aspire extension for VS Code](/get-started/aspire-vscode-extension/).
+</LearnMore>
+
+## Remove the legacy workload (Aspire 8 only)
+
+If you're upgrading from Aspire 8 and your machine has the legacy Aspire workload installed, remove it after updating the CLI. For Aspire 9 or later, no action is required.
+
+Remove the **aspire workload** with the following command:
+
+```bash title="Remove the legacy Aspire workload"
+dotnet workload uninstall aspire
+```
+
+## Verify the upgrade
+
+After upgrading, run your application to ensure everything works as expected:
+
+```bash title="Run the Aspire application"
+aspire run
+```
+
+## Need help?
+
+- 🆘 Stuck? [Join the Discord community](https://discord.com/invite/raNPcaaSj8) for real-time support
+- 🐛 Found a bug? [File a GitHub issue](https://github.com/microsoft/aspire/issues/new/choose)

@@ -1,0 +1,399 @@
+# Aspire.Hosting
+
+- Module: `Aspire.Hosting`
+- Version: `13.5.1`
+- Source: [GitHub](https://github.com/microsoft/aspire/tree/69db530a4816698cf1d5fa4557933e0ac4f127c6)
+- Functions: `232`
+- Types: `151`
+
+## Types
+
+- [AddContainerOptions](/reference/api/typescript/aspire.hosting/addcontaineroptions.md) -- `type` - 2 fields -- Options for configuring a container image in polyglot apphosts.
+- [AfterPublishEvent](/reference/api/typescript/aspire.hosting/afterpublishevent.md) -- `handle` - 2 members -- This event is published after the distributed application is published.
+- [AfterResourcesCreatedEvent](/reference/api/typescript/aspire.hosting/afterresourcescreatedevent.md) -- `handle` - 2 members -- This event is published after all resources have been created.
+- [BeforePublishEvent](/reference/api/typescript/aspire.hosting/beforepublishevent.md) -- `handle` - 2 members -- This event is published before the distributed application is published.
+- [BeforeResourceStartedEvent](/reference/api/typescript/aspire.hosting/beforeresourcestartedevent.md) -- `handle` - 2 members -- This event is raised by orchestrators before they have started a new resource.
+- [BeforeStartEvent](/reference/api/typescript/aspire.hosting/beforestartevent.md) -- `handle` - 2 members -- This event is published before the application starts.
+- [BoolInteractionResult](/reference/api/typescript/aspire.hosting/boolinteractionresult.md) -- `type` - 2 fields -- The result of a boolean interaction prompt.
+- [CertificateTrustExecutionConfigurationContext](/reference/api/typescript/aspire.hosting/certificatetrustexecutionconfigurationcontext.md) -- `type` - 4 fields -- Context for configuring certificate trust configuration properties.
+- [CertificateTrustExecutionConfigurationExportData](/reference/api/typescript/aspire.hosting/certificatetrustexecutionconfigurationexportdata.md) -- `type` - 3 fields -- ATS-friendly certificate trust data returned from an execution-configuration result.
+- [CommandLineArgsCallbackContext](/reference/api/typescript/aspire.hosting/commandlineargscallbackcontext.md) -- `handle` - 4 members -- Represents a callback context for the list of command-line arguments associated with an executable resource.
+- [CommandLineArgsEditor](/reference/api/typescript/aspire.hosting/commandlineargseditor.md) -- `handle` - 1 members -- Provides an ATS-first editor for command-line arguments within polyglot callbacks.
+- [CommandOptions](/reference/api/typescript/aspire.hosting/commandoptions.md) -- `type` - 11 fields -- Optional configuration for resource commands.
+- [CommandProgressOptions](/reference/api/typescript/aspire.hosting/commandprogressoptions.md) -- `type` - 3 fields -- Options for displaying a progress dialog while a command is executing.
+- [CommandResultData](/reference/api/typescript/aspire.hosting/commandresultdata.md) -- `type` - 3 fields -- Represents a value produced by a command.
+- [ConnectionStringAvailableEvent](/reference/api/typescript/aspire.hosting/connectionstringavailableevent.md) -- `handle` - 2 members -- The {@ats-ref type:ConnectionStringAvailableEvent} is raised when a connection string becomes available for a resource.
+- [ContainerBuildOptionsCallbackContext](/reference/api/typescript/aspire.hosting/containerbuildoptionscallbackcontext.md) -- `handle` - 17 members -- Context for configuring container build options via a callback.
+- [ContainerFilesOptions](/reference/api/typescript/aspire.hosting/containerfilesoptions.md) -- `type` - 3 fields -- Options for creating or updating files and directories in a container from polyglot apphosts.
+- [ContainerFileSystemCallbackContext](/reference/api/typescript/aspire.hosting/containerfilesystemcallbackcontext.md) -- `handle` - 5 members -- Represents the context for a `ContainerFileSystemCallbackAnnotation` callback.
+- [ContainerFileSystemItem](/reference/api/typescript/aspire.hosting/containerfilesystemitem.md) -- `handle` - 0 members -- Represents a base class for file system entries in a container.
+- [ContainerImagePushOptions](/reference/api/typescript/aspire.hosting/containerimagepushoptions.md) -- `handle` - 4 members -- Represents options for pushing container images to a registry.
+- [ContainerImagePushOptionsCallbackContext](/reference/api/typescript/aspire.hosting/containerimagepushoptionscallbackcontext.md) -- `handle` - 3 members -- Provides context information for container image push options callbacks.
+- [ContainerImageReference](/reference/api/typescript/aspire.hosting/containerimagereference.md) -- `handle` - 2 members -- Represents the fully‑qualified container image reference that should be deployed.
+- [ContainerMountAnnotation](/reference/api/typescript/aspire.hosting/containermountannotation.md) -- `handle` - 4 members -- Represents a mount annotation for a container resource.
+- [ContainerPortReference](/reference/api/typescript/aspire.hosting/containerportreference.md) -- `handle` - 2 members -- Represents a TCP/UDP port that a container can expose.
+- [ContainerRegistryResource](/reference/api/typescript/aspire.hosting/containerregistryresource.md) -- `handle` - 0 members
+- [ContainerResource](/reference/api/typescript/aspire.hosting/containerresource.md) -- `handle` - 22 members -- A resource that represents a specified container.
+- [CreateBuilderOptions](/reference/api/typescript/aspire.hosting/createbuilderoptions.md) -- `type` - 8 fields -- Options for creating a distributed application builder from polyglot apphosts.
+- [CreateInteractionInputOptions](/reference/api/typescript/aspire.hosting/createinteractioninputoptions.md) -- `type` - 12 fields -- Optional configuration shared by interaction input factory capabilities.
+- [CSharpAppResource](/reference/api/typescript/aspire.hosting/csharpappresource.md) -- `handle` - 0 members
+- [DistributedApplication](/reference/api/typescript/aspire.hosting/distributedapplication.md) -- `handle` - 1 members -- Represents a distributed application that implements the {@ats-ref type:IHost} and {@ats-ref type:IAsyncDisposable} interfaces.
+- [DistributedApplicationEventSubscription](/reference/api/typescript/aspire.hosting/distributedapplicationeventsubscription.md) -- `handle` - 0 members -- Represents a subscription to an event that is published during the lifecycle of the AppHost.
+- [DistributedApplicationExecutionContext](/reference/api/typescript/aspire.hosting/distributedapplicationexecutioncontext.md) -- `handle` - 8 members -- Exposes the global contextual information for this invocation of the AppHost.
+- [DistributedApplicationExecutionContextOptions](/reference/api/typescript/aspire.hosting/distributedapplicationexecutioncontextoptions.md) -- `handle` - 0 members -- Configuration options and references that need to be exposed to the {@ats-ref type:DistributedApplicationExecutionContext}.
+- [DistributedApplicationModel](/reference/api/typescript/aspire.hosting/distributedapplicationmodel.md) -- `handle` - 2 members -- Represents a distributed application.
+- [DistributedApplicationResourceEventSubscription](/reference/api/typescript/aspire.hosting/distributedapplicationresourceeventsubscription.md) -- `handle` - 0 members -- Represents a subscription to an event that is published during the lifecycle of the AppHost for a specific resource.
+- [DockerfileBuilder](/reference/api/typescript/aspire.hosting/dockerfilebuilder.md) -- `handle` - 3 members -- Builder for creating Dockerfiles programmatically.
+- [DockerfileBuilderCallbackContext](/reference/api/typescript/aspire.hosting/dockerfilebuildercallbackcontext.md) -- `handle` - 4 members -- Provides context information for Dockerfile build callbacks.
+- [DockerfileFactoryContext](/reference/api/typescript/aspire.hosting/dockerfilefactorycontext.md) -- `handle` - 1 members -- Provides context for Dockerfile factory functions.
+- [DockerfileStage](/reference/api/typescript/aspire.hosting/dockerfilestage.md) -- `handle` - 14 members -- Represents a stage within a multi-stage Dockerfile.
+- [DotnetToolResource](/reference/api/typescript/aspire.hosting/dotnettoolresource.md) -- `handle` - 6 members
+- [DynamicLoadingOptions](/reference/api/typescript/aspire.hosting/dynamicloadingoptions.md) -- `type` - 2 fields -- Options controlling when a dynamic-loading callback runs.
+- [EndpointReference](/reference/api/typescript/aspire.hosting/endpointreference.md) -- `handle` - 18 members -- Represents an endpoint reference for a resource with endpoints.
+- [EndpointReferenceExpression](/reference/api/typescript/aspire.hosting/endpointreferenceexpression.md) -- `handle` - 3 members -- Represents a property expression for an endpoint reference.
+- [EndpointUpdateContext](/reference/api/typescript/aspire.hosting/endpointupdatecontext.md) -- `handle` - 21 members -- Provides a mutable callback context for updating an endpoint in polyglot AppHosts.
+- [EnvironmentCallbackContext](/reference/api/typescript/aspire.hosting/environmentcallbackcontext.md) -- `handle` - 4 members -- Represents a callback context for environment variables associated with a publisher.
+- [EnvironmentEditor](/reference/api/typescript/aspire.hosting/environmenteditor.md) -- `handle` - 1 members -- Provides an ATS-first editor for environment variables within polyglot callbacks.
+- [EventingSubscriberRegistrationContext](/reference/api/typescript/aspire.hosting/eventingsubscriberregistrationcontext.md) -- `handle` - 6 members -- Context passed to ATS-friendly eventing subscriber registrations.
+- [ExecutableResource](/reference/api/typescript/aspire.hosting/executableresource.md) -- `handle` - 3 members -- A resource that represents a specified executable process.
+- [ExecuteCommandContext](/reference/api/typescript/aspire.hosting/executecommandcontext.md) -- `handle` - 5 members -- Context for {@ats-ref method:ResourceCommandAnnotation.ExecuteCommand}.
+- [ExecuteCommandResult](/reference/api/typescript/aspire.hosting/executecommandresult.md) -- `type` - 5 fields -- The result of executing a command. Returned from `ExecuteCommand`.
+- [ExternalServiceResource](/reference/api/typescript/aspire.hosting/externalserviceresource.md) -- `handle` - 1 members
+- [GenerateParameterDefault](/reference/api/typescript/aspire.hosting/generateparameterdefault.md) -- `type` - 9 fields -- Represents that a default value should be generated.
+- [HealthCheckResult](/reference/api/typescript/aspire.hosting/healthcheckresult.md) -- `type` - 3 fields -- ATS-friendly custom health check result.
+- [HttpCommandExportOptions](/reference/api/typescript/aspire.hosting/httpcommandexportoptions.md) -- `type` - 11 fields -- ATS-friendly configuration for resource HTTP commands.
+- [HttpCommandPrepareRequestContext](/reference/api/typescript/aspire.hosting/httpcommandpreparerequestcontext.md) -- `handle` - 4 members -- Provides context for HTTP command prepare-request callbacks in polyglot AppHosts.
+- [HttpCommandRequestExportData](/reference/api/typescript/aspire.hosting/httpcommandrequestexportdata.md) -- `type` - 4 fields -- ATS-friendly request data returned from HTTP command prepare-request callbacks.
+- [HttpsCertificateConfigurationCallbackAnnotationContext](/reference/api/typescript/aspire.hosting/httpscertificateconfigurationcallbackannotationcontext.md) -- `handle` - 9 members -- Context provided to a `HttpsCertificateConfigurationCallbackAnnotation` callback.
+- [HttpsCertificateExecutionConfigurationContext](/reference/api/typescript/aspire.hosting/httpscertificateexecutionconfigurationcontext.md) -- `type` - 4 fields -- Configuration context for server authentication certificate configuration.
+- [HttpsCertificateExecutionConfigurationExportData](/reference/api/typescript/aspire.hosting/httpscertificateexecutionconfigurationexportdata.md) -- `type` - 8 fields -- ATS-friendly HTTPS certificate data returned from an execution-configuration result.
+- [HttpsCertificateInfo](/reference/api/typescript/aspire.hosting/httpscertificateinfo.md) -- `type` - 3 fields -- ATS-friendly certificate metadata supplied to HTTPS certificate configuration callbacks.
+- [HttpsEndpointUpdateCallbackContext](/reference/api/typescript/aspire.hosting/httpsendpointupdatecallbackcontext.md) -- `handle` - 4 members -- Context provided to the callback of `SubscribeHttpsEndpointsUpdate``1` when an HTTPS certificate is determined to be available for the resource.
+- [IAspireStore](/reference/api/typescript/aspire.hosting/iaspirestore.md) -- `interface` - 2 members -- Represents a store for managing files in the Aspire hosting environment that can be reused across runs.
+- [IComputeEnvironmentResource](/reference/api/typescript/aspire.hosting/icomputeenvironmentresource.md) -- `interface` - 0 members
+- [IDistributedApplicationBuilder](/reference/api/typescript/aspire.hosting/idistributedapplicationbuilder.md) -- `interface` - 29 members -- A builder for creating instances of {@ats-ref type:DistributedApplication}.
+- [IDistributedApplicationEvent](/reference/api/typescript/aspire.hosting/idistributedapplicationevent.md) -- `interface` - 0 members -- Represents an event that is published during the lifecycle of the AppHost.
+- [IDistributedApplicationEventing](/reference/api/typescript/aspire.hosting/idistributedapplicationeventing.md) -- `interface` - 1 members -- Supports publishing and subscribing to events which are executed during the AppHost lifecycle.
+- [IDistributedApplicationPipeline](/reference/api/typescript/aspire.hosting/idistributedapplicationpipeline.md) -- `interface` - 3 members -- Represents a pipeline for executing deployment steps in a distributed application.
+- [IDistributedApplicationResourceEvent](/reference/api/typescript/aspire.hosting/idistributedapplicationresourceevent.md) -- `interface` - 0 members -- Represents an event that is published during the lifecycle of the AppHost for a specific resource.
+- [IExecutionConfigurationBuilder](/reference/api/typescript/aspire.hosting/iexecutionconfigurationbuilder.md) -- `interface` - 5 members -- Builder for gathering and resolving the execution configuration (arguments and environment variables) for a specific resource.
+- [IExecutionConfigurationResult](/reference/api/typescript/aspire.hosting/iexecutionconfigurationresult.md) -- `interface` - 2 members -- Configuration (arguments and environment variables) to apply to a specific resource.
+- [IExpressionValue](/reference/api/typescript/aspire.hosting/iexpressionvalue.md) -- `interface` - 0 members -- Represents a value that provides both a runtime value and a manifest expression.
+- [IInteractionService](/reference/api/typescript/aspire.hosting/iinteractionservice.md) -- `interface` - 13 members -- A service to interact with the current development environment.
+- [InitializeResourceEvent](/reference/api/typescript/aspire.hosting/initializeresourceevent.md) -- `handle` - 5 members -- This event is raised by orchestrators to signal to resources that they should initialize themselves.
+- [InputInteractionResult](/reference/api/typescript/aspire.hosting/inputinteractionresult.md) -- `type` - 2 fields -- The result of a single-input interaction prompt.
+- [InputsDialogValidationContext](/reference/api/typescript/aspire.hosting/inputsdialogvalidationcontext.md) -- `handle` - 4 members -- Represents the context for validating inputs in an inputs dialog interaction.
+- [InputsInteractionResult](/reference/api/typescript/aspire.hosting/inputsinteractionresult.md) -- `handle` - 2 members -- The result of a multi-input interaction prompt.
+- [InteractionChoiceOption](/reference/api/typescript/aspire.hosting/interactionchoiceoption.md) -- `type` - 2 fields -- A single selectable option for a choice input. Options are presented in the order supplied.
+- [InteractionInput](/reference/api/typescript/aspire.hosting/interactioninput.md) -- `type` - 15 fields -- Represents an input for an interaction.
+- [InteractionInputBuilder](/reference/api/typescript/aspire.hosting/interactioninputbuilder.md) -- `handle` - 3 members -- An opaque, server-side builder for an `InteractionInput` used by polyglot AppHosts.
+- [InteractionInputCollection](/reference/api/typescript/aspire.hosting/interactioninputcollection.md) -- `handle` - 1 members -- A collection of interaction inputs that supports both indexed and name-based access.
+- [InteractionInputLoadContext](/reference/api/typescript/aspire.hosting/interactioninputloadcontext.md) -- `handle` - 2 members -- The context passed to a polyglot dynamic-loading callback. Exposes the loading input as a handle and provides read access to the other inputs in the prompt.
+- [InteractionInputsDialogOptions](/reference/api/typescript/aspire.hosting/interactioninputsdialogoptions.md) -- `type` - 6 fields -- Options for inputs dialog prompts.
+- [InteractionLoadingInput](/reference/api/typescript/aspire.hosting/interactionloadinginput.md) -- `handle` - 3 members -- A handle to the input currently being loaded by a dynamic-loading callback. Mirrors the native `LoadInputContext.Input` by letting callbacks update the live input directly.
+- [InteractionMessageBoxOptions](/reference/api/typescript/aspire.hosting/interactionmessageboxoptions.md) -- `type` - 6 fields -- Options for message box and confirmation prompts.
+- [InteractionNotificationOptions](/reference/api/typescript/aspire.hosting/interactionnotificationoptions.md) -- `type` - 8 fields -- Options for notification prompts.
+- [InteractionProgressOptions](/reference/api/typescript/aspire.hosting/interactionprogressoptions.md) -- `type` - 4 fields -- Options for progress dialog prompts.
+- [IReportingStep](/reference/api/typescript/aspire.hosting/ireportingstep.md) -- `interface` - 6 members -- Represents a publishing step, which can contain multiple tasks.
+- [IReportingTask](/reference/api/typescript/aspire.hosting/ireportingtask.md) -- `interface` - 4 members -- Represents a publishing task, which belongs to a step.
+- [IResource](/reference/api/typescript/aspire.hosting/iresource.md) -- `interface` - 35 members -- Represents a resource that can be hosted by an application.
+- [IResourceWithArgs](/reference/api/typescript/aspire.hosting/iresourcewithargs.md) -- `interface` - 2 members -- Represents a resource that is associated with commandline arguments.
+- [IResourceWithConnectionString](/reference/api/typescript/aspire.hosting/iresourcewithconnectionstring.md) -- `interface` - 3 members -- Represents a resource that has a connection string associated with it.
+- [IResourceWithContainerFiles](/reference/api/typescript/aspire.hosting/iresourcewithcontainerfiles.md) -- `interface` - 2 members
+- [IResourceWithEndpoints](/reference/api/typescript/aspire.hosting/iresourcewithendpoints.md) -- `interface` - 15 members -- Represents a resource that has endpoints associated with it.
+- [IResourceWithEnvironment](/reference/api/typescript/aspire.hosting/iresourcewithenvironment.md) -- `interface` - 10 members -- Represents a resource that is associated with an environment.
+- [IResourceWithParent](/reference/api/typescript/aspire.hosting/iresourcewithparent.md) -- `interface` - 0 members -- Represents a resource that has a parent resource.
+- [IResourceWithWaitSupport](/reference/api/typescript/aspire.hosting/iresourcewithwaitsupport.md) -- `interface` - 3 members -- Represents a resource that can wait for other resources to be running, health, and/or completed.
+- [IUserSecretsManager](/reference/api/typescript/aspire.hosting/iusersecretsmanager.md) -- `interface` - 6 members -- Defines an interface for managing user secrets with support for read and write operations.
+- [LogFacade](/reference/api/typescript/aspire.hosting/logfacade.md) -- `handle` - 4 members -- Provides a narrow logging surface for polyglot callback contexts.
+- [ParameterCustomInputOptions](/reference/api/typescript/aspire.hosting/parametercustominputoptions.md) -- `type` - 10 fields -- Options for customizing parameter inputs from polyglot AppHosts.
+- [ParameterResource](/reference/api/typescript/aspire.hosting/parameterresource.md) -- `handle` - 2 members -- Represents a parameter resource.
+- [PipelineConfigurationContext](/reference/api/typescript/aspire.hosting/pipelineconfigurationcontext.md) -- `handle` - 3 members -- Provides contextual information for pipeline configuration callbacks.
+- [PipelineContext](/reference/api/typescript/aspire.hosting/pipelinecontext.md) -- `handle` - 7 members -- Provides contextual information and services for the pipeline execution process of a distributed application.
+- [PipelineEditor](/reference/api/typescript/aspire.hosting/pipelineeditor.md) -- `handle` - 2 members -- Provides an ATS-first editor for pipeline configuration callbacks.
+- [PipelineStep](/reference/api/typescript/aspire.hosting/pipelinestep.md) -- `handle` - 8 members -- Represents a step in the deployment pipeline.
+- [PipelineStepContext](/reference/api/typescript/aspire.hosting/pipelinestepcontext.md) -- `handle` - 8 members -- Provides contextual information for a specific pipeline step execution.
+- [PipelineStepFactoryContext](/reference/api/typescript/aspire.hosting/pipelinestepfactorycontext.md) -- `handle` - 2 members -- Provides contextual information for creating pipeline steps from a {@ats-ref type:PipelineStepAnnotation}.
+- [PipelineSummary](/reference/api/typescript/aspire.hosting/pipelinesummary.md) -- `handle` - 2 members -- Represents pipeline summary information to be displayed after pipeline completion. This is a general-purpose key-value collection that pipeline steps can contribute to.
+- [ProcessCommandExportOptions](/reference/api/typescript/aspire.hosting/processcommandexportoptions.md) -- `type` - 12 fields -- ATS-friendly configuration for resource process commands.
+- [ProcessCommandResultExportOptions](/reference/api/typescript/aspire.hosting/processcommandresultexportoptions.md) -- `type` - 4 fields -- ATS-friendly result and command configuration for resource process commands.
+- [ProcessCommandSpecExportData](/reference/api/typescript/aspire.hosting/processcommandspecexportdata.md) -- `type` - 7 fields -- ATS-friendly process specification for resource process command callbacks.
+- [ProgressContext](/reference/api/typescript/aspire.hosting/progresscontext.md) -- `handle` - 1 members -- Provides context to the work callback of a progress interaction.
+- [ProjectResource](/reference/api/typescript/aspire.hosting/projectresource.md) -- `handle` - 4 members -- A resource that represents a specified .NET project.
+- [ProjectResourceOptions](/reference/api/typescript/aspire.hosting/projectresourceoptions.md) -- `handle` - 6 members -- Various properties to modify the behavior of the project resource.
+- [ReferenceEnvironmentInjectionOptions](/reference/api/typescript/aspire.hosting/referenceenvironmentinjectionoptions.md) -- `type` - 4 fields -- Options that control which reference information is injected into environment variables.
+- [ReferenceExpression](/reference/api/typescript/aspire.hosting/referenceexpression.md) -- `handle` - 1 members -- Represents an expression that might be made up of multiple resource properties. For example, a connection string might be made up of a host, port, and password from different endpoints.
+- [ReferenceExpressionBuilder](/reference/api/typescript/aspire.hosting/referenceexpressionbuilder.md) -- `handle` - 5 members -- A builder for creating {@ats-ref type:ReferenceExpression} instances.
+- [RequiredCommandValidationContext](/reference/api/typescript/aspire.hosting/requiredcommandvalidationcontext.md) -- `handle` - 5 members -- Provides context for validating a required command.
+- [RequiredCommandValidationResult](/reference/api/typescript/aspire.hosting/requiredcommandvalidationresult.md) -- `handle` - 2 members -- Represents the result of validating a required command.
+- [ResourceCommandService](/reference/api/typescript/aspire.hosting/resourcecommandservice.md) -- `handle` - 1 members -- A service to execute resource commands.
+- [ResourceEndpointsAllocatedEvent](/reference/api/typescript/aspire.hosting/resourceendpointsallocatedevent.md) -- `handle` - 2 members -- This event is raised by orchestrators to signal to resources that their endpoints have been allocated.
+- [ResourceEventDto](/reference/api/typescript/aspire.hosting/resourceeventdto.md) -- `type` - 6 fields -- DTO for resource events returned from notification service.
+- [ResourceLoggerService](/reference/api/typescript/aspire.hosting/resourceloggerservice.md) -- `handle` - 2 members -- A service that provides loggers for resources to write to.
+- [ResourceNotificationService](/reference/api/typescript/aspire.hosting/resourcenotificationservice.md) -- `handle` - 6 members -- A service that allows publishing and subscribing to changes in the state of a resource.
+- [ResourceReadyEvent](/reference/api/typescript/aspire.hosting/resourcereadyevent.md) -- `handle` - 2 members -- Event that is raised when a resource initially transitions to a ready state.
+- [ResourceStoppedEvent](/reference/api/typescript/aspire.hosting/resourcestoppedevent.md) -- `handle` - 2 members -- This event is raised after a resource has stopped.
+- [ResourceUrlAnnotation](/reference/api/typescript/aspire.hosting/resourceurlannotation.md) -- `type` - 4 fields -- A URL that should be displayed for a resource.
+- [ResourceUrlsCallbackContext](/reference/api/typescript/aspire.hosting/resourceurlscallbackcontext.md) -- `handle` - 5 members -- Represents a callback context for resource URLs.
+- [ResourceUrlsEditor](/reference/api/typescript/aspire.hosting/resourceurlseditor.md) -- `handle` - 3 members -- Provides an ATS-first editor for resource URLs within polyglot callbacks.
+- [RunConfiguration](/reference/api/typescript/aspire.hosting/runconfiguration.md) -- `type` - 1 fields -- Holds settings applicable to the AppHost run mode (when `Operation` is `Run`).
+- [UpdateCommandStateContext](/reference/api/typescript/aspire.hosting/updatecommandstatecontext.md) -- `handle` - 2 members -- Context for {@ats-ref method:ResourceCommandAnnotation.UpdateState}.
+- [UpdateCommandStateResourceSnapshot](/reference/api/typescript/aspire.hosting/updatecommandstateresourcesnapshot.md) -- `type` - 5 fields -- Resource snapshot data exposed to polyglot command state callbacks.
+
+## Functions
+
+- [addConnectionString](/reference/api/typescript/aspire.hosting/addconnectionstring.md) -- `method` -- Adds a connection string resource
+- [addContainer](/reference/api/typescript/aspire.hosting/addcontainer.md) -- `method` -- Adds a container resource to the application.
+- [addContainerFiles](/reference/api/typescript/aspire.hosting/addcontainerfiles.md) -- `method` -- Adds COPY --from statements for published container files
+- [addContainerFilesStages](/reference/api/typescript/aspire.hosting/addcontainerfilesstages.md) -- `method` -- Adds Dockerfile stages for published container files
+- [addContainerRegistry](/reference/api/typescript/aspire.hosting/addcontainerregistry.md) -- `method` -- Adds a container registry resource
+- [addCSharpApp](/reference/api/typescript/aspire.hosting/addcsharpapp.md) -- `method` -- Adds a C# application resource
+- [addDockerfile](/reference/api/typescript/aspire.hosting/adddockerfile.md) -- `method` -- Adds a Dockerfile to the application model that can be treated like a container resource.
+- [addDockerfileBuilder](/reference/api/typescript/aspire.hosting/adddockerfilebuilder.md) -- `method` -- Adds a container resource built from a programmatically generated Dockerfile
+- [addDockerfileFactory](/reference/api/typescript/aspire.hosting/adddockerfilefactory.md) -- `method` -- Adds a Dockerfile to the application model that can be treated like a container resource, with the Dockerfile content generated by an asynchronous factory function.
+- [addDotnetTool](/reference/api/typescript/aspire.hosting/adddotnettool.md) -- `method` -- Adds a .NET tool resource to the application model.
+- [addEventingSubscriber](/reference/api/typescript/aspire.hosting/addeventingsubscriber.md) -- `method` -- Adds an ATS-friendly eventing subscriber callback to the distributed-application builder.
+- [addExecutable](/reference/api/typescript/aspire.hosting/addexecutable.md) -- `method` -- Adds an executable resource to the application model.
+- [addExternalService](/reference/api/typescript/aspire.hosting/addexternalservice.md) -- `method` -- Adds an external service resource
+- [addHealthCheck](/reference/api/typescript/aspire.hosting/addhealthcheck.md) -- `method` -- Adds a custom health check callback to the distributed-application builder.
+- [addMarkdown](/reference/api/typescript/aspire.hosting/addmarkdown.md) -- `method` -- Adds a key-value pair to the pipeline summary with a Markdown-formatted value.
+- [addParameter](/reference/api/typescript/aspire.hosting/addparameter.md) -- `method` -- Adds a parameter resource
+- [addParameterFromConfiguration](/reference/api/typescript/aspire.hosting/addparameterfromconfiguration.md) -- `method` -- Adds a parameter resource to the application, with a value coming from configuration.
+- [addParameterWithGeneratedValue](/reference/api/typescript/aspire.hosting/addparameterwithgeneratedvalue.md) -- `method` -- Adds a parameter with a generated default value
+- [addProject](/reference/api/typescript/aspire.hosting/addproject.md) -- `method` -- Adds a .NET project resource
+- [addStep](/reference/api/typescript/aspire.hosting/addstep.md) -- `method` -- Adds an application-level pipeline step in a TypeScript-friendly shape.
+- [arg](/reference/api/typescript/aspire.hosting/arg.md) -- `method` -- Adds a global ARG statement to the Dockerfile
+- [arg](/reference/api/typescript/aspire.hosting/arg.md) -- `method` -- Adds an ARG statement to a Dockerfile stage
+- [asHttp2Service](/reference/api/typescript/aspire.hosting/ashttp2service.md) -- `method` -- Configures a resource to mark all endpoints' transport as HTTP/2. This is useful for HTTP/2 services that need prior knowledge.
+- [build](/reference/api/typescript/aspire.hosting/build.md) -- `method` -- Builds the execution configuration for the specified builder.
+- [clearContainerFilesSources](/reference/api/typescript/aspire.hosting/clearcontainerfilessources.md) -- `method` -- Removes any container files source annotation from the resource being built.
+- [cmd](/reference/api/typescript/aspire.hosting/cmd.md) -- `method` -- Adds a CMD statement to a Dockerfile stage
+- [comment](/reference/api/typescript/aspire.hosting/comment.md) -- `method` -- Adds a comment to a Dockerfile stage
+- [completeLog](/reference/api/typescript/aspire.hosting/completelog.md) -- `method` -- Completes the log stream for a resource.
+- [completeLogByName](/reference/api/typescript/aspire.hosting/completelogbyname.md) -- `method` -- Completes the log stream by resource name.
+- [completeStep](/reference/api/typescript/aspire.hosting/completestep.md) -- `method` -- Completes the reporting step with plain-text completion text.
+- [completeStepMarkdown](/reference/api/typescript/aspire.hosting/completestepmarkdown.md) -- `method` -- Completes the reporting step with Markdown-formatted completion text.
+- [completeTask](/reference/api/typescript/aspire.hosting/completetask.md) -- `method` -- Completes the reporting task with plain-text completion text.
+- [completeTaskMarkdown](/reference/api/typescript/aspire.hosting/completetaskmarkdown.md) -- `method` -- Completes the reporting task with Markdown-formatted completion text.
+- [configure](/reference/api/typescript/aspire.hosting/configure.md) -- `method` -- Registers a pipeline configuration callback in a TypeScript-friendly shape.
+- [copy](/reference/api/typescript/aspire.hosting/copy.md) -- `method` -- Adds a COPY statement to a Dockerfile stage
+- [copyFrom](/reference/api/typescript/aspire.hosting/copyfrom.md) -- `method` -- Adds a COPY --from statement to a Dockerfile stage
+- [createBooleanInput](/reference/api/typescript/aspire.hosting/createbooleaninput.md) -- `method` -- Creates a boolean (checkbox) input.
+- [createBuilder](/reference/api/typescript/aspire.hosting/createbuilder.md) -- `method` -- Creates a new distributed application builder
+- [createCertificateFile](/reference/api/typescript/aspire.hosting/createcertificatefile.md) -- `method` -- Creates a PEM container certificate file entry with the OpenSSL subject-hash symlink.
+- [createChoiceInput](/reference/api/typescript/aspire.hosting/createchoiceinput.md) -- `method` -- Creates a choice input that selects from a list of options.
+- [createDirectory](/reference/api/typescript/aspire.hosting/createdirectory.md) -- `method` -- Creates a container directory entry containing the specified child entries.
+- [createExecutionConfiguration](/reference/api/typescript/aspire.hosting/createexecutionconfiguration.md) -- `method` -- Creates an execution configuration builder for the specified resource.
+- [createFile](/reference/api/typescript/aspire.hosting/createfile.md) -- `method` -- Creates a container file entry with inline contents or a host source path.
+- [createFileInput](/reference/api/typescript/aspire.hosting/createfileinput.md) -- `method` -- Creates a file input.
+- [createLogger](/reference/api/typescript/aspire.hosting/createlogger.md) -- `method` -- Creates a logger for the specified category name.
+- [createMarkdownTask](/reference/api/typescript/aspire.hosting/createmarkdowntask.md) -- `method` -- Creates a reporting task with Markdown-formatted status text.
+- [createNumberInput](/reference/api/typescript/aspire.hosting/createnumberinput.md) -- `method` -- Creates a numeric input.
+- [createSecretInput](/reference/api/typescript/aspire.hosting/createsecretinput.md) -- `method` -- Creates a secret (masked) text input.
+- [createTask](/reference/api/typescript/aspire.hosting/createtask.md) -- `method` -- Creates a reporting task with plain-text status text.
+- [createTextInput](/reference/api/typescript/aspire.hosting/createtextinput.md) -- `method` -- Creates a single-line text input.
+- [disableBuildOnlyContainerValidation](/reference/api/typescript/aspire.hosting/disablebuildonlycontainervalidation.md) -- `method` -- Disables the publish and deploy validation that requires build-only containers to be consumed by another resource.
+- [disableForwardedHeaders](/reference/api/typescript/aspire.hosting/disableforwardedheaders.md) -- `method` -- Configures the project to disable forwarded headers when being published.
+- [emptyLine](/reference/api/typescript/aspire.hosting/emptyline.md) -- `method` -- Adds an empty line to a Dockerfile stage
+- [entrypoint](/reference/api/typescript/aspire.hosting/entrypoint.md) -- `method` -- Adds an ENTRYPOINT statement to a Dockerfile stage
+- [env](/reference/api/typescript/aspire.hosting/env.md) -- `method` -- Adds an ENV statement to a Dockerfile stage
+- [excludeFromManifest](/reference/api/typescript/aspire.hosting/excludefrommanifest.md) -- `method` -- Excludes a resource from being published to the manifest.
+- [excludeFromMcp](/reference/api/typescript/aspire.hosting/excludefrommcp.md) -- `method` -- Exclude the resource from MCP operations using the Aspire MCP server. The resource is excluded from results that return resources, console logs and telemetry.
+- [executeCommandAsync](/reference/api/typescript/aspire.hosting/executecommandasync.md) -- `method` -- Executes a command for the specified resource.
+- [exists](/reference/api/typescript/aspire.hosting/exists.md) -- `method` -- Checks whether a configuration section exists.
+- [expose](/reference/api/typescript/aspire.hosting/expose.md) -- `method` -- Adds an EXPOSE statement to a Dockerfile stage
+- [findResourceByName](/reference/api/typescript/aspire.hosting/findresourcebyname.md) -- `method` -- Finds a resource by name.
+- [from](/reference/api/typescript/aspire.hosting/from.md) -- `method` -- Adds a FROM statement to start a Dockerfile stage
+- [getAspireStore](/reference/api/typescript/aspire.hosting/getaspirestore.md) -- `method` -- Gets the Aspire store from the service provider.
+- [getCertificateTrustData](/reference/api/typescript/aspire.hosting/getcertificatetrustdata.md) -- `method` -- Gets certificate trust execution-configuration data when present.
+- [getChildren](/reference/api/typescript/aspire.hosting/getchildren.md) -- `method` -- Gets the child sections of a configuration handle.
+- [getConfiguration](/reference/api/typescript/aspire.hosting/getconfiguration.md) -- `method` -- Gets the application configuration.
+- [getConfigValue](/reference/api/typescript/aspire.hosting/getconfigvalue.md) -- `method` -- Gets a configuration value by key.
+- [getConnectionProperty](/reference/api/typescript/aspire.hosting/getconnectionproperty.md) -- `method` -- Retrieves the value of a specified connection property from the resource's connection properties.
+- [getConnectionString](/reference/api/typescript/aspire.hosting/getconnectionstring.md) -- `method` -- Gets a connection string by name.
+- [getDistributedApplicationModel](/reference/api/typescript/aspire.hosting/getdistributedapplicationmodel.md) -- `method` -- Gets the distributed application model from the service provider.
+- [getEndpoint](/reference/api/typescript/aspire.hosting/getendpoint.md) -- `method` -- Gets an endpoint reference
+- [getEventing](/reference/api/typescript/aspire.hosting/geteventing.md) -- `method` -- Gets the distributed application eventing service from the service provider.
+- [getFileNameWithContent](/reference/api/typescript/aspire.hosting/getfilenamewithcontent.md) -- `method` -- Gets a deterministic file path that is a copy of the `sourceFilename`. The resulting file name will depend on the content of the file.
+- [getHttpsCertificateData](/reference/api/typescript/aspire.hosting/gethttpscertificatedata.md) -- `method` -- Gets HTTPS certificate execution-configuration data when present.
+- [getInteractionService](/reference/api/typescript/aspire.hosting/getinteractionservice.md) -- `method` -- Gets the interaction service from the service provider.
+- [getLoggerFactory](/reference/api/typescript/aspire.hosting/getloggerfactory.md) -- `method` -- Gets the logger factory from the service provider.
+- [getOrSetSecret](/reference/api/typescript/aspire.hosting/getorsetsecret.md) -- `method` -- Gets a secret value if it exists in configuration, or sets it to the provided value if it does not.
+- [getResourceCommandService](/reference/api/typescript/aspire.hosting/getresourcecommandservice.md) -- `method` -- Gets the resource command service from the service provider.
+- [getResourceLoggerService](/reference/api/typescript/aspire.hosting/getresourceloggerservice.md) -- `method` -- Gets the resource logger service from the service provider.
+- [getResourceName](/reference/api/typescript/aspire.hosting/getresourcename.md) -- `method` -- Gets the name of the resource from a builder.
+- [getResourceNotificationService](/reference/api/typescript/aspire.hosting/getresourcenotificationservice.md) -- `method` -- Gets the resource notification service from the service provider.
+- [getResources](/reference/api/typescript/aspire.hosting/getresources.md) -- `method` -- Gets all resources in the distributed application model.
+- [getSection](/reference/api/typescript/aspire.hosting/getsection.md) -- `method` -- Gets a configuration section by key.
+- [getUserSecretsManager](/reference/api/typescript/aspire.hosting/getusersecretsmanager.md) -- `method` -- Gets the user secrets manager from the service provider.
+- [isAvailable](/reference/api/typescript/aspire.hosting/isavailable.md) -- `method` -- Gets a value indicating whether the interaction service is available to prompt the user.
+- [isDevelopment](/reference/api/typescript/aspire.hosting/isdevelopment.md) -- `method` -- Checks if the environment is Development.
+- [isEnvironment](/reference/api/typescript/aspire.hosting/isenvironment.md) -- `method` -- Checks if the environment matches the specified name.
+- [isProduction](/reference/api/typescript/aspire.hosting/isproduction.md) -- `method` -- Checks if the environment is Production.
+- [isStaging](/reference/api/typescript/aspire.hosting/isstaging.md) -- `method` -- Checks if the environment is Staging.
+- [log](/reference/api/typescript/aspire.hosting/log.md) -- `method` -- Logs a message with a specified log level.
+- [logDebug](/reference/api/typescript/aspire.hosting/logdebug.md) -- `method` -- Logs a debug message.
+- [logError](/reference/api/typescript/aspire.hosting/logerror.md) -- `method` -- Logs an error message.
+- [logInformation](/reference/api/typescript/aspire.hosting/loginformation.md) -- `method` -- Logs an information message.
+- [logStep](/reference/api/typescript/aspire.hosting/logstep.md) -- `method` -- Logs a plain-text message for the reporting step.
+- [logStepMarkdown](/reference/api/typescript/aspire.hosting/logstepmarkdown.md) -- `method` -- Logs a Markdown-formatted message for the reporting step.
+- [logWarning](/reference/api/typescript/aspire.hosting/logwarning.md) -- `method` -- Logs a warning message.
+- [onAfterPublish](/reference/api/typescript/aspire.hosting/onafterpublish.md) -- `method` -- Subscribes to the AfterPublish event from an eventing subscriber registration context.
+- [onAfterResourcesCreated](/reference/api/typescript/aspire.hosting/onafterresourcescreated.md) -- `method` -- Subscribes to the AfterResourcesCreated event from an eventing subscriber registration context.
+- [onBeforePublish](/reference/api/typescript/aspire.hosting/onbeforepublish.md) -- `method` -- Subscribes to the BeforePublish event from an eventing subscriber registration context.
+- [onBeforeResourceStarted](/reference/api/typescript/aspire.hosting/onbeforeresourcestarted.md) -- `method` -- Subscribes to the BeforeResourceStarted event.
+- [onBeforeStart](/reference/api/typescript/aspire.hosting/onbeforestart.md) -- `method` -- Subscribes to the BeforeStart event from an eventing subscriber registration context.
+- [onConnectionStringAvailable](/reference/api/typescript/aspire.hosting/onconnectionstringavailable.md) -- `method` -- Subscribes to the ConnectionStringAvailable event.
+- [onInitializeResource](/reference/api/typescript/aspire.hosting/oninitializeresource.md) -- `method` -- Subscribes to the InitializeResource event.
+- [onResourceEndpointsAllocated](/reference/api/typescript/aspire.hosting/onresourceendpointsallocated.md) -- `method` -- Subscribes to the ResourceEndpointsAllocated event.
+- [onResourceReady](/reference/api/typescript/aspire.hosting/onresourceready.md) -- `method` -- Subscribes to the ResourceReady event.
+- [onResourceStopped](/reference/api/typescript/aspire.hosting/onresourcestopped.md) -- `method` -- Subscribes to the ResourceStopped event.
+- [promptConfirmation](/reference/api/typescript/aspire.hosting/promptconfirmation.md) -- `method` -- Prompts the user for confirmation with an OK/Cancel dialog.
+- [promptInput](/reference/api/typescript/aspire.hosting/promptinput.md) -- `method` -- Prompts the user for a single input.
+- [promptInputs](/reference/api/typescript/aspire.hosting/promptinputs.md) -- `method` -- Prompts the user for multiple inputs.
+- [promptMessageBox](/reference/api/typescript/aspire.hosting/promptmessagebox.md) -- `method` -- Prompts the user with a message box dialog.
+- [promptNotification](/reference/api/typescript/aspire.hosting/promptnotification.md) -- `method` -- Prompts the user with a notification.
+- [promptProgress](/reference/api/typescript/aspire.hosting/promptprogress.md) -- `method` -- Displays a progress dialog with an indeterminate progress indicator.
+- [publishAsConnectionString](/reference/api/typescript/aspire.hosting/publishasconnectionstring.md) -- `method` -- Changes the resource to be published as a connection string reference in the manifest.
+- [publishAsContainer](/reference/api/typescript/aspire.hosting/publishascontainer.md) -- `method` -- Changes the resource to be published as a container in the manifest.
+- [publishAsDockerFile](/reference/api/typescript/aspire.hosting/publishasdockerfile.md) -- `method` -- Publishes an executable as a Docker file
+- [publishAsDockerFile](/reference/api/typescript/aspire.hosting/publishasdockerfile.md) -- `method` -- Publishes a project as a Docker file with optional container configuration
+- [publishResourceUpdate](/reference/api/typescript/aspire.hosting/publishresourceupdate.md) -- `method` -- Publishes an update for a resource's state.
+- [publishWithContainerFiles](/reference/api/typescript/aspire.hosting/publishwithcontainerfiles.md) -- `method` -- Configures the resource to copy container files from the specified source resource during publishing.
+- [run](/reference/api/typescript/aspire.hosting/run.md) -- `method` -- Adds a RUN statement to a Dockerfile stage
+- [runWithMounts](/reference/api/typescript/aspire.hosting/runwithmounts.md) -- `method` -- Adds a RUN statement with mounts to a Dockerfile stage
+- [saveStateJson](/reference/api/typescript/aspire.hosting/savestatejson.md) -- `method` -- Saves state to user secrets from a JSON string.
+- [subscribeAfterPublish](/reference/api/typescript/aspire.hosting/subscribeafterpublish.md) -- `method` -- Subscribes to the AfterPublish event, which fires after the application is published.
+- [subscribeAfterResourcesCreated](/reference/api/typescript/aspire.hosting/subscribeafterresourcescreated.md) -- `method` -- Subscribes to the AfterResourcesCreated event, which fires after all resources are created.
+- [subscribeBeforePublish](/reference/api/typescript/aspire.hosting/subscribebeforepublish.md) -- `method` -- Subscribes to the BeforePublish event, which fires before the application is published.
+- [subscribeBeforeStart](/reference/api/typescript/aspire.hosting/subscribebeforestart.md) -- `method` -- Subscribes to the BeforeStart event, which fires before the application starts.
+- [subscribeHttpsEndpointsUpdate](/reference/api/typescript/aspire.hosting/subscribehttpsendpointsupdate.md) -- `method` -- Subscribes to the `BeforeStartEvent` and invokes the specified callback when an HTTPS certificate is determined to be available for the resource. This is used to conditionally update endpoint URI schemes or perform other HTTPS-related configuration at startup.
+- [tryAddEventingSubscriber](/reference/api/typescript/aspire.hosting/tryaddeventingsubscriber.md) -- `method` -- Attempts to add an ATS-friendly eventing subscriber callback to the distributed-application builder.
+- [tryGetResourceState](/reference/api/typescript/aspire.hosting/trygetresourcestate.md) -- `method` -- Tries to get the current state of a resource.
+- [updateTask](/reference/api/typescript/aspire.hosting/updatetask.md) -- `method` -- Updates the reporting task with plain-text status text.
+- [updateTaskMarkdown](/reference/api/typescript/aspire.hosting/updatetaskmarkdown.md) -- `method` -- Updates the reporting task with Markdown-formatted status text.
+- [user](/reference/api/typescript/aspire.hosting/user.md) -- `method` -- Adds a USER statement to a Dockerfile stage
+- [waitFor](/reference/api/typescript/aspire.hosting/waitfor.md) -- `method` -- Waits for another resource to be ready
+- [waitForCompletion](/reference/api/typescript/aspire.hosting/waitforcompletion.md) -- `method` -- Waits for the dependency resource to enter the Exited or Finished state before starting the resource.
+- [waitForDependencies](/reference/api/typescript/aspire.hosting/waitfordependencies.md) -- `method` -- Waits for all dependencies of a resource to be ready.
+- [waitForResourceHealthy](/reference/api/typescript/aspire.hosting/waitforresourcehealthy.md) -- `method` -- Waits for a resource to become healthy.
+- [waitForResourceState](/reference/api/typescript/aspire.hosting/waitforresourcestate.md) -- `method` -- Waits for a resource to reach a specified state.
+- [waitForResourceStates](/reference/api/typescript/aspire.hosting/waitforresourcestates.md) -- `method` -- Waits for a resource to reach one of the specified states.
+- [waitForStart](/reference/api/typescript/aspire.hosting/waitforstart.md) -- `method` -- Waits for another resource to start
+- [withArgs](/reference/api/typescript/aspire.hosting/withargs.md) -- `method` -- Adds arguments to be passed to a resource that supports arguments when it is launched.
+- [withArgsCallback](/reference/api/typescript/aspire.hosting/withargscallback.md) -- `method` -- Adds a callback to be executed with a list of command-line arguments when a resource is started.
+- [withArgumentsConfig](/reference/api/typescript/aspire.hosting/withargumentsconfig.md) -- `method` -- Adds a command line arguments configuration gatherer to the builder.
+- [withBindMount](/reference/api/typescript/aspire.hosting/withbindmount.md) -- `method` -- Adds a bind mount to a container resource.
+- [withBuildArg](/reference/api/typescript/aspire.hosting/withbuildarg.md) -- `method` -- Adds a build argument when the container is built from a Dockerfile.
+- [withBuildSecret](/reference/api/typescript/aspire.hosting/withbuildsecret.md) -- `method` -- Adds a secret build argument when the container is built from a Dockerfile.
+- [withCertificateTrustConfig](/reference/api/typescript/aspire.hosting/withcertificatetrustconfig.md) -- `method` -- Adds a certificate trust configuration gatherer to the builder.
+- [withCertificateTrustScope](/reference/api/typescript/aspire.hosting/withcertificatetrustscope.md) -- `method` -- Sets the certificate trust scope
+- [withChildRelationship](/reference/api/typescript/aspire.hosting/withchildrelationship.md) -- `method` -- Sets a child relationship
+- [withCommand](/reference/api/typescript/aspire.hosting/withcommand.md) -- `method` -- Adds a resource command
+- [withComputeEnvironment](/reference/api/typescript/aspire.hosting/withcomputeenvironment.md) -- `method` -- Configures the compute environment for the compute resource.
+- [withConnectionProperty](/reference/api/typescript/aspire.hosting/withconnectionproperty.md) -- `method` -- Adds a connection property annotation to the resource being built.
+- [withContainerBuildOptions](/reference/api/typescript/aspire.hosting/withcontainerbuildoptions.md) -- `method` -- Configures container build options for a compute resource using an async callback.
+- [withContainerCertificatePaths](/reference/api/typescript/aspire.hosting/withcontainercertificatepaths.md) -- `method` -- Adds container certificate path overrides used for certificate trust at run time.
+- [withContainerFiles](/reference/api/typescript/aspire.hosting/withcontainerfiles.md) -- `method` -- Creates or updates files and folders in a container by copying them from a source path on the host.
+- [withContainerFilesCallback](/reference/api/typescript/aspire.hosting/withcontainerfilescallback.md) -- `method` -- Creates or updates files and/or folders at the destination path in the container using entries produced by a callback.
+- [withContainerFilesSource](/reference/api/typescript/aspire.hosting/withcontainerfilessource.md) -- `method` -- Adds a container files source annotation to the resource being built, specifying the path to the container files source.
+- [withContainerName](/reference/api/typescript/aspire.hosting/withcontainername.md) -- `method` -- Overrides the default container name for this resource. By default Aspire generates a unique container name based on the resource name and a random postfix (or a postfix based on a hash of the AppHost project path for persistent container resources). This method allows you to override that behavior with a custom name, but could lead to naming conflicts if the specified name is not unique.
+- [withContainerNetworkAlias](/reference/api/typescript/aspire.hosting/withcontainernetworkalias.md) -- `method` -- Adds a network alias to container resource.
+- [withContainerRegistry](/reference/api/typescript/aspire.hosting/withcontainerregistry.md) -- `method` -- Configures the resource to use the specified container registry for container image operations.
+- [withContainerRuntimeArgs](/reference/api/typescript/aspire.hosting/withcontainerruntimeargs.md) -- `method` -- Adds a callback to be executed with a list of arguments to add to the container runtime run command when a container resource is started.
+- [withCustomInput](/reference/api/typescript/aspire.hosting/withcustominput.md) -- `method` -- Sets a custom input for the parameter resource from a polyglot AppHost.
+- [withDescription](/reference/api/typescript/aspire.hosting/withdescription.md) -- `method` -- Sets the description of the parameter resource.
+- [withDeveloperCertificateTrust](/reference/api/typescript/aspire.hosting/withdevelopercertificatetrust.md) -- `method` -- Indicates whether developer certificates should be treated as trusted certificate authorities for the resource at run time. Currently this indicates trust for the ASP.NET Core developer certificate. The developer certificate will only be trusted when running in local development scenarios; in publish mode resources will use their default certificate trust.
+- [withDockerfile](/reference/api/typescript/aspire.hosting/withdockerfile.md) -- `method` -- Causes Aspire to build the specified container image from a Dockerfile.
+- [withDockerfileBaseImage](/reference/api/typescript/aspire.hosting/withdockerfilebaseimage.md) -- `method` -- Configures custom base images for generated Dockerfiles.
+- [withDockerfileBuilder](/reference/api/typescript/aspire.hosting/withdockerfilebuilder.md) -- `method` -- Configures the resource to use a programmatically generated Dockerfile
+- [withDockerfileFactory](/reference/api/typescript/aspire.hosting/withdockerfilefactory.md) -- `method` -- Builds the specified container image from a Dockerfile generated by an asynchronous factory function.
+- [withEndpoint](/reference/api/typescript/aspire.hosting/withendpoint.md) -- `method` -- Adds a network endpoint
+- [withEndpointCallback](/reference/api/typescript/aspire.hosting/withendpointcallback.md) -- `method` -- Updates a named endpoint via callback
+- [withEndpointProxySupport](/reference/api/typescript/aspire.hosting/withendpointproxysupport.md) -- `method` -- Set whether a resource can use proxied endpoints or whether they should be disabled for all endpoints belonging to the resource. If set to `false`, endpoints belonging to the resource will ignore the configured proxy settings and run proxy-less.
+- [withEndpointsInEnvironment](/reference/api/typescript/aspire.hosting/withendpointsinenvironment.md) -- `method` -- Includes only the specified project endpoint names in environment-variable injection.
+- [withEntrypoint](/reference/api/typescript/aspire.hosting/withentrypoint.md) -- `method` -- Sets the Entrypoint for the container.
+- [withEnvironment](/reference/api/typescript/aspire.hosting/withenvironment.md) -- `method` -- Sets an environment variable
+- [withEnvironmentCallback](/reference/api/typescript/aspire.hosting/withenvironmentcallback.md) -- `method` -- Allows for the population of environment variables on a resource.
+- [withEnvironmentVariablesConfig](/reference/api/typescript/aspire.hosting/withenvironmentvariablesconfig.md) -- `method` -- Adds an environment variables configuration gatherer to the builder.
+- [withExecutableCommand](/reference/api/typescript/aspire.hosting/withexecutablecommand.md) -- `method` -- Sets the command for the executable resource.
+- [withExplicitStart](/reference/api/typescript/aspire.hosting/withexplicitstart.md) -- `method` -- Prevents resource from starting automatically
+- [withExternalHttpEndpoints](/reference/api/typescript/aspire.hosting/withexternalhttpendpoints.md) -- `method` -- Marks existing http or https endpoints on a resource as external.
+- [withHealthCheck](/reference/api/typescript/aspire.hosting/withhealthcheck.md) -- `method` -- Adds a health check by key
+- [withHidden](/reference/api/typescript/aspire.hosting/withhidden.md) -- `method` -- Hides the resource from default resource lists
+- [withHiddenOnCompletion](/reference/api/typescript/aspire.hosting/withhiddenoncompletion.md) -- `method` -- Hides the resource from default resource lists after successful completion
+- [withHttpCommand](/reference/api/typescript/aspire.hosting/withhttpcommand.md) -- `method` -- Adds an HTTP resource command
+- [withHttpEndpoint](/reference/api/typescript/aspire.hosting/withhttpendpoint.md) -- `method` -- Adds an HTTP endpoint
+- [withHttpEndpointCallback](/reference/api/typescript/aspire.hosting/withhttpendpointcallback.md) -- `method` -- Updates an HTTP endpoint via callback
+- [withHttpHealthCheck](/reference/api/typescript/aspire.hosting/withhttphealthcheck.md) -- `method` -- Adds an HTTP health check to the external service for polyglot AppHosts.
+- [withHttpHealthCheck](/reference/api/typescript/aspire.hosting/withhttphealthcheck.md) -- `method` -- Adds a health check to the resource which is mapped to a specific endpoint.
+- [withHttpProbe](/reference/api/typescript/aspire.hosting/withhttpprobe.md) -- `method` -- Adds an HTTP health probe to the resource
+- [withHttpsCertificateConfig](/reference/api/typescript/aspire.hosting/withhttpscertificateconfig.md) -- `method` -- Adds an HTTPS certificate configuration gatherer using certificate metadata instead of a raw X509 certificate.
+- [withHttpsCertificateConfiguration](/reference/api/typescript/aspire.hosting/withhttpscertificateconfiguration.md) -- `method` -- Adds a callback that allows configuring the resource to use a specific HTTPS/TLS certificate key pair for server authentication.
+- [withHttpsDeveloperCertificate](/reference/api/typescript/aspire.hosting/withhttpsdevelopercertificate.md) -- `method` -- Indicates that a resource should use the developer certificate key pair for HTTPS endpoints at run time. Currently this indicates use of the ASP.NET Core developer certificate. The developer certificate will only be used when running in local development scenarios; in publish mode resources will use their default certificate configuration.
+- [withHttpsEndpoint](/reference/api/typescript/aspire.hosting/withhttpsendpoint.md) -- `method` -- Adds an HTTPS endpoint
+- [withHttpsEndpointCallback](/reference/api/typescript/aspire.hosting/withhttpsendpointcallback.md) -- `method` -- Updates an HTTPS endpoint via callback
+- [withIconName](/reference/api/typescript/aspire.hosting/withiconname.md) -- `method` -- Specifies the icon to use when displaying the resource in the dashboard.
+- [withImage](/reference/api/typescript/aspire.hosting/withimage.md) -- `method` -- Allows overriding the image on a container.
+- [withImagePullPolicy](/reference/api/typescript/aspire.hosting/withimagepullpolicy.md) -- `method` -- Sets the pull policy for the container resource.
+- [withImagePushOptions](/reference/api/typescript/aspire.hosting/withimagepushoptions.md) -- `method` -- Adds an asynchronous callback to configure container image push options for the resource.
+- [withImageRegistry](/reference/api/typescript/aspire.hosting/withimageregistry.md) -- `method` -- Allows overriding the image registry on a container.
+- [withImageSHA256](/reference/api/typescript/aspire.hosting/withimagesha256.md) -- `method` -- Allows setting the image to a specific sha256 on a container.
+- [withImageTag](/reference/api/typescript/aspire.hosting/withimagetag.md) -- `method` -- Allows overriding the image tag on a container.
+- [withLifetime](/reference/api/typescript/aspire.hosting/withlifetime.md) -- `method` -- Sets the lifetime behavior of the container resource.
+- [withLifetimeOf](/reference/api/typescript/aspire.hosting/withlifetimeof.md) -- `method` -- Configures a resource to match the lifetime of another resource.
+- [withMcpServer](/reference/api/typescript/aspire.hosting/withmcpserver.md) -- `method` -- Marks the resource as hosting a Model Context Protocol (MCP) server on the specified endpoint.
+- [withOtlpExporter](/reference/api/typescript/aspire.hosting/withotlpexporter.md) -- `method` -- Configures OTLP telemetry export
+- [withoutHttpsCertificate](/reference/api/typescript/aspire.hosting/withouthttpscertificate.md) -- `method` -- Disable HTTPS/TLS server certificate configuration for the resource. No HTTPS/TLS termination configuration will be applied.
+- [withParentProcessLifetime](/reference/api/typescript/aspire.hosting/withparentprocesslifetime.md) -- `method` -- Configures a resource to use a persistent lifetime that ends when a parent process exits.
+- [withParentRelationship](/reference/api/typescript/aspire.hosting/withparentrelationship.md) -- `method` -- Sets the parent relationship
+- [withPersistentLifetime](/reference/api/typescript/aspire.hosting/withpersistentlifetime.md) -- `method` -- Configures a resource to use a persistent lifetime.
+- [withPipelineConfiguration](/reference/api/typescript/aspire.hosting/withpipelineconfiguration.md) -- `method` -- Registers a callback to be executed during the pipeline configuration phase, allowing modification of step dependencies and relationships.
+- [withPipelineStepFactory](/reference/api/typescript/aspire.hosting/withpipelinestepfactory.md) -- `method` -- Adds a pipeline step to the resource that will be executed during deployment.
+- [withProcessCommand](/reference/api/typescript/aspire.hosting/withprocesscommand.md) -- `method` -- Adds a command to the resource that starts a local process when invoked.
+- [withProcessCommandFactory](/reference/api/typescript/aspire.hosting/withprocesscommandfactory.md) -- `method` -- Adds a command to the resource that starts a local process created by a callback when invoked.
+- [withReference](/reference/api/typescript/aspire.hosting/withreference.md) -- `method` -- Adds a reference to another resource
+- [withReferenceEnvironment](/reference/api/typescript/aspire.hosting/withreferenceenvironment.md) -- `method` -- Configures how information is injected into environment variables when the resource references other resources.
+- [withRelationship](/reference/api/typescript/aspire.hosting/withrelationship.md) -- `method` -- Adds a relationship to another resource using its builder.
+- [withRemoteImageName](/reference/api/typescript/aspire.hosting/withremoteimagename.md) -- `method` -- Sets the remote image name (without registry endpoint or tag) for container push operations.
+- [withRemoteImageTag](/reference/api/typescript/aspire.hosting/withremoteimagetag.md) -- `method` -- Sets the remote image tag for container push operations.
+- [withReplicas](/reference/api/typescript/aspire.hosting/withreplicas.md) -- `method` -- Configures how many replicas of the project should be created for the project.
+- [withRequiredCommand](/reference/api/typescript/aspire.hosting/withrequiredcommand.md) -- `method` -- Declares that a resource requires a specific command/executable to be available on the local machine PATH before it can start.
+- [withRequiredCommandValidation](/reference/api/typescript/aspire.hosting/withrequiredcommandvalidation.md) -- `method` -- Declares that a resource requires a specific command/executable to be available on the local machine PATH before it can start, with custom validation logic.
+- [withSessionLifetime](/reference/api/typescript/aspire.hosting/withsessionlifetime.md) -- `method` -- Configures a resource to use a session lifetime.
+- [withTerminal](/reference/api/typescript/aspire.hosting/withterminal.md) -- `method` -- Adds an interactive terminal session to a resource using the default terminal options.
+- [withToolIgnoreExistingFeeds](/reference/api/typescript/aspire.hosting/withtoolignoreexistingfeeds.md) -- `method` -- Configures the tool to use only the specified package sources, ignoring existing NuGet configuration.
+- [withToolIgnoreFailedSources](/reference/api/typescript/aspire.hosting/withtoolignorefailedsources.md) -- `method` -- Configures the resource to treat package source failures as warnings.
+- [withToolPackage](/reference/api/typescript/aspire.hosting/withtoolpackage.md) -- `method` -- Sets the package identifier for the tool configuration associated with the resource builder.
+- [withToolPrerelease](/reference/api/typescript/aspire.hosting/withtoolprerelease.md) -- `method` -- Allows prerelease versions of the tool to be used
+- [withToolSource](/reference/api/typescript/aspire.hosting/withtoolsource.md) -- `method` -- Adds a NuGet package source for tool acquisition.
+- [withToolVersion](/reference/api/typescript/aspire.hosting/withtoolversion.md) -- `method` -- Sets the package version for a tool to use.
+- [withUrl](/reference/api/typescript/aspire.hosting/withurl.md) -- `method` -- Adds or modifies displayed URLs
+- [withUrlForEndpoint](/reference/api/typescript/aspire.hosting/withurlforendpoint.md) -- `method` -- Registers a callback to update the URL displayed for the endpoint with the specified name.
+- [withUrls](/reference/api/typescript/aspire.hosting/withurls.md) -- `method` -- Registers a callback to customize the URLs displayed for the resource.
+- [withVolume](/reference/api/typescript/aspire.hosting/withvolume.md) -- `method` -- Adds a volume to a container resource.
+- [withWorkingDirectory](/reference/api/typescript/aspire.hosting/withworkingdirectory.md) -- `method` -- Sets the working directory for the executable resource.
+- [workDir](/reference/api/typescript/aspire.hosting/workdir.md) -- `method` -- Adds a WORKDIR statement to a Dockerfile stage
+
+## Enums
+
+- [CertificateTrustScope](/reference/api/typescript/aspire.hosting/certificatetrustscope.md) -- `enum` - 4 values -- Defines the scope of custom certificate authorities for a resource. The default scope for most resources is `Append`, but some resources may choose to override this default behavior.
+- [CommandResultFormat](/reference/api/typescript/aspire.hosting/commandresultformat.md) -- `enum` - 3 values -- Specifies the format of a command result.
+- [ContainerImageDestination](/reference/api/typescript/aspire.hosting/containerimagedestination.md) -- `enum` - 2 values -- Specifies the destination for container images.
+- [ContainerImageFormat](/reference/api/typescript/aspire.hosting/containerimageformat.md) -- `enum` - 2 values -- Specifies the format for container images.
+- [ContainerLifetime](/reference/api/typescript/aspire.hosting/containerlifetime.md) -- `enum` - 2 values -- Lifetime modes for container resources.
+- [ContainerMountType](/reference/api/typescript/aspire.hosting/containermounttype.md) -- `enum` - 2 values -- Represents the type of a container mount.
+- [ContainerTargetPlatform](/reference/api/typescript/aspire.hosting/containertargetplatform.md) -- `enum` - 7 values -- Specifies the target platform for container images.
+- [DistributedApplicationOperation](/reference/api/typescript/aspire.hosting/distributedapplicationoperation.md) -- `enum` - 2 values -- Describes the context in which the AppHost is being executed.
+- [EndpointProperty](/reference/api/typescript/aspire.hosting/endpointproperty.md) -- `enum` - 8 values -- Represents the properties of an endpoint that can be referenced.
+- [HttpCommandResultMode](/reference/api/typescript/aspire.hosting/httpcommandresultmode.md) -- `enum` - 4 values -- Specifies how an HTTP command should surface the HTTP response body as command result data.
+- [IconVariant](/reference/api/typescript/aspire.hosting/iconvariant.md) -- `enum` - 2 values -- The icon variant.
+- [ImagePullPolicy](/reference/api/typescript/aspire.hosting/imagepullpolicy.md) -- `enum` - 4 values -- Image pull policies for container resources.
+- [InputType](/reference/api/typescript/aspire.hosting/inputtype.md) -- `enum` - 6 values -- Specifies the type of input for an `InteractionInput`.
+- [MessageIntent](/reference/api/typescript/aspire.hosting/messageintent.md) -- `enum` - 6 values -- Specifies the intent or purpose of a message in an interaction.
+- [OtlpProtocol](/reference/api/typescript/aspire.hosting/otlpprotocol.md) -- `enum` - 3 values -- Protocols available for OTLP exporters.
+- [ProbeType](/reference/api/typescript/aspire.hosting/probetype.md) -- `enum` - 3 values -- Enum representing the type of probe.
+- [ResourceCommandState](/reference/api/typescript/aspire.hosting/resourcecommandstate.md) -- `enum` - 3 values -- The state of a resource command.
+- [ResourceCommandVisibility](/reference/api/typescript/aspire.hosting/resourcecommandvisibility.md) -- `enum` - 3 values -- Describes where a resource command is visible.
+- [UrlDisplayLocation](/reference/api/typescript/aspire.hosting/urldisplaylocation.md) -- `enum` - 2 values -- Specifies where the URL should be displayed.
+- [WaitBehavior](/reference/api/typescript/aspire.hosting/waitbehavior.md) -- `enum` - 2 values -- Specifies the behavior of the wait.

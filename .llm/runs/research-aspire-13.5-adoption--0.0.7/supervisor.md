@@ -6,7 +6,13 @@
 - Role: harness research orchestrator
 - Route: native Claude / Anthropic / Fable 5 / medium
 - Route reason: explicit owner override for this architectural research epic
-- Remote Control: required; record the attached session identity and URL before research begins
+- Remote Control: required. Observed session URL: <https://claude.ai/code/session_011Ng6hnMLyY8vzM8EJo2XKg>
+  (the session is registered on claude.ai/code; `/rc` is a user-side slash command that the
+  orchestrator cannot toggle from inside the turn — the owner keeps it enabled on this session).
+- Requested identity: Claude · Anthropic · Fable 5 · medium (owner override, drift D-1).
+- Observed identity: model id `claude-fable-5` (reported by the runtime environment on
+  2026-08-29); effort is not introspectable from inside the session — verify with `/status`.
+- Host: WSL2 (Linux 6.18.33.2-microsoft-standard-WSL2), Aspire CLI 13.4.6 on PATH, Deno workspace.
 - Worktree: `/home/codex/repos/netscript-007-aspire-13-5-research`
 - Branch: `research/aspire-13.5-0.0.7`
 - Baseline: `cf648f1ff973d74c213bb125a6f5f5b9328e693b`
