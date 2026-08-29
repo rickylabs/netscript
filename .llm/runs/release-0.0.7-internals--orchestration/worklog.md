@@ -2591,3 +2591,61 @@ and `e2e:cli`. The issue's `scaffold.runtime` restoration claim is therefore **C
 bounded local runtime proof is **queued behind S2 cleanup** — recorded here so it is not silently
 dropped at merge. I did not interrupt the working author to say so; it will be applied at Tier-A and
 stated in the PR body.
+
+## 2026-08-30 — #1734 Tier-A PASS at `e537b2c1f`; IMPL-EVAL launched
+
+### Delivery
+
+| Slice | Commit | Content |
+| --- | --- | --- |
+| S0 | `1f796e0e0ee3fe63d112aedc133d8ffa03e7dd91` | plan, locked decisions |
+| S1 | `d48861c824371a8d83d941a8845d1f559d7ecdc4` | RED — compat test + exact-version fixtures |
+| S2 | `81448d2b5e4352a20a24e6152d3c0e3ed7b756a3` | validated boundary conversion |
+| S3 | `e537b2c1f06e9bc3345efe84597740a72844440b` | gate evidence |
+
+Draft **PR #1736**, `Closes #1734`, `0.0.7`, one `status:` label, DoD 10/10 — and correctly **no**
+self-certified evaluator box; the closest entry states the PR *remains draft for* Tier-A and
+IMPL-EVAL rather than claiming either.
+
+### Tier-A — PASS, one finding corrected
+
+**Two of four cited slice SHAs did not exist.** `d48861c82bc8…` and `81448d2b5f4c…` matched the real
+commits for nine characters and diverged over the remaining thirty-one — a fabricated-suffix
+pattern, not a rebase (the real objects were never rewritten). Corrected in the PR body against
+`git log`, with a correction table appended naming both bad values. No code, test, or gate result is
+affected. Raised rather than quietly fixed because this lane's whole discipline rests on exact-head
+receipts, and a receipt naming a non-existent object is unverifiable by anyone reading it later.
+
+Verified by execution:
+
+- **RED real:** at `d48861c8243…` the compat suite exits 1 with the exact `TS2345` readonly/mutable
+  error; at HEAD it is 2/2 exit 0.
+- **Fixtures are what they claim:** I read the resolved pins rather than trusting filenames —
+  exactly `5.101.0` and `5.102.8`, both passing. This is the load-bearing property, since the defect
+  survived precisely because a check that only holds for the lockfile pin looks green.
+- **The conversion validates rather than casts:** I attacked it directly — malformed mutation,
+  malformed query, `null`, and string entries each throw `TypeError: Invalid dehydrated … at index
+  0`; a well-formed state passes. Crossing `readonly unknown[]` → the stricter upstream element type
+  is *earned* by runtime validation, which is the only honest route from an `unknown` source.
+- No `any` / `as unknown as` / `@ts-ignore` / `@ts-expect-error` anywhere in added source or tests.
+- Public contract intact (`query-types.ts`, `query/mod.ts` unchanged; `DehydratedState` still
+  readonly; upstream element types derived, not hardcoded).
+- **Range decision honoured (D1):** `^5.101.0` unchanged — compatible across the whole declared
+  range rather than narrowed to hide the problem.
+- Scope `packages/fresh` + leaf artifacts; no lock/cache/workflow churn; `quality:scan` exit 0 with
+  `allowCount: 7`.
+
+### IMPL-EVAL launched
+
+Session **`6626f7f2-950b-46d3-b32d-642642cbeb8a`**, cwd `/home/codex/repos/netscript-007-eval-1734`
+@ `e537b2c1f`, native **Claude Fable 5 · medium**, `providerEnv: {}` — route read from the job
+registry, not argv, and launched from inside the eval worktree.
+
+**Route differs from #1728 deliberately.** Lane policy effort-pairs review to the implementation
+lane: this leaf was authored on Sol · **high** (`complex_implementation`) → `review_codex_complex` =
+Fable 5 · **medium**. #1728 was Sol · medium → Fable 5 · low. Reusing the previous route would have
+under-reviewed a harder change.
+
+The brief tells the evaluator explicitly that the missing local runtime proof is **queued behind the
+S2 lease, not waived**, and is **not** a finding — so it cannot fail the leaf for an absence this
+lane does not control.
