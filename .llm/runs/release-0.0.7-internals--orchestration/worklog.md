@@ -2180,3 +2180,69 @@ lease was ever taken in this leaf.
 Plan gate and implementation gate are both closed for #1709. One IMPL-EVAL cycle, no failures, so
 the two-consecutive-failure policy was never engaged. **Stopping for the coordinator**: readiness
 flip, merge, and issue closure are not mine. PR #1710 remains OPEN/draft at `status:impl-eval`.
+
+## 2026-08-29 — #1709 close/readiness gate driven on exact remote head `30df7b9ff`
+
+Coordinator steering: run the full documented PR close/readiness gate, repair only bounded gate
+metadata/harness defects, return merge-ready evidence, do not merge.
+
+### Currency established first (playbook step 2)
+
+`agentic:pr-checks` → `PASS`, `headSha=30df7b9ff…`, `checks=23`, `currentFailures=0`. But this was
+**not** a passing close-gate: `close-gate status=completed conclusion=skipped`. `ci.yml:58` gates the
+job on `github.event.pull_request.draft == false`, and the PR was draft. A skipped gate is not a
+green gate — treating it as one is precisely the false-done this gate exists to stop.
+
+### Gate audit against the three documented `status:ready-merge` requirements
+
+| # | Requirement | Found | Verdict |
+| - | --- | --- | --- |
+| 1 | `[PHASE: IMPL-EVAL] [VERDICT: PASS]` phase comment **from the evaluator** | **0 such comments** | DEFECT |
+| 2 | Every PR-body Definition-of-Done box checked | **0 DoD boxes existed** | DEFECT |
+| 3 | Every close-gated issue box checked with linked evidence | 7 boxes, **0 checked**, no evidence block | DEFECT |
+
+### Repairs — all metadata; the head never moved
+
+**Defect 1 — my omission, not the evaluator's.** My IMPL-EVAL brief never asked for the PR phase
+comment the close-gate requires. I could not write it myself without breaking generator/evaluator
+separation, and my own supervisor comment does not qualify. I had also already removed the evaluator
+worktree during hygiene — cleanup before the evaluator's obligations were discharged. Recreated the
+worktree at `30df7b9ff` and **resumed the same evaluator session** `4336958e` to publish the verdict
+it had already reached, explicitly barred from re-running gates, revising the artifact, or changing
+the verdict. It posted one comment opening with the exact marker and covering the evaluated head,
+four-way head equality, `PASS_IMPL`, the adversarial matrix, the F4 confirmation, both informational
+findings, and its re-executed gate table. Follow-up session `59335f05`, `state: done`, 44,733 tokens.
+
+**Defect 2.** Added a 12-box Definition of Done to the PR body, every box checked and each mapping to
+executed evidence.
+
+**Defect 3.** Added one fenced `acceptance-evidence` block mapping all seven issue boxes. Used
+`box-index` rather than exact text for every entry: box 4 and 6 carry em dashes and an ellipsis, and
+the matcher's evidence split is last-em-dash based, so index matching removes an entire class of
+mapping failure. Verified `index` is 1-based over close-gated boxes only
+(`acceptance-evidence.ts:53-76`) and that #1709's seven boxes all sit under `## Acceptance`, so
+indices map directly. Evidence strings deliberately avoid the `pending|todo|tbd|will run|after
+merge|not yet` prefixes that `evidenceAssertsNotYetDone` rejects.
+
+**Bounded accuracy repair.** The issue's "Accepted design" still described **two** fmt completion
+forms — it predated the owner-accepted F4 amendment. Since box 4 asserts the adapters are pinned,
+leaving it would have mirrored an inaccurate acceptance. Rewrote that paragraph to state all three
+forms, the second-integer rule, the write-only scoping, and why F4 exists. Asserted the anchor
+matched exactly once and that the checkbox count was unchanged (7 → 7) before writing.
+
+### The dry-run trap, avoided
+
+The first mirror dry-run returned **`Mirror skipped because live PR labels do not include
+status:ready-merge`** — it validated nothing. The playbook calls the dry-run a complete pre-flight,
+but its label guard makes that true only once the label is applied. Ordering used instead:
+
+1. Swap `status:impl-eval` → `status:ready-merge` **while still draft** (close-gate cannot run, so no
+   issue mutation is possible yet). Verified exactly one `status:` label remains.
+2. Local `--dry-run` with the label live → `ok: true`, `changed: [1709]`, zero errors. Because an
+   unchecked box with no matching entry is a hard error, this proves all seven resolve.
+3. Re-ran the dry-run after the issue-body edit; still clean against the new `bodySha256`.
+4. `gh pr ready` last, so the `ready_for_review` run reads both the live label and non-draft state.
+
+No push was made at any point — a push would move the head and invalidate the IMPL-EVAL verdict.
+Head remained `30df7b9ff8e3370a7420e5da1c46476253c05b0d` across every body, label, and draft change,
+verified after each.
