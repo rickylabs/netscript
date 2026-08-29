@@ -175,3 +175,27 @@ explicitly directed; it does not leave the superseded envelope as the current pl
 - **Scope/stop result:** Exactly five run artifacts are amended; `supervisor.md`, all seven product
   paths, and `deno.lock` remain untouched. There is no cycle 3 or third evaluator. The generator
   stops before fresh focused Tier-A and does not self-certify or implement.
+
+## 2026-08-29 — D17 source spelling adjusted to preserve doc-lint
+
+- **What:** The planned public declaration `SqlResultSet['columnTypes']` made the full export-map
+  `deno doc --lint` gate fail `private-type-ref` because `SqlResultSet` is imported from
+  `@prisma/driver-adapter-utils` but is not part of this package's public root.
+- **Measured evidence:** The structured actual-example check with a real Prisma 7.8 client passed
+  after D17, but `deno task doc:lint --root packages/prisma-adapter-mysql --pretty` reported one
+  `private-type-ref` at the public `PrismaMySqlResultSet.columnTypes` declaration.
+- **Resolution:** Spell Prisma 7's closed numeric `ColumnType` union inline on `columnTypes`. This
+  remains structurally assignable to Prisma's `SqlResultSet`, keeps the real-client check green, and
+  avoids re-exporting upstream types or inventing a new public alias.
+- **Boundary:** Type-only, within approved `src/adapter.ts`; runtime mapping is unchanged. This is
+  part of the temporary Prisma 7 correctness measure, not durable architecture.
+- **Severity:** minor implementation drift required by an already-selected gate.
+
+## 2026-08-29 — Public legacy-type deletion landed with its barrel update
+
+- **What:** Slice 1 changed `src/types.ts` but temporarily retained the stale legacy declarations so
+  its pushed commit remained independently type-checkable while `src/mod.ts` still re-exported them.
+- **Resolution:** Slice 2 removes the declarations and their root re-exports together. The final
+  seven-path result matches D9 and the census; no stale or broken intermediate public barrel is
+  committed.
+- **Severity:** minor sequencing drift; product scope and two-slice order are unchanged.

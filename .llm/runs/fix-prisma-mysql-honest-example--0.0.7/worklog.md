@@ -108,6 +108,10 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 | 2026-08-29 | slice 1   | Source contract | Added the source-only translator seam, exact structured-to-mysql2 characterization (including both legacy TLS branches), deprecated the misleading mode without runtime change, and asserted successful pool cleanup exactly once. Focused tests passed 38/38. |
 | 2026-08-29 | slice 1   | D17 wrapper choice | Dropped the optional scratch compatibility wrapper. The actual-example check exercises the same factory construction, Prisma client construction, query, and `finally` disconnect with the real generated client, and caught the identical D17 defect; retaining a second scratch program would duplicate evidence and add drift surface. |
 | 2026-08-29 | slice 1   | Scratch cleanup | Removed `examples/.generated` and all `.llm/tmp/prisma-example*` inputs after the green actual-file check and smoke. The ordinary package-root wrapper then selected 12 files with zero diagnostics; `deno.lock` remained unchanged. |
+| 2026-08-29 | slice 1   | Reconcile       | Pushed `69f4ab932`, confirmed PR #1711 remained draft at that head, read the existing evaluator/supervisor trail, and posted the slice evidence without changing labels, readiness, checkboxes, or issue state. A shell-quoting mistake transiently expanded Markdown backticks and produced a malformed comment; the same comment was rewritten in place as `issuecomment-5461874377` with the intended bounded evidence. |
+| 2026-08-29 | slice 2   | Coherent surface | Replaced stale driver/lifecycle claims across the module docs, README, site page, and executable example; removed dead Deno-driver types and their root re-exports. The example now performs a live Prisma query and disconnects in `finally`, with `main()` exclusively guarded by `import.meta.main`. |
+| 2026-08-29 | slice 2   | Generated-client proof | Regenerated the scratch Prisma 7.8 client after the final public-type shape, checked the actual example with 1 selected and 0 diagnostics, ran the guarded import-only smoke successfully, and removed all generated/scratch output. |
+| 2026-08-29 | slice 2   | Static/publish gates | Clean-root check selected 12/12; package tests passed 51/51; docs format/accuracy, full export-map doc lint, publish dry-run, and JSR audit exited 0. Final exact-head reruns remain required after commit. |
 
 ## Implementation Evidence
 
@@ -124,6 +128,22 @@ the same factory → generated Prisma client → query → `$disconnect()` order
 | Code quality / doctrine | `deno task quality:gate` exit 0; repository scan had no findings and doctrine reported only existing warnings. |
 
 This is generator-run evidence, not Tier-A review or self-certification.
+
+### Slice 2 — coherent published and executable story
+
+| Evidence | Result |
+| --- | --- |
+| Actual generated example | 1 selected, 0 diagnostics with real Prisma 7.8 output present. |
+| Guarded import-only smoke | Exit 0; `dynamic-import-smoke:ok`; no MySQL operation ran. |
+| Clean package shell | 12 selected, 0 diagnostics after generated/scratch cleanup. |
+| Package tests | 51 passed, 0 failed. |
+| Docs source / accuracy | `Docs source format: OK`; docs accuracy PASS across 199 published pages. |
+| Full export-map docs | 1 entrypoint, 0 private-type/missing-doc diagnostics after the inline Prisma 7 column-type correction. |
+| Publish / JSR | Dry-run success with 8 intended files; JSR audit exit 0 with the known banner-only slow-type warning. |
+| Driver census | Every Correct/Delete row applied; only `adapter.ts:30` legacy debug namespace remains. |
+
+These working-tree results are slice evidence. Gates 1–15 are rerun after the slice commit so the
+final report refers to the exact final head.
 
 ## Decisions
 

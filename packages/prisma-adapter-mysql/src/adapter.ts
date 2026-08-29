@@ -487,8 +487,41 @@ export interface PrismaMySqlQuery {
 export interface PrismaMySqlResultSet {
   /** Column names in result order. */
   columnNames: string[];
-  /** Prisma column types in result order. */
-  columnTypes: SqlResultSet['columnTypes'];
+  /** Prisma 7 column types in result order. */
+  columnTypes: Array<
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 64
+    | 65
+    | 66
+    | 67
+    | 68
+    | 69
+    | 70
+    | 71
+    | 72
+    | 73
+    | 74
+    | 75
+    | 76
+    | 77
+    | 78
+    | 128
+  >;
   /** Result rows in column order. */
   rows: unknown[][];
   /** Last inserted ID when reported by MySQL. */

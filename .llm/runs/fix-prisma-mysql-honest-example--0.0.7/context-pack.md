@@ -7,7 +7,7 @@
 | Run ID          | `fix-prisma-mysql-honest-example--0.0.7`                         |
 | Branch          | `fix/prisma-mysql-honest-example`                                |
 | Base            | `cf648f1ff973d74c213bb125a6f5f5b9328e693b`                       |
-| Current phase   | `implementation` / slice 1 in progress                          |
+| Current phase   | `implementation` / slice 2 gates and handoff                    |
 | Archetype       | `2 — Integration` (doctrine verdict Keep)                        |
 | Scope overlays  | `docs`                                                           |
 | Product ceiling | Seven named paths; an eighth product path requires rescope       |
@@ -25,10 +25,10 @@ kept the shell green but unnecessarily erased the actual example's generated typ
 accepted the finding and authorized only the literal-dynamic-import correction. There is no cycle 3
 or third evaluator. The coordinator-amended plan still owns exactly seven paths.
 
-The census now contains 50 relevant occurrences/dispositions. It is the authority for the driver
-claim sweep; no hard-coded count may substitute for applying every `Correct`/`Delete` row. The added
-example is materially false: it calls the package a Deno MySQL adapter, comments out the entire
-Prisma flow, and substitutes a connected-adapter raw query plus manual disposal. The corrected flow
+The census contains 50 relevant occurrences/dispositions. It is the authority for the driver claim
+sweep; no hard-coded count may substitute for applying every `Correct`/`Delete` row. At base, the
+example called the package a Deno MySQL adapter, commented out the entire Prisma flow, and
+substituted a connected-adapter raw query plus manual disposal. The implemented flow
 uses literal dynamic `await import('./.generated/client.ts')` at module scope, passes the
 `PrismaMySql` factory, makes one Prisma query, and calls `$disconnect()` in `finally`. This is a
 temporary Prisma 7 correctness measure ahead of Prisma 8 and the Prisma-next database-layer rewrite,
@@ -110,8 +110,9 @@ change.
 - Scratch-generate a real Prisma 7.8 client, check the actual example under the scratch config,
   check the actual example against D17, then import the actual module with `main()`
   invocation exclusively guarded by `import.meta.main`.
-- Structural proof that the factory is accepted by real Prisma types after the in-envelope
-  `SqlResultSet['columnTypes']` declaration correction.
+- Structural proof that the factory is accepted by real Prisma types after the in-envelope Prisma 7
+  `ColumnType` union correction. Direct `SqlResultSet['columnTypes']` spelling was rejected by
+  full-export doc lint as a private upstream type reference.
 - Exact structured/default translation and legacy TLS characterization assertions through the
   source-only seam.
 - Successful `FakePoolClient.close()` invocation exactly once.
@@ -121,22 +122,16 @@ change.
 
 ## Files Changed This Phase
 
-Only harness artifacts are amended. Product paths remain untouched:
-
-- `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/research.md`
-- `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/plan.md`
-- `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/context-pack.md`
-- `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/worklog.md`
-- `.llm/runs/fix-prisma-mysql-honest-example--0.0.7/drift.md`
+Implementation is confined to the seven approved product paths plus the existing run artifacts.
+No eighth product path, config, schema fixture, generated output, scratch input, or lockfile survives.
 
 ## Next Steps
 
-1. Fresh focused Tier-A reviews the pushed owner-authorized amendment; this generator does not
-   self-certify it.
-2. Do not request or launch another PLAN-EVAL cycle or third evaluator.
-3. Await a separate implementation grant.
-4. Implement the two planned slices within the exact seven-path ceiling.
-5. Run all wrapper-sourced gates and mandatory independent IMPL-EVAL before readiness.
+1. Commit and explicitly push slice 2 within the exact seven-path ceiling.
+2. Run all fifteen gates at the exact final head and report their command results without
+   self-certification.
+3. Stop for fresh focused Tier-A and separate-session IMPL-EVAL; do not change draft readiness or
+   request another PLAN-EVAL.
 
 ## Drift and Debt
 
