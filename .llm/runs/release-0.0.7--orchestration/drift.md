@@ -1066,3 +1066,12 @@ implementation thread.
 - App-server process death after a completed agent turn is transport drift, not lost work. #1371's
   RED artifacts and thread identity survived and were resumed; recovery must check both rollout and
   filesystem evidence before relaunching a duplicate author.
+
+- **Generated freshness is a transitive envelope, not a first-hop gate.** #1711's docs/reference and
+  public-surface edits made the source agent-docs corpus, the embedded CLI bundle, the MCP export
+  corpus, and the final publish-assets mirror stale in sequence. A pristine base/head control proved
+  the remaining checked-in derivative set is exactly three generated TypeScript files. Future
+  in-corpus docs or export-surface leaves must run all four freshness checks before evaluation.
+- **A stale evaluator should be cancelled once head drift is proven.** Run `33275424854` could not
+  authorize #1711 after `bbaf70d64` advanced to `a727c7565`; cancelling it avoided further spend and
+  is a control-plane containment action, not a terminal IMPL-EVAL failure.

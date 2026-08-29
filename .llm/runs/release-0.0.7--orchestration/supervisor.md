@@ -1258,3 +1258,18 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   amendment IMPL-EVAL at `a727c7565` are terminal green.
 - The evaluator race is a control-plane failure, not an IMPL-EVAL failure verdict. It does not count
   toward the owner's two-failure escalation threshold.
+
+## 2026-08-29T21:36:06Z — S1 implementation complete; generated cascade ownership restored
+
+- Aspire S1 pushed its atomic 13.5 train commit `4e30264fa50d57f7570baf12af545411be9fbab3`
+  and its debt/evidence handoff `5b42e92e11250615b998d51a24a29d057162b30e`. The worktree and remote
+  agree and are clean. The same Fable 5/medium research session is performing Tier-A; no S2 dispatch
+  or runtime lease precedes S1 sign-off and the independent exact-head evaluator.
+- Stale #1711 evaluator run `33275424854` is terminal `cancelled`. The fixes supervisor proved from
+  a pristine control that this leaf owns exactly three remaining generated derivatives: CLI agent
+  docs, MCP export corpus, and the publish-assets mirror. It resumed the same canonical author thread
+  to regenerate, gate, commit, and explicitly push that cascade while PR #1711 remains draft with
+  `status:impl`.
+- #1371 remains healthy and CPU-active in the same recovered author thread. Its focused 69/69 proof,
+  root lint, and root format are green; the existing root check/test processes continue without a
+  duplicate launch. Docker and Aspire remain empty and no expensive-gate lease exists.

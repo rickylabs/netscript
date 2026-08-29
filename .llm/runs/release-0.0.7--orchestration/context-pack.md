@@ -1179,3 +1179,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
   verdict. Coordinator converted the PR to draft with `status:impl`; it is open and unmerged.
 - Required #1711 continuation: exact-head Tier-A/CI at `a727c7565`, then a new independent amendment
   IMPL-EVAL at that same SHA. No ready flip or merge before terminal PASS.
+
+## Resume checkpoint — 2026-08-29T21:36:06Z
+
+- Aspire S1 / PR #1727 is clean and remote-equal at `5b42e92e1`: RED parity
+  `95680776e`, atomic 13.5.3 train `4e30264fa`, then debt/evidence `5b42e92e1`. The same Fable
+  5/medium research session is now performing Tier-A. Do not dispatch S2, grant runtime, mark ready,
+  or evaluate until its exact-head sign-off.
+- #1371 remains on the same recovered Codex author thread at RED commit `099370709`; production
+  fail-fast is uncommitted while its existing structured root check/test runs complete. Focused
+  neighborhood 69/69 and root lint/fmt are green. Do not duplicate or interrupt those processes.
+- #1711 is draft / `status:impl` at `a727c7565`; stale evaluator `33275424854` is cancelled. The
+  canonical author is regenerating the proven three-file derivative cascade (CLI agent docs, MCP
+  export corpus, publish-assets mirror). After explicit push: fresh exact-head Tier-A/CI and a new
+  independent IMPL-EVAL are mandatory. This race/cancellation is not an IMPL-EVAL failure cycle.
+- Docker 0, Aspire 0, and no expensive/runtime lease.

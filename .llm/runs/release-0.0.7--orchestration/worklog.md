@@ -1978,3 +1978,21 @@
   replaced `status:impl-eval` with `status:impl`, and explicitly required exact-head gates plus a
   new independent amendment IMPL-EVAL at `a727c7565`. No stale receipt can authorize readiness.
 - Docker and Aspire remain empty; no runtime lease was taken.
+
+## 2026-08-29T21:36:06Z — shipping checkpoint: S1 three-commit head and exact derivative envelope
+
+- Aspire S1 is clean and explicitly pushed at `5b42e92e11250615b998d51a24a29d057162b30e` after the
+  RED parity commit, atomic 13.5.3 train commit, and preview-debt/evidence commit. Local parity is
+  `ok:true` with 0 fail / 20 deferred / 6 info / 1 skipped; scaffold-version and policy checks are
+  green. The Fable implementation supervisor independently spot-checked the train and now owns the
+  formal Tier-A handoff.
+- Cancelled stale #1711 OpenHands run `33275424854` after the branch moved away from its target.
+  The fixes supervisor reproduced the complete generator cascade on a pristine archive and found
+  exactly `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, and
+  `packages/mcp/src/publish-assets.generated.ts`. The canonical author was resumed on the same
+  thread with those three generated-only paths and four freshness checks; readiness and merge remain
+  prohibited until new exact-head Tier-A, CI, and IMPL-EVAL PASS.
+- #1371 focused neighborhood tests are 69/69, root lint/fmt are green, and the same root check/test
+  processes are still progressing. No runtime command or lease was used. Environment audit remains
+  Docker 0 / Aspire 0.

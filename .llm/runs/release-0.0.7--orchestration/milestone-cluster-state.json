@@ -26,7 +26,7 @@
       "independentLanesContinue": true
     },
     "latestCheckpoint": {
-      "at": "2026-08-29T21:30:00.000Z",
+      "at": "2026-08-29T21:36:06.000Z",
       "mainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
@@ -46,9 +46,9 @@
         1725,
         1726
       ],
-      "aspireS1": "pr1727_draft_red_first_head_95680776e_pin_commit_active_without_runtime_lease",
-      "issue1371": "red_first_commit_099370709_preserved_after_transport_recovery_implementation_active_without_runtime_lease",
-      "pr1711": "a727c7565_corpus_repaired_push_raced_prior_evaluator_coordinator_enforced_draft_status_impl_fresh_exact_head_eval_required"
+      "aspireS1": "pr1727_draft_three_commits_pushed_head_5b42e92e1_tier_a_active_without_runtime_lease",
+      "issue1371": "red_first_commit_099370709_preserved_after_transport_recovery_implementation_full_structured_test_active_without_runtime_lease",
+      "pr1711": "a727c7565_draft_status_impl_stale_evaluator_cancelled_same_author_regenerating_exact_three_file_derivative_cascade_before_fresh_exact_head_eval"
     }
   },
   "limits": {
