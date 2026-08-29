@@ -21,3 +21,13 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept owner-authorized lane ordering; leave the PR draft and do not self-certify.
 - **Evidence:** `supervisor.md` routes and owner brief.
+
+## 2026-08-30 — Colocated test crossed Fresh query folder cardinality
+
+- **What:** The first S2 test location made `src/application/query` the thirteenth immediate child.
+- **Source:** `deno task arch:check` during the S2 loop.
+- **Expected:** No new/deepened doctrine finding.
+- **Actual:** Fresh temporarily moved from 3 to 4 warnings with a new F-16 query-folder warning.
+- **Severity:** minor
+- **Action:** fix; moved the cross-cutting hydration behavior test to `packages/fresh/tests/`.
+- **Evidence:** Re-run returns Fresh `FAIL=0 WARN=3 INFO=1` with no query-folder finding.
