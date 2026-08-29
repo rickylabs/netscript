@@ -1024,3 +1024,22 @@ implementation thread.
   exact-13.5 structured MCP tool-surface smoke and a path-level stale-surface inventory. Static and
   documentation parity excludes enumerated historical/RFC/design evidence rather than rewriting it
   and falsifying provenance.
+
+## 2026-08-29 — final Aspire ratification and exact-head evaluator protection
+
+- **Generator drift caught before implementation:** three newly captured official deploy/destroy/
+  publish Markdown sources were absent from the checked-in surface manifest. A fresh coordinator run
+  regenerated 813 rows with zero unmatched paths; the same Fable session committed the three
+  archival rows at `e4898e6eb`. Filing and S1 dispatch began only after a second run was
+  byte-stable.
+- **No third PLAN-EVAL:** cycle 2's remaining findings were bounded consistency defects. Coordinator
+  ratified D-17 and the repaired 13-slice/three-canary program directly, preserving the owner's
+  reduced PLAN-EVAL policy while retaining independent executable checks.
+- **Verify-first produced a narrower defect:** #1371 did not reproduce missing endpoint injection or
+  background-key normalization drift. It did reproduce silent success for a declared nonexistent
+  dependency. The admitted correction fails at the emitted wiring boundary, where the fully
+  assembled resource maps and endpoint availability are knowable; it does not broaden into #1365 or
+  all resource types.
+- **A PASS receipt is head-bound:** #1711's `PASS_IMPL` at `cd69eb7cb` did not authorize merging
+  later amendment `bbaf70d64`. Fixes dispatched fresh exact-head IMPL-EVAL and kept close-gate red
+  until acceptance evidence catches up.

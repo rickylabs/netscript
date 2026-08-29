@@ -1211,3 +1211,26 @@ E2E pair at content SHA `cf648f1ff...` (workflow runs `33248726023`, `3324896117
 closing #1709. Internals must now proceed serially to verify-first #1371 against the published
 canary. Aspire 13.5 research is immutable at `d8caa507e` and in the single justified
 GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
+
+## 2026-08-29T21:12:29Z — Aspire ratified and implementation dispatch restored
+
+- The final ordinary Aspire PLAN-EVAL cycle returned `FAIL_PLAN`, and no third cycle was created.
+  The same native Claude Fable 5/medium research session repaired the bounded findings; coordinator
+  independently accepted D-17 and the 13-slice/three-canary architecture after exact contradiction,
+  table, format, generator, and remote-equality checks. A fresh generator run exposed three omitted
+  archival source rows; the same session reconciled the manifest to 813 rows / 0 unmatched and
+  pushed clean research head `e4898e6eb714234cabae0ed0290936a54847862a`.
+- The ratified program is now filed as epic #1712 with implementation slices #1713-#1724, 0.0.8
+  research slice #1725, and 0.0.8 credential/protocol follow-up #1726. The same Fable session is the
+  implementation supervisor and created isolated S1 worktree
+  `/home/codex/repos/netscript-aspire-13-5-s1` at clean main `3b32d1628`; GPT-5.6-SOL dispatch is
+  next. It has no runtime lease.
+- #1371 published-canary verification refuted missing injection and raw-key normalization drift but
+  proved silent success for an unresolved declared reference. Coordinator selected emitted fail-fast
+  at the background wiring boundary, admitted boxes 4+6 together, and the internals supervisor
+  created isolated leaf `/home/codex/repos/netscript-007-leaf-1371` for a GPT-5.6-SOL author. No
+  AppHost/runtime lease is required.
+- #1711 received `PASS_IMPL` at `cd69eb7cb`; the accepted A2 documentation advisory advanced the PR
+  to `bbaf70d6411fb794895af50b010a66cd475aeb7e`. The fixes supervisor correctly dispatched a fresh
+  exact-head IMPL-EVAL rather than merging on the stale receipt. PR readiness/close-gate remains
+  withheld until that exact-head verdict and issue/DoD evidence are green.

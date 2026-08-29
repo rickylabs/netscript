@@ -1922,3 +1922,22 @@
 - The internals lane is released to start verify-first #1371 against the published canary. Aspire
   13.5 research is clean/pushed at `d8caa507e`; its sole risk-selected opposite-family PLAN-EVAL is
   active before the epic/subissues are filed.
+
+## 2026-08-29T21:12:29Z — research converted into two code-shipping leaves
+
+- Ratified Aspire correction head `e4898e6eb714234cabae0ed0290936a54847862a` after executing the
+  manifest generator twice (813 rows, 0 unmatched, byte-idempotent), table check, Deno check/fmt,
+  remote equality, and contradiction sweeps. D-17 stands; no third PLAN-EVAL exists.
+- Filed epic #1712 and child issues #1713-#1726. Preserved the ratified 0.0.8 placement for S12 and
+  S6b. The same Fable 5/medium research session transitioned into implementation supervision and
+  created S1 branch `chore/aspire-13-5-s1-pin-bump` from exact main `3b32d1628`.
+- Reproduced #1371 on published `0.0.7-canary.1`: declared existing references inject correctly and
+  use raw hyphenated keys, while a declared missing service leaves the child running with no visible
+  failure. Chose a deterministic emitted configuration error before background registration and
+  admitted static RED-first service/plugin cases on branch
+  `fix/aspire-declared-reference-fail-fast`.
+- Reconciled #1711 IMPL-EVAL cycle-1 PASS at `cd69eb7cb`. Because the evaluator's useful A2 advisory
+  produced amendment `bbaf70d64`, fixes promoted the PR to `status:impl-eval` and dispatched a new
+  exact-head evaluator. The red close-gate is intentionally retained until the new verdict and
+  acceptance/DoD receipts are complete.
+- Environment rechecked: Docker 0, Aspire applications 0, no release/runtime lease.

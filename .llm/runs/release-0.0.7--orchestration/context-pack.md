@@ -1135,3 +1135,19 @@ continues concurrently because serial ordering is per orchestrator, not global.
   the MCP behavioral smoke contract, all static/generated/doc surfaces, archival exemptions, and S13
   for otherwise-unowned stale surfaces. Fresh GPT-5.6-SOL/high PLAN-EVAL is active on that exact
   head; no issue publication or implementation begins before its verdict.
+
+## Resume checkpoint — Aspire epic filed; S1/#1371 dispatched; #1711 exact-head re-evaluation
+
+- Aspire research is coordinator-ratified at clean/pushed
+  `e4898e6eb714234cabae0ed0290936a54847862a`. The final manifest is 813 rows / 0 unmatched and
+  idempotent. Epic #1712 and issues #1713-#1726 are live. The same Fable 5/medium session now
+  supervises implementation; S1 worktree/branch is `/home/codex/repos/netscript-aspire-13-5-s1` /
+  `chore/aspire-13-5-s1-pin-bump`. No runtime lease.
+- Internals returned #1371 with the original missing-injection claim refuted and a narrower real
+  defect: unresolved declared background service/plugin references silently no-op. Coordinator chose
+  emitted fail-fast and admitted the isolated leaf `/home/codex/repos/netscript-007-leaf-1371` /
+  `fix/aspire-declared-reference-fail-fast`; static gates only.
+- #1711 PASS_IMPL receipt covers `cd69eb7cb`, while advisory amendment `bbaf70d64` is now the PR
+  head. Fresh exact-head IMPL-EVAL is dispatched and close-gate remains red/pending by design. Do
+  not merge until the new exact-head verdict and issue/DoD checklist are green.
+- Current main stays `3b32d1628584749af4dd6e97fd331c24e84f0b9e`; Docker/AppHost counts are zero.

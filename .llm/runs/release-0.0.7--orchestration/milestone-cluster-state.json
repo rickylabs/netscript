@@ -24,6 +24,31 @@
       "planEvaluation": "risk-selected only for genuinely critical or complex topics; routine docs, mechanical, generated, and bounded gate/test work records PLAN-EVAL N/A with a concrete reason and retains Tier-A",
       "implementationEvaluation": "after two consecutive terminal failures on one leaf, stop and release the evaluator, keep the canonical author available, and surface the exact decision to the owner in the primary coordinator task; no third loop is inferred",
       "independentLanesContinue": true
+    },
+    "latestCheckpoint": {
+      "at": "2026-08-29T21:12:29.000Z",
+      "mainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
+      "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
+      "aspireEpic": 1712,
+      "aspireFiledIssues": [
+        1713,
+        1714,
+        1715,
+        1716,
+        1717,
+        1718,
+        1719,
+        1720,
+        1721,
+        1722,
+        1723,
+        1724,
+        1725,
+        1726
+      ],
+      "aspireS1": "dispatching_from_clean_main_without_runtime_lease",
+      "issue1371": "emitted_fail_fast_implementation_dispatching_without_runtime_lease",
+      "pr1711": "exact_head_bbaf70d64_impl_eval_dispatched_close_gate_withheld"
     }
   },
   "limits": {
@@ -4068,7 +4093,7 @@
     "aspireMcpHelpers": "six active helpers are owned by live Claude/Codex tool sessions and are not AppHost runtimes",
     "wslAvailableMemoryGiB": 10.0,
     "wslLoadAfterAuthorExit": "stable; no local runtime gate active",
-    "verifiedAt": "2026-08-29T11:09:30.000Z"
+    "verifiedAt": "2026-08-29T21:12:29.000Z"
   },
-  "updatedAt": "2026-08-29T11:09:30.000Z"
+  "updatedAt": "2026-08-29T21:12:29.000Z"
 }
