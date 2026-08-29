@@ -5816,3 +5816,67 @@ fresh one — the scope is "did the transcription land", the ruling session alre
 and generator ≠ evaluator still holds because the author is Codex.
 
 Queue unchanged: #1387 and #1730 queued behind #1466; #1664 parked at `20337441788b`.
+
+## 2026-08-30 — #1466 plan gate closed: cycle-2 `PASS`, implementation released
+
+| Step | Head | Result |
+| --- | --- | --- |
+| Plan repair | `7db3954bf` | docs-only (+217/−52 `plan.md`, +58 new `worklog.md`), **0** `packages/**` |
+| Tier-A on repair | `b648aa60d` | **PASS** — A-1…A-8 all present, 8 distinct `gateId`s |
+| PLAN-EVAL cycle 2 | `1df5ff3e4` | **`PASS`** — artifact-only (+46) |
+| Implementation | released to `01a04f84` | slice 1 only, stop at its Tier-A |
+
+The cycle-2 verdict checks each A-item against what it *required*, with file:line citations into the
+repaired plan, and closes: *"Implementation may begin at slice 1 under the contract as transcribed;
+IMPL-EVAL evaluates against this `plan.md`."* One non-blocking note — `plan.md:220-221` still lists a
+per-member dry-run in the prose gate list while `:242-244` correctly classifies it as supplemental —
+explicitly does not affect the named receipt set.
+
+### The baseline discrepancy was mine
+
+I asked the author to re-measure the assertion baselines rather than copy the evaluator's, and then
+checked its numbers. My first count disagreed — `grep -oE '\bas\s+…' | wc -l` gave **8** for
+`sdk/src/query/query-factory.ts` against the pinned **5**. Reproducing the *specified* scanner
+semantics (strip block comments, line comments and string literals; count `\bas\s+` excluding
+`as const`) every file matched exactly: 5 / 1 / 1 and 0, 0, 0.
+
+The error was mine: `grep -o` emits one match per occurrence and I counted before stripping. Recorded
+because it is precisely the failure this lane keeps catching in others — a number produced by a
+convenient command and reported as the contracted measurement. Independent of who erred, the
+baselines are now confirmed by two parties with the same semantics, so the assertion-budget gate will
+be neither vacuous nor permanently red.
+
+### Why the plan gate was worth three cycles
+
+The gate's net product is two executable guards that did not exist when the plan was written:
+
+- an **assertion-budget test** under the `test` catalog gate, because `scan-code-quality.ts:75`
+  matches only `as unknown as` / `as any` / `as never` — a plain `x as T` is caught by nothing, which
+  is exactly the form of #1293's `performIO(query as SqlQuery)`;
+- a **doc-JSON independence test** asserting no `@orpc`/`npm:` string appears in the emitted
+  declarations of the five named types, replacing a "declaration scan" that had no tool behind it.
+
+Both convert prose promises into things that can fail. Acceptance point 3 — "without casts or `any`" —
+is now half gated by `deno lint` and half by a committed test, rather than by a reviewer's attention.
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 | **active** — slice 1 implementation, serial slot held |
+| #1387 | queued; **technically dependent on #1466**, see below |
+| #1730 | queued (S-1 executable-guard gap) |
+| #1664 | parked, untouched at `20337441788b` |
+
+### #1387 is not merely queued behind #1466 — it depends on it
+
+Reading #1387 while the plan gate ran: its stated defect is that `AuthzRequest` is path-prefix-only
+and *"oRPC's `.meta()` is used **nowhere** in the codebase, so a procedure cannot declare the policy
+it requires"* — verified in its evidence block by `grep -rn '\.meta(' packages plugins --include=*.ts`
+returning no oRPC call.
+
+That is the exact seam #1466 is building. So #1387's policy declaration must extend
+`NetScriptProcedureMeta` — whose Stage 1b shape already carries `access.authentication` — rather than
+introduce a second metadata vocabulary. Inventing a parallel one would recreate #1387's own headline
+defect: *policy living in a second place that can drift from the contract*. Recorded on the issue so
+whoever picks it up inherits the constraint rather than rediscovering it.
