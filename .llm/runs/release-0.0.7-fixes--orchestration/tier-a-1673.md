@@ -48,3 +48,20 @@ Two supervisor background monitors were killed mid-flight. The Codex author sess
 under the app-server daemon, independent of the supervisor's shell — and continued to `c947b8fa4`.
 Verified by `codex-status` rather than assumed. The consequence that did matter: the queued gate-set
 note was never delivered, so it must be re-sent.
+
+## Monitoring constraint — 2026-08-30
+
+Three supervisor background monitors have now been killed mid-flight (`booauapa5`, `bm4xe9qgp`,
+`b368gfdo9`). The Codex author is unaffected — it runs under the app-server daemon, independent of the
+supervisor's shell — and remains `working` at `c947b8fa4`.
+
+Consequence: the supervisor cannot hold a long-lived wait, so monitoring is turn-driven rather than
+continuous, and the queued gate-set note has not been delivered. The supervisor has stopped
+re-spawning the waiter rather than repeatedly restarting work that keeps being reaped.
+
+**This costs nothing material.** The note asks for `check:mcp-export-corpus` and
+`check:publish-assets` on the final tree with the outcome recorded either way. If the author omits
+them, Tier-A catches it before IMPL-EVAL is dispatched, so the worst case is one bounded correction
+rather than a review cycle — which is the same outcome the note was buying. The red-before evidence,
+which was the part that had to be right at the moment it was produced, is already verified and
+committed at `c947b8fa4`.
