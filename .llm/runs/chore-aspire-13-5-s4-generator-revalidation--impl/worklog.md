@@ -92,6 +92,8 @@ decision remains open.
 | ---------- | ----- | --------------- | ----------------------------------------------------------------------------- |
 | 2026-08-30 | 1     | research/design | Re-baselined at `8b1e42f72`; member pages and S2 receipts reviewed.           |
 | 2026-08-30 | 1     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
+| 2026-08-30 | 2     | implementation  | Modern AppHost default tested; #1728 background-reference coverage confirmed. |
+| 2026-08-30 | 2     | push command    | `git push origin HEAD:refs/heads/chore/aspire-13-5-s4-generator-revalidation` |
 
 ## Decisions
 
@@ -110,7 +112,12 @@ decision remains open.
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until their owning slice lands.
+| Slice | Gate                                | Result       | Evidence                                                                                         |
+| ----- | ----------------------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
+| 1     | Run-artifact formatting             | PASS         | `deno fmt --check` on the seven run Markdown files                                               |
+| 2     | Config + background generator tests | PASS (18/18) | Structured test wrapper on `netscript_config_test.ts` and `generate-register-background_test.ts` |
+| 2     | `quality:scan`                      | PASS         | Repository scanner returned no findings; seven pre-existing allowances                           |
+| 2     | `arch:check`                        | PASS         | Exit 0; existing doctrine warnings only, no failures                                             |
 
 ## Handoff Notes
 
