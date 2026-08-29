@@ -1011,3 +1011,16 @@ implementation thread.
   selected Fable 5 medium as a standalone research orchestrator (an intentional override from the
   default Opus planning route) and expanded scope to MCP plus every canonical/derived static
   resource and doc. Product implementation waits for coordinator ratification of its issue graph.
+
+## 2026-08-29 — foundations publication and whole-ecosystem Aspire acceptance
+
+- **Publication is evidence, not a tag alone:** `v0.0.7-canary.1` is accepted only because OIDC
+  publish run `33248726023`, exact-version production E2E `33248961170`, and the
+  `release/canary-pair` commit status are all green at immutable content SHA `cf648f1ff...`.
+- **Merge ordering preserved:** #1710 merged as `3b32d1628` only after the green-pair status was
+  recorded, so the foundations canary membership remains attributable and cannot include the held
+  leaf accidentally.
+- **Aspire MCP alignment requires behavior:** the research correction at `d8caa507e` adds an
+  exact-13.5 structured MCP tool-surface smoke and a path-level stale-surface inventory. Static and
+  documentation parity excludes enumerated historical/RFC/design evidence rather than rewriting it
+  and falsifying provenance.

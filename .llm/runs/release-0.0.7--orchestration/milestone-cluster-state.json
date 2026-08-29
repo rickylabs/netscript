@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+  "currentMainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -68,7 +68,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "1709_close_gate_active_after_impl_eval_pass",
+        "state": "1371_canary_verification_dispatching_after_1709_merge",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -81,8 +81,8 @@
         "pid": 6174,
         "bridgeSessionId": "cse_01AdcKyNUD9Tk4qNbEBCfQfZ",
         "remoteControlUrl": "https://claude.ai/code/session_01AdcKyNUD9Tk4qNbEBCfQfZ",
-        "topicHeadSha": "767479fbc78bfe87112b2021f01c51889e557559",
-        "queueState": "1709_impl_eval_pass_exact_head_close_gate_active; reintake_1371_queued_after_foundations_canary",
+        "topicHeadSha": "7ce1516f7222acfa193a72b2ae11b3c1997d3a8b",
+        "queueState": "1709_merged_at_3b32d1628; reintake_1371_foundations_canary_verification_dispatching",
         "attachmentVerifiedAt": "2026-08-28T10:22:00.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
@@ -595,7 +595,7 @@
     },
     {
       "number": 1709,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 979,
@@ -654,7 +654,7 @@
     {
       "id": "lint-partial-exclusion-fail-closed",
       "lane": "internals",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
       "currentPrHeadSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
@@ -715,10 +715,14 @@
       "implementationEvaluationVerdict": "PASS_IMPL",
       "implementationEvaluatedHeadSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
       "implementationEvaluationTopicCheckpointSha": "767479fbc78bfe87112b2021f01c51889e557559",
-      "nextGate": "full exact-remote-head PR close/readiness gate; coordinator merges only after the foundations canary captures cf648f1ff",
+      "mergeCommitSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
+      "mergedAt": "2026-08-29T11:09:02.000Z",
+      "nextGate": "terminal; issue #1709 closed by merged PR #1710 after the foundations canary green-pair receipt",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1709",
-        "https://github.com/rickylabs/netscript/pull/1710"
+        "https://github.com/rickylabs/netscript/pull/1710",
+        "https://github.com/rickylabs/netscript/actions/runs/33248726023",
+        "https://github.com/rickylabs/netscript/actions/runs/33248961170"
       ]
     },
     {
@@ -3982,20 +3986,32 @@
     {
       "id": "checkpoint-foundations",
       "rationale": "Publish only after CI correctness and shared SDK/tooling foundations form a coherent, independently green main checkpoint.",
-      "state": "publishing",
+      "state": "complete",
       "contentSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+      "version": "0.0.7-canary.1",
+      "tag": "v0.0.7-canary.1",
+      "releaseCommitSha": "e2c51c6bfd658ae54296c61fe128265700778148",
+      "publicationWorkflowRunId": 33248726023,
+      "productionE2eWorkflowRunId": 33248961170,
+      "completedAt": "2026-08-29T11:08:29.000Z",
       "receiptRefs": [
         "/home/codex/repos/netscript-main/.llm/tmp/gate-receipts/canary-0.0.7-foundations/check.json",
         "/home/codex/repos/netscript-main/.llm/tmp/gate-receipts/canary-0.0.7-foundations/test.json",
         "/home/codex/repos/netscript-main/.llm/tmp/gate-receipts/canary-0.0.7-foundations/quality-gate.json",
-        "coordinator terminal: release:preflight and publish:readiness PASS at cf648f1ff"
+        "coordinator terminal: release:preflight and publish:readiness PASS at cf648f1ff",
+        "https://github.com/rickylabs/netscript/actions/runs/33248726023",
+        "https://github.com/rickylabs/netscript/actions/runs/33248961170",
+        "commit status release/canary-pair: success on cf648f1ff"
       ],
       "localEvidence": [
         "structured check PASS",
         "structured test PASS: 4222 passed, 0 failed, 19 ignored",
         "quality:gate PASS",
         "release:preflight PASS",
-        "publish:readiness PASS"
+        "publish:readiness PASS",
+        "OIDC publish PASS for 0.0.7-canary.1",
+        "published-CLI full scaffold runtime E2E PASS",
+        "published-CLI quickstart walk seven-verdict E2E PASS"
       ]
     },
     {
@@ -4015,7 +4031,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+    "gitHead": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -4049,10 +4065,10 @@
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
     "dockerCleanup": "removed one unused aspire network and nine unlinked zero-byte volumes; retained images as useful test cache",
-    "aspireMcpHelpers": "eight active helpers are owned by live Claude/Codex tool sessions and are not AppHost runtimes",
-    "wslAvailableMemoryGiB": 8.2,
-    "wslLoadAfterAuthorExit": "3.04 5.00 8.06",
-    "verifiedAt": "2026-08-29T10:35:00.000Z"
+    "aspireMcpHelpers": "six active helpers are owned by live Claude/Codex tool sessions and are not AppHost runtimes",
+    "wslAvailableMemoryGiB": 10.0,
+    "wslLoadAfterAuthorExit": "stable; no local runtime gate active",
+    "verifiedAt": "2026-08-29T11:09:30.000Z"
   },
-  "updatedAt": "2026-08-29T10:35:00.000Z"
+  "updatedAt": "2026-08-29T11:09:30.000Z"
 }

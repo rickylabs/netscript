@@ -1202,3 +1202,12 @@ has no product/release authority. It runs native Claude Fable 5/medium with acti
 `https://claude.ai/code/session_011Ng6hnMLyY8vzM8EJo2XKg`, worktree
 `/home/codex/repos/netscript-007-aspire-13-5-research`, branch `research/aspire-13.5-0.0.7`. Its
 issue drafts require coordinator ratification before admission.
+
+## 2026-08-29T11:09:30Z — first canary green; internals merge hold released
+
+Foundations canary `0.0.7-canary.1` completed the production OIDC publish and exact artifact-pinned
+E2E pair at content SHA `cf648f1ff...` (workflow runs `33248726023`, `33248961170`; status
+`release/canary-pair=success`). Coordinator then merged exact evaluated PR #1710 as `3b32d1628`,
+closing #1709. Internals must now proceed serially to verify-first #1371 against the published
+canary. Aspire 13.5 research is immutable at `d8caa507e` and in the single justified
+GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.

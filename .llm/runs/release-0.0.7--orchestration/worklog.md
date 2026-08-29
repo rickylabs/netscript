@@ -1906,3 +1906,19 @@
   `3c63f2f52`, under native Fable 5/medium Remote Control
   `https://claude.ai/code/session_011Ng6hnMLyY8vzM8EJo2XKg`. Scope includes TypeScript bridge, MCP,
   CI/E2E, telemetry, static/generated resources, skills/corpora, examples, and public docs.
+
+## 2026-08-29T11:09:30Z — foundations canary green pair recorded; #1709 merged
+
+- The foundations publication workflow `33248726023` completed `success` for immutable content SHA
+  `cf648f1ff973d74c213bb125a6f5f5b9328e693b`. It minted `0.0.7-canary.1`, produced release commit
+  `e2c51c6bfd658ae54296c61fe128265700778148` with `cf648f1ff...` as its sole parent, passed the
+  35-package OIDC production publish, and deleted its ephemeral branch.
+- Exact canary-pinned production E2E `33248961170` passed Aspire preflight, JSR propagation, the
+  full scaffold runtime, and all seven quickstart-walk verdicts. GitHub recorded
+  `release/canary-pair=success` on `cf648f1ff...`.
+- Only after the green pair, coordinator re-verified PR #1710 at exact evaluated head `30df7b9ff`,
+  with zero non-green checks and a clean merge state. Squash merge
+  `3b32d1628584749af4dd6e97fd331c24e84f0b9e` closed #1709 at 2026-08-29T11:09:03Z.
+- The internals lane is released to start verify-first #1371 against the published canary. Aspire
+  13.5 research is clean/pushed at `d8caa507e`; its sole risk-selected opposite-family PLAN-EVAL is
+  active before the epic/subissues are filed.

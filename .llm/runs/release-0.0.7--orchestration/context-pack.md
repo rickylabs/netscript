@@ -1122,3 +1122,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Separate Aspire 13.5 research: `/home/codex/repos/netscript-007-aspire-13-5-research`, branch
   `research/aspire-13.5-0.0.7`, Fable 5 medium, Remote Control `session_011Ng6hnMLyY8vzM8EJo2XKg`.
   It drafts issues only; coordinator ratifies/publishes them.
+
+## Resume checkpoint — foundations canary green and first held merge released
+
+- `0.0.7-canary.1` is published from immutable content SHA `cf648f1ff...`; release workflow
+  `33248726023` and exact-version production E2E `33248961170` both passed. The release commit is
+  `e2c51c6bfd658ae54296c61fe128265700778148`, and `release/canary-pair` is green on the content SHA.
+- PR #1710 then merged as `3b32d1628584749af4dd6e97fd331c24e84f0b9e`, closing #1709. Current remote
+  main is that merge SHA. Internals resumes serially with verify-first #1371 against the published
+  canary; do not presume a product defect before the observation reproduces it.
+- Aspire 13.5 whole-ecosystem research is clean and explicitly pushed at `d8caa507e`. It includes
+  the MCP behavioral smoke contract, all static/generated/doc surfaces, archival exemptions, and S13
+  for otherwise-unowned stale surfaces. Fresh GPT-5.6-SOL/high PLAN-EVAL is active on that exact
+  head; no issue publication or implementation begins before its verdict.

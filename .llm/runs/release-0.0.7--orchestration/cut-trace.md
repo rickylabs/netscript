@@ -1,8 +1,8 @@
 # Cut trace — release 0.0.7
 
-Publication has not started. This trace will record canary membership from actual first-parent
-history, the exact canary-pinned production E2E, stable publication, and exact artifact-pinned
-production E2E.
+Canary publication is active. This trace records canary membership from actual first-parent history,
+the exact canary-pinned production E2E, and will later record stable publication and exact
+artifact-pinned production E2E.
 
 ## Pre-publication recovery trace — 2026-08-23T06:59:37Z
 
@@ -30,7 +30,17 @@ production E2E.
     specifiers, first-publish/provisioning, and import-attribute preflight;
   - quality/architecture: PASS (`quality:gate`, 25.5 s); doctrine warnings remain advisory with zero
     failures.
-- Actual publication remains workflow-only through `release-canary.yml`. The workflow must record
-  the JSR attempt-budget check before minting, derive the immutable canary identity, publish via
-  OIDC, label the actual first-parent payload, and complete exact canary-pinned production E2E.
-- No pending leaf may merge until the workflow captures this content SHA.
+- `release-canary.yml` run
+  [33248726023](https://github.com/rickylabs/netscript/actions/runs/33248726023) completed `success`
+  at 2026-08-29T11:08:29Z. It checked the JSR attempt budget, minted `v0.0.7-canary.1`, created
+  release commit `e2c51c6bfd658ae54296c61fe128265700778148` with sole parent `cf648f1ff...`, passed
+  readiness/dry-run/preflight, and published the complete 35-package graph through the production
+  OIDC path.
+- Exact-version production E2E run
+  [33248961170](https://github.com/rickylabs/netscript/actions/runs/33248961170) completed `success`
+  against release commit `e2c51c6b...`: Aspire preflight, registry propagation, full scaffold
+  runtime, and the seven-verdict quickstart walk all passed; artifacts uploaded successfully.
+- Commit status `release/canary-pair` is `success` on content SHA `cf648f1ff...` with description
+  `Canary 0.0.7-canary.1 publish + pinned production E2E passed`. The ephemeral branch was removed.
+- The publication hold was therefore released. PR #1710 merged only afterward at main merge
+  `3b32d1628584749af4dd6e97fd331c24e84f0b9e`, preserving the canary's immutable membership.
