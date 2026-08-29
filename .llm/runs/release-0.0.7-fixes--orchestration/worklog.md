@@ -1870,3 +1870,16 @@ brief makes the regression test the deliverable: author a saga after `generate p
 regenerate, assert `doctor` goes red — and record the red-before output against unmodified `main`
 before touching product code. That discipline is the whole point here, since this issue exists because
 a green signal was trusted over reality.
+
+### #1673 dispatch confirmed
+
+Thread `01a04fd2-563e-7250-9173-f6befd6db8f2`, `gpt-5.6-sol` · high, cwd
+`/home/codex/repos/netscript-007-leaf-plugin-doctor`, state `working`. Branch
+`fix/plugin-doctor-registry-drift` off `main@13878a80a50c55b9662099fed64555f2310ae4a3`; upstream
+unset and `--expect-base` matched, so no bare push can reach `main`. Attachment verified from
+`codex-status` rather than inferred from the launcher's exit code — an earlier resume on this queue
+returned exit 0 while the underlying dispatch had failed with a thread-store conflict.
+
+Queue state: **#1711 shipped** (`main@3561bb648`), **#1729 shipped** (`main@13878a80a`), **#1673 in
+implementation**, **#1737** open as the ADVISORY-2 follow-up, and one `[post-merge]` measurement wave
+owed against #1672/#1674/#1675.
