@@ -6,7 +6,8 @@
  * Prerequisites:
  * 1. A running MySQL server
  * 2. A Prisma schema configured for MySQL
- * 3. A Prisma client generated to `examples/.generated/client.ts`
+ * 3. A Prisma client generator using `provider = "prisma-client"`, `runtime = "deno"`, and an
+ *    `output` pointing to this package's `examples/.generated` directory, producing `client.ts`
  * 4. `@prisma/client` resolvable through your import map or an `npm:` specifier
  *
  * @example
