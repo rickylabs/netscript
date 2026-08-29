@@ -22,9 +22,19 @@ export interface MySqlConnectionConfig {
   timeout?: number;
   /** TLS configuration */
   tls?: {
-    /** TLS verification mode. */
+    /**
+     * Legacy TLS selector.
+     *
+     * `verify_identity` is deprecated because its name does not match its behavior. Without
+     * non-empty `caCerts`, `ssl` is left unset and the connection is plaintext. With non-empty
+     * `caCerts`, only the joined `ssl.ca` value is forwarded; mysql2 hostname identity verification
+     * is not enabled. Runtime behavior is unchanged for compatibility.
+     *
+     * @deprecated Do not select `verify_identity`; changing or removing its legacy behavior requires
+     * a separately scoped breaking change.
+     */
     mode?: 'disabled' | 'verify_identity';
-    /** CA certificates used by TLS verification. */
+    /** CA certificates forwarded only for the deprecated `verify_identity` legacy branch. */
     caCerts?: string[];
   };
 }
@@ -50,85 +60,4 @@ export interface PrismaMySqlOptions {
 export interface MySqlCapabilities {
   /** Whether the server supports relation joins (MySQL 8.0.13+) */
   supportsRelationJoins: boolean;
-}
-
-/**
- * Result from execute() call - for INSERT/UPDATE/DELETE
- */
-export interface ExecuteResult {
-  /** Number of rows affected by the statement. */
-  affectedRows?: number;
-  /** Last inserted auto-increment ID, when MySQL reports one. */
-  lastInsertId?: number | bigint;
-}
-
-/**
- * Result from query() call - for SELECT
- */
-export interface QueryResult<T = Record<string, unknown>> {
-  rows?: T[];
-  fields?: FieldInfo[];
-}
-
-/**
- * Field metadata from MySQL
- */
-export interface FieldInfo {
-  catalog: string;
-  schema: string;
-  table: string;
-  originTable: string;
-  name: string;
-  originName: string;
-  encoding: number;
-  fieldLen: number;
-  fieldType: number;
-  fieldFlag: number;
-  decimals: number;
-  defaultVal: string;
-}
-
-/**
- * deno_mysql Client interface
- */
-export interface DenoMySqlClient {
-  /** Connect using the provided MySQL configuration. */
-  connect(config: MySqlConnectionConfig): Promise<DenoMySqlClient>;
-  /** Execute a query and return row objects. */
-  query<T = Record<string, unknown>>(
-    sql: string,
-    params?: unknown[],
-  ): Promise<T[]>;
-  /** Execute a statement and return execution metadata. */
-  execute(
-    sql: string,
-    params?: unknown[],
-  ): Promise<ExecuteResult & { rows?: unknown[] }>;
-  /** Run a callback inside a driver-managed transaction. */
-  transaction<T>(
-    fn: (conn: DenoMySqlConnection) => Promise<T>,
-  ): Promise<T>;
-  /** Run a callback with a checked-out pooled connection. */
-  useConnection<T>(
-    fn: (conn: DenoMySqlConnection) => Promise<T>,
-  ): Promise<T>;
-  /** Close the client and release resources. */
-  close(): Promise<void>;
-}
-
-/**
- * Connection interface for transactions
- */
-export interface DenoMySqlConnection {
-  /** Execute a query on this connection and return row objects. */
-  query<T = Record<string, unknown>>(
-    sql: string,
-    params?: unknown[],
-  ): Promise<T[]>;
-  /** Execute a statement on this connection and return execution metadata. */
-  execute(
-    sql: string,
-    params?: unknown[],
-    iterator?: boolean,
-  ): Promise<ExecuteResult & { rows?: unknown[] }>;
 }
