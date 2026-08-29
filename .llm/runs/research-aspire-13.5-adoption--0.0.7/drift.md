@@ -83,3 +83,14 @@
 - Severity: minor (evidence)
 - Observation: the 13.4.6 server exposes `refresh_tools`, which the "verified tool set on 13.4.6"
   table in `skills/aspire/SKILL.md` omits. Not a 13.5 change; S-09's receipt-driven table fixes it.
+
+## D-11 — PLAN-EVAL cycle 1 FAIL_PLAN and bounded repair
+
+- Severity: plan-shaping
+- Verdict: `plan-eval.md` (head `d8caa507e`, evaluator Codex · Sol · high) — F1 health contract, F2
+  canary/stable admission, F3 MCP ownership/lifecycle, F4 parity phases, F5 wave completeness +
+  manifest, F6 jsr-audit, F7 rendering/staleness.
+- Action: all seven corrected in one research-only commit (mapping in `worklog.md`); decisions
+  D-5/D-6/D-10 revised, D-13/D-14 added, D-17 opened (dashboard-port assumption, resolve before
+  S-13); S6b (protocol-level readiness) deferred to 0.0.8; `aspire-surface-manifest.tsv` + generator
+  committed. No second evaluation cycle was launched.

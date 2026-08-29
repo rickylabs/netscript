@@ -34,7 +34,10 @@ with a generator test.
 
 ## Boundaries
 
-No emission-shape changes beyond #1371's fix; port/health/command changes belong to S5/S6/S8.
+No emission-shape changes beyond #1371's fix and the `AspireConfigSchema` default; port/health/
+command changes belong to S5/S6/S8. Because this slice **can** change emitted output (#1371 env
+injection, config default), it is **not** part of the pin-only canary A — it ships in the
+generated-output train covered by **canary B** (plan §canary).
 
 ## Acceptance
 

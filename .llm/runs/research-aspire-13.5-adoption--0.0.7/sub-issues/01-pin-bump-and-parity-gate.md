@@ -50,8 +50,10 @@ repo currently carries 13.4.6 in 14 places and 13.5.0-preview.1.26404.10 in one
 
 ## Acceptance
 
-- [ ] `rtk grep -rn '13\.4\.6' --exclude-dir=.git --exclude-dir=node_modules .` returns only
-      version-suffixed fixtures (`*-13.4.6-*`), changelog/history prose, and `.llm/` records.
+- [ ] Phase-1 scoped sweep is clean:
+      `git grep -n '13\.4\.6' -- packages/cli/src/kernel/constants/scaffold .github .openhands packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts`
+      returns nothing; the gate's `deferred` report lists exactly the S9/S11/S13 rows (skills, docs
+      snippets, generated corpora, telemetry example) and no other path.
 - [ ] `deno task check:aspire-version-parity` passes locally and in `ci.yml`.
 - [ ] `deno task check:scaffold-versions` passes (no prerelease in `SCAFFOLD_VERSIONS`).
 - [ ] `.github/scripts/aspire-nuget-cache-policy.test.ts` passes with the single 13.5.3 train.
@@ -78,4 +80,5 @@ preview lineage). Regression-check list: `existing-issue-map.md` §B.
 
 ## Canary
 
-This slice is the **canary A** pivot; cut `0.0.7-canary.<n>` once S1–S4 are on `main`.
+This slice is the **canary A** pivot (pin-only train: S1 + S2 + S3, no emitted-output change); cut
+`0.0.7-canary.<n>` once S1–S3 are on `main`.

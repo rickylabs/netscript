@@ -41,8 +41,15 @@ No health-check registration (S6) and no resource commands (S8). Do not touch `_
 ## Tests / gates
 
 Plugin unit tests; `scaffold.runtime`; `scaffold.plugins`; scoped wrappers; `quality:scan`
-(hard-coded plugin-name/host-side coupling check); `arch:check`; `jsr-audit` skill if any plugin
-public surface changes.
+(hard-coded plugin-name/host-side coupling check); `arch:check`; **jsr-audit gates (mandatory, from
+`research.md` §15):** `deno publish --dry-run` for `plugins/sagas` and, if the union gains a
+variant, `packages/plugin-sagas-core`; `deno doc --lint plugins/sagas/mod.ts` must not add errors
+beyond the pre-existing `private-type-ref` on `sagasPlugin` (#1708); consumer-import gate
+(`deps:prod-install` of `@netscript/plugin-sagas@canary` +
+`import { SagaPublisherResult } from
+'@netscript/plugin-sagas/runtime'` type-checks); consumer
+migration note for `plugins/workers/src/cli/official-sample-configuration.ts` and the CLI tests that
+pin the 8092 default.
 
 ## Docs / static asset regeneration
 

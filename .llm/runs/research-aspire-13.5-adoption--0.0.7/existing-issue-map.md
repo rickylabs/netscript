@@ -82,7 +82,9 @@ is version-sensitive and is re-run by the verification slice; **related-only** �
 - Epics are `type:umbrella` + `epic:<slug>` + title `Epic:`; no `type:epic` label exists.
 - No `epic:` slug for Aspire exists — filing needs a new `epic:aspire-13-5` label (add to
   `.github/labels.yml` first, parity PR per seed-run stage H).
-- Milestones: `0.0.7` (#27, 46 open issues), `0.0.8` (#25), `0.0.9` (#24), `Backlog / Triage` (#3).
+- Milestones: `0.0.7` (#27; 46 open non-PR issues on 2026-08-29 per
+  `gh api …/issues?milestone=27&state=open` — advisory, the live board wins), `0.0.8` (#25), `0.0.9`
+  (#24), `Backlog / Triage` (#3).
 - `status:` values available: `triage`, `research`, `plan`, `plan-eval`, `impl`, `impl-eval`,
   `review`, `in-review`, `ready-merge`, `blocked`, `ci-fail`, `shipped`, `in-progress`,
   `augment-review`.

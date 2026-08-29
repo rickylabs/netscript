@@ -10,7 +10,7 @@ Re-read every Aspire-mentioning public page against 13.5 and shipped behaviour (
 version snippets, document the detached/non-TTY start state (#1642), and normalise ".NET Aspire" →
 "Aspire" (#1000).
 
-## Scope (inventory from research §10)
+## Scope (row source: `aspire-surface-manifest.tsv` classes `doc:aspire-dedicated`, `doc:public-page`, `doc:root`, `doc:site-infra`, `doc:diagram-source` — 113 rows at the plan head; regenerate with `tools/aspire-surface-manifest.ts` before starting)
 
 - `docs/site/explanation/aspire.md` (line 83 `aspire.config.json` snippet → 13.5.3 / Browsers
   preview), `docs/site/quickstart/aspire.md`, `docs/site/reference/aspire/index.md` (health checks,
@@ -35,7 +35,9 @@ doctrine changes.
 
 ## Acceptance
 
-- [ ] `check:aspire-version-parity` flipped from warn to fail for `docs/` paths and green.
+- [ ] Every `doc:*` manifest row is either edited in this PR or listed in the PR body with "no
+      change needed" and the grep that proves it; the parity gate's phase-1 `deferred` report shows
+      zero `doc:*` rows afterwards (S13 flips them to enforce).
 - [ ] `deno task doc:lint` green; `diagrams:check` green.
 - [ ] `Closes #1642`, `Closes #1000` in the PR body.
 - [ ] docs_audit log + docs_polish pass recorded per `doc-audit.md`.

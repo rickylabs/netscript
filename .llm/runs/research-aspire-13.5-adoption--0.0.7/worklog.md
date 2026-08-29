@@ -1,32 +1,40 @@
 # Worklog
 
-| Time       | Event                                                                                                            | Evidence        |
-| ---------- | ---------------------------------------------------------------------------------------------------------------- | --------------- |
-| 2026-08-29 | Coordinator activated the separate Aspire 13.5 research worktree at `cf648f1ff`; no product mutation authorized. | `supervisor.md` |
+| Time       | Event                                                                                                                                                                                                                                                                                                                            | Evidence                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 2026-08-29 | Coordinator activated the separate Aspire 13.5 research worktree at `cf648f1ff`; no product mutation authorized.                                                                                                                                                                                                                 | `supervisor.md`                                              |
+| 2026-08-29 | Orchestrator activated (Fable 5 medium, `session_011Ng6hnMLyY8vzM8EJo2XKg`). Read AGENTS.md, AGENTS-handoff.md, aspire + netscript-harness skills, activation/run-loop/lane-policy/seed-run, all run artifacts.                                                                                                                  | `supervisor.md`                                              |
+| 2026-08-29 | Upstream retrieval: aspire.dev serves Markdown at `<page>.md`; `?aspire-lang=typescript` is a no-op on the Markdown form. Retrieved What's New 13.5, GitHub release notes 13.5.0–13.5.3, 55 TS/CLI/MCP/agent pages, TS API reference index + `aspire.hosting`.                                                                   | `sources/README.md`                                          |
+| 2026-08-29 | Discovery agents: repo Aspire-surface audit (Explore) and GitHub sweep (362 open / 518 closed issues, 149 labels, 18 milestones). Orchestrator spot-checked every load-bearing path/line and re-verified 29 issue numbers with `gh issue view`.                                                                                  | `research.md` §4–§6, `existing-issue-map.md`                 |
+| 2026-08-29 | `research.md` written: capability matrix, breaking-change exposure, pin inventory, regeneration chain, upstream doc discrepancies, decisions.                                                                                                                                                                                    | `research.md`                                                |
+| 2026-08-29 | `plan.md` locked (decisions, owner forks, slices, DAG, canaries, rollback, risks). PLAN-EVAL required; route Codex · Sol · high. No implementation → no `## Design` checkpoint.                                                                                                                                                  | `plan.md`                                                    |
+| 2026-08-29 | Deliverables: `epic-draft.md`, `sub-issues/01…12`, `existing-issue-map.md`. Drafts only.                                                                                                                                                                                                                                         | run dir                                                      |
+| 2026-08-29 | Coordinator amendment (scope expansion + S-09 acceptance): `stale-surface-inventory.md`, MCP baseline via the session's Aspire MCP server (`doctor`, `list_apphosts`, tool discovery: CLI 13.4.6, 14 tools, `refresh_tools` present, `get_integration_docs` absent; no AppHost started), S-09 rewrite, new S-13, plan D-11/D-12. | `receipts/aspire-13.4.6-mcp-baseline.json`                   |
+| 2026-08-29 | PLAN-EVAL (Codex evaluator task, head `d8caa507e`) → **FAIL_PLAN** F1–F7.                                                                                                                                                                                                                                                        | `plan-eval.md` (commit `e3f61ab38`)                          |
+| 2026-08-29 | Repair pass on `e3f61ab38` (this orchestrator, research-only): F1–F7 corrections applied (mapping below); manifest generator + 809-row manifest committed; jsr-audit executed for the S-05 surface.                                                                                                                              | this table, `aspire-surface-manifest.tsv`, `research.md` §15 |
 
-| 2026-08-29 | Orchestrator activated (Fable 5 medium, session_011Ng6hnMLyY8vzM8EJo2XKg). Read
-AGENTS.md, AGENTS-handoff.md, aspire + netscript-harness skills,
-activation/run-loop/lane-policy/seed-run, all run artifacts. | `supervisor.md` | | 2026-08-29 |
-Upstream retrieval: aspire.dev serves Markdown at `<page>.md`; `?aspire-lang=typescript` is a no-op
-on the Markdown form (byte-identical). Retrieved What's New 13.5, GitHub release notes
-13.5.0–13.5.3, 55 TS/CLI/MCP/agent pages, TS API reference index + `aspire.hosting`. Saved under
-`sources/` (run dir) and `.llm/tmp/docs/` (ignored). | `sources/README.md` | | 2026-08-29 | Launched
-two read-only discovery agents: repo Aspire-surface audit (Explore) and GitHub issue/label/milestone
-sweep (general-purpose). Results pending. | this log | | 2026-08-29 | Discovery agents returned:
-repo Aspire-surface audit (Explore, 68 tool uses) and GitHub sweep (362 open / 518 closed issues,
-149 labels, 18 milestones). Orchestrator spot-checked every load-bearing path/line and re-verified
-29 issue numbers with `gh issue view`. | `research.md` §4-§6, `existing-issue-map.md` | | 2026-08-29
-| `research.md` written: 25-row capability matrix, 12-row breaking-change exposure, pin inventory,
-regeneration chain, 5 upstream doc discrepancies, 10 decisions for the plan. Key findings: no
-source-level breaking exposure; TS custom health checks + resource-command arguments are GA in 13.5;
-`CommunityToolkit.Aspire.Hosting.Deno` is projected into the TS API (contradicts standing scaffold
-assumption); Deno toolchain/hosting upstream is milestone 13.6, so `_aspire-compat.mts` stays. |
-`research.md` | | 2026-08-29 | `plan.md` locked (D-1…D-10, five owner forks OF-1…OF-5, 12 slices,
-DAG, two mandatory canaries, rollback boundaries, risk register). PLAN-EVAL selected: required
-(multi-PR wave); route Codex · Sol · high. No implementation in this run → no `## Design` checkpoint
-(research-only mandate). | `plan.md` | | 2026-08-29 | Deliverables written: `epic-draft.md`,
-`sub-issues/01…12`, `existing-issue-map.md`. All drafts carry "DRAFT TEXT ONLY — no GitHub
-mutation"; no issue, label, milestone, PR, or product file was created or modified. | run dir |
+## PLAN-EVAL F1–F7 → corrections (repair pass, 2026-08-29)
+
+| Finding                | Correction                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Where                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| F1 S6 contract         | Locked listener-readiness contract per engine (TCP connect / RESP `PING`, `node:net`, 2000 ms, no credentials, `HealthCheckResult` mapping, unreachable-listener fixture with `aspire wait` exit 18); credential readiness explicitly deferred to S6b (0.0.8); acceptance/rollback consistent.                                                                                                                                                                                                                     | `sub-issues/06`, plan D-5, research Q7, epic S6                                                                           |
+| F2 canary/stable       | Canary A = S1–S3 (pin-only); S4 moved to canary B; canary C (S9, S10, S11, S13) mandatory; stable admission = S13 + parity phase 2 + MCP receipt + canary C published-E2E pair + IMPL-EVAL; S13 rollback added.                                                                                                                                                                                                                                                                                                    | plan D-10, §DAG, §Canary, §Rollback; epic; `sub-issues/04`, `13`                                                          |
+| F3 MCP                 | `excludeFromMcp()` owned by S8 alone; S9 depends on S8; receipt requires named hidden + visible resources (no N/A); locked spawn cwd (project root), AppHost selection (`list_apphosts` + `select_apphost` by exact path), timeouts (30/10/30 s, 120 s total), stdin-close → SIGTERM → SIGKILL shutdown, redaction assertions, retention (gate receipt + redacted transcript 30 d + committed copy); exact 13.5.3 server/version + `get_integration_docs`/`refresh_tools` through the generated `.mcp.json` entry. | `sub-issues/08`, `09`; plan D-6; inventory §2                                                                             |
+| F4 parity phases       | Phase 1 (S1): fail on scaffold constants / `toolchain.env` / workflows / cache keys / policy test / `.openhands/setup.sh`, report `deferred` rows by owner; phase 2 (S13): fail on every non-archival manifest row; S1 acceptance grep scoped to phase-1 paths.                                                                                                                                                                                                                                                    | plan D-13, §Parity; `sub-issues/01`, `13`                                                                                 |
+| F5 complete wave       | S13 in slice table, DAG, ratification, rollback, canary C, stable admission, context/resume; reproducible sorted manifest `aspire-surface-manifest.tsv` (809 rows, 0 unmatched) from `tools/aspire-surface-manifest.ts` with documented `git grep` inclusion rules and one owner/disposition per row; S11 consumes the manifest's `doc:*` rows.                                                                                                                                                                    | plan, `aspire-surface-manifest.tsv`, `tools/`, `sub-issues/11`, research §12a                                             |
+| F6 jsr-audit           | Rubric executed now for the S5 surface: `deno publish --dry-run --allow-dirty` (plugins/sagas) → Success; `deno doc --lint plugins/sagas/mod.ts` → 1 pre-existing `private-type-ref` (#1708); export paths, consumers, migration, gates recorded. `packages/aspire` N/A.                                                                                                                                                                                                                                           | research §15; plan D-14; `sub-issues/05`                                                                                  |
+| F7 rendering/staleness | Inline pipes escaped in research C16/C17/C20–C22/C28 and inventory rows; worklog rebuilt as one table; context-pack/session record say 13 slices; milestone count timestamped and marked advisory.                                                                                                                                                                                                                                                                                                                 | `research.md`, `stale-surface-inventory.md`, this file, `context-pack.md`, `.llm/2026-08-29-…md`, `existing-issue-map.md` |
+
+## Validation (repair pass, executed 2026-08-29)
+
+| Command                                                                                                     | Result                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `deno run --allow-run=git --allow-write=<run-dir> <run-dir>/tools/aspire-surface-manifest.ts`               | `rows=809 unmatched=0`                                                                                   |
+| `deno check <run-dir>/tools/aspire-surface-manifest.ts`                                                     | OK                                                                                                       |
+| `cd plugins/sagas && deno publish --dry-run --allow-dirty`                                                  | `Success Dry run complete` (exit 0)                                                                      |
+| `deno doc --lint plugins/sagas/mod.ts`                                                                      | 1 error: `private-type-ref` `sagasPlugin: PluginManifest` (`src/public/mod.ts:91`) — pre-existing, #1708 |
+| `gh api 'repos/rickylabs/netscript/issues?milestone=27&state=open&per_page=100'` (non-PR count)             | 46                                                                                                       |
+| `deno fmt --check` on run-dir Markdown (excluding `sources/`) + table-shape check (`tools/check-tables.py`) | see final row                                                                                            |
 
 ## Design
 
@@ -36,17 +44,6 @@ files the epic and PLAN-EVAL passes.
 
 ## PLAN-EVAL
 
-Required (multi-PR wave, three architecture decisions, owner forks). Evaluator route per
-`lane-policy.md`: fresh native opposite-family session — Codex · GPT-5.6 Sol · high — reading
-`research.md`, `plan.md`, `existing-issue-map.md`, `epic-draft.md`, `sub-issues/`. Not launched by
-this orchestrator (coordinator owns dispatch). | 2026-08-29 | Coordinator amendment (scope
-expansion + S-09 acceptance correction). Repo-wide version-bound sweep (`rtk grep` pattern in
-research §12a) → `stale-surface-inventory.md` with 7 surface classes, authoritative-source
-vocabulary, per-path dispositions, and an explicit archival exemption list. |
-`stale-surface-inventory.md` | | 2026-08-29 | Executed cheap MCP baseline via the session's Aspire
-MCP server (`doctor`, `list_apphosts`, tool discovery): CLI 13.4.6, 14 tools, `refresh_tools`
-present, `get_integration_docs` absent. No AppHost started. |
-`receipts/aspire-13.4.6-mcp-baseline.json` | | 2026-08-29 | S-09 rewritten with the
-`agent.aspire-mcp-smoke` gate + JSON receipt schema tied to S-01/S-02; new S-13 stale-surface
-cleanup; plan D-11/D-12, DAG, rollback, archival section; epic pillar 7 + checklist; research
-C26–C31 + §12a; drift D-8…D-10. | run dir |
+Cycle 1: `FAIL_PLAN` (`plan-eval.md`, evaluator route Codex · GPT-5.6 Sol · high, head `d8caa507e`).
+Repair applied at the head recorded above; a second cycle requires owner authorization (the verdict
+authorizes none by itself).

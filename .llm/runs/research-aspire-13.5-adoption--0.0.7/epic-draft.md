@@ -68,24 +68,30 @@ breaking-change exposure — none at source level — pin inventory, regeneratio
       #1280) (p1)
 - [ ] S7 — Teardown/leak-check on 13.5: orphan cleanup, `stop --force`, descendant tracking (closes
       #1429) (p1)
-- [ ] S8 — Typed resource commands for db-cli-mode resources (closes #863 with S6) (p1)
+- [ ] S8 — Typed resource commands for db-cli-mode resources + sole owner of `excludeFromMcp()`
+      (closes #863 with S6) (p1)
 - [ ] S9 — Skills, corpora, and Aspire MCP alignment + exact-13.5 MCP smoke receipt (depends on S1,
       S2, #1675) (p1)
 - [ ] S10 — E2E gate upgrades: doctor receipt, `describe --follow` evidence, `stop --force` cleanup,
       resource-command gate class (p1)
 - [ ] S11 — Public docs + README refresh for Aspire 13.5 (closes #1642, #1000) (p2)
-- [ ] S13 — Stale version-bound surface cleanup + parity-gate archival exemption list (p2)
+- [ ] S13 — Stale version-bound surface cleanup + parity gate phase 2 over
+      `aspire-surface-manifest.tsv` (depends on S1, S9, S11) (p2)
 - [ ] S12 — 0.0.8 spikes: `addDenoApp` projection proof, `withPostgresMcp` opt-in, NetScript MCP as
       resource MCP server (0.0.8, p2)
 
 ## Sequencing and canaries
 
 ```text
-S1 → S2 → { S3, S4 → S5 → S6 → S8, S7, S9 } → S10 → S11 → S13 ;  S12 after canary B (0.0.8)
-canary A after S1–S4 (pin train)   ·   canary B after S5, S6, S8 (generated-output train)   ·   stable after S9–S11 + IMPL-EVAL
+S1 → S2 → { S3 | S4 → S5 → S6 → S8 → S10 | S7 | S9(needs S8) } → S11 → S13 ;  S12 + S6b (0.0.8) after canary B
+canary A (pin-only)          = S1, S2, S3
+canary B (generated output)  = S4, S5, S6, S7, S8
+canary C (agent/MCP/docs)    = S9, S10, S11, S13
+stable = S13 merged + parity phase 2 green + receipts/aspire-13.5-mcp-smoke.json + canary C green published-E2E pair + IMPL-EVAL PASS
 ```
 
-Canary B is mandatory: S5/S6/S8 change the resource graph every new project gets.
+All three canaries are mandatory: A isolates the pin, B covers every resource-graph change, C covers
+shipped agent output, templates, and the final parity enforcement.
 
 ## Relationships to existing issues
 
@@ -103,11 +109,13 @@ Canary B is mandatory: S5/S6/S8 change the resource graph every new project gets
 OF-1 skill naming (default: keep NetScript `aspire`, install upstream workflow skills beside it);
 OF-2 `Aspire.Hosting.Browsers` preview pin (default: pin `13.5.3-preview.1.26425.3` as accepted
 debt); OF-3 pull #979 into 0.0.7 (default: yes); OF-4 docs lane (default:
-`documentation_authoring`); OF-5 S12 milestone (default: 0.0.8).
+`documentation_authoring`); OF-5 S12 milestone (default: 0.0.8); D-17 dashboard-port assumption
+(resolve before S13).
 
 ## Definition of done
 
-- All S1–S11 and S13 merged to `main`; `receipts/aspire-13.5-mcp-smoke.json` committed and green;
-  canary A and canary B published and green on `e2e-cli-prod`; IMPL-EVAL PASS recorded;
+- All S1–S11 and S13 merged to `main`; canaries A, B, C published and green on `e2e-cli-prod`;
+  `check:aspire-version-parity --phase 2` green; `receipts/aspire-13.5-mcp-smoke.json` committed and
+  green; canary A and canary B published and green on `e2e-cli-prod`; IMPL-EVAL PASS recorded;
   `check:aspire-version-parity` green; no `13.4.6` literal remains outside version-suffixed fixtures
   and changelog prose; S12 filed in 0.0.8 with its restore proof attached.

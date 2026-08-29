@@ -6,9 +6,10 @@
   `/home/codex/repos/netscript-007-aspire-13-5-research`), baseline `cf648f1ff`. Orchestrator Fable
   5 medium, session `session_011Ng6hnMLyY8vzM8EJo2XKg`.
 - **All research deliverables are complete and pushed**: `research.md`, `plan.md`, `epic-draft.md`,
-  `sub-issues/01…13`, `existing-issue-map.md`, `stale-surface-inventory.md` (whole-ecosystem
-  surfaces + archival exemption list), `receipts/aspire-13.4.6-mcp-baseline.json`, `sources/`
-  (verbatim upstream Markdown), `drift.md` D-1…D-10, `worklog.md`.
+  `sub-issues/01…13` (13 slices, 0.0.7) + S12 (0.0.8), `existing-issue-map.md`,
+  `stale-surface-inventory.md`, **`aspire-surface-manifest.tsv`** (809 rows, generator
+  `tools/aspire-surface-manifest.ts`), `receipts/aspire-13.4.6-mcp-baseline.json`, `sources/`,
+  `drift.md` D-1…D-11, `worklog.md`, `plan-eval.md` (cycle 1 = FAIL_PLAN, repaired).
 - Nothing was created on GitHub; no product code, generated file, or static resource was touched.
 - Local Aspire CLI is still 13.4.6 (not upgraded); no AppHost was started.
 
@@ -26,10 +27,19 @@
   (OF-1).
 - Pins live in 14 places; `e2e-cli-prod` already on a 13.5 preview; new parity gate proposed (D-2).
 
+## Repair state (PLAN-EVAL cycle 1)
+
+F1–F7 corrected (mapping in `worklog.md`): listener-readiness health contract (D-5), three mandatory
+canaries + stable admission (D-10), S8 owns `excludeFromMcp()` and S9 proves it with a
+locked-lifecycle receipt (D-6), parity phases 1/2 over the manifest (D-13), S13 everywhere,
+jsr-audit recorded (D-14, research §15), tables/summaries repaired. A second PLAN-EVAL cycle needs
+owner authorization.
+
 ## Next for the coordinator
 
 1. Answer OF-1…OF-5 (defaults in `plan.md`).
-2. Dispatch PLAN-EVAL (Codex Sol high) on this branch.
+2. Authorize and dispatch PLAN-EVAL cycle 2 (Codex Sol high) on this branch.
 3. On PASS: add `epic:aspire-13-5` to `.github/labels.yml`, file epic + S1–S11 (0.0.7) + S12 (0.0.8)
    from the drafts, comment/relabel per `existing-issue-map.md`.
-4. Start S1 (mechanical) and S2 (runtime lease) immediately; cut canary A after S1–S4.
+4. Start S1 (mechanical) and S2 (runtime lease) immediately; cut canary A after S1–S3, canary B
+   after S4–S8, canary C after S9–S11 + S13; stable per D-10.
