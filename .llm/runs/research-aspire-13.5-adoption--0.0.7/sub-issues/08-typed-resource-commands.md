@@ -39,7 +39,8 @@ CLI and dashboard) — and S9's MCP smoke proves it.
 ## Boundaries
 
 No dashboard interaction prompts (`promptInputs`). No plugin contribution changes. DDX-1 (#411)
-vocabulary follows; not implemented here. S9 owns the MCP receipt that _proves_ the MCP-excluded set.
+vocabulary follows; not implemented here. S9 owns the MCP receipt that _proves_ the MCP-excluded
+set.
 
 ## Acceptance
 
