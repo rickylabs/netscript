@@ -136,6 +136,7 @@ export const TEMPLATE_KEYS = {
     'workspace/github/workflows/deploy-deno-deploy.yml.template',
   workspaceGitignore: 'workspace/gitignore.template',
   workspacePluginsMod: 'workspace/plugins/mod.ts.template',
+  agentGuidance: 'agent/guidance.md.template',
 } as const;
 
 export type TemplateKey = typeof TEMPLATE_KEYS[keyof typeof TEMPLATE_KEYS];
