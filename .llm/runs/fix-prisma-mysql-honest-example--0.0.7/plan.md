@@ -13,7 +13,7 @@
 | Scope overlays | `docs`                                                |
 | Issue          | `#1112`, milestone `0.0.7`                            |
 
-> **HARD PATH CEILING:** implementation may modify only these seven product paths:
+> **HARD PATH CEILING:** implementation may modify only these seven authored product paths:
 >
 > 1. `docs/site/reference/prisma-adapter-mysql/index.md`
 > 2. `packages/prisma-adapter-mysql/README.md`
@@ -23,8 +23,14 @@
 > 6. `packages/prisma-adapter-mysql/examples/basic-usage.ts`
 > 7. `packages/prisma-adapter-mysql/tests/connection_errors_test.ts`
 >
-> An eighth product path is a rescope. Stop and return to the topic coordinator; do not add another
+> An eighth authored product path is a rescope. Stop and return to the topic coordinator; do not add another
 > test, fixture, changelog, generated asset, config, lockfile, or tool path opportunistically.
+>
+> The coordinator-authorized generated cascade does not widen that authored ceiling. Regeneration
+> may update exactly `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+> `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, and
+> `packages/mcp/src/publish-assets.generated.ts`; these files must come only from their checked-in
+> generators. Any other generated or authored path remains a rescope.
 
 ## Archetype and doctrine verdict
 
@@ -87,7 +93,7 @@ cleanup without a live MySQL instance.
 
 ## Non-Scope
 
-- Any eighth product path, including the site `examples_test.ts`, a new package test, changelog,
+- Any eighth authored product path, including the site `examples_test.ts`, a new package test, changelog,
   schema fixture, config, lockfile, generated client, or validation tooling.
 - Re-exporting `toMysql2PoolOptions`, `PrismaMySqlAdapter`, or another testing seam from
   `src/mod.ts` or package-root `mod.ts`.
@@ -232,7 +238,12 @@ It must select one file with zero diagnostics. Next run the import-only smoke
 The smoke precondition is the example's `import.meta.main` guard: the `main()` invocation must
 remain exclusively inside that guard. Importing the module therefore executes its generated-client
 dynamic import without executing the query or contacting MySQL. Remove `.generated` and all scratch
-inputs, then repeat gate 1. Gate 15 proves no generated/eighth path or lock churn survives.
+inputs, then repeat gate 1. Gate 15 proves no unauthorized generated/eighth authored path or lock
+churn survives.
+
+An in-corpus documentation or public-export change must regenerate the complete checked-in cascade:
+`gen:agent-docs-prose`, `gen:assets-barrel`, `gen:mcp-export-corpus`, then `gen:publish-assets` last.
+The four corresponding freshness checks are gates 16–19.
 
 ## Gate Plan
 
@@ -252,7 +263,11 @@ inputs, then repeat gate 1. Gate 15 proves no generated/eighth path or lock chur
 | 12    | JSR audit                      | `.llm/tools/fitness/audit-jsr-package.ts --root packages/prisma-adapter-mysql --text`                                                                                                                                                                  | Exit 0; raw dry-run resolves any banner-count warning                                                                                                                                                                                                                                                                                                                                                        | Base exit 0 with one known banner false-positive.                                                                                                                                                                                           |
 | 13    | Driver falsehood census        | Focused `rg` across exactly seven paths, read against every `Correct`/`Delete` disposition in the research census                                                                                                                                      | Every `Correct`/`Delete` row is applied; the repeated census grep leaves only the explicitly allowlisted legacy `adapter.ts:30` debug namespace                                                                                                                                                                                                                                                              | New leaf-specific manual/content gate; no hard-coded occurrence count can mask an omitted row.                                                                                                                                              |
 | 14    | Internal seam boundary         | `deno doc`/export-map inspection plus source search                                                                                                                                                                                                    | Translator is importable from `src/adapter.ts` by the owned test but absent from both barrels and published root surface                                                                                                                                                                                                                                                                                     | New architecture/public-surface gate.                                                                                                                                                                                                       |
-| 15    | Git/lock/path truth            | Direct git status/diff against the immutable base                                                                                                                                                                                                      | No lock churn and no eighth product path; run artifacts current                                                                                                                                                                                                                                                                                                                                              | New leaf-specific handoff check.                                                                                                                                                                                                            |
+| 15    | Git/lock/path truth            | Direct git status/diff against the immutable base                                                                                                                                                                                                      | No lock churn or eighth authored product path; exactly the coordinator-authorized generated derivatives and current run artifacts accompany the seven authored paths                                                                                                                                                                                                                                       | New leaf-specific handoff check.                                                                                                                                                                                                            |
+| 16    | Agent-docs prose freshness     | `deno task check:agent-docs-prose`                                                                                                                                                                                                                     | Exit 0 with `fresh: true` and no stale paths                                                                                                                                                                                                                                                                                                                                                                  | Required because the edited site page is listed in `provenance.json`; omitted from the original plan and caught by CI.                                                                                                                     |
+| 17    | CLI assets-barrel freshness    | `deno task check:assets-barrel`                                                                                                                                                                                                                        | Exit 0; embedded agent-docs asset matches the regenerated prose corpus                                                                                                                                                                                                                                                                                                                                        | Base control was fresh; newly load-bearing generated consequence of the in-corpus page edit.                                                                                                                                               |
+| 18    | MCP export-corpus freshness    | `deno task check:mcp-export-corpus`                                                                                                                                                                                                                    | Exit 0; export-surface corpus matches the final public package surface                                                                                                                                                                                                                                                                                                                                        | Base control was fresh; required because this leaf changes the package's public export surface.                                                                                                                                             |
+| 19    | Publish-assets freshness       | `deno task check:publish-assets`                                                                                                                                                                                                                       | Exit 0 after the prose, CLI-assets, and export-corpus derivatives are current                                                                                                                                                                                                                                                                                                                                 | Base control was fresh; publish mirror runs last and must reflect the upstream corpus.                                                                                                                                                      |
 
 No live-backend runtime, Aspire, Docker, browser, `e2e:cli`, or release gate is planned. Gate 5's
 bounded import-only smoke executes module resolution without running the query or opening MySQL; the

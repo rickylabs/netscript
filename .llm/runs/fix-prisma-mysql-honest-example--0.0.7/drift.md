@@ -216,20 +216,25 @@ explicitly directed; it does not leave the superseded envelope as the current pl
 - **Boundary:** Evidence-neutral implementation-versus-plan drift only. No product behavior, product
   path, generated output, configuration, or lockfile changed as a result.
 
-## 2026-08-29 — Agent-docs corpus freshness gate omitted from the plan
+## 2026-08-29 — Full generated-derivative cascade omitted from the plan
 
-- **What:** The selected gate set omitted `deno task check:agent-docs-prose` even though this leaf
-  edits `docs/site/reference/prisma-adapter-mysql/index.md`, whose rendered page is listed in
-  `.llm/assets/agent-docs/provenance.json` and therefore ships in the checked-in agent-docs prose
-  corpus.
-- **Detection:** CI's `quality` job caught stale `prose.json.gz` and `provenance.json` only after
-  supervisor Tier-A and IMPL-EVAL cycle 1 had passed. This is a generated-cascade gate gap, not a
-  defect in the accepted seven-path product change.
-- **Resolution:** Ran `deno task gen:agent-docs-prose` rather than hand-editing generated output,
-  then `deno task check:agent-docs-prose` exited 0 with `fresh: true` and no stale paths. Only the two
-  tracked agent-docs assets were regenerated; the seven-path product ceiling is unchanged.
-- **Future gate:** Any leaf touching a documentation page listed in `provenance.json` must include
-  `deno task check:agent-docs-prose` in its gate set and regenerate the corpus when the check reports
-  staleness.
-- **Boundary:** Generated harness assets and run artifacts only; no product path or `deno.lock`
-  change.
+- **What:** The selected gate set omitted the full checked-in derivative cascade even though this
+  leaf edits both an in-corpus documentation page and the package's public export surface. The
+  required checks are `check:agent-docs-prose`, `check:assets-barrel`, `check:mcp-export-corpus`, and
+  `check:publish-assets`.
+- **Detection:** The original plan, supervisor Tier-A, and IMPL-EVAL cycle 1 all missed the cascade.
+  CI's `quality` job caught only the stale agent-docs prose first hop; independent coordinator
+  regeneration then proved the CLI agent-docs barrel, MCP export corpus, and publish-assets mirror
+  were also stale. All derivative checks were clean on the immutable-base control.
+- **Resolution:** Regenerated through checked-in tasks only: `gen:agent-docs-prose`,
+  `gen:assets-barrel`, `gen:mcp-export-corpus`, then `gen:publish-assets` last. The cascade changed
+  exactly `.llm/assets/agent-docs/prose.json.gz`, `.llm/assets/agent-docs/provenance.json`,
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, and
+  `packages/mcp/src/publish-assets.generated.ts`. All four checks exited 0 on the committed
+  derivative head.
+- **Future gate:** Any leaf touching a page listed in `provenance.json` or a public export surface
+  must carry all four checks and regenerate the complete cascade in dependency order when stale.
+- **Boundary:** These are generated consequences, not additional authored product paths. The seven
+  authored-path ceiling remains binding; no other package path and no `deno.lock` change is
+  authorized.

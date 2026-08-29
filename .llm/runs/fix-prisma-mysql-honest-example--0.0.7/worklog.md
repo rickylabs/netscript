@@ -142,19 +142,22 @@ This is generator-run evidence, not Tier-A review or self-certification.
 | Publish / JSR | Dry-run success with 8 intended files; JSR audit exit 0 with the known banner-only slow-type warning. |
 | Driver census | Every Correct/Delete row applied; only `adapter.ts:30` legacy debug namespace remains. |
 
-These working-tree results are slice evidence. Gates 1–15 are rerun after the slice commit so the
-final report refers to the exact final head.
+These working-tree results are slice evidence. The original gates 1–15 were rerun after the slice
+commit; CI later exposed the missing generated-derivative gates recorded below.
 
-### CI agent-docs corpus freshness follow-up
+### CI generated-derivative cascade follow-up
 
 | Evidence | Result |
 | --- | --- |
 | Corpus regeneration | `deno task gen:agent-docs-prose` exited 0 and regenerated only `.llm/assets/agent-docs/prose.json.gz` and `.llm/assets/agent-docs/provenance.json`. |
 | Corpus freshness | `deno task check:agent-docs-prose` exited 0 with `fresh: true` and no stale paths. |
+| CLI assets-barrel regeneration | The coordinator-provided `agent-docs.generated.ts` was reproduced byte-for-byte by `deno task gen:assets-barrel`; committed-head `check:assets-barrel` exited 0. |
+| MCP export corpus | `deno task gen:mcp-export-corpus` changed only `export-surface-corpus.generated.ts`; committed-head `check:mcp-export-corpus` exited 0. |
+| Publish-assets mirror | `deno task gen:publish-assets` ran last and changed only `publish-assets.generated.ts`; committed-head `check:publish-assets` exited 0. |
 
-CI exposed this omitted generated-cascade gate after IMPL-EVAL cycle 1 had passed. The source page is
-listed in `provenance.json`, so its checked-in corpus assets are part of the required consequence of
-the owned documentation edit.
+CI exposed only the stale agent-docs first hop after the original plan, supervisor Tier-A, and
+IMPL-EVAL cycle 1 had all passed. Independent coordinator reproduction then identified the full
+three-file derivative cascade. The seven authored-path ceiling remains unchanged.
 
 ## Decisions
 
@@ -184,7 +187,7 @@ the owned documentation edit.
 | PLAN-EVAL cycle 1 exposed an unresolved generated-client import and public result-type mismatch | significant plan defect       | yes                |
 | Tier-A exposed permanent post-cleanup `TS2307` hidden by the narrowed package gate              | significant plan defect       | yes                |
 | PLAN-EVAL cycle 2 exposed avoidable `any` from the non-literal import premise                   | significant plan defect       | yes                |
-| Plan gates omitted agent-docs corpus freshness for an in-corpus documentation page              | generated-cascade gate gap     | yes                |
+| Plan gates omitted the four-gate generated cascade for in-corpus docs/public exports             | generated-cascade gate gap     | yes                |
 
 ## Gate Results — immutable base
 
