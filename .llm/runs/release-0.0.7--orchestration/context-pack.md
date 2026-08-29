@@ -1209,3 +1209,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
   independent opposite-family IMPL-EVAL only if Tier-A passes.
 - #1371 is still active in the existing recovered author lane at RED `099370709`; no remote branch
   exists yet. Local environment remains Docker 0 / Aspire 0.
+
+## Resume checkpoint — consumer train active after canary.2
+
+- Main is `21d516224fe35e92957f0998ee848bbf2024eda0`: PR #1696 merged after fresh Fable 5
+  exact-head `PASS_IMPL` and CI success, closing #1694. This is user-facing AI request-context
+  payload and qualifies toward the next meaningful public canary.
+- `v0.0.7-canary.2` is already published and its pinned production E2E is green. Treat this as an
+  allowed already-started internals-heavy exception; do not cut another public canary until a
+  coherent feature/fix/package/runtime payload is merged.
+- PR #1711 is logically passed and CI-green at `067193acf` but conflicts with current main only in
+  shared generated assets after #1696. Fixes must complete a bounded refresh, authoritative
+  regeneration, focused/Tier-A proof, and cheap independent exact-head delta receipt before merge.
+- Orchestrator isolation is mandatory: features (#1466, then #1387) and fixes
+  (#1672/#1674/#1675, then #1673) advance independently. Docs, internals (#1728/#1371), and Aspire
+  continue concurrently and are never global barriers.

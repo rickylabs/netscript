@@ -1089,3 +1089,17 @@ implementation thread.
   converged on an unrelated generated Fresh/TanStack hydration type mismatch. Keep baseline drift
   separate from branch-owned S1 acceptance and retain the owner's release-cut/explicit-label policy
   for expensive non-critical lanes.
+
+## 2026-08-29 — public-canary trigger and lane-coupling correction
+
+- **Orchestrator seriality is local, not global.** A docs, internals, or Aspire gate cannot idle the
+  feature or fix queue. Each orchestrator preserves its own serial ownership while independent
+  orchestrators and their available evaluator slots advance concurrently.
+- **A public canary needs consumer payload.** Docs, harness, CI, research, and internals-only work
+  stays continuously integrated on main but does not independently justify a public version. The
+  already-running canary.2 was allowed to complete; future cuts require at least one merged
+  user-facing package/runtime feature or fix and a coherent checkpoint.
+- **Generated corpora are a merge resource.** Two independently green PRs can conflict when both
+  regenerate shared agent-doc/publish assets. Merge the first verified leaf, then refresh and
+  regenerate the second from the authoritative generator; use a cheap exact-head delta review when
+  the product semantics are unchanged instead of repeating broad plan evaluation.

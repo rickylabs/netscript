@@ -1294,3 +1294,20 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - #1371 continues in the preserved implementation thread at RED commit `099370709`; its production
   fail-fast and harness records remain the only dirty paths while exact-head review completes.
   Docker and Aspire application counts remain zero.
+
+## 2026-08-29T22:13:00Z — release-driving lanes separated; consumer feature merged
+
+- Feature and fix supervisors are independent release-driving queues. Docs, internals, and Aspire
+  continue in parallel but may neither hold those queues nor become a global canary gate. Serial
+  ordering applies within each orchestrator only.
+- PR #1696 passed fresh native Fable 5 IMPL-EVAL and exact-head CI, merged as
+  `21d516224fe35e92957f0998ee848bbf2024eda0`, and closed #1694. Features continues with #1466;
+  its inactive child transcript was identified for same-route recovery rather than allowing the
+  lane to idle. #1387 remains serially behind #1466.
+- `v0.0.7-canary.2` finished its already-started OIDC publication and pinned published-package E2E
+  green. It is a one-time internals-heavy cut; future public canaries require merged user-facing
+  feature/fix/package/runtime payload.
+- PR #1711 has fresh `PASS_IMPL` at `067193acf` and green CI run `33277584032`. The #1696 merge
+  created a shared generated-asset conflict, so fixes owns a bounded current-main refresh plus
+  authoritative regeneration and a cheap exact-head delta receipt while its grouped
+  #1672/#1674/#1675 implementation continues independently.

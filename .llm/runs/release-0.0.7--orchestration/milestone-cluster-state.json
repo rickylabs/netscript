@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
+  "currentMainSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -25,9 +25,15 @@
       "implementationEvaluation": "after two consecutive terminal failures on one leaf, stop and release the evaluator, keep the canonical author available, and surface the exact decision to the owner in the primary coordinator task; no third loop is inferred",
       "independentLanesContinue": true
     },
+    "canaryPublicationPolicy": {
+      "correctedAt": "2026-08-29T22:13:00.000Z",
+      "rule": "A public canary requires at least one merged user-facing package, runtime, feature, or fix payload. Docs, harness, CI, research, and internals-only batches continue on main under CI but neither trigger nor block publication.",
+      "laneIsolation": "feature and fix orchestrators are independent release-driving lanes; docs, internals, and Aspire run in parallel and are never global barriers",
+      "canary2Disposition": "allowed to finish because publication was already in progress; do not repeat an internals-only cut"
+    },
     "latestCheckpoint": {
-      "at": "2026-08-29T21:36:06.000Z",
-      "mainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
+      "at": "2026-08-29T22:13:00.000Z",
+      "mainSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
       "aspireFiledIssues": [
@@ -48,7 +54,10 @@
       ],
       "aspireS1": "pr1727_draft_remote_equal_head_68b0aef87_coordinator_tier_a_hold_for_two_fail_closed_parity_repairs_e2e_dispatch_exposed_unrelated_baseline_fresh_type_drift_without_local_runtime_lease",
       "issue1371": "red_first_commit_099370709_preserved_after_transport_recovery_implementation_full_structured_test_active_without_runtime_lease",
-      "pr1711": "067193acf_draft_status_impl_exact_three_file_derivative_cascade_and_harness_receipt_pushed_fresh_exact_head_tier_a_active_before_new_independent_impl_eval"
+      "pr1711": "067193acf_pass_impl_and_all_ci_green_but_shared_generated_assets_conflict_after_pr1696_merge_bounded_refresh_and_cheap_exact_head_delta_receipt_active",
+      "pr1696": "merged_as_21d516224_after_fresh_fable5_impl_eval_pass_and_exact_head_ci_green_issue1694_closed",
+      "canary2": "v0.0.7-canary.2_published_from_5bb112dd3_release_commit_2481b57d1_with_oidc_and_pinned_production_e2e_green",
+      "parallelLaneRule": "feature_and_fix_queues_ship_independently; docs_internals_aspire_never_hold_them"
     }
   },
   "limits": {
@@ -668,7 +677,9 @@
     },
     {
       "number": 1694,
-      "state": "open"
+      "state": "closed",
+      "closedAt": "2026-08-29T22:11:11.000Z",
+      "mergeCommitSha": "21d516224fe35e92957f0998ee848bbf2024eda0"
     },
     {
       "number": 1695,
@@ -676,6 +687,29 @@
     }
   ],
   "leaves": [
+    {
+      "id": "ai-request-application-context",
+      "lane": "features",
+      "phase": "merged",
+      "baseBranch": "main",
+      "headSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
+      "currentPrHeadSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
+      "issueNumbers": [1694],
+      "branch": "feat/ai-request-context",
+      "prNumber": 1696,
+      "implementationEvaluationState": "complete_cycle_1",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "414a52ba807683cbe87aa25ca07e344f16731b6d",
+      "evaluationArtifactHeadSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
+      "implementationEvaluatorSessionId": "321b426c-f617-477e-88c0-1f9b9cdb7c50",
+      "implementationEvaluatorBridgeSessionId": "cse_01UgH3wjzJmy8qB7rBdFHoLm",
+      "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1696#issuecomment-5465136681",
+      "ciWorkflowRunId": 33277553650,
+      "ciState": "success",
+      "mergeCommitSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
+      "mergedAt": "2026-08-29T22:11:10.000Z",
+      "nextGate": "terminal; issue #1694 closed by merged PR #1696"
+    },
     {
       "id": "lint-partial-exclusion-fail-closed",
       "lane": "internals",
@@ -753,10 +787,10 @@
     {
       "id": "prisma-mysql-honest-example",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
-      "headSha": "a727c7565534469fbdc285cda71e93c01014a0ca",
-      "currentPrHeadSha": "a727c7565534469fbdc285cda71e93c01014a0ca",
+      "headSha": "067193acff68254b4bd4c6e5d7824f80a9db2b26",
+      "currentPrHeadSha": "067193acff68254b4bd4c6e5d7824f80a9db2b26",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -764,7 +798,7 @@
       "prNumber": 1711,
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
-      "implementationState": "generated_corpus_repaired_coordinator_enforced_draft_fresh_exact_head_eval_required",
+      "implementationState": "cycle_2_pass_and_ci_green_but_shared_generated_assets_conflict_after_1696_merge_bounded_refresh_active",
       "planHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "c36eaf340db2bb6df18f1d7b2149af12e9b9fe1f",
@@ -828,6 +862,23 @@
         "artifactCommitSha": "06e38089123923baea3c3b67410a351b69049c72",
         "commentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5462050873"
       },
+      "implementationEvaluationCycle2": {
+        "state": "complete",
+        "verdict": "PASS_IMPL",
+        "evaluatedHeadSha": "067193acff68254b4bd4c6e5d7824f80a9db2b26",
+        "artifactCommitSha": "f5fd84254e20758d5e697156e67dabed8ad824ba",
+        "evaluatorSessionId": "3ba2ef08-ff69-4fe4-b60f-aeb64967a158",
+        "commentUrl": "https://github.com/rickylabs/netscript/pull/1711#issuecomment-5465128264",
+        "ciWorkflowRunId": 33277584032,
+        "ciState": "success_after_close_gate_failed_job_rerun"
+      },
+      "postMainAdvanceRefresh": {
+        "trigger": "PR #1696 merged first and changed the same generated agent-doc assets",
+        "mainSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
+        "state": "active",
+        "scope": "bounded base refresh plus authoritative regeneration of shared generated assets; preserve product semantics",
+        "evaluation": "cheap independent exact-head delta receipt only; no PLAN-EVAL and no repeat full evaluation unless the delta ceases to be mechanical"
+      },
       "postEvaluationAmendment": {
         "headSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
         "scope": "accepted A2 prerequisite wording in the published example",
@@ -846,7 +897,7 @@
         "coordinatorContainment": "PR converted to draft and status:impl at a727c7565; no merge occurred; new exact-head IMPL-EVAL required before readiness"
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "complete exact-head Tier-A and CI at a727c7565, then dispatch and await a new independent amendment IMPL-EVAL bound to a727c7565; run 33275424854 is stale and cannot authorize readiness",
+      "nextGate": "finish bounded current-main refresh, run focused gates and Tier-A, push, collect cheap exact-head delta receipt, restore ready-merge, pass close-gate/CI, and merge immediately",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -4064,8 +4115,30 @@
       ]
     },
     {
+      "id": "checkpoint-internal-tooling-canary-2",
+      "rationale": "Already-started publication containing #1707 and #1687 plus the previously merged fail-closed tooling change #1710; retained as a one-time completed exception after the owner corrected future public-canary policy.",
+      "state": "complete",
+      "contentSha": "5bb112dd35f94fc8435672e2cabff1f9a447aa0b",
+      "version": "0.0.7-canary.2",
+      "tag": "v0.0.7-canary.2",
+      "releaseCommitSha": "2481b57d1a8fb13f1b308642cda8c9a3611e5e05",
+      "publicationWorkflowRunId": 33277154875,
+      "productionE2eWorkflowRunId": 33277382147,
+      "completedAt": "2026-08-29T22:09:59.000Z",
+      "receiptRefs": [
+        "https://github.com/rickylabs/netscript/actions/runs/33277154875",
+        "https://github.com/rickylabs/netscript/actions/runs/33277382147",
+        "https://github.com/rickylabs/netscript/releases/tag/v0.0.7-canary.2"
+      ],
+      "localEvidence": [
+        "OIDC publication PASS",
+        "published-JSR CLI scaffold runtime E2E PASS",
+        "future internals-only public cuts prohibited by corrected coordinator policy"
+      ]
+    },
+    {
       "id": "checkpoint-consumer-tooling",
-      "rationale": "Publish after #1709/#1112 and the coherent re-intake wave-A consumer/tooling repairs land.",
+      "rationale": "Publish only after a coherent user-facing payload lands; current candidates include merged #1694, refreshed #1112, and subsequent feature/fix slices. Internal/docs/Aspire work cannot hold or independently trigger this checkpoint.",
       "state": "planned"
     },
     {
@@ -4119,5 +4192,5 @@
     "wslLoadAfterAuthorExit": "stable; no local runtime gate active",
     "verifiedAt": "2026-08-29T21:12:29.000Z"
   },
-  "updatedAt": "2026-08-29T21:36:06.000Z"
+  "updatedAt": "2026-08-29T22:13:00.000Z"
 }

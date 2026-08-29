@@ -2013,3 +2013,18 @@
   cascade record at `067193acf`. Fixes began fresh exact-head Tier-A in a tracked-only archive.
 - #1371 remains active without a duplicate implementation launch. Local Docker count is 0 and
   `aspire ps --format Json` returns `[]`.
+
+## 2026-08-29T22:13:00Z — canary.2 terminal green; #1696 merged; parallel train corrected
+
+- Verified release workflow `33277154875` and pinned production E2E `33277382147` both terminal
+  success for `v0.0.7-canary.2`; release commit is `2481b57d1a8fb13f1b308642cda8c9a3611e5e05`.
+- Verified PR #1696 exact-head CI run `33277553650` terminal success, squash-merged it, fast-forwarded
+  main to `21d516224fe35e92957f0998ee848bbf2024eda0`, and verified issue #1694 closed.
+- Verified PR #1711 IMPL-EVAL cycle 2 PASS at `067193acff68254b4bd4c6e5d7824f80a9db2b26`
+  and the failed-only close-gate rerun green. The PR became conflicting only after #1696 changed the
+  same generated corpora. Directed the fixes supervisor to refresh from current main, regenerate
+  authoritative derivatives, run focused/Tier-A gates, push, and obtain a cheap exact-head delta
+  receipt without stopping the active grouped fixes leaf.
+- Corrected release policy: docs/internals/Aspire advance in parallel and cannot block feature or
+  fix queues; public canaries are now triggered only by coherent consumer-facing payload. #1466
+  and #1672/#1674/#1675 remain concurrent active product trains.
