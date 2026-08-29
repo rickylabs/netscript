@@ -1,0 +1,5 @@
+command: aspire doctor --format Json --non-interactive --nologo
+started: 2026-08-30T00:53:22+02:00
+completed: 2026-08-30T00:53:28+02:00
+elapsed_ms: 5849
+exit_code: 0

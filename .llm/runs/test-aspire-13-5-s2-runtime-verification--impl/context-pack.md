@@ -15,8 +15,9 @@
 The assigned worktree began clean at `21d516224`. Slice 1 generated the owned PostgreSQL project,
 applied S1's exact train only there, restored Aspire 13.5.3, and proved the generated AppHost
 compiles. Slice 2 completed two isolated starts, V1–V7 inspection, exact-path force cleanup, and
-launcher-orphan cleanup. The live evidence includes real 13.5 divergences rather than repaired or
-suppressed outcomes.
+launcher-orphan cleanup. Slice 3 completed MCP, Toolkit Deno projection, doctor, deploy-help, and
+bounded closed-issue regression probes. The live evidence includes real 13.5 divergences rather than
+repaired or suppressed outcomes.
 
 ## Completed
 
@@ -26,16 +27,18 @@ suppressed outcomes.
 - Slice 1 scaffold/restore/module/compile receipts.
 - Draft PR #1735 with commit-1 evidence trail.
 - V1–V7 runtime, proxyless endpoint, telemetry, shape, force-stop, and orphan receipts.
+- V8–V12 MCP/toolkit/doctor/deploy/regression receipts.
 
 ## In Progress
 
-- Slice 2 scope/diff validation, commit, push, and PR trail comment.
+- Slice 3 scope/diff validation, commit, push, and PR trail comment.
 
 ## Next Steps
 
-1. Commit/push slice 2 and post its PR evidence.
-2. Consolidate V8–V12 MCP, toolkit, doctor, deploy, and regression evidence.
-3. Run final ownership-aware cleanup and complete the verification matrix.
+1. Commit/push slice 3 and post its PR evidence.
+2. Run final ownership-aware cleanup, applying teardown only to the proven-owned persistent
+   container.
+3. Complete the verification matrix, debt append, final checks, and PR handoff.
 
 ## Key Decisions
 
@@ -56,9 +59,10 @@ suppressed outcomes.
 | --------------- | ------------------------------------ | ---------------------------------- |
 | Static          | bootstrap PASS                       | worklog preflight                  |
 | Fitness         | pending manual scope checks          | plan/worklog                       |
-| Runtime         | V1–V7 recorded; V8–V12 consolidating | receipts table                     |
+| Runtime         | V1–V12 recorded; final table pending | receipts table                     |
 | Runtime slice 1 | PASS                                 | `receipts/01-scaffold-restore.md`  |
 | Runtime slice 2 | RECORDED                             | `receipts/02-runtime-lifecycle.md` |
+| Runtime slice 3 | RECORDED                             | `receipts/03-v8-mcp.md`            |
 | Consumer        | N/A                                  | no product surface                 |
 
 ## Open Questions
@@ -73,4 +77,5 @@ suppressed outcomes.
 ## Commits
 
 - `71a14e3b98fe1dad5d9294fe53f45b706f6f11c2` — scaffold/restore proof.
+- `0956b2d3d` — V1–V7 runtime lifecycle proof.
 - See draft PR #1735 for per-slice comments.

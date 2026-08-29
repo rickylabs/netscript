@@ -76,7 +76,11 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 | `2026-08-29T22:40:09Z` | 2         | telemetry       | Bare detached OTEL exited 12 in 0.34 s; explicit dashboard URL exited 0 in 0.62 s.                                                       |
 | `2026-08-29T22:40:56Z` | 2         | force cleanup   | Exact-path force stop exited 0 in 4.42 s and removed both run-created containers.                                                        |
 | `2026-08-29T22:41:50Z` | 2         | start 2         | Second isolated start exited 0 in 24.80 s; SDK remained 13.5.3.                                                                          |
+| `2026-08-29T22:47:59Z` | 3         | MCP             | Stdio MCP sequence completed cleanly; 14-tool set unchanged from 13.4.6, with documented `get_integration_docs` still absent.            |
 | `2026-08-29T22:52:23Z` | 2         | orphan cleanup  | Validated launcher PID alone received SIGTERM; `aspire ps` emptied in 385 ms and exact-path stop returned in 374 ms.                     |
+| `2026-08-29T22:53:25Z` | 3         | Toolkit restore | Deno toolkit 13.5.0 restored in scratch; `addDenoApp` and `addDenoTask` projected.                                                       |
+| `2026-08-29T22:53:33Z` | 3         | doctor          | JSON doctor exited 0 with 6 pass, 4 warning, 0 failure.                                                                                  |
+| `2026-08-29T22:53:36Z` | 3         | deploy help     | Publish/deploy/destroy help all exited 0 and retained adapter-required flags.                                                            |
 
 ## Decisions
 
@@ -88,13 +92,16 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 
 ## Drift
 
-| Drift                                         | Severity    | Logged in drift.md |
-| --------------------------------------------- | ----------- | ------------------ |
-| Bootstrap help mismatch                       | minor       | yes                |
-| V2 startup/readiness differs from skill input | significant | yes                |
-| V3 DB allocation gate fails                   | significant | yes                |
-| V4 discovery remains broken                   | significant | yes                |
-| V6 orphan cleanup is sub-second               | significant | yes                |
+| Drift                                           | Severity    | Logged in drift.md |
+| ----------------------------------------------- | ----------- | ------------------ |
+| Bootstrap help mismatch                         | minor       | yes                |
+| V2 startup/readiness differs from skill input   | significant | yes                |
+| V3 DB allocation gate fails                     | significant | yes                |
+| V4 discovery remains broken                     | significant | yes                |
+| V6 orphan cleanup is sub-second                 | significant | yes                |
+| V8 tool list unchanged / documented tool absent | significant | yes                |
+| `aspire resources` alias is accepted            | significant | yes                |
+| Initial DB-init console receipt lost            | significant | yes                |
 
 ## Gate Results
 
@@ -113,11 +120,12 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
 
 ### Runtime Gates
 
-| Gate                     | Result   | Evidence                               | Notes                                                                              |
-| ------------------------ | -------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
-| V1–V12                   | PENDING  | `receipts/aspire-13.5-verification.md` | Filled as probes execute; final table will contain no unexecuted row.              |
-| Slice 1 scaffold/restore | PASS     | `receipts/01-scaffold-restore.md`      | Restore exit 0; regenerated 13.5.3 module; AppHost compile exit 0.                 |
-| Slice 2 V1–V7            | RECORDED | `receipts/02-runtime-lifecycle.md`     | Implementation evidence captured; contains real failures and no evaluator verdict. |
+| Gate                     | Result   | Evidence                                         | Notes                                                                              |
+| ------------------------ | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| V1–V12                   | PENDING  | `receipts/aspire-13.5-verification.md`           | Filled as probes execute; final table will contain no unexecuted row.              |
+| Slice 1 scaffold/restore | PASS     | `receipts/01-scaffold-restore.md`                | Restore exit 0; regenerated 13.5.3 module; AppHost compile exit 0.                 |
+| Slice 2 V1–V7            | RECORDED | `receipts/02-runtime-lifecycle.md`               | Implementation evidence captured; contains real failures and no evaluator verdict. |
+| Slice 3 V8–V12           | RECORDED | `receipts/03-v8-mcp.md`; `03-v11-regressions.md` | MCP/toolkit/doctor/deploy/regression evidence captured without product edits.      |
 
 ### Consumer Gates
 
@@ -136,3 +144,6 @@ product decision remains. IMPL-EVAL is still mandatory in the separate Fable sup
   `git push origin HEAD:refs/heads/test/aspire-13-5-s2-runtime-verification`; remote line:
   `HEAD -> test/aspire-13-5-s2-runtime-verification`. Draft PR #1735 opened with the assigned
   taxonomy, milestone, closing keyword, and receipts-only E2E skip rationale.
+- Slice 2 commit `0956b2d3d` pushed with the same explicit refspec; remote line:
+  `71a14e3b9..0956b2d3d HEAD -> test/aspire-13-5-s2-runtime-verification`. PR comment `5465379259`
+  records scope, SHA, evidence, divergences, and evaluator separation.
