@@ -720,3 +720,70 @@ one scratch file and one drift surface at no evidence cost.
 `PASS`. All four authorized amendment points and all three advisories are present in the plan text
 and reproduce as executed behaviour. Amendment is plan-only, seven-path ceiling intact, lock clean,
 no self-certification. Reported for coordinator implementation grant.
+
+## Implementation Tier-A at `30cc8d0845585058c82a337f5193da7af1aaa5f0` — PASS on substance, 1 required correction
+
+Two commits matching the plan's two slices. All probes in a pristine tracked-files-only `git archive`
+of the exact head. Reviewer = topic supervisor, not evaluator, not author.
+
+### Scope (gate 15)
+
+Exactly the seven product paths plus run artifacts; nothing else. `deno.lock` **byte-identical to
+base** `cf648f1ff`. No eighth path, no config/schema/generated file.
+
+### Gate receipts — independently re-derived
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| 1 | root check, `.generated` absent | `12 selected, 0 failed, 0 occurrences`, exit 0 |
+| 1 (repeat) | same, after gate-5 cleanup | `12 / 0 / 0`, exit 0; zero residue found |
+| 2/6 | `run-deno-test.ts -- --allow-all packages/prisma-adapter-mysql/tests` | `passed 51, failed 0`, exit 0 |
+| 3 | `check:source-format` | `Docs source format: OK`, exit 0 |
+| 4 | `docs:accuracy` | `PASS`, 199 published source pages, exit 0 |
+| 5 | actual-example check, real Prisma 7.8 client, scratch config | `1 selected, 0 diagnostics`, exit 0 |
+| 5 (load-bearing proof) | **reverted D17 to `number[]`**, same command | `TS2322 Type 'PrismaMySqlAdapterFactory' is not assignable to type 'SqlDriverAdapterFactory'` — the gate is not vacuous |
+| 5 (smoke) | plan's `deno eval` verbatim | `dynamic-import-smoke:ok`, exit 0; `main()` has exactly one invocation site, inside the `import.meta.main` guard |
+| 7 | package lint | `12 selected, 0 findings` |
+| 8 | package fmt | `12 selected, 0 findings` |
+| 9 | `doc:lint --root packages/prisma-adapter-mysql` | `./mod.ts` exit 0, 0 private-type/missing-doc diagnostics |
+| 10 | `quality:gate` on a pristine archive | exit 0; `prisma-adapter-mysql FAIL=0 WARN=2 INFO=1` — **identical warning set to the base control** (A3 README fences, A8 file length, A9 architecture doc); no new finding |
+| 11 | `deno publish --dry-run` | `Success`, 8 intended files; example correctly not published |
+| 12 | `audit-jsr-package.ts` | exit 0; the single WARN is the captured banner line — the raw dry-run shows **no** slow-type diagnostic |
+| 13 | census across the seven paths | only the allowlisted legacy `adapter.ts:30` `deno-mysql` debug namespace remains; no generic `@prisma/client` import example survives |
+| 14 | seam boundary | `toMysql2PoolOptions` exported from `src/adapter.ts`, imported by the owned test, **absent** from `src/mod.ts` and from `deno doc mod.ts` (`was not found`) |
+
+### D17 spelled inline — verified exact, not merely plausible
+
+The shipped declaration is an inline numeric union, not `SqlResultSet['columnTypes']`, because that
+spelling tripped `deno doc --lint` `private-type-ref` (recorded in `drift.md` 2026-08-29). A
+bidirectional assignability probe against `@prisma/driver-adapter-utils@7.8.0` type-checks in **both**
+directions, so the inline union is exactly Prisma 7.8's `ColumnType` — neither a superset nor a
+subset. `queryRaw` still returns the real `Promise<SqlResultSet>`.
+
+### Required correction before IMPL-EVAL (bounded, artifacts only)
+
+The author dropped the scratch D17 compatibility wrapper — permitted, and the reasoning is recorded
+at `worklog.md:109`. But the divergence was recorded in the wrong artifact:
+
+- `plan.md:272` (gate 5) still mandates a `structured check of .llm/tmp/prisma-example-compatibility.ts`.
+- `worklog.md:68` (slice-2 gate list) still names the `static D17 compatibility wrapper`.
+- `drift.md` has **no entry** for the drop; its latest wrapper statement (`:165`) still says the
+  wrapper "remains focused D17 evidence".
+
+As it stands the plan's own gate list contains a step nobody ran, with no drift record — an
+Operating-Rule-5 gap and a plausible IMPL-EVAL failure on gate-set integrity. The substance is
+unaffected: the dropped check is provably redundant with the actual-example check.
+
+### Supervisor methodology note
+
+An initial gate-10 red was **self-inflicted**: running gates sequentially inside one archive let
+earlier probes rewrite that archive's `deno.lock` (175222 → 139871 bytes, dropping `@olli/kvdex`),
+which then failed `deps:check:zod`. A pristine archive returns exit 0, and the base archive passes
+as a control. Lock-sensitive gates must run on a fresh archive; a red found this way is the
+reviewer's artifact, not the author's defect, and must not be reported as a finding.
+
+### Verdict
+
+`PASS` on substance — all fifteen gates re-derived, gate 5 proven load-bearing, envelope and lock
+clean, no new quality finding. **Not yet dispatchable to IMPL-EVAL** pending the one artifact-coherence
+correction above.
