@@ -5598,3 +5598,83 @@ lane keeps catching. Exactly one `status:` label is present, so the single-statu
 evaluator mutated the loop layer to serialize `context` into a provider-bound field and **9 of 9
 tests still passed**. #1694's whole purpose is that negative property. Filing issues is outside this
 lane's authority, so it is handed up rather than acted on.
+
+## 2026-08-30 — #1696 merged; #1466 recovered from stall; S-1 filed as #1730
+
+### #1696 closed out — no second evaluator was needed
+
+`gh pr view 1696` → **MERGED** at `2026-08-29T22:11:10Z`, merge commit
+**`21d516224fe35e92957f0998ee848bbf2024eda0`**, and #1694 is **CLOSED**. That merge commit *is*
+current `origin/main`.
+
+The coordinator's instruction to "dispatch the fresh exact-head Fable 5 medium IMPL-EVAL now" was
+already discharged before it arrived: session `321b426c-f617-477e-88c0-1f9b9cdb7c50` (native Claude
+Fable 5 · medium · Remote Control, bridge `cse_01UgH3wjzJmy8qB7rBdFHoLm`, branch
+`feat/ai-request-context`) evaluated `414a52ba8` and returned **PASS** in verdict commit
+`2a0a56086`. Dispatching a second evaluator would have duplicated a completed gate on a merged PR,
+so I did not. **Evaluator identifiers, as requested: session `321b426c-f617-477e-88c0-1f9b9cdb7c50`,
+job dir `/home/codex/.claude/jobs/321b426c`, branch `feat/ai-request-context`, verdict commit
+`2a0a56086`.**
+
+### #1466 was genuinely stalled — recovered on the same thread
+
+| Evidence | Value |
+| --- | --- |
+| Rollout last write | `21:59:54Z`, idle **1,129 s** at inspection |
+| Rollout size | `3,547,521` bytes — **unchanged** across three separate checks |
+| Worktree | clean, `0` dirty files, HEAD still at the **old** base `5bb112dd3`, no commits of its own |
+
+That is a stall, not slow work: an agent doing deep research still appends to its rollout, and this
+one did not grow at all between samples. I had earlier said I would wait for a ~30-minute threshold;
+that was the wrong call and the coordinator is right to reject it — the size-unchanged signal was
+already conclusive and waiting would have bought nothing.
+
+**Recovery, in order:**
+
+1. **Rebased the worktree** to current `main@21d516224` with `git reset --hard`. Safe without
+   qualification: zero dirty files and zero commits ahead, so nothing could be lost. Fittingly, the
+   new base is this lane's own merged #1696.
+2. **Resumed the same thread** — `01a04f84-e21d-77f3-863c-56ef2498d581`, same GPT-5.6 Sol · high
+   route, same worktree, via `agentic:codex-resume --message-file`. No rival sender was launched;
+   one sender per worktree holds. No `timeout` wrapper this time.
+3. The resume message tells it the base moved and that **citations verified at `5bb112dd3` are not
+   evidence at `21d516224`** — re-verify and record drift. It converts the deliverable from
+   open-ended reading into a landed artifact: create the run dir, write `research.md` + `plan.md`,
+   commit, push, open the draft PR with `Closes #1466` and a keyword-free `#1348` reference, post the
+   phase comment, then stop. It restates the five required findings and the "without casts or `any`"
+   trap, and says explicitly that a shorter `research.md` grounded in read file/line evidence beats a
+   complete one that never lands.
+
+**Recovery verified, not assumed:** rollout grew `3,547,521 → 3,565,509 → 3,754,481` bytes within
+minutes, idle back to seconds, HEAD now `21d516224`. Next tangible artifact: the run dir plus the
+Phase-1 commit and draft PR.
+
+### S-1 filed as #1730
+
+`test(ai): the provider-invisibility invariant has no executable guard above the adapter` —
+`type:test`, `area:ai-core`, `priority:p1`, `status:triage`, milestone `0.0.7`.
+
+Filed under the coordinator's explicit instruction, which overrides this lane's standing
+no-file-issues prohibition. It carries the evaluator's mutation table as evidence rather than my
+paraphrase: mutation **A** (bridge folds context into `modelOptions`) reds 2 tests, **C** (loop stops
+passing context to tools) reds 2, and **B** (loop appends `JSON.stringify(input.context)` to
+`system`) reds **none — 9/9 still pass**. Acceptance requires that mutation B be *demonstrated* to go
+red, not asserted.
+
+It also captures a second, narrower gap the same pass found: the
+`never reaches the Anthropic provider wire request` test **cannot detect mutation A**, because the
+Anthropic adapter drops unknown `modelOptions` keys itself. It is weaker than its name and must not
+be counted as coverage for that vector. That is the "guard that cannot fail" class this lane has
+rejected twice before.
+
+### Queue state
+
+| Leaf | State |
+| --- | --- |
+| #1466 `sdk-procedure-meta` | **active** implementation/planning slot — recovered, Phase 1 |
+| #1387 `service-principal-policy-contract` | **queued** behind #1466, serial |
+| #1730 (S-1 guard) | **queued** serially after the active leaf |
+| #1664 | **parked**, untouched at `20337441788b` |
+
+No merge, publish, relabel, milestone change, readiness flip, `#1348` mutation, or lease. No release
+authority claimed.
