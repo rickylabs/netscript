@@ -2301,3 +2301,40 @@ the IMPL-EVAL verdict remains bound to the evaluated head.
 `gh run rerun --failed` was refused with "This workflow is already running" — `check-test` was still
 in flight. Waiting for the run to settle before rerunning the close-gate job, rather than pushing to
 force a fresh run, which would move the head and void the verdict.
+
+### Close-gate cycle 2: `success` — gate GREEN at `30df7b9ff`
+
+Reran only the failed job (`gh run rerun 33248347776 --failed`, attempt 2 at `10:48:51Z`) once
+`check-test` settled. Deliberately not a push: a push moves the head and voids the IMPL-EVAL verdict.
+
+Verified independently rather than trusting the green tick:
+
+| Check | Executed result |
+| --- | --- |
+| `close-gate` job | **`success`**; step 4 mirror mutated #1709, step 5 acceptance gate passed |
+| #1709 acceptance boxes | **7/7 checked**, up from 0/7 |
+| Mirror provenance comment | present on #1709 with marker `acceptance-evidence-mirror:pr=1710;issue=1709` and the evidence text |
+| Local `check-close-gate.ts` | **`PASS`**, `bodySha256=ddcdcd81…` |
+| `agentic:pr-checks` | **`PASS`**, `checks=86`, `currentFailures=0`, `headSha=30df7b9ff…` |
+| `agentic:review-threads` | **`PASS`**, `threads=0`, `unanswered=0` |
+| CI run `33248347776` | `completed/success` |
+
+PR state: `OPEN`, non-draft, `MERGEABLE`, milestone `0.0.7`, exactly one `status:` label
+(`status:ready-merge`), `Closes #1709` in the body.
+
+**Head integrity:** branch == PR == evaluated head == `30df7b9ff8e3370a7420e5da1c46476253c05b0d`
+continuously since the verdict commit. Every repair was metadata only, re-verified after each.
+
+### Hygiene and stop
+
+- Evaluator follow-up session `59335f05` stopped; `impl-eval-1709` stopped, `-c1` and
+  `-verdict-comment` done. No evaluator session left running.
+- `leak-check`: `aspire ok`, `docker ok`, `survivors: []`. Docker containers **0**.
+- Recreated evaluator worktree removed again after its purpose was discharged — this time after the
+  PR phase comment existed, not before.
+- Fast-forwarded the leaf checkout from the stale `5c4eaf0a3` to `30df7b9ff` (clean, `--ff-only`) so
+  no future resume repeats the stale-tracking-ref confusion the evaluator already had to correct.
+- Canonical author `01a047f0` idle and available, not frozen. No runtime or evaluator lease held.
+
+Merge-ready evidence posted as PR comment `5461903998`. **Stopping: not merged.** Merge authority
+remains the coordinator's; readiness is proven, not exercised.
