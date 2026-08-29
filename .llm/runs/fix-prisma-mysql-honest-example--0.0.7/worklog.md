@@ -145,6 +145,17 @@ This is generator-run evidence, not Tier-A review or self-certification.
 These working-tree results are slice evidence. Gates 1–15 are rerun after the slice commit so the
 final report refers to the exact final head.
 
+### CI agent-docs corpus freshness follow-up
+
+| Evidence | Result |
+| --- | --- |
+| Corpus regeneration | `deno task gen:agent-docs-prose` exited 0 and regenerated only `.llm/assets/agent-docs/prose.json.gz` and `.llm/assets/agent-docs/provenance.json`. |
+| Corpus freshness | `deno task check:agent-docs-prose` exited 0 with `fresh: true` and no stale paths. |
+
+CI exposed this omitted generated-cascade gate after IMPL-EVAL cycle 1 had passed. The source page is
+listed in `provenance.json`, so its checked-in corpus assets are part of the required consequence of
+the owned documentation edit.
+
 ## Decisions
 
 | Decision                                                                      | Reason                                                                                                                                                                                                                         | Source                                            |
@@ -173,6 +184,7 @@ final report refers to the exact final head.
 | PLAN-EVAL cycle 1 exposed an unresolved generated-client import and public result-type mismatch | significant plan defect       | yes                |
 | Tier-A exposed permanent post-cleanup `TS2307` hidden by the narrowed package gate              | significant plan defect       | yes                |
 | PLAN-EVAL cycle 2 exposed avoidable `any` from the non-literal import premise                   | significant plan defect       | yes                |
+| Plan gates omitted agent-docs corpus freshness for an in-corpus documentation page              | generated-cascade gate gap     | yes                |
 
 ## Gate Results — immutable base
 
