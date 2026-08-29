@@ -1054,3 +1054,15 @@ implementation thread.
   amendment evaluation; the earlier `cd69eb7cb` PASS cannot be reused.
 - A CI gate failure and a formal IMPL-EVAL verdict are distinct control-plane events. Only terminal
   evaluator failures advance the owner's two-consecutive-failure escalation threshold.
+
+## 2026-08-29 — advancing a PR head races and invalidates an active evaluator
+
+- #1711 advanced from evaluator target `bbaf70d64` to corpus repair `a727c7565` while OpenHands run
+  `33275424854` was still active. Even a mechanical generated-only amendment changes the immutable
+  evaluation target; the in-flight verdict is stale and cannot be reused.
+- Coordinator containment is reversible and explicit: PR returned to draft, `status:impl` restored,
+  merge verified absent, and fresh exact-head evaluation required. CI green alone cannot replace the
+  missing independent amendment verdict.
+- App-server process death after a completed agent turn is transport drift, not lost work. #1371's
+  RED artifacts and thread identity survived and were resumed; recovery must check both rollout and
+  filesystem evidence before relaunching a duplicate author.

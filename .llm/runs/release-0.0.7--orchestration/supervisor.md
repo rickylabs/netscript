@@ -1245,3 +1245,16 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   the canonical generated-corpus repair through the existing author, recut all exact-head evidence,
   and evaluate the amendment again. The CI red is not an IMPL-EVAL failure-cycle count.
 - Runtime state is clean: Docker 0, Aspire 0; no expensive-gate lease exists.
+
+## 2026-08-29T21:30:00Z — RED commits live; stale-evaluator containment in force
+
+- Aspire S1 draft PR #1727 is live at RED-first commit `95680776e`; continue the atomic pin slice,
+  then Tier-A must resolve the two coordinator false-green advisories before sign-off. #1371 RED
+  commit `099370709` survived a shared app-server exit and the same implementation thread resumed;
+  no duplicate author was created.
+- #1711 advanced to generated-corpus repair `a727c7565` before evaluator run `33275424854`
+  terminated. That run is stale by construction. Coordinator enforced draft + `status:impl`; no
+  merge occurred. Do not restore readiness until exact-head Tier-A/CI and a new independent
+  amendment IMPL-EVAL at `a727c7565` are terminal green.
+- The evaluator race is a control-plane failure, not an IMPL-EVAL failure verdict. It does not count
+  toward the owner's two-failure escalation threshold.

@@ -26,7 +26,7 @@
       "independentLanesContinue": true
     },
     "latestCheckpoint": {
-      "at": "2026-08-29T21:21:00.000Z",
+      "at": "2026-08-29T21:30:00.000Z",
       "mainSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
@@ -46,9 +46,9 @@
         1725,
         1726
       ],
-      "aspireS1": "sol_medium_active_building_red_first_phase_1_parity_gate_without_runtime_lease",
-      "issue1371": "sol_medium_active_with_red_first_emitted_module_tests_without_runtime_lease",
-      "pr1711": "exact_head_bbaf70d64_impl_eval_active_real_agent_docs_corpus_freshness_red_merge_withheld"
+      "aspireS1": "pr1727_draft_red_first_head_95680776e_pin_commit_active_without_runtime_lease",
+      "issue1371": "red_first_commit_099370709_preserved_after_transport_recovery_implementation_active_without_runtime_lease",
+      "pr1711": "a727c7565_corpus_repaired_push_raced_prior_evaluator_coordinator_enforced_draft_status_impl_fresh_exact_head_eval_required"
     }
   },
   "limits": {
@@ -755,8 +755,8 @@
       "lane": "fixes",
       "phase": "implementing",
       "baseBranch": "main",
-      "headSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
-      "currentPrHeadSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
+      "headSha": "a727c7565534469fbdc285cda71e93c01014a0ca",
+      "currentPrHeadSha": "a727c7565534469fbdc285cda71e93c01014a0ca",
       "issueNumbers": [1112],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
@@ -764,7 +764,7 @@
       "prNumber": 1711,
       "researchState": "complete",
       "coordinatorDecision": "seven_path_envelope_with_source_internal_translation_seam_and_non_breaking_verify_identity_deprecation",
-      "implementationState": "exact_head_amendment_impl_eval_active_quality_repair_withheld",
+      "implementationState": "generated_corpus_repaired_coordinator_enforced_draft_fresh_exact_head_eval_required",
       "planHeadSha": "6ae7113eb4636972ef1df80fc08e6e3a0390d3fb",
       "tierAState": "PASS",
       "tierATopicCheckpointSha": "c36eaf340db2bb6df18f1d7b2149af12e9b9fe1f",
@@ -832,17 +832,21 @@
         "headSha": "bbaf70d6411fb794895af50b010a66cd475aeb7e",
         "scope": "accepted A2 prerequisite wording in the published example",
         "exactHeadEvaluationRunId": 33275424854,
-        "exactHeadEvaluationState": "active",
+        "exactHeadEvaluationState": "stale_after_branch_advanced_during_run",
         "qualityRunId": 33275411339,
         "qualityJobId": 99161160224,
         "qualityState": "FAIL",
         "qualityFinding": "agent-docs prose corpus freshness: prose.json.gz and provenance.json are stale after the branch's docs reference changes",
         "localReceipt": "/home/codex/repos/netscript-007-leaf-prisma-mysql/.llm/tmp/gate-receipts/local-repro-agent-docs-prose.json",
         "failureClassification": "branch-owned CI freshness failure; not a terminal IMPL-EVAL verdict and does not advance the owner two-failure threshold",
-        "mergeAuthority": "withheld"
+        "mergeAuthority": "withheld",
+        "generatedCorpusRepairHeadSha": "a727c7565534469fbdc285cda71e93c01014a0ca",
+        "generatedCorpusRepairScope": ".llm/assets/agent-docs/prose.json.gz, provenance.json, and owned run-artifact drift/worklog",
+        "controlPlaneViolation": "the repair commit was pushed while evaluator run 33275424854 still targeted bbaf70d64, making that run stale regardless of verdict",
+        "coordinatorContainment": "PR converted to draft and status:impl at a727c7565; no merge occurred; new exact-head IMPL-EVAL required before readiness"
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
-      "nextGate": "allow the in-flight bbaf70d64 evaluator to terminate without racing its target; then the same canonical author regenerates the verified derived agent-docs cascade, pushes an explicit new head, reruns exact-head Tier-A/CI, and receives a fresh amendment IMPL-EVAL before readiness",
+      "nextGate": "complete exact-head Tier-A and CI at a727c7565, then dispatch and await a new independent amendment IMPL-EVAL bound to a727c7565; run 33275424854 is stale and cannot authorize readiness",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"

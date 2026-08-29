@@ -1165,3 +1165,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Do not race the active evaluator with a push. When it terminates, resume the same canonical author
   for the verified derived-corpus regeneration, explicit push, exact-head gates, and new amendment
   evaluation. This CI freshness red does not consume an IMPL-EVAL failure cycle.
+
+## Resume checkpoint — PR #1727 live; #1371 recovered; #1711 stale evaluator contained
+
+- Aspire S1 RED-first commit `95680776e` is pushed on draft PR #1727; the atomic 13.5.3 pin slice is
+  active. Tier-A must explicitly decide/prove the missing-file and same-minor mismatch false-green
+  edges before accepting the new parity gate.
+- #1371 RED-first commit `099370709` is durable. The first author process lost its app-server after
+  the completed RED turn; internals resumed the same thread from surviving artifacts and production
+  implementation continues. This was transport recovery, not an agent/evaluator failure.
+- #1711 now points to `a727c7565534469fbdc285cda71e93c01014a0ca`. Because this repair was pushed
+  before OpenHands run `33275424854` terminated against `bbaf70d64`, the run is stale regardless of
+  verdict. Coordinator converted the PR to draft with `status:impl`; it is open and unmerged.
+- Required #1711 continuation: exact-head Tier-A/CI at `a727c7565`, then a new independent amendment
+  IMPL-EVAL at that same SHA. No ready flip or merge before terminal PASS.

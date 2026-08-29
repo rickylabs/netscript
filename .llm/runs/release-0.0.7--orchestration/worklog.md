@@ -1960,3 +1960,21 @@
   to let the in-flight evaluator terminate before the same canonical author regenerates the verified
   derived cascade, reruns exact-head Tier-A/CI, and obtains a fresh amendment evaluation.
 - Environment remains Docker 0 / Aspire applications 0.
+
+## 2026-08-29T21:30:00Z — S1/#1371 shipped RED commits; #1711 evaluator race contained
+
+- Aspire S1 pushed RED-first commit `95680776e475777b0e03f3b3c1935c6cd77347a2` and opened draft PR
+  #1727 with the required issue/epic links and labels. Its pin commit is now active. Coordinator
+  sent a Tier-A advisory to prove the gate cannot false-green on missing manifest paths or an
+  unauthorized 13.5.x mismatch that the 13.0–13.4 stale regex does not itself select.
+- #1371's shared app-server exited after the author completed its RED turn. Internals audited the
+  surviving worktree, preserved the same thread, and resumed it. The RED-first test/harness commit
+  is now `099370709e48237da19bbc67b25cd8901713e324`; production fail-fast implementation is active.
+- Fixes regenerated and pushed the derived agent-docs corpus as
+  `a727c7565534469fbdc285cda71e93c01014a0ca` while OpenHands run `33275424854` still targeted
+  `bbaf70d64`, despite the coordinator hold. This makes that evaluator run stale regardless of its
+  terminal verdict.
+- Contained the race before merge: verified #1711 remained open/unmerged, converted it to draft,
+  replaced `status:impl-eval` with `status:impl`, and explicitly required exact-head gates plus a
+  new independent amendment IMPL-EVAL at `a727c7565`. No stale receipt can authorize readiness.
+- Docker and Aspire remain empty; no runtime lease was taken.
