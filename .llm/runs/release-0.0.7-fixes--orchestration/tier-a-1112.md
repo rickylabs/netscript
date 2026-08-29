@@ -852,3 +852,63 @@ guidance a push invalidates an existing IMPL-EVAL verdict, so this is recorded e
 merged silently: the `PASS_IMPL` covers `cd69eb7cb`, and the supervisor separately verifies that the
 delta beyond it is comment-only and re-runs every gate the delta could affect. That verification is
 recorded below before any merge.
+
+## Fresh exact-head Tier-A at `067193acff68254b4bd4c6e5d7824f80a9db2b26` — PASS
+
+Follows the coordinator correction: PR returned to **draft / `status:impl`**, stale run `33275424854`
+cancelled, readiness flip withdrawn. All probes in a pristine tracked-files-only archive of this
+exact head.
+
+### Supervisor error being corrected
+
+The earlier readiness flip treated the agent-docs bundle regeneration as the whole fix. It was the
+first hop of a three-hop generated cascade. The supervisor's own memory records this trap for CLI
+assets and it was not applied. Readiness must not move until every checked-in derivative gate is
+green at the exact head.
+
+### Derivative cascade — verified, each against a base control
+
+| Derivative | Generator | Base `cf648f1ff` | Head `067193acf` |
+| --- | --- | --- | --- |
+| `packages/cli/src/kernel/assets/agent-docs.generated.ts` | `gen:assets-barrel` | fresh | regenerates **byte-for-byte identical** to the committed bytes |
+| `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | `gen:mcp-export-corpus` | `check` exit 0 | `check` exit 0 |
+| `packages/mcp/src/publish-assets.generated.ts` | `gen:publish-assets` | `check` exit 0 | `check` exit 0 |
+| `.llm/assets/agent-docs/{prose.json.gz,provenance.json}` | `gen:agent-docs-prose` | fresh | `fresh: true`, `stalePaths: []` |
+
+All four were clean at base and stale at head before the cascade, so every one is genuinely caused by
+this leaf rather than pre-existing drift. The coordinator-generated uncommitted
+`agent-docs.generated.ts` was confirmed legitimate by independent regeneration before the author
+committed it.
+
+### Package gates at the exact head
+
+`check` 12 selected / 0 diagnostics · `lint` 12 / 0 · `fmt` 12 / 0 · `tests` exit 0,
+**51 passed / 0 failed**.
+
+### Public surface change — breaking, intended, and now surfaced
+
+`symbolCount` moves 7611 → 7608. The three removed symbols are exactly the type exports dropped from
+`src/mod.ts`:
+
+- `DenoMySqlClient` — **gone entirely**; it described a Deno-native driver the adapter never used
+- `DenoMySqlConnection` — **gone entirely**; same false-driver provenance
+- `ExecuteResult` — replaced by a module-local `Mysql2ExecuteResult` interface, renamed to reflect
+  the real dependency and made internal
+
+No consumer anywhere under `packages/` or `plugins/` imports any of the three. This is a **breaking
+public API removal** in a pre-1.0 package, planned and recorded in `drift.md`, and deliberately
+without a changelog because a changelog would be an eighth path. It was **not** called out in the PR
+body; the supervisor is adding it so a reviewer sees the break rather than inferring it from a
+corpus count.
+
+### Scope
+
+Authored product paths unchanged at 7. Since the IMPL-EVAL cycle-1 head `cd69eb7cb` the only authored
+change is two JSDoc comment lines in `examples/basic-usage.ts`; `git diff -U0` over `packages/`,
+`plugins/`, and `docs/` shows no executable line changed. The three regenerated derivatives are
+`@generated` files, not authored paths. `deno.lock` byte-identical to base.
+
+### Verdict
+
+`PASS`. Ready for a **new independent exact-head IMPL-EVAL**. No ready flip, no label change, no
+merge — PR stays draft / `status:impl` until that verdict returns PASS.
