@@ -6,29 +6,31 @@
 | --- | --- |
 | Run ID | `chore-aspire-13-5-s1-pin-bump--impl` |
 | Branch | `chore/aspire-13-5-s1-pin-bump` |
-| Current phase | implement — slice 1 ready to commit |
+| Current phase | implement — slice 2 ready to commit |
 | Archetype | `6 — CLI/tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The test-first parity gate is implemented. Its focused suite passes 4/4, and the durable phase-1 repository receipt intentionally fails on exactly seven current S1-owned paths. Deferred findings are non-empty, owner-tagged, and contain no archival owner.
+The RED gate slice is pushed on draft PR #1727. The atomic Aspire train now uses SDK/CLI/official integrations 13.5.3, Browsers 13.5.3-preview.1.26425.3, and CommunityToolkit Deno/SQLite 13.5.0. The phase-1 GREEN receipt has fail=0 with 20 owner-tagged, non-archival deferred findings.
 
 ## Completed
 
 - Issue #1713 and locked research decisions re-baselined.
 - Harness bootstrap, Design checkpoint, archetype, gate set, and PLAN-EVAL N/A recorded.
 - Phase-aware parity tool/test, task/catalog wiring, immutable manifest input, and RED receipt completed.
+- Slice 1 commit `95680776…` pushed; draft PR and commit-trail comment created.
+- Atomic pin edits, CI phase-1 wiring, scoped validation, quality/architecture checks, assets freshness, and GREEN receipt completed.
 
 ## In Progress
 
-- Slice 1: commit, push, draft PR, and commit-trail comment.
+- Slice 2: commit, push, and commit-trail comment.
 
 ## Next Steps
 
-1. Commit and push slice 1, then open the draft PR and post evidence.
-2. Land the atomic pin commit and GREEN evidence.
-3. Append debt and finalize the handoff artifacts.
+1. Commit and push the atomic pin slice, then post its evidence.
+2. Append the Browsers preview debt entry and finalize the handoff artifacts.
+3. Push slice 3, post its comment, and leave the PR draft for independent evaluation.
 
 ## Key Decisions
 
@@ -53,9 +55,9 @@ The test-first parity gate is implemented. Its focused suite passes 4/4, and the
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | slice 1 PASS | focused test/check/fmt; RED parity receipt expected FAIL |
-| Fitness | pending | Slice 2 |
+| Fitness | PASS | scoped owned-file wrappers, `quality:scan`, `arch:check` |
 | Runtime | CI-owned | Draft PR checks |
-| Consumer | pending | Slice 2 asset freshness |
+| Consumer | PASS | asset generation/freshness and generator assertions |
 
 ## Open Questions
 
@@ -68,4 +70,5 @@ The test-first parity gate is implemented. Its focused suite passes 4/4, and the
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after slice 1.
+- `95680776…` — RED parity contract and receipt.
+- Slice 2 pending commit; exact GREEN receipt is in `receipts/parity-phase1-green.json`.
