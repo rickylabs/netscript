@@ -37,7 +37,7 @@ Deno.test('manifest parser skips the TSV header and preserves owner/disposition 
   assertEquals(parseManifest(manifest).length, 9);
 });
 
-Deno.test('phase 1 fails only scaffold constants, ci classes, and root config', async () => {
+Deno.test('phase 1 limits stale failures to owned classes and fails required missing paths', async () => {
   const report = await evaluateAspireVersionParity({
     rows: parseManifest(manifest),
     phase: 1,
@@ -48,7 +48,7 @@ Deno.test('phase 1 fails only scaffold constants, ci classes, and root config', 
   assertEquals(report.ok, false);
   assertEquals(report.counts, {
     checked: 8,
-    fail: 3,
+    fail: 4,
     deferred: 2,
     info: 1,
     skipped: 1,
@@ -61,6 +61,7 @@ Deno.test('phase 1 fails only scaffold constants, ci classes, and root config', 
     { path: 'generator.ts', status: 'deferred', owner: 'S4' },
     { path: 'compat.ts', status: 'deferred', owner: 'S3' },
     { path: 'history.md', status: 'info', owner: 'archival' },
+    { path: 'missing.ts', status: 'fail', owner: 'S4' },
   ]);
 });
 
@@ -75,7 +76,7 @@ Deno.test('phase 2 fails every stale non-archival row and accepts a dual-train c
   assertEquals(report.ok, false);
   assertEquals(report.counts, {
     checked: 8,
-    fail: 4,
+    fail: 5,
     deferred: 0,
     info: 2,
     skipped: 1,
@@ -105,4 +106,57 @@ Deno.test('phase 2 fails a compat fixture that lacks the current train literal',
   assertEquals(report.ok, false);
   assertEquals(report.findings[0].status, 'fail');
   assertEquals(report.findings[0].reason, 'compat fixture is missing the required 13.5.3 literal');
+});
+
+Deno.test('missing archival paths remain non-failing but missing required paths fail closed', async () => {
+  const report = await evaluateAspireVersionParity({
+    rows: parseManifest(
+      'path\tclass\towner\tdisposition\nrequired.ts\tci:workflow\tS1\tenforce\nhistory.md\tarchival:this-run\tarchival\tinfo\n',
+    ),
+    phase: 1,
+    expectedVersion: '13.5.3',
+    readText: () => Promise.resolve(null),
+  });
+
+  assertEquals(report.ok, false);
+  assertEquals(report.counts, {
+    checked: 2,
+    fail: 1,
+    deferred: 0,
+    info: 0,
+    skipped: 0,
+    missing: 2,
+  });
+  assertEquals(report.findings[0], {
+    path: 'required.ts',
+    class: 'ci:workflow',
+    owner: 'S1',
+    status: 'fail',
+    matches: [],
+    reason: 'required manifest path is missing',
+  });
+});
+
+Deno.test('phase 1 fails every unauthorized 13.5.x patch across the exact-pin surface', async () => {
+  const exactPinRows = [
+    ['packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts', 'scaffold-constants'],
+    ['packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts', 'scaffold-constants'],
+    ['.github/toolchain.env', 'ci:other'],
+    ['.github/scripts/aspire-nuget-cache-policy.test.ts', 'ci:policy-test'],
+    ['.github/workflows/e2e-cli.yml', 'ci:workflow'],
+    ['.github/workflows/e2e-cli-prod.yml', 'ci:workflow'],
+    ['.github/workflows/e2e-cli-prod-local.yml', 'ci:workflow'],
+  ] as const;
+
+  for (const [path, className] of exactPinRows) {
+    const report = await evaluateAspireVersionParity({
+      rows: [{ path, class: className, owner: 'S1', disposition: 'enforce' }],
+      phase: 1,
+      expectedVersion: '13.5.3',
+      readText: () => Promise.resolve("const unauthorized = '13.5.2';"),
+    });
+    assertEquals(report.ok, false, path);
+    assertEquals(report.findings[0]?.status, 'fail', path);
+    assertEquals(report.findings[0]?.matches, ['13.5.2'], path);
+  }
 });
