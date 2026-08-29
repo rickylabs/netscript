@@ -45,7 +45,7 @@ const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
     }),
 };
 
-Deno.test("agent init writes Claude config, skills, and marked AGENTS section idempotently", async () => {
+Deno.test("agent init writes canonical skills, Claude mirrors, and marked AGENTS idempotently", async () => {
   const root = await Deno.makeTempDir();
   try {
     const fs = new DenoAgentInitFileSystem();
@@ -53,6 +53,7 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
       join(root, ".mcp.json"),
       '{"custom":true,"mcpServers":{"other":{"command":"other"}}}\n',
     );
+    await fs.writeText(join(root, "AGENTS.md"), "# Project guide\n\nKeep me.\n");
     const first = await initAgent({ projectRoot: root, host: "claude" }, {
       fs,
       aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
@@ -79,6 +80,10 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     assertEquals(config.custom, true);
     assertEquals(config.mcpServers.other.command, "other");
     assertStringIncludes(
+      await Deno.readTextFile(join(root, ".agents/skills/netscript/SKILL.md")),
+      "NetScript",
+    );
+    assertStringIncludes(
       await Deno.readTextFile(join(root, ".claude/skills/netscript/SKILL.md")),
       "NetScript",
     );
@@ -87,6 +92,7 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
       "netscript plugin doctor",
     );
     const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
+    assertStringIncludes(agents, "# Project guide\n\nKeep me.");
     for (const expected of ["aspire", "deno", "help.md", "aspire otel"]) {
       assertStringIncludes(agents, expected);
     }
@@ -108,6 +114,97 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     assertEquals(second.changedFiles, []);
   } finally {
     await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("#1674 root guidance points to the build spine and app guide", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "vscode" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
+    for (
+      const expected of [
+        "database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands",
+        "`apps/<app>/AGENTS.md` explains the local examples",
+        "`netscript ui:add page <path> --island`",
+        "`netscript ui:add island <Name> --query`",
+      ]
+    ) {
+      assertStringIncludes(agents, expected);
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("#1672 root guidance teaches Deno inspection before implementation", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "vscode" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
+    for (
+      const expected of [
+        "Read https://deno.com/agents.md and set up Deno in this project.",
+        "`deno doc <module>`",
+        "`deno doc --filter <symbol> <module>`",
+        "`deno info`",
+        "`deno eval`",
+        "These come before reading package source over HTTP.",
+        "`deno outdated`",
+        "`deno why`",
+        "`deno add`",
+        "`deno task check`",
+        "`deno task test`",
+        "`deno task lint`",
+        "`deno task fmt:check`",
+        "A run is not finished until `deno task test` has run.",
+        "`.agents/skills/deno/SKILL.md`",
+      ]
+    ) {
+      assertStringIncludes(agents, expected);
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("#1675 installs canonical skills and derives Claude mirrors", async () => {
+  const allRoot = await Deno.makeTempDir();
+  const nonClaudeRoot = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    await initAgent({ projectRoot: allRoot, host: "all" }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const manifest = JSON.parse(EMBEDDED_SKILL_FILES["manifest.json"]) as {
+      readonly files: readonly string[];
+    };
+    for (const path of manifest.files.filter((path) => path !== "manifest.json")) {
+      const canonical = await Deno.readTextFile(join(allRoot, ".agents", "skills", path));
+      const claude = await Deno.readTextFile(join(allRoot, ".claude", "skills", path));
+      assertEquals(claude, canonical, `Claude mirror diverged at ${path}`);
+    }
+
+    await initAgent({ projectRoot: nonClaudeRoot, host: "vscode" }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assert(await fs.exists(join(nonClaudeRoot, ".agents/skills/netscript/SKILL.md")));
+    assertFalse(await fs.exists(join(nonClaudeRoot, ".claude")));
+    const agents = await Deno.readTextFile(join(nonClaudeRoot, "AGENTS.md"));
+    for (const skill of ["netscript", "netscript-build", "netscript-operate", "aspire", "deno"]) {
+      assertStringIncludes(agents, `.agents/skills/${skill}/SKILL.md`);
+    }
+  } finally {
+    await Deno.remove(allRoot, { recursive: true });
+    await Deno.remove(nonClaudeRoot, { recursive: true });
   }
 });
 
@@ -285,7 +382,7 @@ Deno.test("S-18 prior-release host stays pinned until agent init and restart exp
   }
 });
 
-Deno.test("VS Code-only agent init never delegates to the Claude skill tree", async () => {
+Deno.test("VS Code-only agent init never emits or delegates to the Claude skill tree", async () => {
   const explicitRoot = await Deno.makeTempDir();
   const detectedRoot = await Deno.makeTempDir();
   try {
@@ -303,7 +400,9 @@ Deno.test("VS Code-only agent init never delegates to the Claude skill tree", as
       aspireAgentInitializer: initializer,
     });
     assertEquals(calls, 0);
+    assert(await fs.exists(join(explicitRoot, ".agents/skills/netscript/SKILL.md")));
     assertFalse(await fs.exists(join(explicitRoot, ".claude")));
+    assert(await fs.exists(join(explicitRoot, "AGENTS.md")));
     assert(await fs.exists(join(explicitRoot, ".vscode/mcp.json")));
 
     await Deno.mkdir(join(detectedRoot, ".vscode"));
@@ -313,7 +412,9 @@ Deno.test("VS Code-only agent init never delegates to the Claude skill tree", as
     });
     assertEquals(detected.hosts, ["vscode"]);
     assertEquals(calls, 0);
+    assert(await fs.exists(join(detectedRoot, ".agents/skills/netscript/SKILL.md")));
     assertFalse(await fs.exists(join(detectedRoot, ".claude")));
+    assert(await fs.exists(join(detectedRoot, "AGENTS.md")));
     assert(await fs.exists(join(detectedRoot, ".vscode/mcp.json")));
   } finally {
     await Deno.remove(explicitRoot, { recursive: true });

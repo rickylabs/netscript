@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `fix-agent-init-guidance-and-cross-host-skills--0.0.7` |
 | Branch | `fix/agent-init-guidance-and-cross-host-skills` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Research and design are complete at baseline `5bb112dd35f94fc8435672e2cabff1f9a447aa0b`.
-The product tree is unchanged. The plan locks a five-path product ceiling, treats the current
-re-intake as authority over conflicting older issue comments, and records PLAN-EVAL as N/A.
+Implementation is complete within the five-path ceiling. The generated barrel is current, focused
+tests pass 22/22, scoped check/lint pass, and the real fresh-scaffold consumer proof passes. Slice 2
+is ready to commit; durable asset/quality/publish gates then run against its immutable SHA.
 
 ## Completed
 
@@ -23,17 +23,21 @@ re-intake as authority over conflicting older issue comments, and records PLAN-E
   generator, tests, and public/JSR surface.
 - Mapped every acceptance box separately for #1672, #1674, and #1675.
 - Identified the three behavioural boxes that require supervisor disposition.
+- Opened draft PR #1729 without closing keywords.
+- Implemented one composed root guidance asset with issue-separated semantic assertions.
+- Installed canonical `.agents/skills` for every host and derived Claude mirrors from canonical bytes.
+- Proved a fresh scaffold emits the contracted guidance, configs, offline docs, and byte-identical mirrors.
 
 ## In Progress
 
-- Slice 1 harness bootstrap commit and draft PR opening.
+- Slice 2 implementation commit and durable validation.
 
 ## Next Steps
 
-1. Commit/push the run bootstrap with explicit refspec and open a draft PR without closing keywords.
-2. Implement the guidance asset, canonical skill install, Claude mirror, and semantic tests.
-3. Regenerate assets and run focused/scaffold/quality/publish gates.
-4. Update artifacts/PR evidence and stop for Tier-A.
+1. Commit/push Slice 2 with an explicit full refspec.
+2. Run durable asset freshness and quality/architecture gates against that SHA plus CLI publish dry-run.
+3. Record the formatter-policy exception and final receipts in Slice 3.
+4. Push, update draft PR evidence, and stop for Tier-A.
 
 ## Key Decisions
 
@@ -48,17 +52,21 @@ re-intake as authority over conflicting older issue comments, and records PLAN-E
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| Run artifacts in this directory | new | Research, plan, design, context, drift, supervisor identity. |
-| Product paths | unchanged | Implementation has not begun. |
+| Run artifacts in this directory | updated | Research, plan, design, context, drift, gate and supervisor evidence. |
+| `packages/cli/src/kernel/assets/agent/guidance.md.template` | new | Compact build/Deno/skill/MCP pointer surface. |
+| `packages/cli/src/kernel/assets/manifest.ts` | modified | Adds the guidance asset key at the stable end of the registry. |
+| `packages/cli/src/kernel/assets/embedded.generated.ts` | regenerated | Shipping barrel includes the guidance bytes. |
+| `packages/cli/src/public/features/agent/init/init-agent.ts` | modified | Universal canonical install, derived Claude mirror, root guide render. |
+| `packages/cli/src/public/features/agent/init/init-agent_test.ts` | modified | Issue-separated guidance and host/canonical/mirror proofs. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | Planned scoped wrappers. |
-| Fitness | NOT_RUN | `quality:gate`, JSR scan recorded. |
+| Static | PASS with format exception pending Tier-A | Test 22/22, check/lint clean; CLI is excluded from authoritative root fmt config. |
+| Fitness | PENDING | Durable `quality:gate` after Slice 2 commit. |
 | Runtime | N/A | E2E/Aspire/Docker unauthorized. |
-| Consumer | NOT_RUN | Fresh real CLI scaffold proof planned. |
+| Consumer | PASS | `scaffold-proof.json`: fresh 150-file workspace, host-all docs output and mirror equality. |
 
 ## Open Questions
 
@@ -66,7 +74,8 @@ re-intake as authority over conflicting older issue comments, and records PLAN-E
 
 ## Drift and Debt
 
-- Drift: two significant older-comment/re-intake conflicts recorded in `drift.md`.
+- Drift: two significant older-comment/re-intake conflicts, CLI formatter-policy mismatch, local
+  scaffold docs-evidence normalization, and live-base advance recorded in `drift.md`.
 - Debt: no new debt; existing CLI public-doc completeness debt is not deepened.
 
 ## Commits

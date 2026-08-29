@@ -85,6 +85,9 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | 2026-08-30 | 1 | Research | Verified branch/base, live issue bodies/comments, doctrine profile, exact installer/app-guide/asset paths. |
 | 2026-08-30 | 1 | Plan | Locked five-path product ceiling and separate acceptance/evidence tables. |
 | 2026-08-30 | 1 | Plan-Gate | `PLAN-EVAL: N/A` — current re-intake fixes contract, scope, risks, and gates; only close-gate disposition is safely deferred. |
+| 2026-08-30 | 2 | Implement | Added one embedded guidance asset, universal root guidance, canonical `.agents/skills`, and Claude mirrors copied from canonical bytes. |
+| 2026-08-30 | 2 | Focused gates | Issue-labelled installer suite passed 22/22; scoped check and lint passed with non-empty selections. |
+| 2026-08-30 | 2 | Consumer proof | Fresh local scaffold + real `agent init --host all --editor vscode --with-docs` emitted eight required guidance cues, six canonical skills, six byte-identical Claude mirrors, configs, and offline docs. |
 
 ## Decisions
 
@@ -101,6 +104,9 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 | --- | --- | --- |
 | Older #1674 comment says delete nested app guide; re-intake says preserve/link | significant | yes |
 | Older #1672 comment says edit internal toolchain skill; re-intake forbids it | significant | yes |
+| Root formatter policy excludes `packages/cli`; wrapper cannot give a clean CLI verdict without imposing an ad hoc whole-file rewrite | significant | yes |
+| Local-source scaffold lacks root import evidence required by the existing offline-doc resolver | minor | yes |
+| Draft PR's live `main` base advanced after the exact intake baseline | minor | yes |
 
 ## Gate Results
 
@@ -108,9 +114,11 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Focused unit test | structured test wrapper | NOT_RUN | Runs after implementation. |
-| Scoped check/lint/fmt | structured wrappers | NOT_RUN | Explicit changed-file selection. |
-| Asset barrel | durable gate runner | NOT_RUN | Required after regeneration. |
+| Focused unit test | `scoped-test.json` | PASS | 22 passed, 0 failed; includes separate #1672/#1674/#1675 assertions. |
+| Scoped check | `scoped-check.json` | PASS | Four explicit changed TypeScript files; zero findings. |
+| Scoped lint | `scoped-lint.json` | PASS | Three authored TypeScript files; zero findings with non-empty coverage. |
+| Scoped format | `scoped-fmt.json` | BASELINE_BLOCKED | Root config excludes all of `packages/cli`; an explicit neutral config processes the files but reports legacy whole-file style, so Tier-A must disposition rather than accepting review-noise rewrites. |
+| Asset barrel | durable gate runner | PENDING_COMMIT | Regenerated output is focused; immutable receipt runs after Slice 2 commit. |
 
 ### Fitness Gates
 
@@ -131,7 +139,7 @@ form the shipping boundary; tests verify canonical/mirror semantics and individu
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Fresh `agent init --host all --with-docs` workspace | NOT_RUN | real local CLI proof planned | Must inspect shipped generated barrel output. |
+| Fresh `agent init --host all --with-docs` workspace | PASS | `.llm/tmp/gate-receipts/agent-init-guidance/scaffold-proof.json` | 150-file fresh scaffold; 8 cues, 6 canonical files, 6 byte-identical mirrors, configs and offline docs. Disposable local-source fixture added `@netscript/cli: workspace:` because the existing scaffold root carries no docs-version import evidence. |
 | Behavioural unfamiliar-agent wave | NOT_RUN | supervisor decision pending | Cannot be produced by this leaf. |
 
 ## Handoff Notes
