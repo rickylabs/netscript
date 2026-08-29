@@ -60,6 +60,9 @@ Update the manifest in its owning research/generator workflow, then extend the t
 | 2026-08-29 | 1 | test-first RED | Focused wrapper failed before implementation because the imported module did not exist (exit 1, expected) |
 | 2026-08-29 | 1 | parity contract | Focused wrapper passes 4/4 tests after implementation |
 | 2026-08-29 | 1 | repository RED | Receipt outcome FAIL/exit 1 with exactly 7 phase-1 fail paths; 21 deferred findings are owner-tagged and zero deferred rows are archival |
+| 2026-08-29 | 1 | push + PR | `* [new branch]          HEAD -> chore/aspire-13-5-s1-pin-bump`; draft PR #1727 opened and slice comment posted |
+| 2026-08-29 | 2 | atomic train | Scaffold, integration, toolchain, CI install/preflight/cache pins moved together to the locked 13.5 train; `.openhands/setup.sh` verified to read `.github/toolchain.env` and left untouched |
+| 2026-08-29 | 2 | phase-1 GREEN | Receipt outcome PASS/exit 0; fail=0, deferred=20, info=6, skipped=1. Every deferred finding has a non-archival owner |
 
 ## Decisions
 
@@ -93,8 +96,8 @@ Update the manifest in its owning research/generator workflow, then extend the t
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-19 | NOT_RUN | scoped wrappers | Slice 2 pending |
-| AP/quality | NOT_RUN | `quality:scan`, `arch:check` | Slice 2 pending |
+| F-19 | PASS | scoped wrappers | Changed CLI sources: check 3 files/0 diagnostics; production lint 2 files/0 findings; format 3 files/0 findings. Generator test: 4 steps passed |
+| AP/quality | PASS | `quality:scan`, `arch:check` | Both exit 0; repository doctrine warnings remain informational baseline |
 
 ### Runtime Gates
 
@@ -106,10 +109,31 @@ Update the manifest in its owning research/generator workflow, then extend the t
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| generated assets | NOT_RUN | generation + freshness tasks | Slice 2 pending |
+| generated assets | PASS | `gen:assets-barrel` + `check:assets-barrel` | Exit 0; no generated diff |
+
+### Atomic Pin Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| scaffold versions | PASS | `deno task check:scaffold-versions` | E-12: 11 stable scaffold pins |
+| NuGet cache policy | PASS | targeted Deno test | 2 passed, 0 failed; one stable CLI train |
+| Aspire config generator | PASS | targeted Deno test | 4 steps passed; assertions use integration constants |
+| stale acceptance grep | PASS | issue-scoped `git grep` | No `13.4.6` or `Aspire 13.4` literal |
+| parity phase 1 | PASS | `receipts/parity-phase1-green.json` | fail=0, deferred=20 owner-tagged/non-archival, info=6, skipped=1 |
+| quality scan | PASS | `deno task quality:scan` | Exit 0; no findings beyond seven accepted allowances |
+| architecture | PASS | `deno task arch:check` | Exit 0; no doctrine failures |
+
+### Scoped Wrapper Baseline
+
+The package-wide wrapper probe is not treated as a slice verdict: the existing `packages/cli`
+baseline has 199 lint occurrences across 134 paths and 258 formatting findings. The owned-file
+verdict above isolates this change without modifying unrelated package sources. The generator test's
+two existing inline `jsr:` imports are the only lint observations when the test is included; they
+predate this slice and the test itself passes.
 
 ## Handoff Notes
 
 - Supervisor should inspect parity classification semantics and the exact atomic pin diff first.
 - RED receipt attests baseline HEAD `3b32d162…`; as documented by `run-gate.ts`, it does not attest source-tree cleanliness. The committed slice contains the tested gate implementation and copied receipt.
+- GREEN receipt records committed HEAD `95680776…` while executing the slice-2 dirty tree; the receipt therefore proves the command/result, while commit 2 makes that exact source state reviewable.
 - This implementation lane does not perform Tier-A sign-off or IMPL-EVAL.
