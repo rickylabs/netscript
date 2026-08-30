@@ -4549,3 +4549,45 @@ The correct re-anchor point remains the documented convergence point — immedia
 gate run — not "whenever main moves". Main has now advanced four times during this leaf's life
 (`952cc106`, `a5520e70`, `3e5cbabf`, `de57fab0`) and only **one** of those, `3e5cbabf`, was
 non-inert and warranted action.
+
+## 2026-08-30 — #1533/#1756 ruling applied: partial enforcement slice, parked on credential boundary
+
+Coordinator ruled PR #1756 a **partial enforcement slice**, not full closure of #1533; box 4 not to
+be weakened, `Closes` not to be used. Applied in place:
+
+- **PR body:** `Closes #1533` → **`Refs #1533`**, with the reason written into the body rather than
+  the keyword quietly swapped. #1533 stays open for **#1765** (116 unbound-name) and **#1766** (20
+  type-error). Note both are **issues** I filed with classifier-emitted lists, not PRs.
+- **Leaf harness updated in place** — carrier now `965fcc9c`; product and evaluated heads untouched.
+
+**This is the close gate doing its job.** Had `Closes` survived, merging would have auto-closed an
+issue whose box 4 is unmet across 136 shipped examples — exactly the #1296 failure this run already
+paid for. The gate caught it before merge, twice: once when I refused to write a satisfying evidence
+entry for box 4, and once in the coordinator's ruling.
+
+### Preserved, not re-cut
+
+Local carrier `45c4894c` → now `965fcc9c` (harness truth only); evaluated product `4cdee82f` with
+IMPL-EVAL cycle 2 **`PASS`**; Tier-A six gates raw exit 0 with root test **4,293 / 0**; close gate
+7/7; review-threads 0/0.
+
+### No stale-CI claim
+
+`origin` and PR #1756 remain at `303be12e` because `GH_TOKEN` carries `repo` only and `e1ea9d3a`
+touches `.github/workflows/ci.yml`. **The remote CI on that PR is stale and is explicitly not merge
+evidence** — it reflects a head predating the narrowing, the repairs, the colour-invariance fix and
+both evaluations. Every green claimed for this leaf is a **local exact-head supervisor run**, labelled
+as such. Recording it any other way would be the "green that means nothing" this run has been careful
+to avoid.
+
+### Inert-main currency deferred, with the reconciliation pre-specified
+
+`main` `de57fab0` has **zero path intersection** with this leaf (0 files under the gate tooling paths;
+**0** changed `@example` lines). No re-anchor now: rebasing a sealed, evaluated, unpushable carrier
+would invalidate a census, a Tier-A and a verdict for no gain. When publication is possible the
+bounded reconciliation is pre-written in the leaf worklog — rebase, mechanically regenerate the three
+governed assets, re-verify `check:assets-barrel` + `check:publish-assets`, and confirm
+`deferredCensus {unboundName:116, typeError:20}` is unchanged.
+
+Internals continues independently: **#1774** amending after `FAIL_PLAN`, **#1776** filed for the
+`wslHome()` defect, **#1734** escalated at the owner boundary, **#1747** withheld solely on it.
