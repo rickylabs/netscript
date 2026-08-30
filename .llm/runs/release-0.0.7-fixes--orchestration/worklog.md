@@ -2940,3 +2940,57 @@ Run once, serialized, at the evaluated head, against a slot verified free (`expe
 against a limit of 1) and a sandbox verified empty. The lease request to `codex-root-0.0.7` remains
 unanswered and is still recorded as an unanswered request; this run is logged as a **supervisor
 judgment call under the owner's standing Aspire/Docker instructions**, never as an implied grant.
+
+## 2026-08-30 — #1673 IMPL-EVAL cycle 2 `PASS_IMPL`; handed off; blocked only by cross-lane #1734
+
+Verdict commit `39f9d86f` on `eval/impl-eval-1673-cycle-2`, pushed. Evaluated head `5d1cc5a8`.
+Three findings, **all non-blocking**:
+
+- **F-1 (minor)** — the inspect child can create `deno.lock` on a never-generated project, because
+  Deno writes the lockfile beside `--config` as runtime behaviour that `--allow-read` cannot prevent.
+  Correctly classified: the **legacy doctor already does this** for every configured-module probe, so
+  it is pre-existing rather than leaf-introduced, and it is not a false health claim. Suggested
+  follow-up is `--frozen` on the inspect child.
+- **F-2 (informational)** — the plugin loop is sequential, so the first advertised inspection failure
+  throws for the whole dry run and no per-registry checks run for other plugins. Correct fail-closed
+  direction; noted so the single error is never read as "the others were verified".
+- **F-3 (informational)** — pre-merge obligations remain supervisor-owned. Now discharged.
+
+### Readiness normalized to the truth, which is not "ready"
+
+Review threads: **PASS**, 0 threads, 0 unanswered.
+
+The author had ticked six Definition-of-Done boxes. Of the two remaining, they were **not equal**, and
+that distinction is the whole point:
+
+- *"Fresh Tier-A and independent opposite-family IMPL-EVAL pass before readiness"* — **true and
+  evidenced**, so ticked.
+- *"Supervisor-owned `scaffold.runtime` **passes** with its runner report and cleanup evidence"* —
+  **left unticked**, with an inline annotation explaining why. The suite exited 1. Reading "passes"
+  generously enough to tick it would assert a state the evidence does not support, which is exactly
+  the defect class #1673 exists to remove. A leaf about untrustworthy green signals does not get to
+  finish by producing one.
+
+Labels normalized to `status:impl-eval` on both PR #1739 and issue #1673 — evaluations complete,
+deliberately **not** `status:ready-merge`, because the close-gate is not green. Close-gate now reports
+exactly **one** remaining unchecked box: the `scaffold.runtime` line.
+
+### The blocker is cross-lane, and this lane is not choosing the resolution
+
+`scaffold.runtime` failed on one gate: `TS2345` in
+`packages/fresh/src/application/query/hydration.ts`, which is **open issue #1734**, owned by the
+**internals** lane. This leaf changes 0 files under `packages/fresh`.
+
+Three resolutions were put to the coordinator/human in the handoff comment, without this lane picking
+one: land #1734 then re-run; amend the box to require the runner report plus attribution for failures
+outside the ceiling; or apply `status:close-gate-override` with the attribution as justification.
+
+### Handoff posted
+
+`https://github.com/rickylabs/netscript/pull/1739#issuecomment-5468144760` — full evidence chain, the
+three-head product-caused demonstration, what to read first, every known-and-accepted item (the F-1
+line-count WARN, the base-owned fmt finding, the baseline-red AI `doc:lint`, deferred F4, and
+IMPL-EVAL's F-1 lockfile note), and the resource-hygiene proof.
+
+**#1673 is terminal for this lane.** No merge, no publish, no issue-box ticking, no `ready-merge`.
+Advancing to #1462 per the serial queue.
