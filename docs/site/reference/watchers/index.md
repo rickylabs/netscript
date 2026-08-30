@@ -16,6 +16,12 @@ no sub-path exports. The watcher auto-selects its strategy (native OS notificati
 paths, polling for network paths) so most callers only need `createWatcher`; the strategy
 classes themselves are internal implementation details.
 
+## Exports
+
+| Export | Path |
+| --- | --- |
+| `@netscript/watchers` | `./mod.ts` |
+
 ```ts
 import { createWatcher } from '@netscript/watchers';
 
