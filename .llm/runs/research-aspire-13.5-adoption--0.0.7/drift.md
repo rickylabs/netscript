@@ -1118,3 +1118,22 @@
   the package test roots — invoke explicitly); no 13.5.3 telemetry fixture introduced. Force-pushed
   with lease; S3 worktree moved; PR #1741/#1744 notes posted. Phase-A verdicts carry over (patches
   identical). Phase B for both remains D-55-blocked.
+
+## D-60 — 2026-08-30 — Coordinator rulings: D-17 ratified as written; #1734 cycle 3 authorized; no Phase-B leases; #1642 → 0.0.7
+
+- **D-17 ratified as written:** one resolver `resolveTelemetryEndpoint` — explicit option →
+  `NETSCRIPT_TELEMETRY_ENDPOINT` → `ASPIRE_DASHBOARD_PORT` → running AppHost via
+  `aspire ps
+  --format Json` `dashboardUrl` (`source: 'aspire_ps'`) → `DEFAULT_TELEMETRY_ENDPOINT`
+  (`http://localhost:18888`, `source: 'default'`); the recorded `source` is preserved; no bare
+  `18888` in generated code. S13 (#1724) static Phase A is now dispatchable; its parity phase-2
+  enforcement flip waits for S1/S9/S11 to land on `main` (merge-order fact, recorded in the brief).
+- **#1734 / PR #1736 cycle 3 authorized** (third and final exceptional repair, internals lane):
+  strictly the accepted `hydration.ts` correction, then fresh exact-head tests, IMPL-EVAL, and the
+  blocked `scaffold-runtime` reruns before merge. For Aspire this is the unblock path for the
+  S1/S4/S5 runtime verdicts and the off-host Phase-B route (D-56); no action from this lane until
+  #1736 lands.
+- **Phase-B infrastructure diagnosis accepted:** no further runtime leases until identical-path
+  worktree mounts and shared/reachable networking are proven by the two D-55 probes
+  (`infra-handoff-topology.md`).
+- **#1642 moved to milestone 0.0.7** (S11 closes it).
