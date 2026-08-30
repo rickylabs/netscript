@@ -914,3 +914,35 @@ construction, and the supervisor must either wait for idle or carry the correcti
 stop. This lane waits for idle, because the correction here governs a file the author is going to
 write (`context-pack.md`) and arriving after it writes would mean correcting a committed artifact
 instead of preventing a wrong one.
+
+## D-33 — the slice-1 `test` PASS predates the inotify fix by 11 minutes; it is historical, not a current claim
+
+**Observed.** `receipts/frozen-42874803/test-final.json` — the slice-1 root-`test` receipt I re-cut
+after the reaper fix — records `outcome: PASS`, `exitCode 0`, attempt 7,
+`finishedAt: 2026-08-30T09:16:21Z`. The inotify raise to **1024** was re-proven at
+**2026-08-30T09:27Z**, eleven minutes later.
+
+So that receipt was cut in a **partially** repaired environment: `tini` reaping was in place (which is
+what made `hybrid-launcher_test.ts` pass), but `fs.inotify.max_user_instances` was still **128** —
+the condition D-26 recorded as causing `codex-follow_test.ts` to fail with `watchFs` →
+`Too many open files (os error 24)`.
+
+**Why it passed anyway, and why that is not reassuring.** The inotify cap is a *contention* limit
+across all users of the host, not a deterministic per-run property. At 09:16 the pressure happened to
+be low enough — several supervisors and their sub-agents were between turns — so the watcher
+allocated. The same receipt run half an hour earlier or later could have gone red without any code
+change. A green result under a contended cap is a lucky sample, not a proof, which is precisely the
+asymmetry D-26 identified in the other direction.
+
+**Disposition — no re-cut of the archive, and no waiver either.** The frozen set is append-only
+historical evidence for content head `42874803`; rewriting it would be worse than leaving it. What
+matters is that the **live** receipt set is now being cut by the slice-2 author at content head
+`2863d29e` under the fully repaired environment (`tini` **and** inotify 1024), so the set that the
+final all-slices IMPL-EVAL will evaluate carries no infrastructure waiver at all.
+
+**Recorded so the final evaluator does not inherit it.** When it re-derives host state — which D-30's
+lesson says it must, rather than trusting a prior ruling — it should treat every receipt in
+`frozen-42874803/`, `frozen-235482767/` and `frozen-c9a391811/` as cut under superseded conditions,
+and take only the live set at the final content head as the current claim. The infrastructure
+waivers are gone; the archives are the record of when they existed, not an argument that they still
+apply.
