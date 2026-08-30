@@ -70,6 +70,9 @@ composed config boundary → final static gates.
 | 2026-08-30 | slice 2     | source safety      | Replaced background name-derived bindings/comments, stringified every planned literal site, and updated the flow-B fixture to derive its `bg_\d+` binding.          |
 | 2026-08-30 | slice 2     | focused gates      | Generator tests PASS 59/59; check PASS 4 selected; lint PASS 4/4 processed; format PASS 4/4 processed. No E2E or runtime suite fired.                               |
 | 2026-08-30 | slice 2     | RED transition     | Combined matrix is 74 pass / 25 fail: all generator seams are green; only 24 grammar rejection steps plus their parent summary remain red for slice 3.              |
+| 2026-08-30 | slice 3     | grammar lock       | Added the exact private Aspire rule and background-object `superRefine`; contextual processor/service/plugin diagnostics now fail before generation.                |
+| 2026-08-30 | slice 3     | focused gates      | Full focused tests PASS 143/143; check PASS 3 selected; lint PASS 3/3 processed; format PASS 3/3 processed.                                                         |
+| 2026-08-30 | slice 3     | schema comparison  | `z.toJSONSchema(AppSettingsSchema)` stayed exactly 9,988 bytes with SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881` before and after.    |
 
 ## Decisions
 
@@ -97,13 +100,19 @@ composed config boundary → final static gates.
 | Slice-2 scoped lint                                           |    0 | PASS — four selected and processed, zero findings                                             |
 | Slice-2 scoped format                                         |    0 | PASS — four selected and processed, zero findings                                             |
 | Slice-2 combined RED transition                               |    1 | EXPECTED RED — 74 passed, 25 failed; grammar lock is the only remaining failure class         |
+| Slice-3 focused tests                                         |    0 | PASS — 143 passed, 0 failed                                                                   |
+| Slice-3 scoped check                                          |    0 | PASS — three files selected, zero findings                                                    |
+| Slice-3 scoped lint                                           |    0 | PASS — three selected and processed, zero findings                                            |
+| Slice-3 scoped format                                         |    0 | PASS — three selected and processed, zero findings                                            |
+| Slice-3 JSON-schema comparison                                |    0 | PASS — identical byte count and SHA-256 before/after composed validation                      |
 | PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                    |
 | PLAN-EVAL cycle 2                                             |    — | `FAIL_FIX`; owner-verified mechanical corrections applied and gate released; no cycle 3       |
 
 ## Handoff Notes
 
-- Slice 2 is complete and ready to publish. Slice 3 may add only the private Aspire rule module,
-  composed config validation, config tests already present in RED, and run evidence.
+- Slice 2 published head: `6e82aad1d4e0f4e14a5e4d6ed1395b6169505099` (copied from `git log`).
+- Slice 3 is green and ready to publish. The rule remains absent from `src/domain/mod.ts`, package
+  barrels, export maps, and exported symbol types.
 - Aspire grammar was **not executed against Aspire in this leaf**. The source/docs-derived rule is
   protected by load-bearing literal escaping plus user-text-free ordinal bindings in the
   implementation order.
