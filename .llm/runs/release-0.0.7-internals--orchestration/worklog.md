@@ -5555,3 +5555,21 @@ involved, unlike `codex-status.ts`/`launch-codex-slice.ts`). Dropped the flag; t
 "turn","timeoutSeconds":3600}`, pid verified alive. Two consecutive watcher-setup mistakes on my
 part, zero evidence of any problem with the Codex session itself, which `codex-status` independently
 confirmed `working` throughout.
+
+## D-102 — Main advanced to 73bf2efa9 (#1739); routing leaf reconciliation queued, not immediate
+
+- Verified: `origin/main` now `73bf2efa9f5fd421691fa0e0a04c4a354c79058d`
+  (`fix(cli): detect generated plugin registry source drift (#1739)`), one commit ahead of the routing
+  leaf's base. PR #1792 confirmed as the routing leaf's own draft PR (issue #1791, branch
+  `chore/agentic-open-evaluator-routing`).
+- **Not reconciling now — the Codex session is genuinely active mid-implementation.** `codex-status`
+  did not surface thread `01a05481` in its listing this query (unexplained, possibly a
+  pagination/ranking quirk), but stronger direct evidence contradicts treating that as a stall: the
+  rollout file `rollout-...-01a05481....jsonl` was written 22 seconds before the check, and the
+  worktree gained a fresh commit `a8d9248e3 docs(harness): lock open evaluator routing plan` since
+  the last check. Per instruction, reconciliation with the advanced main (and any regeneration of
+  affected derived carriers) happens **before freezing each evidence head** — i.e. at Tier-A/IMPL-EVAL
+  time — not mid-turn. Queued for then.
+- **Confirmed per instruction: existing #1774 DeepSeek receipts remain valid** — the new routing
+  policy is prospective and does not retroactively apply to or invalidate #1774's already-shipped
+  evaluation (consistent with D-97/D-98).
