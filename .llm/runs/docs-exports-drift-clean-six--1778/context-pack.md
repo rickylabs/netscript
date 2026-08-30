@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `docs-exports-drift-clean-six--1778` |
 | Branch | `docs/exports-drift-clean-six` |
-| Current phase | `plan` |
+| Current phase | `evaluate` handoff |
 | Archetype | N/A — docs tooling policy |
 | Scope overlays | docs |
 
 ## Current State
 
-Research and policy probing are complete on baseline `de57fab0`. The planned mapping uses
-`complete` for `cron` and `entrypoints-only` for the other five candidates. Implementation and the
-required gates remain.
+Implementation and generator validation are complete on baseline `de57fab0`. All six candidates
+are mapped: `cron` uses `complete`; the other five use `entrypoints-only`. All requested gates exit
+0, while the extra README standard task reproduces the same exit 1 on clean `origin/main`.
 
 ## Completed
 
@@ -23,17 +23,20 @@ required gates remain.
 - Re-derived all six entrypoint results and all six complete-mode results.
 - Verified generator input boundaries from source.
 - Recorded justified `PLAN-EVAL: N/A` before implementation.
+- Added all six policy records; the mapping grew from 8 to 14.
+- Ran every requested gate with a real exit code.
+- Proved zero `docs/site/**` and `deno.lock` changes.
+- Reproduced the README baseline failure in a detached clean-main worktree.
 
 ## In Progress
 
-- Harness bootstrap commit and initial PR surface.
+- Final implementation commit/push, PR body evidence, and PR verification.
 
 ## Next Steps
 
-1. Commit/push the run bootstrap and open the non-draft PR as owner-directed.
-2. Add the six policy records.
-3. Run every required gate and clean-main README baseline.
-4. Update artifacts and PR body with pushed-head evidence.
+1. Commit and push the implementation slice with the explicit refspec.
+2. Post the structured implementation comment and replace the PR body with final evidence.
+3. Hand off to Tier-A review and supervisor-dispatched IMPL-EVAL without changing `status:impl`.
 
 ## Key Decisions
 
@@ -47,6 +50,7 @@ required gates remain.
 
 | Path | Status | Notes |
 | --- | --- | --- |
+| `.llm/tools/docs/check-exports-drift.ts` | changed | Six policy records added. |
 | `.llm/runs/docs-exports-drift-clean-six--1778/codex-thread-ids.md` | new (launcher-owned) | Session identity and steering record. |
 | `.llm/runs/docs-exports-drift-clean-six--1778/{supervisor,research,plan,worklog,context-pack,drift}.md` | new | Harness run record. |
 
@@ -54,10 +58,10 @@ required gates remain.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | Required commands not yet run after implementation. |
-| Fitness | partial | Source alignment research complete; final scope proof pending. |
+| Static | PASS | Eight requested commands exit 0; detailed table in `worklog.md`. |
+| Fitness | PASS | Source alignment, scope separation, link integrity, and asset freshness proven. |
 | Runtime | N/A | No runtime change. |
-| Consumer | pending | Export-drift task pending after edit. |
+| Consumer | PASS | `deno task docs:exports-drift` exits 0. |
 
 ## Open Questions
 
@@ -65,7 +69,7 @@ required gates remain.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: none; no packages dropped.
 - Debt: none created or changed.
 
 ## Commits

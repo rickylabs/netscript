@@ -53,6 +53,9 @@ To adopt another package, compare its `deno.json.exports` with its reference exp
 | 2026-08-30 | 1 | research | Read required skills, harness docs, both issues, existing mappings, six pages/export maps, and both asset generators. |
 | 2026-08-30 | 1 | policy probes | Six-package entrypoint probe exits 0. Complete probes: `cron` exits 0; other five exit 1 with concrete symbol omissions. |
 | 2026-08-30 | 1 | plan gate selection | `PLAN-EVAL: N/A` — complete issue contract, hard boundary, empirical decision rule, and fixed gate set leave no unresolved plan decision. |
+| 2026-08-30 | 1 | reconcile | Issue #1778 remains open at `status:impl`, milestone 0.0.7; umbrella #1777 remains reference-only. PR #1780 opened non-draft per owner direction with exactly one `status:impl`. No new comments required readjustment. |
+| 2026-08-30 | 2 | implement | Added all six policies: `cron` complete; the other five entrypoints-only with distinct page-specific reasons. Mapping grew from 8 to 14. |
+| 2026-08-30 | 2 | gate | All eight requested commands exit 0. `docs:readme:check` exits 1 on `packages/bench/README.md` both here and in a detached clean `origin/main` worktree. |
 
 ## Decisions
 
@@ -66,7 +69,7 @@ To adopt another package, compare its `deno.json.exports` with its reference exp
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None so far | minor | yes |
+| None | minor | yes |
 
 ## Gate Results
 
@@ -74,14 +77,23 @@ To adopt another package, compare its `deno.json.exports` with its reference exp
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Required commands | See final gate log after implementation. | NOT_RUN | Pending mapping edit. |
+| Export drift | `deno task docs:exports-drift` | PASS (exit 0) | 14 policies; all six adopted. |
+| Docs accuracy | `deno task docs:accuracy` | PASS (exit 0) | 199 published pages and 91/91 root/direct public commands checked. |
+| Docs links | `deno task docs:links` | PASS (exit 0) | 103 docs; zero broken links/anchors. |
+| Publish assets | `deno task check:publish-assets` | PASS (exit 0) | No stale generated output. |
+| Assets barrel | `deno task check:assets-barrel` | PASS (exit 0) | Generator produced no tracked diff. |
+| Agent docs prose | `deno task check:agent-docs-prose` | PASS (exit 0) | Site built; corpus reported `fresh: true`, no stale paths. |
+| Tool type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/docs --ext ts` | PASS (exit 0) | 22 files, one batch, zero findings. |
+| Lock hygiene | `git diff --exit-code -- deno.lock` | PASS (exit 0) | No lock diff. |
+| README standard | `deno task docs:readme:check` | BASELINE FAIL (exit 1) | Only `packages/bench/README.md` lacks `## Install`. |
+| Clean-main README standard | Same task in detached clean `origin/main` @ `de57fab0` | BASELINE FAIL (exit 1) | Same single `packages/bench/README.md` finding; temp worktree removal exit 0. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Docs source alignment | PASS | Page/export review and complete probes | Policy decisions are evidence-backed. |
-| Scope separation | PENDING_SCRIPT | Final path diff | Must prove zero `docs/site/**` changes. |
+| Scope separation | PASS | `git diff --name-only -- docs/site` produced no paths; command exit 0. | Zero `docs/site/**` files changed. |
 
 ### Runtime Gates
 
@@ -93,9 +105,10 @@ To adopt another package, compare its `deno.json.exports` with its reference exp
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Published reference drift | NOT_RUN | `deno task docs:exports-drift` pending | — |
+| Published reference drift | PASS | `deno task docs:exports-drift`, exit 0 | Six new policies enforced. |
 
 ## Handoff Notes
 
 - Inspect the six reasons first, especially why only `cron` claims `complete`.
 - Re-run complete-mode probes if any page or export map moves before evaluation.
+- The generator must not self-certify; Tier-A review and separate supervisor-dispatched IMPL-EVAL remain.
