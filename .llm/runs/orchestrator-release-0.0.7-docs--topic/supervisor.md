@@ -529,3 +529,49 @@ finding is unchanged and still filed by nobody.
 Allocation `[1551]` remains shipped and exhausted; nothing self-admitted, nothing filed, nothing
 merged, relabelled or closed. Lane continues as an **event-driven watcher** with D-1 as its first
 concrete candidate for the coordinator.
+
+## Leaf allocated — #1745, dispatched 2026-08-30
+
+Coordinator allocated **#1745** (`docs(agentic): document canonical cross-host skill installation`,
+0.0.7, `type:docs`/`area:docs`/`p1`/`status:plan`) to this lane as D-1's leaf. The lane's frozen
+allocation `[1551]` is unchanged — this is a coordinator grant, not a self-admission.
+
+| Field                | Value                                                                     |
+| -------------------- | ------------------------------------------------------------------------- |
+| Branch               | `docs/agentic-cross-host-skills`, direct-to-main, no upstream until push   |
+| Base                 | `origin/main` `13878a80` (verified against `git ls-remote` before cutting) |
+| Leaf worktree        | `projects/netscript/worktrees/007-leaf-1745` (new — one sender per worktree) |
+| Leaf run dir         | `.llm/runs/docs-cross-host-skills--1745/`                                  |
+| Scaffold commit      | `2e2c3364` — research/plan/brief/supervisor/drift written before dispatch  |
+| Route requested      | Codex · OpenAI · `gpt-5.6-sol` · medium (`normal_implementation`)          |
+| Route observed       | provider=openai · model=`gpt-5.6-sol` · effort=medium — **matched**        |
+| Thread               | `01a05164-5ca8-7770-a471-0ce1f00a0171`, launched at base `2e2c3364`        |
+| Steering             | `codex exec resume 01a05164-5ca8-7770-a471-0ce1f00a0171 -- "<follow-up>"` — same thread only; never a second `send-message-v2` at this worktree |
+| Launcher             | `agentic:launch-codex-slice`, `--user node` (NAS), dry-run clean first     |
+| PLAN-EVAL            | **N/A**, coordinator ruling, recorded in the leaf `plan.md`                |
+| IMPL-EVAL            | required, separate session, Claude · Fable 5 · medium (opposite-family for Codex work) |
+
+### Remote Control evidence — stated as it actually is
+
+This supervisor session is a **local interactive tmux session** on the NAS agent plane. The Remote
+Control registration named `netscript-007-docs` is present but **offline**; this session is not
+attached to it. Mobile visibility for the implementation work comes from the **Codex app-server
+daemon**, which owns thread `01a05164…` and reports it under `agentic:codex-status`. That is the
+honest position: daemon-attached implementation, locally-driven supervision. No claim of an attached
+Remote Control bridge is made for this session.
+
+### Two supervisor decisions recorded before implementation, not after
+
+1. **The issue's acceptance names a path that does not exist.** #1745 cites
+   `packages/cli/src/commands/init-agent.ts`; the real file is
+   `packages/cli/src/public/features/agent/init/init-agent.ts`. The run treats the real path as the
+   acceptance target and says so in the leaf `drift.md`, so the evaluator reads a declared
+   substitution rather than silent drift.
+2. **One word outside the issue's literal scope list is authorized.**
+   `docs/site/reference/ai/skills.md:19-21` says "a set of **three** ready-made skills" above a table
+   of five; `skills/` ships five plus `help.md`. Rewriting the section below a known-false count
+   would be a knowing false-fact ship. `three` → `five`, that word only, declared in the leaf
+   `drift.md` in advance.
+
+D-2 (#1728's undocumented error) stays parked. D-3 (release-note surfaces) is not drafted, per the
+coordinator's instruction to wait for the consumer canary payload to be fixed.
