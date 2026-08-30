@@ -1784,3 +1784,15 @@
   step:** the coordinator (or a dedicated implementation session with full context on both the
   readiness refactor's intent and the S1/S5 runtime-gate changes it must absorb) needs to manually
   reconcile `runtime-gates.ts`. No further attempt authorized without that.
+- **D-92 — coordinator ruling on D-91: narrow semantic transplant, not a full replay.** Fresh Codex
+  GPT-5.6 Sol · high thread `01a0546f-3cea-7b22-9b6a-4a38f39c1db9` dispatched from shipped main
+  `2a1248d33d55` in worktree `007-aspire-s6-new`, branch `chore/aspire-13-5-s6-listener-transplant`:
+  carry `5d2bd8756`/`31a2fac87`/regen-of-`714df7de5`/ `01f27d4d4` whole (already proven clean);
+  extract only `b4ca8a1d3`'s listener-readiness gate files/tests/registrations into current main's
+  `runtime-gates.ts` with a required identity assertion that no S1/S5 shipped behavior changed;
+  explicit exclusion list (no `runtime-scripts.ts` refactor, no `generated-app-name.ts` move, no
+  `behavior-gates.ts`/ `behavior-scripts.ts`). Full brief at `slices/s6/transplant-brief.md`. On
+  completion: supervisor pins the push to the existing PR #1743 branch's current head `01f27d4d4`,
+  Tier-A, fresh Phase-B/evaluator, then S8 rebases onto the new S6 head. S8 stays untouched at
+  `f06209d39`; S9/S10/S11/S13 remain stable (checked: all four PRs OPEN/draft/MERGEABLE against
+  their own stacked bases, no regression).
