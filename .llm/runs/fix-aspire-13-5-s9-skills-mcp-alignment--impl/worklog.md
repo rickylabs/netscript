@@ -73,6 +73,7 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | 2 | delivery | Pushed commit `418eb4b9` and posted the required slice-2 implementation comment on draft PR #1759. |
 | 2026-08-30 | 3 | acceptance | Added the supervisor-dispatched Codex Sol prose-audit request and reran the complete static, generator, fitness, and focused test set. |
 | 2026-08-30 | docs-audit fix 1 | implementation | Applied the opposite-family `AUDIT: FAIL_FIX` findings: narrowed 13.5 certification to tagged claims, bounded S2-V4 telemetry wording, replaced stale timings with S2-V2/V9 values, corrected `healthReports` to object, added exact CLI-help receipts, documented dashboard-only MCP startup, and regenerated every required consumer. |
+| 2026-08-30 | IMPL-EVAL fix 1 | implementation | Preserve accumulated MCP observations in failure receipts, leave outer timeout headroom, record structured-log error/count evidence, and add the recorded 14-tool failure regression. SQLite-tier visibility names remain assumed—not proven—and must be explicit Phase-B brief inputs. |
 
 ## Decisions
 

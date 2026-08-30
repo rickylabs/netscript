@@ -6,6 +6,16 @@ import type {
 } from './contract.ts';
 import { ASPIRE_MCP_EXPECTED_TOOLS } from './tools.ts';
 
+export interface AspireMcpPartialObservation {
+  readonly serverInfo: AspireMcpSmokeReceipt['serverInfo'];
+  readonly toolsObserved: readonly string[];
+  readonly toolsMissing: readonly string[];
+  readonly toolsExtra: readonly string[];
+  readonly baselineDiff: AspireMcpSmokeReceipt['baselineDiff'];
+  readonly doctor: AspireMcpSmokeReceipt['doctor'];
+  readonly structuredLogs: AspireMcpSmokeReceipt['structuredLogs'];
+}
+
 /** Redact secret literals and dashboard tokens before transcript persistence. */
 export function redactTranscript(
   transcript: readonly unknown[],
@@ -27,6 +37,7 @@ export function partialReceipt(
   initializeMs: number,
   toolsListMs: number,
   exit: AspireMcpExit,
+  observation: AspireMcpPartialObservation,
 ): AspireMcpSmokeReceipt {
   const excluded = `${input.database}-cli`;
   return {
@@ -35,14 +46,14 @@ export function partialReceipt(
     cliVersion: input.cliVersion,
     scaffoldPin: input.scaffoldPin,
     entryPoint: input.entryPoint,
-    serverInfo: { name: '', version: '' },
+    serverInfo: observation.serverInfo,
     appHost: { path: input.appHostPath, inScope: false, selected: false },
     toolsExpected: ASPIRE_MCP_EXPECTED_TOOLS,
-    toolsObserved: [],
-    toolsMissing: ASPIRE_MCP_EXPECTED_TOOLS,
-    toolsExtra: [],
-    baselineDiff: { added: [], removed: [] },
-    doctor: { cliVersion: '', currentVersion: '', summary: { passed: 0, warnings: 0, failed: 0 } },
+    toolsObserved: observation.toolsObserved,
+    toolsMissing: observation.toolsMissing,
+    toolsExtra: observation.toolsExtra,
+    baselineDiff: observation.baselineDiff,
+    doctor: observation.doctor,
     visibility: {
       expectedVisible: [input.database, input.appResource, input.serviceResource],
       expectedMcpExcluded: [excluded],
@@ -52,6 +63,7 @@ export function partialReceipt(
       ok: false,
     },
     redaction: { secretParamsNull: false, plaintextLeak: false },
+    structuredLogs: observation.structuredLogs,
     lifecycle: { initializeMs, toolsListMs, exit },
     dashboardOnlyTools: [],
     transcript: input.transcript,

@@ -93,6 +93,7 @@ export interface AspireMcpSmokeReceipt {
     readonly ok: boolean;
   };
   readonly redaction: { readonly secretParamsNull: boolean; readonly plaintextLeak: boolean };
+  readonly structuredLogs: { readonly entryCount: number; readonly isError: boolean };
   readonly lifecycle: {
     readonly initializeMs: number;
     readonly toolsListMs: number;

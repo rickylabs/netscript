@@ -93,6 +93,18 @@ export function logCount(value: unknown): number {
   return Array.isArray(lines) ? lines.length : 0;
 }
 
+/** Reject MCP errors and count structured log entries. */
+export function structuredLogEvidence(
+  value: unknown,
+): AspireMcpSmokeReceipt['structuredLogs'] {
+  const source = record(value, 'structured log result');
+  const isError = Reflect.get(source, 'isError') === true;
+  if (isError) throw new Error('list_structured_logs returned an MCP error');
+  const items = Reflect.get(source, 'items');
+  if (!Array.isArray(items)) throw new Error('list_structured_logs omitted items[]');
+  return { entryCount: items.length, isError };
+}
+
 /** Resolve a path through the injected filesystem seam. */
 export async function realPath(
   path: string,

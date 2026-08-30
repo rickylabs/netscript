@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `docs_audit fix cycle 1 — implementation` |
+| Current phase | `IMPL-EVAL fix cycle 1 — implementation` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
