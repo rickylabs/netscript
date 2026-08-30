@@ -103,3 +103,19 @@ of branch. Same failure would occur on a clean checkout of main. Not a leaf regr
 
 TC-6/TC-7/TC-9 (saga span correlation, the actual #1764-owned acceptance target): **not yet proven**.
 The bounded plan above is ready to execute the instant the lease returns.
+
+## Additional static verification (post-correction, no execution)
+
+Checked whether the stopped, overscoped first attempt could have left anything that would block or
+corrupt the bounded plan's execution:
+
+- **`SuiteLeaseManager` self-heals on a dead holder, verified in source.**
+  `createSuiteLeaseManager().acquire()`: if the lease file exists and `isProcessAlive(holder.pid)` is
+  false, it logs "Stale E2E suite lease detected... removing it" and proceeds — a dead holder never
+  blocks a fresh run.
+- **No lease file exists on disk right now**, checked live (`find` across the worktree and
+  `/home/agent`, zero results) — the killed attempt never reached the point of holding it, or never
+  wrote one. Either way, nothing to clear before the bounded run.
+
+This raises confidence in the plan without running it, but does not substitute for running it. Status
+stands as **queued, not executed, TC-6/7/9 unproven**.
