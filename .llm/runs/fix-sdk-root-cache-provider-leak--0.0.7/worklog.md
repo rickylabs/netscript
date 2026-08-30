@@ -83,6 +83,9 @@ gets the same explicit default. A browser/shared author imports `defineServices`
 | 2026-08-30 | S1    | PLAN-EVAL cycle 1 | `FAIL_PLAN` at `1bf9c567`; evaluator accepted structure/doctrine/design and returned six measurement repairs (F1-F7). No implementation started.                                  |
 | 2026-08-30 | S1    | Lume capability   | `deno task check:agent-docs-prose` exit 0; Lume built 638 files, rendered output was OK, and corpus freshness was `true` with no stale paths.                                     |
 | 2026-08-30 | S1    | Plan revision     | Re-locked intact-runtime red, committed graph proof, finite preset type closure, order-independent Fresh proof, four-page prose ownership, and the complete derivative cascade.   |
+| 2026-08-30 | S1    | PLAN-EVAL cycle 2 | `PASS_PLAN` at `9a0f5876`; evaluator measured every cycle-1 repair sufficient on this host and authorized implementation beginning at S2.                                         |
+| 2026-08-30 | S2    | RED               | Added the regression test alone. With the Deno runtime intact, the fresh child reached the target assertion and observed root import -> `hasCacheProvider() === true`.            |
+| 2026-08-30 | S2    | Graph proof       | The same committed test rejects resolved KV/logger modules, raw `@netscript/kv`, and every resolved or raw `node:` edge for both root and presets graphs.                         |
 
 ## Decisions
 
@@ -116,8 +119,8 @@ output filtering only, not evidence selection.
 | JSR audit                       | `audit-jsr-package.ts --root packages/sdk --text`             | PASS WITH 2 WARNINGS (exit 0) | Existing F-DOCT-5 cardinality and slow-types warnings; dry-run reported OK.   |
 | Agent-docs host capability      | `deno task check:agent-docs-prose`                            | PASS (exit 0)                 | Lume built 638 files; rendered output OK; `fresh: true`, no stale paths.      |
 | PLAN-EVAL cycle 1               | Separate opposite-family evaluator                            | FAIL_PLAN                     | Measurement findings F1-F7; no implementation authorized.                     |
-| PLAN-EVAL cycle 2               | Separate coordinator-owned evaluator                          | NOT RUN                       | Required next step; hard stop remains.                                        |
-| S2 RED                          | Focused structured test                                       | NOT RUN                       | Prohibited before PLAN-EVAL PASS.                                             |
+| PLAN-EVAL cycle 2               | Separate opposite-family evaluator                            | PASS_PLAN                     | Plan commit `9a0f5876`; implementation authorized from S2.                    |
+| S2 RED                          | Focused structured test                                       | EXPECTED RED (exit 1)         | 0 passed / 1 failed; observed provider `true`, with no unrelated child crash. |
 
 ### Gates not applicable/run in S1
 
@@ -128,6 +131,6 @@ output filtering only, not evidence selection.
 
 ## Handoff notes
 
-PLAN-EVAL cycle 2 should verify the six required repairs against the tree: intact-runtime red,
-single-test graph assertion, finite ports-type closure, order-independent Fresh registration proof,
-expanded ceiling, and docs/export/generated gate order. S2 must remain absent from this revision.
+S2 is ready to commit as the regression test and run evidence alone. S3 may begin only after that
+commit is pushed and its structured PR comment is posted. The graph portion is intentionally dormant
+behind the behavioral red until S3 removes the import-time provider registration.

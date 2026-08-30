@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `fix-sdk-root-cache-provider-leak--0.0.7` |
 | Branch         | `fix/sdk-root-cache-provider-leak`        |
-| Current phase  | revised `plan-eval` cycle 2 handoff       |
+| Current phase  | S2 red-before handoff                     |
 | Archetype      | `2 — Integration`                         |
 | Scope overlays | none                                      |
 
@@ -20,8 +20,10 @@ committed graph assertion, a finite curated-entry closure, an order-independent 
 affected site pages, and the full agent-docs/publish derivative chain. No test or product file has
 been written.
 
-PLAN-EVAL remains mandatory. This implementation thread stops after the revised S1 plan
-commit/push/PR handoff for cycle 2.
+PLAN-EVAL cycle 2 returned `PASS_PLAN` at plan commit `9a0f5876`, authorizing implementation. S2 now
+contains only the new regression test plus run evidence. Its intact-runtime fresh child imports the
+root `defineServices`, then observes `hasCacheProvider() === true`; the structured runner exits 1
+with 0 passed and 1 failed. The failure is the product defect, not an unrelated runtime crash.
 
 ## Completed
 
@@ -40,19 +42,24 @@ commit/push/PR handoff for cycle 2.
   rendered output OK, corpus fresh.
 - Added the three omitted published guidance pages and both `.llm/assets/agent-docs/*` outputs to
   the locked ceiling.
+- Received PLAN-EVAL cycle 2 `PASS_PLAN`.
+- Added the S2 red-before test without changing product code.
+- Recorded structured RED: exit 1, 0 passed / 1 failed, observed provider `true`.
+- Embedded the final graph assertion in that test: both root and presets must exclude resolved KV,
+  logger, every `node:` module, raw `@netscript/kv`, and raw `node:` dependencies.
 
 ## In progress
 
-- Separate PLAN-EVAL cycle 2 handoff by the fixes-lane coordinator.
+- S2 commit/push/comment checkpoint.
 
 ## Next steps
 
-1. Coordinator launches PLAN-EVAL cycle 2 in a separate session against the revised plan commit.
-2. If verdict is `PASS`, authorize S2: add the intact-runtime failing test plus its later graph
-   assertion alone, record exit/counts and the observed boolean mismatch, then commit/push/comment
-   before any product change.
-3. If cycle 2 does not pass, stop and escalate; the two-cycle harness limit is exhausted.
-4. Do not start S3 until S2 is committed and its exact red is on record.
+1. Commit and push S2, then post its structured PR comment before any product edit.
+2. Implement S3 strictly inside the locked ceiling.
+3. Run the focused regression green and the whole SDK test directory, plus the order-independent
+   Fresh registration child test.
+4. Run the locked docs/export/generated cascade in order and record measured negatives as such.
+5. Prove `deno.lock` unchanged with raw Git before the S3 checkpoint.
 
 ## Key decisions
 
@@ -78,17 +85,18 @@ commit/push/PR handoff for cycle 2.
 
 ## Gates
 
-| Gate family             | Current status                | Evidence                                                                                     |
-| ----------------------- | ----------------------------- | -------------------------------------------------------------------------------------------- |
-| Research/currentness    | PASS                          | Base/source/issue and `deno doc` verification in `research.md`.                              |
-| Plan-Gate               | CYCLE 1 FAIL; CYCLE 2 PENDING | Six measurement repairs incorporated; no implementation authorized.                          |
-| JSR surface scan        | BASELINE RECORDED             | Audit exit 0 with two warnings; full doc-lint and direct preset entry are measured negative. |
-| Agent-docs host         | PASS                          | `check:agent-docs-prose` exit 0; 638-file Lume build; corpus `fresh: true`.                  |
-| Static/runtime/consumer | NOT RUN                       | No product/test changes in S1.                                                               |
+| Gate family          | Current status     | Evidence                                                                                     |
+| -------------------- | ------------------ | -------------------------------------------------------------------------------------------- |
+| Research/currentness | PASS               | Base/source/issue and `deno doc` verification in `research.md`.                              |
+| Plan-Gate            | PASS_PLAN          | Cycle 2 independently measured the revised plan sufficient.                                  |
+| JSR surface scan     | BASELINE RECORDED  | Audit exit 0 with two warnings; full doc-lint and direct preset entry are measured negative. |
+| Agent-docs host      | PASS               | `check:agent-docs-prose` exit 0; 638-file Lume build; corpus `fresh: true`.                  |
+| S2 behavioral red    | EXPECTED RED       | Structured exit 1; 0 passed / 1 failed; root provider observed `true`.                       |
+| S2 graph assertion   | COMMITTED, DORMANT | Runs after the behavioral assertion turns green in S3.                                       |
 
 ## Open questions
 
-None in the revised author plan. Cycle 2 must independently verify the repairs.
+None. S3 follows the locked plan and evaluator refinements M1-M3.
 
 ## Drift and debt
 
