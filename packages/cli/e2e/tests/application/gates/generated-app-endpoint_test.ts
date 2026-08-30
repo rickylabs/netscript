@@ -166,6 +166,34 @@ Deno.test("the app endpoint comes from the resource's declared urls[]", () => {
   ]);
 });
 
+// S2 captured 13.5.3 describe JSON with `--nologo`; this independent, bannerless case is a
+// redacted projection of `02-v5-aspire-describe-final.json`, selecting its `users` resource.
+const ASPIRE_13_5_3_DESCRIBE_FIXTURE = JSON.stringify({
+  resources: [
+    {
+      name: 'users-yvbcumea',
+      displayName: 'users',
+      resourceType: 'Executable',
+      state: 'Running',
+      healthStatus: 'Healthy',
+      dashboardUrl: 'https://localhost:42501/?resource=users-yvbcumea',
+      relationships: [{ type: 'Reference', resourceName: 'aspire-13-5-postgres-db' }],
+      urls: [{ name: 'http', url: 'http://localhost:3001' }],
+      environment: {
+        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:42043',
+        OTEL_SERVICE_NAME: 'users',
+        PORT: '43515',
+      },
+    },
+  ],
+});
+
+Deno.test("13.5.3: the app endpoint comes from the captured resource's declared urls[]", () => {
+  assertEquals(appUrlsFromDescribeOutput(ASPIRE_13_5_3_DESCRIBE_FIXTURE, 'users'), [
+    'http://localhost:3001',
+  ]);
+});
+
 // This is the sharp edge. A recursive scrape of the resource node also picks up the Aspire
 // dashboard deep-link and every sibling URL in `environment`. Probing one of those would not
 // just be wrong — a sibling app's page is `text/html` containing `<html` too, which is the
