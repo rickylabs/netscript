@@ -229,3 +229,34 @@ supervisor's to do, and the numbers are the evaluator's to verify independently.
 PR #1762 stays **draft**, `status:plan`, with live `closingIssuesReferences` **`[]`** — a closing
 keyword would incorrectly mark #1387 complete on merge of a plan-only PR. The body wording repaired by
 the coordinator is preserved verbatim.
+
+## S0 re-run on `24f6642f` — released for implementation under the accepted adapter boundary
+
+`origin/main` advanced to **`24f6642f040617de573c7cef1140eed1ac0efd6d`** (#1763 / issue #1730 shipped,
+after #1772). Branch rebased onto it: **`0a1e6337`**, clean. Rebase remains correct here — this branch
+carries plan artifacts only, so no receipt, archive or verdict cites a SHA it would rewrite.
+
+**S0 preconditions re-verified, not assumed:** `packages/contracts/src/public/mod.ts` on `main` exports
+`NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement` and `BaseContractMeta` — the metadata
+shape the research was written against, unchanged.
+
+**Base-gate census at `0a1e6337`** — identical to the previous measurement, so the two `main` advances
+since were inert for this leaf's contracted signals:
+
+| Package | Measured | `plan.md` row 4 says |
+| --- | --- | --- |
+| contracts | **16** | 8 — **stale (F-1)** |
+| service | 90 | 90 |
+| plugin | 68 | 68 |
+| sdk | **77** | 69 — **stale (F-1)** |
+| mcp | 136 | 136 |
+
+The two stale rows are unchanged from what S0 first surfaced and PLAN-EVAL ruled blocking; they are
+repaired by the author in step 1, not silently by the supervisor.
+
+**Release status.** PLAN-EVAL cycle 1 returned `FAIL_PLAN` with five required fixes and **adjudicated
+both flagged decisions ACCEPTED** — LD-11 (router-rename acceptance) and LD-8 (`optional` fails closed
+at binding). The coordinator has released the leaf under that accepted adapter boundary. The design is
+accepted and unchanged; the five fixes are gate-set, ceiling and text corrections only, and the
+evaluator's own re-evaluation scope says a full fresh PLAN-EVAL is **not** required unless design text
+changes.
