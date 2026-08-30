@@ -5726,3 +5726,27 @@ confirmed `working` throughout.
   (the print-turn transport this leaf's own prior evaluations used — consistent dogfooding of the
   exact route this leaf implements), `z-ai/glm-5.3-flash`, effort `max`, credential sourced without
   printing it. Confirmed genuinely running (pid alive, real init events in the transcript).
+
+## D-108 — Concurrency correction: my dispatch was the duplicate; a parallel internals-supervisor session identified
+
+- **My own final-eval dispatch (pid `328272`, session `8016a5c4-...`) was the duplicate the
+  coordinator terminated**, confirmed by reading its own transcript's `session_id` field. Already
+  dead; not relaunching, per instruction.
+- **The retained evidence carrier is session `ec1cfcda-7207-4719-a976-5e16c0914e8d`, pid `328177`**,
+  found live via `ps aux`, confirmed genuine: invoked with the exact same independently-verified
+  heads (`ba70c6c90098129821cad342d0f005a38d37bb77` vs `origin/main`
+  `5197e70b716eafb82fbb12ddb9a910c248ddb86a`), explicitly instructed read-only (no edit/commit/push/
+  comment/label/merge), with a `BLOCKED_HEAD_MOVED` self-check if HEAD moves before it evaluates.
+- **Notable discovery, recorded plainly rather than acted on**: this process's parent (pid `5498`) is
+  `claude --remote-control netscript-0.0.7 internals supervisor --dangerously-skip-permissions`
+  — a **separate Claude Code Remote Control session also operating as an "internals supervisor"**
+  on this same repo/branch. This explains the pattern of autonomous artifacts and commits found
+  throughout this leaf's work (`evaluate-merged-head.md`, `evaluate-final-head.md`, the review-fix
+  commit `cb14c8ca6`/`3872c5db8`, the OpenHands auto-dispatch) that this session never itself
+  triggered. Consistent with a human owner operating multiple coordinated sessions against the same
+  topic; not itself an anomaly requiring action, but worth the explicit record so a future reader
+  does not mistake this session's ledger as the sole source of activity on this leaf.
+- Waiting on pid `328177` to exit (background wait armed). On exit: verify branch head is still
+  exactly `ba70c6c90` and `git status --short` shows no source mutation before recording any verdict
+  from this session's evidence, per instruction — the supervisor alone records the verdict, not the
+  evaluator session itself (it has no write access to do so).
