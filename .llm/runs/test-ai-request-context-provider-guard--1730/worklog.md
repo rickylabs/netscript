@@ -76,6 +76,8 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 | 2026-08-30T13:47Z | S2 | hygiene | Focused format PASS (1 file), test file 492 LOC, `deno.lock` working/tree blob both `a1522e6e`, and raw status showed no generated carrier movement. |
 | 2026-08-30T13:58Z | S3 | coverage boundary | Chose the locked rename/document path: the Anthropic test now states that it covers direct adapter serialization, while its comment delegates bridge/`modelOptions` leakage to the TanStack seam. This is truthful because the adapter drops unsupported model options and therefore cannot detect mutation A. |
 | 2026-08-30T13:58Z | S3 | proving gate | Focused structured test wrapper PASS, 9/9, `durationMs=1211`; focused format PASS; test file remains below F-10 at 495 LOC. |
+| 2026-08-30T14:00Z | S4 | convergence | Merged `origin/main` `3e5cbabf` once, producing `2b4f7407`. Merge was chosen over rebase to preserve the already-pushed S1–S3 hashes and PR-comment references. There were no conflicts, so no generated carrier was resolved or regenerated; raw post-merge status was clean. |
+| 2026-08-30T14:00Z | S4 | receipt contract | Confirmed no prior top-level #1730 receipt set exists to archive. The final named set will be cut only after this evidence-state commit, under ignored `.llm/tmp/gate-receipts/test-ai-request-context-provider-guard--1730/receipts/`; no later commit is permitted. |
 
 ## Decisions
 
@@ -112,7 +114,26 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 
 | Gate | Result | Notes |
 | --- | --- | --- |
-| Final exact-head static gates | NOT_RUN | S4 |
+| Final exact-head static gates | PENDING_RECEIPTS | Cut only after the final evidence-state commit so every receipt targets one immutable head. |
+
+### S4 exact-head receipt contract
+
+The top-level named receipt set is explicit (never a glob):
+
+1. `check-final.json`
+2. `test-final.json`
+3. `lint-final.json`
+4. `fmt-check-final.json`
+5. `quality-gate-final.json`
+6. `doc-lint-final.json` — expected base-red delta, never PASS
+7. `publish-dry-run-final.json`
+
+The JSR audit remains a named exact-head supplemental command because the committed gate catalog has
+no `jsr-audit` entry; its required no-increase result is 2 warnings. Receipt sufficiency is
+recomputed over the seven named top-level receipts only. A sufficient all-green claim is impossible
+by design because `doc-lint-final.json` must remain terminal `FAIL`; the expected result is
+`INSUFFICIENT` for exactly `doc-lint did not pass (FAIL)`, paired with the verified 128-private-ref /
+0-missing-JSDoc unchanged delta.
 
 ### S3 Anthropic adapter-serialization boundary
 
@@ -181,6 +202,10 @@ focused wrapper after restoration: exit 0; 9 passed, 0 failed; durationMs 214
   altered the locked S3 choice. The test was renamed/documented rather than extended because the
   Anthropic adapter intentionally drops unsupported model options, so the TanStack seam is the
   correct mutation-A detector.
+- **S4:** The PR remained draft and partial at convergence; issue #1730 remained open with no new
+  comments. `origin/main` was integrated once by merge, preserving every published slice hash. The
+  final receipt set is now frozen by name; only ignored receipt/output files and external PR
+  metadata may change after the evidence-state commit.
 
 ## Handoff Notes
 

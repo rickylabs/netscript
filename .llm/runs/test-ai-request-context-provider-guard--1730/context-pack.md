@@ -6,17 +6,18 @@
 | --- | --- |
 | Run ID | `test-ai-request-context-provider-guard--1730` |
 | Branch | `test/ai-request-context-provider-guard` |
-| Current phase | `impl — S3 complete; convergence and S4 pending` |
+| Current phase | `gate — final S4 content state; exact-head receipts pending` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
 ## Current State
 
-S1 and S2 were accepted before this fresh implementation thread began. S3 now narrows the Anthropic
-wire test to its actual boundary: direct adapter serialization. Its comment explicitly assigns
-bridge/`modelOptions` leakage (mutation A) to the TanStack seam test because the Anthropic adapter
-drops unsupported model options. The focused suite is green 9/9 and the test remains below F-10 at
-495 LOC. The branch still needs its one documented `main` convergence before final S4 receipts.
+S1 and S2 were accepted before this fresh implementation thread began. S3 narrows the Anthropic
+wire test to direct adapter serialization and explicitly assigns mutation-A bridge/`modelOptions`
+coverage to the TanStack seam. The focused suite is green 9/9 and the test remains below F-10 at
+495 LOC. The branch converged once with `main` `3e5cbabf` via merge commit `2b4f7407`; there were no
+conflicts and raw post-merge status was clean. This committed state is the final content surface;
+only ignored exact-head receipts and external PR metadata may change afterward.
 
 ## Completed
 
@@ -36,17 +37,21 @@ drops unsupported model options. The focused suite is green 9/9 and the test rem
   remains the mutation-A detector.
 - Kept `request_context_test.ts` at 495 LOC; no product, lock, docs, README, or generated carrier
   moved.
+- Merged current `main` exactly once without conflict; chose merge to preserve pushed slice hashes
+  and their structured PR comments.
+- Confirmed there is no prior top-level #1730 receipt set to archive.
 
 ## In Progress
 
-- S3 commit, explicit-refspec push, structured IMPL comment, then the documented `main`
-  convergence point before S4.
+- Commit this final S4 evidence state, then cut and field-audit the named exact-head receipts.
 
 ## Next Steps
 
-1. Commit/push/comment S3.
-2. Integrate `origin/main` once and record the chosen strategy.
-3. Land the final evidence artifact state, then cut and audit named exact-head S4 receipts.
+1. Cut the seven named top-level receipts at the final immutable content head.
+2. Run the named exact-head JSR supplemental and audit every receipt's `argv`, `durationMs`,
+   `gitHead`, and `actualGitHead`.
+3. Recompute sufficiency over the named receipt set, prove lock/carrier/status hygiene, push/comment,
+   and stop for Tier-A.
 
 ## Key Decisions
 
@@ -69,8 +74,8 @@ drops unsupported model options. The focused suite is green 9/9 and the test rem
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S3 focused PASS | Focused structured test 9/9 and format PASS; final S4 pending. |
-| Fitness | S3 shape PASS | 495 LOC; `quality:gate` and full exact-head set pending S4. |
+| Static | PENDING_RECEIPTS | Final content state is committed before receipt execution. |
+| Fitness | S3 shape PASS | 495 LOC; exact-head quality/delta evidence pending receipts. |
 | Runtime | S2 PASS | Named mutation-red 0/1; restored focused suite 9/9; product diff empty |
 | Consumer | N/A | No public-surface change |
 
