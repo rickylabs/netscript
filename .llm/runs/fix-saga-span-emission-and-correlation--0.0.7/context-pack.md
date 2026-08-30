@@ -23,7 +23,9 @@ transport. S4 now emits all five cascade spans at their operation owners and nor
 instrumentation instance through core/plugin composition. The locked S4 check/format/lint gates are
 clean and its focused suite passes 31/31. S5 documents the contract and adds the real generated
 Flow-B compensation fixture plus direct-parent/correlation validator proof; its focused static and
-5-test gates pass.
+5-test gates pass. S6 exact-head evidence is complete: allowed static, architecture, quality,
+publish, tests, and three non-mutating derivative gates pass; MCP corpus staleness is the expected
+attributed STOP and was not regenerated.
 
 ## Completed
 
@@ -60,17 +62,22 @@ Flow-B compensation fixture plus direct-parent/correlation validator proof; its 
   and direct `saga.handle -> saga.cascade.compensate` validation.
 - Proved S5 with three focused static files, 5/5 validator tests, and a conformant in-scope README;
   recorded the unrelated global bench README failure without editing outside ceiling.
+- Proved S6 with 36 focused tests, clean 112-core/84-plugin check-format-lint passes, architecture
+  and quality exit 0, both publish dry-runs exit 0, and all three non-mutating shared-asset checks
+  green.
+- Confirmed the MCP export corpus is stale because existing exported signatures moved; retained the
+  supervisor-attributed STOP and made no generated write. Recorded the inherited plugin doctor
+  module-tag audit failure without expanding the ceiling.
 
 ## In Progress
 
-- S5 commit and push.
+- S6 evidence commit and push.
 
 ## Next Steps
 
-1. Commit and push the green S5 docs/consumer slice, then update the implementation PR comment.
-2. Run the S6 allowed static, fitness, publish, and non-mutating derivative gate table.
-3. Stop/report at expected MCP corpus staleness; do not regenerate shared artifacts or run the
-   leased Flow-B runtime.
+1. Commit and push the S6 evidence artifacts and update the implementation PR comment.
+2. Hand the final S5/S6 head to the supervisor for refreshed Tier-A and separate IMPL-EVAL.
+3. Preserve MCP corpus regeneration and the leased Flow-B runtime for supervisor coordination.
 
 ## Key Decisions
 
@@ -101,16 +108,18 @@ Flow-B compensation fixture plus direct-parent/correlation validator proof; its 
 
 ## Gates
 
-| Gate family | Current status    | Evidence                                                                         |
-| ----------- | ----------------- | -------------------------------------------------------------------------------- |
-| Static      | baseline measured | package publish dry-run exit 0; doc-lint existing exit 1/nine findings           |
-| Fitness     | baseline measured | JSR audit exit 0 with two existing warnings                                      |
-| Runtime     | NOT_RUN           | prohibited without lease                                                         |
-| Consumer    | baseline measured | MCP corpus check exit 0 now; post-change stale expected and supervisor-sequenced |
-| S2 negative | PASS              | raw exit 1; 0 passed / 2 failed assertions; commit `2146443c`                    |
-| S3 static   | PASS              | 112 checked/formatted/linted; 7 focused tests passed                             |
-| S4 static   | PASS              | core/plugin checks and format/lint clean; 31 focused tests passed                |
-| S5 static   | PASS              | three files clean; 5 validator tests; focused README 1/1                         |
+| Gate family | Current status | Evidence                                                                  |
+| ----------- | -------------- | ------------------------------------------------------------------------- |
+| Static      | PASS           | exact-head check/fmt/lint/tests/arch/quality/publish gates green          |
+| Fitness     | measured delta | core audit pass; inherited plugin doctor module-tag failure               |
+| Runtime     | NOT_RUN        | prohibited without lease                                                  |
+| Consumer    | STOP           | expected leaf-caused MCP corpus stale; other three derivative checks pass |
+| S2 negative | PASS           | raw exit 1; 0 passed / 2 failed assertions; commit `2146443c`             |
+| S3 static   | PASS           | 112 checked/formatted/linted; 7 focused tests passed                      |
+| S4 static   | PASS           | core/plugin checks and format/lint clean; 31 focused tests passed         |
+| S5 static   | PASS           | three files clean; 5 validator tests; focused README 1/1                  |
+| S6 allowed  | PASS           | static/arch/quality/publish/derivatives green; 36 focused tests           |
+| MCP corpus  | STOP           | expected leaf-caused signature staleness; no regeneration                 |
 
 ## Open Questions
 

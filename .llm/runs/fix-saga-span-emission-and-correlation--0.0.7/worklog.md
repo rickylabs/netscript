@@ -92,17 +92,18 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Progress Log
 
-| Time                 | Slice | Step                   | Notes                                                                                                                                                                                                                      |
-| -------------------- | ----- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30T12:57:16Z | S1    | Re-baseline/research   | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                                                |
-| 2026-08-30T12:57:16Z | S1    | Design                 | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                                   |
-| 2026-08-30T13:10:51Z | S1    | Supervisor review      | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                                    |
-| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1      | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                                         |
-| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2      | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                                            |
-| 2026-08-30T13:53:27Z | S2    | Red-before proof       | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                                             |
-| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4.                  |
-| 2026-08-30T14:14:44Z | S4    | Runtime emission       | Added all five operation-owned callers, normalized one instrumentation dependency through core/plugin composition, and preserved engine-selected correlation/direct-parent context through compensation cascades.          |
-| 2026-08-30T14:23:57Z | S5    | Docs/consumer proof    | Documented all six span contracts and added a generated Flow-B compensation fixture plus validator checks for direct parenting and exact callback/payload correlation equality. Runtime execution remains supervisor-only. |
+| Time                 | Slice | Step                     | Notes                                                                                                                                                                                                                                       |
+| -------------------- | ----- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30T12:57:16Z | S1    | Re-baseline/research     | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                                                                 |
+| 2026-08-30T12:57:16Z | S1    | Design                   | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                                                    |
+| 2026-08-30T13:10:51Z | S1    | Supervisor review        | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                                                     |
+| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1        | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                                                          |
+| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2        | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                                                             |
+| 2026-08-30T13:53:27Z | S2    | Red-before proof         | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                                                              |
+| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract   | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4.                                   |
+| 2026-08-30T14:14:44Z | S4    | Runtime emission         | Added all five operation-owned callers, normalized one instrumentation dependency through core/plugin composition, and preserved engine-selected correlation/direct-parent context through compensation cascades.                           |
+| 2026-08-30T14:23:57Z | S5    | Docs/consumer proof      | Documented all six span contracts and added a generated Flow-B compensation fixture plus validator checks for direct parenting and exact callback/payload correlation equality. Runtime execution remains supervisor-only.                  |
+| 2026-08-30T14:28:11Z | S6    | Merge-readiness evidence | Re-ran all allowed exact-head gates. Static, architecture, publish, focused tests, quality, and three check-only derivative gates pass; MCP corpus is the expected attributed STOP; two unrelated baseline gates remain measured negatives. |
 
 ## Decisions
 
@@ -129,6 +130,7 @@ a process seam. A thin plugin may only wire the core primitive.
 | PLAN-EVAL found no-op complete ownership and an invalid mechanical red-before contract | significant | yes                |
 | Release surface baseline and docs export counts sit outside the product ceiling        | minor       | yes                |
 | Global README task reports unchanged out-of-ceiling bench README debt                  | minor       | yes                |
+| Plugin JSR audit reports unchanged out-of-ceiling doctor module-tag debt               | minor       | yes                |
 
 ## Gate Results
 
@@ -151,13 +153,20 @@ a process seam. A thin plugin may only wire the core primitive.
 | S5 focused README        | README standard checker, package path                  | PASS   | exit 0; in-scope README 1/1 conformant                                                      |
 | Global README baseline   | `deno task docs:readme:check`                          | FAIL   | exit 1; only `packages/bench/README.md`, unchanged and outside ceiling                      |
 | Post-change doc lint     | package doc-lint wrapper                               | FAIL   | expected baseline: 9 private-type findings, 0 missing JSDoc/other                           |
+| S6 exact-head checks     | structured core/plugin check wrappers                  | PASS   | 112 core and 84 plugin modules; zero findings                                               |
+| S6 exact-head tests      | structured locked-target test wrapper                  | PASS   | 36 passed / 0 failed                                                                        |
+| S6 exact-head fmt/lint   | structured core/plugin wrappers                        | PASS   | 112 core and 84 plugin files; zero findings                                                 |
+| Architecture/quality     | `arch:check`, `quality:gate`                           | PASS   | exit 0; repository-wide warnings only                                                       |
+| Core/plugin publish      | package publish dry-runs                               | PASS   | both exit 0                                                                                 |
 
 ### Fitness Gates
 
-| Gate                   | Result         | Evidence                      | Notes                                                           |
-| ---------------------- | -------------- | ----------------------------- | --------------------------------------------------------------- |
-| F-5/F-7 baseline audit | PASS           | `audit-jsr-package.ts` exit 0 | Existing root-cardinality and broad slow-type warnings recorded |
-| Remaining fitness set  | PENDING_SCRIPT | plan gate table               | Run only after PLAN-EVAL/S2 implementation authorization        |
+| Gate                   | Result | Evidence                      | Notes                                                           |
+| ---------------------- | ------ | ----------------------------- | --------------------------------------------------------------- |
+| F-5/F-7 baseline audit | PASS   | `audit-jsr-package.ts` exit 0 | Existing root-cardinality and broad slow-type warnings recorded |
+| Core JSR audit         | PASS   | exact-head package audit      | exit 0; same two recorded warnings                              |
+| Plugin JSR audit       | FAIL   | exact-head plugin audit       | inherited `doctor.ts` module-tag finding; outside ceiling       |
+| Remaining fitness set  | PASS   | S6 gate table                 | architecture, quality, publish, static and consumer-unit gates  |
 
 ### Runtime Gates
 
@@ -167,11 +176,13 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ### Consumer Gates
 
-| Consumer                      | Result  | Evidence                                   | Notes                                                                                            |
-| ----------------------------- | ------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Published core/plugin surface | NOT_RUN | plan gate table                            | Additive surface planned; dry-run after implementation                                           |
-| MCP export corpus baseline    | PASS    | `deno task check:mcp-export-corpus` exit 0 | Non-mutating check: 35 packages, 270 subpaths, 7,614 symbols                                     |
-| Generated derivatives         | NOT_RUN | four writers inspected                     | MCP corpus is expected to go stale; all stale results are stop/report, never author regeneration |
+| Consumer                      | Result | Evidence                       | Notes                                                                    |
+| ----------------------------- | ------ | ------------------------------ | ------------------------------------------------------------------------ |
+| Published core/plugin surface | PASS   | both publish dry-runs exit 0   | Additive existing-signature evolution; no export-map key change          |
+| MCP export corpus             | STOP   | exact-head check exits 1       | leaf-caused signature staleness; supervisor-sequenced, never regenerated |
+| Agent docs prose              | PASS   | check-only task exit 0         | no shared asset change                                                   |
+| Publish assets                | PASS   | check-only task exit 0         | no shared asset change                                                   |
+| CLI assets barrel             | PASS   | direct writer `--check` exit 0 | locked non-mutating invocation; no shared asset change                   |
 
 ## Handoff Notes
 
@@ -180,12 +191,15 @@ a process seam. A thin plugin may only wire the core primitive.
 - S3 supplies the typed telemetry/context contract and S4 now supplies all five production owners.
   Compensation request fields remain optional, absent values are never derived, and post-handler
   cascade size is recorded only through the typed instrumentation method.
-- S5 is next: update the package README and Flow-B fixture/validator unit proof without invoking the
-  supervisor-owned runtime gate.
 - S5 is implemented and statically green. The global README task's unrelated bench-package debt is
   measured in `drift.md`; the focused in-scope README check passes.
 - S6 runs the allowed merge-readiness/static derivative gates. The expected MCP corpus stale result
   is stop/report, and the required Flow-B runtime remains supervisor-owned/author-must-not-run.
+- S6 is complete. All allowed author-owned proof is green except the two measured inherited
+  negatives (global bench README and plugin doctor module tag). MCP corpus staleness is the expected
+  attributed `STOP`, not a failure to regenerate.
+- The branch needs a refreshed supervisor/evaluator pass over S5/S6 because the recorded Tier-A
+  sign-off at `7517ae50` predates the consumer-proof slice.
 - The expected MCP corpus and release public-surface baseline staleness are supervisor sequencing
   handoffs. Do not regenerate them. Flow-B runtime remains author-must-not-run.
 

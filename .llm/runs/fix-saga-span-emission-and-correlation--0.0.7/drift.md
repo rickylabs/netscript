@@ -100,3 +100,17 @@ documentation.
 - **Action:** accept measured baseline; do not edit outside ceiling
 - **Evidence:** Global result `1/36 non-conformant`, focused result
   `A2 README standard OK - 1 README(s) conform`.
+
+## 2026-08-30 — Plugin JSR audit has unrelated baseline module-tag debt
+
+- **What:** The plugin-side `audit-jsr-package.ts` exits 1 because exported
+  `plugins/sagas/doctor.ts` lacks an `@module` JSDoc tag; core audit exits 0.
+- **Source:** S6 core/plugin package audit pair.
+- **Expected:** Plan gate 12 expected both audit invocations to exit 0 with no new findings.
+- **Actual:** `doctor.ts` is byte-unchanged from locked baseline `f8b4f804` and outside this leaf's
+  product ceiling. Plugin publish dry-run still exits 0; the audit also reports the existing root
+  cardinality and slow-type warnings.
+- **Severity:** minor
+- **Action:** accept measured baseline; do not edit outside ceiling
+- **Evidence:** Raw base-to-head diff for `plugins/sagas/doctor.ts` exits 0; plugin audit reports
+  one `F-JSR-2 module-tag` failure and two warnings.
