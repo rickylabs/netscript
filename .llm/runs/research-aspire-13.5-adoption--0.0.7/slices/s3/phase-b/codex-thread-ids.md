@@ -33,3 +33,11 @@ _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
   runtime start; Aspire `[]`, dind empty verified) and the correction re-sent on the **same thread**
   via `agentic:codex-resume` (log `/home/agent/observability/aspire-13.5/s3-phase-b-steer-2.log`);
   rollout confirms receipt. No second thread.
+- 2026-08-30 09:34:07Z — **first `aspire start`** by the thread (CLI log
+  `cli_20260830T093407149_detach-child_e0f372f9….log`, AppHost
+  `…/007-aspire-s3/.llm/tmp/aspire-s3-phase-b/aspire/apphost.mts`, SDK 13.5.3, dashboard
+  `https://localhost:34335`). This happened in the ~2-minute window between the supervisor's last
+  "no runtime process" check (09:32Z) and the launcher detach, so the environment correction reached
+  the thread **after** the first start but **before any capture**; the detached AppHost survived the
+  client detach (it is a detached child) and the resumed turn continues under the corrected facts.
+  Recorded verbatim rather than restated as "before first start".
