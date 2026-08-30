@@ -81,3 +81,26 @@
 - Static verification passed: changed-file wrappers, raw excluded-catalog lint/fmt, README/fixture
   format, 190/190 CLI-E2E tests, `quality:scan`, `arch:check`, assets/publish/emitted-samples, and
   Aspire host-port scan. No Phase-B runtime command was run.
+
+## Phase-B describe-follow shape fix
+
+- 2026-08-30: off-host GitHub Actions run `33326591443` supplied the first real Phase-B execution
+  evidence. Both runtime tiers passed 36 gates, then deterministically failed
+  `runtime.aspire-start` because Aspire CLI 13.5.3 emits one bare `ResourceJson` per NDJSON line for
+  `describe --follow`, while the parser required a wrapped `resources[]` object.
+- RED fixture: added captured-style bare lines, including
+  `{"name":"postgres","displayName":"postgres","state":"Running","health":"Healthy"}`. The
+  structured test wrapper exited 1 with 8 passed / 1 failed and the expected
+  `describe line 1 omitted resources[]` error (`.llm/tmp/s10-phase-b-describe-red.json`).
+- Implementation: `resources()` now accepts either wrapped `resources[]` input or a bare resource
+  record carrying `displayName`, `name`, or `resourceName`. Unknown objects fail with a line-numbered
+  dual-shape error. `resource()` name/state/health extraction is unchanged because the real DTO keys
+  already match its accepted fields.
+- Consumer audit: `resource-command.ts` captures and evaluates through the shared parser;
+  `listener-readiness.ts` calls `parseDescribeFollow`. Neither contains a separate follow-stream
+  wrapper assumption, so no consumer change was required.
+- Wrapper validation: check exit 0; fmt exit 0 over 185 files; focused tests exit 0 with 16/16. The
+  first broad lint wrapper run reported zero findings but exited 2 because the pre-existing nested
+  `desktop-native` fixture cannot resolve the parent `zod` catalog; the wrapper rerun excluding
+  only that unrelated fixture exited 0 with zero findings. No Aspire/Docker/runtime/CI command ran
+  on this host.

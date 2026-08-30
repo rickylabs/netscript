@@ -5,7 +5,7 @@
 - Stack base: S8 `9dd06647`
 - Draft PR base: `feat/aspire-13-5-s8-typed-resource-commands`
 - Issues: closes #1722; part of #1712; refs #1372 without closing it
-- Phase A only: fixtures/static gates; no AppHost start, containers, or runtime suites
+- This host remains static-only: no AppHost start, containers, or runtime suites
 - D-43: remote-Docker loopback makes all lease-backed AppHost gates environment-blocked here
 - Push: `git push origin HEAD:refs/heads/test/aspire-13-5-s10-e2e-gate-upgrades`
 - Required evaluator: separate Fable IMPL-EVAL; this implementation session cannot certify
@@ -18,3 +18,7 @@
   commit, while F-5/F-6/F-8 are documented for the Phase-B/evaluator handoff
 - Final static verdict after fixes: 190 CLI-E2E tests pass; scoped check/lint/fmt and all required
   repository gates pass
+- Off-host Phase-B evidence: Actions run `33326591443` exposed Aspire 13.5.3's bare-`ResourceJson`
+  follow-stream shape after 36 passing gates in both tiers. The current slice adds dual bare/wrapped
+  parsing with captured-style RED coverage; local focused wrapper verdict is 16/16 tests plus green
+  scoped check/lint/fmt.
