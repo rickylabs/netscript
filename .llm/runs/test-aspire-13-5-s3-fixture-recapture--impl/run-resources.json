@@ -7,8 +7,21 @@
       "appHostPid": 326833,
       "appHostStartedAt": "26552088",
       "startedAt": "2026-08-30T09:35:01.560Z"
+    },
+    {
+      "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-2/aspire/apphost.mts",
+      "appHostPid": 383334,
+      "appHostStartedAt": "26619412",
+      "startedAt": "2026-08-30T09:46:01.331Z"
     }
   ],
-  "containers": [],
+  "containers": [
+    {
+      "id": "d967c60c86b96a6a83c1eb455e0f436e06390e31725dddb11f8f916c2aaf1c8f",
+      "creatorPid": 383614,
+      "creatorProcessStartTime": "0001-01-04T01:56:39.840Z",
+      "startedAt": "2026-08-30T09:47:29.974Z"
+    }
+  ],
   "ownedRoots": []
 }
