@@ -4975,3 +4975,45 @@ rollout-growth stall.
   exits plus death/timeout signatures.
 - Evaluator worktree `007-eval-1774-impl` created detached at `51a7bafe1`, dirty 0. IMPL-EVAL brief
   finalized, zero placeholders remaining. Dispatch is gated on Tier-A, not on Aspire.
+
+## D-80 — #1774 exact-head Tier-A GREEN after a supervisor-side false-green was corrected; IMPL-EVAL dispatched
+
+- **My own Tier-A script was invalidly measured, and I caught it before reporting.** Gates ran as
+  `cmd 2>&1 | tail -3; echo "EXIT=$?"`. After a pipeline `$?` is **`tail`'s** status, not the
+  command's, and `tail` essentially always exits 0. The first run therefore printed `EXIT=0` for
+  G2–G7 while measuring nothing. Only G1 was validly measured (redirect, no pipe).
+  Demonstrated explicitly: `out=$(bash -c 'exit 7'); echo $?` → **7**; `bash -c 'exit 7' | tail -1;
+  echo $?` → **0**.
+  - *This is the same false-green class I have been policing in author work all run — a passing
+    number that does not measure the thing it names. The lesson is that the policing applies to my
+    own instruments first. A gate table is only as good as its exit-code capture.*
+- Re-ran with real capture (`out=$(cmd); rc=$?`). **One verdict changed**, which is the whole point.
+
+| Gate | Buggy run | Real exit | Verdict |
+| --- | --- | --- | --- |
+| G1 root `deno task test` | 0 | **0** | PASS (validly measured in both) |
+| G2 scoped `deno check --unstable-kv` | 0 | **0** | PASS — 23 files, 0 failed batches, 0 occurrences |
+| G3 scoped `deno lint` | 0 | **2** | **NOT APPLICABLE** — coverage refusal, see below |
+| G4 scoped `deno fmt --check` | 0 | **0** | PASS — 23 selected, **23 processed**, 0 dropped |
+| G5 `validate-claude-surface.ts` | 0 | **0** | PASS — 5/5 incl. hook lock hygiene |
+| G6 `agentic:check-claude` | 0 | **0** | PASS — 18 skills, 22 mirrored files |
+| G7 `arch:check` | 0 | **0** | PASS — only pre-existing F-5/F-6 WARNs on unrelated files |
+
+- **G3 adjudicated as NOT APPLICABLE, not FAIL.** The wrapper refused with `all-excluded`: 23 files
+  selected, **0 processed**. Cause is repo config — `lint.exclude` contains `".llm/"`, and it is
+  **byte-identical on main `74e3d451e` and on HEAD**; #1774's `deno.json` diff touches only the
+  `agentic:claude-hook-log` permission flags. The wrapper exiting 2 rather than emitting
+  "0 findings over 0 processed files" is correct anti-false-green behaviour, so **my gate selection
+  was wrong, not the product**.
+  - Standing observation, explicitly **out of scope** for this PR: `.llm/tools/**` has **no lint
+    coverage** repo-wide. A root `deno task lint` pass does not cover these changed files. Recorded
+    so no future run mistakes that pass for coverage.
+- Tier-A verdict at `51a7bafe1`: **GREEN** (6 PASS, 1 NOT APPLICABLE with proven pre-existing cause,
+  0 FAIL).
+- PR #1775: OPEN, head == `51a7bafe1`, **MERGEABLE / CLEAN**, milestone `0.0.7`, exactly one
+  `status:` label, `Closes #1774` present, acceptance-evidence block present.
+- **IMPL-EVAL dispatched**: job `e3785c3b`, native **Fable 5 / medium**, **separate session** in
+  worktree `007-eval-1774-impl` detached at `51a7bafe1`, dirty 0. Brief carries both supervisor
+  corrections above, and flags that the author's gate table certifies the **pre-rebase**
+  `1d3451845af400cc3bd4aec650bf7ec0bcda18d1` — content-identical, but a differing SHA is a
+  provenance note the evaluator is told to weigh rather than ignore.
