@@ -4483,3 +4483,55 @@ reach) → fresh runtime lease request **only once that exact head is stable** �
 exact-head gates → fresh delta IMPL-EVAL → readiness → merge coordinates.
 
 No new fixes leaf will be opened meanwhile.
+
+## 2026-08-30 — #1758 converged at `65f95b83`; #1368 parked at an ideal boundary
+
+### #1758 integration onto `3e5cbabf` is sound
+
+`65f95b83`, pushed, clean. Verified rather than assumed:
+
+- **Merge, not rebase** — `435c6f69` has parents `1c5fa004` and `3e5cbabf`.
+- **All nine receipt SHAs remain ancestors**: `ddf66a6f`, `1dd64dae`, `bfad0c15`, `83b7109c`,
+  `72ab6411`, `d1f8afe9`, `cea45edd`, `b322bf04`, `1c5fa004`.
+- **Both README intents survived the conflict** — 2 contract-error/procedure-meta mentions from #1731
+  and 6 presets/cache-provider/`defineFreshApp` mentions from this leaf. Neither side was reverted.
+- **Shared carriers resolved through generators**, not hand-merged — all four plus the MCP corpus.
+
+| Gate at `65f95b83` | Result |
+| --- | --- |
+| Ceiling vs `3e5cbabf` | nothing outside |
+| `deno.lock` | byte-unchanged |
+| `check:agent-docs-prose` / `check:assets-barrel` / `check:publish-assets` / `check:mcp-export-corpus` / `docs:exports-drift` | all exit 0 |
+| **D4 preset closure vs #1731's ports/query changes** | `deno check` exit 0 — re-verified, not assumed |
+
+The D4 re-verification mattered specifically because #1731 changed `src/ports/mod.ts`,
+`query-factory.ts`, `service-client.ts` and `src/query/mod.ts`, and the preset entry re-exports
+dependent SDK types under D4's closure rule. An upstream type change there could have silently widened
+or broken the curated closure without touching any file this leaf owns.
+
+Full repository suite is running at this head — the instrument that caught the closure-parity defect
+two bases ago, and the one that must be green before a lease is requested.
+
+### #1368 parked, and the boundary could not be cleaner
+
+The author committed `2146443c` — **the S2 red-before test alone**, 92 lines, one file, **no product
+change** — before the park instruction could reach it. That is the correct red-only slice and a
+natural stopping point.
+
+Its red was then validated against its own strict gate:
+
+```
+exit 1 · 0 passed / 2 failed
+AssertionError: expected saga.cascade.compensate to be started
+AssertionError: Values are not equal.  Actual: undefined  Expected: "order-42"
+```
+
+Both failures are **assertion** failures, not a compile error — so the rule PLAN-EVAL F2 forced into
+gate 1 (*"a compile/load/crash red or zero failed tests is invalid"*) was honoured on the first
+attempt. This lane has now seen that failure mode twice in planning and zero times in execution, which
+is what writing the rule into the gate was for.
+
+Park state: plan gate **PASS** preserved at `81c5f874` on its own branch; red-before committed and
+pushed at `2146443c`; **no product work started**. The park instruction goes on the same thread as soon
+as it is idle, and `status:impl` will be corrected to reflect parked-after-red rather than
+in-implementation, so the board does not claim work that is deliberately stopped.
