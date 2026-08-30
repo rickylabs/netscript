@@ -1504,3 +1504,21 @@ implementation thread.
   content cycle.
 - Main is now `2a1248d33d55a9529d1e4822d9c850bc6caa4c16`. Runtime evidence captured by S8 before
   integrating this merge is stale regardless of whether its narrow probe happened to finish green.
+
+## 2026-08-30 — S6 debt gate and evaluator route are separate authority layers
+
+- The first post-S5 S6 brief incorrectly treated a listener-only insertion as narrower. The open
+  `scaffold-runtime-a8-f16-1333` entry makes the complete runtime module split a stop condition
+  before the next gate, so omitting that split is architectural regression, not scope restraint.
+  Reconstruction remains bounded because every b4-touched current-main path differs from its stacked
+  S5 base in only the exact S1 live-DB title and its test assertion. Preserve those two deltas plus
+  S5 dynamic endpoints; discard broad generator formatting churn and regenerate assets.
+- `/home/agent/AGENTS.md` now names GLM 5.3 Flash as the host-wide default open model, but this
+  branch's checked-in hybrid allowlist and formal #1774 evaluator policy still ratify DeepSeek V4
+  Flash 0731 at `max`. Host guidance does not authorize an unreviewed product-routing mutation in
+  the #1774 leaf. The completed DeepSeek/high result is therefore supplemental; the same allowed
+  model at max remains the exact qualifying rerun.
+- A lifecycle label is not merge evidence. #1790's `status:ready-merge` was held when its current
+  report contradicted itself about prior-report reuse, covered only 5/14 entrypoints freshly, cited
+  superseded heads, and left issue Scope boxes unchecked, even though its product diff and
+  mergeability were clean. Exact-head evidence and checklists must agree before coordinator merge.

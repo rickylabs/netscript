@@ -1399,3 +1399,18 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   exact-head Tier-A/delta evaluation and CI.
 - Fixes/features remain independent. #1764 TC-6/7/9 stays runtime-open; no 79/1 topology receipt or
   stopped pre-runtime script may close it. Feature Slice 4 retains its own sanctioned DeepSeek eval.
+
+## 2026-08-30T20:54:50Z — corrected active dispatches
+
+- Aspire: abandon the rejected S6 replay worktree at its conflicted `01f27d4d4` boundary. A fresh
+  SOL/high thread from `main@2a1248d33` must reconstruct semantic helper/generator hunks and the
+  full debt-required b4 runtime split, preserving exactly the S1 title/assertion and all S5
+  dynamic-port behavior. Phase B is next in this supervisor's serial queue and runs locally through
+  DinD from exact zero; CI fallback is no longer selected.
+- Internals: retain the DeepSeek/high PASS only as supplemental transport evidence. Dispatch the
+  checked-in formal DeepSeek V4 Flash 0731 route at `max`, in a fresh detached evaluator, and
+  require an explicit current-head artifact/comment before any #1774 readiness transition.
+- Docs: #1790 is held despite `status:ready-merge` until all #1788 Scope boxes, current-head body
+  provenance, a coherent 14-entrypoint exact-head verdict, current comment, and CI are complete.
+- Features Slice 5 and fixes #1739 evaluation remain actively delegated. Read-only audits of #1747
+  and #1758 run in parallel; they may recommend bounded repairs but perform no mutation or merge.

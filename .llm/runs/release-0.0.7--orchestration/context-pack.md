@@ -1701,3 +1701,26 @@ continues concurrently because serial ordering is per orchestrator, not global.
   assets, has stale 068d/40f evaluation evidence, no exact-head CI, unchecked #1788 boxes, and two
   whitespace findings. Rebase/regenerate, mirror evidence, recut Tier-A plus a fresh delta verdict,
   then rerun CI.
+
+## Resume delta — 2026-08-30T20:54:50Z
+
+- Canonical NAS facts were re-read from `/home/agent/AGENTS.md`: project paths are under
+  `/home/agent/projects/netscript`, mise owns Deno 2.9.5 and Aspire 13.5.3, and only the disposable
+  `tcp://netscript-dind:2375` sandbox may be used. The live operator state supersedes its stale
+  Docker-version sentence: client/server are both 28.5.2, `/home/agent` is mounted at the identical
+  path, published services are reached at `netscript-dind:<port>`, and inotify instances are 1024.
+  Pre-dispatch census was Aspire `[]`, containers `0`, volumes `0`, and AppHost/relay processes `0`.
+- S6 reconstruction D-92 was stopped before resolving `01f27d4d4`: an independent audit proved the
+  listener-only insertion would violate the open `scaffold-runtime-a8-f16-1333` stop gate. Reject
+  the replay worktree, rebuild semantic helper/generator hunks without format churn from exact main,
+  carry the complete `b4ca8a1d3` runtime split, overlay only the two current-main S1 live-DB title
+  hunks, preserve every S5 dynamic-endpoint behavior, regenerate assets, then run static gates and
+  local DinD Phase B under the single serialized lease.
+- #1774's hybrid DeepSeek/high run produced a real tool-backed `PASS`, but it is supplemental only:
+  the checked-in formal implementation-evaluator binding is DeepSeek V4 Flash 0731 at `max`. One
+  fresh max-effort run is active/required before readiness. The newer host-wide GLM 5.3 default is
+  not yet accepted by this branch's hybrid allowlist and is not being smuggled into #1774.
+- Docs #1790 has a clean reconciled product head, but its ready packet still cited superseded heads,
+  left all five #1788 Scope boxes open, and freshened only 5/14 entrypoints while saying prior
+  evidence was not reused. Merge is held until all 14 receive one coherent exact-head synthesis,
+  bodies/comments/checklists are rewritten in place, and current-head CI completes.

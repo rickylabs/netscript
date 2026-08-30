@@ -2761,3 +2761,26 @@
   runtime evidence. Demoted conflicting docs PR #1790 to `status:impl` pending regeneration and
   exact evidence. Kept #1774 open after two DeepSeek wrapper runs emitted no verdict; same-model
   hybrid transport recovery is active.
+
+## 2026-08-30T20:54:50Z — host-zero reproof, S6 architecture correction, and live merge audits
+
+- Re-read the NAS orientation and independently proved the updated runtime boundary: Aspire `[]`,
+  Docker 28.5.2 client/server, zero containers, zero volumes, and no AppHost or loopback-relay
+  process. All five topic supervisors remain in `/remote-control`; their matching Aspire/agentic
+  processes are owned control transports, not runtime residue.
+- The first S6 transplant thread reached three replay commits and a conflicted `01f27d4d4`
+  cherry-pick. The coordinator interrupted its owned Codex resume before conflict resolution. A
+  read-only architecture audit then proved `31a2fac87` carried broad format churn and that a
+  listener-only addition would deepen the runtime-gates debt stop condition. Aspire was directed to
+  preserve that worktree as rejected evidence and dispatch a fresh GPT-5.6-SOL/high reconstruction
+  from `main@2a1248d33`: semantic helper/generator changes only, full b4 runtime split, the two
+  exact S1 title deltas, all S5 endpoint semantics, regenerated assets, fresh Tier-A, then DinD
+  Phase B.
+- OpenRouter hybrid task `kxgcyv94j` returned a substantive DeepSeek/high `PASS` for #1774. It was
+  explicitly classified supplemental because formal routing requires `max`; internals is launching
+  the same checked-in DeepSeek preset at max in a clean detached evaluator. No credential content
+  was read or printed.
+- Exact-head audit held docs #1790 despite its ready label: product mergeability/diff-check were
+  clean, but scope boxes, head provenance, current-head comment, and 9/14 entrypoint coverage were
+  incomplete. Corrections and CI are active. Independent read-only audits were also dispatched for
+  PRs #1747 and #1758 so their narrow blockers can be removed without idling the merge train.
