@@ -240,3 +240,60 @@
 - **Action:** archived to `/home/agent/observability/aspire-13.5/` (never committed). The runtime
   precondition proof uses `aspire ps --format Json --nologo --non-interactive`, which returns `[]`
   cleanly with no dump. S9's skill/doc line should carry the `--nologo` spelling.
+
+## D-23 — 2026-08-30 — S5 repair left the agent-tools barrel stale (brief defect, not author error)
+
+- **Severity:** minor (gate evidence; blocks S5 CI).
+- **What:** PR #1740 at repair head `f3b3e75e` is red on the `quality` job step "Generated asset
+  freshness" (run `33297719237`, job `99220213430`). `check:assets-barrel` runs
+  `gen:assets-barrel && git diff --exit-code` over the seven generated barrels and exits 1: the
+  receipt diff is confined to `packages/cli/src/kernel/assets/agent-tools.generated.ts`, where
+  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` moves
+  `2549200359d6e12f89eb9d9df1d5b88df6154042b8c0b86bf3f3d06cb98abf26` →
+  `01b5b9b43a008d21c2dc49fc035358a63f9582156b4af81083f427a9860e7b89`. Verified at the branch head:
+  the committed constant is still the pre-edit `2549…` and no `*.generated.ts` was touched between
+  `0bd8ba83` and the current head. `check-test` is green — F-1…F-4 themselves landed correctly.
+- **Cause:** repair slice 4 edited `.llm/tools/validation/check-aspire-host-ports.ts`, and `.llm/tools`
+  sources are embedded in the agent-tools corpus. The repair brief's slice-5 gate list said
+  "`check:assets-barrel` **if any generated asset moved**", which understates the coupling — *any*
+  `.llm/tools` source edit moves that barrel. **This is a supervisor brief defect**, not an
+  implementation error; S6's brief already carried the correct unconditional form.
+- **Action:** the same author thread (`01a0515b-8f4a-7412-a151-42d5fb4258d7`) is steered to run
+  `gen:assets-barrel`, commit only the authoritative regenerated barrels, **re-cut the slice-5 gate
+  evidence at the new exact head** (the `f3b3e75e` table is stale the moment the fix lands), push,
+  and drive CI green. Green CI is a precondition for Tier-A and the independent IMPL-EVAL, not a
+  substitute for either. No runtime lease granted.
+- **Lesson (for the run's brief template):** any slice touching `.llm/tools/**`,
+  `.agents/skills/**`, or an embedded-asset source must list `gen:assets-barrel` +
+  `check:assets-barrel` as **unconditional** slice gates.
+
+## D-24 — 2026-08-30 — S7 phase-B evidence gap flagged by IMPL-EVAL cycle 2 (non-blocking)
+
+- **Severity:** minor (evidence provenance; phase B only).
+- **What:** the cycle-2 IMPL-EVAL `PASS` carries one non-blocking note: `ASPIRE_DCP_APPHOST_PATH`
+  has no receipt provenance, and process `cwd` is not ownership evidence.
+- **Action:** the S7 phase-B lease brief must capture a **real** orphaned descendant's
+  `environ` / `cmdline` / `cwd` / `fd` set and cite it as the receipt behind the ownership
+  classification, rather than resting on the synthetic fixture. Folded into the lease queue; does
+  not affect the phase-A verdict.
+
+## D-25 — 2026-08-30 — NAS container PID 1 is not reaping; 7.7k zombies produce false process-survival reds
+
+- **Severity:** significant (environment, not product). **Not fixable by any agent.**
+- **What (independently verified in this session, read-only):** `ps -eo stat=` reports **7,734
+  zombie processes out of 7,844 total** in the `ai-agents` container. **7,562 are PPID-1-owned
+  `sshd`** children; the remainder are `git` (61), `node-MainThread` (22), `esbuild` (22), `sleep`,
+  `deno`, `sh`, `codex-code-mode`. Container PID 1 is not reaping, and an unprivileged agent cannot
+  reap another process's children.
+- **Consequence:** any gate that asserts "no surviving/leaked child process" reports a false red.
+  The coordinator attributes the hybrid-launcher **cancellation-survivor root test** red to exactly
+  this. **Classification: environment artifact, not a code defect.**
+- **Standing rule for this run:** do not re-run or chase that root test, and do not attribute it to
+  any Aspire slice. **Scoped product gates are judged independently of it** — a slice's verdict rests
+  on its own scoped wrappers, `quality:scan`, `arch:check`, `check:assets-barrel`, and its targeted
+  suites, never on the root process-survival suite while this condition holds.
+- **Carried into evaluator briefs:** every Aspire IMPL-EVAL brief from this point must name this
+  red as known-infra so the evaluator does not return `FAIL_FIX` on it.
+- **Owner action (agent-blocked):** the container needs a reaping init (or a restart) on the host.
+  Secondary risk: ~7.8k processes is within reach of PID/thread limits, which would start failing
+  unrelated spawns. This is a human/host action — flagged, not attempted.
