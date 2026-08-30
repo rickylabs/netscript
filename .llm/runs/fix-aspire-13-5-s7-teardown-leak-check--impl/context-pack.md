@@ -12,11 +12,10 @@
 
 ## Current State
 
-Baseline is exactly S3 head `fe4f496bd`. Required issues, comments, S2 V6/V7 receipts, current
-teardown code/tests, playbook, and harness/doctrine instructions have been read. Slice 1 has a
-durable, assertion-level RED receipt. Descendant discovery/classification is implemented and its
-focused suite is green. The force gate and bounded DCP-helper/orphan confirmation are implemented
-and green.
+Baseline is exactly S3 head `fe4f496bd`. Phase A slices 1–5 are implemented with durable evidence.
+The assertion-level RED was closed by path-backed orphan discovery; force-persistent and bounded
+DCP-helper/orphan confirmation are green. The 13.5 playbook, lease-backed Phase-B procedure, and
+draft closing evidence are complete. This session does not self-certify.
 
 ## Completed
 
@@ -32,15 +31,17 @@ and green.
   helpers time out to escalation without a kill.
 - Aged standalone orphans require an OK AppHost census, positive path ownership, and stable PID
   identity before one targeted TERM; young/ambiguous rows escalate.
+- 13.5 lifecycle/safety playbook update and named Phase-B receipt procedure.
+- Scoped wrappers, 40/40 tests, configured lint, assets, quality, and architecture gates all green.
 
 ## In Progress
 
-- Slice 4 commit/push and PR evidence comment.
+- Slice 5 commit/push and PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push slice 4 and post its evidence.
-2. Update the playbook, regenerate assets, and run the complete Phase-A gate set.
+1. Fable supervisor runs the separate slice review and IMPL-EVAL protocol.
+2. A lease-backed session executes `phase-b-handoff.md` before close-gate evidence is posted.
 
 ## Key Decisions
 
@@ -51,21 +52,23 @@ and green.
 
 ## Files Changed
 
-| Path                                                                 | Status  | Notes                                                             |
-| -------------------------------------------------------------------- | ------- | ----------------------------------------------------------------- |
-| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/`            | new     | Harness state and evidence.                                       |
-| `.llm/tools/agentic/teardown/{ports,probes,ownership,leak-check}.ts` | changed | Process discovery, evidence, ownership, reporting.                |
-| `.llm/tools/agentic/teardown/*_test.ts`                              | changed | Versioned/foreign/MCP/process safety regressions.                 |
-| `.llm/tools/agentic/teardown/teardown.ts`                            | changed | Force gate, bounded helper confirmation, targeted orphan cleanup. |
+| Path                                                                        | Status  | Notes                                                               |
+| --------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------- |
+| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/`                   | new     | Harness state and evidence.                                         |
+| `.llm/tools/agentic/teardown/{ports,probes,ownership,leak-check}.ts`        | changed | Process discovery, evidence, ownership, reporting.                  |
+| `.llm/tools/agentic/teardown/*_test.ts`                                     | changed | Versioned/foreign/MCP/process safety regressions.                   |
+| `.llm/tools/agentic/teardown/teardown.ts`                                   | changed | Force gate, bounded helper confirmation, targeted orphan cleanup.   |
+| `.llm/tools/CLEANUP-PLAYBOOK.md`                                            | changed | Aspire 13.5 relevance, ownership, force, and confirmation contract. |
+| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/phase-b-handoff.md` | new     | Lease-only live receipt and closure procedure.                      |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                       |
-| ----------- | -------------- | -------------------------------------------------------------- |
-| Static      | NOT_RUN        | planned after implementation                                   |
-| Fitness     | NOT_RUN        | planned quality/architecture gates                             |
-| Runtime     | Slice 4 PASS   | `receipts/04-post-stop-confirmation.json`: 40 passed, 0 failed |
-| Consumer    | NOT_RUN        | assets barrel in slice 5                                       |
+| Gate family | Current status | Evidence                                                  |
+| ----------- | -------------- | --------------------------------------------------------- |
+| Static      | PASS           | scoped check/lint/fmt plus configured lint receipts       |
+| Fitness     | PASS           | `05-quality-scan.json`; `05-arch-check.json`              |
+| Runtime     | PASS           | `05-teardown-tests.json`: 40 passed, 0 failed             |
+| Consumer    | PASS           | `05-assets-barrel.json`; canonical generated corpus clean |
 
 ## Open Questions
 

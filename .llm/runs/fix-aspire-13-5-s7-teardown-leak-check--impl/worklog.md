@@ -59,20 +59,25 @@ new ownership shortcut.
 
 ## Progress Log
 
-| Time                 | Slice     | Step            | Notes                                                                                                                                          |
-| -------------------- | --------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30T03:05:31Z | bootstrap | research/design | Read issues, S2 receipts, S3 fixture, skills, harness workflow, doctrine, and current teardown code.                                           |
-| 2026-08-30T03:05:31Z | plan      | PLAN-EVAL       | N/A: the owner-ratified issue and dispatch lock all decisions, five slices, boundaries, and gates; no material planning decision remains open. |
-| 2026-08-30T03:07:56Z | 1         | RED receipt     | Durable test receipt: 7 passed, 1 failed; orphan process expectation received `[]`.                                                            |
-| 2026-08-30T03:09:21Z | 1         | push            | Pushed `593a33c` with the explicit head refspec; opened draft PR #1744 and posted commit evidence.                                             |
-| 2026-08-30T03:15:52Z | 2         | gate            | Descendant tracking passed 33/33 with all evidence modes, both ps fixtures, foreign/MCP guards, and false-positive coverage.                   |
-| 2026-08-30T03:15:52Z | 2         | reconcile       | #1719/#1429 remain open; PR #1744 stays draft at `status:impl`, stacked on S3; Phase B remains lease-backed. No new comments changed the plan. |
-| 2026-08-30T03:17:08Z | 2         | push            | Pushed `555d204` with the explicit head refspec and posted the slice-2 PR evidence comment.                                                    |
-| 2026-08-30T03:18:45Z | 3         | gate            | Force-persistent passed 36/36: exact dry-run argv, apply/flag/ownership arms, scoped-stop confirmation, and no force by default.               |
-| 2026-08-30T03:18:45Z | 3         | reconcile       | PR #1744 remains draft/stacked; closing issues and Phase-B dependency are unchanged. No reviewer comment changed the plan.                     |
-| 2026-08-30T03:20:02Z | 3         | push            | Pushed `28f8807` with the explicit head refspec and posted the slice-3 PR evidence comment.                                                    |
-| 2026-08-30T03:23:50Z | 4         | gate            | Post-stop/orphan process suite passed 40/40: exits-in-time, bounded timeout/no-kill, stable targeted TERM, age, and census fail-closed arms.   |
-| 2026-08-30T03:23:50Z | 4         | reconcile       | PR remains draft/stacked; no runtime start occurred and no new comment changed the locked Phase-A/Phase-B split.                               |
+| Time                 | Slice     | Step            | Notes                                                                                                                                            |
+| -------------------- | --------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-30T03:05:31Z | bootstrap | research/design | Read issues, S2 receipts, S3 fixture, skills, harness workflow, doctrine, and current teardown code.                                             |
+| 2026-08-30T03:05:31Z | plan      | PLAN-EVAL       | N/A: the owner-ratified issue and dispatch lock all decisions, five slices, boundaries, and gates; no material planning decision remains open.   |
+| 2026-08-30T03:07:56Z | 1         | RED receipt     | Durable test receipt: 7 passed, 1 failed; orphan process expectation received `[]`.                                                              |
+| 2026-08-30T03:09:21Z | 1         | push            | Pushed `593a33c` with the explicit head refspec; opened draft PR #1744 and posted commit evidence.                                               |
+| 2026-08-30T03:15:52Z | 2         | gate            | Descendant tracking passed 33/33 with all evidence modes, both ps fixtures, foreign/MCP guards, and false-positive coverage.                     |
+| 2026-08-30T03:15:52Z | 2         | reconcile       | #1719/#1429 remain open; PR #1744 stays draft at `status:impl`, stacked on S3; Phase B remains lease-backed. No new comments changed the plan.   |
+| 2026-08-30T03:17:08Z | 2         | push            | Pushed `555d204` with the explicit head refspec and posted the slice-2 PR evidence comment.                                                      |
+| 2026-08-30T03:18:45Z | 3         | gate            | Force-persistent passed 36/36: exact dry-run argv, apply/flag/ownership arms, scoped-stop confirmation, and no force by default.                 |
+| 2026-08-30T03:18:45Z | 3         | reconcile       | PR #1744 remains draft/stacked; closing issues and Phase-B dependency are unchanged. No reviewer comment changed the plan.                       |
+| 2026-08-30T03:20:02Z | 3         | push            | Pushed `28f8807` with the explicit head refspec and posted the slice-3 PR evidence comment.                                                      |
+| 2026-08-30T03:23:50Z | 4         | gate            | Post-stop/orphan process suite passed 40/40: exits-in-time, bounded timeout/no-kill, stable targeted TERM, age, and census fail-closed arms.     |
+| 2026-08-30T03:23:50Z | 4         | reconcile       | PR remains draft/stacked; no runtime start occurred and no new comment changed the locked Phase-A/Phase-B split.                                 |
+| 2026-08-30T03:25:07Z | 4         | push            | Pushed `a0cbaf6` with the explicit head refspec and posted the slice-4 PR evidence comment.                                                      |
+| 2026-08-30T03:28:24Z | 5         | gates           | Scoped check/lint/fmt, 40/40 teardown tests, configured lint, assets check, quality scan, and arch check all passed.                             |
+| 2026-08-30T03:28:24Z | 5         | docs/evidence   | Added the 13.5 playbook section and lease-backed Phase-B receipt/closing-evidence procedure; canonical regeneration produced no generated delta. |
+| 2026-08-30T03:28:24Z | 5         | reconcile       | Phase B and IMPL-EVAL remain deferred to separate leased/evaluator sessions; PR stays draft and stacked on S3.                                   |
+| 2026-08-30T03:28:24Z | 5         | push            | Slice-5 commit is pushed only through `git push origin HEAD:refs/heads/fix/aspire-13-5-s7-teardown-leak-check`; evidence is posted on PR #1744.  |
 
 ## Decisions
 
@@ -91,35 +96,41 @@ new ownership shortcut.
 
 ### Static Gates
 
-| Gate                  | Command or check | Result  | Notes                      |
-| --------------------- | ---------------- | ------- | -------------------------- |
-| scoped check/lint/fmt | planned          | NOT_RUN | Runs after implementation. |
+| Gate            | Command or check                              | Result | Notes                                                  |
+| --------------- | --------------------------------------------- | ------ | ------------------------------------------------------ |
+| scoped check    | structured wrapper                            | PASS   | 12 files; `--unstable-kv`; 0 findings.                 |
+| scoped lint     | structured wrapper with explicit empty config | PASS   | 12/12 files; 0 findings; root config excludes `.llm/`. |
+| scoped fmt      | structured wrapper                            | PASS   | 12 files; 0 findings.                                  |
+| configured lint | `deno task lint` durable gate                 | PASS   | 2,043 files; 0 findings.                               |
 
 ### Fitness Gates
 
-| Gate                     | Result  | Evidence            | Notes                                                                         |
-| ------------------------ | ------- | ------------------- | ----------------------------------------------------------------------------- |
-| no-cast/no-ignore review | NOT_RUN | pending diff review | Required by dispatch.                                                         |
-| Slice 2 focused review   | PASS    | diff scan           | No new `any`, cast, or lint-ignore; classification remains pure behind ports. |
+| Gate                     | Result | Evidence                        | Notes                                                                         |
+| ------------------------ | ------ | ------------------------------- | ----------------------------------------------------------------------------- |
+| no-cast/no-ignore review | PASS   | added-line diff scan            | No `any`, type casts, lint ignores, or TS ignores were added.                 |
+| Slice 2 focused review   | PASS   | diff scan                       | No new `any`, cast, or lint-ignore; classification remains pure behind ports. |
+| quality scan             | PASS   | `receipts/05-quality-scan.json` | No findings; existing allowance count remains 7.                              |
+| architecture check       | PASS   | `receipts/05-arch-check.json`   | Exit 0; repository baseline warnings only.                                    |
 
 ### Runtime Gates
 
 | Gate                        | Result          | Evidence                                  | Notes                                                              |
 | --------------------------- | --------------- | ----------------------------------------- | ------------------------------------------------------------------ |
-| Phase A unit fixtures       | NOT_RUN         | pending                                   | No AppHost start permitted.                                        |
+| Phase A unit fixtures       | PASS            | `receipts/05-teardown-tests.json`         | 40 passed, 0 failed; no AppHost start.                             |
 | Slice 1 RED                 | FAIL (expected) | `receipts/01-red-orphan-process.json`     | Exact #1429 visibility regression; exit 1 at baseline `fe4f496bd`. |
 | Slice 2 descendant tracking | PASS            | `receipts/02-descendant-tracking.json`    | 33 passed, 0 failed; receipt head `593a33c`.                       |
 | Slice 3 force-persistent    | PASS            | `receipts/03-force-persistent.json`       | 36 passed, 0 failed; receipt head `555d204`.                       |
 | Slice 4 post-stop confirm   | PASS            | `receipts/04-post-stop-confirmation.json` | 40 passed, 0 failed; receipt head `28f8807`.                       |
-| Phase B live reproduction   | N/A             | deferred procedure                        | Requires supervisor-provided runtime lease.                        |
+| Phase B live reproduction   | N/A             | `phase-b-handoff.md`                      | Requires supervisor-provided runtime lease.                        |
 
 ### Consumer Gates
 
-| Consumer                    | Result  | Evidence                    | Notes                 |
-| --------------------------- | ------- | --------------------------- | --------------------- |
-| agent-tools embedded corpus | NOT_RUN | pending barrel regeneration | Playbook is embedded. |
+| Consumer                    | Result | Evidence                         | Notes                                                   |
+| --------------------------- | ------ | -------------------------------- | ------------------------------------------------------- |
+| agent-tools embedded corpus | PASS   | `receipts/05-assets-barrel.json` | Canonical regeneration/check clean; no generated delta. |
 
 ## Handoff Notes
 
 - The Fable supervisor should inspect ownership separation and the MCP/foreign invariants first.
 - This implementation session does not perform slice review sign-off or IMPL-EVAL.
+- Phase A is ready for the separate slice-review/IMPL-EVAL lane; Phase B remains lease-backed.

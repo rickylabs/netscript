@@ -47,6 +47,50 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
    outcome to be **zero deletions** — epics usually leave a flat layout, not dead files.
 7. Commit slice 1: the inventory doc alone.
 
+## Aspire 13.5 teardown semantics
+
+The agentic leak reporter and teardown controller deliberately separate **relevance** from
+**ownership**. Aspire 13.5 can leave DCP helpers and `aspire-managed` descendants re-parented to PID
+1 after the launching CLI exits. A process is relevant when its edge-captured facts contain a DCP
+environment path, an exact `--apphost <path>` argument, or a Unix socket opened by that PID whose
+path is under an AppHost root. PPID 1, a process name, or text that merely mentions those tokens is
+never ownership proof.
+
+Path containment against the worktree, slice registration, and any explicit `--owned-root` remains
+the authorization boundary. Resolve paths before comparison. Foreign and unknown-owner resources are
+reported and left untouched; a root broad enough to cover other runs is refused. The protected
+`aspire agent mcp` command family is never classified as a cleanup target.
+
+Aspire 13.5.3 lifecycle receipts establish these operating facts:
+
+- `aspire ps` and scoped `aspire stop --apphost <exact>` prune orphan registration and backchannel
+  sockets automatically. S2 V6 observed the DCP helper exit 385 ms after the CLI disappeared, so
+  teardown confirms the AppHost PID and its associated helpers with six probes spaced 500 ms apart
+  before declaring the run clean.
+- A normal scoped stop preserves persistent resources. When persistent deletion is explicitly
+  required, preview first, then pass both `--apply` and `--force-persistent`. Only after ownership
+  is proven and the normal scoped stop is confirmed may teardown execute
+  `aspire stop --force --apphost <exact> --non-interactive --nologo`. It never emits `--all`.
+- A confirmed owned orphan process may receive one targeted `TERM` only when it is at least 30
+  seconds old, an Aspire census succeeded, no matching live AppHost remains, and its PID start
+  identity is stable across the mutation boundary. A timeout or ambiguous identity is escalated;
+  teardown does not broaden the kill.
+
+Use the read-only command first:
+
+```bash
+deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+```
+
+After reviewing every reported owner and the exact planned argv, apply only to positively proven
+resources:
+
+```bash
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply --force-persistent
+```
+
 ## 2. Concern-folder taxonomy (the restructure)
 
 Derive folders from **concerns**, not file types. Method:
