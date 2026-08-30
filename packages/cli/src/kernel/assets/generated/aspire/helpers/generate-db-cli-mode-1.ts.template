@@ -6,7 +6,6 @@ import { readFile, rm } from 'node:fs/promises';
 import process from 'node:process';
 import {
   InputType,
-  ResourceCommandVisibility,
   type DistributedApplicationBuilder,
 } from '{{__slot1__}}';
 import { RESOURCE_DEFAULTS, type NetScriptConfig } from '{{__slot2__}}';
@@ -124,9 +123,12 @@ export async function tryHandleDbCliMode(
           }
 
           try {
-            const databaseUrl = target.engine === 'Sqlite'
-              ? `file:./${target.databaseName}`
-              : await (await context.services()).getConnectionString(target.resourceKey);
+            let databaseUrl = `file:./${target.databaseName}`;
+            if (target.engine !== 'Sqlite') {
+              databaseUrl = await builder.getConfiguration().getConnectionString(
+                target.resourceKey,
+              );
+            }
             return await executeDbTool(
               appHostDir,
               target,
@@ -144,7 +146,6 @@ export async function tryHandleDbCliMode(
         {
           commandOptions: {
             description: `${command.displayName} with the generated NetScript database tooling.`,
-            visibility: ResourceCommandVisibility.UI | ResourceCommandVisibility.Api,
             iconName: command.iconName,
             arguments: [
               {
