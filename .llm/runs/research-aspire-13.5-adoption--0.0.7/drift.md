@@ -1196,3 +1196,10 @@
   diagram source/SVG parity verdict for S11 must come from CI (`docs` workflow) or a host with
   Chromium; recorded as environment, not a slice defect. Infra note: `/ephemeral` `noexec` also
   broke the supervisor's scratchpad scripts earlier — a second symptom of the same mount policy.
+- **D-62 ruling (coordinator):** docs_audit **cycle 3 authorized** at `dc92bad4` on the same Sol
+  thread — **the final cycle, no cycle 4**. H5 ratified as the honest current-vs-target framing
+  (generated output currently 13.4.6; 13.5.3 target after the S1 pin converges; final version prose
+  reconciled in S1's convergence). M5 accepted as a local environment limitation only — no more host
+  cycles; **diagram parity must pass in CI before merge** (added to S11's merge preconditions). On
+  PASS: Fable polish immediately, then S13 under the ratified precedence. On FAIL: stop the leaf,
+  surface exact blockers + disposition.
