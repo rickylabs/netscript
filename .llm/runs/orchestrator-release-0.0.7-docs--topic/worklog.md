@@ -1320,3 +1320,20 @@ thread. Topic branch matches `origin` at `0ca4c489f` by `git ls-remote`.
 
 Lane remains **EXHAUSTED / PARKED**, now against a verified-current control plane. It is available
 for immediate dispatch on coordinator allocation.
+
+## 2026-08-30 — NAS resume, first reconciliation against main `13878a80`
+
+- Resumed on the NAS agent plane at worktree `projects/netscript/worktrees/007-docs`. Verified clean
+  tree, local `16325036f` == remote topic branch, `origin/main` == `13878a80` via `git ls-remote`.
+  No runtime lease requested or held; migration/handoff artifacts left outside the repository.
+- Reconciled the 8 commits `c73d361ee..13878a80`. Docs fallout from #1696 is complete in-slice
+  (reference/ai + README + all four derived layers). #1711 was self-contained.
+- **D-1 (new, unclaimed):** #1729 shipped #1675 — canonical `.agents/skills/` for every host,
+  `.claude/skills/` demoted to a mirror — and `docs/site` never mentions `.agents/skills/` at all.
+  `ai/agent-tooling.md:68`, `reference/cli/commands.md:57`, `reference/ai/skills.md:26,43` still teach
+  the superseded Claude-only contract. #1737 covers the skill bodies, not these pages.
+- **D-2:** #1728's new fatal unresolved-reference error is undocumented (no page falsified).
+- **D-3:** no hand-written 0.0.7 release intro exists (required by `release:publish`);
+  `packages/cli/CHANGELOG.md` stops at 0.0.6; the user-facing payload is in no canary yet.
+- Nothing filed, nothing merged, no labels or milestones touched. D-1 proposed to the coordinator;
+  lane stays event-driven at exhausted allocation `[1551]`.

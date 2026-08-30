@@ -404,3 +404,128 @@ The unpoliced-drift finding is unchanged — **8 of 36 package reference pages p
 still a post-0.0.7 candidate, still filed by neither lane. Nothing was added to the frozen milestone:
 #1690 and #1693 are both Backlog / Triage. Lane remains **EXHAUSTED / PARKED** at allocation `[1551]`,
 attached with Remote Control, awaiting explicit coordinator instruction.
+
+## NAS checkpoint + reconciliation — live main `13878a80`, 2026-08-30
+
+Lane resumed on the NAS agent plane after migration. **Checkpoint (non-operational):** the topic
+worktree now lives at `projects/netscript/worktrees/007-docs`; earlier `/home/codex/...` paths in
+this ledger are historical only and must not be used to locate anything. Toolchain is pinned
+per-project outside the repo, so no worktree file changes for it. Container runtime is sandboxed and
+this lane holds **no runtime lease** and requested none. Migration/handoff artifacts stay outside the
+repository and are deliberately not summarized here.
+
+**Verified before any claim:** working tree clean; local `16325036f` **==**
+`refs/heads/orchestrator/release-0.0.7-docs`; `origin/main` fetched and confirmed against
+`git ls-remote` at `13878a80a50c55b9662099fed64555f2310ae4a3`. All main-state facts below were read
+with `git show origin/main:<path>`, per the lane rule earned on 2026-08-23 — never from this parked
+worktree.
+
+Main advanced `c73d361ee` → `13878a80` by **8 commits**, none of them this lane's:
+
+| Commit      | PR    | Docs relevance                                                              |
+| ----------- | ----- | --------------------------------------------------------------------------- |
+| `cf648f1f`  | #1663 | tooling gates — internal, no user-facing docs surface                        |
+| `3b32d162`  | #1710 | tooling lint/fmt fail-closed — internal                                      |
+| `211e8257`  | #1707 | harness SKILL prose — internal                                               |
+| `5bb112dd`  | #1687 | RFC-5 — `.llm/` design artifact, not `docs/site`                             |
+| `21d51622`  | #1696 | **user-facing feature; docs fallout handled in-slice**                       |
+| `3561bb64`  | #1711 | docs slice, self-contained                                                   |
+| `8b1e42f7`  | #1728 | **user-facing fix; new failure mode undocumented**                           |
+| `13878a80`  | #1729 | **user-facing fix; three public pages now describe the superseded contract** |
+
+### #1696 — docs fallout already accepted and complete, no lane action
+
+`docs/site/reference/ai/index.md` carries `RequestContext` (`:111`), the provider-invisible `context`
+on `ChatClientRequest` (`:123`) and `AgentLoopInput` (`:125`), and the `AiToolInvocationContext`
+`metadata` linkage (`:260`). `packages/ai/README.md` and the package architecture doc moved with it,
+and the slice regenerated `prose.json.gz` + `provenance.json` + `agent-docs.generated.ts` +
+`publish-assets.generated.ts` — lane rule 5 firing correctly for a second consecutive case. Worth
+recording: the reference/ai page is one of the **28 unpoliced** surfaces, and only the *prose corpus
+freshness* gate caught the omission (IMPL-EVAL `FAIL_FIX`, corpus stale at `265dd876`). The page
+itself was maintained by hand and by evaluator attention, not by a gate. That is the standing
+`8 of 36` finding seen from its good side; it does not weaken it.
+
+Not verified by this lane, and deliberately: whether `check:mcp-export-corpus` is fresh at `13878a80`
+for `@netscript/ai`'s added surface. #1696 did not regenerate
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`; #1711 did, and
+merged after it. The corpus is gzip/base64-embedded, so a grep proves nothing either way, and running
+the check here would check *this parked worktree*, not main. Gate-evidence question, coordinator/fixes
+territory — flagged, not asserted.
+
+### FINDING D-1 — `agent init`'s shipped contract inverted; three public pages still teach the old one
+
+**Unclaimed, docs-lane-shaped, and live on main.** #1729 (`13878a80`) shipped #1675: skills are now
+installed canonically under `.agents/skills/` for **every** host, `AGENTS.md` is upserted for every
+host, and `.claude/skills/` is a **derived mirror** written only when `claude` is among the hosts.
+Verified structurally at main in `packages/cli/.../init-agent.ts`: the canonical skill write and the
+`AGENTS.md` upsert sit outside the `if (hosts.includes("claude"))` block; at the parent `8b1e42f7`
+both sat inside it (`:127`–`:143`). So the docs were accurate before this commit and are not now.
+
+`git grep '\.agents/skills' origin/main -- docs/site` returns **zero occurrences**. The canonical
+tree the framework now ships is absent from the public documentation entirely, while three pages
+still attribute skills and `AGENTS.md` to the Claude host alone:
+
+- `docs/site/ai/agent-tooling.md:68` — host table: "Claude Code | `.mcp.json`, NetScript skills under
+  `.claude/skills/`, and a marked NetScript section in `AGENTS.md`". The VS Code (`:69`) and Zed
+  (`:70`) rows list only their MCP file, so the table now under-reports what those users receive.
+- `docs/site/reference/cli/commands.md:57` — "Claude Code writes `.mcp.json` and installs the skill
+  bundle".
+- `docs/site/reference/ai/skills.md:26` — "installs five first-party skills and a symptom playbook on
+  the **Claude Code host path** (under `.claude/skills/`, alongside `.mcp.json` and the marked
+  `AGENTS.md` section)", and `:43` points a reader at `.claude/skills/help.md`.
+
+**Checked for existing ownership before proposing.** #1737 (0.0.7, `type:fix`, `status:triage`) fixes
+the same `.claude/skills/help.md` reference but explicitly bounds itself to "prose plus barrel
+regeneration inside `skills/`" — the shipped skill bodies, not `docs/site`. #1675 is shipped. No open
+issue names these three pages. The gap is real and unowned.
+
+Why it matters beyond tidiness: #1675's whole argument was that a non-Claude consumer "cannot read
+`.claude/skills/` at all". A VS Code or Zed user reading the current documentation is told the skill
+bundle is a Claude-host artifact and has no reason to look in `.agents/skills/` — the shipped fix
+stays invisible to exactly the audience it was built for.
+
+**Proposed, not filed.** The milestone is frozen; this lane does not self-admit and opened nothing.
+Candidate for the coordinator: a single `type:docs` / `area:docs` leaf over those three pages,
+sized at three files, no `packages/` source. It is *not* a merge blocker for anything in flight.
+
+### OBSERVATION D-2 — #1728 adds a user-visible failure mode with no documentation anywhere
+
+The generated AppHost now fails before processor registration when a declared background
+`ServiceReferences`/`PluginReferences` entry has no resolvable HTTP endpoint, with
+`Background processor configuration error: '<name>' could not resolve service reference '<ref>' HTTP endpoint.`
+Previously the wiring was skipped silently. **No documentation page is falsified by this** — the
+closest statement, `docs/site/explanation/aspire.md:347` ("a declared-but-not-generated reference does
+nothing"), is about a reference that was never generated and remains true. The gap is that the new
+fatal error is undocumented: nothing in `background-processing/` or `explanation/aspire.md` tells a
+reader what it means or that the resolution is now required configuration. Weaker than D-1 — an
+addition, not a contradiction. Adjacent open issue #1732 (validate reference *names* before emitting)
+is a code fix and does not cover the prose. Proposed as a possible fold-in, not a separate leaf.
+
+### OBSERVATION D-3 — release-note surfaces for 0.0.7
+
+- The stable `v0.0.7` GitHub Release requires a **hand-written intro** (`release:publish --notes-file`
+  refuses to run without one; everything else is generated). No 0.0.7 intro exists in the repository;
+  the only precedent is `.llm/runs/fix-1087-.../release-notes-0.0.4-intro.md`. Prose-shaped work this
+  lane could author on request; owned by the release captain, not claimed here.
+- `packages/cli/CHANGELOG.md` stops at `## 0.0.6` and has exactly one commit in its history (#1574).
+  0.0.7 has already landed user-facing CLI changes (#1728, #1729). No skill or gate requires the file,
+  so the honest options are to extend it for 0.0.7 or to record that GitHub Releases superseded it —
+  either is a coordinator call. Flagged because a half-maintained changelog is itself a user-facing
+  claim.
+- The published canaries are auto-generated from merge history: `v0.0.7-canary.2` (2026-08-29 21:54)
+  covers #1710/#1707/#1687 only. The user-facing payload (#1696, #1728, #1729) landed after it and is
+  in **no** canary yet. Purely an observation for the release captain's "meaningful canary" bar; no
+  docs action.
+
+### Ownership held elsewhere — confirmed, not touched
+
+#1723 `[aspire-13-5 S11] Public docs + README refresh for Aspire 13.5` is open on 0.0.7 under the
+`epic:aspire-13-5` and belongs to the Aspire lane. Aspire docs fallout is therefore claimed, and this
+lane stays off it. #1690 and #1693 remain Backlog / Triage. The `8 of 36` unpoliced reference-page
+finding is unchanged and still filed by nobody.
+
+### Standing
+
+Allocation `[1551]` remains shipped and exhausted; nothing self-admitted, nothing filed, nothing
+merged, relabelled or closed. Lane continues as an **event-driven watcher** with D-1 as its first
+concrete candidate for the coordinator.
