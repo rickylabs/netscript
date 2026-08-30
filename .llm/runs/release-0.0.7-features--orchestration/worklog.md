@@ -8675,3 +8675,43 @@ file) preemptively, and reiterates "no closing keyword" even though this is the 
 slice — the close-gate is a separate, later action.
 
 Sender record evicted under the full procedure (dead pid, absent from session list) before dispatch.
+
+## Routing clarification — GLM 5.3 Flash / Qwen3.8-Flash-Next, prospective only
+
+**Verbatim coordinator instruction:** "OWNER ROUTING CLARIFICATION: Existing DeepSeek evaluation
+receipts remain valid and MUST NOT be rerun, replaced, or invalidated. Prospectively, only a slice
+with no valid evaluation uses the new route: GLM 5.3 Flash at highest effort for default/IMPL
+evaluation; Qwen3.8-Flash-Next at highest effort for PLAN-EVAL when PLAN-EVAL is actually warranted.
+PLAN-EVAL stays reserved for critical/complex topics. Keep shipping independently now; do not wait
+on another lane or on human merge where the next independent slice can start. Report exact active
+worker/thread and next closure candidate."
+
+**Slugs resolved before use, not guessed.** Neither model existed in the checked-in
+`.llm/tools/agentic/config/models.ts` (which has the prior generation: `z-ai/glm-5.2`,
+`qwen/qwen3.8-max`). Web-searched rather than inferring a pattern-matched string:
+
+- **GLM 5.3 Flash → `z-ai/glm-5.3-flash`**, confirmed via OpenRouter's own pricing/benchmark page and
+  three independent comparison-page titles.
+- **Qwen3.8-Flash-Next** — model itself confirmed real (Alibaba open-sourced it 2026-08-26, 125B MoE /
+  6B active, per multiple independent sources), but its exact OpenRouter slug was **not** confirmed by
+  either search; a direct model-page fetch returned only site-navigation boilerplate, inconclusive
+  either way. **Left unresolved for now** — not needed this turn, since PLAN-EVAL is not warranted for
+  any remaining #1387 work (Slice 9 is implementation only), and the instruction itself scopes it to
+  "when PLAN-EVAL is actually warranted." Will resolve at the point a PLAN-EVAL is actually needed
+  rather than dispatch against a guessed slug now.
+
+**Existing DeepSeek receipts untouched, as instructed** — no rerun, no replacement of Slices 3–8's
+concurring/PASS verdicts.
+
+### Status report per the instruction
+
+| | |
+| --- | --- |
+| Active worker | thread `01a054e2-0fb0-7290-b746-96e6143cc91c`, `gpt-5.6-sol · high`, **state: working** (3.3 s since last activity — genuinely live, not stalled) |
+| Base | `9ce84de2f` |
+| Doing | #1387 Slice 9 — adoption documentation, the final implementation slice |
+| Next closure candidate | Slice 9's Tier-A review, then its IMPL-EVAL **on the new GLM 5.3 Flash route** (the first slice with no valid prior evaluation since this clarification), then the #1387 close-gate |
+
+No other independent slice is queued in this lane right now — #1387 is the sole active leaf, and
+Slice 9 genuinely blocks nothing else until it lands (Slices 1–8 are all terminal; #1664 stays parked
+with no retry authorized). Continuing to watch Slice 9 rather than idling.
