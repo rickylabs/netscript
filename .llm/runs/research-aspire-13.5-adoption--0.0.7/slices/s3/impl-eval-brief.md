@@ -12,7 +12,7 @@ use harness
 Formal IMPL-EVAL for **S3 of the Aspire 13.5 epic (phase A)** — issue #1715, draft PR #1741, epic #1712.
 Route: Claude · Anthropic · Fable 5 · medium (native opposite-family evaluator of Codex · GPT-5.6 Sol work), per `.llm/harness/workflow/lane-policy.md`.
 
-- Evaluate **exactly** head `a964a2120` on branch `test/aspire-13-5-s3-fixture-recapture` (base `origin/main` `13878a80a`). Your worktree: `<EVAL_WORKTREE>` (detached at that head; read-only for product files).
+- Evaluate **exactly** head `a964a2120` on branch `test/aspire-13-5-s3-fixture-recapture` (base `origin/main` `13878a80a`). Your worktree: `/home/codex/repos/netscript-aspire-13-5-s3-eval` (detached at that head; read-only for product files).
 - Generator run dir (in the tree): `.llm/runs/test-aspire-13-5-s3-fixture-recapture--impl/` (`supervisor.md`, `worklog.md` incl. Design + gate tables, `context-pack.md`, `drift.md`, `receipts/parity-phase1-{red,green}.json`).
 - Contract of record: issue #1715 (fixture re-capture beside kept 13.4.6 compat cases); locked decision D-13 (parity phase 2 over `compat-fixture` manifest rows). **Phase A only**: the dashboard telemetry envelopes were NOT in S2's receipts and are deferred to a lease-backed phase B — do not fail the slice for their absence; fail it if any 13.5.3 telemetry envelope was fabricated or hand-edited in `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md` on `origin/research/aspire-13.5-0.0.7` (`git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md`).
 - Supervisor Tier-A notes: `git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s3/review-tier-a.md`.
