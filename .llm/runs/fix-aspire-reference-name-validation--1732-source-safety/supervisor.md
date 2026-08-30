@@ -13,17 +13,17 @@
 
 ## Routes in force
 
-| Task lane                | Provider / model / effort                                    | Role in this run                                                                             |
-| ------------------------ | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| `planning_decisions`     | Current Codex session (owner-dispatched fallback supervisor) | Research, compatibility recommendation, delivery coordination                                |
-| `formal_plan_evaluation` | Separate owner-dispatched opposite-family session            | Mandatory PLAN-EVAL; pending while #1734 holds the single-gate evaluator queue               |
-| `light_implementation`   | Codex / current session                                      | Blocked until separately certified PLAN-EVAL returns `PASS`                                  |
-| `formal_impl_evaluation` | Repository draft-to-ready automation; separate session       | Mandatory IMPL-EVAL after the draft is explicitly marked ready; this run must leave it draft |
+| Task lane                | Provider / model / effort                                    | Role in this run                                                                                                   |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `planning_decisions`     | Current Codex session (owner-dispatched fallback supervisor) | Research, compatibility recommendation, delivery coordination                                                      |
+| `formal_plan_evaluation` | Separate owner-dispatched opposite-family session            | Two cycles completed; owner independently verified final mechanical findings and released the gate with no cycle 3 |
+| `light_implementation`   | Codex / current session                                      | RED and implementation slices complete; final static evidence reconciliation in progress                           |
+| `formal_impl_evaluation` | Repository draft-to-ready automation; separate session       | Mandatory IMPL-EVAL after the draft is explicitly marked ready; this run must leave it draft                       |
 
 ## Recorded lane/eval overrides
 
 - The owner directly dispatched this Codex session into the prepared leaf worktree, so it is the run
   supervisor/generator rather than the canonical Claude orchestrator route.
-- The owner, not this lane, dispatches PLAN-EVAL. This session must not launch, simulate, or
-  self-certify it.
+- PLAN-EVAL closed after two cycles through the owner's bounded release; this lane did not launch,
+  simulate, or self-certify either evaluator cycle.
 - The delivery contract requires leaving the PR draft; therefore IMPL-EVAL is not fired by this run.
