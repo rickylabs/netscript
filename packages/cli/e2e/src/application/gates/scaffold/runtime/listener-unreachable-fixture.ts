@@ -23,7 +23,18 @@ interface AspireResult {
   readonly stderr: string;
 }
 
-/** Exercise stop → Unhealthy/exit-18 → start → Healthy for each selected backing service. */
+/**
+ * Exercise pause → Unhealthy/exit-18 → unpause → Healthy for each selected backing service.
+ *
+ * Why not `aspire resource <name> stop`: on 13.5.3 a persistent-lifetime backing container
+ * (the scaffold default) survives `stop` — the container keeps running and its listener stays
+ * reachable — and `stop` also suspends Aspire's own health-check evaluation for that resource,
+ * so `healthReports` simply freezes at its last known value instead of ever transitioning to
+ * `Unhealthy`. The resource must stay started (so Aspire keeps actively evaluating its attached
+ * health check) while the underlying container's listener becomes genuinely unreachable — that
+ * is a container-level process suspension (`docker pause`/`unpause`), not an Aspire resource
+ * lifecycle change.
+ */
 export async function verifyListenerFailureRecovery(
   appHost: string,
   projectRoot: string,
@@ -31,20 +42,27 @@ export async function verifyListenerFailureRecovery(
 ): Promise<readonly ListenerRecoveryReceipt[]> {
   const receipts: ListenerRecoveryReceipt[] = [];
   for (const expectation of expectations) {
-    let stopped = false;
+    let paused = false;
+    let containerId: string | undefined;
     let unhealthy: ListenerHealthReport | undefined;
     let waitExitCode: number | undefined;
     try {
-      await requireAspireSuccess([
-        'resource',
+      containerId = readResourceContainerId(
+        JSON.parse(
+          (await requireAspireSuccess([
+            'describe',
+            '--apphost',
+            appHost,
+            '--format',
+            'Json',
+            '--non-interactive',
+            '--nologo',
+          ])).stdout,
+        ),
         expectation.resource,
-        'stop',
-        '--apphost',
-        appHost,
-        '--non-interactive',
-        '--nologo',
-      ]);
-      stopped = true;
+      );
+      await requireDockerSuccess(['pause', containerId]);
+      paused = true;
       unhealthy = await pollReport(
         appHost,
         expectation,
@@ -75,16 +93,8 @@ export async function verifyListenerFailureRecovery(
         );
       }
     } finally {
-      if (stopped) {
-        await requireAspireSuccess([
-          'resource',
-          expectation.resource,
-          'start',
-          '--apphost',
-          appHost,
-          '--non-interactive',
-          '--nologo',
-        ]);
+      if (paused && containerId) {
+        await requireDockerSuccess(['unpause', containerId]);
       }
     }
 
@@ -172,6 +182,39 @@ async function runAspire(args: readonly string[]): Promise<AspireResult> {
     stdout: new TextDecoder().decode(output.stdout).trim(),
     stderr: new TextDecoder().decode(output.stderr).trim(),
   };
+}
+
+/** Read `properties["container.id"]` for a named resource from `aspire describe` topology. */
+function readResourceContainerId(topology: unknown, resourceName: string): string {
+  const resources = isRecord(topology) && Array.isArray(topology.resources)
+    ? topology.resources
+    : [];
+  for (const candidate of resources) {
+    if (!isRecord(candidate) || candidate.name !== resourceName) continue;
+    const properties = candidate.properties;
+    const id = isRecord(properties) ? properties['container.id'] : undefined;
+    if (typeof id !== 'string' || id.length === 0) {
+      throw new Error(`${resourceName} omitted properties["container.id"]`);
+    }
+    return id;
+  }
+  throw new Error(`${resourceName} not found in describe topology`);
+}
+
+async function requireDockerSuccess(args: readonly string[]): Promise<void> {
+  const output = await new Deno.Command('docker', {
+    args: [...args],
+    stdout: 'piped',
+    stderr: 'piped',
+  })
+    .output();
+  if (!output.success) {
+    throw new Error(
+      `docker ${args.join(' ')} failed (${output.code}): ${
+        new TextDecoder().decode(output.stderr).trim()
+      }`,
+    );
+  }
 }
 
 function parseExpectations(value: string): readonly ListenerReadinessExpectation[] {
