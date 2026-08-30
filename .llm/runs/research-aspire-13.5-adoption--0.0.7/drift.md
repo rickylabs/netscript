@@ -682,3 +682,20 @@
   (the turn is cut) and resuming — which is what D-38 did for S8. Steering before the first runtime
   start therefore costs the in-progress survey turn; accepted here because the coordinator required
   the truthful environment paragraph before `aspire start`.
+
+## D-41 — 2026-08-30 — #1738 / #1740 handoff retracted by independent close-gate audit
+
+- This supervisor presented #1738 and #1740 as human-merge handoffs on CI `close-gate` pass + review
+  threads 0 unanswered + all acceptance boxes checked. The independent audit relabelled both
+  `status:ci-fail` (blocker comments 5467924143, 5467925281): #1738's exact-head manual E2E carries
+  three #1734 hydration failures and owes a runtime verdict; #1740's E2E was policy-skipped and the
+  NAS run never reached Aspire, so #1717/#1370/#979 runtime acceptance is insufficient and a
+  two-concurrent-start receipt is owed.
+- **Supervisor error:** treating checked acceptance boxes + a green `close-gate` job as a merge bar
+  for runtime-affecting slices while the runtime lane was skipped/blocked — the D-33 receipt said
+  "AppHost never reached" and I still forwarded the PR. Retracted at `handoff-ready-prs.md`; heads
+  and checklists untouched; no relabel by this session.
+- **Standing rule:** no Aspire PR is surfaced for merge without an executed runtime verdict at the
+  exact head (CI `scaffold-runtime` run id or a lease-backed local run that reached and passed the
+  AppHost gates). After #1734 lands: rebase S1/S4/S5, rerun the exact runtime gates, then refresh
+  head attribution — in that order.
