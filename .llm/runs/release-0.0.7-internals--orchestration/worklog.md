@@ -5900,3 +5900,25 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   rather than triggering a fresh IMPL-EVAL cycle on its own.
 - Next: finalize #1758's PR-body/DoD state to reflect this runtime evidence, confirm exact-head CI,
   and move to labels/close-gate once the coordinator's currency ruling is reflected in the artifact.
+
+## D-116 — #1751 dispatched: research/plan phase, Codex Sol/high, thread 01a054ff
+
+- Verified #1751 still `status:triage`, no existing branch/PR, genuinely unblocked and independent
+  of #1758/#1792. Reused the plan brief drafted earlier (D-... post-#1774 shipment), correcting its
+  stale "leaf #1774 is in flight" note to reflect that #1774 shipped as `a3ddcbb598` and is now part
+  of the current baseline, not a moving target.
+- Branch `fix/agentic-sender-lease-recovery`, worktree `007-leaf-1751`, off `main` at
+  `5197e70b716eafb82fbb12ddb9a910c248ddb86a`. Upstream unset before launch per the standing
+  push-safety requirement.
+- Routed `complex_implementation` (Sol · high) rather than `normal_implementation` (Sol · medium):
+  this leaf's own safety-critical eviction-path nature (a false-positive eviction can steal a live
+  lane's lease, the same class of harm as tearing down another lane's running gate) is exactly the
+  kind of risk that warrants the higher tier and the PLAN-EVAL stop the brief requires.
+- Dry-run clean (`gitSafety: {upstream: NONE, dirty: 0}`); real launch confirmed live: thread
+  `01a054ff-9028-7333-a6f1-386b94308183`. Noted for awareness, not yet acted on: Codex account rate
+  limit reporting `usedPercent: 79` over a 10080-minute window, `hasCredits: false, balance: "0"` —
+  watching in case it becomes a real blocker.
+- This is Research + Plan only; PLAN-EVAL is explicitly required before any implementation, per the
+  brief's own honest self-assessment of the eviction-path risk.
+- Monitoring in parallel: #1758's off-host `e2e-cli` run (`33341714355`, watch armed, no local lease
+  consumed) and #1792 awaiting owner merge.
