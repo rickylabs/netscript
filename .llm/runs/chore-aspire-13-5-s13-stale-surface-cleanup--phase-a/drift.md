@@ -77,3 +77,18 @@
 - **Action:** coordinator regenerates the surface manifest and reconciles the S1/S13 checker at the
   convergence head before flipping phase 2.
 - **Evidence:** phase-2 report receipt and coordinator convergence checklist.
+
+## 2026-08-31 — D-155 corrected the stacked S10 baseline and parity union
+
+- **What:** the coordinator replaced the old S10 stack point `a46ea16d` with corrected S10 head
+  `c9e3fcbe8` and ruled the final parity conflict as a narrow additive union.
+- **Source:** D-155 coordinator ruling.
+- **Expected:** replay S13's nine commits onto corrected S10, preserve current-main's parity
+  contract/tests, add S13 phase 2, and regenerate the tree-bound manifest.
+- **Actual:** all nine commits map in range-diff order; the only conflicts were the four ruled
+  surfaces plus the generated MCP export corpus covered by the standing generated-file rule.
+  Current-main's exact-token cases and S13's phase-2 cases coexist in a 13-test focused suite.
+- **Severity:** significant, resolved.
+- **Action:** retain corrected S10 as the stacked baseline; do not retarget to main. PLAN-EVAL and
+  evaluator reruns remain prohibited in this lane; the supervisor owns the later GLM IMPL-EVAL.
+- **Evidence:** D-155 section in `worklog.md` and the final nine-commit range-diff.

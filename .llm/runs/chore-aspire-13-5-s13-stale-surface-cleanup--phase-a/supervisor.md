@@ -8,7 +8,7 @@
 | Checkout | `/home/agent/projects/netscript/worktrees/007-aspire` |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-aspire-s13` |
 | Branch | `chore/aspire-13-5-s13-stale-surface-cleanup` |
-| Baseline | `a46ea16d` (`test/aspire-13-5-s10-e2e-gate-upgrades`, 2026-08-30) |
+| Baseline | `c9e3fcbe8` (`test/aspire-13-5-s10-e2e-gate-upgrades`, corrected S10 head, 2026-08-31) |
 | Run ID | `chore-aspire-13-5-s13-stale-surface-cleanup--phase-a` |
 
 ## Routes in force
@@ -30,3 +30,6 @@
 - IMPL-EVAL cycle 2 ran in fresh native Claude/Fable 5 medium session
   `b7095b3b-13aa-466e-895f-c560309a4e48` against exact implementation head `fc0a0c8c` and returned
   `PASS`. The complete independent verdict is recorded in `evaluate.md`.
+- D-155 superseded the old stacked baseline `a46ea16d` with corrected S10 head `c9e3fcbe8` and
+  explicitly prohibited PLAN-EVAL or evaluator reruns in this implementation session. The
+  supervisor will dispatch a separate GLM IMPL-EVAL after the corrected branch is pushed.
