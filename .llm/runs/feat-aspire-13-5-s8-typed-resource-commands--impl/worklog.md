@@ -30,6 +30,9 @@ Phase-B lease and the implementation agent does not self-certify.
   `DbCliModeExcludeFromMcp`, and removes the 13.4 process-command seam. `s8-s2-generator-green`
   passed 34/34; focused `deno check --unstable-kv` passed for both generators and tests. The durable
   receipt is intentionally run after this slice commits so it attests the implemented HEAD.
+- 2026-08-30: slice 2 clean-HEAD receipt `s8-s2-generator-head` passed 34/34 at `1fa1cb75`.
+  Slice 3 regenerated the embedded CLI asset snapshot with `deno task gen:assets-barrel`; the
+  clean-tree `check:assets-barrel` verdict runs immediately after the snapshot commit.
 
 ## Push trail
 
