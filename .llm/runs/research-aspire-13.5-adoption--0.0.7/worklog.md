@@ -393,4 +393,8 @@ Gemini M3 worklog correction running. **S13 released** — `launch-codex-slice` 
 `chore/aspire-13-5-s13-stale-surface-cleanup` @ `a46ea16d`. Runtime zero. | | S11 M3 landed; polish
 launched; S13 live | Gemini docs-only commit `8149c7a4` (worklog 8/113, DONE). Fable docs_polish
 dispatched at `8149c7a4`. S13 thread `01a05348-6d4d-7413-a7d4-da98df0c720e` (openai · gpt-5.6-sol ·
-medium, matched) on `007-aspire-s13` @ `a46ea16d`. Runtime zero. |
+medium, matched) on `007-aspire-s13` @ `a46ea16d`. Runtime zero. | | Monitor prefix collision | An
+S13 watch built on a rollout glob (`*01a05348*`) matched the coordinator's thread `01a05348-4133…`
+and reported its terminal message as S13's. Verified by rollout `cwd`: S13 =
+`01a05348-6d4d-7413-a7d4-da98df0c720e` (running, no commit yet). Watch re-armed on the exact path;
+rule: monitors key on full thread ids only. |
