@@ -41,3 +41,6 @@ _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
   the thread **after** the first start but **before any capture**; the detached AppHost survived the
   client detach (it is a detached child) and the resumed turn continues under the corrected facts.
   Recorded verbatim rather than restated as "before first start".
+- 2026-08-30 ~09:41Z — attempt-1 turn completed (blocked probe `2b0d33bd`). **Attempt 2** under a
+  new serialized lease: same thread resumed with the scratch-only `DataPath`-omission correction
+  (log `s3-phase-b-attempt-2.log`).
