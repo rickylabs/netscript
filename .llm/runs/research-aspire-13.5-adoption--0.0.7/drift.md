@@ -579,3 +579,14 @@
 - **Not covered by the PASS:** Phase B (`runtime.health.listener-unreachable`, both-tier
   `healthReports` receipts, `scaffold.runtime`/`quickstart`) remains lease-gated; #1718 boxes
   unchecked and `status:blocked` stay until then. S6 is now the **settled base for S8**.
+
+## D-35 — 2026-08-30 — `/home/codex` is gone on the NAS; `launch-codex-slice` needs `--dest`
+
+- The launcher stages the brief at `/home/codex/<slug>-brief.md` by default; that path was a symlink
+  to `/home/agent` after the migration and no longer exists, so the S8 launch failed at `stage` ("No
+  such file or directory") until `--dest /home/agent/<slug>-brief.md` was passed. `--user node`
+  remains required (D-21). Tooling follow-up: default the staging dir from the resolved user home
+  instead of a fixed `/home/codex` (candidate for the agentic-suite backlog, not an Aspire slice).
+- Also this checkpoint: the coordinator released the S3 Phase-B lease unused because the shared
+  inotify ceiling is hit (D-34). Standing rule until infrastructure repairs the quota and a fresh
+  serialized lease is granted: **no Phase-B runtime; Aspire/DinD stay at zero; S8 static only.**
