@@ -124,6 +124,8 @@ Deno.test('base contract initializer remains pinned to NetScript procedure metad
     await Deno.readTextFile(CONTRACT_ASSERTION_BUDGETS[0].file),
   );
 
+  // A future `=` or `;` inside the annotation may make this narrow span fail on correct code.
+  // Widen that span when needed; never drop the `export const baseContract` declaration anchor.
   assertEquals(
     countMatches(
       primitives,

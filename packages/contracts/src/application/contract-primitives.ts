@@ -126,8 +126,9 @@ export type BaseContractErrors = MergedErrorMap<Record<never, never>, CommonErro
  * Common oRPC contract primitive with NetScript's standard error map applied.
  *
  * Built with the real oRPC **contract** builder (`oc`), initialized with the
- * NetScript-owned {@link BaseContractMeta}, and wired to the shared
- * {@link commonErrorMap}. Because {@link commonErrorMap} uses real Zod schemas,
+ * NetScript-owned {@link BaseContractMeta}, and wired to NetScript's standard error map. Its error
+ * codes, HTTP statuses, message literals, and data schemas form the stable compatibility contract.
+ * Because the internal map uses real Zod schemas,
  * `oc.errors(...)` type-checks with no cast — the builder's `~orpc` marker is genuinely typed rather
  * than erased to `any`. Every route composed from this value
  * (`baseContract.route(...).input(...).output(...)`) therefore carries its precise metadata,

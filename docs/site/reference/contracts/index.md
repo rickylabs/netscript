@@ -55,7 +55,7 @@ sub-path exports add higher-level builders:
 | `validationFailed` | function | `function validationFailed(options: ValidationFailedOptions): never` | Throws the contract `VALIDATION_ERROR` oRPC error. |
 | `getResourceType` | function | `function getResourceType(options: { path?: readonly string[]; }): string` | Resolves a singular resource name from an oRPC handler path. |
 | `COMMON_ERROR_CODES` | const | `const COMMON_ERROR_CODES: Readonly<{ notFound; validationError; unauthorized; forbidden; rateLimited; serviceUnavailable; }>` | Common oRPC error codes shared by NetScript service contracts. |
-| `CommonErrorMap` | type alias | `type CommonErrorMap = Readonly<{ ... }>` | NetScript-owned public shape of `commonErrorMap`. Its error codes, HTTP statuses, message literals, and data schemas are stable compatibility commitments. |
+| `CommonErrorMap` | type alias | `type CommonErrorMap = Readonly<{ ... }>` | The standard NetScript error map carried by every base route. Its error codes, HTTP statuses, message literals, and data schemas are stable compatibility commitments. |
 | `NotFoundErrorSchema` | const | `const NotFoundErrorSchema: ContractSchema<NotFoundError>` | Common not-found error schema. |
 | `ValidationErrorSchema` | const | `const ValidationErrorSchema: ContractSchema<ValidationError>` | Common validation error schema. |
 | `UnauthorizedErrorSchema` | const | `const UnauthorizedErrorSchema: ContractSchema<UnauthorizedError>` | Common unauthorized error schema. |

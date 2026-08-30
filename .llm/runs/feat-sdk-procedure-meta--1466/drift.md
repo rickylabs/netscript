@@ -247,3 +247,21 @@ The slice follows the more specific L3 export-site lock and the product ceiling:
 two named subpath entrypoints and does not rewrite the root barrel. `ProcedureMetaFromNode` remains
 `./ports`-only as explicitly required. No upstream type is exported and no out-of-ceiling file is
 needed.
+
+## D-33 — repaired host supersedes the root-test no-retry conditions
+
+- Date: 2026-08-30
+- Slice: 3 — publish and compatibility evidence
+- Severity: operational
+- Status: reconciled; frozen evidence remains immutable
+
+The slice-1 R-1/D-26 root-`test` ruling and the receipt sets cut under it described a host where PID
+1 did not reap child processes and a zombie could remain visible to `Deno.kill(pid, 0)`. That host
+condition no longer exists. At slice-3 intake, `/proc/1/comm` is `tini`, the system-wide zombie
+count is 0, and `/proc/sys/fs/inotify/max_user_instances` is 1024. Root `test` is therefore runnable
+and must produce a real PASS receipt; the former no-retry condition and `SKIPPED` form are void.
+
+This is topic drift in the evidence environment, not product drift. Every frozen receipt archive
+was cut under conditions that have since been superseded and remains append-only historical
+evidence; no archived outcome is rewritten or reinterpreted. Slice 3 archives the slice-2 top-level
+set under `receipts/frozen-2863d29e/` before cutting its own eight receipts at the new content head.
