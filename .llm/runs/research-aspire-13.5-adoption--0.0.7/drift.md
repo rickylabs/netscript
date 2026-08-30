@@ -1107,3 +1107,14 @@
     head (D-41) **and** this check.
 - Order this implies for the Aspire stack: #1740 (S5, base main) → retarget #1743 (S6) → #1754 (S8)
   → then #1759 (S9) / #1760 (S10) as siblings → #1771 (S11); #1744 (S7) after #1741 (S3).
+
+## D-59 — 2026-08-30 — S3 → S7 side-stack converged onto `main` `3e5cbabf`
+
+- S3 `9525f1ae` → **`85bd4967`** (8 commits, clean replay, no carrier regeneration needed); S7
+  `eb6f188c` → **`2f721bf3`** (6 commits, clean). `range-diff` 8/8 and 6/6 `=`. Validation at S7′:
+  scoped `deno check` 0 diagnostics; raw lint/fmt clean; quality/arch/barrel/publish-assets/
+  mcp-export-corpus/emitted-samples exit 0; tests **427/0**; S3 parity test still fails-closed on a
+  premature 13.5.3 telemetry literal (`.llm/tools/validation/check-compat-fixtures_test.ts`, outside
+  the package test roots — invoke explicitly); no 13.5.3 telemetry fixture introduced. Force-pushed
+  with lease; S3 worktree moved; PR #1741/#1744 notes posted. Phase-A verdicts carry over (patches
+  identical). Phase B for both remains D-55-blocked.

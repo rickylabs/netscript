@@ -360,4 +360,6 @@ order recorded; appended to the S8/S9/S10 handoffs. | | Converged-head CI eviden
 `56bf4255` (base main): 8 pass / 0 fail, CLEAN. Stacked drafts #1743 `01f27d4d`, #1754 `f2395465`,
 #1759 `d81a8fe1`, #1760 `a46ea16d`, #1771 `9d6afebf`: **all checks skipping by draft/topic-base
 policy** (0 pass / 0 fail) — CI evidence for each leaf arrives only after the D-58 retarget to
-`main`; the retarget step therefore also re-earns CI at the exact head. |
+`main`; the retarget step therefore also re-earns CI at the exact head. | | S3/S7 side-stack
+converged (D-59) | S3 `85bd4967`, S7 `2f721bf3` on main `3e5cbabf`; identity by range-diff; gates
+green (427/0); pushed with lease; PR notes posted. |
