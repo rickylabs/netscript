@@ -3950,3 +3950,57 @@ Runtime lease **released** after that proof. Pre-existing gate receipts under `.
 untouched; only my own run scratch was deleted.
 
 `#1533` continued throughout without a runtime lease and was never blocked by this.
+
+## 2026-08-30 — #1533: my census challenge was wrong; ANSI-colour defect found in the gate itself
+
+### I was wrong twice; the author was right twice
+
+I told the author its committed census of 165 was stale and did not reproduce, on the strength of six
+runs of mine returning 24. It refused twice, published provenance, and changed nothing — because the
+brief carried a stop condition requiring exactly that. **That safeguard is the only reason a correct
+census was not overwritten by my broken measurement.**
+
+Root cause, found by controlling the last uncontrolled variable:
+
+| Condition | failures | unboundName |
+| --- | ---: | ---: |
+| colour enabled (my shell default) | **24** | 0 |
+| `NO_COLOR=1` (the author's environment) | **165** | 116 |
+
+Same commit, same worktree, same command, back to back. `.llm/tools/docs/jsdoc-example-compiler.ts`
+lines 243-262 pipe `deno check` output and hand the raw text to `mapDiagnostics(stderr, modules)`
+with no ANSI stripping and without forcing colour off on the subprocess, so colour defeats the
+`file:line` matching and the classifier silently under-attributes.
+
+**The contradiction was in front of me the whole time:** both runs reported `Found 262 errors`, and
+24 failing examples cannot carry 262 diagnostics while 165 can. I checked my number against the
+author's and never asked whether my own instrument was sound — the same "verify the thing you are
+reasoning about, assume the adjacent one" failure I have logged repeatedly, and the third time this
+session it was mine.
+
+### The defect is worse than what the gate hunts, and is now a required in-scope fix
+
+An **85% undercount** presented as a confident census. CI commonly runs with colour enabled, so this
+gate could pass a corpus it never classified — a false green of exactly the class it exists to
+prevent. Required: force `NO_COLOR`/strip ANSI on the spawned command before `mapDiagnostics` sees
+it, plus a regression test asserting identical classification with colour forced on and off. A gate
+whose verdict depends on `NO_COLOR` is not a gate.
+
+### Consequence: the D14 ceiling IS breached, as the author originally said
+
+Authoritative census `badSpecifier 27 · typeError 21 · unboundName 116 · unfenced 0 · malformed 1`,
+total **165** of 348 candidates:
+
+- mechanical `144` > **90**
+- genuine type errors `21` > **8**
+
+I4 stays blocked. No repairs, no exemptions, no baselining. The rescope decision goes to the
+coordinator once the colour fix lands and the census reproduces identically under both colour
+conditions.
+
+### Not idling behind #1734/#1747
+
+`#1747` is withheld at `c1e03922` as `status:ci-fail` until #1734's bounded repair lands and the full
+one-pass `scaffold.runtime` succeeds; `#1734` stays parked at `eb765629`. Neither blocked this lane
+at any point — #1533 has progressed through plan, PLAN-EVAL, amendment, I1, I2, census, and now a
+gate-integrity fix while those two sat.
