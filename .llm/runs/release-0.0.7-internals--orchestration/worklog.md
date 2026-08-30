@@ -4408,3 +4408,56 @@ All three internals senders reached terminal. `#1533` idle at `4cdee82f` with F1
 corrected 21→20, awaiting its cycle-2 IMPL-EVAL behind #1734 in the single evaluator slot. `#1616`
 handed to **fixes** (ownership correction recorded — internals opened it in error and implemented
 nothing) with a clean plan checkpoint and a completed `FAIL_FIX` PLAN-EVAL. `#1774` queued.
+
+## 2026-08-30 — #1734 third terminal failure escalated; #1533 sealed and re-evaluating; #1774 dispatched
+
+### #1734 cycle 3 — `FAIL_FIX`, third consecutive terminal failure, owner decision surfaced
+
+Verdict `069913e7`, artifact-only, cycle-1 and cycle-2 verdicts bit-identical, evaluator stopped.
+
+The cycle proved a great deal good: cycle-2's F1/F2 genuinely repaired on the real transport **and**
+in memory, RED→GREEN real, both range ends compile, contract and `^5.101.0` untouched, guard resists
+prototype/shape attacks without partial hydration or input mutation — and **every sealing claim
+reproduced at this head, including the root test.** The evaluator checked the evidence I had signed
+rather than accepting it, which is precisely why sealing the carrier first was worth stopping the
+earlier launch for.
+
+Two findings remain, and **I confirmed both by execution rather than trusting the report**:
+
+| Finding | My probe |
+| --- | --- |
+| F1 — the revive still rejects `undefined` (bare `Promise.reject()`), symbols and functions; these hydrate on `main` and now drop every sibling success query on the default paused-mutation path | `undefined`/symbol/function → `valid=false` — **confirmed** |
+| F2 — unguarded `String(value)` lets a consumer-controlled array element throw **past** the guard, in memory | `[{ toString(){ throw … } }]` → **threw past the guard** — confirmed |
+
+**The pattern is the finding.** Three cycles, three terminal failures, all one shape: a value that
+hydrates on `main` is rejected, and each cycle fixes only the instance it was shown. My own Tier-A
+repeated it once. That is not three careless authors — **`reviveSerializedError` enumerates an open
+value domain inside an allowlist guard**, so each cycle enumerates one more member and a fourth has no
+structural reason to differ.
+
+**No cycle 4 authorized or launched.** Escalated as comment `5469436133` with four options and the
+trade named. Lane recommendation: **invert the guard to a total function** — accept every rejection
+value, wrap uniformly via `new Error(safeString(value), { cause: value })` where `safeString` cannot
+throw. That removes the entire "value X is rejected" class *and* F2, keeps the `Error | null` type
+honesty R2 exists for, and stays inside `hydration.ts`. It is explicitly **not** "one more cycle in
+disguise": it changes the guard's shape rather than adding the fourth enumerated case.
+
+### #1533 — sealed at `4cdee82f`, cycle-2 IMPL-EVAL dispatched
+
+All four cycle-1 findings closed and verified. Supervisor Tier-A, every gate raw exit **0**: root
+`deno task test` **4,293 passed / 0 failed / 19 ignored**, `docs:jsdoc-examples` PASS with `exempt=0`
+and `deferredCensus {unboundName:116, typeError:20}`, plus `docs:jsdoc-examples:test`,
+`check:assets-barrel`, `check:publish-assets`, `quality:scan`, `arch:check`.
+
+Cycle-2 evaluator `9316340d` (native Fable 5 / medium, own detached worktree, artifact-only) is
+briefed that the head is **knowingly unpushed** — the `repo`-scope PAT cannot push `e1ea9d3a`, which
+touches `.github/workflows/ci.yml` — so it must not assert `local == remote == PR`, must commit
+locally without pushing, and must **spot-check my sealing claims rather than trust them**.
+
+### #1774 dispatched
+
+`fix/claude-hook-log-cwd-independent` at `3e5cbabf`, worktree `007-leaf-1774`, thread
+`01a05331-e17a-7863-9f06-19f445d4c352`, Sol · medium, plan-gate bounded. The brief carries the
+sibling defect this lane found live — `wslHome()` still defaults to the now-nonexistent `/home/codex`,
+already breaking `launch-codex-slice` without `NETSCRIPT_WSL_HOME` — and requires the plan to address
+or explicitly exclude it rather than widen silently.
