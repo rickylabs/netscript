@@ -379,4 +379,9 @@ supervisor. | | M5 environment verdict | `diagrams:check` unrunnable here: `/eph
 diagrams fail). Parity verdict must come from CI. Not a content finding. | | S11 fix cycle 2 landed
 | `dc92bad4` pushed (same Gemini conversation). Audit cycle 3 **awaits coordinator authorization**
 (D-62). Polish brief head → `dc92bad4`. | | S11 audit cycle 3 (final) | Authorized and launched on
-Sol thread `01a052fc…` at `dc92bad4` with the H5/M5 rulings; on PASS → polish → S13. |
+Sol thread `01a052fc…` at `dc92bad4` with the H5/M5 rulings; on PASS → polish → S13. | | Host
+process cleanup (~17:05 local) | Coordinator notice: ~23 background Claude CLI processes killed
+host-side. Aspire lane audit at 15:10Z: cycle-3 audit thread `01a052fc…` alive (Codex; rollout
+fresh, state working, no abort, resume client alive); no `claude -p`/AGY session was running; Codex
+daemon up. Harness watchers re-armed (monitor + blocking wait). No files/worktrees affected; runtime
+zero. |
