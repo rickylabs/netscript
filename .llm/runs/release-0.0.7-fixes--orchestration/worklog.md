@@ -5731,3 +5731,24 @@ states before/after rather than silently rewriting history.
 
 **Corrected status: #1764 is runtime-open. TC-6/TC-7/TC-9 are unproven. Not merge-ready.**
 `status:impl` stands (unchanged, was never moved to ready-merge); no PR/issue surface claims otherwise.
+
+### #1739 static finding — its target gate may not need the runtime lease at all
+
+Read `behavior-plugins-health-gate.ts`'s `createPackageBackedPluginDoctorGates()` (the implementation
+behind `BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR`, PR #1739's unticked acceptance line). It runs a fixture
+script against a **separate** scratch project root
+(`resolve(context.project.smokeRoot, '${projectName}-package-doctor')`) via a plain `deno run`
+invocation — no AppHost, no Docker, no browser, no relay. It sits after `behavior.app-reference` in
+`RUNTIME_GATES` purely by array position, not by functional dependency, so the same
+break-on-critical-failure that blocked #1764's otel gates blocks this one too — but unlike #1764's
+otel gates, this one doesn't need infrastructure at all to actually run.
+
+Of the three doctor-related gates: `GENERATED_PLUGINS_CHECK` and
+`BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE` sit *before* `behavior.app-reference` and would run in any full
+suite attempt regardless; only `BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR` is affected by the array-order
+issue, and it looks bound-able without any host lease at all.
+
+**Not acted on further this turn.** This is a finding to report, not authorization to write a second
+bounded script unbidden — surfacing it for a decision rather than repeating the #1764 scope mistake on
+a second leaf. `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/leak-report.md` (untracked, pre-
+existing) checked and confirmed harmless — a leftover artifact, not touched.
