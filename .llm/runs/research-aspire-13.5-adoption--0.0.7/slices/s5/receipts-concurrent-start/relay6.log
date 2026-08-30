@@ -1,0 +1,7 @@
+[relay] watching owner=s5-attempt6 dind=netscript-dind(10.4.12.22) since=2026-08-30T20:25:14.508Z pid=3786951
+[relay] postgres-4aa9deee 127.0.0.1:20130 => hopA relay-s5-attempt6-20130 (10.4.12.22:20130) => hopB 127.0.0.1:20130@ai-agents
+[relay] garnet-sktxgwdk 127.0.0.1:32807 => hopA relay-s5-attempt6-32807 (10.4.12.22:32807) => hopB 127.0.0.1:32807@ai-agents
+[relay] poll error: docker inspect --format {{.Created}} 9ef1434e05c1: Error: No such object: 9ef1434e05c1
+[relay] garnet-dvkvryaz 127.0.0.1:32809 => hopA relay-s5-attempt6-32809 (10.4.12.22:32809) => hopB 127.0.0.1:32809@ai-agents
+[relay] redis-znnksdft 127.0.0.1:32808 => hopA relay-s5-attempt6-32808 (10.4.12.22:32808) => hopB 127.0.0.1:32808@ai-agents
+[relay] cleanup: closed 4 listener(s), removed 4 hop-A container(s)

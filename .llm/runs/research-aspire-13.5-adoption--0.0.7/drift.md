@@ -1677,3 +1677,26 @@
   never `git checkout -B` a branch that another worktree may already have checked out — verify with
   `git worktree list` first, or the branch-ref move corrupts the _other_ worktree's apparent status
   without touching its files.
+- **D-87 — S5 #1717 box 4 ("two concurrent `aspire start --isolated` of the same generated project
+  both reach healthy") cannot be reproduced literally with the plain CLI: `aspire start` detects an
+  existing running instance at the same `--apphost` path and stops it first.** Attempt 6
+  (lease-backed, relay `s5-attempt6`, canonical single project with all four plugins
+  workers/sagas/triggers/streams, 13.5.3 pins verified, `DATABASE_URL`/`POSTGRES_URI` offline
+  codegen preflight green, root install + `db:generate` + `restore` all exit 0): first
+  `aspire start --isolated` succeeded (pid 3789463); the second `aspire start --isolated` on the
+  identical apphost path printed
+  `🛑 Stopping previous instance (AppHost PID: 3789463, CLI PID:
+  3789446)` and replaced it —
+  `aspire ps` never showed two entries, only the surviving second instance. `--isolated` randomizes
+  ports/user-secrets but is not a multi-instance flag; the CLI's own instance registry is keyed by
+  apphost path, one running instance per path. **This is a real CLI/product-behavior gap, not a
+  supervisor setup error** — the acceptance box as literally written cannot be satisfied by two
+  sequential/concurrent plain `aspire start --isolated` calls on one path. Torn down to exact zero
+  (stop exit 0, one persistent Postgres survivor removed, relay killed, all scratch dirs — including
+  leftover `s5a/s5a2/s5b/s5b2` from earlier attempts — removed via container due to root-owned
+  `.data`; final `containers=0 volumes=0 aspire=[]`). **Per standing instruction: stopping here
+  rather than a 7th attempt.** Options for the coordinator: (a) reinterpret the box as "two runs of
+  the project, sequentially, both individually reach healthy" (already effectively proven by every
+  green hosted `scaffold.runtime` run); (b) investigate whether a non-default CLI flag/env exists to
+  opt out of the single-instance-per-path behavior (not found in `aspire start --help`); (c) amend
+  the acceptance box to match actual CLI 13.5.3 semantics.
