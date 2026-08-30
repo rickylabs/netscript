@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-30T09:12:00.000Z",
+  "capturedAt": "2026-08-30T09:51:00.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
   "sources": {
@@ -1150,6 +1150,34 @@
       "admissionPredicate": "high-value-coherent",
       "targetMilestone": "0.0.7",
       "movedAt": "2026-08-29T22:55:56.000Z"
+    },
+    {
+      "number": 863,
+      "source": "backlog",
+      "decision": "include",
+      "reason": "Aspire S8 owns the bounded-wait and standalone database-operation behavior that closes this clean-machine quickstart flake together with #1720.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/863",
+        "https://github.com/rickylabs/netscript/pull/1754"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T09:45:00.000Z"
+    },
+    {
+      "number": 1749,
+      "source": "backlog",
+      "decision": "include",
+      "reason": "Bounded public quickstart correction discovered after #1745; direct-to-main PR #1755 already carries independently verified source and generated-corpus evidence.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1749",
+        "https://github.com/rickylabs/netscript/pull/1755"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T09:45:00.000Z"
     },
     {
       "number": 1750,

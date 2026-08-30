@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-30T09:12:00.000Z",
+  "capturedAt": "2026-08-30T09:51:00.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
-  "targetIssueCount": 107,
+  "targetIssueCount": 109,
   "issues": [
     {
       "number": 1093,
@@ -1199,6 +1199,28 @@
       "evidence": [
         "https://github.com/rickylabs/netscript/issues/1737",
         "PR #1746 explicitly excludes this shipped-skill source/barrel correction; it needs its own leaf."
+      ]
+    },
+    {
+      "number": 863,
+      "title": "scaffold: `netscript db init` can block indefinitely on an Unhealthy-but-Running Postgres resource (clean-machine quickstart flake)",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/863",
+        "https://github.com/rickylabs/netscript/pull/1754",
+        "Aspire S8 shares one bounded typed-resource-command leaf with #1720."
+      ]
+    },
+    {
+      "number": 1749,
+      "title": "docs(quickstart): show the canonical .agents/skills/ bundle in the scaffold tree",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1749",
+        "https://github.com/rickylabs/netscript/pull/1755",
+        "Direct-to-main bounded docs leaf at exact head 2c844565 with independent Tier-A evidence; IMPL-EVAL remains required."
       ]
     },
     {

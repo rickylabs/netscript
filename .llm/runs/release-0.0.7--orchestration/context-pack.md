@@ -1335,3 +1335,26 @@ continues concurrently because serial ordering is per orchestrator, not global.
   allocates and reaches its expected exit-2 heartbeat. This authority was sent to all five native
   Remote Control supervisors. Immediately before the S3 lease, Aspire, DinD, exact Aspire/AppHost/
   DCP processes, and other runtime leases were all zero.
+
+## Atomic live reconciliation — 2026-08-30T09:51:00Z
+
+- Central active scope is now 99 issues: 65 open and 34 closed. The fourteen live closures missing
+  from the prior ledger are #1112, #1358, #1371, #1378, #1461, #1502, #1542, #1545, #1551,
+  #1611, #1613, #1672, #1674, and #1675. Newly admitted #863 and #1749 are open in 0.0.7;
+  terminal inventory exclusions and duplicate #1733 remain excluded from committed active scope.
+- Merged truth is #1669 PR head `313cc08d` / merge `0ef48c2e` and #1729 PR head `608f68b0` /
+  merge `13878a80`. Active exact heads are #1731 `bbff7cf9`, #1739 `e24e7ce1`, #1747 `c1e03922`,
+  Aspire S8 #1754 `1efd1a17`, and docs #1755 `2c844565`.
+- #1747 is a ready handoff with immutable product `fc3ea177` and exact-head IMPL-EVAL PASS. #1738
+  and #1740 are not handoffs: both remain baseline-blocked `status:ci-fail`; #1740's expensive gate
+  must not be rerun. #1734 remains the owner boundary after two terminal IMPL-EVAL failures.
+- Docs #1746 and #1748 remain shippable exact-head PASS handoffs. #1755 owns admitted #1749 as a
+  bounded direct-to-main docs leaf at `status:impl-eval`, ordered behind those corpus-changing PRs.
+- S3 attempt 1 at `2b0d33bd` proved remote bind-source invisibility and cleaned to zero. A separately
+  granted attempt 2 omitted only scratch DataPath, then stopped when Aspire advertised remote
+  PostgreSQL as `localhost:17858` and health checks received connection refused. Artifact head
+  `9525f1ae` records `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`; no envelopes were fabricated and no
+  third attempt is authorized. Final Aspire, Docker containers, Docker volumes, and runtime
+  processes are all zero.
+- #1754 owns both #1720 and admitted #863 in features wave 14 after #1718. #1755/#1749 is docs wave
+  11 after #1745. Serial queues remain per topic and neither admission creates a global barrier.

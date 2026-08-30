@@ -529,6 +529,13 @@
       "title": "docs(agentic): document canonical cross-host skill installation"
     },
     {
+      "id": "issue:1749",
+      "kind": "issue",
+      "issueNumber": 1749,
+      "lane": "docs",
+      "title": "docs(quickstart): show the canonical agent skills bundle in the scaffold tree"
+    },
+    {
       "id": "issue:1280",
       "kind": "issue",
       "issueNumber": 1280,
@@ -597,6 +604,13 @@
       "issueNumber": 1720,
       "lane": "features",
       "title": "feat(aspire): typed resource commands and MCP exclusion ownership"
+    },
+    {
+      "id": "issue:863",
+      "kind": "issue",
+      "issueNumber": 863,
+      "lane": "features",
+      "title": "fix(scaffold): bound db init readiness and retain standalone database operations"
     },
     {
       "id": "issue:1721",
@@ -917,6 +931,12 @@
       ]
     },
     {
+      "from": "issue:1745",
+      "to": "issue:1749",
+      "kind": "requires",
+      "evidence": ["#1749 is the bounded quickstart tree follow-up discovered while verifying #1745's canonical cross-host skills contract."]
+    },
+    {
       "from": "issue:1713",
       "to": "issue:1714",
       "kind": "requires",
@@ -993,6 +1013,12 @@
       "to": "issue:1720",
       "kind": "requires",
       "evidence": ["S8 resource commands follow the settled S6 backing-resource readiness model."]
+    },
+    {
+      "from": "issue:1718",
+      "to": "issue:863",
+      "kind": "requires",
+      "evidence": ["#863 shares S8's bounded-wait and standalone database-operation leaf after S6 settles listener readiness."]
     },
     {
       "from": "issue:1713",
@@ -1222,7 +1248,8 @@
       "index": 11,
       "nodeIds": [
         "issue:1715",
-        "issue:1716"
+        "issue:1716",
+        "issue:1749"
       ]
     },
     {
@@ -1245,7 +1272,10 @@
     },
     {
       "index": 14,
-      "nodeIds": ["issue:1720"]
+      "nodeIds": [
+        "issue:863",
+        "issue:1720"
+      ]
     },
     {
       "index": 15,

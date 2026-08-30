@@ -2294,3 +2294,27 @@
   static and independent. The generated prompt retained obsolete Docker 27.5.1/address literals,
   so a same-thread environment correction was immediately queued before first runtime start; no
   duplicate thread or retry was authorized.
+
+## 2026-08-30T09:51:00Z — active-scope, leaf-head, and S3 terminal reconciliation
+
+- Reconciled fourteen committed issue transitions to closed and admitted #863 plus #1749,
+  producing 109 inventory records / 99 committed active issues / 65 open / 34 closed. Preserved all
+  terminal inventory-only exclusions, moved #1453, and duplicate #1733 outside active scope.
+- Reconciled merged #1669 to PR head `313cc08d` / merge `0ef48c2e` and merged #1729 to PR head
+  `608f68b0` / merge `13878a80`. #1731 advanced from slice-2 evidence `dce16175` to host-correction
+  addendum `bbff7cf9` with slice 3 active; #1739 advanced from amended plan `13402d3f` to bounded
+  implementation `e24e7ce1`; #1747 is ready at evidence `c1e03922` over product `fc3ea177`.
+- Corrected false handoff metadata: #1738 and #1740 are baseline-blocked `status:ci-fail`, not
+  merge handoffs. #1734 remains parked after its second terminal IMPL-EVAL failure. #1746 and #1748
+  remain exact-head PASS, CI/thread-clean, shippable docs handoffs.
+- S3 attempt 1 ended at `2b0d33bd` on remote bind-source visibility and exact zero cleanup.
+  Separately authorized attempt 2 omitted scratch-only DataPath and ended at `9525f1ae` when the
+  remote-DinD endpoint was advertised as localhost and refused the AppHost health connection. No
+  telemetry envelope was captured or invented. The same thread stopped; no third attempt exists.
+  Positively owned cleanup removed the sole persistent PostgreSQL container and its same-second
+  anonymous volume; final Aspire, Docker containers, Docker volumes, processes, and survivors are
+  exactly zero.
+- Added active S8 PR #1754, issueNumbers `[1720, 863]`, features wave 14 after #1718; its static
+  stack advanced from asset head `ab0908b8` to resident command routing `1efd1a17` during intake.
+  Added bounded direct-to-main docs PR #1755 at `2c844565`, issue #1749 in wave 11 after #1745,
+  with Tier-A/gates green and separate IMPL-EVAL next.

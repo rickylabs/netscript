@@ -169,3 +169,27 @@ safe-deferred and are not hidden 0.0.7 gates.
 - #1606 is closed after live JSR registry and landing-page verification; it requires no code PR.
 - #1453 was moved to Backlog / Triage with a public reason and evidence.
 - #1384/#1385 remain owned by 0.0.8; this release will not ship a partial security workaround that fails their acceptance contract.
+
+## Live re-intake and leaf plan — 2026-08-30T09:51:00Z
+
+The frozen DAG now carries 99 active issues through waves 0–19. Late admitted work is ordered, not
+globally serialized: #1749 is docs wave 11 after #1745; Aspire S8 owns #1720 and newly admitted #863
+in features wave 14 after #1718. Terminal inventory-only exclusions and duplicate #1733 remain
+outside committed active scope.
+
+| Leaf / PR | Lane | Exact state | Next gate |
+| --- | --- | --- | --- |
+| #1731 / #1466 | features | slice 2 product `2863d29e`; evidence `dce16175`; host addendum `bbff7cf9`; slice 3 active | finish slice 3 G-4, Tier-A, final all-slices IMPL-EVAL |
+| #1739 / #1673 | fixes | focused PLAN-EVAL passed; bounded S7 implementation at `e24e7ce1`; cycle-1 `FAIL_FIX` preserved | finish implementation, Tier-A, cycle-2 IMPL-EVAL |
+| #1747 / #1732 | internals | product `fc3ea177`; PASS evidence `c1e03922`; ready | coordinator pre-merge gate, human merge |
+| #1736 / #1734 | internals | second terminal IMPL-EVAL failure `eb765629`; owner boundary | no cycle 3 without explicit owner authorization |
+| #1738 / #1716 | fixes | `73299241`; baseline-blocked `status:ci-fail` | no merge handoff until the shared baseline is corrected |
+| #1740 / #979/#1365/#1370/#1717 | fixes | `aa822069`; baseline-blocked `status:ci-fail`; expensive gate terminal | do not rerun or hand off until the shared baseline is corrected |
+| #1741 / #1715 | internals | `9525f1ae`; two authorized runtime attempts terminal on remote-DinD topology | parked; no third attempt authorized |
+| #1754 / #1720/#863 | features | S8 static S1–S4 through `1efd1a17`; stacked on S6 | continue S5–S6, separately leased Phase B off the NAS topology, IMPL-EVAL |
+| #1746 / #1745 | docs | `84a5fd11`; exact-head IMPL-EVAL PASS, CI and threads green | shippable human merge handoff |
+| #1748 / #1000 | docs | `22e79dcc`; exact-head IMPL-EVAL PASS, CI and threads green | shippable human merge handoff |
+| #1755 / #1749 | docs | direct-to-main draft `2c844565`; Tier-A and 13 gates PASS | exact-head IMPL-EVAL; corpus queue behind #1746/#1748 |
+
+Merged leaves are terminal at authoritative PR heads: #1669 `313cc08d` (merge `0ef48c2e`) and
+#1729 `608f68b0` (merge/main `13878a80`). Serial queues remain per orchestrator, never global.

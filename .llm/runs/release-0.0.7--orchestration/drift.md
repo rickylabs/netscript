@@ -1256,3 +1256,24 @@ implementation thread.
 - The coordinator repaired the current ledger atomically. A tooling follow-up should teach the
   validator to compare allocated/open milestone PRs against GitHub or a fresh exported snapshot;
   schema consistency alone cannot prove live completeness.
+
+## 2026-08-30 — remote DinD supports containers but not AppHost-local endpoint assumptions
+
+- S3's first authorized Phase-B attempt proved that worktree-local `withDataBindMount` paths are
+  invisible to the remote DinD daemon. The separately granted second attempt removed DataPath only
+  from the scratch AppHost, allowing the container to start, but Aspire then published PostgreSQL
+  as `localhost:17858`; from the AppHost container namespace that address refused the connection.
+- This is a host-topology boundary, not fixture evidence and not product permission. Both attempts
+  preserved the absence of resources/spans envelopes, stopped without workaround, and returned the
+  host to exact zero. No third attempt is authorized. S3 remains
+  `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY` at artifact head `9525f1ae`.
+
+## 2026-08-30 — active milestone truth advanced beyond the last rendered checkpoint
+
+- Live GitHub closed fourteen already-committed issues while the cluster ledger still called them
+  open; #1669/#1729 were merged at newer PR heads; #1731/#1739/#1747 had advanced; and #863/#1749
+  were admitted after the prior 107-record render. The same stale-snapshot class also mislabeled
+  #1738/#1740 as handoffs despite `status:ci-fail`.
+- The atomic reconciliation updates inventory, intake, DAG, lane ownership, leaves, counts, and
+  narrative checkpoints together. #1733 stays a duplicate exclusion, and no terminal inventory
+  cleanup item is promoted into committed active scope merely to make counts match.
