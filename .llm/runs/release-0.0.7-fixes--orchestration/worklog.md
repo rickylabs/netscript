@@ -5621,3 +5621,42 @@ Lane serial runtime order once Aspire returns exact zero: **#1764** (Flow-B, one
 (integrate, `scaffold.runtime` rerun for its single unticked box) → **#1781** (after IMPL-EVAL).
 Lease not requested: `docker ps -a` shows live `relay-s7-phase-b-*` containers, so it is demonstrably
 not free.
+
+### #1357 IMPL-EVAL cycle 1 — `PASS_IMPL` first try; lease precondition now met
+
+Verdict `2991113a6` on `eval/impl-eval-1357-cycle-1`, evaluated head `7bc715b68`, posted to PR #1781.
+All six judged claims **reproduced, no findings**:
+
+1. **Ceiling completeness — no miss.** The product diff is exactly the 12 locked paths, and the
+   evaluator swept *beyond* my claimed set: help snapshots, suite/gate counts, MCP command policy, the
+   generated-app `AGENTS.md` template, emitted-samples (0, 47/37), the cascade checks, plus docs/site
+   verify and source-format at head. No behavioural consumer exists that the ceiling cannot reach. After
+   two PLAN-EVAL ceiling misses on this same leaf, an independent sweep finding none is the result that
+   matters most.
+2. Gate real — defined, registered, and **selected** into `RUNTIME_GATES` between init and
+   generated-check, with the resolver throwing on unselected/unregistered and membership *and order*
+   pinned by test.
+3. Help↔role coupling genuine — rendered Cliffy help parsed against roles from an actual dry-run plan,
+   plus the negative case.
+4. Red-befores reproduced at exact SHAs — 1/7, 17/4, 167/3, all exit 1, and the red→green test diffs
+   show **zero weakening**.
+5. No-binding path is a real precondition — throws the exact prerequisite verb before any write, with
+   tests asserting full filesystem-map equality.
+6. Acceptance honest — boxes unticked, the box-6 `--help`-only limitation disclaimed on every surface,
+   runtime gate never claimed passed.
+
+Gates re-derived by the evaluator at head: CLI 1386/0, e2e 170/0, arch/cascade/JSR/emitted-samples all
+0, `deno.lock` byte-identical, tree clean, and lint/fmt N/A-by-configuration confirmed **honest** rather
+than evasive.
+
+PR #1781 body rewritten with the slice evidence table, the gate results, and an explicit "outstanding
+before ready-merge" block; eight DoD boxes ticked, the runtime box left unticked. Labels `status:impl`
+on PR and issue — same reasoning as #1764: no evaluation is pending, but `ready-merge` would be false
+while a REQUIRED gate is unrun.
+
+**Lease precondition is now met.** `docker ps -aq` count **0**, `aspire ps` returns **`[]`** — the
+Aspire lane has returned to exact zero. Per standing rule the lease is coordinator-granted rather than
+self-taken, so I have started nothing and am requesting it rather than assuming it.
+
+Two leaves are now one runtime gate from merge: **#1764** needs Flow-B, **#1781** needs
+`scaffold.runtime`. Serial order stands: #1764 → #1758 → #1739 → #1781.
