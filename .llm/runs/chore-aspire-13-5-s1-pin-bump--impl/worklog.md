@@ -69,6 +69,7 @@ Update the manifest in its owning research/generator workflow, then extend the t
 | 2026-08-29 | 3 | CI runtime | Run `33276629736` installed/preflighted Aspire CLI 13.5.3 and passed `runtime.aspire-restore` in both tiers, then both stopped at the unchanged Fresh hydration TS2345 baseline |
 | 2026-08-29 | 3 | Tier-A repair | Coordinator hold found missing-required-path and 13.5.x patch-drift false-green gaps; test-first repair now fails closed on both classes |
 | 2026-08-30 | evidence | IMPL-EVAL cycle 1 follow-up | `FAIL_FIX` at evaluated head `69b2ebaf6` requires no S1 code change; this evidence commit corrects the E-12 gap note and supplies the exact cold restore timings for the PR comment, while the warm figure remains pending the next cache-hit run |
+| 2026-08-30 | convergence | live endpoint correction | Hosted run `33328727942` passed all surrounding PostgreSQL gates but exposed the obsolete allocation-inequality assertion. RED failed on the missing pure comparison export; GREEN proves stable 13.5 allocation acceptance and precise stale/literal rejection. No runtime, AppHost, container, evaluator, or CI action ran locally. |
 
 ## Decisions
 
@@ -148,6 +149,22 @@ baseline has 199 lint occurrences across 134 paths and 258 formatting findings. 
 verdict above isolates this change without modifying unrelated package sources. The generator test's
 two existing inline `jsr:` imports are the only lint observations when the test is included; they
 predate this slice and the test itself passes.
+
+### S1 convergence correction gates
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| RED focused test wrapper | 1 | Expected TS2305: `compareSecondReceiptWithLiveTopology` did not exist |
+| Focused tests | 0 | 29 passed, 0 failed across endpoint and runtime-gate builder tests |
+| E2E check wrapper | 0 | 170 files, 0 diagnostics |
+| Owned-file lint wrapper | 0 | 4 files, 0 findings |
+| Owned-file format wrapper | 0 | 4 files, 0 findings; JSON fixture format check passed |
+| `deno task arch:check` | 0 | No doctrine failures; existing warnings remained non-failing |
+| `deno task quality:scan` | 0 | No findings; 7 existing allowances |
+
+An exploratory whole-`packages/cli/e2e` lint selection exited 2 because the pre-existing standalone
+`fixtures/desktop-native` config cannot resolve its `zod` catalog outside the root workspace. It
+reported no lint finding and is not the owned-file lint verdict above.
 
 ## Handoff Notes
 

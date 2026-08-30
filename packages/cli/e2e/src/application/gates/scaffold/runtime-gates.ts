@@ -354,7 +354,7 @@ export function createRuntimeGates(
     ),
     commandGate(
       GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
-      'Users service uses the second live Postgres allocation with correlated telemetry',
+      'Users service uses the live second-start Postgres allocation with correlated telemetry',
       GATE_PHASE.BEHAVIOR,
       (context) => [
         'deno',

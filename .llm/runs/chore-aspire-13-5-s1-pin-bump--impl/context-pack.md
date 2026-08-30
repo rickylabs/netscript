@@ -6,13 +6,17 @@
 | --- | --- |
 | Run ID | `chore-aspire-13-5-s1-pin-bump--impl` |
 | Branch | `chore/aspire-13-5-s1-pin-bump` |
-| Current phase | Tier-A repair complete — supervisor re-review pending |
+| Current phase | S1 convergence gate correction complete — supervisor refreeze pending |
 | Archetype | `6 — CLI/tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The atomic Aspire train is implemented on draft PR #1727. Coordinator Tier-A review found two parity false-green gaps; the bounded repair now fails on missing non-archival manifest paths and unauthorized 13.5.x versions across all seven pin-bearing phase-1 paths. The repaired phase-1 receipt is GREEN with fail=0; all 66 missing paths are archival.
+The atomic Aspire train is implemented on PR #1727. The PostgreSQL tier of hosted run `33328727942`
+passed 67 gates and failed only because the live DB endpoint gate still required consecutive
+persistent allocations to differ. The bounded correction now accepts Aspire 13.5 stable allocation
+reuse while proving the second receipt matches a fresh live topology, the live users environment
+uses that endpoint, `/health` is ready, and telemetry remains correlated.
 
 ## Completed
 
@@ -25,16 +29,17 @@ The atomic Aspire train is implemented on draft PR #1727. Coordinator Tier-A rev
 - Accepted Browsers preview debt appended; handoff artifacts finalized for independent evaluation.
 - CI run `33276629736` proved Aspire CLI 13.5.3 install/preflight and `runtime.aspire-restore` in both tiers before an unchanged Fresh hydration TS2345 blocked generated quality checking.
 - Test-first Tier-A repair completed: 6/6 parity tests plus scoped check/lint/fmt and repaired GREEN receipt.
+- Test-first convergence correction completed: RED on the missing comparison function, GREEN
+  29/29, package E2E check, scoped lint/fmt, architecture, and quality gates all exit 0.
 
 ## In Progress
 
-- Third commit is being amended with the bounded Tier-A repair; supervisor re-review remains external.
+- One convergence correction commit is ready to push; supervisor refreeze and hosted tier rerun remain external.
 
 ## Next Steps
 
-1. Supervisor reruns fresh exact-head Tier-A review of the bounded repair.
-2. Owning Fresh fix clears the generated hydration baseline, then CI runtime tiers rerun.
-3. A separate Fable session performs IMPL-EVAL; coordinator owns readiness and merge.
+1. Push the convergence correction and post the structured PR implementation comment.
+2. Supervisor refreezes the new head and reruns the hosted tiers.
 
 ## Key Decisions
 
@@ -43,6 +48,7 @@ The atomic Aspire train is implemented on draft PR #1727. Coordinator Tier-A rev
 | Target 13.5.3 train | research D-1 | No mixed Aspire trains |
 | Phase-1 classes | research D-13 | Fail only scaffold constants, CI, root config |
 | Runtime in CI only | implementation brief | No local AppHost or host CLI action |
+| Stable first/second allocation is valid | Aspire 13.5 change log and persistent-resource docs | Prove live second-start endpoint use instead of requiring port churn |
 
 ## Files Changed
 
