@@ -3010,3 +3010,86 @@ author was told to record `PLAN-EVAL: pending` and not to launch, simulate, or s
 this lane mandating it for read-heavy commands. The author found it, I confirmed it, and I told it to
 call the underlying commands directly rather than try to install anything. This is repo-wide guidance
 that silently does not apply on the migrated plane — it needs a real fix, not a per-brief workaround.
+
+## 2026-08-30 — #1732 plan gate: PLAN-EVAL cycle 1 `FAIL_FIX`; bounded plan repair authorized
+
+### Plan published
+
+Draft **PR #1747**, `Closes #1732`, milestone `0.0.7`, labels `type:fix`/`area:cli`/`area:aspire`/
+`priority:p1` and exactly one `status:` (`status:plan`). Plan head
+`fddcb833ba5e49466ac942112b41bd7712aa7c17`, local == remote == PR, and the diff versus `main`
+outside `.llm/runs/` is **empty** — no source leaked ahead of the gate.
+
+The author answered my published-surface flag better than either option I offered: instead of
+accepting a new public constant on the `./constants` subpath *or* hiding it, it put the rule
+package-private under `packages/aspire/src/domain/` **and** added doc-lint and JSR-audit **baseline
+comparison** gates with the pre-change numbers recorded, so future drift is attributable rather than
+dismissed as inherited.
+
+### PLAN-EVAL cycle 1 — `FAIL_FIX` at `fddcb833a`
+
+Verdict commit `1f52d5e2b6b35e204167686714fe3ad72f4fafae`, artifact-only (diff outside `.llm/` versus
+the plan head is empty), own verdict comment posted. Native opposite-family Fable 5 · medium, route
+read from the job registry; session stopped once its verdict was pushed.
+
+It confirmed the parts that mattered by execution rather than by reading the plan: **D2 is exactly
+Aspire's platform rule** — checked against upstream `ModelName.cs`, neither stricter nor looser on
+uppercase, digits, dots, length, or leading/trailing characters — and **D5's blast radius is real**:
+no `BackgroundProcessors` key or reference value anywhere in `packages/`, `plugins/`, `docs/`,
+fixtures, templates, or e2e would be newly rejected. The escaping enumeration is complete *for string
+literals*, the validation seam is the only one holding processor key and both arrays together, the
+discovery-key assertions are sufficient for both reference kinds, and the JSR resolution holds.
+
+### F1 — and the wrong claim is mine
+
+`safeIdentifier` is three lines: `name.replace(/-/g, '_')`. It guarantees **nothing** about
+identifier validity. So `JSON.stringify` covers string-literal positions only, and the identifier
+seam was never covered. `plugin install worker --name class` passes `validateResourceName`, passes
+the D2 Aspire grammar (every JS reserved word is lowercase ASCII letters), and emits
+`const class = builder.addExecutable('class', …)` — unparseable. `builder` and `config` are worse:
+they parse, then shadow the generator's own bindings, which is a runtime `ReferenceError`.
+
+I authorized D1 with the framing that escaping makes generated source parseable for *any* input, so
+a wrong grammar could never regress to a syntax error. **That framing was false**, and it was mine
+before it was the plan's. I saw a helper named `safeIdentifier`, and took the name as evidence of
+the behaviour without reading its body.
+
+This is the second time in this session the same failure mode has cost a gate: on #1734 I verified
+the guard had not become too permissive and never checked the opposite direction; here I verified the
+escaping route and never checked the seam the escaping does not reach. The pattern is **confirming
+the property I was reasoning about and assuming the adjacent one**. Recorded as a lesson, not just an
+incident — the mitigation is that an independent evaluator gets the claim, not the reasoning that
+produced it, which is exactly what happened both times.
+
+### Authorized repair — bounded, cycle 2 of 2 follows
+
+- **F1 → option (a)**: a **generator-local** identifier prefix so every emitted binding is valid and
+  cannot collide with a reserved word or with `builder` / `config` / `infrastructure` / `_services`.
+  `_utils.ts` and `safeIdentifier` stay untouched; the platform grammar stays exactly the platform's.
+  Rejected option (b) — pushing reserved words into the config grammar would make our rule stricter
+  than Aspire's, the precise self-inflicted breaking change D1–D3 exist to prevent; we do not fix our
+  generator by narrowing the platform's contract. Rejected option (c) — narrowing the claim is honest
+  but leaves `--name class` producing unparseable source. (a) makes D1's claim **true** rather than
+  trimming it to fit the code.
+- **F2**: stringify `entrypoint` and `workdir` unconditionally (user-supplied included), decide
+  `ConcurrencyEnvVar` explicitly, and enumerate by **emission site** rather than by name-origin.
+- **Advisory adopted**: D4 stays a composed-level `superRefine`; drifting to `.regex()` on
+  `ReferenceFields` or the record key would surface in `z.toJSONSchema(AppSettingsSchema)` and change
+  the published JSON schema for every section — the broadening D4 forbids.
+- Plus the missing identifier-seam risk row, a corrected open-decision sweep, a **PR DoD wording
+  fix** so "Accepted generated source remains parseable" is true as written, and a note pinning the
+  JSR resolution's condition (slice 3 must not add the constant to `src/domain/mod.ts` or type any
+  exported symbol with it).
+
+### Carried upstream, deliberately not fixed here
+
+The sibling generators (`generate-register-services/plugins/apps.ts`) share the identifier defect
+through the same `safeIdentifier` usage. **Pre-existing, out of scope for #1732.** The author records
+it in `drift.md` and names it in the PR body; it needs a follow-up issue, which this lane does not
+open. Flagged for the coordinator.
+
+### Host drift, unchanged
+
+`rtk` still not installed; root `deno task test` still not a usable signal (~7.7k unreapable PID-1
+zombies). The evaluator observed no host-caused failure in its own run and said so rather than
+implying the host was clean.
