@@ -608,3 +608,75 @@ no-auto-close warning, and live `closingIssuesReferences` is empty. The structur
 implementation comment is present. No reviewer was dispatched and no state, label, milestone,
 issue, acceptance-box, or PR-body mutation was made. Slice 9 remains blocked on substantive Tier-A
 review and separate-session evaluation of Slice 8.
+
+## Slice 9 — adoption documentation
+
+Slice 9 replaced the tutorial's duplicated path matcher with the shipped contract-declared policy
+path and documented the completed Slices 1–8 surface across exactly the eight owner-locked ceiling
+files. The package and site references now describe the single `NetScriptProcedureMeta.access`
+vocabulary, service ownership/plugin re-export of `Principal` and `ServiceHandlerContext`, optional
+principal narrowing, opt-in enforcement, metadata/fallback precedence, construction-time rejection
+of `optional`, the exact OpenAPI projection, bounded credential-free MCP access summaries, and the
+owner-amended rename-continuity acceptance wording.
+
+The tutorial retains the runnable 401/403/200 walkthrough but now derives the path, typed input,
+output, and access requirements from one oRPC procedure. `createContractAuthorizer()` is primary;
+`createScopeAuthorizer()` remains supported, not deprecated, and is taught as a match-aware legacy
+fallback consulted only for a matched procedure without metadata.
+
+The authored documentation commit is `582e823223c3c0217dc832d593cad095c6dbf8b7`. The required
+shared-asset cascade changed only the standing ceiling-exempt carriers:
+
+- `.llm/assets/agent-docs/prose.json.gz`
+- `.llm/assets/agent-docs/provenance.json`
+- `packages/cli/src/kernel/assets/agent-docs.generated.ts`
+- `packages/mcp/src/publish-assets.generated.ts`
+
+The MCP export corpus and all other asset barrels remained byte-identical. Because publish assets
+embed the agent-docs bundle, a second generator pass after agent-prose generation refreshed one
+hash in the MCP carrier; that sanctioned follow-up is commit
+`3cb08103ff9c25ff3ec580301b5936586b13d37e`, the immutable final content head.
+
+Slice 8's eight top-level receipts were first verified for `1387-s8-*` identity,
+`gitHead == actualGitHead == ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`, positive duration,
+and byte identity, then moved rather than copied into `receipts/slice-8-ce9bd3e8b/`. An initial
+Slice 9 receipt pass at `582e82322` correctly caught the stale publish carrier; those superseded
+diagnostics were moved byte-identically to `receipts/pre-refresh-s9-582e82322/` and are not part of
+the final evidence set.
+
+### Slice 9 evidence
+
+| Gate / proof | Result | Durable evidence |
+| --- | --- | --- |
+| Exact five-root check | PASS, 431 files / 0 diagnostics | Direct structured wrapper at final head |
+| Exact five-root lint | PASS, 430 files / 0 findings | Direct structured wrapper at final head |
+| Exact five-root format | PASS, 430 files / 0 findings | Direct structured wrapper at final head |
+| Affected package suites/doctests | PASS, 402/402 | `1387-s9-test`, 14,809 ms |
+| Export/docs drift | PASS | `1387-s9-exports-drift`, 3,664 ms |
+| Service `deno doc --lint` | PASS, 3 entrypoints / 0 findings | `1387-s9-public-doc-lint`, 189 ms |
+| Quality/doctrine gate | PASS; existing warnings only | `1387-s9-quality-gate`, 9,796 ms |
+| MCP export corpus | PASS, unchanged at 7,655 symbols | `1387-s9-mcp-export-corpus`, 7,795 ms |
+| Docs tagline | PASS | `1387-s9-docs-tagline`, 174 ms |
+| Publish assets | PASS | `1387-s9-publish-assets`, 506 ms |
+| Agent docs prose | PASS, 639 site files; rendered output OK | `1387-s9-agent-docs-prose`, 9,455 ms |
+| Asset barrels | PASS | `1387-s9-assets-barrel`, 656 ms |
+| Contracts JSR audit | PASS; sanctioned oRPC slow-type info only | Exact direct package audit |
+| Service JSR audit | PASS; sanctioned oRPC slow-type info only | Exact direct package audit |
+| SDK JSR audit | PASS; two existing warnings | Exact direct package audit |
+| MCP JSR audit | PASS; three existing warnings | Exact direct package audit |
+
+The final eleven durable receipts all have expected `1387-s9-*` invocation IDs, positive
+`durationMs`, `outcome: PASS`, and
+`gitHead == actualGitHead == 3cb08103ff9c25ff3ec580301b5936586b13d37e`. The independently
+recomputed `receipts/evidence-set.json` is `SUFFICIENT` with no reasons. The plan's exact scoped
+check is intentionally direct because the catalog's `check` key invokes the broader root task;
+that extra root task was diagnostic-only and reproduced the existing unstable-KV batching failure
+outside the contracted five-root selection.
+
+`deno.lock` is byte-identical at SHA-256
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+No E2E, Aspire, Docker, browser, reviewer dispatch, close-gate, or runtime lease occurred. This
+author stops at Slice 9's Tier-A boundary. The green evidence is not author self-certification;
+substantive supervisor review and a separate opposite-family IMPL-EVAL remain required before the
+supervisor-owned close-gate.

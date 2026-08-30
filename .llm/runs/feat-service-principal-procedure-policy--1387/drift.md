@@ -335,3 +335,26 @@ publishes. No PLAN-EVAL cycle required — same shape as the already-ratified D-
 adding a new public symbol needs its export path on the ceiling, and both files have already carried
 that exact role twice in this plan (Slice 2 for its context types, Slice 4 for its own contract-policy
 types). Plan amended at `plan.md` Slice 5 ceiling. Re-dispatching immediately.
+
+## D-10 — Slice 9 ceiling count and shared-carrier ordering
+
+**Severity:** minor · **Class:** plan prose / generation order · **Shape:** docs-only adoption slice
+
+**Observed.** Slice 9's plan enumerates eight ceiling files but the sentence after the list says
+"nine ceilings." The owner dispatch explicitly resolves the count to eight and lists the same eight
+paths. No ninth authored product file was needed. Separately, the shared cascade revealed an ordering
+dependency: `packages/mcp/src/publish-assets.generated.ts` embeds the agent-docs bundle metadata, so
+running `gen:publish-assets` before `gen:agent-docs-prose` left the publish carrier stale after the
+prose bundle changed.
+
+**Resolution.** The implementation honored the owner-locked eight-file ceiling. Only the plan's
+standing named generated-carrier exemption added outputs outside those files. The generators were
+completed in dependency order — agent prose, asset barrel, MCP export corpus, then publish assets —
+and every corresponding `check:*` gate passed at final content head
+`3cb08103ff9c25ff3ec580301b5936586b13d37e`. The superseded pre-refresh receipts were moved
+byte-identically under `receipts/pre-refresh-s9-582e82322/` rather than being mistaken for current
+evidence.
+
+**Lesson.** For prose changes, refresh an embedded source carrier before regenerating any carrier
+that consumes it. Count authority comes from the enumerated ceiling plus the explicit owner ruling,
+not an inconsistent summary sentence.

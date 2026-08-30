@@ -1,0 +1,41 @@
+{
+  "gateId": "test",
+  "invocationId": "1387-s9-test",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/contracts/tests",
+    "packages/service/tests",
+    "packages/plugin/tests",
+    "packages/sdk/tests",
+    "packages/mcp/tests"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "3cb08103ff9c25ff3ec580301b5936586b13d37e",
+  "actualGitHead": "3cb08103ff9c25ff3ec580301b5936586b13d37e",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex-slice-9",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "5f99164bddbe47b641a7aaa3d2ee58e93146cec7aa8aeb5ccedd48c55a8c469c",
+  "lifecycleId": "codex-slice-9:1387-s9-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T23:18:02.976Z",
+  "startedAt": "2026-08-30T23:18:02.979Z",
+  "finishedAt": "2026-08-30T23:18:17.788Z",
+  "durationMs": 14809,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 390,
+    "sha256": "4140bd62e5dfb714e95812609cdcc4f9bfb53845e0fcd22556b03dd9cad0088b",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/contracts/tests\",\"packages/service/tests\",\"packages/plugin/tests\",\"packages/sdk/tests\",\"packages/mcp/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0,\"durationMs\":14665,\"summary\":{\"passed\":402,\"failed\":0,\"ignored\":0,\"totalResults\":402,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 219,
+    "sha256": "139857b0ede61d079109a01c9190d7e36c957247a9771facc5db0eb770e25caa",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/contracts/tests' 'packages/service/tests' 'packages/plugin/tests' 'packages/sdk/tests' 'packages/mcp/tests'\n",
+    "truncated": false
+  }
+}

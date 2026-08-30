@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slice 8 evidence complete; awaiting Tier-A review |
+| Current phase  | `impl` — Slice 9 evidence complete; awaiting Tier-A review and separate IMPL-EVAL |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -31,13 +31,16 @@ Slice 7 is Tier-A **ACCEPTED** at `897a06cd7` with a separate opposite-family IM
 It publishes the credential-free bounded `OperationAccessSummary` contract and optional list/detail
 fields without populating them.
 
-Slice 8 is implemented at immutable content head
-`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3` with a `SUFFICIENT` seven-receipt evidence set. It
-derives the exact four OpenAPI access states from each retained raw operation, populates both MCP
-read tools, leaves `access` genuinely absent for undeclared operations, and emits four distinct,
-credential-free curl/auth guidance pairs. The public export corpus remains byte-identical at 7,655
-symbols and `deno.lock` remains byte-identical. Slice 8 is at its Tier-A boundary awaiting
-substantive supervisor review; this author has not self-certified it and has not started Slice 9.
+Slice 8 shipped the exact four-state OpenAPI-to-MCP projection at
+`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`. Slice 9 is now implemented at immutable final content
+head `3cb08103ff9c25ff3ec580301b5936586b13d37e`: all eight adoption-doc ceiling files teach the
+shipped Slices 1–8 behavior, and the tutorial uses contract-local metadata plus
+`createContractAuthorizer()` as its source of truth. The required agent-prose, CLI-barrel, and MCP
+publish carriers were regenerated under the standing exemption; the MCP export corpus stayed at
+7,655 symbols and `deno.lock` stayed byte-identical. The final eleven-receipt evidence set is
+`SUFFICIENT`. Slice 9 is at its Tier-A boundary awaiting substantive supervisor review and a
+separate opposite-family IMPL-EVAL; this author has not self-certified it or attempted the
+supervisor-owned close-gate.
 
 **Resume-docs gap, recurring — this file was not the only casualty.** First flagged as F-1 by the
 Slice 4 IMPL-EVAL (this file and `worklog.md` frozen after Slice 1); the same class recurred and was
@@ -75,6 +78,14 @@ certification, not only when an author happens to.**
   `x-netscript-roles`, populating both list/detail MCP results without changing any public signature.
 - Proved all four access states, own-property absence for undeclared results, and four distinct
   credential-free curl/auth guidance pairs; the undeclared generic caveat is unchanged.
+- Documented the single access vocabulary, service-owned principal/context, opt-in enforcement,
+  precedence, unsupported optional runtime behavior, exact OpenAPI projection, bounded MCP access
+  summaries, and the accepted rename-continuity substitution across the eight Slice 9 ceilings.
+- Replaced the tutorial's authoritative hand-written path matcher with procedure metadata plus
+  `createContractAuthorizer()` while retaining `createScopeAuthorizer()` as a supported,
+  match-aware legacy fallback and preserving the runnable 401/403/200 walkthrough.
+- Regenerated and verified the complete shared-asset cascade in dependency order: agent prose,
+  asset barrel, MCP export corpus, and publish assets.
 - Regenerated the MCP export corpus under its standing exemption; it moved from 7,654 to 7,655
   symbols with the expected new type and widened list/detail signatures.
 - Regenerated the ceiling-exempt MCP export corpus at Slice 5 through its checked-in generator; it
@@ -83,15 +94,11 @@ certification, not only when an author happens to.**
 
 ## Next Steps
 
-1. Supervisor performs substantive Tier-A review of Slice 8 and records the separate-session
-   evaluator outcome outside this author lane.
-2. Only after that release, continue Slice 9 with its own Tier-A review and separate opposite-family
-   IMPL-EVAL.
-3. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
-   the implementation PR must state the accepted substitution.
-4. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
-   close-gate are complete.
-5. At the leaf's own pre-merge/close-gate boundary, fold in whatever `main` has advanced to by then
+1. Supervisor performs substantive Tier-A review of Slice 9 and records a separate opposite-family
+   IMPL-EVAL outcome outside this author lane.
+2. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the supervisor-owned
+   close-gate is complete.
+3. At the leaf's own pre-merge/close-gate boundary, fold in whatever `main` has advanced to by then
    in one regeneration pass — the topic supervisor's ledger tracks each intervening main advance and
    has so far found no product-path intersection requiring earlier action.
 
@@ -152,15 +159,23 @@ Slice 8: content `ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`, `SUFFICIENT` eviden
 7/7 durable receipts. Scoped check selected 116 files; lint/fmt selected 115; MCP tests passed
 138/138; corpus freshness, quality/doctrine, and full publish dry run passed. The direct MCP JSR
 audit exited 0 with its three existing warnings. Corpus stayed at 7,655 symbols with a byte-identical
-carrier; lock stayed byte-identical. This is author evidence only; Tier-A acceptance is pending.
+carrier; lock stayed byte-identical. The supervisor subsequently released Slice 9 work.
+
+Slice 9: final content `3cb08103ff9c25ff3ec580301b5936586b13d37e`, `SUFFICIENT` evidence set,
+11/11 current durable receipts. The exact five-root source gates selected 431 check files and 430
+lint/fmt files with zero findings; affected package suites passed 402/402. Service doc lint,
+exports drift, quality, MCP corpus, tagline, publish assets, agent prose, and asset barrels all
+passed. Contracts/service/SDK/MCP direct JSR audits exited 0 with only their existing warning
+inventory. Lock stayed byte-identical. This is author evidence only; Tier-A acceptance and the
+separate IMPL-EVAL are pending.
 
 ## Drift and Debt
 
 - RTK remains unavailable on this host; repo-native wrappers and raw read-only Git inspection were
   used, as recorded in `drift.md`.
-- The gate catalog has no direct `audit-jsr-package` entry. The exact contracts and SDK audit
-  commands were therefore run directly; the durable full publish dry run is the receipt-backed
-  publishability backstop. No gate tooling was changed outside the Slice 1 ceiling.
+- The gate catalog has no direct `audit-jsr-package` or exact five-root check entry. The four JSR
+  audits and scoped source gates were therefore run directly; all named catalog-backed Slice 9
+  gates carry current durable receipts. No gate tooling was changed.
 - Existing service/plugin/#1278 doctrine debt is preserved and excluded.
 
 ## Commits
@@ -168,6 +183,8 @@ carrier; lock stayed byte-identical. This is author evidence only; Tier-A accept
 Slice 5's immutable content commit is `c2cbfbf0b3c355682732be5805f0f180498576db`; Slice 6's is
 `11e83f06426469b48a67c2211d954ac916cd6fda`; Slice 7's is
 `897a06cd7170ca021da1836b3cbcbf790cf97a2f`; Slice 8's is
-`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`. Each has its own evidence commit holding only run
+`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`. Slice 9's authored-doc commit is
+`582e823223c3c0217dc832d593cad095c6dbf8b7`; its final generated-carrier/content head is
+`3cb08103ff9c25ff3ec580301b5936586b13d37e`. Each slice has its own evidence commit holding only run
 documentation and the verified receipt set. Treat Git and the draft PR as the authority for the
 evidence carrier's identifier; this file cannot name its own commit SHA.
