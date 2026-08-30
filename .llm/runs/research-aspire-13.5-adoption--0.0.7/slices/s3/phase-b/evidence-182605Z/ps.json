@@ -1,0 +1,11 @@
+[
+  {
+    "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/aspire/apphost.mts",
+    "appHostPid": 3144718,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 3144687,
+    "dashboardUrl":"<redacted>",
+    "logFilePath": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T182325419_detach-child_c55f9ea9e22340f6ab5cfdb924cd4385.log"
+  }
+]

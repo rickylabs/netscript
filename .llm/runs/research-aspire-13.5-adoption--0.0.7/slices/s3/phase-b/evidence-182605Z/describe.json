@@ -1,0 +1,956 @@
+{
+  "resources": [
+    {
+      "name": "aspire-s3-phase-b-attempt-3-db",
+      "displayName": "aspire-s3-phase-b-attempt-3-db",
+      "resourceType": "PostgresDatabaseResource",
+      "state": "Running",
+      "startTimestamp": "2026-08-30T18:23:35.577214+00:00",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "postgres-2226b6f5"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.connectionString": null,
+        "resource.parentName": "postgres-2226b6f5"
+      },
+      "environment": {},
+      "healthReports": {
+        "aspire-s3-phase-b-attempt-3-db_check": {
+          "status": "Healthy"
+        },
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {}
+    },
+    {
+      "name": "aspire-s3-phase-b-attempt-3-web-browser-logs",
+      "displayName": "aspire-s3-phase-b-attempt-3-web-browser-logs",
+      "resourceType": "BrowserLogs",
+      "state": "NotStarted",
+      "creationTimestamp": "2026-08-30T18:23:31.0600985+00:00",
+      "source": "aspire-s3-phase-b-attempt-3-web",
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "aspire-s3-phase-b-attempt-3-web-paavhurp"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "Active session count": 0,
+        "Active sessions": "None",
+        "Browser": "chrome",
+        "Browser sessions": "[]",
+        "resource.parentName": "aspire-s3-phase-b-attempt-3-web-paavhurp",
+        "resource.source": "aspire-s3-phase-b-attempt-3-web",
+        "Total sessions launched": 0,
+        "User data mode": "Shared"
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "configure-tracked-browser": {
+          "displayName": "Configure tracked browser",
+          "description": "Choose the browser, profile, user data mode, and scope used by tracked browser sessions.",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "scope",
+              "label": "Scope",
+              "inputType": "Choice",
+              "required": true,
+              "value": "resource",
+              "options": {
+                "resource": "This resource only (aspire-s3-phase-b-attempt-3-web)",
+                "global": "All BrowserLogs resources"
+              }
+            },
+            {
+              "name": "browser",
+              "label": "Browser",
+              "description": "Choose an installed Chromium-based browser or enter an executable path.",
+              "inputType": "Choice",
+              "required": true,
+              "options": {},
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "userDataMode",
+              "label": "User data mode",
+              "inputType": "Choice",
+              "required": true,
+              "options": {
+                "Shared": "Shared",
+                "Isolated": "Isolated"
+              },
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "profile",
+              "label": "Profile",
+              "description": "Choose a Chromium profile from the Aspire-managed browser hive, or enter a profile directory/name.",
+              "inputType": "Choice",
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "browser",
+                  "userDataMode"
+                ]
+              }
+            },
+            {
+              "name": "saveToUserSecrets",
+              "label": "Save to AppHost user secrets",
+              "description": "Save these settings to [user secrets](https://aka.ms/aspire/user-secrets) so future AppHost runs use them.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "aspire-s3-phase-b-attempt-3-web-paavhurp",
+      "displayName": "aspire-s3-phase-b-attempt-3-web",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:23:31+00:00",
+      "startTimestamp": "2026-08-30T18:23:31.4+00:00",
+      "source": "deno",
+      "healthStatus": "Unhealthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "users-zhrwpded"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "users-zhrwpded"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "users-zhrwpded"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:40113"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3145539,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/apps/aspire-s3-phase-b-attempt-3-web",
+        "resource.appArgs": [
+          "task",
+          "dev"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46221",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=paavhurp",
+        "OTEL_SERVICE_NAME": "aspire-s3-phase-b-attempt-3-web",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "35639",
+        "services__users__http__0": "http://localhost:41191",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcpfyRfLo/aspire-s3-phase-b-attempt-3-web-paavhurp/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust",
+        "VITE_services__users__http__0": "http://localhost:41191",
+        "VITE_USERS_URL": "http://localhost:41191"
+      },
+      "healthReports": {
+        "aspire-s3-phase-b-attempt-3-web_http_/health_200_check": {
+          "status": "Unhealthy",
+          "description": "Request to http://localhost:40113/health returned 500 InternalServerError"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "garnet-utewsxst",
+      "displayName": "garnet",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:23:31+00:00",
+      "startTimestamp": "2026-08-30T18:23:35.175884+00:00",
+      "source": "ghcr.io/microsoft/garnet:1.1.1",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:43247"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "473ac55df8a09f4f40f9260f261c6ad2176fc5890b9ecc4c365012f3e0172972",
+        "container.image": "ghcr.io/microsoft/garnet:1.1.1",
+        "container.lifetime": "Session",
+        "container.ports": [
+          6379
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": []
+      },
+      "environment": {
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "netscript-db-postgres-zjnevhaf",
+      "displayName": "netscript-db-postgres",
+      "resourceType": "Executable",
+      "state": "NotStarted",
+      "source": "deno",
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": null,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/database/postgres",
+        "resource.appArgs": null,
+        "resource.appArgsSensitivity": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "postgres-2226b6f5",
+      "displayName": "postgres",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:23:31+00:00",
+      "startTimestamp": "2026-08-30T18:23:35.577214+00:00",
+      "source": "docker.io/library/postgres:18.3",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:10538"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/.data/postgres",
+          "target": "/var/lib/postgresql",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "5791cb98046b6e094fd3239fd9f36270086d92badd06f392f2a029c3491f7882",
+        "container.image": "docker.io/library/postgres:18.3",
+        "container.lifetime": "Persistent",
+        "container.ports": [
+          5432
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": [],
+        "resource.connectionString": null
+      },
+      "environment": {
+        "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+        "POSTGRES_PASSWORD": null,
+        "POSTGRES_USER": "postgres",
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "postgres-password",
+      "displayName": "postgres-password",
+      "resourceType": "Parameter",
+      "state": "Running",
+      "source": "Parameters:postgres-password",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.source": "Parameters:postgres-password",
+        "Value": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "delete-parameter": {
+          "displayName": "Delete parameter",
+          "description": "Delete parameter value",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "DeleteFromUserSecrets",
+              "label": "Delete from user secrets",
+              "description": "Delete a value that is saved in [user secrets](https://aka.ms/aspire/user-secrets).",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            }
+          ]
+        },
+        "set-parameter": {
+          "displayName": "Set parameter",
+          "description": "Set parameter value",
+          "state": "Enabled",
+          "sortOrder": 0,
+          "argumentInputs": [
+            {
+              "name": "Value",
+              "label": "postgres-password",
+              "inputType": "SecretText",
+              "required": true,
+              "placeholder": "Enter value for postgres-password",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "SaveToUserSecrets",
+              "label": "Save to user secrets",
+              "description": "Save value to [user secrets](https://aka.ms/aspire/user-secrets) for future use.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "Value"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "prisma-studio-uxfcekxe",
+      "displayName": "prisma-studio",
+      "resourceType": "Executable",
+      "state": "Loaded Prisma config from prisma.config.ts.",
+      "stateStyle": "error",
+      "creationTimestamp": "2026-08-30T18:23:51+00:00",
+      "startTimestamp": "2026-08-30T18:23:50.85+00:00",
+      "stopTimestamp": "2026-08-30T18:23:53.325094+00:00",
+      "source": "deno",
+      "exitCode": 1,
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3147986,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/database/postgres",
+        "resource.appArgs": [
+          "run",
+          "--allow-run",
+          "--allow-write",
+          "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/aspire/.helpers/run-tool.mts",
+          "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/database/postgres/.netscript-prisma-studio.error",
+          "db:studio"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_DATABASENAME": "aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_HOST": "localhost",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PASSWORD": null,
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PORT": "10538",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_URI": "postgresql://postgres:2892f13b3ace423281a5ba5f861a3020@localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_USERNAME": "postgres",
+        "ConnectionStrings__aspire-s3-phase-b-attempt-3-db": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DATABASE_URL": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "POSTGRES_URI": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcpfyRfLo/prisma-studio-uxfcekxe/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "redis-zuxeeaxg",
+      "displayName": "redis",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:23:31+00:00",
+      "startTimestamp": "2026-08-30T18:23:34.725122+00:00",
+      "source": "docker.io/library/redis:7",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:32915"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/.data/redis",
+          "target": "/data",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "3a2d710276624ae041e8cfc48f19ee6e100fa86796c1524714c8f07432fd6b35",
+        "container.image": "docker.io/library/redis:7",
+        "container.lifetime": "Session",
+        "container.ports": [
+          6379
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": []
+      },
+      "environment": {
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "users-zhrwpded",
+      "displayName": "users",
+      "resourceType": "Executable",
+      "state": "Finished",
+      "creationTimestamp": "2026-08-30T18:23:51+00:00",
+      "startTimestamp": "2026-08-30T18:23:50.85+00:00",
+      "stopTimestamp": "2026-08-30T18:23:51.644331+00:00",
+      "source": "deno",
+      "exitCode": 1,
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3147989,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/services/users",
+        "resource.appArgs": [
+          "run",
+          "--minimum-dependency-age=0",
+          "--node-modules-dir=none",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-sys",
+          "src/main.ts"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_DATABASENAME": "aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_HOST": "localhost",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PASSWORD": null,
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PORT": "10538",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_URI": "postgresql://postgres:2892f13b3ace423281a5ba5f861a3020@localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_USERNAME": "postgres",
+        "ConnectionStrings__aspire-s3-phase-b-attempt-3-db": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DB_PROVIDER": "postgres",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46221",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=zhrwpded",
+        "OTEL_SERVICE_NAME": "users",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "39057",
+        "POSTGRES_URI": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcpfyRfLo/users-zhrwpded/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "users_http_/health_200_check": {
+          "status": "Unhealthy",
+          "description": "Health check for http://localhost:41191/health was canceled",
+          "exceptionMessage": "System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.Threading.Tasks.TaskCanceledException: The operation was canceled.\n ---> System.IO.IOException: Unable to read data from the transport connection: Operation canceled.\n ---> System.Net.Sockets.SocketException (125): Operation canceled\n   --- End of inner exception stack trace ---\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)\n   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)\n   at System.Net.Http.HttpConnection.InitialFillAsync(Boolean async)\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)\n   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)\n   at System.Net.Http.SocketsHttpHandler.<SendAsync>g__CreateHandlerAndSendAsync|115_0(HttpRequestMessage request, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.HttpClient.HandleFailure(Exception e, Boolean telemetryStarted, HttpResponseMessage response, CancellationTokenSource cts, CancellationToken cancellationToken, CancellationTokenSource pendingRequestsCts)\n   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)\n   at Aspire.Hosting.HttpHealthCheckHelpers.CheckUriAsync(Uri uri, Int32 expectedStatusCode, Func`1 httpClientFactory, HealthCheckContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/ExternalServiceBuilderExtensions.cs:line 351"
+        }
+      },
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "workers-api-nzdjwdbe",
+      "displayName": "workers-api",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:23:51+00:00",
+      "startTimestamp": "2026-08-30T18:23:50.86+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-zuxeeaxg"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:53716"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3147992,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3",
+        "resource.appArgs": [
+          "run",
+          "--config",
+          "deno.json",
+          "--minimum-dependency-age=0",
+          "--unstable-no-legacy-abort",
+          "--node-modules-dir=none",
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-run",
+          "jsr:@netscript/plugin-workers@0.0.6/services"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_DATABASENAME": "aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_HOST": "localhost",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PASSWORD": null,
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PORT": "10538",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_URI": "postgresql://postgres:2892f13b3ace423281a5ba5f861a3020@localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_USERNAME": "postgres",
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__aspire-s3-phase-b-attempt-3-db": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:32915",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/services/_shared/plugin-service-context.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46221",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=nzdjwdbe",
+        "OTEL_SERVICE_NAME": "workers-api",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "41997",
+        "POSTGRES_URI": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "REDIS_TCP": "tcp://localhost:32915",
+        "REDIS_URI": "localhost:32915",
+        "services__redis__tcp__0": "tcp://localhost:32915",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcpfyRfLo/workers-api-nzdjwdbe/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "workers-api_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "workers-zgcvykrn",
+      "displayName": "workers",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:23:51+00:00",
+      "startTimestamp": "2026-08-30T18:23:50.85+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl":"<redacted>",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "aspire-s3-phase-b-attempt-3-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-zuxeeaxg"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "workers-api-nzdjwdbe"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3147988,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3",
+        "resource.appArgs": [
+          "run",
+          "--minimum-dependency-age=0",
+          "--node-modules-dir=none",
+          "--unstable-worker-options",
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-run",
+          "--watch",
+          "workers/runtime.ts"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_DATABASENAME": "aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_HOST": "localhost",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PASSWORD": null,
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_PORT": "10538",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_URI": "postgresql://postgres:2892f13b3ace423281a5ba5f861a3020@localhost:10538/aspire-s3-phase-b-attempt-3-db",
+        "ASPIRE_S3_PHASE_B_ATTEMPT_3_DB_USERNAME": "postgres",
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__aspire-s3-phase-b-attempt-3-db": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:32915",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b-attempt-3/services/_shared/plugin-service-context.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46221",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=zgcvykrn",
+        "OTEL_SERVICE_NAME": "workers",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "POSTGRES_URI": "Host=localhost;Port=10538;Username=postgres;Password=2892f13b3ace423281a5ba5f861a3020;Database=aspire-s3-phase-b-attempt-3-db",
+        "REDIS_TCP": "tcp://localhost:32915",
+        "REDIS_URI": "localhost:32915",
+        "services__redis__tcp__0": "tcp://localhost:32915",
+        "services__workers-api__http__0": "http://localhost:53716",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcpfyRfLo/workers-zgcvykrn/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust",
+        "WORKER_CONCURRENCY": "2"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    }
+  ]
+}
