@@ -319,4 +319,8 @@ docs lane | Coordinator approved. Launched on OF-4 (b) Antigravity · Gemini 3.6
 worktree `007-aspire-s11` @ `c61b1626` (stacked on S10). Brief `slices/s11/brief.md` (#1000 already
 shipped → Refs; #1642 milestone ask). | | S11 route override (owner) | S11 relaunched on **Gemini
 3.7 Flash · high** (`gemini-3.7-flash-high`) per owner instruction; earlier 3.6/3.7-low attempts
-stopped before any work; S11 worktree reset clean at `c61b1626`. D-53. |
+stopped before any work; S11 worktree reset clean at `c61b1626`. D-53. | | Stack convergence
+executed (D-54) | Rebased bottom-up onto main `3e5cbabf`; generated-carrier conflicts (S5
+`agent-docs.generated.ts`, S9 `export-surface-corpus.generated.ts`) resolved by regeneration; full
+gates green at S8′/S9′/S10′; force-pushed with lease; slice worktrees moved. New heads: S5
+`56bf4255`, S6 `01f27d4d`, S8 `f2395465`, S9 `d81a8fe1`, S10 `a46ea16d`. |

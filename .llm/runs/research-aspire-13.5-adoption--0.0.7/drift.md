@@ -980,3 +980,31 @@
   in-session), superseding the OF-4 (b) default route for this slice. Launched as a recorded ad-hoc
   `agy --print` session (the suite has no `launch-agy-slice`; not daemon-managed) —
   `slices/s11/agy-session.md`.
+
+## D-54 — 2026-08-30 — Stack converged onto `main` `3e5cbabf` (#1731 shared generated carriers); regeneration-only conflict resolution
+
+- **Trigger (coordinator):** #1731 merged shared agent/MCP generated carriers; S9 regenerates
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` (the only
+  file both sides touched), so the D-50 convergence was pulled forward.
+- **Method (D-29 discipline):** dry-run in throwaway worktrees, hop by hop, bottom-up; conflicts
+  allowed **only** in generated carriers and resolved by the checked-in generators
+  (`gen:assets-barrel`, `gen:publish-assets`, `gen:mcp-export-corpus`), never by hand; full gate
+  sets at every new head before any push; `--force-with-lease` pinned to each exact old head.
+- **Heads:** S5 `aa822069` → **`56bf4255`** (17 commits; conflict `agent-docs.generated.ts`
+  regenerated); S6 `564d465c` → **`01f27d4d`** (clean); S8 `9dd06647` → **`f2395465`** (clean); S9
+  `0d81cf64` → **`d81a8fe1`** (conflict `export-surface-corpus.generated.ts` regenerated; post-regen
+  idempotent); S10 `c61b1626` → **`a46ea16d`** (clean; `range-diff` all six patches `=`). PR bases
+  unchanged (#1740 → main; #1743 → S5; #1754 → S6; #1759/#1760 → S8).
+- **Validation at new heads:** S8′ (covers S5′/S6′ content): 0 diagnostics, quality/arch/ host-ports
+  0, 496/0 tests. S9′: 0 diagnostics (965 files), raw lint/fmt clean, quality/arch 0, assets-barrel
+  / publish-assets / mcp-export-corpus / sync-claude / check-claude / dogfood 0, 186/0 + 92/5/24
+  tests, `13.4.6` grep 0; only S9-side content change = the regenerated corpus. S10′: 0 diagnostics,
+  gates 0, 190/0 tests, patches byte-identical.
+- **Evaluation carry-over:** phase-A Tier-A/IMPL-EVAL verdicts were issued at the old heads; for
+  S5/S6/S8/S10 the patches are byte-identical (ancestry only) and for S9 the sole content change is
+  a regenerated carrier verified by its own check — verdicts carry over with this note; no new
+  ordinary evaluation for the rebase. Exact-head runtime receipts (S5 F-A at `aa822069`) were
+  already void pending #1734 and are re-earned at the eventual merge head.
+- **S11:** its Gemini session is mid-run on `docs/aspire-13-5-s11-public-docs-refresh` based on the
+  old S10 head `c61b1626`; rebased onto `a46ea16d` at its handoff (docs-only, low conflict risk).
+- Throwaway worktrees removed after the pushes.
