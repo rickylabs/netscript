@@ -1361,3 +1361,26 @@
   `ok`, `127.0.0.1:32768` refused. Owned probe removed; containers/volumes back to 0. Local Phase B
   (S3 → S7 → S8, serial) resumes under `DOCKER_HOST=tcp://netscript-dind:2375` with
   `aspire start --isolated --non-interactive`; lease returns to exact zero before release.
+- **D-71 — lease collision (resolved by coordinator reassignment) + DCP loopback publish gap.** (a)
+  Minutes after D-70 returned the host to zero, `docker ps -a` showed 3 containers + 1 volume I did
+  not start: `postgres-19eb12d0`, `garnet-hayjwfkx`, `redis-qmmgdfqm` (usvc-dev labels, creator PID
+  3031285, created 18:05:25–34Z), AppHost rooted at
+  `worktrees/007-leaf-1736/.llm/tmp/cli-e2e/plugin-smoke-20260830-200257/aspire/apphost.mts` —
+  internals' #1736 exact-runtime gate. Coordinator ruling: lease temporarily reassigned to internals
+  for that single in-flight gate; this lane **pauses all local runtime starts** (S3→S7→S8 resume
+  only after internals proves aspire `[]` / containers 0 / volumes 0 and the lease returns). Foreign
+  resources untouched; D-70 proof preserved. (b) **Probe 2b (DCP-style publish):**
+  `-p 127.0.0.1::8080` on the dind → `127.0.0.1:32771`; `curl netscript-dind:32771` **refused**,
+  `127.0.0.1:32771` refused. The host fix makes `0.0.0.0` publishes reachable (D-70) but DCP still
+  publishes on the daemon host's loopback — internals' live containers confirm it
+  (`127.0.0.1:32768/32769/32770->…`). Prediction: the #1736 AppHost will fail its backing-service
+  health checks exactly as D-43 (`SocketException 111` on `127.0.0.1:<port>`), which would be an
+  **environment** outcome, not a fourth #1736 product FAIL_FIX. No Aspire-side knob found yet
+  (`DcpOptions` has ContainerRuntime, proxyless port range, RandomizePorts,
+  EnableAspireContainerTunnel — none sets the container host address); DCP binary not located under
+  `~/.nuget`/`~/.aspire` for a strings audit. Required topology remains: DCP-published loopback
+  ports reachable from `ai-agents` (shared netns with `netscript-dind`, or a daemon-side rewrite of
+  `127.0.0.1` binds to `0.0.0.0` plus name resolution of `127.0.0.1`→dind, which does not exist in
+  Docker). (c) S3's Codex thread `01a05045…` rollout lived under `/home/codex` (removed) — S3 Phase
+  B will need a fresh thread; S7's worktree `007-aspire-s7` no longer exists (recreate from
+  `2f721bf3`).
