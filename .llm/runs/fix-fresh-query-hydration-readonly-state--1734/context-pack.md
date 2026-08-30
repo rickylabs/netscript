@@ -12,9 +12,11 @@
 
 ## Current State
 
-Implementation and the preliminary complete static suite are green. Private guards validate
-readonly unknown cache records before copying them into TanStack's mutable input. Exact 5.101.0
-and 5.102.8 checks pass; public types, exports, and the `^5.101.0` range remain unchanged.
+The evaluator-artifact head is preserved and the bounded FAIL_FIX repair is in its RED slice. The
+new suite crosses the real `QueryHydrationScript` serializer: the success query passes, while four
+paused-mutation cases fail at the current guard. The default prior-failure path independently
+reproduces `failureReason: {}` before hydration. Public types, exports, and the `^5.101.0` range
+remain unchanged.
 
 ## Completed
 
@@ -30,13 +32,13 @@ and 5.102.8 checks pass; public types, exports, and the `^5.101.0` range remain 
 
 ## In Progress
 
-- S3 final run-state commit and exact-head receipt rerun.
+- S4 RED commit for the serialized hydration regression.
 
 ## Next Steps
 
-1. Commit/push S3 run-state artifacts.
-2. Rerun every owner-required receipt without modifying files.
-3. Update the draft PR body/comment with exact-head evidence and hand off to Tier-A/IMPL-EVAL.
+1. Commit the S4 RED slice on top of evaluator artifact `ed8a8e9ca9be2e72da4a00bff830caf260ee94ea`.
+2. Implement private JSON-shape normalization and error revival without public-surface changes.
+3. Commit final artifacts, rerun exact-head receipts, explicit-refspec push, and update PR #1736.
 
 ## Key Decisions
 
@@ -44,6 +46,7 @@ and 5.102.8 checks pass; public types, exports, and the `^5.101.0` range remain 
 | --- | --- | --- |
 | Keep `^5.101.0` | plan D1 | Support entire range. |
 | Keep public `DehydratedState` unchanged | plan D2 | No mutable widening or upstream leak. |
+| Revive serialized error records | plan D5 | Restore real `Error` values; retain string fields where present. |
 
 ## Files Changed
 

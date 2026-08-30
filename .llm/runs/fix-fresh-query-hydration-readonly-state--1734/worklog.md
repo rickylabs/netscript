@@ -37,6 +37,9 @@
 | S1 | Prove 5.102.8 compile regression (RED) | focused structured check/test, expected FAIL | Fresh type fixture/config + run dir |
 | S2 | Validate and copy readonly hydration state into TanStack's mutable input | focused wrappers + exact 5.101/5.102 checks | `hydration.ts`, focused tests, run dir |
 | S3 | Record final static receipts and evaluator handoff | full requested static suite | run dir |
+| S4 | Pin the shipped JSON hydration regression at the evaluator-artifact head (RED) | focused structured round-trip test, expected FAIL | new Fresh round-trip test + run plan/worklog |
+| S5 | Normalize JSON-compatible hydration state and revive serialized errors | focused suites + eight guard attacks | `hydration.ts`, focused tests, run dir |
+| S6 | Record and publish exact-final-head static evidence | complete owner-required static suite | run dir |
 
 ### Deferred Scope
 
@@ -59,6 +62,8 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | 2026-08-30T00:52:00+02:00 | S2 | gate | Focused test 4/4, check, lint, fmt, quality scan, and arch check pass. Initial colocated test placement raised Fresh F-16 from 3 to 4 warnings; moving it to `tests/` restored the 3-warning baseline before commit. |
 | 2026-08-30T00:52:00+02:00 | S2 | reconcile | Issue #1734 and draft PR #1736 remain open at `status:impl`, required labels/milestone are present, and no evaluator/reviewer comments have arrived. No plan readjustment is required. |
 | 2026-08-30T01:10:00+02:00 | S3 | preliminary full gate | All owner-required static gates pass; Fresh doc-lint/JSR findings match the inherited baseline, publish dry-run succeeds, and validation leaves the worktree clean. |
+| 2026-08-30T08:34:23+02:00 | S4 | FAIL_FIX reproduction | The real `QueryHydrationScript` serializer produced default-dehydrated paused mutation wire records with absent `context`/`data` (and absent `variables` for the void case). A paused retry after one failure reproduced `failureReason: {}` through the package API. |
+| 2026-08-30T08:34:23+02:00 | S4 | RED | Structured round-trip suite exited 1: success query passed; all four mutation cases failed with `TypeError: Invalid dehydrated mutation at index 0` from `hydration.ts`. Result: 1 passed / 4 failed / 5 total. Production source remained untouched. |
 
 ## Decisions
 
@@ -66,6 +71,8 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | --- | --- | --- |
 | Retain `^5.101.0` | Both known minors will be explicitly supported. | plan D1; dependency wrapper |
 | Preserve public readonly type | Private validation can restore sound assignability. | plan D2/D3; doctrine A1/A2 |
+| Revive serialized error records | Upstream requires `Error \| null`; a JSON record cannot honestly satisfy that type without normalization. | FAIL_FIX R2; plan D5 |
+| Remove query-state `data` ownership check | Query `data` admits `undefined` and JSON drops it just like mutation `data`; status/counters remain load-bearing. | FAIL_FIX R1; plan D6 |
 
 ## Drift
 
@@ -81,6 +88,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | --- | --- | --- | --- |
 | Baseline reproduction | exact no-lock check with temporary 5.102.8 pin | FAIL (expected) | TS2345 at `hydration.ts:43`; package range restored |
 | S1 RED regression | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-version-compat_test.ts` | FAIL (expected), exit 1 | 0 passed / 1 failed; child check reports only TS2345 at `hydration.ts:43` |
+| S4 JSON-transport RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 1 passed / 4 failed / 5 total; four paused-mutation paths reject index 0; default prior-failure wire value independently asserted equal to `{}` before hydration |
 | S2 focused test | `run-deno-test.ts -- --allow-all ...version-compat... ...query-hydration...` | PASS, exit 0 | 4 passed: exact 5.101.0, exact 5.102.8, valid readonly hydration, invalid-entry rejection |
 | S2 focused check | `run-deno-check.ts --file ...` | PASS, exit 0 | 3 files, 0 diagnostics |
 | S2 focused lint | `run-deno-lint.ts --file ...` | PASS, exit 0 | 3 files, 0 findings |
