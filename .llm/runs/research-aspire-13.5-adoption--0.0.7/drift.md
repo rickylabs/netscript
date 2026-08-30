@@ -1977,3 +1977,13 @@
   branch could be correctly renamed to match; `007-aspire-s6-v2` confirmed clean at `60985a98f`
   immediately before dispatch. Awaiting the controller-mechanism implementation, generator-splice,
   tests, and gates; supervisor runs the lease-backed verification after.
+- **D-101 correction (database-awareness):** relayed a critical review guard onto the same S6 thread
+  before any commit landed: `runtime.readiness-fixture`/the listener-unreachable fixture is shared
+  by postgres, sqlite, and MySQL/MSSQL-override suites — the synthetic-injection logic must stay
+  database-aware (postgres tier injects postgres+garnet test-only listeners; sqlite injects garnet
+  only; overrides must not fail pre-`aspire start` on a missing postgres marker), reusing
+  `createListenerReadinessGates(database)`'s existing per-database dispatch rather than a second
+  divergent switch, with focused unit coverage for both the postgres and sqlite-or-override cases
+  before any runtime step. Delivered via detach-then-resume (the client held an active writer at
+  send time — same D-38 pattern); no commits existed yet on this thread's new work, so nothing
+  needed correcting after the fact.
