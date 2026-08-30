@@ -6348,3 +6348,86 @@ would have closed an issue that is not done).
 
 **Readiness remains withheld and is not a judgement call:** the body-level scope is incomplete and
 slices 2–3 are NOT RUN, so `status:ready-merge` and a ready-flip are wrong at any evaluator verdict.
+
+## 2026-08-30 — #1466 slice 1 terminal `PASS`; evidence bundle landed; slice 2 dispatched
+
+### IMPL-EVAL cycle 2 — `PASS`
+
+Session `b13a38f6-8b39-4b28-9a91-0420d5b2d743` (Fable 5 · medium, own detached worktree
+`ns1466-impleval-c2`), verdict pushed evidence-only at `ff4e81cc`. Failure count unchanged at **1 of
+2** — this cycle did not fail. Findings G-1…G-5, all low/medium and none blocking.
+
+**It beat my Tier-A on the finding I was most confident about.** I proved the F-2 pin fires under
+perturbation B and cannot be forged by a trailing comment. The evaluator found a forgery that *works*:
+a divergent initializer **plus a dead decoy** carrying the pinned text passes `check`, `lint`, the
+pin, and the full contracts suite — the `_` prefix even silences `no-unused-vars`. It also corrected
+my framing: plain perturbation B is already caught by the `check` gate at the file itself, so the
+genuinely unguarded case was B2, not B. That is **G-1**, and it goes to slice 2. The lesson is exact:
+a source-text pin must be **anchored to the declaration it guards**, not counted file-wide.
+
+### Evidence bundle at `1f0cdef2` — evidence-only, content head still `42874803`
+
+- **G-3** `context-pack.md` rewritten. The old one described the cycle-3 head, called `commonErrorMap`
+  **public**, and said IMPL-EVAL had not run — a resumer reading it alone would have reintroduced
+  F-1's premise.
+- **G-5** `supervisor.md` now states it was **reconstructed at cycle 4**, not written at run start,
+  and carries all four author threads plus both evaluator sessions and the Tier-A reviewer. The
+  original thread `01a04f84-e21d-77f3-863c-56ef2498d581` was verified against the launcher record,
+  not copied from the verdict prose.
+- **G-2** per-slice PR comment posted:
+  `https://github.com/rickylabs/netscript/pull/1731#issuecomment-5467845684`.
+
+### Root `test` recut — a real `PASS`
+
+`4250 passed / 0 failed / 19 ignored, exit 0`, attempt 7. Detail in
+`audit/root-test-post-host-fix.txt`; drift **D-30**.
+
+I got the first recut wrong: I passed `-- deno task test` when `catalog.ts:35` already supplies that
+argv, producing `deno task test deno task test` and a 152 ms bogus FAIL. Caught it by reading the
+receipt rather than the exit code, and re-cut correctly. Worth recording because a receipt that
+*looks* structurally valid — right gate id, heads matching — can still attest a command nobody meant
+to run.
+
+Sufficiency is now `INSUFFICIENT` for **one** external reason (`public-doc-lint`, R-1 baseline-red
+delta-0), down from two.
+
+**Set-integrity note stated up front rather than left to be found:** `test-final.json` attests
+`ff4e81cc`; the other seven attest `42874803`. The gate genuinely ran at `ff4e81cc` and a receipt must
+attest the head it ran at. Product is byte-identical between the two
+(`git diff 42874803..ff4e81cc -- packages plugins docs templates` empty). Using
+`--allow-git-head-mismatch` would have produced `gitHead != actualGitHead` and broken the invariant
+the evaluator checks — attesting the true head and proving content identity separately is sounder.
+
+### Slice 2 dispatched
+
+| Field | Value |
+| --- | --- |
+| Brief | `slices/impl-1466-s2.md` — plan slice 2 (SDK declaration propagation) **plus G-1** |
+| Thread | `01a051f8-ab0a-7443-921f-17e48be6bc35` |
+| Route | requested = observed = `openai · gpt-5.6-sol · **high**`, verdict **matched** |
+| Lane | `complex_implementation` — a real feature slice, not a repair; the `medium` step-down used for cycles 1–5 does not apply |
+| Worktree / base | `/home/agent/projects/netscript/worktrees/007-leaf-1731` @ `1f0cdef2`, upstream unset, explicit-refspec push |
+
+The brief carries the constraints that must not be relitigated: `commonErrorMap` stays **private**
+(R-2/F-1), no upstream oRPC re-export (AP-14), `public-doc-lint` must hold **12 with the identical
+R-1 set**, `docs:exports-drift` exit 0 as named supplemental evidence (R-3), and root `test` is now
+runnable so R-1 must **not** be cited to skip it. It also fixes the process defect behind G-2 — the
+per-slice PR comment and a current `context-pack.md` are explicit closing obligations, not left to
+"commit, push, stop".
+
+**D-28 recurred a third time** (`ownerPid 125818` gone, thread `01a051e0` absent from the daemon).
+Evicted with the same proof-first procedure. Three occurrences in one lane in one session.
+
+### Queue — corrected by the coordinator
+
+| Leaf | State |
+| --- | --- |
+| #1466 slice 2 | **active** on thread `01a051f8` |
+| #1466 slice 3 | queued — carries **G-4** |
+| #1466 final all-slices IMPL-EVAL + close-gate | queued |
+| #1664 | parked at `20337441788b` |
+| #1387 | **holds** until #1466 reaches a truthful ready handoff — brief already written |
+| #1730 | holds — brief already written |
+
+PR #1731 stays **draft**, `Refs #1466 — partial, slice 1 of 3`, exactly one `status:impl-eval` on
+both PR and issue. No ready-flip, no merge, no restored closing keyword.

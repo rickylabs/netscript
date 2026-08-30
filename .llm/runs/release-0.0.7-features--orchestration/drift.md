@@ -803,3 +803,46 @@ token-free path is broken, and is recorded here rather than passed off as the no
 escalated to the owner under D-26 and is outside features scope. A tooling-level fix — fall back to a
 poll loop when `watchFs` throws `EMFILE`, instead of exiting non-zero — belongs with D-24, D-25 and
 D-28 as repo-tooling follow-ups for the coordinator. This lane does not edit `.llm/tools/`.
+
+## D-30 — the D-26 host baseline is repaired; R-1's root-`test` condition is void, D-29 is not
+
+**Observed.** The container's init changed. Measured directly, not reported:
+
+| Probe | D-26 era | Now |
+| --- | --- | --- |
+| PID 1 | not reaping | `tini -- ttyd …`; `/proc/1/comm` = `tini` |
+| Total zombies (`ps -eo stat=` `^Z`) | 7,733–7,979 | **0** |
+| PID-1-owned zombies | thousands | **0** |
+| root `deno task test` | 4248 passed / **1 failed** / 19 ignored | **4250 passed / 0 failed / 19 ignored, exit 0** |
+
+D-26 established that `hybrid-launcher_test.ts:167` tests liveness with `Deno.kill(pid, 0)` and that
+a zombie answers `kill -0`, so the worker-descendant assertion could not pass *regardless of any code
+change*. With a real init reaping children, the descendant is gone when the loop looks and the
+assertion passes. The failing test was correct code failing on a broken host, exactly as recorded —
+and it now passes with **no change to it**, which is the cleanest possible confirmation that the
+diagnosis was right.
+
+**Consequence for the ruling.** IMPL-EVAL R-1 attached the condition *"no further root-`test` retries
+on this host (they cannot move it)"*. That condition was **premised** on the defect, not on policy.
+The premise is gone, so the condition is void — retrying now moves the number, and declining to run
+the gate while citing R-1 would be using a stale ruling to avoid evidence that is newly available.
+The `SKIPPED` receipt cut at cycle 4 was the honest form *at the time*; it is superseded by a real
+receipt rather than being retroactively criticised.
+
+**R-1's other half is untouched.** `public-doc-lint` is still baseline-red on `main` at 12 findings
+with delta 0, and the set-identity condition still binds every future head of this branch. Nothing
+about the host fix bears on it. Two halves of one ruling, only one of which lost its premise.
+
+**D-29 is NOT fixed.** `fs.inotify.max_user_instances` is still **128**, so
+`.llm/tools/harness/watch-run.ts` still dies in `Deno.watchFs` and the doctrine's token-free
+supervisor wake remains unavailable. The host fix repaired the reaper, not the watcher; the two were
+distinct causes that D-26 happened to record together. Supervision continues to poll, and the tooling
+fallback proposed in D-29 still stands as a coordinator follow-up alongside D-24, D-25 and D-28.
+
+**Lesson worth keeping.** A gate ruled "unpassable for an environmental reason" carries an implicit
+expiry that nothing in the harness tracks: when the environment is repaired, the ruling silently
+becomes a licence to skip evidence that is now obtainable. The evaluator's cycle-2 verdict text still
+says the no-retry condition "stays in force on this host" because the host changed mid-evaluation —
+no fault of the session, but a demonstration that environmental rulings need a re-check trigger, not
+just a rationale. Recorded so the final all-slices IMPL-EVAL re-derives host state rather than
+inheriting this one.
