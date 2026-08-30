@@ -357,3 +357,27 @@ health transitions, fixed ports 18998/18999, and running-resource behavior remai
   bounded correction with Tier-A review, independent evaluation, and fresh runtime lease pending.
 - Runtime/AppHost/containers/evaluators/CI remain NOT_RUN. The coordinator retains Tier-A review,
   independent evaluation, and the fresh zero-state Postgres lease.
+
+## D-102b ANSI-decorated timeout diagnostic correction
+
+PLAN-EVAL is N/A by coordinator ruling: this bounded Tier-A correction changes only CLI-output
+normalization and preserves D-102's exit-17 contract plus every D-101 runtime behavior. The RED
+test feeds the observed Aspire 13.5.3 shape with CSI sequences before the `❌`, around the diagnostic
+run, and at line end. Implementation must reuse `stripAnsiCode` from `@std/fmt/colors`, then apply
+the existing trim/glyph normalization and exact diagnostic comparison. Runtime, AppHost,
+containers, evaluators, and CI remain coordinator-owned and NOT_RUN.
+
+- RED: the focused fixture suite ran four cases; the three D-102 cases passed and the new
+  ANSI-decorated 13.5.3 case failed at the exact matcher.
+- GREEN: importing `stripAnsiCode` from `@std/fmt/colors` and applying it before trim/glyph removal
+  made all four fixture cases pass without weakening exact equality.
+- The complete focused D-101/D-102/D-102b suite passed 56/56 across six roots.
+- Scoped structured check/lint/format selected both touched TypeScript files with zero diagnostics,
+  findings, refusals, or dropped files.
+- `quality:scan` passed with `findings=[]` and allowance count 7; `arch:check` exited 0 with
+  carried-in warnings only.
+- Exit 17, controller/listener behavior, health transitions, resource lifecycle, and ports
+  18998/18999 remain byte-for-byte unchanged by this slice.
+- Reconcile: PR #1743's latest phase comment is the D-102 implementation report; the supplied
+  Tier-A D-102b finding is fully represented here, with fresh substantive review/runtime lease
+  still coordinator-owned.

@@ -163,3 +163,12 @@ now records `healthyWaitTimeoutExitCode` and `healthyWaitTimeoutDiagnostic`. No 
 controller, port, transition, or resource-lifecycle behavior changed. Static evidence is green:
 55/55 focused tests, two-file structured check/lint/format, clean quality scan, and exit-0
 architecture check. Runtime and evaluator work remain coordinator-owned.
+
+## D-102b ANSI-decorated diagnostic correction
+
+Tier-A found that the real Aspire 13.5.3 timeout line contains CSI style/color sequences before the
+`❌`, around the diagnostic text, and at line end. The matcher now calls `stripAnsiCode` from
+`@std/fmt/colors` before the existing trim/glyph removal and exact equality check. The plain and
+ANSI-decorated exit-17 cases both pass; altered diagnostics and exit 18 still fail. Static evidence
+is green: 56/56 focused tests, two-file structured check/lint/format, clean quality scan, and
+exit-0 architecture check. Runtime and evaluator work remain coordinator-owned.

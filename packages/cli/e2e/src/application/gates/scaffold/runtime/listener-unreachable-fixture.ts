@@ -1,3 +1,5 @@
+import { stripAnsiCode } from '@std/fmt/colors';
+
 import type { DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import {
   LISTENER_FAULT_ACK_FILE,
@@ -162,7 +164,9 @@ export function requireHealthyWaitTimeout(
     `Timed out waiting for resource '${resource}' to be healthy after ${timeoutSeconds}s.`;
   const output = [wait.stderr, wait.stdout].filter((value) => value.length > 0).join('\n');
   const hasExactDiagnostic = [wait.stderr, wait.stdout].some((stream) =>
-    stream.split(/\r?\n/u).some((line) => line.trim().replace(/^❌\s*/u, '') === expectedDiagnostic)
+    stream.split(/\r?\n/u).some((line) =>
+      stripAnsiCode(line).trim().replace(/^❌\s*/u, '') === expectedDiagnostic
+    )
   );
   if (
     wait.code !== HEALTHY_WAIT_TIMEOUT_EXIT_CODE ||

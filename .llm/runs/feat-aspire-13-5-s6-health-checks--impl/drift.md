@@ -106,3 +106,16 @@ documentation.
   a healthy-wait timeout, and leave listener/controller/resource lifecycle behavior unchanged.
 - **Evidence boundary:** focused static tests only in this implementation lane; the coordinator
   owns the fresh zero-state Postgres lease and subsequent SQLite progression.
+
+## 2026-08-31 — D-102b strips ANSI before exact timeout matching
+
+- **What:** D-102 normalized whitespace and a leading `❌`, but left ANSI CSI color/style bytes in
+  the candidate line.
+- **Source:** Tier-A inspection of the live Aspire 13.5.3 exit-17 stderr receipt.
+- **Expected:** CLI presentation decoration does not affect the exact semantic diagnostic match.
+- **Actual:** ANSI before the glyph, around the message, and at line end caused a false rejection.
+- **Severity:** bounded string-normalization correction.
+- **Action:** use `stripAnsiCode` from `@std/fmt/colors` before trim/glyph removal, retain exact
+  equality afterward, and add the real decorated-shape regression beside the plain-text case.
+- **Evidence boundary:** static focused tests only; exit 17, transitions, controller architecture,
+  fixed ports 18998/18999, and runtime lease ownership remain unchanged.
