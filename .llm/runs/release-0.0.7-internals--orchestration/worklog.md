@@ -4698,3 +4698,51 @@ RED (three authorized cases through the real transport) → rebase onto current 
 Tier-A + static gates → **coordinator-granted `scaffold.runtime`** as one unsplit command with cleanup
 proven to `aspire` empty / Docker 0 → **exactly one** final IMPL-EVAL cycle 4. **No cycle 5:** on
 failure the leaf parks or rescopes.
+
+## 2026-08-30 — #1734 cycle-4 pushed; hosted exact-head e2e dispatched; local lease released at zero
+
+| Item | Value |
+| --- | --- |
+| Exact head | **`d2c7f16c624c5028cd837595d01ab3b516cb1c23`** — local == remote == PR #1736 |
+| Hosted run | **33327199769** (`workflow_dispatch`, `e2e-cli.yml`, branch `fix/fresh-query-hydration-readonly-state`) |
+| `headSha` verification | **MATCH** — run `d2c7f16c6` == PR head `d2c7f16c6` |
+| Thread | `01a0515b-4d2f-7a91-b71e-43d0b209337c`, `openai · gpt-5.6-sol · high` |
+| Watchers | `b1f0vdkzo` (leaf commits/turn), `b1iqtjw3h` (CI job outcomes) |
+
+Jobs at dispatch: `classify` **success**; `scaffold-static`, `desktop-native-linux`,
+**`scaffold-runtime (aspire + docker + postgres)`**, **`scaffold-runtime-sqlite (aspire + sqlite +
+garnet)`** all in progress.
+
+**Hosted e2e consumes no host runtime lease** — it runs on GitHub-hosted runners. That is why it is the
+correct route now that the sole host lease has returned to the Aspire lane, and not merely a
+workaround for the D-55 topology defect.
+
+### Local runtime: topology FAIL, explicitly not a product verdict
+
+37 PASS / 1 FAIL at `database.init` after 101,016 ms — *JSON-RPC connection lost while starting
+`netscript-db-postgres`*. Known D-55 remote-DinD bind/loopback defect. `cleanup.aspire-stop` passed.
+
+**Zero-state proof before the lease returned:** `aspire ps` empty; containers **0** (`fb3f75f3c295`,
+`9a270b7be38d`, `61d6cfc72aec` removed); volumes **0** with the positively attributed anonymous volume
+`c853aa389cbb…` confirmed gone (`no such volume`); scoped `agentic:leak-check` → `probes.aspire ok`,
+`probes.docker ok`, **`survivors: []`**; `.llm/tmp/cli-e2e` scratch removed. Nothing foreign touched.
+
+### Two supervisor errors in this episode, both mine
+
+1. **My cycle-4 brief instructed the local `scaffold.runtime` run.** The gate-host countermand was
+   queued for a turn boundary that never arrived, so the author reached the runtime step inside the
+   same turn and correctly followed the standing instruction. **A superseding instruction that cannot
+   reach the worker in time is not a correction, it is a hope.** Queuing behind a writer lock is only
+   safe when the corrected step lies *after* the boundary.
+2. **I stopped a healthy in-flight owned gate** on the URGENT instruction; the lease-reassignment
+   correction arrived after `aspire stop` had already returned exit 0. The run was independently
+   failing at `database.init`, but I cannot cleanly separate my stop from that failure and do not
+   claim exoneration.
+
+Both are recorded in the leaf worklog as well, so the leaf's own evidence carries them.
+
+### Sequence from here
+
+Monitor both runtime jobs → on **genuine product green**, dispatch the **single authorized** IMPL-EVAL
+cycle 4 against the exact head. **No cycle 5** — on failure the leaf parks or rescopes. `#1774` stays
+parked clean at `2e5f50f0`; `#1533` parked on the `workflow`-scope credential boundary.
