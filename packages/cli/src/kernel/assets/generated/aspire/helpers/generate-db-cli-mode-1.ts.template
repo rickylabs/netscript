@@ -62,13 +62,25 @@ export async function tryHandleDbCliMode(
   const targets = resolveTargets(appHostDir, infrastructure);
 
   for (const target of targets) {
+    const runnerPath = resolve(appHostDir, 'aspire', '.helpers', 'run-tool.mts');
+    const requestPath = resolve(
+      appHostDir,
+      'aspire',
+      `.netscript-db-operation-${target.configKey}.json`,
+    );
     let resource = await builder.addExecutable(
       `${target.configKey}-cli`,
       'deno',
       target.workdir,
       [
-        'eval',
-        "console.error('Invoke database operations through Aspire resource commands.'); Deno.exit(2);",
+        'run',
+        '--allow-read',
+        '--allow-run',
+        '--allow-write',
+        runnerPath,
+        '--request',
+        requestPath,
+        target.taskSuffix,
       ],
     );
 

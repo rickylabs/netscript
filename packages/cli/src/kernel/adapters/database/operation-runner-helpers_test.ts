@@ -1,6 +1,7 @@
 import { assertEquals } from '@std/assert';
 import {
   buildDbCliEnv,
+  findRunningAppHost,
   isNoRunningAppHostOutput,
 } from './operation-runner-helpers.ts';
 
@@ -30,4 +31,15 @@ Deno.test('db migrate forwards artifact name and terminal identity to the genera
   assertEquals(env.PRISMA_MIGRATION_NAME, 'add-profile');
   assertEquals(env.NETSCRIPT_MIGRATION_INTERACTIVE, 'true');
   assertEquals('NETSCRIPT_PRISMA_NAME' in env, false);
+});
+
+Deno.test('findRunningAppHost matches only the normalized project apphost.mts path', () => {
+  const project = 'C:\\repo\\sample\\aspire\\apphost.mts';
+  const json = JSON.stringify([
+    { appHostPath: 'C:/repo/other/aspire/apphost.mts' },
+    { appHostPath: 'c:/REPO/sample/aspire/apphost.mts' },
+  ]);
+
+  assertEquals(findRunningAppHost(json, project), true);
+  assertEquals(findRunningAppHost('[]', project), false);
 });

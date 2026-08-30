@@ -31,6 +31,19 @@ export function isNoRunningAppHostOutput(stdout: string, stderr: string): boolea
   return NO_RUNNING_APPHOST_LINE.test(`${stdout}\n${stderr}`);
 }
 
+/** Whether `aspire ps --format Json` contains the project's exact AppHost path. */
+export function findRunningAppHost(statusJson: string, apphostPath: string): boolean {
+  const parsed: unknown = JSON.parse(statusJson);
+  if (!Array.isArray(parsed)) {
+    throw new Error('Expected aspire ps JSON to return an array.');
+  }
+  return parsed.some((entry) => {
+    if (typeof entry !== 'object' || entry === null) return false;
+    const candidate = Reflect.get(entry, 'appHostPath');
+    return typeof candidate === 'string' && normalisePath(candidate) === normalisePath(apphostPath);
+  });
+}
+
 export function buildDbCliEnv(
   operation: DbOperationRequest['operation'],
   configKey: string,
@@ -76,7 +89,7 @@ export function buildExecutableDisplayName(
   _operation: DbOperationRequest['operation'],
   configKey: string,
 ): string {
-  return `netscript-db-${configKey}`;
+  return `${configKey}-cli`;
 }
 
 export function findExecutableStatus(

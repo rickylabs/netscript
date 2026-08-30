@@ -33,9 +33,24 @@ Phase-B lease and the implementation agent does not self-certify.
 - 2026-08-30: slice 2 clean-HEAD receipt `s8-s2-generator-head` passed 34/34 at `1fa1cb75`.
   Slice 3 regenerated the embedded CLI asset snapshot with `deno task gen:assets-barrel`; the
   clean-tree `check:assets-barrel` verdict runs immediately after the snapshot commit.
+- 2026-08-30: slice 3 commit `ab0908b8a4f39ee0bdd7d8cc31b2051004dd5e76` was pushed with
+  the explicit refspec. Its clean-HEAD `check:assets-barrel` receipt is
+  `receipts/03-assets-barrel.json`.
+- 2026-08-30: slice 4 detects the exact project `apphost.mts` from `aspire ps`, routes typed
+  `migrate`/`seed`/`reset` commands without starting a second host, and bounds resource readiness
+  with `aspire wait`. Exits 17/18 produce a resource- and timeout-specific diagnostic. When no
+  matching host exists, the adapter starts and later stops the normal project AppHost rather than
+  reviving the retired ad-hoc DB AppHost. Non-typed operations retain the explicit-start resource
+  contract through emitted `run-tool.mts` request mode. Focused tests passed 49/49; `quality:scan`
+  and `arch:check` passed with only their existing warning inventory. No Aspire command or
+  container runtime was executed.
 
 ## Push trail
 
 Each committed slice is pushed only to
 `origin:refs/heads/feat/aspire-13-5-s8-typed-resource-commands`; the concrete SHA and receipt are
 appended after each push and mirrored in the draft PR comment trail.
+
+- `42c4ef51f6f12cd9ba4644c4843895e227d31cec` — slice 1 RED contracts, pushed explicitly.
+- `1fa1cb75b3e3776ed1d0bd9dd9da046203264c20` — slice 2 typed generator, pushed explicitly.
+- `ab0908b8a4f39ee0bdd7d8cc31b2051004dd5e76` — slice 3 regenerated assets, pushed explicitly.
