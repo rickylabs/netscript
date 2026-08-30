@@ -76,6 +76,49 @@ Deno.test('aspire mcp command line is rejected despite otherwise owned path', ()
   );
 });
 
+Deno.test('aspire agent mcp command line is rejected despite otherwise owned path', () => {
+  assertEquals(
+    classify(
+      {
+        kind: 'process',
+        pid: 71,
+        ppid: 1,
+        commandLine: `aspire agent mcp --apphost ${root}/apphost.mts`,
+        evidence: [{ kind: 'apphost-argv', path: `${root}/apphost.mts` }],
+      },
+      { appHosts: [], containers: [] },
+      root,
+    ),
+    'unproven',
+  );
+});
+
+Deno.test('process evidence authorizes only contained paths and reports foreign worktrees', () => {
+  const process = (path: string): ResourceCandidate => ({
+    kind: 'process',
+    pid: 72,
+    ppid: 1,
+    commandLine: 'aspire-managed nuget search',
+    evidence: [{ kind: 'dcp-label', path }],
+  });
+  assertEquals(
+    classify(process(`${root}/apphost.mts`), { appHosts: [], containers: [] }, root),
+    'owned',
+  );
+  assertEquals(
+    classify(
+      process('/home/codex/repos/fix-1011/apphost.mts'),
+      { appHosts: [], containers: [] },
+      root,
+    ),
+    'foreign',
+  );
+  assertEquals(
+    classify(process('/tmp/dcp.sock'), { appHosts: [], containers: [] }, root),
+    'unproven',
+  );
+});
+
 Deno.test('a clean-clone container outside the worktree is owned once its root is registered', () => {
   const cleanClone = '/tmp/opencode/cleanroom/statusline';
   const candidate: ResourceCandidate = {

@@ -24,6 +24,7 @@ export interface LeakReport {
   readonly probes: {
     readonly aspire: ProbeStatus;
     readonly docker: ProbeStatus;
+    readonly process?: ProbeStatus;
   };
   readonly survivors: readonly LeakEntry[];
 }
@@ -31,6 +32,7 @@ export interface LeakReport {
 const OK_PROBES: LeakReport['probes'] = {
   aspire: { state: 'ok' },
   docker: { state: 'ok' },
+  process: { state: 'ok' },
 };
 
 function shellQuote(value: string): string {
@@ -39,9 +41,11 @@ function shellQuote(value: string): string {
 
 /** Builds the exact per-resource command shown to a human or terminal blocker. */
 export function stopCommand(resource: ResourceCandidate): string {
-  return resource.kind === 'apphost'
-    ? `aspire stop --apphost ${shellQuote(resource.appHostPath)} --non-interactive --nologo`
-    : `docker rm -f ${shellQuote(resource.id)}`;
+  if (resource.kind === 'apphost') {
+    return `aspire stop --apphost ${shellQuote(resource.appHostPath)} --non-interactive --nologo`;
+  }
+  if (resource.kind === 'container') return `docker rm -f ${shellQuote(resource.id)}`;
+  return `kill -TERM ${shellQuote(String(resource.pid))}`;
 }
 
 /**
@@ -52,7 +56,11 @@ export function stopCommand(resource: ResourceCandidate): string {
  * resource `unknown`.
  */
 function ownerFrom(resource: ResourceCandidate, worktreeRoot: string): string {
-  const path = resource.kind === 'apphost' ? resource.appHostPath : resource.mountSource;
+  const path = resource.kind === 'apphost'
+    ? resource.appHostPath
+    : resource.kind === 'container'
+    ? resource.mountSource
+    : resource.evidence[0]?.path;
   if (!path || !isAbsolute(path) || !isAbsolute(worktreeRoot)) return 'unknown';
   const siblingRoot = dirname(resolve(worktreeRoot));
   const delta = relative(siblingRoot, resolve(path));
@@ -71,6 +79,7 @@ function registeredStart(
       entry.appHostStartedAt === resource.appHostStartedAt
     )?.startedAt;
   }
+  if (resource.kind === 'process') return undefined;
   return registry.containers.find((entry) =>
     entry.creatorPid === resource.creatorPid &&
     entry.creatorProcessStartTime === resource.creatorProcessStartTime
@@ -98,14 +107,21 @@ export function buildLeakReport(
     worktreeRoot,
     probes,
     survivors: resources.map((resource) => {
-      const startedAt = registeredStart(resource, registry) ?? resource.createdAt;
+      const startedAt = registeredStart(resource, registry) ??
+        (resource.kind === 'process' ? undefined : resource.createdAt);
       const parsedStart = parseTimestamp(startedAt);
-      const ageMs = Number.isFinite(parsedStart) ? Math.max(0, nowMs - parsedStart) : null;
+      const ageMs = resource.kind === 'process'
+        ? resource.observedAgeMs ?? null
+        : Number.isFinite(parsedStart)
+        ? Math.max(0, nowMs - parsedStart)
+        : null;
       return {
         kind: resource.kind,
         identity: resource.kind === 'apphost'
           ? `${resource.appHostPath} (pid ${resource.appHostPid ?? 'unknown'})`
-          : `${resource.name ?? resource.id} (${resource.id})`,
+          : resource.kind === 'container'
+          ? `${resource.name ?? resource.id} (${resource.id})`
+          : `${resource.commandLine} (pid ${resource.pid})`,
         ownership: classify(resource, registry, worktreeRoot),
         owner: ownerFrom(resource, worktreeRoot),
         ageMs,
@@ -126,6 +142,9 @@ export function renderLeakReport(report: LeakReport): string {
     `Worktree: \`${report.worktreeRoot}\``,
     `Aspire probe: ${renderProbeStatus(report.probes.aspire)}`,
     `Docker probe: ${renderProbeStatus(report.probes.docker)}`,
+    `Process probe: ${
+      renderProbeStatus(report.probes.process ?? { state: 'unavailable', message: 'not recorded' })
+    }`,
     '',
   ];
   if (report.survivors.length === 0) {

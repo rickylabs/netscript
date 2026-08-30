@@ -11,11 +11,19 @@ export interface CommandPort {
 export interface FilePort {
   realPath(path: string): Promise<string>;
   readText(path: string): Promise<string>;
+  listNames?(path: string): Promise<readonly string[]>;
+  readLink?(path: string): Promise<string>;
 }
 
 export const systemFiles: FilePort = {
   realPath: (path) => Deno.realPath(path),
   readText: (path) => Deno.readTextFile(path),
+  async listNames(path) {
+    const names: string[] = [];
+    for await (const entry of Deno.readDir(path)) names.push(entry.name);
+    return names;
+  },
+  readLink: (path) => Deno.readLink(path),
 };
 
 export const systemCommands: CommandPort = {

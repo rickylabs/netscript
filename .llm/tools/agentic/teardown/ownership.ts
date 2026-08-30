@@ -25,7 +25,25 @@ export interface ContainerCandidate {
   readonly commandLine?: string;
 }
 
-export type ResourceCandidate = AppHostCandidate | ContainerCandidate;
+export type ProcessEvidenceKind = 'dcp-label' | 'apphost-argv' | 'socket-path';
+
+export interface ProcessEvidence {
+  readonly kind: ProcessEvidenceKind;
+  readonly path: string;
+}
+
+export interface ProcessCandidate {
+  readonly kind: 'process';
+  readonly pid: number;
+  readonly ppid: number;
+  readonly processStartedAt?: string;
+  readonly observedAgeMs?: number;
+  readonly commandLine: string;
+  readonly cwd?: string;
+  readonly evidence: readonly ProcessEvidence[];
+}
+
+export type ResourceCandidate = AppHostCandidate | ContainerCandidate | ProcessCandidate;
 
 export interface RegistryIdentityView {
   readonly appHosts: readonly {
@@ -45,7 +63,7 @@ export interface RegistryIdentityView {
 }
 
 const WORKTREE_PREFIX = resolve('/home/codex/repos');
-const MCP_COMMAND = /(?:^|\s)aspire\s+mcp\b/i;
+export const MCP_COMMAND: RegExp = /(?:^|\s)aspire\s+(?:agent\s+)?mcp\b/i;
 /** A root shallower than this (`/`, `/tmp`, `/home`) would claim other runs' resources. */
 const MIN_OWNED_ROOT_SEGMENTS = 2;
 
@@ -86,6 +104,7 @@ function registryMatches(candidate: ResourceCandidate, registry: RegistryIdentit
       entry.appHostStartedAt === candidate.appHostStartedAt
     );
   }
+  if (candidate.kind === 'process') return false;
   if (candidate.creatorPid === undefined || !candidate.creatorProcessStartTime) return false;
   return registry.containers.some((entry) =>
     entry.creatorPid === candidate.creatorPid &&
@@ -100,10 +119,16 @@ export function classify(
   worktreeRoot: string,
 ): Ownership {
   if (candidate.commandLine && MCP_COMMAND.test(candidate.commandLine)) return 'unproven';
-  const evidencePath = candidate.kind === 'apphost' ? candidate.appHostPath : candidate.mountSource;
-  if (evidencePath && ownedByPath(evidencePath, worktreeRoot, registry.ownedRoots)) return 'owned';
+  const evidencePaths = candidate.kind === 'apphost'
+    ? [candidate.appHostPath]
+    : candidate.kind === 'container'
+    ? candidate.mountSource ? [candidate.mountSource] : []
+    : candidate.evidence.map((entry) => entry.path);
+  if (evidencePaths.some((path) => ownedByPath(path, worktreeRoot, registry.ownedRoots))) {
+    return 'owned';
+  }
   if (registryMatches(candidate, registry)) return 'owned';
-  if (foreignWorktree(evidencePath, worktreeRoot)) return 'foreign';
+  if (evidencePaths.some((path) => foreignWorktree(path, worktreeRoot))) return 'foreign';
   return 'unproven';
 }
 

@@ -12,6 +12,8 @@ const files: FilePort = {
     ),
 };
 
+const emptyProcesses = { code: 0, stdout: '', stderr: '' };
+
 Deno.test('report never hides foreign or unproven survivors', () => {
   const registry = emptyRunResources('/home/codex/repos/fix-1046');
   const report = buildLeakReport(
@@ -100,6 +102,7 @@ Deno.test('successful Aspire probe survives unavailable Docker', async () => {
       if (command[0] === 'docker') {
         return Promise.reject(new Deno.errors.NotFound('docker absent'));
       }
+      if (command[0] === 'ps') return Promise.resolve(emptyProcesses);
       return Promise.resolve({
         code: 0,
         stdout: JSON.stringify([{ appHostPath: '/foreign/apphost.ts', appHostPid: 1 }]),
@@ -136,4 +139,114 @@ Deno.test('a resource outside the sibling root has no apparent owner', () => {
     '/srv/ci/checkout-a',
   );
   assertEquals(report.survivors[0].owner, 'unknown');
+});
+
+Deno.test('13.5.3 orphaned PPID-1 Aspire descendants are reported', async () => {
+  const snapshot: unknown = JSON.parse(
+    await Deno.readTextFile(
+      new URL('./__fixtures__/process-tree-13.5.3-orphaned.json', import.meta.url),
+    ),
+  );
+  if (!Array.isArray(snapshot)) throw new Error('process snapshot fixture must be an array');
+  const processes = snapshot.map((row) => {
+    if (
+      typeof row !== 'object' || row === null ||
+      !('pid' in row) || typeof row.pid !== 'number' ||
+      !('ppid' in row) || typeof row.ppid !== 'number' ||
+      !('elapsedSeconds' in row) || typeof row.elapsedSeconds !== 'number' ||
+      !('startedAt' in row) || typeof row.startedAt !== 'string' ||
+      !('commandLine' in row) || typeof row.commandLine !== 'string' ||
+      !('cwd' in row) || typeof row.cwd !== 'string' ||
+      !('environment' in row) || typeof row.environment !== 'string' ||
+      !('socketPaths' in row) || !Array.isArray(row.socketPaths) ||
+      !row.socketPaths.every((path: unknown) => typeof path === 'string')
+    ) {
+      throw new Error('invalid process snapshot fixture row');
+    }
+    return row;
+  });
+  const commands: CommandPort = {
+    run(command) {
+      if (command[0] === 'aspire') {
+        return Promise.resolve({ code: 0, stdout: '[]', stderr: '' });
+      }
+      if (command[0] === 'docker') {
+        return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+      }
+      if (command[0] === 'ps') {
+        return Promise.resolve({
+          code: 0,
+          stdout: processes.map((row) =>
+            `${row.pid}\t${row.ppid}\t${row.elapsedSeconds}\t${row.commandLine}`
+          ).join('\n'),
+          stderr: '',
+        });
+      }
+      throw new Error(`unexpected command: ${command.join(' ')}`);
+    },
+  };
+  const processFiles: FilePort = {
+    realPath(path) {
+      const match = path.match(/^\/proc\/(\d+)\/cwd$/);
+      const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
+      return Promise.resolve(process?.cwd ?? path);
+    },
+    readText(path) {
+      if (path === '/proc/net/unix') {
+        const lines = processes.flatMap((process) =>
+          process.socketPaths.map((socketPath: unknown, index: number) =>
+            `0000000000000000: 00000002 00000000 00010000 0001 01 ${process.pid}${index} ${socketPath}`
+          )
+        );
+        return Promise.resolve(lines.join('\n'));
+      }
+      const match = path.match(/^\/proc\/(\d+)\/(stat|cmdline|environ|net\/unix)$/);
+      const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
+      if (!process) return Promise.reject(new Deno.errors.NotFound(path));
+      if (match?.[2] === 'stat') {
+        return Promise.resolve(
+          `${process.pid} (aspire-managed) S ${process.ppid} ${
+            '0 '.repeat(17)
+          }${process.startedAt}`,
+        );
+      }
+      if (match?.[2] === 'cmdline') {
+        return Promise.resolve(process.commandLine.replaceAll(' ', '\0'));
+      }
+      if (match?.[2] === 'environ') {
+        return Promise.resolve(process.environment.replaceAll(' ', '\0'));
+      }
+      return Promise.resolve(process.socketPaths.join('\n'));
+    },
+    listNames(path) {
+      const match = path.match(/^\/proc\/(\d+)\/fd$/);
+      const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
+      if (!process) return Promise.reject(new Deno.errors.NotFound(path));
+      return Promise.resolve(
+        process.socketPaths.map((_path: unknown, index: number) => String(index)),
+      );
+    },
+    readLink(path) {
+      const match = path.match(/^\/proc\/(\d+)\/fd\/(\d+)$/);
+      const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
+      if (!process || !match || !process.socketPaths[Number(match[2])]) {
+        return Promise.reject(new Deno.errors.NotFound(path));
+      }
+      return Promise.resolve(`socket:[${process.pid}${match[2]}]`);
+    },
+  };
+  const sliceDir = await Deno.makeTempDir();
+  try {
+    const report = await runLeakCheck(
+      sliceDir,
+      '/home/codex/repos/fix-1046',
+      1,
+      commands,
+      processFiles,
+    );
+    assertEquals(report.survivors.map((entry) => entry.kind), ['process', 'process', 'process']);
+    assertEquals(report.survivors.map((entry) => entry.ownership), ['owned', 'owned', 'owned']);
+  } finally {
+    await Deno.remove(sliceDir, { recursive: true });
+  }
 });
