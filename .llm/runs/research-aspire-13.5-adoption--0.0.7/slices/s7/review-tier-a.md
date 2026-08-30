@@ -48,3 +48,16 @@ Consumer type-check (D-19): N/A — no generator/template change. No blocking fi
 - MEDIUM: slice-5 PR comment missing though the worklog claims it. LOW: `DCP_ENVIRONMENT_KEY`
   env-key false positive untested; MCP processes dropped rather than surfaced (note only).
 - Fix brief sent on the thread (slice 6). Cycle 2 follows.
+
+## Cycle 2 — head `eb6f188ce` (slice 6) — **sign-off to IMPL-EVAL cycle 2**
+
+- `scopedStopCommand(appHostPath, forcePersistent)` makes `--force` the stop variant while the
+  owned AppHost is running (`teardown.ts:57-61,192,244`); `NO_RUNNING_APPHOST_FOR_PERSISTENT_CLEANUP`
+  is an action-required line, never clean; positive confirmation only.
+- New test arms: `apply uses force-persistent as the single stop while the owned AppHost is
+  running`, `force-persistent refuses an already-gone AppHost and reports operator action`,
+  `force-stop accepts a persistent container only after a positive gone census`, `process probe
+  ignores worktree paths in Aspire-like env keys without Aspire identity` (env-key false positive).
+- Gates at `eb6f188ce`: configured lint wrapper exit 0 / 0 findings; `quality:scan` ok;
+  `arch:check` 0; `check:assets-barrel` PASS; teardown suite 46/0; check 0; raw lint/fmt clean;
+  no `--all` outside the forbidden-commands test; PR comments now 6 (slices 5 + 6 posted).
