@@ -3284,3 +3284,34 @@ No merge, publish, ready-flip, relabel, issue close, milestone change, central-c
 mutation, or release-writer lease. No Aspire, Docker, browser, `e2e:cli`, or `scaffold.runtime`.
 Root `deno task test` remains unusable on this host (~7.7k unreapable PID-1 zombies); `rtk` remains
 not installed.
+
+### Delivery-failure lesson — `codex-resume` exits 0 on a rejected send
+
+While supervising #1732 slice 1 I sent two follow-up steering messages. **Neither reached the
+author.** Both were rejected by the app server with:
+
+```
+thread-store conflict: thread 01a0517d-… already has an active writer (code -32600)
+```
+
+and in both cases the wrapper still **exited 0**. The task notification reported success, the
+transcript showed nothing, and `codex-status` had transiently dropped the thread from its session
+list — so three independent surfaces agreed on a turn boundary that had not happened. `ps` was the
+only surface that told the truth: pid `22880`/`22941`, the *original* `codex exec resume`, still
+running at 9 minutes and still holding the writer lock.
+
+I had briefly concluded the author was ending turns without committing. That was wrong. The original
+turn never ended; it was mid-flight the whole time, doing exactly the work the first brief covered.
+
+Two things follow, and the first is already written in this lane's own record:
+
+- **Check the resume output for `thread-store conflict` rather than assuming delivery** — the
+  standing instruction, now with a concrete cost attached. Exit 0 is not delivery.
+- **A wrapper's exit code attests the wrapper, not the send.** Same shape as the receipt rule this
+  lane already enforces for gates: an empty-selection wrapper exit is a refusal, not a green. Here an
+  exit-0 launcher is a *rejection*, not a delivery.
+
+No harm resulted — the lock is precisely what stopped a second steering message from racing the
+author mid-turn, which is the failure this lane has had to unwind before. But had the messages
+carried *new* scope rather than restating the brief, I would have believed instructions were in force
+that the author had never seen. Verify delivery, then act.
