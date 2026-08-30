@@ -144,6 +144,8 @@ describe('generateDbCliMode', () => {
 
     assertStringIncludes(runTool, 'export async function runTool(')
     assertStringIncludes(runTool, 'readonly timeoutSeconds?: number')
+    assertStringIncludes(runTool, 'readonly actionableStderr: readonly string[]')
+    assertStringIncludes(runTool, 'stripVTControlCharacters(line)')
     assertStringIncludes(runTool, "child.kill('SIGTERM')")
     assertStringIncludes(aspireCompat, 'DbCliModeExcludeFromMcp: true')
   })
