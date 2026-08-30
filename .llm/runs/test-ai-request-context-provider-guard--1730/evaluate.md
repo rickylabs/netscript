@@ -293,3 +293,209 @@ All mutations (B, B2, B3, B4, A) were applied by `sed`, run, and reverted with `
 clean after each. A detached base worktree at `3e5cbabf` was created under the job tmp dir for the
 doc-lint/JSR base measurements and removed after this file was written. No PR, issue, label,
 milestone, acceptance box, or `deno.lock` was touched.
+
+---
+
+# IMPL-EVAL cycle 2 (narrow re-evaluation) — repair head `1c836918`
+
+**VERDICT: PASS** — F-1 is genuinely closed; no further un-projected provider-bound loop path
+exists; the durable trail is accurate; the leaf is terminal at `1c836918`.
+
+Fresh, separate `formal_impl_evaluation` session (Claude Fable 5 · medium, native opposite family
+for the Codex-authored repair). Own detached worktree `ns1730-impleval2`, not `007-leaf-1730`
+(D-19). Job `dd9f5faf`, session `https://claude.ai/code/session_016aqGdaUwZxz1tCnzVdzAYi`. This
+session fixed nothing; every perturbation below was reverted and the tree proven clean after each.
+
+Scope is fixed to cycle-1 F-1…F-7. Everything cycle 1 ruled `PASS` (five acceptance points, S3
+rename, retry/continuation coverage, mutation-A delegation, gitignored-receipt design) carries
+forward unchanged and was not reopened. Failure count entering this cycle: 1 of 2.
+
+## Identity — verified, not inherited
+
+| Check | Result |
+| --- | --- |
+| local `HEAD` | `1c836918abde397b320941f70063d83f25f6c355` (detached) |
+| `origin/test/ai-request-context-provider-guard` after `git fetch` | equal |
+| PR #1763 `headRefOid` | equal; `OPEN`, draft, base `main`, labels `status:impl area:ai-core type:test priority:p1` |
+| merge base vs `origin/main` | `3e5cbabf` (unchanged since cycle 1) |
+| commits since cycle 1 | exactly one: `1c836918 test(ai): prove call-option context invisibility` |
+| delta `6977debd..HEAD` | `request_context_test.ts` (+13/−12), `worklog.md`, `context-pack.md`, `drift.md` — nothing else |
+| tree | `git status --porcelain` → 0 lines before and after every step |
+
+## 1. F-1 closure — mutations re-run at `1c836918`
+
+Named test under measurement: `agent loop: keeps context out of every provider-bound retry and
+continuation request` (`request_context_test.ts:356`). Each mutation was applied with `sed` to
+`packages/ai/src/agent/loop.ts`, run through the structured wrapper, reverted with
+`git checkout --`, and followed by `git status --porcelain` = 0 and
+`git diff --exit-code HEAD -- packages/ai/src` = empty.
+
+| Mutation | Line | Result | Payload path exposed |
+| --- | --- | --- | --- |
+| **B2** (brief) `{ signal, modelOptions: { ctx: JSON.stringify(input.context) } }` | 164 | **red**, 0/1, 1,554 ms | `callOptions.modelOptions.ctx` |
+| B6 (mine) `{ signal, modelOptions: { ctx: input.context } }` — raw object, not stringified | 164 | **red**, 0/1, 1,280 ms | `callOptions.modelOptions.ctx.{documentIds,tenantId}` |
+| B5 (mine) `{ signal, connection: { baseURL: JSON.stringify(input.context) } }` | 164 | **red**, 0/1, 1,136 ms | `callOptions.connection.baseURL` |
+| **B** (brief) `system: (input.system ?? "") + JSON.stringify(input.context)` | 159 | **red**, 0/1 | `system` |
+| B3 (cycle-1 F-2) `resolveModelId(input.model) + JSON.stringify(input.context)` | 116 | red in full run 146/147; the one failure is exactly the incidental owner the comment names: `agent loop: single text turn transitions idle -> running -> done` (`agent_loop_test.ts:44`) | model id |
+| B7 (mine) `{ signal: Object.assign(signal, { ctx: JSON.stringify(input.context) }) }` | 164 | green 1/1 — **expected**, see § 3 | — |
+| restored | — | full `packages/ai/tests/` 147/147 green, 2,999 ms | — |
+
+B2 — which left 147/147 green at `1baabbd6` — now fails the named test. **F-1 is closed.** B5/B6
+show the projection covers the whole `ChatClientCallOptions` shape (`modelOptions`, `connection`),
+not just the one field cycle 1 named, and is not defeated by passing the context unstringified.
+
+## 2. Third-escape hunt — none found
+
+Enumerated every value in `loop.ts` `run()` that reaches the provider port:
+
+| Provider-bound path from the loop | Guard coverage |
+| --- | --- |
+| `provider.createChatClient(modelId)` (`loop.ts:140`) | F-2: incidental owner, verified red above (B3) and named in the guard's comment |
+| `client.stream(request, …)` arg 1: `messages` (via `history.apply(working)`, includes loop-built assistant + tool messages on continuation), `system`, `tools`, `options` | projected (cycle 1 + B/B4; continuation is request 3) |
+| `client.stream(…, options)` arg 2: `modelOptions`, `connection` | projected minus `signal` (B2/B5/B6 red) |
+| `signal` | excluded — § 3 |
+
+Nothing else in the loop touches the provider: `telemetry`, `history`, `executeToolCall` (receives
+`context` by design — that is the positive tool-side test), and `AgentChunk` yields are all
+loop-side. The retry wrapper (`provider-retry.ts:55`) forwards the *same* `options` object to every
+attempt, so index pairing `provider.callOptions[i]` ↔ `provider.requests[i]` is sound for the
+retry, and the recording double records **below** the wrapper, so a retry-specific mutation would
+still be seen. I assumed a third path existed and did not find one; the loop's provider-bound
+surface is fully enumerated.
+
+## 3. `signal` exclusion — correct
+
+`ChatClientCallOptions.signal` is an `AbortSignal`. In the bridge
+(`tanstack-chat-client.ts:152–178`) the external signal is read only for `.aborted` and
+`addEventListener('abort', …)`; the object itself is never handed to `chat()` — the bridge passes
+its **own** fresh `AbortController`. So neither `signal.reason` nor any expando on the signal can
+reach the wire. B7 (context stapled onto the signal) staying green is therefore the correct outcome:
+including `signal` in the projection would have made B7 a **false positive** (a "leak" to a value
+that is off the wire by construction). The exclusion is precise, not merely convenient.
+
+## 4. F-10 ceiling
+
+`wc -l request_context_test.ts` = **498**; doctrine F-10 (`09-anti-patterns-and-fitness-functions.md:266`)
+caps `_test.ts` at 500 LOC. Two lines of headroom. **Yes, the guard is at a ceiling**: any further
+guard growth (e.g. recording `modelId` to make F-2 non-incidental, or a fourth mutation vector)
+forces a split. The natural seam is adapter-wire tests (Anthropic/OpenAI direct capture, lines
+~60–290) versus loop-guard tests (~293–498). Not a finding for this leaf; a note for the next one
+that touches this file.
+
+## 5. Receipts at `1c836918` — field audit (independent read, `007-leaf-1730` receipt dir)
+
+| Receipt | `gitHead`=`actualGitHead` | `requestHash` | attempt | exit | ms | argv | receipt's own output shows full work |
+| --- | --- | --- | ---: | ---: | ---: | --- | --- |
+| `check-final.json` | `1c836918` | `794b620ea194` | 1 | 0 | 8,090 | `deno task check` | yes — wrapper JSON: 2,937 files, 25 batches, 0 failed, 0 diagnostics; no `inputs unchanged` marker |
+| `test-final.json` | `1c836918` | `83e426945c5a` | 1 | 0 | 3,615 | `deno task test packages/ai/tests/` | 147/147 |
+| `lint-final.json` | `1c836918` | `45e1e8bc4ab7` | 1 | 0 | 6,420 | `deno task lint` | 2,052 files processed, 0 findings |
+| `fmt-check-final.json` | `1c836918` | `3d35718b192b` | **3** | 0 | 1,907 | `deno task fmt:check` | 2,053 files processed, 0 findings (see note) |
+| `quality-gate-final.json` | `1c836918` | `4c6595a7a3d0` | 1 | 0 | 7,836 | `deno task quality:gate` | pre-existing `export default` warnings only |
+| `doc-lint-final.json` | `1c836918` | `869bf201de89` | 1 | 1 | 1,055 | `deno task doc:lint --root packages/ai --pretty` | contracted base-red |
+| `publish-dry-run-final.json` | `1c836918` | `fd17b317ef7a` | 1 | 0 | 28,664 | `deno task publish:dry-run` | 342 KB stderr ending `Success Dry run complete` |
+
+All seven: `gitHead == actualGitHead == 1c836918`, seven **distinct** `requestHash` values, cwd
+`/home/agent/projects/netscript/worktrees/007-leaf-1730`, `durationMs` = `finishedAt − startedAt`.
+
+**Ruling on the supervisor's self-correction (short duration ≠ replay).** The refinement is
+**right**, and I can sharpen why. There are two distinct caches:
+
+1. **Deno task input cache.** Root `check`, `lint`, and `fmt:check` declare `files` in `deno.json`
+   (`deno.json:33–44, 140–160`); `test`, `publish:dry-run`, `quality:gate`, `doc:lint` are plain
+   strings and cannot be skipped. A task-cache skip runs **nothing** and prints the
+   `cached, inputs unchanged` marker. Measured here: `deno task check` cold in this fresh worktree
+   **91,004 ms**, immediately again **90 ms** with the marker and **no wrapper output**. That is the
+   150 ms replay defect and the two `fmt-check` attempts the R1 comment says were detected and
+   discarded.
+2. **`deno check`'s incremental type-check cache.** The wrapper still runs and walks every file;
+   only the per-module type-check work is reused. The `check` receipt shows exactly this: 8,090 ms
+   with the full wrapper JSON (2,937 files / 25 batches) and no marker — a real run over a warm
+   cache in a worktree that had already checked at `1baabbd6`.
+
+So the rule should read: **a receipt is a replay iff its own output lacks the gate's full work
+summary or carries the task-cache marker — duration is a prompt to look, never the verdict.** A
+duration-only rule would flag every warm `check` and teach people to ignore it, as the brief feared.
+`publish:dry-run` is confirmed non-caching: 29,788 ms then 31,553 ms back-to-back here.
+
+**Note on `fmt-check` attempt 3 (informational, not blocking).** The R1 comment says the third
+attempt was cut "after two detected cache skips" using a "temporary formatter cache-bust input"
+later removed. The receipt selected **2,053** files; `lint` at the same head with the identical
+roots/exclude selected **2,052**, and my own `fmt:check` here selects **2,052**. The extra file is
+the temporary cache-bust input, inside the measured selection. Consequence: the fmt receipt
+measured the head tree plus one untracked scratch file, all 2,053 clean. The 2,052 committed files
+were fully formatted-checked with 0 findings, and my independent run confirms it, so the verdict
+stands; but the cleaner cut is `deno fmt --check` via the wrapper directly (bypassing the cached
+task) or `DENO_TASK_NO_CACHE`-style bypass, so the receipt's selection equals the head exactly.
+Worth a one-line note in the receipt protocol.
+
+## 6. Hygiene over the merge base `3e5cbabf`
+
+| Check | Result |
+| --- | --- |
+| `git diff 3e5cbabf..HEAD -- deno.lock` | 0 bytes |
+| `git diff --stat 3e5cbabf..HEAD -- . ':!packages/ai/tests' ':!.llm/runs'` | **empty** — zero product, zero generated carrier |
+| files changed over merge base | 7 run-dir artifacts + `packages/ai/tests/request_context_test.ts` (+85/−8) |
+
+## Independent gate re-run at `1c836918` (this worktree, clean tree)
+
+| Gate | Result |
+| --- | --- |
+| `deno task check` (cold) | exit 0, 91,004 ms, 2,937 files, 0 diagnostics |
+| `deno task lint` | exit 0, 2,052 files, 0 findings |
+| `deno task fmt:check` | exit 0, 2,052 files, 0 findings |
+| `deno task quality:gate` | exit 0, pre-existing warnings only |
+| `deno task test packages/ai/tests/` | 147/147 |
+| `deno task doc:lint --root packages/ai --pretty` | exit 1, per-entrypoint private refs sum to **128**, missing JSDoc 0 — identical to base (zero-delta base-red, as contracted in cycle 1) |
+| `deno task publish:dry-run` ×2 | exit 0 both, `Success Dry run complete` |
+
+## 7. Durable trail (F-3 / F-4 / F-6)
+
+`worklog.md § Corrected prior-head receipt audit` now states the `publish-dry-run` facts correctly:
+workspace `deno task publish:dry-run`, cwd = worktree root, attempt 2, 30,719 ms, and that the
+150 ms value "was a replay and is not evidence". `drift.md` records the D1 amendment (both stream
+arguments). The **current-head** receipt table lives in the R1 PR comment
+(`issuecomment-5469299415`) and, by the cycle-1 ruling on the gitignored-receipt design, is made
+durable by this independently re-derived audit in the committed `evaluate.md` (§ 5 above) — the
+worklog's `RE-CUT_PENDING` row cannot be updated without moving the head, which is the defect the
+design avoids. **Accurate.** F-5 is closed by `issuecomment-5469233540` (Tier-A `ACCEPTED` at
+`1baabbd6`); the R1 slice itself has not yet received a Tier-A sign-off comment — see § Owed.
+
+## Findings (cycle 2)
+
+| ID | Severity | Finding | Action |
+| --- | --- | --- | --- |
+| F-8 | informational | `fmt-check-final.json` attempt 3 measured 2,053 files (head + temporary cache-bust input); independently confirmed clean at 2,052. | none for this leaf; receipt protocol note |
+| F-9 | informational | `request_context_test.ts` at 498/500 LOC — next change to this file must split it. | none for this leaf |
+
+No blocking finding.
+
+## Rulings
+
+1. **Is F-1 genuinely closed, and is the guard sufficient?** **Yes and yes.** B2 is red on the named
+   test (0/1), as are the two additional call-option vectors I added (`connection`, raw-object
+   `modelOptions`), and B remains red. The loop's provider-bound surface is exactly
+   `createChatClient(modelId)` + `stream(request, options)`; the projection covers both `stream`
+   arguments minus the off-wire `signal`, and `modelId` has a verified red owner named in the
+   comment. I looked for a third path and there is none.
+2. **Is the durable trail accurate on `publish-dry-run` (F-3/F-4/F-6)?** **Yes.** Workspace argv,
+   attempt 2, 30,719 ms, replay disclaimed — all in `worklog.md`; the current-head set is
+   re-audited here with matching fields.
+3. **Is the leaf terminal at `1c836918`?** **Yes. It is merge-ready on evidence.** Zero product
+   change over the merge base, `deno.lock` untouched, all required `packages/ai` gates green at the
+   exact head (receipts and independent re-run agree), doc-lint zero-delta base-red as contracted.
+
+## Owed by the coordinator (no code)
+
+- Tier-A sign-off of the **R1 slice** on PR #1763 (the existing Tier-A comment accepts S1–S4 at
+  `1baabbd6`; A1 requires the supervisor's review of every landed slice).
+- Ready flip and `status:` relabel per `netscript-pr` — evaluator-forbidden.
+- Optional: one-line receipt-protocol note from § 5 (replay test = output/marker, not duration;
+  cut cached tasks so the selection equals the head).
+
+## Perturbations and cleanup
+
+Mutations B2, B6, B5, B7, B, B3 applied by `sed` to `packages/ai/src/agent/loop.ts`, each reverted
+with `git checkout --`; `git status --porcelain` = 0 and `git diff --exit-code HEAD -- packages/ai/src`
+empty after every one; full suite 147/147 on the restored tree. Gate output and scratch scripts lived
+in the job tmp dir only. No PR, issue, label, milestone, acceptance box, PR body, or `deno.lock` was
+touched. `007-leaf-1730` was read (receipts) and never written.
