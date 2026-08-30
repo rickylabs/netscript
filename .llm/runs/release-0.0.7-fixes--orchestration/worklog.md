@@ -5012,3 +5012,39 @@ only for what remains: source-compat/JSR/doc-lint confirmation for the widened p
 transport changed rather than to manufacture green, and F5 confirmation. Verified already done in
 `4b67a14c`: F4 explicit behavior-change line, F6 drift entries with base-proof for plan gates 12/17,
 F7 composition note, and the send-path semantics paragraph.
+
+### #1368 — corpus regenerated, Tier-A signed, IMPL-EVAL cycle 2 dispatched
+
+Coordinator reported the author terminal at `309487d6`. That head was two commits stale by the time
+the message arrived, and the drift is my doing: my stale correction caused `45c77a21` (revert of the
+good design) and then `f1e7d03a` (revert of that revert), followed by `ed270f2a` recording the
+assertion refinement. Net product state at `ed270f2a` is byte-identical to the accepted `4b67a14c`.
+
+Body/issue truth correction was already complete before the coordinator's message — issue #1368 item 1
+amended to the real three-owner boundary, PR #1764 body rewritten at the live head, both moved to
+`status:impl`.
+
+Released corpus regeneration: `deno task gen:mcp-export-corpus` at the terminal author head. Exactly
+one carrier moved; `packageCount 35 / subpathCount 270 / symbolCount 7614` identical to the plan
+baseline. Committed `89bfa6ca` and pushed. The other three cascade writers did not move.
+
+Exact-head gates at `89bfa6ca`, clean tree: focused 12/0, whole core 84/0/3, plugin 7/0, check/lint/
+scoped-fmt 0 findings over 112 files, `arch:check` 0, core JSR audit exit 0 (two baseline WARNs),
+`publish:dry-run` 0, all four derivative checks 0, lock byte-unchanged, ceiling 17-of-19 plus the
+authorized corpus carrier.
+
+**My gate-script error, caught before it reached anyone:** the first sweep reported the core JSR audit
+as exit 1. That was a module-not-found from my script pointing at `.llm/tools/jsr/audit-jsr-package.ts`;
+the real tool is `.llm/tools/fitness/audit-jsr-package.ts` and the audit is exit 0. Script corrected.
+A gate script's own failure must never be reported as the leaf's failure.
+
+Tier-A PASS written and pushed as `22f6fa61`, recording all four of my supervisor errors on this leaf.
+IMPL-EVAL cycle 2 dispatched on the native opposite-family Fable 5 route into
+`007-eval-1368` / `eval/impl-eval-1368-cycle-2` at `22f6fa61`. Preconditions checked this time per the
+rule cycle 1 taught: context-pack carries no unlanded author slice, and the author thread is idle with
+no `codex exec` process. Cycle 2 is terminal — `PASS_IMPL` or `FAIL_IMPL`, no cycle 3.
+
+**Host cleanup audit (~17:05, ~23 background CLI processes killed):** no worker of mine died mid-flight
+needing relaunch — all senders had already reported completion and the gate sweep exited 0. The only
+live `codex exec` on the host belongs to the **Aspire lane** (thread `01a052fc`, worktree
+`007-aspire-s11-audit`); left untouched. Leaf and eval worktrees intact, both clean.
