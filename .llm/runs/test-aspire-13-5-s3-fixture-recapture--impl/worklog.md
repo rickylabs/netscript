@@ -74,6 +74,11 @@ the capture provenance in that fixture folder's README, then update the parity e
 | 2026-08-30 | B2    | restore/start | Restored the exact 13.5.3 scratch AppHost, registered its identity, and used the single isolated start as the remote-dind probe. |
 | 2026-08-30 | B2    | blocked | PostgreSQL and Redis failed container creation because the remote Docker daemon cannot see worktree bind sources; workers remained waiting, so capture stopped without workaround/retry. |
 | 2026-08-30 | B2    | teardown | Exact AppHost stop passed; leak-check survivors `[]`; teardown preview empty; final Aspire/Docker inventories empty. |
+| 2026-08-30 | B3    | attempt-2 lease | New separately serialized lease granted after attempt-1 terminal cleanup; local preflight reconfirmed empty Aspire/Docker/volume/process state and head equality. |
+| 2026-08-30 | B3    | scratch correction | Recorded the authorized scratch-only removal of every database/cache `DataPath`; no product or generator source change is authorized. |
+| 2026-08-30 | B3    | attempt-2 start | Restored SDK 13.5.3 and performed the one authorized isolated start; registered PID 383334/start identity 26619412 before waiting. |
+| 2026-08-30 | B3    | endpoint probe | BLOCKED: PostgreSQL was published on the remote daemon's `127.0.0.1:17858`, while the AppHost health check and an independent local probe both received connection refused. No retry or workaround; receipt `receipts/08-phase-b-attempt-2-capture.md`. |
+| 2026-08-30 | B3    | attempt-2 teardown | Stopped the exact AppHost, registered and removed only its positively proven persistent PostgreSQL survivor, removed its same-second anonymous volume and scratch tree; final leak survivors `[]`, Aspire `[]`, Docker containers/volumes empty. |
 
 ## Phase B Lease Preflight — verbatim
 

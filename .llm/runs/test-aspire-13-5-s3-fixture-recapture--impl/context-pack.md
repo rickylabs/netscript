@@ -6,17 +6,18 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl`   |
 | Branch         | `test/aspire-13-5-s3-fixture-recapture`         |
-| Current phase  | `phase B blocked — remote-dind topology; teardown complete` |
+| Current phase  | `phase B attempt 2 blocked — endpoint topology; teardown complete` |
 | Archetype      | `2 - Integration`                               |
 | Scope overlays | `none`                                          |
 
 ## Current State
 
-Draft PR #1741 is at the phase-A IMPL-EVAL cycle-2 PASS head `fe4f496bd`. The serialized phase-B
-lease was exercised once on the corrected D-39 host. The exact 13.5.3 AppHost started, but its
-PostgreSQL and Redis containers failed because the remote Docker daemon cannot see worktree-local
-bind sources. Required worker resources remained waiting, so no dashboard envelope could be
-captured. Exact AppHost stop, leak-check, teardown preview, and final empty inventories all passed.
+Draft PR #1741 is at `2b0d33bd`: phase-A IMPL-EVAL cycle-2 PASS plus the fully torn-down attempt-1
+probe receipt. The separately serialized attempt-2 lease exercised one 13.5.3 AppHost after the
+authorized scratch-only omission of database/cache `DataPath` keys. Bind mounts were eliminated,
+but remote-DinD ports were published on the daemon host's loopback and were unreachable from this
+AppHost container. No envelope was captured. Exact owned teardown completed with leak survivors
+`[]`, Aspire `[]`, and empty Docker container and volume inventories.
 
 ## Completed
 
