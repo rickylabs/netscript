@@ -330,3 +330,29 @@ authority for the environment-sensitive root test. This evidence table is commit
 because the supervisor explicitly required the preceding generator commit to contain only the
 authoritative barrel. No Aspire, Docker, AppHost, CLI E2E, label, milestone, readiness, merge, or
 issue-state action was taken.
+
+## Follow-up 2 — T-1 streams default-port deprecation
+
+`DEFAULT_STREAMS_PORT` remains a compatibility export with value `4437` and no runtime consumers.
+Its JSDoc now matches the sibling D-14 treatment: it is explicitly not a runtime fallback and names
+the planned 0.0.8 compatibility-export removal. No consumer was added or redirected to it.
+
+### Exact content-head gate evidence
+
+Tested SHA: `2e8c6f4f425f525efadc4b952739a2af587319a9`
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `deno task check` | 0 | 2,938 files checked in 25 batches; 0 diagnostics. |
+| `deno task test` | 1 | 4,282 passed, 2 failed, 19 ignored. The failures are the pre-existing host-process cases: `codex-follow_test.ts` could not create an inotify watcher (`Too many open files`, host maximum 128 instances), and `hybrid-launcher_test.ts` observed a test-owned worker descendant survive cancellation as a PID-1 zombie. No test was changed, skipped, ignored, or narrowed. |
+| `deno task test` (clean retry) | 1 | 4,282 passed, 2 failed, 19 ignored with the same two host-process failures; the retry confirms the local host condition rather than a T-1 regression. |
+| `deno task lint` | 0 | 2,051 files processed in 36 batches; 0 findings. |
+| `deno task quality:scan` | 0 | Repository scan has 0 findings; 7 bounded pre-existing allowances. |
+| `deno task arch:check` | 0 | Doctrine scan has 0 failures; existing warnings only. |
+| `deno task check:assets-barrel` | 0 | Regenerated and compared all seven authoritative barrels; no diff. |
+| `deno task check:publish-assets` | 0 | Checked the declared publish-asset inputs and generated outputs; no drift. |
+
+`git status --porcelain=v1` was empty after the content-head gate set, and `deno.lock` remained
+unchanged. Exact-final-head CI is the remote authority for the environment-sensitive root test. No
+Aspire, Docker, AppHost, CLI E2E, label, milestone, readiness, merge, close, or issue-state action
+was taken. Tier-A sign-off and IMPL-EVAL remain separate from this implementation lane.
