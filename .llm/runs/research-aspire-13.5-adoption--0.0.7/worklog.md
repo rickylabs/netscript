@@ -467,4 +467,9 @@ hosted tiers queued behind the serial chain (chain-2); delta IMPL-EVAL on runtim
 `verify-live-db-endpoint.ts` + `runtime-gates.ts` + tests + 13.5.3 describe fixture + run artifacts;
 inequality throw replaced by live second-endpoint proof; delta tests 29/0; e2e-root check 170/0;
 workflows untouched. Hosted tiers queued (chain-2, keyed to
-`e0d70e40407458bebcf02cc408bea6b49107f42b`). |
+`e0d70e40407458bebcf02cc408bea6b49107f42b`). | | **S3 MERGE PACKET — exact-green** | PR #1741 head
+`338922a20db6` (= cycle-4 PASS `6c699ab66` + identity rebase + evidence-only sign-off), base
+`main`@`52a881c5`, ready (not draft), sole `status:ready-merge` on PR+#1715, `Closes #1715`. Hosted
+run 33329358883 SUCCESS all tiers at the exact head; ci run 33329453582 close-gate **success** after
+label rerun; mirror APPLIED 4/4 boxes + provenance; review-threads PASS (0 threads); checks at head
+6 success / 24 skipped / 0 red. Coordinator lands the merge. |
