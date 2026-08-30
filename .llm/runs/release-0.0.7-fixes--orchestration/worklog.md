@@ -5820,3 +5820,30 @@ targeting the observed failure mode, and an explicit closing checklist (write ve
 `gh pr comment`) so completion isn't left implicit. Running now.
 
 Running total OpenRouter DeepSeek spend this leaf: **$2.27** across two incomplete attempts.
+
+### #1739 IMPL-EVAL — `PASS_IMPL`, third attempt succeeded, verified independently
+
+Verdict commit `54c72a970` on `eval/impl-eval-1739-cycle-3`, PR comment confirmed posted (`20:56:51Z`),
+both checked directly rather than trusted from the launcher's own success report — the first two
+attempts both reported clean exits while doing nothing.
+
+All 15 non-runtime gate rows independently reproduced, matching my Tier-A exactly, plus one thing I
+hadn't done: **patch-identity checked for all 11 ceiling paths individually**, not just spot-checked —
+every one `git diff --quiet`-clean across both main merges. Row 16 judgment is precise: the bounded
+`behavior.package-backed-plugin-doctor` proof is sufficient for `PASS_IMPL`, explicitly **not** read as
+"the full suite passed" — the full `scaffold.runtime` run remains genuinely unproven and stays assigned
+to the supervisor-owned lease.
+
+PR #1739 body updated: DoD ticked through fresh IMPL-EVAL, the bounded-proof line added and ticked, the
+full-suite line left unticked with the Chromium-absence reason and cross-reference to #1764's identical
+finding. Labels moved to `status:impl` (same reasoning as #1764/#1781 — no evaluation pending, but
+`ready-merge` would be false with row 16 open).
+
+**Total OpenRouter DeepSeek spend for this evaluation: $2.27 + $1.09 = $3.36** across three attempts (one
+substantial-but-incomplete, one near-zero resume failure, one complete). Recorded for the record, not as
+a complaint — the sanctioned fallback route worked on the third try.
+
+**#1739 now joins #1764 and #1781** as one runtime gate from merge-ready. All three need
+`scaffold.runtime` (or Flow-B specifically for #1764) under the singleton lease, still held by Aspire.
+#1758 needs a bare `e2e:cli` rerun, also lease-gated. Queue order unchanged: #1764 → #1758 → #1739 →
+#1781.
