@@ -136,7 +136,9 @@ dependency shape, or required file outside the listed ceiling means: stop, appen
 the rescope, and do not continue.
 
 Regeneration by the contracted `gen:*` tasks is ceiling-exempt only for their named generated
-carrier outputs in the slice that staled them, and those outputs must be committed with that slice:
+carrier outputs **in the slice that staled them — or, for the Slice 1 corpus staleness recorded in
+PLAN-EVAL cycle 2 (F-2'), in a supervisor-signed `chore(mcp)` regeneration commit landed before Slice
+2 starts** — and those outputs must be committed with that slice:
 `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, every path in
 `PUBLISH_ASSET_OUTPUTS`, `.llm/assets/agent-docs/{prose.json.gz,provenance.json}`, and the generated
 barrels checked by `check:assets-barrel`. This exception does not authorize hand edits or any other
@@ -156,7 +158,7 @@ Ceiling:
 - `packages/sdk/tests/type-fixtures/procedure-meta_type.ts`
 
 Tier-A stop: scoped check/lint/fmt; contracts and SDK package tests; contracts and SDK JSR audits;
-`docs:exports-drift`.
+`docs:exports-drift`; `mcp-export-corpus`.
 
 ### Slice 2 — Typed context public surface (type contract only)
 
@@ -192,7 +194,8 @@ Ceiling:
 - `packages/service/tests/handlers_test.ts`
 - `packages/service/tests/auth/builder-auth_test.ts`
 
-Tier-A stop: scoped check/lint/fmt; service tests; `quality:gate`; deno.lock hash check.
+Tier-A stop: scoped check/lint/fmt; service tests; `quality:gate`; `mcp-export-corpus`; deno.lock
+hash check.
 
 ### Slice 4 — Contract-policy service ports (type contract only)
 
@@ -233,8 +236,8 @@ Ceiling:
 - `packages/service/tests/auth/builder-auth_test.ts`
 - `packages/service/tests/auth/contract-authorizer_test.ts` (new)
 
-Tier-A stop: scoped check/lint/fmt; service tests; `quality:gate`; service JSR audit; deno.lock hash
-check.
+Tier-A stop: scoped check/lint/fmt; service tests; `quality:gate`; service JSR audit;
+`mcp-export-corpus`; deno.lock hash check.
 
 ### Slice 6 — OpenAPI access projection (behavior only)
 
@@ -248,7 +251,7 @@ Ceiling:
 - `packages/service/tests/auth/contract-authorizer_test.ts`
 
 Tier-A stop: scoped check/lint/fmt; service tests; service `deno doc --lint`; service JSR audit;
-`quality:gate`.
+`quality:gate`; `mcp-export-corpus`.
 
 ### Slice 7 — MCP access result contract (type/schema contract only)
 
@@ -281,7 +284,8 @@ Ceiling:
 - `packages/mcp/tests/openapi-read-tools_test.ts`
 - `packages/mcp/tests/fixtures/openapi/no-db-generated-openapi.json`
 
-Tier-A stop: scoped check/lint/fmt; MCP tests; MCP JSR audit; `quality:gate`; deno.lock hash check.
+Tier-A stop: scoped check/lint/fmt; MCP tests; MCP JSR audit; `quality:gate`; `mcp-export-corpus`;
+deno.lock hash check.
 
 ### Slice 9 — Adoption documentation (docs only)
 
@@ -302,7 +306,8 @@ Ceiling:
 
 Tier-A stop: docs doctests reachable through affected package suites; scoped check/lint/fmt;
 `docs:exports-drift`; contracts/service/SDK/MCP JSR audits; service `deno doc --lint`;
-`quality:gate`; `docs-tagline`; `publish-assets`; `agent-docs-prose`; `assets-barrel`.
+`quality:gate`; `mcp-export-corpus`; `docs-tagline`; `publish-assets`; `agent-docs-prose`;
+`assets-barrel`.
 
 No product file outside those nine ceilings is authorized. In particular, no plugin-core contract,
 CLI scaffold/template, `packages/ai`, auth provider, or lockfile edit is allowed.
@@ -387,7 +392,7 @@ the applicable subset; the final Tier-B readiness run uses all contracted green 
 | 10    | `G-JSR-SDK`       | `audit-jsr-package.ts --root packages/sdk`                                                                                                                                                     | PASS with warnings only                                   |
 | 11    | `G-JSR-MCP`       | `audit-jsr-package.ts --root packages/mcp`                                                                                                                                                     | PASS with warnings only                                   |
 | 12    | `G-LOCK`          | Compare SHA-256 and `git diff` for `deno.lock` against the slice baseline                                                                                                                      | Must remain byte-identical                                |
-| 13    | `mcp-export-corpus` | `deno task check:mcp-export-corpus`                                                                                                                                                           | PASS at base; required at Slices 2/4/7 and final readiness |
+| 13    | `mcp-export-corpus` | `deno task check:mcp-export-corpus`                                                                                                                                                           | PASS at base; **required at every slice (1-9) and final readiness**. The corpus records each public symbol's signature and JSDoc, not just the symbol list, so any slice touching an exported declaration or its JSDoc stales it; the gate runs in under a minute, so per-slice is the only honest contract point. (PLAN-EVAL cycle 2, F-2'.) |
 | 14    | `docs-tagline`    | `deno task docs:tagline:check`                                                                                                                                                                 | PASS at base; required at Slice 9 and final readiness     |
 | 15    | `publish-assets`  | `deno task check:publish-assets`                                                                                                                                                               | PASS at base; required at Slice 9 and final readiness     |
 | 16    | `agent-docs-prose` | `deno task check:agent-docs-prose`                                                                                                                                                            | PASS after the post-S0 base probe: 639 site files built, rendered output OK, bundle fresh (7.33 s); required at Slice 9 and final readiness |

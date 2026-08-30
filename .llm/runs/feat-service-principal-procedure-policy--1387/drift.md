@@ -75,3 +75,44 @@ documentation.
 - **Evidence:** `git diff --name-status 625447f1..f8b4f804`; Slice 0 already requires a full rebase
   and base-gate rerun after #1466 lands, so this planning commit remains anchored to its truthful
   research SHA rather than chasing an unrelated moving main.
+
+## D-3 — Slice 1 staled the MCP export corpus; the gate was contracted at the wrong slices
+
+**Severity:** minor · **Class:** gate contract · **Shape:** #1769
+
+**Observed.** `deno task check:mcp-export-corpus` is **exit 0** at base `24f6642f` and **exit 1** at
+Slice 1's head `c0d61e648ada` — `MCP export-surface corpus is stale; run deno task gen:mcp-export-corpus`.
+Found by PLAN-EVAL cycle 2 (F-2′) and reproduced independently by the supervisor in a detached
+worktree; both trees give the same results.
+
+**Cause.** The corpus records each public symbol's **signature and JSDoc**
+(`generate-export-surface-corpus.ts` `renderSignature` / `renderJsDoc`), not merely the symbol list.
+Slice 1's additive widening of `NetScriptProcedureMeta.access` changes the rendered signature of an
+exported contracts type — no new symbol, but a changed one.
+
+PLAN-EVAL cycle 1's F-2 modelled the gate as sensitive to **symbol growth**, and so contracted it only
+at Slices 2/4/7 — the slices that add symbols. That model was wrong: **every slice touching an
+exported declaration or its JSDoc stales the corpus**, which includes Slice 1 (done) and plausibly 3,
+5, 6 and 8.
+
+**Why it went unnoticed at Slice 1.** The gate was not contracted for Slice 1, so nobody ran it. The
+Slice 1 worklog line "the MCP export corpus … had no tracked movement from the content head" is true
+and **non-probative**: the tracked file did not move *because nothing exercised the gate*. The
+supervisor's Tier-A made the same mistake, checking `git status` for carrier movement instead of
+running the carrier gates — a negative conclusion drawn from a signal that was never generated. It is
+the same class as the `argv`/`durationMs` receipt lesson: an artifact that looks clean because nothing
+tested it.
+
+**Consequence had it stood.** Slice 2's contracted `mcp-export-corpus` would have been **red on
+arrival**, for a cause outside Slice 2's ceiling exemption — exactly the stop-and-rescope trigger F-2
+existed to remove.
+
+**Resolution (owner path 1, no cycle 3).** `mcp-export-corpus` is now contracted at **every** slice
+(1–9) plus final readiness; the ceiling exemption permits the Slice 1 staleness to be cleared in a
+supervisor-signed `chore(mcp)` regeneration commit before Slice 2; and the regeneration is
+`gen:mcp-export-corpus` output only, with no hand edits and `deno.lock` unchanged.
+
+**Lesson.** A gate's contract points must follow **what the gate actually reads**, not what the slice
+intuitively "adds". Cycle 1 reasoned from the slice's intent (adds symbols → contract where symbols
+are added); the corpus reads signatures and docs, so the honest contract point was every slice. Where
+a gate is cheap, contract it everywhere rather than modelling its sensitivity.
