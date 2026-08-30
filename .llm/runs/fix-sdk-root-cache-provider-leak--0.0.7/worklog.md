@@ -589,3 +589,28 @@ main-side merge versions, after which the complete stale→generate→fresh sequ
 
 No acceptance-evidence text, runtime lease/gate, label, issue field, draft state, or issue checkbox was
 changed. Production chunk proof, `e2e:cli`, and renewed evaluator currency remain coordinator-owned.
+
+## Main integration `7c3137696` — carriers resolved through generators, in dependency order
+
+Merged main `9710a2898` (merge, not rebase). **Zero intersection** on owned product paths, but four
+**generated carriers** conflicted: `.llm/assets/agent-docs/prose.json.gz`,
+`.llm/assets/agent-docs/provenance.json`, `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+`packages/mcp/src/publish-assets.generated.ts`.
+
+Resolved by taking main's side and **regenerating from the merged tree** — never hand-merged.
+
+**The cascade has a dependency order, and getting it wrong leaves a carrier stale.** My first pass ran
+`gen:publish-assets` → `gen:assets-barrel` → `gen:agent-docs-prose`, all exit 0, yet
+`check:publish-assets` came back **exit 1**. The later generators rewrite inputs that
+`publish-assets` consumes, so it had gone stale again behind its own successful run. Re-running in
+dependency order — **`gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`** — put all
+three checks at exit 0. A generator exiting 0 is not evidence the carrier is fresh; only the `check:`
+variant afterwards is.
+
+Refreeze at `7c3137696`, clean tree: `packages/sdk` **79 / 0** · `arch:check` 0 ·
+`check:agent-docs-prose` 0 · `check:publish-assets` 0 · `check:mcp-export-corpus` 0 · `deno.lock`
+byte-unchanged vs `f8b4f804` · leaf ceiling **19 paths**.
+
+**The #1734 blocker is retired.** Main `52a881c588` carried the Fresh hydration fix, so this leaf's
+26/1 bare `e2e:cli` receipt is a **stale classification**, not a standing blocker. The queued rerun must
+produce a fresh verdict at this head and must not inherit the old one.
