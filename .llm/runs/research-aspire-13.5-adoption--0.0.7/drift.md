@@ -1083,3 +1083,9 @@
 - Supervisor slip recorded: the first attempt to write this entry ran from a removed worktree
   directory and silently failed; an AGY resume launched with an empty prompt in that window was
   stopped before it did anything (S11 worktree verified clean at `93713837`).
+- **D-57 addendum:** the generator resolved both conflicts as briefed (main's `#1748` line kept;
+  `skills.md` keeps main's `#1746/#1755` facts and re-adds the upstream-skills + exact-14-tool
+  paragraph, `describe_resource` removed — verified by the supervisor on the tree), regenerated
+  carriers, re-ran docs gates, force-pushed with lease: S11 `93713837` → **`9d6afebf`** on S10′
+  `a46ea16d`; PR #1771 comment posted; `DONE`. docs_audit (Codex Sol · high) dispatched at
+  `9d6afebf`.

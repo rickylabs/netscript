@@ -346,4 +346,7 @@ stopped on substantive prose conflicts (D-57); same AGY conversation resumed wit
 (coordinator) | Runtime lease exclusively held by fixes/#1758 at `50710a44` (bare `e2e:cli`). Aspire
 lane: no Aspire/Docker gate until release + fresh zero preflight; runtime-zero watch stopped
 (foreign resources expected); S11 docs_audit brief amended to "foreign runtime visible — do not
-touch". Static work only. |
+touch". Static work only. | | S11 rebase + audit dispatch | Generator rebased S11 onto S10′
+(`9d6afebf`, DONE, PR #1771 comment); supervisor verified both prose resolutions on the tree;
+docs_audit Codex Sol · high launched at `9d6afebf` (read-only worktree `007-aspire-s11-audit`). Host
+lease untouched (fixes/#1758). |
