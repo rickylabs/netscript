@@ -98,3 +98,39 @@ the primary coordinator ratifies and publishes the issue graph.
   (dotnet global tool), one isolated generated AppHost at a time, V1–V12 probes, owned cleanup.
   Safety rule in `supervisor.md` "Research is read-only against Aspire/AppHost runtime" is
   superseded for this lease only; S1/S3+ remain non-runtime unless the coordinator grants again.
+
+## NAS supervisor recovery — 2026-08-30
+
+- **Role:** Aspire 13.5 topic supervisor for release 0.0.7 (fresh session after the N5 NAS
+  migration). Accepted Aspire topic ownership is preserved; the old Claude job registry is **not**
+  resumed or recreated. Every `aspire-s*-impl-eval*` Remote Control session from the WSL era is
+  `offline` and is treated as historical only.
+- **Requested identity:** Claude · Anthropic · Opus 5 · high (`planning_decisions` orchestrator
+  lane, `.llm/harness/workflow/lane-policy.md`).
+- **Observed identity:** model id `claude-opus-5` reported by the runtime; session name
+  `007-aspire-9a`.
+- **Host:** `ai-agents` container on the Minisforum N5 NAS (Linux 6.18.34+). Toolchain pinned by
+  `mise` at `/home/agent/projects/netscript/.mise.toml` — deno 2.9.5, Aspire CLI **13.5.3+b5f14331**
+  (the S2 lease upgrade survived the migration). Docker is the disposable
+  `DOCKER_HOST=tcp://netscript-dind:2375` sandbox; the host runtime is never touched.
+- **Worktree:** `/home/agent/projects/netscript/worktrees/007-aspire`
+- **Branch:** `research/aspire-13.5-0.0.7` @ `42ea3fcc` (remote-authoritative).
+- **Slice worktrees (recreated on the NAS):**
+  - `/home/agent/projects/netscript/worktrees/007-aspire-s5` — `fix/aspire-13-5-s5-literal-ports`
+    @ `0bd8ba83`, upstream deliberately unset.
+  - `/home/agent/projects/netscript/worktrees/007-aspire-s6` — `feat/aspire-13-5-s6-health-checks`
+    @ `1fa5aeec` (survived migration).
+  - `/home/agent/projects/netscript/worktrees/007-aspire-s7-eval` — detached @ `eb6f188ce`.
+- **Standing constraints for this session:** Aspire runs in parallel and is **not** a global canary
+  barrier. No merge, no publish, no relabel, no issue close, no central-state mutation — those stay
+  with the primary coordinator. New Codex threads are launched **only** through
+  `deno task agentic:launch-codex-slice`. Runtime work requires an explicitly granted singleton
+  lease. NAS/session evidence is never published to GitHub.
+
+## Lane bindings in force (this recovery)
+
+| Lane                                    | Route                                              |
+| --------------------------------------- | -------------------------------------------------- |
+| Topic supervisor / Tier-A slice review  | Claude · Anthropic · Opus 5 · high (this session)  |
+| S5 repair implementation                | Codex · OpenAI · GPT-5.6 Sol · medium              |
+| S7 IMPL-EVAL cycle 2                    | Claude · Anthropic · Fable 5 · medium              |

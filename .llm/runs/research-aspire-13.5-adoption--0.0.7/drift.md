@@ -184,3 +184,59 @@
   against the restored 13.5.3 modules is now a mandatory Tier-A + IMPL-EVAL gate for every
   generator slice (S4/S5 to be re-checked retroactively by the supervisor). Severity: significant
   (would have shipped rejecting health checks).
+
+## D-20 — 2026-08-30 — S5 is red on live CI; its IMPL-EVAL PASS is void
+
+- **Severity:** significant (product; blocks S5 and, by stacking, S6).
+- **What:** the context pack recorded S5 (#1717 / PR #1740) as Tier-A ×3 + IMPL-EVAL cycle 2 PASS,
+  `status:ready-merge`, close-gate PASS. Live GitHub at `0bd8ba832` says otherwise:
+  `mergeStateStatus=BLOCKED`, `check-test` FAIL and `close-gate` FAIL in run `33286543750`.
+- **Evidence (four verified defects, all confirmed by supervisor read, not inferred):**
+  - **F-1** `check-test` fails at `plugins/ai/tests/manifest_test.ts:56` —
+    `AssertionError: actual 0 / expected 8095`. S5 removed `officialSource.backgroundPort: 8095`
+    from `plugins/ai/scaffold.plugin.json` but left the assertion in place. 4279 passed / 1 failed.
+  - **F-2** `plugins/{workers,auth,sagas,triggers}/streams/factory.ts` replaced the
+    `options.baseUrl ?? 'http://localhost:4437'` literal with a `requiredStreamsBaseUrl()` that
+    **throws** on an omitted `baseUrl`. `buildStreamUrl(path, baseUrl?)` already falls back to
+    `getStreamsUrl()` (`DURABLE_STREAMS_URL` → `services__streams__http__0` →
+    `VITE_services__streams__http__0`/`VITE_STREAMS_URL`), so S5 deleted the working
+    Aspire-discovery path along with the literal. Valid Aspire-wired callers now fail.
+  - **F-3** `packages/cli/.../install/install-plugin.ts:574` leaves `hostPort` unset on a normal
+    install while the CLI completion still announces `plugin.servicePort` — post-S5 that is only a
+    deterministic template port, never the endpoint Aspire allocates.
+  - **F-4** `.llm/tools/validation/check-aspire-host-ports.ts:50` evaluates
+    `CONTRIBUTION_PORT_FALLBACK` one line at a time, so a multiline `ctx.port(resource,\n port)`
+    escapes the fitness gate it exists to enforce.
+  - F-2..F-4 are the three unanswered `augmentcode` review threads that fail
+    `agentic:review-threads` (`threads=3 unanswered=3`).
+- **Action:** S5 repair dispatched as a new Codex slice (thread
+  `01a0515b-8f4a-7412-a151-42d5fb4258d7`, worktree `007-aspire-s5`, brief
+  `slices/s5/repair/brief.md`). The prior IMPL-EVAL PASS does not carry to the repaired head — S5
+  needs a fresh Tier-A review and a fresh independent IMPL-EVAL before it can be considered
+  merge-ready again. **Coordinator decision required:** `status:ready-merge` and `impl-eval:skip`
+  are currently live on a red PR; this session does not relabel.
+- **Process lesson:** a recorded IMPL-EVAL PASS is not a durable merge signal — live CI and the
+  review-thread gate must be re-read at reconciliation time, because both can go red after the
+  verdict was written.
+
+## D-21 — 2026-08-30 — Codex agentic lane needed `--user node` on the NAS
+
+- **Severity:** minor (tooling; recovered).
+- **What:** `.llm/tools/agentic/lib/agentic-lib.ts` defaults the WSL identity to user `codex`. On
+  the NAS the Linux user is `node`, so every agentic Codex command aborted with
+  `Cannot run WSL command locally as requested user "codex"`.
+- **Action:** all agentic Codex invocations on the NAS pass `--user node`
+  (`NETSCRIPT_WSL_USER` is not readable by `agentic:codex-status`, which runs without
+  `--allow-env`). The daemon itself survived the migration: app-server `0.151.0`, control socket
+  `/home/agent/.codex/app-server-control/app-server-control.sock`, `remoteControlEnabled: true`.
+  Not an Aspire-scope defect; recorded so later slices do not rediscover it.
+
+## D-22 — 2026-08-30 — stray `aspire ps` core dump in the supervisor worktree
+
+- **Severity:** minor (hygiene).
+- **What:** a 116 MB untracked `core` (ELF core dump from `aspire ps --no-logo`, execfn
+  `/home/agent/.local/aspire/aspire`) was sitting in the supervisor worktree after migration.
+  `--no-logo` is not a valid 13.5.3 flag; the correct form is `--nologo`.
+- **Action:** archived to `/home/agent/observability/aspire-13.5/` (never committed). The runtime
+  precondition proof uses `aspire ps --format Json --nologo --non-interactive`, which returns `[]`
+  cleanly with no dump. S9's skill/doc line should carry the `--nologo` spelling.

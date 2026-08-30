@@ -87,3 +87,22 @@ authorizes none by itself).
   then passed. No product, Aspire runtime, Docker, lock, cache, or slice file changed.
 - Fresh native Remote Control supervisor identity and subsequent steering are recorded in the next
   checkpoint after attachment; topic ownership and the S1-S7 queue remain unchanged.
+
+## NAS recovery checkpoint 1 — 2026-08-30 (Aspire topic supervisor, Claude Opus 5 high)
+
+| Step | Evidence |
+| ---- | -------- |
+| Reconciled S1–S7 against live GitHub (`gh pr view` + `gh pr checks` per PR) | S1 #1727 draft `ee379457e` CLEAN · S2 #1735 ready `fffbb0c47` CLEAN · S3 #1741 draft `fe4f496bd` CLEAN · S4 #1738 ready `732992415` CLEAN · S5 #1740 `0bd8ba832` **BLOCKED** · S6 #1743 draft `1fa5aeec1` CLEAN · S7 #1744 draft `eb6f188ce` CLEAN. Board rewritten in `context-pack.md`. |
+| S5 red-state root cause | `check-test` job `99191430853`, receipt `test.report.json` (4279 passed / 1 failed): `plugins/ai/tests/manifest_test.ts:56` `actual 0 / expected 8095`. Confirmed by diffing `plugins/ai/scaffold.plugin.json` `origin/main` vs S5 head — `officialSource.backgroundPort: 8095` removed, assertion not updated. |
+| S5 close-gate root cause | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1740 --pretty` → `threads=3 unanswered=3`. All three read in full and independently verified against the source (see D-20 F-2..F-4). |
+| S5 repair dispatched | `deno task agentic:launch-codex-slice --user node` → thread `01a0515b-8f4a-7412-a151-42d5fb4258d7`, route requested/observed `openai · gpt-5.6-sol · medium` (**matched**), worktree `/home/agent/projects/netscript/worktrees/007-aspire-s5` @ `0bd8ba83`, upstream NONE, dirty 0. Rollout `/home/agent/.codex/sessions/2026/08/30/rollout-2026-08-30T08-29-10-01a0515b-…jsonl`. Steering: `codex exec resume 01a0515b-8f4a-7412-a151-42d5fb4258d7 -- "<follow-up>"`. Brief `slices/s5/repair/brief.md` (contract-valid: `use harness` + `## SKILL`). |
+| S7 IMPL-EVAL cycle 2 relaunched | Pre-migration evaluator sessions are all `offline` and `slices/s7/evaluate-cycle-2.md` was never written. Fresh Claude · Fable 5 · medium background session `c94f14b8` (separate session from the Codex generator), worktree `/home/agent/projects/netscript/worktrees/007-aspire-s7-eval` detached @ `eb6f188ce`; brief `slices/s7/impl-eval-brief-cycle-2.md` re-pathed to the NAS with an added environment section. |
+| Codex lane recovered on the NAS | `deno task agentic:codex-status --user node --pretty` → daemon `running`, backend `pid`, app-server `0.151.0`, socket `/home/agent/.codex/app-server-control/app-server-control.sock`, `remoteControlEnabled: true`. Default WSL user `codex` fails on this host — D-21. |
+| Runtime zero-state proven (lease not requested yet) | `aspire ps --format Json --nologo --non-interactive` → `[]` exit 0 (CLI `13.5.3+b5f143315`); `docker ps -a` on `tcp://netscript-dind:2375` → no containers. |
+| Worktree hygiene | 116 MB untracked `core` (dump from `aspire ps --no-logo`, an invalid flag) archived to `/home/agent/observability/aspire-13.5/`, never committed — D-22. |
+
+**Not done, and why:** no merge, publish, relabel, close, or milestone change (coordinator-owned —
+and S5 carrying `status:ready-merge` on a red PR is an explicit coordinator decision, not a
+supervisor relabel). No runtime started — the three phase-B workstreams (S6, S3, S7) remain queued
+behind one serialized lease that has not been granted. S6 Tier-A is deliberately deferred until the
+S5 repair lands and S6 rebases, so the review runs once against the final head.

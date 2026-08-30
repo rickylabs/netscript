@@ -14,7 +14,7 @@ This is **IMPL-EVAL cycle 2**. Cycle 1 (`slices/s7/evaluate-cycle-2.md`, head `4
 Formal IMPL-EVAL for **S7 of the Aspire 13.5 epic (phase A)** — issue #1719, draft PR #1744 (base = S3 branch `test/aspire-13-5-s3-fixture-recapture`; closes #1719, #1429), epic #1712.
 Route: Claude · Anthropic · Fable 5 · medium (native opposite-family evaluator of Codex · GPT-5.6 Sol work), per `.llm/harness/workflow/lane-policy.md`.
 
-- Evaluate **exactly** head `eb6f188ce` on branch `fix/aspire-13-5-s7-teardown-leak-check` (base = S3 head `fe4f496bd`; evaluate only commits after it). Your worktree: `/home/codex/repos/netscript-aspire-13-5-s7-eval` (detached at that head; read-only for product files).
+- Evaluate **exactly** head `eb6f188ce` on branch `fix/aspire-13-5-s7-teardown-leak-check` (base = S3 head `fe4f496bd`; evaluate only commits after it). Your worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s7-eval` (detached at that head; read-only for product files).
 - Generator run dir (in the tree): `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/` (`supervisor.md`, `worklog.md` incl. Design + gate tables, `context-pack.md`, `drift.md`, `receipts/parity-phase1-{red,green}.json`).
 - Contract of record: issue #1719 (+ #1429 orphaned `aspire-managed` descendants; AGENTS.md Resource-hygiene invariants: foreign/unknown-owner entries reported and never mutated, `--apply` only on proven path-containment ownership, never `aspire stop --all`). **Phase A only**: the #1429 live reproduction and foreign-AppHost re-test are lease-backed phase B — do not fail for their absence in `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md` on `origin/research/aspire-13.5-0.0.7` (`git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md`).
 - Supervisor Tier-A notes: `git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s7/review-tier-a.md`.
@@ -35,4 +35,18 @@ Route: Claude · Anthropic · Fable 5 · medium (native opposite-family evaluato
 
 ## Output
 
-Write `evaluate.md` from `.llm/harness/templates/evaluate.md` into the generator run dir path **on the supervisor's research worktree** by absolute path: `/home/codex/repos/netscript-007-aspire-13-5-research/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s7/evaluate-cycle-2.md` (declare the exact evaluated head in the file), and post the same verdict as a PR #1744 comment starting with `**[PHASE: IMPL-EVAL]**` and the head SHA. Verdict ∈ `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT`. Do not commit to the S7 branch, do not mark the PR ready, do not merge.
+Write `evaluate.md` from `.llm/harness/templates/evaluate.md` into the generator run dir path **on the supervisor's research worktree** by absolute path: `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s7/evaluate-cycle-2.md` (declare the exact evaluated head in the file), and post the same verdict as a PR #1744 comment starting with `**[PHASE: IMPL-EVAL]**` and the head SHA. Verdict ∈ `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT`. Do not commit to the S7 branch, do not mark the PR ready, do not merge.
+
+## Environment (NAS, 2026-08-30 — read before running anything)
+
+The repo moved to the N5 NAS. Old `/home/codex/repos/...` paths are historical; use the paths above.
+- Toolchain is pinned by `mise` in `/home/agent/projects/netscript/.mise.toml` (deno 2.9.5, aspire
+  13.5.3). If `deno` is not on PATH in a non-interactive shell, prepend
+  `/home/agent/.local/share/mise/installs/deno/2.9.5/bin`.
+- Docker is a disposable sandbox: `export DOCKER_HOST=tcp://netscript-dind:2375`. Never touch the
+  host container runtime.
+- Agentic tooling that shells through the WSL adapter needs `--user node` on the NAS (the Linux
+  user is `node`, not `codex`).
+- **You hold no runtime lease.** Do not start an AppHost, do not run `deno task e2e:cli`, do not
+  start containers, do not change the host Aspire CLI. Static gates only.
+- Never commit or publish anything under `/home/agent/projects/netscript/handoff/`.

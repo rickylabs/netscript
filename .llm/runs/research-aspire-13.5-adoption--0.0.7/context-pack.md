@@ -69,19 +69,36 @@ owner authorization.
 4. Start S1 (mechanical) and S2 (runtime lease) immediately; cut canary A after S1–S3, canary B
    after S4–S8, canary C after S9–S11 + S13; stable per D-10.
 
-## Live slice board (supervisor, 2026-08-30 — GitHub wins on conflict)
+## Live slice board (NAS supervisor, 2026-08-30 — reconciled against live GitHub)
 
-| Slice           | Issue / PR                   | Head                                                                                                                      | State                                                                                                                                                                                                                                                   |
-| --------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| S1              | #1713 / PR #1727 (draft)     | `ee379457e` on `chore/aspire-13-5-s1-pin-bump`                                                                            | Tier-A signed off; IMPL-EVAL cycle 1 `FAIL_FIX` (evidence closed); blocked only on baseline Fresh fix #1734 / PR #1736; resume: rebase → rerun `e2e-cli` → delta IMPL-EVAL cycle 2 → ready.                                                             |
-| S2              | #1714 / PR #1735 (**ready**) | `fffbb0c47` on `test/aspire-13-5-s2-runtime-verification`                                                                 | IMPL-EVAL **PASS** (Fable job `9d011c21`); lease released; zero-leak proven; `impl-eval:skip` + `ci:skip-e2e`; close-gate PASS, mergeState CLEAN, `status:ready-merge` — coordinator merges. Receipts copied to `receipts/aspire-13.5-verification.md`. |
-| S4              | #1716                        | PR #1738 **ready**, head `732992415` (product head `c2cceba00`), base `13878a80a` | Tier-A + IMPL-EVAL **PASS**; `impl-eval:skip` + `status:ready-merge`; close-gate **PASS**. `e2e-cli` run 33282384572 red only on #1734 baseline (`hydration.ts` TS2345) — parked with S1 on PR #1736; resume = rebase → `gh workflow run e2e-cli.yml` → coordinator merge. |
-| S5              | #1717                        | PR #1740 **ready**, head `0bd8ba832`, base `13878a80a` | Tier-A ×3 + IMPL-EVAL cycle 2 **PASS**; `impl-eval:skip` + `status:ready-merge`; close-gate **PASS** (mirror applied #1717, #1370); #1365 → `Part of` (D-18); `e2e-cli` 33286544110 red only on #1734 baseline (26/27 runtime gates green, no pinned ports) — **parked with S1/S4 on PR #1736**; F-5 → #1742. Coordinator merge after rebase/rerun. |
-| S6              | #1718                        | PR #1743 (draft, base S5) head `78d0ded28`, eval worktree `/home/codex/repos/netscript-aspire-13-5-s6-eval` | IMPL-EVAL cycle 1 (`9e348b1d`) **FAIL_FIX** — H-1 `property(EndpointProperty)` handles vs `.host()/.port()`, H-2 `data: Record<string,string>` (found by compiling against S2's restored 13.5.3 module — D-19); slice 6 fix resumed; cycle 2 next. S8 dispatch waits for the new S6 head. |
-| S7              | #1719                        | PR #1744 (draft, base S3) head `eb6f188ce` (slice 6), eval worktree `/home/codex/repos/netscript-aspire-13-5-s7-eval` | Cycle 1 FAIL_FIX → slice 6 → Tier-A cycle 2 signed off → **IMPL-EVAL cycle 2 running** (`bbe3d6cf` → `slices/s7/evaluate-cycle-2.md`). Phase B lease-backed. |
-| S3              | #1715                        | PR #1741 (**draft**) head `fe4f496bd` on `13878a80a` | Phase A **IMPL-EVAL PASS** (cycle 2, `78ac4cfa`). Waiting on the runtime lease for phase B (telemetry envelopes) → delta eval → ready. Codex child idle (thread `01a05045-…`, supervisor is sender). |
-| S3, S5–S11, S13 | #1715, #1717–#1724           | —                                                                                                                         | queued; S3 can consume S2's V5 receipts; S5 must include infrastructure host ports (D-16); S9 expects the 14-tool MCP set (D-15).                                                                                                                       |
-| S12, S6b        | #1725, #1726 (0.0.8)         | —                                                                                                                         | after canary B.                                                                                                                                                                                                                                         |
+Reconciliation rule: **git + live GitHub win over every recorded verdict.** Pre-migration
+`/home/codex/...` worktrees, Codex threads, and `aspire-s*-impl-eval*` Remote Control sessions are
+historical; all of those evaluator sessions are `offline` and none was resumed.
 
-Host state: Aspire CLI 13.5.3 (lease-authorized, kept). Evaluator worktrees:
-`netscript-aspire-13-5-s1-eval` (@ `69b2ebaf6`), `netscript-aspire-13-5-s2-eval` (@ `fffbb0c47`).
+| Slice | Issue / PR | Live head | Live CI / merge state | Reconciled state and next step |
+| ----- | ---------- | --------- | --------------------- | ------------------------------ |
+| S1 | #1713 / PR #1727 (draft) | `ee379457e` | CLEAN, no failing checks | Tier-A signed off; IMPL-EVAL cycle 1 `FAIL_FIX` evidence closed. Still parked on the **baseline Fresh fix #1734 / PR #1736** (`ed8a8e9ca`, draft, owned by the fixes lane). Resume = rebase on merged #1736 → rerun `e2e-cli` → delta IMPL-EVAL cycle 2 → ready. Not an Aspire defect. |
+| S2 | #1714 / PR #1735 (**ready**) | `fffbb0c47` | **CLEAN**, all checks green | IMPL-EVAL **PASS**, close-gate PASS, `status:ready-merge`, zero-leak proven. **Ready for HUMAN merge** — this session does not merge. Unchanged by the migration. |
+| S3 | #1715 / PR #1741 (draft) | `fe4f496bd` | CLEAN, no failing checks | Phase A IMPL-EVAL **PASS** (cycle 2). Phase B (telemetry envelopes) is **lease-blocked**. The pre-migration Codex child (`01a05045-…`) did not survive; a new thread must be launched via `agentic:launch-codex-slice` when the lease is granted. |
+| S4 | #1716 / PR #1738 (**ready**) | `732992415` | CLEAN, no failing checks | Tier-A + IMPL-EVAL **PASS**, close-gate PASS, `status:ready-merge`. `e2e-cli` red only on the #1734 baseline. Resume = rebase after #1736 → rerun `e2e-cli` → coordinator merge. |
+| S5 | #1717 / PR #1740 (ready-labelled) | `0bd8ba832` | **BLOCKED** — `check-test` FAIL + `close-gate` FAIL (run `33286543750`) | **Recorded PASS is void — see D-20.** Four verified defects (F-1 stale `plugins/ai` manifest assertion; F-2 stream factories throw instead of using Aspire discovery; F-3 CLI announces a template port; F-4 line-scoped fitness-gate regex). Repair dispatched: Codex thread `01a0515b-8f4a-7412-a151-42d5fb4258d7`, worktree `007-aspire-s5`, brief `slices/s5/repair/brief.md`. Needs fresh Tier-A + fresh independent IMPL-EVAL afterwards. **Coordinator decision:** `status:ready-merge` + `impl-eval:skip` are live on a red PR; this session does not relabel. |
+| S6 | #1718 / PR #1743 (draft, base = S5 branch) | `1fa5aeec1` | CLEAN, no failing checks | Phase A landed (slice 6 = the D-19 13.5.3 typing correction). **Stays draft** until Phase-B runtime receipts, supervisor Tier-A review, and an independent IMPL-EVAL. Tier-A is deliberately sequenced **after** the S5 repair lands and S6 rebases, so the review is performed once on the final head. Phase B is lease-blocked. |
+| S7 | #1719 / PR #1744 (draft, base = S3 branch) | `eb6f188ce` | CLEAN, no failing checks | Tier-A cycle 2 signed off. IMPL-EVAL cycle 2 did **not** survive the migration (no `slices/s7/evaluate-cycle-2.md`). **Relaunched** in a fresh Claude · Fable 5 · medium session `c94f14b8` against worktree `007-aspire-s7-eval` (detached @ `eb6f188ce`). Phase A only; Phase B is lease-blocked. |
+| S8–S11, S13 | #1720–#1724 | — | — | Queued. S8 dispatch waits for the settled S6 head; S9 expects the 14-tool MCP set (D-15); S13 needs the D-17 telemetry-resolver ratification. |
+| S12, S6b | #1725, #1726 (0.0.8) | — | — | After canary B. |
+
+## Runtime lease — preconditions proven, lease not yet requested/granted (2026-08-30)
+
+Both zero-state proofs were taken on the NAS host before any runtime work was contemplated:
+
+- `aspire ps --format Json --nologo --non-interactive` → `[]` (exit 0). Aspire CLI
+  `13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688`.
+- `docker ps -a` against `DOCKER_HOST=tcp://netscript-dind:2375` → header only, **no containers**.
+
+Three phase-B workstreams are queued behind a single serialized lease and must run one at a time,
+each returning the host to proven zero before the next starts: **S6** (listener-unreachable fixture
++ `healthReports` receipts), **S3** (telemetry envelopes), **S7** (#1429 live reproduction +
+foreign-AppHost re-test). Owned cleanup back to zero is verified with
+`agentic:leak-check` / `agentic:teardown` scoped to run-owned resources; foreign or unknown-owner
+entries are reported and never mutated.
+
