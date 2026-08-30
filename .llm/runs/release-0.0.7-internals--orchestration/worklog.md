@@ -5202,3 +5202,36 @@ validated rather than relayed.
   The `+` counterpart was simply below the cut. *A truncated diff cannot support a deletion claim;
   normalize and compare whole contents instead.* Same family as the four earlier instrument errors —
   reading an artifact of the measurement as a property of the thing measured.
+
+## D-88 — CORRECTION: D-85 and D-86 conclusions were WRONG; the evaluator caught what I missed
+
+I published two confident conclusions from the live hook-event log. Both are **retracted**. The
+evaluator's independent account is correct and mine was not.
+
+- **What I claimed (D-85):** the 34 events in `007-eval-1774-impl/.llm/tmp/claude/hooks/` proved the
+  *repaired* exec-form config working under live Claude Code dispatch, including
+  `${CLAUDE_PROJECT_DIR}` interpolation inside `args`.
+- **What is actually true.** Claude Code reads `.claude/settings.json` from the **session launch
+  root**, not the turn cwd. The evaluator's launch root is
+  `/home/agent/projects/netscript/repo`, checked out at `74e3d451e` — plain `main`, which does
+  **not** contain the fix. Verified directly: that file's hooks are the **old string form**,
+  `command: "deno run --no-lock --allow-env --allow-read --allow-write .llm/tools/agentic/claude/
+  claude-hook-log.ts"`, with `args: None`.
+- **Therefore those events were produced by the OLD config**, resolving its relative path against
+  the turn's cwd — which happened to be the eval worktree, where the file exists. They demonstrate
+  the defect's *mechanism*, exactly as the evaluator wrote. They prove **nothing** about exec-form
+  `args` interpolation. Retracted.
+- **D-86 falls with it.** The old command carries a bare `--allow-write` with **no path scope** —
+  unrestricted write. The directory chain it created therefore says nothing about whether the
+  **narrowed** `--allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks` can bootstrap its own
+  parents on a fresh checkout. Retracted. (The evaluator tested the narrowed grant properly, with
+  real exit capture, and reports `NotCapable` on the wrong path and clean behaviour on the right
+  one — its evidence stands; mine was never evidence.)
+- **Root cause of my error.** I observed hook writes inside a worktree containing the new config and
+  inferred the new config produced them. I never checked which `settings.json` was actually loaded —
+  and the answer was knowable in one command. *Sixth instrument error this stretch, and the worst:
+  the earlier five produced no false claim, whereas this one put two confident, wrong conclusions
+  into the ledger and into a report to the coordinator.*
+- **The verdict is unaffected.** `PASS` rests on the evaluator's own measurements, not on my
+  retracted corroboration. The correction removes support I should never have offered; it removes
+  nothing the evaluator relied on.
