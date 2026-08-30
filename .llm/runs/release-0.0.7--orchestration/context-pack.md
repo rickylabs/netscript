@@ -1808,3 +1808,23 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Features Slice 7, docs #1793, and Aspire's scratch-fixture repair each have a live SOL/high Codex
   thread. Routing #1792 has an exact-head GLM/max `PASS` and is packaging its three low bookkeeping
   findings. No historical DeepSeek evaluation is rerun.
+
+## Resume delta — 2026-08-30T22:24:30Z
+
+- Main is `5197e70b716eafb82fbb12ddb9a910c248ddb86a`: docs #1793 / PR #1794 shipped at exact
+  `514f47565` after current CI, rerun close-gate, 7/7 issue boxes, zero threads, immutable-head
+  audit, and accepted separate-session DeepSeek PASS. Both records are sole `status:shipped`; docs
+  must continue immediately with its next serial 0.0.7 issue.
+- S6 D-101 is static-PASS at `3a20d00be` with evidence-only head `929ff72a2`. It currently owns the
+  sole host runtime lease `s6-lease-postgres`; the live AppHost, PostgreSQL/Garnet containers, and
+  two owner-labelled relays are expected. Run the ratified Postgres then SQLite single gates, full
+  suites only after both singles, and clean Aspire/containers/volumes/relays exactly to zero before
+  #1747 receives the next lease.
+- #1792 is not mergeable yet. Its bounded CI consumer repair is `6fe9f3b32`; two valid medium
+  review findings now require visible-assistant-only canary success and phase-locked OpenHands
+  label overrides. Apply through the existing canonical Codex thread, resolve both threads, merge
+  current main, Tier-A, and run one fresh GLM 5.3 Flash/max IMPL-EVAL for the changed product tree.
+  Existing DeepSeek evaluations remain valid and must not be rerun.
+- Features Slice 7 is Tier-A ACCEPTED at `f60c85199` and its new-slice evaluation is active. Fixes
+  remains statically ready behind the runtime queue; serial ordering is per orchestrator, never
+  global.

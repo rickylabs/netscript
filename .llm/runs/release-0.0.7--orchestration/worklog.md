@@ -2908,3 +2908,26 @@
 - Features Slice 6 received `ACCEPTED_WITH_FINDINGS`; its product-neutral resume-doc catch-up
   `ae90bb264` carries the verdict without rerun and Slice 7 is live. Routing #1792 received GLM/max
   `PASS`; final evidence packaging is live. Existing DeepSeek receipts remain accepted unchanged.
+
+## 2026-08-30T22:24:30Z — docs #1794 shipped; S6 owns the runtime lease
+
+- Independently audited and merged PR #1794 at immutable head
+  `514f47565be0d3a9b24444ef06493090ea106769` as main
+  `5197e70b716eafb82fbb12ddb9a910c248ddb86a`. Exact-head quality/check-test, the rerun close-gate,
+  docs build, seven issue checkboxes, zero review threads, clean worktree, unchanged lockfile, and
+  separate-session DeepSeek PASS were all verified without rerunning accepted evidence. Issue #1793
+  and PR #1794 are closed/merged with sole `status:shipped`; docs was ordered immediately to its
+  next 0.0.7 serial issue.
+- PR #1792 repaired its first exact-head CI miss at `6fe9f3b32` (retired model-id test consumers),
+  but two new medium Augment findings are valid product/workflow defects: response non-emptiness
+  must be proven from visible assistant content only, and OpenHands override labels must be
+  phase-locked. The canonical routing author will apply those bounded fixes, resolve both threads,
+  rerun Tier-A, converge main `5197e70b7`, and obtain one fresh exact-head GLM/max IMPL-EVAL because
+  the product tree changes. Historical DeepSeek receipts remain valid and are not rerun.
+- Feature Slice 7 is frozen and pushed through Tier-A at `f60c85199` (product `897a06cd7`, evidence
+  `8e20cf708`); its new-slice evaluator is active. Aspire S6 D-101 is independently static-PASS at
+  product `3a20d00be` / evidence `929ff72a2`; the sole runtime lease is granted to
+  `s6-lease-postgres` for the ratified PostgreSQL then SQLite Phase-B sequence. The currently live
+  AppHost, backing containers, and owner-labelled relays are expected lease resources, not stale
+  leftovers; exact cleanup to Aspire/Docker/relay zero is mandatory before #1747 receives the next
+  lease.
