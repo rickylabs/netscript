@@ -962,7 +962,9 @@
   receipt), F-3 (malformed-NDJSON / pending-state tests), F-4 (Healthy-only convergence), F-7 (dead
   file) re-proven closed by execution; F-5/F-6/F-8 documented; full static/fitness set green, no
   regressions, no new escapes; scope/PR hygiene intact except **H-1** (no per-slice PR comment for
-  the fix commit) — satisfied by the supervisor's trail comment. Supervisor verified non-mutation.
+  the fix commit at evaluation time) — the generator thread's own `[PHASE: IMPL]` fix-cycle comment
+  landed after the evaluator's read (2 comments reference `c61b1626`); nothing posted by the
+  supervisor. Supervisor verified non-mutation.
 - S10 phase A is settled: Tier-A ✓ (`14daa764`, gates re-verified at `c61b1626` by the evaluator),
   IMPL-EVAL cycle 2 `PASS` (phase A). Phase B (`scaffold.runtime --cleanup` with the new receipts,
   leak = 0) remains lease-backed and environment-blocked (D-42/D-43). Not a merge candidate (stacked
