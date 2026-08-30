@@ -2,8 +2,9 @@
  * Root contract vocabulary for NetScript packages and plugins.
  *
  * `@netscript/contracts` owns the common contract primitives that must stay
- * identical across package boundaries: the oRPC base contract, shared error
- * data, pagination schemas, result types, and schema helper factories.
+ * identical across package boundaries: the oRPC base contract, NetScript-owned
+ * procedure metadata, shared error data, pagination schemas, result types, and
+ * schema helper factories.
  *
  * @example
  * ```typescript

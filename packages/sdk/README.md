@@ -25,6 +25,9 @@ and deployed endpoints without a registry or a config file.
   the map key.
 - **Typed service clients** — `createServiceClient` builds a fully inferred oRPC client from a
   shared contract router; input and output types come from the contract, never from you.
+- **Declaration-safe procedure metadata** — `ProcedureMetaFromNode` on `./ports` and `ProcedureMeta`
+  on `./ports` and `./query` recover the exact NetScript-owned metadata carried by direct clients,
+  `defineServices`, and query actions without exposing upstream oRPC types.
 - **Aspire service discovery** — `./discovery` resolves service URLs and database/KV connections
   from orchestrator-injected environment variables, lazily at call time.
 - **Cache-aware query factories** — `createQueryFactories` is the golden path: one call over a
@@ -257,6 +260,7 @@ and Linux apply on relaunch.
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
 | `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
 | `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
+| `./ports`        | structural client/query contracts plus procedure metadata extractors              |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).

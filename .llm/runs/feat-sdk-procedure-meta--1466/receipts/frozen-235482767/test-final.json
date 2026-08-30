@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "1466-test-final",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
+  "gitHead": "235482767edd8a9793c9d6bf6f766441c51ef313",
+  "actualGitHead": "235482767edd8a9793c9d6bf6f766441c51ef313",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:522860",
+  "attempt": 4,
+  "schemaVersion": 1,
+  "requestHash": "d64a6900dcf72649c9bd33087d070ca888d3316479215418fd0d60b185a38151",
+  "lifecycleId": "worker:522860:1466-test-final:4",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-30T07:14:32.569Z",
+  "startedAt": "2026-08-30T07:14:32.571Z",
+  "finishedAt": "2026-08-30T07:17:08.787Z",
+  "durationMs": 156216,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 779,
+    "sha256": "c16a9cb82477c5a1c6f75c8343b6f6f38ab87597587570ca86e88077c0f400fe",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1731\",\"exitCode\":1,\"durationMs\":156076,\"summary\":{\"passed\":4248,\"failed\":1,\"ignored\":19,\"totalResults\":4268,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal: worker descendant 523066 survived cancellation\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   true\\n+   false\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/agentic/claude/hybrid-launcher_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"exact MCP permissions cancel a stubborn worker group without an orphan\",\"file\":\"./.llm/tools/agentic/claude/hybrid-launcher_test.ts\",\"line\":102}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}
