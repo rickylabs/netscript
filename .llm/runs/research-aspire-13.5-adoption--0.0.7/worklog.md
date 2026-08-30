@@ -526,4 +526,9 @@ code-mode-host child alive, rollout fresh `output_text` at 19:32:39Z; host = mid
 design (run CLI killed, orphans awaiting owned teardown, control AppHost sole in `aspire ps`). No
 interrupt issued (a cut would lose the cleanup turn). Hard-stall detector armed: rollout idle >4 min
 or client death → same-thread recovery (scoped leak receipt, stop control via exact `--apphost`,
-remove only S7-owned + relays, prove zero, no second start). |
+remove only S7-owned + relays, prove zero, no second start). | | S1 delta IMPL-EVAL `FAIL_FIX` (one
+bounded item, comment-only) | Evaluator (session `6c9f010f…`) verified the correct head
+`e0d70e404074`: identity 4+1 reproduced, hosted run 33330714604 green both tiers → acceptance MET,
+timing measured — sole gap: cold/warm numbers not in a PR comment (F1). Supervisor posted the timing
+comment; readiness chain (evidence block → mirror → sole ready-merge → ready → close-gate rerun →
+review-threads) proceeds; then the S1 merge packet. |
