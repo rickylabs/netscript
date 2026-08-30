@@ -1523,3 +1523,17 @@
   thread `01a051e6…` resumed with `slices/s8/phase-b-brief.md`). S3 IMPL-EVAL cycle 3 (phase B) =
   **FAIL_FIX** at `1611c5868` (`slices/s3/evaluate-cycle-3.md`, PR comment 18:41:28Z) — bounded fix
   cycle to be routed to the S3 thread.
+- **D-77 — S1 hosted run 33328727942 at `38c3e9e181bf`: static/desktop/SQLite-Garnet PASS;
+  PostgreSQL 67/1 at `behavior.live-db-endpoint` ("consecutive AppHost starts reused the same
+  database allocation: postgres://localhost:12074"); every init/migrate/generate/seed, wait, health,
+  workers/MCP and cleanup gate passed.** Adjudicated by the coordinator from official sources (13.5
+  change log "Consistent port allocation for proxyless endpoints"; persistent containers doc: stable
+  local endpoint across restarts): equality is expected 13.5 behaviour; the inequality throw
+  (pre-S1, #1393/#1654) is obsolete. Bounded gate correction dispatched on a fresh Codex thread in
+  worktree `007-aspire-s1` at the frozen head (`slices/s1/convergence/gate-correction-brief.md`):
+  prove the live second endpoint is observed/ used + telemetry-correlated, keep a negative
+  stale/literal case (RED/GREEN), no weakening. Then refreeze, rerun hosted tiers, delta IMPL-EVAL.
+  Caveat recorded for S7: both `cleanup.aspire-stop` gates passed (PG 544 ms, SQLite 611 ms) but
+  runner finalization reaped descendant `dcp`/`docker`/`deno` processes — the gate alone is never
+  process-zero; exact local census stays mandatory (folded into the S7 amendment). S4 run
+  33328751758 and S5 run 33328889522 pending.

@@ -18,3 +18,11 @@ is authorized, with these invariants:
   supervisor runs fresh Tier-A; the lease-backed rerun of `phase-b-handoff.md` (same
   foreign-control invariant, targeted TERM only, exact-zero cleanup) and a separate Phase-B
   IMPL-EVAL follow — S3 must converge first. Do not start any runtime yourself.
+
+## Hosted-cleanup caveat (fold into the ownership/teardown rationale)
+
+On the hosted S1 run 33328727942 both `cleanup.aspire-stop` gates passed (PG 544 ms, SQLite
+611 ms) yet runner finalization still reaped descendant `dcp`/`docker`/`deno` processes. Hosted VMs
+leave no durable residue, so **`cleanup.aspire-stop` alone must never be cited as process-zero**;
+your reporter/teardown rationale and receipts must keep an exact local process census mandatory
+(PID + start identity, owned-root containment), and the phase-b receipts must state this explicitly.
