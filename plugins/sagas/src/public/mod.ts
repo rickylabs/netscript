@@ -7,7 +7,7 @@
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import { streamsPlugin } from '@netscript/plugin-streams';
 import { workersPlugin } from '@netscript/plugin-workers';
-import { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
+import { SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 
 /** Plugin package version, single-sourced from the package `deno.json`. */
@@ -43,7 +43,6 @@ const sagasManifest: PluginManifest = definePlugin(
   .withService({
     name: SAGAS_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',
-    port: SAGAS_API_DEFAULT_PORT,
   })
   .withDbSchemas([{ path: './database/sagas.prisma', engine: 'postgres' }])
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])

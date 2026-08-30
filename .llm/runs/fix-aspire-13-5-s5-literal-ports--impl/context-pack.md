@@ -12,15 +12,16 @@
 
 ## Current State
 
-Slice 1 is establishing the RED fitness contract from a clean `origin/main` baseline.
+Slice 1 is pushed and draft PR #1740 is open. Slice 2 implements the locked D-14 sagas contract.
 
 ## Completed
 
 - Required issue, parent research/plan, doctrine, skills, and S2 receipt intake.
+- RED fitness contract committed and pushed as `e83659d78`.
 
 ## In Progress
 
-- Host-port checker extension and exact S5 literal grep test.
+- Sagas publisher, compatibility export, CLI/probe discovery, manifest, sample, and README updates.
 
 ## Next Steps
 

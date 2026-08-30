@@ -59,6 +59,8 @@ required, and expose cross-resource URLs through resource-reference environment 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-30 | 1 | RED contract | Extended checker and added exact S5 grep invariant. |
+| 2026-08-30 | 1 | push | `e83659d78` pushed with the explicit required refspec; draft PR #1740 opened. |
+| 2026-08-30 | 2 | D-14 implementation | Removed sagas runtime fallback; retained four deprecated exports. |
 
 ## Decisions
 
@@ -98,7 +100,10 @@ required, and expose cross-resource URLs through resource-reference environment 
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| sagas JSR dry-run/doc-lint | NOT_RUN | slice 2 | Baseline documented in research §15. |
+| sagas JSR dry-run | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | Three baseline dynamic-import warnings only. |
+| sagas doc lint | BASELINE / exit `1` | `receipts/02-sagas-jsr-audit.txt` | Only pre-existing #1708 private-type-ref. |
+| four-entry consumer import | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | Deprecated export present at all locked paths. |
+| sagas unit suite | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | 33 passed, 0 failed. |
 
 ## Handoff Notes
 
