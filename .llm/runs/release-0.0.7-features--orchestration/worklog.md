@@ -8300,3 +8300,12 @@ not scoped to one slice. For Slice 4, dispatching the **native default first** p
 row 46 — Fable 5 · medium, opposite family, own detached worktree `ns1387-impleval-s4` at the evidence
 head. If it hits the same monthly-spend wall, the now-working DeepSeek route is the documented
 fallback and needs no fresh ruling to use, since the credential fix was general.
+
+### Slice 4 evaluator — native quota still exhausted, fell through to DeepSeek
+
+Fable 5 · medium returned the identical monthly-spend-limit message after one turn ($0.0024) — the
+quota is account-wide, not slice-specific, so this was expected once Slice 3 hit it. Falling through
+immediately to **DeepSeek V4 Flash 0731 · max** over OpenRouter, same clean worktree
+(`ns1387-impleval-s4`), same evidence head, unchanged brief. This follows the documented fallback
+chain directly; no fresh ruling needed since the DeepSeek route's availability was a general
+infrastructure fix, not scoped to Slice 3.
