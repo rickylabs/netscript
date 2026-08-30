@@ -171,6 +171,10 @@ Ceiling:
 - `packages/service/src/types.ts`
 - `packages/service/src/builder/service-builder.ts`
 - `packages/service/src/builder/service-rpc.ts`
+- `packages/service/src/builder/service-builder-impl.ts` — **added by owner ruling (PLAN-EVAL cycle 2
+  follow-on, D-4), the same already-ratified shape as F-3.** Signature/generic-only: parameterize the
+  class and its stored factory, preserve the generic through fluent returns, and specialize
+  `withContext`. **Runtime composition remains deferred to Slice 3.**
 - `packages/service/mod.ts`
 - `packages/service/tests/type-assignability_test.ts`
 - `packages/plugin/src/service/presentation/create-plugin-service.ts`

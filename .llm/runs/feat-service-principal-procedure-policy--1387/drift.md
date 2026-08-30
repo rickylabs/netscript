@@ -116,3 +116,69 @@ supervisor-signed `chore(mcp)` regeneration commit before Slice 2; and the regen
 intuitively "adds". Cycle 1 reasoned from the slice's intent (adds symbols → contract where symbols
 are added); the corpus reads signatures and docs, so the honest contract point was every slice. Where
 a gate is cheap, contract it everywhere rather than modelling its sensitivity.
+
+## D-4 — Slice 2 builder generic requires an out-of-ceiling implementation signature edit
+
+**Severity:** significant · **Class:** slice ceiling · **Shape:** typed-context public surface
+
+**Observed.** Applying the locked `ContextFactory<TCustom>` and
+`ServiceBuilder<TRouter, TCustom>` contract inside Slice 2's nine-file ceiling makes the scoped
+structured check fail in `packages/service/src/builder/service-builder-impl.ts`. The class still
+implements `ServiceBuilder<TRouter>` and its non-generic
+`withContext(factory: ContextFactory): ServiceBuilder<TRouter>` cannot satisfy the public generic
+`withContext<TNext>(factory: ContextFactory<TNext>): ServiceBuilder<TRouter, TNext>` contract. Once
+the interface preserves `TCustom` across the fluent chain, all existing `return this` sites are
+reported incompatible for the same reason.
+
+**Evidence.** The exact command
+`deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --root packages/plugin --ext ts,tsx`
+selected 198 files and failed with `TS2416` at `service-builder-impl.ts:301`, `TS2322` at its 21
+fluent return sites, and `TS2322` at `service-builder.ts:204`. An attempted compatibility default
+for unspecialized `ContextFactory` removed the existing mutable-context property errors but could
+not make the non-generic implementation satisfy the generic builder contract; it was not retained.
+
+**Expected.** Slice 2's ceiling contains every file needed for a green type-contract-only slice;
+implementation-file edits remain signature/generic-only.
+
+**Actual.** The minimal coherent fix requires adding
+`packages/service/src/builder/service-builder-impl.ts` to Slice 2 and parameterizing its class,
+stored factory, fluent return signatures, and `withContext` signature. Those edits can remain
+signature/generic-only; no runtime composition or behavior needs to move from Slice 3.
+
+**Action:** rescope-required. No out-of-ceiling file was edited. Slice 2 stopped before durable
+receipts, commit, push, PR comment, or Slice 3 work.
+
+## D-4 — Slice 2's locked builder contract needs one out-of-ceiling file (resolved by owner ruling)
+
+**Severity:** minor · **Class:** ceiling · **Shape:** the already-ratified **F-3** shape
+
+**Observed.** With the Slice 2 draft applied to its nine authorized files,
+`packages/service/src/builder/service-builder-impl.ts` — **outside** the ceiling — fails to
+type-check. Supervisor measurement across `packages/service` + `packages/plugin`: **3 × `TS2339`**,
+all in that one file (`db`, `traceHeaders`, `principal` do not exist on `Record<never, never>`), and
+it is the **only** failing file.
+
+The implementing thread reported `TS2416` at `withContext` plus 21 × `TS2322` at fluent `return this`
+sites. Those codes were **not reproduced** by the supervisor; the numbers recorded here are the
+supervisor's own. The conclusion is identical either way, and it is the conclusion that matters: the
+new `ServiceBuilder<TRouter, TCustom>` interface cannot be satisfied while its implementation still
+carries the erased signature.
+
+**Handled correctly by the author.** The thread stopped at the plan's own rule — *"a required file
+outside the listed ceiling means stop, append `drift.md`, report"* — created no content or evidence
+head, confined its draft to the nine authorized files, and left the out-of-ceiling file untouched.
+That is a rescope stop working as designed, not a failure.
+
+**Resolution (owner ruling; no PLAN-EVAL cycle 3).** `service-builder-impl.ts` is added to Slice 2's
+ceiling, **signature/generic-only**: parameterize the class and stored factory, preserve the generic
+through fluent returns, specialize `withContext`. **Runtime composition stays in Slice 3.**
+
+**Why this is the F-3 shape rather than a new decision.** PLAN-EVAL cycle 1's F-3 already extended
+this same ceiling by `packages/service/src/builder/service-rpc.ts` for exactly this reason — a
+signature-only widening the locked interface requires. The design is unchanged; only the file list
+catches up with what the accepted contract implies. Deferring instead to Slice 3 would land a Slice 2
+that does not compile, which no gate set can rescue.
+
+**Lesson.** When a slice publishes a *parameterized interface*, its ceiling must include every
+implementation that must widen in lockstep — a type contract and its implementers are one atomic
+change, even when the split between "type" and "behaviour" slices is otherwise sound.
