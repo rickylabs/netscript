@@ -64,6 +64,10 @@ Deno.test('live DB endpoint gate reads the detached dashboard metadata path', ()
   if (gate?.kind !== 'command') {
     throw new Error('Expected live DB endpoint gate to be a command gate.');
   }
+  assertEquals(
+    gate.title,
+    'Users service uses the live second-start Postgres allocation with correlated telemetry',
+  );
 
   const command = gate.command({
     request: {

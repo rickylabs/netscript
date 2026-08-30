@@ -408,6 +408,13 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate scaffold-versions --id quality-scaffold-versions
           --output .llm/tmp/gate-receipts/quality/scaffold-versions.json
 
+      - name: Aspire version parity (phase 1)
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate aspire-version-parity --id quality-aspire-version-parity
+          --output .llm/tmp/gate-receipts/quality/aspire-version-parity.json
+
       - name: Publish dry-run (0 slow-types across all units)
         if: env.RUN_DENO == 'true'
         run: >-
