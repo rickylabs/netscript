@@ -1625,3 +1625,22 @@
   completion (scratches `s7-phase-b*`/`s7-foreign-control*` still on disk for it to reap) and
   launches no rival. Lesson: inactivity monitors must measure the rollout file, not transcript relay
   lag.
+- **D-83 — S5 concurrent-start acceptance: corrected reading, offline-codegen preflight solved,
+  premise error caught and reported before a further live attempt.** Attempts 3–5 (all torn down to
+  exact zero; attempt 5's live AppHosts — started despite a rejected tool call — were stopped and
+  cleaned, leftover relay watchers killed, host re-verified `containers=0 volumes=0 aspire=[]`)
+  established: (a) standalone `db:generate` needs `DATABASE_URL`/`POSTGRES_URI` set to the hosted
+  suite's own offline synthetic value `postgres://postgres:postgres@localhost:5432/postgres`
+  (`database-gates.ts` `offlineGenerateDatabaseUrl`) — not a live DB, Prisma generate never
+  connects; with it set, codegen for two independent scratch roots both succeeded (real `.generated`
+  client artifacts). (b) **The acceptance box text itself was misread twice**: #1717 says _"Two
+  concurrent `aspire start --isolated` of the **same generated project** both reach healthy plugin
+  resources"_ — one scratch, started twice concurrently (the reason `--isolated` randomizes ports),
+  not two distinct project roots. My attempts 3–5 built two distinct roots per an earlier
+  (incorrect) instruction; none of them is the canonical fixture. "Plugin resources" refers to the
+  PR's own scope (workers/sagas/triggers/streams literal-port fixes), so the scratch needs those
+  plugins added at `init` time, not a bare postgres-only project. **Per instruction, stopping here
+  rather than burning attempt 6 on a still-unconfirmed premise:** next static-only step (no runtime)
+  is to scaffold one project with the relevant plugin set, confirm `aspire describe`'s static
+  resource list names the expected plugin resources, only then request the lease for the real
+  receipt (two `aspire start --isolated` of that one project).

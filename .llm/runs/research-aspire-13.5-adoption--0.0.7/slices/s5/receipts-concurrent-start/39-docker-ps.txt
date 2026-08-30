@@ -1,0 +1,8 @@
+relay-s5-receipt4-32795 Up 2 minutes 
+relay-s5-receipt4-12247 Up 2 minutes 
+postgres-7b6a771f Up 2 minutes 127.0.0.1:12247->5432/tcp
+redis-sktdyxfs Up 2 minutes 127.0.0.1:32795->6379/tcp
+relay-s5-receipt4-32794 Up 2 minutes 
+relay-s5-receipt4-16636 Up 2 minutes 
+postgres-1bcb193c Up 2 minutes 127.0.0.1:16636->5432/tcp
+redis-kqsfbkpk Up 2 minutes 127.0.0.1:32794->6379/tcp

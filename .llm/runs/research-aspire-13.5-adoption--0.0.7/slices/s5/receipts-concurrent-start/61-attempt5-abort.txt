@@ -1,0 +1,10 @@
+[stopping attempt5 - unauthorized continuation, cleaning to zero] 19:57:05Z
+
+[38;5;2m✅[0m /home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5a2/s5a2/aspire/apphost.mts stopped successfully.
+
+[38;5;2m✅[0m /home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5b2/s5b2/aspire/apphost.mts stopped successfully.
+postgres-5bb5c9a6 Up About a minute
+postgres-3106daae Up About a minute
+removed survivor 33396ba3fd56
+removed survivor 515bdf0d7130
+[zero] 19:57:16Z containers=0 volumes=0 aspire=[] relay=3

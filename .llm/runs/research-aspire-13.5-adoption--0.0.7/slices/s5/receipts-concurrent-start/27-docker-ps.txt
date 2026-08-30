@@ -1,0 +1,5 @@
+relay-s5-receipt3-32793 Up Less than a second 
+redis-tusxdpsa Up 1 second 127.0.0.1:32793->6379/tcp
+relay-s5-receipt3-32792 Up 5 seconds 
+relay-s5-receipt3-32791 Up 8 seconds 
+postgres-6b6307d0 Up 10 seconds 127.0.0.1:32792->5432/tcp

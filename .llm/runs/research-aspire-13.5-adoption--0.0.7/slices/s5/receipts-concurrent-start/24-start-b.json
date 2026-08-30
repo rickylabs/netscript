@@ -1,0 +1,10 @@
+[38;5;9m🛑[0m Stopping previous instance (AppHost PID: 3597062, CLI PID: 3597045)
+[38;5;2m✅[0m Running instance stopped successfully.
+[2mStarting Aspire AppHost in the background...[0m
+{
+  "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5c3/s5c3/aspire/apphost.mts",
+  "appHostPid": 3598553,
+  "cliPid": 3598487,
+  "dashboardUrl": "https://localhost:35185",
+  "logFile": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T194936707_detach-child_0f0154303a974efe89b006021878d669.log"
+}

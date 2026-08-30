@@ -1,0 +1,20 @@
+[
+  {
+    "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5b/s5b/aspire/apphost.mts",
+    "appHostPid": 3607090,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 3607066,
+    "dashboardUrl":"<redacted>",
+    "logFilePath": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T195121442_detach-child_04726e103c1248dd8978f5ac189e78e7.log"
+  },
+  {
+    "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5a/s5a/aspire/apphost.mts",
+    "appHostPid": 3605791,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 3605727,
+    "dashboardUrl":"<redacted>",
+    "logFilePath": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T195112376_detach-child_3859cb15f6b24643a4ce105f16b136e2.log"
+  }
+]
