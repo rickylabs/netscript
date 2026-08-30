@@ -8836,3 +8836,50 @@ landing (or an explicit ruling to attempt the direct-route path). Checked this l
 queue for other non-eval work: #1466/PR #1731 and #1730 are both already shipped earlier in this run;
 #1664 remains parked with no retry authorized. **No other independent slice exists in this lane right
 now** — there is genuinely no non-eval work to continue on while #1387 waits.
+
+## Milestone 0.0.7 audit — next unclaimed, unblocked, user-facing feature leaf
+
+Per the coordinator's instruction to not sit idle on #1792, audited all 56 open milestone-0.0.7
+issues against the live ownership ledger (open PRs' `refs #N` bodies, cross-referenced with
+`.llm/runs/` directories on `main`) rather than a generic queue claim.
+
+### Owned or blocked — excluded with exact proof
+
+| Issue(s) | Proof of ownership/block |
+| --- | --- |
+| #1354, #1355, #1356, #1357, #1360 | Referenced by open PR #1781 `fix/ui-add-data-screen-triad` |
+| #1355, #1360 (again) | Also referenced by open PR #1664 `feat/app-service-client-wiring` — **this lane's own parked issue**, no retry authorized |
+| #1712 and children #1718, #1719, #1720, #1721, #1722, #1723, #1724, #1280, #863, #1429, #1732 | Referenced by five concurrently open PRs (#1743, #1744, #1754, #1759, #1760, #1771, #1779, #1747) — the Aspire 13.5 epic, an active sibling lane per standing instruction to leave `007-aspire-s*` worktrees alone |
+| #1368 | Referenced by open PR #1764 |
+| #1462, #1739 (already shipped), #1740, #1761, #1785, #1788, #1790, #1793, #1794 | Referenced by open PR #1758 |
+| #1533, #1425, #1765, #1766 | Referenced by open PR #1756 |
+| #1791 | Referenced by open PR #1792 — itself the subject of the current STOP/park ruling |
+| #1795, #1797, #1799 | Each referenced by its own open docs PR (#1796, #1798, #1800) |
+| #1576, #1616 | Referenced by open PR #1773 |
+| #1348 (epic) and children #1349, #1351, #1352, #1353, #1467, #1093 | No open PR references any of them, **but** a run directory already exists on `main` — `.llm/runs/docs-rfc-sdk-client-contribution--rfc` — evidence of prior/ongoing ownership of the epic's research; all children are `status:plan`, not `status:triage`, meaning someone has already scoped them. Treated as another supervisor's accepted topic, not picked up. |
+
+### Genuinely unclaimed candidates (no PR, no run-dir, `status:triage`)
+
+#1451, #1452, #1458, #1590, #1591, #1592 — none referenced by any of the 24 open PRs; none have a
+`.llm/runs/` directory on `main`; none carry `status:blocked`.
+
+**Selected: #1591** — "AI provider adapter needs a typed OpenAI Responses mapper," `type:feat`,
+`priority:p1`, `area:ai`. Chosen over the other five: #1590 (Fresh partial navigation) is genuinely
+complex client-runtime work needing browser-level verification this lane cannot perform (no runtime
+lease); #1592 (workers durable progress) touches schema/runtime/stream-publish across three layers
+with non-trivial ordering/coalescing/replay guarantees; #1451/#1452/#1458 are reasonable but lower
+priority (p1 vs their p1/p2 mix) or less precisely bounded. #1591 has an explicit "Removal condition"
+naming its exact acceptance bar (positive/negative type tests against the Responses wire shape), and
+research confirmed the existing code already has the seam half-built:
+`OpenAiCompatibleModelProviderConfig.api?: 'chat-completions' | 'responses'` already exists and is
+already passed to the underlying TanStack client — only the **generation-options mapper** is
+hardcoded to the Chat Completions shape (`openAiCompatibleGenerationModelOptions`, flat
+`reasoning_effort`/`max_tokens`) regardless of `api`. This is a small, precisely-scoped, single-file
+addition with five sibling mappers (Anthropic/OpenRouter/Ollama/OpenAI-compatible) already
+establishing the exact pattern and test shape to follow.
+
+**PLAN-EVAL: N/A** — small, mechanical, complete contract/scope/acceptance/gates record per
+`lane-policy.md`'s own carve-out. No genuinely complex or critical design decision: the target shape
+is dictated by the real OpenAI Responses API wire format, the pattern is already established five
+times over in this exact file, and the acceptance bar is a pure-function unit-test parity with the
+existing `generation_options_test.ts` suite.
