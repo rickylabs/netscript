@@ -6506,3 +6506,71 @@ itself, so there is no divergence and no rebase is owed. Slice 3 continues on th
 | Slice 3 | in flight, thread `01a05215`, based on `bbff7cf9` |
 | Carried | G-4 + AF-1 → slice 3; **G-7 → supervisor, at the slice-3 Tier-A stop** |
 | PR #1731 | draft, `Refs #1466 — partial`, one `status:impl-eval` |
+
+## 2026-08-30 — #1466 TERMINAL: final all-slices IMPL-EVAL `PASS`; readiness normalized; merge handed off
+
+### Verdict
+
+Session `8d9946e6` (Claude Fable 5 · medium, own detached worktree `ns1466-impleval-final`, route
+verified from its own transcript) evaluated **all three slices together** at head `e34505f1`:
+**`PASS` — terminal for #1466.** Failure count unchanged at **1 of 2**. **No re-evaluation scope.**
+
+All six acceptance points **PASS**, each re-derived by the evaluator. Its own runs: root `test`
+**4258 / 0 / 19**, package suites **94 / 94**, `docs:exports-drift` and `quality:gate` green,
+`public-doc-lint` **12 = 12 with the exact R-1 set**, all eight receipts at each content head with
+`gitHead == actualGitHead` and no `SKIPPED`, four archives byte-intact with G-7's restoration
+byte-faithful, `deno.lock` unchanged, **S1 not regressed by S2/S3**.
+
+**It broke S2 on purpose** — seven product-level mutations, each turning the real-export fixture red.
+That was the verification S2 most needed: it had a Tier-A from me but had never been formally
+evaluated, and a declaration-only change is exactly where a guard can look real and prove nothing.
+
+### The finding worth carrying forward
+
+**H-1** — the anchored G-1 pin is defeated by **identifier rebinding**: alias
+`NetScriptProcedureMeta` to an `import()` type and the initializer text stays byte-identical while
+every contracted gate goes green. That is a strictly deeper forgery class than the dead decoy cycle 2
+found, which is itself deeper than the tautology I found at Tier-A. Three evaluations, three
+progressively subtler ways for the same guard to be true and mean nothing. The lesson is not about
+this regex: **a source-text pin secures the text and nothing about what the identifiers in it are
+bound to.** Non-blocking (no consumer-visible effect under `isolatedDeclarations`), and the fix is
+named in H-1.
+
+### Readiness normalized — Ruling B items that are mine
+
+- **PR #1731 body rewritten.** `Refs #1466 — partial` → **`Closes #1466`**; the "does not complete"
+  paragraph and "Remaining scope" section removed; S2/S3/IMPL-EVAL slice rows checked with content
+  heads; all six Definition-of-Done boxes ticked. The keyword is now genuinely owed — it was withheld
+  for exactly as long as it was false.
+- **H-3 closed** (`32a698e1`, evidence-only, content head unchanged): `supervisor.md` now records the
+  S2 author `01a051f8` and S3 author `01a05215` at `gpt-5.6-sol · high` with matched route verdicts,
+  narrows `normal_implementation · medium` to the S1 repair cycles with the reason, and adds the S2/S3
+  Tier-A rows and this evaluator session.
+
+### Blocked by correct ordering, not by omission
+
+`mirror-acceptance-evidence.ts --dry-run` reports **"Mirror skipped because live PR labels do not
+include `status:ready-merge`"**. That gate is right: the acceptance mirror must observe a
+ready-to-merge PR, which follows the ready-flip and a green CI matrix. So Ruling B item 2 cannot run
+before item 4, and item 4 is the coordinator's.
+
+### Withheld deliberately — the ready-flip is a decision, not a formality
+
+Per Ruling B item 4, flipping out of draft **triggers the CI matrix and dispatches an OpenHands
+IMPL-EVAL unless `impl-eval:skip` is applied**. The native opposite-family IMPL-EVAL is already done
+and terminal. Whether a second evaluator runs on the same head should be, in the evaluator's words,
+"a deliberate choice, not an accident of the flip" — so this lane does not flip and does not
+pre-empt the `impl-eval:skip` decision by acting first.
+
+Also withheld and unchanged: `status:ready-merge`, the four follow-up issues (H-1, H-2, H-4, and the
+R-3 catalog entry) which Ruling B assigns to the coordinator, and **the merge, which is a human
+decision**.
+
+### Lane state
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **terminal PASS**, readiness normalized, awaiting coordinator ready-flip and human merge |
+| #1664 | parked at `20337441788b`; runtime question now testable again on the DinD sandbox (D-31), no retry authorized |
+| #1387 | queued, brief written (`slices/research-plan-1387.md`) |
+| #1730 | queued, brief written (`slices/impl-1730.md`) |
