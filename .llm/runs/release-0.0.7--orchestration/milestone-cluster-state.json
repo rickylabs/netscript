@@ -5244,18 +5244,18 @@
     "dockerContainers": 0,
     "dockerVolumes": 0,
     "aspireApplications": 0,
-    "registeredWorktrees": 108,
+    "registeredWorktrees": 70,
     "terminalTypedErrorWorktreesRemoved": true,
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
     "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2; identical /home/agent bind visibility is fixed; direct all-interface publications are reachable at netscript-dind:<port>; DCP loopback-only publications require the proven owner-scoped two-hop relay; exact current inventories containers=0 and volumes=0; host Docker remains outside agent authority",
     "aspireMcpHelpers": "not counted as AppHost runtimes; no Aspire applications are active",
     "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD client/server 28.5.2; fs.inotify.max_user_instances 1024",
-    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; D-42 fixed and direct DinD service routing proven; real DCP loopback contract needs the proven two-hop relay; current inventories Aspire=0, Docker containers=0, Docker volumes=0 after S6 D-100 cleanup; registered-worktree count is 108 and requires an ownership audit before any deletion; cross-supervisor cleanup is prohibited",
+    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; current inventories Aspire=0, Docker containers=0, Docker volumes=0; ownership audit reduced registered worktrees from 108 to 70 by removing 38 clean terminal registrations without deleting branches, while 60 live/required and 10 dirty inspection cases were preserved; fixes relinquished maintenance-only #1758 convergence to the sole internals owner",
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-30T21:50:37.000Z"
+    "verifiedAt": "2026-08-30T22:03:52.000Z"
   },
-  "updatedAt": "2026-08-30T21:50:37.000Z"
+  "updatedAt": "2026-08-30T22:03:52.000Z"
 }

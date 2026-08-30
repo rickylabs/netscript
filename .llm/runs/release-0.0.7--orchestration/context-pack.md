@@ -1797,3 +1797,14 @@ continues concurrently because serial ordering is per orchestrator, not global.
   unconditional recovery. Remove Docker mutation/permission from the product gate. Preserve 56
   green results and accepted evaluator receipts; require SOL/high review after freeze.
 - Host state after aborting D-100 is Aspire `[]`, Docker `[]`.
+
+## Resume delta — 2026-08-30T22:03:52Z
+
+- Worktree registry is 70 after 38 clean/no-process/proven-terminal registrations were removed
+  without force or branch deletion. Preserve 60 live/current trees and 10 dirty terminal audit
+  cases; especially never force-remove `007-aspire-s6-new` or `007-leaf-1732`.
+- #1758 has one owner: internals after #1792. Its clean current-main maintenance head is
+  `a391cbaa0`; fixes must not touch it again. Fixes continues #1781 then #1764.
+- Features Slice 7, docs #1793, and Aspire's scratch-fixture repair each have a live SOL/high Codex
+  thread. Routing #1792 has an exact-head GLM/max `PASS` and is packaging its three low bookkeeping
+  findings. No historical DeepSeek evaluation is rerun.

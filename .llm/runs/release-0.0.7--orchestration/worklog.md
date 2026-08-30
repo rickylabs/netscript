@@ -2889,3 +2889,22 @@
 - Aspire aborted the non-portable D-100 acceptance attempt and cleaned Aspire/Docker to exact zero.
   Existing 56 green runtime gates and all accepted DeepSeek evidence carry. A fresh SOL/high review
   remains mandatory after the corrected fixture is frozen; no runtime lease transfers before then.
+
+## 2026-08-30T22:03:52Z — ownership-safe worktree cleanup and lane collision repair
+
+- A read-only audit classified all 108 registrations using process CWDs, Remote Control/tmux state,
+  Codex thread CWDs, GitHub PR heads, branch supersession, and full dirty state. Migration-flattened
+  mtimes were explicitly rejected as age evidence. The result was 60 live/required, 10 terminal but
+  dirty inspection cases, and 38 clean terminal candidates with no process owner.
+- Removed exactly the 38 proven clean registrations with `git worktree remove`, rechecking dirt and
+  process ownership immediately before each removal. Zero removals were refused; the registry is
+  now 70. No branch or commit was deleted, so every removed checkout is recoverable by re-adding its
+  retained ref. All ten dirty cases remain untouched, including conflicted `007-aspire-s6-new` and
+  the 382-change superseded `007-leaf-1732`.
+- Corrected a duplicate-ownership risk: fixes had performed only current-main maintenance on #1758,
+  producing clean pushed `a391cbaa0`, while internals already owned that leaf after #1792. Fixes
+  proved no process remained in `007-leaf-1462`, recorded the convergence as maintenance-only, and
+  relinquished every future write/eval/metadata action. Internals remains the sole #1758 owner.
+- Features Slice 6 received `ACCEPTED_WITH_FINDINGS`; its product-neutral resume-doc catch-up
+  `ae90bb264` carries the verdict without rerun and Slice 7 is live. Routing #1792 received GLM/max
+  `PASS`; final evidence packaging is live. Existing DeepSeek receipts remain accepted unchanged.

@@ -1466,3 +1466,10 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   serialized focused runtime gate; exact cleanup remains mandatory.
 - On green: freeze product/evidence, dispatch fresh SOL/high focused review, then formal IMPL-EVAL.
   Only after S6 is terminal may #1747 receive the next full runtime lease.
+
+## 2026-08-30T22:03:52Z — active ownership after cleanup
+
+- Registry cleanup is complete at 70; all live/evidence trees and ten dirty audit cases remain.
+- Internals solely owns #1758 after #1792. Fixes owns #1781 then #1764 and may not write #1758.
+- Active independent Codex work: features Slice 7, docs #1793, Aspire S6 scratch fixture. Internals
+  packages #1792's GLM/max PASS. Existing DeepSeek receipts carry and are never rerun for routing.
