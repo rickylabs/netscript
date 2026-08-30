@@ -1,6 +1,9 @@
 import { resolveCanonicalOperation } from '../../domain/openapi/canonical-identity.ts';
 import { indexOpenApiOperations } from '../../domain/openapi/operation-index.ts';
-import type { OperationAccessSummary } from '../../domain/openapi/operation-access.ts';
+import {
+  deriveOperationAccessSummary,
+  type OperationAccessSummary,
+} from '../../domain/openapi/operation-access.ts';
 import {
   projectOperationSchemaViews,
   SCHEMA_VIEW_NAMES,
@@ -61,6 +64,8 @@ export function createGetOperationSchemaFlow(directory: ServiceEndpointDirectory
     }
     const operation = resolution.operation;
     const views = projectOperationSchemaViews(index.document, operation);
+    const access = deriveOperationAccessSummary(operation.operation);
+    const guidance = curlGuidance(row.baseUrl, operation.method, operation.path, access);
     return {
       ok: true,
       value: {
@@ -70,8 +75,8 @@ export function createGetOperationSchemaFlow(directory: ServiceEndpointDirectory
         path: operation.path,
         view: parsed.view,
         schema: views[parsed.view],
-        curlExample: curlExample(row.baseUrl, operation.method, operation.path),
-        authNote: OPENAPI_CURL_AUTH_NOTE,
+        ...guidance,
+        ...(access ? { access } : {}),
       } satisfies GetOperationSchemaResult,
     };
   };
@@ -89,8 +94,41 @@ function parseInput(input: unknown): GetOperationSchemaInput | undefined {
   return { service: record.service, operation: record.operation, view: view as SchemaViewName };
 }
 
-function curlExample(baseUrl: string, method: string, path: string): string {
-  return `curl -X ${method} '${baseUrl.replace(/\/$/, '')}${path}'`;
+interface CurlGuidance {
+  readonly curlExample: string;
+  readonly authNote: string;
+}
+
+function curlGuidance(
+  baseUrl: string,
+  method: string,
+  path: string,
+  access: OperationAccessSummary | undefined,
+): CurlGuidance {
+  const url = `${baseUrl.replace(/\/$/, '')}${path}`;
+  const curlExample = `curl -X ${method} '${url}'`;
+  switch (access?.authentication) {
+    case 'none':
+      return {
+        curlExample: `${curlExample} # Public operation: no Authorization header required`,
+        authNote: 'Public operation; no Authorization header is required.',
+      };
+    case 'optional':
+      return {
+        curlExample:
+          `${curlExample} # Optional authentication: add an Authorization header if needed`,
+        authNote:
+          'Authentication is optional; add an Authorization header only when identity is needed.',
+      };
+    case 'required':
+      return {
+        curlExample: `curl -X ${method} -H 'Authorization: Bearer <credential>' '${url}'`,
+        authNote:
+          'Authentication is required; add an Authorization header before sending this request.',
+      };
+    default:
+      return { curlExample, authNote: OPENAPI_CURL_AUTH_NOTE };
+  }
 }
 
 function failure(code: string, message: string): ToolExecutionResult {
