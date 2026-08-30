@@ -20,6 +20,8 @@ omits chat/session identifiers as required by the owner boundary for this leaf.
 | --------------- | ------------------------------------------------------------------ | --------------------------------------------------------- |
 | `research-plan` | OpenAI Codex, current fresh thread                                 | Research author and locked-plan author                    |
 | `plan-eval`     | Anthropic Claude / Fable 5 / medium, fresh opposite-family session | Required next gate; not dispatched in this planning slice |
+| `slice-2-impl`  | OpenAI Codex, fresh thread; `complex_implementation` route            | Typed-context public-surface implementation                |
 
-The implementation route is intentionally unset. It may be selected from the then-current lane
-policy only after the separate PLAN-EVAL returns `PASS` and dependency #1466 has landed.
+The implementation route was selected only after the accepted PLAN-EVAL adapter boundary, the
+owner-approved plan repair, Slice 1 Tier-A acceptance, and the pre-Slice-2 corpus regeneration had
+all landed. The exact volatile runtime model identifier remains intentionally outside this carrier.

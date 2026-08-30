@@ -47,7 +47,7 @@ export function wireRpc(
   app: Hono,
   router: ServiceRouter,
   serviceName: string,
-  buildContext: (c: Context) => Record<string, unknown>,
+  buildContext: (c: Context) => object,
   options?: RpcWiringOptions,
 ): void {
   const rpcPath = options?.rpcPath ?? '/api/rpc';
@@ -93,7 +93,7 @@ function registerRpcPath(
   app: Hono,
   rpcHandler: ReturnType<typeof createRPCHandler>,
   path: string,
-  buildContext: (c: Context) => Record<string, unknown>,
+  buildContext: (c: Context) => object,
   onMatched?: (context: Context) => void,
 ): void {
   app.use(`${path}/*`, async (c: Context, next: () => Promise<void>) => {

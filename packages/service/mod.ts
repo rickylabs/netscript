@@ -126,6 +126,7 @@ export type {
   ServiceContext,
   ServiceErrorHandler,
   ServiceHandler,
+  ServiceHandlerContext,
   ServiceHandlerPlugin,
   ServiceMiddleware,
   ServiceNotFoundHandler,

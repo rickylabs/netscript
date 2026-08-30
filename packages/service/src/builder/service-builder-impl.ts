@@ -16,6 +16,7 @@ import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logge
 import { createHonoTracingMiddleware } from '@netscript/telemetry/hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
+import type { Principal } from '../auth/types.ts';
 import {
   createHealthHandler,
   createLivenessHandler,
@@ -57,7 +58,10 @@ interface DeferredRoute {
  * defaults. For a Layer 3 one-liner, use `defineService()`. Construct via the
  * `createService()` factory rather than directly.
  */
-export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilder<TRouter> {
+export class ServiceBuilderImpl<
+  TRouter extends ServiceRouter,
+  TCustom extends object = Record<never, never>,
+> implements ServiceBuilder<TRouter, TCustom> {
   private app: Hono;
   private router: TRouter;
   private config: ServiceConfig;
@@ -69,7 +73,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   private healthConfigured = false;
   private startupHooks: Array<() => Promise<void>> = [];
   private shutdownHooks: ShutdownHook[] = [];
-  private contextFactory: ContextFactory = () => ({});
+  private contextFactory: ContextFactory<TCustom> = () => ({}) as TCustom;
   private database: DbContext | null = null;
   private authnOptions: AuthnOptions | null = null;
   private authzOptions: AuthzOptions | null = null;
@@ -92,7 +96,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param options - CORS configuration options
    */
-  withCors(options?: CorsOptions): ServiceBuilder<TRouter> {
+  withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom> {
     this.app.use('*', cors(options ?? { origin: '*' }));
     return this;
   }
@@ -108,7 +112,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param options - Logger middleware configuration
    */
-  withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter> {
+  withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter, TCustom> {
     this.app.use('*', loggerMiddleware(this.config.name, options));
     return this;
   }
@@ -139,7 +143,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     db: DbContext,
     healthCheckDb?: Database,
     healthCheckOptions?: HealthCheckAdapterOptions,
-  ): ServiceBuilder<TRouter> {
+  ): ServiceBuilder<TRouter, TCustom> {
     // Store database reference for context injection
     this.database = db;
 
@@ -166,7 +170,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param check - Health check definition
    */
-  withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter> {
+  withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter, TCustom> {
     this.healthChecks.push(check);
     return this;
   }
@@ -176,7 +180,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param check - Async function returning true if ready
    */
-  withReadinessCheck(check: () => Promise<boolean>): ServiceBuilder<TRouter> {
+  withReadinessCheck(check: () => Promise<boolean>): ServiceBuilder<TRouter, TCustom> {
     this.readinessChecks.push(check);
     return this;
   }
@@ -186,7 +190,9 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param options - OpenAPI configuration
    */
-  withOpenAPI(options?: { title?: string; description?: string }): ServiceBuilder<TRouter> {
+  withOpenAPI(
+    options?: { title?: string; description?: string },
+  ): ServiceBuilder<TRouter, TCustom> {
     if (this.openApiConfigured) return this;
     this.openApiConfigured = true;
     this.openApiOptions = options ?? {};
@@ -198,7 +204,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param options - Scalar docs configuration
    */
-  withDocs(options?: { specUrl?: string }): ServiceBuilder<TRouter> {
+  withDocs(options?: { specUrl?: string }): ServiceBuilder<TRouter, TCustom> {
     if (this.docsConfigured) return this;
     this.docsConfigured = true;
 
@@ -232,7 +238,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
       }[];
       rpcRouter?: ServiceRouter;
     },
-  ): ServiceBuilder<TRouter> {
+  ): ServiceBuilder<TRouter, TCustom> {
     if (this.rpcConfigured) return this;
     this.rpcConfigured = true;
     this.rpcOptions = options ?? {};
@@ -241,13 +247,13 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   }
 
   /** Enables authentication middleware for guarded paths. */
-  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter> {
+  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter, TCustom> {
     this.authnOptions = options;
     return this;
   }
 
   /** Enables authorization middleware for guarded paths. */
-  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter> {
+  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter, TCustom> {
     this.authzOptions = options;
     return this;
   }
@@ -256,8 +262,12 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * Builds the per-request oRPC context: custom factory output plus the optional
    * database handle and distributed-trace headers.
    */
-  private buildRpcContext(c: Context, traceContext: boolean): Record<string, unknown> {
-    const ctx = this.contextFactory(c);
+  private buildRpcContext(c: Context, traceContext: boolean): object {
+    const ctx: TCustom & {
+      db?: DbContext;
+      traceHeaders?: Readonly<Record<string, string | undefined>>;
+      principal?: Principal;
+    } = this.contextFactory(c);
 
     // Add database to context if configured via withDatabase()
     if (this.database) {
@@ -298,8 +308,10 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *   .withRPC()
    * ```
    */
-  withContext(factory: ContextFactory): ServiceBuilder<TRouter> {
-    this.contextFactory = factory;
+  withContext<TNext extends object>(
+    factory: ContextFactory<TNext>,
+  ): ServiceBuilder<TRouter, TNext> {
+    this.contextFactory = factory as ContextFactory<TCustom & TNext>;
     return this;
   }
 
@@ -320,7 +332,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *   .serve()
    * ```
    */
-  onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter> {
+  onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter, TCustom> {
     this.startupHooks.push(hook);
     return this;
   }
@@ -342,7 +354,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *   .serve()
    * ```
    */
-  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter> {
+  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter, TCustom> {
     this.shutdownHooks.push(hook);
     return this;
   }
@@ -358,7 +370,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    */
   withHealth(
     options?: { checks?: HealthCheck[]; includeDetails?: boolean },
-  ): ServiceBuilder<TRouter> {
+  ): ServiceBuilder<TRouter, TCustom> {
     if (this.healthConfigured) return this;
     this.healthConfigured = true;
 
@@ -385,7 +397,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    *
    * @param middleware - Service middleware handler
    */
-  use(middleware: ServiceMiddleware): ServiceBuilder<TRouter> {
+  use(middleware: ServiceMiddleware): ServiceBuilder<TRouter, TCustom> {
     this.app.use('*', middleware);
     return this;
   }
@@ -401,7 +413,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     method: ServiceRouteMethod,
     path: string,
     handler: ServiceHandler,
-  ): ServiceBuilder<TRouter> {
+  ): ServiceBuilder<TRouter, TCustom> {
     this.deferredRoutes.push({ method, path, handler });
     return this;
   }
@@ -409,7 +421,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   /**
    * Configures the service root endpoint with service info.
    */
-  withServiceInfo(): ServiceBuilder<TRouter> {
+  withServiceInfo(): ServiceBuilder<TRouter, TCustom> {
     this.app.get('/', (c: Context) =>
       c.json({
         service: this.config.name,
