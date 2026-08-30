@@ -8,6 +8,15 @@ import type {
   Schema,
 } from '@orpc/contract';
 import type { NetScriptProcedureMeta } from '../domain/procedure-meta.ts';
+import type { ContractObjectSchema } from '../domain/schema-types.ts';
+import type {
+  ForbiddenError,
+  NotFoundError,
+  RateLimitError,
+  ServiceUnavailableError,
+  UnauthorizedError,
+  ValidationError,
+} from '../domain/schemas.ts';
 import {
   forbiddenErrorSchema,
   notFoundErrorSchema,
@@ -17,36 +26,42 @@ import {
   validationErrorSchema,
 } from '../domain/schemas.ts';
 
-type CommonErrorMap = Readonly<{
+/**
+ * Exact NetScript-owned error definitions applied by {@link baseContract}.
+ *
+ * The type preserves every public error code, HTTP status, message literal, and data schema while
+ * keeping the upstream oRPC merge machinery outside NetScript's public surface.
+ */
+export type CommonErrorMap = Readonly<{
   NOT_FOUND: Readonly<{
     status: 404;
     message: 'Resource not found';
-    data: typeof notFoundErrorSchema;
+    data: ContractObjectSchema<NotFoundError, NotFoundError>;
   }>;
   VALIDATION_ERROR: Readonly<{
     status: 422;
     message: 'Validation failed';
-    data: typeof validationErrorSchema;
+    data: ContractObjectSchema<ValidationError, ValidationError>;
   }>;
   UNAUTHORIZED: Readonly<{
     status: 401;
     message: 'Authentication required';
-    data: typeof unauthorizedErrorSchema;
+    data: ContractObjectSchema<UnauthorizedError, UnauthorizedError>;
   }>;
   FORBIDDEN: Readonly<{
     status: 403;
     message: 'Access denied';
-    data: typeof forbiddenErrorSchema;
+    data: ContractObjectSchema<ForbiddenError, ForbiddenError>;
   }>;
   RATE_LIMITED: Readonly<{
     status: 429;
     message: 'Too many requests';
-    data: typeof rateLimitErrorSchema;
+    data: ContractObjectSchema<RateLimitError, RateLimitError>;
   }>;
   SERVICE_UNAVAILABLE: Readonly<{
     status: 503;
     message: 'Service temporarily unavailable';
-    data: typeof serviceUnavailableErrorSchema;
+    data: ContractObjectSchema<ServiceUnavailableError, ServiceUnavailableError>;
   }>;
 }>;
 
