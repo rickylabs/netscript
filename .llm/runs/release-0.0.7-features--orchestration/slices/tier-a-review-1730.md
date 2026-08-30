@@ -92,3 +92,70 @@ caught by a rule this lane paid for on that sibling.
 PR body is still partial (S3/S4 and 6 DoD unchecked, no acceptance map, no S4 phase comment); issue
 #1730's five boxes are unchecked; **no separate-session IMPL-EVAL has run**; and draft CI reports
 every matrix job **skipped**, which is **not** a pass. Those are the next steps, in that order.
+
+---
+
+# Tier-A cycle 2 — IMPL-EVAL `FAIL_FIX` repair at `1c836918`
+
+Repair head **`1c836918`**, local == `origin`, clean. Evaluator verdict `6977debd` (evidence-only).
+
+## F-1 closed — and I broke it myself, both ways
+
+The fix captures `stream()`'s second argument (`async *stream(request, options)`), destructures out
+`signal`, folds the remaining `ChatClientCallOptions` into the per-request projection, and pairs
+request↔options by index. 498 LOC, under the F-10 ceiling of 500.
+
+| Probe (mine, at `1c836918`) | Result |
+| --- | --- |
+| Unmodified | **9 / 0** |
+| **Mutation B2** — `{ signal, modelOptions: { ctx: JSON.stringify(input.context) } }` at `loop.ts:165` | **RED, 8 / 1** |
+| **Mutation B** — context appended to `system` | **RED, 8 / 1** (still fires) |
+| After each revert | **9 / 0**, tree clean |
+
+B2 left **all 147 tests green** before this repair. That is the finding closed, and it is the one my
+own Tier-A missed after breaking the guard twice — the separate evaluator earned its place.
+
+F-2 handled by comment, naming the incidental owner of the `modelId` path rather than silently
+leaving it unguarded.
+
+## F-3 / F-4 / F-6 — the receipt trail is now accurate
+
+`worklog.md` now records that the `publish-dry-run` argv is the **workspace** `deno task
+publish:dry-run`, not the planned package-cwd `deno publish --dry-run --allow-dirty`, and that
+**attempt 2 at 30,719 ms** superseded a 150 ms value that "was a replay and is not" valid evidence.
+The receipt audit table is in the worklog, so it no longer lives only in a partly stale PR comment.
+
+Seven receipts re-cut at `1c836918`, all `gitHead == actualGitHead`: `check`, `lint`, `fmt-check`,
+`test`, `quality-gate`, `publish-dry-run` **PASS**; `doc-lint` the contracted base-red delta.
+`packages/ai` **147 / 147**; `deno.lock` unchanged; **zero** product outside `packages/ai/tests` over
+the merge base.
+
+## A correction to my own AF-1 rule — I nearly raised a false positive
+
+`check-final.json` recorded **8,090 ms** where the prior head's receipt said 119,238 ms, and by the
+rule I wrote after the 150 ms defect I flagged it. Measured before asserting:
+
+| Where | Duration |
+| --- | --- |
+| author's worktree, fully warm | **89 ms** |
+| the receipt's own run | 8,090 ms |
+| my run, cold, in a fresh worktree | **117,649 ms** |
+
+`deno task check` caches aggressively; `publish:dry-run` does not — which is exactly why re-running
+*that* one still took ~30 s and proved 150 ms impossible. The receipt's own stdout shows the complete
+work (`filesSelected: 2937, batches: 25, failedBatches: 0`).
+
+**So the rule needs sharpening: a short duration is not itself evidence of a replay.** The test is
+whether the gate *can* cache, and whether the receipt's own output shows the full work it claims. Left
+as "check `argv` and `durationMs`", the rule generates false positives on cached gates — which would
+train people to ignore it, the opposite of what it is for.
+
+## Verdict — cycle 2
+
+**`ACCEPTED`** at `1c836918`. All six actionable IMPL-EVAL findings are closed: F-1 and F-2 in the
+test, F-3/F-4/F-6 in the durable trail, F-5 by the supervisor's Tier-A comment on PR #1763. F-7 is
+informational.
+
+Outstanding and not Tier-A's to close: a second separate-session IMPL-EVAL at this head (failure count
+stands at **1 of 2**), then body/acceptance/ready/mirror and **real `SUCCESS` CI** — the draft matrix
+currently reports every job `skipped`, which is not a pass.
