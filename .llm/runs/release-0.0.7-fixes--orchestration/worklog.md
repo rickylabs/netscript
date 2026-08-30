@@ -4721,3 +4721,58 @@ The earlier park instruction never landed — the thread stayed continuously bus
 fails with an active-writer conflict. That overrun now turns out to be the work the queue needs, but
 the sequencing lesson stands: a park that cannot be delivered is not a park, and this lane should have
 said so plainly at the time rather than describing it as parked.
+
+## 2026-08-30 — #1368 driven to Tier-A PASS at `456e5590`; exact-head IMPL-EVAL dispatched
+
+### Conditions delivered and made executable, not just recorded
+
+The two PLAN-EVAL cycle-2 conditions were delivered on the author's next idle boundary (auto-delivered
+by a watcher, since a mid-turn resume fails with an active-writer conflict). Both are now recorded in
+the worklog **and** enforced by tests — which is the difference that matters:
+
+- **F3b** — *"SagaCompensator records missing handlers as skipped **without deriving correlation**"* and
+  *"rejects a registered handler when **engine correlation context is absent**"*. The load-bearing half
+  of F3b was that absent fields must mean absent, not "derive locally"; there are now two cases that
+  fail if a fallback returns.
+- **F1 residual** — recorded that `saga.cascade.complete` emits whenever `completed` is true regardless
+  of store presence, carrying the **persisted** status.
+- **D8** — *"compensation and returned cascades consume engine-selected correlation and parents"*.
+- **F4** — *"bridge records send failures at the downstream operation"*, closing the uninstrumented
+  `send` path.
+
+### The red-before flipped honestly
+
+`2146443c`: exit 1 · **0 passed / 2 failed**, both `AssertionError`. `7517ae50`: exit 0 ·
+**9 passed / 0 failed**. The file grew 2 → 9 cases, so the real question was whether the original red
+was weakened. It was not: both original case names survive **verbatim** with their assertions
+(`expected saga.cascade.compensate to be started`, `order-42`).
+
+### Gates at `7517ae50`
+
+Ceiling **13 of the locked 19**, none outside; `deno.lock` byte-unchanged; whole `plugin-sagas-core`
+**81 passed / 0 failed / 3 ignored**; plugin targeted test **7/0**; scoped check, lint and fmt all
+clean; `check:agent-docs-prose`, check-only assets-barrel, and `check:publish-assets` all exit 0.
+
+**A supervisor error caught and corrected in place.** The first ceiling pass flagged the two
+`plugins/sagas/**` files as violations. They are items **8 and 15** of the locked ceiling — the gate
+runner's pattern was too narrow, not the author's work. Re-checked against the plan's actual 19-path
+list, containment is clean. Reported as my error rather than as a finding against the leaf.
+
+### `check:mcp-export-corpus` — a deliberate stop, attributed
+
+NONZERO at head; **exit 0 in a pristine worktree at base `f8b4f804`**. So the staleness is
+**leaf-caused**, not inherited — exactly what gate 16 predicted — and the author correctly did **not**
+regenerate. No new exported symbol was added; the corpus moves via **signature** changes to existing
+exports, consistent with D8. Regeneration stays owner-sequenced while the shared-asset sequence is
+live. Recorded as a stop-and-report, **not a pass and not a waiver**.
+
+### Tier-A signed; evaluator dispatched
+
+Tier-A sign-off `456e5590`, pushed. IMPL-EVAL cycle 1 dispatched at that head — route
+`claude-fable-5` · medium · Remote Control (matched), background `5442ba25`, dedicated worktree
+`007-eval-1368`, verdict branch `eval/impl-eval-1368-cycle-1`, independent of the author and of both
+plan evaluators. Its brief carries the supervisor's findings to reproduce or refute, including the
+corpus attribution and the instruction to confirm gate 18's `NOT_RUN` is never presented as a pass.
+
+`review-threads` PASS, 0 unanswered. Phase normalized to `status:impl-eval` on PR #1764 and issue
+#1368.
