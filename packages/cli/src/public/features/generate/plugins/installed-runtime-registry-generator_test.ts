@@ -181,6 +181,88 @@ describe('installed runtime registry generator', () => {
     );
   });
 
+  it('fails closed when a declared protocol has an omitted or malformed command, and falls back when no protocol is declared', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+
+    const declaredButOmittedCommand = {
+      runtimeRegistryGenerator: { inspectionProtocol: 1 },
+      runtimeRegistries: [{
+        kind: 'map',
+        dir: 'custom',
+        registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+        fileSuffixes: ['.ts'],
+        exclude: ['mod.ts'],
+      }],
+    };
+    const declaredButNonStringCommand = {
+      runtimeRegistryGenerator: { command: 42, inspectionProtocol: 1 },
+      runtimeRegistries: declaredButOmittedCommand.runtimeRegistries,
+    };
+    for (const manifest of [declaredButOmittedCommand, declaredButNonStringCommand]) {
+      const process = new RecordingProcess(fs);
+      const generate = createInstalledRuntimeRegistryGenerator({
+        fs,
+        process,
+        fetchManifest: () => Promise.resolve(jsonResponse(manifest)),
+      });
+      await assertRejects(
+        () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
+        Error,
+        'Generator inspection protocol 1 failed for @acme/plugin-custom: manifest declares inspectionProtocol but omits or malforms command',
+      );
+      assertEquals(process.calls, []);
+    }
+
+    const legacyProcess = new RecordingProcess(fs);
+    const legacyGenerate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: legacyProcess,
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom'))),
+    });
+    const legacyResult = await legacyGenerate({ dryRun: true, projectRoot: '/workspace/app' });
+    assertEquals(legacyResult, [{
+      path: '.netscript/generated/plugin-custom/custom.registry.ts',
+      plugin: '@acme/plugin-custom',
+      registrableItems: 1,
+      sourceAuthority: 'manifest',
+      sourceFiles: ['custom/item.ts'],
+    }]);
+    assertEquals(legacyProcess.calls, []);
+  });
+
+  it('fails closed with the stable protocol-failure prefix when the generator process itself fails to start', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const throwingProcess: ProcessPort = {
+      exec() {
+        throw new Error('spawn deno ENOENT');
+      },
+    };
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: throwingProcess,
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+    });
+    await assertRejects(
+      () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
+      Error,
+      'Generator inspection protocol 1 failed for @acme/plugin-custom: generator process failed to start: spawn deno ENOENT',
+    );
+  });
+
   it('rejects invalid report targets, source paths, duplicates, and source files', async () => {
     const cases: ReadonlyArray<{ readonly report: unknown; readonly message: string }> = [
       {

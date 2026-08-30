@@ -363,14 +363,23 @@ function readRuntimeManifest(value: unknown, plugin: string): RuntimeRegistryMan
   const targets = Array.isArray(manifest.runtimeRegistries)
     ? manifest.runtimeRegistries.map(readTarget)
     : [];
-  if (typeof generator.command !== 'string') return { raw: value, runtimeRegistries: targets };
+  const inspectionProtocolDeclared = Object.hasOwn(generator, 'inspectionProtocol');
+  if (typeof generator.command !== 'string') {
+    if (inspectionProtocolDeclared) {
+      throw new Error(
+        `Generator inspection protocol 1 failed for ${plugin}: ` +
+          'manifest declares inspectionProtocol but omits or malforms command',
+      );
+    }
+    return { raw: value, runtimeRegistries: targets };
+  }
   return {
     raw: value,
     runtimeRegistryGenerator: {
       command: generator.command,
       args: readStrings(generator.args),
       inspectionProtocol: generator.inspectionProtocol,
-      inspectionProtocolDeclared: Object.hasOwn(generator, 'inspectionProtocol'),
+      inspectionProtocolDeclared,
     },
     runtimeRegistries: targets,
   };
@@ -468,23 +477,30 @@ async function inspectRuntimeRegistrySources(options: {
     declaredPaths.add(target.registryPath);
   }
 
-  const result = await options.dependencies.process.exec('deno', [
-    'run',
-    '--config',
-    join(options.projectRoot, 'deno.json'),
-    '--allow-read',
-    resolveGeneratorUrl(options.generatorBase, options.generator.command),
-    '--project-root',
-    options.projectRoot,
-    ...(options.generator.args ?? []),
-    '--official-samples',
-    'false',
-    '--inspect',
-    '--inspection-protocol',
-    '1',
-    '--manifest-json',
-    JSON.stringify(options.rawManifest),
-  ], { cwd: options.projectRoot });
+  let result: Awaited<ReturnType<ProcessPort['exec']>>;
+  try {
+    result = await options.dependencies.process.exec('deno', [
+      'run',
+      '--config',
+      join(options.projectRoot, 'deno.json'),
+      '--allow-read',
+      resolveGeneratorUrl(options.generatorBase, options.generator.command),
+      '--project-root',
+      options.projectRoot,
+      ...(options.generator.args ?? []),
+      '--official-samples',
+      'false',
+      '--inspect',
+      '--inspection-protocol',
+      '1',
+      '--manifest-json',
+      JSON.stringify(options.rawManifest),
+    ], { cwd: options.projectRoot });
+  } catch (error) {
+    throw fail(
+      `generator process failed to start: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
   if (result.code !== 0) {
     const detail = result.stderr.trim() || result.stdout.trim();
     fail(`generator exited ${result.code}${detail ? `: ${detail}` : ''}`);
