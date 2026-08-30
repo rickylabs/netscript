@@ -1656,3 +1656,87 @@ right.
 **Queue posture unchanged: blocked.** `main` `13878a80`, pin still 13.4.6, and #1727/#1718/#1720/
 #1741/#1722/#1740 all OPEN. Host capability is not the dependency — these slices *merging* is. When
 #1727 lands, the version-snippet bucket is dispatchable as one slice against the confirmed row set.
+
+## 2026-08-30 — shipping order executed; #1755 dispatched as the next source-ready leaf
+
+### #1746 / #1748 — evidence gap closed, gates re-run, handoffs surfaced
+
+The evidence gap was that the **deciding evaluator reports existed only as untracked files on the
+supervisor's disk**; every public comment was a summary of them. Both PRs now carry the artifacts
+verbatim — for #1748 that includes the `FAIL_FIX` report in full, published deliberately: a blocking
+report that is only ever summarised is the easiest kind of finding to quietly soften, and this one
+caught a defect the cloud evaluator returned `PASS` on.
+
+Committing the reports to the branches was rejected: it would move the head and void the very
+exact-head verdicts they record. Publishing to comments closes the gap without touching a head.
+
+Exact-head gates, both PRs:
+
+| Gate | #1746 @ `84a5fd11` | #1748 @ `22e79dcc` |
+| --- | --- | --- |
+| `review-threads` | PASS, threads=1 unanswered=0 | PASS, threads=0 |
+| `check-close-gate.ts` | **PASS**, provenance head-matched, `#1745` from body keyword | **PASS**, `#1000` from body keyword |
+| `mergeable` / state | MERGEABLE / CLEAN | MERGEABLE / CLEAN |
+
+No implementation was reopened — heads unchanged and exact-head evaluators passed, so author work
+would have voided the verdicts rather than strengthened them.
+
+### The finding that qualified both handoffs
+
+Before dispatching a third corpus-touching PR I tested the pair against each other:
+
+```
+git merge-tree --write-tree <1746-head> <1748-head>
+CONFLICT: prose.json.gz · provenance.json · agent-docs.generated.ts · publish-assets.generated.ts
+```
+
+**#1746 and #1748 conflict with each other.** Each is `CLEAN` because GitHub computes mergeability
+against current `main` *independently*, and neither calculation knows about the other. The first
+merges clean; the second goes red. Surfaced on both PRs immediately — an unannounced red after a
+merge would read as broken work from this lane.
+
+Resolution is mechanical and must never be a hand-merge: these are generator outputs and one is
+gzipped binary. Rebase → `gen:agent-docs-prose` → `gen:publish-assets` → three freshness gates. The
+cost is that the second PR's exact-head verdict dies with the regeneration and needs a bounded
+re-evaluation; that is the honest price of two docs PRs over one corpus, and the reason to merge
+serially rather than batch.
+
+### Next source-ready leaf chosen: #1749, not the Aspire work
+
+Source-blocked Aspire docs (#1723) must not block the lane, so it is parked. Scanned every open
+0.0.7 docs-labeled issue: #1721 is the Aspire lane's and equally source-blocked; #1533/#1365/#1360
+belong to internals/fixes/features. Nothing unallocated and source-ready there.
+
+**#1749 chosen** — fully unblocked because #1729/#1675 already shipped `.agents/skills/` as canonical
+on `main`, bounded to one file, and it completes the story #1746 started.
+
+**The release-note gap was considered and deliberately not taken.** `packages/cli/CHANGELOG.md` stops
+at 0.0.6 and no 0.0.7 intro exists — both confirmed. But a complete 0.0.7 changelog cannot be written
+while 0.0.7 is still merging, and `github-release.ts:18` records the intro as *"MANUAL BY DESIGN"*,
+supplied at publish time via `--notes-file`, i.e. release-captain-owned rather than a checked-in docs
+artifact. Surfaced to the coordinator instead of absorbed.
+
+### #1755 dispatched, and a launcher lesson
+
+Thread `01a05207-a509-7eb3-9e21-8fed6bfc5381`, worktree `007-leaf-1749`, branch
+`docs/quickstart-skills-tree`, Codex · OpenAI · `gpt-5.6-sol` · medium (route matched).
+
+**The foreground launch exceeded a 10-minute shell timeout and was killed — but the Codex thread had
+already done the work.** `codex-thread-ids.md` was never written (the launcher writes it last), so the
+thread id had to be recovered from the sender-ownership lease record. Lesson: launch these detached,
+and never conclude from a killed launcher that the slice did not run — check the worktree head first.
+Per instruction the existing thread was **resumed, not relaunched**.
+
+**Tier-A: PASS**, re-run by this lane while the thread was idle, not taken from the author's report —
+the four freshness gates the author had deferred to "the PR validation table" all exit 0
+(`fresh:true`, `stalePaths:[]`, `sourceCommit` `5ccdea247` == S1 `5ccdea24`), targeted typecheck 0,
+and `git status --porcelain` empty after every regenerating gate. `deno.lock` untouched.
+
+PR **#1755** opened at `2c844565`, milestone **0.0.7**, `Closes #1749`. Coordinator intake decision
+applied: #1749 admitted to 0.0.7; both issue and PR carry **exactly one** `status:` label
+(`status:impl`) after removing a duplicate `status:impl-eval` that had been applied alongside it.
+
+`check-close-gate` currently exits 1 on #1755 — **correctly**: #1749's acceptance boxes are unticked
+and the final DoD box is deliberately unticked pending the evaluator. That is the gate doing its job,
+not a defect. A separate-session IMPL-EVAL (Claude · Fable 5) is running; boxes get ticked with
+evidence only after it passes.
