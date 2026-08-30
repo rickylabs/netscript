@@ -2715,3 +2715,92 @@ The signal that matters: the S7 healthy-regression case, red at `e24e7ce1` and s
 **goes green once the host consumes the inspect report**. That is the product-caused green this leaf
 required, arriving from the host change exactly as predicted — but it is only a preview until it is
 re-derived at a committed head, which is what the new guard now enforces.
+
+## 2026-08-30 — S9 host slice at `4e1fed64`; exact-head gates green; Tier-A findings
+
+Phase labels normalized to the actual phase: PR #1739 and issue #1673 both moved `status:plan` →
+`status:impl`, exactly one `status:` each.
+
+### Exact-head gates at `4e1fed64` — clean tree, all green
+
+Run through the repaired `gates-1673.sh`, which now refuses a dirty tree. `dirty : 0`, and
+local == `origin` == PR `headRefOid` == `4e1fed64`.
+
+| Gate | Result |
+| --- | --- |
+| Ceiling containment | no path outside the authorized eleven |
+| `deno.lock` | byte-unchanged vs `origin/main` |
+| Focused regression suite | exit 0 · **6 passed / 0 failed** |
+| Related doctor/generator suites | exit 0 · 54 passed / 0 failed |
+| AI plugin CLI suites | exit 0 · 12 passed / 0 failed |
+| Scoped type check (10 ceiling `.ts`) | exit 0 |
+| Scoped lint (root rules, `packages/cli` exclusion removed) | exit 0 · 10 files · 0 findings |
+| Scoped fmt | 1 finding — attributed below |
+| `check:mcp-export-corpus` / `check:publish-assets` | exit 0, both measured negatives |
+| `deno publish --dry-run` (cli) | Success |
+| `doc:lint` (cli) | 0 errors across three entrypoints |
+| `quality:gate` | exit 0 |
+
+### The green is product-caused, and this leaf can prove it with two points rather than a hybrid tree
+
+| Head | State | Focused suite |
+| --- | --- | --- |
+| `e24e7ce1` | regression only, no product change | exit 1 · 5 passed / **1 failed** |
+| `8dcb578f` | AI side reports its selection; **host unchanged** | exit 1 · 5 passed / **1 failed** |
+| `4e1fed64` | host consumes the inspect report | exit 0 · **6 passed / 0 failed** |
+
+Publishing the report changed nothing. The green appears only when the host consumes it. That is a
+cleaner demonstration than the base-archive hybrid used earlier in this leaf, because both points are
+real committed heads rather than a constructed tree.
+
+### Scoped fmt finding — base-owned, proven at line level
+
+`public-command-dependencies.ts` **was** modified by this leaf, so the finding could not be dismissed
+as base-owned on file identity alone. Attributed at line granularity, per the T-1 lesson:
+
+- Head finding is at **line 1** — the `import {` from `@netscript/plugin/sdk` that `deno fmt` wants
+  collapsed to one line.
+- A pristine `git archive` of `origin/main` for the same file produces the **identical finding at the
+  identical line 1**.
+- The leaf's only change to that file is at **line 317**,
+  `inspectRuntimeRegistries: generatePluginRegistries,` — nowhere near the finding.
+
+Base-owned, established by comparing at the granularity of the claim.
+
+### PE-9's predicted WARN is present, exactly as forecast
+
+`WARN A8/AP-1/F-1: file is 673 lines (cap 500) — split into smaller single-reason files
+(src/public/features/generate/plugins/installed-runtime-registry-generator.ts)`.
+
+Path 2 went 478 → 673 lines because the coordinator forbade the split parser file. It is a `WARN`,
+`arch:check` fails only on `fail` totals, `quality:gate` exited 0, and the author recorded the
+expectation at `plan.md:316` before it happened. So it is a predicted, recorded consequence rather
+than unrecorded drift — which is precisely what PE-9 asked for.
+
+### Contract review — read in the source, not from the slice comment
+
+- **Fail-closed is structural.** `inspectionProtocolDeclared` is `Object.hasOwn(generator,
+  'inspectionProtocol')` — *presence*-based. A manifest declaring `inspectionProtocol: 2` or `"1"`
+  therefore still takes the inspect path and then **fails validation**, rather than quietly reverting
+  to the walk. `fail()` is a `never`-returning throw, and both `catch` blocks route into it: a
+  non-JSON stdout fails, and a filesystem error on a reported source fails with an explicit comment
+  that this preserves fail-closed rather than leaking a filesystem-shaped error through the doctor
+  surface.
+- **Legacy behaviour is genuinely untouched.** The branch at line 94 selects the walk whenever the
+  protocol is absent, and the non-dry command result shape is unchanged.
+- **Bounded claims.** Dry-run entries now carry `sourceAuthority: 'generator' | 'manifest'`, so
+  healthy output can state which authority produced the evidence rather than implying one.
+- **PE-2 satisfied** — plain `inspectAiRegistries` builder plus per-target deep-equality against
+  `compileAiRegistry(...).files`, membership and order.
+- **PE-5 satisfied** — regression in path 6; `installed-runtime-registry-integration_test.ts`
+  untouched by this leaf.
+- **PE-10 satisfied** — neutral title `'Runtime registry inspection'`.
+- **Sweep-1 satisfied** — `EmptyPluginRegistryError` retained, and it now guards both paths.
+
+### Tier-A sign-off is deliberately deferred to the final head
+
+S10 is still in flight and carries **PE-8** — recording `check:mcp-export-corpus` as a reproducible
+raw command, since it is not in `.llm/tools/gates/catalog.ts`. Signing off now would attest a head
+that is about to be superseded, and **IMPL-EVAL is cycle 2 of 2** — spending the last cycle on a stale
+head would be an expensive, self-inflicted error. Sign-off and dispatch both wait for S10, which is
+minutes away, not a stop.
