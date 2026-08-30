@@ -79,8 +79,23 @@ is `plugin doctor stays healthy when AI generation excludes the skill-loader fac
 
 ## Remaining Slices
 
-1. S10 — exact author-owned gates and evidence; required `scaffold.runtime` remains
-   supervisor-coordinated under the singleton lease.
+S10 author-owned evidence is complete. Required `scaffold.runtime` remains supervisor-coordinated
+under the singleton lease; its report must be attached before IMPL-EVAL. After that, fresh Tier-A and
+opposite-family IMPL-EVAL remain mandatory.
+
+## S10 Author Gate State
+
+- Focused doctor 6/0; installed-generator unit 9/0; AI compiler 9/0; full AI package 32/0.
+- AI and CLI package checks exit 0. Exact ten-TypeScript ceiling check/lint have zero findings.
+- Exact-ceiling format has one finding in `public-command-dependencies.ts`; its first hunk is the
+  exact base line-1 import already independently accepted as base-owned. All leaf-owned authorized
+  formatting is clean; the AI manifest formats cleanly.
+- `quality:gate`, CLI doc-lint, CLI/AI publish dry-runs, raw `check:mcp-export-corpus`, and catalogued
+  `check:publish-assets` exit 0. Corpus SHA-256 remains `88011e6e...`.
+- AI doc-lint exits 1 with 17 findings. Pinned base reproduces the exact 16 private-type references +
+  one other finding, including per-entrypoint totals and owning paths; this leaf changes none of
+  those public surfaces. The baseline red is disclosed in `drift.md`, not relabelled green.
+- Raw worktree and pinned-base lock comparisons exit 0. Review-thread gate is 0 unanswered.
 
 Each slice commits, explicitly pushes, posts one structured PR comment, updates PR evidence, and
 reconciles before the next.

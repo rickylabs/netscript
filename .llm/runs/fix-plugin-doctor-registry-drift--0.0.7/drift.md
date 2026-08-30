@@ -79,3 +79,14 @@ the coordinator subsequently replaced the first S6 24-path proposal with the rul
 
 Interpretation overturned by PLAN-EVAL; the real AI health regression and layer-3 byte snapshot are
 relocated to authorized path 6, and `installed-runtime-registry-integration_test.ts` remains untouched.
+
+## 2026-08-30 — AI package doc-lint is baseline-red
+
+- **Planned expectation:** `deno task doc:lint --root plugins/ai --pretty` exits zero in S10.
+- **Actual:** head exits `1` with 17 findings: 16 private-type references and one other finding, all
+  owned by unchanged public entrypoints or their transitive types.
+- **Base proof:** the identical raw command against pinned base `13878a80a` exits `1` with the same
+  17 findings, same categories, same entrypoint totals, and same four owning source paths.
+- **Impact:** this leaf changes no AI public entrypoint/export or any finding-owning path. Repairing
+  the baseline would exceed the exact eleven-path ceiling, so no product edit or rescope is proposed.
+  The red is recorded as baseline fitness debt, not presented as a passing leaf verdict.

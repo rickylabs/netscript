@@ -561,3 +561,40 @@ the test changed its behavioral expectation. The integration test remains untouc
 the exact eleven-path ceiling, dependency, export surface, generated asset, lockfile, issue, label,
 readiness state, runtime lease, or external resource was changed. S10 is the next allowed slice;
 `scaffold.runtime` remains required and supervisor-coordinated and was not run by the author.
+
+## S10 — Final Author-Owned Evidence
+
+All commands below ran at product head `4e1fed64f8241b6dc718e4f590feaa530e46140c` unless stated
+otherwise. Gate-runner JSON under `.llm/tmp/gate-receipts/` is local-only; the reproducible commands,
+head, exit codes, counts, and hashes below are the review evidence.
+
+| Gate | Result |
+| --- | --- |
+| Focused doctor structured suite | exit `0`; `6 passed / 0 failed`; includes real AI healthy + complete project-byte equality. |
+| Installed-generator structured unit suite | exit `0`; `9 passed / 0 failed`; covers absence, exact argv/no-write state, fail-closed process/schema/path/duplicate failures, and all-empty behavior. |
+| AI compiler structured suite | exit `0`; `9 passed / 0 failed`; inspect report equals compile selection per target in membership and order. |
+| Full AI package test | exit `0`; `32 passed / 0 failed`. |
+| AI package check | exit `0`. |
+| CLI package check | exit `0`. |
+| Exact-ceiling structured check | exit `0`; 10 TypeScript files selected; zero diagnostics. |
+| Exact-ceiling structured lint | exit `0`; 10 selected/processed; zero findings. |
+| AI manifest format | exit `0`; one JSON file checked. |
+| Exact-ceiling structured format | exit `1`; 10 selected/processed; one finding, in `public-command-dependencies.ts`. Its first hunk is the exact base line-1 `import {` already independently re-derived and accepted at S5; all leaf-owned authorized formatting is clean. |
+| `quality:gate` through `run-gate.ts` | exit `0`; receipt outcome `PASS` at exact product head. The expected path-2 673-line F-1 warning remains non-failing (`FAIL=0`). |
+| CLI doc-lint through `run-gate.ts` | exit `0`; 1 package, 3 entrypoints, zero findings. |
+| AI doc-lint through `run-gate.ts` | exit `1`; 17 findings (16 private-type references + 1 other). Pinned base `13878a80a` reproduces the identical command, counts, entrypoint totals, and four owning paths. None is changed by this leaf; recorded in `drift.md` rather than called green. |
+| CLI publish dry-run | exit `0`; `Success Dry run complete`; existing unanalyzable dynamic-import/import-meta warnings only. |
+| AI publish dry-run | exit `0`; `Success Dry run complete`. |
+| Raw `deno task check:mcp-export-corpus` | exit `0`; SHA-256 `88011e6e459097ba4c74111063dbef13a95823702bd37447f358bc19375cc262`; 35 packages, 270 subpaths, 7,614 symbols. Per PE-8 this is raw reproducible evidence, not a catalog receipt. |
+| `check:publish-assets` through `run-gate.ts` | exit `0`; receipt outcome `PASS`. |
+| Lock hygiene | raw worktree and pinned-base `git diff --exit-code ... -- deno.lock` both exit `0`; byte-unchanged. |
+| Review threads | exit `0`; `threads=0 unanswered=0`. |
+| `scaffold.runtime` | **REQUIRED / PENDING SUPERVISOR**. Author did not obtain the singleton lease and did not run e2e/Aspire/Docker/browser work. Supervisor must attach the runner `--report` JSON and zero-state cleanup evidence before IMPL-EVAL. |
+
+### Reconcile
+
+The branch delta contains exactly the eleven authorized product/test paths plus run artifacts;
+`installed-runtime-registry-integration_test.ts` is byte-unchanged. The PR remains draft and issue,
+acceptance boxes, labels, milestone, and readiness state remain coordinator-owned and untouched. S10
+may land as author evidence now so the supervisor can sequence the required runtime gate; no author
+IMPL-EVAL or self-certification follows.
