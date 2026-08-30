@@ -159,3 +159,25 @@ The streaming resume client is killed by this host's foreground command limit, a
 monitors were before it. The daemon-side turn is unaffected — it survives independently — so steering
 is delivered-then-detached, and progress is observed by re-reading git state rather than by holding a
 live wait.
+
+## S5 repair dispatched — 2026-08-30, after host restart
+
+Findings T-1 and T-2 remain the only blockers; everything else at `02da4e1c` stays accepted and is
+listed as a credit block in the repair brief so the author does not regenerate verified evidence.
+
+The S3/S4 author thread did not survive the restart. A new Codex thread was launched at exactly
+`02da4e1c` into the same leaf worktree (upstream still unset), route `gpt-5.6-sol` · high requested
+and observed identical, attachment confirmed from the daemon rather than from the launcher's exit
+code. Repair scope is unchanged from the disposition above: product path 2, `worklog.md`, and the PR
+#1739 evidence block — no other product path, no test-behaviour change, no new gate.
+
+PR #1739 taxonomy was repaired in the same pass (`type:fix`, `area:cli`, `priority:p1`, `status:impl`,
+milestone `0.0.7`); it had carried none. Issue-side labels stay coordinator-owned and were reported,
+not touched.
+
+`review-threads` on #1739 returns `PASS threads=0 unanswered=0`, so no reviewer feedback was stranded
+by the restart.
+
+After the repair lands: fresh Tier-A over the delta at the new exact head, then the mandatory fresh
+opposite-family IMPL-EVAL in a session this lane owns. No runtime lease is required for this leaf —
+the six-path CLI ceiling touches no Aspire, Docker, or scaffold-runtime surface.

@@ -1959,3 +1959,81 @@ holds inside fixes: nothing is dispatched until #1673 is terminal.
 
 **#1736 stays internals-owned.** The authoritative cluster state assigns the readonly-hydration repair
 (#1734) to the internals lane, and PR #1736 is that work. This lane does not touch it.
+
+## 2026-08-30 — restart recovery; PR #1739 taxonomy repaired; #1673 S5 relaunched
+
+Fresh fixes topic controller after a host restart. Git and live GitHub were treated as the only
+authorities; the checked-in context pack was read as history, not as state.
+
+### Reconciliation against live truth
+
+| Claim under test | Live result |
+| --- | --- |
+| Topic branch `orchestrator/release-0.0.7-fixes` | `f20c2581` — local == remote, clean |
+| Product branch `fix/plugin-doctor-registry-drift` | `02da4e1c` — local == remote == PR #1739 head, clean |
+| `origin/main` | `13878a80a` — unmoved since the #1729 merge |
+| PR #1739 | OPEN, draft, base `main`, body carries `Closes #1673` |
+| Review threads on #1739 | `review-threads PASS threads=0 unanswered=0` — nothing unanswered was stranded |
+| #1673 | OPEN, milestone `0.0.7`, `status:triage` (stale — coordinator-owned, reported not touched) |
+
+The topic checkpoint `f20c2581` and the product head `02da4e1c` are **not** divergent versions of the
+same work: `f20c2581` is this lane's supervision ledger on the orchestrator branch, `02da4e1c` is the
+leaf's S4 head on the product branch. Both are current; no reconciliation commit was needed. All
+evaluator and Tier-A artifacts were preserved — nothing under `.llm/runs/` was rewritten or deleted.
+
+### PR #1739 taxonomy repaired
+
+The PR carried **no labels and no milestone**. Applied `type:fix`, `area:cli`, `priority:p1`,
+`status:impl`, milestone `0.0.7` — mirroring issue #1673 and the leaf's actual phase, with exactly one
+`status:` label per `netscript-pr`.
+
+`gh pr edit` cannot do this here: it resolves labels through a GraphQL query that needs `read:org`,
+which this token lacks (`repo` only). The REST endpoints work —
+`POST /issues/1739/labels` and `PATCH /issues/1739` with `milestone=27`. Recorded so the next lane
+does not read the GraphQL scope error as a permissions failure on the label itself.
+
+Still **not** touched, because relabeling issues is coordinator-owned: #1673 is `status:triage`
+although it has been in implementation since 2026-08-29, and PR #1729 carries `status:augment-review`
+rather than `status:shipped`. Both are reported to the coordinator, not repaired here.
+
+### #1673 S5 relaunched on a new thread
+
+The S3/S4 author thread did not survive the restart, so per the mandate a **new** Codex thread was
+launched at exactly `02da4e1c` into the existing leaf worktree, branch upstream still unset so no bare
+push can reach `main`. Route Codex `gpt-5.6-sol` · high, requested and observed identical, attachment
+confirmed from `agentic:codex-status` rather than inferred from the launcher's exit code.
+
+Scope is the two HELD Tier-A findings and nothing else: **T-1** the line-level fmt attribution on
+`installed-runtime-registry-generator.ts`, and **T-2** the `worklog.md` sentence the S3 diff
+contradicts. The brief carries the accepted-work credit list so the author does not regenerate
+evidence this supervisor already re-derived independently.
+
+### Two launch-path facts worth carrying forward
+
+1. **The duplicate-sender guard is not a liveness signal.** `launch-codex-slice.ts` computes
+   `sessionActive: Boolean(existing.sessionId)`, so a durable sender record that names any thread
+   blocks every future launch at that worktree and tells the operator to resume it — without ever
+   consulting the daemon. Here it named a thread the restart had destroyed. Liveness was therefore
+   proven separately, from the daemon's own session list (the thread was absent while its same-batch
+   siblings were present and idle) and from the owner PID, before the record was released through the
+   adapter's `release()` with its own lease token. Releasing on elapsed time, or by deleting the file,
+   would have been the unsafe version of the same action.
+2. **`/home/codex` no longer exists.** The launcher still defaults brief staging to
+   `/home/codex/<slug>-brief.md` and fails at the stage step. An explicit `--dest` under `/home/agent`
+   is the fix; recreating the symlink would paper over a stale default.
+
+### No runtime lease requested for this leaf, deliberately
+
+#1673's ceiling is six CLI files and its brief bars `e2e:cli`, Aspire, Docker, and browser gates, so
+the singleton host runtime lease is not a prerequisite for its readiness. Independently, the Aspire
+lane has established that this NAS container cannot execute `scaffold.runtime` at all — no .NET SDK,
+Docker client 27.5.1 against Aspire 13.5's 28.0 minimum, and containers in a remote dind sandbox whose
+published ports are not on `localhost`. A lease taken here would produce an environment red, not a
+verdict. If a future fixes leaf needs a runtime verdict, it routes to CI rather than to this host.
+
+### Next
+
+S5 repair → fresh supervisor Tier-A over the delta at the exact new head → mandatory **fresh separate
+opposite-family IMPL-EVAL** in a session this lane owns. PR stays draft; no readiness flip, relabel,
+issue edit, box tick, or merge from this lane. Serial ordering holds: nothing else in the fixes queue
+is dispatched until #1673 is terminal.
