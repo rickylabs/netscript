@@ -4171,3 +4171,58 @@ scope wall that force cannot breach.
 The lease-scoped push itself is left to the author, which owns the branch and is mid-I6; if it hits
 the scope wall it reports, and the exact local commit is preserved either way. No force-push has been
 executed by this lane.
+
+## 2026-08-30 — #1533 Tier-A PASS at `c73fee39`; PAT `workflow`-scope boundary hit; IMPL-EVAL dispatched
+
+### Tier-A on the integration head
+
+Re-anchored onto `3e5cbabf` (verified ancestor). Gate run by me in a detached throwaway worktree,
+colour on: `PASS`, exit 0, `members=35 files=2021 examples=351 candidates=350 checked=350 exempt=0
+non_ts=1 unfenced=0 malformed=0 failures=0`, `enforcedFailureCensus` all zero, `deferredCensus`
+**exactly 116/21**.
+
+The +2 corpus growth is #1731's `procedure-meta.ts` examples, both clean. Scope versus base is 11
+gate-tooling files + `deno.json` + `ci.yml`, 22 example-repair files, and one mechanically
+regenerated asset — `agent-docs.generated.ts` and `publish-assets.generated.ts` match `main` with no
+drift. Enforcement wiring is real: a CI step under `RUN_DENO` invoking
+`run-gate.ts --gate jsdoc-example-compile` with a durable receipt, catalog-mapped to
+`deno task docs:jsdoc-examples` — the receipt path, not a bare command.
+
+### The credential boundary, and the wrong first diagnosis
+
+```
+! [remote rejected] HEAD -> test/jsdoc-example-compile-gate
+  (refusing to allow a Personal Access Token to create or update workflow
+   `.github/workflows/ci.yml` without `workflow` scope)
+```
+
+`gh auth status` → scopes `'repo'` only. The single workflow-touching commit is `e1ea9d3a`.
+
+**Three probes, and only the last one told the truth:**
+
+| Probe | Result | What it actually proved |
+| --- | --- | --- |
+| `push --dry-run` (plain) | rejected, **non-fast-forward** | the authorized rebase rewrote history — says nothing about credentials |
+| `push --dry-run --force-with-lease` | **exit 0** | fast-forwardness is solved; scope untested |
+| **real** `push --force-with-lease` | **rejected, `workflow` scope** | the actual boundary |
+
+GitHub enforces `workflow` scope at **receive** time, which no dry-run reaches. Had I stopped at
+probe 1 I would have reported a credential failure that did not exist; had I stopped at probe 2 I
+would have reported the push as clear. Two failures that look identical from a distance, with
+opposite remedies — one needs a flag, the other needs a token this lane cannot mint.
+
+**State preserved:** local head `c73fee39c86f08882ba8a1214fd87c07d628672d` intact, nothing rewritten,
+no force-push landed. `origin` and PR #1756 remain at pre-rebase `303be12e`, so the PR does not
+currently display the evaluated work — recorded on the PR as comment `5469163308` with the coordinator
+action required (push under a `workflow`-scoped credential, or land `e1ea9d3a` separately).
+
+### IMPL-EVAL dispatched despite the unpushed head
+
+Job `e6d0ed7b`, native `claude-fable-5` / medium, own detached worktree at `c73fee39…`, zero
+provider-override env vars, artifact-only. Briefed explicitly that `local == remote == PR` is
+**knowingly false** here and must not be asserted, that it must commit locally without pushing (any
+push carries `e1ea9d3a` in ancestry), and to independently re-verify the ANSI-colour invariance fix —
+the earlier defect there under-reported failures by 85% and is exactly the kind of thing that must
+not be taken on the supervisor's word.
+
+`#1747` withheld at `c1e03922` on `#1734` alone; `#1734` parked at `eb765629`.
