@@ -104,3 +104,25 @@
   `desktop-native` fixture cannot resolve the parent `zod` catalog; the wrapper rerun excluding
   only that unrelated fixture exited 0 with zero findings. No Aspire/Docker/runtime/CI command ran
   on this host.
+
+## Phase-B nullable health-report fix — cycle 2
+
+- 2026-08-30: hosted proof run `33327294781` passed 36 gates in both tiers, then exposed the
+  nullable `ResourceHealthReportJson.Status` contract during `runtime.aspire-start`. Aspire
+  v13.5.3 source `src/Shared/Model/Serialization/ResourceJson.cs:184-194` declares `Status` as
+  `string?`; the 18-line real capture contains omitted statuses before checks complete.
+- Fixture: copied `03-describe-follow.ndjson` byte-for-byte as
+  `aspire-describe-follow-13.5.3-capture.ndjson` (18 lines, SHA-256
+  `36fe0e3329455d38234d3b44cde28c9ff13eaf6ca180c8f1f66108a722554549`). The requested claim that
+  this capture ends with Healthy postgres evidence conflicts with the file: postgres ends
+  Running/Unhealthy, while `preflight-topology-web` is the report that later becomes Healthy. Tests
+  preserve those actual last-seen facts and keep postgres fail-closed.
+- RED: the focused wrapper exited 1 with four type diagnostics because `DescribeHealthReport` had
+  no pending discriminator.
+- Implementation: omitted/null status maps to `{ status: 'Unknown', pending: true }`; a later
+  string status replaces it with `pending: false`. Non-null non-string statuses and non-object
+  reports fail with line/resource/report-qualified errors. Pending reports use the existing
+  retryable `did not converge` path.
+- Focused validation: check exit 0 (185 files), lint exit 0 (178 files; unrelated nested
+  `desktop-native` fixture excluded), fmt exit 0 (185 files), and evidence tests exit 0 (14/14).
+  No Aspire, Docker, runtime-suite, evaluator, or CI-dispatch command ran.
