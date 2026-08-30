@@ -148,3 +148,10 @@ the primary coordinator ratifies and publishes the issue graph.
   `007-aspire-s5-eval`, `007-aspire-s7-eval` (detached, historical).
 - **Host runtime prerequisites:** `aspire doctor` → `.NET SDK not found` (1 failed), Docker client
   27.5.1 < 28.0; runtime leases cannot be exercised on this host until provisioned (D-31).
+- **Remote Control proof (observed 2026-08-30 08:5xZ):** host process
+  `claude remote-control
+  --spawn=same-dir --permission-mode bypassPermissions` (pid 1319,
+  supervised by a restart loop) is serving this session as `cse_01WSh13irWVfvT6VRZxQzeLj`
+  (`--print --sdk-url
+  …/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj`), i.e. the accepted Fable 5
+  medium supervisor route is daemon-attached and mobile-visible.
