@@ -510,3 +510,49 @@
 - Adding an `e2e-scaffold-runtime` catalog entry is a natural **S10 (#1722)** row (E2E gate
   upgrades), not something to slip in under a lease. Recorded here so the next lease holder does not
   rediscover it.
+
+## D-33 — 2026-08-30 — S5 F-A executed on the NAS: 26/27, the one red is baseline #1734 (Fresh hydration), AppHost never reached
+
+- **Lease:** the single authorized `e2e:cli` attempt at exact head `aa822069` from
+  `worktrees/007-aspire-s5` (clean, equals origin), after the coordinator provisioned the parent
+  mise toolchain (dotnet `10.0.400`, node `24.20.0`). Re-run preflight under
+  `~/.local/bin/mise exec`: `aspire doctor` → **4 passed, 4 warnings, 0 failed** (.NET PASS, DCP
+  ephemeral cert PASS; Docker client 27.5.1 < 28.0 remains a warning); `aspire ps` → `[]`; dind
+  `docker ps -a` → empty. (`mise` is a broken shell function in the supervisor session; the binary
+  path works — recorded so the next lease holder does not lose ten minutes on it.)
+- **Command:**
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report
+  .llm/tmp/e2e-report-scaffold-runtime-aa822069.json`
+  — `08:41:36Z` → `08:43:35Z`, **exit 1**, `summary passed=26 failed=1 skipped=0`.
+- **Exact failing gate:** `generated.quality-negative` (critical, `failureClass: assertion`, one
+  attempt, not retried). The generated workspace's `deno task check` fails with **`TS2345`** at
+  generated `packages/fresh/src/application/query/hydration.ts:43`
+  (`hydrate(queryClient, dehydratedState)`: `readonly unknown[]` mutations not assignable to
+  `DehydratedMutation[]`). This is byte-for-byte the baseline Fresh defect **#1734**, whose fix PR
+  **#1736** (`fix/fresh-query-hydration-readonly-state`, still draft at `eb7656292`) rewrites
+  exactly that file (+193/−1). Same shape as CI run `33286544110` (26/27 at `0bd8ba832`) and the
+  S1/S4 park reason. **Not an Aspire, Docker, S5, or host defect.**
+- **What the run did prove on this host:** 26 gates green including `scaffold.init`, all four
+  official plugin installs, DB init/generate/seed against the dind Postgres (`runtime.*` DB gates),
+  generated typecheck of the Aspire helpers (`aspire/.helpers/*.mts` + `apphost.mts` exit 0), and
+  `cleanup.aspire-stop`. The NAS can now execute the suite up to the critical gate.
+- **What it did not reach:** the critical gate aborts the suite before `aspire start`, so the
+  AppHost boot / DCP / endpoint-proxy path against the remote dind (`10.4.12.16` ≠ `10.4.12.18`) and
+  the Docker-27.5.1-vs-28 question are **still unexercised**. No Docker-version-specific failure
+  occurred, so no sandbox upgrade boundary is surfaced by this run — it stays an open risk for the
+  first Phase-B lease.
+- **Receipt (durable):** `slices/s5/receipts/e2e-scaffold-runtime-aa822069-nas.{json,log,meta.txt}`
+  — SHA-256 `93b0bc68…6730` (json), `537c5535…198e` (log), `f269ee14…f392` (meta). Runner `--report`
+  form per D-32; the generated-project log is archived outside the repo at
+  `/home/agent/observability/aspire-13.5/s5-fa-plugin-smoke-20260830-104136.log`.
+- **Cleanup to zero:** suite `--cleanup` ran;
+  `agentic:leak-check --slice-dir slices/s5 --worktree
+  007-aspire-s5` →
+  `probes aspire ok / docker ok, survivors []` (exit 0); `agentic:teardown` preview → nothing to
+  apply, nothing escalated. The run-owned 534 MB generated project under the S5 worktree's ignored
+  `.llm/tmp/cli-e2e/` was removed (path-contained, created by this run). Final proof: `aspire ps` →
+  `[]`, `docker ps -a` → empty. **Lease released.** No unknown resource touched; no retry.
+- **F-A verdict:** `aa822069` is runtime-**BLOCKED on the #1734 baseline**, exactly like S1 and S4 —
+  not red on its own diff. The merge-head runtime verdict becomes obtainable only after #1736 merges
+  and S5 rebases (or on a throwaway S5+#1736 merge head, which would be a second attempt and
+  therefore a new coordinator grant, not a retry of this one).

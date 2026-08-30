@@ -1,0 +1,96 @@
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.runtime' '--cleanup' '--format' 'pretty' '--report' '/home/agent/projects/netscript/worktrees/007-aspire-s5/.llm/tmp/e2e-report-scaffold-runtime-aa822069.json'
+Running scaffold.runtime
+> preflight.deno: Deno CLI is available
+  PASSED 7ms
+> preflight.aspire: Aspire CLI is available
+  PASSED 45ms
+> scaffold.init: Scaffold generated project
+  PASSED 1705ms
+> scaffold.plugin.worker: Install official worker plugin
+  PASSED 3810ms
+> scaffold.plugin.saga: Install official saga plugin
+  PASSED 663ms
+> scaffold.plugin.trigger: Install official trigger plugin
+  PASSED 645ms
+> scaffold.plugin.stream: Install official stream plugin
+  PASSED 1842ms
+> scaffold.plugin.auth: Install official auth plugin
+  PASSED 706ms
+> scaffold.plugin.ai: Install official ai plugin
+  PASSED 804ms
+> scaffold.plugin.ai.mcp: Install official AI plugin with MCP skill tool
+  PASSED 688ms
+> scaffold.plugin.ai.lifecycle: Add and self-wire an AI tool through the plugin CLI
+  PASSED 86ms
+> scaffold.plugin-list: List configured plugins
+  PASSED 1412ms
+> scaffold.plugin.ai.appsettings: Reject synthesized service configuration for the AI plugin
+  PASSED 4225ms
+> scaffold.ui-add-ai: Install the Fresh UI AI collection
+  PASSED 666ms
+> scaffold.ui-local-source: Map the unpublished AI dependency to the local workspace member
+  PASSED 248ms
+> generated.runtime-schemas: Generate runtime schemas from all configured plugin modules
+  PASSED 1119ms
+> database.codegen: Generate database clients (standalone, no Aspire)
+  PASSED 7614ms
+> behavior.project-boundary-dev: Start the generated Fresh dev server below a hostile parent tsconfig
+  PASSED 14293ms
+> behavior.plugins-unhealthy: Reject missing workers and sagas registries
+  PASSED 1706ms
+> generated.plugins-check: Generate plugin registries from discovered manifests
+  PASSED 999ms
+> generated.workers-registry: Compile workers registry through plugin CLI
+  PASSED 288ms
+> generated.sagas-registry: Generate sagas registry through plugin CLI
+  PASSED 84ms
+> behavior.plugin-doctor-missing-module: Reject a configured plugin whose module has been removed
+  PASSED 3199ms
+> runtime.aspire-restore: Restore Aspire TypeScript SDK
+  PASSED 8769ms
+> runtime.service-env-fixture: Declare service environment and regenerate on the consumer path
+  PASSED 1756ms
+> generated.quality-negative: Prove every generated quality surface with deliberate failures
+  FAILED 60730ms
+    Command exited 1; expected 0.
+    830-104136-web/routes/examples/users/(_components)/summary-card.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_components)/summary-panel.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_islands)/ServiceShowcaseLab.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_lib)/optimistic-list-mutation.ts\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_lib)/route-contract.ts\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_lib)/service-query.ts\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_shared)/authorization.ts\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/(_shared)/service-showcase.ts\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/index.layout.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/examples/users/index.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/health.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/index.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/routes/partials/examples/users/summary.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/utils.ts\n\u001b[0m\u001b[32mCheck\u001b[0m apps/plugin-smoke-20260830-104136-web/vite.config.ts\n\u001b[0m\u001b[1mTS2345 \u001b[0m[ERROR]: Argument of type 'DehydratedState' is not assignable to parameter of type 'Partial<DehydratedState>'.\n  Types of property 'mutations' are incompatible.\n    The type 'readonly unknown[]' is 'readonly' and cannot be assigned to the mutable type 'DehydratedMutation[]'.\n  hydrate(queryClient, dehydratedState);\n\u001b[0m\u001b[31m                       ~~~~~~~~~~~~~~~\u001b[0m\n    at \u001b[0m\u001b[36mfile:///home/agent/projects/netscript/worktrees/007-aspire-s5/.llm/tmp/cli-e2e/plugin-smoke-20260830-104136/packages/fresh/src/application/query/hydration.ts\u001b[0m:\u001b[0m\u001b[33m43\u001b[0m:\u001b[0m\u001b[33m24\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Type checking failed.\n"
+        },
+        {
+          "files": [
+            "aspire/.helpers/_aspire-compat.mts",
+            "aspire/.helpers/config-schema.mts",
+            "aspire/.helpers/configure-dashboard.mts",
+            "aspire/.helpers/db-cli-mode.mts",
+            "aspire/.helpers/index.mts",
+            "aspire/.helpers/register-apps.mts",
+            "aspire/.helpers/register-background.mts",
+            "aspire/.helpers/register-infrastructure.mts",
+            "aspire/.helpers/register-plugins.mts",
+            "aspire/.helpers/register-services.mts",
+            "aspire/.helpers/register-tools.mts",
+            "aspire/apphost.mts"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": "Warning: config file file:///home/agent/projects/netscript/worktrees/007-aspire-s5/.llm/tmp/cli-e2e/plugin-smoke-20260830-104136/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/worktrees/007-aspire-s5/.llm/tmp/cli-e2e/plugin-smoke-20260830-104136/. Ignoring the parent workspace config.\n"
+        }
+      ]
+    }
+    
+    stderr:
+    Task check deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check
+    
+        throw new Error(
+              ^
+        at runQualityProbes (file:///home/agent/projects/netscript/worktrees/007-aspire-s5/packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts:144:11)
+        at async file:///home/agent/projects/netscript/worktrees/007-aspire-s5/packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts:166:3
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 315ms
+Summary: passed=26 failed=1 skipped=0
+error: Uncaught (in promise) RemoteError: CLI E2E suite failed
+      if (!report.ok) throw new RemoteError(1, 'CLI E2E suite failed');
+                            ^
+    at Command.<anonymous> (file:///home/agent/projects/netscript/worktrees/007-aspire-s5/packages/cli/e2e/src/presentation/cli/commands/run-command.ts:37:29)
+    at async Command.execute (https://jsr.io/@cliffy/command/1.2.1/command.ts:2431:5)
+    at async Command.parseCommand (https://jsr.io/@cliffy/command/1.2.1/command.ts:2246:14)
+    at async file:///home/agent/projects/netscript/worktrees/007-aspire-s5/packages/cli/e2e/cli.ts:12:3
