@@ -7618,3 +7618,81 @@ and **0 behind**; `git merge-base --is-ancestor` confirms the remote is an ances
 fast-forward with **no divergence** and no force needed. Pushed at this boundary — between the
 evaluator's dispatch and its verdict — so the harness ledger is durable without touching any leaf head
 or interrupting the in-flight worker.
+
+## 2026-08-30 — #1387 PLAN-EVAL cycle 2 `FAIL_PLAN` (2 of 2) → ESCALATED to the owner
+
+Session `79a0923a` (Fable 5 · medium, own worktree, route verified) returned **`FAIL_PLAN`**, pushed
+evidence-only at **`a796ae8268e3347b65ff8e8612a75f4edb0be789`**. This is the **second** `FAIL_PLAN`, so
+per `plan-protocol.md` the unresolved item **escalates to the owner** — this lane does not grant itself
+a cycle 3.
+
+### Four of the five fixes are real; the fifth was under-specified by cycle 1
+
+F-1, F-3, F-4, F-5 all verified **Real**, and the evaluator **re-derived the baselines itself** rather
+than accepting mine or the author's: `16 / 90 / 68 / 77 / 136`, all exit 0 at `24f6642f` — matching my
+S0 census exactly. `research.md` confirmed append-only.
+
+### F-2′ — the carrier contract points at the wrong slices (blocking), and I confirmed it
+
+Cycle 1 asked whether the carrier contracting would prevent a rescope trip on the first public-surface
+slice. Measured rather than reasoned, the answer is **no — it has already tripped**:
+
+| Tree | `deno task check:mcp-export-corpus` |
+| --- | --- |
+| base `24f6642f` | **exit 0** |
+| Slice 1 head `c0d61e648ada` | **exit 1 — "MCP export-surface corpus is stale"** |
+
+**Re-run by me independently in a detached worktree; both results reproduce exactly.**
+
+**Cause.** The corpus records each public symbol's **signature and JSDoc**, not just the symbol list.
+Slice 1's additive widening of `NetScriptProcedureMeta` changes the rendered signature of an exported
+contracts type. Cycle 1 modelled the gate as sensitive to *symbol growth* and so contracted it only at
+Slices 2/4/7 — the slices that add symbols. That model is wrong: **every slice touching an exported
+declaration or its JSDoc stales it**, including Slice 1 (done) and plausibly 3, 5, 6, 8.
+
+**Consequence.** Slice 2's contracted `mcp-export-corpus` would start **red on arrival**, for a cause
+outside Slice 2's ceiling exemption — exactly the stop-and-rescope trigger F-2 existed to remove.
+
+### My own Tier-A miss, recorded
+
+My Slice 1 Tier-A checked "no generated carrier moved" via `git status`. The evaluator names why that
+is **non-probative**: the tracked file did not move *because nobody ran the gate* — it was not
+contracted for Slice 1. I drew a negative conclusion from the absence of a signal I never generated.
+The correct check was to **run the carrier gates**, not to observe that no carrier file changed. Same
+class as the `argv`/`durationMs` lesson: an artifact that looks clean because nothing exercised it.
+
+This does not reopen Slice 1's acceptance — the evaluator scoped that out, and the substance (additive
+extension, ceiling, fixtures that fail on perturbation) stands. It is a gate-contract defect.
+
+### Escalation to the owner — the decision, and my recommendation
+
+The evaluator offers two paths and forbids a third:
+
+1. **Accept the amended contract on the diff**, no further evaluation cycle; or
+2. **Bounded cycle 3**, limited to row 13, the per-slice stop lines, the exemption sentence, and the
+   `drift.md` entry.
+
+**Slice 2 must not start until the corpus regeneration commit has landed and is supervisor-signed**,
+because its first contracted gate is otherwise red on arrival.
+
+**Recommendation: path 1.** The remedy is three mechanical edits plus one `gen:mcp-export-corpus`
+regeneration commit, with **no design text change** — and the substantive question cycle 3 would ask
+has already been answered by measurement at both trees. Spending the lane's last evaluation cycle
+re-reading three contract lines buys less than landing them.
+
+Fix, when authorised: contract `mcp-export-corpus` at **every** slice's Tier-A stop (it is <1 min and
+sensitive to any public signature/JSDoc change, so per-slice is the only honest contract point); amend
+the exemption sentence to allow the Slice 1 staleness to be cleared in a supervisor-signed
+`chore(mcp)` regeneration commit before Slice 2; and record the staleness in `drift.md` as
+`minor` / gate-contract / **#1769 shape**.
+
+### Lane state — Slice 2 held
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | SHIPPED |
+| #1730 / PR #1763 | SHIPPED |
+| #1387 / PR #1762 | **BLOCKED on owner decision** — Slice 1 accepted at `2ddd6048`; Slice 2 dispatch withheld |
+| #1664 | parked; runtime-bound, and the sole lease is held elsewhere |
+
+No runtime lease held or requested. `#1664` continues to wait for the lease to return exact zero.
