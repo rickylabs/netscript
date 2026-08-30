@@ -155,7 +155,7 @@ Deno.test('accepts explicit-only infrastructure host-port interpolation', () => 
   assertEquals(result.findings, []);
 });
 
-Deno.test('S5 runtime literal grep has only the compatibility export and its deprecation tests', async () => {
+Deno.test('S5 runtime literal grep excludes generated barrels and allows only compatibility contracts', async () => {
   const pattern = String.raw`809[1-4]|4437|127\.0\.0\.1:80`;
   const output = await new Deno.Command('git', {
     args: [
@@ -166,6 +166,7 @@ Deno.test('S5 runtime literal grep has only the compatibility export and its dep
       'plugins',
       'packages/cli/src',
       'packages/cli/e2e',
+      ':(exclude,glob)**/*.generated.ts',
     ],
     stdout: 'piped',
     stderr: 'piped',
@@ -174,8 +175,12 @@ Deno.test('S5 runtime literal grep has only the compatibility export and its dep
   const lines = stdout.length === 0 ? [] : stdout.split('\n');
   const unexpected = lines.filter((line) => {
     const path = line.slice(0, line.indexOf(':'));
-    return path !== 'plugins/sagas/src/constants.ts' &&
-      path !== 'plugins/sagas/tests/public/deprecated-default-port_test.ts';
+    return path !== 'plugins/auth/src/constants.ts' &&
+      path !== 'plugins/auth/tests/public/deprecated-default-port_test.ts' &&
+      path !== 'plugins/sagas/src/constants.ts' &&
+      path !== 'plugins/sagas/tests/public/deprecated-default-port_test.ts' &&
+      path !== 'plugins/triggers/src/constants.ts' &&
+      path !== 'plugins/triggers/tests/public/deprecated-default-port_test.ts';
   });
 
   assertEquals(unexpected, []);

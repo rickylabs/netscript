@@ -1,17 +1,24 @@
-# Draft issue: chore(sagas): remove deprecated SAGAS_API_DEFAULT_PORT compatibility export in 0.0.8
+# Draft issue: chore(plugins): remove deprecated default-port compatibility exports in 0.0.8
 
 ## Summary
 
-Remove the `SAGAS_API_DEFAULT_PORT` compatibility export in 0.0.8. Since Aspire 13.5 S5, the value
-is not a runtime fallback: sagas endpoints resolve only from an explicit URL, an Aspire service
-reference, or supported environment variables.
+Remove the `AUTH_API_DEFAULT_PORT`, `SAGAS_API_DEFAULT_PORT`, and `TRIGGERS_API_DEFAULT_PORT`
+compatibility exports in 0.0.8. Since Aspire 13.5 S5, these values are not runtime fallbacks:
+plugin endpoints resolve only from an explicit URL, an Aspire service reference, supported
+environment variables, or Aspire's allocated resource URL.
+
+`WORKERS_API_DEFAULT_PORT` does not exist on the current public surface, so there is no workers
+compatibility export to remove.
 
 ## Acceptance
 
-- [ ] Remove the export from root, `./public`, `./runtime`, and `./aspire` entry points.
-- [ ] Remove the deprecation-contract tests and update the sagas migration notes.
-- [ ] Confirm no runtime or scaffold path reads the symbol before removal.
-- [ ] Run sagas `deno publish --dry-run` and `deno doc --lint` gates.
+- [ ] Remove the auth export from root and the shared `./public` / `./plugin` entrypoint.
+- [ ] Remove the sagas export from root, `./public`, `./runtime`, and `./aspire` entrypoints.
+- [ ] Remove the triggers export from root, the shared `./public` / `./plugin` entrypoint,
+      `./aspire`, and `./services`.
+- [ ] Remove each deprecation-contract test and update plugin migration notes.
+- [ ] Confirm no runtime or scaffold path reads any symbol before removal.
+- [ ] Run each affected plugin's `deno publish --dry-run` and full-export `deno doc --lint` gates.
 
 ## Milestone
 

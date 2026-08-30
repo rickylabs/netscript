@@ -14,6 +14,8 @@
 ### Public Surface
 
 - `SAGAS_API_DEFAULT_PORT` — retained compatibility export, deprecated and removed from runtime use.
+- `AUTH_API_DEFAULT_PORT` and `TRIGGERS_API_DEFAULT_PORT` — retained compatibility exports,
+  deprecated and restricted to public re-export surfaces.
 - `SagaPublisherResult` — unchanged existing union; no-endpoint uses its rejected member.
 
 ### Domain Vocabulary
@@ -24,12 +26,15 @@
 
 ### Ports
 
-- No runtime literal port is introduced. `8092` remains only as deprecated compatibility data.
+- No runtime literal port is introduced. `8092`, `8093`, and `8094` remain only as deprecated
+  compatibility data.
 - Infrastructure container target ports remain protocol facts; host ports are opt-in.
 
 ### Constants
 
 - `SAGAS_API_DEFAULT_PORT = 8092` — compatibility-only; removal planned for 0.0.8.
+- `AUTH_API_DEFAULT_PORT = 8094` and `TRIGGERS_API_DEFAULT_PORT = 8093` — compatibility-only;
+  removal planned in the same 0.0.8 draft. No workers default-port export exists.
 
 ### Commit Slices
 
@@ -41,6 +46,7 @@
 | 4 | Opt-in generated pins | generator tests + fitness gate | CLI generators/config |
 | 5 | Describe-derived E2E probes | E2E unit/static gates | CLI E2E scaffold gates |
 | 6 | Generated assets and merge evidence | full requested gate set except runtime | generated/run artifacts |
+| 7 | Tier-A evidence correction | honest grep + full slice-6 gate set | generator, compatibility constants/tests, run artifacts |
 
 ### Deferred Scope
 
@@ -70,6 +76,9 @@ required, and expose cross-resource URLs through resource-reference environment 
 | 2026-08-30 | 5 | push | `732337435` pushed with describe-derived probe evidence. |
 | 2026-08-30 | 6 | generated assets | Preserved embedded bytes while removing forbidden generated-source spellings. |
 | 2026-08-30 | 6 | final gates | Static, doctrine, JSR, plugin, and `scaffold.plugins` gates are green/baseline. |
+| 2026-08-30 | 7 | Tier-A fixes | Reverted grep-driven source respelling; aligned generated exclusions; deprecated auth/triggers constants. |
+| 2026-08-30 | 7 | full gates | Static, asset, doctrine, plugin, JSR, and `scaffold.plugins` gates are green/baseline. |
+| 2026-08-30 | 7 | handoff | Explicit branch refspec and PR evidence comment carry the immutable slice SHA. |
 
 ## Decisions
 
@@ -84,6 +93,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Parent plan's D-16 label differs from owner shorthand for infrastructure ports | minor | yes |
+| Generated barrels contain non-runtime embedded prose and follow the checker's generated-source exclusion | minor | yes |
 
 ## Gate Results
 
@@ -92,6 +102,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | S5 literal grep | exact issue command | FAIL / raw exit `1` | RED-first test lists shipped literals. |
+| corrected S5 literal grep | excludes `*.generated.ts` | PASS / exit `0` | Six compatibility-contract hits only. |
 
 ### Fitness Gates
 
@@ -102,6 +113,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | generated host-port opt-in | PASS / exit `0` | `receipts/04-opt-in-host-ports.txt` | Plugin and infrastructure cases covered. |
 | describe-derived probes | PASS / exit `0` | `receipts/05-describe-derived-probes.txt` | 57 tests plus 9 nested smoke steps passed. |
 | final host-port/static gates | PASS / exit `0` | `receipts/06-final-gates.txt` | Exact grep has only the two D-14 compatibility assertions. |
+| Tier-A correction gates | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | Honest generated exclusion and six explicit compatibility paths. |
 
 ### Runtime Gates
 
@@ -118,14 +130,19 @@ required, and expose cross-resource URLs through resource-reference environment 
 | four-entry consumer import | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | Deprecated export present at all locked paths. |
 | sagas unit suite | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | 33 passed, 0 failed. |
 | all official plugin suites | PASS / exit `0` | `receipts/06-final-gates.txt` | 204 passed, 13 intentionally ignored, 0 failed. |
+| auth/triggers deprecation contracts | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | Values, retained entrypoints, and surface-only reference censuses proven. |
+| affected plugin JSR dry-runs | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | Auth/sagas/triggers green with baseline dynamic-import warnings only. |
+| affected plugin doc surfaces | BASELINE | `receipts/07-tier-a-fixes.txt` | No missing JSDoc; existing private-type-ref diagnostics only. |
+| all official plugin suites (S7) | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | 215 passed, 13 intentionally ignored, 0 failed. |
 
 ### Scaffold Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | `scaffold.plugins` | PASS / exit `0` | `receipts/06-final-gates.txt` | 17 passed, 0 failed, 0 skipped. |
+| `scaffold.plugins` (S7) | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | 17 passed, 0 failed, 0 skipped. |
 
 ## Handoff Notes
 
-- All six implementation slices are complete. The supervisor owns IMPL-EVAL, ready-state transition,
+- All seven implementation slices are complete. The supervisor owns the slice-7 rereview, IMPL-EVAL, ready-state transition,
   and CI `scaffold.runtime`; this lane does not self-certify.
