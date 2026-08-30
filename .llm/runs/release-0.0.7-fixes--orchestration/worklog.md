@@ -4093,3 +4093,49 @@ was told to justify the addition in a sentence or two rather than paste it: the 
 frames that constant as *which SDK subpaths participate in the cache-provider closure*, so listing
 `./presets` asserts the browser-safe entry belongs there — true for this leaf, but a parity list
 edited only to silence a failure is the very failure mode this leaf exists to remove.
+
+## 2026-08-30 — #1758 closure amendment confirmed by the coordinator; fix verified in preview
+
+### The reported discrepancy was real and is now resolved upstream
+
+The coordinator's amendment originally named
+`…/dependency-closures/netscript-web-runtime-closure_test.ts`. This lane reported — rather than
+silently substituting — that the test holds no hardcoded expectation, that *Actual* is read live from
+`packages/sdk/deno.json` while *Expected* is the constant in the **source** module, and that the only
+edit which fixes parity without weakening the assertion is in the source.
+
+The coordinator has now corrected the authorization to name
+**`netscript-web-runtime-closure.ts`**, with the existing parity test as validation, scoped to that
+one source file plus test execution and a drift record.
+
+Worth recording as a process outcome, not just an event: **reporting the mismatch is what produced a
+precise authorization.** Silently editing the source under a test-file authorization would have
+produced the same code with a false provenance trail; silently editing the test would have weakened
+the only check that caught the defect. The #1673 precedent — where this lane's own admissible-reading
+substitution was overturned by PLAN-EVAL — is exactly why the instinct to report won here.
+
+The `drift.md` entry therefore changes character: it records a **coordinator-confirmed** ceiling
+amendment, not a supervisor interpretation pending confirmation.
+
+### The fix is correct, verified before the author committed
+
+`'./presets'` is added to `NETSCRIPT_WEB_RUNTIME_EXPORTS['@netscript/sdk']`. Because the parity
+assertion is `assertEquals` over arrays, **order matters** — so both sequences were compared directly:
+
+```
+sdk/deno.json : . ./auto-update ./desktop ./cache ./client ./collections ./discovery ./ports ./presets ./query ./query-client ./streams ./telemetry
+closure const : . ./auto-update ./desktop ./cache ./client ./collections ./discovery ./ports ./presets ./query ./query-client ./streams ./telemetry
+```
+
+Identical, 13 entries, `./presets` correctly positioned after `./ports`.
+
+Focused closure test in **preview** — labelled as such because the tree was still dirty and a dirty-tree
+result is never exact-head evidence: exit 0, **6 passed / 0 failed**. The exact-head run follows the
+author's commit.
+
+### Remaining sequence for #1758
+
+Author commits and pushes the closure fix at the final base `a5520e70` → this lane re-runs the
+contracted gates at that exact head → renewed delta receipt (the `MECHANICAL_PASS` at `f1ff5557` is
+superseded and the author was told not to cite it) → `status:ready-merge` applied immediately before a
+fresh CI run so the mirror's live read observes it → merge coordinates handed over.
