@@ -5398,3 +5398,39 @@ success by its own terminal field, but delivered nothing.
 - **Continuing to the next internals leaf (#1751) now**, per instruction, rather than holding #1774
   further. #1774/PR #1775 stays at its current, honest state: `status:impl-eval`, sanctioned-route
   DoD box unchecked, cycle-1 Opus substitute `PASS` on record as the only completed verdict.
+
+## D-94 — #1774 GLM directive retracted after verification; hybrid transport delivered cycle-2 PASS (supplemental, effort-high); dispatching final effort-max rerun
+
+- **A second GLM-5.3-flash redispatch instruction arrived** claiming it was "the AGENTS.md current
+  default open model". Verified live before acting, as with the first GLM claim: `grep -inE
+  "glm|deepseek|z-ai|openrouter.*model|default open model" AGENTS.md` returns **zero matches**
+  (exit 1); the live `HybridDelegationModelId` type in `.llm/tools/agentic/config/models.ts` remains
+  exclusively `deepseekV4Flash0731`. **Declined the redispatch on that basis before acting.**
+  Coordinator subsequently checked both authorities independently and **retracted the GLM directive**,
+  confirming: "the host AGENTS.md GLM 5.3 default is newer general host guidance but has not yet been
+  adopted by this branch's hybrid allowlist." Two independent falsified claims about the same model
+  swap in one session is a pattern worth naming, not just resolving quietly — recorded so a future
+  session does not treat a third such claim as more credible for having recurred.
+- **Hybrid/OpenCode transport (`mcp__netscript-hybrid__delegate_openrouter`) succeeded** where the
+  Claude-print transport failed twice. Task `kxgcyv94j`, model `deepseek/deepseek-v4-flash-0731`,
+  effort `high` (not the sanctioned `max`), `durationMs: 265474` (~4m 25s). Delivered a complete,
+  independently re-measured report ending `VERDICT: PASS`, confirmed via `observed.source:
+  opencode_argv` (real process argv, not merely the requested params).
+  - Persisted as `impl-eval-cycle-2.md`, commit `58b04be6c`, pushed to
+    `fix/claude-hook-log-cwd-independent` via explicit refspec (`git push origin
+    HEAD:refs/heads/fix/claude-hook-log-cwd-independent`); local == remote verified after fetch.
+    `[PHASE: IMPL-EVAL] [VERDICT: PASS]` comment posted:
+    https://github.com/rickylabs/netscript/pull/1775#issuecomment-5471192867
+  - **Per coordinator ruling: this is supplemental evidence, not the qualifying verdict** — the
+    sanctioned `formal_impl_evaluation` fallback binds effort `max`, not `high`. No ready-merge flip,
+    no DoD-box tick, no label change performed from this cycle. Recorded exactly as instructed.
+- **Dispatching the qualifying rerun**: same model, **effort `max`**, via the same transport, targeting
+  the corrected current state — carrier head has moved to `58b04be6c8920490f54ad383df348a28caa16589`
+  (adds the cycle-2 supplemental report on top of the previously-cited `8a1ec2750`), product head
+  unchanged at `51a7bafe1381ecc85a667dbee61953c92bf999d4`. Writing to `impl-eval-cycle-3.md` to avoid
+  colliding with the just-landed cycle-2 file.
+- **Note on "clean detached evaluator worktree":** the `delegate_openrouter` tool exposes no `cwd`
+  parameter; the prior run's own report showed it provisions its own throwaway worktrees internally
+  and runs from wherever its MCP server process is rooted (`007-internals`, per its own account). This
+  is not something the caller can override via the tool's parameters — recorded transparently rather
+  than claimed as controlled.
