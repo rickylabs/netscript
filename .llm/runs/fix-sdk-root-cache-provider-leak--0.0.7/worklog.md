@@ -354,3 +354,62 @@ agent-docs output.
 The MCP precheck's PASS is deliberately not described as an expected stale result. The corpus did
 not move after the #1748 merge; the prose-derived outputs did. The acceptance-evidence block remains
 unchanged, and no prohibited runtime gate, issue mutation, relabel, or draft-state change occurred.
+
+## Supervisor Tier-A re-sign-off — `8ff04903` (post two main integrations)
+
+Re-derived independently at this exact head; nothing below is read from the author's receipts.
+
+### The product is byte-identical to the head IMPL-EVAL already passed
+
+| Comparison `83b7109c..8ff04903` | Result |
+| --- | --- |
+| Non-generated files under `packages/`/`plugins/` | **none changed** |
+| `packages/sdk/src`, `packages/sdk/mod.ts`, `packages/sdk/deno.json`, `packages/fresh/src` | **empty diff** |
+| Generated files changed | exactly two — `packages/cli/src/kernel/assets/agent-docs.generated.ts` and `packages/mcp/src/publish-assets.generated.ts`, both produced solely by their `gen:` tasks |
+
+So IMPL-EVAL cycle 1's `PASS_IMPL` at `83b7109c` remains valid for the implementation. The delta is two
+`main` integrations (`f8b4f804`, then `952cc106`/#1748), the regenerated shared-asset cascade, doc
+prose, and run artifacts. **Renewed currency is therefore a bounded delta receipt, not a second
+IMPL-EVAL cycle** — the instrument #1711 used for exactly this shape.
+
+### Integration integrity
+
+Both integrations are **merges, not rebases** — `HEAD` has parents `cea45edd` and `952cc106`, the
+earlier one had `72ab6411` and `f8b4f804` — and every receipt SHA in the evidence chain
+(`ddf66a6f`, `1dd64dae`, `bfad0c15`, `83b7109c`, `72ab6411`, `d1f8afe9`, `cea45edd`) is still an
+ancestor. That property was checked rather than assumed, because `git log --oneline` renders a merged
+head directly above `main` and looks identical to a rebase.
+
+### Exact-head gates at `8ff04903`
+
+| Gate | Result |
+| --- | --- |
+| Ceiling containment vs `952cc106` | no path outside the ceiling |
+| `deno.lock` | byte-unchanged |
+| `check:agent-docs-prose` | exit 0 |
+| **`check:assets-barrel`** | **exit 0** — was the newly-found red; now clears |
+| `check:publish-assets` | exit 0 |
+| `check:mcp-export-corpus` | exit 0 |
+| `docs:exports-drift` | exit 0 |
+| `packages/sdk/tests/` whole suite | exit 0 · **70 passed / 0 failed** |
+| `define-fresh-app.test.ts` | exit 0 · **11 passed / 0 failed** |
+| Graph proof, re-measured | root **0** browser-unsafe edges · presets **0** |
+
+The graph proof was re-measured at this head rather than inherited, because two main merges changed
+the module graph's surroundings even though they did not change this leaf's source.
+
+### The `check:assets-barrel` gap, closed
+
+The gate was absent from the plan's table entirely and was red for a real reason: the leaf's new
+published `./presets` subpath must appear in the CLI's `EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS`. It is now
+a recorded gate row, its output file is an authorized mechanical ceiling addition, and it passes.
+
+That gap survived the plan, two PLAN-EVAL cycles, Tier-A and IMPL-EVAL. The durable lesson is narrower
+and more useful than "run more gates": **derive the generated-derivative cascade from the tools that
+write the artifacts, not from a remembered list of gate names.** A list is what failed here — twice.
+
+### Not done here
+
+No readiness flip, merge, relabel, issue edit, or acceptance-box tick from this step. The
+acceptance-evidence block is untouched: the earlier close-gate failure was a mirror label-timing race,
+not a mapping defect.
