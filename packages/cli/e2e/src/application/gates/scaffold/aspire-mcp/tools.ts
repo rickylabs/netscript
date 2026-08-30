@@ -15,23 +15,8 @@ export const ASPIRE_MCP_BASELINE_TOOLS: readonly string[] = [
   'refresh_tools',
 ];
 
-export const ASPIRE_MCP_EXPECTED_TOOLS: readonly string[] = [
-  'list_resources',
-  'list_console_logs',
-  'list_structured_logs',
-  'list_traces',
-  'list_trace_structured_logs',
-  'execute_resource_command',
-  'list_apphosts',
-  'select_apphost',
-  'list_integrations',
-  'get_integration_docs',
-  'list_docs',
-  'search_docs',
-  'get_doc',
-  'doctor',
-  'refresh_tools',
-];
+export const ASPIRE_MCP_EXPECTED_TOOLS: readonly string[] = ASPIRE_MCP_BASELINE_TOOLS;
+export const ASPIRE_MCP_DOCUMENTED_UNOBSERVED: readonly string[] = ['get_integration_docs'];
 
 export const ASPIRE_MCP_DASHBOARD_TOOLS: readonly string[] = [
   'list_structured_logs',

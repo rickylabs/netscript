@@ -15,6 +15,7 @@ import { runAspireMcpSmoke } from './aspire-mcp/evaluate.ts';
 import {
   ASPIRE_MCP_BASELINE_TOOLS,
   ASPIRE_MCP_DASHBOARD_TOOLS,
+  ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
   ASPIRE_MCP_EXPECTED_TOOLS,
   diffAspireMcpTools,
 } from './aspire-mcp/tools.ts';
@@ -23,6 +24,7 @@ import { createStdioAspireMcpTransport } from './aspire-mcp/stdio-transport.ts';
 export {
   ASPIRE_MCP_BASELINE_TOOLS,
   ASPIRE_MCP_DASHBOARD_TOOLS,
+  ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
   ASPIRE_MCP_EXPECTED_TOOLS,
   diffAspireMcpTools,
   runAspireMcpSmoke,
