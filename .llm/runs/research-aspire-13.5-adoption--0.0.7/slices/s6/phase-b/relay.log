@@ -1,0 +1,7 @@
+[relay] watching owner=s6-phase-b dind=netscript-dind(10.4.12.22) since=2026-08-30T21:16:35.473Z pid=4005211
+[relay] garnet-mmdwjydh 127.0.0.1:32820 => hopA relay-s6-phase-b-32820 (10.4.12.22:32820) => hopB 127.0.0.1:32820@ai-agents
+[relay] postgres-185bb677 127.0.0.1:19450 => hopA relay-s6-phase-b-19450 (10.4.12.22:19450) => hopB 127.0.0.1:19450@ai-agents
+[relay] redis-rcvyjuwp 127.0.0.1:32819 => hopA relay-s6-phase-b-32819 (10.4.12.22:32819) => hopB 127.0.0.1:32819@ai-agents
+[relay] redis-rxmekbxc 127.0.0.1:32821 => hopA relay-s6-phase-b-32821 (10.4.12.22:32821) => hopB 127.0.0.1:32821@ai-agents
+[relay] garnet-nseddywd 127.0.0.1:32822 => hopA relay-s6-phase-b-32822 (10.4.12.22:32822) => hopB 127.0.0.1:32822@ai-agents
+[relay] cleanup: closed 5 listener(s), removed 0 hop-A container(s)

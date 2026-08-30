@@ -1865,3 +1865,28 @@
   `runtime-gates.ts` 305 lines, `runtime/` 11 children. Static gates: 99/0 tests, e2e check 178
   files/0 failed batches, raw lint/fmt clean on touched paths, host-ports OK, quality ok, arch:check
   only pre-existing warnings. Host confirmed zero; Phase-B DinD/relay lease acquired.
+- **D-97 — S6 Phase-B: `scaffold.runtime` 56/1 at exact head `31f44f70c`; single failure isolated to
+  `runtime.health.listener-unreachable`, a real relay-topology interaction, not confirmed as a code
+  defect. No unchanged retry.** Full one-pass suite through DinD under relay `s6-phase-b`: every
+  gate through `runtime.aspire-describe` passed, including all `runtime.wait.*` listener gates and
+  `cleanup.aspire-stop`. The single failure: `aspire resource postgres stop` was issued, then
+  `pollReport` polled `postgres_listener` for 30 s expecting a transition to
+  `Unhealthy`/`ECONNREFUSED|ETIMEDOUT` — it never transitioned, staying
+  `Healthy: postgres
+  listener ready on localhost:19450` the whole window. `19450` is exactly the
+  port my two-hop relay bridges for this run (`relay-s6-phase-b-19450`, confirmed in the relay log).
+  Fixture code read: it calls the documented `aspire resource <name> stop` CLI command (not a raw
+  docker-pause), so the mechanism itself is legitimate; the open question is whether Aspire 13.5.3's
+  `resource stop` actually tears down the container's published port promptly enough for the relay's
+  hopA (`socat`, bound to the dind host network) to observe the disconnect within 30 s, or whether
+  the relay's persistent listener/proxy semantics mask a transition that would be immediate on a
+  native Docker host. **Not diagnosed further without another lease** — this is exactly the kind of
+  relay-vs-native-topology question that needs either (a) a repeat with tighter instrumentation
+  (poll `docker ps`/`docker inspect` on the dind side during the stop window) or (b) a native-Docker
+  comparison once available, neither of which is authorized as an unchanged retry. Cleanup: suite's
+  own `--cleanup` already returned containers to 0/aspire `[]`; one leftover anonymous volume
+  (`231a97d9ce40…`) removed via `docker volume prune`; relay watcher killed (5 listeners closed, 0
+  hop-A containers — already gone with their parent containers). **Final: containers=0, volumes=0,
+  aspire=[].** Receipts `slices/s6/phase-b/00-baseline.txt` … `03-reverified-zero.txt`, full suite
+  log `01-scaffold-runtime.txt`. Independent review/evaluation of the frozen `31f44f70c` head is
+  authorized next (do not re-trigger the S7 DeepSeek receipt — that verdict stands).

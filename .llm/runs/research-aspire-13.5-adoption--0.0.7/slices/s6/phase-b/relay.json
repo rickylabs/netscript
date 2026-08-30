@@ -1,0 +1,40 @@
+{
+  "owner": "s6-phase-b",
+  "pid": 4005211,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T21:16:35.473Z",
+  "relays": [
+    {
+      "port": 32820,
+      "container": "relay-s6-phase-b-32820",
+      "source": "garnet-mmdwjydh",
+      "startedAt": "2026-08-30T21:18:26.016Z"
+    },
+    {
+      "port": 19450,
+      "container": "relay-s6-phase-b-19450",
+      "source": "postgres-185bb677",
+      "startedAt": "2026-08-30T21:18:28.522Z"
+    },
+    {
+      "port": 32819,
+      "container": "relay-s6-phase-b-32819",
+      "source": "redis-rcvyjuwp",
+      "startedAt": "2026-08-30T21:18:29.125Z"
+    },
+    {
+      "port": 32821,
+      "container": "relay-s6-phase-b-32821",
+      "source": "redis-rxmekbxc",
+      "startedAt": "2026-08-30T21:19:34.269Z"
+    },
+    {
+      "port": 32822,
+      "container": "relay-s6-phase-b-32822",
+      "source": "garnet-nseddywd",
+      "startedAt": "2026-08-30T21:19:34.784Z"
+    }
+  ],
+  "closed": "2026-08-30T21:21:32.588Z"
+}
