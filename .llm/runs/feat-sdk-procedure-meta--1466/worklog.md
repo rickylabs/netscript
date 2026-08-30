@@ -222,3 +222,10 @@ Sufficiency was recomputed over the eight literal paths, not a glob. Gate IDs an
 unique, every receipt is terminal and exact-head, and the verdict is **INSUFFICIENT** because
 `public-doc-lint` did not pass (`FAIL`) and root `test` did not pass (`SKIPPED` under R-1). The
 machine result is recorded in `audit/evidence-sufficiency-cycle4.json`.
+
+## Repair cycle 5 — supervisor route identity correction
+
+Corrected `supervisor.md` to distinguish the original slice-1 `complex_implementation` route from
+the repair cycles' `normal_implementation` route, record the actual checkout, and mark the
+PLAN-EVAL worktree as historical (pre-migration). This is evidence-only; content head
+`42874803e572a5746834880e387501f0948c7362` is unchanged.
