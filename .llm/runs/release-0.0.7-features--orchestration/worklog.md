@@ -5880,3 +5880,94 @@ That is the exact seam #1466 is building. So #1387's policy declaration must ext
 introduce a second metadata vocabulary. Inventing a parallel one would recreate #1387's own headline
 defect: *policy living in a second place that can drift from the contract*. Recorded on the issue so
 whoever picks it up inherits the constraint rather than rediscovering it.
+
+## 2026-08-30 — NAS migration: features lane resumed, #1466 repair dispatched to a new Codex thread
+
+Supervisor reset onto the NAS agent plane. Old `/home/codex/...` paths and the old session registry
+are historical; the registry is never resumed or recreated. Git and live GitHub are authoritative.
+
+### Reconciliation before dispatch
+
+| Question | Answer | How |
+| --- | --- | --- |
+| Topic head | `78430faf`, local == `origin/orchestrator/release-0.0.7-features` | `git rev-parse` |
+| `main` | `13878a80a`, local == `origin/main` | `git fetch` + `rev-parse` |
+| #1731 head | `f9056f879`, local == remote == PR head, clean, OPEN draft | `gh pr view` + `rev-parse` |
+| Leaf base vs `main` | `21d516224` is **3 commits** behind | `git rev-list --count` |
+| Does that drift touch this slice? | **No** — `git log 21d51622..origin/main -- packages/contracts packages/sdk` is empty, diff is empty | measured, not assumed |
+
+So no rebase. Holding the base fixed is what keeps the pre-repair red receipts and the recut set
+comparable — the mistake D-22 (#1664 era) records is running an old base to answer a question nobody
+asked; the mirror-image mistake is rebasing away the comparability of evidence you are about to
+re-cut. The drift is inert and is recorded as such.
+
+### The three red receipts are not the same defect
+
+The migration checkpoint `f9056f87` froze eight receipts cut at content head `c9a391811`: five PASS
+and three terminal FAIL — `check`, `test`, `public-doc-lint`. Reading them rather than the summary:
+
+- **`check` and `test` are one root cause, not two.** Both fail on a single `TS2344` at
+  `packages/sdk/tests/readme-doctest_test.ts:47:43` —
+  `Assert<Equal<BaseMeta, Record<never, never>>>`. That guard pins the **pre-#1466** fact "the
+  metadata slot is empty", and #1466 deliberately changes it to
+  `NetScriptProcedureMeta & Record<never, never>`. The guard is correctly red. The repair re-pins it;
+  it does not delete or loosen it, and it must still be able to fail.
+- **`public-doc-lint` is a different animal entirely — see D-23.** I ran the plan's exact
+  16-entrypoint argv on both heads: `main@13878a80a` yields **12** `private-type-ref` findings,
+  slice head `f9056f879` yields **14**. The gate is already red on `main`. The contracted PASS
+  receipt was never satisfiable by this leaf, and the leaf's D-1 asks the coordinator the wrong
+  question.
+
+I checked the base rather than relaying D-1 because D-1's remedy space — "rule how the sanctioned
+oRPC slow-types baseline is represented in the named evidence set" — only makes sense if the gate
+was green before. It was not. The slice's real cost is **+2, and it is one symbol**: `baseContract`'s
+annotation moved from `ReturnType<typeof oc.errors<…>>` (1 finding, `oc`) to an explicit
+`ContractBuilder<…>` (3 findings). Every other finding is identical on both heads.
+
+That converts the repair target from "make it green" — impossible in bounds — to **incremental delta
+≤ 0 versus the base**, with the residual recorded as a terminal FAIL receipt carrying the comparison.
+The gate is not weakened, renamed, scoped down, or omitted. Whether the plan's unsatisfiable PASS is
+amended is a coordinator/IMPL-EVAL ruling; this lane does not waive it.
+
+### Dispatch — new thread, never a resume
+
+Brief: `slices/impl-1466-repair.md` (bounded to four items: R-A doctest re-pin, R-B adapter boundary,
+R-C archive-then-recut all eight receipts, R-D land evidence and stop). It carries the base-vs-head
+doc-lint numbers as evidence, names `BaseContractErrors` — a NetScript-owned alias exported in
+`contract-primitives.ts:101` but absent from `public/mod.ts` — as the leading candidate for the
+delta, and forbids re-exporting `ContractBuilder`/`Schema` as AP-14. It repeats the D-21 standing
+instruction: land what exists, and a failing pinned baseline is a finding to report, not a number to
+adjust.
+
+| Field | Value |
+| --- | --- |
+| Launcher | `deno task agentic:launch-codex-slice` (dry-run clean first: brief contract ok, `use harness`=true, `## SKILL`=true, git-safety `upstream: NONE` / `dirty: 0` / base `f9056f87`) |
+| Requested route | Codex · OpenAI · **`gpt-5.6-sol` · medium** — `normal_implementation` (`lane-policy.md`) |
+| Observed route | `provider=openai · model=gpt-5.6-sol · effort=medium` — **matched** |
+| Thread | `01a0515c-28c8-7131-8197-e808f7b7e10f` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1731` |
+| Branch | `feat/sdk-procedure-meta` @ `f9056f87`, upstream unset by me before launch (launcher push-safety requires it) |
+| Daemon attachment | `agentic:codex-status --user node`: daemon `running`, backend `pid`, socket `~/.codex/app-server-control/app-server-control.sock`, cli/app-server `0.151.0`, `app-server-procs=2`; the thread is listed `working` at the correct worktree on the correct route |
+| Steering | `deno task agentic:codex-resume --user node --thread-id 01a0515c-28c8-7131-8197-e808f7b7e10f --worktree /home/agent/projects/netscript/worktrees/007-leaf-1731 --message-file <path>` (verified against `codex-resume.ts` `--help`; the flag is `--thread-id`, and `--user node` is required because this task also lacks `--allow-env` — see D-24) — same thread, same worktree, never a second sender |
+
+**Route choice.** The parent slice ran `complex_implementation` (Sol · high). This repair is a
+re-pinned type assertion, one export line, and a receipt recut — not a new feature — but it does
+carry one genuine mid-slice decision (whether the `BaseContractErrors` export clears the delta
+without introducing a `MergedErrorMap` reference), which is exactly the `medium` selection rule.
+Recorded as a deliberate step down from the parent slice's route, not an oversight.
+
+**Not on this lane's authority and withheld:** merge, publish, ready-flip, relabel, milestone change,
+issue close, #1348 or central cluster-state mutation, expensive-gate lease. Tier-A is mine; IMPL-EVAL
+is a fresh separate session on `formal_impl_evaluation` (Fable 5 · medium for Codex work).
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **active** — bounded repair in flight on thread `01a0515c` |
+| #1664 | **parked**, untouched at `20337441788b` — no retry authorized |
+| #1387 | queued, serial; technically dependent on #1466's metadata vocabulary |
+| #1730 | queued (S-1 executable-guard gap) |
+
+NAS/session operational evidence (host paths, rollout file, socket, thread id) is recorded here for
+continuity and is **committed locally only — not pushed**.

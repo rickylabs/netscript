@@ -539,3 +539,58 @@ the slice comment, report — and *a red gate is still the deliverable*. Uncommi
 to review, and a stall at the commit boundary destroys exactly the evidence the harness runs on. Also
 state explicitly that a failing pinned baseline is a finding to report, not a number to adjust,
 because an agent nudged to "land it" can otherwise make a test pass by moving the target.
+
+## D-23 — the `public-doc-lint` PASS receipt this leaf is held to is unsatisfiable on `main`
+
+**Numbering note.** `D-20`, `D-21` and `D-22` each appear twice in this file — once from the #1664
+era and once from the post-reset lane. I am not renumbering history; new entries continue from the
+highest used id.
+
+**Observed.** `plan.md` (PLAN-EVAL `PASS` at `1df5ff3e4`) contracts a **PASS** `public-doc-lint`
+receipt over a named 16-entrypoint argv. I ran that exact argv on two heads:
+
+| Head | `private-type-ref` findings | Exit |
+| --- | --- | --- |
+| `origin/main` `13878a80a` | **12** | 1 |
+| #1731 slice head `f9056f879` | **14** | 1 |
+
+`deno doc --lint` is therefore **already red on `main`**, before #1466 exists. The leaf's own
+`drift.md` D-1 frames this as the slice having broken doc lint and asks the coordinator to rule on
+"the sanctioned oRPC slow-types baseline". That framing is wrong, and it would have sent the ruling
+in the wrong direction: the gate was never green to lose.
+
+**The slice's actual cost is +2, and it is one symbol.** At base, `baseContract` was annotated
+`ReturnType<typeof oc.errors<…>>` and cost one finding (`references private type 'oc'`). Slice 1
+replaced it with an explicit `ContractBuilder<…>` annotation costing three — `ContractBuilder`,
+`Schema`, `BaseContractErrors`. Every other finding on both heads is byte-identical
+(`QueryClient` ×2, `StreamsInstrumentation`, `CrudRoute`, and the `BaseContractRoute` /
+`BaseContractOutputRoute` family).
+
+**Consequence for the repair.** The bounded target is *not* a PASS receipt — no bounded change can
+produce one, and the changes that could (touching `query-client`, `streams`, `crud`) are outside this
+leaf and outside the approved plan. The target is **incremental delta ≤ 0 versus the base**, with the
+residual recorded as a terminal FAIL receipt carrying the base-vs-head comparison. `public-doc-lint`
+is not weakened, renamed, scoped down, or omitted; the plan's contracted PASS is escalated to the
+IMPL-EVAL and the coordinator as an unsatisfiable-gate finding, which is theirs to rule on and not
+mine to waive.
+
+**Lesson.** A plan gate that names a command but never runs it at the base can contract a green that
+does not exist. Three review passes — Tier-A, PLAN-EVAL, PLAN-EVAL cycle 2 — all upheld this receipt
+set, and none executed the command at the base head. Measuring the base is cheap; assuming it is
+green is what cost this leaf a slice.
+
+## D-24 — `agentic:codex-status` cannot be retargeted off the WSL defaults on the NAS
+
+**Observed.** On the NAS the local Linux user is `node` and the home is `/home/agent`, but
+`wslUser()` defaults to `codex`. `agentic:codex-status` runs without `--allow-env`, so `envOr`
+swallows the permission error and silently returns the `codex` fallback — the
+`NETSCRIPT_WSL_USER` / `NETSCRIPT_WSL_HOME` overrides the doc comments describe **cannot be applied
+to this task at all**. The command fails with
+`Cannot run WSL command locally as requested user "codex"`.
+
+**Workaround, verified.** Pass the explicit `--user node` flag; the env route is unavailable, not
+merely unset. `agentic:launch-codex-slice` does carry `--allow-env`, so it accepts
+`NETSCRIPT_WSL_HOME=/home/agent` plus `--user node`.
+
+**Not repaired here.** This is repo tooling, not features scope; recorded so the next NAS lane does
+not rediscover it and so an internals leaf can pick it up.
