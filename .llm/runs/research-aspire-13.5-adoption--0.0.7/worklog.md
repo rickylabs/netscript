@@ -285,4 +285,7 @@ rewritten to the 14-required / `documentedUnobserved` contract. **#1759** DoD li
 **#1712** pillar 5 + MCP summary line rewritten. S9 thread `01a0523a…` resumed with
 `slices/s9/pre-phase-b-brief.md` (schema/tests/skill wording + F-3b + F-4b + M2, one bounded commit;
 scoped recheck only). S8 Phase-B obligations (exact `db init --name init`, resource + probe detail
-for #863 gate 1; hand S6/root-README/canary receipts forward) recorded in D-49. |
+for #863 gate 1; hand S6/root-README/canary receipts forward) recorded in D-49. | | D-44/D-45
+completion | #1712 Definition-of-done release condition now names the ratified D-45 baseline; #863
+carries a D-44 split comment (stays open for S6 probe + root-README clean-machine canary evidence).
+All coordinator-ordered rewrites applied; S9 correction commit in flight on thread `01a0523a…`. |
