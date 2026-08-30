@@ -74,6 +74,8 @@ export interface AspireMcpSmokeReceipt {
   readonly toolsObserved: readonly string[];
   readonly toolsMissing: readonly string[];
   readonly toolsExtra: readonly string[];
+  readonly documentedUnobserved: readonly string[];
+  readonly documentedUnobservedObserved: readonly string[];
   readonly baselineDiff: { readonly added: readonly string[]; readonly removed: readonly string[] };
   readonly doctor: {
     readonly cliVersion: string;
@@ -93,7 +95,7 @@ export interface AspireMcpSmokeReceipt {
     readonly ok: boolean;
   };
   readonly redaction: { readonly secretParamsNull: boolean; readonly plaintextLeak: boolean };
-  readonly structuredLogs: { readonly entryCount: number; readonly isError: boolean };
+  readonly structuredLogs: { readonly entryCount: number | null; readonly isError: boolean };
   readonly lifecycle: {
     readonly initializeMs: number;
     readonly toolsListMs: number;

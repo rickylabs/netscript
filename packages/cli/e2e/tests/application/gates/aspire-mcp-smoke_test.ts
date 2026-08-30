@@ -2,6 +2,7 @@ import { assert, assertEquals, assertRejects } from '@std/assert';
 import {
   ASPIRE_MCP_BASELINE_TOOLS,
   ASPIRE_MCP_DASHBOARD_TOOLS,
+  ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
   ASPIRE_MCP_EXPECTED_TOOLS,
   ASPIRE_MCP_SMOKE_OUTER_TIMEOUT_MS,
   ASPIRE_MCP_SMOKE_TIMEOUTS,
@@ -99,7 +100,7 @@ function input(secret = 'fixture-secret-never-persist'): Parameters<typeof runAs
 
 function passingPrimary(secret = 'fixture-secret-never-persist'): AspireMcpTransport {
   return transport(
-    [...fixture.tools, 'get_integration_docs'],
+    fixture.tools,
     {
       list_apphosts: fixture.apphosts,
       doctor: fixture.doctor,
@@ -112,14 +113,15 @@ function passingPrimary(secret = 'fixture-secret-never-persist'): AspireMcpTrans
   );
 }
 
-Deno.test('Aspire MCP expected set is the recorded 13.4.6 baseline plus get_integration_docs', () => {
+Deno.test('Aspire MCP expected set is the ratified 14-tool 13.5.3 baseline', () => {
   assertEquals(ASPIRE_MCP_BASELINE_TOOLS.length, 14);
-  assertEquals(ASPIRE_MCP_EXPECTED_TOOLS.length, 15);
+  assertEquals(ASPIRE_MCP_EXPECTED_TOOLS.length, 14);
   assert(ASPIRE_MCP_EXPECTED_TOOLS.includes('refresh_tools'));
-  assert(ASPIRE_MCP_EXPECTED_TOOLS.includes('get_integration_docs'));
+  assertEquals(ASPIRE_MCP_EXPECTED_TOOLS.includes('get_integration_docs'), false);
+  assertEquals(ASPIRE_MCP_DOCUMENTED_UNOBSERVED, ['get_integration_docs']);
   assertEquals(
     diffAspireMcpTools(ASPIRE_MCP_EXPECTED_TOOLS, ASPIRE_MCP_BASELINE_TOOLS),
-    { added: ['get_integration_docs'], removed: [] },
+    { added: [], removed: [] },
   );
 });
 
@@ -132,7 +134,9 @@ Deno.test('Aspire MCP smoke records the exact baseline delta and both-tier visib
     ),
   );
   assertEquals(receipt.toolsMissing, []);
-  assertEquals(receipt.baselineDiff, { added: ['get_integration_docs'], removed: [] });
+  assertEquals(receipt.baselineDiff, { added: [], removed: [] });
+  assertEquals(receipt.documentedUnobserved, ['get_integration_docs']);
+  assertEquals(receipt.documentedUnobservedObserved, []);
   assertEquals(receipt.dashboardOnlyTools, ASPIRE_MCP_DASHBOARD_TOOLS);
   assertEquals(receipt.visibility.expectedVisible, ['postgres', 'fixture-web', 'users']);
   assertEquals(receipt.visibility.expectedMcpExcluded, ['postgres-cli']);
@@ -151,30 +155,60 @@ Deno.test('Aspire MCP outer timeout leaves room to persist an inner-deadline rec
   );
 });
 
-Deno.test('14-tool assertion failure persists the complete observed surface and doctor', async () => {
+Deno.test('durable wrapper budget exceeds the inner whole-gate deadline', async () => {
+  const wrapper = await Deno.readTextFile(
+    new URL('../../../../../../.llm/tools/gates/run-aspire-mcp-smoke.ts', import.meta.url),
+  );
+  assert(wrapper.includes("'--timeout-ms',\n    '140000'"));
+  assert(140_000 > ASPIRE_MCP_SMOKE_TIMEOUTS.wholeGateMs);
+});
+
+Deno.test('missing required baseline tool fails and preserves the observation', async () => {
   const persisted: PersistedEvidence[] = [];
   await assertRejects(
     () =>
       runAspireMcpSmoke(
         input(),
         dependencies(
-          transport(fixture.tools, { list_apphosts: fixture.apphosts, doctor: fixture.doctor }),
+          transport(fixture.tools.filter((name) => name !== 'refresh_tools'), {
+            list_apphosts: fixture.apphosts,
+            doctor: fixture.doctor,
+          }),
           transport([], {}),
           persisted,
         ),
       ),
     Error,
-    'get_integration_docs',
+    'refresh_tools',
   );
   assertEquals(persisted.length, 1);
   const receipt = persisted[0].receipt;
-  assertEquals(receipt.toolsObserved, fixture.tools);
-  assertEquals(receipt.toolsObserved.length, 14);
-  assertEquals(receipt.toolsMissing, ['get_integration_docs']);
+  assertEquals(receipt.toolsObserved.length, 13);
+  assertEquals(receipt.toolsMissing, ['refresh_tools']);
   assertEquals(receipt.toolsExtra, []);
-  assertEquals(receipt.baselineDiff, { added: [], removed: [] });
+  assertEquals(receipt.baselineDiff, { added: [], removed: ['refresh_tools'] });
   assertEquals(receipt.serverInfo, fixture.initialize.serverInfo);
   assertEquals(receipt.doctor.summary, { passed: 6, warnings: 4, failed: 0 });
+});
+
+Deno.test('documented-unobserved tool appearance is informational', async () => {
+  const receipt = await runAspireMcpSmoke(
+    input(),
+    dependencies(
+      transport([...fixture.tools, 'get_integration_docs'], {
+        list_apphosts: fixture.apphosts,
+        doctor: fixture.doctor,
+        list_resources: fixture.resources,
+        'list_console_logs:postgres-cli': fixture.excludedConsole,
+        'list_console_logs:users': fixture.usersConsole,
+        list_structured_logs: fixture.structuredLogs,
+      }),
+      transport(fixture.dashboardTools, {}),
+    ),
+  );
+  assertEquals(receipt.toolsMissing, []);
+  assertEquals(receipt.toolsExtra, ['get_integration_docs']);
+  assertEquals(receipt.documentedUnobservedObserved, ['get_integration_docs']);
 });
 
 Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secrets', async () => {
@@ -205,7 +239,7 @@ Deno.test('Aspire MCP timeout rejects after persisting a partial receipt', async
   assert(encoded.includes('SIGKILL'));
 });
 
-Deno.test('recorded 13.5.3 static fixture remains a truthful 14-tool red case', () => {
+Deno.test('recorded 13.5.3 static fixture is the ratified 14-tool baseline', () => {
   assertEquals(
     diffAspireMcpTools(fixture.tools, ASPIRE_MCP_BASELINE_TOOLS),
     { added: [], removed: [] },

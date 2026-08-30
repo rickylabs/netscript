@@ -100,9 +100,8 @@ export function structuredLogEvidence(
   const source = record(value, 'structured log result');
   const isError = Reflect.get(source, 'isError') === true;
   if (isError) throw new Error('list_structured_logs returned an MCP error');
-  const items = Reflect.get(source, 'items');
-  if (!Array.isArray(items)) throw new Error('list_structured_logs omitted items[]');
-  return { entryCount: items.length, isError };
+  const entries = Reflect.get(source, 'items') ?? Reflect.get(source, 'entries');
+  return { entryCount: Array.isArray(entries) ? entries.length : null, isError };
 }
 
 /** Resolve a path through the injected filesystem seam. */

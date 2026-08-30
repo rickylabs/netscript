@@ -4,7 +4,7 @@ import type {
   AspireMcpSmokeInput,
   AspireMcpSmokeReceipt,
 } from './contract.ts';
-import { ASPIRE_MCP_EXPECTED_TOOLS } from './tools.ts';
+import { ASPIRE_MCP_DOCUMENTED_UNOBSERVED, ASPIRE_MCP_EXPECTED_TOOLS } from './tools.ts';
 
 export interface AspireMcpPartialObservation {
   readonly serverInfo: AspireMcpSmokeReceipt['serverInfo'];
@@ -52,6 +52,10 @@ export function partialReceipt(
     toolsObserved: observation.toolsObserved,
     toolsMissing: observation.toolsMissing,
     toolsExtra: observation.toolsExtra,
+    documentedUnobserved: ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
+    documentedUnobservedObserved: observation.toolsObserved.filter((name) =>
+      ASPIRE_MCP_DOCUMENTED_UNOBSERVED.includes(name)
+    ),
     baselineDiff: observation.baselineDiff,
     doctor: observation.doctor,
     visibility: {

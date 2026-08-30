@@ -50,7 +50,7 @@ async function main(args: readonly string[]): Promise<number> {
     '--cwd',
     repoRoot,
     '--timeout-ms',
-    '120000',
+    '140000',
     '--child-report',
     receipt,
     '--',

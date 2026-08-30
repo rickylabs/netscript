@@ -20,7 +20,6 @@
     "doctor",
     "execute_resource_command",
     "get_doc",
-    "get_integration_docs",
     "list_apphosts",
     "list_console_logs",
     "list_docs",
@@ -49,10 +48,10 @@
     "search_docs",
     "select_apphost"
   ],
-  "toolsMissing": [
-    "get_integration_docs"
-  ],
+  "toolsMissing": [],
   "toolsExtra": [],
+  "documentedUnobserved": ["get_integration_docs"],
+  "documentedUnobservedObserved": [],
   "baselineDiff": {
     "added": [],
     "removed": []

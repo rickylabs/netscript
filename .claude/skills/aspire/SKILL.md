@@ -223,9 +223,9 @@ use the CLI. The 13.5.3 static receipt observed these 14 tools (S9-STATIC):
 | `doctor`, `list_integrations`, `refresh_tools` | —                                          | environment checks, integrations, surface refresh            |
 | `search_docs`, `get_doc`, `list_docs`          | `query` / `slug`                           | aspire.dev documentation                                     |
 
-The locked 13.5 contract also expects `get_integration_docs`, but both the S2 live capture and S9
-static capture omitted it. Treat it as unavailable until a Phase-B receipt observes it; the smoke
-gate deliberately fails rather than claiming a documented tool exists. (S2-V8, S9-STATIC)
+The required 13.5.3 baseline is the 14 tools above. `get_integration_docs` is documented but was
+unobserved in both the S2 live capture and S9 static capture; its absence and later appearance are
+informational, not a smoke-gate failure. (S2-V8, S9-STATIC)
 
 There is no MCP tool for spans — use `aspire otel spans` for span-level detail. **Use the CLI over
 MCP when you need environment variable values:** `list_resources` returns env var _names with null
@@ -314,7 +314,7 @@ default. Run `playwright-cli --help` for available commands.
 - S2-V2:
   `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-runtime-lifecycle.md`
 - S2-V9:
-  `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v9-aspire-restore.raw.txt`
+  `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v9-aspire-restore.time.txt`
 - S2-V6:
   `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v6-aspire-ps-final.json`
 - S2-V7:

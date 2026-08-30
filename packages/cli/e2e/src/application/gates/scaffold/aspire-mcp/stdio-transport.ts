@@ -74,7 +74,7 @@ class StdioAspireMcpTransport implements AspireMcpTransport {
         notFound: /not found|could not find|unknown resource/i.test(text),
       };
     }
-    if (name === 'list_structured_logs') return { items: [], isError };
+    if (name === 'list_structured_logs') return structuredLogsResult(text, isError);
     return { text, isError };
   }
 
@@ -129,6 +129,28 @@ class StdioAspireMcpTransport implements AspireMcpTransport {
       this.#buffer += result.value;
     }
   }
+}
+
+function structuredLogsResult(
+  text: string,
+  isError: boolean,
+): { items?: unknown; entries?: unknown; isError: boolean } {
+  if (isError) return { isError };
+  for (const opening of ['[', '{'] as const) {
+    try {
+      const parsed = parseJsonValue(text, opening);
+      if (Array.isArray(parsed)) return { items: parsed, isError };
+      const source = object(parsed, 'structured log result');
+      return {
+        items: Reflect.get(source, 'items'),
+        entries: Reflect.get(source, 'entries'),
+        isError,
+      };
+    } catch {
+      // The static 13.5.3 receipts do not establish a structured-log response shape.
+    }
+  }
+  return { isError };
 }
 
 function object(value: unknown, label: string): Record<string, unknown> {

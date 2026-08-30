@@ -20,6 +20,7 @@ import { partialReceipt, redactTranscript } from './receipt.ts';
 import {
   ASPIRE_MCP_BASELINE_TOOLS,
   ASPIRE_MCP_DASHBOARD_TOOLS,
+  ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
   ASPIRE_MCP_EXPECTED_TOOLS,
   diffAspireMcpTools,
 } from './tools.ts';
@@ -45,7 +46,10 @@ export async function runAspireMcpSmoke(
     currentVersion: '',
     summary: { passed: 0, warnings: 0, failed: 0 },
   };
-  let structuredLogs: AspireMcpSmokeReceipt['structuredLogs'] = { entryCount: 0, isError: false };
+  let structuredLogs: AspireMcpSmokeReceipt['structuredLogs'] = {
+    entryCount: null,
+    isError: false,
+  };
   const wholeDeadline = performance.now() + dependencies.timeouts.wholeGateMs;
   const stageTimeout = (timeoutMs: number): number =>
     Math.max(1, Math.min(timeoutMs, Math.round(wholeDeadline - performance.now())));
@@ -188,6 +192,10 @@ export async function runAspireMcpSmoke(
       toolsObserved,
       toolsMissing,
       toolsExtra,
+      documentedUnobserved: ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
+      documentedUnobservedObserved: toolsObserved.filter((name) =>
+        ASPIRE_MCP_DOCUMENTED_UNOBSERVED.includes(name)
+      ),
       baselineDiff,
       doctor,
       visibility: {
