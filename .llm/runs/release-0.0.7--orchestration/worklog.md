@@ -2530,3 +2530,18 @@
 - All five Claude supervisors were directly checked and steered after main advanced. Host runtime
   remained exactly empty: `aspire ps --format Json` returned `[]`, and Docker reported no
   containers or volumes.
+
+## 2026-08-30T15:48:00Z — #1763 shipped and the feature queue reopened
+
+- The first #1763 exact-head core run orphaned for more than two hours inside `Repo-wide test`.
+  GitHub confirmed no step progress after all setup/check prerequisites passed, so the coordinator
+  cancelled that stale attempt and reran only `check-test` at unchanged head `c80933f7`.
+- Attempt 2 behaved normally and passed in 7m53s. The final audit then proved: live exact carrier,
+  product/evaluator head roles, eight-path changed-file ceiling, zero intersection with the #1772
+  main advance, 5/5 mirrored issue acceptance, `Closes #1730`, terminal applicable CI, and zero
+  unanswered current review threads.
+- PR #1763 merged at `2026-08-30T15:47:10Z` as main
+  `24f6642f040617de573c7cef1140eed1ac0efd6d`; #1730 auto-closed one second later, and both
+  records now carry the sole lifecycle label `status:shipped`. Features #1387 was immediately
+  released under the already-accepted option-1 adapter boundary; all supervisors received new-main
+  currency without interrupting their active workers.

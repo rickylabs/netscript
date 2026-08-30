@@ -1512,3 +1512,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
   scoping the next authoritative-reference coverage leaf rather than idling after #1772.
 - Runtime is exact zero (`aspire ps` empty; no Docker containers or volumes). Serial queues remain
   per orchestrator, with only host runtime leases serialized globally.
+
+## Resume checkpoint — 2026-08-30T15:48:00Z
+
+- Exact main is `24f6642f040617de573c7cef1140eed1ac0efd6d` after PR #1763 merged from
+  evidence carrier `c80933f7` over evaluated product `1c836918`. The second exact-head CI attempt
+  passed after the first was cancelled as a proven two-hour orphan; #1730 is closed and both
+  PR/issue are `status:shipped`.
+- Features #1387 is now released under owner option 1 and must resume immediately at the precise
+  plugin-CLI/RFC-0003 adapter boundary. Docs #1778 and fixes #1357 have live implementation workers;
+  Aspire S13 has committed through `7e9891fa`; internals #1774 remains active.
+- #1734 remains the sole currently surfaced owner decision: authorize the total private reviver
+  plus one final focused cycle 4, or choose the riskier waiver/rescope path. It does not block any
+  independent queue. Runtime remains exact zero.
