@@ -364,4 +364,6 @@ policy** (0 pass / 0 fail) — CI evidence for each leaf arrives only after the 
 converged (D-59) | S3 `85bd4967`, S7 `2f721bf3` on main `3e5cbabf`; identity by range-diff; gates
 green (427/0); pushed with lease; PR notes posted. | | S13 staged, not dispatched | Brief + worktree
 ready on S10′; dispatch sequenced after S11 audit/polish (coordinator). #1642 already on milestone
-0.0.7 (applied per the ruling). Runtime zero. |
+0.0.7 (applied per the ruling). Runtime zero. | | S11 docs_audit cycle 1 | **`AUDIT: FAIL_FIX`** (7
+high / 5 medium, D-61) — claim-correctness findings; structure green. Fix cycle 1 routed to the same
+Gemini conversation. |
