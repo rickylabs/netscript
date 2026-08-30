@@ -12,11 +12,11 @@
 
 ## Current State
 
-Slices 1–4 are committed/pushed on draft PR #1743. Phase-A implementation and validation are
-complete locally: the E2E registry debt split, listener `healthReports` wait assertions, registered
-Phase-B recovery fixture, coordination drafts, and full non-runtime gate matrix are green.
-`PLAN-EVAL: N/A` is justified by the ratified locked issue; the Fable supervisor retains Phase-B
-runtime execution, slice review, and IMPL-EVAL.
+Slices 1–5 are committed/pushed on draft PR #1743. IMPL-EVAL cycle 1 at `78d0ded28` returned
+`FAIL_FIX` because the generated AppHost did not type-check against the real restored Aspire 13.5.3
+modules. Slice 6 now repairs the endpoint value projection and string-valued health data, and adds
+the real restored-module consumer type-check as a mandatory generator gate. The Fable supervisor
+retains Phase-B runtime execution, slice review, and the next IMPL-EVAL.
 
 ## Completed
 
@@ -43,14 +43,21 @@ runtime execution, slice review, and IMPL-EVAL.
 - Drafted the S6b 0.0.8 issue and the #1366/#863 comments for supervisor posting.
 - Passed the final matrix: configured lint, 29-file scoped check, raw config-excluded lint/fmt,
   99 focused tests, deterministic assets, quality/architecture fitness, and `scaffold.plugins`.
+- Committed/pushed slice 5 as `78d0ded2849eb28eddb60c409bfd68284d7e419b`.
+- Read the full cycle-1 evaluator record and restored SDK 13.5.3 declaration surface.
+- Replaced expression-handle endpoint projection with live `.host()` / `.port()` value calls and
+  made `HealthCheckResult.data` string-valued; focused RED→green is 42/53 then 53/53.
+- Passed a local-head generated Postgres AppHost type-check against S2's restored 13.5.3 modules.
 
 ## In Progress
 
-- Slice 5 artifact commit/push and draft PR trail update.
+- Slice 6 is statically green and is being committed/pushed as the durable NAS migration
+  checkpoint. Phase-B runtime receipts and separate-session IMPL-EVAL remain pending; the draft PR
+  must stay draft.
 
 ## Next Steps
 
-1. Commit/push slice 5 and update the stacked draft PR.
+1. On the NAS, recreate this worktree from the pushed branch and verify the exact checkpoint head.
 2. Supervisor supplies the Phase-B lease and executes the registered live fixture/runtime receipts.
 3. Separate Fable session performs slice review and IMPL-EVAL; implementation lane never marks ready.
 
@@ -58,7 +65,7 @@ runtime execution, slice review, and IMPL-EVAL.
 
 | Decision | Source | Notes |
 | -------- | ------ | ----- |
-| Endpoint values resolve per callback | #1718 / EndpointProperty API | Preserves isolated-start allocation. |
+| Endpoint values resolve per callback | #1718 intent / restored 13.5.3 `host()` + `port()` API | `property()` returns an expression handle; drift recorded. |
 | Credentials never enter probes | #1718 | Only kind/host/port cross the helper boundary. |
 | Deno KV unchanged | owner boundary | Missing current HTTP check is recorded drift, not expanded scope. |
 | E2E debt split precedes fixture | debt stop condition | No direct-child or monolith deepening. |
@@ -84,7 +91,11 @@ runtime execution, slice review, and IMPL-EVAL.
 | Static | Phase A green | configured lint; 29-file check; raw fallback; 99/99 tests; assets current |
 | Fitness | Phase A green | final `quality:scan` findings `[]`; `arch:check` `FAIL=0` |
 | Runtime | NOT_RUN | no Phase-A lease |
-| Consumer | green | `scaffold.plugins` 17/17; AppHost/runtime deliberately not run |
+| Consumer | green | `scaffold.plugins` 17/17; generated AppHost compiles against restored 13.5.3 modules; runtime deliberately not run |
+
+Migration freeze recheck: focused structured test 53/53, structured check 5/5 with zero diagnostics,
+four-file lint/fmt PASS, generated asset reproduced, and `quality:gate` PASS. No Aspire AppHost or
+Docker resource was started.
 
 ## Open Questions
 
@@ -93,6 +104,7 @@ runtime execution, slice review, and IMPL-EVAL.
 ## Drift and Debt
 
 - Drift: current Deno KV arm lacks the assumed existing HTTP health check.
+- Drift: #1718 line 44 / D3 used expression projection where 13.5.3 requires endpoint value APIs.
 - Debt response: S6 satisfied the next-gate split condition; residual direct-child debt remains
   visible at 45 immediate scaffold children (43 files plus two role directories).
 

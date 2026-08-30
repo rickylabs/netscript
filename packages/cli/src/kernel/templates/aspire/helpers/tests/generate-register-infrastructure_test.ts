@@ -59,15 +59,19 @@ describe('generateRegisterInfrastructure', () => {
       const server = `${fixture.name}_server`;
       const block = emittedHealthCheckBlock(output, key, server);
 
-      assertStringIncludes(output, 'EndpointProperty');
+      assert(!output.includes('EndpointProperty'));
       assertStringIncludes(output, 'createListenerReadinessCheck');
       assertStringIncludes(
         block,
-        `const host = await ${server}.getEndpoint('tcp').property(EndpointProperty.Host);`,
+        `const endpoint = await ${server}.getEndpoint('tcp');`,
       );
       assertStringIncludes(
         block,
-        `const port = await ${server}.getEndpoint('tcp').property(EndpointProperty.Port);`,
+        'const host = await endpoint.host();',
+      );
+      assertStringIncludes(
+        block,
+        'const port = await endpoint.port();',
       );
       assertStringIncludes(
         block,
@@ -114,11 +118,15 @@ describe('generateRegisterInfrastructure', () => {
       );
       assertStringIncludes(
         block,
-        `const host = await ${identifier}.getEndpoint('tcp').property(EndpointProperty.Host);`,
+        `const endpoint = await ${identifier}.getEndpoint('tcp');`,
       );
       assertStringIncludes(
         block,
-        `const port = await ${identifier}.getEndpoint('tcp').property(EndpointProperty.Port);`,
+        'const host = await endpoint.host();',
+      );
+      assertStringIncludes(
+        block,
+        'const port = await endpoint.port();',
       );
       assertStringIncludes(block, 'return createRespPingCheck({ host, port })();');
       assert(!block.toLowerCase().includes('password'));

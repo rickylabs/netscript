@@ -150,7 +150,7 @@ describe('generateRegisterInfrastructure', () => {
     });
     assertStringIncludes(
       output,
-      "import { ContainerLifetime, EndpointProperty } from '../.aspire/modules/aspire.mts'",
+      "import { ContainerLifetime } from '../.aspire/modules/aspire.mts'",
     );
     assertStringIncludes(output, 'createListenerReadinessCheck');
     assertStringIncludes(

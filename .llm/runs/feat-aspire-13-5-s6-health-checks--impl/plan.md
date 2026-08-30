@@ -67,7 +67,7 @@ CI-run failure/recovery acceptance code.
 | -- | -------- | --------- |
 | D1 | TCP checks use exactly one `node:net` socket, `setTimeout(2000)`, no retries, and destroy on every terminal event. | #1718 locked cancellation contract. |
 | D2 | RESP writes inline `PING\r\n`; only `+PONG` is Healthy and `-NOAUTH` is Degraded. | Listener readiness without credential material. |
-| D3 | Generator callbacks resolve `EndpointProperty.Host` and `.Port` on every invocation. | S5 isolated-start dynamic ports. |
+| D3 | Generator callbacks obtain the endpoint and resolve `.host()` / `.port()` on every invocation. | Amended after cycle-1 drift: 13.5.3 `property(...)` returns expression handles; live-value intent is unchanged. |
 | D4 | Check keys are `<resource>_listener` for DB servers and `<resource>_resp` for Redis-compatible resources. | Stable describe/receipt contract. |
 | D5 | Runtime I/O lives only in emitted helper/E2E probes; the generator remains pure. | A7/A11 boundary. |
 | D6 | Deno KV remains unchanged despite carried-in drift. | Owner's explicit Phase-A boundary. |
@@ -128,11 +128,11 @@ CI-run failure/recovery acceptance code.
 ## Dependencies
 
 - Stacked base S5 `0bd8ba832`; draft PR base remains `fix/aspire-13-5-s5-literal-ports`.
-- Aspire 13.5 `addHealthCheck`/`withHealthCheck` and endpoint-property projection.
+- Aspire 13.5 `addHealthCheck`/`withHealthCheck` and endpoint `host()` / `port()` value APIs.
 - Phase-B live execution requires the supervisor's runtime lease.
 
 ## Drift Watch
 
-- SDK projection field casing or `EndpointProperty.Port` runtime type.
+- SDK endpoint `host()` / `port()` runtime behavior against later 13.5 patch modules.
 - A resource whose `withHealthCheck` attachment is not represented in `healthReports`.
 - E2E split that increases the scaffold folder's direct-child count.

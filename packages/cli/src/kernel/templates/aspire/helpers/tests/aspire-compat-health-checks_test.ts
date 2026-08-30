@@ -26,16 +26,38 @@ await Deno.mkdir(helpersDir, { recursive: true });
 await Deno.mkdir(modulesDir, { recursive: true });
 await Deno.writeTextFile(
   `${modulesDir}/aspire.mts`,
-  `export const HealthStatus = {
-  Healthy: 'Healthy',
-  Degraded: 'Degraded',
-  Unhealthy: 'Unhealthy',
-};
-export type HealthCheckResult = {
-  readonly status?: string;
-  readonly description?: string;
-  readonly data?: Readonly<Record<string, unknown>>;
-};
+  `// Verbatim 13.5.3 declarations from the restored aspire.mts module:
+// HealthStatus l.619-624; HealthCheckResult l.1013-1021;
+// EndpointReference l.4696-4701; EndpointReferencePromise l.4763-4768.
+export enum HealthStatus {
+  Unhealthy = "Unhealthy",
+  Degraded = "Degraded",
+  Healthy = "Healthy",
+}
+
+/** ATS-friendly custom health check result. */
+export interface HealthCheckResult {
+  /** Gets the health status returned by the health check. */
+  status?: HealthStatus;
+  /** Gets an optional description for the health check result. */
+  description?: string | null;
+  /** Gets optional string data for the health check result. */
+  data?: Record<string, string>;
+}
+
+export interface EndpointReference {
+  /** Gets the port for this endpoint. */
+  port(): Promise<number>;
+  /** Gets the host for this endpoint. */
+  host(): Promise<string>;
+}
+
+export interface EndpointReferencePromise extends PromiseLike<EndpointReference> {
+  /** Gets the port for this endpoint. */
+  port(): Promise<number>;
+  /** Gets the host for this endpoint. */
+  host(): Promise<string>;
+}
 `,
 );
 const compatPath = `${helpersDir}/_aspire-compat.mts`;
@@ -80,8 +102,8 @@ describe('generated Aspire listener readiness helpers', () => {
     assertEquals(result.description, 'postgres listener unreachable: ECONNREFUSED');
     assertEquals(result.data.code, 'ECONNREFUSED');
     assertEquals(result.data.host, '127.0.0.1');
-    assertEquals(result.data.port, port);
-    assertMatch(String(result.data.elapsedMs), /^\d+$/);
+    assertEquals(result.data.port, String(port));
+    assertMatch(result.data.elapsedMs, /^\d+$/);
   });
 
   it('bounds a black-hole TCP address at 2000 ms with ETIMEDOUT', async () => {
@@ -97,8 +119,8 @@ describe('generated Aspire listener readiness helpers', () => {
     assertEquals(result.description, 'postgres listener unreachable: ETIMEDOUT');
     assertEquals(result.data.code, 'ETIMEDOUT');
     assertEquals(result.data.host, '192.0.2.1');
-    assertEquals(result.data.port, 65_000);
-    assertMatch(String(result.data.elapsedMs), /^\d+$/);
+    assertEquals(result.data.port, '65000');
+    assertMatch(result.data.elapsedMs, /^\d+$/);
     assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true);
   });
 
@@ -129,8 +151,8 @@ describe('generated Aspire listener readiness helpers', () => {
         } else {
           assertEquals(result.data.code, fixture.code);
           assertEquals(result.data.host, '127.0.0.1');
-          assertEquals(result.data.port, port);
-          assertMatch(String(result.data.elapsedMs), /^\d+$/);
+          assertEquals(result.data.port, String(port));
+          assertMatch(result.data.elapsedMs, /^\d+$/);
         }
       } finally {
         await closeServer(server);

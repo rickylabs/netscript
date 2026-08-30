@@ -78,8 +78,7 @@ export function generateRegisterInfrastructure(
   );
   const sdkValueImports = [
     ...(hasPersistentContainerDatabase ? ['ContainerLifetime'] : []),
-    ...(usesDatabaseListenerReadiness ||
-        cacheEntries.some(([, entry]) => !['External', 'Local'].includes(entry.Mode ?? 'Container'))
+    ...(cacheEntries.some(([, entry]) => !['External', 'Local'].includes(entry.Mode ?? 'Container'))
       ? ['EndpointProperty']
       : []),
   ];
@@ -200,11 +199,10 @@ export function generateRegisterInfrastructure(
       const healthCheckKey = `${name}_listener`;
       lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`);
       lines.push(
-        `    const host = await ${id}_server.getEndpoint('tcp').property(EndpointProperty.Host);`,
+        `    const endpoint = await ${id}_server.getEndpoint('tcp');`,
       );
-      lines.push(
-        `    const port = await ${id}_server.getEndpoint('tcp').property(EndpointProperty.Port);`,
-      );
+      lines.push(`    const host = await endpoint.host();`);
+      lines.push(`    const port = await endpoint.port();`);
       lines.push(
         `    return createListenerReadinessCheck({ kind: '${entry.Engine.toLowerCase()}', host, port })();`,
       );
@@ -514,12 +512,9 @@ function redisGarnetContainerSetup(
 function appendRespReadinessLines(lines: string[], id: string, name: string): void {
   const healthCheckKey = `${name}_resp`;
   lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`);
-  lines.push(
-    `    const host = await ${id}.getEndpoint('tcp').property(EndpointProperty.Host);`,
-  );
-  lines.push(
-    `    const port = await ${id}.getEndpoint('tcp').property(EndpointProperty.Port);`,
-  );
+  lines.push(`    const endpoint = await ${id}.getEndpoint('tcp');`);
+  lines.push(`    const host = await endpoint.host();`);
+  lines.push(`    const port = await endpoint.port();`);
   lines.push(`    return createRespPingCheck({ host, port })();`);
   lines.push(`  });`);
   lines.push(`  await ${id}.withHealthCheck('${healthCheckKey}');`);

@@ -39,3 +39,39 @@ documentation.
   directories; the new `runtime/` group has 11 direct files, within the 12-child cap.
 - The explicit next-gate monolith/deepening stop condition is satisfied. Residual carried-in
   scaffold fan-out remains visible to the debt owner and is not represented as fully retired.
+
+## 2026-08-30 — Aspire 13.5.3 endpoint projection returns expression handles
+
+- **What:** The locked #1718 line 44 / plan D3 projection form used
+  `await endpoint.property(EndpointProperty.Host | EndpointProperty.Port)` as if it returned live
+  string/number values.
+- **Source:** IMPL-EVAL cycle 1 at `78d0ded28`; restored SDK 13.5.3
+  `.aspire/modules/aspire.mts` has `property()` returning an
+  `EndpointReferenceExpressionPromise`, while `EndpointReference.host()`/`.port()` are declared at
+  lines 4700–4701 / 4696–4697 and the promise equivalents at 4767–4768 / 4763–4764.
+- **Expected:** Resolve the endpoint host and port at health-check invocation time so isolated-start
+  dynamic allocation remains live.
+- **Actual:** The property projection produces expression handles and caused four TS2322 errors in
+  a generated AppHost compiled against the real restored 13.5.3 modules.
+- **Severity:** significant.
+- **Action:** retain the locked readiness intent but amend D3's mechanism to obtain the endpoint in
+  each callback and await `endpoint.host()` / `endpoint.port()`. Add a real restored-module consumer
+  type-check as a mandatory gate for this and every later generator slice.
+- **Evidence:** `receipts/06-consumer-typecheck-13.5.3.txt` passes with TypeScript 5.9.3 against the
+  S2-restored SDK 13.5.3 surface.
+
+## 2026-08-30 — NAS migration freezes the lane after the cycle-1 repair
+
+- **What:** The current host is being replaced before Phase-B runtime execution and IMPL-EVAL.
+- **Source:** Owner-authorized infrastructure migration.
+- **Expected:** The live supervisor would normally proceed directly from slice 6 into the runtime
+  lease and evaluator handoff.
+- **Actual:** Runtime transport sessions were lost during the host restart, while the complete
+  cycle-1 repair remained in this worktree.
+- **Severity:** operational.
+- **Action:** commit and explicitly push the statically green slice-6 repair as the durable recovery
+  boundary. Keep PR #1743 draft; recreate the worktree on the NAS and resume with Phase-B runtime,
+  supervisor slice review, and a separate-session IMPL-EVAL.
+- **Evidence:** focused structured tests 53/53; five-file structured check 0 diagnostics; lint/fmt
+  PASS; generated asset reproduced; `quality:gate` exit 0; host runtime inventory reported zero
+  Aspire resources and zero Docker containers.

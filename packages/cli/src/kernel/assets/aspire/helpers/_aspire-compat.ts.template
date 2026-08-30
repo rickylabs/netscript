@@ -276,12 +276,12 @@ function listenerData(
   host: string,
   port: number,
   startedAt: number,
-): Readonly<Record<string, unknown>> {
+): Record<string, string> {
   return {
     code,
     host,
-    port,
-    elapsedMs: Math.round(performance.now() - startedAt),
+    port: String(port),
+    elapsedMs: String(Math.round(performance.now() - startedAt)),
   };
 }
 

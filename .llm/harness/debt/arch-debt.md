@@ -2272,6 +2272,12 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
   entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
   so the full split is still owed, and the next gate faces the same condition.
+- **S6 status — PR #1743 / issue #1718 (2026-08-30):** S6 performed the owed role split before
+  registering its listener-readiness gate: `runtime-gates.ts` fell from **812 to 305 lines** and
+  `runtime/` contains **11 direct children**. The scaffold directory still has **43 direct files**
+  (**45 immediate children** including role directories), so the F-16 baseline remains over cap;
+  additionally, the gate's one-pass `scaffold.runtime` proof is deferred to the lease-backed Phase
+  B. This entry therefore stays **open** under its own retirement gate.
 
 ## packages/aspire — `config.ts` grows further past the 500-line cap (`aspire-config-length-1447`)
 

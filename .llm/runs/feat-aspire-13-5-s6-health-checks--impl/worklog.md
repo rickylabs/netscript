@@ -97,6 +97,11 @@ its runtime expectation to the readiness gate without touching credentials.
 | 2026-08-30 04:56 +02:00 | 5 | final static | Configured lint passed 2,047 files; scoped check selected 29 files with zero diagnostics; wrapper exclusion of four `packages/cli` files was covered by raw no-config lint/fmt on 27 concrete owned files; focused suite passed 99/99. |
 | 2026-08-30 04:56 +02:00 | 5 | final fitness/consumer | `gen:assets-barrel`/`check:assets-barrel`, `quality:scan` (findings `[]`), `arch:check` (`FAIL=0`), and `scaffold.plugins` (17/17) passed. `scaffold.runtime`, quickstart, AppHost, and resource commands remained NOT_RUN by Phase-A boundary. |
 | 2026-08-30 04:56 +02:00 | 5 | surface review | `packages/aspire` public surface is unchanged; jsr-audit is N/A. No dependency, lock-file, CLI command, host CLI, docs, skills, or S5 commit change. |
+| 2026-08-30 | 5 | commit/push | Committed/pushed slice 5 as `78d0ded2849eb28eddb60c409bfd68284d7e419b`; IMPL-EVAL cycle 1 subsequently returned `FAIL_FIX`. |
+| 2026-08-30 | 6 | evaluator intake | Read the complete cycle-1 record from `origin/research/aspire-13.5-0.0.7` and inspected the exact restored SDK 13.5.3 declarations: `HealthStatus` 619–624, `HealthCheckResult` 1013–1021, endpoint value methods 4696–4701 / 4763–4768. |
+| 2026-08-30 | 6 | RED→green | Updated the real-surface test stub and assertions first; the focused helper/generator suite exposed 11 expected failures (42 pass), then passed 53/53 after switching emitted callbacks to `host()` / `port()` and stringifying result data. |
+| 2026-08-30 | 6 | consumer | Rendered a Postgres AppHost through the local CLI, copied S2's restored 13.5.3 modules/config, and passed `tsc --noEmit -p tsconfig.apphost.json`; receipt: `receipts/06-consumer-typecheck-13.5.3.txt`. No AppHost/runtime/resource command ran. |
+| 2026-08-30 | 6 | migration checkpoint | Re-ran the focused structured test (53/53), five-file structured check (0 diagnostics), four-file no-config lint/fmt, generated-asset reproduction, and `quality:gate` (`findings=[]`, `FAIL=0`). The slice is being committed and pushed as a durable NAS handoff; Phase-B runtime and separate-session IMPL-EVAL remain pending and this checkpoint does not mark the PR ready. |
 
 ## Decisions
 
@@ -111,6 +116,7 @@ its runtime expectation to the readiness gate without touching credentials.
 | ----- | -------- | ------------------ |
 | Deno KV has no existing `withHttpHealthCheck` emission | significant | yes |
 | E2E registry debt remains active at S5 head | significant | yes |
+| #1718/D3 endpoint property projection yields expression handles in 13.5.3 | significant | yes |
 
 ## Gate Results
 
@@ -135,6 +141,9 @@ its runtime expectation to the readiness gate without touching credentials.
 | final scoped check | structured check wrapper | PASS | 29 selected; 0 failed batches/diagnostics. |
 | final scoped lint/fmt | wrappers + raw config-excluded fallback | PASS | Wrappers processed 25 and refused four root-excluded CLI template files; raw no-config commands checked all 27 concrete owned files cleanly. |
 | final focused test | structured test wrapper, seven roots | PASS | 99 passed, 0 failed across helper, generator, credential, readiness, registry, and moved-probe coverage. |
+| slice-6 focused check | structured check wrapper, five files | PASS | 5 selected; 0 failed batches/diagnostics. |
+| slice-6 focused test | structured test wrapper, three roots | PASS | 53 passed, 0 failed after the 13.5.3 API correction. |
+| slice-6 lint/fmt | `deno lint --no-config`; `deno fmt --check --no-config` | PASS | Four changed source/test TypeScript files checked cleanly. |
 
 ### Fitness Gates
 
@@ -151,6 +160,7 @@ its runtime expectation to the readiness gate without touching credentials.
 | slice-4 `arch:check` | PASS | exit 0, `FAIL=0` | Registry monolith is 305 lines; bounded runtime group has 11 files. |
 | final `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | No quality-policy regression. |
 | final `arch:check` | PASS | exit 0, `FAIL=0` | Carried-in warnings only; no new doctrine failure. |
+| slice-6 `quality:gate` | PASS | exit 0; findings `[]`; allowance count 7; `FAIL=0` | Re-run at migration checkpoint; carried-in warnings only. |
 | jsr-audit | N/A | no `packages/aspire` public-surface change | Generated CLI/AppHost internals only. |
 
 ### Runtime Gates
@@ -164,6 +174,7 @@ its runtime expectation to the readiness gate without touching credentials.
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
 | generated AppHost | NOT_RUN | pending slices | Runtime start prohibited in Phase A. |
+| generated AppHost 13.5.3 type-check | PASS | `receipts/06-consumer-typecheck-13.5.3.txt` | Local-head render compiles against S2 restored modules; no runtime start. |
 | asset barrel | PASS | `gen:assets-barrel`; `check:assets-barrel` exit 0 | Structural infrastructure template byte-identical; embedded helper refreshed. |
 | `scaffold.plugins` | PASS | exit 0; 17 passed, 0 failed | Non-runtime consumer gate completed with cleanup. |
 
