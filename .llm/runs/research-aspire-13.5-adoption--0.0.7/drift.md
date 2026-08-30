@@ -400,3 +400,43 @@
   is *skipped at classification* is **not** runtime evidence. "Runtime verdict = CI on this head"
   must be re-earned per head via an explicit workflow dispatch with the run id recorded. This is the
   same class of error as D-23/D-26 — a gate believed covered that never actually executed.
+
+## D-29 — 2026-08-30 — S6 rebased onto the settled S5 head (validated before force-push)
+
+- **What:** S6 (#1718 / PR #1743, draft) was stacked on S5 at `0bd8ba832`. S5's repair advanced that
+  branch to `aa822069`, so S6 was rebased `--onto aa822069 0bd8ba832`.
+- **Validated in a throwaway worktree BEFORE touching the real branch** — all six commits replayed
+  with **zero conflicts**, then at the rebased head:
+  - `deno task check` → exit 0
+  - `deno task check:aspire-host-ports` → exit 0 (957 files, no pinned host ports)
+  - `deno task check:assets-barrel` → exit 0 (no regeneration needed)
+  - `deno task check:publish-assets` → exit 0
+- **The specific risk that had to be cleared:** S5's F-4 hardened `check-aspire-host-ports.ts` from
+  per-line to **full-text** matching, which can newly catch multiline `withHttpEndpoint({ port: … })`
+  and `ctx.port(a,\n b)` shapes. S6 is a generator slice that emits endpoint code, so the hardened
+  gate was the plausible break. It scans clean — S6 emits no pinned host port. Checking this before
+  the force-push, rather than after CI, is the direct application of the D-23/D-26 lesson.
+- **Applied:** `1fa5aeec` → `564d465c`, force-pushed with
+  `--force-with-lease=…:1fa5aeec13d965ddd20806fa373f090e427cf5f4`. Draft state and base branch
+  unchanged. Rewriting published commits is normally barred for implementation lanes; this is the
+  supervisor deliberately restacking his own topic's draft branch after its base moved, with no
+  active S6 author thread (the pre-migration thread `01a0506f…` did not survive), and it is recorded
+  here for that reason.
+- **Next for S6:** Tier-A slice review at `564d465c`, then Phase-B runtime receipts under a
+  serialized lease, then an independent IMPL-EVAL. Phase A alone does not earn ready state.
+
+## D-30 — 2026-08-30 — `doc:lint` is not a valid gate for prose-only slices (affects S11 and S13 acceptance)
+
+- **Reported by the 0.0.7 docs lane; verified here.** `deno task doc:lint` bare → **exit 1**; the
+  task is `.llm/tools/run-deno-doc-lint.ts`, which **requires `--root`** and wraps
+  `deno doc --lint`, i.e. it lints **TypeScript JSDoc**, not Markdown prose.
+- **Consequence:** #1723 (S11) lists `doc:lint` as a required acceptance gate, but S11 consists
+  mostly of prose-only diffs, for which the gate is **not applicable at all**. Inventing a `--root`
+  to make it run would manufacture a green that proves nothing.
+- **Action:** the docs lane records it as `N/A` with that reason and flags it to the coordinator.
+  **S13 inherits the same acceptance text and needs the same note** — recorded here so the S13 brief
+  carries it rather than rediscovering it. Any Aspire slice whose diff is prose-only should record
+  `doc:lint: N/A (requires --root; lints TS JSDoc, not prose)` rather than skipping it silently.
+- **Same failure family as D-23/D-26 and the evaluator's `skipped ≠ pass` lesson:** a gate that is
+  listed but cannot execute is as misleading as a gate that is omitted. Three lanes have now hit
+  "believed covered, never executed" in three different shapes.
