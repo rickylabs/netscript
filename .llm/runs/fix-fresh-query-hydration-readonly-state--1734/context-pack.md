@@ -36,7 +36,7 @@ shared-host root-test waiver is retired; cycle 3 still needs a fresh exact-head 
 
 ## In Progress
 
-- S8 private `reviveSerializedError` correction is implemented; exact-head static sealing remains.
+- S8 private `reviveSerializedError` correction is implemented; exact-head static sealing is COMPLETE (supervisor Tier-A sign-off, root test exit 0, all scoped gates 0).
 
 ## Next Steps
 
@@ -71,7 +71,7 @@ shared-host root-test waiver is retired; cycle 3 still needs a fresh exact-head 
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | cycle-3 RED | real-transport suite: expected exit 1, 6 passed / 5 failed; final-head gates pending |
+| Static | cycle-3 RED | real-transport suite: expected exit 1, 6 passed / 5 failed; final-head gates SEALED: root test exit 0 (4,258/0/19), scoped check+lint+fmt 0, assets-barrel/quality/arch 0 |
 | Fitness | preliminary full PASS | quality scan allowCount 7; arch check; Fresh publish dry-run |
 | Runtime | N/A | no lease |
 | Consumer | PASS | exact 5.101.0 and 5.102.8 no-lock checks |
