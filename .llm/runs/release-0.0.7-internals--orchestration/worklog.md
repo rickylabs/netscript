@@ -4461,3 +4461,53 @@ locally without pushing, and must **spot-check my sealing claims rather than tru
 sibling defect this lane found live — `wslHome()` still defaults to the now-nonexistent `/home/codex`,
 already breaking `launch-codex-slice` without `NETSCRIPT_WSL_HOME` — and requires the plan to address
 or explicitly exclude it rather than widen silently.
+
+## 2026-08-30 ~17:05 — host process-cleanup audit; no casualties; monitor gap found and closed
+
+A host-side memory cleanup killed ~23 background Claude CLI processes (bg-pty-host spare sockets).
+Audited every asset rather than assuming:
+
+| Asset | Evidence | Verdict |
+| --- | --- | --- |
+| #1533 cycle-2 evaluator `9316340d` | `state=working`, 6 live procs in its worktree | **survived** |
+| #1774 author `01a05331` (Codex) | lock held, pid `2570617` alive, commits landing | **survived** |
+| Supervisor session `5498` | alive | **survived** |
+| `dc36782e` / `0be8e970` / `e6d0ed7b` | `done` before the cleanup | not casualties |
+| `fff83fce` | `stopped` — I stopped it deliberately before sealing | not a casualty |
+
+Nothing needed relaunching. The Codex author was never at risk: the cleanup hit Claude CLI
+bg-pty-host sockets, and Codex senders run under the app-server — a different process family.
+
+**The cleanup did surface a real gap it did not cause: every monitor of mine had already completed,
+so both live lanes were running with no wake signal at all.** Re-armed both, and built the #1533
+watcher to detect a **stall** as well as a verdict — it reports tokens frozen across ~6 checks
+alongside the live process count.
+
+**Two liveness lessons, both nearly mine:**
+
+- My first three token samples of `9316340d` all read `8749` and looked frozen. They executed in the
+  same instant, so they proved nothing — **silence and stall are indistinguishable without a
+  time-separated sample.** A later sample showed `8749 → 26082`: healthy all along.
+- In that same window the evaluator's process count fell **6 → 1**. Reading process count as
+  liveness would have had me kill a working evaluator. Subprocesses come and go; **token movement is
+  the signal, process count is not.**
+
+This is the same family as the `codex-status` sampling artifact and the self-matching `pgrep` earlier
+today: the observation surface mistaken for the thing observed. The reliable signals remain the lock
+file, the commit graph, and token movement over a real interval.
+
+## 2026-08-30 — #1774 plan locked at `a002fbf2` and it settled every required decision
+
+- **D1** — `${CLAUDE_PROJECT_DIR}` in `.claude/settings.json`: host-neutral, follows each worktree, no
+  checked-in absolute path, satisfying the acceptance box forbidding `/home/agent` and `/home/codex`.
+- **D3** — same project-root value for logger output, falling back to `Deno.cwd()` only when the
+  variable is absent, so direct task/script use outside Claude is preserved.
+- **D8** — a **sibling-shaped decoy logger** emitting a unique marker proves the configured command
+  resolved from the active project root rather than cwd, global, or sibling state. That *demonstrates*
+  the discrimination acceptance gate 3 asks for instead of asserting it.
+- **D9** — the `wslHome()` / retired `/home/codex` defect is explicitly **out of scope**, named in
+  research, plan and handoff, because repairing it would change unrelated Codex-launcher behaviour and
+  its historical-default unit test. Exactly the "address or exclude, never widen silently" the brief
+  required.
+
+PLAN-EVAL is queued behind #1533's cycle-2 evaluator in the single per-topic slot.
