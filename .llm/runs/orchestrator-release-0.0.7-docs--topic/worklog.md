@@ -1937,3 +1937,64 @@ had overstated that. Implementation steered with the required baseline reconcili
 **Route drift:** the resumed `01a0522a` thread reports effort **high** where the requested route is
 **medium**. `codex-resume.ts` accepts no `--effort`, so a resume does not carry the original identity
 forward. Recorded rather than passed over — lane policy requires observed identity to be reported.
+
+## 2026-08-30 — #1748 handed off; #1761 pending evaluator; two process corrections
+
+### #1748 — merge coordinates issued at `9b79d90e`
+
+Native exact-head IMPL-EVAL `PASS` (unconditional), Tier-A PASS, CI terminal green, `close-gate`
+success with `status:ready-merge` live, review-threads 0, MERGEABLE/CLEAN, exactly one `status:`.
+
+**OpenHands reconciled honestly.** Run `33311911918` concluded **`cancelled`** and never posted an
+`OPENHANDS_VERDICT`. Cause: the `openhands-phase-eval` concurrency group — re-running `ci` for the
+label transition at 12:47Z superseded the cloud run started at 12:35Z. So it **raised no findings and
+also cleared nothing**; that distinction is stated on the PR, because "the cloud eval didn't object"
+and "the cloud eval never finished" are different facts and only the second is true. Not gating: the
+same lane returned `PASS` at `6b91eb25` on a head where the native evaluator found two blocking
+defects.
+
+### Correction: the acceptance mirror ticks issue boxes — the supervisor should not
+
+On #1749 and #1755 this lane **hand-ticked** the issue acceptance boxes and attached a prose evidence
+table. That was doing the tooling's job manually. The correct mechanism, confirmed by dry-run:
+
+- The PR body carries a fenced ` ```acceptance-evidence ` block with `issue: <n>` and `box-index` →
+  `evidence` entries.
+- `close-gate`'s "Mirror structured acceptance evidence" step runs
+  `mirror-acceptance-evidence.ts`, which parses that block from the PR body **and its comments**,
+  validates the mapping against the issue's checkboxes, and ticks them itself.
+- It **skips** while `status:ready-merge` is absent — `acceptance-mirror DRY-RUN: no changes …
+  Mirror skipped because live PR labels do not include status:ready-merge`.
+
+So the sequence is: evaluator `PASS` → apply exactly `status:ready-merge` → `gh run rerun` the
+existing CI run at the unchanged head → the mirror consumes the evidence and ticks. **Do not tick
+issue boxes by hand, and do not tick before final proof.** Hand-ticking bypasses
+`validateEvidenceMapping`, produces no provenance record, and asserts acceptance from the supervisor's
+judgement rather than from verified evidence.
+
+Verified for #1761 by dry-run before the transition, so the rerun is known to work rather than hoped
+to: the block parses, `issue: 1757` resolves, five `box-index` entries map, and the only thing
+blocking is the label.
+
+### Correction: two-dot diffs, twice
+
+Reviewing #1761 I ran `git diff --stat f8b4f804..15c262e4` and it showed **132 files, 8103
+deletions**, appearing to revert all of #1746. False. A branch behind `main` renders newer `main`
+content as deletions under `..`. The true scope with `...` (merge-base) is **13 files, 1100
+insertions, zero deletions**.
+
+This is the **second** instance of the same class today — earlier a gate run from a 29-commit-stale
+topic worktree nearly produced a false accusation of fabricated evidence against #1748 and #1755.
+Both times the alarming result came from comparing against the wrong baseline, and both times the
+check that saved it was re-deriving from `origin/main` before speaking. Recorded as a standing rule
+for this lane: **when a result looks catastrophic, suspect the baseline before the branch.**
+
+Useful side-finding: #1761 touches **no** agent-docs corpus input, so it has **zero** file overlap
+with #1748 and is not part of the serial corpus queue — it can merge in any order.
+
+### #1761 state
+
+Tier-A PASS (five focused gates exit 0; `## 0.0.7` present; CLI version still `0.0.6`; `deno.lock`
+untouched; no release intro or notes file; tree clean). CI green on `build`, `check-test`, `quality`,
+lane visibility. `close-gate` red on "Referenced issue acceptance gate" — **expected** while boxes are
+unticked and the PR is `status:impl`. Separate-session IMPL-EVAL running.
