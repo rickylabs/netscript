@@ -482,4 +482,8 @@ range-diff `=` 12/12, pinned push; PR #1744 base → `main`. Loopback probe re-r
 dind-loopback publishes still refused at `netscript-dind:<port>` (explicit publishes answer) → D-74
 two-hop relay stays mandatory for the Phase-B rerun. | | S4 hosted run GREEN | Run 33329737311
 exit=0 (all tiers) at converged `b2a0529fa19b` on `52a881c5` — S4 #1738 becomes the next
-merge-candidate; close packet in progress. Chain continues → S5 → proof → S1. |
+merge-candidate; close packet in progress. Chain continues → S5 → proof → S1. | | S4 close packet
+staged | #1738/#1716 sole `status:ready-merge`; mirror mapping valid (boxes already 6/6);
+review-threads PASS (0); e2e run 33329737311 green at `b2a0529fa19b5726`; ci run 33328754543
+full-rerun in progress for live-label close-gate. Note: 2 `cancelled` check-runs at the head are
+residue of the superseded pile-up run 33328751758 (D-79), not verdicts. |
