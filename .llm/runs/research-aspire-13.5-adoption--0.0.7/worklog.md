@@ -436,4 +436,8 @@ byte-identical); **run 33326591443** dispatched 17:55:18Z; watching. S3/S7/S8 Ph
 per PR after S1 convergence. | | Off-host proof run 33326591443 → FAILURE on S10 `describe --follow`
 parser (D-69) | Both runtime tiers 36/37 PASSED; `runtime.aspire-start` fails at S10's
 `describe-follow.ts:182` (13.5.3 emits bare ResourceJson per line under `--follow`). S10 same-thread
-fix dispatched; proof rerun after Tier-A. S1/#1736 not implicated. |
+fix dispatched; proof rerun after Tier-A. S1/#1736 not implicated. | | Local preflight definitive
+(D-73) | AppHost boots; DCP publishes on dind loopback; health check refused at `127.0.0.1:29584` →
+D-43 repeat. S3/S7/S8 runtime held; lease idle/returnable; zero re-proven. Real `describe --follow`
+capture validates S10 fix. S9 `include-hidden-files` staged locally (`918a958cd`, unpushed). Proof
+run 33327294781 pending. |

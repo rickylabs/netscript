@@ -1,0 +1,2 @@
+postgres-49f8e6d4 Up 21 seconds 127.0.0.1:29584->5432/tcp
+redis-bksvyyur Up 21 seconds 127.0.0.1:32772->6379/tcp

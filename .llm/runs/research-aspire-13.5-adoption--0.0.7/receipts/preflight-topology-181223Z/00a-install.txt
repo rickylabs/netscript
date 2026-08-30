@@ -1,0 +1,1 @@
+deno install exit=0 root zod: node_modules/zod

@@ -1,0 +1,5 @@
+[2mWaiting for resource 'netscript-db-postgres-kptskkwe' to be healthy...[0m
+[38;5;9m❌[0m [1;38;5;9mTimed out waiting for resource 'netscript-db-postgres-kptskkwe' to be healthy after 60s.[0m
+
+[38;5;15m📄[0m See logs at ]8;id=494317500;file:///home/agent/projects/netscript/.aspire/logs/cli_20260830T181301_ada890e0.log\/home/agent/projects/netscript/.aspire/logs/cli_20260830T181301_ada890e0.log]8;;\
+[38;5;12m🔍[0m See AppHost logs at ]8;id=475283916;file:///home/agent/projects/netscript/.aspire/logs/cli_20260830T181230981_detach-child_af197c508bc5402c81433bce059d10f3.log\/home/agent/projects/netscript/.aspire/logs/cli_20260830T181230981_detach-child_af197c508bc5402c81433bce059d10f3.log]8;;\

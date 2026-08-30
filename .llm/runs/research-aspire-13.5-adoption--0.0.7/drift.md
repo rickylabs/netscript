@@ -1404,3 +1404,36 @@
   zero (`receipts/preflight-topology-181024Z/`). The DCP loopback question (D-71b) is therefore
   still unanswered by a real AppHost; internals' #1736 run (main + #1736, 13.4.6 SDK) is the only
   live data point and it failed `database.init` with the D-55 signature.
+- **D-73 — definitive local preflight (lease, 18:12:30–18:14:33Z): DCP loopback publishing still
+  unreachable → D-43 reproduced verbatim on the fixed topology; local AppHost gates remain
+  environment-blocked.** Setup per coordinator (`deno install` at the generated root →
+  `node_modules/zod` present; D-72 was setup-only). Owner token: this session
+  (`session_01Jusn3woxeK5xhCdj6ccooR`), exact
+  `appHostPath=/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/aspire/apphost.mts`,
+  appHostPid 3077388, one `aspire start --isolated --non-interactive --format Json` (exit 0, 10 s).
+  Containers ran on the dind (`postgres-49f8e6d4` `127.0.0.1:29584->5432`, `redis-bksvyyur`
+  `127.0.0.1:32772->6379`); `aspire wait netscript-db-postgres-kptskkwe --timeout 60` → exit 17
+  (timed out); `aspire describe` health report on `postgres-49f8e6d4`:
+  `postgres_check: Unhealthy — "Failed to connect to 127.0.0.1:29584" … SocketException (111):
+  Connection refused`.
+  Same failure layer as D-43 and D-71b, unrelated to #1736's cleanup race (internals' JSON-RPC loss
+  is separately diagnosed). Built-in cleanup: `aspire stop` exit 0; persistent `postgres-49f8e6d4`
+  (created 18:12:39Z, inside the window, creator PID 3078275) removed by owner; final **containers
+  0, volumes 0, `aspire ps` `[]`**; only a foreign read-only `aspire describe` watcher (cwd
+  `…/netscript/repo`) touched the scratch, untouched. **Ground truth captured:** 18 real
+  `aspire describe --follow --format Json` lines
+  (`receipts/preflight-topology-181223Z/03-describe-follow.ndjson`): bare objects with keys
+  `name,displayName,resourceType,state,dashboardUrl,relationships,urls,volumes,properties,environment,healthReports,commands`
+  — no top-level `health`/`healthStatus`; S10's `73b37ac8` parser (state required, `healthStatus`
+  optional, `healthReports` map) is schema-correct against it; its DTO-derived fixture may be
+  replaced by this capture in S10's own convergence (advisory, not blocking). **Disposition:**
+  S3/S7/S8 local Phase B **held** — a run would repeat this exact failure (per the standing rule: no
+  lease burned on a predicted failure). Lease is idle and returnable; the required topology is
+  unchanged from D-71b (DCP-published `127.0.0.1` ports on the dind reachable from `ai-agents`, i.e.
+  shared network namespace). Hosted proof `e2e-cli.yml` at the exact head remains the
+  runtime-verdict path (run 33327294781 in progress).
+- **S9 staging (coordinator ruling):** `include-hidden-files: true` added to both runtime
+  `upload-artifact` blocks in `.github/workflows/e2e-cli.yml` as local commit `918a958cd` on
+  `fix/aspire-13-5-s9-skills-mcp-alignment` (worktree `007-aspire-s9`), `Refs #1721`. **Not pushed**
+  — the session credential lacks `workflow` scope; publication is the coordinator's. S10 untouched.
+  The combined proof head keeps the S1 workflow tree.
