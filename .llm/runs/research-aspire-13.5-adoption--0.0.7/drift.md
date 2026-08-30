@@ -1488,3 +1488,8 @@
   stays Healthy. Routing: O-1/O-2 are covered by the hosted `scaffold.runtime` proof (codegen + all
   four plugins) and by S8's local Phase B (full suite pass); if either reproduces there it becomes a
   product finding on its owning slice. S3 is not widened.
+- **D-69 cycle 2 proof:** S10 `67827e8baaff` cherry-picked onto the remote proof head →
+  **`597f920089258c8797868cd255437a647e807c97`** (linear descendant; workflow tree byte-identical to
+  S1; `aspire-structured-evidence_test.ts` 14 passed / 0 failed), pushed fast-forward, **run
+  33328308643** dispatched. (The staged rebuild script had rebased from `9303daf61` and was rejected
+  non-fast-forward; corrected to build on the live remote head — no force used.)

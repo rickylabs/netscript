@@ -9,8 +9,8 @@ cd "$PW"
 git fetch -q origin test/aspire-13-5-s10-e2e-gate-upgrades
 git merge-base --is-ancestor a46ea16d0 "$NEW" || { echo "NEW is not a descendant of a46ea16d0"; exit 2; }
 test -z "$(git status --short)" || { echo "proof worktree dirty"; exit 2; }
-git checkout -q 9303daf61
-git cherry-pick a46ea16d0.."$NEW"
+BASE=$(git rev-parse origin/ci/aspire-13-5-runtime-proof 2>/dev/null || git ls-remote origin refs/heads/ci/aspire-13-5-runtime-proof | cut -f1); git fetch -q origin ci/aspire-13-5-runtime-proof; git checkout -q FETCH_HEAD
+LAST=$(git log -1 --format=%s HEAD); git cherry-pick $(git log --format=%H --reverse a46ea16d0.."$NEW" | tail -n +$(( $(git log --oneline 9303daf61..HEAD -- packages/cli/e2e | wc -l) + 1 )))
 # workflow tree must remain byte-identical to S1
 test -z "$(git diff "$S1" HEAD -- .github/workflows)" || { echo "workflow tree drifted"; exit 3; }
 HEAD_SHA=$(git rev-parse HEAD)
