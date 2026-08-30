@@ -254,4 +254,8 @@ brief (log `s9-docs-audit-fix-1.log`); IMPL-EVAL cycle 1 (`7f042a12…`) still r
 D-46. | | S9 IMPL-EVAL cycle 1 | **`FAIL_FIX`** at `e11de98d` (session `7f042a12…`): F-1 citation
 path (= audit M4, in the running docs-fix turn), F-2 failure receipt drops `toolsObserved`, F-3/F-4
 low, F-5 → Phase-B brief, F-6 supervisor disclosure. Non-mutation verified. F-2..F-4 queued for the
-same thread after its current turn (D-47). Runtime zero. |
+same thread after its current turn (D-47). Runtime zero. | | S9 docs_audit fix cycle 1 landed |
+`4af21ddf` `docs(skills): apply S9 docs_audit cycle-1 fixes` (thread `DONE`, pushed). F-1/M4
+citation included. Same thread resumed immediately with `slices/s9/impl-eval-fix-brief.md` (F-2
+failure receipt keeps `toolsObserved`, F-3 timeout budget, F-4 structured-logs check, F-5 worklog
+note). Runtime zero. |
