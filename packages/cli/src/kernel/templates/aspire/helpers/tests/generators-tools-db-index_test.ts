@@ -54,15 +54,6 @@ describe('generateRegisterTools', () => {
     );
     assertStringIncludes(
       output,
-      'tool_0 = maybeWithProcessCommand(tool_0, "prisma-studio", "studio");',
-    );
-    assertStringIncludes(
-      output,
-      "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'",
-    );
-    assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
-    assertStringIncludes(
-      output,
       'const tool_0_errorFile = resolveToolErrorFile(tool_0_workdir, "prisma-studio");',
     );
     assertStringIncludes(
@@ -75,6 +66,29 @@ describe('generateRegisterTools', () => {
     assertStringIncludes(output, 'publishResourceUpdate(resource, {');
     assertStringIncludes(output, 'catch(() => undefined)');
     assert(!output.includes('--minimum-dependency-age=0'));
+  });
+
+  it('does not retain the Aspire 13.4 process-command seam', async () => {
+    const template = await Deno.readTextFile(
+      new URL(
+        '../../../../assets/generated/aspire/helpers/generate-register-tools-1.ts.template',
+        import.meta.url,
+      ),
+    );
+    const output = generateRegisterTools({
+      tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
+    });
+
+    for (
+      const forbidden of [
+        'PROCESS_COMMANDS_FLAG',
+        'Aspire 13.4',
+        'maybeWithProcessCommand',
+      ]
+    ) {
+      assert(!template.includes(forbidden), `raw template contains ${forbidden}`);
+      assert(!output.includes(forbidden), `generated output contains ${forbidden}`);
+    }
   });
 
   it('should use resource name as TaskName fallback', () => {

@@ -2,7 +2,7 @@
  * @module templates/aspire/helpers/generate-db-cli-mode_test
  */
 
-import { assertStringIncludes } from 'jsr:@std/assert@^1'
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1'
 import { describe, it } from 'jsr:@std/testing@^1/bdd'
 
 import { generateDbCliMode } from '../generate-db-cli-mode.ts'
@@ -95,14 +95,33 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, 'export async function tryHandleDbCliMode(')
     assertStringIncludes(
       output,
-      "`.netscript-db-operation-${target.configKey}.json`",
+      '`.netscript-db-operation-${target.configKey}.json`',
     )
     assertStringIncludes(
       output,
-      "const request = JSON.parse(await Deno.readTextFile(Deno.args[0]));",
+      'const request = JSON.parse(await Deno.readTextFile(Deno.args[0]));',
     )
     assertStringIncludes(output, 'request.NETSCRIPT_PRISMA_OPERATION')
     assertStringIncludes(output, "args: ['task', task]")
     assertStringIncludes(output, 'return false;')
+  })
+
+  it('excludes exactly the generated database CLI resource from MCP exposure', () => {
+    const output = generateDbCliMode({
+      databases: {
+        postgres: {
+          Enabled: true,
+          Engine: 'Postgres',
+          Mode: 'Container',
+          DatabaseName: 'app-db',
+          Persistent: true,
+        },
+      },
+    })
+
+    assertStringIncludes(output, '`${target.configKey}-cli`')
+    assertEquals(output.match(/\.excludeFromMcp\(\)/g)?.length ?? 0, 1)
+    assert(!output.includes('.withHidden('))
+    assert(!output.includes('netscript-db-${target.configKey}`.excludeFromMcp'))
   })
 })
