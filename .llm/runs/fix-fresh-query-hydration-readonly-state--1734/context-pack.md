@@ -12,11 +12,12 @@
 
 ## Current State
 
-The evaluator-artifact head is preserved beneath committed RED slice `8dac327d0b21d4fcdabea7adce69e785c1b2a4fb`.
-The bounded repair now passes all 11 focused tests: the real `QueryHydrationScript` serializer,
-paused mutations with/without variables, a paused retry with wire `failureReason: {}`, error-field
-revival, both exact dependency versions, and the evaluator attack set. Public types, exports, and
-the `^5.101.0` range remain unchanged.
+The evaluator-artifact head is preserved beneath committed RED slice `8dac327d0b21d4fcdabea7adce69e785c1b2a4fb`
+and product repair `a1dc5fce65058ab47cd49c5af13d91c145f0d1cf`. All 11 focused tests pass:
+the real `QueryHydrationScript` serializer, paused mutations with/without variables, a paused retry
+with wire `failureReason: {}`, error-field revival, both exact dependency versions, and the
+evaluator attack set. Public types, exports, and the `^5.101.0` range remain unchanged. The root
+test is host-red on two unrelated `.llm/tools/agentic/**` tests; all other required static gates pass.
 
 ## Completed
 
@@ -32,13 +33,13 @@ the `^5.101.0` range remain unchanged.
 
 ## In Progress
 
-- S5 private JSON-shape normalization and error revival, ready to commit.
+- S6 run-artifact handoff and exact-head rerun.
 
 ## Next Steps
 
-1. Commit the S5 repair slice.
-2. Commit final run-state artifacts, then rerun every required gate at that immutable head.
-3. Explicit-refspec push, verify exact remote/PR head, update the PR body, and post `[PHASE: IMPL]`.
+1. Commit final run-state artifacts, then rerun every required gate at that immutable head.
+2. Explicit-refspec push and verify exact local/remote/PR equality.
+3. Update the PR body and post the single `[PHASE: IMPL]` repair comment; keep draft/labels intact.
 
 ## Key Decisions
 
@@ -64,7 +65,7 @@ the `^5.101.0` range remain unchanged.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | focused repair PASS | 11/11 focused tests; 3-file check/lint/fmt |
+| Static | partial | focused/check/lint/fmt pass; root test host-red on 2 unrelated agentic tests |
 | Fitness | preliminary full PASS | quality scan allowCount 7; arch check; Fresh publish dry-run |
 | Runtime | N/A | no lease |
 | Consumer | PASS | exact 5.101.0 and 5.102.8 no-lock checks |
