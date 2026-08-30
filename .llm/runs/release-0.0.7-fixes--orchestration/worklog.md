@@ -4051,3 +4051,45 @@ source file with the substitution recorded in `drift.md` as resting on this supe
 final base of the shared-asset sequence. Readiness rolled back to `status:impl` on PR #1758 and issue
 #1462 while the correction lands. The `MECHANICAL_PASS` receipt at `f1ff5557` is superseded and the
 author was told not to cite it as currency.
+
+## 2026-08-30 — #1368 plan corrected and dispatched to PLAN-EVAL; #1758 closure fix in flight
+
+### #1368's corrections came back better than requested
+
+`742d870d`. Both supervisor findings are discharged, and each was improved on:
+
+- **`check:mcp-export-corpus`** is now gate 16 — and rather than a bare row it records a **measured
+  baseline** (exit 0, 35 packages / 270 subpaths / 7,614 symbols) plus the **expectation** that the
+  planned exported-signature changes will make it stale, with stop/report for supervisor sequencing
+  and an explicit "do not regenerate" while the corpus sequence is live in another lane. That is
+  exactly the "measured expectation, not background assumption" this lane asked for.
+- **Gate 18** is restated as *"Flow-B consumer runtime — REQUIRED, supervisor-coordinated,
+  author-must-not-run"*, with the sentence that matters: **"`NOT_RUN` by this author is required
+  boundary compliance, not a waiver."** Non-scope line 93 separately bars running any leased gate.
+
+Gate 15's check-only barrel invocation — derived from the writer rather than the task name — remains
+the standout, because it avoids the exact hazard this supervisor walked into.
+
+PLAN-EVAL cycle 1 dispatched at `742d870d`: route `claude-fable-5` · medium · Remote Control
+(matched), background `2fee32d8`, PID `1413079`, bridge `session_01VPnPNUS33kgmpeqfFqq82N`, dedicated
+worktree `007-planeval-1368`, verdict branch `eval/plan-eval-1368-cycle-1` with no upstream.
+
+The brief points it at the questions that decide this design rather than at the defect: whether "emit
+all five" is right when *deleting* the surface also keeps CI green today; which layer owns
+`netscript.correlation.id`; whether the ceiling accounts for **everything that consumes a published
+package's exported surface** — citing the sibling SDK leaf, which discovered **three** such consumers
+the hard way (assets barrel, MCP corpus, and a hand-maintained dependency-closure parity constant),
+each only after a gate or CI caught it. It is also asked to confirm the check-only barrel form
+genuinely does not write, rather than take the plan's word for it.
+
+Issue #1368 normalized `status:triage` → `status:plan-eval` to match PR #1764.
+
+### #1758 closure fix dispatched
+
+The author is applying the parity fix to the **source** constant
+`NETSCRIPT_WEB_RUNTIME_EXPORTS` in `netscript-web-runtime-closure.ts`, with the file-name substitution
+recorded in `drift.md` as resting on this supervisor's reading, pending coordinator confirmation. It
+was told to justify the addition in a sentence or two rather than paste it: the module's own comment
+frames that constant as *which SDK subpaths participate in the cache-provider closure*, so listing
+`./presets` asserts the browser-safe entry belongs there — true for this leaf, but a parity list
+edited only to silence a failure is the very failure mode this leaf exists to remove.
