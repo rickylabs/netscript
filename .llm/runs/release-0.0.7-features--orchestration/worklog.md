@@ -7960,3 +7960,62 @@ The leaf's sender record was evicted first under the full procedure: `ownerPid 3
 `/proc`, thread `01a053fe` absent across three debounced `codex-status` probes, backup to scratch, one
 literal path removed, count 29 → 28, and `codex-thread-ids.md` preserved as
 `codex-thread-ids-1387-s2b.md` before the launcher overwrote it.
+
+## #1387 Slice 3 — stopped for rescope (D-7); my over-scope withdrawn; re-dispatched
+
+Thread `01a05424` reached a **terminal `task_complete`** and stopped at the four-file ceiling rather
+than fake the result. It edited no product file, ran no gate, cut no receipt, made no commit and left
+`deno.lock` byte-identical. That is the behaviour the ceiling rule exists to produce.
+
+### The stop was correct, and the fault was mine
+
+It refused to make `TCustom` non-phantom from inside `service-builder-impl.ts`. **Verified
+independently** with my own compile-only probe at the certified head: assigning
+`ServiceBuilder<R, {wrong: number}>` to `ServiceBuilder<R, {tenant: string}>` **and back** both
+type-check, `deno check` exit 0. `TCustom` occurs only in return positions on the public interface, so
+structural typing ignores it.
+
+**The obligation should never have been in the brief.** E-2 was an evaluator observation explicitly
+marked *non-blocking*; I converted it into a Slice 3 requirement. The plan's Slice 3 is behaviour-only
+across four files, and `service-builder.ts` — the only place a consumer position could live — is on
+**Slice 2's** ceiling and on **no later slice**. So the plan never intended to make the parameter
+non-phantom, and no slice as written can. The author was asked to discharge an obligation its ceiling
+made impossible, and it correctly declined to add a private variance marker that would have "greened a
+class-level probe without fixing the public API".
+
+**Lesson: an evaluator finding is not automatically the next slice's work.** Before carrying one into
+a brief, check which ceiling owns the file that would have to change. A non-blocking observation
+promoted to a requirement costs a full dispatch and produces a rescope stop.
+
+Withdrawing my own amendment restores the ratified plan, so **no owner ruling was required to
+re-dispatch** — this is not a plan change. The underlying product question is real, though, and is
+escalated on its own terms rather than settled inside a slice.
+
+### Filed rather than lost — #1787
+
+`ServiceBuilder`'s `TCustom` is a phantom type parameter (`type:fix` · `area:service` ·
+`priority:p2` · `status:triage` · Backlog / Triage), with the probe, why deferring is not hollow
+(runtime composition still works; the exported `ServiceHandlerContext<TCustom>` is directly usable),
+and the note that **adding a consumer position makes the parameter invariant** — a breaking change
+that wants a deliberate release slot, not a slice amendment. `Refs #1387`, no closing keyword.
+
+### The author improved my archiving
+
+It moved Slice 2's **eleven** receipts into `receipts/slice-2-f9b32b4f/` by **move**, not copy — all
+sha256-verified byte-identical against `HEAD` before I committed them. That is the correct form of the
+D-6 fix and better than what I did at the Slice 1 boundary: moving leaves nothing without a successor
+sitting where current evidence lives. The corrected brief now carries that form explicitly.
+
+### Re-dispatch
+
+| Field | Value |
+| --- | --- |
+| Commit | `04b882ab5` — rescope stop, D-7, receipts archived by move |
+| New thread | `01a0542b-ad70-7442-af76-3c0d337f86c2`, `gpt-5.6-sol · high`, working |
+| Base | `04b882ab5`; certified Slice 2 content head remains `f9b32b4f7` |
+| Brief | `slices/impl-1387-s3.md`, E-2 obligation **withdrawn in text**, E-3 kept but bounded |
+
+E-3 is now scoped honestly: tighten `buildRpcContext`'s internal `traceHeaders` annotation **only if**
+the runtime guarantees `string`; if it can genuinely produce `undefined` then the *published* type is
+wrong, which is out of ceiling — stop and report rather than widen a public type to make an annotation
+compile.
