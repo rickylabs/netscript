@@ -327,3 +327,11 @@ receipt was run. The ten current Slice 4 receipts were verified by `invocationId
 `receipts/slice-4-9cc8c4c5f/`; no stale top-level receipt remains. The required ceiling amendment is
 limited to the two entrypoints above and their named value exports; no other product expansion is
 indicated by this finding.
+
+**Owner resolution (recorded by supervisor).** Coordinator approved the two-file amendment exactly as
+proposed: add `packages/service/src/auth/mod.ts` and `packages/service/mod.ts` to Slice 5's ceiling,
+scoped to one named value export (`createContractAuthorizer`) plus the types Slice 4 already
+publishes. No PLAN-EVAL cycle required — same shape as the already-ratified D-4/F-3 pattern: a slice
+adding a new public symbol needs its export path on the ceiling, and both files have already carried
+that exact role twice in this plan (Slice 2 for its context types, Slice 4 for its own contract-policy
+types). Plan amended at `plan.md` Slice 5 ceiling. Re-dispatching immediately.

@@ -239,6 +239,11 @@ Ceiling:
 - `packages/service/tests/auth/middleware_test.ts`
 - `packages/service/tests/auth/builder-auth_test.ts`
 - `packages/service/tests/auth/contract-authorizer_test.ts` (new)
+- `packages/service/src/auth/mod.ts` — **added by owner ruling (D-9). Named value export of
+  `createContractAuthorizer` only; the types it returns are already exported from Slice 4.**
+- `packages/service/mod.ts` — **added by owner ruling (D-9), same purpose and same shape as its own
+  Slice 2/Slice 4 ceiling entries for this file: re-export one slice's new named symbol, nothing
+  else.**
 
 Tier-A stop: scoped check/lint/fmt; service tests; `quality:gate`; service JSR audit;
 `mcp-export-corpus`; deno.lock hash check.
