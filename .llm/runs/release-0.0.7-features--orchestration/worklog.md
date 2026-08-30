@@ -6866,3 +6866,68 @@ expected: the acceptance mirror has not run and cannot until `status:ready-merge
 
 Its own recommendation matches mine independently: add `docs-tagline` **and** `agent-docs-prose` to
 the checked set — "the third D-27-class miss on this leaf".
+
+## 2026-08-30 — #1731 frozen pending a verified #1748 SHA; #1387 and #1730 run in parallel
+
+### #1748 verified from GitHub, not accepted from prose
+
+`gh pr view 1748` → **`state: OPEN`, `mergedAt: null`, head `9b79d90e`**. Not merged. No SHA has been
+acted on, and none will be until the coordinator reports a verified one. `origin/main` remains
+`f8b4f804`.
+
+### #1731 genuinely frozen
+
+Local == remote == `87d53cec`, clean, **no integration attempted and no regeneration run**. Its final
+CI verdict at that head is `ci: failure` (agent-doc corpus), so it is confirmed non-mergeable evidence
+rather than pending. `status:impl` on PR and issue; non-draft so the matrix keeps reporting.
+
+**The single refresh, when the SHA arrives:** merge (never rebase — five receipt archives, four Tier-A
+reviews and three evaluator verdict sections all cite content-head SHAs a rebase would rewrite) →
+one corpus/provenance/carrier regeneration → the full sweep (`check:agent-docs-prose`,
+`check:publish-assets`, `check:assets-barrel`, `check:mcp-export-corpus`, `docs:tagline:check`,
+`docs:exports-drift`, `quality:gate`, plus the contracted eight **with the explicit 16-entrypoint argv
+for `public-doc-lint`**) → push → fresh currency evaluator inheriting `b247bef9`'s measurements.
+
+### #1387 — healthy, and applying the lesson unprompted
+
+It first looked dead: worktree HEAD on a `main` commit with nothing committed, thread absent from the
+daemon across three debounced probes. But the launcher is still streaming and the rollout holds 13
+assistant messages. The latest:
+
+> "public `deno doc --lint` is already red in contracts/plugin/SDK/MCP (service alone is green), and
+> the plugin JSR audit is already red for four missing module tags. Those cannot be regression gates.
+> The plan will contract only base-green signals and will explicitly preserve the existing red
+> findings without treating them as this leaf's debt."
+
+That is the D-27 discipline applied before being reminded of it. No intervention. Recorded because
+"absent from the daemon" has now produced a false death signal three times this session — the
+authoritative check is the launcher process plus the rollout, not the session list.
+
+### #1730 dispatched — the next independent feature slice
+
+| Field | Value |
+| --- | --- |
+| Leaf | `test/ai-request-context-provider-guard`, worktree `007-leaf-1730`, base `f8b4f804` |
+| Thread | `01a052b7-5554-74f2-8098-7d38e0c7cf01` |
+| Route | requested = observed = `openai · gpt-5.6-sol · high`, verdict **matched** |
+| Issue | `status:triage` → **`status:research`** |
+| Independence | `packages/ai` **test-only** — collides with neither #1731's contracts/SDK surface nor #1748's corpus |
+
+**Brief amended before dispatch** with the three lessons this leaf paid for:
+
+1. Run every candidate gate at the **base** first; a base-red gate cannot signal a regression and must
+   be contracted as a delta with the base number named.
+2. Do not *assume* a test-only change leaves generated carriers alone — check `git status` and treat a
+   moved carrier as a finding, not something to regenerate quietly.
+3. **Read a receipt's `argv` and `durationMs`, not just its `exitCode`.** An expected-red gate will
+   record a usage error as `exit 1` and look correct; that is precisely how a defective
+   `public-doc-lint` receipt reached a push on #1731.
+
+### Lane state
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **frozen** at `87d53cec`, `status:impl`, awaiting a verified #1748 merge SHA |
+| #1387 | active — research/plan, thread `01a052a3` |
+| #1730 | active — thread `01a052b7` |
+| #1664 | parked at `20337441788b` |
