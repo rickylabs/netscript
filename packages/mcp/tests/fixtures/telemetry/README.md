@@ -1,0 +1,39 @@
+# Aspire dashboard telemetry fixtures
+
+The 13.4.6 files in this folder are the only dashboard telemetry envelopes captured so far. They
+remain an active backward-compatibility case and must not be deleted when a newer capture lands.
+
+## Current capture
+
+- Aspire version: 13.4.6
+- Capture date: 2026-07-17
+- Files: `aspire-13.4.6-resources.json`, `aspire-13.4.6-spans.json`, and their TypeScript fixture
+- Sequence: trigger the scaffolded `health-check` worker job, then capture the dashboard resources
+  and spans endpoints named in `aspire-13.4.6-fixture.ts`.
+
+## Pending Aspire 13.5.3 capture (phase B)
+
+Phase A has no runtime lease. S2 captured `aspire ps`, `aspire describe`, doctor, and MCP/runtime
+projections, but it did not capture the dashboard API envelopes. A CLI describe snapshot is not a
+substitute: do not fabricate, copy-forward, or hand-edit a 13.5.3 telemetry envelope.
+
+After the supervisor grants the runtime lease and supplies the capture command:
+
+1. Start the exact 13.5.3 AppHost under that lease and wait for the required resources.
+2. Trigger the scaffolded `health-check` worker job.
+3. Capture these exact HTTP requests from the leased dashboard URL:
+
+   ```text
+   GET <dashboardUrl>/api/telemetry/resources
+   GET <dashboardUrl>/api/telemetry/spans
+   ```
+
+4. Save the raw response envelopes as `aspire-13.5.3-resources.json` and `aspire-13.5.3-spans.json`,
+   add `aspire-13.5.3-fixture.ts`, and add the 13.5.3 case beside the retained 13.4.6 case in
+   `../../telemetry-live-fixture_test.ts`.
+5. Promote the parity expectation for that test from `pending-lease` to `required`. Until then, the
+   parity test deliberately fails if `13.5.3` appears in the telemetry consumer.
+
+Record the capture date, CLI version 13.5.3, exact AppHost identity, dashboard URL redaction, and
+lease evidence in the phase-B commit trail. Never commit credentials, tokens, or sensitive
+environment values.
