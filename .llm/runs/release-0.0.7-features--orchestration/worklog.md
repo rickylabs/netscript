@@ -8572,3 +8572,26 @@ IMPL-EVAL dispatched: native Fable 5 attempted first per policy default. Brief a
 Tier-A's own review — confirming `OperationAccessSummary` is a genuine projection rather than a
 structural copy of `packages/service`'s internal `ProcedureAccessPolicy`, since the plan requires MCP
 not import from `packages/service` for this boundary.
+
+## #1387 Slice 7 terminal PASS; Slice 8 dispatched
+
+DeepSeek V4 Flash 0731 returned **PASS at `897a06cd7`** — no findings, matching my Tier-A exactly. It
+gzip/base64-decoded the export corpus at both heads directly rather than trusting the entry count
+(confirming exactly one content-only key added, zero removed, zero unrelated changes), and
+independently re-ran the MCP doc-lint at base and content to confirm the excluded base-red is
+genuinely pre-existing. Committed `evaluate-slice-7.md` at `edb3831b6`; PR comment `5471641909`.
+
+### Slice 8 dispatched
+
+MCP/agent access projection, behavior-only, seven-file ceiling, base `edb3831b6`, thread
+`01a054c9-9a33-7db2-94fd-0e98f0e3d97d`, `gpt-5.6-sol · high`, dry-run clean. This is the reverse of
+Slice 6's mapping — derive `OperationAccessSummary` back out of the raw retained OpenAPI operation.
+The brief states the exact reverse mapping for all three declared states plus the undeclared case
+(access stays absent, not synthesized), and the hard "no secrets" constraint on curl guidance
+distinguishing all four states. It also flags the opposite expectation from Slice 7: this slice
+should **not** move the corpus at all, since it populates existing fields rather than exporting
+anything new — if it does move, that's a signal to investigate before committing, not a routine
+regeneration.
+
+Sender record evicted under the full procedure (dead pid, absent from session list — the strongest
+confirmation form, stronger than idle-with-matching-artifact) before dispatch.
