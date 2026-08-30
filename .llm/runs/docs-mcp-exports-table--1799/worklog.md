@@ -26,3 +26,33 @@ by exported-symbol evidence.
 - Pre-commit gate attempt: all attempted gates passed except `check:assets-barrel` (exit 1), whose
   tracked-file check correctly detected the uncommitted regenerated barrel. The full required set
   will be rerun at the pushed implementation head.
+
+## Pushed-head gates (`127e8ea326e3b421721887422c7cdb8806b10c5e`)
+
+| Gate | Exit |
+| --- | ---: |
+| `deno task docs:exports-drift` | 0 |
+| `deno task --cwd docs/site check:source-format` | 0 |
+| `deno task --cwd docs/site build` | 0 |
+| `deno task --cwd docs/site check:links` | 0 |
+| `deno task --cwd docs/site check:caveats` | 0 |
+| `deno task docs:links` | 0 |
+| `deno task docs:accuracy` | 0 |
+| `deno task docs:snippets` | 0 |
+| `deno task check:agent-docs-prose` | 0 |
+| `deno task check:assets-barrel` | 0 |
+| `deno task check:publish-assets` | 0 |
+| `deno task check:mcp-export-corpus` | 0 |
+| `deno check --unstable-kv packages/cli/src/kernel/assets/agent-docs.generated.ts packages/mcp/src/publish-assets.generated.ts` | 0 |
+| `git diff --check` | 0 |
+| `git status --porcelain` | 0; exact output empty |
+| `git diff --quiet origin/main -- deno.lock` | 0 |
+| `git merge-base --is-ancestor 7586a44a6 HEAD` | 0 |
+
+`docs:accuracy` emitted the existing `@tanstack/ai-preact` peer-version warning and still returned
+PASS/0. The final evidence-only run-artifact commit will be followed by another full gate run.
+
+## Reconcile
+
+PR #1800 closes issue #1799, remains draft at `status:impl`, and intentionally uses the docs-only
+`ci:skip-e2e` and `ci:skip-scaffold` path. No new reviewer comments or scope changes were found.
