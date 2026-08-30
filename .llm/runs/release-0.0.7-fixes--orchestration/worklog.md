@@ -5330,3 +5330,40 @@ Liveness discipline applied correctly this time: with the rollout showing zero g
 checked the **process**, not the byte count, before drawing any conclusion — the inverse of the earlier
 false-stall call. Growth silence plus a live turn is a reasoning pause; growth silence plus a dead
 process is a failure.
+
+### #1357 author turn died mid-slice; recovered by resume, not relaunch
+
+**Correction to what I recorded and reported minutes earlier: the author turn was NOT alive.** I
+checked it with `pgrep -af "app-server-message-cli.*007-leaf-1357"`, which matched **my own shell's
+command string** — the pattern appears verbatim in the `bash -c` I was running. Same self-match bug as
+the earlier `pkill` incident, in its read-only form: there it nearly killed a sibling lane, here it
+produced a false "ALIVE". The turn had in fact died ~11 minutes before, killed by the same host-side
+cleanup that took my monitor.
+
+Correct check, now the standard: resolve `/proc/<pid>/cwd` for each candidate PID and compare it to the
+worktree path, or `ps -eo args | grep -v shell-snapshots`. Identity by *inspected attribute*, never by
+a pattern that can match the inspector.
+
+Diagnosis at death: rollout ended **mid-write**, not on `task_complete`; lease `state: active` with
+`ownerPid 2790189` **gone**; no process with cwd in the leaf. Committed but unpushed `0d620b61`
+(red-before, test-only) plus **uncommitted** `web-scaffold.ts` +219/-54.
+
+Recovery, in this order:
+1. **Backed the work up first** — `git diff` to a patch (309 lines) and a copy of the WIP file — before
+   attempting anything that could touch the tree. Recovery paths must not be the thing that loses work.
+2. Checked resumability before reaching for eviction. `agentic:codex-status` now reports the thread
+   **`idle`** with the correct worktree, so it was resumable: **no stale-sender eviction, no relaunch,
+   and full S2A context preserved.** The documented eviction procedure was not applied because its
+   preconditions were not all met and, more importantly, were not needed.
+3. Resumed with an explicit state statement — what is committed, what is unpushed, what is uncommitted,
+   and that the kill was host-side rather than a stop condition — so the author does not re-derive or
+   redo the slice.
+
+Thread is working again: brief delivered, rollout +435 KB/25 s.
+
+**Second correction, to my earlier "observability gap" claim.** I reported that `codex-status` and
+`agentic:runtime status` did not know this session at all. The thread **is** listed now that it is
+idle. So the accurate statement is narrower: the listing did not show it *while it was actively
+working*, and `runtime status --worktree` reported `sessions: 0` at that moment. That is still a real
+monitoring hazard — a lane checking only `codex-status` mid-run sees nothing and may conclude a healthy
+worker is dead — but it is not the total absence I described. Recorded as the narrower, true claim.
