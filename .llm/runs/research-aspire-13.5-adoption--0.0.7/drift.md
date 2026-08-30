@@ -920,3 +920,18 @@
   rewritten in place; D-48 F-3b/F-4b and docs-audit M2 fold into the **same bounded pre-Phase-B
   commit** on the S9 thread; **scoped recheck only** — no new ordinary evaluation for this
   correction. Dispatched: `slices/s9/pre-phase-b-brief.md` on thread `01a0523a…`.
+
+## D-50 — 2026-08-30 — `main` advanced to `952cc106` (S2 merged; docs/shared-asset changes); stack convergence point recorded
+
+- `main` `13878a80` → `952cc106`: `625447f1` **#1735 S2 runtime-verification receipts merged**
+  (coordinator-landed), `f8b4f804` #1746 cross-host skill docs, `952cc106` #1748 ".NET Aspire →
+  Aspire" normalisation. Within the areas the S5→S6→S8→S9→S10 stack touches, main changed only
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts` (+6/−6); the file intersection between
+  the main delta and `564d465c..0d81cf64` is **empty** — no conflict expected.
+- **Convergence point (documented, not a global barrier):** the stack is based on S5 `aa822069`
+  whose merge-base with main is `13878a80`. Integration happens once, bottom-up, when #1734 (PR
+  #1736) lands: rebase S5 → re-run its exact runtime gates → then S6, S8, S9, S10 in order
+  (re-running the derived-asset regen chain — `gen:assets-barrel`, `agentic:sync-claude`,
+  `gen:mcp-export-corpus`, `gen:publish-assets`, `agentic:dogfood-skills` — at each hop, since S9
+  regenerates the same barrels main's docs changes feed). Until then the stack continues on its
+  current base; S10 (in flight) is not rebased.

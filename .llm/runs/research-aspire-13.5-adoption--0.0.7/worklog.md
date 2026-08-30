@@ -295,4 +295,6 @@ pushed; PR #1759 comment 5468788905; thread turn complete. Scoped supervisor rec
 diff read) in progress — no new ordinary evaluation per the ruling. | | S9 scoped recheck | All nine
 correction items CLOSED at `0d81cf64`; regression gates green (fork). Accepted — no new ordinary
 evaluation per the ruling. S9 phase A settled; Phase B blocked (D-43). PR #1759 review comment
-posted. |
+posted. | | Main advanced (coordinator) | `952cc106` = #1735 (S2) merged + #1746 + #1748. Overlap
+with the S8–S10 stack: `agent-docs.generated.ts` only; file intersection with the stack delta empty.
+Convergence point recorded (D-50); S10 continues on its current base. |
