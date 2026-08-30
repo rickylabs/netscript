@@ -2674,3 +2674,44 @@ The author is modifying exactly the authorized CLI paths — `generate-installed
 `installed-runtime-registry-generator.ts`, `installed-runtime-registry-generator_test.ts`,
 `runtime-registry-drift.ts`, `doctor-plugin-use-case.ts`, and `doctor-plugin-registry-drift_test.ts`.
 All six are inside the eleven; nothing outside has been touched.
+
+## 2026-08-30 — gate runner validated, and a defect found in this lane's own tooling
+
+Dry-ran `gates-1673.sh` while the host slice was still uncommitted, to catch bugs in it before the
+moment it matters. The runner itself is sound — head identity, ceiling containment, lock check,
+suites, scoped check/lint/fmt, cascade, publish dry-run, `doc:lint`, and `quality:gate` all executed
+correctly.
+
+**But it produced a full green report from a dirty tree without objecting.** `dirty : 6` was printed
+and every gate ran anyway. That is the same defect class as #1673: a green that reality does not back,
+because a green from an uncommitted tree is indistinguishable from a green at the head. It would have
+been an easy way to record work-in-progress results as exact-head evidence.
+
+Fixed: the runner now **refuses** on a dirty tree, prints the offending paths, and exits 9. An
+`ALLOW_DIRTY=1` escape exists for previews, and the refusal text states that such output must never be
+recorded as gate evidence. Verified the guard fires.
+
+Writing the guard rather than just remembering to check is the point — this leaf's whole subject is
+that a check which can silently pass on the wrong input eventually will.
+
+### Preview results — explicitly NOT evidence, recorded only as a progress signal
+
+From the pre-guard dirty-tree run at `8dcb578f` **plus the author's uncommitted host changes**:
+
+| Check | Preview result |
+| --- | --- |
+| Focused regression suite | exit 0 · **6 passed / 0 failed** — including the S7 healthy case |
+| Related doctor/generator suites | exit 0 · 54 passed / 0 failed |
+| AI plugin CLI suites | exit 0 · 12 passed / 0 failed |
+| Ceiling containment | no path outside the authorized eleven |
+| `deno.lock` | unchanged |
+| `check:mcp-export-corpus` / `check:publish-assets` | exit 0, both measured negatives |
+| `deno publish --dry-run` (cli) | Success |
+| `doc:lint` (cli) | 0 errors across three entrypoints |
+| `quality:gate` | two pre-existing `export default` WARNs in `cli.ts` and `official-sample-configuration.ts`, both outside the ceiling |
+| Scoped fmt | one finding — `public-command-dependencies.ts`, the known base-owned line-1 import |
+
+The signal that matters: the S7 healthy-regression case, red at `e24e7ce1` and still red at `8dcb578f`,
+**goes green once the host consumes the inspect report**. That is the product-caused green this leaf
+required, arriving from the host change exactly as predicted — but it is only a preview until it is
+re-derived at a committed head, which is what the new guard now enforces.
