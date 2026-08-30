@@ -360,3 +360,43 @@
   attribute to a slice — but **do** report them in the evidence table, as S5's author correctly did.
 - Owner action unchanged and still agent-blocked: the container needs a reaping init (or a restart);
   raising `fs.inotify.max_user_instances` would relieve the watcher ceiling. Both are host actions.
+
+## D-28 — 2026-08-30 — S5 IMPL-EVAL cycle 3 `PASS`; five coordinator-owned follow-ups
+
+- **Verdict:** `PASS` at `aa822069` (content head `2e8c6f4f`), base `13878a80a`. Evaluator: fresh
+  Claude · Fable 5 · medium session `e100ce32`, independent of this supervisor, of the Codex author
+  thread `01a0515b…`, and of the S7 evaluator. Cycle 2's `PASS` was explicitly **not** inherited
+  (D-20). Record: `slices/s5/evaluate-cycle-3.md`; PR comment `#issuecomment-5467470320`.
+- **Verified by this supervisor before acceptance:** branch head unchanged at `aa822069`, eval
+  worktree clean at the same head, labels and draft state untouched — the evaluator reported PR
+  hygiene rather than fixing it, as instructed.
+- **Quality of the pass:** the evaluator reproduced RED **itself** at `0bd8ba83` in a throwaway
+  worktree (F-1 `4 passed/1 failed`; F-2 `0/4`; F-3 `1/1`; F-4 `16 passed/2 failed`, matching the
+  worklog verbatim), re-ran every static, derived-asset, and scoped gate, re-verified the Tier-A
+  claims instead of adopting them, and confirmed `review-threads … unanswered=0`.
+- **Follow-ups — all coordinator-owned, none require an S5 code change:**
+  - **F-A (medium, gates merge).** No runtime verdict exists at the final head: `e2e-cli` was
+    *skipped by classification* at every repair head, and the only `scaffold.runtime` evidence is
+    run `33286544110` at `0bd8ba832` (26/27, red on the #1734 baseline; PR #1736 still open). The
+    repair diff is runtime-monotonic, so this is not a new S5 risk — but the sign-off condition
+    "runtime verdict = CI `scaffold.runtime` on this head" is unmet. Coordinator dispatches
+    `e2e-cli.yml` at the merge head after #1736 lands/rebase and records the run id.
+  - **F-B (low).** `README.md:135` and `plugins/ai/README.md:72` still document the pre-F-3
+    completion line (`Installed … on port <n>`), which F-3 removed for unpinned installs. Handed to
+    the 0.0.7 docs lane as an S11 (#1723) row.
+  - **F-C (low).** `status:ready-merge` + `impl-eval:skip` are live on #1740 from the **voided**
+    cycle-2 verdict, and the PR is not draft. Coordinator decides whether this cycle-3 `PASS`
+    re-grounds those labels or whether they are stripped and re-applied. This session does not
+    relabel.
+  - **F-D (low).** #1717 box 6 reads "Will close … #1365" while the PR body correctly carries
+    `Part of #1365` per D-18. Coordinator amends the box text.
+  - **F-E (low).** The named 0.0.8 removal issue cited by all four `@deprecated` JSDocs
+    (auth/sagas/triggers/streams) is **not filed** — `gh issue list --search` returns nothing, so
+    D-14's "named issue" does not yet resolve to a number. A draft exists
+    (`deprecation-issue-draft.md`) and the PR body says the supervisor files it. **Not filed by this
+    session:** creating a GitHub issue is central-state mutation, which this run's mandate reserves
+    to the coordinator. Surfaced as an explicit ask instead.
+- **Lesson worth promoting (evaluator's, endorsed):** a `pull_request`-triggered `e2e-cli` run that
+  is *skipped at classification* is **not** runtime evidence. "Runtime verdict = CI on this head"
+  must be re-earned per head via an explicit workflow dispatch with the run id recorded. This is the
+  same class of error as D-23/D-26 — a gate believed covered that never actually executed.
