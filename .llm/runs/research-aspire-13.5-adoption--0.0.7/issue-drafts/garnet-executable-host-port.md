@@ -1,5 +1,7 @@
 # Draft issue: fix(cli): Garnet executable arm binds host port 6379 regardless of Aspire allocation
 
+> Filed 2026-08-30 as #1742 (Backlog / Triage; coordinator owns milestone).
+
 > Found by S5 IMPL-EVAL (F-5, low, pre-existing — outside the S5 D-16 contract). Labels:
 > `type:fix`, `area:cli`, `area:aspire`, `priority:p2`, `epic:aspire-13-5`, `status:triage`.
 > Milestone: `0.0.8` (or 0.0.7 if the S6/S8 runtime lease window allows a receipt).
