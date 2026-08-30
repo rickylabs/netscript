@@ -846,3 +846,71 @@ says the no-retry condition "stays in force on this host" because the host chang
 no fault of the session, but a demonstration that environmental rulings need a re-check trigger, not
 just a rationale. Recorded so the final all-slices IMPL-EVAL re-derives host state rather than
 inheriting this one.
+
+## D-29 — RESOLVED 2026-08-30. The inotify quota was raised; the token-free watcher works
+
+**Re-measured, not accepted on report:**
+
+| Probe | D-29 as filed | Now |
+| --- | --- | --- |
+| `fs.inotify.max_user_instances` | 128 | **1024** |
+| `watch-run.ts <run-dir> --timeout-seconds 10` | died in `Deno.watchFs` (`FsWatcher` allocation) | emits `{"watching":…,"files":["worklog.md"]}` then `{"timedOut":true,…}` and **exits 2** — the designed heartbeat |
+
+D-29's diagnosis is confirmed by the fix: raising the per-user inotify **instance** cap — a root-only
+sysctl, not the fd rlimit — is exactly what made `watchFs` allocatable again, with no change to the
+tool. Nothing about `watch-run.ts` was wrong.
+
+**Consequence.** `AGENTS.md`'s "Supervisor wake (token-free)" is implementable again, and this lane
+returns to it: `watch-run.ts` as the primary wake, replacing the `codex-status` poll loop D-29 forced.
+The poll fallback is retired, not kept as a parallel path — two wake mechanisms on one author is how
+a supervisor ends up acting on a stale probe.
+
+The D-26 half is unchanged and still holds: PID 1 is `tini`, zombies **0**, root `deno task test`
+runnable and green. D-30 stands as written.
+
+## D-31 — DinD sandbox is reachable; that is capability, not authorization
+
+Coordinator environment authority update 2, **locally re-proven** by this lane at 2026-08-30T09:27Z
+rather than taken on report:
+
+- `getent hosts netscript-dind` → **`10.4.12.19`**
+- project `mise env` exports **`DOCKER_HOST='tcp://netscript-dind:2375'`**
+- `docker version` through it → client **28.5.2** / server **28.5.2**
+- `docker ps -a` → **0** containers; `aspire ps` empty
+
+**What this does not change.** This lane holds **no runtime lease**. Slice 2 is SDK declaration
+propagation and needs no container; slice 3 is publish/compatibility evidence and needs none either.
+A reachable sandbox is not a licence to start using it, and the slice-2 author has been told so
+explicitly — the standing prohibition on `e2e:cli`, Aspire, Docker and browser gates is unchanged,
+and reaching for one is a rescope.
+
+**What it does change, for the coordinator not for me.** #1664 was parked at a terminal `FAIL_FIX`
+whose open question — why the optimistic `Seed User*` row never appears after Rename — was
+untestable because the runtime gate could not be re-leased. A working DinD sandbox with Docker 28.5.2
+makes that question testable again. **No retry is authorized and this lane does not authorize itself
+one**; recorded so the coordinator can decide with the current facts rather than the parked ones.
+D-22's caution still applies: the attempt-7 red is evidence about base `3fc0f2f92`, not about current
+`main`, so a rerun of the old base would answer a question nobody is asking.
+
+Cleanup obligation if any runtime work is ever leased here: return owned Aspire and Docker state to
+**zero**, proven by path containment (`--owned-root`), and leave every foreign-owner resource alone.
+
+## D-32 — a second sender is refused mid-turn, and that is the tooling working
+
+Attempting `agentic:codex-resume` at the slice-2 author while its launch turn was still streaming:
+
+```text
+thread-store conflict: thread 01a051f8-… already has an active writer (code -32600)
+```
+
+This is the correct outcome, recorded so it is not mistaken for the D-28 class of defect. D-28 is a
+**false positive** — a guard blocking a launch against a thread that is provably dead. This is a
+**true positive** — a guard blocking a concurrent write to a thread that is genuinely alive and
+mid-turn. The two look similar in the error text and are opposite in substance.
+
+Operational consequence: a supervisor correction that arrives mid-turn cannot be delivered until the
+author's turn ends. Environment facts that invalidate a brief mid-flight therefore land late by
+construction, and the supervisor must either wait for idle or carry the correction to the Tier-A
+stop. This lane waits for idle, because the correction here governs a file the author is going to
+write (`context-pack.md`) and arriving after it writes would mean correcting a committed artifact
+instead of preventing a wrong one.
