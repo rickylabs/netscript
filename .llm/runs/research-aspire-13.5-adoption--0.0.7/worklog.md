@@ -328,4 +328,8 @@ gates green at S8′/S9′/S10′; force-pushed with lease; slice worktrees move
 `127.0.0.1:32772` refused from `ai-agents` (curl exit 7, /dev/tcp refused), `ok` inside the dind
 netns. Both causes present on the repaired host; no lease requested; sandbox back to zero. **D-55**.
 | | Infra handoff artifact | `infra-handoff-topology.md`: required topology (shared netns +
-identical-path bind / local daemon / CI) and the two exact acceptance probes from D-55. |
+identical-path bind / local daemon / CI) and the two exact acceptance probes from D-55. | | Off-host
+Phase-B path (coordinator) | `e2e-cli.yml` `workflow_dispatch` can run `scaffold.runtime` at the
+converged S10/S9 heads, but #1734 (fix not on main) fails `generated.quality-negative` before
+runtime and CI pins Aspire 13.4.6 (S1 unmerged) → no 13.5.3 receipts possible. Not dispatched;
+preconditions recorded (**D-56**). S8's Phase-B gate is unwired by design (lease-only). |

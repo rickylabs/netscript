@@ -1033,3 +1033,36 @@
   probe 1 lists the worktree and probe 2's `curl` from `ai-agents` returns `ok`; or a local Docker
   daemon in `ai-agents`; or AppHost gates in CI/off-host. Re-run these two probes after any infra
   change before requesting a lease.
+
+## D-56 — 2026-08-30 — Off-host Phase-B path assessed: `e2e-cli.yml` dispatch exists but is pre-runtime-blocked by #1734 and pinned to 13.4.6
+
+- **Capability found (no scope change needed):** `.github/workflows/e2e-cli.yml` has a bare
+  `workflow_dispatch:` (no inputs); on manual dispatch `RUN` is true for the `scaffold-runtime` and
+  `scaffold-runtime-sqlite` tiers (global mutex, queues), so
+  `gh workflow run e2e-cli.yml --ref <stack branch>` would execute `scaffold.runtime --cleanup` at
+  the exact converged head with local Docker — covering S10's new receipt gates (`preflight.aspire`,
+  `describe --follow`, cleanup probe, `runtime.resource-command`) on
+  `test/aspire-13-5-s10-e2e-gate-upgrades` @ `a46ea16d`, and S9's `agent.aspire-mcp-smoke` on
+  `fix/aspire-13-5-s9-skills-mcp-alignment` @ `d81a8fe1` (siblings: one dispatch per branch). S8's
+  `runtime.typed-db-phase-b` is deliberately unwired from suites, so CI cannot produce S8's Phase-B
+  receipt at all (lease-backed by design).
+- **Why not dispatched now (exact blockers, not inference):**
+  1. **#1734 baseline still absent from `main`**
+     (`git diff origin/main
+     origin/fix/fresh-query-hydration-readonly-state -- packages/fresh/src/application/query/hydration.ts`
+     = +193/−1; PR #1736 parked). The suite's critical `generated.quality-negative` gate fails on
+     that `TS2345` **before** any `runtime.*` gate at every stack head — identical to CI run
+     `33286544110` and the NAS S5 receipt (D-33). A dispatch today is a guaranteed pre-runtime red
+     that also occupies the shared `e2e-scaffold-runtime-global` mutex.
+  2. **CI pins Aspire CLI `13.4.6`** (`e2e-cli.yml:298/385`, NuGet cache key `13.4.6`) and the stack
+     still ships `SCAFFOLD_VERSIONS.ASPIRE_SDK = '13.4…'` (S1 #1727 unmerged). CI would therefore
+     yield **13.4.6** receipts — S9's smoke gate would assert against the 13.4.6 pin and never
+     produce the D-12 **13.5.3** receipt; S10's receipts would prove the mechanics only.
+- `e2e-cli-prod.yml` (input `published-version`, Aspire `13.5.0-preview`) validates a published CLI,
+  and `e2e-cli-prod-local.yml` (13.4.6) validates the local CLI against JSR packages — neither runs
+  a branch head's generated workspace; not applicable.
+- **Preconditions for the off-host run (in order):** #1736 lands → S1 (13.5.3 pin + CI
+  `ASPIRE_CLI_VERSION` bump, part of S1's scope) lands → dispatch `e2e-cli.yml` on the S10 and S9
+  branch refs (after they rebase over S1) and retain run/job ids as the Phase-B receipts. Until then
+  the exact missing capability is not a workflow but the **#1734 fix and the S1 pin on `main`**.
+  Readiness is not flipped to trigger CI.
