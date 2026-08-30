@@ -1796,3 +1796,16 @@
   Tier-A, fresh Phase-B/evaluator, then S8 rebases onto the new S6 head. S8 stays untouched at
   `f06209d39`; S9/S10/S11/S13 remain stable (checked: all four PRs OPEN/draft/MERGEABLE against
   their own stacked bases, no regression).
+- **D-93 — transplant thread client killed early (exit 143), no work lost; identified the parked
+  Phase-B leaf; resumed same thread.** The launcher client for `01a0546f…` was terminated externally
+  (SIGTERM) while still in early planning (rollout: 102 lines, last event a short planning fragment,
+  no file edits, worktree `007-aspire-s6-new` confirmed unchanged at `2a1248d33`). Resumed the
+  **same thread**, not a rival, with an explicit instruction to restart from step 1 if no edits
+  landed. **Parked Aspire local-runtime Phase-B leaf identified:** S6's own brief
+  (`slices/s6/brief.md:65`) defines Phase B as the lease-backed
+  `runtime.health.listener-unreachable` E2E fixture proving the listener-readiness gate detects an
+  unreachable listener live — this is the leaf the coordinator means, and it depends on the
+  listener-readiness code the transplant thread is currently reconstructing. Sequencing: transplant
+  lands first (its own code is the subject of Phase B), then the DinD lease/relay/receipt/zero
+  protocol executes S6's Phase B immediately per instruction, topology propagated to whichever
+  session runs it.
