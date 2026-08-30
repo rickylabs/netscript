@@ -50,7 +50,13 @@ type CommonErrorMap = Readonly<{
   }>;
 }>;
 
-const commonErrorMap: CommonErrorMap = {
+/**
+ * NetScript's standard error definitions for contracts built from {@link baseContract}.
+ *
+ * The map is owned by NetScript and remains concretely typed so inferred oRPC builders preserve
+ * the exact error codes, status literals, messages, and data schemas.
+ */
+export const commonErrorMap: CommonErrorMap = {
   NOT_FOUND: {
     status: 404,
     message: 'Resource not found',
