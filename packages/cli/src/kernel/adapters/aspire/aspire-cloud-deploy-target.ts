@@ -193,7 +193,11 @@ export class AspireCloudDeployTarget implements DeployTargetPort {
     return this.#result('up', `${this.#aspireBin} ${args.join(' ')}`, result);
   }
 
-  /** Tear down the target through Aspire or Cloud Run. */
+  /**
+   * Tear down the target through Aspire or Cloud Run. Aspire 13.5 exposes
+   * `--yes` only on `destroy`, so the non-interactive AppHost path supplies it
+   * here and never on `publish` or `deploy`.
+   */
   async down(request: DeployTargetRequest): Promise<DeployTargetResult> {
     if (this.#descriptor.mode === 'cloud-run') {
       const image = this.#cloudRunImage(request);

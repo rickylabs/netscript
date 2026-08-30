@@ -143,20 +143,22 @@ finding into a debt entry.
 
 ## packages/cli — CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred
 
-- **Reason:** The scaffold still uses `_aspire-compat.mjs` plus generated
-  `builder.addExecutable(...)` registrations for Deno resources. Current Aspire 13.4 docs state
-  `CommunityToolkit.Aspire.Hosting.Deno` does not expose `addDenoApp` or `addDenoTask` APIs in the
-  TypeScript SDK, and SQLite hosting is C#-only for AppHost APIs with TypeScript directed to
-  `builder.addConnectionString(...)`.
-- **Owner:** Aspire scaffold follow-up.
-- **Target:** Dedicated CommunityToolkit Deno/SQLite TypeScript AppHost integration slice.
-- **Linked plan:** `.llm/tmp/run/chore-align-aspire-13.4.6--impl/plan.md`
+- **Reason:** The scaffold still uses `_aspire-compat.mts` plus generated
+  `builder.addExecutable(...)` registrations for Deno resources. Aspire 13.5.3 restore evidence
+  proves `CommunityToolkit.Aspire.Hosting.Deno` projects `addDenoApp` and `addDenoTask` into the
+  TypeScript SDK, but 0.0.7 retains the proven executable path until its dedicated adoption slice.
+  First-party Deno hosting is scheduled upstream for Aspire 13.6 (aspire#18627, aspire#18628, and
+  aspire#16218). SQLite remains modeled through `builder.addConnectionString(...)`.
+- **Owner:** Aspire 13.5 S12 adoption slice.
+- **Target:** Adopt the restored CommunityToolkit Deno projection in S12/0.0.8; reassess SQLite in
+  the same dedicated integration slice without coupling it to S4 emission re-validation.
+- **Linked plan:** `.llm/runs/chore-aspire-13-5-s4-generator-revalidation--impl/plan.md` (D-4)
 - **Created:** 2026-06-27
 - **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when Aspire/CommunityToolkit exposes the required TypeScript SDK APIs or a
-  redesigned scaffold uses documented TypeScript connection-string modeling, and
-  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the workaround
-  removed.
+- **Gate:** Close after S12 replaces the Deno executable registration and compatibility path with
+  the restored CommunityToolkit projection, preserves documented SQLite connection-string modeling,
+  and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the superseded
+  workaround removed.
 
 ## packages/cli — ISSUE-167-PLUGIN-REMOVE-UNINSTALL
 
@@ -713,8 +715,8 @@ finding into a debt entry.
 ## packages/plugin-streams-core — AP-13 console.warn runtime reporting
 
 - **Reason:** `DurableStreamProducer` previously used `console.warn` for connection, pending-event,
-  serialization, and primary-key visibility in published runtime code. The warning debt was
-  accepted for alpha operator visibility until structured producer telemetry was available.
+  serialization, and primary-key visibility in published runtime code. The warning debt was accepted
+  for alpha operator visibility until structured producer telemetry was available.
 - **Owner:** `@netscript/plugin-streams-core` maintainers.
 - **Target:** Completed by the #1326 reconnect supervisor telemetry integration.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
@@ -2139,8 +2141,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when a compiled/public CLI installs a JSR plugin, resolves its doctor adapter,
   executes a contributed check, and reports import failures as structured doctor errors.
 - **Closure evidence:** `behavior.package-backed-plugin-doctor` was demonstrated red before the
-  product fix, red again after deliberately dropping bounded-probe permission metadata, and green
-  in both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
+  product fix, red again after deliberately dropping bounded-probe permission metadata, and green in
+  both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
   executed 88 printed named gates with 0 failures and 0 skips, including the published workers
   doctor adapter. Its summary counts an unprinted 89th passed step because `suite-runner.ts` adds
   the Docker prune step without emitting a reporter event; see the W2-H `evidence.md`.
@@ -2224,10 +2226,10 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/mcp — guidance contracts deepen over-cap tool-contract table (`mcp-tool-contracts-a8-1102`)
 
-- **Reason:** PR #1404 adds the public `find_guidance` schemas to
-  `src/domain/tool-contracts.ts`, deepening the evaluator-counted file from 301 to 367 lines against
-  the 300-line A8/AP-1/F-1 cap. The same doctrine warning already exists on `origin/main`, so the
-  package-root verdict adds no new finding, but growth inside an over-cap file is still debt.
+- **Reason:** PR #1404 adds the public `find_guidance` schemas to `src/domain/tool-contracts.ts`,
+  deepening the evaluator-counted file from 301 to 367 lines against the 300-line A8/AP-1/F-1 cap.
+  The same doctrine warning already exists on `origin/main`, so the package-root verdict adds no new
+  finding, but growth inside an over-cap file is still debt.
 - **Owner:** MCP contract-surface follow-up.
 - **Target:** Before the next MCP public-tool expansion.
 - **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/plan.md`; issue #1102;
@@ -2240,16 +2242,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
 
-- **Reason:** PR #1427 deepens
-  `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906 lines against the 500-line
-  A8/AP-1/F-1 cap while adding the named-app and browser-reference gates. The same slice grows the
-  scaffold gate directory from 41 to 43 direct children against F-16. Both were already over their
-  doctrine limits; splitting the established runtime registry during the release-blocking scaffold
-  feature would mix an architecture migration into behavioral acceptance.
+- **Reason:** PR #1427 deepens `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906
+  lines against the 500-line A8/AP-1/F-1 cap while adding the named-app and browser-reference gates.
+  The same slice grows the scaffold gate directory from 41 to 43 direct children against F-16. Both
+  were already over their doctrine limits; splitting the established runtime registry during the
+  release-blocking scaffold feature would mix an architecture migration into behavioral acceptance.
 - **Owner:** CLI E2E scaffold-runtime maintainers.
 - **Target:** Before the next scaffold runtime gate or probe is added.
-- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue #1333;
-  PR #1427.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue
+  #1333; PR #1427.
 - **Created:** 2026-08-09
 - **Status:** open, DEBT_ACCEPTED for #1427; registry entry added after IMPL-EVAL cycle 1. **Not
   deepened by PR #1449** (2026-08-11) — see the stop-condition note below.
@@ -2266,9 +2267,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   baseline 43 plus the one bounded `service-env/` subdirectory, whose own **12** files sit **exactly
   at** the 12-child cap — not comfortably inside it. IMPL-EVAL recorded 10 here; the remediation
   slices then added `gate-permission-probe.ts` and `service-env-gates_test.ts`, and the count was
-  not re-measured, so the record was a false-done. Corrected by measurement at head.
-  **Stop condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a
-  sibling directory, requires the owed `runtime-gates.ts` split first rather than another bounded
+  not re-measured, so the record was a false-done. Corrected by measurement at head. **Stop
+  condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a sibling
+  directory, requires the owed `runtime-gates.ts` split first rather than another bounded
   subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
   entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
   so the full split is still owed, and the next gate faces the same condition.
