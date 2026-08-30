@@ -11,8 +11,8 @@
 
 ## Design
 
-Design is locked for PLAN-EVAL. Implementation remains blocked until a separately dispatched
-opposite-family evaluator returns `PASS`.
+Design is locked. After independently verifying the final PLAN-EVAL findings, the owner released the
+plan gate with bounded F1/F2 corrections and authorized implementation; there is no cycle 3.
 
 ### Public Surface
 
@@ -40,9 +40,9 @@ opposite-family evaluator returns `PASS`.
 
 ### Commit Slices
 
-Plan artifacts → separately certified PLAN-EVAL → visible RED test commit → source-safe literal and
-binding emission → composed-level grammar lock → final static evidence. No implementation slice
-starts before PLAN-EVAL `PASS`.
+Plan artifacts → owner-released PLAN-EVAL → visible RED test commit → source-safe literal and
+binding emission → composed-level grammar lock → final static evidence → separately dispatched
+IMPL-EVAL.
 
 ### Deferred Scope
 
@@ -56,14 +56,17 @@ composed config boundary → final static gates.
 
 ## Progress Log
 
-| Date       | Slice       | Step               | Notes                                                                                                                                                          |
-| ---------- | ----------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30 | research    | compatibility gate | Exact Aspire grammar rejects currently scaffoldable `a--b`, `a-`, and over-64 names; stopped before implementation.                                            |
-| 2026-08-30 | plan        | owner decision     | Locked source-safe emission first, then exact config grammar; approved observable fail-fast correction.                                                        |
-| 2026-08-30 | plan        | published surface  | Moved the planned rule from exported `constants.ts` to a private `src/domain` module after correcting the JSR-surface analysis.                                |
-| 2026-08-30 | plan        | baseline           | Doc-lint exits 1 on existing private-type refs; JSR audit exits 1 on four existing module-tag failures plus one slow-types warning. Neither is reported green. |
-| 2026-08-30 | plan-eval   | cycle 1 `FAIL_FIX` | Evaluator proved D1 missed reserved/invalid/shadowing identifiers and non-name literal sites; evaluated head `fddcb833ba5e49466ac942112b41bd7712aa7c17`.       |
-| 2026-08-30 | plan repair | F1/F2 resolution   | Locked user-text-free ordinal bindings; unconditional entrypoint/workdir escaping; conditional concurrency-key escaping; composed-only validation.             |
+| Date       | Slice       | Step               | Notes                                                                                                                                                               |
+| ---------- | ----------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30 | research    | compatibility gate | Exact Aspire grammar rejects currently scaffoldable `a--b`, `a-`, and over-64 names; stopped before implementation.                                                 |
+| 2026-08-30 | plan        | owner decision     | Locked source-safe emission first, then exact config grammar; approved observable fail-fast correction.                                                             |
+| 2026-08-30 | plan        | published surface  | Moved the planned rule from exported `constants.ts` to a private `src/domain` module after correcting the JSR-surface analysis.                                     |
+| 2026-08-30 | plan        | baseline           | Doc-lint exits 1 on existing private-type refs; JSR audit exits 1 on four existing module-tag failures plus one slow-types warning. Neither is reported green.      |
+| 2026-08-30 | plan-eval   | cycle 1 `FAIL_FIX` | Evaluator proved D1 missed reserved/invalid/shadowing identifiers and non-name literal sites; evaluated head `fddcb833ba5e49466ac942112b41bd7712aa7c17`.            |
+| 2026-08-30 | plan repair | F1/F2 resolution   | Locked user-text-free ordinal bindings; unconditional entrypoint/workdir escaping; conditional concurrency-key escaping; composed-only validation.                  |
+| 2026-08-30 | plan-eval   | cycle 2 `FAIL_FIX` | Owner independently confirmed the flow-B fixture anchors and U+2028 comment seam, supplied mechanical satisfying conditions, and released the gate with no cycle 3. |
+| 2026-08-30 | plan repair | gate release       | Pushed the bounded amendment at `f1d7d9d8f738b4907e1c770051ee1f59abaacc4a`; evaluator verdict files stayed untouched.                                               |
+| 2026-08-30 | RED         | focused tests      | Structured two-file wrapper executed 99 results: 67 passed, 32 failed. Failures expose 24 missing config rejections plus six generator source/execution seams.      |
 
 ## Decisions
 
@@ -75,25 +78,27 @@ composed config boundary → final static gates.
 | Schema placement  | composed custom validation      | Prevent validation from leaking into published JSON schema for unrelated sections.                                                   |
 | Compatibility     | deliberate fail-fast correction | `a--b`, `a-`, and over-64 names are observably rejected earlier but are not runnable Aspire names today.                             |
 | Published surface | private rule module             | Avoid a permanent JSR export for an internal parsing invariant; keep `./constants` unchanged.                                        |
-| PLAN-EVAL         | cycle 2 of 2 `pending`          | Cycle 1 returned `FAIL_FIX`; owner dispatches cycle 2 separately, and this lane does not launch, simulate, or certify it.            |
+| PLAN-EVAL         | released after cycle 2          | Owner independently verified final mechanical findings, fixed the plan contract, authorized RED, and declared no cycle 3.            |
 
 ## Gate Results
 
-| Gate                                                          | Exit | Result                                                                                      |
-| ------------------------------------------------------------- | ---: | ------------------------------------------------------------------------------------------- |
-| `deno task doc:lint --root packages/aspire --pretty` baseline |    1 | RED BASELINE — zero missing JSDoc/combined errors; existing private-type-reference findings |
-| `audit-jsr-package.ts --root packages/aspire --text` baseline |    1 | RED BASELINE — four existing F-JSR-2 failures, one F-JSR-7 warning; dry-run OK              |
-| Root `deno task test`                                         |    — | **NOT FIRED** by owner instruction; no false green substituted                              |
-| Implementation gates                                          |    — | NOT RUN; no source or tests changed                                                         |
-| PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                  |
+| Gate                                                          | Exit | Result                                                                                        |
+| ------------------------------------------------------------- | ---: | --------------------------------------------------------------------------------------------- |
+| `deno task doc:lint --root packages/aspire --pretty` baseline |    1 | RED BASELINE — zero missing JSDoc/combined errors; existing private-type-reference findings   |
+| `audit-jsr-package.ts --root packages/aspire --text` baseline |    1 | RED BASELINE — four existing F-JSR-2 failures, one F-JSR-7 warning; dry-run OK                |
+| Root `deno task test`                                         |    — | **NOT FIRED** by owner instruction; no false green substituted                                |
+| First wrapper invocation                                      |    1 | REFUSAL — type-check stopped before TAP selection; fixed test typing and did not count as RED |
+| Focused RED wrapper                                           |    1 | EXPECTED RED — 67 passed, 32 failed, 99 total, 32 unique failures                             |
+| PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                    |
+| PLAN-EVAL cycle 2                                             |    — | `FAIL_FIX`; owner-verified mechanical corrections applied and gate released; no cycle 3       |
 
 ## Handoff Notes
 
-- PLAN-EVAL cycle 2 of 2 is pending and is the only authorized next action; the owner dispatches it
-  separately.
+- Visible RED is established. Slice 2 may now change only the background generator, both focused
+  generator tests, the flow-B fixture, and run artifacts under the locked contract.
 - Aspire grammar was **not executed against Aspire in this leaf**. The source/docs-derived rule is
   protected by load-bearing literal escaping plus user-text-free ordinal bindings in the
   implementation order.
-- Final published plan head: the commit containing this worklog, resolved by branch `HEAD` after
-  publication; its exact immutable SHA is copied into the PR `[PHASE: PLAN]` comment and final
-  handoff because a Git commit cannot contain its own object ID.
+- Plan-release head: `f1d7d9d8f738b4907e1c770051ee1f59abaacc4a` (copied from `git log`).
+- The RED commit SHA is copied from `git log` into the PR slice comment after publication because a
+  Git commit cannot contain its own object ID.
