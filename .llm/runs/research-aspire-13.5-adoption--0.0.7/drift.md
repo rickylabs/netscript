@@ -879,7 +879,7 @@
   (no writer cut), as one narrow code slice with a fixture test. Then docs_audit cycle 2
   - IMPL-EVAL cycle 2 (scoped re-eval) at the fixed head. Two-failure escalation rule applies.
 
-## D-48 — 2026-08-30 — S9 IMPL-EVAL cycle 2 at `f6ca9695`: `PASS`, `FAIL`, `N/A`, `PENDING_SCRIPT`, `DEBT; two low residuals become pre-Phase-B conditions
+## D-48 — 2026-08-30 — S9 IMPL-EVAL cycle 2 at `f6ca9695`: **`PASS` — phase A only**; two low residuals become pre-Phase-B conditions
 
 - Independent Claude · Fable 5 · medium session `b8a63574…` (`slices/s9/evaluate-cycle-2.md`; PR
   #1759 comment 5468684689). F-1/F-2 closed (citation → real `docs-api-search-help` receipt; failure
