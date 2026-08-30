@@ -2794,3 +2794,11 @@ Final state: PR #1800 head `a0c4c7c95407499b2ea60709059ab8c120c5f5d7`, terminal 
 OpenHands `status:` label-race has now recurred four times across three consecutive PRs in this
 queue — worth root-causing or disabling the conflicting automation on `docs:` PRs rather than
 absorbing it per-PR.**
+
+### #1800 confirmed terminal, human-merge handoff recorded
+
+Re-verified immediately before dispatching the next slice: PR #1800 head
+`a0c4c7c95407499b2ea60709059ab8c120c5f5d7` unchanged, `mergeStateStatus: CLEAN`, `mergeable:
+MERGEABLE`, sole `status:ready-merge` on both PR #1800 and issue #1799, issue 4/4 boxes, both still
+`OPEN` awaiting the human owner's merge per NAS repository policy. No further action taken on this
+PR by this session; handed off.
