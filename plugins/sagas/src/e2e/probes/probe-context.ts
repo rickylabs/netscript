@@ -1,6 +1,5 @@
-import { normalizeProbePath, resolveProbeUrl } from '@netscript/plugin';
+import { normalizeProbePath } from '@netscript/plugin';
 
-const DEFAULT_SAGAS_URL = 'http://127.0.0.1:8092';
 const DEFAULT_HEALTH_PATH = '/health';
 const DEFAULT_ROUNDTRIP_PATH = '/api/v1/sagas/publish';
 
@@ -19,7 +18,16 @@ export interface SagasRoundtripProbePayload {
 
 /** Resolve the sagas service URL used by E2E probes. */
 export function resolveSagasProbeUrl(): string {
-  return resolveProbeUrl(['SAGAS_API_URL', 'NETSCRIPT_SAGAS_URL'], DEFAULT_SAGAS_URL);
+  const value = Deno.env.get('services__sagas-api__https__0') ??
+    Deno.env.get('services__sagas-api__http__0') ??
+    Deno.env.get('SAGAS_API_URL') ??
+    Deno.env.get('NETSCRIPT_SAGAS_URL');
+  if (value === undefined) {
+    throw new Error(
+      'Sagas probe endpoint was not discovered. Configure an Aspire service reference or SAGAS_API_URL.',
+    );
+  }
+  return value.replace(/\/$/, '');
 }
 
 /** Resolve the health path used by E2E probes. */
