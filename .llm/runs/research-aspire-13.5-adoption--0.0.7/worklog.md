@@ -457,4 +457,7 @@ run 33328972788 dispatched 18:45:25Z. S7 Phase B: honest FAIL on its reporter (r
 descendants `unproven`), foreign-control non-mutation PASS; static reporter-fix cycle dispatched on
 thread `01a053ef…`; rerun after S8. | | S3 IMPL-EVAL cycle 4 (phase B) **PASS** at `6c699ab66` |
 `slices/s3/evaluate-cycle-4.md` (session `dfc30c9e…`). S3 Phase B complete; converging onto main
-`52a881c5` + hosted tiers → merge-candidate handover (coordinator lands). |
+`52a881c5` + hosted tiers → merge-candidate handover (coordinator lands). | | S1 gate correction
+pushed `e0d70e404979` | Thread `01a05401…`: live second-endpoint proof + negative stale case (RED
+wrapper exit 1 → GREEN 29/0), check 170/0, arch/quality green. Refrozen; hosted tiers queued behind
+the serial chain (chain-2); delta IMPL-EVAL on runtime green — run 33328727942 not reused. |
