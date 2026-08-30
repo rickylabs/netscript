@@ -5544,3 +5544,38 @@ package suite**, because S2C touches e2e paths and both sides of that compositio
 and **do not execute `e2e:cli`/`scaffold.runtime`/AppHost/containers** — not merely out of author
 scope, but because the singleton host runtime lease is held by another lane right now and starting
 runtime would collide with a live leaseholder.
+
+### #1357 S2C reviewed and accepted at `dbb62c065`; S2D dispatched (NOT Tier-A yet)
+
+| Check | Result |
+| --- | --- |
+| Red-before `7ed5b94c6` (test-only, two test files) | e2e tests exit 1, **167 passed / 3 failed** |
+| Green at `dbb62c065` | **170 passed / 0 failed** |
+| **Whole `packages/cli`** | exit 0, **1386 passed / 0 failed** |
+| `deno check --unstable-kv` | 0 occurrences |
+| `deno.lock` vs `de57fab0` | byte-unchanged |
+| **Full leaf ceiling** | exactly **12 paths** — all twelve items used, nothing outside |
+
+**The gate is genuinely selected, not merely defined** — PLAN-EVAL cycle 1's blocking finding, checked
+by me at the blob rather than taken on report: `SCAFFOLD_UI_DATA_SCREEN: 'scaffold.ui-data-screen'` at
+`cli-surface.ts:78`, selected into `RUNTIME_GATES` at `capability-suites.ts:54`. Definition,
+registration, id, tests and selection all landed.
+
+**Correction to my own last report: S2C is not the final slice.** I told the coordinator the next step
+after S2C was Tier-A. Wrong — `plan.md` row 205 defines **S2D**, "merge-readiness evidence and
+supervisor runtime handoff", run-artifacts only, and `context-pack.md` Next Steps names it explicitly.
+I had grepped the slice table over too narrow a range and read S1/S2A/S2B/S2C as complete. Dispatching
+an evaluator now would have repeated the exact #1368 mistake — evaluating a mid-plan head — which is the
+one precondition I wrote into memory after it cost a cycle. The rule caught it: **context-pack Next
+Steps naming an unlanded slice is a hard stop for the dispatcher.**
+
+**A PLAN-EVAL carry-forward was also still outstanding.** `plan.md` rows 221 and 222 still read "the 9
+existing ceiling TS files"; the repaired ceiling has **10** (12 paths, items 8 and 10 new). It had not
+been folded in despite being passed to the author twice. Included in the S2D dispatch with the specific
+row numbers so it cannot be missed again — the lesson being that a carry-forward stated as prose gets
+lost, while one stated as "rows 221 and 222 say X, make them say Y" does not.
+
+S2D dispatched: quality/arch/JSR/publish/read-only-cascade evidence; `check:assets-barrel` stays
+`NOT_RUN` because it writes before it diffs; lint/fmt recorded N/A by configuration; runtime gate stays
+`NOT_RUN` with the **corrected** rationale — D-42/D-43 are resolved, so it is queued on lease
+availability rather than blocked by topology, and the author is told not to restate the dead blocker.
