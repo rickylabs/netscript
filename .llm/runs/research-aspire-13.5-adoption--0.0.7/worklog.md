@@ -75,3 +75,15 @@ files the epic and PLAN-EVAL passes.
 Cycle 1: `FAIL_PLAN` (`plan-eval.md`, evaluator route Codex · GPT-5.6 Sol · high, head `d8caa507e`).
 Repair applied at the head recorded above; a second cycle requires owner authorization (the verdict
 authorizes none by itself).
+
+## NAS recovery — 2026-08-30
+
+- Recreated the Aspire supervisor worktree at
+  `/home/agent/projects/netscript/worktrees/007-aspire` from authoritative remote head
+  `3707e4eae3915482b47063ff0ee4a76c88f71df8`; the historical `/home/codex/...` path and session
+  registry were not resumed.
+- `deno task agentic:check-claude` found only the generated `netscript-pr` Claude skill mirror
+  stale. `deno task agentic:sync-claude` regenerated that one mirror, and the full Claude surface
+  then passed. No product, Aspire runtime, Docker, lock, cache, or slice file changed.
+- Fresh native Remote Control supervisor identity and subsequent steering are recorded in the next
+  checkpoint after attachment; topic ownership and the S1-S7 queue remain unchanged.
