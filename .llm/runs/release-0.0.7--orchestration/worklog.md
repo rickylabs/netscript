@@ -2655,3 +2655,15 @@
   after the currently active S4/S5/proof chain. Combined S10 proof `33328972788` at `d0023b834`
   passed static, desktop, and 53 SQLite/Garnet gates before the sole dashboard-unavailable Aspire
   MCP failure; Postgres was cancelled by fail-fast, so no unchanged retry is authorized.
+
+## 2026-08-30T19:17:52Z — S4 shipped and S5 released
+
+- PR #1738 at exact head `b2a0529fa19b5726c41fdbf6a7678bb67f95347b` passed full hosted
+  run `33329737311`, refreshed merge-ref CI `33328754543`, close-gate, six mirrored acceptance rows,
+  and zero review threads. Its 17-path delta had zero intersection with the intervening S3 main
+  advance, so the coordinator merged it without a receipt-invalidating rebase as main
+  `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`. #1716 closed; both records are sole
+  `status:shipped`.
+- Aspire was directed immediately into S5 current-main convergence and its outstanding review
+  repairs while the independent S7 pre-runtime bootstrap-order correction retains the single local
+  runtime lease. No global lane barrier was introduced.

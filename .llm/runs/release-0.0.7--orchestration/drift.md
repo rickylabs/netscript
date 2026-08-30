@@ -1427,3 +1427,12 @@ implementation thread.
   `e0d70e404979` expansion exists only in historical hook telemetry and is not evidence. S10's next
   boundary is dashboard/MCP availability after 53 passing runtime gates, not the already-repaired
   NDJSON parser and not another infrastructure fallback.
+
+## 2026-08-30 — S4 and the S7 bootstrap failure have distinct dispositions
+
+- S4 is terminal merged at main `74e3d451e`; stale `status:ci-fail` or baseline-blocked prose for
+  #1716/#1738 is invalid. Its prior exact-head runtime receipts remained current because the S3
+  advance had zero changed-path intersection and refreshed merge-ref CI passed.
+- S7 did not reach Aspire or Docker in its first post-S3 attempt. `deno install` encountered a local
+  generated-module ordering dependency before AppHost start. This is neither D-42 nor D-43; preserve
+  the red receipt, correct only canonical bootstrap ordering, and start a new attempt from exact zero.

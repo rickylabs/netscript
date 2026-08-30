@@ -1609,3 +1609,13 @@ continues concurrently because serial ordering is per orchestrator, not global.
   PRs #1738 and #1747 must integrate current main and clear their stale `status:ci-fail` state before
   merge; #1740 additionally has two unresolved review threads. Do not merge merely from old green
   checks.
+
+## Resume checkpoint — 2026-08-30T19:17:52Z
+
+- Exact main is `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`: S4 PR #1738 shipped after
+  full exact-head E2E, refreshed merge-ref CI, close-gate, 6/6 acceptance, zero threads, and a
+  zero-intersection current-main audit. Issue #1716 and the PR are sole `status:shipped`.
+- S5 is released for current-main convergence and review repair. S7's first new Phase-B attempt
+  stopped before runtime on missing generated Zod CRUD artifacts; host cleanup remained exact zero.
+  The only authorized continuation is a canonical bootstrap-order RED/GREEN correction, Tier-A,
+  refrozen head, and one new serialized attempt—never an unchanged retry or DinD fallback.

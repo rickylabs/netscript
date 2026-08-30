@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "9710a2898d4f0536752ab303b737e70411a4c399",
+  "currentMainSha": "74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -156,8 +156,8 @@
       ]
     },
     "latestCheckpoint": {
-      "at": "2026-08-30T19:08:48.000Z",
-      "mainSha": "9710a2898d4f0536752ab303b737e70411a4c399",
+      "at": "2026-08-30T19:17:52.000Z",
+      "mainSha": "74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
       "aspireFiledIssues": [
@@ -183,6 +183,7 @@
       "pr1731": "phase_1_plan_live_on_draft_pr_for_1466_features_tier_a_then_single_risk_selected_plan_eval_active",
       "aspireS2": "merged_shipped_issue1714_closed",
       "aspireS3": "pr1741_merged_as_9710a2898_after_real_local_phase_b_cycle4_impl_eval_pass_exact_head_full_ci_and_close_gate_issue1715_closed_shipped",
+      "aspireS4": "pr1738_merged_as_74e3d451e_after_full_exact_head_e2e_current_merge_ref_ci_close_gate_acceptance_and_zero_review_threads_issue1716_closed_shipped",
       "aspireS7": "tier_a_green_provenance_repair_head_4aac6d7be_local_phase_b_next_serial_host_lease_after_s3_merge",
       "aspireS10": "combined_hosted_proof_d0023b834_passed_static_desktop_and_53_runtime_gates_then_failed_only_agent_aspire_mcp_smoke_dashboard_unavailable_postgres_cancelled_by_fail_fast",
       "freshHydration": "issue1734_open_and_gpt_5_6_sol_high_red_first_repair_active_non_runtime_work_does_not_wait_for_aspire_s2_lease",
@@ -3306,17 +3307,18 @@
     {
       "id": "aspire-13-5-s4-generator-revalidation",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "732992415ff819f73474816cd8d0e979c5db348c",
-      "currentPrHeadSha": "732992415ff819f73474816cd8d0e979c5db348c",
+      "headSha": "b2a0529fa19b5726c41fdbf6a7678bb67f95347b",
+      "currentPrHeadSha": "b2a0529fa19b5726c41fdbf6a7678bb67f95347b",
       "issueNumbers": [1716],
       "branch": "chore/aspire-13-5-s4-generator-revalidation",
       "prNumber": 1738,
-      "implementationState": "exact product head retained but live PR is status:ci-fail on the same baseline failure as #1740; this is not a merge handoff",
-      "ciState": "baseline_blocked_status_ci_fail",
-      "blocker": "shared baseline failure; live status:ci-fail",
-      "nextGate": "wait for the shared baseline correction, then re-evaluate only the affected close gate; no human merge handoff while status:ci-fail"
+      "implementationState": "full exact-head E2E and refreshed current-merge-ref CI passed; acceptance 6/6, zero review threads, zero changed-path intersection with the S3 main advance; coordinator merged and normalized #1716/#1738 to status:shipped",
+      "ciState": "success",
+      "mergeCommitSha": "74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9",
+      "mergedAt": "2026-08-30T19:17:52.000Z",
+      "nextGate": "terminal merged; release S5 convergence and review repair"
     },
     {
       "id": "aspire-reference-name-validation",
@@ -5244,7 +5246,7 @@
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-30T19:08:48.000Z"
+    "verifiedAt": "2026-08-30T19:17:52.000Z"
     },
-  "updatedAt": "2026-08-30T19:08:48.000Z"
+  "updatedAt": "2026-08-30T19:17:52.000Z"
 }

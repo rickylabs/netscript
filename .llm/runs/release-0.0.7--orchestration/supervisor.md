@@ -1362,3 +1362,11 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   Slice 2 Tier-A/evaluation, internals is recovering #1774 cycle 2 into implementation, and docs is
   taking #1784 through Tier-A/evaluation. Serial ordering remains per supervisor; only host runtime
   execution is globally serialized.
+
+## 2026-08-30T19:17:52Z — S4 merge packet consumed
+
+- Coordinator merged S4 PR #1738 as main `74e3d451e`, closed #1716, normalized both lifecycle
+  labels, and directly released the Aspire supervisor into S5 convergence/review repair.
+- S7's failed pre-runtime bootstrap receipt is preserved with host zero. The supervisor has a
+  coordinator-bounded canonical ordering correction and one newly refrozen attempt; it may not
+  unchanged-retry or reinterpret the failure as a DinD regression.
