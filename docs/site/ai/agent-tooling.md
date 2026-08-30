@@ -56,6 +56,9 @@ an existing project and adds native MCP wiring. When omitted, one existing `.zed
 directory is honoured; if both exist, select explicitly. Unsupported editor names fail with the
 supported list and instructions to use `--editor none` plus a manual MCP configuration.
 
+Every host receives the canonical NetScript skill bundle under `.agents/skills/` and a marked
+NetScript section in `AGENTS.md`. Host and editor targets add only their own integration files:
+
 If network lookup is unavailable or the framework is unfamiliar, add `--with-docs`. This opt-in
 expands a several-megabyte local corpus containing the release-built prose and task router plus
 `deno doc` output for every export subpath of each exact NetScript package version found in the
@@ -63,11 +66,11 @@ project. Version disagreement or a failed documentation command aborts before th
 is written; without the flag, no offline corpus is installed. When the bundle is installed, every
 generated host command receives the same absolute `--docs-root <project>/.netscript/docs` pair.
 
-| Host        | Files written                                                                                        |
-| ----------- | ---------------------------------------------------------------------------------------------------- |
-| Claude Code | `.mcp.json`, NetScript skills under `.claude/skills/`, and a marked NetScript section in `AGENTS.md` |
-| VS Code     | `.vscode/mcp.json`                                                                                   |
-| Zed         | `.zed/settings.json` with `context_servers` (plus Deno settings, tasks, and debug configuration)     |
+| Host or editor target | Additional files written |
+| --- | --- |
+| Claude Code host | `.mcp.json` and a derived mirror of the canonical bundle under `.claude/skills/` |
+| VS Code editor | `.vscode/mcp.json` |
+| Zed editor | `.zed/settings.json` with `context_servers` (plus Deno settings, tasks, and debug configuration) |
 
 The generated MCP configuration runs `netscript agent mcp` for the current
 project. Re-running `agent init` is idempotent: unchanged files are left alone,
