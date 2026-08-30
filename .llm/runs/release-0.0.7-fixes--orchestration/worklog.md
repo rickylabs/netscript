@@ -3104,3 +3104,59 @@ matter: whether the three-move design **dominates** its alternatives or merely w
 compatibility contract names who breaks; whether the generated-file handling is right; whether the S2
 red-before is real; and whether the new `./presets` entry **proves** browser-safety rather than
 asserting it, since a curated re-export can reintroduce a server import transitively.
+
+## 2026-08-30 — #1462 PLAN-EVAL cycle 1 `FAIL_PLAN`; repair dispatched
+
+Verdict commit `7c6ca56e` on `eval/plan-eval-1462-cycle-1`, pushed. Four blocking findings, three
+minors, two advisory. **Cycle 1 of the two permitted.** No implementation slice may begin until a
+revised plan passes cycle 2.
+
+The plan's structure, doctrine verdict, three-move design, and ceiling discipline were accepted.
+Every blocking finding is about **measurement** — the evaluator executed what the plan described and
+found the described outcome does not occur. That is the standard this lane wants and rarely gets.
+
+### F1 — the locked S2 red would crash for an unrelated reason
+
+The evaluator ran the planned S2 shape (fresh child, delete `globalThis.Deno`, install `window`,
+import `packages/sdk/mod.ts`) and got
+`ReferenceError: Deno is not defined at isWarmupPhase (ext:deno_node/internal/options.ts)`. Deno's
+Node-compat layer reads `Deno` while the root's npm dependencies load, **before** `hasCacheProvider`
+can be observed. The plan itself names "unrelated Deno-global crash" as an unacceptable red and never
+measured that its own shape produces exactly that.
+
+The control run is the constructive half: with the runtime **intact**, root import →
+`hasCacheProvider() === true`, preset import → `false`. The red is already available without deleting
+the runtime, so S2 re-locks with the runtime intact and the browser-shaped evidence moves to a
+committed static-graph assertion.
+
+### F2 — the generated-derivative cascade is mis-attributed, and the ceiling misses its real outputs
+
+`check:publish-assets` **never reads `docs/site/`**; it rebases the checked-in
+`.llm/assets/agent-docs/prose.json.gz`. The gate that turns red when
+`docs/site/reference/sdk/index.md` changes is **`check:agent-docs-prose`**, whose generator writes
+`.llm/assets/agent-docs/prose.json.gz` and `.llm/assets/agent-docs/provenance.json` — **neither in the
+ceiling**, whose own rule is rescope-and-stop. As written, S3 either stops on an undeclared path or
+ships a red CI gate.
+
+**This lane's own record already lists `check:agent-docs-prose` as one of the four cascade gates a
+public-surface or doc-corpus edit obliges.** The plan caught two of four. The lesson was written down
+and still half-missed, which is the useful part: the cascade has to be **derived from the tooling**,
+not recalled from a list. That instruction is now in the repair brief.
+
+### F3 and F4
+
+`deno task docs:exports-drift` is the gate that proves the new `./presets` row on the reference page —
+adding the subpath without a matching entrypoint row fails it, and the plan has no such row. And the
+compatibility contract leaves three published pages (`web-layer/query-bridge.md`,
+`web-layer/server.md`, `services-sdk/sdk.md`) still teaching the auto-registration being removed;
+either they join the ceiling or a deferred follow-up is recorded with a PR-body caveat.
+
+F9 flags a neighbouring leak in `packages/fresh` that is **out of leaf scope** — explicitly not taken.
+
+### Repair dispatched
+
+Same thread `01a05238`, sent once it was `idle | turn complete`, delivery proven from the target
+rollout (`agent-docs-prose`, `docs:exports-drift`, `crash for an unrelated reason` all present), no
+active-writer conflict, and **no `timeout` wrapper** — the prohibition now holds in practice, not just
+in the record. Scope is the plan and its run artifacts only; S2 stays blocked until PLAN-EVAL cycle 2
+passes.
