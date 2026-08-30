@@ -15,9 +15,9 @@ and the cycle-1 evaluator; you inherit no verdict.
   `--allow-env=ASPIRE_CLI_START_TIMEOUT` and no receipt on that failure branch; F-3 missing
   malformed-NDJSON / pending-state tests; F-4 convergence bar accepted Running+Unhealthy; F-7 dead
   file; notes F-5/F-6/F-8.
-- Evaluate **exactly** head `__HEAD__`; scoped range `14daa764..__HEAD__` for the fixes, and re-run
+- Evaluate **exactly** head `c61b1626`; scoped range `14daa764..c61b1626` for the fixes, and re-run
   the gate set to confirm nothing regressed. Worktree:
-  `/home/agent/projects/netscript/worktrees/007-aspire-s10-eval` (detached at `__HEAD__`, read-only
+  `/home/agent/projects/netscript/worktrees/007-aspire-s10-eval` (detached at `c61b1626`, read-only
   for product files). Supervisor run dir:
   `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`
   (read `slices/s10/evaluate.md`, `slices/s10/review-tier-a.md`,
