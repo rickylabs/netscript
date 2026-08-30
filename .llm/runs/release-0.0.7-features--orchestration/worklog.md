@@ -7295,3 +7295,64 @@ survived review.
 | #1664 | parked at `20337441788b` |
 
 No new features leaf until one closes.
+
+## 2026-08-30 — #1730 merge-ready and handed off; #1387 parked
+
+### Coordinates handed to the coordinator
+
+| Field | Value |
+| --- | --- |
+| **Merge head** | **`899e30ad832cdd2b4dd62eb95592ce51384a9acd`** |
+| **Content head** | `1c836918abde397b320941f70063d83f25f6c355` |
+| Evidence above content | `6977debd`, `899e30ad` — `evaluate.md` only, zero product bytes |
+| PR #1763 | OPEN, not draft, `MERGEABLE` / **`CLEAN`**, milestone `0.0.7` |
+| Closing | `closingIssuesReferences: [1730]` |
+| Labels | PR and issue both exactly `status:ready-merge` |
+| Issue #1730 | **5 checked / 0 unchecked**, ticked by the **mirror** |
+| CI | run `33317991712` **attempt 3, `completed/success`** — `close-gate`, `quality`, `check-test`, `classify changes`, `core CI lane visibility`, `Phase eval PR` all green |
+| Threads | **PASS**, 1 thread, 0 unanswered |
+
+### Verdict chain
+
+Tier-A `ACCEPTED` at `1baabbd6` → IMPL-EVAL cycle 1 **`FAIL_FIX`** → repair → Tier-A `ACCEPTED` at
+`1c836918` → IMPL-EVAL cycle 2 **`PASS`, terminal**. Failure count **1 of 2**.
+
+### The close-gate lesson — a first green that was not a pass
+
+`close-gate` initially reported `success`, and taking that at face value would have handed over a head
+whose gate result predated the corrections. Re-running it against the corrected body and label
+produced **attempt 2 `failure`**, on exactly one step: **`Answered review-thread gate`**.
+
+The cause was not the body or the label — both of which the coordinator had flagged and I had already
+fixed — but an `augmentcode[bot]` review thread that arrived after the first close-gate run. Answering
+it (a reply satisfies the gate; resolution is not required) flipped `review-threads` to **PASS** and
+attempt 3 to **`completed/success`**.
+
+**Generalisation worth keeping:** a green gate is only evidence about the state it observed. Any
+mutation of the reviewable surface after it ran — body, labels, **or a new review thread** — invalidates
+it, and only a rerun re-establishes it. This is the CI-side twin of the receipt rule (`argv` and
+`durationMs`, not `exitCode`): in both cases the artifact looked like a pass while attesting something
+other than the current state.
+
+### The review finding was correct, and is answered but not yet fixed
+
+`augmentcode[bot]` on `context-pack.md:50`: the pack still instructs a resumer to commit R1 and cut the
+receipts, all of which landed at `1c836918`. Verified against the file — it is right, and it is the
+same C-1 resume-hazard class a sibling leaf repaired earlier in this milestone.
+
+Answered on the thread (`discussion_r3889708716`) with the correction drafted and an explicit statement
+of the trade: the edit is evidence-only and leaves the content head at `1c836918`, but committing it
+moves the **PR** head off `899e30ad` — the head CI has proven green and the coordinator's audit
+blessed. Held for the coordinator's decision rather than taken unilaterally; committed to landing it
+either pre-merge or immediately post-merge so the stale text never reaches a resumer merged.
+
+### Lane state
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **SHIPPED** |
+| #1730 / PR #1763 | **merge-ready**, handed off at `899e30ad`; awaiting coordinator merge |
+| #1387 / PR #1762 | **PARKED** at `a72af9a4`, `FAIL_PLAN` preserved, five required fixes recorded |
+| #1664 | parked at `20337441788b` |
+
+`origin/main` remains `3e5cbabf`. No new features leaf until #1730 closes.
