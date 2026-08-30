@@ -87,17 +87,20 @@ a new cwd/worktree case without changing production code.
 
 ## Progress Log
 
-| Time       | Slice     | Step        | Notes                                                                                                                     |
-| ---------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30 | Bootstrap | Activated   | Loaded required authorities; verified branch/baseline; pushed first commit and opened draft PR #1775.                     |
-| 2026-08-30 | Research  | Re-derived  | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output pushed in `research.md`. |
-| 2026-08-30 | Plan      | Locked      | Combined settings/logger repair, granular permissions, RED→GREEN fixture, gate set, and sibling-defect deferral recorded. |
-| 2026-08-30 | Plan      | PR sync     | Updated draft body/comment and moved exactly one lifecycle label to `status:plan-eval`; REST fallback recorded in drift.  |
-| 2026-08-30 | PLAN-EVAL | Cycle 1     | `FAIL_PLAN` at `26102943`; evaluator artifact committed at `842816a2`; implementation remained stopped.                   |
-| 2026-08-30 | Plan      | Amendment   | Corrected launch-root semantics and pinned decoy, host-path, and #1776 contracts for cycle 2.                             |
-| 2026-08-30 | PLAN-EVAL | Cycle 2     | `PASS` at `2e5f50f0`; artifact-only verdict committed at `2cfc0b4c9`; both evaluator files remain bit-identical.          |
-| 2026-08-30 | S3        | RED fixture | Added live-settings coverage; root and decoys pass, while nested `PreToolUse` and `Stop` each fail before repair.         |
-| 2026-08-30 | S3        | Fmt nit     | Applied the cycle-2 `research.md` table fix and formatted all five files changed by this slice.                           |
+| Time       | Slice     | Step         | Notes                                                                                                                     |
+| ---------- | --------- | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30 | Bootstrap | Activated    | Loaded required authorities; verified branch/baseline; pushed first commit and opened draft PR #1775.                     |
+| 2026-08-30 | Research  | Re-derived   | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output pushed in `research.md`. |
+| 2026-08-30 | Plan      | Locked       | Combined settings/logger repair, granular permissions, RED→GREEN fixture, gate set, and sibling-defect deferral recorded. |
+| 2026-08-30 | Plan      | PR sync      | Updated draft body/comment and moved exactly one lifecycle label to `status:plan-eval`; REST fallback recorded in drift.  |
+| 2026-08-30 | PLAN-EVAL | Cycle 1      | `FAIL_PLAN` at `26102943`; evaluator artifact committed at `842816a2`; implementation remained stopped.                   |
+| 2026-08-30 | Plan      | Amendment    | Corrected launch-root semantics and pinned decoy, host-path, and #1776 contracts for cycle 2.                             |
+| 2026-08-30 | PLAN-EVAL | Cycle 2      | `PASS` at `2e5f50f0`; artifact-only verdict committed at `2cfc0b4c9`; both evaluator files remain bit-identical.          |
+| 2026-08-30 | S3        | RED fixture  | Added live-settings coverage; root and decoys pass, while nested `PreToolUse` and `Stop` each fail before repair.         |
+| 2026-08-30 | S3        | Fmt nit      | Applied the cycle-2 `research.md` table fix and formatted all five files changed by this slice.                           |
+| 2026-08-30 | S3        | Boundary     | Committed/pushed RED at `f8e6ad0c9`; posted slice evidence and retained draft PR with `status:impl`.                      |
+| 2026-08-30 | S4        | GREEN repair | Applied exec-form launch-root commands/output and exact permissions; unchanged fixture passes 9/9.                        |
+| 2026-08-30 | S4        | Gate drift   | Aggregate Claude gate exposed two stale generated skill mirrors; canonical sync reconciled them and rerun passed.         |
 
 ## Decisions
 
@@ -117,6 +120,7 @@ a new cwd/worktree case without changing production code.
 | `gh pr edit` over-fetched scopes; REST fallback    | minor       | yes                |
 | Active-worktree premise corrected to launch root   | significant | yes                |
 | Fetched `origin/main` moved but hook surface inert | minor       | yes                |
+| Mandatory gate found stale generated skill mirrors | minor       | yes                |
 
 ## Gate Results
 
@@ -130,29 +134,31 @@ a new cwd/worktree case without changing production code.
 
 ### Static Gates
 
-| Gate                    | Command or check                       | Result  | Notes                                                       |
-| ----------------------- | -------------------------------------- | ------- | ----------------------------------------------------------- |
-| Focused RED fixture     | Structured test wrapper                | RED     | Exit 1; 7 passed, 2 failed: nested `PreToolUse` and `Stop`. |
-| Decoy assertions        | Focused raw test                       | PASS    | Exit 0; both event decoys reached marker/exit assertions.   |
-| Changed-file formatting | Structured fmt wrapper                 | PASS    | Exit 0; all five S3 files included.                         |
-| Check/lint/root test    | Structured wrappers/tasks in `plan.md` | NOT_RUN | S4/S5 implementation gates.                                 |
+| Gate                   | Command or check                       | Result  | Notes                                                           |
+| ---------------------- | -------------------------------------- | ------- | --------------------------------------------------------------- |
+| Focused RED fixture    | Structured test wrapper                | RED     | S3 exit 1; 7 passed, 2 nested-event failures.                   |
+| Focused GREEN fixture  | Same unchanged structured test         | PASS    | S4 exit 0; 9 passed, 0 failed; fixture blob unchanged.          |
+| Decoy assertions       | Focused child-process cases            | PASS    | RED marker/73; GREEN marker absent + launch-root record.        |
+| S3 changed-file format | Structured fmt wrapper                 | PASS    | Exit 0; 5 selected / 5 processed / 0 findings.                  |
+| S4 changed-file format | Structured fmt wrapper                 | PASS    | 10 changed counted; 8 authored processed, 2 generated excluded. |
+| Check/lint/root test   | Structured wrappers/tasks in `plan.md` | NOT_RUN | S5 final gate set.                                              |
 
 ### Fitness Gates
 
-| Gate                              | Result  | Evidence                                 | Notes                              |
-| --------------------------------- | ------- | ---------------------------------------- | ---------------------------------- |
-| Claude surface validator          | NOT_RUN | `deno task agentic:check-claude` planned | Mandatory after changes.           |
-| No host path / permission minimum | PASS    | S3 fixture assertions                    | Exact owned-file/config contracts. |
-| No `any`                          | NOT_RUN | S5 source scan planned                   | Full owned surface after repair.   |
+| Gate                              | Result  | Evidence                         | Notes                             |
+| --------------------------------- | ------- | -------------------------------- | --------------------------------- |
+| Claude surface validator          | PASS    | Public + JSON invocations exit 0 | Hook lock check and sync green.   |
+| No host path / permission minimum | PASS    | S4 unchanged fixture             | Exact six-file/config assertions. |
+| No `any`                          | NOT_RUN | S5 source scan planned           | Full owned surface after repair.  |
 
 ### Runtime Gates
 
-| Gate                                 | Result  | Evidence                 | Notes                          |
-| ------------------------------------ | ------- | ------------------------ | ------------------------------ |
-| Actual launch-root child processes   | PASS    | S3 fixture: both events  | Exit 0 and active-root record. |
-| Actual nested-cwd child processes    | RED     | S3 fixture: both events  | Exit 1, `Module not found`.    |
-| Reachable temp-decoy child processes | PASS    | S3 fixture: both events  | Marker present; exit 73.       |
-| Aspire/Docker/browser/scaffold       | NOT_RUN | Scope and lease boundary | Must remain not run.           |
+| Gate                                 | Result  | Evidence                 | Notes                           |
+| ------------------------------------ | ------- | ------------------------ | ------------------------------- |
+| Actual launch-root child processes   | PASS    | S4 fixture: both events  | Exit 0 and launch-root record.  |
+| Actual nested-cwd child processes    | PASS    | S4 fixture: both events  | Exit 0 and launch-root record.  |
+| Reachable temp-decoy child processes | PASS    | S3 RED / S4 GREEN        | Marker+73 before; bypass after. |
+| Aspire/Docker/browser/scaffold       | NOT_RUN | Scope and lease boundary | Must remain not run.            |
 
 ### Consumer Gates
 
@@ -163,6 +169,6 @@ a new cwd/worktree case without changing production code.
 ## Handoff Notes
 
 - Cycle-2 PLAN-EVAL passed in the separate evaluator session; implementation is authorized.
-- S3 must remain an independent pushed RED commit before S4 changes the configured handlers.
+- S3 remains the independent pushed RED commit; its test blob is byte-identical under S4 GREEN.
 - #1776 owns the deferred `wslHome()` `/home/codex` launcher defect for milestone 0.0.8.
 - Do not edit either evaluator-owned plan-eval file or launch/simulate IMPL-EVAL in this session.

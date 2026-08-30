@@ -59,3 +59,20 @@ Drift is append-only.
 - **Action:** accept
 - **Evidence:** No rebase was performed, as explicitly required; the implementation continues on the
   plan-evaluated base.
+
+## 2026-08-30 — Mandatory Claude gate found stale generated skill mirrors
+
+- **What:** The first S4 `deno task agentic:check-claude` invocation exited 1 because the generated
+  `netscript-harness` and `netscript-pr` Claude mirrors lagged their checked-in source skills.
+- **Source:** Machine output named only `.claude/skills/netscript-harness/SKILL.md` and
+  `.claude/skills/netscript-pr/SKILL.md` as stale; the hook lock subcheck itself passed.
+- **Expected:** The plan's five-file repair plus run artifacts would be sufficient for the mandatory
+  aggregate Claude-surface gate.
+- **Actual:** The mismatch predates S3/S4. `deno task agentic:sync-claude` deterministically updated
+  those two generated files, after which both the public and JSON validator invocations exited 0.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** Canonical sync raw exit 0; post-sync aggregate gate raw exit 0 with 18 skills and 22
+  mirrored files. No source skill, workflow, launcher, or evaluator artifact was edited. The S4
+  format accounting names all 10 changed files while excluding the two byte-mirrored generated files
+  from the eight-file authored-source receipt, as required by the repo tooling format policy.

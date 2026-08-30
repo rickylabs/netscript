@@ -6,17 +6,16 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `fix-claude-hook-log-cwd--1774`       |
 | Branch         | `fix/claude-hook-log-cwd-independent` |
-| Current phase  | `implementation / S3 RED`             |
+| Current phase  | `implementation / S4 GREEN`           |
 | Archetype      | N/A — repository agentic tooling      |
 | Scope overlays | none                                  |
 
 ## Current State
 
-Cycle-2 PLAN-EVAL returned `PASS` at `2e5f50f0`; evaluator artifacts are present through `2cfc0b4c9`
-and remain untouched by this generator. S3 adds the unchanged-live-settings fixture and records its
-expected RED: launch-root invocations pass, while nested-cwd `PreToolUse` and `Stop` each fail with
-`Module not found`. Both temporary-decoy assertions pass, proving the relative command reaches the
-exact cwd-relative decoy before the repair.
+S3 is pushed at `f8e6ad0c94381e8fe9d5d50e8ec94c5d5a9e3139` with the required historical RED. S4
+applies the plan-evaluated exec-form and launch-root-output repair. The S3 fixture blob remains
+`fbabb838c26a601cf50ef9b1ade4cc9d16ffbb83` and now passes all nine cases. The mandatory Claude
+surface gate and its machine-readable invocation both exit 0 with the hook lock check green.
 
 ## Completed
 
@@ -39,16 +38,24 @@ exact cwd-relative decoy before the repair.
   negative GREEN decoys, bounded permissions, and the exact six-file host-path scan.
 - Applied the evaluator-requested Markdown formatting correction to `research.md` and included it in
   this slice's full changed-file format receipt.
+- Committed and pushed S3, posted its PR slice evidence, and moved the draft PR to exactly one
+  `status:impl` label.
+- Converted both live handlers to host-neutral exec form with the exact named env/write contract.
+- Anchored event output to the session launch root when `CLAUDE_PROJECT_DIR` exists, retaining cwd
+  only for direct non-Claude invocation.
+- Aligned the direct task, validator child command, logger help, and agentic README.
+- Reconciled two pre-existing stale generated Claude skill mirrors with the canonical sync task so
+  the mandatory aggregate gate is reproducibly green.
 
 ## In Progress
 
-- Commit and push the S3 failing fixture without changing production configuration.
+- Commit and push the S4 GREEN repair without altering the S3 fixture.
 
 ## Next Steps
 
-1. Preserve the RED fixture as an independently pushed S3 commit and PR slice comment.
-2. Apply the S4 launch-root repair without editing the S3 fixture.
-3. Run the complete S5 gate set and stop for supervisor Tier-A/IMPL-EVAL dispatch.
+1. Preserve the S4 repair as an independently pushed commit and PR slice comment.
+2. Run the complete S5 structured gate set, including the usable root test.
+3. Stop for supervisor Tier-A and separately dispatched IMPL-EVAL; do not self-evaluate.
 
 ## Key Decisions
 
@@ -62,17 +69,19 @@ exact cwd-relative decoy before the repair.
 
 ## Files Changed
 
-S3 adds `claude-hook-log_test.ts` and updates generator-owned run artifacts only. Product/config
-implementation files remain at baseline until the RED commit is pushed.
+S4 changes the five planned product/config/doc files plus the two deterministic generated Claude
+skill mirrors required to make the mandatory pre-existing sync check green. It updates only
+generator-owned run artifacts beyond that; `.github/workflows/**` and launcher/home code are
+untouched.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                               |
-| ----------- | -------------- | ---------------------------------------------------------------------- |
-| Static      | RED            | Structured fixture: exit 1, 7 passed, 2 nested-cwd failures.           |
-| Fitness     | PARTIAL        | Host-path and current permission assertions pass; GREEN gates pending. |
-| Runtime     | RED            | Both launch-root cases and both decoys pass; both nested cases fail.   |
-| Consumer    | NOT_RUN        | No published package/plugin consumer surface.                          |
+| Gate family | Current status | Evidence                                                       |
+| ----------- | -------------- | -------------------------------------------------------------- |
+| Static      | GREEN          | Unchanged fixture: exit 0, 9 passed, 0 failed.                 |
+| Fitness     | GREEN          | Claude surface public + JSON gates exit 0; lock unchanged.     |
+| Runtime     | GREEN          | Launch-root, nested-cwd, and decoy cases pass for both events. |
+| Consumer    | NOT_RUN        | No published package/plugin consumer surface.                  |
 
 ## Open Questions
 
@@ -83,6 +92,8 @@ implementation files remain at baseline until the RED commit is pushed.
 - Drift: the corrected launch-root premise, owner-selected planning route, and repo-REST PR-sync
   fallback are recorded in `drift.md`. The fetched `origin/main` moved beyond the owner-stated SHA,
   but a path audit confirms no hook-owned surface drift; the branch remains intentionally unrebased.
+  The mandatory gate also exposed two baseline-stale generated skill mirrors; their deterministic
+  canonical sync is recorded as S4 drift.
 - Debt: none created.
 
 ## Commits
