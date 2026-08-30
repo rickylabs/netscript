@@ -6228,3 +6228,58 @@ class is closed, and what remains before #1466 can close.
 publish and compatibility evidence). PR #1731 carries `Closes #1466`, so a `PASS` on slice 1 does not
 make the leaf closeable. Whether slices 2–3 return to this lane before or after #1387 is the
 coordinator's call; this lane will not self-authorize them.
+
+## 2026-08-30 — #1466 cycle 5 closed AF-1; IMPL-EVAL cycle 2 dispatched
+
+### Cycle 5 — verified, evidence-only
+
+Head `369928cf7ca7125fd6e8e94b4975f29fa187e400` — local == `origin` == PR head, clean. One commit,
+`369928cf docs(harness): correct #1466 repair route evidence`, touching **two** run artifacts and
+**zero** files under `packages/`, `plugins/`, `docs/`, or `receipts/` — verified by
+`git diff --name-only`. Content head stays `42874803`, so the eight receipts remain valid at it and
+nothing was recut. Same evidence-head pattern as `fc81e652` and `74483f02`.
+
+All four AF-1 points landed: the `Model` row now names both routes and defers to the table; a
+`normal_implementation` · Sol · **medium** row owns repair cycles 1–3 and 4; `complex_implementation`
+· high is narrowed to the original slice-1 implementation; `Checkout` names the worktree rather than
+the repo root; and the pre-migration PLAN-EVAL path is marked **historical** rather than rewritten to
+a path that session never used — which is the right treatment, since falsifying a correct historical
+record to look tidy is the same defect in the opposite direction.
+
+### IMPL-EVAL cycle 2 — dispatched
+
+| Field | Value |
+| --- | --- |
+| Lane | `formal_impl_evaluation` — native opposite-family for Codex-authored work (`lane-policy.md:46`) |
+| Requested route | Claude · Anthropic · **Fable 5 · medium** |
+| Observed route | `message.model: claude-fable-5`, `effort: medium`, `permissionMode: bypassPermissions` — read from the session's **own transcript**, `.claude/projects/…/b13a38f6-….jsonl`. **Matched.** |
+| Session | `b13a38f6-8b39-4b28-9a91-0420d5b2d743` (short `b13a38f6`), PID `97957`, `--remote-control ns1466-impleval-c2` |
+| Worktree | `/home/agent/projects/netscript/worktrees/ns1466-impleval-c2` — **detached** at `369928cf`, its own, never the author's (D-19) |
+| Brief | `slices/impl-eval-1466-cycle2.md` |
+| Generator ≠ evaluator | Codex `gpt-5.6-sol` authored; Claude Fable 5 evaluates — holds |
+| Failure budget | this is **2 of 2** for the leaf's IMPL-EVAL loop |
+
+**Route proof needed a second method.** `claude --bg` handed the work to a pre-warmed `bg-spare`
+process, so its argv carries `claude bg-spare --bg-spare <socket>` and **no model or effort** — the
+argv proof that worked for the Codex threads and for this supervisor is unavailable here. Route was
+instead read from the session's own transcript record, which is what the cycle-1 evaluator did. Worth
+knowing before anyone tries to verify a backgrounded native session from `ps` and concludes the route
+is unset.
+
+The brief routes three rulings this lane may not make: whether a **`SKIPPED`** receipt satisfies the
+contracted `test` gate at a content head where root `test` never ran; whether AF-1's class is closed;
+and what remains before #1466 can close. It requires the evaluator to re-derive my numbers rather
+than accept them — two sessions agreeing is worth less than one measuring — and to break the F-2 pin
+itself, including looking for a forgery my trailing-comment attempt did not find.
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | IMPL-EVAL cycle 2 in flight at `369928cf` |
+| #1664 | parked at `20337441788b`; no retry authorized |
+| #1387 | queued — brief written (`slices/research-plan-1387.md`), holds until #1466 reaches terminal |
+| #1730 | queued — brief written (`slices/impl-1730.md`) |
+
+The lane stays serial: nothing else dispatches while an evaluator is in flight. Both queued briefs
+are staged so dispatch is immediate at terminal handoff and needs no further preparation.
