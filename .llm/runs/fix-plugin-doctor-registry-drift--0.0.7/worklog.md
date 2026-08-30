@@ -685,3 +685,53 @@ into the plan *before* it happened. A predicted, recorded consequence — not un
 No readiness flip, no merge, no relabel beyond phase truth, no issue edit, no acceptance-box tick, and
 no runtime gate. `scaffold.runtime` is supervisor-coordinated and is sequenced separately under the
 serialized singleton lease, with the sandbox returned to Aspire/Docker zero afterwards.
+
+## Supervisor Tier-A — exact-head sign-off at `8dce918ba` (2026-08-30)
+
+Artifact-only commit. Every row re-derived independently at this head on a clean tree.
+
+### Head identity
+
+Main converged: `24f6642f` → `9710a2898` (S8 cleanup epoch) → `2a1248d33` (#1740, S5). Merge
+`4bf62c18d`, corpus regen + bounded receipt `8dce918ba`. **Patch-identity proven**: all 11 owned files
+byte-identical before/after the merge (`git diff --quiet` clean on each). True intersection with the
+`9710a2898..2a1248d33` main delta: zero (`comm` on the authoritative 11-path list, not a polluted
+base..head diff).
+
+### Bounded, no-runtime evidence for the owned acceptance line
+
+`behavior.package-backed-plugin-doctor` run standalone (no scaffold/plugin-install/DB/AppHost/Docker/
+browser/relay): **exit 0, 2/2 passed**, captured stdout shows `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS` with
+concrete registry/permission evidence, not a silent skip. Receipt:
+`receipts/package-backed-doctor-9900007f7.json`. **This proves the leaf's owned criterion. It does
+NOT satisfy plan row 16's literal "Full runtime smoke... REQUIRED" wording**, which names the complete
+`scaffold.runtime` suite — that remains genuinely unproven, blocked by the unrelated
+`behavior.app-reference` browser gate sitting earlier in `RUNTIME_GATES` (see #1764's identical finding
+this session). Not conflating the two.
+
+### Gate table results at `8dce918ba`
+
+| Row | Gate | Result |
+| --- | --- | --- |
+| 2 | Focused doctor regression | PASS — exit 0, **34/0** over `packages/cli/src/public/features/plugins/doctor` |
+| 3 | Installed generator unit | PASS — exit 0, **9/0** |
+| 4 | AI compiler suite | PASS — exit 0, **9/0** |
+| 5 | AI package suite | PASS — `test` **32/0**; `check` clean |
+| 6 | CLI package check | PASS — clean |
+| 7 | Exact-ceiling check | PASS — exit 0, 10 files selected, 0 diagnostics |
+| 8 | Exact-ceiling lint | PASS — scratch config (root `packages/cli/` exclusion removed, disclosed not concealed), exit 0, 10/10 processed, 0 findings |
+| 9 | Exact-ceiling format | 1 finding, `public-command-dependencies.ts` — **pre-existing**, confirmed by patch-identity: this exact file is byte-identical across the main merge, so the finding predates this convergence. Cannot fail CI (root config still excludes `packages/cli/` from real `fmt`). Previously recorded as leaf-owned/scope-deferred; unchanged status. |
+| 10 | Doctrine/quality | PASS — `quality:gate` exit 0, only pre-existing F-5/F-6 `export default` warnings outside the ceiling |
+| 11 | JSR doc surface | `packages/cli` exit 0. `plugins/ai` exit 1 — **verified pre-existing**: diffed head vs a detached checkout of main `2a1248d33`, output identical except for path prefixes and one npm build-script warning; same finding count and content at base. |
+| 12 | Package publish dry runs | PASS — both `packages/cli` and `plugins/ai` succeed |
+| 13 | MCP export corpus | Regenerated (only carrier that moved), now exit 0 |
+| 14 | Publish assets | PASS — exit 0 |
+| 15 | Lock hygiene | PASS — byte-unchanged vs `13878a80a` |
+| 16 | Full runtime smoke | **NOT proven.** Bounded evidence above covers the owned criterion only. |
+
+### Verdict
+
+**Tier-A PASS at `8dce918ba`**, with row 16 explicitly open pending the singleton runtime lease (queued
+behind #1764 per standing order). Cleared for a fresh, opposite-family IMPL-EVAL on the criteria this
+head can actually support — evaluator must judge the bounded evidence as bounded, not as full-suite
+proof.
