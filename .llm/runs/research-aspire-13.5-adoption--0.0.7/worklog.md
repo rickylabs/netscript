@@ -232,4 +232,11 @@ launched as `claude -p` session `657b1ab5…` in `007-aspire-s8-eval` @ `9dd0664
 `slices/s8/handoff-phase-a.md` (phase A only; Phase-B receipts environment-blocked; not a merge
 candidate). Runtime zero throughout. | | S8 IMPL-EVAL cycle 1 | **`PASS` — phase A only** at
 `9dd06647` (session `657b1ab5…`); non-mutation verified; advisories A-1 (receipt wording) and A-2
-(`Closes #863` scope → coordinator ruling) recorded in D-44 and the handoff. Runtime zero. |
+(`Closes #863` scope → coordinator ruling) recorded in D-44 and the handoff. Runtime zero. | | S9
+(#1721) dispatched — static Phase A |
+`agentic:launch-codex-slice --user node --dest /home/agent/aspire-13-5-s9-brief.md --expect-base 9dd06647 …`
+→ thread `01a0523a-d727-7610-9cd4-e4eddbd77aea`, route openai · gpt-5.6-sol · medium, worktree
+`007-aspire-s9` @ `9dd06647` (branch `fix/aspire-13-5-s9-skills-mcp-alignment`, upstream none).
+Brief `slices/s9/brief.md`: no AppHost; one AppHost-less stdio MCP session allowed for the static
+tool-surface receipt; Phase B (D-12 live smoke) lease-backed and D-43-blocked. Launcher backgrounded
+without timeout (D-38). |
