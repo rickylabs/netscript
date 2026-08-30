@@ -8263,3 +8263,40 @@ per its own account, `deno.lock` unchanged.
 **Per the sequencing note above, this is acknowledged but not certified.** I am not running Slice 4's
 Tier-A review, not verifying its receipts, and not touching its PR comment until DeepSeek's verdict on
 Slice 3 is in hand. The work is safe where it is — pushed, PR still draft, no downstream action taken.
+
+## #1387 Slice 3 double-certified; Slice 4 certified by supervisor, evaluator dispatched
+
+### Sanctioned second opinion concurs
+
+DeepSeek V4 Flash 0731 · max, retry 2 (attempt 1 produced an empty result after 34 turns and was not
+counted — recorded above), returned **ACCEPTED_WITH_FINDINGS at `c297064aa`** after 51 turns, its own
+independent read of the diff, drift D-3–D-8, both prior evaluations, and its own reproduction of all
+seven receipts plus the corpus sha256. It explicitly did not copy Opus's verdict — it verified each
+point before concurring, and reached the non-mutation conclusion by test analysis alone since its
+brief forbade the in-place revert experiment Opus performed. Confirms F-1 and independently re-derives
+Opus's F-A/F-B under new labels. Committed to the leaf as `evaluate-slice-3-deepseek.md` (`0520521db`);
+PR comment `5471089235`.
+
+**Two opposite-provenance evaluators, two independent methodologies, one verdict on one head.** The
+Slice 4 hold is lifted.
+
+### Slice 4 certified
+
+I reviewed Slice 4 myself (`tier-a-slice-4.md`, commit `0f8e99ec9`): exactly the six ceiling files
+plus the corpus carrier, `deno.lock` unchanged, `AuthorizerPort` untouched and its compatibility
+proven by direct assignment, the contract-local design matches research finding 15's rejection of a
+router/URL-keyed map, and the fallback-typing invariant is proved by a genuine `@ts-expect-error`
+rejection — not acceptance alone, which this lane has been burned by before. Nine receipts, all PASS,
+`gitHead == actualGitHead`. Evidence set SUFFICIENT. Corpus grew by exactly the twelve new public
+types this slice exports.
+
+**Verdict: ACCEPTED** at content head `9cc8c4c5f84acef262bca2cec9169ebbaa410eb5`.
+
+### Evaluator route reverts to standard native default
+
+The Opus 5 authorization was explicit: "#1387 Slice 3 only... not a policy-wide waiver." The routing
+update's DeepSeek availability reads as a general infrastructure fix (credential now provisioned),
+not scoped to one slice. For Slice 4, dispatching the **native default first** per `lane-policy.md`
+row 46 — Fable 5 · medium, opposite family, own detached worktree `ns1387-impleval-s4` at the evidence
+head. If it hits the same monthly-spend wall, the now-working DeepSeek route is the documented
+fallback and needs no fresh ruling to use, since the credential fix was general.
