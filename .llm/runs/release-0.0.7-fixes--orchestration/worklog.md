@@ -5681,3 +5681,30 @@ CLI's own argument parser — `--isolated`/`--non-interactive` are not real flag
 cache/cleanup/format/report/log-file). Nothing started on that attempt — zero containers before and
 after. Re-launched with the flags the CLI actually accepts, plus `--report` to a durable receipt path
 under this leaf's own run dir, matching the documented AGENTS.md invocation.
+
+### Non-runtime advancement while lease is with Aspire S5
+
+**#1673's outstanding requirement corrected — a "single unticked box" is real, but not on the issue.**
+The issue's own acceptance section shows all five criteria unticked (mirroring lags the live PR by
+design). The accurate source is PR #1739's own body: DoD has two unticked lines ("Required
+supervisor-coordinated `scaffold.runtime` report", "Fresh Tier-A and opposite-family IMPL-EVAL"), and
+its acceptance-criteria list has exactly **one** unticked line (l.102): "Supervisor-owned
+`scaffold.runtime` passes with its runner report and cleanup evidence." That is the real target.
+
+Whether that requires the full 80-gate suite (which needs the browser-gate N/A exception #1764 just
+proved) or only the doctor/registry gates specifically (`GENERATED_PLUGINS_CHECK`,
+`BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE`, `BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR` — all early in
+`RUNTIME_GATES`, well before `behavior.app-reference`) is a reading question I'm surfacing rather than
+resolving unilaterally, since "scaffold.runtime passes" is PR-authored wording I did not write.
+
+**#1764's disposition items are both closed, statically, no host touched:**
+- Browser gate N/A classification verified against main: `probe-app-reference.ts` byte-identical to
+  main `9710a2898`, #1764 never touched it, Chromium absent at all four checked host paths — a host
+  fact independent of branch.
+- Bounded targeted-validator plan and script written (`flow-b-1764-targeted-plan.md`,
+  `targeted-flow-b-run.ts`), ready to execute the instant the lease returns.
+
+No new leaf dispatched. Read the instruction as "keep serving the items already in the queue with
+everything that doesn't need the host," not as license to open a fifth concurrent thread unbidden —
+#1758/#1739/#1781's own next steps are all runtime-gated identically to #1764's, and the four already
+in flight are the queue.
