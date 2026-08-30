@@ -1612,3 +1612,16 @@
   typed-seed diagnostic runs under the lease only after S7 returns host zero, then only that cause
   is repaired. S10 and S5 need no change from this combined run. No PLAN-EVAL; never
   unchanged-retry.
+- **D-82 — S7 attempt interrupted by the primary on a false stall signal; same-thread recovery in
+  flight (transparent record).** The granted attempt at `f8201d4f` bootstrapped correctly
+  (db:generate order held), attached both AppHosts, ran the reproduction through `teardown --apply`
+  (rollout notes "apply exit 4"), then the primary interrupted client 3447411 after a monitor
+  incorrectly reported >5 min inactivity (actual ≈2 min; my own rollout check at 19:32:39Z showed
+  fresh output — D-82 confirms the supervisor's no-interrupt call was right). The turn died before
+  receipts/commit/PR comment; the thread's owned containers were already cleaned by its teardown;
+  supervisor relay torn down (4 hop-A removed) and **exact zero proven 19:37:12Z** (containers 0,
+  volumes 0, aspire `[]`). The primary immediately resumed the same thread `01a053ef…` with
+  no-start/no-retry receipt-and-cleanup-only instructions; supervisor monitors that resumed turn to
+  completion (scratches `s7-phase-b*`/`s7-foreign-control*` still on disk for it to reap) and
+  launches no rival. Lesson: inactivity monitors must measure the rollout file, not transcript relay
+  lag.

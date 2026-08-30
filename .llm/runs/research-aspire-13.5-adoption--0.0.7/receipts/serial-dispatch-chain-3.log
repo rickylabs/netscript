@@ -2,3 +2,11 @@
 [chain3] dispatching S5 at bf7223a6c3305c753bb38c566a9d1cc17f46df0b 19:29:56Z
 https://github.com/rickylabs/netscript/actions/runs/33331022935
 [S5b] run 33331022935
+[S5b] run 33331022935 exit=0 19:37:55Z
+success
+  classify changes: success
+  scaffold-static (deno-only): success
+  desktop-native-linux (deb + signed updater): success
+  scaffold-runtime-sqlite (aspire + sqlite + garnet): success
+  scaffold-runtime (aspire + docker + postgres): success
+  scaffold CI lane visibility: skipped
