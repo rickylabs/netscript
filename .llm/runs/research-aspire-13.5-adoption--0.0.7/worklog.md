@@ -516,4 +516,8 @@ AppHost up under the granted attempt at `f8201d4f`; relay attached `postgres-0e5
 armed. | | **S1 hosted run GREEN — both tiers** | Run 33330714604 SUCCESS (all tiers) at
 authoritative `e0d70e404074…` — #1713 "scaffold.runtime green on both CI tiers" met at the exact
 head with the adjudicated gate semantics. Delta IMPL-EVAL dispatched (fresh session);
-ready/close-gate follows a PASS. Chain-3 (S5b full runtime) now unblocked. |
+ready/close-gate follows a PASS. Chain-3 (S5b full runtime) now unblocked. | | S1 eval live; S5
+fronts green | S1 delta IMPL-EVAL running (session `6c9f010f…`, worktree `007-aspire-s1-eval` @
+`e0d70e404074`; hosted receipt run 33330714604 all-green attached in the brief). S5: core CI
+33330647399 SUCCESS (close-gate/quality/check-test); full-runtime run **33331022935** dispatched at
+`bf7223a6c3305c` (chain-3). |
