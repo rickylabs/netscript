@@ -3984,3 +3984,70 @@ Two fixes dispatched:
 Correcting a plan that breaches a boundary the brief set is cheaper before the gate than inside it —
 PLAN-EVAL cycles are capped at two, and a cycle spent on a defect the supervisor could already name is
 a cycle wasted.
+
+## 2026-08-30 — #1758 third integration at `70d82c37`; CI found a real leaf defect the local gates could not
+
+### The superseded CI run was still worth reading
+
+The run at `f1ff5557` completed **failure** on two jobs. `close-gate` was the expected label-race
+residue. **`check-test` was new**, and dismissing it as "superseded head" would have been wrong: a
+test failure caused by the leaf persists across rebases of the base.
+
+The failing test is not in the log — it is in an uploaded artifact. Fetched
+`ci-check-test-gate-receipts-…` rather than re-running a four-minute suite blind:
+
+```
+4265 passed · 1 failed · 14 ignored
+closure export lists stay in parity with Fresh and SDK manifests
+packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure_test.ts:79
+missing: "./presets"
+```
+
+### A third consumer of the SDK export map, outside the ceiling
+
+The leaf added `./presets` to `packages/sdk/deno.json`. A parity test asserts the CLI's
+`NETSCRIPT_WEB_RUNTIME_EXPORTS` constant mirrors that manifest exactly. This is the **third** place a
+new published subpath propagated to that the plan never enumerated — after `check:assets-barrel` and
+the MCP corpus. Same shape each time: *adding one export map entry reaches further than the plan
+listed.*
+
+The file is **hand-maintained, not generated**, and its own doc comment is about precisely what this
+leaf changes:
+
+> `@netscript/fresh-ui` is intentionally excluded … **A second fresh-ui instance therefore cannot
+> instantiate a cache-provider singleton.**
+
+So including `./presets` is a semantic statement — that the browser-safe preset entry belongs in the
+web-runtime cache-provider closure — not mere bookkeeping. It happens to be exactly the leaf's own
+claim, which makes it appropriate, but it must be argued rather than pasted.
+
+### The coordinator's amendment names the wrong file — reported, not silently reinterpreted
+
+The authorization admits *"exactly
+`packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure_test.ts` … update
+its parity expectation for `./presets`"*.
+
+Read the test: it holds **no** hardcoded list.
+
+```js
+assertEquals(Object.keys(sdk.exports), [...NETSCRIPT_WEB_RUNTIME_EXPORTS['@netscript/sdk']]);
+```
+
+*Actual* is read live from `packages/sdk/deno.json`; *Expected* is the constant in the **source**
+module `netscript-web-runtime-closure.ts`. The only edit that fixes the parity is in the **source**,
+and the only way to "fix" it inside the test would be to weaken the assertion — defeating the very
+check that caught this.
+
+The intent is unambiguous ("the discovered third consumer of the SDK export map", "its parity
+expectation"), so the file name is a slip. But this lane does not silently substitute a different file
+for an authorized one: on #1673 exactly that instinct — reaching for an admissible reading instead of
+the right file — was overturned by PLAN-EVAL, and recording it *as an interpretation* is what made the
+reversal cheap. So it is reported here and to the coordinator, and the author is directed at the
+source file with the substitution recorded in `drift.md` as resting on this supervisor's reading.
+
+### Integration state
+
+`70d82c37` — proper merge (parents `f1ff5557` + `a5520e70`), `a5520e70` an ancestor, pushed, third and
+final base of the shared-asset sequence. Readiness rolled back to `status:impl` on PR #1758 and issue
+#1462 while the correction lands. The `MECHANICAL_PASS` receipt at `f1ff5557` is superseded and the
+author was told not to cite it as currency.
