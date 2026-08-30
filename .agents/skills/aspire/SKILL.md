@@ -8,10 +8,11 @@ description: 'Diagnoses and operates Aspire distributed applications with the As
 This repository uses Aspire to orchestrate its distributed application. Resources are defined in the
 AppHost (`aspire/apphost.mts`, or `apphost.cs` in .NET projects).
 
-The Aspire CLI is a **diagnostic instrument**, not just a launcher. The 13.5-specific commands and
-behaviours below were verified against **Aspire CLI 13.5.3**; the evidence keys link to exact
-receipts at the end of this skill. When something misbehaves, ask the CLI before touching
-application code. **Rule zero: `Healthy` is not proof.** (S2-MATRIX, S9-STATIC)
+The Aspire CLI is a **diagnostic instrument**, not just a launcher. Statements explicitly tagged
+with an S2 or S9 evidence key were re-verified against **Aspire CLI 13.5.3**; other operational
+guidance is not a blanket 13.5 certification. The evidence keys link to exact receipts at the end of
+this skill. When something misbehaves, ask the CLI before touching application code. **Rule zero:
+`Healthy` is not proof.**
 
 ## CLI command reference
 
@@ -40,7 +41,7 @@ no prompts, parseable output. Add `--format Json` when you need fields rather th
 | Restore AppHost SDK + deps                          | `aspire restore`                                                             |
 | Add an integration / list AppHost files             | `aspire add` · `aspire ls`                                                   |
 | Docs                                                | `aspire docs search <query>` · `aspire docs get <slug>` · `aspire docs list` |
-| TypeScript API docs                                 | `aspire docs api search <query> --language typescript` (S9-HELP)             |
+| TypeScript API docs                                 | `aspire docs api search <query> --language typescript` (S9-DOCS-API-HELP)    |
 | Resource-exposed MCP tools                          | `aspire mcp tools` · `aspire mcp call <resource> <tool> --input <json>`      |
 
 `--apphost <path>` targets a specific AppHost when several run. There is no `aspire exec`.
@@ -121,10 +122,9 @@ no correlated log records.
 
 ### "`aspire otel` says the dashboard is not available"
 
-Verified 13.5.3 behaviour on a detached AppHost (`aspire start`): `aspire otel …` and
-`aspire export` fail with _"Could not fetch telemetry data from the dashboard. The dashboard is not
-available."_ (exit 12) **even though the dashboard is up and serving 200**. The CLI's backchannel
-lookup returns nothing; `aspire ps` knows the URL. Pass it explicitly. (S2-V4)
+Verified 13.5.3 behavior on a detached AppHost: bare `aspire otel logs` exited 12 because the
+dashboard URL was unavailable to the command, while the same query succeeded when passed the
+recorded URL with `--dashboard-url`. Pass the URL explicitly. (S2-V4)
 
 ```bash
 DASH=$(aspire ps --format Json --non-interactive --nologo | jq -r '.[0].dashboardUrl')
@@ -178,47 +178,38 @@ takes over the AppHost's port, e.g. a database CLI command). When one _is_ runni
 `appHostPath`, `appHostPid`, `cliPid`, `sdkVersion`, `dashboardUrl` and **`logFilePath`** — the
 AppHost's own log, which explains startup and shutdown when resource logs cannot.
 
-**With no AppHost running, `aspire describe` and `aspire logs` print an informational message and
-still exit 0.** Never infer health from exit status; check `aspire ps` first. Useful exit codes: `7`
-resource not found (describe), `18` resource not found (wait), `12` telemetry unavailable.
+With no AppHost running, command output may be informational rather than a health verdict. Check
+`aspire ps` first; the S2/S9 receipts did not re-verify the complete no-AppHost exit-code set.
 
 ### "`aspire restore` / `aspire start` is hanging"
 
-Measured baselines on this machine: `aspire restore` **3.5s**, `aspire start` (13 resources, images
-cached) **13s**. Multi-minute restores are environmental — network, cold NuGet/npm cache, or a
-container runtime that is not up. Before waiting it out, run
+Measured 13.5.3 observations on the S2 host were **38.62s** for a cold start, **24.80s** for the
+second start, and **13.065s** for the isolated scratch restore. Treat these as bounded observations,
+not portable performance guarantees. (S2-V2, S2-V9) Before waiting out a multi-minute operation, run
 `aspire doctor --non-interactive
 --nologo` (container runtime, SDK, certs, WSL integration) and
 `docker ps`.
 
 ### Capture everything before you lose it
 
-`aspire export --dashboard-url "$DASH" -o /tmp/aspire.zip --non-interactive --nologo` writes
-`resources/<name>.json` (full state), `consolelogs/<name>.txt`, `structuredlogs/<name>.json` and
-`traces/<name>.json` for every resource. Use it for intermittent failures, before a restart that
-would destroy the evidence, or when handing a problem to another agent. Without `--dashboard-url` it
-warns and silently omits all telemetry.
+Use `aspire export --help` to inspect the current export options before capturing an intermittent
+failure or preparing a handoff. The S2/S9 receipts did not re-verify archive contents or behavior
+when `--dashboard-url` is omitted.
 
 ## Search and filter syntax
 
-`--search` works on `aspire logs` and all three `aspire otel` commands; terms are ANDed. Console
-logs accept free text only. The structured commands also accept: field filters (`severity:error`,
-`resource:hooks`, `kind:client`, `status:error`), quoted phrases (`"connection refused"`), numeric
-comparisons (`duration:>100`), negation (`-severity:debug`), and custom attributes
-(`--search=@url.path:/health`).
-
-Fields — logs: `severity`, `resource`, `scope`, `message`, `trace-id`, `span-id`, `event`; traces:
-`name`, `resource`, `trace-id`, `status`, `duration`; spans: those plus `scope`, `kind`, `span-id`.
-
-**Gotcha:** an `@` attribute filter must be passed as `--search=@attr:value` with an `=`. Written as
-`--search @attr:value` the CLI treats `@…` as a response-file token and dumps help. Verified.
+Search grammar differs across console logs and structured telemetry commands. Run the relevant
+`aspire logs --help` or `aspire otel logs|spans|traces --help` before composing filters; the S2/S9
+receipts did not re-verify the full search grammar.
 
 ## Aspire MCP tools
 
-The Aspire MCP server is launched as `aspire agent mcp`; that exact argv was observed in the 13.5.3
-JSON-RPC capture. (S9-STATIC) It exposes the same data without shelling out. **It is often not
-connected** — if these tools are absent from your tool list, use the CLI. The 13.5.3 static receipt
-observed these 14 tools (S9-STATIC):
+The Aspire MCP server is launched in AppHost mode as `aspire agent mcp`; that exact argv was
+observed in the 13.5.3 JSON-RPC capture. For dashboard-only mode, use
+`aspire agent mcp --dashboard-url <dashboard-url>`; add `--api-key <api-key>` only when that
+dashboard requires API-key authentication. (S9-STATIC, S9-AGENT-MCP-HELP) It exposes the same data
+without shelling out. **It is often not connected** — if these tools are absent from your tool list,
+use the CLI. The 13.5.3 static receipt observed these 14 tools (S9-STATIC):
 
 | Tool                                           | Args                                       | Use it for                                                   |
 | ---------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ |
@@ -320,6 +311,10 @@ default. Run `playwright-cli --help` for available commands.
 - S2-V4:
   `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v4-otel-bare.raw.txt`
   and `02-v4-otel-explicit.json`
+- S2-V2:
+  `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-runtime-lifecycle.md`
+- S2-V9:
+  `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v9-aspire-restore.raw.txt`
 - S2-V6:
   `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v6-aspire-ps-final.json`
 - S2-V7:
@@ -332,5 +327,7 @@ default. Run `playwright-cli --help` for available commands.
   `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v11-resources-alias.json`
 - S9-STATIC:
   `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/receipts/aspire-13.5.3-mcp-tools-static.json`
-- S9-HELP: supervisor source capture
-  `.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-agent-init.md`
+- S9-DOCS-API-HELP:
+  `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/receipts/aspire-13.5.3-docs-api-search-help.json`
+- S9-AGENT-MCP-HELP:
+  `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/receipts/aspire-13.5.3-agent-mcp-help.json`

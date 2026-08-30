@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `implementation handoff — blocked acceptance` |
+| Current phase | `docs_audit fix cycle 1 — implementation` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -26,14 +26,16 @@ Aspire 13.5.3 exposed 14 baseline tools and omitted `get_integration_docs`.
   installation, and deterministic dogfood bundle/check are implemented.
 - The Codex Sol prose-audit request is drafted for supervisor dispatch, and all locally runnable
   Phase-A gates pass.
+- Opposite-family docs audit cycle 1 returned `FAIL_FIX`; all H1/M1–M4/L1 changes are implemented in
+  one prose/regeneration slice with exact non-runtime CLI-help receipts.
 
 ## In Progress
 
-- Slice 3 evidence commit, push, and PR trail comment.
+- Docs-audit cycle-1 generator checks, commit, push, and PR trail comment.
 
 ## Next Steps
 
-1. Supervisor dispatches the independent docs audit.
+1. Supervisor re-dispatches the independent docs audit against the cycle-1 fix head.
 2. Supervisor/upstream resolves why Aspire 13.5.3 omits locked `get_integration_docs` or explicitly
    re-baselines the acceptance contract.
 3. Phase B later runs the live lease-backed receipt on the isolated AppHost; this session must not
