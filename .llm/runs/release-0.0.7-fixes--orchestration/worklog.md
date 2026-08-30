@@ -5931,3 +5931,25 @@ recorded as a supervisor-verified bounded amendment, with a fresh Tier-A sweep a
 lock unchanged) rather than a new evaluator cycle.
 
 close-gate rerun in progress at `05a274e40` (run `33335926680`).
+
+### #1739/#1673 EXACT MERGE PACKET
+
+close-gate `success` independently confirmed at exact head (run `33335926680`, `headSha=05a274e40`,
+not trusted from watcher exit code — job-level query re-fetched). Final re-audit, all live:
+
+| Check | State |
+| --- | --- |
+| PR head | `05a274e409b42388991da7a88b43105c80d0f9e1` |
+| PR draft | `false` |
+| PR mergeable / mergeStateStatus | `MERGEABLE` / `CLEAN` |
+| PR labels | `type:fix, area:cli, status:ready-merge, priority:p1` (sole status) |
+| Issue #1673 state | `OPEN` |
+| Issue #1673 labels | `type:fix, area:cli, status:ready-merge, priority:p1` (sole status) |
+| Issue #1673 acceptance boxes | 5/5 `[x]`, mirrored |
+| review-threads | `PASS`, threads=2, unanswered=0 |
+| close-gate | `success` |
+| Main drift since last converge | one commit, `a3ddcbb59` (#1775) — `.claude/`/agentic-hook-tooling only, zero intersection with the 11 owned paths, confirmed inert |
+| Evaluator | `PASS_IMPL` `54c72a970`, valid per owner ruling, not rerun |
+
+**Merge packet: PR #1739, `--match-head-commit 05a274e409b42388991da7a88b43105c80d0f9e1`, closes #1673.**
+No further action available to the supervisor short of the merge action itself — handing to coordinator.
