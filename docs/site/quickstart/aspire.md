@@ -33,7 +33,7 @@ NetScript is in the 0.0.x series: the API is unfrozen until 0.1.0 and subject to
 {{ comp callout { type: "note", title: "Prerequisites" } }}
 <strong><a href="https://docs.deno.com">Deno</a> 2.x</strong> and the <code>netscript</code> CLI
 (install steps in the <a href="/quickstart/">Quickstart</a>), the external
-<strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a> CLI</strong>, and a
+<strong><a href="https://aspire.dev">Aspire</a> CLI</strong>, and a
 running <strong>Docker</strong> daemon — Aspire provisions Postgres and Redis as local containers.
 {{ /comp }}
 

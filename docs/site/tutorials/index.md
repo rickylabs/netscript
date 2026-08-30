@@ -30,7 +30,7 @@ reasoning behind durability, contracts, and plugins, read the
 
 There are five independent tracks. **Each builds one complete application** from a
 fresh `netscript init`, and each ends by running that application **locally
-under .NET Aspire** — so whichever you pick, you finish with something that boots,
+under Aspire** — so whichever you pick, you finish with something that boots,
 serves, and survives a restart. The tracks don't depend on each other; start with
 the one closest to what you're building.
 
@@ -87,7 +87,7 @@ scaffold, so you can start in either place.
 
 {{ comp callout { type: "note", title: "What you'll need" } }}
 A recent <a href="https://deno.com/">Deno</a> and the
-<a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a> CLI on your
+<a href="https://aspire.dev">Aspire</a> CLI on your
 PATH. Install the NetScript CLI with
 <code>deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}</code>.
 Each chapter lists its own prerequisite state, so you always know which earlier
