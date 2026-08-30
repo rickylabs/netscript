@@ -140,7 +140,8 @@ real instrumentation from <code>@netscript/telemetry</code>, not the scaffold he
 
 ### Query or export a detached AppHost
 
-Generated workspaces include task routes that query traces and logs without requiring you to discover or remember the dashboard URL:
+Generated workspaces include task routes that query traces and logs so you never have to discover
+or remember the dashboard URL:
 
 ```bash
 # Query traces or logs for a specific resource
@@ -155,17 +156,19 @@ deno task aspire:export -- -o telemetry.zip
 ```
 
 Generate traffic before querying traces; a healthy but idle AppHost legitimately returns an empty
-array. The generated task wrappers forward arguments, try Aspire's automatic discovery first, and on
-failure query `aspire ps --format Json` for the matching AppHost path and retry with its active
-`dashboardUrl`. Note that bare `aspire otel` exits with code `12` when executed without a reachable
-dashboard; the task wrappers catch this and resolve the running instance automatically.
+array. The generated task wrappers forward your arguments, try Aspire's automatic discovery first,
+and on failure query `aspire ps --format Json` for the matching AppHost path and retry with its
+active `dashboardUrl`. Bare `aspire otel` exits with code `12` when no dashboard is reachable; the
+task wrappers catch that exit and resolve the running instance automatically.
 
-For AI agents and external tools connecting through the NetScript MCP telemetry server (`@netscript/mcp`),
-endpoint resolution follows a structured precedence chain across options, environment variables, and defaults:
-1. Explicit `--endpoint` option.
-2. `NETSCRIPT_TELEMETRY_ENDPOINT` environment variable.
-3. `ASPIRE_DASHBOARD_PORT` environment variable (e.g. `18888`).
-4. Default fallback endpoint (`http://localhost:18888`).
+AI agents and external tools that connect through the NetScript MCP telemetry server
+(`@netscript/mcp`) resolve the endpoint by a fixed precedence — options first, then environment
+variables, then the default:
+
+1. The explicit `--endpoint` option.
+2. The `NETSCRIPT_TELEMETRY_ENDPOINT` environment variable.
+3. The `ASPIRE_DASHBOARD_PORT` environment variable (e.g. `18888`).
+4. The default fallback endpoint, `http://localhost:18888`.
 
 ## Step 3 — Add your own spans in a job handler
 

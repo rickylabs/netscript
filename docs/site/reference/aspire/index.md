@@ -12,18 +12,23 @@ surface reported by `deno doc`. For the full index of packages and plugins retur
 
 > **Generated AppHost runtime behavior.** The TypeScript AppHost this package generates emits
 > **ephemeral ports** (`0`) for the dashboard, OTLP, and resource-service endpoints, so
-> `aspire start --isolated` (an upstream Aspire CLI flag) configures randomized ports
-> and isolated user secrets (note that container resource host ports are not guaranteed unique across isolated starts without explicit port configuration). Frontend **app** resources also configure `withBrowserLogs()` when the `Aspire.Hosting.Browsers` package is present, forwarding browser console output into the Aspire
-> dashboard.
+> `aspire start --isolated` (an upstream Aspire CLI flag) configures randomized ports and isolated
+> user secrets (the host ports of container resources, however, are not guaranteed unique across
+> isolated starts without explicit port configuration). Frontend **app** resources also configure
+> `withBrowserLogs()` when the `Aspire.Hosting.Browsers` package is present, forwarding browser
+> console output into the Aspire dashboard.
 >
 > **13.5 AppHost configuration contracts:**
-> - **Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`):** Backing infrastructure
->   contracts define non-credential listener readiness probes (TCP socket connect for Postgres/MySQL/MSSQL, RESP `PING` → `+PONG`
->   for Redis/Garnet over `node:net` with a 2000 ms timeout).
-> - **Typed resource commands (`CommandOptions.Arguments`):** `<db>-cli` resources configure typed
->   `migrate` (with `--timeout <seconds>`), `seed`, and `reset` (with `--confirm true` guard) command shapes in generated TypeScript AppHost definitions.
-> - **MCP tool exposure control (`excludeFromMcp`):** `<db>-cli` helper executables invoke `excludeFromMcp()` so they are
->   omitted from the Aspire MCP server tool surface.
+>
+> - **Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`):** backing-infrastructure
+>   contracts define credential-free listener-readiness probes — a TCP socket connect for
+>   Postgres/MySQL/MSSQL, and a RESP `PING` → `+PONG` exchange for Redis/Garnet over `node:net` with a
+>   2000 ms timeout.
+> - **Typed resource commands (`CommandOptions.Arguments`):** `<db>-cli` resources define typed
+>   command shapes — `migrate` (with `--timeout <seconds>`), `seed`, and `reset` (guarded by
+>   `--confirm true`) — in the generated TypeScript AppHost definitions.
+> - **MCP tool exposure control (`excludeFromMcp`):** `<db>-cli` helper executables invoke
+>   `excludeFromMcp()` so they are omitted from the Aspire MCP server's tool surface.
 
 The root entrypoint (`@netscript/aspire`) exposes the diagnostic contract only. Composition,
 config, schema, type, adapter, and testing APIs live on typed sub-path exports:

@@ -85,7 +85,11 @@ and runs the resulting graph.
 ] }) }}
 
 {{ comp callout { type: "note", title: "Target after the 13.5.3 pin" } }}
-The generated scaffold config above targets the <code>13.4.6</code> baseline emitted by the current CLI head. Target workspaces adopting the <code>13.5.3</code> train configure <code>sdk.version</code> to <code>13.5.3</code>, hosting packages to <code>13.5.3</code>, and <code>Aspire.Hosting.Browsers</code> to <code>13.5.3-preview.1.26425.3</code> (the CLI and AppHost SDK must remain on the same release train).
+The generated config above shows the <code>13.4.6</code> baseline that the current
+<code>netscript init</code> emits. Workspaces adopting the <code>13.5.3</code> train set
+<code>sdk.version</code> to <code>13.5.3</code>, the hosting packages to <code>13.5.3</code>, and
+<code>Aspire.Hosting.Browsers</code> to <code>13.5.3-preview.1.26425.3</code> — the CLI and the
+AppHost SDK must stay on the same release train.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral, not pinned" } }}
@@ -96,9 +100,11 @@ dashboard to <code>:18888</code> or the collector to <code>:4318</code>. Two con
 <strong>trust the URL <code>aspire start</code> prints</strong>, not a memorized port — the
 examples in this essay use <code>:18888</code>/<code>:4318</code> as the conventional Aspire
 defaults, but your run may differ; (2) <code>aspire start --isolated</code> configures
-randomized ports and isolated user secrets, allowing apphosts to run without colliding on
-the default dashboard port (note that container resource host ports are not guaranteed unique across isolated starts without explicit port configuration). Point telemetry backends at the endpoint the
-run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yourself to fix it.
+randomized ports and isolated user secrets, so several apphosts can run without colliding on the
+default dashboard port (the host ports of container resources, however, are not guaranteed unique
+across isolated starts without explicit port configuration). Point telemetry backends at the
+endpoint the run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yourself to
+fix it.
 {{ /comp }}
 
 Two facts about the AppHost are worth internalizing because they contradict assumptions people
