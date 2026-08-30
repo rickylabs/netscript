@@ -4666,3 +4666,58 @@ is required.
 Parked target unchanged; the leaf has advanced to `9c9d2196` while its thread stayed continuously
 busy. The park lands at its next genuine idle boundary; nothing from it is merged, readied, or on the
 merge front.
+
+## 2026-08-30 — #1758 PARKED at `f4ca7c32`; #1368 becomes the sole fixes merge-front
+
+### The evaluator was stopped before it could produce a stale artifact
+
+The coordinator's pre-audit is right: #1734 must change `main` and force an exact-head rerun, so any
+verdict cut now would be **knowingly stale**. The delta evaluator dispatched at `f4ca7c32`
+(`55a500df`) was **stopped**, and it had **not** written
+`delta-receipt-final.md` — verified before and after. So there is **no stale receipt to retract**,
+which is the cheap outcome; stopping a few minutes later would have meant publishing and then
+withdrawing a verdict. Its worktree and branch were removed.
+
+Superseded `MECHANICAL_PASS` at `f1ff5557` (`ca46f565`) remains marked not-to-be-cited.
+
+### Body repair finished — the checklist now under-claims rather than over-claims
+
+Two readiness boxes are deliberately **unticked**, each with inline attribution:
+
+- **Bare `deno task e2e:cli` passes green** — cannot be ticked until #1734 lands and the suite reruns
+  green at the post-#1734 exact head.
+- **Fresh final evaluator verdict at the post-#1734 merge head** — deliberately not run.
+
+The PLAN-EVAL/IMPL-EVAL box was restored to a **precise** claim — that both passed *at their evaluated
+heads* (`9a0f5876`, `83b7109c`) — rather than either an over-claim of current-head currency or an
+under-claim that erases real completed gates. That distinction is the whole point: the box should say
+exactly what was proven and where.
+
+`status:impl` retained; readiness withheld on #1734. Park comment posted at
+`https://github.com/rickylabs/netscript/pull/1758#issuecomment-5469167501` with the four heads
+distinguished, the AC3 chunk scan, the 26/1 baseline-blocked receipt, the resource-zero proof, and the
+resume plan.
+
+### #1368 is the merge-front, and it has real committed progress
+
+Ironically the leaf that spent this period parked-but-busy is now the one to drive. Committed and
+pushed at `9c9d2196`:
+
+| Commit | Content |
+| --- | --- |
+| `2146443c` | S2 red-before **alone** — validated as a true assertion-red: exit 1, 0 passed / 2 failed, `AssertionError` on both the missing `saga.cascade.compensate` span and the absent correlation id |
+| `f8563626` | red-before evidence, run artifacts only |
+| `9c9d2196` | `feat(sagas): carry correlated span context` — first product slice |
+
+Product surface so far: `saga-engine.ts`, `telemetry/attributes.ts`, `telemetry/instrumentation.ts`,
+`telemetry/otel-saga-telemetry.ts` plus four telemetry test files — all inside the locked ceiling.
+
+Its plan gate is **`PASS_PLAN` cycle 2** (`81c5f874`) with two carried conditions still owed before S4:
+F3b (record whether the new `SagaCompensationRequest` fields are optional **and** that the compensator
+applies no fallback precedence) and F1-residual (`saga.cascade.complete` emits whenever `completed` is
+true, with the **persisted** status, which may be `failed`/`compensating`).
+
+The earlier park instruction never landed — the thread stayed continuously busy and a mid-turn resume
+fails with an active-writer conflict. That overrun now turns out to be the work the queue needs, but
+the sequencing lesson stands: a park that cannot be delivered is not a park, and this lane should have
+said so plainly at the time rather than describing it as parked.
