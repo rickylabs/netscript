@@ -1493,3 +1493,14 @@
   S1; `aspire-structured-evidence_test.ts` 14 passed / 0 failed), pushed fast-forward, **run
   33328308643** dispatched. (The staged rebuild script had rebased from `9303daf61` and was rejected
   non-fast-forward; corrected to build on the live remote head — no force used.)
+- **D-69 cycle 3 (hosted proof run 33328308643 at `597f92008`, FAILURE):** postgres tier 36 PASS →
+  `runtime.aspire-start` `prisma-studio omitted state`; sqlite tier 37 PASS →
+  `sagas-api omitted
+  state`. Third boundary of the same class. Root cause settled at the source:
+  13.5.3 `src/Shared/Model/Serialization/ResourceJson.cs` — **every** property nullable and nulls
+  omitted on the wire (my own 18-line capture shows `healthStatus`/`source`/timestamps present only
+  sometimes). Bounded cycle 3 dispatched on the S10 thread
+  (`slices/s10/phase-b-fix-cycle-3-brief.md`): parser modelled on the DTO once — identity required,
+  `state`/`status` missing → pending, everything else optional, wrong types fail-closed,
+  table-driven tests + the two CI shapes as fixture lines. Rebuild on the live proof head follows
+  its push (no unchanged proof rerun).
