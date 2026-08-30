@@ -2543,3 +2543,52 @@ committed; recorded as an instruction, not verified by inspection.
 This resolves the policy gap recorded earlier in this session for `formal_impl_evaluation` — the
 documented fallback now actually has working credentials, so future capacity exhaustion routes
 through DeepSeek rather than requiring another bounded exception.
+
+## 2026-08-30 — #1790 reconciliation: caught a real defect on my own promotion
+
+### The audit was right, and precisely so
+
+I promoted #1790 to `status:ready-merge` and polled for a CI run that never existed —
+`mergeStateStatus` was `DIRTY`/`CONFLICTING`, not `CLEAN`, and I had not checked it after main moved
+past `74e3d451` while the DeepSeek evaluation was running. Verified every claim before acting:
+
+- `mergeStateStatus`: **CONFLICTING/DIRTY**, confirmed
+- `git diff --check origin/main...HEAD`: two "new blank line at EOF" violations in
+  `plan.md`/`supervisor.md`, confirmed
+- `git merge-tree origin/main HEAD`: **real conflicts** in all four derived-asset carriers, confirmed
+
+**What I actually did wrong:** I ran the earlier PASS gates in the leaf worktree, which was still on
+its stale base, and never re-checked `mergeable`/`mergeStateStatus` against `origin/main` before
+promoting. Gate greenness in a worktree proves nothing about integration with a base that has since
+moved. That check belongs in Tier-A going forward, not just at dispatch time.
+
+### Reconciliation
+
+Reset to `bc33c2aa3`, replayed the two **prose** commits only (`958184886` cli, `fa1055887` plugin —
+clean cherry-picks, confirming the earlier conflict was entirely in the derived-asset commits, which
+is expected and correct: those should never be replayed, only regenerated). Fixed the two trailing
+blank lines. Regenerated the four carriers fresh in their own commit.
+
+**Product identity proved, not assumed:** `git diff <pre-reconcile-tag> HEAD -- docs/site/reference/{cli,plugin}/index.md`
+is empty — the reconciliation touched integration and whitespace only.
+
+New head: **`a6f3927b0`**. 14 gates green including `diff --check`. Pushed with `--force-with-lease`.
+
+### Main moved a second time mid-cycle, and the evaluator caught it live
+
+While the cli-half delta re-evaluation was running, `origin/main` advanced again to `2a1248d33`
+(#1740, Aspire runtime-port fix). The dispatched evaluator noticed the base SHA mismatch and reported
+it rather than silently evaluating against a memorized SHA — checked independently: **zero path
+intersection** with #1790's scope (e2e gates, plugin runtime code, a *different* generated carrier
+`agent-tools.generated.ts`), and `git merge-tree` against the new main returns **zero conflicts**. No
+further reconciliation needed — consistent with this session's standing rule to integrate only where
+paths or gate inputs actually intersect.
+
+### Fresh delta re-evaluation, explicitly barred from reusing prior evidence
+
+Both dispatches instructed not to cite the `068d4ba30`/`40f799eae` evaluations as evidence — those
+heads are superseded and one had unresolvable conflicts with the current base. `cli` half re-run:
+**PASS**, 23/23 and 29/29 fresh, `diff --check` clean, `mergeable: MERGEABLE`. `plugin` half running.
+
+Not promoting to `status:ready-merge` again until the plugin half returns and mergeability is
+re-confirmed at the exact pushed head.
