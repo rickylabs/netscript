@@ -6264,3 +6264,25 @@ whole workflow run to finish naturally (a job can't be rerun mid-flight), then r
 close-gate job** by its `databaseId` — not a full workflow rerun, not the evaluator. Genuinely fresh
 attempt confirmed by its own `started_at` timestamp, well after the label restoration:
 **`close-gate: success`**.
+
+### #1781/#1357 EXACT MERGE PACKET (immutable)
+
+Every field independently re-verified, not carried from prior claims:
+
+| Check | State |
+| --- | --- |
+| PR head | `a34c37eb2d43414385016b8532047796b0f07f87` |
+| PR draft | `false` |
+| PR mergeable / mergeStateStatus | `MERGEABLE` / `CLEAN` |
+| PR labels | `type:fix, area:cli, area:fresh, status:ready-merge, priority:p1` (sole status) |
+| Issue #1357 state / labels | `OPEN` / sole `status:ready-merge` |
+| Issue #1357 acceptance boxes | 11/11 `[x]`, mirrored |
+| review-threads | `PASS`, threads=0, unanswered=0 |
+| close-gate | `success` (attempt 2, genuinely fresh post-label-restoration) |
+| Evaluator | `PASS_IMPL` `2991113a6`, valid, not rerun; two automation-spawned redundant runs
+  cancelled and not adopted |
+| On-host runtime proof | 80/1, sole red the known NAS Chromium-absence gate |
+| Off-host runtime proof | `e2e-cli.yml` run `33342040720`, terminal SUCCESS, all four tiers including the browser-backed gate |
+
+**Merge packet: PR #1781, `--match-head-commit a34c37eb2d43414385016b8532047796b0f07f87`, closes #1357.**
+No further action available short of the merge itself — handing to coordinator.
