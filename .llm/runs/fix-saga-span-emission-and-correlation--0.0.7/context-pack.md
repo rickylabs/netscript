@@ -27,9 +27,9 @@ Flow-B compensation fixture plus direct-parent/correlation validator proof; its 
 publish, tests, and three non-mutating derivative gates pass; MCP corpus staleness is the expected
 attributed STOP and was not regenerated. IMPL-EVAL cycle 1 ran against a pre-S5/S6 head, but its
 live F2/F3 regressions were reproduced by assertions at `bd89e523`; S7 preserves explicit scheduled
-child keys, keeps nested sends from acquiring the upstream domain key, transports cross-plane send
-correlation separately, and preserves both message-level W3C fields in the noop compensation handler
-context. The full allowed author gate set is green at the final repaired tree.
+child keys and both message-level W3C fields in the noop compensation handler context. The send
+variant has no child-key field, so its accepted, documented upstream-correlation fallback remains
+unchanged. The full allowed author gate set is green at the final repaired tree.
 
 ## Completed
 
@@ -73,10 +73,10 @@ context. The full allowed author gate set is green at the final repaired tree.
   supervisor-attributed STOP and made no generated write. Recorded the inherited plugin doctor
   module-tag audit failure without expanding the ceiling.
 - Reproduced IMPL-EVAL cycle-1 F2/F3 at `bd89e523` with 10 passed / 2 failed assertions, then fixed
-  scheduled child-key precedence and noop compensation handler trace context. The final correction
-  keeps nested sends domain-key-neutral while carrying the upstream telemetry ID separately and
-  covers both `traceparent` and `tracestate`. The repaired focused suite passes 12/12 and the whole
-  core surface passes 84/0/3 ignored.
+  scheduled child-key precedence and noop compensation handler trace context. Type inspection
+  confirms the send variant cannot supply a child key, so its documented upstream-ID fallback is
+  retained. Both `traceparent` and `tracestate` are covered. The repaired focused suite passes 12/12
+  and the whole core surface passes 84/0/3 ignored.
 
 ## In Progress
 

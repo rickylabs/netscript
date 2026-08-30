@@ -162,8 +162,8 @@ export class SagaBusBridge implements SagaBusPort {
     }
   }
 
-  async #handleAndDispatch(message: SagaMessage, correlationId?: string): Promise<void> {
-    const results = await this.#engine.handle(message, { correlationId });
+  async #handleAndDispatch(message: SagaMessage): Promise<void> {
+    const results = await this.#engine.handle(message);
     for (const result of results) {
       const definition = this.#definitions.get(result.sagaId);
       if (!definition) {
@@ -263,9 +263,10 @@ export class SagaBusBridge implements SagaBusPort {
         payload: message.payload,
         idempotencyKey: message.idempotencyKey,
         concurrencyKey: message.concurrencyKey,
+        correlationKey: execution?.correlationId as SagaCorrelationKey | undefined,
         traceparent: child?.traceparent,
         tracestate: child?.tracestate,
-      }, execution?.correlationId);
+      });
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
     } catch (error) {
       if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);

@@ -166,9 +166,8 @@ direct child of the operation that produced it, including compensation-generated
 
 For scheduled child messages, an explicit child `correlationKey` wins; the upstream cross-plane ID
 is used only when the child omitted one. The current `send()` DSL has no child-correlation option,
-so the bridge leaves the nested message's domain key unset and supplies the upstream cross-plane ID
-to the engine separately. A rule-less downstream saga therefore retains its existing
-`<sagaId>:<type>` domain identity while its spans remain joined to the upstream operation.
+so the bridge seeds its nested message with the upstream cross-plane ID. A rule-less downstream saga
+therefore uses that value as its domain key; a downstream `.correlate()` rule still wins.
 
 `saga.cascade.complete` is emitted whenever a handler returns a complete effect, including a
 storeless runtime. Its `netscript.saga.status` is the resolved persisted status—not a success flag.

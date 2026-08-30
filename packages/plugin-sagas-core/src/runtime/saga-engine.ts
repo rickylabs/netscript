@@ -158,10 +158,7 @@ export class SagaEngine implements SagaBusPort {
   }
 
   /** Execute all handlers registered for a message type. */
-  async handle(
-    message: SagaMessage,
-    execution: number | Readonly<{ attempt?: number; correlationId?: string }> = 1,
-  ): Promise<readonly SagaEngineHandleResult[]> {
+  async handle(message: SagaMessage, attempt = 1): Promise<readonly SagaEngineHandleResult[]> {
     if (!this.#running) {
       throw SagasError.validationFailed('SagaEngine must be started before handling messages.');
     }
@@ -171,11 +168,9 @@ export class SagaEngine implements SagaBusPort {
       throw SagasError.sagaNotFound(message.type);
     }
 
-    const attempt = typeof execution === 'number' ? execution : execution.attempt ?? 1;
-    const correlationId = typeof execution === 'number' ? undefined : execution.correlationId;
     const results: SagaEngineHandleResult[] = [];
     for (const entry of entries) {
-      results.push(await this.#handleEntry(entry, message, attempt, correlationId));
+      results.push(await this.#handleEntry(entry, message, attempt));
     }
     return Object.freeze(results);
   }
@@ -222,7 +217,6 @@ export class SagaEngine implements SagaBusPort {
     entry: SagaEngineDispatchEntry,
     message: SagaMessage,
     attempt: number,
-    suppliedCorrelationId?: string,
   ): Promise<SagaEngineHandleResult> {
     return await this.#withConcurrency(entry.definition, message, async () => {
       const handler = entry.definition.handlers.get(message.type);
@@ -231,7 +225,7 @@ export class SagaEngine implements SagaBusPort {
       }
 
       const correlationKey = resolveCorrelationKey(entry.definition, message);
-      const correlationId = suppliedCorrelationId ?? message.correlationKey ?? correlationKey;
+      const correlationId = message.correlationKey ?? correlationKey;
       const instanceId = await this.#resolveInstanceId(entry.sagaId, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
