@@ -93,3 +93,81 @@ the set, so R-1's set-identity condition is satisfied by measurement rather than
 
 **No verdict yet.** Substance is strong and nothing found so far blocks; the verdict waits on the
 receipt set rather than being issued against a half-cut one.
+
+---
+
+# Part 2 — receipts, process, and verdict
+
+Author turn closed. Evidence head **`dce16175`** (`test(harness): record #1466 slice 2 evidence`),
+local == `origin` == PR head, clean. Content head remains **`2863d29e`** —
+`git diff --stat 2863d29e..dce16175 -- packages plugins docs templates` is **empty**, so the evidence
+commit moved no product.
+
+## Receipt set — all eight at the content head
+
+| Receipt | exit | outcome | attempt | gitHead == actualGitHead |
+| --- | --- | --- | --- | --- |
+| `check` | 0 | PASS | 8 | ✓ `2863d29e34` |
+| `lint` | 0 | PASS | 8 | ✓ |
+| `fmt-check` | 0 | PASS | 8 | ✓ |
+| **`test`** | **0** | **PASS** | 8 | ✓ |
+| `public-doc-lint` | 1 | FAIL | 8 | ✓ |
+| `quality-gate` | 0 | PASS | 8 | ✓ |
+| `arch-check` | 0 | PASS | 8 | ✓ |
+| `publish-dry-run` | 0 | PASS | 8 | ✓ |
+
+Named explicitly, never a glob; every head matches. `deno.lock` **byte-unchanged**
+(`git diff --exit-code -- deno.lock`). Sufficiency `INSUFFICIENT` with exactly one reason —
+`public-doc-lint` — which is R-1's baseline-red / delta-0 finding and external to this leaf.
+
+**The `test` receipt matters more than its row suggests.** It is a real `PASS` at exit 0, cut after
+the host repair, i.e. under `tini` **and** `fs.inotify.max_user_instances` = 1024. The live set for
+slice 2 therefore carries **no infrastructure waiver at all** — no `SKIPPED`, no ruling cited to
+avoid a gate. That is the state D-33 said the final evaluator should require, reached one slice
+earlier than expected.
+
+## Process obligations — met
+
+- **G-2 discharged by the author**, not by me: a per-slice PR comment is posted on #1731 ("Slice 2 of
+  3 is implemented…"). The brief made it a closing obligation instead of "commit, push, stop", and
+  that fixed the defect cycle 2 raised.
+- **`context-pack.md` refreshed and accurate.** It names the slice-2 content head, marks S3 and the
+  final IMPL-EVAL as outstanding, states `Refs #1466 — partial` with no closing keyword, and tells a
+  resumer not to touch the G-4 docs items before slice 3. A resumer reading it alone is not misled —
+  which is the G-3 standard.
+- Supplemental evidence recorded under `audit/`: `docs-exports-drift-slice2.txt`,
+  `public-doc-lint-slice2.txt`, `sdk-focused-slice2.txt`, `evidence-sufficiency-slice2.json`.
+
+## Carried to slice 3 — not blocking
+
+- **AF-1** (this review, Part 1): the G-1 anchor's `[^=;]+?` annotation span goes red on *correct*
+  code if that annotation ever gains a `=` (a default type parameter). The hazard is the repair
+  someone would reach for — loosening back toward the file-wide form G-1 removed. Slice 3 adds a
+  comment naming the trap; **the pattern itself is not to be changed.**
+- **Host-state gap in `context-pack.md`.** Slice 2 correctly removed the stale "inotify is 128 /
+  watch-run dies" paragraph but put nothing in its place, so a resumer cannot tell the host was ever
+  repaired, that R-1's root-`test` condition is void, or that the frozen archives predate the fix.
+  Slice 3's brief requires a short host-state section. Left to that author rather than patched by me,
+  so one owner writes the file.
+- **G-4** (IMPL-EVAL cycle 2): the `CommonErrorMap` docs row and a `{@link commonErrorMap}` public
+  JSDoc still point at a symbol that is no longer public. Slice 3's, by the evaluator's assignment.
+
+## Verdict
+
+**`ACCEPTED`** at content head `2863d29e`, evidence head `dce16175`.
+
+Slice 2 does what plan slice 2 contracts and nothing else. The two claims worth attacking both held
+under my own measurement: the anchored G-1 pin goes **red** against the evaluator's exact decoy
+forgery while `deno check` still passes on the forged file — so the guard is the only thing standing
+between that substitution and a green build, and it now stands — and `public-doc-lint` is **12 with a
+set identical to slice 1's**, meaning two new public SDK type exports added zero findings. Suites
+94/0, `docs:exports-drift` exit 0, `ActionMethod` wired and exported, `commonErrorMap` untouched and
+still private, no upstream re-export (AP-14 clear), no metadata-boundary cast or `any` — the only
+`as` tokens in the diff are inside the new scanner's own fixture strings, the scanner proving itself.
+
+No finding blocks. AF-1 and the context-pack host-state gap are carried to slice 3 with G-4.
+
+Withheld from this lane and unchanged: merge, ready-flip, relabel, milestone change, issue close,
+acceptance-box ticking, restoring a closing keyword, and any runtime lease. PR #1731 stays **draft**
+at `Refs #1466 — partial`; slice 3, the final all-slices separate-session IMPL-EVAL, and the
+close-gate all remain outstanding.
