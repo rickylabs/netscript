@@ -7,7 +7,6 @@ import {
   KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
 } from '../../../src/domain/cli-surface.ts';
 import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
-import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import {
@@ -95,8 +94,8 @@ Deno.test('live DB endpoint gate reads the detached dashboard metadata path', ()
   ]);
 });
 
-// #954 regression: this gate shipped probing a hardcoded `http://127.0.0.1:8000/` while a
-// pinning scaffold published the app on 8010, so all 60 attempts were refused and the failure
+// #954 regression: this gate shipped probing the start of the app range while a pinning
+// scaffold published a different port, so all 60 attempts were refused and the failure
 // read exactly like an app that could not render.
 //
 // #952 follow-on: the pristine scaffold now pins nothing, so the gate must also hand over the
@@ -197,22 +196,51 @@ Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
   if (gate?.kind !== 'command') {
     throw new Error('Expected durable CLI parity gate to be a command gate.');
   }
-  const projectName = 'runtime-gates-test';
   const context = {
-    project: { repoRoot: '/repo', projectRoot: '/workspace/app' },
-    request: { options: { projectName } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+    request: { options: { projectName: 'runtime-gates-test' } },
   } as RunContext;
-  const workersPort = allocateScaffoldDefaultPort(projectName, 'plugin:workers-api');
-  const sagasPort = allocateScaffoldDefaultPort(projectName, 'plugin:sagas-api');
   assertEquals(gate.cwd(context), '/workspace/app');
   assertEquals(gate.command(context), [
     'deno',
     'run',
-    `--allow-net=127.0.0.1:${workersPort},127.0.0.1:${sagasPort}`,
+    '--allow-net=localhost,127.0.0.1',
+    '--allow-run=aspire',
+    '--allow-env=WORKERS_API_URL,SAGAS_API_URL',
     '--allow-read',
     '/repo/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts',
+    '/workspace/app/aspire/apphost.mts',
   ]);
   assertEquals(gate.failureHint, undefined);
+});
+
+Deno.test('plugin behavior gates resolve live resource URLs through Aspire describe', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_WORKERS_HEALTH);
+  if (gate?.kind !== 'command') throw new Error('Expected workers health command gate.');
+  const context = {
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+    request: { options: { projectName: 'runtime-gates-test' } },
+  } as RunContext;
+
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-run=aspire',
+    '--allow-net=localhost,127.0.0.1',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-plugin-resource.ts',
+    '/workspace/app/aspire/apphost.mts',
+    'workers-api',
+    'get',
+    '/health/live',
+  ]);
 });
 
 Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live AppHost', () => {

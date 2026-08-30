@@ -1,6 +1,7 @@
 import { StreamProducerMetricNames } from '@netscript/plugin-streams-core/telemetry';
 import type { TelemetryTrace } from '@netscript/telemetry/query';
 import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
+import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
 
 // This coordinator is copied into service-only smoke workspaces where the streams plugin source is
 // intentionally absent. Keep the probe's wire markers structural so static scaffold checks do not
@@ -97,10 +98,14 @@ export function assertProducerReconnectMetrics(
 }
 
 async function main(): Promise<void> {
-  const [projectRoot, appHost, repoRoot, baseUrl] = Deno.args;
-  if (!projectRoot || !appHost || !repoRoot || !baseUrl) {
-    throw new Error('project root, AppHost, repository root, and streams base URL are required');
+  const [projectRoot, appHost, repoRoot] = Deno.args;
+  if (!projectRoot || !appHost || !repoRoot) {
+    throw new Error('project root, AppHost, and repository root are required');
   }
+  const baseUrl = firstResourceUrl(
+    await resolveResourceUrlsFromAppHost(appHost, 'streams'),
+    'streams',
+  );
   const metadata = await readStartMetadata(projectRoot);
   const otlpEndpoint = await readOtlpEndpoint(metadata.logFile);
   let streamsStarted = true;
@@ -185,6 +190,12 @@ async function main(): Promise<void> {
     }
     await otlpCapture?.shutdown();
   }
+}
+
+function firstResourceUrl(urls: readonly string[], resourceName: string): string {
+  const url = urls[0];
+  if (!url) throw new Error(`Aspire resource ${resourceName} declared no URL.`);
+  return url;
 }
 
 interface OtlpCapture {

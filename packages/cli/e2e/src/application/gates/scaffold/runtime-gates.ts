@@ -10,8 +10,7 @@ import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/e
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import { resolve } from '@std/path';
-import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
-import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
+import { commandGate, denoCommand } from './gate-factory.ts';
 import { generatedAppName } from './generated-app-name.ts';
 
 const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
@@ -50,25 +49,23 @@ const AI_CHAT_ROUTE_FAILURE_HINT =
   '`e2e-tool` was absent or not callable after plugin registry generation. Inspect the captured ' +
   'stderr for the failing generated module and registry path.';
 
-function pluginUrl(resourceName: string, path: string): (context: RunContext) => string {
-  return (context) =>
-    `http://127.0.0.1:${
-      allocateScaffoldDefaultPort(
-        context.request.options.projectName,
-        `plugin:${resourceName}`,
-      )
-    }${path}`;
-}
-
-function pluginPort(context: RunContext, resourceName: string): number {
-  return allocateScaffoldDefaultPort(
-    context.request.options.projectName,
-    `plugin:${resourceName}`,
-  );
-}
-
-function withPluginPort(script: string, previousPort: number, port: number): string {
-  return script.replaceAll(String(previousPort), String(port));
+function pluginProbeCommand(
+  context: RunContext,
+  resourceName: string,
+  action: string,
+  path?: string,
+): readonly string[] {
+  return [
+    'deno',
+    'run',
+    '--allow-run=aspire',
+    '--allow-net=localhost,127.0.0.1',
+    `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-plugin-resource.ts`,
+    context.project.appHost,
+    resourceName,
+    action,
+    ...(path === undefined ? [] : [path]),
+  ];
 }
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
@@ -174,11 +171,7 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'eval',
-        withPluginPort(
-          AUTH_SMOKE_ENV_SCRIPT,
-          8094,
-          pluginPort(context, 'auth'),
-        ),
+        AUTH_SMOKE_ENV_SCRIPT,
         context.project.projectRoot,
         context.project.repoRoot,
       ],
@@ -370,69 +363,59 @@ export function createRuntimeGates(
         database,
       ],
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_WORKERS_HEALTH,
       'Workers API health',
-      pluginUrl('workers-api', '/health/live'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'workers-api', 'get', '/health/live'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_WORKERS_JOBS,
       'List worker jobs',
-      pluginUrl('workers-api', '/api/v1/workers/jobs'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'workers-api', 'get', '/api/v1/workers/jobs'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_WORKERS_TASKS,
       'List worker tasks',
-      pluginUrl('workers-api', '/api/v1/workers/tasks'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'workers-api', 'get', '/api/v1/workers/tasks'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_WORKERS_SEED,
       'Seed worker demo data through API',
-      pluginUrl('workers-api', '/api/v1/workers/seed'),
-      'POST',
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'workers-api', 'post', '/api/v1/workers/seed'),
     ),
     commandGate(
       GATE.BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB,
       'Trigger workers plugin health job',
       GATE_PHASE.BEHAVIOR,
-      (context) => [
-        'deno',
-        'run',
-        '--allow-read',
-        `--allow-net=127.0.0.1:${pluginPort(context, 'workers-api')}`,
-        'packages/cli/e2e/src/application/gates/scaffold/configure-flow-b-job.ts',
-        context.project.projectRoot,
-        String(pluginPort(context, 'workers-api')),
-      ],
+      (context) => pluginProbeCommand(context, 'workers-api', 'workers-trigger'),
     ),
     commandGate(
       GATE.BEHAVIOR_WORKERS_EXECUTIONS,
       'List recent worker executions',
       GATE_PHASE.BEHAVIOR,
-      (context) => [
-        'deno',
-        'eval',
-        withPluginPort(
-          VALIDATE_WORKER_EXECUTIONS_SCRIPT,
-          8091,
-          pluginPort(context, 'workers-api'),
-        ),
-      ],
+      (context) => pluginProbeCommand(context, 'workers-api', 'workers-executions'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_SAGAS_HEALTH,
       'Sagas API health',
-      pluginUrl('sagas-api', '/health/live'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'sagas-api', 'get', '/health/live'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_SAGAS_LIST,
       'List saga definitions',
-      pluginUrl('sagas-api', '/api/v1/sagas/sagas'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'sagas-api', 'get', '/api/v1/sagas/sagas'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_SAGAS_INSTANCES,
       'List saga instances',
-      pluginUrl('sagas-api', '/api/v1/sagas/instances'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'sagas-api', 'get', '/api/v1/sagas/instances'),
     ),
     commandGate(
       GATE.BEHAVIOR_DURABLE_CLI_PARITY,
@@ -441,61 +424,50 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
-        `--allow-net=127.0.0.1:${pluginPort(context, 'workers-api')},127.0.0.1:${
-          pluginPort(context, 'sagas-api')
-        }`,
+        '--allow-net=localhost,127.0.0.1',
+        '--allow-run=aspire',
+        '--allow-env=WORKERS_API_URL,SAGAS_API_URL',
         '--allow-read',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts`,
+        context.project.appHost,
       ],
       (context) => context.project.projectRoot,
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_TRIGGERS_HEALTH,
       'Triggers API health',
-      pluginUrl('triggers-api', '/health'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'triggers-api', 'get', '/health'),
     ),
     commandGate(
       GATE.BEHAVIOR_TRIGGERS_WEBHOOK,
       'Accept generic trigger webhook',
       GATE_PHASE.BEHAVIOR,
-      (context) => [
-        'deno',
-        'eval',
-        withPluginPort(
-          ACCEPT_TRIGGER_WEBHOOK_SCRIPT,
-          8093,
-          pluginPort(context, 'triggers-api'),
-        ),
-      ],
+      (context) => pluginProbeCommand(context, 'triggers-api', 'trigger-webhook'),
     ),
     commandGate(
       GATE.BEHAVIOR_TRIGGERS_EVENTS,
       'List trigger events',
       GATE_PHASE.BEHAVIOR,
-      (context) => [
-        'deno',
-        'eval',
-        withPluginPort(
-          VALIDATE_TRIGGER_EVENTS_SCRIPT,
-          8093,
-          pluginPort(context, 'triggers-api'),
-        ),
-      ],
+      (context) => pluginProbeCommand(context, 'triggers-api', 'trigger-events'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_AUTH_LIVE,
       'Auth API liveness',
-      pluginUrl('auth', '/health/live'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'auth', 'get', '/health/live'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_AUTH_READY,
       'Auth API readiness',
-      pluginUrl('auth', '/health/ready'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'auth', 'get', '/health/ready'),
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_AUTH_SESSION,
       'Read auth session route',
-      pluginUrl('auth', '/api/v1/auth/session'),
+      GATE_PHASE.BEHAVIOR,
+      (context) => pluginProbeCommand(context, 'auth', 'get', '/api/v1/auth/session'),
     ),
     commandGate(
       GATE.BEHAVIOR_APP_HOME,
@@ -791,40 +763,6 @@ export const PROBE_SERVICE_HEALTH_SCRIPT = [
   '}',
 ].join('\n');
 
-const VALIDATE_TRIGGER_EVENTS_SCRIPT = [
-  'const url = "http://127.0.0.1:8093/api/v1/events?limit=10";',
-  'const response = await fetch(url);',
-  'if (!response.ok) throw new Error("HTTP " + response.status + " from " + url);',
-  'const body = await response.json() as { events?: unknown[]; total?: number };',
-  'if (!Array.isArray(body.events)) throw new Error("events response is missing events[]");',
-  'if (typeof body.total !== "number") throw new Error("events response is missing total");',
-  'if (body.total < 1) throw new Error("expected at least one trigger event after webhook gate");',
-].join('\n');
-
-const ACCEPT_TRIGGER_WEBHOOK_SCRIPT = [
-  'const url = "http://127.0.0.1:8093/api/v1/webhooks/inbound/generic";',
-  'let lastStatus = 0;',
-  'let lastBody = "";',
-  'for (let attempt = 1; attempt <= 30; attempt++) {',
-  '  const response = await fetch(url, {',
-  '    method: "POST",',
-  '    headers: { "Content-Type": "application/json" },',
-  '    body: JSON.stringify({',
-  '      message: "e2e-trigger-gate",',
-  '      timestamp: new Date().toISOString(),',
-  '    }),',
-  '  });',
-  '  lastStatus = response.status;',
-  '  lastBody = await response.text();',
-  '  if (response.ok) {',
-  '    console.info(`trigger webhook accepted: HTTP ${response.status}`);',
-  '    Deno.exit(0);',
-  '  }',
-  '  await new Promise((resolve) => setTimeout(resolve, 500));',
-  '}',
-  'throw new Error(`trigger webhook was not accepted after retries: HTTP ${lastStatus}: ${lastBody}`);',
-].join('\n');
-
 const AUTH_SMOKE_ENV_SCRIPT = [
   'const projectRoot = Deno.args[0];',
   'const repoRoot = Deno.args[1];',
@@ -844,44 +782,12 @@ const AUTH_SMOKE_ENV_SCRIPT = [
   '  "plugin", "auth", "provider", "set", "--preset", "github",',
   '  "--client-id", "scaffold_runtime_smoke",',
   '  "--client-secret", "scaffold_runtime_smoke_secret",',
-  '  "--redirect-uri", "http://127.0.0.1:8094/api/v1/auth/callback",',
+  '  "--redirect-uri", "http://localhost/api/v1/auth/callback",',
   '  "--kv-oauth-key", key, "--project-root", projectRoot,',
   ']);',
   'const configured = JSON.parse(await Deno.readTextFile(`${projectRoot}/appsettings.json`));',
   'if (configured.Auth?.Backend !== "kv-oauth") throw new Error("auth backend CLI did not persist appsettings");',
   'if (configured.NetScript?.Plugins?.auth?.Environment?.NETSCRIPT_AUTH_PROVIDER_ID !== "github") throw new Error("auth provider CLI did not persist plugin environment");',
-].join('\n');
-
-const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [
-  'const url = "http://127.0.0.1:8091/api/v1/workers/executions?limit=10";',
-  'const expectedJobId = "health-check";',
-  'let lastBody = "";',
-  'for (let attempt = 1; attempt <= 30; attempt++) {',
-  '  const response = await fetch(url);',
-  '  lastBody = await response.text();',
-  '  if (!response.ok) throw new Error("HTTP " + response.status + " from " + url + ": " + lastBody);',
-  '  const body = JSON.parse(lastBody);',
-  '  if (!Array.isArray(body.executions)) throw new Error("executions response is missing executions[]");',
-  '  if (typeof body.total !== "number") throw new Error("executions response is missing total");',
-  '  const execution = body.executions.find((item) => isExecutionForJob(item, expectedJobId));',
-  '  if (execution && isRecord(execution) && execution.status === "completed") {',
-  '    console.info(`worker health job completed after ${attempt} attempt(s)`);',
-  '    Deno.exit(0);',
-  '  }',
-  '  if (execution && isRecord(execution) && ["failed", "timeout", "cancelled"].includes(String(execution.status))) {',
-  '    throw new Error(`worker health job reached terminal failure state: ${JSON.stringify(execution)}`);',
-  '  }',
-  '  await new Promise((resolve) => setTimeout(resolve, 1_000));',
-  '}',
-  'throw new Error(`expected completed ${expectedJobId} execution after trigger gate; last body: ${lastBody}`);',
-  '',
-  'function isExecutionForJob(value, jobId) {',
-  '  return isRecord(value) && value.jobId === jobId;',
-  '}',
-  '',
-  'function isRecord(value) {',
-  '  return typeof value === "object" && value !== null && !Array.isArray(value);',
-  '}',
 ].join('\n');
 
 /** Create cleanup gates that stop generated runtime resources. */

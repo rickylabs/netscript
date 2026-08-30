@@ -34,7 +34,7 @@ export interface AuthStreamDB {
  * import { createAuthStreamDB } from '@plugins/auth/streams';
  * import { useLiveQuery } from '@tanstack/react-db';
  *
- * const authDb = createAuthStreamDB({ baseUrl: 'http://localhost:4437' });
+ * const authDb = createAuthStreamDB({ baseUrl: streamsServiceUrl });
  *
  * const { data: active } = useLiveQuery((q) =>
  *   q.from({ s: authDb.collections.authSession })
@@ -43,7 +43,7 @@ export interface AuthStreamDB {
  * ```
  */
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
+  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
 
   const streamDb = createStreamDB({
     streamOptions: {
@@ -60,4 +60,11 @@ export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStre
     preload: () => streamDb.preload(),
     close: () => streamDb.close(),
   };
+}
+
+function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
+  if (baseUrl === undefined) {
+    throw new Error('Auth StreamDB requires the Aspire-discovered streams service URL.');
+  }
+  return baseUrl;
 }

@@ -36,7 +36,7 @@ export interface SagasStreamDB {
  * import { createSagasStreamDB } from '@plugins/sagas/streams';
  * import { useLiveQuery } from '@tanstack/react-db';
  *
- * const sagasDb = createSagasStreamDB({ baseUrl: 'http://localhost:4437' });
+ * const sagasDb = createSagasStreamDB({ baseUrl: streamsServiceUrl });
  *
  * const { data: active } = useLiveQuery((q) =>
  *   q.from({ s: sagasDb.collections.sagaInstance })
@@ -45,7 +45,7 @@ export interface SagasStreamDB {
  * ```
  */
 export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
+  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
   const sagaInstanceSchema: z.ZodType<SagaInstance> = z.unknown().transform(
     (value): SagaInstance => SagaInstanceSchema.parse(value),
   );
@@ -65,4 +65,11 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
     },
     state,
   });
+}
+
+function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
+  if (baseUrl === undefined) {
+    throw new Error('Sagas StreamDB requires the Aspire-discovered streams service URL.');
+  }
+  return baseUrl;
 }

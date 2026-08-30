@@ -215,7 +215,13 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
     '--stream-url',
     'http://streams.test/auth/sessions',
   ]);
-  await command.parse(['session', 'revoke', 'active-1']);
+  await command.parse([
+    'session',
+    'revoke',
+    'active-1',
+    '--auth-url',
+    'http://auth.test/api/v1/auth',
+  ]);
   assertEquals(output, [
     'kv-oauth',
     'Session\tUser\tProvider\tState\tExpires',
@@ -294,7 +300,13 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
     '--stream-url',
     'http://streams.test/auth/sessions',
   ]);
-  await command.parse(['session', 'revoke', id]);
+  await command.parse([
+    'session',
+    'revoke',
+    id,
+    '--auth-url',
+    'http://auth.test/api/v1/auth',
+  ]);
 
   assertMatch(output[1], new RegExp(id));
   assertEquals((await session({ sessionId: id }, { registry })).authenticated, false);

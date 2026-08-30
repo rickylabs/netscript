@@ -65,6 +65,8 @@ required, and expose cross-resource URLs through resource-reference environment 
 | 2026-08-30 | 3 | contribution wiring | Four contributions allocate ports and publish resource references. |
 | 2026-08-30 | 3 | push | `aae91586b` pushed with contribution and consumer-stub evidence. |
 | 2026-08-30 | 4 | opt-in pins | Plugin manifests/entries and five infrastructure engines default to allocation. |
+| 2026-08-30 | 4 | push | `8aee17462` pushed with plugin/infrastructure opt-in evidence. |
+| 2026-08-30 | 5 | live probes | Runtime and OTEL gates resolve resource URLs from live Aspire describe output. |
 
 ## Decisions
 
@@ -95,6 +97,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | host-port allocation | FAIL (expected RED) | `receipts/01-aspire-host-ports-red.raw.txt` | Names all current contribution fallbacks/URLs. |
 | contribution allocation | PASS / exit `0` | `receipts/03-contributions.txt` | 957 files; no contribution fallback/URL findings. |
 | generated host-port opt-in | PASS / exit `0` | `receipts/04-opt-in-host-ports.txt` | Plugin and infrastructure cases covered. |
+| describe-derived probes | PASS / exit `0` | `receipts/05-describe-derived-probes.txt` | 57 tests plus 9 nested smoke steps passed. |
 
 ### Runtime Gates
 

@@ -114,7 +114,7 @@ export function createAuthPluginCommand(
         .action(async (options: { streamUrl?: string }) => {
           if (!options.streamUrl) {
             throw new Error(
-              'The legacy localhost:4437 stream URL is no longer inferred. ' +
+              'The legacy fixed stream URL is no longer inferred. ' +
                 'Run `aspire describe streams --format Json`, append `/auth/sessions` to the ' +
                 'streams HTTP endpoint, and pass it with `--stream-url`.',
             );
@@ -134,8 +134,8 @@ export function createAuthPluginCommand(
     .command(
       'revoke',
       new Command().arguments('<id:string>')
-        .option('--auth-url <url:string>', 'Auth REST base URL', {
-          default: 'http://localhost:8094/api/v1/auth',
+        .option('--auth-url <url:string>', 'Aspire-discovered Auth REST base URL', {
+          required: true,
         })
         .action(async (options: { authUrl: string }, id: string) => {
           print(`Revoked ${await dependencies.sessions.revoke(options.authUrl, id)}.`);
