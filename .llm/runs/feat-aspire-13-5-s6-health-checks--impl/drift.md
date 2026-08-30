@@ -134,3 +134,17 @@ documentation.
 - **Action:** enable hidden files and narrow both upload steps to their exact report filename
   family plus `.llm/tmp/cli-e2e/**/.netscript/e2e/listener-unreachable-receipt.json`; leave the
   fixture, receipt, gates, and runtime behavior unchanged.
+
+## 2026-08-31 — D-111 restores the classifier's artifact-path contract
+
+- **What:** D-110 correctly enabled hidden-file upload but replaced the four established artifact
+  patterns with two narrower paths.
+- **Source:** `.github/scripts/ci-classify-changes.test.ts` line 862 and the exact local reproduction
+  at D-110 head: 59 passed, 1 failed.
+- **Expected:** the SQLite runtime upload block retains `.llm/tmp/**/report*.ndjson` as part of the
+  original four-pattern evidence-carrier contract.
+- **Actual:** D-110 removed that pattern, causing the classifier self-test and CI to fail.
+- **Severity:** bounded CI contract regression.
+- **Action:** restore all four original patterns in both runtime upload steps, retain
+  `include-hidden-files: true`, and leave classifier, fixture, receipt, and product behavior
+  unchanged.

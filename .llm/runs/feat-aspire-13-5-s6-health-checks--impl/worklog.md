@@ -409,3 +409,28 @@ NOT_RUN and remain coordinator-owned.
   no lockfile or product-source change.
 - Reconcile: this slice implements the owner-supplied D-110 correction only. The coordinator owns
   PR base retargeting, the single exact-head `workflow_dispatch`, and archive inspection.
+
+## D-111 classifier artifact-path contract correction
+
+PLAN-EVAL is N/A by owner ruling: this is a bounded CI-only restoration of an existing classifier
+self-test contract, with no architecture or product decision. At exact D-110 head
+`144988b864d12c4c6d7d292ba1f7107ec7c6129d`, the SQLite workflow assertion still requires
+`.llm/tmp/**/report*.ndjson`, while D-110 removed that pattern. This slice restores the original
+four upload patterns in both runtime jobs and keeps D-110's `include-hidden-files: true`. It does
+not change the classifier test, fixture, receipt, gate logic, health checks, or runtime behavior.
+Runtime, workflow dispatch, PLAN-EVAL, and evaluator activity remain coordinator-owned and NOT_RUN.
+
+- RED at exact D-110 head: the required raw classifier command reproduced 59 passed / 1 failed;
+  `workflow: sqlite runtime uses sibling diff guard and fails closed` failed at line 862 because
+  `.llm/tmp/**/report*.ndjson` was absent.
+- Restored the original four upload patterns, in their original order, in both runtime jobs. Kept
+  `include-hidden-files: true` in both steps; no classifier source or test changed.
+- GREEN required command: `deno test --allow-read --allow-env
+  .github/scripts/ci-classify-changes.test.ts` passed 60/60 with the formerly failing workflow
+  contract green.
+- Structured harness verdict over the same test: PASS, 60/60 results.
+- Exact two-job artifact assertion: PASS; original four patterns and hidden-file upload are present
+  in both blocks. Workflow YAML parse and `git diff --check`: PASS.
+- Lock hygiene: PASS; no `deno.lock`, product source, fixture, receipt, or classifier change.
+- Reconcile: D-111 is the complete owner-supplied correction. The coordinator retains the single
+  exact-head `workflow_dispatch` and direct artifact-archive inspection.

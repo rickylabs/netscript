@@ -326,8 +326,10 @@ jobs:
         with:
           name: e2e-cli-scaffold-runtime-report
           path: |
-            .llm/tmp/e2e-report-scaffold-runtime*.json
-            .llm/tmp/cli-e2e/**/.netscript/e2e/listener-unreachable-receipt.json
+            .llm/tmp/**/report*.json
+            .llm/tmp/**/report*.ndjson
+            **/e2e-report*.json
+            **/listener-unreachable-receipt.json
           include-hidden-files: true
           if-no-files-found: ignore
 
@@ -411,8 +413,10 @@ jobs:
         with:
           name: e2e-cli-scaffold-runtime-sqlite-report
           path: |
-            .llm/tmp/e2e-report-scaffold-runtime-sqlite*.json
-            .llm/tmp/cli-e2e/**/.netscript/e2e/listener-unreachable-receipt.json
+            .llm/tmp/**/report*.json
+            .llm/tmp/**/report*.ndjson
+            **/e2e-report*.json
+            **/listener-unreachable-receipt.json
           include-hidden-files: true
           if-no-files-found: ignore
 

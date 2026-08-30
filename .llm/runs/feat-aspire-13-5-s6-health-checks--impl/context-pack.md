@@ -184,3 +184,14 @@ exact two-job contract assertion, 13/13 focused workflow-policy tests, YAML pars
 integrity. No product code, runtime behavior, receipt shape/location, workflow dispatch, or
 evaluator changed; the coordinator owns the one fresh exact-head workflow run and artifact
 inspection.
+
+## D-111 classifier artifact-path contract correction
+
+D-110's exact-path narrowing broke the checked-in classifier workflow contract, which requires
+`.llm/tmp/**/report*.ndjson` in the SQLite runtime job. Both runtime upload blocks now again carry
+the original four JSON/NDJSON/report/receipt globs while retaining D-110's real hidden-directory
+fix, `include-hidden-files: true`. The classifier script/test, fixture, receipt, and product logic
+are unchanged. Evidence is RED 59/60 at D-110, then GREEN 60/60 under both the owner-required raw
+command and the structured harness wrapper; exact artifact-block assertion, YAML parse, and diff
+integrity also pass. The coordinator owns the single fresh exact-head workflow dispatch and archive
+inspection.
