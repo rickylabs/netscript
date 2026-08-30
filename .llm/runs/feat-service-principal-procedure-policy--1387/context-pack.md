@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — stopped after Slice 1                  |
+| Current phase  | `impl` — Slices 1–4 accepted; Slice 5 not started |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -18,8 +18,19 @@ accepted design. Slice 1 then extended the existing `NetScriptProcedureMeta.acce
 optional readonly `authorization.scopes` and `authorization.roles`, plus its contracts/SDK type and
 runtime-independence proofs.
 
-Slice 1 is stopped at its Tier-A boundary. Slice 2 must not begin until the supervisor performs the
-substantive Tier-A review and releases the next slice.
+Slices 1–4 are each Tier-A **ACCEPTED** (Slice 1 at `2ddd6048`, Slice 2 at `f9b32b4f7` with a D-4
+ceiling amendment mid-slice, Slice 3 at `c297064aa` after two rescope stops (D-7, D-8) that traced to
+supervisor-brief errors rather than author defects, Slice 4 at `9cc8c4c5f`). Every slice has a
+separate opposite-family IMPL-EVAL verdict; Slice 3 carries two independent concurring verdicts
+(Opus 5 and DeepSeek V4 Flash 0731) under a coordinator-authorized routing deviation recorded in the
+topic supervisor's ledger, not here. Slice 5 must not begin until the supervisor releases it under
+its locked ceiling.
+
+**Resume-docs gap, corrected here.** This file and `worklog.md` were not updated after Slice 1
+landed — flagged as F-1 by the Slice 4 IMPL-EVAL, since a fresh session trusting this file alone
+would have been materially misled about run position despite the commit trail, per-slice Tier-A
+documents, and receipt archives all being current. Update this file at each slice boundary going
+forward, not only at Slice 1.
 
 ## Completed
 
@@ -37,12 +48,20 @@ substantive Tier-A review and releases the next slice.
 
 ## Next Steps
 
-1. Supervisor performs the substantive Tier-A review of Slice 1 and its receipt set.
-2. If accepted, the supervisor explicitly releases Slice 2 under its locked ceiling.
+1. Supervisor releases Slice 5 (contract-policy adapter and middleware binding, behaviour-only) under
+   its locked ceiling.
+2. Continue Slices 6–9, each with its own Tier-A review and separate opposite-family IMPL-EVAL.
 3. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
    the implementation PR must state the accepted substitution.
 4. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
    close-gate are complete.
+
+## Open follow-ups filed off this run (not slice work)
+
+| Issue | What | Why deferred |
+| --- | --- | --- |
+| #1787 | `ServiceBuilder`'s `TCustom` is a phantom type parameter | Fix needs a consumer position on `service-builder.ts` (Slice 2's ceiling only); makes the parameter invariant — a breaking change, plan-level decision |
+| #1789 | No `build()`-level RPC test exercises the real context wiring; `withContext` drops class-instance prototypes | Pre-existing test-coverage gap and an undocumented constraint, both outside Slice 3's ceiling |
 
 ## Key Decisions
 

@@ -336,3 +336,40 @@ each receipt's own work output; exit code alone was not treated as evidence.
 - E2E, Aspire, Docker, and browser gates were not run; no runtime lease was held.
 - Slice 1 is awaiting substantive supervisor Tier-A review. The implementation author has not
   self-certified Tier-A acceptance and has not started Slice 2.
+
+## Supervisor catch-up — Slices 1–4 accepted (resume-docs gap closed)
+
+This worklog was not updated after Slice 1, flagged as **F-1** by the Slice 4 IMPL-EVAL
+(`evaluate-slice-4-deepseek.md`) as a resume-docs gap: a fresh session trusting this file alone would
+have been materially misled about run position, even though the commit trail, per-slice Tier-A
+documents (`tier-a-slice-2/3/4.md`), and per-head receipt archives were all current. Catching up here
+rather than rewriting history into the earlier entries.
+
+**Slice 1** — Tier-A ACCEPTED at `2ddd6048`. IMPL-EVAL PASS. Metadata extension only, six-file
+ceiling, seven durable receipts, evidence set SUFFICIENT.
+
+**Slice 2** — Tier-A ACCEPTED_WITH_FINDINGS at `f9b32b4f7`. Mid-slice ceiling amendment (**D-4**,
+owner-ruled) added `service-builder-impl.ts` to a plan that had scoped it to `service-builder.ts`
+alone; the same shape as PLAN-EVAL's already-ratified F-3. The author terminated without
+`task_complete` after dispatching an out-of-brief reviewer; the supervisor committed its complete,
+uncommitted work unchanged rather than re-implementing. IMPL-EVAL (Fable 5) found a real evidence
+defect — **D-6**: three Slice 1 receipts sat uncleared at the top level beside Slice 2's set, read as
+current. Fixed; catalog gaps for `exports-drift`/`mcp-export-corpus` closed as **D-5**.
+
+**Slice 3** — Tier-A ACCEPTED at `c297064aa`, after **two rescope stops that traced to supervisor
+brief errors, not author defects**: **D-7** demanded a non-phantom `TCustom` proof the ceiling could
+not reach (the fix belongs to Slice 2's file, on no later slice — withdrawn, filed as **#1787**);
+**D-8** offered a false binary on a `traceHeaders` contract mismatch and omitted the correct third
+option (fix the runtime composition, which needed no ceiling amendment). The third dispatch resolved
+D-8 correctly. **Double-certified**: the native evaluator route hit an account-wide monthly spend
+limit, so a coordinator-authorized Opus 5 session evaluated first (`ACCEPTED_WITH_FINDINGS`), then a
+sanctioned DeepSeek V4 Flash 0731 session independently concurred without copying the first verdict —
+recorded in the topic supervisor's ledger, not duplicated here.
+
+**Slice 4** — Tier-A ACCEPTED at `9cc8c4c5f`. Contract-policy service ports, six-file ceiling,
+`AuthorizerPort` compatibility preserved and proven by direct assignment, contract-local design per
+research finding 15, fallback-typing invariant proved by a genuine `@ts-expect-error` rejection
+(independently reproduced by the DeepSeek evaluator, which removed the directive and confirmed
+`TS2741`). Nine receipts, evidence set SUFFICIENT, corpus grew by exactly the twelve new exports.
+
+Slice 5 is the next release: contract-policy adapter and middleware binding, behaviour-only.
