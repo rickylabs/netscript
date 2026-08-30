@@ -2508,3 +2508,38 @@ correlation repair and the convergence.
 rather than waiting: the `cli` and `plugin` reference pages carry the **same false-deferral pattern**
 the `logger` slice just fixed (`reference/cli/index.md:75`, `reference/plugin/index.md:85`) — surfaced
 by the #1785 evaluator before it died, and independent of #1785's merge.
+
+## 2026-08-30 — #1785 exact-green packet delivered; routing update noted
+
+### Body correction applied precisely
+
+Six edits, all itemized by the Opus evaluator and verified rather than blindly applied: Slices
+section marks the four pre-convergence commits historical and adds S5–S7 for the convergence and
+both evaluator carriers; Validation header re-dated to the product head; the provenance line in
+"exactness evidence" corrected `9f6935980`→`45737bda4`; the Head lineage table extended with the
+converged/carrier rows; all five `acceptance-evidence` SHAs re-pointed to `b7c8560ea`; DoD box 7
+re-verified true against the corrected body rather than merely re-worded.
+
+Second evaluator-report carrier `b7bd9238` added on top of `b8095e905` — the stale `impl-eval.md`
+was **left untouched** as historical record; the new `impl-eval-opus.md` sits alongside it. Product
+diff between the two carriers is empty.
+
+### Full cycle closed
+
+Label applied **before** the push that triggered the final CI run — held the #1783 sequencing rule
+this time. `close-gate` PASS on the first attempt at the merge head, no failed-then-fixed cycle.
+Thread resolved only after both evaluators confirmed the repair, not on the strength of the fix being
+dispatched. #1784 at 10/10, `status:ready-merge`, CI terminal green. Merge packet delivered.
+
+### Routing update — sanctioned for new dispatches, not retroactive
+
+Coordinator: OpenRouter credential is now provisioned and host-verified at the standard mode-600
+path. **All new quota-blocked `formal_impl_evaluation` dispatches use DeepSeek V4 Flash 0731 via the
+checked-in agentic tooling** — the documented fallback that was previously unavailable. #1785's
+Opus 5 fallback was explicitly **not reopened** for this — its terminal `PASS` stands as the bounded,
+PR-scoped exception it was authorized to be. The credential file must never be printed, catted, or
+committed; recorded as an instruction, not verified by inspection.
+
+This resolves the policy gap recorded earlier in this session for `formal_impl_evaluation` — the
+documented fallback now actually has working credentials, so future capacity exhaustion routes
+through DeepSeek rather than requiring another bounded exception.
