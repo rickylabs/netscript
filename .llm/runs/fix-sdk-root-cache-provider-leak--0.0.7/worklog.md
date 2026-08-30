@@ -271,3 +271,32 @@ The corrected row now names base, head, delta, scope, and the head measured at.
 No readiness flip, merge, relabel beyond phase truth, issue edit, or acceptance-box tick. No
 `e2e:cli`/Aspire/Docker/browser gate ran and no runtime lease was requested — this leaf's ceiling
 touches none of that surface.
+
+## Integration refresh after `origin/main` `f8b4f804`
+
+CI at `72ab6411` exposed real shared-generated-asset drift after #1746 landed. The feature branch
+merged `origin/main` at `f8b4f804` without rebasing. The only conflicts were the three generated
+paths already in the locked ceiling: `.llm/assets/agent-docs/prose.json.gz`,
+`.llm/assets/agent-docs/provenance.json`, and `packages/mcp/src/publish-assets.generated.ts`. They
+were restored to the incoming-main baseline and regenerated through their named tasks; no conflict
+resolution or leaf edit escaped the ceiling.
+
+| Gate | Result | Artifact-derived evidence |
+| --- | --- | --- |
+| Agent-docs precheck | EXPECTED STALE (exit 1) | Lume built 639 files and rendered 227 HTML files; the checker named both `prose.json.gz` and `provenance.json` stale. |
+| Agent-docs generation/final | PASS (exit 0) | `gen:agent-docs-prose` completed; final `check:agent-docs-prose` returned `fresh: true`, no stale paths, bundle SHA `141b9ce0928fd5efc2fdc7dd6dc64dce86d28e0c3fc97c62283a955ad6684856`. |
+| Publish-assets precheck | EXPECTED STALE (exit 1) | The checker named only `packages/mcp/src/publish-assets.generated.ts` stale after the prose regeneration. |
+| Publish-assets generation/final | PASS (exit 0) | `gen:publish-assets` completed and the final freshness check passed. |
+| MCP export-corpus precheck | MEASURED PASS (exit 0) | The merged corpus was already fresh: 35 packages, 271 subpaths, 7,668 symbols, SHA `76b5d30e12b5306530efa900bf817a8ac3a2f4854e381e232aca367e4efdbc57`. This did not reproduce the expected stale negative and is recorded as measured. |
+| MCP export-corpus generation/final | PASS (exit 0) | The named generator and final check reproduced the same counts and SHA. |
+| Whole SDK test directory | PASS (exit 0) | Structured wrapper: 70 passed / 0 failed / 0 ignored. |
+| Fresh bootstrap test | PASS (exit 0) | Structured wrapper: 11 passed / 0 failed / 0 ignored. |
+| Nine-file scoped check | PASS (exit 0) | 9 selected in one batch; zero diagnostics and zero failed batches. |
+| Nine-file scoped lint | PASS (exit 0) | 9 selected/processed; zero findings, dropped files, or refusals. |
+| Nine-file scoped format | PASS (exit 0) | 9 selected/processed; zero findings, dropped files, or refusals. |
+| Export/reference drift | PASS (exit 0) | `docs:exports-drift` reported SDK entrypoint coverage and `Exports & Symbols drift check: PASS`. |
+| Lock hygiene | PASS (exit 0) | Raw `git diff --exit-code -- deno.lock` and `git diff --exit-code origin/main -- deno.lock` both returned 0. |
+
+The close-gate failure at the prior head is not an implementation or evidence-mapping defect. Per
+coordinator diagnosis it is a live-label timing race; this lane did not edit the acceptance-evidence
+block, issue checkboxes, PR/issue labels, or draft state. Prohibited runtime gates remain not run.

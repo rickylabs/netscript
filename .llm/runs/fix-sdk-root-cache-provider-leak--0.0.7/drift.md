@@ -70,3 +70,19 @@ requirements.
   `import '@netscript/sdk/cache';` and tests that emitted line. Generated apps still cache through
   `defineFreshApp()`. Dropping the dead import and assertion requires a separate follow-up issue and
   remains outside this leaf's ceiling; no CLI file or issue was changed here.
+
+## 2026-08-30 — post-evaluation main integration refresh
+
+- Severity: required integration refresh; no product rescope.
+- `origin/main` advanced from the locked research base to `f8b4f804` after #1746 changed shared
+  generated assets. The feature branch merged that commit without rebasing so existing gate
+  evidence remains attached to its original commits.
+- The merge conflicted only in the two authorized agent-docs outputs and the authorized MCP publish
+  asset. Each conflict stayed inside the ceiling; the combined outputs were produced by
+  `gen:agent-docs-prose` and `gen:publish-assets`, not by hand.
+- The refreshed agent-docs and publish-assets prechecks were stale as expected. The MCP export
+  corpus precheck was already fresh (exit 0) on the merged tree; its generator and final check kept
+  the same corpus hash. This measured pass replaces the expected-negative outcome for this
+  integration refresh without changing the locked derivative ownership.
+- The separate close-gate red was coordinator-diagnosed as a label-timing race. The acceptance
+  mapping, issue boxes, labels, and PR state were deliberately left untouched by this lane.

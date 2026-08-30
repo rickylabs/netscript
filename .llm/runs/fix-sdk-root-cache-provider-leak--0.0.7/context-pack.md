@@ -6,11 +6,20 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `fix-sdk-root-cache-provider-leak--0.0.7` |
 | Branch         | `fix/sdk-root-cache-provider-leak`        |
-| Current phase  | S4 evaluator handoff                      |
+| Current phase  | post-evaluation integration refresh       |
 | Archetype      | `2 — Integration`                         |
 | Scope overlays | none                                      |
 
 ## Current state
+
+After separate IMPL-EVAL and Tier-A acceptance, CI at `72ab6411` found shared generated assets stale
+because #1746 advanced `origin/main` to `f8b4f804`. The branch merged that exact main head without
+rebasing. All three conflicts were generated outputs already named in the locked ceiling. The
+agent-docs and publish-assets cascades produced measured stale prechecks followed by green generator
+and freshness checks; the MCP corpus was already fresh and remained byte-equivalent after its named
+generator. Focused merged-tree validation passes: SDK tests 70/70, Fresh bootstrap 11/11, nine-file
+check/lint/fmt with zero findings, docs export drift, and raw lock hygiene. The PR acceptance block,
+issue boxes, labels, and draft state remain coordinator-owned and unchanged.
 
 S1 research/design remains against `origin/main` `13878a80a50c55b9662099fed64555f2310ae4a3`.
 PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `1bf9c567`: the archetype, doctrine, three-move design,
@@ -66,13 +75,13 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 
 ## In progress
 
-- S4 run-artifact-only commit/push/comment checkpoint.
+- Commit and explicit-refspec push of the merged-main derivative refresh.
 
 ## Next steps
 
-1. Commit and push this S4 evidence reconciliation, then post its structured PR comment.
-2. Hand off commit range through S4 to the mandatory separate opposite-family IMPL-EVAL.
-3. Leave draft state, labels, issue text, and acceptance boxes coordinator-owned.
+1. Push the integration-refresh merge commit by explicit refspec.
+2. Leave the close-gate label-timing rerun, draft state, labels, issue text, and acceptance boxes to
+   the coordinator.
 
 ## Key decisions
 
