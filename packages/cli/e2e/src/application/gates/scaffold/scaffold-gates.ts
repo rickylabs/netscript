@@ -71,6 +71,13 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       scaffoldInitCommand,
     ),
     commandGate(
+      GATE.SCAFFOLD_AGENT_INIT,
+      'Install generated Claude agent integration',
+      GATE_PHASE.SCAFFOLD,
+      (context) => cli(context, 'agent', 'init', '--host', 'claude'),
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
       GATE.SERVICE_LIST,
       'List generated services',
       GATE_PHASE.SCAFFOLD,

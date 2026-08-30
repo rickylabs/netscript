@@ -451,6 +451,18 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
 
   const runtimeGateIds = cases[0][0].gates.map((gate) => gate.id);
+  for (const [suite] of cases) {
+    const gateIds = suite.gates.map((gate) => gate.id);
+    const smokeIndex = gateIds.indexOf(GATE.AGENT_ASPIRE_MCP_SMOKE);
+    assertEquals(
+      gateIds.indexOf(GATE.SCAFFOLD_AGENT_INIT) > gateIds.indexOf(GATE.SCAFFOLD_INIT),
+      true,
+      suite.id,
+    );
+    assertEquals(smokeIndex > gateIds.indexOf(GATE.RUNTIME_WAIT_APP), true, suite.id);
+    assertEquals(smokeIndex > gateIds.indexOf(GATE.RUNTIME_ASPIRE_DESCRIBE), true, suite.id);
+    assertEquals(smokeIndex < gateIds.indexOf(GATE.CLEANUP_ASPIRE_STOP), true, suite.id);
+  }
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);

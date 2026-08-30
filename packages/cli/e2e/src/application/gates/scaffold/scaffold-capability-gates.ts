@@ -23,6 +23,7 @@ import { createListenerReadinessGates } from './runtime/listener-readiness-gates
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
 import { createServiceEnvironmentGates } from './service-env/service-env-gates.ts';
 import { createUiAiGates } from './ui-ai-gates.ts';
+import { createAspireMcpSmokeGate } from './aspire-mcp-smoke.ts';
 
 /** Build the scaffold capability gate list. */
 export function createScaffoldCapabilityGates(
@@ -55,6 +56,7 @@ export function createScaffoldCapabilityGates(
     ...runtimeGates.slice(0, startIndex + 1),
     ...residentDatabaseGates,
     ...runtimeGates.slice(startIndex + 1),
+    createAspireMcpSmokeGate(),
     ...createListenerReadinessGates(database),
     ...createRuntimeBehaviorGates(database),
     ...createBehaviorPluginHealthGates(),
