@@ -101,3 +101,15 @@ Append-only. No implementation drift recorded yet.
   tests.
 - **Evidence:** PR threads `PRRT_kwDOSxcnO86dkbLP` and `PRRT_kwDOSxcnO86dkbLS`; 493-test structured
   suite; hardened live GLM/Qwen canaries in `worklog.md`.
+
+## 2026-08-31 — evaluate-merged-head.md restored as historical, superseded evidence
+
+- **What:** The supervisor deleted `evaluate-merged-head.md` (currency-refresh PASS at merge head
+  `1f5bda258`) as apparently-stale, then a coordinator ruling required its restoration for
+  provenance.
+- **Disposition:** Restored byte-for-byte from `3872c5db8` (sha256 `ba987f627d…`), same content, no
+  history rewrite. Its `PASS` verdict is **historical and superseded** for merge currency — it
+  predates the two Augment source fixes (`cb14c8ca6`/`3872c5db8`) and the subsequent main
+  convergence to `5197e70b7`. It does not count as the leaf's final verdict; that role belongs to
+  the fresh exact-head GLM/max IMPL-EVAL dispatched after this restoration and the current main
+  convergence.
