@@ -170,3 +170,62 @@ operation summaries.
 - Implementation remains prohibited until both PLAN-EVAL passes and #1466 lands.
 - The initial `deno.lock` SHA-256 is
   `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+## S0 satisfied — #1466 merged, branch rebased, base-gate census re-run
+
+Executed by the features topic supervisor before PLAN-EVAL dispatch. S0 is a **precondition**, not an
+implementation slice; no product code was written.
+
+### S0.1 — #1466 is merged and its vocabulary is on `main`
+
+PR #1731 **`MERGED`** at `e325b7fe`, `2026-08-30T13:41:17Z`; issue #1466 **`CLOSED / COMPLETED`**;
+both `status:shipped`. `origin/main` = **`3e5cbabf`**.
+
+Verified on `main` directly rather than inferred from merge status:
+`packages/contracts/src/domain/procedure-meta.ts` present, and `src/public/mod.ts` exports
+`NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement`, `BaseContractMeta`.
+
+**LD-1's blocker is therefore lifted for the first time.**
+
+### S0.2 — rebased onto `3e5cbabf`
+
+`89d2afda`, clean, two plan-artifact commits replayed. **Rebase is correct here and was correct to
+refuse on #1731**: this branch carries plan artifacts only, so no receipt, archive or verdict cites a
+SHA that a rebase would rewrite. #1731 had seven archives and eight verdict artifacts addressed by
+content head, which is why it took two `--no-ff` merges instead.
+
+### S0.3 — base-gate census at `89d2afda` (== `origin/main` `3e5cbabf`)
+
+| Gate | Result |
+| --- | --- |
+| `G-CHECK` (contracts, service, plugin, sdk, mcp) | **PASS** |
+| `G-LINT` | **PASS** |
+| `G-FMT` | **PASS** |
+| `G-QUALITY` (`quality:scan` + `arch:check`) | **PASS** |
+| `G-EXPORTS` (`docs:exports-drift`) | **PASS** |
+
+### Two contracted baselines moved — a real finding for PLAN-EVAL
+
+| Package | `plan.md` expected | Measured at the rebased base | Δ |
+| --- | --- | --- | --- |
+| contracts | 8 | **16** | **+8** |
+| service | 90 | 90 | — |
+| plugin | 68 | 68 | — |
+| sdk | 69 | **77** | **+8** |
+| mcp | 136 | 136 | — |
+
+Both movements are attributable to #1466 landing: it added the contracts metadata suite (inference
+probe, assertion-budget cases, runtime storage, doc-JSON independence) and the SDK propagation tests.
+The plan's numbers were measured against `13878a80a` **before** that merge, so they are stale rather
+than wrong — but a plan that contracts `contracts 8` as its baseline would now report a false
+regression signal on its first slice.
+
+This is precisely what S0 exists to catch, and it is left as a **finding for the PLAN-EVAL to rule
+on** rather than silently patched into the locked plan: amending a PLAN-EVAL-approved plan is not the
+supervisor's to do, and the numbers are the evaluator's to verify independently.
+
+### Not changed
+
+PR #1762 stays **draft**, `status:plan`, with live `closingIssuesReferences` **`[]`** — a closing
+keyword would incorrectly mark #1387 complete on merge of a plan-only PR. The body wording repaired by
+the coordinator is preserved verbatim.
