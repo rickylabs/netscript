@@ -6431,3 +6431,78 @@ Evicted with the same proof-first procedure. Three occurrences in one lane in on
 
 PR #1731 stays **draft**, `Refs #1466 — partial, slice 1 of 3`, exactly one `status:impl-eval` on
 both PR and issue. No ready-flip, no merge, no restored closing keyword.
+
+## 2026-08-30 — IMPL-EVAL cycle-2 addendum: Ruling 1 reframed, G-6 satisfied, **G-7 is my error**
+
+Evaluator session `b13a38f6` woke on my cross-session host-fix message, **re-measured rather than
+accepting it**, and appended an addendum at `bbff7cf9` (evidence-only, +94 lines to `evaluate.md`).
+Verdict unchanged: **`PASS`**.
+
+### It verified my claim instead of trusting it — and that is the point of the lane
+
+It ran its own `deno task test`: `exitCode 0 · passed 4250 · failed 0 · ignored 19`, 190,644 ms,
+started `09:47:28Z` after confirming the other `deno.*test` process matches were Codex tooling paths
+containing "test" rather than concurrent runs. It confirmed PID 1 `tini`, zombies 0, and identified
+the +2 delta over the old 4248/1 as the new F-2 pin plus `hybrid-launcher_test.ts` going green.
+
+**Ruling 1 reframed, correctly:** the question is no longer whether `SKIPPED` satisfies a gate that
+cannot run, but whether it is acceptable at all now that it can — **ruled no**. R-1's root-`test` half
+loses its premise; its `public-doc-lint` half stands untouched. `SKIPPED` is no longer an available
+form on this host, and slices 2 and 3 must cut real `test` receipts. Slice 2 already did.
+
+### G-6 — already satisfied, and my head choice was accepted over the evaluator's prescription
+
+G-6 prescribed cutting the receipt in a detached checkout **at the content head** `42874803`. I had
+instead cut it at `ff4e81cc` and proven product identity separately. The evaluator checked and
+**accepted mine as the sounder form**: "an honest head with proven content identity is the sounder
+form than the one I prescribed." That is the judgement I flagged at the time rather than quietly
+taking — worth noting that flagging it is what let the evaluator adjudicate it instead of filing it
+as a defect.
+
+### G-7 — my error, and the discipline I have been enforcing on everyone else
+
+**When I re-cut `test-final.json` at `1f0cdef2`, I overwrote the attempt-5 `SKIPPED` receipt in place
+without archiving it first.** Archives are append-only; that rule is the one I have written into every
+brief this session and asserted in three Tier-A reviews. I broke it for one file, in the very commit
+whose message claimed the recut was clean.
+
+Consequences the evaluator names precisely: `receipts/frozen-42874803/` now holds seven attempt-5
+receipts at `42874803` plus the attempt-7 `test` receipt at `ff4e81cc`, so the archive named for the
+content head is **neither homogeneous nor does it contain the receipt explaining why `test` was
+skipped there**. The `SKIPPED` record survives only in git history (`dd201816`) and in worklog prose —
+recoverable, which is why this is low and not blocking, but it should never have depended on that.
+
+Required, evidence-only: restore it byte-for-byte from `dd201816` as
+`receipts/frozen-42874803/test-final.attempt5-skipped.json` and note the archive's mixed heads in the
+worklog. Verified recoverable: `git show dd201816:…/receipts/test-final.json` →
+`outcome: SKIPPED, attempt: 5, gitHead: 42874803e5`.
+
+**Deferred deliberately, not forgotten.** The slice-3 author is live in that worktree with 9 dirty
+files and will archive the slice-2 receipt set. Writing into `receipts/` concurrently is how two
+writers corrupt an archive — the exact class of damage G-7 is about. I land it at the slice-3 Tier-A
+stop.
+
+### One stale reading in the addendum, recorded so it is not inherited
+
+The addendum reports `fs.inotify.max_user_instances` = **128** and says D-29's `watchFs` half is not
+fixed. That was true when it measured. It was raised to **1024** shortly after (coordinator authority
+update 2, re-proven by me at 09:27Z), and `watch-run.ts` now reaches its designed heartbeat exit 2.
+**D-29 is resolved**; this lane is back on the token-free wake. The addendum's other host readings are
+current.
+
+### Branch coordination — checked, no divergence
+
+The evaluator pushed `bbff7cf9` from its own worktree while the slice-3 author was live in
+`007-leaf-1731`. Two writers on one branch is a real hazard; I checked rather than assumed:
+`git merge-base --is-ancestor bbff7cf9 HEAD` is true — the author fast-forwarded onto the addendum
+itself, so there is no divergence and no rebase is owed. Slice 3 continues on thread `01a05215`.
+
+### State
+
+| Item | Value |
+| --- | --- |
+| Slice 1 | terminal on substance **and** evidence (`42874803` content, `ff4e81cc` test attestation) |
+| Slice 2 | Tier-A `ACCEPTED` at `2863d29e`; **not yet IMPL-EVAL'd** — the final all-slices evaluation covers it |
+| Slice 3 | in flight, thread `01a05215`, based on `bbff7cf9` |
+| Carried | G-4 + AF-1 → slice 3; **G-7 → supervisor, at the slice-3 Tier-A stop** |
+| PR #1731 | draft, `Refs #1466 — partial`, one `status:impl-eval` |
