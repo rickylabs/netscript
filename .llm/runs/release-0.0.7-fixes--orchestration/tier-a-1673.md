@@ -242,3 +242,93 @@ this supervisor's Tier-A is an **input to verify, not a substitute for its judgm
 lane's five recorded analytical errors — the wrong-file green, file-level attribution hiding a
 line-level fact, evidence written from a claim, the #1112 generated-derivative cascade, and the
 supervisor `timeout` that killed a live author turn — so nothing is inherited.
+
+## IMPL-EVAL cycle 1 verdict — `FAIL_FIX` at `61b8bf52`, and a Tier-A miss to own
+
+Verdict commit `120ab86df627071aded8c7c04508cbebbbd59a12`, pushed on
+`eval/impl-eval-1673-cycle-1`. Immutable pushed verdict satisfied. Evaluator route was the canonical
+Fable 5 · medium, and it re-ran every gate itself rather than copying the Tier-A table.
+
+### F1 is real, blocking, and I confirmed it independently
+
+**The doctor's expected set is the CLI's manifest walk; the actual registry is written by each
+plugin's own generator, which may apply a selection rule the manifest does not declare.** Verified
+here, from source, not from the evaluator's summary:
+
+- `plugins/ai/src/cli/ai-registry-compiler.ts` — `selectToolDefinitionModules` includes a file only
+  if `exportsReadyAiToolDefinition(source)`. That is a **shape** predicate, not a path rule.
+- `plugins/ai/scaffold.runtime.json` — the `ai-tools` manifest is `dir: ai/tools`,
+  `fileSuffixes: ['.ts']`, `exclude: ['_registry.ts','mod.ts','plugin.ts','types.ts']`. It therefore
+  **does** discover `ai/tools/skill-loader.ts`.
+- `plugins/ai/src/adapter/resources/mcp-tool/mcp-tool.ts:19` ships exactly that file whenever the
+  opt-in MCP tool is enabled.
+- `packages/cli/.../installed-runtime-registry-integration_test.ts:276` and `:319` assert
+  `tools.registry.has('skill-loader') === false` — the CLI's **own** test says excluding it is
+  correct.
+
+So on a correctly generated AI project the doctor reports
+`Missing generated entry for manifest source: ai/tools/skill-loader.ts. Run: netscript generate
+plugins` — a failure that is untrue and a remediation that can never succeed.
+
+**This is #1673's own defect class, inverted.** The issue exists because the command asserted a state
+the evidence did not support; at this head it does the same thing in the other direction. That makes
+it blocking on the merits, not merely on process.
+
+### Why my Tier-A missed it, stated plainly
+
+I verified the six-path ceiling, the exact-head gates, the line-level fmt attribution, and that all
+five test cases are red at base and green at head. Every one of those checks was sound, and none of
+them could have caught F1: **the five cases only exercise the sagas manifest, whose generator
+selection — `-saga.ts` suffix plus exclude — happens to coincide with the manifest walk.** I checked
+that the green came from product code and never asked whether the equivalence it relies on holds for
+any *other* plugin.
+
+That is the #1112 lesson recurring in a new shape: I asked whether the design worked, not whether its
+central assumption generalized. The generalization question is the one an evaluator asked and I did
+not. Recorded here rather than glossed, because this is the second Tier-A in this lane to pass an
+implementation with a real defect.
+
+### F2 corrects a claim in this file
+
+The earlier Tier-A entry above records "base product + head tests → 0 passed / 5 failed". That is
+reproducible **only with `--no-check`**: under default type-checking the head test file does not
+compile against base (`TS2353: 'inspectRuntimeRegistries' does not exist in type
+'PluginDoctorDependencies'`) and zero tests run. The conclusion is unchanged — and the honest
+red-before is the S2 file at base, 0/1 with `Expected function to reject`, which both the earlier
+Tier-A and the evaluator reproduced — but the flag belongs in the record. Evidence precision, no
+product impact.
+
+F3–F5 are informational and are recorded in the evaluator's artifact: `registrableItems` changed from
+plugin-wide sum to per-target count (no production consumer); latent walk-vs-generator divergence in
+the workers generator's `include`/`includeWhenPresent` handling, same class as F1 but unexercised by
+any shipped manifest; and `.llm/tmp/gate-receipts/` being gitignored, so receipts cited in the
+worklog are not verifiable from a fresh checkout.
+
+### The repair needs a ceiling expansion — verified, not assumed
+
+I checked whether F1 could be fixed inside the existing six-path ceiling.
+`plugins/ai/src/cli/generate-runtime-registries.ts` has **no** dry-run or selection-reporting mode —
+its only flag handling is `--profile`/`--official-samples`. So the CLI cannot obtain the generator's
+selected set today, and the honest directions both land outside the ceiling:
+
+- **(a)** have each plugin generator report the sources it actually selected, and compare against that
+  — general, and it also covers the latent workers divergence in F4;
+- **(b)** declare the selection contract in `scaffold.runtime.json` — weak for AI specifically, whose
+  rule is a source-shape predicate that no glob or exclude list can express.
+
+The third option — downgrading a missing entry to a warning — stays inside the ceiling but trades away
+issue AC2, so it is the least honest of the three and should not be chosen merely because it is
+cheapest.
+
+**Note that (a) does not require amending #1673's acceptance criteria.** AC2 says a *definition*
+present in source and absent from the registry is a failure. `skill-loader.ts` is a factory, not a
+definition, so under (a) AC2 is satisfied as written. No issue edit is implied — which matters,
+because issue mutation is coordinator-owned.
+
+### Disposition
+
+Cycle 2 of 2 remains available. The design is now genuinely open — it was not when the bounded plan
+marked `PLAN-EVAL: N/A` — so the repair gets a plan slice with a **real PLAN-EVAL**, not another
+straight-to-implementation pass. The ceiling expansion is a lane plan amendment and is authorized here
+with the rationale above; it is reported to the coordinator rather than hidden, and no issue edit,
+relabel, readiness flip, or merge follows from it.
