@@ -5545,3 +5545,13 @@ own mistake, not evidence about the Codex session. Verified independently via `c
 node` before re-arming: thread `01a05481` is genuinely `working`, artifact still the bootstrap commit
 `bc1b2f88b` (actively progressing toward its first real implementation commit, not stalled or dead).
 Re-armed correctly as task `bcqo3dhuc`.
+
+## D-101 — Routing leaf watcher fixed for real (second attempt also failed on my error, not the tool)
+
+Second watcher attempt (`bcqo3dhuc`) also failed fast: `Unknown argument: --user` — `codex-watch.ts`
+takes no `--user` flag (it watches the rollout JSONL file directly, no WSL user-switching subprocess
+involved, unlike `codex-status.ts`/`launch-codex-slice.ts`). Dropped the flag; third attempt (task
+`bdquo7hvd`) confirmed genuinely attached: `{"watching":".../rollout-...-01a05481....jsonl","mode":
+"turn","timeoutSeconds":3600}`, pid verified alive. Two consecutive watcher-setup mistakes on my
+part, zero evidence of any problem with the Codex session itself, which `codex-status` independently
+confirmed `working` throughout.
