@@ -1717,3 +1717,19 @@
   (final, authorized): rebuild the canonical tree with default samples +
   `netscript generate plugins`, duplicate to two fresh distinct roots, re-prove byte identity, run
   the same concurrent-start receipt.
+- **D-89 — S5 #1717 box 4 PASS: two concurrently running isolated copies of one byte-identical
+  canonical tree, at distinct absolute AppHost paths, all plugin resources Healthy in both, no port
+  collision.** Attempt 8 (lease-backed, relay `s5-attempt8`, host `bc33c2aa319c`): canonical tree
+  built with default samples (D-88 fix) + `netscript generate plugins` (3 registries written, sagas
+  included), 13.5.3 pins verified, offline-codegen preflight green, duplicated to `s5-r1`/`s5-r2`
+  with proven byte-identity (0 diff lines excluding
+  `.aspire`/`.data`/`.netscript/e2e`/`node_modules`/logs; matching SHA-256 on `apphost.mts` and
+  `sagas.registry.ts`). Both started `aspire start --isolated` concurrently → **2 AppHosts, 2
+  distinct paths, no "Stopping previous instance"**. First health poll (12 s): **11/11 relevant
+  resources Healthy in both roots** — `workers`, `workers-api`, `sagas`, `sagas-api`, `triggers`,
+  `triggers-api`, `streams`, `postgres`, `redis`, `garnet`, plus each root's own web app. Owned
+  teardown: both `aspire stop` exit 0; one persistent Postgres survivor per root removed (creation
+  times inside the window); relay cleanup removed 6 hop-A containers; all scratch trees removed via
+  container (root-owned `.data`); **final zero confirmed `containers=0 volumes=0 aspire=[]` at
+  20:38:06Z.** Receipts `120`–`137` in `slices/s5/receipts-concurrent-start/`. **#1717 box 4 is now
+  provably satisfied under the amended (D-87) wording.**

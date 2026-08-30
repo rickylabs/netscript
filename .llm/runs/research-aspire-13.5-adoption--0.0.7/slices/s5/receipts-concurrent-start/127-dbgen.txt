@@ -1,0 +1,222 @@
+[0m[32mTask[0m [0m[36mdb:generate[0m deno task db:clear-seeded-client && deno run -A --minimum-dependency-age=0 npm:prisma@^7.4.2 generate --generator client --config prisma.config.ts && deno run -A --minimum-dependency-age=0 scripts/generate-zod.ts && deno run -A --minimum-dependency-age=0 scripts/fix-zod-imports.ts
+[0m[32mTask[0m [0m[36mdb:clear-seeded-client[0m deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from schema.
+
+✔ Generated Prisma Client (7.10.0) to ./schema/.generated in 64ms
+
+🔷 Generating Zod schemas from Prisma models...
+
+📦 Ensuring prisma-zod-generator is available...
+[0m[32mInitialize[0m prisma-zod-generator@2.1.4
+[0m[32mInitialize[0m node-fetch@3.3.2
+[0m[32mInitialize[0m @prisma/internals@7.10.0
+[0m[32mInitialize[0m @types/express@5.0.6
+[0m[32mInitialize[0m @prisma/generator-helper@7.10.0
+[0m[32mInitialize[0m prettier@3.9.6
+[0m[32mInitialize[0m js-yaml@4.3.2
+[0m[32mInitialize[0m express@5.2.1
+[0m[32mInitialize[0m @types/cors@2.8.19
+[0m[32mInitialize[0m cors@2.8.6
+[0m[32mInitialize[0m ajv-formats@3.0.1
+[0m[32mInitialize[0m formdata-polyfill@4.0.10
+[0m[32mInitialize[0m data-uri-to-buffer@4.0.1
+[0m[32mInitialize[0m fetch-blob@3.2.0
+[0m[32mInitialize[0m prompts@2.4.2
+[0m[32mInitialize[0m @prisma/get-dmmf@7.10.0
+[0m[32mInitialize[0m @prisma/generator@7.10.0
+[0m[32mInitialize[0m @prisma/schema-engine-wasm@7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3
+[0m[32mInitialize[0m @prisma/dmmf@7.10.0
+[0m[32mInitialize[0m @prisma/prisma-schema-wasm@7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3
+[0m[32mInitialize[0m @streamparser/json@0.0.22
+[0m[32mInitialize[0m @prisma/schema-files-loader@7.10.0
+[0m[32mInitialize[0m arg@5.0.2
+[0m[32mInitialize[0m @types/express-serve-static-core@5.1.3
+[0m[32mInitialize[0m @types/serve-static@2.2.0
+[0m[32mInitialize[0m @types/body-parser@1.19.6
+[0m[32mInitialize[0m argparse@2.0.1
+[0m[32mInitialize[0m mime-types@3.0.2
+[0m[32mInitialize[0m on-finished@2.4.1
+[0m[32mInitialize[0m proxy-addr@2.0.7
+[0m[32mInitialize[0m qs@6.15.3
+[0m[32mInitialize[0m statuses@2.0.2
+[0m[32mInitialize[0m type-is@2.1.0
+[0m[32mInitialize[0m fresh@2.0.0
+[0m[32mInitialize[0m once@1.4.0
+[0m[32mInitialize[0m content-type@1.0.5
+[0m[32mInitialize[0m cookie@0.7.2
+[0m[32mInitialize[0m finalhandler@2.1.1
+[0m[32mInitialize[0m router@2.2.0
+[0m[32mInitialize[0m vary@1.1.2
+[0m[32mInitialize[0m http-errors@2.0.1
+[0m[32mInitialize[0m merge-descriptors@2.0.0
+[0m[32mInitialize[0m send@1.2.1
+[0m[32mInitialize[0m encodeurl@2.0.0
+[0m[32mInitialize[0m serve-static@2.2.1
+[0m[32mInitialize[0m accepts@2.0.0
+[0m[32mInitialize[0m range-parser@1.3.0
+[0m[32mInitialize[0m content-disposition@1.1.0
+[0m[32mInitialize[0m depd@2.0.0
+[0m[32mInitialize[0m escape-html@1.0.3
+[0m[32mInitialize[0m etag@1.8.1
+[0m[32mInitialize[0m cookie-signature@1.2.2
+[0m[32mInitialize[0m parseurl@1.3.3
+[0m[32mInitialize[0m body-parser@2.3.0
+[0m[32mInitialize[0m object-assign@4.1.1
+[0m[32mInitialize[0m web-streams-polyfill@3.3.3
+[0m[32mInitialize[0m node-domexception@1.0.0
+[0m[32mInitialize[0m kleur@3.0.3
+[0m[32mInitialize[0m sisteransi@1.0.5
+[0m[32mInitialize[0m pluralize@8.0.0
+[0m[32mInitialize[0m fs-extra@11.3.0
+[0m[32mInitialize[0m @types/qs@6.15.1
+[0m[32mInitialize[0m @types/range-parser@1.2.7
+[0m[32mInitialize[0m @types/send@1.2.1
+[0m[32mInitialize[0m @types/http-errors@2.0.5
+[0m[32mInitialize[0m @types/connect@3.4.38
+[0m[32mInitialize[0m mime-db@1.54.0
+[0m[32mInitialize[0m ee-first@1.1.1
+[0m[32mInitialize[0m ipaddr.js@1.9.1
+[0m[32mInitialize[0m forwarded@0.2.0
+[0m[32mInitialize[0m es-define-property@1.0.1
+[0m[32mInitialize[0m side-channel@1.1.1
+[0m[32mInitialize[0m content-type@2.1.0
+[0m[32mInitialize[0m media-typer@1.1.1
+[0m[32mInitialize[0m wrappy@1.0.2
+[0m[32mInitialize[0m path-to-regexp@8.4.2
+[0m[32mInitialize[0m is-promise@4.0.0
+[0m[32mInitialize[0m toidentifier@1.0.1
+[0m[32mInitialize[0m setprototypeof@1.2.0
+[0m[32mInitialize[0m negotiator@1.1.0
+[0m[32mInitialize[0m raw-body@3.0.2
+[0m[32mInitialize[0m bytes@3.1.2
+[0m[32mInitialize[0m universalify@2.0.1
+[0m[32mInitialize[0m jsonfile@6.2.1
+[0m[32mInitialize[0m es-errors@1.3.0
+[0m[32mInitialize[0m object-inspect@1.13.4
+[0m[32mInitialize[0m side-channel-weakmap@1.0.2
+[0m[32mInitialize[0m side-channel-list@1.0.1
+[0m[32mInitialize[0m side-channel-map@1.0.1
+[0m[32mInitialize[0m unpipe@1.0.0
+[0m[32mInitialize[0m get-intrinsic@1.3.0
+[0m[32mInitialize[0m call-bound@1.0.4
+[0m[32mInitialize[0m es-object-atoms@1.1.2
+[0m[32mInitialize[0m get-proto@1.0.1
+[0m[32mInitialize[0m hasown@2.0.4
+[0m[32mInitialize[0m call-bind-apply-helpers@1.0.2
+[0m[32mInitialize[0m has-symbols@1.1.0
+[0m[32mInitialize[0m math-intrinsics@1.1.0
+[0m[32mInitialize[0m function-bind@1.1.2
+[0m[32mInitialize[0m gopd@1.2.0
+[0m[32mInitialize[0m dunder-proto@1.0.1
+[0m[38;5;245mInstalled[0m 101 [0m[38;5;245mpackages[0m [0m[38;5;245min[0m 214ms
+[0m[38;5;245mReused[0m 101 [0m[38;5;245mpackages from cache[0m
+[0m[1m[33m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[0m
+[0m[38;5;245mDownloaded[0m 0 [0m[38;5;245mpackages from JSR[0m
+[0m[38;5;245mDownloaded[0m 0 [0m[38;5;245mpackages from npm[0m
+
+[0m[36mDependencies:[0m
+[0m[32m+[0m [0m[38;5;245mnpm:[0mprisma-zod-generator [0m[38;5;245m2.1.4[0m
+
+[0m[33m╭[0m [0m[1m[33mWarning[0m
+[0m[33m│[0m
+[0m[33m│[0m  Ignored build scripts for packages:
+[0m[33m│[0m  [0m[3mnpm:prisma@7.10.0[0m
+[0m[33m│[0m  [0m[3mnpm:lmdb@3.5.6[0m
+[0m[33m│[0m  [0m[3mnpm:@prisma/engines@7.10.0[0m
+[0m[33m│[0m  [0m[3mnpm:msgpackr-extract@3.0.4[0m
+[0m[33m│[0m  [0m[3mnpm:prisma-zod-generator@2.1.4[0m
+[0m[33m│[0m
+[0m[33m│[0m  Run "[0m[1mdeno approve-scripts[0m" to run build scripts.
+[0m[33m╰─[0m
+[0m[33m╭[0m [0m[1m[33mWarning[0m
+[0m[33m│[0m
+[0m[33m│[0m  The following packages are deprecated:
+[0m[33m│[0m  [0m[38;5;245mnpm:node-domexception@1.0.0 (Use your platform's native DOMException instead)[0m
+[0m[33m╰─[0m
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from schema.
+✅ Zod schemas generated successfully with filtering applied
+
+
+[36m🚀 prisma-zod-generator has powered 1 runs on this project![0m
+
+✨ Level up with PZG Pro (14-day trial, no card needed):
+   - Server actions & policy automation
+   - SDK publisher, API docs, drift guard
+   - Performance tooling for large teams and more!
+   [32mhttps://omar-dulaimi.github.io/prisma-zod-generator/pricing[0m
+
+💬 Need help or want to suggest an idea?
+   [32mhttps://github.com/omar-dulaimi/prisma-zod-generator/issues[0m
+
+🙌 Sponsorships literally keep the lights (and tests) running:
+   My current Dell Latitude laptop needs 40+ minutes to finish the full test suite.
+   Helping me upgrade means faster fixes and better tooling for everyone.
+   [32mhttps://github.com/sponsors/omar-dulaimi[0m
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.0 -> 8.0.0-rc.12                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+✔ Generated Prisma Client (7.10.0) to ./schema/.generated in 59ms
+
+✔ Generated Prisma Zod Generator to ./schema/.generated/zod in 191ms
+
+
+🔧 Fixing generated Zod schemas for Deno compatibility...
+   Directory: /home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5canon-final/s5final/database/postgres/schema/.generated/zod
+
+📦 Phase 1: Adding .ts extensions to relative imports...
+   ✅ Fixed 683 imports across 174 files
+
+🔄 Phase 1.6: Fixing circular references in schemas...
+   ✅ Fixed circular references in 32 files
+
+🔄 Phase 1.7: Fixing getter patterns with .optional()...
+   ✅ Fixed 101 getter patterns in 34 files
+
+🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...
+   ✅ Fixed isValidDecimalInput in 0 files
+
+💰 Phase 2: Fixing Decimal imports for browser compatibility...
+   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367
+   ✅ Fixed 0 Decimal references across 0 files
+
+🎉 All fixes applied successfully!
+
+🔧 Fixing generated Zod schemas for Deno compatibility...
+   Directory: /home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5canon-final/s5final/database/postgres/schema/.generated/zod
+
+📦 Phase 1: Adding .ts extensions to relative imports...
+   ✅ Fixed 0 imports across 0 files
+
+🔄 Phase 1.6: Fixing circular references in schemas...
+   ✅ Fixed circular references in 32 files
+
+🔄 Phase 1.7: Fixing getter patterns with .optional()...
+   ✅ Fixed 0 getter patterns in 0 files
+
+🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...
+   ✅ Fixed isValidDecimalInput in 0 files
+
+💰 Phase 2: Fixing Decimal imports for browser compatibility...
+   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367
+   ✅ Fixed 0 Decimal references across 0 files
+
+🎉 All fixes applied successfully!
+
+ℹ️  No files needed fixing
+🔧 Patching Prisma client in: /home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5canon-final/s5final/database/postgres/schema/.generated
+   📋 Backed up original → client.server.ts
+   ✅ client.ts → isomorphic re-export of browser.ts
+   💎 Added "export type Decimal = runtime.Decimal" to prismaNamespaceBrowser.ts

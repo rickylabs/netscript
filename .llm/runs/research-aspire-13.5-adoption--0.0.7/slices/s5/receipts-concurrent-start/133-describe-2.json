@@ -1,0 +1,1515 @@
+{
+  "resources": [
+    {
+      "name": "garnet-gqctsqxq",
+      "displayName": "garnet",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:08+00:00",
+      "startTimestamp": "2026-08-30T20:37:12.559839+00:00",
+      "source": "ghcr.io/microsoft/garnet:1.1.1",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=garnet-gqctsqxq",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:33247"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "907063fe81ab5b9f35556dc51c8e15165f015bd455d170d0bb1a95858fe9dae1",
+        "container.image": "ghcr.io/microsoft/garnet:1.1.1",
+        "container.lifetime": "Session",
+        "container.ports": [
+          6379
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": []
+      },
+      "environment": {
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "netscript-db-postgres-jkjvukxs",
+      "displayName": "netscript-db-postgres",
+      "resourceType": "Executable",
+      "state": "NotStarted",
+      "source": "deno",
+      "dashboardUrl": "https://localhost:39419/?resource=netscript-db-postgres-jkjvukxs",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": null,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/database/postgres",
+        "resource.appArgs": null,
+        "resource.appArgsSensitivity": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "postgres-37646eed",
+      "displayName": "postgres",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:08+00:00",
+      "startTimestamp": "2026-08-30T20:37:12.183048+00:00",
+      "source": "docker.io/library/postgres:18.3",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=postgres-37646eed",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:31999"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/.data/postgres",
+          "target": "/var/lib/postgresql",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "746df32db3cc089b518318ced7a7eda1c2dfc066caf59fc58565ba6e3b37884a",
+        "container.image": "docker.io/library/postgres:18.3",
+        "container.lifetime": "Persistent",
+        "container.ports": [
+          5432
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": [],
+        "resource.connectionString": null
+      },
+      "environment": {
+        "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+        "POSTGRES_PASSWORD": null,
+        "POSTGRES_USER": "postgres",
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "postgres-password",
+      "displayName": "postgres-password",
+      "resourceType": "Parameter",
+      "state": "Running",
+      "source": "Parameters:postgres-password",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=postgres-password",
+      "relationships": [],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.source": "Parameters:postgres-password",
+        "Value": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "delete-parameter": {
+          "displayName": "Delete parameter",
+          "description": "Delete parameter value",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "DeleteFromUserSecrets",
+              "label": "Delete from user secrets",
+              "description": "Delete a value that is saved in [user secrets](https://aka.ms/aspire/user-secrets).",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            }
+          ]
+        },
+        "set-parameter": {
+          "displayName": "Set parameter",
+          "description": "Set parameter value",
+          "state": "Enabled",
+          "sortOrder": 0,
+          "argumentInputs": [
+            {
+              "name": "Value",
+              "label": "postgres-password",
+              "inputType": "SecretText",
+              "required": true,
+              "placeholder": "Enter value for postgres-password",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "SaveToUserSecrets",
+              "label": "Save to user secrets",
+              "description": "Save value to [user secrets](https://aka.ms/aspire/user-secrets) for future use.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "Value"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "prisma-studio-zdwsnfvg",
+      "displayName": "prisma-studio",
+      "resourceType": "Executable",
+      "state": "\u001B[0m\u001B[32mTask\u001B[0m \u001B[0m\u001B[36mdb:studio\u001B[0m deno run -A --minimum-dependency-age=0 npm:prisma@^7.4.2 studio --config prisma.config.ts --port 5555",
+      "stateStyle": "error",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.52+00:00",
+      "stopTimestamp": "2026-08-30T20:37:30.480504+00:00",
+      "source": "deno",
+      "exitCode": 1,
+      "dashboardUrl": "https://localhost:39419/?resource=prisma-studio-zdwsnfvg",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871790,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/database/postgres",
+        "resource.appArgs": [
+          "run",
+          "--allow-run",
+          "--allow-write",
+          "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/aspire/.helpers/run-tool.mts",
+          "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/database/postgres/.netscript-prisma-studio.error",
+          "db:studio"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/prisma-studio-zdwsnfvg/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "redis-ndzgcrjy",
+      "displayName": "redis",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:08+00:00",
+      "startTimestamp": "2026-08-30T20:37:11.714165+00:00",
+      "source": "docker.io/library/redis:7",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=redis-ndzgcrjy",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:35423"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/.data/redis",
+          "target": "/data",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "b175631d05c46e76eb35b8fcdce41e599b92aaf52d1608785644a4108c03a9b1",
+        "container.image": "docker.io/library/redis:7",
+        "container.lifetime": "Session",
+        "container.ports": [
+          6379
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": []
+      },
+      "environment": {
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "s5final-db",
+      "displayName": "s5final-db",
+      "resourceType": "PostgresDatabaseResource",
+      "state": "Running",
+      "startTimestamp": "2026-08-30T20:37:12.183048+00:00",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=s5final-db",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "postgres-37646eed"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.connectionString": null,
+        "resource.parentName": "postgres-37646eed"
+      },
+      "environment": {},
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        },
+        "s5final-db_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {}
+    },
+    {
+      "name": "s5final-web-browser-logs",
+      "displayName": "s5final-web-browser-logs",
+      "resourceType": "BrowserLogs",
+      "state": "NotStarted",
+      "creationTimestamp": "2026-08-30T20:37:07.8083128+00:00",
+      "source": "s5final-web",
+      "dashboardUrl": "https://localhost:39419/?resource=s5final-web-browser-logs",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "s5final-web-tvqzfbap"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "Active session count": 0,
+        "Active sessions": "None",
+        "Browser": "chrome",
+        "Browser sessions": "[]",
+        "resource.parentName": "s5final-web-tvqzfbap",
+        "resource.source": "s5final-web",
+        "Total sessions launched": 0,
+        "User data mode": "Shared"
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "configure-tracked-browser": {
+          "displayName": "Configure tracked browser",
+          "description": "Choose the browser, profile, user data mode, and scope used by tracked browser sessions.",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "scope",
+              "label": "Scope",
+              "inputType": "Choice",
+              "required": true,
+              "value": "resource",
+              "options": {
+                "resource": "This resource only (s5final-web)",
+                "global": "All BrowserLogs resources"
+              }
+            },
+            {
+              "name": "browser",
+              "label": "Browser",
+              "description": "Choose an installed Chromium-based browser or enter an executable path.",
+              "inputType": "Choice",
+              "required": true,
+              "options": {},
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "userDataMode",
+              "label": "User data mode",
+              "inputType": "Choice",
+              "required": true,
+              "options": {
+                "Shared": "Shared",
+                "Isolated": "Isolated"
+              },
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "profile",
+              "label": "Profile",
+              "description": "Choose a Chromium profile from the Aspire-managed browser hive, or enter a profile directory/name.",
+              "inputType": "Choice",
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "browser",
+                  "userDataMode"
+                ]
+              }
+            },
+            {
+              "name": "saveToUserSecrets",
+              "label": "Save to AppHost user secrets",
+              "description": "Save these settings to [user secrets](https://aka.ms/aspire/user-secrets) so future AppHost runs use them.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "value": "true"
+            }
+          ]
+        },
+        "open-tracked-browser": {
+          "displayName": "Open tracked browser",
+          "description": "Open the app in a tracked browser session and stream browser logs to this resource.",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "s5final-web-tvqzfbap",
+      "displayName": "s5final-web",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:08+00:00",
+      "startTimestamp": "2026-08-30T20:37:08.18+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=s5final-web-tvqzfbap",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:43059"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3867952,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/apps/s5final-web",
+        "resource.appArgs": [
+          "task",
+          "dev"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=tvqzfbap",
+        "OTEL_SERVICE_NAME": "s5final-web",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "43549",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/s5final-web-tvqzfbap/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "s5final-web_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "sagas-api-hkxvbaqw",
+      "displayName": "sagas-api",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.53+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=sagas-api-hkxvbaqw",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "streams-xdmycrpz"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "workers-api-vkzkjtft"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:33271"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871818,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--config",
+          "deno.json",
+          "--minimum-dependency-age=0",
+          "--unstable-no-legacy-abort",
+          "--node-modules-dir=none",
+          "--unstable-kv",
+          "--allow-all",
+          "jsr:@netscript/plugin-sagas@0.0.6/services"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:35423",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "NETSCRIPT_SAGA_STORE": "kv",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=hkxvbaqw",
+        "OTEL_SERVICE_NAME": "sagas-api",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "45821",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "REDIS_TCP": "tcp://localhost:35423",
+        "REDIS_URI": "localhost:35423",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "services__redis__tcp__0": "tcp://localhost:35423",
+        "services__streams__http__0": "http://localhost:43061",
+        "services__workers-api__http__0": "http://localhost:37809",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/sagas-api-hkxvbaqw/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "sagas-api_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "sagas-qkmabrsb",
+      "displayName": "sagas",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.53+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=sagas-qkmabrsb",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "sagas-api-hkxvbaqw"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "streams-xdmycrpz"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "workers-api-vkzkjtft"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:42837"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871802,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--minimum-dependency-age=0",
+          "--node-modules-dir=none",
+          "--unstable-worker-options",
+          "--unstable-kv",
+          "--allow-all",
+          "--watch",
+          "sagas/runtime.ts"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:35423",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "NETSCRIPT_SAGA_STORE": "kv",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=qkmabrsb",
+        "OTEL_SERVICE_NAME": "sagas",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "34765",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "REDIS_TCP": "tcp://localhost:35423",
+        "REDIS_URI": "localhost:35423",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "SAGA_CONCURRENCY": "2",
+        "services__redis__tcp__0": "tcp://localhost:35423",
+        "services__sagas-api__http__0": "http://localhost:33271",
+        "services__streams__http__0": "http://localhost:43061",
+        "services__workers-api__http__0": "http://localhost:37809",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/sagas-qkmabrsb/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "sagas_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "streams-xdmycrpz",
+      "displayName": "streams",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:08+00:00",
+      "startTimestamp": "2026-08-30T20:37:08.16+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=streams-xdmycrpz",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:43061"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3867930,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--config",
+          "deno.json",
+          "--minimum-dependency-age=0",
+          "--unstable-no-legacy-abort",
+          "--node-modules-dir=none",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-sys",
+          "--allow-ffi",
+          "jsr:@netscript/plugin-streams@0.0.6/services"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=xdmycrpz",
+        "OTEL_SERVICE_NAME": "streams",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "34983",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/streams-xdmycrpz/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "streams_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "triggers-api-rxqrbjky",
+      "displayName": "triggers-api",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.53+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=triggers-api-rxqrbjky",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "streams-xdmycrpz"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "workers-api-vkzkjtft"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:34399"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871793,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--config",
+          "deno.json",
+          "--minimum-dependency-age=0",
+          "--unstable-no-legacy-abort",
+          "--node-modules-dir=none",
+          "--unstable-kv",
+          "--allow-all",
+          "jsr:@netscript/plugin-triggers@0.0.6/services"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:35423",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "NETSCRIPT_TRIGGER_REGISTRY_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/.netscript/generated/plugin-triggers/triggers.registry.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=rxqrbjky",
+        "OTEL_SERVICE_NAME": "triggers-api",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "35941",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "REDIS_TCP": "tcp://localhost:35423",
+        "REDIS_URI": "localhost:35423",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "services__redis__tcp__0": "tcp://localhost:35423",
+        "services__streams__http__0": "http://localhost:43061",
+        "services__workers-api__http__0": "http://localhost:37809",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/triggers-api-rxqrbjky/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "triggers-api_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "triggers-drtrjdev",
+      "displayName": "triggers",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.53+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=triggers-drtrjdev",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "streams-xdmycrpz"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "triggers-api-rxqrbjky"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "workers-api-vkzkjtft"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871792,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--minimum-dependency-age=0",
+          "--node-modules-dir=none",
+          "--unstable-worker-options",
+          "--unstable-kv",
+          "--allow-all",
+          "--watch",
+          "triggers/runtime.ts"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:35423",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "NETSCRIPT_TRIGGER_REGISTRY_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/.netscript/generated/plugin-triggers/triggers.registry.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=drtrjdev",
+        "OTEL_SERVICE_NAME": "triggers",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "REDIS_TCP": "tcp://localhost:35423",
+        "REDIS_URI": "localhost:35423",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "services__redis__tcp__0": "tcp://localhost:35423",
+        "services__streams__http__0": "http://localhost:43061",
+        "services__triggers-api__http__0": "http://localhost:34399",
+        "services__workers-api__http__0": "http://localhost:37809",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/triggers-drtrjdev/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust",
+        "TRIGGER_CONCURRENCY": "10"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "workers-api-vkzkjtft",
+      "displayName": "workers-api",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.53+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=workers-api-vkzkjtft",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "streams-xdmycrpz"
+        }
+      ],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:37809"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871801,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--config",
+          "deno.json",
+          "--minimum-dependency-age=0",
+          "--unstable-no-legacy-abort",
+          "--node-modules-dir=none",
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-run",
+          "jsr:@netscript/plugin-workers@0.0.6/services"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:35423",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=vkzkjtft",
+        "OTEL_SERVICE_NAME": "workers-api",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "41967",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "REDIS_TCP": "tcp://localhost:35423",
+        "REDIS_URI": "localhost:35423",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "services__redis__tcp__0": "tcp://localhost:35423",
+        "services__streams__http__0": "http://localhost:43061",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/workers-api-vkzkjtft/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "workers-api_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "workers-zfwxvfyr",
+      "displayName": "workers",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T20:37:28+00:00",
+      "startTimestamp": "2026-08-30T20:37:27.53+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39419/?resource=workers-zfwxvfyr",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "s5final-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "redis-ndzgcrjy"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "streams-xdmycrpz"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "workers-api-vkzkjtft"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3871803,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2",
+        "resource.appArgs": [
+          "run",
+          "--minimum-dependency-age=0",
+          "--node-modules-dir=none",
+          "--unstable-worker-options",
+          "--unstable-kv",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          "--allow-write",
+          "--allow-run",
+          "--watch",
+          "workers/runtime.ts"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "CACHE_PROVIDER": "redis",
+        "ConnectionStrings__s5final-db": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_URL": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "DB_PROVIDER": "postgres",
+        "GARNET_URI": "localhost:35423",
+        "NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE": "file:///home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-r2/services/_shared/plugin-service-context.ts",
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:46845",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=zfwxvfyr",
+        "OTEL_SERVICE_NAME": "workers",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "POSTGRES_URI": "Host=localhost;Port=31999;Username=postgres;Password=8cec181763fd4b67abb8565cadb6f848;Database=s5final-db",
+        "REDIS_TCP": "tcp://localhost:35423",
+        "REDIS_URI": "localhost:35423",
+        "S5FINAL_DB_DATABASENAME": "s5final-db",
+        "S5FINAL_DB_HOST": "localhost",
+        "S5FINAL_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:31999/s5final-db",
+        "S5FINAL_DB_PASSWORD": null,
+        "S5FINAL_DB_PORT": "31999",
+        "S5FINAL_DB_URI": "postgresql://postgres:8cec181763fd4b67abb8565cadb6f848@localhost:31999/s5final-db",
+        "S5FINAL_DB_USERNAME": "postgres",
+        "services__redis__tcp__0": "tcp://localhost:35423",
+        "services__streams__http__0": "http://localhost:43061",
+        "services__workers-api__http__0": "http://localhost:37809",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcptlwKOE/workers-zfwxvfyr/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust",
+        "WORKER_CONCURRENCY": "2"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    }
+  ]
+}
