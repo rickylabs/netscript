@@ -98,12 +98,17 @@ console.log(`[relay] watching owner=${owner} dind=${dindHost}(${dindIp}) since=$
 
 while (!stopping) {
   try {
-    const rows = (await docker('ps', '--format', '{{.Names}}\t{{.CreatedAt}}\t{{.Ports}}')).split('\n').filter(Boolean);
+    const rows = (await docker('ps', '--format', '{{.ID}}\t{{.Names}}\t{{.Ports}}')).split('\n').filter(Boolean);
     for (const row of rows) {
-      const [name, createdAt, ports] = row.split('\t');
-      if (!name || name.startsWith('relay-')) continue;
-      const created = new Date(createdAt.replace(/ [A-Z]+$/, '').replace(' ', 'T'));
-      if (Number.isFinite(created.getTime()) && created < since) continue;
+      const [id, name, ports] = row.split('\t');
+      if (!id || !name || name.startsWith('relay-')) continue;
+      if (!(ports ?? '').includes('127.0.0.1:')) continue;
+      // Fail closed: creation time comes from `docker inspect .Created` (RFC 3339); anything
+      // unparseable is skipped and logged, never relayed.
+      const createdIso = await docker('inspect', '--format', '{{.Created}}', id);
+      const created = new Date(createdIso);
+      if (!Number.isFinite(created.getTime())) { console.error(`[relay] skip ${name}: unparseable Created "${createdIso}"`); continue; }
+      if (created < since) continue;
       for (const m of (ports ?? '').matchAll(/127\.0\.0\.1:(\d+)->/g)) {
         const port = Number(m[1]);
         if (listeners.has(port)) continue;
