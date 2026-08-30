@@ -342,4 +342,8 @@ clean, only regenerated carriers under `packages/`. AGY reported
 printed; treated as complete-with-truncated-transcript, verified by the rebase gates + docs_audit.
 Rebasing onto S10′ `a46ea16d` next (D-54). | | S11 convergence → generator | Supervisor rebase
 stopped on substantive prose conflicts (D-57); same AGY conversation resumed with
-`slices/s11/rebase-brief.md`; docs_audit follows at the rebased head. |
+`slices/s11/rebase-brief.md`; docs_audit follows at the rebased head. | | Host lease held elsewhere
+(coordinator) | Runtime lease exclusively held by fixes/#1758 at `50710a44` (bare `e2e:cli`). Aspire
+lane: no Aspire/Docker gate until release + fresh zero preflight; runtime-zero watch stopped
+(foreign resources expected); S11 docs_audit brief amended to "foreign runtime visible — do not
+touch". Static work only. |
