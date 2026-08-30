@@ -1458,3 +1458,21 @@
 - **S3 sender record:** `01a05200…` owner PID 296398 dead, absent from `codex-status`; record
   archived to `slices/s3/evicted-sender/` and evicted per the stale-branch procedure (its rollout
   still exists on disk, so a same-thread resume is attempted first).
+- **D-69 cycle 2 (hosted proof run 33327294781 at `6e6163a21`, FAILURE):** both runtime tiers 36
+  PASS then `runtime.aspire-start` FAIL in S10's parser — `… has no string status` (postgres job:
+  web `/health` report; sqlite job: `workers-api` report). Early `--follow` lines carry
+  `healthReports` entries with `status` omitted/null (13.5.3 `ResourceHealthReportJson.Status` is
+  nullable); confirmed by the real host capture
+  (`receipts/preflight-topology-181223Z/03-describe-follow.ndjson` line 1: `"postgres_check":{}` →
+  later `Healthy`). Coordinator-bounded S10 cycle 2 dispatched on the same thread
+  (`slices/s10/phase-b-fix-cycle-2-brief.md`): missing/null status = pending → did-not-converge
+  (retryable), last-seen Healthy replaces; non-object / non-string-non-null stay fail-closed; real
+  capture becomes the fixture. Proof rebuild + rerun follow the new S10 head.
+- **Relay (coordinator review):** `CreatedAt` parsing was not fail-closed (`+0200 CEST` could yield
+  an Invalid Date that bypassed `since`). Fixed at `34b3765f7`: creation time now comes from
+  `docker inspect .Created` per candidate; unparseable ⇒ skip + log. Proof: a foreign container with
+  a `127.0.0.1` publish created _before_ relay start → 0 relays, 0 hop-A containers
+  (`receipts/relay-presince-proof-*.log`). S3 relay restarted on the fixed tool: owner
+  `s3-attempt-3`, PID 3139731, since 2026-08-30T18:22:23Z, registry
+  `slices/s3/phase-b/relay-registry.json`. S3 thread `01a05200…` resumed with
+  `slices/s3/phase-b-attempt-3-brief.md` (same thread; sender record evicted as stale).
