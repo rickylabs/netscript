@@ -3930,3 +3930,57 @@ close-gate then reported five unticked boxes.
 ### #1368 continues independently
 
 Unaffected by the corpus sequence; still at base `f8b4f804` with its author working S1 research.
+
+## 2026-08-30 — #1462 delta receipt `MECHANICAL_PASS`; #1368 plan reviewed before its gate
+
+### Delta receipt verified more than was claimed
+
+`ca46f565` on `eval/delta-receipt-1462`, pushed. Verdict **`MECHANICAL_PASS`** over
+`83b7109c..f1ff5557` — 143 files, two `main` integrations plus regenerated assets.
+
+It improved on the supervisor's framing in two ways worth recording:
+
+- Where this lane measured "no non-generated product file changed", the evaluator proved the
+  **stronger** property: the leaf's non-generated `packages/`+`plugins/` **patch is identical** before
+  and after the integrations. Same conclusion, better evidence.
+- It regenerated both generated files in **write mode** and confirmed `git status --porcelain` came
+  back empty — establishing they are genuinely generated rather than hand-edited, which a read-only
+  check could never show.
+
+All four cascade gates exit 0 with per-gate evidence, including `check:mcp-export-corpus` at 35
+packages / 271 subpaths / 7,668 symbols.
+
+### #1368 plan reviewed at `d1436696` — two fixes sent before spending a PLAN-EVAL cycle
+
+PR **#1764** opened as draft with `Closes #1368`, correct taxonomy, milestone `0.0.7`, exactly one
+`status:`.
+
+What the plan got right, and was told so: its **Alternatives Rejected** table genuinely argues D1
+rather than asserting it — "deletion only hides behaviour", and today's green is an *absent-test false
+positive*. D10 commits to regenerating no shared asset with stop/report under the coordinator's
+ordering, correct while the corpus sequence is live in another lane.
+
+**Gate 15 is better than what was asked for.** The author derived the barrel check from its writer and
+used the **check-only** form (`generate-cli-assets-barrel.ts --check`), noting the task normally
+generates before diffing. That is exactly the hazard this supervisor walked into earlier — running
+`deno task check:assets-barrel` during a regeneration hold, which **wrote**
+`agent-docs.generated.ts` into the leaf worktree and had to be reverted. The author's invocation
+avoids it. Credited explicitly, because the point of publishing these lessons is that the next agent
+does better than the one that learned them.
+
+Two fixes dispatched:
+
+1. **`check:mcp-export-corpus` is absent entirely** — gates 13/14/15 cover prose, publish-assets and
+   the barrel; the corpus is the fourth family member and is missing. The leaf adds exported span
+   constants to a published package, so it can move. Asked for a gate row in the same check-only
+   spirit, and for the "additive types/constants only" reasoning at line 147 to become a **measured
+   expectation with a named gate** rather than a background assumption. This is precisely the gap that
+   cost #1462 a red CI cycle — that leaf carried three of four and `check:assets-barrel` was the one
+   missing. Different member, identical shape.
+2. **Gate 17 violates a stated boundary** — it plans `e2e:cli run scaffold.runtime`, which the brief
+   bars outright since no runtime lease is held and the lease is a cluster-wide singleton. Remove it,
+   or restate it as *supervisor-coordinated, author-must-not-run*, the way #1673 recorded it.
+
+Correcting a plan that breaches a boundary the brief set is cheaper before the gate than inside it —
+PLAN-EVAL cycles are capped at two, and a cycle spent on a defect the supervisor could already name is
+a cycle wasted.
