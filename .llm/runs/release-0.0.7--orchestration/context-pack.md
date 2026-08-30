@@ -1528,3 +1528,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
   executes only the named `saga.handle` assertion correction plus one delta-scoped cycle 3, while
   mandatory Flow-B remains unwaived. Both resume without blocking independent queues. Runtime was
   exact zero at the preceding checkpoint.
+
+## Resume checkpoint — 2026-08-30T17:50:00Z
+
+- Exact main is `2a65a8cd0f3872c2b95b00fe0a9edae10531921b` after PR #1780 merged from
+  exact carrier `f3106e63`; #1778 is closed and both records are `status:shipped`.
+- Aspire 13.5 is the explicit convergence critical path. Foreground #1734 at the next clean
+  internals checkpoint, prepare the complete D-58 retarget chain in advance, and dispatch mandatory
+  Phase-B to CI/off-host rather than waiting on another local lease while topology is unchanged.
+- Fresh D-55 probes re-confirmed both local blockers: the DinD daemon cannot see the NAS worktree
+  path and DinD-published loopback ports are unreachable from ai-agents. Cleanup returned Docker and
+  Aspire to zero. An infrastructure audit is running in parallel; do not restart ai-agents or
+  disrupt live workers to repair topology.

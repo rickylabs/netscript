@@ -1362,3 +1362,12 @@ implementation thread.
   assertion/evaluator result alone.
 - Central state incorrectly carried #1734 as `merged` while GitHub PR #1736 remained open. The same
   atomic authorization checkpoint restores the Git-authoritative `implementing` phase.
+
+## 2026-08-30 — Docker 28.5.2 did not itself resolve the remote-DinD topology boundary
+
+- The version mismatch and inotify blockers are fixed, but they were independent of D-42/D-43.
+  A fresh identical-path bind probe still produced an empty/invisible worktree inside the daemon,
+  and a fresh DinD-published Redis loopback port still refused connection from ai-agents.
+- Therefore another local Phase-B lease would deterministically repeat the failure. The accepted
+  paths remain a NAS compose correction (identical bind plus shared/reachable namespace) or
+  existing CI/off-host runtime gates. All static and retarget preparation continues in parallel.

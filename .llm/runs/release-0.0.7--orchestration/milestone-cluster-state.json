@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "24f6642f040617de573c7cef1140eed1ac0efd6d",
+  "currentMainSha": "2a65a8cd0f3872c2b95b00fe0a9edae10531921b",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -5224,14 +5224,14 @@
     "terminalTypedErrorWorktreesRemoved": true,
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
-    "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 verified with zero containers; host Docker is outside agent authority",
+    "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2 verified with zero containers after run-owned D-55 probes; host Docker is outside agent authority",
     "aspireMcpHelpers": "not counted as AppHost runtimes; no Aspire applications are active",
     "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD client/server 28.5.2; fs.inotify.max_user_instances 1024",
-      "loadState": "stable after tini PID1 maintenance restart; zombie count 0; S3 Phase-B attempts 1 and 2 are terminal at the authorized remote-DinD topology boundary; exact Aspire, Docker container, Docker volume, and runtime-process inventories are zero; no runtime lease is active",
+    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; fresh D-55 probes at 2026-08-30T17:49Z re-proved D-42 identical-path bind invisibility and D-43 DinD-loopback refusal; cleanup restored exact Aspire, Docker container, Docker volume, and runtime-process inventories to zero; no runtime lease is active",
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-      "verifiedAt": "2026-08-30T10:00:33.000Z"
+    "verifiedAt": "2026-08-30T17:49:00.000Z"
     },
-  "updatedAt": "2026-08-30T17:46:16.000Z"
+  "updatedAt": "2026-08-30T17:50:00.000Z"
 }

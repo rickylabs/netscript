@@ -2559,3 +2559,19 @@
 - Both supervisors were directly released without interrupting the live #1357 or #1774 workers.
   Reconciliation also corrected stale central phase drift: #1734/PR #1736 is open and implementing,
   never merged.
+
+## 2026-08-30T17:50:00Z — #1780 shipped; Aspire promoted to the convergence critical path
+
+- PR #1780 passed exact-head CI, close-gate, evaluator PASS, review-thread gate, a nine-path scope
+  audit, and zero changed-path intersection with main's #1763 advance. It merged from carrier
+  `f3106e63` as main `2a65a8cd0f3872c2b95b00fe0a9edae10531921b`; #1778 auto-closed and both
+  records were normalized to `status:shipped`.
+- Owner priority now makes Aspire 13.5 convergence the cluster critical path. Internals was directed
+  to foreground #1734 at the next clean checkpoint because its merge releases Aspire S1/S4/S5 and
+  the dependent runtime-red leaves. Aspire was directed to pre-build the D-58 retarget/close-gate
+  sequence and use the fastest existing CI/off-host Phase-B path.
+- Fresh run-owned D-55 probes against Docker 28.5.2 failed exactly as the historical diagnosis:
+  DinD could not see `/home/agent/projects/netscript/worktrees` at the identical path, and a Redis
+  port published on DinD `127.0.0.1:32773` refused connection from ai-agents. Both probe containers
+  were removed; Docker and Aspire returned to exact zero. A parallel infrastructure audit is
+  locating a safe NAS topology correction or the fastest existing off-host gate.
