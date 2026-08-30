@@ -58,7 +58,10 @@ snippets were type-checked in scratch fixtures.
    `agentic:pr-checks` snapshot — a snapshot taken seconds after a job completes can miss it.
 4. **Check `fmt.exclude`/`lint.exclude` before prescribing a scoped wrapper.** Three stops in this
    run came from gates the repository excludes by configuration.
-5. **A docs change invalidates three generated layers** — agent-docs bundle → CLI assets barrel →
+5. **A docs change invalidates generated layers — and the 2026-08-23 list of them was wrong.**
+   See the CORRECTION below; read that before using this rule. Original text follows.
+
+   **A docs change invalidates three generated layers** — agent-docs bundle → CLI assets barrel →
    MCP publish assets. Regenerate all three in the same slice; do not let CI discover them one at a
    time. Precision added 2026-08-23: the three have *distinct* sources, so check which actually
    fires before demanding a regen. `agent-docs.generated.ts` is fed from
@@ -78,3 +81,27 @@ lane shipped. The preserved Codex author threads are
 leaf needs its own worktree and its own thread.
 
 Merge authority rests with the coordinator, not this lane.
+
+## CORRECTION to rule 5 — recorded 2026-08-30, paid for by a red CI job
+
+The 2026-08-23 "precision" was false where it mattered most. It said
+`publish-assets.generated.ts` "embeds `packages/mcp/README.md` only". It does not.
+`.llm/tools/generate-publish-assets.ts` consumes **`.llm/assets/agent-docs/provenance.json`** (among
+others) and embeds its `sourceCommit`, so **every** agent-docs corpus regeneration makes
+`packages/mcp/src/publish-assets.generated.ts` stale.
+
+Its full input set, read from the generator rather than remembered:
+`.llm/assets/agent-docs/{prose.json.gz,provenance.json}`,
+`packages/cli/src/kernel/assets/{agent-tools,agent-docs,embedded,skills}.generated.ts`, and
+`packages/plugin/src/kernel/assets/embedded.generated.ts`.
+
+**How it cost us.** The #1745 leaf brief used the false rule to *forbid* regenerating the file, and
+therefore left `check:publish-assets` off the gate list. Tier-A re-ran the list; an independent
+IMPL-EVAL re-ran the list; both passed. CI caught it. **A wrong gate list cannot be rescued by
+independent review** — every reviewer inherits the omission. The repair was one line.
+
+**The rule that replaces it:** regenerate any asset whose *generator inputs* your diff touches, and
+determine that by reading the generator, never from a remembered file list. When a diff regenerates
+any corpus, run `check:publish-assets` and `check:assets-barrel` **unconditionally**. The Aspire lane
+independently paid for the same lesson in `agent-tools.generated.ts` via a conditional
+`check:assets-barrel`; two lanes, two files, one rule.
