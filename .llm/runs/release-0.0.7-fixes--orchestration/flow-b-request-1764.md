@@ -3,14 +3,23 @@
 Prepared, **not fired**. Posting the trigger spends external CI, so it is the coordinator's call;
 say the word and I will post it verbatim.
 
-## Why off-host
+## SUPERSEDED PREMISE — D-42/D-43 is resolved (coordinator infrastructure update)
 
-Flow-B is the sole remaining blocker after IMPL-EVAL cycle 3 `PASS_IMPL`. It cannot run on this host:
-D-42/D-43 established that AppHost gates cannot boot against the remote dind — generated
-`withDataBindMount('.data/postgres')` names a path the dind daemon cannot see, and with the scratch
-`DataPath` omitted DCP publishes container ports on the dind host's `127.0.0.1` while the AppHost dials
-`127.0.0.1:<port>` from this container. Not fixable by version, quota, or product config. No local
-Aspire or Docker was started to prepare this request.
+This request was written when Flow-B could not run on this host at all. That is **no longer true**.
+DinD mount visibility and cross-container ports are fixed: use `DOCKER_HOST=tcp://netscript-dind:2375`
+and reach published ports via **`netscript-dind:<port>`, not `127.0.0.1`** — which was precisely the
+D-43 failure mode (DCP publishes on the dind host's loopback while the AppHost dialled its own).
+
+So Flow-B is now a **queued local runtime request**, with off-host as the fallback rather than the only
+route. It is **not** runnable right now: the sole host runtime lease is held by the Aspire supervisor
+for Phase B. Queue behind it; start no Aspire and no Docker until that lease returns exact zero.
+Nothing in this request has been executed — no container or AppHost was started to prepare it.
+
+**Preferred route (local, when the lease returns):** request the singleton host runtime lease at the
+exact head, run the command below, capture the durable receipt, then scoped teardown proving
+`aspire ps` empty and `docker ps -a` empty before releasing.
+
+**Fallback route (off-host):** the OpenHands trigger at the end of this file, unchanged.
 
 ## Exact head
 
@@ -75,5 +84,7 @@ exactly and report; do not retry into a different answer.
 ## On completion
 
 PASS → the last DoD box closes and #1764 can move to `status:ready-merge` for the coordinator's merge.
+Either route satisfies the owner ruling: it required CI or off-host **because** local was blocked, and
+that condition no longer holds — a local lease-backed green run is equally valid evidence.
 FAIL → classify leaf-caused vs baseline-caused by comparing against the same command at `24f6642f`,
 and report before any repair.
