@@ -460,3 +460,38 @@ and `./auth` subpath. `deno.lock` is byte-identical at SHA-256
 E2E, Aspire, Docker, and browser gates were not run and no runtime lease was acquired. Slice 6 was
 not started. This author stops with Slice 5 awaiting substantive supervisor Tier-A review and a
 separate opposite-family IMPL-EVAL; the green evidence is not an author self-certification.
+
+## Supervisor catch-up — Slices 5 and 6 accepted (F-1 class recurred, closed again)
+
+This worklog stopped at "Slice 5 awaiting Tier-A" even after Slice 6 landed and was accepted —
+flagged as a **recurrence** of F-1 by the Slice 6 IMPL-EVAL (the same class the Slice 4 evaluator
+first caught, closed in the prior catch-up at `61ee0a25c`, and then allowed to recur). The gap was in
+the record, not the evidence: the commit trail and per-slice Tier-A documents were current throughout.
+
+**Slice 5** — Tier-A ACCEPTED at `c2cbfbf0b`. Contract-policy adapter and middleware binding, twelve-
+file ceiling (ten original plus two added by the D-9 owner ruling). LD-6/LD-7/LD-8 each verified
+against call-count and exact-message assertions, not outcome-only tests: `fallbackCalls === 0` proves
+the fallback is never *consulted* when metadata exists; `resolverCalls === 2 /
+authenticatorCalls === 0 / authorizerCalls === 0` proves one shared resolver short-circuits both
+middleware stages for a declared-public procedure. Separate opposite-family IMPL-EVAL (DeepSeek V4
+Flash 0731, native route quota-exhausted) independently reproduced the full test suite and cold
+scoped check, concurring `ACCEPTED_WITH_FINDINGS`.
+
+**Slice 6** — Tier-A ACCEPTED at `11e83f064`. OpenAPI access projection, two-of-three ceiling files
+(`contract-authorizer_test.ts` correctly untouched). `createOpenAPISpec` post-processes generated
+operations via oRPC's public `traverseContractProcedures`, implementing LD-9's exact security mapping
+for all four access states, with a single test proving preservation of user-supplied operation fields
+(custom `operationId`, `.route({spec:...})`-added `summary`/`x-user-field`) alongside the injected
+`security`/`x-netscript-roles`. Corpus and lock both unchanged, correctly — a runtime-behavior-only
+change adds no new exported signature. Separate opposite-family IMPL-EVAL (DeepSeek, same route)
+concurred `ACCEPTED_WITH_FINDINGS`, additionally confirming that overwriting a user-supplied
+`security` on a metadata-bearing operation is the *intentional* resolution (LD-6's specific-over-
+general precedence applied to docs, not just runtime), not an untested defect.
+
+**Convention note carried from both Slice 5 and Slice 6 evaluators, not a defect.** The plan names a
+"service JSR audit" at each Tier-A stop; the gate catalog has no entry for it, so `publish:dry-run` is
+the receipted backstop (the same D-5/Slice-1-era convention). Both evaluators independently re-ran
+the direct audit command and got the same sanctioned-INFO-only result `publish:dry-run` already
+proves — accepted, not a gap needing a fix.
+
+Slice 7 (MCP access result contract, type/schema only) is the next release.
