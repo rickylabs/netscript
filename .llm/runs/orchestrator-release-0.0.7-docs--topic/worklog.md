@@ -1998,3 +1998,69 @@ Tier-A PASS (five focused gates exit 0; `## 0.0.7` present; CLI version still `0
 untouched; no release intro or notes file; tree clean). CI green on `build`, `check-test`, `quality`,
 lane visibility. `close-gate` red on "Referenced issue acceptance gate" — **expected** while boxes are
 unticked and the PR is `status:impl`. Separate-session IMPL-EVAL running.
+
+## 2026-08-30 — #1755 shipped; #1761 blocked on a real review finding
+
+### Milestone state
+
+| PR | Issue | Merge SHA | State |
+| --- | --- | --- | --- |
+| #1746 | #1745 | `f8b4f804` | shipped |
+| #1748 | #1000 | `952cc106` | shipped |
+| #1755 | #1749 | `a5520e70` | shipped |
+| #1761 | #1757 | — | blocked on review repair |
+
+Epic **#1723 remains OPEN** throughout, as intended — no PR carried a closing keyword on it.
+
+### #1755 integration and a rationale that had to change, not just a date
+
+Rebased onto `952cc106`, assets regenerated once, delta IMPL-EVAL `PASS` at `91bf721c`. Seven
+evaluator-required body edits applied **body-only, no head move**.
+
+One was not cosmetic: the body justified omitting `.claude/skills/` as preserving a "host-neutral
+illustration". The evaluator **rejected the reasoning** — `resolveHosts` falls back to `["claude"]`,
+so the quickstart's own bare command *does* produce the mirror, and the tree already lists
+`.mcp.json` from that same branch. The omission now rests on the ground that survives scrutiny: the
+mirror is a byte-identical derived copy of the row already shown. Right conclusion, wrong reason,
+corrected rather than re-dated.
+
+**OpenHands runs `33312864635` / `33312881075`: recorded NONE / non-gating** — cancelled by the
+coordinator to protect the reviewed head. They raised nothing *and cleared nothing*; the distinction
+is kept because a cancelled run is not a silent pass.
+
+### #1761 — an external review caught what three internal passes missed
+
+An Augment review thread on `packages/cli/CHANGELOG.md:7-8` was **valid**. The bullet said the
+installed scanner *"now needs environment and network permissions"*. Verified from source:
+
+- `optionalGitHubToken()` wraps `Deno.env.get` in try/catch and returns `undefined` on denial —
+  its own comment says a caller without env permission "deliberately uses the public unauthenticated
+  API". **Env is optional.**
+- The only network call is `createGitHubAllowanceIssueResolver` fetching a `quality-allow` issue.
+  **Net is conditional.**
+- Corroboration neither side had cited: the shipped agent-tools cheat-sheet documents this very tool
+  as `deno run --allow-read … scan-code-quality.ts` — read-only. The changelog contradicted the
+  bundle's own documented invocation and would have pushed consumers to over-grant.
+
+**The reviewable failure is ours, and it is a verification gap, not a typo.** PLAN-EVAL cycle 2 and a
+separate-session IMPL-EVAL both confirmed the *declared* permission set moved `["read"]` →
+`["read","env","net"]` — true — and both then accepted "needs" as a description of a runtime
+requirement. Two independent passes checked the same fact and neither asked whether the word matched
+the behaviour. A declaration is not a requirement; nothing in either brief made that distinction, so
+neither evaluator tested it.
+
+Repair `3befc1e2` rewrote only that parenthetical: the bundle **declares** env+net, env access is
+**optional**, net is used **only when resolving a `quality-allow` issue**. Tier-A re-run by this lane:
+seven gates exit 0, 11 bullets intact, B1's "surfaces silent check failures" **not** strengthened to
+"fails" (PLAN-EVAL cycle 2 had specifically warned against that), `deno.lock` and
+`packages/cli/deno.json` unchanged at `0.0.6`.
+
+### Baseline moved three times during one slice
+
+`13878a80` → `625447f1` → `f8b4f804` → `952cc106` → `a5520e70`. The triage table covered 35 rows
+against a range that is now **37**. A second bounded steer adds one row per new commit — both
+verified by this lane as docs/generated-corpus only with no hand-written `packages/` source, hence
+Exclude — and refreshes every live count and pin statement. The changelog map itself is not reopened.
+
+This is the cost of writing a changelog while its milestone is still merging, and it is why the
+section is framed **provisional** rather than complete.
