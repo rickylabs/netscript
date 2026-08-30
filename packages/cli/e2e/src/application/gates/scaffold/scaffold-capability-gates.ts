@@ -17,7 +17,11 @@ import { createGeneratedPluginCheckGates } from './generated-plugins-check-gate.
 import { createGeneratedQualityGates } from './generated-quality-gate.ts';
 import { createOtelGates } from './otel-gates.ts';
 import { createPluginContractGates } from './plugin-contract-gates.ts';
-import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
+import {
+  createCleanupGates,
+  createResourceCommandGate,
+  createRuntimeGates,
+} from './runtime-gates.ts';
 import { createRuntimeBehaviorGates } from './runtime/behavior-gates.ts';
 import { createListenerReadinessGates } from './runtime/listener-readiness-gates.ts';
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
@@ -63,6 +67,7 @@ export function createScaffoldCapabilityGates(
     // Registration only — the suite gate lists in `capability-suites.ts` decide
     // where the fixture and the verification run relative to AppHost start.
     ...createServiceEnvironmentGates(),
+    createResourceCommandGate(),
     ...createCleanupGates(),
   ];
 }

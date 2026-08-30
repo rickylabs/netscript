@@ -1,7 +1,7 @@
 import { join } from '@std/path';
 import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operation-runner-helpers.ts';
 
-const READY_STATES = ['Healthy', 'Ready', 'Running', 'Finished'] as const;
+const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
 
 /** One object-valued Aspire health report. */
 export interface DescribeHealthReport {
@@ -137,7 +137,7 @@ export async function captureDescribeFollow(
         child.kill('SIGTERM');
         break;
       } catch (error) {
-        if (error instanceof SyntaxError) throw error;
+        if (!(error instanceof Error) || !isPendingConvergence(error.message)) throw error;
       }
     }
     const status = await child.status;
@@ -244,6 +244,10 @@ function record(value: unknown, label: string): Record<string, unknown> {
 
 function isReadyState(state: string): boolean {
   return READY_STATES.some((candidate) => candidate.toLowerCase() === state.toLowerCase());
+}
+
+function isPendingConvergence(message: string): boolean {
+  return message.includes('omitted resources:') || message.includes('did not converge:');
 }
 
 function normalizeName(name: string): string {

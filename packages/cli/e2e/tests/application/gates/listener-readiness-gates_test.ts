@@ -9,7 +9,7 @@ import {
   listenerReadinessWaitCommand,
   listenerUnreachableExpectations,
 } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
-import { readListenerHealthReport } from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
+import { readListenerHealthReport } from '../../../src/application/gates/scaffold/runtime/evidence/listener-readiness.ts';
 
 Deno.test('listener readiness maps database and RESP resources to stable report keys', () => {
   assertEquals(listenerReadinessExpectation(ASPIRE_RESOURCE.POSTGRES), {
@@ -62,7 +62,7 @@ Deno.test('describe-derived listener report requires the object-valued 13.5 shap
         'postgres_listener',
       ),
     Error,
-    'omitted healthReports.postgres_listener',
+    'healthReports is not an object',
   );
 });
 
@@ -73,7 +73,7 @@ Deno.test('listener wait command verifies the named report after Aspire wait', (
     'deno',
     'run',
     '--allow-run=aspire',
-    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/listener-readiness.ts',
     '/workspace/app/aspire/apphost.mts',
     'postgres',
     'postgres_listener',

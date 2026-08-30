@@ -3,7 +3,6 @@ import {
   type AspireResource,
   GATE,
   GATE_PHASE,
-  KV_BACKGROUND_RUNTIME_RESOURCES,
   KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
 } from '../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
@@ -12,16 +11,10 @@ import { resolve } from '@std/path';
 import { commandGate } from './gate-factory.ts';
 import { generatedAppName } from './runtime/generated-app-name.ts';
 import {
-  ASPIRE_START_SCRIPT,
   ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT,
   AUTH_SMOKE_ENV_SCRIPT,
 } from './runtime/runtime-scripts.ts';
-import {
-  listenerReadinessExpectation,
-  listenerReadinessWaitCommand,
-} from './runtime/listener-readiness-gates.ts';
-
-const KV_BACKGROUND_RUNTIME_WAIT_TIMEOUT_SECONDS = 300;
+import { listenerReadinessExpectation } from './runtime/listener-readiness-gates.ts';
 
 /** A feed stall gets three short chances instead of consuming two suite-wide 15-minute budgets. */
 export const ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000;
@@ -29,59 +22,20 @@ export const ASPIRE_RESTORE_MAX_RETRIES = 2;
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   const listenerExpectation = listenerReadinessExpectation(resource);
-  if (listenerExpectation) {
-    return commandGate(
-      `runtime.wait.${resource}`,
-      `Wait for ${resource} listener health`,
-      GATE_PHASE.RUNTIME,
-      (context) => listenerReadinessWaitCommand(context, listenerExpectation),
-    );
-  }
-
-  if (resource === ASPIRE_RESOURCE.WORKERS) {
-    return commandGate(
-      `runtime.wait.${resource}`,
-      `Wait for ${resource}`,
-      GATE_PHASE.RUNTIME,
-      (context) => [
-        'deno',
-        'run',
-        '--allow-run=aspire',
-        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts`,
-        context.project.appHost,
-      ],
-    );
-  }
-
   return commandGate(
     `runtime.wait.${resource}`,
-    `Wait for ${resource}`,
+    listenerExpectation ? `Assert ${resource} listener health` : `Assert ${resource} convergence`,
     GATE_PHASE.RUNTIME,
-    (context) => {
-      const command = [
-        'aspire',
-        'wait',
-        resource,
-        '--apphost',
-        context.project.appHost,
-        '--non-interactive',
-        '--nologo',
-      ];
-      const timeoutSeconds = isKvBackgroundRuntime(resource)
-        ? KV_BACKGROUND_RUNTIME_WAIT_TIMEOUT_SECONDS
-        : undefined;
-      if (timeoutSeconds !== undefined) {
-        command.splice(
-          3,
-          0,
-          '--status',
-          'healthy',
-          '--timeout',
-          String(timeoutSeconds),
-        );
-      }
-      return command;
-    },
+    (context) => [
+      'deno',
+      'run',
+      '--allow-read',
+      `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts`,
+      'assert',
+      `${context.project.projectRoot}/.netscript/e2e/aspire-describe.ndjson`,
+      resource,
+      ...(listenerExpectation ? [listenerExpectation.healthCheckKey] : []),
+    ],
   );
 }
 
@@ -91,17 +45,13 @@ function runtimeAppWaitGate(): GateDefinition {
     'Wait for the project-derived Fresh app',
     GATE_PHASE.RUNTIME,
     (context) => [
-      'aspire',
-      'wait',
+      'deno',
+      'run',
+      '--allow-read',
+      `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts`,
+      'assert',
+      `${context.project.projectRoot}/.netscript/e2e/aspire-describe.ndjson`,
       generatedAppName(context),
-      '--status',
-      'healthy',
-      '--timeout',
-      '300',
-      '--apphost',
-      context.project.appHost,
-      '--non-interactive',
-      '--nologo',
     ],
   );
 }
@@ -181,14 +131,29 @@ export function createRuntimeGates(
       GATE.RUNTIME_ASPIRE_START,
       'Start generated Aspire AppHost',
       GATE_PHASE.RUNTIME,
-      (
-        context,
-      ) => [
+      (context) => [
         'deno',
-        'eval',
-        ASPIRE_START_SCRIPT,
+        'run',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run=git,deno',
+        `${context.project.repoRoot}/.llm/tools/gates/run-gate.ts`,
+        '--gate',
+        'cli-e2e-aspire-start',
+        '--id',
+        `${context.request.suiteId}:runtime.aspire-start`,
+        '--output',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/runtime.aspire-start.receipt.json`,
+        '--cwd',
+        context.project.repoRoot,
+        '--child-report',
+        `${context.project.projectRoot}/.netscript/e2e/aspire-start.json`,
+        '--',
+        'capture',
         context.project.appHost,
         context.project.projectRoot,
+        JSON.stringify([...runtimeResources(database), generatedAppName(context)]),
       ],
     ),
     commandGate(
@@ -243,12 +208,13 @@ export function createRuntimeGates(
       'Describe generated topology',
       GATE_PHASE.RUNTIME,
       (context) => [
-        'aspire',
-        'describe',
-        '--apphost',
-        context.project.appHost,
-        '--format',
-        'Json',
+        'deno',
+        'run',
+        '--allow-read',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts`,
+        'assert',
+        `${context.project.projectRoot}/.netscript/e2e/aspire-describe.ndjson`,
+        generatedAppName(context),
       ],
     ),
   ];
@@ -263,10 +229,6 @@ export function runtimeResources(database: DatabaseEngine): readonly AspireResou
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
   ];
-}
-
-function isKvBackgroundRuntime(resource: AspireResource): boolean {
-  return KV_BACKGROUND_RUNTIME_RESOURCES.some((candidate) => candidate === resource);
 }
 
 function databaseRuntimeResources(
@@ -291,16 +253,52 @@ export function createCleanupGates(): readonly GateDefinition[] {
       GATE.CLEANUP_ASPIRE_STOP,
       'Stop generated Aspire AppHost',
       GATE_PHASE.CLEANUP,
-      (
-        context,
-      ) => [
-        'aspire',
-        'stop',
-        '--apphost',
+      (context) => [
+        'deno',
+        'run',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run=git,deno',
+        `${context.project.repoRoot}/.llm/tools/gates/run-gate.ts`,
+        '--gate',
+        'cli-e2e-aspire-cleanup',
+        '--id',
+        `${context.request.suiteId}:cleanup.aspire-stop`,
+        '--output',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/cleanup.aspire-stop.receipt.json`,
+        '--cwd',
+        context.project.repoRoot,
+        '--child-report',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/cleanup.aspire-stop.json`,
+        '--',
         context.project.appHost,
-        '--non-interactive',
-        '--nologo',
+        String(context.request.options.cleanup),
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/cleanup.aspire-stop.json`,
       ],
     ),
   ];
+}
+
+/** Exercise typed database and background-child resource commands after runtime behavior gates. */
+export function createResourceCommandGate(): GateDefinition {
+  const gate = commandGate(
+    GATE.RUNTIME_RESOURCE_COMMAND,
+    'Exercise Aspire resource commands',
+    GATE_PHASE.RUNTIME,
+    (context) => [
+      'deno',
+      'run',
+      '--allow-read',
+      '--allow-write',
+      '--allow-run=aspire',
+      `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/resource-command.ts`,
+      context.project.appHost,
+      context.project.projectRoot,
+      context.request.options.database,
+      `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/runtime.resource-command.json`,
+    ],
+  );
+  if (gate.kind !== 'command') throw new Error('resource-command must be a command gate');
+  return { ...gate, skip: { exitCode: 75, message: 'runtime.aspire-start receipt absent' } };
 }
