@@ -848,6 +848,308 @@
       "reason": "Present in the live owner-scheduled 0.0.7 milestone re-intake; deliberate TanStack compatibility pass grouped with #1677.",
       "evidence": ["https://github.com/rickylabs/netscript/issues/1695"],
       "ownerRatified": true
+    },
+    {
+      "number": 1745,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Owner-authorized live milestone rescope: current-main audit proved three public pages contradict #1729's shipped cross-host skill installation contract.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1745",
+        "https://github.com/rickylabs/netscript/pull/1729"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1108,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Post-freeze live-milestone reconciliation at main 13878a80; closed as overlapping residual scope already owned by #1296.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1108",
+        "https://github.com/rickylabs/netscript/issues/1108#issuecomment-5258777802"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1201,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Post-freeze live-milestone reconciliation at main 13878a80; already delivered by #1218/#1258 with behavioral observation retained by #1090.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1201",
+        "https://github.com/rickylabs/netscript/issues/1201#issuecomment-5258778289"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1260,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Post-freeze live-milestone reconciliation at main 13878a80; release-pinned SDK corpus and CLI stdio composition already shipped.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1260",
+        "https://github.com/rickylabs/netscript/issues/1260#issuecomment-5258778683"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1280,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Aspire 13.5 now supplies the TypeScript custom-health-check prerequisite; #1718 owns the formerly blocked acceptance.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1280",
+        "https://github.com/rickylabs/netscript/issues/1718"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "dependency-required",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:13:33.000Z"
+    },
+    {
+      "number": 1550,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Post-freeze live-milestone reconciliation at main 13878a80; closed after production evidence disproved the proposed primitive.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1550",
+        "https://github.com/rickylabs/netscript/issues/1550#issuecomment-5268246752"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1659,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Post-freeze live-milestone reconciliation at main 13878a80; delivered comparison rewrite with Tier-A acceptance evidence.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1659",
+        "https://github.com/rickylabs/netscript/issues/1659#issuecomment-5301504877"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1712,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Owner-ratified Aspire 13.5 adoption epic; coherent release stabilization programme executed by the Aspire sub-orchestrator through canonical topic lanes.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1712"],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:10:16.000Z"
+    },
+    {
+      "number": 1713,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "P0 atomic Aspire 13.5.3 train and parity gate; root prerequisite for the accepted epic.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1713",
+        "https://github.com/rickylabs/netscript/pull/1727"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:07.000Z"
+    },
+    {
+      "number": 1714,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "P0 exact-13.5.3 runtime verification prerequisite for every later Aspire slice.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1714",
+        "https://github.com/rickylabs/netscript/pull/1735"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:09.000Z"
+    },
+    {
+      "number": 1715,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Coherent 13.5 fixture recapture required to keep telemetry and teardown evidence version-honest.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1715",
+        "https://github.com/rickylabs/netscript/pull/1741"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:11.000Z"
+    },
+    {
+      "number": 1716,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Generator and deploy-adapter contract must be re-proven against the new exact Aspire API before graph changes land.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1716",
+        "https://github.com/rickylabs/netscript/pull/1738"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:13.000Z"
+    },
+    {
+      "number": 1717,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "P0 removal of literal runtime ports; one accepted leaf also owns #1365/#1370/#979.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1717",
+        "https://github.com/rickylabs/netscript/pull/1740"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:15.000Z"
+    },
+    {
+      "number": 1718,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Aspire 13.5 unlocks real TypeScript listener-readiness checks and closes the long-blocked #1280 contract.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1718",
+        "https://github.com/rickylabs/netscript/pull/1743"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:17.000Z"
+    },
+    {
+      "number": 1719,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Release runtime hygiene depends on honest 13.5 stop/orphan/descendant teardown behavior.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1719",
+        "https://github.com/rickylabs/netscript/pull/1744"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:19.000Z"
+    },
+    {
+      "number": 1720,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Typed resource commands and MCP exclusion ownership are coherent user-facing Aspire 13.5 adoption.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1720"],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:20.000Z"
+    },
+    {
+      "number": 1721,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Shipped skills, corpora, static resources, and Aspire MCP must match the upgraded runtime with an exact smoke receipt.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1721"],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:22.000Z"
+    },
+    {
+      "number": 1722,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Structured doctor, describe, resource-command, and cleanup evidence is a release-critical E2E honesty upgrade.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1722"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:25.000Z"
+    },
+    {
+      "number": 1723,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Public Aspire documentation must describe the behavior actually shipped by S1-S10.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1723"],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:27.000Z"
+    },
+    {
+      "number": 1724,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Final stale-surface closure and parity phase 2 are release-critical exact-version enforcement.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1724"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T21:11:29.000Z"
+    },
+    {
+      "number": 1730,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Coherent regression net for #1694's shipped provider-invisible request-context promise.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1730"],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T22:20:06.000Z"
+    },
+    {
+      "number": 1732,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Generated AppHost source-safety defect reproduced independently at the #1728 base; admitted to the internals serial queue.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1732"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T22:25:54.000Z"
+    },
+    {
+      "number": 1733,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Post-freeze live-milestone reconciliation at main 13878a80; concurrently filed duplicate already closed in favor of #1732.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1733",
+        "https://github.com/rickylabs/netscript/issues/1733#issuecomment-5465240364"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1734,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Current TanStack minor breaks generated-project check and scaffold.runtime through the declared Fresh range.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1734",
+        "https://github.com/rickylabs/netscript/pull/1736"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T22:28:57.000Z"
+    },
+    {
+      "number": 1737,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Bounded shipped-skill prose correction required to finish #1675's canonical cross-host contract.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1737"],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-29T22:55:56.000Z"
     }
   ]
 }

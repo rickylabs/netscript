@@ -1116,3 +1116,132 @@ implementation thread.
   is shipped and Aspire S11 is explicitly epic-owned.
 - Runtime serialization blocks only the exact runtime probe. It must not block research, RED tests,
   implementation, cheap gates, PR preparation, or review in another orchestrator.
+
+## 2026-08-30 — NAS transport and authority drift
+
+- The coordinator and topic sessions moved from historical WSL paths to the N5 NAS. Old worktree,
+  PID, session, and transcript paths are recovery metadata only; remapped NAS worktrees and Git
+  heads are authoritative.
+- The NAS uses mise-pinned Deno 2.9.5 and Aspire 13.5.3 plus a disposable DinD endpoint. Previous
+  WSL memory/load and host-container assumptions no longer apply. Host Docker and unrelated service
+  containers are outside agent authority.
+- The current parent operating contract reserves PR merges for humans. The coordinator therefore
+  advances leaves through acceptance, review, CI, and ready/CLEAN handoff without performing the
+  merge mutation itself.
+- Fresh Claude supervisors were created rather than reviving the migrated registry. Their transport
+  and process evidence is kept locally because NAS handoff/harness operational evidence must not be
+  committed or published.
+
+## 2026-08-30 — NAS watcher and child Remote Control evidence gap
+
+- `agentic:codex-follow` currently fails at `Deno.watchFs` with `EMFILE` on the NAS. Visible
+  container inotify usage is far below the kernel per-user ceiling, so the likely pressure is shared
+  host-wide outside this container. Do not multiply watchers; supervise through the compact status
+  reporter, append-only launch logs, tmux, and exact Git heads until the platform ceiling is repaired.
+- Fresh Codex threads are created correctly by the checked-in launcher and are discoverable by the
+  managed daemon, but their one-turn stdio app-server emits `remoteControl/status=disabled`.
+  Therefore daemon health is not sufficient proof of per-thread phone attachment. The ledger keeps
+  this red/unknown honestly; future launcher work should establish a supported daemon-proxy or
+  equivalent per-thread attachment proof rather than relabeling discovery as attachment.
+
+## 2026-08-30 — migrated Aspire home ownership
+
+- The migrated default `/home/agent/.aspire` was created as `root:root`, so a node-owned Aspire CLI
+  invocation aborted while creating its diagnostic log and could not prove the runtime baseline.
+- Aspire's own `AspireHomeDirectory` contract supports `ASPIRE_HOME`. The untracked parent mise
+  environment now points it at `/home/agent/projects/netscript/.aspire`, shared by the canonical
+  clone and worktrees and owned by the agent user. With that authority loaded, `aspire ps --format
+  Json` returns `[]`; DinD independently reports zero containers.
+- The root-owned legacy directory was not deleted or mutated because it is outside the agent user's
+  ownership. It contains only two log files plus NuGet-search cache and no live backchannel.
+
+## 2026-08-30 — NAS PID 1 does not reap child processes
+
+- A process-table audit found 7,730 zombies, all adopted by PID 1, including thousands of defunct
+  `sshd` children plus the worker descendants exercised by `hybrid-launcher_test.ts`. A zombie
+  cannot be killed; only its parent can reap it, or the container must be restarted with a proper
+  init/reaper.
+- This platform state explains the repeatable non-product root-test failures now seen by #1731,
+  #1734, and Aspire S5: `Deno.watchFs` reaches `EMFILE`, and the cancellation assertion sees a
+  PID-1-owned defunct descendant as still present. Repeating the same root gate consumes capacity
+  without changing the verdict.
+- The coordinator did not restart the agent container because doing so would terminate five live
+  Remote Control supervisors and active evaluator sessions. Product lanes retain focused gates and
+  honest baseline-red receipts; a human-controlled container restart/init repair remains outside
+  the agent's authority. Docker and Aspire application counts remain exactly zero.
+
+## 2026-08-30 — post-freeze issues existed outside the dispatch gate
+
+- The Aspire checkpoint recorded epic #1712 and its children, and supervisors were actively
+  executing them, but the frozen inventory/DAG omitted #1712–#1724 plus five later issues and six
+  closed milestone records. The validator was internally consistent yet could not detect live
+  GitHub omissions.
+- Re-intake now records all 102 GitHub milestone issues plus retained moved #1453, maps every active
+  issue into one canonical topic lane, and carries the Aspire dependency chain through waves 9–18.
+  Future issue filing/milestone moves must update intake, inventory, DAG, and cluster state in the
+  same atomic checkpoint instead of relying on a topic context pack alone.
+
+## 2026-08-30 — second consecutive #1734 implementation-evaluation failure
+
+- Cycle 1 found that the guard rejected the package's own JSON transport. Cycle 2 confirms that
+  repair, then finds a distinct supported TanStack error-domain hole: JSON-preserved primitive,
+  array, and structured rejection values are rejected or collapsed by the new normalization.
+- Per owner policy, the coordinator did not silently authorize cycle 3. #1734 is parked at artifact
+  head `eb7656292` for the explicit bounded-repair-versus-park choice while #1732 and every other
+  independent lane continue.
+
+## 2026-08-30 — maintenance restart closes the PID-1 false-red
+
+- The platform restarted with `tini` as PID 1. The zombie count fell from 7,730 to 0 without any
+  repository or lane workaround. The exact focused regressions that previously failed now pass:
+  `codex-follow_test.ts` plus `hybrid-launcher_test.ts` report 13 passed / 0 failed, including the
+  stubborn worker-group cancellation check. This supersedes the active operational consequence of
+  the earlier PID-1 and watcher drift while preserving it as cause history.
+- All pre-restart supervisor PIDs and bridges are historical. Five fresh native Remote Control
+  sessions were launched from the exact NAS topic worktrees, with features/fixes/internals/docs on
+  Opus 5/high and the accepted Aspire research supervisor on Fable 5/medium. Recreating the old
+  blocked Claude registry remains prohibited and did not occur.
+
+## 2026-08-30 — hybrid task example and parser disagree on the separator
+
+- `.llm/tools/agentic/README.md` shows `deno task agentic:claude-hybrid -- --cwd ...`, but Deno 2.9.5
+  forwards that separator to `hybrid-launcher.ts`, whose finite parser rejects it as
+  `unknown argument: --`. The failure occurs before the Claude child is spawned, so the five failed
+  recovery attempts left no session or orphan.
+- The working checked-in invocation is `deno task agentic:claude-hybrid --cwd ... --name ...`.
+  Supervisor recovery used that form. The docs/parser mismatch is a bounded tooling follow-up and
+  does not weaken attachment proof: each successful launch emitted matching PID, cwd, session ID,
+  and non-empty bridge ID, and the UI showed `/remote-control is active`.
+
+## 2026-08-30 — NAS project foundation omitted Aspire runtime prerequisites
+
+- The NAS orientation pinned Deno and Aspire but omitted .NET; `aspire doctor` failed on the absent
+  SDK. The container also inherited Node 26 even though current Aspire TypeScript prerequisites
+  support Node 20.19, 22.13, or 24. Project-local mise now pins .NET 10.0.400 and Node 24.20.0;
+  neither was installed globally and no repository file changed.
+- Doctor is now 0 failures. The DinD sandbox remains Docker 27.5.1, reported by Aspire as a warning
+  below its 28.0.0 minimum. Agents cannot upgrade or reset the human-owned sandbox. One authorized
+  S5 gate attempt may characterize compatibility; a version-specific failure is an infrastructure
+  receipt and human boundary, never permission to mutate host Docker or retry repeatedly.
+
+## 2026-08-30 — shared NAS inotify quota blocks token-free run watchers
+
+- The prescribed `.llm/tools/harness/watch-run.ts` helper was attempted against four existing
+  topic run directories after the tini restart. Every `Deno.watchFs` call failed immediately with
+  `Too many open files`; the run directories contain only 3–18 directories, the invoking soft file
+  limit is 1024, and this process namespace exposes only 17 inotify descriptors. This points to a
+  shared kernel/user quota outside the visible project process set rather than topic-run size or
+  the repaired zombie condition.
+- The coordinator did not raise a host sysctl or kill foreign sessions. Until infrastructure frees
+  or raises the quota, supervision uses sparse explicit checkpoints and existing Remote Control
+  liveness while preserving all active lanes. This is operational drift, not a product/evaluator
+  failure and not permission to waive exact-head gates.
+
+## 2026-08-30 — central validator passed despite stale live leaf reconciliation
+
+- `harness:milestone:validate` was green while #1731/#1736/#1743/#1747 heads were stale and live
+  leaves #1739/#1746/#1748 were absent. The rendered status consequently showed false zero active
+  work in features, fixes, and docs even though GitHub and supervisors were active.
+- The coordinator repaired the current ledger atomically. A tooling follow-up should teach the
+  validator to compare allocated/open milestone PRs against GitHub or a fresh exported snapshot;
+  schema consistency alone cannot prove live completeness.

@@ -520,6 +520,139 @@
       "issueNumber": 1695,
       "lane": "fixes",
       "title": "deps(ai): deliberately adopt the current TanStack AI minor line"
+    },
+    {
+      "id": "issue:1745",
+      "kind": "issue",
+      "issueNumber": 1745,
+      "lane": "docs",
+      "title": "docs(agentic): document canonical cross-host skill installation"
+    },
+    {
+      "id": "issue:1280",
+      "kind": "issue",
+      "issueNumber": 1280,
+      "lane": "features",
+      "title": "feat(aspire): real backing-service listener-readiness health checks"
+    },
+    {
+      "id": "issue:1712",
+      "kind": "issue",
+      "issueNumber": 1712,
+      "lane": "internals",
+      "title": "Epic: Aspire 13.5 adoption and orchestration stabilization"
+    },
+    {
+      "id": "issue:1713",
+      "kind": "issue",
+      "issueNumber": 1713,
+      "lane": "internals",
+      "title": "chore(aspire): atomic 13.5.3 pin bump and version-parity gate"
+    },
+    {
+      "id": "issue:1714",
+      "kind": "issue",
+      "issueNumber": 1714,
+      "lane": "internals",
+      "title": "test(aspire): 13.5.3 runtime verification receipts"
+    },
+    {
+      "id": "issue:1715",
+      "kind": "issue",
+      "issueNumber": 1715,
+      "lane": "internals",
+      "title": "test(aspire): re-capture 13.5.3 fixtures"
+    },
+    {
+      "id": "issue:1716",
+      "kind": "issue",
+      "issueNumber": 1716,
+      "lane": "fixes",
+      "title": "fix(aspire): re-validate generators against the 13.5 TypeScript API"
+    },
+    {
+      "id": "issue:1717",
+      "kind": "issue",
+      "issueNumber": 1717,
+      "lane": "fixes",
+      "title": "fix(aspire): remove literal pre-randomization ports"
+    },
+    {
+      "id": "issue:1718",
+      "kind": "issue",
+      "issueNumber": 1718,
+      "lane": "features",
+      "title": "feat(aspire): listener-readiness health checks for backing services"
+    },
+    {
+      "id": "issue:1719",
+      "kind": "issue",
+      "issueNumber": 1719,
+      "lane": "internals",
+      "title": "fix(agentic): 13.5 teardown and descendant-aware leak checks"
+    },
+    {
+      "id": "issue:1720",
+      "kind": "issue",
+      "issueNumber": 1720,
+      "lane": "features",
+      "title": "feat(aspire): typed resource commands and MCP exclusion ownership"
+    },
+    {
+      "id": "issue:1721",
+      "kind": "issue",
+      "issueNumber": 1721,
+      "lane": "internals",
+      "title": "fix(agentic): align Aspire skills, corpora, MCP, and static resources"
+    },
+    {
+      "id": "issue:1722",
+      "kind": "issue",
+      "issueNumber": 1722,
+      "lane": "internals",
+      "title": "test(aspire): structured 13.5 E2E gate evidence"
+    },
+    {
+      "id": "issue:1723",
+      "kind": "issue",
+      "issueNumber": 1723,
+      "lane": "docs",
+      "title": "docs(aspire): refresh public pages and READMEs for 13.5"
+    },
+    {
+      "id": "issue:1724",
+      "kind": "issue",
+      "issueNumber": 1724,
+      "lane": "internals",
+      "title": "chore(aspire): close stale version surfaces and enforce parity phase 2"
+    },
+    {
+      "id": "issue:1730",
+      "kind": "issue",
+      "issueNumber": 1730,
+      "lane": "features",
+      "title": "test(ai): prove provider invisibility above the adapter"
+    },
+    {
+      "id": "issue:1732",
+      "kind": "issue",
+      "issueNumber": 1732,
+      "lane": "internals",
+      "title": "fix(cli): validate background references before AppHost source emission"
+    },
+    {
+      "id": "issue:1734",
+      "kind": "issue",
+      "issueNumber": 1734,
+      "lane": "internals",
+      "title": "fix(fresh): preserve readonly hydration across TanStack 5.102.x"
+    },
+    {
+      "id": "issue:1737",
+      "kind": "issue",
+      "issueNumber": 1737,
+      "lane": "fixes",
+      "title": "fix(cli/skills): remove Claude-only help paths from shipped skill bodies"
     }
   ],
   "edges": [
@@ -740,12 +873,180 @@
       ]
     },
     {
-      "from": "issue:979",
-      "to": "issue:1370",
+      "from": "issue:1675",
+      "to": "issue:1745",
       "kind": "requires",
       "evidence": [
-        "#1370 Boundaries explicitly state #979 owns prerequisites and must land first."
+        "#1745 documents the canonical cross-host install contract shipped by #1675 through PR #1729."
       ]
+    },
+    {
+      "from": "issue:1713",
+      "to": "issue:1714",
+      "kind": "requires",
+      "evidence": ["S2 executes against the atomic exact-13.5.3 train established by S1."]
+    },
+    {
+      "from": "issue:1714",
+      "to": "issue:1715",
+      "kind": "requires",
+      "evidence": ["S3 captures fixtures from S2's observed 13.5.3 runtime shapes."]
+    },
+    {
+      "from": "issue:1713",
+      "to": "issue:1716",
+      "kind": "requires",
+      "evidence": ["S4 validates emission against the exact hosting train selected by S1."]
+    },
+    {
+      "from": "issue:1714",
+      "to": "issue:1716",
+      "kind": "requires",
+      "evidence": ["S4 consumes S2 V1 and deploy-command runtime observations."]
+    },
+    {
+      "from": "issue:1716",
+      "to": "issue:1717",
+      "kind": "requires",
+      "evidence": ["The literal-port graph correction follows the 13.5 generator/API re-validation."]
+    },
+    {
+      "from": "issue:1716",
+      "to": "issue:1365",
+      "kind": "cross-epic-order",
+      "evidence": ["#1365 is resolved inside S5 after S4 settles the generated discovery contract."]
+    },
+    {
+      "from": "issue:1716",
+      "to": "issue:1370",
+      "kind": "cross-epic-order",
+      "evidence": ["#1370 is resolved inside S5 after S4 settles the generated contribution contract."]
+    },
+    {
+      "from": "issue:1716",
+      "to": "issue:979",
+      "kind": "cross-epic-order",
+      "evidence": ["#979 is resolved inside the same S5 leaf after S4 re-validation."]
+    },
+    {
+      "from": "issue:1717",
+      "to": "issue:1718",
+      "kind": "requires",
+      "evidence": ["S6 health checks bind to the randomized endpoint graph corrected by S5."]
+    },
+    {
+      "from": "issue:1717",
+      "to": "issue:1280",
+      "kind": "requires",
+      "evidence": ["#1280 shares the S6 leaf and consumes S5's settled endpoint graph."]
+    },
+    {
+      "from": "issue:1714",
+      "to": "issue:1719",
+      "kind": "requires",
+      "evidence": ["S7 consumes S2 V6/V7 lifecycle observations."]
+    },
+    {
+      "from": "issue:1715",
+      "to": "issue:1719",
+      "kind": "requires",
+      "evidence": ["S7 runs teardown probes against the newly captured 13.5 ps fixtures."]
+    },
+    {
+      "from": "issue:1718",
+      "to": "issue:1720",
+      "kind": "requires",
+      "evidence": ["S8 resource commands follow the settled S6 backing-resource readiness model."]
+    },
+    {
+      "from": "issue:1713",
+      "to": "issue:1721",
+      "kind": "requires",
+      "evidence": ["S9 regenerates shipped guidance against S1's exact version train."]
+    },
+    {
+      "from": "issue:1714",
+      "to": "issue:1721",
+      "kind": "requires",
+      "evidence": ["S9 consumes S2's exact Aspire MCP/runtime behavior receipts."]
+    },
+    {
+      "from": "issue:1720",
+      "to": "issue:1721",
+      "kind": "requires",
+      "evidence": ["S9's MCP hidden-set proof consumes S8 excludeFromMcp ownership."]
+    },
+    {
+      "from": "issue:1675",
+      "to": "issue:1721",
+      "kind": "requires",
+      "evidence": ["S9 installs regenerated Aspire skills through #1675's canonical cross-host tree."]
+    },
+    {
+      "from": "issue:1719",
+      "to": "issue:1722",
+      "kind": "requires",
+      "evidence": ["S10 embeds the stop/cleanup guarantees proven by S7."]
+    },
+    {
+      "from": "issue:1720",
+      "to": "issue:1722",
+      "kind": "requires",
+      "evidence": ["S10's resource-command gate class consumes S8's typed commands."]
+    },
+    {
+      "from": "issue:1721",
+      "to": "issue:1723",
+      "kind": "requires",
+      "evidence": ["S11 public prose follows the finalized skill/MCP/static-resource surface."]
+    },
+    {
+      "from": "issue:1722",
+      "to": "issue:1723",
+      "kind": "requires",
+      "evidence": ["S11 documents behavior only after the final E2E evidence contract is settled."]
+    },
+    {
+      "from": "issue:1713",
+      "to": "issue:1724",
+      "kind": "requires",
+      "evidence": ["S13 turns S1's phase-1 parity inventory into complete enforcement."]
+    },
+    {
+      "from": "issue:1721",
+      "to": "issue:1724",
+      "kind": "requires",
+      "evidence": ["S13 closes all remaining agent/MCP/static-resource manifest rows after S9."]
+    },
+    {
+      "from": "issue:1723",
+      "to": "issue:1724",
+      "kind": "requires",
+      "evidence": ["S13 enforces complete parity only after public docs are refreshed."]
+    },
+    {
+      "from": "issue:1724",
+      "to": "issue:1712",
+      "kind": "requires",
+      "evidence": ["The Aspire umbrella closes by hand only after terminal S13 acceptance."]
+    },
+    {
+      "from": "issue:1694",
+      "to": "issue:1730",
+      "kind": "cross-epic-order",
+      "evidence": ["#1730 is the regression-net follow-up for #1694's shipped request-context contract."]
+    },
+    {
+      "from": "issue:1371",
+      "to": "issue:1732",
+      "kind": "cross-epic-order",
+      "evidence": ["#1732 is the independently routed source-safety residual from #1371/#1728 evaluation."]
+    },
+    {
+      "from": "issue:1675",
+      "to": "issue:1737",
+      "kind": "cross-epic-order",
+      "evidence": ["#1737 corrects two shipped skill-body paths against #1675's canonical tree."]
     }
   ],
   "waves": [
@@ -859,6 +1160,8 @@
       "index": 9,
       "nodeIds": [
         "issue:1371",
+        "issue:1713",
+        "issue:1734",
         "issue:1672",
         "issue:1673",
         "issue:1674",
@@ -869,24 +1172,63 @@
     {
       "index": 10,
       "nodeIds": [
-        "issue:1365",
         "issue:1387",
         "issue:1677",
-        "issue:1695"
+        "issue:1695",
+        "issue:1714",
+        "issue:1730",
+        "issue:1732",
+        "issue:1737",
+        "issue:1745"
       ]
     },
     {
       "index": 11,
       "nodeIds": [
-        "issue:979",
-        "issue:1368"
+        "issue:1715",
+        "issue:1716"
       ]
     },
     {
       "index": 12,
       "nodeIds": [
-        "issue:1370"
+        "issue:979",
+        "issue:1365",
+        "issue:1370",
+        "issue:1717",
+        "issue:1719"
       ]
+    },
+    {
+      "index": 13,
+      "nodeIds": [
+        "issue:1280",
+        "issue:1368",
+        "issue:1718"
+      ]
+    },
+    {
+      "index": 14,
+      "nodeIds": ["issue:1720"]
+    },
+    {
+      "index": 15,
+      "nodeIds": [
+        "issue:1721",
+        "issue:1722"
+      ]
+    },
+    {
+      "index": 16,
+      "nodeIds": ["issue:1723"]
+    },
+    {
+      "index": 17,
+      "nodeIds": ["issue:1724"]
+    },
+    {
+      "index": 18,
+      "nodeIds": ["issue:1712"]
     }
   ]
 }

@@ -19,16 +19,15 @@ dispatch at plan head `331f7c664`; `leaf-contracts.json` is binding input for ev
 
 Reset authority at `2026-08-15T00:00:00+02:00`: `codex-root-0.0.7` remains sole milestone
 coordinator in Codex session `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd`; its canonical transcript is
-`/home/codex/.codex/sessions/2026/08/13/rollout-2026-08-13T12-20-27-019ffaa3-32ae-7b02-92a5-d7ae146d8cbd.jsonl`.
+`/home/agent/.codex/sessions/2026/08/13/rollout-2026-08-13T12-20-27-019ffaa3-32ae-7b02-92a5-d7ae146d8cbd.jsonl`.
 Resume that exact session rather than creating a rival coordinator. Its binding route is GPT-5.6-SOL
 at **high** effort, never max, through the Codex app-server Remote Control socket
-`unix:///home/codex/.codex/app-server-control/app-server-control.sock`. The current proof is resume
-PID `2452378` with explicit `-m gpt-5.6-sol -c model_reasoning_effort=high` and app-server PID
-`5027` with `--remote-control`; the two interrupted `max` turn contexts are non-authoritative
-history. Topic supervision is native Claude Opus 5/high only. Preserve the four active Claude Remote
-Control supervisors as-is; a coordinator transport repair never authorizes their relaunch or
-mutation. Claude supervisors do not implement; WSL Codex Sol leaves use effort matched to the
-harness's per-slice complexity record.
+`unix:///home/agent/.codex/app-server-control/app-server-control.sock`. The current NAS proof is the
+daemon-attached thread reported by `agentic:codex-status` on GPT-5.6-SOL/high; the two interrupted
+`max` turn contexts are non-authoritative history. The four canonical topic supervisors use native
+Claude Opus 5/high. The parallel Aspire research/execution sub-orchestrator intentionally uses
+Claude Fable 5/medium and maps its slices back into canonical ownership. Claude supervisors do not
+implement; Codex Sol leaves use effort matched to the harness's per-slice complexity record.
 
 Read `briefs/reset-gates/dispatch.json` after the central state. It supersedes both the pre-reset
 six-Fable route and the rejected Sonnet-low matrix. The six retained holds have specific existing
@@ -1243,3 +1242,60 @@ continues concurrently because serial ordering is per orchestrator, not global.
   with the Aspire epic supervisor. Future public canary selection is now consumer-eligible from
   #1696 + #1711 + #1728, but should wait for the nearest coherent bundle boundary such as #1729
   rather than interrupting a near-ready user-facing leaf.
+
+## Resume checkpoint — N5 NAS recovery at main `13878a80a`
+
+- Coordinator thread is `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd` on GPT-5.6-SOL/high; max remains
+  forbidden. The clean main checkout and `origin/main` both resolve to
+  `13878a80a50c55b9662099fed64555f2310ae4a3`.
+- Canonical paths are `/home/agent/projects/netscript/repo`,
+  `/home/agent/projects/netscript/worktrees`, and the dated untracked handoff directory. Treat every
+  `/home/codex/...` value as historical metadata only. Git plus the NAS migration manifest is
+  authoritative.
+- Four fresh canonical Claude Opus 5/high topic supervisors plus the accepted Aspire Fable
+  5/medium sub-orchestrator are daemon-persistent in tmux with native Remote Control. Preserve the
+  feature/fix/internal/docs/Aspire ownership and per-orchestrator seriality; never restore the old
+  blocked Claude registry.
+- Immediate independent gates: internals repairs #1736 from `ed8a8e9ca`; features repairs #1731
+  from `f9056f879`; Aspire completes S6 Phase-B/review/IMPL-EVAL from `1fa5aeec1`. S2/#1735 already
+  passed runtime verification and is ready/CLEAN for the human merge handoff.
+- Runtime precondition is currently clean: Aspire 0 and DinD containers 0. Serialize only actual
+  host runtime leases. Deno 2.9.5 and Aspire 13.5.3 come from mise; do not install global runtimes,
+  touch host Docker, print secrets, or publish NAS operational evidence.
+
+## Live continuation — re-intake complete; #1734 owner boundary
+
+- Central scope is validator-green at 103 inventory records, 93 active/committed issues, and waves
+  0–18 after formally admitting the Aspire epic/slices, #1730, #1732, #1734, #1737, and #1280 plus
+  recording the six closed/stale milestone omissions. Canonical lane ownership remains exactly
+  docs/internals/fixes/features; Aspire is a parallel execution sub-orchestrator, not a fifth
+  central ownership lane.
+- Canary `0.0.7-canary.3` is a terminal green OIDC/publication + published-CLI E2E pair at content
+  `13878a80a`, release commit `5a54d187d`, workflows `33297296394` and `33297519134`.
+- #1734 is the sole current owner boundary: cycle-2 IMPL-EVAL at product head `3b3044f7a` returned a
+  second consecutive `FAIL_FIX`, preserved in artifact head `eb7656292`. No cycle 3 may launch
+  without explicit owner authorization. Internals continues #1732; other topic queues stay active.
+
+## Live continuation — tini restart recovered at 2026-08-30T08:34:27Z
+
+- Coordinator thread remains `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd` on GPT-5.6-SOL/high; main and
+  `origin/main` remain clean/equal at `13878a80a50c55b9662099fed64555f2310ae4a3`. PID 1 is `tini`,
+  zombies are 0, focused agentic lifecycle smoke is 13/13, DinD is empty, and Aspire is empty.
+- Fresh Remote Control supervisors replace only the tmux sessions lost in maintenance: features
+  `6c654229-9c4c-4b88-8321-9310778b7366`, fixes `84ea13ea-f34a-41d7-9f65-c9d13ddc95ae`, internals
+  `eef77fc1-8224-483d-990f-00fd0145b629`, docs `1d06dd31-be07-405a-9762-e641197e285f`, and Aspire
+  `4e08fdff-708d-4d6b-8ba9-fded2fc292e3`. Their bridge IDs and URLs are in cluster state. Preserve
+  exact topic ownership; old sessions and paths are historical only.
+- Active recovery gates are independent: #1731 is at exact evidence head `369928cf` with the
+  factual route-identity correction complete and final IMPL-EVAL active; #1739 is at `61b8bf52` under
+  independent Fable 5/medium IMPL-EVAL; #1732/#1747 implemented the bounded repair at `6e82aad1`
+  while #1734 stays parked; #1746 is ready with unchanged-head CI rerunning and #1748 is under
+  exact-head evaluation; Aspire S6 is at `564d465c` with its restored 13.5.3 consumer check green.
+- Aspire S5's only exact-head `scaffold.runtime` lease is terminal: 26 passed / 1 known baseline
+  failure from #1734, before AppHost startup. Its run-owned resources were cleaned, Aspire and DinD
+  are both zero, and the expensive gate must not be retried. No Phase-B runtime lease begins until
+  a new serialized grant after a fresh zero precondition.
+- The prescribed `watch-run.ts` helper currently cannot allocate a watcher because this shared NAS
+  kernel rejects new inotify instances with `Too many open files`; the supervisor processes remain
+  healthy. Use sparse explicit checkpoints until infrastructure raises or frees the shared quota,
+  and do not kill foreign/unknown-owner sessions. A proven stale S5 `tail -f` monitor was stopped.

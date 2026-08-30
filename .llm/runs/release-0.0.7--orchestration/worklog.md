@@ -2044,3 +2044,187 @@
 - Audited the absent docs process against its durable checkpoint. Its only allocation `[1551]` is
   shipped and its queue is genuinely exhausted; Aspire S11 is epic-owned. No release-driving lane
   waits on docs, internals, or Aspire.
+
+## 2026-08-30T06:25:20Z — N5 NAS recovery and fresh supervisor attachment
+
+- Re-read `/home/agent/AGENTS.md` and adopted the NAS authority: canonical repositories and
+  worktrees live below `/home/agent/projects`, old `/home/codex` paths are historical, toolchains
+  are mise-managed, and long-lived workers run in tmux with logs under
+  `/home/agent/observability`. Git and the dated migration manifest—not old session paths—are the
+  recovery authorities. Humans merge PRs; agents prepare verified handoffs.
+- Reconciled `origin/main` and the clean main checkout at
+  `13878a80a50c55b9662099fed64555f2310ae4a3`. Restored nine milestone worktrees plus main and
+  verified every recovery branch against the manifest and current GitHub heads.
+- Verified the disposable DinD sandbox at `tcp://netscript-dind:2375` has zero containers and
+  `aspire ps --format Json` is empty. Deno `2.9.5` and Aspire `13.5.3` are supplied by mise; no
+  global runtime installation or host-Docker mutation is authorized.
+- Launched fresh Claude Opus 5/high supervisors for features, fixes, internals, docs, and Aspire
+  through the checked-in AGENTIC surface. All five proved native `/remote-control` attachment and
+  run in persistent tmux sessions. The old blocked job registry was neither resumed nor recreated.
+- First dispatch order is internals #1736 at exact GitHub head `ed8a8e9ca`, because that bounded
+  repair unlocks Aspire S1/S4/S5. Features #1731 at `f9056f879` and Aspire S6 at `1fa5aeec1`
+  continue independently. Aspire S2/#1735 is terminal PASS, ready/CLEAN, and awaits human merge.
+- NAS operational paths, process identifiers, transport identifiers, and handoff evidence remain
+  local to the harness ledger and must not be committed or published.
+
+## 2026-08-30T06:38:30Z — first dispatches verified; truthful queue repair
+
+- Verified four fresh implementation threads through the checked-in launcher: #1736 repair,
+  #1731 repair, fixes #1673 S3-S4, and Aspire S5 repair. Each has a NAS worktree, matching requested
+  route, thread record, explicit-refspec push rule, and same-thread steering command. The managed
+  Remote Control daemon discovers the threads, but the launch-local stdio app-server reports Remote
+  Control disabled; per-thread phone attachment is therefore recorded as unproven rather than
+  claimed green.
+- The repository follow command could not allocate another filesystem watcher (`EMFILE`) despite
+  only 17 visible inotify descriptors in this container, consistent with a host-wide NAS inotify
+  instance ceiling shared outside the container. Avoided adding polling/watch processes and retained
+  read-only `agentic:codex-status`, launch logs, tmux output, and Git heads as supervision evidence.
+- Reclassified accepted issue #1732 from `status:triage` to `status:plan`, matching the internals
+  serial queue after #1734.
+- Admitted docs issue #1745 after a current-main audit proved three public pages contradict #1729's
+  shipped cross-host skill installation contract. Docs now owns the bounded three-page correction;
+  PLAN-EVAL is N/A, with Tier-A and separate IMPL-EVAL still mandatory.
+- Rechecked the runtime boundary after dispatch: disposable DinD containers 0 and Aspire
+  applications 0. Thirteen registered NetScript worktrees are all current milestone/controller
+  worktrees; none is a proven stale cleanup target.
+
+## 2026-08-30T06:40:00Z — meaningful consumer canary.3 dispatched
+
+- Dispatched the OIDC-only `release-canary.yml` workflow for exact main
+  `13878a80a50c55b9662099fed64555f2310ae4a3` as run `33297296394`. The workflow concurrency key
+  serializes this canary publication; the stable release captain remains inactive until the
+  milestone cut preconditions are green.
+- Expected immutable version is `0.0.7-canary.3`. The coherent public payload is #1696, #1711,
+  #1728, and #1729; unlike canary.2, this checkpoint is not docs/harness/internal-only.
+- Completion still requires both independent verdicts: coordinated publish success and the exact
+  canary-pinned production E2E success. The release lease stays active until the green pair or a
+  terminal failure is recorded; no local/ad-hoc publication is permitted.
+
+## 2026-08-30T06:54:00Z — NAS runtime control repaired; active gates re-steered
+
+- Revalidated the project runtime through the mise-owned environment: the disposable DinD sandbox
+  contains zero containers and Aspire reports `[]`. The migrated `/home/agent/.aspire` directory
+  was root-owned and caused the 13.5.3 CLI to abort before `ps`; upstream's supported `ASPIRE_HOME`
+  override is now set in the untracked parent `/home/agent/projects/netscript/.mise.toml` to the
+  node-owned `/home/agent/projects/netscript/.aspire`. No `HOME` override, host-container action, or
+  global tool installation was used. The legacy directory contains only cache/log files and no
+  backchannel.
+- Corrected a timestamp interpretation during canary monitoring: Actions timestamps are UTC while
+  the NAS shell displays UTC+2. Pinned production E2E `33297519134` was about eleven minutes into
+  its 75-minute job window, not two hours old; publication run `33297296394` remains legitimately
+  in progress awaiting it.
+- Features Tier-A proved #1731's annotated metadata equality guard can absorb a divergent builder
+  initializer and therefore does not independently pin oRPC metadata position 4. Authorized the
+  already-bounded architectural correction in the same Codex thread: infer or expose a
+  NetScript-owned boundary, keep upstream/private oRPC types private, reach public-doc-lint delta
+  zero, then recut exact-head receipts before a separate IMPL-EVAL.
+- Docs #1745 advanced independently to supervisor Tier-A on pushed head `96501e107`; fixes #1673,
+  internals #1734, and Aspire S5 remain live in their original implementation threads. No duplicate
+  author or global queue barrier was created.
+
+## 2026-08-30T06:54:25Z — canary.3 terminal green pair
+
+- Release workflow `33297296394` completed successfully for exact content SHA `13878a80a`; OIDC
+  published immutable prerelease `0.0.7-canary.3` at release commit `5a54d187d`, tagged
+  `v0.0.7-canary.3`.
+- Exact canary-pinned production E2E `33297519134` completed successfully. The published JSR CLI
+  passed its one-pass `scaffold.runtime` suite and the subsequent quickstart seven-verdict walk.
+  The release workflow deleted its ephemeral branch and recorded the green pair.
+- Consumer-tooling checkpoint is complete. This canary carries the coherent user-facing payload
+  #1696, #1711, #1728, and #1729; stable publication remains inactive while the independent
+  feature/fix/Aspire queues continue toward later meaningful checkpoints.
+
+## 2026-08-30T07:02:00Z — platform false-red isolated without idling product lanes
+
+- Process audit counted 7,730 PID-1-owned zombies. This is the common host cause behind
+  `codex-follow_test.ts` (`EMFILE`) and `hybrid-launcher_test.ts` (defunct descendant still visible)
+  in otherwise-green #1731, #1734, and Aspire S5 root suites. Agents cannot reap zombies and the
+  coordinator is not authorized to restart the container while five Remote Control sessions are
+  active.
+- Directed affected supervisors to stop redundant root-test retries, preserve the exact red
+  receipt, compare the main baseline, and continue focused Tier-A/evaluation. This does not waive
+  branch-owned failures: Aspire S5's generated-agent-tools freshness failure still requires a new
+  exact-head green CI result.
+
+## 2026-08-30T07:12:00Z — post-freeze milestone re-intake and #1734 owner boundary
+
+- Re-intake repaired the central blind spot at current main `13878a80a`: inventory now contains 103
+  records (all 102 live milestone issues plus retained moved #1453), including 18 newly active
+  admissions and six closed/stale records. The active DAG and committed set now contain 93 issues
+  across waves 0–18. Aspire execution remains a parallel sub-orchestrator, while every admitted
+  issue maps to one canonical docs/internals/fixes/features lane as required by the milestone
+  contract.
+- GitHub taxonomy repair removed the duplicate status from #1718, restored missing taxonomy on
+  #1695/#1677/#1429/#1694, corrected canonical type on #1306, moved completed issues to
+  `status:shipped`, and removed stale phase labels from the not-planned #1108/#1550. A fresh sweep
+  reports zero open milestone issues without a status and zero duplicate status labels.
+- #1734 / PR #1736 reached its second consecutive terminal IMPL-EVAL failure. Cycle 2 evaluated
+  product head `3b3044f7a`; artifact-only head `eb7656292` records `FAIL_FIX`. The original
+  JSON-dropped-field regression is fixed, but the guard rejects supported primitive/array error
+  values and silently collapses structured error records. No cycle 3 is authorized. Only #1734 is
+  parked for owner choice; internals continues #1732 and all other lanes continue independently.
+
+## 2026-08-30T08:34:27Z — tini restart proven; five fresh supervisors attached and executing
+
+- Maintenance recovery is green: PID 1 is `tini`, zombie count is exactly 0, the focused
+  `codex-follow_test.ts` + `hybrid-launcher_test.ts` smoke is 13/13, clean main and `origin/main`
+  both remain `13878a80a50c55b9662099fed64555f2310ae4a3`, DinD containers are 0, and Aspire
+  applications are 0. The parent mise contract still pins Deno 2.9.5, Aspire 13.5.3,
+  `DOCKER_HOST=tcp://netscript-dind:2375`, and the node-owned `ASPIRE_HOME`.
+- Relaunched all lost tmux supervisors through `agentic:claude-hybrid`; every launcher emitted a
+  PID/cwd/session/bridge proof and every Claude UI shows `/remote-control is active`. Features is
+  session `6c654229-9c4c-4b88-8321-9310778b7366` / bridge
+  `session_01CHWTWUvxjEkHB7TCav7G2H`; fixes `84ea13ea-f34a-41d7-9f65-c9d13ddc95ae` /
+  `session_011PR3tqPTHXX7P8LBRywQRH`; internals `eef77fc1-8224-483d-990f-00fd0145b629` /
+  `session_01AQCc1qsArwb7CPELZwYDfq`; docs `1d06dd31-be07-405a-9762-e641197e285f` /
+  `session_016g86jW5sMJE9z9EHHGPByH`; Aspire `4e08fdff-708d-4d6b-8ba9-fded2fc292e3` /
+  `session_01Jusn3woxeK5xhCdj6ccooR`. Canonical topics are Opus 5/high; Aspire is restored to its
+  accepted Fable 5/medium route. Global Claude defaults were restored to Opus 5/high after the
+  Aspire session-local route change.
+- Steered exact independent recovery: features reconciles #1731 remote `74483f02` against leaf
+  `fc81e652`; fixes reconciles #1739 product `02da4e1c` against topic evidence `f20c2581` and repairs
+  missing taxonomy; internals keeps #1734 parked and resumes #1732/#1747 at `e3f227c2`; docs
+  reconciles #1746 `84a5fd11` and #1748 `6b91eb25`; Aspire reconciles S1–S13.
+- Granted the single runtime lease to Aspire S5 only after the zero preflight. Its exact-head
+  `deno task e2e:cli` at `aa822069` is active; run-owned cleanup and new Aspire/DinD zero proofs are
+  mandatory before any S6/S3/S7 Phase-B lease. All non-runtime topic work continues concurrently.
+- The checked-in README example includes an extra `--` before hybrid arguments, but the current
+  Deno task forwards it and the parser rejects `unknown argument: --`. The first attempts failed
+  before spawning Claude and left no orphan; successful recovery used the same checked-in task
+  without that extra separator. This tooling/docs mismatch is recorded for a bounded follow-up.
+- Aspire S5 preflight initially stopped before runtime because `aspire doctor` found the .NET SDK
+  absent and the inherited Node 26 line outside Aspire's supported TypeScript range. Repaired only
+  the untracked project-local mise toolchain: installed/pinned .NET 10.0.400 and Node 24.20.0.
+  Doctor now reports 4 passed / 4 warnings / 0 failed; Docker 27.5.1 remains an attributable
+  below-28 warning on the human-owned disposable sandbox. The single S5 attempt is reauthorized;
+  any Docker-version-specific failure releases cleanly with no retry and surfaces the sandbox
+  upgrade boundary.
+- S5 F-A completed at exact product head `aa822069`: 26 passed / 1 failed / 0 skipped. The sole
+  `generated.quality-negative` failure is the known #1734 generated Fresh hydration TS2345 and
+  occurs before AppHost startup; the S5 diff and Docker warning were not causal. Aspire checkpoint
+  `f9553ac1` carries the JSON/log/leak receipt and PR comment `5467711108`. Suite cleanup plus the
+  scoped leak check prove zero Aspire applications, zero DinD containers, and zero survivors; the
+  proven run-owned 534 MB scaffold scratch was removed. No retry is authorized.
+
+## 2026-08-30T08:56:09Z — live-head reconciliation and post-restart queue checkpoint
+
+- Reconciled authoritative GitHub heads into the central leaf ledger: #1664 `a257807d`, #1731
+  `dd201816`, #1736 evaluator-artifact head `eb765629`, #1743 `564d465c`, and #1747 `6e82aad1`.
+  Added the previously omitted live leaves #1739 (`61b8bf52`), #1746 (`84a5fd11`), and #1748
+  (`22e79dcc`) so the rendered topic status no longer reports false zero activity.
+- #1731 completed its evidence-only factual route-identity correction at `369928cf` with product
+  content unchanged and entered a separate final IMPL-EVAL. #1739 is already under a fresh exact-head Fable
+  5/medium IMPL-EVAL. #1732's four-path bounded implementation is committed and remote-equal at
+  `6e82aad1`; internals now owns Tier-A and a separate IMPL-EVAL.
+- #1746 passed exact-head evaluation and its unanswered-thread gate, moved to `status:ready-merge`,
+  and is rerunning the supported unchanged-head CI attempt. #1748 remains at `22e79dcc` under
+  separate evaluation. Aspire S6's restored 13.5.3 consumer check passed at `564d465c`; the check
+  started no AppHost or container and disclosed only the two existing zod baseline errors.
+- PID 1 remains `tini`, zombies remain zero, and Docker/Aspire remain zero. A proven stale S5
+  `tail -f` process owned by the completed gate was terminated. No foreign/unknown-owner process
+  was changed.
+- After a fresh zero/zero preflight at `2026-08-30T09:00:07Z`, granted the sole runtime lease to
+  Aspire S3 Phase B. Its scope is one isolated 13.5.3 AppHost for two dashboard telemetry envelopes
+  and the first actual Docker 27.5.1 remote-DinD compatibility probe, followed by exact owned stop,
+  leak-check, teardown, and zero postconditions. S6 evaluation remains static and does not consume
+  the runtime lease.
