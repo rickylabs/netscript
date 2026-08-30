@@ -6,9 +6,12 @@ import type { PluginDoctorCheck } from './doctor-plugin-use-case.ts';
 
 const CHECK_PREFIX = 'runtime-registry';
 const CHECK_TITLE = 'Manifest-declared runtime registry matches source';
+const GENERATOR_CHECK_TITLE = 'Generator-selected runtime registry matches source';
 const REMEDIATION = 'Run: netscript generate plugins';
 const EVIDENCE_BOUNDARY =
   'This verifies manifest-declared runtime registry sources only; no non-registry runtime topology was verified.';
+const GENERATOR_EVIDENCE_BOUNDARY =
+  'This verifies generator-selected runtime registry sources only; no non-registry runtime topology was verified.';
 
 /** Input for manifest-backed runtime registry drift checks. */
 export interface RuntimeRegistryDriftInput {
@@ -38,6 +41,11 @@ export async function checkRuntimeRegistryDrift(
   }
 
   return await Promise.all(input.registries.map(async (registry) => {
+    const generatorSelected = registry.sourceAuthority === 'generator';
+    const sourceDescription = generatorSelected ? 'generator-selected' : 'manifest-discovered';
+    const declaredDescription = generatorSelected ? 'generator-selected' : 'manifest-declared';
+    const title = generatorSelected ? GENERATOR_CHECK_TITLE : CHECK_TITLE;
+    const evidenceBoundary = generatorSelected ? GENERATOR_EVIDENCE_BOUNDARY : EVIDENCE_BOUNDARY;
     const expected = new Set(
       (registry.sourceFiles ?? []).map(normalizeProjectPath),
     );
@@ -56,12 +64,14 @@ export async function checkRuntimeRegistryDrift(
     if (!registryExists || missing.length > 0 || orphaned.length > 0) {
       const details = [
         ...(!registryExists ? [`Generated registry does not exist: ${registryPath}.`] : []),
-        ...missing.map((path) => `Missing generated entry for manifest source: ${path}.`),
-        ...orphaned.map((path) => `Registry entry has no manifest-discovered source: ${path}.`),
+        ...missing.map((path) =>
+          `Missing generated entry for ${sourceDescription} source: ${path}.`
+        ),
+        ...orphaned.map((path) => `Registry entry has no ${sourceDescription} source: ${path}.`),
       ].join(' ');
       return {
         id: `${CHECK_PREFIX}:${registryPath}`,
-        title: CHECK_TITLE,
+        title,
         status: 'error' as const,
         message: `${registryPath}: ${details} ${REMEDIATION}`,
       };
@@ -72,10 +82,10 @@ export async function checkRuntimeRegistryDrift(
     const evidence = files.length > 0 ? `: ${files.join(', ')}` : '';
     return {
       id: `${CHECK_PREFIX}:${registryPath}`,
-      title: CHECK_TITLE,
+      title,
       status: 'healthy' as const,
       message:
-        `Verified ${registryPath} against ${files.length} manifest-declared ${noun}${evidence}. ${EVIDENCE_BOUNDARY}`,
+        `Verified ${registryPath} against ${files.length} ${declaredDescription} ${noun}${evidence}. ${evidenceBoundary}`,
     };
   }));
 }

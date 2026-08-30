@@ -3,8 +3,8 @@
 ## Current Phase
 
 PLAN-EVAL cycle 1 returned harness `PASS` / PR `APPROVED` at plan commit `13402d3f`. S7 is committed
-red-before. S8 now owns the shared AI selector and v1 inspection document; S9 host consumption has
-not landed yet.
+red-before, S8 owns the shared AI selector and v1 inspection document, and S9 now consumes and
+validates that document fail-closed through the installed generator's injected `ProcessPort`.
 
 ## S7 Evidence
 
@@ -50,6 +50,21 @@ is `plugin doctor stays healthy when AI generation excludes the skill-loader fac
 - Focused AI compiler suite: 9/0. Full structured AI plugin suite: 32/0. S8 structured check/format:
   zero diagnostics/findings.
 
+## S9 State
+
+- Only a present `inspectionProtocol` key activates inspection. Integer `1` invokes the same external
+  generator with the exact inspect suffix, inline manifest JSON, and neither write permission nor a
+  manifest sidecar; absence performs the unchanged legacy walk without a child process.
+- Advertised-version, process, JSON/schema, exact-target-set, duplicate, canonical-path, and
+  regular-file failures all retain the generator-inspection prefix and never fall back.
+- Doctor evidence identifies generator-selected versus legacy manifest-discovered sources, uses the
+  neutral wrapper title, and preserves `EmptyPluginRegistryError` for an all-empty inspected result.
+- Installed-generator plus focused-doctor structured suites are 15/0. The real AI doctor case is
+  healthy and its complete project byte snapshot is unchanged. Exact six-file check/lint/fmt are
+  clean, `quality:gate` exits 0, and raw lock diff exits 0.
+- Path 2 is 673 lines and produces the expected PE-9 F-1 `WARN`; CLI doctrine totals remain
+  `FAIL=0`. The ruled ceiling prevents a new parser file, so this is recorded scope pressure.
+
 ## Locked Contract
 
 - Optional `runtimeRegistryGenerator.inspectionProtocol: 1`.
@@ -64,9 +79,7 @@ is `plugin doctor stays healthy when AI generation excludes the skill-loader fac
 
 ## Remaining Slices
 
-1. S9 — host parsing/validation via `ProcessPort`, fail-closed/legacy behavior, neutral error title,
-   empty-total behavior, evidence wording, focused green and byte-snapshot proof.
-2. S10 — exact author-owned gates and evidence; required `scaffold.runtime` remains
+1. S10 — exact author-owned gates and evidence; required `scaffold.runtime` remains
    supervisor-coordinated under the singleton lease.
 
 Each slice commits, explicitly pushes, posts one structured PR comment, updates PR evidence, and

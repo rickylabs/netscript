@@ -368,8 +368,9 @@ above only as chronological evidence of the proposal at commit `349d5915`.
 - The response is strict protocol v1 with an exact declared registry target set, canonical
   project-relative registry/source paths, duplicate rejection, and regular-file source validation.
 - Failure detail starts `Generator inspection protocol 1 failed for <plugin>:` and appears under the
-  distinct doctor title `Generator runtime registry inspection`; no advertised failure silently
-  falls back or receives a false regeneration remedy.
+  neutral doctor title `Runtime registry inspection`; no advertised failure silently falls back or
+  receives a false regeneration remedy. The prefix, rather than the wrapper shared with legacy
+  dry-run failures, identifies the protocol failure.
 
 ### No-write and regression proof
 
@@ -513,3 +514,50 @@ inspect `MemoryProjectFiles.written` map equals its pre-call snapshot.
 S7 remains the unmodified red contract until host consumption lands in S9. The PR remains draft;
 no runtime lease, issue/acceptance mutation, label/readiness change, dependency, export, or lockfile
 change was made. S9 is the next allowed slice.
+
+## S9 — Fail-Closed Host Consumption and Focused Green
+
+### Scope and contract
+
+- A present `inspectionProtocol` key is distinguished from absence. Absence retains the legacy
+  manifest walk and starts no inspect process; any advertised value other than integer `1` fails
+  closed.
+- Protocol v1 invokes the installed plugin's existing external generator through injected
+  `ProcessPort` with the locked inspect suffix and inline manifest JSON. It includes neither
+  `--allow-write` nor `--manifest`.
+- The host accepts one strict JSON document, requires exactly version `1` and the declared registry
+  target set, rejects extra fields, unsafe/non-canonical paths, duplicate targets or sources, omitted
+  or unknown targets, and source paths that are not regular project files. Process errors and every
+  validation error retain the `Generator inspection protocol 1 failed for <plugin>:` prefix; none
+  falls back to the legacy walk.
+- Dry-run results mark their source authority as `generator` or `manifest`, and doctor evidence says
+  `generator-selected` only for inspected targets. The wrapper title is the neutral `Runtime registry
+  inspection`; its protocol prefix supplies disambiguation per PE-10.
+- A valid report selecting zero sources across every target still raises
+  `EmptyPluginRegistryError` under generator authority, preserving Sweep-1.
+
+### Proof
+
+| Gate | Result |
+| --- | --- |
+| Installed-generator + focused doctor structured suites | exit `0`; `passed=15 failed=0`. The six doctor cases include the real AI healthy regression. |
+| Real AI no-write proof | PASS; the generated registry legitimately excludes `skill-loader.ts`, doctor is healthy, the output names `generator-selected source file`, and the complete before/after project byte maps are equal. |
+| Advertised protocol host no-write proof | PASS; injected filesystem state is byte-for-byte unchanged and the exact process args contain neither `--allow-write` nor `--manifest`. |
+| Exact S9 TypeScript check | exit `0`; 6 selected; zero diagnostics. |
+| Exact S9 TypeScript lint | exit `0`; 6 selected/processed; zero findings. |
+| Exact S9 TypeScript format | exit `0`; 6 selected/processed; zero findings. |
+| Repository `quality:gate` | exit `0`. |
+| Raw `git diff --exit-code -- deno.lock` | exit `0`; lockfile byte-unchanged. |
+
+PE-9 is expected and disclosed: path 2 is now 673 lines, so `arch:check` reports an F-1 `WARN`
+against the 500-line cap while the CLI package remains `FAIL=0`. The coordinator prohibited the new
+parser file that would split this concern, and the check fails only on `FAIL`; this is known scope
+pressure, not concealed drift or a new debt entry.
+
+### Reconcile
+
+The S7 regression is green because the CLI consumes the generator's exact selected set, not because
+the test changed its behavioral expectation. The integration test remains untouched. No path outside
+the exact eleven-path ceiling, dependency, export surface, generated asset, lockfile, issue, label,
+readiness state, runtime lease, or external resource was changed. S10 is the next allowed slice;
+`scaffold.runtime` remains required and supervisor-coordinated and was not run by the author.

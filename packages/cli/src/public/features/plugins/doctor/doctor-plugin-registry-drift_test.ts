@@ -165,6 +165,7 @@ Deno.test('plugin doctor stays healthy when AI generation excludes the skill-loa
     await command.parse(['--project-root', projectRoot]);
 
     assertStringIncludes(output.join('\n'), 'ai/tools/e2e-tool.ts');
+    assertStringIncludes(output.join('\n'), 'generator-selected source file');
     assertEquals(await snapshotProjectFiles(projectRoot), beforeDoctor);
   } finally {
     await Deno.remove(projectRoot, { recursive: true });

@@ -9,7 +9,9 @@ export interface GeneratedPluginRegistry {
   readonly path: string;
   readonly plugin: string;
   readonly registrableItems: number;
-  /** Manifest-discovered project source files, present for read-only inspection. */
+  /** Authority that selected {@linkcode sourceFiles} during read-only inspection. */
+  readonly sourceAuthority?: 'generator' | 'manifest';
+  /** Project source files expected in this registry, present for read-only inspection. */
   readonly sourceFiles?: readonly string[];
 }
 
