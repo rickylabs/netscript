@@ -6,17 +6,17 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `fix-ui-add-data-screen-triad--0.0.7` |
 | Branch         | `fix/ui-add-data-screen-triad`        |
-| Current phase  | `implementation — S2A`                |
+| Current phase  | `implementation — S2B`                |
 | Archetype      | `6 — CLI / Tooling`                   |
 | Scope overlays | `frontend`                            |
 
 ## Current State
 
-PLAN-EVAL cycle 2 returned terminal `PASS_PLAN` at `53e696b5` with verdict `886f0860`. S2A now has
-an isolated red-before commit (`0d620b61`) plus the kernel planner/preflight implementation and a
-canonical router fixture correction in locked path 6. Focused tests, whole CLI check/test, and the
-whole nested E2E check/test are green; the explicit push and PR comment are the remaining handoff
-actions after this product/harness commit lands.
+PLAN-EVAL cycle 2 returned terminal `PASS_PLAN` at `53e696b5` with verdict `886f0860`. The owner
+independently reproduced and accepted S2A at `e5d820b3f`. S2B now has isolated test-only red commit
+`22e737fc3` and green public command changes: real help/role coupling, dry-run/force threading, and
+per-role path reporting. Focused and whole CLI gates are green; the S2B product/harness commit,
+explicit push, and PR comment remain.
 
 ## Completed
 
@@ -33,20 +33,25 @@ actions after this product/harness commit lands.
   semantics, appRoutes registration, and one route-tree island convention.
 - Restored the in-ceiling app-root consumer fixture with a canonical `router.ts` after whole-package
   composition exposed three deterministic failures.
-- Proved focused green (8/0), whole CLI green (838/0, 541 steps), and nested E2E green (168/0).
+- Proved focused green (8/0), whole structured CLI green (1,379/0), and nested E2E green (168/0).
+- Recorded lint/fmt as N/A by repository configuration for `packages/cli`, not as a false green.
+- Captured S2B focused red-before (2/4) and whole-package red-before (1,380/4) at `22e737fc3`.
+- Made real command help advertise the four planned roles and route-tree island convention; the
+  test parses that rendered help and compares it with an independently planned result set.
+- Threaded public `--dry-run` and `--force` into page/island scaffolds and report every role/path.
+- Proved S2B focused 6/0 and whole structured CLI 1,384/0.
 
 ## In Progress
 
-- Push the separate S2A product/harness commit and its red-before parent by explicit refspec, then
-  post the S2A evidence comment to PR #1781.
+- Commit the S2B product/harness changes separately from `22e737fc3`, push by explicit refspec, and
+  post the single S2B evidence comment to PR #1781.
 
 ## Next Steps
 
-1. Finish the S2A commit/push/comment trail.
-2. Implement S2B public options/help/result reporting in locked paths 3–6, retaining the real-help
-   versus independently emitted-role seam.
-3. Implement S2C gate definition and explicit runtime-suite selection in locked paths 7–12 without
+1. Finish the S2B commit/push/comment trail.
+2. Implement S2C gate definition and explicit runtime-suite selection in locked paths 7–12 without
    executing `scaffold.runtime`.
+3. Run S2D static/fitness/read-only cascade evidence and prepare separate-session IMPL-EVAL.
 
 ## Key Decisions
 
@@ -71,21 +76,25 @@ actions after this product/harness commit lands.
 | `packages/cli/src/public/features/ui/ui-app-root-command_test.ts` | modified | Canonical router fixture for composed tests.  |
 | `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/worklog.md`      | modified | S2A evidence and corrected 10-file count.       |
 | `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/drift.md`        | modified | Records in-ceiling fixture ordering drift.      |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/context-pack.md` | modified | Resumable S2A state and next steps.              |
+| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/context-pack.md` | modified | Resumable S2B state and next steps.              |
+| `packages/cli/src/public/features/ui/add/add-ui-command.ts`     | modified | S2B real help, option threading, role reporting. |
+| `packages/cli/src/public/features/ui/add/add-ui-command_test.ts` | committed | S2B red-before seam at `22e737fc3`.             |
+| `packages/cli/src/public/features/ui/add/add-ui-input.ts`       | modified | Adds the optional `dryRun` public input.          |
+| `packages/cli/src/public/features/ui/ui-app-root-command_test.ts` | modified | Covers the accepted `dryRun` input field.       |
 
 ## Gates
 
 | Gate family | Current status                  | Evidence                                                                                                       |
 | ----------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Static      | S2A PASS plus measured base-red tooling | CLI 838/0 and nested E2E 168/0; lint/fmt task-path defects remain baseline-only.                         |
+| Static      | S2B PASS plus configured N/A lint/fmt | CLI 1,384/0; `packages/cli` is excluded from root lint/fmt and declares no package scope.                |
 | Fitness     | PASS at base                    | quality, doctrine, docs, JSR, publish checks exit 0.                                                           |
 | Runtime     | REQUIRED / NOT_RUN              | supervisor-coordinated `scaffold.runtime`; author prohibited.                                                  |
 | Consumer    | PASS except intentional NOT_RUN | No corpus member is touched: three read-only checks stay green; writing assets-barrel remains supervisor-only. |
 
 ## Open Questions
 
-- No S2A question remains open. S2B must make the command's own real `--help` the only in-leaf
-  documentation proof; deferred `cli-reference.md:104` remains knowingly stale.
+- No S2B question remains open. Command-owned real `--help` is the only in-leaf documentation
+  proof; deferred `cli-reference.md:104` remains knowingly stale.
 
 ## Drift and Debt
 
@@ -98,4 +107,6 @@ actions after this product/harness commit lands.
 
 - S1 terminal plan head: `53e696b5` (`PASS_PLAN` verdict `886f0860`).
 - S2A red-before test-only commit: `0d620b61`.
-- S2A product/harness commit: this commit; exact SHA is recorded in the PR comment and owner report.
+- S2A product/harness commit: `e5d820b3f` (accepted).
+- S2B red-before test-only commit: `22e737fc3`.
+- S2B product/harness commit: this commit; exact SHA is recorded in the PR comment and owner report.

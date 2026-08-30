@@ -185,6 +185,8 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | 2026-08-30                 | S1    | PLAN-EVAL 2 | Terminal `PASS_PLAN` at `53e696b5` (verdict `886f0860`); implementation unblocked inside the repaired 12-path ceiling.                                                             |
 | 2026-08-30 16:15–17:11 UTC | S2A   | Red/green   | Committed the semantic tests alone at `0d620b61`; detached focused proof was 1 pass/7 fail, then 8 pass/0 fail after the kernel implementation.                                     |
 | 2026-08-30 16:15–17:11 UTC | S2A   | Composition | Whole CLI first exposed three stale app-root fixtures without `router.ts`; advanced ceiling path 6's canonical router fixture from S2B, then whole CLI and nested E2E suites passed. |
+| 2026-08-30                 | S2A   | Review      | Owner independently reproduced and accepted `e5d820b3f`; structured whole CLI was 1,379/0. Lint/fmt are N/A by repository exclusion, not green.                                    |
+| 2026-08-30 17:35–18:13 UTC | S2B   | Red/green   | Test-only `22e737fc3` proved 2/4 focused and 1,380/4 whole-package red; public help/options/reporting then reached 6/0 focused and 1,384/0 whole-package green.                        |
 
 ## Decisions
 
@@ -262,11 +264,12 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | Focused kernel suite after S2A        | PASS    | exit 0; 8 passed, 0 failed.                         |
 | App-root command consumer             | PASS    | exit 0; 7 passed, 0 failed.                         |
 | Whole `packages/cli` check            | PASS    | exit 0.                                             |
-| Whole `packages/cli` test             | PASS    | exit 0; 838 passed (541 steps), 0 failed.           |
+| Whole `packages/cli` test             | PASS    | exit 0; 1,379 passed, 0 failed.                     |
 | Whole nested `packages/cli/e2e` check | PASS    | exit 0.                                             |
 | Whole nested `packages/cli/e2e` test  | PASS    | exit 0; 168 passed, 0 failed.                       |
-| Changed-file no-config lint           | PASS    | exit 0; 3 files checked.                            |
-| Kernel no-config fmt and AP-1/F-1 cap | PASS    | exit 0 at line width 500; exactly 250 LOC.          |
+| Scoped lint                            | N/A     | Root config excludes `packages/cli`; no target set. |
+| Scoped fmt                             | N/A     | Root config excludes `packages/cli`; no target set. |
+| AP-1/F-1 cap                           | PASS    | Kernel application file is exactly 250 LOC.         |
 | Runtime/AppHost and `assets-barrel`   | NOT_RUN | Prohibited by D16/D17.                              |
 | Lock hygiene                          | PASS    | `deno.lock` byte-unchanged.                         |
 
@@ -275,6 +278,26 @@ canonical generated-app fixture after whole-package composition proved that type
 registration now requires `router.ts`; no public command behavior from S2B was implemented early.
 Acceptance box 6 remains documented only through the command's own `--help` surface when S2B lands;
 `docs/site/cli-reference.md:104` remains knowingly falsified and deferred under D17.
+
+### S2B Gates
+
+| Gate                                      | Result  | Evidence                                                        |
+| ----------------------------------------- | ------- | --------------------------------------------------------------- |
+| Focused red-before at `22e737fc3`         | RED     | exit 1; 2 passed, 4 failed; unchanged S2B product code.         |
+| Whole CLI red-before                      | RED     | exit 1; 1,380 passed, 4 failed; the same four S2B assertions.   |
+| Focused command suite after S2B           | PASS    | exit 0; 6 passed, 0 failed.                                    |
+| Whole `packages/cli` check                | PASS    | exit 0.                                                        |
+| Whole structured `packages/cli` test      | PASS    | exit 0; 1,384 passed, 0 failed.                                |
+| Targeted `deno check --unstable-kv`       | PASS    | exit 0; all four S2B ceiling paths checked.                     |
+| Scoped lint/fmt                           | N/A     | Root excludes `packages/cli`; package config declares no scope. |
+| Presentation size                         | PASS    | `add-ui-command.ts` is 130 LOC, below the 150-LOC ceiling.      |
+| Runtime/AppHost and `assets-barrel`       | NOT_RUN | Prohibited by the live lease plus D16/D17.                      |
+| Lock hygiene                              | PASS    | `deno.lock` byte-unchanged.                                    |
+
+S2B touched locked ceiling paths 3–6. The real Cliffy help renders the shared role vocabulary, but
+the contract test independently plans the data screen, parses the rendered help, and compares those
+two observed sets. A stale three-role help fixture is rejected. Acceptance box 6 is documented only
+through this command-owned `--help`; `cli-reference.md:104` remains false and deferred.
 
 ## Handoff Notes
 

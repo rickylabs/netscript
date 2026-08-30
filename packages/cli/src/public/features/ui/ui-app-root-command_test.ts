@@ -129,11 +129,13 @@ Deno.test('UiAddCommandInput exposes every accepted option', () => {
     registryRoot: '/registry',
     theme: 'default',
     force: true,
+    dryRun: true,
     route: 'incidents.detail',
     island: true,
     query: true,
   };
   assertEquals(input.app, 'dashboard');
+  assertEquals(input.dryRun, true);
   assertEquals(input.route, 'incidents.detail');
   assertEquals(input.island, true);
   assertEquals(input.query, true);
