@@ -3866,3 +3866,67 @@ layer owns the correlation attribute.
 `1673_pr1739_cycle_1_fail_fix...; 1462_queued`. In reality #1673 is at IMPL-EVAL cycle 2 `PASS_IMPL`
 awaiting a coordinator decision, and #1462 is merged-onto-main and held for #1748. Central state is
 coordinator-owned, so this is reported rather than edited — as with the still-absent #1673 leaf entry.
+
+## 2026-08-30 — #1758 refreshed onto verified `952cc106`; all gates green; delta receipt + CI running
+
+### The SHA was verified before acting
+
+`origin/main` was fetched and compared against the reported `952cc106aafea61570d24247695ac23f5d810026`
+— exact match — and `952cc106` confirmed to *be* the #1748 merge commit. Given the explicit warning
+about placeholder SHAs, checking rather than trusting was the whole point.
+
+#1748's delta touched **all four** shared assets (`prose.json.gz`, `provenance.json`,
+`agent-docs.generated.ts`, `publish-assets.generated.ts`) plus a wide `docs/site` terminology rewrite,
+which is exactly why waiting was right: regenerating against `f8b4f804` would have gone stale
+immediately.
+
+### Refresh landed at `8ff04903`, Tier-A re-signed at `f1ff5557`
+
+Integration integrity verified, not assumed — **merge, not rebase**: `HEAD` parents are `cea45edd` and
+`952cc106`, and all seven prior receipt SHAs remain ancestors.
+
+| Gate at `8ff04903` | Result |
+| --- | --- |
+| Ceiling vs `952cc106` | nothing outside |
+| `deno.lock` | byte-unchanged |
+| `check:agent-docs-prose` / **`check:assets-barrel`** / `check:publish-assets` / `check:mcp-export-corpus` / `docs:exports-drift` | **all exit 0** |
+| `packages/sdk/tests/` | exit 0 · 70 passed / 0 failed |
+| `define-fresh-app.test.ts` | exit 0 · 11 passed / 0 failed |
+| Graph, re-measured at this head | root **0** · presets **0** browser-unsafe edges |
+
+`check:assets-barrel` — absent from the plan entirely, red since before the first merge — now passes
+with the leaf's `./presets` entry correctly present in the CLI embedded export list.
+
+### Evaluator currency: a delta receipt, not a second IMPL-EVAL
+
+Measured `83b7109c..f1ff5557`: **no non-generated file under `packages/`/`plugins/` changed**, and
+`packages/sdk/src`, `packages/sdk/mod.ts`, `packages/sdk/deno.json` and `packages/fresh/src` all
+diff **empty**. Only two generated derivatives moved. The implementation IMPL-EVAL passed is therefore
+byte-identical, so the correct instrument is a **bounded delta receipt** — the pattern #1711 used —
+rather than spending a full evaluator cycle re-deriving a verdict that cannot have changed.
+
+| Field | Value |
+| --- | --- |
+| Head under receipt | `f1ff5557` |
+| Previously evaluated head | `83b7109c` (`PASS_IMPL`) |
+| Route | `claude-fable-5` · medium · `--remote-control` — matched |
+| Background / session | `0c2073cd` / `0c2073cd-a9ae-43a4-96c2-5f8a5c28bb0a`, PID `1280626` |
+| Verdict branch | `eval/delta-receipt-1462`, upstream NONE |
+| Remote Control | `https://claude.ai/code/session_01VpBbyYWVY14Che2ZjT6yvN` |
+
+Its brief asks it to reproduce or refute the product-identity claim, confirm merge-not-rebase, prove
+both generated files are reproducible from their `gen:` tasks rather than hand-edited, confirm the
+cascade is green including the newly added barrel gate, re-check the 0-edge conclusion after
+integration, and verify **#1748's terminology was not reverted** on the doc pages both changes touch.
+
+### CI sequencing, corrected from last time
+
+`status:ready-merge` is applied to PR #1758 and issue #1462 (exactly one `status:` each, counted after
+the phase-eval automation's known habit of re-adding `impl-eval`). The `ci` run at `f1ff5557` was
+**still queued** when the label landed, so its mirror step's live read will observe it — which is
+precisely the ordering that failed on the previous attempt, when the mirror skipped itself and the
+close-gate then reported five unticked boxes.
+
+### #1368 continues independently
+
+Unaffected by the corpus sequence; still at base `f8b4f804` with its author working S1 research.
