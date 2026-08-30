@@ -5384,3 +5384,48 @@ This supersedes option A as I framed it in `decision-packet-1764.md`: the owner 
 variant I had flagged as "more than one assertion and I did not assume authorization for it". Ceiling
 item 20 is therefore `plugins/sagas/tests/telemetry/publish-trace-linkage_test.ts` with a by-name
 selection, not a count bump. The leaf is unparked for exactly this work and nothing else.
+
+### #1764 unparked and executed per owner ruling; IMPL-EVAL cycle 3 (delta) dispatched
+
+**Assertion correction — `f0b01dac`.** Implemented the owner's by-name variant, not my minimal count
+bump. In `plugins/sagas/tests/telemetry/publish-trace-linkage_test.ts` the handle span is now selected
+by name: `findIndex((entry) => entry.name === 'saga.handle')` with a `handleIndex >= 0` guard, and both
+`started[handleIndex]` and `spans[handleIndex]` derived from it — sound because `RecordingTracer
+.startSpan` pushes to both arrays in lockstep. The brittle `started.length === 1` pin and the now
+tautological `started.name` assertion are gone. Constraint worth recording: the file defines its **own
+local** `assertEquals`/`assertRejects` and imports nothing from `@std/assert`, so `assertExists`/
+`assertNotEquals` were unavailable and the guard had to be expressed through the local helper.
+
+Result: whole `plugins/sagas` **exit 0, 51 passed / 0 failed / 1 ignored** (was 50/1/1). Product code
+untouched; scope not widened.
+
+**Main reconciled — merge `60e0b198`.** Merged `24f6642f`, not rebased. One conflict, on
+`export-surface-corpus.generated.ts`, resolved **only through the generator** per the shared-carrier
+rule — `gen:mcp-export-corpus`, never a hand-merge. `symbolCount` moved 7614 → 7623 with
+`packageCount 35` / `subpathCount 270` unchanged, attributable to main's own additions entering scope;
+the evaluator is asked to verify that attribution rather than take it from me.
+
+Gates at `60e0b198`, clean tree: `plugins/sagas` 51/0/1; `packages/plugin-sagas-core` 84/0/3;
+`arch:check`, core JSR audit, `publish:dry-run`, `check:mcp-export-corpus`, `check:publish-assets`,
+`check:agent-docs-prose` all exit 0; `deno.lock` byte-unchanged vs `f8b4f804`. Ceiling measured
+**against main** rather than against the stale base — 19 leaf paths: the 17 previously verified, the
+corpus carrier exception, and owner-authorized item 20.
+
+**Main `2a65a8cd` (PR #1780) — inert, deliberately NOT merged.** Eight #1778 run artifacts plus
+`.llm/tools/docs/check-exports-drift.ts`; `comm` against the leaf's 19 paths returns empty, and it
+touches nothing in my gate set. Merging it would move the head under the evaluator I was about to
+dispatch for the **final** authorized cycle, for zero benefit. Recorded as inert; reconciliation stays
+available at the next boundary if it ever intersects.
+
+IMPL-EVAL **cycle 3, delta-scoped** dispatched at `60e0b198`, native opposite-family Fable 5, with the
+owner's scope constraint stated up front: carry forward cycle-2's verified rows, judge only the
+correction and the resulting green suite, confirm product scope was not widened. It is told explicitly
+to run **whole** package suites rather than targeted files, because that gap is precisely what produced
+F-A. Flow-B stays `NOT_RUN` and mandatory before ready/merge, in CI or off-host per the owner.
+Labels `status:impl-eval` on PR #1764 and issue #1368.
+
+**#1357 undisturbed and progressing.** All #1764 work happened in `007-leaf-1368`, a different
+worktree. Its recovered worker is alive — confirmed via `/proc/<pid>/cwd`, not a self-matching pattern
+— and S2A is complete and pushed: `0d620b61` red-before alone, then `e5d820b3`
+"fix(cli): scaffold a bound Fresh data screen". Three paths touched, all inside the locked 12
+(ceiling items 1, 2, 6). Clean red-before/green separation.
