@@ -1663,3 +1663,17 @@
   "leak-check reports it / apply removes it" text literally — now states the dual-path requirement
   actually met). Posted on PR #1744; S7 disposition resolved, no third runtime attempt needed for
   this criterion.
+- **D-86 — stale-index worktree artifact (not real uncommitted work), reconciled
+  non-destructively.** `007-aspire-s5` and `007-aspire-s5-conv` both had
+  `fix/aspire-13-5-s5-literal-ports` checked out simultaneously; rebasing in `-conv` moved the
+  shared branch ref, so `007-aspire-s5`'s long-dormant HEAD (reflog: last activity was the original
+  S5 implementer session, well before this convergence work) silently followed to the new tip while
+  its index/working tree stayed frozen at the old content — surfacing as a ~12k-line "staged reverse
+  diff" that was in fact just index-vs-new-HEAD, not index-vs-worktree (confirmed: unstaged diff was
+  empty). Reconciled via `git reset --hard HEAD` in `007-aspire-s5` only after confirming zero
+  unstaged loss; both worktrees now clean at `1c2cf2ef5bd8`. **S5 reconverged**: 17 commits,
+  `bc33c2aa319c` main, identity `=` for all product commits (only the prior regen commit was
+  superseded by a fresh one against the new main tip, as expected), pinned push accepted. Lesson:
+  never `git checkout -B` a branch that another worktree may already have checked out — verify with
+  `git worktree list` first, or the branch-ref move corrupts the _other_ worktree's apparent status
+  without touching its files.
