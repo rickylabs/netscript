@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
-  "immutableHead": "2ddd60481217f0931ea8f96228d213f10be12a9f",
-  "surface": "#1387 Slice 1 contract metadata type",
+  "immutableHead": "f9b32b4f7a029d9226584b9c170eb44357e10fdb",
+  "surface": "#1387 Slice 2 typed service context surface",
   "expectedGateIds": [
+    "arch-check",
     "check",
-    "docs-accuracy",
+    "doc-lint",
     "fmt-check",
     "lint",
     "publish-dry-run",
-    "quality-gate",
     "test"
   ],
   "receiptIds": [
-    "1387-s1-check",
-    "1387-s1-docs-accuracy",
-    "1387-s1-fmt",
-    "1387-s1-lint",
-    "1387-s1-publish-dry-run",
-    "1387-s1-quality",
-    "1387-s1-tests-contracts-sdk"
+    "1387-s2-arch",
+    "1387-s2-check",
+    "1387-s2-doc-lint",
+    "1387-s2-fmt",
+    "1387-s2-lint",
+    "1387-s2-publish-dry-run",
+    "1387-s2-tests"
   ],
   "sufficiency": "SUFFICIENT",
   "reasons": []

@@ -1,38 +1,38 @@
 {
   "gateId": "check",
-  "invocationId": "1387-s1-check",
+  "invocationId": "1387-s2-check",
   "argv": [
     "deno",
     "task",
     "check",
     "--include",
-    "^packages/(contracts|sdk)/"
+    "^packages/(service|plugin)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "2ddd60481217f0931ea8f96228d213f10be12a9f",
-  "actualGitHead": "2ddd60481217f0931ea8f96228d213f10be12a9f",
+  "gitHead": "f9b32b4f7a029d9226584b9c170eb44357e10fdb",
+  "actualGitHead": "f9b32b4f7a029d9226584b9c170eb44357e10fdb",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:2849829",
+  "runnerIdentity": "worker:3403186",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "723b651fc73ea791b4a00ad723aaaf5099709c56c150d9b4eb041fa9b966f639",
-  "lifecycleId": "worker:2849829:1387-s1-check:1",
+  "requestHash": "03b10c82eab790b8d244be6e01470d8492da6506b922b71549fd62d6f6b2f54e",
+  "lifecycleId": "worker:3403186:1387-s2-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T16:00:48.336Z",
-  "startedAt": "2026-08-30T16:00:48.338Z",
-  "finishedAt": "2026-08-30T16:00:50.412Z",
-  "durationMs": 2074,
+  "claimedAt": "2026-08-30T19:16:41.510Z",
+  "startedAt": "2026-08-30T19:16:41.512Z",
+  "finishedAt": "2026-08-30T19:16:42.044Z",
+  "durationMs": 532,
   "exitCode": 0,
   "stdout": {
     "bytes": 303,
-    "sha256": "a3fbc3006d853a5466c10893c5d7413beae43a19c837dc7eeabcad8219c84e63",
-    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":114,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "54a2edb536b25a774bcd6e27eb746570fb8ffb6e174eb743b614b992d2561dcc",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":198,\"batches\":2,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {
-    "bytes": 233,
-    "sha256": "c1464ca4f2fe2d009c991e1eec805a10fa49d49dc7ac240391435d7c1d69e7cb",
-    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(contracts|sdk)/'\n",
+    "bytes": 260,
+    "sha256": "961f4e901e2a8354d3aabcf8201ba8e569cd8a769019c95dba41c1ae9429eaeb",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(service|plugin)/'\n",
     "truncated": false
   }
 }
