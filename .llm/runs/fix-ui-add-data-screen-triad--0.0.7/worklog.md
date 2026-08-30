@@ -413,3 +413,23 @@ runtime was started.
 ### Verdict
 
 **Tier-A PASS at `b8846d6b3`.** Cleared for separate-session IMPL-EVAL.
+
+## Main integration `f52d041e6` — MECHANICAL_PASS, evaluator currency preserved
+
+Merged main `9710a2898` (merge, not rebase). **Zero intersection**: `comm` of main's changed paths
+against this leaf's 12 owned paths returns empty, so the integration touches nothing IMPL-EVAL cycle 1
+judged. No conflict; no shared carrier moved.
+
+Refreeze at `f52d041e6`, clean tree:
+
+`packages/cli` **1388 / 0** (was 1386) · `packages/cli/e2e/tests` **171 / 0** (was 170) ·
+`arch:check` 0 · `check:agent-docs-prose` 0 · `check:publish-assets` 0 · `check:mcp-export-corpus` 0 ·
+CLI JSR audit 0 · `deno.lock` byte-unchanged vs `de57fab0` · leaf ceiling still **12 paths** · tree
+clean after the sweep.
+
+The +2 and +1 are exactly main's newly added tests (`service-env-evidence_test.ts`,
+`generated-app-endpoint_test.ts`, and the mcp fixture tests) — the leaf's own suites are unchanged and
+all still pass, which is what makes this mechanical rather than a re-cut.
+
+IMPL-EVAL cycle 1 `PASS_IMPL` (`2991113a6`) therefore carries forward to this head.
+`scaffold.runtime --cleanup` remains the sole outstanding gate, queued on the singleton host lease.
