@@ -39,3 +39,26 @@
 - **Verdict: sign-off to independent IMPL-EVAL (phase A) at `e11de98d`.** Not a merge recommendation
   (stacked S8 → S6 → S5; D-41 applies). `docs_audit` single Sol pass dispatched in parallel per the
   doc-audit lane.
+
+## Scoped recheck — pre-Phase-B correction `0d81cf64` (D-45 ratified; D-48 F-3b/F-4b; docs-audit M2) — 2026-08-30
+
+Per the coordinator ruling this is a **scoped supervisor recheck, not a new ordinary evaluation**.
+All nine items CLOSED (fork, read-only, no runtime/MCP): `ASPIRE_MCP_BASELINE_TOOLS` = the 14
+required incl. `refresh_tools` (`aspire-mcp/tools.ts:1-19`),
+`ASPIRE_MCP_DOCUMENTED_UNOBSERVED =
+['get_integration_docs']`; schema fields `documentedUnobserved`
+/ `documentedUnobservedObserved` populated on pass and failure paths; `toolsMissing`/`baselineDiff`
+computed over the 14, fail only on missing required, extras INFO (`evaluate.ts:80-105`); fixture
+tests cover 14/14 pass and extra-`get_integration_docs` INFO (e2e tests **186/0**); F-3b outer 140
+000 ms > inner 120 000 ms, tested; F-4b real `list_structured_logs` parsing,
+`entryCount: number | null`, no hard-coded `items: []`; M2 S2-V9 cites
+`03-v9-aspire-restore.time.txt`; skill table = 14 required + documented-but-unobserved line; mirrors
+byte-identical; static receipt re-annotated (`toolsMissing []`, `documentedUnobserved [...]`,
+`proofScope` static). Regression gates: scoped `deno check` 0 diagnostics (891 files); raw lint/fmt
+clean; `quality:scan` `[]`; `arch:check` exit 0; assets-barrel / publish-assets / mcp-export-corpus
+/ sync-claude:check / check-claude / dogfood-skills:check exit 0; `13.4.6` grep 0; lint escapes 0.
+
+**Accepted at `0d81cf64`.** docs-audit M2 is closed by this commit (the two-failure escalation is
+resolved by the ruling, no audit cycle 3 required). S9 phase A: Tier-A ✓, IMPL-EVAL cycle 2 `PASS`
+(phase A) ✓ at `f6ca9695` + scoped recheck ✓ at `0d81cf64`. Phase B (live D-12 receipt on the
+isolated AppHost, F-5 sqlite-tier names) remains lease-backed and environment-blocked (D-42/D-43).

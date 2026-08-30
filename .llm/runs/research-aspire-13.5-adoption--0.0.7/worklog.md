@@ -292,4 +292,7 @@ All coordinator-ordered rewrites applied; S9 correction commit in flight on thre
 S9 pre-Phase-B correction landed | `0d81cf64`
 `fix(e2e): ratify the 14-tool 13.5.3 MCP baseline; get_integration_docs documented-unobserved (D-45)`
 pushed; PR #1759 comment 5468788905; thread turn complete. Scoped supervisor recheck (fork gates +
-diff read) in progress — no new ordinary evaluation per the ruling. |
+diff read) in progress — no new ordinary evaluation per the ruling. | | S9 scoped recheck | All nine
+correction items CLOSED at `0d81cf64`; regression gates green (fork). Accepted — no new ordinary
+evaluation per the ruling. S9 phase A settled; Phase B blocked (D-43). PR #1759 review comment
+posted. |
