@@ -67,6 +67,9 @@ new ownership shortcut.
 | 2026-08-30T03:09:21Z | 1         | push            | Pushed `593a33c` with the explicit head refspec; opened draft PR #1744 and posted commit evidence.                                             |
 | 2026-08-30T03:15:52Z | 2         | gate            | Descendant tracking passed 33/33 with all evidence modes, both ps fixtures, foreign/MCP guards, and false-positive coverage.                   |
 | 2026-08-30T03:15:52Z | 2         | reconcile       | #1719/#1429 remain open; PR #1744 stays draft at `status:impl`, stacked on S3; Phase B remains lease-backed. No new comments changed the plan. |
+| 2026-08-30T03:17:08Z | 2         | push            | Pushed `555d204` with the explicit head refspec and posted the slice-2 PR evidence comment.                                                    |
+| 2026-08-30T03:18:45Z | 3         | gate            | Force-persistent passed 36/36: exact dry-run argv, apply/flag/ownership arms, scoped-stop confirmation, and no force by default.               |
+| 2026-08-30T03:18:45Z | 3         | reconcile       | PR #1744 remains draft/stacked; closing issues and Phase-B dependency are unchanged. No reviewer comment changed the plan.                     |
 
 ## Decisions
 
@@ -103,6 +106,7 @@ new ownership shortcut.
 | Phase A unit fixtures       | NOT_RUN         | pending                                | No AppHost start permitted.                                        |
 | Slice 1 RED                 | FAIL (expected) | `receipts/01-red-orphan-process.json`  | Exact #1429 visibility regression; exit 1 at baseline `fe4f496bd`. |
 | Slice 2 descendant tracking | PASS            | `receipts/02-descendant-tracking.json` | 33 passed, 0 failed; receipt head `593a33c`.                       |
+| Slice 3 force-persistent    | PASS            | `receipts/03-force-persistent.json`    | 36 passed, 0 failed; receipt head `555d204`.                       |
 | Phase B live reproduction   | N/A             | deferred procedure                     | Requires supervisor-provided runtime lease.                        |
 
 ### Consumer Gates

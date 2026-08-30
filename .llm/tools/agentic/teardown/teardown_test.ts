@@ -2,9 +2,28 @@ import { assertEquals } from '@std/assert';
 import { buildLeakReport } from './leak-check.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { emptyRunResources } from './run-resources.ts';
-import { runTeardown, teardownExitCode } from './teardown.ts';
+import { parseTeardownArgs, runTeardown, teardownExitCode } from './teardown.ts';
 
 const root = '/home/codex/repos/fix-1046';
+
+Deno.test('force-persistent CLI flag is explicit and remains dry-run without apply', () => {
+  assertEquals(
+    parseTeardownArgs([
+      '--slice-dir',
+      '.llm/runs/example',
+      '--worktree',
+      root,
+      '--force-persistent',
+    ]),
+    {
+      sliceDir: '.llm/runs/example',
+      worktreeRoot: root,
+      apply: false,
+      forcePersistent: true,
+      ownedRoots: [],
+    },
+  );
+});
 
 Deno.test('dry run and foreign resources execute no commands', async () => {
   const called: string[][] = [];
@@ -27,6 +46,83 @@ Deno.test('dry run and foreign resources execute no commands', async () => {
   assertEquals(called, []);
 });
 
+Deno.test('force-persistent dry run prints exact owned argv and refuses foreign resources', async () => {
+  const called: string[][] = [];
+  const commands: CommandPort = {
+    run(command) {
+      called.push([...command]);
+      return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+    },
+  };
+  const registry = emptyRunResources(root);
+  const report = buildLeakReport(
+    [
+      { kind: 'apphost', appHostPath: `${root}/apphost.mts`, appHostPid: 1 },
+      {
+        kind: 'apphost',
+        appHostPath: '/home/codex/repos/fix-1025/apphost.mts',
+        appHostPid: 2,
+      },
+    ],
+    registry,
+    root,
+  );
+  const result = await runTeardown(report, registry, false, commands, undefined, {
+    forcePersistent: true,
+  });
+  assertEquals(result.plannedCommands, [
+    ['aspire', 'stop', '--apphost', `${root}/apphost.mts`, '--non-interactive', '--nologo'],
+    [
+      'aspire',
+      'stop',
+      '--force',
+      '--apphost',
+      `${root}/apphost.mts`,
+      '--non-interactive',
+      '--nologo',
+    ],
+  ]);
+  assertEquals(result.escalated.map((entry) => entry.ownership), ['foreign']);
+  assertEquals(called, []);
+});
+
+Deno.test('apply runs force-persistent only after owned scoped stop is confirmed', async () => {
+  const called: string[][] = [];
+  const commands: CommandPort = {
+    run(command) {
+      called.push([...command]);
+      return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+    },
+  };
+  const files: FilePort = {
+    realPath: (path) => Promise.resolve(path),
+    readText: (path) => Promise.reject(new Deno.errors.NotFound(path)),
+  };
+  const registry = emptyRunResources(root);
+  const report = buildLeakReport(
+    [{ kind: 'apphost', appHostPath: `${root}/apphost.mts`, appHostPid: 1 }],
+    registry,
+    root,
+  );
+  const result = await runTeardown(report, registry, true, commands, files, {
+    forcePersistent: true,
+  });
+  assertEquals(called, [
+    ['aspire', 'stop', '--apphost', `${root}/apphost.mts`, '--non-interactive', '--nologo'],
+    [
+      'aspire',
+      'stop',
+      '--force',
+      '--apphost',
+      `${root}/apphost.mts`,
+      '--non-interactive',
+      '--nologo',
+    ],
+  ]);
+  assertEquals(result.stoppedAppHosts, [`${root}/apphost.mts`]);
+  assertEquals(result.escalated, []);
+});
+
 Deno.test('apply exits non-zero when requested cleanup is escalated', () => {
   const report = buildLeakReport(
     [{ kind: 'container', id: 'foreign', mountSource: '/home/codex/repos/fix-1025/.data' }],
@@ -37,6 +133,7 @@ Deno.test('apply exits non-zero when requested cleanup is escalated', () => {
   assertEquals(
     teardownExitCode({
       applied: true,
+      plannedCommands: [],
       stoppedAppHosts: [],
       removedContainers: [],
       escalated: [escalated],
@@ -46,6 +143,7 @@ Deno.test('apply exits non-zero when requested cleanup is escalated', () => {
   assertEquals(
     teardownExitCode({
       applied: false,
+      plannedCommands: [],
       stoppedAppHosts: [],
       removedContainers: [],
       escalated: [escalated],
