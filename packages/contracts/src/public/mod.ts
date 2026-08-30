@@ -1,9 +1,5 @@
 // arch:barrel-ok Root mod.ts delegates to this curated public package surface.
-export {
-  type BaseContract,
-  baseContract,
-  commonErrorMap,
-} from '../application/contract-primitives.ts';
+export { type BaseContract, baseContract } from '../application/contract-primitives.ts';
 export type {
   BaseContractErrors,
   BaseContractMeta,

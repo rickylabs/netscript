@@ -25,8 +25,8 @@ sub-path exports add higher-level builders:
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `baseContract` | const | `const baseContract: BaseContract` | Common oRPC contract primitive with NetScript's standard error map applied. |
-| `BaseContract` | type alias | `type BaseContract = ReturnType<typeof oc.errors>` | Common oRPC contract primitive with NetScript's standard error map applied. |
-| `BaseContractErrors` | type alias | `type BaseContractErrors = MergedErrorMap<Record<never, never>, typeof commonErrorMap>` | NetScript-owned name for the exact standard error map carried by every base route. Its error codes, HTTP statuses, message literals, and data schemas are the stable compatibility contract. |
+| `BaseContract` | type alias | `type BaseContract = typeof baseContract` | Common oRPC contract primitive with NetScript's standard error map applied. |
+| `BaseContractErrors` | type alias | `type BaseContractErrors = MergedErrorMap<Record<never, never>, CommonErrorMap>` | NetScript-owned name for the exact standard error map carried by every base route. Its error codes, HTTP statuses, message literals, and data schemas are the stable compatibility contract. |
 | `BaseContractMeta` | type alias | `type BaseContractMeta = NetScriptProcedureMeta & Record<never, never>` | NetScript-owned exact metadata slot carried by the base builder. Compatibility evolves through additive optional readonly fields on `NetScriptProcedureMeta`. |
 | `BaseContractRoute` | type alias | `type BaseContractRoute<TIn, TOut> = ContractProcedureBuilderWithInputOutput<...>` | Sound type of a route built via baseContract.route(...).input(TIn).output(TOut). |
 | `BaseContractOutputRoute` | type alias | `type BaseContractOutputRoute<TOut> = ContractProcedureBuilderWithOutput<...>` | Sound type of an output-only route built via baseContract.route(...).output(TOut) (no .input(...)). |
@@ -55,7 +55,6 @@ sub-path exports add higher-level builders:
 | `validationFailed` | function | `function validationFailed(options: ValidationFailedOptions): never` | Throws the contract `VALIDATION_ERROR` oRPC error. |
 | `getResourceType` | function | `function getResourceType(options: { path?: readonly string[]; }): string` | Resolves a singular resource name from an oRPC handler path. |
 | `COMMON_ERROR_CODES` | const | `const COMMON_ERROR_CODES: Readonly<{ notFound; validationError; unauthorized; forbidden; rateLimited; serviceUnavailable; }>` | Common oRPC error codes shared by NetScript service contracts. |
-| `commonErrorMap` | const | `const commonErrorMap: CommonErrorMap` | NetScript-owned shared error definitions backing every base contract. Its error codes, HTTP statuses, message literals, and data schemas are the stable contract. The singleton is read-only by contract; JavaScript mutation is possible at runtime but unsupported. |
 | `CommonErrorMap` | type alias | `type CommonErrorMap = Readonly<{ ... }>` | NetScript-owned public shape of `commonErrorMap`. Its error codes, HTTP statuses, message literals, and data schemas are stable compatibility commitments. |
 | `NotFoundErrorSchema` | const | `const NotFoundErrorSchema: ContractSchema<NotFoundError>` | Common not-found error schema. |
 | `ValidationErrorSchema` | const | `const ValidationErrorSchema: ContractSchema<ValidationError>` | Common validation error schema. |

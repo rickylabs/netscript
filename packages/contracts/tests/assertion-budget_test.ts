@@ -118,3 +118,17 @@ Deno.test('contracts metadata boundary has no imports or explicit any tokens', a
   assertEquals(countMatches(primitives, /\bany\b/g), 0);
   assertEquals(countMatches(metadata, /\bany\b/g), 0);
 });
+
+Deno.test('base contract initializer remains pinned to NetScript procedure metadata', async () => {
+  const primitives = stripCommentsAndStrings(
+    await Deno.readTextFile(CONTRACT_ASSERTION_BUDGETS[0].file),
+  );
+
+  assertEquals(
+    countMatches(
+      primitives,
+      /oc\.\$meta<NetScriptProcedureMeta>\(\{\}\)\.errors\(commonErrorMap\)/g,
+    ),
+    1,
+  );
+});

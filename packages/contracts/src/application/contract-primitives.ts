@@ -120,7 +120,7 @@ export type BaseContractMeta = NetScriptProcedureMeta & Record<never, never>;
  * oRPC builder types it composes. It mirrors the `BaseErrors` alias used by the first-party
  * `@netscript/plugin-*-core` contract definitions.
  */
-export type BaseContractErrors = MergedErrorMap<Record<never, never>, typeof commonErrorMap>;
+export type BaseContractErrors = MergedErrorMap<Record<never, never>, CommonErrorMap>;
 
 /**
  * Common oRPC contract primitive with NetScript's standard error map applied.

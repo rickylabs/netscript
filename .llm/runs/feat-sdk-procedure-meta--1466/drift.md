@@ -126,7 +126,7 @@ field to the same annotation argument. That equality can fail when the two writt
 but it cannot detect a divergent initializer because the annotation absorbs the initializer's
 inferred type. It therefore did not independently pin T-2 against an oRPC inference change.
 
-`packages/contracts/tests/procedure-meta-inference_test.ts` now constructs the same
+`packages/contracts/tests/procedure-meta-inference_test.ts` constructs the same
 `oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap)` expression without an annotation. It
 compares the inferred `~orpc.meta` to public `BaseContractMeta` and the inferred `~orpc.errorMap` to
 public `BaseContractErrors` with exact `Equal<>` assertions. The test imports `commonErrorMap` from
@@ -135,9 +135,13 @@ under the contracted root `test` gate.
 
 A temporary perturbation of the expected metadata type to `Record<never, never>` produced
 `TS2344: Type 'false' does not satisfy the constraint 'true'` at the inferred-meta assertion. The
-perturbation was restored before commit. This inferred probe, rather than the explicit annotation,
-now supplies the independent T-2 pin. The working `.meta(publicMeta)` check, both negative
-`@ts-expect-error` checks, and runtime metadata-storage assertions were not changed.
+perturbation was restored before commit. The inferred probe pins the public alias spelling against
+oRPC's inference for the contracted expression, which is the independent T-2 requirement as
+PLAN-EVAL worded it. It does not observe `baseContract`'s actual initializer and therefore does not
+cover a divergent initializer under an unchanged annotation. The assertion-budget test now closes
+that residual by requiring the stripped source to contain the exact initializer once. The working
+`.meta(publicMeta)` check, both negative `@ts-expect-error` checks, and runtime metadata-storage
+assertions were not changed.
 
 ## D-6 — cycle-2 quiet-load root test retains one out-of-scope tooling failure
 

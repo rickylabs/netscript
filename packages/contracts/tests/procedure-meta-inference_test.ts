@@ -1,3 +1,4 @@
+// This test reaches into src/ because only the private real error-map value exercises inference.
 import type {
   BaseContractErrors,
   BaseContractMeta,
