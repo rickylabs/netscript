@@ -1733,3 +1733,30 @@
   container (root-owned `.data`); **final zero confirmed `containers=0 volumes=0 aspire=[]` at
   20:38:06Z.** Receipts `120`–`137` in `slices/s5/receipts-concurrent-start/`. **#1717 box 4 is now
   provably satisfied under the amended (D-87) wording.**
+- **D-90 — S8 runtime diagnostic invalidated as stale-base (confirmed); S8 convergence is a
+  two-level stacked problem, not a single rebase — stopped before any risky surgery.** Cleanup: the
+  S8 seed-diagnostic AppHost was stopped (exit 0), its persistent Postgres survivor removed, relay
+  processes killed, scratch removed via container; host re-verified
+  `containers=0
+  volumes=0 aspire=[]`. The captured seed error (`PrismaClientKnownRequestError` on
+  `prisma.user.findFirst()`) is preserved as `03-seed-STALE-not-evidence.txt` — **not evidence**,
+  per the stale-base ruling. **Convergence attempt:**
+  `git rebase --onto origin/main <merge-base 3e5cbabfc>` hit real content conflicts on
+  `.llm/tools/validation/check-aspire-host-ports.ts`/`_test.ts` at the very first replayed commit
+  (`755d84f1f`, itself an S5 commit). Diffing that commit against `origin/main` shows **main's
+  shipped version is strictly more evolved** (the S5-repair commits in main dropped/refactored
+  constants this old copy still has) — this is not a duplicate to skip blindly, it needs the same
+  content main already has. `git cherry origin/main HEAD` marked **all 33** of S8's commits as
+  patch-unique (no help — main's S5 landed via rebase/regeneration, so patch-ids never match even
+  where content is superseded). **Root structural cause:** S8 is stacked on **S6**
+  (`feat/aspire-13-5-s6-health-checks`, issue #1718, **`status:blocked`, PR #1743 not merged**), and
+  S6 itself was built stacked on S5 _before_ S5 shipped — so S8's history still carries S5's
+  pre-shipment commits nested inside S6's own unconverged commits. Per D-58 (stacked PRs land
+  bottom-up), **S8 cannot be independently converged onto main by rebasing past its own parent**: S6
+  must reconverge onto main first (dropping its own inherited stale-S5 duplicates the same way
+  S5/S7/#1747 did), and only then does S8 rebase onto S6's new head. Attempting to jump S8 straight
+  to main now would require deciding, file-by-file across 100+ real product files, which of two
+  divergent evolutions of the same logic to keep — exactly the kind of high-risk operation the
+  standing git-safety discipline says to stop and report rather than guess. **S8 worktree restored
+  to its original head `f06209d39` via `git rebase --abort`, unmodified.** No S8 runtime authorized
+  until S6 converges.
