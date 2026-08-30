@@ -6187,3 +6187,55 @@ guessing at a script fix and burning another lease cycle, especially with #1747 
 queue. If authorized to continue, the concrete next step is adding an explicit Postgres-readiness wait
 immediately before `DATABASE_INIT` in the bounded script (not present in my earlier version, which
 copied the full array's literal ordering without accounting for the removed buffer time).
+
+### #1764 bounded Flow-B — conclusive receipt: the harness's reuse strategy cannot pass `database.init`
+
+**Runner fix, proven before spending lease time.** Read the real `runtime.wait.postgres` gate
+implementation (`aspire wait postgres --apphost ... --non-interactive --nologo`) rather than
+hand-rolling a wait, and moved that exact gate object ahead of `DATABASE_INIT` in the bounded script —
+not duplicated, since `createScaffoldCapabilitySuite` resolves ids from the suite's own registry, so
+reusing the id just relocates the same gate. Proved the change **statically before running anything**:
+a standalone script imported the real `GATE`/`KV_BACKGROUND_RUNTIME_WAIT_RESOURCES` constants and
+confirmed 28 unique ids (no duplicates), `RUNTIME_WAIT_POSTGRES` genuinely at index 3, `DATABASE_INIT`
+at index 4.
+
+**Retried once, as instructed.** Preconditions reconfirmed zero, relay armed under the same owner
+identity, inner PID saved before launch.
+
+**Result: `runtime.wait.postgres` PASSED (1716ms) — the fix worked exactly as designed — and
+`database.init` still failed.** This disproves the working hypothesis rather than confirming it. This
+time the structured report was written (no crash), so the exact stderr was available:
+
+> Already in sync, no schema change or pending migration was found.
+> Migration creation returned success but created no migration artifact.
+> This headless session could not create a migration.
+
+**Root cause, now conclusive rather than speculative**: the reused scratch project
+(`plugin-smoke-20260830-220506`) already has `prisma/migrations/` history on disk from its own prior
+successful run. Prisma compares the schema against the **files on disk**, sees no pending change, and
+creates nothing — but the fresh AppHost boot gives it a genuinely empty Postgres container with no
+tables, so `db init` fails with nothing ever applied. This is a structural conflict between the bounded
+runner's core design (reuse an existing scaffolded project to skip ~15 setup steps) and Prisma's
+migration-creation semantics, which assume continuity between the project's on-disk migration history
+and the database it's pointed at. **Neither of #1764's two lease-backed full runs this session hit
+this** because both used freshly `scaffold.init`-created projects (new timestamped name each time) with
+no prior migration history — only my bounded-reuse shortcut does.
+
+**This is a harness-design dead end for the bounded-reuse approach, not a #1764 product finding.**
+`plugin-sagas-core`/`plugins/sagas` were never reached by either bounded attempt — the otel/Flow-B gates
+that actually exercise this leaf's product code sit downstream of `database.init` and never ran.
+TC-6/TC-7/TC-9 remain unproven, but for a reason that has nothing to do with the saga span/correlation
+code under review.
+
+Teardown, immediate, before diagnosis: relay cleanup (0 listeners — self-cleaned), watch PID confirmed
+dead. One leftover volume (created inside this run's exact window) and the same recurring nondefault
+network removed by exact ID after confirming empty. **Final proof: containers=0, volumes=0, nondefault
+networks=0, `aspire ps` []**.
+
+**Reporting this as the conclusive receipt the instruction called for.** The only path to a genuine
+TC-6/7/9 proof now is either (a) a full, non-bounded `scaffold.runtime` run with a fresh project — the
+same shape as the two full runs already completed this session for #1764 and #1781, both of which
+reached this point cleanly — or (b) teaching the bounded script to clear the reused project's stale
+migration state before `database.init`, which needs product-level Prisma knowledge I have not verified
+is safe to improvise. Not attempting either without direction, given the lease and #1747's position in
+the queue.
