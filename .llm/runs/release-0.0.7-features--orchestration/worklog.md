@@ -6931,3 +6931,54 @@ authoritative check is the launcher process plus the rollout, not the session li
 | #1387 | active — research/plan, thread `01a052a3` |
 | #1730 | active — thread `01a052b7` |
 | #1664 | parked at `20337441788b` |
+
+## 2026-08-30 — #1387 research/plan landed as draft PR #1762; I corrected my own brief's keyword error
+
+Thread `01a052a3` completed: head `5c82200b`, pushed, clean, draft **PR #1762**
+(`feat/service-principal-procedure-policy`). Full artifact set in
+`.llm/runs/feat-service-principal-procedure-policy--1387/` — `research.md`, `plan.md`, `drift.md`,
+`context-pack.md`, `supervisor.md`, `worklog.md`. No product code, as the brief required.
+
+### The plan holds the constraint that mattered
+
+The binding risk was that #1387 would invent a **second** policy vocabulary — reproducing its own
+headline defect one layer up. The locked decisions say otherwise:
+
+- **LD-2** — extend `NetScriptProcedureMeta.access` with optional readonly `authorization.scopes` /
+  `authorization.roles`. Additive, serializable, SDK-propagated, **"no parallel `{ public }` policy"**.
+- **LD-3** — `@netscript/service` owns `Principal` and `ServiceHandlerContext`; `@netscript/plugin`
+  **re-exports** them rather than importing service internals, preserving dependency direction.
+- **LD-1** — implementation is blocked until #1466/PR #1731 lands on `main`; **S0 is a precondition,
+  not an implementation slice** (verify the merge, rebase, re-run the base-gate census).
+
+It also ran the base-gate census unprompted and found `deno doc --lint` already red in
+contracts/plugin/SDK/MCP and the plugin JSR audit already red for four missing module tags,
+concluding those "cannot be regression gates" and contracting only base-green signals. That is the
+D-27 discipline applied without being reminded.
+
+### My error, found and fixed
+
+PR #1762 was created carrying **`Closes #1387`** — on a PR that contains research and a plan and
+nothing else. **My brief instructed that**, and it is precisely the defect I spent this session
+correcting on #1731: a closing keyword on a PR that does not complete its issue auto-closes the issue
+on merge with the work unstarted.
+
+Corrected on the PR: `Closes #1387` → **`Refs #1387` — partial**, with an explicit
+"Remaining scope before #1387 can close" section naming S0–S8, stating that S0 is a precondition, and
+recording that a keyword becomes owed only when the slices land, a separate-session IMPL-EVAL passes,
+and the close-gate passes.
+
+**The lesson is about brief-writing, not about the author.** The author did exactly what it was told.
+I carried a template instruction (`body carrying Closes #<issue>`) into a slice whose entire content
+is a plan — the keyword rule is not "what will eventually be true of this branch", it is
+**"what is true of this PR if it merges right now"**. Every future brief in this lane states the
+partial form for non-terminal slices and reserves the keyword for the slice that completes the issue.
+
+Issue #1387 label advanced `status:research` → **`status:plan`**, matching the PR.
+
+### Not authorized from here
+
+PLAN-EVAL for #1387 is a fresh separate opposite-family session and is **not dispatched** — the plan
+itself makes implementation contingent on #1466 merging, and #1466 is frozen pending a verified #1748
+SHA. Dispatching a PLAN-EVAL now would evaluate a plan whose precondition cannot yet be tested.
+Queued behind the #1731 refresh.
