@@ -49,15 +49,12 @@ in, client out. The server's full per-tool contracts live in the
 netscript agent init
 ```
 
-Host detection installs the matching files. Use `--host claude`, `--host vscode`, or `--host all`
+Host detection selects which host integrations are added. Use `--host claude`, `--host vscode`, or `--host all`
 to select an agent host explicitly. Editor configuration is a separate, shared target:
 `--editor none|zed|vscode` applies the same Deno editor setup available during `netscript init` to
 an existing project and adds native MCP wiring. When omitted, one existing `.zed` or `.vscode`
 directory is honoured; if both exist, select explicitly. Unsupported editor names fail with the
 supported list and instructions to use `--editor none` plus a manual MCP configuration.
-
-Every host receives the canonical NetScript skill bundle under `.agents/skills/` and a marked
-NetScript section in `AGENTS.md`. Host and editor targets add only their own integration files:
 
 If network lookup is unavailable or the framework is unfamiliar, add `--with-docs`. This opt-in
 expands a several-megabyte local corpus containing the release-built prose and task router plus
@@ -65,6 +62,9 @@ expands a several-megabyte local corpus containing the release-built prose and t
 project. Version disagreement or a failed documentation command aborts before the local docs tree
 is written; without the flag, no offline corpus is installed. When the bundle is installed, every
 generated host command receives the same absolute `--docs-root <project>/.netscript/docs` pair.
+
+Every host receives the canonical NetScript skill bundle under `.agents/skills/` and a marked
+NetScript section in `AGENTS.md`. Host and editor targets add only their own integration files:
 
 | Host or editor target | Additional files written |
 | --- | --- |
