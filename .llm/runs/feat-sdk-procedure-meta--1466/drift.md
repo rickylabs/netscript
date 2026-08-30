@@ -352,3 +352,43 @@ That proof is the price of the carry-forward and must be recorded, not assumed.
 **The evaluator did not assess its own commit.** Session `2f492178` evaluated content head
 `d5f3bf4c` at evidence head `dbd3eafa`; `ce73a038` is where it *wrote* the verdict and postdates the
 tree it judged. Claiming otherwise would assert a self-certification the harness forbids.
+
+### D-40 addendum — where the ambiguous phrase survives, and why it is not rewritten
+
+The currency evaluator ruled on the corrected wording (`evaluate.md`, addendum `b39faa1c`) and
+resolved what R-1 actually required:
+
+> R-1's "set identical to the one above" refers to the **three-way record it tabulated**
+> (`main` / HEAD / diff) — identity of the head set and of the recorded 3-for-3 substitution, **never
+> head = `main`**. Head = `main` is unsatisfiable by construction, since the leaf makes
+> `BaseContractErrors` public.
+
+So the leaf satisfies R-1 as written at every head through `d5f3bf4c`, against three successive
+`main`s, and **"count delta 0 + known 3-for-3 + no unreviewed additions" is stricter than the wording
+it replaced**, not a relaxation.
+
+**Two places still carry the ambiguous phrase and are deliberately left alone:**
+
+- `audit/evidence-sufficiency-post-1748.json` and `post-1755.json` — the latter's note reads
+  "head 12, main 12, finding set identical", which **read alone is the false head-vs-`main` claim**.
+  They are receipt-adjacent audit records of what was computed at those heads; rewriting them after
+  the fact would be worse than the imprecision. This entry is the correction of record.
+- The predecessor verdict sections in `evaluate.md` — they tabulate the three-way sets and use the
+  phrase in R-1's own sense, which the evaluator confirmed is correct there. **Not to be edited.**
+
+**One factual nit the evaluator caught in the PR body:** it described the residual private names as
+"upstream oRPC/TanStack names". **None of the six is TanScript/TanStack** — all three head-only
+references (`MergedErrorMap`, `ContractBuilder`, `Schema`) are `@orpc/contract` imports. Corrected in
+the body to "upstream oRPC names".
+
+**Source anchors, from the evaluator's re-derivation** — exactly two reviewed slice-1 declarations
+account for all three head-only findings, and nothing else:
+
+| Finding | Anchor | Cause |
+| --- | --- | --- |
+| `BaseContractErrors → MergedErrorMap` | `contract-primitives.ts:123` | the R-2/F-1 alias, now public at `src/public/mod.ts:4` |
+| `baseContract → ContractBuilder` | `contract-primitives.ts:155` | the T-2 explicit annotation |
+| `baseContract → Schema` | `contract-primitives.ts:155` | the T-2 explicit annotation |
+
+and the three `main`-only findings disappear because `main` does not export `BaseContractErrors`
+(`:211`, `:240`) and annotates `baseContract` as `ReturnType<typeof oc…>` (`:120`).
