@@ -5885,3 +5885,49 @@ trusting the tool's own success message:
    `gh run rerun 33335152037 --failed` to rerun only the failed job. Running now.
 
 No head movement in any of this — carrier stays `2b5682342` throughout, exactly as ruled.
+
+### #1739 post-eval review amendment — two Augment threads fixed, both authorized/in-ceiling
+
+Live audit correction received mid-close-gate-rerun: two `augmentcode` review threads on
+`installed-runtime-registry-generator.ts` (lines 373 medium, 471 low), both real and within the
+locked ceiling. Read exact thread text via GraphQL before touching code, then read the surrounding
+implementation fully to understand the fail-closed contract before writing anything.
+
+**Thread 1 (373).** `readRuntimeManifest`'s early return on invalid `command` dropped the entire
+`runtimeRegistryGenerator` object — including `inspectionProtocolDeclared` — so a manifest that
+DECLARED `inspectionProtocol` but malformed `command` was indistinguishable from one that never
+declared a protocol at all; the caller's `!generator` check silently `continue`d past it instead of
+failing closed. Fixed by throwing the existing stable `Generator inspection protocol 1 failed for
+<plugin>:` prefix when protocol is declared and command is invalid, while preserving the legacy
+fallback exactly for manifests with no declared protocol — matching the original F1 authorization's
+"declared protocol failure is fail-closed with no silent fallback; absent protocol retains legacy
+behavior" verbatim.
+
+**Thread 2 (471).** `process.exec`'s await was unwrapped; a throw before the process started (spawn
+failure) bypassed `fail()` and lost the stable prefix. Wrapped in try/catch, routed through
+`throw fail(...)` — plain `fail(...)` alone didn't satisfy TypeScript's control-flow narrowing for the
+later use of `result`, confirmed by `deno check` (`TS2454: used before being assigned`) before I found
+the right form.
+
+**My own test bug, caught before commit.** My first draft of the "no protocol declared" regression
+used an empty `runtimeRegistryGenerator: {}` fixture and asserted a populated legacy-fallback result —
+but an empty generator object also has no `command`, so it hits the exact same silent-skip path as the
+malformed case, correctly returning `[]`. Caught by running red-before/green properly rather than
+trusting my own first draft: reverted the product fix, ran the new tests, and the failure diff showed
+my *expected* value was the wrong one, not the product. Fixed by reusing the existing
+`runtimeManifest('custom')` helper (valid command, no protocol key) — the actual "protocol absent,
+command fine" case worth testing.
+
+Red-before (product fix reverted via patch stash, new tests only): 8/11, 3 failures — the two new tests
+plus their top-level wrapper. Green after reapplying: 11/11. Doctor/generate areas: 56/0. `deno check`
+clean on both changed files. Ceiling and lock unchanged.
+
+Both threads answered via GraphQL reply with commit `2b0c05356` and the specific evidence, then
+resolved — `agentic:review-threads` now `PASS`, `unanswered=0`.
+
+**No new IMPL-EVAL, per owner ruling** — the existing `PASS_IMPL` (`54c72a970`) stands; this is
+recorded as a supervisor-verified bounded amendment, with a fresh Tier-A sweep at the final carrier
+`05a274e40` (AI compiler 9/0, AI package test 32/0, CLI check clean, all four cascade checks exit 0,
+lock unchanged) rather than a new evaluator cycle.
+
+close-gate rerun in progress at `05a274e40` (run `33335926680`).
