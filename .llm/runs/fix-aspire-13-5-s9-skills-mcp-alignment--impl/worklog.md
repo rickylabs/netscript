@@ -76,6 +76,7 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | IMPL-EVAL fix 1 | implementation | Preserve accumulated MCP observations in failure receipts, leave outer timeout headroom, record structured-log error/count evidence, and add the recorded 14-tool failure regression. SQLite-tier visibility names remain assumed—not proven—and must be explicit Phase-B brief inputs. |
 | 2026-08-30 | pre-Phase-B D-45 | implementation | Coordinator-ratified the observed 14-tool set as required; `get_integration_docs` is documented-unobserved INFO, wrapper timeout is 140s, structured-log count is nullable without response-shape evidence, and S2-V9 cites the elapsed-time receipt. |
 | 2026-08-30 | hosted dashboard availability | implementation | Hosted proof run `33328972788` established that Aspire 13.5.3 can list the dashboard-backed MCP tools while an isolated headless AppHost returns exact JSON-RPC `-32603` dashboard-unavailable evidence. Added RED-first coverage and a documented degraded receipt outcome without weakening the 14-tool, visibility, redaction, or dashboard-only surface assertions. |
+| 2026-08-30 | hosted dashboard availability cycle 2 | implementation | Hosted proof run `33330455111` supplied the full `-32603` message and showed per-tool degradation was the wrong model. Aspire 13.5.3 source at `b5f143315` proves the CLI selects the scaffold's `https` profile; the profile's `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` prevents `AppHost:DashboardApiKey` generation, while MCP rejects a null API token as dashboard-unavailable. Chose shape A: authenticate only the E2E scratch profile before detached start/restart, keep all MCP calls/assertions mandatory, and annotate the exact error in a failing partial receipt. |
 
 ## Decisions
 
@@ -83,6 +84,7 @@ or the canonical generator source and run the documented generators.
 | --- | --- | --- |
 | Inherit external Plan-Gate | Supervisor already ran two separate PLAN-EVAL cycles and dispatched this exact contract | supervisor plan + owner prompt |
 | JSR publish audit is N/A for the new gate | `packages/cli/e2e` is unpublished and the gate is not exported by `@netscript/cli` | `packages/cli/e2e/deno.json` / `mod.ts` |
+| Cycle-2 shape A: secure the E2E scratch dashboard | The launch profile is selected, but its anonymous mode suppresses the dashboard API key required by Aspire MCP; changing the scratch config exercises the real call contract without changing product scaffold output | `packages/cli/src/kernel/templates/aspire/generate-aspire-config.ts`; Aspire `v13.5.3` `GuestAppHostProject.cs`, `DistributedApplicationBuilder.cs`, `DashboardUrlsHelper.cs`, `McpToolHelpers.cs`; hosted run `33330455111` |
 
 ## Drift
 
@@ -119,6 +121,8 @@ or the canonical generator source and run the documented generators.
 | Hosted dashboard RED/GREEN | PASS | Run `33328972788` exact `-32603` fixture failed before implementation; final focused suite passed 12/12, including non-dashboard and different-error rejection guards. |
 | Hosted dashboard scoped check/lint/fmt | PASS | Check covered 187 TypeScript files; lint/fmt covered 180 with zero findings after excluding the unrelated standalone `desktop-native` fixture whose detached config cannot resolve the root `zod` catalog. |
 | Hosted dashboard fitness gates | PASS | `quality:scan` reported zero findings; `arch:check` exited 0 with pre-existing repository warnings only. |
+| Hosted dashboard cycle-2 RED/GREEN | PASS | Exact run `33330455111` `list_resources` error plus authenticated-start assertions failed 2/32 before implementation; final MCP/runtime-builder suites passed 32/32. |
+| Hosted dashboard cycle-2 scoped gates | PASS | Check covered 187 TypeScript files; lint/fmt covered 180 with zero findings under the recorded standalone-fixture exclusion; `quality:scan` and `arch:check` passed. |
 
 ## Handoff Notes
 

@@ -203,6 +203,8 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command.at(-1), '/workspace/app');
   assertEquals(command[2].includes('"--format"'), true);
   assertEquals(command[2].includes('aspire-start.json'), true);
+  assertEquals(command[2].includes('ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS'), true);
+  assertEquals(command[2].includes('environmentVariables[dashboardAnonymousKey] = "false"'), true);
 });
 
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {

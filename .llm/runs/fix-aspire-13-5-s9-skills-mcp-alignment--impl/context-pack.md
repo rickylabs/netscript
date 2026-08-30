@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `hosted dashboard-availability fix cycle — implementation` |
+| Current phase | `hosted dashboard-availability fix cycle 2 — implementation` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 

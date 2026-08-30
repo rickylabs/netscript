@@ -38,7 +38,7 @@ const fixture: RecordedFixture = JSON.parse(
 );
 
 const DASHBOARD_UNAVAILABLE = new Error(
-  'tools/call failed: {"code":-32603,"message":"The Aspire Dashboard is not available in the running AppHost"}',
+  'tools/call failed: {"code":-32603,"message":"The Aspire Dashboard is not available in the running AppHost. The dashboard must be enabled to use MCP tools. Ensure your AppHost is configured with the dashboard enabled (this is the default configuration)."}',
 );
 
 function transport(
@@ -155,30 +155,33 @@ Deno.test('Aspire MCP smoke records the exact baseline delta and both-tier visib
   });
 });
 
-Deno.test('Aspire MCP smoke records unavailable AppHost dashboard as degraded', async () => {
-  const receipt = await runAspireMcpSmoke(
-    input(),
-    dependencies(
-      transport(fixture.tools, {
-        list_apphosts: fixture.apphosts,
-        doctor: fixture.doctor,
-        list_resources: fixture.resources,
-        'list_console_logs:postgres-cli': fixture.excludedConsole,
-        'list_console_logs:users': fixture.usersConsole,
-        list_structured_logs: DASHBOARD_UNAVAILABLE,
-      }),
-      transport(fixture.dashboardTools, {}),
-    ),
+Deno.test('Aspire MCP smoke fails list_resources dashboard error with explicit receipt state', async () => {
+  const persisted: PersistedEvidence[] = [];
+  await assertRejects(
+    () =>
+      runAspireMcpSmoke(
+        input(),
+        dependencies(
+          transport(fixture.tools, {
+            list_apphosts: fixture.apphosts,
+            doctor: fixture.doctor,
+            list_resources: DASHBOARD_UNAVAILABLE,
+          }),
+          transport(fixture.dashboardTools, {}),
+          persisted,
+        ),
+      ),
+    Error,
+    'dashboard must be enabled to use MCP tools',
   );
-  assertEquals(receipt.toolsMissing, []);
-  assertEquals(receipt.baselineDiff, { added: [], removed: [] });
-  assertEquals(receipt.documentedUnobserved, ['get_integration_docs']);
-  assertEquals(receipt.dashboardOnlyTools, ASPIRE_MCP_DASHBOARD_TOOLS);
-  assertEquals(receipt.visibility.ok, true);
-  assertEquals(receipt.redaction, { secretParamsNull: true, plaintextLeak: false });
-  assertEquals(receipt.structuredLogs.entryCount, null);
-  assertEquals(receipt.structuredLogs.isError, true);
-  assertEquals(receipt.structuredLogs.dashboardAvailable, false);
+  assertEquals(persisted.length, 1);
+  assertEquals(persisted[0].receipt.toolsMissing, []);
+  assertEquals(persisted[0].receipt.baselineDiff, { added: [], removed: [] });
+  assertEquals(persisted[0].receipt.structuredLogs, {
+    entryCount: null,
+    isError: true,
+    dashboardAvailable: false,
+  });
 });
 
 Deno.test('Aspire MCP smoke rejects a different structured-log error', async () => {
@@ -202,25 +205,6 @@ Deno.test('Aspire MCP smoke rejects a different structured-log error', async () 
       ),
     Error,
     'different internal error',
-  );
-});
-
-Deno.test('Aspire MCP smoke rejects dashboard-unavailable error on a non-dashboard tool', async () => {
-  await assertRejects(
-    () =>
-      runAspireMcpSmoke(
-        input(),
-        dependencies(
-          transport(fixture.tools, {
-            list_apphosts: fixture.apphosts,
-            doctor: fixture.doctor,
-            list_resources: DASHBOARD_UNAVAILABLE,
-          }),
-          transport(fixture.dashboardTools, {}),
-        ),
-      ),
-    Error,
-    'Dashboard is not available',
   );
 });
 

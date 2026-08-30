@@ -10,7 +10,7 @@ import {
   appHostEvidence,
   doctorEvidence,
   emptyOrNotFound,
-  isDashboardUnavailableToolError,
+  isDashboardUnavailableError,
   logCount,
   matchingAppHosts,
   realPath,
@@ -55,6 +55,24 @@ export async function runAspireMcpSmoke(
   const wholeDeadline = performance.now() + dependencies.timeouts.wholeGateMs;
   const stageTimeout = (timeoutMs: number): number =>
     Math.max(1, Math.min(timeoutMs, Math.round(wholeDeadline - performance.now())));
+  const callPrimary = async (
+    name: string,
+    args: Readonly<Record<string, unknown>>,
+  ): Promise<unknown> => {
+    try {
+      return await call(
+        primary,
+        name,
+        args,
+        stageTimeout(dependencies.timeouts.toolCallMs),
+      );
+    } catch (error) {
+      if (isDashboardUnavailableError(error)) {
+        structuredLogs = { entryCount: null, isError: true, dashboardAvailable: false };
+      }
+      throw error;
+    }
+  };
   try {
     serverInfo = await timed(
       'initialize',
@@ -84,22 +102,17 @@ export async function runAspireMcpSmoke(
     baselineDiff = diffAspireMcpTools(toolsObserved, ASPIRE_MCP_BASELINE_TOOLS);
 
     const apphosts = appHostEvidence(
-      await call(primary, 'list_apphosts', {}, stageTimeout(dependencies.timeouts.toolCallMs)),
+      await callPrimary('list_apphosts', {}),
     );
     const expectedPath = await realPath(input.appHostPath, dependencies);
     const inScope = await matchingAppHosts(apphosts.inScope, expectedPath, dependencies);
     if (inScope.length === 0) throw new Error(`AppHost is not in MCP scope: ${expectedPath}`);
     if (apphosts.inScope.length > 1) {
-      await call(
-        primary,
-        'select_apphost',
-        { appHostPath: expectedPath },
-        stageTimeout(dependencies.timeouts.toolCallMs),
-      );
+      await callPrimary('select_apphost', { appHostPath: expectedPath });
     }
 
     doctor = doctorEvidence(
-      await call(primary, 'doctor', {}, stageTimeout(dependencies.timeouts.toolCallMs)),
+      await callPrimary('doctor', {}),
     );
     if (doctor.cliVersion !== 'pass') throw new Error('Aspire MCP doctor cli-version did not pass');
     assertVersion('doctor currentVersion', doctor.currentVersion, input.scaffoldPin);
@@ -108,7 +121,7 @@ export async function runAspireMcpSmoke(
     }
 
     const resources = resourceEvidence(
-      await call(primary, 'list_resources', {}, stageTimeout(dependencies.timeouts.toolCallMs)),
+      await callPrimary('list_resources', {}),
     );
     const expectedVisible = [input.database, input.appResource, input.serviceResource];
     const expectedMcpExcluded = [`${input.database}-cli`];
@@ -116,38 +129,23 @@ export async function runAspireMcpSmoke(
     const observedMcpExcluded = expectedMcpExcluded.filter((name) =>
       !resources.names.includes(name)
     );
-    const excludedLogs = await call(
-      primary,
+    const excludedLogs = await callPrimary(
       'list_console_logs',
       { resourceName: expectedMcpExcluded[0] },
-      stageTimeout(dependencies.timeouts.toolCallMs),
     );
     if (!emptyOrNotFound(excludedLogs)) {
       throw new Error(`${expectedMcpExcluded[0]} unexpectedly exposed console logs through MCP`);
     }
-    const usersLogs = await call(
-      primary,
+    const usersLogs = await callPrimary(
       'list_console_logs',
       { resourceName: input.serviceResource },
-      stageTimeout(dependencies.timeouts.toolCallMs),
     );
     if (logCount(usersLogs) < 1) {
       throw new Error(`${input.serviceResource} returned no console logs`);
     }
-    const structuredLogsTool = 'list_structured_logs';
-    try {
-      structuredLogs = structuredLogEvidence(
-        await call(
-          primary,
-          structuredLogsTool,
-          {},
-          stageTimeout(dependencies.timeouts.toolCallMs),
-        ),
-      );
-    } catch (error) {
-      if (!isDashboardUnavailableToolError(structuredLogsTool, error)) throw error;
-      structuredLogs = { entryCount: null, isError: true, dashboardAvailable: false };
-    }
+    structuredLogs = structuredLogEvidence(
+      await callPrimary('list_structured_logs', {}),
+    );
     const described = await dependencies.describeResources();
     const describeListsExcluded = expectedMcpExcluded.every((name) => described.includes(name));
     const visibilityOk = observedMcpVisible.length === expectedVisible.length &&
