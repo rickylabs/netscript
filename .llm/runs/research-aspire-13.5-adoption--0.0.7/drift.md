@@ -297,3 +297,49 @@
 - **Owner action (agent-blocked):** the container needs a reaping init (or a restart) on the host.
   Secondary risk: ~7.8k processes is within reach of PID/thread limits, which would start failing
   unrelated spawns. This is a human/host action — flagged, not attempted.
+
+## D-26 — 2026-08-30 — `check:publish-assets` is a second derived-asset trap; S5 verified clear
+
+- **Severity:** minor (gate coverage; no S5 impact).
+- **Source:** the 0.0.7 docs lane hit this on PR #1746 — `check:assets-barrel` and
+  `check:agent-docs-prose` were green at the pushed head, Tier-A re-ran them, and an independent
+  IMPL-EVAL re-ran them; CI still failed on "Publish asset freshness". Their brief had barred
+  regenerating `packages/mcp/src/publish-assets.generated.ts` on a lane rule claiming it "embeds
+  `packages/mcp/README.md` only" — a false premise, so the gate never reached the list and no
+  amount of independent review could catch it. Repair was one line, `'sourceCommit'`.
+- **Input set** (`.llm/tools/generate-publish-assets.ts:34-40`):
+  `.llm/assets/agent-docs/{prose.json.gz,provenance.json}`,
+  `packages/cli/src/kernel/assets/{agent-tools,agent-docs,embedded,skills}.generated.ts`,
+  `packages/plugin/src/kernel/assets/embedded.generated.ts`.
+- **Verified for S5 (negative result, taken at the exact head):** S5's `59728705` regenerates
+  `agent-tools.generated.ts`, which *is* on that input list, yet `deno task check:publish-assets`
+  **exits 0** at `f0de60a1`. Run in a throwaway detached worktree so the author's tree was never
+  touched. **S5 needs no publish-assets commit.**
+- **Refined rule:** the trigger is not "an input path changed" but "an input whose content actually
+  reaches the emitted output". The docs lane's failure came from **agent-docs corpus regeneration**
+  moving `provenance.json`'s `sourceCommit`, which is embedded; S5 moved
+  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` and embedded tool bodies without touching the agent-docs corpus,
+  so nothing emitted moved.
+- **Action:** `gen:publish-assets` + `check:publish-assets` join `gen:assets-barrel` +
+  `check:assets-barrel` as **unconditional** slice gates for every corpus-touching slice — S9
+  (corpora/skills), S13, and the S7 playbook rows are the exposed ones. Generalises D-23: the brief
+  rule is **"any generated asset whose *inputs* your diff touches"**, never a memorised file list.
+  A conditional phrasing ("if any generated asset moved") is what let both D-23 and #1746 through.
+
+## D-27 — 2026-08-30 — Mermaid `%%` comments do not reach the rendered SVG (terminology rows are diagram-safe)
+
+- **Severity:** trivial (unblocks an S11 row).
+- **Question:** the docs lane asked whether changing the `.NET Aspire` string in the `%%` comment at
+  `docs/site/_diagrams/aspire-resource-graph.mmd:2` would move the rendered artifact and hand this
+  run a spurious diagram diff.
+- **Evidence:** `docs/site/assets/diagrams/aspire-resource-graph.svg` (21,680 bytes) contains **zero**
+  occurrences of `.NET Aspire`, of the comment line text, of `%%`, and of `Theme-neutral` — all four
+  `%%` header lines are absent. Only generic `aria-roledescription="flowchart-v2"` metadata; no
+  embedded source digest, no timestamp. `diagrams:check` (`docs/site/_diagrams/render.ts`) renders to
+  a temp SVG and byte-compares against the committed one, so a comment-only edit renders identically.
+- **Limitation stated:** proven from the committed artifact, not from an executed A/B render —
+  `mmdc` cannot run in this container (`Permission denied`, noexec scratch, and mermaid-cli needs
+  headless Chromium).
+- **Answer given:** the terminology row is safe to sweep; it does not need to be deferred, and it
+  does not interact with the manifest's "diagrams:render if S6/S8 add nodes" condition (which is
+  separately proven NO for S6 — 2 `addContainer` emissions before and after).
