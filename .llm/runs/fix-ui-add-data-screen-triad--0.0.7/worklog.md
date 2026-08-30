@@ -182,6 +182,9 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | 2026-08-30 15:49 UTC       | S1    | Design lock | Locked 12-path ceiling, six requested decisions, four implementation slices, and separate PLAN-EVAL stop.                                                                           |
 | 2026-08-30                 | S1    | PLAN-EVAL 1 | `FAIL_PLAN` at `402c552f` (`1a1a0d53`): bounded ceiling/corpus correction requested; all other reviewed design areas passed.                                                        |
 | 2026-08-30                 | S1    | Repair      | Swapped the corpus-member how-to for `capability-suites.ts`, made the no-corpus cascade reason explicit, corrected optional timestamp wording, and tightened help/plain-page paths. |
+| 2026-08-30                 | S1    | PLAN-EVAL 2 | Terminal `PASS_PLAN` at `53e696b5` (verdict `886f0860`); implementation unblocked inside the repaired 12-path ceiling.                                                             |
+| 2026-08-30 16:15–17:11 UTC | S2A   | Red/green   | Committed the semantic tests alone at `0d620b61`; detached focused proof was 1 pass/7 fail, then 8 pass/0 fail after the kernel implementation.                                     |
+| 2026-08-30 16:15–17:11 UTC | S2A   | Composition | Whole CLI first exposed three stale app-root fixtures without `router.ts`; advanced ceiling path 6's canonical router fixture from S2B, then whole CLI and nested E2E suites passed. |
 
 ## Decisions
 
@@ -204,6 +207,7 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | Package lint/fmt tasks and mixed wrapper are red at base       | significant tooling baseline       | yes                |
 | Owner reserves PR/evaluator dispatch                           | minor authorized workflow override | yes                |
 | PLAN-EVAL found a missing selector and corpus-member conflict  | significant, cycle-1 plan repair   | yes                |
+| S2A whole-suite consumer required the path-6 router fixture    | minor, in-ceiling slice ordering   | yes                |
 
 ## Gate Results
 
@@ -218,9 +222,9 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | E2E test                     | `deno task --cwd packages/cli/e2e test`        | PASS        | exit 0; 168 passed.                                  |
 | Docs-site verify             | `deno task --cwd docs/site verify`             | PASS        | exit 0.                                              |
 | Docs-site source-format test | `deno task --cwd docs/site test:source-format` | PASS        | exit 0; 6 passed.                                    |
-| Exact existing ceiling check | structured check, 9 files                      | PASS        | exit 0; 9/9 processed.                               |
-| Mixed ceiling lint           | structured lint, 9 files                       | FAIL (base) | exit 2; partial-exclusion, only 3 processed.         |
-| Mixed ceiling fmt            | structured fmt, 9 files                        | FAIL (base) | exit 2; partial-exclusion, only 3 processed.         |
+| Exact existing ceiling check | structured check, 10 files                     | PASS        | exit 0; 10/10 processed (cycle-2 evaluator rerun).   |
+| Mixed ceiling lint           | structured lint, 10 files                      | FAIL (base) | exit 2; partial-exclusion, only 3 processed.         |
+| Mixed ceiling fmt            | structured fmt, 10 files                       | FAIL (base) | exit 2; partial-exclusion, only 3 processed.         |
 | Package local lint/fmt tasks | four CLI/E2E task invocations                  | FAIL (base) | exit 1; root wrapper path resolves below package.    |
 | Lock hygiene                 | diff/blob/SHA-256                              | PASS        | unchanged; blob `a1522e6...`, SHA-256 `edfa0c24...`. |
 
@@ -249,6 +253,28 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | publish assets    | PASS    | check exit 0 | Expected to stay green because no publish/corpus member is in the final ceiling.                    |
 | MCP export corpus | PASS    | check exit 0 | Expected to stay green because no MCP/corpus member is in the final ceiling.                        |
 | assets barrel     | NOT_RUN | D17          | Expected stable/green for the same no-corpus reason, but the writing check remains supervisor-only. |
+
+### S2A Gates
+
+| Gate                                  | Result  | Evidence                                            |
+| ------------------------------------- | ------- | --------------------------------------------------- |
+| Focused red-before at `0d620b61`      | RED     | exit 1; 1 passed, 7 failed; unchanged product code. |
+| Focused kernel suite after S2A        | PASS    | exit 0; 8 passed, 0 failed.                         |
+| App-root command consumer             | PASS    | exit 0; 7 passed, 0 failed.                         |
+| Whole `packages/cli` check            | PASS    | exit 0.                                             |
+| Whole `packages/cli` test             | PASS    | exit 0; 838 passed (541 steps), 0 failed.           |
+| Whole nested `packages/cli/e2e` check | PASS    | exit 0.                                             |
+| Whole nested `packages/cli/e2e` test  | PASS    | exit 0; 168 passed, 0 failed.                       |
+| Changed-file no-config lint           | PASS    | exit 0; 3 files checked.                            |
+| Kernel no-config fmt and AP-1/F-1 cap | PASS    | exit 0 at line width 500; exactly 250 LOC.          |
+| Runtime/AppHost and `assets-barrel`   | NOT_RUN | Prohibited by D16/D17.                              |
+| Lock hygiene                          | PASS    | `deno.lock` byte-unchanged.                         |
+
+S2A touched locked ceiling paths 1, 2, and 6. Path 6 was advanced from S2B only to restore its
+canonical generated-app fixture after whole-package composition proved that typed route
+registration now requires `router.ts`; no public command behavior from S2B was implemented early.
+Acceptance box 6 remains documented only through the command's own `--help` surface when S2B lands;
+`docs/site/cli-reference.md:104` remains knowingly falsified and deferred under D17.
 
 ## Handoff Notes
 

@@ -16,6 +16,13 @@ import { createUiRemoveCommand } from './remove/remove-ui-command.ts';
 import { createUiUpdateCommand } from './update/update-ui-command.ts';
 import type { UiAddCommandInput } from './add/add-ui-input.ts';
 
+const ROUTER_SOURCE = `import { createRouteReference } from '@netscript/fresh/route';
+
+export const appRoutes = {
+  home: createRouteReference('/', { id: 'home', kind: 'page' }),
+} as const;
+`;
+
 Deno.test('ui commands resolve the sole Fresh app and never write the workspace root', async () => {
   await withWorkspace(['dashboard'], async (root) => {
     await parseUiAdd(root, root, ['page', 'incidents']);
@@ -143,7 +150,9 @@ async function withWorkspace(
       `${JSON.stringify({ workspace: apps.map((app) => `apps/${app}`) }, null, 2)}\n`,
     );
     for (const app of apps) {
-      await Deno.mkdir(join(root, 'apps', app), { recursive: true });
+      const appRoot = join(root, 'apps', app);
+      await Deno.mkdir(appRoot, { recursive: true });
+      await Deno.writeTextFile(join(appRoot, 'router.ts'), ROUTER_SOURCE);
     }
     await run(root);
   } finally {

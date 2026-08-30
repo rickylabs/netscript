@@ -104,3 +104,17 @@ locked base.
 - **Action:** state that the upstream option is optional while the #1357 generated-data contract
   deliberately always supplies it with seeded `initialData`; #1360 remains independent.
 - **Evidence:** real `deno doc` output and corrected D10/worklog wording.
+
+## 2026-08-30 — S2A whole-suite composition advanced one in-ceiling fixture
+
+- **What:** The kernel's typed route-registration preflight made three untouched app-root command
+  tests fail because their synthetic Fresh apps contained only directories and no `router.ts`.
+- **Source:** First whole `packages/cli` run after the focused kernel suite went green.
+- **Expected:** S2A would touch ceiling paths 1–2; path 6 was scheduled with S2B.
+- **Actual:** Whole-package exit 1 reported 835 passed (541 steps) and three failures, all in
+  `ui-app-root-command_test.ts` at the missing-router precondition. The file is already locked
+  ceiling path 6 and its fixture models the composed consumer of the S2A behavior.
+- **Severity:** minor, in-ceiling slice-order drift; no scope or public-surface expansion.
+- **Action:** Advance only the canonical `router.ts` fixture setup into S2A. Leave all path-6 public
+  option/help assertions for S2B. Rerun the entire CLI and nested E2E package suites.
+- **Evidence:** focused consumer 7/0; whole CLI 838/0 (541 steps); nested E2E 168/0.

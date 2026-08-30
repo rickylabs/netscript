@@ -6,17 +6,17 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `fix-ui-add-data-screen-triad--0.0.7` |
 | Branch         | `fix/ui-add-data-screen-triad`        |
-| Current phase  | `plan-eval` cycle 2 handoff           |
+| Current phase  | `implementation — S2A`                |
 | Archetype      | `6 — CLI / Tooling`                   |
 | Scope overlays | `frontend`                            |
 
 ## Current State
 
-S1 research/design remains at locked base `de57fab0`; no product/test code exists. PLAN-EVAL cycle 1
-returned `FAIL_PLAN` at `402c552f` with verdict `1a1a0d53`. The bounded repair keeps a 12-path
-ceiling by replacing the generated-corpus how-to with the missing `scaffold.runtime` selector,
-preserves D17, and prepares the final cycle-2 handoff. A separate evaluator must issue PLAN-EVAL
-`PASS` before S2.
+PLAN-EVAL cycle 2 returned terminal `PASS_PLAN` at `53e696b5` with verdict `886f0860`. S2A now has
+an isolated red-before commit (`0d620b61`) plus the kernel planner/preflight implementation and a
+canonical router fixture correction in locked path 6. Focused tests, whole CLI check/test, and the
+whole nested E2E check/test are green; the explicit push and PR comment are the remaining handoff
+actions after this product/harness commit lands.
 
 ## Completed
 
@@ -28,18 +28,25 @@ preserves D17, and prepares the final cycle-2 handoff. A separate evaluator must
 - Incorporated the cycle-1 selector/corpus correction without revisiting the design areas the
   evaluator passed.
 - Recorded all deferred known-stale docs and corrected the optional `initialDataUpdatedAt` wording.
+- Captured detached focused red-before evidence at exact `0d620b61`: exit 1, 1 passed/7 failed.
+- Implemented the four-role data-screen plan, full no-write preflight, force/dry-run kernel
+  semantics, appRoutes registration, and one route-tree island convention.
+- Restored the in-ceiling app-root consumer fixture with a canonical `router.ts` after whole-package
+  composition exposed three deterministic failures.
+- Proved focused green (8/0), whole CLI green (838/0, 541 steps), and nested E2E green (168/0).
 
 ## In Progress
 
-- Commit/push/PR-comment handoff for the cycle-1 repair; owner dispatches final PLAN-EVAL cycle 2.
+- Push the separate S2A product/harness commit and its red-before parent by explicit refspec, then
+  post the S2A evidence comment to PR #1781.
 
 ## Next Steps
 
-1. Owner dispatches separate PLAN-EVAL cycle 2 at the repair head.
-2. Evaluator checks the final 12-path ceiling, no-corpus cascade invariant, and bounded wording
-   corrections, then records `PASS` or `FAIL_PLAN` without implementation.
-3. Only on PASS, implementation author resumes S2A inside the 12-path ceiling. Cycle 2 is the final
-   plan cycle.
+1. Finish the S2A commit/push/comment trail.
+2. Implement S2B public options/help/result reporting in locked paths 3–6, retaining the real-help
+   versus independently emitted-role seam.
+3. Implement S2C gate definition and explicit runtime-suite selection in locked paths 7–12 without
+   executing `scaffold.runtime`.
 
 ## Key Decisions
 
@@ -59,23 +66,26 @@ preserves D17, and prepares the final cycle-2 handoff. A separate evaluator must
 
 | Path                                                            | Status   | Notes                                         |
 | --------------------------------------------------------------- | -------- | --------------------------------------------- |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/plan.md`         | modified | Corrected ceiling, cascade, gates, and seams. |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/worklog.md`      | modified | Recorded cycle-1 repair and advisories.       |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/drift.md`        | modified | Appended selector/corpus and API drift.       |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/context-pack.md` | modified | Prepared final plan-eval handoff.             |
+| `packages/cli/src/kernel/application/ui/web-scaffold.ts`        | modified | S2A planner, binding, emission, preflight.      |
+| `packages/cli/src/kernel/application/ui/web-scaffold_test.ts`   | committed | Red-before semantic goldens at `0d620b61`.      |
+| `packages/cli/src/public/features/ui/ui-app-root-command_test.ts` | modified | Canonical router fixture for composed tests.  |
+| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/worklog.md`      | modified | S2A evidence and corrected 10-file count.       |
+| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/drift.md`        | modified | Records in-ceiling fixture ordering drift.      |
+| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/context-pack.md` | modified | Resumable S2A state and next steps.              |
 
 ## Gates
 
 | Gate family | Current status                  | Evidence                                                                                                       |
 | ----------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Static      | mixed measured base             | CLI/E2E check+test pass; lint/fmt base tooling failures recorded.                                              |
+| Static      | S2A PASS plus measured base-red tooling | CLI 838/0 and nested E2E 168/0; lint/fmt task-path defects remain baseline-only.                         |
 | Fitness     | PASS at base                    | quality, doctrine, docs, JSR, publish checks exit 0.                                                           |
 | Runtime     | REQUIRED / NOT_RUN              | supervisor-coordinated `scaffold.runtime`; author prohibited.                                                  |
 | Consumer    | PASS except intentional NOT_RUN | No corpus member is touched: three read-only checks stay green; writing assets-barrel remains supervisor-only. |
 
 ## Open Questions
 
-- Final PLAN-EVAL cycle-2 verdict only; no implementation-forcing author question remains open.
+- No S2A question remains open. S2B must make the command's own real `--help` the only in-leaf
+  documentation proof; deferred `cli-reference.md:104` remains knowingly stale.
 
 ## Drift and Debt
 
@@ -86,6 +96,6 @@ preserves D17, and prepares the final cycle-2 handoff. A separate evaluator must
 
 ## Commits
 
-- S1 harness-only PLAN-EVAL cycle-1 subject: `402c552f`.
-- Cycle-1 repair is the next harness-only commit; exact SHA is reported after commit/push and in the
-  PR #1781 summary comment.
+- S1 terminal plan head: `53e696b5` (`PASS_PLAN` verdict `886f0860`).
+- S2A red-before test-only commit: `0d620b61`.
+- S2A product/harness commit: this commit; exact SHA is recorded in the PR comment and owner report.
