@@ -16,6 +16,7 @@ import type {
   ContractLike,
   ContractProcedureNames,
   ProcedureInputFromNode,
+  ProcedureMetaFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
 } from './service-client.ts';
@@ -37,12 +38,23 @@ export type ProcedureOutput<
 > = ProcedureOutputFromNode<TContract[TAction]>;
 
 /**
+ * Metadata carried by a contract procedure.
+ */
+export type ProcedureMeta<
+  TContract extends ContractLike,
+  TAction extends ContractProcedureNames<TContract>,
+> = ProcedureMetaFromNode<TContract[TAction]>;
+
+/**
  * Query helper bound to a specific resource action.
  */
 export interface ActionMethod<
   TContract extends ContractLike,
   TAction extends ContractProcedureNames<TContract>,
 > {
+  /** Procedure metadata marker used only by TypeScript inference. */
+  readonly __netscriptProcedureMeta?: ProcedureMeta<TContract, TAction>;
+
   /**
    * Execute the action with cache-aware query semantics.
    */

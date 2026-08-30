@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "75b782205d",
+  "surface": "PR #1731 after the JSR tagline repair (branch-introduced CI red)",
+  "expectedGateIds": ["arch-check","check","fmt-check","lint","public-doc-lint","publish-dry-run","quality-gate","test"],
+  "receiptIds": ["1466-arch-check-final","1466-check-final","1466-fmt-check-final","1466-lint-final","1466-public-doc-lint-final","1466-publish-dry-run-final","1466-quality-gate-final","1466-test-final"],
+  "sufficiency": "INSUFFICIENT",
+  "reasons": ["public-doc-lint did not pass (FAIL) - baseline-red on main, delta 0, set identical per R-1; external to this leaf"],
+  "notes": [
+    "All eight receipts attempt 10 at content head 75b78220 with gitHead == actualGitHead.",
+    "docs-tagline is NOT in the contracted set and caught this defect; see worklog and topic drift - candidate for the set.",
+    "Slice-3 set archived append-only to receipts/frozen-9ab779ce/ before recutting (fifth archive)."
+  ]
+}
