@@ -22,7 +22,7 @@ project, including every published export subpath.
 
 ## `Healthy` is not proof
 
-`state: Running` + `healthStatus: Healthy` with an empty `healthReports` array means **nothing was
+`state: Running` + `healthStatus: Healthy` with an empty `healthReports` object means **nothing was
 ever checked** — health was inferred from the process being alive. A crash-looping resource under
 watch mode, or one whose port never bound, reads as `Healthy`.
 

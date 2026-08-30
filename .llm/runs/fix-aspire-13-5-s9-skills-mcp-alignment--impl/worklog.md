@@ -72,6 +72,7 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | 2 | corpora | Regenerated CLI assets, MCP export corpus, publish assets, and the consumer dogfood bundle; added a deterministic dogfood check gate. |
 | 2026-08-30 | 2 | delivery | Pushed commit `418eb4b9` and posted the required slice-2 implementation comment on draft PR #1759. |
 | 2026-08-30 | 3 | acceptance | Added the supervisor-dispatched Codex Sol prose-audit request and reran the complete static, generator, fitness, and focused test set. |
+| 2026-08-30 | docs-audit fix 1 | implementation | Applied the opposite-family `AUDIT: FAIL_FIX` findings: narrowed 13.5 certification to tagged claims, bounded S2-V4 telemetry wording, replaced stale timings with S2-V2/V9 values, corrected `healthReports` to object, added exact CLI-help receipts, documented dashboard-only MCP startup, and regenerated every required consumer. |
 
 ## Decisions
 
@@ -111,6 +112,7 @@ or the canonical generator source and run the documented generators.
 | Final generated-surface checks | PASS | assets barrel, Claude sync/validation, MCP corpus, and publish assets reproduce cleanly |
 | Final `quality:scan` / `arch:check` | PASS | zero quality findings; doctrine exit 0 with pre-existing warnings only |
 | Static MCP expected delta | BLOCKED | observed 14 baseline tools and no `get_integration_docs`; truthful receipt cannot prove locked `+get_integration_docs` |
+| Docs-audit fix cycle 1 | IMPLEMENTED | one prose/regeneration slice; independent re-audit remains supervisor-owned |
 
 ## Handoff Notes
 
@@ -120,3 +122,4 @@ or the canonical generator source and run the documented generators.
   dispatch or self-certify it.
 - Phase A is pushed and locally green except for the upstream static MCP acceptance mismatch recorded
   in `drift.md` and `receipts/aspire-13.5.3-mcp-tools-static.json`.
+- Cycle-1 help captures are non-runtime CLI reads; pre/post Aspire and Docker inventories stayed empty.
