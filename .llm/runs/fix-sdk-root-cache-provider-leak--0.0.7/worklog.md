@@ -484,3 +484,74 @@ propagates, after the CLI embedded agent-docs inventory and the MCP export corpu
 The four derivative checks were freshness rechecks at this final-base candidate, not a new
 regeneration: each passed without changing its generated artifact. No acceptance-evidence text,
 issue state, labels, draft state, runtime gate, or path outside the amended ceiling was touched.
+
+## Supervisor Tier-A final sign-off — `b322bf04` (third and final base `a5520e70`)
+
+Re-derived independently at this exact head. Nothing below is read from the author's receipts.
+
+### The whole repository suite is green
+
+```
+deno task test → exit 0 · 4261 passed / 0 failed / 19 ignored / 4280 total
+```
+
+Run **before** attempting CI, deliberately. Two CI cycles had already been spent, and the second failed
+on `netscript-web-runtime-closure_test.ts` — a test in `packages/cli` that **no scope this leaf was
+running could see**. The scoped gates were all green while the repository was red. The full suite is
+the only instrument that closes that gap, and it is cheaper than a third red cycle.
+
+### The defect CI found, and why it was not noise
+
+Adding `./presets` to `packages/sdk/deno.json` broke a parity assertion between the SDK manifest and
+the hand-maintained `NETSCRIPT_WEB_RUNTIME_EXPORTS` constant in
+`packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure.ts`.
+
+That is the **third** consumer of the SDK export map this leaf discovered the hard way — after
+`check:assets-barrel` and the MCP export corpus. Each was found by a different instrument, none by the
+plan. The durable lesson is now specific: **a new published export subpath propagates to every
+consumer of the export map, and those consumers are not enumerable by recall — they must be derived
+from the tooling and from a full-suite run.**
+
+The fix is one line in a hand-maintained constant, and it is **semantically correct rather than merely
+green**: that module's own comment frames the constant as which SDK subpaths participate in the
+cache-provider closure, and `./presets` is precisely the browser-safe entry that cannot instantiate a
+provider — this leaf's own claim. Verified for **order** as well as presence, since `assertEquals`
+over arrays is order-sensitive: both sequences are identical at 13 entries with `./presets` after
+`./ports`.
+
+### Exact-head gates at `b322bf04`
+
+| Gate | Result |
+| --- | --- |
+| Head identity | local == `origin` == PR #1758 `headRefOid`; tree clean |
+| Ceiling vs `a5520e70` | nothing outside the ceiling (closure module now coordinator-authorized) |
+| `deno.lock` | byte-unchanged |
+| **Full repository suite** | exit 0 · **4261 passed / 0 failed** |
+| Closure parity test | exit 0 · 6 passed / 0 failed |
+| `packages/sdk/tests/` | exit 0 · 70 passed / 0 failed |
+| `define-fresh-app.test.ts` | exit 0 · 11 passed / 0 failed |
+| `check:agent-docs-prose` / `check:assets-barrel` / `check:publish-assets` / `check:mcp-export-corpus` / `docs:exports-drift` | all exit 0 |
+| Graph proof, re-measured | root **0** · presets **0** browser-unsafe edges |
+
+### Three integrations, chain intact throughout
+
+`f8b4f804` (#1746) → `952cc106` (#1748) → `a5520e70` (#1755), each a **merge, not a rebase**, verified
+by parent count and by confirming every receipt SHA remains an ancestor. The shared-asset cascade was
+regenerated **once**, at the final base, exactly as the coordinator's ordering required — the earlier
+regeneration against `f8b4f804` was correctly held rather than pushed, which is why only one
+regeneration cycle was spent instead of three.
+
+### Coordinator-confirmed ceiling amendment
+
+`netscript-web-runtime-closure.ts` is authorized as the expectation owner, with its existing parity
+test as validation. The amendment initially named the `_test.ts`; this lane reported that the test
+holds no expectation — *Actual* is read live from the SDK manifest — rather than silently substituting
+the source file, and the coordinator corrected the authorization. Recorded because reporting the
+mismatch is what produced a precise authorization; a silent substitution would have produced identical
+code with a false provenance trail.
+
+### Still required before readiness
+
+A renewed delta receipt at this head — the `MECHANICAL_PASS` at `f1ff5557` is **superseded** by two
+further integrations and must not be cited — then `status:ready-merge` applied immediately before a
+fresh CI run so the mirror's live label read observes it.
