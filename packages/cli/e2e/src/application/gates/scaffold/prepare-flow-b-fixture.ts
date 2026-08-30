@@ -309,11 +309,40 @@ const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,
 );
+const workersConfigAnchor = / {2}if \(config\.BackgroundProcessors\[(["'])workers\1\]\?\.Enabled !== false\) \{/
+  .exec(workersBackgroundBlock)?.[0];
+if (!workersConfigAnchor) {
+  throw new Error('generated workers resource block did not contain its config lookup');
+}
+const workersExecutableMatch =
+  /const ([A-Za-z_$][\w$]*) = builder\.addExecutable\((["'])workers\2,/.exec(
+    workersBackgroundBlock,
+  );
+if (!workersExecutableMatch) {
+  throw new Error('generated register-background.mts did not contain the workers resource block');
+}
+const workersBinding = workersExecutableMatch[1];
+if (!workersBinding) {
+  throw new Error('generated workers resource block did not expose its processor binding');
+}
+const workersSetAnchor = new RegExp(
+  `    backgroundProcessors\\.set\\((["'])workers\\1, ${workersBinding}\\);`,
+).exec(workersBackgroundBlock)?.[0];
+const workersSetIndex = workersSetAnchor
+  ? workersBackgroundBlock.indexOf(workersSetAnchor, workersExecutableMatch.index)
+  : -1;
+if (!workersSetAnchor || workersSetIndex < 0) {
+  throw new Error('generated workers resource block did not contain its registration marker');
+}
+const workersBlockClose = workersBackgroundBlock.indexOf('\n  }', workersSetIndex);
+if (workersBlockClose < 0) {
+  throw new Error('generated workers resource block did not contain its closing brace');
+}
 const usersReference = [
   '    {',
   "      const usersEndpoint = await _services.get('users')?.getEndpoint('http');",
   '      if (usersEndpoint) {',
-  "        await workers.withEnvironment('services__users__http__0', usersEndpoint);",
+  `        await ${workersBinding}.withEnvironment('services__users__http__0', usersEndpoint);`,
   '      }',
   '    }',
 ].join('\n');
@@ -321,7 +350,7 @@ const sagasReference = [
   '    {',
   "      const sagasEndpoint = await _plugins.get('sagas-api')?.getEndpoint('http');",
   '      if (sagasEndpoint) {',
-  "        await workers.withEnvironment('services__sagas-api__http__0', sagasEndpoint);",
+  `        await ${workersBinding}.withEnvironment('services__sagas-api__http__0', sagasEndpoint);`,
   '      }',
   '    }',
 ].join('\n');
@@ -332,10 +361,8 @@ const missingBackgroundReferences = [
 const configuredBackgroundBlock = missingBackgroundReferences.length === 0
   ? workersBackgroundBlock
   : workersBackgroundBlock.replace(
-    "    backgroundProcessors.set('workers', workers);",
-    `${
-      missingBackgroundReferences.join('\n\n')
-    }\n\n    backgroundProcessors.set('workers', workers);`,
+    workersSetAnchor,
+    `${missingBackgroundReferences.join('\n\n')}\n\n${workersSetAnchor}`,
   );
 if (
   !configuredBackgroundBlock.includes('services__users__http__0') ||

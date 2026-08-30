@@ -67,6 +67,9 @@ composed config boundary → final static gates.
 | 2026-08-30 | plan-eval   | cycle 2 `FAIL_FIX` | Owner independently confirmed the flow-B fixture anchors and U+2028 comment seam, supplied mechanical satisfying conditions, and released the gate with no cycle 3. |
 | 2026-08-30 | plan repair | gate release       | Pushed the bounded amendment at `f1d7d9d8f738b4907e1c770051ee1f59abaacc4a`; evaluator verdict files stayed untouched.                                               |
 | 2026-08-30 | RED         | focused tests      | Structured two-file wrapper executed 99 results: 67 passed, 32 failed. Failures expose 24 missing config rejections plus six generator source/execution seams.      |
+| 2026-08-30 | slice 2     | source safety      | Replaced background name-derived bindings/comments, stringified every planned literal site, and updated the flow-B fixture to derive its `bg_\d+` binding.          |
+| 2026-08-30 | slice 2     | focused gates      | Generator tests PASS 59/59; check PASS 4 selected; lint PASS 4/4 processed; format PASS 4/4 processed. No E2E or runtime suite fired.                               |
+| 2026-08-30 | slice 2     | RED transition     | Combined matrix is 74 pass / 25 fail: all generator seams are green; only 24 grammar rejection steps plus their parent summary remain red for slice 3.              |
 
 ## Decisions
 
@@ -89,13 +92,18 @@ composed config boundary → final static gates.
 | Root `deno task test`                                         |    — | **NOT FIRED** by owner instruction; no false green substituted                                |
 | First wrapper invocation                                      |    1 | REFUSAL — type-check stopped before TAP selection; fixed test typing and did not count as RED |
 | Focused RED wrapper                                           |    1 | EXPECTED RED — 67 passed, 32 failed, 99 total, 32 unique failures                             |
+| Slice-2 generator tests                                       |    0 | PASS — 59 passed, 0 failed                                                                    |
+| Slice-2 scoped check                                          |    0 | PASS — four files selected, zero findings                                                     |
+| Slice-2 scoped lint                                           |    0 | PASS — four selected and processed, zero findings                                             |
+| Slice-2 scoped format                                         |    0 | PASS — four selected and processed, zero findings                                             |
+| Slice-2 combined RED transition                               |    1 | EXPECTED RED — 74 passed, 25 failed; grammar lock is the only remaining failure class         |
 | PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                    |
 | PLAN-EVAL cycle 2                                             |    — | `FAIL_FIX`; owner-verified mechanical corrections applied and gate released; no cycle 3       |
 
 ## Handoff Notes
 
-- Visible RED is established. Slice 2 may now change only the background generator, both focused
-  generator tests, the flow-B fixture, and run artifacts under the locked contract.
+- Slice 2 is complete and ready to publish. Slice 3 may add only the private Aspire rule module,
+  composed config validation, config tests already present in RED, and run evidence.
 - Aspire grammar was **not executed against Aspire in this leaf**. The source/docs-derived rule is
   protected by load-bearing literal escaping plus user-text-free ordinal bindings in the
   implementation order.
