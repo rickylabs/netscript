@@ -501,4 +501,8 @@ sealed; correction dispatched | Head `b16fcd093a71`: honest ABORTED-in-preparati
 (`phase-b-11..19`; `deno install` → `Module not found …/.generated/zod/crud.ts`; no AppHost, zero
 preserved; PR comment 19:18:19Z). D-80 bootstrap-correction brief now on the same thread
 (`bj1oyj4h0`): db:generate in ratified position, RED/GREEN bootstrap proof (no lease), Tier-A on
-changed harness paths, refreeze; ONE serialized attempt follows from host zero. |
+changed harness paths, refreeze; ONE serialized attempt follows from host zero. | | S4 SHIPPED; S5
+converged | S4 merged as main `74e3d451e5dc`, #1716 closed. S5: both medium review findings already
+fixed in-branch (`79255394`,`f3b3e75e`) with reasoned replies (gate PASS, 0 unanswered); 18/18
+identity rebase onto new main → **`bf7223a6c330`**, pinned push; exact-head run queued as chain-3
+(after proof + S1). |
