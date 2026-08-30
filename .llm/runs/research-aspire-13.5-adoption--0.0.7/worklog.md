@@ -263,4 +263,10 @@ note). Runtime zero. | | S9 IMPL-EVAL fix cycle 1 landed | `f6ca9695`
 docs_audit cycle 2 (Sol) and IMPL-EVAL cycle 2 (fresh Fable session) dispatched at `f6ca9695`;
 audit/eval worktrees moved to that head. Runtime zero. | | S9 cycle-2 dispatches | IMPL-EVAL cycle 2
 session `b8a63574…` (eval worktree @ `f6ca9695`); docs_audit cycle 2 resumed on the cycle-1 audit
-thread `01a05265…` (launcher refused a duplicate sender — correct), worktree @ `f6ca9695`. |
+thread `01a05265…` (launcher refused a duplicate sender — correct), worktree @ `f6ca9695`. | |
+Authority correction (coordinator) | Merges are **coordinator-landed after the pre-merge gate**, not
+human-only. Supervisor obligation: hand over any **exact-green** candidate (executed runtime verdict
+at the exact head, close-gate satisfied, stack below it landed) and continue without waiting for
+merge completion. Current exact-green candidates: **none** (S2 #1735 unchanged CLEAN but its runtime
+verdict predates #1734 handling — coordinator's call; S4/S5 owe runtime at exact head per the audit;
+S6/S8/S9 stacked + Phase B blocked). |
