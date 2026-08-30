@@ -5075,3 +5075,26 @@ rollout-growth stall.
   states and would have hung to timeout on both a success and a spend-limit block. New monitor
   `bd51fhiet` reads `state.json` (probe proven against a known-positive) and matches
   `done|blocked|failed|stopped|error|completed|cancelled`, emitting on every state change.
+
+## D-83 — #1533 durability finding: 27 local-only commits, 9 unpushable in principle
+
+- Re-proved the parked claim rather than assuming it. **First measurement was invalid and I caught
+  it**: `git log @{u}..HEAD | wc -l` reported "0 unpushed" — but the branch has **no upstream**, so
+  `@{u}` errored and `wc -l` counted zero lines of error output. Zero meant "the probe failed", not
+  "nothing unpushed". *Fourth instrument artifact this stretch; same root as the others — an
+  unvalidated probe whose empty output was read as a measurement.*
+- Correct measurement against the real remote ref `origin/test/jsdoc-example-compile-gate`
+  (`303be12ea`, which is also PR #1756's head): **27 local-only commits**, local head `965fcc9ca`.
+- Exactly **one** commit touches `.github/workflows/`: `e1ea9d3a5 ci(docs): enforce JSDoc example
+  imports`, at **index 19 of 27**. GitHub enforces `workflow` scope at receive time, and the PAT
+  carries `repo` only.
+- **Consequence, stated precisely:** commits 1–18 are pushable; commits 19–27 sit *behind* the
+  blocked commit in the stack and cannot reach the remote **in principle** until the scope is
+  granted. Nine commits of completed, IMPL-EVAL-passed work exist **only on this NAS worktree** and
+  would be lost with it. Renaming or re-targeting the ref does not help — the check is at receive
+  time, not ref-name based.
+- **Mitigation available, not taken unilaterally:** pushing the 1–18 prefix to a new backup branch
+  would preserve 18 of 27 off-host without touching PR #1756 or its head. It creates a new remote
+  ref in the owner's repo, so it is offered rather than performed.
+- PR #1756 live state re-verified: OPEN, **draft**, head `303be12ea`, MERGEABLE/CLEAN, labels
+  `status:impl, area:docs, area:tooling, type:test`. Parked state confirmed current, not stale.
