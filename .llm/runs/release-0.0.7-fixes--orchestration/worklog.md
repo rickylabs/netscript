@@ -6116,3 +6116,38 @@ touching #1758's resources and I have no positive attribution for it.
 explicit coordinator regrant before touching the lease again. #1781 stays static-only in the
 meantime — both fixes are committed, pushed, and gate-verified; only the runtime proof itself remains
 outstanding.
+
+### #1781 attempt 3 — 80/1 product-green, exact-head runtime proof; host returned to literal zero
+
+Preconditions verified independently before starting: containers=0, volumes=0, `aspire ps` `[]`, no
+nondefault networks. Head confirmed exact match to `a34c37eb2d43414385016b8532047796b0f07f87`.
+
+Relay armed under owner `fix1781-attempt3`, fresh `--since`, and — critically — **I saved the internal
+watch PID to a file before launching, specifically so teardown would not depend on remembering it**,
+after the earlier lesson of leaving a watcher armed indefinitely. Relay attached correctly (3 ports)
+right as `runtime.aspire-start` began.
+
+**Result: exit 1, but `passed=80 / failed=1`.** The sole failure is `behavior.app-reference` — the same
+known, pre-existing, host-wide Chromium-absence gate independently confirmed identical on main this
+session (on #1764 and #1739). **Both of this leaf's own fixes' target gates PASSED**:
+`scaffold.ui-data-screen` (274ms) and `generated.deno-fmt-check` (249ms) — confirmed by reading the
+exact log lines, not inferred from the aggregate pass count.
+
+**Teardown, done immediately on run completion, before reading any result** — the rule I recorded after
+the earlier mistake: relay `cleanup` (0 listeners/containers — it had already self-cleaned via the
+run's own `--cleanup` step), watch PID confirmed dead. One leftover anonymous volume (created
+`23:28:55Z`, inside this run's own window) removed by exact ID. One leftover nondefault network
+(`aspire-persistent-network-140ca981-...`, a **different** id-suffix than the pre-run baseline network,
+confirming it was newly created by this run) — confirmed empty (no attached containers) before removal,
+per this turn's explicit instruction to zero nondefault networks too, stricter than the earlier
+"one empty network is baseline" framing. **Final proof: containers=0, volumes=0, nondefault
+networks=0, `aspire ps` []** — cleaner than even the pre-run state.
+
+Reported local zero immediately, before dispatching anything further, so the lease could rotate to
+#1764 without waiting on the CI dispatch.
+
+**Off-host browser proof dispatched**, not a rerun of the valid DeepSeek evaluation: `e2e-cli.yml`
+workflow_dispatch at exact head (branch tip confirmed matching before dispatch,
+`git ls-remote` — not assumed), run `33342040720`. This workflow's `scaffold-runtime` job runs on a
+stock GitHub runner with real Chrome present, so it is the correct instrument for the one gate this
+NAS structurally cannot prove, per this session's repeated, independently-confirmed finding.
