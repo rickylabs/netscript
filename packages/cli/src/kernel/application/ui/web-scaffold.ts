@@ -94,16 +94,13 @@ async function findBinding(root: string, fs: FileSystemPort): Promise<Binding> {
       ) candidates.push(path);
     }
   }
-  const fallback = resolve(
-    root,
-    "routes",
-    "examples",
-    "service",
-    "(_lib)",
-    "service-query.ts",
-  );
-  if (!candidates.length && await fs.exists(fallback)) {
-    candidates.push(fallback);
+  const examples = resolve(root, "routes", "examples");
+  if (!candidates.length && await fs.exists(examples)) {
+    for (const entry of await fs.readDir(examples)) {
+      if (!entry.isDirectory) continue;
+      const fallback = resolve(examples, entry.name, "(_lib)", "service-query.ts");
+      if (await fs.exists(fallback)) candidates.push(fallback);
+    }
   }
   if (candidates.length !== 1) {
     bindingError(

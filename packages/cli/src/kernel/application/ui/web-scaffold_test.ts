@@ -47,11 +47,17 @@ const MEMORY_CONTRACT = `export const OrdersListInputSchemaV1 = z.object({
 
 async function seedApp(
   fs: MemoryFileSystemAdapter,
-  options: { readonly fallback?: boolean; readonly contract?: string } = {},
+  options: {
+    readonly fallback?: boolean | string;
+    readonly contract?: string;
+  } = {},
 ): Promise<void> {
   await fs.writeFile(ROUTER_PATH, ROUTER_SOURCE);
+  const exampleDir = typeof options.fallback === "string"
+    ? options.fallback
+    : "service";
   const queryPath = options.fallback
-    ? `${APP_ROOT}/routes/examples/service/(_lib)/service-query.ts`
+    ? `${APP_ROOT}/routes/examples/${exampleDir}/(_lib)/service-query.ts`
     : `${APP_ROOT}/lib/orders.ts`;
   await fs.writeFile(queryPath, queryModule());
   await fs.writeFile(
@@ -140,6 +146,22 @@ Deno.test("page --island dry-run plans the memory dialect through the init fallb
   assertStringIncludes(loader, "offset: 0");
   assertFalse(loader.includes("sortBy"));
   assertEquals(fs.getFiles(), before);
+});
+
+Deno.test("page --island discovers the example query client under its real service-named directory, not only the literal 'service' fallback", async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await seedApp(fs, { fallback: "users", contract: MEMORY_CONTRACT });
+
+  const result = await scaffoldUiPage(
+    {
+      projectRoot: APP_ROOT,
+      path: "activity",
+      island: true,
+      dryRun: true,
+    } as Parameters<typeof scaffoldUiPage>[0],
+    fs,
+  );
+  assertDataScreenPlan(plannedFiles(result));
 });
 
 Deno.test("data-bound scaffold names the prerequisite and performs zero writes without a binding", async () => {
