@@ -7516,3 +7516,57 @@ public-surface slice.
 | #1730 / PR #1763 | **SHIPPED** |
 | #1387 / PR #1762 | **active** — plan repair + Slice 1 on thread `01a0535d` |
 | #1664 | parked at `20337441788b` |
+
+## 2026-08-30 — `main` advanced to `2a65a8cd` (#1780); intersection tested, ruled inert; no integration
+
+`origin/main` = **`2a65a8cd0f3872c2b95b00fe0a9edae10531921b`** (exact match), #1780
+"docs(tooling): adopt six clean exports-drift packages". #1387's branch is **1 behind**.
+
+### Why this one needed more than a path diff
+
+`#1780` changed **`.llm/tools/docs/check-exports-drift.ts`** — the implementation behind
+`docs:exports-drift`, which is a **contracted gate** in #1387's plan (`G-EXPORTS`), on a leaf that
+grows public surface. A file-path diff alone would have said "disjoint" and moved on; but when the
+drift changes a *gate's implementation* rather than the code under test, disjoint paths do not imply
+an unchanged outcome. The gate could newly fail for reasons that have nothing to do with this leaf.
+
+### Two measurements, not one
+
+**Coverage** — the six adopted packages are `aspire`, `cli`, `cron`, `database`, `kv`, `logger`. None
+is `contracts`, `sdk`, `service` or `plugin`. `git diff --name-only 24f6642f..2a65a8cd -- packages/contracts
+packages/sdk packages/service packages/plugin` → **0 files**; generated carriers → **0 files**.
+
+**Outcome** — the decisive test. I applied `main`'s new `check-exports-drift.ts` onto #1387's head
+`c0d61e64` and ran the gate:
+
+```text
+Exports & Symbols drift check: PASS      (exit 0)
+```
+
+So the newer tool, with six more packages under coverage, still passes on this leaf's tree. The drift
+is inert **in effect**, not merely in file paths — which is the claim worth making, and the only one
+that would have caught a regression if the six new packages had been dirty here.
+
+### Ruling — no integration
+
+We are at a **safe slice boundary**: Slice 1 is complete and Tier-A accepted, Slice 2 has not started.
+That is precisely when integration would be cheapest — and it is still not justified, because the
+measured outcome is unchanged. Integrating would move the head and re-run gates for no possible change
+in result.
+
+Consistent with how this lane has ruled all three advances: **#1731 integrated twice** (the drift
+landed on the shared-asset surface it was regenerating — outcome could and did change); **#1730 did
+not** (0 files in its surface); **#1387 does not** (0 files in its surface *and* the changed gate tool
+verified PASS on its tree). Integrate when the drift can change a result — established by measurement,
+not by whether paths happen to overlap.
+
+Slice 2 will pick up `2a65a8cd` naturally at its own convergence point if the plan calls for one.
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | SHIPPED |
+| #1730 / PR #1763 | SHIPPED |
+| #1387 / PR #1762 | **active** — Slice 1 Tier-A `ACCEPTED` at content `2ddd6048`; bounded plan re-evaluation then Slice 2 |
+| #1664 | parked at `20337441788b` |
