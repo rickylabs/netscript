@@ -2,8 +2,9 @@
 
 ## Current Phase
 
-PLAN-EVAL cycle 1 returned harness `PASS` / PR `APPROVED` at plan commit `13402d3f`. S7 is the
-test-only red-before slice; no S8/S9 product implementation has landed yet.
+PLAN-EVAL cycle 1 returned harness `PASS` / PR `APPROVED` at plan commit `13402d3f`. S7 is committed
+red-before. S8 now owns the shared AI selector and v1 inspection document; S9 host consumption has
+not landed yet.
 
 ## S7 Evidence
 
@@ -37,6 +38,18 @@ is `plugin doctor stays healthy when AI generation excludes the skill-loader fac
   `EmptyPluginRegistryError`.
 - PE-11: `supervisor.md` now records the PLAN-EVAL pass rather than `N/A`.
 
+## S8 State
+
+- AI manifest advertises `inspectionProtocol: 1`.
+- `selectAiRegistrySources` is the only selection pipeline used by both `compileAiRegistry` and the
+  plain `inspectAiRegistries` builder.
+- The CLI inspect path validates its required invocation args, loads the inline manifest JSON, and
+  directly serializes the builder's v1 document without compile writes/progress logs.
+- PE-2 is proven on one two-target fixture: every inspect `sourceFiles` array deep-equals the matching
+  compile `files` array, including order; inspect writes remain empty.
+- Focused AI compiler suite: 9/0. Full structured AI plugin suite: 32/0. S8 structured check/format:
+  zero diagnostics/findings.
+
 ## Locked Contract
 
 - Optional `runtimeRegistryGenerator.inspectionProtocol: 1`.
@@ -51,11 +64,9 @@ is `plugin doctor stays healthy when AI generation excludes the skill-loader fac
 
 ## Remaining Slices
 
-1. S8 — shared pure selector, plain inspect report builder, CLI serialization, AI manifest
-   advertisement, direct inspect/compile equivalence tests, selector no-write proof.
-2. S9 — host parsing/validation via `ProcessPort`, fail-closed/legacy behavior, neutral error title,
+1. S9 — host parsing/validation via `ProcessPort`, fail-closed/legacy behavior, neutral error title,
    empty-total behavior, evidence wording, focused green and byte-snapshot proof.
-3. S10 — exact author-owned gates and evidence; required `scaffold.runtime` remains
+2. S10 — exact author-owned gates and evidence; required `scaffold.runtime` remains
    supervisor-coordinated under the singleton lease.
 
 Each slice commits, explicitly pushes, posts one structured PR comment, updates PR evidence, and

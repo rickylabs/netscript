@@ -481,3 +481,35 @@ No assertion is weakened or bypassed. S8 must not amend this test to manufacture
 The PR remains draft with `Closes #1673`; no issue, acceptance box, label, readiness state, or runtime
 resource was mutated. PLAN-EVAL findings are incorporated into the current plan/worklog/context and
 the next allowed slice is S8 only.
+
+## S8 — Shared AI Selector and Inspection Document
+
+### Scope
+
+- `plugins/ai/scaffold.runtime.json` advertises exactly `inspectionProtocol: 1`.
+- `ai-registry-compiler.ts` owns `selectAiRegistrySources`, used by normal compilation and the plain
+  `inspectAiRegistries(files, targets)` report builder.
+- `generate-runtime-registries.ts` accepts the locked inspect args, reads the inline manifest JSON,
+  and only serializes the returned v1 report in inspect mode. Normal compile logging/writes remain on
+  the existing path.
+- No CLI host consumption, doctor change, or test-path change landed in S8.
+
+### PE-2 and no-write evidence
+
+The compiler test uses one source fixture with both manifest targets, including a ready tool,
+excluded `skill-loader.ts` factory, and agent. For each target it deep-compares the plain inspect
+report's `sourceFiles` to `compileAiRegistry(...).files`; membership and order are identical. The
+inspect `MemoryProjectFiles.written` map equals its pre-call snapshot.
+
+| Gate | Result |
+| --- | --- |
+| Focused structured AI compiler test | exit `0`; `passed=9 failed=0`. |
+| Full structured AI plugin suite | exit `0`; `passed=32 failed=0`. |
+| Structured check over S8 TypeScript paths | exit `0`; 3 selected, zero diagnostics. |
+| Structured format over S8 TypeScript paths | exit `0`; 3 selected/processed, zero findings. |
+
+### Reconcile
+
+S7 remains the unmodified red contract until host consumption lands in S9. The PR remains draft;
+no runtime lease, issue/acceptance mutation, label/readiness change, dependency, export, or lockfile
+change was made. S9 is the next allowed slice.
