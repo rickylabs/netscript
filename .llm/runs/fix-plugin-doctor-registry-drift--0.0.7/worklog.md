@@ -100,6 +100,8 @@ mandatory in a fresh opposite-family session.
 | 2026-08-30T06:49Z | 4 | Durable fitness evidence | `quality-gate` and package-scoped `doc-lint` receipts both attest `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`, exit `0`, outcome `PASS`. |
 | 2026-08-30T06:50Z | 4 | Publish/cascade evidence | CLI publish dry-run, `check:mcp-export-corpus`, and `check:publish-assets` exited `0`; `check:assets-barrel` is inapplicable because no template or `kernel/assets` path is in the six-file ceiling. |
 | 2026-08-30T06:50Z | 4 | Lock hygiene | Raw worktree and pinned-base comparisons both exited `0`: `deno.lock` is byte-unchanged through the final product head. |
+| 2026-08-30T08:43Z | 5 | Tier-A evidence repair | Wrapped the S3-added `@std/path` import in authorized product path 2, then re-derived every remaining scoped-format finding from its exact first reported hunk rather than its file. |
+| 2026-08-30T08:43Z | 5 | Focused validation | Focused structured test exited `0`: `passed=5 failed=0`; exact six-file structured check and lint both exited `0`; raw `git diff --exit-code -- deno.lock` exited `0`. |
 
 ## Decisions
 
@@ -122,11 +124,24 @@ mandatory in a fresh opposite-family session.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Red-before regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --pretty -- --allow-all packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts` | EXPECTED_FAIL | Exit `1`; `passed=0 failed=1`; `AssertionError: Expected function to reject.` This is the required baseline defect evidence, not a product-gate failure. |
-| Focused green regression | same structured wrapper and test path | PASS | Exit `0`; `passed=5 failed=0`; covers late source, reverse orphan, imported-but-unused binding, aligned evidence, and no-target wording. |
+| Focused green regression | same structured wrapper and test path | PASS | S5 rerun exit `0`; `passed=5 failed=0`; covers late source, reverse orphan, imported-but-unused binding, aligned evidence, and no-target wording. |
 | Related doctor/generator tests | structured wrapper over the five locked test paths | PASS | Exit `0`; `passed=47 failed=0`. |
-| Exact-file type check | `run-deno-check.ts` over all six ceiling paths | PASS | Exit `0`; six files selected; zero diagnostics. |
-| Exact-file lint | `run-deno-lint.ts` over all six ceiling paths using a scratch copy of the root lint rules without the root's `packages/cli` exclusion | PASS | Exit `0`; six selected/processed, zero findings. Receipt: `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/scoped-lint.json`. |
-| Exact-file format | `run-deno-fmt.ts` over all six ceiling paths using a scratch copy of the root format rules without the root's `packages/cli` exclusion | FAIL (ATTRIBUTED) | Exit `1`; six selected/processed, four findings. A pristine archive of base `13878a80a` has the same three findings in the existing generator, doctor use case, and composition root; the fourth is the accepted S2 regression test at dispatch start and was not altered to manufacture green. Evidence: `scoped-fmt.json` and `main-existing-scoped-fmt.json`. |
+| Exact-file type check | `run-deno-check.ts` over all six ceiling paths | PASS | S5 rerun exit `0`; six files selected; zero diagnostics. Receipt: `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/s5-scoped-check.json`. |
+| Exact-file lint | `run-deno-lint.ts` over all six ceiling paths using a scratch copy of the root lint rules without the root's `packages/cli` exclusion | PASS | S5 rerun exit `0`; six selected/processed, zero findings. Receipt: `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/s5-scoped-lint.json`. |
+| Exact-file format | `run-deno-fmt.ts` over all six ceiling paths using a scratch copy of the root format rules without the root's `packages/cli` exclusion | FAIL (LINE-ATTRIBUTED) | S5 rerun exit `1`; six selected/processed, four file findings. Three first reported hunks are base-proven on the same source line; the regression-test finding is leaf-owned. Evidence: `s5-scoped-fmt.json` and `main-existing-scoped-fmt.json`; exact ownership follows. |
+
+#### S5 format finding ownership
+
+| Finding path | Head first reported hunk | Base comparison | Ownership / action |
+| --- | --- | --- | --- |
+| `generate/plugins/installed-runtime-registry-generator.ts` | line 18, `type GenerateInstalledPluginRegistries,` | exact same source line at base line 9 | Base-owned. The different leaf-owned line-2 `@std/path` hunk was fixed in S5 with the formatter's multi-line import form. |
+| `plugins/doctor/doctor-plugin-use-case.ts` | line 19, `import {` for `jsr-export-map-loader-port.ts` | exact same source line at base line 19 | Base-owned. |
+| `root/public-command-dependencies.ts` | line 1, `import {` from `@netscript/plugin/sdk` | exact same source line at base line 1 | Base-owned. |
+| `plugins/doctor/doctor-plugin-registry-drift_test.ts` | line 9, `import {` for `jsr-specifiers.ts` | file absent at base | Leaf-owned. Not fixed because S5 authorizes only product path 2 and forbids test changes. |
+
+The S2 case was refactored in S3 to share `createDoctorHarness` with four added cases; its original
+case name and all four assertions remain, with no assertion weakened or removed. Its format finding
+is therefore the leaf's own, not inherited evidence.
 
 ### Fitness Gates
 
@@ -144,7 +159,7 @@ mandatory in a fresh opposite-family session.
 | `check:mcp-export-corpus` | PASS (measured negative) | Exit `0`; corpus SHA-256 `88011e6e459097ba4c74111063dbef13a95823702bd37447f358bc19375cc262`, 35 packages/270 subpaths/7,614 symbols | Required by supervisor despite plan reasoning; no generated corpus drift. |
 | `check:publish-assets` | PASS (measured negative) | Exit `0` | Required by supervisor despite plan reasoning; checked publish assets are current. |
 | `check:assets-barrel` | N/A | six-file product ceiling | No template or `kernel/assets` path is changed, so the assets-barrel derivative has no input in this leaf. |
-| `deno.lock` | PASS | raw `git diff --exit-code -- deno.lock` and `git diff --exit-code 13878a80a50c55b9662099fed64555f2310ae4a3 e5123a0e4f3d6844dbc173d5b09249a24e637fb8 -- deno.lock` | Both exit `0`; byte-unchanged. |
+| `deno.lock` | PASS | raw `git diff --exit-code -- deno.lock` plus the accepted pinned-base comparison | S5 raw worktree command exited `0`; byte-unchanged. |
 
 ### Runtime Gates
 
@@ -162,9 +177,10 @@ mandatory in a fresh opposite-family session.
 
 - Tier-A should inspect the source-file discovery contract, import-binding comparison, and exact
   healthy/error wording first.
-- Final product/gate head is `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`; the S4 commit contains
-  evidence-only run-artifact updates.
-- Scoped format remains transparently red with three base-proven existing findings and one inherited
-  accepted-S2-test finding; no product or test source was reformatted outside the locked slices.
+- S5 repairs the leaf-owned generator import formatting and the inaccurate S4 evidence statement;
+  its commit hash is recorded in the structured PR comment after the explicit-refspec push.
+- Scoped format remains transparently red: the generator, doctor use-case, and composition-root
+  first hunks are base-proven on the same source lines; the regression-test finding is leaf-owned
+  and intentionally untouched because S5 authorizes only product path 2 and forbids test changes.
 - Runtime gates remained unauthorized and were not run. No architecture debt entry was created.
 - This implementation author does not provide a sign-off or IMPL-EVAL verdict.
