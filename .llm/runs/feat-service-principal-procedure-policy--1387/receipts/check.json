@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "1387-s9-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--include",
+    "^packages/(contracts|service|plugin|mcp)/"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/s1387-s9-recut",
+  "gitHead": "3cb08103ff9c25ff3ec580301b5936586b13d37e",
+  "actualGitHead": "3cb08103ff9c25ff3ec580301b5936586b13d37e",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:583921",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "5b279ccdcacbf0955fd22ca1e1f20e2ff329a5b903abac2c519608450f72fef4",
+  "lifecycleId": "worker:583921:1387-s9-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T23:28:55.151Z",
+  "startedAt": "2026-08-30T23:28:55.153Z",
+  "finishedAt": "2026-08-30T23:29:05.212Z",
+  "durationMs": 10060,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 304,
+    "sha256": "7469d53ae0932f71f5af87dd6b1a18edd7b631769eec781eea716dbc2b3f8f36",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/s1387-s9-recut\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":344,\"batches\":3,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 729,
+    "sha256": "e414a6be664d54852119489b5e44de78d94919dd542a995a6c24b1beff866d4c",
+    "tail": "\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Ignored build scripts for packages:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:lmdb@3.5.5\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:msgpackr-extract@3.0.4\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Lifecycle scripts are only supported when using a `node_modules` directory.\n\u001b[0m\u001b[33m│\u001b[0m  Enable it in your deno config file:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[1m\"nodeModulesDir\": \"auto\"\u001b[0m\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(contracts|service|plugin|mcp)/'\n",
+    "truncated": false
+  }
+}

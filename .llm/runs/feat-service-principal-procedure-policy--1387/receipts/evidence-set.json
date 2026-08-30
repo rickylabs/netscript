@@ -5,6 +5,7 @@
   "expectedGateIds": [
     "agent-docs-prose",
     "assets-barrel",
+    "check",
     "docs-tagline",
     "exports-drift",
     "fmt-check",
@@ -18,6 +19,7 @@
   "receiptIds": [
     "1387-s9-agent-docs-prose",
     "1387-s9-assets-barrel",
+    "1387-s9-check",
     "1387-s9-docs-tagline",
     "1387-s9-exports-drift",
     "1387-s9-fmt-check",

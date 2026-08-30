@@ -4,33 +4,35 @@
   "argv": [
     "deno",
     "task",
-    "fmt:check"
+    "fmt:check",
+    "--include",
+    "^packages/(contracts|service|plugin|mcp)/"
   ],
-  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "cwd": "/home/agent/projects/netscript/worktrees/s1387-s9-recut",
   "gitHead": "3cb08103ff9c25ff3ec580301b5936586b13d37e",
   "actualGitHead": "3cb08103ff9c25ff3ec580301b5936586b13d37e",
   "timeoutMs": 1800000,
-  "runnerIdentity": "codex-slice-9",
+  "runnerIdentity": "worker:586853",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "4686be8427e1e6f8773d50ec0c8e3d160bf3c812649792b53c7d2427fcb54d55",
-  "lifecycleId": "codex-slice-9:1387-s9-fmt-check:1",
+  "requestHash": "7dd25e84066bf3d04fe8df11883add5153baeeb1071f2921a5bac6051707ddbc",
+  "lifecycleId": "worker:586853:1387-s9-fmt-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T23:18:02.967Z",
-  "startedAt": "2026-08-30T23:18:02.971Z",
-  "finishedAt": "2026-08-30T23:18:06.116Z",
-  "durationMs": 3145,
+  "claimedAt": "2026-08-30T23:29:06.905Z",
+  "startedAt": "2026-08-30T23:29:06.907Z",
+  "finishedAt": "2026-08-30T23:29:07.731Z",
+  "durationMs": 824,
   "exitCode": 0,
   "stdout": {
-    "bytes": 308,
-    "sha256": "7bd17f4b549fffe788d31d2d0adcbd9fb6a1a65dfd9885a20ffb2de68f8c9768",
-    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"mode\":\"check\",\"summary\":{\"filesSelected\":2056,\"batches\":36,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":2056,\"filesProcessed\":2056,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
+    "bytes": 305,
+    "sha256": "393a81d438d0907369a37f527cdc9cda40d1d7daf9cea9cdeaeae558d487f9b8",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/agent/projects/netscript/worktrees/s1387-s9-recut\",\"mode\":\"check\",\"summary\":{\"filesSelected\":343,\"batches\":5,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":343,\"filesProcessed\":343,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
     "truncated": false
   },
   "stderr": {
-    "bytes": 231,
-    "sha256": "08f3e7cfb1d83f57b2cc1b3ae21e91f08d4305ce2e5a30b4e9a584029fc6364d",
-    "tail": "Task fmt:check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings\n",
+    "bytes": 313,
+    "sha256": "90280f3d6337cc06876fc4e3965ffda9332a769f7c4a2dcf9cc9d3f89d300bf3",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--include' '^packages/(contracts|service|plugin|mcp)/'\n",
     "truncated": false
   }
 }
