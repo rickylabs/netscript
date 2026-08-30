@@ -29,7 +29,7 @@ const COMPAT_FIXTURES: readonly CompatFixtureExpectation[] = [
   },
   {
     path: 'packages/mcp/tests/telemetry-live-fixture_test.ts',
-    state: 'pending-lease',
+    state: 'required',
   },
 ];
 
