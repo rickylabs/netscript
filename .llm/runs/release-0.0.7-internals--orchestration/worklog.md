@@ -5652,3 +5652,35 @@ confirmed `working` throughout.
 - Redundant leftover file `evaluate-merged-head-prompt.md` (drafted by the still-active generator
   toward a rerun the owner explicitly prohibited) left **uncommitted**, per instruction, rather than
   deleted — does no harm untracked.
+
+## D-106 — Routing leaf metadata correction, refresh-artifact rollback, two Augment findings confirmed real and steered back to Codex
+
+- **Confirmed local `bb1fe8daa` never reached origin** (`git branch -r --contains` empty); reset
+  hard to `6fe9f3b32`, verified `local == origin == 6fe9f3b326309e17595d079a97d8106db488430f`
+  exactly, worktree clean — no revert commit needed since nothing public existed to revert.
+- **`evaluate-merged-head.md`** (a genuine, autonomously-produced IMPL-EVAL currency refresh from a
+  distinct session, triggered by the leaf's own new `@openhands-agent` dispatch convention, not by
+  the supervisor) was initially committed, then removed per explicit coordinator ruling: it evaluated
+  the obsolete pre-repair head `1f5bda258`, superseded by the accepted `d9722b0b` PASS. Not
+  preserved.
+- **Labels normalized**: both PR #1792 and issue #1791 now carry sole `status:ready-merge` (PR had
+  reverted to `status:impl-eval` after the CI/label churn above).
+- **Two Augment medium-severity findings on #1792, both independently verified real against the
+  actual source before any reply:**
+  1. `provider-canary-adapter.ts:132` — `responseNonEmpty` stringifies the *entire* event object
+     and searches for the marker anywhere in it, so a thinking/tool-input event echoing the prompt
+     text (which itself contains the marker) would satisfy the check with no visible assistant
+     output — exactly the false-green class the canary exists to prevent.
+  2. `openhands-phase-eval.yml:296-300` — the override-label branch takes the labeled model
+     unconditionally before ever consulting `phase`, so `eval:model:glm` on `phase=plan` or
+     `eval:model:qwen` on `phase=impl` silently bypasses the just-established phase-specific default.
+  - Initially replied acknowledging both as real but deferred (filed as follow-up hardening) —
+    **superseded by owner ruling that both must be fixed before merge**, with named regression
+    tests for each (marker-in-thinking-but-empty-assistant-output; both wrong-phase override cases).
+- **Steered back to the routing leaf's own active Codex thread (`01a05481`), not implemented
+  directly** — this is real production-logic + new-test authorship, not the earlier mechanical
+  rename exception, so it stays on the doctrine-correct implementation lane. Watching for genuine
+  turn-idle (task `b289wc7l7`) before firing the single steering send, per the one-send-at-a-time
+  `codex-resume` discipline.
+- Explicitly deferred per instruction: no DeepSeek rerun, no PLAN-EVAL. Exactly one fresh
+  separate-session exact-head IMPL-EVAL on GLM 5.3 Flash / max is queued for after the fix lands.
