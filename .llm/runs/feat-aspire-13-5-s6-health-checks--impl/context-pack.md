@@ -12,10 +12,9 @@
 
 ## Current State
 
-Harness bootstrap, research, plan, design, and drift re-baseline are complete on stacked S5 head
-`0bd8ba832`. Slice 1 helper implementation is green locally and ready to commit/push. `PLAN-EVAL:
-N/A` is justified by the ratified locked issue; the Fable supervisor retains slice review and
-IMPL-EVAL.
+Harness bootstrap and slice 1 are committed/pushed on draft PR #1743. Slice 2 generator emission is
+green locally after a RED gate. `PLAN-EVAL: N/A` is justified by the ratified locked issue; the
+Fable supervisor retains slice review and IMPL-EVAL.
 
 ## Completed
 
@@ -24,15 +23,19 @@ IMPL-EVAL.
 - Selected Archetype 6 and the required gate set.
 - Added generated-template TCP/RESP helper tests RED→green (8 passed).
 - Added one-socket helper implementation with 2000 ms timeout and exact result data.
+- Committed/pushed slice 1 as `54fdf19fe735fea793e3548825bd3f3015044461` and opened the correctly
+  stacked draft PR with its implementation trail.
+- Added per-kind TCP/RESP registration, live endpoint projection, attachment, non-emission, and
+  credential-isolation tests; the combined focused suite passes 53 results.
 
 ## In Progress
 
-- Slice 1 commit/push and stacked draft PR opening.
+- Slice 2 commit/push and draft PR trail update.
 
 ## Next Steps
 
-1. Commit/push slice 1 and open the stacked draft PR.
-2. Continue generator, asset, E2E, and gate slices with per-commit PR comments.
+1. Commit/push slice 2 and update the stacked draft PR.
+2. Regenerate and verify the snapshot/asset barrel for slice 3.
 
 ## Key Decisions
 
@@ -50,13 +53,16 @@ IMPL-EVAL.
 | `.llm/runs/feat-aspire-13-5-s6-health-checks--impl/*` | new | Harness bootstrap/research/plan/design/drift. |
 | `packages/cli/src/kernel/assets/aspire/helpers/_aspire-compat.ts.template` | changed | TCP/RESP readiness helper runtime edge. |
 | `packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts` | new | Generated-template real-socket tests. |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts` | changed | Per-kind custom check registration and resource attachment. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts` | changed | Exact emission and credential-boundary tests. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts` | changed | Updated import composition expectation. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | slice 1 green | structured test/check; raw config-excluded lint/fmt |
-| Fitness | slice 1 green | `quality:scan`, `arch:check` exit 0 |
+| Static | slices 1–2 green | structured test/check; raw config-excluded lint |
+| Fitness | slices 1–2 green | per-slice `quality:scan`, `arch:check` exit 0 |
 | Runtime | NOT_RUN | no Phase-A lease |
 | Consumer | pending | implementation not started |
 
