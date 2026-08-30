@@ -6071,3 +6071,48 @@ reused scratch AppHost project (`plugin-smoke-20260830-220506`) confirmed still 
 
 Existing DeepSeek receipts (`54c72a970` for #1739, shipped) untouched, not rerun — irrelevant to
 either leaf currently in flight, no evaluator work was in scope for this maintenance pass.
+
+### #1781 lease-backed run: two genuine runtime-only findings, both fixed and proven. My relay-teardown error recorded.
+
+**Attempt 1 at `da5084381`**: `scaffold.ui-data-screen: FAILED` — "no query client found" — before any
+container started. Read the gate implementation and `findBinding` fully: the fallback hardcoded a
+single literal path (`routes/examples/service/(_lib)/service-query.ts`), but the real scaffolded
+example directory is named after the actual service (`users`, not `service`). Confirmed by inspecting
+the scaffolded project on disk directly. **Fixed**: scan every subdirectory of `routes/examples/` for
+`(_lib)/service-query.ts` instead of one hardcoded path, preserving the existing
+ambiguous/none candidate-count semantics. Red-before/green proven (8/9 → 9/9, existing 8 cases
+unaffected). Pushed `41e9b4c5e`.
+
+**Attempt 2 at `41e9b4c5e`**: `scaffold.ui-data-screen: PASSED` — the fix works under real runtime.
+Suite continued into plugin/quality gates and failed later at `generated.deno-fmt-check` on the
+GENERATED PROJECT's own files. Ran `deno fmt --check` directly on the emitted island file to get the
+exact diff rather than guess: both `dataIslandTemplate` and `queryIslandTemplate` emit
+`return <QueryIsland><NameData .../></QueryIsland>;` as one line, which `deno fmt` reflows once the
+component name pushes past line width. This predates both fixes — the template was simply never
+reached with real output before, since `findBinding` always threw first. **Fixed**: both templates
+now emit the multi-line JSX form. Verified the hand-written replacement is itself fmt-stable by writing
+it to disk and running `deno fmt --check` directly (exit 0) rather than trusting it by inspection.
+Regressions added to both existing tests that exercise each template. Red-before/green proven (7/9 →
+9/9). Pushed `a34c37eb2`.
+
+Both findings are exactly the class the runtime gate exists to catch — unit-test fixtures encoded the
+same wrong assumptions the product code made, so nothing short of a real generated-project run would
+have surfaced either.
+
+**My error: I never tore down the relay watcher after attempt 2 finished.** It stayed armed and,
+still polling `docker ps` for any new host container, auto-attached to whatever appeared next — which
+turned out to be #1758/internals' AppHost containers after their lease started, producing three
+`relay-fix1781-runtime-*` hop-A containers against resources that were never mine. Coordinator flagged
+it; by the time I checked, all three were already gone and my watch process (PID 450446) was already
+dead, containers at 0 overall. One anonymous, unlabeled volume remains with no traceable owner —
+**left alone and reported rather than guessed at**, since the instruction was explicit about not
+touching #1758's resources and I have no positive attribution for it.
+
+**Rule for next time, recorded so this doesn't repeat**: a relay watcher must be torn down
+(`cleanup`, or SIGTERM the watch PID) the moment its run finishes — pass or fail — never left armed
+"just in case," because it does not know which run's containers it should or shouldn't attach to.
+
+**Not requesting attempt 3.** Per instruction: waiting for #1758's terminal cleanup report and an
+explicit coordinator regrant before touching the lease again. #1781 stays static-only in the
+meantime — both fixes are committed, pushed, and gate-verified; only the runtime proof itself remains
+outstanding.
