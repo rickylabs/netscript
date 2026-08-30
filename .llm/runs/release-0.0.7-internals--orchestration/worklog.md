@@ -4511,3 +4511,41 @@ file, the commit graph, and token movement over a real interval.
   required.
 
 PLAN-EVAL is queued behind #1533's cycle-2 evaluator in the single per-topic slot.
+
+## 2026-08-30 — main `de57fab0` reconciled as INERT for every active lane; no re-anchor
+
+`origin/main` = `de57fab0e220203567367b6852f918dc71f296a6` (#1772 Aspire background-reference
+preflight docs; #1770 shipped). Measured rather than assumed, against each active lane's actual
+surface:
+
+| Lane surface | Files touched by `3e5cbabf..de57fab0` |
+| --- | ---: |
+| #1533 gate tooling (`.llm/tools/docs`, `.llm/tools/gates`, `deno.json`) | **0** |
+| #1533 corpus — changed `@example` lines across `packages/**` + `plugins/**` | **0** |
+| #1734 `packages/fresh/src/application/query` | **0** |
+| #1774 `.claude/**` + `.llm/tools/agentic/claude/**` | **0** |
+
+The 16-file delta is Aspire documentation plus `agent-docs.generated.ts` and
+`publish-assets.generated.ts`.
+
+**Inert-main currency applied: no lane re-anchored.** Each also has a reason beyond inertness, and
+the reasons matter more than the measurement:
+
+- **#1533** is sealed, evaluated `PASS`, and unpushable pending a `workflow`-scoped credential.
+  Rebasing a sealed carrier would invalidate a census and a verdict to gain nothing — and would move
+  the head the acceptance-evidence block and close gate were computed against.
+- **#1734** is parked at the owner boundary awaiting the guard-shape decision. Touching it would
+  disturb a leaf explicitly held for a decision that is not mine.
+- **#1774** has a **live PLAN-EVAL** (`15148c8e`) running against `26102943`. Re-anchoring under a
+  running evaluator produces a verdict naming a head the branch has left — the #1644 debt this run
+  has now avoided four times deliberately.
+
+**Recorded for whoever re-anchors later:** both generated assets moved again, so the eventual rebase
+of #1533 must re-run `gen:agent-docs-prose` / `gen:publish-assets` / `gen:assets-barrel` mechanically
+and re-verify `check:assets-barrel` + `check:publish-assets`. #1533 already regenerated
+`export-surface-corpus.generated.ts` once at its I6 re-anchor; that is the file most likely to conflict.
+
+The correct re-anchor point remains the documented convergence point — immediately before the final
+gate run — not "whenever main moves". Main has now advanced four times during this leaf's life
+(`952cc106`, `a5520e70`, `3e5cbabf`, `de57fab0`) and only **one** of those, `3e5cbabf`, was
+non-inert and warranted action.
