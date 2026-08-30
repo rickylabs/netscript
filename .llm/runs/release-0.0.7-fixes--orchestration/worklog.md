@@ -5708,3 +5708,26 @@ No new leaf dispatched. Read the instruction as "keep serving the items already 
 everything that doesn't need the host," not as license to open a fifth concurrent thread unbidden —
 #1758/#1739/#1781's own next steps are all runtime-gated identically to #1764's, and the four already
 in flight are the queue.
+
+### CORRECTION to the immediately preceding entry — #1764 is runtime-open, not closed
+
+The previous entry's "#1764's disposition items are both closed, statically, no host touched" is
+**wrong as written** and is corrected here rather than edited in place, per the rule that a retraction
+states before/after rather than silently rewriting history.
+
+**What is actually true:**
+- The only structured JSON report that exists for this leaf's Flow-B work is
+  `flow-b-scaffold-runtime-5b526e4bc-attempt2.json` — **79/1, topology proof only**. It terminates at
+  `cleanup.aspire-stop`, before `createOtelGates()`'s gates ever ran, and contains **zero** `otel`-
+  prefixed step ids. It is not evidence for TC-6/TC-7/TC-9.
+- The corrected bounded/targeted script was **stopped before it reached runtime** (killed at PID
+  `3746647` while still in its wrong, overscoped first form) and **produced no report JSON at all**.
+  There is no second, targeted report to point to.
+- What was actually "closed" in that entry were two narrower, genuinely static sub-questions: (a) the
+  browser-gate N/A classification (verified byte-identical to main, host-wide Chromium absence — this
+  one holds), and (b) whether I had a bounded plan ready versus needing to record a gap (I had written
+  one). Calling the *leaf* "closed" conflated those two narrow items with #1764's actual acceptance
+  state. That was my error.
+
+**Corrected status: #1764 is runtime-open. TC-6/TC-7/TC-9 are unproven. Not merge-ready.**
+`status:impl` stands (unchanged, was never moved to ready-merge); no PR/issue surface claims otherwise.
