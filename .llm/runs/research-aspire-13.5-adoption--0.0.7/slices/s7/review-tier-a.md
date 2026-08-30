@@ -36,3 +36,15 @@
 
 Consumer type-check (D-19): N/A — no generator/template change. No blocking finding.
 **Tier-A verdict: sign-off to IMPL-EVAL (phase A) at `473286671`.**
+
+## IMPL-EVAL cycle 1 (session `4cd5ba90`, head `473286671`) — `FAIL_FIX`
+
+- HIGH: `--force-persistent` runs `aspire stop --force` only after the scoped stop confirmed the
+  AppHost gone — S2 V6 shows that form exits 0 with "No AppHost is currently running" → silent
+  false-clean; S2 V7 shows `--force` acts only against a running AppHost. **Tier-A miss:** I
+  checked the gate/argv/refusal arms, not the lifecycle precondition against the S2 receipts.
+  Lesson (evaluator's, adopted): a receipt proves the command *in the state it was run*; exit 0
+  from `aspire stop` is not "stopped".
+- MEDIUM: slice-5 PR comment missing though the worklog claims it. LOW: `DCP_ENVIRONMENT_KEY`
+  env-key false positive untested; MCP processes dropped rather than surfaced (note only).
+- Fix brief sent on the thread (slice 6). Cycle 2 follows.
