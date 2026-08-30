@@ -171,3 +171,77 @@ S3 implementation, compatibility prose, generated derivatives, and gate evidence
 `1dd64dae`. S4 contains run-artifact reconciliation only. The draft PR must remain draft and retain
 its current labels/status until the mandatory separate opposite-family IMPL-EVAL and coordinator
 review complete; this implementation session does not self-certify or change issue acceptance.
+
+## Supervisor Tier-A sign-off — `bfad0c15`
+
+Reviewer is the fixes topic supervisor: not the author, not the plan evaluator. Every check below was
+re-derived independently — by re-running the command or by measuring against a pristine base worktree
+— never read out of the author's receipts.
+
+**Tier-A PASSES at this head.** A fresh, separate, opposite-family IMPL-EVAL remains mandatory before
+readiness.
+
+### The fix is proven structurally, not only behaviourally
+
+| Graph | Base `13878a80a` | Head `bfad0c15` |
+| --- | --- | --- |
+| `packages/sdk/mod.ts` | **19** browser-unsafe edges — KV modules, 2 `node:` edges, 5 logger modules | **0** |
+| `packages/sdk/src/presets/mod.ts` | — (entry did not exist) | **0** |
+
+Measured by re-implementing the leaf's own predicate over `deno info --json`. The SDK root no longer
+reaches `@netscript/kv`, `node:`, or the logger **at all**, so issue AC "production client chunks
+contain no server KV adapter" is demonstrated at graph level rather than asserted.
+
+### Exact-head gates, re-run
+
+| Gate | Result |
+| --- | --- |
+| Head identity | local == `origin` == PR #1758 `headRefOid` == `bfad0c15`; tree clean |
+| Ceiling containment | no path outside the locked ceiling |
+| `deno.lock` | byte-unchanged vs `origin/main` |
+| `packages/sdk/tests/` (whole suite, per M3) | exit 0 · **70 passed / 0 failed** |
+| `define-fresh-app.test.ts` | exit 0 · **11 passed / 0 failed** |
+| S2 regression at S3 head | exit 0 · 1 passed / 0 failed — **including the graph phase's first execution** |
+
+### The red-before holds in both directions, with one honest asymmetry
+
+| Head | State | Focused suite |
+| --- | --- | --- |
+| `ddf66a6f` | regression only, no product change | exit 1 · **0 passed / 1 failed** — `observed true`, no Deno-global crash |
+| `1dd64dae` | product change landed | exit 0 · 1 passed / 0 failed |
+
+The asymmetry, stated rather than glossed: the test throws on the child assertion at base, so **the
+graph half never executed there**. Its red-before rests on the supervisor's direct measurement (19
+edges at base), not on the committed test run, and its first execution is the green above. The author
+recorded this correctly in its own evidence.
+
+### Two declined reds, both re-derived against a pristine base worktree
+
+| Claim | Verdict |
+| --- | --- |
+| Full SDK `doc:lint` is baseline | **Confirmed.** exit 1 · 3 errors / 3 private-type refs / 0 missing JSDoc at **both** base and head — no new unique diagnostic. |
+| `surface:diff` is a measured negative | **Confirmed after correction (T-1).** Base **542** undeclared major; head **552**; the **+10** is entirely SDK-scoped (45 → 55) and is the intended surface change. |
+
+**T-1 was a real finding and is fixed.** The original row read "Repo baseline reports 559 undeclared
+major change(s)", which neither reproduced (552) nor distinguished baseline from head — it folded the
+leaf's own +10 into the baseline it was measured against. That is the same overstated-attribution
+class this leaf's brief carried forward from #1673's T-2, which is why it was held rather than waived.
+The corrected row now names base, head, delta, scope, and the head measured at.
+
+### Contract review
+
+- **Root is side-effect-free**: importing `defineServices` from the root leaves
+  `hasCacheProvider() === false`; the server provider is registered only by explicit bootstrap.
+- **Explicit server registration** lands in `defineFreshApp()`, with its own test proving the module
+  import is inert and the bootstrap call registers.
+- **Compatibility handled honestly**: the workspace publish dry-run initially failed six Fresh checks
+  caused by removing root `CachedEntry`/`CacheEntry`; resolved with **type-only** exports. The graph
+  measurement above confirms no server edge returned.
+- **Generated cascade executed in the corrected order** — precheck (expected stale) → generate →
+  recheck PASS, for MCP corpus, agent-docs prose, and publish-assets alike.
+
+### Not done here, by design
+
+No readiness flip, merge, relabel beyond phase truth, issue edit, or acceptance-box tick. No
+`e2e:cli`/Aspire/Docker/browser gate ran and no runtime lease was requested — this leaf's ceiling
+touches none of that surface.
