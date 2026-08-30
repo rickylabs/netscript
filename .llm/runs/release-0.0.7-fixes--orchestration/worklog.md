@@ -2370,3 +2370,53 @@ that reading is this supervisor's, was recorded as such, and a plan evaluator is
 place to confirm or reject it.
 
 Dispatch is one command once the amended plan commit lands; a watcher is armed on that head.
+
+### Close-gate baseline run early, and it found a readiness blocker already in the PR body
+
+Ran `.llm/tools/validation/check-close-gate.ts --repo rickylabs/netscript --pr 1739` at head
+`349d5915` rather than waiting for readiness, on the principle that a gate which will run later is
+cheaper to read now. It needs `GH_TOKEN`/`GITHUB_TOKEN` in the environment — `gh auth token` supplies
+it; without it the tool aborts before evaluating anything.
+
+Verdict `FAIL`, as expected mid-work. Two results are already useful:
+
+**Confirmed correct.** The closing reference resolves — `closing issues: #1673`,
+`closing reference: #1673 source: body keyword`. The keyword obligation is genuinely satisfied, not
+merely present as text. The five #1673 acceptance boxes are correctly unticked; this lane mirrors
+evidence and never ticks issue boxes, which stay coordinator-owned.
+
+**A blocker found early.** PR #1739's Definition-of-Done still carries line 93:
+
+> Workers report selection covers profiles, includes, conditional includes, plugin directories,
+
+That box is a leftover from the pre-ruling 24-path plan. **Workers is now deferred follow-up scope**,
+so as written the close-gate would demand evidence for work this leaf is forbidden to do, and an
+unticked DoD box blocks readiness. Left unnoticed it would have surfaced at the readiness step, after
+S7 and the IMPL-EVAL — the most expensive possible moment to discover a scope contradiction.
+
+Queued for the author in the same amendment: drop or explicitly defer that box, and align the whole
+DoD list to the re-locked 11-path ceiling so every box is something this leaf can actually evidence.
+Nothing gets ticked yet — the gate's own rule is that a box is ticked only once its claim is true and
+evidenced.
+
+### Pipeline staged so the remaining stages do not each need a stop
+
+- **PLAN-EVAL brief** — focused and bounded, F1 explicitly off-limits, Fable 5 · medium.
+- **Exact-head gate runner** (`gates-1673.sh`) — head identity, ceiling containment against the
+  authorized 11 (flagging the interpretation-allowed integration test distinctly), `deno.lock`,
+  focused + related + AI-plugin suites, scoped check/lint/fmt, the `check:mcp-export-corpus` /
+  `check:publish-assets` cascade, publish dry-run, `doc:lint`, `quality:gate`. `scaffold.runtime` is
+  deliberately excluded — it is supervisor-coordinated under the singleton lease, never author-run.
+- **PR-body DoD correction** — queued for the next same-thread delivery.
+
+### Author liveness — verified, and an earlier alarm corrected
+
+The turn looked dead: 76 seconds of rollout silence, agent absent from `codex-status`, and `plan.md`
+showing as **deleted** in the worktree. It was not dead — the rollout has since grown three times
+(8,275,580 → 8,339,136 → 8,354,008 → 8,379,158 bytes) and `plan.md` is back to modified. The deletion
+was the midpoint of a large rewrite, and the silence was one long tool call.
+
+The lesson is about the *detector*, not the incident: mtime staleness alone produces false deaths just
+as `state` alone produces false turn-boundaries. The watcher now distinguishes them properly — it
+reports ALIVE on rollout growth, exits on a head move, and only declares death after four consecutive
+minutes with no growth.
