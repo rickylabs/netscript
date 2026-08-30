@@ -12,6 +12,7 @@ const APPHOST = 'packages/cli/src/kernel/application/scaffold/render-ts-apphost.
 const APPSETTINGS = 'packages/cli/src/kernel/templates/aspire/generate-appsettings.ts';
 const GENERATOR =
   'packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-services.ts';
+const CONTRIBUTION = 'plugins/workers/src/aspire/workers-contribution.ts';
 
 Deno.test('rejects the generated line that shipped #952', () => {
   const { findings } = scanContent(
@@ -114,4 +115,56 @@ Deno.test('does not descend into generated runtime state', async () => {
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('rejects contribution fallback ports and loopback URL literals', () => {
+  const fallback = scanContent(
+    CONTRIBUTION,
+    'const port = ctx.port(WORKERS_API_RESOURCE, WORKERS_API_DEFAULT_PORT);',
+  );
+  const url = scanContent(
+    CONTRIBUTION,
+    'url: `http://localhost:${WORKERS_API_DEFAULT_PORT}/health`,',
+  );
+  assertEquals(fallback.findings.length, 1);
+  assertEquals(url.findings.length, 1);
+});
+
+Deno.test('accepts allocated contribution ports and resource references', () => {
+  const allocated = scanContent(
+    CONTRIBUTION,
+    'const port = ctx.port(WORKERS_API_RESOURCE);',
+  );
+  const reference = scanContent(
+    CONTRIBUTION,
+    "WORKERS_API_URL: { kind: 'resource', resource: WORKERS_API_RESOURCE, key: 'url' },",
+  );
+  assertEquals(allocated.findings, []);
+  assertEquals(reference.findings, []);
+});
+
+Deno.test('S5 runtime literal grep has only the compatibility export and its deprecation tests', async () => {
+  const pattern = String.raw`809[1-4]|4437|127\.0\.0\.1:80`;
+  const output = await new Deno.Command('git', {
+    args: [
+      'grep',
+      '-nE',
+      pattern,
+      '--',
+      'plugins',
+      'packages/cli/src',
+      'packages/cli/e2e',
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const stdout = new TextDecoder().decode(output.stdout).trim();
+  const lines = stdout.length === 0 ? [] : stdout.split('\n');
+  const unexpected = lines.filter((line) => {
+    const path = line.slice(0, line.indexOf(':'));
+    return path !== 'plugins/sagas/src/constants.ts' &&
+      path !== 'plugins/sagas/tests/public/deprecated-default-port_test.ts';
+  });
+
+  assertEquals(unexpected, []);
 });
