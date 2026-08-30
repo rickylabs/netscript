@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `fix-ui-add-data-screen-triad--0.0.7` |
 | Branch         | `fix/ui-add-data-screen-triad`        |
-| Current phase  | `implementation — S2C`                |
+| Current phase  | `implementation complete — handoff`   |
 | Archetype      | `6 — CLI / Tooling`                   |
 | Scope overlays | `frontend`                            |
 
@@ -14,9 +14,10 @@
 
 PLAN-EVAL cycle 2 returned terminal `PASS_PLAN` at `53e696b5` with verdict `886f0860`. The owner
 independently reproduced and accepted S2A at `e5d820b3f` and S2B at `0cc9b7ad7`. S2C has isolated
-test-only red commit `7ed5b94c6` and a green generated-consumer gate implementation: stable gate id,
-gate definition, capability registration, and explicit `scaffold.runtime` selection. Both whole
-package suites and checks are green without executing the runtime suite.
+test-only red commit `7ed5b94c6` and accepted green implementation head `dbb62c065`. S2D static,
+fitness, JSR, publish, emitted-sample, and three read-only derivative checks are green. Product
+implementation is complete and awaits supervisor Tier-A runtime evidence plus separate-session
+IMPL-EVAL.
 
 ## Completed
 
@@ -43,16 +44,21 @@ package suites and checks are green without executing the runtime suite.
 - Added the generated data-screen consumer gate and registered it with the scaffold capability set.
 - Explicitly selected the gate into `RUNTIME_GATES` after init and before generated-workspace check.
 - Proved S2C focused red 18/3 and green 21/0, nested E2E 170/0, and whole CLI 1,386/0.
+- Recorded the owner-reproduced whole E2E red at `7ed5b94c6`: exit 1, 167/3.
+- Proved S2D quality, architecture, CLI doc lint, JSR audit, CLI publish dry-run, emitted samples,
+  JSR specifiers, agent-docs prose, publish assets, and MCP export corpus at exit 0.
+- Kept the writing assets-barrel check and runtime gate `NOT_RUN`; lint/fmt remain N/A by config.
+- Corrected the two stale plan gate rows from 9 to 10 existing ceiling TS files.
 
 ## In Progress
 
-- Commit the S2C product/harness changes separately from `7ed5b94c6`, push by explicit refspec, and
-  post the single S2C evidence comment to PR #1781.
+- Commit/push the S2D run-artifact evidence and post the single S2D handoff comment to PR #1781.
 
 ## Next Steps
 
-1. Finish the S2C commit/push/comment trail.
-2. Run S2D static/fitness/read-only cascade evidence and prepare separate-session IMPL-EVAL.
+1. Supervisor acquires the singleton runtime lease and runs the required Tier-A
+   `scaffold.runtime --cleanup` gate.
+2. Dispatch separate-session IMPL-EVAL after the S2D artifact head is available.
 
 ## Key Decisions
 
@@ -83,14 +89,15 @@ package suites and checks are green without executing the runtime suite.
 
 | Gate family | Current status                  | Evidence                                                                                                       |
 | ----------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Static      | S2C PASS plus configured N/A lint/fmt | CLI 1,386/0; E2E 170/0; both checks exit 0. `packages/cli` is excluded from root lint/fmt.                |
-| Fitness     | PASS at base                    | quality, doctrine, docs, JSR, publish checks exit 0.                                                           |
-| Runtime     | REQUIRED / NOT_RUN              | supervisor-coordinated `scaffold.runtime`; author prohibited.                                                  |
-| Consumer    | PASS except intentional NOT_RUN | No corpus member is touched: three read-only checks stay green; writing assets-barrel remains supervisor-only. |
+| Static      | PASS plus configured N/A lint/fmt | CLI 1,386/0; E2E 170/0; package checks and S2D static gates exit 0.                                           |
+| Fitness     | PASS                              | Quality, architecture, doc lint, JSR audit, publish, samples, and specifier gates exit 0.                      |
+| Runtime     | REQUIRED / NOT_RUN                | Supervisor Tier-A; queued on singleton lease. D-42/D-43 topology is resolved.                                  |
+| Consumer    | PASS except intentional NOT_RUN   | Three read-only cascade checks exit 0; writing assets-barrel remains prohibited.                              |
 
 ## Open Questions
 
-- No S2C question remains open. Runtime execution remains a required supervisor handoff. The
+- No implementation question remains open. Runtime execution and IMPL-EVAL remain required
+  supervisor/separate-session handoffs. The
   command-owned real `--help` is the only in-leaf documentation proof; deferred
   `cli-reference.md:104` remains knowingly stale.
 
@@ -109,3 +116,4 @@ package suites and checks are green without executing the runtime suite.
 - S2B red-before test-only commit: `22e737fc3`.
 - S2B product/harness commit: `0cc9b7ad7` (accepted).
 - S2C red-before test-only commit: `7ed5b94c6`.
+- S2C product/harness commit: `dbb62c065` (accepted).

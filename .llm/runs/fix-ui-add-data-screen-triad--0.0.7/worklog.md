@@ -245,7 +245,7 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 
 | Gate                         | Result  | Evidence         | Notes                                                                       |
 | ---------------------------- | ------- | ---------------- | --------------------------------------------------------------------------- |
-| `scaffold.runtime --cleanup` | NOT_RUN | Owner rule + D16 | REQUIRED supervisor-coordinated; author-must-not-run; D-42/D-43 host block. |
+| `scaffold.runtime --cleanup` | NOT_RUN | Owner rule + D16 | REQUIRED supervisor-coordinated; author-must-not-run. D-42/D-43 are resolved; execution is queued on the cluster lease. |
 
 ### Consumer Gates
 
@@ -304,6 +304,7 @@ through this command-owned `--help`; `cli-reference.md:104` remains false and de
 | Gate                                      | Result  | Evidence                                                                  |
 | ----------------------------------------- | ------- | ------------------------------------------------------------------------- |
 | Focused red-before at `7ed5b94c6`         | RED     | exit 1; 18 passed, 3 failed; unchanged S2C product code.                  |
+| Whole E2E red-before at `7ed5b94c6`       | RED     | owner-reproduced exit 1; 167 passed, 3 failed.                            |
 | Focused E2E selection suite after S2C      | PASS    | exit 0; 21 passed, 0 failed.                                              |
 | Whole nested `packages/cli/e2e` test      | PASS    | exit 0; 170 passed, 0 failed.                                             |
 | Whole nested `packages/cli/e2e` check     | PASS    | exit 0.                                                                   |
@@ -320,6 +321,31 @@ membership and order, so a registered-but-unselected gate fails rather than disa
 The gate itself invokes `ui:add page data-screen --island --app <generated-app>`; the existing
 generated-workspace check is the composed type-check consumer. Runtime execution remains REQUIRED,
 supervisor-coordinated, and `NOT_RUN` while another lane owns the singleton host lease.
+
+### S2D Merge-Readiness Gates
+
+| Gate / command                                                                                         | Result  | Raw evidence                                                                                                      |
+| ------------------------------------------------------------------------------------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `deno task quality:gate`                                                                               | PASS    | exit 0; repository quality scan clean; doctrine/dependency warnings remain the established non-failing inventory. |
+| `deno task arch:check`                                                                                 | PASS    | exit 0; no doctrine failure.                                                                                       |
+| `deno task doc:lint --root packages/cli --pretty`                                                      | PASS    | exit 0; 1 package, 3 entrypoints, 0 diagnostics.                                                                  |
+| CLI JSR audit (`audit-jsr-package.ts --root packages/cli --text`)                                      | PASS    | exit 0; dry-run OK, 0 FAIL findings; 19 existing WARN findings.                                                   |
+| `deno task --cwd packages/cli publish:dry-run`                                                         | PASS    | exit 0; publish simulation complete; existing dynamic-import warnings only.                                       |
+| `deno task check:emitted-samples`                                                                      | PASS    | exit 0; 47 TypeScript samples from 37 artifact paths checked.                                                     |
+| `deno task check:netscript-jsr-specifiers`                                                             | PASS    | exit 0; 2,365 scanned, 1 allowance, 0 ranges, 0 failures.                                                         |
+| `deno task check:agent-docs-prose`                                                                     | PASS    | exit 0; generated prose bundle fresh, no stale paths.                                                             |
+| `deno task check:publish-assets`                                                                       | PASS    | exit 0; publish assets fresh.                                                                                      |
+| `deno task check:mcp-export-corpus`                                                                    | PASS    | exit 0; 35 packages, 270 subpaths, 7,623 symbols; corpus fresh.                                                   |
+| `deno task check:assets-barrel`                                                                        | NOT_RUN | Deliberate D17 prohibition: the check writes before diffing.                                                      |
+| CLI/E2E lint and fmt                                                                                   | N/A     | Root `deno.json` excludes `packages/cli/`; package configs define no replacement scope.                           |
+| `deno task e2e:cli run scaffold.runtime --cleanup`                                                     | NOT_RUN | REQUIRED supervisor Tier-A handoff; another lane currently holds the singleton runtime lease.                     |
+| `git diff --exit-code de57fab0 -- deno.lock` plus SHA-256                                              | PASS    | exit 0; `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.                                      |
+
+The runtime handoff is queued, not topology-blocked. D-42/D-43 are resolved: the runtime uses
+`DOCKER_HOST=tcp://netscript-dind:2375`, and published ports are reached at
+`netscript-dind:<port>` rather than `127.0.0.1`. The author did not acquire the lease or execute any
+runtime/AppHost/container command. S2D changes only run artifacts; the full product/test diff
+remains exactly the locked 12 paths.
 
 ## Handoff Notes
 
