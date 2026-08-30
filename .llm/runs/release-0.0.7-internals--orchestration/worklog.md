@@ -4226,3 +4226,67 @@ the earlier defect there under-reported failures by 85% and is exactly the kind 
 not be taken on the supervisor's word.
 
 `#1747` withheld at `c1e03922` on `#1734` alone; `#1734` parked at `eb765629`.
+
+## 2026-08-30 — three lanes active; #1734 cycle 3 recovered onto the canonical sender; #1774 queued
+
+### #1533 — IMPL-EVAL cycle 1 `FAIL_FIX`, bounded repair dispatched
+
+Verdict `6d85d4f2`, artifact-only boundary held (empty diff outside `.llm/runs/`), evaluator stopped.
+It confirmed the gate *mechanism* is sound and that history order is real — census before repairs.
+**The failures are in what the repairs assert about the corpus**, which is precisely where a
+supervisor checking alone is weakest.
+
+- **F1 (high) — a false green in our own repairs.** Five `@netscript/service` examples were "fixed"
+  from `./router.ts` to `@app/router.ts`, but `generate-service-deno-json.ts:67-71` shows the
+  **service** scaffold emits only `@<project>/contracts`, `@database`, `@netscript/service`; `@app/`
+  belongs to the **Fresh app** generator. Those examples now document a specifier a scaffolded
+  service cannot resolve — the #1425 class this gate exists to catch — **and the gate is green on
+  them.** A detectable defect was swapped for an undetectable one. My own spot-check saw the alias
+  swap and confirmed the alias exists *somewhere*; I never asked whether it exists **for that
+  scaffold kind**.
+- **F2 (high) — reverse ratchet.** The corpus test asserts the deferred census *exactly equals*
+  21/116, and `deno test` walks dot-directories, so root test runs it: the first fix in #1765/#1766
+  turns root red, contradicting D13's "may shrink without ceremony". Fix is `<=` ceilings via
+  `jsdocExampleRatchetFailures`.
+- **F3 (medium) — a false deferred entry I published.** Placeholder regexes fire on comment text, so
+  three examples never reach `deno check`; `parseAppSettings` **compiles clean**. True deferred
+  `typeError` is **20, not 21**, so **#1766 as I filed it lists an example that is not broken.** I
+  will correct it from the re-emitted classifier output, not from my own arithmetic.
+- **F4** confirms the risk I had explicitly warned about landed anyway: narrowing `TracedQueue`,
+  `createServiceQueryUtils` and four `create*StreamDB` bodies **deleted three genuine type errors**
+  (restored-body run 24 > 21). Routed to drift + #1766.
+
+### #1734 cycle 3 — owner-authorized; recovered after a dead sender
+
+Owner granted the **third and final** exceptional cycle. The recorded "preserved author"
+`01a04fa4-8970-79d1-a899-6290bf3585cb` is **gone**: `thread/resume failed: no rollout found`. My next
+move was to launch a fresh thread; that attempt returned terminal **`duplicate_sender_risk`** and was
+correctly stopped before it could create a second sender against the same worktree.
+
+The canonical sender is **`01a0515b-4d2f-7a91-b71e-43d0b209337c`**, and resuming *that* succeeded
+cleanly (lock held, zero conflict/rollout errors). **The lesson is specific and worth keeping: a
+missing rollout means the recorded id is stale, not that the sender is absent.** Reaching for a fresh
+launch would have duplicated a live sender on a leaf that has already spent two terminal evaluation
+cycles — the most expensive possible way to be wrong here.
+
+Scope is strictly the accepted `hydration.ts` correction (cycle-2 F1 non-`Error`/non-record
+rejections, F2 plain-object collapse), RED through the real `renderToString(<QueryHydrationScript/>)`
+transport in **both** directions, no change to `query-types.ts` / `query/mod.ts` / the dependency
+range. `#1747` and `#1758` untouched until #1734 lands; the bare `scaffold.runtime` rerun stays
+serialized to the coordinator, after exact runtime zero.
+
+### #1616 — advancing
+
+`c06d3654`, thread `01a05306`, Sol · medium, plan-gate bounded.
+
+### #1774 — recorded and queued, not started
+
+`fix(agentic): make Claude hook logging independent of turn cwd` — milestone `0.0.7`, `priority:p1`,
+`type:fix`, `area:tooling` + `area:agentic`, `status:research`, **5 executable acceptance boxes**.
+Checked-in Claude hook logger uses a cwd-relative script path and emits false Module-not-found noise
+from nested run directories.
+
+**Queued behind current WIP, deliberately not dispatched.** Internals is at its
+`activeImplementationSlicesPerLane` ceiling with #1734, #1533 and #1616 all mid-flight; opening a
+fourth would breach the limit the cluster sets. It enters the serial queue at the first terminal
+checkpoint among those three.
