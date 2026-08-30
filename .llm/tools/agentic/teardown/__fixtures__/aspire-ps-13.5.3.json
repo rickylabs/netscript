@@ -1,0 +1,11 @@
+[
+  {
+    "appHostPath": "/home/codex/repos/fix-1011/.llm/tmp/cli-e2e/plugin-smoke/aspire/apphost.mts",
+    "appHostPid": 52220,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 51963,
+    "dashboardUrl": "https://localhost:46251",
+    "logFilePath": "/home/codex/.aspire/logs/cli_REDACTED.log"
+  }
+]
