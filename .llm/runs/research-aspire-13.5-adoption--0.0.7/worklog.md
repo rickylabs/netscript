@@ -505,4 +505,9 @@ changed harness paths, refreeze; ONE serialized attempt follows from host zero. 
 converged | S4 merged as main `74e3d451e5dc`, #1716 closed. S5: both medium review findings already
 fixed in-branch (`79255394`,`f3b3e75e`) with reasoned replies (gate PASS, 0 unanswered); 18/18
 identity rebase onto new main → **`bf7223a6c330`**, pinned push; exact-head run queued as chain-3
-(after proof + S1). |
+(after proof + S1). | | S7 granted attempt dispatched; S5 threads resolved | S7: head `f8201d4f`
+verified local==origin, host zero, relay `s7-rerun` alive, RED/GREEN bootstrap receipts
+(`phase-b-21/22`) committed → same-thread attempt with receipts `phase-b-31..40`. S5: all 3 fixed
+review threads mechanically resolved (GraphQL); full-runtime dispatch queued (chain-3 after S1);
+two-concurrent-isolated-start receipt scheduled for the next lease after S7; proof failures (D-81)
+stay separate from S5 evidence. S9 cycle-2 running. |
