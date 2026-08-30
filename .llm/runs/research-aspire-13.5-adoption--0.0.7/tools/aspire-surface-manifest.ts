@@ -422,36 +422,52 @@ async function gitGrep(pathspecs: string[]): Promise<string[]> {
   }).output();
   return new TextDecoder().decode(out.stdout).split('\n').filter(Boolean);
 }
-// Two invocations because a positive pathspec would otherwise narrow the search to that path only.
-const paths = [
-  ...(await gitGrep([':!node_modules', ':!deno.lock', ':!.llm/runs', ':!.llm/tmp'])),
-  ...(await gitGrep([RUN_DIR])),
-]
-  .filter((p) =>
-    !p.startsWith(RUN_DIR + '/tools/') && p !== RUN_DIR + '/aspire-surface-manifest.tsv'
+
+/** Reproducible manifest content plus paths missing an ownership rule. */
+export interface AspireSurfaceManifestBuild {
+  readonly body: string;
+  readonly rows: readonly string[];
+  readonly unmatched: readonly string[];
+}
+
+/** Build the current tracked Aspire surface manifest without writing it. */
+export async function buildAspireSurfaceManifest(): Promise<AspireSurfaceManifestBuild> {
+  // Two invocations because a positive pathspec would otherwise narrow the search to that path only.
+  const paths = [
+    ...(await gitGrep([':!node_modules', ':!deno.lock', ':!.llm/runs', ':!.llm/tmp'])),
+    ...(await gitGrep([RUN_DIR])),
+  ].filter((path) =>
+    !path.startsWith(RUN_DIR + '/tools/') && path !== RUN_DIR + '/aspire-surface-manifest.tsv'
   );
-const rows: string[] = [];
-const unmatched: string[] = [];
-for (const p of paths) {
-  const rule = RULES.find((r) => r.test(p));
-  if (!rule) {
-    unmatched.push(p);
-    continue;
+  const rows: string[] = [];
+  const unmatched: string[] = [];
+  for (const path of paths) {
+    const rule = RULES.find((candidate) => candidate.test(path));
+    if (!rule) {
+      unmatched.push(path);
+      continue;
+    }
+    rows.push([path, rule.cls, rule.owner, rule.disposition].join('\t'));
   }
-  rows.push([p, rule.cls, rule.owner, rule.disposition].join('\t'));
+  rows.sort((left, right) => left.localeCompare(right, 'en'));
+  const header = 'path\tclass\towner\tdisposition';
+  return { body: [header, ...rows].join('\n') + '\n', rows, unmatched };
 }
-rows.sort((a, b) => a.localeCompare(b, 'en'));
-const header = 'path\tclass\towner\tdisposition';
-const body = [header, ...rows].join('\n') + '\n';
-await Deno.writeTextFile(`${RUN_DIR}/aspire-surface-manifest.tsv`, body);
-const byClass = new Map<string, number>();
-for (const r of rows) {
-  const c = r.split('\t')[1];
-  byClass.set(c, (byClass.get(c) ?? 0) + 1);
-}
-console.log(`rows=${rows.length} unmatched=${unmatched.length}`);
-for (const [c, n] of [...byClass.entries()].sort()) console.log(`${n}\t${c}`);
-if (unmatched.length) {
-  console.error('UNMATCHED:\n' + unmatched.join('\n'));
-  Deno.exit(1);
+
+if (import.meta.main) {
+  const manifest = await buildAspireSurfaceManifest();
+  await Deno.writeTextFile(`${RUN_DIR}/aspire-surface-manifest.tsv`, manifest.body);
+  const byClass = new Map<string, number>();
+  for (const row of manifest.rows) {
+    const className = row.split('\t')[1];
+    byClass.set(className, (byClass.get(className) ?? 0) + 1);
+  }
+  console.log(`rows=${manifest.rows.length} unmatched=${manifest.unmatched.length}`);
+  for (const [className, count] of [...byClass.entries()].sort()) {
+    console.log(`${count}\t${className}`);
+  }
+  if (manifest.unmatched.length) {
+    console.error('UNMATCHED:\n' + manifest.unmatched.join('\n'));
+    Deno.exit(1);
+  }
 }

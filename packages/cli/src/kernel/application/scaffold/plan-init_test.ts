@@ -17,6 +17,7 @@ import type { PublicCommandDependencies } from '../../../public/features/root/pu
 import { createDeployCommand } from '../../../public/features/deploy/deploy-group.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
+import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
 import type { InitPipelineContext } from './context.ts';
 import { scaffoldRoot } from './plan-init.ts';
 
@@ -184,7 +185,7 @@ Deno.test('scaffoldRoot emits CI/CD workflow templates for shipped deploy target
   assertStringIncludes(compose ?? '', netscriptJsrSpecifier('cli'));
   assertStringIncludes(
     compose ?? '',
-    'dotnet tool install Aspire.Cli --version 13.4.6',
+    `dotnet tool install Aspire.Cli --version ${SCAFFOLD_VERSIONS.ASPIRE_SDK}`,
   );
   assert(
     (compose ?? '').indexOf('dotnet tool install Aspire.Cli') <

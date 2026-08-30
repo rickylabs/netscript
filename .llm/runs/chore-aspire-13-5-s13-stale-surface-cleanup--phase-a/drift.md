@@ -12,6 +12,19 @@
   defer CI flip/convergence until S1 is on main.
 - **Evidence:** `research.md`, final dependency check in `worklog.md`.
 
+## 2026-08-30 — Phase-2 flip deferred by ratified ordering
+
+- **What:** S13 implements phase 2 but cannot make it the CI/default enforcement phase yet.
+- **Source:** dispatch ordering requires S1 #1727, S9 #1759, and S11 #1771 on `main` first.
+- **Expected:** all three dependency row sets current before the final flip commit.
+- **Actual:** refreshed `origin/main` is `24f6642f`; `.github/toolchain.env` still pins Aspire 13.4.6,
+  and the report sweep attributes 24 remaining non-archival hits to predecessor/derived owners.
+- **Severity:** significant, expected sequencing drift
+- **Action:** keep phase 1 as the no-argument default, leave CI unchanged, and record the exact owner
+  counts for the coordinator's later convergence commit.
+- **Evidence:** `worklog.md` slice-4 report and `deno task check:aspire-version-parity -- --phase 2
+  --report` output.
+
 ## 2026-08-30 — RTK binary unavailable
 
 - **What:** The repository skill recommends RTK for read-heavy commands, but `rtk` is not on PATH.

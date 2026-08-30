@@ -139,6 +139,8 @@ path	class	owner	disposition
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/check-aspire-version-parity_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/check-aspire-version-parity.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-scaffold-versions.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .openhands/setup.sh	ci:openhands	S1	OpenHands runner hydrates Aspire CLI from toolchain.env; parity phase 1 enforce
 AGENTS.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)

@@ -64,6 +64,9 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | 2 | D-17 implementation | Added the injected dashboard port and runtime-edge `AspirePsDashboardReader`; wired query, doctor, MCP server, and CLI composition through the one resolver. |
 | 2026-08-30 | 3 | stale-surface cleanup | Reused the shared reader from generated telemetry and `.netscript/aspire-cli.ts`; removed bare dashboard defaults, stale wording/pin, paired consumer CI with `SCAFFOLD_VERSIONS`, and updated teardown MCP ownership. |
 | 2026-08-30 | 3 | generated carriers | Regenerated CLI/publish assets, synchronized Claude skill mirrors, and regenerated the 798-row Aspire surface manifest with zero unmatched paths. |
+| 2026-08-30 | 4 | parity phase 2 | Imported the S1 checker baseline without pins/CI, kept phase 1 default, added phase-2 enforcement, fixed 13.5.3 compat assertions, stale/unmatched manifest detection, and report-only exit mode. |
+| 2026-08-30 | 4 | convergence sweep | Regenerated an 800-row manifest (zero unmatched) and ran phase 2 in report mode: 24 non-archival failures remain, all outside S13 ownership. |
+| 2026-08-30 | 4 | flip ordering | Refreshed `origin/main` at `24f6642f`; toolchain.env remains 13.4.6, proving S1 is not on main. The CI/default phase-2 flip is deferred; S9 and S11 convergence cannot satisfy the all-three prerequisite without S1. |
 
 ## Gate Results
 
@@ -82,6 +85,10 @@ source and generated-carrier freshness gates.
 | Emitted samples | `deno task check:emitted-samples` | PASS | 47 emitted TypeScript samples from 37 artifact paths. |
 | Framework quality (slice 3) | `deno task quality:scan` | PASS | No findings; existing allowance count 7. |
 | Architecture (slice 3) | `deno task arch:check` | PASS | No failures; existing repository warnings retained. |
+| Parity tests | structured test wrapper over `.llm/tools/validation/check-aspire-version-parity_test.ts` | PASS | 10 passed, 0 failed; both phases, fixed compat train, archival handling, freshness, and default selector covered. |
+| Validation check | `run-deno-check.ts --root .llm/tools/validation --ext ts,tsx` | PASS | 18 files; no findings. |
+| Validation raw lint/fmt | `deno lint/fmt --no-config` with repository style flags | PASS | Checker, tests, and manifest generator clean. |
+| Phase-2 convergence report | `deno task check:aspire-version-parity -- --phase 2 --report` | REPORT PASS (exit 0) | `manifestFresh=true`; 799 checked, 24 enforcement hits, 6 archival info, 1 lockfile skipped, 0 missing. |
 
 Runtime gates are N/A by explicit scope.
 
@@ -105,6 +112,14 @@ Runtime gates are N/A by explicit scope.
   it once here with the RED-first test already committed in slice 1.
 - Asset freshness commands compare against committed state; their exact-head checks are scheduled
   immediately after this slice commit and again in the final gate receipt pass.
+
+## Reconcile — slice 4
+
+- Remaining non-archival phase-2 hits by manifest owner: S1 (7), S3 (5), S9 (4), S11 (2), derived
+  carriers (2), S1/S4 (2), S4/S6 (1), and S4/S5/S6/S8 (1). No S13-owned hit remains.
+- Phase 1 remains the no-argument default and `.github/workflows/ci.yml` is unchanged. The phase-2
+  flip must follow S1 #1727, S9 #1759, and S11 #1771 on `main`; current-main toolchain evidence is
+  still `NETSCRIPT_ASPIRE_CLI_VERSION=13.4.6` and `NETSCRIPT_ASPIRE_SDK_VERSION=13.4.6`.
 
 ## Handoff Notes
 

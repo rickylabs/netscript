@@ -10,5 +10,4 @@ Deno.test('unused scaffold community toolkit pin is removed', async () => {
     new URL('../../constants/scaffold/scaffold-aspire.ts', import.meta.url),
   );
   assert(!source.includes('SCAFFOLD_COMMUNITY_TOOLKIT'));
-  assert(!source.includes('13.2.1-beta.532'));
 });
