@@ -1,7 +1,7 @@
-import {
-  type BaseContractErrors,
-  type BaseContractMeta,
-  type NetScriptProcedureMeta,
+import type {
+  BaseContractErrors,
+  BaseContractMeta,
+  NetScriptProcedureMeta,
 } from '@netscript/contracts';
 import { oc } from '@orpc/contract';
 import { commonErrorMap } from '../src/application/contract-primitives.ts';
