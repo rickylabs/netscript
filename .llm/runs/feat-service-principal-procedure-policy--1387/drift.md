@@ -229,3 +229,36 @@ archived copy by sha256. The archive is untouched at eight files, so append-only
 leaves any receipt without a successor sitting where current evidence lives, and filenames are what
 readers scan. Verify a receipt by `invocationId` and `gitHead`, and after any recut, check that every
 file remaining at the top level attests the current head.
+
+## D-7 — Slice 3's non-phantom `TCustom` proof requires an out-of-ceiling public contract edit
+
+**Severity:** significant · **Class:** slice ceiling · **Shape:** typed-context runtime composition
+
+**Observed.** Slice 2 evaluator finding E-2 requires Slice 3 to give `TCustom` a consumer position
+and add a negative type proof that a builder with the wrong custom context is rejected. The Slice 3
+ceiling contains the implementation and three behavior-test files, but not
+`packages/service/src/builder/service-builder.ts`. `createService()` returns that file's public
+`ServiceBuilder<T, TCustom>` interface, whose `TCustom` still appears only in fluent return types;
+an implementation-private use cannot change the structural assignability seen by callers.
+
+**Evidence.** A compile-only `deno eval --check --ext=ts` probe assigned
+`ServiceBuilder<ServiceRouter, { readonly wrong: number }>` to
+`ServiceBuilder<ServiceRouter, { readonly tenant: string }>` and also assigned the tenant builder
+back to the wrong builder. It exited 0 with both directions accepted. Returning or locally composing
+`ServiceHandlerContext<TCustom>` inside `service-builder-impl.ts` would make the runtime behavior
+sound, but would not alter those public interface assignments or make the required negative test
+fail.
+
+**Expected.** Runtime composition inside the four-file ceiling both makes the published generic
+non-phantom and permits a negative public type test that distinguishes the real constraint from
+inference-only acceptance.
+
+**Actual.** The minimal coherent fix needs a public `ServiceBuilder` contract change that places
+the current `TCustom` in a genuine consumer/invariant position while preserving `withContext()`
+widening. The exact public shape is an owner/plan decision; adding a private marker or an unused
+implementation-only consumer would green a class-level probe without fixing the public API E-2
+identified.
+
+**Action:** rescope-required. No Slice 3 product file was edited, no Slice 3 gate or receipt was run,
+and no Slice 3 commit, push, or PR comment was created. Per the brief, the top-level Slice 2 receipt
+set was moved append-only to `receipts/slice-2-f9b32b4f/` before this stop.
