@@ -41,7 +41,10 @@ silent success when it produced nothing.
   head `d9722b0b17a478af3db5bdafad87391a2ccbfd67`. Requested OpenRouter / GLM / max; observed `Z.AI`
   / `z-ai/glm-5.3-flash` with real reasoning/tool activity and non-empty completion; `max` is
   launcher-argv attested. This deliberately dogfoods the changed route and is not independent.
-- Remaining: publish the artifact-only evaluator packet and hand off without merging.
+- Exact-green packet: evaluator artifacts are published in the run-artifact-only branch head
+  carrying this record; PR comment `5471524652` contains the redacted structured canary results and
+  S1-S4 gate summary. PR/issue are at `status:augment-review` and the PR remains draft/unmerged.
+- Remaining: supervisor handoff only; do not merge from this run.
 - Publication: the HTTPS PAT lacked workflow scope, so the GitHub connector published tree-identical
   commits without force. Current published evidence head before this record: `9937705b5d`.
 
@@ -58,6 +61,5 @@ silent success when it produced nothing.
 
 ## Next steps
 
-1. Publish the artifact-only evaluation packet and post the S1-S4 PR evidence comment.
-2. Leave PR #1792 unmerged and hand the supervisor the exact-green packet, distinguishing the
+1. Leave PR #1792 unmerged and hand the supervisor the exact-green packet, distinguishing the
    evaluated product head from the later artifact-only head.
