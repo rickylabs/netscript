@@ -14,3 +14,11 @@
 - `docs/site/reference/aspire/index.md`: documented 13.5 AppHost capabilities — listener-readiness health checks (`addHealthCheck`/`withHealthCheck`), typed resource commands (`CommandOptions.Arguments`), `excludeFromMcp()` for `<db>-cli` helper executables, and `Aspire.Hosting.Browsers` preview.
 - `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md`: updated line 58 to SDK `13.5.3`, documented the CLI/SDK single-train pairing rule and npm self-update note; normalised terminology.
 
+### S3: #1642 how-to "Detached start for agents and CI" (2026-08-30)
+- Authored `docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md` closing #1642.
+- Documented `aspire start --format Json` and `aspire ps --format Json` schemas (`pid`, `appHostPath`, `dashboardUrl` with token redacted, `logFilePath`, `resources`).
+- Documented `ASPIRE_CLI_START_TIMEOUT` environment variable vs `aspire wait --timeout <seconds>`, parallel execution with `--isolated`, and forceful teardown via `aspire stop --force`.
+- Cited S2 runtime verification receipts (`03-v2-cold-start-timing.time.txt`, `03-v3-isolated-starts.raw.txt`, `03-v4-detached-dashboard.raw.txt`) and S10 gate receipts.
+- Wired xref and how-to index links; `deno task docs:links` passes clean (103 docs, 0 broken links).
+
+

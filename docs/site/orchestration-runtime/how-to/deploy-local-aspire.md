@@ -207,5 +207,7 @@ a Deno workspace problem.</li>
   {{ comp.xref({ key: "howto:database-migration", text: "Database & migration" }) }}.
 - **Exact symbols + full port map:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }}
   and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
+- **Non-interactive / CI execution:** {{ comp.xref({ key: "howto:detached-start-agents-ci", text: "Detached start for agents and CI" }) }}
+  — structured JSON output, timeout budgets, and `--isolated` parallel mode.
 
-{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" } }) }}

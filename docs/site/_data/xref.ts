@@ -127,6 +127,7 @@ export const xref: Record<string, XrefTarget> = {
   "howto:graceful-shutdown": { href: "/orchestration-runtime/how-to/graceful-shutdown/", label: "Graceful shutdown" },
   "howto:tune-worker-runtime": { href: "/background-processing/how-to/tune-worker-runtime/", label: "Tune the worker runtime" },
   "howto:deploy-local-aspire": { href: "/orchestration-runtime/how-to/deploy-local-aspire/", label: "Deploy locally with Aspire" },
+  "howto:detached-start-agents-ci": { href: "/orchestration-runtime/how-to/detached-start-agents-ci/", label: "Detached start for agents and CI" },
   "howto:roll-out-runtime-overrides": { href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/", label: "Roll out runtime overrides" },
   "howto:add-a-task-runtime-adapter": { href: "/background-processing/how-to/add-a-task-runtime-adapter/", label: "Add a task runtime adapter" },
   "howto:build-a-server-validated-form": { href: "/web-layer/how-to/build-a-server-validated-form/", label: "Build a server-validated form" },
