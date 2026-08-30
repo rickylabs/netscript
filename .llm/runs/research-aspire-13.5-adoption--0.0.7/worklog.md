@@ -402,4 +402,10 @@ docs, #1770 shipped). Inert for the code stack (0 overlap); S11 overlaps on 5 fi
 reconcile queued after polish (D-64). | | S11 docs_polish | **`POLISH: DONE`** (`44a57a64`, Fable
 session `e9fa058c…`, edit-only, docs + regenerated carrier; PR #1771 `[PHASE: DOCS-POLISH]`
 comment). Report lists deliberately-left items for the supervisor (see `slices/s11/docs-polish.md`
-§Deliberately left). #1772 prose reconcile launched on the Gemini conversation (D-64). |
+§Deliberately left). #1772 prose reconcile launched on the Gemini conversation (D-64). | | Polish
+leftovers adjudicated | (1) `(S2 V2)` citation on the public how-to: kept (audit cycle 3 passed the
+internal-wording scan; receipt keys are the page's evidence convention). (2)
+`ASPIRE_CLI_START_TIMEOUT`: accurate but partial — the generated `aspire:start` task sets it for
+`aspire start` (deno-json.ts:91-93; README: "Aspire reads it") and NetScript reuses it as the db-cli
+budget; one-clause clarification queued as a non-blocking follow-up for S11's next prose touch. (3)
+callout title kept (H5 ruling). |
