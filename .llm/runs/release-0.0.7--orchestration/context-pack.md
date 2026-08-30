@@ -1619,3 +1619,19 @@ continues concurrently because serial ordering is per orchestrator, not global.
   stopped before runtime on missing generated Zod CRUD artifacts; host cleanup remained exact zero.
   The only authorized continuation is a canonical bootstrap-order RED/GREEN correction, Tier-A,
   refrozen head, and one new serialized attempt—never an unchanged retry or DinD fallback.
+
+## Resume delta — 2026-08-30T19:47Z
+
+- Main remains `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`. S1 exact head
+  `c4cbda25410cd56d915d420c17d97ee74c16be55` has a fully green hosted matrix
+  (`33331429495`) but needs the bounded exact-version-token review repair and a delta verdict/CI.
+- S5 head `bf7223a6c3305c753bb38c566a9d1cc17f46df0b` is statically/hosted green. Its
+  first local two-start capture was invalid because it reused one AppHost identity and observed
+  13.4.6; it returned Aspire/Docker/volumes to zero. Rerun from two isolated 13.5.3 roots through
+  `netscript-dind:<published-port>`, then hand the merge packet if acceptance is exact-green.
+- The next serialized local lease after S5 is S8's single typed-seed diagnostic at branch
+  `feat/aspire-13-5-s8-typed-resource-commands`; do not grant S7 a third runtime. Keep S9's exact
+  dashboard payload repair static and parallel.
+- Aspire supervisor transport is the same Remote Control session, switched from quota-exhausted
+  Fable 5 to Sonnet 5. This is not a plan reset. Docs #1785's repaired-head Fable evaluator ended
+  on HTTP 429, not a verdict; docs is converging current main and using its approved fallback.

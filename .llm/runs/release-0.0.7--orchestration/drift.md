@@ -1436,3 +1436,18 @@ implementation thread.
 - S7 did not reach Aspire or Docker in its first post-S3 attempt. `deno install` encountered a local
   generated-module ordering dependency before AppHost start. This is neither D-42 nor D-43; preserve
   the red receipt, correct only canonical bootstrap ordering, and start a new attempt from exact zero.
+
+## 2026-08-30 — Phase-B address contract is fixed; setup-invalid captures remain invalid
+
+- The authoritative sandbox topology is now stable: identical `/home/agent` bind in DinD, Docker
+  API at `tcp://netscript-dind:2375`, and published application endpoints at
+  `netscript-dind:<port>` from `ai-agents`. Do not revive D-42/D-43 or select CI fallback merely
+  because historical receipts predate this topology.
+- This infrastructure correction does not validate a malformed acceptance setup. S5's first
+  two-start capture reused one AppHost identity and resolved the wrong 13.4.6 toolchain. It is red
+  as evidence construction, not a product failure or a reason to waive the acceptance row. The
+  successor must use two isolated roots, prove 13.5.3 in both, assert exit codes, and clean exactly.
+- Fable 5 monthly-spend exhaustion is a transport/provider boundary, not an evaluator FAIL. The
+  Aspire supervisor's same Remote Control session moved to Sonnet 5 without resetting accepted
+  scope. Evaluator HTTP 429s likewise do not increment the two-terminal-content-failure ceiling;
+  use an approved opposite-family fallback and keep independent slices moving.

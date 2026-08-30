@@ -2667,3 +2667,29 @@
 - Aspire was directed immediately into S5 current-main convergence and its outstanding review
   repairs while the independent S7 pre-runtime bootstrap-order correction retains the single local
   runtime lease. No global lane barrier was introduced.
+
+## 2026-08-30T19:47:00Z — corrected DinD Phase B resumed; evaluator quota recovered in-session
+
+- The host operator reconfirmed the final DinD contract: `netscript-dind` has `/home/agent`
+  mounted at the identical absolute path, Docker remains at `tcp://netscript-dind:2375`, and
+  application ports published by the sandbox must be reached from `ai-agents` at
+  `netscript-dind:<published-port>`, never `127.0.0.1`. The coordinator independently observed
+  `aspire ps --format Json == []`, zero Docker containers, and zero Docker volumes before release.
+- S5's first local two-start capture was setup-invalid rather than product evidence: both starts
+  used the same AppHost identity, start B displaced start A, and the observed SDK line was 13.4.6.
+  It cleaned back to exact zero at `19:44:52Z`. The Aspire supervisor was directed to rerun only
+  this bounded proof from two genuinely isolated roots under the 13.5.3 mise pin and the corrected
+  DinD endpoint contract, then clean its exact owned resources. S8's single typed-seed diagnostic
+  remains next in the serialized Aspire lease queue; S7 receives no third runtime attempt.
+- S1's converged exact head `c4cbda25410cd56d915d420c17d97ee74c16be55` passed full hosted
+  run `33331429495` across static, desktop, PostgreSQL, and SQLite/Garnet. One valid medium review
+  finding remains: substring matching lets `13.5.30` satisfy an expected `13.5.3`. A bounded
+  exact-token match plus negative regression was authorized, followed by delta evaluation and
+  current-head CI; the prior green runtime receipt remains product evidence but is not by itself a
+  merge waiver after the head moves.
+- The Aspire supervisor exhausted its Fable 5 monthly spend after consuming the dispatch. The same
+  Remote Control session and accepted topic ownership were preserved and switched in place to
+  Sonnet 5; the directive was resubmitted without changing scope, branches, or prior verdicts.
+  Docs #1785 separately received a provider HTTP 429 rather than a content verdict and was directed
+  to converge onto current main and use the documented opposite-family evaluator fallback while
+  continuing its independent #1777 queue.
