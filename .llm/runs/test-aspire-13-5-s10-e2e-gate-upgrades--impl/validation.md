@@ -37,3 +37,16 @@ trail are the handoff record. No Phase-B runtime command was run.
 
 Phase B remains prohibited in this cycle. No AppHost was started, no container was created, and no
 `e2e:cli` runtime suite was run.
+
+## Phase-B nullable health-report fix — cycle 2
+
+| Gate                         | Verdict                         | Evidence                                                        |
+| ---------------------------- | ------------------------------- | --------------------------------------------------------------- |
+| Focused RED                  | expected fail, exit 1            | four diagnostics: pending discriminator absent                  |
+| Scoped check                 | pass, exit 0, 185 files          | wrapper: 2 batches / 0 diagnostics                              |
+| Scoped lint                  | pass, exit 0, 178 files          | wrapper: 0 findings; unrelated `desktop-native` fixture excluded |
+| Scoped fmt                   | pass, exit 0, 185 files          | wrapper: 2 batches / 0 findings                                 |
+| Structured-evidence test file | pass, exit 0, 14/14             | focused test wrapper                                            |
+
+The fixture is an exact 18-line Aspire 13.5.3 capture. No Aspire, Docker, runtime-suite, evaluator,
+or CI-dispatch command was run in this cycle.

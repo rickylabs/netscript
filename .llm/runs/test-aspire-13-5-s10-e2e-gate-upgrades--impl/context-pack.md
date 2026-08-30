@@ -22,3 +22,9 @@
   follow-stream shape after 36 passing gates in both tiers. The current slice adds dual bare/wrapped
   parsing with captured-style RED coverage; local focused wrapper verdict is 16/16 tests plus green
   scoped check/lint/fmt.
+- Off-host Phase-B cycle 2: Actions run `33327294781` exposed nullable/omitted
+  `ResourceHealthReportJson.Status`. The parser now represents this as explicit pending `Unknown`,
+  retries convergence, and lets later string reports win. The exact 18-line real capture is checked
+  in; its final postgres report is Unhealthy (not Healthy as the steering text stated), while the
+  web report supplies the real pending-to-Healthy transition. Focused verdict: 14/14 evidence tests
+  plus green scoped check/lint/fmt; no runtime, evaluator, or CI dispatch.

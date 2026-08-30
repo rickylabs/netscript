@@ -38,3 +38,13 @@ creator-process label alone remains unproven because S7's PID/start-time registr
 branch ancestry. Env/argv process rules and creator-only behavior are fixture-tested. Phase B must
 capture live process evidence and retain zero owned containers; S7 integration later supplies the
 stable registry identity without importing `.llm/tools` into the E2E package.
+
+## D-06 — Named 13.5.3 capture does not end with Healthy postgres evidence
+
+Cycle-2 steering requested that the full named capture prove postgres converges Healthy. The exact
+18-line file (SHA-256 `36fe0e3329455d38234d3b44cde28c9ff13eaf6ca180c8f1f66108a722554549`)
+instead ends postgres at `Running`, `healthStatus: Unhealthy`, and
+`postgres_check.status: Unhealthy`. Its web report is the observation that transitions from an
+omitted status to `Healthy`. The fixture remains an unmodified copy: tests prove pending parsing,
+last-seen Healthy convergence on the web report, and fail-closed non-convergence on postgres rather
+than manufacturing evidence or weakening the health gate.

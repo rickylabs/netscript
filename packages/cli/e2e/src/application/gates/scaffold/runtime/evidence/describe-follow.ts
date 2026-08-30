@@ -4,11 +4,18 @@ import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adap
 const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
 const RESOURCE_NAME_FIELDS: readonly string[] = ['displayName', 'name', 'resourceName'];
 
-/** One object-valued Aspire health report. */
-export interface DescribeHealthReport {
-  readonly status: string;
-  readonly description?: string;
-}
+/** One object-valued Aspire health report, including the DTO's nullable pending state. */
+export type DescribeHealthReport =
+  | {
+    readonly status: 'Unknown';
+    readonly pending: true;
+    readonly description?: string;
+  }
+  | {
+    readonly status: string;
+    readonly pending: false;
+    readonly description?: string;
+  };
 
 /** Last-seen resource observation in an Aspire describe stream. */
 export interface DescribeResourceObservation {
@@ -65,7 +72,7 @@ export function evaluateDescribeFollow(
       ? [`${entry.name}.healthStatus=${entry.healthStatus}`]
       : []),
     ...Object.entries(entry.healthReports)
-      .filter(([, report]) => report.status !== 'Healthy')
+      .filter(([, report]) => report.pending || report.status !== 'Healthy')
       .map(([key, report]) => `${entry.name}.healthReports.${key}=${report.status}`),
   ]);
   if (unhealthy.length > 0) {
@@ -207,7 +214,7 @@ function resource(
   if (!state) throw new Error(`${name} omitted state`);
   const healthStatus = firstString(source, ['healthStatus']);
   const reportsValue = Reflect.get(source, 'healthReports');
-  const reports = reportsValue === undefined ? {} : healthReports(reportsValue, name);
+  const reports = reportsValue === undefined ? {} : healthReports(reportsValue, name, lineIndex);
   return {
     name: normalizeName(name),
     state,
@@ -216,20 +223,25 @@ function resource(
   };
 }
 
-function healthReports(value: unknown, resourceName: string): Record<string, DescribeHealthReport> {
-  const source = record(value, `${resourceName} healthReports`);
+function healthReports(
+  value: unknown,
+  resourceName: string,
+  lineIndex: number,
+): Record<string, DescribeHealthReport> {
+  const prefix = `describe line ${lineIndex + 1} ${resourceName} healthReports`;
+  const source = record(value, prefix);
   const reports: Record<string, DescribeHealthReport> = {};
   for (const [key, candidate] of Object.entries(source)) {
-    const report = record(candidate, `${resourceName} healthReports.${key}`);
+    const report = record(candidate, `${prefix}.${key}`);
     const status = Reflect.get(report, 'status');
-    if (typeof status !== 'string') {
-      throw new Error(`${resourceName} healthReports.${key} has no string status`);
+    if (status !== undefined && status !== null && typeof status !== 'string') {
+      throw new Error(`${prefix}.${key} status must be a string, null, or omitted`);
     }
     const description = Reflect.get(report, 'description');
-    reports[key] = {
-      status,
-      ...(typeof description === 'string' ? { description } : {}),
-    };
+    const details = typeof description === 'string' ? { description } : {};
+    reports[key] = status === undefined || status === null
+      ? { status: 'Unknown', pending: true, ...details }
+      : { status, pending: false, ...details };
   }
   return reports;
 }
