@@ -28,3 +28,8 @@ _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
   `agentic:codex-resume --thread-id 01a05200-345d-7ef0-bb18-30c4dacdaf4a --worktree …/007-aspire-s3 --user node`
   (log `/home/agent/observability/aspire-13.5/s3-phase-b-steer-1.log`). Cause: the run-dir brief
   edit in `beb5de8c` had not applied (regex vs fmt reflow), so the staged brief was stale — D-40.
+- 2026-08-30 ~09:36Z — first `codex-resume` was refused (`thread already has an active writer`: the
+  launcher client still held the turn). The launcher client was detached (turn cut before any
+  runtime start; Aspire `[]`, dind empty verified) and the correction re-sent on the **same thread**
+  via `agentic:codex-resume` (log `/home/agent/observability/aspire-13.5/s3-phase-b-steer-2.log`);
+  rollout confirms receipt. No second thread.

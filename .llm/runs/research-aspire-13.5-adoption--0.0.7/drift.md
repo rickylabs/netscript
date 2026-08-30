@@ -677,3 +677,8 @@
 - Fix: same-thread `codex-resume` correction (no relaunch, no second thread), brief amended with an
   explicit amendment section, staged copy refreshed. Lesson: after any scripted edit of a
   fmt-managed brief, `grep` for the old literal before dispatch — a no-op replacement is silent.
+- **D-40 addendum:** `codex-resume` cannot write to a thread while the launcher client is attached
+  ("already has an active writer"); same-thread steering mid-turn requires detaching the launcher
+  (the turn is cut) and resuming — which is what D-38 did for S8. Steering before the first runtime
+  start therefore costs the in-progress survey turn; accepted here because the coordinator required
+  the truthful environment paragraph before `aspire start`.
