@@ -1,0 +1,4 @@
+Plugin registry generation complete: 3 written.
+.netscript/generated/plugin-sagas/sagas.registry.ts
+.netscript/generated/plugin-triggers/triggers.registry.ts
+.netscript/generated/plugin-workers/job-registry.ts

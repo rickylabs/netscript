@@ -1,0 +1,46 @@
+{
+  "owner": "s5-attempt7",
+  "pid": 3804596,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T20:29:23.740Z",
+  "relays": [
+    {
+      "port": 32810,
+      "container": "relay-s5-attempt7-32810",
+      "source": "redis-sbzaqqjn",
+      "startedAt": "2026-08-30T20:29:35.014Z"
+    },
+    {
+      "port": 27330,
+      "container": "relay-s5-attempt7-27330",
+      "source": "postgres-8fc50900",
+      "startedAt": "2026-08-30T20:29:37.462Z"
+    },
+    {
+      "port": 32811,
+      "container": "relay-s5-attempt7-32811",
+      "source": "garnet-murvnnjr",
+      "startedAt": "2026-08-30T20:29:38.392Z"
+    },
+    {
+      "port": 25711,
+      "container": "relay-s5-attempt7-25711",
+      "source": "postgres-237a2636",
+      "startedAt": "2026-08-30T20:29:47.436Z"
+    },
+    {
+      "port": 32813,
+      "container": "relay-s5-attempt7-32813",
+      "source": "garnet-cwujphbg",
+      "startedAt": "2026-08-30T20:29:48.544Z"
+    },
+    {
+      "port": 32812,
+      "container": "relay-s5-attempt7-32812",
+      "source": "redis-czarynfa",
+      "startedAt": "2026-08-30T20:29:50.938Z"
+    }
+  ],
+  "closed": "2026-08-30T20:34:06.640Z"
+}

@@ -1,0 +1,3 @@
+Installed saga plugin "sagas". View its endpoint in the Aspire dashboard.
+Created 3 plugin files.
+Regenerated 13 Aspire helper files.

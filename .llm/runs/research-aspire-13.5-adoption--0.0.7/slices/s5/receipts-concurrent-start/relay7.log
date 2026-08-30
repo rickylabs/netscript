@@ -1,0 +1,8 @@
+[relay] watching owner=s5-attempt7 dind=netscript-dind(10.4.12.22) since=2026-08-30T20:29:23.740Z pid=3804596
+[relay] redis-sbzaqqjn 127.0.0.1:32810 => hopA relay-s5-attempt7-32810 (10.4.12.22:32810) => hopB 127.0.0.1:32810@ai-agents
+[relay] postgres-8fc50900 127.0.0.1:27330 => hopA relay-s5-attempt7-27330 (10.4.12.22:27330) => hopB 127.0.0.1:27330@ai-agents
+[relay] garnet-murvnnjr 127.0.0.1:32811 => hopA relay-s5-attempt7-32811 (10.4.12.22:32811) => hopB 127.0.0.1:32811@ai-agents
+[relay] postgres-237a2636 127.0.0.1:25711 => hopA relay-s5-attempt7-25711 (10.4.12.22:25711) => hopB 127.0.0.1:25711@ai-agents
+[relay] garnet-cwujphbg 127.0.0.1:32813 => hopA relay-s5-attempt7-32813 (10.4.12.22:32813) => hopB 127.0.0.1:32813@ai-agents
+[relay] redis-czarynfa 127.0.0.1:32812 => hopA relay-s5-attempt7-32812 (10.4.12.22:32812) => hopB 127.0.0.1:32812@ai-agents
+[relay] cleanup: closed 6 listener(s), removed 6 hop-A container(s)

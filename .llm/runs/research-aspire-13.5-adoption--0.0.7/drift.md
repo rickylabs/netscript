@@ -1700,3 +1700,20 @@
   green hosted `scaffold.runtime` run); (b) investigate whether a non-default CLI flag/env exists to
   opt out of the single-instance-per-path behavior (not found in `aspire start --help`); (c) amend
   the acceptance box to match actual CLI 13.5.3 semantics.
+- **D-88 — attempt 7 setup-invalid: `--no-samples` on `plugin install sagas` produced an empty saga
+  plugin, so `netscript generate plugins` failed with "Installed plugin @netscript/plugin-sagas
+  produced no registrable runtime items", leaving
+  `.netscript/generated/plugin-sagas/sagas.registry.ts` absent — the sagas resource then timed out
+  unhealthy in both concurrent roots (coordinator's independent log finding). Not a literal-port
+  collision, not evidence against S5's product diff. **Root-caused, not a generator defect**:
+  reproduced with default samples (no `--no-samples`) on a fresh scratch — `plugin install sagas`
+  reports "Created 5 plugin files", `netscript generate
+  plugins --project-root <root>` succeeds
+  ("3 written"), `sagas.registry.ts` present. The official generator works correctly; my earlier
+  `--no-samples` choice was the defect. **No product change authorized or needed.** Attempt 7's
+  AppHosts stopped (both exit 0), relay `s5-attempt7` torn down (6 hop-A removed), one survivor per
+  root removed, all scratch dirs removed via container (root-owned `.data`); host re-verified
+  `containers=0 volumes=0 aspire=[]`. Both console logs and receipts 90–108 preserved. Attempt 8
+  (final, authorized): rebuild the canonical tree with default samples +
+  `netscript generate plugins`, duplicate to two fresh distinct roots, re-prove byte identity, run
+  the same concurrent-start receipt.
