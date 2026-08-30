@@ -182,3 +182,50 @@ that does not compile, which no gate set can rescue.
 **Lesson.** When a slice publishes a *parameterized interface*, its ceiling must include every
 implementation that must widen in lockstep — a type contract and its implementers are one atomic
 change, even when the split between "type" and "behaviour" slices is otherwise sound.
+
+## D-5 — the corpus gate was contracted at every slice but could not be receipted
+
+**Found by:** the Slice 2 IMPL-EVAL (separate session), which also independently confirmed it.
+
+Plan row 13 contracts `mcp-export-corpus` at every slice (1–9), and each per-slice Tier-A stop names
+it. But `.llm/tools/gates/catalog.ts` had no entry for it or for `docs:exports-drift`, and
+`run-gate.ts` refuses any gate outside the catalog. Both gates could therefore only be run loose,
+producing prose in a Tier-A note instead of a durable receipt with `gitHead == actualGitHead`.
+
+**This is the same shape as D-3.** D-3 was the corpus gate contract pointing at the wrong points in
+the plan; D-5 is the corpus gate being uncontractable in the tooling. In both cases the plan asserted
+an evidence obligation that the machinery could not discharge, and in both cases the gap was invisible
+while the gate happened to pass.
+
+**Resolution (supervisor-signed, `04d22e7e1`):** two catalog entries added — `exports-drift` →
+`deno task docs:exports-drift`, `mcp-export-corpus` → `deno task check:mcp-export-corpus`.
+`deno task gates:test` 67 passed / 0 failed. Three supplementary receipts were then cut at
+`04d22e7e1`, all PASS.
+
+**Out-of-ceiling note.** `.llm/tools/gates/catalog.ts` is harness tooling, not framework source and
+not on any slice ceiling. It is changed here under the same supervisor-signed precedent as the
+pre-Slice-2 `chore(mcp)` corpus regeneration: additive, tested, and confined to `.llm/tools/`.
+AGENTS.md places fixes of this kind in `.llm/tools/` rather than in a leaf slice, which is exactly
+what this is.
+
+**Lesson.** A gate named in a plan is only contracted if the tooling can produce evidence for it.
+When adding a gate to a plan row, check it resolves in the catalog at the same time — otherwise the
+row buys nothing but a sentence in a report.
+
+## D-6 — stale receipts survived archiving because the archive was a copy, not a move
+
+**Found by:** the Slice 2 IMPL-EVAL, finding **E-1**.
+
+Before recutting for Slice 2 the eight Slice 1 receipts were copied into
+`receipts/slice-1-2ddd6048/` and verified byte-identical. Five were then overwritten by Slice 2's
+recut — but three (`docs-accuracy`, `quality-gate`, `test-contracts-sdk`) had **no Slice 2
+counterpart**, so they stayed at the top level of `receipts/` beside the current set. The evaluator
+read `quality-gate.json` as the Slice 2 quality gate; it was Slice 1's, at head `2ddd60481`.
+
+**Resolution:** the three stale top-level copies were removed after re-verifying each against its
+archived copy by sha256. The archive is untouched at eight files, so append-only holds.
+
+**Lesson.** Append-only protects the *record*; it does nothing for the *reading*. Archiving by copy
+leaves any receipt without a successor sitting where current evidence lives, and filenames are what
+readers scan. Verify a receipt by `invocationId` and `gitHead`, and after any recut, check that every
+file remaining at the top level attests the current head.
