@@ -75,6 +75,7 @@ export const GATE = {
   SCAFFOLD_PLUGIN_AI_APPSETTINGS: 'scaffold.plugin.ai.appsettings',
   SCAFFOLD_UI_ADD_AI: 'scaffold.ui-add-ai',
   SCAFFOLD_UI_LOCAL_SOURCE: 'scaffold.ui-local-source',
+  SCAFFOLD_UI_DATA_SCREEN: 'scaffold.ui-data-screen',
   DATABASE_INIT: 'database.init',
   DATABASE_MIGRATION_ARTIFACTS: 'database.migration-artifacts',
   DATABASE_LIST: 'database.list',

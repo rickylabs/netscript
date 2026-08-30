@@ -131,7 +131,7 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_ADD_AI), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_LOCAL_SOURCE), true);
   assertEquals(
-    runtime.gates.some((gate) => gate.id === ('scaffold.ui-data-screen' as GateId)),
+    runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN),
     true,
     'the generated data-screen gate must be selected into scaffold.runtime',
   );
@@ -174,7 +174,7 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(appsettingsIndex < runtimeSchemasIndex, true);
   assertEquals(runtimeSchemasIndex < generatedCheckIndex, true);
   const dataScreenIndex = runtime.gates.findIndex((gate) =>
-    gate.id === ('scaffold.ui-data-screen' as GateId)
+    gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN
   );
   assertEquals(
     runtime.gates.findIndex((gate) => gate.id === GATE.SCAFFOLD_INIT) < dataScreenIndex,

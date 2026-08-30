@@ -2,12 +2,10 @@ import { assertEquals, assertExists, assertStringIncludes } from '@std/assert';
 import { dirname, join } from '@std/path';
 
 import { createScaffoldCapabilityGates } from '../../../../src/application/gates/scaffold/scaffold-capability-gates.ts';
-import { type GateId, SCAFFOLD } from '../../../../src/domain/cli-surface.ts';
+import { GATE, SCAFFOLD } from '../../../../src/domain/cli-surface.ts';
 import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../../src/domain/extension-axes.ts';
 import type { CommandGateDefinition } from '../../../../src/domain/gate-definition.ts';
 import type { RunContext } from '../../../../src/domain/run-context.ts';
-
-const UI_DATA_SCREEN_GATE_ID = 'scaffold.ui-data-screen' as GateId;
 
 Deno.test('scaffold capability gates register the generated data-screen consumer', () => {
   const gate = dataScreenGate();
@@ -32,7 +30,7 @@ function dataScreenGate(): CommandGateDefinition | undefined {
   const gate = createScaffoldCapabilityGates({
     plugins: [],
     samples: false,
-  }).find((candidate) => candidate.id === UI_DATA_SCREEN_GATE_ID);
+  }).find((candidate) => candidate.id === GATE.SCAFFOLD_UI_DATA_SCREEN);
   return gate?.kind === 'command' ? gate : undefined;
 }
 

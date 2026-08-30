@@ -283,9 +283,9 @@ Acceptance box 6 remains documented only through the command's own `--help` surf
 
 | Gate                                      | Result  | Evidence                                                        |
 | ----------------------------------------- | ------- | --------------------------------------------------------------- |
-| Focused red-before at `22e737fc3`         | RED     | exit 1; 2 passed, 4 failed; unchanged S2B product code.         |
+| Focused red-before at `22e737fc3`         | RED     | exit 1; 17 passed, 4 failed; unchanged S2B product code.        |
 | Whole CLI red-before                      | RED     | exit 1; 1,380 passed, 4 failed; the same four S2B assertions.   |
-| Focused command suite after S2B           | PASS    | exit 0; 6 passed, 0 failed.                                    |
+| Focused command suite after S2B           | PASS    | exit 0; 21 passed, 0 failed.                                   |
 | Whole `packages/cli` check                | PASS    | exit 0.                                                        |
 | Whole structured `packages/cli` test      | PASS    | exit 0; 1,384 passed, 0 failed.                                |
 | Targeted `deno check --unstable-kv`       | PASS    | exit 0; all four S2B ceiling paths checked.                     |
@@ -298,6 +298,28 @@ S2B touched locked ceiling paths 3–6. The real Cliffy help renders the shared 
 the contract test independently plans the data screen, parses the rendered help, and compares those
 two observed sets. A stale three-role help fixture is rejected. Acceptance box 6 is documented only
 through this command-owned `--help`; `cli-reference.md:104` remains false and deferred.
+
+### S2C Gates
+
+| Gate                                      | Result  | Evidence                                                                  |
+| ----------------------------------------- | ------- | ------------------------------------------------------------------------- |
+| Focused red-before at `7ed5b94c6`         | RED     | exit 1; 18 passed, 3 failed; unchanged S2C product code.                  |
+| Focused E2E selection suite after S2C      | PASS    | exit 0; 21 passed, 0 failed.                                              |
+| Whole nested `packages/cli/e2e` test      | PASS    | exit 0; 170 passed, 0 failed.                                             |
+| Whole nested `packages/cli/e2e` check     | PASS    | exit 0.                                                                   |
+| Whole structured `packages/cli` test      | PASS    | exit 0; 1,386 passed, 0 failed (845 tests plus 541 nested steps).         |
+| Whole `packages/cli` check                | PASS    | exit 0.                                                                   |
+| Scoped lint/fmt                           | N/A     | Root excludes `packages/cli`; package configs declare no replacement.    |
+| Runtime/AppHost and `assets-barrel`       | NOT_RUN | Prohibited by the live runtime lease plus D16/D17.                        |
+| Lock hygiene                              | PASS    | `deno.lock` SHA-256 matches `de57fab0`: `edfa0c24...`.                    |
+
+S2C touched locked ceiling paths 7–12. `GATE.SCAFFOLD_UI_DATA_SCREEN` is registered through
+`createScaffoldCapabilityGates`, and `RUNTIME_GATES` explicitly selects it after
+`GATE.SCAFFOLD_INIT` and before `GATE.GENERATED_DENO_CHECK`. The resolved-suite test asserts that
+membership and order, so a registered-but-unselected gate fails rather than disappearing silently.
+The gate itself invokes `ui:add page data-screen --island --app <generated-app>`; the existing
+generated-workspace check is the composed type-check consumer. Runtime execution remains REQUIRED,
+supervisor-coordinated, and `NOT_RUN` while another lane owns the singleton host lease.
 
 ## Handoff Notes
 

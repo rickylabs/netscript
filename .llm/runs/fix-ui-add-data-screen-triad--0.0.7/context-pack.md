@@ -6,17 +6,17 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `fix-ui-add-data-screen-triad--0.0.7` |
 | Branch         | `fix/ui-add-data-screen-triad`        |
-| Current phase  | `implementation — S2B`                |
+| Current phase  | `implementation — S2C`                |
 | Archetype      | `6 — CLI / Tooling`                   |
 | Scope overlays | `frontend`                            |
 
 ## Current State
 
 PLAN-EVAL cycle 2 returned terminal `PASS_PLAN` at `53e696b5` with verdict `886f0860`. The owner
-independently reproduced and accepted S2A at `e5d820b3f`. S2B now has isolated test-only red commit
-`22e737fc3` and green public command changes: real help/role coupling, dry-run/force threading, and
-per-role path reporting. Focused and whole CLI gates are green; the S2B product/harness commit,
-explicit push, and PR comment remain.
+independently reproduced and accepted S2A at `e5d820b3f` and S2B at `0cc9b7ad7`. S2C has isolated
+test-only red commit `7ed5b94c6` and a green generated-consumer gate implementation: stable gate id,
+gate definition, capability registration, and explicit `scaffold.runtime` selection. Both whole
+package suites and checks are green without executing the runtime suite.
 
 ## Completed
 
@@ -35,23 +35,24 @@ explicit push, and PR comment remain.
   composition exposed three deterministic failures.
 - Proved focused green (8/0), whole structured CLI green (1,379/0), and nested E2E green (168/0).
 - Recorded lint/fmt as N/A by repository configuration for `packages/cli`, not as a false green.
-- Captured S2B focused red-before (2/4) and whole-package red-before (1,380/4) at `22e737fc3`.
+- Captured owner-reproduced S2B focused red-before (17/4) and green (21/0) at `22e737fc3` and
+  `0cc9b7ad7`; whole-package green is 1,384/0.
 - Made real command help advertise the four planned roles and route-tree island convention; the
   test parses that rendered help and compares it with an independently planned result set.
 - Threaded public `--dry-run` and `--force` into page/island scaffolds and report every role/path.
-- Proved S2B focused 6/0 and whole structured CLI 1,384/0.
+- Added the generated data-screen consumer gate and registered it with the scaffold capability set.
+- Explicitly selected the gate into `RUNTIME_GATES` after init and before generated-workspace check.
+- Proved S2C focused red 18/3 and green 21/0, nested E2E 170/0, and whole CLI 1,386/0.
 
 ## In Progress
 
-- Commit the S2B product/harness changes separately from `22e737fc3`, push by explicit refspec, and
-  post the single S2B evidence comment to PR #1781.
+- Commit the S2C product/harness changes separately from `7ed5b94c6`, push by explicit refspec, and
+  post the single S2C evidence comment to PR #1781.
 
 ## Next Steps
 
-1. Finish the S2B commit/push/comment trail.
-2. Implement S2C gate definition and explicit runtime-suite selection in locked paths 7–12 without
-   executing `scaffold.runtime`.
-3. Run S2D static/fitness/read-only cascade evidence and prepare separate-session IMPL-EVAL.
+1. Finish the S2C commit/push/comment trail.
+2. Run S2D static/fitness/read-only cascade evidence and prepare separate-session IMPL-EVAL.
 
 ## Key Decisions
 
@@ -67,34 +68,31 @@ explicit push, and PR comment remain.
 | Real help-surface assertion                | plan D13     | Render real Cliffy help and compare it independently with planned emission roles.                          |
 | Plain page registration                    | plan D7      | Non-island pages use `router.ts`/`appRoutes` but do not require a data binding.                            |
 
-## Files Changed
+## S2C Files Changed
 
-| Path                                                            | Status   | Notes                                         |
-| --------------------------------------------------------------- | -------- | --------------------------------------------- |
-| `packages/cli/src/kernel/application/ui/web-scaffold.ts`        | modified | S2A planner, binding, emission, preflight.      |
-| `packages/cli/src/kernel/application/ui/web-scaffold_test.ts`   | committed | Red-before semantic goldens at `0d620b61`.      |
-| `packages/cli/src/public/features/ui/ui-app-root-command_test.ts` | modified | Canonical router fixture for composed tests.  |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/worklog.md`      | modified | S2A evidence and corrected 10-file count.       |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/drift.md`        | modified | Records in-ceiling fixture ordering drift.      |
-| `.llm/runs/fix-ui-add-data-screen-triad--0.0.7/context-pack.md` | modified | Resumable S2B state and next steps.              |
-| `packages/cli/src/public/features/ui/add/add-ui-command.ts`     | modified | S2B real help, option threading, role reporting. |
-| `packages/cli/src/public/features/ui/add/add-ui-command_test.ts` | committed | S2B red-before seam at `22e737fc3`.             |
-| `packages/cli/src/public/features/ui/add/add-ui-input.ts`       | modified | Adds the optional `dryRun` public input.          |
-| `packages/cli/src/public/features/ui/ui-app-root-command_test.ts` | modified | Covers the accepted `dryRun` input field.       |
+| Ceiling | Path                                                                          | Notes                                  |
+| ------- | ----------------------------------------------------------------------------- | -------------------------------------- |
+| 7       | `packages/cli/e2e/src/domain/cli-surface.ts`                                  | Stable data-screen gate id.            |
+| 8       | `packages/cli/e2e/src/application/gates/scaffold/ui-data-screen-gates.ts`     | Generated-consumer command definition. |
+| 9       | `packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts` | Capability registration.               |
+| 10      | `packages/cli/e2e/tests/application/gates/scaffold/ui-data-screen-gates_test.ts` | Command/registration contract.         |
+| 11      | `packages/cli/e2e/tests/presentation/suite-registry_test.ts`                  | Resolved-suite membership/order proof. |
+| 12      | `packages/cli/e2e/suites/scaffold/capability-suites.ts`                       | Explicit `RUNTIME_GATES` selection.     |
 
 ## Gates
 
 | Gate family | Current status                  | Evidence                                                                                                       |
 | ----------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Static      | S2B PASS plus configured N/A lint/fmt | CLI 1,384/0; `packages/cli` is excluded from root lint/fmt and declares no package scope.                |
+| Static      | S2C PASS plus configured N/A lint/fmt | CLI 1,386/0; E2E 170/0; both checks exit 0. `packages/cli` is excluded from root lint/fmt.                |
 | Fitness     | PASS at base                    | quality, doctrine, docs, JSR, publish checks exit 0.                                                           |
 | Runtime     | REQUIRED / NOT_RUN              | supervisor-coordinated `scaffold.runtime`; author prohibited.                                                  |
 | Consumer    | PASS except intentional NOT_RUN | No corpus member is touched: three read-only checks stay green; writing assets-barrel remains supervisor-only. |
 
 ## Open Questions
 
-- No S2B question remains open. Command-owned real `--help` is the only in-leaf documentation
-  proof; deferred `cli-reference.md:104` remains knowingly stale.
+- No S2C question remains open. Runtime execution remains a required supervisor handoff. The
+  command-owned real `--help` is the only in-leaf documentation proof; deferred
+  `cli-reference.md:104` remains knowingly stale.
 
 ## Drift and Debt
 
@@ -109,4 +107,5 @@ explicit push, and PR comment remain.
 - S2A red-before test-only commit: `0d620b61`.
 - S2A product/harness commit: `e5d820b3f` (accepted).
 - S2B red-before test-only commit: `22e737fc3`.
-- S2B product/harness commit: this commit; exact SHA is recorded in the PR comment and owner report.
+- S2B product/harness commit: `0cc9b7ad7` (accepted).
+- S2C red-before test-only commit: `7ed5b94c6`.
