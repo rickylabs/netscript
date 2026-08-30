@@ -5870,3 +5870,33 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   (147s, exit 0, "db init completed successfully"), now at `database.migration-artifacts`. Awaiting
   the retry's arrival at `behavior.db-status-preserves-apphost` specifically and full completion
   before drawing a root-cause conclusion.
+
+## D-115 — #1758 e2e:cli: contamination hypothesis confirmed correct; genuine result is 79/80 with one pre-existing host gap; relay cleaned to literal zero
+
+- **Clean retry (pid `503306`) result, read directly from `suite-end`**: `ok: false`, 80 total
+  steps, exactly **one** failure: `behavior.app-reference` — "Render canonical app reference states
+  in desktop and mobile browsers" — `No supported headless Chrome/Chromium executable found`.
+  `behavior.db-status-preserves-apphost`, the gate that failed in the first (unrelayed) run,
+  **passed cleanly** this time.
+- **Contamination hypothesis confirmed, not merely accepted**: the DB gate's clean pass with the
+  correctly-owned relay in place versus its failure without one is direct before/after evidence,
+  not just a claim.
+- **The new failure is independently confirmed a pre-existing host environment gap, not a product
+  defect**: `which google-chrome chromium chromium-browser` and a direct `/usr/bin/*chrom*` glob
+  both found nothing — **no headless browser binary exists anywhere on this host**. Also confirmed
+  this gate never ran in the first attempt at all (0 occurrences in that log — the earlier failure
+  happened at an earlier gate in sequence), so it is not a regression introduced by anything in this
+  session's work; it is a standing host limitation, present regardless of branch.
+- **Genuine current result: 79/80 gates pass; the one failure is a host capability gap outside this
+  leaf's or this session's control**, not a code defect requiring product changes.
+- **Relay cleanup**: the watcher process (pid `528937`) and its tmux session (`netscript-1758-relay`)
+  had already exited and self-cleaned by the time I ran the tool's own `cleanup --owner
+  fix1758-runtime --registry .../relay-1758.json` (reported "0 listener(s), 0 container(s)" —
+  accurate, not a failure, since nothing remained). **Independently proved literal zero across all
+  four resource classes**: no AppHost, 0 containers, 0 volumes, 0 non-default networks.
+- **Owner currency ruling, per instruction: no evaluator rerun.** This runtime evidence (79/80,
+  contamination-explained single host-capability gap) is recorded as current, carrying forward
+  whatever prior evaluation/DoD state this leaf already held before this session's convergence work,
+  rather than triggering a fresh IMPL-EVAL cycle on its own.
+- Next: finalize #1758's PR-body/DoD state to reflect this runtime evidence, confirm exact-head CI,
+  and move to labels/close-gate once the coordinator's currency ruling is reflected in the artifact.
