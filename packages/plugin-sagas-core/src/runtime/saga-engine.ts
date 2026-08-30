@@ -22,8 +22,13 @@ import type {
   SagaStorePort,
 } from '../ports/mod.ts';
 import { MemorySagaAppliedKeyStore } from './saga-applied-keys.ts';
-import { SagaAttributes, SagaInstrumentation } from '../telemetry/mod.ts';
-import { type SagaTelemetryOutcome, SagaTelemetryOutcomes } from '../telemetry/mod.ts';
+import {
+  SagaAttributes,
+  SagaInstrumentation,
+  type SagaTelemetryOutcome,
+  SagaTelemetryOutcomes,
+  type SagaTraceParent,
+} from '../telemetry/mod.ts';
 
 /** Registered handler target stored in the O(1) message dispatch index. */
 export type SagaEngineDispatchEntry = Readonly<{
@@ -39,6 +44,9 @@ export type SagaEngineHandleResult<TState extends SagaState = SagaState> = Reado
   message: SagaMessage;
   state: TState;
   cascaded: readonly CascadedMessage[];
+  correlationId: string;
+  correlationKey: SagaCorrelationKey;
+  spanContext?: SagaTraceParent;
   completed: boolean;
   alreadyApplied: boolean;
 }>;
@@ -217,6 +225,7 @@ export class SagaEngine implements SagaBusPort {
       }
 
       const correlationKey = resolveCorrelationKey(entry.definition, message);
+      const correlationId = message.correlationKey ?? correlationKey;
       const instanceId = await this.#resolveInstanceId(entry.sagaId, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
@@ -229,6 +238,8 @@ export class SagaEngine implements SagaBusPort {
             message,
             state: cloneState(baseState),
             cascaded: Object.freeze([]),
+            correlationId,
+            correlationKey,
             completed: false,
             alreadyApplied: true,
           });
@@ -253,6 +264,7 @@ export class SagaEngine implements SagaBusPort {
         eventType: message.type,
         attempt,
         durabilityTier: entry.definition.durability,
+        correlationId,
         correlationKey,
         parent: {
           traceparent: message.traceparent,
@@ -266,12 +278,14 @@ export class SagaEngine implements SagaBusPort {
             [SagaAttributes.SAGA_INSTANCE_ID]: instanceId,
             [SagaAttributes.SAGA_EVENT_TYPE]: message.type,
             [SagaAttributes.SAGA_ATTEMPT]: attempt,
+            [SagaAttributes.CORRELATION_ID]: correlationId,
             [SagaAttributes.SAGA_CORRELATION_KEY]: correlationKey,
           },
         }],
       });
       const startedAt = performance.now();
       const span = this.#instrumentation.startHandleSpan(handleSpanInput);
+      const spanContext = this.#instrumentation.spanContext(span);
       this.#instrumentation.recordStateBefore(span, {
         [SagaAttributes.STATUS]: loaded?.metadata.status,
       });
@@ -281,6 +295,7 @@ export class SagaEngine implements SagaBusPort {
         const completed = cascaded.some((item) => item.kind === 'complete');
         const state = cloneState(saga.state);
         const status = resolvePersistedStatus(cascaded, loaded?.metadata.status);
+        const outcome = telemetryOutcomeFromStatus(status);
 
         await this.#persistTransition({
           definition: entry.definition,
@@ -295,7 +310,6 @@ export class SagaEngine implements SagaBusPort {
           now: context.now,
         });
 
-        const outcome = telemetryOutcomeFromStatus(status);
         this.#instrumentation.recordStateAfter(span, {
           [SagaAttributes.STATUS]: status,
         });
@@ -312,6 +326,9 @@ export class SagaEngine implements SagaBusPort {
           message,
           state,
           cascaded,
+          correlationId,
+          correlationKey,
+          spanContext,
           completed,
           alreadyApplied: false,
         });

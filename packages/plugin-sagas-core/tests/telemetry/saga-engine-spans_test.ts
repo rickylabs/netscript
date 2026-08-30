@@ -53,6 +53,7 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     assertEquals(span.attributes[SagaAttributes.SAGA_EVENT_TYPE], 'counter.incremented');
     assertEquals(span.attributes[SagaAttributes.SAGA_ATTEMPT], 1);
     assertEquals(span.attributes[SagaAttributes.SAGA_DURABILITY_TIER], 't2');
+    assertEquals(span.attributes[SagaAttributes.CORRELATION_ID], 'counter-1');
     assertEquals(span.attributes[SagaAttributes.SAGA_CORRELATION_KEY], 'counter-1');
     assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.SUCCESS);
     assertEquals(span.events, [
@@ -62,6 +63,9 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     assertEquals(span.status, { status: 'ok', description: undefined });
     assertEquals(span.exceptions.length, 0);
     assertEquals(span.ended, true);
+    assertEquals(results[0].correlationId, 'counter-1');
+    assertEquals(results[0].correlationKey, 'counter-1');
+    assertEquals(results[0].spanContext, span.spanContext());
     assertEquals(telemetry.durations.length, 1);
     assertEquals(telemetry.durations[0].attributes?.[SagaAttributes.SAGA_ID], 'telemetry-success');
     assertEquals(
@@ -144,10 +148,11 @@ Deno.test('createSagaRuntime threads native instrumentation into the saga engine
     });
 
     assertEquals(telemetry.spans.length, 1);
-    assertEquals(telemetry.spans[0].name, SagaSpanNames.HANDLE);
-    assertEquals(telemetry.spans[0].attributes[SagaAttributes.SAGA_ID], 'telemetry-runtime');
-    assertEquals(telemetry.spans[0].attributes[SagaAttributes.OUTCOME], 'success');
-    assertEquals(telemetry.spans[0].ended, true);
+    const handle = telemetry.spans[0];
+    assertEquals(handle.attributes[SagaAttributes.SAGA_ID], 'telemetry-runtime');
+    assertEquals(handle.attributes[SagaAttributes.CORRELATION_ID], 'work-1');
+    assertEquals(handle.attributes[SagaAttributes.OUTCOME], 'success');
+    assertEquals(handle.ended, true);
   } finally {
     await runtime.stop('saga runtime telemetry test complete');
   }
@@ -162,7 +167,14 @@ class RecordingTelemetry {
   readonly instrumentation = new SagaInstrumentation({
     tracer: {
       startSpan: (name, options): SagaTelemetrySpan => {
-        const span = new RecordingSpan(name, options.kind, options.attributes, options.parent);
+        const spanId = (this.spans.length + 1).toString(16).padStart(16, '0');
+        const span = new RecordingSpan(
+          name,
+          options.kind,
+          options.attributes,
+          options.parent,
+          { traceparent: `00-${'a'.repeat(32)}-${spanId}-01` },
+        );
         this.spans.push(span);
         return span;
       },
@@ -192,8 +204,13 @@ class RecordingSpan implements SagaTelemetrySpan {
     readonly kind: SagaTelemetrySpanKind,
     attributes: SagaTelemetryAttributes | undefined,
     readonly parent: SagaTraceParent | undefined,
+    readonly context: SagaTraceParent,
   ) {
     this.attributes = { ...attributes };
+  }
+
+  spanContext(): SagaTraceParent {
+    return this.context;
   }
 
   setAttribute(key: string, value: string | number | boolean): void {

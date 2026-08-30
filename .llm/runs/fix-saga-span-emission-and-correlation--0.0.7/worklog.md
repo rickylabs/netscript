@@ -92,14 +92,15 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Progress Log
 
-| Time                 | Slice | Step                 | Notes                                                                                                                                                              |
-| -------------------- | ----- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-08-30T12:57:16Z | S1    | Re-baseline/research | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.        |
-| 2026-08-30T12:57:16Z | S1    | Design               | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                           |
-| 2026-08-30T13:10:51Z | S1    | Supervisor review    | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                            |
-| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1    | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate. |
-| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2    | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                    |
-| 2026-08-30T13:53:27Z | S2    | Red-before proof     | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                     |
+| Time                 | Slice | Step                   | Notes                                                                                                                                                                                                     |
+| -------------------- | ----- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30T12:57:16Z | S1    | Re-baseline/research   | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                               |
+| 2026-08-30T12:57:16Z | S1    | Design                 | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                  |
+| 2026-08-30T13:10:51Z | S1    | Supervisor review      | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                   |
+| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1      | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                        |
+| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2      | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                           |
+| 2026-08-30T13:53:27Z | S2    | Red-before proof       | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                            |
+| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4. |
 
 ## Decisions
 
@@ -137,6 +138,9 @@ a process seam. A thin plugin may only wire the core primitive.
 | S1 artifact/lock checks  | `deno fmt --check`, `git diff --check`, raw lock diff | PASS   | Six artifacts formatted; diff checks exit 0; `deno.lock` unchanged                          |
 | PLAN-EVAL cycle 2        | separate evaluator verdict `81c5f874`                 | PASS   | `PASS_PLAN`; implementation authorized                                                      |
 | S2 measured negative     | structured test wrapper                               | PASS   | raw exit 1; 0 passed / 2 failed; both failures are assertions; test-only commit `2146443c`  |
+| S3 core check            | structured check wrapper, package root                | PASS   | exit 0; 112 selected modules, zero findings                                                 |
+| S3 telemetry tests       | structured test wrapper, three focused suites         | PASS   | exit 0; 7 passed / 0 failed                                                                 |
+| S3 package format/lint   | structured format and lint wrappers, package root     | PASS   | exit 0; 112 files processed by each, zero findings                                          |
 
 ### Fitness Gates
 
@@ -163,8 +167,8 @@ a process seam. A thin plugin may only wire the core primitive.
 
 - PLAN-EVAL is cleared. S2 compiled against the locked surface and failed exactly at the two
   required assertions; product implementation may proceed in slice order.
-- S3 must add the typed telemetry/context contract and tests before S4 consumes it. S4 must preserve
-  the optional/no-fallback compensation request decision and the typed post-handler cascade-size
-  recorder above.
+- S3 now supplies the typed telemetry/context contract, engine-selected transport, and tests. S4
+  must add the five production emission owners while preserving the optional/no-fallback
+  compensation request decision and typed post-handler cascade-size recorder above.
 - The expected MCP corpus and release public-surface baseline staleness are supervisor sequencing
   handoffs. Do not regenerate them. Flow-B runtime remains author-must-not-run.

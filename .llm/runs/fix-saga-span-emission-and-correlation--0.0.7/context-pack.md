@@ -18,7 +18,9 @@ the missing MCP export-corpus check and made the leased Flow-B runtime proof exp
 supervisor-coordinated/author-must-not-run. PLAN-EVAL cycle 2 returned `PASS_PLAN` at evaluator
 commit `81c5f874`. S2 then landed as the isolated test-only commit `2146443c`: the
 baseline-compatible test compiled and produced raw exit 1 with 0 passed / 2 failed, both at the
-required assertions. No product source has changed. S3 telemetry/context contract work is next.
+required assertions. S3 now adds the typed telemetry/W3C contract and engine-selected correlation
+transport; its focused check, format, lint, and 7-test gate are green. Production factory callers
+remain reserved for S4.
 
 ## Completed
 
@@ -37,18 +39,20 @@ required assertions. No product source has changed. S3 telemetry/context contrac
 - Cleared PLAN-EVAL in a separate evaluator session after two cycles.
 - Proved the defect red before product edits: missing `saga.cascade.compensate` and missing
   `netscript.correlation.id`, each by assertion.
+- Added `netscript.correlation.id` to the canonical saga attribute vocabulary, typed common cascade
+  context, optional structural W3C extraction, and engine result transport for the resolved
+  correlation ID/key and handle parent.
+- Proved S3 with 112-module check/format/lint coverage and 7 focused passing telemetry tests.
 
 ## In Progress
 
-- S3 telemetry/W3C contract implementation.
+- S3 commit and push.
 
 ## Next Steps
 
-1. Add the S3 typed common context, optional structural span-context extraction, engine result
-   transport, and telemetry tests.
-2. Record targeted structured check/test evidence, commit, push, and update the implementation PR
-   comment before S4.
-3. In S4, enforce optional compensation request fields with no fallback precedence and use a typed
+1. Commit and push the green S3 contract slice, then update the implementation PR comment.
+2. In S4, add the five operation-owned production emission seams and composition wiring.
+3. Enforce optional compensation request fields with no fallback precedence and use a typed
    instrumentation recorder for post-handler cascade size.
 
 ## Key Decisions
@@ -66,10 +70,13 @@ required assertions. No product source has changed. S3 telemetry/context contrac
 
 ## Files Changed
 
-| Path                                                                    | Status | Notes                  |
-| ----------------------------------------------------------------------- | ------ | ---------------------- |
-| `.llm/runs/fix-saga-span-emission-and-correlation--0.0.7/*.md`          | new    | Harness state/evidence |
-| `packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts` | new    | S2 red-before contract |
+| Path                                                                                                         | Status   | Notes                                         |
+| ------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------- |
+| `.llm/runs/fix-saga-span-emission-and-correlation--0.0.7/*.md`                                               | new      | Harness state/evidence                        |
+| `packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts`                                      | new      | S2 red-before contract                        |
+| `packages/plugin-sagas-core/src/telemetry/{attributes,instrumentation,otel-saga-telemetry}.ts`               | modified | S3 typed telemetry/W3C contract               |
+| `packages/plugin-sagas-core/src/runtime/saga-engine.ts`                                                      | modified | Engine-selected correlation/context transport |
+| `packages/plugin-sagas-core/tests/telemetry/{instrumentation,otel-saga-telemetry,saga-engine-spans}_test.ts` | modified | S3 contract tests                             |
 
 ## Gates
 
@@ -80,6 +87,7 @@ required assertions. No product source has changed. S3 telemetry/context contrac
 | Runtime     | NOT_RUN           | prohibited without lease                                                         |
 | Consumer    | baseline measured | MCP corpus check exit 0 now; post-change stale expected and supervisor-sequenced |
 | S2 negative | PASS              | raw exit 1; 0 passed / 2 failed assertions; commit `2146443c`                    |
+| S3 static   | PASS              | 112 checked/formatted/linted; 7 focused tests passed                             |
 
 ## Open Questions
 
