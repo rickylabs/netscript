@@ -556,3 +556,26 @@
   not red on its own diff. The merge-head runtime verdict becomes obtainable only after #1736 merges
   and S5 rebases (or on a throwaway S5+#1736 merge head, which would be a second attempt and
   therefore a new coordinator grant, not a retry of this one).
+
+## D-34 — 2026-08-30 — S6 IMPL-EVAL cycle 2 `PASS` (phase A); inotify ceiling now hits `aspire restore`
+
+- **Verdict:** `PASS — phase A only` at `564d465c` (base S5 `aa822069`), independent Claude · Fable
+  5 · medium session `988f2cdc…` (`slices/s6/evaluate-cycle-2.md`, PR #1743 comment
+  2026-08-30T08:58:43Z). All cycle-1 findings H-1/H-2/M-1/M-2 closed on executed evidence; L-2 (no
+  slice-6 comment) noted, non-blocking. Evaluator verified the supervisor's D-19 receipt (module
+  SHA-256s, raw tsc, emitted lines byte-identical to its own generator render and its own scratch
+  `init`). Supervisor verified non-mutation: eval worktree clean, PR draft, labels unchanged, head
+  unchanged.
+- **New host finding:** the evaluator's own `aspire restore` reproduction aborted twice with
+  `AppHost server process exited … Exit code: 134`, CLI log root cause
+  `IOException: The
+  configured user limit (128) on the number of inotify instances has been reached`
+  — D-25a, minutes after the supervisor's restore succeeded on the same host. **Consequence for
+  Phase-B leases:** `aspire start` needs more watchers than `restore`; a lease granted while the
+  ceiling is saturated will fail as environment, not product. **Host action (human):** raise
+  `fs.inotify.max_user_instances` (and reap the D-25 zombies) before the S3 Phase-B lease is
+  granted; the lease holder must record `cat /proc/sys/fs/inotify/max_user_instances` and the
+  current instance count in preflight.
+- **Not covered by the PASS:** Phase B (`runtime.health.listener-unreachable`, both-tier
+  `healthReports` receipts, `scaffold.runtime`/`quickstart`) remains lease-gated; #1718 boxes
+  unchecked and `status:blocked` stay until then. S6 is now the **settled base for S8**.

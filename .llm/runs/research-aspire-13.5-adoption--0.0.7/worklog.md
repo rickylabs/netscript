@@ -154,3 +154,13 @@ cancel sibling lanes) or from a re-granted host lease after the NAS is provision
 - **Exit rule if Docker-version-specific:** receipt preserved, zero proven, lease released,
   `sandboxctl` upgrade of the dind sandbox surfaced as the human infrastructure boundary; all static
   Aspire work continues.
+
+## Checkpoint 4 — 2026-08-30 — S6 IMPL-EVAL cycle 2 PASS (phase A)
+
+| Step               | Evidence                                                                                                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Evaluator session  | `988f2cdc-6c86-4b64-ad56-4fdab8d1c989` (`claude -p`, brief on stdin; the idle `--bg` `f966add1` was stopped unused). Separate from supervisor, Codex thread, S5/S7 evaluators. |
+| Verdict            | **`PASS` — phase A only** at `564d465c` (`slices/s6/evaluate-cycle-2.md`; PR #1743 `[PHASE: IMPL-EVAL]` comment 08:58:43Z). D-34.                                              |
+| Non-mutation check | eval worktree dirty 0; PR draft, base S5 branch, labels unchanged; S6 head `564d465c`; `aspire ps` → `[]`; dind containers 0.                                                  |
+| Host risk surfaced | inotify ceiling (128) hit during the evaluator's `aspire restore` — must be raised before the next Phase-B lease (D-34).                                                       |
+| Queue effect       | S6 Phase A settled → S8 (#1720) dispatch precondition met; S8 stacks on `feat/aspire-13-5-s6-health-checks` @ `564d465c`.                                                      |
