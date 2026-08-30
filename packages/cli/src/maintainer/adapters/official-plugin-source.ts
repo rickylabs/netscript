@@ -8,6 +8,7 @@ import type { PackageSourceMode } from '../../kernel/domain/scaffold/scaffold-op
 import type { ScaffoldResult } from '../../kernel/domain/core-types.ts';
 import type { PluginKind, PluginKindProvider } from '../../kernel/domain/plugin-kind.ts';
 import { PluginKindRegistry } from '../../kernel/application/registries/plugin-kind-registry.ts';
+import { allocateScaffoldDefaultPort } from '../../kernel/domain/scaffold/default-port-allocation.ts';
 
 export interface OfficialPluginSource {
   readonly kind: PluginKind;
@@ -215,14 +216,16 @@ async function discoverOfficialPluginSources(
   const entries = await readPluginManifestEntries(sourceRoot);
   const sourcesByPluginDir = new Map<string, OfficialPluginDependency>();
   const result = new Map<PluginKind, OfficialPluginSource>();
+  const usedPorts = new Set<number>();
 
   for (const entry of entries) {
     const source = entry.manifest.officialSource;
     if (!source || !hasOfficialService(source)) continue;
-    sourcesByPluginDir.set(source.pluginDir ?? entry.pluginDir, {
-      pluginDir: source.pluginDir ?? entry.pluginDir,
+    const pluginDir = source.pluginDir ?? entry.pluginDir;
+    sourcesByPluginDir.set(pluginDir, {
+      pluginDir,
       configKey: source.serviceConfigKey,
-      servicePort: source.servicePort,
+      servicePort: resolveOfficialPort(source.servicePort, pluginDir, 'service', usedPorts),
       serviceEntrypoint: source.serviceEntrypoint,
       requiresDb: source.requiresDb ?? false,
       requiresKv: source.requiresKv ?? false,
@@ -234,20 +237,27 @@ async function discoverOfficialPluginSources(
     const provider = entry.manifest.provider;
     const source = entry.manifest.officialSource;
     if (!provider || !source) continue;
+    const pluginDir = source.pluginDir ?? entry.pluginDir;
+    const service = sourcesByPluginDir.get(pluginDir);
     result.set(provider.kind, {
       kind: provider.kind,
       canonicalName: source.canonicalName,
-      pluginDir: source.pluginDir ?? entry.pluginDir,
+      pluginDir,
       backgroundDir: source.backgroundDir,
       backgroundEntrypoint: source.backgroundEntrypoint,
-      ...(hasOfficialService(source)
+      ...(hasOfficialService(source) && service !== undefined
         ? {
           serviceEntrypoint: source.serviceEntrypoint,
           serviceConfigKey: source.serviceConfigKey,
-          servicePort: source.servicePort,
+          servicePort: service.servicePort,
         }
         : {}),
-      backgroundPort: source.backgroundPort,
+      backgroundPort: resolveOfficialPort(
+        source.backgroundPort,
+        pluginDir,
+        'background',
+        usedPorts,
+      ),
       dependencies: (source.dependencies ?? []).map((pluginDir) =>
         resolveDependency(sourcesByPluginDir, pluginDir)
       ),
@@ -263,11 +273,26 @@ function hasOfficialService(
 ): source is OfficialSourceManifest & {
   readonly serviceEntrypoint: string;
   readonly serviceConfigKey: string;
-  readonly servicePort: number;
 } {
   return source.serviceEntrypoint !== undefined &&
-    source.serviceConfigKey !== undefined &&
-    source.servicePort !== undefined;
+    source.serviceConfigKey !== undefined;
+}
+
+function resolveOfficialPort(
+  configuredPort: number | undefined,
+  pluginDir: string,
+  role: 'service' | 'background',
+  usedPorts: Set<number>,
+): number {
+  const port = configuredPort !== undefined && configuredPort > 0
+    ? configuredPort
+    : allocateScaffoldDefaultPort(
+      'official-plugins',
+      `plugin:${pluginDir}:${role}`,
+      usedPorts,
+    );
+  usedPorts.add(port);
+  return port;
 }
 
 function resolveDependency(

@@ -12,14 +12,15 @@
 
 ## Current State
 
-Slices 1-2 are pushed on draft PR #1740. Slice 3 removes contribution and generated-consumer
-fallback ports.
+Slices 1-3 are pushed on draft PR #1740. Slice 4 makes plugin and infrastructure host-port pins
+explicit-only.
 
 ## Completed
 
 - Required issue, parent research/plan, doctrine, skills, and S2 receipt intake.
 - RED fitness contract committed and pushed as `e83659d78`.
 - D-14 sagas slice committed and pushed as `24817a404` with JSR evidence.
+- Contribution slice committed and pushed as `aae91586b`.
 
 ## In Progress
 

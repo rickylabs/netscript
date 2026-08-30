@@ -420,7 +420,6 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
   assertEquals(config.NetScript.Plugins['billing-worker-api'], {
     Enabled: true,
     Runtime: 'deno',
-    Port: 8091,
     Entrypoint: netscriptJsrSpecifier('plugin-billing-worker', '/services'),
     Workdir: '.',
     RequiresKv: true,
@@ -533,7 +532,6 @@ Deno.test('PluginWorkspaceMutator honors absolute local source service entrypoin
     {
       Enabled: true,
       Runtime: 'deno',
-      Port: 8093,
       Entrypoint:
         '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
       Workdir: '.',

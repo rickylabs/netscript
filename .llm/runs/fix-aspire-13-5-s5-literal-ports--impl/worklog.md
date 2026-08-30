@@ -63,6 +63,8 @@ required, and expose cross-resource URLs through resource-reference environment 
 | 2026-08-30 | 2 | D-14 implementation | Removed sagas runtime fallback; retained four deprecated exports. |
 | 2026-08-30 | 2 | push | `24817a404` pushed with JSR and consumer-import evidence. |
 | 2026-08-30 | 3 | contribution wiring | Four contributions allocate ports and publish resource references. |
+| 2026-08-30 | 3 | push | `aae91586b` pushed with contribution and consumer-stub evidence. |
+| 2026-08-30 | 4 | opt-in pins | Plugin manifests/entries and five infrastructure engines default to allocation. |
 
 ## Decisions
 
@@ -92,6 +94,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | --- | --- | --- | --- |
 | host-port allocation | FAIL (expected RED) | `receipts/01-aspire-host-ports-red.raw.txt` | Names all current contribution fallbacks/URLs. |
 | contribution allocation | PASS / exit `0` | `receipts/03-contributions.txt` | 957 files; no contribution fallback/URL findings. |
+| generated host-port opt-in | PASS / exit `0` | `receipts/04-opt-in-host-ports.txt` | Plugin and infrastructure cases covered. |
 
 ### Runtime Gates
 

@@ -40,7 +40,6 @@ const triggersManifest: PluginManifest = definePlugin(
   .withService({
     name: TRIGGERS_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',
-    port: TRIGGERS_API_DEFAULT_PORT,
   })
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([
