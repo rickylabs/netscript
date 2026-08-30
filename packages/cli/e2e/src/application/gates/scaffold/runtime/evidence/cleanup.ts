@@ -1,9 +1,11 @@
-import { dirname } from '@std/path';
+import { basename, dirname, isAbsolute, relative, resolve } from '@std/path';
 
 export const ASPIRE_MOUNTS = 'com.microsoft.developer.usvc-dev.mountsLabel';
+export const ASPIRE_CREATOR_PID = 'com.microsoft.developer.usvc-dev.creatorProcessId';
 export const ASPIRE_DCP_APPHOST_PATH = 'ASPIRE_DCP_APPHOST_PATH';
 interface ContainerEvidence {
   readonly id: string;
+  readonly creatorProcessId?: string;
 }
 interface ProcessEvidence {
   readonly pid: number;
@@ -18,8 +20,18 @@ export interface PostStopProbeEvaluation {
   readonly foreignProcesses: readonly ProcessEvidence[];
 }
 
+/** Returns true only when an absolute candidate path is contained by root on path boundaries. */
+export function pathContained(candidate: string, root: string): boolean {
+  if (!isAbsolute(candidate) || !isAbsolute(root)) return false;
+  const delta = relative(resolve(root), resolve(candidate));
+  return delta === '' || (!delta.startsWith('..') && !isAbsolute(delta));
+}
+
 /** Classify fixture or live probe data with S7's label, env, argv, and process-name evidence. */
-export function evaluatePostStopProbe(value: unknown, appHost: string): PostStopProbeEvaluation {
+export function evaluatePostStopProbe(
+  value: unknown,
+  projectRoot: string,
+): PostStopProbeEvaluation {
   const root = record(value, 'post-stop probe');
   const ownedContainers: ContainerEvidence[] = [];
   const foreignContainers: ContainerEvidence[] = [];
@@ -28,11 +40,12 @@ export function evaluatePostStopProbe(value: unknown, appHost: string): PostStop
     const container = record(candidate, 'container');
     const id = firstString(container, ['Id', 'ID', 'id']);
     if (!id) throw new Error('container omitted id');
+    const creatorProcessId = containerCreatorProcessId(container);
+    const evidence = { id, ...(creatorProcessId ? { creatorProcessId } : {}) };
     const source = containerAppHostSource(container);
-    if (!source) unprovenContainers.push({ id });
-    else if (samePath(source, dirname(appHost)) || samePath(source, appHost)) {
-      ownedContainers.push({ id });
-    } else foreignContainers.push({ id });
+    if (!source || !isAbsolute(source)) unprovenContainers.push(evidence);
+    else if (pathContained(source, projectRoot)) ownedContainers.push(evidence);
+    else foreignContainers.push(evidence);
   }
   const ownedProcesses: ProcessEvidence[] = [];
   const foreignProcesses: ProcessEvidence[] = [];
@@ -41,16 +54,20 @@ export function evaluatePostStopProbe(value: unknown, appHost: string): PostStop
     const pid = numberField(process, 'pid');
     const argv = stringArray(process, 'argv');
     const environment = stringArray(process, 'environment');
-    const processName = argv[0] ?? '';
+    const processName = basename(argv[0] ?? '').toLowerCase();
     const appHostArgument = valueAfter(argv, '--apphost');
     const envAppHost = environment.find((entry) => entry.startsWith(`${ASPIRE_DCP_APPHOST_PATH}=`))
       ?.slice(ASPIRE_DCP_APPHOST_PATH.length + 1);
-    if (processName !== 'aspire' && processName !== 'aspire-managed' && processName !== 'dcp') {
+    if (
+      processName !== 'aspire' && processName !== 'aspire.exe' &&
+      processName !== 'aspire-managed' && processName !== 'dcp' &&
+      !processName.endsWith('.dcp.dll')
+    ) {
       continue;
     }
     const evidence = appHostArgument ?? envAppHost;
-    if (evidence && samePath(evidence, appHost)) ownedProcesses.push({ pid });
-    else if (evidence) foreignProcesses.push({ pid });
+    if (evidence && pathContained(evidence, projectRoot)) ownedProcesses.push({ pid });
+    else if (evidence && isAbsolute(evidence)) foreignProcesses.push({ pid });
   }
   return {
     ownedContainers,
@@ -61,9 +78,28 @@ export function evaluatePostStopProbe(value: unknown, appHost: string): PostStop
   };
 }
 
+/** Fail cleanup when the post-stop evidence still maps a resource to this generated project. */
+export function assertNoOwnedSurvivors(evaluation: PostStopProbeEvaluation): void {
+  if (evaluation.ownedContainers.length > 0) {
+    throw new Error(
+      `post-stop probe found owned containers: ${
+        evaluation.ownedContainers.map((entry) => entry.id).join(', ')
+      }`,
+    );
+  }
+  if (evaluation.ownedProcesses.length > 0) {
+    throw new Error(
+      `post-stop probe found owned processes: ${
+        evaluation.ownedProcesses.map((entry) => entry.pid).join(', ')
+      }`,
+    );
+  }
+}
+
 /** Stop one exact AppHost, force only for cleanup runs, then prove no owned container remains. */
 export async function stopAndProbe(
   appHost: string,
+  projectRoot: string,
   cleanup: boolean,
   receiptPath: string,
 ): Promise<void> {
@@ -81,8 +117,8 @@ export async function stopAndProbe(
     if (!Array.isArray(parsed)) throw new Error(`docker inspect ${id} did not return an array`);
     containers.push(...parsed);
   }
-  const probe = { appHost, containers, processes: [] };
-  const evaluation = evaluatePostStopProbe(probe, appHost);
+  const probe = { appHost, projectRoot, containers, processes: [] };
+  const evaluation = evaluatePostStopProbe(probe, projectRoot);
   const receipt = {
     appHost,
     cleanup,
@@ -93,13 +129,7 @@ export async function stopAndProbe(
   };
   await Deno.mkdir(dirname(receiptPath), { recursive: true });
   await Deno.writeTextFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
-  if (evaluation.ownedContainers.length > 0) {
-    throw new Error(
-      `post-stop probe found owned containers: ${
-        evaluation.ownedContainers.map((entry) => entry.id).join(', ')
-      }`,
-    );
-  }
+  assertNoOwnedSurvivors(evaluation);
   const terminalStop = transcripts.at(-1);
   if (!terminalStop || terminalStop.code !== 0) {
     throw new Error(
@@ -154,7 +184,7 @@ function containerAppHostSource(container: Record<string, unknown>): string | un
   const labels = config ? optionalRecord(Reflect.get(config, 'Labels')) : undefined;
   const mount = labels ? Reflect.get(labels, ASPIRE_MOUNTS) : undefined;
   if (typeof mount === 'string') {
-    return mount.split(',').find((part) => part.startsWith('src='))?.slice(4);
+    return mount.match(/(?:^|,)src=([^,]+)(?:,|$)/)?.[1]?.trim() || undefined;
   }
   const environment = config ? Reflect.get(config, 'Env') : undefined;
   if (Array.isArray(environment)) {
@@ -165,13 +195,16 @@ function containerAppHostSource(container: Record<string, unknown>): string | un
   return undefined;
 }
 
-function samePath(left: string, right: string): boolean {
-  return left.replaceAll('\\', '/').replace(/\/$/, '') ===
-    right.replaceAll('\\', '/').replace(/\/$/, '');
+function containerCreatorProcessId(container: Record<string, unknown>): string | undefined {
+  const config = optionalRecord(Reflect.get(container, 'Config'));
+  const labels = config ? optionalRecord(Reflect.get(config, 'Labels')) : undefined;
+  const value = labels ? Reflect.get(labels, ASPIRE_CREATOR_PID) : undefined;
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 function valueAfter(values: readonly string[], flag: string): string | undefined {
   const index = values.indexOf(flag);
-  return index < 0 ? undefined : values[index + 1];
+  if (index >= 0) return values[index + 1];
+  return values.find((value) => value.startsWith(`${flag}=`))?.slice(flag.length + 1) || undefined;
 }
 function firstString(source: Record<string, unknown>, keys: readonly string[]): string | undefined {
   for (const key of keys) {
@@ -209,9 +242,9 @@ function record(value: unknown, label: string): Record<string, unknown> {
 }
 
 if (import.meta.main) {
-  const [appHost, cleanupValue, receiptPath] = Deno.args;
-  if (!appHost || !cleanupValue || !receiptPath) {
-    throw new Error('cleanup requires AppHost, cleanup boolean, and receipt path');
+  const [appHost, projectRoot, cleanupValue, receiptPath] = Deno.args;
+  if (!appHost || !projectRoot || !cleanupValue || !receiptPath) {
+    throw new Error('cleanup requires AppHost, project root, cleanup boolean, and receipt path');
   }
-  await stopAndProbe(appHost, cleanupValue === 'true', receiptPath);
+  await stopAndProbe(appHost, projectRoot, cleanupValue === 'true', receiptPath);
 }

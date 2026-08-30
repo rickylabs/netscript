@@ -48,3 +48,45 @@ Deno.test('describe follow fails when the final resource set does not converge',
     'missing',
   );
 });
+
+Deno.test('describe follow reports a malformed NDJSON line number', () => {
+  const stream = [
+    JSON.stringify({ resources: [{ displayName: 'postgres', state: 'Starting' }] }),
+    '{not-json}',
+  ].join('\n');
+  assertThrows(
+    () => evaluateDescribeFollow(stream, ['postgres']),
+    Error,
+    'line 2 is not JSON',
+  );
+});
+
+Deno.test('describe follow reports a pending last-seen resource state', () => {
+  const stream = `${
+    JSON.stringify({
+      resources: [{ displayName: 'postgres', state: 'Starting', healthReports: {} }],
+    })
+  }\n`;
+  assertThrows(
+    () => evaluateDescribeFollow(stream, ['postgres']),
+    Error,
+    'did not converge: postgres=Starting',
+  );
+});
+
+Deno.test('describe follow rejects Running resources with unhealthy reports', () => {
+  const stream = `${
+    JSON.stringify({
+      resources: [{
+        displayName: 'postgres',
+        state: 'Running',
+        healthReports: { self: { status: 'Unhealthy' } },
+      }],
+    })
+  }\n`;
+  assertThrows(
+    () => evaluateDescribeFollow(stream, ['postgres']),
+    Error,
+    'did not converge: postgres.healthReports.self=Unhealthy',
+  );
+});

@@ -1,4 +1,4 @@
-import { type DescribeHealthReport, evaluateDescribeFollow } from './describe-follow.ts';
+import { type DescribeHealthReport, parseDescribeFollow } from './describe-follow.ts';
 
 /** One custom listener health report selected from captured Aspire describe evidence. */
 export interface ListenerHealthReport {
@@ -28,7 +28,9 @@ export function readListenerHealthReport(
     })
     : candidates;
   const line = `${JSON.stringify(root ? { ...root, resources } : topology)}\n`;
-  const resource = evaluateDescribeFollow(line, [resourceName]).resources[0];
+  const resource = parseDescribeFollow(line).resources.find((candidate) =>
+    candidate.name === resourceName.toLowerCase()
+  );
   if (!resource) throw new Error(`describe stream omitted ${resourceName}`);
   const report: DescribeHealthReport | undefined = resource.healthReports[healthCheckKey];
   if (!report) throw new Error(`${resourceName} omitted healthReports.${healthCheckKey}`);

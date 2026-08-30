@@ -41,6 +41,13 @@ export async function runResourceCommands(
     });
     return 75;
   }
+  const transcripts: {
+    readonly command: readonly string[];
+    readonly code: number;
+    readonly stdout: string;
+    readonly stderr: string;
+  }[] = [];
+  const describeEvidence = `${projectRoot}/.netscript/e2e/resource-command-describe.ndjson`;
   const commands = [
     [
       'aspire',
@@ -65,46 +72,53 @@ export async function runResourceCommands(
       '--nologo',
     ]),
   ];
-  const transcripts = [];
-  for (const command of commands) {
-    const output = await new Deno.Command(command[0] ?? 'aspire', {
-      args: command.slice(1),
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
-    const transcript = {
-      command,
-      code: output.code,
-      stdout: new TextDecoder().decode(output.stdout),
-      stderr: new TextDecoder().decode(output.stderr),
-    };
-    transcripts.push(transcript);
-    if (!output.success) {
-      await writeReceipt(receiptPath, { verdict: 'failed', transcripts });
-      throw new Error(
-        `${command.join(' ')} failed (${output.code}): ${transcript.stderr || transcript.stdout}`,
-      );
+  try {
+    for (const command of commands) {
+      const output = await new Deno.Command(command[0] ?? 'aspire', {
+        args: command.slice(1),
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      const transcript = {
+        command,
+        code: output.code,
+        stdout: new TextDecoder().decode(output.stdout),
+        stderr: new TextDecoder().decode(output.stderr),
+      };
+      transcripts.push(transcript);
+      if (!output.success) {
+        throw new Error(
+          `${command.join(' ')} failed (${output.code}): ${transcript.stderr || transcript.stdout}`,
+        );
+      }
     }
+    const expectedResources = [
+      ...(database === 'sqlite' ? [] : [database]),
+      'workers',
+      'sagas',
+      'triggers',
+    ];
+    await captureDescribeFollow(appHost, describeEvidence, expectedResources);
+    const convergence = evaluateDescribeFollow(
+      await Deno.readTextFile(describeEvidence),
+      expectedResources,
+    );
+    await writeReceipt(receiptPath, {
+      verdict: 'passed',
+      transcripts,
+      describeEvidence,
+      convergence,
+    });
+    return 0;
+  } catch (error) {
+    await writeReceipt(receiptPath, {
+      verdict: 'failed',
+      error: error instanceof Error ? error.message : String(error),
+      transcripts,
+      describeEvidence,
+    });
+    throw error;
   }
-  const describeEvidence = `${projectRoot}/.netscript/e2e/resource-command-describe.ndjson`;
-  const expectedResources = [
-    ...(database === 'sqlite' ? [] : [database]),
-    'workers',
-    'sagas',
-    'triggers',
-  ];
-  await captureDescribeFollow(appHost, describeEvidence, expectedResources);
-  const convergence = evaluateDescribeFollow(
-    await Deno.readTextFile(describeEvidence),
-    expectedResources,
-  );
-  await writeReceipt(receiptPath, {
-    verdict: 'passed',
-    transcripts,
-    describeEvidence,
-    convergence,
-  });
-  return 0;
 }
 
 async function writeReceipt(path: string, value: unknown): Promise<void> {

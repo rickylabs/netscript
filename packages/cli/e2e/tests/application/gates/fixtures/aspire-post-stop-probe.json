@@ -1,12 +1,13 @@
 {
   "appHost": "/workspace/app/aspire/apphost.mts",
+  "projectRoot": "/workspace/app",
   "containers": [
     {
       "Id": "owned-container",
       "Name": "/postgres-owned",
       "Config": {
         "Labels": {
-          "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/workspace/app/aspire,dst=/apphost"
+          "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/workspace/app/.data/postgres,dst=/var/lib/postgresql/data"
         }
       }
     },
@@ -15,7 +16,16 @@
       "Name": "/postgres-foreign",
       "Config": {
         "Labels": {
-          "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/workspace/other/aspire,dst=/apphost"
+          "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/workspace/other/.data/postgres,dst=/var/lib/postgresql/data"
+        }
+      }
+    },
+    {
+      "Id": "creator-only-container",
+      "Name": "/creator-only",
+      "Config": {
+        "Labels": {
+          "com.microsoft.developer.usvc-dev.creatorProcessId": "4242"
         }
       }
     },

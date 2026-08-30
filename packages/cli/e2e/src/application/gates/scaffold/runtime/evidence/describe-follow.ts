@@ -13,13 +13,13 @@ export interface DescribeHealthReport {
 export interface DescribeResourceObservation {
   readonly name: string;
   readonly state: string;
+  readonly healthStatus?: string;
   readonly healthReports: Readonly<Record<string, DescribeHealthReport>>;
 }
 
-/** Evaluate last-seen resource state from an Aspire describe NDJSON stream. */
-export function evaluateDescribeFollow(
+/** Parse last-seen resource observations without applying the convergence policy. */
+export function parseDescribeFollow(
   text: string,
-  expectedResources: readonly string[],
 ): { readonly resources: readonly DescribeResourceObservation[] } {
   const observations = new Map<string, DescribeResourceObservation>();
   const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
@@ -33,6 +33,17 @@ export function evaluateDescribeFollow(
     }
     for (const resource of resources(parsed, index)) observations.set(resource.name, resource);
   }
+  return { resources: [...observations.values()] };
+}
+
+/** Evaluate last-seen resource state and health from an Aspire describe NDJSON stream. */
+export function evaluateDescribeFollow(
+  text: string,
+  expectedResources: readonly string[],
+): { readonly resources: readonly DescribeResourceObservation[] } {
+  const observations = new Map(
+    parseDescribeFollow(text).resources.map((resource) => [resource.name, resource]),
+  );
   const missing = expectedResources.filter((name) => !observations.has(normalizeName(name)));
   if (missing.length > 0) {
     throw new Error(`describe stream omitted resources: ${missing.join(', ')}`);
@@ -47,6 +58,17 @@ export function evaluateDescribeFollow(
         pending.map((entry) => `${entry.name}=${entry.state}`).join(', ')
       }`,
     );
+  }
+  const unhealthy = selected.flatMap((entry) => [
+    ...(entry.healthStatus && entry.healthStatus !== 'Healthy'
+      ? [`${entry.name}.healthStatus=${entry.healthStatus}`]
+      : []),
+    ...Object.entries(entry.healthReports)
+      .filter(([, report]) => report.status !== 'Healthy')
+      .map(([key, report]) => `${entry.name}.healthReports.${key}=${report.status}`),
+  ]);
+  if (unhealthy.length > 0) {
+    throw new Error(`describe resources did not converge: ${unhealthy.join(', ')}`);
   }
   return { resources: selected };
 }
@@ -173,9 +195,15 @@ function resource(
   }
   const state = firstString(source, ['state', 'status', 'resourceState']);
   if (!state) throw new Error(`${name} omitted state`);
+  const healthStatus = firstString(source, ['healthStatus']);
   const reportsValue = Reflect.get(source, 'healthReports');
   const reports = reportsValue === undefined ? {} : healthReports(reportsValue, name);
-  return { name: normalizeName(name), state, healthReports: reports };
+  return {
+    name: normalizeName(name),
+    state,
+    ...(healthStatus ? { healthStatus } : {}),
+    healthReports: reports,
+  };
 }
 
 function healthReports(value: unknown, resourceName: string): Record<string, DescribeHealthReport> {

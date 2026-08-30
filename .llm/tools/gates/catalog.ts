@@ -80,6 +80,15 @@ export const GATE_CATALOG = {
     '--allow-run=aspire',
     'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
   ],
+  'cli-e2e-aspire-resource-command': [
+    'deno',
+    'run',
+    '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/resource-command.ts',
+  ],
   'cli-e2e-aspire-cleanup': [
     'deno',
     'run',

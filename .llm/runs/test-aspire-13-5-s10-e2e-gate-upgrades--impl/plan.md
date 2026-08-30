@@ -13,8 +13,8 @@ third ordinary PLAN-EVAL is authorized. A separate Fable IMPL-EVAL remains manda
 3. `ASPIRE_CLI_START_TIMEOUT` is the single positive-integer budget for describe capture and
    resource-command observation; no parallel timeout policy is introduced.
 4. Cleanup always targets the exact AppHost. With `--cleanup`, normal stop is followed by force stop
-   and a read-only ownership probe. The probe mirrors S7 path evidence but imports nothing from
-   `.llm/tools`.
+   and a read-only ownership probe. The probe mirrors S7 path containment beneath the generated
+   project root but imports nothing from `.llm/tools`.
 5. `runtime.resource-command` exercises the S8 typed database command and background restarts, then
    asserts the resulting topology through describe evidence. Missing runtime start produces an
    explicit durable skip receipt.
@@ -46,13 +46,13 @@ third ordinary PLAN-EVAL is authorized. A separate Fable IMPL-EVAL remains manda
 
 ## Risk register
 
-| Risk                             | Mitigation                                                                   |
-| -------------------------------- | ---------------------------------------------------------------------------- |
-| NDJSON shape drift               | Fail closed per line and test last-seen convergence plus malformed input.    |
-| Cleanup claims foreign resources | Exact normalized path evidence only; fixtures include foreign/unproven rows. |
-| Warnings block healthy hosts     | Doctor policy records warnings but fails only explicit failures.             |
-| Runtime phase absent             | Durable `SKIPPED` receipt; gate never silently disappears.                   |
-| S9 not in ancestry               | Register before cleanup and record the pending stack-order reconciliation.   |
+| Risk                             | Mitigation                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| NDJSON shape drift               | Fail closed per line and test last-seen convergence plus malformed input.       |
+| Cleanup claims foreign resources | Boundary-safe project-root containment; fixtures include foreign/unproven rows. |
+| Warnings block healthy hosts     | Doctor policy records warnings but fails only explicit failures.                |
+| Runtime phase absent             | Durable `SKIPPED` receipt; gate never silently disappears.                      |
+| S9 not in ancestry               | Register before cleanup and record the pending stack-order reconciliation.      |
 
 ## Required gates
 
