@@ -53,32 +53,37 @@ the capture provenance in that fixture folder's README, then update the parity e
 
 ## Progress Log
 
-| Time       | Slice | Step           | Notes                                                                                                                                     |
-| ---------- | ----- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30 | 1     | design         | Required reading re-baselined; `PLAN-EVAL: N/A` recorded before implementation.                                                           |
-| 2026-08-30 | 1     | RED gate       | Expected FAIL names exactly the four phase-A rows missing 13.5.3; telemetry remains `pending-lease`.                                      |
-| 2026-08-30 | 1     | reconcile      | Draft PR #1741 opened with closing keyword, epic reference, requested labels/milestone, and S1 trail comment; no new review comments yet. |
-| 2026-08-30 | 2     | implementation | Copied S2 V5 `aspire ps` JSON, applied documented deterministic redaction, and parameterized probes across 13.4.6/13.5.3.                 |
-| 2026-08-30 | 2     | reconcile      | PR #1741 body and S2 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending.                          |
-| 2026-08-30 | 3     | implementation | Added redacted 13.5.3 banner/describe cases beside retained 13.4.6 cases in MCP and CLI E2E consumers.                                    |
-| 2026-08-30 | 3     | reconcile      | PR #1741 body and S3 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending.                          |
-| 2026-08-30 | 4     | implementation | Documented the sole 13.4.6 dashboard capture, exact phase-B GETs, lease boundary, filenames, and parity promotion step.                   |
-| 2026-08-30 | 4     | reconcile      | Commit `37f0487f1` pushed and S4 trail comment posted; supervisor/evaluator review remains pending.                                       |
-| 2026-08-30 | 5     | gate           | Full Phase-A scoped checks, tests, doctrine gates, and unchanged MCP export-corpus check passed.                                          |
-| 2026-08-30 | 5     | handoff        | Drafted the deferred #413 comment; PR remains draft for the supervisor's lease-backed phase B.                                            |
-| 2026-08-30 | 6     | IMPL-EVAL      | Cycle 1 at `a964a2120` returned `FAIL_FIX`: H-1, M-1, L-1, and L-2 recorded on the research branch.                                       |
-| 2026-08-30 | 6     | implementation | Restored the 13.4.6 MCP fixture and assertions verbatim; added independent bannerless S2 V5-derived 13.5.3 cases and exact provenance.    |
-| 2026-08-30 | 6     | gate           | Coverage restored at adapter lines 237/239; focused 52/52 and complete 263/263 suites plus the full Phase-A gate set pass.                |
-| 2026-08-30 | B1    | lease preflight | The serialized phase-B lease was granted; doctor reported 0 failed, `aspire ps` returned `[]`, and `docker ps -a` listed no containers.   |
-| 2026-08-30 | B1    | steering correction | Before any AppHost start, acknowledged D-39: dind is `10.4.12.19`, Docker client/server are 28.5.2, inotify is 1024, and PID 1 is `tini` with zero zombies. |
-| 2026-08-30 | B2    | restore/start | Restored the exact 13.5.3 scratch AppHost, registered its identity, and used the single isolated start as the remote-dind probe. |
-| 2026-08-30 | B2    | blocked | PostgreSQL and Redis failed container creation because the remote Docker daemon cannot see worktree bind sources; workers remained waiting, so capture stopped without workaround/retry. |
-| 2026-08-30 | B2    | teardown | Exact AppHost stop passed; leak-check survivors `[]`; teardown preview empty; final Aspire/Docker inventories empty. |
-| 2026-08-30 | B3    | attempt-2 lease | New separately serialized lease granted after attempt-1 terminal cleanup; local preflight reconfirmed empty Aspire/Docker/volume/process state and head equality. |
-| 2026-08-30 | B3    | scratch correction | Recorded the authorized scratch-only removal of every database/cache `DataPath`; no product or generator source change is authorized. |
-| 2026-08-30 | B3    | attempt-2 start | Restored SDK 13.5.3 and performed the one authorized isolated start; registered PID 383334/start identity 26619412 before waiting. |
-| 2026-08-30 | B3    | endpoint probe | BLOCKED: PostgreSQL was published on the remote daemon's `127.0.0.1:17858`, while the AppHost health check and an independent local probe both received connection refused. No retry or workaround; receipt `receipts/08-phase-b-attempt-2-capture.md`. |
-| 2026-08-30 | B3    | attempt-2 teardown | Stopped the exact AppHost, registered and removed only its positively proven persistent PostgreSQL survivor, removed its same-second anonymous volume and scratch tree; final leak survivors `[]`, Aspire `[]`, Docker containers/volumes empty. |
+| Time       | Slice | Step                | Notes                                                                                                                                                                                                                                                   |
+| ---------- | ----- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30 | 1     | design              | Required reading re-baselined; `PLAN-EVAL: N/A` recorded before implementation.                                                                                                                                                                         |
+| 2026-08-30 | 1     | RED gate            | Expected FAIL names exactly the four phase-A rows missing 13.5.3; telemetry remains `pending-lease`.                                                                                                                                                    |
+| 2026-08-30 | 1     | reconcile           | Draft PR #1741 opened with closing keyword, epic reference, requested labels/milestone, and S1 trail comment; no new review comments yet.                                                                                                               |
+| 2026-08-30 | 2     | implementation      | Copied S2 V5 `aspire ps` JSON, applied documented deterministic redaction, and parameterized probes across 13.4.6/13.5.3.                                                                                                                               |
+| 2026-08-30 | 2     | reconcile           | PR #1741 body and S2 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending.                                                                                                                                        |
+| 2026-08-30 | 3     | implementation      | Added redacted 13.5.3 banner/describe cases beside retained 13.4.6 cases in MCP and CLI E2E consumers.                                                                                                                                                  |
+| 2026-08-30 | 3     | reconcile           | PR #1741 body and S3 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending.                                                                                                                                        |
+| 2026-08-30 | 4     | implementation      | Documented the sole 13.4.6 dashboard capture, exact phase-B GETs, lease boundary, filenames, and parity promotion step.                                                                                                                                 |
+| 2026-08-30 | 4     | reconcile           | Commit `37f0487f1` pushed and S4 trail comment posted; supervisor/evaluator review remains pending.                                                                                                                                                     |
+| 2026-08-30 | 5     | gate                | Full Phase-A scoped checks, tests, doctrine gates, and unchanged MCP export-corpus check passed.                                                                                                                                                        |
+| 2026-08-30 | 5     | handoff             | Drafted the deferred #413 comment; PR remains draft for the supervisor's lease-backed phase B.                                                                                                                                                          |
+| 2026-08-30 | 6     | IMPL-EVAL           | Cycle 1 at `a964a2120` returned `FAIL_FIX`: H-1, M-1, L-1, and L-2 recorded on the research branch.                                                                                                                                                     |
+| 2026-08-30 | 6     | implementation      | Restored the 13.4.6 MCP fixture and assertions verbatim; added independent bannerless S2 V5-derived 13.5.3 cases and exact provenance.                                                                                                                  |
+| 2026-08-30 | 6     | gate                | Coverage restored at adapter lines 237/239; focused 52/52 and complete 263/263 suites plus the full Phase-A gate set pass.                                                                                                                              |
+| 2026-08-30 | B1    | lease preflight     | The serialized phase-B lease was granted; doctor reported 0 failed, `aspire ps` returned `[]`, and `docker ps -a` listed no containers.                                                                                                                 |
+| 2026-08-30 | B1    | steering correction | Before any AppHost start, acknowledged D-39: dind is `10.4.12.19`, Docker client/server are 28.5.2, inotify is 1024, and PID 1 is `tini` with zero zombies.                                                                                             |
+| 2026-08-30 | B2    | restore/start       | Restored the exact 13.5.3 scratch AppHost, registered its identity, and used the single isolated start as the remote-dind probe.                                                                                                                        |
+| 2026-08-30 | B2    | blocked             | PostgreSQL and Redis failed container creation because the remote Docker daemon cannot see worktree bind sources; workers remained waiting, so capture stopped without workaround/retry.                                                                |
+| 2026-08-30 | B2    | teardown            | Exact AppHost stop passed; leak-check survivors `[]`; teardown preview empty; final Aspire/Docker inventories empty.                                                                                                                                    |
+| 2026-08-30 | B3    | attempt-2 lease     | New separately serialized lease granted after attempt-1 terminal cleanup; local preflight reconfirmed empty Aspire/Docker/volume/process state and head equality.                                                                                       |
+| 2026-08-30 | B3    | scratch correction  | Recorded the authorized scratch-only removal of every database/cache `DataPath`; no product or generator source change is authorized.                                                                                                                   |
+| 2026-08-30 | B3    | attempt-2 start     | Restored SDK 13.5.3 and performed the one authorized isolated start; registered PID 383334/start identity 26619412 before waiting.                                                                                                                      |
+| 2026-08-30 | B3    | endpoint probe      | BLOCKED: PostgreSQL was published on the remote daemon's `127.0.0.1:17858`, while the AppHost health check and an independent local probe both received connection refused. No retry or workaround; receipt `receipts/08-phase-b-attempt-2-capture.md`. |
+| 2026-08-30 | B3    | attempt-2 teardown  | Stopped the exact AppHost, registered and removed only its positively proven persistent PostgreSQL survivor, removed its same-second anonymous volume and scratch tree; final leak survivors `[]`, Aspire `[]`, Docker containers/volumes empty.        |
+| 2026-08-30 | B4    | attempt-3 lease     | Owner token `s3-attempt-3`; preflight at `85bd4967` recorded Aspire `[]`, Docker containers/volumes empty, Aspire doctor 0 failed. Supervisor relay resources are foreign and excluded from cleanup/leak classification.                                |
+| 2026-08-30 | B4    | capture             | One 13.5.3 start; postgres and workers waits passed; `health-check` trigger accepted; raw resources (560 bytes/4 entries) and spans (18,682 bytes/29 spans) saved without editing.                                                                      |
+| 2026-08-30 | B4    | slice commits       | Envelopes/fixture/provenance `3e39df1ee`; consumer/parity-required `28815d35b`.                                                                                                                                                                         |
+| 2026-08-30 | B4    | gates               | PASS: scoped check 404, unit tests 427/427, parity fixtures 3/3, quality scan, architecture, MCP corpus, scoped lint 379, scoped fmt 386.                                                                                                               |
+| 2026-08-30 | B4    | teardown            | Exact AppHost stopped; only owned persistent PostgreSQL removed; leak survivors `[]`; final Aspire `[]`, volumes 0, containers only three supervisor `relay-s3-attempt-3-*`; scratch removed.                                                           |
 
 ## Phase B Lease Preflight — verbatim
 
@@ -150,14 +155,14 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 Recorded before the first AppHost start:
 
-- D-39 is authoritative: `netscript-dind` resolves to `10.4.12.19`; Docker client/server are
-  28.5.2; `fs.inotify.max_user_instances` is 1024; PID 1 is `tini` with zero zombies.
+- D-39 is authoritative: `netscript-dind` resolves to `10.4.12.19`; Docker client/server are 28.5.2;
+  `fs.inotify.max_user_instances` is 1024; PID 1 is `tini` with zero zombies.
 - D-37's below-Docker-28 probe is resolved. This run will not stop, waive, or classify a result on
   the obsolete Docker-version condition.
 - The container remains a different host from remote dind. The first and only authorized
   `aspire start --isolated` remains the endpoint/proxy probe. If its container-backed endpoints are
-  unreachable because of that topology, preserve exact evidence, tear down to zero, and stop
-  without workaround or retry.
+  unreachable because of that topology, preserve exact evidence, tear down to zero, and stop without
+  workaround or retry.
 - The exit-134/inotify report-and-stop rule, exact-AppHost stop, run-resource registration,
   leak-check/teardown, final empty inventories, scratch removal, and one-AppHost limit remain in
   force.
@@ -187,13 +192,13 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 ### Cleanup verdicts
 
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Exact AppHost stop | PASS | `receipts/07-phase-b-runtime-probe.md` |
-| `agentic:leak-check` | PASS | `survivors: []` |
-| `agentic:teardown` preview | PASS | no stopped AppHosts, removed containers, or escalations; `--apply` not warranted |
-| Final Aspire inventory | PASS | `[]` |
-| Final Docker inventory | PASS | header only |
+| Check                      | Result | Evidence                                                                         |
+| -------------------------- | ------ | -------------------------------------------------------------------------------- |
+| Exact AppHost stop         | PASS   | `receipts/07-phase-b-runtime-probe.md`                                           |
+| `agentic:leak-check`       | PASS   | `survivors: []`                                                                  |
+| `agentic:teardown` preview | PASS   | no stopped AppHosts, removed containers, or escalations; `--apply` not warranted |
+| Final Aspire inventory     | PASS   | `[]`                                                                             |
+| Final Docker inventory     | PASS   | header only                                                                      |
 
 ## Decisions
 

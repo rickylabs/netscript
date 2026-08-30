@@ -2,22 +2,21 @@
 
 ## Run Metadata
 
-| Field          | Value                                           |
-| -------------- | ----------------------------------------------- |
-| Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl`   |
-| Branch         | `test/aspire-13-5-s3-fixture-recapture`         |
-| Current phase  | `phase B attempt 2 blocked — endpoint topology; teardown complete` |
-| Archetype      | `2 - Integration`                               |
-| Scope overlays | `none`                                          |
+| Field          | Value                                                     |
+| -------------- | --------------------------------------------------------- |
+| Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl`             |
+| Branch         | `test/aspire-13-5-s3-fixture-recapture`                   |
+| Current phase  | `phase B attempt 3 complete — capture and teardown green` |
+| Archetype      | `2 - Integration`                                         |
+| Scope overlays | `none`                                                    |
 
 ## Current State
 
-Draft PR #1741 is at `2b0d33bd`: phase-A IMPL-EVAL cycle-2 PASS plus the fully torn-down attempt-1
-probe receipt. The separately serialized attempt-2 lease exercised one 13.5.3 AppHost after the
-authorized scratch-only omission of database/cache `DataPath` keys. Bind mounts were eliminated,
-but remote-DinD ports were published on the daemon host's loopback and were unreachable from this
-AppHost container. No envelope was captured. Exact owned teardown completed with leak survivors
-`[]`, Aspire `[]`, and empty Docker container and volume inventories.
+Attempt 3 captured real Aspire Dashboard 13.5.3 resources and spans envelopes after the scaffolded
+`health-check` trigger. The retained 13.4.6 and new 13.5.3 MCP consumer cases pass, and telemetry
+parity is now `required`. All Phase-A scoped gates pass. Exact owned teardown is complete: leak
+survivors `[]`, Aspire `[]`, volumes zero, and only the three foreign supervisor relay containers
+remain; the scratch tree is removed.
 
 ## Completed
 
@@ -37,22 +36,21 @@ AppHost container. No envelope was captured. Exact owned teardown completed with
 
 ## In Progress
 
-- Commit/push the phase-B blocked probe receipt and teardown evidence; post the structured IMPL
-  phase comment without changing draft/readiness/labels.
+- Commit/push the final attempt-3 run artifacts and post the structured IMPL phase comment without
+  changing draft/readiness/labels.
 
 ## Next Steps
 
-1. Supervisor selects a future host where the Docker daemon can see the AppHost bind sources, then
-   grants a new serialized lease.
-2. Resume the unchanged README capture contract: wait required resources, trigger `health-check`,
-   capture raw resources/spans envelopes, add the fixture/test, and promote parity to `required`.
+1. Supervisor reviews the three phase-B commits and receipt.
+2. A separate evaluator session owns any subsequent IMPL-EVAL; this implementation thread does not
+   write evaluator artifacts.
 
 ## Key Decisions
 
-| Decision                   | Source              | Notes                                       |
-| -------------------------- | ------------------- | ------------------------------------------- |
-| Five-row expectation table | D-13 manifest       | Four required now; telemetry pending lease. |
-| No self-certification      | harness lane policy | Fable supervisor owns review/evaluation.    |
+| Decision                   | Source              | Notes                                    |
+| -------------------------- | ------------------- | ---------------------------------------- |
+| Five-row expectation table | D-13 manifest       | All five rows are now required.          |
+| No self-certification      | harness lane policy | Fable supervisor owns review/evaluation. |
 
 ## Files Changed
 
@@ -76,17 +74,17 @@ AppHost container. No envelope was captured. Exact owned teardown completed with
 | ----------- | ------------------------------------------------- | -------------------------------------------------------------- |
 | Static      | S1 expected RED; slice-6 evaluator-fix gates PASS | worklog + `receipts/06-scoped-gates.md`                        |
 | Fitness     | PASS                                              | `receipts/06-quality-scan.json`, `receipts/06-arch-check.json` |
-| Runtime     | BLOCKED phase B                                   | `receipts/07-phase-b-runtime-probe.md`; teardown complete       |
+| Runtime     | PASS phase B                                      | `receipts/09-phase-b-attempt-3-capture.md`; teardown complete  |
 | Consumer    | PASS                                              | unchanged MCP export corpus in `receipts/06-scoped-gates.md`   |
 
 ## Open Questions
 
-- Which future leased host provides co-located Docker bind-mount visibility?
+- None for this implementation thread.
 
 ## Drift and Debt
 
-- Drift: phase-B remote-dind topology cannot mount worktree-local database/cache sources;
-  exact evidence is committed and the runtime is fully torn down.
+- Drift: attempt 3 used the supervisor-owned loopback relay to close the previously recorded
+  remote-DinD endpoint gap; relay resources remained foreign and untouched.
 - Debt: none created or deepened.
 
 ## Commits
