@@ -1433,3 +1433,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   provenance, a coherent 14-entrypoint exact-head verdict, current comment, and CI are complete.
 - Features Slice 5 and fixes #1739 evaluation remain actively delegated. Read-only audits of #1747
   and #1758 run in parallel; they may recommend bounded repairs but perform no mutation or merge.
+
+## 2026-08-30T23:40:00Z — active queue after D-99 and docs convergence
+
+- Aspire: the host is zero after D-99. Replace backend-container pause with endpoint-publisher
+  pause/unpause, run only `runtime.health.listener-unreachable`, and clean exactly. On green, freeze
+  the bounded fixture/permission delta and dispatch a fresh SOL/high review before IMPL-EVAL. Then
+  release the next full runtime lease to #1747.
+- Docs: hold #1790 at exact `75538c723` until issue #1788's stale completion prose is rewritten in
+  place, `check-test`, `quality`, and the independent merge re-audit are green. Its existing
+  DeepSeek receipts carry unchanged. Merge with immutable-head matching once complete, normalize
+  #1788/#1790, fast-forward main, and immediately advance the docs serial queue.
+- Features: Slice 6 remains live after terminal Slice 5. Fixes: #1781 is statically frozen and may
+  request runtime only after Aspire's #1747 lease. Internals: #1792 continues the prospective
+  GLM/Qwen implementation; no historical DeepSeek receipt may be rerun or invalidated.

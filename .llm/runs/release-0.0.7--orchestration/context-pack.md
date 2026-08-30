@@ -1755,3 +1755,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - PR #1792 is the active GLM/Qwen routing leaf. #1790 is compacted/recovered and must replace stale
   `sourceCommit 290ac9406` via an honestly successful generator run before push. Fixes prepares
   #1781 statically; features #1762 Slice 5 has 101/101 tests and awaits its evaluator.
+
+## Resume delta — 2026-08-30T23:40Z
+
+- Supersede the prior S6 relay-root-cause statement. Relay teardown is valid infrastructure
+  hardening, but D-98 proved persistent-resource `aspire resource stop` suspends the live health
+  transition, and D-99 proved pausing PostgreSQL leaves the separate TCP relay reachable. The
+  bounded portable fixture must pause the container publishing the checked endpoint port: relay on
+  NAS, service container on direct-host CI. Preserve 56/57 unchanged results, rerun only the failed
+  listener proof, clean exactly, then obtain fresh SOL/high review before formal IMPL-EVAL.
+- The D-99 lease is fully cleaned: Aspire `[]`, Docker `[]`. #1747 still owns the next full runtime
+  lease only after the S6 focused retry reaches a terminal result.
+- Docs #1790 is now on `75538c723` over main `73bf2efa9`; its authoritative MCP-corpus gate is green,
+  published pages and prior 14-entrypoint evidence are byte-identical, and its PR lineage was
+  replaced in place. Issue #1788 still needs its stale completion section rewritten in place; exact
+  CI and independent re-audit are the other remaining merge gates.
+- Existing DeepSeek evaluations are explicitly owner-valid. The GLM/Qwen migration in #1791/#1792
+  is prospective and never triggers retroactive evaluator reruns.

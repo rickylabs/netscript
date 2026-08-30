@@ -2832,3 +2832,26 @@
   containers, volumes, and relays to exact zero. The operational relay watcher is receiving a
   bounded stale-publication teardown/re-arm correction before only the failed listener proof is
   repeated; unchanged green gates are preserved.
+
+## 2026-08-30T23:40:00Z — S6 D-98/D-99 corrected the listener-fixture diagnosis
+
+- The operational relay teardown in `e0ffec707` remains useful hardening, but a bounded D-98 retry
+  proved it was not the product-gate root cause. The generated PostgreSQL resource is persistent;
+  `aspire resource stop` removes its publication and stops live health evaluation, so its last
+  `healthReports` value can remain Healthy. That lifecycle command cannot prove the required live
+  listener transition.
+- D-99 kept Aspire running and paused the PostgreSQL container. The focused gate still stayed
+  Healthy because the NAS two-hop relay continued to accept TCP on the exact endpoint consumed by
+  the generated AppHost. This is expected for a connect-only listener probe: pausing the upstream
+  container does not close a separate forwarding listener.
+- The next and only bounded fixture correction resolves the container that actually publishes the
+  configured listener port and pauses/unpauses that endpoint publisher. On NAS this is the owned
+  relay; on direct-host CI it is the service container. The failed lease was stopped and the host
+  returned to Aspire `[]` and Docker `[]` before any retry. Because the supervisor authored this
+  repair, a fresh SOL/high focused review is required after the exact gate turns green.
+- Docs #1790 advanced to current-main carrier `75538c723`: the seven stale MCP-corpus entries are
+  inherited correctly from main, provenance now names a real ancestor, pages and the 14-entrypoint
+  evidence are byte-identical, and PR lineage was rewritten in place. Issue #1788 still has stale
+  completion prose and must be rewritten in place before merge. Exact CI plus independent re-audit
+  remain active. All existing DeepSeek verdicts remain valid and will not be rerun; #1791 changes
+  only prospective routing.

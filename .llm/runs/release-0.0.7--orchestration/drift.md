@@ -1546,3 +1546,17 @@ implementation thread.
   forwarding hops when an owned publication disappears and recreate them when it returns. Preserve
   the 56 unchanged green runtime results, require the listener Unhealthy/exit-18/recovery receipt,
   and reprove exact zero. Do not grant another runtime lane until this owned lease finishes cleanup.
+
+## 2026-08-30 — health transitions require the checked endpoint to become unreachable
+
+- Supersede the prior assumption that relay watcher teardown alone fixes S6. A persistent Aspire
+  resource stopped through `aspire resource stop` no longer supplies a live transition suitable for
+  this assertion, while pausing its upstream container leaves an independent relay socket open.
+  Both red outcomes are fixture semantics, not product-listener failures.
+- The portable fault injection point is the container publishing the exact endpoint port consumed
+  by the AppHost. Pausing that publisher removes TCP reachability while the Aspire resource and its
+  health evaluator remain live; unpausing permits the same resource to recover. Select it from
+  Docker metadata rather than assuming a NAS relay or a direct service container by name.
+- Historical DeepSeek verdicts are immutable accepted evidence. A prospective default-model change
+  must preserve their deserialization and provenance, never reinterpret them as stale or request a
+  rerun.
