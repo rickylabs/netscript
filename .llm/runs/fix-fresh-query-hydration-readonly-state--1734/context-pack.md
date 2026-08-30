@@ -14,11 +14,11 @@
 
 Cycle-2 evaluator artifact `eb765629206092f97b3dd8f76a64fa0c3769bcb8` is preserved unchanged.
 Cycle 3 is owner-authorized and bounded to `reviveSerializedError` plus the existing real-transport
-round-trip test. The S7 RED test drives string, number, boolean, array, and plain-object rejection
-values through `renderToString(<QueryHydrationScript/>)`: 6 pass / 5 fail at the inherited product
-head, with four indexed hydration rejections and one independent plain-record field-loss failure.
-Production source remains untouched at this checkpoint. The old shared-host root-test waiver is
-retired; cycle 3 must produce a fresh exact-head root-test result.
+round-trip test. S7 captured a 6-pass / 5-fail RED across string, number, boolean, array, and
+plain-object rejections. S8 now wraps those JSON-preserved values in a real `Error` and retains the
+original value in `cause`; the focused real-transport suite passes 11/11 and the complete Fresh
+hydration trio passes 16/16. Public types, exports, and dependency range remain untouched. The old
+shared-host root-test waiver is retired; cycle 3 still needs a fresh exact-head root-test result.
 
 ## Completed
 
@@ -36,14 +36,14 @@ retired; cycle 3 must produce a fresh exact-head root-test result.
 
 ## In Progress
 
-- S8 private `reviveSerializedError` correction.
+- S8 private `reviveSerializedError` correction is implemented; exact-head static sealing remains.
 
 ## Next Steps
 
-1. Commit the S7 RED slice without changing production source.
-2. Preserve supported JSON rejection values through a type-honest `Error.cause` wrapper and turn
-   all real-transport assertions green.
-3. Seal run artifacts, run every requested gate at the immutable final head, push with the explicit
+1. Commit the S8 product repair and its run record.
+2. Run the requested focused, scoped, root, quality, and architecture gates; seal their table in the
+   run artifacts and rerun it at the immutable artifact head.
+3. Push with the explicit
    refspec, and update the draft PR without changing labels or dispatching IMPL-EVAL.
 
 ## Key Decisions

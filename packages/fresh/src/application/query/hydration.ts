@@ -204,13 +204,22 @@ function reviveSerializedError(value: unknown): RevivedError {
   if (value === null || value instanceof Error) {
     return { valid: true, value };
   }
-  if (!isPlainRecord(value)) return { valid: false };
+  const record = isPlainRecord(value) ? value : undefined;
+  if (
+    !record && !Array.isArray(value) && typeof value !== 'string' &&
+    typeof value !== 'number' && typeof value !== 'boolean'
+  ) {
+    return { valid: false };
+  }
 
   const error = new Error(
-    typeof value.message === 'string' ? value.message : 'Serialized hydration error',
+    record
+      ? typeof record.message === 'string' ? record.message : 'Serialized hydration error'
+      : String(value),
+    { cause: value },
   );
-  if (typeof value.name === 'string') error.name = value.name;
-  if (typeof value.stack === 'string') error.stack = value.stack;
+  if (record && typeof record.name === 'string') error.name = record.name;
+  if (record && typeof record.stack === 'string') error.stack = record.stack;
   return { valid: true, value: error };
 }
 
