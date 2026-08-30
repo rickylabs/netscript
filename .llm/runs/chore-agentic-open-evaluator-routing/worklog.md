@@ -95,6 +95,11 @@ would not change the implementation contract. IMPL-EVAL remains mandatory.
 | ---------- | ----- | ---- | ----- |
 | 2026-08-30 21:11 | Research | Catalog verification | Both IDs present; only plain Qwen Flash ID exists; GLM mandatory reasoning/max. |
 | 2026-08-30 21:20 | Plan | Design checkpoint | Active-vs-persisted preset split, canary attestation, workflow behavior, gates, and four slices locked. |
+| 2026-08-30 21:31 | S1/S2 | Runtime and workflow implementation | Current/legacy domains split; Qwen/GLM presets and formal bindings active; gateway task unshadowed; OpenHands routes current models and states its effort limitation. |
+| 2026-08-30 21:35 | S3 | Policy/docs/skills convergence | Added exact lane-policy parity markers/test; updated evaluator docs, README, root docs, source skills; canonical sync updated three mirrors. |
+| 2026-08-30 21:38 | S4 | Full local gates | 165-file check/lint/fmt coverage and 491 tests green; workflow YAML parsed; no-hardcoded guard and skill sync/check green. |
+| 2026-08-30 21:40 | S4 | Live canaries | Both new Claude/OpenRouter presets passed with matched route identity, `max` argv effort, 1024-token budget, non-empty response, and tools/reasoning/streaming evidence. |
+| 2026-08-30 21:41 | S1-S3 | Product sign-off commit | `601a53e04` — routing, canaries, workflows, parity/docs, skills, and lint-gate remediation committed atomically. |
 
 ## Gate Results
 
@@ -102,7 +107,27 @@ would not change the implementation contract. IMPL-EVAL remains mandatory.
 | ---- | ------ | ---------------- |
 | OpenRouter catalog existence | PASS | Public catalog query at 2026-08-30T21:11:02Z; both IDs true; no Qwen Flash Next. |
 | PLAN-EVAL | N/A | Owner decision and complete issue contract; recorded before source edits. |
-| Remaining implementation gates | NOT_RUN | Run after the relevant slice; final full set before IMPL-EVAL. |
+| Full agentic tests | PASS | Structured wrapper: 491 passed, 0 failed. |
+| Full agentic check | PASS | Structured wrapper: 165 selected, 2 batches, 0 failed; `--unstable-kv`. |
+| Full agentic lint | PASS | Structured wrapper with run-owned config overriding the root `.llm/` exclusion: 165 selected/processed, 0 findings. Initial covered run exposed 15 baseline findings; fixed without suppressions. |
+| Full agentic fmt | PASS | Structured wrapper: 165 selected/processed; write normalization then check, 0 findings. |
+| Policy/doc parity | PASS | `routing-policy-doc-parity_test.ts`; exact PLAN/IMPL preset/model/effort/condition match. |
+| Volatile-model guard | PASS | `no-hardcoded-volatile_test.ts` within full suite and focused six-test gate. |
+| OpenHands static behavior | PASS | Phase/dispatch workflow tests within 491-test suite; Qwen PLAN, GLM IMPL/default, effort limitation text asserted. |
+| Workflow YAML parse | PASS | `@std/yaml` parsed both OpenHands workflows and `.github/labels.yml`; `actionlint` unavailable. |
+| Skill sync/check | PASS | `agentic:sync-claude`: 18 skills/22 mirrors, three updated; `agentic:check-claude` green including lock hook. |
+| Legacy preset deserialization | PASS | Table test parses all four retired preset IDs; active match test proves they cannot launch. |
+| GLM live canary | PASS | Requested/observed `openrouter` / `z-ai/glm-5.3-flash` / `max`, matched via argv/profile; budget 1024; non-empty; tools 6, reasoning 154, streaming 158; exit 0. |
+| Qwen live canary | PASS | Requested/observed `openrouter` / `qwen/qwen3.8-flash` / `max`, matched via argv/profile; budget 1024; non-empty; tools 6, reasoning 184, streaming 188; exit 0. |
+| `deno.lock` | PASS | `git diff --quiet -- deno.lock` exit 0 after hooks, YAML parser, and canaries. |
+| IMPL-EVAL | NOT_RUN | Mandatory separate exact-head evaluation runs after implementation commits are pushed. |
+
+## Commit Trail
+
+| Commit | Scope | Gate state |
+| ------ | ----- | ---------- |
+| `a8d9248e3` | Research, locked plan/design, PLAN-EVAL N/A record | Bootstrap/research/plan complete |
+| `601a53e04` | S1-S3 product/config/workflows/docs/skills plus full-lint remediation | Full generator gate set and both live canaries PASS |
 
 ## Handoff Notes
 

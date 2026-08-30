@@ -26,15 +26,19 @@ silent success when it produced nothing.
 
 ## Current state
 
-- Phase: plan complete; implementation not started.
+- Phase: implementation and generator gates complete; exact-head IMPL-EVAL pending.
 - Generator: Codex/OpenAI `gpt-5.6-sol` high, thread
   `01a05481-a2ff-7632-809a-e478889e626e`, route matched.
 - Worktree: `/home/agent/projects/netscript/worktrees/007-leaf-routing`.
 - Live catalog re-check at `2026-08-30T21:11:02Z`: both selected IDs present; only the plain Qwen
   Flash ID exists; GLM reports mandatory reasoning with `max` supported/default.
 - PLAN-EVAL: N/A by owner decision, recorded in `worklog.md` before implementation.
-- Plan: four slices — typed routing/canary contract; OpenHands routing; docs/skills parity; exact
-  green evidence + separate GLM/max IMPL-EVAL.
+- Implemented: typed routing/canary contract; OpenHands routing; docs/skills parity; full
+  165-file check/lint/fmt and 491-test gate all green.
+- Live canaries: both GLM and Qwen presets passed at matched `max` argv identity with a 1024-token
+  budget, non-empty marker, and tools/reasoning/streaming evidence.
+- Remaining: commit/push exact head, run fresh separate-session GLM/max IMPL-EVAL, address any
+  findings, and hand off without merging.
 
 ## Key locked decisions
 
@@ -49,6 +53,8 @@ silent success when it produced nothing.
 
 ## Next steps
 
-1. Commit/push the complete run bootstrap, open the draft PR, and post research/plan phase records.
-2. Implement S1 and run its focused structured gates.
-3. Continue S2/S3, then full gates, two live canaries, and exact-head separate-session IMPL-EVAL.
+1. Commit and push the implementation/docs/evidence slices; update PR phase records.
+2. Launch a fresh separate GLM/max session at the exact pushed head. This intentionally dogfoods
+   the route implemented by this leaf and must not be described as route-independent evidence.
+3. Require a qualifying IMPL-EVAL `PASS`, record requested/observed identity and session ID, then
+   deliver the exact-green packet without merging.

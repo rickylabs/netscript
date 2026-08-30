@@ -24,3 +24,37 @@ Append-only. No implementation drift recorded yet.
 - **Severity:** significant
 - **Action:** fix in S3 with a machine-parsed formal-route table and exact comparison test.
 - **Evidence:** `research.md` finding 12; planned D11.
+
+## 2026-08-30 — Root lint policy excluded the required agentic surface
+
+- **What:** The structured full-tree lint wrapper initially refused coverage because root
+  `deno.json` excludes `.llm/` from lint.
+- **Source:** Required S4 full `.llm/tools/agentic` lint gate.
+- **Expected:** Every selected agentic TypeScript file is processed.
+- **Actual:** Default-config run selected 165 files but processed zero; a run-owned temporary lint
+  config preserving the root rule set processed all 165 and exposed 15 pre-existing findings.
+- **Severity:** significant for gate integrity; no product-scope change.
+- **Action:** fixed all findings without suppressions, reran to 165/165 and zero findings, then
+  deleted the temporary config. No permanent lint-policy change was introduced.
+- **Evidence:** `worklog.md` gate table; structured wrapper results in the generator transcript.
+
+## 2026-08-30 — Workflow syntax fallback used standard YAML parser
+
+- **What:** Neither `actionlint` nor a system YAML parser was installed.
+- **Expected:** Actionlint or equivalent plus repository workflow static tests.
+- **Actual:** Existing workflow static/behavior tests passed; Deno `@std/yaml` parsed both changed
+  workflows and the label manifest with `--no-lock`.
+- **Severity:** minor.
+- **Action:** accept the explicit issue-authorized fallback; record that it is syntax parsing, not
+  full GitHub Actions semantic lint.
+
+## 2026-08-30 — Product slices committed atomically
+
+- **What:** Planned S1-S3 boundaries converged into one product sign-off commit.
+- **Expected:** Separate routing, OpenHands, and docs/skills commits.
+- **Actual:** Model constant renames make the TypeScript consumers and workflow tests compile only
+  with their new bindings, while the parity test requires its policy markers. Splitting the final
+  state would leave red intermediate commits.
+- **Severity:** minor; scope and validation did not change.
+- **Action:** commit the mutually dependent product state atomically as `601a53e04`; retain S1-S3
+  evidence separately in the worklog and use a distinct audit commit for exact-head evaluation.
