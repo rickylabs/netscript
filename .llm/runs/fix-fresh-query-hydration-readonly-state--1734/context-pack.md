@@ -6,19 +6,17 @@
 | --- | --- |
 | Run ID | `fix-fresh-query-hydration-readonly-state--1734` |
 | Branch | `fix/fresh-query-hydration-readonly-state` |
-| Current phase | `implement` (cycle-3 bounded FAIL_FIX repair) |
+| Current phase | `implement` (cycle-4 owner-approved total private reviver) |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` (contract-only) |
 
 ## Current State
 
-Cycle-2 evaluator artifact `eb765629206092f97b3dd8f76a64fa0c3769bcb8` is preserved unchanged.
-Cycle 3 is owner-authorized and bounded to `reviveSerializedError` plus the existing real-transport
-round-trip test. S7 captured a 6-pass / 5-fail RED across string, number, boolean, array, and
-plain-object rejections. S8 now wraps those JSON-preserved values in a real `Error` and retains the
-original value in `cause`; the focused real-transport suite passes 11/11 and the complete Fresh
-hydration trio passes 16/16. Public types, exports, and dependency range remain untouched. The old
-shared-host root-test waiver is retired; cycle 3 still needs a fresh exact-head root-test result.
+All three prior evaluator artifacts are preserved unchanged. Cycle 4 is owner-authorized and bounded
+to replacing the private rejection-value allowlist in `reviveSerializedError` with a total,
+non-throwing reviver. S9 captured an 11-pass / 3-fail RED through the real transport: JSON-omitted
+mutation and query error fields reject the whole state, while hostile coercion escapes through
+`String(value)`. Public types, exports, and dependency range remain untouched.
 
 ## Completed
 
@@ -33,18 +31,22 @@ shared-host root-test waiver is retired; cycle 3 still needs a fresh exact-head 
 - Fresh doc-lint and JSR audit remain at their recorded inherited baselines.
 - Cycle-3 skills/doctrine/run-artifact intake completed at exact local/remote/PR head equality.
 - S7 real-transport rejection-value RED reproduced with both failure directions visible.
+- Cycle-4 owner ruling, required skills, doctrine, all prior verdicts, drift, and worklog reviewed.
+- S9 real-transport RED reproduced for omitted mutation state, query error twins, and hostile
+  coercion; production source is still untouched.
 
 ## In Progress
 
-- S8 private `reviveSerializedError` correction is implemented; exact-head static sealing is COMPLETE (supervisor Tier-A sign-off, root test exit 0, all scoped gates 0).
+- S9 RED is ready to commit as a standalone slice before the private implementation changes.
 
 ## Next Steps
 
-1. Commit the S8 product repair and its run record.
-2. Run the requested focused, scoped, root, quality, and architecture gates; seal their table in the
-   run artifacts and rerun it at the immutable artifact head.
-3. Push with the explicit
-   refspec, and update the draft PR without changing labels or dispatching IMPL-EVAL.
+1. Commit the S9 RED slice.
+2. Implement the total private reviver and prove both the supported-value and guard-attack
+   directions.
+3. Rebase onto owner-pinned `24f6642f040617de573c7cef1140eed1ac0efd6d`, run the complete static and
+   leased one-pass runtime gates at the immutable head, then push by explicit refspec and update the
+   draft PR without dispatching IMPL-EVAL.
 
 ## Key Decisions
 
@@ -54,6 +56,7 @@ shared-host root-test waiver is retired; cycle 3 still needs a fresh exact-head 
 | Keep public `DehydratedState` unchanged | plan D2 | No mutable widening or upstream leak. |
 | Revive serialized error records | plan D5 | Restore real `Error` values; retain string fields where present. |
 | Preserve JSON rejection values | cycle-3 amendment | Wrap them in `Error` and retain the original value in `cause`; no public widening. |
+| Make the private reviver total | cycle-4 owner ruling | Every non-null state value becomes an `Error`; safe message selection cannot invoke hostile object coercion. |
 
 ## Files Changed
 

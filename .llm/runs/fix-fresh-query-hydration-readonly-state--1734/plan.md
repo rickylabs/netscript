@@ -160,3 +160,27 @@ non-plain host objects) remain invalid; this cycle does not broaden the public w
 
 The stop condition remains unchanged: any required edit to `query-types.ts`, `query/mod.ts`, or the
 declared query-core range is a rescope and halts implementation.
+
+## Owner-Approved Cycle 4 Amendment — total private reviver
+
+Cycle 4 removes the rejection-value allowlist rather than adding another member. The private
+`reviveSerializedError` function becomes total: every value passed to it returns an `Error`, keeps
+the original input in `cause`, and cannot return an invalid branch or throw during message
+construction. TanStack's `null` no-error sentinel remains `null` at the four normalization call
+sites; every non-null value, including an absent-key read as `undefined`, goes through the total
+reviver. Plain-record string `message`, `name`, and `stack` remain supported with guarded property
+reads. All other messages use finite safe primitive cases or `Serialized hydration error`; arbitrary
+objects, functions, symbols, and arrays are never coerced.
+
+The RED slice uses mutation/query states produced by TanStack and the real
+`renderToString(<QueryHydrationScript/>)` boundary. It covers an omitted mutation
+`failureReason`, the query-side omitted `error` and `fetchFailureReason` twins, and sibling success
+queries in both paths. A hostile `Symbol.toPrimitive`/`toString` hook cannot survive JSON—the hook is
+not a JSON value—so the same mutation-produced dehydrated state is exercised both after the real
+script round trip and through `HydrationBoundary`'s documented direct-state shape. This avoids a
+hand-built payload while pinning the in-memory escape that cycle-3 F2 found.
+
+After RED and GREEN commits, the branch rebases onto the owner-pinned main commit
+`24f6642f040617de573c7cef1140eed1ac0efd6d`. The granted runtime proof is the single one-pass
+`scaffold.runtime` command followed by explicit Aspire/Docker/scratch cleanup checks. No public
+type, export, dependency range, or other Fresh behavior is reopened.

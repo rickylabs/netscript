@@ -66,3 +66,39 @@ Drift is append-only.
   the initial worktree as clean.
 - **Evidence:** the file content is byte-for-byte the current owner brief; initial status listed no
   other change.
+
+## 2026-08-30 — Cycle-4 owner brief is a local artifact commit above the stated inherited head
+
+- **What:** local HEAD includes `88dac4ebfab4393d945db691b3cbd32ca331e8e3`, which adds only
+  `cycle4-brief.md`, above the brief's stated local/remote head
+  `069913e79c60018786eed683b9ab02896a2e405d`.
+- **Source:** initial raw local/remote/log verification in the cycle-4 session.
+- **Expected:** local, remote, and PR all equal `069913e7…`.
+- **Actual:** the worktree is clean and the remote remains `069913e7…`, while the local owner brief
+  has already been committed as one run-artifact-only child.
+- **Severity:** minor artifact-state drift; no product scope drift.
+- **Action:** preserve the owner artifact and build cycle 4 on top; do not reset or rewrite it.
+
+## 2026-08-30 — Live main advanced beyond the owner-pinned rebase target
+
+- **What:** `origin/main` is `2a65a8cd0f3872c2b95b00fe0a9edae10531921b`, newer than the
+  explicitly pinned cycle-4 target `24f6642f040617de573c7cef1140eed1ac0efd6d`.
+- **Source:** raw `git ls-remote origin refs/heads/main` during cycle-4 intake.
+- **Expected:** the brief describes `24f6642f…` as current main.
+- **Actual:** main advanced after the brief was prepared; the pinned commit exists locally, and the
+  interval from the evaluator's prior main through `24f6642f…` changes zero `packages/fresh` files.
+- **Severity:** minor coordination drift.
+- **Action:** obey the exact owner-pinned rebase target instead of silently moving to newer main.
+
+## 2026-08-30 — Hostile coercion hooks cannot survive the JSON transport
+
+- **What:** functions and symbol-keyed properties are removed by `JSON.stringify`, so a hostile
+  `toString`/`Symbol.toPrimitive` hook cannot be present after `QueryHydrationScript` is parsed.
+- **Source:** JSON semantics and cycle-3 F2's in-memory-only reproduction.
+- **Expected:** the cycle-4 brief asks all three RED cases to cross the real script transport.
+- **Actual:** mutation/query omitted-key cases cross that boundary exactly; the hostile value can
+  only remain hostile on the documented direct-state path.
+- **Severity:** minor test-shape reality, not product rescope.
+- **Action:** build the hostile value through a real mutation, round-trip the same dehydrated state
+  through `QueryHydrationScript`, then also hydrate the original direct state. Do not fabricate a
+  JSON payload that cannot exist.

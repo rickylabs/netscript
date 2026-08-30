@@ -42,6 +42,9 @@
 | S6 | Record and publish exact-final-head static evidence | complete owner-required static suite | run dir |
 | S7 | Prove JSON-preserved rejection values are rejected or collapsed (RED) | real-transport focused test, expected FAIL | round-trip test + run dir |
 | S8 | Preserve JSON rejection values through a type-honest `Error.cause` wrapper | focused/scoped/root static gates | `hydration.ts`, round-trip test, run dir |
+| S9 | Prove absent mutation/query error keys and hostile coercion remain regressions (RED) | real-transport round-trip suite, expected FAIL | round-trip test + run dir |
+| S10 | Replace the open-domain allowlist with a total non-throwing private reviver | focused suites + guard attacks | `hydration.ts`, round-trip test, run dir |
+| S11 | Rebase onto the owner-pinned main and seal static/runtime evidence | full cycle-4 gate set + owned cleanup | run dir |
 
 ### Deferred Scope
 
@@ -74,6 +77,8 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | 2026-08-30T14:35:05Z | S8 | implementation | `reviveSerializedError` now accepts the JSON-preserved primitive/array shapes from cycle-2 F1 and wraps them in a real `Error` with the original value in `cause`. Plain records use the same cause preservation while retaining string `message`/`name`/`stack`; non-JSON host shapes remain invalid. No public type, export, or range file changed. |
 | 2026-08-30T14:35:05Z | S8 | focused gate | The round-trip suite passes 11/11; the complete compat + hydration attacks + real-transport set passes 16/16. The sibling-query assertions prove supported values no longer reject the whole state, while the `cause` assertions prove primitive, array, and record content is retained. |
 | 2026-08-30T14:35:05Z | S8 | reconcile | PR #1736 remains draft at `status:impl`; local, remote, and PR inherited heads matched before S7. Cycle 3 was explicitly owner-authorized after the prior supervisor park comment. No label, issue, milestone, readiness, or evaluator action is required from this lane. |
+| 2026-08-30T17:54:35Z | S9 | cycle-4 RED | The structured real-transport round-trip suite exited 1 with 11 passed / 3 failed / 14 total. A bare mutation rejection and the query `error` / `fetchFailureReason` twins were omitted by JSON and rejected with indexed `TypeError`; a hostile array escaped as `Error: hostile Symbol.toPrimitive` through `String(value)`. Production source remained untouched. |
+| 2026-08-30T17:54:35Z | S9 | direction check | The new sibling-success assertions cover the over-rejection direction on the real `QueryHydrationScript` wire. The existing evaluator guard-attack table remains the locked under-rejection/no-mutation direction and will be rerun after the total-reviver repair. |
 
 ## Decisions
 
@@ -84,6 +89,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | Revive serialized error records | Upstream requires `Error \| null`; a JSON record cannot honestly satisfy that type without normalization. | FAIL_FIX R2; plan D5 |
 | Remove query-state `data` ownership check | Query `data` admits `undefined` and JSON drops it just like mutation `data`; status/counters remain load-bearing. | FAIL_FIX R1; plan D6 |
 | Preserve JSON rejection values in `Error.cause` | It keeps TanStack's declared `Error \| null` boundary honest, preserves primitive/array/record values, and avoids prototype-sensitive field copying. | Cycle-2 F1/F2; cycle-3 plan amendment |
+| Make `reviveSerializedError` total | Rejection values are an open JavaScript domain; enumerating accepted shapes repeatedly narrowed behavior. The reviver returns `Error` for every non-null state value, uses non-throwing message selection, and keeps the original value in `cause`. | Owner cycle-4 ruling; cycle-3 F1/F2 |
 
 ## Drift
 
@@ -101,6 +107,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | S1 RED regression | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-version-compat_test.ts` | FAIL (expected), exit 1 | 0 passed / 1 failed; child check reports only TS2345 at `hydration.ts:43` |
 | S4 JSON-transport RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 1 passed / 4 failed / 5 total; four paused-mutation paths reject index 0; default prior-failure wire value independently asserted equal to `{}` before hydration |
 | S7 cycle-3 rejection-value RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 6 passed / 5 failed / 11 total; four indexed `TypeError` failures prove over-rejection, one `Error.cause === undefined` assertion proves plain-record field loss |
+| S9 cycle-4 total-reviver RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 11 passed / 3 failed / 14 total; omitted mutation and query error fields are over-rejected, and hostile coercion throws past the boundary |
 | S8 focused Fresh suites | `run-deno-test.ts -- --allow-all` over compat, hydration, round-trip | PASS, exit 0 | 16 passed / 0 failed; includes both exact versions, eight guard attacks, and all five real-transport rejection shapes |
 | S5 focused suites | `run-deno-test.ts -- --allow-all ...version-compat... ...query-hydration... ...roundtrip...` | PASS, exit 0 | 11 passed / 0 failed; includes real serializer round trips and the eight guard-attack categories |
 | S5 focused check | `run-deno-check.ts --file ...` | PASS, exit 0 | 3 files, 0 diagnostics |

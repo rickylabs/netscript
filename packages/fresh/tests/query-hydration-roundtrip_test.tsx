@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertInstanceOf } from '@std/assert';
-import { onlineManager, QueryClient } from '@tanstack/query-core';
+import { dehydrate, onlineManager, QueryClient } from '@tanstack/query-core';
 import { render as renderToString } from 'preact-render-to-string';
 import { QueryHydrationScript } from '../src/application/query/hydration-script.tsx';
 import { dehydrateQueryClient, hydrateFromDehydrated } from '../src/application/query/hydration.ts';
@@ -209,6 +209,142 @@ for (const [label, rejection] of rejectionCases) {
     }
   });
 }
+
+Deno.test('query hydration restores a mutation whose failure reason is omitted on the wire', async () => {
+  onlineManager.setOnline(true);
+  const serverClient = new QueryClient();
+  serverClient.mount();
+  serverClient.setQueryData(['undefined-mutation-sibling'], 'kept');
+  let attempts = 0;
+  const mutation = serverClient.getMutationCache().build(serverClient, {
+    mutationKey: ['reject-with-undefined'],
+    mutationFn: () => {
+      attempts += 1;
+      if (attempts === 1) {
+        onlineManager.setOnline(false);
+        return Promise.reject();
+      }
+      return Promise.resolve('recovered');
+    },
+    retry: 1,
+    retryDelay: 0,
+  });
+  const pending = mutation.execute(undefined);
+
+  try {
+    await waitForMutationState(
+      () => mutation.state.isPaused && mutation.state.failureCount === 1,
+      'paused undefined rejection',
+    );
+    const wireState = roundTripThroughHydrationScript(dehydrateQueryClient(serverClient));
+    const wireMutation = requireRecord(wireState.mutations[0], 'undefined wire mutation');
+    const wireMutationState = requireRecord(
+      wireMutation.state,
+      'undefined wire mutation state',
+    );
+    assert(!Object.hasOwn(wireMutationState, 'failureReason'));
+
+    const browserClient = new QueryClient();
+    hydrateFromDehydrated(browserClient, wireState);
+
+    assertEquals(browserClient.getQueryData(['undefined-mutation-sibling']), 'kept');
+    assertEquals(browserClient.getMutationCache().getAll().length, 1);
+    const hydratedFailure = browserClient.getMutationCache().getAll()[0]?.state.failureReason;
+    assertInstanceOf(hydratedFailure, Error);
+    assertEquals(hydratedFailure.cause, undefined);
+  } finally {
+    onlineManager.setOnline(true);
+    await pending;
+    serverClient.unmount();
+  }
+});
+
+Deno.test('query hydration restores omitted query error twins and sibling query', async () => {
+  const serverClient = new QueryClient();
+  serverClient.setQueryData(['undefined-query-sibling'], 'kept');
+  await serverClient.fetchQuery({
+    queryKey: ['reject-query-with-undefined'],
+    queryFn: () => Promise.reject(),
+    retry: false,
+  }).catch(() => undefined);
+
+  const wireState = roundTripThroughHydrationScript(
+    dehydrate(serverClient, { shouldDehydrateQuery: () => true }),
+  );
+  const wireFailedQuery = wireState.queries.find((query) =>
+    isRecord(query) && Array.isArray(query.queryKey) &&
+    query.queryKey[0] === 'reject-query-with-undefined'
+  );
+  const wireQuery = requireRecord(wireFailedQuery, 'undefined wire query');
+  const wireQueryState = requireRecord(wireQuery.state, 'undefined wire query state');
+  assert(!Object.hasOwn(wireQueryState, 'error'));
+  assert(!Object.hasOwn(wireQueryState, 'fetchFailureReason'));
+
+  const browserClient = new QueryClient();
+  hydrateFromDehydrated(browserClient, wireState);
+
+  assertEquals(browserClient.getQueryData(['undefined-query-sibling']), 'kept');
+  const hydratedState = browserClient.getQueryState(['reject-query-with-undefined']);
+  assertInstanceOf(hydratedState?.error, Error);
+  assertEquals(hydratedState.error.cause, undefined);
+  assertInstanceOf(hydratedState.fetchFailureReason, Error);
+  assertEquals(hydratedState.fetchFailureReason.cause, undefined);
+});
+
+Deno.test('query hydration cannot escape through hostile rejection coercion', async () => {
+  onlineManager.setOnline(true);
+  const serverClient = new QueryClient();
+  serverClient.mount();
+  serverClient.setQueryData(['hostile-sibling'], 'kept');
+  const hostileValue = {
+    [Symbol.toPrimitive](): never {
+      throw new Error('hostile Symbol.toPrimitive');
+    },
+    toString(): never {
+      throw new Error('hostile toString');
+    },
+  };
+  const rejection = [hostileValue];
+  let attempts = 0;
+  const mutation = serverClient.getMutationCache().build(serverClient, {
+    mutationKey: ['reject-with-hostile-coercion'],
+    mutationFn: () => {
+      attempts += 1;
+      if (attempts === 1) {
+        onlineManager.setOnline(false);
+        return Promise.reject(rejection);
+      }
+      return Promise.resolve('recovered');
+    },
+    retry: 1,
+    retryDelay: 0,
+  });
+  const pending = mutation.execute(undefined);
+
+  try {
+    await waitForMutationState(
+      () => mutation.state.isPaused && mutation.state.failureCount === 1,
+      'paused hostile rejection',
+    );
+    const dehydratedState = dehydrateQueryClient(serverClient);
+    const wireState = roundTripThroughHydrationScript(dehydratedState);
+
+    const wireClient = new QueryClient();
+    hydrateFromDehydrated(wireClient, wireState);
+    assertEquals(wireClient.getQueryData(['hostile-sibling']), 'kept');
+
+    const directClient = new QueryClient();
+    hydrateFromDehydrated(directClient, dehydratedState);
+    assertEquals(directClient.getQueryData(['hostile-sibling']), 'kept');
+    const hydratedFailure = directClient.getMutationCache().getAll()[0]?.state.failureReason;
+    assertInstanceOf(hydratedFailure, Error);
+    assert(hydratedFailure.cause === rejection);
+  } finally {
+    onlineManager.setOnline(true);
+    await pending;
+    serverClient.unmount();
+  }
+});
 
 Deno.test('query hydration preserves fields from a serialized error record', async () => {
   onlineManager.setOnline(false);
