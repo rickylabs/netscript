@@ -351,3 +351,36 @@ negative expressions reject an invalid authentication literal and invalid access
 
 No source file imports `@netscript/contracts`; no mapped declaration file was needed; no runtime,
 CLI, scaffold, Aspire, Docker, browser, or E2E surface was touched.
+
+### Slice 2 immutable content head and Tier-A evidence handoff
+
+Content commit: `2863d29e342b135de9e9c41c0508a5032c98261f`
+(`feat(sdk): preserve procedure metadata through declarations`). The previous eight top-level
+receipts were moved byte-for-byte into the new append-only `receipts/frozen-42874803/` archive
+before this commit. The earlier archives remain untouched.
+
+All eight named gates were then run serially through `run-gate.ts`, attempt 8, with invocation IDs
+`1466-<gate>-final`. Every receipt records
+`gitHead == actualGitHead == 2863d29e342b135de9e9c41c0508a5032c98261f`.
+
+| Receipt | Outcome | Exit | Duration |
+| --- | --- | ---: | ---: |
+| `check-final.json` | PASS | 0 | 101746 ms |
+| `lint-final.json` | PASS | 0 | 18584 ms |
+| `fmt-check-final.json` | PASS | 0 | 8654 ms |
+| `test-final.json` | PASS — 4258/0/19 | 0 | 197439 ms |
+| `public-doc-lint-final.json` | FAIL — baseline-red, exact R-1 set of 12 | 1 | 398 ms |
+| `quality-gate-final.json` | PASS | 0 | 8881 ms |
+| `arch-check-final.json` | PASS | 0 | 5360 ms |
+| `publish-dry-run-final.json` | PASS | 0 | 28436 ms |
+
+Supplemental same-head results are recorded under `audit/`: exports drift PASS with SDK omitted
+groups 0; focused SDK 78/78; exact public-doc finding-set identity; and the G-1 red/green
+demonstration. Mechanical sufficiency over the eight literal receipt paths is **INSUFFICIENT for
+exactly one reason**, the expected baseline-red `public-doc-lint` receipt. This is recorded without
+renaming the result or treating a delta-0 exception as a fabricated PASS.
+
+`deno.lock` remains byte-unchanged. The evidence-only commit containing the receipts, audit files,
+this worklog entry, and the rewritten context pack is the slice-2 evidence head. It is pushed by
+explicit refspec and followed by the required structured per-slice PR comment. Stop immediately
+after that comment for supervisor Tier-A; slice 3 and G-4 remain not run.
