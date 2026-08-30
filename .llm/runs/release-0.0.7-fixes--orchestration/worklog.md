@@ -3432,3 +3432,57 @@ with the enumerated surface delta, and name the head measured. Evidence-only; no
 The SDK root no longer reaches `@netscript/kv`, `node:`, or the logger at all. `deno.lock`
 byte-unchanged. Acceptance criterion "production client chunks contain no server KV adapter" is
 demonstrated structurally.
+
+## 2026-08-30 — #1462 T-1 corrected; Tier-A signed at `83b7109c`; IMPL-EVAL dispatched
+
+### T-1 fixed exactly as measured
+
+`bfad0c15` rewrites the row to: repo baseline **542** undeclared major at `13878a80`, head
+`1ccddd6e` **552**, the **+10** entirely SDK-scoped (45 → 55) and enumerated — `./presets` added, 21
+root cache exports removed, `QueryClientPort` absent, `CachedEntry`/`CacheEntry` retained type-only.
+It matches the supervisor's independent measurement precisely and names the head measured at.
+
+### Tier-A PASS at `83b7109c`
+
+Exact-head, all re-run: identity clean (local == `origin` == PR #1758 `headRefOid`), nothing outside
+the ceiling, `deno.lock` byte-unchanged, `packages/sdk/tests/` whole suite exit 0 · **70 passed / 0
+failed**, `define-fresh-app.test.ts` exit 0 · **11 passed / 0 failed**.
+
+Structural proof re-derived by re-implementing the leaf's own predicate over `deno info --json`:
+
+| Graph | Base | Head |
+| --- | --- | --- |
+| `packages/sdk/mod.ts` | **19** browser-unsafe edges (KV modules, 2 `node:`, 5 logger) | **0** |
+| `packages/sdk/src/presets/mod.ts` | — | **0** |
+
+Both declined reds were re-derived against a **pristine base worktree**, not reasoned about: SDK
+`doc:lint` is genuinely baseline (exit 1 · 3 errors / 3 private-type refs at both sides), and
+`surface:diff` is a true measured negative once attribution is stated correctly.
+
+The compatibility break found inside the gate run is worth recording: removing root
+`CachedEntry`/`CacheEntry` failed six Fresh checks in the workspace publish dry-run, and was resolved
+with **type-only** exports. The graph measurement confirms no server edge returned — which is exactly
+why the graph assertion is more valuable than a behavioural one here.
+
+### IMPL-EVAL cycle 1 — identity recorded before mutation
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `83b7109c` — Tier-A sign-off; local == `origin` == PR `headRefOid` |
+| Requested / observed route | canonical `formal_impl_evaluation` — `claude-fable-5` · medium · `--remote-control` — **matched** |
+| Background id / session | `bca1ea48` / `bca1ea48-ee20-4223-b16c-2434b38b134a` |
+| PID | `781613` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-eval-1462` (dedicated; sole session) |
+| Verdict branch | `eval/impl-eval-1462-cycle-1`, upstream NONE |
+| Remote Control URL | `https://claude.ai/code/session_014K84nbQc9qbpxKyPrTxfUM` |
+| Independence | fresh; separate from the author `01a05238`, this supervisor, and **both** plan evaluators |
+
+The brief hands over every supervisor measurement so the cycle is spent on judgment rather than
+re-derivation, and asks the harder questions: can the graph predicate be satisfied while a server edge
+still exists in some other shape; are the type-only exports really type-only; is `defineFreshApp()`
+registration order-independent. It also states the one asymmetry deliberately — **the graph half never
+executed at base**, so its red-before rests on supervisor measurement rather than the test run — and
+asks the evaluator to judge whether that is adequate or whether the assertion needs its own red-state
+demonstration.
+
+Phase normalized to `status:impl-eval` on PR #1758 and issue #1462, exactly one `status:` each.
