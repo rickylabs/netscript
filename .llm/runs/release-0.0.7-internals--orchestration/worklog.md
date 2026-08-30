@@ -5151,3 +5151,28 @@ evaluator's verdict — corroboration, obtained by a different route.
   "distinct events: []". The field is nested under `event`. The empty result was my bug, not absent
   data — re-extracted correctly above. Recording it because "no events found" would have been a
   false negative pointing the opposite way, and I nearly reported it.
+
+## D-86 — #1774: fresh-checkout parent-dir creation under the narrowed write grant is empirically proven
+
+The evaluator probed whether the tightened `--allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks`
+can create its own parent directories on a fresh checkout, where `.llm/tmp` does not exist. The
+answer is already on disk, from the evaluator's own worktree.
+
+| Fact | Value |
+| --- | --- |
+| `007-eval-1774-impl` created (fresh `git worktree add`) | **21:41:51** |
+| `.llm/tmp` ignored at `.gitignore:17`; tracked files under it | **0** → absent from checkout |
+| `.llm/tmp/claude` and `.../hooks/unscoped` created | **21:48:40.854** |
+| First hook event written | **21:48:40.855** (1 ms later) |
+
+- In a genuinely fresh checkout the hook created the **entire chain** `tmp/claude/hooks/unscoped`
+  and wrote immediately. The narrowed grant is therefore **sufficient in practice**, and the
+  fresh-checkout attack resolves in the fix's favour.
+- Worth noting precisely: `.llm/tmp` is itself **outside** the allowlisted path, yet recursive
+  creation toward the allowed target succeeded. That is Deno's `mkdir --recursive` behaviour against
+  a path-scoped write grant. It means the permission narrowing does not break first-run bootstrap —
+  the specific regression risk a tightened grant usually carries.
+- This is supervisor corroboration gathered independently, **not** fed to the evaluator: injecting
+  it mid-evaluation would compromise the independence that makes the verdict worth having. It is
+  recorded here so that, if the evaluator returns a FAIL on this point, the disagreement can be
+  reconciled against measured evidence rather than re-litigated from opinion.
