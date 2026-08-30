@@ -5512,3 +5512,35 @@ deleted.
 
 **Ledger durability:** verified `origin/orchestrator/release-0.0.7-fixes` had not diverged
 (behind=0), then pushed 20 commits fast-forward, no force. Remote now at the current ledger.
+
+### #1357 S2B reviewed and accepted at `0cc9b7ad7`; S2C dispatched
+
+Re-derived independently in a detached scratch worktree, again so it could not race the live worker:
+
+| Check | Result |
+| --- | --- |
+| Red-before `22e737fc3` (test-only, one file) | exit 1, **17 passed / 4 failed** |
+| Green at `0cc9b7ad7` | exit 0, **21 passed / 0 failed** |
+| **Whole `packages/cli`** | exit 0, **1384 passed / 0 failed** (1379 → 1384) |
+| `deno check --unstable-kv` | 0 occurrences |
+| `deno.lock` vs `de57fab0` | byte-unchanged |
+| Ceiling | exactly items 3–6, nothing else |
+
+**The D13 advisory is genuinely closed, and I checked the code rather than the design note.** Both
+PLAN-EVAL cycles warned that the help↔role coupling could degrade into constant-compared-to-constant.
+It has not: `'ui:add real help advertises exactly the independently planned data-screen roles'` calls
+`testCommand(fs).getHelp()` and `assertHelpMatchesPlan` parses `Data-screen roles: …` out of the
+**rendered** help, comparing it against the independently planned file roles, with a negative case
+rejecting the stale three-part advertisement. Help→plan, as designed.
+
+S2C dispatched — ceiling 7–12, the generated-consumer gate definition and its explicit
+`scaffold.runtime` selection. The brief leads with the reason PLAN-EVAL cycle 1 failed: a gate that is
+defined but not **selected** into `RUNTIME_GATES` is silently dropped, so definition, registration,
+gate id, tests and selection must all land, and the selection must be proved by a test assertion rather
+than by inspection.
+
+Two constraints tightened for this slice specifically: run the **whole `packages/cli` suite and the e2e
+package suite**, because S2C touches e2e paths and both sides of that composition must be exercised;
+and **do not execute `e2e:cli`/`scaffold.runtime`/AppHost/containers** — not merely out of author
+scope, but because the singleton host runtime lease is held by another lane right now and starting
+runtime would collide with a live leaseholder.
