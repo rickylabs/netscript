@@ -12,9 +12,15 @@
 
 ## Current State
 
-Research and the locked nine-slice plan are complete on current main. No product code exists in this
-leaf. #1466's PR #1731 remains open, so implementation has two independent blockers: the metadata
-dependency must merge and a fresh opposite-family PLAN-EVAL must return `PASS`.
+Research and the locked nine-slice plan are complete on the recorded `625447f1` main baseline. No
+product code exists in this leaf. #1466's PR #1731 remains open, so implementation has two
+independent blockers: the metadata dependency must merge and a fresh opposite-family PLAN-EVAL must
+return `PASS`.
+
+After the research baseline froze, `main` advanced from `625447f1` to `f8b4f804` through an
+unrelated cross-host skill-documentation/generated-assets commit. Its focused delta does not change
+the researched policy surfaces, and Slice 0 already requires the authoritative post-#1466 rebase and
+full base-gate rerun.
 
 ## Completed
 
@@ -78,8 +84,8 @@ dependency must merge and a fresh opposite-family PLAN-EVAL must return `PASS`.
 
 ## Drift and Debt
 
-- Drift: branch re-baseline, unmerged dependency, impossible rename wording, missing RTK, and
-  base-red candidate gates are recorded in `drift.md`.
+- Drift: branch re-baseline, unmerged dependency, impossible rename wording, missing RTK, base-red
+  candidate gates, and the unrelated post-freeze main advance are recorded in `drift.md`.
 - Debt: no new debt proposed; existing service/plugin/#1278 items are preserved and excluded.
 
 ## Commits

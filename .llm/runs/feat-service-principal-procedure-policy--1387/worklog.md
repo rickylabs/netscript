@@ -89,14 +89,15 @@ operation summaries.
 
 ## Progress Log
 
-| Time       | Slice    | Step                    | Notes                                                                                                                              |
-| ---------- | -------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30 | planning | activation              | Read harness, doctrine, PR, Deno toolchain, RTK, repo-tools, and JSR-audit instructions.                                           |
-| 2026-08-30 | planning | re-baseline             | Fetched current main and #1466 branch; safely fast-forwarded the clean leaf branch.                                                |
-| 2026-08-30 | planning | public-surface research | Used `deno doc` before focused source reads; enumerated context callers, auth ordering, OpenAPI/MCP reach, and consumer contracts. |
-| 2026-08-30 | planning | migration research      | Counted 54 undeclared first-party procedures and identified scaffold generators; selected opt-in enforcement.                      |
-| 2026-08-30 | planning | base gates              | Ran candidate gates on clean base; contracted only green signals.                                                                  |
-| 2026-08-30 | planning | artifacts               | Wrote research, locked plan, drift, worklog, supervisor, and context pack only; no product code.                                   |
+| Time       | Slice    | Step                    | Notes                                                                                                                                                                     |
+| ---------- | -------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30 | planning | activation              | Read harness, doctrine, PR, Deno toolchain, RTK, repo-tools, and JSR-audit instructions.                                                                                  |
+| 2026-08-30 | planning | re-baseline             | Fetched current main and #1466 branch; safely fast-forwarded the clean leaf branch.                                                                                       |
+| 2026-08-30 | planning | public-surface research | Used `deno doc` before focused source reads; enumerated context callers, auth ordering, OpenAPI/MCP reach, and consumer contracts.                                        |
+| 2026-08-30 | planning | migration research      | Counted 54 undeclared first-party procedures and identified scaffold generators; selected opt-in enforcement.                                                             |
+| 2026-08-30 | planning | base gates              | Ran candidate gates on clean base; contracted only green signals.                                                                                                         |
+| 2026-08-30 | planning | artifacts               | Wrote research, locked plan, drift, worklog, supervisor, and context pack only; no product code.                                                                          |
+| 2026-08-30 | planning | draft recheck           | Main advanced by one unrelated docs/generated-assets commit after the research freeze; inspected the delta and retained the truthful `625447f1` baseline pending Slice 0. |
 
 ## Decisions
 
@@ -111,13 +112,14 @@ operation summaries.
 
 ## Drift
 
-| Drift                              | Severity      | Logged in drift.md |
-| ---------------------------------- | ------------- | ------------------ |
-| Initial branch behind fetched main | minor         | yes                |
-| #1466 not merged                   | significant   | yes                |
-| Router-rename acceptance conflict  | architectural | yes                |
-| RTK unavailable                    | minor         | yes                |
-| Candidate gates red at base        | minor         | yes                |
+| Drift                               | Severity      | Logged in drift.md |
+| ----------------------------------- | ------------- | ------------------ |
+| Initial branch behind fetched main  | minor         | yes                |
+| #1466 not merged                    | significant   | yes                |
+| Router-rename acceptance conflict   | architectural | yes                |
+| RTK unavailable                     | minor         | yes                |
+| Candidate gates red at base         | minor         | yes                |
+| Main advanced after research freeze | minor         | yes                |
 
 ## Gate Results
 

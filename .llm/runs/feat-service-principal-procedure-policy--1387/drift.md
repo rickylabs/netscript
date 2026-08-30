@@ -59,3 +59,19 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** Base gate census in `research.md`; red candidates are excluded from `plan.md`.
+
+## 2026-08-30 — Main advanced after the research baseline froze
+
+- **What:** GitHub created the draft against `main` at `f8b4f804`, one commit beyond the researched
+  baseline `625447f1`.
+- **Source:** Draft PR base SHA, followed by `git fetch origin main` and focused name-status diff.
+- **Expected:** The draft PR and frozen research baseline could initially share the same main SHA.
+- **Actual:** The intervening commit documents cross-host skill installation and changes generated
+  agent-doc assets, including `packages/mcp/src/publish-assets.generated.ts`; it does not touch the
+  metadata, context, auth, OpenAPI, or MCP projection source researched by this plan. #1466 remains
+  unmerged.
+- **Severity:** minor
+- **Action:** defer
+- **Evidence:** `git diff --name-status 625447f1..f8b4f804`; Slice 0 already requires a full rebase
+  and base-gate rerun after #1466 lands, so this planning commit remains anchored to its truthful
+  research SHA rather than chasing an unrelated moving main.
