@@ -4801,3 +4801,43 @@ evaluator.
 
 **No cycle 5 under any result.** On `PASS` an exact merge packet follows immediately; on failure the
 leaf parks or rescopes.
+
+## 2026-08-30 — #1734 SHIPPED: PR #1736 merged as `52a881c58842f521b7b253b9781a0b56ae897069`
+
+| Item | Value |
+| --- | --- |
+| Merge commit | `52a881c58842f521b7b253b9781a0b56ae897069` — verified an ancestor of `origin/main` |
+| PR #1736 | `MERGED` at 2026-08-30T18:38:25Z |
+| Issue #1734 | `closed`, sole status **`status:shipped`** |
+| Evaluated carrier | `be949ebd3359624fe881883e6ac2d78928703a1f` |
+| Product + runtime head | `d2c7f16c624c5028cd837595d01ab3b516cb1c23` |
+| Hosted acceptance | run **33327199769**, all five jobs green |
+
+Four cycles, and the shape of the fix is the lesson. Cycles 1–3 each repaired the rejection value the
+previous evaluator had shown, and the next value surfaced — because `reviveSerializedError` was
+enumerating an **open** domain inside an allowlist. Option 2 replaced it with a **total** reviver whose
+signature `(value: unknown): Error` admits no representable rejection, and cycle 4 could not defeat it
+with revoked proxies, throwing traps and getters, symbols, bigints, cyclic/frozen/null-prototype
+objects, host objects, hostile coercion hooks, or prototype pollution. **The recurring defect was
+answered by changing the shape of the question, not by enumerating one more member.**
+
+The decisive external proof was the hosted `scaffold-runtime (aspire + docker + postgres)` job: it
+contains `generated.quality-negative`, the step that had failed on this exact defect (`TS2345` at
+`hydration.ts:43`) when #1747's gate ran. Its passing is what made this a product verdict rather than
+a unit-test verdict.
+
+**Unblocks:** `#1747`, `#1758`, `#1739`, and the Aspire S1/S4/S5 runtime verdicts. This lane does
+**not** hold on Aspire convergence and resumes its own queue immediately.
+
+### Errors this leaf cost, all recorded rather than smoothed
+
+1. My cycle-4 brief instructed a local `scaffold.runtime` run; the countermand was queued behind a
+   writer lock for a boundary that never arrived. **A superseding instruction that cannot reach the
+   worker in time is not a correction, it is a hope.**
+2. That same queued message later fired at the real boundary and started an unwanted turn.
+3. I stopped a healthy in-flight owned gate on an URGENT instruction that a lease-reassignment
+   correction superseded moments later.
+4. I attributed the resulting `database.init` failure to D-55 topology in the ledger while hedging in
+   prose. **Hedging in prose while asserting in the ledger is not honest recording** — the ledger is
+   what future readers act on. Corrected in the leaf worklog, the internals worklog, and the cycle-4
+   evaluator brief before dispatch.
