@@ -5829,3 +5829,26 @@ genuinely free (`docker ps` empty, no AppHost) before launching. `deno task e2e:
 `459495` at head `94620577d`, confirmed genuinely progressing (real gate sequence: schema
 generation passed, database codegen started). This is the fresh verdict the #1734 fix retires the
 stale `26/1` classification for — first real e2e:cli run at this leaf's current converged head.
+
+## D-113 — #1758 e2e:cli first run: 1 real failure isolated (behavior.db-status-preserves-apphost); clean retry launched, no fabricated relay tooling
+
+- First e2e:cli run (pid `459495`) completed a full 56/56-gate cycle including clean cleanup
+  (`cleanup.aspire-stop` passed). Exactly **one** failing gate:
+  `behavior.db-status-preserves-apphost` — "DB status preserves resident AppHost identity". The
+  captured evidence is opaque: the wrapper's error message embeds the inner `netscript-dev.ts db
+  status` command's own stderr/stdout, both empty in the blob, so the real underlying cause (network,
+  timing, or logic) is not visible from this log alone.
+- **Verified independently, not accepted on claim**, that resources are genuinely at zero before the
+  retry: `docker ps -a` → 0 containers, `aspire ps` → no AppHost, no process matching
+  `fix1781|relay|watcher`.
+- **Searched the actual repository for the described "#1758-owned loopback relay watcher/registry"
+  mechanism and found nothing matching it** — no such tool exists anywhere under `.llm/tools/` or
+  `packages/cli/e2e/`. Declined to fabricate one: inventing undocumented infrastructure to satisfy an
+  unverified claim would itself violate wrap-don't-reinvent and risk adding new contamination rather
+  than removing it. Instead treating a clean rerun via the standard, already-documented
+  `deno task e2e:cli` path (confirmed zero resources beforehand) as the actual diagnostic: if it
+  passes clean, the first run's failure was contamination; if it fails identically with zero foreign
+  interference this time, that is real evidence of a product-behavior defect, not an infrastructure
+  artifact.
+- Clean retry launched (pid `503306`), confirmed genuinely progressing through real gates. Awaiting
+  result before drawing any root-cause conclusion or touching product code.
