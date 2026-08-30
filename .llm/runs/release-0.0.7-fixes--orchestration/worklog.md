@@ -3802,3 +3802,67 @@ ends up worse than it started.
 
 PR #1758 `status:ci-fail`, issue #1462 `status:impl` — exactly one `status:` each, verified by count
 after the phase-eval automation re-added `impl-eval` once already.
+
+## 2026-08-30 — #1758 held for #1748 (not yet merged); #1368 opened as the second WIP slice
+
+### The hold is correct and may last
+
+The coordinator confirms **#1748 is not merged**, and any placeholder SHA is to be ignored. The docs
+lane's own queue state corroborates the reason:
+`1748_withheld_until_false_every_published_surface_claim_and_shared_asset_are_repaired`, with
+`1755_third_in_same_shared_asset_sequence`. So #1748 is deliberately withheld pending repairs and the
+hold on #1758's regeneration could last a while — which is what makes opening a second slice the right
+use of the wait rather than idling.
+
+`#1758` sits at `cea45edd`: merge of `f8b4f804` intact at `d1f8afe9`, the `check:assets-barrel` gate
+row and the bounded ceiling addition recorded, acceptance-evidence untouched. Labels hold at
+`status:ci-fail` / `status:impl`.
+
+### A hazard this lane created and cleaned up
+
+Running `deno task check:assets-barrel` in the leaf worktree **wrote**
+`packages/cli/src/kernel/assets/agent-docs.generated.ts` — the very shared asset under hold — and left
+it uncommitted. That file would have been swept into the next commit or confused the next gate run.
+Restored with `git checkout --`; the tree is clean at `cea45edd`, and no generated asset differs from
+`d1f8afe9`.
+
+The general point: a `check:` task is not necessarily read-only. This one is a generate-then-compare,
+so running a "check" during a regeneration hold can itself violate the hold. Verify tree cleanliness
+after any gate run performed while holding.
+
+### #1368 dispatched — second WIP slice, chosen to avoid the shared-asset sequence
+
+`limits.activeImplementationSlicesPerLane` is 2 and #1462 is one, so there is headroom for exactly
+one more. Selection was constrained by the corpus landing, not just by priority:
+
+| Candidate | Why not / why |
+| --- | --- |
+| #1357 `ui:add` scaffold | touches CLI templates — a **direct** `assets-barrel` collision with the in-flight sequence |
+| #1677 tanstack-bridge `TokenUsage` | may widen a public type into the MCP corpus |
+| **#1368** saga span emission | saga telemetry internals — five defined-but-never-emitted span factories, an uninstrumented `SagaCompensator`, and a missing `netscript.correlation.id`. Lowest shared-asset risk. |
+
+| Field | Value |
+| --- | --- |
+| Branch / worktree | `fix/saga-span-emission-and-correlation` @ `f8b4f804`, upstream NONE · `007-leaf-1368` |
+| Codex thread | `01a052b6-7c27-7790-ab01-1a69600faadb` |
+| Requested / observed route | openai · `gpt-5.6-sol` · high — **matched** |
+| Attachment | confirmed from `agentic:codex-status` (`working`), not from the launcher's exit code |
+
+Scope is S1 + S2 with **PLAN-EVAL required** — the design is genuinely open. The brief carries this
+lane's hardest-won lesson explicitly: **derive the generated-derivative cascade from the tooling**
+(`generate-publish-assets.ts`, `generate-cli-assets-barrel.ts`, `build-agent-docs-bundle.ts`), not
+from a remembered list of gate names, citing #1462 where `check:assets-barrel` survived plan, two
+plan-eval cycles, Tier-A and IMPL-EVAL before CI caught it. It also instructs the author to **stop and
+report** rather than regenerate if the change forces any shared asset, because that ordering is
+coordinator-controlled right now.
+
+Two questions the plan must answer rather than assume: whether emitting all five factories is right or
+some are genuinely dead (deleting them also keeps CI green today, so both options pass), and which
+layer owns the correlation attribute.
+
+### Central state is stale for this lane, reported not touched
+
+`milestone-cluster-state.json` records the fixes queue as
+`1673_pr1739_cycle_1_fail_fix...; 1462_queued`. In reality #1673 is at IMPL-EVAL cycle 2 `PASS_IMPL`
+awaiting a coordinator decision, and #1462 is merged-onto-main and held for #1748. Central state is
+coordinator-owned, so this is reported rather than edited — as with the still-absent #1673 leaf entry.
