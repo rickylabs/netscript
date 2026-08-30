@@ -295,3 +295,59 @@ evidence, carries **G-4**) are **NOT RUN**. PR #1731 therefore says `Refs #1466 
 stays **draft**. No ready-flip, no merge, and no restored closing keyword until all three slices land,
 the final all-slices separate-session IMPL-EVAL passes, and the close-gate passes — including root
 `test` green off this host on the CI matrix at the final head.
+
+## Slice 2 implementation — SDK declaration propagation plus G-1
+
+Date: 2026-08-30. Implementation author: fresh Codex thread in the existing leaf worktree. This
+section records the implementation candidate before the immutable content commit and receipt recut;
+the final content/evidence heads and receipt table are appended after the gates run.
+
+### Declaration contract
+
+- `ProcedureMetaFromNode<TNode>` structurally reads `~orpc.meta` with an empty-record fallback and
+  introduces no `@netscript/contracts` dependency in SDK source.
+- `ProcedureMeta<TContract, TAction>` mirrors the existing input/output extractor pair.
+- `ActionMethod` carries an optional readonly `__netscriptProcedureMeta` type marker, so query
+  metadata is recoverable from `defineServices({...}).queries.<service>.<action>` without runtime
+  interpretation.
+- Physical exports are limited to the locked `./ports` and `./query` entrypoints. D-32 records the
+  existing root barrel's transitive visibility without editing that out-of-ceiling file.
+
+### Real-export proof
+
+`packages/sdk/tests/type-fixtures/procedure-meta_type.ts` imports only `@netscript/contracts`,
+`@netscript/sdk`, `@netscript/sdk/ports`, and `@netscript/sdk/query`. It pins exact metadata through
+a direct `ServiceClient`, a `defineServices` client, the mapped query action marker, and the public
+query extractor. It separately pins the complete base error map, defined-client error-code union,
+NOT_FOUND status `404`, message `Resource not found`, and data schema. Two single-diagnostic
+negative expressions reject an invalid authentication literal and invalid access shape.
+
+### Assertion and independence gates
+
+- SDK assertion budgets re-measured at the implementation candidate: metadata ports `0/0`;
+  pre-existing mapped/runtime boundaries `define-services=1`, client `service-client=1`, runtime
+  `query-factory=5`; zero angle-bracket casts and zero `any` tokens at the two metadata ports.
+- The SDK doc-JSON test selects the three contracts symbols plus `ProcedureMetaFromNode` and
+  `ProcedureMeta` from the real contracts root and SDK ports entrypoint; every selected subtree is
+  free of `@orpc` and `npm:`.
+- G-1 uses a statement-bounded declaration regex. B2 plus the old dead decoy kept focused check and
+  lint green but made the pin fail 4/1; B2 alone also failed 4/1. All perturbations were restored,
+  `contract-primitives.ts` is unchanged, and the committed-state pin passes 5/5. Full details:
+  `audit/g1-declaration-pin-slice2.txt`; drift D-31.
+
+### Preliminary focused validation
+
+| Validation | Result |
+| --- | --- |
+| SDK structured check | PASS — 87 files, 0 findings |
+| SDK structured test | PASS — 78 passed / 0 failed |
+| SDK structured lint | PASS — 87 files, 0 findings |
+| SDK structured TS format | PASS — 87 files, 0 findings |
+| `docs:exports-drift` | PASS — SDK `entrypoints-only`, zero omitted symbol groups |
+| SDK JSR audit | exit 0 — two existing warnings: `src/` cardinality and one slow-types warning |
+| SDK scoped doc lint | baseline-red — 3 combined private-type references, 0 missing JSDoc |
+| exact 16-entrypoint public doc lint | baseline-red — 12 findings, exact R-1 set |
+| `quality:gate` | PASS |
+
+No source file imports `@netscript/contracts`; no mapped declaration file was needed; no runtime,
+CLI, scaffold, Aspire, Docker, browser, or E2E surface was touched.

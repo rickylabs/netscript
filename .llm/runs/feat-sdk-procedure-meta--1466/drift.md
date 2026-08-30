@@ -199,3 +199,51 @@ Add a distinct `docs-exports-drift` gate to future contracted evidence sets when
 a package's published surface, and require it at the immutable content head. This implementation
 thread does not amend the approved plan or add a catalog entry. IMPL-EVAL and the coordinator own
 the decision.
+
+## D-31 — G-1 declaration pin is statement-bounded, not merely declaration-prefixed
+
+- Date: 2026-08-30
+- Slice: 2 — SDK declaration propagation plus G-1
+- Severity: informational
+- Status: implemented and adversarially demonstrated
+
+### Planned
+
+G-1 allowed an anchor shaped like
+`export const baseContract:[\s\S]*?= oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap);`.
+The required proof was B2 with the old dead `_legacyBase` decoy and B2 alone, with every
+perturbation restored.
+
+### Observed
+
+A prefix followed by unrestricted `[\s\S]*?` can cross the divergent declaration's semicolon and
+consume a later decoy initializer. The slice therefore uses `[^=;]+?` between the declaration name
+and initializer. That span covers the multiline type annotation but cannot cross an assignment or
+statement boundary.
+
+Under B2 plus the dead decoy, focused `deno check` and `deno lint` stayed green while the pin failed
+with 4 passed / 1 failed. Under B2 alone the pin again failed 4/1. After restoration the pin passed
+5/5 and `contract-primitives.ts` had no diff. The exact commands and outcomes are recorded in
+`audit/g1-declaration-pin-slice2.txt`.
+
+### Impact
+
+No scope change. This is the same G-1 repair with a stricter boundary that survives the exact
+forgery it claims to reject.
+
+## D-32 — locked `./query` export is transitively visible from the existing root barrel
+
+- Date: 2026-08-30
+- Slice: 2 — SDK declaration propagation
+- Severity: informational
+- Status: reconciled within the locked physical export sites
+
+L3 requires `ProcedureMeta` wherever `ProcedureInput` and `ProcedureOutput` are exported, naming
+`src/ports/mod.ts` and `src/query/mod.ts`, while the public-surface table says the SDK root remains
+unchanged. The existing root already uses `export * from './src/query/mod.ts'`, so any new
+`./query` symbol is mechanically visible at the root even though `packages/sdk/mod.ts` is untouched.
+
+The slice follows the more specific L3 export-site lock and the product ceiling: it edits only the
+two named subpath entrypoints and does not rewrite the root barrel. `ProcedureMetaFromNode` remains
+`./ports`-only as explicitly required. No upstream type is exported and no out-of-ceiling file is
+needed.
