@@ -510,4 +510,7 @@ verified local==origin, host zero, relay `s7-rerun` alive, RED/GREEN bootstrap r
 (`phase-b-21/22`) committed → same-thread attempt with receipts `phase-b-31..40`. S5: all 3 fixed
 review threads mechanically resolved (GraphQL); full-runtime dispatch queued (chain-3 after S1);
 two-concurrent-isolated-start receipt scheduled for the next lease after S7; proof failures (D-81)
-stay separate from S5 evidence. S9 cycle-2 running. |
+stay separate from S5 evidence. S9 cycle-2 running. | | S7 attempt: first AppHost attached | Run
+AppHost up under the granted attempt at `f8201d4f`; relay attached `postgres-0e5c6d1c :20800` +
+`redis-amduaucj :32783` within seconds (routing confirmed); corrected bootstrap held. Turn-end wake
+armed. |

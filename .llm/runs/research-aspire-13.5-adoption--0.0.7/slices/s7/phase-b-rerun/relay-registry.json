@@ -4,5 +4,18 @@
   "dindHost": "netscript-dind",
   "dindIp": "10.4.12.22",
   "since": "2026-08-30T19:09:42.848Z",
-  "relays": []
+  "relays": [
+    {
+      "port": 20800,
+      "container": "relay-s7-rerun-20800",
+      "source": "postgres-0e5c6d1c",
+      "startedAt": "2026-08-30T19:29:23.356Z"
+    },
+    {
+      "port": 32783,
+      "container": "relay-s7-rerun-32783",
+      "source": "redis-amduaucj",
+      "startedAt": "2026-08-30T19:29:24.680Z"
+    }
+  ]
 }

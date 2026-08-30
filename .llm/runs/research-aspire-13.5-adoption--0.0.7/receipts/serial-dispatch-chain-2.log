@@ -2,3 +2,11 @@
 [chain2] dispatching S1 at e0d70e40407458bebcf02cc408bea6b49107f42b 19:22:58Z
 https://github.com/rickylabs/netscript/actions/runs/33330714604
 [S1] run 33330714604 sha=e0d70e40407458bebcf02cc408bea6b49107f42b
+[S1] run 33330714604 exit=0 19:29:41Z
+success
+  classify changes: success
+  scaffold-static (deno-only): success
+  desktop-native-linux (deb + signed updater): success
+  scaffold-runtime-sqlite (aspire + sqlite + garnet): success
+  scaffold-runtime (aspire + docker + postgres): success
+  scaffold CI lane visibility: skipped
