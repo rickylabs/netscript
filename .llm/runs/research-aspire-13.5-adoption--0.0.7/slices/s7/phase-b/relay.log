@@ -1,1 +1,5 @@
 [relay] watching owner=s7-phase-b dind=netscript-dind(10.4.12.22) since=2026-08-30T18:29:44.135Z pid=3193227
+[relay] postgres-46428945 127.0.0.1:21054 => hopA relay-s7-phase-b-21054 (10.4.12.22:21054) => hopB 127.0.0.1:21054@ai-agents
+[relay] redis-kyzdwfmm 127.0.0.1:32779 => hopA relay-s7-phase-b-32779 (10.4.12.22:32779) => hopB 127.0.0.1:32779@ai-agents
+[relay] postgres-b415ea7e 127.0.0.1:12229 => hopA relay-s7-phase-b-12229 (10.4.12.22:12229) => hopB 127.0.0.1:12229@ai-agents
+[relay] redis-mrecybvk 127.0.0.1:32780 => hopA relay-s7-phase-b-32780 (10.4.12.22:32780) => hopB 127.0.0.1:32780@ai-agents

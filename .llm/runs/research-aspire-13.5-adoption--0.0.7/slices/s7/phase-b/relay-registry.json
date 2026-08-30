@@ -4,5 +4,30 @@
   "dindHost": "netscript-dind",
   "dindIp": "10.4.12.22",
   "since": "2026-08-30T18:29:44.135Z",
-  "relays": []
+  "relays": [
+    {
+      "port": 21054,
+      "container": "relay-s7-phase-b-21054",
+      "source": "postgres-46428945",
+      "startedAt": "2026-08-30T18:32:41.981Z"
+    },
+    {
+      "port": 32779,
+      "container": "relay-s7-phase-b-32779",
+      "source": "redis-kyzdwfmm",
+      "startedAt": "2026-08-30T18:32:43.166Z"
+    },
+    {
+      "port": 12229,
+      "container": "relay-s7-phase-b-12229",
+      "source": "postgres-b415ea7e",
+      "startedAt": "2026-08-30T18:33:04.554Z"
+    },
+    {
+      "port": 32780,
+      "container": "relay-s7-phase-b-32780",
+      "source": "redis-mrecybvk",
+      "startedAt": "2026-08-30T18:33:05.439Z"
+    }
+  ]
 }
