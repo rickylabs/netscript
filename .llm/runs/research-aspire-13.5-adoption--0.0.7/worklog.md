@@ -323,4 +323,8 @@ stopped before any work; S11 worktree reset clean at `c61b1626`. D-53. | | Stack
 executed (D-54) | Rebased bottom-up onto main `3e5cbabf`; generated-carrier conflicts (S5
 `agent-docs.generated.ts`, S9 `export-surface-corpus.generated.ts`) resolved by regeneration; full
 gates green at S8′/S9′/S10′; force-pushed with lease; slice worktrees moved. New heads: S5
-`56bf4255`, S6 `01f27d4d`, S8 `f2395465`, S9 `d81a8fe1`, S10 `a46ea16d`. |
+`56bf4255`, S6 `01f27d4d`, S8 `f2395465`, S9 `d81a8fe1`, S10 `a46ea16d`. | | D-42/D-43 re-verified
+(coordinator challenge) | Exact current probes: bind-mounted worktree → `entries=0`; published port
+`127.0.0.1:32772` refused from `ai-agents` (curl exit 7, /dev/tcp refused), `ok` inside the dind
+netns. Both causes present on the repaired host; no lease requested; sandbox back to zero. **D-55**.
+|

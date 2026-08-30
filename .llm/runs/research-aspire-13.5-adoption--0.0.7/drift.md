@@ -1008,3 +1008,28 @@
 - **S11:** its Gemini session is mid-run on `docs/aspire-13-5-s11-public-docs-refresh` based on the
   old S10 head `c61b1626`; rebased onto `a46ea16d` at its handoff (docs-only, low conflict risk).
 - Throwaway worktrees removed after the pushes.
+
+## D-55 — 2026-08-30 — Coordinator challenge answered: D-42/D-43 re-proven by exact current commands (not carried by inference)
+
+- Host state at probe time (13:50Z): PID 1 `tini`; Docker client/server **28.5.2** at
+  `tcp://netscript-dind:2375` (`10.4.12.19`); inotify **1024**; `ai-agents` = `10.4.12.18`; stack
+  converged on main `3e5cbabf`. Pre/post: `aspire ps` `[]`, containers 0, volumes 0.
+- **Probe 1 — bind-mount visibility (D-42):**
+  `docker run --rm -v /home/agent/projects/netscript/worktrees/007-aspire-s10:/probe alpine:3 sh -c 'ls /probe | wc -l'`
+  → **`entries=0`** (exit 0). The daemon materialises an empty directory: this container's paths do
+  not exist on the dind host. Any generated AppHost with a `DataPath` bind mount still fails
+  `FailedToStart` exactly as attempt 1 did.
+- **Probe 2 — loopback locality (D-43):** `docker run -d --rm -p 127.0.0.1::8080 alpine:3 …`
+  published as `127.0.0.1:32772` on the dind. From `ai-agents`: `curl http://127.0.0.1:32772` →
+  `http=000 exit=7`; `bash -c 'exec 3<>/dev/tcp/127.0.0.1/32772'` → **Connection refused**; via the
+  dind IP `10.4.12.19:32772` → refused (bound to the dind's loopback). Control from inside the dind
+  network namespace (`docker exec … wget http://127.0.0.1:8080`) → `ok`. DCP publishes exactly this
+  way and the AppHost dials `127.0.0.1`, so attempt 2's failure reproduces without an AppHost.
+- **Conclusion:** the tini/DinD-28.5.2/inotify fixes are real and recorded (D-39); they do not touch
+  either cause. `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY` stands **on fresh evidence**. No Phase-B
+  lease requested. Cleanup: probe containers `--rm`, `alpine:3` image removed; zero re-proven.
+- **What clears it (infra handover, unchanged):** `ai-agents` sharing `netscript-dind`'s network
+  namespace **and** the worktrees bound into the dind at the identical absolute path — acceptance =
+  probe 1 lists the worktree and probe 2's `curl` from `ai-agents` returns `ok`; or a local Docker
+  daemon in `ai-agents`; or AppHost gates in CI/off-host. Re-run these two probes after any infra
+  change before requesting a lease.
