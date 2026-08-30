@@ -52,73 +52,143 @@ export function hydrateFromDehydrated(
 }
 
 function toMutableDehydratedState(state: DehydratedState): TanStackDehydratedState {
+  if (!Array.isArray(state.mutations) || !Array.isArray(state.queries)) {
+    throw new TypeError('Invalid dehydrated state: mutations and queries must be arrays');
+  }
   return {
     mutations: state.mutations.map((mutation, index) => {
-      if (!isDehydratedMutation(mutation)) {
+      const normalized = normalizeDehydratedMutation(mutation);
+      if (!normalized) {
         throw new TypeError(`Invalid dehydrated mutation at index ${index}`);
       }
-      return { ...mutation, state: { ...mutation.state } };
+      return normalized;
     }),
     queries: state.queries.map((query, index) => {
-      if (!isDehydratedQuery(query)) {
+      const normalized = normalizeDehydratedQuery(query);
+      if (!normalized) {
         throw new TypeError(`Invalid dehydrated query at index ${index}`);
       }
-      return { ...query, state: { ...query.state } };
+      return normalized;
     }),
   };
 }
 
-function isDehydratedMutation(value: unknown): value is TanStackDehydratedMutation {
-  if (!isRecord(value) || !isMutationState(value.state)) return false;
-  if (value.mutationKey !== undefined && !Array.isArray(value.mutationKey)) return false;
-  if (value.meta !== undefined && !isRecord(value.meta)) return false;
-  return value.scope === undefined ||
-    (isRecord(value.scope) && typeof value.scope.id === 'string');
+function normalizeDehydratedMutation(value: unknown): TanStackDehydratedMutation | undefined {
+  if (!isRecord(value)) return undefined;
+  const state = normalizeMutationState(value.state);
+  if (!state) return undefined;
+
+  const mutationKey = value.mutationKey;
+  if (mutationKey !== undefined && !isUnknownArray(mutationKey)) return undefined;
+  const meta = value.meta;
+  if (meta !== undefined && !isRecord(meta)) return undefined;
+  const scope = value.scope;
+  let normalizedScope: { readonly id: string } | undefined;
+  if (scope !== undefined) {
+    if (!isRecord(scope) || typeof scope.id !== 'string') return undefined;
+    normalizedScope = { id: scope.id };
+  }
+
+  return {
+    mutationKey,
+    state,
+    meta,
+    scope: normalizedScope,
+  };
 }
 
-function isDehydratedQuery(value: unknown): value is TanStackDehydratedQuery {
+function normalizeDehydratedQuery(value: unknown): TanStackDehydratedQuery | undefined {
   if (
     !isRecord(value) || typeof value.queryHash !== 'string' ||
-    !Array.isArray(value.queryKey) || !isQueryState(value.state)
+    !isUnknownArray(value.queryKey)
   ) {
-    return false;
+    return undefined;
   }
-  if (value.promise !== undefined && !(value.promise instanceof Promise)) return false;
-  if (value.meta !== undefined && !isRecord(value.meta)) return false;
-  if (value.queryType !== undefined && value.queryType !== 'infinite') return false;
-  return value.dehydratedAt === undefined || typeof value.dehydratedAt === 'number';
+  const state = normalizeQueryState(value.state);
+  if (!state) return undefined;
+  const promise = value.promise;
+  if (promise !== undefined && !(promise instanceof Promise)) return undefined;
+  const meta = value.meta;
+  if (meta !== undefined && !isRecord(meta)) return undefined;
+  const queryType = value.queryType;
+  if (queryType !== undefined && queryType !== 'infinite') return undefined;
+  const dehydratedAt = value.dehydratedAt;
+  if (dehydratedAt !== undefined && typeof dehydratedAt !== 'number') return undefined;
+
+  return {
+    queryHash: value.queryHash,
+    queryKey: value.queryKey,
+    state,
+    promise,
+    meta,
+    queryType,
+    dehydratedAt,
+  };
 }
 
-function isMutationState(value: unknown): value is MutationState {
-  return isRecord(value) &&
-    Object.hasOwn(value, 'context') &&
-    Object.hasOwn(value, 'data') &&
-    isErrorOrNull(value.error) &&
-    typeof value.failureCount === 'number' &&
-    isErrorOrNull(value.failureReason) &&
-    typeof value.isPaused === 'boolean' &&
-    isOneOf(value.status, ['idle', 'pending', 'success', 'error']) &&
-    Object.hasOwn(value, 'variables') &&
-    typeof value.submittedAt === 'number';
+function normalizeMutationState(value: unknown): MutationState | undefined {
+  if (!isRecord(value)) return undefined;
+  const error = reviveSerializedError(value.error);
+  const failureReason = reviveSerializedError(value.failureReason);
+  if (
+    !error.valid || !failureReason.valid ||
+    typeof value.failureCount !== 'number' ||
+    typeof value.isPaused !== 'boolean' ||
+    !isOneOf(value.status, ['idle', 'pending', 'success', 'error']) ||
+    typeof value.submittedAt !== 'number'
+  ) {
+    return undefined;
+  }
+
+  return {
+    context: value.context,
+    data: value.data,
+    error: error.value,
+    failureCount: value.failureCount,
+    failureReason: failureReason.value,
+    isPaused: value.isPaused,
+    status: value.status,
+    variables: value.variables,
+    submittedAt: value.submittedAt,
+  };
 }
 
-function isQueryState(value: unknown): value is QueryState {
-  return isRecord(value) &&
-    Object.hasOwn(value, 'data') &&
-    typeof value.dataUpdateCount === 'number' &&
-    typeof value.dataUpdatedAt === 'number' &&
-    isErrorOrNull(value.error) &&
-    typeof value.errorUpdateCount === 'number' &&
-    typeof value.errorUpdatedAt === 'number' &&
-    typeof value.fetchFailureCount === 'number' &&
-    isErrorOrNull(value.fetchFailureReason) &&
-    isFetchMetaOrNull(value.fetchMeta) &&
-    typeof value.isInvalidated === 'boolean' &&
-    isOneOf(value.status, ['pending', 'error', 'success']) &&
-    isOneOf(value.fetchStatus, ['fetching', 'paused', 'idle']);
+function normalizeQueryState(value: unknown): QueryState | undefined {
+  if (!isRecord(value)) return undefined;
+  const error = reviveSerializedError(value.error);
+  const fetchFailureReason = reviveSerializedError(value.fetchFailureReason);
+  if (
+    !error.valid || !fetchFailureReason.valid ||
+    typeof value.dataUpdateCount !== 'number' ||
+    typeof value.dataUpdatedAt !== 'number' ||
+    typeof value.errorUpdateCount !== 'number' ||
+    typeof value.errorUpdatedAt !== 'number' ||
+    typeof value.fetchFailureCount !== 'number' ||
+    !isFetchMetaOrNull(value.fetchMeta) ||
+    typeof value.isInvalidated !== 'boolean' ||
+    !isOneOf(value.status, ['pending', 'error', 'success']) ||
+    !isOneOf(value.fetchStatus, ['fetching', 'paused', 'idle'])
+  ) {
+    return undefined;
+  }
+
+  return {
+    data: value.data,
+    dataUpdateCount: value.dataUpdateCount,
+    dataUpdatedAt: value.dataUpdatedAt,
+    error: error.value,
+    errorUpdateCount: value.errorUpdateCount,
+    errorUpdatedAt: value.errorUpdatedAt,
+    fetchFailureCount: value.fetchFailureCount,
+    fetchFailureReason: fetchFailureReason.value,
+    fetchMeta: value.fetchMeta,
+    isInvalidated: value.isInvalidated,
+    status: value.status,
+    fetchStatus: value.fetchStatus,
+  };
 }
 
-function isFetchMetaOrNull(value: unknown): boolean {
+function isFetchMetaOrNull(value: unknown): value is QueryState['fetchMeta'] {
   if (value === null) return true;
   if (!isRecord(value)) return false;
   if (value.fetchMore === undefined) return true;
@@ -126,8 +196,22 @@ function isFetchMetaOrNull(value: unknown): boolean {
     isOneOf(value.fetchMore.direction, ['forward', 'backward']);
 }
 
-function isErrorOrNull(value: unknown): value is Error | null {
-  return value === null || value instanceof Error;
+type RevivedError =
+  | { readonly valid: true; readonly value: Error | null }
+  | { readonly valid: false };
+
+function reviveSerializedError(value: unknown): RevivedError {
+  if (value === null || value instanceof Error) {
+    return { valid: true, value };
+  }
+  if (!isPlainRecord(value)) return { valid: false };
+
+  const error = new Error(
+    typeof value.message === 'string' ? value.message : 'Serialized hydration error',
+  );
+  if (typeof value.name === 'string') error.name = value.name;
+  if (typeof value.stack === 'string') error.stack = value.stack;
+  return { valid: true, value: error };
 }
 
 function isOneOf<const TValue extends string>(
@@ -139,4 +223,14 @@ function isOneOf<const TValue extends string>(
 
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isPlainRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  if (!isRecord(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function isUnknownArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
 }

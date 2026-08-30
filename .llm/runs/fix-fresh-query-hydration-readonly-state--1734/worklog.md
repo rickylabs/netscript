@@ -64,6 +64,9 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | 2026-08-30T01:10:00+02:00 | S3 | preliminary full gate | All owner-required static gates pass; Fresh doc-lint/JSR findings match the inherited baseline, publish dry-run succeeds, and validation leaves the worktree clean. |
 | 2026-08-30T08:34:23+02:00 | S4 | FAIL_FIX reproduction | The real `QueryHydrationScript` serializer produced default-dehydrated paused mutation wire records with absent `context`/`data` (and absent `variables` for the void case). A paused retry after one failure reproduced `failureReason: {}` through the package API. |
 | 2026-08-30T08:34:23+02:00 | S4 | RED | Structured round-trip suite exited 1: success query passed; all four mutation cases failed with `TypeError: Invalid dehydrated mutation at index 0` from `hydration.ts`. Result: 1 passed / 4 failed / 5 total. Production source remained untouched. |
+| 2026-08-30T08:38:40+02:00 | S5 | implementation | Replaced predicates that claimed wire records were upstream states with private normalizers that construct real `MutationState`/`QueryState` values. JSON-dropped optional data fields become `undefined`; plain error records become `Error` instances with retained string fields. Public types/exports remain untouched. |
+| 2026-08-30T08:38:40+02:00 | S5 | focused gate | Required compat, hydration, and transport suites pass 11/11. The committed guard-attack test rejects all eight evaluator categories, additional non-record values in both lists, and non-array top-level lists without partial hydration or input mutation. Focused check/lint/fmt pass over 3 files. |
+| 2026-08-30T08:38:40+02:00 | S5 | reconcile | PR #1736 remains draft at `status:impl`; F1 is the only authorized repair. No public-surface stop condition or rescope trigger fired. |
 
 ## Decisions
 
@@ -89,6 +92,10 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | Baseline reproduction | exact no-lock check with temporary 5.102.8 pin | FAIL (expected) | TS2345 at `hydration.ts:43`; package range restored |
 | S1 RED regression | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-version-compat_test.ts` | FAIL (expected), exit 1 | 0 passed / 1 failed; child check reports only TS2345 at `hydration.ts:43` |
 | S4 JSON-transport RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 1 passed / 4 failed / 5 total; four paused-mutation paths reject index 0; default prior-failure wire value independently asserted equal to `{}` before hydration |
+| S5 focused suites | `run-deno-test.ts -- --allow-all ...version-compat... ...query-hydration... ...roundtrip...` | PASS, exit 0 | 11 passed / 0 failed; includes real serializer round trips and the eight guard-attack categories |
+| S5 focused check | `run-deno-check.ts --file ...` | PASS, exit 0 | 3 files, 0 diagnostics |
+| S5 focused lint | `run-deno-lint.ts --file ...` | PASS, exit 0 | 3 files, 0 findings |
+| S5 focused fmt | `run-deno-fmt.ts --file ...` | PASS, exit 0 | 3 files, 0 findings |
 | S2 focused test | `run-deno-test.ts -- --allow-all ...version-compat... ...query-hydration...` | PASS, exit 0 | 4 passed: exact 5.101.0, exact 5.102.8, valid readonly hydration, invalid-entry rejection |
 | S2 focused check | `run-deno-check.ts --file ...` | PASS, exit 0 | 3 files, 0 diagnostics |
 | S2 focused lint | `run-deno-lint.ts --file ...` | PASS, exit 0 | 3 files, 0 findings |

@@ -7,8 +7,8 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Model | Codex implementation session (runtime model identity not exposed) |
 | Session | Current `/root` workspace session |
 | Host | `YogaBook9i` · WSL2 Linux · `codex` |
-| Checkout | `/home/codex/repos/netscript-007-leaf-hydration` |
-| Worktree | `/home/codex/repos/netscript-007-leaf-hydration` |
+| Checkout | `/home/agent/projects/netscript/worktrees/007-leaf-1736` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1736` |
 | Branch | `fix/fresh-query-hydration-readonly-state` |
 | Baseline | `21d516224fe35e92957f0998ee848bbf2024eda0` (`main`, 2026-08-30) |
 | Run ID | `fix-fresh-query-hydration-readonly-state--1734` |

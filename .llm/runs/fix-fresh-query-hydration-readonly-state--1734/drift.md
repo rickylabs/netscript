@@ -31,3 +31,13 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** fix; moved the cross-cutting hydration behavior test to `packages/fresh/tests/`.
 - **Evidence:** Re-run returns Fresh `FAIL=0 WARN=3 INFO=1` with no query-folder finding.
+
+## 2026-08-30 — Repair session moved to the NAS worktree
+
+- **What:** The original supervisor artifact named a retired `/home/codex/repos/...` checkout.
+- **Source:** Owner FAIL_FIX brief.
+- **Expected:** Continue the exact branch/head from its recorded checkout.
+- **Actual:** The old path no longer exists; the same branch and evaluator-artifact head are present at `/home/agent/projects/netscript/worktrees/007-leaf-1736`.
+- **Severity:** minor
+- **Action:** update `supervisor.md` to the live path; preserve commit history and base unchanged.
+- **Evidence:** raw `git rev-parse HEAD` returned `ed8a8e9ca9be2e72da4a00bff830caf260ee94ea` before S4.
