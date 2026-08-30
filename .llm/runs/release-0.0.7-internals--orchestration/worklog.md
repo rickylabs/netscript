@@ -5176,3 +5176,29 @@ answer is already on disk, from the evaluator's own worktree.
   it mid-evaluation would compromise the independence that makes the verdict worth having. It is
   recorded here so that, if the evaluator returns a FAIL on this point, the disagreement can be
   reconciled against measured evidence rather than re-litigated from opinion.
+
+## D-87 — #1774 plan-eval.md bit-identity: technical breach, zero semantic change (reconciliation datum)
+
+Cross-checked the same artifact-immutability claim the evaluator was probing, so its finding can be
+validated rather than relayed.
+
+- `plan-eval-cycle-2.md`: current blob `10ff92ac…` **== at-add blob** (added `59f65e9e9`).
+  **Bit-identical since introduction.**
+- `plan-eval.md`: current blob `c17631cb…` **≠ at-add blob `1d2d7230…`** (added `ec291343e`).
+  Changed by **`3cf5de369 docs(harness): format PLAN-EVAL artifact`** at 17:27 — during the plan
+  phase, **hours before** this IMPL-EVAL started at 21:46. Not the current evaluator's doing.
+- **Character of the change, measured:** normalized byte counts are **identical (13,853 both)**. The
+  only content deltas are two markdown emphasis markers, `*nested*` → `_nested_` and
+  `*session … root*` → `_session … root_`. Everything else is line reflow. This is `deno fmt`
+  markdown normalization, not editing.
+- **The cycle-1 substance is intact.** The block recording that `${CLAUDE_PROJECT_DIR}` stays at the
+  session launch root and does not follow `EnterWorktree` — the finding that produced the cycle-1
+  `FAIL_PLAN` — is preserved verbatim in content. It was re-wrapped, not removed.
+- **Assessment: a technical breach of bit-identity with zero semantic change.** If the evaluator
+  returns a FAIL on artifact mutation it is not wrong on the letter, but the reconciliation is that a
+  formatting pass touched the file, not tampering with a verdict.
+- **My own near-miss, recorded.** I first read the mutation from a diff truncated at 40 lines that
+  showed a large prose block as `-` with no visible `+`, and briefly treated deletion as plausible.
+  The `+` counterpart was simply below the cut. *A truncated diff cannot support a deletion claim;
+  normalize and compare whole contents instead.* Same family as the four earlier instrument errors —
+  reading an artifact of the measurement as a property of the thing measured.
