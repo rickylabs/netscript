@@ -1883,3 +1883,79 @@ returned exit 0 while the underlying dispatch had failed with a thread-store con
 Queue state: **#1711 shipped** (`main@3561bb648`), **#1729 shipped** (`main@13878a80a`), **#1673 in
 implementation**, **#1737** open as the ADVISORY-2 follow-up, and one `[post-merge]` measurement wave
 owed against #1672/#1674/#1675.
+
+## 2026-08-30 — NAS migration reconciliation; #1673 relaunched on a fresh worktree
+
+Fresh fixes topic supervisor after the NAS host migration. Old worktree paths
+(`/home/codex/repos/netscript-007-*`), the old sender registry, and every pre-migration Codex thread
+are historical. Nothing was resumed or recreated from them. Git and live GitHub were treated as the
+only authorities; the checked-in context pack was read as history, not as state.
+
+### Reconciliation against live truth
+
+| Claim under test | Live result |
+| --- | --- |
+| Topic branch `orchestrator/release-0.0.7-fixes` | `dfbd6dbf9` — local == remote, clean |
+| `origin/main` | `13878a80a` — identical to the #1729 merge commit |
+| PR #1729 | **MERGED** 2026-08-29T23:17:54Z at `13878a80a`, head `608f68b07` |
+| #1672 / #1674 / #1675 | all **CLOSED**, `status:shipped` |
+
+So the #1729 obligations — current-main integration, generated derivatives, exact-head Tier-A, the
+separate IMPL-EVAL, and truthful CI on the non-draft head — are **already discharged and merged**.
+The dispatch instruction naming them was written before the last pre-migration checkpoint; carrying
+it out would have re-run work that is on `main`. Recorded here rather than silently skipped.
+
+**Not reconciled — two label facts this lane may not fix.** Relabeling is coordinator-owned, so both
+are reported, not touched:
+
+1. PR #1729 currently carries `status:augment-review`, not the `status:shipped` this lane's previous
+   checkpoint recorded. An advisory augment pass appears to have relabeled it after merge. The three
+   issues are correctly `status:shipped`, so the merge lifecycle itself is intact.
+2. #1673 is still `status:triage` although it has been in implementation since 2026-08-29, and PR
+   #1739 carries **no labels at all** — no `type:`, `area:`, `priority:`, or `status:`, and no
+   milestone. Per `netscript-pr` the taxonomy is non-negotiable; this is a gap in central state, not
+   in the leaf's work.
+
+### #1673 — the leaf was further along than the ledger recorded
+
+PR **#1739** exists and was never written into this ledger: draft, base `main`, head `c947b8fa4`,
+body carries `Closes #1673`. Two commits: `d37b278b6` (locked plan, six-path ceiling, gate table,
+`PLAN-EVAL: N/A` justified) and `c947b8fa4` (the red-before regression alone). The red-before proof
+verified at the previous checkpoint stands; product code has not been touched.
+
+Remaining: **S3** (manifest-backed bidirectional comparison + production wiring) and **S4** (gate
+receipts and evaluator handoff).
+
+### Relaunch
+
+The pre-migration author thread cannot be resumed — its worktree does not exist on this host and it
+is absent from the live daemon. A **new** Codex thread was launched through
+`agentic:launch-codex-slice` into a **new** NAS worktree cut at exactly `c947b8fa4` with no upstream,
+so no bare push can reach `main`. Route Codex `gpt-5.6-sol` · high, requested and observed identical.
+Attachment was confirmed from `agentic:codex-status` rather than inferred from the launcher's exit
+code — an earlier dispatch on this queue returned exit 0 while the underlying send had failed with a
+thread-store conflict. Operational identity (path, thread, rollout, resume command, daemon proof) is
+held locally and deliberately kept out of this published artifact.
+
+**The gate-set note that three killed monitors failed to deliver is now in the brief itself.** The
+plan marks `check:mcp-export-corpus` and `check:publish-assets` N/A *by reasoning*; the brief requires
+both to be **run against the final tree and recorded either way, including as a measured negative**,
+plus a one-line statement of why `check:assets-barrel` does not apply. #1112 is the precedent: that
+cascade was missed by the plan, by supervisor Tier-A, and by a formal IMPL-EVAL, and CI caught it at a
+cost of two review cycles. Putting the requirement in the dispatch removes the dependency on a
+long-lived supervisor wait, which this host has not been able to hold.
+
+Also carried into the brief: the six-path ceiling with a seventh path as an explicit rescope-and-stop;
+the ban on merge, readiness flip, relabel, issue edits, and self-certification; no `e2e:cli`/Aspire/
+Docker/browser; unchanged `deno.lock` proved by raw `git diff --exit-code`; and the #1729 lesson that
+**evidence quoting a pointer must be verified against what the pointer resolves to**.
+
+### Queue after #1673
+
+Accepted fixes issues still OPEN: #979, #1093, #1249, #1351, #1353, #1357, #1365 (p0), #1368, #1370,
+#1462, #1481, #1543, #1544, #1609, #1610, #1616, #1677, #1695 — plus #1737 (the #1729 ADVISORY-2
+follow-up) and the owed `[post-merge]` measurement wave against #1672/#1674/#1675. Serial ordering
+holds inside fixes: nothing is dispatched until #1673 is terminal.
+
+**#1736 stays internals-owned.** The authoritative cluster state assigns the readonly-hydration repair
+(#1734) to the internals lane, and PR #1736 is that work. This lane does not touch it.
