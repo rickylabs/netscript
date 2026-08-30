@@ -2812,3 +2812,23 @@
   `0`, volumes `0`. S6 v2 has reconstructed the required runtime-module boundary and listener
   semantics in commits `a3e4b0f07` and `b34722425`; two generator/test paths remain in progress
   before static gates and the first serialized DinD Phase-B lease.
+
+## 2026-08-30T23:25:42Z — #1739 shipped; S6 Phase-B isolated a relay boundary
+
+- The two new #1739 review findings were repaired in product commit `2b0c05356` with 11/11 focused
+  regressions and 56/0 related tests. Both threads were answered/resolved; Tier-A carrier
+  `05a274e40` passed close-gate, quality, and the 8m13 repo-wide check. After a fresh
+  zero-intersection current-main audit, the coordinator merged PR #1739 with exact head matching as
+  `73bf2efa9f5fd421691fa0e0a04c4a354c79058d`; #1673 closed and both records are sole
+  `status:shipped`. The owner-accepted DeepSeek verdict was not rerun.
+- Fixes immediately advanced to user-facing PR #1781/#1357: current-main convergence and acceptance
+  mirroring proceed statically while its one full `scaffold.runtime` request waits behind the Aspire
+  lease. Internals draft PR #1792 now owns the GLM/Qwen prospective routing implementation; features
+  #1762 Slice 5 is Tier-A green and in its current-policy evaluator.
+- S6 v2 froze and pushed `31f44f70c`. Its first Phase-B suite reached 56/57: every bootstrap, wait,
+  topology, and cleanup gate passed, but `runtime.health.listener-unreachable` remained falsely
+  Healthy after Postgres stopped. Root cause is the NAS two-hop relay continuing to accept a
+  connect-only probe after its upstream publication disappeared. Cleanup returned Aspire,
+  containers, volumes, and relays to exact zero. The operational relay watcher is receiving a
+  bounded stale-publication teardown/re-arm correction before only the failed listener proof is
+  repeated; unchanged green gates are preserved.

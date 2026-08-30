@@ -1741,3 +1741,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - S6 v2 remains the runtime priority. After its static reconstruction completes, require exact host
   zero, run its one serialized DinD/relay Phase-B lease, clean to zero, then give #1747 the next
   runtime slot. Docs, fixes, features, and internals continue independently.
+
+## Resume delta — 2026-08-30T23:25:42Z
+
+- Main is `73bf2efa9f5fd421691fa0e0a04c4a354c79058d`: #1739/#1673 shipped after exact-head CI,
+  repaired/answered fail-closed review findings, zero current-main path intersection, and
+  immutable-head merge. Both records are sole `status:shipped`; no DeepSeek rerun occurred.
+- S6 Phase B is red only at the host relay boundary: 56/57 gates passed, but the persistent two-hop
+  forwarder kept accepting TCP after the backing resource stopped. Exact cleanup returned all host
+  resources to zero. Correct the owner-scoped relay watcher so stale publications tear down both
+  forwarding hops and re-arm on resource restart; rerun the failed listener proof, not all 56
+  unchanged green gates. #1747 retains the next full runtime lease.
+- PR #1792 is the active GLM/Qwen routing leaf. #1790 is compacted/recovered and must replace stale
+  `sourceCommit 290ac9406` via an honestly successful generator run before push. Fixes prepares
+  #1781 statically; features #1762 Slice 5 has 101/101 tests and awaits its evaluator.

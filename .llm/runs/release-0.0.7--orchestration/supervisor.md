@@ -32,7 +32,7 @@
   `netscript-007-fixes-r2`, `netscript-007-internals-r2`, `netscript-007-docs-r2`, and
   `netscript-007-aspire-r2`. Preserve their topic ownership; serial queues apply inside each one,
   never globally across them.
-- Current main is `a3ddcbb598f81180437e06f743e24d6ef137b101`. Docker is the isolated
+- Current main is `73bf2efa9f5fd421691fa0e0a04c4a354c79058d`. Docker is the isolated
   `tcp://netscript-dind:2375` sandbox, client/server 28.5.2, with `/home/agent` mounted identically;
   direct publications use `netscript-dind:<port>`. Runtime leases remain globally serialized and
   must clean Aspire, containers, volumes, AppHosts, and relays to exact zero.

@@ -1535,3 +1535,14 @@ implementation thread.
 - #1739 demonstrates why green core CI is not sufficient: a later review can add real unanswered
   threads and correctly make close-gate red. Those bounded findings require code/tests and thread
   resolution, but not a wholesale rerun of an owner-accepted evaluator receipt.
+
+## 2026-08-30 — a transport relay can hide an intentionally stopped listener
+
+- S6 Phase B proved that the NAS two-hop relay keeps its local/DinD listeners open after Aspire
+  removes the backing container publication. A connect-only application health check therefore sees
+  the relay accept TCP and remains Healthy even though its upstream service is gone. This is neither
+  product health semantics nor a reason to weaken the listener gate.
+- The bounded infrastructure correction is for the owner-scoped relay watcher to tear down both
+  forwarding hops when an owned publication disappears and recreate them when it returns. Preserve
+  the 56 unchanged green runtime results, require the listener Unhealthy/exit-18/recovery receipt,
+  and reprove exact zero. Do not grant another runtime lane until this owned lease finishes cleanup.
