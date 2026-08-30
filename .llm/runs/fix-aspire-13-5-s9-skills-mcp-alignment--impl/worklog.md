@@ -75,6 +75,7 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | docs-audit fix 1 | implementation | Applied the opposite-family `AUDIT: FAIL_FIX` findings: narrowed 13.5 certification to tagged claims, bounded S2-V4 telemetry wording, replaced stale timings with S2-V2/V9 values, corrected `healthReports` to object, added exact CLI-help receipts, documented dashboard-only MCP startup, and regenerated every required consumer. |
 | 2026-08-30 | IMPL-EVAL fix 1 | implementation | Preserve accumulated MCP observations in failure receipts, leave outer timeout headroom, record structured-log error/count evidence, and add the recorded 14-tool failure regression. SQLite-tier visibility names remain assumed—not proven—and must be explicit Phase-B brief inputs. |
 | 2026-08-30 | pre-Phase-B D-45 | implementation | Coordinator-ratified the observed 14-tool set as required; `get_integration_docs` is documented-unobserved INFO, wrapper timeout is 140s, structured-log count is nullable without response-shape evidence, and S2-V9 cites the elapsed-time receipt. |
+| 2026-08-30 | hosted dashboard availability | implementation | Hosted proof run `33328972788` established that Aspire 13.5.3 can list the dashboard-backed MCP tools while an isolated headless AppHost returns exact JSON-RPC `-32603` dashboard-unavailable evidence. Added RED-first coverage and a documented degraded receipt outcome without weakening the 14-tool, visibility, redaction, or dashboard-only surface assertions. |
 
 ## Decisions
 
@@ -115,6 +116,9 @@ or the canonical generator source and run the documented generators.
 | Final `quality:scan` / `arch:check` | PASS | zero quality findings; doctrine exit 0 with pre-existing warnings only |
 | Static MCP expected delta | BLOCKED | observed 14 baseline tools and no `get_integration_docs`; truthful receipt cannot prove locked `+get_integration_docs` |
 | Docs-audit fix cycle 1 | IMPLEMENTED | one prose/regeneration slice; independent re-audit remains supervisor-owned |
+| Hosted dashboard RED/GREEN | PASS | Run `33328972788` exact `-32603` fixture failed before implementation; final focused suite passed 12/12, including non-dashboard and different-error rejection guards. |
+| Hosted dashboard scoped check/lint/fmt | PASS | Check covered 187 TypeScript files; lint/fmt covered 180 with zero findings after excluding the unrelated standalone `desktop-native` fixture whose detached config cannot resolve the root `zod` catalog. |
+| Hosted dashboard fitness gates | PASS | `quality:scan` reported zero findings; `arch:check` exited 0 with pre-existing repository warnings only. |
 
 ## Handoff Notes
 

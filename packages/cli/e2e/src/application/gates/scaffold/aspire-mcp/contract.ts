@@ -95,7 +95,11 @@ export interface AspireMcpSmokeReceipt {
     readonly ok: boolean;
   };
   readonly redaction: { readonly secretParamsNull: boolean; readonly plaintextLeak: boolean };
-  readonly structuredLogs: { readonly entryCount: number | null; readonly isError: boolean };
+  readonly structuredLogs: {
+    readonly entryCount: number | null;
+    readonly isError: boolean;
+    readonly dashboardAvailable: boolean | null;
+  };
   readonly lifecycle: {
     readonly initializeMs: number;
     readonly toolsListMs: number;

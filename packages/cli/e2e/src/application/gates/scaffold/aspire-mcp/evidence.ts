@@ -1,4 +1,8 @@
 import type { AspireMcpSmokeDependencies, AspireMcpSmokeReceipt } from './contract.ts';
+import { ASPIRE_MCP_DASHBOARD_TOOLS } from './tools.ts';
+
+const DASHBOARD_UNAVAILABLE_MESSAGE =
+  'The Aspire Dashboard is not available in the running AppHost';
 
 /** Read the in-scope paths returned by `list_apphosts`. */
 export function appHostEvidence(value: unknown): { inScope: readonly string[] } {
@@ -101,7 +105,26 @@ export function structuredLogEvidence(
   const isError = Reflect.get(source, 'isError') === true;
   if (isError) throw new Error('list_structured_logs returned an MCP error');
   const entries = Reflect.get(source, 'items') ?? Reflect.get(source, 'entries');
-  return { entryCount: Array.isArray(entries) ? entries.length : null, isError };
+  return {
+    entryCount: Array.isArray(entries) ? entries.length : null,
+    isError,
+    dashboardAvailable: true,
+  };
+}
+
+/** Match the hosted 13.5.3 headless-AppHost error only for dashboard-backed tools. */
+export function isDashboardUnavailableToolError(toolName: string, error: unknown): boolean {
+  if (!ASPIRE_MCP_DASHBOARD_TOOLS.includes(toolName) || !(error instanceof Error)) return false;
+  const objectIndex = error.message.indexOf('{');
+  if (objectIndex < 0) return false;
+  try {
+    const payload: unknown = JSON.parse(error.message.slice(objectIndex));
+    const source = record(payload, 'JSON-RPC error');
+    return Reflect.get(source, 'code') === -32603 &&
+      Reflect.get(source, 'message') === DASHBOARD_UNAVAILABLE_MESSAGE;
+  } catch {
+    return false;
+  }
 }
 
 /** Resolve a path through the injected filesystem seam. */

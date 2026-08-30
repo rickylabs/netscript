@@ -10,6 +10,7 @@ import {
   appHostEvidence,
   doctorEvidence,
   emptyOrNotFound,
+  isDashboardUnavailableToolError,
   logCount,
   matchingAppHosts,
   realPath,
@@ -49,6 +50,7 @@ export async function runAspireMcpSmoke(
   let structuredLogs: AspireMcpSmokeReceipt['structuredLogs'] = {
     entryCount: null,
     isError: false,
+    dashboardAvailable: null,
   };
   const wholeDeadline = performance.now() + dependencies.timeouts.wholeGateMs;
   const stageTimeout = (timeoutMs: number): number =>
@@ -132,14 +134,20 @@ export async function runAspireMcpSmoke(
     if (logCount(usersLogs) < 1) {
       throw new Error(`${input.serviceResource} returned no console logs`);
     }
-    structuredLogs = structuredLogEvidence(
-      await call(
-        primary,
-        'list_structured_logs',
-        {},
-        stageTimeout(dependencies.timeouts.toolCallMs),
-      ),
-    );
+    const structuredLogsTool = 'list_structured_logs';
+    try {
+      structuredLogs = structuredLogEvidence(
+        await call(
+          primary,
+          structuredLogsTool,
+          {},
+          stageTimeout(dependencies.timeouts.toolCallMs),
+        ),
+      );
+    } catch (error) {
+      if (!isDashboardUnavailableToolError(structuredLogsTool, error)) throw error;
+      structuredLogs = { entryCount: null, isError: true, dashboardAvailable: false };
+    }
     const described = await dependencies.describeResources();
     const describeListsExcluded = expectedMcpExcluded.every((name) => described.includes(name));
     const visibilityOk = observedMcpVisible.length === expectedVisible.length &&
