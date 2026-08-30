@@ -3844,3 +3844,42 @@ F6 and F7 authorized as written.
 
 `#1734` stays parked at `eb765629206092f97b3dd8f76a64fa0c3769bcb8` and did not block this queue for a
 moment. `#1747` remains terminal at `c1e03922ad02416ea31219df94422f062ac33690`, untouched.
+
+## 2026-08-30 — #1533 slices I1/I2 gated in scope; independent census taken before I3
+
+| Slice | Head | Scope verdict |
+| --- | --- | --- |
+| Amendment | `551f4edc81807df755de5e745e5e7ceba3a3ee39` | Tier-A **PASS**, comment `5468084157` |
+| I1 contracts | `e63f1b85f3ab177aaf1af1f60cb563482b121a1f` | in scope |
+| I2 extraction/compiler | `b4a4a40c` | in scope |
+
+Cumulative source versus `main` is five files — `jsdoc-example-contract.ts`,
+`jsdoc-example-policy.ts`, `jsdoc-example-compiler.ts`, `snippet-workspace.ts`,
+`preflight-text-imports.ts`. I checked each against the plan's per-slice file table rather than
+eyeballing it: `preflight-text-imports.ts` looked like drift until I read the I1 row, which names it
+verbatim, and `snippet-workspace.ts` is covered by I2's "existing snippet compiler/workspace/support
+modules". No drift.
+
+### I own a census now, so the author's I3 number is checkable rather than acceptable
+
+D14's ceiling is only as good as the census it is judged against, and accepting the author's own count
+would make the ceiling self-certifying. So I measured the corpus myself before I3 lands:
+
+| Measure | This lane, independently | PLAN-EVAL's census |
+| --- | --- | --- |
+| **TS-fenced candidates** | **415** | ~415 |
+| `@example` tags | 463 | ~443 |
+| Files carrying `@example` | 237 | ~234 |
+| Bare (no-language) fence opens | 11 | 6 unfenced tags (different metric) |
+
+The load-bearing number — TS-fenced candidates — matches **exactly**. The tag/file counts differ by a
+few percent, consistent with slightly different test/fixture skip rules, and the bare-fence figures
+measure different things (mine counts unlabelled opens, the evaluator counted unfenced tags). Two
+independent measurements agreeing on 415 is what makes the ceiling meaningful.
+
+**Scale check against my own ceiling:** 415 candidates with a 90-example repair ceiling means a
+failure rate above ~22% breaches it. Given ≥29 fences already known to carry unbound names, a breach
+is plausible, and that is precisely the case D14 exists to route to rescope rather than to
+exemptions. I will compare the committed I3 census against these numbers, and specifically check that
+the census commit **precedes** the repair commit in real history — a census recomputed after repairs
+would satisfy D14's letter and defeat its purpose.
