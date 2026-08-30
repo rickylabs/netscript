@@ -624,3 +624,32 @@ Leaf run evidence (`drift.md`, `worklog.md`, `codex-thread-ids.md` updates) stay
 uncommitted** per NAS policy. The scaffold commit `2e2c3364` already carries the run dir on the
 pushed branch, consistent with every other leaf in this repo; published history was not rewritten to
 remove it.
+
+### IMPL-EVAL verdict — `PASS`, no blocking findings, 2026-08-30
+
+Evaluated head `96501e10`, fresh Claude · Fable 5 · medium session, read-only. Ten prose claims
+re-derived against `init-agent.ts`; all true. Completeness sweep of `docs/site` clean — the only other
+`.claude/skills` mentions are a third-party global plugin in `deno-lsp-code-intelligence.md`. Corpus
+verified by content independently. All eight gates re-run, all exit 0.
+
+The evaluator **confirmed rather than accepted** the formatter-governance claim this lane made, and
+judged both declared deviations (the non-existent acceptance path, the one-word `three` → `five`)
+adequate as declared — neither warranted a rescope or a separate issue.
+
+**Seven advisories, none blocking, and deliberately not folded in.** Chasing advisories after a PASS
+would leave a merged head that no evaluator ever saw; the evaluated head is the head that merges.
+The substantive ones: `skills.md:27` "optional" reads opt-in when `resolveHosts` makes Claude the
+opt-out default; `agent-tooling.md:69-73` VS Code row under-reports the four editor-config files that
+`generateEditorConfigFiles('vscode')` also writes, which the PR's own retitled column turns into a
+claim — **Tier-A missed that one, recorded rather than glossed**; the Claude row omits the conditional
+`playwright-cli` skill; `commands.md:57`'s lead clause attaches to the wrong noun; and
+`quickstart.vto:59-60` is a fourth page outside the three-file contract. Surfaced to the coordinator
+as one bounded follow-up candidate; this lane files nothing into a frozen milestone.
+
+**Coordinator action needed (not taken here):** issue **#1745 still carries `status:plan`** while
+PR #1746 is at `status:impl-eval`. Issue-label lifecycle is central state and this lane does not
+relabel it.
+
+PR #1746 moved `status:impl` → `status:impl-eval` and out of draft so the `quality` job's docs gates
+actually run — they were skipping only because the PR was a draft, which is why a green draft would
+have been a false readiness signal.
