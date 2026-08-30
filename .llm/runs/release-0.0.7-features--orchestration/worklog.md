@@ -8166,3 +8166,32 @@ any other native/OpenRouter/AGY route without a fresh, equally explicit ruling.
 
 No brief content changed for the route swap; the evaluator identity is the only variable. On PASS,
 Slice 4 is dispatched immediately per the coordinator's instruction, without a separate checkpoint.
+
+## #1387 Slice 3 terminal ACCEPTED_WITH_FINDINGS; Slice 4 dispatched
+
+Opus 5 evaluator went further than reading assertions: it **reverted `service-builder-impl.ts` to the
+base mutating implementation in place, re-ran the suite, and restored the file** — 89 passed / 3
+failed against the old code, with exactly the three right failure modes (`Cannot add property db`,
+`Cannot add property principal`, and a surplus `tracestate: undefined`). The suite genuinely fails
+against the defect it claims to catch; this is not an acceptance-only proof.
+
+Two findings beyond Tier-A's own F-1, both ruled non-blocking and filed as **#1789** rather than
+worked around in-ceiling: no `build()`-level RPC test exercises `buildRpcContext`'s real wiring at
+`:502`, and switching mutate-and-return to spread silently drops prototype methods from a
+class-instance context factory — undocumented on `withContext`'s public declaration. It also
+independently re-confirmed the #1787 deferral is correct.
+
+PR comment `5470972914`. Evidence carrier `2d7d1b79a` (evaluate-slice-3.md only, product-neutral by
+construction).
+
+### Slice 4 dispatched
+
+Contract-policy service ports, type-contract-only, six-file ceiling, base `2d7d1b79a`, route
+`openai · gpt-5.6-sol · high`, thread `01a05449-61dc-7cb2-8aad-3bb3ec4c260c`, dry-run clean
+(`upstream: NONE`, `dirty: 0`). Brief carries: preserve `AuthorizerPort` compatibility exactly;
+contract-local policy, not a router/URL-keyed map (research finding 15 already rejected that shape);
+the corpus gate now has a working catalog entry, cut a real receipt; archive by move with byte
+verification, not copy; and the two #1789 findings named as explicitly out of ceiling.
+
+Sender record evicted under the full procedure before dispatch (dead pid, thread absent across three
+probes, thread record preserved as `codex-thread-ids-1387-s3c.md`).
