@@ -5922,3 +5922,15 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   brief's own honest self-assessment of the eviction-path risk.
 - Monitoring in parallel: #1758's off-host `e2e-cli` run (`33341714355`, watch armed, no local lease
   consumed) and #1792 awaiting owner merge.
+
+## D-117 — #1751 PLAN-EVAL routing decision recorded ahead of need
+
+- Confirmed: PR #1792 not yet merged (`mergedAt: null`); #1751's branch (based on current main
+  `5197e70b7`) has **neither** `qwen-3-8-flash` nor `glm-5-3-flash` registered in
+  `provider-profiles.ts` — the OLD DeepSeek/Qwen-max registry is what's live there.
+- **Routing decision for #1751's PLAN-EVAL stop, per instruction**: use Qwen 3.8 Flash · max via
+  **direct OpenRouter** (`deno task agentic:claude-openrouter --model qwen/qwen3.8-flash --effort
+  max`), the same raw-model-id approach already proven for #1774's GLM dogfooding — **not**
+  `delegate_openrouter` (which validates against the current preset registry and would reject an
+  unregistered id) and not DeepSeek as a fallback. Recorded now, ahead of actually needing it, so
+  the correct route is ready the moment #1751's plan reaches its stop.
