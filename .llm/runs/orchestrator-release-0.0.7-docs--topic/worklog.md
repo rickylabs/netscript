@@ -1805,3 +1805,67 @@ Leaf dispatched **detached** (thread launching), worktree `007-leaf-1757`, branc
 `AUTHORITATIVE_MAPPING` covering only 8 of the packages with published reference pages is real and
 still a candidate, but it belongs to **closed #1108**'s territory and needs proper sizing before it
 is filed as new scope. Not filed on an unverified number.
+
+## 2026-08-30 — merge-authority correction; #1757 through FAIL_PLAN into cycle 2
+
+### Correction to this lane's record: merges are not human-only
+
+The coordinator states merges run through its pre-merge gate, and it is landing #1746/#1748/#1755
+itself. This lane's handoff comments said "ready for a human to merge" and "merge authority rests
+with the coordinator". The second half was right; **"human-only" was wrong** and is retracted here.
+The gates, evidence and exact heads in those comments are unaffected — only the phrasing about who
+performs the merge. Not re-posted to three PRs the coordinator is actively landing; correcting the
+record here is proportionate and does not add noise to a live merge queue.
+
+This lane still does not merge. Nothing about that changed.
+
+### #1757 — the plan review earned its cost
+
+The Codex thread judged the slice warranted a plan review rather than taking the `PLAN-EVAL: N/A`
+the brief offered, and **dispatched one itself**. Cycle 1 returned **`FAIL_PLAN`**:
+
+- **F1** — five commits (`f7ad44dc`, `01e09604`, `473e8d75`, `cf648f1f`, `3b32d162`) excluded on the
+  reason "source edits change comments". True of the `packages/` diff, **false** of the shipped
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts` bundle, which did change. A false
+  exclusion reason, independent of whether the verdict survived.
+- **F2** — the plan deferred "final bullet wording" *to* PLAN-EVAL. As the evaluator put it,
+  "PLAN-EVAL judges the mapping, it does not author it."
+- **Fix 3** — three bullets would have shipped misleading notes. Sharpest: `3561bb64` was to be
+  described as "tighter public types" when the package root actually **stops exporting**
+  `DenoMySqlClient`, `DenoMySqlConnection` and `ExecuteResult`. Describing a removal as an
+  improvement is the exact failure a changelog must not have.
+
+**Integrity check before trusting that verdict.** An implementation thread dispatching its own
+evaluator is a process deviation, and a self-authored "evaluation" would be a serious problem. I
+verified the session was real: PID `491257`, session `71a70862-0184-4252-84e3-5bbfc9946791`, bridge
+`session_01Qccb4kNXWBMY2Z2KiCadfj`, `kind: bg`, cwd in the leaf worktree. A genuine separate Fable 5
+session — generator ≠ evaluator holds, so the verdict stands. Recorded as a deviation with a good
+outcome: **evaluator dispatch is the supervisor's**, and cycle 2 was dispatched by this lane to put
+that back where it belongs.
+
+The thread revised the plan and **stopped without implementing** — correct behaviour on `FAIL_PLAN`.
+Supervisor review of the revision: D2 now locks eleven bullets with a `## Locked Changelog Map`
+(commit→bullet, draft wording); B1 **includes** the five formerly mis-excluded commits; B2 describes
+`--skip-apphost` as an argument accepted by generated `check`/`lint`/`fmt-check` flows, not a new
+task; B7 states the root export removal plainly; B11 carries all three breaking facts
+(`null → undefined`, default `TError` `unknown → Error`, `safe()` rejecting non-Promise thenables).
+All three fix-3 constraints discharged in wording, not merely mentioned.
+
+PLAN-EVAL cycle 2 dispatched by this lane on the canonical route (Claude · Fable 5, native
+opposite-family for a Codex plan).
+
+### Baseline moved under the evaluation, and it was handled as fact not surprise
+
+`origin/main` `13878a80` → `625447f1` mid-evaluation. Exactly one commit landed:
+`test(aspire): 13.5.3 runtime verification receipts (S2) (#1735)` — entirely `.llm/` run artifacts,
+receipts and `arch-debt.md`, with **zero** `packages/`/`plugins/`/`docs/site` content, so it is a
+clean changelog exclude. The `v0.0.6..main` range is now **34**, where `plan.md` says 33.
+
+Supplied to the running cycle-2 evaluator as verified fact with an explicit statement that no verdict
+was being signalled, so it could rule on a one-row addendum versus an invalidated baseline itself.
+
+**#1723 is not unblocked by this.** The Aspire pin on the new main is still `13.4.6` and S1 #1727 is
+still OPEN — S2 shipping verification receipts does not move the pin. Re-checked at source rather
+than inferred from "an Aspire slice merged".
+
+None of #1746/#1748/#1755 has merged yet; all three still OPEN with `mergeStateStatus` recomputing.
