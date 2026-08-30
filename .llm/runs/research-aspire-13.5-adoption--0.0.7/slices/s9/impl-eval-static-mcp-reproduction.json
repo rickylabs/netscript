@@ -1,0 +1,49 @@
+{
+  "serverInfo": {
+    "name": "aspire-mcp-server",
+    "version": "13.5.3"
+  },
+  "toolCount": 14,
+  "tools": [
+    "doctor",
+    "execute_resource_command",
+    "get_doc",
+    "list_apphosts",
+    "list_console_logs",
+    "list_docs",
+    "list_integrations",
+    "list_resources",
+    "list_structured_logs",
+    "list_trace_structured_logs",
+    "list_traces",
+    "refresh_tools",
+    "search_docs",
+    "select_apphost"
+  ],
+  "hasGetIntegrationDocs": false,
+  "doctorCliVersion": {
+    "category": "aspire",
+    "name": "cli-version",
+    "status": "pass",
+    "message": "Aspire CLI version 13.5.3 (channel: stable)",
+    "metadata": {
+      "currentVersion": "13.5.3",
+      "identityChannel": "stable"
+    }
+  },
+  "doctorSummary": {
+    "passed": 4,
+    "warnings": 3,
+    "failed": 0
+  },
+  "exit": {
+    "code": 0,
+    "signal": null,
+    "graceful": true
+  },
+  "elapsedMs": 2974,
+  "receipt": "impl-eval-static-mcp-reproduction",
+  "head": "e11de98d",
+  "capturedAt": "2026-08-30T11:24:46.166Z",
+  "note": "IMPL-EVAL reproduction of the S9 static receipt; one AppHost-less stdio session; not the D-12 smoke receipt"
+}

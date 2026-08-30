@@ -247,4 +247,8 @@ Runtime zero throughout (watch armed). Tier-A gate set running at `e11de98d`. | 
 dispatches | Tier-A sign-off at `e11de98d` (PR #1759 comment); IMPL-EVAL cycle 1 launched as
 `claude -p` session `7f042a12…` in `007-aspire-s9-eval`; docs_audit single Sol pass launched via
 `launch-codex-slice` (thread `01a05265-594b-7c20-8ae9-56f6d4a19344`, detached read-only worktree
-`007-aspire-s9-audit`, output `slices/s9/docs-audit/report.md` + PR comment). Runtime zero. |
+`007-aspire-s9-audit`, output `slices/s9/docs-audit/report.md` + PR comment). Runtime zero. | | S9
+docs_audit cycle 1 | **`AUDIT: FAIL_FIX`** (1 high, 4 medium, 1 low — prose precision vs receipts;
+structural checks PASS). Read-only respected. Same generator thread `01a0523a…` resumed with the fix
+brief (log `s9-docs-audit-fix-1.log`); IMPL-EVAL cycle 1 (`7f042a12…`) still running on `e11de98d`.
+D-46. |

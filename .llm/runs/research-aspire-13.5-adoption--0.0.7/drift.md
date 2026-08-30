@@ -834,3 +834,21 @@
 - **Queue effect:** S9 Phase A gates/Tier-A proceed at `e11de98d`; the amendment (if ratified) is a
   small follow-up slice on the same thread before Phase B. Phase B itself shares the D-43
   environment block.
+
+## D-46 — 2026-08-30 — S9 docs_audit cycle 1 `FAIL_FIX` (prose overclaims vs receipts); fix cycle on the same generator thread
+
+- Opposite-family single pass (Codex · GPT-5.6 Sol · medium, thread `01a05265…`, read-only worktree
+  `007-aspire-s9-audit` @ `e11de98d`; `slices/s9/docs-audit/report.md`; PR #1759
+  `[PHASE: DOCS-AUDIT]` 11:25:34Z). Checks 4–6 PASS (truthful 14-vs-15 tool table, identical
+  mirrors/embedded/consumer copies, NetScript/upstream skill separation); checks 1–3 FAIL on prose
+  precision: **high** blanket "verified against 13.5.3" broader than the named S2/S9 receipts
+  (export exit-12, HTTP 200 probe, export archive, no-AppHost exit codes, search grammar
+  unreceipted); **medium** ×4 (detached-dashboard claim beyond S2-V4; stale 3.5 s/13 s timings vs S2
+  V2/V9 13.5.3 values; `healthReports` called an array — receipts encode an object; `(S9-HELP)` tag
+  pointing at an `aspire agent init` capture); **low** dashboard-only `--dashboard-url` form
+  missing. `docs:links`, Lume build, wording/specifier scans, template↔generated drift all PASS.
+- Per `.llm/harness/workflow/doc-audit.md`: fixes by the **same generator session** — S9 thread
+  `01a0523a…` resumed with the six required changes as one prose/regeneration slice (no gate/test
+  semantics change). Audit cycle 2 follows on the fixed head (2-failure escalation rule). The
+  IMPL-EVAL cycle 1 continues on `e11de98d`; the fix commit gets a delta evaluation.
+- Lesson (endorsed): "verified against <version>" is a per-claim citation, not a section banner.
