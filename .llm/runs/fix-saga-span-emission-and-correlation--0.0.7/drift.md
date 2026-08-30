@@ -130,7 +130,7 @@ documentation.
   message-trace fallback with only the optional new span context.
 - **Severity:** significant
 - **Action:** fix within the locked bridge, compensator, test, README, and run-artifact ceiling.
-- **Evidence:** Repair red at `bd89e523` exits 1 with 10 passed / 2 failed assertions. The fix makes
-  explicit scheduled keys child-wins, retains the documented upstream-ID fallback for `send()`—whose
-  published variant has no child-key field—and restores message trace context only for the
-  handler—not for span parenting or correlation precedence.
+- **Evidence:** Repair red at `bd89e523` exits 1 with 10 passed / 2 failed assertions. The final fix
+  makes explicit scheduled keys child-wins, keeps nested sends keyless while transporting the
+  cross-plane ID through separate engine execution context, and restores message trace context only
+  for the handler—not for span parenting or correlation precedence.

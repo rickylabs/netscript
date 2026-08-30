@@ -245,7 +245,7 @@ Deno.test('send transports upstream correlation when the DSL supplies no child k
   assertEquals(handles[1].attributes[SagaAttributes.CORRELATION_ID], 'upstream-42');
   assertEquals(
     handles[1].attributes[SagaAttributes.SAGA_CORRELATION_KEY],
-    'upstream-42',
+    'send-correlation-transport:next',
   );
 });
 
