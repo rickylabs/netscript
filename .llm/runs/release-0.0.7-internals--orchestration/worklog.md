@@ -5934,3 +5934,30 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   `delegate_openrouter` (which validates against the current preset registry and would reject an
   unregistered id) and not DeepSeek as a fallback. Recorded now, ahead of actually needing it, so
   the correct route is ready the moment #1751's plan reaches its stop.
+
+## D-118 — #1758 (PR unnumbered, issue #1758/#1462) SHIPPED-READY: evaluator misattribution corrected, exact-head CI green
+
+- **Corrected a real factual error before writing it into the PR record.** The coordinator
+  repeatedly referred to "the existing DeepSeek PASS" for this leaf. Verified directly: the leaf's
+  actual qualifying evaluation (IMPL-EVAL cycle 1, `PASS_IMPL` at `83b7109c`) was a **native Fable 5**
+  session, not DeepSeek — confirmed from the PR comment's own text ("Fresh native Fable session,
+  opposite-family to the Codex author"). Wrote the corrected attribution into the PR body rather than
+  propagate the wrong model name into a permanent record.
+- **Declined the requested blanket byte-identity claim, on evidence.** `git diff` between the
+  evaluated head and the final merge head spans hundreds of files — almost entirely unrelated
+  main-advance noise, but genuinely including this leaf's own `packages/sdk/src/ports/{mod,
+  query-factory,service-client}.ts` and `query/mod.ts`, changed by its own documented
+  post-evaluation corrections (`72cd2ecd`, `72ab6411`). A same-content claim would have been false.
+  Instead wrote the DoD entry as what it actually is: an **owner-ratified currency carry-forward**
+  accepting a named, honestly-described delta — not a proof that nothing changed.
+- Rewrote four separate stale prose blocks in the PR body (evaluator-currency paragraph, runtime
+  evidence paragraph, Harness phase line, and an HTML comment) that all still described the
+  pre-#1734 `50710a44` baseline-blocked state or an "in progress" delta evaluator that was actually
+  stopped — replaced with the current, accurate, evidence-cited state throughout.
+- Both PR and issue labels normalized to sole `status:ready-merge`. Review-threads: 0 threads, PASS.
+  `close-gate` (previously FAILURE, from before the label/DoD fixes) rerun: **SUCCESS**.
+- **Final exact-head CI at `94620577db9532cb281160c0734cfe8fe33e1115`: 8 SUCCESS / 16 SKIPPED / 0
+  FAILURE. MERGEABLE / CLEAN.** External audit detail (Postgres 89/0, SQLite/Garnet 84/0,
+  `behavior.app-reference` PASS in 43.669s) corroborated at the job level: all 5 relevant CI jobs
+  independently confirmed `success` via `gh run view`.
+- **Ready for owner merge. Supervisor does not merge.**
