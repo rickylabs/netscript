@@ -3037,3 +3037,70 @@ not argued N/A by reasoning.
 Two lessons carried into the brief from this lane's own record: evidence must be written from the
 artifact rather than the claim about it, and base-vs-head comparisons must be made at the granularity
 of the claim.
+
+## 2026-08-30 — #1462 S1 landed at `1bf9c567`; PLAN-EVAL dispatched
+
+### A self-inflicted stall, and the rule that now has teeth
+
+The #1462 launch was wrapped in `timeout 300 … &`. The timeout fired at ~12:35:20Z and the thread's
+last rollout event is **12:35:17Z** — the turn died with the client, exactly as #1673's S5 launch did.
+The rule "never wrap `launch-codex-slice`/`codex-resume` in a foreground timeout" was **already
+written in this lane's record** after the first occurrence and was violated anyway, because
+`&`-backgrounding made the `timeout` look harmless. It is not: the wrapper still owns the process
+group. It is now a hard prohibition with no exceptions — the harness `run_in_background` flag alone,
+which imposes no deadline.
+
+**Near-miss during recovery.** The surviving `launch-codex-slice.ts` process (PID `689711`) looked
+like this lane's lingering client. Walking its parent chain *before* acting gave
+`689711 → 689704 → 689702 → 5530 → 5475 → 5405` — the **Aspire 13.5 supervisor's** launcher. This
+lane's own had already died with the timeout. Killing it would have destroyed a sibling lane's
+in-flight work over a misdiagnosis. Process ownership must be proven by walking the parent chain to
+this session's PID (`5501`) before any kill — the same path-containment discipline `leak-check`
+applies to containers.
+
+Recovery was clean: no owned client lingered, so the thread was free; it was resumed on the **same**
+thread with delivery proven from the rollout, and its research context survived intact.
+
+### S1 is a strong plan
+
+`1bf9c567`, pushed. Structure: doctrine verdict, a **LOCKED** 15-path ceiling in table form with an
+explicit "outside the ceiling" list, locked decisions, a compatibility contract, an open-decision
+sweep, ordered slices, an S2 red-test contract, anti-patterns, a risk register, a gate table locked
+from S1, and an explicit plan-gate state saying S2 may not begin until a separate PLAN-EVAL writes
+`PASS`.
+
+Two things it got right without being told:
+
+- it treats the three **generated** derivatives (`export-surface-corpus.generated.ts` and both
+  `publish-assets.generated.ts`) as *ceiling paths* to be regenerated only through their `gen:` tasks —
+  the #1112 cascade lesson applied up front rather than after CI catches it;
+- it takes all three of #1462's "Expected" moves as a combination rather than picking the cheapest.
+
+**Correction to this lane's own reporting.** An earlier check with `gh pr list --head <branch>`
+returned nothing and this lane concluded no PR existed. That query form was wrong — it needs
+`owner:branch`. PR **#1758** existed already, correctly authored: draft, `Closes #1462` in the body,
+`type:fix` + `area:sdk` + `area:fresh` + `priority:p1` + exactly one `status:`, milestone `0.0.7`. The
+attempted duplicate creation was refused by the API, which is the only reason the mistake cost
+nothing. Verify PR existence with the API's `head=owner:branch` form.
+
+Issue #1462 normalized `status:triage` → `status:plan` to match its real phase.
+
+### PLAN-EVAL cycle 1 — identity recorded before mutation
+
+| Field | Value |
+| --- | --- |
+| Plan commit evaluated | `1bf9c567` — local == `origin` == PR #1758 `headRefOid` |
+| Requested route | canonical `formal_plan_evaluation` — native Claude `claude-fable-5` · medium · `--remote-control` |
+| Observed route | `["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--model","claude-fable-5"]` — **matched** |
+| Background id / session | `4b24f6dc` / `4b24f6dc-d0f1-400a-94cb-bee43080dc00` |
+| PID | `631238` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-planeval-1462` (dedicated; sole session) |
+| Verdict branch | `eval/plan-eval-1462-cycle-1`, upstream NONE |
+| Remote Control URL | `https://claude.ai/code/session_019rjXgCpUY8pRpdoiWHKmXt` |
+| Independence | fresh; separate from the Codex author `01a05238` and from this supervisor; opposite-family |
+
+The brief asks it to judge the plan rather than the defect, and names the specific questions that
+matter: whether the three-move design **dominates** its alternatives or merely works; whether the
+compatibility contract names who breaks; whether the generated-file handling is right; whether the S2
+red-before is real; and whether the new `./presets` entry **proves** browser-safety rather than
+asserting it, since a curated re-export can reintroduce a server import transitively.
