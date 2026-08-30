@@ -1522,6 +1522,7 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Features #1387 is now released under owner option 1 and must resume immediately at the precise
   plugin-CLI/RFC-0003 adapter boundary. Docs #1778 and fixes #1357 have live implementation workers;
   Aspire S13 has committed through `7e9891fa`; internals #1774 remains active.
-- #1734 remains the sole currently surfaced owner decision: authorize the total private reviver
-  plus one final focused cycle 4, or choose the riskier waiver/rescope path. It does not block any
-  independent queue. Runtime remains exact zero.
+- Two exhausted-evaluation owner decisions remain parked without blocking independent queues:
+  #1734 needs the total private reviver plus one final focused cycle 4 (or a riskier waiver/rescope),
+  and #1764 needs the single named-span assertion correction plus a delta-scoped third evaluation
+  (or rejection/parking). Runtime remains exact zero.
