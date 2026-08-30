@@ -119,7 +119,7 @@ so in the final column; a filesystem-only `--dry-run` would not safely model tho
     { name: "Preview first", type: "netscript init my-app --dry-run", desc: "Print every file and directory the scaffold would create, and write nothing." },
     { name: "Fully specified, no prompts", type: "netscript init my-app --db postgres --service --service-name users --yes", desc: "Postgres database support, an example oRPC <code>users</code> service on its assigned port, defaults for the rest. <code>--yes</code> accepts defaults, <code>--ci</code> is non-interactive; both engage automatically when stdin is not a terminal." },
     { name: "Pick a database engine", type: "netscript init my-app --db postgres", desc: "<code>postgres</code> (recommended), <code>mysql</code>, <code>mssql</code>, <code>sqlite</code>, or <code>none</code> — the default is no database unless you pass <code>--db</code>." },
-    { name: "Skip Aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint; start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code>." },
+    { name: "Skip Aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the Aspire footprint; start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code>." },
     { name: "Tune the rest", type: "--cache-backend garnet · --model-name Product · --path ./apps · --editor zed", desc: "Cache backend (<code>redis</code> default, <code>garnet</code>, or app-level <code>deno-kv</code>; <code>--cache=false</code> for none), the Prisma model name for the scaffolded CRUD surface, the target directory, and editor settings." }
   ]
 }) }}

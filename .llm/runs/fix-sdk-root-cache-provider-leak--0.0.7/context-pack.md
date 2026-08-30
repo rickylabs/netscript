@@ -75,11 +75,11 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 
 ## In progress
 
-- Commit and explicit-refspec push of the merged-main derivative refresh.
+- Commit and explicit-refspec push of the final #1748 merged-main derivative refresh.
 
 ## Next steps
 
-1. Push the integration-refresh merge commit by explicit refspec.
+1. Push the final #1748 integration-refresh merge commit by explicit refspec.
 2. Leave the close-gate label-timing rerun, draft state, labels, issue text, and acceptance boxes to
    the coordinator.
 
@@ -117,8 +117,8 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 | S2 graph assertion   | PASS               | Executed for the first time at S3 green; both graphs contained zero forbidden edges.          |
 | Focused tests        | PASS               | 82 passed / 0 failed, including the entire SDK test directory and Fresh bootstrap test.       |
 | Type/lint/format     | PASS               | Nine owned TS files selected; zero diagnostics/findings and full coverage.                    |
-| Published surface   | PASS / NEGATIVE RECORDED | Preset doc + JSR + publish pass; repo surface baseline remains a measured 559-major negative. |
-| Generated cascade   | PASS               | MCP corpus, agent-docs prose/provenance, and publish-assets final checks are fresh.            |
+| Published surface   | PASS / NEGATIVE RECORDED | Preset doc + JSR + publish pass; at measured head `1ccddd6e`, base was 542 undeclared major changes and head was 552, with the +10 entirely SDK-scoped. |
+| Generated cascade   | PASS               | Post-#1748 agent-docs, assets-barrel, publish-assets, and MCP corpus final checks are fresh.    |
 | Lock hygiene        | PASS               | Raw `git diff --exit-code -- deno.lock` returned 0.                                           |
 
 ## Open questions
@@ -142,4 +142,5 @@ None. S4 is evidence reconciliation only; mandatory IMPL-EVAL remains coordinato
 - Revised plan: `9a0f5876` (`PASS_PLAN` cycle 2).
 - S2 red-before: `ddf66a6f` (test and red evidence only).
 - S3 implementation: `1dd64dae` (product, docs, generated derivatives, and gate evidence).
-- S4 evidence reconciliation: pending this artifact-only commit.
+- S4 evidence reconciliation and integration refreshes: retained in branch history; the final
+  #1748 merge/evidence commit is pending this commit.

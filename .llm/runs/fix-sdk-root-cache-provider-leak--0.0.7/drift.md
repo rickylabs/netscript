@@ -101,3 +101,18 @@ requirements.
 - #1748 is the active corpus landing and must merge before the final derivative refresh. No asset
   is regenerated or pushed in this checkpoint; the single post-#1748 refresh will run the complete
   cascade once against the coordinator-supplied merge SHA.
+
+## 2026-08-30 — final post-#1748 derivative refresh
+
+- Severity: required integration refresh inside the expanded ceiling; no design or product rescope.
+- The branch merged #1748 at `952cc106aafea61570d24247695ac23f5d810026` without rebasing. Its
+  conflicts were limited to the already-authorized agent-docs pair and MCP publish asset. Incoming
+  #1748 versions were used as the regeneration baseline, preserving the Aspire terminology change;
+  this leaf's cache-provider migration text remains present on all four owned SDK guidance pages.
+- The complete dependency-ordered cascade ran once. Agent-docs, assets-barrel, and publish-assets
+  prechecks were stale and their final checks passed. MCP export-corpus was already fresh at its
+  precheck; its generator and final check reproduced the same hash, so the worklog records a measured
+  PASS instead of inventing an expected negative.
+- `gen:assets-barrel` changed only the authorized
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`, including the SDK `./presets` inventory
+  entry. No additional generated path was forced, so the rescope-and-stop condition did not fire.

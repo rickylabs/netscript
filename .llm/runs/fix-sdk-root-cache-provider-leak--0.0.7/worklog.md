@@ -321,3 +321,36 @@ working tree by the red check is deliberately excluded from this artifact-only c
 lands, it will be regenerated once with the rest of the derivative cascade; any additional changed
 generated path is rescope-and-stop. The acceptance-evidence block, issue boxes, labels, and PR state
 remain untouched.
+
+## Final integration refresh after #1748 — `origin/main` `952cc106`
+
+The branch merged GitHub-confirmed #1748 commit
+`952cc106aafea61570d24247695ac23f5d810026` without rebasing. The merge conflicted only in the two
+authorized agent-docs outputs and the authorized MCP publish asset. Those conflicts were restored to
+the incoming-main versions before regeneration so #1748's Aspire terminology remained the input;
+all four owned SDK guidance pages still carry this leaf's cache-provider migration prose. No
+conflict resolution or generated leaf delta escaped the ceiling plus the coordinator-authorized CLI
+agent-docs output.
+
+| Gate | Result | Artifact-derived evidence |
+| --- | --- | --- |
+| Agent-docs precheck | EXPECTED STALE (exit 1) | Lume built 639 files and rendered 227 HTML files; the checker named `prose.json.gz` and `provenance.json` stale and measured target SHA `e9b195fa0cacdabdb94369085b09e48e143ee32ef9c5ad8096977e3f4c2770e8`. |
+| Agent-docs generation/final | PASS (exit 0) | `gen:agent-docs-prose` produced that SHA; the final Lume-backed check returned `fresh: true` after the same 639-file/227-HTML build. |
+| Assets-barrel precheck | EXPECTED STALE (exit 1) | The task-generated comparison changed only `packages/cli/src/kernel/assets/agent-docs.generated.ts`; its embedded SDK export inventory gained `./presets` and its agent-doc metadata moved to the regenerated prose bundle. |
+| Assets-barrel generation/final | PASS (exit 0) | `gen:assets-barrel` was the only writer; final `check:assets-barrel` passed. No other barrel output changed. |
+| Publish-assets precheck | EXPECTED STALE (exit 1) | The checker named only `packages/mcp/src/publish-assets.generated.ts` stale after prose regeneration. |
+| Publish-assets generation/final | PASS (exit 0) | `gen:publish-assets` completed and final `check:publish-assets` passed. The CLI publish asset did not change. |
+| MCP export-corpus precheck | MEASURED PASS (exit 0) | The corpus was already fresh rather than stale: 35 packages, 271 subpaths, 7,668 symbols, SHA `76b5d30e12b5306530efa900bf817a8ac3a2f4854e381e232aca367e4efdbc57`. |
+| MCP export-corpus generation/final | PASS (exit 0) | The named generator and final check reproduced the same counts and SHA. |
+| Export/reference drift | PASS (exit 0) | `docs:exports-drift` retained SDK entrypoint coverage and reported `Exports & Symbols drift check: PASS`. |
+| Whole SDK test directory | PASS (exit 0) | Structured wrapper: 70 passed / 0 failed / 0 ignored. |
+| Fresh bootstrap test | PASS (exit 0) | Structured wrapper: 11 passed / 0 failed / 0 ignored. |
+| Nine-file scoped check | PASS (exit 0) | 9 selected in one batch; zero diagnostics and zero failed batches. |
+| Nine-file scoped lint | PASS (exit 0) | 9 selected/processed; zero findings, dropped files, or refusals. |
+| Nine-file scoped format | PASS (exit 0) | 9 selected/processed; zero findings, dropped files, or refusals. |
+| Published-entry graph proof | PASS (exit 0) | The committed predicate remeasured 0 browser-unsafe edges from `packages/sdk/mod.ts` and 0 from `packages/sdk/src/presets/mod.ts`. |
+| Lock hygiene | PASS (exit 0) | Raw `git diff --exit-code -- deno.lock` and `git diff --exit-code origin/main -- deno.lock` both returned 0. |
+
+The MCP precheck's PASS is deliberately not described as an expected stale result. The corpus did
+not move after the #1748 merge; the prose-derived outputs did. The acceptance-evidence block remains
+unchanged, and no prohibited runtime gate, issue mutation, relabel, or draft-state change occurred.
