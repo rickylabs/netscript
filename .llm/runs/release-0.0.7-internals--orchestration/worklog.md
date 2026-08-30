@@ -5053,3 +5053,25 @@ rollout-growth stall.
   `007-eval-1774-impl` remains detached at `51a7bafe1`, dirty 0; brief finalized at 118 lines.
   #1774 is at Tier-A GREEN with PR #1775 MERGEABLE/CLEAN. The lane is parked **only** on the
   evaluator route, not on the product.
+
+## D-82 — #1774 IMPL-EVAL relaunched on coordinator-authorized Opus 5 substitute
+
+- **Coordinator ruling (2026-08-30):** authorize a Claude-family substitute for the blocked
+  `formal_impl_evaluation` primary. Dispatched **Claude · Opus 5 · medium**, fresh separate session,
+  job `8f436cac`, in `007-eval-1774-impl` detached at `51a7bafe1`. Confirmed `state: working`.
+- Invariants preserved: **opposite-family** to the Codex implementer, **generator ≠ evaluator**,
+  **fresh separate session**. Deviation is only in the model binding, and the brief requires the
+  evaluator to reproduce the deviation verbatim in `impl-eval.md` and in its verdict comment, naming
+  both blocked routes and their causes.
+- **Same-family hazard stated to the evaluator explicitly.** The supervisor is also an Opus 5
+  session, so the evaluator shares a family with the agent that wrote its brief and chose its gate
+  set. The brief names all three supervisor instrument errors from this run and instructs the
+  evaluator **not** to accept the Tier-A table as evidence, to re-measure independently, and to
+  validate every probe against a known-positive and a known-negative before trusting its output or
+  its silence. Deference is named as the most likely failure mode of this particular pairing.
+- **Monitor probe validated before arming — a direct application of the D-81 lesson.** The prior
+  monitor filtered terminal states on `completed|failed|stopped|error`. Observed runtime values are
+  `working`, **`done`**, and **`blocked`** — so that filter matched *none* of the real terminal
+  states and would have hung to timeout on both a success and a spend-limit block. New monitor
+  `bd51fhiet` reads `state.json` (probe proven against a known-positive) and matches
+  `done|blocked|failed|stopped|error|completed|cancelled`, emitting on every state change.
