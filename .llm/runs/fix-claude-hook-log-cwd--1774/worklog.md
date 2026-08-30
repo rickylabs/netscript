@@ -19,10 +19,11 @@ file is created or changed.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-30 | Bootstrap | Activated | Loaded required skills and harness authority; verified branch and baseline. |
+| 2026-08-30 | Research | Re-derived | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output recorded in `research.md`. |
 
 ## Gate Results
 
-No implementation gates have run. The current phase is Bootstrap.
+No implementation gates have run. The current phase is Research.
 
 ## Handoff Notes
 
