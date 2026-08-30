@@ -7112,3 +7112,58 @@ Session **`2f492178`** (Fable 5 · medium, route verified from its transcript, o
 both earlier scopes, tells it not to trust the archived defective receipt, explains that
 `close-gate`'s red is an ordering artifact rather than a code defect, and flags that **the G-1 decoy
 probe is genuinely unverified at any recent head** because both stopped sessions missed it.
+
+## 2026-08-30 — #1731 pre-merge body repair (rows 1/2/7), body-only at `dbd3eafa`
+
+Prepared while CI and the currency evaluator run at the final head. **No commit, no push, no head
+movement** — verified: `origin/feat/sdk-procedure-meta` was `dbd3eafa6670` before the edit and
+`dbd3eafa6670` after.
+
+### What was wrong
+
+- **No fenced acceptance-evidence block.** #1466's six boxes were unticked with no machine-readable
+  evidence for the mirror to consume, so the close-gate could never clear.
+- **Stale baseline.** The body still cited `main 13878a80` for the doc-lint comparison — two main
+  advances out of date (`952cc106`, then `a5520e70`).
+- **Stale closing posture.** It ended "Not yet ready to merge… coordinator owes mirror", written when
+  merge authority was misunderstood as human-only.
+
+### What the body now carries
+
+1. **Integration history** — both `--no-ff` merges named with their bases, the four-carrier conflict
+   on the second and its resolution (take `main`, then re-run all four generators; generated output is
+   never hand-merged), and an explicit statement that **`a5520e70` is the current base and the
+   `13878a80` references are superseded**.
+2. **Exact-head validation** at content head **`d5f3bf4c`** — eight receipts at `attempt 12`, all
+   `gitHead == actualGitHead`, seven PASS plus `public-doc-lint` baseline-red **re-measured against
+   the current base**: `main` 12, head 12, set identical.
+3. **Truthful Definition of Done** — six boxes ticked on delivered substance, and the seventh left
+   **unticked**: the exact-head currency evaluation has not returned. Ticking it now would be the
+   hand-tick this repair exists to avoid.
+4. **A fenced `acceptance-evidence` block** mapping all six #1466 boxes by `box-index`, each with
+   concrete evidence (file paths, perturbation results, receipt names, gate outcomes at `d5f3bf4c`).
+
+### The block was validated, not assumed
+
+The fence is parsed by `FENCE_PATTERN = /^\s*```acceptance-evidence\s*$/i` and every line must match
+`^-?\s*(issue|box|box-index|evidence):`; `parseStructuredBlock` **throws** on anything else. Checked
+locally before publishing: **1 fenced block, `issue: 1466`, 6 `box-index` entries, zero unparseable
+lines**. Then confirmed end-to-end — `mirror-acceptance-evidence.ts --dry-run` read the live body and
+raised **no parse warning**, stopping only at the expected gate:
+
+> "Mirror skipped because live PR labels do not include `status:ready-merge`; apply the label, then
+> rerun the existing CI workflow with `gh run rerun <run-id>` so its live reads observe the label
+> without moving the evaluated head."
+
+That is the mechanism confirming its own ordering: the mirror is the thing that ticks the boxes, and
+it will not run until the label is applied. **The six issue boxes remain unticked — verified 6
+unticked after the edit.**
+
+### Sequence still owed, in order
+
+1. Currency evaluator `2f492178` returns at `d5f3bf4c`, and CI reports at `dbd3eafa`.
+2. On `PASS`: apply **`status:ready-merge`**.
+3. **Targeted `gh run rerun`** of the existing close-gate run — never a push, which would move the
+   evaluated head away from the verdict.
+4. The mirror ticks the six boxes from the block; `close-gate` clears.
+5. Hand the coordinator the exact SHA with backing run/job IDs. Merge is the coordinator's.
