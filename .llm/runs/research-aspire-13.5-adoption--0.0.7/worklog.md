@@ -540,4 +540,7 @@ Mirror/labels/ready already done; close-gate re-verifies at the new head. | | S5
 | Run 33331022935 SUCCESS all tiers at `bf7223a6c3305c`. Packet remainder: the current-head
 two-concurrent-isolated-start receipt (next host lease, after S7's primary-resumed cleanup reaches
 zero) → evidence block → sole ready-merge → close-gate. Chain-4 dispatching S1's current-main proof
-at `c4cbda25`. |
+at `c4cbda25`. | | S8 observability landed `f06209d39` | Product fix `63e291f62` "preserve
+actionable typed-command stderr" (ANSI-strip + banner filtering, RED/GREEN template tests), pushed
+with PR comment citing run 33330455111 / job 99308020561. Lease queue after S7 cleanup: **S5
+concurrent-start receipt → S8 typed-seed diagnostic** (one lease each, exact zero between). |
