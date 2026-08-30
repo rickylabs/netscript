@@ -6,8 +6,11 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createConnection } from 'node:net';
 import process from 'node:process';
 import { z } from 'zod';
+import { HealthStatus } from '../.aspire/modules/aspire.mts';
+import type { HealthCheckResult } from '../.aspire/modules/aspire.mts';
 
 // ============================================================================
 // Types
@@ -51,6 +54,17 @@ export interface ResourceDependencies {
 }
 
 export type OtelMode = 'denoApp' | 'denoTask' | 'executable';
+
+export interface ListenerReadinessCheckOptions {
+  readonly kind: string;
+  readonly host: string;
+  readonly port: number | string;
+}
+
+export interface RespPingCheckOptions {
+  readonly host: string;
+  readonly port: number | string;
+}
 
 // Project-specific config generation extends these schemas to preserve literal
 // resource names without importing Deno-owned framework modules into AppHost.
@@ -126,6 +140,7 @@ export const DEFAULT_PERMISSIONS: readonly string[] = [
 ] as const;
 
 export const RESOURCE_DEFAULTS = {
+  DbCliModeExcludeFromMcp: true,
   Runtime: 'deno',
   ServiceEntrypoint: 'src/main.ts',
   AppEntrypoint: 'main.ts',
@@ -138,6 +153,147 @@ export const RESOURCE_DEFAULTS = {
 } as const;
 
 const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
+const LISTENER_READINESS_TIMEOUT_MS = 2_000;
+
+// ============================================================================
+// Listener readiness
+// ============================================================================
+
+/** Creates a one-socket TCP listener readiness check for an Aspire resource. */
+export function createListenerReadinessCheck(
+  options: ListenerReadinessCheckOptions,
+): () => Promise<HealthCheckResult> {
+  return () =>
+    new Promise((resolve) => {
+      const startedAt = performance.now();
+      const port = normalizeListenerPort(options.port);
+      const socket = createConnection({ host: options.host, port });
+      let settled = false;
+
+      const finish = (result: HealthCheckResult): void => {
+        if (settled) return;
+        settled = true;
+        socket.destroy();
+        resolve(result);
+      };
+
+      socket.setTimeout(LISTENER_READINESS_TIMEOUT_MS);
+      socket.once('connect', () => {
+        finish({
+          status: HealthStatus.Healthy,
+          description: `${options.kind} listener ready on ${options.host}:${port}`,
+        });
+      });
+      socket.once('error', (error) => {
+        finish(
+          listenerFailure(options.kind, options.host, port, socketErrorCode(error), startedAt),
+        );
+      });
+      socket.once('timeout', () => {
+        finish(listenerFailure(options.kind, options.host, port, 'ETIMEDOUT', startedAt));
+      });
+    });
+}
+
+/** Creates a one-socket Redis-compatible PING readiness check. */
+export function createRespPingCheck(
+  options: RespPingCheckOptions,
+): () => Promise<HealthCheckResult> {
+  return () =>
+    new Promise((resolve) => {
+      const startedAt = performance.now();
+      const port = normalizeListenerPort(options.port);
+      const socket = createConnection({ host: options.host, port });
+      let settled = false;
+
+      const finish = (result: HealthCheckResult): void => {
+        if (settled) return;
+        settled = true;
+        socket.destroy();
+        resolve(result);
+      };
+
+      socket.setTimeout(LISTENER_READINESS_TIMEOUT_MS);
+      socket.once('connect', () => {
+        socket.write('PING\r\n');
+      });
+      socket.once('data', (data) => {
+        const reply = data.toString('utf8').trim();
+        if (reply.startsWith('+PONG')) {
+          finish({
+            status: HealthStatus.Healthy,
+            description: `RESP listener ready on ${options.host}:${port}`,
+          });
+          return;
+        }
+        if (reply.startsWith('-NOAUTH')) {
+          finish({
+            status: HealthStatus.Degraded,
+            description: 'auth required — readiness only',
+            data: listenerData('NOAUTH', options.host, port, startedAt),
+          });
+          return;
+        }
+        finish(respFailure(options.host, port, 'EPROTO', startedAt));
+      });
+      socket.once('error', (error) => {
+        finish(respFailure(options.host, port, socketErrorCode(error), startedAt));
+      });
+      socket.once('timeout', () => {
+        finish(respFailure(options.host, port, 'ETIMEDOUT', startedAt));
+      });
+    });
+}
+
+function listenerFailure(
+  kind: string,
+  host: string,
+  port: number,
+  code: string,
+  startedAt: number,
+): HealthCheckResult {
+  return {
+    status: HealthStatus.Unhealthy,
+    description: `${kind} listener unreachable: ${code}`,
+    data: listenerData(code, host, port, startedAt),
+  };
+}
+
+function respFailure(
+  host: string,
+  port: number,
+  code: string,
+  startedAt: number,
+): HealthCheckResult {
+  return {
+    status: HealthStatus.Unhealthy,
+    description: `RESP listener unreachable: ${code}`,
+    data: listenerData(code, host, port, startedAt),
+  };
+}
+
+function listenerData(
+  code: string,
+  host: string,
+  port: number,
+  startedAt: number,
+): Record<string, string> {
+  return {
+    code,
+    host,
+    port: String(port),
+    elapsedMs: String(Math.round(performance.now() - startedAt)),
+  };
+}
+
+function normalizeListenerPort(port: number | string): number {
+  return typeof port === 'number' ? port : Number.parseInt(port, 10);
+}
+
+function socketErrorCode(error: Error): string {
+  const code = Reflect.get(error, 'code');
+  return typeof code === 'string' ? code : 'UNKNOWN';
+}
 
 // ============================================================================
 // Path helpers

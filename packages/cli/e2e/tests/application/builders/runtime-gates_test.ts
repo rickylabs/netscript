@@ -7,7 +7,6 @@ import {
   KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
 } from '../../../src/domain/cli-surface.ts';
 import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
-import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import {
@@ -15,6 +14,8 @@ import {
   ASPIRE_RESTORE_MAX_RETRIES,
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
+import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
+import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 
 Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
@@ -32,6 +33,79 @@ Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', ()
     maxRetries: 2,
   });
 });
+
+Deno.test('runtime prefers the typed database command and retains restart fallback', () => {
+  const gate = createRuntimeGates(DATABASE.POSTGRES).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected a command gate.');
+  const command = gate.command(s8RuntimeContext());
+
+  assertEquals(command.at(-1), DATABASE.POSTGRES);
+  assertEquals(command[2].includes('`${database}-cli`'), true);
+  assertEquals(command[2].includes('"migrate", "--timeout", "60"'), true);
+  assertEquals(command[2].includes('using restart fallback'), true);
+  assertEquals(command[2].includes('"stop"'), true);
+  assertEquals(command[2].includes('"start"'), true);
+});
+
+Deno.test('typed database Phase-B gate is defined but not registered in Phase A', () => {
+  const gate = createTypedDbPhaseBGate();
+  if (gate.kind !== 'command') throw new Error('Expected a command gate.');
+  const context = s8RuntimeContext();
+
+  assertEquals(gate.cwd(context), '/workspace/app');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire,deno',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts',
+    '/workspace/app/aspire/apphost.mts',
+    '/workspace/app',
+    '/repo/packages/cli/bin/netscript.ts',
+    DATABASE.POSTGRES,
+  ]);
+  assertEquals(
+    createRuntimeGates(DATABASE.POSTGRES).some((entry) =>
+      entry.id === GATE.RUNTIME_TYPED_DB_PHASE_B
+    ),
+    false,
+  );
+});
+
+function s8RuntimeContext(): RunContext {
+  return {
+    request: {
+      suiteId: 'scaffold.runtime',
+      options: {
+        repoRoot: '/repo',
+        cliEntrypoint: 'packages/cli/bin/netscript.ts',
+        smokeRoot: '/workspace',
+        projectName: 'generated',
+        database: DATABASE.POSTGRES,
+        packageSource: 'local',
+        plugins: [],
+        samples: true,
+        cache: true,
+        cleanup: true,
+        format: 'pretty',
+        commandTimeoutMs: 900_000,
+        httpTimeoutMs: 30_000,
+      },
+    },
+    project: {
+      repoRoot: '/repo',
+      cliEntrypoint: 'packages/cli/bin/netscript.ts',
+      smokeRoot: '/workspace',
+      projectName: 'generated',
+      appHost: '/workspace/app/aspire/apphost.mts',
+      projectRoot: '/workspace/app',
+    },
+  };
+}
 
 Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_START);
@@ -52,15 +126,19 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   } as RunContext);
 
   assertEquals(command[0], 'deno');
-  assertEquals(command[1], 'eval');
-  assertEquals(command.at(-2), '/workspace/app/aspire/apphost.mts');
-  assertEquals(command.at(-1), '/workspace/app');
-  assertEquals(command[2].includes('"--format"'), true);
-  assertEquals(command[2].includes('aspire-start.json'), true);
+  assertEquals(command[1], 'run');
+  assertEquals(command.some((entry) => entry.endsWith('/.llm/tools/gates/run-gate.ts')), true);
+  assertEquals(command.includes('cli-e2e-aspire-start'), true);
+  assertEquals(command.includes('capture'), true);
+  assertEquals(command.includes('/workspace/app/aspire/apphost.mts'), true);
+  assertEquals(command.includes('/workspace/app'), true);
+  assertEquals(command.at(-1)?.includes('postgres'), true);
 });
 
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT);
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT
+  );
   if (gate?.kind !== 'command') {
     throw new Error('Expected live DB endpoint gate to be a command gate.');
   }
@@ -91,15 +169,15 @@ Deno.test('live DB endpoint gate reads the detached dashboard metadata path', ()
   ]);
 });
 
-// #954 regression: this gate shipped probing a hardcoded `http://127.0.0.1:8000/` while a
-// pinning scaffold published the app on 8010, so all 60 attempts were refused and the failure
+// #954 regression: this gate shipped probing the start of the app range while a pinning
+// scaffold published a different port, so all 60 attempts were refused and the failure
 // read exactly like an app that could not render.
 //
 // #952 follow-on: the pristine scaffold now pins nothing, so the gate must also hand over the
 // AppHost — that is the only thing that knows the port Aspire allocated. Passing the project
 // alone was enough while a port sat in appsettings.json; it is not enough now.
 Deno.test('app home gate hands the probe a project and an AppHost to resolve the port from', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_HOME);
+  const gate = createRuntimeBehaviorGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_HOME);
   if (gate?.kind !== 'command') {
     throw new Error('Expected app home gate to be a command gate.');
   }
@@ -132,7 +210,7 @@ Deno.test('app home gate hands the probe a project and an AppHost to resolve the
 // 127.0.0.1 denied every fetch, and the retry loop reported it as if the app never rendered —
 // 60 attempts, 60 seconds, and a failure message that blamed the wrong thing.
 Deno.test('app home gate can reach a localhost endpoint, not only 127.0.0.1', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_HOME);
+  const gate = createRuntimeBehaviorGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_HOME);
   if (gate?.kind !== 'command') throw new Error('Expected app home gate to be a command gate.');
 
   const command = gate.command({
@@ -146,7 +224,9 @@ Deno.test('app home gate can reach a localhost endpoint, not only 127.0.0.1', ()
 });
 
 Deno.test('app reference gate runs the real browser probe for the project-derived app', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_REFERENCE);
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_APP_REFERENCE
+  );
   if (gate?.kind !== 'command') throw new Error('Expected app reference command gate.');
   const command = gate.command({
     request: { options: { projectName: 'inventory-console' } },
@@ -162,7 +242,7 @@ Deno.test('app reference gate runs the real browser probe for the project-derive
     'run',
     '--allow-read',
     '--allow-run',
-    '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-app-reference.ts',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts',
     '/workspace/app',
     'inventory-console-web',
     '/workspace/app/aspire/apphost.mts',
@@ -182,37 +262,74 @@ Deno.test('runtime app wait derives the resource name from the scaffold project'
 
   const command = gate.command({
     request: { options: { projectName: 'inventory-console' } },
-    project: { appHost: '/workspace/app/aspire/apphost.mts' },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
   } as RunContext);
-  assertEquals(command[2], 'inventory-console-web');
+  assertEquals(command.at(-1), 'inventory-console-web');
   assertEquals(command.includes('dashboard'), false);
 });
 
 Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_DURABLE_CLI_PARITY);
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_DURABLE_CLI_PARITY
+  );
   if (gate?.kind !== 'command') {
     throw new Error('Expected durable CLI parity gate to be a command gate.');
   }
-  const projectName = 'runtime-gates-test';
   const context = {
-    project: { repoRoot: '/repo', projectRoot: '/workspace/app' },
-    request: { options: { projectName } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+    request: { options: { projectName: 'runtime-gates-test' } },
   } as RunContext;
-  const workersPort = allocateScaffoldDefaultPort(projectName, 'plugin:workers-api');
-  const sagasPort = allocateScaffoldDefaultPort(projectName, 'plugin:sagas-api');
   assertEquals(gate.cwd(context), '/workspace/app');
   assertEquals(gate.command(context), [
     'deno',
     'run',
-    `--allow-net=127.0.0.1:${workersPort},127.0.0.1:${sagasPort}`,
+    '--allow-net=localhost,127.0.0.1',
+    '--allow-run=aspire',
+    '--allow-env=WORKERS_API_URL,SAGAS_API_URL',
     '--allow-read',
     '/repo/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts',
+    '/workspace/app/aspire/apphost.mts',
   ]);
   assertEquals(gate.failureHint, undefined);
 });
 
+Deno.test('plugin behavior gates resolve live resource URLs through Aspire describe', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_WORKERS_HEALTH
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected workers health command gate.');
+  const context = {
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+    request: { options: { projectName: 'runtime-gates-test' } },
+  } as RunContext;
+
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-run=aspire',
+    '--allow-net=localhost,127.0.0.1',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts',
+    '/workspace/app/aspire/apphost.mts',
+    'workers-api',
+    'get',
+    '/health/live',
+  ]);
+});
+
 Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live AppHost', () => {
-  const gate = createRuntimeGates().find((entry) =>
+  const gate = createRuntimeBehaviorGates().find((entry) =>
     entry.id === GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY
   );
   if (gate?.kind !== 'command') {
@@ -280,15 +397,18 @@ Deno.test('workers wait gate requires runtime startup evidence before behavior g
     gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext),
     [
       'deno',
       'run',
-      '--allow-run=aspire',
-      '/repo/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts',
-      '/workspace/app/aspire/apphost.mts',
+      '--allow-read',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+      'assert',
+      '/workspace/app/.netscript/e2e/aspire-describe.ndjson',
+      'workers',
     ],
   );
 });
@@ -318,18 +438,19 @@ Deno.test('runtime gates enumerate every KV-backed first-party background runtim
     const command = gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext);
-    if (resource !== ASPIRE_RESOURCE.WORKERS) {
-      assertEquals(command.includes('--status'), true);
-      assertEquals(command.includes('healthy'), true);
-    }
+    assertEquals(command.includes('assert'), true);
+    assertEquals(command.includes(resource), true);
   }
 });
 
 Deno.test('AI chat route gate captures generated registry import failures', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_AI_CHAT_ROUTE);
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_AI_CHAT_ROUTE
+  );
   if (gate?.kind !== 'command') {
     throw new Error('Expected AI chat route gate to be a command gate.');
   }
@@ -355,7 +476,7 @@ Deno.test('runtime gates skip database resource wait for sqlite', () => {
 });
 
 Deno.test('runtime service health gate asserts only the selected sqlite adapter', () => {
-  const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) =>
+  const gate = createRuntimeBehaviorGates(DATABASE.SQLITE).find((entry) =>
     entry.id === GATE.BEHAVIOR_SERVICE_HEALTH
   );
   if (gate?.kind !== 'command') {
@@ -389,21 +510,20 @@ Deno.test('runtime gates wait for mssql resource with extended timeout when mssq
   assertEquals(
     gate.command({
       project: {
+        repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext),
     [
-      'aspire',
-      'wait',
+      'deno',
+      'run',
+      '--allow-read',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+      'assert',
+      '/workspace/app/.netscript/e2e/aspire-describe.ndjson',
       'mssql',
-      '--status',
-      'healthy',
-      '--timeout',
-      '600',
-      '--apphost',
-      '/workspace/app/aspire/apphost.mts',
-      '--non-interactive',
-      '--nologo',
+      'mssql_listener',
     ],
   );
 });

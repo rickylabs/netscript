@@ -176,6 +176,10 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_AUTH_SMOKE_ENV), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
   assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE),
+    true,
+  );
+  assertEquals(
     runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTORE) <
       runtime.gates.findIndex((gate) => gate.id === GATE.GENERATED_QUALITY_NEGATIVE),
     true,
@@ -213,6 +217,18 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
+  const resourceCommandIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_RESOURCE_COMMAND
+  );
+  assertEquals(
+    resourceCommandIndex >
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES),
+    true,
+  );
+  assertEquals(
+    resourceCommandIndex < runtime.gates.findIndex((gate) => gate.id === GATE.CLEANUP_ASPIRE_STOP),
+    true,
+  );
 });
 
 Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () => {
@@ -266,6 +282,17 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
   assertEquals(waitIndex < homeIndex, true);
+});
+
+Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const describe = ids.indexOf(GATE.RUNTIME_ASPIRE_DESCRIBE);
+    const listenerFixture = ids.indexOf(GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE);
+    const behavior = ids.indexOf(GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST);
+    assertEquals(describe >= 0 && describe < listenerFixture, true, suiteId);
+    assertEquals(listenerFixture < behavior, true, suiteId);
+  }
 });
 
 Deno.test('runtime DB mutations run only after the resident AppHost starts', () => {

@@ -1,5 +1,5 @@
-import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../../src/kernel/application/registries/template-registry.ts';
-import { generateRegisterApps } from '../../../../../src/kernel/templates/aspire/helpers/register/generate-register-apps.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../../../src/kernel/application/registries/template-registry.ts';
+import { generateRegisterApps } from '../../../../../../src/kernel/templates/aspire/helpers/register/generate-register-apps.ts';
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) throw new Error('project root argument is required');

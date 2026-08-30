@@ -1,0 +1,7 @@
+# S3 contribution evidence
+
+- `deno check --unstable-kv` on four contributions, generated consumer stub, and contribution tests:
+  exit `0`.
+- Targeted contribution/stream-generator tests: exit `0`; 11 passed, 0 failed.
+- `deno task check:aspire-host-ports --pretty`: exit `0`; 957 files scanned and no pinned host
+  ports. Slice 4 still extends generator coverage and explicit infrastructure pin behavior.

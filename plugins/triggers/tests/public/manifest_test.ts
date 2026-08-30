@@ -1,7 +1,6 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { inspectPlugin } from '@netscript/plugin';
 import {
-  TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
   TRIGGERS_PLUGIN_VERSION,
@@ -21,7 +20,7 @@ Deno.test('triggersPlugin manifest exposes core dependencies, service, contract,
     triggersPlugin.contributions.services?.some((service) =>
       service.name === TRIGGERS_API_SERVICE_NAME &&
       service.entrypoint === './services/src/main.ts' &&
-      service.port === TRIGGERS_API_DEFAULT_PORT
+      service.port === undefined
     ),
   );
   assert(

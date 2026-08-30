@@ -1,0 +1,56 @@
+{
+  "appHost": "/workspace/app/aspire/apphost.mts",
+  "projectRoot": "/workspace/app",
+  "containers": [
+    {
+      "Id": "owned-container",
+      "Name": "/postgres-owned",
+      "Config": {
+        "Labels": {
+          "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/workspace/app/.data/postgres,dst=/var/lib/postgresql/data"
+        }
+      }
+    },
+    {
+      "Id": "foreign-container",
+      "Name": "/postgres-foreign",
+      "Config": {
+        "Labels": {
+          "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/workspace/other/.data/postgres,dst=/var/lib/postgresql/data"
+        }
+      }
+    },
+    {
+      "Id": "creator-only-container",
+      "Name": "/creator-only",
+      "Config": {
+        "Labels": {
+          "com.microsoft.developer.usvc-dev.creatorProcessId": "4242"
+        }
+      }
+    },
+    { "Id": "unproven-container", "Name": "/plain", "Config": { "Labels": {} } }
+  ],
+  "processes": [
+    {
+      "pid": 41,
+      "argv": ["aspire", "stop", "--apphost", "/workspace/app/aspire/apphost.mts"],
+      "environment": []
+    },
+    {
+      "pid": 42,
+      "argv": ["aspire-managed"],
+      "environment": ["ASPIRE_DCP_APPHOST_PATH=/workspace/app/aspire/apphost.mts"]
+    },
+    {
+      "pid": 43,
+      "argv": ["dcp"],
+      "environment": ["ASPIRE_DCP_APPHOST_PATH=/workspace/other/aspire/apphost.mts"]
+    },
+    {
+      "pid": 44,
+      "argv": ["deno", "task", "dev"],
+      "environment": ["ASPIRE_DCP_APPHOST_PATH=/workspace/app/aspire/apphost.mts"]
+    }
+  ]
+}

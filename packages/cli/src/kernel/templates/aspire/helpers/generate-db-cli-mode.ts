@@ -1,8 +1,8 @@
 /**
  * @module templates/aspire/helpers/generate-db-cli-mode
  *
- * Generator for `.helpers/db-cli-mode.mts`, the AppHost short-circuit used by
- * `netscript db <operation>` commands.
+ * Generator for `.helpers/db-cli-mode.mts`, which registers typed database
+ * operation commands in the resident AppHost.
  */
 
 import type { DbCliModeOptions } from './types.ts';

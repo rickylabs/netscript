@@ -54,8 +54,6 @@
     "backgroundEntrypoint": "workers/runtime.ts",
     "doctorEntrypoint": "./doctor.ts",
     "serviceConfigKey": "workers-api",
-    "servicePort": 8091,
-    "backgroundPort": 8091,
     "dependencies": ["streams"],
     "requiresDb": true,
     "requiresKv": true,

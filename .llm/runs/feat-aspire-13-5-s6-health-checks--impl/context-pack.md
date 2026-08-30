@@ -1,0 +1,113 @@
+# Context Pack: Aspire 13.5 listener-readiness health checks
+
+## Run Metadata
+
+| Field | Value |
+| ----- | ----- |
+| Run ID | `feat-aspire-13-5-s6-health-checks--impl` |
+| Branch | `feat/aspire-13-5-s6-health-checks` |
+| Current phase | `implement` |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `none` |
+
+## Current State
+
+Slices 1–5 are committed/pushed on draft PR #1743. IMPL-EVAL cycle 1 at `78d0ded28` returned
+`FAIL_FIX` because the generated AppHost did not type-check against the real restored Aspire 13.5.3
+modules. Slice 6 now repairs the endpoint value projection and string-valued health data, and adds
+the real restored-module consumer type-check as a mandatory generator gate. The Fable supervisor
+retains Phase-B runtime execution, slice review, and the next IMPL-EVAL.
+
+## Completed
+
+- Read all requested skills/workflow/doctrine/API/S2 evidence and target code.
+- Confirmed branch/worktree/base and no pre-existing edits.
+- Selected Archetype 6 and the required gate set.
+- Added generated-template TCP/RESP helper tests RED→green (8 passed).
+- Added one-socket helper implementation with 2000 ms timeout and exact result data.
+- Committed/pushed slice 1 as `54fdf19fe735fea793e3548825bd3f3015044461` and opened the correctly
+  stacked draft PR with its implementation trail.
+- Added per-kind TCP/RESP registration, live endpoint projection, attachment, non-emission, and
+  credential-isolation tests; the combined focused suite passes 53 results.
+- Committed/pushed slice 2 as `feb1e7aadcf4f875cbcd2b878161c3ba9a5d705a` with its PR trail.
+- Regenerated the embedded asset barrel and proved deterministic reproduction plus scoped type
+  checking.
+- Committed/pushed slice 3 as `c3376671877d50b17a16e237336f58edda34e5bf` with its PR trail.
+- Split the 812-line runtime registry into lifecycle/behavior/script concerns and grouped runtime
+  probes, reducing `runtime-gates.ts` to 305 lines and direct scaffold files from 48 to 43.
+- Added describe-derived checks for `<resource>_listener`/`<resource>_resp` object-valued reports.
+- Registered (without running) the lease-backed stop → Unhealthy → exit 18 → start → Healthy
+  recovery fixture and JSON receipt path.
+- Passed 46 focused E2E tests and the 17-gate `scaffold.plugins` suite.
+- Committed/pushed slice 4 as `92de34d9bc440a7ede229daed7bd2b449e6b1a83` with its PR trail.
+- Drafted the S6b 0.0.8 issue and the #1366/#863 comments for supervisor posting.
+- Passed the final matrix: configured lint, 29-file scoped check, raw config-excluded lint/fmt,
+  99 focused tests, deterministic assets, quality/architecture fitness, and `scaffold.plugins`.
+- Committed/pushed slice 5 as `78d0ded2849eb28eddb60c409bfd68284d7e419b`.
+- Read the full cycle-1 evaluator record and restored SDK 13.5.3 declaration surface.
+- Replaced expression-handle endpoint projection with live `.host()` / `.port()` value calls and
+  made `HealthCheckResult.data` string-valued; focused RED→green is 42/53 then 53/53.
+- Passed a local-head generated Postgres AppHost type-check against S2's restored 13.5.3 modules.
+
+## In Progress
+
+- Slice 6 is statically green and is being committed/pushed as the durable NAS migration
+  checkpoint. Phase-B runtime receipts and separate-session IMPL-EVAL remain pending; the draft PR
+  must stay draft.
+
+## Next Steps
+
+1. On the NAS, recreate this worktree from the pushed branch and verify the exact checkpoint head.
+2. Supervisor supplies the Phase-B lease and executes the registered live fixture/runtime receipts.
+3. Separate Fable session performs slice review and IMPL-EVAL; implementation lane never marks ready.
+
+## Key Decisions
+
+| Decision | Source | Notes |
+| -------- | ------ | ----- |
+| Endpoint values resolve per callback | #1718 intent / restored 13.5.3 `host()` + `port()` API | `property()` returns an expression handle; drift recorded. |
+| Credentials never enter probes | #1718 | Only kind/host/port cross the helper boundary. |
+| Deno KV unchanged | owner boundary | Missing current HTTP check is recorded drift, not expanded scope. |
+| E2E debt split precedes fixture | debt stop condition | No direct-child or monolith deepening. |
+
+## Files Changed
+
+| Path | Status | Notes |
+| ---- | ------ | ----- |
+| `.llm/runs/feat-aspire-13-5-s6-health-checks--impl/*` | new | Harness bootstrap/research/plan/design/drift. |
+| `packages/cli/src/kernel/assets/aspire/helpers/_aspire-compat.ts.template` | changed | TCP/RESP readiness helper runtime edge. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts` | new | Generated-template real-socket tests. |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts` | changed | Per-kind custom check registration and resource attachment. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts` | changed | Exact emission and credential-boundary tests. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts` | changed | Updated import composition expectation. |
+| `packages/cli/src/kernel/assets/embedded.generated.ts` | changed | Regenerated helper asset literal. |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime*` | changed/new | Split registry, describe verifier, and Phase-B fixture. |
+| `packages/cli/e2e/tests/**` | changed/new | Exact wait/report/ordering and moved-probe coverage. |
+
+## Gates
+
+| Gate family | Current status | Evidence |
+| ----------- | -------------- | -------- |
+| Static | Phase A green | configured lint; 29-file check; raw fallback; 99/99 tests; assets current |
+| Fitness | Phase A green | final `quality:scan` findings `[]`; `arch:check` `FAIL=0` |
+| Runtime | NOT_RUN | no Phase-A lease |
+| Consumer | green | `scaffold.plugins` 17/17; generated AppHost compiles against restored 13.5.3 modules; runtime deliberately not run |
+
+Migration freeze recheck: focused structured test 53/53, structured check 5/5 with zero diagnostics,
+four-file lint/fmt PASS, generated asset reproduced, and `quality:gate` PASS. No Aspire AppHost or
+Docker resource was started.
+
+## Open Questions
+
+- None blocking Phase A.
+
+## Drift and Debt
+
+- Drift: current Deno KV arm lacks the assumed existing HTTP health check.
+- Drift: #1718 line 44 / D3 used expression projection where 13.5.3 requires endpoint value APIs.
+- Debt response: S6 satisfied the next-gate split condition; residual direct-child debt remains
+  visible at 45 immediate scaffold children (43 files plus two role directories).
+
+## Commits
+
+- See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).

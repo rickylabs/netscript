@@ -1,0 +1,3 @@
+{"resources":[{"displayName":"postgres","state":"Starting","healthReports":{}},{"displayName":"workers","state":"Starting","healthReports":{}}]}
+{"resources":[{"displayName":"postgres","state":"Running","healthReports":{"postgres_listener":{"status":"Healthy","description":"postgres listener ready on localhost:49152"}}},{"displayName":"workers","state":"Starting","healthReports":{}}]}
+{"resources":[{"displayName":"workers","state":"Running","healthReports":{"self":{"status":"Healthy"}}},{"displayName":"postgres","state":"Running","healthReports":{"postgres_listener":{"status":"Healthy","description":"postgres listener ready on localhost:49152"}}}]}

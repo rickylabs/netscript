@@ -1,0 +1,23 @@
+{
+  "appHost": "/workspace/app/aspire/apphost.mts",
+  "cleanup": true,
+  "commands": [
+    [
+      "aspire",
+      "stop",
+      "--apphost",
+      "/workspace/app/aspire/apphost.mts",
+      "--non-interactive",
+      "--nologo"
+    ],
+    [
+      "aspire",
+      "stop",
+      "--force",
+      "--apphost",
+      "/workspace/app/aspire/apphost.mts",
+      "--non-interactive",
+      "--nologo"
+    ]
+  ]
+}

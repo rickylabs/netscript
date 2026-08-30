@@ -1,0 +1,32 @@
+# S2 sagas JSR/public-surface evidence
+
+## Publish dry-run
+
+Command: `(cd plugins/sagas && deno publish --dry-run --allow-dirty)`
+Raw exit: `0`
+Verdict: `Success Dry run complete`; no slow-type warning and no new warning class.
+Baseline warnings retained exactly:
+
+1. `services/src/main.ts` bootstrap-module dynamic import.
+2. `src/runtime/saga-runner.ts` specifier dynamic import.
+3. `src/runtime/saga-runner.ts` bootstrap-module dynamic import.
+
+## Documentation lint
+
+Command: `deno doc --lint plugins/sagas/mod.ts`
+Raw exit: `1`
+Verdict: one error only, the pre-existing `private-type-ref` on `sagasPlugin: PluginManifest`,
+tracked by #1708. No new documentation error.
+
+## Consumer imports
+
+Command: `deno test --allow-all --unstable-kv plugins/sagas/tests/public/deprecated-default-port_test.ts`
+Raw exit: `0`
+Verdict: root, `./public`, `./runtime`, and `./aspire` import the compatibility export and agree on
+its locked value.
+
+## Plugin unit suite
+
+Command: `deno test --allow-all --unstable-kv plugins/sagas/tests`
+Raw exit: `0`
+Verdict: 33 passed, 0 failed.

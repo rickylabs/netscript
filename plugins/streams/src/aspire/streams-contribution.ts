@@ -17,10 +17,11 @@ export class StreamsAspireContribution extends AspireNSPluginContribution {
     builder: AspireBuilder,
     ctx: ContributionContext,
   ): readonly AspireResource[] {
+    const servicePort = ctx.port('streams');
     const service = builder.addDenoService('streams', {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/streams/services/src/main.ts',
-      port: ctx.port('streams', 4437),
+      port: servicePort,
       permissions: [
         '--allow-net',
         '--allow-env',
@@ -40,15 +41,16 @@ export class StreamsAspireContribution extends AspireNSPluginContribution {
   /** Declare environment values used by the streams Aspire resource. */
   override declareEnv(_ctx: ContributionContext): Record<string, EnvSource | string> {
     return {
-      DURABLE_STREAMS_URL: 'http://localhost:4437',
+      DURABLE_STREAMS_URL: { kind: 'resource', resource: 'streams', key: 'url' },
     };
   }
 
   /** Declare health checks used by plugin doctor commands. */
-  override declareHealthChecks(_ctx: ContributionContext): readonly HealthCheckSpec[] {
+  override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
+    const servicePort = ctx.port('streams');
     return [{
       resource: 'streams',
-      url: 'http://localhost:4437/health',
+      url: `http://localhost:${servicePort}/health`,
       expect: 200,
       timeoutMs: 3000,
     }];

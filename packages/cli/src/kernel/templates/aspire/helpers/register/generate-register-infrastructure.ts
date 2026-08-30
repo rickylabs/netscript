@@ -7,24 +7,24 @@
  * resource resolution.
  */
 
-import type { CacheEntry } from '@netscript/aspire/types'
-import type { RegisterInfrastructureOptions } from '../types.ts'
-import { fileHeader, safeIdentifier } from '../_utils.ts'
-import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts'
-import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts'
-import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts'
-import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts'
+import type { CacheEntry } from '@netscript/aspire/types';
+import type { RegisterInfrastructureOptions } from '../types.ts';
+import { fileHeader, safeIdentifier } from '../_utils.ts';
+import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
+import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts';
+import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
+import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 
 /** Maps database engine names to SDK builder method names. */
 const DB_ENGINE_METHODS: Record<string, string> = {
   Postgres: 'addPostgres',
   Mysql: 'addMySql',
   Mssql: 'addSqlServer',
-}
+};
 
-const MSSQL_CONTAINER_IMAGE = 'mssql/server'
-const MSSQL_CONTAINER_TAG = '2022-latest'
-const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026'
+const MSSQL_CONTAINER_IMAGE = 'mssql/server';
+const MSSQL_CONTAINER_TAG = '2022-latest';
+const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026';
 
 /** Default Redis-compatible cache container images. */
 const CACHE_CONTAINER_IMAGES: Record<
@@ -33,19 +33,19 @@ const CACHE_CONTAINER_IMAGES: Record<
 > = {
   Redis: { image: 'docker.io/library/redis', tag: '7' },
   Garnet: { image: 'ghcr.io/microsoft/garnet', tag: '1.1.1' },
-}
+};
 
 /** Default Redis-compatible TCP port. */
-const CACHE_DEFAULT_PORT = 6379
+const CACHE_DEFAULT_PORT = 6379;
 
 /** Deno KV Connect container image (shared KV over HTTP). */
 const DENOKV_CONTAINER = {
   image: 'ghcr.io/denoland/denokv',
   tag: '0.11.0',
-} as const
+} as const;
 
 /** Deno KV Connect HTTP port inside the container. */
-const DENOKV_HTTP_PORT = 4512
+const DENOKV_HTTP_PORT = 4512;
 
 /**
  * Generates the register-infrastructure.mts file content.
@@ -56,28 +56,36 @@ const DENOKV_HTTP_PORT = 4512
 export function generateRegisterInfrastructure(
   options: RegisterInfrastructureOptions,
 ): string {
-  const { databases, caches, primaryDatabase, primaryCache } = options
-  const dbEntries = Object.entries(databases)
-  const cacheEntries = Object.entries(caches)
+  const { databases, caches, primaryDatabase, primaryCache } = options;
+  const dbEntries = Object.entries(databases);
+  const cacheEntries = Object.entries(caches);
   const usesDenoKvContainer = cacheEntries.some(([, entry]) =>
     entry.Engine === 'DenoKv' &&
     !['External', 'Local'].includes(entry.Mode ?? 'Container')
-  )
+  );
   const hasPersistentContainerDatabase = dbEntries.some(([, entry]) =>
     entry.Engine !== 'Sqlite' &&
     (entry.Mode ?? 'Container') === 'Container' &&
     entry.Persistent === true
-  )
+  );
+  const usesDatabaseListenerReadiness = dbEntries.some(([, entry]) =>
+    ['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine) &&
+    (entry.Mode ?? 'Container') === 'Container'
+  );
+  const usesRespReadiness = cacheEntries.some(([, entry]) =>
+    ['Redis', 'Garnet'].includes(entry.Engine) &&
+    !['External', 'Local'].includes(entry.Mode ?? 'Container')
+  );
   const sdkValueImports = [
     ...(hasPersistentContainerDatabase ? ['ContainerLifetime'] : []),
-    ...(cacheEntries.some(([, entry]) =>
-        !['External', 'Local'].includes(entry.Mode ?? 'Container')
-      )
+    ...(cacheEntries.some(([, entry]) => !['External', 'Local'].includes(entry.Mode ?? 'Container'))
       ? ['EndpointProperty']
       : []),
-  ]
+  ];
   const compatImports = [
     'type CacheWiring',
+    ...(usesDatabaseListenerReadiness ? ['createListenerReadinessCheck'] : []),
+    ...(usesRespReadiness ? ['createRespPingCheck'] : []),
     ...(dbEntries.some(([, entry]) =>
         ['Postgres', 'Mysql'].includes(entry.Engine) &&
         (entry.Mode ?? 'Container') === 'Container'
@@ -90,43 +98,39 @@ export function generateRegisterInfrastructure(
       )
       ? ['ensureGarnetToolManifest']
       : []),
-    ...(usesDenoKvContainer
-      ? ['generateAccessToken as _generateAccessToken']
-      : []),
+    ...(usesDenoKvContainer ? ['generateAccessToken as _generateAccessToken'] : []),
     ...(usesResolvedDataPath(dbEntries, cacheEntries) ? ['resolveDataPath'] : []),
-    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto')
-      ? ['shouldUseContainerCache']
-      : []),
-  ]
+    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto') ? ['shouldUseContainerCache'] : []),
+  ];
 
   // Build database registration blocks
-  const dbBlocks: string[] = []
+  const dbBlocks: string[] = [];
   for (const [name, entry] of dbEntries) {
-    const id = safeIdentifier(name)
-    const mode = entry.Mode ?? 'Container'
+    const id = safeIdentifier(name);
+    const mode = entry.Mode ?? 'Container';
 
     if (entry.Engine === 'Sqlite') {
-      const sqlitePath = entry.DataPath ?? entry.DatabaseName ?? `${name}.sqlite`
+      const sqlitePath = entry.DataPath ?? entry.DatabaseName ?? `${name}.sqlite`;
       dbBlocks.push(`  // ${name} (Sqlite, resolved file-backed resource)
   const ${id} = await builder.addParameter('${name}', {
     value: resolveDataPath(appHostDir, '${sqlitePath}', '${name}'),
     secret: false,
   });
-  databases.set('${name}', ${id});`)
-      continue
+  databases.set('${name}', ${id});`);
+      continue;
     }
 
     if (mode === 'External') {
       dbBlocks.push(`  // ${name} (${entry.Engine}, External)
   const ${id} = await builder.addConnectionString('${name}');
-  databases.set('${name}', ${id});`)
-      continue
+  databases.set('${name}', ${id});`);
+      continue;
     }
 
-    const method = DB_ENGINE_METHODS[entry.Engine] ?? 'addConnectionString'
-    const lines: string[] = []
+    const method = DB_ENGINE_METHODS[entry.Engine] ?? 'addConnectionString';
+    const lines: string[] = [];
 
-    lines.push(`  // ${name} (${entry.Engine}, Container)`)
+    lines.push(`  // ${name} (${entry.Engine}, Container)`);
     // TypeScript Aspire SDK: every `builder.addXxx(...)` and `.addDatabase(...)`
     // returns a ResourcePromise. The chained configuration methods
     // (`withLifetime`, `withDataBindMount`, …) are defined on the promise,
@@ -135,82 +139,103 @@ export function generateRegisterInfrastructure(
     // "Argument 'source' is a Promise-like value". So we `await` the entire
     // chain here.
     if (entry.Engine === 'Postgres' || entry.Engine === 'Mysql') {
-      lines.push(`  const ${id}_password = await builder.addParameter('${name}-password', {`)
-      lines.push(`    value: ensureDatabasePassword(appHostDir, '${name}'),`)
-      lines.push(`    secret: true,`)
-      lines.push(`  });`)
-      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
-      lines.push(`    password: ${id}_password,`)
-      lines.push(`  })`)
+      lines.push(`  const ${id}_password = await builder.addParameter('${name}-password', {`);
+      lines.push(`    value: ensureDatabasePassword(appHostDir, '${name}'),`);
+      lines.push(`    secret: true,`);
+      lines.push(`  });`);
+      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`);
+      if (entry.Port !== undefined) {
+        lines.push(`    port: ${entry.Port},`);
+      }
+      lines.push(`    password: ${id}_password,`);
+      lines.push(`  })`);
     } else if (entry.Engine === 'Mssql') {
       lines.push(
         `  const ${id}_password = await builder.addParameter('${name}-password', {`,
-      )
-      lines.push(`    value: '${MSSQL_SA_PASSWORD}',`)
-      lines.push(`    secret: true,`)
-      lines.push(`  });`)
-      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
-      lines.push(`    password: ${id}_password,`)
-      lines.push(`  })`)
+      );
+      lines.push(`    value: '${MSSQL_SA_PASSWORD}',`);
+      lines.push(`    secret: true,`);
+      lines.push(`  });`);
+      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`);
+      if (entry.Port !== undefined) {
+        lines.push(`    port: ${entry.Port},`);
+      }
+      lines.push(`    password: ${id}_password,`);
+      lines.push(`  })`);
     } else {
-      lines.push(`  const ${id}_server = await builder.${method}('${name}')`)
+      lines.push(`  const ${id}_server = await builder.${method}('${name}')`);
     }
 
     if (entry.Persistent) {
       lines.push(
         `    // Isolated starts randomize ports, so a configured-persistent container must remain session-scoped.`,
-      )
+      );
       lines.push(
         `    .withLifetime(isolatedStart ? ContainerLifetime.Session : ContainerLifetime.Persistent)`,
-      )
+      );
     }
     if (entry.DataPath) {
       lines.push(
         `    .withDataBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'))`,
-      )
+      );
     }
     if (entry.Engine === 'Mssql') {
-      lines.push(`    .withImage('${MSSQL_CONTAINER_IMAGE}')`)
+      lines.push(`    .withImage('${MSSQL_CONTAINER_IMAGE}')`);
       lines.push(
         `    .withImageTag('${entry.ImageTag ?? MSSQL_CONTAINER_TAG}')`,
-      )
-      lines.push(`    .withEnvironment('ACCEPT_EULA', 'Y')`)
-      lines.push(`    .withEnvironment('SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`)
+      );
+      lines.push(`    .withEnvironment('ACCEPT_EULA', 'Y')`);
+      lines.push(`    .withEnvironment('SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`);
       lines.push(
         `    .withEnvironment('MSSQL_SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`,
-      )
+      );
     }
 
     // Close the server chain with semicolon
-    const lastIdx = lines.length - 1
-    lines[lastIdx] = lines[lastIdx] + ';'
+    const lastIdx = lines.length - 1;
+    lines[lastIdx] = lines[lastIdx] + ';';
+
+    if (['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine)) {
+      const healthCheckKey = `${name}_listener`;
+      lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`);
+      lines.push(
+        `    const endpoint = await ${id}_server.getEndpoint('tcp');`,
+      );
+      lines.push(`    const host = await endpoint.host();`);
+      lines.push(`    const port = await endpoint.port();`);
+      lines.push(
+        `    return createListenerReadinessCheck({ kind: '${entry.Engine.toLowerCase()}', host, port })();`,
+      );
+      lines.push(`  });`);
+      lines.push(`  await ${id}_server.withHealthCheck('${healthCheckKey}');`);
+    }
 
     // Add database child resource if DatabaseName is specified
     if (entry.DatabaseName) {
       lines.push(
         `  const ${id} = await ${id}_server.addDatabase('${entry.DatabaseName}');`,
-      )
+      );
     } else {
-      lines.push(`  const ${id} = ${id}_server;`)
+      lines.push(`  const ${id} = ${id}_server;`);
     }
 
-    lines.push(`  databases.set('${name}', ${id});`)
-    dbBlocks.push(lines.join('\n'))
+    lines.push(`  databases.set('${name}', ${id});`);
+    dbBlocks.push(lines.join('\n'));
   }
 
   // Build cache registration blocks
-  const cacheBlocks: string[] = []
+  const cacheBlocks: string[] = [];
   for (const [name, entry] of cacheEntries) {
-    const id = safeIdentifier(name)
-    const mode = entry.Mode ?? 'Container'
+    const id = safeIdentifier(name);
+    const mode = entry.Mode ?? 'Container';
 
     // DenoKv Local — in-process Deno.openKv(), no Aspire resource.
     if (entry.Engine === 'DenoKv' && mode === 'Local') {
       cacheBlocks.push(
         `  // ${name} (DenoKv, Local — in-process Deno.openKv(), no Aspire resource)\n` +
           `  cacheWiring.set('${name}', { resource: null, reference: null, env: {}, local: true });`,
-      )
-      continue
+      );
+      continue;
     }
 
     // External — connection-string resource; consumer wires by reference only.
@@ -218,8 +243,8 @@ export function generateRegisterInfrastructure(
       cacheBlocks.push(`  // ${name} (${entry.Engine}, External)
   const ${id} = await builder.addConnectionString('${name}');
   caches.set('${name}', ${id});
-  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}, env: {}, local: false });`)
-      continue
+  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}, env: {}, local: false });`);
+      continue;
     }
 
     // Auto — environment-aware at apphost runtime (D5/D6). Docker present →
@@ -231,76 +256,76 @@ export function generateRegisterInfrastructure(
     if (mode === 'Auto') {
       const container = entry.Engine === 'DenoKv'
         ? denokvContainerSetup(id, name, entry)
-        : redisGarnetContainerSetup(id, name, entry)
-      const executable = garnetExecutableSetup(id, name, entry)
+        : redisGarnetContainerSetup(id, name, entry);
+      const executable = garnetExecutableSetup(id, name, entry);
       const containerLabel = entry.Engine === 'DenoKv'
         ? 'DenoKv container'
-        : `${entry.Engine} container`
-      const lines: string[] = []
+        : `${entry.Engine} container`;
+      const lines: string[] = [];
 
       lines.push(
         `  // ${name} (${entry.Engine}, Auto — Docker → ${containerLabel}; Docker-less → Garnet executable)`,
-      )
-      lines.push(`  let ${id}_wiring: CacheWiring;`)
-      lines.push(`  if (shouldUseContainerCache()) {`)
-      for (const line of container.lines) lines.push(`  ${line}`)
-      lines.push(`    ${id}_wiring = ${container.wiring};`)
-      lines.push(`  } else {`)
-      for (const line of executable.lines) lines.push(`  ${line}`)
-      lines.push(`    ${id}_wiring = ${executable.wiring};`)
-      lines.push(`  }`)
-      lines.push(`  cacheWiring.set('${name}', ${id}_wiring);`)
-      cacheBlocks.push(lines.join('\n'))
-      continue
+      );
+      lines.push(`  let ${id}_wiring: CacheWiring;`);
+      lines.push(`  if (shouldUseContainerCache()) {`);
+      for (const line of container.lines) lines.push(`  ${line}`);
+      lines.push(`    ${id}_wiring = ${container.wiring};`);
+      lines.push(`  } else {`);
+      for (const line of executable.lines) lines.push(`  ${line}`);
+      lines.push(`    ${id}_wiring = ${executable.wiring};`);
+      lines.push(`  }`);
+      lines.push(`  cacheWiring.set('${name}', ${id}_wiring);`);
+      cacheBlocks.push(lines.join('\n'));
+      continue;
     }
 
     // DenoKv Container — Deno KV Connect over HTTP with an access token.
     if (entry.Engine === 'DenoKv') {
-      const setup = denokvContainerSetup(id, name, entry)
+      const setup = denokvContainerSetup(id, name, entry);
       const lines = [
         `  // ${name} (DenoKv, Container — Deno KV Connect)`,
         ...setup.lines,
         `  cacheWiring.set('${name}', ${setup.wiring});`,
-      ]
-      cacheBlocks.push(lines.join('\n'))
-      continue
+      ];
+      cacheBlocks.push(lines.join('\n'));
+      continue;
     }
 
     // Garnet Executable — Docker-less self-provisioned dotnet tool (#372).
     if (entry.Engine === 'Garnet' && mode === 'Executable') {
-      const setup = garnetExecutableSetup(id, name, entry)
+      const setup = garnetExecutableSetup(id, name, entry);
       const lines = [
         `  // ${name} (Garnet, Executable — Docker-less dotnet tool)`,
         ...setup.lines,
         `  cacheWiring.set('${name}', ${setup.wiring});`,
-      ]
-      cacheBlocks.push(lines.join('\n'))
-      continue
+      ];
+      cacheBlocks.push(lines.join('\n'));
+      continue;
     }
 
     // Redis / Garnet Container — Redis-compatible TCP endpoint.
-    const setup = redisGarnetContainerSetup(id, name, entry)
+    const setup = redisGarnetContainerSetup(id, name, entry);
     const lines = [
       `  // ${name} (${entry.Engine}, Container)`,
       ...setup.lines,
       `  cacheWiring.set('${name}', ${setup.wiring});`,
-    ]
-    cacheBlocks.push(lines.join('\n'))
+    ];
+    cacheBlocks.push(lines.join('\n'));
   }
 
   // Primary resolution
   const primaryDbLine = primaryDatabase
     ? `  const primaryDatabase = databases.get('${primaryDatabase}') ?? null;`
-    : `  const primaryDatabase = null;`
+    : `  const primaryDatabase = null;`;
   const primaryCacheLine = primaryCache
     ? `  const primaryCache = caches.get('${primaryCache}') ?? null;`
-    : `  const primaryCache = null;`
+    : `  const primaryCache = null;`;
   const primaryCacheEndpointLine = primaryCache
     ? `  const primaryCacheEndpoint = cacheEndpoints.get('${primaryCache}') ?? null;`
-    : `  const primaryCacheEndpoint = null;`
+    : `  const primaryCacheEndpoint = null;`;
   const primaryCacheWiringLine = primaryCache
     ? `  const primaryCacheWiring = cacheWiring.get('${primaryCache}') ?? null;`
-    : `  const primaryCacheWiring = null;`
+    : `  const primaryCacheWiring = null;`;
 
   return renderTemplateAssetSync(
     TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterInfrastructure1,
@@ -309,22 +334,22 @@ export function generateRegisterInfrastructure(
       __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
       __slot2__: String(
         sdkValueImports.length > 0
-          ? `import { ${sdkValueImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
+          ? `import { ${
+            sdkValueImports.join(', ')
+          } } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
           : '',
       ),
       __slot3__: String(
-        `import { ${compatImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
+        `import { ${
+          compatImports.join(', ')
+        } } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
       ),
       __slot4__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
       __slot5__: String(
-        dbBlocks.length > 0
-          ? dbBlocks.join('\n\n')
-          : '  // No databases configured',
+        dbBlocks.length > 0 ? dbBlocks.join('\n\n') : '  // No databases configured',
       ),
       __slot6__: String(
-        cacheBlocks.length > 0
-          ? cacheBlocks.join('\n\n')
-          : '  // No caches configured',
+        cacheBlocks.length > 0 ? cacheBlocks.join('\n\n') : '  // No caches configured',
       ),
       __slot7__: String(primaryDbLine),
       __slot8__: String(primaryCacheLine),
@@ -336,7 +361,7 @@ export function generateRegisterInfrastructure(
           : '',
       ),
     },
-  )
+  );
 }
 
 function usesResolvedDataPath(
@@ -350,7 +375,7 @@ function usesResolvedDataPath(
     entry.DataPath !== undefined &&
     !['External', 'Local'].includes(entry.Mode ?? 'Container') &&
     !(entry.Engine === 'Garnet' && entry.Mode === 'Executable')
-  )
+  );
 }
 
 /**
@@ -364,33 +389,33 @@ function denokvContainerSetup(
   name: string,
   entry: CacheEntry,
 ): { lines: string[]; wiring: string } {
-  const tag = entry.ImageTag ?? DENOKV_CONTAINER.tag
-  const imageRef = `${DENOKV_CONTAINER.image}:${tag}`
-  const lines: string[] = []
+  const tag = entry.ImageTag ?? DENOKV_CONTAINER.tag;
+  const imageRef = `${DENOKV_CONTAINER.image}:${tag}`;
+  const lines: string[] = [];
 
-  lines.push(`  const ${id}_token = _generateAccessToken();`)
-  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
+  lines.push(`  const ${id}_token = _generateAccessToken();`);
+  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`);
   lines.push(
     `    .withEndpoint({ name: 'http', targetPort: ${DENOKV_HTTP_PORT}, scheme: 'http' })`,
-  )
-  lines.push(`    .withContainerRuntimeArgs(['--init'])`)
-  lines.push(`    .withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])`)
-  lines.push(`    .withEnvironment('DENO_KV_ACCESS_TOKEN', ${id}_token)`)
+  );
+  lines.push(`    .withContainerRuntimeArgs(['--init'])`);
+  lines.push(`    .withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])`);
+  lines.push(`    .withEnvironment('DENO_KV_ACCESS_TOKEN', ${id}_token)`);
   if (entry.DataPath) {
     lines.push(
       `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
-    )
+    );
   }
 
-  const lastIdx = lines.length - 1
-  lines[lastIdx] = lines[lastIdx] + ';'
+  const lastIdx = lines.length - 1;
+  lines[lastIdx] = lines[lastIdx] + ';';
 
-  lines.push(`  const ${id}_httpEndpoint = await ${id}.getEndpoint('http');`)
+  lines.push(`  const ${id}_httpEndpoint = await ${id}.getEndpoint('http');`);
   lines.push(
     `  const ${id}_httpUrl = ${id}_httpEndpoint.property(EndpointProperty.Url);`,
-  )
-  lines.push(`  caches.set('${name}', ${id});`)
-  lines.push(`  cacheEndpoints.set('${name}', ${id}_httpEndpoint);`)
+  );
+  lines.push(`  caches.set('${name}', ${id});`);
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_httpEndpoint);`);
 
   // DENO_KV_URL is injected explicitly (scheme-complete, via EndpointProperty.Url)
   // so the consumer's autoDetectProvider() resolves the KV Connect URL from an env
@@ -399,8 +424,8 @@ function denokvContainerSetup(
   // resource is literally named 'kv' (services__kv__http__0), silently falling back
   // to in-process Deno.openKv() otherwise.
   const wiring =
-    `{ resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_URL: ${id}_httpUrl, DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false }`
-  return { lines, wiring }
+    `{ resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_URL: ${id}_httpUrl, DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false }`;
+  return { lines, wiring };
 }
 
 /**
@@ -414,28 +439,31 @@ function garnetExecutableSetup(
   name: string,
   entry: CacheEntry,
 ): { lines: string[]; wiring: string } {
-  const version = entry.ToolVersion ?? SCAFFOLD_VERSIONS.GARNET_TOOL
-  const lines: string[] = []
+  const version = entry.ToolVersion ?? SCAFFOLD_VERSIONS.GARNET_TOOL;
+  const lines: string[] = [];
 
   lines.push(
     `  const ${id}_workdir = ensureGarnetToolManifest(appHostDir, '${version}');`,
-  )
+  );
   lines.push(
     `  const ${id} = await builder.addExecutable('${name}', 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
-  )
+  );
   lines.push(
-    `    .withEndpoint({ name: 'tcp', targetPort: ${CACHE_DEFAULT_PORT}, scheme: 'tcp' });`,
-  )
-  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+    `    .withEndpoint(${cacheEndpointOptions(entry.Port)});`,
+  );
+  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`);
   lines.push(
     `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
-  )
-  lines.push(`  caches.set('${name}', ${id});`)
-  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+  );
+  if (['Redis', 'Garnet'].includes(entry.Engine)) {
+    appendRespReadinessLines(lines, id, name);
+  }
+  lines.push(`  caches.set('${name}', ${id});`);
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`);
 
   const wiring =
-    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: 'garnet' }, local: false }`
-  return { lines, wiring }
+    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: 'garnet' }, local: false }`;
+  return { lines, wiring };
 }
 
 /**
@@ -449,33 +477,47 @@ function redisGarnetContainerSetup(
   entry: CacheEntry,
 ): { lines: string[]; wiring: string } {
   const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
-    CACHE_CONTAINER_IMAGES.Redis
-  const tag = entry.ImageTag ?? image.tag
-  const imageRef = `${image.image}:${tag}`
-  const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'
-  const lines: string[] = []
+    CACHE_CONTAINER_IMAGES.Redis;
+  const tag = entry.ImageTag ?? image.tag;
+  const imageRef = `${image.image}:${tag}`;
+  const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis';
+  const lines: string[] = [];
 
-  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
-  lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
+  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`);
+  lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`);
   if (entry.DataPath) {
     lines.push(
       `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
-    )
+    );
   }
 
-  const lastIdx = lines.length - 1
-  lines[lastIdx] = lines[lastIdx] + ';'
+  const lastIdx = lines.length - 1;
+  lines[lastIdx] = lines[lastIdx] + ';';
 
-  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`);
   lines.push(
     `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
-  )
-  lines.push(`  caches.set('${name}', ${id});`)
-  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+  );
+  if (['Redis', 'Garnet'].includes(entry.Engine)) {
+    appendRespReadinessLines(lines, id, name);
+  }
+  lines.push(`  caches.set('${name}', ${id});`);
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`);
 
   const wiring =
-    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false }`
-  return { lines, wiring }
+    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false }`;
+  return { lines, wiring };
+}
+
+function appendRespReadinessLines(lines: string[], id: string, name: string): void {
+  const healthCheckKey = `${name}_resp`;
+  lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`);
+  lines.push(`    const endpoint = await ${id}.getEndpoint('tcp');`);
+  lines.push(`    const host = await endpoint.host();`);
+  lines.push(`    const port = await endpoint.port();`);
+  lines.push(`    return createRespPingCheck({ host, port })();`);
+  lines.push(`  });`);
+  lines.push(`  await ${id}.withHealthCheck('${healthCheckKey}');`);
 }
 
 function cacheEndpointOptions(port: number | undefined): string {
@@ -483,9 +525,9 @@ function cacheEndpointOptions(port: number | undefined): string {
     "name: 'tcp'",
     `targetPort: ${CACHE_DEFAULT_PORT}`,
     "scheme: 'tcp'",
-  ]
+  ];
   if (port !== undefined) {
-    options.unshift(`port: ${port}`)
+    options.unshift(`port: ${port}`);
   }
-  return `{ ${options.join(', ')} }`
+  return `{ ${options.join(', ')} }`;
 }

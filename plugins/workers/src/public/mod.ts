@@ -63,7 +63,6 @@ const workersManifest = definePlugin('@netscript/plugin-workers', VERSION)
   .withService({
     name: 'workers-api',
     entrypoint: './services/src/main.ts',
-    port: 8091,
   })
   .withBackgroundProcessor({
     name: 'workers-combined',
