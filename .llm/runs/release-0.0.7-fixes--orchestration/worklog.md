@@ -5579,3 +5579,45 @@ S2D dispatched: quality/arch/JSR/publish/read-only-cascade evidence; `check:asse
 `NOT_RUN` because it writes before it diffs; lint/fmt recorded N/A by configuration; runtime gate stays
 `NOT_RUN` with the **corrected** rationale — D-42/D-43 are resolved, so it is queued on lease
 availability rather than blocked by topology, and the author is told not to restate the dead blocker.
+
+### #1357 S2D accepted, Tier-A PASS at `b8846d6b3`, IMPL-EVAL cycle 1 dispatched
+
+S2D is artifacts-only (three run-dir files) and correct: the stale "9 existing ceiling TS files" is now
+**10** in both `plan.md` rows 221 and 222 — the carry-forward that had been passed as prose twice and
+lost twice; naming the exact row numbers is what made it land. The runtime rows are framed truthfully —
+"D-42/D-43 are resolved; execution is queued on the cluster lease", "queued, not topology-blocked",
+"another lane currently holds the singleton runtime lease" — and the author acquired no lease and
+started nothing.
+
+Tier-A sweep, re-derived by me in a detached worktree: whole `packages/cli` **1386/0**; `arch:check`,
+`check:agent-docs-prose`, `check:publish-assets`, `check:mcp-export-corpus`, CLI JSR audit all exit 0;
+`deno.lock` byte-unchanged; ceiling **exactly 12**; tree clean after the sweep. `check:assets-barrel`
+`NOT_RUN` by design. Lint/fmt recorded **N/A by configuration**, not green.
+
+Both prior findings verified closed at the blob rather than from prose: the gate is **selected** into
+`RUNTIME_GATES` at `capability-suites.ts:54`, and the D13 help↔role seam renders **real** command help
+and compares it to independently planned roles. **Tier-A PASS**, signed `7bc715b68`, pushed.
+
+IMPL-EVAL cycle 1 dispatched at `7bc715b68`, native opposite-family Fable 5, into `007-eval-1357b`.
+Preconditions checked first: no unlanded slice remains (S2D was the last), author idle, local == remote.
+The brief carries an explicit safety constraint I have not had to write before — **another lane holds
+the runtime lease and has live containers, so the evaluator must never run `e2e:cli`, AppHost, or any
+container command**; the risk here is not scope creep but colliding with a live leaseholder.
+
+### Runtime queue and an ownership boundary I declined to cross
+
+Recorded in `runtime-queue.md`. **#1738 and #1740 are not this lane's work** — both carry
+`epic:aspire-13-5` on `aspire-13-5-s4`/`s5` branches, both `status:ci-fail`, both `impl-eval:skip`. They
+belong to the Aspire lane, which is the same lane currently holding the runtime lease. Integrating or
+rerunning them from here would cross a lane boundary and collide with a live leaseholder, so I did not
+adopt them; flagged to the coordinator rather than silently actioned or silently dropped.
+
+The **#1734 blocker is retired**, not carried: main `52a881c588` contains the Fresh hydration fix, so
+#1758's 26/1 `e2e:cli` receipt is now a **stale classification** rather than a standing blocker, and its
+rerun must produce a fresh verdict rather than inherit the old one.
+
+Lane serial runtime order once Aspire returns exact zero: **#1764** (Flow-B, one gate from ready) →
+**#1758** (integrate `52a881c588`, rerun bare `e2e:cli`, renew evaluator currency) → **#1739**
+(integrate, `scaffold.runtime` rerun for its single unticked box) → **#1781** (after IMPL-EVAL).
+Lease not requested: `docker ps -a` shows live `relay-s7-phase-b-*` containers, so it is demonstrably
+not free.
