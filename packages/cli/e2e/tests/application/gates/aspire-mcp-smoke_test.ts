@@ -37,6 +37,10 @@ const fixture: RecordedFixture = JSON.parse(
   ),
 );
 
+const DASHBOARD_UNAVAILABLE = new Error(
+  'tools/call failed: {"code":-32603,"message":"The Aspire Dashboard is not available in the running AppHost"}',
+);
+
 function transport(
   tools: readonly string[],
   calls: Readonly<Record<string, unknown>>,
@@ -48,7 +52,8 @@ function transport(
     callTool: (name, args = {}) => {
       const resourceName = Reflect.get(args, 'resourceName');
       const keyed = typeof resourceName === 'string' ? calls[`${name}:${resourceName}`] : undefined;
-      return Promise.resolve(keyed ?? calls[name]);
+      const result = keyed ?? calls[name];
+      return result instanceof Error ? Promise.reject(result) : Promise.resolve(result);
     },
     close: () => Promise.resolve({ code: 0, signal: null, graceful: true }),
     transcript: () => transcript,
@@ -143,7 +148,80 @@ Deno.test('Aspire MCP smoke records the exact baseline delta and both-tier visib
   assertEquals(receipt.visibility.observedMcpExcluded, ['postgres-cli']);
   assertEquals(receipt.visibility.describeListsExcluded, true);
   assertEquals(receipt.visibility.ok, true);
-  assertEquals(receipt.structuredLogs, { entryCount: 0, isError: false });
+  assertEquals(receipt.structuredLogs, {
+    entryCount: 0,
+    isError: false,
+    dashboardAvailable: true,
+  });
+});
+
+Deno.test('Aspire MCP smoke records unavailable AppHost dashboard as degraded', async () => {
+  const receipt = await runAspireMcpSmoke(
+    input(),
+    dependencies(
+      transport(fixture.tools, {
+        list_apphosts: fixture.apphosts,
+        doctor: fixture.doctor,
+        list_resources: fixture.resources,
+        'list_console_logs:postgres-cli': fixture.excludedConsole,
+        'list_console_logs:users': fixture.usersConsole,
+        list_structured_logs: DASHBOARD_UNAVAILABLE,
+      }),
+      transport(fixture.dashboardTools, {}),
+    ),
+  );
+  assertEquals(receipt.toolsMissing, []);
+  assertEquals(receipt.baselineDiff, { added: [], removed: [] });
+  assertEquals(receipt.documentedUnobserved, ['get_integration_docs']);
+  assertEquals(receipt.dashboardOnlyTools, ASPIRE_MCP_DASHBOARD_TOOLS);
+  assertEquals(receipt.visibility.ok, true);
+  assertEquals(receipt.redaction, { secretParamsNull: true, plaintextLeak: false });
+  assertEquals(receipt.structuredLogs.entryCount, null);
+  assertEquals(receipt.structuredLogs.isError, true);
+  assertEquals(receipt.structuredLogs.dashboardAvailable, false);
+});
+
+Deno.test('Aspire MCP smoke rejects a different structured-log error', async () => {
+  await assertRejects(
+    () =>
+      runAspireMcpSmoke(
+        input(),
+        dependencies(
+          transport(fixture.tools, {
+            list_apphosts: fixture.apphosts,
+            doctor: fixture.doctor,
+            list_resources: fixture.resources,
+            'list_console_logs:postgres-cli': fixture.excludedConsole,
+            'list_console_logs:users': fixture.usersConsole,
+            list_structured_logs: new Error(
+              'tools/call failed: {"code":-32603,"message":"different internal error"}',
+            ),
+          }),
+          transport(fixture.dashboardTools, {}),
+        ),
+      ),
+    Error,
+    'different internal error',
+  );
+});
+
+Deno.test('Aspire MCP smoke rejects dashboard-unavailable error on a non-dashboard tool', async () => {
+  await assertRejects(
+    () =>
+      runAspireMcpSmoke(
+        input(),
+        dependencies(
+          transport(fixture.tools, {
+            list_apphosts: fixture.apphosts,
+            doctor: fixture.doctor,
+            list_resources: DASHBOARD_UNAVAILABLE,
+          }),
+          transport(fixture.dashboardTools, {}),
+        ),
+      ),
+    Error,
+    'Dashboard is not available',
+  );
 });
 
 Deno.test('Aspire MCP outer timeout leaves room to persist an inner-deadline receipt', () => {
@@ -234,6 +312,11 @@ Deno.test('Aspire MCP timeout rejects after persisting a partial receipt', async
   deps.timeouts.initializeMs = 5;
   await assertRejects(() => runAspireMcpSmoke(input(), deps), Error, 'initialize timed out');
   assertEquals(persisted.length, 1);
+  assertEquals(persisted[0].receipt.structuredLogs, {
+    entryCount: null,
+    isError: false,
+    dashboardAvailable: null,
+  });
   const encoded = JSON.stringify(persisted[0]);
   assert(encoded.includes('aspire-mcp-smoke'));
   assert(encoded.includes('SIGKILL'));
