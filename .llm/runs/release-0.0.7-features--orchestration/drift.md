@@ -594,3 +594,31 @@ merely unset. `agentic:launch-codex-slice` does carry `--allow-env`, so it accep
 
 **Not repaired here.** This is repo tooling, not features scope; recorded so the next NAS lane does
 not rediscover it and so an internals leaf can pick it up.
+
+## D-25 — `agentic:codex-resume` cannot pin the route, and the observed effort drifted on the steering send
+
+**Observed.** The #1466 repair thread `01a0515c` was **launched** at the contracted
+`normal_implementation` route — `openai / gpt-5.6-sol / medium`, requested == observed, recorded from
+the authoritative `thread/start` response. After steering it with `agentic:codex-resume`,
+`agentic:codex-status` reports the same thread as `gpt-5.6-sol / **high**`.
+
+**Cause.** `codex-resume.ts` accepts `--thread-id`, `--message`/`--message-file`, `--worktree`,
+`--profile`, `--profile-home`, `--user`, `--dry-run` — and **no `--model` or `--effort`**. It shells
+out to `codex exec resume <id> -- '<msg>'`, which inherits the CLI's ambient default rather than the
+route the thread was launched on. `launch-codex-slice` pins the route through
+`app-server-message-cli --model … --effort …` and enforces requested == observed; the resume path has
+no equivalent, so **no steering send in this repo can pin or verify effort**.
+
+**Impact here: none adverse.** Same agent, same provider, same model, same thread, same worktree;
+only the effort tier moved, and upward, on a slice that turned out to carry a genuine architectural
+correction. It is recorded because an unpinned, unverified route on the steering path means every
+lane's "requested == observed" evidence is a **launch-time** claim only, and silently stops being
+true at the first resume. Any lane that reports a route verdict after a resume is reporting a stale
+measurement.
+
+**Standing practice until the tool is fixed.** Record the route at launch *and* re-read it from
+`agentic:codex-status --user node` after every resume, and report both. Do not restate the launch
+verdict as if it still held.
+
+**Not repaired here** — `.llm/tools/agentic/` is repo tooling, not features scope. It belongs with
+D-24 in an internals leaf.
