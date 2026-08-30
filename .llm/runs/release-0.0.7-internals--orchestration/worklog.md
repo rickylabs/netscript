@@ -5486,3 +5486,21 @@ safety; root test / surface validator if budget allows). Backgrounded per host b
   necessary PLAN-EVAL. Explicitly **prospective and separate** — does not retroactively gate #1774.
   This is the proper-process route for exactly the change two prior chat instructions tried to apply
   ad hoc (D-89, D-94); recorded as vindication of declining those, not as a reversal of that decision.
+
+## D-98 — #1774 SHIPPED
+
+- PR #1775 merged by the owner: `a3ddcbb598f81180437e06f743e24d6ef137b101`, `mergedAt: 2026-08-30T21:05:03Z`.
+  Issue #1774 closed via the `Closes #1774` keyword. `origin/main` now at `a3ddcbb598`.
+- Full close sequence: acceptance-evidence mirror applied for real by CI (issue body ticked from
+  cycle-2 evidence), review thread answered (Augment comma-path finding — documented in Non-Scope,
+  not fixed, correct tradeoff verified empirically with a live Deno probe: `NotCapable`, no mis-write),
+  close-gate SUCCESS, both PR and issue carried sole `status:ready-merge` at merge time.
+- Total evaluator saga for this leaf: 3 transports tried (Claude-print ×2 empty, hybrid/OpenCode ×3
+  with 1 delivered PASS + 1 output-cap failure + 1 owner-stopped retry), ~$10 spent, qualifying
+  verdict ultimately an owner-promoted effort-`high` PASS rather than the originally-bound effort-`max`.
+- **Routing toolchain leaf now proceeds from `a3ddcbb598`**, per the owner's queued instruction. Model
+  ids independently verified live against the OpenRouter catalog before dispatch: `z-ai/glm-5.3-flash`
+  and `qwen/qwen3.8-flash` both **EXIST**; no `-next`-suffixed qwen3.8 variant exists in the catalog,
+  confirming "Qwen3.8-Flash-Next" resolves to the plain `qwen/qwen3.8-flash` id as instructed. Unlike
+  two earlier chat claims this run that falsely asserted GLM was already a sanctioned default, this
+  instruction's technical premises check out.
