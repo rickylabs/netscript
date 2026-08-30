@@ -4290,3 +4290,63 @@ from nested run directories.
 `activeImplementationSlicesPerLane` ceiling with #1734, #1533 and #1616 all mid-flight; opening a
 fourth would breach the limit the cluster sets. It enters the serial queue at the first terminal
 checkpoint among those three.
+
+## 2026-08-30 — #1734 cycle 3 RED→GREEN verified; #1533 F1–F4 closed; #1616 at PLAN-EVAL
+
+### #1734 cycle 3 — the repair that finally covers both directions
+
+**RED `5d16fe17`** reproduced by me in a detached worktree: `6 passed | 5 failed`, exit 1, **test-only**
+(no production source touched). The five failures are exactly F1's four value kinds (string, number,
+boolean, array) and F2's plain object, driven through the real
+`renderToString(<QueryHydrationScript/>)` transport — not a hand-built payload, which matters because
+cycle-1's F1 was a check green *only pre-serialization*. Each test asserts the **sibling query
+survives**, which is F1's actual user-visible damage: one bad rejection value drops every success
+query with it. Posted as `5469299087`.
+
+**GREEN `40ab61a7`**, verified independently:
+
+| Suite | Result |
+| --- | --- |
+| `query-hydration-roundtrip_test.tsx` | **11 passed / 0 failed** (was 6/5 — reconciles exactly) |
+| `packages/fresh/tests/` | **19 passed / 0 failed** |
+
+The decisive one is inside that second number: `hydrateFromDehydrated rejects the evaluator
+guard-attack cases without mutation` **still passes**. That is the cycle-2 evaluator's own
+over-permissiveness attack suite. **Both directions now hold simultaneously** — the guard stays closed
+against prototype/shape attacks while opening to values that hydrated on `main`. That is precisely
+what cycle 2 failed to do, and what my own Tier-A missed when I verified only the direction I was
+worried about.
+
+Scope is exactly the accepted correction: `hydration.ts` (+17/−4) and its test. No `query-types.ts`,
+no `query/mod.ts`, no dependency-range change, and **zero** forbidden constructs (`any`,
+`as unknown as`, suppressions) — checked, not assumed.
+
+The fix itself is well-judged: acceptance widens to arrays/strings/numbers/booleans while everything
+else still returns `{ valid: false }` (`null`, `undefined`, functions, symbols stay rejected), and the
+original value is preserved losslessly through the platform-standard **`{ cause: value }`** rather
+than a bespoke carrier. Bounded widening, not an open guard.
+
+Scoped gates at the exact head: `check:assets-barrel` **0**, `quality:scan` **0**, `arch:check` **0**.
+
+### #1533 — all four IMPL-EVAL findings closed
+
+| Finding | Commit | Verified |
+| --- | --- | --- |
+| F1 alias false-green | `f9e17f4a` | `@app/` dropped from the five service examples; new control **invokes the real generators** and asserts `@app/` is `undefined` for services — generator truth, not a hardcoded list |
+| F2 reverse ratchet | `faf03851` | asserts `{code:0, ratchetFailures:[]}`; ceilings are `<=`, so shrinking is free |
+| F3 comment-text regexes | `4cdee82f` | true deferred `typeError` is **20**; census re-emitted |
+| F4 narrowing-deleted diagnostics | `4cdee82f` | drift entry + routed to #1766 |
+
+**#1766 corrected: 21 → 20.** I filed that issue with a wrong count and the correction came from the
+evaluator's F3, not from me — `parseAppSettings` was never broken; the gate's placeholder regexes
+matched on comment prose. The issue now carries a visible "⚠ Corrected" section rather than a silent
+edit, the list re-emitted **from the corrected classifier**, and F4's three removed diagnostics
+recorded separately because they are absent from the corpus precisely *because* narrowing deleted
+them.
+
+### #1616 — PLAN-EVAL running
+
+Job `0be8e970`, native Fable 5 / medium, artifact-only, currently verifying D1–D8 including the
+`scaffold.runtime` placement and the `href`-throw site. The plan chose the harder honest option —
+**seed the product scaffold, not an injected fixture** — which makes it a public-surface change, and
+that is exactly what the evaluator was pointed at.
