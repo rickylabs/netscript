@@ -4881,3 +4881,55 @@ surface (0 files under `.claude/**` or `.llm/tools/agentic/**`), verified rather
 Watcher `bv2r41hxb` armed on commits, turn end, **and rollout-growth stall** — the signal that
 distinguishes a hung worker from a quiet one, learned the hard way today when a 45-second sample read
 as a stall and a 60-second one showed 118 KB of progress.
+
+## 2026-08-30 — #1774 RED→GREEN verified; main `74e3d451e` audited as inert; convergence pending turn end
+
+### RED → GREEN, verified independently in detached worktrees
+
+| Stage | Head | Result |
+| --- | --- | --- |
+| RED | `f8e6ad0c9` | **7 passed / 2 failed**, exit 1 — `PreToolUse configured hook succeeds from a nested run cwd` and `Stop configured hook succeeds from a nested run cwd` |
+| GREEN | `ba04b0387` | **9 passed / 0 failed**, exit 0 |
+
+7 + 2 = 9, no substitutions. The RED is **test-only** and proves **both hook events independently** —
+a fixture exercising `PreToolUse` and generalising to `Stop` would not have been coverage. Seven tests
+pass alongside the two failures, so the harness is demonstrably working and only the nested-cwd defect
+fails.
+
+### Scope — a false alarm I chased down rather than raised
+
+`git diff main..HEAD` listed `packages/fresh/.../hydration.ts`, `packages/ai/tests/...` and Aspire
+docs, which reads exactly like scope creep. It is a **two-way diff artifact**: the leaf is based on
+`3e5cbabf` and main has since moved. Computed from the **merge-base**, the true leaf scope is **8
+files**, all in-scope:
+
+`.claude/settings.json` · `.claude/skills/{netscript-harness,netscript-pr}/SKILL.md` ·
+`.llm/tools/agentic/README.md` · `claude-hook-log.ts` · `claude-hook-log_test.ts` ·
+`validate-claude-surface.ts` · `deno.json`
+
+**The mirrored `SKILL.md` files were the real question**, since they add a "Human Review Surface"
+section unrelated to hook resolution and `CLAUDE.md` forbids hand-editing mirrors. Resolved in the
+leaf's favour by checking the source rather than the diff: `.agents/skills/netscript-harness/SKILL.md`
+**already carried that section at the merge-base**, the leaf touched `.agents/skills/` **zero** times,
+and the mirror now **matches the source exactly**. The mirror was stale; regenerating it is obligatory,
+not optional. A mirrored-file diff carrying unrelated doctrine is indistinguishable from scope creep
+until you check whether the source already had it.
+
+### Repair quality
+
+Gate 5 satisfied: **0** `/home/agent` or `/home/codex` paths introduced. Permissions genuinely
+narrowed rather than nominally — `--allow-env` → `--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID`
+and `--allow-write` → `--allow-write=.llm/tmp/claude/hooks`, plus `--no-prompt` (the evaluator's
+optional hardening, taken). `settings.json` moves from a relative command string to an exec-form
+`args` array. **0** workflow files touched, so the branch stays pushable under the `repo`-scope PAT.
+
+### Main advance audited — inert
+
+`origin/main` = `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9` (#1738 Aspire S4, #1741 Aspire S3).
+Intersection with this leaf's surface: `.claude/**` **0**, `.llm/tools/agentic/claude/**` **0**,
+`deno.json` **0**, agentic README **0**. No conflict expected at convergence.
+
+**Convergence deferred until the worker's turn ends** — it is live (rollout written 5 s ago, lock held,
+3 files dirty). Rebasing under an active worker corrupts its tree; the rebase belongs at the clean
+checkpoint, as with every leaf this milestone. Watcher `bv2r41hxb` armed on commits, turn end, and
+rollout-growth stall.
