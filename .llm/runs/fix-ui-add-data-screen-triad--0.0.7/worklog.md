@@ -19,6 +19,9 @@ artifacts only.
 - `netscript ui:add page <path> --island [--route <id>] [--app <name>] [--force] [--dry-run]` —
   emits/plans page + loader + island + route registration when exactly one bindable generated query
   client exists.
+- `netscript ui:add page <path> [--route <id>] [--app <name>] [--force] [--dry-run]` — the plain
+  non-island path emits/plans its static page plus the same `router.ts`/`appRoutes` registration; it
+  does not require a query binding and does not emit loader/island roles.
 - `netscript ui:add island <Name> --query [--app <name>] [--force] [--dry-run]` — emits/plans one
   route-tree query island bound to that client.
 - `UiAddCommandInput` — retains current optional `projectRoot`, `app`, `registryRoot`, `theme`,
@@ -98,7 +101,8 @@ artifacts only.
 - New standalone island: `routes/(_islands)/<Name>.tsx` because its current syntax carries no route.
 - These are one convention: route-tree helper directories excluded from route discovery.
 - Existing top-level `islands/` files continue to work and are not moved. Already-scaffolded apps
-  see no automatic migration; only future command output changes. The help/how-to states this.
+  see no automatic migration; only future command output changes. Real command help states this;
+  generated-corpus how-tos are deferred under D17.
 
 ### No-write precondition sequence
 
@@ -115,33 +119,35 @@ No cleanup path is part of this contract because validation errors cannot cross 
 
 ### #1360 boundary
 
-`initialDataUpdatedAt` is already a required field in `IslandQueryOptions`; therefore #1357 can and
-must emit it now. #1360 is still real: it owns correcting the two existing canonical showcase
-variants, the invariant test for those shipped assets, and the beta migration note. This leaf does
-not edit those paths and does not drop the timestamp from its own contract.
+`initialDataUpdatedAt?: number` is already available as an optional field in `IslandQueryOptions`;
+therefore #1357 can and, by its generator contract, must emit it whenever it seeds `initialData`.
+#1360 is still real: it owns correcting the two existing canonical showcase variants, the invariant
+test for those shipped assets, and the beta migration note. This leaf does not edit those paths and
+does not drop the timestamp from its own contract.
 
 ### Golden and help seam
 
 - Planned files carry semantic roles. Help derives its advertised role list from
-  `UI_DATA_SCREEN_FILE_ROLES`.
+  `UI_DATA_SCREEN_FILE_ROLES`, but the test expectation is not derived from that same constant.
 - Positive semantic golden: generate into an in-memory canonical app and assert roles plus
   `appRoutes`, cache-first `fetchQuery`, factory `clientKey`, `QueryIsland`, `useIslandQuery`,
   `initialData`, `initialDataUpdatedAt`, real rendering, and the absence of old placeholders.
 - Negative semantic golden: pass a fixture matching the old lone-`useSignal` island and empty loader
   object to the validator; it must reject both independently.
-- Help coupling: render command help and compare every advertised role to the actual planned role
-  set. A changed description or emission set requires changing the shared contract and test.
+- Help coupling: invoke/render the real Cliffy `ui:add` command help, extract every advertised role,
+  and compare it with the independently observed actual planned role set. A constant-to-constant
+  assertion is insufficient; a changed description or emission set must break this surface test.
 - No giant byte snapshot; assertions are semantic and focused (AP-18).
 
 ### Commit Slices
 
-| #   | Slice                                           | Gate                                                            | Files                |
-| --- | ----------------------------------------------- | --------------------------------------------------------------- | -------------------- |
-| S1  | Research/design/baselines/ceiling               | clean harness-only diff, lock hash                              | run directory        |
-| S2A | Planner/preflight/emission + goldens            | whole CLI check/test + split scoped wrappers                    | product ceiling 1–2  |
-| S2B | CLI options/help/input + negative command tests | whole CLI check/test                                            | product ceiling 3–6  |
-| S2C | Consumer E2E gate + documentation               | whole E2E check/test, docs-site verify/test, doc/emitted checks | product ceiling 7–12 |
-| S2D | Full static/fitness/cascade evidence            | quality, doctrine, JSR, publish, derivatives                    | run artifacts only   |
+| #   | Slice                                            | Gate                                         | Files                |
+| --- | ------------------------------------------------ | -------------------------------------------- | -------------------- |
+| S1  | Research/design/baselines/ceiling                | clean harness-only diff, lock hash           | run directory        |
+| S2A | Planner/preflight/emission + goldens             | whole CLI check/test + split scoped wrappers | product ceiling 1–2  |
+| S2B | CLI options/help/input + negative command tests  | whole CLI check/test                         | product ceiling 3–6  |
+| S2C | Consumer E2E gate definition + runtime selection | whole E2E check/test, emitted-samples        | product ceiling 7–12 |
+| S2D | Full static/fitness/cascade evidence             | quality, doctrine, JSR, publish, derivatives | run artifacts only   |
 
 ### Deferred Scope
 
@@ -149,6 +155,10 @@ not edit those paths and does not drop the timestamp from its own contract.
   named-procedure capabilities.
 - #1355 multi-service/query procedure selection and factory/invalidation improvements.
 - #1360 canonical showcase corrections and migration note.
+- Generated-corpus/public documentation corrections, including
+  `docs/site/web-layer/how-to/customize-fresh-ui.md`, `docs/site/quickstart.vto`,
+  `docs/site/cli-reference.md`, and `docs/site/web-layer/fresh-ui.md`; known-stale passages and
+  ownership are recorded in `drift.md`.
 - Automatic migration from top-level `islands/`.
 - Arbitrary custom-client parsing, generic schema introspection, filesystem transactions, and
   content-compare idempotency.
@@ -165,11 +175,13 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 
 ## Progress Log
 
-| Time                       | Slice | Step        | Notes                                                                                                                                                             |
-| -------------------------- | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30 14:00–15:49 UTC | S1    | Research    | Read required skills/doctrine/harness, live issues #1354/#1356/#1357/#1360, exact cited tree, Fresh/SDK public docs, CLI client and router seams.                 |
-| 2026-08-30 14:45–15:49 UTC | S1    | Baselines   | Measured package/E2E/fitness/JSR/publish/docs/cascade gates. Preserved red-at-base lint/fmt/tooling results. Runtime and writing asset gate deliberately not run. |
-| 2026-08-30 15:49 UTC       | S1    | Design lock | Locked 12-path ceiling, six requested decisions, four implementation slices, and separate PLAN-EVAL stop.                                                         |
+| Time                       | Slice | Step        | Notes                                                                                                                                                                               |
+| -------------------------- | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30 14:00–15:49 UTC | S1    | Research    | Read required skills/doctrine/harness, live issues #1354/#1356/#1357/#1360, exact cited tree, Fresh/SDK public docs, CLI client and router seams.                                   |
+| 2026-08-30 14:45–15:49 UTC | S1    | Baselines   | Measured package/E2E/fitness/JSR/publish/docs/cascade gates. Preserved red-at-base lint/fmt/tooling results. Runtime and writing asset gate deliberately not run.                   |
+| 2026-08-30 15:49 UTC       | S1    | Design lock | Locked 12-path ceiling, six requested decisions, four implementation slices, and separate PLAN-EVAL stop.                                                                           |
+| 2026-08-30                 | S1    | PLAN-EVAL 1 | `FAIL_PLAN` at `402c552f` (`1a1a0d53`): bounded ceiling/corpus correction requested; all other reviewed design areas passed.                                                        |
+| 2026-08-30                 | S1    | Repair      | Swapped the corpus-member how-to for `capability-suites.ts`, made the no-corpus cascade reason explicit, corrected optional timestamp wording, and tightened help/plain-page paths. |
 
 ## Decisions
 
@@ -191,6 +203,7 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 | Required `rtk` binary absent                                   | minor                              | yes                |
 | Package lint/fmt tasks and mixed wrapper are red at base       | significant tooling baseline       | yes                |
 | Owner reserves PR/evaluator dispatch                           | minor authorized workflow override | yes                |
+| PLAN-EVAL found a missing selector and corpus-member conflict  | significant, cycle-1 plan repair   | yes                |
 
 ## Gate Results
 
@@ -230,18 +243,19 @@ For a standalone query island, run `netscript ui:add island <Name> --query`; it 
 
 ### Consumer Gates
 
-| Consumer          | Result  | Evidence     | Notes                                                        |
-| ----------------- | ------- | ------------ | ------------------------------------------------------------ |
-| agent docs prose  | PASS    | check exit 0 | Expected unchanged in S2.                                    |
-| publish assets    | PASS    | check exit 0 | Expected unchanged in S2.                                    |
-| MCP export corpus | PASS    | check exit 0 | Expected unchanged in S2.                                    |
-| assets barrel     | NOT_RUN | D17          | Writing check; expected unchanged; never regenerate in leaf. |
+| Consumer          | Result  | Evidence     | Notes                                                                                               |
+| ----------------- | ------- | ------------ | --------------------------------------------------------------------------------------------------- |
+| agent docs prose  | PASS    | check exit 0 | Expected to stay green because no corpus member is in the final ceiling.                            |
+| publish assets    | PASS    | check exit 0 | Expected to stay green because no publish/corpus member is in the final ceiling.                    |
+| MCP export corpus | PASS    | check exit 0 | Expected to stay green because no MCP/corpus member is in the final ceiling.                        |
+| assets barrel     | NOT_RUN | D17          | Expected stable/green for the same no-corpus reason, but the writing check remains supervisor-only. |
 
 ## Handoff Notes
 
 - PLAN-EVAL should inspect `plan.md` D2–D7 first: narrow binding and router mutation are the main
   design risks.
-- Confirm the 12-path ceiling is sufficient before any S2 edit.
+- PLAN-EVAL cycle 2 should confirm the corrected 12-path ceiling contains the runtime selector and
+  no generated-corpus member. This is the final plan cycle.
 - Do not treat base-red lint/fmt commands as implementation regressions; require split wrapper full
   coverage and compare like-for-like.
 - Do not run or mark `scaffold.runtime` passing in the author session.

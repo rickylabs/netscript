@@ -62,3 +62,45 @@ locked base.
 - **Severity:** minor, explicitly authorized.
 - **Action:** accept; push only with the exact refspec and stop before S2.
 - **Evidence:** user kickoff and `supervisor.md` override.
+
+## 2026-08-30 — PLAN-EVAL cycle 1 exposed selector and generated-corpus ceiling drift
+
+- **What:** Cycle 1 found that the locked S2C claim could neither select its runtime gate nor edit
+  its documentation path without violating the shared-carrier rule.
+- **Source:** PLAN-EVAL verdict `1a1a0d53` at author head `402c552f`, posted to PR #1781; owner
+  confirmation against the base tree.
+- **Expected:** The original 12 paths covered both E2E gate definition/selection and a local how-to
+  correction while the four generated-derivative checks remained unchanged.
+- **Actual:** `packages/cli/e2e/suites/scaffold/capability-suites.ts:50` owns `RUNTIME_GATES` and is
+  the only runtime-suite selector, but was absent from the ceiling. Conversely,
+  `docs/site/web-layer/how-to/customize-fresh-ui.md` emits the
+  `pages/web-layer/how-to/customize-fresh-ui/index.md` member listed in
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts:181`; editing it would move shared agent
+  docs/publish/assets carriers that D17 correctly reserves for the supervisor.
+- **Severity:** significant, cycle-1 plan repair.
+- **Action:** keep the ceiling at 12 by swapping the how-to out and `capability-suites.ts` in. Keep
+  D17 locked. Defer all public-doc corrections below to their owning docs/generated-carrier work;
+  they are known-stale, owned elsewhere, and out of scope for this leaf:
+  - `docs/site/web-layer/how-to/customize-fresh-ui.md` — generated-corpus member; planned edit
+    deferred.
+  - `docs/site/quickstart.vto:247-260` — still describes the old three-file output and manual
+    binding/check path.
+  - `docs/site/cli-reference.md:104` — still says `ui:add` has no dry-run surface.
+  - `docs/site/web-layer/fresh-ui.md:245-249` — still describes re-copy/force behavior that the
+    corrected planned semantics supersede.
+- **Evidence:** focused base reads of the selector, generated asset membership, and the exact three
+  stale passages; corrected ceiling/cascade/S2C rows in `plan.md`.
+
+## 2026-08-30 — `initialDataUpdatedAt` wording overstated the Fresh surface
+
+- **What:** D10's boundary was correct, but the worklog described the option as required.
+- **Source:** PLAN-EVAL cycle 1 advisory and
+  `deno doc --filter IslandQueryOptions
+  packages/fresh/src/application/query/mod.ts` at the locked
+  base.
+- **Expected:** required `initialDataUpdatedAt` field.
+- **Actual:** `initialDataUpdatedAt?: number` is optional in `IslandQueryOptions`.
+- **Severity:** minor; no boundary or dependency change.
+- **Action:** state that the upstream option is optional while the #1357 generated-data contract
+  deliberately always supplies it with seeded `initialData`; #1360 remains independent.
+- **Evidence:** real `deno doc` output and corrected D10/worklog wording.
