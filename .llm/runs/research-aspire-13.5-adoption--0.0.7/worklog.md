@@ -408,4 +408,6 @@ internal-wording scan; receipt keys are the page's evidence convention). (2)
 `ASPIRE_CLI_START_TIMEOUT`: accurate but partial — the generated `aspire:start` task sets it for
 `aspire start` (deno-json.ts:91-93; README: "Aspire reads it") and NetScript reuses it as the db-cli
 budget; one-clause clarification queued as a non-blocking follow-up for S11's next prose touch. (3)
-callout title kept (H5 ruling). |
+callout title kept (H5 ruling). | | S11 Phase A terminal | #1772 reconcile landed (`4c370482`,
+docs-only, DONE; all #1772 additions present, S11 corrections kept). Handoff finalized; PR #1771
+handoff comment posted. Leaf terminal; merge prerequisites recorded. |
