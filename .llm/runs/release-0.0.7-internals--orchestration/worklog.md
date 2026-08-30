@@ -5750,3 +5750,25 @@ confirmed `working` throughout.
   exactly `ba70c6c90` and `git status --short` shows no source mutation before recording any verdict
   from this session's evidence, per instruction — the supervisor alone records the verdict, not the
   evaluator session itself (it has no write access to do so).
+
+## D-109 — Routing leaf (#1791/PR #1792) SHIPPED-READY: final verdict recorded, cleanup consolidated, exact-head CI green
+
+- Verified no source mutation and unchanged head (`ba70c6c90`) after the retained read-only
+  evaluator (`ec1cfcda`) exited; recorded its PASS verdict as supervisor-owned evidence in
+  `evaluate-final.md`, commit `8d120f6fe`, since the evaluator itself had no write access.
+- A concurrent internals-supervisor session (parent pid `5498`, Remote Control) independently
+  committed a duplicate report of the same verdict (`evaluate-review-fixes.md`, commit `fccb39f1c`).
+  Removed as a genuine duplicate carrier, consolidated in commit `107bfe8aa` — `evaluate-final.md`
+  is the sole final IMPL-EVAL carrier for this leaf.
+- Both PR #1792 and issue #1791 hold sole `status:ready-merge`. Review-threads: 2 threads, 0
+  unanswered (both Augment findings answered with verified-real fixes, one marked outdated after the
+  fix landed). **Exact-head CI at `107bfe8aae733946e4aa52381b87e692c3a778a8`: 10 SUCCESS / 13
+  SKIPPED / 0 FAILURE.** PR: OPEN, not draft, MERGEABLE, CLEAN.
+- Non-qualifying attempts explicitly on record and excluded from the verdict chain: duplicate
+  mutating session `8016a5c4` (terminated), two corrupted/stale prompt drafts (one citing a
+  fabricated main SHA), the pre-repair `evaluate.md`/`evaluate-merged-head.md` (retained as
+  historical provenance only, both explicitly marked superseded).
+- #1774's DeepSeek-route receipts remain untouched and valid throughout — this leaf's own
+  evaluation used its own new GLM 5.3 Flash / max route exclusively, appropriately dogfooding what
+  it implements.
+- **Ready for owner merge. Supervisor does not merge.**
