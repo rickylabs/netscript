@@ -3586,3 +3586,49 @@ pre-merge check. Choosing the honest framing here is the same discipline that ke
 Acceptance-evidence block dispatched. Readiness normalization and the merge handoff follow once it
 lands; `status:ready-merge`, the draft flip, and issue-box ticking remain with this lane's supervisor
 or the coordinator, never the author.
+
+## 2026-08-30 — #1462 readiness normalized; close-gate mechanism understood correctly
+
+### Acceptance evidence landed, and AC3 is honest
+
+`72ab6411`. The delta since the Tier-A sign-off is **evidence-only** — no product path — so the
+signed-off implementation is unchanged. Head identity clean: local == `origin` == PR #1758
+`headRefOid`. SDK suite re-confirmed exit 0 · **70 passed / 0 failed**; `deno.lock` byte-unchanged.
+
+The AC3 entry says what actually happened rather than what the box wants to hear:
+
+> "No production bundle was run and no chunk was inspected. The committed `deno info --json` assertion
+> plus independent reproduction prove root unsafe edges 19 → 0 and presets 0 … those modules are
+> unreachable from either entry and therefore unavailable to a bundler from these entries; this is
+> module-graph evidence, not chunk-inspection evidence."
+
+That is the right call: unreachability is a stronger property than absence-in-one-build, and saying so
+precisely costs nothing while claiming a chunk inspection would have been false.
+
+### Readiness normalized
+
+`status:impl-eval` → **`status:ready-merge`** on PR #1758 and issue #1462, exactly one `status:` each;
+draft flipped to **ready for review**. `review-threads` re-run at the ready head: **PASS**, 0 threads,
+0 unanswered.
+
+### The close-gate's local FAIL is not a defect — the mechanism was misread at first
+
+Running `check-close-gate.ts` locally still reported five unchecked #1462 acceptance boxes even with
+the evidence block and `status:ready-merge` in place. Reading the tool rather than retrying it:
+`findUncheckedAcceptance` skips a box only when it is **checked** or marked **`[post-merge]`**. There
+is no ready-merge or structured-evidence exemption in that tool at all.
+
+The remedy lives one step earlier in CI. `.github/workflows/ci.yml` runs **Mirror structured
+acceptance evidence** *before* the close-gate; that tool does **live** reads of labels/body/head at
+execution time and **skips itself with exit 0 when `status:ready-merge` is absent**. With the label
+present it mirrors the PR's `acceptance-evidence` block into the issue, ticking the boxes — so the
+**tool** ticks them, not this lane, which is exactly why the "never tick issue boxes" rule and the
+close-gate remedy are compatible.
+
+So the local invocation is simply the wrong instrument for this step: it evaluates the gate without
+the mirroring that precedes it. The authoritative verdict is the CI `ci` workflow run at the exact
+head. A run is in progress at `72ab6411` (`33311494015`), started by the ready flip, after the label
+was applied — so its live read will observe `status:ready-merge`.
+
+Recorded because the failure mode is subtle: a local gate that returns FAIL for a structural reason
+looks identical to a real product failure, and retrying it would never have changed the answer.
