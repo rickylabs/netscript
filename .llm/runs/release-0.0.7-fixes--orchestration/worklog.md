@@ -2202,3 +2202,47 @@ The shared `fs.inotify.max_user_instances` ceiling (128) is the only remaining h
 is shared across every lane. An Aspire abort with exit 134 / `IOException: configured user limit … on
 inotify instances` is a **quota collision to retry against** — it is not evidence about the change
 under test and must never be recorded as a product red.
+
+### Coordinator ruling delivered at 11:25Z — proven from the rollout, not from an exit code
+
+Delivered on the same thread once it went `idle` (`turn complete`). Verified by grepping the target
+rollout for four phrases unique to the message — `inspectionProtocol`, `same pure selector`,
+`Workers/profile adoption`, `24-path ceiling must be cut` — each present, with no active-writer
+conflict in the sender output. The thread is now `working` on the amendment.
+
+The wait was the correct call: the previous attempt failed *because* the thread was mid-turn, and a
+second sender into an owned worktree is exactly what this lane's rules forbid.
+
+### The author had already converged on the ruling's design
+
+Its S6 plan at `349d5915`, written before the ruling arrived, independently chose direction (a), an
+optional manifest-advertised report protocol v1, fail-closed with no silent fallback, AC2 unchanged
+with no issue edit, and PLAN-EVAL blocking S7 — and rejected (b) and (c) on the same grounds the
+ruling gives. Far less work was discarded than the superseded brief implied. Only a naming alignment
+was needed: the coordinator's `inspectionProtocol: 1` replaces the author's
+`sourceSelectionReport.protocolVersion`.
+
+### The real gap was scope, and it is now cut to the authorized set
+
+The plan proposed a **24-path** ceiling; the coordinator authorized **11** — the prior six, the
+generator test, and the four `plugins/ai` paths. Removed: `plugins/workers/*` (4),
+`plugins/sagas/*` (4), `plugins/triggers/*` (3).
+
+**Cutting those is safe rather than a compromise, and the author was told why.** The protocol is
+*optional* and an absent protocol retains legacy behaviour, so only `plugins/ai` advertises it in this
+leaf; sagas, triggers, and workers keep the manifest walk, which is correct for them today — and is
+exactly why the five original semantic cases passed. F4 is knowingly deferred as follow-up.
+
+Two paths were flagged rather than silently allowed:
+
+- `runtime-registry-source-report.ts` — a **new** CLI file, not among the five authorized additions.
+  The author must fold it into an authorized path (path 2 already owns the `ProcessPort` invocation)
+  or stop and request approval in `drift.md`. Creating it on its own authority is not permitted.
+- `installed-runtime-registry-integration_test.ts` — allowed on **this supervisor's reading** of
+  "existing test paths may be amended", and it is where `skill-loader` exclusion is already asserted
+  (lines 276 and 319), making it the natural home for the required healthy regression. The author
+  records in `drift.md` that this rests on a supervisor interpretation, so PLAN-EVAL or the
+  coordinator can correct it cheaply if the reading is wrong.
+
+Recording the interpretation as an interpretation is the point: an unmarked reading of someone else's
+ruling is indistinguishable from an authorization, which is the failure class this leaf exists to fix.
