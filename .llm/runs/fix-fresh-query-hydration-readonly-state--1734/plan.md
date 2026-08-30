@@ -60,6 +60,8 @@ Keep `@tanstack/query-core@^5.101.0`, make hydration soundly compatible with bot
 | D2 | Preserve the public readonly `DehydratedState` exactly. | Widening to mutable or leaking upstream types is unnecessary and contrary to the package-owned boundary. |
 | D3 | Use exhaustive private shape guards plus mutable object/array copies. | This restores assignability without `any`, assertions, double casts, or suppressions and fails closed for invalid input. |
 | D4 | Pin 5.102.8 only in the regression fixture/config, not the package dependency. | The fixture must remain independent of root lock resolution while the package retains its supported range. |
+| D5 | Normalize JSON error records into real `Error` instances at the private hydration boundary. | JSON erases ordinary `Error` values to `{}`; accepting that record as `Error` would lie to TanStack's `Error \| null` contract. Revival restores the declared runtime type without a cast and preserves string `message`, `name`, and `stack` fields when the serializer retained them. |
+| D6 | Treat absent mutation `context`/`data`/`variables` and query `data` as `undefined`. | All four fields legitimately admit `undefined`, which JSON drops. Their presence is not load-bearing; lifecycle enums, numeric counters, required query identity, and state-object checks continue to reject malformed input. |
 
 ## Open-Decision Sweep
 
@@ -74,6 +76,7 @@ Keep `@tanstack/query-core@^5.101.0`, make hydration soundly compatible with bot
 | Risk | Mitigation |
 | --- | --- |
 | Runtime guard omits a required TanStack field | Mirror exported 5.102.8 `MutationState`/`QueryState` declarations and add valid/invalid focused tests. |
+| JSON error records no longer satisfy upstream `Error \| null` fields | Revive plain serialized records into `Error` instances and pin both the default `{}` wire case and retained message/name/stack fields. |
 | Regression silently uses the root lock | Give the fixture its own config with exact 5.102.8 imports and `--no-lock`. |
 | Unrelated package-wide quality residue obscures the slice | Record baseline counts and require no increase; use focused wrappers over changed source/test files. |
 
@@ -110,6 +113,20 @@ Keep `@tanstack/query-core@^5.101.0`, make hydration soundly compatible with bot
 | 3 | Dual-version consumer | no-lock checks against exact 5.101.x and 5.102.8 configs | PASS / PASS |
 | 4 | Required static suite | root `check`, `test`, `lint`, `fmt:check`, `quality:scan`, `arch:check` | PASS; quality allowCount remains 7 |
 | 5 | JSR surface | Fresh doc-lint/audit comparison | no new findings versus recorded baseline |
+
+## FAIL_FIX Amendment — serialized hydration repair
+
+The repair validates the shape that actually crosses `QueryHydrationScript`'s JSON transport. A new
+round-trip suite renders that component, extracts/parses its JSON payload, and covers a success
+query plus default-dehydrated paused mutations with variables, without variables, and after one
+failed attempt. The prior-failure case must reproduce `failureReason: {}` before implementation.
+
+R2 is resolved by private error revival (D5), not by widening `DehydratedState`, exporting a wire
+type, or casting a serialized record to `Error`. The deliberate behavior change is that error-shaped
+wire records arrive at TanStack as real `Error` instances; an empty record receives a neutral
+fallback message, while string `message`, `name`, and `stack` fields are retained. Query `data` is
+treated consistently with the three mutation fields (D6) because it also admits `undefined` and is
+dropped from pending-query JSON. No public type, export, or dependency-range decision is reopened.
 
 ## Risks
 
