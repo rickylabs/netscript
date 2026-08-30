@@ -7046,3 +7046,69 @@ land: push, dispatch a fresh currency evaluator inheriting `b247bef9`'s measurem
 merge coordinates.
 
 #1387 stays active at plan (PR #1762, `status:plan`), #1730 active on `01a052b7`.
+
+## 2026-08-30 — second main integration (#1755 / `a5520e70`); final evidence at `d5f3bf4c` / `dbd3eafa`
+
+### A premise I had to correct
+
+The coordinator's instruction said "if your current attempt is still local, fold this now rather than
+publish a knowingly stale head." **It was not local — `1539e81f` was already pushed.** It was not
+*knowingly* stale when published (#1755 merged at 13:08:59Z, afterwards), but it is stale now and is
+superseded rather than defended. Recording the distinction because "we never published it" and "we
+published it and then it aged" are different facts about the branch's history.
+
+### The previous push was more informative than it looked
+
+CI at `1539e81f` reported `ci: failure`, but the jobs say otherwise:
+
+| Job | Result |
+| --- | --- |
+| `quality` | **success** — the tagline **and** corpus repairs both worked |
+| `check-test` | **success** |
+| `classify changes`, `core CI lane visibility` | success |
+| `close-gate` | **failure** — "Referenced issue acceptance gate" |
+
+The only red is `close-gate`, which fails because the PR carries `Closes #1466` while the acceptance
+mirror has not run — and the mirror requires `status:ready-merge`. That is an **ordering artifact of
+Ruling B's close sequence, not a code defect**, and it will persist until the label is applied. Anyone
+reading `ci: failure` at the run level without opening the jobs would draw the wrong conclusion —
+which is exactly the mistake I made earlier in the opposite direction.
+
+### Second integration — and the conflict class that matters
+
+`git merge --no-ff origin/main` (`a5520e70`) **conflicted in four generated carriers**:
+`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`, `publish-assets.generated.ts`.
+
+**Generated artifacts are never hand-merged.** Resolved by taking main's side wholesale, then
+re-running all four generators, so the committed carriers are tooling output that folds in both main's
+inputs and this branch's contracts doc edits. Hand-resolving a compressed corpus or a generated
+barrel would produce a file no generator would ever emit — plausible-looking and unreproducible.
+
+Rebase was refused for the second time: **seven** append-only receipt archives and eight
+review/verdict artifacts cite content-head SHAs.
+
+### Final state
+
+| Field | Value |
+| --- | --- |
+| Base | `a5520e70` (#1755), verified `MERGED` and equal to `origin/main` |
+| **Content head** | **`d5f3bf4c`** |
+| **Evidence head / PR head** | **`dbd3eafa`** |
+| Receipts | 8 at content head, **attempt 12**, all `gitHead == actualGitHead` — 7 PASS, `public-doc-lint` baseline-red |
+| `public-doc-lint` receipt | **19-element argv, 178 ms** — verified by argv and duration, not `exitCode` |
+| R-1 | head **12**, **new** main `a5520e70` **12**, set **IDENTICAL** — delta 0 held across *two* main advances |
+| Carriers | `agent-docs-prose` `fresh:true`; `assets-barrel`, `mcp-export-corpus`, `publish-assets`, `docs:tagline` over=0, `docs:exports-drift` all PASS |
+| `deno.lock` | byte-unchanged |
+| Archives | **seven**, append-only |
+
+### Evaluator
+
+Two currency sessions were stopped before committing a verdict — `b247bef9` at `75b78220`,
+`a103dbb6` at `b01ffcd8` — each because `main` moved under them. Neither stop reflects a fault in
+those sessions; certifying a superseded head would have produced a verdict needing withdrawal.
+
+Session **`2f492178`** (Fable 5 · medium, route verified from its transcript, own detached worktree
+`ns1466-impleval-c4`) is dispatched at `dbd3eafa`. Its brief carries **Amendment 2**, which supersedes
+both earlier scopes, tells it not to trust the archived defective receipt, explains that
+`close-gate`'s red is an ordering artifact rather than a code defect, and flags that **the G-1 decoy
+probe is genuinely unverified at any recent head** because both stopped sessions missed it.
