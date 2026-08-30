@@ -97,3 +97,17 @@ not S5's. **Tier-A verdict: sign-off to IMPL-EVAL at `1634a3c3c`.**
 
 Fix brief sent on the thread (slice 8: explicit `export { … } from '../constants.ts'`, dead
 import removed, configured-lint receipt). Cycle 2 IMPL-EVAL follows at the slice-8 head.
+
+## Cycle 3 — head `0bd8ba832` (slice 8; code delta vs `1634a3c3c`: 2 files, +4/−14) — **sign-off to IMPL-EVAL cycle 2**
+
+| Gate | Result |
+| --- | --- |
+| configured `deno task lint` (root wrapper, CI `quality-lint`) | exit 0, 0 occurrences |
+| `quality:scan` / `arch:check` | ok / exit 0 |
+| auth + triggers + sagas unit suites | 70 passed / 0 failed / 12 ignored |
+| `run-deno-check` plugins/auth, plugins/triggers | 0 diagnostics |
+| literal grep excl. generated | 6 hits = three `constants.ts` + three deprecation tests |
+| runtime reads of `*_API_DEFAULT_PORT` | 0 |
+
+`./public` surfaces now `export { X_API_DEFAULT_PORT } from '../constants.ts'` explicitly; no
+import binding left. Cycle-2 IMPL-EVAL brief: `slices/s5/impl-eval-brief-cycle-2.md`.
