@@ -2649,3 +2649,128 @@ under-reviewed a harder change.
 The brief tells the evaluator explicitly that the missing local runtime proof is **queued behind the
 S2 lease, not waived**, and is **not** a finding — so it cannot fail the leaf for an absence this
 lane does not control.
+
+## 2026-08-30 — post-migration resume; #1734 IMPL-EVAL returned FAIL_IMPL; bounded repair dispatched
+
+### Lane re-established on the new host
+
+This lane resumed on the migrated agent plane. The old session/registry is historical and was **not**
+resumed or recreated. Git and live GitHub were treated as the only authority for state; every fact
+below was re-derived from them rather than carried over from the pre-migration notes.
+
+Re-verified live, not assumed:
+
+| Object | Value |
+| --- | --- |
+| Leaf branch | `fix/fresh-query-hydration-readonly-state` |
+| Local HEAD == `origin` == PR #1736 `headRefOid` | `ed8a8e9ca9be2e72da4a00bff830caf260ee94ea` |
+| PR #1736 | OPEN, **draft**, MERGEABLE, `Closes #1734`, milestone `0.0.7` |
+| Labels | `type:fix`, `area:fresh`, `priority:p1`, exactly one `status:` (`status:impl`) |
+| Issue #1734 | OPEN, milestone `0.0.7` |
+
+`ed8a8e9ca` is the **evaluator-only** verdict commit — its single file is
+`.llm/runs/fix-fresh-query-hydration-readonly-state--1734/impl-eval.md`, sitting on the product head
+`e537b2c1f`. The repair was dispatched **on top of it**; resetting to the older product head would
+have destroyed the verdict artifact, which is the same mistake a force-push nearly caused at #1728
+closeout.
+
+NAS worktree, thread, route identity, daemon proof, and the resume command are recorded **locally
+only**, outside the repository — they are operational evidence, not publishable harness evidence.
+
+### IMPL-EVAL verdict — `FAIL_IMPL` (`FAIL_FIX` class) at `e537b2c1f`
+
+Acceptance items 1–4 and 6 hold: dual-version compile, no forbidden constructs, the RED regression is
+genuinely pinned, the `^5.101.0` range decision (D1) was honoured rather than narrowed to hide the
+problem, and the public export surface is unchanged. The type-level design is not reopened.
+
+**F1** blocks. `toMutableDehydratedState` validates the **in-memory** shape returned by
+`dehydrateQueryClient()`, but the package's own transport is JSON — `QueryHydrationScript` →
+`JSON.stringify` → `readDehydratedState` → `JSON.parse` → `hydrateFromDehydrated`. `JSON.stringify`
+drops `undefined`-valued keys, so `Object.hasOwn(state, 'context' | 'data' | 'variables')` is false on
+the wire and the guard throws inside `HydrationBoundary`'s `useEffect` on state that hydrated fine
+before the fix. A runtime behaviour regression on the shipped server→island path.
+
+### I did not simply relay the verdict — and the relay would have been wrong
+
+I confirmed F1's mechanism by reading `hydration.ts`, then reproduced the wire shape myself with a
+throwaway test inside the leaf worktree (deleted afterwards; worktree left clean, `git status`
+empty). A mutation paused while offline **after one failed attempt**, dehydrated through the
+package's own default `shouldDehydrateMutation`, serializes to:
+
+```text
+PROBE isPaused=true status=pending failureCount=1
+PROBE dehydratedMutations=1
+PROBE wireKeys=error|failureCount|failureReason|isPaused|status|variables|submittedAt
+PROBE wireFailureReason={}
+PROBE hasOwn(context|data|variables)=false|false|true
+```
+
+That object is rejected **twice**, not once. Beyond the `hasOwn` failures, `failureReason` survives
+JSON as `{}`, so `isErrorOrNull` is false and the guard still throws even after F1 is fixed as
+literally prescribed.
+
+The evaluator recorded the error-shape problem as an *observation* "outside the package's default
+API", reachable only by bypassing `dehydrateQueryClient`. **That scoping is too narrow.** A paused
+mutation with a prior failure is squarely inside the default API. Repairing only the `hasOwn` checks
+would have left the leaf broken and spent the next IMPL-EVAL cycle discovering it. Both items are
+therefore inside the authorized envelope, with the correction stated in the brief rather than
+silently widened — and the author is told to reproduce it rather than take the supervisor's probe on
+faith.
+
+The general lesson, which is the same one that produced this leaf in the first place: **a guard that
+validates the shape you happen to hold in memory is not validating the shape that actually crosses
+your boundary.** #1734 existed because a check was green only for the lockfile pin; F1 exists because
+a check was green only for the pre-serialization object.
+
+### Authorized envelope — bounded, with an explicit stop condition
+
+- **R1** — validate the serialized shape: drop the `hasOwn` requirements on `context` / `data` /
+  `variables`, decide and justify the same question for `data` in `isQueryState`, and keep every
+  check that is genuinely load-bearing for `hydrate()`. The evaluator's eight guard-attack cases must
+  still be rejected, re-executed rather than assumed.
+- **R2** — make the error-shaped fields survive the round trip without lying about their type, with
+  no `any` / `as unknown as` / `@ts-ignore` / `@ts-expect-error`. Recommended (overrulable with a
+  stated reason): revive a serialized error record into a real `Error`, which yields the type
+  upstream declares and needs no cast. It is a deliberate behaviour change versus pre-fix and must be
+  stated and pinned by a test.
+- **R3** — tests that cross the boundary the package really uses, ideally through
+  `serializeDehydratedState` / `readDehydratedState` themselves; RED first, in its own slice commit.
+- **Stop and report** if the honest fix requires touching anything exported from `query-types.ts` or
+  `query/mod.ts`, or widening the public `DehydratedState` contract. That is a scope decision for
+  this lane, not the author's.
+
+Everything else is out of envelope: no refactor, no new exported symbol, no dependency or range
+change, no lock churn, no pre-existing test modified or deleted, no edit to `impl-eval.md`.
+
+### Route
+
+Dispatched as a **new** Codex thread — the pre-migration author thread was not resumed. Lane
+`normal_implementation` (**Sol · medium**), route requested explicitly from lane policy and confirmed
+**matched** against the observed thread identity rather than assumed from argv.
+
+Not `light_implementation`: R2 carries a genuine design decision with a stop-and-report branch, which
+is exactly the "real potential for decision-taking mid-slice" that the effort-selection guidance puts
+at medium. Not `complex_implementation`: no new surface, no reopened design.
+
+**The follow-up IMPL-EVAL stays at Fable 5 · medium (`review_codex_complex`), not the Fable 5 · low
+that a Sol·medium slice would normally pair with.** The artifact under evaluation is the whole leaf,
+authored on Sol · high; pairing the re-evaluation to the repair slice alone would under-review a
+larger accumulated change than cycle 1 saw. Reviewing down after a FAIL is precisely the wrong
+direction.
+
+### Gates and bounds carried into the repair
+
+Static only. No Aspire, Docker, browser, `scaffold.runtime`, or `e2e:cli`. The bounded local runtime
+proof for this leaf remains **queued behind another lane's host lease, not waived**, and its absence
+is explicitly not a finding — the brief says so, so the next evaluator cannot fail the leaf for an
+absence this lane does not control. PR stays draft with its labels untouched: marking ready is this
+repo's IMPL-EVAL dispatch trigger and is not the author's to fire.
+
+Receipt discipline restated in the brief, including the fabricated-SHA-suffix failure this very leaf
+produced in cycle 1 — copy SHAs, never retype them.
+
+### Standing constraints unchanged
+
+No merge, publish, ready-flip, relabel, issue close, milestone change, central-cluster-state
+mutation, or release-writer lease. Serial ordering is preserved **inside** internals only; other
+topics are unaffected by this lane's queue.
