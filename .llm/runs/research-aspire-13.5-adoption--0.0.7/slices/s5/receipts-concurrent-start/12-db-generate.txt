@@ -1,0 +1,26 @@
+Task not found: db:generate
+[0m[32mAvailable tasks:[0m
+- [0m[36mdev[0m
+    deno task deps:closure && deno task deps:verify && deno run --allow-all apps/s5c-web/main.ts
+- [0m[36mdeps:closure[0m
+    deno task --cwd apps/s5c-web deps:closure
+- [0m[36mdeps:verify[0m
+    deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts
+- [0m[36maspire:start[0m
+    cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start
+- [0m[36maspire:start:isolated[0m
+    cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated
+- [0m[36maspire:otel[0m
+    deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts otel
+- [0m[36maspire:export[0m
+    deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export
+- [0m[36mcheck[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check
+- [0m[36mlint[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint
+- [0m[36mfmt:check[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check
+- [0m[36mfmt[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write
+- [0m[36mtest[0m
+    deno test --allow-all

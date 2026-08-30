@@ -1,0 +1,28 @@
+{
+  "owner": "s5-receipt",
+  "pid": 3539803,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T19:41:27.942Z",
+  "relays": [
+    {
+      "port": 32785,
+      "container": "relay-s5-receipt-32785",
+      "source": "postgres-d1d564e7",
+      "startedAt": "2026-08-30T19:41:50.174Z"
+    },
+    {
+      "port": 32786,
+      "container": "relay-s5-receipt-32786",
+      "source": "redis-mrbnrhfy",
+      "startedAt": "2026-08-30T19:41:51.134Z"
+    },
+    {
+      "port": 32787,
+      "container": "relay-s5-receipt-32787",
+      "source": "redis-xpfcuyhn",
+      "startedAt": "2026-08-30T19:41:56.208Z"
+    }
+  ],
+  "closed": "2026-08-30T19:43:21.441Z"
+}

@@ -1,0 +1,5 @@
+relay-s5-receipt-32787 Up About a minute 
+redis-xpfcuyhn Up About a minute 127.0.0.1:32787->6379/tcp
+relay-s5-receipt-32786 Up About a minute 
+relay-s5-receipt-32785 Up About a minute 
+postgres-d1d564e7 Up About a minute 127.0.0.1:32785->5432/tcp

@@ -1,0 +1,5 @@
+[relay] watching owner=s5-receipt2 dind=netscript-dind(10.4.12.22) since=2026-08-30T19:44:20.105Z pid=3566716
+[relay] postgres-0c8d3194 127.0.0.1:32789 => hopA relay-s5-receipt2-32789 (10.4.12.22:32789) => hopB 127.0.0.1:32789@ai-agents
+[relay] redis-cvcvuatn 127.0.0.1:32788 => hopA relay-s5-receipt2-32788 (10.4.12.22:32788) => hopB 127.0.0.1:32788@ai-agents
+[relay] redis-wpxdmswd 127.0.0.1:32790 => hopA relay-s5-receipt2-32790 (10.4.12.22:32790) => hopB 127.0.0.1:32790@ai-agents
+[relay] cleanup: closed 3 listener(s), removed 3 hop-A container(s)

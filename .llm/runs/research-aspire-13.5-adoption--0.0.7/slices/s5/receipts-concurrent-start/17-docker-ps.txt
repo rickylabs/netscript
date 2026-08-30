@@ -1,0 +1,5 @@
+relay-s5-receipt2-32790 Created 
+redis-wpxdmswd Up 2 seconds 127.0.0.1:32790->6379/tcp
+relay-s5-receipt2-32788 Up 7 seconds 
+relay-s5-receipt2-32789 Up 8 seconds 
+postgres-0c8d3194 Up 9 seconds 127.0.0.1:32789->5432/tcp

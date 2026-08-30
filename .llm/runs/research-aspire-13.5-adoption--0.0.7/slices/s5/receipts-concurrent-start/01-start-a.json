@@ -1,0 +1,7 @@
+{
+  "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s5-conv/.llm/tmp/s5-concurrent/s5-concurrent/aspire/apphost.mts",
+  "appHostPid": 3540767,
+  "cliPid": 3540741,
+  "dashboardUrl": "https://localhost:40581",
+  "logFile": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T194134916_detach-child_39589cdee7964000831ea252909a0520.log"
+}
