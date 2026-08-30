@@ -7766,3 +7766,41 @@ signature/generic-only, runtime composition still deferred to Slice 3.** Rationa
 | #1730 / PR #1763 | SHIPPED |
 | #1387 / PR #1762 | Slice 1 accepted; gate contract repaired at `35de5ec93`; **Slice 2 held on a ceiling decision (D-4)** |
 | #1664 | parked; runtime-bound, sole lease held elsewhere |
+
+---
+
+## #1387 Slice 2 continuation dispatched — base `5ae8270ce`, amended ten-file ceiling
+
+The owner ruling on **D-4** is applied and pushed (`35de5ec93..5ae8270ce`), so the ceiling now names
+ten files and the continuation is dispatchable without a PLAN-EVAL cycle 3.
+
+| Field | Value |
+| --- | --- |
+| Brief | `slices/impl-1387-s2b.md` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1387` |
+| Branch / PR | `feat/service-principal-procedure-policy` · **#1762** draft, `Refs #1387 — partial` |
+| Base | `5ae8270ce` (launcher short form; `--expect-base` matched) |
+| Route | requested `openai · gpt-5.6-sol · high` |
+| Dry-run | clean — `use harness`=true, `## SKILL`=true, `upstream: NONE`, `dirty: 10` |
+
+**`dirty: 10` is intended.** The prior thread's Slice 2 draft is uncommitted in the worktree; it
+stopped correctly at the plan's rescope rule rather than breaching the ceiling. The brief tells the
+new thread to build on that draft, not restart, and `service-builder-impl.ts` is still untouched.
+
+**Stale sender eviction, by the mandated procedure.** The record at
+`senders/ad03b605….json` (sha256 of the leaf worktree path, resolved read-only, self-describing
+`worktree` + `sessionId 01a053ed-972a…`) was proven dead on both conditions: `ownerPid 3183928`
+absent from `/proc`, and the thread absent across **3** debounced `codex-status` probes. Backed up to
+scratch, then removed as a single fully literal path. `codex-thread-ids.md` — which the launcher
+writes at a fixed path — was preserved first as `codex-thread-ids-1387-s2a.md`.
+
+**What the brief carries beyond the ceiling change.** The owner's scope verbatim (parameterize the
+class and stored factory, preserve the generic through fluent returns, specialize `withContext`,
+runtime composition deferred to Slice 3); the Slice 2 Tier-A stop **including `mcp-export-corpus`**;
+and the two evidence traps this lane has already paid for — verify receipts by `argv` and
+`durationMs` rather than `exitCode`, and never conclude "no carrier moved" from `git status`, which
+is non-probative when the gate never ran (that is exactly how D-3 escaped Slice 1).
+
+The brief also tells the thread to trust its own measurement over either report: the supervisor
+measured **3 × `TS2339`** in the single failing file, while the prior thread reported `TS2416` plus
+21 × `TS2322`, which did not reproduce.
