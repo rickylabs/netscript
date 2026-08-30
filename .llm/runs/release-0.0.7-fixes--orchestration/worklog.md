@@ -4405,3 +4405,42 @@ author mid-merge:
 Readiness rolled back to `status:impl` on both objects while the integration runs. Both
 `status:ready-merge` deletes returned 404 — the phase-eval automation had already displaced the label,
 the same behaviour recorded on #1729 — so the label set was re-read and counted rather than assumed.
+
+## 2026-08-30 — #1368 plan gate CLEARED (`PASS_PLAN` cycle 2); implementation dispatched
+
+Verdict `81c5f874` on `eval/plan-eval-1368-cycle-2`, pushed. **Cycle 2 of 2 — the plan gate is
+cleared** and implementation may begin at S2. Two conditions carry into implementation, both
+non-blocking:
+
+- **F3b (major)** — before S4, record whether the new `SagaCompensationRequest` fields are optional
+  (the evaluator recommends optional) **and** that the compensator applies **no fallback precedence**
+  when they are absent. The second half is the load-bearing part: a fallback would recreate exactly
+  the engine/compensator divergence F3 was raised about.
+- **F1 residual (minor)** — state that `saga.cascade.complete` emits whenever `completed` is true
+  regardless of store presence, and that its status attribute is the **persisted** status, which may
+  be `failed` or `compensating` on mixed terminal cascades. The span must not be read as meaning
+  success.
+
+Both were relayed with the reasoning rather than as a checklist, because the risk in each is a
+plausible-looking implementation that quietly reintroduces the defect the finding prevented.
+
+S2 dispatched as **red-only**, with the gate stated back to the author verbatim from its own plan —
+*"a compile/load/crash red or zero failed tests is invalid"* — plus the explicit instruction that if
+the red arrives as a type error, load failure, or crash, the gate is **not** satisfied and the test
+must be reshaped rather than the result recorded. That rule exists because this lane has now seen two
+planned red-befores that would have been red for unrelated mechanical reasons.
+
+Carried reminders: gate 15 keeps the **check-only** barrel invocation (not the mutating task form);
+gate 16's corpus staleness is **stop-and-report**, never regenerate, while the shared-asset sequence is
+live elsewhere; gate 18 stays supervisor-coordinated and author-must-not-run. And the working
+discipline that cost the sibling leaf three consecutive turns: **commit and push each meaningful unit**
+rather than deferring to one large finish.
+
+Phase normalized to `status:impl` on PR #1764 and issue #1368.
+
+### #1758 convergence in flight
+
+The author has the merge onto `3e5cbabf` locally (`435c6f69`, 6 dirty) and has not yet pushed. Its
+conflict map was pre-computed and handed over: `README.md` is the real textual conflict, the four
+shared carriers resolve **only through generators**, and D4's preset closure must be **re-verified**
+against #1731's `src/ports/*` and `src/query/mod.ts` changes rather than assumed to have survived.
