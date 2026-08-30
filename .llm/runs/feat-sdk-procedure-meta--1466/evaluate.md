@@ -491,3 +491,236 @@ Slice 1 is therefore **terminal on evidence as well as substance** at the slice-
 (`42874803` content, `ff4e81cc` test attestation), with G-1/G-4 carried into slices 2/3 and G-7 as
 an evidence-only tidy-up. Slice 2 (`2863d29e`) has not been evaluated by this session and needs its
 own separate-session IMPL-EVAL.
+
+---
+
+# Evaluation — FINAL all-slices IMPL-EVAL: #1466 slices 1–3 (PR #1731)
+
+This section is appended by the final all-slices IMPL-EVAL session. Nothing above this rule was
+modified; `git diff` of this commit shows only additions at the end of this file.
+
+## Metadata
+
+| Field | Value |
+| --- | --- |
+| Run ID | `feat-sdk-procedure-meta--1466` |
+| Target | **The whole leaf.** Slice 1 (`42874803`, standing cycle-2 `PASS`, checked only for regression), slice 2 (`2863d29e`, SDK declaration propagation + G-1, never formally evaluated), slice 3 (`9ab779ce`, publish & compatibility evidence + G-4/AF-1, never formally evaluated). Terminal gate for #1466. |
+| Archetype | 2 — Integration (`packages/sdk`, governing); `packages/contracts` portion Archetype 1; docs overlay (package READMEs, JSDoc, `docs/site/reference/contracts/index.md`) |
+| Evaluator | Claude Fable 5 · medium, `formal_impl_evaluation` (`lane-policy.md:46`, native opposite-family for Codex work), fresh separate session `8d9946e6`, 2026-08-30. Generators: Codex `gpt-5.6-sol` · high, threads `01a051f8…` (S2) and `01a05215…` (S3); S1 threads as recorded in `supervisor.md`. Both prior evaluator sessions (`00ec0e55…`, `b13a38f6…`) are different sessions from this one. |
+| Worktree | `/home/agent/projects/netscript/worktrees/ns1466-impleval-final`, detached; `007-leaf-1731` (author) not touched (D-19). A scratch detached worktree of `origin/main` was created under the job tmp dir for the doc-lint baseline and removed afterwards (`git worktree remove`). |
+
+### Immutable identity
+
+- `git rev-parse HEAD` = `origin/feat/sdk-procedure-meta` (fetched live) = PR #1731 `headRefOid` (live `gh`) = **`e34505f187970dac261dce2ddc898c5baedd83c3`**. All three agree.
+- PR OPEN, **draft**, milestone `0.0.7`, labels `status:impl-eval, type:feat, priority:p1, area:sdk, area:contracts, epic:sdk-client-contrib` (exactly one `status:`). Body carries **`Refs #1466 — partial`**, states "This PR does not complete #1466", and its `## Slices` list still marks S2/S3 "NOT RUN". Issue #1466 OPEN, six acceptance boxes unchecked, `status:impl-eval`.
+- Content heads: S1 `42874803`, S2 `2863d29e`, S3 `9ab779ce`. `git diff 9ab779ce..HEAD -- . ':!.llm/runs'` is **empty** — this evaluation's product tree is byte-identical to the S3 content head; `e19de923` and `e34505f1` are evidence-only.
+- `deno.lock`: `git rev-parse <c>:deno.lock` = `a1522e6e…` at `21d516224` (base), `42874803`, `2863d29e`, `9ab779ce`, `HEAD`, and `origin/main`. **Byte-unchanged across the whole branch.**
+- Merge base `21d516224`; `origin/main` still `13878a80a` (3 commits ahead); `git diff 21d516224..origin/main -- packages/contracts packages/sdk deno.lock docs/site/reference/contracts .llm/tools/gates` is empty. D-3's inert-drift reasoning still holds; no rebase needed.
+- Tree clean before and after: every perturbation below was restored with `git checkout -- <file>` and the one scratch fixture deleted; `git status --porcelain` was empty after each case and at the end.
+
+## Process verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Plan-Gate passed before implementation | PASS | unchanged: `plan-eval.md` cycle 2 `PASS` at `7db3954bf`, before `c9a39181` |
+| Design section in worklog | PASS | `worklog.md` `## Design`, unchanged |
+| Commit slices match the plan's three slices | PASS | S1 `c9a39181…42874803` (+repairs), S2 `2863d29e` (one content commit, files exactly the plan's slice-2 list plus the contracts pin file G-1 assigned to it), S3 `9ab779ce` (docs row, JSDoc paragraph, two comment lines — "no feature expansion" honoured: +7/−3 product lines) |
+| Each slice has its named gate | PASS (ruled) | eight receipts at each content head; `public-doc-lint` baseline-red/delta-0 per R-1 (§ Re-measurement 1) |
+| Per-slice PR comment (commit trail) | PASS | 14 comments; S2 `[PHASE: IMPL]` at `09:45:05Z`, S3 `[PHASE: IMPL] [VERDICT: COMPLETE]` at `10:16:17Z`. Only the supervisor's evidence-only G-7 commit `e34505f1` has no comment (noted, not a finding — supervisor bookkeeping, no product change) |
+| Tier-A slice review before sign-off | PASS | `tier-a-review-1466-s2.md` and `…-s3.md` (features supervisor, Opus 5 high, worktree `ns1466-tiera-c4`), both `ACCEPTED`, both re-measured rather than self-certified. Read here as claims and re-derived below. |
+| Agent briefs carry `## SKILL` | PASS | `slices/impl-eval-1466-final.md` (this brief) carries `## SKILL`; S2/S3 briefs asserted by the Tier-A records |
+| `supervisor.md` current | **PASS with H-3** | present; stale for S2/S3 (thread ids, effort, reviews, this session) — evidence-only |
+| Evaluator route | PASS | Fable 5 · medium, native opposite-family primary; no escalation needed |
+| Release-gate class (rule 14) | N/A | not a cut or release-gating run; no runtime lease held; no E2E/Aspire/Docker/browser gate run |
+
+## Re-measurement (nothing below is taken from the supervisor or the authors)
+
+### 1. `public-doc-lint` at the final head vs `main` — set identity, not count
+
+Receipt argv (16 entrypoints, `receipts/public-doc-lint-final.json`), run at `e34505f1` and in the scratch `origin/main` worktree at `13878a80a`:
+
+- `main`: exit 1, 12 `private-type-ref` findings. Head: exit 1, 12.
+- Sorted `(public symbol → private type)` pairs: **9 identical**. `main`-only: `BaseContractOutputRoute→BaseContractErrors`, `BaseContractRoute→BaseContractErrors`, `baseContract→oc`. Head-only: `BaseContractErrors→MergedErrorMap`, `baseContract→ContractBuilder`, `baseContract→Schema`.
+
+Exactly the R-1 set, at a fourth consecutive content head (`42874803`, `2863d29e`, `9ab779ce`, and the final evidence head). S2 added two public SDK types and S3 rewrote public JSDoc: **zero** findings moved. The head-side residuals are the same three AP-14-protected upstream names R-1 recorded.
+
+### 2. The G-1 anchored pin — required forgery, then my own
+
+Committed pin (`packages/contracts/tests/assertion-budget_test.ts:131`):
+`/export\s+const\s+baseContract\s*:[^=;]+?=\s*oc\.\$meta<NetScriptProcedureMeta>\(\{\}\)\.errors\(commonErrorMap\);/g`, count must be exactly 1 over comment/string-stripped source.
+
+| Probe | `check` (primitives + both fixtures + inference probe) | `lint` | pin test | notes |
+| --- | --- | --- | --- | --- |
+| Head, unmodified | exit 0 | exit 0 | 5/5 | baseline |
+| **P1 (required)** — B2 (`NetScriptProcedureMeta & { readonly extra?: string }`) **plus** the dead decoy `const _legacyBase = oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap); void _legacyBase;` | exit 0 | exit 0 | **RED** — `4 passed / 1 failed` | the cycle-2 forgery is defeated; Tier-A's and the author's results reproduced |
+| P2 — B2 + the decoy inside `namespace _legacy { export const baseContract: … = …; }` | exit 0 | **exit 1** `no-namespace` | GREEN (count 1 = decoy) | not a working forgery: the contracted `lint` gate rejects it |
+| P3 — initializer byte-identical; `import type { NetScriptProcedureMeta as OwnedProcedureMeta }` + local `type NetScriptProcedureMeta = OwnedProcedureMeta & { readonly extra?: string }`; `BaseContractMeta` re-pointed at `OwnedProcedureMeta` | exit 0 | exit 0 | pin GREEN, but the **assertion-budget test goes RED** (`as` in the import rename counts as an assertion token) | caught, incidentally, by the sibling scanner |
+| **P3b — same rebinding without an `as` token**: `type NetScriptProcedureMeta = import('../domain/procedure-meta.ts').NetScriptProcedureMeta & { readonly extra?: string };` replacing the import; `BaseContractMeta` re-pointed at the `import()` type | **exit 0** | **exit 0** | **GREEN 5/5** | full contracts suite **16/16**, `quality:scan` exit 0, 16-entrypoint doc-lint still 12 findings. **A working forgery against the anchored pin** — finding **H-1** |
+
+What P3b shows: the pin is a *text* pin. It fixes the spelling of the initializer statement but not the binding of the identifiers inside it; rebinding `NetScriptProcedureMeta` (or `commonErrorMap`, or `oc`) to a divergent local declaration keeps the text identical and every contracted gate green. Impact is the same bounded class cycle 2 assigned to G-1: a deliberate forgery, visible in any diff, with **no consumer-visible effect** under `isolatedDeclarations` (the annotation is the published declaration and the runtime value is `{}` either way). Non-blocking; required action in H-1.
+
+### 3. AF-1 — is `[^=;]+?` brittle on correct code?
+
+Yes, at the regex level, by construction: the span cannot contain `=` or `;`, so any annotation that legitimately contains a `=>` function type, a `;`-separated object-type literal, or a default type parameter stops the pattern from matching. I demonstrated both characters (P4: a `;`-bearing mapped type in generic position 3; P5: a `=>`-bearing intersection in position 4) — the pin went **RED** in both cases. I note honestly that neither perturbation was type-identical to the current annotation (both also failed `check` on the `Equal<>` fixtures), so this is a demonstration of the *pattern's* behaviour, not of a false red on a real refactor; no such refactor exists at this head. D-31's reason for the bounded span is sound (an unbounded `[\s\S]*?` re-opens the cross-statement decoy). The author's comment names the trap and the correct response and is an **adequate mitigation for now**; the robust form is the statement-extraction approach in H-2, which also removes the character restriction. Not blocking.
+
+### 4. S2 — metadata propagation, broken on purpose
+
+Guard: `deno check --unstable-kv packages/sdk/tests/type-fixtures/procedure-meta_type.ts` (exit 0 at head; the root `check` wrapper selects `_type.ts` fixtures — verified, 10 files selected under `packages/sdk/tests/type-fixtures`).
+
+| Perturbation (product file) | Result |
+| --- | --- |
+| S1 `ProcedureMetaFromNode` → always `Record<never, never>` | **RED** — 4× TS2344 (direct, generated, query-marker, extractor) |
+| S2 `ProcedureMetaFromNode` → `TMeta & { readonly extra?: string }` | **RED** — 4× TS2344 |
+| S3 `ActionMethod.__netscriptProcedureMeta` marker removed | **RED** — TS2339 |
+| S4 `ProcedureMeta` alias → `Record<string, unknown>` | **RED** — 2× TS2344 **and TS2578** (the negative fixture's `@ts-expect-error` becomes unused — the negative half fails correctly when the type is loosened) |
+| S5 client error `code: K` → `code: string` | **RED** — TS2344 on `_DirectClientErrorCodesRemainExact` |
+| S6 `DefinedServiceQueries` → `QueryFactory<ContractLike>` | **RED** — TS2339 (`list` no longer exists on the loosened factory) |
+| S7 `__netscriptServiceContract?: TContract` → `ContractLike` | **RED** — 4× TS2339 (direct and generated) |
+
+Every declaration the fixture claims can be made to fail by a product edit; the fixture is a contract, not a tautology.
+
+**S8 — unannotated route probe (scratch fixture, deleted).** The committed fixture annotates its route with `BaseContractRoute<…>`, so I added a scratch `_type.ts` in which the route is *inferred* (`baseContract.route(...).input(...).output(...).meta({ access: { authentication: 'required' } })`, no annotation) and asserted, through `ServiceClient`, `defineServices(...).queries.svc.get.__netscriptProcedureMeta`, and `ProcedureMeta<typeof c, 'get'>`, that meta is exactly `BaseContractMeta`, the `~orpc.errorMap` is exactly `BaseContractErrors`, and the client method's defined-error `code` union is exactly the six literals — plus a sanity assertion that `Equal<…, Record<never, never>>` is `false`. **exit 0.** Metadata and error literals reach direct clients, generated clients, and query factories from the real initializer path, not only from the annotation.
+
+**Boundary hygiene.** `packages/sdk/tests/assertion-budget_test.ts` pins `ports/service-client.ts` = 0, `ports/query-factory.ts` = 0, `presets/define-services.ts` = 1, `client/service-client.ts` = 1, `query/query-factory.ts` = 5 — the plan's re-measured baselines exactly — and zero `any` in the two port files; all in the 94/94 package run. `ProcedureMetaFromNode` is structural (`'~orpc'.meta` inference), imports nothing from `@netscript/contracts`; the doc-JSON independence test covers the five symbols and passes. The `__netscriptProcedureMeta` optional marker follows the existing `__netscriptServiceContract` / `__netscriptSchemas` precedent.
+
+### 5. S3 — publish & compatibility evidence, re-run
+
+- Per-member `deno publish --dry-run --allow-dirty`: contracts exit 0, sdk exit 0, both `Success Dry run complete`. Workspace receipt `publish-dry-run-final.json` PASS at `9ab779ce`.
+- `isolatedDeclarations: true` at root `deno.json:175`; neither member `deno.json` sets the key (verified by grep) — inherited, no opt-out.
+- Exact `@netscript/*` pins: contracts none; SDK exactly `@netscript/service = jsr:@netscript/service@0.0.6`.
+- JSR audit (`audit-jsr-package.ts`, re-run): contracts — one **INFO** (sanctioned oRPC slow-types); SDK — two **WARN** (`src/` 13 immediate children vs cap 12; slow-types banner), **no FAIL**. The cardinality WARN is base-inherited: `packages/sdk/src` has **13 entries on `origin/main` and 13 at head** (my own `ls | wc -l` in both trees), matching the features run's D-36. Reported, not adjusted; a coordinator debt/split question, not this leaf's.
+- G-4 closed by absence: `grep -rn '{@link commonErrorMap}' packages/` → none; `grep -rn 'shape of .commonErrorMap' docs/ packages/` → none; `commonErrorMap` absent from `src/public/mod.ts`. The value stays private (R-2 honoured); the fix did not re-export it.
+- `deno task docs:exports-drift` → **PASS, exit 0**; contracts `complete` with 0 omitted groups, SDK `entrypoints-only` with 0 omitted groups.
+- `deno task quality:gate` (scan + `arch:check`) → exit 0.
+
+### 6. Receipts and archives
+
+All eight top-level receipts: attempt 9, `invocationId = 1466-<gateId>-final`, **`gitHead == actualGitHead == 9ab779ce…`** on every file, outcomes 7 PASS / `public-doc-lint` FAIL exit 1; `test` summary `4258 passed / 0 failed / 19 ignored`, no `reason` field, no `SKIPPED`. `frozen-2863d29e/`: attempt 8, all at `2863d29e`, `test` PASS 4258/0/19. `frozen-42874803/`: seven attempt-5 receipts at `42874803`, `test-final.json` attempt 7 PASS 4250/0/19 at `ff4e81cc` (product identity `42874803..ff4e81cc` re-verified empty), and the restored `test-final.attempt5-skipped.json` (attempt 5, `SKIPPED`, at `42874803`).
+
+Byte integrity: every file in `frozen-2863d29e/` equals its blob at `dce16175:receipts/*-final.json`; every file in `frozen-42874803/` (the eight) equals its blob at `1f0cdef2:receipts/*-final.json`; every file in `frozen-235482767/` equals `fc81e652:receipts/*-final.json`; `frozen-c9a391811/` unchanged since `fc81e652`. **G-7 restoration is byte-faithful**: `git show dd201816:…/receipts/test-final.json | sha256sum` = `0d5d2c3d…f720e92fca` = the restored file. `git log --all --diff-filter=MD -- receipts/frozen-*` is **empty**: append-only holds for all four archives.
+
+Root `test` by me at `e34505f1` (product ≡ `9ab779ce`): `deno task test` → exit 0, **4258 passed / 0 failed / 19 ignored**, 212 s. Host: PID 1 `tini`, zombies 0. That is protocol rule 6's independent verification of the contracted `test` receipt; the addendum's condition (a) — root `test` green off the defective host — is met locally at the final head, and the CI matrix at ready-flip remains the off-host confirmation (all matrix jobs at `e34505f1` are `skipping` on the draft; only the Pages docs classifier ran, pass).
+
+### 7. Regression check of S1 by S2/S3
+
+S2 touched one S1 file (`contracts/tests/assertion-budget_test.ts`, the pin — strengthened, G-1); S3 touched `contract-primitives.ts` JSDoc only, the docs row, and the pin's comment. Contracts suite **16/16**; contracts fixture + inference probe `check` exit 0; doc-lint set unchanged (§1); `BaseContractMeta`/`BaseContractErrors`/`baseContract` declarations unchanged since `42874803`; `commonErrorMap` still private; R-2's alias (`MergedErrorMap<Record<never, never>, CommonErrorMap>`) intact. **No regression.**
+
+## Acceptance points (#1466) — the whole leaf
+
+| # | Point | Result | Evidence (re-derived here) |
+| - | ----- | ------ | -------- |
+| 1 | `NetScriptProcedureMeta` has a public, versionable NetScript-owned shape | **PASS** | S1 unchanged; `src/domain/procedure-meta.ts` zero imports (scanner), exported via `public/mod.ts`; doc-JSON independence test green |
+| 2 | Existing contract error literals remain preserved end to end | **PASS** | S5 (code literal widened → red), fixture status `404`/message `'Resource not found'`/data identity assertions; S8 inferred-route error map ≡ `BaseContractErrors`; `readme-doctest` `safe()` pin green |
+| 3 | Metadata reaches direct clients, generated clients, and query factories without casts or `any` | **PASS** | S1–S7 all red on breakage; S8 inferred path green; SDK assertion budgets 0/0 at the boundary, zero `any`; `quality:gate` green |
+| 4 | Positive and negative type fixtures exercise real exports | **PASS** | SDK fixture imports `@netscript/contracts`, `@netscript/sdk`, `@netscript/sdk/ports`, `@netscript/sdk/query` (L5); negative `@ts-expect-error` twins fail correctly when loosened (S4 TS2578); contracts fixtures per S1 |
+| 5 | Public docs explain ownership and compatibility boundaries | **PASS** | contracts README + reference (S1, F-4 corrected); `CommonErrorMap` row and `baseContract` JSDoc describe the map on its own terms (G-4); SDK README bullet + `./ports` row; `docs:exports-drift` PASS |
+| 6 | Required SDK/contracts gates and IMPL-EVAL pass | **PASS** | eight receipts at each content head, seven PASS + one ruled baseline-red (R-1, set-identical); root `test` re-run green; this verdict |
+
+**All six acceptance points are met on substance.** The issue's boxes are unchecked; ticking them with linked evidence is the coordinator's close-gate step, not this session's.
+
+## Static gates
+
+| Gate | Command or check | Result | Evidence |
+| --- | --- | --- | --- |
+| Narrow typecheck | `deno check --unstable-kv` primitives + both fixtures + probe + doctest | PASS | exit 0 (baseline of the perturbation tables) |
+| Root typecheck | `receipts/check-final.json` | PASS | attempt 9, `9ab779ce` |
+| Format / Lint | `fmt-check-final.json`, `lint-final.json` | PASS | attempt 9 |
+| Doc lint | 16-entrypoint `deno doc --lint`, head vs `main` | FAIL (baseline-red, delta 0, set identical) | § 1 |
+| Publish dry-run | workspace receipt + per-member re-run | PASS | § 5 |
+| Exports drift | `deno task docs:exports-drift` (R-3 supplemental) | PASS | exit 0 |
+| Package tests | `deno test --allow-all packages/contracts packages/sdk` | PASS | 94/94 |
+| Root test | receipt attempt 9 + my run | PASS | 4258/0/19 both |
+| Quality gate / arch | `deno task quality:gate` | PASS | exit 0 |
+
+## Fitness gates
+
+| Gate | Function | Result | Evidence |
+| --- | --- | --- | --- |
+| F-3 | Layering | PASS | SDK ports import nothing from contracts; `arch-check` receipt PASS |
+| F-5 | Public surface audit | PASS | contracts +3 types / 3 changed declarations; SDK +2 types (`./ports`, `./query`) + 1 changed interface — exactly the plan's delta; SDK root untouched (D-32 transitive visibility acknowledged) |
+| F-6 | JSR publishability | PASS | dry-runs green; audits no FAIL; SDK WARNs base-inherited (D-36) |
+| F-7 | Doc-score | PASS | 0 missing JSDoc; residual set = `main` |
+| F-10 | Test-shape audit | PASS with H-1/H-2 | fixtures are real tripwires (S1–S7); pin is text-only (P3b) |
+| F-15 | AP-14 re-export lint | PASS | no upstream type re-exported; independence test green |
+| F-16 | Folder cardinality | pre-existing WARN | SDK `src/` 13 on `main` and head — not this leaf's |
+| F-19 | Scoped source gate runners | PASS | receipts 1–3, 6–7 |
+
+## Runtime / consumer gates
+
+| Gate | Validation | Result | Evidence |
+| --- | --- | --- | --- |
+| Runtime metadata storage | `procedure-meta_test.ts` | PASS | in 94/94 |
+| Consumer: `@netscript/sdk` | fixture + doctest + S8 | PASS | exit 0 |
+| Consumer: plugins / templates | grep for withdrawn value | N/A | zero consumers |
+| Expensive gates | `scaffold.runtime`, Aspire, Docker, browser | NOT RUN | no lease; not applicable |
+
+## Anti-pattern check
+
+| AP | Status | Evidence |
+| --- | --- | --- |
+| AP-14 | CLEAR | `ProcedureMetaFromNode`/`ProcedureMeta` structural; no `@orpc` in their doc-JSON subtrees; doc-lint set unchanged |
+| others | N/A | no runtime, folder, naming, saga, console, or permission surface changed |
+
+## Arch-debt delta
+
+| Metric | Count | Evidence |
+| --- | --- | --- |
+| New entries | 0 | no #1466 entry; none owed — no doctrine violation introduced |
+| Resolved / deepened | 0 | — |
+| Unrecorded violations | 0 for this leaf | the SDK `src/` cardinality overage (D-36) predates the branch and is not in `arch-debt.md`; a coordinator follow-up, not a `FAIL_DEBT` trigger for work that did not touch it |
+
+## Findings (final)
+
+| ID | Severity | Finding | Evidence | Required action |
+| --- | --- | --- | --- | --- |
+| H-1 | low | The anchored G-1 pin is defeated by identifier rebinding: replacing the `NetScriptProcedureMeta` import with `type NetScriptProcedureMeta = import('../domain/procedure-meta.ts').NetScriptProcedureMeta & { readonly extra?: string }` (and re-pointing `BaseContractMeta` at the `import()` type) keeps the initializer text identical and every contracted gate green. | § 2, P3b | non-blocking follow-up (any later contracts slice, or the H-2 follow-up): pin the bindings too — stripped source contains exactly one `import type { NetScriptProcedureMeta } from '../domain/procedure-meta.ts'`, zero `type NetScriptProcedureMeta`, zero `import(`, exactly one `const commonErrorMap: CommonErrorMap =`, and `oc` imported only from `@orpc/contract`. |
+| H-2 | low | `[^=;]+?` is a character restriction standing in for a statement boundary; it fails to match on any annotation containing `=` or `;`. The author's comment is an adequate interim mitigation. | § 3, P4/P5 | non-blocking follow-up: extract the `export const baseContract` statement with a depth-aware scan (track `<>`, `()`, `{}`, `[]` to the terminating `;`) and assert its initializer text exactly — removes the restriction without re-opening the cross-statement decoy. |
+| H-3 | low (evidence-only) | `supervisor.md` is stale for S2/S3: it omits author threads `01a051f8…` (S2) and `01a05215…` (S3), records `complex_implementation · high` as "original slice-1 only" although S2/S3 ran at high, omits the S2/S3 Tier-A reviews, and lacks this session. | file at `e34505f1` vs Tier-A S2/S3 records | coordinator, evidence-only: add the two threads and efforts, the two Tier-A rows, and this session (`8d9946e6`, worktree `ns1466-impleval-final`, verdict below). No content change. |
+| H-4 | info | SDK JSR WARNs (`src/` cardinality 13 > 12; slow-types banner) are base-inherited and unrecorded in `arch-debt.md`. | § 5; D-36 | coordinator follow-up outside this leaf: record as debt or schedule the split. |
+
+Non-findings, so they are not re-litigated: R-1 (both halves as settled — root-`test` half void, doc-lint half verified), R-2/F-1, R-3, AP-14, D-3 drift, the `SKIPPED` history (archived, byte-faithful), G-1…G-7 (all closed or carried as stated), AF-1 (H-2 is its follow-up form).
+
+## Rulings requested of this gate
+
+### Ruling A — is #1466 complete?
+
+**Yes.** All six acceptance points are met across the three slices, each re-derived above rather than accepted from the slice reports. The leaf's product delta is exactly the PLAN-EVAL-approved public-surface delta; every test that claims to guard something was made to fail by a product edit; every contracted receipt is real, at its content head, with `gitHead == actualGitHead`; and no doctrine violation or debt was introduced. Nothing remains for an implementation lane.
+
+### Ruling B — is the leaf close-gate ready (`netscript-pr` rule 12)?
+
+**Ready on substance; not yet in form.** This PASS completes the evaluator half. What the coordinator must do, in order, before `status:ready-merge` / merge — none of it is this session's to perform:
+
+1. **PR body**: this PR now completes #1466, so the closing keyword is owed — replace `Refs #1466 — partial` with **`Closes #1466`** in `## Scope`, delete the "This PR does not complete #1466" paragraph and the "Remaining scope" section, mark the `## Slices` rows S2/S3/IMPL-EVAL done with the content heads, and check the three open Definition-of-Done boxes with links (S2 fixture + this section for declarations; the attempt-9 receipt set for gates; this verdict for IMPL-EVAL). Keep `Part of #1348` without a keyword.
+2. **Issue #1466**: an `acceptance-evidence` block mapping all six boxes (evidence: this section, the receipt paths, the S2 fixture, the S3 audit doc), validated with `mirror-acceptance-evidence.ts --dry-run` then applied.
+3. **`supervisor.md`** H-3 edit and the H-1/H-2/H-4 follow-ups filed (issues), plus the still-open R-3 catalog-entry follow-up.
+4. **Ready-flip**: this triggers the CI matrix (root `test` off-host — the remaining condition from the cycle-2 addendum) and, per the evaluator protocol, dispatches an OpenHands IMPL-EVAL unless `impl-eval:skip` is present. The native opposite-family IMPL-EVAL is this one; whether to add `impl-eval:skip` is the coordinator's call, but two evaluators on the same head should be a deliberate choice, not an accident of the flip.
+5. **Label** `status:impl-eval` → `status:ready-merge` only after the matrix is green; then `gh run rerun` so the close-gate and mirror jobs read live labels. Do not push to refresh them — a push invalidates this verdict's head.
+6. **Merge** stays a human decision.
+
+### Ruling C — is a permanently baseline-red `public-doc-lint` acceptable to merge on?
+
+**Yes, for this leaf, on the delta-0-with-set-identity standard — and that standard is sufficient only because it is measured, not asserted.** The 12 residual findings are all `private-type-ref` to upstream oRPC/TanStack names that AP-14 forbids re-exporting; a green gate would require either re-exporting them (a doctrine violation) or hiding real public types (a worse docs outcome). Four consecutive heads have held the exact set, and two evaluators plus a Tier-A reviewer have re-derived it independently. Merging on it does not weaken anything the gate was contracted to detect: the branch-owned regression class (a new symbol referencing a new private type, or a missing JSDoc) would have moved the set, and `docs:exports-drift` covers the inventory class the receipt set was blind to (D-7).
+
+What must change — **not before this merge, but before the next leaf relies on the same ruling**: the standard should become mechanical. A baseline-aware form of the gate (a checked-in expected-finding set the runner diffs against, failing on any addition or removal) would turn "an evaluator ruled the set identical" into a receipt-level PASS/FAIL, and would let the residual 12 be reviewed as one recorded item instead of re-ruled per leaf. That is a harness-tooling follow-up for the coordinator alongside the R-3 catalog entry; it is not a #1466 obligation.
+
+### Ruling D — did S2/S3 regress S1?
+
+**No** — § 7.
+
+## Lessons for promotion
+
+| Lesson | Pattern | Applies to | Confidence |
+| --- | --- | --- | --- |
+| A source-text pin fixes spelling, not binding; anchor the identifiers as well as the statement, or extract the statement with a depth-aware scan | pin imports/declarations of every identifier the pinned expression uses | Archetype 1–2 test-shape | medium |
+| A baseline-red gate needs a checked-in baseline set, not a per-leaf evaluator ruling | `--baseline <set-file>` in the doc-lint runner; fail on set delta in either direction | harness `gates/`, `.llm/tools/docs/` | high |
+| Prove propagation on the inferred path, not only the annotated one | pair each annotated-route fixture with an unannotated twin | Archetype 2 fixtures | medium |
+| Tier-A acceptance that re-measures is a claim the evaluator still re-derives; both reviews here were accurate, which is the point of checking | keep the "read as claims to test" instruction in final-gate briefs | evaluator protocol | high |
+
+## Verdict
+
+| Field | Value |
+| --- | --- |
+| Verdict | **`PASS`** — terminal for #1466 |
+| Rationale | Approved scope is complete across all three slices and was re-derived here: the S2 declarations preserve exact metadata and exact error literals through direct clients, `defineServices` clients and query factories, and every one of seven product-level breakages turns the real-export fixture red (plus an inferred-route probe green); S3's publish evidence re-runs green (workspace and per-member dry-runs, inherited `isolatedDeclarations`, exact pins, audits with no FAIL) and G-4 is closed without re-exposing the private value; the required G-1 forgery goes red; `public-doc-lint` is 12 = 12 with the exact R-1 set at the final head; `docs:exports-drift`, `quality:gate`, package suites 94/94 and root `test` 4258/0/19 are green by my own runs; all eight receipts at each content head attest `gitHead == actualGitHead` with real `test` PASSes and no `SKIPPED`; four archives are byte-intact and append-only, G-7's restoration byte-faithful; `deno.lock` is unchanged across the branch; no doctrine violation or debt was introduced; S1 is not regressed. The open items — H-1/H-2 (a text-pin forgery class already bounded by cycle 2's G-1 judgement, with no consumer-visible effect), H-3 (supervisor bookkeeping), H-4 (base-inherited debt) — are non-blocking follow-ups that need no implementation lane on this leaf. Close-gate form (PR body keyword, acceptance mirror, ready-flip, CI matrix, label) is the coordinator's and the merge is human. |
+
+Failure count for this leaf's IMPL-EVAL loop: unchanged at 1 of 2. No re-evaluation scope: this verdict is terminal.
