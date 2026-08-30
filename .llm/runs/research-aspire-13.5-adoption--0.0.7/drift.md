@@ -904,3 +904,19 @@
   dispatched by this supervisor on its own; the M2 fix is folded into the coordinator-ruled
   **pre-Phase-B slice** (D-45 amendment + F-3b/F-4b + M2) on the same S9 thread, followed by one
   combined audit cycle 3 + scoped IMPL-EVAL re-check when the coordinator authorizes it.
+
+## D-49 — 2026-08-30 — Coordinator rulings ratified after independent audit: D-44 narrowed, D-45 contract fixed
+
+- **D-44 (S8 / PR #1754):** keep `Closes #1720`; **`Closes #863` → `Part of #863`** (#863 gates 2/3
+  are not S8-owned or evidenced). S8 Phase B must still execute exact `db init --name init`, record
+  resource + actual probe detail for #863 gate 1, and hand the remaining exact S6 / root-README /
+  canary receipts forward. Applied by the supervisor to the PR body (central-state edit explicitly
+  ordered).
+- **D-45 (S9 / D-15 baseline):** the exact 13.5.3 baseline is the **required set of 14 tools
+  including `refresh_tools`, excluding `get_integration_docs`**. Missing required or baseline
+  removal → FAIL; `get_integration_docs` is a separate `documentedUnobserved` INFO (later appearance
+  optional INFO); `toolsMissing` only over the 14 and must be `[]`; `baselineDiff.added` expected
+  `[]`. #1721 acceptance, #1759 DoD, #1712 pillar/DoD, and the S9 schema/tests/skill wording are
+  rewritten in place; D-48 F-3b/F-4b and docs-audit M2 fold into the **same bounded pre-Phase-B
+  commit** on the S9 thread; **scoped recheck only** — no new ordinary evaluation for this
+  correction. Dispatched: `slices/s9/pre-phase-b-brief.md` on thread `01a0523a…`.
