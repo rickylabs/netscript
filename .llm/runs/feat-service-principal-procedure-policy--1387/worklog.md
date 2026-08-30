@@ -599,3 +599,12 @@ slice changed no public type or signature. `deno.lock` remains byte-identical at
 No E2E, Aspire, Docker, or browser gate ran and no runtime lease was acquired. This author stops at
 Slice 8's Tier-A boundary: the green evidence is not author self-certification, and Slice 9 has not
 started.
+
+### Slice 8 post-slice reconcile
+
+After the explicit-refspec push, GitHub reported PR #1762 open and draft on the expected branch,
+targeting `main`. Its body still contains both the protected `Refs #1387 — partial` wording and the
+no-auto-close warning, and live `closingIssuesReferences` is empty. The structured Slice 8
+implementation comment is present. No reviewer was dispatched and no state, label, milestone,
+issue, acceptance-box, or PR-body mutation was made. Slice 9 remains blocked on substantive Tier-A
+review and separate-session evaluation of Slice 8.
