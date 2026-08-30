@@ -14,8 +14,17 @@ surface reported by `deno doc`. For the full index of packages and plugins retur
 > **ephemeral ports** (`0`) for the dashboard, OTLP, and resource-service endpoints, so
 > `aspire start --isolated` (an upstream Aspire CLI flag) yields non-colliding, parallel-safe ports
 > and isolated secrets. Generated frontend **app** resources also call `withBrowserLogs()` by default
-> (the AppHost pins `Aspire.Hosting.Browsers`), forwarding browser console output into the Aspire
+> (the AppHost pins `Aspire.Hosting.Browsers` `13.5.3-preview.1.26425.3`), forwarding browser console output into the Aspire
 > dashboard with no opt-in.
+>
+> **13.5 AppHost contracts & capabilities:**
+> - **Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`):** Backing infrastructure
+>   registers non-credential listener readiness probes (TCP socket connect for Postgres/MySQL/MSSQL, RESP `PING` → `+PONG`
+>   for Redis/Garnet over `node:net` with a 2000 ms timeout).
+> - **Typed resource commands (`CommandOptions.Arguments`):** `<db>-cli` resources expose typed
+>   `migrate` (with `--timeout <seconds>`), `seed`, and `reset` (with `--confirm true` guard) operations directly in the Aspire CLI and dashboard.
+> - **MCP tool exposure control (`excludeFromMcp`):** `<db>-cli` helper executables invoke `excludeFromMcp()` so they are
+>   omitted from the Aspire MCP server tool surface while remaining visible in `aspire describe`, `aspire resources`, and the dashboard UI.
 
 The root entrypoint (`@netscript/aspire`) exposes the diagnostic contract only. Composition,
 config, schema, type, adapter, and testing APIs live on typed sub-path exports:

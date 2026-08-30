@@ -55,7 +55,12 @@ ls aspire/apphost.mts aspire/aspire.config.json
 ```
 
 `aspire.config.json` pins `language: "typescript/nodejs"`, `appHost.path: "apphost.mts"`, and the
-Aspire SDK version `13.4.6`. The graph inside the AppHost is **derived from your installed
+Aspire SDK version `13.5.3`. The Aspire CLI version and AppHost SDK version must match on `13.5.3`
+(never mix CLI and SDK trains). If you installed the Aspire CLI via npm (`npm install -g @dotnet/aspire-cli`),
+upgrade it with `npm install -g @dotnet/aspire-cli@13.5.3` rather than `aspire update --self`
+(which targets the .NET global tool package).
+
+The graph inside the AppHost is **derived from your installed
 plugins** at boot via `composeAppHost` (from `@netscript/aspire/application`) — add a plugin and
 its API plus background processor appear in the graph; remove it and they vanish, no edit to
 `apphost.mts` required. The mechanics are in [Orchestration with Aspire](/explanation/aspire/).
