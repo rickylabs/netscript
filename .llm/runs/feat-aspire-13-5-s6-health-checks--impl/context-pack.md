@@ -111,3 +111,24 @@ Docker resource was started.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
+
+## Reconstruction v2 checkpoint (2026-08-30)
+
+The corrected architecture was reconstructed onto exactly-shipped main `2a1248d33d55` in
+`/home/agent/projects/netscript/worktrees/007-aspire-s6-v2`. Coordinator ruling D-91 overrules the
+abandoned D-92 narrow-exclusion attempt: the branch carries the semantic health-check hunks and
+the entire `b4ca8a1d3` runtime-module split.
+
+- Semantic carry: `a5a445c1a`.
+- Complete module split and current-main reconciliation: `719b298ee`.
+- Static gate formatting and fresh 13.5.3 consumer receipt: `fb67d3077`.
+- Exact current measurements: `runtime-gates.ts` 305 lines; `runtime/` 11 immediate children.
+- S1 wording/assertion retained exactly; S5 dynamic endpoint discovery and opt-in port semantics
+  retained; `verify-live-db-endpoint.ts` untouched.
+- Static evidence is green: 99/99 combined focused tests, 28-file structured check, configured and
+  raw lint/fmt, both asset-barrel pairs, host-port policy, quality scan, architecture check, and a
+  real restored-module Aspire 13.5.3 generated-consumer type-check.
+- No runtime, AppHost, container, evaluator, or CI-dispatch command was run.
+
+The original S6 history above is intentionally preserved as audit context. The reconstruction-v2
+worklog section and receipt are authoritative for this corrected branch.

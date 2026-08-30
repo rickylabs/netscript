@@ -6,8 +6,8 @@ Generator source:
   worktree: /home/agent/projects/netscript/worktrees/007-aspire-s6-v2
   baseline: 2a1248d33d55 (exactly-shipped main)
   reconstructed commits at render time:
-    a3e4b0f07 feat(aspire): reconstruct listener readiness semantics
-    b34722425 test(e2e): reconstruct listener runtime module boundary
+    a5a445c1a feat(aspire): reconstruct listener readiness semantics
+    719b298ee test(e2e): reconstruct listener runtime module boundary
   command: deno run -A packages/cli/bin/netscript-dev.ts init s6-consumer --path <scratch-root> --db postgres --ci --yes --no-git --force
   generated AppHost: <scratch-root>/s6-consumer/aspire
 

@@ -219,3 +219,34 @@ health-check changes from `5d2bd8756`, `31a2fac87`, and `01f27d4d4` and the comp
   `verify-live-db-endpoint.ts` is untouched.
 - Fresh measurement: `runtime-gates.ts` is 305 lines; `runtime/` has 11 immediate children.
 - Focused listener/runtime/suite/probe tests: PASS, 46/46 results.
+
+### Reconstruction v2 final static evidence
+
+The historical 812→305 and 48→43 measurements retained earlier in this run describe the original
+S6 split. No rejected-attempt line-count note was copied into this run directory. The corrected
+reconstruction was measured again from its own tree: `runtime-gates.ts` is exactly 305 lines,
+`behavior-gates.ts` is 304 lines, and `runtime/` has exactly 11 immediate children.
+
+| Gate | Result | Reconstruction-v2 evidence |
+| ---- | ------ | -------------------------- |
+| helper/generator tests | PASS | 53/53 focused results. |
+| listener/runtime/suite/probe tests | PASS | 46/46 focused results. |
+| combined focused tests | PASS | 99/99 results across seven roots after final formatting. |
+| scoped check | PASS | Structured `deno check --unstable-kv`; 28 selected files, one batch, zero diagnostics. |
+| configured lint | PASS | `deno task lint`; 2,064/2,064 files processed, zero findings. |
+| configured format | PASS | `deno task fmt:check`; 2,064/2,064 files processed, zero findings. |
+| scoped lint wrapper | EXPECTED_REFUSAL | Root configuration excludes five CLI source files; the wrapper processed the other 23. |
+| raw scoped lint | PASS | `deno lint --no-config`; all 28 touched TypeScript files checked. |
+| raw scoped format | PASS | `deno fmt --check --no-config` with the shipped per-path semicolon conventions; 25 + 3 files checked. |
+| source asset barrel | PASS | `deno task gen:assets-barrel` followed by `deno task check:assets-barrel`. |
+| publish asset barrel | PASS | `deno task gen:publish-assets` followed by `deno task check:publish-assets`. |
+| host-port policy | PASS | `deno task check:aspire-host-ports`; 957 files scanned, no pinned host ports. |
+| quality scan | PASS | `deno task quality:scan`; findings `[]`, allowance count unchanged at 7. |
+| architecture | PASS | `deno task arch:check`; exit 0, no doctrine failures; carried-in warnings remain. |
+| generated 13.5.3 consumer | PASS | `receipts/reconstruction-v2-consumer-typecheck-13.5.3.txt`; `tsc --noEmit` exit 0. |
+| runtime/AppHost/containers/evaluators/CI | NOT_RUN | Explicit corrected-reconstruction boundary. |
+
+Reconstruction commits at this checkpoint are `a5a445c1a` (semantic carry), `719b298ee`
+(complete module split plus shipped-main conflict reconciliation), and `fb67d3077` (gate formatting
+and fresh 13.5.3 consumer receipt). `verify-live-db-endpoint.ts` remains byte-for-byte untouched
+relative to shipped main.

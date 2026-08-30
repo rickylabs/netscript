@@ -29,3 +29,21 @@ Reference `.llm/harness/workflow/lane-policy.md`; do not copy its complete route
 The owner explicitly selected a Fable 5 supervisor for this stacked S6 implementation. The
 implementation session never self-certifies; supervisor review and IMPL-EVAL remain external to
 this run session.
+
+## Corrected reconstruction v2 identity
+
+This appended identity supersedes the historical checkout/baseline fields above for the corrected
+reconstruction while preserving the original S6 audit record.
+
+| Field | Value |
+| --- | --- |
+| Model | Codex GPT-5.6 Sol, high implementation thread |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-aspire-s6-v2` |
+| Local branch | `chore/aspire-13-5-s6-listener-transplant-v2` |
+| PR branch target | `refs/heads/feat/aspire-13-5-s6-health-checks` |
+| Baseline | `2a1248d33d55` (exactly-shipped main) |
+| Architecture ruling | D-91; the narrow-exclusion D-92 attempt is rejected audit history only |
+
+The owner explicitly prohibited runtime, AppHost, container, evaluator, and CI-dispatch activity
+for this reconstruction. Accordingly, the implementation thread completed only the static gate
+matrix and generated-consumer type-check; it did not start or delegate an evaluator session.
