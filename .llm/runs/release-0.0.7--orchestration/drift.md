@@ -1288,3 +1288,15 @@ implementation thread.
   pinned by SHA-256 `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`.
   The evaluated product head remains `c1700128...`; the preservation commit is harness evidence,
   not a new product or PR-head verdict.
+
+## 2026-08-30 — #1731 coordinator inert-main ruling preserves evidence without ritual recut
+
+- After Fable 5 session `2f492178` certified #1731's content/evidence against `a5520e70`, main moved
+  once to `a5f506dd` through #1761. Raw changed-file verification found only the CLI changelog and
+  #1757 run artifacts: no contracts/SDK code or tests, lock, gate catalog, docs tooling, workflows,
+  reference docs, or generated carrier moved.
+- The coordinator ruled this delta inert for #1466 and did not force a rebase or regenerate receipts
+  that would attest the same product bytes. This applies the run's already-evaluated carry-forward
+  rule rather than inventing a waiver: content `d5f3bf4c...`, evidence `dbd3eafa...`, evaluator
+  carrier `ce73a038...`, and current `e325b7fe...` remain distinct and auditable. The ruling is
+  https://github.com/rickylabs/netscript/pull/1731#issuecomment-5469026813.

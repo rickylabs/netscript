@@ -2429,3 +2429,30 @@
 - Coordinator squash-merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
   `13:36:41Z`; #1757 closed at `13:36:42Z`; both are `status:shipped`. The provisional changelog
   remains explicitly subject to a release-cut top-up as later 0.0.7 payload lands.
+
+## 2026-08-30T13:41:18Z — #1731 live-main seven-row PASS and Stage 1b merge
+
+- Reconciled exact PR/current head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22` without
+  conflating it with immutable content `d5f3bf4c159d59bcb468e1abe325f40e267196b9`, receipt/evidence
+  `dbd3eafa6670d90148f52e2f7beec75155267ab6`, or evaluator carrier
+  `ce73a0381485576e63c75fdcae3e163b5b788b4a`. Diffs above content were product-empty.
+- Native Fable 5 currency-renewal session `2f492178` returned `PASS`. It re-derived the terminal
+  all-slices verdict against `a5520e70`, verified attempt-12's eight exact-content-head receipts,
+  genuine root test 4275/0/19, combined package tests, publish surface and G-1 forgery tripwire, and
+  ruled the public-doc-lint result as the exact accepted R-1 3-for-3 substitution rather than a
+  count-only false green.
+- The later #1761 merge moved live main to `a5f506dd...` but touched only
+  `packages/cli/CHANGELOG.md` plus its run artifacts. Coordinator ruling `PASS_INERT_MAIN` verified
+  zero movement across every #1466 read/write/gate surface and therefore preserved the existing
+  content/evidence verdict without a no-information rebase or recut. Evidence:
+  https://github.com/rickylabs/netscript/pull/1731#issuecomment-5469026813.
+- Seven-row pre-merge gate: (1) close-gate `99264739058` SUCCESS; (2) all six #1466 Acceptance boxes
+  checked with evidence; (3) prohibited additions clean outside run artifacts; (4) required
+  check-test, quality, code-quality, publish/docs/package gates terminal green, with non-applicable
+  scaffold/runtime jobs not credited; (5) NetScriptProcedureMeta and exact contract-error retention
+  plus the head chain independently reverified; (6) changed-file envelope matched approved
+  contracts/SDK source, tests, docs and run evidence; (7) body/DoD, head roles, R-1 ruling, closing
+  keyword and ready state matched the exact head.
+- Coordinator squash-merged #1731 as `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at
+  `13:41:17Z`; #1466 closed one second later; both are `status:shipped`. This satisfies Stage 1b and
+  releases #1349/#1352's dependency edges while each successor keeps its own gate contract.

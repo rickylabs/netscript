@@ -726,7 +726,8 @@
       "to": "issue:1466",
       "kind": "rfc-prerequisite",
       "evidence": [
-        "Stage 1b owner is \"selected in Stage 0; do not file in this run\"; rfcs/0001-sdk-client-contributions.md:1275."
+        "Stage 1b owner is \"selected in Stage 0; do not file in this run\"; rfcs/0001-sdk-client-contributions.md:1275.",
+        "PR #1731 merged as 3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c and closed #1466, satisfying this Stage 1b node."
       ]
     },
     {
@@ -782,7 +783,8 @@
       "to": "issue:1466",
       "kind": "requires",
       "evidence": [
-        "Stage 1b must initialize NetScriptProcedureMeta \"without re-erasing Stage 1a types\"; rfcs/0001-sdk-client-contributions.md:1275."
+        "Stage 1b must initialize NetScriptProcedureMeta \"without re-erasing Stage 1a types\"; rfcs/0001-sdk-client-contributions.md:1275.",
+        "#1466 is now closed by merged PR #1731 after independently proving exact contract errors survive the metadata boundary."
       ]
     },
     {
@@ -790,7 +792,8 @@
       "to": "issue:1349",
       "kind": "requires",
       "evidence": [
-        "The normative SdkClientProcedureDescriptor consumed by every contribution embeds Readonly<NetScriptProcedureMeta>; rfcs/0001-sdk-client-contributions.md:410-413."
+        "The normative SdkClientProcedureDescriptor consumed by every contribution embeds Readonly<NetScriptProcedureMeta>; rfcs/0001-sdk-client-contributions.md:410-413.",
+        "Merged #1731/#1466 satisfies this predecessor; #1349 retains its own implementation and gate obligations."
       ]
     },
     {
@@ -798,7 +801,8 @@
       "to": "issue:1352",
       "kind": "requires",
       "evidence": [
-        "#1352 acceptance reads procedure policy metadata, which #1466 defines."
+        "#1352 acceptance reads procedure policy metadata, which #1466 defines.",
+        "Merged #1731/#1466 releases this metadata prerequisite without waiving #1352's auth-dogfood gates."
       ]
     },
     {

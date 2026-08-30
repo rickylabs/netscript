@@ -1434,3 +1434,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - The coordinator merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
   `13:36:41Z`; #1757 closed one second later and both are `status:shipped`. Exact main is
   `a5f506dd...`. This docs merge neither blocks nor globally serializes independent topic queues.
+
+## Resume checkpoint — 2026-08-30T13:41:18Z
+
+- #1731 exact current/evidence head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22` passed the
+  terminal live-main seven-row coordinator gate and merged as
+  `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at `13:41:17Z`; #1466 closed one second later and
+  both are `status:shipped`. Exact main is now `3e5cbabf...`.
+- Preserve the head model exactly: content `d5f3bf4c159d59bcb468e1abe325f40e267196b9`, evidence
+  `dbd3eafa6670d90148f52e2f7beec75155267ab6`, evaluator carrier
+  `ce73a0381485576e63c75fdcae3e163b5b788b4a`, current `e325b7fe...`. Native Fable 5 session
+  `2f492178` returned currency `PASS`; close-gate job `99264739058` succeeded.
+- Coordinator `PASS_INERT_MAIN` ruled #1761's intervening CLI changelog/run-artifact-only main delta
+  outside every #1466 product and evidence surface, so no rebase/receipt recut was warranted. The
+  satisfied Stage 1b node releases #1349/#1352 prerequisites; their queues and gates remain
+  independent.

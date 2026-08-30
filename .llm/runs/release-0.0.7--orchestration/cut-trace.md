@@ -131,3 +131,30 @@ artifact-pinned production E2E.
   `2026-08-30T13:36:41Z`; #1757 closed at `13:36:42Z`. PR and issue are terminal
   `status:shipped`, and exact current `main` is the merge SHA. The changelog is deliberately
   provisional and must be topped up after the remaining 0.0.7 consumer payload lands.
+
+## 2026-08-30T13:41:17Z — #1731 lands the Stage 1b procedure-metadata contract
+
+- PR #1731 completed #1466 at current head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22`
+  while preserving the run's distinct immutable roles: content
+  `d5f3bf4c159d59bcb468e1abe325f40e267196b9`, evidence
+  `dbd3eafa6670d90148f52e2f7beec75155267ab6`, evaluator carrier
+  `ce73a0381485576e63c75fdcae3e163b5b788b4a`, and final evidence/current head `e325b7fe...`.
+  Every commit above content was independently proven to touch no product byte.
+- Fresh native Fable 5 currency session `2f492178` returned `PASS`: the terminal all-slices verdict
+  carries forward, all eight attempt-12 receipts attest the immutable content head, root test is
+  4275 passed / 0 failed / 19 ignored, and the expected public-doc-lint red retains the exact known
+  3-for-3 R-1 substitution with no unreviewed additions.
+- Live `main` advanced from certified evidence base `a5520e70...` to `a5f506dd...` only through
+  #1761's CLI changelog and run artifacts. The coordinator's inert-main ruling verified no
+  contracts/SDK source, tests, lock, gates, workflows, reference docs, or generated carriers moved,
+  so a product/evidence recut or rebase would add no information. Ruling:
+  https://github.com/rickylabs/netscript/pull/1731#issuecomment-5469026813.
+- The terminal live-main seven-row gate passed at `e325b7fe...`: close-gate job `99264739058`; all
+  six #1466 acceptance boxes evidenced; prohibited-pattern diff clean; applicable named CI/quality
+  checks terminal green with runtime/scaffold gates N/A; exact metadata/error-preservation and head
+  roles independently verified; changed files matched the contracts/SDK/docs/tests/run envelope;
+  and the PR body/DoD, baseline-red ruling, and `Closes #1466` matched the shipped head.
+- The coordinator squash-merged #1731 as `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at
+  `2026-08-30T13:41:17Z`; #1466 closed at `13:41:18Z`. Both are terminal `status:shipped`, exact
+  current `main` is the merge SHA, and the satisfied Stage 1b node releases #1349/#1352's metadata
+  prerequisites without waiving their independent gates.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
+  "currentMainSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -22,7 +22,7 @@
       "predecessorPr": 1755,
       "predecessorMergeSha": "a5520e70b43fa792c36451270742240e0f2aa889",
       "state": "docs_sequence_complete_final_base_successors_released_for_current_main_regeneration",
-      "releasedSuccessorPrs": [1731, 1758],
+      "releasedSuccessorPrs": [1758],
       "rule": "each successor rebases onto current main, regenerates the corpus mechanically, and recuts exact-head evidence/evaluation when its head moves"
     },
     "verifiedAt": "2026-08-30T06:16:47.000Z",
@@ -475,7 +475,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "pr1731_slice_2_complete_tier_a_pending_s8_static_implementation_active",
+        "state": "pr1731_merged_shipped_s8_static_implementation_active",
         "worktree": "/home/agent/projects/netscript/worktrees/007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -489,7 +489,7 @@
         "bridgeSessionId": "session_01CHWTWUvxjEkHB7TCav7G2H",
         "remoteControlUrl": "https://claude.ai/code/session_01CHWTWUvxjEkHB7TCav7G2H",
         "topicHeadSha": "e4e71a0804d5cb65704a27eeecca620b20432825",
-        "queueState": "1466_pr1731_slice_2_exact_head_dce16175_plus_host-correction_addendum_bbff7cf9; final_shared_asset_base_1755_merged_as_a5520e70_and_1731_released_for_current_main_regeneration_during_slice_3; slice_3_then_final_all_slices_impl_eval; Aspire S8 #1720/#863 static work continues independently at 1efd1a17; 1387 then 1730",
+        "queueState": "1466_pr1731_merged_shipped_as_3e5cbabf_after_live_main_seven_row_pass; Aspire S8 #1720/#863 static work continues independently at 1efd1a17; 1387 then 1730",
         "tmuxSession": "netscript-007-features-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
@@ -669,7 +669,9 @@
     },
     {
       "number": 1466,
-      "state": "open"
+      "state": "closed",
+      "closedAt": "2026-08-30T13:41:18.000Z",
+      "mergeCommitSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c"
     },
     {
       "number": 1467,
@@ -3051,21 +3053,53 @@
     {
       "id": "sdk-procedure-meta",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "bbff7cf906b4e4d96c49865cada900ea55894d2b",
-      "currentPrHeadSha": "bbff7cf906b4e4d96c49865cada900ea55894d2b",
-      "productHeadSha": "2863d29e342b135de9e9c41c0508a5032c98261f",
+      "headSha": "e325b7fe212f7cf7e0985c634af19e2bd4d5ea22",
+      "currentPrHeadSha": "e325b7fe212f7cf7e0985c634af19e2bd4d5ea22",
+      "productHeadSha": "d5f3bf4c159d59bcb468e1abe325f40e267196b9",
+      "contentHeadSha": "d5f3bf4c159d59bcb468e1abe325f40e267196b9",
+      "evidenceHeadSha": "dbd3eafa6670d90148f52e2f7beec75155267ab6",
+      "evaluatorCarrierHeadSha": "ce73a0381485576e63c75fdcae3e163b5b788b4a",
       "issueNumbers": [1466],
       "branch": "feat/sdk-procedure-meta",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
       "prNumber": 1731,
-      "planEvaluationState": "risk_selected_after_fresh_tier_a",
+      "planEvaluationState": "risk_selected_pass_cycles_1_2",
       "selectionReason": "complex public cross-consumer procedure metadata and error vocabulary boundary",
-      "implementationState": "slice 1 separate-session IMPL-EVAL cycle 2 PASS; slice 2 implementation plus G-1 complete at product 2863d29e with evidence dce16175 and host-correction addendum bbff7cf9; slice 3 active; PR remains draft and partial",
-      "implementationEvaluationState": "slice_1_pass_cycle_2_slice_2_tier_a_pass_slice_3_active",
-      "sharedAssetPredecessorState": "final docs sequence PR #1755 merged as a5520e70; released for current-main rebase and mechanical corpus regeneration before exact-head completion evidence",
-      "nextGate": "integrate final shared-asset main a5520e70 and regenerate assets while completing slice 3 with G-4, then fresh Tier-A, final all-slices separate-session IMPL-EVAL and close-gate"
+      "implementationState": "all three slices complete; immutable content d5f3bf4c159d59bcb468e1abe325f40e267196b9, evidence dbd3eafa6670d90148f52e2f7beec75155267ab6, evaluator carrier ce73a0381485576e63c75fdcae3e163b5b788b4a and final current head e325b7fe212f7cf7e0985c634af19e2bd4d5ea22 are explicitly separated; all commits above content are proven product-inert; terminal live-main seven-row PASS; merged and closed #1466 status:shipped",
+      "implementationEvaluationState": "terminal_all_slices_pass_plus_currency_renewal_pass",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "d5f3bf4c159d59bcb468e1abe325f40e267196b9",
+      "implementationEvaluatorSessionId": "2f492178",
+      "coordinatorCurrentMainRuling": {
+        "state": "PASS_INERT_MAIN",
+        "certifiedEvidenceBaseSha": "a5520e70b43fa792c36451270742240e0f2aa889",
+        "liveMainAtGateSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
+        "rationale": "the only intervening merge was #1761, limited to packages/cli/CHANGELOG.md and its run artifacts; no contracts/SDK/product, test, lock, gate, workflow, reference-doc or generated-carrier byte moved",
+        "commentUrl": "https://github.com/rickylabs/netscript/pull/1731#issuecomment-5469026813"
+      },
+      "preMergeGate": {
+        "state": "PASS",
+        "evaluatedHeadSha": "e325b7fe212f7cf7e0985c634af19e2bd4d5ea22",
+        "liveMainSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
+        "rows": [
+          "1_close_gate_success_job_99264739058",
+          "2_issue_1466_six_acceptance_boxes_checked_with_evidence",
+          "3_prohibited_pattern_diff_clean_excluding_run_artifacts",
+          "4_applicable_named_checks_terminal_success_expensive_runtime_scaffold_gates_n_a",
+          "5_metadata_contract_error_preservation_and_three_head_evidence_chain_independently_verified",
+          "6_changed_file_audit_matches_contracts_sdk_docs_tests_and_run_evidence_scope",
+          "7_body_dod_head_roles_baseline_red_ruling_and_closes_keyword_match_shipped_head"
+        ]
+      },
+      "closeGateJobId": 99264739058,
+      "ciWorkflowRunId": 33314274931,
+      "ciState": "success",
+      "mergeCommitSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c",
+      "mergedAt": "2026-08-30T13:41:17.000Z",
+      "sharedAssetPredecessorState": "final docs sequence PR #1755 merged as a5520e70 and was integrated before exact content/evidence recut",
+      "nextGate": "terminal merged; releases #1349 and #1352 metadata prerequisites while preserving their own gates"
     },
     {
       "id": "fresh-readonly-dehydrated-state",
@@ -4990,5 +5024,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
       "verifiedAt": "2026-08-30T10:00:33.000Z"
     },
-  "updatedAt": "2026-08-30T13:36:42.000Z"
+  "updatedAt": "2026-08-30T13:41:18.000Z"
 }

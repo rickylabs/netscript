@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-30T13:36:42.000Z",
+  "capturedAt": "2026-08-30T13:41:18.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
   "targetIssueCount": 110,
@@ -405,7 +405,9 @@
         "rfcs/0001-sdk-client-contributions.md:1275 Stage 1b — 'Initialize/export NetScriptProcedureMeta without re-erasing Stage 1a types … an explicit dependent child owns this before auth dogfood'",
         "rfcs/0001-sdk-client-contributions.md:410-413 — `SdkClientProcedureDescriptor.meta: Readonly<NetScriptProcedureMeta>` is a field of the normative public contribution contract",
         "Issue body 'Part of #1348. Implements RFC 0001 stage 1b.' — filed after PR #1390 merged, so it IS the Stage-0-selected 1b owner",
-        "rfcs/0001-sdk-client-contributions.md:1347 §'Procedure metadata' defines the shape this issue must export"
+        "rfcs/0001-sdk-client-contributions.md:1347 §'Procedure metadata' defines the shape this issue must export",
+        "PR #1731 exact head e325b7fe212f7cf7e0985c634af19e2bd4d5ea22 passed the live-main seven-row coordinator gate, close-gate job 99264739058, and fresh native Fable 5 currency evaluation session 2f492178; it merged as 3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c at 2026-08-30T13:41:17Z and closed #1466 at 13:41:18Z; both are status:shipped.",
+        "Certified head roles remain distinct: content d5f3bf4c159d59bcb468e1abe325f40e267196b9, evidence dbd3eafa6670d90148f52e2f7beec75155267ab6, evaluator carrier ce73a0381485576e63c75fdcae3e163b5b788b4a, and current PR head e325b7fe212f7cf7e0985c634af19e2bd4d5ea22; every commit above content was proven product-inert."
       ]
     },
     {
