@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { gateArgv } from '../../../../../../.llm/tools/gates/catalog.ts';
 import { resourceCommandContract } from '../../../src/application/gates/scaffold/runtime/evidence/resource-command.ts';
 import { createResourceCommandGate } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
@@ -15,6 +16,12 @@ Deno.test('resource-command gate owns typed db command background restart descri
     describe: ['describe', '--follow', '--format', 'Json'],
     skipWhenStartReceiptAbsent: true,
   });
+  assertEquals(
+    gateArgv('cli-e2e-aspire-resource-command').includes(
+      '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    ),
+    true,
+  );
 });
 
 Deno.test('resource-command gate registers an explicit absent-start skip receipt', () => {
@@ -52,6 +59,14 @@ Deno.test('resource-command gate registers an explicit absent-start skip receipt
   assertEquals(
     gate.command(context).includes(
       '/repo/.llm/tmp/gate-receipts/scaffold.runtime/runtime.resource-command.json',
+    ),
+    true,
+  );
+  assertEquals(gate.command(context).includes('cli-e2e-aspire-resource-command'), true);
+  assertEquals(gate.command(context).includes('--allow-env'), true);
+  assertEquals(
+    gate.command(context).includes(
+      '/repo/.llm/tmp/gate-receipts/scaffold.runtime/runtime.resource-command.receipt.json',
     ),
     true,
   );

@@ -46,9 +46,9 @@
   `5468795433` records fixture evidence and the Phase-B prohibition.
 - Slice 3 (`d6daf416`): exact-AppHost cleanup ownership classifier committed and pushed; PR comment
   `5468796382` records S7-compatible owned/foreign/unproven evidence.
-- Slice 4 (`df8b3f18`): durable receipt wiring, describe-backed wait assertions, resource-command gate,
-  explicit skip policy, and both-tier ordering committed and pushed; PR comment `5468803146` records
-  65 focused passing tests.
+- Slice 4 (`df8b3f18`): durable receipt wiring, describe-backed wait assertions, resource-command
+  gate, explicit skip policy, and both-tier ordering committed and pushed; PR comment `5468803146`
+  records 65 focused passing tests.
 - Final static matrix: structured check selected 187 files with 0 diagnostics; lint selected 179
   files with 0 findings; fmt selected 179 files with 0 findings; raw stdin lint/fmt covered the
   config-excluded gate catalog; README format passed; the complete `packages/cli/e2e/tests` root
@@ -58,3 +58,26 @@
   37 artifact paths. Architecture warnings are baseline except D-04's intentional skip edge and
   contain no failures.
 - Phase B was not attempted: no AppHost start, no containers, and no `e2e:cli` runtime suite.
+
+## IMPL-EVAL fix cycle 1
+
+- 2026-08-30: read the independent Fable 5 `FAIL_FIX` report at the supervisor S10
+  `slices/s10/evaluate.md` and reproduced the focused tests RED: cleanup helpers/signature were
+  absent (three TypeScript diagnostics).
+- F-1: cleanup now classifies absolute mount/env/argv evidence by S7's boundary-safe containment
+  under the generated `projectRoot`. The fixture proves `.data/postgres` owned, a different root
+  foreign, and creator-PID-only evidence unproven without S7's stable PID/start-time registry. The
+  zero-survivor assertion is tested to fail on the owned fixture container.
+- F-2: `runtime.resource-command` now routes through the catalog with the exact
+  `ASPIRE_CLI_START_TIMEOUT` env grant and durable outer/child receipt paths. Command and
+  post-command failures both write `verdict: failed` before rethrowing.
+- F-3/F-4: malformed NDJSON, pending last-seen state, and Running/Unhealthy fixtures now fail. A raw
+  topology parser remains available to listener failure/recovery evidence without weakening
+  convergence.
+- F-7: removed the unused `wait-for-workers-runtime.ts` edge.
+- F-5/F-6/F-8: README and handoff record the single whole-convergence budget (300 seconds; MSSQL
+  Phase B uses 600), Phase-A live `processes: []` limitation, and intentional unknown-doctor-status
+  fail-closed policy.
+- Static verification passed: changed-file wrappers, raw excluded-catalog lint/fmt, README/fixture
+  format, 190/190 CLI-E2E tests, `quality:scan`, `arch:check`, assets/publish/emitted-samples, and
+  Aspire host-port scan. No Phase-B runtime command was run.

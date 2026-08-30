@@ -129,16 +129,25 @@ and requested PR checks should use
 
 ### Structured Aspire evidence gates
 
-| Gate                       | Evidence contract                                                                                                                              |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preflight.aspire`         | `aspire doctor --format Json --non-interactive --nologo`; failures fail closed and warnings remain in the child receipt                        |
-| `runtime.aspire-start`     | bounded `aspire describe --follow --format Json` NDJSON at `.netscript/e2e/aspire-describe.ndjson` with last-seen resource convergence         |
-| `runtime.resource-command` | typed `<db>-cli` migration plus background-child restarts, followed by describe convergence; absent start evidence is an explicit skip receipt |
-| `cleanup.aspire-stop`      | exact-AppHost graceful stop, cleanup-only force stop, then an S7-compatible Docker ownership probe with zero owned survivors                   |
+| Gate                       | Evidence contract                                                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preflight.aspire`         | `aspire doctor --format Json --non-interactive --nologo`; warnings remain in the child receipt, while `fail` and unknown statuses fail closed                  |
+| `runtime.aspire-start`     | bounded `aspire describe --follow --format Json` NDJSON at `.netscript/e2e/aspire-describe.ndjson`; last-seen state and non-empty health reports must converge |
+| `runtime.resource-command` | typed `<db>-cli` migration plus background-child restarts, followed by describe convergence; absent start evidence is an explicit skip receipt                 |
+| `cleanup.aspire-stop`      | exact-AppHost graceful stop, cleanup-only force stop, then a Docker probe that fails on mount or DCP evidence path-contained by the generated project root     |
 
 Durable receipts are written beneath `.llm/tmp/gate-receipts/<suite>/`. The runtime suites retain
 both the receipt envelope and the doctor, start, resource-command, cleanup, and Docker-probe child
 evidence.
+
+`ASPIRE_CLI_START_TIMEOUT` is one budget for the whole describe-follow convergence, not a
+per-resource allowance. It defaults to 300 seconds. The lease-backed Phase-B MSSQL tier sets it to
+600 seconds because that tier converges more slowly.
+
+The live Phase-A cleanup probe deliberately records `processes: []`; its process-name, argv, and
+`ASPIRE_DCP_APPHOST_PATH` rules are fixture-proven only until Phase B captures live process
+evidence. Likewise, a container with only Aspire's creator-process label remains unproven without
+S7's stable PID/start-time registry identity.
 
 ## Required Permissions
 
@@ -157,5 +166,8 @@ implementation are:
 
 After the run completes, the suite gracefully stops the exact generated AppHost and, only when
 `--cleanup` is enabled, follows with `aspire stop --force --apphost <exact>`. It then records a
-Docker probe and fails if Aspire mount-label or DCP AppHost evidence maps any surviving container to
-that AppHost. Foreign and unproven containers are recorded but left untouched.
+Docker probe and fails if Aspire mount-label or `ASPIRE_DCP_APPHOST_PATH` evidence resolves beneath
+the generated project root, including `.data/<resource>` bind mounts. Absolute evidence beneath a
+different root is foreign; evidence without an ownership path is unproven. Both are recorded and
+left untouched. This mirrors S7's containment/env/argv rules pending S7's merge, but Phase A does
+not claim S7's live process probe or creator-PID registry.
