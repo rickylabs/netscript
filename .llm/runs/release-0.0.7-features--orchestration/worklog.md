@@ -7895,3 +7895,68 @@ detached worktree `ns1387-impleval-s2` at the evidence head. Brief:
 `slices/impl-eval-1387-s2.md`. It is told to re-run the product-neutrality diff itself rather than
 trust the supervisor's claim, and to rule on whether F-1, F-2 and the tooling gap are correctly
 classified as non-blocking.
+
+### Slice 2 terminal — IMPL-EVAL ACCEPTED_WITH_FINDINGS; Slice 3 dispatched
+
+| Head role | SHA |
+| --- | --- |
+| **Certified content** | `f9b32b4f7a029d9226584b9c170eb44357e10fdb` |
+| Evidence (final) | `3d00bf3d7` — product-neutral to the content head, re-proved after each carrier |
+| Pushed | `be22d4b6a..d6e6697a9..3d00bf3d7` |
+| PR comments | #1762 `5470736368` (Tier-A), `5470778011` (IMPL-EVAL) |
+
+The evaluator (Fable 5 · medium, separate session, opposite family, own detached worktree
+`ns1387-impleval-s2`) re-ran the neutrality diff, a cold scoped check, the tests, `arch:check` and both
+non-receipted gates itself rather than trusting Tier-A — which is what made **E-1** findable.
+
+### E-1 was a real evidence defect, and my mistake
+
+Three Slice 1 receipts — `docs-accuracy`, `quality-gate`, `test-contracts-sdk` — were still at the
+**top level** of `receipts/` beside the Slice 2 set. The evaluator read `quality-gate.json` as Slice
+2's; it was Slice 1's, at `2ddd60481`.
+
+The cause is precise and worth keeping: I archived by **copy**, then recut. Five receipts were
+overwritten by their Slice 2 counterparts, but these three had **no Slice 2 counterpart**, so nothing
+displaced them. **Append-only protects the record; it does nothing for the reading.** Filenames are
+what a reader scans, and a receipt whose successor never arrives keeps sitting where current evidence
+lives. Fixed by removing the three top-level copies after re-verifying each against its archived copy
+by sha256; archive untouched at eight files. Recorded as **D-6**.
+
+### D-5 — a plan row can contract a gate the tooling cannot receipt
+
+`run-gate.ts` refuses any gate outside `.llm/tools/gates/catalog.ts`, and neither `docs:exports-drift`
+nor `check:mcp-export-corpus` had an entry — while plan row 13 contracts the corpus at **every** slice.
+Both could only be run loose, producing prose instead of a receipt. Same shape as D-3, and invisible
+while the gates happened to pass. Two additive catalog entries landed in supervisor-signed `04d22e7e1`
+(`gates:test` 67/0), then three supplementary receipts at that carrier: `quality-gate` PASS 7 215 ms,
+`exports-drift` PASS 2 569 ms, `mcp-export-corpus` PASS 6 000 ms. **Lesson: a gate named in a plan is
+only contracted if the tooling can produce evidence for it — check the catalog when you write the row.**
+
+`.llm/tools/gates/catalog.ts` is out of ceiling but is harness tooling, not framework source; changed
+under the same supervisor-signed precedent as the pre-Slice-2 `chore(mcp)` regeneration, which is where
+AGENTS.md puts fixes of this kind.
+
+### Evaluator findings carried forward, not closed
+
+- **E-2** — `TCustom` is a **phantom** parameter today: return positions only, so any two
+  instantiations are mutually assignable and the widening guarantee holds by inference rather than
+  enforcement. Slice 3's brief asks for a type test that a *wrong* `TCustom` is **rejected**; a test
+  that only proves acceptance cannot distinguish a real constraint from a phantom one.
+- **E-3** — `traceHeaders` values are `string | undefined` internally, `string` in the published type.
+  Reconcile in Slice 3 **in the direction the runtime guarantees**, not by widening the public type to
+  make an annotation compile.
+- **E-4** — a stated gap rather than a defect: that the dead author's bytes were committed unchanged is
+  no longer independently verifiable. Correct; left visible rather than argued away.
+
+### Slice 3 dispatched
+
+Behaviour-only typed-context composition, four-file ceiling, base `3d00bf3d7`, route
+`openai · gpt-5.6-sol · high`, dry-run clean (`upstream: NONE`, `dirty: 0`). The brief carries E-2 and
+E-3, the now-receiptable corpus gate, both `run-gate.ts` invocation traps, and an explicit **"do not
+dispatch your own reviewer"** — the Slice 2 author died polling a reviewer it launched outside its
+brief and nearly lost its work.
+
+The leaf's sender record was evicted first under the full procedure: `ownerPid 3304466` absent from
+`/proc`, thread `01a053fe` absent across three debounced `codex-status` probes, backup to scratch, one
+literal path removed, count 29 → 28, and `codex-thread-ids.md` preserved as
+`codex-thread-ids-1387-s2b.md` before the launcher overwrote it.
