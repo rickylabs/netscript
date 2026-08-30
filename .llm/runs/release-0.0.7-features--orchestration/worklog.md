@@ -7404,3 +7404,54 @@ Also reconciled: the ~17:05 host process cleanup killed background Claude CLI pr
 lane nothing — all four evaluator sessions had already pushed their verdicts to git before it, so
 their absence from the session list is completion, not loss. Verdicts live in git, not in process
 memory.
+
+## 2026-08-30 — #1730 final handoff at `c80933f7`
+
+Supersedes the `899e30ad` handoff record: three context-pack corrections moved the carrier since,
+each proven product-neutral.
+
+| Field | Value |
+| --- | --- |
+| **Merge head (live)** | **`c80933f7b94804319024b77247f653f073b738ed`** |
+| **Product head** | `1c836918abde397b320941f70063d83f25f6c355` |
+| Evaluator carrier | `899e30ad` (cycle-2 verdict); `6977debd` (cycle-1) |
+| Carriers since | `eb6b9f29` (terminal-state correction) → `a8aedc3f` (self-reference) → `c80933f7` (CI row) |
+| CI | run `33319935905` **attempt 2 `completed/success`** — all jobs green |
+| Threads | PASS, 1 thread, 0 unanswered |
+| PR #1763 | OPEN, not draft, `MERGEABLE`/`CLEAN`, `Closes #1730`, sole `status:ready-merge` on PR and issue, boxes 5/5 |
+
+### The cancelled attempt was infrastructure, and was treated as such
+
+Attempt 1's `check-test` came back **`cancelled`**, not failed, with the head unmoved throughout — so
+it was neither a defect nor a superseding push. Attempt 2 passed on the byte-identical tree. Reporting
+attempt 1's partial as green would have handed over a head whose required job had no successful
+conclusion; waiting cost minutes.
+
+### Three context-pack corrections, all one defect class
+
+Each was a statement that **could not be true at read time**:
+
+1. `## In Progress` / `Next Steps` / two gate rows told a resumer to commit R1, re-cut receipts and
+   stop for Tier-A — all complete at `1c836918`. Found by an `augmentcode` review thread; I verified it
+   and found three more instances beyond the one flagged.
+2. `Next Steps` named **`899e30ad`** as the merge head. Unfixable by updating the value: a commit
+   cannot name its own SHA, so any carrier writing its own head is wrong the moment it exists.
+   Replaced with "resolve the live head from GitHub", and the three roles — **product head**,
+   **evaluator carrier**, **current PR head** — declared never interchangeable.
+3. The CI row cited run `33317991712` as current status. That run belongs to `899e30ad` and was two
+   carriers stale. Replaced with the *requirement* (terminal green at the current head, resolved live)
+   and both prior runs recorded in a superseded-carriers table.
+
+**The general defect:** a document that records *results* about its own repository state goes stale the
+instant it is committed. Records belong in the artifact; **requirements and resolution instructions**
+belong in the pack. That is why all three corrections replaced a value with a rule.
+
+### Carrier-only ruling verified at every step
+
+`git diff --stat 1c836918..<carrier> -- packages plugins docs templates` is **empty** for
+`eb6b9f29`, `a8aedc3f` and `c80933f7`; each touches only `context-pack.md` and `evaluate.md`. The
+cycle-2 `PASS` carries forward unchanged and **no re-evaluation is owed**.
+
+### Awaiting coordinator merge
+
+`origin/main` `de57fab0`, measured inert for this leaf. Nothing in this lane blocks the merge.
