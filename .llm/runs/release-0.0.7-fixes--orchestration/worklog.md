@@ -5215,3 +5215,38 @@ The brief points the evaluator hardest at **ceiling completeness**, carrying #13
 explicitly: enumerate *behavioural* consumers — tests asserting generated-file counts, `--help` text,
 CLI surface snapshots, e2e suite registries — not just structural ones. That is the defect class that
 cost #1368 a terminal cycle, and `ui:add` emission has exactly the same shape of consumer.
+
+### #1357 PLAN-EVAL cycle 1 — `FAIL_PLAN`; the lesson I forwarded is exactly what it caught
+
+Verdict `1a1a0d53` on `eval/plan-eval-1357-cycle-1`, evaluated head `402c552f`, posted to PR #1781.
+Cycle 1 of 2. Five of six judged areas PASS — D10, gate-baseline measurement, the D13/D14 help/emission
+seam, the D5 no-write precondition, and #1354/#1355 scope discipline. One blocking area: ceiling
+completeness, with two misses **of the #1368 class**, both of which I re-derived myself rather than
+accept:
+
+- `packages/cli/e2e/suites/scaffold/capability-suites.ts` defines `RUNTIME_GATES` at l.50 and is the
+  only mechanism selecting a gate into `scaffold.runtime`; an unselected gate is silently dropped. It
+  is **absent from the ceiling** (0 hits), so S2C's gate definition/selection could not have been
+  delivered inside the locked ceiling.
+- Ceiling path 12, `docs/site/web-layer/how-to/customize-fresh-ui.md`, **is a member of the agent-docs
+  prose corpus** (confirmed present in `agent-docs.generated.ts`). Editing it turns
+  `check:agent-docs-prose`, `check:publish-assets` and `check:assets-barrel` red — while the plan's
+  cascade table predicts "None", gate row 16 promises "unchanged PASS", and D17 forbids the
+  regeneration that would clear it. Three mutually contradictory statements.
+
+Forwarding #1368's F-A lesson into the brief was the reason this surfaced at plan time rather than as a
+red suite after implementation. The defect class transfers: enumerate **behavioural** consumers —
+gate-selection registries, generated-corpus membership — not just structural ones.
+
+Repair dispatched (plan cycle 1 of 2, cycle 2 is final): add `capability-suites.ts`; **drop path 12 and
+defer the docs edit** rather than relax D17 — D17 exists to keep shared carriers under supervisor
+ownership and this leaf's value is the emission fix; rewrite the cascade/gate rows so the green
+expectation reads as a *consequence* of touching no corpus member rather than a bare assertion; record
+the three falsified-but-unowned docs (`quickstart.vto:247-260`, `cli-reference.md:104`,
+`fresh-ui.md:245-249`) in `drift.md` as known-stale and owned elsewhere rather than silently dropping
+them; correct D10's wording, since `initialDataUpdatedAt` is optional, not required — the boundary
+conclusion itself was verified true against the base surface. Ceiling lands back at 12.
+
+Sender carries the head-verification guard I promised after the #1368 stale-correction incident: it
+aborts rather than delivering if the head has moved off `402c552f`. Labels moved to `status:plan` on
+both PR and issue.
