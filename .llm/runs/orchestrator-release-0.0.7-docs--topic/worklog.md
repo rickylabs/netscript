@@ -2754,3 +2754,43 @@ freshly-dispatched slice.
 
 Final state: PR #1798 head `0342ef845a6d310f02c1c3fc9bdfb40ab047038f`, terminal green, ready for an
 exact merge packet.
+
+### #1799/PR #1800: mcp summary-table fix, third OpenHands label-race, GLM-route provisioning gap
+
+`mcp`'s reference page had the *correctly named* `## Sub-path exports` heading but no top-level
+summary-table row for any of its three exports — only a per-symbol `### @netscript/mcp/cli`
+subsection. Filed as #1799, dispatched to Codex, delivered as PR #1800 (commit `a0c4c7c95`): a
+3-row summary table inserted above the existing subsection (preserved unchanged), plus one
+`AUTHORITATIVE_MAPPING` entry (`entrypoints-only`, naming 6 specific real-but-undocumented symbols
+across all three entrypoints). Tier-A independently confirmed all 6 named symbols are real exports
+with zero page occurrences, and that `/openapi-projection`'s entire 25-symbol surface is genuinely
+undocumented (0/25) — a substantial, honest gap, not a lazy default.
+
+**Codex stripped backticks from the PR's `acceptance-evidence` `box:` text** (e.g. "mcp is in
+AUTHORITATIVE_MAPPING..." instead of "`mcp` is in `AUTHORITATIVE_MAPPING`...") — the same class of
+exact-text-match defect as #1793, caught by this session before it reached CI and fixed pre-emptively
+this time (previously it was only caught by a CI failure).
+
+**Owner routing update arrived mid-dispatch**: GLM 5.3 Flash (max effort) is now the prospective
+default IMPL-EVAL route, Qwen3.8-Flash-Next (max effort) for PLAN-EVAL when warranted. Probed the
+hybrid-delegation allowlist for two plausible GLM 5.3 Flash model-id slugs (`z-ai/glm-5.3-flash`,
+`zhipuai/glm-5.3-flash`) — both rejected as not-approved. **The new route is not yet provisioned in
+this environment's allowlist.** Per the owner's final ruling, the already-in-flight DeepSeek dispatch
+for #1799/#1800 (started before the routing change was communicated) is a qualifying, owner-preserved
+receipt and stands — the routing change applies prospectively to new dispatches only, and the next
+#1777 slice's evaluation should use GLM 5.3 Flash once provisioned, or fall back to the sanctioned
+direct-OpenRouter route / park that one evaluation (continuing other work) if GLM remains
+unavailable when reached.
+
+**Fourth occurrence of the OpenHands `status:` label-race**, same pattern as #1795/#1797: flipped
+this PR to `status:impl-eval` mid-CI. This time an OpenHands evaluation run (`33341864782`) was also
+launched redundantly on top of the already-completed, owner-ruled-valid DeepSeek PASS; the
+coordinator cancelled it directly. Restored sole `status:ready-merge`, corrected two PR-body
+inaccuracies in place (a stray "prior to the owner's routing update" chronology note, and an
+unticked Definition-of-Done box), reran close-gate once: **PASS**.
+
+Final state: PR #1800 head `a0c4c7c95407499b2ea60709059ab8c120c5f5d7`, terminal green, issue #1799
+4/4 boxes checked, ready for an exact merge packet. **Standing flag for the coordinator: the
+OpenHands `status:` label-race has now recurred four times across three consecutive PRs in this
+queue — worth root-causing or disabling the conflicting automation on `docs:` PRs rather than
+absorbing it per-PR.**
