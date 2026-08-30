@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "f8b4f804cc5fe77054d4f220974eae66becf090c",
+  "currentMainSha": "952cc106aafea61570d24247695ac23f5d810026",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -18,6 +18,13 @@
     "remoteControlEnabled": true,
     "routeCorrection": "owner-corrected coordinator route is GPT-5.6-SOL/high; max is never authorized",
     "mergeAuthorityCorrection": "coordinator owns milestone merges after the full seven-row pre-merge gate; the prior human-only claim was false. PR #1735 exposed a transparent row-7 procedural miss that was repaired in place immediately post-merge without changing substantive evidence.",
+    "sharedAssetSequence": {
+      "predecessorPr": 1748,
+      "predecessorMergeSha": "952cc106aafea61570d24247695ac23f5d810026",
+      "state": "predecessor_merged_successors_released_for_current_main_regeneration",
+      "releasedSuccessorPrs": [1755, 1731, 1758],
+      "rule": "each successor rebases onto current main, regenerates the corpus mechanically, and recuts exact-head evidence/evaluation when its head moves"
+    },
     "verifiedAt": "2026-08-30T06:16:47.000Z",
     "runtimeProbeState": "current Codex Desktop coordinator task is active on GPT-5.6-SOL/high; agentic:runtime repair codex-remote dry-run refused with active_session and therefore no daemon or session was killed or replaced",
     "evaluationPolicy": {
@@ -193,7 +200,7 @@
       "orchestratorAgentId": "topic-docs-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "pr1746_merged_shipped_pr1748_withheld_claim_asset_repair_pr1755_third_in_asset_sequence_1723_source_blocked",
+        "state": "pr1746_pr1748_merged_shipped_pr1755_shared_asset_refresh_released_1723_source_blocked",
         "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
         "branch": "orchestrator/release-0.0.7-docs",
         "requestedModel": "claude-opus-5",
@@ -207,7 +214,7 @@
         "bridgeSessionId": "session_016g86jW5sMJE9z9EHHGPByH",
         "remoteControlUrl": "https://claude.ai/code/session_016g86jW5sMJE9z9EHHGPByH",
         "topicHeadSha": "b35420eed07046f197a47766be7411832a85a39c",
-        "queueState": "1746_merged_shipped; 1748_withheld_until_false_every_published_surface_claim_and_shared_asset_are_repaired; 1755_third_in_same_shared_asset_sequence; 1723_remaining_s11_blocked_until_aspire_s1_s10_land",
+        "queueState": "1746_and_1748_merged_shipped; 1755_released_for_current_main_rebase_regeneration_and_fresh_exact_head_verification; 1723_remaining_s11_blocked_until_aspire_s1_s10_land",
         "tmuxSession": "netscript-007-docs-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
@@ -481,7 +488,7 @@
         "bridgeSessionId": "session_01CHWTWUvxjEkHB7TCav7G2H",
         "remoteControlUrl": "https://claude.ai/code/session_01CHWTWUvxjEkHB7TCav7G2H",
         "topicHeadSha": "e4e71a0804d5cb65704a27eeecca620b20432825",
-        "queueState": "1466_pr1731_slice_2_exact_head_dce16175_plus_host-correction_addendum_bbff7cf9; slice_3_active_then_final_all_slices_impl_eval; Aspire S8 #1720/#863 static work continues independently at 1efd1a17; 1387 then 1730",
+        "queueState": "1466_pr1731_slice_2_exact_head_dce16175_plus_host-correction_addendum_bbff7cf9; shared_asset_predecessor_1748_merged_and_1731_released_for_current_main_regeneration_during_slice_3; slice_3_then_final_all_slices_impl_eval; Aspire S8 #1720/#863 static work continues independently at 1efd1a17; 1387 then 1730",
         "tmuxSession": "netscript-007-features-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
@@ -543,7 +550,9 @@
     },
     {
       "number": 1000,
-      "state": "open"
+      "state": "closed",
+      "closedAt": "2026-08-30T12:55:06.000Z",
+      "mergeCommitSha": "952cc106aafea61570d24247695ac23f5d810026"
     },
     {
       "number": 1093,
@@ -3046,7 +3055,8 @@
       "selectionReason": "complex public cross-consumer procedure metadata and error vocabulary boundary",
       "implementationState": "slice 1 separate-session IMPL-EVAL cycle 2 PASS; slice 2 implementation plus G-1 complete at product 2863d29e with evidence dce16175 and host-correction addendum bbff7cf9; slice 3 active; PR remains draft and partial",
       "implementationEvaluationState": "slice_1_pass_cycle_2_slice_2_tier_a_pass_slice_3_active",
-      "nextGate": "complete slice 3 with G-4, fresh Tier-A, final all-slices separate-session IMPL-EVAL and close-gate"
+      "sharedAssetPredecessorState": "PR #1748 merged as 952cc106; released for current-main rebase and mechanical corpus regeneration before exact-head completion evidence",
+      "nextGate": "integrate current main and regenerate shared assets while completing slice 3 with G-4, then fresh Tier-A, final all-slices separate-session IMPL-EVAL and close-gate"
     },
     {
       "id": "fresh-readonly-dehydrated-state",
@@ -3107,18 +3117,41 @@
     {
       "id": "aspire-terminology-sweep",
       "lane": "docs",
-      "phase": "ready",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "22e79dccf5f7cc8bb766d9eb1bd11d5bd8c9e525",
-      "currentPrHeadSha": "22e79dccf5f7cc8bb766d9eb1bd11d5bd8c9e525",
+      "headSha": "9b79d90ef729519e4007010d10851304661a4d61",
+      "currentPrHeadSha": "9b79d90ef729519e4007010d10851304661a4d61",
       "issueNumbers": [1000],
       "parentIssueNumbers": [1723],
       "branch": "docs/aspire-terminology-sweep",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1723a",
       "prNumber": 1748,
-      "implementationState": "fresh exact-head IMPL-EVAL PASS, close-gate/check-test/quality success at unchanged head, but merge authority is withheld because the every-published-surface PR claim is false and the shared asset needs refresh",
-      "blocker": "correct the false every-published-surface claim and refresh the shared asset before coordinator re-runs the seven-row gate",
-      "nextGate": "bounded claim/asset correction, exact-head re-verification, then coordinator pre-merge gate; parent #1723 remains open for the rest of Aspire S11"
+      "implementationState": "rebased after #1746, narrowed the false published-surface claim, regenerated all four shared carriers, passed native exact-head Fable 5 IMPL-EVAL and the coordinator seven-row gate, then merged and closed #1000 status:shipped",
+      "implementationEvaluationState": "native_fable_5_exact_head_pass",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "preMergeGate": {
+        "state": "PASS",
+        "evaluatedHeadSha": "9b79d90ef729519e4007010d10851304661a4d61",
+        "rows": [
+          "1_close_gate_current_success",
+          "2_issue_1000_zero_unticked_acceptance",
+          "3_prohibited_pattern_diff_clean_excluding_run_artifacts",
+          "4_applicable_named_checks_terminal_success_docs_only_e2e_scaffold_n_a",
+          "5_narrowed_s11_public_surface_claim_independently_verified",
+          "6_docs_changed_file_audit_no_hand_written_package_plugin_source",
+          "7_corrected_pr_body_and_dod_match_shipped_scope"
+        ]
+      },
+      "redundantOpenHands": {
+        "runId": 33311911918,
+        "conclusion": "cancelled",
+        "verdict": "NONE",
+        "gating": false,
+        "disposition": "concurrency-cancelled did-not-run; raised and cleared nothing"
+      },
+      "mergeCommitSha": "952cc106aafea61570d24247695ac23f5d810026",
+      "mergedAt": "2026-08-30T12:55:05.000Z",
+      "nextGate": "terminal merged; parent #1723 remains open for the rest of Aspire S11; shared-asset successors #1755/#1731/#1758 released"
     },
     {
       "id": "aspire-13-5-s1-pin-parity",
@@ -3266,17 +3299,17 @@
     {
       "id": "docs-quickstart-skills-tree",
       "lane": "docs",
-      "phase": "ready",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "2c844565c75058425f41542e12b9ee88a45b585a",
       "currentPrHeadSha": "2c844565c75058425f41542e12b9ee88a45b585a",
       "issueNumbers": [1749],
       "branch": "docs/quickstart-skills-tree",
       "prNumber": 1755,
-      "implementationState": "bounded direct-to-main docs leaf; source row and four generated corpus carriers complete; independent Tier-A, exact-head IMPL-EVAL, and named gates PASS; held third in the serial shared-asset sequence after #1748",
+      "implementationState": "pre-#1748 implementation/evaluation was green at 2c844565, but #1748 has now merged the shared corpus; successor is released for current-main rebase, mechanical regeneration, and fresh exact-head verification",
       "planEvaluationState": "n_a_mechanical_bounded_docs_leaf",
-      "blocker": "shared asset sequence requires #1748 claim correction and asset refresh before #1755 can be rebased/reverified",
-      "nextGate": "after #1748 correction, rebase/refresh the third shared-asset leaf and repeat exact-head gates before coordinator merge"
+      "sharedAssetPredecessorMergeSha": "952cc106aafea61570d24247695ac23f5d810026",
+      "nextGate": "rebase onto current main, regenerate the shared carriers without hand resolution, then repeat exact-head gates and separate evaluation before coordinator merge"
     }
   ],
   "evaluatorLeases": [
@@ -4886,5 +4919,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
       "verifiedAt": "2026-08-30T10:00:33.000Z"
     },
-  "updatedAt": "2026-08-30T12:33:50.000Z"
+  "updatedAt": "2026-08-30T12:56:18.000Z"
 }

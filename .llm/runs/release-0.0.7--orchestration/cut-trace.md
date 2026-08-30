@@ -68,3 +68,26 @@ artifact-pinned production E2E.
 - The next shared-asset order is intentionally withheld: #1747 still lacks the mandatory exact-head
   `scaffold.runtime`; #1748 must correct its false every-published-surface claim and refresh the
   shared asset; #1755 is third in that same asset sequence.
+
+## 2026-08-30T12:55:05Z — #1748 corrected, regenerated, evaluated, and coordinator-merged
+
+- PR #1748 rebased after #1746, corrected its published-surface overclaim, regenerated the four
+  shared agent-doc carriers, and reached exact head `9b79d90ef729519e4007010d10851304661a4d61`.
+  The coordinator's complete seven-row gate passed: current close-gate success; zero unticked #1000
+  acceptance boxes; no new prohibited suppressions/casts in the non-run diff; every applicable
+  named check terminal success with intentional docs-only path skips classified N/A rather than
+  green; the narrowed S11 public-surface claim independently verified; changed-file audit confirmed
+  no hand-written `packages/**`/`plugins/**` source; and the corrected PR body/DoD matched the
+  shipped scope.
+- A separate native Claude Fable 5 evaluator returned unconditional `PASS` at that exact head.
+  Redundant OpenHands run
+  [33311911918](https://github.com/rickylabs/netscript/actions/runs/33311911918) was cancelled by
+  workflow concurrency and produced `OPENHANDS_VERDICT: NONE`; it raised and cleared nothing and was
+  explicitly non-gating.
+- The coordinator squash-merged #1748 as
+  `952cc106aafea61570d24247695ac23f5d810026` at `2026-08-30T12:55:05Z`. Issue #1000 closed at
+  `2026-08-30T12:55:06Z`; PR and issue are terminal `status:shipped`. Exact current `main` is the
+  merge SHA.
+- The shared-asset predecessor is now satisfied. #1755, #1731, and #1758 are released to their
+  independent supervisors for current-main rebase/regeneration and fresh exact-head verification;
+  this is not permission to reuse their pre-merge asset receipts or evaluator verdicts.

@@ -2362,3 +2362,26 @@
   ahead of #1748's correction.
 - DAG structure was not rewritten: #1745's closure releases #1749, and #1714's closure satisfies
   the S2 dependency for #1715/#1716/#1719/#1721; every successor retains its own gates.
+
+## 2026-08-30T12:56:18Z — #1748 seven-row PASS, merge, and shared-asset successors released
+
+- Reconciled corrected post-#1746 head `9b79d90ef729519e4007010d10851304661a4d61` for #1748. The
+  coordinator pre-merge gate passed all seven rows: (1) current close-gate success; (2) zero
+  unticked acceptance boxes on closing issue #1000; (3) prohibited-pattern diff scan clean outside
+  `.llm/runs/**`; (4) applicable named CI/checks terminal success, with the explicit docs-only E2E
+  and scaffold skips treated as N/A rather than successes; (5) the decisive claim independently
+  narrowed and verified to the S11 manifest + root README + docs site; (6) docs changed-file audit
+  found only prose and declared generated carriers, no hand-written package/plugin source; (7) the
+  corrected Summary, Scope, Harness, and DoD matched what shipped.
+- Native opposite-family Claude Fable 5 returned unconditional exact-head IMPL-EVAL `PASS`.
+  OpenHands run 33311911918 was redundant, cancelled by concurrency, and emitted verdict `NONE`;
+  it is recorded as non-gating and neither raises nor clears a finding. The terminal reconciliation
+  is https://github.com/rickylabs/netscript/pull/1748#issuecomment-5468789434; exact merge coordinates
+  are https://github.com/rickylabs/netscript/pull/1748#issuecomment-5468779050.
+- Coordinator squash-merged #1748 as `952cc106aafea61570d24247695ac23f5d810026` at
+  `2026-08-30T12:55:05Z`; #1000 closed one second later. Both are `status:shipped`, and
+  `origin/main` now equals the merge SHA.
+- Released shared-asset successors #1755, #1731, and #1758 to their existing independent queues.
+  Each must integrate current main, regenerate rather than hand-resolve the corpus, and recut its
+  own exact-head gates/evaluation where the head moves. DAG topology remains unchanged because this
+  is generated-asset serialization, not a new issue dependency edge.

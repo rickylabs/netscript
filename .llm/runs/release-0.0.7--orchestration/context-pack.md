@@ -1393,3 +1393,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   that serial shared-asset sequence. Other topic queues remain independent.
 - DAG topology is unchanged. Closed #1745 releases #1749; closed #1714 satisfies the S2 predecessor
   for #1715/#1716/#1719/#1721 without waiving any successor-specific gate.
+
+## Resume checkpoint — 2026-08-30T12:56:18Z
+
+- #1748 is terminal merged, not withheld. After correcting the every-published-surface claim and
+  regenerating the shared corpus on #1746's main, exact head
+  `9b79d90ef729519e4007010d10851304661a4d61` passed the coordinator's complete seven-row gate and a
+  separate native Fable 5 exact-head IMPL-EVAL. It squash-merged as
+  `952cc106aafea61570d24247695ac23f5d810026` at `12:55:05Z`; #1000 closed at `12:55:06Z`.
+  Both are `status:shipped`; current main is `952cc106...`.
+- Redundant OpenHands run 33311911918 was cancelled and emitted `NONE`. It is a non-gating
+  did-not-run, not a PASS or failure; the native exact-head evaluator is the verdict of record.
+- Shared-asset successors #1755, #1731, and #1758 are released. Their supervisors must rebase onto
+  current main, regenerate the assets mechanically, and recut exact-head evidence/evaluation as
+  applicable; no pre-#1748 shared-asset receipt survives a moved head.

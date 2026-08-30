@@ -711,7 +711,7 @@
       "to": "issue:1723",
       "kind": "requires",
       "evidence": [
-        "PR #1748 completes the terminology slice #1000 while #1723 retains the remaining Aspire S11 documentation scope."
+        "PR #1748 exact head 9b79d90ef729519e4007010d10851304661a4d61 merged as 952cc106aafea61570d24247695ac23f5d810026 and closed #1000; this predecessor is satisfied while #1723 retains the remaining Aspire S11 documentation scope."
       ]
     },
     {

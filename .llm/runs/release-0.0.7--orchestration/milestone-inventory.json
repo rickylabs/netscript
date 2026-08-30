@@ -1262,7 +1262,8 @@
       "lane": "docs",
       "evidence": [
         "https://github.com/rickylabs/netscript/issues/1000",
-        "PR #1748 is exact-head IMPL-EVAL PASS, CI green, ready/CLEAN, and carries the closing keyword."
+        "PR #1748 exact head 9b79d90ef729519e4007010d10851304661a4d61 passed the complete coordinator seven-row gate plus native Fable 5 IMPL-EVAL, merged as 952cc106aafea61570d24247695ac23f5d810026 at 2026-08-30T12:55:05Z, and closed #1000 at 2026-08-30T12:55:06Z; both items are status:shipped.",
+        "Redundant OpenHands run 33311911918 was cancelled with verdict NONE and was explicitly non-gating."
       ]
     }
   ]
