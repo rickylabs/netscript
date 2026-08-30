@@ -1,1 +1,2 @@
 [relay] watching owner=s8-phase-b dind=netscript-dind(10.4.12.22) since=2026-08-30T18:41:42.833Z pid=3276830
+[relay] cleanup: closed 0 listener(s), removed 0 hop-A container(s)

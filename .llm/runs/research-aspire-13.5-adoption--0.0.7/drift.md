@@ -1537,3 +1537,20 @@
   runner finalization reaped descendant `dcp`/`docker`/`deno` processes — the gate alone is never
   process-zero; exact local census stays mandatory (folded into the S7 amendment). S4 run
   33328751758 and S5 run 33328889522 pending.
+- **D-78 — S3 close packet executed at carrier `338922a20db6`** (= cycle-4 PASS head `6c699ab66`
+  rebased identical 12/12 onto main `52a881c58842` + one supervisor sign-off commit: telemetry-row
+  comment refreshed, worklog row added — evidence-only; diff vs main is fixtures/tests/README/run
+  artifacts only). Box-3 tests at the head: mcp 138/0, telemetry 54/0, teardown 29/0. #413 pointer
+  comment posted (issuecomment-5470614073); fenced acceptance-evidence block posted (id 5470615218);
+  **mirror dry-run: mapping valid, no changes** (skip only for the not-yet-applied label).
+  Exact-head `e2e-cli.yml` run 33329358883 in progress (supersedes cancelled 33329277906).
+  Labels/ready/DoD/ci-rerun/review-threads per the packet; merge stays coordinator-landed.
+- **S8 Phase B (one authorized pass, thread `01a051e6…`, head `18923b54e`): suite FAIL 26/1 at
+  `generated.quality-negative` — baseline/stacking, not S8 code.** The S8 branch (base S6 → old
+  main, scratch restored configured SDK 13.4.6 under CLI 13.5.3) hits the already-landed #1734
+  hydration TS2345 and missing S6 `HealthCheckResult`/`addHealthCheck` members;
+  `runtime.typed-db-phase-b` unreached → typed live acceptance unproven. S8-owned registration
+  defect was found and fixed RED-first (19/1 → 41/41) before the pass; D-44 A-1 wording corrected.
+  Zero proof clean (leak-check survivors `[]`); relay `s8-phase-b` torn down, host zero 18:54:49Z.
+  **Rerun after S6/S8 converge on main with S1's pins — per the parent-gates rule, no retry
+  unchanged.**
