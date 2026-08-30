@@ -666,3 +666,41 @@ grant itself that ruling, and does not retry its way to a different number.
 this container is not reaping) and `fs.inotify.max_user_instances` raised. Until then every lane on
 this host will see intermittent `watchFs` EMFILE and false process-survivor assertions, and will
 waste gate time rediscovering it. Related tooling gaps: D-24, D-25.
+
+## D-27 — the contracted receipt set was blind to the one branch check that works
+
+**Observed.** The docs-site workflow **Deploy docs site to Pages** fails on PR #1731 at its
+`Check documentation exports drift` step (`deno task docs:exports-drift`), run `33298487084`, job
+`99222167342`. `docs/site/reference/contracts/index.md` is declared `mode=complete` — a complete
+published-symbol inventory — and the leaf added six public exports it does not document:
+`NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement`, `BaseContractMeta` (slice 1),
+`BaseContractErrors` (repair cycle 1), `CommonErrorMap` and `commonErrorMap` (repair cycle 2).
+
+**Attribution established, not assumed.** `docs:exports-drift` exits **0** on `origin/main`
+`13878a80a`, and has failed on **every** head of this branch — `c9a391811`, `f9056f879`, `b4157a9d`,
+`c2ae8c425`. Branch-owned, deterministic, and unrelated to the D-26 host baseline.
+
+**The finding is not the missing prose — it is the gate set.** The plan's eight-receipt set contracts
+`public-doc-lint`, which per D-23 is **baseline-red on `main`** and therefore cannot signal a
+regression by construction. `docs:exports-drift` is **green on `main`**, detects this leaf's
+public-surface growth exactly, and is **not in the set**. So the leaf shipped four heads with a red
+branch check that its own evidence was structurally incapable of seeing, through a Tier-A, two
+PLAN-EVAL cycles and two repair cycles.
+
+A gate that is red at the base is not merely unsatisfiable — it is **uninformative**, and budgeting
+attention to it while omitting a green-at-base gate over the same surface is worse than having no
+doc gate at all. That is the general lesson: when selecting an evidence set, run each candidate at
+the base first. A gate that is already red there proves nothing about the change; a gate that is
+green there is the one that can fail for your reasons.
+
+**Disposition.** Cycle 3 documents the six symbols under acceptance point 5 and records
+`docs:exports-drift` as supplemental evidence. Adding `docs-exports-drift` to the contracted set is
+**proposed, not applied** — the plan is PLAN-EVAL-approved and neither the supervisor nor the
+implementer amends it. The IMPL-EVAL and coordinator rule. Adding the gate id to
+`.llm/tools/gates/catalog.ts` is repo tooling and out of leaf scope; it belongs with D-24 and D-25.
+
+**Second-order note.** `commonErrorMap` is now an exported **mutable singleton** backing every
+contract in the workspace. `Readonly<>` stops TypeScript consumers; nothing stops a JavaScript one.
+Cycle 3 documents it as read-only-by-contract rather than changing the value — flagged here so the
+IMPL-EVAL rules on whether a published mutable error-map value is an acceptable public surface, since
+it was introduced to satisfy a doc-lint delta rather than for a consumer need.
