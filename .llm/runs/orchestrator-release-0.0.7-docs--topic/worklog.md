@@ -2136,6 +2136,7 @@ verified from the diff rather than the commit subject.
 | Commit | PR / issue | Decision | Reason (verified) |
 | --- | --- | --- | --- |
 | `3e5cbabf` | #1731 → closes #1466 | **INCLUDE** | `packages/contracts` gains a NetScript-owned procedure-metadata vocabulary on its **published** surface: `src/public/mod.ts` newly exports `NetScriptProcedureMeta` and `NetScriptAuthenticationRequirement` from the new `src/domain/procedure-meta.ts`, alongside `BaseContractErrors`, `BaseContractMeta` and `CommonErrorMap`. The metadata is deliberately independent of oRPC public types and propagates to direct clients, generated clients and query factories without casts. Crucially it does **not** erase the concrete error channel repaired by #1350 — that preservation is the point of the change and must be stated, not just the addition. `docs/site/reference/contracts/index.md` and `packages/contracts/README.md` moved with it. |
+| `24f6642f` | #1763 → closes #1730 | **EXCLUDE** | Test-only. The diff is `packages/ai/tests/request_context_test.ts` plus its own run dir — no export map, no `mod.ts`, no `docs/site` page, no hand-written product source. It guards request context against provider payloads, which is a regression guard on behaviour #1731 and #1730 already shipped; a consumer of the published packages observes nothing new. Verified from the diff, not the `test(ai):` prefix. |
 
 **Draft bullet for the top-up** (wording to be re-verified against source at top-up time, not
 copied forward blind):
@@ -2230,3 +2231,52 @@ Related closed issue **#1108** delivered the checker and the initial eight; this
 **Brief change carried forward:** the author thread has skipped the PR body on three consecutive
 slices, each time leaving the supervisor to write it. #1778's brief makes the body an explicit
 deliverable with a named per-package table, rather than absorbing the gap a fourth time.
+
+## 2026-08-30 — main currency at `24f6642f`; leaf deliberately not disturbed
+
+`origin/main` advanced `de57fab0` → **`24f6642f`** (PR #1763, `test(ai): guard request context from
+provider payloads`).
+
+**No integration performed, by design.** Path intersection between #1763 and the in-flight #1780 leaf
+is **empty**:
+
+- `24f6642f` touches `packages/ai/tests/request_context_test.ts` and its own run dir.
+- `85e7f96b` (#1780) touches `.llm/tools/docs/check-exports-drift.ts` and its own run dir.
+
+No semantic intersection either: #1763 alters no export map, no `mod.ts` and no reference page, so it
+cannot move `docs:exports-drift`'s inputs — and `ai` is not among the six packages this slice adopts
+(it is one of the 15 with findings, deferred to a later #1777 slice). Rebasing would have moved the
+head under a **running exact-head evaluator** for zero benefit, so the leaf was left alone.
+
+Recorded as a rule: integrate a moving base into an in-flight leaf only where changed paths actually
+intersect, or where the base change could move a gate's inputs. Head churn under a live evaluator is
+a real cost — it voids the verdict — and "main moved" is not by itself a reason to pay it.
+
+`24f6642f` triaged into the changelog top-up queue as **EXCLUDE** (test-only), from the diff rather
+than the `test(ai):` prefix.
+
+### #1780 — the brief change worked
+
+Slice 1 of #1777 is open as **PR #1780** at `85e7f96b`, and for the first time in four slices the
+author produced a **complete PR body** (6,735 bytes: Summary, Scope, **Package policy decisions**,
+Slices, Validation, Harness, Drift/Debt, Definition of Done) with `Closes #1778` and `Part of #1777`
+carrying no closing keyword. Making the body an explicit named deliverable in the brief — rather than
+absorbing the gap a fourth time — is what changed.
+
+Supervisor Tier-A **PASS**:
+
+- **Hard boundary held** — zero `docs/site/**` files changed. The slice adopts pages already correct.
+- All six packages adopted, and the policies genuinely **differ**: `cron` at `mode: 'complete'`, the
+  other five `entrypoints-only`. Each `reason` is specific to its page (e.g. `kv` "summarizing kvdex
+  compatibility re-exports in prose"), not six copies of one sentence — which was the failure mode
+  the brief called out.
+- The one duplicated `reason` string in the file is **pre-existing on `de57fab0`**, verified against
+  the base blob rather than assumed.
+- Gates: `docs:exports-drift`, `docs:accuracy`, `docs:links`, `check:publish-assets`,
+  `check:assets-barrel`, `check:agent-docs-prose`, scoped `deno check` of `.llm/tools/docs`, and a
+  `deno.lock` diff — **all exit 0**. Tree clean.
+
+A supervisor-dispatched exact-head IMPL-EVAL is running, briefed that **a green gate proves a
+`symbolCoverage` claim is enforceable, not that it is true** — the substantive check is whether
+`cron`'s `complete` declaration actually holds, and whether any package was adopted at the weaker
+mode to dodge a genuine undocumented export.
