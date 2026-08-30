@@ -4444,3 +4444,42 @@ The author has the merge onto `3e5cbabf` locally (`435c6f69`, 6 dirty) and has n
 conflict map was pre-computed and handed over: `README.md` is the real textual conflict, the four
 shared carriers resolve **only through generators**, and D4's preset closure must be **re-verified**
 against #1731's `src/ports/*` and `src/query/mod.ts` changes rather than assumed to have survived.
+
+## 2026-08-30 — WIP correction: serial queue applies inside this topic; #1368 parked, #1758 is the sole merge-front
+
+### The correction, and what it costs
+
+This lane had read `limits.activeImplementationSlicesPerLane: 2` as permitting a second concurrent
+implementation slice, and dispatched #1368's S2 on the strength of its `PASS_PLAN`. The coordinator
+has corrected that: **the serial queue applies inside the topic**, so #1758 is the sole merge-front
+until it is terminal.
+
+**Parking costs nothing here**, which was verified before acting rather than assumed:
+
+| Check | State |
+| --- | --- |
+| #1368 leaf `fix/saga-span-emission-and-correlation` | `f5994260`, **clean**, local == remote |
+| S2 work on disk | **none** — no product or test file written |
+| `PASS_PLAN` artifact | preserved on its own pushed branch `eval/plan-eval-1368-cycle-2` @ `81c5f874` |
+
+So the terminal plan-gate artifact is safe on a real branch independent of the leaf, and no
+implementation work is lost by stopping. The author was mid-turn when the correction arrived, so the
+park instruction goes on the same thread the moment it is free — a mid-turn send would only produce an
+active-writer conflict and waste the turn.
+
+`status:impl` on PR #1764 and issue #1368 will be corrected to reflect parked-after-plan rather than
+in-implementation, so the board does not claim work that is deliberately stopped.
+
+### #1758 is converging correctly
+
+Merge onto `3e5cbabf` is local at `435c6f69` with the shared carriers being regenerated rather than
+hand-merged — all four are present as modifications alongside the MCP corpus:
+`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`, `publish-assets.generated.ts`,
+`export-surface-corpus.generated.ts`. That is the "generators only" instruction being followed.
+
+Remaining sequence, now the only active work in this topic: push the converged head → production
+bundle proof via a **local-source generated project** (the vehicle the four bare-Vite probes could not
+reach) → fresh runtime lease request **only once that exact head is stable** → leased bare `e2e:cli` →
+exact-head gates → fresh delta IMPL-EVAL → readiness → merge coordinates.
+
+No new fixes leaf will be opened meanwhile.
