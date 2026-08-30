@@ -2592,3 +2592,49 @@ heads are superseded and one had unresolvable conflicts with the current base. `
 
 Not promoting to `status:ready-merge` again until the plugin half returns and mergeability is
 re-confirmed at the exact pushed head.
+
+### #1790 third integration cycle: two rebases, one recurring provenance defect, one real gate intersection
+
+Main advanced twice more mid-review: `a3ddcbb598` (#1775) then `73bf2efa9` (#1739). The first had
+zero path/gate intersection with #1790's scope on inspection, but a deeper audit found the coordinator
+was right to insist on integration anyway for the second: `check:mcp-export-corpus` — one of the
+required gates — genuinely **fails** against this branch's stale base and **passes** once `#1739`'s
+export-surface corrections are integrated, even though no file path overlaps. Lesson for future cycles:
+"integrate only where paths/gate-inputs intersect" must check whether a **required gate's outcome**
+changes, not only whether changed-file paths overlap — a gate can depend on repo-wide generated state.
+
+**Recurring defect found and fixed twice**: `build-agent-docs-bundle.ts`'s `writeCorpus()` has a
+deliberate anti-churn shortcut — when regenerated prose is byte-identical to the committed
+`prose.json.gz`, it reuses the prior `provenance.json.sourceCommit` instead of recomputing it. This
+is correct in the normal case but breaks across a rebase: the commit that SHA points to gets rewritten,
+so the preserved value becomes a genuine orphan (`git merge-base --is-ancestor <sha> HEAD` fails) even
+though `git status --porcelain` reports zero drift and the generator exits 0. Caught first after the
+`a3ddcbb598` rebase (`290ac9406` orphaned, repaired to `e3a4f29b3`), then again after the `73bf2efa9`
+rebase (`e3a4f29b3` itself orphaned in turn, repaired to `aee2ac4c3`). Both repairs: bump
+`sourceCommit`/`extractionTimestamp` only, regenerate `assets-barrel`/`publish-assets` from the fix,
+verify `git merge-base --is-ancestor` succeeds, verify no other field changed. **Standing lesson**:
+after any rebase that touches a branch carrying this provenance chain, explicitly check
+`sourceCommit`'s ancestor status — do not trust a clean regeneration diff alone.
+
+Also discarded an unrelated incidental regeneration: `deno task gen:mcp-export-corpus` (distinct from
+the docs chain) touches `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`,
+which was independently stale on `main` itself since `#1731` (predates `a3ddcbb598`) for reasons
+unrelated to #1790. `check:mcp-export-corpus` now passes cleanly after integrating `73bf2efa9` (which
+happened to also fix it) without #1790 needing to touch that file — correctly left untouched, out of
+scope for a docs-only PR.
+
+Rewrote PR #1790's body and issue #1788's "Scope completion" section in place to state only the
+current, exact lineage, and to precisely distinguish orphaned/non-ancestor SHAs (`068d4ba30`,
+`40f799eae`, `290ac9406`, `a6f3927b0`, `0bfecff58`, `c11f75768`, `e3a4f29b3` — none exist in current
+branch history) from `aee2ac4c3`, which is `HEAD~1`, a live ancestor and the actual current
+`sourceCommit` value — an important distinction a first pass at the rewrite blurred by lumping both
+categories together as "superseded". Caught by a second coordinator audit before merge.
+
+Final exact head: **`75538c723188bcd8994dcc74531138ec1d0a1c39`**, based on `main` `73bf2efa9`. Docs
+pages verified byte-identical back to the very first pre-`a3ddcbb598` backup across all three
+integration cycles. The existing 14-entrypoint DeepSeek IMPL-EVAL (`impl-eval-exact-head.md`) was
+**not** re-run at any point in this cycle — content never changed, only provenance metadata and
+lineage prose. All required gates green at the final head including the now-real `check:mcp-export-corpus`.
+`close-gate` re-run after the metadata correction: **PASS**. `mergeStateStatus: CLEAN`, `mergeable:
+MERGEABLE`, issue #1788 9/9 boxes checked, single `status:ready-merge` on both PR and issue. Ready for
+an exact merge packet.
