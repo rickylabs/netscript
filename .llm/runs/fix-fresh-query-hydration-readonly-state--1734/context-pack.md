@@ -18,7 +18,9 @@ non-throwing reviver. S9 captured an 11-pass / 3-fail RED through the real trans
 mutation and query error fields reject the whole state, while hostile coercion escapes through
 `String(value)`. S10 removes the validity branch, preserves original non-`Error` values in `cause`,
 and uses only safe primitive or fallback messages. The focused trio passes 19/19, including the
-eight guard-attack cases. Public types, exports, and dependency range remain untouched.
+eight guard-attack cases. The leaf is cleanly rebased onto owner-pinned
+`24f6642f040617de573c7cef1140eed1ac0efd6d`; public types, exports, and dependency range remain
+untouched.
 
 ## Completed
 
@@ -37,17 +39,18 @@ eight guard-attack cases. Public types, exports, and dependency range remain unt
 - S9 real-transport RED reproduced for omitted mutation state, query error twins, and hostile
   coercion; production source is still untouched.
 - S10 total private reviver implemented; focused tests and scoped Fresh check/lint/fmt are green.
+- S11 clean rebase completed; rebased RED is `059ca9421a46618a0fd6d4bdf14c513522d705b7`
+  and rebased fix is `4cd899bcc0f8faa143557f1148eec39ecd40b793`.
 
 ## In Progress
 
-- S10 is ready to commit before the owner-pinned rebase and exact-head sealing gates.
+- The final run-artifact carrier is ready to commit before every exact-head sealing gate.
 
 ## Next Steps
 
-1. Commit the S10 repair slice.
-2. Rebase onto owner-pinned `24f6642f040617de573c7cef1140eed1ac0efd6d`, run the complete static and
-   leased one-pass runtime gates at the immutable head, then push by explicit refspec and update the
-   draft PR without dispatching IMPL-EVAL.
+1. Commit the final run-artifact carrier.
+2. Run the complete static and leased one-pass runtime gates at that immutable head, then push by
+   explicit refspec and update the draft PR without dispatching IMPL-EVAL.
 
 ## Key Decisions
 
