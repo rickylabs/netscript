@@ -12,10 +12,11 @@
 
 ## Current State
 
-Slices 1–3 are committed/pushed on draft PR #1743. Slice 4 is green locally: the E2E registry debt
-split is complete, listener `healthReports` wait assertions and the Phase-B recovery fixture are
-registered, and `scaffold.plugins` passes without starting an AppHost. `PLAN-EVAL: N/A` is justified
-by the ratified locked issue; the Fable supervisor retains slice review and IMPL-EVAL.
+Slices 1–4 are committed/pushed on draft PR #1743. Phase-A implementation and validation are
+complete locally: the E2E registry debt split, listener `healthReports` wait assertions, registered
+Phase-B recovery fixture, coordination drafts, and full non-runtime gate matrix are green.
+`PLAN-EVAL: N/A` is justified by the ratified locked issue; the Fable supervisor retains Phase-B
+runtime execution, slice review, and IMPL-EVAL.
 
 ## Completed
 
@@ -31,22 +32,27 @@ by the ratified locked issue; the Fable supervisor retains slice review and IMPL
 - Committed/pushed slice 2 as `feb1e7aadcf4f875cbcd2b878161c3ba9a5d705a` with its PR trail.
 - Regenerated the embedded asset barrel and proved deterministic reproduction plus scoped type
   checking.
+- Committed/pushed slice 3 as `c3376671877d50b17a16e237336f58edda34e5bf` with its PR trail.
 - Split the 812-line runtime registry into lifecycle/behavior/script concerns and grouped runtime
   probes, reducing `runtime-gates.ts` to 305 lines and direct scaffold files from 48 to 43.
 - Added describe-derived checks for `<resource>_listener`/`<resource>_resp` object-valued reports.
 - Registered (without running) the lease-backed stop → Unhealthy → exit 18 → start → Healthy
   recovery fixture and JSON receipt path.
 - Passed 46 focused E2E tests and the 17-gate `scaffold.plugins` suite.
+- Committed/pushed slice 4 as `92de34d9bc440a7ede229daed7bd2b449e6b1a83` with its PR trail.
+- Drafted the S6b 0.0.8 issue and the #1366/#863 comments for supervisor posting.
+- Passed the final matrix: configured lint, 29-file scoped check, raw config-excluded lint/fmt,
+  99 focused tests, deterministic assets, quality/architecture fitness, and `scaffold.plugins`.
 
 ## In Progress
 
-- Slice 4 commit/push and draft PR trail update.
+- Slice 5 artifact commit/push and draft PR trail update.
 
 ## Next Steps
 
-1. Commit/push slice 4 and update the stacked draft PR.
-2. Draft the S6b issue and #1366/#863 coordination comments.
-3. Run the final Phase-A gate matrix and commit/push the run artifacts.
+1. Commit/push slice 5 and update the stacked draft PR.
+2. Supervisor supplies the Phase-B lease and executes the registered live fixture/runtime receipts.
+3. Separate Fable session performs slice review and IMPL-EVAL; implementation lane never marks ready.
 
 ## Key Decisions
 
@@ -68,13 +74,15 @@ by the ratified locked issue; the Fable supervisor retains slice review and IMPL
 | `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts` | changed | Exact emission and credential-boundary tests. |
 | `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts` | changed | Updated import composition expectation. |
 | `packages/cli/src/kernel/assets/embedded.generated.ts` | changed | Regenerated helper asset literal. |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime*` | changed/new | Split registry, describe verifier, and Phase-B fixture. |
+| `packages/cli/e2e/tests/**` | changed/new | Exact wait/report/ordering and moved-probe coverage. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | slices 1–4 green | structured test/check; raw config-excluded lint; asset reproduction |
-| Fitness | slices 1–4 green | per-slice `quality:scan`, `arch:check` exit 0 |
+| Static | Phase A green | configured lint; 29-file check; raw fallback; 99/99 tests; assets current |
+| Fitness | Phase A green | final `quality:scan` findings `[]`; `arch:check` `FAIL=0` |
 | Runtime | NOT_RUN | no Phase-A lease |
 | Consumer | green | `scaffold.plugins` 17/17; AppHost/runtime deliberately not run |
 

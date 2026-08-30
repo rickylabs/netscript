@@ -92,6 +92,11 @@ its runtime expectation to the readiness gate without touching credentials.
 | 2026-08-30 04:48 +02:00 | 4 | green | Focused check/lint/test: 23 files linted, four test roots checked, and 46/46 tests passed for report parsing, wait commands, recovery registration/order, and moved probes. |
 | 2026-08-30 04:51 +02:00 | 4 | consumer/fitness | `quality:scan` findings `[]`, `arch:check` `FAIL=0`, and `scaffold.plugins` passed 17/17 with cleanup. The lease-backed recovery fixture remained unexecuted. |
 | 2026-08-30 04:51 +02:00 | 4 | reconcile | Registered the Phase-B stop/unhealthy/exit-18/start/healthy fixture behind the runtime suite and recorded JSON receipt output, but honored the no-lease boundary by running construction/parser tests only. No plan readjustment. |
+| 2026-08-30 04:53 +02:00 | 4 | commit/push | Committed `92de34d9bc440a7ede229daed7bd2b449e6b1a83` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 body/trail updated. |
+| 2026-08-30 04:55 +02:00 | 5 | coordination drafts | Drafted the 0.0.8 S6b protocol-readiness issue plus bounded comments for #1366 and #863. Files are committed for the supervisor to post; no issue/comment mutation was performed by this lane. |
+| 2026-08-30 04:56 +02:00 | 5 | final static | Configured lint passed 2,047 files; scoped check selected 29 files with zero diagnostics; wrapper exclusion of four `packages/cli` files was covered by raw no-config lint/fmt on 27 concrete owned files; focused suite passed 99/99. |
+| 2026-08-30 04:56 +02:00 | 5 | final fitness/consumer | `gen:assets-barrel`/`check:assets-barrel`, `quality:scan` (findings `[]`), `arch:check` (`FAIL=0`), and `scaffold.plugins` (17/17) passed. `scaffold.runtime`, quickstart, AppHost, and resource commands remained NOT_RUN by Phase-A boundary. |
+| 2026-08-30 04:56 +02:00 | 5 | surface review | `packages/aspire` public surface is unchanged; jsr-audit is N/A. No dependency, lock-file, CLI command, host CLI, docs, skills, or S5 commit change. |
 
 ## Decisions
 
@@ -126,6 +131,10 @@ its runtime expectation to the readiness gate without touching credentials.
 | slice-4 test | structured test wrapper, four focused roots | PASS | 46 passed, 0 failed. |
 | slice-4 lint | `deno lint --no-config` on 23 owned files | PASS | No new lint finding; no cast/`any`/ignore introduced. |
 | slice-4 format | raw config-excluded formatter/check | PASS | 23 owned files match single-quote/100-column repo settings. |
+| final configured lint | `deno task lint` | PASS | 2,047 selected/processed; 0 findings. |
+| final scoped check | structured check wrapper | PASS | 29 selected; 0 failed batches/diagnostics. |
+| final scoped lint/fmt | wrappers + raw config-excluded fallback | PASS | Wrappers processed 25 and refused four root-excluded CLI template files; raw no-config commands checked all 27 concrete owned files cleanly. |
+| final focused test | structured test wrapper, seven roots | PASS | 99 passed, 0 failed across helper, generator, credential, readiness, registry, and moved-probe coverage. |
 
 ### Fitness Gates
 
@@ -140,6 +149,9 @@ its runtime expectation to the readiness gate without touching credentials.
 | slice-3 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
 | slice-4 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | E2E process/file IO stays in runtime fixture scripts. |
 | slice-4 `arch:check` | PASS | exit 0, `FAIL=0` | Registry monolith is 305 lines; bounded runtime group has 11 files. |
+| final `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | No quality-policy regression. |
+| final `arch:check` | PASS | exit 0, `FAIL=0` | Carried-in warnings only; no new doctrine failure. |
+| jsr-audit | N/A | no `packages/aspire` public-surface change | Generated CLI/AppHost internals only. |
 
 ### Runtime Gates
 
@@ -159,4 +171,7 @@ its runtime expectation to the readiness gate without touching credentials.
 
 - Supervisor should inspect socket single-settlement/destruction, credential-free callback blocks,
   live endpoint resolution, and the E2E registry debt split first.
+- Supervisor-postable S6b/#1366/#863 drafts are in the run directory.
+- Phase B must execute `runtime.health.listener-unreachable`, capture both-tier `healthReports`
+  receipts, and run the lease-backed runtime/quickstart gates before readiness evaluation.
 - This implementation session does not self-certify or mark the PR ready.
