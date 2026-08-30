@@ -5852,3 +5852,21 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   artifact.
 - Clean retry launched (pid `503306`), confirmed genuinely progressing through real gates. Awaiting
   result before drawing any root-cause conclusion or touching product code.
+
+## D-114 — #1758: relay tooling verified real and correctly scoped, precisely characterized
+
+- The claimed "checked-in loopback-relay.ts" was checked independently: the file exists, but **only
+  as a run-scratch tool inside a different leaf's directory**
+  (`007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/tools/loopback-relay.ts`), not a
+  canonical tool checked into `#1758`'s own branch — exactly why my earlier repo search inside
+  `007-leaf-1462` found nothing. Recording the precise distinction rather than accepting "checked-in"
+  uncritically.
+- **The actual running infrastructure is genuine and correctly scoped, independently confirmed**:
+  tmux session `netscript-1758-relay` exists (created `01:20:31`); registry file
+  `.llm/tmp/relay-1758.json` under `007-leaf-1462`'s own worktree shows `owner: "fix1758-runtime"`,
+  pid `528937`, three relays (Postgres `17882`, Redis `32839`, Garnet `32840`) matching exactly what
+  was described; tmux pane shows live relay traffic for the correct ports.
+- Retry (pid `503306`) progressed well past the previously-failing point: `database.init` passed
+  (147s, exit 0, "db init completed successfully"), now at `database.migration-artifacts`. Awaiting
+  the retry's arrival at `behavior.db-status-preserves-apphost` specifically and full completion
+  before drawing a root-cause conclusion.
