@@ -1,8 +1,4 @@
-import {
-  TRIGGERS_API_DEFAULT_PORT,
-  TRIGGERS_API_SERVICE_NAME,
-  TRIGGERS_PLUGIN_VERSION,
-} from '../constants.ts';
+import { TRIGGERS_API_SERVICE_NAME, TRIGGERS_PLUGIN_VERSION } from '../constants.ts';
 
 /** Package name reported by the triggers Aspire contribution. */
 export const TRIGGERS_PLUGIN_PACKAGE_NAME = '@netscript/plugin-triggers' as const;
@@ -110,10 +106,11 @@ export class TriggersAspireContribution {
     builder: TriggersAspireBuilder,
     ctx: TriggersContributionContext,
   ): readonly TriggersAspireResource[] {
+    const apiPort = ctx.port(TRIGGERS_API_SERVICE_NAME);
     const api = builder.addDenoService(TRIGGERS_API_SERVICE_NAME, {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/triggers/services/src/main.ts',
-      port: ctx.port(TRIGGERS_API_SERVICE_NAME, TRIGGERS_API_DEFAULT_PORT),
+      port: apiPort,
       permissions: TRIGGERS_API_PERMISSIONS,
       env: {
         TRIGGERS_PLUGIN_VERSION,
@@ -136,7 +133,11 @@ export class TriggersAspireContribution {
   /** Declare environment values used by triggers Aspire resources. */
   declareEnv(_ctx: TriggersContributionContext): Record<string, TriggersEnvSource | string> {
     return {
-      TRIGGERS_API_URL: `http://localhost:${TRIGGERS_API_DEFAULT_PORT}`,
+      TRIGGERS_API_URL: {
+        kind: 'resource',
+        resource: TRIGGERS_API_SERVICE_NAME,
+        key: 'url',
+      },
       TRIGGERS_ADAPTER: 'native',
       TRIGGERS_DURABILITY_TIER: 't1',
       [TRIGGERS_PROCESSOR_CONCURRENCY_ENV]: TRIGGERS_DEFAULT_PROCESSOR_CONCURRENCY,
@@ -144,10 +145,11 @@ export class TriggersAspireContribution {
   }
 
   /** Declare health checks used by plugin doctor commands. */
-  declareHealthChecks(_ctx: TriggersContributionContext): readonly TriggersHealthCheckSpec[] {
+  declareHealthChecks(ctx: TriggersContributionContext): readonly TriggersHealthCheckSpec[] {
+    const apiPort = ctx.port(TRIGGERS_API_SERVICE_NAME);
     return [{
       resource: TRIGGERS_API_SERVICE_NAME,
-      url: `http://localhost:${TRIGGERS_API_DEFAULT_PORT}/health`,
+      url: `http://localhost:${apiPort}/health`,
       expect: 200,
       timeoutMs: 3000,
     }];

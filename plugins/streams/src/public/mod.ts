@@ -46,7 +46,6 @@ export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-str
   .withService({
     name: 'streams',
     entrypoint: './services/src/main.ts',
-    port: 4437,
   })
   .withTelemetry([{
     name: 'streams',

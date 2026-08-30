@@ -34,7 +34,7 @@ export interface AuthStreamDB {
  * import { createAuthStreamDB } from '@plugins/auth/streams';
  * import { useLiveQuery } from '@tanstack/react-db';
  *
- * const authDb = createAuthStreamDB({ baseUrl: 'http://localhost:4437' });
+ * const authDb = createAuthStreamDB({ baseUrl: streamsServiceUrl });
  *
  * const { data: active } = useLiveQuery((q) =>
  *   q.from({ s: authDb.collections.authSession })
@@ -43,11 +43,9 @@ export interface AuthStreamDB {
  * ```
  */
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
-
   const streamDb = createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/auth/sessions', baseUrl),
+      url: buildStreamUrl('/auth/sessions', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },

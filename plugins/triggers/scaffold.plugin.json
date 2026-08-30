@@ -46,8 +46,6 @@
     "serviceEntrypoint": "services/src/main.ts",
     "backgroundEntrypoint": "triggers/runtime.ts",
     "serviceConfigKey": "triggers-api",
-    "servicePort": 8093,
-    "backgroundPort": 8093,
     "dependencies": ["streams"],
     "pluginReferences": ["workers-api"]
   }

@@ -290,14 +290,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
 
       - name: Install Aspire CLI
         if: env.RUN == 'true'
-        env:
-          ASPIRE_CLI_VERSION: "13.4.6"
         run: |
-          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
@@ -306,8 +304,8 @@ jobs:
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            13.4.*) ;;
-            *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
+            13.5.*) ;;
+            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
           esac
 
       - name: Install workspace dependencies
@@ -377,14 +375,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
 
       - name: Install Aspire CLI
         if: env.RUN == 'true'
-        env:
-          ASPIRE_CLI_VERSION: "13.4.6"
         run: |
-          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
@@ -393,8 +389,8 @@ jobs:
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            13.4.*) ;;
-            *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
+            13.5.*) ;;
+            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
           esac
 
       - name: Install workspace dependencies

@@ -5,6 +5,7 @@ import {
   appUrlsFromDescribeOutput,
   generatedAppHomeUrls,
   readPinnedAppPort,
+  resourceUrlsFromDescribeOutput,
 } from '../../../src/application/gates/scaffold/generated-app-endpoint.ts';
 import {
   diagnosticBody,
@@ -208,6 +209,19 @@ Deno.test('resolution never returns the dashboard link or a sibling service URL'
 // DCP suffixes the instance id; gates pass the AppHost-given name.
 Deno.test('a resource resolves by displayName even though name is suffixed', () => {
   assertEquals(appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'users'), ['http://localhost:34100']);
+});
+
+Deno.test('generic resource endpoint resolution supports plugin resources', () => {
+  const describe = JSON.stringify({
+    resources: [{
+      name: 'workers-api-random',
+      displayName: 'workers-api',
+      urls: [{ name: 'http', url: 'http://localhost:35123' }],
+    }],
+  });
+  assertEquals(resourceUrlsFromDescribeOutput(describe, 'workers-api'), [
+    'http://localhost:35123',
+  ]);
 });
 
 // `relationships[]` entries carry a matching `resourceName` but no endpoint. Matching one

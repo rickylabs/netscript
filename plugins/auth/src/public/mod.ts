@@ -5,12 +5,7 @@
  */
 
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
-import {
-  AUTH_API_DEFAULT_PORT,
-  AUTH_API_SERVICE_NAME,
-  AUTH_PLUGIN_ID,
-  AUTH_PLUGIN_VERSION,
-} from '../constants.ts';
+import { AUTH_API_SERVICE_NAME, AUTH_PLUGIN_ID, AUTH_PLUGIN_VERSION } from '../constants.ts';
 
 const AUTH_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -35,7 +30,6 @@ const builtAuthManifest: PluginManifest = definePlugin(
   .withService({
     name: AUTH_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',
-    port: AUTH_API_DEFAULT_PORT,
   })
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: AUTH_PLUGIN_ID }])
@@ -67,10 +61,6 @@ const authManifest: PluginManifest = Object.freeze({
 /** Plugin manifest for NetScript auth. */
 export const authPlugin: PluginManifest = authManifest;
 
-export {
-  AUTH_API_DEFAULT_PORT,
-  AUTH_API_SERVICE_NAME,
-  AUTH_PLUGIN_ID,
-  AUTH_PLUGIN_VERSION,
-} from '../constants.ts';
+export { AUTH_API_DEFAULT_PORT } from '../constants.ts';
+export { AUTH_API_SERVICE_NAME, AUTH_PLUGIN_ID, AUTH_PLUGIN_VERSION } from '../constants.ts';
 export type { AuthApiServiceName, AuthPluginId, AuthPluginVersion } from '../constants.ts';

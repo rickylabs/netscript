@@ -5,7 +5,10 @@ import type { SagasAspireBuilder } from '../../src/aspire/mod.ts';
 
 Deno.test('SagasAspireContribution registers API and background resources', () => {
   const builder = new MemoryAspireBuilder();
-  const ctx = createContributionContextFixture({ projectRoot: '/workspace/netscript-app' });
+  const ctx = createContributionContextFixture({
+    projectRoot: '/workspace/netscript-app',
+    port: () => 9192,
+  });
   const contribution = new SagasAspireContribution();
 
   const resources = contribution.contribute(builder as unknown as SagasAspireBuilder, ctx);
@@ -23,12 +26,12 @@ Deno.test('SagasAspireContribution registers API and background resources', () =
   ]);
 
   const [api, runner] = builder.resources;
-  assertEquals(api.port, 8092);
+  assertEquals(api.port, 9192);
   assert(api.metadata);
   assertEquals(api.metadata.spec, {
     workdir: '/workspace/netscript-app',
     entrypoint: 'plugins/sagas/services/src/main.ts',
-    port: 8092,
+    port: 9192,
     permissions: [
       '--unstable-kv',
       '--allow-net',
@@ -56,7 +59,7 @@ Deno.test('SagasAspireContribution registers API and background resources', () =
   });
 
   assertEquals(contribution.declareEnv(ctx), {
-    SAGAS_API_URL: 'http://localhost:8092',
+    SAGAS_API_URL: { kind: 'resource', resource: 'sagas-api', key: 'url' },
     SAGAS_ADAPTER: 'native',
     SAGAS_DURABILITY_TIER: 't1',
     SAGAS_REGISTRY_MODULE:
@@ -65,7 +68,7 @@ Deno.test('SagasAspireContribution registers API and background resources', () =
   });
   assertEquals(contribution.declareHealthChecks(ctx), [{
     resource: 'sagas-api',
-    url: 'http://localhost:8092/health',
+    url: 'http://localhost:9192/health',
     expect: 200,
     timeoutMs: 3000,
   }]);

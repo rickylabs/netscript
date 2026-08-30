@@ -9,7 +9,10 @@ export const AUTH_PLUGIN_VERSION: string = PLUGIN_PACKAGE_VERSION;
 /** Service contribution name for the auth API process. */
 export const AUTH_API_SERVICE_NAME = 'auth-api' as const;
 
-/** Default HTTP port for the auth API process. */
+/**
+ * @deprecated Not a runtime fallback; removed in 0.0.8 — see
+ * "chore(plugins): remove deprecated default-port compatibility exports in 0.0.8".
+ */
 export const AUTH_API_DEFAULT_PORT = 8094 as const;
 
 /** Literal type for the auth plugin identifier. */

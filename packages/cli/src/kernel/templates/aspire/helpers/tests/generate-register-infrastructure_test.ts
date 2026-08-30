@@ -18,6 +18,61 @@ function countOccurrences(value: string, needle: string): number {
 }
 
 describe('generateRegisterInfrastructure', () => {
+  it('omits database host ports by default and honors an explicit pin', () => {
+    const engines: readonly ('Postgres' | 'Mysql' | 'Mssql')[] = [
+      'Postgres',
+      'Mysql',
+      'Mssql',
+    ]
+    for (const engine of engines) {
+      const unpinned = generateRegisterInfrastructure({
+        databases: {
+          database: {
+            Enabled: true,
+            Engine: engine,
+            Mode: 'Container',
+            Persistent: false,
+          },
+        },
+        caches: {},
+      })
+      const pinned = generateRegisterInfrastructure({
+        databases: {
+          database: {
+            Enabled: true,
+            Engine: engine,
+            Mode: 'Container',
+            Port: 55_432,
+            Persistent: false,
+          },
+        },
+        caches: {},
+      })
+
+      assert(!unpinned.includes('port: 55432'))
+      assertStringIncludes(pinned, 'port: 55432')
+    }
+  })
+
+  it('omits Redis-compatible host ports by default and honors explicit pins', () => {
+    const unpinned = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        redis: { Enabled: true, Engine: 'Redis', Mode: 'Container' },
+      },
+    })
+    const pinned = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: { Enabled: true, Engine: 'Garnet', Mode: 'Executable', Port: 16_379 },
+      },
+    })
+
+    assert(!unpinned.includes('port: 6379'))
+    assertStringIncludes(pinned, 'port: 16379')
+    assertStringIncludes(pinned, 'targetPort: 6379')
+  })
+
   it('uses session lifetime for configured-persistent databases only under isolated starts', () => {
     const output = generateRegisterInfrastructure({
       databases: {

@@ -1,11 +1,17 @@
-import { resolveProbeUrl } from '@netscript/plugin';
 import type { StreamPayloadSchema } from '../../public/stream-api.ts';
-
-const DEFAULT_STREAMS_URL = 'http://127.0.0.1:4437';
 
 /** Resolve the streams service URL used by E2E probes. */
 export function resolveStreamsProbeUrl(): string {
-  return resolveProbeUrl(['DURABLE_STREAMS_URL', 'STREAMS_URL'], DEFAULT_STREAMS_URL);
+  const value = Deno.env.get('services__streams__https__0') ??
+    Deno.env.get('services__streams__http__0') ??
+    Deno.env.get('DURABLE_STREAMS_URL') ??
+    Deno.env.get('STREAMS_URL');
+  if (value === undefined) {
+    throw new Error(
+      'Streams probe endpoint was not discovered. Configure an Aspire service reference or DURABLE_STREAMS_URL.',
+    );
+  }
+  return value.replace(/\/$/, '');
 }
 
 /** Return a unique E2E stream path for an isolated probe run. */

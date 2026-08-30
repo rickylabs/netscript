@@ -12,7 +12,7 @@ import type {
   SagaPublisherResult,
 } from '@netscript/plugin-sagas-core/integration/publisher';
 
-import { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME } from '../constants.ts';
+import { SAGAS_API_SERVICE_NAME } from '../constants.ts';
 
 /** JSON primitive accepted by the saga HTTP publisher. */
 export type SagaPublisherJsonPrimitive = string | number | boolean | null;
@@ -111,7 +111,11 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
   ): Promise<SagaPublisherResult<TNextMessage['type']>> {
     try {
       const input = createPublishHttpInput(message, options);
-      const response = await this.fetcher(this.publishUrl(), {
+      const publishUrl = this.publishUrl();
+      if (publishUrl === undefined) {
+        return rejectedResult(message, options, 'no-endpoint', false);
+      }
+      const response = await this.fetcher(publishUrl, {
         body: JSON.stringify(input),
         headers: createPublishHeaders(this.headers, message, options),
         method: 'POST',
@@ -159,11 +163,9 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
   }
 
   /** Resolve the current publish URL from static options or Aspire service discovery. */
-  private publishUrl(): string {
-    return joinUrl(
-      resolveServiceUrl(this.serviceName, this.baseUrl, this.readEnv),
-      this.publishPath,
-    );
+  private publishUrl(): string | undefined {
+    const serviceUrl = resolveServiceUrl(this.serviceName, this.baseUrl, this.readEnv);
+    return serviceUrl === undefined ? undefined : joinUrl(serviceUrl, this.publishPath);
   }
 }
 
@@ -296,15 +298,13 @@ function resolveServiceUrl(
   serviceName: string,
   baseUrl: string | undefined,
   readEnv: SagaPublisherEnvReader,
-): string {
-  return normalizeBaseUrl(
-    baseUrl ??
-      readEnv(`services__${serviceName}__https__0`) ??
-      readEnv(`services__${serviceName}__http__0`) ??
-      readEnv('SAGAS_API_URL') ??
-      readEnv('NETSCRIPT_SAGAS_URL') ??
-      `http://127.0.0.1:${SAGAS_API_DEFAULT_PORT}`,
-  );
+): string | undefined {
+  const resolved = baseUrl ??
+    readEnv(`services__${serviceName}__https__0`) ??
+    readEnv(`services__${serviceName}__http__0`) ??
+    readEnv('SAGAS_API_URL') ??
+    readEnv('NETSCRIPT_SAGAS_URL');
+  return resolved === undefined ? undefined : normalizeBaseUrl(resolved);
 }
 
 function joinUrl(baseUrl: string, path: string): string {

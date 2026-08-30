@@ -11,7 +11,7 @@ import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { DbContext } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
-import { AUTH_API_DEFAULT_PORT, AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
+import { AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
 import { type AuthPluginServiceContext, initializeAuthService } from './init.ts';
 import { withAuthRequest } from './request-context.ts';
@@ -54,7 +54,11 @@ export type AuthRunningService = Readonly<{
 export default async function createAuthService(
   ctx: PluginServiceContext,
 ): Promise<AuthRunningService> {
-  const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? String(AUTH_API_DEFAULT_PORT));
+  const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
+  if (portValue === undefined) {
+    throw new Error('Auth API requires the host-provided PORT environment variable.');
+  }
+  const port = Number.parseInt(portValue, 10);
   const dbClient = await ctx.db.getClient();
   const registry = await initializeAuthService(ctx, dbClient);
   const telemetry = createAuthTelemetry({
