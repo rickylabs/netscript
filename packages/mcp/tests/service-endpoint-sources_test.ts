@@ -6,7 +6,8 @@ import { OverrideEndpointSource } from '../src/infrastructure/service-endpoints/
 import { RunManifestEndpointSource } from '../src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
 import {
   APPSETTINGS_FIXTURE,
-  ASPIRE_DESCRIBE_FIXTURES,
+  ASPIRE_DESCRIBE_13_5_3_FIXTURE,
+  ASPIRE_DESCRIBE_FIXTURE,
 } from './service-endpoint-source-fixtures.ts';
 
 function missingFile(): Promise<string> {
@@ -162,50 +163,85 @@ Deno.test('torn manifest remains failed while healthy appsettings remains indepe
   assertEquals(appsettings.candidates.length, 3);
 });
 
-for (const fixture of ASPIRE_DESCRIBE_FIXTURES) {
-  Deno.test(`Aspire CLI source parses ${fixture.version} banner-prefixed resources`, async () => {
-    const calls: Array<{ command: string; args: readonly string[] }> = [];
-    let invocation = 0;
-    const source = new AspireCliEndpointSource({
-      execute: (command, args) => {
-        calls.push({ command, args });
-        invocation++;
-        return Promise.resolve(
-          invocation === 2 ? { code: 0, stdout: fixture.output, stderr: '' } : {
-            code: 0,
-            stdout: '[{"appHostPath":"/project/apphost.mts","appHostPid":4312}]',
-            stderr: '',
-          },
-        );
-      },
-      realPath: (path) => Promise.resolve(path),
-    });
-    const outcome = await source.read({
-      projectRoot: '/project',
-      appHostPath: '/project/apphost.mts',
-    });
-    assertEquals(calls.map(({ args }) => args[0]), ['ps', 'describe', 'ps']);
-    assertEquals(outcome, {
-      source: 'aspire-cli',
-      outcome: 'used',
-      candidates: [
-        {
-          name: 'billing',
-          baseUrl: 'http://127.0.0.2:43128',
-          source: 'aspire-cli',
-          operatorTrusted: false,
+Deno.test('Aspire CLI source uses the 13.4 machine query and parses banner-prefixed resources', async () => {
+  const calls: Array<{ command: string; args: readonly string[] }> = [];
+  let invocation = 0;
+  const source = new AspireCliEndpointSource({
+    execute: (command, args) => {
+      calls.push({ command, args });
+      invocation++;
+      return Promise.resolve(
+        invocation === 2 ? { code: 0, stdout: ASPIRE_DESCRIBE_FIXTURE, stderr: '' } : {
+          code: 0,
+          stdout: '[{"appHostPath":"/project/apphost.mts","appHostPid":4312}]',
+          stderr: '',
         },
-        {
-          name: 'users',
-          baseUrl: 'http://127.0.0.1:43127',
-          source: 'aspire-cli',
-          operatorTrusted: false,
-        },
-      ],
-      excludedServices: [],
-    });
+      );
+    },
+    realPath: (path) => Promise.resolve(path),
   });
-}
+  const outcome = await source.read({
+    projectRoot: '/project',
+    appHostPath: '/project/apphost.mts',
+  });
+  assertEquals(calls.map(({ args }) => args[0]), ['ps', 'describe', 'ps']);
+  assertEquals(outcome, {
+    source: 'aspire-cli',
+    outcome: 'used',
+    candidates: [
+      {
+        name: 'billing',
+        baseUrl: 'http://127.0.0.2:43128',
+        source: 'aspire-cli',
+        operatorTrusted: false,
+      },
+      {
+        name: 'users',
+        baseUrl: 'http://127.0.0.1:43127',
+        source: 'aspire-cli',
+        operatorTrusted: false,
+      },
+    ],
+    excludedServices: [],
+  });
+});
+
+Deno.test('Aspire CLI source parses the bannerless 13.5.3 describe receipt shape', async () => {
+  const calls: Array<{ command: string; args: readonly string[] }> = [];
+  let invocation = 0;
+  const source = new AspireCliEndpointSource({
+    execute: (command, args) => {
+      calls.push({ command, args });
+      invocation++;
+      return Promise.resolve(
+        invocation === 2 ? { code: 0, stdout: ASPIRE_DESCRIBE_13_5_3_FIXTURE, stderr: '' } : {
+          code: 0,
+          stdout: '[{"appHostPath":"/project/apphost.mts","appHostPid":4312}]',
+          stderr: '',
+        },
+      );
+    },
+    realPath: (path) => Promise.resolve(path),
+  });
+  const outcome = await source.read({
+    projectRoot: '/project',
+    appHostPath: '/project/apphost.mts',
+  });
+  assertEquals(calls.map(({ args }) => args[0]), ['ps', 'describe', 'ps']);
+  assertEquals(outcome, {
+    source: 'aspire-cli',
+    outcome: 'used',
+    candidates: [
+      {
+        name: 'users',
+        baseUrl: 'http://127.0.0.1:43515',
+        source: 'aspire-cli',
+        operatorTrusted: false,
+      },
+    ],
+    excludedServices: [],
+  });
+});
 
 Deno.test('Aspire CLI absence, non-zero exit, and parse failure are explicit failed rows', async () => {
   const projectRoot = '/fixture';

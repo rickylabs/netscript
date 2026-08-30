@@ -32,13 +32,14 @@
 
 ### Commit Slices
 
-| # | Slice                                                       | Gate                               | Files                                               |
-| - | ----------------------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
-| 1 | Prove missing phase-A parity is RED                         | structured test wrapper            | parity test + run artifacts                         |
-| 2 | Prove teardown accepts the captured 13.5.3 `ps` shape       | teardown probe tests               | teardown fixture/test/README + run artifacts        |
-| 3 | Prove banner and describe consumers accept both versions    | scoped MCP/CLI E2E tests           | four compat files + fixtures README + run artifacts |
-| 4 | Make the lease boundary executable and documented           | parity test + documentation review | telemetry README + drift/run artifacts              |
-| 5 | Record complete Phase-A gate evidence and #413 handoff text | prescribed full gate set           | run artifacts/receipts/comment draft                |
+| # | Slice                                                                   | Gate                               | Files                                               |
+| - | ----------------------------------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
+| 1 | Prove missing phase-A parity is RED                                     | structured test wrapper            | parity test + run artifacts                         |
+| 2 | Prove teardown accepts the captured 13.5.3 `ps` shape                   | teardown probe tests               | teardown fixture/test/README + run artifacts        |
+| 3 | Prove banner and describe consumers accept both versions                | scoped MCP/CLI E2E tests           | four compat files + fixtures README + run artifacts |
+| 4 | Make the lease boundary executable and documented                       | parity test + documentation review | telemetry README + drift/run artifacts              |
+| 5 | Record complete Phase-A gate evidence and #413 handoff text             | prescribed full gate set           | run artifacts/receipts/comment draft                |
+| 6 | Restore immutable 13.4.6 coverage and receipt-derived 13.5.3 provenance | evaluator-fix gate set             | MCP/CLI fixtures, tests, README, run artifacts      |
 
 ### Deferred Scope
 
@@ -65,13 +66,17 @@ the capture provenance in that fixture folder's README, then update the parity e
 | 2026-08-30 | 4     | reconcile      | Commit `37f0487f1` pushed and S4 trail comment posted; supervisor/evaluator review remains pending.                                       |
 | 2026-08-30 | 5     | gate           | Full Phase-A scoped checks, tests, doctrine gates, and unchanged MCP export-corpus check passed.                                          |
 | 2026-08-30 | 5     | handoff        | Drafted the deferred #413 comment; PR remains draft for the supervisor's lease-backed phase B.                                            |
+| 2026-08-30 | 6     | IMPL-EVAL      | Cycle 1 at `a964a2120` returned `FAIL_FIX`: H-1, M-1, L-1, and L-2 recorded on the research branch.                                       |
+| 2026-08-30 | 6     | implementation | Restored the 13.4.6 MCP fixture and assertions verbatim; added independent bannerless S2 V5-derived 13.5.3 cases and exact provenance.    |
+| 2026-08-30 | 6     | gate           | Coverage restored at adapter lines 237/239; focused 52/52 and complete 263/263 suites plus the full Phase-A gate set pass.                |
 
 ## Decisions
 
-| Decision                         | Reason                                                            | Source                       |
-| -------------------------------- | ----------------------------------------------------------------- | ---------------------------- |
-| Phase A never starts Aspire      | No runtime lease; S2 receipts are sufficient for structural work. | User dispatch / Aspire skill |
-| Telemetry row is `pending-lease` | It must fail closed when phase B lands without table promotion.   | Slice 4 contract             |
+| Decision                            | Reason                                                            | Source                       |
+| ----------------------------------- | ----------------------------------------------------------------- | ---------------------------- |
+| Phase A never starts Aspire         | No runtime lease; S2 receipts are sufficient for structural work. | User dispatch / Aspire skill |
+| Telemetry row is `pending-lease`    | It must fail closed when phase B lands without table promotion.   | Slice 4 contract             |
+| Retained compat bytes are immutable | Version-literal parity cannot detect lost behavioral coverage.    | IMPL-EVAL cycle 1 H-1        |
 
 ## Drift
 
@@ -107,16 +112,23 @@ the capture provenance in that fixture folder's README, then update the parity e
 | Slice 5 raw lint             | `deno lint --no-config` on owned `.llm` TypeScript                                              | PASS             | 2 files, 0 findings.                                                                         |
 | Slice 5 scoped fmt           | structured format wrapper on all four roots                                                     | PASS             | 390/390 TypeScript files.                                                                    |
 | Slice 5 raw fmt              | direct check on config-excluded owned files                                                     | PASS             | 4 files checked.                                                                             |
+| Slice 6 configured lint      | `deno task lint`                                                                                | PASS             | 2,043/2,043 configured files, 0 findings.                                                    |
+| Slice 6 scoped check         | structured check wrapper on all four roots                                                      | PASS             | 391 files, 0 findings.                                                                       |
+| Slice 6 focused tests        | three corrected consumers plus parity                                                           | PASS             | 52/52.                                                                                       |
+| Slice 6 complete tests       | durable structured Phase-A unit set                                                             | PASS             | 263/263; receipt `receipts/06-unit-tests.json`.                                              |
+| Slice 6 coverage             | service-endpoint source test with LCOV                                                          | PASS             | Adapter fallback lines 237 and 239 each hit once.                                            |
+| Slice 6 lint/fmt             | scoped wrappers plus config-excluded fallbacks and package README check                         | PASS             | 378 lint, 390 TS fmt, 2 raw lint, 4 raw fmt, and 2 Markdown files.                           |
 
 ### Fitness Gates
 
-| Gate                   | Result | Evidence                                                       | Notes                                                                   |
-| ---------------------- | ------ | -------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| F-3/F-5/F-10/F-19      | PASS   | `receipts/05-quality-scan.json`, `receipts/05-arch-check.json` | Zero quality findings; architecture exit 0 with existing warnings only. |
-| Slice 3 `quality:scan` | PASS   | Repository task, 0 findings                                    | 7 pre-existing bounded allowances; none touched.                        |
-| Slice 3 `arch:check`   | PASS   | Repository task, exit 0                                        | Existing warnings only; no new FAIL.                                    |
-| Slice 4 `quality:scan` | PASS   | Repository task, 0 findings                                    | No package code changed.                                                |
-| Slice 4 `arch:check`   | PASS   | Repository task, exit 0                                        | Existing warnings only; no new FAIL.                                    |
+| Gate                      | Result | Evidence                                                       | Notes                                                                   |
+| ------------------------- | ------ | -------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| F-3/F-5/F-10/F-19         | PASS   | `receipts/05-quality-scan.json`, `receipts/05-arch-check.json` | Zero quality findings; architecture exit 0 with existing warnings only. |
+| Slice 3 `quality:scan`    | PASS   | Repository task, 0 findings                                    | 7 pre-existing bounded allowances; none touched.                        |
+| Slice 3 `arch:check`      | PASS   | Repository task, exit 0                                        | Existing warnings only; no new FAIL.                                    |
+| Slice 4 `quality:scan`    | PASS   | Repository task, 0 findings                                    | No package code changed.                                                |
+| Slice 4 `arch:check`      | PASS   | Repository task, exit 0                                        | Existing warnings only; no new FAIL.                                    |
+| Slice 6 F-3/F-5/F-10/F-19 | PASS   | `receipts/06-quality-scan.json`, `receipts/06-arch-check.json` | Zero quality findings; restored fallback coverage; architecture exit 0. |
 
 ### Runtime Gates
 
@@ -126,9 +138,9 @@ the capture provenance in that fixture folder's README, then update the parity e
 
 ### Consumer Gates
 
-| Consumer          | Result | Evidence                      | Notes                                                       |
-| ----------------- | ------ | ----------------------------- | ----------------------------------------------------------- |
-| MCP export corpus | PASS   | `receipts/05-scoped-gates.md` | 35 packages, 270 subpaths, 7,614 symbols; corpus unchanged. |
+| Consumer          | Result | Evidence                                                     | Notes                                                                     |
+| ----------------- | ------ | ------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| MCP export corpus | PASS   | `receipts/05-scoped-gates.md`, `receipts/06-scoped-gates.md` | 35 packages, 270 subpaths, 7,614 symbols; corpus unchanged after slice 6. |
 
 ## Handoff Notes
 
@@ -137,3 +149,5 @@ the capture provenance in that fixture folder's README, then update the parity e
 - Resume this draft PR only with the runtime lease, capture both dashboard envelopes, add the 13.5.3
   telemetry consumer case, and promote its parity row to `required` in the same commit.
 - Post `413-comment-draft.md` only after those phase-B files and gates land.
+- Fable supervisor should run IMPL-EVAL cycle 2 against the slice-6 head; this implementation lane
+  does not self-certify the fixes.
