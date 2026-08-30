@@ -1349,3 +1349,16 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - S3 Phase B is terminal success at `1611c5868`. S7 now owns the sole host runtime lease for its
   explicitly authorized two-AppHost foreign-control test. S3 review/evaluation, S10 static/parser
   proof, and every non-runtime topic lane continue in parallel.
+
+## 2026-08-30T19:08:48Z — S3 merged and runtime queue actively recovered
+
+- Coordinator merged S3 PR #1741 at exact head `338922a20db6` after every gate passed; main is now
+  `9710a2898`, issue #1715 is closed, and both records are sole `status:shipped`.
+- Aspire supervisor received the authoritative post-merge release command. Its first handover was
+  caught staged at a prompt and explicitly submitted/recovered. It must now rebase Tier-A-green S7
+  head `4aac6d7be`, run the two-AppHost local Phase-B lease through corrected DinD routing, clean to
+  exact zero, and obtain a separate-session IMPL-EVAL without stopping at a checkpoint.
+- Fixes prepared #1764/#1758/#1739/#1781 while queued behind that one host lease. Features continues
+  Slice 2 Tier-A/evaluation, internals is recovering #1774 cycle 2 into implementation, and docs is
+  taking #1784 through Tier-A/evaluation. Serial ordering remains per supervisor; only host runtime
+  execution is globally serialized.

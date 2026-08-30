@@ -1412,3 +1412,18 @@ implementation thread.
 - The shared #1734 baseline blocker is gone from main at `52a881c58842`. Any S1/S4/S5 or fix leaf
   that still reports #1734 as its blocker is stale and must integrate current main before spending
   another runtime lease.
+
+## 2026-08-30 — S3 convergence supersedes its historical blocked state
+
+- S3 is no longer blocked, draft, or awaiting acceptance mirroring. PR #1741 merged as
+  `9710a2898` after real local Phase B, independent cycle-4 `PASS`, exact-head full hosted CI,
+  checked issue acceptance, zero review threads, and a green close-gate. Any ledger or supervisor
+  text describing #1715/#1741 as `status:triage`, `status:impl`, or remote-DinD-blocked is stale.
+- The corrected DinD topology does not make ai-agents loopback interchangeable with the Docker
+  host: direct published application endpoints are `netscript-dind:<port>`. Aspire DCP's explicit
+  loopback publications still use the already-proven owner-scoped relay. New Phase-B work must
+  record which of those two paths it uses rather than collapsing them into one address claim.
+- S1's only authoritative head is `e0d70e40407458bebcf02cc408bea6b49107f42b`. The transient
+  `e0d70e404979` expansion exists only in historical hook telemetry and is not evidence. S10's next
+  boundary is dashboard/MCP availability after 53 passing runtime gates, not the already-repaired
+  NDJSON parser and not another infrastructure fallback.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "2a65a8cd0f3872c2b95b00fe0a9edae10531921b",
+  "currentMainSha": "9710a2898d4f0536752ab303b737e70411a4c399",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -156,8 +156,8 @@
       ]
     },
     "latestCheckpoint": {
-      "at": "2026-08-29T22:33:04.000Z",
-      "mainSha": "8b1e42f725919457c64781d5973fd419017fab13",
+      "at": "2026-08-30T19:08:48.000Z",
+      "mainSha": "9710a2898d4f0536752ab303b737e70411a4c399",
       "aspireResearchHead": "e4898e6eb714234cabae0ed0290936a54847862a",
       "aspireEpic": 1712,
       "aspireFiledIssues": [
@@ -176,12 +176,15 @@
         1725,
         1726
       ],
-      "aspireS1": "pr1727_draft_remote_equal_head_68b0aef87_coordinator_tier_a_hold_for_two_fail_closed_parity_repairs_e2e_dispatch_exposed_unrelated_baseline_fresh_type_drift_without_local_runtime_lease",
+      "aspireS1": "pr1727_draft_clean_authoritative_head_e0d70e404074_stable_13_5_persistent_endpoint_gate_corrected_and_green_hosted_runtime_rerun_queued_after_current_aspire_ci_chain",
       "issue1371": "pr1728_merged_as_8b1e42f72_after_pass_impl_mechanical_evidence_append_and_exact_head_ci_green_issue_closed",
       "pr1711": "merged_as_3561bb648_after_pass_impl_current_main_refresh_mechanical_delta_pass_and_exact_head_ci_green_issue1112_closed",
       "pr1729": "product_and_evidence_commits_live_on_draft_pr_grouping_1672_1674_1675_current_main_refresh_tier_a_and_impl_eval_active",
       "pr1731": "phase_1_plan_live_on_draft_pr_for_1466_features_tier_a_then_single_risk_selected_plan_eval_active",
-      "aspireS2": "runtime_lease_granted_to_issue1714_same_fable_research_supervisor_dispatched_gpt_5_6_sol_high_v1_v12_receipts_active_on_cli_13_5_3",
+      "aspireS2": "merged_shipped_issue1714_closed",
+      "aspireS3": "pr1741_merged_as_9710a2898_after_real_local_phase_b_cycle4_impl_eval_pass_exact_head_full_ci_and_close_gate_issue1715_closed_shipped",
+      "aspireS7": "tier_a_green_provenance_repair_head_4aac6d7be_local_phase_b_next_serial_host_lease_after_s3_merge",
+      "aspireS10": "combined_hosted_proof_d0023b834_passed_static_desktop_and_53_runtime_gates_then_failed_only_agent_aspire_mcp_smoke_dashboard_unavailable_postgres_cancelled_by_fail_fast",
       "freshHydration": "issue1734_open_and_gpt_5_6_sol_high_red_first_repair_active_non_runtime_work_does_not_wait_for_aspire_s2_lease",
       "pr1696": "merged_as_21d516224_after_fresh_fable5_impl_eval_pass_and_exact_head_ci_green_issue1694_closed",
       "canary2": "v0.0.7-canary.2_published_from_5bb112dd3_release_commit_2481b57d1_with_oidc_and_pinned_production_e2e_green",
@@ -985,7 +988,7 @@
     {
       "id": "ai-request-application-context",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
       "currentPrHeadSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
@@ -3259,14 +3262,14 @@
       "lane": "internals",
       "phase": "blocked",
       "baseBranch": "main",
-      "headSha": "ee379457e87bf0f02ab6a9851c4d2b7fe1d06f35",
-      "currentPrHeadSha": "ee379457e87bf0f02ab6a9851c4d2b7fe1d06f35",
+      "headSha": "e0d70e40407458bebcf02cc408bea6b49107f42b",
+      "currentPrHeadSha": "e0d70e40407458bebcf02cc408bea6b49107f42b",
       "issueNumbers": [1713],
       "branch": "chore/aspire-13-5-s1-pin-bump",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire",
       "prNumber": 1727,
-      "implementationState": "existing direct-to-main draft; bounded parity repairs remain under Aspire supervisor review",
-      "nextGate": "finish exact-head repairs, Tier-A, required runtime evidence, separate IMPL-EVAL"
+      "implementationState": "exact clean local/remote/PR head; bounded stable-persistent-endpoint correction passed 29/29 and Tier-A; hosted exact-head runtime rerun is queued behind the supervisor's current S4/S5/proof chain",
+      "nextGate": "restart the serialized dispatcher after the current chain, run both hosted runtime tiers at exact head, then separate delta IMPL-EVAL"
     },
     {
       "id": "aspire-13-5-s2-runtime-verification",
@@ -3287,22 +3290,23 @@
     {
       "id": "aspire-13-5-s3-fixture-recapture",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "85bd496737586da125c17e908f5ec0c0ce2cb4ff",
-      "currentPrHeadSha": "85bd496737586da125c17e908f5ec0c0ce2cb4ff",
+      "headSha": "338922a20db6d5c908ab1ef0efb3e896f3de725a",
+      "currentPrHeadSha": "338922a20db6d5c908ab1ef0efb3e896f3de725a",
       "issueNumbers": [1715],
       "branch": "test/aspire-13-5-s3-fixture-recapture",
       "prNumber": 1741,
-      "implementationState": "Phase A is preserved at live convergence head 85bd4967; two Phase-B attempts proved remote-DinD bind-source invisibility and unreachable localhost publication with exact zero cleanup; no envelopes were fabricated",
-      "runtimeState": "BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY",
-      "blocker": "remote-DinD lacks identical absolute worktree mounts and publishes loopback in another network namespace",
-      "nextGate": "only after identical-path mount plus reachable networking (or off-host CI) passes: capture real envelopes, complete Phase-B evaluation, and retain exact zero cleanup"
+      "implementationState": "real local Phase B captured 13.5.3 resources/spans, cycle-4 IMPL-EVAL passed, exact-head full CI and close-gate passed, and the coordinator merged PR #1741; #1715 is closed with sole status:shipped",
+      "runtimeState": "PASS_LOCAL_PHASE_B_AND_HOSTED_EXACT_HEAD",
+      "mergeCommitSha": "9710a2898d4f0536752ab303b737e70411a4c399",
+      "mergedAt": "2026-08-30T19:05:59.000Z",
+      "nextGate": "terminal merged; release and rebase S7 plus downstream Aspire stack"
     },
     {
       "id": "aspire-13-5-s4-generator-revalidation",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "732992415ff819f73474816cd8d0e979c5db348c",
       "currentPrHeadSha": "732992415ff819f73474816cd8d0e979c5db348c",
@@ -3317,7 +3321,7 @@
     {
       "id": "aspire-reference-name-validation",
       "lane": "internals",
-      "phase": "ready",
+      "phase": "blocked",
       "baseBranch": "main",
       "headSha": "c1e03922ad02416ea31219df94422f062ac33690",
       "currentPrHeadSha": "c1e03922ad02416ea31219df94422f062ac33690",
@@ -3370,16 +3374,16 @@
     {
       "id": "aspire-13-5-s7-teardown-leak-check",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "evaluating",
       "baseBranch": "main",
       "currentPrBaseBranch": "test/aspire-13-5-s3-fixture-recapture",
-      "headSha": "2f721bf32b94e7bb69deeded36ee6b573db4ea0f",
-      "currentPrHeadSha": "2f721bf32b94e7bb69deeded36ee6b573db4ea0f",
+      "headSha": "6f73dcae778a3086cf7a8032c66b75530e2d4743",
+      "currentPrHeadSha": "6f73dcae778a3086cf7a8032c66b75530e2d4743",
       "issueNumbers": [1429, 1719],
       "branch": "fix/aspire-13-5-s7-teardown-leak-check",
       "prNumber": 1744,
-      "implementationState": "live convergence head 2f721bf3 remains stacked behind S3 and lacks topology-backed teardown/leak Phase B evidence",
-      "nextGate": "after S3 lands recreate a live-head worktree, capture the topology-capable leak/foreign-AppHost Phase B proof, evaluate exact head, and retarget main"
+      "implementationState": "bounded explicit contained-cwd/contentRoot provenance repair is Tier-A green and rebased onto S3/main; local Phase-B worker 01a053ef-4c27-7f31-ac43-e78a00dff7c6 is dispatched at exact head",
+      "nextGate": "run the two-AppHost leak/foreign-control Phase B through DinD, clean host to exact zero, then separate-session IMPL-EVAL"
     },
     {
       "id": "aspire-13-5-s8-typed-resource-commands",
@@ -3533,8 +3537,10 @@
       "branch": "test/aspire-13-5-s10-e2e-gate-upgrades",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s10",
       "prNumber": 1760,
-      "implementationState": "Phase A is preserved at the live convergence head; stacked behind S8 with Phase B missing",
-      "nextGate": "land parent and satisfy topology, capture scaffold-runtime receipts, evaluate exact live head, then retarget main"
+      "implementationState": "direct-ResourceJson NDJSON and nullable-health repairs passed all earlier combined-proof gates at d0023b834; the hosted proof now fails only when Aspire MCP reports that the dashboard is unavailable",
+      "runtimeProofHeadSha": "d0023b83450ff597c9868f290466dd383f399916",
+      "runtimeProofRunId": 33328972788,
+      "nextGate": "diagnose the S9/S10 dashboard availability and MCP discovery ownership boundary, make a bounded repair with no unchanged retry, then rebuild exact-head combined proof"
     },
     {
       "id": "service-principal-adapter-boundary",
@@ -5238,7 +5244,7 @@
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-30T18:18:00.000Z"
+    "verifiedAt": "2026-08-30T19:08:48.000Z"
     },
-  "updatedAt": "2026-08-30T18:18:00.000Z"
+  "updatedAt": "2026-08-30T19:08:48.000Z"
 }

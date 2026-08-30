@@ -1589,3 +1589,23 @@ continues concurrently because serial ordering is per orchestrator, not global.
   blocked by #1734 and must resume in the Aspire supervisor's own serial queue.
 - Docs has moved to the #1777 logger-reference gap; features #1387, fixes #1357, and the next
   internals leaf remain active independently. Docs, internals, and Aspire are not global barriers.
+
+## Resume checkpoint — 2026-08-30T19:08:48Z
+
+- Exact main is `9710a2898d4f0536752ab303b737e70411a4c399` after coordinator merge of Aspire
+  S3 PR #1741. Issue #1715 is closed; both PR and issue carry the sole lifecycle label
+  `status:shipped`. The final packet is cycle-4 IMPL-EVAL `PASS`, hosted full run `33329358883`,
+  close-gate run `33329453582`, four mirrored acceptance rows, and zero live review threads.
+- Host runtime is exact zero. The next serialized lease belongs to S7 after its Tier-A-green
+  provenance repair `4aac6d7be` is rebased patch-identically onto current main. Use the identical
+  `/home/agent` DinD bind and `netscript-dind:<published-port>` application routing, preserve the
+  existing owner-scoped relay where DCP explicitly consumes loopback, and return Aspire, Docker,
+  volumes, and relays to exact zero before fixes receives its queued Flow-B lease.
+- S1's authoritative head is `e0d70e40407458bebcf02cc408bea6b49107f42b`; restart its hosted
+  dispatcher after the current S4/S5/proof chain, then run both runtime tiers and a delta
+  IMPL-EVAL. S10 proof run `33328972788` isolates the remaining boundary to Aspire dashboard/MCP
+  availability after all earlier gates passed; diagnose S9/S10 ownership before any retry.
+- Features, docs, fixes, and internals were explicitly re-steered and remain independent. Near-ready
+  PRs #1738 and #1747 must integrate current main and clear their stale `status:ci-fail` state before
+  merge; #1740 additionally has two unresolved review threads. Do not merge merely from old green
+  checks.

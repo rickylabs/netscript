@@ -2631,3 +2631,27 @@
   relays to zero. S7 then acquired the serialized lease for its explicitly two-AppHost
   foreign-control reproduction. S3 evaluation, S10 parser proof, and S1 exact-main convergence
   continue independently.
+
+## 2026-08-30T19:08:48Z — S3 shipped; local Phase B re-armed on the corrected DinD contract
+
+- S3's bounded documentation correction earned independent cycle-4 IMPL-EVAL `PASS`. The branch
+  was rebased patch-identically, full hosted run `33329358883` passed every tier, issue #1715's four
+  acceptance rows were mirrored, the live review-thread count was zero, and close-gate run
+  `33329453582` passed at exact head `338922a20db6`. The coordinator squash-merged PR #1741 as main
+  `9710a2898d4f0536752ab303b737e70411a4c399`; #1715 auto-closed and both records now have the sole
+  lifecycle label `status:shipped`.
+- The owner reconfirmed the repaired DinD contract: `/home/agent` is mounted identically inside
+  `netscript-dind`, Docker remains `tcp://netscript-dind:2375`, and application publications are
+  reached from `ai-agents` through `netscript-dind:<published-port>`, never its own loopback. Exact
+  pre-dispatch census was zero Aspire applications, Docker containers, and volumes.
+- S7's bounded explicit contained-`cwd`/`--contentRoot` provenance repair is Tier-A green at
+  `4aac6d7be`. The Aspire supervisor was recovered from a staged-but-unsubmitted prompt and directed
+  to rebase S7 onto S3/main, prove patch identity, execute the single local two-AppHost Phase-B
+  lease, clean to exact zero, and then dispatch a separate-session IMPL-EVAL. The fixes runtime
+  queue remains next after that lease; its static preparation continues in parallel.
+- S1 is authoritatively clean at `e0d70e40407458bebcf02cc408bea6b49107f42b`; live PR comments and
+  durable ledgers contain no malformed SHA. Its stable Aspire 13.5 persistent-endpoint correction
+  passed 29/29 focused tests and Tier-A, but the hosted exact-head rerun dispatcher must be restarted
+  after the currently active S4/S5/proof chain. Combined S10 proof `33328972788` at `d0023b834`
+  passed static, desktop, and 53 SQLite/Garnet gates before the sole dashboard-unavailable Aspire
+  MCP failure; Postgres was cancelled by fail-fast, so no unchanged retry is authorized.
