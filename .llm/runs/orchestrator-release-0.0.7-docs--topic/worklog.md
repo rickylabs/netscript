@@ -1504,3 +1504,51 @@ since that is new scope rather than the normalization of an issue a 0.0.7 PR alr
 5. **Re-run, never re-push, to refresh CI on a verified head.** `close-gate` reads labels live, so a
    label transition plus `gh run rerun` re-executes the acceptance mirror while the head — and the
    exact-head verdict attached to it — survives.
+
+## 2026-08-30 — ledger pushed; queue advanced to #1723 and found dependency-blocked
+
+**Push.** `5188cbe8` pushed by explicit refspec after proving the remote was a strict ancestor
+(fast-forward, no force) and that the seven-commit range touched **only**
+`.llm/runs/orchestrator-release-0.0.7-docs--topic/` — no product path. `git ls-remote` confirms
+local == remote at `5188cbe861c46f110589f7601252a725bdb71d11`; tree clean.
+
+**Allocation re-read from the coordinator's control plane, not from labels.**
+`chore/release-0.0.7-orchestration` @ `117e23f9` (`updatedAt` 2026-08-30T09:00:07Z, `currentMainSha`
+`13878a80`) now allocates the docs lane **`[1551, 1723, 1745]`** — widened from the frozen `[1551]`
+this lane had recorded. #1551 closed, #1745 → PR #1746 at ready-merge. **#1723 is the active
+issue**, and #1748 was only its version-independent slice A.
+
+The coordinator's `queueState` for this lane reads
+`1746_exact_head_impl_eval_and_review_thread_gate; 1748_exact_head_evidence_reconciliation;
+later_docs_serially` — the first two are now complete. Its `topicHeadSha` still records `5160a46c`
+and is stale after this push; that field is coordinator-owned and was **not** mutated by this lane.
+Reported rather than corrected.
+
+**#1723 is blocked at the source, verified live rather than inferred.** The issue's own Related
+section states "Depends on S1–S10 (prose must match shipped behaviour)". At `origin/main`
+`13878a80`, `.github/toolchain.env` still pins `NETSCRIPT_ASPIRE_CLI_VERSION=13.4.6` /
+`NETSCRIPT_ASPIRE_SDK_VERSION=13.4.6`, and every named dependency is **OPEN**: S1 #1727, S6 #1718
+(PR #1743 still draft), S8 #1720, S3 #1741, S10 #1722, S5 #1740, and #1642 (which declares itself
+outside 0.0.7). Nothing 13.5 has merged.
+
+Both public version literals therefore read `13.4.6` and are **correct today**; writing 13.5.3 now
+would publish documentation that is false against main. That is the reason S11 was sliced, and it is
+why #1748 preserves both literals deliberately.
+
+**No work was invented to look busy.** The one unblocked adjacent item —
+`packages/aspire/README.md:11`, still ".NET Aspire" on a JSR-published README, so #1000's intent is
+incomplete across every published surface — belongs to **S13 #1724**, which is not in this lane's
+allocation. Taking it would breach exclusive issue allocation, so it was handed over on the PR and
+on #1723 instead.
+
+**Action taken:** a full status comment posted on #1723 enumerating every remaining row against the
+dependency that releases it, plus two findings about the issue's own text — its acceptance lists
+`deno task doc:lint`, which requires `--root` and lints TypeScript entrypoints, so it is inapplicable
+to a prose slice (the PR that finally closes #1723 still owes a green run, which today means fixing a
+pre-existing `packages/mcp` `private-type-ref`); and its scope header's 113-row manifest count needs
+regenerating per its own instruction. `status:triage` → `status:plan`, since research and
+decomposition are recorded and only implementation is waiting.
+
+**Posture: event-driven on #1723.** Dependency release and re-intake are the coordinator's call. The
+moment S1 **#1727** lands, the version-snippet bucket becomes actionable as a single slice and is the
+natural next dispatch.
