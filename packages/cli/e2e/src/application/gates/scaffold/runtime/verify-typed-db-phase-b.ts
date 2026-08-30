@@ -1,4 +1,4 @@
-import { readListenerHealthReport } from './verify-listener-readiness.ts';
+import { readListenerHealthReport } from './evidence/listener-readiness.ts';
 
 const WAIT_TIMEOUT_SECONDS = 10;
 const REPORT_DEADLINE_MS = 30_000;

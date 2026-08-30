@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import { evaluateAspireDoctor } from '../../../src/application/gates/scaffold/runtime/aspire-doctor-evidence.ts';
-import { evaluateDescribeFollow } from '../../../src/application/gates/scaffold/runtime/aspire-describe-follow.ts';
+import { evaluateAspireDoctor } from '../../../src/application/gates/scaffold/runtime/evidence/doctor.ts';
+import { evaluateDescribeFollow } from '../../../src/application/gates/scaffold/runtime/evidence/describe-follow.ts';
 
 const FIXTURES = new URL('./fixtures/', import.meta.url);
 
