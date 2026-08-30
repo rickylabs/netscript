@@ -25,8 +25,11 @@ export type TelemetryEndpointSource =
 
 /** Resolved endpoint and its discovery source. */
 export interface ResolvedTelemetryEndpoint {
+  /** Normalized HTTP(S) endpoint selected by the resolver. */
   readonly endpoint: string;
+  /** Precedence step that selected the endpoint. */
   readonly source: TelemetryEndpointSource;
+  /** Loopback HTTPS alternative derived from an Aspire dashboard port. */
   readonly httpsFallback?: string;
 }
 

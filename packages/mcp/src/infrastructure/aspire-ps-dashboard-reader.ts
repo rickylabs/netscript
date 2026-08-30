@@ -7,8 +7,11 @@ import {
 
 /** Result returned by the injected Aspire command runner. */
 export interface AspirePsCommandResult {
+  /** Child-process exit code. */
   readonly code: number;
+  /** Decoded standard output. */
   readonly stdout: string;
+  /** Decoded standard error. */
   readonly stderr: string;
 }
 
@@ -42,6 +45,7 @@ export class AspirePsDashboardReader implements AspirePsDashboardPort {
   readonly #execute: AspirePsCommand;
   readonly #realPath: (path: string) => string;
 
+  /** Create a reader with optional injected command and filesystem edges. */
   constructor(options: AspirePsDashboardReaderOptions = {}) {
     this.#appHostPath = options.appHostPath;
     this.#execute = options.execute ?? executeAspirePs;

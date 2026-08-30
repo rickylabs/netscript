@@ -68,6 +68,7 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | 4 | convergence sweep | Regenerated an 800-row manifest (zero unmatched) and ran phase 2 in report mode: 24 non-archival failures remain, all outside S13 ownership. |
 | 2026-08-30 | 4 | flip ordering | Refreshed `origin/main` at `24f6642f`; toolchain.env remains 13.4.6, proving S1 is not on main. The CI/default phase-2 flip is deferred; S9 and S11 convergence cannot satisfy the all-three prerequisite without S1. |
 | 2026-08-30 | 5 | receipt wiring | Registered `aspire-version-parity` in the durable gate catalog so the required phase-2 report can produce an exact-head JSON receipt. |
+| 2026-08-30 | 5 | public docs lint | Added member-level JSDoc to the new endpoint/reader exports; targeted `deno doc --lint` passes. Root MCP doc lint still exposes the pre-existing private `SchemaViewName` reference outside S13 scope. |
 
 ## Gate Results
 
@@ -90,6 +91,7 @@ source and generated-carrier freshness gates.
 | Validation check | `run-deno-check.ts --root .llm/tools/validation --ext ts,tsx` | PASS | 18 files; no findings. |
 | Validation raw lint/fmt | `deno lint/fmt --no-config` with repository style flags | PASS | Checker, tests, and manifest generator clean. |
 | Phase-2 convergence report | `deno task check:aspire-version-parity -- --phase 2 --report` | REPORT PASS (exit 0) | `manifestFresh=true`; 799 checked, 24 enforcement hits, 6 archival info, 1 lockfile skipped, 0 missing. |
+| New MCP exports doc lint | `deno doc --lint` over telemetry endpoint and Aspire-ps reader modules | PASS | New public types, members, and constructor documented. |
 
 Runtime gates are N/A by explicit scope.
 
