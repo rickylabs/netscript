@@ -2,19 +2,20 @@
 
 ## Run Metadata
 
-| Field          | Value                                         |
-| -------------- | --------------------------------------------- |
-| Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl` |
-| Branch         | `test/aspire-13-5-s3-fixture-recapture`       |
-| Current phase  | `handoff — phase B pending`                   |
-| Archetype      | `2 - Integration`                             |
-| Scope overlays | `none`                                        |
+| Field          | Value                                           |
+| -------------- | ----------------------------------------------- |
+| Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl`   |
+| Branch         | `test/aspire-13-5-s3-fixture-recapture`         |
+| Current phase  | `impl-eval cycle 1 fix — re-evaluation pending` |
+| Archetype      | `2 - Integration`                               |
+| Scope overlays | `none`                                          |
 
 ## Current State
 
-Draft PR #1741 contains pushed slices 1–4. Slice 5 has a green Phase-A gate set and records the
-lease-backed phase-B handoff. No runtime has started, and the 13.5.3 telemetry envelope remains
-absent by design.
+Draft PR #1741 contains pushed slices 1–5. IMPL-EVAL cycle 1 returned `FAIL_FIX` at `a964a2120`.
+Slice 6 restores the verbatim 13.4.6 fallback case, derives independent bannerless 13.5.3 cases from
+the S2 V5 describe receipt, corrects provenance/README formatting, and has a green gate set. No
+runtime has started, and the 13.5.3 telemetry envelope remains absent by design.
 
 ## Completed
 
@@ -27,16 +28,20 @@ absent by design.
 - Slice 4 commit `37f0487f1` pushed with its PR trail comment.
 - Final scoped check/lint/fmt, 263 tests, `quality:scan`, `arch:check`, and MCP export corpus pass.
 - Deferred #413 comment text drafted for use only after phase B lands.
+- Slice 5 commit `a964a2120` pushed with its PR trail comment.
+- IMPL-EVAL cycle 1 findings H-1, M-1, L-1, and L-2 fixed in slice 6.
+- Configured lint (2,043 files), scoped check/lint/fmt, fallback coverage, 263 tests,
+  `quality:scan`, `arch:check`, and MCP export corpus pass after the fixes.
 
 ## In Progress
 
-- Slice 5 evidence commit and PR trail update.
+- Slice 6 commit, push, PR trail comment, and supervisor re-evaluation handoff.
 
 ## Next Steps
 
-1. Commit and push the slice 5 evidence and handoff artifacts.
-2. Leave PR #1741 draft for Fable supervisor review.
-3. Resume only after a runtime lease is granted for phase-B dashboard capture.
+1. Commit and push slice 6 with the prescribed message and explicit refspec.
+2. Post the slice-6 SHA and gate evidence to draft PR #1741.
+3. Fable supervisor runs IMPL-EVAL cycle 2; phase B remains separately lease-backed.
 
 ## Key Decisions
 
@@ -47,28 +52,28 @@ absent by design.
 
 ## Files Changed
 
-| Path                                                                                       | Status  | Notes                                                 |
-| ------------------------------------------------------------------------------------------ | ------- | ----------------------------------------------------- |
-| `.llm/tools/validation/check-compat-fixtures_test.ts`                                      | new     | Phase-A parity gate.                                  |
-| `.llm/runs/test-aspire-13-5-s3-fixture-recapture--impl/`                                   | new     | Harness state.                                        |
-| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.5.3.json`                           | new     | Redacted S2 V5 snapshot.                              |
-| `.llm/tools/agentic/teardown/__fixtures__/README.md`                                       | new     | Capture provenance.                                   |
-| `.llm/tools/agentic/teardown/probes_test.ts`                                               | changed | Both Aspire versions exercise the same normalization. |
-| `packages/mcp/tests/service-endpoint-source-fixtures.ts`                                   | changed | Redacted describe fixtures for both versions.         |
-| `packages/mcp/tests/service-endpoint-sources_test.ts`                                      | changed | Both banners exercise the adapter.                    |
-| `packages/mcp/tests/fixtures/README.md`                                                    | new     | Describe capture provenance.                          |
-| `packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts`                  | changed | Both describe shapes exercise endpoint selection.     |
-| `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts` | changed | Both banners exercise topology evidence.              |
-| `packages/mcp/tests/fixtures/telemetry/README.md`                                          | new     | Lease-backed phase-B capture contract.                |
+| Path                                                                                       | Status  | Notes                                                                 |
+| ------------------------------------------------------------------------------------------ | ------- | --------------------------------------------------------------------- |
+| `.llm/tools/validation/check-compat-fixtures_test.ts`                                      | new     | Phase-A parity gate.                                                  |
+| `.llm/runs/test-aspire-13-5-s3-fixture-recapture--impl/`                                   | new     | Harness state.                                                        |
+| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.5.3.json`                           | new     | Redacted S2 V5 snapshot.                                              |
+| `.llm/tools/agentic/teardown/__fixtures__/README.md`                                       | new     | Capture provenance.                                                   |
+| `.llm/tools/agentic/teardown/probes_test.ts`                                               | changed | Both Aspire versions exercise the same normalization.                 |
+| `packages/mcp/tests/service-endpoint-source-fixtures.ts`                                   | changed | Verbatim 13.4.6 plus independent bannerless S2-derived 13.5.3.        |
+| `packages/mcp/tests/service-endpoint-sources_test.ts`                                      | changed | Preserves fallback assertions and exercises the 13.5.3 receipt shape. |
+| `packages/mcp/tests/fixtures/README.md`                                                    | new     | Describe capture provenance.                                          |
+| `packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts`                  | changed | Both describe shapes exercise endpoint selection.                     |
+| `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts` | changed | Retained 13.4.6 case plus bannerless 13.5.3 topology evidence.        |
+| `packages/mcp/tests/fixtures/telemetry/README.md`                                          | new     | Lease-backed phase-B capture contract.                                |
 
 ## Gates
 
-| Gate family | Current status                                   | Evidence                                                       |
-| ----------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| Static      | S1 expected RED; final Phase-A scoped gates PASS | worklog + `receipts/05-scoped-gates.md`                        |
-| Fitness     | PASS                                             | `receipts/05-quality-scan.json`, `receipts/05-arch-check.json` |
-| Runtime     | N/A phase A                                      | telemetry README + drift entry                                 |
-| Consumer    | PASS                                             | unchanged MCP export corpus in `receipts/05-scoped-gates.md`   |
+| Gate family | Current status                                    | Evidence                                                       |
+| ----------- | ------------------------------------------------- | -------------------------------------------------------------- |
+| Static      | S1 expected RED; slice-6 evaluator-fix gates PASS | worklog + `receipts/06-scoped-gates.md`                        |
+| Fitness     | PASS                                              | `receipts/06-quality-scan.json`, `receipts/06-arch-check.json` |
+| Runtime     | N/A phase A                                       | telemetry README + drift entry                                 |
+| Consumer    | PASS                                              | unchanged MCP export corpus in `receipts/06-scoped-gates.md`   |
 
 ## Open Questions
 

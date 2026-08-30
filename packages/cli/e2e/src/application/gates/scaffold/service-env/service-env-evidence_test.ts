@@ -96,20 +96,22 @@ Deno.test('contract: covers every documented category, in both directions', () =
   assertEquals([...rules].toSorted(), ['declared-wins', 'generated-wins', 'refused']);
 });
 
-for (const aspireVersion of ['13.4.6', '13.5.3']) {
-  Deno.test(`topology evidence: accepts an Aspire ${aspireVersion} running resource`, () => {
-    const evidence = readDescribedResource(
-      describeOutput(healthyResource(), `Aspire CLI ${aspireVersion}\n`),
-      SERVICE,
-    );
+Deno.test('topology evidence: accepts a running resource that honors the contract', () => {
+  const evidence = readDescribedResource(describeOutput(healthyResource()), SERVICE);
 
-    assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);
-  });
-}
+  assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);
+});
+
+Deno.test('topology evidence: accepts the bannerless Aspire 13.5.3 describe shape', () => {
+  // The S2 V5 receipt was captured with `--nologo`; its environment is object-shaped.
+  const evidence = readDescribedResource(describeOutput(healthyResource(), ''), SERVICE);
+
+  assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);
+});
 
 Deno.test('topology evidence: reads a DCP-suffixed instance id', () => {
   const resource = { ...healthyResource(), name: `${SERVICE}-sayhwbds`, displayName: undefined };
-  const evidence = readDescribedResource(describeOutput(resource, 'Aspire CLI 13.4.6\n'), SERVICE);
+  const evidence = readDescribedResource(describeOutput(resource), SERVICE);
 
   assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);
 });
@@ -122,7 +124,7 @@ Deno.test('topology evidence: reads the array-shaped environment', () => {
       value,
     })),
   };
-  const evidence = readDescribedResource(describeOutput(resource, 'Aspire CLI 13.4.6\n'), SERVICE);
+  const evidence = readDescribedResource(describeOutput(resource), SERVICE);
 
   assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);
 });
