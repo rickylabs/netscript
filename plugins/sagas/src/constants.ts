@@ -9,7 +9,7 @@ export const SAGAS_API_SERVICE_NAME = 'sagas-api' as const;
 
 /**
  * @deprecated Not a runtime fallback; removed in 0.0.8 — see
- * "chore(sagas): remove deprecated SAGAS_API_DEFAULT_PORT compatibility export in 0.0.8".
+ * "chore(plugins): remove deprecated default-port compatibility exports in 0.0.8".
  */
 export const SAGAS_API_DEFAULT_PORT = 8092 as const;
 

@@ -12,17 +12,16 @@
 - **Evidence:** S2 `02-capture-db-allocation-*.raw.txt`, `02-verify-live-db-endpoint.raw.txt`, and
   `02-aspire-describe-*.json` on `origin/test/aspire-13-5-s2-runtime-verification`.
 
-## 2026-08-30 — Embedded asset source spelling
+## 2026-08-30 — Generated asset exclusion from the S5 runtime-literal grep
 
-- **What:** The exact S5 grep includes generated barrels whose embedded skill/prose bytes and gzip
-  base64 can contain or coincidentally spell a forbidden port, although those assets are not
-  executable runtime fallbacks.
-- **Source:** Slice 6 `gen:assets-barrel` output and the locked exact grep.
-- **Expected:** Do not edit S9/S11 skill/docs content; generated assets still satisfy the exact S5
-  invariant.
-- **Actual:** The generator emits JavaScript Unicode escapes only at forbidden source spellings.
-  Runtime bytes and canonical bundle hashes remain unchanged and are covered by a round-trip test.
+- **What:** Generated `*.generated.ts` barrels embed S9/S11-owned prose and compressed bytes that
+  may contain a historical port spelling but are not executable runtime fallbacks.
+- **Source:** Tier-A review of slice 6 and the checker's existing `isGeneratedSource` exclusion.
+- **Expected:** The S5 grep tests runtime source with the same generated-source boundary as
+  `check:aspire-host-ports`; asset serialization remains content-agnostic.
+- **Actual:** The test and receipt command exclude `*.generated.ts`, while regeneration preserves
+  the source assets verbatim and the check gate continues to validate barrel freshness.
 - **Severity:** minor
 - **Action:** accept
-- **Evidence:** `receipts/06-final-gates.txt` and
-  `.llm/tools/generate-cli-assets-barrel_test.ts`.
+- **Evidence:** `receipts/07-tier-a-fixes.txt` and
+  `.llm/tools/validation/check-aspire-host-ports_test.ts`.

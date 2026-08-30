@@ -16,7 +16,8 @@ async function main(): Promise<void> {
       const triggerResponse = await fetch(`${jobUrl}/trigger`, { method: 'POST' });
       if (!triggerResponse.ok) {
         throw new Error(
-          `Flow-B job trigger failed: HTTP ${triggerResponse.status}: ${await triggerResponse.text()}`,
+          `Flow-B job trigger failed: HTTP ${triggerResponse.status}: ${await triggerResponse
+            .text()}`,
         );
       }
       console.info(`Flow-B callback job ${String(current.id)} triggered`);

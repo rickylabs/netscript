@@ -1,8 +1,5 @@
 import { assert, assertEquals, assertFalse, assertThrows } from '@std/assert';
-import {
-  readAgentToolEmbeddedBundle,
-  sourceSafeAssetLiteral,
-} from './generate-cli-assets-barrel.ts';
+import { readAgentToolEmbeddedBundle } from './generate-cli-assets-barrel.ts';
 
 interface MissingRelativeImport {
   readonly importer: string;
@@ -87,11 +84,4 @@ Deno.test('relative-import closure guard rejects an omitted dependency', () => {
     Error,
     'commands/scan.ts -> modules/extract.ts',
   );
-});
-
-Deno.test('embedded asset literals preserve bytes without spelling legacy ports in source', () => {
-  const value = '8091 8092 8093 8094 4437 127.0.0.1:8000';
-  const literal = sourceSafeAssetLiteral(value);
-  assertFalse(/809[1-4]|4437|127\.0\.0\.1:80/.test(literal));
-  assertEquals(Function(`return ${literal}`)(), value);
 });
