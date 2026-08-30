@@ -88,7 +88,7 @@ Deno.test('runtime prefers the typed database command and retains restart fallba
   assertEquals(command[2].includes('"start"'), true);
 });
 
-Deno.test('typed database Phase-B gate is defined but not registered in Phase A', () => {
+Deno.test('typed database Phase-B gate stays outside the base runtime gate list', () => {
   const gate = createTypedDbPhaseBGate();
   if (gate.kind !== 'command') throw new Error('Expected a command gate.');
   const context = s8RuntimeContext();

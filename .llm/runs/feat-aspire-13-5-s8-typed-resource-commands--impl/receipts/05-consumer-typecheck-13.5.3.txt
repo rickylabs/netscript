@@ -1,6 +1,6 @@
 Gate: S8 consumer AppHost type-check against restored Aspire SDK 13.5.3
 Date: 2026-08-30
-Result: PASS (final compiler exit 0)
+Result: PASS (compiler exit 2 with exactly two allowed zod TS2307 baseline errors and zero S8 errors)
 
 Generator source:
   worktree: /home/agent/projects/netscript/worktrees/007-aspire-s8
@@ -67,9 +67,12 @@ D-19 correction cycle:
 Compiler:
   TypeScript 5.9.3 from the restored AppHost node_modules
   command (from generated aspire directory): ./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json
-  final observed output: <empty>
-  final exit code: 0
-  zod TS2307 errors on the final run: 0 (the allowance was not needed)
+  final observed output:
+    .helpers/_aspire-compat.mts(10,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+    .helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+  final exit code: 2
+  baseline diagnostics: exactly the two allowed zod TS2307 errors above
+  S8 diagnostics: 0
 
 No Aspire start, run, wait, resource command, AppHost process, or container operation was used.
 The scratch workspace was removed after evidence capture.
