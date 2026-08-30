@@ -327,4 +327,5 @@ gates green at S8′/S9′/S10′; force-pushed with lease; slice worktrees move
 (coordinator challenge) | Exact current probes: bind-mounted worktree → `entries=0`; published port
 `127.0.0.1:32772` refused from `ai-agents` (curl exit 7, /dev/tcp refused), `ok` inside the dind
 netns. Both causes present on the repaired host; no lease requested; sandbox back to zero. **D-55**.
-|
+| | Infra handoff artifact | `infra-handoff-topology.md`: required topology (shared netns +
+identical-path bind / local daemon / CI) and the two exact acceptance probes from D-55. |
