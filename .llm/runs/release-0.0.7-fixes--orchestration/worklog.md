@@ -5953,3 +5953,35 @@ not trusted from watcher exit code — job-level query re-fetched). Final re-aud
 
 **Merge packet: PR #1739, `--match-head-commit 05a274e409b42388991da7a88b43105c80d0f9e1`, closes #1673.**
 No further action available to the supervisor short of the merge action itself — handing to coordinator.
+
+### #1781/#1357 — converged, Tier-A re-verified, evidence prepared, lease request prepared
+
+`#1739`/`#1673` shipped, merged to main as `73bf2efa9`. Moved to the next queued leaf immediately, per
+instruction, without waiting on another topic lane.
+
+Converged onto `73bf2efa9`: zero true intersection verified against the authoritative 12-path ceiling
+(155-file main delta, `comm` against the path list, not a polluted diff), clean merge, patch-identity
+proven on all 12. Static Tier-A re-run at carrier `07441ca3d`→`d86b8b32b`: `packages/cli` **1410/0**
+(was 1388), e2e **175/0** (was 170), all cascade checks exit 0, lock unchanged, tree clean. `PASS_IMPL`
+(`2991113a6`) carries forward as MECHANICAL_PASS — same pattern proven twice already this session.
+
+**Acceptance-evidence mapping: 10 of 11 boxes, deliberately not 11.** Built the PR-body
+`acceptance-evidence` block for issue #1357 boxes 1–10 from IMPL-EVAL/Tier-A-verified evidence, one new
+verification worth noting: box 3 ("factory-derived key") required reading `web-scaffold.ts`'s
+standalone-island template directly (`queryKey: <factory>.list.clientKey(input)`) rather than
+inferring it from slice notes. **Box 11 has no entry, by design, not oversight** — read
+`mirror-acceptance-evidence.ts`'s validation before writing anything: any evidence entry for a
+currently-unchecked box unconditionally ticks it (`if (!box.checked) mapping.set(...)`), so there is no
+way to represent "10 done, 1 pending" in one mirror call. Confirmed empirically with a dry-run before
+concluding this rather than trusting the source read alone: the mirror **self-gated** on the missing
+`status:ready-merge` label (genuinely absent, since the leaf isn't ready) and never even reached the
+box-11 validation — so no premature label was needed or set.
+
+**Lease request prepared, nothing started.** `scaffold-runtime-request-1781.md`: exact carrier, the
+one-pass command, gate identity (`scaffold.ui-data-screen`, verified selected not just defined), the
+known `behavior.app-reference` host risk carried forward from #1764/#1739's identical findings this
+session, and an evidence contract requiring the gate to be shown executing.
+
+Sequence from here, once the lease frees: run the prepared command → mirror box 11 → set
+`status:ready-merge` → rerun CI/close-gate at exact carrier → merge packet. Not waiting on another
+topic lane in the meantime.
