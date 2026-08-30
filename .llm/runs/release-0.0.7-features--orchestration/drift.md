@@ -622,3 +622,47 @@ verdict as if it still held.
 
 **Not repaired here** — `.llm/tools/agentic/` is repo tooling, not features scope. It belongs with
 D-24 in an internals leaf.
+
+## D-26 — the root `test` red is a proven host-infrastructure baseline, and neither failure can pass here
+
+**Coordinator evidence, independently confirmed.** `ps -eo stat=` on this host reports **7,733
+zombies**, of which **7,562 are `sshd`** children reparented to PID 1, plus `git` (61), `node` (22),
+`esbuild` (21), `deno` (10), `claude` (7). Every one is owned by PID 1. No agent can reap them; only
+a host-level intervention can.
+
+**Both #1731 root-`test` failures reduce to that single condition, and I traced each mechanism rather
+than accepting the correlation.**
+
+**`hybrid-launcher_test.ts` — proven, not inferred.** The test's liveness check is
+`Deno.kill(descendantPid, 0)` at `:167`, and `kill(pid, 0)` **succeeds on a zombie** — a zombie holds
+its PID until reaped. So a worker descendant that exited exactly as designed still answers, `alive`
+stays `true`, and `:177` fires `worker descendant <pid> survived cancellation`. On a host with PID 1
+accumulating thousands of unreaped children, **this assertion cannot pass regardless of any code
+change**, in this repo or any other.
+
+**`codex-follow_test.ts` — and the fd framing is wrong.** The failure is
+`Deno.watchFs` → `Too many open files (os error 24)`. It is **not** the file-descriptor rlimit:
+`ulimit -n` is `524288` soft and hard, and system-wide `/proc/sys/fs/file-nr` shows only `10,777`
+open. The exhausted resource is **`fs.inotify.max_user_instances = 128`** — `watchFs` allocates one
+inotify *instance* per watcher, and `inotify_init1` returns `EMFILE` when that per-user cap is hit,
+which Deno surfaces with the generic "Too many open files" text. Thousands of stuck processes plus
+several live agents exhaust 128 instances easily. Raising `ulimit -n` would change nothing; the knob
+is a **root-only sysctl**.
+
+**Disposition (coordinator, 2026-08-30).** No further root-`test` retries after the current attempt.
+Record the exact red as a host baseline with this cause. The focused and product gates stand as the
+product verdict: `check`, `lint`, `fmt-check`, `quality-gate`, `arch-check`, `publish-dry-run`, the
+contracts suite, and the focused SDK doctest. **No product change in #1731 may target this
+infrastructure** — the two tests are correct code failing on a broken host, and "fixing" them would
+mean weakening a real guard to fit a transient environment.
+
+**Consequence for `test-final.json`.** It stays a terminal FAIL receipt and sufficiency stays
+`INSUFFICIENT`. That is the honest record: the leaf's own `TS2344` is fixed and its 4,246 tests pass,
+and the two reds are provably outside its diff — `git diff --stat 21d51622..<head> -- .llm/tools`
+is empty. The IMPL-EVAL rules on whether a host-baseline red blocks the slice; this lane does not
+grant itself that ruling, and does not retry its way to a different number.
+
+**Escalated to the owner, outside features scope:** the host needs the zombie reaper fixed (PID 1 in
+this container is not reaping) and `fs.inotify.max_user_instances` raised. Until then every lane on
+this host will see intermittent `watchFs` EMFILE and false process-survivor assertions, and will
+waste gate time rediscovering it. Related tooling gaps: D-24, D-25.
