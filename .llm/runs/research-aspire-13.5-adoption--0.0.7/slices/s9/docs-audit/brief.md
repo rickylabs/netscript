@@ -2,7 +2,22 @@ use harness
 
 ## SKILL
 
-Read `.agents/skills/netscript-harness/SKILL.md`, `.llm/harness/workflow/doc-audit.md`, `.agents/skills/aspire/SKILL.md`, and `.agents/skills/netscript-tools/SKILL.md`. You are the **opposite-family docs_audit session** (Codex · GPT-5.6 Sol · medium): one single pass over the S9 skill prose at exact head `e11de98d`. You are NOT a generator and NOT the IMPL-EVAL evaluator; you do not edit tracked files, do not commit, do not push, do not start any AppHost or container, do not run `e2e:cli`. Your worktree is detached read-only: `/home/agent/projects/netscript/worktrees/007-aspire-s9-audit`. Host: Aspire CLI 13.5.3 via `/home/agent/.local/bin/mise exec --`; you MAY run non-runtime CLI reads (`aspire --help`, `aspire agent mcp --help`, `aspire docs …`) to check claims; `aspire ps` must stay `[]`. Write your findings as a Markdown report to `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s9/docs-audit/report.md` (absolute path; create it) with: a findings table (severity high/medium/low/info · claim · file:line · evidence · required change), the six required checks each marked PASS/FAIL with evidence, and a final line `AUDIT: PASS` or `AUDIT: FAIL_FIX`. Also post the same report as a PR #1759 comment starting with `**[PHASE: DOCS-AUDIT]**` and the head SHA (`gh pr comment 1759 --repo rickylabs/netscript --body-file …`). The audit request follows verbatim.
+Read `.agents/skills/netscript-harness/SKILL.md`, `.llm/harness/workflow/doc-audit.md`,
+`.agents/skills/aspire/SKILL.md`, and `.agents/skills/netscript-tools/SKILL.md`. You are the
+**opposite-family docs_audit session** (Codex · GPT-5.6 Sol · medium): one single pass over the S9
+skill prose at exact head `e11de98d`. You are NOT a generator and NOT the IMPL-EVAL evaluator; you
+do not edit tracked files, do not commit, do not push, do not start any AppHost or container, do not
+run `e2e:cli`. Your worktree is detached read-only:
+`/home/agent/projects/netscript/worktrees/007-aspire-s9-audit`. Host: Aspire CLI 13.5.3 via
+`/home/agent/.local/bin/mise exec --`; you MAY run non-runtime CLI reads (`aspire --help`,
+`aspire agent mcp --help`, `aspire docs …`) to check claims; `aspire ps` must stay `[]`. Write your
+findings as a Markdown report to
+`/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s9/docs-audit/report.md`
+(absolute path; create it) with: a findings table (severity high/medium/low/info · claim · file:line
+· evidence · required change), the six required checks each marked PASS/FAIL with evidence, and a
+final line `AUDIT: PASS` or `AUDIT: FAIL_FIX`. Also post the same report as a PR #1759 comment
+starting with `**[PHASE: DOCS-AUDIT]**` and the head SHA
+(`gh pr comment 1759 --repo rickylabs/netscript --body-file …`). The audit request follows verbatim.
 
 # S9 Aspire Skill Prose Audit Request
 
@@ -38,8 +53,7 @@ not certify the slice.
 
 - S9 static capture:
   `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/receipts/aspire-13.5.3-mcp-tools-static.json`.
-- S9 drift record:
-  `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/drift.md`.
+- S9 drift record: `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/drift.md`.
 - S2 runtime receipts on branch `origin/test/aspire-13-5-s2-runtime-verification`:
   `.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v4-otel-*`,
   `02-v5-aspire-describe-final.json`, `03-v8-*`, and `03-v12-*`.

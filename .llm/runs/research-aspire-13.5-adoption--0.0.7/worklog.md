@@ -259,3 +259,4 @@ same thread after its current turn (D-47). Runtime zero. | | S9 docs_audit fix c
 citation included. Same thread resumed immediately with `slices/s9/impl-eval-fix-brief.md` (F-2
 failure receipt keeps `toolsObserved`, F-3 timeout budget, F-4 structured-logs check, F-5 worklog
 note). Runtime zero. |
+| S9 IMPL-EVAL fix cycle 1 landed | `f6ca9695` `fix(e2e): keep observed tool surface in the MCP smoke failure receipt` (thread `DONE`, pushed). docs_audit cycle 2 (Sol) and IMPL-EVAL cycle 2 (fresh Fable session) dispatched at `f6ca9695`; audit/eval worktrees moved to that head. Runtime zero. |

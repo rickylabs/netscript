@@ -15,9 +15,9 @@ and the cycle-1 evaluator; you inherit no verdict.
   `list_structured_logs` unchecked; F-5 sqlite-tier visibility names assumed (Phase-B input); F-6
   supervisor disclosure. The docs_audit cycle 1 (`slices/s9/docs-audit/report.md`) = `FAIL_FIX` (H1,
   M1–M4, L1) was fixed in `4af21ddf`; the IMPL-EVAL fixes land in the commit(s) after it.
-- Evaluate **exactly** head `__HEAD__`; scoped range `e11de98d..__HEAD__` for the fixes, and confirm
+- Evaluate **exactly** head `f6ca9695`; scoped range `e11de98d..f6ca9695` for the fixes, and confirm
   nothing else regressed (re-run the gate set). Worktree:
-  `/home/agent/projects/netscript/worktrees/007-aspire-s9-eval` (detached at `__HEAD__`, read-only
+  `/home/agent/projects/netscript/worktrees/007-aspire-s9-eval` (detached at `f6ca9695`, read-only
   for product files). Supervisor run dir:
   `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`
   (read `slices/s9/evaluate.md`, `slices/s9/review-tier-a.md`, `slices/s9/docs-audit/report*.md`,
