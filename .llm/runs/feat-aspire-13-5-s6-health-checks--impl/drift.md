@@ -28,3 +28,14 @@ documentation.
   script modules and group readiness probes without increasing the direct-child count.
 - **Evidence:** `wc -l packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts`; direct
   `find ... -maxdepth 1 -type f | wc -l`.
+
+### S6 response
+
+- Extracted `runtime/behavior-gates.ts`, `runtime/behavior-scripts.ts`, and
+  `runtime/runtime-scripts.ts`; moved five existing runtime probes under the same role directory.
+- `runtime-gates.ts` is now 305 lines and `behavior-gates.ts` is 304 lines, both within the
+  archetype-6 implementation cap.
+- The scaffold folder now has 43 direct files and 45 immediate children including its two role
+  directories; the new `runtime/` group has 11 direct files, within the 12-child cap.
+- The explicit next-gate monolith/deepening stop condition is satisfied. Residual carried-in
+  scaffold fan-out remains visible to the debt owner and is not represented as fully retired.

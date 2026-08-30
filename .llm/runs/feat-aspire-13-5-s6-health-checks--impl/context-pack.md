@@ -12,10 +12,10 @@
 
 ## Current State
 
-Slices 1–2 are committed/pushed on draft PR #1743. Slice 3 asset regeneration is green locally;
-the structural infrastructure template is byte-identical because existing slots carry the new
-emission. `PLAN-EVAL: N/A` is justified by the ratified locked issue; the Fable supervisor retains
-slice review and IMPL-EVAL.
+Slices 1–3 are committed/pushed on draft PR #1743. Slice 4 is green locally: the E2E registry debt
+split is complete, listener `healthReports` wait assertions and the Phase-B recovery fixture are
+registered, and `scaffold.plugins` passes without starting an AppHost. `PLAN-EVAL: N/A` is justified
+by the ratified locked issue; the Fable supervisor retains slice review and IMPL-EVAL.
 
 ## Completed
 
@@ -31,16 +31,22 @@ slice review and IMPL-EVAL.
 - Committed/pushed slice 2 as `feb1e7aadcf4f875cbcd2b878161c3ba9a5d705a` with its PR trail.
 - Regenerated the embedded asset barrel and proved deterministic reproduction plus scoped type
   checking.
+- Split the 812-line runtime registry into lifecycle/behavior/script concerns and grouped runtime
+  probes, reducing `runtime-gates.ts` to 305 lines and direct scaffold files from 48 to 43.
+- Added describe-derived checks for `<resource>_listener`/`<resource>_resp` object-valued reports.
+- Registered (without running) the lease-backed stop → Unhealthy → exit 18 → start → Healthy
+  recovery fixture and JSON receipt path.
+- Passed 46 focused E2E tests and the 17-gate `scaffold.plugins` suite.
 
 ## In Progress
 
-- Slice 3 commit/push and draft PR trail update.
+- Slice 4 commit/push and draft PR trail update.
 
 ## Next Steps
 
-1. Commit/push slice 3 and update the stacked draft PR.
-2. Perform the owed E2E registry split, then add describe-derived assertions and register the
-   non-executed Phase-B recovery fixture.
+1. Commit/push slice 4 and update the stacked draft PR.
+2. Draft the S6b issue and #1366/#863 coordination comments.
+3. Run the final Phase-A gate matrix and commit/push the run artifacts.
 
 ## Key Decisions
 
@@ -67,10 +73,10 @@ slice review and IMPL-EVAL.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | slices 1–3 green | structured test/check; raw config-excluded lint; asset reproduction |
-| Fitness | slices 1–3 green | per-slice `quality:scan`, `arch:check` exit 0 |
+| Static | slices 1–4 green | structured test/check; raw config-excluded lint; asset reproduction |
+| Fitness | slices 1–4 green | per-slice `quality:scan`, `arch:check` exit 0 |
 | Runtime | NOT_RUN | no Phase-A lease |
-| Consumer | pending | implementation not started |
+| Consumer | green | `scaffold.plugins` 17/17; AppHost/runtime deliberately not run |
 
 ## Open Questions
 
@@ -79,7 +85,8 @@ slice review and IMPL-EVAL.
 ## Drift and Debt
 
 - Drift: current Deno KV arm lacks the assumed existing HTTP health check.
-- Debt: `scaffold-runtime-a8-f16-1333` requires the E2E split before the listener gate.
+- Debt response: S6 satisfied the next-gate split condition; residual direct-child debt remains
+  visible at 45 immediate scaffold children (43 files plus two role directories).
 
 ## Commits
 

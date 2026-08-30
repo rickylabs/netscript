@@ -86,6 +86,12 @@ its runtime expectation to the readiness gate without touching credentials.
 | 2026-08-30 04:36 +02:00 | 3 | regen | `gen:assets-barrel` embedded the emitted helper contract; the infrastructure structural template stayed byte-identical because its existing import/database/cache slots already carry the new emission. |
 | 2026-08-30 04:36 +02:00 | 3 | green | Staged-output `check:assets-barrel` reproduced all generated barrels with no unstaged diff; structured check selected `embedded.generated.ts` with 0 diagnostics. |
 | 2026-08-30 04:36 +02:00 | 3 | reconcile | #1718 remains open and the draft remains stacked. Snapshot verification found no new slot requirement; no plan readjustment. |
+| 2026-08-30 04:38 +02:00 | 3 | commit/push | Committed `c3376671877d50b17a16e237336f58edda34e5bf` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 trail updated. |
+| 2026-08-30 04:43 +02:00 | 4 | debt split | Split runtime lifecycle, behavior gates/scripts, and five runtime probes into a bounded role-named directory before registering the new gate. `runtime-gates.ts` fell from 812 to 305 lines; scaffold direct files fell from 48 to 43 (45 immediate children including directories); runtime has 11 direct files. |
+| 2026-08-30 04:46 +02:00 | 4 | RED | Focused E2E test run exited 1 on moved `generated-app-name.ts` paths and a stale quickstart script import. No Aspire command or runtime was executed. |
+| 2026-08-30 04:48 +02:00 | 4 | green | Focused check/lint/test: 23 files linted, four test roots checked, and 46/46 tests passed for report parsing, wait commands, recovery registration/order, and moved probes. |
+| 2026-08-30 04:51 +02:00 | 4 | consumer/fitness | `quality:scan` findings `[]`, `arch:check` `FAIL=0`, and `scaffold.plugins` passed 17/17 with cleanup. The lease-backed recovery fixture remained unexecuted. |
+| 2026-08-30 04:51 +02:00 | 4 | reconcile | Registered the Phase-B stop/unhealthy/exit-18/start/healthy fixture behind the runtime suite and recorded JSON receipt output, but honored the no-lease boundary by running construction/parser tests only. No plan readjustment. |
 
 ## Decisions
 
@@ -116,6 +122,10 @@ its runtime expectation to the readiness gate without touching credentials.
 | slice-2 test | structured test wrapper | PASS | exit 0; 53 passed, 0 failed across helper and generator suites. |
 | slice-2 lint | `deno lint --no-config` | PASS | 3 config-excluded owned TypeScript files checked. |
 | slice-2 format | raw config-excluded format check | PASS | 3 owned TypeScript files match single-quote/100-column repo settings. |
+| slice-4 check | `deno check --unstable-kv` on four focused test roots | PASS | Listener modules, registry split, suite resolution, and moved probe graph type-check. |
+| slice-4 test | structured test wrapper, four focused roots | PASS | 46 passed, 0 failed. |
+| slice-4 lint | `deno lint --no-config` on 23 owned files | PASS | No new lint finding; no cast/`any`/ignore introduced. |
+| slice-4 format | raw config-excluded formatter/check | PASS | 23 owned files match single-quote/100-column repo settings. |
 
 ### Fitness Gates
 
@@ -128,6 +138,8 @@ its runtime expectation to the readiness gate without touching credentials.
 | slice-2 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
 | slice-3 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | Regenerated barrel carries the owned helper source only. |
 | slice-3 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
+| slice-4 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | E2E process/file IO stays in runtime fixture scripts. |
+| slice-4 `arch:check` | PASS | exit 0, `FAIL=0` | Registry monolith is 305 lines; bounded runtime group has 11 files. |
 
 ### Runtime Gates
 
@@ -141,6 +153,7 @@ its runtime expectation to the readiness gate without touching credentials.
 | -------- | ------ | -------- | ----- |
 | generated AppHost | NOT_RUN | pending slices | Runtime start prohibited in Phase A. |
 | asset barrel | PASS | `gen:assets-barrel`; `check:assets-barrel` exit 0 | Structural infrastructure template byte-identical; embedded helper refreshed. |
+| `scaffold.plugins` | PASS | exit 0; 17 passed, 0 failed | Non-runtime consumer gate completed with cleanup. |
 
 ## Handoff Notes
 

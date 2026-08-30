@@ -124,6 +124,7 @@ export const GATE = {
   RUNTIME_WAIT_STREAMS: 'runtime.wait.streams',
   RUNTIME_WAIT_APP: 'runtime.wait.app',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
+  RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',

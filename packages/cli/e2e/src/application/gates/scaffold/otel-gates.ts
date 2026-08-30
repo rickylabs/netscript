@@ -15,7 +15,7 @@ export function createOtelGates(): readonly GateDefinition[] {
         'run',
         '--allow-run=aspire',
         '--allow-net=localhost,127.0.0.1',
-        new URL('./probe-plugin-resource.ts', import.meta.url).pathname,
+        new URL('./runtime/probe-plugin-resource.ts', import.meta.url).pathname,
         context.project.appHost,
         'triggers-api',
         'trigger-webhook',
