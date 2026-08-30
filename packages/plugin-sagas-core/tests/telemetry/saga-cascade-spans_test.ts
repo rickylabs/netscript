@@ -245,7 +245,7 @@ Deno.test('send transports upstream correlation when the DSL supplies no child k
   assertEquals(handles[1].attributes[SagaAttributes.CORRELATION_ID], 'upstream-42');
   assertEquals(
     handles[1].attributes[SagaAttributes.SAGA_CORRELATION_KEY],
-    'upstream-42',
+    'send-correlation-transport:next',
   );
 });
 
@@ -338,11 +338,13 @@ Deno.test('SagaCompensator rejects a registered handler when engine correlation 
 Deno.test('SagaCompensator preserves message trace context when no span context exists', async () => {
   const compensator = new SagaCompensator({ clock: new TestSagaClock() });
   let observedTraceparent: string | undefined;
+  let observedTracestate: string | undefined;
   const definition = defineSaga('compensation-message-trace')
     .state<SagaState>({})
     .on('undo', () => [])
     .compensate('undo', (_saga, _message, context) => {
       observedTraceparent = context.traceparent;
+      observedTracestate = context.tracestate;
       return [];
     })
     .build() as SagaDefinition;
@@ -355,6 +357,7 @@ Deno.test('SagaCompensator preserves message trace context when no span context 
       type: 'undo',
       payload: {},
       traceparent: `00-${'b'.repeat(32)}-${'c'.repeat(16)}-01`,
+      tracestate: 'vendor=message',
     },
     correlationKey: 'domain-42' as SagaCorrelationKey,
   });
@@ -363,6 +366,7 @@ Deno.test('SagaCompensator preserves message trace context when no span context 
     observedTraceparent,
     `00-${'b'.repeat(32)}-${'c'.repeat(16)}-01`,
   );
+  assertEquals(observedTracestate, 'vendor=message');
 });
 
 Deno.test('SagaCompensator records thrown and nested-deferred compensation as errors', async () => {

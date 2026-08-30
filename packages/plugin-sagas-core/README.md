@@ -144,6 +144,10 @@ Inject `SagaInstrumentation` through `createSagaRuntime({ native: { instrumentat
 composition root gives the engine, bridge, and compensator the same instance. Saga operations emit
 these spans:
 
+When `createNativeBus` receives a prebuilt `native.engine` without an `instrumentation` option, the
+bridge uses its own noop instrumentation instance; pass the same instrumentation explicitly when the
+prebuilt engine and bridge must share telemetry.
+
 | Span                      | Runtime owner | Meaning and outcomes                                                                                       |
 | ------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
 | `saga.handle`             | Engine        | Handler execution; `success` or `error`                                                                    |
@@ -162,8 +166,9 @@ direct child of the operation that produced it, including compensation-generated
 
 For scheduled child messages, an explicit child `correlationKey` wins; the upstream cross-plane ID
 is used only when the child omitted one. The current `send()` DSL has no child-correlation option,
-so the bridge seeds its nested message with the upstream cross-plane ID. A rule-less downstream saga
-therefore uses that value as its domain key; a downstream `.correlate()` rule still wins.
+so the bridge leaves the nested message's domain key unset and supplies the upstream cross-plane ID
+to the engine separately. A rule-less downstream saga therefore retains its existing
+`<sagaId>:<type>` domain identity while its spans remain joined to the upstream operation.
 
 `saga.cascade.complete` is emitted whenever a handler returns a complete effect, including a
 storeless runtime. Its `netscript.saga.status` is the resolved persisted status—not a success flag.
@@ -173,9 +178,11 @@ complete effect supplied a result.
 Direct `SagaCompensator` callers may omit the optional correlation and parent fields for source
 compatibility. The compensator does not invent fallbacks from the message, a correlation rule, or a
 default. A missing handler is observable as `skipped`; a registered handler without an
-engine-resolved `correlationKey` fails validation. This no-fallback rule applies to correlation and
-span parenting; when no instrumentation span context exists, the compensation handler still sees the
-handled message's existing `traceparent`/`tracestate` for backward compatibility.
+engine-resolved `correlationKey` fails validation. **Behavior change:** direct callers that invoke a
+registered compensation handler without that key now receive `SAGA_VALIDATION_FAILED`. This
+no-fallback rule applies to correlation and span parenting; when no instrumentation span context
+exists, the compensation handler still sees the handled message's existing
+`traceparent`/`tracestate` for backward compatibility.
 
 ## Public surface
 

@@ -99,7 +99,8 @@ documentation.
 - **Severity:** minor
 - **Action:** accept measured baseline; do not edit outside ceiling
 - **Evidence:** Global result `1/36 non-conformant`, focused result
-  `A2 README standard OK - 1 README(s) conform`.
+  `A2 README standard OK - 1 README(s) conform`. The final repair's raw base-to-head diff for
+  `packages/bench/README.md` exits 0, proving the plan-gate-17 red is identical at `f8b4f804`.
 
 ## 2026-08-30 — Plugin JSR audit has unrelated baseline module-tag debt
 
@@ -113,7 +114,8 @@ documentation.
 - **Severity:** minor
 - **Action:** accept measured baseline; do not edit outside ceiling
 - **Evidence:** Raw base-to-head diff for `plugins/sagas/doctor.ts` exits 0; plugin audit reports
-  one `F-JSR-2 module-tag` failure and two warnings.
+  one `F-JSR-2 module-tag` failure and two warnings. This proves the plan-gate-12 red is identical
+  at `f8b4f804`.
 
 ## 2026-08-30 — IMPL-EVAL found bridge child-key precedence regression
 
@@ -128,6 +130,7 @@ documentation.
   message-trace fallback with only the optional new span context.
 - **Severity:** significant
 - **Action:** fix within the locked bridge, compensator, test, README, and run-artifact ceiling.
-- **Evidence:** Repair red at `bd89e523` exits 1 with 10 passed / 2 failed assertions. The fix makes
-  explicit scheduled keys child-wins, documents the existing `send()` fallback, and restores message
-  trace context only for the handler—not for span parenting or correlation precedence.
+- **Evidence:** Repair red at `bd89e523` exits 1 with 10 passed / 2 failed assertions. The final fix
+  makes explicit scheduled keys child-wins, keeps nested sends keyless while transporting the
+  cross-plane ID through separate engine execution context, and restores message trace context only
+  for the handler—not for span parenting or correlation precedence.
