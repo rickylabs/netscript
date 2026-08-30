@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-30T13:41:18.000Z",
+  "capturedAt": "2026-08-30T13:51:57.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
   "targetIssueCount": 110,
@@ -89,10 +89,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "packages/prisma-adapter-mysql/src/adapter.ts:319 declares `class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>` with no `export` keyword; src/mod.ts exports only PrismaMySqlAdapterFactory/PrismaMySql (adapter.ts:742 aliases them) — the class is still unexported",
-        "packages/prisma-adapter-mysql/src/types.ts:39 `onConnectionError?: (err: Error) => void` exists in the options type but no src/ file reads it — the hook is declared, not implemented or tested",
-        "packages/prisma-adapter-mysql/src/adapter.ts:544,546 already carry explicit annotations (`readonly provider: 'mysql' = 'mysql'`, `readonly adapterName: string`), so the slow-types row is largely satisfied on baseline",
-        "packages/prisma-adapter-mysql/deno.json exports only '.' -> './mod.ts', so any new export must go through src/mod.ts"
+        "PLAN-EVAL R2.1–R2.4 selected the public factory/connected/transaction contract and deliberately kept concrete PrismaMySqlAdapter out of the package root: tests may reach a module-scoped export, while src/mod.ts and surface:diff must not expose the private construction seam.",
+        "PR #1662 evaluated head f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf merged as 3fc0f2f9221a8246f0d26a26189bafb2647be08a on 2026-08-15T10:27:29Z; its surface test proves PrismaMySqlConnectedAdapter, PrismaMySqlTransactionAdapter, and PrismaMySqlTransactionOptions are root-nameable while the concrete class is absent.",
+        "#1662's fresh native Fable 5 IMPL-EVAL returned PASS; the classifier/notifier suite passed 46/46, exact receipts recomputed SUFFICIENT, deno doc --lint exited 0, and the eight-file publish dry-run exited 0.",
+        "PR #1711 evaluated head 07e12efacf3cd23672395507cbf77ecf620cd454 merged as 3561bb64820602e065bf6df0afeed82b39062e42 on 2026-08-29T22:28:24Z; the real generated Prisma 7.8 client check, dynamic-import smoke, focused 38/38, package 51/51, and #1112 5/5 acceptance completed the example obligation.",
+        "At 2026-08-30T13:51:56Z the coordinator rewrote stale acceptance row 1 in place to the formally accepted R2.1–R2.4 boundary, checked all four rows against exact evidence, posted https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369, labeled status:shipped, and closed the issue COMPLETED without a new PR merge or main movement."
       ]
     },
     {

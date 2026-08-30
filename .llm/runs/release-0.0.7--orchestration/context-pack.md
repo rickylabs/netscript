@@ -1449,3 +1449,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
   outside every #1466 product and evidence surface, so no rebase/receipt recut was warranted. The
   satisfied Stage 1b node releases #1349/#1352 prerequisites; their queues and gates remain
   independent.
+
+## Resume checkpoint — 2026-08-30T13:51:57Z
+
+- #1293 is now closed `COMPLETED` and `status:shipped` after the coordinator rewrote stale acceptance
+  row 1 to formal PLAN-EVAL R2.1–R2.4 and verified all four rows. Public boundary: factory plus
+  connected/transaction contracts are root-nameable; concrete `PrismaMySqlAdapter` remains
+  intentionally root-private and only module-scoped for tests.
+- Exact evidence remains #1662 head `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf` / merge
+  `3fc0f2f9221a8246f0d26a26189bafb2647be08a` / native Fable `PASS`, plus #1711 head
+  `07e12efacf3cd23672395507cbf77ecf620cd454` / merge
+  `3561bb64820602e065bf6df0afeed82b39062e42` / real generated-client and executable-example gates.
+  Closure evidence: https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369.
+- No PR merged and main did not move; exact main remains `3e5cbabf...`. The observed GitHub milestone
+  count was 80 open / 82 closed at `13:51:57Z`, but that PR-inclusive count is intentionally not
+  frozen as a control-plane invariant.

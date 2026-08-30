@@ -503,7 +503,9 @@
           "remoteControlUrl": "https://claude.ai/code/session_01F8yPoUNC56gdZ9KsbRmiWu",
           "route": "native claude-opus-5 / high / Remote Control",
           "topicCheckpointSha": "e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14",
-          "finding": "1293 row 1 requires truthful owner rewrite; 1112 remains fixes-owned under the frozen prisma-mysql-honest-example contract"
+          "finding": "1293 row 1 requires truthful owner rewrite; 1112 remains fixes-owned under the frozen prisma-mysql-honest-example contract",
+          "resolution": "coordinator rewrote row 1 to PLAN-EVAL R2.1–R2.4, verified all four rows from #1662/#1711, and closed #1293 status:shipped at 2026-08-30T13:51:56Z",
+          "resolutionCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369"
         }
       },
       "issueNumbers": [
@@ -581,7 +583,11 @@
     },
     {
       "number": 1293,
-      "state": "open"
+      "state": "closed",
+      "closedAt": "2026-08-30T13:51:56.000Z",
+      "closeReason": "completed",
+      "acceptanceCorrection": "row 1 rewritten to formally accepted PLAN-EVAL R2.1–R2.4 public connected/transaction contract; all four rows checked from exact #1662/#1711 evidence",
+      "evidenceCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369"
     },
     {
       "number": 1296,
@@ -1179,8 +1185,15 @@
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
       "mergeCommitSha": "3561bb64820602e065bf6df0afeed82b39062e42",
-      "mergedAt": "2026-08-29T22:20:00.000Z",
+      "mergedAt": "2026-08-29T22:28:24.000Z",
       "nextGate": "terminal; issue #1112 closed by merged PR #1711",
+      "dependentIssueClosure": {
+        "issueNumber": 1293,
+        "state": "closed_completed",
+        "closedAt": "2026-08-30T13:51:56.000Z",
+        "role": "satisfied acceptance row 4 with the shipped-surface executable example; #1662 supplied rows 1–3",
+        "evidenceCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369"
+      },
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
@@ -2581,7 +2594,7 @@
       "lane": "features",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
+      "headSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
       "issueNumbers": [
         1293
       ],
@@ -2589,7 +2602,7 @@
       "branch": "feat/prisma-mysql-adapter-surface",
       "worktree": "/home/codex/repos/netscript-007-features-1293",
       "currentPrHeadSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
-      "implementationState": "merged_product_split_close",
+      "implementationState": "merged_product_split_close_then_historical_acceptance_completed_after_1112_example_landed",
       "prNumber": 1662,
       "compatibilityDisposition": "preserve and wire the already-published PrismaMySqlOptions.onConnectionError hook; removal is not authorized",
       "planEvaluationState": "complete",
@@ -2631,13 +2644,33 @@
       "readinessDisposition": "exact-head checks terminal green with zero review threads; coordinator merge complete",
       "mergeCommitSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
       "mergedAt": "2026-08-15T10:27:29.000Z",
-      "issueCompletionState": "PR 1662 shipped; issue 1293 remains open with acceptance boxes 2 and 3 checked and boxes 1 and 4 open",
+      "issueCompletionState": "PR #1662 shipped the accepted R2.1–R2.4 product contract; after #1711 shipped the executable example, coordinator corrected stale row 1, verified all four rows, and closed #1293 COMPLETED/status:shipped at 2026-08-30T13:51:56Z",
       "planEvaluatorTerminalMetadata": "stale working state; terminal response and exact pushed verdict commit independently verified by coordinator",
-      "splitCloseContract": "product PR uses Part of #1293 and may merge on product gates while #1293 remains open; #1112 must rewrite and verify the docs example before box 4 and issue closure",
+      "splitCloseContract": "historical contract satisfied: product PR used Part of #1293 and merged on product gates while #1293 remained open; #1711 later rewrote and verified the docs example before row 4 and issue closure",
       "acceptanceAuditTopicCheckpointSha": "e1a6a2c4f789cc5bd45a4a1bcdb8ccb8a798ba14",
-      "ownerWordingBoundary": "issue 1293 acceptance row 1 must truthfully describe the public PrismaMySql factory and PrismaMySqlConnectedAdapter while preserving the intentional exclusion of concrete driver-bound PrismaMySqlAdapter from the root export map",
-      "docsFollowUp": "#1112 and all five frozen prisma-mysql-honest-example paths remain fixes-owned; the site example and package module documentation must be corrected together before issue closure",
-      "receiptRefs": []
+      "ownerWordingBoundary": "resolved at 2026-08-30T13:51:56Z: issue 1293 acceptance row 1 truthfully describes the public factory and connected/transaction contracts while preserving the intentional exclusion of concrete driver-bound PrismaMySqlAdapter from the root export map",
+      "docsFollowUp": "completed by fixes-owned #1112/PR #1711 across all frozen paths before #1293 closure",
+      "acceptanceClosure": {
+        "state": "complete",
+        "closedAt": "2026-08-30T13:51:56.000Z",
+        "architecture": "PLAN-EVAL R2.1–R2.4: public factory plus connected/transaction contracts; concrete PrismaMySqlAdapter is module-scoped for tests and intentionally absent from the root export map",
+        "productPrHeadSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
+        "productMergeSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
+        "productImplementationEvaluationVerdict": "PASS",
+        "examplePrHeadSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
+        "exampleMergeSha": "3561bb64820602e065bf6df0afeed82b39062e42",
+        "evidenceCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369",
+        "mainMoved": false,
+        "observedMainSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c"
+      },
+      "receiptRefs": [
+        "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369",
+        "https://github.com/rickylabs/netscript/pull/1662",
+        ".llm/runs/feat-prisma-mysql-adapter-surface--1293/plan-eval.md",
+        ".llm/runs/feat-prisma-mysql-adapter-surface--1293/evaluate.md",
+        ".llm/runs/feat-prisma-mysql-adapter-surface--1293/acceptance-evidence.md",
+        "https://github.com/rickylabs/netscript/pull/1711"
+      ]
     },
     {
       "id": "app-service-client-wiring",
@@ -5024,5 +5057,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
       "verifiedAt": "2026-08-30T10:00:33.000Z"
     },
-  "updatedAt": "2026-08-30T13:41:18.000Z"
+  "updatedAt": "2026-08-30T13:51:57.000Z"
 }

@@ -1300,3 +1300,16 @@ implementation thread.
   rule rather than inventing a waiver: content `d5f3bf4c...`, evidence `dbd3eafa...`, evaluator
   carrier `ce73a038...`, and current `e325b7fe...` remain distinct and auditable. The ruling is
   https://github.com/rickylabs/netscript/pull/1731#issuecomment-5469026813.
+
+## 2026-08-30 — #1293 filed acceptance contradicted the accepted public boundary
+
+- The original first acceptance row demanded a root-exported concrete `PrismaMySqlAdapter`, but
+  formal PLAN-EVAL R2.1–R2.4 deliberately rejected that surface. The class depends on private
+  `MysqlPoolClient` / `MySqlQueryable` construction seams; exporting it from the root would enlarge
+  the contract or force an unapproved construction redesign. The accepted solution exports the
+  factory and connected/transaction contracts, with only a module-scoped concrete export for fake
+  client tests and a surface test forbidding the root symbol.
+- Keeping the stale box unchecked after both #1662 and #1711 shipped made completed architecture
+  look unfinished. The coordinator corrected the issue text rather than reversing the reviewed
+  boundary, then closed from exact historical evidence. This is acceptance-record repair, not
+  retroactive product scope, a new merge, or permission to rewrite gate history.

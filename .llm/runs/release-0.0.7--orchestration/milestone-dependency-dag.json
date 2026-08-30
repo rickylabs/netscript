@@ -866,7 +866,8 @@
       "to": "issue:1112",
       "kind": "requires",
       "evidence": [
-        "#1112 own text: \"Until this lands, #1112 example must document only what ships today\"; #1293 opening paragraph."
+        "#1112 own text: \"Until this lands, #1112 example must document only what ships today\"; #1293 opening paragraph.",
+        "The dependency is terminally satisfied: #1662/merge 3fc0f2f9 shipped the accepted connected/transaction API and hook, #1711/merge 3561bb64 shipped the executable example and closed #1112, and the corrected four-row evidence closed #1293 COMPLETED at 2026-08-30T13:51:56Z."
       ]
     },
     {

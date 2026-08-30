@@ -2456,3 +2456,24 @@
 - Coordinator squash-merged #1731 as `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at
   `13:41:17Z`; #1466 closed one second later; both are `status:shipped`. This satisfies Stage 1b and
   releases #1349/#1352's dependency edges while each successor keeps its own gate contract.
+
+## 2026-08-30T13:51:57Z — #1293 acceptance-record correction and completed closure
+
+- Reconciled the owner-only wording boundary previously surfaced by the features acceptance audit.
+  Acceptance row 1 no longer demands the architecture formal PLAN-EVAL rejected; it now records
+  R2.1–R2.4 exactly: public factory plus nameable connected/transaction contracts, concrete adapter
+  module-scoped for tests and intentionally absent from the package root.
+- Re-verified #1662 exact PR/evaluator head `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf`
+  and merge `3fc0f2f9221a8246f0d26a26189bafb2647be08a`. The native Fable 5 IMPL-EVAL is `PASS`;
+  `surface_test.ts` enforces the intended export map; classifier/notifier tests are 46/46; the four
+  exact receipts recompute `SUFFICIENT`; `deno doc --lint` and the eight-file publish dry-run both
+  exit 0.
+- Re-verified #1711 exact head `07e12efacf3cd23672395507cbf77ecf620cd454` and merge
+  `3561bb64820602e065bf6df0afeed82b39062e42`: real Prisma 7.8 generated-client typing,
+  dynamic-import smoke, focused 38/38, package 51/51, and #1112 5/5 close the executable-example row.
+- Coordinator checked all four rows, posted the closure evidence at
+  https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369, applied sole
+  `status:shipped`, and closed #1293 `COMPLETED` at `13:51:56Z`. This created no commit, PR merge,
+  or main movement; exact main remains `3e5cbabf...`.
+- Observed GitHub milestone snapshot at `13:51:57Z`: 80 open / 82 closed including PRs. It is
+  recorded as observation only because concurrent issue/PR transitions may change it.

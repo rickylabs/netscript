@@ -158,3 +158,28 @@ artifact-pinned production E2E.
   `2026-08-30T13:41:17Z`; #1466 closed at `13:41:18Z`. Both are terminal `status:shipped`, exact
   current `main` is the merge SHA, and the satisfied Stage 1b node releases #1349/#1352's metadata
   prerequisites without waiving their independent gates.
+
+## 2026-08-30T13:51:56Z — #1293 historical acceptance corrected and closed; no main move
+
+- This is an issue-record closure, not a new PR merge. Exact `main` remains
+  `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c`; the prior merge order is unchanged.
+- The coordinator rewrote stale acceptance row 1 in place to the architecture formally selected by
+  PLAN-EVAL R2.1–R2.4: consumers construct public `PrismaMySql` /
+  `PrismaMySqlAdapterFactory`, receive the public connected/transaction contracts, and do not gain
+  the concrete driver-bound `PrismaMySqlAdapter` through the root. The concrete class remains only
+  module-scoped for fake-client tests because a root export would expose `MysqlPoolClient` /
+  `MySqlQueryable` construction seams and violate the accepted AP-3/AP-4 boundary.
+- Product evidence is historical and exact: PR #1662 head
+  `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf`, merge
+  `3fc0f2f9221a8246f0d26a26189bafb2647be08a`, fresh native Fable 5 IMPL-EVAL `PASS`, 46/46
+  classifier/notifier suite, four-receipt `SUFFICIENT`, doc lint 0, and eight-file publish dry-run 0.
+  Its surface test names the three intended public contracts and rejects the concrete root export.
+- Example evidence is likewise exact: PR #1711 head
+  `07e12efacf3cd23672395507cbf77ecf620cd454`, merge
+  `3561bb64820602e065bf6df0afeed82b39062e42`, real generated Prisma 7.8 client check,
+  dynamic-import smoke, focused 38/38, package 51/51, and #1112's 5/5 acceptance.
+- All four corrected #1293 rows were checked, closure evidence was posted at
+  https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369, and the issue was
+  labeled `status:shipped` and closed `COMPLETED` at `13:51:56Z`. GitHub's combined milestone count
+  observed one second later was 80 open / 82 closed; that PR-inclusive count is a moving snapshot,
+  not a control-plane invariant.
