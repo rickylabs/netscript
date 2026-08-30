@@ -8595,3 +8595,29 @@ regeneration.
 
 Sender record evicted under the full procedure (dead pid, absent from session list — the strongest
 confirmation form, stronger than idle-with-matching-artifact) before dispatch.
+
+## #1387 Slice 8 — integrated, verified, certified; IMPL-EVAL dispatched
+
+Confirmed exact heads: content `ce9bd3e8b`, evidence `15a5197235cee5b49fa1f5167619b35057055c93` (per
+coordinator report). Reviewed independently: `deriveOperationAccessSummary` implements the exact
+reverse mapping from OpenAPI `security`/`x-netscript-roles` back to `OperationAccessSummary`,
+defensively parsing malformed input, returning `undefined` (genuinely absent, not synthesized) for
+undeclared operations. Curl guidance differs across all four states; only `required` changes the
+curl command itself, adding a placeholder `Bearer <credential>` rather than a fabricated real-looking
+secret; the undeclared/default case is byte-for-byte the original behavior. The single new test
+proves genuine absence via `Object.hasOwn` on both the list row and the detail result, and proves the
+four states produce four genuinely distinct strings via `Set.size` checks rather than one template
+satisfying loose assertions. Five of seven ceiling files touched (the other two correctly unneeded —
+the raw operation was already reachable from prior slices' work). `deno.lock` and corpus both
+unchanged, as expected for a populate-only slice. Seven receipts all `gitHead == actualGitHead`,
+evidence set SUFFICIENT, 138/138 tests.
+
+**Verdict: ACCEPTED at `ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`.** No findings. `tier-a-slice-8.md`
+committed as evidence head `34796d147`. PR comment `5471716617`.
+
+This slice's own author updated `worklog.md`/`context-pack.md` at its own stop — the resume-docs gap
+did not recur a third time.
+
+IMPL-EVAL dispatched: native Fable 5 attempted first per policy default (the single required
+evaluation, falling through to the sanctioned DeepSeek route on the now-expected quota exhaustion
+rather than treating that as a second evaluation).
