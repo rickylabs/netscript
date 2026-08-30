@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "worktreeRoot": "/home/agent/projects/netscript/worktrees/007-aspire-s3",
+  "appHosts": [
+    {
+      "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b/aspire/apphost.mts",
+      "appHostPid": 326833,
+      "appHostStartedAt": "26552088",
+      "startedAt": "2026-08-30T09:35:01.560Z"
+    }
+  ],
+  "containers": [],
+  "ownedRoots": []
+}

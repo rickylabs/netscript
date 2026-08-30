@@ -22,3 +22,15 @@ slice review and evaluator dispatch; this Codex session is the implementation la
 | `review_codex` | Anthropic / Fable 5 / supervisor session | Slice review and final evaluator separation |
 
 Reference `.llm/harness/workflow/lane-policy.md`; no implementation lane self-certifies.
+
+## Phase-B resume identity
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-08-30 |
+| Model / lane | OpenAI GPT-5.6 Sol / `normal_implementation` / medium |
+| Host | `ai-agents`, native Linux container, user `agent` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-aspire-s3` |
+| Baseline | `fe4f496bdcc605eceb9b3e5748ad55a7811bbed9` (phase-A IMPL-EVAL cycle-2 PASS) |
+| Authority | Serialized S3 phase-B runtime lease; exactly one isolated AppHost at a time |
+| Result | Remote-dind bind-mount topology blocked capture; teardown complete |
