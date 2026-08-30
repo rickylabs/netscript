@@ -324,3 +324,90 @@ so its nested message remains keyless and receives the upstream cross-plane ID t
 engine execution context; this preserves rule-less downstream identity and is documented and tested.
 The compensator's message trace fallback affects only the handler context under noop
 instrumentation—it does not parent a span or derive correlation.
+
+## Supervisor Tier-A — exact-head sign-off at `89bfa6ca` (2026-08-30)
+
+Artifact-only supervisor commit. Every result below was re-derived by me at this head on a clean
+tree, not copied from the author's report.
+
+### Head identity
+
+- Product head `ed270f2a`; supervisor corpus regeneration `89bfa6ca`; local == remote == `89bfa6ca`.
+- Base `f8b4f804`. PLAN-EVAL `PASS_PLAN` at `81c5f874`. IMPL-EVAL cycle 1 `FAIL_FIX` at `456e5590`.
+
+### Gate results (exact head, clean tree)
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused `saga-cascade-spans_test.ts` | PASS | exit 0, **12 passed / 0 failed** (9 → 12; three regression cases added) |
+| Whole `packages/plugin-sagas-core` | PASS | exit 0, **84 passed / 0 failed / 3 ignored** (81 → 84) |
+| `plugins/sagas` targeted | PASS | exit 0, **7 passed / 0 failed** |
+| `deno check --unstable-kv` | PASS | 112 files, 0 occurrences |
+| lint | PASS | 112 files, 0 occurrences |
+| scoped fmt (`--ext ts`) | PASS | 112 files, 0 findings |
+| `arch:check` | PASS | exit 0 |
+| Core JSR audit | PASS | exit 0; 2 findings, both WARN — `F-DOCT-5` 19 > 12 cardinality and `F-JSR-7` slow-types, matching baseline |
+| Plugin JSR audit | PRE-EXISTING FAIL | `F-JSR-2 ./doctor.ts lacks @module`, identical at `f8b4f804`, out of ceiling, drift-recorded |
+| `publish:dry-run` core | PASS | exit 0 |
+| `check:mcp-export-corpus` | PASS | exit 0 after the released regeneration |
+| `check:publish-assets` | PASS | exit 0 |
+| `check:assets-barrel` | PASS | exit 0, tree clean after the run |
+| `deno.lock` | PASS | `git diff --exit-code f8b4f804 -- deno.lock` exit 0, byte-unchanged |
+| Flow-B consumer runtime | NOT_RUN | supervisor-owned lease gate; additionally blocked host-side by D-42/D-43 |
+
+### Ceiling
+
+18 changed product paths. 17 are inside the locked 19 (items 1–12, 15–19; 13 and 14 unused). The
+18th, `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, is the
+coordinator-released generated carrier — an authorized supervisor exception, not leaf rescope.
+
+### Corpus regeneration (supervisor-owned)
+
+Ran `deno task gen:mcp-export-corpus` at the author's terminal head. Exactly one carrier moved, and
+`packageCount 35 / subpathCount 270 / symbolCount 7614` are **identical to the plan baseline**, so no
+export was added or removed — movement is signature-only, matching the author's stop-and-report
+prediction. The file is base64+gzip, so I did not line-inspect it and make no claim about its
+internal scoping; the evidence is the authorized generator, the unchanged counts, and the check
+returning exit 0. The other three cascade writers (`publish-assets`, `assets-barrel`,
+`agent-docs-prose` via its check) were exercised and did not move.
+
+### Findings carried from IMPL-EVAL cycle 1
+
+- **F1 (mid-plan head): withdrawn as stale.** It judged `456e5590`, before S5 `8d3317a3` and S6
+  `ff161a44` landed. Caused by my dispatching the evaluator while the author was still working.
+- **F2: resolved, and by a better design than either option I authorized.** The bridge no longer
+  writes the cross-plane id into any nested message's domain key. `#handleAndDispatch` takes the id as
+  a parameter, `SagaEngine.handle` widens to `number | Readonly<{ attempt?, correlationId? }>`, and
+  `#handleEntry` resolves `suppliedCorrelationId ?? message.correlationKey ?? correlationKey`. A
+  rule-less downstream saga keeps `<sagaId>:<type>` while its spans stay joined upstream. This also
+  clears the evaluator's AP-3/AP-8 plane-conflation violation.
+- **F3: resolved** — `spanContext?.traceparent ?? request.message.traceparent` plus the matching
+  `tracestate`, with a noop-instrumentation regression test.
+- **F4/F5/F6/F7: resolved** — explicit README behavior-change line for the `SAGA_VALIDATION_FAILED`
+  break, refreshed gate rows (zero `PENDING_SCRIPT` remaining; Flow-B left a truthful `NOT_RUN`),
+  drift entries with base proof for plan gates 12 and 17, and the `createNativeBus` composition note.
+
+### Published surface
+
+`SagaEngine.handle` is on the published `./runtime` surface and its second parameter widened from
+`attempt = 1` to `number | Readonly<{ attempt?, correlationId? }> = 1`. Verified via `deno doc`. This
+is a widening: `handle(msg)` and `handle(msg, 3)` both still typecheck, so callers stay
+source-compatible. No export-map key or subpath changed.
+
+### Supervisor errors recorded against this leaf
+
+1. I dispatched IMPL-EVAL cycle 1 on a mid-plan head, which wasted the cycle's headline finding.
+2. I edited a staged message file while a sender armed on it was waiting, and the send raced my edit.
+3. I then delivered a correction that had gone stale within minutes, telling the author not to change
+   a line they had already improved. They briefly reverted good work (`45c77a21`) before my retraction
+   landed and they reverted the revert (`f1e7d03a`). Net product state at `ed270f2a` is byte-identical
+   to the accepted `4b67a14c` — verified by empty `git diff 4b67a14c HEAD` over `src` — so the cost
+   was two commits of history, not correctness.
+4. My first gate script pointed at a non-existent `.llm/tools/jsr/audit-jsr-package.ts` and reported
+   the resulting module-not-found as a core JSR audit failure. The real tool is
+   `.llm/tools/fitness/audit-jsr-package.ts` and the audit is exit 0. Script corrected.
+
+### Verdict
+
+**Tier-A PASS at `89bfa6ca`**, with Flow-B consumer runtime outstanding as a genuine `NOT_RUN`.
+Cleared for IMPL-EVAL cycle 2 — the second and final permitted cycle.
