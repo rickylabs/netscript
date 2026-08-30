@@ -211,27 +211,46 @@ await Deno.writeTextFile(flowBJobPath, updatedFlowBJob);
 
 const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-background.mts`;
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
-const workersBackgroundMarker = '  // --- workers ---';
-const workersBackgroundIndex = registerBackground.indexOf(workersBackgroundMarker);
-if (workersBackgroundIndex < 0) {
+const workersExecutableMatch = /const (bg_\d+) = builder\.addExecutable\("workers",/.exec(
+  registerBackground,
+);
+if (!workersExecutableMatch) {
   throw new Error('generated register-background.mts did not contain the workers resource block');
 }
-const followingBackgroundIndex = registerBackground.indexOf(
-  '  // --- ',
-  workersBackgroundIndex + workersBackgroundMarker.length,
+const workersBinding = workersExecutableMatch[1];
+if (!workersBinding) {
+  throw new Error('generated workers resource block did not expose its processor binding');
+}
+const workersConfigAnchor = '  if (config.BackgroundProcessors["workers"]?.Enabled !== false) {';
+const workersBackgroundIndex = registerBackground.lastIndexOf(
+  workersConfigAnchor,
+  workersExecutableMatch.index,
 );
-const nextBackgroundIndex = followingBackgroundIndex < 0
-  ? registerBackground.length
-  : followingBackgroundIndex;
+if (workersBackgroundIndex < 0) {
+  throw new Error('generated workers resource block did not contain its config lookup');
+}
+const workersSetAnchor = `    backgroundProcessors.set("workers", ${workersBinding});`;
+const workersSetIndex = registerBackground.indexOf(
+  workersSetAnchor,
+  workersExecutableMatch.index,
+);
+if (workersSetIndex < 0) {
+  throw new Error('generated workers resource block did not contain its registration marker');
+}
+const workersBlockClose = registerBackground.indexOf('\n  }', workersSetIndex);
+if (workersBlockClose < 0) {
+  throw new Error('generated workers resource block did not contain its closing brace');
+}
+const nextBackgroundIndex = workersBlockClose + '\n  }'.length;
 const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,
 );
 const usersReference = [
   '    {',
-  "      const usersEndpoint = await _services.get('users')?.getEndpoint('http');",
+  '      const usersEndpoint = await _services.get("users")?.getEndpoint(\'http\');',
   '      if (usersEndpoint) {',
-  "        await workers.withEnvironment('services__users__http__0', usersEndpoint);",
+  `        await ${workersBinding}.withEnvironment("services__users__http__0", usersEndpoint);`,
   '      }',
   '    }',
 ].join('\n');
@@ -240,8 +259,8 @@ const configuredBackgroundBlock = workersBackgroundBlock.includes(
   )
   ? workersBackgroundBlock
   : workersBackgroundBlock.replace(
-    "    backgroundProcessors.set('workers', workers);",
-    `${usersReference}\n\n    backgroundProcessors.set('workers', workers);`,
+    workersSetAnchor,
+    `${usersReference}\n\n${workersSetAnchor}`,
   );
 if (!configuredBackgroundBlock.includes('services__users__http__0')) {
   throw new Error('workers resource did not contain its expected registration marker');

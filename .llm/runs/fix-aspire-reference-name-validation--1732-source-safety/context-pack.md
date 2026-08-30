@@ -6,17 +6,17 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-aspire-reference-name-validation--1732-source-safety` |
 | Branch         | `fix/aspire-reference-name-validation`                     |
-| Current phase  | `implementation` — visible RED established                 |
+| Current phase  | `implementation` — slice 2 green                           |
 | Archetype      | `6 — CLI / Tooling` (dominant surface)                     |
 | Scope overlays | none                                                       |
 
 ## Current State
 
-The owner independently confirmed cycle-2 F1/F2, released the plan gate after the second and final
-cycle, and authorized implementation. The bounded amendment adds the flow-B fixture derivation
-contract and removes user text from generated comments. The focused RED wrapper now executes 99
-results and fails 32 as expected: 24 missing contextual config rejections, six generator
-source/execution seams, and two parent-step summaries. Production code remains unchanged.
+Slice 2 is green: the background generator uses ordinal-only bindings and comments, stringifies all
+planned config-derived literal sites, and no longer imports `safeIdentifier`. The flow-B fixture
+finds the stringified `workers` executable call and derives the captured `bg_\d+` binding. Generator
+tests pass 59/59; the combined matrix now has only the 24 grammar rejection steps plus their parent
+summary red for slice 3.
 
 ## Completed
 
@@ -36,23 +36,26 @@ source/execution seams, and two parent-step summaries. Production code remains u
 - Pushed the final plan amendment at `f1d7d9d8f738b4907e1c770051ee1f59abaacc4a` without modifying
   either evaluator verdict file.
 - Added and executed the visible RED matrix before production edits: 67 pass, 32 fail, 99 total.
+- Completed slice 2 with 59/59 generator tests and fully covered scoped check/lint/format wrappers.
+- Preserved the exact `services__workers-api__http__0` discovery key and negative normalization
+  assertion while making generated code safe for arbitrary direct-generator names.
 
 ## Next Steps
 
-1. Commit and push the visible RED test slice with its structured failure receipt.
-2. Implement source-safe literal/binding/comment emission and the flow-B fixture update.
-3. Implement the private composed-level config grammar lock only after slice 2 is green.
+1. Commit and push slice 2 with its focused receipts.
+2. Implement the private rule module and composed-level background-only `superRefine`.
+3. Prove `z.toJSONSchema(AppSettingsSchema)` is unchanged outside the composed runtime check.
 
 ## Files Changed
 
-- RED changes are limited to `packages/aspire/tests/config_test.ts`,
-  `generate-register-background_test.ts`, and run evidence. Product files are untouched.
+- Slice 2 changes only the background generator, its two focused tests, the flow-B fixture, and run
+  evidence. Aspire grammar production files remain untouched until slice 3.
 
 ## Gates
 
-The focused RED wrapper exits 1 after executing 99 results (67 pass, 32 fail). Root test remains
-explicitly `NOT FIRED`. Pre-change doc-lint and JSR-audit comparisons both exit 1 on recorded
-existing findings.
+Slice-2 generator tests, scoped check, scoped lint, and scoped format all pass. The combined matrix
+remains expected red at 74 pass / 25 fail because grammar rejection has not yet landed. Root test
+remains explicitly `NOT FIRED`; no runtime/E2E gate has run.
 
 ## Open Questions
 

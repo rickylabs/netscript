@@ -298,7 +298,7 @@ describe('generateRegisterBackground declared references (#1371)', () => {
 
     assertEquals(createServerServiceEnvKey(REFERENCE_NAME), DISCOVERY_KEY);
     assertEquals(
-      output.split(`withEnvironment('${DISCOVERY_KEY}'`).length - 1,
+      output.split(`withEnvironment("${DISCOVERY_KEY}"`).length - 1,
       2,
       'service and plugin references must emit the same raw consumer-read key',
     );
@@ -397,7 +397,7 @@ describe('generateRegisterBackground declared references (#1371)', () => {
       version: EMPTY_CONFIG.Version,
       denoDefaults: MINIMAL_DENO_DEFAULTS,
     });
-    const registration = output.indexOf(`builder.addExecutable('${PROCESSOR_NAME}'`);
+    const registration = output.indexOf(`builder.addExecutable("${PROCESSOR_NAME}"`);
 
     const serviceError = configurationError('service');
     const pluginError = configurationError('plugin');
