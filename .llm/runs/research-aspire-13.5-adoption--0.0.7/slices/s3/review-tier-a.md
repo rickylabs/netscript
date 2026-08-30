@@ -67,3 +67,10 @@ stays draft until phase B lands under the lease.
   repo-config `deno fmt --check`.
 - Gates at `fe4f496bd`: configured `deno task lint` exit 0; `quality:scan` ok; `arch:check` 0;
   `check:mcp-export-corpus` unchanged; tests 282/0; check 0 diagnostics; raw lint/fmt clean.
+
+## IMPL-EVAL cycle 2 (session `78ac4cfa`, head `fe4f496bd`) — `PASS` (phase A)
+
+Two info-level notes (shape-test labelling in `service-env-evidence_test.ts`; README could mention
+the collapsed duplicate relationships). PR #1741 stays **draft** until the lease-backed phase B
+(dashboard telemetry envelopes) lands; then a delta Tier-A + IMPL-EVAL cycle 3 on the phase-B head,
+`#413` comment, ready + close-gate.
