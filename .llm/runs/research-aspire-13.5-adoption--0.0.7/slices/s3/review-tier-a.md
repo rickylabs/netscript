@@ -95,3 +95,14 @@ the collapsed duplicate relationships). PR #1741 stays **draft** until the lease
 - Verdict: **honest blocked-probe receipt; accepted.** No IMPL-EVAL dispatched (no product change to
   evaluate); the separate-session IMPL-EVAL is owed with the actual 13.5.3 envelopes under the next
   lease (D-42 options).
+
+## Tier-A — attempt-2 receipt commit `9525f1ae` (2026-08-30)
+
+Same integrity bar as `2b0d33bd`: run artifacts only (`receipts/08-phase-b-attempt-2-capture.md`,
+`run-resources.json`, worklog/context-pack/leak-report), no product/fixture/test change, parity row
+still `pending-lease`, no dashboard coordinates committed, AppHost identity (PID 383334, exact
+scratch path) matches live `aspire ps` surveillance, scratch-only correction verified in the receipt
+(no `DataPath`/`withDataBindMount` in the regenerated files), verbatim Npgsql/`aspire
+wait`
+evidence, cleanup quoted and independently re-proven. **Accepted.** IMPL-EVAL owed when real
+envelopes exist (D-43 infrastructure boundary first).

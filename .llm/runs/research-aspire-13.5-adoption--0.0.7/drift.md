@@ -741,3 +741,33 @@
 - **IMPL-EVAL:** none dispatched for this lease — the landed commit is a blocked-probe receipt with
   no product or fixture change; the separate-session IMPL-EVAL is owed when the 13.5.3 envelopes
   actually land. Tier-A of `2b0d33bd` is a receipt-integrity review (below).
+
+## D-43 — 2026-08-30 — S3 Phase-B attempt 2 terminal: DCP loopback endpoint topology; both authorized attempts consumed
+
+- **Attempt 2 (new lease, same thread, scratch `DataPath` omitted — verified: regenerated
+  `appsettings.json` / `register-infrastructure.mts` contain no `DataPath` / `withDataBindMount`):**
+  single `aspire start --isolated` exit 0 (AppHost PID 383334, registered); `postgres`, `redis`,
+  `garnet` containers **all started** on the remote dind — the D-42 bind-mount layer is cleared.
+  Next layer failed exactly as the probe predicted: DCP published the ports on the **Docker host's
+  loopback** (`127.0.0.1:17858->5432/tcp` on `netscript-dind`) and the AppHost health check dialed
+  `127.0.0.1:17858` from _this_ container → `Npgsql … SocketException (111): Connection refused`;
+  `aspire wait postgres-5133183a` timed out (10 s); independent `ConnectionRefused (os error 111)`.
+  `workers-api` stayed `Waiting`; no health-check trigger; **no envelope captured, copied,
+  fabricated, or edited**; parity row stays `pending-lease`. Receipt: S3 branch
+  `receipts/08-phase-b-attempt-2-capture.md`, commit `9525f1ae` (run artifacts only, redacted).
+- **Cleanup:** thread — exact stop, leak-check `[]`, teardown preview empty, scratch removed;
+  supervisor re-proof 09:50:21Z — `aspire ps` `[]`, containers 0, volumes 0, no
+  `aspire`/`dcp`/AppHost process. **Lease released. No third attempt is authorized.**
+- **Classification — infrastructure boundary (human, `sandboxctl`):** Aspire/DCP assumes the Docker
+  host is the local host: it binds published ports to the daemon host's `127.0.0.1` and dials
+  `127.0.0.1` from the AppHost. With `DOCKER_HOST` pointing at a _separate_ `netscript-dind`
+  container, no generated AppHost can reach its own backing services from `ai-agents`, regardless of
+  bind mounts. Nothing in Aspire 13.5, the S3 diff, Docker version, or quotas is at fault. **Fix
+  options:** (1) run `ai-agents` in the **same network namespace** as `netscript-dind`
+  (`network_mode: service:netscript-dind` or equivalent) so the dind's `127.0.0.1` is this
+  container's `127.0.0.1` — plus the identical-path worktree bind for D-42; (2) give `ai-agents` a
+  local Docker daemon/socket; (3) keep host-run AppHost gates off this host and use CI `e2e-cli.yml`
+  / another host for every Phase-B capture (S3, S6, S7) and for `scaffold.runtime`. Until one of
+  these lands, **every lease-backed AppHost gate on this NAS is environment-blocked** and must not
+  be requested.
+- **IMPL-EVAL:** still owed with the actual envelopes; not dispatched for a blocked receipt.
