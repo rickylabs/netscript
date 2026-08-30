@@ -18,3 +18,10 @@ shape difference remains explicit: `logFilePath` is present and `sdkVersion` is 
 
 The Docker inspect fixture remains named `docker-inspect-13.4.6.json`; S2's V5 shape comparison did
 not identify a Docker envelope change, and this slice does not fabricate a new Docker capture.
+
+## Orphaned process tree
+
+`process-tree-13.5.3-orphaned.json` is synthetic, not a live capture. Its PIDs, worktree, and
+process facts are shaped from S2 V6's launcher-orphan lifecycle receipt and #1429's observed
+`aspire-managed` PPID-1 helpers. The three rows isolate the evidence modes the classifier must
+support: DCP environment label, exact `--apphost` argv, and contained backchannel socket path.
