@@ -108,3 +108,47 @@ then `rg -n "backgroundPort|servicePort|809[1-5]|4437" plugins/*/tests plugins/*
 - Live issue #1717 and PR #1740 were read at repair activation; the branch and remote PR head were
   both `0bd8ba832`. No new comment changes the locked disposition. PR labels, milestone, readiness,
   acceptance evidence, and issue state were intentionally not mutated.
+
+## Slice 2 — F-2 stream-factory discovery restoration
+
+### RED
+
+Added one focused factory-discovery test under each affected plugin. Each test injects the Aspire
+server discovery variable `services__streams__http__0`, calls the factory with omitted `baseUrl`,
+and separately proves an explicit `baseUrl` wins while discovery remains set.
+
+| Command | Exit | Evidence |
+| --- | ---: | --- |
+| `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all plugins/auth/tests/streams/factory-discovery_test.ts plugins/sagas/tests/streams/factory-discovery_test.ts plugins/triggers/tests/streams/factory-discovery_test.ts plugins/workers/tests/streams/factory-discovery_test.ts` | 1 | 0 passed, 4 failed; every omitted-base case threw its plugin's `requiredStreamsBaseUrl` error before core discovery ran. |
+
+### Implementation
+
+- Removed `requiredStreamsBaseUrl()` from auth, sagas, triggers, and workers.
+- Passed `options.baseUrl` directly to `buildStreamUrl(path, options.baseUrl)`. The unchanged core
+  resolver therefore owns explicit override → Aspire/environment discovery → terminal not-found
+  error semantics.
+- `deno doc --filter createStreamDB npm:@durable-streams/state/db` and `deno doc --filter DurableStream
+  npm:@durable-streams/client` confirmed construction is synchronous/no-network and the underlying
+  stream carries a readonly URL. The auth wrapper intentionally hides `stream`, so its regression
+  reads the public TanStack collection identity, which incorporates the same configured stream URL.
+- No literal `4437`, new cast, `any`, or lint suppression was introduced. `rg` finds neither
+  `requiredStreamsBaseUrl` nor `4437` in the four factories and new tests (exit 1/no matches).
+- Native upstream API inspection transiently added an `npm:@durable-streams/state@*` resolution to
+  `deno.lock`; it was removed before commit because no dependency changed.
+
+### GREEN
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| Focused structured four-plugin discovery test command above | 0 | 4 passed, 0 failed. |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/auth --root plugins/sagas --root plugins/triggers --root plugins/workers --ext ts,tsx` | 0 | 303 files, 3 batches, 0 diagnostics. |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/auth --root plugins/sagas --root plugins/triggers --root plugins/workers --ext ts,tsx` | 0 | 303 files, 0 findings. |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/auth --root plugins/sagas --root plugins/triggers --root plugins/workers --ext ts,tsx` | 0 | 303 files, 0 findings. |
+| `deno task quality:scan` | 0 | Repository scan has 0 findings; 7 pre-existing bounded allowances. |
+| `deno task arch:check` | 0 | Doctrine scan has 0 failures; warnings are the existing repository baseline. |
+
+### Reconcile
+
+- Re-read the live PR timeline after the slice gates. No comment newer than the slice-1 implementation
+  evidence changed F-2 or the locked repair plan. The F-2 thread remains open for the supervisor's
+  review-thread workflow; this implementation lane does not self-resolve it.

@@ -45,7 +45,6 @@ export interface SagasStreamDB {
  * ```
  */
 export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasStreamDB {
-  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
   const sagaInstanceSchema: z.ZodType<SagaInstance> = z.unknown().transform(
     (value): SagaInstance => SagaInstanceSchema.parse(value),
   );
@@ -59,17 +58,10 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
 
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/sagas/instances', baseUrl),
+      url: buildStreamUrl('/sagas/instances', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
     state,
   });
-}
-
-function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
-  if (baseUrl === undefined) {
-    throw new Error('Sagas StreamDB requires the Aspire-discovered streams service URL.');
-  }
-  return baseUrl;
 }
