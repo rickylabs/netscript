@@ -3315,3 +3315,34 @@ No harm resulted — the lock is precisely what stopped a second steering messag
 author mid-turn, which is the failure this lane has had to unwind before. But had the messages
 carried *new* scope rather than restating the brief, I would have believed instructions were in force
 that the author had never seen. Verify delivery, then act.
+
+### Supervisor error — I killed the author's turn with my own timeout wrapper
+
+I launched the #1732 author resume as `timeout 900 deno task agentic:codex-resume …`. At exactly 15
+minutes the wrapper sent SIGTERM and the turn died mid-slice-2 (exit 143). **The author did nothing
+wrong; my launch command capped it.**
+
+Damage was limited and is recorded rather than glossed:
+
+| Item | State after the kill |
+| --- | --- |
+| `f1d7d9d8` plan amendment | committed + pushed, unaffected |
+| `5b84eaea` visible RED | committed + pushed, unaffected |
+| Slice-2 working tree (4 files) | **fully intact on disk**, uncommitted |
+| Writer lock | released by the kill, so the thread was immediately resumable |
+| Work lost | none on disk; only the turn's in-flight reasoning |
+
+Relaunched detached with `nohup` and **no timeout**, delivery verified by watching for
+`thread-store conflict` and confirming a live `codex exec resume` pid — not by trusting the launcher's
+exit code, per the lesson recorded above.
+
+**The lesson is narrower than "don't use timeout".** A timeout is right for a probe whose duration I
+control and wrong for an agent turn whose duration I do not. A 15-minute cap encoded an assumption I
+never checked — that a four-slice implementation turn fits in 15 minutes — and enforced it silently
+as a kill. The two failures in this session now rhyme: `codex-resume` exiting 0 on a *rejected* send,
+and my wrapper exiting 143 on a *successful* one. In both cases the launcher's exit code described the
+launcher, never the agent. **Verify the agent, not the wrapper** — `ps` and the commit graph were
+truthful both times when the tooling was not.
+
+Mitigation carried forward: the relaunch brief instructs the author to commit at every slice boundary,
+so any future turn ending costs at most one slice of uncommitted work rather than an unbounded amount.
