@@ -545,3 +545,57 @@ lint was excluded exactly as contracted. `deno.lock` is unchanged.
 No E2E, Aspire, Docker, or browser gate ran and no runtime lease was acquired. This author stops at
 Slice 7's Tier-A boundary: the green evidence is not author self-certification, Slice 7 still awaits
 substantive supervisor review, and Slice 8 has not started.
+
+## Slice 8 — MCP/agent access projection (behavior only)
+
+Slice 8 derives `OperationAccessSummary` directly from each indexed operation's retained raw
+OpenAPI object. The reverse projection implements the four contracted states without consulting
+document-level defaults: an operation with no own `security` key omits `access`; `security: []` is
+public; an empty-object security alternative is optional; and a non-empty requirement with no
+anonymous alternative is required. Scheme names and scope strings come from the non-empty
+requirements, while `x-netscript-roles` is retained for public and required declarations exactly as
+contracted.
+
+Both `list_service_operations` and `get_operation_schema` now populate the same bounded summary.
+Object-own-property assertions prove undeclared operations do not emit a present-but-empty field.
+The detail flow keeps `OPENAPI_CURL_AUTH_NOTE` byte-for-byte for undeclared operations and emits four
+distinct `curlExample` values and four distinct `authNote` values for undeclared, public, optional,
+and required access. Required guidance uses only the explicit `<credential>` placeholder; no
+credential value is solicited, embedded, or echoed.
+
+Five of the seven authorized product files changed. `operation-index.ts` and the real generated
+OpenAPI fixture were correctly left untouched: the index already retains the operation without
+mutation, and the fixture's three existing operations remain genuinely undeclared. Slice 7's nine
+top-level receipts were verified by SHA-256 and moved byte-identically (R100), not copied, into
+`receipts/slice-7-897a06cd7/` before Slice 8 evidence was cut. No generated carrier moved.
+
+The immutable Slice 8 content head is
+`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`.
+
+### Slice 8 evidence
+
+| Gate / proof | Result | Durable evidence |
+| --- | --- | --- |
+| Scoped check | PASS, 116 files / 0 diagnostics | `1387-s8-check`, 409 ms |
+| Scoped lint | PASS, 115 files / 0 findings | `1387-s8-lint`, 666 ms |
+| Scoped format | PASS, 115 files / 0 findings | `1387-s8-fmt-check`, 658 ms |
+| MCP tests | PASS, 138/138 | `1387-s8-test`, 6,864 ms |
+| Quality/doctrine gate | PASS; existing warnings only | `1387-s8-quality-gate`, 9,960 ms |
+| MCP export corpus | PASS, unchanged at 7,655 symbols | `1387-s8-mcp-export-corpus`, 8,194 ms |
+| Publish dry run | PASS, full workspace simulation | `1387-s8-publish-dry-run`, 36,121 ms |
+| MCP JSR audit | PASS (exit 0); three existing warnings | Exact direct package audit |
+
+Every durable receipt was checked for the expected `1387-s8-*` invocation ID, positive
+`durationMs`, `outcome: PASS`, work-bearing output, and
+`gitHead == actualGitHead == ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`. The recomputed
+`receipts/evidence-set.json` is `SUFFICIENT` with no reasons. The direct MCP audit reports the same
+two existing folder-cardinality warnings and one known slow-type warning.
+
+The MCP export corpus carrier remains byte-identical at SHA-256
+`b0616d3e533977b1726bc4c5b823bdbe2bf43f42ea844f4c9c7ffd679d28a10b`, proving this behavior-only
+slice changed no public type or signature. `deno.lock` remains byte-identical at SHA-256
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+No E2E, Aspire, Docker, or browser gate ran and no runtime lease was acquired. This author stops at
+Slice 8's Tier-A boundary: the green evidence is not author self-certification, and Slice 9 has not
+started.

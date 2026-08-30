@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slice 7 evidence complete; awaiting Tier-A review |
+| Current phase  | `impl` — Slice 8 evidence complete; awaiting Tier-A review |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -27,12 +27,17 @@ separate opposite-family IMPL-EVAL verdict; Slice 3 carries two independent conc
 were evaluated by DeepSeek after the native route hit an account-wide monthly spend limit — all
 recorded in the topic supervisor's ledger, not here.
 
-Slice 7 is now implemented at immutable content head `897a06cd7170ca021da1836b3cbcbf790cf97a2f`
-with a `SUFFICIENT` eight-receipt evidence set. It publishes a credential-free bounded
-`OperationAccessSummary`, adds the same optional `access` field to the list/detail result types and
-MCP schemas, and exports the type from `./openapi-projection`. Neither flow populates access data and
-the existing generic `authNote` is unchanged. Slice 7 remains at its Tier-A boundary awaiting
-substantive supervisor review; this author has not self-certified it and has not started Slice 8.
+Slice 7 is Tier-A **ACCEPTED** at `897a06cd7` with a separate opposite-family IMPL-EVAL **PASS**.
+It publishes the credential-free bounded `OperationAccessSummary` contract and optional list/detail
+fields without populating them.
+
+Slice 8 is implemented at immutable content head
+`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3` with a `SUFFICIENT` seven-receipt evidence set. It
+derives the exact four OpenAPI access states from each retained raw operation, populates both MCP
+read tools, leaves `access` genuinely absent for undeclared operations, and emits four distinct,
+credential-free curl/auth guidance pairs. The public export corpus remains byte-identical at 7,655
+symbols and `deno.lock` remains byte-identical. Slice 8 is at its Tier-A boundary awaiting
+substantive supervisor review; this author has not self-certified it and has not started Slice 9.
 
 **Resume-docs gap, recurring — this file was not the only casualty.** First flagged as F-1 by the
 Slice 4 IMPL-EVAL (this file and `worklog.md` frozen after Slice 1); the same class recurred and was
@@ -66,6 +71,10 @@ certification, not only when an author happens to.**
 - Implemented Slice 7's type/schema contract only: optional list/detail `access` fields share one
   bounded `OperationAccessSummary`; a typed schema example proves literal construction while both
   flows continue to omit the field.
+- Implemented Slice 8's reverse projection from raw operation-level OpenAPI `security` and
+  `x-netscript-roles`, populating both list/detail MCP results without changing any public signature.
+- Proved all four access states, own-property absence for undeclared results, and four distinct
+  credential-free curl/auth guidance pairs; the undeclared generic caveat is unchanged.
 - Regenerated the MCP export corpus under its standing exemption; it moved from 7,654 to 7,655
   symbols with the expected new type and widened list/detail signatures.
 - Regenerated the ceiling-exempt MCP export corpus at Slice 5 through its checked-in generator; it
@@ -74,10 +83,10 @@ certification, not only when an author happens to.**
 
 ## Next Steps
 
-1. Supervisor performs substantive Tier-A review of Slice 7 and records the separate-session
+1. Supervisor performs substantive Tier-A review of Slice 8 and records the separate-session
    evaluator outcome outside this author lane.
-2. Only after that release, continue Slices 8–9, each with its own Tier-A review and separate
-   opposite-family IMPL-EVAL.
+2. Only after that release, continue Slice 9 with its own Tier-A review and separate opposite-family
+   IMPL-EVAL.
 3. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
    the implementation PR must state the accepted substitution.
 4. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
@@ -135,11 +144,15 @@ verdicts: supervisor Tier-A **ACCEPTED** plus a separate opposite-family IMPL-EV
 **ACCEPTED_WITH_FINDINGS** (DeepSeek V4 Flash 0731, native route quota-exhausted both times —
 `evaluate-slice-5.md`, `evaluate-slice-6.md`). Neither slice was author-self-certified.
 
-Slice 7: content `897a06cd7170ca021da1836b3cbcbf790cf97a2f`, `SUFFICIENT` evidence set,
-8/8 durable receipts. Scoped check selected 116 files; lint/fmt selected 115; MCP tests passed
-136/136; exports drift, corpus freshness, quality/doctrine, and full publish dry run passed. The
-direct MCP JSR audit exited 0 with its three existing warnings. MCP public doc lint remained
-excluded as base-red. This is author evidence only; Tier-A acceptance is still pending.
+Slice 7: content `897a06cd7170ca021da1836b3cbcbf790cf97a2f`, Tier-A **ACCEPTED**, separate
+opposite-family IMPL-EVAL **PASS**. Its 8/8 durable receipts remain archived byte-identically under
+`receipts/slice-7-897a06cd7/`.
+
+Slice 8: content `ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`, `SUFFICIENT` evidence set,
+7/7 durable receipts. Scoped check selected 116 files; lint/fmt selected 115; MCP tests passed
+138/138; corpus freshness, quality/doctrine, and full publish dry run passed. The direct MCP JSR
+audit exited 0 with its three existing warnings. Corpus stayed at 7,655 symbols with a byte-identical
+carrier; lock stayed byte-identical. This is author evidence only; Tier-A acceptance is pending.
 
 ## Drift and Debt
 
@@ -154,6 +167,7 @@ excluded as base-red. This is author evidence only; Tier-A acceptance is still p
 
 Slice 5's immutable content commit is `c2cbfbf0b3c355682732be5805f0f180498576db`; Slice 6's is
 `11e83f06426469b48a67c2211d954ac916cd6fda`; Slice 7's is
-`897a06cd7170ca021da1836b3cbcbf790cf97a2f`. Each has its own evidence commit holding only run
+`897a06cd7170ca021da1836b3cbcbf790cf97a2f`; Slice 8's is
+`ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`. Each has its own evidence commit holding only run
 documentation and the verified receipt set. Treat Git and the draft PR as the authority for the
 evidence carrier's identifier; this file cannot name its own commit SHA.
