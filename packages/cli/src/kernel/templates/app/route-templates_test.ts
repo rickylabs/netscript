@@ -95,6 +95,10 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(appTelemetryExampleSharedTemplate, 'NETSCRIPT_TELEMETRY_ENDPOINT');
     assertStringIncludes(appTelemetryExampleSharedTemplate, 'ASPIRE_DASHBOARD_PORT');
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      'resolved.httpsFallback ?? resolved.endpoint',
+    );
     assertStringIncludes(appTelemetryExampleSharedTemplate, "source === 'default'");
     assertStringIncludes(
       appTelemetryExampleSharedTemplate,

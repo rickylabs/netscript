@@ -69,6 +69,8 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | 4 | flip ordering | Refreshed `origin/main` at `24f6642f`; toolchain.env remains 13.4.6, proving S1 is not on main. The CI/default phase-2 flip is deferred; S9 and S11 convergence cannot satisfy the all-three prerequisite without S1. |
 | 2026-08-30 | 5 | receipt wiring | Registered `aspire-version-parity` in the durable gate catalog so the required phase-2 report can produce an exact-head JSON receipt. |
 | 2026-08-30 | 5 | public docs lint | Added member-level JSDoc to the new endpoint/reader exports; targeted `deno doc --lint` passes. Root MCP doc lint still exposes the pre-existing private `SchemaViewName` reference outside S13 scope. |
+| 2026-08-30 | eval 1 | independent IMPL-EVAL | Native Claude/Fable 5 medium session `5263170d-bbd6-4832-aea5-08a1a26dd669` returned `FAIL_FIX`: the workspace runner's new `@netscript/mcp` import was unmapped in public scaffold modes. |
+| 2026-08-30 | 6 | evaluator remediation | Added exact JSR/local root import mappings and paired generator coverage, restored the Aspire-port HTTPS fallback, and recorded the new package dependency, synchronous example-route trade-off, and merge-head manifest regeneration obligation. |
 
 ## Gate Results
 
@@ -92,6 +94,10 @@ source and generated-carrier freshness gates.
 | Validation raw lint/fmt | `deno lint/fmt --no-config` with repository style flags | PASS | Checker, tests, and manifest generator clean. |
 | Phase-2 convergence report | `deno task check:aspire-version-parity -- --phase 2 --report` | REPORT PASS (exit 0) | `manifestFresh=true`; 799 checked, 24 enforcement hits, 6 archival info, 1 lockfile skipped, 0 missing. |
 | New MCP exports doc lint | `deno doc --lint` over telemetry endpoint and Aspire-ps reader modules | PASS | New public types, members, and constructor documented. |
+| Evaluator-fix focused tests | structured test wrapper over workspace generators, route templates, and plan-init | PASS | 57 passed, 0 failed. |
+| Evaluator-fix check | structured check over workspace/app template TypeScript | PASS | 19 files; no findings. |
+| Evaluator-fix raw lint/fmt | `deno lint/fmt --no-config` over touched config-excluded TypeScript | PASS | 3 files clean after applying repository formatting to the touched generator. |
+| Evaluator-fix consumer/fitness | emitted samples, `quality:scan`, `arch:check`, Claude mirror | PASS | 47 emitted samples; no quality/doctrine failures; mirrors current. |
 
 Runtime gates are N/A by explicit scope.
 
@@ -128,3 +134,12 @@ Runtime gates are N/A by explicit scope.
 
 - Evaluator must inspect only `a46ea16d..HEAD`, verify no runtime was started, and independently
   check whether the phase-2 CI flip remains deferred.
+
+## Reconcile — evaluator cycle 1
+
+- F-1 was a valid generated-consumer defect: public JSR/local root configs did not resolve the
+  shared reader imported by `.netscript/aspire-cli.ts`. The remediation maps the direct dependency
+  only when Aspire tasks are emitted and copied packages are not already workspace members.
+- F-2 is fixed by consuming the resolver's `httpsFallback` for `ASPIRE_DASHBOARD_PORT`.
+- F-3/F-4/F-6 are explicitly dispositioned in `drift.md`; F-5 remains a non-blocking diagnostic
+  improvement. The plan and ratified D-17 contract remain unchanged.

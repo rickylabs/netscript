@@ -74,7 +74,9 @@ function getDashboardBaseUrl(): string | undefined {
     NETSCRIPT_TELEMETRY_ENDPOINT: Deno.env.get('NETSCRIPT_TELEMETRY_ENDPOINT'),
     ASPIRE_DASHBOARD_PORT: Deno.env.get('ASPIRE_DASHBOARD_PORT'),
   }, new AspirePsDashboardReader());
-  return resolved.source === 'default' ? undefined : resolved.endpoint;
+  return resolved.source === 'default'
+    ? undefined
+    : resolved.httpsFallback ?? resolved.endpoint;
 }
 
 function getServiceName(resource: OtlpResource): string {

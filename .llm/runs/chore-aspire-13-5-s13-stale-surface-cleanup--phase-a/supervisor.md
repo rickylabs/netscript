@@ -24,3 +24,6 @@
   D-1…D-17 contract and explicitly dispatched S13 (epic worklog and drift D-60/D-63). This leaf
   records `PLAN-EVAL: N/A` because it implements that owner-ratified contract rather than reopening
   the exhausted epic plan loop.
+- IMPL-EVAL cycle 1 ran in fresh native Claude/Fable 5 medium session
+  `5263170d-bbd6-4832-aea5-08a1a26dd669` against `e3ffb5dd` and returned `FAIL_FIX`; remediation is
+  recorded in `evaluate.md`, `drift.md`, and `worklog.md`. Cycle 2 must be a fresh session.

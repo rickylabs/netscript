@@ -47,6 +47,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     '@netscript/config': netscriptJsrSpecifier('config'),
     '@netscript/contracts': netscriptJsrSpecifier('contracts'),
     '@netscript/kv': netscriptJsrSpecifier('kv'),
+    '@netscript/mcp': netscriptJsrSpecifier('mcp'),
     '@netscript/plugin': netscriptJsrSpecifier('plugin'),
   });
   assertEquals(result.minimumDependencyAge, {
@@ -230,6 +231,7 @@ Deno.test('generateDenoJson emits shared plugin service-context imports in JSR m
     '@netscript/config': netscriptJsrSpecifier('config'),
     '@netscript/contracts': netscriptJsrSpecifier('contracts'),
     '@netscript/kv': netscriptJsrSpecifier('kv'),
+    '@netscript/mcp': netscriptJsrSpecifier('mcp'),
     '@netscript/plugin': netscriptJsrSpecifier('plugin'),
   });
 });
@@ -260,6 +262,7 @@ Deno.test('generateDenoJson keeps generated database aliases in local mode', () 
   }));
 
   assertEquals(result.imports, {
+    '@netscript/mcp': '../../packages/mcp/mod.ts',
     '@database/zod': './database/sqlite/schema/.generated/zod/crud.ts',
   });
 });
@@ -278,14 +281,22 @@ Deno.test('generateDenoJson keeps the same root-only shape in local mode', () =>
     result.tasks.dev,
     'deno task deps:closure && deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
   );
-  assert(!('imports' in result), 'root deno.json must not carry import maps');
+  assertEquals(result.imports, {
+    '@netscript/mcp': '../../packages/mcp/mod.ts',
+  });
   assert(
     !('minimumDependencyAge' in result),
     'local root deno.json must not carry registry age policy',
   );
 });
 
-Deno.test('generateDenoJson omits imports in local mode', () => {
+Deno.test('generateDenoJson maps the detached Aspire runner dependency in public modes', () => {
+  const jsr = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'plugins'],
+    importMode: 'jsr',
+  }));
   const result = JSON.parse(generateDenoJson({
     name: 'test-project',
     appName: 'dashboard',
@@ -293,7 +304,9 @@ Deno.test('generateDenoJson omits imports in local mode', () => {
     importMode: 'local',
     localBase: '../..',
   }));
-  assert(!('imports' in result), 'root deno.json must not carry import maps');
+  assertEquals(jsr.imports['@netscript/mcp'], netscriptJsrSpecifier('mcp'));
+  assertEquals(result.imports['@netscript/mcp'], '../../packages/mcp/mod.ts');
+  assertStringIncludes(generateAspireCliTaskRunner(), "from '@netscript/mcp'");
 });
 
 Deno.test('generateDenoJson expands copied workspace packages in stable order', () => {
