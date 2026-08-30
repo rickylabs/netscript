@@ -4139,3 +4139,59 @@ Author commits and pushes the closure fix at the final base `a5520e70` → this 
 contracted gates at that exact head → renewed delta receipt (the `MECHANICAL_PASS` at `f1ff5557` is
 superseded and the author was told not to cite it) → `status:ready-merge` applied immediately before a
 fresh CI run so the mirror's live read observes it → merge coordinates handed over.
+
+## 2026-08-30 — #1758 final-base gates green at `b322bf04`; #1368 PLAN-EVAL `FAIL_PLAN` cycle 1
+
+### #1758 — closure fix landed and the contracted gates pass
+
+`b322bf04`, pushed, clean; local == `origin` == PR #1758 `headRefOid`.
+
+| Gate at `b322bf04` | Result |
+| --- | --- |
+| Ceiling vs `a5520e70` (closure module now authorized) | nothing outside |
+| `deno.lock` | byte-unchanged |
+| `check:agent-docs-prose` / `check:assets-barrel` / `check:publish-assets` / `check:mcp-export-corpus` / `docs:exports-drift` | all exit 0 |
+| Closure parity test | exit 0 · **6 passed / 0 failed** |
+| `packages/sdk/tests/` | exit 0 · 70 passed / 0 failed |
+| `define-fresh-app.test.ts` | exit 0 · 11 passed / 0 failed |
+| Graph proof, re-measured | root **0** · presets **0** |
+
+The parity fix was verified for **order**, not just presence — `assertEquals` over arrays is
+order-sensitive, and both sequences match exactly at 13 entries with `./presets` after `./ports`.
+
+**The full repository suite is running locally before any CI attempt.** Two CI cycles have already
+been spent, and the second one failed on a test the scoped gates could not see — the closure parity
+test lives in `packages/cli`, outside every scope this leaf was running. Running `deno task test`
+locally is the cheapest way to avoid a third red cycle, and it is the same instrument that caught the
+defect.
+
+### #1368 — PLAN-EVAL cycle 1 `FAIL_PLAN`, and it answered the question this lane asked
+
+Verdict `7b96c498`, pushed. Three blocking, one major, one minor, two informational. All fixes are
+plan-text; archetype, ceiling, slice order and gate ownership stand. The evaluator confirmed gate
+honesty (F6) and judged factory liveness **per factory** (F7) — and the check-only barrel invocation
+and measured corpus baseline both held up.
+
+**F1 is the answer to "is some factory genuinely dead?"** — the question the brief demanded be argued
+rather than assumed. From the tree: `saga-bus-bridge.ts` `#dispatchOne` contains
+`case 'complete': return;`. The bridge performs no completion work; the real bookkeeping happens in
+`SagaEngine` inside the existing `saga.handle` span. So a bridge-emitted `saga.cascade.complete` span
+would surround `return;` — measuring nothing and always reporting success. The plan's own rationale is
+**correct for send/schedule and inverted for complete**, because for completion the engine *is* the
+operation owner. "Emit all five" was close but wrong as stated.
+
+**F2 is the second instance of a defect class this lane has now seen twice.** The planned red-before
+constructs `new SagaCompensator({ clock, instrumentation })`, but that option does not exist on
+`f8b4f804` — so the test is an excess-property **type error**, exiting 1 with **0 passed / 0 failed**:
+red by compile failure, indistinguishable from a broken test file, proving nothing about emission.
+The sibling SDK leaf planned to delete `globalThis.Deno` and would have crashed in Deno's Node-compat
+layer before its assertion could run.
+
+The rule that generalizes, now sent to the author and worth keeping: **a red-before must fail by
+assertion, and the plan must explicitly forbid a compile-error or crash red from satisfying the
+gate.** Both times an independent evaluator caught it by *executing* the planned shape rather than
+reading it.
+
+F3 (correlation precedence open and resolved inconsistently between compensator and engine), F4
+(engine-as-bus `send` uninstrumented), and F5 (ceiling/gate completeness) also dispatched. Repair is
+plan-only; S2 stays blocked until cycle 2 — the final permitted plan cycle.
