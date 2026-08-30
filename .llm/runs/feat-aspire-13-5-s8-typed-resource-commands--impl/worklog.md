@@ -44,6 +44,18 @@ Phase-B lease and the implementation agent does not self-certify.
   contract through emitted `run-tool.mts` request mode. Focused tests passed 49/49; `quality:scan`
   and `arch:check` passed with only their existing warning inventory. No Aspire command or
   container runtime was executed.
+- 2026-08-30: pushed slice 4 commit `1efd1a175d75cb5bb167b0998e0ce559f037255f` with the
+  explicit refspec and posted its PR trail. Clean-HEAD receipt `s8-s4-adapters-head` passed 49/49
+  and is stored at `receipts/04-adapter-tests.json`.
+- 2026-08-30: completed D-19 from a fresh PostgreSQL/Redis/service consumer. Static pre/post
+  invariants were `aspire ps = []` and empty `docker ps -a`; the single mise-prefixed
+  `aspire restore` exited 0 and restored the three expected module hashes exactly. The first
+  consumer compile exposed unsupported `ServiceProvider.getConnectionString` emission and the
+  string-valued TypeScript visibility projection. The generator now resolves the connection via
+  `builder.getConfiguration().getConnectionString`; documented default UI+API visibility replaces
+  the untypeable bitwise expression without a cast (drift D-03). Final TypeScript 5.9.3 compile
+  exited 0 with empty output. No Zod allowance was needed. The scratch was moved to trash and the
+  worktree contains no scratch residue. Receipt: `receipts/05-consumer-typecheck-13.5.3.txt`.
 
 ## Push trail
 
@@ -54,3 +66,4 @@ appended after each push and mirrored in the draft PR comment trail.
 - `42c4ef51f6f12cd9ba4644c4843895e227d31cec` — slice 1 RED contracts, pushed explicitly.
 - `1fa1cb75b3e3776ed1d0bd9dd9da046203264c20` — slice 2 typed generator, pushed explicitly.
 - `ab0908b8a4f39ee0bdd7d8cc31b2051004dd5e76` — slice 3 regenerated assets, pushed explicitly.
+- `1efd1a175d75cb5bb167b0998e0ce559f037255f` — slice 4 resident routing and bounded wait, pushed explicitly.
