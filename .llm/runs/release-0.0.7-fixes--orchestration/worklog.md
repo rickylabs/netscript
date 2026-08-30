@@ -5752,3 +5752,42 @@ issue, and it looks bound-able without any host lease at all.
 bounded script unbidden — surfacing it for a decision rather than repeating the #1764 scope mistake on
 a second leaf. `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/leak-report.md` (untracked, pre-
 existing) checked and confirmed harmless — a leftover artifact, not touched.
+
+### #1739 — bounded no-runtime script, main converged twice, IMPL-EVAL dispatched (route corrected mid-flight)
+
+**Bounded package-backed-plugin-doctor script**, no lease used: read the gate's implementation fully
+before writing anything — `context.project.smokeRoot`/`projectName` compute a throwaway sub-project
+(`${projectName}-package-doctor`) the fixture creates itself; the command only needs
+`cliEntrypoint`/`repoRoot`, checks JSR registry availability for the pinned version, and exits 78
+(gate-level `skip`) if unpublished. No scaffold/plugin-install/DB/AppHost/Docker/browser/relay anywhere
+in the call graph. Ran directly: **exit 0, 2/2 passed**, `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS` with real
+registry/permission evidence in the captured stdout — not a silent skip. As a side effect it also
+independently confirmed the suite-lease self-heal I'd only verified from source: it found and cleared
+the exact stale lease left by #1764's earlier killed attempt.
+
+**Converged onto main twice in this turn** — `9710a2898` was already integrated; the newest tip
+`2a1248d33` (#1740/#1738/#1727/#1785, 130+ files) needed a fresh true-intersection check, since a
+naive `diff old-base..new-head` conflates the leaf's own changes with main content pulled in by the
+leaf's OWN prior merge. Recomputed against the **authoritative 11-path ceiling from `plan.md`**, not a
+polluted diff: zero intersection. Merged clean, 0 conflicts, **patch-identity proven** — all 11 owned
+files `git diff --quiet` identical before/after. One generated carrier (`export-surface-corpus
+.generated.ts`) needed regeneration; regenerated via `gen:mcp-export-corpus`, only carrier that moved.
+
+Full plan gate table (rows 2–15) re-run at the converged head: all PASS. Two findings verified
+pre-existing rather than accepted on claim — the format finding on `public-command-dependencies.ts`
+(that exact file proven byte-identical across the merge, so the finding predates it) and `plugins/ai`
+`doc:lint` exit 1 (diffed head vs a detached checkout of `2a1248d33`, identical findings modulo path
+prefixes). Row 16 (full runtime smoke) explicitly left open — the bounded proof is not a substitute,
+and the Tier-A record says so in the same sentence it reports the bounded PASS, specifically to avoid
+the conflation the coordinator flagged after my #1764 wording error. Tier-A signed at `fcba13423`.
+
+**IMPL-EVAL dispatched on native opposite-family Fable 5 first — hit the monthly spend limit mid-run**
+(HTTP 429, no verdict, no partial artifact, confirmed clean via `git log` on the eval branch and the
+PR's last comment). Per the coordinator's standing routing update, did **not** retry with an Opus
+exception. Re-dispatched on the sanctioned fallback: **OpenRouter DeepSeek V4 Flash 0731 · max**, via
+`deno task agentic:claude-openrouter` (the checked-in Agentic launcher), model id and effort taken from
+`lane-policy.md`'s quota-blocked row rather than guessed. Credential handling delegated entirely to the
+launcher — no credential path printed, read, or committed by me.
+
+**#1764 remains separately queued** — TC-6/TC-7/TC-9 unproven, its bounded plan unrun, waiting on the
+singleton runtime lease. Not touched or advanced in this entry.
