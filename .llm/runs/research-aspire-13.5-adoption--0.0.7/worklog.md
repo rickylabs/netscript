@@ -472,4 +472,7 @@ workflows untouched. Hosted tiers queued (chain-2, keyed to
 `main`@`52a881c5`, ready (not draft), sole `status:ready-merge` on PR+#1715, `Closes #1715`. Hosted
 run 33329358883 SUCCESS all tiers at the exact head; ci run 33329453582 close-gate **success** after
 label rerun; mirror APPLIED 4/4 boxes + provenance; review-threads PASS (0 threads); checks at head
-6 success / 24 skipped / 0 red. Coordinator lands the merge. |
+6 success / 24 skipped / 0 red. Coordinator lands the merge. | | **S3 SHIPPED** | PR #1741 merged by
+primary → main `9710a2898d4f`; #1715 closed; PR/issue `status:shipped`. Stack released: S7 converges
+onto this main; next local Phase-B lease → S7 rerun (S8 retry stays blocked until its own
+convergence after S1). |
