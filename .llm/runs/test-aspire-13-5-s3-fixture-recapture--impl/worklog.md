@@ -69,6 +69,126 @@ the capture provenance in that fixture folder's README, then update the parity e
 | 2026-08-30 | 6     | IMPL-EVAL      | Cycle 1 at `a964a2120` returned `FAIL_FIX`: H-1, M-1, L-1, and L-2 recorded on the research branch.                                       |
 | 2026-08-30 | 6     | implementation | Restored the 13.4.6 MCP fixture and assertions verbatim; added independent bannerless S2 V5-derived 13.5.3 cases and exact provenance.    |
 | 2026-08-30 | 6     | gate           | Coverage restored at adapter lines 237/239; focused 52/52 and complete 263/263 suites plus the full Phase-A gate set pass.                |
+| 2026-08-30 | B1    | lease preflight | The serialized phase-B lease was granted; doctor reported 0 failed, `aspire ps` returned `[]`, and `docker ps -a` listed no containers.   |
+| 2026-08-30 | B1    | steering correction | Before any AppHost start, acknowledged D-39: dind is `10.4.12.19`, Docker client/server are 28.5.2, inotify is 1024, and PID 1 is `tini` with zero zombies. |
+| 2026-08-30 | B2    | restore/start | Restored the exact 13.5.3 scratch AppHost, registered its identity, and used the single isolated start as the remote-dind probe. |
+| 2026-08-30 | B2    | blocked | PostgreSQL and Redis failed container creation because the remote Docker daemon cannot see worktree bind sources; workers remained waiting, so capture stopped without workaround/retry. |
+| 2026-08-30 | B2    | teardown | Exact AppHost stop passed; leak-check survivors `[]`; teardown preview empty; final Aspire/Docker inventories empty. |
+
+## Phase B Lease Preflight — verbatim
+
+Commands were run from `/home/agent/projects/netscript/worktrees/007-aspire-s3` with the requested
+mise binary. Docker inventory used `DOCKER_HOST=tcp://netscript-dind:2375`.
+
+### `aspire doctor`
+
+```text
+Checking Aspire environment...
+
+Aspire Environment Check
+========================
+
+Aspire
+  ✅ Aspire CLI version 13.5.3 (channel: stable)
+  ✅ Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded
+  ⚠️ No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check
+       Run `aspire certs trust` to create and trust a developer certificate.
+       Details:
+       No fully trusted exportable developer certificate with a private key was found.
+
+.NET SDK
+  ✅ .NET 10.0.400 installed (x64)
+
+Container Runtime
+  ✅ Docker v28.5.2: running (auto-detected (default)) ← active
+
+Environment
+  ✅ Operating system: Linux Debian 12
+  ⚠️ HTTPS development certificate is not trusted
+       Run 'aspire certs trust' to trust the HTTPS development certificate.
+       See: https://aka.ms/aspire-prerequisites#dev-certs
+       Details:
+       Certificate B61BC460D594D5C0EF406F52A03D4577A49D1DFC exists in the personal store but was not found in the trusted root store.
+  ⚠️ certutil is not available; browser certificate trust may be incomplete
+       Install certutil from your distribution's NSS tools package (for example, libnss3-tools).
+       See: https://aka.ms/aspire-prerequisites#dev-certs
+       Details:
+       Aspire uses certutil to query and update NSS certificate databases used by Firefox and Chromium browsers on Linux.
+
+Summary: 5 passed, 3 warnings, 0 failed
+For detailed prerequisites: https://aka.ms/aspire-prerequisites
+
+Aspire CLI Installations
+========================
+
+╭───────────────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────┬─────────┬───────────┬─────────────╮
+│ Path                                                                  │ Version                                         │ Channel │ Route     │ PATH status │
+├───────────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────┼─────────┼───────────┼─────────────┤
+│ /home/agent/.local/share/mise/installs/aspire/13.5.3/aspire (current) │ 13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688 │ stable  │ (unknown) │ active      │
+│ /home/agent/.local/aspire/aspire                                      │ 13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688 │ stable  │ script    │ shadowed    │
+╰───────────────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────┴─────────┴───────────┴─────────────╯
+```
+
+### `aspire ps --format Json --nologo --non-interactive`
+
+```json
+[]
+```
+
+### `docker ps -a`
+
+```text
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+## Phase B Supervisor Steering Acknowledgment
+
+Recorded before the first AppHost start:
+
+- D-39 is authoritative: `netscript-dind` resolves to `10.4.12.19`; Docker client/server are
+  28.5.2; `fs.inotify.max_user_instances` is 1024; PID 1 is `tini` with zero zombies.
+- D-37's below-Docker-28 probe is resolved. This run will not stop, waive, or classify a result on
+  the obsolete Docker-version condition.
+- The container remains a different host from remote dind. The first and only authorized
+  `aspire start --isolated` remains the endpoint/proxy probe. If its container-backed endpoints are
+  unreachable because of that topology, preserve exact evidence, tear down to zero, and stop
+  without workaround or retry.
+- The exit-134/inotify report-and-stop rule, exact-AppHost stop, run-resource registration,
+  leak-check/teardown, final empty inventories, scratch removal, and one-AppHost limit remain in
+  force.
+
+## Phase B Runtime Probe and Stop
+
+- Durable receipt: `receipts/07-phase-b-runtime-probe.md`.
+- The one authorized isolated start returned 0 and registered SDK 13.5.3.
+- PostgreSQL and Redis then entered `FailedToStart`. Their exact logs report
+  `invalid mount config for type "bind": bind source path does not exist` for worktree-local
+  `.data/postgres` and `.data/redis` paths. This is the remote-dind topology stop condition.
+- `users`, `workers`, and `workers-api` remained `Waiting`; therefore no required-resource wait,
+  health-check trigger, or dashboard envelope capture was possible.
+- No workaround, resource restart, AppHost retry, fixture fabrication, or envelope edit occurred.
+
+### Final `aspire ps --format Json --nologo --non-interactive` — verbatim
+
+```json
+[]
+```
+
+### Final `docker ps -a` — verbatim
+
+```text
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+### Cleanup verdicts
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact AppHost stop | PASS | `receipts/07-phase-b-runtime-probe.md` |
+| `agentic:leak-check` | PASS | `survivors: []` |
+| `agentic:teardown` preview | PASS | no stopped AppHosts, removed containers, or escalations; `--apply` not warranted |
+| Final Aspire inventory | PASS | `[]` |
+| Final Docker inventory | PASS | header only |
 
 ## Decisions
 

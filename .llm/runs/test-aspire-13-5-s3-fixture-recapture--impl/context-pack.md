@@ -6,16 +6,17 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl`   |
 | Branch         | `test/aspire-13-5-s3-fixture-recapture`         |
-| Current phase  | `impl-eval cycle 1 fix — re-evaluation pending` |
+| Current phase  | `phase B blocked — remote-dind topology; teardown complete` |
 | Archetype      | `2 - Integration`                               |
 | Scope overlays | `none`                                          |
 
 ## Current State
 
-Draft PR #1741 contains pushed slices 1–5. IMPL-EVAL cycle 1 returned `FAIL_FIX` at `a964a2120`.
-Slice 6 restores the verbatim 13.4.6 fallback case, derives independent bannerless 13.5.3 cases from
-the S2 V5 describe receipt, corrects provenance/README formatting, and has a green gate set. No
-runtime has started, and the 13.5.3 telemetry envelope remains absent by design.
+Draft PR #1741 is at the phase-A IMPL-EVAL cycle-2 PASS head `fe4f496bd`. The serialized phase-B
+lease was exercised once on the corrected D-39 host. The exact 13.5.3 AppHost started, but its
+PostgreSQL and Redis containers failed because the remote Docker daemon cannot see worktree-local
+bind sources. Required worker resources remained waiting, so no dashboard envelope could be
+captured. Exact AppHost stop, leak-check, teardown preview, and final empty inventories all passed.
 
 ## Completed
 
@@ -35,13 +36,15 @@ runtime has started, and the 13.5.3 telemetry envelope remains absent by design.
 
 ## In Progress
 
-- Slice 6 commit, push, PR trail comment, and supervisor re-evaluation handoff.
+- Commit/push the phase-B blocked probe receipt and teardown evidence; post the structured IMPL
+  phase comment without changing draft/readiness/labels.
 
 ## Next Steps
 
-1. Commit and push slice 6 with the prescribed message and explicit refspec.
-2. Post the slice-6 SHA and gate evidence to draft PR #1741.
-3. Fable supervisor runs IMPL-EVAL cycle 2; phase B remains separately lease-backed.
+1. Supervisor selects a future host where the Docker daemon can see the AppHost bind sources, then
+   grants a new serialized lease.
+2. Resume the unchanged README capture contract: wait required resources, trigger `health-check`,
+   capture raw resources/spans envelopes, add the fixture/test, and promote parity to `required`.
 
 ## Key Decisions
 
@@ -72,16 +75,17 @@ runtime has started, and the 13.5.3 telemetry envelope remains absent by design.
 | ----------- | ------------------------------------------------- | -------------------------------------------------------------- |
 | Static      | S1 expected RED; slice-6 evaluator-fix gates PASS | worklog + `receipts/06-scoped-gates.md`                        |
 | Fitness     | PASS                                              | `receipts/06-quality-scan.json`, `receipts/06-arch-check.json` |
-| Runtime     | N/A phase A                                       | telemetry README + drift entry                                 |
+| Runtime     | BLOCKED phase B                                   | `receipts/07-phase-b-runtime-probe.md`; teardown complete       |
 | Consumer    | PASS                                              | unchanged MCP export corpus in `receipts/06-scoped-gates.md`   |
 
 ## Open Questions
 
-- None for phase A.
+- Which future leased host provides co-located Docker bind-mount visibility?
 
 ## Drift and Debt
 
-- Drift: dashboard telemetry unavailable until phase B (minor, expected).
+- Drift: phase-B remote-dind topology cannot mount worktree-local database/cache sources;
+  exact evidence is committed and the runtime is fully torn down.
 - Debt: none created or deepened.
 
 ## Commits
