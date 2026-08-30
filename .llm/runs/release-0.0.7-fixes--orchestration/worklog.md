@@ -3486,3 +3486,61 @@ asks the evaluator to judge whether that is adequate or whether the assertion ne
 demonstration.
 
 Phase normalized to `status:impl-eval` on PR #1758 and issue #1462, exactly one `status:` each.
+
+## 2026-08-30 — #1462 IMPL-EVAL cycle 1 `PASS_IMPL`; two findings dispatched, two recorded
+
+Verdict commit `256cb1c3` on `eval/impl-eval-1462-cycle-1`, pushed. Evaluated head `83b7109c`.
+**Four low findings, zero blocking.**
+
+### The evaluator reproduced everything, and did its own work to do so
+
+It wrote its own `graph.ts` and ran its own `publish-dry-run` rather than accepting the supervisor's
+numbers. Its reproduction table is complete: root **19 → 0** unsafe edges and presets 0; SDK suite
+70/0 and `define-fresh-app.test.ts` 11/0; `deno.lock` byte-unchanged; `doc:lint` baseline-red with
+identical 3/3/0 at both trees; `surface:diff` **542 → 552** with the **+10 entirely SDK (45 → 55)** —
+explicitly marking the **T-1 correction as accurate**; workspace and SDK publish dry-runs green with
+13 exports including `./presets`; `quality:scan`, `arch:check`, `docs:exports-drift` green; scoped
+check/lint/fmt clean; ceiling containment at 25 files, none outside. Its closing line: *"Nothing in
+the supervisor's or author's record failed to reproduce."*
+
+That is the outcome the expensive independent gate exists to produce — and it is worth contrasting
+with #1673, where the equivalent gate found a blocking defect. The gates are not ceremonial in either
+direction.
+
+### Dispatched to the author
+
+- **F-3 — the PR #1758 body is stale and would misrepresent the PR at readiness.** It still says
+  "This draft still contains plan artifacts only" with S2–S4 unchecked and Validation listing only
+  S1-era gates, while the per-slice comments are accurate. Same class as the stale workers DoD box
+  caught on #1739 by running the close-gate early. The author refreshes slices, validation, and DoD —
+  with the explicit instruction **not** to tick any box whose wording is not literally true, and to
+  say so inline instead.
+- **F-1 — record the predicate substitution in `drift.md`.** The committed graph predicate rejects
+  `/packages/kv/`, `jsr:@netscript/kv`, `node:` and `/packages/logger/` plus `@netscript/kv`/`node:`
+  dependency edges; the plan and DoD instead name `cache-query.ts`, `kv-cache-store.ts`,
+  `@netscript/kv`. Both measure 0 at head, and the committed form is **stricter** on transitive
+  edges — so a bookkeeping gap, not a coverage gap. It still has to be written down.
+
+### Recorded as coordinator follow-ups, deliberately not acted on
+
+- **F-2** — `defineFreshApp()` calls `setCacheProvider(cacheQuery)` unconditionally and
+  `setCacheProvider` replaces without a guard, so a custom provider registered *before*
+  `defineFreshApp()` is silently overwritten. Plan D5 locked this shape and PLAN-EVAL accepted it, so
+  it is a design note rather than a defect against the plan: either document "register custom
+  providers after `defineFreshApp()`" or guard with `hasCacheProvider()`.
+- **F-4** — the CLI scaffold still emits `import '@netscript/sdk/cache'`, now inert; generated apps
+  keep caching through `defineFreshApp`. The plan explicitly deferred this, and it is outside the
+  ceiling by design. Follow-up issue only.
+
+### A supervisor misdiagnosis, corrected within the same turn
+
+When the verdict watcher was killed, `claude agents --json` did not list the evaluator and no process
+held the eval worktree, so this lane concluded the session had "died without producing an artifact".
+Wrong: the evaluator had just committed `256cb1c3`, and its job directory held `graph.ts`,
+`comment.md`, and `publish-dry-run.log`. The registry PID had been recycled to an unrelated
+`claude bg-spare`, and the agents listing lagged.
+
+**Checking the worktree head before relaunching is what prevented a duplicate evaluator.** Added to
+the liveness checklist: for a Claude background evaluator the authoritative signals are its **worktree
+head** and **job-directory contents**, not the process table or the agents listing — the mirror of the
+rollout-growth rule for Codex threads.
