@@ -77,14 +77,27 @@ export {
   type HealthStatus,
 } from './src/primitives/health.ts';
 
-export type { AuthnOptions, AuthzOptions } from './src/auth/options.ts';
+export type { AuthnOptions, AuthzOptions, ContractAuthorizerOptions } from './src/auth/options.ts';
+export type {
+  ContractAuthorizerFactory,
+  ContractPolicyAuthorizerPort,
+  ContractPolicyBindingOptions,
+  ContractPolicyContract,
+  ContractPolicyRpcRouteAlias,
+  ProcedureAccessPolicy,
+  ProcedurePolicyRequest,
+  ProcedurePolicyResolution,
+  ProcedurePolicyResolver,
+} from './src/auth/contract-policy.ts';
 export type {
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthorizerMatch,
   AuthorizerPort,
   AuthzDecision,
   AuthzRequest,
+  MatchAwareAuthorizerPort,
   Principal,
 } from './src/auth/types.ts';
 

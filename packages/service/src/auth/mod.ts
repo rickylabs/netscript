@@ -33,7 +33,18 @@
  */
 
 export type { ServiceEnv, ServiceVariables } from './hono-context.ts';
-export type { AuthnOptions, AuthzOptions } from './options.ts';
+export type { AuthnOptions, AuthzOptions, ContractAuthorizerOptions } from './options.ts';
+export type {
+  ContractAuthorizerFactory,
+  ContractPolicyAuthorizerPort,
+  ContractPolicyBindingOptions,
+  ContractPolicyContract,
+  ContractPolicyRpcRouteAlias,
+  ProcedureAccessPolicy,
+  ProcedurePolicyRequest,
+  ProcedurePolicyResolution,
+  ProcedurePolicyResolver,
+} from './contract-policy.ts';
 export {
   createScopeAuthorizer,
   type ScopeAuthorizationRule,
@@ -52,8 +63,10 @@ export type {
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthorizerMatch,
   AuthorizerPort,
   AuthzDecision,
   AuthzRequest,
+  MatchAwareAuthorizerPort,
   Principal,
 } from './types.ts';
