@@ -10,7 +10,7 @@ export const AUTH_PLUGIN_VERSION: string = PLUGIN_PACKAGE_VERSION;
 export const AUTH_API_SERVICE_NAME = 'auth-api' as const;
 
 /** Default HTTP port for the auth API process. */
-export const AUTH_API_DEFAULT_PORT = 8094 as const;
+export const AUTH_API_DEFAULT_PORT = 8_094 as const;
 
 /** Literal type for the auth plugin identifier. */
 export type AuthPluginId = typeof AUTH_PLUGIN_ID;

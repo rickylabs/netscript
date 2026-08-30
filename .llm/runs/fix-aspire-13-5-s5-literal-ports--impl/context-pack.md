@@ -12,8 +12,8 @@
 
 ## Current State
 
-Slices 1-4 are pushed on draft PR #1740. Slice 5 removes deterministic E2E probe ports and resolves
-plugin resource endpoints from the running AppHost's `aspire describe` `urls[].url` contract.
+Slices 1-5 are pushed on draft PR #1740. Slice 6 is complete and locally validated; its final
+commit/push and PR evidence update are the only remaining implementation-lane actions.
 
 ## Completed
 
@@ -22,15 +22,17 @@ plugin resource endpoints from the running AppHost's `aspire describe` `urls[].u
 - D-14 sagas slice committed and pushed as `24817a404` with JSR evidence.
 - Contribution slice committed and pushed as `aae91586b`.
 - Plugin/infrastructure opt-in pin slice committed and pushed as `8aee17462`.
+- Describe-derived E2E probe slice committed and pushed as `732337435`.
+- Final static, JSR, plugin, asset, doctrine, and `scaffold.plugins` gates are green/baseline.
 
 ## In Progress
 
-- Slice 5 is validated and ready to commit; slice 6 regeneration and final gates remain.
+- Commit/push slice 6 and post the final draft-PR evidence trail.
 
 ## Next Steps
 
-1. Commit and push slice 5 with its receipt and PR trail comment.
-2. Regenerate embedded/publish assets, make the exact literal grep green, and run final gates.
+1. Commit and push slice 6 with `receipts/06-final-gates.txt`.
+2. Update PR acceptance evidence and hand the draft to the independent Fable 5 supervisor.
 
 ## Key Decisions
 
@@ -51,10 +53,11 @@ plugin resource endpoints from the running AppHost's `aspire describe` `urls[].u
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | E2E subtree green; repo cleanup pending | slice 5 receipt |
-| Fitness | contribution/infrastructure checks green | slices 3-4 receipts |
+| Static | green; exact literal grep has only D-14 compatibility assertions | slice 6 receipt |
+| Fitness | green across contributions and generated host ports | slices 3-4, 6 receipts |
 | Runtime | CI deferred | S2 live receipts + future CI `scaffold.runtime` |
-| Consumer | sagas JSR baseline proven | slice 2 JSR evidence |
+| Consumer | sagas JSR baseline re-proven | slices 2 and 6 receipts |
+| Scaffold | `scaffold.plugins` 17/17 | slice 6 receipt |
 
 ## Open Questions
 
@@ -67,4 +70,5 @@ plugin resource endpoints from the running AppHost's `aspire describe` `urls[].u
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- Slices 1-5: `e83659d78`, `24817a404`, `aae91586b`, `8aee17462`, `732337435`.
+- Slice 6 is ready to commit; see the draft PR's per-slice comments for the evidence trail.
