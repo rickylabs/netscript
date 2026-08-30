@@ -330,8 +330,10 @@ jobs:
           path: |
             .llm/tmp/**/report*.json
             .llm/tmp/**/report*.ndjson
+            .llm/tmp/gate-receipts/scaffold-runtime/agent.aspire-mcp-smoke*
             **/e2e-report*.json
           if-no-files-found: ignore
+          retention-days: 30
 
   scaffold-runtime-sqlite:
     name: scaffold-runtime-sqlite (aspire + sqlite + garnet)
@@ -417,8 +419,10 @@ jobs:
           path: |
             .llm/tmp/**/report*.json
             .llm/tmp/**/report*.ndjson
+            .llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*
             **/e2e-report*.json
           if-no-files-found: ignore
+          retention-days: 30
 
   desktop-native-linux:
     name: desktop-native-linux (deb + signed updater)
