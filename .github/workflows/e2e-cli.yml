@@ -329,6 +329,7 @@ jobs:
             .llm/tmp/**/report*.json
             .llm/tmp/**/report*.ndjson
             **/e2e-report*.json
+            **/listener-unreachable-receipt.json
           if-no-files-found: ignore
 
   scaffold-runtime-sqlite:
@@ -414,6 +415,7 @@ jobs:
             .llm/tmp/**/report*.json
             .llm/tmp/**/report*.ndjson
             **/e2e-report*.json
+            **/listener-unreachable-receipt.json
           if-no-files-found: ignore
 
   desktop-native-linux:
