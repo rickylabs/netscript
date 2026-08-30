@@ -269,4 +269,7 @@ human-only. Supervisor obligation: hand over any **exact-green** candidate (exec
 at the exact head, close-gate satisfied, stack below it landed) and continue without waiting for
 merge completion. Current exact-green candidates: **none** (S2 #1735 unchanged CLEAN but its runtime
 verdict predates #1734 handling — coordinator's call; S4/S5 owe runtime at exact head per the audit;
-S6/S8/S9 stacked + Phase B blocked). |
+S6/S8/S9 stacked + Phase B blocked). | | S9 IMPL-EVAL cycle 2 | `PASS`, `FAIL`, `N/A`,
+`PENDING_SCRIPT`, `DEBT at`f6ca9695`(session`b8a63574…`); F-1/F-2 closed; F-3b/F-4b low →
+pre-Phase-B slice (D-48). Non-mutation verified. docs_audit cycle 2 pending. S10 dispatched (below).
+|

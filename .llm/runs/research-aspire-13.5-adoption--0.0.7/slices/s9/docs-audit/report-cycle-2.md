@@ -1,0 +1,74 @@
+**[PHASE: DOCS-AUDIT cycle 2]**
+
+Head SHA: `f6ca9695e3215cc4c0789d44cffc7d11a472e22d`
+
+# S9 Aspire skill prose audit — cycle 2
+
+Independent opposite-family cycle-2 docs audit over the S9 skill prose fixes in
+`4af21ddf..f6ca9695`. This is not an IMPL-EVAL verdict and does not certify the slice. The audited
+worktree was detached and clean; `aspire ps --format Json --non-interactive --nologo` returned `[]`
+before and after the pass. No AppHost or container was started, and `e2e:cli` was not run.
+
+## Cycle-1 finding disposition
+
+| Cycle-1 item | Severity | Status | Claim / file:line | Evidence | Required change |
+| --- | --- | --- | --- | --- | --- |
+| H1 | high | **CLOSED** | The blanket 13.5.3 certification was too broad. `skills/aspire/SKILL.md:11-15` now limits re-verification to statements explicitly tagged with an S2/S9 key and says the remaining operational guidance is not blanket-certified. | Whole-file review plus `git diff e11de98d..f6ca9695`; export behavior and search grammar are now explicitly described as not reverified at `skills/aspire/SKILL.md:195-203`. | None. |
+| M1 | medium | **CLOSED** | Detached-dashboard prose overstated S2-V4. `skills/aspire/SKILL.md:123-127` now claims only the observed bare `aspire otel logs` exit 12 and successful explicit-URL retry. | S2-V4: `02-v4-otel-bare.raw.txt` and `02-v4-otel-explicit.json`; the unsupported export and HTTP-200 claims were removed. | None. |
+| M2 | medium | **OPEN** | The replacement timing prose at `skills/aspire/SKILL.md:186-188` correctly uses 38.62s, 24.80s, and 13.065s as bounded 13.5.3 observations, but the exact S2-V9 evidence entry at `skills/aspire/SKILL.md:295-296` names only `03-v9-aspire-restore.raw.txt`. That raw receipt does not contain the elapsed time. | S2-V2 `02-runtime-lifecycle.md` supports the two start timings. On the S2 branch, `03-v9-aspire-restore.raw.txt` contains restore console output but no elapsed value; sibling receipt `03-v9-aspire-restore.time.txt` contains `elapsed_ms: 13065`. Although S2-MATRIX summarizes 13.065s, the claim's exact S2-V9 key does not link the timing receipt. | Add `03-v9-aspire-restore.time.txt` to the S2-V9 evidence entry, or remove the exact 13.065-second claim. |
+| M3 | medium | **CLOSED** | `skills/help.md:25-27` now describes empty `healthReports` as an object. | S2 describe/resource receipts use `{}`; canonical, embedded, and consumer help copies are byte-equivalent. | None. |
+| M4 | medium | **CLOSED** | The TypeScript API-doc command at `skills/aspire/SKILL.md:44` now uses the dedicated S9-DOCS-API-HELP key. | `skills/aspire/SKILL.md:309-310` names committed `aspire-13.5.3-docs-api-search-help.json`; the receipt and live 13.5.3 help expose `aspire docs api search` and `--language`. | None. |
+| L1 | low | **CLOSED** | Dashboard-only MCP startup is now documented at `skills/aspire/SKILL.md:207-210`. | The prose uses `aspire agent mcp --dashboard-url <dashboard-url>` and makes `--api-key` conditional; S9-AGENT-MCP-HELP and live 13.5.3 help expose both options. Scoped scans found no obsolete `aspire mcp start`. | None. |
+| New overclaim scan | info | **CLOSED** | No new unsupported behavioral assertion was introduced by the cycle-2 fixes beyond M2's incomplete exact-receipt link. | Whole-file canonical/mirror review, S2/S9 receipt reads, live non-runtime help sampling, wording scans, and generated-copy comparisons. | None beyond M2. |
+
+## Required checks
+
+1. **FAIL — Exact S2/S9 receipt support.** H1, M1, M3, M4, and L1 are repaired, and every named
+   evidence path exists. The exact 13.065-second restore observation is still not supported by the
+   path named under its S2-V9 key: the named `.raw.txt` has no duration, while the unmentioned
+   `.time.txt` contains `elapsed_ms: 13065`.
+2. **PASS — MCP startup and dashboard-only form.** `skills/aspire/SKILL.md:207-210` uses
+   `aspire agent mcp` and `aspire agent mcp --dashboard-url <dashboard-url>`, with optional
+   `--api-key`. Scoped canonical, mirror, embedded, and consumer scans found zero active
+   `aspire mcp start` occurrences.
+3. **PASS — Required command coverage without overstatement.** The prose covers
+   `aspire resources`, scoped `stop --force`, orphan cleanup, OTEL exit code 12,
+   `aspire doctor --format Json`, OTEL logs/spans/traces, and
+   `aspire docs api search <query> --language typescript`. The former export/HTTP-200 and broad
+   search/export assertions have been removed or qualified, and non-runtime 13.5.3 help sampling
+   confirms the command/options surface.
+4. **PASS — Locked 15 tools versus observed 14.** `skills/aspire/SKILL.md:212-228` truthfully lists
+   the 14 observed tools and separately says the locked 15-tool contract expects
+   `get_integration_docs`. The S9 receipt records 15 expected, 14 observed, and only
+   `get_integration_docs` missing; no prose claims that tool was observed.
+5. **PASS — Generated meaning and active version claims.** SHA-256 is identical for canonical,
+   `.agents`, `.claude`, and both consumer Aspire copies
+   (`11f5e225fad844e1b6078cdb15c797bc89275bb70ec5b09e2686c3a976c7003f`). Canonical and both
+   consumer help copies share
+   `0e021232441ebeefddfb3fc23f492870e422ce304de244b3f9c6d6dd6bf4ced9`. Decoding
+   `EMBEDDED_SKILL_FILES` shows embedded Aspire/help exact-equal to canonical. Scoped active prose
+   has zero `13.4.6` claims and zero obsolete MCP-start forms; archival manifest rows remain out of
+   scope.
+6. **PASS — NetScript/upstream skill separation.** Both consumer families contain distinct
+   `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and `aspire-deployment` skills. Their
+   frontmatter names are distinct, their `.agents`/`.claude` counterparts agree, and none is equal
+   to NetScript's diagnostic `aspire` skill.
+
+## Gate log
+
+| Gate | Command(s) | Scope | Result | Evidence / findings | Proceeded |
+| --- | --- | --- | --- | --- | --- |
+| `deno task docs:links` | `deno task docs:links` | Repository docs links, anchors, and orphan report | **PASS** | 103 docs; 0 broken links; 0 broken anchors; 0 orphans; exit 0. | Continued audit. |
+| Site build (Lume) clean | `deno task build` from `docs/site` | Source formatting, full Lume render, rendered-output checks | **PASS** | 638 files generated; source format and rendered output OK; exit 0. The existing workspace-membership warnings were non-fatal. | Continued audit. |
+| Internal-wording grep | `git diff --unified=0 e11de98d f6ca9695 -- <canonical prose/template>` plus focused `rg` | Added canonical skill/help and guidance-template prose | **PASS** | No issue/PR-number leakage. Required S2/S9 evidence identifiers and receipt paths were retained. | Continued audit. |
+| Versionless-specifier scan | Focused added-line and decoded-surface scans | Canonical, mirrors, embedded asset, consumer snapshots | **PASS** | No new bare pinnable `jsr:@netscript/*` install/import specifier. | Continued audit. |
+| Command/API accuracy sampling | Aspire 13.5.3 `--help` reads for root, resources, stop, logs, OTEL logs/spans/traces, export, doctor, docs/API search, agent MCP, legacy MCP; S2/S9 receipt reads | Every command family relevant to the six checks | **FAIL** | Live non-runtime CLI surface agrees with the corrected commands, but the exact S2-V9 evidence link does not support the claimed 13.065-second duration. | Flagged M2 for correction. |
+| Template ↔ generated drift | `sha256sum` across canonical/mirrors/consumer copies; decoded `EMBEDDED_SKILL_FILES` exact-string comparison | Canonical Aspire/help, `.agents`, `.claude`, embedded asset, both consumer families | **PASS** | All Aspire copies share one hash; help copies share one hash; embedded Aspire/help equal canonical exactly. | Continued audit. |
+| Nav / front-matter wiring | Direct scope inspection | Skill files and generated consumer bundle; no site pages added | **PASS** | Aspire frontmatter is preserved; nav wiring is not applicable to this skill-only prose slice. | Continued audit. |
+| Prose-quality pass | Whole-file read of `skills/aspire/SKILL.md` and `skills/help.md`, with generated copies | Complete cycle-2 S9 prose | **FAIL** | The substantive prose is narrowed and clear, but the S2-V9 annotation still directs the exact timing claim to a receipt that lacks the timing datum. | Flagged M2 for correction. |
+| Cross-page contradiction check | Canonical/help comparison plus S2 describe/resource receipts | `skills/aspire/SKILL.md` ↔ `skills/help.md` and generated copies | **PASS** | Both canonical surfaces now use the object shape for empty `healthReports`; generated copies preserve it. | Continued audit. |
+
+This is a second consecutive docs-audit `FAIL_FIX`; the harness supervisor must disposition or
+escalate the remaining exact-receipt-link defect before further evaluator cycling.
+
+AUDIT: FAIL_FIX

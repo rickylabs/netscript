@@ -878,3 +878,20 @@
   already in that turn (M4). F-2/F-3/F-4 are sent on the same thread as soon as that turn completes
   (no writer cut), as one narrow code slice with a fixture test. Then docs_audit cycle 2
   - IMPL-EVAL cycle 2 (scoped re-eval) at the fixed head. Two-failure escalation rule applies.
+
+## D-48 — 2026-08-30 — S9 IMPL-EVAL cycle 2 at `f6ca9695`: `PASS`, `FAIL`, `N/A`, `PENDING_SCRIPT`, `DEBT; two low residuals become pre-Phase-B conditions
+
+- Independent Claude · Fable 5 · medium session `b8a63574…` (`slices/s9/evaluate-cycle-2.md`; PR
+  #1759 comment 5468684689). F-1/F-2 closed (citation → real `docs-api-search-help` receipt; failure
+  receipt now persists the observed tool surface, fixture-tested); regression gates all green (184/0
+  e2e, 29/0 agent-init, `13.4.6` grep 0, mirrors/corpus/dogfood clean). Non-mutation verified by the
+  supervisor (eval worktree clean, branch/PR/labels unchanged).
+- **Residuals (low, required before Phase B, not blocking Phase A):** **F-3b** only the outer
+  `command-gate` budget was raised to 140 s while `.llm/tools/gates/run-aspire-mcp-smoke.ts:53`
+  still passes `--timeout-ms 120000` to `run-gate.ts` (== inner `wholeGateMs`) — the partial receipt
+  can still be killed at the whole-deadline edge; **F-4b** `stdio-transport.ts:77` hard-codes
+  `items: []`, so `entryCount` is always 0 and the fix comment overclaims "records entryCount"; no
+  receipt holds a real 13.5.3 `list_structured_logs` response.
+- **Routing:** F-3b/F-4b fold into the **pre-Phase-B slice** on the same S9 thread together with the
+  D-45 contract amendment once the coordinator rules — one narrow commit, then a scoped re-check.
+  docs_audit cycle 2 (same audit thread) is still running at `f6ca9695`.
