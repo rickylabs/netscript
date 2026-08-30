@@ -76,3 +76,19 @@ Drift is append-only.
   mirrored files. No source skill, workflow, launcher, or evaluator artifact was edited. The S4
   format accounting names all 10 changed files while excluding the two byte-mirrored generated files
   from the eight-file authored-source receipt, as required by the repo tooling format policy.
+
+## 2026-08-30 — Scoped Claude lint is excluded by root configuration
+
+- **What:** The planned structured lint over `.llm/tools/agentic/claude` exited 2 with an
+  `all-excluded` coverage refusal because `deno.json` excludes all `.llm/**` files from lint.
+- **Source:** Structured wrapper output selected 23 files, processed zero, and listed the root lint
+  exclusion. An explicit minimal-config diagnostic processed all 23 and found three existing issues:
+  two `require-await` findings in `hybrid-launcher_test.ts` and one `no-control-regex` finding in
+  `remote-model-launcher.ts`.
+- **Expected:** The plan treated the directory-wide wrapper as a zero-finding verdict source.
+- **Actual:** That invocation cannot be a verdict on this base. The same structured wrapper with the
+  explicit config processed the three changed TypeScript files and exited 0 with zero findings.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Root-config raw exit 2; full-directory diagnostic raw exit 1; changed-source lint
+  raw exit 0, 3 selected / 3 processed / 0 findings. The unrelated launcher files remain untouched.

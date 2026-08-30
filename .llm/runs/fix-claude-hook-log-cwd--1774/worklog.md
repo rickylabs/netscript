@@ -101,6 +101,9 @@ a new cwd/worktree case without changing production code.
 | 2026-08-30 | S3        | Boundary     | Committed/pushed RED at `f8e6ad0c9`; posted slice evidence and retained draft PR with `status:impl`.                      |
 | 2026-08-30 | S4        | GREEN repair | Applied exec-form launch-root commands/output and exact permissions; unchanged fixture passes 9/9.                        |
 | 2026-08-30 | S4        | Gate drift   | Aggregate Claude gate exposed two stale generated skill mirrors; canonical sync reconciled them and rerun passed.         |
+| 2026-08-30 | S4        | Boundary     | Committed/pushed repair at `ba04b0387`; posted slice evidence and retained draft PR with `status:impl`.                   |
+| 2026-08-30 | S5        | Gates        | Focused 24/24, check 23 files, changed lint 3 files, Claude gates, no-`any`, fallback, and root 4,284/4,284 passed.       |
+| 2026-08-30 | S5        | Lint drift   | Root config excluded all `.llm` lint; override exposed three unrelated baseline findings, while changed TS is clean.      |
 
 ## Decisions
 
@@ -121,6 +124,7 @@ a new cwd/worktree case without changing production code.
 | Active-worktree premise corrected to launch root   | significant | yes                |
 | Fetched `origin/main` moved but hook surface inert | minor       | yes                |
 | Mandatory gate found stale generated skill mirrors | minor       | yes                |
+| Scoped Claude lint excluded with baseline findings | minor       | yes                |
 
 ## Gate Results
 
@@ -134,31 +138,42 @@ a new cwd/worktree case without changing production code.
 
 ### Static Gates
 
-| Gate                   | Command or check                       | Result  | Notes                                                           |
-| ---------------------- | -------------------------------------- | ------- | --------------------------------------------------------------- |
-| Focused RED fixture    | Structured test wrapper                | RED     | S3 exit 1; 7 passed, 2 nested-event failures.                   |
-| Focused GREEN fixture  | Same unchanged structured test         | PASS    | S4 exit 0; 9 passed, 0 failed; fixture blob unchanged.          |
-| Decoy assertions       | Focused child-process cases            | PASS    | RED marker/73; GREEN marker absent + launch-root record.        |
-| S3 changed-file format | Structured fmt wrapper                 | PASS    | Exit 0; 5 selected / 5 processed / 0 findings.                  |
-| S4 changed-file format | Structured fmt wrapper                 | PASS    | 10 changed counted; 8 authored processed, 2 generated excluded. |
-| Check/lint/root test   | Structured wrappers/tasks in `plan.md` | NOT_RUN | S5 final gate set.                                              |
+| Gate                   | Command or check                    | Result   | Notes                                                            |
+| ---------------------- | ----------------------------------- | -------- | ---------------------------------------------------------------- |
+| Focused RED fixture    | Structured test wrapper             | RED      | S3 exit 1; 7 passed, 2 nested-event failures.                    |
+| Focused GREEN fixture  | Same unchanged structured test      | PASS     | S4 exit 0; 9 passed, 0 failed; fixture blob unchanged.           |
+| Decoy assertions       | Focused child-process cases         | PASS     | RED marker/73; GREEN marker absent + launch-root record.         |
+| S3 changed-file format | Structured fmt wrapper              | PASS     | Exit 0; 5 selected / 5 processed / 0 findings.                   |
+| S4 changed-file format | Structured fmt wrapper              | PASS     | 10 changed counted; 8 authored processed, 2 generated excluded.  |
+| Focused hook/launchers | Structured test wrapper             | PASS     | Exit 0; 24 passed / 0 failed.                                    |
+| Scoped type check      | Structured check wrapper            | PASS     | Exit 0; 23 selected / 0 findings.                                |
+| Root-config lint       | Structured lint wrapper             | REFUSED  | Exit 2; all 23 excluded by checked-in config.                    |
+| Full lint diagnostic   | Wrapper + minimal config            | BASELINE | Exit 1; 3 findings in two untouched launcher files.              |
+| Changed-TS lint        | Wrapper + minimal config            | PASS     | Exit 0; 3 selected / 3 processed / 0 findings.                   |
+| Root test              | `deno task test` structured wrapper | PASS     | Exit 0; 4,284 passed / 19 ignored / 0 failed.                    |
+| S5 cumulative format   | Structured fmt wrapper              | PASS     | 12 changed counted; 10 authored processed, 2 generated excluded. |
 
 ### Fitness Gates
 
-| Gate                              | Result  | Evidence                         | Notes                             |
-| --------------------------------- | ------- | -------------------------------- | --------------------------------- |
-| Claude surface validator          | PASS    | Public + JSON invocations exit 0 | Hook lock check and sync green.   |
-| No host path / permission minimum | PASS    | S4 unchanged fixture             | Exact six-file/config assertions. |
-| No `any`                          | NOT_RUN | S5 source scan planned           | Full owned surface after repair.  |
+| Gate                              | Result | Evidence                         | Notes                                  |
+| --------------------------------- | ------ | -------------------------------- | -------------------------------------- |
+| Claude surface validator          | PASS   | Public + JSON invocations exit 0 | Final S5 raw exits 0; lock/sync green. |
+| No host path / permission minimum | PASS   | S5 nine-case matrix exit 0       | Exact six-file/config assertions.      |
+| No `any`                          | PASS   | Explicit changed-TS scan exit 0  | Zero prohibited patterns.              |
 
 ### Runtime Gates
 
-| Gate                                 | Result  | Evidence                 | Notes                           |
-| ------------------------------------ | ------- | ------------------------ | ------------------------------- |
-| Actual launch-root child processes   | PASS    | S4 fixture: both events  | Exit 0 and launch-root record.  |
-| Actual nested-cwd child processes    | PASS    | S4 fixture: both events  | Exit 0 and launch-root record.  |
-| Reachable temp-decoy child processes | PASS    | S3 RED / S4 GREEN        | Marker+73 before; bypass after. |
-| Aspire/Docker/browser/scaffold       | NOT_RUN | Scope and lease boundary | Must remain not run.            |
+| Gate                                 | Result  | Evidence                    | Notes                           |
+| ------------------------------------ | ------- | --------------------------- | ------------------------------- |
+| Actual launch-root child processes   | PASS    | S4 fixture: both events     | Exit 0 and launch-root record.  |
+| Actual nested-cwd child processes    | PASS    | S4 fixture: both events     | Exit 0 and launch-root record.  |
+| Reachable temp-decoy child processes | PASS    | S3 RED / S4 GREEN           | Marker+73 before; bypass after. |
+| Direct cwd compatibility fallback    | PASS    | Direct task + record probes | Both raw exits 0.               |
+| Aspire                               | NOT_RUN | Lease boundary              | No command or process launched. |
+| Docker                               | NOT_RUN | Lease boundary              | No command or process launched. |
+| Browser                              | NOT_RUN | Lease boundary              | No command or process launched. |
+| `e2e:cli`                            | NOT_RUN | Lease boundary              | No command or process launched. |
+| `scaffold.runtime`                   | NOT_RUN | Lease boundary              | No command or process launched. |
 
 ### Consumer Gates
 
@@ -171,4 +186,5 @@ a new cwd/worktree case without changing production code.
 - Cycle-2 PLAN-EVAL passed in the separate evaluator session; implementation is authorized.
 - S3 remains the independent pushed RED commit; its test blob is byte-identical under S4 GREEN.
 - #1776 owns the deferred `wslHome()` `/home/codex` launcher defect for milestone 0.0.8.
+- S5 is ready for supervisor Tier-A review; IMPL-EVAL remains separately dispatched.
 - Do not edit either evaluator-owned plan-eval file or launch/simulate IMPL-EVAL in this session.
