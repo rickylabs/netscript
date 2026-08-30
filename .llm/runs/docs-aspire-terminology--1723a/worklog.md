@@ -158,3 +158,118 @@ docs/site/orchestration-runtime/how-to/deploy-local-aspire.md:58:Aspire SDK vers
 $ git diff --check
 (no output; exit 0)
 ```
+
+## Implementation — S2 generated assets
+
+```text
+$ deno task gen:agent-docs-prose
+Docs source format: OK
+Site built into _site (638 files generated)
+Rendered output: OK (homepage semantics; 227 HTML files; 4 documented-syntax allowances)
+agent-docs provenance: sourceCommit=b835638e2, files=181,
+sha256=4da2f64a678bbe6c3c2ef0aac0c92552954a50c59a0428fde1e439b27c66686d
+exit 0
+
+$ deno task gen:assets-barrel
+Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+exit 0
+
+$ deno task gen:publish-assets
+Task gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts
+exit 0
+```
+
+Rewritten outputs: `.llm/assets/agent-docs/prose.json.gz`,
+`.llm/assets/agent-docs/provenance.json`,
+`packages/cli/src/kernel/assets/agent-docs.generated.ts`, and
+`packages/mcp/src/publish-assets.generated.ts`. Reconcile: all four are direct outputs of the
+unconditional generator sequence specified by the slice; no source implementation was edited.
+
+## Gate evidence
+
+All commands were run from the repository root at `c632850c` unless a scoped retry is shown.
+
+| Command | Exit | Decisive output |
+| --- | ---: | --- |
+| `deno task --cwd docs/site check:source-format` | 0 | `Docs source format: OK` |
+| `deno task --cwd docs/site build` | 0 | `Site built into _site` (638 files); `Rendered output: OK` (227 HTML files) |
+| `deno task --cwd docs/site check:links` | 0 | `35344 internal links across 227 pages — all resolve` |
+| `deno task --cwd docs/site check:caveats` | 0 | `18 caveat markers across 14 pages — all references resolve` |
+| `deno task --cwd docs/site diagrams:check` | 0 | after host-only Mermaid bootstrap: `rendered 16 diagram(s)`; `16 committed SVGs match Mermaid sources` |
+| `deno task docs:links` | 0 | `docs=103 broken-links=0 broken-anchors=0 orphans=0` |
+| `deno task docs:accuracy` | 0 | `docs accuracy: PASS` (199 published source pages; 181 shipped corpus files) |
+| `deno task doc:lint` | 1 | task contract error: `--root is required`; exact requested command is not a valid invocation on this base (D-5) |
+| `deno task doc:lint --root packages/cli --pretty` | 0 | 3 entrypoints; 0 private refs, missing JSDoc, or other errors |
+| `deno task doc:lint --root packages/mcp --pretty` | 1 | existing private-type-ref findings in `cli.ts` and `mod.ts`; the changed generated publish-assets file is not an entrypoint and all three combined child exits are 0 (D-5) |
+| `deno task check:agent-docs-prose` | 0 | `fresh: true`, `stalePaths: []`; source commit `b835638e2`; corpus SHA-256 `4da2f64a…c66686d` |
+| `deno task check:assets-barrel` | 0 | generator rerun followed by zero diff on all enumerated generated barrels |
+| `deno task check:publish-assets` | 0 | `gen:publish-assets --check` exited 0 |
+
+The first two diagram attempts failed on host prerequisites (root-owned npm cache, then absent
+Chromium/shared libraries/sandbox). The successful retry used Mermaid CLI 10.9.1 plus a temporary
+Chromium and extracted runtime libraries under `/tmp`; no repository source, lock, or cache file was
+changed. One run-owned 22,847,488-byte Chromium core dump was removed from `docs/site/core` after
+the gate completed.
+
+Final content assertions after gates:
+
+```text
+$ git grep -n '\.NET Aspire' -- docs/site README.md CONTRIBUTING.md | grep -v '_plan/'
+(no output)
+$ git grep -n 'https://learn.microsoft.com/dotnet/aspire/' -- docs/site README.md CONTRIBUTING.md | grep -v '_plan/'
+(no output)
+$ git grep -rniE 'ai.assistant' -- docs/site README.md
+(no output)
+$ git status --short
+?? .llm/runs/docs-aspire-terminology--1723a/codex-thread-ids.md
+```
+
+The untracked thread-id artifact pre-existed implementation and is supervisor-owned; it was left
+untouched and is not part of either slice.
+
+## 2026-08-30 — IMPL-EVAL `FAIL_FIX` repair
+
+S3 restores the AppHost contrast, adds the retroactive supervisor identity, and records D-7/D-8.
+S4 regenerates only the four derived assets. In the final two-commit repair pair, S3 is `HEAD^` and
+S4 is `HEAD`; the handoff reports their literal full SHAs. This relative notation keeps the
+committed ledger truthful because a Git commit cannot contain its own final SHA.
+
+| Command | Exit | Decisive output |
+| --- | ---: | --- |
+| `deno task --cwd docs/site check:source-format` | 0 | `Docs source format: OK` |
+| `deno task --cwd docs/site build` | 0 | 638 files generated; rendered output OK across 227 HTML files |
+| `deno task --cwd docs/site check:links` | 0 | 35,344 internal links across 227 pages all resolve |
+| `deno task --cwd docs/site check:caveats` | 0 | 18 caveat markers across 14 pages all resolve |
+| `deno task docs:links` | 0 | 103 docs; zero broken links, anchors, or orphans |
+| `deno task docs:accuracy` | 0 | `docs accuracy: PASS` across 199 published pages and 181 corpus files |
+| `deno task docs:snippets` | 0 | `docs snippets: PASS`; 581 scanned, zero malformed |
+| `deno task docs:exports-drift` | 0 | `Exports & Symbols drift check: PASS` |
+| `deno task check:agent-docs-prose` | 0 | `fresh: true`, `stalePaths: []`; source commit is S3 |
+| `deno task check:assets-barrel` | 0 | generator completed and scoped `git diff --exit-code` stayed clean |
+| `deno task check:publish-assets` | 0 | publish-assets `--check` completed with no stale paths |
+| `deno task check:mcp-export-corpus` | 0 | schema 1 corpus emitted; 35 packages, 270 subpaths, 7,614 symbols |
+| `deno check --unstable-kv packages/cli/src/kernel/assets/agent-docs.generated.ts packages/mcp/src/publish-assets.generated.ts` | 0 | both generated modules checked |
+
+`diagrams:check` is not required for this repair delta: no `.mmd` or SVG changes were made. Root
+`fmt:check` and `lint` do not govern the changed Markdown/run artifacts or these generated outputs;
+the mutating root `deno task fmt` was not run.
+
+Final invariant checks:
+
+```text
+$ git grep -n '\.NET Aspire' -- . ':!docs/site/_plan' ':!.llm'
+.agents/docs/README.md:56:  aspire/                # .NET Aspire integration
+packages/aspire/README.md:11:Orchestrating a polyglot workspace with .NET Aspire usually means writing against the Aspire SDK
+resources/design/dashboard/reference/dashboard-design--orchestrator/design-prompts/01-shell-ia-routing.md:5:framework — a satellite that orbits the .NET Aspire dashboard (infra/telemetry) and Scalar
+
+$ git grep -n '13\.4\.6' -- docs/site/explanation/aspire.md docs/site/orchestration-runtime/how-to/deploy-local-aspire.md
+docs/site/explanation/aspire.md:83:    code: "{... \"sdk\": { \"version\": \"13.4.6\" } ... \"Aspire.Hosting.PostgreSQL\": \"13.4.6\" ...}"
+docs/site/orchestration-runtime/how-to/deploy-local-aspire.md:58:Aspire SDK version `13.4.6`. The graph inside the AppHost is **derived from your installed
+
+$ git status --porcelain
+?? .llm/runs/docs-aspire-terminology--1723a/codex-thread-ids.md
+?? .llm/runs/docs-aspire-terminology--1723a/impl-eval.md
+```
+
+The two untracked files are the protected evaluator evidence named in the repair brief. No generated
+asset drift or unexpected product file remains, and `deno.lock` is unchanged.

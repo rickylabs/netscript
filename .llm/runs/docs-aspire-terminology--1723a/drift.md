@@ -31,3 +31,43 @@ The implementation brief says “18 occurrences, 14 files,” but its enumerated
 required pre-edit `git grep` both resolve to 18 occurrences across 13 files. `CONTRIBUTING.md` has no
 matching occurrence, as already established in `research.md` §3. The enumerated occurrences remain
 the authority; no extra row was inferred or edited to manufacture a fourteenth file.
+
+## D-5 · Bare `doc:lint` command is invalid on this base
+
+The requested `deno task doc:lint` invocation exits 1 before linting because the checked-in task
+requires `--root`. Its usage text names `--root <path>` as required; the root task does not provide
+a repository-wide default. The relevant generated package surface was therefore checked explicitly:
+`packages/cli` passes across all three exports. `packages/mcp` reports existing private-type-ref
+findings in `cli.ts` and `mod.ts`; this leaf changes only `publish-assets.generated.ts`, which is not
+an entrypoint, and the wrapper reports combined child exit 0 for all three MCP entrypoints. The exact
+bare-command failure and both scoped outputs are preserved in `worklog.md` for Tier-A classification.
+
+## D-6 · Diagram gate required host-only bootstrap
+
+The first `diagrams:check` attempt could not use the root-owned npm cache. A task-specific cache made
+the pinned Mermaid CLI available, after which the host lacked Chromium and its shared libraries and
+did not provide a usable Chromium sandbox. The successful retry used Mermaid CLI 10.9.1, a temporary
+Chromium revision 1108766, extracted Debian runtime libraries, and a temporary `--no-sandbox`
+launcher. All 16 SVGs byte-matched. No repository file or lock changed; a Chromium core dump created
+by the failed launch was removed after ownership was verified.
+
+## D-7 · The terminology sweep dropped a necessary AppHost contrast
+
+Recorded after IMPL-EVAL. Removing “.NET” from `docs/site/explanation/aspire.md:100-101` left the
+sentence saying the facts “contradict assumptions people carry from Aspire,” which no longer named
+the experience being contrasted and read as a near-tautology on the Aspire explanation page. This
+was a real contrast regression, not a terminology exception: the isolated TypeScript/Node runtime
+and derived graph are contrasted with Aspire's .NET AppHost. The repaired wording is “assumptions
+people carry from Aspire's .NET AppHost.”
+
+`git grep -n '\.NET Aspire' -- . ':!docs/site/_plan' ':!.llm'` still returns exactly the three
+pre-existing hits (`.agents/docs/README.md:56`, `packages/aspire/README.md:11`, and
+`resources/design/dashboard/reference/dashboard-design--orchestrator/design-prompts/01-shell-ia-routing.md:5`),
+proving the repair introduced no new “.NET Aspire” occurrence.
+
+## D-8 · `supervisor.md` was added after implementation
+
+At IMPL-EVAL time this run directory had no `supervisor.md`, which
+`.llm/harness/workflow/lane-policy.md:250` classes as an un-activated run. The file was added
+retroactively in S3 with the identity transcribed from the supervisor. It was added after
+implementation, not at run start; this entry does not backdate activation.
