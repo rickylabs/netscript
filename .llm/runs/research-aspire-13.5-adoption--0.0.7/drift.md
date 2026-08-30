@@ -1289,3 +1289,30 @@
 - **#1736 (fix for #1734)** is parked at `069913e7` after a **third consecutive `FAIL_FIX`** ("owner
   decision required"). Every S1/S4/S5 runtime verdict and every CI `scaffold-runtime` run at any
   Aspire head is pre-runtime-red on that baseline until an owner disposition exists.
+
+## D-68 — 2026-08-30 — Off-host runtime-proof ref built and validated; push blocked by the PAT's missing `workflow` scope
+
+- **Proof ref (evidence-only, never a merge head):** `origin/main` `2a65a8cd` + S1
+  `chore/aspire-13-5-s1-pin-bump` (`ee379457`, 13.5.3 pins incl. the CI `ASPIRE_CLI_VERSION`
+  bumps) + #1736 `069913e7` (disputed hydration fix, used only to get past the pre-runtime
+  `generated.quality-negative` red) + S10′ `a46ea16d` (carries S5′/S6′/S8′) + S3′ `85bd4967` + S7′
+  `2f721bf3` + S9′ `d81a8fe1` (one mechanical conflict in `cli-surface.ts`: both S9 and S10 register
+  a runtime gate id — both kept; suite order = MCP smoke after wait/describe, resource-command
+  before cleanup). S13 excluded (conflicts with S1's parity tool — needs S1 landed); S11 excluded
+  (docs). Local head **`f5b8d89e9`**, tagged `aspire-13-5-runtime-proof` in the shared object store;
+  validation: scoped `deno check` 0 diagnostics, e2e tests **200/0**, `check:aspire-host-ports` /
+  `check:emitted-samples` / `check:mcp-export-corpus` exit 0, `.github/workflows/e2e-cli.yml` pins
+  13.5.3 on this ref, hydration fix present.
+- **Blocker:** `git push origin f5b8d89e9:refs/heads/ci/aspire-13-5-runtime-proof` →
+  `refusing to allow a Personal Access Token to create or update workflow
+  .github/workflows/e2e-cli.yml without workflow scope`
+  (token scopes: `repo` only). The ref cannot omit the workflow changes: without S1's CI pin, CI
+  runs Aspire 13.4.6 against a 13.5.3 scaffold (known runtime mixing failure) and S9's D-12 receipt
+  would be a 13.4.6 receipt.
+- **Fastest unblock (owner, one line, ~1 min):** `gh auth refresh -h github.com -s workflow` (or any
+  `workflow`-scoped credential) — then the supervisor pushes the tag and dispatches
+  `gh workflow run e2e-cli.yml --ref ci/aspire-13-5-runtime-proof`, keeping the run id as the
+  evidence-only receipt for S9/S10 (and S5/S6/S8 gates) Phase B; exact-merge-head verdicts are
+  re-earned later per D-41/D-58. Alternative: the owner pushes the commit directly
+  (`git push origin aspire-13-5-runtime-proof:refs/heads/ci/aspire-13-5-runtime-proof` from any
+  worktree of this repo — the objects are already in the shared store).

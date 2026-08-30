@@ -427,4 +427,7 @@ cycle 1 | **`PASS`** at `d3f71c0b` (session `b03fc914…`); non-mutation verifie
 retargets, S1/S9/S11 landing for the parity flip). | | Owner priority — convergence critical path |
 D-55 probes re-run: still failing (entries=0; curl exit 7). Main `2a65a8cd` inert. #1736 third
 FAIL_FIX → owner decision. Preparing: off-host runtime-proof ref feasibility, D-58 retarget
-playbook, dispatch capability check (D-67). |
+playbook, dispatch capability check (D-67). | | Off-host proof ref | Built + validated at
+`f5b8d89e9` (local tag `aspire-13-5-runtime-proof`); push refused for missing `workflow` scope
+(D-68). Owner unblock: `gh auth refresh -s workflow` or push the tag; then dispatch `e2e-cli.yml`.
+D-58 playbook written (`retarget-playbook-d58.md`). |
