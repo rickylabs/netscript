@@ -5149,3 +5149,31 @@ is a decision for the S1/S2 boundary, not a mid-slice interruption.
 
 #1764 remains parked and untouched at the owner boundary; `24f6642f` is inert for it too. Its standing
 obligation to integrate from `f8b4f804` before merge is unchanged and unaffected.
+
+### #1357 false stall alarm — my monitor threshold, not a worker failure
+
+My first monitor declared `STALLED` after three 30-second zero-growth samples. That was wrong: the
+worker was inside a long high-effort reasoning block. During the diagnosis itself the rollout advanced
+`9,614,761 → 9,817,827` (+203 KB), and a further +42 KB over 45 s confirmed steady progress.
+
+Two things stopped me from acting destructively on the false alarm, both worth keeping:
+
+1. **The stale-sender eviction procedure did not apply and I checked before reaching for it.** That
+   procedure is for a *dead* thread — it requires `/proc/<ownerPid>` absent and the rollout ending on
+   `task_complete`. Here the owner PID was alive and there was no `task_complete`, so evicting the
+   record would have destroyed a live session on a threshold artifact.
+2. **The sanctioned repair refused, correctly.** `agentic:runtime repair codex-remote --dry-run`
+   returned `status: blocked / active_session: Codex remote repair refused because active sessions or
+   child commands were observed`. The tool's own probe saw the session that the status view could not.
+
+**Correction to what I reported earlier.** I said the thread's absence from `agentic:codex-status` was
+"listing lag". The sharper statement, now that two views disagree: `codex-status` and
+`agentic:runtime status --worktree` both report no identity for this worktree (`sessions: 0`,
+`MISSING_IDENTITY`), while the repair path's live probe positively observes the session. So the session
+is genuinely active and it is the *status/identity filter* that does not match sessions launched via
+`app-server-message-cli.ts`. That is a real observability gap in the suite — a lane watching only
+`codex-status` would conclude a healthy worker is dead, which is exactly the mistake I nearly made.
+Belongs in `.llm/tools/`, not a leaf.
+
+Monitor re-armed with a threshold matched to the workload: 60-second samples, stall declared only after
+8 consecutive minutes of zero growth. #1357 remains at `de57fab0`, 0 commits, clean tree, mid-S1.
