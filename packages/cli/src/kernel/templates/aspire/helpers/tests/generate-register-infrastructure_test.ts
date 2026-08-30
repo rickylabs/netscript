@@ -590,7 +590,10 @@ describe('generateRegisterInfrastructure', () => {
 
       assertStringIncludes(output, `builder.addParameter('${name}-password', {`)
       assertStringIncludes(output, `value: ensureDatabasePassword(appHostDir, '${name}')`)
-      assertStringIncludes(output, `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}('${name}', {`)
+      assertStringIncludes(
+        output,
+        `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}('${name}', {`,
+      )
       assertStringIncludes(output, `password: ${name}_password`)
     }
   })

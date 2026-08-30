@@ -78,9 +78,7 @@ export function generateRegisterInfrastructure(
   )
   const sdkValueImports = [
     ...(hasPersistentContainerDatabase ? ['ContainerLifetime'] : []),
-    ...(cacheEntries.some(([, entry]) =>
-        !['External', 'Local'].includes(entry.Mode ?? 'Container')
-      )
+    ...(cacheEntries.some(([, entry]) => !['External', 'Local'].includes(entry.Mode ?? 'Container'))
       ? ['EndpointProperty']
       : []),
   ]
@@ -100,13 +98,9 @@ export function generateRegisterInfrastructure(
       )
       ? ['ensureGarnetToolManifest']
       : []),
-    ...(usesDenoKvContainer
-      ? ['generateAccessToken as _generateAccessToken']
-      : []),
+    ...(usesDenoKvContainer ? ['generateAccessToken as _generateAccessToken'] : []),
     ...(usesResolvedDataPath(dbEntries, cacheEntries) ? ['resolveDataPath'] : []),
-    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto')
-      ? ['shouldUseContainerCache']
-      : []),
+    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto') ? ['shouldUseContainerCache'] : []),
   ]
 
   // Build database registration blocks
@@ -338,22 +332,22 @@ export function generateRegisterInfrastructure(
       __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
       __slot2__: String(
         sdkValueImports.length > 0
-          ? `import { ${sdkValueImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
+          ? `import { ${
+            sdkValueImports.join(', ')
+          } } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
           : '',
       ),
       __slot3__: String(
-        `import { ${compatImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
+        `import { ${
+          compatImports.join(', ')
+        } } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
       ),
       __slot4__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
       __slot5__: String(
-        dbBlocks.length > 0
-          ? dbBlocks.join('\n\n')
-          : '  // No databases configured',
+        dbBlocks.length > 0 ? dbBlocks.join('\n\n') : '  // No databases configured',
       ),
       __slot6__: String(
-        cacheBlocks.length > 0
-          ? cacheBlocks.join('\n\n')
-          : '  // No caches configured',
+        cacheBlocks.length > 0 ? cacheBlocks.join('\n\n') : '  // No caches configured',
       ),
       __slot7__: String(primaryDbLine),
       __slot8__: String(primaryCacheLine),
