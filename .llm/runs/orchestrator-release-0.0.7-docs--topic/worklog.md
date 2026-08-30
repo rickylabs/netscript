@@ -2802,3 +2802,28 @@ Re-verified immediately before dispatching the next slice: PR #1800 head
 MERGEABLE`, sole `status:ready-merge` on both PR #1800 and issue #1799, issue 4/4 boxes, both still
 `OPEN` awaiting the human owner's merge per NAS repository policy. No further action taken on this
 PR by this session; handed off.
+
+### #1801/PR #1803: auth-kv-oauth Path-column fix, exceptional-precision reason, GLM eval parked
+
+`auth-kv-oauth`'s reference page was a third distinct defect shape: the `## Sub-path exports` table
+already listed all 8 real entrypoints correctly, but had no Path column (`Export | Purpose` only) —
+the checker read the Purpose prose as the path, producing 7 "mismatching path" findings and 1 full
+"OMITS" finding for the one row (`/providers`) whose Purpose cell had an embedded code span that
+broke the row-matching regex outright.
+
+Codex's fix: added the Path column with real `deno.json` paths, rephrased the `/providers` row to
+remove the regex-breaking embedded backtick, and added an `AUTHORITATIVE_MAPPING` entry. Tier-A
+independently recomputed the full 8-entrypoint export union (80 real symbols) against everything
+documented anywhere on the page and found the claimed 56-symbol `entrypoints-only` gap list to be
+**exact**: 56/56 real, zero invented, zero false "already documented" claims, zero undercounts — the
+most precisely verified reason field in this cluster so far. All required gates green; acceptance-
+evidence box text matched the issue exactly (backticks included) on the first try.
+
+**GLM 5.3 Flash route still not provisioned**: reprobed `z-ai/glm-5.3-flash` against the hybrid-
+delegation allowlist — still rejected as not-approved. Per the owner's explicit instruction, this
+evaluation is **parked** (not run via any fallback, including DeepSeek) until #1792 lands; PR #1803
+stays at `status:impl` and this session moves to the next independent slice rather than blocking.
+
+Head at parking: `251890bcf3fae36def796c5d5471a73a93ea20dd`. Product/implementation is Tier-A PASS
+and ready for GLM evaluation as soon as the route is provisioned — no rework needed then, only the
+evaluation dispatch itself.
