@@ -5660,3 +5660,24 @@ self-taken, so I have started nothing and am requesting it rather than assuming 
 
 Two leaves are now one runtime gate from merge: **#1764** needs Flow-B, **#1781** needs
 `scaffold.runtime`. Serial order stands: #1764 → #1758 → #1739 → #1781.
+
+### #1764 head attribution audit (coordinator-issued, verified independently)
+
+Coordinator ruling: `product=c20cba7d4`, `exact runtime/PR carrier=5b526e4bc`; do not rewrite for SHA
+cosmetics. Confirmed exactly as stated: `diff --quiet c20cba7d4 5b526e4bc -- . ':!.llm/runs/*worklog.md'`
+is clean, the sole delta is the one worklog file documenting the merge itself.
+
+Also verified the accompanying main-advance claim: main is now `74e3d451e`, one commit ahead of the
+`9710a2898` this leaf integrated — and that commit is **`#1738`**, the exact PR I identified earlier
+this session as belonging to the Aspire lane (`epic:aspire-13-5`) and declined to adopt. Its own product
+diff is entirely `packages/cli/src/kernel/adapters/aspire/**`, `packages/config/**/aspire-schema.ts`,
+and the aspire helper template — zero intersection with #1764's 19 owned paths, confirmed by `comm`.
+Not re-integrated: correctly inert, and re-merging under a live Flow-B run in the same worktree would
+be actively harmful.
+
+Flow-B is running under the granted lease at the confirmed product head. First attempt failed at the
+CLI's own argument parser — `--isolated`/`--non-interactive` are not real flags on
+`packages/cli/e2e/cli.ts` (confirmed via `--help`: repo/cli/smoke-root/name/db/source/plugins/samples/
+cache/cleanup/format/report/log-file). Nothing started on that attempt — zero containers before and
+after. Re-launched with the flags the CLI actually accepts, plus `--report` to a durable receipt path
+under this leaf's own run dir, matching the documented AGENTS.md invocation.
