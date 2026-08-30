@@ -17,7 +17,7 @@
 | Field | Value |
 | --- | --- |
 | **Content head** | **`1c836918abde397b320941f70063d83f25f6c355`** — the tree all seven receipts attest |
-| **Evaluator carrier head** | **`899e30ad`** — `evaluate.md` only (cycle-2 verdict); `6977debd` likewise (cycle-1). **Zero product bytes** in either. |
+| **Evaluator carrier head** | **`899e30ad`** — the carrier bearing the cycle-2 verdict (`evaluate.md` only); `6977debd` likewise for cycle 1. **Zero product bytes** in either. **This is not the current PR head**: evidence-only carriers stack above it, so resolve the live head from GitHub rather than from this table. |
 | Tier-A | `ACCEPTED` at `1baabbd6` (S1–S4) and at `1c836918` (R1) — PR comments `5469233540`, `5469372450` |
 | IMPL-EVAL | cycle 1 `FAIL_FIX` (`6977debd`) → **cycle 2 `PASS`, terminal** (`899e30ad`); failure count 1 of 2 |
 | Receipts | **seven, cut and field-audited** at `1c836918`, `gitHead == actualGitHead`, distinct `requestHash` |
@@ -40,6 +40,12 @@ stacked above content head `1c836918`, and each is *proven* product-neutral rath
 is the price of the carry-forward and is restated here so a resumer does not mistake a moved PR head
 for moved content.
 
+**Three distinct roles, never interchangeable:** the **product head** (`1c836918`) is what the receipts
+and verdict certify; the **evaluator carrier** (`899e30ad`) is where the terminal verdict was written;
+the **current PR head** is whatever carrier is live now and advances with each evidence-only commit —
+including this one, which cannot name its own SHA. Any instruction to act on a specific head must say
+which role it means, and a merge instruction must resolve the live head from GitHub.
+
 ## In Progress
 
 **Nothing.** R1 is committed at `1c836918`, the seven named receipts are cut and field-audited at that
@@ -47,8 +53,10 @@ head, both Tier-A reviews are posted on PR #1763, and IMPL-EVAL cycle 2 returned
 
 ## Next Steps
 
-1. **Coordinator merge** of PR #1763 at carrier head `899e30ad` (content `1c836918`). Nothing in this
-   leaf blocks it.
+1. **Coordinator merge of PR #1763 at its current head** — resolve it live
+   (`gh pr view 1763 --json headRefOid`), never from a SHA written in this file. Its **product head is
+   `1c836918`** and the **evaluator carrier that bears the terminal verdict is `899e30ad`**. Nothing in
+   this leaf blocks the merge.
 2. After merge: `status:shipped` on PR and issue is the coordinator's close step.
 
 There is **no** outstanding implementation, receipt, gate or review work in this leaf. Any instruction
