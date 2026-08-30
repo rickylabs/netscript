@@ -38,3 +38,16 @@ The coordinator/evaluator must rule how the sanctioned oRPC slow-type baseline i
 named evidence set—for example, by a catalog-level allowlisted doc-lint wrapper or an explicit
 revision of the contracted gate. The implementation leaf will not silently weaken, rename, or omit
 `public-doc-lint`.
+
+## D-2 — NAS migration preserves the terminal receipt set before repair
+
+- Date: 2026-08-30
+- Slice: 1 — contracts vocabulary + builder soundness
+- Severity: operational
+- Status: checkpointed
+
+The current host is being replaced after the immutable implementation commit and receipt run but
+before the bounded repair and Tier-A sign-off. The eight exact-head JSON receipts are therefore
+committed and pushed even though three are terminal FAIL receipts. This is evidence preservation,
+not a gate waiver or self-certification. The NAS resume must regenerate the receipts after repair;
+it must not treat the preserved red set as current proof.

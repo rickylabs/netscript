@@ -60,6 +60,7 @@ add runtime interpretation in this slice family without the RFC-owned Stage 2 po
 | 2026-08-30 | slice 1           | Added the contracts metadata vocabulary, exact builder/route metadata typing, real-export fixtures, runtime storage proof, assertion budget, contracts-side doc-JSON independence proof, and public ownership/compatibility docs.                                                                                     | Slice content commit; final SHA recorded in the PR comment |
 | 2026-08-30 | slice 1 gate      | Focused structured check selected 26 files with zero diagnostics; contracts tests passed 14/14; scoped lint and TS format selected 26 files with zero findings. `quality:gate` and the separately contracted `arch:check` exited successfully. Contracts JSR audit reported only the sanctioned oRPC slow-types INFO. | Local gate output                                          |
 | 2026-08-30 | slice 1 gate      | Full-export contracts doc lint has zero missing JSDoc but exits 1 on 11 `private-type-ref` diagnostics from the sanctioned oRPC-bound surface. This makes the planned final `public-doc-lint` PASS receipt unsatisfiable without a ruled gate change.                                                                 | `drift.md` D-1                                             |
+| 2026-08-30 | migration freeze  | Preserved the exact-head eight-receipt set at `c9a391811`: five PASS receipts and three terminal FAIL receipts. The red receipts capture the SDK README doctest `BaseMeta` mismatch and public doc-lint private-type findings; they are durable evidence for the resumed bounded repair, not a green sign-off. | `receipts/*.json`; NAS recovery checkpoint commit          |
 
 ## Slice 1 gate results
 
@@ -78,3 +79,7 @@ add runtime interpretation in this slice family without the RFC-owned Stage 2 po
 The coordinator directed the complete eight-receipt set to be recorded at the committed slice head,
 including terminal red receipts. Receipt outcomes and sufficiency are recorded in the slice PR
 comment. No expensive gate was run.
+
+The host migration freezes this lane at the pushed receipt checkpoint. On the NAS, resume from the
+remote branch, retain the red evidence, apply only the already-bounded SDK/doctest and adapter-boundary
+repair, then regenerate exact-head receipts before Tier-A review and IMPL-EVAL.

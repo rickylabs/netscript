@@ -1,0 +1,36 @@
+{
+  "gateId": "check",
+  "invocationId": "1466-check-final",
+  "argv": [
+    "deno",
+    "task",
+    "check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1466",
+  "gitHead": "c9a391811a10d29c06eaf85d30d01fd342ebd47a",
+  "actualGitHead": "c9a391811a10d29c06eaf85d30d01fd342ebd47a",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1104389",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "aa12193d13cb8021095f96aa9b2ca34d126b692f7fdd1e602204175b5bee849f",
+  "lifecycleId": "worker:1104389:1466-check-final:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-29T23:16:31.843Z",
+  "startedAt": "2026-08-29T23:16:31.848Z",
+  "finishedAt": "2026-08-29T23:23:25.727Z",
+  "durationMs": 398591,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 545,
+    "sha256": "6633eb10b42b6b58fe6c3cd99239ee6cff73029062c611f438d3f2df62898b6e",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-features-1466\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2932,\"batches\":25,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":1,\"uniqueOccurrences\":1,\"uniqueCodes\":1,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'false' does not satisfy the constraint 'true'.\",\"count\":1,\"paths\":[{\"path\":\"/home/codex/repos/netscript-007-features-1466/packages/sdk/tests/readme-doctest_test.ts\",\"count\":1,\"locations\":[{\"line\":47,\"column\":43}]}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 192,
+    "sha256": "8e7cb67a36cfafde9a120b0109ba1f06cbe2c185d7d3fac8967000ed6e61dfec",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\n",
+    "truncated": false
+  }
+}
