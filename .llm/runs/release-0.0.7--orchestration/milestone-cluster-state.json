@@ -26,7 +26,7 @@
       "independentLanesContinue": true
     },
     "maintenanceRestart": {
-      "reconciledAt": "2026-08-30T08:34:27.000Z",
+      "reconciledAt": "2026-08-30T09:27:09.000Z",
       "pid1": "tini",
       "zombieCount": 0,
       "lifecycleSmoke": "13 passed / 0 failed: codex-follow_test.ts plus hybrid-launcher_test.ts",
@@ -34,13 +34,21 @@
       "dockerContainers": 0,
       "aspireApplications": 0,
       "dockerSandbox": {
-        "verifiedAt": "2026-08-30T09:20:00.000Z",
+        "verifiedAt": "2026-08-30T09:27:09.000Z",
         "host": "tcp://netscript-dind:2375",
-        "resolvedAddress": "10.4.12.16",
-        "clientVersion": "27.5.1",
-        "serverVersion": "27.5.1",
+        "resolvedAddress": "10.4.12.19",
+        "clientVersion": "28.5.2",
+        "serverVersion": "28.5.2",
         "state": "operational",
-        "aspireDoctorBelow28Disposition": "warning_only_not_a_dispatch_blocker"
+        "aspireDoctorBelow28Disposition": "resolved_by_sandbox_upgrade"
+      },
+      "inotifyQuota": {
+        "verifiedAt": "2026-08-30T09:27:09.000Z",
+        "maxUserInstances": 1024,
+        "maxUserWatches": 762026,
+        "state": "operational",
+        "watchRunProof": "watch-run.ts allocated successfully and reached its expected exit-2 heartbeat after two seconds",
+        "lifecycleProof": "codex-follow_test.ts plus hybrid-launcher_test.ts passed 13/13"
       },
       "supervisorDisposition": "five fresh Remote Control supervisors launched; pre-restart tmux sessions remain historical",
       "launcherDrift": "the documented extra task separator is currently forwarded to hybrid-launcher and rejected; successful launch omits that separator"
@@ -4620,14 +4628,14 @@
     },
     {
       "id": "aspire-13-5-s3-phase-b-runtime",
-      "state": "released_unused_inotify_blocked",
+      "state": "active",
       "lane": "aspire-research",
       "leafId": "aspire-13-5-s3-fixture-recapture",
       "gateId": "s3_phase_b_telemetry_capture",
       "preGateHead": "fe4f496bdcc605eceb9b3e5748ad55a7811bbed9",
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-30T09:00:07.000Z",
-      "scope": "one isolated Aspire 13.5.3 AppHost for the two S3 dashboard telemetry envelopes and Docker 27.5.1 remote-DinD compatibility probe; exact owned stop, leak-check, teardown, and zero Aspire/DinD postconditions mandatory",
+      "grantedAt": "2026-08-30T09:27:50.000Z",
+      "scope": "one isolated Aspire 13.5.3 AppHost for the two S3 dashboard telemetry envelopes against Docker 28.5.2 remote DinD; exact owned stop, leak-check, teardown, and zero Aspire/DinD/exact-process postconditions mandatory",
       "supervisorRoute": "Claude Fable 5 medium session 4e08fdff-708d-4d6b-8ba9-fded2fc292e3 with Remote Control",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s3",
       "preflight": {
@@ -4638,14 +4646,29 @@
         "otherLeaseOwners": 0
       },
       "cleanupRequired": true,
-      "releasedAt": "2026-08-30T09:02:00.000Z",
-      "verdict": "NOT_STARTED_INFRASTRUCTURE_BLOCKED",
-      "blocker": "shared kernel fs.inotify.max_user_instances=128 rejects new watchers; S6 restore and watch-run.ts reproduced the ceiling before S3 runtime dispatch",
+      "dispatchedAt": "2026-08-30T09:29:00.000Z",
+      "implementationThread": {
+        "threadId": "01a05200-345d-7ef0-bb18-30c4dacdaf4a",
+        "route": "gpt-5.6-sol/medium",
+        "routeVerdict": "matched",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s3",
+        "brief": "/home/agent/aspire-13-5-s3-phase-b-brief.md",
+        "staleEnvironmentCorrection": "same-thread steering queued before first runtime start: Docker 28.5.2 at 10.4.12.19 and inotify 1024 supersede generated brief literals"
+      },
+      "verdict": "RUNTIME_THREAD_ACTIVE",
+      "blocker": null,
+      "previousAttempt": {
+        "grantedAt": "2026-08-30T09:00:07.000Z",
+        "releasedAt": "2026-08-30T09:02:00.000Z",
+        "verdict": "NOT_STARTED_INFRASTRUCTURE_BLOCKED",
+        "blocker": "shared kernel fs.inotify.max_user_instances=128 rejected new watchers before runtime dispatch"
+      },
       "cleanup": {
         "aspirePostcondition": "empty",
         "dockerPostcondition": "empty",
         "survivors": 0,
-        "runtimeStarted": false
+        "runtimeStarted": false,
+        "state": "pending_after_runtime"
       }
     }
   ],
@@ -4775,12 +4798,12 @@
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
     "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 verified with zero containers; host Docker is outside agent authority",
     "aspireMcpHelpers": "not counted as AppHost runtimes; no Aspire applications are active",
-    "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD 27.5.1 remains an Aspire below-minimum warning",
-    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; no local runtime gate active",
+    "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD client/server 28.5.2; fs.inotify.max_user_instances 1024",
+    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; S3 Phase-B is the sole active runtime lease, with one matched-route Codex thread dispatched and no AppHost started at the checkpoint",
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-30T08:46:38.000Z"
+    "verifiedAt": "2026-08-30T09:30:39.000Z"
   },
-  "updatedAt": "2026-08-30T09:20:00.000Z"
+  "updatedAt": "2026-08-30T09:30:39.000Z"
 }

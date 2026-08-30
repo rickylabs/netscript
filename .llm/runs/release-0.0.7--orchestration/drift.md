@@ -1237,6 +1237,17 @@ implementation thread.
   liveness while preserving all active lanes. This is operational drift, not a product/evaluator
   failure and not permission to waive exact-head gates.
 
+### Resolution — 2026-08-30T09:27:09Z
+
+- Infrastructure raised and persisted `fs.inotify.max_user_instances` from 128 to 1024. A fresh
+  `watch-run.ts` invocation allocated successfully and reached its normal heartbeat timeout, while
+  the combined Codex-follow/hybrid-launcher lifecycle suite passed 13/13. Sparse polling is no
+  longer a quota workaround; supervisors must restore the prescribed event-driven watcher.
+- The DinD sandbox was independently upgraded to Docker client/server 28.5.2 and reset while empty.
+  Project mise resolves the same `tcp://netscript-dind:2375` authority at `10.4.12.19`; D-37 is
+  closed as infrastructure drift. This resolution authorizes Docker/Aspire-dependent dispatch but
+  does not relax serialized runtime leases or exact owned zero-state cleanup.
+
 ## 2026-08-30 — central validator passed despite stale live leaf reconciliation
 
 - `harness:milestone:validate` was green while #1731/#1736/#1743/#1747 heads were stale and live

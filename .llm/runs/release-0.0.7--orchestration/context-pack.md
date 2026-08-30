@@ -1323,10 +1323,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
   green, review-thread clean, ready/CLEAN, and await human merge. #1000 is normalized into 0.0.7;
   parent #1723 remains open and source-blocked until the Aspire implementation slices land.
 - Aspire S6 phase A is PASS; S8 static thread `01a051e6-90d4-7e50-a91e-ac4bd23b880c` is active.
-  S3 Phase B remains prepared but unstarted. PID 1 is tini, zombies 0, Aspire 0, DinD 0; inotify is
-  the only current host quota blocker for Phase B.
-- Owner infrastructure update re-proved `netscript-dind` at `10.4.12.16`, project mise
-  `DOCKER_HOST=tcp://netscript-dind:2375`, and responding client/server 27.5.1. The below-28 Aspire
-  doctor result is warning-only and must not block Docker/Aspire dispatch. A fresh focused lifecycle
-  smoke again passed 13/13 with tini and zero zombies; this correction was queued to all five
-  supervisors. Only the independent inotify-instance quota can hold Phase B.
+  The S3 Phase-B worktree remains clean and prepared at `fe4f496bd`. After a fresh exact zero-state
+  preflight, S3 received the sole serialized runtime lease and dispatched matched-route Codex thread
+  `01a05200-345d-7ef0-bb18-30c4dacdaf4a` (GPT-5.6-SOL/medium) in the existing worktree. The staged
+  brief retained obsolete Docker 27.5.1/address text; the supervisor has a same-thread correction
+  queued before first runtime start. S8 stays static and no other Phase-B runtime may overlap S3.
+- Owner infrastructure update 2 is locally re-proven: `netscript-dind` resolves at `10.4.12.19`,
+  project mise `DOCKER_HOST=tcp://netscript-dind:2375` responds with Docker client/server 28.5.2,
+  and `fs.inotify.max_user_instances=1024`. The D-37 version warning and watcher quota blocker are
+  resolved. `codex-follow_test.ts` plus `hybrid-launcher_test.ts` pass 13/13; `watch-run.ts` now
+  allocates and reaches its expected exit-2 heartbeat. This authority was sent to all five native
+  Remote Control supervisors. Immediately before the S3 lease, Aspire, DinD, exact Aspire/AppHost/
+  DCP processes, and other runtime leases were all zero.

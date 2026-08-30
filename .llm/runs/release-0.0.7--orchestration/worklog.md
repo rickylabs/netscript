@@ -2272,3 +2272,25 @@
   every formerly host-waived gate is rerun or truthfully reclassified from fresh evidence.
 - Aspire and DinD container counts remain zero. Phase-B remains parked only on the separately
   reproduced shared inotify-instance ceiling; Docker 27.5.1 is no longer an inferred blocker.
+
+## 2026-08-30T09:28:32Z — Docker 28 and inotify quota unblock lifecycle and S3 Phase B
+
+- Re-proved `netscript-dind -> 10.4.12.19`, project mise
+  `DOCKER_HOST=tcp://netscript-dind:2375`, Docker client/server 28.5.2, and zero DinD containers.
+  The Aspire D-37 below-28 warning is resolved rather than waived.
+- Re-proved `fs.inotify.max_user_instances=1024` and `max_user_watches=762026`. The formerly blocked
+  `codex-follow_test.ts` plus `hybrid-launcher_test.ts` lifecycle set passed 13/13, and
+  `watch-run.ts` allocated normally and reached its expected two-second heartbeat (exit 2).
+- Propagated the exact authority and rerun obligation to features, fixes, internals, docs, and the
+  Aspire Fable supervisor through their live native Remote Control sessions. Old prompt text that
+  mentions `aspire start` accounted for the broad process-match false positives; exact executable
+  inspection proved zero Aspire, AppHost, and DCP processes.
+- Fresh preflight proved PID 1 `tini`, zero zombies, `aspire ps []`, zero Docker containers, zero
+  exact runtime processes, and zero competing leases. Granted the sole serialized Phase-B lease to
+  prepared S3 worktree `/home/agent/projects/netscript/worktrees/007-aspire-s3` at `fe4f496bd`.
+  The Aspire supervisor dispatched matched-route Codex thread
+  `01a05200-345d-7ef0-bb18-30c4dacdaf4a` (GPT-5.6-SOL/medium); exact owned
+  stop/leak-check/teardown and Aspire/Docker/process zero are mandatory before release. S8 remains
+  static and independent. The generated prompt retained obsolete Docker 27.5.1/address literals,
+  so a same-thread environment correction was immediately queued before first runtime start; no
+  duplicate thread or retry was authorized.
