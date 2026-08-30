@@ -4,3 +4,4 @@
 [relay] postgres-b415ea7e 127.0.0.1:12229 => hopA relay-s7-phase-b-12229 (10.4.12.22:12229) => hopB 127.0.0.1:12229@ai-agents
 [relay] redis-mrecybvk 127.0.0.1:32780 => hopA relay-s7-phase-b-32780 (10.4.12.22:32780) => hopB 127.0.0.1:32780@ai-agents
 [relay] redis-cqkaeqwm 127.0.0.1:32781 => hopA relay-s7-phase-b-32781 (10.4.12.22:32781) => hopB 127.0.0.1:32781@ai-agents
+[relay] cleanup: closed 5 listener(s), removed 5 hop-A container(s)

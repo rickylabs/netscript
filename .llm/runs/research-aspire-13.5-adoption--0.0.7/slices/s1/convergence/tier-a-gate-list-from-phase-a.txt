@@ -1,0 +1,12 @@
+11:| `95680776e`                       | test(aspire): prove phase-1 parity detects the stale train | OK — RED-first: gate + 4 unit tests + committed RED receipt (`outcome: FAIL`, exactly the 7 S1-o
+12:| `4e30264fa`                       | chore(aspire): prove one atomic 13.5.3 train               | OK — every pin on 13.5.3; Browsers `13.5.3-preview.1.26425.3` (OF-2a); CommunityToolkit 13.5.0 (
+13:| `68b0aef87` (amended `5b42e92e1`) | docs(aspire): preserve preview debt and evaluator handoff  | OK — append-only debt entry `aspire-browsers-preview-1713` with a stable-drop gate; worklog/cont
+17:| Gate                                                                                                               | Result                                                                        
+19:| `run-deno-check.ts --root .llm/tools/validation --root packages/cli/src/kernel/constants`                          | 38 files, 0 diagnostics                                                       
+20:| raw `deno fmt --check` on the 7 touched TS/test files (wrappers exclude `.llm/tools` and `packages/cli` by config) | clean                                                                         
+21:| `deno test .llm/tools/validation/check-aspire-version-parity_test.ts`                                              | 4/4                                                                           
+22:| `deno task check:scaffold-versions`                                                                                | E-12 OK, 11 stable pins                                                       
+23:| `deno task check:aspire-version-parity`                                                                            | ok=true, fail 0, deferred 20, info 6, skipped 1, missing 66 (research-run path
+26:| `deno task quality:scan`                                                                                           | ok, 0 findings (7 pre-existing allowances)                                    
+27:| `deno task arch:check`                                                                                             | 3 pre-existing F-5/F-6 warnings, no new                                       
+28:| `deno task check:assets-barrel`                                                                                    | clean                                                                         

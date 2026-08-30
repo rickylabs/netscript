@@ -1504,3 +1504,22 @@
   `state`/`status` missing → pending, everything else optional, wrong types fail-closed,
   table-driven tests + the two CI shapes as fixture lines. Rebuild on the live proof head follows
   its push (no unchanged proof rerun).
+- **D-76 — main `52a881c58842` ships #1736/#1734; S1 convergence packet executed; S4/S5 released
+  from the #1734 park.** S1 #1727: four commits rebased onto exact main in a fresh worktree
+  (`3b32d1628..ee379457e` → `origin/main..38c3e9e181bf`, range-diff `=` 4/4, workflow tree unchanged
+  vs old head), pushed `--force-with-lease` pinned to `ee379457` (accepted — identical workflow
+  content is not a scope violation); **S1 head frozen `38c3e9e181bf`**, hosted `e2e-cli.yml` **run
+  33328727942** dispatched 18:40:11Z; focused Tier-A + cold/warm restore timing at the frozen head
+  in progress (`slices/s1/convergence/`); delta IMPL-EVAL follows. S4 #1738: 7 commits rebased
+  (`13878a80a` base → `b2a0529fa19b`, `=` 7/7, no workflow files), pinned push, **run 33328751758**.
+  **S5 #1740 — supervisor error, corrected:** the rebase of its 17 commits stopped at a conflict on
+  `581784ef0` ("finish literal-port cleanup and regenerate assets"); my chain misread the exit
+  status and force-pushed the partial head `0f3d24f6563a` and dispatched run 33328756425. Within ~1
+  min the branch was restored to the exact prior head `56bf42556` (pinned lease on the bad head; PR
+  #1740 head verified `56bf42556`), the run was cancelled, the partial rebase aborted. Redo with
+  regeneration-only conflict resolution follows. Rule added: a rebase chain must assert `git rebase`
+  exit 0 **and** an empty `git status` before any push. S7 Phase B runtime closed at exact zero
+  18:41:25Z (5 hop-A relays removed; thread in its static tail); lease → S8 (relay `s8-phase-b`,
+  thread `01a051e6…` resumed with `slices/s8/phase-b-brief.md`). S3 IMPL-EVAL cycle 3 (phase B) =
+  **FAIL_FIX** at `1611c5868` (`slices/s3/evaluate-cycle-3.md`, PR comment 18:41:28Z) — bounded fix
+  cycle to be routed to the S3 thread.
