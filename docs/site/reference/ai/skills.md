@@ -48,10 +48,10 @@ the first diagnostic command; Claude Code receives the same playbook in the deri
 re-running `netscript agent init` is idempotent. See
 [Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP combo.
 
-Upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`) may be installed beside NetScript's `aspire` diagnostic skill by explicit name, never overwriting `aspire/SKILL.md` (OF-1 (a)).
+Upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`) may be installed beside NetScript's `aspire` diagnostic skill by explicit name, never overwriting `aspire/SKILL.md`.
 
-For agents connecting to the Aspire MCP server (`aspire agent mcp`), Aspire 13.5.3 exposes a
-ratified **14-tool MCP baseline**: `list_resources`, `list_console_logs`, `list_structured_logs`,
+For agents connecting to the Aspire MCP server (`aspire agent mcp`, or the dashboard-only form `aspire agent mcp --dashboard-url <url>` with optional `--api-key`), Aspire 13.5.3 exposes a
+**14-tool MCP baseline**: `list_resources`, `list_console_logs`, `list_structured_logs`,
 `list_traces`, `list_trace_structured_logs`, `execute_resource_command`, `list_apphosts`,
 `select_apphost`, `list_integrations`, `list_docs`, `search_docs`, `get_doc`, `doctor`, and
 `refresh_tools` (`get_integration_docs` is documented upstream on aspire.dev but unobserved at 13.5.3).

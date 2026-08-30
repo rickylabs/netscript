@@ -15,27 +15,27 @@ While interactive development uses <code>aspire start</code> directly in a termi
 
 ## Detached startup with JSON output
 
-To launch Aspire in non-interactive mode and capture structured startup information, pass `--format Json` and `--non-interactive` (or `--nologo`):
+To launch Aspire in non-interactive mode and capture structured startup information, pass `--format Json` and `--non-interactive` (pass `--nologo` to suppress the startup banner):
 
 ```bash
 # Run from within the aspire/ folder
 aspire start --format Json --non-interactive
 ```
 
-The CLI starts the AppHost in the background and returns a single JSON object with the process state, dashboard endpoint, and log file path:
+The CLI starts the AppHost in the background and emits a single JSON object containing process identifiers, the dashboard endpoint, and the log file path:
 
 ```json
 {
-  "pid": 48219,
-  "appHostPath": "/home/agent/projects/my-app/aspire/apphost.mts",
-  "dashboardUrl": "https://localhost:18888?t=REDACTED_TOKEN",
-  "logFilePath": "/home/agent/.aspire/logs/my-app-apphost-48219.log",
-  "state": "Running"
+  "appHostPath": "/path/to/my-app/aspire/apphost.mts",
+  "appHostPid": 48219,
+  "cliPid": 48218,
+  "dashboardUrl": "https://localhost:18888",
+  "logFile": "/path/to/logs/cli_apphost-48219.log"
 }
 ```
 
 {{ comp callout { type: "note", title: "Redacting dashboard tokens" } }}
-The <code>dashboardUrl</code> field contains an authentication token parameter (<code>?t=...</code>). When storing or logging Aspire output in CI job artifacts or agent transcripts, always redact the token query parameter.
+When authentication is enabled, the <code>dashboardUrl</code> may carry an authentication token query parameter (<code>?t=...</code>). When storing or logging Aspire output in CI job artifacts or agent transcripts, redact any token parameter present in the URL.
 {{ /comp }}
 
 ## Inspecting running instances with `aspire ps`
@@ -43,7 +43,7 @@ The <code>dashboardUrl</code> field contains an authentication token parameter (
 To discover currently active AppHosts, their endpoints, and their log paths without attaching to a TTY, use `aspire ps --format Json`:
 
 ```bash
-aspire ps --format Json --nologo --non-interactive
+aspire ps --format Json --non-interactive --nologo
 ```
 
 Output:
@@ -51,15 +51,13 @@ Output:
 ```json
 [
   {
-    "pid": 48219,
-    "appHostPath": "/home/agent/projects/my-app/aspire/apphost.mts",
-    "dashboardUrl": "https://localhost:18888?t=REDACTED_TOKEN",
-    "logFilePath": "/home/agent/.aspire/logs/my-app-apphost-48219.log",
-    "resources": [
-      { "name": "postgres", "type": "Container", "state": "Running" },
-      { "name": "redis", "type": "Container", "state": "Running" },
-      { "name": "my-app-web", "type": "Executable", "state": "Running" }
-    ]
+    "appHostPath": "/path/to/my-app/aspire/apphost.mts",
+    "appHostPid": 48219,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 48218,
+    "dashboardUrl": "https://localhost:18888",
+    "logFilePath": "/path/to/logs/cli_apphost-48219.log"
   }
 ]
 ```
@@ -68,7 +66,7 @@ When no AppHost is running, `aspire ps --format Json` returns an empty array (`[
 
 ## Startup timeout budget vs `aspire wait`
 
-Aspire cold starts involve container provisioning (Postgres, Redis), Node SDK compilation, and health probe convergence. In CI environments under load, cold starts can take tens of seconds (observed 13–38s across runtime verification benchmarks).
+Aspire cold starts involve container provisioning (Postgres, Redis), AppHost TypeScript compilation, and health probe convergence. In CI environments or heavy host loads, cold starts typically require 25–39 seconds (measured across local 13.5.3 test runs at 24.80–38.62 s).
 
 NetScript provides two complementary timeout controls:
 
@@ -78,7 +76,7 @@ NetScript provides two complementary timeout controls:
    export ASPIRE_CLI_START_TIMEOUT=120
    ```
 2. **`aspire wait` CLI command**:
-   Explicitly blocks until a specific resource or the overall AppHost reaches a healthy state with a bounded deadline:
+   Explicitly blocks until a specific resource reaches a healthy state with a bounded deadline:
    ```bash
    # Wait up to 60 seconds for postgres to become healthy
    aspire wait postgres --timeout 60
@@ -86,35 +84,30 @@ NetScript provides two complementary timeout controls:
 
 ## Parallel isolation with `--isolated`
 
-When multiple CI workers or agent implementation loops run concurrently on a shared host, hardcoded ports collide. Passing `--isolated` to `aspire start`:
+When multiple CI workers or agent implementation loops run concurrently on a shared host, hardcoded ports and shared secrets can collide. Passing `--isolated` to `aspire start`:
 
-- Randomizes all host port allocations (Postgres, Redis, services, and dashboard).
-- Scopes container lifetimes to the session (`ContainerLifetime.Session`), ensuring containers are not shared between concurrent runs.
-- Stores secrets and state in an isolated run directory.
+- Selects randomized dashboard and endpoint ports.
+- Isolates user secrets and run state into a dedicated directory.
 
 ```bash
 aspire start --isolated --format Json --non-interactive
 ```
 
-## Forceful cleanup and teardown
+For full host port randomization across containerized infrastructure services, NetScript workspaces can additionally configure `DcpPublisher__RandomizePorts=true` in the environment.
 
-When terminating an automated run, stop the AppHost and ensure no orphaned containers or background processes survive:
+## Cleanup and teardown
+
+When terminating an automated run, stop the AppHost:
 
 ```bash
 # Graceful stop
 aspire stop
 
-# Forceful teardown for CI exit traps and teardown scripts
+# Stop the AppHost and clean up persistent resources
 aspire stop --force
 ```
 
-Verify that `aspire ps --format Json` reads `[]` and `docker ps` contains no surviving project containers.
-
-## Verified evidence & receipts
-
-The behaviors and JSON schemas documented here are verified by reproducible repository receipts:
-- **S2 runtime verification receipts**: `03-v2-cold-start-timing.time.txt` (cold-start budgets), `03-v3-isolated-starts.raw.txt` (isolated port allocation), and `03-v4-detached-dashboard.raw.txt` (JSON format schema).
-- **S10 E2E gate receipts**: `doctor --format Json` contract verification, `describe --follow` stream parsing, and `stop --force` container ownership proof.
+Verify that `aspire ps --format Json` reads `[]` and no orphaned processes survive.
 
 ## See also
 

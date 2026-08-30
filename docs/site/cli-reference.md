@@ -136,9 +136,9 @@ Run these commands from inside the `aspire/` subfolder using the Aspire CLI (13.
   rows: [
     { name: "Restore SDK", type: "aspire restore", desc: "Download and restore the AppHost SDK modules (run once per workspace and after SDK bumps)." },
     { name: "Start resource graph", type: "aspire start", desc: "Boot the database, cache, services, and dashboard. Flags: <code>--isolated</code> (random ports/secrets), <code>--format Json</code> (structured output)." },
-    { name: "List running AppHosts", type: "aspire ps --format Json", desc: "List running AppHost instances, dashboard URLs (with auth tokens), and log paths in machine-readable JSON." },
+    { name: "List running AppHosts", type: "aspire ps --format Json", desc: "List running AppHost instances, dashboard URLs (which may carry an auth token), and log paths in machine-readable JSON." },
     { name: "Describe resources", type: "aspire describe (alias: aspire resources)", desc: "Show detailed status, health, and endpoints for all registered AppHost resources." },
-    { name: "Stop AppHost", type: "aspire stop [--force]", desc: "Gracefully shut down the AppHost; pass <code>--force</code> for immediate teardown of containers and processes." },
+    { name: "Stop AppHost", type: "aspire stop [--force]", desc: "Gracefully shut down the AppHost; pass <code>--force</code> to stop the AppHost and clean up persistent resources." },
     { name: "Search Aspire docs", type: "aspire docs api search <query> --language typescript", desc: "Query the Aspire documentation CLI for TypeScript and AppHost API references." }
   ]
 }) }}

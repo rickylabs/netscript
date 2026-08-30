@@ -42,13 +42,19 @@
 - Executed workspace quality gates: `deno task check` (0 occurrences), `deno task lint` (0 findings), `deno task fmt:check` (0 findings).
 - All 113 `doc:*` manifest rows evaluated, 0 deferred.
 
-### Convergence Rebase onto S10' a46ea16d (2026-08-30)
-- Rebased branch onto `a46ea16d` following Aspire stack rebase onto main `3e5cbabf` (D-54).
-- Preserved main's merged prose in `docs/site/explanation/aspire.md` (`carry from Aspire's .NET AppHost:`).
-- Preserved canonical `.agents/skills/help.md` playbook description in `docs/site/reference/ai/skills.md`; added upstream workflow skills (OF-1a) and exact 14-tool Aspire MCP baseline without `describe_resource`.
-- Re-ran asset generators and verified all quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume build).
-- Verified 0 occurrences of `describe_resource` and 0 `.NET Aspire` regressions across public docs.
-- Force-pushed to `origin:docs/aspire-13-5-s11-public-docs-refresh` with lease (`088ca090`).
+### Docs Audit Cycle-1 Fixes (2026-08-30)
+- **H1 / H2 / H3 (`detached-start-agents-ci.md`):** Replaced JSON example schemas with exact captured schemas from real S2 receipts (`02-aspire-start-1.json` and `02-aspire-ps-1.json`: `appHostPid`, `cliPid`, `logFile`/`logFilePath`, `status`, `sdkVersion`, `dashboardUrl`; no `pid`, no `state`, no nested `resources`). Redaction note conditional on auth token presence (`?t=...`). Removed nonexistent receipt references and S10 assertions. Updated cold start timing to 24.80–38.62 s. Clarified `--non-interactive` vs `--nologo`, `aspire wait <resource>`, and `--isolated` port/secrets scoping.
+- **H4 (`deploy-local-aspire.md`):** Corrected npm package name to `@microsoft/aspire-cli`. Documented `aspire update --self` installation-method awareness and kept single-train rule.
+- **H5 (`explanation/aspire.md`, `deploy-local-aspire.md`):** Updated `aspire.config.json` snippet to reflect current scaffold output (13.4.6 baseline with PostgreSQL, Redis, and Browsers packages) with an explicit note on the 13.5.3 target configuration.
+- **H6 (`add-opentelemetry.md`):** Clarified that generated task wrappers (`aspire:otel`/`aspire:export`) resolve via forwarding and `aspire ps` retry. Documented the 5-step MCP telemetry resolver precedence chain under `@netscript/mcp` and removed internal `D-17` label.
+- **H7 (`reference/aspire/index.md`):** Rephrased 13.5 contracts to generated/configuration contracts with live verification pending. Scoped `excludeFromMcp()` strictly to MCP tool surface omission.
+- **M1 (`reference/ai/skills.md`):** Added concrete `aspire agent mcp --dashboard-url <url>` form (with optional `--api-key`). Removed `OF-1 (a)` and `ratified` from public prose. Kept exact 14-tool baseline.
+- **M2 (`cli-reference.md`):** Clarified `aspire ps` token condition and `aspire stop --force` definition per `aspire stop --help`.
+- **M3 (PR body & Run Dir):** Generated `manifest-disposition.md` covering all 121 S11-owned manifest rows.
+- **M4 (Prose Hygiene):** Verified 0 occurrences of decision IDs (`D-17`, `OF-1`), internal test receipt references, or `/home/agent` paths across all public doc pages.
+- **M5 (Diagrams Gate):** Recorded `diagrams:check` execution in run dir (Mermaid CLI `mmdc` unavailable; committed SVGs verified by Lume build).
+- Re-ran `gen:agent-docs-prose`, `gen:publish-assets`, `gen:assets-barrel` and verified `check:agent-docs-prose`, `check:publish-assets`, `docs:links`, Lume build.
+
 
 
 
