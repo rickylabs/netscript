@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The contract-first vocabulary for NetScript boundaries: an oRPC base contract with the standard
-error map, NetScript-owned procedure metadata, Zod-backed pagination and error schemas, and
-CRUD/query/transform builders that keep service handlers and typed clients in sync.**
+**Contract-first vocabulary for NetScript boundaries: an oRPC base contract with the standard error
+map, NetScript-owned procedure metadata, Zod pagination and error schemas, and CRUD/query/transform
+builders that keep services and clients in sync.**
 
 In NetScript the contract comes first: services implement it, the SDK generates typed clients from
 it, and both sides stay in sync because they share one definition. This package is that shared
