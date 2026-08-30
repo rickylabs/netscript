@@ -172,3 +172,15 @@ Tier-A found that the real Aspire 13.5.3 timeout line contains CSI style/color s
 ANSI-decorated exit-17 cases both pass; altered diagnostics and exit 18 still fail. Static evidence
 is green: 56/56 focused tests, two-file structured check/lint/format, clean quality scan, and
 exit-0 architecture check. Runtime and evaluator work remain coordinator-owned.
+
+## D-110 hidden E2E artifact carrier correction
+
+The branch was re-baselined at reconstructed D-109 head
+`300eac3ba94a1670b51e01982aa1658dc402ef3d`. Code inspection confirms the default generated-project
+root is `<repo>/.llm/tmp/cli-e2e/<projectName>`, so both runtime upload steps now carry the exact
+listener receipt glob beneath that root, their job-specific top-level report family, and
+`include-hidden-files: true`. The D-107 broad patterns were removed. Static evidence is green:
+exact two-job contract assertion, 13/13 focused workflow-policy tests, YAML parse, and diff
+integrity. No product code, runtime behavior, receipt shape/location, workflow dispatch, or
+evaluator changed; the coordinator owns the one fresh exact-head workflow run and artifact
+inspection.

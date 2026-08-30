@@ -381,3 +381,31 @@ containers, evaluators, and CI remain coordinator-owned and NOT_RUN.
 - Reconcile: PR #1743's latest phase comment is the D-102 implementation report; the supplied
   Tier-A D-102b finding is fully represented here, with fresh substantive review/runtime lease
   still coordinator-owned.
+
+## D-110 hidden E2E artifact carrier correction
+
+PLAN-EVAL is N/A by owner ruling: this is a bounded CI carrier correction with an exact workflow
+contract and no architecture or product decision. Run 33341398265 proved both runtime suites green
+at the pre-D-109 head, while `upload-artifact@v5` excluded every `.llm/` output because its default
+is `include-hidden-files: false`.
+
+Re-baseline against reconstructed branch head `300eac3ba94a1670b51e01982aa1658dc402ef3d` confirms
+`defaultRunOptions()` resolves `smokeRoot` to `<repo>/.llm/tmp/cli-e2e` and
+`createSmokeProject()` resolves each project beneath that directory. The exact receipt carrier is
+therefore `.llm/tmp/cli-e2e/**/.netscript/e2e/listener-unreachable-receipt.json`. This slice will
+enable hidden-file upload and replace each runtime job's broad path list with its exact report path
+plus that receipt path. Runtime, workflow dispatch, product semantics, and evaluator activity are
+NOT_RUN and remain coordinator-owned.
+
+- Both runtime artifact steps now set `include-hidden-files: true`.
+- The Postgres job carries only `.llm/tmp/e2e-report-scaffold-runtime*.json` plus the exact receipt
+  path; the SQLite job uses its `-sqlite*.json` report family plus the same receipt path. All four
+  D-107-era broad globs were removed.
+- Exact structural contract check: PASS for both jobs, including rejection of every stale broad
+  pattern.
+- Focused structured workflow-policy tests: PASS, 13/13 results across receipt, draft, event, and
+  Aspire NuGet-cache policy suites.
+- Workflow YAML parse with `@std/yaml` under `deno eval --no-lock`: PASS. `git diff --check`: PASS;
+  no lockfile or product-source change.
+- Reconcile: this slice implements the owner-supplied D-110 correction only. The coordinator owns
+  PR base retargeting, the single exact-head `workflow_dispatch`, and archive inspection.

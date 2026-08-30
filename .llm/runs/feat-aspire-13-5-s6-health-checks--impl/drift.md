@@ -119,3 +119,18 @@ documentation.
   equality afterward, and add the real decorated-shape regression beside the plain-text case.
 - **Evidence boundary:** static focused tests only; exit 17, transitions, controller architecture,
   fixed ports 18998/18999, and runtime lease ownership remain unchanged.
+
+## 2026-08-31 — D-110 enables hidden E2E artifact upload
+
+- **What:** D-107 added the listener receipt glob but retained `upload-artifact@v5`'s default
+  `include-hidden-files: false` and broad path patterns.
+- **Source:** exact-head workflow run 33341398265; both green runtime jobs reported that no files
+  matched any artifact path.
+- **Expected:** each runtime job uploads its top-level JSON report and the generated project's
+  listener-unreachable receipt.
+- **Actual:** every output lives below the hidden `.llm/` directory, so the action excluded all of
+  them before glob selection.
+- **Severity:** bounded CI evidence-carrier correction.
+- **Action:** enable hidden files and narrow both upload steps to their exact report filename
+  family plus `.llm/tmp/cli-e2e/**/.netscript/e2e/listener-unreachable-receipt.json`; leave the
+  fixture, receipt, gates, and runtime behavior unchanged.
