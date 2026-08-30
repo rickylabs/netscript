@@ -5434,3 +5434,13 @@ success by its own terminal field, but delivered nothing.
   and runs from wherever its MCP server process is rooted (`007-internals`, per its own account). This
   is not something the caller can override via the tool's parameters — recorded transparently rather
   than claimed as controlled.
+
+## D-95 — #1774 qualifying effort-max rerun dispatched
+
+Task `k8hva2jfq`, `mcp__netscript-hybrid__delegate_openrouter`, `deepseek/deepseek-v4-flash-0731`,
+effort `max`, `timeoutMs: 600000`. Context updated to name the moved carrier head (`58b04be6c`) and
+explicitly flags the effort-high cycle-2 report as material to re-derive, not restate. Task text
+requires comprehensive re-verification across all 7 original attack points plus the two supplemental
+items the high-effort cycle only partially covered (both hook events individually for fallback
+safety; root test / surface validator if budget allows). Backgrounded per host bridge behavior after
+120s; awaiting completion notification. No PR/label/DoD action taken pending this verdict.
