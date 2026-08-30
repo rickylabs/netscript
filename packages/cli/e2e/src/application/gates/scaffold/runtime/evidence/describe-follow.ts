@@ -2,6 +2,7 @@ import { join } from '@std/path';
 import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operation-runner-helpers.ts';
 
 const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
+const RESOURCE_NAME_FIELDS: readonly string[] = ['displayName', 'name', 'resourceName'];
 
 /** One object-valued Aspire health report. */
 export interface DescribeHealthReport {
@@ -179,8 +180,17 @@ export async function captureDescribeFollow(
 function resources(value: unknown, lineIndex: number): DescribeResourceObservation[] {
   const root = record(value, `describe line ${lineIndex + 1}`);
   const source = Reflect.get(root, 'resources');
-  if (!Array.isArray(source)) throw new Error(`describe line ${lineIndex + 1} omitted resources[]`);
-  return source.map((entry, resourceIndex) => resource(entry, lineIndex, resourceIndex));
+  const candidates = Array.isArray(source)
+    ? source
+    : RESOURCE_NAME_FIELDS.some((key) => Reflect.has(root, key))
+    ? [root]
+    : undefined;
+  if (!candidates) {
+    throw new Error(
+      `describe line ${lineIndex + 1} is neither wrapped resources[] nor a bare resource object`,
+    );
+  }
+  return candidates.map((entry, resourceIndex) => resource(entry, lineIndex, resourceIndex));
 }
 
 function resource(
@@ -189,7 +199,7 @@ function resource(
   resourceIndex: number,
 ): DescribeResourceObservation {
   const source = record(value, `describe line ${lineIndex + 1} resource ${resourceIndex + 1}`);
-  const name = firstString(source, ['displayName', 'name', 'resourceName']);
+  const name = firstString(source, RESOURCE_NAME_FIELDS);
   if (!name) {
     throw new Error(`describe line ${lineIndex + 1} resource ${resourceIndex + 1} omitted name`);
   }

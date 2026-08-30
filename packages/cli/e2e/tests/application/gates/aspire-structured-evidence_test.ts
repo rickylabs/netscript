@@ -1,6 +1,9 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { evaluateAspireDoctor } from '../../../src/application/gates/scaffold/runtime/evidence/doctor.ts';
-import { evaluateDescribeFollow } from '../../../src/application/gates/scaffold/runtime/evidence/describe-follow.ts';
+import {
+  evaluateDescribeFollow,
+  parseDescribeFollow,
+} from '../../../src/application/gates/scaffold/runtime/evidence/describe-follow.ts';
 
 const FIXTURES = new URL('./fixtures/', import.meta.url);
 
@@ -30,14 +33,34 @@ Deno.test('doctor receipt fails closed on an explicit failed check', async () =>
   assertThrows(() => evaluateAspireDoctor(fixture), Error, 'docker: stopped');
 });
 
-Deno.test('describe follow converges from last-seen resource state and object health reports', async () => {
+Deno.test('describe follow parses bare Aspire 13.5 ResourceJson lines with last-seen semantics', async () => {
+  const stream = await Deno.readTextFile(
+    new URL('aspire-describe-follow-13.5.3.ndjson', FIXTURES),
+  );
+  const parsed = parseDescribeFollow(stream);
+  assertEquals(parsed.resources.map((entry) => [entry.name, entry.state]), [
+    ['postgres', 'Running'],
+    ['workers', 'Running'],
+  ]);
+  assertEquals(evaluateDescribeFollow(stream, ['postgres', 'workers']), parsed);
+});
+
+Deno.test('describe follow retains the wrapped resources shape', async () => {
   const stream = await Deno.readTextFile(new URL('aspire-describe-follow.ndjson', FIXTURES));
-  const result = evaluateDescribeFollow(stream, ['postgres', 'workers']);
+  const result = parseDescribeFollow(stream);
   assertEquals(result.resources.map((entry) => [entry.name, entry.state]), [
     ['postgres', 'Running'],
     ['workers', 'Running'],
   ]);
   assertEquals(result.resources[0].healthReports.postgres_listener.status, 'Healthy');
+});
+
+Deno.test('describe follow converges from wrapped last-seen resource state', async () => {
+  const stream = await Deno.readTextFile(new URL('aspire-describe-follow.ndjson', FIXTURES));
+  assertEquals(
+    evaluateDescribeFollow(stream, ['postgres', 'workers']).resources.map((entry) => entry.state),
+    ['Running', 'Running'],
+  );
 });
 
 Deno.test('describe follow fails when the final resource set does not converge', async () => {
@@ -58,6 +81,14 @@ Deno.test('describe follow reports a malformed NDJSON line number', () => {
     () => evaluateDescribeFollow(stream, ['postgres']),
     Error,
     'line 2 is not JSON',
+  );
+});
+
+Deno.test('describe follow rejects an unknown JSON line shape precisely', () => {
+  assertThrows(
+    () => parseDescribeFollow('{"message":"not a resource"}\n'),
+    Error,
+    'describe line 1 is neither wrapped resources[] nor a bare resource object',
   );
 });
 
