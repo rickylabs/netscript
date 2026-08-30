@@ -1760,3 +1760,27 @@
   standing git-safety discipline says to stop and report rather than guess. **S8 worktree restored
   to its original head `f06209d39` via `git rebase --abort`, unmodified.** No S8 runtime authorized
   until S6 converges.
+- **D-91 — S6 bottom-up reconvergence attempted; stopped at a genuine module-refactor collision, not
+  a simple content merge. S6 restored unmodified at `01f27d4d4`.** Audit: S6's own commit range is
+  exactly the 6 commits `5d2bd8756..01f27d4d4` (merge-base with `origin/main` is `3e5cbabfc`,
+  identical to S8's — confirming S6 was built stacked on S5 before S5 shipped). Cherry-picking those
+  6 onto `origin/main` (`2a1248d33`): first 3 applied clean; commit 4 (`714df7de5` chore,
+  generated-asset conflict on `embedded.generated.ts`) resolved by regeneration
+  (`gen:assets-barrel`) per doctrine; commit 5 (`b4ca8a1d3` "test(e2e): add listener health recovery
+  gate") produced a **~250-line conflict in `runtime-gates.ts` where the incoming side is empty** —
+  inspection of the commit shows it is not additive: it **refactors the whole module**, removing
+  `pluginProbeCommand`/`APP_HOME_FAILURE_HINT`/`APP_REFERENCE_FAILURE_HINT`/
+  `AI_CHAT_ROUTE_FAILURE_HINT` and moving imports into a new `runtime/` subdirectory
+  (`runtime/generated-app-name.ts`, `runtime/runtime-scripts.ts`,
+  `runtime/listener-readiness-gates.ts`), while `origin/main`'s current file (evolved independently
+  by S1's live-db-endpoint fix and S5's port fixes) still has the pre-refactor layout with
+  additional content of its own. Reconciling this correctly requires re-deriving, function by
+  function, which of two independently-evolved versions of the same module each surviving piece of
+  logic belongs to — a semantic merge, not a mechanical one. **Stopped and reported per git-safety
+  discipline rather than force a resolution that could silently drop either S1/S5's runtime fixes or
+  S6's readiness refactor.** `git cherry-pick --abort` run; S6 worktree and branch confirmed
+  byte-identical to origin (`01f27d4d4`, 0 uncommitted changes). **This blocks S8/S9/S10/S11/S13
+  exactly as before (D-90) — the chain is unchanged, now with a precise, human-decidable next
+  step:** the coordinator (or a dedicated implementation session with full context on both the
+  readiness refactor's intent and the S1/S5 runtime-gate changes it must absorb) needs to manually
+  reconcile `runtime-gates.ts`. No further attempt authorized without that.
