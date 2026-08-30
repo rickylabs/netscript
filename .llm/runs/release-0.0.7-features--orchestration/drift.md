@@ -1000,3 +1000,64 @@ Applied for the completed slice-2 thread `01a051f8-ab0a-7443-921f-17e48be6bc35`,
 **Fourth occurrence in this lane in one session.** D-28's proposed fix — compute `sessionActive` from
 the daemon, and add an explicit `--release-stale-sender` — is now a measured operational cost, not a
 theoretical tidy-up, and belongs with D-24, D-25 and D-29's tooling follow-ups.
+
+## D-35 — a "deleted" context pack was a read sampled mid-rewrite; restoring it would have destroyed work
+
+**Reported.** Coordinator read-only status showed
+`.llm/runs/feat-sdk-procedure-meta--1466/context-pack.md` **deleted** while slice 3 was active, with
+an instruction to treat it as a possible harness regression and restore unless deletion was proven
+required.
+
+**Measured immediately, before touching anything:**
+
+| Probe | Result |
+| --- | --- |
+| `git status --porcelain -- <path>` | ` M` — **modified**, not ` D` |
+| File on disk | present, **5,886 bytes**, mtime 12:11 |
+| `git diff --cached --name-status --diff-filter=D` | empty |
+| `git diff --name-status --diff-filter=D` | empty |
+| Content | **108 lines**, current through slice 3, correct heads, `Refs #1466 — partial` note intact |
+
+**No deletion existed, staged or unstaged.** The file was being rewritten by the live slice-3 author
+(its brief requires refreshing the pack at the final head). A writer that replaces a file — truncate
+then write, or write-temp then rename — leaves a window in which an external reader sees the path
+absent. The status tool sampled that window and rendered it as a deletion.
+
+**The important part is what the instructed remedy would have done.** "Restore it" means writing the
+committed version over the working tree — `git checkout -- <path>`. Executed at that moment it would
+have **discarded the author's in-flight rewrite** and replaced a current pack with a stale one, then
+committed the stale one as evidence. The reported regression did not exist; the repair for it would
+have created a real one, of exactly the kind the report was trying to prevent.
+
+**Rule this lane now applies.** A destructive remedy is never executed on a reported state — only on
+a *measured* one. `git status` on the exact path plus a `--diff-filter=D` check plus an `ls` costs
+three commands and distinguishes "deleted" from "being written" definitively. This is the same
+discipline the coordinator required for the sender-record eviction (D-34): resolve read-only, prove
+the thing you believe, then act on the proof rather than the report.
+
+**Generalisation worth keeping.** Any read-only observer of a worktree with a live author is sampling
+a moving target. File-absence is the least reliable signal it can produce, because it is exactly what
+a normal atomic write looks like from outside. Observers should re-sample before reporting absence,
+and consumers of such a report should treat it as a prompt to measure, never as a fact to repair.
+
+## D-36 — the SDK JSR audit's two WARNs are base-inherited, not this leaf's
+
+Slice 3's `audit/sdk.json` reports two gates above INFO, and the slice-3 brief said any WARN is a
+finding to report rather than a number to adjust. Attribution measured at the base rather than assumed
+(D-27's lesson):
+
+- **`F-DOCT-5 cardinality` — WARN, "directory has 13 immediate children; doctrine cap is 12",
+  `path: src`.** `ls -1 packages/sdk/src | wc -l` is **13 on `origin/main` `13878a80a`** and **13 at
+  slice-3 head `9ab779ce`**, with an identical listing (`auto-update cache client collections desktop
+  discovery openapi ports presets query query-client streams.ts telemetry`). The leaf **added no
+  directory**; slice 2 edited existing `ports/` and `query/` members only. Pre-existing debt, delta 0.
+- **`F-JSR-7 slow-types` — WARN on `@netscript/sdk`, INFO on `@netscript/contracts`.** The contracts
+  entry carries the sanctioned annotation (`sanctioned --allow-slow-types`, oRPC-bound, doctrine
+  `02-public-surface.md`); the SDK entry does not, which is why the same underlying condition renders
+  at a higher level. `slowTypes.ok` is **true** for both members and both publish dry-runs pass.
+
+Neither WARN is introduced by #1466 and neither is a merge blocker for this leaf. Whether the SDK
+member deserves the same sanctioned-slow-types annotation as contracts, and whether the `src`
+cardinality overage should become a recorded debt entry or a split, are **pre-existing architecture
+questions for the coordinator** — filed here rather than fixed inside a slice whose plan says
+"no feature expansion".
