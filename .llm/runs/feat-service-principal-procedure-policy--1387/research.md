@@ -234,6 +234,16 @@ All commands ran on the clean baseline before artifacts were added.
 | Root `deno task test`                                                 | NOT RUN by owner direction; known host infrastructure red         | Exclude                                                |
 | E2E/Aspire/Docker/browser                                             | NOT RUN; no runtime lease                                         | Forbidden for this slice and not a per-slice contract  |
 
+### Post-S0 corrected census (append-only)
+
+The census was re-measured after S0 at the current `24f6642f` base and reproduced the earlier
+post-#1466 `3e5cbabf` measurement. Package tests are contracts 16, service 90, plugin 68, SDK 77,
+and MCP 136: **387 total**, replacing the pre-#1466 8/69 baselines above. The scoped check, lint,
+format, quality, export-drift, service doc-lint, and four contracted JSR audit results remained
+unchanged. The required `agent-docs-prose` base probe also passed: it rebuilt 639 site files,
+validated source format and rendered output, and reported the prose bundle fresh in 7.33 seconds;
+the probe left the tracked worktree clean.
+
 ## Open questions for PLAN-EVAL
 
 1. Will PLAN-EVAL explicitly accept replacing the impossible “router rename breaks policy at compile

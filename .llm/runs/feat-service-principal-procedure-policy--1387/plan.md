@@ -102,6 +102,14 @@ tooling without changing existing services until they opt in.
 | LD-11 | Rename proof is corrected: metadata must follow the renamed procedure; the old SDK key must fail type-check. No key-indexed policy map will be introduced.                             | The issue's original compile-time wording conflicts with its binding contract-local design.                                                    |
 | LD-12 | The work remains one leaf with nine small Tier-A-stopped slices. Any ceiling breach or need to change scaffold/plugin-core contracts triggers rescope rather than silent expansion.    | The concerns are separable without mixing type contracts and behavior.                                                                         |
 
+For LD-8, “binding time” means construction of
+`createContractAuthorizer(contract, ...)` during contract traversal: an `optional` declaration must
+raise a stable namespaced error there, not on the first request or later in `build()`.
+
+For LD-11, the owner/supervisor must amend the issue's compile-time-rename acceptance line to the
+accepted rename-continuity plus stale-SDK-key wording before close-gate. The implementation PR body
+must state that substitution and its rationale explicitly; the implementer does not edit the issue.
+
 ## Open-Decision Sweep
 
 | Decision                                    | Status                                      | Notes                                                                            |
@@ -127,6 +135,13 @@ Every numbered slice below ends with its named Tier-A gates and a commit. A fail
 dependency shape, or required file outside the listed ceiling means: stop, append `drift.md`, report
 the rescope, and do not continue.
 
+Regeneration by the contracted `gen:*` tasks is ceiling-exempt only for their named generated
+carrier outputs in the slice that staled them, and those outputs must be committed with that slice:
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, every path in
+`PUBLISH_ASSET_OUTPUTS`, `.llm/assets/agent-docs/{prose.json.gz,provenance.json}`, and the generated
+barrels checked by `check:assets-barrel`. This exception does not authorize hand edits or any other
+file outside a slice ceiling.
+
 ### Slice 1 — Contract metadata type (type contract only)
 
 Extend the one #1466 vocabulary and its type/runtime independence proofs. Do not add enforcement.
@@ -146,12 +161,14 @@ Tier-A stop: scoped check/lint/fmt; contracts and SDK package tests; contracts a
 ### Slice 2 — Typed context public surface (type contract only)
 
 Parameterize the context factory/builder/plugin forwarding signatures and publish the service-owned
-handler context plus plugin re-exports. Edits in implementation files are signature/generic-only.
+handler context plus plugin re-exports. Widen `FetchHandler.handle`'s context and `wireRpc`'s
+`buildContext` signature to `object`; edits in implementation files are signature/generic-only.
 
 Ceiling:
 
 - `packages/service/src/types.ts`
 - `packages/service/src/builder/service-builder.ts`
+- `packages/service/src/builder/service-rpc.ts`
 - `packages/service/mod.ts`
 - `packages/service/tests/type-assignability_test.ts`
 - `packages/plugin/src/service/presentation/create-plugin-service.ts`
@@ -161,7 +178,7 @@ Ceiling:
 
 Compile-only, no-edit consumers: the seven plugin configurations listed in `research.md`. Tier-A
 stop: scoped check/lint/fmt; service and plugin tests; service `deno doc --lint`; service JSR audit;
-`docs:exports-drift`. The base-red plugin JSR/doc gates are not contracted.
+`docs:exports-drift`; `mcp-export-corpus`. The base-red plugin JSR/doc gates are not contracted.
 
 ### Slice 3 — Typed context runtime composition (behavior only)
 
@@ -192,14 +209,16 @@ Ceiling:
 - `packages/service/tests/type-assignability_test.ts`
 
 Tier-A stop: scoped check/lint/fmt; service tests; service `deno doc --lint`; service JSR audit;
-`docs:exports-drift`.
+`docs:exports-drift`; `mcp-export-corpus`.
 
 ### Slice 5 — Contract-policy adapter and middleware binding (behavior only)
 
 Implement contract traversal/matching, fallback precedence, scope/role decisions, optional-policy
 binding rejection, and shared authn/authz resolution. Bind matcher configuration from the builder's
 actual RPC/REST options. Add REST/RPC, no-policy, missing-scope, disagreement, and rename-continuity
-tests; the old SDK key failure remains in the Slice 1 type fixture.
+tests; name the construction-time negative test
+`createContractAuthorizer rejects optional authentication during construction`; the old SDK key
+failure remains in the Slice 1 type fixture.
 
 Ceiling:
 
@@ -244,8 +263,8 @@ Ceiling:
 - `packages/mcp/src/application/flows/get-operation-schema-flow.ts`
 - `packages/mcp/openapi-projection.ts`
 
-Tier-A stop: scoped check/lint/fmt; MCP tests; MCP JSR audit; `docs:exports-drift`. MCP public doc
-lint is base-red and excluded.
+Tier-A stop: scoped check/lint/fmt; MCP tests; MCP JSR audit; `docs:exports-drift`;
+`mcp-export-corpus`. MCP public doc lint is base-red and excluded.
 
 ### Slice 8 — MCP/agent access projection (behavior only)
 
@@ -283,7 +302,7 @@ Ceiling:
 
 Tier-A stop: docs doctests reachable through affected package suites; scoped check/lint/fmt;
 `docs:exports-drift`; contracts/service/SDK/MCP JSR audits; service `deno doc --lint`;
-`quality:gate`.
+`quality:gate`; `docs-tagline`; `publish-assets`; `agent-docs-prose`; `assets-barrel`.
 
 No product file outside those nine ceilings is authorized. In particular, no plugin-core contract,
 CLI scaffold/template, `packages/ai`, auth provider, or lockfile edit is allowed.
@@ -359,7 +378,7 @@ the applicable subset; the final Tier-B readiness run uses all contracted green 
 | 1     | `G-CHECK`         | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/contracts --root packages/service --root packages/plugin --root packages/sdk --root packages/mcp --ext ts,tsx` | PASS, 0 diagnostics                                       |
 | 2     | `G-LINT`          | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts` with the same roots and extensions                                                                                             | PASS, 0 findings                                          |
 | 3     | `G-FMT`           | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts` with the same roots and extensions                                                                                              | PASS, 0 findings                                          |
-| 4     | `G-TEST-*`        | `run-deno-test.ts -- --allow-all packages/<package>/tests` for each affected package                                                                                                           | PASS: contracts 8, service 90, plugin 68, SDK 69, MCP 136 |
+| 4     | `G-TEST-*`        | `run-deno-test.ts -- --allow-all packages/<package>/tests` for each affected package                                                                                                           | PASS: contracts 16, service 90, plugin 68, SDK 77, MCP 136 (387 total) |
 | 5     | `G-QUALITY`       | `deno task quality:gate`                                                                                                                                                                       | PASS, including `quality:scan` and `arch:check`           |
 | 6     | `G-EXPORTS`       | `deno task docs:exports-drift`                                                                                                                                                                 | PASS; required because this leaf grows public surfaces    |
 | 7     | `G-DOC-SERVICE`   | `run-deno-doc-lint.ts --root packages/service`                                                                                                                                                 | PASS                                                      |
@@ -368,6 +387,14 @@ the applicable subset; the final Tier-B readiness run uses all contracted green 
 | 10    | `G-JSR-SDK`       | `audit-jsr-package.ts --root packages/sdk`                                                                                                                                                     | PASS with warnings only                                   |
 | 11    | `G-JSR-MCP`       | `audit-jsr-package.ts --root packages/mcp`                                                                                                                                                     | PASS with warnings only                                   |
 | 12    | `G-LOCK`          | Compare SHA-256 and `git diff` for `deno.lock` against the slice baseline                                                                                                                      | Must remain byte-identical                                |
+| 13    | `mcp-export-corpus` | `deno task check:mcp-export-corpus`                                                                                                                                                           | PASS at base; required at Slices 2/4/7 and final readiness |
+| 14    | `docs-tagline`    | `deno task docs:tagline:check`                                                                                                                                                                 | PASS at base; required at Slice 9 and final readiness     |
+| 15    | `publish-assets`  | `deno task check:publish-assets`                                                                                                                                                               | PASS at base; required at Slice 9 and final readiness     |
+| 16    | `agent-docs-prose` | `deno task check:agent-docs-prose`                                                                                                                                                            | PASS after the post-S0 base probe: 639 site files built, rendered output OK, bundle fresh (7.33 s); required at Slice 9 and final readiness |
+| 17    | `assets-barrel`   | `deno task check:assets-barrel`                                                                                                                                                                | PASS at base; required at Slice 9 and final readiness     |
+
+Row 4 was re-measured after S0 at the current `24f6642f` base and reproduced the evaluator's
+`3e5cbabf` census; the earlier 8/69 values predated #1466.
 
 Excluded base-red gates: contracts/plugin/SDK/MCP public doc lint and plugin JSR audit. Excluded by
 owner direction: root test and every E2E/Aspire/Docker/browser gate. RTK output, when available, is

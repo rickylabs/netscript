@@ -260,3 +260,23 @@ at binding). The coordinator has released the leaf under that accepted adapter b
 accepted and unchanged; the five fixes are gate-set, ceiling and text corrections only, and the
 evaluator's own re-evaluation scope says a full fresh PLAN-EVAL is **not** required unless design text
 changes.
+
+## PLAN-EVAL cycle 1 repair — bounded fixes applied
+
+The implementation author applied only the five corrections required by `plan-eval.md` § Required
+fixes; the accepted design and locked adapter boundary did not change.
+
+- Replaced the stale pre-#1466 test census with contracts 16 / service 90 / plugin 68 / SDK 77 /
+  MCP 136 (387 total) and appended the post-S0 correction to `research.md`.
+- Contracted the generated-carrier gates at their staling slices and final readiness, and declared
+  only their named `gen:*` outputs ceiling-exempt. The required base
+  `check:agent-docs-prose` probe passed after building 639 site files and reporting the bundle fresh
+  in 7.33 seconds; tracked Git status remained clean after the probe.
+- Added the two signature-only context widenings and `service-rpc.ts` to Slice 2 so Slice 3 remains
+  behavior-only inside its ceiling.
+- Recorded the owner-only LD-11 issue-text amendment and implementation-PR substitution rule.
+- Pinned LD-8 rejection to `createContractAuthorizer()` construction and named the Slice 5 negative
+  test.
+
+Validation for this plan-only repair: `git diff --check` passed. No product source, generated
+carrier, or `deno.lock` file changed.
