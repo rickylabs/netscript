@@ -8478,3 +8478,27 @@ optional→`[{}, {bearerAuth:[]}]` despite LD-8 runtime rejection — deliberate
 regardless of runtime support) and points at research finding 10's `traverseContractProcedures`
 inspection command rather than prescribing oRPC's traversal API from memory, since getting that wrong
 would mislead the implementer more than leaving it to inspect.
+
+## #1387 Slice 6 terminal ACCEPTED; IMPL-EVAL dispatched
+
+Recovered thread `01a05495` per the coordinator's liveness correction (`state: idle`, last artifact
+matching the expected evidence commit `2d3c148d1`). Reviewed independently: `openapi.ts` post-
+processes the generated spec using oRPC's public `traverseContractProcedures`, implementing LD-9's
+exact mapping (none→`security:[]`, required→bearer+scopes+`x-netscript-roles`,
+optional→`[{}, {bearerAuth:[]}]` despite LD-8's runtime rejection). The single new test proves all
+four access states plus preservation of a custom `operationId` and `.route({spec:...})`-added
+`summary`/`x-user-field`, using `Object.hasOwn` for the no-metadata absence claim rather than an
+equality check. Two of three ceiling files touched (correctly), `deno.lock` and the corpus both
+unchanged (7 654 symbols — no new exported signature, as expected for a runtime-output-only change),
+eight receipts all PASS, evidence set SUFFICIENT, 102/102 tests.
+
+**Verdict: ACCEPTED at `11e83f06426469b48a67c2211d954ac916cd6fda`.** No findings. `tier-a-slice-6.md`
+committed as evidence head `3d6e4d239`; PR comment `5471460251`.
+
+IMPL-EVAL dispatched: native Fable 5 attempted first (fresh slice, not covered by "existing DeepSeek
+receipts... must not be rerun" — that instruction protects already-certified slices, not new ones).
+The evaluator brief adds one judgment point beyond Tier-A's own review: whether a user-supplied
+`security` field on a metadata-bearing procedure would be silently overwritten by the projection —
+a real design question (the feature's whole purpose is to set `security`, so overwriting on
+disagreement is plausibly correct by the same spirit as LD-6, but the current test doesn't cover that
+exact conflict) left to the evaluator's judgment rather than pre-decided.
