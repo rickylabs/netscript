@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6",
+  "version": "0.0.7-canary.3",
   "workspace": [
     "packages/*",
     "packages/cli/e2e",
