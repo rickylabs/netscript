@@ -495,3 +495,53 @@ the direct audit command and got the same sanctioned-INFO-only result `publish:d
 proves — accepted, not a gap needing a fix.
 
 Slice 7 (MCP access result contract, type/schema only) is the next release.
+
+## Slice 7 — MCP access result contract (type/schema only)
+
+Slice 7 adds one credential-free `OperationAccessSummary` domain contract with a finite
+`none | optional | required` authentication classification plus bounded security-scheme, scope, and
+role arrays. An absent summary represents an operation whose access is undeclared. The type is
+public through `@netscript/mcp/openapi-projection`; its schema carries a literal typed example that
+constructs every field without containing a token, principal, header value, or other credential.
+
+`ServiceOperationSummary` and `GetOperationSchemaResult` now each expose the same optional
+`access?: OperationAccessSummary` field. Their MCP output schemas advertise the optional field; the
+operation-list schema now describes the complete existing row shape so `additionalProperties:
+false` remains truthful. Neither flow populates `access`, `OPENAPI_CURL_AUTH_NOTE` and `authNote`
+behavior are unchanged, and `operation-index.ts` remains untouched. Population and curl-guidance
+changes remain Slice 8 work.
+
+The five product files match the locked ceiling exactly. The only additional product carrier is the
+standing ceiling-exempt generated MCP export corpus. Its checked-in generator moved the public
+surface from 7,654 to 7,655 symbols and recorded the new type plus the widened list/detail
+signatures. Slice 6's nine top-level receipts were checked for invocation identity, matching heads,
+positive duration, PASS outcome, and SHA-256, then moved byte-identically to
+`receipts/slice-6-11e83f064/` before Slice 7 evidence was cut.
+
+The immutable Slice 7 content head is
+`897a06cd7170ca021da1836b3cbcbf790cf97a2f`.
+
+### Slice 7 evidence
+
+| Gate / proof | Result | Durable evidence |
+| --- | --- | --- |
+| Scoped check | PASS, 116 files / 0 diagnostics | `1387-s7-check`, 1,458 ms |
+| Scoped lint | PASS, 115 files / 0 findings | `1387-s7-lint`, 607 ms |
+| Scoped format | PASS, 115 files / 0 findings | `1387-s7-fmt-check`, 577 ms |
+| MCP tests | PASS, 136/136 | `1387-s7-test`, 7,500 ms |
+| Export/docs drift | PASS | `1387-s7-exports-drift`, 3,499 ms |
+| MCP export corpus | PASS, 7,655 symbols | `1387-s7-mcp-export-corpus`, 8,380 ms |
+| Quality/doctrine gate | PASS; existing warnings only | `1387-s7-quality-gate`, 10,209 ms |
+| Publish dry run | PASS, full workspace simulation | `1387-s7-publish-dry-run`, 36,506 ms |
+| MCP JSR audit | PASS (exit 0); three existing warnings | Exact direct package audit |
+
+Every durable receipt above was independently checked for its expected invocation ID, positive
+`durationMs`, `outcome: PASS`, and
+`gitHead == actualGitHead == 897a06cd7170ca021da1836b3cbcbf790cf97a2f`. The recomputed
+`receipts/evidence-set.json` is `SUFFICIENT` with no reasons. The direct MCP audit reports the same
+two existing folder-cardinality warnings and known slow-type warning; the base-red MCP public doc
+lint was excluded exactly as contracted. `deno.lock` is unchanged.
+
+No E2E, Aspire, Docker, or browser gate ran and no runtime lease was acquired. This author stops at
+Slice 7's Tier-A boundary: the green evidence is not author self-certification, Slice 7 still awaits
+substantive supervisor review, and Slice 8 has not started.

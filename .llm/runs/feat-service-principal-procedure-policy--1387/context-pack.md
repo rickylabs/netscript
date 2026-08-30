@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slices 1–6 accepted; Slice 7 not started |
+| Current phase  | `impl` — Slice 7 evidence complete; awaiting Tier-A review |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -25,8 +25,14 @@ after a D-9 ceiling amendment for its export surface, Slice 6 at `11e83f064`). E
 separate opposite-family IMPL-EVAL verdict; Slice 3 carries two independent concurring verdicts
 (Opus 5 and DeepSeek V4 Flash 0731) under a coordinator-authorized routing deviation, Slices 5 and 6
 were evaluated by DeepSeek after the native route hit an account-wide monthly spend limit — all
-recorded in the topic supervisor's ledger, not here. Slice 7 must not begin until the supervisor
-releases it under its locked ceiling.
+recorded in the topic supervisor's ledger, not here.
+
+Slice 7 is now implemented at immutable content head `897a06cd7170ca021da1836b3cbcbf790cf97a2f`
+with a `SUFFICIENT` eight-receipt evidence set. It publishes a credential-free bounded
+`OperationAccessSummary`, adds the same optional `access` field to the list/detail result types and
+MCP schemas, and exports the type from `./openapi-projection`. Neither flow populates access data and
+the existing generic `authNote` is unchanged. Slice 7 remains at its Tier-A boundary awaiting
+substantive supervisor review; this author has not self-certified it and has not started Slice 8.
 
 **Resume-docs gap, recurring — this file was not the only casualty.** First flagged as F-1 by the
 Slice 4 IMPL-EVAL (this file and `worklog.md` frozen after Slice 1); the same class recurred and was
@@ -57,15 +63,21 @@ certification, not only when an author happens to.**
 - Implemented Slice 6: `createOpenAPISpec` post-processes generated operations via oRPC's public
   `traverseContractProcedures`, projecting LD-9's exact security mapping (none/required/optional)
   while preserving every user-supplied operation field.
+- Implemented Slice 7's type/schema contract only: optional list/detail `access` fields share one
+  bounded `OperationAccessSummary`; a typed schema example proves literal construction while both
+  flows continue to omit the field.
+- Regenerated the MCP export corpus under its standing exemption; it moved from 7,654 to 7,655
+  symbols with the expected new type and widened list/detail signatures.
 - Regenerated the ceiling-exempt MCP export corpus at Slice 5 through its checked-in generator; it
   grew by only the two expected public `createContractAuthorizer` entries, then stayed unchanged at
   Slice 6 (a runtime-behavior-only change, no new exported signature).
 
 ## Next Steps
 
-1. Supervisor releases Slice 7 (MCP access result contract, type/schema only) under its locked
-   ceiling.
-2. Continue Slices 8–9, each with its own Tier-A review and separate opposite-family IMPL-EVAL.
+1. Supervisor performs substantive Tier-A review of Slice 7 and records the separate-session
+   evaluator outcome outside this author lane.
+2. Only after that release, continue Slices 8–9, each with its own Tier-A review and separate
+   opposite-family IMPL-EVAL.
 3. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
    the implementation PR must state the accepted substitution.
 4. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
@@ -123,6 +135,12 @@ verdicts: supervisor Tier-A **ACCEPTED** plus a separate opposite-family IMPL-EV
 **ACCEPTED_WITH_FINDINGS** (DeepSeek V4 Flash 0731, native route quota-exhausted both times —
 `evaluate-slice-5.md`, `evaluate-slice-6.md`). Neither slice was author-self-certified.
 
+Slice 7: content `897a06cd7170ca021da1836b3cbcbf790cf97a2f`, `SUFFICIENT` evidence set,
+8/8 durable receipts. Scoped check selected 116 files; lint/fmt selected 115; MCP tests passed
+136/136; exports drift, corpus freshness, quality/doctrine, and full publish dry run passed. The
+direct MCP JSR audit exited 0 with its three existing warnings. MCP public doc lint remained
+excluded as base-red. This is author evidence only; Tier-A acceptance is still pending.
+
 ## Drift and Debt
 
 - RTK remains unavailable on this host; repo-native wrappers and raw read-only Git inspection were
@@ -135,6 +153,7 @@ verdicts: supervisor Tier-A **ACCEPTED** plus a separate opposite-family IMPL-EV
 ## Commits
 
 Slice 5's immutable content commit is `c2cbfbf0b3c355682732be5805f0f180498576db`; Slice 6's is
-`11e83f06426469b48a67c2211d954ac916cd6fda`. Each has its own evidence commit holding only run
+`11e83f06426469b48a67c2211d954ac916cd6fda`; Slice 7's is
+`897a06cd7170ca021da1836b3cbcbf790cf97a2f`. Each has its own evidence commit holding only run
 documentation and the verified receipt set. Treat Git and the draft PR as the authority for the
 evidence carrier's identifier; this file cannot name its own commit SHA.
