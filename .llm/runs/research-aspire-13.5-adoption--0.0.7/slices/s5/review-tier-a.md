@@ -21,7 +21,8 @@ Gates executed by the reviewer at `13375bfc0`:
 | `quality:scan` / `arch:check` | 0 findings / FAIL=0 |
 | `run-deno-check` (plugins, cli/src, cli/e2e, .llm/tools e2e+validation) | 1282 files, 0 diagnostics |
 | unit suites (5 plugins, cli templates/adapters, tool tests) | 481 passed / 0 failed / 12 ignored |
-| raw `deno lint --no-config` / `deno fmt --check --no-config …` on changed TS | clean |
+| raw `deno lint --no-config` on 79 changed TS files | clean |
+| raw `deno fmt --check --no-config --single-quote --line-width 100` on the same files | 8 flagged; 7 already non-conforming on `origin/main` (pre-existing `packages/cli` double-quote style), 1 new: `packages/cli/e2e/.../configure-flow-b-job.ts` (minor, in the steer) |
 | sagas `deno publish --dry-run --allow-dirty` / `deno doc --lint mod.ts` | 3 pre-existing warnings / pre-existing #1708 only |
 | `deno task e2e:cli run scaffold.plugins --cleanup --format pretty` | 17/17 |
 | `SAGAS_API_DEFAULT_PORT` runtime reads | none (exports + README only) |
@@ -40,4 +41,4 @@ the `aspire describe`-derived E2E probes are correct and tested. Two findings ar
    deprecation-contract tests, allow-list the constants files), extend the 0.0.8 removal draft.
 
 Steer posted as PR #1740 comment (2026-08-30 ~03:05 CEST); runner stopped (SIGTERM, runner only);
-the child's in-flight continuation turn reads the comment. Slice 7 expected.
+the child's in-flight continuation turn reads the comment. Slice 7 expected. Fix brief also sent by `codex-resume` on the same thread (supervisor is the sender after the runner stop).
