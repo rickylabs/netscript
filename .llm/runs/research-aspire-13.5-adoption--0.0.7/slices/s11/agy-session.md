@@ -18,3 +18,5 @@
   <id> -p "<follow-up>"` from the same worktree.
 - **Follow-on lanes (mandatory, supervisor-dispatched):** `docs_audit` (Codex · Sol · medium single
   pass) → fixes on the same AGY conversation → `docs_polish` (Claude · Fable · medium edit-only).
+- Launch attempt 1 failed at argv parsing (`-p` consumed `--model`; exit 2, nothing ran). Attempt 2:
+  flags first, prompt attached as `--prompt=…` (log `s11-agy-launch-2.log`).
