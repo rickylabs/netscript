@@ -8055,3 +8055,51 @@ frozen factory result.
 Re-dispatched from `8e1d639d2` after the full eviction procedure (`ownerPid 3519642` absent from
 `/proc`, session absent across three debounced probes, backup, single literal path, thread record
 preserved as `codex-thread-ids-1387-s3b.md`).
+
+## #1387 Slice 3 — ACCEPTED; native evaluator quota exhausted, escalated per policy
+
+The third dispatch (`01a05432`) did the work in one turn.
+
+| Head role | SHA |
+| --- | --- |
+| **Content** | `c297064aa76ca1b2b790f399adfb899e95c03920` |
+| **Evidence** | `248b2f062322106c2bf57e6ddd3d4e32e0b446d6` — product-neutral |
+| Base | `8e1d639d2` · pushed · PR comment #1762 `5470908400` |
+
+### Tier-A ACCEPTED
+
+Exactly the four ceiling files; `deno.lock` byte-identical at `edfa0c24…`. `buildRpcContext` now
+returns a fresh `ServiceHandlerContext<TCustom>` assembled by conditional spread, so no key is ever
+created with an `undefined` value — **D-8 resolved in the runtime direction**, making the published
+`Readonly<Record<string, string>>` true rather than aspirational. **The third door needed no ceiling
+amendment and no owner ruling**, which is the direct cost of my earlier false binary.
+
+Seven receipts, all PASS at the content head with `gitHead == actualGitHead`; evidence set
+**SUFFICIENT**. Slice 1 and Slice 2 sets stayed frozen and the top level held only Slice 3's — the D-6
+discipline held once it was stated as *move, not copy*.
+
+**`mcp-export-corpus` carried a receipt for the first time.** That is D-5's catalog fix paying off two
+slices after the gap was found, and it passed *unchanged*, which is the informative result: on a
+behaviour-only slice a moved corpus would have meant a public signature changed.
+
+The proofs are real rather than acceptance-only: the factory result is frozen and the composed context
+asserted to be a different object, and absence is checked with `Object.hasOwn` — the only assertion
+that separates "absent" from "present and `undefined`". A value comparison would have passed against
+the very defect being fixed.
+
+**F-1 (non-blocking):** the tests reach the private `buildRpcContext` through
+`as unknown as RpcContextBuilder`. It is the only seam available, so the cast buys otherwise
+unreachable coverage — but a test that must cast away privacy is itself evidence the composition has
+no public observation point, which is the same surface question as **#1787**.
+
+### Evaluator route changed — native quota, not a fault
+
+The native opposite-family session returned, in one turn for $0.0025:
+*"You've hit your monthly spend limit."* That is a **native-family quota limit**, which
+`lane-policy.md` row 46 anticipates: local IMPL-EVAL escalates to **DeepSeek V4 Flash 0731 · max**
+over OpenRouter, with AGY Gemini 3.6 Flash · high as the next fallback if OpenRouter is also limited.
+
+Re-dispatched on that route at the same evidence head, same brief. **The escalation is the documented
+one, not an improvisation** — recorded here because a changed evaluator identity must never be silent:
+generator ≠ evaluator still holds (Codex authored, non-Codex evaluates), and the verdict will name its
+own route.
