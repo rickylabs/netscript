@@ -71,6 +71,9 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 | 2026-08-30T12:54Z | S1 | baseline gates | Ran every candidate at base; doc-lint alone is pre-existing red and is contracted as a delta. |
 | 2026-08-30T12:55Z | S1 | plan | Recorded design, locked decisions, four slices, risks, and exact provider-bound fields. |
 | 2026-08-30T12:59Z | S1 | reconcile | Live `main` advanced to `952cc106`; verified no owned-surface overlap, rebased, and reran every base candidate in a detached clean worktree. |
+| 2026-08-30T13:45Z | S2 | implementation | Added an inner recording client under `withRetryingChatClient`; attempt 1 fails before output, attempt 2 emits the tool call, and attempt 3 is the post-tool continuation. |
+| 2026-08-30T13:46Z | S2 | mutation proof | Mutation B made the named guard fail 0/1; restored `loop.ts` byte-for-byte and reran the focused suite green 9/9. |
+| 2026-08-30T13:47Z | S2 | hygiene | Focused format PASS (1 file), test file 492 LOC, `deno.lock` working/tree blob both `a1522e6e`, and raw status showed no generated carrier movement. |
 
 ## Decisions
 
@@ -119,8 +122,33 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Mutation B guard | NOT_RUN | S2 | Must record exact named red output and restored green. |
-| Retry + continuation | NOT_RUN | S2 | Must cover every recorded request. |
+| Mutation B guard | PASS | Named mutation-red output below | Temporary loop mutation failed 0/1, then `git diff --exit-code -- packages/ai/src/agent/loop.ts` passed after restoration. |
+| Retry + continuation | PASS | Focused wrapper 9/9, 214 ms after restoration | Three inner attempts recorded: initial failure, retry success, and post-tool continuation. Every request projects `messages/system/tools/options`, rejects the sentinel, and retains the identical `CONTEXT` reference. |
+
+### S2 mutation-B red/green demonstration
+
+Temporary mutation (never staged):
+
+```ts
+system: `${input.system ?? ''}${JSON.stringify(input.context)}`,
+```
+
+Exact expected-red invocation and wrapper output:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter 'agent loop: keeps context out of every provider-bound retry and continuation request' packages/ai/tests/request_context_test.ts
+exit_code=1
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","--filter","agent loop: keeps context out of every provider-bound retry and continuation request","packages/ai/tests/request_context_test.ts"],"cwd":"/home/agent/projects/netscript/worktrees/007-leaf-1730","exitCode":1,"durationMs":1208,"summary":{"passed":0,"failed":1,"ignored":0,"totalResults":1,"uniqueFailures":1},"failures":[{"message":"AssertionError: context leaked into a provider-bound loop request: {\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"system\":\"be brief{/\"documentIds/\":[/\"doc-ns1730-provider-invisibility-7f3b9d2e-context-must-not-leak/\"],/\"tenantId/\":/\"tenant-ns1730-provider-invisibility-7f3b9d2e-context-must-not-leak/\"}\",\"tools\":[{\"name\":\"echo\",\"description\":\"echo\",\"parameters\":{\"type\":\"object\"}}],\"options\":{\"reasoningEffort\":\"low\"}}\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/ai/tests/request_context_test.ts:<line>:<column>","count":1,"tests":[{"name":"agent loop: keeps context out of every provider-bound retry and continuation request","file":"./packages/ai/tests/request_context_test.ts","line":352}]}]}
+```
+
+Restoration evidence:
+
+```text
+git diff --exit-code -- packages/ai/src/agent/loop.ts
+exit_code=0
+
+focused wrapper after restoration: exit 0; 9 passed, 0 failed; durationMs 214
+```
 
 ### Consumer Gates
 
@@ -134,9 +162,13 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
   `status:research`, and milestone number 27. No new issue/PR comments existed at intake. The draft
   PR carries `Closes #1730`; no issue box is edited. Live `main` advanced once during PR creation;
   the branch was rebased and the base census repeated with unchanged classification.
+- **S2:** PR #1763 still had only the S1 PLAN comment and issue #1730 had no comments; no evaluator
+  or reviewer finding changed the locked slice. Per the owner instruction for partial work, the
+  post-push PR update will replace the premature `Closes #1730` with `Refs #1730 — partial`, mark
+  only the S2 slice complete, and leave every Definition-of-Done/acceptance box untouched.
 
 ## Handoff Notes
 
-- Tier-A should inspect the exhaustive field list, retry recording level, base-red doc-lint delta,
-  and product ceiling first.
-- S2 must not start until the separate Tier-A supervisor records substantive approval of S1.
+- Tier-A should inspect the request snapshots, strict positive context identity assertion, all-four-
+  field negative projection, deterministic three-attempt sequence, and captured mutation-red output.
+- S3 must not start until the separate Tier-A supervisor substantively approves S2.

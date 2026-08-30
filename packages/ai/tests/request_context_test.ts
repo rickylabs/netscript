@@ -31,12 +31,17 @@ import type { AnyTextAdapter, StreamChunk } from '@tanstack/ai';
 import { createAgentLoop } from '../agent.ts';
 import type { RequestContext } from '../agent.ts';
 import type { AgentChunk } from '../src/contracts/chunk.ts';
-import type { ChatClientEvent } from '../src/ports/chat-client.ts';
+import type {
+  ChatClientEvent,
+  ChatClientRequest,
+  ChatModelProviderPort,
+} from '../src/ports/chat-client.ts';
 import type { ToolInvocationOptions } from '../src/ports/tool-registry.ts';
 import type { AiToolInvocationContext } from '../src/tools/domain/definition.ts';
 import { toTanstackChatClient } from '../src/adapters/tanstack-chat-client.ts';
 import { AnthropicModelProvider } from '../anthropic.ts';
 import { OpenAiCompatibleModelProvider } from '../openai-compatible.ts';
+import { withRetryingChatClient } from '../mod.ts';
 import { createToolRegistry, defineAiTool } from '../tools.ts';
 import { createFakeChatModelProvider, createInMemoryToolRegistry } from '../src/testing/mod.ts';
 
@@ -46,7 +51,7 @@ const MODEL = 'anthropic:claude-sonnet-4-5';
  * A string that exists nowhere else in the package. Any occurrence of it in a
  * provider-bound payload is proof of a leak, whatever shape the leak took.
  */
-const SENTINEL = 'ns1694-request-context-must-not-leak';
+const SENTINEL = 'ns1730-provider-invisibility-7f3b9d2e-context-must-not-leak';
 
 const CONTEXT: RequestContext = {
   documentIds: [`doc-${SENTINEL}`],
@@ -285,6 +290,51 @@ Deno.test('request context: omitting it sends no metadata at all', async () => {
 
 // --- Positive: the agent loop threads it to both consumers -------------------
 
+interface RecordingRetryProvider extends ChatModelProviderPort {
+  readonly requests: readonly ChatClientRequest[];
+}
+
+/** Fail once before output, then answer a tool turn and its continuation. */
+function retryThenToolThenTextProvider(): RecordingRetryProvider {
+  const requests: ChatClientRequest[] = [];
+  let attempt = 0;
+  return {
+    id: MODEL,
+    requests,
+    createChatClient() {
+      return withRetryingChatClient({
+        kind: 'text',
+        name: 'recording',
+        async *stream(request) {
+          requests.push({ ...request, messages: [...request.messages] });
+          attempt++;
+          if (attempt === 1) throw { status: 429 };
+          if (attempt === 2) {
+            yield {
+              type: 'tool-call',
+              toolCall: { id: 'call-1', name: 'echo', arguments: '{"text":"hi"}' },
+            };
+            yield { type: 'finish', finishReason: 'tool-calls' };
+            return;
+          }
+          yield { type: 'text', delta: 'done' };
+          yield { type: 'finish', finishReason: 'stop' };
+        },
+      }, { maxAttempts: 2, sleep: () => Promise.resolve() });
+    },
+  };
+}
+
+/** Every loop request field that can reach a provider, excluding `context`. */
+function loopProviderBoundPayload(request: ChatClientRequest): string {
+  return JSON.stringify({
+    messages: request.messages,
+    system: request.system,
+    tools: request.tools,
+    options: request.options,
+  });
+}
+
 /** A scripted two-turn provider: one tool call, then a plain text turn. */
 function toolThenTextProvider() {
   return createFakeChatModelProvider(MODEL, [
@@ -299,8 +349,8 @@ function toolThenTextProvider() {
   ]);
 }
 
-Deno.test('agent loop: threads the run context into every ChatClientRequest', async () => {
-  const provider = toolThenTextProvider();
+Deno.test('agent loop: keeps context out of every provider-bound retry and continuation request', async () => {
+  const provider = retryThenToolThenTextProvider();
   const tools = createInMemoryToolRegistry();
   tools.register(
     { name: 'echo', description: 'echo', parameters: { type: 'object' } },
@@ -311,12 +361,25 @@ Deno.test('agent loop: threads the run context into every ChatClientRequest', as
   await collect(loop.run({
     model: MODEL,
     messages: [{ role: 'user', content: 'hi' }],
+    system: 'be brief',
+    tools: [{ name: 'echo', description: 'echo', parameters: { type: 'object' } }],
+    options: { reasoningEffort: 'low' },
     context: CONTEXT,
   }));
 
-  assertEquals(provider.requests.length, 2);
+  assertEquals(provider.requests.length, 3);
+  assertEquals(provider.requests[0]?.messages, provider.requests[1]?.messages);
+  assert(
+    (provider.requests[2]?.messages.length ?? 0) > (provider.requests[1]?.messages.length ?? 0),
+    'the third provider call should be the post-tool continuation',
+  );
   for (const request of provider.requests) {
-    assertEquals(request.context, CONTEXT);
+    assert(request.context === CONTEXT, 'the provider attempt should retain the run context');
+    const payload = loopProviderBoundPayload(request);
+    assert(
+      !payload.includes(SENTINEL),
+      `context leaked into a provider-bound loop request: ${payload}`,
+    );
   }
 });
 
