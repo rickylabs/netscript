@@ -13,14 +13,18 @@
  * start with `relay-` are relayed; hop-A containers carry label netscript.relay.owner=<owner>.
  * SIGTERM/SIGINT on `watch` runs the same cleanup as `cleanup`.
  *
- * Availability tracking (D-97): each poll cycle recomputes the set of currently-published
- * `127.0.0.1:<port>` mappings from live (non-`relay-`) containers. Any port this relay owns that
- * is no longer published — e.g. `aspire resource <name> stop` removed the container/its port —
- * is torn down immediately (hopB listener closed, hopA socat container removed), so a stopped
- * backing service is truly unreachable through the relay rather than staying falsely connectable.
- * When the same port is republished (e.g. after `aspire resource <name> start`), it is relayed
- * again fresh on the next cycle via the normal creation path below.
+ * Availability tracking (D-97/D-100): each poll cycle recomputes the set of currently-published,
+ * currently-*running* `127.0.0.1:<port>` mappings from live (non-`relay-`) containers. A port is
+ * considered vanished — its hop-B listener closed and hop-A socat container removed — not only
+ * when the source container disappears (`aspire resource <name> stop`) but also when it is
+ * merely `docker pause`d: a paused container still satisfies a new inbound TCP handshake at the
+ * kernel level (the process just never calls `accept()`), so treating "published" as "listed in
+ * `docker ps`" alone leaves a paused backing service falsely connectable through the relay. Once
+ * the source container is unpaused (or a fresh container republishes the same port), the normal
+ * creation path below re-arms it fresh on the next cycle.
  */
+import { shouldRelayContainer } from './loopback-relay-logic.ts';
+
 const MISE = '/home/agent/.local/bin/mise';
 const args = parse(Deno.args.slice(1));
 const mode = Deno.args[0];
@@ -122,12 +126,23 @@ while (!stopping) {
       const [id, name, ports] = row.split('\t');
       if (!id || !name || name.startsWith('relay-')) continue;
       if (!(ports ?? '').includes('127.0.0.1:')) continue;
-      // Fail closed: creation time comes from `docker inspect .Created` (RFC 3339); anything
-      // unparseable is skipped and logged, never relayed.
-      const createdIso = await docker('inspect', '--format', '{{.Created}}', id);
-      const created = new Date(createdIso);
-      if (!Number.isFinite(created.getTime())) { console.error(`[relay] skip ${name}: unparseable Created "${createdIso}"`); continue; }
-      if (created < since) continue;
+      // Fail closed: creation time and paused state come from a single `docker inspect` call
+      // (RFC 3339 `.Created`, boolean `.State.Paused`); an unparseable `.Created` is skipped and
+      // logged, never relayed, and a `.State.Paused=true` container is treated as unavailable.
+      const [createdIso, pausedRaw] = (await docker(
+        'inspect',
+        '--format',
+        '{{.Created}}\t{{.State.Paused}}',
+        id,
+      )).split('\t');
+      const paused = pausedRaw === 'true';
+      if (!shouldRelayContainer(createdIso, paused, since)) {
+        if (paused) console.log(`[relay] ${name} is paused — treating its published ports as unavailable`);
+        else if (!Number.isFinite(new Date(createdIso).getTime())) {
+          console.error(`[relay] skip ${name}: unparseable Created "${createdIso}"`);
+        }
+        continue;
+      }
       for (const m of (ports ?? '').matchAll(/127\.0\.0\.1:(\d+)->/g)) {
         const port = Number(m[1]);
         livePorts.add(port);
