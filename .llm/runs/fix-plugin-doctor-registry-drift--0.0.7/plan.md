@@ -8,9 +8,10 @@
 | Branch | `fix/plugin-doctor-registry-drift` |
 | Phase | `plan-eval` |
 | Re-plan baseline | `61b8bf52b50a3cc3e98b67b367d1a1e4a2022807` |
-| Target | `packages/cli` plugin doctor plus first-party runtime-registry generators |
+| Plan amendment baseline | `349d5915062566c331f6d703e74be3099251a363` |
+| Target | `packages/cli` plugin doctor and the AI runtime-registry generator |
 | Archetypes | `6 — CLI / Tooling`; `5 — Plugin Package` |
-| Scope overlays | generator-selection reporting protocol; JSR/publish surface validation |
+| Scope overlay | optional manifest-advertised generator inspection protocol v1 |
 
 ## Why the Plan Reopened
 
@@ -21,264 +22,325 @@ express. The shipped AI generator reads source and accepts only modules that exp
 registry even though the manifest walk discovers it. Doctor currently reports that correct state as
 an error and prescribes a regeneration that cannot change it.
 
-The repair is a material contract and scope change. The old `PLAN-EVAL: N/A` decision is superseded;
-a fresh, separate PLAN-EVAL must approve this plan before any S7 test or product edit.
+The repair introduces an architectural process contract. The old `PLAN-EVAL: N/A` decision is
+superseded; a fresh, separate PLAN-EVAL must approve this plan before any S7 test or product edit.
+
+## Coordinator-Ruled Design
+
+The direction and ceiling are no longer open choices. The authorized repair is a narrow, generic,
+optional, manifest-advertised generator inspection protocol:
+
+- `runtimeRegistryGenerator.inspectionProtocol: 1` advertises support. Advertising is optional.
+- only a present `inspectionProtocol` key activates inspection; version `1` uses
+  `--inspect --inspection-protocol 1 --manifest-json <json>`, omits both `--manifest` and
+  `--allow-write`, and accepts one strict JSON document on stdout. Invalid advertised declarations,
+  process failures, and invalid reports all remain generator-inspection errors — none can enter the
+  legacy manifest-walk path.
+- The CLI invokes the same external generator through the already-injected `ProcessPort`.
+- Inspect and compile use one shared pure AI selector. The CLI never learns what a ready AI tool
+  definition is.
+- A manifest with no `inspectionProtocol` property retains the current manifest walk unchanged.
+- AI adopts protocol v1 in this leaf. Workers, sagas, and triggers do not.
+
+AC2 is unchanged. A definition selected by the generator but absent from the registry remains a
+failure. `skill-loader.ts` is a factory, not a definition, so excluding it is healthy and requires no
+issue edit.
 
 ## Doctrine and Architecture
 
 - `packages/cli` remains an Archetype-6 **Keep** surface. Process execution stays behind
-  `ProcessPort`, manifest/file access stays behind `FileSystemPort`, and the composition root stays
+  `ProcessPort`; manifest and source validation stay behind `FileSystemPort`; composition stays
   declarative.
-- `plugins/ai`, `plugins/workers`, `plugins/sagas`, and `plugins/triggers` are Archetype-5 plugin
-  packages. Each plugin remains the owner of its selection semantics and reports the result through
-  a thin CLI adapter; the host does not acquire a plugin-kind switch.
-- A1 is applied at the process boundary: define and validate a versioned JSON report contract before
-  changing discovery. A6/A7 keep selection with the existing generator/compiler and use captured
-  stdout rather than another filesystem protocol. A10 keeps generator construction in composition.
-  A14 requires the AI false-positive regression red-before product edits.
-- AP-9 is avoided by reporting the generator's decision instead of reimplementing AI source parsing,
-  workers profiles, conditional includes, or dotfile policy in `packages/cli`.
-- No public package export is planned. The JSON report is a private executable protocol negotiated by
-  the optional manifest capability; package export maps and dependencies remain unchanged.
+- `plugins/ai` remains an Archetype-5 plugin package and owns its selection semantics. The host
+  consumes a versioned evidence report and never gains a plugin-kind switch or source-shape parser.
+- A1 applies at the process boundary: the v1 JSON request/response contract is defined and validated
+  before consumption. A6/A7 keep selection in the existing compiler and use captured stdout instead
+  of a second filesystem protocol. A14 requires the real AI regression to be committed red-before.
+- AP-9 is avoided: neither the runtime manifest nor `packages/cli` copies AI source-selection logic.
+- No public package export, new dependency, lockfile update, or architecture-debt entry is planned.
 
-## Goal
+## Locked Contract
 
-Make doctor compare generated registry entries with the source files the responsible generator would
-select now. A source definition selected by the generator but absent from the registry remains an
-error under AC2; a discoverable factory or helper that the generator legitimately rejects is not a
-definition and must not make doctor unhealthy.
+### Capability declaration and invocation
 
-## Direction Analysis
-
-| Direction | Strengths | Failure mode / cost | Decision |
-| --- | --- | --- | --- |
-| (a) Generator-selected source report | Uses the same source-shape, profile, include, conditional-include, plugin-directory, and dotfile rules that write each registry. General across current and future non-path predicates. | Requires an additive process protocol and report-only support in each first-party generator. Older third-party generators need a compatibility fallback. | **Chosen.** It is the only direction that preserves AC2 while making the expected set evidence-backed. |
-| (b) Declare selection in `scaffold.runtime.json` | Static and cheap for simple suffix/exclude policies. | Cannot express AI's source-shape predicate without embedding executable policy in data. Mirroring workers overlays and filesystem-dependent conditions would create a second selector and AP-9 drift. | Rejected as the selection authority. The manifest may advertise report capability only; it does not restate selection rules. |
-| (c) Downgrade missing entries to warnings | Fits the old CLI-only ceiling and eliminates this false error. | Directly trades away AC2: a real selected definition omitted from the registry would no longer fail doctor. It hides uncertainty rather than improving evidence. | Rejected. AC2 remains unchanged and no issue edit is proposed. |
-
-## Re-locked Decisions
-
-| ID | Decision | Rationale |
-| --- | --- | --- |
-| D1R | The plugin generator's current selected-source report is authoritative when the manifest advertises it. | It is the artifact-producing policy, including source-shape and filesystem-dependent rules. |
-| D2R | `runtimeRegistryGenerator` gains an optional `sourceSelectionReport.protocolVersion: 1` declaration. | Capability negotiation prevents the CLI from passing unknown flags to older third-party generators. The declaration identifies the executable protocol, not what to select. |
-| D3R | Report-only execution receives the already-resolved manifest through `--manifest-json`, gets read permission but not write permission, writes no registry/project manifest, and emits exactly one versioned JSON document on stdout with one normalized `sourceFiles` set per declared `registryPath`. | Doctor stays read-only, stdout is already captured by `ProcessPort`, and published manifests need no project or temp sidecar. |
-| D4R | All four first-party runtime-registry generators adopt the report protocol. A manifest without the capability retains the current suffix/exclude walk for backward compatibility. | First-party evidence becomes generator-owned without breaking already-published third-party commands. The fallback is explicitly identified as manifest-derived evidence. |
-| D5R | The host rejects malformed, duplicate, absolute, escaping, missing-target, or extra-target report data as a named inspection failure; it never silently falls back after an advertised reporter fails. | An advertised but unusable report is evidence failure, not permission to make a stronger claim from weaker data. |
-| D6R | `GeneratedPluginRegistry` carries source evidence and its authority (`generator` or `manifest`); `registrableItems` is the per-target selected/discovered count. | Doctor wording can name its evidence honestly. This also corrects the prior worklog's shape-only/value-preservation overstatement. |
-| D7R | Registry import/binding comparison and AC2 error semantics remain unchanged after replacing the expected set. | The defect is the provenance of expected sources, not the bidirectional comparison itself. |
-| D8R | Workers reporting includes main target files and `pluginDirs` after profile overlays, `include`, `includeWhenPresent`, excludes, and dotfile filtering. | This closes evaluator F4 rather than knowingly leaving the same assumption latent. |
-| D9R | PLAN-EVAL is required and blocks S7. | The reporting protocol, fallback, expanded ceiling, and cross-archetype sequence are material open-design repairs. |
-
-## Compatibility and Failure Semantics
-
-### Locked wire shape
-
-The additive manifest capability is:
+The AI manifest changes only the existing generator declaration:
 
 ```json
 {
   "runtimeRegistryGenerator": {
-    "sourceSelectionReport": {
-      "protocolVersion": 1
-    }
+    "command": "src/cli/generate-runtime-registries.ts",
+    "args": ["--profile", "scaffold"],
+    "inspectionProtocol": 1
   }
 }
 ```
 
-For a version-1 declaration the host invokes the generator with
-`--report-selected-sources --manifest-json <resolved-json>` plus the existing project root/profile
-arguments, but with `--allow-read` and no `--allow-write`. The generator emits only this normalized
-stdout document and performs no writes:
+Presence is tested separately from value:
+
+- Property absent: do not invoke a child process during dry-run; use the legacy manifest walk.
+- Property present and exactly numeric integer `1`: invoke protocol v1.
+- Property present with any other value, including a string, `null`, fraction, or unknown version:
+  fail closed as an invalid advertised generator-inspection contract. Do not fall back.
+
+The v1 process arguments, in contract order after the generator URL, are:
+
+```text
+--project-root <absolute-project-root>
+<runtimeRegistryGenerator.args>
+--official-samples false
+--inspect
+--inspection-protocol 1
+--manifest-json <JSON.stringify(resolved-runtime-manifest)>
+```
+
+The parent command is `deno run --config <projectRoot>/deno.json --allow-read <generatorUrl> ...`.
+Inspect mode does not receive `--allow-write`, does not receive `--manifest`, and does not materialize
+or remove `.netscript/.runtime-manifests/<plugin>.json`. Normal compile invocation remains unchanged.
+
+### Response schema
+
+The generator emits exactly one JSON document on stdout and no progress text in inspect mode:
 
 ```json
 {
-  "schemaVersion": 1,
+  "inspectionProtocol": 1,
   "registries": [
     {
-      "registryPath": ".netscript/generated/plugin-x/x.registry.ts",
-      "sourceFiles": ["x/definition.ts"]
+      "registryPath": ".netscript/generated/plugin-ai/tools.registry.ts",
+      "sourceFiles": ["ai/tools/e2e-tool.ts"]
     }
   ]
 }
 ```
 
-Array order is deterministic (`registryPath`, then `sourceFiles` lexical order). Paths are
-project-relative `/`-normalized strings. The host matches report entries to the manifest's declared
-registry paths and never trusts the generator to introduce a target.
+Protocol v1 is strict:
 
-- Normal `netscript generate plugins` invocation and generator stdout remain unchanged when the
-  report-only args are absent.
-- Maintainer copied-plugin generation ignores the additive manifest member and continues its normal
-  invocation.
-- Report-only mode must not write, delete, or format registry or manifest files. It may read source
-  text where selection requires it. The existing project-side temporary manifest remains confined to
-  normal generation and is not used by doctor inspection.
-- A generator-capable manifest is all-or-nothing: non-zero exit, non-JSON/mixed stdout, wrong
-  protocol version, unsafe paths, duplicate target reports, or target-set mismatch becomes a doctor
-  inspection error naming the plugin. There is no manifest fallback in that case.
-- An older manifest with no report capability keeps the existing path walk and is labelled
-  `manifest` authority. This is compatibility behavior, not a claim that arbitrary undeclared
-  source predicates are modeled.
-- Empty-selection behavior stays bounded to existing generator semantics; the repair does not invent
-  definitions or turn a legitimate helper-only directory into an AC2 failure.
+- The top-level value is a plain object with exactly `inspectionProtocol` and `registries`.
+- `inspectionProtocol` is exactly numeric integer `1`.
+- `registries` is an array of plain objects with exactly `registryPath` and `sourceFiles`.
+- Each `registryPath` is a non-empty canonical project-relative slash path: no URL, absolute path,
+  backslash, empty/`.`/`..` segment, query, or fragment.
+- The manifest's declared `runtimeRegistries[].registryPath` values must themselves be valid and
+  unique before invocation. The response registry set must match that declared set exactly: every
+  declared path once, with no duplicate, omission, or extra target. An empty `sourceFiles` array is
+  valid and must still be reported for its target.
+- Each `sourceFiles` element is a non-empty canonical project-relative slash path under the project
+  root with the same escape/URL checks. It must exist at inspection time and be a regular file.
+  Validation deliberately does not require membership in the legacy manifest walk; doing so would
+  reintroduce the host as selection authority and prevent later workers/profile adoption.
+- A source path may appear at most once within a registry. The same source may appear in two distinct
+  declared registries because target overlap can be legitimate. Accepted source sets are sorted by
+  the host before comparison; the AI reporter also emits deterministic sorted arrays.
+- Empty stdout, multiple/log-prefixed JSON documents, malformed JSON, wrong types, and unknown fields
+  are invalid protocol responses.
 
-## Scope — Expanded and Locked Product/Test Ceiling
+The schema/parser/validator remains private in
+`installed-runtime-registry-generator.ts`, which already owns the `ProcessPort` call. The previously
+proposed new `runtime-registry-source-report.ts` is removed because it is not authorized.
 
-Only the following product/test paths are authorized after PLAN-EVAL approval:
+### Shared pure AI selector
+
+`plugins/ai/src/cli/ai-registry-compiler.ts` owns one pure selection function over `ProjectFiles` and
+an `AiRegistryTarget`. It returns the deterministic selected relative paths and performs no write.
+
+- `compileAiRegistry` calls that selector, then alone renders/writes the registry.
+- AI inspect mode calls that same selector for every declared AI target, then serializes the v1
+  report. It never calls `compileAiRegistry`.
+- There is no second source-shape predicate, report-only approximation, or host-side AI rule.
+- Compiler tests assert normal compile's returned `files` exactly equal the shared selector result.
+
+### No-write proof
+
+Omitting `--allow-write` is a permission boundary, but it is not the whole proof. The implementation
+must establish all of the following:
+
+1. AI compiler unit evidence snapshots the in-memory `ProjectFiles` write map before and after pure
+   selection and asserts byte-for-byte equality.
+2. Installed-generator unit evidence snapshots the complete `MemoryFileSystem` before and after an
+   advertised dry-run, asserts equality, and asserts the `ProcessPort` invocation contains no
+   `--allow-write` or `--manifest` while returning a valid fixture report.
+3. The real AI integration regression snapshots all regular project files and their bytes after
+   normal generation, runs doctor/inspection, then asserts the full snapshot is unchanged. This
+   proves inspect mode did not rewrite the registries, create a sidecar, or mutate another project
+   file.
+
+Any write attempt that escapes a test double is independently denied by the child Deno permission
+set. Normal compile write behavior remains covered by existing AI and installed-generator tests.
+
+### Fail-closed user surface
+
+All advertised-protocol failures throw with this stable prefix and make doctor unhealthy:
+
+```text
+Generator inspection protocol 1 failed for <plugin>: <reason>
+```
+
+The reason is precise:
+
+| Validation/process failure | Reported reason |
+| --- | --- |
+| Invalid advertised value | `manifest inspectionProtocol must be the integer 1` |
+| Child non-zero | `generator exited <code>: <trimmed stderr, or stdout when stderr is empty>` |
+| Empty/malformed/multiple output | `stdout is not one protocol 1 JSON document` |
+| Wrong version or shape/unknown field | `invalid protocol 1 response: <field-specific reason>` |
+| Duplicate manifest registry path | `manifest declares duplicate registry path: <path>` |
+| Missing response target | `response omitted declared registry path: <path>` |
+| Extra response target | `response declared unknown registry path: <path>` |
+| Duplicate response target | `response duplicated registry path: <path>` |
+| Invalid source path | `response source path is invalid for <registry>: <path>` |
+| Missing/non-file source | `response source is not a regular project file for <registry>: <path>` |
+| Duplicate source in one target | `response duplicated source for <registry>: <path>` |
+
+The doctor workspace report keeps id `runtime-registry:inspection`, changes its title to
+`Generator runtime registry inspection`, and preserves the thrown detail. It offers no false
+`netscript generate plugins` remediation for a protocol failure. This wording cannot be mistaken for
+the legacy path: absent-protocol inspection never invokes a generator and retains existing
+manifest-derived evidence wording.
+
+`GeneratedPluginRegistry` carries `sourceAuthority: 'generator' | 'manifest'` beside `sourceFiles` so
+healthy and drift reports name the evidence used. Its field shape remains internal. As corrected for
+F3, S3 already changed `registrableItems` from the base plugin-wide sum to a per-target count; only
+the result shape was preserved, no production consumer reads the value, and this repair will use the
+selected per-target count for generator-authoritative results.
+
+## Locked Scope
+
+### Eleven coordinator-authorized product/test paths
+
+Only these eleven coordinator-enumerated paths are authorized:
 
 1. `packages/cli/src/public/features/generate/plugins/generate-installed-plugin-registries.ts`
 2. `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator.ts`
-3. `packages/cli/src/public/features/generate/plugins/runtime-registry-source-report.ts` (new)
-4. `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts`
-5. `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts`
-6. `packages/cli/src/public/features/plugins/doctor/runtime-registry-drift.ts`
-7. `packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts`
-8. `packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts`
-9. `packages/cli/src/public/features/root/public-command-dependencies.ts`
-10. `plugins/ai/scaffold.runtime.json`
-11. `plugins/ai/src/cli/generate-runtime-registries.ts`
-12. `plugins/ai/src/cli/ai-registry-compiler.ts`
-13. `plugins/ai/src/cli/ai-registry-compiler.test.ts`
-14. `plugins/workers/scaffold.runtime.json`
-15. `plugins/workers/src/cli/generate-runtime-registries.ts`
-16. `plugins/workers/src/cli/runtime-registry-generator.ts`
-17. `plugins/workers/src/cli/runtime-registry-generator_test.ts` (new)
-18. `plugins/sagas/scaffold.runtime.json`
-19. `plugins/sagas/src/cli/generate-runtime-registries.ts`
-20. `plugins/sagas/src/cli/registry-generator.ts`
-21. `plugins/sagas/tests/cli/registry-generator-golden_test.ts`
-22. `plugins/triggers/scaffold.runtime.json`
-23. `plugins/triggers/src/cli/generate-runtime-registries.ts`
-24. `plugins/triggers/src/cli/generate-runtime-registries_test.ts` (new)
+3. `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts`
+4. `packages/cli/src/public/features/plugins/doctor/runtime-registry-drift.ts`
+5. `packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts`
+6. `packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts`
+7. `packages/cli/src/public/features/root/public-command-dependencies.ts`
+8. `plugins/ai/scaffold.runtime.json`
+9. `plugins/ai/src/cli/generate-runtime-registries.ts`
+10. `plugins/ai/src/cli/ai-registry-compiler.ts`
+11. `plugins/ai/src/cli/ai-registry-compiler.test.ts`
+
+### Flagged existing-test interpretation
+
+`packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts`
+is retained as the natural home for the already-existing real AI `skill-loader` generation case and
+the required byte-snapshot/no-write assertion. This rests on the supervisor's reading of the
+coordinator's statement that existing adapter/evidence/doctor/test paths may be amended; it is not
+one of the five enumerated added paths. The interpretation is recorded in `drift.md` so PLAN-EVAL or
+the coordinator can overturn it before S7 at low cost.
 
 Run artifacts under `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/` remain authorized evidence.
-Any product/test path beyond these 24 paths is a significant rescope: stop before editing, append the
-need and evidence to `drift.md`, and request supervisor approval. No plugin manifest, generator,
-generated asset, docs/export surface, or test outside this list is implicitly authorized.
+Any product/test path beyond the eleven listed paths and the one flagged existing integration test is
+a rescope-and-stop: do not edit it, append the evidence and need to `drift.md`, and request approval.
+
+### Explicitly removed/deferred paths
+
+- No `runtime-registry-source-report.ts` is created; parsing and validation stay in path 2.
+- No `plugins/workers/*`, `plugins/sagas/*`, or `plugins/triggers/*` path is amended.
+- F4/workers profile, `include`, `includeWhenPresent`, plugin-directory, and dotfile adoption is
+  knowingly deferred to follow-up scope. The protocol needs no redesign for that work: a workers
+  manifest can later advertise `inspectionProtocol: 1`, and its existing selector can feed the same
+  target/path/source report without the host learning workers policy.
 
 ## Non-Scope
 
 - Issue or acceptance-text mutation; AC2 already distinguishes definitions from factories.
-- Streams registry creation, arbitrary handwritten registry grammar, recursive discovery changes,
-  and unrelated #1366/#1574/#1365 behavior.
-- A new public `@netscript/plugin` API, package export, dependency, lockfile update, generated repo
-  asset, or documentation surface.
-- `e2e:cli`, Aspire, Docker, browser gates, runtime leases, merge/readiness changes, labels, issue
-  edits/closure, acceptance-box mutation, or implementation-author self-certification.
+- Workers adoption/F4 closure, streams registry creation, arbitrary handwritten registry grammar,
+  recursive discovery changes, and unrelated #1366/#1574/#1365 behavior.
+- New public exports, dependencies, lockfile changes, generated repository assets, docs, plugin
+  manifests other than AI's authorized manifest, or any seventh/new product family.
+- Merge/readiness changes, labels, issue edits/closure, acceptance-box mutation, or
+  implementation-author self-certification.
+- Author-run `scaffold.runtime`, Aspire, Docker, or browser work. The required runtime gate is
+  supervisor-coordinated under the cluster-wide singleton lease.
 
 ## Required Regression and Slice Discipline
 
-| Slice | Work | Product/test files | Commit/push/comment boundary | Proving evidence |
+| Slice | Work | Product/test paths | Commit/push/comment boundary | Required evidence |
 | --- | --- | --- | --- | --- |
-| S6 | Re-derive F1/F3/F4/F5, expand ceiling, and re-lock this plan. No product/test edit. | none; run artifacts only | Commit and explicit-refspec push; structured PLAN comment; stop. | Raw `git diff --exit-code -- deno.lock`; separate PLAN-EVAL required next. |
-| S7 | Add one AI case: create a ready tool plus discoverable `skill-loader.ts`, run the real installed AI generator, then assert doctor remains healthy. No product edit. | ceiling path 8 only | Commit the red test alone, push, and post its structured evidence before S8. | Against S6 head the focused structured suite must exit non-zero because current doctor raises `RemoteError` for `skill-loader.ts`; record exact passed/failed counts. |
-| S8 | Add the locked report-only protocol to AI while reusing the compiler's exact source-shape selection. | ceiling paths 10–13 only | Commit/push/comment before S9. | AI tests prove deterministic report JSON, `skill-loader.ts` exclusion, zero report-mode writes, and unchanged normal generation. |
-| S9 | Add the same protocol to workers and make its existing selector return complete per-target evidence. | ceiling paths 14–17 only | Commit/push/comment before S10. | Workers tests prove profile/include/conditional/dotfile/plugin-dir selection, zero report-mode writes, and unchanged normal generation; F4 is closed. |
-| S10 | Add the protocol to sagas and triggers without changing their normal registry output. | ceiling paths 18–24 only | Commit/push/comment before host consumption. | Saga/trigger tests prove exact report paths, zero report-mode writes, and byte/semantic stability of normal registries. |
-| S11 | Define the focused host report parser/validator, consume reports in installed dry-run inspection, retain manifest fallback for non-capable plugins, expose authority, and update doctor evidence wording. | ceiling paths 1–9 only | Commit/push/comment before final gates. | S7 regression turns green without weakening/removing its assertion; malformed-report and compatibility tests pass; existing five semantic cases remain green. |
-| S12 | Reconcile final evidence, run locked gates, update PR evidence, and hand off. | none unless an authorized leaf-owned format correction is required; run artifacts otherwise | Evidence commit/push/comment; stop for fresh Tier-A and opposite-family IMPL-EVAL. | Gate matrix below at exact final head. |
+| S6 | Amend and re-lock the ruled design/ceiling/gates. No product or test edit. | run artifacts only | Commit, explicit-refspec push, structured correction PLAN comment, PR body update, then stop. | Raw `git diff --exit-code -- deno.lock`; separate PLAN-EVAL next. |
+| PLAN-EVAL | Separate evaluator reviews the contract, exact scope, red-before design, failure surface, no-write proof, F4 deferral, and gate sufficiency. | evaluator artifact only | `APPROVED` permits S7; `CHANGES_REQUESTED` returns to S6. | No implementation before approval. |
+| S7 | Extend the existing real AI integration case: normal generation includes a real ready tool, legitimately excludes discoverable `ai/tools/skill-loader.ts`, then doctor is asserted healthy. Capture the pre-inspection byte snapshot for the later no-write assertion. No product edit. | flagged integration test only | Commit the red test alone, explicit push, structured TEST/IMPL comment, stop before S8. | Against the current product the new healthy assertion must fail because doctor expects `skill-loader.ts`; record exact exit and counts. Existing case name/assertions stay intact. |
+| S8 | Extract/use the shared pure AI selector, add inspect CLI mode, advertise v1 in the AI manifest, and prove selector purity/normal compile stability. | paths 8–11 | Commit/push/comment before host work. | AI compiler test and AI package suite: shared selector equality, deterministic report, no selector writes, normal generation unchanged. |
+| S9 | Parse/validate the advertised contract through `ProcessPort`, consume generator-selected evidence, retain absent-protocol legacy behavior, fail closed, update evidence wording, and turn S7 green. | paths 1–7 plus flagged integration test | Commit/push/comment before final gates. | Unit validation matrix; real AI `skill-loader` healthy; full project byte snapshot unchanged by inspect; original five doctor cases green. |
+| S10 | Reconcile all required gates and evidence. | run artifacts only unless an authorized path needs a proven correction | Commit/push/comment and update PR body. | All author-owned gates green; supervisor-owned `scaffold.runtime` report attached before IMPL-EVAL. |
 
-Every slice must update `worklog.md`/`context-pack.md`, commit, push with the explicit refspec, and
-post its structured PR comment before the next slice starts. S7's red commit is never amended into a
-product commit.
+Every slice commits only its named scope, pushes with
+`git push origin fix/plugin-doctor-registry-drift:fix/plugin-doctor-registry-drift`, posts the
+structured PR comment required by `netscript-pr`, updates the PR Validation/evidence block, and checks
+review threads before the next slice. A discovered need outside the locked scope stops the slice.
 
-## Test Invariants
+## Required Gate Set
 
-- The S7 case must prove the full defect: the generator legitimately excludes a path the manifest
-  walk can see, generation succeeds, and doctor exits healthy. Merely unit-testing AI's predicate is
-  insufficient.
-- The original S2 case name and its four assertions remain intact; shared-harness refactoring may
-  not weaken or remove them.
-- AC2 retains a negative case where a generator-selected definition is absent from its registry and
-  doctor exits 1 with `netscript generate plugins` remediation.
-- Reverse orphan and imported-but-unused cases remain errors.
-- Report parsing tests exercise hostile/invalid target and path data, not only the happy JSON shape.
-- F4 is closed, not deferred: at least one workers report test distinguishes generator selection
-  from the host's old manifest walk using overlay/include/conditional or dotfile behavior.
+Structured wrappers are the verdict source for focused Deno check/test/lint/fmt. Any JSON receipt in
+`.llm/tmp/gate-receipts/` is local-only and gitignored; committed evidence must give a reproducible
+command, evaluated SHA, exit code, and test counts. No claim relies on a receipt unavailable from a
+fresh checkout.
 
-## Open-Decision Sweep
-
-| Decision | Disposition | Why deferral will not force repair rework |
-| --- | --- | --- |
-| Legacy/third-party manifest has no report capability | **Safe to defer.** Preserve the existing suffix/exclude walk and mark its authority as `manifest`. | Capability is additive, so any plugin can adopt the same wire contract later without changing host comparison or report parsing. This is explicit compatibility evidence, not a claim that unknown private predicates were executed. |
-| Shared public `@netscript/plugin/cli` report helper | **Safe to defer.** Do not add one in this repair. | The executable JSON boundary is small and versioned; adding a public helper would expand exports and cascade without being required for interoperability. A later helper can emit the identical wire shape. |
-| Report transport and failure policy | **Resolved now** by D2R–D5R. | Captured stdout, inline resolved manifest JSON, read-only permission, strict validation, and no silent fallback are locked. |
-| First-party adoption breadth / workers F4 | **Resolved now** by D4R/D8R. | All four generators adopt; workers selection divergence is tested and closed. |
-| Empty selected target | **Resolved now.** Report every manifest target, including an empty `sourceFiles`; preserve existing normal-generator empty behavior and do not invent a definition. | Host target matching remains total and future behavior does not require a schema change. |
-| Issue AC2 wording | **Safe to defer / no edit needed.** | AC2 already says definition; generator selection supplies that evidence. Issue mutation is coordinator-owned. |
-
-No unresolved “must resolve now” decision remains for the planning evaluator.
-
-## JSR Audit Surface Scan
-
-- Planned publish packages: `@netscript/cli`, `@netscript/plugin-ai`,
-  `@netscript/plugin-workers`, `@netscript/plugin-sagas`, and
-  `@netscript/plugin-triggers`.
-- Planned public export-map delta: none. The manifest capability and generator executable protocol
-  are shipped inputs, but no `deno.json` export key or public `mod.ts` barrel changes.
-- Planned dependency/lock delta: none.
-- Slow-type risk: generator compiler/result functions that are already exported from internal CLI
-  modules may gain options or richer return types. Every exported function, option, and result field
-  must keep explicit named types and JSDoc where its publish package requires it; do not infer an
-  anonymous cross-module return type under `isolatedDeclarations`.
-- Surface-leak risk: host report types stay inside the CLI feature; plugin report DTOs stay inside
-  generator entrypoints/implementation modules and are not re-exported.
-- Publish-asset risk: four `scaffold.runtime.json` files are shipped and therefore require the
-  measured publish-assets check plus package dry runs.
-- Verification: touched-package `check`, full-export doc lint, publish dry runs,
-  `check:mcp-export-corpus`, and `check:publish-assets`. Any unexpected export, dependency, or
-  generated-asset requirement is outside the ceiling and triggers rescope-and-stop.
-
-## Fitness and Validation Gates — Locked Before Repair Implementation
-
-| Order | Gate | Command/check | Required outcome |
+| # | Gate | Command/scope | Required outcome / owner |
 | --- | --- | --- | --- |
-| 1 | S7 red-before | Structured `run-deno-test.ts` over `doctor-plugin-registry-drift_test.ts` | Non-zero for the new healthy assertion on S6 product; record pass/fail counts and failure name. |
-| 2 | Focused doctor green | Same structured command | Exit `0`; all focused cases pass, including legitimate AI exclusion. |
-| 3 | CLI generator/doctor related suite | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --pretty -- --allow-all` followed by the focused doctor file, `doctor-plugin-command_test.ts`, `doctor-plugin-invariants_test.ts`, and installed generator unit/integration files | Exit `0`; report protocol, fallback, and comparison remain integrated. |
-| 4 | Plugin generator suites | The same structured wrapper over the authorized AI compiler/report, workers runtime-generator/report, sagas generator, and triggers generator/report test files | Exit `0`; report-only selection equals normal generator selection and writes nothing. |
-| 5 | Expanded-ceiling check | `run-deno-check.ts` with every ceiling TypeScript file and `--unstable-kv` | Exit `0`, zero diagnostics. |
-| 6 | Expanded-ceiling lint | `run-deno-lint.ts` over the same TypeScript ceiling | Exit `0`, zero leaf-owned findings. |
-| 7 | Expanded-ceiling format | `run-deno-fmt.ts` over the same TypeScript ceiling | Report every finding with line-level base-vs-head ownership; leaf-owned findings are fixed within the authorized ceiling. |
-| 8 | Package checks | `deno task --cwd <package> check` for `packages/cli`, `plugins/ai`, `plugins/workers`, `plugins/sagas`, and `plugins/triggers`, plus explicitly selected non-e2e test files through the structured wrapper | Exit `0`, with exact pass/fail counts. Do not use broad package `test` tasks because recursive discovery can include plugin `tests/e2e` paths. |
-| 9 | Quality/doctrine | `deno task quality:gate` through `run-gate.ts` | Exit `0`; exact-head local receipt may be cited as local-only, while the command is the reproducible evidence. |
-| 10 | JSR docs/publish | `doc:lint` for every touched publish package plus `deno publish --dry-run --allow-dirty` in CLI and each touched plugin | Exit `0` or transparently record a base-proven warning; no export/dependency/lock drift. |
-| 11 | MCP export corpus | `deno task check:mcp-export-corpus` | Measured outcome recorded regardless of expected applicability. |
-| 12 | Publish assets | `deno task check:publish-assets` | Measured outcome recorded regardless of expected applicability. |
-| 13 | Lock hygiene | Raw `git diff --exit-code -- deno.lock` and final pinned-base comparison | Exit `0`; `deno.lock` byte-unchanged. |
+| 1 | S7 red-before | `run-deno-test.ts` over `installed-runtime-registry-integration_test.ts` | Non-zero at the S6 product head for the new AI healthy assertion; exact pass/fail counts recorded. Author. |
+| 2 | Focused doctor regression | `run-deno-test.ts` over `doctor-plugin-registry-drift_test.ts` | Exit 0 after implementation; all original five cases plus any authorized protocol cases pass. Author. |
+| 3 | Installed generator unit/integration | Structured test wrapper over `installed-runtime-registry-generator_test.ts` and the flagged integration test | Exit 0; protocol validation, legacy absence, fail-closed failures, real AI health, and byte-identical inspect proven. Author. |
+| 4 | AI compiler suite | Structured wrapper over `plugins/ai/src/cli/ai-registry-compiler.test.ts` | Exit 0; shared selector used by inspect/compile, zero selector writes, normal generation stable. Author. |
+| 5 | AI package suite | `deno task --cwd plugins/ai test` and `deno task --cwd plugins/ai check` through `rtk proxy` when available | Exit 0 with exact test counts; this is the plugin-owning suite implicated by the expanded ceiling. Author. |
+| 6 | CLI package check | `deno task --cwd packages/cli check` through `rtk proxy` when available | Exit 0. Author. |
+| 7 | Exact-ceiling check | `run-deno-check.ts --unstable-kv` over every authorized TypeScript path actually changed | Exit 0, zero diagnostics. Author. |
+| 8 | Exact-ceiling lint | `run-deno-lint.ts` over the same TypeScript paths using the disclosed root-rule scratch config if the root exclusion selects none | Exit 0, zero leaf-owned findings. Author. |
+| 9 | Exact-ceiling format | `run-deno-fmt.ts` over the same TypeScript paths using the disclosed root-rule scratch config | Every finding line-attributed base-vs-head; all leaf-owned findings in authorized paths fixed. Author. |
+| 10 | Doctrine/quality | `deno task quality:gate` through the repo gate wrapper | Exit 0. Author. |
+| 11 | JSR doc surface | `deno task doc:lint --root packages/cli --pretty` and `--root plugins/ai --pretty` through repo gates where catalogued | Exit 0. Author. |
+| 12 | Package publish dry runs | `deno publish --dry-run --allow-dirty --no-check=remote` in `packages/cli`; `deno task --cwd plugins/ai publish:dry-run` | Exit 0; exact warnings recorded, no mutation. Author. |
+| 13 | MCP export corpus | `deno task check:mcp-export-corpus` through repo gate | Measured outcome recorded even if unchanged. Author. |
+| 14 | Publish assets | `deno task check:publish-assets` through repo gate | Measured outcome recorded because AI's shipped manifest changes. Author. |
+| 15 | Lock hygiene | raw `git diff --exit-code -- deno.lock`, plus pinned-base comparison at handoff | Exit 0; byte-unchanged. Author. |
+| 16 | Full runtime smoke | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report <owned-report-path>` | **REQUIRED**, exit 0. Supervisor coordinates the cluster-wide singleton runtime lease and run; author must not run it. Durable evidence is the runner's `--report` JSON because `e2e:cli` is not in `.llm/tools/gates/catalog.ts`. |
 
-`.llm/tmp/gate-receipts/` is gitignored and local-only. A receipt may support same-worktree
-reconciliation, but durable review evidence is the committed command, exact head, exit code, and
-pass/fail or diagnostic counts, all reproducible from a fresh checkout.
+The runtime smoke is the end-to-end proof for F1 because the plugin-suite builder defaults
+`aiMcp = true` and `behavior.plugin-doctor-missing-module` requires doctor to be healthy before its
+mutation. Before and after the leased run, the supervisor uses `agentic:leak-check`; cleanup then uses
+`agentic:teardown --apply` only for positively proven owned resources, adding `--owned-root` for
+anything started outside the worktree. The required terminal state is Aspire/Docker zero.
 
-### Generated Cascade Applicability
+Current host facts are recorded only as gate prerequisites, not excuses: the recreated
+`netscript-dind` resolves at `10.4.12.19`; the project `mise` environment supplies
+`DOCKER_HOST=tcp://netscript-dind:2375`; Docker client/server are 28.5.2; the sandbox was observed at
+zero; and `fs.inotify.max_user_instances` is 1024. No below-28 warning or expected inotify collision
+is recognized. Any runtime abort, including exit 134/inotify errors, is a real finding to investigate
+and cannot be pre-classified away.
 
-- `check:mcp-export-corpus`: measured and recorded because the expanded repair crosses CLI and
-  publishable plugin packages, even though no export is planned.
-- `check:publish-assets`: measured and recorded because four shipped `scaffold.runtime.json` files
-  change.
-- `check:assets-barrel`: N/A unless an authorized path unexpectedly proves to be an asset input; if
-  so, stop and rescope rather than touching a generated asset.
-- `check:agent-docs-prose`: N/A; no docs corpus path is authorized.
-- `e2e:cli`, Aspire, Docker, and browser gates: explicitly prohibited.
+## Risk Register
 
-## Risks and Mitigations
-
-| Risk | Mitigation |
+| Risk | Mitigation / stop condition |
 | --- | --- |
-| Breaking older third-party generators | Invoke report-only args only when the manifest advertises the capability; preserve the existing walk otherwise. |
-| Generator writes during doctor | Report invocation uses inline manifest JSON and omits `--allow-write`; tests snapshot registry/project paths and assert zero writes. |
-| Mixed logs corrupt JSON | Report mode emits exactly one JSON document and suppresses ordinary progress logs; host rejects mixed stdout. |
-| Malicious or buggy paths escape the project | Normalize and reject absolute, parent-escaping, duplicate, and undeclared-target paths before comparison. |
-| Generator/report selection drift | Both modes call one selector/compiler path; tests compare their selected sets. |
-| F4 remains latent | Workers tests cover overlays/includes/conditional includes, plugin dirs, and dotfile exclusion through the same report used by doctor. |
-| Public-surface drift | No new export; run full touched-package doc/publish and measured corpus/assets gates anyway. |
-| Evidence overstates durability | Treat gitignored receipts as local-only and commit reproducible commands plus exact outcomes. |
+| Inspect and compile selectors diverge | One pure selector in `ai-registry-compiler.ts`; equality test proves both paths consume its output. A second predicate is forbidden. |
+| Inspect mutates the project | Permission omission plus three-layer before/after state proof; any byte drift is a failing test. |
+| Advertised protocol silently degrades | Presence/value handled separately; every invalid declaration, child failure, or invalid report uses the generator-inspection error surface and exits unhealthy. |
+| Malicious or corrupt response escapes project/targets | Strict DTO, exact declared target set, canonical relative paths, duplicate rejection, and regular-file validation. |
+| Legacy third-party behavior changes | Property absence performs no process call and preserves the current manifest walk and wording. |
+| F4 remains latent | Knowingly deferred by coordinator. The generic v1 contract supports later workers adoption without a host or schema redesign. |
+| Integration-test permission is narrower than supervisor reading | `drift.md` flags the interpretation; PLAN-EVAL/coordinator may remove or relocate it before S7. |
+| Runtime lease collision or leaked resources | Only supervisor runs `scaffold.runtime`; serialize lease, use owned report, leak-check, proven teardown, and require Aspire/Docker zero. |
+| Runtime failure is prematurely excused | No environment failure is pre-excused. Docker 28.5.2 and inotify 1024 are the baseline; any failure is investigated. |
+| Evidence overstates durability or values | Treat gitignored receipts as local-only; record reproducible commands/outcomes. State F3 as shape-preserved/value-changed. |
 
 ## PLAN-EVAL Handoff
 
-The evaluator must decide whether the opt-in report protocol, strict advertised-capability failure,
-third-party fallback, all-first-party adoption, 24-path ceiling, F4 closure, S7 red-before case, and
-gate set are complete and proportionate. Implementation must not start until a separate session
-posts `PLAN-EVAL: APPROVED` or this plan is revised for `CHANGES_REQUESTED`.
+**REQUIRED — awaiting a fresh separate evaluator.** Review must confirm:
+
+- exact `inspectionProtocol: 1` activation, invocation, response schema, and fail-closed surface;
+- one shared pure selector used by AI inspect and compile;
+- the three-layer no-write proof;
+- the real AI `skill-loader` healthy regression committed red-before in S7;
+- the eleven coordinator-authorized paths, the flagged integration-test interpretation, and the
+  absence of the unauthorized new parser file;
+- F4/workers adoption knowingly deferred without protocol redesign;
+- required AI/CLI/static/publish gates and the supervisor-coordinated leased `scaffold.runtime`
+  report with no pre-excused environment failure;
+- F3 and F5 evidence corrections.
+
+No S7 test or product implementation begins until a separate session records
+`PLAN-EVAL: APPROVED`. `CHANGES_REQUESTED` returns the run to S6. The implementation author does not
+self-certify, flip draft state, mutate issue/acceptance state, relabel, merge, or run the leased
+runtime gate.

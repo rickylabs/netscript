@@ -104,7 +104,7 @@ plugin.
 | S6-8 | `.llm/tmp/gate-receipts/` is gitignored. It is useful local reconciliation state, not durable fresh-checkout evidence. | repository ignore behavior and evaluator F5 |
 | S6-9 | Normal installed generation materializes the resolved manifest under the project and grants the child write permission. Reusing that invocation for doctor would make “dry-run” mutate the project. Report mode must instead pass resolved JSON inline and omit write permission. | installed generator `runGenerator` |
 
-### Direction conclusion
+### Direction conclusion (historical pre-ruling analysis)
 
 Generator-selected reporting dominates manifest-encoded selection and warning downgrade. A manifest
 cannot express AI's source predicate or workers' conditional filesystem policy without duplicating
@@ -118,17 +118,49 @@ well as AI F1. Manifests without the capability retain the current suffix/exclud
 breaking already-published third-party generators. Once a manifest advertises reporting, malformed
 or failed evidence is an inspection error rather than a silent downgrade.
 
-### Required red-before proof
+### Required red-before proof (refined by coordinator ruling below)
 
 Before product work, extend the focused doctor regression with a generated AI project containing one
 ready tool definition and the discoverable `ai/tools/skill-loader.ts` factory. Current head must fail
 that test because doctor raises `RemoteError`; later green must show the same generated registry and
 unchanged healthy assertion pass because the generator reports only the ready definition.
 
-### Superseded scope and JSR conclusion
+### Superseded first S6 scope and JSR conclusion
 
 The old six-path ceiling and original D1/D6 are superseded by the 24-path ceiling and decisions D1R–D9R
 in `plan.md`. The repair crosses Archetypes 6 and 5 but plans no package export or dependency change.
 Because shipped plugin manifests and publishable generator sources change, touched-package check,
 doc/publish validation, `check:mcp-export-corpus`, and `check:publish-assets` remain measured gates.
 No generated asset is authorized.
+
+## S6 Coordinator-Ruled Amendment
+
+The coordinator subsequently fixed the design and scope. The earlier direction comparison remains
+research history, but the following rules supersede its four-plugin adoption and 24-path proposal:
+
+- The manifest capability name is exactly `inspectionProtocol: 1`.
+- AI alone advertises the optional protocol in this leaf. A present key activates the same external
+  generator through `ProcessPort`; absence preserves legacy manifest discovery. Any present invalid
+  declaration, failed process, or invalid response fails closed and never falls back.
+- Inspect v1 uses `--inspect --inspection-protocol 1 --manifest-json <json>`, omits `--manifest` and
+  `--allow-write`, and accepts one strict stdout JSON document.
+- One pure selector in `ai-registry-compiler.ts` serves both inspect and normal compile. No host or
+  manifest copy of the AI predicate is permitted.
+- The 24-path proposal is replaced by the eleven coordinator-enumerated paths in `plan.md`. The new
+  parser file is removed and its private validation folds into the authorized installed generator.
+- The existing installed-generator integration test is retained only under the supervisor's flagged
+  reading of the coordinator's existing-test allowance; `drift.md` exposes that interpretation to
+  PLAN-EVAL.
+- F4/workers adoption is knowingly deferred. The response validation does not constrain selected
+  sources to the legacy manifest candidate walk, so workers can later advertise the same v1 contract
+  and report its profiles/conditional includes/dotfile selection without redesign.
+- The required red-before lives in the real AI integration seam: normal generation legitimately
+  excludes discoverable `skill-loader.ts`, then doctor is asserted healthy. No-write evidence adds
+  complete before/after file-byte snapshots, not just permission-flag inspection.
+- `scaffold.runtime` is required but supervisor-coordinated under the singleton runtime lease. Its
+  runner `--report` JSON is durable evidence. Docker 28.5.2 and inotify 1024 are the current baseline;
+  no runtime failure is pre-excused.
+
+F3 and F5 are also carried forward accurately: S3 preserved the result field shape but changed
+`registrableItems` from the base plugin-wide sum to a per-target count, and gitignored local receipts
+are not fresh-checkout evidence.

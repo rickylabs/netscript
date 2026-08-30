@@ -58,13 +58,11 @@
 | # | Slice | Gate | Files |
 | - | ----- | ---- | ----- |
 | 1–5 | Original plan, red-before, six-path implementation, evidence, and Tier-A correction | accepted historical evidence through `61b8bf52` | original six paths + run artifacts |
-| 6 | Research the generator-selection gap and re-lock the expanded plan | raw lock proof; mandatory separate PLAN-EVAL | run artifacts only |
-| 7 | AI legitimate-exclusion red-before regression | focused structured test fails on S6 product | doctor regression test + run artifacts |
-| 8 | AI report-only source-shape selection | AI report/compiler tests | AI manifest/generator/compiler/test + run artifacts |
-| 9 | Workers report-only full selection and F4 closure | workers report/selection tests | workers manifest/generator/new test + run artifacts |
-| 10 | Sagas/triggers report-only selection | generator/golden tests | sagas/triggers manifests/generators/tests + run artifacts |
-| 11 | Host report validation/consumption and doctor evidence wording | focused/related suites green | authorized CLI paths + run artifacts |
-| 12 | Expanded gates and evaluator handoff | locked plan gate matrix | run artifacts only |
+| 6 | Research the generator-selection gap, receive the coordinator ruling, and amend/re-lock the plan | raw lock proof; mandatory separate PLAN-EVAL | run artifacts only |
+| 7 | Real AI legitimate-exclusion healthy regression, red-before | installed-generator integration test fails on S6 product | flagged existing integration test + run artifacts |
+| 8 | Shared pure AI selector and AI inspect protocol | AI compiler/package suites | AI manifest/generator/compiler/test + run artifacts |
+| 9 | Host protocol validation/consumption and doctor evidence wording | focused/related suites green; no-write snapshots | authorized CLI paths + flagged integration test + run artifacts |
+| 10 | Expanded author gates and supervisor runtime evidence | locked gate matrix, including required leased `scaffold.runtime` | run artifacts only |
 
 ### Deferred Scope
 
@@ -72,7 +70,7 @@
   current main.
 - Recursive directory discovery and arbitrary handwritten registry grammars — preserve generator
   manifest semantics.
-- #1366, #1574, #1365, and all live-runtime gates.
+- Workers protocol adoption/F4 closure, sagas/triggers adoption, #1366, #1574, and #1365.
 
 ### Contributor Path
 
@@ -82,7 +80,7 @@ advertise and implement the source-selection report protocol so doctor consumes 
 actual selected set without a CLI plugin-name switch. To extend doctor wording, edit the focused
 `runtime-registry-drift.ts` policy and its semantic tests.
 
-### S6 Design Checkpoint — generator-selected evidence
+### S6 Design Checkpoint — generator-selected evidence (historical pre-ruling proposal)
 
 #### Contract and vocabulary
 
@@ -147,8 +145,9 @@ actual selected set without a CLI plugin-name switch. To extend doctor wording, 
 ## PLAN-EVAL
 
 **REQUIRED — awaiting a fresh separate evaluator.** IMPL-EVAL cycle 1 proved the original
-manifest-authority assumption incomplete, opening a cross-process report contract, third-party
-compatibility policy, four-plugin adoption decision, workers F4 closure, and 24-path ceiling. The old
+manifest-authority assumption incomplete. The coordinator has now ruled the protocol and restricted
+adoption to AI, but the cross-process contract, strict validation/failure surface, selector-sharing
+proof, no-write proof, and flagged integration-test interpretation remain architectural. The old
 `PLAN-EVAL: N/A` statement is superseded. No S7 test or product implementation may start until a
 separate session records `APPROVED`; `CHANGES_REQUESTED` returns this run to S6 planning.
 
@@ -183,7 +182,7 @@ separate session records `APPROVED`; `CHANGES_REQUESTED` returns this run to S6 
 | Keep stream registry creation out of scope | No such generated contract exists on current main; doctor must state evidence limits. | research re-baseline |
 | Supersede manifest-only authority | AI and workers prove that candidate path discovery can be broader than generator selection. | IMPL-EVAL F1/F4; S6 source re-derivation |
 | Choose opt-in generator reporting | Preserves AC2 and backward compatibility without duplicating plugin selectors in CLI/manifest data. | plan D1R–D7R |
-| Close workers F4 | All four first-party generators adopt reporting; workers reports its overlays, conditions, plugin dirs, and dotfile policy. | plan D8R |
+| Close workers F4 (superseded) | The first S6 proposal adopted all four generators; the coordinator later deferred F4/workers adoption. | historical plan D8R; current amendment below |
 | Require PLAN-EVAL | The material contract, compatibility, scope, and sequence decisions need independent approval. | plan D9R; harness plan gate |
 
 ## Drift
@@ -191,7 +190,7 @@ separate session records `APPROVED`; `CHANGES_REQUESTED` returns this run to S6 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Current streams plugin has no runtime registry manifest despite issue's generic stream wording. | minor | yes |
-| IMPL-EVAL disproved the six-path plan's manifest-only authority; repair expands to four plugin generators and 24 locked paths. | significant | yes |
+| IMPL-EVAL disproved the six-path plan's manifest-only authority; the first S6 proposal expanded to four generators/24 paths, then the coordinator replaced that scope with AI-only adoption and the ruled ceiling. | significant | yes |
 
 ## Gate Results
 
@@ -261,7 +260,7 @@ is therefore the leaf's own, not inherited evidence.
 - Runtime gates remained unauthorized and were not run. No architecture debt entry was created.
 - This implementation author does not provide a sign-off or IMPL-EVAL verdict.
 
-## S6 PLAN-EVAL Handoff
+## S6 PLAN-EVAL Handoff (superseded by coordinator ruling below)
 
 - Direction (a) dominates through an opt-in, report-only JSON capability; the manifest advertises
   protocol version 1 but does not encode source selection.
@@ -348,3 +347,88 @@ attribution rather than about a merge blocker.
 No readiness flip, relabel, issue edit, acceptance-box tick, or merge. Those are coordinator-owned.
 No `e2e:cli`, Aspire, Docker, or browser gate ran, and no host runtime lease was requested or held —
 this leaf's six-path CLI ceiling touches none of that surface.
+
+## S6 Coordinator-Ruled Plan Amendment
+
+This section supersedes the earlier S6 design/handoff statements about four-plugin adoption, a
+24-path ceiling, F4 closure, report naming, and runtime-gate prohibition. Those statements remain
+above only as chronological evidence of the proposal at commit `349d5915`.
+
+### Locked contract
+
+- Capability name: `runtimeRegistryGenerator.inspectionProtocol: 1`.
+- only a present `inspectionProtocol` key activates inspection; version `1` uses
+  `--inspect --inspection-protocol 1 --manifest-json <json>`, omits both `--manifest` and
+  `--allow-write`, and accepts one strict JSON document on stdout. Invalid advertised declarations,
+  process failures, and invalid reports all remain generator-inspection errors — none can enter the
+  legacy manifest-walk path.
+- Absent property retains the legacy manifest walk and performs no dry-run child invocation.
+- Inspect and compile call one pure selector in `ai-registry-compiler.ts`; neither the host nor the
+  manifest models AI source shape.
+- The response is strict protocol v1 with an exact declared registry target set, canonical
+  project-relative registry/source paths, duplicate rejection, and regular-file source validation.
+- Failure detail starts `Generator inspection protocol 1 failed for <plugin>:` and appears under the
+  distinct doctor title `Generator runtime registry inspection`; no advertised failure silently
+  falls back or receives a false regeneration remedy.
+
+### No-write and regression proof
+
+Omitting `--allow-write` is reinforced by state evidence: the AI selector's in-memory write map, the
+installed generator's complete memory filesystem, and the real AI project's complete file-byte
+snapshot must each remain unchanged across their inspect path. The S7 red-before case first performs
+real AI generation with a ready tool and discoverable `skill-loader.ts`, confirms the factory is
+legitimately excluded, and then asserts doctor remains healthy. S7 is committed alone before product
+work.
+
+### Scope correction
+
+- The coordinator-authorized ceiling is eleven paths: the seven retained CLI paths and four AI paths
+  enumerated in `plan.md`.
+- The unauthorized proposed `runtime-registry-source-report.ts` is removed; private parsing and
+  validation stay in `installed-runtime-registry-generator.ts`.
+- `installed-runtime-registry-integration_test.ts` is retained under the supervisor's explicitly
+  flagged reading of the coordinator's existing-test allowance. `drift.md` exposes this for
+  PLAN-EVAL/coordinator correction before S7.
+- No workers, sagas, or triggers path may change. F4/workers adoption is knowingly deferred; a later
+  workers manifest can advertise the generic v1 contract and reuse its own selector without host or
+  protocol redesign.
+
+### Evidence corrections
+
+- F3: S3 preserved the non-dry result field shape, but changed `registrableItems` from the base
+  plugin-wide sum to a per-target count. No production consumer reads it.
+- F5: `.llm/tmp/gate-receipts/` is gitignored/local-only. Reproducible commands, exact evaluated SHA,
+  exit codes/counts, and the runtime runner report are the review evidence.
+- Any later `0/5` base-product/head-tests statement must name `--no-check`; default type-checking runs
+  zero tests because the head test does not compile against base.
+
+### Required runtime gate and corrected host baseline
+
+`scaffold.runtime` is now **REQUIRED** because AI MCP is enabled by the plugin-suite builder and the
+doctor behavior gate requires a healthy baseline. The author must not run it. The supervisor obtains
+the cluster-wide singleton lease and runs:
+
+```text
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report <owned-report-path>
+```
+
+`e2e:cli` is absent from the gate catalog, so the runner's `--report` JSON is the durable receipt.
+Cleanup is `agentic:leak-check` first, then `agentic:teardown --apply` only for proven resources, with
+`--owned-root` for work started outside the worktree, and an Aspire/Docker-zero terminal state.
+
+Current supplied baseline: recreated DinD `10.4.12.19`, project
+`DOCKER_HOST=tcp://netscript-dind:2375`, Docker client/server 28.5.2, empty Docker/Aspire sandbox, and
+`fs.inotify.max_user_instances=1024`. The earlier below-28 and expected inotify-collision statements
+are withdrawn. Any runtime failure, including exit 134/inotify, is a real finding to investigate.
+
+### Progress and handoff
+
+| Time (UTC) | Slice | Step | Notes |
+| --- | --- | --- | --- |
+| 2026-08-30T09:30Z | 6 | Coordinator ruling intake | Accepted the fixed optional protocol, AI-only adoption, eleven-path ceiling, F4 deferral, and mandatory separate PLAN-EVAL; no product/test edit. |
+| 2026-08-30T09:30Z | 6 | Plan mechanics | Locked activation, exact args, strict schema/validation, shared selector, three-layer no-write proof, fail-closed user surface, and real AI red-before. |
+| 2026-08-30T09:30Z | 6 | Environment correction | Removed the obsolete Docker-version warning and inotify pre-excuse; made leased `scaffold.runtime` required with runner-report evidence and owned cleanup. |
+
+Stop after committing/pushing this amendment, updating PR evidence, and posting the structured plan
+correction. Fresh PLAN-EVAL is next. Do not start S7, run the leased runtime gate, mutate lifecycle or
+issue state, or self-certify.

@@ -1,8 +1,8 @@
 # Drift Log: plugin doctor registry/source drift
 
-Drift is append-only. The original six-path ceiling was superseded by the S6 24-path ceiling after a
-blocking evaluator finding. Any product/test path beyond the current ceiling in `plan.md` requires
-supervisor approval before editing.
+Drift is append-only. The original six-path ceiling was reopened after a blocking evaluator finding;
+the coordinator subsequently replaced the first S6 24-path proposal with the ruled scope recorded in
+`plan.md`. Any product/test path beyond that current ceiling requires rescope-and-stop before editing.
 
 ## 2026-08-30 — Current streams plugin has no registry contract
 
@@ -37,3 +37,40 @@ supervisor approval before editing.
 - **F4:** closes in the planned repair; workers must report its full selected set rather than leave the
   divergence knowingly latent.
 - **Evidence:** S6 section of `research.md`; D1R–D9R and ceiling/gates in `plan.md`.
+
+## 2026-08-30 — Coordinator ruling supersedes the first S6 scope proposal
+
+- **Source:** coordinator ruling delivered after plan commit `349d5915`.
+- **Previous proposal:** optional reporting was to be adopted by AI, workers, sagas, and triggers
+  across 24 paths, with a new CLI parser file; workers F4 would close in this leaf.
+- **Ruled scope:** AI alone advertises `inspectionProtocol: 1`. The coordinator enumerated eleven
+  authorized product/test paths: the seven retained CLI paths and four AI paths listed in `plan.md`.
+  The new `runtime-registry-source-report.ts` is removed; its private schema/parser/validator folds
+  into authorized `installed-runtime-registry-generator.ts`, which already owns the `ProcessPort`
+  invocation.
+- **Deferred:** workers/profile adoption (F4), plus sagas/triggers adoption. The generic protocol is
+  deliberately compatible with later workers adoption, but no `plugins/workers/*`,
+  `plugins/sagas/*`, or `plugins/triggers/*` path may change here.
+- **Process:** the design remains architectural and the separate PLAN-EVAL still blocks S7.
+
+## 2026-08-30 — Flagged integration-test scope interpretation
+
+- **Path:**
+  `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts`.
+- **Coordinator text:** existing adapter/evidence/doctor/test paths may be amended; separately, a
+  real AI `skill-loader` healthy regression and proof of no inspect writes are mandatory.
+- **Supervisor interpretation:** this existing test path may be amended and is the natural home
+  because it already generates AI registries and proves `skill-loader` exclusion.
+- **Status:** retained in the plan on that supervisor reading, while explicitly separated from the
+  eleven enumerated paths. PLAN-EVAL or the coordinator may overturn the interpretation before S7.
+  Anything else remains rescope-and-stop.
+
+## 2026-08-30 — Runtime environment evidence corrected before implementation
+
+- **Current facts supplied by supervisor:** recreated DinD at `10.4.12.19`, Docker client/server
+  28.5.2, empty Docker/Aspire sandbox, and `fs.inotify.max_user_instances=1024`.
+- **Correction:** the earlier below-28 warning and expected inotify quota-collision framing are
+  withdrawn and are not accepted mitigations. Any runtime failure is a finding to investigate.
+- **Gate impact:** `scaffold.runtime` is required but supervisor-coordinated under the singleton
+  runtime lease. Its durable evidence is the runner `--report` JSON; cleanup is leak-check followed
+  by proven-resource teardown and an Aspire/Docker-zero terminal state.
