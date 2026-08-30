@@ -1,0 +1,26 @@
+Gate: S6 consumer AppHost type-check against restored Aspire SDK 13.5.3 (D-19), NAS re-execution
+Date: 2026-08-30T08:49:46Z–08:50:35Z
+Head: 564d465cc6b6af5518f959f3ad53beb422590da1 (feat/aspire-13-5-s6-health-checks, base S5 aa822069)
+Result: PASS — 0 slice-attributable errors (tsc exit 2 from exactly the 2 pre-existing TS2307 'zod' baseline errors, identical to S5/S2 receipts)
+
+Host: ai-agents (NAS), Aspire CLI 13.5.3+b5f143315, dotnet 10.0.400 + node 24.20.0 via ~/.local/bin/mise exec, TypeScript 5.9.3 (restore-installed node_modules)
+Scratch: /home/agent/projects/netscript/worktrees/007-aspire-s6/.llm/tmp/s6-consumer-typecheck (gitignored; removed after this receipt; worktree status 0)
+
+Steps:
+  1. deno run -A packages/cli/bin/netscript.ts init s6tsc --path .llm/tmp/s6-consumer-typecheck --db postgres --cache --cache-backend redis --service --no-git --ci --yes  (exit 0)
+  2. aspire restore --apphost <scratch>/s6tsc/aspire --non-interactive --nologo  (exit 0) -> generated 13.4.6 modules (branch aspire.config.json still pre-S1: sdk 13.4.6); CLI warned 13.5.3 CLI vs 13.4.6 SDK
+     informational tsc against 13.4.6: exit 2, 5 errors = 2x zod TS2307 + TS2305 no 'HealthCheckResult' + 2x TS2339 no 'addHealthCheck' -> S6 hard-depends on S1 (13.5.3 pin), as planned
+  3. scratch aspire.config.json set to sdk 13.5.3, packages PostgreSQL/Redis 13.5.3, Browsers 13.5.3-preview.1.26425.3 (scratch only, no product file changed); rm .aspire/modules; aspire restore again (exit 0)
+  4. ./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json  -> exit 2, 2 errors:
+       .helpers/_aspire-compat.mts(11,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+       .helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+  5. Emitted callbacks verified in .helpers/register-infrastructure.mts: builder.addHealthCheck('postgres_listener'|'redis_resp', async () => { const endpoint = await X.getEndpoint('tcp'); const host = await endpoint.host(); const port = await endpoint.port(); ... }); await X.withHealthCheck(...)
+
+Restored 13.5.3 module SHA-256 (identical to the S2 restore and to the S6 branch receipt 06-consumer-typecheck-13.5.3.txt):
+  7cd4cf8319360b4ddbe8fb8f5481e3e5907610883c40179840fa249a86600487  .aspire/modules/aspire.mts
+  e2ce97fa0ceaf103fd604174473dfcb6e586db9f548d1759e291618514ec656e  .aspire/modules/base.mts
+  2fd6593b7390e43e322f26e884f5b56fbad25f7f7dd0695671982bd72e455c17  .aspire/modules/transport.mts
+  a59a5be079b9f5ce2d1d3e47946692ae83716247cf0eca87f9b68e8125923225  aspire.config.json (scratch, 13.5.3)
+
+Runtime: no aspire start, no AppHost, no containers. aspire ps -> [] and dind docker ps -a -> empty before and after.
+Raw logs (outside repo): /home/agent/observability/aspire-13.5/s6-consumer-{init,restore,restore-13.5.3}.log, s6-consumer-tsc-{13.4.6,13.5.3}.txt

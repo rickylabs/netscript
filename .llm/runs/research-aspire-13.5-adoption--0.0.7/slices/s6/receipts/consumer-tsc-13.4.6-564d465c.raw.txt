@@ -1,0 +1,5 @@
+.helpers/_aspire-compat.mts(11,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+.helpers/_aspire-compat.mts(13,15): error TS2305: Module '"../.aspire/modules/aspire.mts"' has no exported member 'HealthCheckResult'.
+.helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+.helpers/register-infrastructure.mts(69,11): error TS2339: Property 'addHealthCheck' does not exist on type 'DistributedApplicationBuilder'.
+.helpers/register-infrastructure.mts(86,11): error TS2339: Property 'addHealthCheck' does not exist on type 'DistributedApplicationBuilder'.

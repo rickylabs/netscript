@@ -104,3 +104,12 @@ No blocking finding. **Tier-A verdict: sign-off to IMPL-EVAL (phase A) at `78d0d
 - No blocking finding. **Tier-A verdict: sign-off to IMPL-EVAL cycle 2 (phase A) at `564d465c`.**
   Phase B (listener-unreachable fixture + `healthReports` receipts) still needs a serialized runtime
   lease; the PR stays draft.
+
+### D-19 re-executed on the NAS at `564d465c` (2026-08-30, supervisor)
+
+Coordinator asked for a real verdict before IMPL-EVAL: scoped `aspire restore` in a throwaway
+consumer (no AppHost, no containers; Aspire/DinD zero before and after) → 13.5.3 modules
+byte-identical to the S2 restore → `tsc --noEmit` = only the 2 known `zod` TS2307s, **0
+slice-attributable errors**. Informational 13.4.6 run: `addHealthCheck`/`HealthCheckResult` absent →
+S6 must land after S1. Receipt `slices/s6/receipts/consumer-typecheck-13.5.3-564d465c.txt`. Sign-off
+to IMPL-EVAL cycle 2 stands, now on executed D-19 evidence rather than carry-over.

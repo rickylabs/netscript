@@ -41,14 +41,15 @@ nothing and inherit no earlier verdict.
    `check:assets-barrel`; `check:publish-assets`; `check:aspire-host-ports`; tests under
    `packages/cli/src/kernel/templates/aspire` and `packages/cli/e2e/tests`. New `deno-lint-ignore` /
    `as unknown as` / `: any` in the diff are blocking.
-3. **D-19 consumer typecheck** at this head: the branch receipt was taken pre-rebase. Verify the
-   supervisor's carry-over argument
-   (`git diff --stat 0bd8ba83..aa822069 -- packages/cli/src/kernel/templates/aspire packages/cli/e2e`
-   is empty) yourself. You MAY additionally reproduce it: `netscript init` a throwaway project under
-   your eval worktree's `.llm/tmp/`, run `aspire restore` there (SDK/package restore only — **no**
-   `aspire start`, no AppHost, no containers), then `tsc --noEmit -p tsconfig.apphost.json`; the two
-   pre-existing `TS2307 'zod'` baseline errors are known. If restore is impossible, say so and rely
-   on the carry-over argument with your own verification of it.
+3. **D-19 consumer typecheck**: the supervisor re-executed it on this host at this head —
+   `slices/s6/receipts/consumer-typecheck-13.5.3-564d465c.txt` (+ raw tsc outputs): restored 13.5.3
+   modules (SHA-256s match the S2/S6-branch receipt), `tsc --noEmit` → only the 2 pre-existing
+   `TS2307 'zod'` baseline errors, 0 slice-attributable; the 13.4.6 run shows the expected
+   `addHealthCheck`/`HealthCheckResult` absence (S6 depends on S1). Verify the receipt against the
+   diff; you MAY reproduce it (`netscript init` a throwaway under your eval worktree's `.llm/tmp/`,
+   set the scratch `aspire.config.json` sdk/packages to 13.5.3, `aspire restore` only — **no**
+   `aspire start`, no containers — then `tsc --noEmit -p tsconfig.apphost.json`; delete the scratch
+   afterwards).
 4. Generated-output review: render `generateRegisterInfrastructure` for Postgres+Redis and confirm
    the emitted callbacks use `endpoint.host()/port()` values and `withHealthCheck` keys
    `<r>_listener` / `<r>_resp`; confirm `listenerData` is `Record<string,string>`.
