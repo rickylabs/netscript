@@ -12,8 +12,8 @@ supervisor; you inherit no verdict and self-certify nothing.
 
 - Slice: **S8 — typed db-cli-mode resource commands, bounded wait, `excludeFromMcp`** (#1720 + #863,
   PR #1754 draft, base `feat/aspire-13-5-s6-health-checks`). Epic #1712. Evaluate **exactly** head
-  `__HEAD__` on `feat/aspire-13-5-s8-typed-resource-commands`; base = S6 `564d465c` (evaluate only
-  `564d465c..__HEAD__`). Your worktree:
+  `9dd06647` on `feat/aspire-13-5-s8-typed-resource-commands`; base = S6 `564d465c` (evaluate only
+  `564d465c..9dd06647`). Your worktree:
   `/home/agent/projects/netscript/worktrees/007-aspire-s8-eval` (detached at that head; product
   files read-only). Supervisor run dir (absolute):
   `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`

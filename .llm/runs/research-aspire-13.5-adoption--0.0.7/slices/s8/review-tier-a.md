@@ -49,3 +49,31 @@ tests **292/0 · 25/0 · 175/0**; lint escapes added: `deno-lint-ignore` 0, `: a
 
 **Status: provisional PASS for slices 1–5; sign-off is issued only at the exact final head after
 slice 6 (E2E + gates) lands, with the gate set re-run there.**
+
+## Tier-A sign-off at exact head `9dd06647` (phase A) — 2026-08-30
+
+- Stack: slices 1–5 as reviewed above + **slice 6 `5b6f8a0a`** (`verify-typed-db-phase-b.ts` Phase-B
+  receipt gate: asserts exactly one resident AppHost, `<db>-cli --help`, bounded
+  `migrate --timeout`, Unhealthy-but-Running `listener unreachable` description; registered as
+  `GATE.RUNTIME_TYPED_DB_PHASE_B` with phase RUNTIME and unit-tested, **deliberately unwired from
+  every suite** until the lease-backed Phase B; `ASPIRE_RESTART_SCRIPT` demoted to the fallback
+  inside `ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT`; timeout budget unified through
+  `resolveDbCliTimeoutSeconds()` — validated positive integer from the existing env input) +
+  `9dd06647` (docs: clean-head gate evidence; **no product file** vs `5b6f8a0a`).
+- Gates re-executed at `5b6f8a0a` (product-identical to `9dd06647`): scoped `deno check` → **0
+  diagnostics** (239 files); raw lint on the 14 changed TS files → clean; raw fmt → 1 pre-existing
+  unformatted test file (`generate-db-cli-mode_test.ts`, unformatted at base); `quality:scan` `[]`;
+  `arch:check` FAIL 0; `check:assets-barrel`, `check:publish-assets`, `check:aspire-host-ports`,
+  `check:emitted-samples` → exit 0; tests **292/0 · 27/0 · 177/0**; lint escapes added in code:
+  0/0/0. S8 run dir carries the D-39 host facts; no stale inotify/ zombie waiver.
+- Contract re-verified at head: `excludeFromMcp()` only on `<db>-cli` (single emission site); typed
+  `withCommand(... commandOptions.arguments ...)`; `withHidden(` never emitted;
+  `PROCESS_COMMANDS_FLAG` 0; D-19 consumer compile exit 0 with matching 13.5.3 module hashes
+  (evaluator re-renders at this head).
+- Not claimed: any Phase-B runtime receipt (#863 Unhealthy-but-Running, db-cli `--help`,
+  `migrate --timeout`) — environment-blocked on this NAS (D-42/D-43). `PROCESS_COMMANDS_FLAG`
+  removal is a behaviour change to the emitted runtime that only the Phase-B/`scaffold.runtime` run
+  can prove live.
+- **Verdict: sign-off to independent IMPL-EVAL (phase A) at `9dd06647`.** No lane self-certifies;
+  this is not a merge recommendation — S8 is stacked on S6 → S5, and the D-41 rule (runtime verdict
+  at the exact head before any merge surfacing) applies to the whole stack.
