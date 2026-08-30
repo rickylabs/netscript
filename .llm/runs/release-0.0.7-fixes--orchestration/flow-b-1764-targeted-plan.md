@@ -96,9 +96,10 @@ time. Not proposing to build it now — flagging it as a real gap, not silently 
 
 ## Disposition
 
-`behavior.app-reference` (browser gate): classify N/A **only if main has the same missing-browser
-behavior** — not yet checked; do so before final disposition, per standing instruction. Not yet
-verified in this turn.
+`behavior.app-reference` (browser gate): **classified N/A, verified.** `probe-app-reference.ts` at
+this leaf's head is byte-identical to main `9710a2898`'s copy (`diff` clean), #1764 never touched the
+file, and Chromium/Chrome are absent at all four checked paths on this host — a host fact independent
+of branch. Same failure would occur on a clean checkout of main. Not a leaf regression.
 
 TC-6/TC-7/TC-9 (saga span correlation, the actual #1764-owned acceptance target): **not yet proven**.
 The bounded plan above is ready to execute the instant the lease returns.
