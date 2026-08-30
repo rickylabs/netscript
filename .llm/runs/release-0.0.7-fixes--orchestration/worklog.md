@@ -4247,3 +4247,59 @@ That is a legitimate outcome and it was named as one rather than steered away fr
 `status:ready-merge` applied to PR #1758 and issue #1462, exactly one `status:` each. A `ci` run is in
 flight at `1c5fa004`; if its mirror step skipped on the label boundary again, the remedy is the tool's
 own — rerun with the label stable.
+
+## 2026-08-30 — #1462 AC3: production-chunk evidence is NOT achievable pre-merge. Exact blocker, box kept intact.
+
+The coordinator is right that the box must hold: AC3 says *"Production client chunks contain no server
+KV adapter"*, and `deno info` unreachability is not chunk inspection. This lane raised the same gap
+earlier and did not weaken the box then either. **It is not weakened or reworded now — it is reported
+as unevidenceable with the exact reason.**
+
+An existing harness for this shape **does** exist —
+`packages/fresh/tests/defer-island-client-bundle_test.ts` runs a real
+`deno run -A npm:vite@7.2.2 build`, reads the emitted `.vite/manifest.json`, and asserts on the
+**contents of emitted chunk files**. So the pattern is precedented. It is the *resolution topology*
+that blocks it, and four placements were measured rather than reasoned about:
+
+| Attempt | Result |
+| --- | --- |
+| Fixture in `.llm/tmp/` (sanctioned scratch) | `Rollup failed to resolve "@netscript/sdk"` — `.llm/tmp/` is excluded from the Deno workspace, so bare specifiers do not resolve |
+| Same, plus alias to `packages/sdk/mod.ts` | Resolves **into** the SDK (9 modules transformed), then `Rollup failed to resolve "@orpc/openapi" from packages/sdk/src/openapi/helpers.ts` |
+| Fixture in `packages/fresh/tests/fixtures/` | Bare `@netscript/sdk` still unresolvable — `packages/fresh` declares only `@netscript/sdk/desktop` → **`jsr:@netscript/sdk@0.0.6`**, the *published* package. With alias: same `@orpc/openapi` failure |
+| Fixture in `packages/sdk/tests/` — the SDK's **own** package context | 8 modules transformed, same `@orpc/openapi` failure |
+
+**Root cause, single sentence:** the SDK is **not a workspace member** (root `workspace` has 5 members,
+none is the SDK; the root import map has no `@netscript/sdk` entry), and its dependencies are
+**Deno-import-map-only npm specifiers**, which Vite/Rollup cannot resolve — so no Vite build in this
+repository can bundle the *local* SDK root.
+
+### The e2e suite is not a substitute — verified, not assumed
+
+The generated scaffold app **is** the representative consumer: it imports `@netscript/sdk` root plus
+`/client`, `/query`, `/query-client`. But **`e2e:cli` never runs Vite** —
+`grep -rln vite packages/cli/e2e/src` returns **nothing**. The suite type-checks the generated web app
+and boots Aspire; it emits no client chunks. So the newly-mandated `e2e:cli` gate, whatever else it
+proves, will **not** produce AC3's evidence.
+
+### What AC3 would actually require — all new scope, all outside this ceiling
+
+1. Make the SDK resolvable to a bundler: add it to the workspace or provide a node-resolvable
+   dependency context for its npm specifiers — a repo-wide build-topology change; or
+2. Add a production client-build step to the e2e suite — new suite scope; or
+3. Publish the SDK and bundle the published artifact — impossible pre-merge, and it would evidence
+   `0.0.6`, i.e. the code **without** this fix.
+
+None is inside #1462's ceiling, and none is test-only.
+
+### Recommendation, offered not taken
+
+`[post-merge]` is the instrument this repo already uses for a structurally impossible pre-merge check —
+the #1729 precedent, where three acceptance boxes were marked `[post-merge]` because the signal could
+not exist before merge, with a tracking comment so the obligation could not quietly lapse. AC3 fits
+that shape exactly: it is verifiable the moment the SDK is published and a real consumer builds.
+
+**That is a coordinator decision and this lane has not taken it.** The box remains unticked and
+un-reworded; the acceptance-evidence entry already states plainly that no bundle was run and no chunk
+inspected, and calls its evidence module-graph rather than chunk-inspection.
+
+All probe fixtures were removed; the leaf tree is clean at `1c5fa004`.
