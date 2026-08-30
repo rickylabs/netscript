@@ -280,4 +280,7 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
   telemetry consumer case, and promote its parity row to `required` in the same commit.
 - Post `413-comment-draft.md` only after those phase-B files and gates land.
 - Fable supervisor should run IMPL-EVAL cycle 2 against the slice-6 head; this implementation lane
-  does not self-certify the fixes.
+  does not self-certify the fixes. | 2026-08-30 | B5 | cycle-3 fixes | `6c699ab66` documented the
+  scoped 13.5.3 capture semantics (F-1 README/fixture header, F-2 in-test cause comment, F-3
+  drift/context-pack/PR body); IMPL-EVAL cycle 4 `PASS` (evaluator session `dfc30c9e…`). Supervisor
+  sign-off: telemetry-row comment refreshed in `check-compat-fixtures_test.ts`. |

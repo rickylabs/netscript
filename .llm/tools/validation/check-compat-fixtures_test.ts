@@ -7,8 +7,9 @@ interface CompatFixtureExpectation {
   readonly state: CompatFixtureState;
 }
 
-// D-13's complete compat-fixture row set from aspire-surface-manifest.tsv. The telemetry row
-// remains pending until the lease-backed dashboard capture lands in phase B.
+// D-13's complete compat-fixture row set from aspire-surface-manifest.tsv. The telemetry row is
+// `required`: the 13.5.3 dashboard envelopes were captured under the phase-B runtime lease (S3
+// attempt 3, 2026-08-30; see packages/mcp/tests/fixtures/telemetry/README.md).
 const COMPAT_FIXTURES: readonly CompatFixtureExpectation[] = [
   {
     path: '.llm/tools/agentic/teardown/probes_test.ts',
