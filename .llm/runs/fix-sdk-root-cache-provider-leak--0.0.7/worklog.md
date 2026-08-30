@@ -448,3 +448,39 @@ The MCP precheck is recorded as the measured PASS it actually produced, not as t
 negative. The earlier `MECHANICAL_PASS` delta receipt at `ca46f565`/head `f1ff5557` is superseded by
 this integration and is not cited as current-head evidence; renewed evaluator currency remains
 coordinator-owned. The fenced acceptance-evidence block remains unchanged.
+
+## Third SDK export-map consumer — runtime closure parity
+
+CI's previous full check-test run reached 4,265 passed / 1 failed. The sole failure was
+`closure export lists stay in parity with Fresh and SDK manifests`: the live SDK manifest contained
+`./presets`, while `NETSCRIPT_WEB_RUNTIME_EXPORTS['@netscript/sdk']` did not. The parity test itself
+contains no hardcoded list, so it remains unchanged; the manifest-order correction is one added
+`./presets` entry in the source constant.
+
+This is a semantic closure declaration, not a test appeasement. `./presets` is a published SDK
+subpath consumed by the web runtime and therefore must participate in the exact release/origin
+coherence check, while this leaf's committed graph invariant proves that importing it cannot
+instantiate the cache-provider singleton. It is the third consumer to which the new export-map row
+propagates, after the CLI embedded agent-docs inventory and the MCP export corpus.
+
+| Gate | Result | Artifact-derived evidence |
+| --- | --- | --- |
+| Focused closure parity test | PASS (exit 0) | Structured wrapper: 6 passed / 0 failed / 0 ignored. The test file is byte-unchanged in the candidate diff. |
+| Agent-docs freshness | PASS (exit 0) | Lume built 639 files and 227 HTML pages; `fresh: true`, SHA `17f33216cfa54e0e04f1d4b3ff63209964ff410608f28cf87c61aa7bb5a985ea`. |
+| Assets-barrel freshness | PASS (exit 0) | `check:assets-barrel` produced no generated diff. |
+| Publish-assets freshness | PASS (exit 0) | `check:publish-assets` reported the embedded publish assets fresh. |
+| MCP export-corpus freshness | PASS (exit 0) | 35 packages, 271 subpaths, 7,668 symbols; SHA `76b5d30e12b5306530efa900bf817a8ac3a2f4854e381e232aca367e4efdbc57`. |
+| Export/reference drift | PASS (exit 0) | `docs:exports-drift` reported `Exports & Symbols drift check: PASS`. |
+| Whole SDK test directory | PASS (exit 0) | Structured wrapper: 70 passed / 0 failed / 0 ignored. |
+| Fresh bootstrap test | PASS (exit 0) | Structured wrapper: 11 passed / 0 failed / 0 ignored. |
+| Ten-file scoped type-check | PASS (exit 0) | Ten selected files, including the new CLI source owner; zero diagnostics or failed batches. |
+| Original nine-file scoped lint/format | PASS (exit 0 each) | Both wrappers processed all 9 files with zero findings, drops, or refusals. |
+| CLI source lint/format | PASS / CONFIG EXCLUSION RECORDED | Root wrappers refused the CLI source because repository lint/fmt explicitly exclude all `packages/cli/`; raw `deno lint --no-config` passed. Raw format confirmed unrelated pre-existing whole-file differences under generic defaults, so the file was not mechanically reformatted; the added row follows the adjacent manifest style exactly. |
+| Quality/doctrine gate | PASS (exit 0) | `quality:gate` reported no quality findings and no doctrine failures; existing repository warnings remained non-blocking. |
+| Published-entry graph proof | PASS (exit 0) | Exact-head `deno info --json` predicate measured 0 browser-unsafe edges from both `packages/sdk/mod.ts` and `packages/sdk/src/presets/mod.ts`. |
+| Lock hygiene | PASS (exit 0) | Raw `git diff --exit-code a5520e70b43fa792c36451270742240e0f2aa889 -- deno.lock` returned 0. |
+| Diff hygiene | PASS (exit 0) | `git diff --check` and the explicit no-diff check for the closure parity test both returned 0. |
+
+The four derivative checks were freshness rechecks at this final-base candidate, not a new
+regeneration: each passed without changing its generated artifact. No acceptance-evidence text,
+issue state, labels, draft state, runtime gate, or path outside the amended ceiling was touched.

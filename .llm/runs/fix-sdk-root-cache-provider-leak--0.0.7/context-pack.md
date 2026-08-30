@@ -13,14 +13,14 @@
 ## Current state
 
 After separate IMPL-EVAL and Tier-A acceptance, the branch has integrated the final shared-asset
-sequence through #1755/main `a5520e70` without rebasing. The final merge conflicted only in the four
-coordinator-named generated outputs, which were regenerated through their named tasks. #1755's
-quickstart skills tree, #1748's Aspire terminology, and this leaf's SDK cache-provider migration
-prose coexist. Focused merged-tree validation passes: SDK tests 70/70, Fresh bootstrap 11/11,
-nine-file check/lint/fmt with zero findings, docs export drift, both entry graphs at zero unsafe
-edges, and raw lock comparison to `a5520e70`. The prior `ca46f565`/`f1ff5557` mechanical receipt is
-superseded; renewed currency is coordinator-owned. The PR acceptance block, issue boxes, labels, and
-draft state remain coordinator-owned and unchanged.
+sequence through #1755/main `a5520e70` without rebasing. A CI parity failure then identified a third
+consumer of the SDK export map: the CLI web-runtime closure's source constant. The coordinator-named
+test contains only the live-manifest assertion, so the amended ceiling substitutes its sibling source
+module pending coordinator confirmation, leaves the test untouched, and adds only the manifest-order
+`./presets` row. The focused closure suite passes 6/6; SDK tests pass 70/70; Fresh bootstrap passes
+11/11; all four derivative checks and docs export drift pass; both entry graphs remain at zero unsafe
+edges; and `deno.lock` is byte-identical to `a5520e70`. The PR acceptance block, issue boxes, labels,
+and draft state remain coordinator-owned and unchanged.
 
 S1 research/design remains against `origin/main` `13878a80a50c55b9662099fed64555f2310ae4a3`.
 PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `1bf9c567`: the archetype, doctrine, three-move design,
@@ -68,6 +68,8 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 - Added `./presets` with 7 direct preset exports and the locked 68-type closure; no
   `QueryClientPort`, ports wildcard, or ports runtime value is exported.
 - Added explicit Fresh composition-root registration and an order-independent fresh-child test.
+- Propagated the published `./presets` row to the CLI web-runtime release/origin closure without
+  weakening its live-manifest parity test.
 - Updated the SDK README and all four owned site pages with compatibility/migration guidance.
 - Regenerated and verified the MCP export corpus, agent-docs prose/provenance, and MCP publish asset
   in dependency order, recording every stale precheck and final pass.
@@ -76,12 +78,12 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 
 ## In progress
 
-- Commit and explicit-refspec push of the final #1755 merged-main derivative refresh.
+- Commit and explicit-refspec push of the SDK runtime-closure parity correction and evidence.
 
 ## Next steps
 
-1. Push the final #1755 integration-refresh merge commit by explicit refspec.
-2. Leave the close-gate label-timing rerun, draft state, labels, issue text, and acceptance boxes to
+1. Push the closure parity correction by explicit refspec and refresh PR Validation only.
+2. Leave evaluator currency, the close-gate rerun, draft state, labels, issue text, and acceptance boxes to
    the coordinator.
 
 ## Key decisions

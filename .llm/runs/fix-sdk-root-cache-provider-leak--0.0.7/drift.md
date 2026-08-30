@@ -130,3 +130,21 @@ requirements.
   same hash. No additional output path was forced.
 - The prior `MECHANICAL_PASS` receipt `ca46f565`, evaluated at `f1ff5557`, is superseded by this
   integration and is intentionally not treated as currency for the new head.
+
+## 2026-08-30 — SDK runtime-closure manifest consumer amendment
+
+- Severity: coordinator-authorized semantic ceiling amendment; no broader CLI/runtime rescope.
+- The coordinator amendment named
+  `packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure_test.ts`, but
+  that file contains only the live-manifest parity assertion and no editable expected export list.
+  The expectation actually lives in `NETSCRIPT_WEB_RUNTIME_EXPORTS` in the sibling source module,
+  `netscript-web-runtime-closure.ts`. Based on the supervisor's source reading, this slice
+  substitutes that source path pending coordinator confirmation and deliberately leaves the test
+  untouched.
+- Adding `./presets` is semantic rather than bookkeeping: the constant defines the published SDK
+  subpaths that must share the web runtime's exact release/origin closure. The browser-safe preset
+  entry belongs in that closure while its graph remains incapable of instantiating the cache-provider
+  singleton.
+- This leaf caused the propagation by adding a published SDK subpath. The closure constant is the
+  third export-map consumer found, after the CLI embedded agent-docs inventory and the MCP export
+  corpus. No other closure, topology, CLI, or runtime path was changed.
