@@ -230,4 +230,6 @@ A closed out | Thread `01a051e6…` ended `DONE` at `9dd06647` (product head `5b
 gates green (fork re-run); Tier-A signed off; PR #1754 sign-off comment posted; IMPL-EVAL cycle 1
 launched as `claude -p` session `657b1ab5…` in `007-aspire-s8-eval` @ `9dd06647`; handoff
 `slices/s8/handoff-phase-a.md` (phase A only; Phase-B receipts environment-blocked; not a merge
-candidate). Runtime zero throughout. |
+candidate). Runtime zero throughout. | | S8 IMPL-EVAL cycle 1 | **`PASS` — phase A only** at
+`9dd06647` (session `657b1ab5…`); non-mutation verified; advisories A-1 (receipt wording) and A-2
+(`Closes #863` scope → coordinator ruling) recorded in D-44 and the handoff. Runtime zero. |

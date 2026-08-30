@@ -780,3 +780,25 @@
   Corrected on the same thread by detaching the resume client and resuming (second application of
   the D-38 path). Rule: when host facts change, every live thread whose steering named the old fact
   gets a same-thread correction at the next safe point — the S3 thread got D-39 the same way.
+
+## D-44 — 2026-08-30 — S8 IMPL-EVAL cycle 1 `PASS` (phase A); two advisories, one needs a coordinator ruling
+
+- **Verdict:** `PASS — phase A only (static)` at `9dd06647`, independent Claude · Fable 5 · medium
+  session `657b1ab5…` (`slices/s8/evaluate.md`; PR #1754 comment 10:29:59Z). Evaluator reproduced
+  D-19 itself (restore exit 0, module SHA-256s identical, tsc = only the allowed zod pair), re-ran
+  every gate, verified PR hygiene. Supervisor verified non-mutation (eval worktree clean, PR
+  draft/base/labels/head unchanged).
+- **A-1 (low, wording):** the S8 branch receipt `05-consumer-typecheck-13.5.3.txt` claims final
+  `tsc` exit 0 / no zod errors; the evaluator reproduces exit 2 with exactly the two allowed
+  `TS2307 'zod'` baseline errors and zero S8 errors — same gate outcome, wrong wording. Fix in the
+  Phase-B cycle on the same thread; not a code change.
+- **A-2 (medium, scope — coordinator ruling needed):** `Closes #863` exceeds what S8 covers: #863
+  acceptance gates 2 (probe false-negative explanation) and 3 (clean-machine quickstart) are owned
+  by no S8 slice. The coordinator's intake ruling ("PR #1754 may retain `Closes #863` because the
+  accepted S8 bounded-wait scope directly owns its acceptance") and this finding conflict on gates
+  2–3. Options: (a) S8 Phase B adds evidence for gates 2–3 (quickstart walk is a runtime gate → same
+  D-42/D-43 block); (b) downgrade to `Part of #863` and leave #863 open with a named follow-up. **No
+  relabel/body edit by this session** — surfaced for the coordinator. Either way it gates
+  `status:ready-merge`, not this PASS.
+- **Queue effect:** S8 phase A is settled (Tier-A + IMPL-EVAL). Serial queue advances to the next
+  static-provable slice; Phase-B receipts for S3/S6/S7/S8 all wait on the D-43 boundary.
