@@ -5595,3 +5595,15 @@ confirmed `working` throughout.
   earlier today. If the routing leaf's own scope later grows to touch anything doc-generation-adjacent
   before merge, this same conflict class could recur — worth checking for at the actual freeze point,
   not assumed absent just because it's absent today.
+
+## D-104 — #1758 ownership: fixes-lane maintenance convergence verified, internals remains sole owner
+
+- Verified: `origin/fix/sdk-root-cache-provider-leak` now `a391cbaa0e77b3484cced3c076391113b4ff3682`,
+  a genuine merge commit ("Merge commit '96d44758d' into fix/sdk-root-cache-provider-leak") authored
+  by the human owner, bringing main's last 7 commits (including `a3ddcbb598`/#1775 and the
+  generated-carrier files that conflicted during my earlier abandoned dry-run merge attempt, D-93
+  onward) into the branch. My prior local head was `aab3376ccbfbfadf1392576788a994d530f9acb8`, a
+  clean 4-behind state before I aborted the merge and paused per the serial-queue correction.
+- **Ownership confirmed unchanged**: internals remains sole owner of #1758, to reconcile
+  `a391cbaa0` once the routing leaf (#1792) reaches terminal. No action taken now; no duplicate
+  evaluator dispatched. #1774's DeepSeek receipts remain valid and untouched by this.
