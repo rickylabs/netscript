@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slices 1–4 accepted; Slice 5 not started |
+| Current phase  | `impl` — Slice 5 stopped for rescope before product edits (D-9) |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -32,6 +32,14 @@ would have been materially misled about run position despite the commit trail, p
 documents, and receipt archives all being current. Update this file at each slice boundary going
 forward, not only at Slice 1.
 
+Slice 5 was released but stopped before product edits under **D-9**. The required runtime factory
+cannot be made public inside the locked ceiling: both explicit package entrypoints
+(`packages/service/src/auth/mod.ts` and `packages/service/mod.ts`) need a named
+`createContractAuthorizer` value export, and neither is among the ten authorized files. A private
+internal import would not satisfy the Design checkpoint or consumer API. Slice 4's ten top-level
+receipts were verified and moved byte-identically to `receipts/slice-4-9cc8c4c5f/`; the top level is
+empty pending a future, owner-amended Slice 5 attempt.
+
 ## Completed
 
 - Re-verified the merged #1466 metadata exports and shape against the research after S0.
@@ -48,12 +56,14 @@ forward, not only at Slice 1.
 
 ## Next Steps
 
-1. Supervisor releases Slice 5 (contract-policy adapter and middleware binding, behaviour-only) under
-   its locked ceiling.
-2. Continue Slices 6–9, each with its own Tier-A review and separate opposite-family IMPL-EVAL.
-3. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
+1. Owner/supervisor adjudicates D-9 and, if accepted, adds only
+   `packages/service/src/auth/mod.ts` and `packages/service/mod.ts` to Slice 5 for the two named value
+   exports before re-releasing implementation.
+2. Do not begin Slice 6; complete and separately evaluate Slice 5 first.
+3. Continue Slices 6–9, each with its own Tier-A review and separate opposite-family IMPL-EVAL.
+4. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
    the implementation PR must state the accepted substitution.
-4. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
+5. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
    close-gate are complete.
 
 ## Open follow-ups filed off this run (not slice work)

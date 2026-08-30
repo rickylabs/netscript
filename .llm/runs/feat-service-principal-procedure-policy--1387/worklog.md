@@ -373,3 +373,30 @@ research finding 15, fallback-typing invariant proved by a genuine `@ts-expect-e
 `TS2741`). Nine receipts, evidence set SUFFICIENT, corpus grew by exactly the twelve new exports.
 
 Slice 5 is the next release: contract-policy adapter and middleware binding, behaviour-only.
+
+## Slice 5 — rescope stop before product edits (D-9)
+
+The Slice 5 implementation surface was inspected against the locked ten-file ceiling before any
+product edit. The behavior slice must construct `createContractAuthorizer(contract, ...)`, but both
+published service entrypoints use explicit named exports and currently expose only the Slice 4
+contract-policy types. The focused command
+`deno doc --filter createContractAuthorizer packages/service/mod.ts` returned
+`Node createContractAuthorizer was not found!`.
+
+The minimal public-surface completion needs two files outside the ceiling:
+
+- `packages/service/src/auth/mod.ts` — export `createContractAuthorizer` from the `./auth` subpath.
+- `packages/service/mod.ts` — export `createContractAuthorizer` from the package root.
+
+No private-path test workaround was introduced: it would make the implementation pass internally
+while leaving the promised consumer factory unreachable. Per the ceiling contract, Slice 5 stopped
+and D-9 was appended to `drift.md`; no Slice 5 source/test gate, receipt, commit, or PR phase comment
+claims a content implementation.
+
+Before the stop, the ten current Slice 4 receipts were checked for their `1387-s4-*` invocation IDs,
+matching `gitHead == actualGitHead == 9cc8c4c5f84acef262bca2cec9169ebbaa410eb5`, and positive
+durations. They were then moved (not copied) into `receipts/slice-4-9cc8c4c5f/`; post-move SHA-256
+comparison was byte-identical for all ten files and the receipt root has no top-level files.
+
+**Next step:** owner/supervisor ceiling adjudication. If D-9 is accepted, add only the two entrypoint
+files for named value exports and re-release Slice 5. Do not begin Slice 6.

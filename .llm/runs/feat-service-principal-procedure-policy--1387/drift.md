@@ -292,3 +292,38 @@ must be adjudicated outside Slice 3's four-file ceiling.
 **Action:** rescope-required under E-3. No Slice 3 product or test file was edited, no Slice 3 gate
 or receipt was run, and `deno.lock` remains byte-unchanged from the starting hash
 `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+## D-9 — Slice 5 cannot publish `createContractAuthorizer` inside its ten-file ceiling
+
+**Severity:** significant · **Class:** slice ceiling · **Shape:** contract-policy behavior
+
+**Observed.** Slice 5 requires construction and consumer use of
+`createContractAuthorizer(contract, ...)`, but the package's two published entrypoints use explicit
+named exports. `packages/service/src/auth/mod.ts` exports only the Slice 4 contract-policy *types*,
+and `packages/service/mod.ts` does the same. Neither entrypoint exports a runtime factory. A focused
+public-surface probe — `deno doc --filter createContractAuthorizer packages/service/mod.ts` — fails
+with `Node createContractAuthorizer was not found!`.
+
+Adding `packages/service/src/auth/contract-authorizer.ts` can implement the factory, but cannot make
+it reachable from either declared package export (`.` or `./auth`). The minimal coherent behavior
+slice therefore also requires named value exports in:
+
+- `packages/service/src/auth/mod.ts`
+- `packages/service/mod.ts`
+
+Both files are outside Slice 5's locked ten-file ceiling, and no later slice includes them. Importing
+the new source file by an unpublished internal path in tests would create a private implementation
+that consumers cannot install through the public API named in the run's Design checkpoint.
+
+**Expected.** Slice 4's public `ContractAuthorizerFactory` contract is implemented by a publicly
+reachable `createContractAuthorizer` value during Slice 5.
+
+**Actual.** The implementation can be private or the public surface can be complete, but the current
+ceiling cannot permit both.
+
+**Action:** rescope-required. No Slice 5 product or test file was edited and no Slice 5 gate or
+receipt was run. The ten current Slice 4 receipts were verified by `invocationId`, matching
+`gitHead`/`actualGitHead`, and positive `durationMs`, then moved byte-identically into
+`receipts/slice-4-9cc8c4c5f/`; no stale top-level receipt remains. The required ceiling amendment is
+limited to the two entrypoints above and their named value exports; no other product expansion is
+indicated by this finding.
