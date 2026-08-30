@@ -6738,3 +6738,72 @@ matters, which is the distinction the earlier false-green report missed.
 Research/plan thread `01a052a3` working in `007-leaf-1387`, committed `625447f1` (local; branch not
 yet pushed). Running `run-deno-check.ts` across `packages/contracts` + `packages/service` — reading
 the real seam rather than the issue text, which is what the brief asked for.
+
+## 2026-08-30 — second CI red at `87d53cec`: agent-doc corpus stale; integration sequenced behind #1748
+
+### The failure
+
+CI run `33312063301`, job `99258835145` (`quality`), step **`Agent docs corpus freshness`**. The
+tagline step **now passes**, so the previous repair was correct and complete for what it targeted.
+Reproduced locally at the exact head:
+
+```text
+{"fresh":false,"stalePaths":["prose.json.gz","provenance.json"], ...}
+error: Agent docs prose is stale: prose.json.gz, provenance.json
+```
+
+The gate is `check:agent-docs-prose` → `gen:agent-docs-prose --check`, which builds the Lume site and
+diffs the regenerated agent-doc bundle against the committed one. `docs/site/reference/contracts/index.md`
+is inside that corpus, and this branch edited it (F-4 row, G-4 prose) plus `packages/contracts/README.md`.
+
+**Provenance worth noting:** the committed bundle records `sourceCommit 265dd8760`,
+`extractionTimestamp 2026-08-24T10:08:06Z` — the corpus has been carried unregenerated for days, so
+this is not purely a #1731 defect. A base-vs-head check on `f8b4f804` is running to establish exactly
+how much is inherited.
+
+### Ordering — integration deliberately held
+
+The coordinator sequenced **#1748** as the active regenerated-corpus landing on `f8b4f804`, to merge
+**before** #1731. So:
+
+- `origin/main` is now `f8b4f804` (#1746), past the `13878a80a` this branch's evidence baselines were
+  measured against.
+- Regenerating the corpus against `f8b4f804` **right now would be immediately stale** the moment #1748
+  lands, producing exactly the second stale-corpus cycle the coordinator asked to avoid.
+
+**Therefore: prepare now, integrate once.** The repair is understood and reproducible; the integration
+onto post-#1748 `main`, the single regeneration, the gate sweep
+(`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `check:mcp-export-corpus`,
+`docs:tagline:check`, `docs:exports-drift`, `quality:gate` and the contracted eight) and the push all
+happen **once**, after the coordinator reports #1748's merge SHA.
+
+**Integration will be a merge, not a rebase.** This branch's entire evidence chain is addressed by
+content head — five append-only receipt archives, three evaluator verdict sections and four Tier-A
+reviews all cite specific SHAs. A rebase would rewrite every one of those and invalidate the
+provenance the leaf has spent the whole run establishing.
+
+### Currency evaluator stopped rather than left to certify a dead head
+
+Session `b247bef9` was dispatched against `87d53cec` before this failure surfaced. It was told to stop
+without committing or pushing: a verdict at that head would certify already-superseded evidence and
+have to be withdrawn, which is worse than no verdict. It was asked to report any measurements it had
+already completed (tagline bytes and claim faithfulness, the single-paragraph diff check, doc-lint set
+identity, receipt integrity) so the successor brief inherits them rather than re-deriving them.
+
+### Status
+
+**`87d53cec` is not mergeable evidence.** PR #1731 and issue #1466 stay at **`status:impl`**. The PR
+stays non-draft so the matrix keeps running against it. No `status:ready-merge`, no acceptance mirror,
+no merge coordinates offered — the previous flip happened on a head whose `ci` was already failing,
+and repeating that on a head with a *known* red gate would be worse.
+
+### The compounding lesson
+
+Two consecutive branch-introduced CI failures — `JSR tagline length`, then `Agent docs corpus
+freshness` — were both caught **only by CI**, after a terminal `PASS` and a ready-flip. Neither gate
+is in the plan's contracted eight-receipt set. That is now three instances of the same class on this
+leaf (`docs:exports-drift` at D-27, then these two): **the contracted set is scoped to package
+correctness and is structurally blind to the repo-level generated-artifact surface a docs edit
+touches.** The fix is not another one-off addition; it is that any slice touching `docs/` or a package
+README must carry the generated-carrier gates — corpus, publish assets, assets barrel, export-surface
+corpus, tagline — in its contracted set from the start. Proposed for the coordinator, not applied.
