@@ -3468,3 +3468,47 @@ running AppHost. This lane started no runtime resource at any point; every probe
 worktree outside the leaf, each removed with its scratch.
 
 Recorded on PR #1747 as comment `5467891151`, superseding the stale figures in `5467882090`.
+
+## 2026-08-30 — #1747 shipping gates: review-threads PASS, close gate FAILS on missing acceptance evidence
+
+Reconciled first: leaf local == remote == PR `headRefOid` == `fc3ea1775029502ea0b811137aa2096e40505709`,
+worktree clean.
+
+### Labels corrected
+
+Both the PR and the **issue** were still `status:plan` after implementation completed. Advanced both
+to `status:impl` (exactly one `status:` label each) via the REST API — `gh pr edit` / `gh issue edit`
+fail on this token, which holds only `repo` and not the `read:org` scope their GraphQL path needs.
+The issue relabel was previously outside this lane's authority and is now explicitly owner-authorized.
+
+### review-threads gate — PASS
+
+`deno task agentic:review-threads --repo rickylabs/netscript --pr 1747 --pretty` →
+`PASS threads=0 unanswered=0`, exit **0**. No unanswered reviewer thread blocks the push.
+
+### Close gate — FAIL, and this is a real gap, not a tooling artifact
+
+I did **not** trust `mirror-acceptance-evidence.ts --dry-run`, because this run's own standing lesson
+records that its label guard skips validation without `status:ready-merge` and therefore proves
+nothing. Instead I executed `acceptanceCheckboxes` + `parseAcceptanceEvidence` +
+`validateEvidenceMapping` directly against the **live** PR body, all PR comments, and the issue body:
+
+| Measure | Result |
+| --- | --- |
+| Acceptance checkboxes on #1732 | **5** (all unchecked) |
+| Acceptance-evidence entries across PR body + all comments | **0** |
+| Parse warnings | 0 |
+| `validateEvidenceMapping(1732, …)` | **FAIL** — all five boxes report "no matching evidence entry" |
+
+So #1747 cannot pass the close gate as it stands: `Closes #1732` would auto-close an issue whose five
+acceptance criteria have no evidence mapping at all. This is exactly the omission the repo's close-gate
+rules exist to catch.
+
+**Deliberate sequencing.** The fix is one fenced ```acceptance-evidence``` block with five
+`box-index`/`evidence` entries. I am posting it **once, after the IMPL-EVAL verdict lands**, rather
+than now-and-again-later: the mirror concatenates body plus every comment, so two blocks would make
+each box ambiguous or duplicated — the precise failure that cost leaf #1653 a `FAIL_FIX`. One block,
+written once, against a settled verdict.
+
+IMPL-EVAL `03818ee7` is still working (head/main/RED test re-execution). #1734 remains parked at its
+two-failure owner boundary — untouched.
