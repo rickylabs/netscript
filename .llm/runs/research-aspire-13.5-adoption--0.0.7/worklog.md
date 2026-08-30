@@ -440,4 +440,8 @@ fix dispatched; proof rerun after Tier-A. S1/#1736 not implicated. | | Local pre
 (D-73) | AppHost boots; DCP publishes on dind loopback; health check refused at `127.0.0.1:29584` →
 D-43 repeat. S3/S7/S8 runtime held; lease idle/returnable; zero re-proven. Real `describe --follow`
 capture validates S10 fix. S9 `include-hidden-files` staged locally (`918a958cd`, unpushed). Proof
-run 33327294781 pending. |
+run 33327294781 pending. | | S3 attempt 3 runtime closed; lease → S7 | S3 capture commits
+`3e39df1ee`/`28815d35b` on branch (push pending in thread tail). Relay `s3-attempt-3` torn down (3
+hop-A removed); **18:29:29Z containers=0 volumes=0 aspire=[]**
+(`slices/s3/phase-b/zero-after-relay.txt`). S7 Phase B launched on a fresh thread under relay owner
+`s7-phase-b`; S8 queued. |
