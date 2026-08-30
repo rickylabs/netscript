@@ -667,3 +667,13 @@
 - **Queue effect:** S3 Phase B is **grantable now** (`slices/s3/phase-b-brief.md`, worktree
   `007-aspire-s3` @ `fe4f496b`); not started — no lease has been granted since the S3 release. S8
   continues static on thread `01a051e6…`.
+
+## D-40 — 2026-08-30 — S3 Phase-B brief dispatched with a stale host paragraph; corrected on the same thread
+
+- The D-39 refresh of `slices/s3/phase-b-brief.md` (commit `beb5de8c`) did not apply: the regex
+  targeted pre-`deno fmt` line breaks, the replacement silently no-op'd, and the launcher staged the
+  stale text (Docker 27.5.1, dind `10.4.12.16`, inotify 128, D-37 probe). Caught by the coordinator
+  before the thread's first runtime start.
+- Fix: same-thread `codex-resume` correction (no relaunch, no second thread), brief amended with an
+  explicit amendment section, staged copy refreshed. Lesson: after any scripted edit of a
+  fmt-managed brief, `grep` for the old literal before dispatch — a no-op replacement is silent.

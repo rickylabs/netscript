@@ -20,3 +20,11 @@ codex exec resume 01a05200-345d-7ef0-bb18-30c4dacdaf4a -- "<follow-up>"
 ```
 
 _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
+
+## Steering log
+
+- 2026-08-30 ~09:31Z — before first runtime start: environment correction (dind `10.4.12.19`, Docker
+  28.5.2, inotify 1024, D-37 resolved; probe + cleanup rules unchanged) sent via
+  `agentic:codex-resume --thread-id 01a05200-345d-7ef0-bb18-30c4dacdaf4a --worktree …/007-aspire-s3 --user node`
+  (log `/home/agent/observability/aspire-13.5/s3-phase-b-steer-1.log`). Cause: the run-dir brief
+  edit in `beb5de8c` had not applied (regex vs fmt reflow), so the staged brief was stale — D-40.

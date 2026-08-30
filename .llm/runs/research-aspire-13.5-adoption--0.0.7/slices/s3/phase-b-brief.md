@@ -19,10 +19,10 @@ authorization for exactly one isolated AppHost at a time and nothing else.
   D-25/D-31/D-33).
 - Host: NAS `ai-agents`; Deno 2.9.5, Aspire CLI 13.5.3, dotnet 10.0.400 + node 24.20.0 through
   `/home/agent/.local/bin/mise exec --` (the `mise` shell function is broken; use the binary).
-  `DOCKER_HOST=tcp://netscript-dind:2375` (remote dind `10.4.12.16`; this container is
-  `10.4.12.18`). **Docker client 27.5.1 is below Aspire's 28.0 minimum (warning)** and the
-  AppHost/DCP path against the remote dind has **never been exercised on this host** (D-33). Your
-  first `aspire start` is therefore also that probe.
+  `DOCKER_HOST=tcp://netscript-dind:2375` (remote dind `10.4.12.19`, Docker client/server 28.5.2;
+  this container is `10.4.12.18`). **Docker client 27.5.1 is below Aspire's 28.0 minimum (warning)**
+  and the AppHost/DCP path against the remote dind has **never been exercised on this host** (D-33).
+  Your first `aspire start` is therefore also that probe.
 - Contract for the capture is the branch's own `packages/mcp/tests/fixtures/telemetry/README.md`
   "Pending Aspire 13.5.3 capture (phase B)": start the exact 13.5.3 AppHost, wait for required
   resources, trigger the scaffolded `health-check` worker job,
@@ -64,3 +64,10 @@ authorization for exactly one isolated AppHost at a time and nothing else.
    `## [PHASE: IMPL] S3 phase B` (commit hash, capture date, CLI 13.5.3, AppHost identity redacted,
    lease evidence, gate results). Do not mark ready, do not merge, do not relabel. Report the
    teardown proof to the supervisor as your last line.
+
+## Amendment 2026-08-30 ~09:31Z (same-thread steering, before first runtime start)
+
+The staged copy the thread received still carried the pre-D-39 host paragraph (Docker 27.5.1, dind
+10.4.12.16, inotify 128). The correction above was sent on the same thread
+`01a05200-345d-7ef0-bb18-30c4dacdaf4a` via `agentic:codex-resume` before any AppHost started; no
+second thread was created. Endpoint/proxy probe and every cleanup rule are unchanged.
