@@ -2882,3 +2882,61 @@ Running once, serialized, at the evaluated head, followed by `agentic:leak-check
 `agentic:teardown --apply` scoped to proven resources, returning the sandbox to Aspire/Docker zero.
 The durable receipt is the runner output, since `e2e:cli` is not in `.llm/tools/gates/catalog.ts`.
 This is recorded as a supervisor judgment call, not an implied grant.
+
+## 2026-08-30 — `scaffold.runtime` at `5d1cc5a8`: 26 passed / 1 failed, and the one failure is not this leaf's
+
+Reported as it happened rather than as a verdict this lane would prefer. **The suite exited 1.**
+
+### Every gate that bears on #1673 passed
+
+| Gate | Result | Why it matters here |
+| --- | --- | --- |
+| `scaffold.plugin.ai.mcp` — install official AI plugin with MCP skill tool | **PASSED** | This is the exact path that ships `ai/tools/skill-loader.ts` — the F1 trigger. A real scaffolded project now carries the factory *and* the doctor stays healthy. |
+| `behavior.plugin-doctor-missing-module` | **PASSED** | The gate IMPL-EVAL cycle 1 predicted would go red at the pre-fix head, because it requires doctor healthy first. |
+| `behavior.plugins-unhealthy` — reject missing workers and sagas registries | **PASSED** | Workers and sagas do **not** advertise `inspectionProtocol`, so this proves the legacy walk still correctly *rejects*. Legacy preservation demonstrated end-to-end, not merely unit-tested. |
+| `generated.plugins-check`, `generated.workers-registry`, `generated.sagas-registry`, `scaffold.plugin.ai.lifecycle`, `generated.runtime-schemas` | PASSED | Generation across advertising and non-advertising plugins alike. |
+
+That is the end-to-end proof the unit tests could not give: F1 is fixed **in a real scaffolded project
+with the MCP skill-loader present**, and the non-advertising path is unchanged.
+
+### The single failure is #1734 — open, internals-owned, and untouched by this leaf
+
+```
+TS2345 [ERROR]: Argument of type 'DehydratedState' is not assignable to parameter of
+type 'Partial<DehydratedState>'. … 'readonly unknown[]' … cannot be assigned to the
+mutable type 'DehydratedMutation[]'
+  at packages/fresh/src/application/query/hydration.ts:43:24
+```
+
+Attribution, established rather than asserted:
+
+- this leaf changes **0 files** under `packages/fresh`;
+- the failing file's most recent commit is `4d438ce1`, a beta.10 release wave long predating this leaf;
+- **issue #1734** is precisely this defect — *"fix(fresh): readonly DehydratedState breaks TanStack
+  hydrate() on query-core 5.102.x, failing generated-project check"* — **OPEN**, and owned by the
+  **internals** lane (PR #1736), which this lane's own state has recorded as internals-owned since the
+  NAS reconciliation.
+
+So the failure is a **known open cross-lane baseline defect**, reproducible on `main`, that this leaf
+neither caused nor is authorized to fix. It is recorded as a cross-lane dependency for the merge
+decision, **not** waived and **not** relabelled as a pass. Whether it blocks the merge is a
+coordinator/human call, and the handoff will say so plainly.
+
+### Resource hygiene — sandbox returned to zero, verified
+
+| Check | Result |
+| --- | --- |
+| `docker ps -a` | 0 containers |
+| `aspire ps` | no running AppHost |
+| `agentic:leak-check` | exit 0 · `probes.aspire: ok`, `probes.docker: ok`, **`survivors: []`** |
+
+`teardown --apply` was not needed: there was nothing to tear down. Preflight had also required and
+recorded `aspire doctor` at **5 passed, 3 warnings, 0 failed** before the suite started, so a failure
+could not be silently blamed on the environment.
+
+### Lease conduct
+
+Run once, serialized, at the evaluated head, against a slot verified free (`expensiveGates` 0 active
+against a limit of 1) and a sandbox verified empty. The lease request to `codex-root-0.0.7` remains
+unanswered and is still recorded as an unanswered request; this run is logged as a **supervisor
+judgment call under the owner's standing Aspire/Docker instructions**, never as an implied grant.
