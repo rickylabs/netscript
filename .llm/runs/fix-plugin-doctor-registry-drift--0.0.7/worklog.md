@@ -735,3 +735,28 @@ this session). Not conflating the two.
 behind #1764 per standing order). Cleared for a fresh, opposite-family IMPL-EVAL on the criteria this
 head can actually support — evaluator must judge the bounded evidence as bounded, not as full-suite
 proof.
+
+## Post-eval review amendment — supervisor Tier-A re-verification at `2b0c05356`
+
+Owner ruling: existing DeepSeek IMPL-EVAL (`54c72a970`, `PASS_IMPL`) remains valid and is **not**
+rerun. Two Augment review threads on the close-gate run were valid findings within the authorized
+ceiling (paths 2/3), fixed as a bounded S10 amendment.
+
+Threads, both on `installed-runtime-registry-generator.ts`: line 373 (medium) —
+`readRuntimeManifest` dropped `inspectionProtocolDeclared` whenever `command` was missing/malformed,
+so a manifest that declared the protocol but malformed `command` fell through to silent
+`continue`-skip instead of failing closed; line 471 (low) — a throw from `process.exec` bypassed
+`fail()`'s stable `Generator inspection protocol 1 failed for <plugin>:` prefix.
+
+Both fixed with a shared stable-prefix error path. Two focused regressions added, each proven red
+against a temporarily-reverted product file before the fix, green after: file-local 11/11 (was 9/11
+pre-fix-tests baseline, +2 new); doctor/generate areas 56/0. `deno check` clean on both changed files.
+Ceiling unchanged (both files already in the locked 11); `deno.lock` byte-unchanged.
+
+Both review threads answered with commit `2b0c05356` and evidence, then resolved.
+`agentic:review-threads` now reports `PASS`, `unanswered=0`.
+
+Tier-A re-verified at `2b0c05356`: AI compiler suite 9/0, AI package test 32/0, CLI package check
+clean, `check:mcp-export-corpus`/`check:publish-assets`/`check:agent-docs-prose`/`arch:check` all
+exit 0, lock unchanged. **No new IMPL-EVAL required per owner ruling** — this is a supervisor-verified
+bounded amendment on top of the already-valid evaluator verdict, not a new implementation cycle.
