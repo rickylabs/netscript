@@ -500,3 +500,55 @@ archive telling half the story — which was precisely the defect.
 raised, because slice 3's author was live in this worktree archiving its own receipt set. Concurrent
 writes into `receipts/` are the exact class of damage G-7 describes; fixing an archive corruption by
 risking another one would have been the wrong trade.
+
+## FINAL all-slices IMPL-EVAL — `PASS` (terminal for #1466); H-3 closed
+
+Session `8d9946e6` (Claude Fable 5 · medium, `formal_impl_evaluation`, own detached worktree
+`ns1466-impleval-final`) evaluated **all three slices together** at head `e34505f1` and returned
+**`PASS` — terminal**. Failure count unchanged at 1 of 2. No re-evaluation scope.
+
+All six #1466 acceptance points **PASS**, each re-derived by the evaluator rather than accepted from
+the slice reports. Its own runs: root `test` **4258 / 0 / 19**, package suites **94 / 94**,
+`docs:exports-drift` and `quality:gate` green, `public-doc-lint` **12 = 12 with the exact R-1 set** at
+the final head, all eight receipts at each content head with `gitHead == actualGitHead` and real
+`test` PASSes with no `SKIPPED`, four archives byte-intact with G-7's restoration byte-faithful,
+`deno.lock` unchanged across the branch, and **S1 not regressed by S2/S3**.
+
+It broke S2 on purpose — seven product-level breakages, each turning the real-export fixture red —
+which is the verification S2 most needed, having had a Tier-A but never a formal evaluation.
+
+### Findings — four, none blocking
+
+- **H-1** (low) — the anchored G-1 pin is defeated by **identifier rebinding**: aliasing
+  `NetScriptProcedureMeta` to an `import()` type leaves the initializer text byte-identical and every
+  contracted gate green. A deeper forgery class than the decoy cycle 2 found. Follow-up: pin the
+  bindings too (exactly one `import type { NetScriptProcedureMeta } from …`, zero `type
+  NetScriptProcedureMeta`, zero `import(`, `oc` only from `@orpc/contract`).
+- **H-2** (low) — `[^=;]+?` is a character restriction standing in for a statement boundary. My AF-1
+  finding, restated in its proper form; the author's comment is an adequate interim mitigation. Real
+  fix is a depth-aware scan of the `export const baseContract` statement.
+- **H-3** (low, evidence-only) — `supervisor.md` stale for S2/S3. **Closed in this commit.**
+- **H-4** (info) — the SDK JSR WARNs are base-inherited and unrecorded in `arch-debt.md`; coordinator
+  follow-up outside this leaf (topic drift D-36).
+
+### H-3 applied here
+
+`supervisor.md` now records the **S2 author `01a051f8`** and **S3 author `01a05215`**, both at
+`gpt-5.6-sol · high` with launcher route verdict `matched`; narrows `normal_implementation · medium`
+to the S1 **repair cycles only** and says why (repairs stepped down; S2/S3 are feature slices); adds
+the **S2 and S3 Tier-A `ACCEPTED`** rows; and adds this **final IMPL-EVAL session `8d9946e6`**.
+Evidence-only — no content change, content head unchanged at `9ab779ce`.
+
+### What remains is form, not substance — and it is the coordinator's
+
+Ruling B is explicit that the close-gate steps are not the evaluator's and not this lane's to
+complete unilaterally. Ordered: PR body keyword and Definition-of-Done boxes → issue
+`acceptance-evidence` mirror → H-3 (done) and the H-1/H-2/H-4 + R-3 follow-up issues → **ready-flip**
+→ CI matrix green → `status:ready-merge` → **merge, which is a human decision**.
+
+Ruling C accepted merging on a permanently baseline-red `public-doc-lint` **on the delta-0
+with-set-identity standard, because it was measured rather than asserted** — four consecutive heads,
+two evaluators and a Tier-A reviewer each re-deriving the same 12-finding set. Its condition is
+forward-looking: before the *next* leaf relies on the same ruling, the standard should become
+mechanical (a checked-in expected-finding set the runner diffs against), so "an evaluator ruled the
+set identical" becomes a receipt-level PASS/FAIL. Harness follow-up, not a #1466 obligation.
