@@ -3222,3 +3222,59 @@ genuinely *prove* absence of a server edge rather than sample for one. It is als
 `check:agent-docs-prose` measurement is reproducible — the whole F2 finding turned on the difference
 between a reasoned gate and a measured one. And it is told this is the final permitted cycle, so a
 finding must be genuinely blocking to be recorded as blocking.
+
+## 2026-08-30 — #1462 PLAN-EVAL cycle 2 `PASS_PLAN`; S2 dispatched
+
+Verdict commit `53fd529d` on `eval/plan-eval-1462-cycle-2`, pushed. Plan-Gate **PASS** on the second
+and final permitted cycle. The evaluator's own summary: every cycle-1 required fix is "not merely
+present but measured sufficient on this host".
+
+It also reproduced the author's `check:agent-docs-prose` measurement exactly — exit 0, 638 files,
+`fresh: true`. That mattered: the entire F2 finding turned on the difference between a reasoned gate
+and a measured one, and the author's decision to *run* the Lume build rather than assert host
+capability is now independently confirmed.
+
+### M1 — the same defect class as #1673's PE-2, found again by an evaluator
+
+The plan's graph assertion would have been a **no-op**. Measured with `deno info --json` on
+`packages/sdk/mod.ts` at base: in a workspace-resolved graph the literal `@netscript/kv` **never
+appears in `modules[].specifier`** — it resolves to `file:///…/packages/kv/**`, and shows up only as a
+raw `dependencies[].specifier` with `isDynamic: true`. A test scanning module specifiers for that
+string passes today **while proving nothing**, and would keep passing if a future module reached KV by
+another path — defeating the plan's own durability argument by degrading into a three-name denylist.
+
+The fix converts sampling into proof, and the evaluator measured the discriminator rather than
+proposing it: reject resolved specifiers containing `/packages/kv/` or `jsr:@netscript/kv`, raw
+dependency specifiers equal to `@netscript/kv`, **and any `node:` specifier or `/packages/logger/`
+module**. At base the root graph carries `node:async_hooks` (via KV → logger → logtape) and four
+logger modules; the preset graph carries **zero** of each — red-then-green with no false positive.
+
+This is worth naming as a pattern: **an assertion that passes without proving its claim** is now the
+third finding of that shape in this lane — #1673's PE-2 (compile-side equivalence proved, inspect-side
+unproven), #1673's F1 (a doctor green that reality did not support), and now this. In every case a
+separate evaluator caught what the author and the supervisor did not, because it *ran* the assertion
+against base instead of reading it.
+
+M2 (`resetCacheProvider` is exported from `./cache`, not `./query` — wording only) and M3 (gate 3
+should run the whole `packages/sdk/tests/` suite, since `readme-doctest_test.ts` imports `../mod.ts`
+and the README is in the ceiling) fold in without plan edits. A1 and A2 are advisory; A2 records that
+`rtk` is unavailable on this host, already in the leaf's `drift.md`.
+
+### S2 dispatched
+
+Same thread `01a05238`, sent while `idle | turn complete`, delivery proven from the rollout
+(`node:async_hooks`, `no-op today`), no active-writer conflict, **no `timeout` wrapper**.
+
+S2 is **RED-ONLY**: the failing test committed alone, before any product change — fresh child with the
+Deno runtime **intact**, import root `defineServices`, read `hasCacheProvider()` from
+`src/query/mod.ts`, require `false`, today's red being the observed `true` — carrying the M1 graph
+assertion in the same committed test. Then S3 onward under the revised ceiling and the corrected gate
+ordering (`check:agent-docs-prose` stale-negative → `gen:agent-docs-prose` → `check:agent-docs-prose`
+PASS, before the publish-assets rows; `docs:exports-drift` PASS after S3).
+
+### #1673 blocker status, checked not assumed
+
+`#1734` remains **OPEN** at `status:impl` with its fix PR **#1736** (draft, head `eb765629`) active in
+the internals lane — so resolution option 1 from the handoff (land #1734, re-run `scaffold.runtime`)
+is already progressing on its own. `origin/main` is still `13878a80`, so #1673's evidence stays
+current and no gate needs re-running. PR #1739 is unchanged at `status:impl-eval`.
