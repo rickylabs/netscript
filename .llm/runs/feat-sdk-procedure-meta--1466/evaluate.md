@@ -397,3 +397,97 @@ Non-findings, so they are not re-litigated: R-1, R-2, R-3 (settled inputs, all c
 5. **Coordinator follow-ups** already routed: `docs-exports-drift` catalog entry + gate-matrix row (R-3); the stale `status:plan` label on #1731.
 
 Failure count for this leaf's IMPL-EVAL loop: unchanged at 1 of 2 — this cycle did not fail.
+
+### Addendum (cycle 2, same session) — R-1's root-`test` premise is gone; Ruling 1 reframed
+
+After the verdict above was committed (`ff4e81cc`), the features supervisor withdrew the brief's
+"do not retry root `test` (R-1)" instruction, stating the host reaper defect behind R-1/D-26 was
+fixed. I did not take that on trust.
+
+**Host state, measured by me (2026-08-30, host `ai-agents`):**
+
+- `/proc/1/comm` = `tini` (`tini -- ttyd … tmux …`): a real init that reaps.
+- `ps -eo stat= | grep -c '^Z'` = **0**; PID-1-owned zombies = **0**. D-26 recorded 7,733 and the
+  cycle-1 verdict counted 7,979 when R-1 was written.
+- `hybrid-launcher_test.ts:164-176` polls `Deno.kill(pid, 0)` for `NotFound`, which a zombie never
+  yields until reaped. With zero zombies that loop can terminate — the exact reason R-1 said the
+  test "can never observe `NotFound` on this host" no longer holds.
+- `/proc/sys/fs/inotify/max_user_instances` = **128** (unchanged). D-29's `watchFs` half is not
+  fixed by this host change; only the zombie/reaper half is.
+
+**Root `test`, run by me — not the supervisor's number.** `deno task test` in this worktree at
+`ff4e81cc` (source byte-identical to content head `42874803`: `git diff 42874803..HEAD -- . ':!.llm/runs'`
+is empty), started `09:47:28Z` after the host's other `deno test` invocations drained (the 14
+processes still matching `deno.*test` were Codex resume/launch tooling in other worktrees whose paths
+contain "test", not test runs):
+
+```text
+exitCode 0 · durationMs 190644 · passed 4250 · failed 0 · ignored 19 · uniqueFailures 0
+```
+
+Previous terminal record (frozen-235482767, attempt 4): 4248 passed / 1 failed / 19 ignored. The +2 are
+the new F-2 pin test and `hybrid-launcher_test.ts` "exact MCP permissions cancel a stubborn worker group
+without an orphan", now green. The cycle-2 `Too many open files` / `watchFs` failure (D-6) did not
+recur at `max_user_instances` = 128. Tree clean after the run.
+
+**Ruling 1, reframed.** The question is no longer whether a `SKIPPED` receipt satisfies the gate
+when the gate cannot run; it is whether a `SKIPPED` receipt is acceptable at all now that it can.
+
+- **Ruled: no.** `SKIPPED` was the honest form *only* under R-1's no-retry condition, and that
+  condition was explicitly premised on a host defect that is now gone. R-1's root-`test` half loses its
+  premise; its `public-doc-lint` half (baseline-red on `main`, delta 0, set identity verified above) is
+  untouched and stands. With the gate runnable, the contracted `test` receipt at the content head must
+  be a real run. My own green run is the evaluator's independent verification (protocol rule 6); it is
+  not the leaf's durable receipt.
+- **What the receipt must show** (finding **G-6**, medium, evidence-only, no content change, no Codex
+  cycle required): `receipts/test-final.json` cut through `.llm/tools/gates/run-gate.ts` with
+  `gateId: test`, `invocationId: 1466-test-final`, `attempt: 6`, `argv: ["deno","task","test"]`,
+  `gitHead == actualGitHead == 42874803e572…` (the **content** head — cut it in a detached checkout at
+  `42874803`, not at an evidence commit), `outcome: PASS`, `exitCode: 0`, a summary of the shape
+  `4250 passed / 0 failed / 19 ignored` (an equal-or-higher pass count with 0 failed is acceptable if
+  the ignored set is unchanged), and no `reason` field. The attempt-5 `SKIPPED` receipt is not
+  overwritten silently: archive it unchanged (append-only, e.g. `receipts/frozen-42874803-attempt5/`)
+  so the record shows why a run was skipped and when it became runnable. Recompute
+  `audit/evidence-sufficiency` over the eight literal paths and record it.
+- **What this does to sufficiency and to "terminal".** After G-6, the named-set sufficiency at
+  `42874803` is `INSUFFICIENT` for exactly **one** reason — `public-doc-lint` FAIL, the R-1
+  baseline-red/delta-0 external — instead of two. That is the terminal expected state for this leaf:
+  seven real PASS receipts plus one ruled baseline red. Until G-6 lands, slice 1 is **complete on
+  substance but not terminal on evidence**; the `PASS` above stands on substance (every gate verified
+  independently, root `test` now included), and G-6 joins G-2/G-3/G-5 as the evidence-only work the
+  supervisor must land before slice 2 is dispatched. Ruling 1's condition (a) — root `test` green
+  off this host before ready-flip — is now satisfied locally as well, but the CI matrix at ready-flip
+  remains the off-host confirmation.
+- Slices 2 and 3 must cut real root-`test` receipts at their content heads; `SKIPPED` is no longer an
+  available form on this host.
+
+**Drift to record (coordinator-owned, not this session's file):** D-26 and the cycle-1 R-1 root-`test`
+half should be marked superseded by the host fix with the measurements above; D-29 stays open.
+
+Verdict unchanged: **`PASS`**. Required evidence-only actions before slice 2: G-2, G-3, G-5, **G-6**.
+
+**Post-rebase observation (same session).** While this addendum was being written the lane landed
+`1f0cdef2` (G-2/G-3/G-5 plus a root-`test` recut), `2863d29e` (slice 2 content — outside this verdict)
+and `dce16175` (slice 2 evidence). Checked against G-6 above:
+
+- G-2 posted (`[PHASE: IMPL-EVAL] Slice 1 — PASS…` at `09:18:19Z`), G-3 `context-pack.md` rewritten,
+  G-5 `supervisor.md` updated — all closed.
+- G-6: `test-final.json` attempt 7, `PASS`, exit 0, `gitHead == actualGitHead == ff4e81cc` — the
+  evidence head, not `42874803`. The worklog states this deliberately: the run happened at `ff4e81cc`,
+  and attesting a head it did not run at (`--allow-git-head-mismatch`) would break the
+  `gitHead == actualGitHead` invariant. **Accepted**: product is byte-identical between the two heads
+  (my own empty `git diff 42874803..ff4e81cc -- . ':!.llm/runs'`), and an honest head with proven
+  content identity is the sounder form than the one I prescribed. `evidence-sufficiency-slice1-final.json`
+  reports `INSUFFICIENT` for the single `public-doc-lint` reason — the terminal expected state.
+- **G-7 (low, evidence-only):** the attempt-5 `SKIPPED` receipt was overwritten in place by `1f0cdef2`
+  without being archived first; the later `frozen-42874803/` set holds seven attempt-5 receipts at
+  `42874803` and the attempt-7 `test` receipt at `ff4e81cc`, so the archive named for the content head
+  neither contains the receipt that explains why `test` was skipped there nor is homogeneous. The record
+  survives only in git (`dd201816:…/receipts/test-final.json`) and in worklog prose. Required: restore it
+  as `receipts/frozen-42874803/test-final.attempt5-skipped.json` (byte-for-byte from `dd201816`) and note
+  the set's mixed heads in the worklog. Not blocking; does not reopen anything.
+
+Slice 1 is therefore **terminal on evidence as well as substance** at the slice-1 record
+(`42874803` content, `ff4e81cc` test attestation), with G-1/G-4 carried into slices 2/3 and G-7 as
+an evidence-only tidy-up. Slice 2 (`2863d29e`) has not been evaluated by this session and needs its
+own separate-session IMPL-EVAL.
