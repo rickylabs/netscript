@@ -304,4 +304,7 @@ IMPL-EVAL cycle 1 launched as session `e7075f01-3d58-4fe9-a6b5-61c16e84bcef` in
 `007-aspire-s10-eval`. #1722 normalized to `status:impl`. Runtime zero. | | #1372 update posted |
 S10's `1372-update-draft.md` posted on #1372 by the supervisor (scope of coverage vs. residual
 compensation/streams); #1372 stays open. | | Main advanced (coordinator) | `a5520e70` (#1755). Stack
-not rebased; convergence per D-50. File overlap with the S8–S10 stack delta recorded below. |
+not rebased; convergence per D-50. File overlap with the S8–S10 stack delta recorded below. | | S10
+IMPL-EVAL cycle 1 | **`FAIL_FIX`** at `14daa764` (session `e7075f01…`): F-1 probe ownership by
+containment, F-2 `--allow-env` + always-written receipt, F-3/F-4 tests + convergence bar, F-7 dead
+file; notes F-5/F-6/F-8. Non-mutation verified. Fix brief sent on the same thread (D-51). |

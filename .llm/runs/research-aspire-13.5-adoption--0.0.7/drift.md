@@ -938,3 +938,19 @@
 - **D-50 addendum:** `main` → `a5520e70` (#1755). Convergence discipline unchanged: the
   S5→S6→S8→{S9,S10} stack stays on its base until #1734 lands, then rebases bottom-up with the regen
   chain at each hop; S9/S10 gate ordering reconciled at that point. No rebase now.
+
+## D-51 — 2026-08-30 — S10 IMPL-EVAL cycle 1 `FAIL_FIX` at `14daa764`; fixes routed to the same thread
+
+- Independent Claude · Fable 5 · medium session `e7075f01…` (`slices/s10/evaluate.md`; PR #1760
+  comment 13:11:25Z). Static matrix green (186/186, 0 diagnostics, gates exit 0); two contracted
+  behaviours not delivered: **F-1 (high)** the post-stop probe proves ownership by path equality
+  with `dirname(appHost)`, while generated projects bind-mount `<projectRoot>/.data/<resource>`
+  (D-42 shape) → a leaked owned container would be classified foreign/unproven and the "zero owned
+  survivors" assertion passes vacuously (S7 proves by containment); **F-2 (high)**
+  `runtime.resource-command` lacks `--allow-env=ASPIRE_CLI_START_TIMEOUT` → `NotCapable` after the
+  migrate/restarts already ran, and no receipt is written on that branch. Medium: F-3 missing
+  malformed-NDJSON / pending-state tests; F-4 convergence bar weakened (Running+Unhealthy accepted).
+  Low/notes: F-5 single 300 s budget (mssql tier note), F-6 live probe `processes: []`, F-7 dead
+  file, F-8 fail-closed doctor statuses, F-9 run-dir fmt.
+- Non-mutation verified (eval worktree clean; PR draft/labels/head unchanged). Fix brief
+  `slices/s10/impl-eval-fix-brief.md` sent on thread `01a052a5…`; cycle 2 follows at the fixed head.
