@@ -6,17 +6,16 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-aspire-reference-name-validation--1732-source-safety` |
 | Branch         | `fix/aspire-reference-name-validation`                     |
-| Current phase  | `implementation` — slice 2 green                           |
+| Current phase  | `implementation` — slice 3 green                           |
 | Archetype      | `6 — CLI / Tooling` (dominant surface)                     |
 | Scope overlays | none                                                       |
 
 ## Current State
 
-Slice 2 is green: the background generator uses ordinal-only bindings and comments, stringifies all
-planned config-derived literal sites, and no longer imports `safeIdentifier`. The flow-B fixture
-finds the stringified `workers` executable call and derives the captured `bg_\d+` binding. Generator
-tests pass 59/59; the combined matrix now has only the 24 grammar rejection steps plus their parent
-summary red for slice 3.
+Slices 2 and 3 are green. Source-safe emission is load-bearing beneath an exact private Aspire
+resource-name rule applied through a background-object `superRefine`. The full focused matrix passes
+143/143. The generated JSON schema is byte-for-byte unchanged from the slice-2 baseline, and the
+private rule is not re-exported or exposed through a public type.
 
 ## Completed
 
@@ -39,23 +38,26 @@ summary red for slice 3.
 - Completed slice 2 with 59/59 generator tests and fully covered scoped check/lint/format wrappers.
 - Preserved the exact `services__workers-api__http__0` discovery key and negative normalization
   assertion while making generated code safe for arbitrary direct-generator names.
+- Added exact processor/service/plugin contextual diagnostics at config parse time without changing
+  shared `ReferenceFields`, record-key schemas, or published JSON-schema output.
+- Confirmed identical `z.toJSONSchema(AppSettingsSchema)` serialization before/after: 9,988 bytes,
+  SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881`.
 
 ## Next Steps
 
-1. Commit and push slice 2 with its focused receipts.
-2. Implement the private rule module and composed-level background-only `superRefine`.
-3. Prove `z.toJSONSchema(AppSettingsSchema)` is unchanged outside the composed runtime check.
+1. Commit and push slice 3 with its focused receipts.
+2. Run the ratified 14-row static gate set at the final product head.
+3. Reconcile run artifacts and the draft PR without triggering IMPL-EVAL.
 
 ## Files Changed
 
-- Slice 2 changes only the background generator, its two focused tests, the flow-B fixture, and run
-  evidence. Aspire grammar production files remain untouched until slice 3.
+- Product changes are limited to the background generator, flow-B fixture, private Aspire rule,
+  composed config validation, and the focused tests committed in RED.
 
 ## Gates
 
-Slice-2 generator tests, scoped check, scoped lint, and scoped format all pass. The combined matrix
-remains expected red at 74 pass / 25 fail because grammar rejection has not yet landed. Root test
-remains explicitly `NOT FIRED`; no runtime/E2E gate has run.
+The full focused suite passes 143/143; slice-3 scoped check/lint/format all pass with complete
+selection coverage. Root test remains explicitly `NOT FIRED`; no runtime/E2E gate has run.
 
 ## Open Questions
 
