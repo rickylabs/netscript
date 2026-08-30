@@ -1,5 +1,6 @@
 import { describeOpenApiOperation } from '../../domain/openapi/description-ladder.ts';
 import { indexOpenApiOperations } from '../../domain/openapi/operation-index.ts';
+import type { OperationAccessSummary } from '../../domain/openapi/operation-access.ts';
 import type { ServiceEndpointDirectoryPort } from '../../ports/service-endpoint-directory-port.ts';
 import type { ToolFlow } from '../../domain/tool-types.ts';
 
@@ -13,6 +14,8 @@ export interface ServiceOperationSummary {
   /** Exact OpenAPI path template. */ readonly path: string;
   /** S4 description-ladder result. */ readonly summary: string;
   /** Declared OpenAPI tags. */ readonly tags: readonly string[];
+  /** Bounded declared access facts; absent when access is undeclared. */
+  readonly access?: OperationAccessSummary;
 }
 
 /** Successful operation-list value. */

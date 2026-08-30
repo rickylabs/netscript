@@ -1,5 +1,6 @@
 import { resolveCanonicalOperation } from '../../domain/openapi/canonical-identity.ts';
 import { indexOpenApiOperations } from '../../domain/openapi/operation-index.ts';
+import type { OperationAccessSummary } from '../../domain/openapi/operation-access.ts';
 import {
   projectOperationSchemaViews,
   SCHEMA_VIEW_NAMES,
@@ -22,6 +23,8 @@ export interface GetOperationSchemaResult {
   /** S4-projected schema view. */ readonly schema: unknown;
   /** Explicitly unauthenticated request template. */ readonly curlExample: string;
   /** Authentication caveat for the request template. */ readonly authNote: string;
+  /** Bounded declared access facts; absent when access is undeclared. */
+  readonly access?: OperationAccessSummary;
 }
 
 interface GetOperationSchemaInput {
