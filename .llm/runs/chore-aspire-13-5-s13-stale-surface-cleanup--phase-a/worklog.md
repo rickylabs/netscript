@@ -67,6 +67,7 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | 4 | parity phase 2 | Imported the S1 checker baseline without pins/CI, kept phase 1 default, added phase-2 enforcement, fixed 13.5.3 compat assertions, stale/unmatched manifest detection, and report-only exit mode. |
 | 2026-08-30 | 4 | convergence sweep | Regenerated an 800-row manifest (zero unmatched) and ran phase 2 in report mode: 24 non-archival failures remain, all outside S13 ownership. |
 | 2026-08-30 | 4 | flip ordering | Refreshed `origin/main` at `24f6642f`; toolchain.env remains 13.4.6, proving S1 is not on main. The CI/default phase-2 flip is deferred; S9 and S11 convergence cannot satisfy the all-three prerequisite without S1. |
+| 2026-08-30 | 5 | receipt wiring | Registered `aspire-version-parity` in the durable gate catalog so the required phase-2 report can produce an exact-head JSON receipt. |
 
 ## Gate Results
 
