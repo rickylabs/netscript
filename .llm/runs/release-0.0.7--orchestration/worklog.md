@@ -2514,7 +2514,7 @@
   and committed issue scope. The DAG edge `#1722 -> #1642` records the S10/S11 stack dependency;
   independent docs and internals work remains parallel rather than globally serialized.
 
-## 2026-08-30T17:37:00Z — shipping resumed; Aspire ruling and exact main advanced
+## 2026-08-30T15:37:00Z — shipping resumed; Aspire ruling and exact main advanced
 
 - Merged docs leaf PR #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`
   as main `de57fab0e220203567367b6852f918dc71f296a6`; issue #1770 auto-closed and both

@@ -1495,7 +1495,7 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Exact main remains `3e5cbabf...`; preserve runtime zero and serialize only host runtime leases,
   never the independent topic queues.
 
-## Resume checkpoint — 2026-08-30T17:37:00Z
+## Resume checkpoint — 2026-08-30T15:37:00Z
 
 - Exact main is `de57fab0e220203567367b6852f918dc71f296a6` after coordinator merge of PR
   #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`; #1770 auto-closed and the
