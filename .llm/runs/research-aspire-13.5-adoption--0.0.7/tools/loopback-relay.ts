@@ -12,6 +12,14 @@
  * Ownership: only containers created at/after --since (default: process start) whose names do not
  * start with `relay-` are relayed; hop-A containers carry label netscript.relay.owner=<owner>.
  * SIGTERM/SIGINT on `watch` runs the same cleanup as `cleanup`.
+ *
+ * Availability tracking (D-97): each poll cycle recomputes the set of currently-published
+ * `127.0.0.1:<port>` mappings from live (non-`relay-`) containers. Any port this relay owns that
+ * is no longer published — e.g. `aspire resource <name> stop` removed the container/its port —
+ * is torn down immediately (hopB listener closed, hopA socat container removed), so a stopped
+ * backing service is truly unreachable through the relay rather than staying falsely connectable.
+ * When the same port is republished (e.g. after `aspire resource <name> start`), it is relayed
+ * again fresh on the next cycle via the normal creation path below.
  */
 const MISE = '/home/agent/.local/bin/mise';
 const args = parse(Deno.args.slice(1));
@@ -96,9 +104,20 @@ Deno.addSignalListener('SIGTERM', stop);
 Deno.addSignalListener('SIGINT', stop);
 console.log(`[relay] watching owner=${owner} dind=${dindHost}(${dindIp}) since=${reg.since} pid=${Deno.pid}`);
 
+async function teardownPort(port: number) {
+  const l = listeners.get(port);
+  if (l) { try { l.close(); } catch { /* already closed */ } listeners.delete(port); }
+  const container = `relay-${owner}-${port}`;
+  try { await docker('rm', '-f', container); } catch { /* already gone */ }
+  reg.relays = reg.relays.filter((r) => r.port !== port);
+  await writeRegistry(reg);
+  console.log(`[relay] ${container} torn down — upstream port ${port} no longer published`);
+}
+
 while (!stopping) {
   try {
     const rows = (await docker('ps', '--format', '{{.ID}}\t{{.Names}}\t{{.Ports}}')).split('\n').filter(Boolean);
+    const livePorts = new Set<number>();
     for (const row of rows) {
       const [id, name, ports] = row.split('\t');
       if (!id || !name || name.startsWith('relay-')) continue;
@@ -111,6 +130,7 @@ while (!stopping) {
       if (created < since) continue;
       for (const m of (ports ?? '').matchAll(/127\.0\.0\.1:(\d+)->/g)) {
         const port = Number(m[1]);
+        livePorts.add(port);
         if (listeners.has(port)) continue;
         const container = `relay-${owner}-${port}`;
         await docker('run', '-d', '--rm', '--network', 'host', '--name', container,
@@ -121,6 +141,9 @@ while (!stopping) {
         await writeRegistry(reg);
         console.log(`[relay] ${name} 127.0.0.1:${port} => hopA ${container} (${dindIp}:${port}) => hopB 127.0.0.1:${port}@ai-agents`);
       }
+    }
+    for (const port of [...listeners.keys()]) {
+      if (!livePorts.has(port)) await teardownPort(port);
     }
   } catch (e) { console.error(`[relay] poll error: ${(e as Error).message}`); }
   await new Promise((r) => setTimeout(r, interval));
