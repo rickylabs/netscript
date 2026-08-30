@@ -28,13 +28,19 @@ Publishing that alias is the bounded repair: it clears the new finding and the t
 findings where `BaseContractRoute` / `BaseContractOutputRoute` already reference it. `ContractBuilder`
 and `Schema` remain upstream oRPC types and are not re-exported under AP-14.
 
-The repaired-head measurement did not fully match that expectation. The exact 16-entrypoint argv
-reports 13 findings: exporting `BaseContractErrors` clears its three consumer references, but the
-now-public alias itself introduces two findings, one for upstream `MergedErrorMap` and one for the
-private `commonErrorMap` value used through `typeof`. Net change from the 14-finding slice head is
--1; incremental cost versus the 12-finding base is therefore +1. The brief explicitly bounds this
-lane to reporting a fresh `MergedErrorMap` finding rather than chasing it further, so the residual
-is left for Tier-A/evaluator disposition.
+Cycle 1 did not fully match that expectation. Its exact 16-entrypoint argv reported 13 findings:
+exporting `BaseContractErrors` cleared its three consumer references, but the now-public alias
+introduced two findings, one for upstream `MergedErrorMap` and one for the private `commonErrorMap`
+value used through `typeof`. That reduced the pre-repair slice head from 14 to 13 but left a +1
+incremental cost versus the 12-finding base.
+
+Cycle 2 was authorized to correct the NetScript-owned half of that boundary. `commonErrorMap` now
+has a public NetScript-owned `CommonErrorMap` contract, and both are exported with ownership JSDoc.
+The alias describes its six `data` fields with the existing public NetScript error vocabulary and
+`ContractObjectSchema`; it does not expose the private lower-case schema constants. The exact
+16-entrypoint argv at content head `bb1a489ace2c162c1caca065fc2762d7807330d0` reports 12 findings.
+The measured sequence is therefore: base `13878a80a` = 12, pre-repair `f9056f879` = 14, cycle 1
+`3c3f9b7c` = 13, cycle 2 `bb1a489a` = 12. The final incremental cost is 0.
 
 The package JSR audit separately recognizes this exact boundary and reports its slow-types check as
 INFO because `@netscript/contracts` is on the doctrine's sanctioned oRPC slow-types allowlist. That
@@ -43,17 +49,19 @@ sanction does not affect `deno doc --lint` exit status or the `public-doc-lint` 
 ### Impact
 
 The honest final `public-doc-lint-final.json` remains terminal FAIL because the repository baseline
-is already red, and this bounded repair leaves a measured +1 incremental `private-type-ref` cost.
-Generic position 3, exact metadata position 4, and the #1350 error-channel guarantee remain intact.
-Re-exporting `ContractBuilder`, `Schema`, or `MergedErrorMap` would violate AP-14 and is prohibited;
-changing the alias representation or exposing `commonErrorMap` is outside this repair.
+itself is 12 findings, but this bounded repair adds no findings relative to it. The final twelve
+include the permitted residual references from `baseContract` to upstream `ContractBuilder` and
+`Schema`, and from `BaseContractErrors` to upstream `MergedErrorMap`; the other nine are unchanged
+baseline findings outside this leaf. Generic position 3, exact metadata position 4, and the #1350
+error-channel guarantee remain intact. Re-exporting `ContractBuilder`, `Schema`, or
+`MergedErrorMap` would violate AP-14 and was not done.
 
 ### Decision required
 
-Recut the unchanged contracted public-doc-lint gate as a terminal FAIL receipt, record the exact
-base-vs-repaired-head finding counts beside it, and recompute receipt sufficiency honestly. Tier-A
-and separate-session IMPL-EVAL own the final sign-off; this implementation lane does not
-self-certify.
+The unchanged contracted public-doc-lint gate is recut as a terminal FAIL receipt, with the exact
+base/pre-repair/cycle-1/cycle-2 finding counts recorded beside it. Receipt sufficiency remains an
+honest mechanical result. Tier-A and separate-session IMPL-EVAL own final sign-off; this
+implementation lane does not self-certify.
 
 ## D-2 — NAS migration preserves the terminal receipt set before repair
 
@@ -104,3 +112,48 @@ descendant in `hybrid-launcher_test.ts`). The focused SDK doctest passes 3/3, so
 Sufficiency recomputed over the eight explicit files is **INSUFFICIENT** solely because those two
 receipts did not pass. The supplemental contracts JSR audit passes with one sanctioned oRPC
 slow-types INFO and is explicitly excluded from the named set.
+
+## D-5 — annotation-derived exactness guards were tautological
+
+- Date: 2026-08-30
+- Slice: 1 repair, cycle 2
+- Severity: significant
+- Status: corrected with an inferred upstream probe
+
+The cycle-1 SDK doctest and the pre-existing contracts fixture derived a builder field from an
+explicit `ContractBuilder<..., BaseContractErrors, BaseContractMeta>` annotation and compared that
+field to the same annotation argument. That equality can fail when the two written types differ,
+but it cannot detect a divergent initializer because the annotation absorbs the initializer's
+inferred type. It therefore did not independently pin T-2 against an oRPC inference change.
+
+`packages/contracts/tests/procedure-meta-inference_test.ts` now constructs the same
+`oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap)` expression without an annotation. It
+compares the inferred `~orpc.meta` to public `BaseContractMeta` and the inferred `~orpc.errorMap` to
+public `BaseContractErrors` with exact `Equal<>` assertions. The test imports `commonErrorMap` from
+the internal application module because inference must use the actual error-map value; it remains
+under the contracted root `test` gate.
+
+A temporary perturbation of the expected metadata type to `Record<never, never>` produced
+`TS2344: Type 'false' does not satisfy the constraint 'true'` at the inferred-meta assertion. The
+perturbation was restored before commit. This inferred probe, rather than the explicit annotation,
+now supplies the independent T-2 pin. The working `.meta(publicMeta)` check, both negative
+`@ts-expect-error` checks, and runtime metadata-storage assertions were not changed.
+
+## D-6 — cycle-2 quiet-load root test retains one out-of-scope tooling failure
+
+- Date: 2026-08-30
+- Slice: 1 repair, cycle 2
+- Severity: operational
+- Status: scoped blocker recorded; no tooling change attempted
+
+The attempt-3 root `test` gate was run serially at immutable content head `bb1a489a`, with no other
+gate from this lane running. It completed with 4248 passed, 1 failed, and 19 ignored. The earlier
+`Deno.watchFs` / `Too many open files` failure did not recur. The sole remaining failure is
+`.llm/tools/agentic/claude/hybrid-launcher_test.ts` observing a worker descendant that survived
+cancellation. This slice changes zero files under `.llm/tools`, so the terminal FAIL is preserved as
+an out-of-scope repository-tooling blocker rather than skipped, narrowed, or repaired here.
+
+All eight contracted receipts were recut serially with `--attempt 3`. Every receipt records
+`gitHead == actualGitHead == bb1a489ace2c162c1caca065fc2762d7807330d0`; all gate IDs and invocation
+IDs are unique. Six PASS, while root `test` and the baseline-red `public-doc-lint` are terminal FAIL.
+Exact-file sufficiency is therefore **INSUFFICIENT** for those two reasons only.

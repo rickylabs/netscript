@@ -65,6 +65,10 @@ add runtime interpretation in this slice family without the RFC-owned Stage 2 po
 | 2026-08-30 | repair content    | Re-pinned the SDK doctest metadata guard to public `BaseContractMeta`; temporarily restored the stale empty-meta expectation and observed the required `TS2344`, then restored the correct exact-equality pin. Exported the NetScript-owned `BaseContractErrors` alias without re-exporting upstream oRPC types. | Content commit `3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d` |
 | 2026-08-30 | repair validation | Focused SDK doctest passed 3/3. The committed contracts assertion scanner passed 4/4 and re-measured `contract-primitives.ts = 0`, `procedure-meta.ts = 0`; no SDK assertion scanner exists in slice 1. Exact public doc lint measured base 12, pre-repair 14, repaired 13; the public alias exposes fresh `MergedErrorMap` and `commonErrorMap` references, so the bounded repair leaves delta +1 and stops. | Focused wrapper output; corrected `drift.md` D-1           |
 | 2026-08-30 | receipt recut     | Recut all eight named receipts with `--attempt 2` at content head `3c3f9b7c`; every `gitHead` equals `actualGitHead`. Six PASS; root `test` FAIL (4246 pass, 2 unrelated agentic failures, 19 ignored); `public-doc-lint` FAIL (13 findings). Explicit eight-file computation is `INSUFFICIENT` for those two FAIL receipts. Contracts JSR audit is supplemental PASS with one sanctioned INFO. | `receipts/*-final.json`; `audit/contracts.json`             |
+| 2026-08-30 | repair cycle 2 AF-1 | Replaced the annotation-derived tautology with an unannotated inference probe over the actual `oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap)` expression. Exact inferred metadata and error-map types are pinned to public `BaseContractMeta` and `BaseContractErrors`. A temporary `Record<never, never>` expectation failed with `TS2344: Type 'false' does not satisfy the constraint 'true'`, then was restored. | Content commit `64350c5af6109b8c5619520fac69b8369c062a0b` |
+| 2026-08-30 | repair cycle 2 AF-2 | Published the NetScript-owned `commonErrorMap` value and `CommonErrorMap` type with ownership JSDoc. The public alias uses the existing public NetScript error vocabulary and does not re-export upstream oRPC names. Exact doc-lint counts are base 12, pre-repair 14, cycle 1 13, cycle 2 12; final incremental cost is 0. | Content commits `c57cac676920d6390d3748ef70ef5f5d0671c794`, `bb1a489ace2c162c1caca065fc2762d7807330d0`; `drift.md` D-1 |
+| 2026-08-30 | repair cycle 2 AF-3 | Recut root `test` serially under quiet load. The fd-exhaustion failure cleared; one unrelated hybrid-launcher cancellation test remains red (4248 pass, 1 fail, 19 ignored). No `.llm/tools` files were changed. | `receipts/test-final.json`; `drift.md` D-6 |
+| 2026-08-30 | receipt recut cycle 2 | Recut all eight named receipts with `--attempt 3` at content head `bb1a489a`; every `gitHead` equals `actualGitHead`. Six PASS; root `test` and baseline-red `public-doc-lint` are terminal FAIL. Exact eight-file computation is `INSUFFICIENT` for those two FAIL receipts only. Contracts JSR audit is supplemental PASS with one sanctioned INFO. | `receipts/*-final.json`; `audit/contracts.json` |
 
 ## Slice 1 gate results
 
@@ -88,7 +92,7 @@ The host migration freezes this lane at the pushed receipt checkpoint. On the NA
 remote branch, retain the red evidence, apply only the already-bounded SDK/doctest and adapter-boundary
 repair, then regenerate exact-head receipts before Tier-A review and IMPL-EVAL.
 
-## Repair receipt results
+## Repair receipt results — cycle 1
 
 Content head: `3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d`.
 
@@ -106,3 +110,25 @@ Content head: `3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d`.
 Sufficiency was recomputed over those eight explicit files, not a glob. Gate IDs and invocation IDs
 are unique. Verdict: **INSUFFICIENT** because `test` and `public-doc-lint` are terminal FAIL; there
 are no missing, duplicate, contradictory, nonterminal, or head-mismatched receipts.
+
+## Repair receipt results — cycle 2
+
+Content head: `bb1a489ace2c162c1caca065fc2762d7807330d0`.
+
+| Receipt | Outcome | Attempt | Head attestation |
+| --- | --- | ---: | --- |
+| `check-final.json` | PASS | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `lint-final.json` | PASS | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `fmt-check-final.json` | PASS | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `test-final.json` | FAIL | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `public-doc-lint-final.json` | FAIL | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `quality-gate-final.json` | PASS | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `arch-check-final.json` | PASS | 3 | `gitHead == actualGitHead == bb1a489a…` |
+| `publish-dry-run-final.json` | PASS | 3 | `gitHead == actualGitHead == bb1a489a…` |
+
+Sufficiency was recomputed over those eight literal paths, not a glob. Gate IDs and invocation IDs
+are unique, and every receipt is terminal and exact-head. Verdict: **INSUFFICIENT** because `test`
+and `public-doc-lint` did not pass; there are no missing, duplicate, contradictory, nonterminal, or
+head-mismatched receipts. The contracts assertion scanner re-measured
+`contract-primitives.ts = 0` and `procedure-meta.ts = 0`. The supplemental contracts JSR audit
+passes with one sanctioned oRPC slow-types INFO and remains outside the named eight.
