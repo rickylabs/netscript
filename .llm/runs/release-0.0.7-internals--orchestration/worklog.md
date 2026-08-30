@@ -5120,3 +5120,34 @@ rollout-growth stall.
   finding against main; resolution of every cited SHA; and root `deno task test` **re-measured with
   real exit capture**. It is independently re-measuring rather than deferring to the supervisor
   table, which is what the same-family hazard warning in the brief was for.
+
+## D-85 — #1774 fix independently proven under LIVE Claude Code hook dispatch, on the exact defect geometry
+
+Supervisor-side confirming evidence, gathered while IMPL-EVAL ran. Not a substitute for the
+evaluator's verdict — corroboration, obtained by a different route.
+
+- The evaluator's own session runs in `007-eval-1774-impl`, a worktree carrying the repaired
+  `.claude/settings.json` at `51a7bafe1`. Its hooks therefore fire under **real Claude Code
+  dispatch**, not a simulation. It wrote `.llm/tmp/claude/hooks/unscoped/events.jsonl`.
+- Measured contents: **34 events** — `PreToolUse` ×33 (session `8f436cac`, the evaluator) and
+  `Stop` ×1 (session `24ee44d2`, the Sonnet 5 spend-limit probe). **Both hook events are therefore
+  proven live, in two different sessions on two different models** — stronger than one event
+  generalised to the other, which the brief explicitly refused to accept.
+- **The decisive datum — two distinct `cwd` values:**
+  - `/home/agent/.../007-eval-1774-impl`
+  - `/home/agent/.../007-eval-1774-impl/.llm/runs/fix-claude-hook-log-cwd--1774`
+  The second is a **nested run directory**, which is *exactly* the geometry that produced the
+  original defect: a relative hook path resolved against the turn's cwd into a nonexistent nested
+  path and emitted `Module not found`. Under the repair the hook resolved and logged successfully
+  from that same nested cwd.
+- **Exec-form interpolation is confirmed working.** `.claude/settings.json` uses `command: "deno"`
+  plus an `args` array containing `${CLAUDE_PROJECT_DIR}` in both `--allow-write` and the script
+  path. Had Claude Code not interpolated inside exec-form `args`, deno would have received the
+  literal string and failed. It did not: no literal `${CLAUDE_PROJECT_DIR}` directory exists
+  anywhere under `worktrees/`, and the writes landed in the interpolated location.
+- The `unscoped/` bucket reflects `NETSCRIPT_RUN_ID` being unset for these sessions — expected
+  fallback behaviour, not a defect.
+- **Own slip, corrected:** my first extractor read a top-level `hook_event_name` and reported
+  "distinct events: []". The field is nested under `event`. The empty result was my bug, not absent
+  data — re-extracted correctly above. Recording it because "no events found" would have been a
+  false negative pointing the opposite way, and I nearly reported it.
