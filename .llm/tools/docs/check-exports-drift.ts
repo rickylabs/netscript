@@ -60,6 +60,66 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'watchers',
+    packagePath: 'packages/watchers',
+    docPath: 'docs/site/reference/watchers/index.md',
+    packageName: '@netscript/watchers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories the supported watcher APIs while deliberately classifying exported strategy implementations as internal.',
+    },
+  },
+  {
+    name: 'runtime-config',
+    packagePath: 'packages/runtime-config',
+    docPath: 'docs/site/reference/runtime-config/index.md',
+    packageName: '@netscript/runtime-config',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason:
+        'The single-entrypoint reference inventories every exported loader, accessor, diagnostic, type, constant, and alias reported by deno doc.',
+    },
+  },
+  {
+    name: 'prisma-adapter-mysql',
+    packagePath: 'packages/prisma-adapter-mysql',
+    docPath: 'docs/site/reference/prisma-adapter-mysql/index.md',
+    packageName: '@netscript/prisma-adapter-mysql',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories primary adapter contracts while omitting the lower-level transaction options contract.',
+    },
+  },
+  {
+    name: 'auth-workos',
+    packagePath: 'packages/auth-workos',
+    docPath: 'docs/site/reference/auth-workos/index.md',
+    packageName: '@netscript/auth-workos',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories WorkOS APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.',
+    },
+  },
+  {
+    name: 'auth-better-auth',
+    packagePath: 'packages/auth-better-auth',
+    docPath: 'docs/site/reference/auth-better-auth/index.md',
+    packageName: '@netscript/auth-better-auth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories Better Auth APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.',
+    },
+  },
+  {
     name: 'cron',
     packagePath: 'packages/cron',
     docPath: 'docs/site/reference/cron/index.md',
