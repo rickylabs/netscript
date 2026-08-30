@@ -3413,3 +3413,58 @@ included in the thing being observed.** `codex-resume` exit 0 described the laun
 send; my `timeout` wrapper killed the turn it was meant to bound; `pgrep -f` matched the watcher
 rather than only the watched. Each time the fix was to check the target directly — `ps` against the
 real pid, the commit graph, the git head.
+
+## 2026-08-30T09:27Z — environment authority update 2 re-proven; pre-existing reds re-earned under new conditions
+
+Coordinator authority update 2 arrived and I re-proved every claim locally rather than adopting it:
+
+| Item | Previously recorded by this lane | Re-proven |
+| --- | --- | --- |
+| `netscript-dind` | `10.4.12.16` | **`10.4.12.19`** |
+| Docker | server `27.5.1` | **client/server `28.5.2`** |
+| `fs.inotify.max_user_instances` | `128` | **`1024`** |
+| `docker ps -a` / `aspire ps` | — | **empty / no running AppHost** |
+
+Docker is now ≥28, so the below-28 caveat is moot rather than merely non-blocking, and the
+watchFs/inotify quota blocker is resolved.
+
+### The part that actually mattered — my own classification was resting on stale conditions
+
+I had classified two root-test failures as pre-existing baseline reds, and I measured them under the
+**old 128** inotify ceiling. `hybrid-launcher_test` is a **process-lifecycle** test — precisely the
+class an inotify-allocation failure could fabricate. Gate row 6 depends on that classification, and
+the IMPL-EVAL now running is evaluating it.
+
+So I re-ran both at final head `fc3ea1775029502ea0b811137aa2096e40505709` under inotify 1024:
+
+| Test | 128 | **1024** | Verdict |
+| --- | --- | --- | --- |
+| `hybrid-launcher_test.ts:102` | FAIL 9/1 | **FAIL 9/1** | genuinely pre-existing |
+| `markdown-renderer.test.ts:142` | FAIL 1/1 | **FAIL 1/1** | genuinely pre-existing |
+
+Both still fail identically and still reproduce at `main` `13878a80a50c55b9662099fed64555f2310ae4a3`.
+**Row 6 stands** — but now on a current measurement instead of a superseded one.
+
+The lesson, turned on myself this time: **a conclusion inherits the conditions of its measurement.**
+When the conditions move, the conclusion must be re-earned, not restated. I had already caught this
+shape three times in other people's work this session — the stale ledger citation on #1533, the
+zombie explanation covering two unrelated failures, the wrapper exit codes describing wrappers. This
+was the same error with my own name on it, and the only reason it did not become a false receipt is
+that the environment update named the specific quota I had measured under.
+
+Coordinator's fresh lifecycle rerun (13/13 PASS incl. `codex-follow` streaming) is consistent:
+`codex-follow` recovered, `hybrid-launcher` did not. They were never the same failure, despite once
+sharing one explanation.
+
+### Runtime posture and owned cleanup
+
+Aspire/Docker/`scaffold.runtime` remain `NOT_RUN`, excluded by the **coordinator-owned serialized
+host runtime lease**, not by environment. A healthy sandbox does not grant a lease and this lane took
+none.
+
+**Owned cleanup is at Aspire/Docker zero, verified not assumed:** `docker ps -a` 0 containers,
+`docker volume ls` 0 volumes, only the three default networks, 0 `postgres-*`, `aspire ps` reports no
+running AppHost. This lane started no runtime resource at any point; every probe was a detached git
+worktree outside the leaf, each removed with its scratch.
+
+Recorded on PR #1747 as comment `5467891151`, superseding the stale figures in `5467882090`.
