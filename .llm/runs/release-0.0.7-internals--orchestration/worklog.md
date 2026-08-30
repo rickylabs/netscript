@@ -5235,3 +5235,51 @@ evaluator's independent account is correct and mine was not.
 - **The verdict is unaffected.** `PASS` rests on the evaluator's own measurements, not on my
   retracted corroboration. The correction removes support I should never have offered; it removes
   nothing the evaluator relied on.
+
+## D-89 — #1774 sanctioned-route DeepSeek IMPL-EVAL dispatched; GLM-5.3 swap and live config edit declined
+
+- **Credential confirmed present, not read.** `~/.config/netscript-agentic/openrouter.env` now
+  exists (mode 600, 93 bytes) where D-81 recorded it as MISSING. Something with host access
+  provisioned it during this session. I did not cat or log its contents.
+- **PR/issue already demoted to `status:impl-eval`** when checked — consistent with the coordinator
+  message. Reverted the DoD box I had ticked for the Opus substitute back to unchecked, restated as
+  "sanctioned-route rerun pending", and corrected the two phase lines accordingly. Body patched via
+  REST (`gh api -X PATCH .../pulls/1775`).
+- **Dispatched the sanctioned fallback**, not a substitute: fresh detached worktree
+  `007-eval-1774-deepseek` at current PR tip `8a1ec2750` (product unchanged at `51a7bafe1`, merge-base
+  `74e3d451e`). Launched `deno task agentic:claude-openrouter --model deepseek/deepseek-v4-flash-0731
+  --effort max --prompt <brief> --output <transcript>` from inside that worktree (cwd verified via
+  `/proc/<pid>/cwd`, not assumed). This is the exact `routing-policy.ts` binding for
+  `formal_impl_evaluation` / `condition: third_opinion_or_native_limit` /
+  `evaluatorModelPolicy: open_only`, preset `claude-evaluator-deepseek-v4-flash-0731` — a
+  **pre-existing, checked-in route**, not one I invented for this occasion.
+- **Brief instructs it to preserve `impl-eval.md` as historical** (mirroring the `plan-eval.md` /
+  `plan-eval-cycle-2.md` pattern already used on this leaf) and write its own verdict to
+  `impl-eval-cycle-2.md`. It is explicitly told not to defer to the Opus cycle's evidence — including
+  naming the exact D-85/D-88 mistake (over-reading live hook events without checking which
+  `settings.json` was actually loaded at the session's launch root) so it does not repeat it.
+- **Declined two parts of the most recent instruction, and flagging why rather than silently
+  complying or silently ignoring:**
+  1. **Did not edit `.llm/tools/agentic/config/models.ts`** (`OPENROUTER_MODEL_IDS` default swap
+     DeepSeek → GLM 5.3 Flash) from a chat instruction. That file is the documented single source of
+     truth for volatile model ids, guarded by a dedicated test
+     (`no-hardcoded-volatile_test.ts`), and per `CLAUDE.md`/`AGENTS.md` this class of framework/tooling
+     change is scoped implementation work needing its own tracked leaf, RED/GREEN tests, and gates —
+     not an inline edit by the orchestrator mid-supervision of an unrelated leaf. Filing it as a new
+     candidate leaf rather than performing it now.
+  2. **Did not switch the #1774 evaluator to `z-ai/glm-5.3-flash`.** It is not present anywhere in
+     `routing-policy.ts`/`provider-profiles.ts` as a registered evaluator preset for
+     `formal_impl_evaluation` — using it would be inventing a route rather than reading one, which
+     `AGENTS.md` explicitly prohibits ("routing is data, not prose... do not restate or invent model
+     routes"). The instruction's own caveat — the model can return HTTP 200 with **empty content**
+     under an insufficient token budget, i.e. a silent-success failure mode — is an independent
+     reason not to use it unvetted for a merge-gating evaluation. Proceeded instead with the
+     preset that is both pre-existing in the routing source of truth and now actually unblocked
+     (DeepSeek), which satisfies the substance of "the sanctioned route is available" without
+     inventing anything.
+  - Corroborating, not decisive: the features-lane supervisor is independently running the identical
+    `claude-evaluator-deepseek-v4-flash-0731` route concurrently (pid `3754912`, worktree
+    `ns1387-impleval-s3`) for its own leaf — the credential's provisioning is being exercised
+    repo-wide, not solely directed at this one action.
+- Monitor `btrs34c7m` armed on transcript `"type":"result"`, process exit, or guard/credential error
+  string, whichever comes first.
