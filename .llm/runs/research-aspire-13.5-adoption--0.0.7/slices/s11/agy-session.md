@@ -1,8 +1,10 @@
 # S11 — documentation_authoring session (OF-4 (b), Antigravity)
 
-- **Route requested:** Antigravity CLI · Google · Gemini 3.6 Flash · low (`documentation_authoring`,
-  `routing-policy.ts` lane binding; model id `MODEL_IDS.antigravityDocs = gemini-3.6-flash-high`,
-  `--effort low`).
+- **Route requested:** Antigravity CLI · Google · **Gemini 3.7 Flash · high** — **owner override**
+  (2026-08-30, in-session: "use 3.7 flash not 3.6", "use it at high reasoning") over the
+  `documentation_authoring` lane default (Gemini 3.6 Flash · low; config id
+  `MODEL_IDS.antigravityDocs = gemini-3.6-flash-high`). Model id `gemini-3.7-flash-high` (effort is
+  encoded in the AGY model id; no `--effort` flag).
 - **Launch:**
   `agy -p --model gemini-3.6-flash-high --effort low --dangerously-skip-permissions
   --add-dir /home/agent/projects/netscript/worktrees/007-aspire --print-timeout 6h
@@ -20,3 +22,5 @@
   pass) → fixes on the same AGY conversation → `docs_polish` (Claude · Fable · medium edit-only).
 - Launch attempt 1 failed at argv parsing (`-p` consumed `--model`; exit 2, nothing ran). Attempt 2:
   flags first, prompt attached as `--prompt=…` (log `s11-agy-launch-2.log`).
+- Attempts 3 (3.6-low) and 4 (3.7-low) were stopped by the owner before doing work (worktree reset,
+  run dir removed). **Attempt 5 = `gemini-3.7-flash-high`** (log `s11-agy-launch-5.log`).

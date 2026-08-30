@@ -969,3 +969,14 @@
   IMPL-EVAL cycle 2 `PASS` (phase A). Phase B (`scaffold.runtime --cleanup` with the new receipts,
   leak = 0) remains lease-backed and environment-blocked (D-42/D-43). Not a merge candidate (stacked
   S8 → S6 → S5; D-41; S9/S10 gate ordering reconciled at convergence, D-50).
+
+## D-53 — 2026-08-30 — AGY docs lane: owner override to Gemini 3.7 Flash · high; model-id/effort encoding; no suite launcher
+
+- The AGY CLI encodes effort in the model id and rejects
+  `--model gemini-3.6-flash-high --effort low` ("conflicts");
+  `MODEL_IDS.antigravityDocs = gemini-3.6-flash-high` disagrees with the lane table's "3.6 Flash ·
+  low" — tooling follow-up to reconcile (not an Aspire slice).
+- **Owner override recorded:** S11 runs on **`gemini-3.7-flash-high`** (owner instruction
+  in-session), superseding the OF-4 (b) default route for this slice. Launched as a recorded ad-hoc
+  `agy --print` session (the suite has no `launch-agy-slice`; not daemon-managed) —
+  `slices/s11/agy-session.md`.

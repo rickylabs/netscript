@@ -317,4 +317,6 @@ evaluator's read); non-mutation verified. S10 phase A settled (D-52). | | S11 (#
 docs lane | Coordinator approved. Launched on OF-4 (b) Antigravity · Gemini 3.6 Flash · low via
 `agy -p` (recorded ad-hoc print session, no suite launcher exists; `slices/s11/agy-session.md`),
 worktree `007-aspire-s11` @ `c61b1626` (stacked on S10). Brief `slices/s11/brief.md` (#1000 already
-shipped → Refs; #1642 milestone ask). |
+shipped → Refs; #1642 milestone ask). | | S11 route override (owner) | S11 relaunched on **Gemini
+3.7 Flash · high** (`gemini-3.7-flash-high`) per owner instruction; earlier 3.6/3.7-low attempts
+stopped before any work; S11 worktree reset clean at `c61b1626`. D-53. |
