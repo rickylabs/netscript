@@ -2383,3 +2383,71 @@ Confirmed on `38439740f`, **with a positive control** after three false-signal p
 Same defect class as `aspire`'s: **a page pointing somewhere that does not exist**. Larger, because
 `aspire` hid four symbols behind a false claim while `logger` hides its entire `/middleware` and
 `/orpc` surface behind a promise of pages that were never generated.
+
+## 2026-08-30 — #1785 repair cycle: an external review caught a third unconditional claim
+
+`logger` slice, PR #1785. Head chain: `2d0bf5a46` prose → `87930240` assets → `a34754374` evaluator
+carrier → `9f6935980` wording repair → **`30b4018ce`** assets.
+
+### The finding, and why it was not resolved away
+
+An `augmentcode` review objected to the `LoggingPlugin` row's *"correlated request, completion, and
+failure logging"*. Verified at source and **valid**:
+
+```
+packages/logger/orpc-plugin.ts
+:180  let currentRequestId    }  closure shared by BOTH interceptors,
+:181  let requestStartTime    }  created once per init() — not per request
+:187    currentRequestId = …     ← root interceptor writes
+:229    const requestId = currentRequestId ?? 'unknown'   ← procedure interceptor reads
+```
+
+Under concurrency, request B's root interceptor overwrites the id before A's procedure interceptor
+reads it, so logs cross-attribute; `requestStartTime` misattributes durations the same way.
+
+The word was in a description **this PR added**, so it was in scope. Resolving a valid finding to
+protect a green head would have been the wrong trade — the PR was demoted to `status:impl` and a
+bounded repair dispatched, at the cost of a fresh exact-head evaluation. **The Augment thread is left
+open deliberately until the new verdict confirms the repair**, rather than resolved on the strength of
+the fix being dispatched.
+
+Repair: *"for correlated request, completion, and failure logging"* → *"to log request start,
+completion, and failure."* One table row. Tier-A: 25 distinct symbols across both entrypoints with
+**0 missing**, 13 gates exit 0, zero `packages/logger` source changes, `AUTHORITATIVE_MAPPING`
+untouched, provenance `9f6935980` == `HEAD^`.
+
+**Two boundaries stated in the repair brief and worth keeping:** do not write "correlated except under
+concurrency" — that documents a bug as a feature; and do not fix `orpc-plugin.ts` from a docs slice.
+
+### The source defect filed separately — #1786
+
+`fix(logger): LoggingPlugin correlates request IDs via shared closure state`, Backlog / Triage. Its
+acceptance requires the regression test to exercise **concurrent** invocations — a sequential test
+passes today and would not have caught this.
+
+**A silent failure caught by checking:** the first `gh issue create` **exited 0 while creating
+nothing** — `area:logger` is not in `.github/labels.yml`. Only verifying the issue existed surfaced it.
+A non-zero exit would have been kinder; the lesson is that `gh issue create` can partially fail on an
+invalid label and still report success. Refiled with `area:telemetry`.
+
+### The pattern is now unmistakable
+
+Three slices in a row, an external review has caught an unconditional claim that this lane's internal
+passes verified the *mechanism* of and never tested the *qualifier* on:
+
+| Slice | Claim | Reality |
+| --- | --- | --- |
+| #1772 | "preflights **every** declared reference" | skipped for `Enabled: false` processors |
+| #1761 | scanner "**needs** env and network permissions" | env optional, network conditional |
+| #1785 | "**correlated** request logging" | not under concurrency |
+
+Each internal pass confirmed the underlying feature exists. None asked whether the modifier attached
+to it was earned. The evaluator briefs now carry an explicit modal-verb sweep, which is why #1783's
+"published exclusively" claim was proven complete *and* minimal rather than merely plausible — but the
+sweep only runs where a brief demands it.
+
+### Systemic advisory for #1777
+
+The same "generated separately" false-deferral pattern survives in `docs/site/reference/cli/index.md:75`
+and `docs/site/reference/plugin/index.md:85`. It was never a `logger`-specific defect; it is a page
+template that promises generated pages nobody generates.
