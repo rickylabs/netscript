@@ -86,3 +86,18 @@ requirements.
   integration refresh without changing the locked derivative ownership.
 - The separate close-gate red was coordinator-diagnosed as a label-timing race. The acceptance
   mapping, issue boxes, labels, and PR state were deliberately left untouched by this lane.
+
+## 2026-08-30 — assets-barrel ceiling addition and #1748 ordering hold
+
+- Severity: coordinator-authorized bookkeeping correction; no design rescope.
+- Add exactly `packages/cli/src/kernel/assets/agent-docs.generated.ts` to the ceiling as a
+  mechanical generated output. It may be produced solely by `deno task gen:assets-barrel`, may
+  contain only generator-produced content, and must never be hand-edited. Any additional generated
+  path forced by that refresh remains rescope-and-stop.
+- Reason: publishing the new SDK `./presets` subpath changes the CLI's embedded agent-docs export
+  inventory. The coordinator's base-vs-head measurement has `check:assets-barrel` passing at main
+  `f8b4f804` and failing at merged leaf head `d1f8afe9`, with this file gaining `./presets` and a
+  regenerated SHA/prose payload.
+- #1748 is the active corpus landing and must merge before the final derivative refresh. No asset
+  is regenerated or pushed in this checkpoint; the single post-#1748 refresh will run the complete
+  cascade once against the coordinator-supplied merge SHA.

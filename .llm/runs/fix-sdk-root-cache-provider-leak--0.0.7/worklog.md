@@ -300,3 +300,24 @@ resolution or leaf edit escaped the ceiling.
 The close-gate failure at the prior head is not an implementation or evidence-mapping defect. Per
 coordinator diagnosis it is a live-label timing race; this lane did not edit the acceptance-evidence
 block, issue checkboxes, PR/issue labels, or draft state. Prohibited runtime gates remain not run.
+
+## Ordering hold and missing assets-barrel gate
+
+#1748 is the active corpus landing and is ordered before this PR. The `f8b4f804` merge at
+`d1f8afe9` remains intact, but no further generated asset is committed or pushed until the
+coordinator supplies #1748's merge SHA.
+
+The coordinator measured a leaf-caused gate gap that the locked plan omitted:
+
+- `check:assets-barrel` passes at main `f8b4f804` and fails at merged leaf head `d1f8afe9`.
+- The reported stale artifact is
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`.
+- Its generated delta adds `./presets` to `EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS` and refreshes the
+  embedded SHA/prose metadata.
+
+That one path is now ceiling-authorized as mechanical generated output, and the plan carries
+`gen:assets-barrel` followed by required-PASS `check:assets-barrel`. The generated file left in the
+working tree by the red check is deliberately excluded from this artifact-only commit. After #1748
+lands, it will be regenerated once with the rest of the derivative cascade; any additional changed
+generated path is rescope-and-stop. The acceptance-evidence block, issue boxes, labels, and PR state
+remain untouched.
