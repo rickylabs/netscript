@@ -4,15 +4,16 @@ Prepared while Aspire owns the singleton host lease. Nothing started here — no
 
 ## Exact head
 
-Carrier `d86b8b32b` on `fix/ui-add-data-screen-triad`. Product head `7bc715b68`, IMPL-EVAL `PASS_IMPL`
-`2991113a6`, carries forward as MECHANICAL_PASS after zero-intersection convergence onto main
-`73bf2efa9` — patch-identity proven on all 12 ceiling paths.
+Carrier `da5084381` on `fix/ui-add-data-screen-triad`. Product head `7bc715b68`, IMPL-EVAL `PASS_IMPL`
+`2991113a6`, carries forward as MECHANICAL_PASS through three consecutive zero-intersection
+convergences (`73bf2efa9` → `96d44758d` → `5197e70b7`) — patch-identity proven on all 12 ceiling
+paths at every hop.
 
 ## Command — one pass, do not split
 
 ```bash
 deno task e2e:cli run scaffold.runtime --cleanup --format pretty \
-  --report .llm/runs/fix-ui-add-data-screen-triad--0.0.7/receipts/scaffold-runtime-d86b8b32b.json
+  --report .llm/runs/fix-ui-add-data-screen-triad--0.0.7/receipts/scaffold-runtime-da5084381.json
 ```
 
 ## Gate identity

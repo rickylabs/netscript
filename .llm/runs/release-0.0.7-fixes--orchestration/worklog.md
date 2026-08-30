@@ -6046,3 +6046,28 @@ beyond what is already committed.
 **Fixes serial queue, corrected:** **#1781/#1357 active** (lease-queued for `scaffold.ui-data-screen`),
 **#1764 in its own queue** (lease-queued for Flow-B TC-6/7/9). #1758 removed from this lane's queue
 entirely — ownership was never this lane's to begin with the way I'd been tracking it.
+
+### Bounded non-runtime prep while host lease priority is with S6 (D-102 correction)
+
+Not requesting the lease — priority belongs to S6 pending its D-102 correction, per instruction.
+Advanced both queued leaves without consuming it.
+
+Main advanced `96d44758d` → `5197e70b7` (#1794, docs+`docs:exports-drift` adoption; 10 files, four of
+them the same shared generated carriers touched twice already this session). Checked true intersection
+before merging: **zero** for both #1781 (12-path list) and #1764 (19-path list, this time correctly
+derived from the known-good `9710a2898` ancestor from the start, no repeat of the earlier polluted-diff
+mistake).
+
+Both merged clean, **0 conflicts on either leaf** — the shared carriers happened to merge without a
+textual clash this time. Verified rather than assumed: all four cascade checks exit 0 on both, focused
+suites re-run (1764: `plugins/sagas` 55/0/1, `plugin-sagas-core` 84/0/3; 1357: `packages/cli` 1410/0,
+e2e 175/0), patch-identity proven on all owned paths at both leaves, lock unchanged both. Pushed:
+`#1764` → `9d8bbb4e9`, `#1781` → `da5084381`.
+
+Both prepared lease-request documents refreshed to the new carrier heads
+(`scaffold-runtime-request-1781.md`, `flow-b-1764-targeted-plan.md`); the #1764 bounded script and its
+reused scratch AppHost project (`plugin-smoke-20260830-220506`) confirmed still intact — untracked
+`.llm/tmp/` content is unaffected by git merges.
+
+Existing DeepSeek receipts (`54c72a970` for #1739, shipped) untouched, not rerun — irrelevant to
+either leaf currently in flight, no evaluator work was in scope for this maintenance pass.

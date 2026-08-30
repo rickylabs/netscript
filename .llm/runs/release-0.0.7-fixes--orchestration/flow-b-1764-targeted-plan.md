@@ -25,7 +25,7 @@
    `cleanup.aspire-stop` ran afterward, via the separate always-run cleanup-gate path.
    **Conclusion: 79/1 is topology proof (relay works, AppHost boots, DB/resources come up,
    `runtime.flow-b-fixture` wired the callback), not TC-6/7/9 acceptance.** Confirmed via the run's
-   own structured JSON report (`flow-b-scaffold-runtime-5b526e4bc-attempt2.json`): zero `otel`-prefixed
+   own structured JSON report (`flow-b-scaffold-runtime-9d8bbb4e9-attempt2.json`): zero `otel`-prefixed
    step ids among the 80 that executed.
 5. **First remediation attempt (mine) was a scope breach, corrected before any runtime started.**
    I wrote a script that reconstructed nearly the entire `RUNTIME_GATES` prefix (97 gates) AND forced
