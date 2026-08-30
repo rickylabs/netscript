@@ -2299,3 +2299,74 @@ anything started outside the worktree). `e2e:cli` is still absent from
 The steering already delivered to the author contains the superseded inotify risk-register
 instruction. A correction is queued and goes out on the same thread as soon as its current turn ends —
 not as a rival send, and not by editing what was already delivered.
+
+## 2026-08-30 — shipping order accepted; phase truth normalized; PLAN-EVAL staged
+
+Owner shipping order: drive #1739 from the current remote head through the already-approved generic
+inspect boundary, exact-head gates, a separate IMPL-EVAL, close-gate, and ready handoff. **F1 is
+accepted and is not to be re-audited.** PLAN-EVAL stays focused and bounded. On terminal #1739, begin
+#1462 in this lane's own serial queue without waiting on another orchestrator.
+
+### Phase truth normalized
+
+| Object | Was | Now | Why |
+| --- | --- | --- | --- |
+| Issue #1673 | `status:triage` | `status:plan` | It has been past triage since 2026-08-29; triage was stale by two phases |
+| PR #1739 | `status:impl` | `status:plan` | The F1 repair returned the leaf to a re-locked plan awaiting PLAN-EVAL |
+
+Exactly one `status:` label on each, milestone `0.0.7` on both. **Closing keyword verified present** —
+PR #1739's body carries `Closes #1673`, confirmed by a case-insensitive body match rather than by
+eye. Head identity is clean: local == `origin` == PR `headRefOid` == `349d5915`.
+
+Earlier this lane reported the stale issue label to the coordinator rather than fixing it, on the
+standing rule that relabeling is coordinator-owned. The owner has now directed this lane to normalize
+phase truth, so it is normalized; the change and its rationale are recorded here so the transfer of
+that authority is auditable rather than looking like a lane taking relabeling on its own.
+
+### A supervisor-side failure that cost the author a turn
+
+The author's turn died at 09:30:32Z without committing: last rollout event was a progress message, no
+completion event, agent absent from the daemon. Investigation found **my own `codex-resume` client
+still alive** afterwards, holding the thread-store writer for `01a051d0`.
+
+Two lessons, both now in the lane's steering rules:
+
+1. **A resume client owns the turn and can outlive it.** The earlier lesson — that a foreground
+   `timeout` on the *launcher* kills the turn — generalizes to `codex-resume`. A lingering client also
+   blocks the next send with the active-writer conflict.
+2. **`codex-status` `state` alone is not a turn boundary.** It flickers to `idle` between operations
+   inside a turn; a watcher polling only `state` produced a false boundary at 11:29Z. The reliable
+   predicate is `state != "working"` **and** `lastActivity` containing `turn complete` (or the agent
+   gone), confirmed over two consecutive polls.
+
+When cleaning up, a second `codex-resume` tree was present at worktree `007-aspire-s8` on thread
+`01a051e6` — **the Aspire lane's**, not this one's. It was identified by parent PID and left
+untouched. Only the client parented to this session's PID was stopped, through `TaskStop` rather than
+a raw kill.
+
+Nothing was lost: the thread retains its context, and the author's pinned mechanics were quoted back
+verbatim on recovery —
+
+> only a present `inspectionProtocol` key activates inspection; version `1` uses
+> `--inspect --inspection-protocol 1 --manifest-json <json>`, omits both `--manifest` and
+> `--allow-write`, and accepts one strict JSON document on stdout. Invalid advertised declarations,
+> process failures, and invalid reports all remain generator-inspection errors.
+
+That is the coordinator's contract expressed correctly, fail-closed included. The one caution passed
+back: omitting `--allow-write` expresses "no writes in inspect" but does not *prove* it, and the
+ruling requires proof.
+
+### PLAN-EVAL staged, deliberately narrow
+
+Route is the canonical `formal_plan_evaluation` for Codex work — native opposite-family **Fable 5 ·
+medium**. The brief opens by telling the evaluator that **F1 and the design response are settled and
+must not be re-audited**, and that it is judging one thing: whether the re-locked plan faithfully and
+implementably expresses the ruling, and whether its evidence obligations are real. If it thinks the
+ruling itself is wrong it says so in one marked paragraph and evaluates the plan anyway.
+
+It is also asked to **rule on the supervisor's interpretation** that
+`installed-runtime-registry-integration_test.ts` falls under "existing test paths may be amended" —
+that reading is this supervisor's, was recorded as such, and a plan evaluator is exactly the right
+place to confirm or reject it.
+
+Dispatch is one command once the amended plan commit lands; a watcher is armed on that head.
