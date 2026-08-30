@@ -2,19 +2,20 @@
 
 ## Run Metadata
 
-| Field          | Value                                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Run ID         | `fix-aspire-reference-name-validation--1732-source-safety`                                                                                       |
-| Branch         | `fix/aspire-reference-name-validation`                                                                                                           |
-| Baseline       | `13878a80a50c55b9662099fed64555f2310ae4a3`                                                                                                       |
-| Phase          | `plan`                                                                                                                                           |
-| PLAN-EVAL      | cycle 1 `FAIL_FIX` at `1f52d5e2b6b35e204167686714fe3ad72f4fafae`; cycle 2 of 2 `pending`, owner-dispatched in a separate opposite-family session |
-| Target         | `packages/aspire` config boundary and the CLI background AppHost generator                                                                       |
-| Archetype      | `6 — CLI / Tooling` (dominant combined surface; `packages/aspire` remains Archetype 2 Keep)                                                      |
-| Scope overlays | none                                                                                                                                             |
+| Field          | Value                                                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Run ID         | `fix-aspire-reference-name-validation--1732-source-safety`                                                                                                                     |
+| Branch         | `fix/aspire-reference-name-validation`                                                                                                                                         |
+| Baseline       | `13878a80a50c55b9662099fed64555f2310ae4a3`                                                                                                                                     |
+| Phase          | `implementation authorized`                                                                                                                                                    |
+| PLAN-EVAL      | cycles 1 and 2 returned `FAIL_FIX`; the owner independently verified and mechanically resolved cycle-2 F1/F2, released the gate, and authorized implementation with no cycle 3 |
+| Target         | `packages/aspire` config boundary and the CLI background AppHost generator                                                                                                     |
+| Archetype      | `6 — CLI / Tooling` (dominant combined surface; `packages/aspire` remains Archetype 2 Keep)                                                                                    |
+| Scope overlays | none                                                                                                                                                                           |
 
-No implementation may begin until the separately dispatched PLAN-EVAL returns `PASS`. This lane must
-not launch, simulate, or self-certify that gate.
+PLAN-EVAL is closed by the owner's bounded release after the final granted cycle. There is no cycle
+3. The next formal gate is separately dispatched IMPL-EVAL; this lane must not launch, simulate, or
+self-certify it.
 
 ## Archetype and Doctrine Position
 
@@ -67,17 +68,34 @@ validation diagnostic; it can never regress to the original syntax error or a bi
 `ReferenceError`. Making grammar the only defense would leave those defects reachable whenever the
 documentation-derived rule misses an input.
 
-Slice 2 enumerates config-derived values by emission site rather than name origin:
+Slice 2 enumerates emissions by site rather than name origin:
 
-1. processor config lookup, comment label, executable name, OTEL service-name argument, result-map
-   key, and every processor-derived binding;
-2. service/plugin lookup literals, discovery environment keys, and every reference-derived binding;
-3. resolved `entrypoint` and `workdir` literals, stringified unconditionally whether defaulted or
-   user-supplied through `Entrypoint` / `Workdir`;
-4. `ConcurrencyEnvVar`, stringified whenever its conditional environment binding is emitted.
+1. `config.BackgroundProcessors[...]`, `builder.addExecutable(...)`, `buildOtelEnvVars(...)`, and
+   `backgroundProcessors.set(...)` stringify the processor name;
+2. `_services.get(...)`, `_plugins.get(...)`, and the corresponding discovery environment keys
+   stringify each reference name without normalizing the key;
+3. the resolved `entrypoint` and `workdir` arguments are stringified unconditionally, whether
+   defaulted or user-supplied through `Entrypoint` / `Workdir`;
+4. the `ConcurrencyEnvVar` environment key is stringified whenever that conditional binding is
+   emitted;
+5. the already-safe `entryPermissions` / `defaultPermissions` (lines 64/68) and `sagaStoreBackend`
+   (line 136) retain their existing `JSON.stringify` calls;
+6. the already-safe `watchMode` is emitted as a boolean (line 69), and `entry.Concurrency` remains
+   in its numeric code position (line 167). It must not be stringified: `JSON.stringify` maps a
+   non-finite number to `null`, while this emission site is code rather than a string literal.
+
+No user text remains in the comment site: it becomes `// --- processor <ordinal> ---`. Traceability
+remains on the immediately following stringified config lookup and executable call. Neutralizing
+`\n`, `\r`, U+2028, and U+2029 specially in the comment would invent a second escaping mechanism
+used nowhere else, with its own test and maintenance contract. The ordinal comment makes source
+safety structural at that site and introduces no new churn class because bindings already use the
+same processor ordinals. Inserting a processor mid-config can therefore churn subsequent ordinal
+bindings and comments in user-committed generated helpers; that deterministic diff noise is accepted
+in exchange for binding validity and collision safety.
 
 Existing error messages already use `JSON.stringify` and remain so. Static internal
-`RESOURCE_DEFAULTS` literals are not config-derived and remain unchanged.
+`RESOURCE_DEFAULTS` literals are not config-derived and remain unchanged. The now-unused
+`safeIdentifier` import is removed from the background generator.
 
 ### D2 — Exact Aspire grammar is layered above escaping
 
@@ -152,36 +170,38 @@ runtime-executed in this no-lease leaf.
 
 ## Per-Path Change Plan
 
-| Path                                                                                                       | Planned change                                                                                                                                                                    | Why this path owns it                                                                                                              |
-| ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/aspire/src/domain/aspire-resource-name.ts`                                                       | Add the separately named exact Aspire resource-name pattern and canonical rule text as package-private exports.                                                                   | Keeps an internal parsing invariant reusable by config/tests without permanently expanding the JSR-published constants surface.    |
-| `packages/aspire/config.ts`                                                                                | Add background-processor key/reference validation at the composed config boundary with contextual Zod issues.                                                                     | This is the earliest boundary that knows the processor, reference kind, and rejected value and runs before generation.             |
-| `packages/aspire/tests/config_test.ts`                                                                     | Add table-driven boundary cases for processor names and both reference kinds.                                                                                                     | Existing semantic contract tests for `AppSettingsSchema` and `parseAppSettings`; proves diagnostics and accepted/rejected grammar. |
-| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts`                | Stringify every config-derived literal emission; derive processor/reference bindings from generator-local prefixes plus stable ordinals; leave shared `safeIdentifier` untouched. | This is the only generator in #1732; it owns both the raw-literal seam and the accepted reserved/shadowing identifier seam.        |
-| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts`              | Add semantic generated-module parse/execution and exact discovery-key tests across the required name, identifier, entrypoint, workdir, and concurrency-key matrix.                | Existing focused executable test harness for this generator; avoids AP-18 giant-string snapshots.                                  |
-| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts`                 | Update narrow expectations that pin current processor identifiers and single-quoted literal spelling; preserve semantic assertions.                                               | Existing tests pin `workers`/`benchmark`/`triggers` binding text and raw lookup/key literals that slice 2 intentionally changes.   |
-| `.llm/runs/fix-aspire-reference-name-validation--1732-source-safety/{worklog.md,context-pack.md,drift.md}` | Update only in later slices with RED output, commit SHAs copied from Git, reconcile notes, and final-head receipts.                                                               | Harness evidence and resumability; no implementation claim lives only in chat.                                                     |
+| Path                                                                                                       | Planned change                                                                                                                                                                                                           | Why this path owns it                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/aspire/src/domain/aspire-resource-name.ts`                                                       | Add the separately named exact Aspire resource-name pattern and canonical rule text as package-private exports.                                                                                                          | Keeps an internal parsing invariant reusable by config/tests without permanently expanding the JSR-published constants surface.                                |
+| `packages/aspire/config.ts`                                                                                | Add background-processor key/reference validation at the composed config boundary with contextual Zod issues.                                                                                                            | This is the earliest boundary that knows the processor, reference kind, and rejected value and runs before generation.                                         |
+| `packages/aspire/tests/config_test.ts`                                                                     | Add table-driven boundary cases for processor names and both reference kinds.                                                                                                                                            | Existing semantic contract tests for `AppSettingsSchema` and `parseAppSettings`; proves diagnostics and accepted/rejected grammar.                             |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts`                | Stringify every config-derived literal emission; derive processor/reference bindings from generator-local prefixes plus stable ordinals; leave shared `safeIdentifier` untouched.                                        | This is the only generator in #1732; it owns both the raw-literal seam and the accepted reserved/shadowing identifier seam.                                    |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts`              | Add semantic generated-module parse/execution and exact discovery-key tests across the required matrix; update existing assertions that pin single-quote spelling while retaining the full positive discovery-key count. | Existing focused executable test harness for this generator; avoids AP-18 giant-string snapshots without weakening current coverage.                           |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts`                 | Update narrow expectations that pin current processor identifiers and single-quoted literal spelling; preserve semantic assertions.                                                                                      | Existing tests pin `workers`/`benchmark`/`triggers` binding text and raw lookup/key literals that slice 2 intentionally changes.                               |
+| `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts`                                | Update the fixture's generated-helper anchors and derive the new processor binding from the surviving `workers` executable call; do not execute E2E.                                                                     | The merge-readiness fixture consumes the exact helper shape changed by slice 2 and otherwise breaks before `scaffold.runtime` can exercise its owned behavior. |
+| `.llm/runs/fix-aspire-reference-name-validation--1732-source-safety/{worklog.md,context-pack.md,drift.md}` | Update only in later slices with RED output, commit SHAs copied from Git, reconcile notes, and final-head receipts.                                                                                                      | Harness evidence and resumability; no implementation claim lives only in chat.                                                                                 |
 
 ## Required Test Matrix
 
 The RED tests cover all three input positions: processor name, `ServiceReferences`, and
 `PluginReferences`.
 
-| Input class        | Example              | Generator source-safety expectation            | Config-boundary expectation                                     |
-| ------------------ | -------------------- | ---------------------------------------------- | --------------------------------------------------------------- |
-| single quote       | `it's`               | parseable when generator is invoked directly   | reject contextually                                             |
-| backslash          | `back\\slash`        | parseable when generator is invoked directly   | reject contextually                                             |
-| backtick           | ``tick`name``        | parseable when generator is invoked directly   | reject contextually                                             |
-| hyphen             | `workers-api`        | parseable; raw discovery key preserved exactly | accept                                                          |
-| underscore         | `workers_api`        | parseable when generator is invoked directly   | reject contextually                                             |
-| ordinary           | `workers`            | parseable and behavior unchanged               | accept                                                          |
-| reserved word      | `class`              | parse and execute; binding cannot be `class`   | accept; platform-valid                                          |
-| async reserved     | `await`              | parse and execute; binding cannot be `await`   | accept; platform-valid                                          |
-| generator binding  | `builder`            | parse and execute without TDZ/shadowing        | accept; platform-valid                                          |
-| uppercase boundary | `Workers-API2`       | parseable                                      | accept; prevents accidental reuse of lowercase scaffold grammar |
-| consecutive hyphen | `a--b`               | parseable when generator is invoked directly   | reject as fail-fast correction                                  |
-| trailing hyphen    | `a-`                 | parseable when generator is invoked directly   | reject as fail-fast correction                                  |
-| length boundary    | 64 and 65 characters | both parseable when generator invoked directly | accept 64; reject 65                                            |
+| Input class        | Example              | Generator source-safety expectation                         | Config-boundary expectation                                     |
+| ------------------ | -------------------- | ----------------------------------------------------------- | --------------------------------------------------------------- |
+| single quote       | `it's`               | parseable when generator is invoked directly                | reject contextually                                             |
+| backslash          | `back\\slash`        | parseable when generator is invoked directly                | reject contextually                                             |
+| backtick           | ``tick`name``        | parseable when generator is invoked directly                | reject contextually                                             |
+| hyphen             | `workers-api`        | parseable; raw discovery key preserved exactly              | accept                                                          |
+| underscore         | `workers_api`        | parseable when generator is invoked directly                | reject contextually                                             |
+| ordinary           | `workers`            | parseable and behavior unchanged                            | accept                                                          |
+| reserved word      | `class`              | parse and execute; binding cannot be `class`                | accept; platform-valid                                          |
+| async reserved     | `await`              | parse and execute; binding cannot be `await`                | accept; platform-valid                                          |
+| generator binding  | `builder`            | parse and execute without TDZ/shadowing                     | accept; platform-valid                                          |
+| uppercase boundary | `Workers-API2`       | parseable                                                   | accept; prevents accidental reuse of lowercase scaffold grammar |
+| consecutive hyphen | `a--b`               | parseable when generator is invoked directly                | reject as fail-fast correction                                  |
+| trailing hyphen    | `a-`                 | parseable when generator is invoked directly                | reject as fail-fast correction                                  |
+| length boundary    | 64 and 65 characters | both parseable when generator invoked directly              | accept 64; reject 65                                            |
+| comment terminator | `a<U+2028>b`         | direct generator output parses; no name in comment position | reject contextually at config boundary                          |
 
 For invalid references, fixtures must also define the referenced service/plugin where necessary so
 cross-reference existence warnings cannot mask the name-rule diagnostic. The hyphen test asserts the
@@ -198,21 +218,37 @@ bindings are derived. They must be accepted by config validation and the generat
 parse and execute. Direct-generator cases also prove quote/backslash/backtick-safe bindings even
 though the config boundary rejects those values. Separate fixtures inject quoted/backslashed
 user-supplied `Entrypoint`, `Workdir`, and `ConcurrencyEnvVar` values and prove the generated module
-parses; this pins F2 by emission site.
+parses. A direct-generator U+2028 processor-name case proves the generated module parses with no
+user text in comment position; this pins the cycle-2 F2 correction by emission site.
 
 ## Commit Slices
 
-| # | Slice and proof                                                                                                                                                                                                                                                           | Gate                                                                                                                                    | Files                                                            |
-| - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| P | **Plan only:** lock compatibility, ordering, exact paths, risks, tests, and published-surface position; stop for real PLAN-EVAL.                                                                                                                                          | Human review, then separate PLAN-EVAL                                                                                                   | complete run-artifact set                                        |
-| 1 | **Visible RED:** add the complete generator/config test matrix, including reserved/shadowing bindings and config-derived non-name literals, and record baseline failures before implementation. Commit remains intentionally red and is pushed/commented as RED evidence. | Focused structured wrapper over `config_test.ts` + `generate-register-background_test.ts`; expected nonzero with captured failing tests | those two test files + run artifacts                             |
-| 2 | **Source-safe emission and bindings:** stringify every enumerated config-derived literal; use exact ordinal-backed `bg_` / `ref_service_` / `ref_plugin_` bindings; update existing narrow text assertions honestly while grammar tests remain red.                       | Focused generator tests and scoped check/lint/fmt                                                                                       | background generator + both generator test files + run artifacts |
-| 3 | **Grammar lock:** define the exact separate private rule module and add composed-level contextual background validation without JSON-schema broadening; make the full focused matrix green.                                                                               | Focused config and generator tests; scoped check/lint/fmt                                                                               | Aspire private rule/config + run artifacts                       |
-| 4 | **Final static evidence and handoff:** run every authorized final-head gate, record exact copied SHAs/receipts, reconcile the GitHub surface, and update the draft PR.                                                                                                    | Full static gate table below                                                                                                            | run artifacts only unless a gate exposes an in-scope fix         |
+| # | Slice and proof                                                                                                                                                                                                                                                                                                              | Gate                                                                                                                                    | Files                                                                             |
+| - | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| P | **Plan only:** lock compatibility, ordering, exact paths, risks, tests, and published-surface position; stop for real PLAN-EVAL.                                                                                                                                                                                             | Human review, then separate PLAN-EVAL                                                                                                   | complete run-artifact set                                                         |
+| 1 | **Visible RED:** add the complete generator/config test matrix, including reserved/shadowing bindings and config-derived non-name literals, and record baseline failures before implementation. Commit remains intentionally red and is pushed/commented as RED evidence.                                                    | Focused structured wrapper over `config_test.ts` + `generate-register-background_test.ts`; expected nonzero with captured failing tests | those two test files + run artifacts                                              |
+| 2 | **Source-safe emission and bindings:** stringify every enumerated config-derived literal; use exact ordinal-backed `bg_` / `ref_service_` / `ref_plugin_` bindings; replace the user-derived comment with an ordinal; update existing narrow text assertions and the flow-B fixture honestly while grammar tests remain red. | Focused generator tests and scoped check/lint/fmt; fixture edit only, with no E2E execution                                             | background generator + both generator test files + flow-B fixture + run artifacts |
+| 3 | **Grammar lock:** define the exact separate private rule module and add composed-level contextual background validation without JSON-schema broadening; make the full focused matrix green.                                                                                                                                  | Focused config and generator tests; scoped check/lint/fmt                                                                               | Aspire private rule/config + run artifacts                                        |
+| 4 | **Final static evidence and handoff:** run every authorized final-head gate, record exact copied SHAs/receipts, reconcile the GitHub surface, and update the draft PR.                                                                                                                                                       | Full static gate table below                                                                                                            | run artifacts only unless a gate exposes an in-scope fix                          |
 
-Each implementation slice waits for PLAN-EVAL `PASS`, follows this order, receives substantive slice
-review before sign-off, commits atomically, pushes with the explicit refspec, and posts its
-scope/SHA/evidence on the draft PR. The draft remains draft; this lane does not trigger IMPL-EVAL.
+Slice 2 updates `prepare-flow-b-fixture.ts` under this exact contract:
+
+1. locate the `workers` block by the surviving stringified `builder.addExecutable("workers",` call
+   (or equivalently the stringified `config.BackgroundProcessors["workers"]` lookup), never by the
+   comment marker;
+2. derive its binding by matching `const (bg_\d+) = builder.addExecutable("workers"`; do not
+   hardcode `workers` as a binding and do not pin a literal ordinal, because scaffolded processor
+   order determines that ordinal;
+3. update the `.set(...)` replace anchor to its stringified form and construct the injected
+   `withEnvironment` call from the derived binding.
+
+This is a fixture edit, not E2E execution. This no-lease leaf does not fire `scaffold.runtime`; that
+suite remains a merge-readiness responsibility.
+
+The owner released PLAN-EVAL after the second and final cycle with these bounded mechanical
+corrections. Slices now follow this order, receive substantive review before sign-off, commit
+atomically, push with the explicit refspec, and post their scope/SHA/evidence on the draft PR. The
+draft remains draft; this lane does not trigger IMPL-EVAL.
 
 ## Validation Plan
 
@@ -256,7 +292,9 @@ export nor a new warning/failure.
 | A package-internal invariant accidentally becomes permanent JSR API.                                                        | Keep the rule under `packages/aspire/src/domain/`; do not barrel it or expose it in exported types; compare doc-lint and JSR-audit baselines.                            |
 | Schema validation broadens beyond background processors or changes published JSON schema.                                   | Use a composed-level custom issue only; do not attach `.regex()` to shared `ReferenceFields` or record keys.                                                             |
 | Literal escaping fixes named sites but misses config-derived `Entrypoint`, `Workdir`, or `ConcurrencyEnvVar`.               | Enumerate by emission site; stringify resolved entrypoint/workdir unconditionally and the concurrency key whenever emitted.                                              |
+| A processor name containing a line terminator escapes string positions but breaks a generated comment.                      | Remove user text from the comment site entirely; emit only the processor ordinal and parse a direct-generator U+2028 case.                                               |
 | Name-derived bindings emit reserved words, invalid tokens, collisions, or shadow generator bindings.                        | Remove user text from background binding derivation; use exact ordinal-backed `bg_`/`ref_service_`/`ref_plugin_` identifiers; parse+execute `class`, `await`, `builder`. |
+| Ordinal-backed bindings create source churn when a processor is inserted before existing entries.                           | Accept deterministic helper diff noise; fixture derives the `workers` binding rather than pinning an ordinal, and semantic tests avoid ordinal snapshots.                |
 | Existing tests fail from intentional identifier or quote-style churn and are weakened to get green.                         | Update only narrow output-spelling assertions in both generator test files; retain/strengthen semantic execution and discovery-key assertions.                           |
 | Sibling service/plugin/app generators retain the pre-existing identifier exposure.                                          | Record in drift/PR and leave those generators untouched; the owner carries the cross-generator concern upstream.                                                         |
 | Discovery-key normalization breaks #1371 contract.                                                                          | Exact raw hyphenated-key assertion and negative underscore-normalization assertion.                                                                                      |
@@ -309,7 +347,13 @@ resolved before cycle 2:
   generator-local bindings and no user text in emitted identifiers. Do not reject platform-valid
   reserved words and do not change shared `safeIdentifier`.
 - **Non-name literals — resolved, must not defer:** stringify resolved `entrypoint` and `workdir`
-  unconditionally, and stringify `ConcurrencyEnvVar` whenever emitted.
+  unconditionally, stringify `ConcurrencyEnvVar` whenever emitted, retain already-safe string and
+  boolean emissions, and leave numeric `entry.Concurrency` in code position.
+- **Comment site — resolved, must not defer:** remove user text and emit the processor ordinal;
+  direct-generator U+2028 coverage proves parseability without a bespoke comment neutralizer.
+- **Flow-B fixture — resolved, must not defer:** locate `workers` by a stringified executable/config
+  anchor, derive `bg_\d+`, update the stringified `.set(...)` anchor, and inject through that
+  derived binding without executing E2E in this leaf.
 - **Validation/schema placement — resolved, must not defer:** composed-level custom validation only;
   no shared-field/record-key regex and no published JSON-schema broadening.
 - **JSR reachability — resolved, must not defer:** no domain barrel, export-map entry, or exported
@@ -317,6 +361,7 @@ resolved before cycle 2:
 - **Sibling generators — safe to defer and explicitly out of scope:** record the known exposure; the
   owner carries it upstream, and this leaf changes no sibling generator.
 
-No implementation decision remains open after those resolutions. PLAN-EVAL cycle 2 of 2 is a gate,
-not an implementation decision; it is **must resolve now** and blocks the RED slice until the
-separate owner-dispatched evaluator returns `PASS`.
+No implementation decision remains open after those resolutions. PLAN-EVAL cycle 2 was the final
+granted cycle; after independently verifying F1/F2, the owner supplied the satisfying conditions
+above, released the plan gate without a cycle 3, and authorized the RED slice. IMPL-EVAL is the next
+formal gate and remains owner-dispatched.
