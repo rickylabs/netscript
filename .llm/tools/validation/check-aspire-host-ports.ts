@@ -67,6 +67,12 @@ const SCAFFOLD_ENTRY_FILES = [
   'packages/cli/src/kernel/templates/aspire/generate-appsettings.ts',
 ];
 
+const ENDPOINT_LITERAL_MESSAGE =
+  'Generated `withHttpEndpoint` pins a literal host port. Drive it from the ' +
+  'resource entry (`HostPort`) so `aspire start --isolated` can allocate.';
+const CONTRIBUTION_FALLBACK_MESSAGE =
+  'Plugin contribution supplies a fallback port. Use `ctx.port(resource)` so Aspire allocates it.';
+
 /** One place a scaffold default pins a host port. */
 export interface HostPortFinding {
   readonly path: string;
@@ -108,6 +114,20 @@ function allowanceReason(line: string): string | undefined {
   return line.slice(index + ALLOW_MARKER.length).trim();
 }
 
+function lineNumberAt(content: string, index: number): number {
+  let line = 1;
+  for (let position = 0; position < index; position += 1) {
+    if (content[position] === '\n') line += 1;
+  }
+  return line;
+}
+
+function sourceLineAt(content: string, index: number): string {
+  const start = content.lastIndexOf('\n', Math.max(0, index - 1)) + 1;
+  const nextBreak = content.indexOf('\n', index);
+  return content.slice(start, nextBreak === -1 ? content.length : nextBreak);
+}
+
 /**
  * Scans one file's content for scaffold defaults that pin an Aspire host port.
  *
@@ -126,21 +146,48 @@ export function scanContent(
   const checksContribution = PLUGIN_CONTRIBUTION.test(normalizedPath);
   const checksInfrastructureGenerator = normalizedPath === INFRASTRUCTURE_GENERATOR;
 
+  const fullTextChecks = [
+    { pattern: LITERAL_HOST_PORT, message: ENDPOINT_LITERAL_MESSAGE },
+    ...(checksContribution
+      ? [{ pattern: CONTRIBUTION_PORT_FALLBACK, message: CONTRIBUTION_FALLBACK_MESSAGE }]
+      : []),
+  ];
+
+  for (const check of fullTextChecks) {
+    const pattern = new RegExp(check.pattern.source, `${check.pattern.flags}g`);
+    for (const match of content.matchAll(pattern)) {
+      const index = match.index ?? 0;
+      const text = sourceLineAt(content, index);
+      const line = lineNumberAt(content, index);
+      const reason = allowanceReason(text);
+      if (reason !== undefined) {
+        if (reason.length > 0) {
+          allowances.push({ path, line, reason });
+          continue;
+        }
+        findings.push({
+          path,
+          line,
+          text: text.trim(),
+          message: `\`${ALLOW_MARKER}\` marker has an empty reason.`,
+        });
+        continue;
+      }
+      findings.push({ path, line, text: text.trim(), message: check.message });
+    }
+  }
+
   content.split('\n').forEach((text, index) => {
-    const hitsEndpoint = LITERAL_HOST_PORT.test(text);
     const hitsEntry = checksEntryPorts &&
       ENTRY_PORT_KEY.test(text) &&
       !CONDITIONAL_WRITE.test(text);
     const hitsGeneratedJson = checksGeneratedJson && JSON_PORT_KEY.test(text);
-    const hitsContributionFallback = checksContribution && CONTRIBUTION_PORT_FALLBACK.test(text);
     const hitsContributionUrl = checksContribution && LOOPBACK_PORT_URL.test(text);
     const hitsInfrastructureLiteral = checksInfrastructureGenerator &&
       INFRASTRUCTURE_LITERAL_HOST_PORT.test(text);
     if (
-      !hitsEndpoint &&
       !hitsEntry &&
       !hitsGeneratedJson &&
-      !hitsContributionFallback &&
       !hitsContributionUrl &&
       !hitsInfrastructureLiteral
     ) return;
@@ -165,15 +212,10 @@ export function scanContent(
       path,
       line,
       text: text.trim(),
-      message: hitsContributionFallback
-        ? 'Plugin contribution supplies a fallback port. Use `ctx.port(resource)` so Aspire allocates it.'
-        : hitsContributionUrl
+      message: hitsContributionUrl
         ? 'Plugin contribution embeds a loopback port. Use a resource reference or the allocated `ctx.port(resource)` value.'
         : hitsInfrastructureLiteral
         ? 'Infrastructure generator embeds a host port. Emit `port` only from an explicit database/cache `Port` entry.'
-        : hitsEndpoint
-        ? 'Generated `withHttpEndpoint` pins a literal host port. Drive it from the ' +
-          'resource entry (`HostPort`) so `aspire start --isolated` can allocate.'
         : 'Scaffold writes a literal host port into appsettings.json. Leave it unset so ' +
           'Aspire allocates the host and target ports.',
     });

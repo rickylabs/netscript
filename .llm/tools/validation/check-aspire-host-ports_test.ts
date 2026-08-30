@@ -33,6 +33,19 @@ Deno.test('accepts a config-driven pin, which a resource opts into', () => {
   assertEquals(findings, []);
 });
 
+Deno.test('rejects a multiline generated literal host-port call', () => {
+  const { findings } = scanContent(
+    GENERATOR,
+    [
+      'lines.push(`      .withHttpEndpoint({',
+      "        port: 3000, env: 'PORT'",
+      '      });`);',
+    ].join('\n'),
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].line, 1);
+});
+
 Deno.test('accepts the un-pinned shape', () => {
   const { findings } = scanContent(GENERATOR, "const options = `{ env: 'PORT' }`;");
   assertEquals(findings, []);
@@ -130,6 +143,20 @@ Deno.test('rejects contribution fallback ports and loopback URL literals', () =>
   );
   assertEquals(fallback.findings.length, 1);
   assertEquals(url.findings.length, 1);
+});
+
+Deno.test('rejects a multiline contribution fallback port with the call line', () => {
+  const result = scanContent(
+    CONTRIBUTION,
+    ['const port = ctx.port(resource,', '  defaultPort', ');'].join('\n'),
+  );
+  assertEquals(result.findings.length, 1);
+  assertEquals(result.findings[0].line, 1);
+});
+
+Deno.test('accepts a single-argument contribution port call', () => {
+  const result = scanContent(CONTRIBUTION, 'const port = ctx.port(resource);');
+  assertEquals(result.findings, []);
 });
 
 Deno.test('accepts allocated contribution ports and resource references', () => {

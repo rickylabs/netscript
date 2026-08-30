@@ -197,3 +197,48 @@ The temporary `.llm/tmp/s5-repair-cli-quality.json` config was removed before co
 - Re-read the live PR timeline after the slice gates. No comment newer than slice-2 evidence changed
   F-3 or its test/output contract. The F-3 review thread remains open for supervisor handling; no PR
   metadata or issue state was changed.
+
+## Slice 4 — F-4 multiline fitness-gate detection
+
+### RED
+
+Added fixtures for a multiline generated `withHttpEndpoint` literal, a multiline contribution
+`ctx.port(resource, defaultPort)` fallback, and the allowed single-argument `ctx.port(resource)`
+shape before changing the scanner.
+
+| Command | Exit | Evidence |
+| --- | ---: | --- |
+| `deno test --allow-read --allow-write --allow-run .llm/tools/validation/check-aspire-host-ports_test.ts` | 1 | 16 passed, 2 failed: both multiline calls escaped the line-scoped matchers; the existing cases and new single-argument pass case succeeded. |
+
+### Implementation
+
+- `CONTRIBUTION_PORT_FALLBACK` now runs over full file text and reports the line containing the
+  `ctx.port` call, so normal multiline formatting cannot hide the fallback.
+- Regex review found `LITERAL_HOST_PORT` had the same call-shaped multiline defect; it now uses the
+  same full-text path and preserves its existing allowance/message semantics. The remaining
+  matchers are correctly line-scoped by design: entry/JSON/infrastructure rules identify a single
+  key/value source line, loopback URLs are one lexical literal, and the conditional-write exemption
+  deliberately applies only to a ternary on the same line as the emitted key.
+- Every other path-selection and test/fixture exclusion rule is unchanged.
+
+### GREEN
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `deno test --allow-read --allow-write --allow-run .llm/tools/validation/check-aspire-host-ports_test.ts` | 0 | 18 passed, 0 failed. |
+| Preliminary `deno test --allow-read ...` rerun | 1 | Permission-only non-verdict: two existing tests require temp write and `git` run access; all 16 permission-independent cases passed. |
+| `deno task check:aspire-host-ports` | 0 | 957 files scanned; no pinned host ports. |
+| `run-deno-check.ts` limited to the checker and self-test | 0 | 2 files, 0 diagnostics. |
+| `run-deno-lint.ts` limited to the checker and self-test with temporary no-exclude repository rules | 0 | 2 files processed, 0 findings. |
+| `run-deno-fmt.ts` limited to the checker and self-test with temporary no-exclude repository rules | 0 | 2 files processed, 0 findings. |
+| `deno task quality:scan` | 0 | Repository scan has 0 findings; 7 pre-existing bounded allowances. |
+| `deno task arch:check` | 0 | Doctrine scan has 0 failures; warnings are the existing repository baseline. |
+
+The temporary `.llm/tmp/s5-repair-tool-quality.json` config was removed before commit. No generated
+asset or lockfile changed, and no runtime process was started.
+
+### Reconcile
+
+- The locked F-4 review disposition remains current. Thread resolution and independent evaluation
+  remain supervisor work; this lane will attach the immutable repair commit and gate evidence but
+  will not self-certify or mutate PR state.
