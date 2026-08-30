@@ -3723,3 +3723,60 @@ one-shot fire on `research.md`) and a condition loop keyed on plan growth, a new
 
 `c1e03922ad02416ea31219df94422f062ac33690` — local == remote == PR `headRefOid`, worktree clean,
 untouched. #1734 likewise parked at `eb765629206092f97b3dd8f76a64fa0c3769bcb8`, draft.
+
+## 2026-08-30 — #1533 plan locked at `0f30c4f4bd2c9e7b615dfc776f05d7b2c0c4bf93`; PLAN-EVAL cycle 1 dispatched
+
+### Terminal plan readiness, verified before dispatch
+
+| Check | Result |
+| --- | --- |
+| Head | `0f30c4f4bd2c9e7b615dfc776f05d7b2c0c4bf93` — local == remote == PR #1756 `headRefOid` |
+| Worktree | clean |
+| Source ahead of the gate | **none** — `git diff 13878a80..HEAD -- . ':!.llm/runs'` empty |
+| Plan commit scope | run artifacts only (`plan.md` +257, `context-pack.md`, `worklog.md`) |
+| PR #1756 | draft, base `main`, milestone `0.0.7`, `Closes #1533`, labels `type:test`/`area:tooling`/`area:docs`, exactly one `status:` (`status:plan-eval`) |
+
+**A transient scare that resolved itself.** Mid-turn, `context-pack.md` and `worklog.md` were
+*deleted* from disk — both mandatory harness artifacts. I did not intervene: the writer lock was held
+and interrupting mid-turn to fix a file the author was in the middle of rewriting is how this lane
+creates work for itself. It was a delete-then-write; both came back and are in the commit. Watching
+beat steering.
+
+**I also deliberately did not dispatch at the first sighting of a complete plan.** The plan was
+committed while the turn was still running its PR-surface work, and dispatching then risks a verdict
+that names a head the branch has already moved past — the exact reconciliation problem leaf #1644
+left behind. I waited for the launcher pid to exit, re-read all three heads, confirmed no movement,
+and only then dispatched.
+
+### The plan decided the thing it had to decide
+
+D12 locks the fix-or-baseline policy as **"repair, never compile-failure baseline"**: every genuine
+first-run failure is fixed in this leaf, only intentionally non-runnable TypeScript gets a
+source-local reasoned exemption, and no failure is deferred merely because N is large. D14 protects
+scope without weakening it — a repair needing a public API change or another issue's surface stops
+for rescope rather than silently splitting. D13's ratchet is explicitly framed as an **attributable
+coverage allowance, not a failure baseline**, and D5 keeps exemptions attributable at the public
+example through #1374's existing `ts no-check:<reason>` fence rather than a detached baseline file.
+
+That is the decision the brief said the gate turned on, made rather than surveyed.
+
+### Evaluator dispatched — risk-appropriate, one cycle
+
+| Field | Value |
+| --- | --- |
+| Job | `f4f36161` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-eval-1533-plan`, detached at the evaluated head |
+| Route | native **`claude-fable-5` / effort `medium`** — opposite-family to the Sol·high author; zero provider-override env vars, so not a gateway session |
+| Scope | artifact-only: one new `plan-eval.md` + one `[PHASE: PLAN-EVAL] [VERDICT: …]` comment; diff outside `.llm/runs/` must be empty |
+
+A full PLAN-EVAL is warranted here in a way it was not for #1732's two mechanical corrections: this
+plan carries an unresolved policy decided before the failure count is knowable, and an unbounded
+blast radius across 35 publishable members. The brief points it at the baseline-attributability trap,
+whether the mechanism type-checks imports or merely parses them, the illustrative-example opt-out as a
+hiding place, and empty-selection false greens — and instructs it to **re-derive this lane's own
+inherited research and state it as a finding against me if I got it wrong.**
+
+### #1747 and #1734 untouched
+
+`#1747` verified again this turn at `c1e03922ad02416ea31219df94422f062ac33690` (local == remote == PR,
+clean). `#1734` parked at `eb765629206092f97b3dd8f76a64fa0c3769bcb8`, draft. Neither touched.
