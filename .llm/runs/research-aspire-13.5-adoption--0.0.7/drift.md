@@ -775,3 +775,8 @@
 - **D-43 addendum (2026-08-30T09:52:55Z):** terminal classification for S3 Phase B is
   `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`; final zero verification: Aspire `[]`, containers 0,
   volumes 0, runtime processes 0. Attempt 3 not requested, not authorized.
+- **D-38 addendum (S8, ~10:10Z):** the first S8 resume message carried the then-current "inotify 128
+  / stop on exit-134" rule; after D-39 that wording became stale inside the thread's own argv.
+  Corrected on the same thread by detaching the resume client and resuming (second application of
+  the D-38 path). Rule: when host facts change, every live thread whose steering named the old fact
+  gets a same-thread correction at the next safe point — the S3 thread got D-39 the same way.
