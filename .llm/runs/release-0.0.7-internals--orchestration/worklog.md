@@ -5444,3 +5444,16 @@ requires comprehensive re-verification across all 7 original attack points plus 
 items the high-effort cycle only partially covered (both hook events individually for fallback
 safety; root test / surface validator if budget allows). Backgrounded per host bridge behavior after
 120s; awaiting completion notification. No PR/label/DoD action taken pending this verdict.
+
+## D-96 — #1774 qualifying rerun (task k8hva2jfq) failed on output size, not content
+
+- **New failure mode, third distinct one for this leaf's evaluator dispatches.** Result:
+  `Task failed: result_too_large: worker output exceeds 262144 bytes`. My own brief caused this — I
+  asked for "be comprehensive, this is the qualifying evaluation" across 8 checklist items with
+  actual command output per item, at effort `max` (which itself tends to produce longer reasoning).
+  The transport has a **~256KB hard output cap** I had not previously hit or accounted for.
+- Root cause is mine: verbosity requested, not a transport defect. Fix is bounding output size
+  explicitly in the next brief (word/line ceiling, "cite, don't paste" for command output) while
+  keeping the same effort `max` and the same corrected carrier head `58b04be6c`.
+- Redispatching now with an explicit size bound. No PR/label/DoD action was pending on this attempt
+  (nothing to unwind).
