@@ -31,3 +31,22 @@ The implementation brief says “18 occurrences, 14 files,” but its enumerated
 required pre-edit `git grep` both resolve to 18 occurrences across 13 files. `CONTRIBUTING.md` has no
 matching occurrence, as already established in `research.md` §3. The enumerated occurrences remain
 the authority; no extra row was inferred or edited to manufacture a fourteenth file.
+
+## D-5 · Bare `doc:lint` command is invalid on this base
+
+The requested `deno task doc:lint` invocation exits 1 before linting because the checked-in task
+requires `--root`. Its usage text names `--root <path>` as required; the root task does not provide
+a repository-wide default. The relevant generated package surface was therefore checked explicitly:
+`packages/cli` passes across all three exports. `packages/mcp` reports existing private-type-ref
+findings in `cli.ts` and `mod.ts`; this leaf changes only `publish-assets.generated.ts`, which is not
+an entrypoint, and the wrapper reports combined child exit 0 for all three MCP entrypoints. The exact
+bare-command failure and both scoped outputs are preserved in `worklog.md` for Tier-A classification.
+
+## D-6 · Diagram gate required host-only bootstrap
+
+The first `diagrams:check` attempt could not use the root-owned npm cache. A task-specific cache made
+the pinned Mermaid CLI available, after which the host lacked Chromium and its shared libraries and
+did not provide a usable Chromium sandbox. The successful retry used Mermaid CLI 10.9.1, a temporary
+Chromium revision 1108766, extracted Debian runtime libraries, and a temporary `--no-sandbox`
+launcher. All 16 SVGs byte-matched. No repository file or lock changed; a Chromium core dump created
+by the failed launch was removed after ownership was verified.
