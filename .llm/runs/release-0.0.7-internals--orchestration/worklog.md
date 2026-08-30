@@ -5802,3 +5802,22 @@ confirmed `working` throughout.
 - Next: confirm mergeable/CI, then resolve the queued bare `deno task e2e:cli` rerun (owner
   instruction: the leaf's old `26/1` receipt is stale post-#1734, needs a fresh verdict at this
   head, serialized behind whatever runtime lease currently holds).
+
+## D-111 — #1758: mergeable/conflict resolved; e2e:cli genuinely lease-blocked by another lane, not free
+
+- #1758 mergeable state confirmed `MERGEABLE` after the D-110 convergence push (was `CONFLICTING`
+  before). `mergeState: BLOCKED` — required checks not yet satisfied at this head, expected given
+  e2e:cli and a fresh IMPL-EVAL are still pending; `close-gate` FAILURE at this point is expected
+  pre-ready-state noise (labels/DoD legitimately not yet finalized), not a defect.
+- **Attempted the queued bare `deno task e2e:cli`.** `docker ps`/`aspire ps` showed nothing running,
+  which I initially read as "lease free" — **that check was insufficient.** The actual arbiter is a
+  separate lease file, `/ephemeral/tmp/netscript-e2e-scaffold-runtime.lease`, which
+  `SuiteLeaseContentionError` reported held by **pid `448849` from worktree `007-leaf-1357`** (the
+  fixes lane) since `2026-08-30T23:09:12Z`. The tool's own message is explicit: "This is a
+  contention verdict, not a product failure." Correctly refused, not forced.
+- **Lesson recorded**: container/AppHost absence does not prove the e2e:cli lease is free; the
+  lease file is the actual serialization primitive and must be checked directly, not inferred from
+  `docker ps`.
+- Not seizing or contending for the lease. Queuing #1758's e2e:cli behind `007-leaf-1357`'s current
+  hold, per "queue at the next serialized runtime lease" — this means wait for a free turn, not
+  force one.
