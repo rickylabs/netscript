@@ -30,3 +30,12 @@ the restored 13.5.3 `aspire.mts` emits a string enum (`UI = "UI"`, `Api = "Api"`
 with TS2322/TS2362/TS2363. Slice 5 therefore omits the property and uses Aspire's documented
 default visibility (both UI and API), preserving the intended dashboard and CLI surface without a
 cast. The restored declaration and compiler evidence are cited in the slice-5 receipt.
+
+## D-04 — D-39 supersedes the historical inotify/zombie host classification
+
+The supervisor re-proved the host at 2026-08-30T09:27Z: `fs.inotify.max_user_instances=1024`,
+Docker client/server 28.5.2 at `tcp://netscript-dind:2375`, and PID 1 is `tini` with zero zombies.
+The lifecycle and watch tests are trustworthy. This run therefore treats any restore, `watchFs`,
+or lifecycle-test red as a real finding and does not apply the old inotify-128 or zombie waiver.
+The separately recorded remote-DinD bind-mount and loopback topology (D-42/D-43) remains the only
+runtime-phase limitation; it does not change Phase A's static-only boundary.

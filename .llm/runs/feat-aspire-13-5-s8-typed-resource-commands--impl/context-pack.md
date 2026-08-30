@@ -8,8 +8,11 @@
 - Locked decision: D-6, `excludeFromMcp()` controls MCP exposure only; never emit `withHidden()`
 - Phase-A prohibition: no `aspire start`, AppHost runtime, or containers
 - D-19 command prefix: `/home/agent/.local/bin/mise exec --`; restore only
-- Known host blocker: first restore exit 134 with `inotify instances ... limit (128)` is recorded
-  once and escalated; no retry loop
+- D-39 host facts (re-proven 2026-08-30T09:27Z): inotify instances limit 1024; Docker
+  client/server 28.5.2 at `tcp://netscript-dind:2375`; PID 1 is `tini` with zero zombies; lifecycle
+  and watch tests are trustworthy. Any restore/watch/test red is a real finding.
+- The only runtime-phase limitation is the remote-DinD topology recorded in D-42/D-43 (bind mounts
+  and loopback endpoints); Phase A remains static independently of that limitation.
 - Push command: `git push origin HEAD:refs/heads/feat/aspire-13-5-s8-typed-resource-commands`
 - Required evaluator: separate Fable 5 IMPL-EVAL; implementation agent cannot certify the result
 

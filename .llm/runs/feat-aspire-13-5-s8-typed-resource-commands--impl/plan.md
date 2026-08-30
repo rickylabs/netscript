@@ -45,8 +45,8 @@ without introducing a parallel plugin or framework mechanism.
 4. Add running-AppHost detection, typed resource routing, bounded wait, standalone fallback, and
    fake-process unit coverage for every branch.
 5. Render a PostgreSQL consumer, restore Aspire 13.5.3 without starting it, type-check it, cite
-   restored signatures/hashes, remove scratch, and commit the receipt. Stop after a single exit-134
-   inotify failure.
+   restored signatures/hashes, remove scratch, and commit the receipt. Restore and watch failures
+   are real findings under the re-proven D-39 host state; no historical inotify waiver applies.
 6. Add the unexecuted Phase-B E2E gate path, prefer a typed command where restart is avoidable,
    retain restart fallback, run Phase-A static/scaffold/quality gates, and draft the #411 comment.
 
