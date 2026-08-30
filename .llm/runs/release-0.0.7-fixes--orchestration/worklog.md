@@ -2483,3 +2483,70 @@ It is also asked to **rule on the supervisor's interpretation** of
 `installed-runtime-registry-integration_test.ts` under "existing test paths may be amended". That
 reading is this supervisor's, was recorded as such by the author, and a plan evaluator is the right
 place to confirm or reject it.
+
+## 2026-08-30 — PLAN-EVAL `PASS_PLAN` at `13402d3f`; S7 dispatched with binding amendments
+
+Verdict commit `7db40ca0`, pushed on `eval/plan-eval-1673-cycle-1`. Immutable pushed verdict
+satisfied. Route was the canonical Fable 5 · medium, and the evaluator stayed inside the narrow
+mandate — it did not re-audit F1.
+
+Passed: contract fidelity, the eleven-path ceiling, the correctly-absent report file, the no-writes
+proof design across three seams, the healthy-regression shape, genericity, and doctrine layering into
+`plugins/ai`. Seven binding items follow, all executing inside the plan's own provisions with no S6
+re-lock.
+
+### PE-2 (major) — a hole inside the guard built to prevent F1
+
+The plan's shared-selector obligation proved that **compile** did not diverge from the shared
+selector. **Nothing proved inspect did not.** An implementer could post-filter or re-order inside the
+report serializer and every listed assertion would still pass — the F1 divergence shape reappearing
+inside its own countermeasure.
+
+Binding fix: assert the inspect report's `registries[i].sourceFiles` **deep-equals**
+`compileAiRegistry(files, target).files` per declared target, membership *and* order. To make that
+assertable without a subprocess, the report builder becomes a plain function
+(`inspectAiRegistries(files, targets)` in path 10) that `generate-runtime-registries.ts` merely
+serialises — `main()` currently hard-codes `LocalProjectFiles` + `console.log`, so equivalence cannot
+be asserted through `main` alone. Lands in S8.
+
+This is the sharpest finding of the gate: the requirement was correct, and its evidence obligation was
+one-sided in exactly the direction that matters.
+
+### PE-5 (major, ruled) — this supervisor's interpretation was overturned, and correctly
+
+The reading that `installed-runtime-registry-integration_test.ts` fell under "existing test paths may
+be amended" was ruled **textually admissible but unnecessary**: an interpretation is warranted only
+when no enumerated path can host the obligation, and path 6 can. `doctor-plugin-registry-drift_test.ts`
+already drives the real `doctorPlugin` with `DenoFileSystem` + `DenoProcess` over a temp project and
+already runs real installed generation first; the obligation is "assert **doctor** stays healthy",
+which the integration test never touches and would have to cross features to reach.
+
+So S7 and the layer-3 byte snapshot relocate into path 6, the integration test is not amended, and the
+ceiling is now **exactly the enumerated eleven** with no flagged interpretation and no coordinator
+adjudication outstanding — a strictly better position than the one this lane created.
+
+**The lesson is this supervisor's to carry:** when a ruling appears to require a path outside its own
+authorization, the first move is to check whether an authorized path can carry the obligation better —
+not to reach for an admissible reading. Recording the interpretation *as* an interpretation is what
+made it cheap to overturn; that part worked exactly as intended.
+
+### Minor binding items, routed to slices
+
+| Item | Substance | Slice |
+| --- | --- | --- |
+| PE-9 | Path 2 crosses the 500-line F-1 cap (478 now). It is `level: WARN`, `arch:check` fails only on `fail` totals, and `doctor-plugin-use-case.ts` already carries the same WARN — state it so IMPL-EVAL does not read it as unrecorded drift | S7 artifacts |
+| PE-11 | Leaf `supervisor.md:27` still says PLAN-EVAL is `N/A`; this pass disproves it | S7 artifacts |
+| PE-10 | The renamed error title does **not** "cannot be mistaken for the legacy path" — the wrapper catches every dry-run failure including legacy ones. Neutral title or drop the claim | S9 |
+| PE-8 | `check:mcp-export-corpus` is **not** in `.llm/tools/gates/catalog.ts`, so it cannot be recorded "through repo gate" — record a reproducible raw command plus exit code | S10 |
+| Sweep-1 | Keep `EmptyPluginRegistryError` for zero-selected-sources-across-all-targets under generator authority | S9 |
+
+IMPL-EVAL will treat PE-2 and PE-5 as `FAIL_FIX` conditions if absent.
+
+### S7 dispatched
+
+Delivered on the same author thread once it was free, proven from the target rollout
+(`inspectAiRegistries`, `relocated to path 6`) with no active-writer conflict. The brief carries every
+binding item with its slice, restates the unchanged boundaries, and repeats that `scaffold.runtime` is
+required but supervisor-coordinated and must never be author-run.
+
+Exact-head gates run from `gates-1673.sh` once the implementation slices land.
