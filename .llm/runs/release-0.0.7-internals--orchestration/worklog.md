@@ -3780,3 +3780,67 @@ inherited research and state it as a finding against me if I got it wrong.**
 
 `#1747` verified again this turn at `c1e03922ad02416ea31219df94422f062ac33690` (local == remote == PR,
 clean). `#1734` parked at `eb765629206092f97b3dd8f76a64fa0c3769bcb8`, draft. Neither touched.
+
+## 2026-08-30 — #1533 PLAN-EVAL cycle 1 `FAIL_FIX`; bounded amendment authorized, no cycle 2
+
+Verdict commit `9b34b657093894b1000e977327dec70225c15318` (sole file `plan-eval.md`), comment
+`5468049944`, native `claude-fable-5`/medium, job `f4f36161`. Boundary verified rather than trusted:
+diff versus the evaluated head `0f30c4f4` outside `.llm/runs/` is **empty** and the brief I staged in
+its worktree was **not** committed. Session stopped once its verdict was pushed; leaf fast-forwarded.
+
+Seven findings, none changing the plan's shape. **No cycle 2** — all are plan-text/convention edits
+with stated satisfying conditions, and the evaluator itself says implementation may begin without
+one. The two items needing supervisor judgement I decided rather than delegated.
+
+### F1 is my error, and it is the same error a fourth time
+
+I told the author "exactly one genuine defect survives" in `packages/contracts`. **Wrong.** All four
+cited examples fail `deno check`, plus both entrypoint module examples:
+
+| Example | Diagnostics |
+| --- | --- |
+| `schemas/pagination.ts` | TS2304 `baseContract`, `UserSchema` |
+| `schemas/filters.ts` | **TS2345** literal widening — a consumer pasting it hits it verbatim |
+| `src/application/paginated-query.ts` | TS2304 `db` |
+| `src/application/transform-helpers.ts` | TS2552 ×2, TS18046 ×3 — **genuine inference defect** |
+| `query.ts`, `transform.ts` (entrypoints) | TS2304 `db` / `UserRecord` |
+
+The ledger was wrong about the **reason**; it was not wrong that the examples are **defective**. I
+disproved the mechanism — "they import from a non-exporting root" is false — and then carried
+"therefore only one is broken" forward without checking the other three. **Disproving an
+explanation is not disproving the observation it was invented to explain.** That is the same shape as
+the #1734 guard (checked one direction of a validator, not the other) and the #1732 `safeIdentifier`
+seam (verified the escaping route, assumed the adjacent one). Fourth instance, my own name on it
+again, and this one materially shifted the plan's premise: D12's rationale was written believing N in
+the motivating package was 1. The real census is ~443 `@example` tags, ~415 TS-fenced candidates, and
+**≥29 fences across 20 files** already using `db`/`UserSchema`/`prisma`/`baseContract` unbound.
+
+The mitigation that worked is the one this run keeps relying on: an independent evaluator got the
+claim, not the reasoning that produced it, and was told to name a finding against me if I was wrong.
+It did.
+
+### Decisions I made rather than delegating
+
+- **Repair convention → option (a)**, stand-in declarations in the example body. Rejected (b), a
+  `no-check` exemption at this volume, because it would make the exemption list the gate's largest
+  number and shrink the checked corpus precisely where the docs are most consumer-facing — the
+  unattributable-allowance class internals has already fixed three times. (c) is forbidden by D6.
+  (a)'s cost (visible on JSR) is the point: an example needing `db` should show what `db` is. Added a
+  bloat guard — where a stand-in would exceed the substance it supports, **narrow the example**
+  rather than bolt scaffolding onto it.
+- **Rescope ceiling, set by me per F2(iii)** so "regardless of N" has a supervisor-set bound: stop
+  and hand up if mechanical repairs would touch **>25 packages or >90 examples**; or if **>8**
+  examples need a *genuine type-error* repair (the `filters.ts`/`transform-helpers.ts` class), since
+  each is a judgement about published API ergonomics and past a handful this becomes an API campaign
+  deserving its own issue; or on any public API/export change (D14, unchanged). The ceiling is checked
+  against the **committed I3 RED census split by class**, not a running tally.
+
+F3 (empty selection is FAIL, never spawn `deno check` with an empty path list — this lane's recurring
+defect), F4 (bare fence is `malformed`, not merely counted), F5 (bad specifier / undeclared subpath /
+real type error may never be exempted; I4 lists every exemption with reason for IMPL-EVAL to audit),
+F6 and F7 authorized as written.
+
+### #1734 and #1747
+
+`#1734` stays parked at `eb765629206092f97b3dd8f76a64fa0c3769bcb8` and did not block this queue for a
+moment. `#1747` remains terminal at `c1e03922ad02416ea31219df94422f062ac33690`, untouched.
