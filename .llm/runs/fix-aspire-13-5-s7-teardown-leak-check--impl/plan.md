@@ -57,13 +57,14 @@ persistent cleanup behind an explicit flag, and confirm helper exit after stop.
 
 ## Locked Decisions
 
-| ID | Decision                                                                                            | Rationale                                         |
-| -- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| D1 | PPID 1 makes a process observable but never owned.                                                  | Detached helpers are normal during a live run.    |
-| D2 | Mutation requires worktree/owned-root path containment; DCP/argv/socket signals classify relevance. | Preserves the shared-host safety boundary.        |
-| D3 | Never target `aspire agent mcp` and never emit `--all`.                                             | Protects the session MCP server and sibling runs. |
-| D4 | Force cleanup argv is exactly `aspire stop --force --apphost <exact> --non-interactive --nologo`.   | Encodes the S2 V7 proven surface.                 |
-| D5 | Confirmation timeout is bounded from S2 V6's 385 ms observation with test-injected sleep/probes.    | Avoids false clean without an unbounded wait.     |
+| ID | Decision                                                                                                                                    | Rationale                                                                    |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| D1 | PPID 1 makes a process observable but never owned.                                                                                          | Detached helpers are normal during a live run.                               |
+| D2 | Mutation requires worktree/owned-root path containment; DCP/argv/socket signals classify relevance.                                         | Preserves the shared-host safety boundary.                                   |
+| D3 | Never target `aspire agent mcp` and never emit `--all`.                                                                                     | Protects the session MCP server and sibling runs.                            |
+| D4 | Force cleanup is exactly one `aspire stop --force --apphost <exact> --non-interactive --nologo` while that owned AppHost is proven running. | S2 V7 proves the running precondition; V6 proves no-running exit 0 is inert. |
+| D5 | Confirmation timeout is bounded from S2 V6's 385 ms observation with test-injected sleep/probes.                                            | Avoids false clean without an unbounded wait.                                |
+| D6 | Cleanup success is based on positive PID/helper/container disappearance, never the stop/remove exit code.                                   | Preserves A13 and prevents false clean.                                      |
 
 ## Open-Decision Sweep
 
@@ -110,7 +111,7 @@ persistent cleanup behind an explicit flag, and confirm helper exit after stop.
 | 1     | RED             | `run-gate.ts --gate test ... -- .llm/tools/agentic/teardown/leak-check_test.ts` | failing orphan regression receipt before implementation      |
 | 2     | unit            | scoped test wrapper over `.llm/tools/agentic/teardown/*_test.ts`                | all tests pass against 13.4.6, 13.5.3, and process snapshots |
 | 3     | static          | scoped check/lint/fmt wrappers                                                  | zero findings                                                |
-| 4     | configured lint | `deno task lint`                                                                | exit 0                                                       |
+| 4     | configured lint | direct `run-deno-lint.ts` with the configured package/plugin roots and excludes | wrapper JSON: 2,043 processed, zero findings                 |
 | 5     | quality         | `deno task quality:scan`; `deno task arch:check`                                | exit 0                                                       |
 | 6     | generated       | `deno task gen:assets-barrel`; `deno task check:assets-barrel`                  | generated corpus current                                     |
 
@@ -124,3 +125,10 @@ persistent cleanup behind an explicit flag, and confirm helper exit after stop.
 - Any inability to model real process evidence without widening IO permissions.
 - Any generated output beyond the expected agent-tools corpus.
 - Any need for a runtime start before Phase B.
+
+## IMPL-EVAL Cycle 1 Amendment
+
+The evaluator record on `origin/research/aspire-13.5-0.0.7` found that the original two-step
+normal-stop then force-stop ordering reused the V7 argv in the V6 no-running lifecycle state. Slice
+6 corrects D4/D6 without expanding scope: it proves the AppHost's stable running identity before
+issuing force as the only stop, then accepts cleanup only after bounded positive observations.

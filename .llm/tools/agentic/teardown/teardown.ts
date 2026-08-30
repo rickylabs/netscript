@@ -8,6 +8,7 @@ import {
 import type { CommandPort, FilePort } from './ports.ts';
 import { systemCommands, systemFiles } from './ports.ts';
 import {
+  DEFAULT_PROBE_TIMEOUT_MS,
   probeContainer,
   probeProcesses as probeProcessResources,
   processStartedAt,
@@ -21,16 +22,19 @@ export interface TeardownResult {
   readonly stoppedAppHosts: readonly string[];
   readonly terminatedProcesses: readonly number[];
   readonly removedContainers: readonly string[];
+  readonly actionsRequired: readonly string[];
   readonly escalated: readonly LeakEntry[];
 }
 
 /** Maps a completed teardown to an honest CLI status. */
 export function teardownExitCode(result: TeardownResult): number {
-  return result.applied && result.escalated.length > 0 ? 4 : 0;
+  return result.applied && (result.escalated.length > 0 || result.actionsRequired.length > 0)
+    ? 4
+    : 0;
 }
 
 export interface TeardownOptions {
-  /** Deletes persistent resources only after an owned AppHost's scoped stop is confirmed. */
+  /** Uses force as the stop variant while a positively owned AppHost is still running. */
   readonly forcePersistent?: boolean;
   /** Confirmation probes after `aspire stop` before an AppHost is declared stopped. */
   readonly confirmAttempts?: number;
@@ -39,11 +43,14 @@ export interface TeardownOptions {
   readonly processProbe?: () => Promise<readonly ProcessCandidate[]>;
 }
 
-// S2 V6 observed Aspire 13.5.3 orphan registration cleanup in 385 ms. Six probes spaced 500 ms
-// bound confirmation to 2.5 s while allowing more than six times the observed cleanup latency.
+// S2 `02-v6-aspire-ps-after-kill.time.txt` observed Aspire 13.5.3 orphan registration cleanup in
+// 385 ms. Six probes spaced 500 ms bound confirmation to 2.5 s while allowing more than six times
+// the observed cleanup latency.
 const DEFAULT_CONFIRM_ATTEMPTS = 6;
 const DEFAULT_CONFIRM_INTERVAL_MS = 500;
 const MIN_ORPHAN_PROCESS_AGE_MS = 30_000;
+export const NO_RUNNING_APPHOST_FOR_PERSISTENT_CLEANUP =
+  'persistent cleanup not performed: no running owned AppHost';
 
 const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -80,6 +87,20 @@ async function appHostGone(
   }
   const startedAt = processStartedAt(stat);
   return Boolean(resource.appHostStartedAt && startedAt && startedAt !== resource.appHostStartedAt);
+}
+
+/** Proves the pre-stop PID still names the captured AppHost rather than trusting Aspire exit 0. */
+async function appHostRunning(
+  resource: { readonly appHostPid?: number; readonly appHostStartedAt?: string },
+  files: FilePort,
+): Promise<boolean> {
+  if (resource.appHostPid === undefined || !resource.appHostStartedAt) return false;
+  try {
+    return processStartedAt(await files.readText(`/proc/${resource.appHostPid}/stat`)) ===
+      resource.appHostStartedAt;
+  } catch {
+    return false;
+  }
 }
 
 /** Associates DCP/managed helpers with one exact AppHost without treating PPID as ownership. */
@@ -125,6 +146,21 @@ async function confirmedGone(
   return false;
 }
 
+async function containerGone(
+  id: string,
+  commands: CommandPort,
+): Promise<boolean> {
+  const result = await commands.run(
+    ['docker', 'ps', '-a', '--filter', `id=${id}`, '--format', '{{.ID}}'],
+    DEFAULT_PROBE_TIMEOUT_MS,
+  );
+  return result.code === 0 && result.stdout.trim() === '';
+}
+
+function requireAction(actions: string[], message: string): void {
+  if (!actions.includes(message)) actions.push(message);
+}
+
 /** Stops/removes only positively owned resources; mutation requires explicit apply=true. */
 export async function runTeardown(
   report: LeakReport,
@@ -139,17 +175,21 @@ export async function runTeardown(
   const stoppedAppHosts: string[] = [];
   const terminatedProcesses: number[] = [];
   const removedContainers: string[] = [];
+  const actionsRequired: string[] = [];
   const escalated = report.survivors.filter((entry) => entry.ownership !== 'owned');
   const appHosts = report.survivors.flatMap((entry) =>
     entry.resource.kind === 'apphost' ? [entry.resource] : []
   );
+  const ownedAppHosts = report.survivors.filter((entry) =>
+    entry.ownership === 'owned' && entry.resource.kind === 'apphost'
+  );
+  if (forcePersistent && ownedAppHosts.length === 0) {
+    requireAction(actionsRequired, NO_RUNNING_APPHOST_FOR_PERSISTENT_CLEANUP);
+  }
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned') continue;
     if (entry.resource.kind === 'apphost') {
-      plannedCommands.push(scopedStopCommand(entry.resource.appHostPath));
-      if (forcePersistent) {
-        plannedCommands.push(scopedStopCommand(entry.resource.appHostPath, true));
-      }
+      plannedCommands.push(scopedStopCommand(entry.resource.appHostPath, forcePersistent));
     } else if (entry.resource.kind === 'container') {
       plannedCommands.push(['docker', 'rm', '-f', entry.resource.id]);
     } else if (
@@ -172,6 +212,7 @@ export async function runTeardown(
       stoppedAppHosts,
       terminatedProcesses,
       removedContainers,
+      actionsRequired,
       escalated,
     };
   }
@@ -185,11 +226,22 @@ export async function runTeardown(
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned' || entry.resource.kind !== 'apphost') continue;
     const appHost = entry.resource;
-    const result = await commands.run(scopedStopCommand(appHost.appHostPath), 30_000);
-    if (result.code !== 0) {
+    if (
+      forcePersistent &&
+      (
+        classify(appHost, registry, report.worktreeRoot) !== 'owned' ||
+        !(await appHostRunning(appHost, files))
+      )
+    ) {
+      requireAction(actionsRequired, NO_RUNNING_APPHOST_FOR_PERSISTENT_CLEANUP);
       escalated.push(entry);
       continue;
     }
+    // S2 `02-v7-aspire-stop-force.raw.txt` proves force cleans persistent resources only while the
+    // AppHost is running. `02-v6-aspire-stop-after-kill.raw.txt` proves an already-gone AppHost
+    // returns exit 0 without cleanup. Force is therefore the single stop variant, never a second
+    // command after normal stop; success comes only from the positive probes below.
+    await commands.run(scopedStopCommand(appHost.appHostPath, forcePersistent), 30_000);
     const gone = await confirmedGone(
       async () => {
         if (!(await appHostGone(appHost, files))) return false;
@@ -209,16 +261,6 @@ export async function runTeardown(
       continue;
     }
     stoppedAppHosts.push(appHost.appHostPath);
-    if (
-      forcePersistent &&
-      classify(appHost, registry, report.worktreeRoot) === 'owned'
-    ) {
-      const forceResult = await commands.run(
-        scopedStopCommand(appHost.appHostPath, true),
-        30_000,
-      );
-      if (forceResult.code !== 0) escalated.push(entry);
-    }
   }
 
   for (const entry of report.survivors) {
@@ -256,16 +298,31 @@ export async function runTeardown(
 
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned' || entry.resource.kind !== 'container') continue;
-    const fresh = await probeContainer(entry.resource.id, commands, files);
-    if (
-      !fresh || fresh.kind !== 'container' ||
-      classify(fresh, registry, report.worktreeRoot) !== 'owned'
-    ) {
+    const container = entry.resource;
+    const fresh = await probeContainer(container.id, commands, files);
+    if (!fresh) {
+      const gone = await confirmedGone(
+        () => containerGone(container.id, commands),
+        attempts,
+        intervalMs,
+        sleep,
+      );
+      if (gone) removedContainers.push(container.id);
+      else escalated.push(entry);
+      continue;
+    }
+    if (fresh.kind !== 'container' || classify(fresh, registry, report.worktreeRoot) !== 'owned') {
       escalated.push(entry);
       continue;
     }
-    const result = await commands.run(['docker', 'rm', '-f', fresh.id], 30_000);
-    if (result.code === 0) removedContainers.push(fresh.id);
+    await commands.run(['docker', 'rm', '-f', fresh.id], 30_000);
+    const gone = await confirmedGone(
+      () => containerGone(fresh.id, commands),
+      attempts,
+      intervalMs,
+      sleep,
+    );
+    if (gone) removedContainers.push(fresh.id);
     else escalated.push(entry);
   }
   return {
@@ -274,6 +331,7 @@ export async function runTeardown(
     stoppedAppHosts,
     terminatedProcesses,
     removedContainers,
+    actionsRequired,
     escalated,
   };
 }

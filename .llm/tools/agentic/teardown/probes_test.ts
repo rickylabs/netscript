@@ -86,3 +86,27 @@ Deno.test('process probe ignores command arguments that merely mention Aspire cl
   };
   assertEquals(await probeProcesses(commands, files), []);
 });
+
+Deno.test('process probe ignores worktree paths in Aspire-like env keys without Aspire identity', async () => {
+  const commands: CommandPort = {
+    run: () =>
+      Promise.resolve({
+        code: 0,
+        stdout: '43 1 90 deno long-lived-worker.ts',
+        stderr: '',
+      }),
+  };
+  const files: FilePort = {
+    realPath: (path) => Promise.resolve(path),
+    readText(path) {
+      if (path.endsWith('/cmdline')) return Promise.resolve('deno\0long-lived-worker.ts');
+      if (path.endsWith('/environ')) {
+        return Promise.resolve(
+          'ASPIRE_DCP_APPHOST_PATH=/home/codex/repos/fix-1046/aspire/apphost.mts\0',
+        );
+      }
+      return Promise.resolve('');
+    },
+  };
+  assertEquals(await probeProcesses(commands, files), []);
+});

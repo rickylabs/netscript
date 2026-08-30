@@ -8,7 +8,7 @@ export const ASPIRE_CREATOR_STARTED = 'com.microsoft.developer.usvc-dev.creatorP
 export const ASPIRE_MOUNTS = 'com.microsoft.developer.usvc-dev.mountsLabel';
 export const DEFAULT_PROBE_TIMEOUT_MS = 10_000;
 const PROCESS_ROW = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/;
-const DCP_ENVIRONMENT_KEY = /(?:ASPIRE|DCP)/i;
+const DCP_ENVIRONMENT_KEY = /^ASPIRE_DCP_APPHOST_PATH$/;
 const ABSOLUTE_PATH = /\/(?:[^\s\0'"=,:]+\/?)+/g;
 
 interface AspireRow {
@@ -182,7 +182,7 @@ export async function probeProcesses(
     const dcpPaths = environmentEvidence(environment);
     const socketPaths = await socketEvidence(files, procRoot);
     const aspireCommand = aspireProcessIdentity(tokens);
-    if (!aspireCommand && dcpPaths.length === 0) continue;
+    if (!aspireCommand) continue;
     const rawAppHostEvidence: ProcessEvidence[] = appHostPath
       ? [{ kind: 'apphost-argv', path: appHostPath }]
       : [];

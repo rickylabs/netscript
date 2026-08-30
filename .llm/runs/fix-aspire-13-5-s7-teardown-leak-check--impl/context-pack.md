@@ -12,10 +12,10 @@
 
 ## Current State
 
-Baseline is exactly S3 head `fe4f496bd`. Phase A slices 1–5 are implemented with durable evidence.
-The assertion-level RED was closed by path-backed orphan discovery; force-persistent and bounded
-DCP-helper/orphan confirmation are green. The 13.5 playbook, lease-backed Phase-B procedure, and
-draft closing evidence are complete. This session does not self-certify.
+Baseline is exactly S3 head `fe4f496bd`. IMPL-EVAL cycle 1 at `473286671` returned `FAIL_FIX`
+because the force call followed a completed normal stop and was therefore inert in the V6 no-AppHost
+state. Slice 6 makes force the single stop variant for a stable, running, positively owned AppHost;
+an already-gone AppHost emits action-required and exit 4. This session does not self-certify.
 
 ## Completed
 
@@ -26,21 +26,23 @@ draft closing evidence are complete. This session does not self-certify.
   descriptor-to-Unix-socket evidence.
 - Positive path ownership, foreign worktree reporting, and both Aspire MCP command guards.
 - Dry-run `plannedCommands` plus force execution only after apply, explicit flag, positive AppHost
-  ownership, scoped-stop success, and PID confirmation.
+  ownership, stable running-PID proof, and positive post-stop confirmation.
 - Six 500 ms confirmation probes (2.5 s total) derived from S2 V6's 385 ms observation; associated
   helpers time out to escalation without a kill.
 - Aged standalone orphans require an OK AppHost census, positive path ownership, and stable PID
   identity before one targeted TERM; young/ambiguous rows escalate.
 - 13.5 lifecycle/safety playbook update and named Phase-B receipt procedure.
 - Scoped wrappers, 40/40 tests, configured lint, assets, quality, and architecture gates all green.
+- Slice 6 adds positive PID/helper/container confirmation, the already-gone force refusal, and a
+  non-Aspire `ASPIRE_*` environment false-positive regression. The suite is green at 46/46.
 
 ## In Progress
 
-- Slice 5 commit/push and PR evidence comment.
+- Slice 6 commit/push plus the missing slice-5 and new slice-6 PR evidence comments.
 
 ## Next Steps
 
-1. Fable supervisor runs the separate slice review and IMPL-EVAL protocol.
+1. Fable supervisor runs separate IMPL-EVAL cycle 2 at the slice-6 head.
 2. A lease-backed session executes `phase-b-handoff.md` before close-gate evidence is posted.
 
 ## Key Decisions
@@ -69,14 +71,15 @@ draft closing evidence are complete. This session does not self-certify.
 | Fitness     | PASS           | `05-quality-scan.json`; `05-arch-check.json`              |
 | Runtime     | PASS           | `05-teardown-tests.json`: 40 passed, 0 failed             |
 | Consumer    | PASS           | `05-assets-barrel.json`; canonical generated corpus clean |
+| Eval fix    | PASS           | `06-*` receipts; 46/46 tests; direct configured lint JSON |
 
 ## Open Questions
 
-- None for Phase A. Phase B waits for a runtime lease.
+- None for slice 6. Phase B still waits for a runtime lease.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: significant lifecycle-state correction recorded in `drift.md`.
 - Debt: none planned.
 
 ## Commits

@@ -69,8 +69,10 @@ Aspire 13.5.3 lifecycle receipts establish these operating facts:
   before declaring the run clean.
 - A normal scoped stop preserves persistent resources. When persistent deletion is explicitly
   required, preview first, then pass both `--apply` and `--force-persistent`. Only after ownership
-  is proven and the normal scoped stop is confirmed may teardown execute
-  `aspire stop --force --apphost <exact> --non-interactive --nologo`. It never emits `--all`.
+  is proven and that AppHost is confirmed running may teardown use
+  `aspire stop --force --apphost <exact> --non-interactive --nologo` as the single stop command. If
+  the owned AppHost is already gone, teardown reports persistent cleanup as action-required instead
+  of trusting Aspire's no-op exit 0. It never emits `--all`.
 - A confirmed owned orphan process may receive one targeted `TERM` only when it is at least 30
   seconds old, an Aspire census succeeded, no matching live AppHost remains, and its PID start
   identity is stable across the mutation boundary. A timeout or ambiguous identity is escalated;
