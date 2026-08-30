@@ -475,4 +475,9 @@ label rerun; mirror APPLIED 4/4 boxes + provenance; review-threads PASS (0 threa
 6 success / 24 skipped / 0 red. Coordinator lands the merge. | | **S3 SHIPPED** | PR #1741 merged by
 primary → main `9710a2898d4f`; #1715 closed; PR/issue `status:shipped`. Stack released: S7 converges
 onto this main; next local Phase-B lease → S7 rerun (S8 retry stays blocked until its own
-convergence after S1). |
+convergence after S1). | | S7 converged on shipped main | `fix/aspire-13-5-s7-teardown-leak-check`
+rebased: only its 12 own commits replayed (`85bd4967`-era S3 lineage dropped; first attempt
+replaying old S3 commits aborted safely, remote untouched) → **`6f73dcae778a`** on `9710a2898d4f`,
+range-diff `=` 12/12, pinned push; PR #1744 base → `main`. Loopback probe re-run post-host-update:
+dind-loopback publishes still refused at `netscript-dind:<port>` (explicit publishes answer) → D-74
+two-hop relay stays mandatory for the Phase-B rerun. |
