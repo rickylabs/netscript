@@ -128,10 +128,11 @@ function normalizeDehydratedQuery(value: unknown): TanStackDehydratedQuery | und
 
 function normalizeMutationState(value: unknown): MutationState | undefined {
   if (!isRecord(value)) return undefined;
-  const error = reviveSerializedError(value.error);
-  const failureReason = reviveSerializedError(value.failureReason);
+  const error = value.error === null ? null : reviveSerializedError(value.error);
+  const failureReason = value.failureReason === null
+    ? null
+    : reviveSerializedError(value.failureReason);
   if (
-    !error.valid || !failureReason.valid ||
     typeof value.failureCount !== 'number' ||
     typeof value.isPaused !== 'boolean' ||
     !isOneOf(value.status, ['idle', 'pending', 'success', 'error']) ||
@@ -143,9 +144,9 @@ function normalizeMutationState(value: unknown): MutationState | undefined {
   return {
     context: value.context,
     data: value.data,
-    error: error.value,
+    error,
     failureCount: value.failureCount,
-    failureReason: failureReason.value,
+    failureReason,
     isPaused: value.isPaused,
     status: value.status,
     variables: value.variables,
@@ -155,10 +156,11 @@ function normalizeMutationState(value: unknown): MutationState | undefined {
 
 function normalizeQueryState(value: unknown): QueryState | undefined {
   if (!isRecord(value)) return undefined;
-  const error = reviveSerializedError(value.error);
-  const fetchFailureReason = reviveSerializedError(value.fetchFailureReason);
+  const error = value.error === null ? null : reviveSerializedError(value.error);
+  const fetchFailureReason = value.fetchFailureReason === null
+    ? null
+    : reviveSerializedError(value.fetchFailureReason);
   if (
-    !error.valid || !fetchFailureReason.valid ||
     typeof value.dataUpdateCount !== 'number' ||
     typeof value.dataUpdatedAt !== 'number' ||
     typeof value.errorUpdateCount !== 'number' ||
@@ -176,11 +178,11 @@ function normalizeQueryState(value: unknown): QueryState | undefined {
     data: value.data,
     dataUpdateCount: value.dataUpdateCount,
     dataUpdatedAt: value.dataUpdatedAt,
-    error: error.value,
+    error,
     errorUpdateCount: value.errorUpdateCount,
     errorUpdatedAt: value.errorUpdatedAt,
     fetchFailureCount: value.fetchFailureCount,
-    fetchFailureReason: fetchFailureReason.value,
+    fetchFailureReason,
     fetchMeta: value.fetchMeta,
     isInvalidated: value.isInvalidated,
     status: value.status,
@@ -196,31 +198,53 @@ function isFetchMetaOrNull(value: unknown): value is QueryState['fetchMeta'] {
     isOneOf(value.fetchMore.direction, ['forward', 'backward']);
 }
 
-type RevivedError =
-  | { readonly valid: true; readonly value: Error | null }
-  | { readonly valid: false };
-
-function reviveSerializedError(value: unknown): RevivedError {
-  if (value === null || value instanceof Error) {
-    return { valid: true, value };
-  }
-  const record = isPlainRecord(value) ? value : undefined;
-  if (
-    !record && !Array.isArray(value) && typeof value !== 'string' &&
-    typeof value !== 'number' && typeof value !== 'boolean'
-  ) {
-    return { valid: false };
+function reviveSerializedError(value: unknown): Error {
+  try {
+    if (value instanceof Error) return value;
+  } catch {
+    // A hostile or revoked proxy is still a valid rejection value.
   }
 
-  const error = new Error(
-    record
-      ? typeof record.message === 'string' ? record.message : 'Serialized hydration error'
-      : String(value),
-    { cause: value },
-  );
-  if (record && typeof record.name === 'string') error.name = record.name;
-  if (record && typeof record.stack === 'string') error.stack = record.stack;
-  return { valid: true, value: error };
+  let record: Readonly<Record<string, unknown>> | undefined;
+  try {
+    record = isPlainRecord(value) ? value : undefined;
+  } catch {
+    // Prototype inspection can throw for a revoked proxy; use the fallback message.
+  }
+
+  const error = new Error(serializedErrorMessage(value, record), { cause: value });
+  if (record) {
+    const name = readStringField(record, 'name');
+    if (name !== undefined) error.name = name;
+    const stack = readStringField(record, 'stack');
+    if (stack !== undefined) error.stack = stack;
+  }
+  return error;
+}
+
+function serializedErrorMessage(
+  value: unknown,
+  record: Readonly<Record<string, unknown>> | undefined,
+): string {
+  if (record) {
+    return readStringField(record, 'message') ?? 'Serialized hydration error';
+  }
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'bigint') return `${value}`;
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  return 'Serialized hydration error';
+}
+
+function readStringField(
+  record: Readonly<Record<string, unknown>>,
+  field: string,
+): string | undefined {
+  try {
+    const value = record[field];
+    return typeof value === 'string' ? value : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function isOneOf<const TValue extends string>(

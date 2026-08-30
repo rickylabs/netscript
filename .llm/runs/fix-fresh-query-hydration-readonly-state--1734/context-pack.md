@@ -16,7 +16,9 @@ All three prior evaluator artifacts are preserved unchanged. Cycle 4 is owner-au
 to replacing the private rejection-value allowlist in `reviveSerializedError` with a total,
 non-throwing reviver. S9 captured an 11-pass / 3-fail RED through the real transport: JSON-omitted
 mutation and query error fields reject the whole state, while hostile coercion escapes through
-`String(value)`. Public types, exports, and dependency range remain untouched.
+`String(value)`. S10 removes the validity branch, preserves original non-`Error` values in `cause`,
+and uses only safe primitive or fallback messages. The focused trio passes 19/19, including the
+eight guard-attack cases. Public types, exports, and dependency range remain untouched.
 
 ## Completed
 
@@ -34,17 +36,16 @@ mutation and query error fields reject the whole state, while hostile coercion e
 - Cycle-4 owner ruling, required skills, doctrine, all prior verdicts, drift, and worklog reviewed.
 - S9 real-transport RED reproduced for omitted mutation state, query error twins, and hostile
   coercion; production source is still untouched.
+- S10 total private reviver implemented; focused tests and scoped Fresh check/lint/fmt are green.
 
 ## In Progress
 
-- S9 RED is ready to commit as a standalone slice before the private implementation changes.
+- S10 is ready to commit before the owner-pinned rebase and exact-head sealing gates.
 
 ## Next Steps
 
-1. Commit the S9 RED slice.
-2. Implement the total private reviver and prove both the supported-value and guard-attack
-   directions.
-3. Rebase onto owner-pinned `24f6642f040617de573c7cef1140eed1ac0efd6d`, run the complete static and
+1. Commit the S10 repair slice.
+2. Rebase onto owner-pinned `24f6642f040617de573c7cef1140eed1ac0efd6d`, run the complete static and
    leased one-pass runtime gates at the immutable head, then push by explicit refspec and update the
    draft PR without dispatching IMPL-EVAL.
 
