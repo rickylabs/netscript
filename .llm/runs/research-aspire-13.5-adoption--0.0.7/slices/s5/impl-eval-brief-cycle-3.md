@@ -23,9 +23,9 @@ unanswered `augmentcode` review threads. A supervisor-directed repair cycle then
 plus a derived-asset regeneration. **Evaluate the whole S5 contract at the final head**, with the
 repair range as the focus — do not assume any part of the earlier PASS still holds.
 
-- Evaluate **exactly** head `<HEAD>` on `fix/aspire-13-5-s5-literal-ports`.
-- Original wave: `0bd8ba832` and below. Repair range: `0bd8ba83..<HEAD>`.
-- Your worktree: `<EVAL_WORKTREE>` (detached at that head; product files are read-only to you).
+- Evaluate **exactly** head `aa822069` on `fix/aspire-13-5-s5-literal-ports`.
+- Original wave: `0bd8ba832` and below. Repair range: `0bd8ba83..aa822069`.
+- Your worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s5-eval` (detached at that head; product files are read-only to you).
 - Generator run dir: `.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/`
   (`worklog.md` with `## Design` + gate tables, `drift.md`).
 - Supervisor Tier-A review: `slices/s5/repair/review-tier-a.md` — treat its findings as claims to
