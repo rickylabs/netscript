@@ -8652,3 +8652,26 @@ edit itself (`login`/`name`/`slug` fields `gh` queries alongside the mutation). 
 `gh api repos/.../pulls/1762 -X PATCH -F body=@<file>` directly against the REST API — note `-F`
 (capital, for `@file` raw-content references), not `-f`. No head movement; verified via a fresh
 `gh pr view` immediately after.
+
+## #1387 Slice 9 dispatched — the final implementation slice
+
+Docs-only, eight-file ceiling, base `9ce84de2f`, thread `01a054e2-0fb0-7290-b746-96e6143cc91c`,
+`gpt-5.6-sol · high`, dry-run clean. The last slice before the close-gate: replaces the auth
+tutorial's duplicated path-matcher teaching (research finding 14) with contract-declared
+`.meta({access:...})` plus `createContractAuthorizer` as primary, repositioning
+`createScopeAuthorizer` as the correctly-explained match-aware legacy fallback rather than removing
+it. Documents exactly what Slices 1–8 shipped — the single metadata vocabulary, LD-6/LD-7 precedence,
+LD-8's construction-time optional rejection stated as a real constraint not a bug, LD-11's accepted
+rename-continuity substitution (not the issue's original compile-time wording), and Slice 6–8's
+generated OpenAPI/MCP outputs.
+
+Tier-A stop is the broadest of this run — the full shared-asset cascade
+(`agent-docs-prose`/`assets-barrel`/`publish-assets`/`mcp-export-corpus`/`docs-tagline`) plus every
+package's JSR audit, since prose changes can stale a generated carrier unrelated to the slice's own
+files. Brief states explicitly: run each one for real, don't assume docs-only exempts the cascade.
+
+Brief also carries the filename-collision lesson from Slice 8 (`evaluate.md` colliding with Slice 2's
+file) preemptively, and reiterates "no closing keyword" even though this is the last implementation
+slice — the close-gate is a separate, later action.
+
+Sender record evicted under the full procedure (dead pid, absent from session list) before dispatch.
