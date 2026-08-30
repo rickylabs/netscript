@@ -92,16 +92,17 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Progress Log
 
-| Time                 | Slice | Step                   | Notes                                                                                                                                                                                                             |
-| -------------------- | ----- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30T12:57:16Z | S1    | Re-baseline/research   | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                                       |
-| 2026-08-30T12:57:16Z | S1    | Design                 | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                          |
-| 2026-08-30T13:10:51Z | S1    | Supervisor review      | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                           |
-| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1      | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                                |
-| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2      | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                                   |
-| 2026-08-30T13:53:27Z | S2    | Red-before proof       | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                                    |
-| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4.         |
-| 2026-08-30T14:14:44Z | S4    | Runtime emission       | Added all five operation-owned callers, normalized one instrumentation dependency through core/plugin composition, and preserved engine-selected correlation/direct-parent context through compensation cascades. |
+| Time                 | Slice | Step                   | Notes                                                                                                                                                                                                                      |
+| -------------------- | ----- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30T12:57:16Z | S1    | Re-baseline/research   | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                                                |
+| 2026-08-30T12:57:16Z | S1    | Design                 | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                                   |
+| 2026-08-30T13:10:51Z | S1    | Supervisor review      | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                                    |
+| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1      | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                                         |
+| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2      | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                                            |
+| 2026-08-30T13:53:27Z | S2    | Red-before proof       | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                                             |
+| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4.                  |
+| 2026-08-30T14:14:44Z | S4    | Runtime emission       | Added all five operation-owned callers, normalized one instrumentation dependency through core/plugin composition, and preserved engine-selected correlation/direct-parent context through compensation cascades.          |
+| 2026-08-30T14:23:57Z | S5    | Docs/consumer proof    | Documented all six span contracts and added a generated Flow-B compensation fixture plus validator checks for direct parenting and exact callback/payload correlation equality. Runtime execution remains supervisor-only. |
 
 ## Decisions
 
@@ -127,6 +128,7 @@ a process seam. A thin plugin may only wire the core primitive.
 | Initial S1 plan omitted the MCP export corpus gate and over-assigned the runtime gate  | significant | yes                |
 | PLAN-EVAL found no-op complete ownership and an invalid mechanical red-before contract | significant | yes                |
 | Release surface baseline and docs export counts sit outside the product ceiling        | minor       | yes                |
+| Global README task reports unchanged out-of-ceiling bench README debt                  | minor       | yes                |
 
 ## Gate Results
 
@@ -145,6 +147,10 @@ a process seam. A thin plugin may only wire the core primitive.
 | S4 core/plugin checks    | structured check wrappers, core and plugin roots       | PASS   | exit 0; 112 core and 84 plugin modules, zero findings                                       |
 | S4 targeted tests        | structured test wrapper, locked core/plugin targets    | PASS   | exit 0; 31 passed / 0 failed                                                                |
 | S4 core/plugin fmt/lint  | structured format/lint wrappers, core and plugin roots | PASS   | exit 0; 112 core and 84 plugin files, zero findings                                         |
+| S5 Flow-B check/test     | focused structured wrappers                            | PASS   | 3 files checked/linted/formatted; validator 5 passed / 0 failed                             |
+| S5 focused README        | README standard checker, package path                  | PASS   | exit 0; in-scope README 1/1 conformant                                                      |
+| Global README baseline   | `deno task docs:readme:check`                          | FAIL   | exit 1; only `packages/bench/README.md`, unchanged and outside ceiling                      |
+| Post-change doc lint     | package doc-lint wrapper                               | FAIL   | expected baseline: 9 private-type findings, 0 missing JSDoc/other                           |
 
 ### Fitness Gates
 
@@ -176,6 +182,10 @@ a process seam. A thin plugin may only wire the core primitive.
   cascade size is recorded only through the typed instrumentation method.
 - S5 is next: update the package README and Flow-B fixture/validator unit proof without invoking the
   supervisor-owned runtime gate.
+- S5 is implemented and statically green. The global README task's unrelated bench-package debt is
+  measured in `drift.md`; the focused in-scope README check passes.
+- S6 runs the allowed merge-readiness/static derivative gates. The expected MCP corpus stale result
+  is stop/report, and the required Flow-B runtime remains supervisor-owned/author-must-not-run.
 - The expected MCP corpus and release public-surface baseline staleness are supervisor sequencing
   handoffs. Do not regenerate them. Flow-B runtime remains author-must-not-run.
 
@@ -184,51 +194,52 @@ a process seam. A thin plugin may only wire the core primitive.
 Reviewer is the fixes topic supervisor: not the author, not either plan evaluator. Every check was
 re-derived independently.
 
-**Tier-A PASSES.** A fresh, separate, opposite-family IMPL-EVAL is still mandatory, and one gate is a
-deliberate stop-and-report rather than a pass (below).
+**Tier-A PASSES.** A fresh, separate, opposite-family IMPL-EVAL is still mandatory, and one gate is
+a deliberate stop-and-report rather than a pass (below).
 
 ### The red-before flipped, and it flipped honestly
 
-| Head | Focused `saga-cascade-spans_test.ts` |
-| --- | --- |
+| Head                                       | Focused `saga-cascade-spans_test.ts`                    |
+| ------------------------------------------ | ------------------------------------------------------- |
 | `2146443c` (red-before, no product change) | exit 1 · **0 passed / 2 failed**, both `AssertionError` |
-| `7517ae50` (product landed) | exit 0 · **9 passed / 0 failed** |
+| `7517ae50` (product landed)                | exit 0 · **9 passed / 0 failed**                        |
 
 The test grew from 2 cases to 9, so the important question is whether the original red was weakened.
-It was not: both original case names survive **verbatim** — *"Saga runtime emits a compensation cascade
-span"* and *"Saga handle span carries the cross-plane correlation id"* — along with their assertions
-(`expected saga.cascade.compensate to be started`, and the `order-42` correlation value).
+It was not: both original case names survive **verbatim** — _"Saga runtime emits a compensation
+cascade span"_ and _"Saga handle span carries the cross-plane correlation id"_ — along with their
+assertions (`expected saga.cascade.compensate to be started`, and the `order-42` correlation value).
 
 The seven added cases are the conditions made executable rather than merely recorded:
 
-- *"SagaCompensator records missing handlers as skipped **without deriving correlation**"* — F3b's
+- _"SagaCompensator records missing handlers as skipped **without deriving correlation**"_ — F3b's
   no-fallback rule
-- *"SagaCompensator rejects a registered handler when **engine correlation context is absent**"* — F3b
-- *"compensation and returned cascades **consume engine-selected** correlation and parents"* — D8
-- *"bridge records **send failures** at the downstream operation"* — F4's uninstrumented `send`
+- _"SagaCompensator rejects a registered handler when **engine correlation context is absent**"_ —
+  F3b
+- _"compensation and returned cascades **consume engine-selected** correlation and parents"_ — D8
+- _"bridge records **send failures** at the downstream operation"_ — F4's uninstrumented `send`
 - plus scheduled-persistence, unsupported-spawn, and thrown/nested-deferred compensation cases
 
 ### Exact-head gates at `7517ae50`
 
-| Gate | Result |
-| --- | --- |
-| Head identity | local == `origin` == PR #1764 `headRefOid`; tree clean |
-| Ceiling containment | **13 changed product paths, all inside the locked 19** — none outside |
-| `deno.lock` | byte-unchanged vs `f8b4f804` |
-| Focused cascade-spans suite | exit 0 · 9 passed / 0 failed |
-| Whole `packages/plugin-sagas-core` | exit 0 · **81 passed / 0 failed / 3 ignored** |
-| Plugin targeted (`create-durable-saga-runtime_test.ts`) | exit 0 · 7 passed / 0 failed |
-| Scoped type check | exit 0 |
-| Scoped lint (root rules) | exit 0 · 11 files |
-| Scoped fmt | no findings |
-| `check:agent-docs-prose` / assets-barrel (check-only) / `check:publish-assets` | all exit 0 |
-| `quality:gate` | two pre-existing `export default` WARNs, outside the ceiling |
+| Gate                                                                           | Result                                                                |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Head identity                                                                  | local == `origin` == PR #1764 `headRefOid`; tree clean                |
+| Ceiling containment                                                            | **13 changed product paths, all inside the locked 19** — none outside |
+| `deno.lock`                                                                    | byte-unchanged vs `f8b4f804`                                          |
+| Focused cascade-spans suite                                                    | exit 0 · 9 passed / 0 failed                                          |
+| Whole `packages/plugin-sagas-core`                                             | exit 0 · **81 passed / 0 failed / 3 ignored**                         |
+| Plugin targeted (`create-durable-saga-runtime_test.ts`)                        | exit 0 · 7 passed / 0 failed                                          |
+| Scoped type check                                                              | exit 0                                                                |
+| Scoped lint (root rules)                                                       | exit 0 · 11 files                                                     |
+| Scoped fmt                                                                     | no findings                                                           |
+| `check:agent-docs-prose` / assets-barrel (check-only) / `check:publish-assets` | all exit 0                                                            |
+| `quality:gate`                                                                 | two pre-existing `export default` WARNs, outside the ceiling          |
 
 **A supervisor error corrected in place.** The first ceiling check flagged
 `plugins/sagas/src/runtime/create-durable-saga-runtime{,_test}.ts` as violations. They are **not** —
 they are items 8 and 15 of the locked ceiling, and the plan's Target line reads
-"`packages/plugin-sagas-core`, thin `plugins/sagas` wiring". The gate runner's pattern was too narrow;
-re-checked against the plan's actual 19-path list, containment is clean.
+"`packages/plugin-sagas-core`, thin `plugins/sagas` wiring". The gate runner's pattern was too
+narrow; re-checked against the plan's actual 19-path list, containment is clean.
 
 ### `check:mcp-export-corpus` — stop-and-report, and it is genuinely leaf-caused
 
@@ -236,10 +247,10 @@ The gate is **NONZERO** at this head. Attributed rather than assumed: the same c
 worktree at base `f8b4f804` exits **0**, so the staleness is **caused by this leaf**, not inherited
 from a stale base.
 
-The plan predicted exactly this (gate 16: *"expect nonzero stale-corpus result; stop/report for
-supervisor sequencing and do not regenerate"*), and the author correctly **did not regenerate**. No
-new exported symbol was added — the corpus moves because of **signature** changes to existing exports,
-consistent with D8's explicit request/result signature change.
+The plan predicted exactly this (gate 16: _"expect nonzero stale-corpus result; stop/report for
+supervisor sequencing and do not regenerate"_), and the author correctly **did not regenerate**. No
+new exported symbol was added — the corpus moves because of **signature** changes to existing
+exports, consistent with D8's explicit request/result signature change.
 
 Regeneration stays owner-sequenced while the shared-asset sequence is live. This is recorded as a
 **deliberate stop, not a pass and not a waiver.**
@@ -248,8 +259,8 @@ Regeneration stays owner-sequenced while the shared-asset sequence is live. This
 
 Both are recorded in the worklog and made executable in tests: **F3b** (optional fields, and the
 compensator applying **no fallback precedence** when they are absent) and **F1 residual**
-(`saga.cascade.complete` emits whenever `completed` is true regardless of store presence, carrying the
-**persisted** status, which may be `failed`/`compensating`).
+(`saga.cascade.complete` emits whenever `completed` is true regardless of store presence, carrying
+the **persisted** status, which may be `failed`/`compensating`).
 
 ### Not done here
 

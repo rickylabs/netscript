@@ -21,7 +21,9 @@ baseline-compatible test compiled and produced raw exit 1 with 0 passed / 2 fail
 required assertions. S3 added the typed telemetry/W3C contract and engine-selected correlation
 transport. S4 now emits all five cascade spans at their operation owners and normalizes one
 instrumentation instance through core/plugin composition. The locked S4 check/format/lint gates are
-clean and its focused suite passes 31/31.
+clean and its focused suite passes 31/31. S5 documents the contract and adds the real generated
+Flow-B compensation fixture plus direct-parent/correlation validator proof; its focused static and
+5-test gates pass.
 
 ## Completed
 
@@ -51,18 +53,24 @@ clean and its focused suite passes 31/31.
   optional correlation/context fields with no fallback, and compensation-result parent replacement.
 - Normalized one instrumentation instance through `createSagaRuntime` and the durable plugin's
   default compensator; proved S4 with 31 focused passing tests.
+- Documented owners/outcomes, complete-status semantics, correlation precedence, and optional
+  no-fallback compensator behavior in the package README.
+- Extended Flow-B with CLI-generated saga registration, an HTTP publish from the active callback
+  using `getTraceContext()`, the shared callback/payload correlation fixture, sagas-api discovery,
+  and direct `saga.handle -> saga.cascade.compensate` validation.
+- Proved S5 with three focused static files, 5/5 validator tests, and a conformant in-scope README;
+  recorded the unrelated global bench README failure without editing outside ceiling.
 
 ## In Progress
 
-- S4 commit and push.
+- S5 commit and push.
 
 ## Next Steps
 
-1. Commit and push the green S4 runtime/composition slice, then update the implementation PR
-   comment.
-2. In S5, document the span contract and extend the Flow-B generated compensation fixture and
-   validator unit proof.
-3. Do not run the leased Flow-B runtime; preserve that required gate for supervisor sequencing.
+1. Commit and push the green S5 docs/consumer slice, then update the implementation PR comment.
+2. Run the S6 allowed static, fitness, publish, and non-mutating derivative gate table.
+3. Stop/report at expected MCP corpus staleness; do not regenerate shared artifacts or run the
+   leased Flow-B runtime.
 
 ## Key Decisions
 
@@ -79,15 +87,17 @@ clean and its focused suite passes 31/31.
 
 ## Files Changed
 
-| Path                                                                                                          | Status   | Notes                                          |
-| ------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
-| `.llm/runs/fix-saga-span-emission-and-correlation--0.0.7/*.md`                                                | new      | Harness state/evidence                         |
-| `packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts`                                       | new      | S2 red-before contract                         |
-| `packages/plugin-sagas-core/src/telemetry/{attributes,instrumentation,otel-saga-telemetry}.ts`                | modified | S3 typed telemetry/W3C contract                |
-| `packages/plugin-sagas-core/src/runtime/saga-engine.ts`                                                       | modified | Engine-selected correlation/context transport  |
-| `packages/plugin-sagas-core/tests/telemetry/{instrumentation,otel-saga-telemetry,saga-engine-spans}_test.ts`  | modified | S3 contract tests                              |
-| `packages/plugin-sagas-core/src/{adapters/saga-bus-bridge,runtime/{create-saga-runtime,saga-compensator}}.ts` | modified | S4 operation owners and composition            |
-| `plugins/sagas/src/runtime/create-durable-saga-runtime{,_test}.ts`                                            | modified | Thin default-compensator instrumentation proof |
+| Path                                                                                                                             | Status   | Notes                                          |
+| -------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
+| `.llm/runs/fix-saga-span-emission-and-correlation--0.0.7/*.md`                                                                   | new      | Harness state/evidence                         |
+| `packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts`                                                          | new      | S2 red-before contract                         |
+| `packages/plugin-sagas-core/src/telemetry/{attributes,instrumentation,otel-saga-telemetry}.ts`                                   | modified | S3 typed telemetry/W3C contract                |
+| `packages/plugin-sagas-core/src/runtime/saga-engine.ts`                                                                          | modified | Engine-selected correlation/context transport  |
+| `packages/plugin-sagas-core/tests/telemetry/{instrumentation,otel-saga-telemetry,saga-engine-spans}_test.ts`                     | modified | S3 contract tests                              |
+| `packages/plugin-sagas-core/src/{adapters/saga-bus-bridge,runtime/{create-saga-runtime,saga-compensator}}.ts`                    | modified | S4 operation owners and composition            |
+| `plugins/sagas/src/runtime/create-durable-saga-runtime{,_test}.ts`                                                               | modified | Thin default-compensator instrumentation proof |
+| `packages/plugin-sagas-core/README.md`                                                                                           | modified | Published telemetry contract                   |
+| `packages/cli/e2e/src/application/gates/scaffold/{prepare-flow-b-fixture,validate-flow-b-traces,validate-flow-b-traces_test}.ts` | modified | Generated consumer fixture/unit proof          |
 
 ## Gates
 
@@ -100,6 +110,7 @@ clean and its focused suite passes 31/31.
 | S2 negative | PASS              | raw exit 1; 0 passed / 2 failed assertions; commit `2146443c`                    |
 | S3 static   | PASS              | 112 checked/formatted/linted; 7 focused tests passed                             |
 | S4 static   | PASS              | core/plugin checks and format/lint clean; 31 focused tests passed                |
+| S5 static   | PASS              | three files clean; 5 validator tests; focused README 1/1                         |
 
 ## Open Questions
 

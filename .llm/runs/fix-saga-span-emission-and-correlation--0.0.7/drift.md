@@ -86,3 +86,17 @@ documentation.
   classify the optional-field surface change additive/minor and forbids regeneration here. The docs
   export counts remain outside scope and are reported for the docs lane; this author will not edit
   either path.
+
+## 2026-08-30 — Global README gate has unrelated baseline debt
+
+- **What:** `deno task docs:readme:check` exits 1 because `packages/bench/README.md` lacks an
+  `## Install` section; the edited `packages/plugin-sagas-core/README.md` passes the same checker
+  when selected directly.
+- **Source:** S5 global and focused invocations of `.llm/tools/validation/check-readme-standard.ts`.
+- **Expected:** Plan gate 17 expected the repository-wide task to exit 0.
+- **Actual:** The one reported non-conformant README is outside this leaf's product ceiling and is
+  unchanged from locked baseline `f8b4f804`; the in-scope README reports `1/1` conformant.
+- **Severity:** minor
+- **Action:** accept measured baseline; do not edit outside ceiling
+- **Evidence:** Global result `1/36 non-conformant`, focused result
+  `A2 README standard OK - 1 README(s) conform`.

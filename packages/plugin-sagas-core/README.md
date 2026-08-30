@@ -138,6 +138,38 @@ const orderSaga = defineSaga('order')
   .build();
 ```
 
+## Telemetry contract
+
+Inject `SagaInstrumentation` through `createSagaRuntime({ native: { instrumentation } })`; the
+composition root gives the engine, bridge, and compensator the same instance. Saga operations emit
+these spans:
+
+| Span                      | Runtime owner | Meaning and outcomes                                                                                       |
+| ------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `saga.handle`             | Engine        | Handler execution; `success` or `error`                                                                    |
+| `saga.cascade.send`       | Bus bridge    | Downstream internal-message dispatch; `success` or `error`                                                 |
+| `saga.cascade.schedule`   | Bus bridge    | Scheduler persistence call; `success` or `error`                                                           |
+| `saga.cascade.spawn`      | Bus bridge    | Defensive rejected attempt; **error-only** because child-saga lifecycle is unsupported                     |
+| `saga.cascade.compensate` | Compensator   | Registered compensation execution; `success`, missing-handler `skipped`, or `error`                        |
+| `saga.cascade.complete`   | Engine        | Participation of a complete effect in transition resolution; outcome follows the resolved persisted status |
+
+Every engine-originated saga span carries `netscript.correlation.id`, the cross-plane convention
+exported as `NetScriptCorrelationAttributes.CORRELATION_ID` by `@netscript/telemetry/attributes`,
+plus the saga-domain `netscript.saga.correlation_key`. The publisher's message correlation key wins
+for the cross-plane ID; a saga's `.correlate()` rule wins for the domain key. Cascade spans consume
+those two engine-selected values unchanged. Explicit W3C trace context makes each cascade span a
+direct child of the operation that produced it, including compensation-generated cascades.
+
+`saga.cascade.complete` is emitted whenever a handler returns a complete effect, including a
+storeless runtime. Its `netscript.saga.status` is the resolved persisted status—not a success flag.
+For mixed terminal effects it can be `failed` or `compensating`; the span also records whether the
+complete effect supplied a result.
+
+Direct `SagaCompensator` callers may omit the optional correlation and parent fields for source
+compatibility. The compensator does not invent fallbacks from the message, a correlation rule, or a
+default. A missing handler is observable as `skipped`; a registered handler without an
+engine-resolved `correlationKey` fails validation.
+
 ## Public surface
 
 | Entry                     | What it gives you                                                                                          |
