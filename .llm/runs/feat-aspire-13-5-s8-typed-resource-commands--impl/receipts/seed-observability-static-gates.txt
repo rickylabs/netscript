@@ -25,6 +25,8 @@ Static gates
   template lint through typed stdin: PASS
   template format comparison through typed stdin: PASS
   quality:gate: PASS (`quality:scan` findings=[], `arch:check` FAIL=0 with existing warnings)
-  generated asset barrel: regenerated; clean-head `check:assets-barrel` is run after commit
+  clean product head 63e291f62103447f7a0f5dfc009aaa1e51956358:
+    focused tests: PASS, 8/8 (`seed-observability-tests-head.json`)
+    check:assets-barrel: PASS (`seed-observability-assets-head.json`)
 
 No Aspire command, AppHost, container, seed diagnostic, CI dispatch, or evaluator was used.
