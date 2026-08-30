@@ -465,3 +465,38 @@ runtime lease. The evidence commit contains the new receipts, audits, this workl
 rewritten context pack. It is pushed by explicit refspec and followed by the mandatory structured
 slice-3 PR comment, then stops for supervisor Tier-A. The final all-slices separate-session
 IMPL-EVAL and close-gate remain coordinator-owned.
+
+## G-7 landed — the attempt-5 `SKIPPED` receipt restored to its archive
+
+Written by the features topic supervisor. **Evidence-only; content head unchanged at `9ab779ce`.**
+
+G-7 is a **supervisor error, not an author's.** When root `test` was re-cut at `1f0cdef2` after the
+host reaper fix, `receipts/test-final.json` was overwritten **in place** — the attempt-5 `SKIPPED`
+receipt was never archived first. Archives on this leaf are append-only, and that rule is the one this
+lane has written into every implementation brief and asserted in three Tier-A reviews. It was broken
+for one file, in the commit whose own message called the recut clean. The cycle-2 evaluator caught it.
+
+**Restored:** `receipts/frozen-42874803/test-final.attempt5-skipped.json`, extracted with
+`git show dd201816:…/receipts/test-final.json`. Byte-faithful — SHA-256
+`0d5d2c3d729baecf369b91b4017806acbcde0419756575288bfca5f720e92fca` on both source and restored file.
+It records `attempt 5`, `outcome SKIPPED`, `gitHead == actualGitHead == 42874803`, `durationMs 0`, and
+the reason citing R-1 and the terminal FAIL in `frozen-235482767/`.
+
+**Mixed heads in `frozen-42874803/`, stated rather than left to be discovered.** That archive is
+deliberately not homogeneous:
+
+- seven attempt-5 receipts at `42874803` (the content head it is named for),
+- `test-final.json` at **`ff4e81cc`** — attempt 7, the real `PASS` cut after the host fix, attesting
+  the head it actually ran at, with product proven byte-identical to `42874803`
+  (`git diff 42874803..ff4e81cc -- packages plugins docs templates` empty),
+- and now `test-final.attempt5-skipped.json` at `42874803` — the record of *why* `test` was skipped
+  there and when it became runnable.
+
+Both `test` entries are kept because they answer different questions: one is the gate result at that
+content head, the other is the reason a gate result was absent. Deleting either would leave the
+archive telling half the story — which was precisely the defect.
+
+**Timing was deliberate.** This landed at the slice-3 Tier-A stop rather than when the finding was
+raised, because slice 3's author was live in this worktree archiving its own receipt set. Concurrent
+writes into `receipts/` are the exact class of damage G-7 describes; fixing an archive corruption by
+risking another one would have been the wrong trade.
