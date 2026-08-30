@@ -6,88 +6,96 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `plan`                                          |
+| Current phase  | `impl` — stopped after Slice 1                  |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
 ## Current State
 
-Research and the locked nine-slice plan are complete on the recorded `625447f1` main baseline. No
-product code exists in this leaf. #1466's PR #1731 remains open, so implementation has two
-independent blockers: the metadata dependency must merge and a fresh opposite-family PLAN-EVAL must
-return `PASS`.
+PLAN-EVAL cycle 1 accepted LD-8 and LD-11 and returned `FAIL_PLAN` only for five bounded gate-set,
+ceiling, and text corrections. Those corrections were committed separately without changing the
+accepted design. Slice 1 then extended the existing `NetScriptProcedureMeta.access` vocabulary with
+optional readonly `authorization.scopes` and `authorization.roles`, plus its contracts/SDK type and
+runtime-independence proofs.
 
-After the research baseline froze, `main` advanced from `625447f1` to `f8b4f804` through an
-unrelated cross-host skill-documentation/generated-assets commit. Its focused delta does not change
-the researched policy surfaces, and Slice 0 already requires the authoritative post-#1466 rebase and
-full base-gate rerun.
+Slice 1 is stopped at its Tier-A boundary. Slice 2 must not begin until the supervisor performs the
+substantive Tier-A review and releases the next slice.
 
 ## Completed
 
-- Re-derived all issue anchors and public surfaces with `deno doc` plus focused reads.
-- Classified contracts/service/plugin archetypes, layering, verdicts, and existing debt.
-- Inspected #1466's actual `NetScriptProcedureMeta` and SDK propagation.
-- Enumerated all direct/context-forwarded `withContext` consumers.
-- Counted the 54 currently undeclared first-party procedures and scaffold exposure.
-- Resolved opt-in fail-closed migration, contract/fallback precedence, OpenAPI/MCP reach, and #884
-  extension space.
-- Ran every candidate gate at base and excluded pre-existing red gates.
-- Produced planning artifacts only.
-
-## In Progress
-
-- None. This planning author must stop after draft PR/comment delivery.
+- Re-verified the merged #1466 metadata exports and shape against the research after S0.
+- Repaired all five PLAN-EVAL findings in the bounded artifact locations.
+- Probed `check:agent-docs-prose` at base and contracted all generated carriers at their staling
+  slices and final readiness.
+- Added the Slice 1 metadata shape to the one existing contract vocabulary; no enforcement or second
+  policy vocabulary was introduced.
+- Proved runtime metadata storage, readonly authorization arrays, rejection of a parallel `public`
+  policy, SDK propagation through a renamed procedure, and absence of the old SDK procedure key.
+- Cut and verified the named durable receipts at the immutable content head, including command
+  arguments, duration, and work-bearing output.
+- Proved `deno.lock` byte-identical and every named generated carrier unchanged.
 
 ## Next Steps
 
-1. Dispatch a fresh Anthropic Claude / Fable 5 / medium PLAN-EVAL session using the run artifacts.
-2. Require the evaluator to explicitly adjudicate fail-closed optional-auth binding and the
-   corrected router-rename acceptance proof.
-3. Wait for #1466/PR #1731 to merge.
-4. Only after both conditions pass, rebase, re-run the base census, and dispatch implementation from
-   Slice 1 under the current lane policy.
+1. Supervisor performs the substantive Tier-A review of Slice 1 and its receipt set.
+2. If accepted, the supervisor explicitly releases Slice 2 under its locked ceiling.
+3. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
+   the implementation PR must state the accepted substitution.
+4. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
+   close-gate are complete.
 
 ## Key Decisions
 
-| Decision                         | Source                      | Notes                                         |
-| -------------------------------- | --------------------------- | --------------------------------------------- |
-| One additive metadata vocabulary | #1466 branch, plan LD-1/2   | `access.authorization` only                   |
-| Service owns principal/context   | Doctrine, plan LD-3         | Plugin re-exports public service types        |
-| Opt-in enforcement               | Migration census, plan LD-5 | Existing consumers/scaffolds unchanged        |
-| Contract wins over fallback      | Plan LD-6/7                 | Same resolver informs authn and authz         |
-| Optional runtime fails closed    | Plan LD-8                   | Await typed absent-vs-invalid credentials     |
-| Rename proof corrected           | Drift, plan LD-11           | Metadata follows procedure; old SDK key fails |
+| Decision                         | Source                  | Rule                                                                 |
+| -------------------------------- | ----------------------- | -------------------------------------------------------------------- |
+| One additive metadata vocabulary | Plan LD-1/LD-2, Slice 1 | `access.authorization` only; never add a parallel procedure policy   |
+| Service owns principal/context   | Doctrine, plan LD-3     | Plugin re-exports public service types                               |
+| Opt-in enforcement               | Migration census, LD-5  | Existing consumers and scaffolds remain unchanged                    |
+| Contract wins over fallback      | Plan LD-6/LD-7          | One resolver informs authentication and authorization                |
+| Optional fails at construction   | Accepted LD-8           | Reject during `createContractAuthorizer()` construction              |
+| Rename proof substitution        | Accepted LD-11          | Metadata follows the procedure; the old SDK key must fail type-check |
 
-## Files Changed
+## Slice 1 Product Ceiling
 
-| Path                                                                      | Status | Notes                                      |
-| ------------------------------------------------------------------------- | ------ | ------------------------------------------ |
-| `.llm/runs/feat-service-principal-procedure-policy--1387/supervisor.md`   | new    | Non-identifying run identity and route     |
-| `.llm/runs/feat-service-principal-procedure-policy--1387/research.md`     | new    | Re-derived evidence and migration analysis |
-| `.llm/runs/feat-service-principal-procedure-policy--1387/plan.md`         | new    | Locked decisions, ceilings, slices, gates  |
-| `.llm/runs/feat-service-principal-procedure-policy--1387/drift.md`        | new    | Append-only deviations/findings            |
-| `.llm/runs/feat-service-principal-procedure-policy--1387/worklog.md`      | new    | Design and base gate evidence              |
-| `.llm/runs/feat-service-principal-procedure-policy--1387/context-pack.md` | new    | Resumable handoff                          |
+All product edits stayed inside the six-file ceiling:
+
+- `packages/contracts/src/domain/procedure-meta.ts`
+- `packages/contracts/tests/procedure-meta_test.ts`
+- `packages/contracts/tests/procedure-meta-independence_test.ts`
+- `packages/contracts/tests/type-fixtures/procedure-meta_type.ts`
+- `packages/sdk/tests/procedure-meta-independence_test.ts`
+- `packages/sdk/tests/type-fixtures/procedure-meta_type.ts`
 
 ## Gates
 
-| Gate family | Current status                    | Evidence                                                        |
-| ----------- | --------------------------------- | --------------------------------------------------------------- |
-| Static      | PASS at base                      | Five-root check/lint/fmt and 371 package tests                  |
-| Fitness     | PASS for contracted gates         | `quality:gate`, export drift, service doc lint, four JSR audits |
-| Runtime     | NOT_RUN                           | Forbidden/no runtime lease                                      |
-| Consumer    | PASS at base / dependency pending | Plugin compile census; #1466 not merged                         |
+| Gate                      | Historical Slice 1 result                                                        |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| Scoped check/lint/fmt     | PASS over contracts and SDK; 114 files, zero findings                            |
+| Contracts + SDK tests     | PASS, 93/93                                                                      |
+| Contracts JSR audit       | PASS; one sanctioned slow-type info                                              |
+| SDK JSR audit             | PASS; only the two known baseline warnings                                       |
+| Export drift              | PASS via the exact `docs:exports-drift` task and durable `docs:accuracy` receipt |
+| Quality gate              | PASS, including architecture and dependency checks                               |
+| Publish dry run           | PASS; full workspace dry run completed                                           |
+| Lock/generated carriers   | PASS; byte-identical / no tracked movement                                       |
+| E2E/Aspire/Docker/browser | NOT_RUN by the explicit no-lease boundary                                        |
 
-## Open Questions
-
-- PLAN-EVAL must explicitly accept LD-8 and LD-11 or return FAIL with a bounded alternative.
+The durable named set is `receipts/evidence-set.json`; it records `SUFFICIENT` for its declared
+automated surface. Tier-A acceptance remains a supervisor judgment, not an author
+self-certification.
 
 ## Drift and Debt
 
-- Drift: branch re-baseline, unmerged dependency, impossible rename wording, missing RTK, base-red
-  candidate gates, and the unrelated post-freeze main advance are recorded in `drift.md`.
-- Debt: no new debt proposed; existing service/plugin/#1278 items are preserved and excluded.
+- RTK remains unavailable on this host; repo-native wrappers and raw read-only Git inspection were
+  used, as recorded in `drift.md`.
+- The gate catalog has no direct `audit-jsr-package` entry. The exact contracts and SDK audit
+  commands were therefore run directly; the durable full publish dry run is the receipt-backed
+  publishability backstop. No gate tooling was changed outside the Slice 1 ceiling.
+- Existing service/plugin/#1278 doctrine debt is preserved and excluded.
 
 ## Commits
 
-- See the draft PR's commit list and phase comments.
+The branch history contains a separate bounded plan-repair commit, a six-file Slice 1 product
+commit, and a following evidence/carrier commit. Treat Git and the draft PR as the authority for
+their identifiers; this context carrier intentionally does not claim that a SHA is eternally
+current.

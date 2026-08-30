@@ -173,8 +173,8 @@ operation summaries.
 
 ## S0 satisfied — #1466 merged, branch rebased, base-gate census re-run
 
-Executed by the features topic supervisor before PLAN-EVAL dispatch. S0 is a **precondition**, not an
-implementation slice; no product code was written.
+Executed by the features topic supervisor before PLAN-EVAL dispatch. S0 is a **precondition**, not
+an implementation slice; no product code was written.
 
 ### S0.1 — #1466 is merged and its vocabulary is on `main`
 
@@ -190,88 +190,89 @@ Verified on `main` directly rather than inferred from merge status:
 ### S0.2 — rebased onto `3e5cbabf`
 
 `89d2afda`, clean, two plan-artifact commits replayed. **Rebase is correct here and was correct to
-refuse on #1731**: this branch carries plan artifacts only, so no receipt, archive or verdict cites a
-SHA that a rebase would rewrite. #1731 had seven archives and eight verdict artifacts addressed by
+refuse on #1731**: this branch carries plan artifacts only, so no receipt, archive or verdict cites
+a SHA that a rebase would rewrite. #1731 had seven archives and eight verdict artifacts addressed by
 content head, which is why it took two `--no-ff` merges instead.
 
 ### S0.3 — base-gate census at `89d2afda` (== `origin/main` `3e5cbabf`)
 
-| Gate | Result |
-| --- | --- |
+| Gate                                             | Result   |
+| ------------------------------------------------ | -------- |
 | `G-CHECK` (contracts, service, plugin, sdk, mcp) | **PASS** |
-| `G-LINT` | **PASS** |
-| `G-FMT` | **PASS** |
-| `G-QUALITY` (`quality:scan` + `arch:check`) | **PASS** |
-| `G-EXPORTS` (`docs:exports-drift`) | **PASS** |
+| `G-LINT`                                         | **PASS** |
+| `G-FMT`                                          | **PASS** |
+| `G-QUALITY` (`quality:scan` + `arch:check`)      | **PASS** |
+| `G-EXPORTS` (`docs:exports-drift`)               | **PASS** |
 
 ### Two contracted baselines moved — a real finding for PLAN-EVAL
 
-| Package | `plan.md` expected | Measured at the rebased base | Δ |
-| --- | --- | --- | --- |
-| contracts | 8 | **16** | **+8** |
-| service | 90 | 90 | — |
-| plugin | 68 | 68 | — |
-| sdk | 69 | **77** | **+8** |
-| mcp | 136 | 136 | — |
+| Package   | `plan.md` expected | Measured at the rebased base | Δ      |
+| --------- | ------------------ | ---------------------------- | ------ |
+| contracts | 8                  | **16**                       | **+8** |
+| service   | 90                 | 90                           | —      |
+| plugin    | 68                 | 68                           | —      |
+| sdk       | 69                 | **77**                       | **+8** |
+| mcp       | 136                | 136                          | —      |
 
 Both movements are attributable to #1466 landing: it added the contracts metadata suite (inference
-probe, assertion-budget cases, runtime storage, doc-JSON independence) and the SDK propagation tests.
-The plan's numbers were measured against `13878a80a` **before** that merge, so they are stale rather
-than wrong — but a plan that contracts `contracts 8` as its baseline would now report a false
+probe, assertion-budget cases, runtime storage, doc-JSON independence) and the SDK propagation
+tests. The plan's numbers were measured against `13878a80a` **before** that merge, so they are stale
+rather than wrong — but a plan that contracts `contracts 8` as its baseline would now report a false
 regression signal on its first slice.
 
 This is precisely what S0 exists to catch, and it is left as a **finding for the PLAN-EVAL to rule
-on** rather than silently patched into the locked plan: amending a PLAN-EVAL-approved plan is not the
-supervisor's to do, and the numbers are the evaluator's to verify independently.
+on** rather than silently patched into the locked plan: amending a PLAN-EVAL-approved plan is not
+the supervisor's to do, and the numbers are the evaluator's to verify independently.
 
 ### Not changed
 
 PR #1762 stays **draft**, `status:plan`, with live `closingIssuesReferences` **`[]`** — a closing
-keyword would incorrectly mark #1387 complete on merge of a plan-only PR. The body wording repaired by
-the coordinator is preserved verbatim.
+keyword would incorrectly mark #1387 complete on merge of a plan-only PR. The body wording repaired
+by the coordinator is preserved verbatim.
 
 ## S0 re-run on `24f6642f` — released for implementation under the accepted adapter boundary
 
-`origin/main` advanced to **`24f6642f040617de573c7cef1140eed1ac0efd6d`** (#1763 / issue #1730 shipped,
-after #1772). Branch rebased onto it: **`0a1e6337`**, clean. Rebase remains correct here — this branch
-carries plan artifacts only, so no receipt, archive or verdict cites a SHA it would rewrite.
+`origin/main` advanced to **`24f6642f040617de573c7cef1140eed1ac0efd6d`** (#1763 / issue #1730
+shipped, after #1772). Branch rebased onto it: **`0a1e6337`**, clean. Rebase remains correct here —
+this branch carries plan artifacts only, so no receipt, archive or verdict cites a SHA it would
+rewrite.
 
-**S0 preconditions re-verified, not assumed:** `packages/contracts/src/public/mod.ts` on `main` exports
-`NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement` and `BaseContractMeta` — the metadata
-shape the research was written against, unchanged.
+**S0 preconditions re-verified, not assumed:** `packages/contracts/src/public/mod.ts` on `main`
+exports `NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement` and `BaseContractMeta` — the
+metadata shape the research was written against, unchanged.
 
-**Base-gate census at `0a1e6337`** — identical to the previous measurement, so the two `main` advances
-since were inert for this leaf's contracted signals:
+**Base-gate census at `0a1e6337`** — identical to the previous measurement, so the two `main`
+advances since were inert for this leaf's contracted signals:
 
-| Package | Measured | `plan.md` row 4 says |
-| --- | --- | --- |
-| contracts | **16** | 8 — **stale (F-1)** |
-| service | 90 | 90 |
-| plugin | 68 | 68 |
-| sdk | **77** | 69 — **stale (F-1)** |
-| mcp | 136 | 136 |
+| Package   | Measured | `plan.md` row 4 says |
+| --------- | -------- | -------------------- |
+| contracts | **16**   | 8 — **stale (F-1)**  |
+| service   | 90       | 90                   |
+| plugin    | 68       | 68                   |
+| sdk       | **77**   | 69 — **stale (F-1)** |
+| mcp       | 136      | 136                  |
 
 The two stale rows are unchanged from what S0 first surfaced and PLAN-EVAL ruled blocking; they are
 repaired by the author in step 1, not silently by the supervisor.
 
-**Release status.** PLAN-EVAL cycle 1 returned `FAIL_PLAN` with five required fixes and **adjudicated
-both flagged decisions ACCEPTED** — LD-11 (router-rename acceptance) and LD-8 (`optional` fails closed
-at binding). The coordinator has released the leaf under that accepted adapter boundary. The design is
-accepted and unchanged; the five fixes are gate-set, ceiling and text corrections only, and the
-evaluator's own re-evaluation scope says a full fresh PLAN-EVAL is **not** required unless design text
-changes.
+**Release status.** PLAN-EVAL cycle 1 returned `FAIL_PLAN` with five required fixes and
+**adjudicated both flagged decisions ACCEPTED** — LD-11 (router-rename acceptance) and LD-8
+(`optional` fails closed at binding). The coordinator has released the leaf under that accepted
+adapter boundary. The design is accepted and unchanged; the five fixes are gate-set, ceiling and
+text corrections only, and the evaluator's own re-evaluation scope says a full fresh PLAN-EVAL is
+**not** required unless design text changes.
 
 ## PLAN-EVAL cycle 1 repair — bounded fixes applied
 
 The implementation author applied only the five corrections required by `plan-eval.md` § Required
 fixes; the accepted design and locked adapter boundary did not change.
 
-- Replaced the stale pre-#1466 test census with contracts 16 / service 90 / plugin 68 / SDK 77 /
-  MCP 136 (387 total) and appended the post-S0 correction to `research.md`.
+- Replaced the stale pre-#1466 test census with contracts 16 / service 90 / plugin 68 / SDK 77 / MCP
+  136 (387 total) and appended the post-S0 correction to `research.md`.
 - Contracted the generated-carrier gates at their staling slices and final readiness, and declared
-  only their named `gen:*` outputs ceiling-exempt. The required base
-  `check:agent-docs-prose` probe passed after building 639 site files and reporting the bundle fresh
-  in 7.33 seconds; tracked Git status remained clean after the probe.
+  only their named `gen:*` outputs ceiling-exempt. The required base `check:agent-docs-prose` probe
+  passed after building 639 site files and reporting the bundle fresh in 7.33 seconds; tracked Git
+  status remained clean after the probe.
 - Added the two signature-only context widenings and `service-rpc.ts` to Slice 2 so Slice 3 remains
   behavior-only inside its ceiling.
 - Recorded the owner-only LD-11 issue-text amendment and implementation-PR substitution rule.
@@ -280,3 +281,58 @@ fixes; the accepted design and locked adapter boundary did not change.
 
 Validation for this plan-only repair: `git diff --check` passed. No product source, generated
 carrier, or `deno.lock` file changed.
+
+## Slice 1 — additive contract metadata type
+
+Slice 1 changed exactly its six-file product ceiling and stopped before Slice 2. The implementation
+extends the existing `NetScriptProcedureMeta.access` object with optional readonly
+`authorization.scopes` and `authorization.roles`. It adds no enforcement, exported parallel policy
+symbol, or second metadata vocabulary.
+
+### Type and independence proofs
+
+- The contracts runtime test stores and retrieves both authorization arrays through oRPC metadata.
+- The contracts type fixture accepts readonly scopes/roles, rejects a parallel `public` policy, and
+  proves the declared arrays cannot be mutated.
+- The SDK type fixture renames the procedure to `renamedList`, proves the metadata survives the
+  rename, and marks the former `list` key as an expected type error.
+- Contracts and SDK doc-JSON independence tests require the declared exported symbol and its
+  `authorization`, `scopes`, and `roles` fields while retaining the no-oRPC/npm leakage assertions.
+- An exploratory doc-JSON assertion initially selected a name reference rather than the declaration;
+  requiring a node with declarations corrected the test helper without changing product scope.
+
+The product commit is `2ddd60481217f0931ea8f96228d213f10be12a9f`. All durable receipts below attest
+that exact content head, with `gitHead == actualGitHead`.
+
+### Named Slice 1 evidence
+
+| Gate / proof   | Exact command or method                                      | Result                                            | Receipt evidence                                               |
+| -------------- | ------------------------------------------------------------ | ------------------------------------------------- | -------------------------------------------------------------- |
+| Scoped check   | `deno task check --include ^packages/(contracts\|sdk)/`      | PASS, 114 files / 0 diagnostics                   | 2,074 ms; structured batch output                              |
+| Scoped lint    | `deno task lint --include ^packages/(contracts\|sdk)/`       | PASS, 114 files / 0 findings                      | 648 ms; structured findings output                             |
+| Scoped format  | `deno task fmt:check --include ^packages/(contracts\|sdk)/`  | PASS, 114 files / 0 findings                      | 499 ms; structured findings output                             |
+| Package tests  | `deno task test packages/contracts/tests packages/sdk/tests` | PASS, 93/93                                       | 4,665 ms; structured test summary                              |
+| Export drift   | `deno task docs:exports-drift`                               | PASS, contracts and SDK coverage current          | Exact direct task plus `docs:accuracy` receipt, 4,460 ms       |
+| Contracts JSR  | `audit-jsr-package.ts --root packages/contracts`             | PASS; four exports, one sanctioned slow-type info | Exact package audit output                                     |
+| SDK JSR        | `audit-jsr-package.ts --root packages/sdk`                   | PASS; 12 exports, two known baseline warnings     | Exact package audit output                                     |
+| Quality        | `deno task quality:gate`                                     | PASS                                              | 7,468 ms; quality, architecture, and dependency work in output |
+| Publishability | `deno task publish:dry-run`                                  | PASS                                              | 27,863 ms; full package listing and `Dry run complete`         |
+
+The runner catalog does not expose `audit-jsr-package` as a gate ID. The two plan-contracted package
+audits therefore ran as exact direct commands; the receipt-backed full publish dry run supplies the
+durable publishability backstop. Changing the runner catalog would have breached the Slice 1 file
+ceiling, so no gate tooling was modified.
+
+`receipts/evidence-set.json` was recomputed over the seven named durable receipts only and is
+`SUFFICIENT` with no reasons. Receipt verification used exact `argv`, positive `durationMs`, and
+each receipt's own work output; exit code alone was not treated as evidence.
+
+### Integrity and stop
+
+- `deno.lock` remained byte-identical at
+  `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+- The MCP export corpus, every `PUBLISH_ASSET_OUTPUTS` path, agent-docs prose/provenance, and
+  generated asset barrels had no tracked movement from the content head.
+- E2E, Aspire, Docker, and browser gates were not run; no runtime lease was held.
+- Slice 1 is awaiting substantive supervisor Tier-A review. The implementation author has not
+  self-certified Tier-A acceptance and has not started Slice 2.
