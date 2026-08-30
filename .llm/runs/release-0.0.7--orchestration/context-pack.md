@@ -1265,9 +1265,10 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Live continuation — re-intake complete; #1734 owner boundary
 
-- Central scope is validator-green at 103 inventory records, 93 active/committed issues, and waves
-  0–18 after formally admitting the Aspire epic/slices, #1730, #1732, #1734, #1737, and #1280 plus
-  recording the six closed/stale milestone omissions. Canonical lane ownership remains exactly
+- Central scope is validator-green at 107 inventory records, 97 active/committed issues, and waves
+  0–19 after formally admitting the Aspire epic/slices, #1730, #1732, #1734, #1737, and #1280 plus
+  the restart-discovered tooling fixes #1750/#1751/#1753, ready docs slice #1000, and the six
+  closed/stale milestone omissions. Canonical lane ownership remains exactly
   docs/internals/fixes/features; Aspire is a parallel execution sub-orchestrator, not a fifth
   central ownership lane.
 - Canary `0.0.7-canary.3` is a terminal green OIDC/publication + published-CLI E2E pair at content
@@ -1290,7 +1291,8 @@ continues concurrently because serial ordering is per orchestrator, not global.
   factual route-identity correction complete and final IMPL-EVAL active; #1739 is at `61b8bf52` under
   independent Fable 5/medium IMPL-EVAL; #1732/#1747 implemented the bounded repair at `6e82aad1`
   while #1734 stays parked; #1746 is ready with unchanged-head CI rerunning and #1748 is under
-  exact-head evaluation; Aspire S6 is at `564d465c` with its restored 13.5.3 consumer check green.
+  exact-head evaluation; Aspire S6 is at `564d465c` with its restored 13.5.3 consumer check and
+  phase-A IMPL-EVAL cycle 2 green.
 - Aspire S5's only exact-head `scaffold.runtime` lease is terminal: 26 passed / 1 known baseline
   failure from #1734, before AppHost startup. Its run-owned resources were cleaned, Aspire and DinD
   are both zero, and the expensive gate must not be retried. No Phase-B runtime lease begins until
@@ -1299,3 +1301,32 @@ continues concurrently because serial ordering is per orchestrator, not global.
   kernel rejects new inotify instances with `Too many open files`; the supervisor processes remain
   healthy. Use sparse explicit checkpoints until infrastructure raises or frees the shared quota,
   and do not kill foreign/unknown-owner sessions. A proven stale S5 `tail -f` monitor was stopped.
+- The prepared S3 Phase-B lease was released unused when the same inotify ceiling surfaced in S6's
+  restore. Its clean worktree remains at `fe4f496b`, but no runtime resource was started. Aspire
+  advances S8 statically; all Phase-B leases stay parked until infrastructure repairs the quota.
+
+## Live continuation — first post-restart terminals at 2026-08-30T09:17:00Z
+
+- Features #1731 slice 1 is terminal `PASS` in fresh Fable 5/medium IMPL-EVAL artifact head
+  `ff4e81cc`; product head remains `42874803`. The repaired host root suite is now genuinely green
+  at 4,250 passed / 0 failed / 19 ignored. PR and issue are `status:impl-eval`, the body is partial
+  with `Refs #1466`, and readiness remains withheld. Continue the same leaf through slice 2 (G-1),
+  slice 3 (G-4), and a final all-slices IMPL-EVAL before #1387.
+- Fixes #1739 cycle 1 is terminal `FAIL_FIX` at `61b8bf52`: doctor false-fails the healthy AI
+  skill-loader exclusion because it compares a manifest walk with a generator-selected registry.
+  The coordinator approved a generic optional inspection protocol at the process adapter boundary,
+  five named additional paths, and one focused PLAN-EVAL because the contract is architectural.
+- Internals #1747 is clean at evidence head `6605625a`; the product commits remain immutable. A
+  post-tini root measurement found two main-equal baseline reds, so the gate table must replace the
+  obsolete not-fired host claim before final Tier-A and the separate IMPL-EVAL.
+- Docs #1746 (`84a5fd11`) and #1748 (`22e79dcc`) are exact-head IMPL-EVAL PASS, unchanged-head CI
+  green, review-thread clean, ready/CLEAN, and await human merge. #1000 is normalized into 0.0.7;
+  parent #1723 remains open and source-blocked until the Aspire implementation slices land.
+- Aspire S6 phase A is PASS; S8 static thread `01a051e6-90d4-7e50-a91e-ac4bd23b880c` is active.
+  S3 Phase B remains prepared but unstarted. PID 1 is tini, zombies 0, Aspire 0, DinD 0; inotify is
+  the only current host quota blocker for Phase B.
+- Owner infrastructure update re-proved `netscript-dind` at `10.4.12.16`, project mise
+  `DOCKER_HOST=tcp://netscript-dind:2375`, and responding client/server 27.5.1. The below-28 Aspire
+  doctor result is warning-only and must not block Docker/Aspire dispatch. A fresh focused lifecycle
+  smoke again passed 13/13 with tini and zero zombies; this correction was queued to all five
+  supervisors. Only the independent inotify-instance quota can hold Phase B.

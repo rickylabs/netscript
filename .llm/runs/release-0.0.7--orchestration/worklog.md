@@ -2228,3 +2228,47 @@
   and the first actual Docker 27.5.1 remote-DinD compatibility probe, followed by exact owned stop,
   leak-check, teardown, and zero postconditions. S6 evaluation remains static and does not consume
   the runtime lease.
+- Released that S3 grant unused before dispatch when S6's terminal phase-A evaluator disclosed that
+  `aspire restore` had reached the shared kernel's inotify-instance ceiling (`128`). The clean S3
+  worktree exists at `fe4f496b`, but no author, AppHost, Aspire process, or container started and
+  zero/zero remained true. S6 phase A itself passed in separate session
+  `988f2cdc-6c86-4b64-ad56-4fdab8d1c989`; Aspire continues non-runtime S8 work while Phase B waits
+  for an infrastructure quota repair.
+- Filed and atomically admitted three reproduced false-positive/tooling defects into the 0.0.7
+  internals queue: #1750 accepts or corrects the documented Claude-hybrid task separator, #1751
+  repairs stale sender lease recovery plus exit-zero rejected steering, and #1753 makes milestone
+  validation detect missing/stale live PR leaves. Docs also normalized #1000 into 0.0.7 because
+  ready/CLEAN PR #1748 closes it. The central inventory is now 107 records / 97
+  active committed issues across waves 0–19; none of these tooling leaves blocks feature/fix/docs
+  shipping or a meaningful canary.
+
+## 2026-08-30T09:17:00Z — slice terminals, truthful baselines, and continuing dispatch
+
+- #1731 slice 1 reached fresh Fable 5/medium IMPL-EVAL `PASS` at artifact head `ff4e81cc`, product
+  head `42874803`. Re-ran the formerly skipped root suite after tini: 4,250 passed / 0 failed / 19
+  ignored. Removed the premature closing keyword, aligned PR/issue to `status:impl-eval`, and held
+  readiness because slices 2–3 remain not run. Features continues slice 2 then slice 3 before the
+  final all-slices evaluator; #1387 stays queued.
+- #1739 IMPL-EVAL cycle 1 returned `FAIL_FIX`; an independent doctrine audit confirmed its F1. The
+  coordinator authorized the generic generator inspection protocol boundary and exact five-path
+  ceiling expansion, retained a focused architectural PLAN-EVAL, and forbade manifest-exclude or
+  CLI-copied AI-policy shortcuts. This is failure 1 of 2, so no owner escalation is due.
+- #1747 advanced through product/grammar/evidence heads to `6605625a`. Fresh post-tini root
+  measurement produced the same two failures at main and leaf; internals is correcting the old host
+  attribution before final Tier-A and IMPL-EVAL rather than laundering or retrying product code.
+- #1746 and #1748 are exact-head PASS, CI green, thread-clean, ready/CLEAN human handoffs. Docs
+  normalized #1000 into 0.0.7 and kept parent #1723 open for remaining S11 scope. The docs topic
+  ledger is pushed at `b35420ee`; its remaining assigned work is genuinely source-blocked, not an
+  orchestrator idle.
+
+## 2026-08-30T09:20:00Z — Docker sandbox authority re-proved and propagated
+
+- Re-proved host resolution `netscript-dind -> 10.4.12.16`, project-local
+  `DOCKER_HOST=tcp://netscript-dind:2375`, and responding Docker client/server 27.5.1. The Aspire
+  doctor minimum-version warning is warning-only; it is not a Docker or Aspire dispatch blocker.
+- Re-ran the exact focused lifecycle smoke after the owner infrastructure update:
+  `codex-follow_test.ts` plus `hybrid-launcher_test.ts` passed 13/13 in 888 ms with PID 1 `tini` and
+  zombie count zero. Propagated this authority to features, fixes, internals, docs, and Aspire so
+  every formerly host-waived gate is rerun or truthfully reclassified from fresh evidence.
+- Aspire and DinD container counts remain zero. Phase-B remains parked only on the separately
+  reproduced shared inotify-instance ceiling; Docker 27.5.1 is no longer an inferred blocker.

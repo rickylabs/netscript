@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-29T10:35:00.000Z",
+  "capturedAt": "2026-08-30T09:12:00.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
   "sources": {
@@ -1150,6 +1150,53 @@
       "admissionPredicate": "high-value-coherent",
       "targetMilestone": "0.0.7",
       "movedAt": "2026-08-29T22:55:56.000Z"
+    },
+    {
+      "number": 1750,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "The documented Claude hybrid launch command is rejected by the checked-in parser and blocked restart recovery before child creation.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1750"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T09:11:00.000Z"
+    },
+    {
+      "number": 1751,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Stale sender ownership and exit-zero resume rejection repeatedly blocked active 0.0.7 lanes after the maintenance restart.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1751"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T09:11:00.000Z"
+    },
+    {
+      "number": 1753,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "The milestone validator passed while live allocated PR leaves were missing or stale, producing false zero lane activity.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1753"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T09:12:00.000Z"
+    },
+    {
+      "number": 1000,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "PR #1748 closes this bounded Aspire terminology slice; docs normalized it into 0.0.7 before the exact-head ready handoff.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1000",
+        "https://github.com/rickylabs/netscript/pull/1748"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T09:12:09.000Z"
     }
   ]
 }

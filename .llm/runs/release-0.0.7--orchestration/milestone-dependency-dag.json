@@ -653,6 +653,34 @@
       "issueNumber": 1737,
       "lane": "fixes",
       "title": "fix(cli/skills): remove Claude-only help paths from shipped skill bodies"
+    },
+    {
+      "id": "issue:1000",
+      "kind": "issue",
+      "issueNumber": 1000,
+      "lane": "docs",
+      "title": "docs: normalize .NET Aspire terminology across public surfaces"
+    },
+    {
+      "id": "issue:1750",
+      "kind": "issue",
+      "issueNumber": 1750,
+      "lane": "internals",
+      "title": "fix(agentic): accept the documented task separator in the Claude hybrid launcher"
+    },
+    {
+      "id": "issue:1751",
+      "kind": "issue",
+      "issueNumber": 1751,
+      "lane": "internals",
+      "title": "fix(agentic): recover stale sender leases and propagate resume rejection"
+    },
+    {
+      "id": "issue:1753",
+      "kind": "issue",
+      "issueNumber": 1753,
+      "lane": "internals",
+      "title": "fix(harness): detect live milestone PR leaves missing or stale in cluster state"
     }
   ],
   "edges": [
@@ -662,6 +690,14 @@
       "kind": "rfc-prerequisite",
       "evidence": [
         "RFC 0001 Stage 0 (#1348) must accept the RFC and align #1349-#1353 bodies before Stage 1a implements; rfcs/0001-sdk-client-contributions.md:1273-1274."
+      ]
+    },
+    {
+      "from": "issue:1000",
+      "to": "issue:1723",
+      "kind": "requires",
+      "evidence": [
+        "PR #1748 completes the terminology slice #1000 while #1723 retains the remaining Aspire S11 documentation scope."
       ]
     },
     {
@@ -1214,6 +1250,7 @@
     {
       "index": 15,
       "nodeIds": [
+        "issue:1000",
         "issue:1721",
         "issue:1722"
       ]
@@ -1229,6 +1266,14 @@
     {
       "index": 18,
       "nodeIds": ["issue:1712"]
+    },
+    {
+      "index": 19,
+      "nodeIds": [
+        "issue:1750",
+        "issue:1751",
+        "issue:1753"
+      ]
     }
   ]
 }

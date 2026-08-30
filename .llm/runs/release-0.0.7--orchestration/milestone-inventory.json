@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-29T10:35:00.000Z",
+  "capturedAt": "2026-08-30T09:12:00.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
-  "targetIssueCount": 103,
+  "targetIssueCount": 107,
   "issues": [
     {
       "number": 1093,
@@ -1199,6 +1199,46 @@
       "evidence": [
         "https://github.com/rickylabs/netscript/issues/1737",
         "PR #1746 explicitly excludes this shipped-skill source/barrel correction; it needs its own leaf."
+      ]
+    },
+    {
+      "number": 1750,
+      "title": "fix(agentic): accept the documented task separator in the Claude hybrid launcher",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1750",
+        "Maintenance recovery reproduced unknown argument before Claude child creation; no orphan was left."
+      ]
+    },
+    {
+      "number": 1751,
+      "title": "fix(agentic): recover stale sender leases and propagate resume rejection",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1751",
+        "Features and fixes both reproduced stale ownership or exit-zero rejected delivery after restart."
+      ]
+    },
+    {
+      "number": 1753,
+      "title": "fix(harness): detect live milestone PR leaves missing or stale in cluster state",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1753",
+        "Central validation was green while #1739/#1746/#1748 were absent and five recorded PR heads were stale."
+      ]
+    },
+    {
+      "number": 1000,
+      "title": "docs: normalize .NET Aspire terminology across public surfaces",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1000",
+        "PR #1748 is exact-head IMPL-EVAL PASS, CI green, ready/CLEAN, and carries the closing keyword."
       ]
     }
   ]

@@ -33,6 +33,15 @@
       "mainSha": "13878a80a50c55b9662099fed64555f2310ae4a3",
       "dockerContainers": 0,
       "aspireApplications": 0,
+      "dockerSandbox": {
+        "verifiedAt": "2026-08-30T09:20:00.000Z",
+        "host": "tcp://netscript-dind:2375",
+        "resolvedAddress": "10.4.12.16",
+        "clientVersion": "27.5.1",
+        "serverVersion": "27.5.1",
+        "state": "operational",
+        "aspireDoctorBelow28Disposition": "warning_only_not_a_dispatch_blocker"
+      },
       "supervisorDisposition": "five fresh Remote Control supervisors launched; pre-restart tmux sessions remain historical",
       "launcherDrift": "the documented extra task separator is currently forwarded to hybrid-launcher and rejected; successful launch omits that separator"
     },
@@ -78,7 +87,7 @@
       "pid": 5530,
       "bridgeSessionId": "session_01Jusn3woxeK5xhCdj6ccooR",
       "remoteControlUrl": "https://claude.ai/code/session_01Jusn3woxeK5xhCdj6ccooR",
-      "topicHeadSha": "fd0bd9276fcc2960a025a9c309bbb9595ee7a2f6",
+      "topicHeadSha": "eb237c1cf9fcb7063f7652bb665d3fa59a7ecfe4",
       "tmuxSession": "netscript-007-aspire-r2",
       "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z"
     },
@@ -175,7 +184,7 @@
       "orchestratorAgentId": "topic-docs-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "restart_reconciled_pr1746_pr1748_exact_head_gates_active",
+        "state": "pr1746_pr1748_ready_clean_human_handoff_1723_source_blocked",
         "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
         "branch": "orchestrator/release-0.0.7-docs",
         "requestedModel": "claude-opus-5",
@@ -188,8 +197,8 @@
         "pid": 5519,
         "bridgeSessionId": "session_016g86jW5sMJE9z9EHHGPByH",
         "remoteControlUrl": "https://claude.ai/code/session_016g86jW5sMJE9z9EHHGPByH",
-        "topicHeadSha": "5160a46cef8d88331efc40375b7712b6dd09e3f9",
-        "queueState": "1746_exact_head_impl_eval_and_review_thread_gate; 1748_exact_head_evidence_reconciliation; later_docs_serially",
+        "topicHeadSha": "b35420eed07046f197a47766be7411832a85a39c",
+        "queueState": "1746_and_1748_exact_head_pass_ci_green_ready_clean_await_human_merge; 1723_remaining_s11_blocked_until_aspire_s1_s10_land",
         "tmuxSession": "netscript-007-docs-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
@@ -198,6 +207,7 @@
         "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
       },
       "issueNumbers": [
+        1000,
         1551,
         1723,
         1745
@@ -221,7 +231,7 @@
         "pid": 5498,
         "bridgeSessionId": "session_01AQCc1qsArwb7CPELZwYDfq",
         "remoteControlUrl": "https://claude.ai/code/session_01AQCc1qsArwb7CPELZwYDfq",
-        "topicHeadSha": "52e94cad5876c598e6f45442eed472e7dff12d9c",
+        "topicHeadSha": "9ec7ce94bd8000cd03c90290d6f7e6c08883105f",
         "queueState": "1734_pr1736_parked_after_second_terminal_impl_eval_failure; 1732_pr1747_implementation_at_6e82aad1_then_tier_a_and_impl_eval; later_internals_continue",
         "tmuxSession": "netscript-007-internals-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
@@ -322,7 +332,10 @@
         1722,
         1724,
         1732,
-        1734
+        1734,
+        1750,
+        1751,
+        1753
       ]
     },
     {
@@ -330,7 +343,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "pr1739_exact_head_impl_eval_active",
+        "state": "pr1739_cycle_1_fail_fix_bounded_inspection_protocol_plan_active",
         "worktree": "/home/agent/projects/netscript/worktrees/007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -343,8 +356,8 @@
         "pid": 5501,
         "bridgeSessionId": "session_011PR3tqPTHXX7P8LBRywQRH",
         "remoteControlUrl": "https://claude.ai/code/session_011PR3tqPTHXX7P8LBRywQRH",
-        "topicHeadSha": "9b86b54cba97b266b775e0603c0df636d364f6dd",
-        "queueState": "1673_pr1739_exact_head_61b8bf52_under_fable_5_medium_impl_eval; later_fixes_serially",
+        "topicHeadSha": "0b05707430e2d6848809b93860c85fa141c257aa",
+        "queueState": "1673_pr1739_cycle_1_fail_fix_generic_generator_inspection_protocol_plan_and_focused_plan_eval; 1462_queued",
         "tmuxSession": "netscript-007-fixes-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
@@ -444,7 +457,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "pr1731_exact_head_cycle_5_evidence_correction_and_tier_a_active",
+        "state": "pr1731_slice_1_pass_root_test_green_slice_2_dispatch_active",
         "worktree": "/home/agent/projects/netscript/worktrees/007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -457,8 +470,8 @@
         "pid": 5495,
         "bridgeSessionId": "session_01CHWTWUvxjEkHB7TCav7G2H",
         "remoteControlUrl": "https://claude.ai/code/session_01CHWTWUvxjEkHB7TCav7G2H",
-        "topicHeadSha": "2453bdffee33760127c44bdb1d7a294295e867bc",
-        "queueState": "1466_pr1731_exact_head_369928cf_under_final_impl_eval; 1387_then_1730_serially",
+        "topicHeadSha": "e4e71a0804d5cb65704a27eeecca620b20432825",
+        "queueState": "1466_pr1731_slice_1_pass_at_ff4e81cc_then_slice_2_slice_3_and_final_all_slices_impl_eval; 1387_then_1730_after_truthful_1466_handoff",
         "tmuxSession": "netscript-007-features-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
@@ -513,6 +526,10 @@
     }
   ],
   "committedIssues": [
+    {
+      "number": 1000,
+      "state": "open"
+    },
     {
       "number": 1093,
       "state": "open"
@@ -885,6 +902,18 @@
     },
     {
       "number": 1737,
+      "state": "open"
+    },
+    {
+      "number": 1750,
+      "state": "open"
+    },
+    {
+      "number": 1751,
+      "state": "open"
+    },
+    {
+      "number": 1753,
       "state": "open"
     }
   ],
@@ -2977,18 +3006,20 @@
     {
       "id": "sdk-procedure-meta",
       "lane": "features",
-      "phase": "evaluating",
+      "phase": "implementing",
       "baseBranch": "main",
-      "headSha": "369928cf7ca7125fd6e8e94b4975f29fa187e400",
-      "currentPrHeadSha": "369928cf7ca7125fd6e8e94b4975f29fa187e400",
+      "headSha": "ff4e81cc1eea2145c4ba7edaa54c7a45714a4de7",
+      "currentPrHeadSha": "ff4e81cc1eea2145c4ba7edaa54c7a45714a4de7",
+      "productHeadSha": "42874803",
       "issueNumbers": [1466],
       "branch": "feat/sdk-procedure-meta",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
       "prNumber": 1731,
       "planEvaluationState": "risk_selected_after_fresh_tier_a",
       "selectionReason": "complex public cross-consumer procedure metadata and error vocabulary boundary",
-      "implementationState": "bounded product repair complete; evidence-only route-identity correction committed with product content unchanged; final separate-session IMPL-EVAL active",
-      "nextGate": "terminal IMPL-EVAL, then correct stale PR/issue phase metadata and rebaseline the skipped root-test receipt now that tini lifecycle is healthy before readiness"
+      "implementationState": "slice 1 separate-session IMPL-EVAL cycle 2 PASS; post-tini root test rerun green at 4250 passed / 0 failed / 19 ignored; PR and issue truthfully partial with no closing keyword",
+      "implementationEvaluationState": "slice_1_pass_cycle_2",
+      "nextGate": "evidence-only reconciliation, then implement slice 2 with G-1 and slice 3 with G-4, each under Tier-A, followed by one final all-slices separate-session IMPL-EVAL and close-gate"
     },
     {
       "id": "fresh-readonly-dehydrated-state",
@@ -3022,10 +3053,12 @@
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1673",
       "prNumber": 1739,
       "implementationState": "bounded two-file product repair and supervisor Tier-A PASS; exact-head evaluator artifact committed",
-      "implementationEvaluationState": "cycle_1_active",
+      "implementationEvaluationState": "cycle_1_fail_fix_bounded_repair_active",
       "implementationEvaluatorSessionId": "9db66b8a-b7f2-47f9-b3d4-ef8e53c2d7e2",
       "implementationEvaluatorBridgeSessionId": "cse_01NKoRnBpTaUJWVJZcGeK3Zc",
-      "nextGate": "terminal Fable 5 medium IMPL-EVAL verdict, exact-head CI/readiness, then next fixes issue"
+      "implementationEvaluationVerdict": "FAIL_FIX",
+      "blockingFinding": "doctor compares manifest discovery while the AI generator intentionally selects a narrower source-shape set, so skill-loader.ts false-fails a healthy generated project",
+      "nextGate": "focused PLAN-EVAL of the coordinator-approved generic inspection protocol boundary, bounded implementation, fresh Tier-A, then IMPL-EVAL cycle 2"
     },
     {
       "id": "agentic-cross-host-skills-docs",
@@ -3038,22 +3071,23 @@
       "branch": "docs/agentic-cross-host-skills",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1745",
       "prNumber": 1746,
-      "implementationState": "exact-head IMPL-EVAL PASS, unanswered review threads zero, ready-merge taxonomy applied, unchanged-head CI rerun active",
-      "nextGate": "confirm unchanged-head CI terminal green and hand off for human merge"
+      "implementationState": "exact-head IMPL-EVAL PASS, unanswered review threads zero, unchanged-head CI success, ready/CLEAN",
+      "nextGate": "human merge"
     },
     {
       "id": "aspire-terminology-sweep",
       "lane": "docs",
-      "phase": "evaluating",
+      "phase": "ready",
       "baseBranch": "main",
       "headSha": "22e79dccf5f7cc8bb766d9eb1bd11d5bd8c9e525",
       "currentPrHeadSha": "22e79dccf5f7cc8bb766d9eb1bd11d5bd8c9e525",
-      "issueNumbers": [1723],
+      "issueNumbers": [1000],
+      "parentIssueNumbers": [1723],
       "branch": "docs/aspire-terminology-sweep",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1723a",
       "prNumber": 1748,
-      "implementationState": "bounded prose repair and derived asset regeneration complete at exact remote head; separate IMPL-EVAL active",
-      "nextGate": "terminal IMPL-EVAL, taxonomy/readiness alignment, exact-head CI, then human merge handoff"
+      "implementationState": "fresh exact-head IMPL-EVAL PASS, close-gate/check-test/quality success at unchanged head, closing issue #1000 normalized to 0.0.7, ready/CLEAN",
+      "nextGate": "human merge; parent #1723 remains open for the rest of Aspire S11"
     },
     {
       "id": "aspire-13-5-s1-pin-parity",
@@ -3113,16 +3147,16 @@
       "lane": "internals",
       "phase": "implementing",
       "baseBranch": "main",
-      "headSha": "6e82aad1d4e0f4e14a5e4d6ed1395b6169505099",
-      "currentPrHeadSha": "6e82aad1d4e0f4e14a5e4d6ed1395b6169505099",
+      "headSha": "6605625ab50850da40e71b6f0a77bb704c675751",
+      "currentPrHeadSha": "6605625ab50850da40e71b6f0a77bb704c675751",
       "issueNumbers": [1732],
       "branch": "fix/aspire-reference-name-validation",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1732",
       "prNumber": 1747,
-      "implementationState": "two PLAN-EVAL cycles exhausted; bounded F1/F2 repair implemented and pushed at exact head 6e82aad1",
+      "implementationState": "bounded source-safety and grammar repair complete; exact-head evidence committed at 6605625a; post-tini root test measured identical two baseline reds on main and leaf",
       "planEvaluationState": "cycle_2_fail_fix_no_cycle_3",
       "planEvaluationArtifactHeadSha": "e3f227c2151dcde3db0599af6dd37c61cbd76ba9",
-      "nextGate": "fresh internals Tier-A and exact-head receipts, then one separate-session IMPL-EVAL without a third PLAN-EVAL"
+      "nextGate": "update the gate table with measured baseline attribution, fresh internals Tier-A, then one separate-session IMPL-EVAL without a third PLAN-EVAL"
     },
     {
       "id": "aspire-13-5-s5-literal-ports",
@@ -3150,8 +3184,10 @@
       "branch": "feat/aspire-13-5-s6-health-checks",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s6",
       "prNumber": 1743,
-      "implementationState": "static Tier-A green and restored Aspire 13.5.3 consumer typecheck proves only two disclosed baseline zod errors; separate IMPL-EVAL active",
-      "nextGate": "finish separate IMPL-EVAL; after S5 lands rebase/retarget direct-to-main, then separately leased Phase-B runtime receipts"
+      "implementationState": "static Tier-A and separate-session IMPL-EVAL cycle 2 PASS at exact head 564d465c; restored Aspire 13.5.3 consumer typecheck proves only two disclosed baseline zod errors",
+      "implementationEvaluationState": "phase_a_pass_cycle_2",
+      "implementationEvaluatorSessionId": "988f2cdc-6c86-4b64-ad56-4fdab8d1c989",
+      "nextGate": "after S5 lands rebase/retarget direct-to-main, then separately leased Phase-B runtime receipts after the shared inotify-instance ceiling is repaired"
     },
     {
       "id": "aspire-13-5-s7-teardown-leak-check",
@@ -4584,7 +4620,7 @@
     },
     {
       "id": "aspire-13-5-s3-phase-b-runtime",
-      "state": "granted_dispatching",
+      "state": "released_unused_inotify_blocked",
       "lane": "aspire-research",
       "leafId": "aspire-13-5-s3-fixture-recapture",
       "gateId": "s3_phase_b_telemetry_capture",
@@ -4601,7 +4637,16 @@
         "aspireApplications": 0,
         "otherLeaseOwners": 0
       },
-      "cleanupRequired": true
+      "cleanupRequired": true,
+      "releasedAt": "2026-08-30T09:02:00.000Z",
+      "verdict": "NOT_STARTED_INFRASTRUCTURE_BLOCKED",
+      "blocker": "shared kernel fs.inotify.max_user_instances=128 rejects new watchers; S6 restore and watch-run.ts reproduced the ceiling before S3 runtime dispatch",
+      "cleanup": {
+        "aspirePostcondition": "empty",
+        "dockerPostcondition": "empty",
+        "survivors": 0,
+        "runtimeStarted": false
+      }
     }
   ],
   "canaryCheckpoints": [
@@ -4737,5 +4782,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-08-30T08:46:38.000Z"
   },
-  "updatedAt": "2026-08-30T09:00:07.000Z"
+  "updatedAt": "2026-08-30T09:20:00.000Z"
 }
