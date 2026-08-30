@@ -1358,3 +1358,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
   processes are all zero.
 - #1754 owns both #1720 and admitted #863 in features wave 14 after #1718. #1755/#1749 is docs wave
   11 after #1745. Serial queues remain per topic and neither admission creates a global barrier.
+
+## Live continuation — five closure handoffs; no global queue barrier
+
+- Human merge queue: #1746@`84a5fd11` closes #1745; #1748@`22e79dcc` closes #1000;
+  #1747@`c1e03922` closes #1732; #1735@`fffbb0c4` closes #1714; #1755@`2c844565` closes
+  #1749. All five are non-draft/CLEAN with independent exact-head PASS, terminal required checks,
+  close/acceptance gates, and zero unanswered current review threads. #1714's stale label was
+  normalized to `status:ready-merge`; #1755's last check-test rerun passed.
+- Active independent queues: #1731 slice 3 -> final all-slices IMPL-EVAL; #1739 remaining host slice
+  -> exact gates/IMPL-EVAL; #1533 bounded first PLAN-EVAL amendment -> implementation; docs next leaf
+  source verification; Aspire S8 static completion -> Tier-A/IMPL-EVAL. Serial ordering is local to
+  each supervisor only.
+- Runtime authority is still zero (`aspire ps []`, Docker 0, exact runtime processes 0). Ignore the
+  retired inotify=128 wording still visible in an older S8 process argv: the same thread was steered
+  with the authoritative 1024 quota, Docker 28.5.2 DinD, and tini lifecycle proof. D-42/D-43 remain
+  the only current NAS Phase-B topology block.
+- #1734 remains parked pending the owner's explicit authorization for its third and final bounded
+  correction/evaluation cycle. This does not pause any other topic.
