@@ -15,7 +15,8 @@
 Baseline is exactly S3 head `fe4f496bd`. Required issues, comments, S2 V6/V7 receipts, current
 teardown code/tests, playbook, and harness/doctrine instructions have been read. Slice 1 has a
 durable, assertion-level RED receipt. Descendant discovery/classification is implemented and its
-focused suite is green. The explicit persistent-resource force gate is implemented and green.
+focused suite is green. The force gate and bounded DCP-helper/orphan confirmation are implemented
+and green.
 
 ## Completed
 
@@ -27,15 +28,19 @@ focused suite is green. The explicit persistent-resource force gate is implement
 - Positive path ownership, foreign worktree reporting, and both Aspire MCP command guards.
 - Dry-run `plannedCommands` plus force execution only after apply, explicit flag, positive AppHost
   ownership, scoped-stop success, and PID confirmation.
+- Six 500 ms confirmation probes (2.5 s total) derived from S2 V6's 385 ms observation; associated
+  helpers time out to escalation without a kill.
+- Aged standalone orphans require an OK AppHost census, positive path ownership, and stable PID
+  identity before one targeted TERM; young/ambiguous rows escalate.
 
 ## In Progress
 
-- Slice 3 commit/push and PR evidence comment.
+- Slice 4 commit/push and PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push slice 3 and post its evidence.
-2. Implement DCP-helper post-stop confirmation.
+1. Commit/push slice 4 and post its evidence.
+2. Update the playbook, regenerate assets, and run the complete Phase-A gate set.
 
 ## Key Decisions
 
@@ -46,21 +51,21 @@ focused suite is green. The explicit persistent-resource force gate is implement
 
 ## Files Changed
 
-| Path                                                                 | Status  | Notes                                              |
-| -------------------------------------------------------------------- | ------- | -------------------------------------------------- |
-| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/`            | new     | Harness state and evidence.                        |
-| `.llm/tools/agentic/teardown/{ports,probes,ownership,leak-check}.ts` | changed | Process discovery, evidence, ownership, reporting. |
-| `.llm/tools/agentic/teardown/*_test.ts`                              | changed | Versioned/foreign/MCP/process safety regressions.  |
-| `.llm/tools/agentic/teardown/teardown.ts`                            | changed | Explicit force-persistent plan and execution gate. |
+| Path                                                                 | Status  | Notes                                                             |
+| -------------------------------------------------------------------- | ------- | ----------------------------------------------------------------- |
+| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/`            | new     | Harness state and evidence.                                       |
+| `.llm/tools/agentic/teardown/{ports,probes,ownership,leak-check}.ts` | changed | Process discovery, evidence, ownership, reporting.                |
+| `.llm/tools/agentic/teardown/*_test.ts`                              | changed | Versioned/foreign/MCP/process safety regressions.                 |
+| `.llm/tools/agentic/teardown/teardown.ts`                            | changed | Force gate, bounded helper confirmation, targeted orphan cleanup. |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                 |
-| ----------- | -------------- | -------------------------------------------------------- |
-| Static      | NOT_RUN        | planned after implementation                             |
-| Fitness     | NOT_RUN        | planned quality/architecture gates                       |
-| Runtime     | Slice 3 PASS   | `receipts/03-force-persistent.json`: 36 passed, 0 failed |
-| Consumer    | NOT_RUN        | assets barrel in slice 5                                 |
+| Gate family | Current status | Evidence                                                       |
+| ----------- | -------------- | -------------------------------------------------------------- |
+| Static      | NOT_RUN        | planned after implementation                                   |
+| Fitness     | NOT_RUN        | planned quality/architecture gates                             |
+| Runtime     | Slice 4 PASS   | `receipts/04-post-stop-confirmation.json`: 40 passed, 0 failed |
+| Consumer    | NOT_RUN        | assets barrel in slice 5                                       |
 
 ## Open Questions
 

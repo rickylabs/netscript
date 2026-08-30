@@ -1,7 +1,17 @@
-import { classify } from './ownership.ts';
+import { dirname } from '@std/path';
+import {
+  classify,
+  pathContained,
+  type ProcessCandidate,
+  type ResourceCandidate,
+} from './ownership.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { systemCommands, systemFiles } from './ports.ts';
-import { probeContainer, processStartedAt } from './probes.ts';
+import {
+  probeContainer,
+  probeProcesses as probeProcessResources,
+  processStartedAt,
+} from './probes.ts';
 import { type LeakEntry, type LeakReport, runLeakCheck } from './leak-check.ts';
 import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
 
@@ -9,6 +19,7 @@ export interface TeardownResult {
   readonly applied: boolean;
   readonly plannedCommands: readonly (readonly string[])[];
   readonly stoppedAppHosts: readonly string[];
+  readonly terminatedProcesses: readonly number[];
   readonly removedContainers: readonly string[];
   readonly escalated: readonly LeakEntry[];
 }
@@ -25,10 +36,14 @@ export interface TeardownOptions {
   readonly confirmAttempts?: number;
   readonly confirmIntervalMs?: number;
   readonly sleep?: (ms: number) => Promise<void>;
+  readonly processProbe?: () => Promise<readonly ProcessCandidate[]>;
 }
 
+// S2 V6 observed Aspire 13.5.3 orphan registration cleanup in 385 ms. Six probes spaced 500 ms
+// bound confirmation to 2.5 s while allowing more than six times the observed cleanup latency.
 const DEFAULT_CONFIRM_ATTEMPTS = 6;
 const DEFAULT_CONFIRM_INTERVAL_MS = 500;
+const MIN_ORPHAN_PROCESS_AGE_MS = 30_000;
 
 const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -67,6 +82,49 @@ async function appHostGone(
   return Boolean(resource.appHostStartedAt && startedAt && startedAt !== resource.appHostStartedAt);
 }
 
+/** Associates DCP/managed helpers with one exact AppHost without treating PPID as ownership. */
+export function processBelongsToAppHost(
+  process: ProcessCandidate,
+  appHostPath: string,
+): boolean {
+  const workspaceRoot = dirname(dirname(appHostPath));
+  return process.evidence.some((entry) =>
+    entry.path === appHostPath ||
+    (entry.kind === 'socket-path' && pathContained(entry.path, workspaceRoot))
+  );
+}
+
+function processCandidates(resources: readonly ResourceCandidate[]): ProcessCandidate[] {
+  return resources.filter((resource): resource is ProcessCandidate => resource.kind === 'process');
+}
+
+async function processGone(
+  resource: ProcessCandidate,
+  files: FilePort,
+): Promise<boolean> {
+  let stat: string;
+  try {
+    stat = await files.readText(`/proc/${resource.pid}/stat`);
+  } catch {
+    return true;
+  }
+  const startedAt = processStartedAt(stat);
+  return Boolean(resource.processStartedAt && startedAt && startedAt !== resource.processStartedAt);
+}
+
+async function confirmedGone(
+  check: () => Promise<boolean>,
+  attempts: number,
+  intervalMs: number,
+  sleep: (ms: number) => Promise<void>,
+): Promise<boolean> {
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    if (attempt > 0) await sleep(intervalMs);
+    if (await check()) return true;
+  }
+  return false;
+}
+
 /** Stops/removes only positively owned resources; mutation requires explicit apply=true. */
 export async function runTeardown(
   report: LeakReport,
@@ -79,8 +137,12 @@ export async function runTeardown(
   const forcePersistent = options.forcePersistent ?? false;
   const plannedCommands: string[][] = [];
   const stoppedAppHosts: string[] = [];
+  const terminatedProcesses: number[] = [];
   const removedContainers: string[] = [];
   const escalated = report.survivors.filter((entry) => entry.ownership !== 'owned');
+  const appHosts = report.survivors.flatMap((entry) =>
+    entry.resource.kind === 'apphost' ? [entry.resource] : []
+  );
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned') continue;
     if (entry.resource.kind === 'apphost') {
@@ -90,43 +152,106 @@ export async function runTeardown(
       }
     } else if (entry.resource.kind === 'container') {
       plannedCommands.push(['docker', 'rm', '-f', entry.resource.id]);
+    } else if (
+      report.probes.aspire.state === 'ok' &&
+      entry.ageMs !== null && entry.ageMs >= MIN_ORPHAN_PROCESS_AGE_MS &&
+      entry.resource.processStartedAt &&
+      !appHosts.some((appHost) => {
+        const process = entry.resource;
+        return process.kind === 'process' &&
+          processBelongsToAppHost(process, appHost.appHostPath);
+      })
+    ) {
+      plannedCommands.push(['kill', '-TERM', String(entry.resource.pid)]);
     }
   }
   if (!apply) {
-    return { applied: false, plannedCommands, stoppedAppHosts, removedContainers, escalated };
+    return {
+      applied: false,
+      plannedCommands,
+      stoppedAppHosts,
+      terminatedProcesses,
+      removedContainers,
+      escalated,
+    };
   }
 
   const attempts = options.confirmAttempts ?? DEFAULT_CONFIRM_ATTEMPTS;
   const intervalMs = options.confirmIntervalMs ?? DEFAULT_CONFIRM_INTERVAL_MS;
   const sleep = options.sleep ?? defaultSleep;
+  const processProbe = options.processProbe ??
+    (() => probeProcessResources(commands, files).then(processCandidates));
 
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned' || entry.resource.kind !== 'apphost') continue;
-    const result = await commands.run(scopedStopCommand(entry.resource.appHostPath), 30_000);
+    const appHost = entry.resource;
+    const result = await commands.run(scopedStopCommand(appHost.appHostPath), 30_000);
     if (result.code !== 0) {
       escalated.push(entry);
       continue;
     }
-    let gone = false;
-    for (let attempt = 0; attempt < attempts && !gone; attempt++) {
-      if (attempt > 0) await sleep(intervalMs);
-      gone = await appHostGone(entry.resource, files);
-    }
+    const gone = await confirmedGone(
+      async () => {
+        if (!(await appHostGone(appHost, files))) return false;
+        try {
+          const helpers = await processProbe();
+          return !helpers.some((process) => processBelongsToAppHost(process, appHost.appHostPath));
+        } catch {
+          return false;
+        }
+      },
+      attempts,
+      intervalMs,
+      sleep,
+    );
     if (!gone) {
       escalated.push(entry);
       continue;
     }
-    stoppedAppHosts.push(entry.resource.appHostPath);
+    stoppedAppHosts.push(appHost.appHostPath);
     if (
       forcePersistent &&
-      classify(entry.resource, registry, report.worktreeRoot) === 'owned'
+      classify(appHost, registry, report.worktreeRoot) === 'owned'
     ) {
       const forceResult = await commands.run(
-        scopedStopCommand(entry.resource.appHostPath, true),
+        scopedStopCommand(appHost.appHostPath, true),
         30_000,
       );
       if (forceResult.code !== 0) escalated.push(entry);
     }
+  }
+
+  for (const entry of report.survivors) {
+    if (entry.ownership !== 'owned' || entry.resource.kind !== 'process') continue;
+    const process = entry.resource;
+    if (appHosts.some((appHost) => processBelongsToAppHost(process, appHost.appHostPath))) {
+      continue;
+    }
+    if (report.probes.aspire.state !== 'ok') {
+      escalated.push(entry);
+      continue;
+    }
+    if (
+      entry.ageMs === null || entry.ageMs < MIN_ORPHAN_PROCESS_AGE_MS ||
+      !process.processStartedAt
+    ) {
+      escalated.push(entry);
+      continue;
+    }
+    if (await processGone(process, files)) continue;
+    const result = await commands.run(['kill', '-TERM', String(process.pid)], 30_000);
+    if (result.code !== 0) {
+      escalated.push(entry);
+      continue;
+    }
+    const gone = await confirmedGone(
+      () => processGone(process, files),
+      attempts,
+      intervalMs,
+      sleep,
+    );
+    if (gone) terminatedProcesses.push(process.pid);
+    else escalated.push(entry);
   }
 
   for (const entry of report.survivors) {
@@ -143,7 +268,14 @@ export async function runTeardown(
     if (result.code === 0) removedContainers.push(fresh.id);
     else escalated.push(entry);
   }
-  return { applied: true, plannedCommands, stoppedAppHosts, removedContainers, escalated };
+  return {
+    applied: true,
+    plannedCommands,
+    stoppedAppHosts,
+    terminatedProcesses,
+    removedContainers,
+    escalated,
+  };
 }
 
 export function parseTeardownArgs(

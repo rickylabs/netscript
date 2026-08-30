@@ -70,6 +70,9 @@ new ownership shortcut.
 | 2026-08-30T03:17:08Z | 2         | push            | Pushed `555d204` with the explicit head refspec and posted the slice-2 PR evidence comment.                                                    |
 | 2026-08-30T03:18:45Z | 3         | gate            | Force-persistent passed 36/36: exact dry-run argv, apply/flag/ownership arms, scoped-stop confirmation, and no force by default.               |
 | 2026-08-30T03:18:45Z | 3         | reconcile       | PR #1744 remains draft/stacked; closing issues and Phase-B dependency are unchanged. No reviewer comment changed the plan.                     |
+| 2026-08-30T03:20:02Z | 3         | push            | Pushed `28f8807` with the explicit head refspec and posted the slice-3 PR evidence comment.                                                    |
+| 2026-08-30T03:23:50Z | 4         | gate            | Post-stop/orphan process suite passed 40/40: exits-in-time, bounded timeout/no-kill, stable targeted TERM, age, and census fail-closed arms.   |
+| 2026-08-30T03:23:50Z | 4         | reconcile       | PR remains draft/stacked; no runtime start occurred and no new comment changed the locked Phase-A/Phase-B split.                               |
 
 ## Decisions
 
@@ -101,13 +104,14 @@ new ownership shortcut.
 
 ### Runtime Gates
 
-| Gate                        | Result          | Evidence                               | Notes                                                              |
-| --------------------------- | --------------- | -------------------------------------- | ------------------------------------------------------------------ |
-| Phase A unit fixtures       | NOT_RUN         | pending                                | No AppHost start permitted.                                        |
-| Slice 1 RED                 | FAIL (expected) | `receipts/01-red-orphan-process.json`  | Exact #1429 visibility regression; exit 1 at baseline `fe4f496bd`. |
-| Slice 2 descendant tracking | PASS            | `receipts/02-descendant-tracking.json` | 33 passed, 0 failed; receipt head `593a33c`.                       |
-| Slice 3 force-persistent    | PASS            | `receipts/03-force-persistent.json`    | 36 passed, 0 failed; receipt head `555d204`.                       |
-| Phase B live reproduction   | N/A             | deferred procedure                     | Requires supervisor-provided runtime lease.                        |
+| Gate                        | Result          | Evidence                                  | Notes                                                              |
+| --------------------------- | --------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| Phase A unit fixtures       | NOT_RUN         | pending                                   | No AppHost start permitted.                                        |
+| Slice 1 RED                 | FAIL (expected) | `receipts/01-red-orphan-process.json`     | Exact #1429 visibility regression; exit 1 at baseline `fe4f496bd`. |
+| Slice 2 descendant tracking | PASS            | `receipts/02-descendant-tracking.json`    | 33 passed, 0 failed; receipt head `593a33c`.                       |
+| Slice 3 force-persistent    | PASS            | `receipts/03-force-persistent.json`       | 36 passed, 0 failed; receipt head `555d204`.                       |
+| Slice 4 post-stop confirm   | PASS            | `receipts/04-post-stop-confirmation.json` | 40 passed, 0 failed; receipt head `28f8807`.                       |
+| Phase B live reproduction   | N/A             | deferred procedure                        | Requires supervisor-provided runtime lease.                        |
 
 ### Consumer Gates
 
