@@ -1,0 +1,7 @@
+[relay] watching owner=s6-phase-b-2 dind=netscript-dind(10.4.12.22) since=2026-08-30T21:24:15.941Z pid=4065657
+[relay] postgres-0ad69d26 127.0.0.1:28049 => hopA relay-s6-phase-b-2-28049 (10.4.12.22:28049) => hopB 127.0.0.1:28049@ai-agents
+[relay] garnet-jyeahzkt 127.0.0.1:32823 => hopA relay-s6-phase-b-2-32823 (10.4.12.22:32823) => hopB 127.0.0.1:32823@ai-agents
+[relay] relay-s6-phase-b-2-28049 torn down — upstream port 28049 no longer published
+[relay] postgres-0ad69d26 127.0.0.1:28049 => hopA relay-s6-phase-b-2-28049 (10.4.12.22:28049) => hopB 127.0.0.1:28049@ai-agents
+[relay] relay-s6-phase-b-2-32823 torn down — upstream port 32823 no longer published
+[relay] cleanup: closed 1 listener(s), removed 1 hop-A container(s)

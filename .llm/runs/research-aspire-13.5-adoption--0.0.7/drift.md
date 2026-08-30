@@ -1890,3 +1890,32 @@
   aspire=[].** Receipts `slices/s6/phase-b/00-baseline.txt` … `03-reverified-zero.txt`, full suite
   log `01-scaffold-runtime.txt`. Independent review/evaluation of the frozen `31f44f70c` head is
   authorized next (do not re-trigger the S7 DeepSeek receipt — that verdict stands).
+- **D-98 — the relay was NOT the cause; corrected root-cause evidence: the scaffold's postgres
+  resource is `container.lifetime: "Persistent"`, and `aspire resource <name> stop` has no way to
+  force-kill a Persistent-lifetime container.** Relay's teardown-on-stop fix from D-97 (kept — it is
+  a genuine correctness improvement and did fire correctly: log shows
+  `relay-s6-phase-b-2-28049 torn down — upstream port 28049 no longer published` immediately after
+  the `stop` call) did **not** change the outcome: isolated single-gate retry (minimal
+  postgres+garnet scratch,
+  `deno task e2e:cli gate scaffold.runtime
+  runtime.health.listener-unreachable`, absolute
+  `--smoke-root`) reproduced the **identical** failure — `postgres_listener` stayed `Healthy` the
+  full 30 s. Live inspection of the resource during/after the window:
+  `"container.lifetime": "Persistent"`, port still published, container still running under Docker
+  (confirmed by `docker ps` showing `postgres-0ad69d26 Up …` even after the fixture's own
+  `aspire resource postgres stop` call). `aspire resource --help` has **no**
+  force/persistent-override flag — the official Aspire 13.5.3 CLI cannot stop a Persistent-lifetime
+  container through `resource stop`; it is designed to survive exactly this kind of stop-for-restart
+  cycle (matching the project's own D-83 discovery about persistent container semantics, and the
+  reason S7 needed its own `--force-persistent` **teardown tool** flag — an Aspire-external
+  mechanism — to actually kill such containers). **Conclusion: the
+  `runtime.health.listener-unreachable` fixture's premise (that `aspire resource stop` induces real
+  unreachability) is incompatible with the scaffold's default Persistent DB lifetime.** This is a
+  fixture-design question, not a relay-topology question and not confirmed as a transplant-code bug
+  — it needs a decision: either scaffold a non-persistent DB resource for this specific test, or
+  have the fixture stop the underlying Docker container directly (bypassing Aspire's
+  resource-lifecycle command) to actually simulate unreachability. No further attempt made without
+  that decision. Owned cleanup: AppHost stopped, one persistent-container survivor removed, relay
+  killed (1 hop-A removed), scratch removed via container, volume prune; **final zero confirmed
+  21:29:26Z.** Current main advanced again to `73bf2efa9` (#1739 shipped) — S6's convergence
+  intersection must be re-verified against this new tip before the merge packet.

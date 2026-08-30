@@ -1,0 +1,16 @@
+{
+  "owner": "s6-phase-b-2",
+  "pid": 4065657,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T21:24:15.941Z",
+  "relays": [
+    {
+      "port": 28049,
+      "container": "relay-s6-phase-b-2-28049",
+      "source": "postgres-0ad69d26",
+      "startedAt": "2026-08-30T21:28:18.100Z"
+    }
+  ],
+  "closed": "2026-08-30T21:29:22.022Z"
+}
