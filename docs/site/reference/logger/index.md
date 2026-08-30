@@ -104,7 +104,7 @@ documented here from each entrypoint's own `deno doc` surface.
 | `LoggingHandlerOptions` | interface | Mutable handler options whose interceptor arrays `LoggingPlugin.init` creates or appends to. Consumers meet it when initializing the plugin outside the concrete oRPC handler type. |
 | `LogLevelConfig` | interface | Optional log levels for procedure start, success, client-error, and server-error events. |
 | `LoggingPluginOptions` | interface | Plugin configuration for service identity, debug behavior, levels, input summaries, skipped paths, and an optional custom logger. |
-| `LoggingPlugin` | class | oRPC handler plugin that installs a root request interceptor and a procedure interceptor for correlated request, completion, and failure logging. |
+| `LoggingPlugin` | class | oRPC handler plugin that installs a root request interceptor and a procedure interceptor to log request start, completion, and failure. |
 | `createLoggingPlugin` | function | Constructs a `LoggingPlugin`; use it as the factory alternative to calling the class constructor directly. |
 | `LoggerContext` | interface | Logger and generated request ID returned for injection into an oRPC handler context. |
 | `createLoggerContext` | function | Creates a service-scoped logger with a generated request ID and returns both as a `LoggerContext`. |

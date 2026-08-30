@@ -12,9 +12,10 @@
 
 ## Current State
 
-The brief's defect was independently reproduced at the exact baseline. The existing page now holds
-two source-derived tables covering 13 middleware and 13 oRPC export rows, with `Logger` explicitly
-identified as the root re-export in each.
+The original 13/13 symbol inventories remain intact. A valid Augment finding showed that the
+`LoggingPlugin` row overclaimed correlated logging: `LoggingPlugin.init()` stores request state in
+a closure shared by both installed interceptors. The bounded repair removes that guarantee without
+documenting the source defect as intended behavior.
 
 ## Completed
 
@@ -23,17 +24,19 @@ identified as the root re-export in each.
 - Source, `deno doc`, and generator-chain research.
 - Plan/design checkpoint with justified `PLAN-EVAL: N/A`.
 - Prose implementation.
+- Exact-head IMPL-EVAL of the preceding product head, carried in `impl-eval.md` by the supervisor.
+- Source verification for the bounded `LoggingPlugin` wording repair.
 
 ## In Progress
 
-- S1 commit, derived generation, and consumer validation.
+- S3 wording/run-artifact commit, S4 derived regeneration, and final-head validation.
 
 ## Next Steps
 
-1. Run the static/prose gates and baseline comparison.
-2. Commit S1.
-3. Regenerate and verify exactly four assets, then commit S2.
-4. Push by explicit refspec and open/configure the non-draft PR for supervisor IMPL-EVAL.
+1. Commit the one-row wording repair plus run-ledger updates as S3.
+2. Regenerate and verify exactly four assets, then commit S4.
+3. Run every required gate at the new head and update PR evidence SHAs.
+4. Push by explicit refspec for fresh supervisor-dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -42,22 +45,23 @@ identified as the root re-export in each.
 | One existing page, two tables | #1784 / brief | Separate pages are forbidden. |
 | Exact `deno doc` sets | source / doctrine A14 | 26 rows, 25 distinct names. |
 | `Logger` is a re-export | both sub-path source files | No duplicate standalone description. |
+| Describe installed interceptors without claiming correlation | `orpc-plugin.ts` read/write ordering | Shared closure state cannot support an unconditional guarantee. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `docs/site/reference/logger/index.md` | changed | Corrected promise and two symbol tables. |
-| `.llm/runs/docs-logger-subpath-surface--1784/*` | new | Harness identity, research, plan, design, evidence, and handoff. |
+| `docs/site/reference/logger/index.md` | changed | One-row `LoggingPlugin` wording repair. |
+| `.llm/runs/docs-logger-subpath-surface--1784/{context-pack,drift,worklog}.md` | changed | Repair evidence and deferred source-defect record. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Eight required docs/page gates exit 0; README baseline red reproduced at exit 1. |
+| Static | pending repair head | Previous head passed; full list must be rerun after S4. |
 | Fitness | N/A | No package/plugin source change. |
 | Runtime | N/A | Static-only; Aspire/Docker forbidden. |
-| Consumer | pending | Generated corpus/barrel/publish checks after S1. |
+| Consumer | pending repair head | Regenerate after S3, then rerun on S4. |
 
 ## Open Questions
 
@@ -66,7 +70,8 @@ identified as the root re-export in each.
 ## Drift and Debt
 
 - Drift: the shared `origin/main` tracking ref advanced after the locked-baseline research; the
-  branch remains based on the owner-specified `38439740f` and was not rebased.
+  branch remains based on the owner-specified `38439740f` and was not rebased. The oRPC plugin's
+  shared request-correlation closure is an observed source defect deferred to its owning lane.
 - Debt: none.
 
 ## Commits
