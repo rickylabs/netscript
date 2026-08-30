@@ -60,9 +60,9 @@ invocation reached the logger.
 | --- | --- | --- |
 | 1 | `PreToolUse` and `Stop` carry the identical relative shell-form command. | `.claude/settings.json` |
 | 2 | The logger writes `.llm/tmp/claude/hooks/<run-id>/events.jsonl` relative to `Deno.cwd()`, so changing only the executable path would still misplace output. | `.llm/tools/agentic/claude/claude-hook-log.ts` (`outDir`) |
-| 3 | Claude Code exports `CLAUDE_PROJECT_DIR` as the project root and substitutes `${CLAUDE_PROJECT_DIR}` in command/args. Official guidance prefers exec form when a hook references a path placeholder. | [Claude Code hooks reference](https://code.claude.com/docs/en/hooks#reference-scripts-by-path) |
+| 3 | Claude Code exports `CLAUDE_PROJECT_DIR` as the session launch root and substitutes `${CLAUDE_PROJECT_DIR}` in command/args. It does not follow `EnterWorktree`; official guidance prefers exec form when a hook references a path placeholder. | [Claude Code hooks reference](https://code.claude.com/docs/en/hooks#reference-scripts-by-path); cycle-1 PLAN-EVAL verification |
 | 4 | Installed Claude Code is `2.1.251`, which supports the documented exec-form command/args surface. | `claude --version` |
-| 5 | The current hook needs only three environment reads (`CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID`) and writes only beneath the active worktree's hook-log directory. It does not need runtime read permission. | Granular permission probe below; logger source |
+| 5 | The current hook needs only three environment reads (`CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID`) and writes only beneath the session launch root's hook-log directory. It does not need runtime read permission. | Granular permission probe below; logger source |
 | 6 | `.llm/tools/agentic/claude/validate-claude-surface.ts` is the mandatory Claude-surface gate and currently checks JSON, skill sync, and that three root-cwd logger runs leave `deno.lock` unchanged. It does not cover nested cwd or configured-command fidelity. | `CLAUDE.md`; validator source |
 | 7 | There is no focused hook test today. Existing Claude launcher tests are separate and do not exercise `.claude/settings.json`. | `find .llm/tools/agentic/claude`; focused `rg Deno.test` |
 | 8 | `/home/codex` is absent, while `wslHome()` still defaults through `wslUser() === "codex"` to `/home/codex`; the existing unit test explicitly preserves that historical default. | `test ! -e /home/codex`; `agentic-lib.ts`; `agentic-lib_test.ts` |
@@ -92,7 +92,7 @@ with `${CLAUDE_PROJECT_DIR}`, never a host path.
 | Settings only | Strong when it uses `${CLAUDE_PROJECT_DIR}` | Loads the correct script, but current logger still writes relative to turn cwd. | Reject as incomplete. |
 | Hook script only | Can anchor output after it starts | Cannot repair a relative entrypoint that Deno fails to load. | Reject as impossible alone. |
 | New wrapper | Can change cwd and launch the logger | Adds another executable/config seam and a helper whose only job is path indirection. | Reject under A6/A7. |
-| Exec-form settings + logger project-root output | Uses Claude's documented project-root contract; follows each worktree | Smallest complete repair; settings selects the active worktree and script anchors output there. | Preferred for the plan. |
+| Exec-form settings + logger launch-root output | Uses Claude's documented session launch-root contract; does not follow `EnterWorktree` | Smallest complete repair for #1774's nested-cwd defect; settings selects the launch checkout and script anchors output there. | Preferred for the plan. |
 
 ## Fixture shape
 
@@ -101,11 +101,12 @@ The focused test must parse `.claude/settings.json` instead of duplicating its c
 1. enumerate both `PreToolUse` and `Stop` configured command handlers;
 2. substitute a supplied project root exactly as Claude does and execute shell form (RED) or exec
    form (GREEN), preserving stdin payloads;
-3. invoke each handler from the worktree root and a nested `.llm/runs/...` cwd;
-4. create a temporary sibling checkout-shaped decoy whose relative logger exits with a distinctive
-   failure; invoke the active worktree's configured handlers while cwd points inside the decoy;
-5. assert the active worktree event log contains each unique payload and that the decoy marker is
-   absent; and
+3. invoke each handler from the session launch checkout and a nested `.llm/runs/...` cwd;
+4. create a decoy cwd with `Deno.makeTempDir`, place its relative logger exactly at
+   `<decoy cwd>/.llm/tools/agentic/claude/claude-hook-log.ts`, and require RED to reach its marker
+   and distinctive exit;
+5. in GREEN, model the session launch root through placeholder substitution, then assert its event
+   log contains each unique payload and that the decoy marker is absent; and
 6. clean its ignored log output.
 
 Before repair, the nested cases fail at module resolution. The test itself must land and be pushed
@@ -119,11 +120,11 @@ plugin surface.
 
 ## Scope conclusion
 
-- #1774 owns `.claude/settings.json`, the hook logger's project-root output resolution, its focused
-  fixture, any necessary validator alignment, and hook documentation directly made stale.
+- #1774 owns `.claude/settings.json`, the hook logger's session-launch-root output resolution, its
+  focused fixture, any necessary validator alignment, and hook documentation directly made stale.
 - The `wslHome()` `/home/codex` default is a confirmed sibling defect but belongs to launcher/home
-  configuration work. It is explicitly out of scope: changing it would alter unrelated Codex
-  launcher contracts and tests.
+  configuration work tracked by #1776. It is explicitly out of scope: changing it would alter
+  unrelated Codex launcher contracts and tests.
 - No `.github/workflows/**` edit is required; the repo-scope PAT boundary is not engaged.
 - Aspire, Docker, browser, `e2e:cli`, and `scaffold.runtime` are irrelevant to this tooling-only
   repair and must not run without the serialized expensive-gate lease.

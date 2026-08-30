@@ -23,13 +23,13 @@
 
 ### Domain Vocabulary
 
-- **Claude project root** — the active worktree path supplied/substituted by Claude as
-  `CLAUDE_PROJECT_DIR`.
+- **Claude session launch root** — the checkout root where the session started, supplied/substituted
+  as `CLAUDE_PROJECT_DIR`; it does not follow `EnterWorktree`.
 - **Turn cwd** — the directory inherited by a hook process; explicitly not a project-root source.
 - **Configured handler** — one command hook beneath `PreToolUse` or `Stop` in live settings.
-- **Active event log** — `<project-root>/.llm/tmp/claude/hooks/<run-id>/events.jsonl`.
-- **Sibling decoy** — a temporary checkout-shaped cwd with a distinctive fake relative logger, used
-  to prove the active project root wins over cwd.
+- **Launch-root event log** — `<session-launch-root>/.llm/tmp/claude/hooks/<run-id>/events.jsonl`.
+- **Sibling decoy** — a `Deno.makeTempDir` cwd with a distinctive fake logger at the exact relative
+  command path, used to prove the modeled session launch root wins over cwd.
 - **RED fixture** — the committed test that fails against the current relative settings before any
   production repair.
 
@@ -38,8 +38,8 @@ narrowing from `unknown`, never `any` or casting escapes.
 
 ### Ports
 
-- Claude hook configuration supplies `CLAUDE_PROJECT_DIR` and substitutes the same placeholder in
-  exec arguments.
+- Claude hook configuration supplies the session launch root as `CLAUDE_PROJECT_DIR` and substitutes
+  the same placeholder in exec arguments.
 - `Deno.stdin.readable` supplies the event payload.
 - `Deno.env.get` consumes exactly the three named hook environment keys.
 - `Deno.mkdir` and `Deno.writeTextFile` append inside the active hook-log subtree.
@@ -60,18 +60,20 @@ Do not add production constants unless repeated use in the actual implementation
 
 ### Commit Slices
 
-| #  | Slice                                                                                                                | Gate                                                                      | Files                                                                   |
-| -- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| S3 | Commit/push the live-settings root/nested/sibling fixture while it is RED for both events.                           | Structured focused test exits nonzero and reports nested module failures. | `claude-hook-log_test.ts`, run artifacts                                |
-| S4 | Apply combined exec-form/project-output repair and permission/task/validator/docs alignment; do not edit S3 fixture. | Same focused test GREEN; `agentic:check-claude` GREEN.                    | settings, logger, validator, `deno.json`, agentic README, run artifacts |
-| S5 | Run/record all selected structured gates and prepare separate IMPL-EVAL handoff.                                     | Full validation table green; raw git/lock review.                         | run artifacts and PR surface only                                       |
+| #  | Slice                                                                                                                | Gate                                                                                | Files                                                                   |
+| -- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| S3 | Commit/push the live-settings root/nested/temp-decoy fixture while it is RED for both events.                        | Structured test reports nested failures and positive decoy marker/distinctive exit. | `claude-hook-log_test.ts`, run artifacts                                |
+| S4 | Apply combined exec-form/project-output repair and permission/task/validator/docs alignment; do not edit S3 fixture. | Same focused test GREEN; `agentic:check-claude` GREEN.                              | settings, logger, validator, `deno.json`, agentic README, run artifacts |
+| S5 | Run/record all selected structured gates and prepare separate IMPL-EVAL handoff.                                     | Full validation table green; raw git/lock review.                                   | run artifacts and PR surface only                                       |
 
 Bootstrap, Research, and Plan are already independent pushed phase commits. S3 must be visible as a
 failing commit before S4.
 
 ### Deferred Scope
 
-- `wslHome()` and the retired `/home/codex` launcher default — separate launcher/home contract.
+- `wslHome()` and the retired `/home/codex` launcher default — separate launcher/home contract
+  tracked by #1776.
+- Execution/output that follows `EnterWorktree` rather than the session launch root.
 - General hook wrapper/framework — unnecessary for two identical handlers.
 - Hook schema/blocking/log-retention behavior — unrelated to cwd resolution.
 - CI workflow and leased Aspire/Docker/browser/scaffold gates — irrelevant and unauthorized here.
@@ -91,6 +93,8 @@ a new cwd/worktree case without changing production code.
 | 2026-08-30 | Research  | Re-derived | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output pushed in `research.md`. |
 | 2026-08-30 | Plan      | Locked     | Combined settings/logger repair, granular permissions, RED→GREEN fixture, gate set, and sibling-defect deferral recorded. |
 | 2026-08-30 | Plan      | PR sync    | Updated draft body/comment and moved exactly one lifecycle label to `status:plan-eval`; REST fallback recorded in drift.  |
+| 2026-08-30 | PLAN-EVAL | Cycle 1    | `FAIL_PLAN` at `26102943`; evaluator artifact committed at `842816a2`; implementation remained stopped.                   |
+| 2026-08-30 | Plan      | Amendment  | Corrected launch-root semantics and pinned decoy, host-path, and #1776 contracts for cycle 2.                             |
 
 ## Decisions
 
@@ -99,15 +103,16 @@ a new cwd/worktree case without changing production code.
 | Combined exec-form settings and project-root output | Either half alone leaves one cwd-relative failure.                  | `research.md`, `plan.md` D1–D4 |
 | Exact env/write grants; no runtime read             | Permission probe proves the smaller contract.                       | `research.md`, `plan.md` D5    |
 | Parse live settings in unchanged test               | Prevent duplicated-command false green and preserve historical RED. | `plan.md` D7                   |
-| Sibling decoy distinguishes active worktree         | Exit-only/root-only tests cannot exclude cwd sibling resolution.    | `plan.md` D8                   |
-| Defer `wslHome()`                                   | Unrelated launcher contract and tests; no silent scope widening.    | `plan.md` D9                   |
+| Reachable decoy distinguishes launch root from cwd  | Positive RED plus negative GREEN prevents a vacuous marker check.   | `plan.md` D8                   |
+| Defer `wslHome()` to #1776                          | Unrelated launcher contract and tests; deferral is tracked.         | `plan.md` D9                   |
 
 ## Drift
 
-| Drift                                           | Severity | Logged in drift.md |
-| ----------------------------------------------- | -------- | ------------------ |
-| Owner-selected Codex medium planning session    | minor    | yes                |
-| `gh pr edit` over-fetched scopes; REST fallback | minor    | yes                |
+| Drift                                            | Severity    | Logged in drift.md |
+| ------------------------------------------------ | ----------- | ------------------ |
+| Owner-selected Codex medium planning session     | minor       | yes                |
+| `gh pr edit` over-fetched scopes; REST fallback  | minor       | yes                |
+| Active-worktree premise corrected to launch root | significant | yes                |
 
 ## Gate Results
 
@@ -116,7 +121,7 @@ a new cwd/worktree case without changing production code.
 | Gate                                                   | Result | Evidence                                               | Notes                         |
 | ------------------------------------------------------ | ------ | ------------------------------------------------------ | ----------------------------- |
 | Research current                                       | READY  | `research.md` raw root/nested output at exact baseline | Await evaluator confirmation. |
-| Decisions/open sweep/slices/risks/gates/deferred scope | READY  | `plan.md`                                              | Await separate PLAN-EVAL.     |
+| Decisions/open sweep/slices/risks/gates/deferred scope | READY  | Amended `plan.md`                                      | Await cycle-2 PLAN-EVAL.      |
 | jsr-audit                                              | N/A    | Non-package/plugin tooling                             | No published surface.         |
 
 ### Static Gates
@@ -135,10 +140,10 @@ a new cwd/worktree case without changing production code.
 
 ### Runtime Gates
 
-| Gate                                            | Result  | Evidence                 | Notes                 |
-| ----------------------------------------------- | ------- | ------------------------ | --------------------- |
-| Actual root/nested/sibling Deno child processes | NOT_RUN | S3/S4 fixture            | Both events required. |
-| Aspire/Docker/browser/scaffold                  | N/A     | Scope and lease boundary | Must not run.         |
+| Gate                                                 | Result  | Evidence                 | Notes                 |
+| ---------------------------------------------------- | ------- | ------------------------ | --------------------- |
+| Actual launch-root/nested/temp-decoy child processes | NOT_RUN | S3/S4 fixture            | Both events required. |
+| Aspire/Docker/browser/scaffold                       | N/A     | Scope and lease boundary | Must not run.         |
 
 ### Consumer Gates
 
@@ -148,8 +153,9 @@ a new cwd/worktree case without changing production code.
 
 ## Handoff Notes
 
-- PLAN-EVAL must be performed by a separate native Claude/Fable session dispatched by the
-  supervisor; this Codex session does not evaluate its own plan.
-- Inspect `research.md` raw RED first, then plan decisions D1–D10, exact handler contract, fixture
-  discrimination, and validation table.
-- Do not implement or add `plan-eval.md` in this session.
+- One cycle-2 PLAN-EVAL must be performed by a separate native Claude/Fable session dispatched by
+  the supervisor; this Codex session does not evaluate its own amendment.
+- Inspect cycle-1 F1–F4 against amended D1/D8/D9, the launch-root-only Non-Scope, the exact six-file
+  host-path assertion, and the #1776 handoff pointer. Everything else in D1–D10 stands.
+- #1776 owns the deferred `wslHome()` `/home/codex` launcher defect for milestone 0.0.8.
+- Do not implement or edit the evaluator-owned `plan-eval.md` in this session.
