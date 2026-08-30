@@ -4535,3 +4535,63 @@ Park state: plan gate **PASS** preserved at `81c5f874` on its own branch; red-be
 pushed at `2146443c`; **no product work started**. The park instruction goes on the same thread as soon
 as it is idle, and `status:impl` will be corrected to reflect parked-after-red rather than
 in-implementation, so the board does not claim work that is deliberately stopped.
+
+## 2026-08-30 — #1758: AC3 literally evidenced; full suite green; leased `e2e:cli` running at `50710a44`
+
+### Full repository suite at the converged head
+
+```
+deno task test → exit 0 · 4277 passed / 0 failed / 19 ignored / 4296 total
+```
+
+Green at `65f95b83`, after the fourth integration onto `3e5cbabf`.
+
+### AC3 is satisfied by a real production build — the box was never weakened
+
+The coordinator held the acceptance contract and was right to. Four earlier placements failed for a
+topology reason, which was reported as a blocker rather than worked around. The vehicle that works is
+a **local-source scaffolded project**, which none of the standalone-fixture attempts could reach:
+
+`netscript-dev.ts init` copied **28 local packages** from this leaf; the copied SDK's export map
+contains `./presets`, proving it is *this* SDK, and the generated app maps `@netscript/sdk` →
+`../../packages/sdk/mod.ts` — the shipped root-import path.
+
+Because the generated app imports only `/auto-update` and `/desktop`, the **root** was imported from a
+real client island so the path is genuinely exercised; the island chunk grew to 41,788 bytes,
+confirming the root entered the client graph. `deno task build` → exit 0, 665 modules, **15 client
+chunks**.
+
+| Symbol / specifier | In client chunks |
+| --- | --- |
+| `KvCacheStore`, `kv-cache-store`, `@netscript/kv`, `packages/kv`, `openKv`, `DENO_KV`, `hasCacheProvider` | **absent** |
+| `setCacheProvider`, `cacheQuery` | present **only inside a string literal** |
+
+**The nuance was checked, not glossed.** Those two identifiers appear solely inside the *"Cache
+provider not initialized … call `setCacheProvider(cacheQuery)` during server bootstrap"* error text.
+Every client chunk was re-scanned with template literals and quoted strings stripped, then searched
+for `setCacheProvider(`: **0 executable registration calls**. Source maps show 0 hits for
+`kv-cache-store`, `packages/kv`, `cache-query`.
+
+The receipt states its own limit rather than implying more: it is a **positive measurement at head**;
+the red-before counterpart is the base module-graph measurement (19 browser-unsafe edges including the
+`packages/kv` adapters, versus 0 here). The chunk build was **not** re-run at base, so the receipt is
+not itself a red-before. Committed at `50710a44` under
+`.llm/runs/fix-sdk-root-cache-provider-leak--0.0.7/receipts/ac3-production-chunk-proof.md`.
+
+### Leased `e2e:cli` in flight
+
+Lease granted exclusively to #1758 at `50710a44`. Head identity re-proved before consuming it —
+local == remote == leased — with 0 containers, 0 volumes, no AppHost. Bare `deno task e2e:cli` with
+cleanup is running from the owned worktree, raw output and receipt under the slice `receipts/`
+directory. At last sample: **25 gates completed, 0 failures**, past
+`behavior.plugin-doctor-missing-module` and into the runtime gates.
+
+### #1368 — park not yet deliverable, stated plainly
+
+The park instruction has **not** landed: the thread has been continuously busy since before the WIP
+correction arrived, and a mid-turn `codex-resume` fails with a thread-store active-writer conflict.
+The leaf is now at `f8563626` with 7 dirty files, i.e. it has begun S3 work that should not have
+started. Killing the turn would destroy uncommitted work and repeat the error that cost this lane
+three consecutive turns earlier, so the park is armed for the next idle boundary instead. The overrun
+is bounded: it is on its own branch, competes with nothing on the merge front, and no #1368 work has
+been merged or readied.
