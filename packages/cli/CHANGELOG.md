@@ -4,9 +4,10 @@
 
 - `agent init` now installs canonical cross-host skills and project guidance together with an
   updated tool bundle that writes atomic reports, surfaces silent check failures, audits public API
-  quality, verifies `quality-allow` owners against GitHub (the installed scanner now needs
-  environment and network permissions), honors subtree/config lint exclusions, and fails closed
-  when Deno processes fewer files than selected.
+  quality, verifies `quality-allow` owners against GitHub (the bundle declares environment and
+  network permissions, but environment access is optional and network access is used only when
+  resolving a `quality-allow` issue), honors subtree/config lint exclusions, and fails closed when
+  Deno processes fewer files than selected.
 - Generated workspace `check`, `lint`, and `fmt-check` flows accept `--skip-apphost` so project-only
   quality runs can omit AppHost sources.
 - `plugin auth session list` requires an explicit `--stream-url` instead of assuming the legacy

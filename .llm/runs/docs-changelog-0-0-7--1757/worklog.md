@@ -117,6 +117,8 @@ must state both that pin and the provisional top-up requirement.
 | 2026-08-30 | 1 | PLAN-EVAL post-escalation | `PASS_PLAN`: independent source verification confirmed all 33 triage decisions and all eleven locked bullets; implementation authorized after mechanical baseline reconciliation. |
 | 2026-08-30 | 1 | Baseline reconciliation | `origin/main` advanced by two commits to `f8b4f804`; both are excluded above, and the evaluated `13878a80` content pin is retained. |
 | 2026-08-30 | 1 | Implementation | Added `## 0.0.7` from the locked eleven-row map with no release introduction or version bump. |
+| 2026-08-30 | 1 | IMPL-EVAL at `15c262e4` | Separate-session evaluator returned `PASS`, but verified the scanner's declared permission change without testing whether the changelog's word "needs" described a runtime requirement; this verdict is superseded by the repair below. |
+| 2026-08-30 | 1 | B1 wording repair | Augment review correctly distinguished the bundle declaration from runtime behavior. Source verification showed environment access is optional and network access occurs only when resolving a `quality-allow` issue; changed only B1's parenthetical and recorded the medium-requested/high-observed resume-route drift in `drift.md`. |
 
 ## Gate Results
 
@@ -132,6 +134,14 @@ must state both that pin and the provisional top-up requirement.
 | `deno task check:agent-docs-prose` | PASS (exit 0) | Site build/render checks passed; corpus reported `fresh: true`, `stalePaths: []` | Confirms no agent-docs prose regeneration is needed. |
 | `git diff --exit-code -- deno.lock` | PASS (exit 0) | No diff | Lock hygiene boundary. |
 | `git diff --exit-code -- packages/cli/deno.json` | PASS (exit 0) | No diff; parsed version remains `0.0.6` | Version bump remains release-cut scope. |
+| B1 repair: `deno task docs:links` | PASS (exit 0) | `broken-links=0 broken-anchors=0 orphans=0` | Repair-tree rerun. |
+| B1 repair: `deno task docs:snippets` | PASS (exit 0) | `PASS scanned=581 ... checked=22 exempt=14 ... malformed=0` | Repair-tree rerun. |
+| B1 repair: `deno task check:publish-assets` | PASS (exit 0) | No stale publish asset reported | Changelog remains outside generator inputs. |
+| B1 repair: `deno task check:assets-barrel` | PASS (exit 0) | Generator completed; generated-file diff check clean | No derived asset churn. |
+| B1 repair: `deno task check:agent-docs-prose` | PASS (exit 0) | Site build/render checks passed; corpus reported `fresh: true`, `stalePaths: []` | No agent-docs prose regeneration required. |
+| B1 repair: `git diff --exit-code -- deno.lock` | PASS (exit 0) | No diff | Lock remains unchanged. |
+| B1 repair: `git diff --exit-code -- packages/cli/deno.json` | PASS (exit 0) | No diff | Version file remains unchanged at `0.0.6`. |
+| B1 repair: `deno task docs:readme:check` | BASELINE RED (exit 1) | `packages/bench/README.md`: missing `## Install` | Same sole pre-existing finding previously reproduced in a clean `origin/main` archive; this repair does not touch `packages/bench/`. |
 
 ### Explicit N/A gates
 
@@ -149,3 +159,5 @@ must state both that pin and the provisional top-up requirement.
   0.0.7 release cut.
 - Tier-A review and a separate IMPL-EVAL are intentionally deferred to the coordinator after this
   implementation handoff.
+- The prior IMPL-EVAL applies only to `15c262e4`; the B1 wording repair requires the coordinator's
+  renewed exact-head IMPL-EVAL before any status advance.

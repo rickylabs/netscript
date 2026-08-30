@@ -59,3 +59,25 @@
 - **Severity:** significant
 - **Action:** keep the evaluated changelog content explicitly pinned to `13878a80`, add both commits as Exclude reconciliation rows, preserve the locked map, and state the provisional top-up requirement in the PR.
 - **Evidence:** `worklog.md ## Commit Triage`; `git diff --name-status 13878a80..f8b4f804`; `git show f8b4f804 -- docs/site/ai/agent-tooling.md docs/site/reference/ai/skills.md docs/site/reference/cli/commands.md`.
+
+## 2026-08-30 — B1 misstated declared permissions as runtime requirements
+
+- **What:** B1 said the installed quality scanner "needs environment and network permissions."
+- **Source:** The Augment review on PR #1761, confirmed against `.llm/tools/quality/scan-code-quality.ts` before editing.
+- **Expected:** Preserve the shipped bundle's declared permission change from `["read"]` to `["read","env","net"]` without telling consumers to over-grant permissions.
+- **Actual:** `optionalGitHubToken()` catches denied environment access and proceeds without a token. The resolver's GitHub fetch runs only for issue references found in `quality-allow` records; its failure guidance requires `--allow-net=api.github.com` for that resolution path and says the token is optional. The shipped cheat-sheet's ordinary scan remains read-only.
+- **Severity:** significant
+- **Action:** replace only B1's permission parenthetical with wording that distinguishes the declaration from optional environment access and conditional network use; preserve every other B1 clause and all other bullets.
+- **Review gap:** The post-escalation PLAN-EVAL and separate-session IMPL-EVAL both verified the manifest declaration change and accepted the word "needs" without testing its runtime meaning. The later PR review caught the distinction, so the repaired head requires a renewed exact-head IMPL-EVAL.
+- **Evidence:** `.llm/tools/quality/scan-code-quality.ts:768-777,805-841,968-978`; `packages/cli/src/kernel/assets/agent-tools.generated.ts:8-10`; `impl-eval.md:43,169-175`.
+
+## 2026-08-30 — Resumed generator effort differed from the requested route
+
+- **What:** The existing Codex implementation thread was resumed through `codex-resume.ts`, whose interface has no `--effort` argument, and the daemon reported a higher effort than the launch record.
+- **Requested identity:** provider `openai`, model `gpt-5.6-sol`, effort `medium`.
+- **Observed identity after resume:** provider `openai`, model `gpt-5.6-sol`, effort `high`.
+- **Expected:** Requested and observed route identity remain explicit even when a resume surface cannot carry the original effort selection.
+- **Actual:** Provider and model remained matched; effort moved from the initial observed `medium` to daemon-observed `high` after resume.
+- **Severity:** minor
+- **Action:** accept the owner-authorized resumed thread for this bounded repair and record the drift; do not describe the stale initial "matched" record as the resumed identity.
+- **Evidence:** `codex-thread-ids.md`; `.llm/tools/agentic/codex/codex-resume.ts:35-44,46-60,65-108,141-148`; `impl-eval.md:28-31,171-175`.
