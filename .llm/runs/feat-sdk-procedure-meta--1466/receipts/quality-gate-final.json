@@ -7,19 +7,19 @@
     "quality:gate"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
-  "gitHead": "9ab779ce96f0ae282afe96ad3efaa5146a2bf428",
-  "actualGitHead": "9ab779ce96f0ae282afe96ad3efaa5146a2bf428",
+  "gitHead": "75b782205de25d986d837958578b92114d70fb83",
+  "actualGitHead": "75b782205de25d986d837958578b92114d70fb83",
   "timeoutMs": 1800000,
-  "runnerIdentity": "slice3-codex",
-  "attempt": 9,
+  "runnerIdentity": "worker:958686",
+  "attempt": 10,
   "schemaVersion": 1,
-  "requestHash": "993f209998a11c3a57a26fa5c8b3daeb8c81c2e972a2da49c707fd3e908aeb85",
-  "lifecycleId": "slice3-codex:1466-quality-gate-final:9",
+  "requestHash": "085e5ebe231a44721ad9bad8161e423cad85e7a1fcb07a62c2b9d241e8bbf2bf",
+  "lifecycleId": "worker:958686:1466-quality-gate-final:10",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T10:04:57.878Z",
-  "startedAt": "2026-08-30T10:04:57.880Z",
-  "finishedAt": "2026-08-30T10:05:04.945Z",
-  "durationMs": 7066,
+  "claimedAt": "2026-08-30T12:37:36.595Z",
+  "startedAt": "2026-08-30T12:37:36.598Z",
+  "finishedAt": "2026-08-30T12:37:44.022Z",
+  "durationMs": 7424,
   "exitCode": 0,
   "stdout": {
     "bytes": 44001,
@@ -28,9 +28,9 @@
     "truncated": true
   },
   "stderr": {
-    "bytes": 820,
-    "sha256": "8a8e390f39c878090a6ca47a125557d3ff837cb8f95bfdb83bb388a4fa82f7cf",
-    "tail": "Task quality:gate deno task quality:scan && deno task arch:check\nTask quality:scan deno run --allow-read .llm/tools/quality/check-root-coverage.ts && deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root docs/site --max-allow 7\nTask arch:check deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots\nTask deps:check deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod\nTask deps:check:zod deno run --allow-read .llm/tools/deps/check-zod-alignment.ts\n",
+    "bytes": 950,
+    "sha256": "ba64748a3d6300b2c054f4d84f833cae71ee5a10318d184546b13555e1f327e7",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:gate\u001b[0m deno task quality:scan && deno task arch:check\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:scan\u001b[0m deno run --allow-read .llm/tools/quality/check-root-coverage.ts && deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root docs/site --max-allow 7\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36march:check\u001b[0m deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdeps:check\u001b[0m deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdeps:check:zod\u001b[0m deno run --allow-read .llm/tools/deps/check-zod-alignment.ts\n",
     "truncated": false
   }
 }

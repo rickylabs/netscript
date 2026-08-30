@@ -7,19 +7,19 @@
     "arch:check"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
-  "gitHead": "75b782205de25d986d837958578b92114d70fb83",
-  "actualGitHead": "75b782205de25d986d837958578b92114d70fb83",
+  "gitHead": "9ab779ce96f0ae282afe96ad3efaa5146a2bf428",
+  "actualGitHead": "9ab779ce96f0ae282afe96ad3efaa5146a2bf428",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:959347",
-  "attempt": 10,
+  "runnerIdentity": "slice3-codex",
+  "attempt": 9,
   "schemaVersion": 1,
-  "requestHash": "f37efb299c69134e0f0b065412aefb335c4e1263072d15fab1a3960613adcb85",
-  "lifecycleId": "worker:959347:1466-arch-check-final:10",
+  "requestHash": "487532c97fdf516d41f904c7358ebd1cfc9a52e059ae5056079885d988a1e96b",
+  "lifecycleId": "slice3-codex:1466-arch-check-final:9",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T12:37:44.111Z",
-  "startedAt": "2026-08-30T12:37:44.113Z",
-  "finishedAt": "2026-08-30T12:37:49.725Z",
-  "durationMs": 5612,
+  "claimedAt": "2026-08-30T10:05:05.032Z",
+  "startedAt": "2026-08-30T10:05:05.033Z",
+  "finishedAt": "2026-08-30T10:05:10.292Z",
+  "durationMs": 5258,
   "exitCode": 0,
   "stdout": {
     "bytes": 39909,
@@ -28,9 +28,9 @@
     "truncated": true
   },
   "stderr": {
-    "bytes": 563,
-    "sha256": "90f62d89abe62e61c82b10d75449755960fb101535878c3db522ad74ae27ab1c",
-    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36march:check\u001b[0m deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdeps:check\u001b[0m deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdeps:check:zod\u001b[0m deno run --allow-read .llm/tools/deps/check-zod-alignment.ts\n",
+    "bytes": 485,
+    "sha256": "d383a582d1a3ab53409417a624b04062624331ae3ada6bd36a8fb15ed8e33cc6",
+    "tail": "Task arch:check deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots\nTask deps:check deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod\nTask deps:check:zod deno run --allow-read .llm/tools/deps/check-zod-alignment.ts\n",
     "truncated": false
   }
 }

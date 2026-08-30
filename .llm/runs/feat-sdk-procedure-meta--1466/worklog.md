@@ -552,3 +552,40 @@ two evaluators and a Tier-A reviewer each re-deriving the same 12-finding set. I
 forward-looking: before the *next* leaf relies on the same ruling, the standard should become
 mechanical (a checked-in expected-finding set the runner diffs against), so "an evaluator ruled the
 set identical" becomes a receipt-level PASS/FAIL. Harness follow-up, not a #1466 obligation.
+
+## JSR tagline repair — branch-introduced CI red, fixed at content head `75b78220`
+
+**Defect.** CI run `33311482503`, job `99257258418` (`quality`), step **`JSR tagline length`**:
+`packages/contracts/README.md` measured **271 B against a 250 B cap**. Reproduced locally at the exact
+head (`checked=36 over=1`).
+
+**Attribution measured, not assumed.** `origin/main` `13878a80a` runs the same gate at **over=0** with
+a **235 B** tagline. Slice 1's insertion of `NetScript-owned procedure metadata, ` is what crossed the
+cap. Branch-introduced, and consumer-facing: this paragraph becomes the JSR package description, so
+21 bytes over means the registry truncates it.
+
+**The evidence-set gap is the real lesson.** `docs-tagline` is **not** among the plan's contracted
+eight receipts, is **green at base**, and is **branch-sensitive** — the D-27 class this leaf already
+recorded once for `docs:exports-drift`. Eight contracted gates all passed while a consumer-facing
+defect shipped to a ready-flip. Proposed for the contracted set; not applied here, since the plan is
+PLAN-EVAL-approved and this lane does not amend it.
+
+**Repair — 246 B, margin 4.** Candidates dropping `NetScript-owned` were rejected for weakening
+exactly the claim slice 1 established; a 250 B candidate was rejected for zero margin. The landed text
+trims only stylistic words (`The`, `-backed`, `handlers`, `typed`) and keeps every semantic element of
+`main`'s tagline plus the ownership claim.
+
+**Evidence at content head `75b78220`** — all eight receipts `attempt 10`,
+`gitHead == actualGitHead`:
+
+`check` · `lint` · `fmt-check` · **`test`** · `quality-gate` · `arch-check` · `publish-dry-run`
+**PASS exit 0**; `public-doc-lint` **FAIL exit 1** (baseline-red on `main`, delta 0, R-1 — unchanged).
+
+Sufficiency `INSUFFICIENT` for exactly one external reason, the terminal expected state.
+`deno.lock` byte-unchanged. Five append-only archives: `frozen-c9a391811`, `frozen-235482767`,
+`frozen-42874803` (9 files — includes the restored attempt-5 `SKIPPED` record, G-7),
+`frozen-2863d29e`, `frozen-9ab779ce`.
+
+**Currency.** The terminal `PASS` certified content heads `42874803`/`2863d29e`/`9ab779ce`; the head
+has moved, so a renewed exact-head evaluator pass is owed before `status:ready-merge`. Rerunning CI on
+the old head would have proven nothing — the defect was in the tree, not the run.
