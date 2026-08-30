@@ -5357,3 +5357,44 @@ success if I had trusted the field alone.
 
 Unrelated, noted but not yet acted on: an OpenHands agent is running against PR #1775
 (`run_id 33333056325`), not triggered by this supervisor.
+
+## D-93 — #1774 sanctioned-route TOOLING FAILURE: two-for-two empty results; transport decision surfaced, lane not frozen
+
+Both sanctioned-route (`claude-evaluator-deepseek-v4-flash-0731`) dispatches ended the same way:
+`stop_reason: "end_turn"`, `result: ""`, `is_error: false` — a session that looks like a clean
+success by its own terminal field, but delivered nothing.
+
+| Attempt | Turns | Cost | Artifact | Comment | Failure point |
+| --- | --- | --- | --- | --- | --- |
+| 1 (front-loaded protocol) | 104 | $9.59 | none | none | empty final text after exhaustive re-measurement |
+| 2 (output-first protocol, fresh session) | 12 | $0.40 | `impl-eval-cycle-2.md` committed **locally only** (`18d1f8f4a`), 1 of 7 checklist items filled (scope PASS), no verdict line | none | empty final text mid-investigation of item 2, right after a `tool_result` |
+
+- **Confirmed not pushed** — `git rev-parse HEAD` (`18d1f8f4a`) vs `origin/fix/claude-hook-log-cwd-independent`
+  (`8a1ec2750`) differ; PR #1775 is untouched by the incomplete attempt. No ambiguous partial verdict
+  is visible anywhere public.
+- **Both transcripts show `"provider":"Relace"`** for every generation. Combined with identical
+  failure shape (empty text immediately following a `tool_result`, `stop_reason: end_turn`, twice, at
+  turn counts 104 and 12 — ruling out "ran out of turns/context") this reads as a **systematic
+  transport/provider quirk in this exact route** (DeepSeek V4 Flash 0731 via OpenRouter through the
+  Relace inference backend under `claude -p --output-format stream-json`), not two independent
+  flukes. Output-first (attempt 2) reduced blast radius — real partial progress survived as a local
+  commit — but did not fix the underlying empty-completion behavior.
+- **This is now first-hand, reproduced evidence that this preset carries a real silent-completion
+  failure risk**, structurally the same class the "GLM 5.3 Flash" host message warned about for a
+  different model (silent empty output under a token/generation constraint), just via a different
+  mechanism. Worth weighing against that swap proposal rather than for it: the demonstrated failure
+  here is on the *currently registered* preset, not a reason to prefer an unregistered one untested
+  in this harness.
+- **Per instruction: recording as a tooling failure, surfacing the transport decision, not freezing
+  the lane.** Total spent on the sanctioned route so far: **$9.99**, zero verdicts. Options for the
+  next transport decision, left to the coordinator:
+  1. A third sanctioned-route attempt (possibly `--resume 18d1f8f4a`'s session `a0daf17c-...` to
+     continue from item 2 rather than restart, cutting cost).
+  2. Accept the existing Opus 5 substitute cycle-1 `PASS` as standing (it fully completed, with an
+     attack narrative, and was never found wrong on substance — only superseded pending sanctioned
+     confirmation that this route has since twice failed to deliver).
+  3. Escalate per lane policy's own next tier (`COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET`, Qwen 3.8 Max)
+     rather than retry the same preset a third time.
+- **Continuing to the next internals leaf (#1751) now**, per instruction, rather than holding #1774
+  further. #1774/PR #1775 stays at its current, honest state: `status:impl-eval`, sanctioned-route
+  DoD box unchecked, cycle-1 Opus substitute `PASS` on record as the only completed verdict.
