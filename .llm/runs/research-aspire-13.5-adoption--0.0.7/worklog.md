@@ -424,4 +424,7 @@ sign-off recorded; supervisor IMPL-EVAL cycle 1 dispatched as session
 `b03fc914-101a-446c-8d17-03ce7ffb312e` in `007-aspire-s13-eval` @ `d3f71c0b`. | | S13 IMPL-EVAL
 cycle 1 | **`PASS`** at `d3f71c0b` (session `b03fc914…`); non-mutation verified; handoff finalized
 (D-66). Static queue exhausted; remaining work is coordinator/infra-gated (D-55 Phase B, #1736, D-58
-retargets, S1/S9/S11 landing for the parity flip). |
+retargets, S1/S9/S11 landing for the parity flip). | | Owner priority — convergence critical path |
+D-55 probes re-run: still failing (entries=0; curl exit 7). Main `2a65a8cd` inert. #1736 third
+FAIL_FIX → owner decision. Preparing: off-host runtime-proof ref feasibility, D-58 retarget
+playbook, dispatch capability check (D-67). |

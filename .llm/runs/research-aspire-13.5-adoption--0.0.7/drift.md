@@ -1275,3 +1275,17 @@
   flip deferred until S1/S9/S11 land on `main`. Non-mutation verified. The generator's self-arranged
   sessions (D-65) inherited nothing. S13 phase A settled; the Aspire 0.0.7 static queue is now
   exhausted (S12/S6b are 0.0.8 after canary B).
+
+## D-67 — 2026-08-30 — Owner priority: convergence is the critical path; probes re-run (still failing); #1736 at a third FAIL_FIX
+
+- **D-55 probes re-run 17:49:30Z** on the current NAS/DinD (Docker 28.5.2, dind `10.4.12.19`, self
+  `10.4.12.18`): probe 1 bind-mount visibility → **`entries=0`**; probe 2 loopback →
+  `curl
+  http://127.0.0.1:<port>` **exit 7** from `ai-agents`, `ok` from inside the dind netns.
+  Topology unchanged → local Phase B still `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`; runtime proof
+  moves to CI/off-host per the owner. Sandbox: containers 0 before/after; **one pre-existing
+  volume** not created by this lane was present before and after (foreign, untouched, reported).
+- `main` → `2a65a8cd` (#1780, run-dir only): 0 overlap with every Aspire branch → inert.
+- **#1736 (fix for #1734)** is parked at `069913e7` after a **third consecutive `FAIL_FIX`** ("owner
+  decision required"). Every S1/S4/S5 runtime verdict and every CI `scaffold-runtime` run at any
+  Aspire head is pre-runtime-red on that baseline until an owner disposition exists.
