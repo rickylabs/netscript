@@ -2513,3 +2513,20 @@
 - Added newly admitted #1642, #1770, and #1774 consistently to intake, inventory, DAG, lane queues,
   and committed issue scope. The DAG edge `#1722 -> #1642` records the S10/S11 stack dependency;
   independent docs and internals work remains parallel rather than globally serialized.
+
+## 2026-08-30T17:37:00Z — shipping resumed; Aspire ruling and exact main advanced
+
+- Merged docs leaf PR #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`
+  as main `de57fab0e220203567367b6852f918dc71f296a6`; issue #1770 auto-closed and both
+  records now carry the sole lifecycle label `status:shipped`.
+- Ruled the Aspire S11 M3 finding as bounded acceptance-artifact hygiene: correct the stale
+  `10/111` arithmetic to the manifest-proven `8/113`, update the PR body in place, and do not burn
+  a fourth docs-audit. The correction and Fable polish completed; content-independent S13 was
+  released immediately on its live Codex thread under the already-ratified endpoint precedence.
+- Features #1763 is at evidence-only carrier `c80933f7` over product `1c836918`; current-head CI is
+  the last routine gate before the coordinator's exact final audit and merge. Fixes advanced an
+  independent leaf while #1764 remains parked at its two-evaluation owner boundary. Internals
+  continues #1774 while an exact #1734 guard-shape decision packet is reconstructed.
+- All five Claude supervisors were directly checked and steered after main advanced. Host runtime
+  remained exactly empty: `aspire ps --format Json` returned `[]`, and Docker reported no
+  containers or volumes.

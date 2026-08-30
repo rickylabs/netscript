@@ -1340,3 +1340,14 @@ implementation thread.
   lacks renewed Tier-A/evaluation, while #1764 still contains a reproduced product regression and
   cannot advance on paperwork-only corrections. These are recorded as gates, not waived as stale
   supervisor prose.
+
+## 2026-08-30 — S11's final docs-audit finding was receipt arithmetic, not content drift
+
+- Cycle 3 closed every substantive S11 finding and left M3 only: the checked manifest proved eight
+  edited and 113 clean rows, while the worklog retained `10/111` and the PR body omitted the exact
+  row-level proof. Treating this as another formal content-audit cycle would have spent evaluation
+  budget without exercising a new product or documentation claim.
+- The coordinator therefore authorized one audit-free metadata repair, accepted H5's truthful
+  current/target version framing and M5's host-only diagram limitation, and released S13 in
+  parallel. S11 remains stacked and cannot merge until its parent convergence and CI diagram-parity
+  receipt are satisfied; the ruling does not waive those release gates.

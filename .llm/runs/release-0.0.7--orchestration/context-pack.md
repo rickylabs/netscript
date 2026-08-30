@@ -1494,3 +1494,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
   cwd-independent Claude hook logging.
 - Exact main remains `3e5cbabf...`; preserve runtime zero and serialize only host runtime leases,
   never the independent topic queues.
+
+## Resume checkpoint — 2026-08-30T17:37:00Z
+
+- Exact main is `de57fab0e220203567367b6852f918dc71f296a6` after coordinator merge of PR
+  #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`; #1770 auto-closed and the
+  PR/issue lifecycle is normalized to `status:shipped`.
+- All five Claude supervisors are live with Remote Control. Features #1763 is the merge front at
+  evidence carrier `c80933f7` over evaluated product `1c836918`, awaiting only terminal current-head
+  CI and the coordinator's exact final audit. On merge, features immediately resumes #1387.
+- Aspire S11's cycle-3 M3 was accepted as an audit-free arithmetic/PR-body correction (`8/113`, not
+  `10/111`); the correction and Fable polish completed. S13 is actively implementing on its live
+  Codex thread under the owner-ratified endpoint precedence and does not wait for S11 metadata.
+- Fixes has dispatched an independent leaf while #1764 remains parked at the two-terminal-eval
+  owner boundary. Internals is actively applying #1774's bounded plan findings; #1734's third/final
+  evaluator carrier is `069913e7` and awaits the exact guard-shape owner ruling packet. Docs is
+  scoping the next authoritative-reference coverage leaf rather than idling after #1772.
+- Runtime is exact zero (`aspire ps` empty; no Docker containers or volumes). Serial queues remain
+  per orchestrator, with only host runtime leases serialized globally.
