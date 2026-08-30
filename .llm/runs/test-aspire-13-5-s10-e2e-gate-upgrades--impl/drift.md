@@ -19,3 +19,12 @@ contract inside `packages/cli/e2e`; it does not copy S7 commits or import `.llm/
 The dispatched branch is explicitly based on S8 `9dd06647`, while S9 is a sibling stack. S10 can
 guarantee `runtime.resource-command` precedes cleanup on both tiers. The supervisor must preserve
 S9-before-S10 ordering when the stacks meet; Phase A does not import or cherry-pick S9.
+
+## D-04 — Explicit skip exit is a gate-edge doctrine warning
+
+`arch:check` exits zero but its broad A13 heuristic reports `Deno.exit` in
+`e2e/src/application/gates/scaffold/runtime/evidence/resource-command.ts`. This is intentional IO at
+the executable gate edge: exit 75 is the existing `CommandGateSkipPolicy` contract that turns an
+absent `runtime.aspire-start` receipt into a visible `skipped` gate verdict. Replacing it with a
+throw would erase the required skip semantics. The domain parser and command contract remain pure;
+there is no exit in framework/domain code.

@@ -42,3 +42,19 @@
 
 - Slice 1 pre-commit: #1722 is the only closing issue; #1712 and #1372 remain reference-only. Draft
   PR metadata and milestone are locked by the dispatch. No new reviewer comments exist yet.
+- Slice 2 (`690d70b6`): doctor and describe-follow parsers/capture committed and pushed; PR comment
+  `5468795433` records fixture evidence and the Phase-B prohibition.
+- Slice 3 (`d6daf416`): exact-AppHost cleanup ownership classifier committed and pushed; PR comment
+  `5468796382` records S7-compatible owned/foreign/unproven evidence.
+- Slice 4 (`df8b3f18`): durable receipt wiring, describe-backed wait assertions, resource-command gate,
+  explicit skip policy, and both-tier ordering committed and pushed; PR comment `5468803146` records
+  65 focused passing tests.
+- Final static matrix: structured check selected 187 files with 0 diagnostics; lint selected 179
+  files with 0 findings; fmt selected 179 files with 0 findings; raw stdin lint/fmt covered the
+  config-excluded gate catalog; README format passed; the complete `packages/cli/e2e/tests` root
+  passed 186/186.
+- `quality:scan`, `arch:check`, `check:assets-barrel`, `check:publish-assets`, and
+  `check:emitted-samples` all exited 0. Emitted-sample validation checked 47 TypeScript samples from
+  37 artifact paths. Architecture warnings are baseline except D-04's intentional skip edge and
+  contain no failures.
+- Phase B was not attempted: no AppHost start, no containers, and no `e2e:cli` runtime suite.

@@ -51,9 +51,9 @@ The `behavior.app-reference` gate renders every canonical reference state in a r
 Chromium browser at desktop and mobile viewports. It is fail-closed: a missing browser is a failed
 prerequisite, never a skipped or passing browser verdict.
 
-Automatic executable discovery supports Google Chrome or Chromium on Linux; Windows Chrome or
-Edge in a native checkout and through WSL interop; and Chrome, Edge, or Chromium in their standard
-macOS `/Applications` locations. Install one of those browsers before running `scaffold.runtime`.
+Automatic executable discovery supports Google Chrome or Chromium on Linux; Windows Chrome or Edge
+in a native checkout and through WSL interop; and Chrome, Edge, or Chromium in their standard macOS
+`/Applications` locations. Install one of those browsers before running `scaffold.runtime`.
 Non-standard installation paths are intentionally not guessed; add an explicit supported candidate
 with a focused probe test instead of treating a browserless run as evidence.
 
@@ -73,11 +73,11 @@ Run the exact one-pass gate from a native Linux filesystem (WSL paths under `/ho
 deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
 ```
 
-The structured native report is written to
-`.llm/tmp/desktop-native-e2e/evidence.json`. A host-inapplicable gate is `NOT_RUN`, not a pass.
-The current WSL execution reached the signed manifest through ephemeral-CA TLS but failed in the
-packaged runtime because `op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the
-Linux verdict until the consumed runtime/SDK seam is reconciled and the complete gate reruns green.
+The structured native report is written to `.llm/tmp/desktop-native-e2e/evidence.json`. A
+host-inapplicable gate is `NOT_RUN`, not a pass. The current WSL execution reached the signed
+manifest through ephemeral-CA TLS but failed in the packaged runtime because
+`op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the Linux verdict until the
+consumed runtime/SDK seam is reconciled and the complete gate reruns green.
 
 Owner-hosted Windows invocation (from an elevated Developer PowerShell in a native Windows clone):
 
@@ -127,6 +127,19 @@ and requested PR checks should use
 | `scaffold.runtime`        | full scaffold runtime behavior path                        |
 | `scaffold.runtime.sqlite` | reduced-container sqlite runtime tier                      |
 
+### Structured Aspire evidence gates
+
+| Gate                       | Evidence contract                                                                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preflight.aspire`         | `aspire doctor --format Json --non-interactive --nologo`; failures fail closed and warnings remain in the child receipt                        |
+| `runtime.aspire-start`     | bounded `aspire describe --follow --format Json` NDJSON at `.netscript/e2e/aspire-describe.ndjson` with last-seen resource convergence         |
+| `runtime.resource-command` | typed `<db>-cli` migration plus background-child restarts, followed by describe convergence; absent start evidence is an explicit skip receipt |
+| `cleanup.aspire-stop`      | exact-AppHost graceful stop, cleanup-only force stop, then an S7-compatible Docker ownership probe with zero owned survivors                   |
+
+Durable receipts are written beneath `.llm/tmp/gate-receipts/<suite>/`. The runtime suites retain
+both the receipt envelope and the doctor, start, resource-command, cleanup, and Docker-probe child
+evidence.
+
 ## Required Permissions
 
 The CLI entrypoint is intended to run with `--allow-all` because smoke tests create files, spawn
@@ -142,6 +155,7 @@ implementation are:
 
 ## Docker Cleanup
 
-Before a smoke run starts, the suite snapshots existing Docker container IDs. After the run
-completes, it stops the generated Aspire AppHost and removes only containers that were created after
-that snapshot. Existing containers from the main checkout are left untouched.
+After the run completes, the suite gracefully stops the exact generated AppHost and, only when
+`--cleanup` is enabled, follows with `aspire stop --force --apphost <exact>`. It then records a
+Docker probe and fails if Aspire mount-label or DCP AppHost evidence maps any surviving container to
+that AppHost. Foreign and unproven containers are recorded but left untouched.
