@@ -51,12 +51,14 @@ function context(scaffolder: InMemoryScaffolder): InitPipelineContext {
 }
 
 function fakeDeployTarget(key: string): DeployTargetPort {
-  const handler = (operation: DeployTargetOperation) => (_request: DeployTargetRequest): Promise<DeployTargetResult> =>
-    Promise.resolve({
-      target: key,
-      operation,
-      message: `${key} ${operation} ok`,
-    });
+  const handler =
+    (operation: DeployTargetOperation) =>
+    (_request: DeployTargetRequest): Promise<DeployTargetResult> =>
+      Promise.resolve({
+        target: key,
+        operation,
+        message: `${key} ${operation} ok`,
+      });
   return {
     key,
     label: key,
@@ -95,7 +97,8 @@ function fakeDeployDependencies(): PublicCommandDependencies {
       ['compose', fakeDeployTarget('compose')],
       ['docker', fakeDeployTarget('docker')],
     ]),
-    denoDeployTargetFactory: (_defaults: DenoDeployTargetDefaults) => fakeDeployTarget('deno-deploy'),
+    denoDeployTargetFactory: (_defaults: DenoDeployTargetDefaults) =>
+      fakeDeployTarget('deno-deploy'),
   } as unknown as PublicCommandDependencies;
 }
 

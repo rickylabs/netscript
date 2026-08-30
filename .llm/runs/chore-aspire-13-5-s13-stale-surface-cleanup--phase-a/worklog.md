@@ -62,6 +62,8 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | bootstrap | host preflight | Deno 2.9.5, .NET 10.0.400, Aspire 13.5.3; `aspire ps` returned `[]`; `docker ps -a` returned no containers. |
 | 2026-08-30 | 1 | RED-first contract | Structured test wrapper exited 1 before executing tests: missing Aspire-ps adapter, resolver lacks the third injected-port argument and `aspire_ps` source. This is the intended pre-implementation failure. |
 | 2026-08-30 | 2 | D-17 implementation | Added the injected dashboard port and runtime-edge `AspirePsDashboardReader`; wired query, doctor, MCP server, and CLI composition through the one resolver. |
+| 2026-08-30 | 3 | stale-surface cleanup | Reused the shared reader from generated telemetry and `.netscript/aspire-cli.ts`; removed bare dashboard defaults, stale wording/pin, paired consumer CI with `SCAFFOLD_VERSIONS`, and updated teardown MCP ownership. |
+| 2026-08-30 | 3 | generated carriers | Regenerated CLI/publish assets, synchronized Claude skill mirrors, and regenerated the 798-row Aspire surface manifest with zero unmatched paths. |
 
 ## Gate Results
 
@@ -73,6 +75,13 @@ source and generated-carrier freshness gates.
 | MCP lint/fmt | structured lint/fmt wrappers for `packages/mcp` | PASS | 116 files; no findings. |
 | Framework quality | `deno task quality:scan` | PASS | No findings; existing allowance count 7. |
 | Architecture | `deno task arch:check` | PASS | No failures; existing repository warnings retained. |
+| CLI/teardown focused tests | structured test wrapper over 8 files | PASS | 96 passed, 0 failed. |
+| CLI touched-root check | `run-deno-check.ts` over touched CLI roots | PASS | 83 files; no findings. |
+| Raw lint/fmt | `deno lint --no-config` and `deno fmt --no-config` with repository style flags | PASS | 19 config-excluded touched TypeScript files; one pre-existing regex spacing form corrected without an ignore. |
+| Claude mirror | `deno task agentic:sync-claude:check` | PASS | 18 skills, 22 mirrored files. |
+| Emitted samples | `deno task check:emitted-samples` | PASS | 47 emitted TypeScript samples from 37 artifact paths. |
+| Framework quality (slice 3) | `deno task quality:scan` | PASS | No findings; existing allowance count 7. |
+| Architecture (slice 3) | `deno task arch:check` | PASS | No failures; existing repository warnings retained. |
 
 Runtime gates are N/A by explicit scope.
 
@@ -86,6 +95,16 @@ Runtime gates are N/A by explicit scope.
 - D-17 remains unchanged: explicit option → NetScript env → Aspire dashboard port → injected
   `aspire ps` adapter → named default. The adapter selects a running AppHost by canonical path and
   treats the authoritative empty array as unavailable. Domain code performs no process or file IO.
+
+## Reconcile — slice 3
+
+- Generated telemetry now delegates to the package resolver and renders the required unavailable
+  guidance instead of materializing the compatibility default. The generated workspace Aspire task
+  also consumes the shared reader, completing the D-17 extraction.
+- S7's `aspire agent mcp` ownership update was not present on this S10 sibling stack, so S13 applied
+  it once here with the RED-first test already committed in slice 1.
+- Asset freshness commands compare against committed state; their exact-head checks are scheduled
+  immediately after this slice commit and again in the final gate receipt pass.
 
 ## Handoff Notes
 

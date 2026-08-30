@@ -12,7 +12,10 @@ import { SCAFFOLD_JSR_RELEASE_PACKAGES } from '../../constants/scaffold/scaffold
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateAppTsConfig } from '../../adapters/templates/app/generate-app-tsconfig.ts';
 import { generateDenoJson } from './deno-json.ts';
-import { formatAspireDashboardResolutionFailure, generateAspireCliTaskRunner } from './aspire-cli-task.ts';
+import {
+  formatAspireDashboardResolutionFailure,
+  generateAspireCliTaskRunner,
+} from './aspire-cli-task.ts';
 import { generateNetScriptConfig } from './netscript-config.ts';
 import { generateReadme } from './generate-readme.ts';
 import { generatePackageJson } from './package-json.ts';
@@ -164,7 +167,8 @@ Deno.test('generateAspireCliTaskRunner emits bare-first fallback and actionable 
   );
   assertStringIncludes(source, 'arg === name || arg.startsWith(`${name}=`)');
   assertStringIncludes(source, "'--dashboard-url', dashboardUrl");
-  assertStringIncludes(source, "await Deno.realPath('aspire/apphost.mts')");
+  assertStringIncludes(source, "import { AspirePsDashboardReader } from '@netscript/mcp';");
+  assertStringIncludes(source, "appHostPath: 'aspire/apphost.mts'");
   assertEquals(
     formatAspireDashboardResolutionFailure('aspire ps exited 1'),
     'Dashboard URL resolution failed: aspire ps exited 1\n' +
