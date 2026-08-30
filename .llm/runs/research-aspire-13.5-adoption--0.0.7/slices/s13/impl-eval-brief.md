@@ -12,8 +12,8 @@ from the generator thread and the supervisor; you inherit no verdict and self-ce
 
 - Slice: **S13 — stale version-bound surface cleanup, D-17 telemetry resolver, parity phase 2**
   (#1724, PR **PR** draft, base `test/aspire-13-5-s10-e2e-gate-upgrades`; epic #1712; canary C).
-  Evaluate **exactly** head `ba989e9a` on `chore/aspire-13-5-s13-stale-surface-cleanup`; base = S10′
-  `a46ea16d` (evaluate only `a46ea16d..ba989e9a`). Your worktree:
+  Evaluate **exactly** head `d3f71c0b` on `chore/aspire-13-5-s13-stale-surface-cleanup`; base = S10′
+  `a46ea16d` (evaluate only `a46ea16d..d3f71c0b`). Your worktree:
   `/home/agent/projects/netscript/worktrees/007-aspire-s13-eval` (detached at that head; product
   files read-only). Supervisor run dir (absolute):
   `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`

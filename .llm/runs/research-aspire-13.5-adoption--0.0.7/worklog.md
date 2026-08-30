@@ -419,4 +419,6 @@ IMPL-EVAL brief filled (head `ba989e9a`, PR #1779). #1724 → `status:impl`. Eva
 `007-aspire-s13-eval` @ `ba989e9a`. | | S13 Tier-A cycle 1 | Gates at `ba989e9a`: all green except
 **T-1 `check:mcp-export-corpus` FAIL** (stale corpus after the D-17 export change). Fix routed to
 the same thread (regen-only commit; D-65 rule restated: no self-dispatched evaluation). Sign-off +
-supervisor IMPL-EVAL follow at the fixed head. |
+supervisor IMPL-EVAL follow at the fixed head. | | S13 Tier-A sign-off | T-1 closed at `d3f71c0b`;
+sign-off recorded; supervisor IMPL-EVAL cycle 1 dispatched as session
+`b03fc914-101a-446c-8d17-03ce7ffb312e` in `007-aspire-s13-eval` @ `d3f71c0b`. |

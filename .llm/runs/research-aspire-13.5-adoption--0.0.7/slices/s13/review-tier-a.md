@@ -27,3 +27,15 @@
   the fixed head. Convergence note: this is the same shared carrier S9 regenerated — the sibling
   conflict is resolved by regeneration at the next stack hop (D-54 rule).
 - **Not signed off yet** (T-1 open).
+
+## Sign-off at exact head `d3f71c0b` (phase A) — 2026-08-30
+
+- T-1 closed by `d3f71c0b` (`chore(mcp): regenerate export-surface corpus …`): only the generated
+  corpus + two run-dir records changed; supervisor re-check at head: `check:mcp-export-corpus`
+  **0**, `check:publish-assets` 0, `check:assets-barrel` 0, `packages/mcp` tests **139/0**, tree
+  clean; no new evaluator artifacts (D-65 rule honoured). Product content identical to the gated
+  `ba989e9a` → the cycle-1 gate set (0 diagnostics, 698/0, fitness/mirror checks, lint escapes 0)
+  carries over.
+- **Verdict: sign-off to the supervisor-dispatched IMPL-EVAL (phase A) at `d3f71c0b`.** Not a merge
+  recommendation (stacked S10′ → S8′ → S6′ → S5′; D-41/D-58). Parity phase-2 flip deferred until
+  S1/S9/S11 land on `main`.
