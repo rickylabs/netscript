@@ -6027,3 +6027,22 @@ No new IMPL-EVAL required for any of the three — all inert-or-carrier-only con
 MECHANICAL_PASS pattern already established. Serial queue keeps moving: #1764 and #1758 remain
 lease-queued, #1781/#1357 remains lease-queued for its `scaffold.ui-data-screen` proof; nothing waited
 on another topic lane.
+
+### OWNERSHIP CORRECTION — #1758 is internals' leaf, not fixes'; handoff recorded, no further writes
+
+Coordinator correction: #1758 is already accepted in the **internals** serial queue, behind #1792.
+The `a391cbaa0` main-`96d44758d` convergence just performed on `007-leaf-1462` is retroactively
+classified **maintenance-only** — a routine drift-clearing commit, not a fixes-lane action requiring
+further follow-through. Verified **zero writers remain** on `007-leaf-1462` from this lane: no process
+with cwd in that worktree anywhere on the host (full `/proc` scan, not just the app-server-message-cli
+pattern), tree clean at `a391cbaa0`, nothing queued behind the push.
+
+**No further #1758 writes, pushes, gates, evals, or metadata changes from the fixes lane, per instruction.**
+Handoff state for internals: head `a391cbaa0` on `fix/sdk-root-cache-provider-leak`, converged onto
+main `96d44758d`, all four cascade checks green, `packages/sdk` 79/0, lock unchanged — a clean, current
+starting point for whatever internals does next. Not touching its labels, PR body, or run artifacts
+beyond what is already committed.
+
+**Fixes serial queue, corrected:** **#1781/#1357 active** (lease-queued for `scaffold.ui-data-screen`),
+**#1764 in its own queue** (lease-queued for Flow-B TC-6/7/9). #1758 removed from this lane's queue
+entirely — ownership was never this lane's to begin with the way I'd been tracking it.
