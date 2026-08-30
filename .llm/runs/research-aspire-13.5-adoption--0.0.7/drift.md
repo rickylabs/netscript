@@ -626,3 +626,21 @@
   D-25a, the **only** remaining host quota blocker (`fs.inotify.max_user_instances` = 128); it gates
   Phase-B runtime and this one watcher test, nothing else.
 - Worktree `007-aspire-s5` stayed clean; Aspire `[]`, dind empty after the runs.
+
+## D-38 — 2026-08-30 — S8 first turn cut by the launcher client's timeout; resumed on the same thread
+
+- **What:** `agentic:launch-codex-slice` was wrapped in `timeout 300` by this supervisor. The
+  launcher streams the child's turn; at 09:05:55Z (≈300 s after the 09:00:59Z start) the client was
+  killed and the S8 thread's turn stopped mid-survey — rollout ends on a `custom_tool_call_output` +
+  `token_count` with **no** `task_complete` and no `turn_aborted`, worktree `007-aspire-s8`
+  untouched at `564d465c`, and `codex-status --pretty` no longer lists the thread (8-row recency
+  cap), which is why the monitor reported "not listed".
+- **Fix applied:**
+  `agentic:codex-resume --thread-id 01a051e6-90d4-7e50-a91e-ac4bd23b880c
+  --worktree …/007-aspire-s8 --user node --message "<steering>"`
+  run **in the background without a timeout** (steering text: resume the brief, static only,
+  restore-only D-19 with the inotify stop rule, tini/0-zombie host so no zombie-infra
+  classification, end with a status line). Same thread — never a second launch at that worktree.
+- **Rule for this run:** never wrap `launch-codex-slice` / `codex-resume` in `timeout`; run them
+  backgrounded and wake on the rollout (`task_complete` / `turn_aborted`) or the worktree head. Use
+  `codex-status --sessions <n>` larger than the default when more than 5–8 threads are live.
