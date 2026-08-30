@@ -20,7 +20,8 @@
 
 - `RequestContext` — existing opaque application-state bag that must stay provider-invisible.
 - `ChatClientRequest` — existing owned five-field turn request; four fields are provider-bound.
-- `provider-bound payload` — test-only JSON projection of `messages`, `system`, `tools`, `options`.
+- `provider-bound payload` — test-only projection of the request's `messages`, `system`, `tools`,
+  and `options`, plus `ChatClientCallOptions` minus the non-provider `signal`.
 - `attempt` — one inner provider stream call; a retry creates another attempt for the same turn.
 - `continuation` — the loop turn after a tool result is appended to history.
 
@@ -44,6 +45,7 @@
 | S2 | Add retry/continuation loop guard and demonstrate mutation B red then restored green. | Focused structured test wrapper | Test file + run artifacts |
 | S3 | Rename/document Anthropic adapter-wire coverage. | Focused structured test wrapper | Test file + run artifacts |
 | S4 | Land evidence-only artifact state, then create/audit exact-head receipts. | Receipt and Git hygiene audit | Run artifacts; ignored receipts |
+| R1 | Repair IMPL-EVAL F-1 by guarding provider-bound stream call options and proving B2 red. | Named mutation test + exact-head receipts | Test file + run artifacts |
 
 ### Deferred Scope
 
@@ -78,12 +80,14 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 | 2026-08-30T13:58Z | S3 | proving gate | Focused structured test wrapper PASS, 9/9, `durationMs=1211`; focused format PASS; test file remains below F-10 at 495 LOC. |
 | 2026-08-30T14:00Z | S4 | convergence | Merged `origin/main` `3e5cbabf` once, producing `2b4f7407`. Merge was chosen over rebase to preserve the already-pushed S1–S3 hashes and PR-comment references. There were no conflicts, so no generated carrier was resolved or regenerated; raw post-merge status was clean. |
 | 2026-08-30T14:00Z | S4 | receipt contract | Confirmed no prior top-level #1730 receipt set exists to archive. The final named set will be cut only after this evidence-state commit, under ignored `.llm/tmp/gate-receipts/test-ai-request-context-provider-guard--1730/receipts/`; no later commit is permitted. |
+| 2026-08-30T14:27Z | R1 | F-1 repair | The recording client now captures each `stream(request, options)` call. The provider-bound projection includes every call-option field except `signal`; the optional F-2 model-ID path remains owned incidentally by the exact basic single-text-turn test named beside the guard. The test file is 498 LOC. |
+| 2026-08-30T14:27Z | R1 | mutation B2 proof | Temporary B2 made the named guard fail 0/1 in 1115 ms with the sentinel under `callOptions.modelOptions.ctx`; restored `loop.ts`, proved the product diff empty, and reran the focused file green 9/9 in 212 ms. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
-| Exhaustive loop projection is `messages/system/tools/options`. | Those are all request fields except `context`. | `ChatClientRequest` docs/source |
+| Exhaustive loop projection covers both stream arguments. | The request contributes `messages/system/tools/options`; call options contribute every field except the non-provider cancellation `signal`. | IMPL-EVAL F-1 + `ChatClientCallOptions` docs/source |
 | Record retry attempts below `withRetryingChatClient`. | Recording only provider creation or loop turns misses retries. | Provider retry implementation |
 | Rename/document Anthropic test. | Adapter drops unknown model options; seam test owns mutation-A detection. | Issue #1730 + bridge/adapter code |
 | No PLAN-EVAL. | Complete mechanical contract with no open decision. | Harness run-loop §4 |
@@ -114,7 +118,38 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 
 | Gate | Result | Notes |
 | --- | --- | --- |
-| Final exact-head static gates | PENDING_RECEIPTS | Cut only after the final evidence-state commit so every receipt targets one immutable head. |
+| Final exact-head static gates | RE-CUT_PENDING | R1 must be committed first so every replacement receipt targets its immutable content head. |
+
+### R1 pre-commit candidate gates
+
+| Gate | Result | Notes |
+| --- | --- | --- |
+| Focused tests | PASS | 9/9 after B2 restoration; 212 ms |
+| Full AI tests | PASS | 147/147; 3379 ms |
+| Scoped check | PASS | 100 files; 0 diagnostics |
+| Scoped lint | PASS | 100 files; 0 findings |
+| Scoped format | PASS | 100 files; 0 findings |
+| Quality gate | PASS | `quality:scan` + `arch:check`; pre-existing warnings only |
+| Test-shape review | PASS | `request_context_test.ts` is 498 LOC (F-10 ceiling ≤ 500) |
+
+### Corrected prior-head receipt audit (F-3 / F-4 / F-6)
+
+The prior set at `1baabbd6` was audited by exact filename. Every `cwd` was the worktree root
+(`/home/agent/projects/netscript/worktrees/007-leaf-1730`), and every `gitHead` equaled
+`actualGitHead`. In particular, `publish-dry-run-final.json` was the **workspace**
+`deno task publish:dry-run`, not the planned package-cwd `deno publish --dry-run --allow-dirty`.
+Its valid replacement was attempt 2 at 30,719 ms; the earlier 150 ms value was a replay and is not
+evidence.
+
+| Receipt | Exact `argv` | Attempt | `durationMs` | Result |
+| --- | --- | ---: | ---: | --- |
+| `check-final.json` | `deno task check` | 1 | 119238 | PASS |
+| `test-final.json` | `deno task test packages/ai/tests/` | 1 | 3737 | PASS 147/147 |
+| `lint-final.json` | `deno task lint` | 1 | 22199 | PASS |
+| `fmt-check-final.json` | `deno task fmt:check` | 1 | 12144 | PASS |
+| `quality-gate-final.json` | `deno task quality:gate` | 1 | 8839 | PASS |
+| `doc-lint-final.json` | `deno task doc:lint --root packages/ai --pretty` | 1 | 1035 | Contracted base-red, exit 1 |
+| `publish-dry-run-final.json` | `deno task publish:dry-run` | **2** | **30719** | PASS |
 
 ### S4 exact-head receipt contract
 
@@ -181,6 +216,33 @@ exit_code=0
 focused wrapper after restoration: exit 0; 9 passed, 0 failed; durationMs 214
 ```
 
+### R1 mutation-B2 red/green demonstration
+
+Temporary mutation (never staged):
+
+```ts
+{ signal, modelOptions: { ctx: JSON.stringify(input.context) } },
+```
+
+Exact expected-red invocation and wrapper result:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter 'agent loop: keeps context out of every provider-bound retry and continuation request' packages/ai/tests/request_context_test.ts
+exit_code=1
+durationMs=1115; passed=0; failed=1
+failure=agent loop: keeps context out of every provider-bound retry and continuation request
+payload path=callOptions.modelOptions.ctx; sentinel present
+```
+
+Restoration evidence:
+
+```text
+git diff --exit-code HEAD -- packages/ai/src/agent/loop.ts packages/ai/src/adapters/tanstack-chat-client.ts
+exit_code=0
+
+focused wrapper after restoration: exit 0; 9 passed, 0 failed; durationMs 212
+```
+
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
@@ -206,6 +268,9 @@ focused wrapper after restoration: exit 0; 9 passed, 0 failed; durationMs 214
   comments. `origin/main` was integrated once by merge, preserving every published slice hash. The
   final receipt set is now frozen by name; only ignored receipt/output files and external PR
   metadata may change after the evidence-state commit.
+- **R1:** The coordinator-owned Tier-A comment closes F-5. The evaluator's bounded repair changes
+  only the named test and run evidence: F-1 is fixed, F-2 uses the permitted incidental-owner
+  comment, and the corrected prior receipt facts close F-3/F-4/F-6 before exact-head recutting.
 
 ## Handoff Notes
 

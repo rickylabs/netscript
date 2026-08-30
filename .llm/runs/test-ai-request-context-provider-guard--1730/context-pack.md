@@ -6,18 +6,17 @@
 | --- | --- |
 | Run ID | `test-ai-request-context-provider-guard--1730` |
 | Branch | `test/ai-request-context-provider-guard` |
-| Current phase | `gate — final S4 content state; exact-head receipts pending` |
+| Current phase | `IMPL-EVAL repair R1 — content ready; exact-head receipt re-cut pending` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
 ## Current State
 
-S1 and S2 were accepted before this fresh implementation thread began. S3 narrows the Anthropic
-wire test to direct adapter serialization and explicitly assigns mutation-A bridge/`modelOptions`
-coverage to the TanStack seam. The focused suite is green 9/9 and the test remains below F-10 at
-495 LOC. The branch converged once with `main` `3e5cbabf` via merge commit `2b4f7407`; there were no
-conflicts and raw post-merge status was clean. This committed state is the final content surface;
-only ignored exact-head receipts and external PR metadata may change afterward.
+S1–S4 remain Tier-A accepted. The separate-session IMPL-EVAL evidence commit `6977debd` returned
+`FAIL_FIX` for one bounded hole: the loop guard ignored `ChatClientCallOptions`. R1 now records the
+second `stream()` argument and projects every call-option field except `signal`; mutation B2 makes
+the named guard red, then reverts to a 9/9 green focused suite. The test is 498 LOC. The optional
+model-ID path is documented as incidentally owned by the existing basic single-text-turn loop test.
 
 ## Completed
 
@@ -40,18 +39,22 @@ only ignored exact-head receipts and external PR metadata may change afterward.
 - Merged current `main` exactly once without conflict; chose merge to preserve pushed slice hashes
   and their structured PR comments.
 - Confirmed there is no prior top-level #1730 receipt set to archive.
+- Read the immutable IMPL-EVAL record first and repaired only F-1 through the existing test seam.
+- Demonstrated mutation B2 red in the named guard (0/1, 1115 ms), restored product source, and
+  proved the focused test file green (9/9, 212 ms).
+- Corrected the durable prior-head receipt audit: the publish receipt is the root workspace task,
+  attempt 2 at 30,719 ms, not a 150 ms package-cwd run.
 
 ## In Progress
 
-- Commit this final S4 evidence state, then cut and field-audit the named exact-head receipts.
+- Commit R1's test and durable evidence state, then replace and field-audit the named receipts.
 
 ## Next Steps
 
-1. Cut the seven named top-level receipts at the final immutable content head.
-2. Run the named exact-head JSR supplemental and audit every receipt's `argv`, `durationMs`,
-   `gitHead`, and `actualGitHead`.
-3. Recompute sufficiency over the named receipt set, prove lock/carrier/status hygiene, push/comment,
-   and stop for Tier-A.
+1. Run the bounded green gates, prove the product/lock/carrier hygiene, and commit R1.
+2. Cut the seven explicitly named top-level receipts at the immutable R1 head and audit each
+   receipt's `argv`, `cwd`, `attempt`, `durationMs`, `gitHead`, and `actualGitHead`.
+3. Push by explicit refspec, post one structured repair-slice comment, and stop for Tier-A.
 
 ## Key Decisions
 
@@ -60,6 +63,8 @@ only ignored exact-head receipts and external PR metadata may change afterward.
 | Assert `messages/system/tools/options` minus `context`. | `plan.md` D1 | Exhaustive owned-request projection. |
 | Record inner attempts under retry wrapper. | `plan.md` D3 | Covers initial, retry, continuation. |
 | Rename/document Anthropic coverage. | `plan.md` D5 | TanStack seam remains mutation-A guard. |
+| Project both `stream()` arguments. | IMPL-EVAL F-1 | Keep request `context` and call `signal` out; inspect every provider-bound field. |
+| Document model-ID's incidental owner. | IMPL-EVAL F-2 | Avoid extra fixture surface while naming the existing detecting test. |
 | Product ceiling is one test file. | `plan.md` | Temporary loop mutation must never be staged. |
 
 ## Files Changed
@@ -74,9 +79,9 @@ only ignored exact-head receipts and external PR metadata may change afterward.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PENDING_RECEIPTS | Final content state is committed before receipt execution. |
-| Fitness | S3 shape PASS | 495 LOC; exact-head quality/delta evidence pending receipts. |
-| Runtime | S2 PASS | Named mutation-red 0/1; restored focused suite 9/9; product diff empty |
+| Static | RE-CUT_PENDING | R1 content state must be committed before replacement receipt execution. |
+| Fitness | R1 shape PASS | 498 LOC; exact-head quality/delta evidence pending receipts. |
+| Runtime | R1 PASS | B2 named mutation-red 0/1; restored focused suite 9/9; product diff empty |
 | Consumer | N/A | No public-surface change |
 
 ## Open Questions

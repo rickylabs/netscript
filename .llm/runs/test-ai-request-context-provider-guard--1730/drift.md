@@ -25,3 +25,15 @@ state here before expanding scope.
 - **Evidence:** Rebased S1; clean detached-base rerun at `952cc106` reproduced every gate
   classification (focused 9/9, full AI 147/147, check/lint/fmt/quality/JSR/publish green,
   doc-lint base-red at 128 private refs and 0 missing JSDoc).
+
+## 2026-08-30 — IMPL-EVAL found a second provider-bound stream argument
+
+- **What:** Locked decision D1 called the request-only projection exhaustive, but
+  `ChatClientPort.stream(request, options)` also accepts provider-bound call options.
+- **Source:** Separate-session IMPL-EVAL F-1; mutation B2 stayed green before repair.
+- **Expected:** The named guard trips on every provider-bound loop path.
+- **Actual:** `ChatClientCallOptions.modelOptions` was unobserved.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** R1 records call options, removes only `signal` from the projection, and makes B2 fail
+  the named test before clean restoration.
