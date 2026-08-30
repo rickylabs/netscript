@@ -7570,3 +7570,51 @@ Slice 2 will pick up `2a65a8cd` naturally at its own convergence point if the pl
 | #1730 / PR #1763 | SHIPPED |
 | #1387 / PR #1762 | **active** — Slice 1 Tier-A `ACCEPTED` at content `2ddd6048`; bounded plan re-evaluation then Slice 2 |
 | #1664 | parked at `20337441788b` |
+
+## 2026-08-30 — #1387 bounded plan re-evaluation dispatched; ledger made durable
+
+### Bounded re-evaluation in flight
+
+| Field | Value |
+| --- | --- |
+| Session | `79a0923a`, `--remote-control ns1387-planeval2` |
+| Route | requested = observed = **Claude Fable 5 · medium**, read from the session's own transcript |
+| Worktree | `ns1387-planeval2`, detached at `c0d61e648adaf6db86ee834b88a37857d9438dc8` |
+| Brief | `slices/plan-eval-1387-cycle2.md` |
+| Scope | **bounded by cycle 1's own words**, quoted verbatim: row 4 + carrier rows, Slices 2/3/4/7/9 ceilings, LD-8/LD-11 text, appended census. Design accepted; no fresh PLAN-EVAL required. |
+
+It is told to **re-derive the baselines itself** rather than accept my numbers or the author's, and
+that **Slice 1's receipts and Tier-A sign-off are frozen evidence, explicitly out of scope**.
+
+### A false positive in my own watcher, recorded
+
+My terminal watcher reported `PUSHED remote=c0d61e648ada` — it had not. I hardcoded the baseline as
+`c0d61e648e1c` from a mistranscribed 9-character `--short` reading; the real head is
+`c0d61e648adaf6db86ee834b88a37857d9438dc8`. Same 9-char prefix, different string, so every comparison
+read as "changed".
+
+The lesson is the shape of the bug, not the typo: **`git rev-parse --short` returns a variable-length
+prefix** — it widened to 9 characters here precisely because the repository holds another object
+sharing `c0d61e64`. Watchers must compare **full SHAs captured programmatically**, never a prefix
+pasted into a script. Verified the truth directly (`git rev-parse HEAD` == `origin/…`) rather than
+trusting the watcher, and the evaluator is still `working/busy`.
+
+### Runtime lease — acknowledged, nothing to change
+
+DinD mount visibility and cross-container ports are fixed (`DOCKER_HOST=tcp://netscript-dind:2375`,
+published ports at `netscript-dind:<port>`, **not** `127.0.0.1`). The **sole host runtime lease is
+currently held by the Aspire supervisor for Phase B**.
+
+This lane holds no lease and requests none. Every brief it has issued already forbids `e2e:cli`,
+Aspire, Docker and browser gates and states that a reachable sandbox is not authorization — so the
+constraint needs no change, only confirmation. **#1664 stays parked**: its open question is runtime
+and would need a lease, so it waits for the lease to return exact zero rather than queueing behind it.
+All #1387 work is static and unaffected.
+
+### Ledger durability
+
+The topic branch was **43 commits ahead** of `origin/orchestrator/release-0.0.7-features` (`78430faf`)
+and **0 behind**; `git merge-base --is-ancestor` confirms the remote is an ancestor, so this is a
+fast-forward with **no divergence** and no force needed. Pushed at this boundary — between the
+evaluator's dispatch and its verdict — so the harness ledger is durable without touching any leaf head
+or interrupting the in-flight worker.
