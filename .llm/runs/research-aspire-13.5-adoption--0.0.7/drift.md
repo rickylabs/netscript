@@ -161,3 +161,13 @@
   absent until `db generate` ran; browser-log child `NotStarted`.
 - Action: S9 replaces the skill timing claim with measured ranges; S10 orders db codegen before the
   readiness wait; not an Aspire regression claim without a same-host 13.4.6 control.
+
+## D-18 — 2026-08-30 — S5 does not close #1365 (OF-3a drift)
+
+- **What:** Ratified OF-3a / #1717 box 6 had S5's PR close #1365, #1370, #979. At IMPL-EVAL PASS
+  (`slices/s5/evaluate-cycle-2.md` F-2) the #1365 acceptance boxes for docs-site embedding
+  (S11), "discarding a publish result fails type-check/lint" (declined by locked D-14), and
+  restart/duplicate/out-of-order/OTEL-correlation proofs are not met by S5.
+- **Action:** PR #1740 references `Part of #1365` with the remaining scope listed; #1370 and #979
+  keep closing keywords. Coordinator to either amend #1365's boxes (D-14 decision) or route the
+  remainder to S11 + a sagas follow-up. Severity: minor (scope honesty, no code impact).
