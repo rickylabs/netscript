@@ -12,8 +12,8 @@
 
 ## Current State
 
-Slices 1-3 are pushed on draft PR #1740. Slice 4 makes plugin and infrastructure host-port pins
-explicit-only.
+Slices 1-4 are pushed on draft PR #1740. Slice 5 removes deterministic E2E probe ports and resolves
+plugin resource endpoints from the running AppHost's `aspire describe` `urls[].url` contract.
 
 ## Completed
 
@@ -21,15 +21,16 @@ explicit-only.
 - RED fitness contract committed and pushed as `e83659d78`.
 - D-14 sagas slice committed and pushed as `24817a404` with JSR evidence.
 - Contribution slice committed and pushed as `aae91586b`.
+- Plugin/infrastructure opt-in pin slice committed and pushed as `8aee17462`.
 
 ## In Progress
 
-- Sagas publisher, compatibility export, CLI/probe discovery, manifest, sample, and README updates.
+- Slice 5 is validated and ready to commit; slice 6 regeneration and final gates remain.
 
 ## Next Steps
 
-1. Record RED output, commit, push, and open the draft PR.
-2. Implement the D-14 sagas slice.
+1. Commit and push slice 5 with its receipt and PR trail comment.
+2. Regenerate embedded/publish assets, make the exact literal grep green, and run final gates.
 
 ## Key Decisions
 
@@ -50,10 +51,10 @@ explicit-only.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | RED pending | slice 1 receipt |
-| Fitness | RED pending | slice 1 receipt |
+| Static | E2E subtree green; repo cleanup pending | slice 5 receipt |
+| Fitness | contribution/infrastructure checks green | slices 3-4 receipts |
 | Runtime | CI deferred | S2 live receipts + future CI `scaffold.runtime` |
-| Consumer | pending | slice 2 JSR evidence |
+| Consumer | sagas JSR baseline proven | slice 2 JSR evidence |
 
 ## Open Questions
 

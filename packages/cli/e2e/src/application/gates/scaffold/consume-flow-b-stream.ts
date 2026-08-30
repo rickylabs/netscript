@@ -21,6 +21,7 @@ import {
   selectFlowBStreamChange,
   streamChangeCorrelationId,
 } from './select-flow-b-stream-change.ts';
+import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
 
 const FLOW_B_SELECTION_MAX_BATCHES = 40;
 const FLOW_B_SELECTION_TIMEOUT_MS = 20_000;
@@ -28,6 +29,8 @@ const FLOW_B_SELECTION_RETRY_DELAY_MS = 500;
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) throw new Error('project root argument is required');
+const appHost = Deno.args[1];
+if (!appHost) throw new Error('apphost argument is required');
 
 const metadataText = await Deno.readTextFile(
   `${projectRoot}/.netscript/e2e/aspire-start.json`,
@@ -50,9 +53,14 @@ await provider.register();
 
 try {
   const flowBProducer = await readJobExecuteIdentity(metadata.dashboardUrl);
-  const streamPort = Number(Deno.args[1]);
-  if (!Number.isInteger(streamPort)) throw new Error('streams port argument is required');
-  const streamUrl = `http://127.0.0.1:${streamPort}/v1/stream/netscript/workers/executions`;
+  const streamBaseUrl = firstResourceUrl(
+    await resolveResourceUrlsFromAppHost(appHost, 'streams'),
+    'streams',
+  );
+  const streamUrl = new URL(
+    '/v1/stream/netscript/workers/executions',
+    streamBaseUrl,
+  ).toString();
   let response = await fetch(
     `${streamUrl}?offset=-1`,
     {
@@ -141,6 +149,12 @@ try {
   );
 } finally {
   await provider.shutdown?.();
+}
+
+function firstResourceUrl(urls: readonly string[], resourceName: string): string {
+  const url = urls[0];
+  if (!url) throw new Error(`Aspire resource ${resourceName} declared no URL.`);
+  return url;
 }
 
 async function readJobExecuteIdentity(dashboardUrl: unknown): Promise<FlowBProducerIdentity> {

@@ -41,7 +41,7 @@ export type TriggersStreamDBOptions = Readonly<{
  * import { createTriggersStreamDB } from '@plugins/triggers/streams';
  * import { useLiveQuery } from '@tanstack/react-db';
  *
- * const triggersDb = createTriggersStreamDB({ baseUrl: 'http://localhost:4437' });
+ * const triggersDb = createTriggersStreamDB({ baseUrl: streamsServiceUrl });
  *
  * const { data: detected } = useLiveQuery((q) =>
  *   q.from({ t: triggersDb.collections.triggerEvent })
@@ -52,7 +52,7 @@ export type TriggersStreamDBOptions = Readonly<{
 export function createTriggersStreamDB(
   options: TriggersStreamDBOptions = {},
 ): TriggersStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
+  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
   const state = createStateSchema<TriggersStreamDefinition>({
     triggerEvent: {
       schema: TriggerStreamEntitySchema,
@@ -69,4 +69,11 @@ export function createTriggersStreamDB(
     },
     state,
   });
+}
+
+function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
+  if (baseUrl === undefined) {
+    throw new Error('Triggers StreamDB requires the Aspire-discovered streams service URL.');
+  }
+  return baseUrl;
 }

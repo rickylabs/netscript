@@ -257,17 +257,24 @@ function resolveKvOAuthProviderEnv(
   const usesLocalDefaults = !env.NETSCRIPT_AUTH_CLIENT_ID || !env.NETSCRIPT_AUTH_REDIRECT_URI ||
     (!env.NETSCRIPT_AUTH_ISSUER &&
       (!env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT || !env.NETSCRIPT_AUTH_TOKEN_ENDPOINT));
-  const port = env.PORT ?? '8094';
-  const origin = `http://localhost:${port}`;
   return {
     clientId: env.NETSCRIPT_AUTH_CLIENT_ID ?? 'netscript-auth-local',
-    redirectUri: env.NETSCRIPT_AUTH_REDIRECT_URI ?? `${origin}/api/v1/auth/callback`,
+    redirectUri: env.NETSCRIPT_AUTH_REDIRECT_URI ??
+      `${localAuthOrigin(env)}/api/v1/auth/callback`,
     authorizationEndpoint: env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT ??
-      (env.NETSCRIPT_AUTH_ISSUER ? undefined : `${origin}/v1/auth/signin/not-configured`),
+      (env.NETSCRIPT_AUTH_ISSUER
+        ? undefined
+        : `${localAuthOrigin(env)}/v1/auth/signin/not-configured`),
     tokenEndpoint: env.NETSCRIPT_AUTH_TOKEN_ENDPOINT ??
-      (env.NETSCRIPT_AUTH_ISSUER ? undefined : `${origin}/v1/auth/token/not-configured`),
+      (env.NETSCRIPT_AUTH_ISSUER
+        ? undefined
+        : `${localAuthOrigin(env)}/v1/auth/token/not-configured`),
     usesLocalDefaults,
   };
+}
+
+function localAuthOrigin(env: Readonly<Record<string, string | undefined>>): string {
+  return `http://localhost:${requiredEnv(env, 'PORT')}`;
 }
 
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {
