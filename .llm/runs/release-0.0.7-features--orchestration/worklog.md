@@ -7356,3 +7356,51 @@ either pre-merge or immediately post-merge so the stale text never reaches a res
 | #1664 | parked at `20337441788b` |
 
 `origin/main` remains `3e5cbabf`. No new features leaf until #1730 closes.
+
+## 2026-08-30 — `main` advanced to `de57fab0` (#1772); measured **inert** for this lane
+
+Verified from GitHub, not accepted from prose: `origin/main` = **`de57fab0e220203567367b6852f918dc71f296a6`**
+(exact match), PR #1772 `MERGED` at 15:32:34Z, issue #1770 `CLOSED` / `status:shipped`.
+
+### Inertness measured per surface, not assumed
+
+`git diff 3e5cbabf..de57fab0`:
+
+| Surface | Result |
+| --- | --- |
+| `packages/ai` (the only product surface #1730 touches) | **0 files** |
+| generated carriers | **4 files** — `agent-docs.generated.ts`, `publish-assets.generated.ts`, prose/provenance |
+| `docs/site` (corpus input) | **1 file** — `deploy-local-aspire.md` |
+
+So the advance is **not** inert in general — it moves the corpus carriers — but it **is inert for
+#1730**, and the distinction matters. #1730 changes exactly one file outside its run dir,
+`packages/ai/tests/request_context_test.ts`, and touches **no** corpus input and **no** carrier. The
+two changesets are disjoint: no merge conflict, and #1730 introduces no carrier staleness at either
+end. Its branch carries `3e5cbabf`'s carriers, which are fresh *for that tree* because #1730 changed
+no corpus input; after merge the result carries `de57fab0`'s carriers plus one test file, still fresh.
+
+### No integration performed — deliberately
+
+Integrating would move the PR head again, cancel the in-flight run, and re-run CI for **no measurable
+change in outcome**. The leaf is mid-handoff at a head whose `close-gate` has already gone green.
+Currency is justified when the base motion can change a result; here it provably cannot.
+
+This is the mirror image of the #1731 decision, and worth recording as the same rule applied both
+ways: #1731 *did* integrate twice, because #1748 and #1755 landed on the **shared-asset surface it was
+itself regenerating**, so the base motion could and did change its result. #1730 does not integrate,
+because the base motion cannot touch anything it asserts. **Integrate when the drift intersects the
+leaf's surface; do not integrate on a schedule.**
+
+### Lane state
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **SHIPPED** |
+| #1730 / PR #1763 | merge-ready; current carrier `c80933f7`, product head `1c836918`; CI in flight |
+| #1387 / PR #1762 | **PARKED**, `FAIL_PLAN` preserved, five required fixes recorded |
+| #1664 | parked at `20337441788b` |
+
+Also reconciled: the ~17:05 host process cleanup killed background Claude CLI processes but cost this
+lane nothing — all four evaluator sessions had already pushed their verdicts to git before it, so
+their absence from the session list is completion, not loss. Verdicts live in git, not in process
+memory.
