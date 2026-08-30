@@ -9,8 +9,8 @@ and `AspireCommandExecutor` remains the process port. D-6 ownership is expressed
 `RESOURCE_DEFAULTS.DbCliModeExcludeFromMcp`; no hidden-resource behavior is introduced.
 
 The six committed slices follow the ratified issue order. Phase A provides static, unit,
-consumer-compile, and scaffold evidence. Live AppHost evidence is deferred to the supervisor's
-Phase-B lease and the implementation agent does not self-certify.
+consumer-compile, and scaffold evidence. Phase B uses the supervisor's serialized runtime lease;
+the implementation agent records the resulting evidence and does not self-certify.
 
 ## Progress
 
@@ -53,9 +53,10 @@ Phase-B lease and the implementation agent does not self-certify.
   consumer compile exposed unsupported `ServiceProvider.getConnectionString` emission and the
   string-valued TypeScript visibility projection. The generator now resolves the connection via
   `builder.getConfiguration().getConnectionString`; documented default UI+API visibility replaces
-  the untypeable bitwise expression without a cast (drift D-03). Final TypeScript 5.9.3 compile
-  exited 0 with empty output. No Zod allowance was needed. The scratch was moved to trash and the
-  worktree contains no scratch residue. Receipt: `receipts/05-consumer-typecheck-13.5.3.txt`.
+  the untypeable bitwise expression without a cast (drift D-03). D-44 later corrected the receipt:
+  the final TypeScript 5.9.3 compile exited 2 with exactly the two allowed `zod` TS2307 baseline
+  diagnostics and zero S8 diagnostics. The scratch was moved to trash and the worktree contains no
+  scratch residue. Receipt: `receipts/05-consumer-typecheck-13.5.3.txt`.
 - 2026-08-30: pushed slice 5 commit `c0d47238` with the explicit refspec and posted its D-19 PR
   trail. Supervisor steering then superseded the historical host classification with D-39:
   inotify limit 1024, Docker 28.5.2 client/server, PID 1 `tini`, and zero zombies. Restore/watch and
@@ -93,3 +94,75 @@ appended after each push and mirrored in the draft PR comment trail.
 - `1efd1a175d75cb5bb167b0998e0ce559f037255f` — slice 4 resident routing and bounded wait, pushed explicitly.
 - `c0d47238` — slice 5 Aspire 13.5.3 consumer restore/type-check receipt, pushed explicitly.
 - `5b6f8a0a8b89803ec10fbb13600fc7427ddc9260` — slice 6 E2E/static gate surface, pushed explicitly.
+
+## Phase B — serialized runtime lease
+
+Lease window opened at `2026-08-30T18:42:56Z`. Preflight output, recorded verbatim:
+
+```text
+WINDOW_START_UTC=2026-08-30T18:42:56Z
+GIT_STATUS_SHORT_BEGIN
+GIT_STATUS_SHORT_END
+LOCAL_HEAD=f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2
+ORIGIN_HEAD=f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2
+ASPIRE_PS_BEGIN
+[]
+ASPIRE_PS_END
+DOCKER_PS_A_BEGIN
+DOCKER_PS_A_END
+DOCKER_VOLUME_LS_BEGIN
+DOCKER_VOLUME_LS_END
+```
+
+No AppHost, Docker container, or Docker volume existed at entry. The supervisor relay inventory was
+empty at preflight; any later `relay-*` container or `loopback-relay.ts` process remains
+supervisor-owned and must not be stopped, removed, or classified as a leak.
+
+Before the live pass, suite-registry inspection exposed an S8 defect: the Phase-B gate was defined
+but absent from `scaffold.runtime`. Durable RED `phase-b-registration-red.json` failed as expected
+with 19 passed / 1 failed. The minimal repair registers `runtime.typed-db-phase-b` for PostgreSQL
+runtime suites and excludes it from SQLite; durable GREEN `phase-b-registration-green.json` passed
+41/41. Focused check/lint/fmt, `quality:scan`, and `arch:check` then passed.
+
+The single authorized command was executed once, without retry or split execution:
+
+```text
+DOCKER_HOST=tcp://netscript-dind:2375 /home/agent/.local/bin/mise exec -- deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report .llm/runs/feat-aspire-13-5-s8-typed-resource-commands--impl/receipts/phase-b-scaffold-runtime.json
+RAW_EXIT_CODE=1
+Summary: passed=26 failed=1 skipped=0
+Failing gate: generated.quality-negative
+```
+
+The critical quality probe failed before the live runtime gates. It reported the Fresh hydration
+`DehydratedState` readonly-mutations TS2345 and, because the generated scratch manifest restored SDK
+13.4.6 under Aspire CLI 13.5.3, missing S6 `HealthCheckResult`/`addHealthCheck` members. This is a
+real suite finding, not a host waiver and not an S8 Phase-B command defect. Only
+`runtime.aspire-restore` and `runtime.service-env-fixture` executed (both passed);
+`runtime.typed-db-phase-b` was not reached. Exact report and runtime tails are retained under
+`receipts/phase-b-scaffold-runtime.json` and `receipts/phase-b-runtime-gate-tails.txt`.
+
+Suite cleanup passed and reported that no AppHost was running. No `postgres-*` survivor or anonymous
+volume existed, so no container or volume was removed. Post-suite and final observations remained
+`aspire ps = []`, empty `docker ps -a`, and empty `docker volume ls`; the supervisor-owned
+`loopback-relay.ts` process was observed and left untouched. `agentic:leak-check` exited 0 with
+Aspire/Docker states `ok` and `survivors: []` (`leak-report.md`). Exact zero/count and relay evidence
+is retained in `receipts/phase-b-aspire-ps-count.txt` and
+`receipts/phase-b-relay-inventory.txt`.
+
+Final host observation, recorded verbatim:
+
+```text
+FINAL_UTC=2026-08-30T18:51:35Z
+ASPIRE_PS_BEGIN
+[]
+ASPIRE_PS_END
+DOCKER_PS_A_BEGIN
+DOCKER_PS_A_END
+DOCKER_VOLUME_LS_BEGIN
+DOCKER_VOLUME_LS_END
+LOCAL_HEAD=f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2
+ORIGIN_HEAD=f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2
+```
+
+At the final source state, the focused runtime/suite-registry tests passed 41/41 and the structured
+check, lint, and formatting wrappers each passed across all five changed E2E TypeScript files.

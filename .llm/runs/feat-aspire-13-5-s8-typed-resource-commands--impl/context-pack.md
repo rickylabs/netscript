@@ -6,7 +6,7 @@
 - Draft PR base: `feat/aspire-13-5-s6-health-checks`
 - Issues: closes #1720 and #863; part of #1712 (never close the epic)
 - Locked decision: D-6, `excludeFromMcp()` controls MCP exposure only; never emit `withHidden()`
-- Phase-A prohibition: no `aspire start`, AppHost runtime, or containers
+- Phase A was static; the supervisor-authorized Phase-B lease permitted one `scaffold.runtime` pass
 - D-19 command prefix: `/home/agent/.local/bin/mise exec --`; restore only
 - D-39 host facts (re-proven 2026-08-30T09:27Z): inotify instances limit 1024; Docker
   client/server 28.5.2 at `tcp://netscript-dind:2375`; PID 1 is `tini` with zero zombies; lifecycle
@@ -15,6 +15,9 @@
   and loopback endpoints); Phase A remains static independently of that limitation.
 - Push command: `git push origin HEAD:refs/heads/feat/aspire-13-5-s8-typed-resource-commands`
 - Required evaluator: separate Fable 5 IMPL-EVAL; implementation agent cannot certify the result
+- Phase-B one-pass verdict: exit 1, passed=26 failed=1 skipped=0 at
+  `generated.quality-negative`; `runtime.typed-db-phase-b` was not reached. Cleanup and leak-check
+  proved `aspire ps = []`, empty Docker containers/volumes, and zero run-owned survivors.
 
 Primary code surfaces are the db-cli-mode and register-tools generators/templates, Aspire runtime
 asset templates, database Aspire command executor/operation runner and their tests, and the CLI

@@ -39,3 +39,20 @@ The lifecycle and watch tests are trustworthy. This run therefore treats any res
 or lifecycle-test red as a real finding and does not apply the old inotify-128 or zombie waiver.
 The separately recorded remote-DinD bind-mount and loopback topology (D-42/D-43) remains the only
 runtime-phase limitation; it does not change Phase A's static-only boundary.
+
+## D-05 — Phase-B gate existed but was not registered
+
+At the leased Phase-B preflight, the typed DB gate factory existed but `scaffold.runtime` did not
+include it. A focused suite-registry test failed RED (19 passed / 1 failed). The minimal repair
+registers it for PostgreSQL runtime suites and excludes it for SQLite; the focused suite-registry
+and runtime-gate tests then passed 41/41. This was an S8-owned defect and was repaired before the
+single live pass so that a successful suite could execute the requested evidence gate.
+
+## D-06 — Full runtime pass stopped before typed DB evidence
+
+The one authorized `scaffold.runtime` pass exited 1 at `generated.quality-negative` with
+passed=26, failed=1, skipped=0. The report records a Fresh hydration TS2345 and missing S6 health
+members after the scratch restored configured SDK 13.4.6 under CLI 13.5.3. The critical failure
+occurred before runtime startup, so `runtime.typed-db-phase-b` did not execute. No retry or
+workaround was attempted. Cleanup and the independent leak reporter proved zero run-owned
+survivors; the supervisor relay process was left untouched.
