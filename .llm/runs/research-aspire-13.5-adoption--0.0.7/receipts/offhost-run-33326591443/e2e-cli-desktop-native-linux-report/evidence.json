@@ -1,0 +1,19 @@
+{
+  "status": "FAIL",
+  "platform": "linux",
+  "installMode": "isolated-root-dpkg",
+  "package": "/home/runner/work/netscript/netscript/.llm/tmp/desktop-native-e2e/packages/1.0.0/netscript-desktop-e2e-1.0.0-linux-x86_64.deb",
+  "installedLauncher": "/home/runner/work/netscript/netscript/.llm/tmp/desktop-native-e2e/install-root/usr/lib/netscript-desktop-e2e-1.0/netscript-desktop-e2e-1.0",
+  "releaseBaseUrl": "https://localhost:44393",
+  "failure": "v1 failed to stage v2: \n(netscript-desktop-e2e-1.0:3763): dbind-WARNING **: 17:56:49.844: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files\n[desktop] dylib path: \"/home/runner/work/netscript/netscript/.llm/tmp/desktop-native-e2e/install-root/usr/lib/netscript-desktop-e2e-1.0/netscript-desktop-e2e-1.0.so\"\nlibEGL warning: DRI3 error: Could not get DRI3 device\nlibEGL warning: Ensure your X server supports DRI3 to get accelerated rendering\nListening on http://127.0.0.1:45581/\nUpdate written to /home/runner/work/netscript/netscript/.llm/tmp/desktop-native-e2e/install-root/usr/lib/netscript-desktop-e2e-1.0/netscript-desktop-e2e-1.0.so.update. Will be applied on next launch.\n",
+  "unsupported": {
+    "windows": {
+      "status": "NOT_RUN",
+      "reason": "Owner-hosted Windows MSI invocation was not run on this Linux host."
+    },
+    "darwin": {
+      "status": "NOT_RUN",
+      "reason": "The macOS best-effort invocation was not run on this Linux host."
+    }
+  }
+}

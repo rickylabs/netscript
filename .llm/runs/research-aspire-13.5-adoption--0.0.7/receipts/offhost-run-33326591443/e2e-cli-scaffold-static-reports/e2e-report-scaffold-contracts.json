@@ -1,0 +1,205 @@
+{
+  "ok": true,
+  "suiteId": "scaffold.contracts",
+  "projectRoot": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624",
+  "startedAt": "2026-08-30T17:56:24.529Z",
+  "durationMs": 17732,
+  "steps": [
+    {
+      "id": "preflight.deno",
+      "title": "Deno CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "preflight.deno attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "--version"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 8,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 8
+    },
+    {
+      "id": "scaffold.init",
+      "title": "Scaffold generated project",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.init attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/runner/work/netscript/netscript/packages/cli/bin/netscript-dev.ts",
+              "init",
+              "plugin-smoke-20260830-175624",
+              "--path",
+              "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e",
+              "--db",
+              "postgres",
+              "--service",
+              "--service-name",
+              "users",
+              "--ci",
+              "--yes",
+              "--no-git",
+              "--force"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "╔═════════════════════════════════════════════════════════════╗\n║              NetScript — Scaffold New Project               ║\n╚═════════════════════════════════════════════════════════════╝\n\n📁 Creating project \"plugin-smoke-20260830-175624\"...\n   \u001b[32m✓\u001b[39m Project root (deno.json, netscript.config.ts, .gitignore, README.md)\n   \u001b[32m✓\u001b[39m Aspire orchestration (TypeScript AppHost, .helpers/, package.json)\n   \u001b[32m✓\u001b[39m Database workspace (postgres)\n   \u001b[32m✓\u001b[39m Frontend app \"plugin-smoke-20260830-175624-web\" (Fresh framework)\n   \u001b[32m✓\u001b[39m Contracts (v1 with users stub)\n   \u001b[32m✓\u001b[39m Example service \"users\" (oRPC handler, Aspire assigns its port)\n   \u001b[32m✓\u001b[39m Plugins (empty registry)\n   \u001b[32m✓\u001b[39m Output formatted (deno fmt)\n\n\u001b[32m✅\u001b[39m \u001b[1mProject scaffolded successfully in 0.2s\u001b[22m\n\n  Created: 209 files, 46 directories\n\nNext steps:\n  1. cd plugin-smoke-20260830-175624\n  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace\n  3. aspire restore  # download TypeScript AppHost SDK modules (run once)\n  4. cd ..\n  5. deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed\n  6. deno run -A packages/cli/bin/netscript-dev.ts db init --name init\n  7. deno run -A packages/cli/bin/netscript-dev.ts db generate\n  8. deno run -A packages/cli/bin/netscript-dev.ts db seed\n  9. # oRPC service \"users\" at the URL shown for it in the Aspire dashboard, path /api/rpc\n  10. # Postgres provisioned by Aspire (see \"Databases\" in appsettings.json)\n\nMaintainer scaffold root: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624\nMonorepo root: /home/runner/work/netscript/netscript\nCopied 28 local packages.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1398,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1398
+    },
+    {
+      "id": "contract.list",
+      "title": "List generated contracts",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "contract.list attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/runner/work/netscript/netscript/packages/cli/bin/netscript-dev.ts",
+              "contract",
+              "list",
+              "--path",
+              "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Contracts (v1)\n  users  service paired\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 352,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 352
+    },
+    {
+      "id": "database.codegen",
+      "title": "Generate database clients (standalone, no Aspire)",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "database.codegen attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "\nconst [databaseUrl, providerEnvKey] = Deno.args;\nif (!databaseUrl) throw new Error('database URL argument is required');\nDeno.env.set('DATABASE_URL', databaseUrl);\nif (providerEnvKey) Deno.env.set(providerEnvKey, databaseUrl);\nconst child = new Deno.Command('deno', {\n  args: ['task', 'db:generate'],\n  stdout: 'inherit',\n  stderr: 'inherit',\n}).spawn();\nconst status = await child.status;\nDeno.exit(status.code);\n",
+              "postgres://postgres:postgres@localhost:5432/postgres",
+              "POSTGRES_URI"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624/database/postgres",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\n✔ Generated Prisma Client (7.10.0) to ./schema/.generated in 32ms\n\n🔷 Generating Zod schemas from Prisma models...\n\n📦 Ensuring prisma-zod-generator is available...\n✅ Zod schemas generated successfully with filtering applied\n\n\n\u001b[36m🚀 prisma-zod-generator has powered 1 runs on this project!\u001b[0m\n\n✨ Level up with PZG Pro (14-day trial, no card needed):\n   - Server actions & policy automation\n   - SDK publisher, API docs, drift guard\n   - Performance tooling for large teams and more!\n   \u001b[32mhttps://omar-dulaimi.github.io/prisma-zod-generator/pricing\u001b[0m\n\n💬 Need help or want to suggest an idea?\n   \u001b[32mhttps://github.com/omar-dulaimi/prisma-zod-generator/issues\u001b[0m\n\n🙌 Sponsorships literally keep the lights (and tests) running:\n   My current Dell Latitude laptop needs 40+ minutes to finish the full test suite.\n   Helping me upgrade means faster fixes and better tooling for everyone.\n   \u001b[32mhttps://github.com/sponsors/omar-dulaimi\u001b[0m\n\n\n✔ Generated Prisma Client (7.10.0) to ./schema/.generated in 36ms\n\n✔ Generated Prisma Zod Generator to ./schema/.generated/zod in 76ms\n\n\n🔧 Fixing generated Zod schemas for Deno compatibility...\n   Directory: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624/database/postgres/schema/.generated/zod\n\n📦 Phase 1: Adding .ts extensions to relative imports...\n   ✅ Fixed 75 imports across 30 files\n\n🔄 Phase 1.6: Fixing circular references in schemas...\n   ✅ Fixed circular references in 8 files\n\n🔄 Phase 1.7: Fixing getter patterns with .optional()...\n   ✅ Fixed 22 getter patterns in 6 files\n\n🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...\n   ✅ Fixed isValidDecimalInput in 0 files\n\n💰 Phase 2: Fixing Decimal imports for browser compatibility...\n   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367\n   ✅ Fixed 0 Decimal references across 0 files\n\n🎉 All fixes applied successfully!\n\n🔧 Fixing generated Zod schemas for Deno compatibility...\n   Directory: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624/database/postgres/schema/.generated/zod\n\n📦 Phase 1: Adding .ts extensions to relative imports...\n   ✅ Fixed 0 imports across 0 files\n\n🔄 Phase 1.6: Fixing circular references in schemas...\n   ✅ Fixed circular references in 8 files\n\n🔄 Phase 1.7: Fixing getter patterns with .optional()...\n   ✅ Fixed 0 getter patterns in 0 files\n\n🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...\n   ✅ Fixed isValidDecimalInput in 0 files\n\n💰 Phase 2: Fixing Decimal imports for browser compatibility...\n   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367\n   ✅ Fixed 0 Decimal references across 0 files\n\n🎉 All fixes applied successfully!\n\nℹ️  No files needed fixing\n🔧 Patching Prisma client in: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624/database/postgres/schema/.generated\n   📋 Backed up original → client.server.ts\n   ✅ client.ts → isomorphic re-export of browser.ts\n   💎 Added \"export type Decimal = runtime.Decimal\" to prismaNamespaceBrowser.ts\n",
+            "stderrTail": "itialize\u001b[0m @prisma/generator@7.10.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/dmmf@7.10.0\n\u001b[0m\u001b[32mInitialize\u001b[0m argparse@2.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/body-parser@1.19.6\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/express-serve-static-core@5.1.3\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/serve-static@2.2.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/prisma-schema-wasm@7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3\n\u001b[0m\u001b[32mInitialize\u001b[0m @streamparser/json@0.0.22\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/schema-engine-wasm@7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/schema-files-loader@7.10.0\n\u001b[0m\u001b[32mInitialize\u001b[0m arg@5.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m prompts@2.4.2\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/get-dmmf@7.10.0\n\u001b[0m\u001b[32mInitialize\u001b[0m web-streams-polyfill@3.3.3\n\u001b[0m\u001b[32mInitialize\u001b[0m node-domexception@1.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/connect@3.4.38\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/range-parser@1.2.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/qs@6.15.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/send@1.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/http-errors@2.0.5\n\u001b[0m\u001b[32mInitialize\u001b[0m fs-extra@11.3.0\n\u001b[0m\u001b[32mInitialize\u001b[0m kleur@3.0.3\n\u001b[0m\u001b[32mInitialize\u001b[0m sisteransi@1.0.5\n\u001b[0m\u001b[32mInitialize\u001b[0m pluralize@8.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m jsonfile@6.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m universalify@2.0.1\n\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n\u001b[0m\u001b[38;5;245mInstalled\u001b[0m 37 \u001b[0m\u001b[38;5;245mpackages\u001b[0m \u001b[0m\u001b[38;5;245min\u001b[0m 368ms\n\u001b[0m\u001b[38;5;245mReused\u001b[0m 37 \u001b[0m\u001b[38;5;245mpackages from cache\u001b[0m\n\u001b[0m\u001b[1m\u001b[33m+++++++++++++++++++++++++++++++++++++\u001b[0m\n\u001b[0m\u001b[38;5;245mDownloaded\u001b[0m 0 \u001b[0m\u001b[38;5;245mpackages from JSR\u001b[0m\n\u001b[0m\u001b[38;5;245mDownloaded\u001b[0m 0 \u001b[0m\u001b[38;5;245mpackages from npm\u001b[0m\n\n\u001b[0m\u001b[36mDependencies:\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mnpm:\u001b[0mprisma-zod-generator \u001b[0m\u001b[38;5;245m2.1.4\u001b[0m\n\n\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Ignored build scripts for packages:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:prisma@7.10.0\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:@prisma/engines@7.10.0\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:prisma-zod-generator@2.1.4\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Run \"\u001b[0m\u001b[1mdeno approve-scripts\u001b[0m\" to run build scripts.\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  The following packages are deprecated:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[38;5;245mnpm:node-domexception@1.0.0 (Use your platform's native DOMException instead)\u001b[0m\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\nLoaded Prisma config from prisma.config.ts.\n\nPrisma schema loaded from schema.\n┌─────────────────────────────────────────────────────────┐\n│  Update available 7.10.0 -> 8.0.0-rc.12                 │\n│                                                         │\n│  This is a major update - please follow the guide at    │\n│  https://pris.ly/d/major-version-upgrade                │\n│                                                         │\n│  Run the following to update                            │\n│    npm i --save-dev prisma@latest                       │\n│    npm i @prisma/client@latest                          │\n└─────────────────────────────────────────────────────────┘\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 4675,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 4675
+    },
+    {
+      "id": "generated.contracts-check",
+      "title": "Type-check generated contracts",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.contracts-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "task",
+              "check",
+              "--skip-apphost"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260830-175624",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "/tokens.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/_app.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/_layout.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/dashboard.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/(_components)/crud-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/(_components)/examples-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/crud.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/telemetry/(_components)/telemetry-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/telemetry/(_shared)/telemetry-trace.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/telemetry/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/hero.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/lab-panel.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/managed-form.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/notes-card.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/page-layout.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/summary-card.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_components)/summary-panel.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_islands)/ServiceShowcaseLab.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_lib)/optimistic-list-mutation.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_lib)/route-contract.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_lib)/service-query.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_shared)/authorization.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/(_shared)/service-showcase.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/index.layout.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/examples/users/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/health.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/routes/partials/examples/users/summary.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/utils.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/plugin-smoke-20260830-175624-web/vite.config.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/mod.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/prisma.config.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/clear-seeded-client.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/fix-zod-imports.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/generate-zod.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/migrate.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/patch-prisma-client.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/seed.ts\\n\"\n    }\n  ]\n}\n",
+            "stderrTail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check '--skip-apphost'\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 11293,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 11293
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  }
+}

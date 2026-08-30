@@ -1334,3 +1334,22 @@
   checked-in Phase-B briefs **one PR at a time via `agentic:dispatch-openhands`** on #1741, #1744,
   #1754, preserving exact-head receipts + generic e2e artifacts. No safe live NAS topology fix
   exists without external `ai-agents` recreation — local leases stay off.
+- **D-69 — off-host proof run 33326591443 FAILED on an S10 Phase-B defect (first real execution of
+  the describe-follow evidence).** `classify`, `scaffold-static`, `desktop-native-linux` green;
+  `scaffold-runtime` (job 99297741092) and `scaffold-runtime-sqlite` (job 99297741074) each PASSED
+  36 gates then FAILED `runtime.aspire-start` in 10–15 s with `describe line 1 omitted resources[]`
+  (`evidence/describe-follow.ts:182`); `cleanup.aspire-stop` PASSED in both. Attribution:
+  `describe-follow.ts` is S10-only (`a26347bb`, `4e270e94`, `a46ea16d`; not in S1 `ee379457`, not in
+  #1736 `069913e7`, not on main). Root cause verified against Aspire CLI 13.5.3
+  `DescribeCommand.cs`: `--format json` wraps `{resources:[…]}` only **without** `--follow`; with
+  `--follow` each NDJSON line is a bare `ResourceJson`. S10's parser requires the wrapper on every
+  line → deterministic failure, and because S10 wired the capture into the shared
+  `runtime.aspire-start` gate it also blanked the S6/S9/generic evidence in this run (no
+  `e2e-cli-scaffold-runtime-report` artifact was produced — the upload globs that would have matched
+  are S9's `06a0e5e1` lines, deliberately not on the proof head). **No prior `e2e-cli` run on any
+  aspire branch ever executed the runtime jobs (all `skipped` by classify), so nothing earlier could
+  have caught this.** Disposition: S10 Phase-B fix dispatched on the same Codex thread
+  (`slices/s10/phase-b-fix-brief.md`); after Tier-A, rebuild the proof head from the new S10 head
+  (workflows still pinned to S1) and re-dispatch — this is S10 Phase-B attempt 1 = FAIL_FIX, not an
+  S1/#1736 finding. Receipts (static/desktop artifacts + failed-step extracts):
+  `receipts/offhost-run-33326591443/`.

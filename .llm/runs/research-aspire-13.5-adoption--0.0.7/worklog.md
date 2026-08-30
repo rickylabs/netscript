@@ -433,4 +433,7 @@ playbook, dispatch capability check (D-67). | | Off-host proof ref | Built + val
 D-58 playbook written (`retarget-playbook-d58.md`). | | Off-host runtime proof dispatched | Proof
 ref `ci/aspire-13-5-runtime-proof` @ `9303daf61` (descendant of S1 `ee379457`, workflows
 byte-identical); **run 33326591443** dispatched 17:55:18Z; watching. S3/S7/S8 Phase B → OpenHands
-per PR after S1 convergence. |
+per PR after S1 convergence. | | Off-host proof run 33326591443 → FAILURE on S10 `describe --follow`
+parser (D-69) | Both runtime tiers 36/37 PASSED; `runtime.aspire-start` fails at S10's
+`describe-follow.ts:182` (13.5.3 emits bare ResourceJson per line under `--follow`). S10 same-thread
+fix dispatched; proof rerun after Tier-A. S1/#1736 not implicated. |
