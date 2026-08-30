@@ -179,6 +179,14 @@ Deno.test('scaffoldRoot emits CI/CD workflow templates for shipped deploy target
 
   assertStringIncludes(compose ?? '', 'deploy compose plan');
   assertStringIncludes(compose ?? '', netscriptJsrSpecifier('cli'));
+  assertStringIncludes(
+    compose ?? '',
+    'dotnet tool install Aspire.Cli --version 13.4.6',
+  );
+  assert(
+    (compose ?? '').indexOf('dotnet tool install Aspire.Cli') <
+      (compose ?? '').indexOf('aspire restore'),
+  );
   assertStringIncludes(compose ?? '', '--clear-cache');
   assertStringIncludes(compose ?? '', 'ghcr.io');
   assert(!compose?.includes('~/.aspire/deployments'));
