@@ -2804,3 +2804,81 @@ raw command, since it is not in `.llm/tools/gates/catalog.ts`. Signing off now w
 that is about to be superseded, and **IMPL-EVAL is cycle 2 of 2** — spending the last cycle on a stale
 head would be an expensive, self-inflicted error. Sign-off and dispatch both wait for S10, which is
 minutes away, not a stop.
+
+## 2026-08-30 — S10 terminal at `a073e0b1`; Tier-A signed at `5d1cc5a8`; IMPL-EVAL c2 and runtime gate running
+
+### S10 landed and the author is terminal
+
+`a073e0b1`, evidence-only (three run-artifact files), pushed, clean, final PR comment posted, thread
+`idle | turn complete`. **PE-8 satisfied**: `check:mcp-export-corpus` recorded as
+"raw reproducible evidence, not a catalog receipt", with exit 0 and corpus SHA-256
+`88011e6e4590…`.
+
+### Two declined reds, both re-derived rather than accepted
+
+S10 declared a red it does not fix, which is exactly the class of claim Tier-A must verify itself:
+
+1. **`doc:lint --root plugins/ai` exits 1 with 17 findings** (16 private-type refs, 1 other).
+   Re-derived by running the identical command in a **pristine detached worktree at base
+   `13878a80a`**: exit 1, **17 errors, 16 private-type refs, 1 other** — identical totals. The leaf
+   touches no AI public entrypoint; `.`, `./adapter-cli`, `./public`, `./plugin`, `./adapter`,
+   `./scaffold`, `./contracts` are all unchanged. Genuine baseline debt, correctly recorded as debt
+   rather than dressed up as a passing verdict. The temporary base worktree was removed afterwards.
+2. **Scoped fmt on `public-command-dependencies.ts`** — base-owned, established at *line* granularity
+   because file identity was not sufficient: this leaf did modify that file. Head finding sits at
+   line 1; a pristine `origin/main` archive yields the identical finding at line 1; the leaf's only
+   change is at line 317.
+
+### Exact-head gates at the terminal head `a073e0b1`
+
+Identity clean (local == `origin` == PR `headRefOid`, dirty 0); ceiling respected; `deno.lock`
+byte-unchanged; focused **6/0**, related **54/0**, AI CLI **12/0**; scoped type check and lint exit 0;
+both cascade gates measured negatives; publish dry-run Success; `doc:lint` (cli) 0 errors;
+`quality:gate` exit 0 with PE-9's predicted F-1 WARN and two pre-existing `export default` WARNs.
+
+### Tier-A sign-off — `5d1cc5a8`
+
+Artifact-only, pushed; this is the evaluated head. The sign-off records the three-head demonstration
+that the green is product-caused, the structural fail-closed review, both declined reds with their
+base proofs, and PE-2/PE-5/PE-8/PE-10/Sweep-1 confirmations.
+
+### IMPL-EVAL cycle 2 of 2 — identity and route recorded before mutation
+
+| Field | Value |
+| --- | --- |
+| **Evaluated head** | `5d1cc5a8` — Tier-A sign-off; local == `origin` == PR `headRefOid` |
+| Author final / product heads | `a073e0b1` / `4e1fed64` — both ancestors |
+| Requested route | canonical `formal_impl_evaluation` — native Claude `claude-fable-5` · medium · `--remote-control` |
+| Observed route | `["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--model","claude-fable-5"]` — **matched** |
+| Background id / session | `af623619` / `af623619-c88e-4706-96d9-b6004bb8128c` |
+| PID | `485999` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-eval2-1673` (dedicated; sole session) |
+| Verdict branch | `eval/impl-eval-1673-cycle-2`, upstream NONE |
+| Remote Control URL | `https://claude.ai/code/session_013q9hnqyyUotHNo8aQXPNGG` |
+| Independence | fresh; separate from author `01a051d0`, from this supervisor, and from both prior evaluators |
+
+The brief carries PE-2 and PE-5 as explicit `FAIL_FIX` conditions (the plan evaluator's instruction,
+not this lane's), the full contract, the eleven-path ceiling, the deferred-F4 caveat so its absence is
+not misread as a defect, and the two intermediate red-state facts to reproduce or refute.
+
+### `scaffold.runtime` — running, with the lease reasoning stated
+
+The lease was requested from `codex-root-0.0.7` and recorded; no grant arrived, and the coordinator is
+a Codex session this lane cannot reliably message. The gate is **required by the PR's own
+Definition of Done** ("the required supervisor runtime report"), so readiness cannot be normalized
+without it.
+
+Proceeding on the owner's standing instructions — *Aspire/Docker work must use this sandbox and exact
+owned cleanup*, *keep host runtime leases serialized* — read as authorization with conditions, all of
+which are met and were checked first:
+
+- `expensiveGates` shows **0 active/held** against `limits.globalExpensiveGates: 1` — the singleton
+  slot is genuinely free, not merely assumed free;
+- `docker ps -a` is **0 containers**;
+- `aspire doctor` reports **5 passed, 3 warnings, 0 failed** — meeting the "require 0 failed" bar
+  before any suite starts.
+
+Running once, serialized, at the evaluated head, followed by `agentic:leak-check` and then
+`agentic:teardown --apply` scoped to proven resources, returning the sandbox to Aspire/Docker zero.
+The durable receipt is the runner output, since `e2e:cli` is not in `.llm/tools/gates/catalog.ts`.
+This is recorded as a supervisor judgment call, not an implied grant.
