@@ -1351,3 +1351,14 @@ implementation thread.
   current/target version framing and M5's host-only diagram limitation, and released S13 in
   parallel. S11 remains stacked and cannot merge until its parent convergence and CI diagram-parity
   receipt are satisfied; the ruling does not waive those release gates.
+
+## 2026-08-30 — exhausted evaluator ceilings were explicitly extended, not silently reset
+
+- #1734 had already consumed its exceptional third cycle and #1764 had consumed its ordinary two
+  cycles. Their newly authorized runs are owner-specific, bounded exceptions: one final focused
+  cycle 4 for the total private reviver and one delta-scoped cycle 3 for the named-span assertion.
+- This does not raise the milestone-wide evaluator ceiling or permit recursive retries. #1734 must
+  park/rescope after another failure; #1764 still requires Flow-B and cannot become ready on the
+  assertion/evaluator result alone.
+- Central state incorrectly carried #1734 as `merged` while GitHub PR #1736 remained open. The same
+  atomic authorization checkpoint restores the Git-authoritative `implementing` phase.

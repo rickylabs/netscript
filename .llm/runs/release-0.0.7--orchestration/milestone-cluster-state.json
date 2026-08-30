@@ -985,7 +985,7 @@
     {
       "id": "ai-request-application-context",
       "lane": "features",
-      "phase": "merged",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
       "currentPrHeadSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
@@ -3152,7 +3152,7 @@
     {
       "id": "fresh-readonly-dehydrated-state",
       "lane": "internals",
-      "phase": "merged",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "40ab61a7ef43633bf946af06f7f15c7e1fd567fd",
       "currentPrHeadSha": "069913e79c60018786eed683b9ab02896a2e405d",
@@ -3160,16 +3160,18 @@
       "branch": "fix/fresh-query-hydration-readonly-state",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1736",
       "prNumber": 1736,
-      "implementationState": "the owner-authorized third and final IMPL-EVAL has exited at evaluator carrier 069913e7; the remaining guard-shape disposition is escalated while independent lanes continue",
-      "implementationEvaluationState": "cycle_3_terminal_pending_owner_guard_shape_disposition",
+      "implementationState": "owner authorized option 2 after cycle 3: replace the private allowlist with a total reviver, add bounded omitted-key/query-twin and non-throwing-message RED tests, rebase current main, and run one final focused cycle 4",
+      "implementationEvaluationState": "cycle_4_repair_authorized_pending_exact_head_gates",
       "implementationEvaluationVerdict": "FAIL_FIX",
       "implementationEvaluatedProductHeadSha": "3b3044f7af178e740b577a80f83e785c1fd6ee7f",
       "evaluationArtifactHeadSha": "069913e79c60018786eed683b9ab02896a2e405d",
       "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1736#issuecomment-5467324070",
       "ownerAuthorization": "Authorize #1734 cycle 3.",
       "ownerAuthorizedAt": "2026-08-30T14:21:34.000Z",
-      "blocker": "third and final evaluator left one guard-shape disposition requiring the exact owner ruling packet; no fourth evaluator cycle is implied",
-      "nextGate": "apply the owner-selected bounded guard-shape disposition; after merge, serialize the blocked scaffold.runtime reruns for #1747/#1758/#1739 from exact runtime zero"
+      "ownerFinalAuthorization": "Authorize option 2 total private reviver and exactly one final focused IMPL-EVAL cycle 4; no public type, export, dependency-range, or wider hydration scope.",
+      "ownerFinalAuthorizedAt": "2026-08-30T17:46:16.000Z",
+      "blocker": null,
+      "nextGate": "apply option 2 RED-first, rebase current main, run exact-head Tier-A/static plus scaffold.runtime from runtime zero, then exactly one separate-session focused cycle 4; if it fails, park or rescope"
     },
     {
       "id": "plugin-doctor-registry-drift",
@@ -3545,7 +3547,7 @@
     {
       "id": "ai-request-context-provider-guard",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "c80933f7b94804319024b77247f653f073b738ed",
       "currentPrHeadSha": "c80933f7b94804319024b77247f653f073b738ed",
@@ -3570,8 +3572,12 @@
       "branch": "fix/saga-span-emission-and-correlation",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
       "prNumber": 1764,
-      "implementationState": "two terminal IMPL-EVAL failures exhausted the lane ceiling at 22f6fa61; one narrow test selector correction and recertification disposition are parked for the owner while fixes dispatches an independent leaf",
-      "nextGate": "obtain owner ruling on selecting the saga.handle span by name and on recertification after the two-cycle ceiling; do not block the independent fixes queue"
+      "implementationState": "owner authorized the single test-only selector correction at 22f6fa61 and exactly one delta-scoped cycle 3 while the independent #1357 worker continues",
+      "implementationEvaluationState": "cycle_3_delta_authorized_pending_assertion_repair",
+      "ownerAuthorization": "Select the saga.handle span by name rather than positional index and run exactly one delta-scoped IMPL-EVAL cycle 3; carry forward cycle-2 rows and preserve mandatory Flow-B.",
+      "ownerAuthorizedAt": "2026-08-30T17:46:16.000Z",
+      "blocker": "Flow-B runtime proof remains mandatory before ready/merge and must run in CI or off-host while local D-42/D-43 topology is unsuitable",
+      "nextGate": "apply only the named-span assertion correction, integrate current main at the safe slice boundary, prove the resulting suite green, then run one delta-scoped cycle 3 and obtain Flow-B before readiness"
     },
     {
       "id": "aspire-13-5-s11-public-docs-refresh",
@@ -5227,5 +5233,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
       "verifiedAt": "2026-08-30T10:00:33.000Z"
     },
-  "updatedAt": "2026-08-30T15:48:00.000Z"
+  "updatedAt": "2026-08-30T17:46:16.000Z"
 }

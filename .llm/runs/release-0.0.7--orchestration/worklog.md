@@ -2545,3 +2545,17 @@
   records now carry the sole lifecycle label `status:shipped`. Features #1387 was immediately
   released under the already-accepted option-1 adapter boundary; all supervisors received new-main
   currency without interrupting their active workers.
+
+## 2026-08-30T17:46:16Z — owner authorized the two exhausted-evaluation repairs
+
+- #1734 option 2 is authorized: replace the private rejection-value allowlist with a total reviver,
+  add RED-first omitted-key mutation/query twins and non-throwing message construction, rebase on
+  current main, run exact-head Tier-A/static and `scaffold.runtime`, then exactly one final focused
+  separate-session IMPL-EVAL cycle 4. Public types, exports, dependency ranges, and wider hydration
+  behavior remain out of scope; another failure parks or rescopes the leaf.
+- #1764 is authorized for the single assertion correction selecting `saga.handle` by name rather
+  than index and exactly one delta-scoped cycle 3 carrying forward cycle-2 rows. Flow-B remains a
+  hard readiness gate and must execute in CI/off-host if D-42/D-43 still prevents local proof.
+- Both supervisors were directly released without interrupting the live #1357 or #1774 workers.
+  Reconciliation also corrected stale central phase drift: #1734/PR #1736 is open and implementing,
+  never merged.

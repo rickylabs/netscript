@@ -1522,7 +1522,9 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Features #1387 is now released under owner option 1 and must resume immediately at the precise
   plugin-CLI/RFC-0003 adapter boundary. Docs #1778 and fixes #1357 have live implementation workers;
   Aspire S13 has committed through `7e9891fa`; internals #1774 remains active.
-- Two exhausted-evaluation owner decisions remain parked without blocking independent queues:
-  #1734 needs the total private reviver plus one final focused cycle 4 (or a riskier waiver/rescope),
-  and #1764 needs the single named-span assertion correction plus a delta-scoped third evaluation
-  (or rejection/parking). Runtime remains exact zero.
+- At `2026-08-30T17:46:16Z` the owner authorized both exhausted-evaluation repairs. #1734 executes
+  option 2 total private reviver with bounded RED tests, exact-head Tier-A/static plus
+  `scaffold.runtime`, and exactly one final focused cycle 4; another failure parks/rescopes. #1764
+  executes only the named `saga.handle` assertion correction plus one delta-scoped cycle 3, while
+  mandatory Flow-B remains unwaived. Both resume without blocking independent queues. Runtime was
+  exact zero at the preceding checkpoint.
