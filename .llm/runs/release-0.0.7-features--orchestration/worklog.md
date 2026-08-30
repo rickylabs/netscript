@@ -6982,3 +6982,67 @@ PLAN-EVAL for #1387 is a fresh separate opposite-family session and is **not dis
 itself makes implementation contingent on #1466 merging, and #1466 is frozen pending a verified #1748
 SHA. Dispatching a PLAN-EVAL now would evaluate a plan whose precondition cannot yet be tested.
 Queued behind the #1731 refresh.
+
+## 2026-08-30 — #1731 refreshed once onto post-#1748 `main`; full cascade regenerated
+
+### The SHA was verified, not accepted
+
+`gh pr view 1748` → `state: MERGED`, `mergedAt: 2026-08-30T12:55:05Z`,
+`mergeCommit: 952cc106aafea61570d24247695ac23f5d810026`, and
+`git rev-parse origin/main` returns the **same** SHA. Coordinator-reported and independently
+confirmed before a single command touched the branch.
+
+### Merge, not rebase — and it mattered
+
+`git merge --no-ff origin/main` at `87d53cec` → **`b8e04fea`**, **zero conflicts**.
+
+The strategy was chosen for a concrete reason, not style: this branch's entire evidence chain is
+addressed by content-head SHA — six append-only receipt archives, four Tier-A reviews and three
+evaluator verdict sections all cite specific commits. A rebase rewrites every one of those and would
+have silently invalidated the provenance the leaf spent the whole run establishing.
+
+### The cascade regenerated from tooling, in one pass
+
+| Task | Carrier |
+| --- | --- |
+| `gen:agent-docs-prose` | `.llm/assets/agent-docs/prose.json.gz`, `provenance.json` |
+| `gen:assets-barrel` | `packages/cli/src/kernel/assets/agent-docs.generated.ts` |
+| `gen:mcp-export-corpus` | `packages/mcp/.../export-surface-corpus.generated.ts` |
+| `gen:publish-assets` | `packages/mcp/src/publish-assets.generated.ts` |
+
+Five files, all machine-generated, none hand-edited. Committed as content head **`b01ffcd8`**.
+
+**Check sweep after commit — all green:**
+
+`check:agent-docs-prose` **`fresh:true, stalePaths:[]`** · `check:mcp-export-corpus` **PASS** ·
+`check:publish-assets` **PASS** · `check:assets-barrel` **PASS** · `docs:tagline:check`
+**over=0** · `docs:exports-drift` **PASS**.
+
+`check:assets-barrel` failed on the first pass and that was expected, not a defect: the task is
+`gen:assets-barrel && git diff --exit-code`, so it necessarily fails while the regenerated carriers
+are uncommitted. It passes once they are committed — worth recording so a future run does not chase it.
+
+### The defective receipt is fixed, and the defect is preserved
+
+The `public-doc-lint` recut passed the plan's **explicit 16-entrypoint argv** this time:
+
+| | argv length | durationMs | meaning |
+| --- | --- | --- | --- |
+| attempt 10 (defective, mine) | **3** | **7** | bare catalog form → usage error recorded as `exit 1` |
+| attempt 11 (correct) | **19** | **164** | a real doc-lint run |
+
+The defective attempt-10 receipt is **retained** in `receipts/frozen-75b78220/` — the sixth archive —
+as the honest record of the defect rather than being quietly replaced. It is not evidence; it is the
+account of a mistake.
+
+**R-1 still holds at the post-merge head:** `deno doc --lint` gives **12** findings and `diff` against
+the recorded R-1 set reports **IDENTICAL**. A whole-main merge plus a full asset regeneration moved
+neither the count nor the set.
+
+### State
+
+Content head **`b01ffcd8`**. Remaining seven contracted receipts recutting at `attempt 11`. Once they
+land: push, dispatch a fresh currency evaluator inheriting `b247bef9`'s measurements, then hand exact
+merge coordinates.
+
+#1387 stays active at plan (PR #1762, `status:plan`), #1730 active on `01a052b7`.
