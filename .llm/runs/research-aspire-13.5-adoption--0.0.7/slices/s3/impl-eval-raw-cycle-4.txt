@@ -1,0 +1,15 @@
+## IMPL-EVAL cycle 4 (S3 phase B) — `PASS`
+
+Evaluated exactly `6c699ab66` (= remote head) in the detached read-only worktree; wrote `slices/s3/evaluate-cycle-4.md` in the supervisor run dir and posted the verdict comment: https://github.com/rickylabs/netscript/pull/1741#issuecomment-5470600618. No branch, PR metadata, or product file was touched.
+
+**What I verified (reproduced, not inherited)**
+
+- **F-1/F-2/F-3 closed as specified.** README "Capture scope"/"Interpretation" + fixture header name D-74, missing `database.codegen`/`streams`, producer-only trace, 12 web `/health` 500s, `list_runs` 0 / `found: false`, classify it as environment/scope, and route completed-consumer coverage to 13.4.6 + `scaffold.runtime`. Test has the named `ASPIRE_1353_CAPTURED_WITHOUT_CONSUMER` constant + comment, assertions unchanged. Generator `drift.md`/`context-pack.md` and the PR body now carry phase-B facts.
+- **The new prose is true of the envelope**, not just present: 12 × `GET localhost:40113/health` → 500 on `paavhurp`; exactly one producer span (`queue.enqueue`), zero `job.execute`/`dequeue`; all four `service.name: workers` attributes sit on `@hono/otel` spans of the `workers-api` resource, and the `workers` resource has `hasTraces:false`.
+- **Regression gates green at head (all exit 0):** envelopes byte-identical to cycle 3 (SHA-256 = receipt 09), 13.4.6 files unchanged vs `85bd49673`, redaction clean, focused consumer+parity 3/3, `packages/mcp` 138/138, check 116/0, lint/fmt 115/0, `quality:scan` 0, `arch:check` 0, export corpus unchanged, parity row `required`.
+- **PR hygiene:** draft, base `main`, labels/milestone `0.0.7`/`Closes #1715`/`Part of #1712` with zero label/draft/base events since cycle 2.
+- **Contract decision:** #1715 is satisfied as written; the captured-but-not-listed run is a scope gap now explicitly named in the tree — not a rescope, no fourth lease.
+
+**Non-blocking info observations** (for the supervisor sign-off, not required for this pass): O-1 stale "remains pending" comment at `.llm/tools/validation/check-compat-fixtures_test.ts:10-11`; O-2 no `worklog.md` row for the fix commit.
+
+**Next (not mine):** the supervisor's Tier-A sign-off; draft→ready still needs the #1715 close-gate (acceptance/`gate:` boxes mirrored with linked evidence).
