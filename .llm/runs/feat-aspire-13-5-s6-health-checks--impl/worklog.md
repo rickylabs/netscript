@@ -207,3 +207,15 @@ health-check changes from `5d2bd8756`, `31a2fac87`, and `01f27d4d4` and the comp
 - Regenerated `embedded.generated.ts` from its source asset.
 - Focused structured tests: PASS, 53/53 results.
 - Scoped structured check: PASS, five files selected with zero diagnostics.
+
+### Complete runtime-module split and shipped-main reconciliation
+
+- Applied the full `b4ca8a1d3` E2E module split, including all declared source moves, new runtime
+  modules, suite registrations, command/permission changes, and focused tests.
+- Resolved the extraction conflict by moving behavior declarations out of `runtime-gates.ts`; the
+  S1 gate title and its existing test assertion both read exactly
+  `Users service uses the live second-start Postgres allocation with correlated telemetry`.
+- Preserved S5's port-literal removal, opt-in host ports, and `aspire describe` endpoint discovery.
+  `verify-live-db-endpoint.ts` is untouched.
+- Fresh measurement: `runtime-gates.ts` is 305 lines; `runtime/` has 11 immediate children.
+- Focused listener/runtime/suite/probe tests: PASS, 46/46 results.
