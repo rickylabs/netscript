@@ -78,9 +78,9 @@ use harness
    skills beside NetScript `aspire`; `cli-reference.md`; `glossary.md`; tutorial tracks'
    scaffold/deploy chapters; `quickstart.vto`/`index.vto`/`why.vto`/`concepts.vto`; README (~20
    lines); `CONTRIBUTING.md:57,86`).
-5. **#1000 terminology sweep** (".NET Aspire" → "Aspire", links to aspire.dev; main already
-   normalised some surfaces in #1748 — do not undo, do not duplicate; diff against `origin/main` for
-   those files). Dashboard: no AI-Assistant mentions; VS Code auto-launch note if present. Diagram
+5. **Terminology check (#1000 shipped in #1748):** verify no ".NET Aspire" regression in the pages
+   you touch and in any page #1748 missed; do not undo or duplicate #1748 (diff against
+   `origin/main`). Dashboard: no AI-Assistant mentions; VS Code auto-launch note if present. Diagram
    `_diagrams/aspire-resource-graph.mmd` if S6/S8 added nodes → `diagrams:render`.
 6. **Regeneration + gates:** `gen:agent-docs-prose`, `gen:publish-assets`, `diagrams:render`; then
    `doc:lint` (`--root` form — record `N/A` reasoning if it lints TS JSDoc only, D-30),
@@ -97,10 +97,12 @@ to skills (S9 owns `skills/aspire`); no pins (S1); no runtime; archival manifest
 
 - After commit 1: draft PR (base `test/aspire-13-5-s10-e2e-gate-upgrades`), title
   `docs(aspire): public docs + README refresh for Aspire 13.5 (S11)`; body per
-  `.github/pull_request_template.md`, `## Scope` = `Closes #1723`, `Closes #1642`, `Closes #1000`,
-  `Part of #1712`; labels `type:docs`, `epic:aspire-13-5`, `area:docs`, `area:aspire`,
-  `priority:p2`, `status:impl`, plus `ci:skip-e2e` (docs-only) and record that choice in the opening
-  comment; milestone `0.0.7`. State the S10 stacking and that docs_audit + docs_polish follow.
+  `.github/pull_request_template.md`, `## Scope` = `Closes #1723`, `Closes #1642` (#1642 is in the
+  Backlog/Triage milestone — the supervisor asks the coordinator to move it to 0.0.7), `Refs #1000`
+  (already shipped on main via #1748 — no closing keyword), `Part of #1712`; labels `type:docs`,
+  `epic:aspire-13-5`, `area:docs`, `area:aspire`, `priority:p2`, `status:impl`, plus `ci:skip-e2e`
+  (docs-only) and record that choice in the opening comment; milestone `0.0.7`. State the S10
+  stacking and that docs_audit + docs_polish follow.
 
 ## Stop conditions
 
