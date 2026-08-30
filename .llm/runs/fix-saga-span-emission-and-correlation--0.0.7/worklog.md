@@ -436,3 +436,19 @@ paths (17 verified + corpus carrier exception + owner-authorized item 20).
 **IMPL-EVAL cycle 3 (delta): `PASS_IMPL`** at `60e0b198`, verdict `14889037`. Flow-B consumer runtime
 remains `NOT_RUN` and is the sole outstanding gate before ready-merge; per owner it must run green in
 CI or off-host because local topology is blocked by D-42/D-43.
+
+## Main integration `c20cba7d4` — MECHANICAL_PASS, evaluator currency preserved
+
+Merged main `9710a2898` (merge, not rebase). **Zero intersection**: `comm` of main's changed paths
+against this leaf's 19 owned paths returns empty, so the integration touches nothing IMPL-EVAL cycle 3
+judged. No conflict; no shared carrier moved (main's delta contains no `.generated.` file).
+
+Refreeze at `c20cba7d4`, clean tree — every number identical to the pre-merge measurement, which is
+what makes this mechanical rather than a re-cut:
+
+`plugins/sagas` **51 / 0 / 1** · `packages/plugin-sagas-core` **84 / 0 / 3** · `arch:check` 0 ·
+`check:mcp-export-corpus` 0 · `check:publish-assets` 0 · core JSR audit 0 · `deno.lock` byte-unchanged
+vs `f8b4f804` · leaf ceiling still **19 paths** · tree clean after the sweep.
+
+IMPL-EVAL cycle 3 `PASS_IMPL` (`14889037`) therefore carries forward to this head. Flow-B remains the
+sole outstanding gate.
