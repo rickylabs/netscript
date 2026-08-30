@@ -6,17 +6,19 @@
 | --- | --- |
 | Run ID | `fix-plugin-doctor-registry-drift--0.0.7` |
 | Branch | `fix/plugin-doctor-registry-drift` |
-| Current phase | `implement` |
+| Current phase | `evaluate handoff` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Issue #1673 is re-baselined at `origin/main` `13878a80a`. S3 now implements manifest-backed,
-bidirectional runtime-registry comparison across exactly the six locked product/test paths. The
-focused structured suite is green (`passed=5 failed=0`), the related suite is green
-(`passed=47 failed=0`), and exact-file type-checking reports zero diagnostics. S4 final-head gates
-and independent IMPL-EVAL remain pending.
+Issue #1673 is implemented at product head `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`
+across exactly the six locked product/test paths. S4 has recorded every locked gate plus the two
+supervisor-required measured cascade checks. Quality/doctrine, doc lint, publish dry-run, both
+cascade checks, focused/related tests, exact-file check/lint, and lock hygiene pass. Scoped format
+is red with exact attribution: three findings reproduce on pristine base `13878a80a`; the fourth is
+the accepted S2 regression test present when this dispatch began. Tier-A and independent
+opposite-family IMPL-EVAL remain coordinator-owned next steps.
 
 ## Completed
 
@@ -38,14 +40,13 @@ and independent IMPL-EVAL remain pending.
 
 ## In Progress
 
-- Slice-3 commit/push, PR body progress, and structured PR evidence comment.
+- S4 evidence-only commit/push, final PR body evidence, and structured S4 comment.
 
 ## Next Steps
 
-1. Commit/push S3 with the focused and related green evidence.
-2. Update the draft PR's S2/S3 progress and post the S3 structured comment.
-3. Run gates 1–10 plus the two measured cascade checks at the final implementation head.
-4. Commit/push S4 evidence, finalize the PR body/comment, and stop for Tier-A.
+1. Commit/push S4 evidence by explicit refspec.
+2. Finalize draft PR #1739's boxes and evidence block, then post the S4 structured comment.
+3. Stop for supervisor Tier-A and the mandatory separate opposite-family IMPL-EVAL.
 
 ## Key Decisions
 
@@ -53,7 +54,7 @@ and independent IMPL-EVAL remain pending.
 | --- | --- | --- |
 | Manifest discovery is authoritative | research / generator code | Avoids hard-coded plugin names. |
 | Healthy wording is evidence-bounded | issue target / streams re-baseline | No claim about non-registry stream topology. |
-| No generated cascade | path ceiling | No templates/assets/docs/exports touched. |
+| Generated cascade is measured | supervisor addition | `check:mcp-export-corpus` and `check:publish-assets` both pass; `check:assets-barrel` has no input path. |
 
 ## Files Changed
 
@@ -68,9 +69,9 @@ and independent IMPL-EVAL remain pending.
 | --- | --- | --- |
 | Plan | PASS (authoring completeness only) | `research.md`, `plan.md`, `worklog.md`; PLAN-EVAL N/A, not self-certification |
 | Static | PASS_S3 | focused `5/5`, related `47/47`, exact-file check zero diagnostics |
-| Fitness | NOT_RUN | S4 final-head quality/doctrine and JSR gates pending |
+| Fitness | PASS | exact-head quality/doctrine and doc-lint receipts; package publish dry-run exit `0` |
 | Runtime | N/A | prohibited live surfaces |
-| Consumer | NOT_RUN | focused temp-workspace regression planned |
+| Consumer | PASS | focused `5/5`, related `47/47`; no live services |
 
 ## Open Questions
 
@@ -86,5 +87,6 @@ and independent IMPL-EVAL remain pending.
 
 - Bootstrap: `d37b278b6` (pushed; draft PR #1739 opened).
 - Red-before regression: `c947b8fa4` (pushed; S2 PR comment posted).
-- Bidirectional comparison and production wiring: the S3 commit containing this context update;
-  exact SHA is recorded in the PR comment after push.
+- Bidirectional comparison and production wiring: `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`
+  (pushed; S3 PR comment posted).
+- S4: evidence-only commit is created after this context update and recorded in the PR comment.

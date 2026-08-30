@@ -97,6 +97,9 @@ mandatory in a fresh opposite-family session.
 | 2026-08-30T08:37Z | 3 | Production wiring | Kept doctor discovery optional for legacy seams and supplied the existing generator closure unconditionally from `public-command-dependencies.ts`. |
 | 2026-08-30T08:45Z | 3 | Green regression | Focused structured test exited `0`: `passed=5 failed=0`; exact six-file structured check exited `0`; related structured suite exited `0`: `passed=47 failed=0`. |
 | 2026-08-30T08:47Z | 3 | Reconcile | PR #1739 remains draft with `Closes #1673`; issue #1673 remains open and unchanged; no new reviewer/evaluator comment or scope adjustment. S2/S3 body progress and the S3 phase comment will be updated after the explicit-refspec push. |
+| 2026-08-30T06:49Z | 4 | Durable fitness evidence | `quality-gate` and package-scoped `doc-lint` receipts both attest `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`, exit `0`, outcome `PASS`. |
+| 2026-08-30T06:50Z | 4 | Publish/cascade evidence | CLI publish dry-run, `check:mcp-export-corpus`, and `check:publish-assets` exited `0`; `check:assets-barrel` is inapplicable because no template or `kernel/assets` path is in the six-file ceiling. |
+| 2026-08-30T06:50Z | 4 | Lock hygiene | Raw worktree and pinned-base comparisons both exited `0`: `deno.lock` is byte-unchanged through the final product head. |
 
 ## Decisions
 
@@ -122,14 +125,26 @@ mandatory in a fresh opposite-family session.
 | Focused green regression | same structured wrapper and test path | PASS | Exit `0`; `passed=5 failed=0`; covers late source, reverse orphan, imported-but-unused binding, aligned evidence, and no-target wording. |
 | Related doctor/generator tests | structured wrapper over the five locked test paths | PASS | Exit `0`; `passed=47 failed=0`. |
 | Exact-file type check | `run-deno-check.ts` over all six ceiling paths | PASS | Exit `0`; six files selected; zero diagnostics. |
-| Final-head lint/fmt | structured wrappers | NOT_RUN | S4 runs and records the final-head receipts. Root config intentionally excludes `packages/cli`; S4 uses a scratch config carrying the same rules without that exclusion. |
+| Exact-file lint | `run-deno-lint.ts` over all six ceiling paths using a scratch copy of the root lint rules without the root's `packages/cli` exclusion | PASS | Exit `0`; six selected/processed, zero findings. Receipt: `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/scoped-lint.json`. |
+| Exact-file format | `run-deno-fmt.ts` over all six ceiling paths using a scratch copy of the root format rules without the root's `packages/cli` exclusion | FAIL (ATTRIBUTED) | Exit `1`; six selected/processed, four findings. A pristine archive of base `13878a80a` has the same three findings in the existing generator, doctor use case, and composition root; the fourth is the accepted S2 regression test at dispatch start and was not altered to manufacture green. Evidence: `scoped-fmt.json` and `main-existing-scoped-fmt.json`. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-1/F-3/F-5/F-6/F-7/F-8/F-9/F-10/F-11/F-12/F-15..F-19 | NOT_RUN | selected gate list in `plan.md` | No public/asset surface change planned. |
-| F-CLI-1..31 | NOT_RUN | quality/doctrine gate + manual structural review | No command vocabulary or presentation shape change. |
+| Code quality + doctrine | PASS | `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/quality-gate.json` | Durable receipt attests exact git head `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`; exit `0`, outcome `PASS`. |
+| JSR doc surface | PASS | `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/doc-lint.json` | Durable receipt attests the same exact head; one package, three entrypoints, zero errors/private-type refs/missing JSDoc/other findings. |
+| JSR package dry run | PASS | `deno publish --dry-run --allow-dirty` from `packages/cli` | Exit `0`; `Success Dry run complete`. Existing unanalyzable dynamic-import warnings remain warnings. |
+| F-CLI-1..31 | PASS | quality/doctrine receipt + focused semantic suites | Command vocabulary/options are unchanged; source discovery remains manifest-driven and composition remains declarative. |
+
+### Generated Cascade and Lock Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `check:mcp-export-corpus` | PASS (measured negative) | Exit `0`; corpus SHA-256 `88011e6e459097ba4c74111063dbef13a95823702bd37447f358bc19375cc262`, 35 packages/270 subpaths/7,614 symbols | Required by supervisor despite plan reasoning; no generated corpus drift. |
+| `check:publish-assets` | PASS (measured negative) | Exit `0` | Required by supervisor despite plan reasoning; checked publish assets are current. |
+| `check:assets-barrel` | N/A | six-file product ceiling | No template or `kernel/assets` path is changed, so the assets-barrel derivative has no input in this leaf. |
+| `deno.lock` | PASS | raw `git diff --exit-code -- deno.lock` and `git diff --exit-code 13878a80a50c55b9662099fed64555f2310ae4a3 e5123a0e4f3d6844dbc173d5b09249a24e637fb8 -- deno.lock` | Both exit `0`; byte-unchanged. |
 
 ### Runtime Gates
 
@@ -141,10 +156,15 @@ mandatory in a fresh opposite-family session.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `netscript plugin doctor` focused temp workspace | RED_BASELINE | structured wrapper output recorded above | Doctor succeeded after `sagas/late-saga.ts` was added without regeneration. No live backend used. |
+| `netscript plugin doctor` focused temp workspace | PASS | focused `5/5` and related `47/47` structured receipts | Missing source registration, reverse orphan, imported-but-unused, aligned, and no-target claims are covered without a live backend. |
 
 ## Handoff Notes
 
 - Tier-A should inspect the source-file discovery contract, import-binding comparison, and exact
   healthy/error wording first.
+- Final product/gate head is `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`; the S4 commit contains
+  evidence-only run-artifact updates.
+- Scoped format remains transparently red with three base-proven existing findings and one inherited
+  accepted-S2-test finding; no product or test source was reformatted outside the locked slices.
+- Runtime gates remained unauthorized and were not run. No architecture debt entry was created.
 - This implementation author does not provide a sign-off or IMPL-EVAL verdict.
