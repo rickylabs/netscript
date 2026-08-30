@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------- |
 | Run ID         | `fix-saga-span-emission-and-correlation--0.0.7`                  |
 | Branch         | `fix/saga-span-emission-and-correlation`                         |
-| Current phase  | `implement`                                                      |
+| Current phase  | `gate` — author complete; refreshed Tier-A and IMPL-EVAL pending |
 | Archetype      | `3 - Runtime/Behavior`; `5 - Plugin Package` composition overlay |
 | Scope overlays | runtime + telemetry + consumer proof                             |
 
@@ -71,13 +71,13 @@ attributed STOP and was not regenerated.
 
 ## In Progress
 
-- S6 evidence commit and push.
+- Supervisor-owned refreshed Tier-A review and separate-session IMPL-EVAL for the final head.
 
 ## Next Steps
 
-1. Commit and push the S6 evidence artifacts and update the implementation PR comment.
-2. Hand the final S5/S6 head to the supervisor for refreshed Tier-A and separate IMPL-EVAL.
-3. Preserve MCP corpus regeneration and the leased Flow-B runtime for supervisor coordination.
+1. Preserve the final author head for refreshed Tier-A and separate-session IMPL-EVAL.
+2. Preserve MCP corpus regeneration and the leased Flow-B runtime for supervisor coordination.
+3. Do not flip draft state, relabel, merge, or mirror issue acceptance boxes from the author lane.
 
 ## Key Decisions
 
