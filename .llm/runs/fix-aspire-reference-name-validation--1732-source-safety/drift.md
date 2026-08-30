@@ -34,3 +34,30 @@
 - **Action:** keep the grammar module-private under `packages/aspire/src/domain/`; add attributable
   doc-lint and JSR-audit baselines to the plan.
 - **Evidence:** `research.md` JSR section and `plan.md` D3/gate table.
+
+## 2026-08-30 — PLAN-EVAL exposed an undeclared identifier seam
+
+- **What:** Cycle 1 proved that literal escaping alone does not protect emitted identifier
+  positions. `safeIdentifier` only replaces hyphens, so `class`/`await` remain reserved and
+  `builder`/`config` can shadow generator bindings.
+- **Source:** `plan-eval.md` F1 and its direct generated-module probes.
+- **Expected:** D1's load-bearing source-safety property covered every syntax/binding seam.
+- **Actual:** The plan covered string literals but silently assumed identifier safety.
+- **Severity:** significant
+- **Action:** owner authorized option (a): background-local, user-text-free ordinal identifiers; add
+  parse-and-execute rows for `class`, `await`, and `builder`; keep the platform grammar pure.
+- **Evidence:** repaired `plan.md` D1, matrix, slice 2, and risk register.
+
+## 2026-08-30 — Sibling generators retain identifier exposure
+
+- **What:** The evaluator found the same weak identifier-policy class in sibling service, plugin,
+  and app registration generators.
+- **Source:** `plan-eval.md` F1 side-effect / attack narrative and focused sibling scan.
+- **Expected:** A shared helper named `safeIdentifier` would guarantee valid, collision-safe
+  generated bindings.
+- **Actual:** It only replaces hyphens, and sibling generators remain exposed to reserved words or
+  binding collisions.
+- **Severity:** significant, pre-existing
+- **Action:** deliberately defer. #1732 changes only the background generator; the supervisor owns
+  upstream follow-up. Do not touch sibling files or open an issue from this lane.
+- **Evidence:** PR #1747 Drift / Debt section and repaired plan's Deliberately Untouched section.
