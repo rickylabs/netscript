@@ -76,7 +76,8 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "taskSuffix: 'sqlite'")
     assertStringIncludes(output, 'let resource = await builder.addExecutable(')
     assertStringIncludes(output, '`${target.configKey}-cli`')
-    assertStringIncludes(output, 'Invoke database operations through Aspire resource commands')
+    assertStringIncludes(output, "'--request'")
+    assertStringIncludes(output, '`.netscript-db-operation-${target.configKey}.json`')
     assertStringIncludes(output, '.withExplicitStart()')
     assertStringIncludes(
       output,
@@ -156,7 +157,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, 'export async function tryHandleDbCliMode(')
     assertStringIncludes(output, 'await resource.withCommand(')
     assert(!output.includes('DB_OPERATION_RUNNER'))
-    assert(!output.includes('.netscript-db-operation-'))
+    assertStringIncludes(output, "'aspire', '.helpers', 'run-tool.mts'")
     assertStringIncludes(output, 'return false;')
   })
 

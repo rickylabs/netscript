@@ -93,6 +93,31 @@ export async function runTool(
 }
 
 if (import.meta.main) {
+  if (Deno.args[0] === '--request') {
+    const [, requestPath, taskSuffix] = Deno.args;
+    if (!requestPath || !taskSuffix) {
+      console.error('Tool runner request mode requires a request file and task suffix.');
+      Deno.exit(2);
+    }
+    const request = parseOperationRequest(await Deno.readTextFile(requestPath));
+    const operation = request.NETSCRIPT_PRISMA_OPERATION;
+    if (!operation || !/^[a-z-]+$/.test(operation)) {
+      console.error('Invalid NetScript database operation request.');
+      Deno.exit(2);
+    }
+    const configuredTimeout = request.ASPIRE_CLI_START_TIMEOUT;
+    const timeoutSeconds = configuredTimeout ? Number(configuredTimeout) : undefined;
+    if (timeoutSeconds !== undefined && (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 1)) {
+      console.error('Tool runner request timeout must be a positive whole number.');
+      Deno.exit(2);
+    }
+    const result = await runTool(`db:${operation}:${taskSuffix}`, {
+      env: request,
+      timeoutSeconds,
+    });
+    Deno.exit(result.exitCode);
+  }
+
   const [errorFile, taskName, timeoutValue] = Deno.args;
   if (!errorFile || !taskName) {
     console.error('Tool runner requires an error file and task name.');
@@ -107,4 +132,19 @@ if (import.meta.main) {
 
   const result = await runTool(taskName, { errorFile, timeoutSeconds });
   Deno.exit(result.exitCode);
+}
+
+function parseOperationRequest(text: string): Record<string, string> {
+  const parsed: unknown = JSON.parse(text);
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('Database operation request must be an object.');
+  }
+  const request: Record<string, string> = {};
+  for (const [key, value] of Object.entries(parsed)) {
+    if (typeof value !== 'string') {
+      throw new Error(`Database operation request value ${key} must be a string.`);
+    }
+    request[key] = value;
+  }
+  return request;
 }
