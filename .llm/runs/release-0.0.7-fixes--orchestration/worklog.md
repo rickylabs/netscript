@@ -4776,3 +4776,62 @@ corpus attribution and the instruction to confirm gate 18's `NOT_RUN` is never p
 
 `review-threads` PASS, 0 unanswered. Phase normalized to `status:impl-eval` on PR #1764 and issue
 #1368.
+
+## 2026-08-30 — two findings that change #1758's outlook; next fixes issue selected
+
+### #1758's blocker is itself parked — this materially changes the wait
+
+`#1758` is parked on `#1734`. The internals lane's own queue state reads:
+
+> `1734_pr1736_parked_after_second_terminal_impl_eval_failure`
+
+So #1734 is not merely open and progressing — its PR **#1736 is parked after a second terminal
+IMPL-EVAL failure**, still draft at head `eb765629`, `status:impl`. Confirmed live: issue #1734 OPEN,
+PR #1736 OPEN and draft.
+
+That matters because #1758's park was justified on the expectation that #1734 *"must change main"* and
+force an exact-head rerun. If #1734 is itself parked after two terminal evaluator failures, that
+change may not arrive soon, and #1758 — which is otherwise complete, with a full green suite, an AC3
+production-chunk proof, and 26 of 27 e2e gates passing — could sit indefinitely on a blocker owned by
+a stalled lane.
+
+**Surfaced, not decided.** This lane does not choose between the options; it reports that the premise
+of the wait has weakened. The three resolutions already on the table for the analogous #1739 case
+apply here too: land #1734 first, amend the box to require the runner report plus attribution for
+failures outside the leaf's ceiling, or apply `status:close-gate-override` with the attribution as
+justification.
+
+### The shared-asset sequence is finished
+
+`#1755` **MERGED** at 2026-08-30T13:08:59Z, and the docs lane records
+`1746_1748_1755_1761_merged_shipped`. So the owner-controlled shared-asset ordering that constrained
+regeneration — and that made this lane hold #1758's cascade through two intermediate bases — is
+**complete**.
+
+Two consequences:
+
+1. #1368's `check:mcp-export-corpus` stop-and-report may now be sequenceable rather than blocked; that
+   is an owner call, and the gate stays stop-and-reported until told otherwise.
+2. The next fixes leaf no longer needs to avoid CLI-template work, which was the reason #1357 was
+   passed over earlier in favour of #1368.
+
+### Next fixes issue selected — #1357, queued not dispatched
+
+| Candidate | Assessment |
+| --- | --- |
+| **#1357** — `ui:add page --island` emits a `useSignal` counter and an empty `queryLoaders` instead of the advertised data-screen triad | **p1**, `area:cli` + `area:fresh`, `status:triage`, unclaimed by any lane or leaf. Its CLI-template collision risk has now passed with the shared-asset sequence merged. |
+| #1677 / #1695 — tanstack-bridge `TokenUsage`, `@tanstack/ai` pin | p1 but `status:plan`; the pin bump touches `deno.lock`, which conflicts with lock-hygiene while another leaf is mid-flight |
+| #1249 / #1544 | p2 — lower priority than #1357 |
+
+#1357 is queued as the next front and **not dispatched**: the serial rule holds, and #1368 is the sole
+merge-front until terminal. It is also the leaf whose own subject — a scaffold command that advertises
+a data-screen triad and emits a counter — is the same "signal that does not match reality" family as
+#1673 and #1462, so the lane's accumulated evidence discipline transfers directly.
+
+### Central state remains stale for this lane
+
+`milestone-cluster-state.json` still records the fixes queue as
+`1673_pr1739_cycle_1_fail_fix…; 1462_queued`. In reality #1673/#1739 is at IMPL-EVAL cycle 2
+`PASS_IMPL` awaiting a coordinator decision, #1462/#1758 is parked at `f4ca7c32` with full evidence,
+and #1368/#1764 is at Tier-A PASS with an evaluator in flight. Reported, not edited — central state is
+coordinator-owned.
