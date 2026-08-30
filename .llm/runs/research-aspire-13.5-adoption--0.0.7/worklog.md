@@ -513,4 +513,7 @@ two-concurrent-isolated-start receipt scheduled for the next lease after S7; pro
 stay separate from S5 evidence. S9 cycle-2 running. | | S7 attempt: first AppHost attached | Run
 AppHost up under the granted attempt at `f8201d4f`; relay attached `postgres-0e5c6d1c :20800` +
 `redis-amduaucj :32783` within seconds (routing confirmed); corrected bootstrap held. Turn-end wake
-armed. |
+armed. | | **S1 hosted run GREEN — both tiers** | Run 33330714604 SUCCESS (all tiers) at
+authoritative `e0d70e404074…` — #1713 "scaffold.runtime green on both CI tiers" met at the exact
+head with the adjudicated gate semantics. Delta IMPL-EVAL dispatched (fresh session);
+ready/close-gate follows a PASS. Chain-3 (S5b full runtime) now unblocked. |
