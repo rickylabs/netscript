@@ -2037,3 +2037,84 @@ S5 repair → fresh supervisor Tier-A over the delta at the exact new head → m
 opposite-family IMPL-EVAL** in a session this lane owns. PR stays draft; no readiness flip, relabel,
 issue edit, box tick, or merge from this lane. Serial ordering holds: nothing else in the fixes queue
 is dispatched until #1673 is terminal.
+
+## 2026-08-30 — #1673 Tier-A PASS, IMPL-EVAL dispatched; #1462 selected and researched
+
+### #1673 is through Tier-A
+
+The S5 repair landed at `c1e21c1b` and the supervisor sign-off at `61b8bf52`. Both HELD findings are
+resolved and were re-derived independently rather than accepted:
+
+- **T-1.** The over-width `@std/path` line is wrapped and its finding is gone. The four remaining
+  format findings were re-attributed by running the same scoped format against a pristine base archive
+  and comparing **source lines**: three base-owned on identical lines, one leaf-owned because the
+  regression-test file does not exist at base. The generator's 9 → 18 shift is exactly +9 — the cost of
+  expanding one import line into ten — which is an independent consistency check on the attribution
+  rather than a restatement of it.
+- **T-2.** The corrected sentence was checked against the file, not the claim: the original S2 case
+  name is present **verbatim** at head beside the four added cases, sharing `createDoctorHarness`.
+
+Exact-head gates, all independently re-run at `c1e21c1b`: focused suite exit `0` (5/0); scoped type
+check exit `0`, zero diagnostics; scoped lint under the root rule set exit `0`, zero findings;
+`deno.lock` byte-unchanged; delta is exactly two files, both authorized; no identity leakage into
+committed artifacts; `review-threads PASS threads=0 unanswered=0`.
+
+**One fact recorded so it is not mistaken for a hidden risk.** The root `deno.json` excludes
+`packages/cli/` from *both* `fmt` and `lint`. The leaf's scoped runs deliberately removed that
+exclusion — disclosed in its own gate table — so they are stricter than CI, and the residual
+leaf-owned format finding in the regression test cannot fail CI. Correcting it still mattered, because
+T-1 was about the honesty of the attribution, not about a merge blocker.
+
+IMPL-EVAL cycle 1 is dispatched at evaluated head `61b8bf52` on the canonical `formal_impl_evaluation`
+route — native Claude `claude-fable-5` · medium · Remote Control, requested and observed identical — in
+a dedicated worktree on `eval/impl-eval-1673-cycle-1`, so the leaf branch stays pristine while the
+verdict is written on its own branch. Full identity, route, and Remote Control proof are in
+`tier-a-1673.md`, recorded before the evaluator mutated anything.
+
+### Two central-state gaps reported to the coordinator, not touched
+
+1. **#1673 / PR #1739 is absent from `milestone-cluster-state.json` entirely.** Every other fixes leaf
+   has an entry; this one has none, so the cluster state cannot see the lane's active work. Central
+   state is coordinator-owned, so this is reported rather than written.
+2. The `lane: fixes` tag on the two Aspire 13.5 leaves (`aspire-13-5-s4-generator-revalidation` /
+   PR #1738, `aspire-13-5-s5-literal-ports` / PR #1740, issues #979, #1365, #1370, #1717) places
+   work in this lane's name that lives in the Aspire worktrees under its own supervisor. This lane did
+   not touch them. It is the same trap as #1736/internals: **lane ownership is settled by the
+   controller that actually holds the worktree, not by the tag.** Recorded because those four issues
+   would otherwise look like unclaimed fixes-queue candidates — #1365 is a p0.
+
+### Next fixes leaf selected — #1462, researched but deliberately not dispatched
+
+The coordinator's fixes `queueState` names #1673 and then only `later_fixes_serially`, so no specific
+next issue is ordered and selection falls to this lane. No sibling lane claims it: docs holds
+#1746/#1748, internals #1732, features #1466 then #1387/#1730.
+
+**#1462** (`priority:p1`, `type:fix`, `area:sdk`+`area:fresh`): importing `defineServices` from the SDK
+root auto-registers the server KV cache provider, so browser code silently takes the server cache path
+and pulls `@netscript/kv` toward the client bundle.
+
+Verified against **this tree** rather than accepted from the issue text — the issue reports
+`@netscript/sdk@0.0.5` and the package is now `0.0.6`, so the defect had to be re-proved as live:
+
+```
+hasCacheProvider() from packages/sdk/mod.ts          -> true
+hasCacheProvider() from packages/sdk/src/query/mod.ts -> false
+```
+
+Exact chain confirmed in current source: `mod.ts:46` re-exports `./src/cache/mod.ts`, whose line 22 is
+a top-level `setCacheProvider(cacheQuery)`; `defineServices` is exported from the root at `mod.ts:49`.
+The `packages/sdk/deno.json` exports map has **no `./presets` subpath**, so `defineServices` is
+reachable only through the leaking root — which is precisely why a consumer cannot avoid the side
+effect.
+
+The sharpest finding is a contradiction inside the file itself: `mod.ts` line 24 documents "Use
+`@netscript/sdk/cache` only from server-side code", and line 46 re-exports that module from the root.
+The documented boundary is the one the code breaks.
+
+**Not dispatched.** Serial ordering holds inside this lane and one evaluator runs at a time
+cluster-wide, so #1462 waits until #1673 is terminal. The research above is the advance work; the brief
+is staged and dispatch is one command once the verdict lands. This will be a WSL Codex daemon-attached
+slice, not a Claude workflow — it is framework source under `packages/sdk/`, and it moves the published
+export surface, so the #1112 generated-derivative cascade (`check:mcp-export-corpus`,
+`check:publish-assets`, JSR audit, publish dry-run) is mandatory in its gate set from the start rather
+than argued N/A by reasoning.
