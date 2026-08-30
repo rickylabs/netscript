@@ -1476,3 +1476,15 @@
   `s3-attempt-3`, PID 3139731, since 2026-08-30T18:22:23Z, registry
   `slices/s3/phase-b/relay-registry.json`. S3 thread `01a05200…` resumed with
   `slices/s3/phase-b-attempt-3-brief.md` (same thread; sender record evicted as stale).
+- **D-75 — S3 attempt 3 (relay, lease) reaches the contracted capture; two observations routed
+  separately.** Coordinator monitor + live snapshot (`slices/s3/phase-b/evidence-182605Z/`):
+  postgres/db/redis/garnet/workers-api Healthy, `aspire wait` postgres + workers exit 0, POST
+  `health-check` trigger OK, real 13.5.3 envelopes captured (4 resources, 29 normalized spans),
+  fixture/consumer/parity `pending-lease → required` focused test PASS (thread sealing exact-head
+  gates). Observations, **not** in S3's approved scope and not product verdicts: (O-1) the scratch
+  had no `database/postgres/schema/.generated/` (no `database.codegen` step in the brief-scoped
+  scratch; the hosted suite runs it) → `users` Finished/Unhealthy, web `/health` Unhealthy; (O-2)
+  `streams` plugin not scaffolded → workers watcher lists zero completed runs while `workers-api`
+  stays Healthy. Routing: O-1/O-2 are covered by the hosted `scaffold.runtime` proof (codegen + all
+  four plugins) and by S8's local Phase B (full suite pass); if either reproduces there it becomes a
+  product finding on its owning slice. S3 is not widened.
