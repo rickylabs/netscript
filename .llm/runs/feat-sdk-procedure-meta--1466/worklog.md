@@ -69,6 +69,8 @@ add runtime interpretation in this slice family without the RFC-owned Stage 2 po
 | 2026-08-30 | repair cycle 2 AF-2 | Published the NetScript-owned `commonErrorMap` value and `CommonErrorMap` type with ownership JSDoc. The public alias uses the existing public NetScript error vocabulary and does not re-export upstream oRPC names. Exact doc-lint counts are base 12, pre-repair 14, cycle 1 13, cycle 2 12; final incremental cost is 0. | Content commits `c57cac676920d6390d3748ef70ef5f5d0671c794`, `bb1a489ace2c162c1caca065fc2762d7807330d0`; `drift.md` D-1 |
 | 2026-08-30 | repair cycle 2 AF-3 | Recut root `test` serially under quiet load. The fd-exhaustion failure cleared; one unrelated hybrid-launcher cancellation test remains red (4248 pass, 1 fail, 19 ignored). No `.llm/tools` files were changed. | `receipts/test-final.json`; `drift.md` D-6 |
 | 2026-08-30 | receipt recut cycle 2 | Recut all eight named receipts with `--attempt 3` at content head `bb1a489a`; every `gitHead` equals `actualGitHead`. Six PASS; root `test` and baseline-red `public-doc-lint` are terminal FAIL. Exact eight-file computation is `INSUFFICIENT` for those two FAIL receipts only. Contracts JSR audit is supplemental PASS with one sanctioned INFO. | `receipts/*-final.json`; `audit/contracts.json` |
+| 2026-08-30 | repair cycle 3 docs | Completed the contracts reference's published-symbol inventory for `commonErrorMap`, `CommonErrorMap`, `BaseContractErrors`, `BaseContractMeta`, `NetScriptAuthenticationRequirement`, and `NetScriptProcedureMeta`, including ownership, compatibility, and the unsupported-mutation warning for the shared singleton. `deno task docs:exports-drift` then exited 0 at the committed content head. | Content commit `235482767edd8a9793c9d6bf6f766441c51ef313`; `audit/docs-exports-drift.txt`; `drift.md` D-7 |
+| 2026-08-30 | receipt recut cycle 3 | Recut all eight named receipts serially with `--attempt 4` at content head `23548276`; every `gitHead` equals `actualGitHead`. Six PASS; root `test` retains only the ruled zombie-sensitive hybrid-launcher failure, and `public-doc-lint` retains the 12-finding main baseline. Exact eight-file computation remains `INSUFFICIENT` for those two FAIL receipts. | `receipts/*-final.json` |
 
 ## Slice 1 gate results
 
@@ -132,3 +134,24 @@ and `public-doc-lint` did not pass; there are no missing, duplicate, contradicto
 head-mismatched receipts. The contracts assertion scanner re-measured
 `contract-primitives.ts = 0` and `procedure-meta.ts = 0`. The supplemental contracts JSR audit
 passes with one sanctioned oRPC slow-types INFO and remains outside the named eight.
+
+## Repair receipt results — cycle 3
+
+Content head: `235482767edd8a9793c9d6bf6f766441c51ef313`.
+
+| Receipt | Outcome | Attempt | Head attestation |
+| --- | --- | ---: | --- |
+| `check-final.json` | PASS | 4 | `gitHead == actualGitHead == 23548276…` |
+| `lint-final.json` | PASS | 4 | `gitHead == actualGitHead == 23548276…` |
+| `fmt-check-final.json` | PASS | 4 | `gitHead == actualGitHead == 23548276…` |
+| `test-final.json` | FAIL | 4 | `gitHead == actualGitHead == 23548276…` |
+| `public-doc-lint-final.json` | FAIL | 4 | `gitHead == actualGitHead == 23548276…` |
+| `quality-gate-final.json` | PASS | 4 | `gitHead == actualGitHead == 23548276…` |
+| `arch-check-final.json` | PASS | 4 | `gitHead == actualGitHead == 23548276…` |
+| `publish-dry-run-final.json` | PASS | 4 | `gitHead == actualGitHead == 23548276…` |
+
+Sufficiency was recomputed over the eight literal paths. Gate IDs and invocation IDs are unique,
+and every receipt is terminal and exact-head. Verdict: **INSUFFICIENT** because `test` and
+`public-doc-lint` did not pass; there are no missing, duplicate, contradictory, nonterminal, or
+head-mismatched receipts. The supplemental `docs:exports-drift` check exits 0 and remains outside
+the approved named set.

@@ -157,3 +157,41 @@ All eight contracted receipts were recut serially with `--attempt 3`. Every rece
 `gitHead == actualGitHead == bb1a489ace2c162c1caca065fc2762d7807330d0`; all gate IDs and invocation
 IDs are unique. Six PASS, while root `test` and the baseline-red `public-doc-lint` are terminal FAIL.
 Exact-file sufficiency is therefore **INSUFFICIENT** for those two reasons only.
+
+## D-7 — the contracted receipt set was blind to branch-owned docs-site export drift
+
+- Date: 2026-08-30
+- Slice: 1 repair, cycle 3
+- Severity: significant
+- Status: branch drift repaired; gate-set change proposed for coordinator / IMPL-EVAL ruling
+
+The `Deploy docs site to Pages` workflow ran `deno task docs:exports-drift` and correctly rejected
+the contracts reference page's complete-inventory declaration. The page omitted six public symbols
+introduced by this branch: `commonErrorMap`, `BaseContractErrors`, `BaseContractMeta`,
+`CommonErrorMap`, `NetScriptAuthenticationRequirement`, and `NetScriptProcedureMeta`.
+
+Attribution is unambiguous. The task exits 0 on `origin/main` at `13878a80a`, but failed on every
+measured branch head: `c9a391811`, `f9056f879`, `b4157a9d`, and `c2ae8c425`. Three omissions existed
+from the first slice-1 content commit, while the other three followed the bounded adapter repair.
+This was branch-owned public-documentation drift, not the host-zombie or public-doc-lint baseline.
+
+The PLAN-EVAL-approved eight-receipt set includes `public-doc-lint`, which is already red on main
+and cannot distinguish this regression. It excludes `docs:exports-drift`, which is green on main
+and precisely detected the branch's public-surface/documentation mismatch. The evidence design was
+therefore structurally blind to the branch-owned check that worked, allowing four branch heads to
+carry the regression without a named receipt signaling it.
+
+Cycle 3 documents all six symbols in the complete contracts inventory. The metadata entries state
+NetScript ownership and the additive-optional-readonly compatibility rule. The error-map entries
+state that codes, HTTP statuses, message literals, and data schemas are stable contract, and that
+mutating the exported `commonErrorMap` singleton is unsupported even though JavaScript can do so at
+runtime. `deno task docs:exports-drift` exits 0 at content head
+`235482767edd8a9793c9d6bf6f766441c51ef313`; the raw command, exit code, and output are preserved in
+`audit/docs-exports-drift.txt` as supplemental evidence outside the named eight.
+
+### Proposal — not a plan amendment
+
+Add a distinct `docs-exports-drift` gate to future contracted evidence sets whenever a slice changes
+a package's published surface, and require it at the immutable content head. This implementation
+thread does not amend the approved plan or add a catalog entry. IMPL-EVAL and the coordinator own
+the decision.
