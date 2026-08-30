@@ -35,7 +35,6 @@ const builtAuthManifest: PluginManifest = definePlugin(
   .withService({
     name: AUTH_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',
-    port: AUTH_API_DEFAULT_PORT,
   })
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: AUTH_PLUGIN_ID }])

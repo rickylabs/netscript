@@ -325,6 +325,8 @@ function normalizeScaffoldPluginMetadata(
   const infrastructureOptionalDeps = normalizeInfrastructureDependencies(
     metadata.provider.infrastructureOptionalDeps,
   );
+  const configuredServicePort = metadata.officialSource?.servicePort ??
+    metadata.officialSource?.backgroundPort;
 
   return {
     name,
@@ -344,7 +346,9 @@ function normalizeScaffoldPluginMetadata(
     service: serviceEntrypoint
       ? {
         entrypoint: serviceEntrypoint,
-        port: metadata.officialSource?.servicePort ?? metadata.officialSource?.backgroundPort,
+        port: configuredServicePort !== undefined && configuredServicePort > 0
+          ? configuredServicePort
+          : undefined,
       }
       : undefined,
     infrastructure: infrastructureRequires.length > 0

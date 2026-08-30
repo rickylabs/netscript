@@ -56,6 +56,11 @@ const CONTRIBUTION_PORT_FALLBACK = /\bctx\.port\([^)]*,[^)]*\)/;
 /** Loopback URLs with an embedded port bypass the resource-reference contract. */
 const LOOPBACK_PORT_URL = /https?:\/\/(?:localhost|127\.0\.0\.1):(?:\d+|\$\{[^}]*PORT[^}]*\})/;
 
+/** A generator that bakes a numeric infrastructure host port into its output. */
+const INFRASTRUCTURE_GENERATOR =
+  'packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
+const INFRASTRUCTURE_LITERAL_HOST_PORT = /\bport:\s*\d/;
+
 /** Files that compose resource entries for the scaffolded `appsettings.json`. */
 const SCAFFOLD_ENTRY_FILES = [
   'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts',
@@ -119,6 +124,7 @@ export function scanContent(
   const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalizedPath);
   const checksGeneratedJson = normalizedPath.endsWith('/aspire/appsettings.json');
   const checksContribution = PLUGIN_CONTRIBUTION.test(normalizedPath);
+  const checksInfrastructureGenerator = normalizedPath === INFRASTRUCTURE_GENERATOR;
 
   content.split('\n').forEach((text, index) => {
     const hitsEndpoint = LITERAL_HOST_PORT.test(text);
@@ -128,12 +134,15 @@ export function scanContent(
     const hitsGeneratedJson = checksGeneratedJson && JSON_PORT_KEY.test(text);
     const hitsContributionFallback = checksContribution && CONTRIBUTION_PORT_FALLBACK.test(text);
     const hitsContributionUrl = checksContribution && LOOPBACK_PORT_URL.test(text);
+    const hitsInfrastructureLiteral = checksInfrastructureGenerator &&
+      INFRASTRUCTURE_LITERAL_HOST_PORT.test(text);
     if (
       !hitsEndpoint &&
       !hitsEntry &&
       !hitsGeneratedJson &&
       !hitsContributionFallback &&
-      !hitsContributionUrl
+      !hitsContributionUrl &&
+      !hitsInfrastructureLiteral
     ) return;
 
     const line = index + 1;
@@ -160,6 +169,8 @@ export function scanContent(
         ? 'Plugin contribution supplies a fallback port. Use `ctx.port(resource)` so Aspire allocates it.'
         : hitsContributionUrl
         ? 'Plugin contribution embeds a loopback port. Use a resource reference or the allocated `ctx.port(resource)` value.'
+        : hitsInfrastructureLiteral
+        ? 'Infrastructure generator embeds a host port. Emit `port` only from an explicit database/cache `Port` entry.'
         : hitsEndpoint
         ? 'Generated `withHttpEndpoint` pins a literal host port. Drive it from the ' +
           'resource entry (`HostPort`) so `aspire start --isolated` can allocate.'

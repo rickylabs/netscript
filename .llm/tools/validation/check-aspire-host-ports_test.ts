@@ -13,6 +13,8 @@ const APPSETTINGS = 'packages/cli/src/kernel/templates/aspire/generate-appsettin
 const GENERATOR =
   'packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-services.ts';
 const CONTRIBUTION = 'plugins/workers/src/aspire/workers-contribution.ts';
+const INFRASTRUCTURE =
+  'packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 
 Deno.test('rejects the generated line that shipped #952', () => {
   const { findings } = scanContent(
@@ -141,6 +143,16 @@ Deno.test('accepts allocated contribution ports and resource references', () => 
   );
   assertEquals(allocated.findings, []);
   assertEquals(reference.findings, []);
+});
+
+Deno.test('rejects generated infrastructure host-port literals', () => {
+  const result = scanContent(INFRASTRUCTURE, "lines.push('    port: 5432,')");
+  assertEquals(result.findings.length, 1);
+});
+
+Deno.test('accepts explicit-only infrastructure host-port interpolation', () => {
+  const result = scanContent(INFRASTRUCTURE, 'lines.push(`    port: ${entry.Port},`)');
+  assertEquals(result.findings, []);
 });
 
 Deno.test('S5 runtime literal grep has only the compatibility export and its deprecation tests', async () => {
