@@ -6151,3 +6151,39 @@ workflow_dispatch at exact head (branch tip confirmed matching before dispatch,
 `git ls-remote` — not assumed), run `33342040720`. This workflow's `scaffold-runtime` job runs on a
 stock GitHub runner with real Chrome present, so it is the correct instrument for the one gate this
 NAS structurally cannot prove, per this session's repeated, independently-confirmed finding.
+
+### #1764 bounded Flow-B proof attempted at exact head `9d8bbb4e9` — genuine host inconclusive, TC-6/7/9 still unproven
+
+Preconditions verified: literal zero on arrival, head matched exactly. Existing receipt files
+(`flow-b-scaffold-runtime-5b526e4bc-attempt2.json`, `relay.json`, `relay-targeted.json`) confirmed
+present and **untouched** — new files written under distinct names
+(`relay-flowb-final.json`, `flow-b-bounded-final-9d8bbb4e9.json`).
+
+Relay armed under owner `fix1764-flowb-final`, inner watch PID saved to a file immediately (the
+discipline from #1781's teardown lesson), attached correctly at `runtime.aspire-start` (3 ports).
+
+**`database.init` FAILED**, exit 1, after `runtime.aspire-start` PASSED (8355ms). No structured JSON
+report was written — the run's own cleanup step then hit `docker rm -f <id> failed: removal ... already
+in progress` and crashed with an uncaught error before the reporter flushed, so the only evidence is the
+pretty-console line "Database operation failed with exit code 1", without stderr detail.
+
+**Most likely cause, not yet confirmed**: the bounded script's gate list goes straight from
+`RUNTIME_ASPIRE_START` to `DATABASE_INIT` with no scaffold/plugin steps between them; in the real
+80-gate suite, ~15 plugin-install/codegen steps (each 0.5-2s) run in between and incidentally give
+Postgres time to finish starting before `database.init` connects. My bounded script strips exactly that
+buffer. This is a property of the **bounded testing script**, not evidence of a product regression in
+#1764's saga code — nothing in `plugin-sagas-core`/`plugins/sagas` was touched or exercised by this
+failure.
+
+**Teardown, done immediately, before diagnosing anything**: relay cleanup (0 listeners — already
+self-cleaned by the crash path); watch PID confirmed dead. The `docker rm` race left containers/volumes
+at true zero regardless (Docker's own removal completed a beat after the script's check raced it) — one
+leftover nondefault network (`aspire-persistent-network-0dd731f2-...`) confirmed empty and removed.
+**Final proof: containers=0, volumes=0, nondefault networks=0, `aspire ps` []**.
+
+**Not retrying blindly.** I have a plausible diagnosis but not a confirmed root cause, and no structured
+report to examine further. TC-6/TC-7/TC-9 remain unproven. Reporting this precisely rather than
+guessing at a script fix and burning another lease cycle, especially with #1747 next in the serial
+queue. If authorized to continue, the concrete next step is adding an explicit Postgres-readiness wait
+immediately before `DATABASE_INIT` in the bounded script (not present in my earlier version, which
+copied the full array's literal ordering without accounting for the removed buffer time).
