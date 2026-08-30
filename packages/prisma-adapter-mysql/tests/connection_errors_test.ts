@@ -1,7 +1,7 @@
 import { assertEquals, assertInstanceOf, assertStrictEquals } from 'jsr:@std/assert@1';
 import { DriverAdapterError, type SqlQuery } from '@prisma/driver-adapter-utils';
 
-import { getCapabilities, PrismaMySqlAdapter } from '../src/adapter.ts';
+import { getCapabilities, PrismaMySqlAdapter, toMysql2PoolOptions } from '../src/adapter.ts';
 import type { MySqlCapabilities, PrismaMySqlOptions } from '../src/types.ts';
 
 interface FakeExecuteResult {
@@ -387,8 +387,72 @@ for (const classified of [true, false]) {
 Deno.test('successful disposal never notifies', async () => {
   const client = new FakePoolClient();
   const recorder = callbackRecorder();
+  let closeCalls = 0;
+  client.closeImpl = () => {
+    closeCalls += 1;
+    return Promise.resolve();
+  };
 
   await adapter(client, recorder.options).dispose();
 
   assertEquals(recorder.calls.length, 0);
+  assertEquals(closeCalls, 1);
+});
+
+Deno.test('structured connection config maps exactly to mysql2 pool options', () => {
+  assertEquals(
+    toMysql2PoolOptions({
+      hostname: 'db.internal',
+      port: 3307,
+      username: 'app',
+      password: 'secret',
+      db: 'example',
+      poolSize: 4,
+      timeout: 12_345,
+    }),
+    {
+      host: 'db.internal',
+      port: 3307,
+      user: 'app',
+      password: 'secret',
+      database: 'example',
+      waitForConnections: true,
+      connectionLimit: 4,
+      multipleStatements: true,
+      connectTimeout: 12_345,
+    },
+  );
+});
+
+Deno.test('structured connection config defaults pool size to one', () => {
+  assertEquals(toMysql2PoolOptions({}).connectionLimit, 1);
+});
+
+Deno.test('legacy verify_identity without CA certificates leaves TLS unset', () => {
+  const options = toMysql2PoolOptions({
+    tls: { mode: 'verify_identity' },
+  });
+
+  assertEquals(options.ssl, undefined);
+});
+
+Deno.test('legacy verify_identity forwards only joined CA certificates', () => {
+  const options = toMysql2PoolOptions({
+    tls: {
+      mode: 'verify_identity',
+      caCerts: ['first certificate', 'second certificate'],
+    },
+  });
+
+  assertEquals(options.ssl, {
+    ca: 'first certificate\nsecond certificate',
+  });
+});
+
+Deno.test('disabled TLS ignores CA certificates and leaves TLS unset', () => {
+  const options = toMysql2PoolOptions({
+    tls: { mode: 'disabled', caCerts: ['ignored certificate'] },
+  });
+
+  assertEquals(options.ssl, undefined);
 });

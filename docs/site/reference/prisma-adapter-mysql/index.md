@@ -5,25 +5,25 @@ title: "@netscript/prisma-adapter-mysql"
 
 # `@netscript/prisma-adapter-mysql`
 
-Prisma driver adapter for MySQL and MariaDB on Deno. Rather than using Deno-native TCP sockets directly, this adapter dynamically imports the npm `mysql2/promise` driver to handle connection pooling, query execution, and Node.js-compatible socket streams.
+Prisma driver adapter for MySQL and MariaDB on Deno. It dynamically imports the npm `mysql2/promise` driver to handle connection pooling, query execution, and Node.js-compatible socket streams.
 
 For the full index of packages and plugins return to the [reference overview](/reference/).
 
 ## Runtime and Deployment Constraints
 
 - **Dependency**: Dynamically imports `mysql2/promise` from npm at runtime.
-- **Node Compatibility**: Fully compatible with Deno's Node.js compatibility layer and npm package resolution.
-- **Pooling Ownership**: The constructed `PrismaMySqlConnectedAdapter` owns the underlying `mysql2` connection pool. Call `dispose()` to close the pool and release resources deterministically.
-- **Timeout**: The `timeout` configuration option controls connection establishment timeouts (mapped to `connectTimeout` in `mysql2`).
-- **Connection Strings**: Not parsed directly by the factory; use individual connection configuration fields.
+- **Node Compatibility**: The deployment must provide Deno npm resolution and Node-compatible socket APIs; database access requires `--allow-net`.
+- **Pooling Ownership**: Pass the `PrismaMySql` factory to Prisma. Prisma owns the connected `mysql2` pool and closes it through `$disconnect()`. Only callers that invoke `connect()` directly own the returned adapter and call `dispose()` themselves.
+- **Timeout**: `timeout` maps only to mysql2 `connectTimeout`, the initial connection-establishment deadline. It is not a query, transaction, queue, idle, or total-operation timeout; mysql2 supplies its default when omitted.
+- **Connection Strings**: This low-level factory accepts only the individual `MySqlConnectionConfig` fields. Higher-level NetScript database configuration may normalize other input forms separately.
 
 ## Usage Example
 
 > [!NOTE]
-> Connection error hooks (such as `onConnectionError`) are not supported by the shipped adapter and are blocked on #1293.
+> `onConnectionError` observes errors classified as connection failures: fatal handshake/transport errors, server-capacity errors 1040/1203, and the adapter's closed set of transport/pool codes. Authentication, access, and missing-database errors 1045/1044/1049 fire only when driver-fatal. Callback failure is contained and never replaces the primary error.
 
 ```typescript
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../../schema/.generated/client.server.ts";
 import { PrismaMySql } from "@netscript/prisma-adapter-mysql";
 
 // 1. Connection configuration
@@ -40,26 +40,28 @@ const config = {
 // 2. Construct the adapter factory with options
 const adapterFactory = new PrismaMySql(config, {
   database: "mydb",
+  onConnectionError(error) {
+    console.error("MySQL connection error:", error);
+  },
 });
 
-// 3. Connect to database and construct Prisma Client
-const adapter = await adapterFactory.connect();
-const prisma = new PrismaClient({ adapter });
+// 3. Pass the factory to Prisma Client; Prisma opens the pool on connect.
+const prisma = new PrismaClient({ adapter: adapterFactory });
 
 try {
   // 4. Run a query
   const result = await prisma.$queryRawUnsafe("SELECT 1 + 1");
   console.log("Query Result:", result);
 } finally {
-  // 5. Deterministically disconnect Prisma and close the connection pool
+  // 5. Deterministically disconnect Prisma and close its connection pool.
   await prisma.$disconnect();
-  await adapter.dispose();
 }
 ```
 
 The package exposes a single root entrypoint (`@netscript/prisma-adapter-mysql` → `./mod.ts`).
-`PrismaMySql` is the factory you construct with a connection configuration; `connect()`
-returns a [`PrismaMySqlConnectedAdapter`](#connected-adapter) that you pass to a Prisma client.
+`PrismaMySql` is the factory you construct with a connection configuration and pass to Prisma.
+Prisma calls `connect()` and owns the resulting [`PrismaMySqlConnectedAdapter`](#connected-adapter)
+until `$disconnect()`. A direct `connect()` caller owns that result and must call `dispose()`.
 
 ## Adapter factory
 
@@ -91,19 +93,19 @@ returns a [`PrismaMySqlConnectedAdapter`](#connected-adapter) that you pass to a
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `MySqlConnectionConfig` | interface | MySQL connection configuration: `hostname?`, `port?`, `username?`, `password?`, `db?`, `poolSize?`, `timeout?`, and `tls?`. |
-| `PrismaMySqlOptions` | interface | Adapter options: `database?` (schema name). |
+| `MySqlConnectionConfig` | interface | Structured MySQL connection configuration: `hostname?`, `port?`, `username?`, `password?`, `db?`, `poolSize?`, `timeout?`, and `tls?`. |
+| `PrismaMySqlOptions` | interface | Adapter options: `database?` (reported schema name) and `onConnectionError?` (contained connection-failure observer). |
 | `MySqlCapabilities` | interface | Capabilities of the connected MySQL server (`supportsRelationJoins`). |
 
-## Driver interfaces
+### Legacy TLS mode
 
-These describe the underlying `deno_mysql` client surface the adapter wraps.
+`tls.mode: "verify_identity"` is deprecated because its name does not match its unchanged legacy
+behavior:
 
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `DenoMySqlClient` | interface | `deno_mysql` client: `connect`, `query`, `execute`, `transaction`, `useConnection`, and `close`. |
-| `DenoMySqlConnection` | interface | Connection used inside transactions: `query` and `execute`. |
-| `ExecuteResult` | interface | Result from an `execute()` call for INSERT/UPDATE/DELETE: `affectedRows?` and `lastInsertId?`. |
+- Without non-empty `caCerts`, mysql2 `ssl` is left unset. The connection is plaintext and no TLS is requested.
+- With non-empty `caCerts`, only their newline-joined value is forwarded as `ssl.ca`. mysql2 hostname identity verification is not enabled.
+
+Changing this behavior or removing the mode requires a separately scoped breaking change.
 
 ---
 

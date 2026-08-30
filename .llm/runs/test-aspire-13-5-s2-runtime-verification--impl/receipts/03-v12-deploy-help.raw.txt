@@ -1,0 +1,25 @@
+Description:
+  Deploy an AppHost to its deployment targets
+
+Usage:
+  aspire deploy [options] [[--] <additional arguments>...]]
+
+Options:
+  --apphost <apphost>                                                    The path to the Aspire AppHost project file or a directory to search
+  -o, --output-path <output-path>                                        The optional output path for deployment artifacts
+  --pipeline-log-level <pipeline-log-level>                              Set the minimum log level for pipeline logging (trace, debug, information, warning, error, critical). The default is 'information'.
+  -e, --environment <environment>                                        The environment to use for the operation. The default is 'Production'.
+  --include-exception-details                                            Include exception details (stack traces) in pipeline logs
+  --no-build                                                             Do not build or restore the project before running
+  --list-steps                                                           List the pipeline steps that would be executed, without running them.
+  --clear-cache                                                          Clear the deployment cache associated with the current environment and do not save deployment state
+  -?, -h, --help                                                         Show help and usage information
+  -l, --log-level <Critical|Debug|Error|Information|None|Trace|Warning>  Set the minimum log level for console output (Trace, Debug, Information, Warning, Error, Critical)
+  --non-interactive                                                      Run the command in non-interactive mode, disabling all interactive prompts and spinners
+  --nologo                                                               Suppress the startup banner and telemetry notice
+  --banner                                                               Display the animated Aspire CLI welcome banner
+  --wait-for-debugger                                                    Wait for a debugger to attach before executing the command
+
+Additional Arguments:
+  Arguments passed to the application that is being run.
+

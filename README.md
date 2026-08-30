@@ -13,7 +13,7 @@ where today you assemble a stack.
 
 Define your API once as an oRPC contract. The typed Hono service and the typed SDK clients both
 derive from it — server and callers cannot drift apart. Background jobs, sagas, triggers, event
-streams, auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings
+streams, auth, and AI install as first-party plugins behind the same unified API. Aspire brings
 the whole graph up locally with one command. And it ships: from a single compiled binary to a
 multi-cloud distributed infrastructure, with observability on by default — one toolchain shared by
 you and the coding agent you work with.
@@ -28,7 +28,7 @@ all the generated code.
 ## 🚀 Quickstart
 
 You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/) and the
-[.NET Aspire CLI](https://learn.microsoft.com/dotnet/aspire/) (or skip orchestration with
+[Aspire CLI](https://aspire.dev) (or skip orchestration with
 `--no-aspire`). Docker provisions Postgres and the cache.
 
 ```bash
@@ -314,7 +314,7 @@ reasoning.
 [Glossary](https://rickylabs.github.io/netscript/glossary/)
 
 **Five tutorial tracks** — each builds one complete application from a fresh `netscript init` and
-ends by running it locally under .NET Aspire:
+ends by running it locally under Aspire:
 
 - [Live dashboard](https://rickylabs.github.io/netscript/tutorials/live-dashboard/)
 - [AI chat](https://rickylabs.github.io/netscript/tutorials/chat/)
