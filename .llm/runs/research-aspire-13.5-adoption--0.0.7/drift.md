@@ -1089,3 +1089,21 @@
   carriers, re-ran docs gates, force-pushed with lease: S11 `93713837` → **`9d6afebf`** on S10′
   `a46ea16d`; PR #1771 comment posted; `DONE`. docs_audit (Codex Sol · high) dispatched at
   `9d6afebf`.
+
+## D-58 — 2026-08-30 — Close-gate rule for stacked leaves: `closingIssuesReferences` is empty while the base is a topic branch
+
+- **Finding (coordinator close-gate audit):** #1743 (S6), #1744 (S7), #1754 (S8), #1759 (S9), #1760
+  (S10), #1771 (S11) carry textual `Closes #…` keywords, but GitHub's `closingIssuesReferences` is
+  **empty** because each PR's base is a topic branch, not `main`. Merging any of them into its
+  topic-branch base would land code without auto-closing anything and would strand the issues — the
+  same failure class as the 40+ stale-open issues in AGENTS.md.
+- **Standing rule (every stacked Aspire leaf, in order):** (1) never merge a leaf into a topic
+  branch; (2) at each terminal leaf, land its parent dependency to `main` first; (3) retarget the
+  leaf's PR base to `main` (`gh api -X PATCH …/pulls/N -f base=main` — the REST path, since
+  `gh pr edit` needs `read:org` here); (4) re-run the acceptance mirror + close-gate at the exact
+  head; (5) verify `closingIssuesReferences` equals **exactly** the intended issue set (S6 → #1718
+  - #1280; S7 → #1719; S8 → #1720 only, #863 is `Part of`; S9 → #1721; S10 → #1722; S11 → #1723
+  - #1642) before handing to the coordinator for merge. Exact-green = runtime verdict at the exact
+    head (D-41) **and** this check.
+- Order this implies for the Aspire stack: #1740 (S5, base main) → retarget #1743 (S6) → #1754 (S8)
+  → then #1759 (S9) / #1760 (S10) as siblings → #1771 (S11); #1744 (S7) after #1741 (S3).
