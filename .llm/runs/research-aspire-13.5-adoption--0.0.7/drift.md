@@ -1602,3 +1602,13 @@
   runtime proofs on their own converged branches (D-58 order) instead of patching the stale combined
   head. No unchanged retry dispatched. S1 hosted run 33330714604 in flight (chain-2); S5b queued
   (chain-3); S7 correction turn running.
+- **D-81 classification (coordinator, no full retry):** sqlite = bounded **S9**: fail-closed match
+  of code `-32603` + the exact full 13.5.3 payload (period + suffix), with negatives for
+  truncated/changed-suffix/wrong-code/non-dashboard-tool; the `b9f4d30b` truncated fixture is
+  insufficient (amendment staged, sent after the cycle-2 turn). postgres = **S8 observability
+  first**: the ANSI `Task db:seed:postgres` banner bypasses `startsWith` filtering and the
+  actionable stderr is discarded — RED/GREEN ANSI-strip + banner filtering + persist/print first
+  actionable stderr, converged onto S8 `18923b54` (brief dispatched, thread resumed); ONE cheap
+  typed-seed diagnostic runs under the lease only after S7 returns host zero, then only that cause
+  is repaired. S10 and S5 need no change from this combined run. No PLAN-EVAL; never
+  unchanged-retry.
