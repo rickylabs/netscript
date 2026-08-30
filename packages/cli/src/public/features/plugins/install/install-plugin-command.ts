@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
@@ -82,7 +82,14 @@ export function createPluginInstallCommand(
       }, dependencies.installPluginDependencies);
 
       const plugin = result.plugin;
-      print(`Installed ${plugin.kind} plugin "${plugin.configKey}" on port ${plugin.servicePort}.`);
+      if (plugin.hostPort === undefined) {
+        print(
+          `Installed ${plugin.kind} plugin "${plugin.configKey}". ` +
+            'View its endpoint in the Aspire dashboard.',
+        );
+      } else {
+        print(`Installed ${plugin.kind} plugin "${plugin.configKey}" on port ${plugin.hostPort}.`);
+      }
       print(`Created ${plugin.scaffoldResult.filesCreated.length} plugin files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
     });

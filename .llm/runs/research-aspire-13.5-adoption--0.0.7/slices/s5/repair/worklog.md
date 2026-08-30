@@ -152,3 +152,48 @@ and separately proves an explicit `baseUrl` wins while discovery remains set.
 - Re-read the live PR timeline after the slice gates. No comment newer than the slice-1 implementation
   evidence changed F-2 or the locked repair plan. The F-2 thread remains open for the supervisor's
   review-thread workflow; this implementation lane does not self-resolve it.
+
+## Slice 3 — F-3 CLI completion port honesty
+
+### RED
+
+Added a focused command test that performs the real local-path streams plugin install twice and
+captures completion output: once with no `--port`, once with `--port 61234`.
+
+| Command | Exit | Evidence |
+| --- | ---: | --- |
+| `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts` | 1 | 1 passed, 1 failed; unpinned install misleadingly printed template port `52900`. The explicit `61234` case passed. |
+
+### Implementation
+
+- Kept `InstallPluginResult` and `plugin.servicePort` intact.
+- Completion now branches on `plugin.hostPort`: absent prints no number and directs the user to the
+  Aspire dashboard; present prints the explicitly pinned host port itself.
+- No AppHost, Docker, or E2E runtime was started; the command tests exercise file generation only in
+  temporary directories and clean them in `finally`.
+
+### GREEN
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| Focused structured CLI command test above | 0 | 2 passed, 0 failed. |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | 886 files, 8 batches, 0 diagnostics. |
+| `run-deno-lint.ts --root packages/cli --ext ts,tsx` | 2 | Coverage refusal: root config intentionally excludes `packages/cli`; not treated as a verdict. |
+| `run-deno-fmt.ts --root packages/cli --ext ts,tsx` | 2 | Coverage refusal: root config intentionally excludes `packages/cli`; not treated as a verdict. |
+| install-directory lint/fmt wrappers with `packages/cli/deno.json` | 2 each | Same inherited root exclusion; not treated as a verdict. |
+| install-directory lint/fmt wrappers with temporary no-exclude repository rules | 1 each | Baseline findings in untouched install files plus formatting needed in the two owned files; not treated as green. |
+| mutating fmt wrapper limited to the two owned files with temporary no-exclude repository rules | 0 | 2 files formatted; no root-wide formatting. |
+| lint wrapper limited to the two owned files with temporary no-exclude repository rules | 0 | 2 files processed, 0 findings. |
+| fmt-check wrapper limited to the two owned files with temporary no-exclude repository rules | 0 | 2 files processed, 0 findings. |
+| check wrapper limited to the two owned files | 0 | 2 files, 0 diagnostics. |
+| focused structured CLI command test after formatting | 0 | 2 passed, 0 failed. |
+| `deno task quality:scan` | 0 | Repository scan has 0 findings; 7 pre-existing bounded allowances. |
+| `deno task arch:check` | 0 | Doctrine scan has 0 failures; warnings are the existing repository baseline. |
+
+The temporary `.llm/tmp/s5-repair-cli-quality.json` config was removed before commit.
+
+### Reconcile
+
+- Re-read the live PR timeline after the slice gates. No comment newer than slice-2 evidence changed
+  F-3 or its test/output contract. The F-3 review thread remains open for supervisor handling; no PR
+  metadata or issue state was changed.
