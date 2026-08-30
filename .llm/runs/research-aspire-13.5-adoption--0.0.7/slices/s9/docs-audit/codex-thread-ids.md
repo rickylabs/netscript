@@ -19,3 +19,10 @@ codex exec resume 01a05265-594b-7c20-8ae9-56f6d4a19344 -- "<follow-up>"
 ```
 
 _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
+
+## Steering log
+
+- 2026-08-30 — cycle 2: `launch-codex-slice` refused a second sender on `007-aspire-s9-audit`
+  (`duplicate_sender_risk`, correct); cycle 2 resumed on the **same audit thread**
+  `01a05265-594b-7c20-8ae9-56f6d4a19344` via `agentic:codex-resume` with `brief-cycle-2.md`,
+  worktree moved to `f6ca9695` (log `s9-docs-audit-2-resume.log`).
