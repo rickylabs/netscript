@@ -31,7 +31,7 @@
 | 7 | `PluginDoctorReport` already supports a workspace-scoped aggregate report and the command exits non-zero whenever any report is `error`. | `doctor-plugin-use-case.ts`; `doctor-plugin-command.ts` |
 | 8 | No CLI template, embedded asset, public `mod.ts` export, docs corpus, or dependency changes are required. | Planned product ceiling below; `deno doc packages/cli/mod.ts` |
 
-## Exact Product Path Ceiling
+## Original Exact Product Path Ceiling (superseded by S6)
 
 The implementation may change only these product/test paths; any additional product path requires
 supervisor approval and a significant `drift.md` entry:
@@ -43,10 +43,11 @@ supervisor approval and a significant `drift.md` entry:
 5. `packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts` (new)
 6. `packages/cli/src/public/features/root/public-command-dependencies.ts`
 
-Run artifacts under `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/` and receipts under
-`.llm/tmp/gate-receipts/plugin-doctor-registry-drift/` are evidence, not product paths.
+Run artifacts under `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/` are committed evidence, not
+product paths. Receipts under `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/` are gitignored,
+local-only reconciliation aids; the reproducible commands and exact outcomes are the review evidence.
 
-## JSR Audit Surface Scan
+## Original JSR Audit Surface Scan (superseded by S6)
 
 - Surface inspected: `deno doc packages/cli/mod.ts` at the baseline; `packages/cli/deno.json` export
   map remains unchanged.
@@ -81,3 +82,53 @@ Run artifacts under `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/` and rec
   each missing/orphaned source file and end with `Run: netscript generate plugins`.
 - **What is not claimed?** Non-manifest, non-registry runtime topology—including the current streams
   plugin—is not certified.
+
+## S6 Re-baseline after IMPL-EVAL Cycle 1
+
+Evaluated head `61b8bf52b50a3cc3e98b67b367d1a1e4a2022807` invalidates the original finding that
+the runtime manifest is always the generator's complete selection contract. The prior six-path
+implementation remains useful, but its expected source set is not authoritative for every shipped
+plugin.
+
+### Re-derived findings
+
+| # | Finding | Artifact evidence |
+| - | ------- | ----------------- |
+| S6-1 | AI tool selection is source-shaped. `compileAiRegistry` first applies manifest path filters, then `selectToolDefinitionModules` reads each candidate and retains only sources satisfying `exportsReadyAiToolDefinition`. | `plugins/ai/src/cli/ai-registry-compiler.ts` |
+| S6-2 | `skill-loader.ts` is intentionally discoverable but not a definition. The AI manifest does not exclude it, the MCP resource emits it, and the installed-generator integration test asserts it is absent from the registry. | `plugins/ai/scaffold.runtime.json`; `plugins/ai/src/adapter/resources/mcp-tool/mcp-tool.ts`; `installed-runtime-registry-integration_test.ts` |
+| S6-3 | The AI compiler already returns its exact selected `files`; the thin generator entrypoint discards that evidence and supports no report-only invocation. | `ai-registry-compiler.ts`; `generate-runtime-registries.ts` |
+| S6-4 | The existing `ProcessPort` captures stdout, so a no-write JSON report can reuse the established process seam without a sidecar or new port. | `packages/cli/src/kernel/ports/process-port.ts` |
+| S6-5 | Workers selection also exceeds the host walk: it skips dotfiles and applies profile `include`/`includeWhenPresent` overlays before generation, including filesystem-dependent conditions and plugin directories. | `plugins/workers/src/cli/runtime-registry-generator.ts` |
+| S6-6 | Sagas, workers, triggers, and AI each own a separate `runtimeRegistryGenerator.command`. Normal generators reject unknown flags, so an undeclared universal reporting flag would break older and third-party plugins. | four `scaffold.runtime.json` files and four generator entrypoints |
+| S6-7 | `runtimeRegistryGenerator` is parsed structurally by installed generation and extra manifest members are ignored by maintainer copied-plugin generation. An optional capability declaration is additive and backward-compatible. | installed generator `readRuntimeManifest`; maintainer `plugin-file-collector.ts` |
+| S6-8 | `.llm/tmp/gate-receipts/` is gitignored. It is useful local reconciliation state, not durable fresh-checkout evidence. | repository ignore behavior and evaluator F5 |
+| S6-9 | Normal installed generation materializes the resolved manifest under the project and grants the child write permission. Reusing that invocation for doctor would make “dry-run” mutate the project. Report mode must instead pass resolved JSON inline and omit write permission. | installed generator `runGenerator` |
+
+### Direction conclusion
+
+Generator-selected reporting dominates manifest-encoded selection and warning downgrade. A manifest
+cannot express AI's source predicate or workers' conditional filesystem policy without duplicating
+executable generator logic. A warning would avoid the false positive only by abandoning AC2 for real
+definitions. The selected design instead adds an optional protocol-version capability; the host
+passes the resolved manifest inline to a standard no-write JSON report mode, while selection remains
+wholly plugin-owned.
+
+All four first-party generators will adopt the report protocol, so the repair closes workers F4 as
+well as AI F1. Manifests without the capability retain the current suffix/exclude walk to avoid
+breaking already-published third-party generators. Once a manifest advertises reporting, malformed
+or failed evidence is an inspection error rather than a silent downgrade.
+
+### Required red-before proof
+
+Before product work, extend the focused doctor regression with a generated AI project containing one
+ready tool definition and the discoverable `ai/tools/skill-loader.ts` factory. Current head must fail
+that test because doctor raises `RemoteError`; later green must show the same generated registry and
+unchanged healthy assertion pass because the generator reports only the ready definition.
+
+### Superseded scope and JSR conclusion
+
+The old six-path ceiling and original D1/D6 are superseded by the 24-path ceiling and decisions D1R–D9R
+in `plan.md`. The repair crosses Archetypes 6 and 5 but plans no package export or dependency change.
+Because shipped plugin manifests and publishable generator sources change, touched-package check,
+doc/publish validation, `check:mcp-export-corpus`, and `check:publish-assets` remain measured gates.
+No generated asset is authorized.

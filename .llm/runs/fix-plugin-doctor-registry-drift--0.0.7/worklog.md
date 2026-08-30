@@ -6,8 +6,8 @@
 | --- | --- |
 | Run ID | `fix-plugin-doctor-registry-drift--0.0.7` |
 | Branch | `fix/plugin-doctor-registry-drift` |
-| Archetype | `6 — CLI / Tooling` |
-| Scope overlays | none |
+| Archetypes | `6 — CLI / Tooling`; `5 — Plugin Package` |
+| Scope overlays | generator-selection reporting protocol; JSR/publish validation |
 
 ## Design
 
@@ -57,10 +57,14 @@
 
 | # | Slice | Gate | Files |
 | - | ----- | ---- | ----- |
-| 1 | Bootstrap plan/design and draft review surface | manual Plan-Gate; PLAN-EVAL N/A | run artifacts |
-| 2 | Red-before regression | focused structured test exits non-zero for the expected assertion failure | new regression test + run artifacts |
-| 3 | Bidirectional manifest-backed drift check | focused and related structured tests | six ceiling paths + run artifacts |
-| 4 | Quality evidence and handoff | scoped wrappers, quality receipt, JSR gates | run artifacts |
+| 1–5 | Original plan, red-before, six-path implementation, evidence, and Tier-A correction | accepted historical evidence through `61b8bf52` | original six paths + run artifacts |
+| 6 | Research the generator-selection gap and re-lock the expanded plan | raw lock proof; mandatory separate PLAN-EVAL | run artifacts only |
+| 7 | AI legitimate-exclusion red-before regression | focused structured test fails on S6 product | doctor regression test + run artifacts |
+| 8 | AI report-only source-shape selection | AI report/compiler tests | AI manifest/generator/compiler/test + run artifacts |
+| 9 | Workers report-only full selection and F4 closure | workers report/selection tests | workers manifest/generator/new test + run artifacts |
+| 10 | Sagas/triggers report-only selection | generator/golden tests | sagas/triggers manifests/generators/tests + run artifacts |
+| 11 | Host report validation/consumption and doctor evidence wording | focused/related suites green | authorized CLI paths + run artifacts |
+| 12 | Expanded gates and evaluator handoff | locked plan gate matrix | run artifacts only |
 
 ### Deferred Scope
 
@@ -72,17 +76,81 @@
 
 ### Contributor Path
 
-To add a new registry-backed definition kind, declare its source directories/suffixes/exclusions
-and registry path in the plugin's `scaffold.runtime.json`; the generator and doctor comparison then
-consume the same declaration without a CLI plugin-name switch. To extend doctor wording, edit the
-focused `runtime-registry-drift.ts` policy and its semantic tests.
+To add a new registry-backed definition kind, declare its candidate paths and registry path in the
+plugin's `scaffold.runtime.json`. If the generator applies any selection beyond that path contract,
+advertise and implement the source-selection report protocol so doctor consumes the generator's
+actual selected set without a CLI plugin-name switch. To extend doctor wording, edit the focused
+`runtime-registry-drift.ts` policy and its semantic tests.
+
+### S6 Design Checkpoint — generator-selected evidence
+
+#### Contract and vocabulary
+
+- `runtimeRegistryGenerator.sourceSelectionReport.protocolVersion` — optional version marker that
+  advertises the executable report contract without putting selection rules in the manifest.
+- `RuntimeRegistrySourceSelectionReport` — private process DTO with `schemaVersion: 1` and a complete
+  `registries` array of `{ registryPath, sourceFiles }` records.
+- `sourceAuthority` — internal result evidence identifying `generator` or compatibility
+  `manifest` selection.
+- `--report-selected-sources --manifest-json <resolved-json>` — the version-1 report invocation. It
+  emits one JSON document, suppresses progress logs, and writes nothing.
+
+#### Public surface
+
+- User commands and normal `netscript generate plugins` behavior remain unchanged.
+- No `deno.json` export map, public barrel, dependency, or lockfile changes.
+- The report is an executable protocol between the host and shipped plugin generator entrypoints,
+  not a new exported `@netscript/plugin` API.
+
+#### Ports and effects
+
+- Existing `ProcessPort.stdout` carries the report. The resolved manifest is passed inline, so no new
+  port, project manifest, or sidecar file is introduced.
+- Existing `FileSystemPort` resolves manifests and validates project-relative source evidence.
+- Report-only modes share each generator's normal selector/compiler, run with read permission and no
+  write permission, and bypass registry writes.
+- Host validation rejects non-zero execution, mixed/non-JSON stdout, wrong version, duplicate or
+  undeclared targets, duplicate sources, absolute paths, and parent escapes. An advertised reporter
+  never silently falls back.
+
+#### Archetype structure
+
+- Archetype 6 host: parsing/orchestration remains in `generate/plugins`; doctor comparison policy
+  stays in `plugins/doctor`; composition wiring stays unchanged unless the existing seam requires a
+  narrow type update.
+- Archetype 5 plugins: AI/workers/sagas/triggers entrypoints remain thin. Selection stays in their
+  existing compiler/generator path, and report mode serializes that returned selection.
+- No plugin-kind switch or selector is added to the host.
+
+#### Compatibility
+
+- A manifest lacking the capability keeps the existing suffix/exclude walk and is marked
+  manifest-authoritative; no unknown flag is passed to an older generator.
+- All current first-party generators advertise and implement reporting. Workers evidence includes
+  profiles, `include`, `includeWhenPresent`, plugin directories, and dotfile rejection, closing F4.
+- Normal invocation without report args keeps existing writes and progress output.
+
+#### JSR/publish surface
+
+- The five touched publish packages receive check, doc-lint, and dry-run evidence.
+- Any changed exported internal generator function keeps explicit named option/result types and
+  JSDoc to satisfy `isolatedDeclarations`; report DTOs are not barrel-exported.
+- Four shipped manifests make `check:publish-assets` a measured gate; corpus measurement remains
+  required despite no planned export delta.
+
+#### Deferred scope
+
+- A shared public report helper, mandatory migration for old third-party manifests, streams registry
+  creation, arbitrary handwritten registry support, and recursive discovery changes.
+- Live e2e/Aspire/Docker/browser execution and all coordinator-owned lifecycle mutations.
 
 ## PLAN-EVAL
 
-`N/A` — issue #1673 and current-tree research provide a bounded internal contract, explicit negative
-regression, locked path ceiling, reverse case, and complete gate set. No architecture or sequencing
-decision remains open that would benefit from a separate planning evaluator. IMPL-EVAL remains
-mandatory in a fresh opposite-family session.
+**REQUIRED — awaiting a fresh separate evaluator.** IMPL-EVAL cycle 1 proved the original
+manifest-authority assumption incomplete, opening a cross-process report contract, third-party
+compatibility policy, four-plugin adoption decision, workers F4 closure, and 24-path ceiling. The old
+`PLAN-EVAL: N/A` statement is superseded. No S7 test or product implementation may start until a
+separate session records `APPROVED`; `CHANGES_REQUESTED` returns this run to S6 planning.
 
 ## Progress Log
 
@@ -92,16 +160,20 @@ mandatory in a fresh opposite-family session.
 | 2026-08-29T23:32Z | 1 | Issue evidence contract | Preserved the five target-contract statements and converted them to `## Acceptance` checkboxes; no labels, milestone, or state changed. |
 | 2026-08-29T23:35Z | 2 | Regression authored | Generated a real saga registry with `registered-saga.ts`, then authored `sagas/late-saga.ts` without regeneration and invoked the real doctor command. No product source had changed. |
 | 2026-08-29T23:35Z | 2 | Red-before | Structured wrapper exited `1`: `passed=0 failed=1`; sole failure was `AssertionError: Expected function to reject.` Doctor incorrectly exited zero, exactly reproducing #1673. |
-| 2026-08-30T08:35Z | 3 | Manifest discovery evidence | Extended the installed-runtime generator's dry-run result with normalized per-target `sourceFiles`, preserving manifests as the only discovery authority and preserving the non-dry command result shape. |
+| 2026-08-30T08:35Z | 3 | Manifest discovery evidence | Extended the installed-runtime generator's dry-run result with normalized per-target `sourceFiles`. The interface field shape stayed compatible, but `registrableItems` changed from the prior plugin-wide total to a per-target source count; no production consumer reads that value. |
 | 2026-08-30T08:36Z | 3 | Bidirectional comparison | Added focused registry import/binding comparison, reverse-orphan detection, imported-but-unused rejection, exact healthy evidence, and the bounded no-target statement. |
 | 2026-08-30T08:37Z | 3 | Production wiring | Kept doctor discovery optional for legacy seams and supplied the existing generator closure unconditionally from `public-command-dependencies.ts`. |
 | 2026-08-30T08:45Z | 3 | Green regression | Focused structured test exited `0`: `passed=5 failed=0`; exact six-file structured check exited `0`; related structured suite exited `0`: `passed=47 failed=0`. |
 | 2026-08-30T08:47Z | 3 | Reconcile | PR #1739 remains draft with `Closes #1673`; issue #1673 remains open and unchanged; no new reviewer/evaluator comment or scope adjustment. S2/S3 body progress and the S3 phase comment will be updated after the explicit-refspec push. |
-| 2026-08-30T06:49Z | 4 | Durable fitness evidence | `quality-gate` and package-scoped `doc-lint` receipts both attest `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`, exit `0`, outcome `PASS`. |
+| 2026-08-30T06:49Z | 4 | Historical fitness evidence | `quality-gate` and package-scoped `doc-lint` commands exited `0` at `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`; their JSON receipts are gitignored/local-only. |
 | 2026-08-30T06:50Z | 4 | Publish/cascade evidence | CLI publish dry-run, `check:mcp-export-corpus`, and `check:publish-assets` exited `0`; `check:assets-barrel` is inapplicable because no template or `kernel/assets` path is in the six-file ceiling. |
 | 2026-08-30T06:50Z | 4 | Lock hygiene | Raw worktree and pinned-base comparisons both exited `0`: `deno.lock` is byte-unchanged through the final product head. |
 | 2026-08-30T08:43Z | 5 | Tier-A evidence repair | Wrapped the S3-added `@std/path` import in authorized product path 2, then re-derived every remaining scoped-format finding from its exact first reported hunk rather than its file. |
 | 2026-08-30T08:43Z | 5 | Focused validation | Focused structured test exited `0`: `passed=5 failed=0`; exact six-file structured check and lint both exited `0`; raw `git diff --exit-code -- deno.lock` exited `0`. |
+| 2026-08-30T09:31Z | 6 | IMPL-EVAL intake | Read the cycle-1 evaluator artifact first. Accepted F1 as a blocking design gap and F3/F5 as evidence corrections; made no product/test edit. |
+| 2026-08-30T09:38Z | 6 | Source re-derivation | Confirmed AI source-shape selection and discarded compiler `files`, workers profile/include/conditional/dotfile divergence, captured process stdout, four rejecting generator arg parsers, and additive manifest parsing. |
+| 2026-08-30T09:44Z | 6 | Re-plan | Chose protocol-versioned generator-owned report-only JSON with an inline resolved manifest over manifest selection duplication or AC2 warning downgrade; expanded and locked 24 product/test paths, closed F4 in scope, and required the AI healthy red-before case. |
+| 2026-08-30T09:48Z | 6 | Re-baseline/lock proof | Confirmed `origin/main` remains `13878a80a50c55b9662099fed64555f2310ae4a3`; raw `git diff --exit-code -- deno.lock` exited `0`. Only five run artifacts are modified. |
 
 ## Decisions
 
@@ -109,13 +181,17 @@ mandatory in a fresh opposite-family session.
 | --- | --- | --- |
 | Reuse manifest-backed generator discovery | It is the source tree contract that produced the registry. | research D1 / A6 / AP-9 |
 | Keep stream registry creation out of scope | No such generated contract exists on current main; doctor must state evidence limits. | research re-baseline |
-| PLAN-EVAL N/A | Small bounded defect with no material open planning decision. | harness run-loop §4 |
+| Supersede manifest-only authority | AI and workers prove that candidate path discovery can be broader than generator selection. | IMPL-EVAL F1/F4; S6 source re-derivation |
+| Choose opt-in generator reporting | Preserves AC2 and backward compatibility without duplicating plugin selectors in CLI/manifest data. | plan D1R–D7R |
+| Close workers F4 | All four first-party generators adopt reporting; workers reports its overlays, conditions, plugin dirs, and dotfile policy. | plan D8R |
+| Require PLAN-EVAL | The material contract, compatibility, scope, and sequence decisions need independent approval. | plan D9R; harness plan gate |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Current streams plugin has no runtime registry manifest despite issue's generic stream wording. | minor | yes |
+| IMPL-EVAL disproved the six-path plan's manifest-only authority; repair expands to four plugin generators and 24 locked paths. | significant | yes |
 
 ## Gate Results
 
@@ -126,9 +202,9 @@ mandatory in a fresh opposite-family session.
 | Red-before regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --pretty -- --allow-all packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts` | EXPECTED_FAIL | Exit `1`; `passed=0 failed=1`; `AssertionError: Expected function to reject.` This is the required baseline defect evidence, not a product-gate failure. |
 | Focused green regression | same structured wrapper and test path | PASS | S5 rerun exit `0`; `passed=5 failed=0`; covers late source, reverse orphan, imported-but-unused binding, aligned evidence, and no-target wording. |
 | Related doctor/generator tests | structured wrapper over the five locked test paths | PASS | Exit `0`; `passed=47 failed=0`. |
-| Exact-file type check | `run-deno-check.ts` over all six ceiling paths | PASS | S5 rerun exit `0`; six files selected; zero diagnostics. Receipt: `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/s5-scoped-check.json`. |
-| Exact-file lint | `run-deno-lint.ts` over all six ceiling paths using a scratch copy of the root lint rules without the root's `packages/cli` exclusion | PASS | S5 rerun exit `0`; six selected/processed, zero findings. Receipt: `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/s5-scoped-lint.json`. |
-| Exact-file format | `run-deno-fmt.ts` over all six ceiling paths using a scratch copy of the root format rules without the root's `packages/cli` exclusion | FAIL (LINE-ATTRIBUTED) | S5 rerun exit `1`; six selected/processed, four file findings. Three first reported hunks are base-proven on the same source line; the regression-test finding is leaf-owned. Evidence: `s5-scoped-fmt.json` and `main-existing-scoped-fmt.json`; exact ownership follows. |
+| Exact-file type check | `run-deno-check.ts` over all six ceiling paths | PASS | S5 rerun exit `0`; six files selected; zero diagnostics. The JSON receipt is local-only; this command and outcome are reproducible. |
+| Exact-file lint | `run-deno-lint.ts` over all six ceiling paths using a scratch copy of the root lint rules without the root's `packages/cli` exclusion | PASS | S5 rerun exit `0`; six selected/processed, zero findings. The JSON receipt is local-only; this command and outcome are reproducible. |
+| Exact-file format | `run-deno-fmt.ts` over all six ceiling paths using a scratch copy of the root format rules without the root's `packages/cli` exclusion | FAIL (LINE-ATTRIBUTED) | S5 rerun exit `1`; six selected/processed, four file findings. Three first reported hunks are base-proven on the same source line; the regression-test finding is leaf-owned. Local-only JSON aided reconciliation; exact ownership follows in committed text. |
 
 #### S5 format finding ownership
 
@@ -147,10 +223,10 @@ is therefore the leaf's own, not inherited evidence.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Code quality + doctrine | PASS | `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/quality-gate.json` | Durable receipt attests exact git head `e5123a0e4f3d6844dbc173d5b09249a24e637fb8`; exit `0`, outcome `PASS`. |
-| JSR doc surface | PASS | `.llm/tmp/gate-receipts/plugin-doctor-registry-drift/doc-lint.json` | Durable receipt attests the same exact head; one package, three entrypoints, zero errors/private-type refs/missing JSDoc/other findings. |
+| Code quality + doctrine | PASS at historical S3 head | Reproducible command: `deno task quality:gate` through `run-gate.ts` | Exit `0`, outcome `PASS` at `e5123a0e4...`. The cited JSON receipt is gitignored/local-only, not durable fresh-checkout evidence. |
+| JSR doc surface | PASS at historical S3 head | Reproducible command: `deno task doc:lint --root packages/cli --pretty` through `run-gate.ts` | One package, three entrypoints, zero findings at `e5123a0e4...`. The cited JSON receipt is gitignored/local-only. |
 | JSR package dry run | PASS | `deno publish --dry-run --allow-dirty` from `packages/cli` | Exit `0`; `Success Dry run complete`. Existing unanalyzable dynamic-import warnings remain warnings. |
-| F-CLI-1..31 | PASS | quality/doctrine receipt + focused semantic suites | Command vocabulary/options are unchanged; source discovery remains manifest-driven and composition remains declarative. |
+| F-CLI-1..31 | PASS at historical S3 head | reproducible quality/doctrine command + focused semantic suites | Command vocabulary/options were unchanged and composition remained declarative. S6 supersedes the manifest-only authority claim. |
 
 ### Generated Cascade and Lock Gates
 
@@ -171,7 +247,7 @@ is therefore the leaf's own, not inherited evidence.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `netscript plugin doctor` focused temp workspace | PASS | focused `5/5` and related `47/47` structured receipts | Missing source registration, reverse orphan, imported-but-unused, aligned, and no-target claims are covered without a live backend. |
+| `netscript plugin doctor` focused temp workspace | PASS at historical S5 head | focused `5/5` and related `47/47` structured command outcomes | Missing source registration, reverse orphan, imported-but-unused, aligned, and no-target cases pass; IMPL-EVAL F1 requires the added AI legitimate-exclusion case. |
 
 ## Handoff Notes
 
@@ -184,6 +260,23 @@ is therefore the leaf's own, not inherited evidence.
   and intentionally untouched because S5 authorizes only product path 2 and forbids test changes.
 - Runtime gates remained unauthorized and were not run. No architecture debt entry was created.
 - This implementation author does not provide a sign-off or IMPL-EVAL verdict.
+
+## S6 PLAN-EVAL Handoff
+
+- Direction (a) dominates through an opt-in, report-only JSON capability; the manifest advertises
+  protocol version 1 but does not encode source selection.
+- All four first-party generators adopt the protocol, so AI F1 and workers F4 are both in scope.
+- The required next test is committed red-before product work: correct AI generation excludes the
+  discoverable `skill-loader.ts` factory and doctor is asserted healthy.
+- AC2 and the issue remain unchanged. A generator-selected definition missing from its registry is
+  still an error.
+- The exact expanded ceiling is the 24-path list in `plan.md`; a 25th path is rescope-and-stop.
+- Local gate receipts are explicitly local-only. Reproducible commands, exact head, exit code, and
+  counts are the review evidence.
+- If the historical base-product/head-tests comparison is restated later, it must say `--no-check`;
+  default type-checking fails before tests run.
+- Stop here for a fresh separate PLAN-EVAL. No implementation, runtime gate, label, issue, readiness,
+  or acceptance mutation is authorized.
 
 ## Supervisor Tier-A sign-off — `c1e21c1b0823d1bd057d252e59f7bee5fbbdfc89`
 
