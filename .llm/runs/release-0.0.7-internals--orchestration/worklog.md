@@ -4746,3 +4746,58 @@ Both are recorded in the leaf worklog as well, so the leaf's own evidence carrie
 Monitor both runtime jobs → on **genuine product green**, dispatch the **single authorized** IMPL-EVAL
 cycle 4 against the exact head. **No cycle 5** — on failure the leaf parks or rescopes. `#1774` stays
 parked clean at `2e5f50f0`; `#1533` parked on the `workflow`-scope credential boundary.
+
+## 2026-08-30 — #1734 hosted runtime gate GREEN; cycle-4 IMPL-EVAL dispatched (final)
+
+### Hosted acceptance proof — terminal SUCCESS
+
+Run **33327199769**, `workflow_dispatch` on `e2e-cli.yml`, `headSha`
+`d2c7f16c624c5028cd837595d01ab3b516cb1c23`, **conclusion: success**.
+
+| Job | Result |
+| --- | --- |
+| classify changes | success |
+| scaffold-static (deno-only) | success |
+| desktop-native-linux (deb + signed updater) | success |
+| **scaffold-runtime (aspire + docker + postgres)** | **success** |
+| **scaffold-runtime-sqlite (aspire + sqlite + garnet)** | **success** |
+| scaffold CI lane visibility | skipped |
+
+The postgres runtime job is the decisive one: it contains `generated.quality-negative`, the step that
+previously failed on **this exact defect** — `TS2345` at
+`packages/fresh/src/application/query/hydration.ts:43` — when #1747's gate ran. That failure is gone.
+The total reviver is proven against the real scaffolded workspace, not only against unit tests.
+
+### Dual-head carrier, per coordinator ruling
+
+| Role | SHA |
+| --- | --- |
+| PR / evaluated carrier | `662be2e9df930fed24918aaf0eddef71bc58c7b5` |
+| Product + runtime head | `d2c7f16c624c5028cd837595d01ab3b516cb1c23` |
+| Product diff between them | **empty** — worklog correction only |
+
+The evidence-only carrier exception is accepted: the hosted run at `d2c7f16c` is authoritative product
+proof for `662be2e9` because the product tree is byte-identical. **No rerun for metadata.** My own
+head-move guard fired here and reported the run "STALE" — that alarm was right about `headSha`
+equality and wrong about product validity, and I did not let it overstate itself.
+
+### Cycle-4 IMPL-EVAL dispatched — the last cycle under any result
+
+Job `dc98d7f4`, native `claude-fable-5` / medium, own detached worktree at the evaluated carrier,
+artifact-only. The brief **names both heads explicitly** and requires the evaluator to verify the
+empty product diff itself, since that verification is the entire basis of the exception.
+
+It is also directed to: test totality **behaviourally** rather than accept the type signature (revoked
+proxies, throwing getters, `Object.create(null)`, `BigInt`, cyclic structures); confirm totality did
+not buy openness at the **envelope-validation** layer, where the cycle-2 guard-attack suite must still
+reject with no partial hydration or input mutation; **spot-check the root test** rather than trust my
+sealing claim; and read the hosted run's artifacts rather than reproduce them.
+
+The brief also carries the corrected record: the earlier local run is **invalid evidence in either
+direction** — externally interrupted by my own `aspire stop` at 18:06:46.537, AppHost cancel at .999,
+JSON-RPC drop at 47.026 — **not** a D-55 topology defect and **not** a product verdict. Had I
+dispatched before that correction landed, I would have handed a false environmental finding to the
+evaluator.
+
+**No cycle 5 under any result.** On `PASS` an exact merge packet follows immediately; on failure the
+leaf parks or rescopes.
