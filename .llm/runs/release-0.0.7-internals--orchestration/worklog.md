@@ -5299,3 +5299,39 @@ match embedded JSON text) found nothing.
 match said less than I initially read into it.* Caught this one in under a minute by checking real
 liveness before reporting or acting on the monitor's claim — the discipline from D-81/D-82 (validate
 a probe before trusting its silence or its output) held. Re-armed with the anchored pattern.
+
+## D-91 — #1774 DeepSeek sanctioned-route run completed with EMPTY result: no artifact, no comment
+
+The dispatched DeepSeek V4 Flash 0731 · max session ran for real: 104 turns, 15 min 32s API time,
+**$9.59 cost** (684k input / 7.4M cache-read / 62k output tokens incl. 39.5k thinking). Every sampled
+mid-run action across the transcript was genuine, substantive re-measurement — mutation checks, real
+exit-code capture, its own live-hook-event generation with launch-root scope verification (the exact
+check the brief asked for after my D-85/D-88 error), receipt cross-checking against `worklog.md`,
+throwaway-worktree cleanup.
+
+**But the terminal event is `result: ""` with `stop_reason: "end_turn"`.** The last two transcript
+entries before termination are synthetic harness nudges — `"[Your previous response had no visible
+output. Please continue and produce a user-visible response.]"` — fired **twice**, then the session
+ended anyway. Verified directly, not inferred from the empty string alone:
+
+- `.llm/runs/fix-claude-hook-log-cwd--1774/` contains **only** the pre-existing `impl-eval.md`
+  (28,237 bytes, unchanged mtime `22:17`) — no `impl-eval-cycle-2.md` was written.
+- Eval worktree `007-eval-1774-deepseek`: **zero uncommitted changes, zero new commits** beyond the
+  `8a1ec2750` tip it started from.
+- PR #1775's most recent comment is unrelated (an OpenHands agent run, see below) — no
+  `[PHASE: IMPL-EVAL]` comment from this session.
+
+**Assessment.** This is a genuine model/session failure, not a false alarm on my part this time —
+the opposite of the pattern in D-90. It closely parallels the exact silent-empty-output failure mode
+the "GLM 5.3 Flash" host message warned about for a different model (HTTP 200 with empty content
+under an insufficient token budget) — here manifesting as an `end_turn` with no synthesized final
+text after two harness retries, despite `modelUsage.maxOutputTokens: 32000` and a cumulative
+`outputTokens: 71908` across the session suggesting a per-turn generation cap was hit on a late turn
+with no room left to write the actual verdict. This is now direct, first-hand evidence — not merely
+a secondhand claim — that this preset carries a real silent-failure risk for long, evidence-heavy
+evaluator sessions, worth surfacing to the coordinator regardless of the model swap question.
+- **Unrelated observation, flagged rather than acted on:** PR #1775 now has a live OpenHands agent
+  comment (`run_id 33333056325`, "conclusion: running", posted `20:14:15Z`) that I did not trigger.
+  Not investigated yet — noted so it isn't mistaken for supervisor-initiated activity.
+- **Next action:** attempt a cheap `--resume <session>` nudge asking the session to synthesize and
+  write its already-gathered findings now, before considering a full costly restart.
