@@ -1,0 +1,16 @@
+**Verdict: `PASS`** — posted as [PR #1727 comment 5470985147](https://github.com/rickylabs/netscript/pull/1727#issuecomment-5470985147); artifact at `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/slices/s1/convergence/evaluate-r3890336485.md`.
+
+**What I verified (gates re-run here, not read from the worklog):**
+
+1. **Delta exact** — `git diff --name-status c4cbda254 32e418c58` = 4 files, +83 −6: the parity validator, its test, and the run's `context-pack.md`/`worklog.md`. Nothing in `packages/`, `plugins/`, `apps/`, or any other `.llm/tools/` path.
+2. **`r3890336485` resolved** — I reproduced RED against the *baseline* validator rather than trusting the claim: copying `git show c4cbda254:…` to equal directory depth and running the new behavioral tests gives `7 passed | 1 failed`, the failure being the `13.5.30` case with `report.ok === true` where `false` is expected. Fail-closed at head, 9/9. Negative regression exists at both the helper level and the end-to-end phase-2 level.
+3. **Scoped gates green** — 9/9 focused; **65/0** across `.llm/tools/validation/` (matches the supervisor's number); check wrapper 19 files / **0 failed batches** / 0 diagnostics; `deno task check:aspire-version-parity` **exit 0** (812 checked, 0 fail); fmt 19/0. Scoped lint's exit 2 is a coverage refusal from `deno.json:184-189` excluding `.llm/` — the worklog correctly declines to claim it as a pass.
+4. **Carry-forward legitimate** — but not as the brief describes it. Run **33331429495** has `headSha` **`c4cbda254` exactly** and is success on all four tiers; the carry-forward stands on that run alone.
+
+**One thing you should know:** the brief's two run labels are wrong. Run `33330714604` did *not* target `c4cbda254` — its head is `e0d70e404`, the pre-rebase version of the same commit (same message, parent `38c3e9e18` vs `766c2c6fa`), on no remote branch; its diff to the audited head includes ~20 `packages/**` files the rebase pulled in. And `33331429495` isn't a "current-main" run — `origin/main` is `74e3d451e`. Both named runs are on the PR's own lineage. Non-blocking, since the exact-head run is green on every tier, but the refreeze record should be corrected.
+
+I also checked something the brief didn't ask for: `VERSION_LITERAL_PATTERN` is shared with `unexpectedPhaseOneVersions()`, i.e. the **CI-enabled** phase-1 gate, so tightening it for phase 2 could have quietly narrowed phase 1. Running both validators side by side over the real 812-entry manifest gives **byte-identical JSON for both phases** — the change is inert on the real surface and active only on the false-positive class.
+
+Second (low) finding: the worklog's gate rows say "18 files" where this head has 19 (`check-compat-fixtures_test.ts` arrived in the rebase), so those rows were measured pre-rebase. It under-reports coverage; re-measurement at the true head is clean.
+
+Two notes on state: the evaluation artifact is **uncommitted** — this worktree is on a detached HEAD, so I left it for the supervisor to commit at refreeze. And no epic orchestration run dir exists here, so I placed the requested relative path `slices/s1/convergence/evaluate-r3890336485.md` under the S1 run dir. Scratch reproduction files were removed; the only worktree change is that artifact.

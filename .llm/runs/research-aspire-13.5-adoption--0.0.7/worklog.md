@@ -543,4 +543,12 @@ zero) → evidence block → sole ready-merge → close-gate. Chain-4 dispatchin
 at `c4cbda25`. | | S8 observability landed `f06209d39` | Product fix `63e291f62` "preserve
 actionable typed-command stderr" (ANSI-strip + banner filtering, RED/GREEN template tests), pushed
 with PR comment citing run 33330455111 / job 99308020561. Lease queue after S7 cleanup: **S5
-concurrent-start receipt → S8 typed-seed diagnostic** (one lease each, exact zero between). |
+concurrent-start receipt → S8 typed-seed diagnostic** (one lease each, exact zero between). | | **S1
+MERGE PACKET — exact-green** | PR #1727 head `32e418c586e7` (product carry-forward from
+`c4cbda25410c`; delta = version-parity validator + tests only), base `main` `74e3d451e5dc`, ready,
+sole `status:ready-merge` on PR+#1713, `Closes #1713`, boxes 6/6. Runtime: `e2e-cli.yml` run
+33330714604 (pre-rebase, all tiers SUCCESS) + run 33331429495 (current-main, all tiers SUCCESS)
+carried forward per audited zero-intersection delta — no re-run needed. Delta IMPL-EVAL PASS
+(`r3890336485`, session `9f1820c9…` Opus 5, after a Fable-quota deviation transparently recorded);
+review comment resolved; review-threads PASS (0 unanswered); close-gate rerun 33332251837 in flight.
+Coordinator lands the merge. |
