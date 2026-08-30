@@ -4004,3 +4004,50 @@ conditions.
 one-pass `scaffold.runtime` succeeds; `#1734` stays parked at `eb765629`. Neither blocked this lane
 at any point — #1533 has progressed through plan, PLAN-EVAL, amendment, I1, I2, census, and now a
 gate-integrity fix while those two sat.
+
+## 2026-08-30 — main advanced to `952cc106`; #1533 deliberately NOT re-anchored; colour fix Tier-A PASS
+
+### Main move assessed rather than reflexively absorbed
+
+`origin/main` = `952cc106aafea61570d24247695ac23f5d810026` (#1748, Aspire terminology normalisation).
+The question that matters for #1533 is not "did main move" but "did main move **this leaf's
+corpus**". Measured:
+
+- 139 files changed overall, but only **two** `.ts` files under `packages/` — `agent-docs.generated.ts`
+  and `publish-assets.generated.ts`, both **generated** assets.
+- **Zero** changed `@example` lines across `packages/**` and `plugins/**`.
+
+So the 348-candidate corpus and the 165-failure census are unaffected. **No re-anchor**, per the
+no-global-barrier instruction: re-anchoring happens when the bounded slice reaches integration, not
+on every main move. Rebasing now would churn the branch and invalidate a census for nothing.
+
+### Colour-invariance fix — Tier-A PASS at `0495c9b6b9e4839e8d1f996c8f48af46e785fa90`
+
+Verified by me at that head in both directions, identical:
+`failures=165 {badSpecifier:27, typeError:21, unboundName:116, unfenced:0, malformed:1}`.
+
+The fix is `stripAnsi` before classification plus a **fixture-level** regression test
+(`diagnostic classification is identical with compiler color on and off`) asserting
+`withColor === withoutColor`. Fixture-level matters: a test that merely re-ran the corpus would pass
+for the wrong reason on a machine where colour happens to be off.
+
+### Kept moving without pre-empting the coordinator
+
+D14 remains breached and I4 remains blocked — no repairs, no exemptions, nothing baselined. But the
+leaf is not idle: I authorized **I5's wiring minus enforcement** — the `docs:jsdoc-examples` /
+`docs:jsdoc-examples:test` task surface, the `jsdoc-example-compile` catalog entry, and the workflow
+structure test. Those names are fixed by D15/D16 and are invariant across all three rescope options,
+so the work cannot be wasted by the decision.
+
+**Explicitly withheld: adding the gate to the blocking CI quality job.** With 165 real failures that
+would turn CI red repo-wide, and whether it enforces — and over what asserted contract — is precisely
+what the rescope decides. The author must state in its slice comment and `worklog.md` that
+enforcement is deliberately off, so an unwired gate is never mistaken for a passing one.
+
+The author was also told: if any part of I5 genuinely cannot be written without the rescope answer,
+stop and name it rather than guess.
+
+### Parked leaves still not blocking
+
+`#1747` withheld at `c1e03922`, `status:ci-fail`, pending #1734's bounded repair and a full one-pass
+`scaffold.runtime`. `#1734` parked at `eb765629`. Neither has blocked #1533 at any point.
