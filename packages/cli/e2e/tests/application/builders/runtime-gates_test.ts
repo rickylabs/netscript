@@ -198,11 +198,13 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   } as RunContext);
 
   assertEquals(command[0], 'deno');
-  assertEquals(command[1], 'eval');
-  assertEquals(command.at(-2), '/workspace/app/aspire/apphost.mts');
-  assertEquals(command.at(-1), '/workspace/app');
-  assertEquals(command[2].includes('"--format"'), true);
-  assertEquals(command[2].includes('aspire-start.json'), true);
+  assertEquals(command[1], 'run');
+  assertEquals(command.some((entry) => entry.endsWith('/.llm/tools/gates/run-gate.ts')), true);
+  assertEquals(command.includes('cli-e2e-aspire-start'), true);
+  assertEquals(command.includes('capture'), true);
+  assertEquals(command.includes('/workspace/app/aspire/apphost.mts'), true);
+  assertEquals(command.includes('/workspace/app'), true);
+  assertEquals(command.at(-1)?.includes('postgres'), true);
 });
 
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
@@ -336,9 +338,13 @@ Deno.test('runtime app wait derives the resource name from the scaffold project'
 
   const command = gate.command({
     request: { options: { projectName: 'inventory-console' } },
-    project: { appHost: '/workspace/app/aspire/apphost.mts' },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
   } as RunContext);
-  assertEquals(command[2], 'inventory-console-web');
+  assertEquals(command.at(-1), 'inventory-console-web');
   assertEquals(command.includes('dashboard'), false);
 });
 
@@ -467,15 +473,18 @@ Deno.test('workers wait gate requires runtime startup evidence before behavior g
     gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext),
     [
       'deno',
       'run',
-      '--allow-run=aspire',
-      '/repo/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts',
-      '/workspace/app/aspire/apphost.mts',
+      '--allow-read',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+      'assert',
+      '/workspace/app/.netscript/e2e/aspire-describe.ndjson',
+      'workers',
     ],
   );
 });
@@ -505,13 +514,12 @@ Deno.test('runtime gates enumerate every KV-backed first-party background runtim
     const command = gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext);
-    if (resource !== ASPIRE_RESOURCE.WORKERS) {
-      assertEquals(command.includes('--status'), true);
-      assertEquals(command.includes('healthy'), true);
-    }
+    assertEquals(command.includes('assert'), true);
+    assertEquals(command.includes(resource), true);
   }
 });
 
@@ -595,18 +603,19 @@ Deno.test('runtime gates wait for mssql resource with extended timeout when mssq
     gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext),
     [
       'deno',
       'run',
-      '--allow-run=aspire',
-      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts',
-      '/workspace/app/aspire/apphost.mts',
+      '--allow-read',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+      'assert',
+      '/workspace/app/.netscript/e2e/aspire-describe.ndjson',
       'mssql',
       'mssql_listener',
-      '600',
     ],
   );
 });
