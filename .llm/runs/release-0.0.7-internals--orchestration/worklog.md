@@ -5537,3 +5537,11 @@ safety; root test / surface validator if budget allows). Backgrounded per host b
   the first turn, so it is not a fire-and-forget dispatch — treating it the same as other Codex
   sessions this run: watch/status/resume, never a second concurrent send.
 - **#1758 remains parked** behind this leaf per the serial internals queue, exactly as instructed.
+
+## D-100 — Routing leaf watcher self-correction
+
+First watch attempt (`bag1vk48o`) exited 1 on a trivial missing `--allow-env` permission flag — my
+own mistake, not evidence about the Codex session. Verified independently via `codex-status --user
+node` before re-arming: thread `01a05481` is genuinely `working`, artifact still the bootstrap commit
+`bc1b2f88b` (actively progressing toward its first real implementation commit, not stalled or dead).
+Re-armed correctly as task `bcqo3dhuc`.
