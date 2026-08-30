@@ -5091,3 +5091,40 @@ Both evaluator cycles are now spent. The leaf cannot self-certify out of this: p
 coordinator ruling on (1) a ceiling amendment for the one test file, and (2) how to re-certify once
 repaired, since the two permitted IMPL-EVAL cycles are exhausted. Escalating rather than choosing
 either for myself. `status:impl` retained; nothing mirrored, ticked, or readied.
+
+### Main advance `de57fab0` reconciled; #1357 S1 dispatched
+
+`#1772` merged as `de57fab0`, `#1770` shipped. Diff `3e5cbabf..de57fab0` is 16 files: #1770 run
+artifacts, `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md`, and four generated carriers
+(`agent-docs.generated.ts`, `publish-assets.generated.ts`, `prose.json.gz`, `provenance.json`).
+**Zero files** in #1368's saga territory or #1357's ui-scaffold territory.
+
+- **#1764: inert-main currency applies.** No owned product path is touched, and the carrier this leaf
+  regenerated (`export-surface-corpus.generated.ts`) is not among the four that moved. No re-cut is
+  justified by this advance. Its base is still `f8b4f804` and will need integration plus an exact-head
+  re-cut whenever the owner unparks it, but that obligation predates and is independent of `de57fab0`.
+  Left untouched per the owner boundary.
+- **#1357: re-based before launch.** The leaf had zero commits, so `git reset --hard de57fab0` moved it
+  with no disturbance and the brief's four base references were updated to match.
+
+#1357 S1 dispatched: thread `01a0534e-de79-70c1-9d0d-e01c0018d3fd`, worktree `007-leaf-1357`, branch
+`fix/ui-add-data-screen-triad` @ `de57fab0`, route requested and observed
+`openai · gpt-5.6-sol · high` — **matched**. S1 is research/design/ceiling/gate-table only; no product
+code, PLAN-EVAL is the hard stop before S2. Issue moved `status:triage` → `status:plan`, milestone 0.0.7.
+
+The brief front-loads the three constraints I verified rather than leaving them to be discovered:
+#1356 is **closed** so the `app` option already exists; **#1360 is open** while target item 3 depends on
+its `initialDataUpdatedAt` seeding, so the author must state the boundary rather than silently widen or
+silently drop it; and acceptance item 11's `e2e:cli run scaffold.runtime` is author-must-not-run and
+additionally host-blocked by D-42/D-43. It also carries the two lessons this lane paid for: baseline
+every gate's "exit 0" against the actual base before promising it, and run the **whole** package suite
+on both sides of a composition.
+
+**Two launcher traps recorded.** `launch-codex-slice` rejected the first brief for lacking a `## SKILL`
+chapter and **exited 0 while printing FAIL** — the same exit-code trap as `codex-resume`; launch success
+must be read from the FAIL/thread-id line, never the exit code. It then failed staging because the
+default dest `/home/codex/<slug>-brief.md` assumes the `codex` user while this NAS runs `--user node`;
+an explicit `--dest` under `/home/agent` fixes it. `--dry-run` surfaced both without burning a launch.
+
+#1764 decision packet written to `decision-packet-1764.md` with a **verified** one-assertion amendment
+and a recommendation of a delta-scoped third cycle.
