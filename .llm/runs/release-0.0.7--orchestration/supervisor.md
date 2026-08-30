@@ -1261,36 +1261,36 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 
 ## 2026-08-29T21:36:06Z — S1 implementation complete; generated cascade ownership restored
 
-- Aspire S1 pushed its atomic 13.5 train commit `4e30264fa50d57f7570baf12af545411be9fbab3`
-  and its debt/evidence handoff `5b42e92e11250615b998d51a24a29d057162b30e`. The worktree and remote
-  agree and are clean. The same Fable 5/medium research session is performing Tier-A; no S2 dispatch
-  or runtime lease precedes S1 sign-off and the independent exact-head evaluator.
+- Aspire S1 pushed its atomic 13.5 train commit `4e30264fa50d57f7570baf12af545411be9fbab3` and its
+  debt/evidence handoff `5b42e92e11250615b998d51a24a29d057162b30e`. The worktree and remote agree
+  and are clean. The same Fable 5/medium research session is performing Tier-A; no S2 dispatch or
+  runtime lease precedes S1 sign-off and the independent exact-head evaluator.
 - Stale #1711 evaluator run `33275424854` is terminal `cancelled`. The fixes supervisor proved from
   a pristine control that this leaf owns exactly three remaining generated derivatives: CLI agent
-  docs, MCP export corpus, and the publish-assets mirror. It resumed the same canonical author thread
-  to regenerate, gate, commit, and explicitly push that cascade while PR #1711 remains draft with
-  `status:impl`.
+  docs, MCP export corpus, and the publish-assets mirror. It resumed the same canonical author
+  thread to regenerate, gate, commit, and explicitly push that cascade while PR #1711 remains draft
+  with `status:impl`.
 - #1371 remains healthy and CPU-active in the same recovered author thread. Its focused 69/69 proof,
   root lint, and root format are green; the existing root check/test processes continue without a
   duplicate launch. Docker and Aspire remain empty and no expensive-gate lease exists.
 
 ## 2026-08-29T21:45:00Z — exact-head holds enforced while lanes continue
 
-- Aspire S1 is clean and remote-equal at amended evidence head `68b0aef878a45ae4460b1625679040faab0f6a72`.
-  Coordinator review withheld Tier-A sign-off because missing required manifest paths do not affect
-  `ok`, and the 13.0–13.4 stale selector does not prove exact-current-train mismatches for every
-  phase-1 fail-class pin. The bounded same-author repair is mandatory; hold comment:
+- Aspire S1 is clean and remote-equal at amended evidence head
+  `68b0aef878a45ae4460b1625679040faab0f6a72`. Coordinator review withheld Tier-A sign-off because
+  missing required manifest paths do not affect `ok`, and the 13.0–13.4 stale selector does not
+  prove exact-current-train mismatches for every phase-1 fail-class pin. The bounded same-author
+  repair is mandatory; hold comment:
   <https://github.com/rickylabs/netscript/pull/1727#issuecomment-5465054608>. PR #1727 stays draft;
   no S2 dispatch or local runtime lease.
 - Dispatched exact-head e2e run `33276629736` completed with desktop success and three scaffold
   failures. The common `packages/fresh` `DehydratedState` readonly mismatch is outside S1's changed
   paths and was independently classified as baseline drift; it cannot waive the two branch-owned
   parity defects or authorize sign-off.
-- #1711 is now clean, explicitly pushed, and PR-equal at
-  `067193acff68254b4bd4c6e5d7824f80a9db2b26`. Commits `361feca71` and `067193acf` carry the exact
-  three generated derivatives and harness cascade receipt. Fixes is running fresh Tier-A from a
-  pristine archive; the PR remains draft / `status:impl` until a new independent exact-head
-  IMPL-EVAL returns PASS.
+- #1711 is now clean, explicitly pushed, and PR-equal at `067193acff68254b4bd4c6e5d7824f80a9db2b26`.
+  Commits `361feca71` and `067193acf` carry the exact three generated derivatives and harness
+  cascade receipt. Fixes is running fresh Tier-A from a pristine archive; the PR remains draft /
+  `status:impl` until a new independent exact-head IMPL-EVAL returns PASS.
 - #1371 continues in the preserved implementation thread at RED commit `099370709`; its production
   fail-fast and harness records remain the only dirty paths while exact-head review completes.
   Docker and Aspire application counts remain zero.
@@ -1301,9 +1301,9 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   continue in parallel but may neither hold those queues nor become a global canary gate. Serial
   ordering applies within each orchestrator only.
 - PR #1696 passed fresh native Fable 5 IMPL-EVAL and exact-head CI, merged as
-  `21d516224fe35e92957f0998ee848bbf2024eda0`, and closed #1694. Features continues with #1466;
-  its inactive child transcript was identified for same-route recovery rather than allowing the
-  lane to idle. #1387 remains serially behind #1466.
+  `21d516224fe35e92957f0998ee848bbf2024eda0`, and closed #1694. Features continues with #1466; its
+  inactive child transcript was identified for same-route recovery rather than allowing the lane to
+  idle. #1387 remains serially behind #1466.
 - `v0.0.7-canary.2` finished its already-started OIDC publication and pinned published-package E2E
   green. It is a one-time internals-heavy cut; future public canaries require merged user-facing
   feature/fix/package/runtime payload.
@@ -1330,9 +1330,9 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   cross-consumer metadata/error vocabulary receives one risk-selected Fable 5/medium PLAN-EVAL;
   #1387 and #1730 stay serially queued behind it. #1664 remains parked and consumes no queue slot.
 - Aspire S2 / #1714 holds the single bounded runtime lease. The same Fable 5/medium research
-  supervisor dispatched GPT-5.6-SOL/high thread `01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1`; Aspire
-  CLI 13.5.3 scaffold and restore receipts are already landing. Exact cleanup to Aspire, Docker,
-  and owned-process zero is mandatory before the lease releases.
+  supervisor dispatched GPT-5.6-SOL/high thread `01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1`; Aspire CLI
+  13.5.3 scaffold and restore receipts are already landing. Exact cleanup to Aspire, Docker, and
+  owned-process zero is mandatory before the lease releases.
 - The docs supervisor is not silently stalled: its frozen allocation is exactly `[1551]`, already
   shipped, with no unowned docs leaf available. Aspire S11 remains owned by the same Aspire research
   supervisor per the epic contract. Docs is therefore deliberately exhausted/parked, not a global
@@ -1370,3 +1370,18 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - S7's failed pre-runtime bootstrap receipt is preserved with host zero. The supervisor has a
   coordinator-bounded canonical ordering correction and one newly refrozen attempt; it may not
   unchanged-retry or reinterpret the failure as a DinD regression.
+
+## 2026-08-30T20:19:28Z — live dispatch order after S1/docs merges
+
+- Aspire: exact main is `bc33c2aa3`; own the sole runtime lease. Seal S5's canonical plugin
+  inventory, converge, then execute attempt 6 through DinD plus the owned loopback relay and clean
+  to zero. Continue S8/S9/S10/S11/S13/#1747 static work without waiting on that runtime.
+- Internals: #1774/#1775 remains `status:impl-eval`; launch the fresh checked-in Agentic
+  `claude-evaluator-deepseek-v4-flash-0731` fallback without exposing its mode-600 credential.
+- Fixes: runtime paused behind S5. Preserve the stopped scope-breach receipt; find or specify only a
+  direct bounded #1764 validator. If absent, record the tooling gap and advance independent static
+  fixes rather than holding the host.
+- Docs: #1785 is terminal shipped; actively drive #1788 and immediately dispatch its next
+  independent docs slice. Features: one empty-output DeepSeek attempt is transport failure, not a
+  verdict; complete the single sanctioned retry and keep later slices queued, never globally
+  blocked.

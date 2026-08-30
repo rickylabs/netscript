@@ -1181,10 +1181,10 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-29T21:36:06Z
 
-- Aspire S1 / PR #1727 is clean and remote-equal at `5b42e92e1`: RED parity
-  `95680776e`, atomic 13.5.3 train `4e30264fa`, then debt/evidence `5b42e92e1`. The same Fable
-  5/medium research session is now performing Tier-A. Do not dispatch S2, grant runtime, mark ready,
-  or evaluate until its exact-head sign-off.
+- Aspire S1 / PR #1727 is clean and remote-equal at `5b42e92e1`: RED parity `95680776e`, atomic
+  13.5.3 train `4e30264fa`, then debt/evidence `5b42e92e1`. The same Fable 5/medium research session
+  is now performing Tier-A. Do not dispatch S2, grant runtime, mark ready, or evaluate until its
+  exact-head sign-off.
 - #1371 remains on the same recovered Codex author thread at RED commit `099370709`; production
   fail-fast is uncommitted while its existing structured root check/test runs complete. Focused
   neighborhood 69/69 and root lint/fmt are green. Do not duplicate or interrupt those processes.
@@ -1196,10 +1196,10 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-29T21:45:00Z
 
-- S1 / PR #1727 is clean and remote-equal at `68b0aef878a45ae4460b1625679040faab0f6a72`,
-  but coordinator Tier-A is held on two exact fail-closed repairs: missing non-lockfile manifest
-  paths must fail `ok`, and exact-current-train mismatches must be exhaustively negative-tested for
-  every phase-1 fail-class pin. The same author repairs; no S2, readiness flip, or evaluator yet.
+- S1 / PR #1727 is clean and remote-equal at `68b0aef878a45ae4460b1625679040faab0f6a72`, but
+  coordinator Tier-A is held on two exact fail-closed repairs: missing non-lockfile manifest paths
+  must fail `ok`, and exact-current-train mismatches must be exhaustively negative-tested for every
+  phase-1 fail-class pin. The same author repairs; no S2, readiness flip, or evaluator yet.
 - Exact-head e2e run `33276629736` completed: desktop passed; scaffold lanes found a common
   pre-existing Fresh/TanStack `DehydratedState` readonly mismatch outside S1 scope. Preserve this as
   separate baseline drift, not as permission to waive S1 findings.
@@ -1211,24 +1211,24 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — consumer train active after canary.2
 
-- Main is `21d516224fe35e92957f0998ee848bbf2024eda0`: PR #1696 merged after fresh Fable 5
-  exact-head `PASS_IMPL` and CI success, closing #1694. This is user-facing AI request-context
-  payload and qualifies toward the next meaningful public canary.
+- Main is `21d516224fe35e92957f0998ee848bbf2024eda0`: PR #1696 merged after fresh Fable 5 exact-head
+  `PASS_IMPL` and CI success, closing #1694. This is user-facing AI request-context payload and
+  qualifies toward the next meaningful public canary.
 - `v0.0.7-canary.2` is already published and its pinned production E2E is green. Treat this as an
   allowed already-started internals-heavy exception; do not cut another public canary until a
   coherent feature/fix/package/runtime payload is merged.
 - PR #1711 is logically passed and CI-green at `067193acf` but conflicts with current main only in
   shared generated assets after #1696. Fixes must complete a bounded refresh, authoritative
   regeneration, focused/Tier-A proof, and cheap independent exact-head delta receipt before merge.
-- Orchestrator isolation is mandatory: features (#1466, then #1387) and fixes
-  (#1672/#1674/#1675, then #1673) advance independently. Docs, internals (#1728/#1371), and Aspire
-  continue concurrently and are never global barriers.
+- Orchestrator isolation is mandatory: features (#1466, then #1387) and fixes (#1672/#1674/#1675,
+  then #1673) advance independently. Docs, internals (#1728/#1371), and Aspire continue concurrently
+  and are never global barriers.
 
 ## Resume checkpoint — main `8b1e42f72`; all independent queues active
 
 - #1711/#1112 is terminal merged at `3561bb648` after cycle-2 `PASS_IMPL`, current-main refresh,
-  independent `MECHANICAL_PASS`, and exact-head CI. #1728/#1371 is terminal merged at
-  `8b1e42f72` after `PASS_IMPL` and exact-head CI.
+  independent `MECHANICAL_PASS`, and exact-head CI. #1728/#1371 is terminal merged at `8b1e42f72`
+  after `PASS_IMPL` and exact-head CI.
 - Fixes: #1729 groups #1672/#1674/#1675 and has authored product/evidence commits; current-main
   integration, generated derivatives, Tier-A, IMPL-EVAL, and CI are the active gates. #1673 is next.
 - Features: #1731/#1466 phase-1 plan is under fresh Tier-A and one justified Fable 5/medium
@@ -1252,12 +1252,12 @@ continues concurrently because serial ordering is per orchestrator, not global.
   `/home/agent/projects/netscript/worktrees`, and the dated untracked handoff directory. Treat every
   `/home/codex/...` value as historical metadata only. Git plus the NAS migration manifest is
   authoritative.
-- Four fresh canonical Claude Opus 5/high topic supervisors plus the accepted Aspire Fable
-  5/medium sub-orchestrator are daemon-persistent in tmux with native Remote Control. Preserve the
+- Four fresh canonical Claude Opus 5/high topic supervisors plus the accepted Aspire Fable 5/medium
+  sub-orchestrator are daemon-persistent in tmux with native Remote Control. Preserve the
   feature/fix/internal/docs/Aspire ownership and per-orchestrator seriality; never restore the old
   blocked Claude registry.
-- Immediate independent gates: internals repairs #1736 from `ed8a8e9ca`; features repairs #1731
-  from `f9056f879`; Aspire completes S6 Phase-B/review/IMPL-EVAL from `1fa5aeec1`. S2/#1735 already
+- Immediate independent gates: internals repairs #1736 from `ed8a8e9ca`; features repairs #1731 from
+  `f9056f879`; Aspire completes S6 Phase-B/review/IMPL-EVAL from `1fa5aeec1`. S2/#1735 already
   passed runtime verification and is ready/CLEAN for the human merge handoff.
 - Runtime precondition is currently clean: Aspire 0 and DinD containers 0. Serialize only actual
   host runtime leases. Deno 2.9.5 and Aspire 13.5.3 come from mise; do not install global runtimes,
@@ -1287,16 +1287,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
   `eef77fc1-8224-483d-990f-00fd0145b629`, docs `1d06dd31-be07-405a-9762-e641197e285f`, and Aspire
   `4e08fdff-708d-4d6b-8ba9-fded2fc292e3`. Their bridge IDs and URLs are in cluster state. Preserve
   exact topic ownership; old sessions and paths are historical only.
-- Active recovery gates are independent: #1731 is at exact evidence head `369928cf` with the
-  factual route-identity correction complete and final IMPL-EVAL active; #1739 is at `61b8bf52` under
+- Active recovery gates are independent: #1731 is at exact evidence head `369928cf` with the factual
+  route-identity correction complete and final IMPL-EVAL active; #1739 is at `61b8bf52` under
   independent Fable 5/medium IMPL-EVAL; #1732/#1747 implemented the bounded repair at `6e82aad1`
   while #1734 stays parked; #1746 is ready with unchanged-head CI rerunning and #1748 is under
   exact-head evaluation; Aspire S6 is at `564d465c` with its restored 13.5.3 consumer check and
   phase-A IMPL-EVAL cycle 2 green.
 - Aspire S5's only exact-head `scaffold.runtime` lease is terminal: 26 passed / 1 known baseline
   failure from #1734, before AppHost startup. Its run-owned resources were cleaned, Aspire and DinD
-  are both zero, and the expensive gate must not be retried. No Phase-B runtime lease begins until
-  a new serialized grant after a fresh zero precondition.
+  are both zero, and the expensive gate must not be retried. No Phase-B runtime lease begins until a
+  new serialized grant after a fresh zero precondition.
 - The prescribed `watch-run.ts` helper currently cannot allocate a watcher because this shared NAS
   kernel rejects new inotify instances with `Too many open files`; the supervisor processes remain
   healthy. Use sparse explicit checkpoints until infrastructure raises or frees the shared quota,
@@ -1313,17 +1313,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   with `Refs #1466`, and readiness remains withheld. Continue the same leaf through slice 2 (G-1),
   slice 3 (G-4), and a final all-slices IMPL-EVAL before #1387.
 - Fixes #1739 cycle 1 is terminal `FAIL_FIX` at `61b8bf52`: doctor false-fails the healthy AI
-  skill-loader exclusion because it compares a manifest walk with a generator-selected registry.
-  The coordinator approved a generic optional inspection protocol at the process adapter boundary,
-  five named additional paths, and one focused PLAN-EVAL because the contract is architectural.
+  skill-loader exclusion because it compares a manifest walk with a generator-selected registry. The
+  coordinator approved a generic optional inspection protocol at the process adapter boundary, five
+  named additional paths, and one focused PLAN-EVAL because the contract is architectural.
 - Internals #1747 is clean at evidence head `6605625a`; the product commits remain immutable. A
   post-tini root measurement found two main-equal baseline reds, so the gate table must replace the
   obsolete not-fired host claim before final Tier-A and the separate IMPL-EVAL.
 - Docs #1746 (`84a5fd11`) and #1748 (`22e79dcc`) are exact-head IMPL-EVAL PASS, unchanged-head CI
   green, review-thread clean, ready/CLEAN, and await human merge. #1000 is normalized into 0.0.7;
   parent #1723 remains open and source-blocked until the Aspire implementation slices land.
-- Aspire S6 phase A is PASS; S8 static thread `01a051e6-90d4-7e50-a91e-ac4bd23b880c` is active.
-  The S3 Phase-B worktree remains clean and prepared at `fe4f496bd`. After a fresh exact zero-state
+- Aspire S6 phase A is PASS; S8 static thread `01a051e6-90d4-7e50-a91e-ac4bd23b880c` is active. The
+  S3 Phase-B worktree remains clean and prepared at `fe4f496bd`. After a fresh exact zero-state
   preflight, S3 received the sole serialized runtime lease and dispatched matched-route Codex thread
   `01a05200-345d-7ef0-bb18-30c4dacdaf4a` (GPT-5.6-SOL/medium) in the existing worktree. The staged
   brief retained obsolete Docker 27.5.1/address text; the supervisor has a same-thread correction
@@ -1339,22 +1339,22 @@ continues concurrently because serial ordering is per orchestrator, not global.
 ## Atomic live reconciliation — 2026-08-30T09:51:00Z
 
 - Central active scope is now 99 issues: 65 open and 34 closed. The fourteen live closures missing
-  from the prior ledger are #1112, #1358, #1371, #1378, #1461, #1502, #1542, #1545, #1551,
-  #1611, #1613, #1672, #1674, and #1675. Newly admitted #863 and #1749 are open in 0.0.7;
-  terminal inventory exclusions and duplicate #1733 remain excluded from committed active scope.
-- Merged truth is #1669 PR head `313cc08d` / merge `0ef48c2e` and #1729 PR head `608f68b0` /
-  merge `13878a80`. Active exact heads are #1731 `bbff7cf9`, #1739 `e24e7ce1`, #1747 `c1e03922`,
-  Aspire S8 #1754 `1efd1a17`, and docs #1755 `2c844565`.
+  from the prior ledger are #1112, #1358, #1371, #1378, #1461, #1502, #1542, #1545, #1551, #1611,
+  #1613, #1672, #1674, and #1675. Newly admitted #863 and #1749 are open in 0.0.7; terminal
+  inventory exclusions and duplicate #1733 remain excluded from committed active scope.
+- Merged truth is #1669 PR head `313cc08d` / merge `0ef48c2e` and #1729 PR head `608f68b0` / merge
+  `13878a80`. Active exact heads are #1731 `bbff7cf9`, #1739 `e24e7ce1`, #1747 `c1e03922`, Aspire S8
+  #1754 `1efd1a17`, and docs #1755 `2c844565`.
 - #1747 is a ready handoff with immutable product `fc3ea177` and exact-head IMPL-EVAL PASS. #1738
   and #1740 are not handoffs: both remain baseline-blocked `status:ci-fail`; #1740's expensive gate
   must not be rerun. #1734 remains the owner boundary after two terminal IMPL-EVAL failures.
 - Docs #1746 and #1748 remain shippable exact-head PASS handoffs. #1755 owns admitted #1749 as a
   bounded direct-to-main docs leaf at `status:impl-eval`, ordered behind those corpus-changing PRs.
-- S3 attempt 1 at `2b0d33bd` proved remote bind-source invisibility and cleaned to zero. A separately
-  granted attempt 2 omitted only scratch DataPath, then stopped when Aspire advertised remote
-  PostgreSQL as `localhost:17858` and health checks received connection refused. Artifact head
-  `9525f1ae` records `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`; no envelopes were fabricated and no
-  third attempt is authorized. Final Aspire, Docker containers, Docker volumes, and runtime
+- S3 attempt 1 at `2b0d33bd` proved remote bind-source invisibility and cleaned to zero. A
+  separately granted attempt 2 omitted only scratch DataPath, then stopped when Aspire advertised
+  remote PostgreSQL as `localhost:17858` and health checks received connection refused. Artifact
+  head `9525f1ae` records `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`; no envelopes were fabricated and
+  no third attempt is authorized. Final Aspire, Docker containers, Docker volumes, and runtime
   processes are all zero.
 - #1754 owns both #1720 and admitted #863 in features wave 14 after #1718. #1755/#1749 is docs wave
   11 after #1745. Serial queues remain per topic and neither admission creates a global barrier.
@@ -1362,14 +1362,14 @@ continues concurrently because serial ordering is per orchestrator, not global.
 ## Live continuation — five closure handoffs; no global queue barrier
 
 - Coordinator merge queue: #1746@`84a5fd11` closes #1745; #1748@`22e79dcc` closes #1000;
-  #1747@`c1e03922` closes #1732; #1735@`fffbb0c4` closes #1714; #1755@`2c844565` closes
-  #1749. All five are non-draft/CLEAN with independent exact-head PASS, terminal required checks,
+  #1747@`c1e03922` closes #1732; #1735@`fffbb0c4` closes #1714; #1755@`2c844565` closes #1749. All
+  five are non-draft/CLEAN with independent exact-head PASS, terminal required checks,
   close/acceptance gates, and zero unanswered current review threads. #1714's stale label was
   normalized to `status:ready-merge`; #1755's last check-test rerun passed.
 - Active independent queues: #1731 slice 3 -> final all-slices IMPL-EVAL; #1739 remaining host slice
-  -> exact gates/IMPL-EVAL; #1533 bounded first PLAN-EVAL amendment -> implementation; docs next leaf
-  source verification; Aspire S8 static completion -> Tier-A/IMPL-EVAL. Serial ordering is local to
-  each supervisor only.
+  -> exact gates/IMPL-EVAL; #1533 bounded first PLAN-EVAL amendment -> implementation; docs next
+  leaf source verification; Aspire S8 static completion -> Tier-A/IMPL-EVAL. Serial ordering is
+  local to each supervisor only.
 - Runtime authority is still zero (`aspire ps []`, Docker 0, exact runtime processes 0). Ignore the
   retired inotify=128 wording still visible in an older S8 process argv: the same thread was steered
   with the authoritative 1024 quota, Docker 28.5.2 DinD, and tini lifecycle proof. D-42/D-43 remain
@@ -1380,11 +1380,11 @@ continues concurrently because serial ordering is per orchestrator, not global.
 ## Resume checkpoint — 2026-08-30T12:33:50Z
 
 - Coordinator merge authority is authoritative; the earlier `human-only` wording was false and is
-  superseded. Exact first-parent order is #1735 head `fffbb0c473dec14aedd858127b9a3ce4afee74a2`
-  -> merge `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `12:27:43Z` -> closes #1714,
-  then #1746 head `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` -> merge
-  `f8b4f804cc5fe77054d4f220974eae66becf090c` at `12:30:25Z` -> closes #1745. Both
-  PRs/issues are `status:shipped`; exact current main is `f8b4f804...`.
+  superseded. Exact first-parent order is #1735 head `fffbb0c473dec14aedd858127b9a3ce4afee74a2` ->
+  merge `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `12:27:43Z` -> closes #1714, then #1746 head
+  `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` -> merge `f8b4f804cc5fe77054d4f220974eae66becf090c` at
+  `12:30:25Z` -> closes #1745. Both PRs/issues are `status:shipped`; exact current main is
+  `f8b4f804...`.
 - #1735 had a procedural row-7 miss only: stale draft/pending-evaluator prose remained in its body
   at merge while all substantive gates/evidence were valid. The body was rewritten in place and the
   correction comment is https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739.
@@ -1400,8 +1400,8 @@ continues concurrently because serial ordering is per orchestrator, not global.
   regenerating the shared corpus on #1746's main, exact head
   `9b79d90ef729519e4007010d10851304661a4d61` passed the coordinator's complete seven-row gate and a
   separate native Fable 5 exact-head IMPL-EVAL. It squash-merged as
-  `952cc106aafea61570d24247695ac23f5d810026` at `12:55:05Z`; #1000 closed at `12:55:06Z`.
-  Both are `status:shipped`; current main is `952cc106...`.
+  `952cc106aafea61570d24247695ac23f5d810026` at `12:55:05Z`; #1000 closed at `12:55:06Z`. Both are
+  `status:shipped`; current main is `952cc106...`.
 - Redundant OpenHands run 33311911918 was cancelled and emitted `NONE`. It is a non-gating
   did-not-run, not a PASS or failure; the native exact-head evaluator is the verdict of record.
 - Shared-asset successors #1755, #1731, and #1758 are released. Their supervisors must rebase onto
@@ -1410,37 +1410,37 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T13:09:42Z
 
-- #1755 completed the serial docs asset chain. Exact head
-  `91bf721c6f6f6a20c55077a6aaa72e5316734abb` passed all seven coordinator rows, native exact-head
-  Fable 5 IMPL-EVAL, and targeted mirror/close-gate job `99262079245` (`SUCCESS`) after body
-  sequencing/currency and host-mirror rationale were corrected. It merged as
-  `a5520e70b43fa792c36451270742240e0f2aa889` at `13:08:59Z`; #1749 closed at `13:09:01Z`;
-  both are `status:shipped`.
+- #1755 completed the serial docs asset chain. Exact head `91bf721c6f6f6a20c55077a6aaa72e5316734abb`
+  passed all seven coordinator rows, native exact-head Fable 5 IMPL-EVAL, and targeted
+  mirror/close-gate job `99262079245` (`SUCCESS`) after body sequencing/currency and host-mirror
+  rationale were corrected. It merged as `a5520e70b43fa792c36451270742240e0f2aa889` at `13:08:59Z`;
+  #1749 closed at `13:09:01Z`; both are `status:shipped`.
 - OpenHands runs `33312864635`/`33312881075` were cancelled `NONE`, explicitly non-gating.
 - Exact main and the final shared-asset base are `a5520e70...`. Only #1731 and #1758 remain released
   from this serialization point; both must regenerate and recut exact-head evidence after rebasing.
 
 ## Resume checkpoint — 2026-08-30T13:36:42Z
 
-- #1761 exact head `c1700128e38dd923cd57298c171b5976ec690a83` passed the full coordinator
-  seven-row gate after the Augment-discovered declared-vs-runtime scanner-permission defect and its
+- #1761 exact head `c1700128e38dd923cd57298c171b5976ec690a83` passed the full coordinator seven-row
+  gate after the Augment-discovered declared-vs-runtime scanner-permission defect and its
   contradictory run evidence were repaired. The live changelog ledger covers 37 commits through
-  `a5520e70` as 17 Include / 20 Exclude, and its provisional release-cut top-up boundary is explicit.
+  `a5520e70` as 17 Include / 20 Exclude, and its provisional release-cut top-up boundary is
+  explicit.
 - A fresh separate native Fable 5 IMPL-EVAL returned exact-head `PASS`, no blockers or required body
   edits. Its formerly untracked exact report is now durably preserved at
   `.llm/runs/docs-changelog-0-0-7--1757/impl-eval-final.md` with SHA-256
-  `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`; the merge-coordinate
-  summary is https://github.com/rickylabs/netscript/pull/1761#issuecomment-5469007019.
-- The coordinator merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
-  `13:36:41Z`; #1757 closed one second later and both are `status:shipped`. Exact main is
-  `a5f506dd...`. This docs merge neither blocks nor globally serializes independent topic queues.
+  `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`; the merge-coordinate summary
+  is https://github.com/rickylabs/netscript/pull/1761#issuecomment-5469007019.
+- The coordinator merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at `13:36:41Z`; #1757
+  closed one second later and both are `status:shipped`. Exact main is `a5f506dd...`. This docs
+  merge neither blocks nor globally serializes independent topic queues.
 
 ## Resume checkpoint — 2026-08-30T13:41:18Z
 
-- #1731 exact current/evidence head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22` passed the
-  terminal live-main seven-row coordinator gate and merged as
-  `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at `13:41:17Z`; #1466 closed one second later and
-  both are `status:shipped`. Exact main is now `3e5cbabf...`.
+- #1731 exact current/evidence head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22` passed the terminal
+  live-main seven-row coordinator gate and merged as `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at
+  `13:41:17Z`; #1466 closed one second later and both are `status:shipped`. Exact main is now
+  `3e5cbabf...`.
 - Preserve the head model exactly: content `d5f3bf4c159d59bcb468e1abe325f40e267196b9`, evidence
   `dbd3eafa6670d90148f52e2f7beec75155267ab6`, evaluator carrier
   `ce73a0381485576e63c75fdcae3e163b5b788b4a`, current `e325b7fe...`. Native Fable 5 session
@@ -1452,18 +1452,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T13:51:57Z
 
-- #1293 is now closed `COMPLETED` and `status:shipped` after the coordinator rewrote stale acceptance
-  row 1 to formal PLAN-EVAL R2.1–R2.4 and verified all four rows. Public boundary: factory plus
-  connected/transaction contracts are root-nameable; concrete `PrismaMySqlAdapter` remains
-  intentionally root-private and only module-scoped for tests.
+- #1293 is now closed `COMPLETED` and `status:shipped` after the coordinator rewrote stale
+  acceptance row 1 to formal PLAN-EVAL R2.1–R2.4 and verified all four rows. Public boundary:
+  factory plus connected/transaction contracts are root-nameable; concrete `PrismaMySqlAdapter`
+  remains intentionally root-private and only module-scoped for tests.
 - Exact evidence remains #1662 head `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf` / merge
   `3fc0f2f9221a8246f0d26a26189bafb2647be08a` / native Fable `PASS`, plus #1711 head
-  `07e12efacf3cd23672395507cbf77ecf620cd454` / merge
-  `3561bb64820602e065bf6df0afeed82b39062e42` / real generated-client and executable-example gates.
-  Closure evidence: https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369.
-- No PR merged and main did not move; exact main remains `3e5cbabf...`. The observed GitHub milestone
-  count was 80 open / 82 closed at `13:51:57Z`, but that PR-inclusive count is intentionally not
-  frozen as a control-plane invariant.
+  `07e12efacf3cd23672395507cbf77ecf620cd454` / merge `3561bb64820602e065bf6df0afeed82b39062e42` /
+  real generated-client and executable-example gates. Closure evidence:
+  https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369.
+- No PR merged and main did not move; exact main remains `3e5cbabf...`. The observed GitHub
+  milestone count was 80 open / 82 closed at `13:51:57Z`, but that PR-inclusive count is
+  intentionally not frozen as a control-plane invariant.
 
 ## Resume checkpoint — 2026-08-30T14:21:34Z
 
@@ -1497,17 +1497,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T15:37:00Z
 
-- Exact main is `de57fab0e220203567367b6852f918dc71f296a6` after coordinator merge of PR
-  #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`; #1770 auto-closed and the
-  PR/issue lifecycle is normalized to `status:shipped`.
+- Exact main is `de57fab0e220203567367b6852f918dc71f296a6` after coordinator merge of PR #1772 from
+  exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`; #1770 auto-closed and the PR/issue
+  lifecycle is normalized to `status:shipped`.
 - All five Claude supervisors are live with Remote Control. Features #1763 is the merge front at
   evidence carrier `c80933f7` over evaluated product `1c836918`, awaiting only terminal current-head
   CI and the coordinator's exact final audit. On merge, features immediately resumes #1387.
 - Aspire S11's cycle-3 M3 was accepted as an audit-free arithmetic/PR-body correction (`8/113`, not
   `10/111`); the correction and Fable polish completed. S13 is actively implementing on its live
   Codex thread under the owner-ratified endpoint precedence and does not wait for S11 metadata.
-- Fixes has dispatched an independent leaf while #1764 remains parked at the two-terminal-eval
-  owner boundary. Internals is actively applying #1774's bounded plan findings; #1734's third/final
+- Fixes has dispatched an independent leaf while #1764 remains parked at the two-terminal-eval owner
+  boundary. Internals is actively applying #1774's bounded plan findings; #1734's third/final
   evaluator carrier is `069913e7` and awaits the exact guard-shape owner ruling packet. Docs is
   scoping the next authoritative-reference coverage leaf rather than idling after #1772.
 - Runtime is exact zero (`aspire ps` empty; no Docker containers or volumes). Serial queues remain
@@ -1515,10 +1515,10 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T15:48:00Z
 
-- Exact main is `24f6642f040617de573c7cef1140eed1ac0efd6d` after PR #1763 merged from
-  evidence carrier `c80933f7` over evaluated product `1c836918`. The second exact-head CI attempt
-  passed after the first was cancelled as a proven two-hour orphan; #1730 is closed and both
-  PR/issue are `status:shipped`.
+- Exact main is `24f6642f040617de573c7cef1140eed1ac0efd6d` after PR #1763 merged from evidence
+  carrier `c80933f7` over evaluated product `1c836918`. The second exact-head CI attempt passed
+  after the first was cancelled as a proven two-hour orphan; #1730 is closed and both PR/issue are
+  `status:shipped`.
 - Features #1387 is now released under owner option 1 and must resume immediately at the precise
   plugin-CLI/RFC-0003 adapter boundary. Docs #1778 and fixes #1357 have live implementation workers;
   Aspire S13 has committed through `7e9891fa`; internals #1774 remains active.
@@ -1531,8 +1531,8 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T17:50:00Z
 
-- Exact main is `2a65a8cd0f3872c2b95b00fe0a9edae10531921b` after PR #1780 merged from
-  exact carrier `f3106e63`; #1778 is closed and both records are `status:shipped`.
+- Exact main is `2a65a8cd0f3872c2b95b00fe0a9edae10531921b` after PR #1780 merged from exact carrier
+  `f3106e63`; #1778 is closed and both records are `status:shipped`.
 - Aspire 13.5 is the explicit convergence critical path. Foreground #1734 at the next clean
   internals checkpoint, prepare the complete D-58 retarget chain in advance, and dispatch mandatory
   Phase-B to CI/off-host rather than waiting on another local lease while topology is unchanged.
@@ -1575,12 +1575,13 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T18:39:00Z
 
-- Exact main is `52a881c58842f521b7b253b9781a0b56ae897069` after coordinator merges of docs
-  PR #1783 (`38439740f`) and Fresh PR #1736. Issues #1782 and #1734 are closed; both PR/issue pairs
-  have sole `status:shipped` lifecycle labels.
+- Exact main is `52a881c58842f521b7b253b9781a0b56ae897069` after coordinator merges of docs PR #1783
+  (`38439740f`) and Fresh PR #1736. Issues #1782 and #1734 are closed; both PR/issue pairs have sole
+  `status:shipped` lifecycle labels.
 - #1736's final cycle-4 evaluator is terminal `PASS` at carrier `be949ebd3` over product/runtime
   head `d2c7f16c6`; current CI `33328161675`, close-gate `99301885933`, hosted PostgreSQL and
-  SQLite/Garnet run `33327199769`, and the exact-main disjointness audit are green. No cycle 5 exists.
+  SQLite/Garnet run `33327199769`, and the exact-main disjointness audit are green. No cycle 5
+  exists.
 - Aspire S3 local Phase B is terminal success at `1611c5868`, including real 13.5.3 resources/spans
   capture, 427/427 tests, and exact cleanup. S7 now owns the serialized runtime lease for its
   explicitly authorized two-AppHost foreign-control reproduction; no other runtime lane may overlap.
@@ -1592,28 +1593,28 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Resume checkpoint — 2026-08-30T19:08:48Z
 
-- Exact main is `9710a2898d4f0536752ab303b737e70411a4c399` after coordinator merge of Aspire
-  S3 PR #1741. Issue #1715 is closed; both PR and issue carry the sole lifecycle label
-  `status:shipped`. The final packet is cycle-4 IMPL-EVAL `PASS`, hosted full run `33329358883`,
-  close-gate run `33329453582`, four mirrored acceptance rows, and zero live review threads.
+- Exact main is `9710a2898d4f0536752ab303b737e70411a4c399` after coordinator merge of Aspire S3 PR
+  #1741. Issue #1715 is closed; both PR and issue carry the sole lifecycle label `status:shipped`.
+  The final packet is cycle-4 IMPL-EVAL `PASS`, hosted full run `33329358883`, close-gate run
+  `33329453582`, four mirrored acceptance rows, and zero live review threads.
 - Host runtime is exact zero. The next serialized lease belongs to S7 after its Tier-A-green
   provenance repair `4aac6d7be` is rebased patch-identically onto current main. Use the identical
   `/home/agent` DinD bind and `netscript-dind:<published-port>` application routing, preserve the
   existing owner-scoped relay where DCP explicitly consumes loopback, and return Aspire, Docker,
   volumes, and relays to exact zero before fixes receives its queued Flow-B lease.
 - S1's authoritative head is `e0d70e40407458bebcf02cc408bea6b49107f42b`; restart its hosted
-  dispatcher after the current S4/S5/proof chain, then run both runtime tiers and a delta
-  IMPL-EVAL. S10 proof run `33328972788` isolates the remaining boundary to Aspire dashboard/MCP
-  availability after all earlier gates passed; diagnose S9/S10 ownership before any retry.
+  dispatcher after the current S4/S5/proof chain, then run both runtime tiers and a delta IMPL-EVAL.
+  S10 proof run `33328972788` isolates the remaining boundary to Aspire dashboard/MCP availability
+  after all earlier gates passed; diagnose S9/S10 ownership before any retry.
 - Features, docs, fixes, and internals were explicitly re-steered and remain independent. Near-ready
-  PRs #1738 and #1747 must integrate current main and clear their stale `status:ci-fail` state before
-  merge; #1740 additionally has two unresolved review threads. Do not merge merely from old green
-  checks.
+  PRs #1738 and #1747 must integrate current main and clear their stale `status:ci-fail` state
+  before merge; #1740 additionally has two unresolved review threads. Do not merge merely from old
+  green checks.
 
 ## Resume checkpoint — 2026-08-30T19:17:52Z
 
-- Exact main is `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`: S4 PR #1738 shipped after
-  full exact-head E2E, refreshed merge-ref CI, close-gate, 6/6 acceptance, zero threads, and a
+- Exact main is `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`: S4 PR #1738 shipped after full
+  exact-head E2E, refreshed merge-ref CI, close-gate, 6/6 acceptance, zero threads, and a
   zero-intersection current-main audit. Issue #1716 and the PR are sole `status:shipped`.
 - S5 is released for current-main convergence and review repair. S7's first new Phase-B attempt
   stopped before runtime on missing generated Zod CRUD artifacts; host cleanup remained exact zero.
@@ -1623,33 +1624,55 @@ continues concurrently because serial ordering is per orchestrator, not global.
 ## Resume delta — 2026-08-30T19:47Z
 
 - Main remains `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`. S1 exact head
-  `c4cbda25410cd56d915d420c17d97ee74c16be55` has a fully green hosted matrix
-  (`33331429495`) but needs the bounded exact-version-token review repair and a delta verdict/CI.
-- S5 head `bf7223a6c3305c753bb38c566a9d1cc17f46df0b` is statically/hosted green. Its
-  first local two-start capture was invalid because it reused one AppHost identity and observed
-  13.4.6; it returned Aspire/Docker/volumes to zero. Rerun from two isolated 13.5.3 roots through
+  `c4cbda25410cd56d915d420c17d97ee74c16be55` has a fully green hosted matrix (`33331429495`) but
+  needs the bounded exact-version-token review repair and a delta verdict/CI.
+- S5 head `bf7223a6c3305c753bb38c566a9d1cc17f46df0b` is statically/hosted green. Its first local
+  two-start capture was invalid because it reused one AppHost identity and observed 13.4.6; it
+  returned Aspire/Docker/volumes to zero. Rerun from two isolated 13.5.3 roots through
   `netscript-dind:<published-port>`, then hand the merge packet if acceptance is exact-green.
 - The next serialized local lease after S5 is S8's single typed-seed diagnostic at branch
   `feat/aspire-13-5-s8-typed-resource-commands`; do not grant S7 a third runtime. Keep S9's exact
   dashboard payload repair static and parallel.
 - Aspire supervisor transport is the same Remote Control session, switched from quota-exhausted
-  Fable 5 to Sonnet 5. This is not a plan reset. Docs #1785's repaired-head Fable evaluator ended
-  on HTTP 429, not a verdict; docs is converging current main and using its approved fallback.
+  Fable 5 to Sonnet 5. This is not a plan reset. Docs #1785's repaired-head Fable evaluator ended on
+  HTTP 429, not a verdict; docs is converging current main and using its approved fallback.
 
 ## Resume delta — 2026-08-30T20:04Z
 
 - S5 is not merge-ready. Attempts 3–5 are setup/fixture-invalid; #1717's concurrent plugin row is
   unchecked and #1717/#1740 are `status:impl`. Host is zero after them. Static canonical plugin
   inventory is being sealed before any attempt 6; the current sole runtime lease belongs to fixes.
-- S1 is `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2`. Carry full runtime
-  `33331429495` from parent `c4cbda254` by audited product-path identity; require exact validator
-  gates, live Opus delta verdict, thread/DoD/status, and rerun close-gate. Never commit the staged
-  reverse diff in duplicate worktree `007-aspire-s1-conv`.
+- S1 is `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2`. Carry full runtime `33331429495` from parent
+  `c4cbda254` by audited product-path identity; require exact validator gates, live Opus delta
+  verdict, thread/DoD/status, and rerun close-gate. Never commit the staged reverse diff in
+  duplicate worktree `007-aspire-s1-conv`.
 - Docs #1785 has fresh Opus `PASS` on `b7c8560ea`; evaluator carrier `b7bd92387` is correcting only
   current SHA/body provenance and finishing CI. Merge immediately after the exact packet. #1788 is
   independently active for the next #1777 reference slice.
 - Fixes #1764 product `c20cba7d4`, PR carrier `5b526e4bc`, has zero product delta and zero main-path
   intersection. Its first Flow-B attempt is invalid D-43 evidence because no relay was armed; exact
   cleanup returned zero. Corrected relay-backed Flow-B owns the serialized host lease now.
-- After the lease: S5 plugin-bearing receipt, then S8 typed-seed diagnostic; #1747 static convergence
-  remains parallel and its exact full runtime follows in the Aspire queue. Do not grant S7 runtime.
+- After the lease: S5 plugin-bearing receipt, then S8 typed-seed diagnostic; #1747 static
+  convergence remains parallel and its exact full runtime follows in the Aspire queue. Do not grant
+  S7 runtime.
+
+## Resume delta — 2026-08-30T20:19:28Z
+
+- Aspire S1 PR #1727 shipped as main `798e901afaef65b000cd78a4a2dd9c3aa122220e` after its
+  exact-token repair, carried full-runtime identity audit, separate-session delta `PASS`, exact-head
+  CI/close-gate, resolved review, and complete mirrored acceptance. Docs PR #1785 then shipped as
+  main `bc33c2aa319c057dda6525d91cb8adcae56b3d77`; #1784/#1785 are closed and sole `status:shipped`.
+  Every surviving topic branch must reconcile against this exact main.
+- The host operator provisioned the sanctioned OpenRouter fallback at
+  `/home/agent/.config/netscript-agentic/openrouter.env` with mode 600 and independently proved the
+  key plus a DeepSeek completion. The credential must only be sourced by the checked-in Agentic
+  launcher and must never be printed or committed. #1774/#1775 is demoted to `status:impl-eval`
+  until a fresh `claude-evaluator-deepseek-v4-flash-0731` verdict replaces the historical Opus
+  substitute as the final receipt.
+- Fixes' expanded targeted #1764 runner was stopped before AppHost/container creation; exact owner
+  PID/relay cleanup and a fresh census proved Aspire `[]`, Docker containers `0`, and volumes `0`.
+  Its runtime lease is released. Aspire S5 now owns the one serialized lease for attempt 6 after a
+  sealed canonical plugin inventory and current-main convergence. Use DinD at
+  `tcp://netscript-dind:2375`, direct publications at `netscript-dind:<port>`, and the checked-in
+  owner-scoped two-hop relay whenever DCP or generated clients consume loopback. Cleanup must return
+  AppHosts, containers, volumes, and relays to exact zero.

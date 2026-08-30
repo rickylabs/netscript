@@ -1986,9 +1986,9 @@
   `ok:true` with 0 fail / 20 deferred / 6 info / 1 skipped; scaffold-version and policy checks are
   green. The Fable implementation supervisor independently spot-checked the train and now owns the
   formal Tier-A handoff.
-- Cancelled stale #1711 OpenHands run `33275424854` after the branch moved away from its target.
-  The fixes supervisor reproduced the complete generator cascade on a pristine archive and found
-  exactly `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+- Cancelled stale #1711 OpenHands run `33275424854` after the branch moved away from its target. The
+  fixes supervisor reproduced the complete generator cascade on a pristine archive and found exactly
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
   `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, and
   `packages/mcp/src/publish-assets.generated.ts`. The canonical author was resumed on the same
   thread with those three generated-only paths and four freshness checks; readiness and merge remain
@@ -2008,8 +2008,8 @@
   jobs exposed the same generated Fresh/TanStack hydration type drift, including the readonly
   `DehydratedState.mutations` mismatch in `packages/fresh`; this is outside S1's pin-only product
   delta and is recorded separately from the required parity correction.
-- Verified #1711 local, remote, and PR equality at `067193acff68254b4bd4c6e5d7824f80a9db2b26`.
-  The same author committed the three proven generated derivatives at `361feca71`, then the durable
+- Verified #1711 local, remote, and PR equality at `067193acff68254b4bd4c6e5d7824f80a9db2b26`. The
+  same author committed the three proven generated derivatives at `361feca71`, then the durable
   cascade record at `067193acf`. Fixes began fresh exact-head Tier-A in a tracked-only archive.
 - #1371 remains active without a duplicate implementation launch. Local Docker count is 0 and
   `aspire ps --format Json` returns `[]`.
@@ -2018,16 +2018,17 @@
 
 - Verified release workflow `33277154875` and pinned production E2E `33277382147` both terminal
   success for `v0.0.7-canary.2`; release commit is `2481b57d1a8fb13f1b308642cda8c9a3611e5e05`.
-- Verified PR #1696 exact-head CI run `33277553650` terminal success, squash-merged it, fast-forwarded
-  main to `21d516224fe35e92957f0998ee848bbf2024eda0`, and verified issue #1694 closed.
-- Verified PR #1711 IMPL-EVAL cycle 2 PASS at `067193acff68254b4bd4c6e5d7824f80a9db2b26`
-  and the failed-only close-gate rerun green. The PR became conflicting only after #1696 changed the
-  same generated corpora. Directed the fixes supervisor to refresh from current main, regenerate
+- Verified PR #1696 exact-head CI run `33277553650` terminal success, squash-merged it,
+  fast-forwarded main to `21d516224fe35e92957f0998ee848bbf2024eda0`, and verified issue #1694
+  closed.
+- Verified PR #1711 IMPL-EVAL cycle 2 PASS at `067193acff68254b4bd4c6e5d7824f80a9db2b26` and the
+  failed-only close-gate rerun green. The PR became conflicting only after #1696 changed the same
+  generated corpora. Directed the fixes supervisor to refresh from current main, regenerate
   authoritative derivatives, run focused/Tier-A gates, push, and obtain a cheap exact-head delta
   receipt without stopping the active grouped fixes leaf.
 - Corrected release policy: docs/internals/Aspire advance in parallel and cannot block feature or
-  fix queues; public canaries are now triggered only by coherent consumer-facing payload. #1466
-  and #1672/#1674/#1675 remain concurrent active product trains.
+  fix queues; public canaries are now triggered only by coherent consumer-facing payload. #1466 and
+  #1672/#1674/#1675 remain concurrent active product trains.
 
 ## 2026-08-29T22:33:04Z — two user-facing fixes merged; four independent queues executing
 
@@ -2049,9 +2050,9 @@
 
 - Re-read `/home/agent/AGENTS.md` and adopted the NAS authority: canonical repositories and
   worktrees live below `/home/agent/projects`, old `/home/codex` paths are historical, toolchains
-  are mise-managed, and long-lived workers run in tmux with logs under
-  `/home/agent/observability`. Git and the dated migration manifest—not old session paths—are the
-  recovery authorities. Humans merge PRs; agents prepare verified handoffs.
+  are mise-managed, and long-lived workers run in tmux with logs under `/home/agent/observability`.
+  Git and the dated migration manifest—not old session paths—are the recovery authorities. Humans
+  merge PRs; agents prepare verified handoffs.
 - Reconciled `origin/main` and the clean main checkout at
   `13878a80a50c55b9662099fed64555f2310ae4a3`. Restored nine milestone worktrees plus main and
   verified every recovery branch against the manifest and current GitHub heads.
@@ -2069,8 +2070,8 @@
 
 ## 2026-08-30T06:38:30Z — first dispatches verified; truthful queue repair
 
-- Verified four fresh implementation threads through the checked-in launcher: #1736 repair,
-  #1731 repair, fixes #1673 S3-S4, and Aspire S5 repair. Each has a NAS worktree, matching requested
+- Verified four fresh implementation threads through the checked-in launcher: #1736 repair, #1731
+  repair, fixes #1673 S3-S4, and Aspire S5 repair. Each has a NAS worktree, matching requested
   route, thread record, explicit-refspec push rule, and same-thread steering command. The managed
   Remote Control daemon discovers the threads, but the launch-local stdio app-server reports Remote
   Control disabled; per-thread phone attachment is therefore recorded as unproven rather than
@@ -2103,16 +2104,16 @@
 ## 2026-08-30T06:54:00Z — NAS runtime control repaired; active gates re-steered
 
 - Revalidated the project runtime through the mise-owned environment: the disposable DinD sandbox
-  contains zero containers and Aspire reports `[]`. The migrated `/home/agent/.aspire` directory
-  was root-owned and caused the 13.5.3 CLI to abort before `ps`; upstream's supported `ASPIRE_HOME`
+  contains zero containers and Aspire reports `[]`. The migrated `/home/agent/.aspire` directory was
+  root-owned and caused the 13.5.3 CLI to abort before `ps`; upstream's supported `ASPIRE_HOME`
   override is now set in the untracked parent `/home/agent/projects/netscript/.mise.toml` to the
   node-owned `/home/agent/projects/netscript/.aspire`. No `HOME` override, host-container action, or
   global tool installation was used. The legacy directory contains only cache/log files and no
   backchannel.
 - Corrected a timestamp interpretation during canary monitoring: Actions timestamps are UTC while
   the NAS shell displays UTC+2. Pinned production E2E `33297519134` was about eleven minutes into
-  its 75-minute job window, not two hours old; publication run `33297296394` remains legitimately
-  in progress awaiting it.
+  its 75-minute job window, not two hours old; publication run `33297296394` remains legitimately in
+  progress awaiting it.
 - Features Tier-A proved #1731's annotated metadata equality guard can absorb a divergent builder
   initializer and therefore does not independently pin oRPC metadata position 4. Authorized the
   already-bounded architectural correction in the same Codex thread: infer or expose a
@@ -2128,8 +2129,8 @@
   published immutable prerelease `0.0.7-canary.3` at release commit `5a54d187d`, tagged
   `v0.0.7-canary.3`.
 - Exact canary-pinned production E2E `33297519134` completed successfully. The published JSR CLI
-  passed its one-pass `scaffold.runtime` suite and the subsequent quickstart seven-verdict walk.
-  The release workflow deleted its ephemeral branch and recorded the green pair.
+  passed its one-pass `scaffold.runtime` suite and the subsequent quickstart seven-verdict walk. The
+  release workflow deleted its ephemeral branch and recorded the green pair.
 - Consumer-tooling checkpoint is complete. This canary carries the coherent user-facing payload
   #1696, #1711, #1728, and #1729; stable publication remains inactive while the independent
   feature/fix/Aspire queues continue toward later meaningful checkpoints.
@@ -2141,8 +2142,8 @@
   in otherwise-green #1731, #1734, and Aspire S5 root suites. Agents cannot reap zombies and the
   coordinator is not authorized to restart the container while five Remote Control sessions are
   active.
-- Directed affected supervisors to stop redundant root-test retries, preserve the exact red
-  receipt, compare the main baseline, and continue focused Tier-A/evaluation. This does not waive
+- Directed affected supervisors to stop redundant root-test retries, preserve the exact red receipt,
+  compare the main baseline, and continue focused Tier-A/evaluation. This does not waive
   branch-owned failures: Aspire S5's generated-agent-tools freshness failure still requires a new
   exact-head green CI result.
 
@@ -2173,32 +2174,31 @@
   `DOCKER_HOST=tcp://netscript-dind:2375`, and the node-owned `ASPIRE_HOME`.
 - Relaunched all lost tmux supervisors through `agentic:claude-hybrid`; every launcher emitted a
   PID/cwd/session/bridge proof and every Claude UI shows `/remote-control is active`. Features is
-  session `6c654229-9c4c-4b88-8321-9310778b7366` / bridge
-  `session_01CHWTWUvxjEkHB7TCav7G2H`; fixes `84ea13ea-f34a-41d7-9f65-c9d13ddc95ae` /
-  `session_011PR3tqPTHXX7P8LBRywQRH`; internals `eef77fc1-8224-483d-990f-00fd0145b629` /
-  `session_01AQCc1qsArwb7CPELZwYDfq`; docs `1d06dd31-be07-405a-9762-e641197e285f` /
-  `session_016g86jW5sMJE9z9EHHGPByH`; Aspire `4e08fdff-708d-4d6b-8ba9-fded2fc292e3` /
-  `session_01Jusn3woxeK5xhCdj6ccooR`. Canonical topics are Opus 5/high; Aspire is restored to its
-  accepted Fable 5/medium route. Global Claude defaults were restored to Opus 5/high after the
-  Aspire session-local route change.
+  session `6c654229-9c4c-4b88-8321-9310778b7366` / bridge `session_01CHWTWUvxjEkHB7TCav7G2H`; fixes
+  `84ea13ea-f34a-41d7-9f65-c9d13ddc95ae` / `session_011PR3tqPTHXX7P8LBRywQRH`; internals
+  `eef77fc1-8224-483d-990f-00fd0145b629` / `session_01AQCc1qsArwb7CPELZwYDfq`; docs
+  `1d06dd31-be07-405a-9762-e641197e285f` / `session_016g86jW5sMJE9z9EHHGPByH`; Aspire
+  `4e08fdff-708d-4d6b-8ba9-fded2fc292e3` / `session_01Jusn3woxeK5xhCdj6ccooR`. Canonical topics are
+  Opus 5/high; Aspire is restored to its accepted Fable 5/medium route. Global Claude defaults were
+  restored to Opus 5/high after the Aspire session-local route change.
 - Steered exact independent recovery: features reconciles #1731 remote `74483f02` against leaf
-  `fc81e652`; fixes reconciles #1739 product `02da4e1c` against topic evidence `f20c2581` and repairs
-  missing taxonomy; internals keeps #1734 parked and resumes #1732/#1747 at `e3f227c2`; docs
+  `fc81e652`; fixes reconciles #1739 product `02da4e1c` against topic evidence `f20c2581` and
+  repairs missing taxonomy; internals keeps #1734 parked and resumes #1732/#1747 at `e3f227c2`; docs
   reconciles #1746 `84a5fd11` and #1748 `6b91eb25`; Aspire reconciles S1–S13.
 - Granted the single runtime lease to Aspire S5 only after the zero preflight. Its exact-head
   `deno task e2e:cli` at `aa822069` is active; run-owned cleanup and new Aspire/DinD zero proofs are
   mandatory before any S6/S3/S7 Phase-B lease. All non-runtime topic work continues concurrently.
-- The checked-in README example includes an extra `--` before hybrid arguments, but the current
-  Deno task forwards it and the parser rejects `unknown argument: --`. The first attempts failed
-  before spawning Claude and left no orphan; successful recovery used the same checked-in task
-  without that extra separator. This tooling/docs mismatch is recorded for a bounded follow-up.
+- The checked-in README example includes an extra `--` before hybrid arguments, but the current Deno
+  task forwards it and the parser rejects `unknown argument: --`. The first attempts failed before
+  spawning Claude and left no orphan; successful recovery used the same checked-in task without that
+  extra separator. This tooling/docs mismatch is recorded for a bounded follow-up.
 - Aspire S5 preflight initially stopped before runtime because `aspire doctor` found the .NET SDK
   absent and the inherited Node 26 line outside Aspire's supported TypeScript range. Repaired only
   the untracked project-local mise toolchain: installed/pinned .NET 10.0.400 and Node 24.20.0.
   Doctor now reports 4 passed / 4 warnings / 0 failed; Docker 27.5.1 remains an attributable
-  below-28 warning on the human-owned disposable sandbox. The single S5 attempt is reauthorized;
-  any Docker-version-specific failure releases cleanly with no retry and surfaces the sandbox
-  upgrade boundary.
+  below-28 warning on the human-owned disposable sandbox. The single S5 attempt is reauthorized; any
+  Docker-version-specific failure releases cleanly with no retry and surfaces the sandbox upgrade
+  boundary.
 - S5 F-A completed at exact product head `aa822069`: 26 passed / 1 failed / 0 skipped. The sole
   `generated.quality-negative` failure is the known #1734 generated Fresh hydration TS2345 and
   occurs before AppHost startup; the S5 diff and Docker warning were not causal. Aspire checkpoint
@@ -2213,16 +2213,16 @@
   Added the previously omitted live leaves #1739 (`61b8bf52`), #1746 (`84a5fd11`), and #1748
   (`22e79dcc`) so the rendered topic status no longer reports false zero activity.
 - #1731 completed its evidence-only factual route-identity correction at `369928cf` with product
-  content unchanged and entered a separate final IMPL-EVAL. #1739 is already under a fresh exact-head Fable
-  5/medium IMPL-EVAL. #1732's four-path bounded implementation is committed and remote-equal at
-  `6e82aad1`; internals now owns Tier-A and a separate IMPL-EVAL.
+  content unchanged and entered a separate final IMPL-EVAL. #1739 is already under a fresh
+  exact-head Fable 5/medium IMPL-EVAL. #1732's four-path bounded implementation is committed and
+  remote-equal at `6e82aad1`; internals now owns Tier-A and a separate IMPL-EVAL.
 - #1746 passed exact-head evaluation and its unanswered-thread gate, moved to `status:ready-merge`,
   and is rerunning the supported unchanged-head CI attempt. #1748 remains at `22e79dcc` under
   separate evaluation. Aspire S6's restored 13.5.3 consumer check passed at `564d465c`; the check
   started no AppHost or container and disclosed only the two existing zod baseline errors.
 - PID 1 remains `tini`, zombies remain zero, and Docker/Aspire remain zero. A proven stale S5
-  `tail -f` process owned by the completed gate was terminated. No foreign/unknown-owner process
-  was changed.
+  `tail -f` process owned by the completed gate was terminated. No foreign/unknown-owner process was
+  changed.
 - After a fresh zero/zero preflight at `2026-08-30T09:00:07Z`, granted the sole runtime lease to
   Aspire S3 Phase B. Its scope is one isolated 13.5.3 AppHost for two dashboard telemetry envelopes
   and the first actual Docker 27.5.1 remote-DinD compatibility probe, followed by exact owned stop,
@@ -2238,9 +2238,9 @@
   internals queue: #1750 accepts or corrects the documented Claude-hybrid task separator, #1751
   repairs stale sender lease recovery plus exit-zero rejected steering, and #1753 makes milestone
   validation detect missing/stale live PR leaves. Docs also normalized #1000 into 0.0.7 because
-  ready/CLEAN PR #1748 closes it. The central inventory is now 107 records / 97
-  active committed issues across waves 0–19; none of these tooling leaves blocks feature/fix/docs
-  shipping or a meaningful canary.
+  ready/CLEAN PR #1748 closes it. The central inventory is now 107 records / 97 active committed
+  issues across waves 0–19; none of these tooling leaves blocks feature/fix/docs shipping or a
+  meaningful canary.
 
 ## 2026-08-30T09:17:00Z — slice terminals, truthful baselines, and continuing dispatch
 
@@ -2275,9 +2275,9 @@
 
 ## 2026-08-30T09:28:32Z — Docker 28 and inotify quota unblock lifecycle and S3 Phase B
 
-- Re-proved `netscript-dind -> 10.4.12.19`, project mise
-  `DOCKER_HOST=tcp://netscript-dind:2375`, Docker client/server 28.5.2, and zero DinD containers.
-  The Aspire D-37 below-28 warning is resolved rather than waived.
+- Re-proved `netscript-dind -> 10.4.12.19`, project mise `DOCKER_HOST=tcp://netscript-dind:2375`,
+  Docker client/server 28.5.2, and zero DinD containers. The Aspire D-37 below-28 warning is
+  resolved rather than waived.
 - Re-proved `fs.inotify.max_user_instances=1024` and `max_user_watches=762026`. The formerly blocked
   `codex-follow_test.ts` plus `hybrid-launcher_test.ts` lifecycle set passed 13/13, and
   `watch-run.ts` allocated normally and reached its expected two-second heartbeat (exit 2).
@@ -2287,26 +2287,25 @@
   inspection proved zero Aspire, AppHost, and DCP processes.
 - Fresh preflight proved PID 1 `tini`, zero zombies, `aspire ps []`, zero Docker containers, zero
   exact runtime processes, and zero competing leases. Granted the sole serialized Phase-B lease to
-  prepared S3 worktree `/home/agent/projects/netscript/worktrees/007-aspire-s3` at `fe4f496bd`.
-  The Aspire supervisor dispatched matched-route Codex thread
-  `01a05200-345d-7ef0-bb18-30c4dacdaf4a` (GPT-5.6-SOL/medium); exact owned
-  stop/leak-check/teardown and Aspire/Docker/process zero are mandatory before release. S8 remains
-  static and independent. The generated prompt retained obsolete Docker 27.5.1/address literals,
-  so a same-thread environment correction was immediately queued before first runtime start; no
-  duplicate thread or retry was authorized.
+  prepared S3 worktree `/home/agent/projects/netscript/worktrees/007-aspire-s3` at `fe4f496bd`. The
+  Aspire supervisor dispatched matched-route Codex thread `01a05200-345d-7ef0-bb18-30c4dacdaf4a`
+  (GPT-5.6-SOL/medium); exact owned stop/leak-check/teardown and Aspire/Docker/process zero are
+  mandatory before release. S8 remains static and independent. The generated prompt retained
+  obsolete Docker 27.5.1/address literals, so a same-thread environment correction was immediately
+  queued before first runtime start; no duplicate thread or retry was authorized.
 
 ## 2026-08-30T09:51:00Z — active-scope, leaf-head, and S3 terminal reconciliation
 
-- Reconciled fourteen committed issue transitions to closed and admitted #863 plus #1749,
-  producing 109 inventory records / 99 committed active issues / 65 open / 34 closed. Preserved all
-  terminal inventory-only exclusions, moved #1453, and duplicate #1733 outside active scope.
+- Reconciled fourteen committed issue transitions to closed and admitted #863 plus #1749, producing
+  109 inventory records / 99 committed active issues / 65 open / 34 closed. Preserved all terminal
+  inventory-only exclusions, moved #1453, and duplicate #1733 outside active scope.
 - Reconciled merged #1669 to PR head `313cc08d` / merge `0ef48c2e` and merged #1729 to PR head
   `608f68b0` / merge `13878a80`. #1731 advanced from slice-2 evidence `dce16175` to host-correction
   addendum `bbff7cf9` with slice 3 active; #1739 advanced from amended plan `13402d3f` to bounded
   implementation `e24e7ce1`; #1747 is ready at evidence `c1e03922` over product `fc3ea177`.
-- Corrected false handoff metadata: #1738 and #1740 are baseline-blocked `status:ci-fail`, not
-  merge handoffs. #1734 remains parked after its second terminal IMPL-EVAL failure. #1746 and #1748
-  remain exact-head PASS, CI/thread-clean, shippable docs handoffs.
+- Corrected false handoff metadata: #1738 and #1740 are baseline-blocked `status:ci-fail`, not merge
+  handoffs. #1734 remains parked after its second terminal IMPL-EVAL failure. #1746 and #1748 remain
+  exact-head PASS, CI/thread-clean, shippable docs handoffs.
 - S3 attempt 1 ended at `2b0d33bd` on remote bind-source visibility and exact zero cleanup.
   Separately authorized attempt 2 omitted scratch-only DataPath and ended at `9525f1ae` when the
   remote-DinD endpoint was advertised as localhost and refused the AppHost health connection. No
@@ -2316,19 +2315,19 @@
   exactly zero.
 - Added active S8 PR #1754, issueNumbers `[1720, 863]`, features wave 14 after #1718; its static
   stack advanced from asset head `ab0908b8` to resident command routing `1efd1a17` during intake.
-  Added bounded direct-to-main docs PR #1755 at `2c844565`, issue #1749 in wave 11 after #1745,
-  with Tier-A/gates green and separate IMPL-EVAL next.
+  Added bounded direct-to-main docs PR #1755 at `2c844565`, issue #1749 in wave 11 after #1745, with
+  Tier-A/gates green and separate IMPL-EVAL next.
 
 ## 2026-08-30T10:09:20Z — five exact-green closure handoffs and queues recycled
 
 - Re-verified five non-draft, CLEAN, exact-head human merge handoffs: #1746 (`84a5fd11`, closes
-  #1745), #1748 (`22e79dcc`, closes #1000), #1747 (`c1e03922`, closes #1732), #1735
-  (`fffbb0c4`, closes #1714), and #1755 (`2c844565`, closes #1749). Each has its independent
-  evaluator verdict, required checks/close gate, complete acceptance evidence, and zero unanswered
-  current review threads. Corrected #1714's stale `status:impl-eval` label to exactly
-  `status:ready-merge`; #1755's final repo-wide check/test rerun passed in 8m21s. Merges remain the
-  coordinator-authority boundary and will auto-close all five leaves through their PR body
-  keywords. The earlier `human-only` wording was incorrect and is superseded below.
+  #1745), #1748 (`22e79dcc`, closes #1000), #1747 (`c1e03922`, closes #1732), #1735 (`fffbb0c4`,
+  closes #1714), and #1755 (`2c844565`, closes #1749). Each has its independent evaluator verdict,
+  required checks/close gate, complete acceptance evidence, and zero unanswered current review
+  threads. Corrected #1714's stale `status:impl-eval` label to exactly `status:ready-merge`; #1755's
+  final repo-wide check/test rerun passed in 8m21s. Merges remain the coordinator-authority boundary
+  and will auto-close all five leaves through their PR body keywords. The earlier `human-only`
+  wording was incorrect and is superseded below.
 - Recycled every topic queue without a global barrier. Features is finishing #1731 slice 3 and its
   final all-slices evaluator; fixes is implementing the remaining #1739 host slice before exact-head
   gates/evaluation; internals received #1533's first bounded PLAN-EVAL amendment and continues on
@@ -2345,23 +2344,24 @@
 ## 2026-08-30T12:33:50Z — coordinator landed #1735 then #1746; three shared-asset leaves withheld
 
 - Exercised the coordinator merge authority defined by `milestone-run.md`, correcting the prior
-  false claim that merges were human-only. PR #1735 exact head `fffbb0c473dec14aedd858127b9a3ce4afee74a2`
-  merged first as `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `12:27:43Z` and closed
-  #1714. PR #1746 exact head `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` merged second as
-  `f8b4f804cc5fe77054d4f220974eae66becf090c` at `12:30:25Z` and closed #1745. Both
-  PRs and both issues are now exactly `status:shipped`; `origin/main` equals the second merge.
+  false claim that merges were human-only. PR #1735 exact head
+  `fffbb0c473dec14aedd858127b9a3ce4afee74a2` merged first as
+  `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `12:27:43Z` and closed #1714. PR #1746 exact head
+  `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` merged second as
+  `f8b4f804cc5fe77054d4f220974eae66becf090c` at `12:30:25Z` and closed #1745. Both PRs and both
+  issues are now exactly `status:shipped`; `origin/main` equals the second merge.
 - #1735 substantive gates were valid, but pre-merge row 7 was procedurally missed: three PR-body
   Harness lines still described the earlier draft/pending-evaluator state. The coordinator rewrote
   those lines in place immediately post-merge and posted the transparent correction at
-  https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739. This does not retroactively
-  call row 7 green; it records the miss and repair while preserving the valid exact-head evaluator,
-  close-gate, acceptance, prohibited-pattern, and thread evidence.
+  https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739. This does not
+  retroactively call row 7 green; it records the miss and repair while preserving the valid
+  exact-head evaluator, close-gate, acceptance, prohibited-pattern, and thread evidence.
 - Merge authority remains withheld from #1747 until the mandatory exact-head `scaffold.runtime`
   exists. #1748 is withheld until its false every-published-surface PR claim is corrected and the
   shared asset is refreshed. #1755 is third in the same shared-asset sequence, so it cannot move
   ahead of #1748's correction.
-- DAG structure was not rewritten: #1745's closure releases #1749, and #1714's closure satisfies
-  the S2 dependency for #1715/#1716/#1719/#1721; every successor retains its own gates.
+- DAG structure was not rewritten: #1745's closure releases #1749, and #1714's closure satisfies the
+  S2 dependency for #1715/#1716/#1719/#1721; every successor retains its own gates.
 
 ## 2026-08-30T12:56:18Z — #1748 seven-row PASS, merge, and shared-asset successors released
 
@@ -2374,9 +2374,9 @@
   found only prose and declared generated carriers, no hand-written package/plugin source; (7) the
   corrected Summary, Scope, Harness, and DoD matched what shipped.
 - Native opposite-family Claude Fable 5 returned unconditional exact-head IMPL-EVAL `PASS`.
-  OpenHands run 33311911918 was redundant, cancelled by concurrency, and emitted verdict `NONE`;
-  it is recorded as non-gating and neither raises nor clears a finding. The terminal reconciliation
-  is https://github.com/rickylabs/netscript/pull/1748#issuecomment-5468789434; exact merge coordinates
+  OpenHands run 33311911918 was redundant, cancelled by concurrency, and emitted verdict `NONE`; it
+  is recorded as non-gating and neither raises nor clears a finding. The terminal reconciliation is
+  https://github.com/rickylabs/netscript/pull/1748#issuecomment-5468789434; exact merge coordinates
   are https://github.com/rickylabs/netscript/pull/1748#issuecomment-5468779050.
 - Coordinator squash-merged #1748 as `952cc106aafea61570d24247695ac23f5d810026` at
   `2026-08-30T12:55:05Z`; #1000 closed one second later. Both are `status:shipped`, and
@@ -2388,18 +2388,18 @@
 
 ## 2026-08-30T13:09:42Z — #1755 terminal seven-row PASS and final asset base landed
 
-- Reconciled exact head `91bf721c6f6f6a20c55077a6aaa72e5316734abb` after the third serial
-  corpus integration. Seven-row PASS: (1) current close-gate plus acceptance mirror; (2) all eight
-  #1749 boxes checked with evidence; (3) non-run prohibited-pattern diff clean; (4) all applicable
-  named checks terminal success and explicit docs-only skips N/A; (5) canonical `.agents/skills/`
-  tree and derived `.claude/skills/` omission independently verified; (6) docs changed-file audit
-  found prose/run artifacts plus declared generated carriers only; (7) body sequencing, currency,
+- Reconciled exact head `91bf721c6f6f6a20c55077a6aaa72e5316734abb` after the third serial corpus
+  integration. Seven-row PASS: (1) current close-gate plus acceptance mirror; (2) all eight #1749
+  boxes checked with evidence; (3) non-run prohibited-pattern diff clean; (4) all applicable named
+  checks terminal success and explicit docs-only skips N/A; (5) canonical `.agents/skills/` tree and
+  derived `.claude/skills/` omission independently verified; (6) docs changed-file audit found
+  prose/run artifacts plus declared generated carriers only; (7) body sequencing, currency,
   corrected host-mirror rationale, and DoD all matched the exact shipped head.
 - Native exact-head Fable 5 delta IMPL-EVAL passed. Targeted mirror/close-gate rerun job
-  `99262079245` succeeded. Redundant OpenHands runs `33312864635` and `33312881075` were coordinator-
-  cancelled with verdict `NONE`; neither is gating evidence.
-- Coordinator squash-merged #1755 as `a5520e70b43fa792c36451270742240e0f2aa889` at
-  `13:08:59Z`; #1749 closed at `13:09:01Z`; both are `status:shipped`.
+  `99262079245` succeeded. Redundant OpenHands runs `33312864635` and `33312881075` were
+  coordinator- cancelled with verdict `NONE`; neither is gating evidence.
+- Coordinator squash-merged #1755 as `a5520e70b43fa792c36451270742240e0f2aa889` at `13:08:59Z`;
+  #1749 closed at `13:09:01Z`; both are `status:shipped`.
 - Final shared-asset base is now `a5520e70...`. #1731 and #1758 are released to their independent
   supervisors for current-main rebase/regeneration and fresh exact-head gates/evaluation.
 
@@ -2426,14 +2426,14 @@
 - CI run `33314032803` is terminal green, including close-gate job `99265315596`, check-test
   `99265346412`, quality `99265346382`, and core lane visibility `99265443431`; review-thread gate
   passed with the single Augment thread answered/outdated and zero unanswered.
-- Coordinator squash-merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
-  `13:36:41Z`; #1757 closed at `13:36:42Z`; both are `status:shipped`. The provisional changelog
-  remains explicitly subject to a release-cut top-up as later 0.0.7 payload lands.
+- Coordinator squash-merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at `13:36:41Z`;
+  #1757 closed at `13:36:42Z`; both are `status:shipped`. The provisional changelog remains
+  explicitly subject to a release-cut top-up as later 0.0.7 payload lands.
 
 ## 2026-08-30T13:41:18Z — #1731 live-main seven-row PASS and Stage 1b merge
 
-- Reconciled exact PR/current head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22` without
-  conflating it with immutable content `d5f3bf4c159d59bcb468e1abe325f40e267196b9`, receipt/evidence
+- Reconciled exact PR/current head `e325b7fe212f7cf7e0985c634af19e2bd4d5ea22` without conflating it
+  with immutable content `d5f3bf4c159d59bcb468e1abe325f40e267196b9`, receipt/evidence
   `dbd3eafa6670d90148f52e2f7beec75155267ab6`, or evaluator carrier
   `ce73a0381485576e63c75fdcae3e163b5b788b4a`. Diffs above content were product-empty.
 - Native Fable 5 currency-renewal session `2f492178` returned `PASS`. It re-derived the terminal
@@ -2453,9 +2453,9 @@
   plus the head chain independently reverified; (6) changed-file envelope matched approved
   contracts/SDK source, tests, docs and run evidence; (7) body/DoD, head roles, R-1 ruling, closing
   keyword and ready state matched the exact head.
-- Coordinator squash-merged #1731 as `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at
-  `13:41:17Z`; #1466 closed one second later; both are `status:shipped`. This satisfies Stage 1b and
-  releases #1349/#1352's dependency edges while each successor keeps its own gate contract.
+- Coordinator squash-merged #1731 as `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` at `13:41:17Z`;
+  #1466 closed one second later; both are `status:shipped`. This satisfies Stage 1b and releases
+  #1349/#1352's dependency edges while each successor keeps its own gate contract.
 
 ## 2026-08-30T13:51:57Z — #1293 acceptance-record correction and completed closure
 
@@ -2463,14 +2463,15 @@
   Acceptance row 1 no longer demands the architecture formal PLAN-EVAL rejected; it now records
   R2.1–R2.4 exactly: public factory plus nameable connected/transaction contracts, concrete adapter
   module-scoped for tests and intentionally absent from the package root.
-- Re-verified #1662 exact PR/evaluator head `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf`
-  and merge `3fc0f2f9221a8246f0d26a26189bafb2647be08a`. The native Fable 5 IMPL-EVAL is `PASS`;
+- Re-verified #1662 exact PR/evaluator head `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf` and merge
+  `3fc0f2f9221a8246f0d26a26189bafb2647be08a`. The native Fable 5 IMPL-EVAL is `PASS`;
   `surface_test.ts` enforces the intended export map; classifier/notifier tests are 46/46; the four
   exact receipts recompute `SUFFICIENT`; `deno doc --lint` and the eight-file publish dry-run both
   exit 0.
 - Re-verified #1711 exact head `07e12efacf3cd23672395507cbf77ecf620cd454` and merge
   `3561bb64820602e065bf6df0afeed82b39062e42`: real Prisma 7.8 generated-client typing,
-  dynamic-import smoke, focused 38/38, package 51/51, and #1112 5/5 close the executable-example row.
+  dynamic-import smoke, focused 38/38, package 51/51, and #1112 5/5 close the executable-example
+  row.
 - Coordinator checked all four rows, posted the closure evidence at
   https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369, applied sole
   `status:shipped`, and closed #1293 `COMPLETED` at `13:51:56Z`. This created no commit, PR merge,
@@ -2480,10 +2481,10 @@
 
 ## 2026-08-30T14:21:34Z — owner ratifications unblock #1734 cycle 3 and Aspire S13
 
-- The owner submitted the exact verdict `Authorize #1734 cycle 3.` in the live Aspire Remote
-  Control session. The coordinator propagated it directly to internals: resume the preserved #1736
-  author from evaluator carrier `eb765629`, keep the third and final exceptional repair strictly
-  inside the accepted `hydration.ts` correction, and require fresh exact-head targeted/Tier-A plus
+- The owner submitted the exact verdict `Authorize #1734 cycle 3.` in the live Aspire Remote Control
+  session. The coordinator propagated it directly to internals: resume the preserved #1736 author
+  from evaluator carrier `eb765629`, keep the third and final exceptional repair strictly inside the
+  accepted `hydration.ts` correction, and require fresh exact-head targeted/Tier-A plus
   separate-session IMPL-EVAL before merge. #1747/#1758/#1739 retain their own gates and may rerun
   the shared scaffold-runtime proof only after #1734 lands and the host is at exact runtime zero.
 - The owner ratified Aspire S13's resolver precedence exactly: explicit option →
@@ -2491,8 +2492,8 @@
   `dashboardUrl` with source `aspire_ps` → compatibility `DEFAULT_TELEMETRY_ENDPOINT` with source
   `default`; generated code must contain no bare `18888`. S13 remains sequenced after S9/S11.
 - The Phase-B infrastructure finding remains accepted and blocking for local runtime: ai-agents and
-  netscript-dind need identical absolute-path worktree mounts plus shared/reachable networking.
-  No lease will be burned before those two probes pass; topology-independent Aspire work continues.
+  netscript-dind need identical absolute-path worktree mounts plus shared/reachable networking. No
+  lease will be burned before those two probes pass; topology-independent Aspire work continues.
 - #1642 was already assigned to milestone 0.0.7 when checked live, so the requested milestone move
   was already satisfied and no redundant GitHub mutation was made.
 
@@ -2516,20 +2517,20 @@
 
 ## 2026-08-30T15:37:00Z — shipping resumed; Aspire ruling and exact main advanced
 
-- Merged docs leaf PR #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0`
-  as main `de57fab0e220203567367b6852f918dc71f296a6`; issue #1770 auto-closed and both
-  records now carry the sole lifecycle label `status:shipped`.
-- Ruled the Aspire S11 M3 finding as bounded acceptance-artifact hygiene: correct the stale
-  `10/111` arithmetic to the manifest-proven `8/113`, update the PR body in place, and do not burn
-  a fourth docs-audit. The correction and Fable polish completed; content-independent S13 was
-  released immediately on its live Codex thread under the already-ratified endpoint precedence.
+- Merged docs leaf PR #1772 from exact head `6d275b2c9350b084ccf4fa62982e2f20432fe9d0` as main
+  `de57fab0e220203567367b6852f918dc71f296a6`; issue #1770 auto-closed and both records now carry the
+  sole lifecycle label `status:shipped`.
+- Ruled the Aspire S11 M3 finding as bounded acceptance-artifact hygiene: correct the stale `10/111`
+  arithmetic to the manifest-proven `8/113`, update the PR body in place, and do not burn a fourth
+  docs-audit. The correction and Fable polish completed; content-independent S13 was released
+  immediately on its live Codex thread under the already-ratified endpoint precedence.
 - Features #1763 is at evidence-only carrier `c80933f7` over product `1c836918`; current-head CI is
   the last routine gate before the coordinator's exact final audit and merge. Fixes advanced an
   independent leaf while #1764 remains parked at its two-evaluation owner boundary. Internals
   continues #1774 while an exact #1734 guard-shape decision packet is reconstructed.
 - All five Claude supervisors were directly checked and steered after main advanced. Host runtime
-  remained exactly empty: `aspire ps --format Json` returned `[]`, and Docker reported no
-  containers or volumes.
+  remained exactly empty: `aspire ps --format Json` returned `[]`, and Docker reported no containers
+  or volumes.
 
 ## 2026-08-30T15:48:00Z — #1763 shipped and the feature queue reopened
 
@@ -2540,11 +2541,11 @@
   product/evaluator head roles, eight-path changed-file ceiling, zero intersection with the #1772
   main advance, 5/5 mirrored issue acceptance, `Closes #1730`, terminal applicable CI, and zero
   unanswered current review threads.
-- PR #1763 merged at `2026-08-30T15:47:10Z` as main
-  `24f6642f040617de573c7cef1140eed1ac0efd6d`; #1730 auto-closed one second later, and both
-  records now carry the sole lifecycle label `status:shipped`. Features #1387 was immediately
-  released under the already-accepted option-1 adapter boundary; all supervisors received new-main
-  currency without interrupting their active workers.
+- PR #1763 merged at `2026-08-30T15:47:10Z` as main `24f6642f040617de573c7cef1140eed1ac0efd6d`;
+  #1730 auto-closed one second later, and both records now carry the sole lifecycle label
+  `status:shipped`. Features #1387 was immediately released under the already-accepted option-1
+  adapter boundary; all supervisors received new-main currency without interrupting their active
+  workers.
 
 ## 2026-08-30T17:46:16Z — owner authorized the two exhausted-evaluation repairs
 
@@ -2564,17 +2565,17 @@
 
 - PR #1780 passed exact-head CI, close-gate, evaluator PASS, review-thread gate, a nine-path scope
   audit, and zero changed-path intersection with main's #1763 advance. It merged from carrier
-  `f3106e63` as main `2a65a8cd0f3872c2b95b00fe0a9edae10531921b`; #1778 auto-closed and both
-  records were normalized to `status:shipped`.
+  `f3106e63` as main `2a65a8cd0f3872c2b95b00fe0a9edae10531921b`; #1778 auto-closed and both records
+  were normalized to `status:shipped`.
 - Owner priority now makes Aspire 13.5 convergence the cluster critical path. Internals was directed
   to foreground #1734 at the next clean checkpoint because its merge releases Aspire S1/S4/S5 and
   the dependent runtime-red leaves. Aspire was directed to pre-build the D-58 retarget/close-gate
   sequence and use the fastest existing CI/off-host Phase-B path.
-- Fresh run-owned D-55 probes against Docker 28.5.2 failed exactly as the historical diagnosis:
-  DinD could not see `/home/agent/projects/netscript/worktrees` at the identical path, and a Redis
-  port published on DinD `127.0.0.1:32773` refused connection from ai-agents. Both probe containers
-  were removed; Docker and Aspire returned to exact zero. A parallel infrastructure audit is
-  locating a safe NAS topology correction or the fastest existing off-host gate.
+- Fresh run-owned D-55 probes against Docker 28.5.2 failed exactly as the historical diagnosis: DinD
+  could not see `/home/agent/projects/netscript/worktrees` at the identical path, and a Redis port
+  published on DinD `127.0.0.1:32773` refused connection from ai-agents. Both probe containers were
+  removed; Docker and Aspire returned to exact zero. A parallel infrastructure audit is locating a
+  safe NAS topology correction or the fastest existing off-host gate.
 
 ## 2026-08-30T18:04:24Z — NAS topology repaired; Aspire Phase B locally released
 
@@ -2583,24 +2584,26 @@
   `ai-agents` through `netscript-dind:<published-port>` rather than `127.0.0.1`; a Redis PING at
   `netscript-dind:36379` returned `+PONG`. D-42 and D-43 are therefore resolved.
 - Re-proved the grant baseline: Docker 28.5.2 reported zero containers and, after removing the
-  positively attributable anonymous Redis acceptance-probe volume, zero volumes; `aspire ps
-  --format Json` returned `[]`. The sole serialized runtime lease was granted to the Aspire
-  supervisor for local S3/S7/S8 Phase B, with exact owned cleanup back to zero required.
+  positively attributable anonymous Redis acceptance-probe volume, zero volumes;
+  `aspire ps
+  --format Json` returned `[]`. The sole serialized runtime lease was granted to the
+  Aspire supervisor for local S3/S7/S8 Phase B, with exact owned cleanup back to zero required.
 - Hosted integration run `33326591443` at `9303daf61` independently passed static, desktop, and 36
   gates in each runtime suite before both suites exposed the same S10 adapter defect: Aspire 13.5.3
-  `describe --follow --format Json` emits one `ResourceJson` per NDJSON line, while the parser expects
-  a snapshot `{resources:[...]}` envelope. #1736 is not causal. S10 owns a bounded real-fixture/parser
-  correction plus hidden runtime-report artifact upload repair before the exact-head proof reruns.
+  `describe --follow --format Json` emits one `ResourceJson` per NDJSON line, while the parser
+  expects a snapshot `{resources:[...]}` envelope. #1736 is not causal. S10 owns a bounded
+  real-fixture/parser correction plus hidden runtime-report artifact upload repair before the
+  exact-head proof reruns.
 
 ## 2026-08-30T18:18:00Z — real Phase-B refined the DinD address contract
 
-- The identical-path repair is fully effective, and direct agent probes can reach ports published
-  on all DinD interfaces through `netscript-dind:<port>`. Real Aspire 13.5 DCP execution exposed a
+- The identical-path repair is fully effective, and direct agent probes can reach ports published on
+  all DinD interfaces through `netscript-dind:<port>`. Real Aspire 13.5 DCP execution exposed a
   narrower remaining case: DCP deliberately publishes its container ports on the Docker host's
   `127.0.0.1` and its own health checks consume that localhost endpoint. From `ai-agents`, that
-  loopback is a different namespace, so PostgreSQL health remained red even though the container
-  and bind mount were healthy. The host repair therefore resolved D-42 and direct D-43 probes, but
-  did not by itself make DCP's loopback contract remote-DinD-safe.
+  loopback is a different namespace, so PostgreSQL health remained red even though the container and
+  bind mount were healthy. The host repair therefore resolved D-42 and direct D-43 probes, but did
+  not by itself make DCP's loopback contract remote-DinD-safe.
 - The Aspire supervisor proved a reversible two-hop relay end to end: expose the DinD-loopback port
   on DinD's service interface, then forward the matching ai-agents loopback port to
   `netscript-dind:<port>`. An owner-scoped relay tool is being checked into the Aspire operational
@@ -2615,9 +2618,9 @@
 
 - PR #1783 passed its independent IMPL-EVAL, mirrored all #1782 acceptance evidence, resolved its
   sole review thread, and completed exact-head close-gate, quality, check-test, code-quality, and
-  docs-build checks. It merged as `38439740f248ef2ba5f173dad96b2edaa829392c`; #1782 auto-closed,
-  and both records now carry the sole lifecycle label `status:shipped`. Docs immediately dispatched
-  the next logger-reference coverage slice rather than waiting on another topic lane.
+  docs-build checks. It merged as `38439740f248ef2ba5f173dad96b2edaa829392c`; #1782 auto-closed, and
+  both records now carry the sole lifecycle label `status:shipped`. Docs immediately dispatched the
+  next logger-reference coverage slice rather than waiting on another topic lane.
 - PR #1736 earned final cycle-4 `PASS` at evaluator carrier `be949ebd3` over byte-identical product
   and hosted-runtime head `d2c7f16c6`. The evaluator reproduced RED 11/3 to GREEN 14/0, root
   4,294/0/19, Fresh 22/0, both TanStack range ends, hostile-value and envelope attacks, and hosted
@@ -2634,8 +2637,8 @@
 
 ## 2026-08-30T19:08:48Z — S3 shipped; local Phase B re-armed on the corrected DinD contract
 
-- S3's bounded documentation correction earned independent cycle-4 IMPL-EVAL `PASS`. The branch
-  was rebased patch-identically, full hosted run `33329358883` passed every tier, issue #1715's four
+- S3's bounded documentation correction earned independent cycle-4 IMPL-EVAL `PASS`. The branch was
+  rebased patch-identically, full hosted run `33329358883` passed every tier, issue #1715's four
   acceptance rows were mirrored, the live review-thread count was zero, and close-gate run
   `33329453582` passed at exact head `338922a20db6`. The coordinator squash-merged PR #1741 as main
   `9710a2898d4f0536752ab303b737e70411a4c399`; #1715 auto-closed and both records now have the sole
@@ -2651,28 +2654,28 @@
   queue remains next after that lease; its static preparation continues in parallel.
 - S1 is authoritatively clean at `e0d70e40407458bebcf02cc408bea6b49107f42b`; live PR comments and
   durable ledgers contain no malformed SHA. Its stable Aspire 13.5 persistent-endpoint correction
-  passed 29/29 focused tests and Tier-A, but the hosted exact-head rerun dispatcher must be restarted
-  after the currently active S4/S5/proof chain. Combined S10 proof `33328972788` at `d0023b834`
-  passed static, desktop, and 53 SQLite/Garnet gates before the sole dashboard-unavailable Aspire
-  MCP failure; Postgres was cancelled by fail-fast, so no unchanged retry is authorized.
+  passed 29/29 focused tests and Tier-A, but the hosted exact-head rerun dispatcher must be
+  restarted after the currently active S4/S5/proof chain. Combined S10 proof `33328972788` at
+  `d0023b834` passed static, desktop, and 53 SQLite/Garnet gates before the sole
+  dashboard-unavailable Aspire MCP failure; Postgres was cancelled by fail-fast, so no unchanged
+  retry is authorized.
 
 ## 2026-08-30T19:17:52Z — S4 shipped and S5 released
 
-- PR #1738 at exact head `b2a0529fa19b5726c41fdbf6a7678bb67f95347b` passed full hosted
-  run `33329737311`, refreshed merge-ref CI `33328754543`, close-gate, six mirrored acceptance rows,
-  and zero review threads. Its 17-path delta had zero intersection with the intervening S3 main
-  advance, so the coordinator merged it without a receipt-invalidating rebase as main
-  `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`. #1716 closed; both records are sole
-  `status:shipped`.
+- PR #1738 at exact head `b2a0529fa19b5726c41fdbf6a7678bb67f95347b` passed full hosted run
+  `33329737311`, refreshed merge-ref CI `33328754543`, close-gate, six mirrored acceptance rows, and
+  zero review threads. Its 17-path delta had zero intersection with the intervening S3 main advance,
+  so the coordinator merged it without a receipt-invalidating rebase as main
+  `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`. #1716 closed; both records are sole `status:shipped`.
 - Aspire was directed immediately into S5 current-main convergence and its outstanding review
   repairs while the independent S7 pre-runtime bootstrap-order correction retains the single local
   runtime lease. No global lane barrier was introduced.
 
 ## 2026-08-30T19:47:00Z — corrected DinD Phase B resumed; evaluator quota recovered in-session
 
-- The host operator reconfirmed the final DinD contract: `netscript-dind` has `/home/agent`
-  mounted at the identical absolute path, Docker remains at `tcp://netscript-dind:2375`, and
-  application ports published by the sandbox must be reached from `ai-agents` at
+- The host operator reconfirmed the final DinD contract: `netscript-dind` has `/home/agent` mounted
+  at the identical absolute path, Docker remains at `tcp://netscript-dind:2375`, and application
+  ports published by the sandbox must be reached from `ai-agents` at
   `netscript-dind:<published-port>`, never `127.0.0.1`. The coordinator independently observed
   `aspire ps --format Json == []`, zero Docker containers, and zero Docker volumes before release.
 - S5's first local two-start capture was setup-invalid rather than product evidence: both starts
@@ -2681,18 +2684,18 @@
   this bounded proof from two genuinely isolated roots under the 13.5.3 mise pin and the corrected
   DinD endpoint contract, then clean its exact owned resources. S8's single typed-seed diagnostic
   remains next in the serialized Aspire lease queue; S7 receives no third runtime attempt.
-- S1's converged exact head `c4cbda25410cd56d915d420c17d97ee74c16be55` passed full hosted
-  run `33331429495` across static, desktop, PostgreSQL, and SQLite/Garnet. One valid medium review
+- S1's converged exact head `c4cbda25410cd56d915d420c17d97ee74c16be55` passed full hosted run
+  `33331429495` across static, desktop, PostgreSQL, and SQLite/Garnet. One valid medium review
   finding remains: substring matching lets `13.5.30` satisfy an expected `13.5.3`. A bounded
   exact-token match plus negative regression was authorized, followed by delta evaluation and
   current-head CI; the prior green runtime receipt remains product evidence but is not by itself a
   merge waiver after the head moves.
 - The Aspire supervisor exhausted its Fable 5 monthly spend after consuming the dispatch. The same
-  Remote Control session and accepted topic ownership were preserved and switched in place to
-  Sonnet 5; the directive was resubmitted without changing scope, branches, or prior verdicts.
-  Docs #1785 separately received a provider HTTP 429 rather than a content verdict and was directed
-  to converge onto current main and use the documented opposite-family evaluator fallback while
-  continuing its independent #1777 queue.
+  Remote Control session and accepted topic ownership were preserved and switched in place to Sonnet
+  5; the directive was resubmitted without changing scope, branches, or prior verdicts. Docs #1785
+  separately received a provider HTTP 429 rather than a content verdict and was directed to converge
+  onto current main and use the documented opposite-family evaluator fallback while continuing its
+  independent #1777 queue.
 
 ## 2026-08-30T20:04:00Z — false-green runtime captures rejected; exact merge queue restored
 
@@ -2702,9 +2705,10 @@
   row. Every attempt returned Aspire, Docker containers/volumes, and relays to zero. The unchecked
   acceptance row was restored and #1717/#1740 were demoted from false `status:ready-merge` to
   `status:impl`. A zero-runtime canonical install probe has now enumerated the required first-party
-  plugin resources; no attempt 6 may start until its full static inventory/health preflight is sealed.
-- S1's bounded exact-token correction landed at `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2`.
-  The delta from full-runtime head `c4cbda254` changes only the validator/test and two run artifacts;
+  plugin resources; no attempt 6 may start until its full static inventory/health preflight is
+  sealed.
+- S1's bounded exact-token correction landed at `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2`. The
+  delta from full-runtime head `c4cbda254` changes only the validator/test and two run artifacts;
   product/runtime paths are byte-identical, so hosted matrix `33331429495` is carried forward by
   explicit coordinator identity ruling. Exact-head core CI is green except the intentionally stale
   close-gate metadata. Fable delta evaluation quota-failed without a verdict; one fresh Opus 5
@@ -2717,9 +2721,26 @@
 - The otherwise near-merge #1764 Flow-B lease first ran without the mandatory DCP two-hop relay.
   Healthy DinD containers were unreachable through ai-agents loopback, so the supervisor preserved
   the D-43 red, stopped the exact AppHost, removed the exact survivor, and proved zero. Product head
-  `c20cba7d4` is byte-identical to PR/evidence carrier `5b526e4bc`; the sole added file is a worklog.
-  A corrected run is now armed with the proven owner-scoped relay tool and exact cleanup contract.
+  `c20cba7d4` is byte-identical to PR/evidence carrier `5b526e4bc`; the sole added file is a
+  worklog. A corrected run is now armed with the proven owner-scoped relay tool and exact cleanup
+  contract.
 - The read-only merge audit restored orphan PR #1747/#1732 to the Aspire queue: prior static and
   IMPL-EVAL evidence is green, its stale runtime red predates the shipped #1736 baseline repair, and
   its delta has zero path intersection with intervening main. Static convergence precedes one exact
   full-runtime receipt after the current serialized lease.
+
+## 2026-08-30T20:19:28Z — two leaves shipped; sanctioned evaluator and S5 runtime re-armed
+
+- Merged Aspire S1 PR #1727 at exact head `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2` with
+  `--match-head-commit`; merge SHA `798e901afaef65b000cd78a4a2dd9c3aa122220e` closed #1713. Merged
+  docs PR #1785 at exact head `b7bd9238734bfd0b035a9431fdf2b558896fb77c`; merge SHA
+  `bc33c2aa319c057dda6525d91cb8adcae56b3d77` closed #1784. Both issue/PR pairs were normalized to
+  the sole lifecycle label `status:shipped`, and the canonical repository fast-forwarded.
+- Verified only metadata for the newly provisioned OpenRouter credential: path exists, owner
+  `node:node`, mode `600`; no secret content was read. Internals was directed to dispatch a fresh
+  Agentic DeepSeek evaluator for #1774/#1775 at product `51a7bafe1` / carrier `8a1ec2750`,
+  preserving the Opus pass as history but not as final sanctioned evidence.
+- Stopped the fixes supervisor's over-broad targeted runner before runtime. Exact PIDs `3746647` and
+  child `3751092` plus relay watcher exited; the owned census returned Aspire `[]`, containers `0`,
+  volumes `0`, relays `0`. Lease transferred immediately to Aspire S5 for its sixth and first
+  canonical plugin-bearing two-root receipt under the corrected DinD/relay topology.

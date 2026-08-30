@@ -1108,8 +1108,8 @@ implementation thread.
 
 - A topic supervisor finishing a checkpoint does not satisfy the coordinator mandate. Before the
   supervisor can remain at a prompt, the coordinator must either supply the next gate/leaf, record a
-  real exclusive-resource queue position while non-resource work continues, or prove that the
-  frozen allocation is exhausted.
+  real exclusive-resource queue position while non-resource work continues, or prove that the frozen
+  allocation is exhausted.
 - This rule re-armed fixes (#1729 then #1673), features (#1731 then #1387/#1730), and internals
   (#1734 then #1732) immediately after #1711/#1728 merged. Aspire S2 received the bounded runtime
   lease instead of remaining at its request. Docs alone stays parked because its only frozen issue
@@ -1137,7 +1137,8 @@ implementation thread.
 - `agentic:codex-follow` currently fails at `Deno.watchFs` with `EMFILE` on the NAS. Visible
   container inotify usage is far below the kernel per-user ceiling, so the likely pressure is shared
   host-wide outside this container. Do not multiply watchers; supervise through the compact status
-  reporter, append-only launch logs, tmux, and exact Git heads until the platform ceiling is repaired.
+  reporter, append-only launch logs, tmux, and exact Git heads until the platform ceiling is
+  repaired.
 - Fresh Codex threads are created correctly by the checked-in launcher and are discoverable by the
   managed daemon, but their one-turn stdio app-server emits `remoteControl/status=disabled`.
   Therefore daemon health is not sufficient proof of per-thread phone attachment. The ledger keeps
@@ -1150,7 +1151,8 @@ implementation thread.
   invocation aborted while creating its diagnostic log and could not prove the runtime baseline.
 - Aspire's own `AspireHomeDirectory` contract supports `ASPIRE_HOME`. The untracked parent mise
   environment now points it at `/home/agent/projects/netscript/.aspire`, shared by the canonical
-  clone and worktrees and owned by the agent user. With that authority loaded, `aspire ps --format
+  clone and worktrees and owned by the agent user. With that authority loaded,
+  `aspire ps --format
   Json` returns `[]`; DinD independently reports zero containers.
 - The root-owned legacy directory was not deleted or mutated because it is outside the agent user's
   ownership. It contains only two log files plus NuGet-search cache and no live backchannel.
@@ -1167,15 +1169,15 @@ implementation thread.
   without changing the verdict.
 - The coordinator did not restart the agent container because doing so would terminate five live
   Remote Control supervisors and active evaluator sessions. Product lanes retain focused gates and
-  honest baseline-red receipts; a human-controlled container restart/init repair remains outside
-  the agent's authority. Docker and Aspire application counts remain exactly zero.
+  honest baseline-red receipts; a human-controlled container restart/init repair remains outside the
+  agent's authority. Docker and Aspire application counts remain exactly zero.
 
 ## 2026-08-30 — post-freeze issues existed outside the dispatch gate
 
 - The Aspire checkpoint recorded epic #1712 and its children, and supervisors were actively
   executing them, but the frozen inventory/DAG omitted #1712–#1724 plus five later issues and six
-  closed milestone records. The validator was internally consistent yet could not detect live
-  GitHub omissions.
+  closed milestone records. The validator was internally consistent yet could not detect live GitHub
+  omissions.
 - Re-intake now records all 102 GitHub milestone issues plus retained moved #1453, maps every active
   issue into one canonical topic lane, and carries the Aspire dependency chain through waves 9–18.
   Future issue filing/milestone moves must update intake, inventory, DAG, and cluster state in the
@@ -1204,8 +1206,8 @@ implementation thread.
 
 ## 2026-08-30 — hybrid task example and parser disagree on the separator
 
-- `.llm/tools/agentic/README.md` shows `deno task agentic:claude-hybrid -- --cwd ...`, but Deno 2.9.5
-  forwards that separator to `hybrid-launcher.ts`, whose finite parser rejects it as
+- `.llm/tools/agentic/README.md` shows `deno task agentic:claude-hybrid -- --cwd ...`, but Deno
+  2.9.5 forwards that separator to `hybrid-launcher.ts`, whose finite parser rejects it as
   `unknown argument: --`. The failure occurs before the Claude child is spawned, so the five failed
   recovery attempts left no session or orphan.
 - The working checked-in invocation is `deno task agentic:claude-hybrid --cwd ... --name ...`.
@@ -1226,12 +1228,12 @@ implementation thread.
 
 ## 2026-08-30 — shared NAS inotify quota blocks token-free run watchers
 
-- The prescribed `.llm/tools/harness/watch-run.ts` helper was attempted against four existing
-  topic run directories after the tini restart. Every `Deno.watchFs` call failed immediately with
+- The prescribed `.llm/tools/harness/watch-run.ts` helper was attempted against four existing topic
+  run directories after the tini restart. Every `Deno.watchFs` call failed immediately with
   `Too many open files`; the run directories contain only 3–18 directories, the invoking soft file
   limit is 1024, and this process namespace exposes only 17 inotify descriptors. This points to a
-  shared kernel/user quota outside the visible project process set rather than topic-run size or
-  the repaired zombie condition.
+  shared kernel/user quota outside the visible project process set rather than topic-run size or the
+  repaired zombie condition.
 - The coordinator did not raise a host sysctl or kill foreign sessions. Until infrastructure frees
   or raises the quota, supervision uses sparse explicit checkpoints and existing Remote Control
   liveness while preserving all active lanes. This is operational drift, not a product/evaluator
@@ -1261,8 +1263,8 @@ implementation thread.
 
 - S3's first authorized Phase-B attempt proved that worktree-local `withDataBindMount` paths are
   invisible to the remote DinD daemon. The separately granted second attempt removed DataPath only
-  from the scratch AppHost, allowing the container to start, but Aspire then published PostgreSQL
-  as `localhost:17858`; from the AppHost container namespace that address refused the connection.
+  from the scratch AppHost, allowing the container to start, but Aspire then published PostgreSQL as
+  `localhost:17858`; from the AppHost container namespace that address refused the connection.
 - This is a host-topology boundary, not fixture evidence and not product permission. Both attempts
   preserved the absence of resources/spans envelopes, stopped without workaround, and returned the
   host to exact zero. No third attempt is authorized. S3 remains
@@ -1285,9 +1287,9 @@ implementation thread.
   evaluator-only commit would have moved the exact head already certified by the seven-row gate.
 - This was not treated as permission to lose the verdict. After coordinator merge, the byte-exact
   report was copied into the leaf's canonical run path on the central orchestration branch and
-  pinned by SHA-256 `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`.
-  The evaluated product head remains `c1700128...`; the preservation commit is harness evidence,
-  not a new product or PR-head verdict.
+  pinned by SHA-256 `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`. The
+  evaluated product head remains `c1700128...`; the preservation commit is harness evidence, not a
+  new product or PR-head verdict.
 
 ## 2026-08-30 — #1731 coordinator inert-main ruling preserves evidence without ritual recut
 
@@ -1333,9 +1335,9 @@ implementation thread.
   older heads and omitted the new PRs. A partial head-only edit would still have left intake,
   inventory, DAG membership, generated status, and ownership internally contradictory, so the
   coordinator repaired the complete validator-controlled set atomically.
-- Reconciliation corrected two semantic drifts, not just timestamps: #1740 does not close #1365,
-  and #1616 remains a fixes-owned issue even though internals created the clean plan checkpoint.
-  The latter must cross lanes as an explicit handoff; no topic ownership was silently rewritten.
+- Reconciliation corrected two semantic drifts, not just timestamps: #1740 does not close #1365, and
+  #1616 remains a fixes-owned issue even though internals created the clean plan checkpoint. The
+  latter must cross lanes as an explicit handoff; no topic ownership was silently rewritten.
 - Current candidate truth also changed after independent review: #1763's bounded repair is sound but
   lacks renewed Tier-A/evaluation, while #1764 still contains a reproduced product regression and
   cannot advance on paperwork-only corrections. These are recorded as gates, not waived as stale
@@ -1365,12 +1367,12 @@ implementation thread.
 
 ## 2026-08-30 — Docker 28.5.2 did not itself resolve the remote-DinD topology boundary
 
-- The version mismatch and inotify blockers are fixed, but they were independent of D-42/D-43.
-  A fresh identical-path bind probe still produced an empty/invisible worktree inside the daemon,
-  and a fresh DinD-published Redis loopback port still refused connection from ai-agents.
+- The version mismatch and inotify blockers are fixed, but they were independent of D-42/D-43. A
+  fresh identical-path bind probe still produced an empty/invisible worktree inside the daemon, and
+  a fresh DinD-published Redis loopback port still refused connection from ai-agents.
 - Therefore another local Phase-B lease would deterministically repeat the failure. The accepted
-  paths remain a NAS compose correction (identical bind plus shared/reachable namespace) or
-  existing CI/off-host runtime gates. All static and retarget preparation continues in parallel.
+  paths remain a NAS compose correction (identical bind plus shared/reachable namespace) or existing
+  CI/off-host runtime gates. All static and retarget preparation continues in parallel.
 
 ## 2026-08-30 — host topology repair supersedes the D-42/D-43 local-runtime prohibition
 
@@ -1378,13 +1380,13 @@ implementation thread.
   recreated DinD with an identical `/home/agent` bind and proved cross-container service access via
   `netscript-dind:<published-port>`. The stale rule "local Phase B deterministically fails" is no
   longer true; local Phase B is preferred again under the single serialized runtime lease.
-- `127.0.0.1` remains the wrong address from `ai-agents` for a DinD-published service. All probes and
-  generated acceptance harnesses must distinguish the Docker API endpoint
+- `127.0.0.1` remains the wrong address from `ai-agents` for a DinD-published service. All probes
+  and generated acceptance harnesses must distinguish the Docker API endpoint
   `tcp://netscript-dind:2375` from application endpoints at `netscript-dind:<published-port>`.
 - The first combined hosted run did not invalidate the topology fix: it passed 36 gates per runtime
-  suite and failed in NetScript's S10 parser before convergence because Aspire 13.5 follow-mode emits
-  direct `ResourceJson` NDJSON lines. Treat that as a bounded adapter/evidence repair, not an infra
-  regression and not a reason to return to unconditional CI fallback.
+  suite and failed in NetScript's S10 parser before convergence because Aspire 13.5 follow-mode
+  emits direct `ResourceJson` NDJSON lines. Treat that as a bounded adapter/evidence repair, not an
+  infra regression and not a reason to return to unconditional CI fallback.
 
 ## 2026-08-30 — direct DinD reachability is not identical to DCP loopback reachability
 
@@ -1405,24 +1407,24 @@ implementation thread.
   probe: PostgreSQL and workers became healthy, `aspire wait` passed, and real 13.5.3 resources and
   spans were captured. S3's first successful local Phase B therefore supersedes the CI-fallback
   posture for S3/S7/S8 while keeping the single host lease and exact owned cleanup mandatory.
-- Two scaffold observations (missing generated Zod CRUD during an otherwise unrelated web start,
-  and a minimal workers fixture without `streams`) did not invalidate S3's approved worker-trigger
-  and telemetry-envelope acceptance. They are recorded as observations and must not silently widen
-  S3; any repair requires its own owned slice.
+- Two scaffold observations (missing generated Zod CRUD during an otherwise unrelated web start, and
+  a minimal workers fixture without `streams`) did not invalidate S3's approved worker-trigger and
+  telemetry-envelope acceptance. They are recorded as observations and must not silently widen S3;
+  any repair requires its own owned slice.
 - The shared #1734 baseline blocker is gone from main at `52a881c58842`. Any S1/S4/S5 or fix leaf
   that still reports #1734 as its blocker is stale and must integrate current main before spending
   another runtime lease.
 
 ## 2026-08-30 — S3 convergence supersedes its historical blocked state
 
-- S3 is no longer blocked, draft, or awaiting acceptance mirroring. PR #1741 merged as
-  `9710a2898` after real local Phase B, independent cycle-4 `PASS`, exact-head full hosted CI,
-  checked issue acceptance, zero review threads, and a green close-gate. Any ledger or supervisor
-  text describing #1715/#1741 as `status:triage`, `status:impl`, or remote-DinD-blocked is stale.
-- The corrected DinD topology does not make ai-agents loopback interchangeable with the Docker
-  host: direct published application endpoints are `netscript-dind:<port>`. Aspire DCP's explicit
-  loopback publications still use the already-proven owner-scoped relay. New Phase-B work must
-  record which of those two paths it uses rather than collapsing them into one address claim.
+- S3 is no longer blocked, draft, or awaiting acceptance mirroring. PR #1741 merged as `9710a2898`
+  after real local Phase B, independent cycle-4 `PASS`, exact-head full hosted CI, checked issue
+  acceptance, zero review threads, and a green close-gate. Any ledger or supervisor text describing
+  #1715/#1741 as `status:triage`, `status:impl`, or remote-DinD-blocked is stale.
+- The corrected DinD topology does not make ai-agents loopback interchangeable with the Docker host:
+  direct published application endpoints are `netscript-dind:<port>`. Aspire DCP's explicit loopback
+  publications still use the already-proven owner-scoped relay. New Phase-B work must record which
+  of those two paths it uses rather than collapsing them into one address claim.
 - S1's only authoritative head is `e0d70e40407458bebcf02cc408bea6b49107f42b`. The transient
   `e0d70e404979` expansion exists only in historical hook telemetry and is not evidence. S10's next
   boundary is dashboard/MCP availability after 53 passing runtime gates, not the already-repaired
@@ -1435,30 +1437,31 @@ implementation thread.
   advance had zero changed-path intersection and refreshed merge-ref CI passed.
 - S7 did not reach Aspire or Docker in its first post-S3 attempt. `deno install` encountered a local
   generated-module ordering dependency before AppHost start. This is neither D-42 nor D-43; preserve
-  the red receipt, correct only canonical bootstrap ordering, and start a new attempt from exact zero.
+  the red receipt, correct only canonical bootstrap ordering, and start a new attempt from exact
+  zero.
 
 ## 2026-08-30 — Phase-B address contract is fixed; setup-invalid captures remain invalid
 
-- The authoritative sandbox topology is now stable: identical `/home/agent` bind in DinD, Docker
-  API at `tcp://netscript-dind:2375`, and published application endpoints at
-  `netscript-dind:<port>` from `ai-agents`. Do not revive D-42/D-43 or select CI fallback merely
-  because historical receipts predate this topology.
+- The authoritative sandbox topology is now stable: identical `/home/agent` bind in DinD, Docker API
+  at `tcp://netscript-dind:2375`, and published application endpoints at `netscript-dind:<port>`
+  from `ai-agents`. Do not revive D-42/D-43 or select CI fallback merely because historical receipts
+  predate this topology.
 - This infrastructure correction does not validate a malformed acceptance setup. S5's first
   two-start capture reused one AppHost identity and resolved the wrong 13.4.6 toolchain. It is red
   as evidence construction, not a product failure or a reason to waive the acceptance row. The
   successor must use two isolated roots, prove 13.5.3 in both, assert exit codes, and clean exactly.
 - Fable 5 monthly-spend exhaustion is a transport/provider boundary, not an evaluator FAIL. The
   Aspire supervisor's same Remote Control session moved to Sonnet 5 without resetting accepted
-  scope. Evaluator HTTP 429s likewise do not increment the two-terminal-content-failure ceiling;
-  use an approved opposite-family fallback and keep independent slices moving.
+  scope. Evaluator HTTP 429s likewise do not increment the two-terminal-content-failure ceiling; use
+  an approved opposite-family fallback and keep independent slices moving.
 
 ## 2026-08-30 — topology proof is necessary but does not waive fixture semantics
 
 - Two isolated AppHosts and healthy database/cache containers do not prove a plugin acceptance row
   when the generated `netscript.config.ts` says `plugins: []`. Keep the S5 row unchecked and its
   lifecycle metadata at `status:impl` until both roots contain the named first-party plugin graph
-  and every required plugin resource is healthy concurrently. Repeated infrastructure success is
-  not a substitute for the claimed fixture.
+  and every required plugin resource is healthy concurrently. Repeated infrastructure success is not
+  a substitute for the claimed fixture.
 - Direct `netscript-dind:<port>` reachability applies to probes from ai-agents. DCP and generated
   clients still consume their localhost publication contract and require the proven owner-scoped
   two-hop relay. #1764's first Flow-B lease omitted that relay and is infrastructure-red, not a
@@ -1471,3 +1474,16 @@ implementation thread.
   substitute is a one-topic recorded exception preserving Codex-generator/Claude-evaluator and
   fresh-session invariants; it is not a content failure and does not silently amend the default
   routing policy.
+
+## 2026-08-30 — OpenRouter fallback and runtime ownership correction
+
+- Fable's spend limit no longer implies that the opposite-family fallback route is exhausted. A
+  host-provisioned mode-600 OpenRouter environment file now supports the checked-in DeepSeek preset.
+  Existing terminal verdicts remain historical evidence, but #1774 specifically requires a fresh
+  sanctioned DeepSeek verdict before merge. Never expose the key in transcripts or repository data.
+- A supervisor calling a near-full scaffold suite "targeted" does not satisfy a bounded runtime
+  authorization. The #1764 expanded runner was interrupted before runtime and contributes no gate
+  result. With exact cleanup back to zero, lease ownership transferred to S5 rather than allowing a
+  static tooling search to idle the runtime train.
+- The authoritative main is now `bc33c2aa319c057dda6525d91cb8adcae56b3d77`, containing shipped S1
+  and docs #1785. Any lane still using `74e3d451e` or describing S1 as pending is stale.
