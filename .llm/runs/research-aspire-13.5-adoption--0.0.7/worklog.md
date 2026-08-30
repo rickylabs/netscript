@@ -297,4 +297,8 @@ correction items CLOSED at `0d81cf64`; regression gates green (fork). Accepted �
 evaluation per the ruling. S9 phase A settled; Phase B blocked (D-43). PR #1759 review comment
 posted. | | Main advanced (coordinator) | `952cc106` = #1735 (S2) merged + #1746 + #1748. Overlap
 with the S8–S10 stack: `agent-docs.generated.ts` only; file intersection with the stack delta empty.
-Convergence point recorded (D-50); S10 continues on its current base. |
+Convergence point recorded (D-50); S10 continues on its current base. | | S10 Tier-A + dispatch |
+Sign-off at `14daa764` (`slices/s10/review-tier-a.md`; gates 0 diag / 186/0 / fitness exit 0;
+contracts a–g PASS; catalog allowlist justified; S9/S10 ordering to reconcile at convergence).
+IMPL-EVAL cycle 1 launched as session `e7075f01-3d58-4fe9-a6b5-61c16e84bcef` in
+`007-aspire-s10-eval`. #1722 normalized to `status:impl`. Runtime zero. |
