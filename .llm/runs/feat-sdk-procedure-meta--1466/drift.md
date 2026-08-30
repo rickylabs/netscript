@@ -261,7 +261,8 @@ condition no longer exists. At slice-3 intake, `/proc/1/comm` is `tini`, the sys
 count is 0, and `/proc/sys/fs/inotify/max_user_instances` is 1024. Root `test` is therefore runnable
 and must produce a real PASS receipt; the former no-retry condition and `SKIPPED` form are void.
 
-This is topic drift in the evidence environment, not product drift. Every frozen receipt archive
-was cut under conditions that have since been superseded and remains append-only historical
-evidence; no archived outcome is rewritten or reinterpreted. Slice 3 archives the slice-2 top-level
-set under `receipts/frozen-2863d29e/` before cutting its own eight receipts at the new content head.
+This is topic drift in the evidence environment, not product drift. The frozen receipt archives were
+cut under run, content, and (for the older host-defect sets) host conditions that later heads have
+superseded. They remain append-only historical evidence; no archived outcome is rewritten or
+reinterpreted. Slice 3 archives the slice-2 top-level set under `receipts/frozen-2863d29e/` before
+cutting its own eight receipts at the new content head.

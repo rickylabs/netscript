@@ -384,3 +384,84 @@ renaming the result or treating a delta-0 exception as a fabricated PASS.
 this worklog entry, and the rewritten context pack is the slice-2 evidence head. It is pushed by
 explicit refspec and followed by the required structured per-slice PR comment. Stop immediately
 after that comment for supervisor Tier-A; slice 3 and G-4 remain not run.
+
+## Slice 3 implementation — publish and compatibility evidence plus G-4 and AF-1
+
+Date: 2026-08-30. Implementation author: fresh Codex thread in the existing leaf worktree. Start
+head `bbff7cf906b4e4d96c49865cada900ea55894d2b` was independently verified as local origin and PR
+#1731 head after a fast-forward from its parent; no rebase or merge commit was used.
+
+### Bounded content and archive
+
+The slice-2 top-level receipt set was verified as eight attempt-8 files with
+`gitHead == actualGitHead == 2863d29e342b135de9e9c41c0508a5032c98261f`, then moved byte-for-byte
+into the append-only `receipts/frozen-2863d29e/` archive before any new receipt was cut. Earlier
+archives were untouched.
+
+Content commit: `9ab779ce96f0ae282afe96ad3efaa5146a2bf428`
+(`docs(contracts): close procedure metadata compatibility findings`). Its only non-run-artifact
+changes are the two G-4 descriptions and the AF-1 comment:
+
+- `CommonErrorMap` is described as the standard NetScript error map carried by every base route;
+  the public JSDoc no longer links the private `commonErrorMap` value. The value remains private and
+  no type, export, or behavior was added.
+- The assertion-budget test warns that a future `=` or `;` inside the annotation can make the narrow
+  span false-red, and says to widen the annotation span without dropping the
+  `export const baseContract` anchor. The regex itself is unchanged.
+- Under B2 plus the old dead decoy, focused check and lint stayed green while the pin failed 4/1.
+  After exact restoration the contracts suite passed 16/16. Full commands are in
+  `audit/af1-annotation-span-slice3.txt`.
+
+### Host state and D-33
+
+At intake PID 1 was `tini`, the system-wide zombie count was 0, and
+`fs.inotify.max_user_instances` was 1024. Root `test` is runnable; R-1's no-retry condition and the
+`SKIPPED` form are void. D-33 records that the frozen archives were cut under superseded run/content
+conditions, with the older sets also carrying the host defect, but remain immutable historical
+evidence.
+
+### Eight exact-head receipts
+
+All eight named gates ran serially through `run-gate.ts`, attempt 9, with invocation IDs
+`1466-<gate>-final`. Every receipt records
+`gitHead == actualGitHead == 9ab779ce96f0ae282afe96ad3efaa5146a2bf428`.
+
+| Receipt | Outcome | Exit | Duration |
+| --- | --- | ---: | ---: |
+| `check-final.json` | PASS | 0 | 24376 ms |
+| `lint-final.json` | PASS | 0 | 5467 ms |
+| `fmt-check-final.json` | PASS | 0 | 1800 ms |
+| `test-final.json` | PASS — 4258/0/19 | 0 | 162641 ms |
+| `public-doc-lint-final.json` | FAIL — baseline-red, exact R-1 set of 12 | 1 | 161 ms |
+| `quality-gate-final.json` | PASS | 0 | 7066 ms |
+| `arch-check-final.json` | PASS | 0 | 5258 ms |
+| `publish-dry-run-final.json` | PASS | 0 | 26961 ms |
+
+Mechanical sufficiency was recomputed through `evidence-set.ts` over those eight literal paths only:
+**INSUFFICIENT for exactly one reason**, `public-doc-lint did not pass (FAIL)`. Its measured pair
+comparison returns `exactR1Set=true`; the structured member reports contain 9 contracts plus 3 SDK
+private-type references, with 0 missing JSDoc and 0 other findings.
+
+### Supplemental publish and acceptance evidence
+
+- Direct `deno publish --dry-run --allow-dirty`: contracts PASS across 4 entrypoints / 21 published
+  files; SDK PASS across 12 entrypoints / 60 published files. The canonical workspace dry-run is the
+  PASS receipt above.
+- Root `isolatedDeclarations` is `true`; neither member overrides it. Both members checked every
+  export entrypoint and completed the public-API slow-type pass under that inherited setting.
+- Exact `@netscript/*` pins: contracts has none; SDK has exactly
+  `@netscript/service = jsr:@netscript/service@0.0.6`.
+- JSR audit: contracts has one sanctioned oRPC slow-types INFO and no WARN/FAIL. SDK has two WARNs
+  that are reported without adjustment: `src/` cardinality 13 (cap 12) and the slow-types banner;
+  it has no FAIL.
+- Combined structured contracts/SDK suites PASS, 94/94. Root `test` independently covers all 4258
+  passing repository tests.
+- `deno task docs:exports-drift` PASS; contracts and SDK each report zero omitted symbol groups.
+- `deno.lock` hash remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`, byte-identical to base
+  `21d516224`.
+
+No E2E, Aspire, Docker, browser, scaffold, runtime, or release gate was run; this lane held no
+runtime lease. The evidence commit contains the new receipts, audits, this worklog entry, and the
+rewritten context pack. It is pushed by explicit refspec and followed by the mandatory structured
+slice-3 PR comment, then stops for supervisor Tier-A. The final all-slices separate-session
+IMPL-EVAL and close-gate remain coordinator-owned.
