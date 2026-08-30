@@ -113,11 +113,8 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "await args.value('confirm') !== 'true'")
     assertStringIncludes(output, 'inputType: InputType.Number')
     assertStringIncludes(output, 'inputType: InputType.Boolean')
-    assertStringIncludes(
-      output,
-      'visibility: ResourceCommandVisibility.UI | ResourceCommandVisibility.Api',
-    )
     assertStringIncludes(output, 'iconName: command.iconName')
+    assertStringIncludes(output, 'builder.getConfiguration().getConnectionString(')
     assertStringIncludes(output, 'return await executeDbTool(')
     assertStringIncludes(output, "'aspire', '.helpers', 'run-tool.mts'")
     assertStringIncludes(output, "const child = spawn(\n    'deno'")
@@ -126,7 +123,7 @@ describe('generateDbCliMode', () => {
   it('rejects reset without confirmation before resolving or invoking runtime IO', () => {
     const output = generateDbCliMode({ databases: {} })
     const confirmation = output.indexOf("command.name === 'reset'")
-    const connection = output.indexOf('context.services()')
+    const connection = output.indexOf('builder.getConfiguration().getConnectionString(')
     const mutation = output.indexOf('await executeDbTool(')
 
     assert(confirmation > 0)

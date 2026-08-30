@@ -21,3 +21,12 @@ The named S2 V12 help receipt covers deploy-family commands rather than full `as
 `aspire wait` argv. A separate lifecycle receipt demonstrates wait exit 17; exit 18 is not observed
 in the checked-in research receipts. Phase A treats the dispatch contract as locked and unit-tests
 both exits. Phase B remains responsible for live CLI evidence.
+
+## D-03 — 13.5.3 TypeScript visibility projection is not bit-combinable
+
+The documentation describes `ResourceCommandVisibility.UI | ResourceCommandVisibility.Api`, but
+the restored 13.5.3 `aspire.mts` emits a string enum (`UI = "UI"`, `Api = "Api"`) and
+`CommandOptions.visibility?: ResourceCommandVisibility`. The documented bitwise form fails D-19
+with TS2322/TS2362/TS2363. Slice 5 therefore omits the property and uses Aspire's documented
+default visibility (both UI and API), preserving the intended dashboard and CLI surface without a
+cast. The restored declaration and compiler evidence are cited in the slice-5 receipt.
