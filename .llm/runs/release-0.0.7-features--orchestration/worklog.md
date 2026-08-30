@@ -8883,3 +8883,33 @@ establishing the exact pattern and test shape to follow.
 is dictated by the real OpenAI Responses API wire format, the pattern is already established five
 times over in this exact file, and the acceptance bar is a pure-function unit-test parity with the
 existing `generation_options_test.ts` suite.
+
+## #1591 implementation dispatched — new leaf, first non-#1387 work this run
+
+Scoped and researched myself before dispatching, per the coordinator's instruction to scope/research
+directly for a bounded feature. Confirmed the exact wire shape (`reasoning: { effort }`,
+`max_output_tokens`) against the authoritative OpenAI Responses `create` reference the coordinator
+pointed at, not just the issue's paraphrase — matches exactly.
+
+**Drew and documented an explicit scope boundary the coordinator's own guidance required.** The
+coordinator's coordination evidence about response-side complexity (discriminated-union output items,
+`call_id`/`type` correlation, streaming event names) describes a real, separate, much larger problem
+— whether `@tanstack/ai-openai/compatible`'s existing `api: 'responses'` handling correctly parses
+that shape is unverified and explicitly **not** this slice's concern. Recorded in `research.md` as a
+candidate follow-up rather than folded into #1591, matching the coordinator's explicit "not permission
+to widen #1591's issue ceiling."
+
+New leaf: worktree `/home/agent/projects/netscript/worktrees/007-leaf-1591`, branch
+`feat/ai-openai-responses-mapper` (new, off current `main` `5197e70b7`), run dir
+`.llm/runs/feat-openai-responses-mapper--1591/`. `PLAN-EVAL: N/A` — small, mechanical, complete
+contract/scope/acceptance record; the pattern is already established five times over in the same file
+this slice extends, and the acceptance bar is pure-function unit-test parity with the existing
+`generation_options_test.ts` suite.
+
+Dispatched: thread `01a05510-01ac-7961-a579-80c716a7b59b`, `gpt-5.6-sol · high`, base `0331014fe`,
+dry-run clean. Three-file ceiling; brief gives the exact mapping with field names pre-verified,
+requires proof that `createChatClient` actually selects the new mapper only under `api: 'responses'`
+(not just the pure-function tests), and repeats the out-of-scope boundary verbatim so the implementer
+doesn't rediscover and then ignore it.
+
+**#1387's Slice 9 evaluation remains parked** pending #1792, unaffected by this new leaf.
