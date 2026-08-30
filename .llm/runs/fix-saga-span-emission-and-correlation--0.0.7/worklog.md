@@ -411,3 +411,28 @@ source-compatible. No export-map key or subpath changed.
 
 **Tier-A PASS at `89bfa6ca`**, with Flow-B consumer runtime outstanding as a genuine `NOT_RUN`.
 Cleared for IMPL-EVAL cycle 2 — the second and final permitted cycle.
+
+## Post-cycle-2 correction and main reconciliation (supervisor-owned)
+
+| Commit | Slice | What | Evidence |
+| --- | --- | --- | --- |
+| `f0b01dac` | F-A repair | Select the `saga.handle` span by name, not positional index, in `plugins/sagas/tests/telemetry/publish-trace-linkage_test.ts`. Owner-authorized ceiling item 20, by-name variant. | whole `plugins/sagas` exit 0, **51 passed / 0 failed / 1 ignored** (was 50/1/1); file green at base `f8b4f804` (2/0); no product code touched |
+| `60e0b198` | main reconcile | Merge of main `24f6642f` (merge, not rebase). Sole conflict `export-surface-corpus.generated.ts` resolved **only through `gen:mcp-export-corpus`**, never hand-merged. | `check:mcp-export-corpus` exit 0; `packageCount 35` / `subpathCount 270` unchanged; `symbolCount` 7614 → 7623 from main's own additions |
+
+Why the pin was wrong rather than the product: the test's definition returns `{ kind: 'complete' }` and
+`assertEquals(tracer.started.length, 1)` encoded the pre-leaf world where a `complete` cascade emitted
+no span. Issue target item 1 makes `SagaEngine` emit `saga.cascade.complete`, so the assertion
+contradicted the approved plan. The file was untouched by this leaf and green at base.
+
+Constraint encountered: the file defines its own local `assertEquals`/`assertRejects` and imports
+nothing from `@std/assert`, so `assertExists`/`assertNotEquals` were unavailable; the guard is expressed
+as `assertEquals(handleIndex >= 0, true)`.
+
+Gate results at `60e0b198`, clean tree: `plugins/sagas` 51/0/1; `packages/plugin-sagas-core` 84/0/3;
+`arch:check`, core JSR audit, `publish:dry-run`, `check:mcp-export-corpus`, `check:publish-assets`,
+`check:agent-docs-prose` all exit 0; `deno.lock` byte-unchanged. Ceiling measured against main: 19 leaf
+paths (17 verified + corpus carrier exception + owner-authorized item 20).
+
+**IMPL-EVAL cycle 3 (delta): `PASS_IMPL`** at `60e0b198`, verdict `14889037`. Flow-B consumer runtime
+remains `NOT_RUN` and is the sole outstanding gate before ready-merge; per owner it must run green in
+CI or off-host because local topology is blocked by D-42/D-43.
