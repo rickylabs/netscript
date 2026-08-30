@@ -362,4 +362,6 @@ order recorded; appended to the S8/S9/S10 handoffs. | | Converged-head CI eviden
 policy** (0 pass / 0 fail) — CI evidence for each leaf arrives only after the D-58 retarget to
 `main`; the retarget step therefore also re-earns CI at the exact head. | | S3/S7 side-stack
 converged (D-59) | S3 `85bd4967`, S7 `2f721bf3` on main `3e5cbabf`; identity by range-diff; gates
-green (427/0); pushed with lease; PR notes posted. |
+green (427/0); pushed with lease; PR notes posted. | | S13 staged, not dispatched | Brief + worktree
+ready on S10′; dispatch sequenced after S11 audit/polish (coordinator). #1642 already on milestone
+0.0.7 (applied per the ruling). Runtime zero. |
