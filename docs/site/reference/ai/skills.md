@@ -25,7 +25,8 @@ of five ready-made skills that teach an agent the NetScript vocabulary.
 
 `netscript agent init` installs five first-party skills and a symptom playbook in the canonical
 `.agents/skills/` tree and adds a marked NetScript section to `AGENTS.md` for every host. The
-optional Claude Code host integration writes `.mcp.json` and derives a mirror under
+Claude Code host integration is the fallback default when no host is selected or detected. It
+writes `.mcp.json` and derives a mirror under
 `.claude/skills/`; the VS Code editor writes `.vscode/mcp.json`; Zed writes native
 `context_servers` into `.zed/settings.json`. Select an editor with
 `netscript agent init --editor none|zed|vscode`, including on a cloned existing project. They share
