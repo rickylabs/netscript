@@ -105,7 +105,7 @@ function printHelp(): void {
     '  --pr <n>              Target PR number (checks out PR branch).',
     '  --issue <n>           Target issue number (checks out default branch).',
     '  --prompt-file <path>  Windows path to the dispatch prompt (validated for contract). Required.',
-    `  --model <id>          Literal LiteLLM model id (e.g. openrouter/${OPENROUTER_MODEL_IDS.qwen}).`,
+    `  --model <id>          Literal LiteLLM model id (e.g. openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}).`,
     '  --output <mode>       pr-comment | respond-comments | thread-replies | summary-only.',
     '  --iterations <n>      Max agent iterations (50-3000).',
     '  --provider <name>     Provider gateway override (e.g. openrouter).',

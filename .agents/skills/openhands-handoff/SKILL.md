@@ -8,9 +8,9 @@ description: >
 This skill is the routing card for OpenHands handoffs: comments and labels start cloud work, and the
 required summary artifacts keep local and cloud agents synchronized.
 
-> **Hold lifted (2026-08-12):** generic OpenHands dispatch is fail-closed to the approved open
-> evaluator set. DeepSeek V4 Flash 0731 completed the bounded branch smoke in Actions run
-> `31574668989`; keep one trigger per PR and use the phase/complexity route below.
+> **Current route (2026-08-30):** generic OpenHands dispatch is fail-closed to the approved open
+> evaluator set: Qwen 3.8 Flash for PLAN-EVAL and GLM 5.3 Flash for IMPL/default work. Keep one
+> trigger per PR and use the phase route below.
 
 ## When to Use
 
@@ -31,8 +31,8 @@ required summary artifacts keep local and cloud agents synchronized.
 
 OpenHands is **not** the evaluator for local runs. Two hard rules:
 
-1. **OpenHands runs OPEN models only** — MiniMax M3 for PLAN-EVAL, DeepSeek V4 Flash 0731 for
-   small/simple IMPL-EVAL, and Qwen 3.8 Max for broader/complex IMPL-EVAL. NEVER dispatch OpenHands
+1. **OpenHands runs OPEN models only** — Qwen 3.8 Flash for PLAN-EVAL and GLM 5.3 Flash for
+   IMPL-EVAL/default work. NEVER dispatch OpenHands
    with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed models on
    OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the owner's balance
    — this is prohibited.
@@ -51,18 +51,22 @@ Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-author
 is conditional for complex or decision-heavy work; IMPL-EVAL remains mandatory unless the owner
 explicitly waives it. Generator and evaluator sessions must always differ.
 
-OpenRouter is no longer the primary local evaluator. Use the bound Minimax M3 PLAN preset or
-DeepSeek V4 Flash 0731 IMPL preset only when a third opinion is genuinely required or the native
+OpenRouter is no longer the primary local evaluator. Use the bound Qwen 3.8 Flash PLAN preset or
+GLM 5.3 Flash IMPL preset only when a third opinion is genuinely required or the native
 opposite-family route is quota-blocked. If that OpenRouter escalation is itself limited, use a fresh
 AGY Gemini 3.6 Flash high session on the Google subscription. Rule 1 still applies to OpenRouter and
 OpenHands: only approved open models may use those paid relay surfaces.
 
-**Capability (verified; drift D-4 amended):** both approved open models return a **real reasoning
+**Local Claude/OpenRouter capability:** both approved open models return a **real reasoning
 trace** and have a **verified agentic turn** (real tool calls) on this transport. Both bound
 evaluation presets can therefore run gates and their `effort` is genuine — not nominal. The
 zero-reasoning behaviour is **specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a
 client-wide gap: never cite "GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that
 caveat as a property of the transport or of the evaluator lane.
+
+OpenHands itself cannot currently attest reasoning effort because its adapter does not expose that
+capability. Always state that limitation in OpenHands handoffs and summaries; never claim `max` for
+an OpenHands run even though the local Claude/OpenRouter presets are bound to `max`.
 
 If neither an approved local route nor an authorized cloud run can be launched, record the gap in
 `drift.md` and let the supervisor decide — never self-certify.
@@ -73,7 +77,7 @@ If neither an approved local route nor an authorized cloud run can be launched, 
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | OPEN models only: MiniMax M3 (PLAN), DeepSeek V4 Flash 0731 (small IMPL), Qwen 3.8 Max (broader/complex IMPL). Closed models are PROHIBITED on OpenHands.                    |
+| Model profile    | OPEN models only: Qwen 3.8 Flash (PLAN) and GLM 5.3 Flash (IMPL/default). OpenHands effort is not attestable. Closed models are PROHIBITED.                              |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |

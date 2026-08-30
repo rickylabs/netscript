@@ -430,14 +430,14 @@ Deno.test('formal evaluator defaults to a native opposite-family session', () =>
   }
 });
 
-Deno.test('formal evaluator uses Minimax/DeepSeek only for third opinion or native quota limit', () => {
+Deno.test('formal evaluator uses Qwen Flash/GLM Flash only for explicit open-model routing', () => {
   for (
     const [phase, presetId, model, effort] of [
-      ['plan', 'claude-evaluator-minimax-m3', OPENROUTER_MODEL_IDS.minimax, 'high'],
+      ['plan', 'claude-evaluator-qwen-3-8-flash', OPENROUTER_MODEL_IDS.planEvaluator, 'max'],
       [
         'impl',
-        'claude-evaluator-deepseek-v4-flash-0731',
-        OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+        'claude-evaluator-glm-5-3-flash',
+        OPENROUTER_MODEL_IDS.implEvaluator,
         'max',
       ],
     ] as const
@@ -543,7 +543,7 @@ Deno.test('formal evaluator rejects cross-phase presets', () => {
       fallbackReason: 'third_opinion',
       route: CANONICAL_ROUTE_POLICY.find((entry) =>
         entry.lane === 'formal_impl_evaluation' &&
-        entry.condition === 'third_opinion_or_native_limit'
+        entry.condition === 'open_model_route'
       ),
     }, at)
   );
@@ -554,7 +554,7 @@ Deno.test('formal evaluator rejects cross-phase presets', () => {
       fallbackReason: 'third_opinion',
       route: CANONICAL_ROUTE_POLICY.find((entry) =>
         entry.lane === 'formal_plan_evaluation' &&
-        entry.condition === 'third_opinion_or_native_limit'
+        entry.condition === 'open_model_route'
       ),
     }, at)
   );
@@ -564,7 +564,7 @@ Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
   const at = new Date('2026-07-13T00:00:00Z');
   const route = CANONICAL_ROUTE_POLICY.find((entry) =>
     entry.lane === 'formal_impl_evaluation' &&
-    entry.condition === 'third_opinion_or_native_limit'
+    entry.condition === 'open_model_route'
   )!;
   assertThrows(
     () =>
@@ -581,7 +581,7 @@ Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
   );
 });
 
-Deno.test('formal complex IMPL evaluator selects Qwen 3.8 max', () => {
+Deno.test('formal IMPL evaluator ignores the retired complexity split and selects GLM Flash', () => {
   const at = new Date('2026-08-06T00:00:00Z');
   const route = resolveCanonicalFormalEvaluatorRoute({
     phase: 'impl',
@@ -597,10 +597,10 @@ Deno.test('formal complex IMPL evaluator selects Qwen 3.8 max', () => {
     route.effort,
     route.condition,
   ], [
-    'claude-evaluator-qwen-3-8-max',
-    OPENROUTER_MODEL_IDS.qwen,
+    'claude-evaluator-glm-5-3-flash',
+    OPENROUTER_MODEL_IDS.implEvaluator,
     'max',
-    'complex_third_opinion_or_native_limit',
+    'open_model_route',
   ]);
 });
 
@@ -775,7 +775,7 @@ Deno.test('docs_polish is Claude Fable 5 medium edit-only, with an ordered depth
   equal([noClaude.agent, noClaude.provider, noClaude.model, noClaude.effort], [
     'claude',
     'openrouter',
-    OPENROUTER_MODEL_IDS.glm,
+    OPENROUTER_MODEL_IDS.designGlm,
     'xhigh',
   ]);
   // The last-resort GLM fallback rides the same design-lane claude-openrouter transport.

@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 import { isOpenHandsCommentCandidate } from '../../../../.github/scripts/openhands-comment-trigger.mjs';
 import { OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
@@ -25,20 +25,19 @@ function decision(event: Event): PhaseDecision {
 }
 
 const MODELS = new Map([
-  ['eval:model:minimax', `openrouter/${OPENROUTER_MODEL_IDS.minimax}`],
-  ['eval:model:deepseek', `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`],
-  ['eval:model:qwen', `openrouter/${OPENROUTER_MODEL_IDS.qwen}`],
+  ['eval:model:qwen', `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`],
+  ['eval:model:glm', `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`],
 ]);
 
-async function selectModel(phase: 'plan' | 'impl', labels: string[]): Promise<string> {
+function selectModel(phase: 'plan' | 'impl', labels: string[]): string {
   const selected = labels.filter((label) => label.startsWith('eval:model:'));
   if (selected.some((label) => !MODELS.has(label))) throw new Error('unknown evaluator label');
   if (selected.length > 1) throw new Error('conflicting evaluator labels');
   return selected.length
     ? MODELS.get(selected[0])!
     : phase === 'plan'
-    ? `openrouter/${OPENROUTER_MODEL_IDS.minimax}`
-    : `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`;
+    ? `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`
+    : `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`;
 }
 
 function nextStatus(
@@ -104,15 +103,15 @@ Deno.test('phase evaluator event matrix dispatches only deliberate transitions',
   assertEquals(decision({ action: 'synchronize', labels: ['status:impl-eval'] }), 'ignore');
 });
 
-Deno.test('phase evaluator model labels are exact, optional, and mutually exclusive', async () => {
-  assertEquals(await selectModel('plan', []), `openrouter/${OPENROUTER_MODEL_IDS.minimax}`);
+Deno.test('phase evaluator model labels are exact, optional, and mutually exclusive', () => {
+  assertEquals(selectModel('plan', []), `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`);
   assertEquals(
-    await selectModel('impl', []),
-    `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`,
+    selectModel('impl', []),
+    `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
   );
-  for (const [label, model] of MODELS) assertEquals(await selectModel('impl', [label]), model);
-  await assertRejects(() => selectModel('impl', ['eval:model:not-real']));
-  await assertRejects(() => selectModel('impl', ['eval:model:deepseek', 'eval:model:qwen']));
+  for (const [label, model] of MODELS) assertEquals(selectModel('impl', [label]), model);
+  assertThrows(() => selectModel('impl', ['eval:model:not-real']));
+  assertThrows(() => selectModel('impl', ['eval:model:glm', 'eval:model:qwen']));
 });
 
 Deno.test('formal verdicts advance or return the harness status deterministically', () => {
@@ -164,6 +163,7 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, 'const marker = phaseEvalMarker(claimKey);');
   assertStringIncludes(phase, '@openhands-agent model=${model}');
   assertStringIncludes(phase, 'head=${livePr.head.sha}');
+  assertStringIncludes(phase, 'Reasoning effort: not attested');
   assertStringIncludes(phase, 'decidePhaseEvaluationCurrency');
   assertStringIncludes(phase, 'No evaluator was claimed or dispatched.');
   assertStringIncludes(phase, 'Zero-spend stale evaluator event');
@@ -177,6 +177,7 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(runner, 'liveLabels: liveLabelData.map(({ name }) => name)');
   assertStringIncludes(runner, 'phase: env.EVAL_PHASE || null');
   assertStringIncludes(runner, 'evaluated_head: env.EVAL_HEAD || null');
+  assertStringIncludes(runner, 'Reasoning effort: not attested');
   assertStringIncludes(runner, 'Check out trusted status transition helper');
   assertStringIncludes(runner, 'applyStatusTransition');
   assertStringIncludes(phase, 'run-name: Phase eval PR #');
