@@ -653,3 +653,71 @@ relabel it.
 PR #1746 moved `status:impl` → `status:impl-eval` and out of draft so the `quality` job's docs gates
 actually run — they were skipping only because the PR was a draft, which is why a green draft would
 have been a false readiness signal.
+
+## Two leaves live — #1746 at `84a5fd11`, #1748 at `6b91eb25`, 2026-08-30
+
+### #1746 — content correct throughout; the failures were all mine, on the PR surface
+
+| Head | Evaluation | Verdict |
+| --- | --- | --- |
+| `96501e10` | full IMPL-EVAL (Fable 5) | `PASS`, 7 advisories |
+| `96501e10` | OpenHands cloud IMPL-EVAL | `FAIL_FIX` (F-1: `check:publish-assets` red) |
+| `f2e00668` | bounded delta | `PASS`, full generated-asset sweep clean |
+| `84a5fd11` | bounded delta cycle 2 | `FAIL_FIX` — PR surface only |
+| `84a5fd11` | bounded body-read confirmation | 4/5 satisfied, one residual stale sha |
+
+CI at `84a5fd11`: **8 succeeded** (`quality`, `close-gate`, `check-test`, `build`, …), **13
+skipped** by the `ci:skip-*` labels and path classification. Recorded as a split, not as "green" —
+skipped is not passed.
+
+**The body carried a false statement three separate times**, each true when written and stale after
+the head moved: the "publish-assets deliberately not regenerated" scope claim, DoD box 3, and the
+`check:agent-docs-prose` provenance sha. All three corrected. The lesson is narrow and real: **a PR
+body that cites shas, counts, or scope is a claim about a specific head and must be re-verified on
+every push**, not written once and revisited at the end.
+
+**Correction to the confirmation evaluator, recorded rather than silently accepted.** It asserted
+that `067193acf` "was only ever the MCP carrier's stale value" and that `provenance.json` went
+`18ab8a6ad → 9f5c6a7ea → 51fdb014b`. Checked commit by commit: `provenance.json` reads `067193acf`
+at the base and at `18ab8a6a`, then `18ab8a6ad` at `c9bb3115`, `9f5c6a7ea` at `96501e10`, and
+`51fdb014b` at `84a5fd11`. Its conclusion was right — the cited transition was wrong for this head —
+but its stated reason was not, and correcting the body to match its reasoning would have introduced a
+different false claim.
+
+### #1748 — the #1723 slice-A terminology leaf
+
+Opened draft; `type:docs`/`area:docs`/`area:aspire`/`p2`/`status:impl`, milestone 0.0.7. Gates green
+at `6b91eb25`, verified by this lane. 102/102 manifest rows accounted (8 edited · 91 no-change with
+proving grep · 3 deferred), independently spot-checked. Both `13.4.6` literals preserved.
+
+**Two findings about #1723 itself, not about the work.** `doc:lint` cannot be a bare gate — it
+requires `--root` and lints TypeScript JSDoc, so it is **inapplicable to prose-only slices**, yet
+#1723's acceptance lists it as required and S13 (#1724) inherits the same text. Recorded N/A with
+the reason and scoped evidence; the Aspire lane independently reproduced it and logged it as its
+D-30. Second, `diagrams:check` needs host-only bootstrap (npm cache, temporary Chromium,
+`--no-sandbox`) to execute at all — it ran and all 16 SVGs byte-matched.
+
+### Slice B queued behind #1740
+
+The Aspire lane offered two README rows (`README.md:135`, `plugins/ai/README.md:72`) whose plugin
+install message S5 changes. Checked before accepting: `install-plugin-command.ts:85` prints the port
+**unconditionally** on main and `plugins/ai/scaffold.plugin.json:45` still declares
+`backgroundPort: 8095`, so both lines document main accurately **today**. Ownership accepted;
+sequenced as `S11-B → #1740 merged`. The lane accepted the correction and withdrew its "wrong today"
+framing. #1740 is IMPL-EVAL PASS at `aa822069` but unmerged, gated on a real `e2e-cli` run because
+every repair head was skipped at classification.
+
+### Standing proposal for the coordinator — not filed
+
+Three lanes have now hit one failure mode in three shapes: a gate **omitted** because a false rule
+said it could not fire (this lane's `check:publish-assets`; Aspire D-23), a gate **listed but unable
+to execute** (`doc:lint`), and a gate **present in the checks list but skipped at classification**
+(Aspire `e2e-cli`, F-A on #1740). All three are *believed covered, never executed*.
+
+The compounding property is what makes it worth a policy line: **evaluator independence does not
+protect against a wrong gate list, because every evaluator starts from that list.** Two independent
+IMPL-EVALs re-ran this lane's list and inherited its blind spot; CI was the only thing positioned to
+catch it. A lane-policy line should require a slice to **derive** its gate set — which generated
+artifacts do this diff's inputs feed, and did each listed gate actually execute — rather than carry a
+memorised set. The Aspire lane backs this with drift entries D-23, D-26 and D-30. Neither lane files
+into the milestone; this is the coordinator's call.
