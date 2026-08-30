@@ -54,18 +54,44 @@ describe('generateRegisterTools', () => {
     );
     assertStringIncludes(
       output,
-      "prisma_studio = maybeWithProcessCommand(prisma_studio, 'prisma-studio', 'studio');",
+      "const prisma_studio_errorFile = resolveToolErrorFile(prisma_studio_workdir, 'prisma-studio');",
     );
-    assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
-    assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
-    assertStringIncludes(output, "const prisma_studio_errorFile = resolveToolErrorFile(prisma_studio_workdir, 'prisma-studio');");
-    assertStringIncludes(output, "['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio']");
-    assertStringIncludes(output, "aspire/.helpers/run-tool.mts");
-    assertStringIncludes(output, 'monitorToolFailure(builder, prisma_studio, prisma_studio_errorFile);');
+    assertStringIncludes(
+      output,
+      "['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio']",
+    );
+    assertStringIncludes(output, 'aspire/.helpers/run-tool.mts');
+    assertStringIncludes(
+      output,
+      'monitorToolFailure(builder, prisma_studio, prisma_studio_errorFile);',
+    );
     assertStringIncludes(output, "targetState: 'Finished'");
     assertStringIncludes(output, 'publishResourceUpdate(resource, {');
     assertStringIncludes(output, 'catch(() => undefined)');
     assert(!output.includes('--minimum-dependency-age=0'));
+  });
+
+  it('does not retain the Aspire 13.4 process-command seam', async () => {
+    const template = await Deno.readTextFile(
+      new URL(
+        '../../../../assets/generated/aspire/helpers/generate-register-tools-1.ts.template',
+        import.meta.url,
+      ),
+    );
+    const output = generateRegisterTools({
+      tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
+    });
+
+    for (
+      const forbidden of [
+        'PROCESS_COMMANDS_FLAG',
+        'Aspire 13.4',
+        'maybeWithProcessCommand',
+      ]
+    ) {
+      assert(!template.includes(forbidden), `raw template contains ${forbidden}`);
+      assert(!output.includes(forbidden), `generated output contains ${forbidden}`);
+    }
   });
 
   it('should use resource name as TaskName fallback', () => {
