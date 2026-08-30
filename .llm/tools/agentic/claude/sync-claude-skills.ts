@@ -8,8 +8,16 @@ interface SkillFile {
 const args = new Set(Deno.args);
 const check = args.has('--check');
 const pretty = args.has('--pretty');
+const canonicalAspireRoot = 'skills/aspire';
 const sourceRoot = '.agents/skills';
 const targetRoot = '.claude/skills';
+
+const aspireStale = await syncCanonicalAspire(check);
+if (aspireStale.length > 0 && check) {
+  reportCanonicalAspire('FAIL', aspireStale);
+  Deno.exit(1);
+}
+if (aspireStale.length > 0) reportCanonicalAspire('SYNCED', aspireStale);
 
 const sourceSkills = await collectSkills(sourceRoot);
 const targetSkills = await collectExistingTarget(targetRoot);
@@ -134,4 +142,48 @@ async function removeGeneratedTarget(path: string): Promise<void> {
       throw error;
     }
   }
+}
+
+async function syncCanonicalAspire(checkOnly: boolean): Promise<string[]> {
+  const target = `${sourceRoot}/aspire`;
+  const sourceFiles = await collectFiles(canonicalAspireRoot);
+  const targetFiles = await collectExistingTarget(target);
+  const planned = new Map<string, string>();
+  for (const file of sourceFiles) {
+    const relative = file.path.slice(`${canonicalAspireRoot}/`.length);
+    planned.set(`${target}/${relative}`, file.text);
+  }
+  const stale = diffMaps(planned, targetFiles);
+  if (checkOnly || stale.length === 0) return stale;
+  await removeGeneratedTarget(target);
+  for (const [path, text] of planned) {
+    await Deno.mkdir(dirname(path), { recursive: true });
+    await Deno.writeTextFile(path, text);
+  }
+  return stale;
+}
+
+function reportCanonicalAspire(status: string, staleFiles: string[]): void {
+  const payload = {
+    gate: 'agentic:sync-claude:canonical-aspire',
+    status,
+    sourceRoot: canonicalAspireRoot,
+    targetRoot: `${sourceRoot}/aspire`,
+    staleFiles,
+  };
+  if (!pretty) {
+    console.log(JSON.stringify(payload));
+    return;
+  }
+  console.log(`${payload.gate} ${status}: ${staleFiles.length} stale file(s)`);
+  for (const file of staleFiles) console.log(`  stale: ${file}`);
+}
+
+async function collectFiles(root: string): Promise<SkillFile[]> {
+  const files: SkillFile[] = [];
+  for await (const path of walk(root)) {
+    files.push({ path, text: await Deno.readTextFile(path) });
+  }
+  files.sort((left, right) => left.path.localeCompare(right.path));
+  return files;
 }

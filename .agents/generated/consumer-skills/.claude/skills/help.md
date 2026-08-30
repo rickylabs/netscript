@@ -4,13 +4,19 @@ A symptom-to-action playbook for the non-deterministic problems: things that han
 silently do nothing. **Reach for this before you start guessing**, and before you conclude the
 framework is broken.
 
-Every command here was verified against **Aspire CLI 13.4.6**, **Deno 2.9.3** and **NetScript
-0.0.3**. Where a command does not exist, this file says so.
+Aspire-specific commands here were re-verified against **Aspire CLI 13.5.3**; see the receipt index
+in `aspire/SKILL.md`. Where a command does not exist, this file says so.
 
 > **The one rule this file exists to teach.** In the last round five agents lost hours to problems
 > the toolchain would have answered in seconds, because they hand-rolled `curl` probes instead of
-> asking the runtime. `aspire otel` — the command that shows logs, spans and traces — was run
-> **zero times** across all five. Ask the tools first.
+> asking the runtime. `aspire otel` — the command that shows logs, spans and traces — was run **zero
+> times** across all five. Ask the tools first.
+
+## Framework or package guidance is unavailable offline
+
+Run `netscript agent init --with-docs`. It installs a version-checked offline corpus and reports the
+local task-router entrypoint. The API portion is generated from the exact NetScript packages in the
+project, including every published export subpath.
 
 ---
 
@@ -41,9 +47,9 @@ aspire resource <resource> stop                              # stop one resource
 aspire stop --apphost <exact-AppHost-path> --non-interactive --nologo
 ```
 
-**Never kill `aspire mcp start`** — those are your MCP servers, not AppHosts.
+**Never kill `aspire agent mcp`** — those are your MCP servers, not AppHosts.
 
-On a shared machine, confirm the thing answering a port is yours: compare the resource's *assigned*
+On a shared machine, confirm the thing answering a port is yours: compare the resource's _assigned_
 port from `aspire describe --format Json` against the fixed/default port you are probing. A foreign
 service on a default port will happily answer and look healthy. If stopping the AppHost does not
 restore a clean state, run `aspire doctor --format Json --non-interactive --nologo`; leave leftover
@@ -129,10 +135,9 @@ proof that the runtime registry is correct.
 
 1. **`deno doc jsr:@netscript/<pkg>/<subpath>`** — the exported surface, including every export
    subpath. The helper you want is usually a few exports below the general-purpose one you already
-   found. Offline copies are in `docs/deno-doc/`. Use `NO_COLOR=1` — `deno doc` emits ANSI escapes
-   even when redirected, which corrupts every grep.
-2. **The official NetScript docs**, via the MCP server or `docs/llms-full.txt` (one grep across the
-   whole corpus beats guessing which page).
+   found. Use `NO_COLOR=1` — `deno doc` emits ANSI escapes even when redirected, which corrupts
+   every grep.
+2. **The official NetScript docs**, through the connected NetScript MCP server when available.
 3. Only then, the source.
 
 Guessing an API signature and iterating against the type checker is slower than reading it once.
@@ -141,7 +146,7 @@ Guessing an API signature and iterating against the type checker is slower than 
 
 **Verify the artefact, never the exit code.**
 
-A piped command reports the exit status of the *last stage in the pipe* — `deno task check | tail`
+A piped command reports the exit status of the _last stage in the pipe_ — `deno task check | tail`
 exits `0` while type checking fails. An `&&` chain short-circuiting on a no-op produces a false
 success.
 
@@ -177,9 +182,9 @@ aspire stop --apphost <exact-AppHost-path> --non-interactive --nologo
 
 Re-run `aspire ps` and `aspire describe` after stopping. Aspire's `dcp` helper processes can take
 about 20 seconds to exit, so re-check rather than killing them. Leaving AppHosts running is how the
-*next* run gets a port conflict it cannot explain; leftover containers are Aspire's to reclaim. If
+_next_ run gets a port conflict it cannot explain; leftover containers are Aspire's to reclaim. If
 cleanup still looks wrong, use `aspire doctor --format Json --non-interactive --nologo` to diagnose
 the container runtime, SDK, and certificates.
 
-`aspire cache clear` clears only the Aspire CLI's disk cache. It does **not** stop AppHosts or remove
-containers, so use it only for a CLI-cache problem—not as runtime cleanup.
+`aspire cache clear` clears only the Aspire CLI's disk cache. It does **not** stop AppHosts or
+remove containers, so use it only for a CLI-cache problem—not as runtime cleanup.
