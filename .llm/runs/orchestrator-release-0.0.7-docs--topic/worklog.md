@@ -2331,3 +2331,55 @@ Umbrella safety confirmed in **both** the body and the commit messages: `Closes 
 
 Supervisor-dispatched exact-head IMPL-EVAL running, briefed to attack the exclusivity claim and to
 run the modal-verb sweep this lane has now needed on three consecutive slices.
+
+## 2026-08-30 — #1783 shipped as `38439740f`
+
+| PR | Issue | Merge SHA |
+| --- | --- | --- |
+| #1783 | #1782 | `38439740f248ef2ba5f173dad96b2edaa829392c` |
+
+Six docs PRs shipped this session (#1746, #1748, #1755, #1761, #1772, #1780, #1783 — seven counting
+#1780). **Umbrella #1777 remains OPEN** and no PR has ever carried a closing keyword against it.
+
+### The stall, and what actually caused it
+
+`close-gate` failed for ~8 minutes with #1782's acceptance boxes unticked. The evaluator had already
+returned `PASS`; nothing was waiting on it. The cause was **ordering**: the CI run was triggered by my
+push of the evaluator-report carrier, which happened **before** I applied `status:ready-merge`. The
+acceptance mirror self-skips without that label, so the boxes stayed unticked and close-gate failed on
+them — correctly.
+
+Re-running with the label live ticked all five with provenance (4 → 9, zero unchecked) and turned the
+gate green. The mirror was left to do it rather than hand-ticking, per the correction earned earlier
+in this session.
+
+**Rule earned: apply `status:ready-merge` *before* pushing anything that triggers CI.** Otherwise the
+first run is guaranteed to fail on unticked boxes, and the failure looks like a defect rather than a
+sequencing error.
+
+### What the slice established
+
+The false `/public` claim is gone. The evaluator enumerated all nine published entrypoints via
+`deno doc --json` and computed the exclusive set independently: **exactly**
+`{AspireError, AspireRuntime, DuplicateContributionError, ReferenceSpec}` — complete **and** minimal.
+
+One advisory recorded on #1777 rather than folded in: `/public` also **omits** 17 symbols the
+sub-paths publish (12 `/config`, 3 `/types`, 2 root diagnostics). Not false under `entrypoints-only`,
+but a hard prerequisite before re-adopting `aspire` at `mode: 'complete'`.
+
+### Next slice verified before filing — `logger`
+
+Confirmed on `38439740f`, **with a positive control** after three false-signal probes this session:
+
+- The page's `## Sub-path exports` section says *"Their reference pages are **generated separately**
+  from their own `deno doc` surface."*
+- **No such pages exist.** `docs/site/reference/logger-middleware`, `logger/middleware`,
+  `logger-orpc`, `logger/orpc` all return zero tracked files.
+- The sub-path symbols are documented nowhere: `LoggerContextVariables`, `LoggerMiddlewareOptions`,
+  `injectLogger`, `LoggerMiddleware`, `LoggerMiddlewareEnv` each appear **0** times in the page.
+- Source: `middleware.ts` has 13 export statements, `orpc.ts` 2.
+- Positive control: `RequestLogContext` (a documented root symbol) returns 1, so the grep is sound.
+
+Same defect class as `aspire`'s: **a page pointing somewhere that does not exist**. Larger, because
+`aspire` hid four symbols behind a false claim while `logger` hides its entire `/middleware` and
+`/orpc` surface behind a promise of pages that were never generated.
