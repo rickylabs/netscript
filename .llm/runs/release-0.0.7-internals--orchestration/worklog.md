@@ -3682,3 +3682,44 @@ the repository. It is already established practice here (earlier internals slice
 file), so this is pre-existing repo-wide drift rather than a novel leak by this leaf, and I am not
 blocking the gate on it. Flagged for the coordinator: either the launcher should stop writing it into
 a committed path, or the rule should be retired as unenforced.
+
+## 2026-08-30 — #1533 draft PR #1756 open; denominator independently confirmed; plan gate still open
+
+### PR surface correct on first attempt
+
+**#1756** `test(docs): compile published JSDoc examples` — draft, base `main`, head
+`a1a4328ba4706f3fe8e7c541e43763975a8df485`, milestone `0.0.7`, **`Closes #1533`** present, labels
+`type:test` + `area:tooling` + `area:docs` with exactly one `status:` (`status:research`). Nothing to
+correct, which is a change from the last two leaves.
+
+### The author's denominator claim verified independently
+
+The research asserts 35 publishable workspace members as the gate's universe. My first probe was a
+hand-rolled `deno.json` walk and it returned nonsense (5 members) because the workspace list uses
+globs my parser did not expand — **the exact anti-pattern this repo's tooling rules exist to
+prevent**, and I caught myself doing it. Re-ran through the repo's own
+`.llm/tools/release/publish-workspace.ts::discoverWorkspaceMembers`:
+
+```
+publishable members discovered: 35
+```
+
+Confirmed. The lesson is the one `AGENTS.md` states directly — use the repo-native tool rather than
+re-deriving its logic badly. A wrong hand-rolled denominator would have made me challenge a correct
+plan.
+
+### Plan gate deliberately still open
+
+`plan.md` remains the 4-line seed; the author is at 14:02 on the design checkpoint, launcher pid
+alive and writer lock held. It has not submitted, which matches the seed's own instruction not to
+reach PLAN-EVAL before the locked decisions exist. Not rushing it: the fix-or-baseline policy is the
+substance of this gate.
+
+Event-driven supervision active on both surfaces — `watch-run.ts` over `plan.md` (re-armed after its
+one-shot fire on `research.md`) and a condition loop keyed on plan growth, a new commit, or launcher
+**pid** exit.
+
+### #1747 preserved, verified not assumed
+
+`c1e03922ad02416ea31219df94422f062ac33690` — local == remote == PR `headRefOid`, worktree clean,
+untouched. #1734 likewise parked at `eb765629206092f97b3dd8f76a64fa0c3769bcb8`, draft.
