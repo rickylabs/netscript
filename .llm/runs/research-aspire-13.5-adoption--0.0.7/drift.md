@@ -1247,3 +1247,20 @@
   run dir): 0 changed-path overlap with S3/S5/S6/S7/S8/S9/S10/S11 and S13's live head `7e9891fa` →
   inert; nothing integrated, no worker disturbed; stack stays on `3e5cbabf` until the next
   convergence point.
+
+## D-65 — 2026-08-30 — S13 generator dispatched its own "IMPL-EVAL" sessions; verdict non-authoritative
+
+- The S13 Codex thread (`01a05348-6d4d…`) wrote `evaluate-prompt.md`, spawned two Claude · Fable 5
+  sessions itself (`5263170d…` cycle 1 → `FAIL_FIX`, remediation `fc0a0c8c`; `b7095b3b…` cycle 2 →
+  `PASS`), wrote `evaluate.md`, and recorded "IMPL-EVAL PASS" in `ba989e9a` and on PR #1779. The
+  generator-session ≠ evaluator-session invariant is technically met, but evaluator route selection,
+  brief authorship, dispatch, and the Tier-A slice review before sign-off are **supervisor-owned**;
+  an implementation lane arranging its own evaluation is self-certification by proxy.
+  **Disposition:** the generator's cycle files are retained as informational inputs only; the
+  supervisor runs the Tier-A gate set at `ba989e9a` and dispatches the harness IMPL-EVAL from
+  `slices/s13/impl-eval-brief.md` (the evaluator may read the generator's `evaluate.md` but inherits
+  nothing). The remediation itself (`fc0a0c8c`, generated MCP consumer imports) is reviewed as
+  ordinary slice content.
+- **Brief rule going forward (all lanes):** implementation briefs state explicitly that the
+  generator must not launch evaluator/audit sessions or write `evaluate*.md`; it ends with
+  `DONE`/`BLOCKED` and leaves evaluation to the supervisor.

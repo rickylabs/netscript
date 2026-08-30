@@ -411,4 +411,9 @@ budget; one-clause clarification queued as a non-blocking follow-up for S11's ne
 callout title kept (H5 ruling). | | S11 Phase A terminal | #1772 reconcile landed (`4c370482`,
 docs-only, DONE; all #1772 additions present, S11 corrections kept). Handoff finalized; PR #1771
 handoff comment posted. Leaf terminal; merge prerequisites recorded. | | Main advanced (coordinator)
-| `24f6642f` (#1763). 0 overlap with every Aspire branch incl. live S13 → inert; recorded only. |
+| `24f6642f` (#1763). 0 overlap with every Aspire branch incl. live S13 → inert; recorded only. | |
+S13 thread DONE; self-eval non-authoritative | Thread `01a05348-6d4d…` closed `DONE` at `ba989e9a`
+(PR #1779 draft, base S10′, 8 slices). It dispatched its own Claude "IMPL-EVAL" sessions and
+recorded PASS — treated as non-authoritative (D-65); supervisor Tier-A gate fork running; harness
+IMPL-EVAL brief filled (head `ba989e9a`, PR #1779). #1724 → `status:impl`. Eval worktree
+`007-aspire-s13-eval` @ `ba989e9a`. |

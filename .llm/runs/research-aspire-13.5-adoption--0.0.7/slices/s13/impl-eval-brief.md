@@ -12,8 +12,8 @@ from the generator thread and the supervisor; you inherit no verdict and self-ce
 
 - Slice: **S13 — stale version-bound surface cleanup, D-17 telemetry resolver, parity phase 2**
   (#1724, PR **PR** draft, base `test/aspire-13-5-s10-e2e-gate-upgrades`; epic #1712; canary C).
-  Evaluate **exactly** head `__HEAD__` on `chore/aspire-13-5-s13-stale-surface-cleanup`; base = S10′
-  `a46ea16d` (evaluate only `a46ea16d..__HEAD__`). Your worktree:
+  Evaluate **exactly** head `ba989e9a` on `chore/aspire-13-5-s13-stale-surface-cleanup`; base = S10′
+  `a46ea16d` (evaluate only `a46ea16d..ba989e9a`). Your worktree:
   `/home/agent/projects/netscript/worktrees/007-aspire-s13-eval` (detached at that head; product
   files read-only). Supervisor run dir (absolute):
   `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`
@@ -32,6 +32,14 @@ from the generator thread and the supervisor; you inherit no verdict and self-ce
   `aspire ps --format Json --nologo --non-interactive` (read-only) for the empty-list shape;
   `aspire ps` must stay `[]`. Host AppHost gates are environment-blocked (D-42/D-43/D-55) — not a
   slice defect.
+
+## Note on prior artifacts
+
+The generator thread itself spawned two Claude sessions it called "IMPL-EVAL" and wrote
+`.llm/runs/chore-aspire-13-5-s13-stale-surface-cleanup--phase-a/evaluate.md` + `evaluate-prompt.md`
+on the branch, then recorded `PASS` (D-65). Those are **informational only** — you inherit nothing
+from them; you may read them to find what was remediated in `fc0a0c8c`, but every verdict input must
+be re-executed by you.
 
 ## What to verify (execute yourself)
 
