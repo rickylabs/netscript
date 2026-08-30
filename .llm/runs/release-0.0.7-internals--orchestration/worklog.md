@@ -3382,3 +3382,34 @@ fail, the earlier attribution was wrong and that is a finding about this lane's 
 about the leaf.
 
 A red that is genuinely pre-existing gets proved against `main` before it is called pre-existing.
+
+### Stale lease reconciliation — the only stale lease was mine, and it was self-inflicted
+
+With the #1732 author turn ended (thread `01a0517d` reports `idle` / `turn complete`, no
+`codex exec resume` process), I reconciled what still held the leaf before dispatching anything.
+
+**The Codex writer lease was already clean.** `/home/agent/.codex/thread-writer-locks/` holds eight
+`.lock` files; **none** is `01a0517d-*.lock`. The lease that rejected two of my earlier sends had been
+released properly when the turn ended. Nothing to force, and I forced nothing.
+
+**The stale holders were my own background waiters**, and the cause is worth recording because it
+will recur. I armed them as:
+
+```
+until ! pgrep -f "codex exec resume 01a0517d" >/dev/null 2>&1; do sleep 30; done
+```
+
+`pgrep -f` matches against full command lines — including **the waiter's own**, since the bash `-c`
+string contains that literal text. So the predicate could never become false and the loops would have
+spun forever, holding the leaf worktree as cwd long after the author finished. Two of them
+(`175496`, `233328`) were doing exactly that.
+
+Released **only** those two, and only after proving ownership from `/proc/<pid>/cmdline` matching my
+own `until`-loop string — not by name, not by cwd, not by assumption. Every other process on the host
+was left alone. Subsequent waiters watch the **git head** instead, which cannot self-match.
+
+This is the third instance this session of the same underlying error: **the observation tool was
+included in the thing being observed.** `codex-resume` exit 0 described the launcher rather than the
+send; my `timeout` wrapper killed the turn it was meant to bound; `pgrep -f` matched the watcher
+rather than only the watched. Each time the fix was to check the target directly — `ps` against the
+real pid, the commit graph, the git head.
