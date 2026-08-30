@@ -4933,3 +4933,45 @@ Intersection with this leaf's surface: `.claude/**` **0**, `.llm/tools/agentic/c
 3 files dirty). Rebasing under an active worker corrupts its tree; the rebase belongs at the clean
 checkpoint, as with every leaf this milestone. Watcher `bv2r41hxb` armed on commits, turn end, and
 rollout-growth stall.
+
+## D-79 — #1774 converged onto current main; exact-head Tier-A in flight
+
+- **Author turn ended clean** at `1d3451845af400cc3bd4aec650bf7ec0bcda18d1` (local == remote, dirty 0,
+  writer lock released). Committed gate table recorded: root `deno task test` exit 0
+  (4,284 passed / 0 failed / 19 ignored); S5 cumulative format PASS reported as
+  "12 changed counted; 10 authored processed, 2 generated excluded"; Claude surface validator PASS;
+  no-host-path/permission-minimum PASS (nine-case matrix); no-`any` PASS; launch-root, nested-cwd,
+  temp-decoy, and direct-cwd fallback child-process cases PASS. Aspire / Docker / Browser /
+  `e2e:cli` / `scaffold.runtime` all NOT_RUN, "no command or process launched".
+- The S5 row is the substantive PLAN-EVAL cycle-2 fix: the receipt now counts **all 12 changed
+  files** and names the 2 generated exclusions, closing the subset-coverage false-green class rather
+  than reporting a passing subset.
+- **NOT_RUN claim independently verified, and attribution changed the conclusion.** Host showed 4
+  containers. Before reporting a lease violation I attributed them: all four are `relay-s7-rerun-*`,
+  created 21:29–21:30, **no AppHost label, zero labels referencing 1774**; no aspire/dcp/dotnet
+  process has a cwd under `007-leaf-1774`; `aspire ps` reports no running AppHost. They belong to
+  the **Aspire lane's S7 rerun**, which holds the sole runtime lease. Foreign — left untouched.
+  - **Lesson recorded.** My reflex was to report "containers: 4" as a violation. That would have
+    escalated falsely against another lane, and acting on it would have torn down another lane's
+    live gate — the exact failure committed against #1736 at D-70. *Attribute resources before
+    judging them; ownership is proven by label and path containment, not by presence.*
+- **Convergence:** rebased onto current main `74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9`. 11 commits
+  replayed, **exit 0, zero conflicts** — empirical confirmation of the D-78 zero-intersection audit.
+  New head `51a7bafe1381ecc85a667dbee61953c92bf999d4`. True scope from merge-base unchanged at
+  **8 files** (identical list): `.claude/settings.json`, two mirrored SKILL.md, agentic README,
+  `claude-hook-log.ts`, `claude-hook-log_test.ts`, `validate-claude-surface.ts`, `deno.json`.
+- **Push error worth recording: I fabricated a lease SHA.** The first
+  `--force-with-lease` used `1d34518455f0d05e60a5e63dfe5b3d5bfeee54ef` — I hand-extended the short
+  `1d3451845` into full length instead of resolving it. Push rejected as "stale info"; the true SHA
+  is `1d3451845af400cc3bd4aec650bf7ec0bcda18d1`. Re-pushed with `git rev-parse`-resolved
+  expectation, exit 0, local == remote == `51a7bafe1`.
+  - *Never hand-extend an abbreviated SHA into a full one — resolve it. The lease rejected an
+    invented identifier, which is precisely the failure mode an explicit lease value exists to
+    catch.* Same family as the D-31 census error: a plausible-looking value substituted for a
+    measured one.
+- The author's gate table certifies `1d3451845`, **not** the rebased tip, so it does not carry
+  forward. Exact-head Tier-A relaunched at `51a7bafe1` (root test, scoped check/lint/fmt, Claude
+  surface validator, `agentic:check-claude`, `arch:check`); monitor `bumad2sfd` armed on per-gate
+  exits plus death/timeout signatures.
+- Evaluator worktree `007-eval-1774-impl` created detached at `51a7bafe1`, dirty 0. IMPL-EVAL brief
+  finalized, zero placeholders remaining. Dispatch is gated on Tier-A, not on Aspire.
