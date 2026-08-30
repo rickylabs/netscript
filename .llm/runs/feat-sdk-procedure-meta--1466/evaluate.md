@@ -724,3 +724,114 @@ What must change — **not before this merge, but before the next leaf relies on
 | Rationale | Approved scope is complete across all three slices and was re-derived here: the S2 declarations preserve exact metadata and exact error literals through direct clients, `defineServices` clients and query factories, and every one of seven product-level breakages turns the real-export fixture red (plus an inferred-route probe green); S3's publish evidence re-runs green (workspace and per-member dry-runs, inherited `isolatedDeclarations`, exact pins, audits with no FAIL) and G-4 is closed without re-exposing the private value; the required G-1 forgery goes red; `public-doc-lint` is 12 = 12 with the exact R-1 set at the final head; `docs:exports-drift`, `quality:gate`, package suites 94/94 and root `test` 4258/0/19 are green by my own runs; all eight receipts at each content head attest `gitHead == actualGitHead` with real `test` PASSes and no `SKIPPED`; four archives are byte-intact and append-only, G-7's restoration byte-faithful; `deno.lock` is unchanged across the branch; no doctrine violation or debt was introduced; S1 is not regressed. The open items — H-1/H-2 (a text-pin forgery class already bounded by cycle 2's G-1 judgement, with no consumer-visible effect), H-3 (supervisor bookkeeping), H-4 (base-inherited debt) — are non-blocking follow-ups that need no implementation lane on this leaf. Close-gate form (PR body keyword, acceptance mirror, ready-flip, CI matrix, label) is the coordinator's and the merge is human. |
 
 Failure count for this leaf's IMPL-EVAL loop: unchanged at 1 of 2. No re-evaluation scope: this verdict is terminal.
+
+---
+
+# IMPL-EVAL currency renewal at `d5f3bf4c` — does the terminal `PASS` carry forward? (session `2f492178`)
+
+## Metadata
+
+| Field | Value |
+| --- | --- |
+| Run ID | `feat-sdk-procedure-meta--1466` |
+| Target | **Currency renewal only.** The terminal all-slices `PASS` (session `8d9946e6`, content heads `42874803`/`2863d29e`/`9ab779ce`) is not reopened. Question ruled: does that verdict still hold at content head `d5f3bf4c` (evidence head `dbd3eafa`) after a one-paragraph tagline repair, two `--no-ff` merges of `main` (`952cc106` #1748, `a5520e70` #1755) and one tooling regeneration of the shared-asset cascade. |
+| Archetype | unchanged — 2 (`packages/sdk`, governing) + 1 (`packages/contracts`) + docs overlay |
+| Evaluator | Claude Fable 5 · medium, `formal_impl_evaluation` (`lane-policy.md:46`, native opposite-family for Codex work), fresh separate session `2f492178`, 2026-08-30. Different session from `8d9946e6` (terminal PASS), `b247bef9` and `a103dbb6` (the two currency sessions stopped before a verdict when `main` advanced), and from every generator. |
+| Worktree | `/home/agent/projects/netscript/worktrees/ns1466-impleval-c4`, detached at `dbd3eafa`; `007-leaf-1731` (author) not touched (D-19). Two scratch detached worktrees (`origin/main` `a5520e70` for the doc-lint baseline; `9ab779ce` for the publish-surface comparison) were created under the job tmp dir and removed with `git worktree remove` afterwards. |
+
+### Immutable identity
+
+- `git rev-parse HEAD` = `origin/feat/sdk-procedure-meta` (fetched live) = PR #1731 `headRefOid` (live `gh`) = **`dbd3eafa6670d90148f52e2f7beec75155267ab6`**. All three agree. Content head `d5f3bf4c159d…` is `HEAD^` (the evidence commit `dbd3eafa` touches only the run dir).
+- `origin/main` = `a5520e70`; `git merge-base a5520e70 d5f3bf4c` = `a5520e70` — the branch is exactly main plus the leaf.
+- PR #1731 OPEN, **not draft**, `MERGEABLE`, milestone `0.0.7`, labels `status:impl, type:feat, priority:p1, area:sdk, area:contracts, epic:sdk-client-contrib, impl-eval:skip` (exactly one `status:`); body carries `Closes #1466`. All coordinator-owned; not touched.
+- `deno.lock` blob `a1522e6e…` at `21d51622` (original base), `9ab779ce`, `a5520e70` (main), `d5f3bf4c`, `dbd3eafa`. **Byte-unchanged across the whole branch and equal to main's.**
+- Tree clean before, after every perturbation, and at the end (`git status --porcelain` empty; `git diff --quiet HEAD` true).
+
+## Re-measurement (nothing below is taken from the supervisor, the brief, or the stopped sessions)
+
+### 1. What moved since the terminal `PASS` — the "README only" claim
+
+The naive `git diff 9ab779ce..d5f3bf4c -- packages plugins` is *not* the right check: it shows 11 files, but ten of them (`packages/cli` background-reference/agent-init, `packages/prisma-adapter-mysql`) arrived from `main` via #1728/#1729/#1711 and the two merges. The correct check is the branch's delta **over its base** at each end: `git diff 21d51622..9ab779ce` (old base → S3 head) versus `git diff a5520e70..d5f3bf4c` (new base → new head), both over `packages plugins` excluding the generated carriers. The two patches (1084 vs 1086 lines) differ **only** in the `packages/contracts/README.md` tagline hunk. `git diff 9ab779ce..d5f3bf4c -- packages/contracts/src packages/sdk/src packages/contracts/tests packages/sdk/tests` is **empty**. The claim holds: no product source or test changed beyond the tagline paragraph.
+
+### 2. The tagline
+
+- `deno task docs:tagline:check` → `checked=36 over=0`, exit 0. Independently, `taglineBytes()` from `.llm/tools/validation/check-jsr-tagline-length.ts` (the same extractor `jsr-set-package-settings.ts` uses) reports **contracts 246 B** (sdk 215 B); my own `TextEncoder` measurement of the bold paragraph's inner text is also 246 B. Cap 250, margin 4.
+- Faithfulness: `main`'s 235 B tagline names (a) contract-first vocabulary for NetScript boundaries, (b) an oRPC base contract, (c) the standard error map, (d) Zod pagination and error schemas, (e) CRUD/query/transform builders, (f) services and clients kept in sync. The repaired text keeps all six and adds **`NetScript-owned procedure metadata`** — the slice-1 ownership claim. The words dropped (`The`, `-backed`, `handlers`, `typed`) are stylistic; "typed clients" → "clients" is the only one that carries any meaning, and the README body two paragraphs down states "the SDK generates typed clients from it", so nothing consumer-facing is lost from the package description. **Judged faithful; nothing material lost.**
+
+### 3. `public-doc-lint` at `d5f3bf4c` vs the new `main` `a5520e70` — set identity
+
+Ran the plan's 16-entrypoint argv (`plan.md:233`, 19 elements) here and in the scratch `a5520e70` worktree. Both exit 1, `Found 12 documentation lint errors.` Sorted `(public symbol → private type)` pairs, ANSI-stripped, paths ignored: **9 identical**; `main`-only `BaseContractOutputRoute→BaseContractErrors`, `BaseContractRoute→BaseContractErrors`, `baseContract→oc`; head-only `BaseContractErrors→MergedErrorMap`, `baseContract→ContractBuilder`, `baseContract→Schema`. **Exactly the R-1 set**, now against a `main` two merges newer than the one the terminal `PASS` measured. Delta 0 preserved.
+
+### 4. Receipts — read by argv and duration, not exitCode
+
+All eight `receipts/*-final.json`: `attempt` = **12**, `invocationId` = `1466-<gateId>-final`, **`gitHead == actualGitHead == d5f3bf4c`** on every file, `cwd` = `007-leaf-1731`. `public-doc-lint` argv = **19 elements** (the plan's explicit entrypoint list), 178 ms, exit 1 — a real gate result. `test` exit 0 in 174 334 ms with summary `passed 4275 / failed 0 / ignored 19 / uniqueFailures 0`, outcome `PASS`, no `SKIPPED`. The six others exit 0 at plausible durations (`check` 23 s, `lint` 6.7 s, `fmt-check` 1.9 s, `quality-gate` 7.5 s, `arch-check` 5.3 s, `publish-dry-run` 28.7 s). The attempt-10 archive (`frozen-75b78220/public-doc-lint-final.json`) carries the defect exactly as briefed — argv `["deno","doc","--lint"]`, 7 ms, exit 1 — and is retained unchanged; I did not read it as evidence. The attempt-11 archive (`frozen-b01ffcd8`) already carries the 19-element argv at 164 ms.
+
+### 5. Seven archives — byte-intact and append-only
+
+`frozen-c9a391811`, `frozen-235482767`, `frozen-42874803` (9 files, G-7's restored `SKIPPED` record included), `frozen-2863d29e`, `frozen-9ab779ce`, `frozen-75b78220`, `frozen-b01ffcd8`. For each: every file's working-tree bytes equal the committed blob, and `git log --all --diff-filter=MD -- <dir>` is **empty** — no archive file has ever been modified or deleted in any ref.
+
+### 6. Gates re-run by me at `dbd3eafa` (product tree = `d5f3bf4c`)
+
+| Gate | Result |
+| --- | --- |
+| `docs:tagline:check` | exit 0, `over=0` |
+| `docs:exports-drift` | exit 0, `PASS` (contracts `mode=complete`, 0 omitted groups) |
+| `check:mcp-export-corpus` | exit 0 |
+| `check:publish-assets` | exit 0 |
+| `check:assets-barrel` (gen + `git diff --exit-code`, run on the clean committed tree) | exit 0; tree still clean afterwards |
+| `check:agent-docs-prose` | exit 0, `{"fresh":true,"stalePaths":[]}`, provenance `sourceCommit 85dfe90b7` |
+| `quality:gate` (`quality:scan` + `arch:check`) | exit 0 |
+| contracts suite | **16 passed / 0 failed** |
+| sdk suite | **78 passed / 0 failed** (94/94 together) |
+| root `test` (the contracted task) | exit 0, **4275 passed / 0 failed / 19 ignored**, 212 s, no `SKIPPED` — matches the attempt-12 receipt's summary exactly |
+| `publish:dry-run` (workspace) | `Success Dry run complete` |
+| `deno publish --dry-run` per member (`contracts`, `sdk`) | both `Success`, slow-type check clean |
+
+Published file surface, head vs `9ab779ce` (scratch worktree): `sdk` **60 files, identical list and sizes**; `contracts` **21 files, identical** except `README.md` 5.97 KB → 5.94 KB — the tagline trim and nothing else.
+
+### 7. Consumer-visible effect of the merges and the regeneration
+
+The generated carriers' delta over `main` (`agent-docs.generated.ts`, `provenance.json`, `prose.json.gz`, `export-surface-corpus.generated.ts`, `publish-assets.generated.ts`) consists of `sourceCommit`/`extractionTimestamp`/byte-count/sha lines and the recompressed corpus payload — i.e. exactly what regenerating from tooling produces when its inputs (`packages/contracts/README.md`, `docs/site/reference/contracts/index.md`) differ from `main`'s. All four `check:*` freshness gates are green, so the carriers are the tooling's output for this tree, not a hand-merge. Contracts/SDK source is byte-identical to `9ab779ce` (§1), and the R-1 doc-lint set (§3) and the publish surface (§6) are unchanged. **Nothing a consumer sees moved beyond the 246 B tagline.**
+
+### 8. The G-1 anchored pin at this head — the unverified probe
+
+Baseline: `assertion-budget_test.ts` 5/5. Perturbation **B2 + dead decoy** applied to `contract-primitives.ts` (initializer meta → `NetScriptProcedureMeta & { readonly extra?: string }`, plus `const _legacyBase = oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap); void _legacyBase;` appended): `deno check` of primitives + both fixtures + inference probe **exit 0**, `deno lint` **exit 0** — the forgery slips past both contracted gates, as cycle 2 and the terminal pass recorded — and the pin goes **RED**: `FAILED | 4 passed | 1 failed`, `AssertionError: Values are not equal` (count ≠ 1). Reverted with `git checkout --`; `git status --porcelain` empty, `git diff --quiet HEAD` true; pin back to 5/5. The tree under evaluation is the one that was evaluated, and H-1/H-2 remain as recorded (identifier-rebinding forgery, `[^=;]` span) — not re-probed, not reopened.
+
+### 9. CI reading
+
+Run `33313731785` at `dbd3eafa` (in progress while this was written): `classify changes` success, `quality` success, `close-gate` **failure**, `check-test` pending. The `close-gate` red is the briefed ordering artifact — `Closes #1466` in the body while the acceptance mirror has not run — not a code defect; `quality` (which hosts `JSR tagline length` and `Agent docs corpus freshness`) is green at this head, which is the substantive fact.
+
+## Findings
+
+| ID | Severity | Finding | Evidence | Required action |
+| --- | --- | --- | --- | --- |
+| **C-1** | low, non-blocking | The run's prose artifacts are not current with the evidence head. `worklog.md` ends at the `75b78220` tagline section; `worklog.md`, `context-pack.md`, `drift.md` and `supervisor.md` contain **zero** mentions of `b01ffcd8`, `d5f3bf4c`, `1539e81f`, attempt 11/12, the two `--no-ff` merges, the four-carrier merge conflict resolved by regeneration, the `Agent docs corpus freshness` red, or the attempt-10 defective receipt. Those facts live only in `audit/evidence-sufficiency-post-1748.json`, `audit/evidence-sufficiency-post-1755.json` and the commit messages — which is why a resumer following the read order (worklog → context-pack → drift) would believe the head is `75b78220`. The attempt-10 usage-error receipt and the third/fourth D-27 instances are drift-class facts with no `D-nn` entry. | `grep -c` over the four files; `worklog.md:556` is the last section | Supervisor appends (evidence-only, no recut): a worklog section covering `b01ffcd8` and `d5f3bf4c`, a `context-pack.md` refresh to the current head, and `drift.md` entries for the defective attempt-10 receipt and the two new D-27-class gate gaps. Does not need an implementation lane and does not block merge; it should land before the run is closed. |
+
+Carried unchanged, not reopened: H-1, H-2 (bounded forgery class, no consumer-visible effect), H-4 (base-inherited debt). Non-findings: the `close-gate` CI red (§9); the `impl-eval:skip` label and `Closes #1466` body (coordinator-owned form); the naive 11-file `packages` diff (§1, base motion, not branch motion).
+
+## Rulings
+
+### Ruling 1 — does the terminal `PASS` carry forward to `d5f3bf4c`?
+
+**Yes.** Everything the terminal verdict rested on was re-derived at this head, not inherited: contracts/SDK source and tests byte-identical to the certified S3 head; the R-1 doc-lint set identical against the *new* main; every contracted receipt real (argv and duration checked) at `gitHead == actualGitHead == d5f3bf4c`; root `test` a genuine 4275/0/19 PASS by my own run; package suites 94/94; publish surface identical modulo the tagline; seven archives append-only; `deno.lock` unchanged; and the G-1 pin — the one probe no recent session had completed — goes red under the required forgery. **This leaf is merge-ready on evidence at content head `d5f3bf4c` / evidence head `dbd3eafa`** (this session's evidence commit will sit on top; it changes no product byte). Merge, ready-flip, relabel, mirror and close remain the coordinator's after the milestone pre-merge gate.
+
+### Ruling 2 — is the repaired tagline acceptable?
+
+**Yes.** 246 B by the gate's own extractor (margin 4), so JSR stores it whole; every semantic element of `main`'s description survives; the `NetScript-owned procedure metadata` ownership claim that slice 1 established is present. The only meaning-bearing trim (`typed clients` → `clients`) is restated in the README body. Acceptable as the published `@netscript/contracts` description.
+
+### Ruling 3 — should `docs-tagline` and `agent-docs-prose` join the contracted receipt set?
+
+**Yes — as catalog entries for future leaves, via the coordinator, not as a plan amendment here.** Both share the D-27 signature R-3 already ruled on for `docs:exports-drift`: green at base, branch-sensitive, and consumer-facing (one is the literal JSR description, the other is what agents read as the package's documentation). Two such defects reached a ready-flip through eight passing contracted gates; CI caught them, but only after the ready-flip — the harness's own evidence was structurally blind. Concretely: (a) any leaf touching a package `README.md` must carry `docs-tagline`; (b) any leaf touching a corpus input (package READMEs, `docs/site/**`, plugin docs) must carry `agent-docs-prose` **and** the sibling carrier checks (`mcp-export-corpus`, `publish-assets`, `assets-barrel`), since the second merge showed the cascade conflicts as a unit; (c) the `gates/archetype-gate-matrix.md` docs-overlay row and the receipt catalog should name them, and the plan template's "contracted set" should be derived from the touched-path classes rather than fixed at planning time. For **this** leaf they are accepted as named supplemental evidence, run by me at this head (§6), in the same form R-3 accepted `docs:exports-drift`; the PLAN-EVAL-approved eight-receipt contract is not amended by an evaluator. Filing the follow-up is the coordinator's (this session may not file issues).
+
+### Ruling 4 — did either main merge or the regeneration change anything a consumer sees?
+
+**No.** §1 (source delta over base identical modulo the tagline), §3 (doc-lint set unchanged against the new main), §6 (publish file surface identical except the README's 30-byte shrink), §7 (carrier deltas are provenance/timestamp/payload lines produced by tooling, with all four freshness gates green). The merges brought `main`'s own changes (#1728, #1729, #1711, #1746, #1748, #1755) into the branch, which is base motion, not leaf motion.
+
+## Verdict
+
+| Field | Value |
+| --- | --- |
+| Verdict | **`PASS`** — the terminal all-slices `PASS` carries forward to content head **`d5f3bf4c`** (evidence head `dbd3eafa`, this section's commit on top). |
+| Rationale | Only one product byte-class changed since the certified heads — a 246 B tagline that is under the cap and faithful to the contract claim — and every invariant the terminal verdict rested on was re-derived here at this head against the current `main`: source identity, R-1 set identity, eight real receipts, a genuine root-`test` PASS, 94/94 suites, an unchanged publish surface, seven append-only archives, an unchanged lock, fresh tooling-generated carriers, and a G-1 pin that still goes red under the required forgery. C-1 is supervisor bookkeeping that needs no lane and no recut. |
+| Failure count | unchanged at 1 of 2. No re-evaluation scope. |
+| Boundaries honoured | No fix, no merge, no ready-flip, no relabel, no milestone/issue/body/acceptance edit, no `e2e:cli`/Aspire/Docker/browser gate, no edit to product code, tests, receipts, archives, `plan.md`, `supervisor.md`, `deno.lock`, or any predecessor verdict. Every perturbation reverted; tree clean. |
