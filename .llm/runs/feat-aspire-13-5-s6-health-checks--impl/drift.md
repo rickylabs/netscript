@@ -148,3 +148,18 @@ documentation.
 - **Action:** restore all four original patterns in both runtime upload steps, retain
   `include-hidden-files: true`, and leave classifier, fixture, receipt, and product behavior
   unchanged.
+
+## 2026-08-31 — D-112 prevents artifact traversal into protected Postgres data
+
+- **What:** D-111 restored the classifier's established recursive patterns while retaining hidden
+  files, causing the artifact action to traverse generated-project internals.
+- **Source:** exact-head workflow run 33342459451 at `235631d63`; the Postgres product test passed,
+  but artifact upload failed `EACCES` under `.data/postgres/18/docker`.
+- **Expected:** the carrier uploads only the job report and listener-unreachable receipt without
+  inspecting database data directories.
+- **Actual:** recursive `**` patterns combined with hidden-file inclusion descended into protected
+  Postgres-owned files.
+- **Severity:** bounded CI evidence-carrier regression; product evidence remains green.
+- **Action:** use job-specific top-level report patterns and a single-project-level receipt glob,
+  keep hidden-file inclusion, and update the classifier self-test to reject recursive smoke-root
+  traversal.

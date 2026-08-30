@@ -195,3 +195,16 @@ are unchanged. Evidence is RED 59/60 at D-110, then GREEN 60/60 under both the o
 command and the structured harness wrapper; exact artifact-block assertion, YAML parse, and diff
 integrity also pass. The coordinator owns the single fresh exact-head workflow dispatch and archive
 inspection.
+
+## D-112 non-recursive runtime artifact carrier correction
+
+Run 33342459451 proved the Postgres product suite green but exposed that D-111's recursive globs,
+combined with hidden-file inclusion, traversed permission-restricted `.data/postgres` files and
+failed artifact upload with `EACCES`. Both runtime upload blocks now use only job-specific top-level
+JSON/NDJSON report patterns and the single-project-level
+`.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json`, while retaining
+`include-hidden-files: true`. The classifier self-test now owns those safe paths for both jobs and
+rejects `.llm/tmp/**` recursion. RED was 59/60 before the workflow change; GREEN is 60/60 under the
+required raw command and structured wrapper, with structured check/lint/fmt, exact artifact
+assertion, YAML parse, and diff integrity also green. Product/runtime behavior is unchanged; the
+coordinator owns the one exact-head workflow run and archive inspection.

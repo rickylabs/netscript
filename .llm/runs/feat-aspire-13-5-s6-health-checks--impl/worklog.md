@@ -434,3 +434,32 @@ Runtime, workflow dispatch, PLAN-EVAL, and evaluator activity remain coordinator
 - Lock hygiene: PASS; no `deno.lock`, product source, fixture, receipt, or classifier change.
 - Reconcile: D-111 is the complete owner-supplied correction. The coordinator retains the single
   exact-head `workflow_dispatch` and direct artifact-archive inspection.
+
+## D-112 non-recursive runtime artifact carrier correction
+
+PLAN-EVAL is N/A by owner ruling: this is a bounded CI-only carrier correction with exact paths and
+an explicit classifier self-test contract. Exact-head run 33342459451 proved the Postgres product
+suite green but the artifact upload failed `EACCES` because D-111's recursive globs, combined with
+`include-hidden-files: true`, traversed the generated project's protected `.data/postgres` tree.
+
+This slice updates the checked-in classifier contract first, then replaces both workflow path lists
+with job-specific top-level report JSON/NDJSON patterns and the single-level
+`.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json` path. It keeps
+`include-hidden-files: true` and does not change gate logic, the fixture, receipt shape/location,
+health checks, exit-code semantics, or product source. Runtime, Docker, workflow dispatch, and all
+evaluator activity remain coordinator-owned and NOT_RUN.
+
+- RED after updating the classifier contract first: 59 passed / 1 failed; the workflow contract
+  rejected the D-111 SQLite block because its safe JSON prefix was absent.
+- Both runtime jobs now carry exactly their job-specific top-level JSON and NDJSON report patterns
+  plus `.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json`. No `**` recursive
+  wildcard remains in either upload path list; `include-hidden-files: true` remains in both.
+- Required raw classifier command: PASS, 60/60 tests. Structured test wrapper: PASS, 60/60.
+- Structured check/lint/format over the changed classifier test: PASS; one file selected and
+  processed, zero diagnostics, findings, refusals, or dropped files.
+- Exact two-job non-recursive artifact assertion: PASS. Workflow YAML parse and
+  `git diff --check`: PASS.
+- Lock hygiene: PASS; no `deno.lock`, product, fixture, receipt, health-check, or runtime change.
+- Reconcile: D-112 is the complete owner-supplied correction. The coordinator retains the single
+  fresh exact-head `workflow_dispatch` and direct inspection of both artifact archives for report,
+  receipt, and no-`EACCES` evidence.
