@@ -52,6 +52,21 @@ export async function runAspireMcpSmoke(
     isError: false,
     dashboardAvailable: null,
   };
+  let dashboardDegradation: AspireMcpSmokeReceipt['dashboardDegradation'] = {
+    documented: false,
+    tool: null,
+  };
+  const expectedVisible = [input.database, input.appResource, input.serviceResource];
+  const expectedMcpExcluded = [`${input.database}-cli`];
+  let expectedPath = input.appHostPath;
+  let appHostInScope = false;
+  let observedMcpVisible: readonly string[] = [];
+  let observedMcpExcluded: readonly string[] = [];
+  let describeListsExcluded = false;
+  let visibilityOk = false;
+  let secretParamsNull = input.secretValues.length === 0;
+  let plaintextLeak = false;
+  let dashboardTools: readonly string[] = [];
   const wholeDeadline = performance.now() + dependencies.timeouts.wholeGateMs;
   const stageTimeout = (timeoutMs: number): number =>
     Math.max(1, Math.min(timeoutMs, Math.round(wholeDeadline - performance.now())));
@@ -67,12 +82,79 @@ export async function runAspireMcpSmoke(
         stageTimeout(dependencies.timeouts.toolCallMs),
       );
     } catch (error) {
-      if (isDashboardUnavailableError(error)) {
+      if (isDashboardUnavailableError(name, error)) {
         structuredLogs = { entryCount: null, isError: true, dashboardAvailable: false };
+        dashboardDegradation = { documented: true, tool: name };
+        throw new DashboardUnavailableDegradation(name);
       }
       throw error;
     }
   };
+  const readTranscriptRedaction = (): void => {
+    transcript = primary.transcript();
+    plaintextLeak = input.secretValues.some((secret) =>
+      secret.length > 0 && JSON.stringify(transcript).includes(secret)
+    );
+    if (plaintextLeak) throw new Error('Aspire MCP secret redaction contract failed');
+  };
+  const readDashboardToolSurface = async (): Promise<void> => {
+    const dashboardEntry: AspireMcpEntryPoint = {
+      ...input.entryPoint,
+      args: [...input.entryPoint.args, '--dashboard-url', input.dashboardUrl],
+    };
+    const dashboardTransport = await dependencies.createTransport(dashboardEntry);
+    dashboard = dashboardTransport;
+    await timed(
+      'dashboard initialize',
+      stageTimeout(dependencies.timeouts.initializeMs),
+      () => dashboardTransport.initialize(),
+    );
+    dashboardTools = [
+      ...await timed(
+        'dashboard tools/list',
+        stageTimeout(dependencies.timeouts.toolsListMs),
+        () => dashboardTransport.listTools(),
+      ),
+    ];
+    if (!sameSet(dashboardTools, ASPIRE_MCP_DASHBOARD_TOOLS)) {
+      throw new Error(`Unexpected dashboard-only tools: ${dashboardTools.join(', ')}`);
+    }
+    await dashboardTransport.close();
+    dashboard = undefined;
+  };
+  const receipt = (): AspireMcpSmokeReceipt => ({
+    receipt: 'aspire-mcp-smoke',
+    capturedAt: dependencies.now().toISOString(),
+    cliVersion: input.cliVersion,
+    scaffoldPin: input.scaffoldPin,
+    entryPoint: input.entryPoint,
+    serverInfo,
+    appHost: { path: expectedPath, inScope: appHostInScope, selected: appHostInScope },
+    toolsExpected: ASPIRE_MCP_EXPECTED_TOOLS,
+    toolsObserved,
+    toolsMissing,
+    toolsExtra,
+    documentedUnobserved: ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
+    documentedUnobservedObserved: toolsObserved.filter((name) =>
+      ASPIRE_MCP_DOCUMENTED_UNOBSERVED.includes(name)
+    ),
+    baselineDiff,
+    doctor,
+    visibility: {
+      expectedVisible,
+      expectedMcpExcluded,
+      observedMcpVisible,
+      observedMcpExcluded,
+      describeListsExcluded,
+      ok: visibilityOk,
+    },
+    redaction: { secretParamsNull, plaintextLeak },
+    structuredLogs,
+    dashboardDegradation,
+    lifecycle: { initializeMs, toolsListMs, exit },
+    dashboardOnlyTools: dashboardTools,
+    transcript: input.transcript,
+  });
   try {
     serverInfo = await timed(
       'initialize',
@@ -104,9 +186,10 @@ export async function runAspireMcpSmoke(
     const apphosts = appHostEvidence(
       await callPrimary('list_apphosts', {}),
     );
-    const expectedPath = await realPath(input.appHostPath, dependencies);
+    expectedPath = await realPath(input.appHostPath, dependencies);
     const inScope = await matchingAppHosts(apphosts.inScope, expectedPath, dependencies);
     if (inScope.length === 0) throw new Error(`AppHost is not in MCP scope: ${expectedPath}`);
+    appHostInScope = true;
     if (apphosts.inScope.length > 1) {
       await callPrimary('select_apphost', { appHostPath: expectedPath });
     }
@@ -123,12 +206,9 @@ export async function runAspireMcpSmoke(
     const resources = resourceEvidence(
       await callPrimary('list_resources', {}),
     );
-    const expectedVisible = [input.database, input.appResource, input.serviceResource];
-    const expectedMcpExcluded = [`${input.database}-cli`];
-    const observedMcpVisible = expectedVisible.filter((name) => resources.names.includes(name));
-    const observedMcpExcluded = expectedMcpExcluded.filter((name) =>
-      !resources.names.includes(name)
-    );
+    observedMcpVisible = expectedVisible.filter((name) => resources.names.includes(name));
+    observedMcpExcluded = expectedMcpExcluded.filter((name) => !resources.names.includes(name));
+    secretParamsNull = input.secretValues.length === 0 || resources.secretParamsNull;
     const excludedLogs = await callPrimary(
       'list_console_logs',
       { resourceName: expectedMcpExcluded[0] },
@@ -147,80 +227,40 @@ export async function runAspireMcpSmoke(
       await callPrimary('list_structured_logs', {}),
     );
     const described = await dependencies.describeResources();
-    const describeListsExcluded = expectedMcpExcluded.every((name) => described.includes(name));
-    const visibilityOk = observedMcpVisible.length === expectedVisible.length &&
+    describeListsExcluded = expectedMcpExcluded.every((name) => described.includes(name));
+    visibilityOk = observedMcpVisible.length === expectedVisible.length &&
       observedMcpExcluded.length === expectedMcpExcluded.length && describeListsExcluded;
     if (!visibilityOk) throw new Error('Aspire MCP resource visibility contract failed');
 
-    transcript = primary.transcript();
-    const plaintextLeak = input.secretValues.some((secret) =>
-      secret.length > 0 && JSON.stringify(transcript).includes(secret)
-    );
-    const secretParamsNull = input.secretValues.length === 0 || resources.secretParamsNull;
+    readTranscriptRedaction();
     if (!secretParamsNull || plaintextLeak) {
       throw new Error('Aspire MCP secret redaction contract failed');
     }
 
-    const dashboardEntry: AspireMcpEntryPoint = {
-      ...input.entryPoint,
-      args: [...input.entryPoint.args, '--dashboard-url', input.dashboardUrl],
-    };
-    const dashboardTransport = await dependencies.createTransport(dashboardEntry);
-    dashboard = dashboardTransport;
-    await timed(
-      'dashboard initialize',
-      stageTimeout(dependencies.timeouts.initializeMs),
-      () => dashboardTransport.initialize(),
-    );
-    const dashboardTools = [
-      ...await timed(
-        'dashboard tools/list',
-        stageTimeout(dependencies.timeouts.toolsListMs),
-        () => dashboardTransport.listTools(),
-      ),
-    ];
-    if (!sameSet(dashboardTools, ASPIRE_MCP_DASHBOARD_TOOLS)) {
-      throw new Error(`Unexpected dashboard-only tools: ${dashboardTools.join(', ')}`);
-    }
-    await dashboardTransport.close();
-    dashboard = undefined;
+    await readDashboardToolSurface();
     exit = await primary.close();
 
-    const receipt: AspireMcpSmokeReceipt = {
-      receipt: 'aspire-mcp-smoke',
-      capturedAt: dependencies.now().toISOString(),
-      cliVersion: input.cliVersion,
-      scaffoldPin: input.scaffoldPin,
-      entryPoint: input.entryPoint,
-      serverInfo,
-      appHost: { path: expectedPath, inScope: true, selected: true },
-      toolsExpected: ASPIRE_MCP_EXPECTED_TOOLS,
-      toolsObserved,
-      toolsMissing,
-      toolsExtra,
-      documentedUnobserved: ASPIRE_MCP_DOCUMENTED_UNOBSERVED,
-      documentedUnobservedObserved: toolsObserved.filter((name) =>
-        ASPIRE_MCP_DOCUMENTED_UNOBSERVED.includes(name)
-      ),
-      baselineDiff,
-      doctor,
-      visibility: {
-        expectedVisible,
-        expectedMcpExcluded,
-        observedMcpVisible,
-        observedMcpExcluded,
-        describeListsExcluded,
-        ok: visibilityOk,
-      },
-      redaction: { secretParamsNull, plaintextLeak },
-      structuredLogs,
-      lifecycle: { initializeMs, toolsListMs, exit },
-      dashboardOnlyTools: dashboardTools,
-      transcript: input.transcript,
-    };
-    await dependencies.persist(receipt, redactTranscript(transcript, input));
-    return receipt;
+    const completed = receipt();
+    await dependencies.persist(completed, redactTranscript(transcript, input));
+    return completed;
   } catch (error) {
+    let failure = error;
+    if (failure instanceof DashboardUnavailableDegradation) {
+      try {
+        readTranscriptRedaction();
+        const described = await dependencies.describeResources();
+        describeListsExcluded = expectedMcpExcluded.every((name) => described.includes(name));
+        visibilityOk = observedMcpVisible.length === expectedVisible.length &&
+          observedMcpExcluded.length === expectedMcpExcluded.length && describeListsExcluded;
+        await readDashboardToolSurface();
+        exit = await primary.close();
+        const degraded = receipt();
+        await dependencies.persist(degraded, redactTranscript(transcript, input));
+        return degraded;
+      } catch (completionError) {
+        failure = completionError;
+      }
+    }
     if (dashboard) await dashboard.close().catch(() => undefined);
     exit = await primary.close().catch(() => exit);
     transcript = primary.transcript();
@@ -233,10 +273,18 @@ export async function runAspireMcpSmoke(
         baselineDiff,
         doctor,
         structuredLogs,
+        dashboardDegradation,
       }),
       redactTranscript(transcript, input),
     );
-    throw error;
+    throw failure;
+  }
+}
+
+class DashboardUnavailableDegradation extends Error {
+  constructor(readonly toolName: string) {
+    super(`Aspire Dashboard unavailable for ${toolName}`);
+    this.name = 'DashboardUnavailableDegradation';
   }
 }
 

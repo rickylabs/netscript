@@ -77,6 +77,7 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | pre-Phase-B D-45 | implementation | Coordinator-ratified the observed 14-tool set as required; `get_integration_docs` is documented-unobserved INFO, wrapper timeout is 140s, structured-log count is nullable without response-shape evidence, and S2-V9 cites the elapsed-time receipt. |
 | 2026-08-30 | hosted dashboard availability | implementation | Hosted proof run `33328972788` established that Aspire 13.5.3 can list the dashboard-backed MCP tools while an isolated headless AppHost returns exact JSON-RPC `-32603` dashboard-unavailable evidence. Added RED-first coverage and a documented degraded receipt outcome without weakening the 14-tool, visibility, redaction, or dashboard-only surface assertions. |
 | 2026-08-30 | hosted dashboard availability cycle 2 | implementation | Hosted proof run `33330455111` supplied the full `-32603` message and showed per-tool degradation was the wrong model. Aspire 13.5.3 source at `b5f143315` proves the CLI selects the scaffold's `https` profile; the profile's `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` prevents `AppHost:DashboardApiKey` generation, while MCP rejects a null API token as dashboard-unavailable. Chose shape A: authenticate only the E2E scratch profile before detached start/restart, keep all MCP calls/assertions mandatory, and annotate the exact error in a failing partial receipt. |
+| 2026-08-30 | coordinator classification amendment | implementation | Reclassified only code `-32603` plus the byte-exact hosted 13.5.3 message on dashboard-gated AppHost calls as a documented degradation. Primary and dashboard-only initialize/tools-list surfaces remain mandatory; accumulated visibility/redaction evidence and the degraded tool name persist. Truncated text, a changed suffix, a wrong code, and the exact payload on `doctor` remain hard failures. Static only: no AppHost, runtime, CI dispatch, or evaluator. |
 
 ## Decisions
 
@@ -85,6 +86,7 @@ or the canonical generator source and run the documented generators.
 | Inherit external Plan-Gate | Supervisor already ran two separate PLAN-EVAL cycles and dispatched this exact contract | supervisor plan + owner prompt |
 | JSR publish audit is N/A for the new gate | `packages/cli/e2e` is unpublished and the gate is not exported by `@netscript/cli` | `packages/cli/e2e/deno.json` / `mod.ts` |
 | Cycle-2 shape A: secure the E2E scratch dashboard | The launch profile is selected, but its anonymous mode suppresses the dashboard API key required by Aspire MCP; changing the scratch config exercises the real call contract without changing product scaffold output | `packages/cli/src/kernel/templates/aspire/generate-aspire-config.ts`; Aspire `v13.5.3` `GuestAppHostProject.cs`, `DistributedApplicationBuilder.cs`, `DashboardUrlsHelper.cs`, `McpToolHelpers.cs`; hosted run `33330455111` |
+| Coordinator amendment: exact payload on dashboard-gated calls is documented degradation | Hosted CI still proves the headless condition; the ratified correction supersedes the earlier shape choice. Matching is fail-closed by tool, code, and full message. | coordinator steering after cycle 2; hosted run `33330455111` |
 
 ## Drift
 
@@ -95,6 +97,7 @@ or the canonical generator source and run the documented generators.
 | First scoped-check wrapper flag was redundant/invalid | minor | yes |
 | Requested AGENTS guidance authority moved to a template generator source | minor | yes |
 | HTTPS credential lacked workflow scope for the workflow-only commit | minor | yes |
+| Final host inventory contained foreign S5 runtime resources under `007-aspire-s5-conv`; S9 did not start, inspect beyond ownership, or mutate them | external | no — not S9 drift |
 
 ## Gate Results
 
@@ -123,6 +126,10 @@ or the canonical generator source and run the documented generators.
 | Hosted dashboard fitness gates | PASS | `quality:scan` reported zero findings; `arch:check` exited 0 with pre-existing repository warnings only. |
 | Hosted dashboard cycle-2 RED/GREEN | PASS | Exact run `33330455111` `list_resources` error plus authenticated-start assertions failed 2/32 before implementation; final MCP/runtime-builder suites passed 32/32. |
 | Hosted dashboard cycle-2 scoped gates | PASS | Check covered 187 TypeScript files; lint/fmt covered 180 with zero findings under the recorded standalone-fixture exclusion; `quality:scan` and `arch:check` passed. |
+| Exact-payload amendment RED/GREEN | PASS | The two exact dashboard-backed success cases failed before implementation; final focused suite passed 16/16, including required truncated-message, changed-suffix, wrong-code, and non-dashboard-tool negatives. |
+| Exact-payload amendment scoped gates | PASS | Check covered 187 TypeScript files; lint/fmt covered 180 files with zero findings under the existing `desktop-native` fixture exclusion. |
+| Exact-payload amendment fitness gates | PASS | `quality:scan` reported zero findings; `arch:check` exited 0 with pre-existing repository warnings only. |
+| Exact-payload amendment resource ownership | PASS (S9) | S9 started no AppHost/container. Read-only inventory found a foreign S5 AppHost at `007-aspire-s5-conv/.llm/tmp/s5-concurrent/**` and five S5-named containers; left untouched. |
 
 ## Handoff Notes
 

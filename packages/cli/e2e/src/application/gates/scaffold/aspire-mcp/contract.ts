@@ -100,6 +100,10 @@ export interface AspireMcpSmokeReceipt {
     readonly isError: boolean;
     readonly dashboardAvailable: boolean | null;
   };
+  readonly dashboardDegradation: {
+    readonly documented: boolean;
+    readonly tool: string | null;
+  };
   readonly lifecycle: {
     readonly initializeMs: number;
     readonly toolsListMs: number;

@@ -1,4 +1,5 @@
 import type { AspireMcpSmokeDependencies, AspireMcpSmokeReceipt } from './contract.ts';
+import { ASPIRE_MCP_DASHBOARD_GATED_CALLS } from './tools.ts';
 
 const DASHBOARD_UNAVAILABLE_MESSAGE =
   'The Aspire Dashboard is not available in the running AppHost. The dashboard must be enabled to use MCP tools. Ensure your AppHost is configured with the dashboard enabled (this is the default configuration).';
@@ -111,8 +112,9 @@ export function structuredLogEvidence(
   };
 }
 
-/** Match the exact hosted 13.5.3 dashboard-token error without tolerating it. */
-export function isDashboardUnavailableError(error: unknown): boolean {
+/** Match the exact hosted 13.5.3 payload on a dashboard-gated call. */
+export function isDashboardUnavailableError(toolName: string, error: unknown): boolean {
+  if (!ASPIRE_MCP_DASHBOARD_GATED_CALLS.includes(toolName)) return false;
   if (!(error instanceof Error)) return false;
   const objectIndex = error.message.indexOf('{');
   if (objectIndex < 0) return false;

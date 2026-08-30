@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `hosted dashboard-availability fix cycle 2 — implementation` |
+| Current phase | `coordinator exact-payload classification amendment — delivery` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -31,15 +31,14 @@ Aspire 13.5.3 exposed 14 baseline tools and omitted `get_integration_docs`.
 
 ## In Progress
 
-- Docs-audit cycle-1 generator checks, commit, push, and PR trail comment.
+- Commit, explicit-refspec push, and PR trail comment for the coordinator-ratified exact-payload
+  dashboard degradation contract.
 
 ## Next Steps
 
-1. Supervisor re-dispatches the independent docs audit against the cycle-1 fix head.
-2. Supervisor/upstream resolves why Aspire 13.5.3 omits locked `get_integration_docs` or explicitly
-   re-baselines the acceptance contract.
-3. Phase B later runs the live lease-backed receipt on the isolated AppHost; this session must not
-   attempt it.
+1. Supervisor runs only the requested scoped recheck; this session does not dispatch an evaluator.
+2. A later hosted proof may exercise the amended receipt against a headless AppHost; this static
+   correction does not dispatch CI or start runtime resources.
 
 ## Key Decisions
 
@@ -62,6 +61,7 @@ Aspire 13.5.3 exposed 14 baseline tools and omitted `get_integration_docs`.
 | Fitness | slice-1 PASS | `quality:scan`, `arch:check` |
 | Runtime | Phase B deferred | owner contract |
 | Consumer | PASS | generator checks and zero-state dogfood check |
+| Exact dashboard classification | PASS | 16 focused tests plus scoped check/lint/fmt |
 
 ## Open Questions
 

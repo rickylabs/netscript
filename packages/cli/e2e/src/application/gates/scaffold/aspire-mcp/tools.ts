@@ -24,6 +24,13 @@ export const ASPIRE_MCP_DASHBOARD_TOOLS: readonly string[] = [
   'list_trace_structured_logs',
 ];
 
+/** AppHost-mode calls backed by the Aspire Dashboard in 13.5.3. */
+export const ASPIRE_MCP_DASHBOARD_GATED_CALLS: readonly string[] = [
+  'list_resources',
+  'list_console_logs',
+  ...ASPIRE_MCP_DASHBOARD_TOOLS,
+];
+
 /** Compare an observed Aspire MCP tool surface with a baseline. */
 export function diffAspireMcpTools(
   observed: readonly string[],

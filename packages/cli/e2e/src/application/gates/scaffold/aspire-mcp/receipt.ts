@@ -14,6 +14,7 @@ export interface AspireMcpPartialObservation {
   readonly baselineDiff: AspireMcpSmokeReceipt['baselineDiff'];
   readonly doctor: AspireMcpSmokeReceipt['doctor'];
   readonly structuredLogs: AspireMcpSmokeReceipt['structuredLogs'];
+  readonly dashboardDegradation: AspireMcpSmokeReceipt['dashboardDegradation'];
 }
 
 /** Redact secret literals and dashboard tokens before transcript persistence. */
@@ -68,6 +69,7 @@ export function partialReceipt(
     },
     redaction: { secretParamsNull: false, plaintextLeak: false },
     structuredLogs: observation.structuredLogs,
+    dashboardDegradation: observation.dashboardDegradation,
     lifecycle: { initializeMs, toolsListMs, exit },
     dashboardOnlyTools: [],
     transcript: input.transcript,
