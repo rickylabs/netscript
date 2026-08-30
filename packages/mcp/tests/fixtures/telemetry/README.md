@@ -11,6 +11,14 @@ land.
 - Files: `aspire-13.5.3-resources.json`, `aspire-13.5.3-spans.json`, and their TypeScript fixture
 - Sequence: under the serialized phase-B lease, trigger the scaffolded `health-check` worker job,
   then capture the dashboard resources and spans endpoints named in `aspire-13.5.3-fixture.ts`.
+- Capture scope: the brief-scoped scratch ran through the supervisor-owned loopback relay (D-74)
+  without `database.codegen` and without the `streams` plugin required by the workers runtime. The
+  envelope therefore contains the trigger's producer span but no consumer/`job.execute` span, 12 web
+  `/health` responses with status 500, and no listed worker run (`list_runs` count 0;
+  `get_last_job_result` reports `found: false`).
+- Interpretation: those degraded semantics are an environment/scope condition, not Aspire 13.5.3
+  behavior. Completed consumer-span coverage remains in the retained 13.4.6 fixture case and the
+  hosted `scaffold.runtime` suite, whose full plugin topology includes the streams dependency.
 
 ## Retained compatibility capture
 

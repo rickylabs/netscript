@@ -11,7 +11,8 @@ documentation.
 - **Expected:** Original issue text implied S2 V5 contained dashboard envelopes.
 - **Actual:** Capturing them requires a running 13.5.3 AppHost and runtime lease.
 - **Severity:** minor
-- **Action:** defer to phase B in the same draft PR; keep telemetry parity `pending-lease` in phase A.
+- **Action:** defer to phase B in the same draft PR; keep telemetry parity `pending-lease` in phase
+  A.
 - **Evidence:** `origin/test/aspire-13-5-s2-runtime-verification` receipt inventory and
   `packages/mcp/tests/fixtures/telemetry/aspire-13.4.6-fixture.ts` capture header.
 
@@ -45,11 +46,42 @@ documentation.
   worktree/container filesystem.
 - **Expected:** Container-backed resources become healthy, worker resources start, and the
   `health-check` job produces a dashboard telemetry capture.
-- **Actual:** PostgreSQL/Redis were `FailedToStart`; users/workers/workers-api stayed `Waiting`.
-  No capture was possible.
+- **Actual:** PostgreSQL/Redis were `FailedToStart`; users/workers/workers-api stayed `Waiting`. No
+  capture was possible.
 - **Severity:** significant (environment blocker, not a product or fixture defect)
 - **Action:** Obeyed the explicit stop condition: no workaround and no retry; stopped the exact
   AppHost, verified leak-check survivors `[]`, previewed an empty teardown, and proved final Aspire
   and Docker inventories empty. A future capture needs a newly authorized lease on a host whose
   Docker daemon can see the AppHost bind sources.
 - **Evidence:** `receipts/07-phase-b-runtime-probe.md`.
+
+## 2026-08-30 — Attempt 2 removed bind mounts but exposed the remote-loopback gap (D-43)
+
+- **What:** The attempt-2 scratch omitted database/cache `DataPath` values, allowing the containers
+  to start without worktree bind mounts.
+- **Expected:** Healthy containers would unblock the workers resources and dashboard capture.
+- **Actual:** DCP published PostgreSQL on the remote dind's `127.0.0.1`; the AppHost host could not
+  reach that loopback endpoint. PostgreSQL health checks failed with connection refused and no
+  envelope was captured.
+- **Severity:** significant (environment blocker, not product behavior)
+- **Action:** Obeyed the no-retry rule, preserved D-43 evidence, and tore down to zero. A later
+  attempt required an owner-scoped relay rather than a product workaround.
+- **Evidence:** `receipts/08-phase-b-attempt-2-capture.md`.
+
+## 2026-08-30 — Attempt 3 used relay D-74 but the brief-scoped capture lacked consumer-run inputs
+
+- **What:** The supervisor-owned D-74 loopback relay closed the remote-DinD endpoint gap, allowing
+  the exact 13.5.3 AppHost to reach healthy PostgreSQL and capture real dashboard envelopes.
+- **Expected:** The triggered `health-check` job would also produce a worker consumer/`job.execute`
+  span and a listed completed run.
+- **Actual:** The brief-scoped scratch omitted `database.codegen` and the `streams` plugin. Its web
+  resource produced 12 `/health` 500 responses, and the workers runtime could not consume the
+  accepted trigger. The envelope has a producer trace but no consumer/`job.execute` span, listed
+  run, or found last-job result.
+- **Severity:** minor (fixture provenance/coverage routing; environment/scope condition, not Aspire
+  13.5.3 behavior)
+- **Action:** Keep the raw capture unchanged and state its semantics in the README, fixture header,
+  and test. Completed consumer-span coverage remains in the retained 13.4.6 case and hosted
+  `scaffold.runtime` suite.
+- **Evidence:** D-74 supervisor relay receipt, `receipts/09-phase-b-attempt-3-capture.md`, and
+  IMPL-EVAL cycle 3 F-1/F-2.

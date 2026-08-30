@@ -79,12 +79,18 @@ remain; the scratch tree is removed.
 
 ## Open Questions
 
-- None for this implementation thread.
+- Consumer-run gap: a future 13.5.3 fixture captured from a streams-enabled topology can add direct
+  consumer/`job.execute`, listed-run, and found last-job evidence; until then, completed-run
+  coverage lives in the retained 13.4.6 fixture and hosted `scaffold.runtime` suite.
+- Web-health gap: a future full-topology fixture with `database.codegen` can replace the 12 scoped
+  scratch `/health` 500 responses; those responses are not treated as Aspire 13.5.3 behavior.
 
 ## Drift and Debt
 
 - Drift: attempt 3 used the supervisor-owned loopback relay to close the previously recorded
-  remote-DinD endpoint gap; relay resources remained foreign and untouched.
+  remote-DinD endpoint gap; relay resources remained foreign and untouched. The brief-scoped scratch
+  omitted database.codegen and streams, so its degraded capture semantics are documented and
+  completed-run coverage is routed to 13.4.6 plus hosted `scaffold.runtime`.
 - Debt: none created or deepened.
 
 ## Commits

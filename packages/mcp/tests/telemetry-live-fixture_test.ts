@@ -37,6 +37,16 @@ function createFixtureFetch(resourcesFixture: unknown, spansFixture: unknown): t
   };
 }
 
+// See fixtures/telemetry/README.md § "Current capture". This brief-scoped relay capture omitted
+// database.codegen and the streams plugin, so it has only the trigger producer trace: no worker
+// consumer/job.execute span, listed run, or last-job result. The `service.name === "workers"`
+// assertion is satisfied by workers-api's @hono/otel span attribute, not a worker-runtime span.
+const ASPIRE_1353_CAPTURED_WITHOUT_CONSUMER = {
+  workerSpanKind: 'producer',
+  listedRunCount: 0,
+  jobFound: false,
+} as const;
+
 async function assertCapturedTelemetryShape(options: {
   resourcesFixture: unknown;
   spansFixture: unknown;
@@ -106,9 +116,7 @@ Deno.test('MCP adapter and telemetry flows consume the captured Aspire 13.5.3 sh
     spansFixture: aspireDashboardSpans1353Fixture,
     spanCount: 29,
     resourceCount: 4,
-    workerSpanKind: 'producer',
     captureNow: 1_788_114_300_000,
-    listedRunCount: 0,
-    jobFound: false,
+    ...ASPIRE_1353_CAPTURED_WITHOUT_CONSUMER,
   });
 });
