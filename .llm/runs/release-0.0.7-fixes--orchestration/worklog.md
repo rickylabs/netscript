@@ -2585,3 +2585,50 @@ the supervisor from a re-run rather than from a receipt.
 S8 next, carrying the PE-2 binding amendment: the inspect-report ≡ compile-`files` equivalence
 assertion per declared target, with the report builder extracted to a plain
 `inspectAiRegistries(files, targets)` so the equivalence is assertable without a subprocess.
+
+## 2026-08-30 — S8 landed at `8dcb578f`; PE-2 satisfied, verified from the code
+
+Pushed; local == remote. Files touched are exactly authorized paths 8–11
+(`plugins/ai/scaffold.runtime.json`, `ai-registry-compiler.ts`, `ai-registry-compiler.test.ts`,
+`generate-runtime-registries.ts`) plus run artifacts. No seventh path, no CLI-side change yet.
+
+### PE-2 — the binding amendment is genuinely implemented, not nominally
+
+Checked in the source rather than from the slice comment:
+
+- **Protocol advertised.** `scaffold.runtime.json` now carries
+  `runtimeRegistryGenerator: { command, args, inspectionProtocol: 1 }` — the coordinator's key name,
+  optional and additive.
+- **Plain report builder in path 10.** `export async function inspectAiRegistries(` at
+  `ai-registry-compiler.ts:118`, returning the document object, so the equivalence is assertable
+  without a subprocess — which was the whole point of the amendment.
+- **The equivalence assertion exists, per declared target.** In `ai-registry-compiler.test.ts`, for
+  each target: `const compiled = await compileAiRegistry(compileFiles, target);` then
+  `assertEquals(report.registries[index].sourceFiles, compiled.files)`. `assertEquals` on arrays
+  compares membership **and** order, which is what PE-2 required.
+- **No-writes assertion at layer 1.** `assertEquals(inspectFiles.written, writesBeforeInspect)` —
+  a snapshot around the inspect call, not an inference from a missing flag.
+- Protocol version and declared registry paths are asserted alongside.
+
+So the loophole PE-2 identified — an implementer post-filtering or re-ordering inside the serializer
+while every listed assertion still passed — is now closed by construction.
+
+### The intermediate test state is exactly right
+
+| Suite | Result at `8dcb578f` |
+| --- | --- |
+| `plugins/ai/src/cli/ai-registry-compiler.test.ts` | exit 0 · **9 passed / 0 failed** |
+| `packages/cli/.../doctor-plugin-registry-drift_test.ts` | exit 1 · **5 passed / 1 failed** |
+
+The doctor case is *still red*, and that is correct: the AI side now reports its selection, but the
+**host** has not yet been changed to consume the report as the expected set. The failure is still the
+S7 healthy-regression case.
+
+This is worth stating because it is the cleanest possible evidence that the eventual green will be
+**product-caused**: publishing the report alone does not turn the test green, so the green — when it
+comes — can only come from the host consuming it. The same standard this leaf applied to its own
+red-before now applies to its fix.
+
+Next slice is the host side, carrying the remaining minors: PE-10's neutral inspection error title and
+Sweep-1's retained `EmptyPluginRegistryError` (S9), then PE-8's raw-command receipt for
+`check:mcp-export-corpus` (S10).
