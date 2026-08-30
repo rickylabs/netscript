@@ -116,9 +116,22 @@ The derivative cascade was derived from the writer implementations rather than r
   keys through `readPackageExportMap()`, not exported symbols. No subpath changes are planned, but
   its `--check` mode (the non-mutating equivalent underlying `check:assets-barrel`) remains
   mandatory.
+- `.llm/tools/docs/generate-export-surface-corpus.ts` discovers every published package export
+  subpath, runs `deno doc --json`, and stores each exported symbol's kind, normalized signature, and
+  JSDoc in `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`. The
+  root `check:mcp-export-corpus` task passes `--check` without write permission. It is therefore the
+  fourth mandatory freshness gate.
 
-If any freshness check reports a shared generated asset stale, this run stops and reports it; it
-does not regenerate assets while the coordinated corpus/doc-asset landing is in flight.
+The MCP corpus **is expected to move** after implementation: the planned changes alter exported
+telemetry constants/type aliases, the structural span interface, and class method contracts even
+though the export-map keys stay fixed. The current baseline was measured with
+`deno task check:mcp-export-corpus`: exit `0`, 35 packages, 270 subpaths, and 7,614 symbols. After
+the public-surface slice, its non-mutating check is expected to exit nonzero with the named stale
+corpus. That result is a stop/report handoff for supervisor sequencing, not permission for this
+author to regenerate it. The other three writers are expected to remain fresh because package
+versions, export-map subpaths, and docs-site prose inputs do not change. Any unexpected stale result
+from them likewise stops the run; no shared generated asset is regenerated while the coordinated
+corpus/doc-asset landing is in flight.
 
 ## jsr-audit Surface Scan
 

@@ -13,8 +13,10 @@
 ## Current State
 
 S1 has re-derived the defect at locked baseline `f8b4f804`, resolved the design questions, and
-locked a 19-path product ceiling plus a writer-derived gate table. No product or test file has been
-changed. The next action is independent PLAN-EVAL; S2 must not begin before that verdict.
+locked a 19-path product ceiling plus a four-writer derivative gate table. Supervisor review added
+the missing MCP export-corpus check and made the leased Flow-B runtime proof explicitly
+supervisor-coordinated/author-must-not-run. No product or test file has changed. The next action is
+independent PLAN-EVAL; S2 must not begin before that verdict.
 
 ## Completed
 
@@ -23,7 +25,11 @@ changed. The next action is independent PLAN-EVAL; S2 must not begin before that
 - Chose truthful emission for all five, including an error span for unsupported structural spawn.
 - Assigned compensation span ownership to `SagaCompensator` and cross-plane key ownership to the
   telemetry attribute set.
-- Derived public-surface and generated-derivative implications from the three actual writers.
+- Derived public-surface and generated-derivative implications from all four actual writers.
+- Measured `check:mcp-export-corpus` green at the baseline (35 packages, 270 subpaths, 7,614
+  symbols) and locked its expected post-surface-change stale result as stop/report.
+- Assigned the real Flow-B runtime acceptance proof to the supervisor after lease acquisition; the
+  author retains only the validator unit gate.
 - Measured baseline publish/doc-lint/JSR audit behavior and locked validation expectations.
 
 ## In Progress
@@ -39,13 +45,14 @@ changed. The next action is independent PLAN-EVAL; S2 must not begin before that
 
 ## Key Decisions
 
-| Decision                                  | Source                           | Notes                                                        |
-| ----------------------------------------- | -------------------------------- | ------------------------------------------------------------ |
-| Emit all five cascade factories           | `plan.md` D1–D4                  | Spawn is an error attempt, not a successful child lifecycle. |
-| Attribute/factory/runtime ownership split | `research.md`, `plan.md` D5–D6   | Both correlation fields emitted with distinct meanings.      |
-| Explicit W3C context handoff              | `plan.md` D7–D8                  | Direct parent survives ended/non-ambient spans.              |
-| Compensator owns compensate span          | `plan.md` D3                     | Missing, nested, thrown, and direct paths are observable.    |
-| No generated writes                       | writer inspection, `plan.md` D10 | Any stale check causes stop/report.                          |
+| Decision                                  | Source                                | Notes                                                                          |
+| ----------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------ |
+| Emit all five cascade factories           | `plan.md` D1–D4                       | Spawn is an error attempt, not a successful child lifecycle.                   |
+| Attribute/factory/runtime ownership split | `research.md`, `plan.md` D5–D6        | Both correlation fields emitted with distinct meanings.                        |
+| Explicit W3C context handoff              | `plan.md` D7–D8                       | Direct parent survives ended/non-ambient spans.                                |
+| Compensator owns compensate span          | `plan.md` D3                          | Missing, nested, thrown, and direct paths are observable.                      |
+| No generated writes                       | four-writer inspection, `plan.md` D10 | MCP corpus is expected to move; author stops/reports rather than regenerating. |
+| Leased runtime ownership                  | supervisor review, gate 18            | REQUIRED supervisor-coordinated; author-must-not-run.                          |
 
 ## Files Changed
 
@@ -55,12 +62,12 @@ changed. The next action is independent PLAN-EVAL; S2 must not begin before that
 
 ## Gates
 
-| Gate family | Current status    | Evidence                                                               |
-| ----------- | ----------------- | ---------------------------------------------------------------------- |
-| Static      | baseline measured | package publish dry-run exit 0; doc-lint existing exit 1/nine findings |
-| Fitness     | baseline measured | JSR audit exit 0 with two existing warnings                            |
-| Runtime     | NOT_RUN           | prohibited without lease                                               |
-| Consumer    | planned           | derivative writers inspected; no output change expected                |
+| Gate family | Current status    | Evidence                                                                         |
+| ----------- | ----------------- | -------------------------------------------------------------------------------- |
+| Static      | baseline measured | package publish dry-run exit 0; doc-lint existing exit 1/nine findings           |
+| Fitness     | baseline measured | JSR audit exit 0 with two existing warnings                                      |
+| Runtime     | NOT_RUN           | prohibited without lease                                                         |
+| Consumer    | baseline measured | MCP corpus check exit 0 now; post-change stale expected and supervisor-sequenced |
 
 ## Open Questions
 

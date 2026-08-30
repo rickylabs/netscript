@@ -36,3 +36,18 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** Gate table names raw commands and structured wrappers as verdict sources.
+
+## 2026-08-30 — Supervisor review corrected derivative and runtime gate ownership
+
+- **What:** The initial S1 plan omitted `check:mcp-export-corpus` and listed the leased
+  `scaffold.runtime` command in the author validation table despite the leaf's no-runtime boundary.
+- **Source:** Supervisor plan review at `d1436696` and direct inspection of
+  `.llm/tools/docs/generate-export-surface-corpus.ts` plus root task definitions.
+- **Expected:** All four shared derivative writers are represented with non-mutating checks, and
+  cluster-wide runtime gates are assigned only to a lease-holding supervisor.
+- **Actual:** The first plan carried only three derivative gates and described the runtime command
+  as later work without an explicit author-must-not-run owner.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** The corrected plan adds measured baseline/expected-stale MCP corpus evidence and
+  marks Flow-B runtime proof `REQUIRED, supervisor-coordinated, author-must-not-run`.

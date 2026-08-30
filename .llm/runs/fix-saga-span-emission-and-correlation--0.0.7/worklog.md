@@ -91,6 +91,7 @@ a process seam. A thin plugin may only wire the core primitive.
 | -------------------- | ----- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-08-30T12:57:16Z | S1    | Re-baseline/research | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline. |
 | 2026-08-30T12:57:16Z | S1    | Design               | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                    |
+| 2026-08-30T13:10:51Z | S1    | Supervisor review    | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                     |
 
 ## Decisions
 
@@ -104,11 +105,12 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Drift
 
-| Drift                                                                  | Severity | Logged in drift.md |
-| ---------------------------------------------------------------------- | -------- | ------------------ |
-| Owner-locked baseline differs from newly advanced local `origin/main`  | minor    | yes                |
-| Owner-assigned Codex S1 route differs from generic deep-research route | minor    | yes                |
-| RTK executable absent despite repo preference                          | minor    | yes                |
+| Drift                                                                                 | Severity    | Logged in drift.md |
+| ------------------------------------------------------------------------------------- | ----------- | ------------------ |
+| Owner-locked baseline differs from newly advanced local `origin/main`                 | minor       | yes                |
+| Owner-assigned Codex S1 route differs from generic deep-research route                | minor       | yes                |
+| RTK executable absent despite repo preference                                         | minor       | yes                |
+| Initial S1 plan omitted the MCP export corpus gate and over-assigned the runtime gate | significant | yes                |
 
 ## Gate Results
 
@@ -129,21 +131,21 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ### Runtime Gates
 
-| Gate                  | Result  | Evidence       | Notes                                             |
-| --------------------- | ------- | -------------- | ------------------------------------------------- |
-| Flow-B Aspire runtime | NOT_RUN | owner boundary | No runtime lease; coordinator gate required later |
+| Gate                    | Result  | Evidence        | Notes                                                                                               |
+| ----------------------- | ------- | --------------- | --------------------------------------------------------------------------------------------------- |
+| Flow-B consumer runtime | NOT_RUN | author boundary | REQUIRED supervisor-coordinated acceptance gate; author-must-not-run without the cluster-wide lease |
 
 ### Consumer Gates
 
-| Consumer                      | Result  | Evidence                   | Notes                                                   |
-| ----------------------------- | ------- | -------------------------- | ------------------------------------------------------- |
-| Published core/plugin surface | NOT_RUN | plan gate table            | Additive surface planned; dry-run after implementation  |
-| Generated derivatives         | NOT_RUN | writer inspection complete | All three check-only gates mandatory; stop on staleness |
+| Consumer                      | Result  | Evidence                                   | Notes                                                                                            |
+| ----------------------------- | ------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Published core/plugin surface | NOT_RUN | plan gate table                            | Additive surface planned; dry-run after implementation                                           |
+| MCP export corpus baseline    | PASS    | `deno task check:mcp-export-corpus` exit 0 | Non-mutating check: 35 packages, 270 subpaths, 7,614 symbols                                     |
+| Generated derivatives         | NOT_RUN | four writers inspected                     | MCP corpus is expected to go stale; all stale results are stop/report, never author regeneration |
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D1–D9, especially explicit trace handoff and the unsupported spawn error
-  span, then confirm that the product path ceiling covers the real Flow-B fixture without allowing
-  generated asset churn.
+- PLAN-EVAL should inspect D1–D10, especially explicit trace handoff, the unsupported spawn error
+  span, the expected MCP corpus movement, and the supervisor-only Flow-B runtime acceptance gate.
 - S2 must be a failing-test-only commit. Do not edit product source until its raw nonzero exit and
   exact counts are recorded against the locked baseline.
