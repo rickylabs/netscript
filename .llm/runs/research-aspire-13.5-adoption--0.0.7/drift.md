@@ -1809,3 +1809,30 @@
   lands first (its own code is the subject of Phase B), then the DinD lease/relay/receipt/zero
   protocol executes S6's Phase B immediately per instruction, topology propagated to whichever
   session runs it.
+- **D-94 — coordinator overrules D-92 with a corrected architecture (D-91 audit overrules D-92's
+  narrow exclusion). The full `b4ca8a1d3` runtime-module split IS required** — a later gate
+  (`scaffold-runtime-a8-f16-1333`) depends on the module boundary; the earlier "extract listener
+  semantics only, exclude the split" instruction was wrong. Execution:
+  1. The mid-flight resumed transplant thread (client PIDs 3930029/3930090) was terminated (SIGTERM)
+     the instant this ruling arrived, before it could touch the paused `01f27d4d4` cherry-pick
+     further.
+  2. Its 3 commits (`e2daea4fe`, `b30bcb094`, `366e1f51f`) preserved as **rejected audit history**:
+     tag `aspire-13-5-s6-transplant-rejected-audit` on `366e1f51f`, pushed; the `007-aspire-s6-new`
+     worktree left exactly as it was (still mid-cherry-pick) — not reset, not deleted.
+  3. Fresh worktree `007-aspire-s6-v2` / branch `chore/aspire-13-5-s6-listener-transplant-v2` at
+     exact `2a1248d33d55`; fresh Codex GPT-5.6 Sol · high thread
+     `01a05474-cad4-7912-87c9-2e0045b30ac4` dispatched with the corrected brief
+     (`slices/s6/transplant-brief-v2.md`): manually re-express (not mechanically diff) the
+     health-check semantics from `5d2bd8756`/`31a2fac87`/`01f27d4d4` in current no-semicolon style,
+     never select `embedded.generated.ts` from either side (always regenerate), preserve the
+     CommunityToolkit 13.5/13.6 compat comment; carry `b4ca8a1d3`'s entire runtime-module split
+     whole (exact file list: `database-gates.ts`/`otel-gates.ts`/ `runtime-gates.ts` modified, 6 new
+     `runtime/*` files, 5 files moved into `runtime/`, plus registrations); exactly two named
+     conflict hunks (the S1 behavior-gate title string, and preserving every S5 dynamic-endpoint
+     semantic with `verify-live-db-endpoint.ts` untouched); remeasure `runtime-gates.ts` (~305
+     lines) and `runtime/` (11 children) rather than trusting stale figures; full static gate list
+     (focused tests, scoped+raw lint/fmt, asset/publish generation, host-ports check, quality:scan,
+     arch:check, real 13.5.3 consumer type-check). S6 Phase-B DinD dispatch
+     (`runtime.health.listener-unreachable`, wait exit 18 + restart recovery, full
+     `scaffold.runtime` + quickstart, two-hop relay, exact-zero protocol) still follows once this
+     lands. S8 remains frozen at `f06209d39`; S9/S10/S11/S13 unaffected.
