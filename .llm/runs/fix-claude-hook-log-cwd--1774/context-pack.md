@@ -25,6 +25,8 @@ set are locked. Implementation is stopped pending a separate-session PLAN-EVAL `
 - Confirmed minimum permission classes and explicitly deferred the sibling `wslHome()` defect.
 - Locked `plan.md` and the complete `worklog.md` Design checkpoint.
 - Selected PLAN-EVAL as an owner-required hard stop.
+- Synchronized draft PR #1775 to `status:plan-eval` with milestone `0.0.7`, the required labels, and
+  a PLAN phase comment; no evaluator was dispatched.
 
 ## In Progress
 
@@ -66,8 +68,8 @@ baseline.
 
 ## Drift and Debt
 
-- Drift: owner-selected Codex medium planning session recorded in `supervisor.md` and `drift.md`; no
-  additional plan drift.
+- Drift: owner-selected Codex medium planning session plus the repo-REST PR-sync fallback are
+  recorded in `supervisor.md`/`drift.md`; neither changes implementation scope.
 - Debt: none created.
 
 ## Commits

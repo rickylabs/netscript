@@ -90,6 +90,7 @@ a new cwd/worktree case without changing production code.
 | 2026-08-30 | Bootstrap | Activated  | Loaded required authorities; verified branch/baseline; pushed first commit and opened draft PR #1775.                     |
 | 2026-08-30 | Research  | Re-derived | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output pushed in `research.md`. |
 | 2026-08-30 | Plan      | Locked     | Combined settings/logger repair, granular permissions, RED→GREEN fixture, gate set, and sibling-defect deferral recorded. |
+| 2026-08-30 | Plan      | PR sync    | Updated draft body/comment and moved exactly one lifecycle label to `status:plan-eval`; REST fallback recorded in drift.  |
 
 ## Decisions
 
@@ -103,9 +104,10 @@ a new cwd/worktree case without changing production code.
 
 ## Drift
 
-| Drift                                        | Severity | Logged in drift.md |
-| -------------------------------------------- | -------- | ------------------ |
-| Owner-selected Codex medium planning session | minor    | yes                |
+| Drift                                           | Severity | Logged in drift.md |
+| ----------------------------------------------- | -------- | ------------------ |
+| Owner-selected Codex medium planning session    | minor    | yes                |
+| `gh pr edit` over-fetched scopes; REST fallback | minor    | yes                |
 
 ## Gate Results
 
