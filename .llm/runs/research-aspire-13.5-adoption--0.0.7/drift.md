@@ -699,3 +699,45 @@
   exact head (CI `scaffold-runtime` run id or a lease-backed local run that reached and passed the
   AppHost gates). After #1734 lands: rebase S1/S4/S5, rerun the exact runtime gates, then refresh
   head attribution — in that order.
+
+## D-42 — 2026-08-30 — S3 Phase B blocked by remote-dind bind-mount topology; lease released at zero
+
+- **What happened under the lease (thread `01a05200…`, worktree `007-aspire-s3`):** restore OK
+  (13.5.3 train), single `aspire start --isolated` exit 0 (AppHost PID 326833 registered in
+  `run-resources.json`), then `aspire describe`: `postgres` / `redis` containers
+  **`FailedToStart`**, `users`/`workers`/`workers-api` `Waiting`. Verbatim daemon error:
+  `invalid mount config for type "bind": bind source path does not exist:
+  /home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/aspire-s3-phase-b/.data/postgres`.
+  DCP correctly drove the **remote** `netscript-dind` daemon (it created the containers), but the
+  generated AppHost's `withDataBindMount(resolveDataPath(appHostDir, '.data/postgres'))` names a
+  path on _this_ container's filesystem, which the dind daemon cannot see. **No envelope was
+  captured, copied, fabricated, or edited.** Receipt: S3 branch
+  `.llm/runs/test-aspire-13-5-s3-fixture-recapture--impl/receipts/07-phase-b-runtime-probe.md`
+  (commit `2b0d33bd`), dashboard coordinates redacted.
+- **Cleanup (thread + supervisor, both):** exact `aspire stop --apphost`, `agentic:leak-check`
+  survivors `[]`, `agentic:teardown` preview empty; supervisor re-proof 09:39:22Z: `aspire ps` →
+  `[]`, `docker ps -a` 0, `docker volume ls` 0, no `aspire`/`dcp`/AppHost process. **Lease
+  released.** Scratch project left in the S3 worktree's ignored `.llm/tmp/` for the thread's own
+  cleanup step; nothing tracked changed except run artifacts.
+- **Classification:** infrastructure topology, not Aspire 13.5, not the S3 diff, not Docker version
+  (28.5.2 worked). This is the "remote-dind endpoint/proxy probe" answered one layer earlier than
+  expected: the endpoint layer was never reached because the data layer failed.
+- **Consequence for every host-run AppHost gate on this NAS:** any generated project with a
+  `DataPath` (the scaffold default for Postgres/MySQL/Redis) cannot start its containers against the
+  remote dind. The S5 `scaffold.runtime` attempt never got this far (D-33), so this is new.
+- **Remediation options (coordinator decision, one of):**
+  1. **Infrastructure (durable, human boundary):** make the worktree tree visible to the dind daemon
+     at the identical absolute path (bind `/home/agent/projects/netscript/worktrees` into
+     `netscript-dind` at the same path via `sandboxctl`). Then bind mounts, the endpoint/proxy
+     probe, and eventually `scaffold.runtime` all become testable on this host.
+  2. **Lease-scoped (no product drift):** re-grant one serialized lease for S3 Phase B with the
+     **scratch** `appsettings.json` `Databases[].DataPath` / cache `DataPath` omitted — the
+     generator emits no `withDataBindMount` when `DataPath` is unset
+     (`generate-register-infrastructure.ts:167`), so containers use ephemeral storage. This is a
+     scratch configuration choice recorded in the receipt, not a workaround of a product defect, and
+     the capture contract (health-check job → two telemetry GETs) is unaffected by data persistence.
+     It still leaves the endpoint/proxy question to be answered by the same start.
+  3. Run the capture on a host with local Docker.
+- **IMPL-EVAL:** none dispatched for this lease — the landed commit is a blocked-probe receipt with
+  no product or fixture change; the separate-session IMPL-EVAL is owed when the 13.5.3 envelopes
+  actually land. Tier-A of `2b0d33bd` is a receipt-integrity review (below).

@@ -93,7 +93,15 @@ historical; all of those evaluator sessions are `offline` and none was resumed.
 close-gate independently of S3 Phase B; caveats = #1734 baseline for #1740's runtime verdict, S6/S8
 stacked on the S5 branch, issue `status:` labels lag the PRs.
 
-## Runtime lease — S3 Phase B held (2026-08-30)
+## Runtime lease — S3 Phase B executed and released 09:39Z; capture BLOCKED by remote-dind bind-mount topology (D-42)
+
+The generated AppHost's `withDataBindMount('.data/postgres')` names a path the remote
+`netscript-dind` daemon cannot see → `postgres`/`redis` `FailedToStart`; no envelope captured. Host
+back at zero (thread + supervisor proofs). Options: bind the worktrees into `netscript-dind` at the
+identical path (infrastructure, durable) or re-grant with the scratch `DataPath` omitted (no bind
+mount, no product drift). IMPL-EVAL owed when envelopes land; S8 static continues.
+
+## Runtime lease — history (2026-08-30)
 
 Both zero-state proofs were taken on the NAS host before any runtime work was contemplated:
 
