@@ -12,9 +12,10 @@
 
 ## Current State
 
-Harness bootstrap and slice 1 are committed/pushed on draft PR #1743. Slice 2 generator emission is
-green locally after a RED gate. `PLAN-EVAL: N/A` is justified by the ratified locked issue; the
-Fable supervisor retains slice review and IMPL-EVAL.
+Slices 1–2 are committed/pushed on draft PR #1743. Slice 3 asset regeneration is green locally;
+the structural infrastructure template is byte-identical because existing slots carry the new
+emission. `PLAN-EVAL: N/A` is justified by the ratified locked issue; the Fable supervisor retains
+slice review and IMPL-EVAL.
 
 ## Completed
 
@@ -27,15 +28,19 @@ Fable supervisor retains slice review and IMPL-EVAL.
   stacked draft PR with its implementation trail.
 - Added per-kind TCP/RESP registration, live endpoint projection, attachment, non-emission, and
   credential-isolation tests; the combined focused suite passes 53 results.
+- Committed/pushed slice 2 as `feb1e7aadcf4f875cbcd2b878161c3ba9a5d705a` with its PR trail.
+- Regenerated the embedded asset barrel and proved deterministic reproduction plus scoped type
+  checking.
 
 ## In Progress
 
-- Slice 2 commit/push and draft PR trail update.
+- Slice 3 commit/push and draft PR trail update.
 
 ## Next Steps
 
-1. Commit/push slice 2 and update the stacked draft PR.
-2. Regenerate and verify the snapshot/asset barrel for slice 3.
+1. Commit/push slice 3 and update the stacked draft PR.
+2. Perform the owed E2E registry split, then add describe-derived assertions and register the
+   non-executed Phase-B recovery fixture.
 
 ## Key Decisions
 
@@ -56,13 +61,14 @@ Fable supervisor retains slice review and IMPL-EVAL.
 | `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts` | changed | Per-kind custom check registration and resource attachment. |
 | `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts` | changed | Exact emission and credential-boundary tests. |
 | `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts` | changed | Updated import composition expectation. |
+| `packages/cli/src/kernel/assets/embedded.generated.ts` | changed | Regenerated helper asset literal. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | slices 1–2 green | structured test/check; raw config-excluded lint |
-| Fitness | slices 1–2 green | per-slice `quality:scan`, `arch:check` exit 0 |
+| Static | slices 1–3 green | structured test/check; raw config-excluded lint; asset reproduction |
+| Fitness | slices 1–3 green | per-slice `quality:scan`, `arch:check` exit 0 |
 | Runtime | NOT_RUN | no Phase-A lease |
 | Consumer | pending | implementation not started |
 

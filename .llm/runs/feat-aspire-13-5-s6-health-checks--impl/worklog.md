@@ -82,6 +82,10 @@ its runtime expectation to the readiness gate without touching credentials.
 | 2026-08-30 04:30 +02:00 | 2 | RED | Structured generator test: exit 1, 16 passed and the TCP/RESP emission cases failed on missing `postgres_listener` and `redis_resp` registrations. |
 | 2026-08-30 04:33 +02:00 | 2 | green | Structured helper/generator suite: exit 0, 53 passed; exact database/cache keys, live endpoint projections, all Garnet arms, Deno KV non-emission, and credential-free callback blocks proved. |
 | 2026-08-30 04:33 +02:00 | 2 | reconcile | Official 13.5 API confirms `getEndpoint` returns an `EndpointReference`; the locked callback form awaits `property(EndpointProperty.Host|Port)` inside each invocation. No plan readjustment. |
+| 2026-08-30 04:35 +02:00 | 2 | commit/push | Committed `feb1e7aadcf4f875cbcd2b878161c3ba9a5d705a` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 body/trail updated. |
+| 2026-08-30 04:36 +02:00 | 3 | regen | `gen:assets-barrel` embedded the emitted helper contract; the infrastructure structural template stayed byte-identical because its existing import/database/cache slots already carry the new emission. |
+| 2026-08-30 04:36 +02:00 | 3 | green | Staged-output `check:assets-barrel` reproduced all generated barrels with no unstaged diff; structured check selected `embedded.generated.ts` with 0 diagnostics. |
+| 2026-08-30 04:36 +02:00 | 3 | reconcile | #1718 remains open and the draft remains stacked. Snapshot verification found no new slot requirement; no plan readjustment. |
 
 ## Decisions
 
@@ -122,6 +126,8 @@ its runtime expectation to the readiness gate without touching credentials.
 | `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; new helper justified under A6/A7. |
 | slice-2 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | Generator stays pure; callback I/O remains emitted at the runtime edge. |
 | slice-2 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
+| slice-3 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | Regenerated barrel carries the owned helper source only. |
+| slice-3 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
 
 ### Runtime Gates
 
@@ -134,6 +140,7 @@ its runtime expectation to the readiness gate without touching credentials.
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
 | generated AppHost | NOT_RUN | pending slices | Runtime start prohibited in Phase A. |
+| asset barrel | PASS | `gen:assets-barrel`; `check:assets-barrel` exit 0 | Structural infrastructure template byte-identical; embedded helper refreshed. |
 
 ## Handoff Notes
 
