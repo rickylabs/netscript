@@ -2451,3 +2451,60 @@ sweep only runs where a brief demands it.
 The same "generated separately" false-deferral pattern survives in `docs/site/reference/cli/index.md:75`
 and `docs/site/reference/plugin/index.md:85`. It was never a `logger`-specific defect; it is a page
 template that promises generated pages nobody generates.
+
+## 2026-08-30 — #1785 converged and green, but the evaluator chain is exhausted
+
+### Convergence
+
+Base `38439740f` → current main **`74e3d451`**. Reset, replayed prose only, regenerated the carriers
+once, then re-applied the evaluator-report carrier so `provenance.json` `sourceCommit` still names the
+prose commit rather than an evidence commit.
+
+`f70b3d43d` prose → `45737bda4` correlation repair → `b7c8560ea` assets → **`b8095e905`** report carrier.
+
+**Product diff preserved byte-for-byte** — `git diff backup/1785-pre-converge HEAD -- docs/site/reference/logger/index.md`
+is empty. 25 symbols / 0 missing, zero "correlated" claims, boundaries held, 13 gates exit 0, tree clean.
+
+### The blocker: every documented evaluator route is down
+
+| Route | Policy role | Status |
+| --- | --- | --- |
+| Claude · Fable 5 · medium | primary | **HTTP 429**, monthly spend limit, `req_011CeZWSaRmQkeprnuGwPF4B` |
+| DeepSeek V4 Flash 0731 · max (OpenRouter) | fallback for native quota limit | `OPENROUTER_API_KEY` unset; no credential file where `openrouter-run.ts:101-114` looks |
+| AGY Gemini 3.6 Flash · high | fallback if OpenRouter limited | `agy` on PATH but `antigravity` component **missing** and `antigravity-auth` **AUTH_REQUIRED** |
+
+Checked each rather than assuming the chain worked.
+
+**What I did not do, and why it matters.** Opus 5 is opposite-family to Codex, in-plan, and would
+have produced a verdict. It is **not** a documented `formal_impl_evaluation` route — `lane-policy.md:46`
+names DeepSeek then AGY, and nothing else. Substituting it would have been inventing a route to
+manufacture a green gate, which inverts the purpose of the gate. Self-evaluation is barred outright.
+So the PR is held with no verdict rather than passed on an unauthorised one.
+
+### The policy gap, stated precisely
+
+1. The fallback chain **terminates** — after AGY the policy is silent on what a lane does.
+2. Both fallbacks **require credentials the harness does not provision**. A documented fallback that
+   cannot authenticate is not a fallback.
+3. The `review_codex*` ladders already solve this shape (Fable → Opus, Claude-family throughout).
+   `formal_impl_evaluation` has no equivalent terminal fallback. **That asymmetry is the gap.**
+
+Recommended: name an in-plan Claude-family terminal fallback for `formal_impl_evaluation` when the
+native model is spend-limited.
+
+### Partial evaluator output deliberately discarded
+
+The killed session's last words were that it had reached "root-surface sanity and generator identity"
+— i.e. nearly done. It produced **no verdict**, and a nearly-complete evaluation is not a pass. Same
+call as when the `cac095e1` evaluator was stopped mid-sweep on #1772: a half-finished sweep quoted as
+evidence is how a false pass gets manufactured.
+
+The prior `PASS` at `87930240` is carried in-tree but **superseded** — it predates both the
+correlation repair and the convergence.
+
+### Not idling
+
+#1785 is parked awaiting an evaluator route. The lane advances to the next independent #1777 slice
+rather than waiting: the `cli` and `plugin` reference pages carry the **same false-deferral pattern**
+the `logger` slice just fixed (`reference/cli/index.md:75`, `reference/plugin/index.md:85`) — surfaced
+by the #1785 evaluator before it died, and independent of #1785's merge.
