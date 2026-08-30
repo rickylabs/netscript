@@ -5098,3 +5098,25 @@ rollout-growth stall.
   ref in the owner's repo, so it is offered rather than performed.
 - PR #1756 live state re-verified: OPEN, **draft**, head `303be12ea`, MERGEABLE/CLEAN, labels
   `status:impl, area:docs, area:tooling, type:test`. Parked state confirmed current, not stale.
+
+## D-84 — #1774 pre-merge staging; close-gate partially verified only
+
+- Merge packet staged at head `51a7bafe1`: base `74e3d451e`, `Closes #1774`, 8-file scope, Tier-A
+  6 PASS / 1 NOT APPLICABLE / 0 FAIL, runtime gates NOT_RUN by lease boundary. Supervisor pre-merge
+  actions are `gh pr ready 1775` + label flip `status:impl` → `status:ready-merge`; the merge command
+  itself is left to the owner. **I do not merge.**
+- **Acceptance-evidence mirror dry-run: exit 0**, and it confirmed `Closing reference #1774
+  classified as issue; retained for acceptance mirroring` — the closing keyword resolves to a real
+  issue rather than a PR, which is the failure that historically stranded merged PRs with stale-open
+  issues.
+- **Stated honestly: this did NOT verify the close gate.** The mirror returns early when live PR
+  labels lack `status:ready-merge`, so `validateEvidenceMapping` never executed. The
+  evidence→checkbox mapping remains **unverified**. It can only be validated after the ready label is
+  applied, which is correct ordering and happens on a PASS verdict. Recording this so no later reader
+  mistakes "mirror dry-run exit 0" for a proven close gate — that inference is exactly the
+  subset-coverage false-green class in a different costume.
+- Evaluator `8f436cac` progress observed: mutation testing on `settings.json`; `CLAUDE_PROJECT_DIR`
+  absent fallback probe; known-negative validation of the claude-surface gate; localization of a fmt
+  finding against main; resolution of every cited SHA; and root `deno task test` **re-measured with
+  real exit capture**. It is independently re-measuring rather than deferring to the supervisor
+  table, which is what the same-family hazard warning in the brief was for.
