@@ -32,3 +32,14 @@ head. **Do not request or run the full E2E matrix.**
 Verdict `PASS`/`FAIL_FIX`/`FAIL_PLAN`. Write
 `slices/s1/convergence/evaluate-r3890336485.md` + PR #1727 comment
 `[PHASE: IMPL-EVAL] [VERDICT: …] — r3890336485 delta`.
+
+## Bounded deviation (record only — validation scope unchanged)
+
+The first dispatch (Claude Fable 5 · medium) terminated immediately on the session's monthly
+spend limit, with **no verdict produced**. This is a routing/availability event, not a content
+cycle: no evidence was read, no judgment was rendered, nothing here is a policy-wide model
+waiver. Retry authorized as **Claude Opus 5 · medium**, same brief, same exact head, same
+Codex-generator/Claude-evaluator and fresh-session (never the generator, never a prior evaluator)
+invariants. `openrouter.env` is absent and AGY is unauthenticated in this environment, so those
+are not available fallbacks; Opus 5 is the in-family substitute per the lane's own escalation
+order. Validation-only — no runtime.
