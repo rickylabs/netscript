@@ -71,6 +71,8 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | 5 | public docs lint | Added member-level JSDoc to the new endpoint/reader exports; targeted `deno doc --lint` passes. Root MCP doc lint still exposes the pre-existing private `SchemaViewName` reference outside S13 scope. |
 | 2026-08-30 | eval 1 | independent IMPL-EVAL | Native Claude/Fable 5 medium session `5263170d-bbd6-4832-aea5-08a1a26dd669` returned `FAIL_FIX`: the workspace runner's new `@netscript/mcp` import was unmapped in public scaffold modes. |
 | 2026-08-30 | 6 | evaluator remediation | Added exact JSR/local root import mappings and paired generator coverage, restored the Aspire-port HTTPS fallback, and recorded the new package dependency, synchronous example-route trade-off, and merge-head manifest regeneration obligation. |
+| 2026-08-30 | eval 2 | independent IMPL-EVAL | Fresh native Claude/Fable 5 medium session `b7095b3b-13aa-466e-895f-c560309a4e48` evaluated exact implementation head `fc0a0c8c` and returned `PASS`; Phase A is complete and S13 has no Phase B. |
+| 2026-08-30 | closeout | host postflight | `aspire ps --format Json --nologo --non-interactive` returned `[]`; `docker ps -a` returned empty. No AppHost, container, runtime, or `e2e:cli` was started. |
 
 ## Gate Results
 
@@ -98,6 +100,7 @@ source and generated-carrier freshness gates.
 | Evaluator-fix check | structured check over workspace/app template TypeScript | PASS | 19 files; no findings. |
 | Evaluator-fix raw lint/fmt | `deno lint/fmt --no-config` over touched config-excluded TypeScript | PASS | 3 files clean after applying repository formatting to the touched generator. |
 | Evaluator-fix consumer/fitness | emitted samples, `quality:scan`, `arch:check`, Claude mirror | PASS | 47 emitted samples; no quality/doctrine failures; mirrors current. |
+| Independent IMPL-EVAL cycle 2 | native Claude/Fable 5 medium at exact `fc0a0c8c` | PASS | Full verdict and independently rerun evidence in `evaluate.md`; remaining findings are coordinator bookkeeping or low/info only. |
 
 Runtime gates are N/A by explicit scope.
 
@@ -143,3 +146,12 @@ Runtime gates are N/A by explicit scope.
 - F-2 is fixed by consuming the resolver's `httpsFallback` for `ASPIRE_DASHBOARD_PORT`.
 - F-3/F-4/F-6 are explicitly dispositioned in `drift.md`; F-5 remains a non-blocking diagnostic
   improvement. The plan and ratified D-17 contract remain unchanged.
+
+## Reconcile — evaluator cycle 2
+
+- Cycle 2 independently verified F-1 and F-2 fixed and accepted the recorded F-3/F-4/F-6
+  dispositions. It found no remaining blocking implementation issue and returned `PASS`.
+- The phase-2 flip remains correctly deferred: S1 #1727, S9 #1759, and S11 #1771 are not all on
+  `main`. `.github/workflows/ci.yml` remains unchanged and phase 1 remains the no-argument default.
+- This verdict certifies S13 Phase A only. D-58 retargeting, merge-head manifest convergence,
+  issue close-gate evidence, canary C, and runtime validation remain coordinator-owned.

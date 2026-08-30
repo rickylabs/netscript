@@ -24,7 +24,9 @@ self-certify.
 - Worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s13`.
 - Branch: `chore/aspire-13-5-s13-stale-surface-cleanup`.
 - Base: S10' commit `a46ea16d`.
-- Evaluate product/tooling changes exactly in `a46ea16d..e3ffb5ddcbaa717b9db22c2ca29573626a20de69`.
+- This is IMPL-EVAL cycle 2 after cycle 1 returned `FAIL_FIX`. Evaluate product/tooling changes
+  exactly in `a46ea16d..fc0a0c8ccc02ed8f741931de3455e7778df8697d`, with focused re-evaluation of
+  `e3ffb5ddcbaa717b9db22c2ca29573626a20de69..fc0a0c8ccc02ed8f741931de3455e7778df8697d`.
 - The worktree has untracked exact-head receipt artifacts. Treat them as evidence, not product
   changes. You may write exactly one file:
   `.llm/runs/chore-aspire-13-5-s13-stale-surface-cleanup--phase-a/evaluate.md`.
@@ -55,7 +57,9 @@ generated code must contain no bare `18888`; telemetry templates render env -> r
 
 ## Independent verification
 
-1. Inspect the full diff and commits. Confirm RED-first tests and commit-by-slice evidence match the
+1. Read the existing cycle-1 `evaluate.md` first, then inspect the remediation commit and exact-head
+   receipts. Independently decide whether F-1 is fixed and F-2/F-3/F-4 are fixed or validly
+   dispositioned. Inspect the full diff and commits. Confirm RED-first tests and commit-by-slice evidence match the
    locked design; PLAN-EVAL is N/A only because the epic exhausted two plan-eval cycles and the
    coordinator ratified D-1 through D-17 before dispatch.
 2. Verify resolver precedence and every `source`, S2-shaped and empty-`[]` fixtures, injected port,
@@ -87,7 +91,8 @@ allowed, and it must remain `[]`; `docker ps -a` must remain empty.
 ## Output
 
 Write the complete `.llm/harness/templates/evaluate.md` structure to the allowed local
-`evaluate.md`, declaring exact evaluated head `e3ffb5ddcbaa717b9db22c2ca29573626a20de69` and evaluator
+`evaluate.md`, replacing the cycle-1 verdict with a complete cycle-2 evaluation and declaring exact
+evaluated head `fc0a0c8ccc02ed8f741931de3455e7778df8697d` and evaluator
 identity `native Claude / Fable 5 / medium`. Verdict must be exactly one of `PASS`, `FAIL_FIX`,
 `FAIL_RESCOPE`, or `FAIL_DEBT`, following `verdict-definitions.md`. `PASS` means Phase A is complete;
 S13 has no Phase B. Explicitly state whether the parity flip was applied or deferred. Leave no
