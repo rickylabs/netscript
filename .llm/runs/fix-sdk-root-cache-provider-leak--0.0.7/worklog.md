@@ -155,7 +155,7 @@ syntax before the owned pages were restored and edited narrowly.
 | Agent-docs final | Generate, then `deno task check:agent-docs-prose` | PASS (exit 0) | Lume built 638 files; rendered output OK; `fresh: true`, no stale paths; bundle SHA `6a71e9f57e459f18ce74eafa4d69757aa764dc284598da1f1464ee2746865134`. |
 | Publish-assets precheck | `deno task check:publish-assets` after prose regeneration | EXPECTED STALE (exit 1) | Tool named only the MCP publish asset stale; the CLI asset was unchanged, which is recorded rather than inferred otherwise. |
 | Publish-assets final | Generate, inspect changed output, then recheck | PASS (exit 0) | Only `packages/mcp/src/publish-assets.generated.ts` changed; final freshness check passed. |
-| Public surface | `deno task surface:diff` plus decoded SDK corpus comparison | MEASURED NEGATIVE (exit 1) | Repo baseline reports 559 undeclared major changes across many packages. SDK-granular artifact comparison proves new `./presets`, 75 curated entries, `QueryClientPort` absent, and 21 root cache exports removed while `CachedEntry`/`CacheEntry` remain type-only. |
+| Public surface | `deno task surface:diff` plus decoded SDK corpus comparison | MEASURED NEGATIVE (exit 1) | The repo baseline is 542 undeclared major changes at `13878a80`; head `1ccddd6e` has 552. The +10 delta is entirely SDK-scoped (45 -> 55) and is the intended surface change: `./presets` added, 21 root cache exports removed, `QueryClientPort` absent, and `CachedEntry`/`CacheEntry` retained type-only. |
 | Lock hygiene | Raw `git diff --exit-code -- deno.lock`; raw `git diff --check` | PASS (exit 0) | `deno.lock` byte-unchanged and no whitespace errors. |
 
 ### Gates not applicable/run in S1
