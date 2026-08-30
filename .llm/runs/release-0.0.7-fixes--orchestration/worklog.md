@@ -4939,3 +4939,37 @@ commit's own D6/D8 rows describe publisher-supplied-value-survives and "no fallb
 precedence", which argue **for** the F2 fix; the mismatch is in the code's direction, not the
 doctrine's. Folded that into the staged repair brief, along with the corrected head reference and a
 clause reserving the PR body and issue text to me so the author's edits cannot collide with this repair.
+
+### #1368 repair dispatched; author had already landed most of it; sender race recorded
+
+Coordinator confirmed the sequencing (repair first, cycle 2 only at the post-repair head) and upgraded
+F3 from measure-then-decide to a mandated fix of the message `traceparent`/`tracestate` fallback.
+
+Before the sender fired, the author independently landed `bd89e523` (precedence regression tests) and
+`309487d6` (preserve cascade message context), which resolve most of the repair:
+
+- **F2 scheduled path — fixed.** `withScheduledContext` is now
+  `scheduled.message.correlationKey ?? correlationId`; caller-supplied wins.
+- **F2 send path — correctly NOT changed.** I checked the type rather than assuming: the `send`
+  variant of `CascadedMessage` carries kind/target/payload/queue plus shared
+  idempotency/concurrency/retry and has **no `correlationKey` field**. The DSL cannot supply a child
+  key on that path, so nothing can be overwritten and l.266 is right as written. The author took the
+  lock-and-document branch and proved it with `'send transports upstream correlation when the DSL
+  supplies no child key'`. Accepted. This is why the evaluator's "either fix or lock" framing
+  mattered — a blanket "preserve on both paths" reading would have demanded a shim for a field that
+  cannot exist.
+- **F3 — fixed** exactly as mandated, both fields, with a noop-instrumentation regression test.
+- README already carried the publisher-key precedence and scheduled explicit-child-key rules.
+
+Remaining: F4 explicit consumer-facing breaking-change line, F5 three stale worklog gate rows plus
+`context-pack.md` phase text, F6 drift entry for the two baseline-red gates, and a re-run with raw
+counts.
+
+**Sender race — my error, no damage.** I rewrote the staged message file in place while a sender armed
+on that same path was waiting for idle. Idle fired at 14:48:54 mid-rewrite. The delivered copy was the
+fully amended version (F3-mandatory, D-row argument, PR-body reservation, last-cycle notice) rather
+than the final trimmed rewrite, confirmed by marker counts in the rollout — substantively correct but
+written against the superseded head `be3d1546`. Rule going forward: **never edit a message file an
+armed sender points at.** Write a new file and arm a new sender; the old file is immutable once armed.
+A short correction crediting the completed work, accepting the send-path decision explicitly so it is
+not second-guessed, and reducing scope to F4/F5/F6 is armed on the same idle rule.
