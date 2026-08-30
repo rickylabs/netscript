@@ -1836,3 +1836,19 @@
      (`runtime.health.listener-unreachable`, wait exit 18 + restart recovery, full
      `scaffold.runtime` + quickstart, two-hop relay, exact-zero protocol) still follows once this
      lands. S8 remains frozen at `f06209d39`; S9/S10/S11/S13 unaffected.
+- **D-95 — #1747 queued as next serialized leaf (after S6 Phase B, ahead of S8 diagnostic).**
+  Independently re-verified: head `a93df413e376678b33e109167c5bf37c1308323d` unchanged, PR
+  non-draft/`MERGEABLE`, DoD 0 unchecked, #1732 boxes 0 unchecked, review-threads PASS (0). Modified
+  fixture identified: `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts` (+
+  `generate-register-background.ts` and its tests) — exercised by the postgres tier's
+  `runtime.flow-b-fixture` gate. Execution plan on grant:
+  1. Local lease-backed `scaffold.runtime` (postgres tier only) through corrected DinD + two-hop
+     relay; prove it reaches and passes `runtime.flow-b-fixture`; owned cleanup to exact zero.
+  2. Apply the `e2e-cli-gate` label (not `ci:full`) to PR #1747 — this is the PR's own opt-in label
+     (`.github/workflows/e2e-cli.yml:31-95`) that makes its `pull_request` trigger run the scaffold
+     lanes on the existing head; require postgres runtime success plus the accompanying
+     static/SQLite lanes green.
+  3. Flip PR+#1732 to sole `status:ready-merge`, rerun `ci.yml` for the live-label close-gate, hand
+     the exact-`a93df413e` merge packet. No rebase, no new eval unless the head moves or a gate
+     fails. Currently blocked only on S6's Phase B (thread `01a05474…`, still executing the
+     corrected reconstruction); no runtime attempted yet for #1747.
