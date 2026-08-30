@@ -559,4 +559,6 @@ head `32e418c586e7`, base `main`, ready, sole `status:ready-merge` on PR+#1713, 
 0 unchecked, boxes 6/6. Close-gate SUCCESS (33332251837, second rerun after the DoD correction);
 checks 7 success/23 skipped/0 red. Runtime carried forward (33330714604 + 33331429495, both
 all-tiers SUCCESS); delta IMPL-EVAL PASS (Opus 5, r3890336485 resolved); review-threads PASS.
-Coordinator lands. |
+Coordinator lands. | | S6 v2 thread client killed early (exit 143), resumed same thread | Rollout
+confirmed 75 lines, no edits, worktree unchanged at `2a1248d33`. Resumed `01a05474…` in place — same
+recurring external-interruption pattern as D-93; no rival launched, no work lost. |
