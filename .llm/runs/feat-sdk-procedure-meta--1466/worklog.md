@@ -155,3 +155,70 @@ and every receipt is terminal and exact-head. Verdict: **INSUFFICIENT** because 
 `public-doc-lint` did not pass; there are no missing, duplicate, contradictory, nonterminal, or
 head-mismatched receipts. The supplemental `docs:exports-drift` check exits 0 and remains outside
 the approved named set.
+
+## Repair cycle 4 — IMPL-EVAL `FAIL_FIX`
+
+Content head: `42874803e572a5746834880e387501f0948c7362`.
+
+### Finding repairs
+
+| Finding | Repair |
+| --- | --- |
+| F-1 | `BaseContractErrors` now references the public `CommonErrorMap` type, while the mutable `commonErrorMap` value is withdrawn from the public root and its docs inventory row is removed. No upstream type was re-exported and the value was not frozen as a substitute. |
+| F-2 | The assertion-budget test requires the stripped `contract-primitives.ts` source to contain `oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap)` exactly once. D-5 now distinguishes the expression-inference pin from this real-initializer text pin. |
+| F-3 | The inference test header states why this test reaches into `src/` for the now-private real error-map value. |
+| F-4 | The reference row now matches `deno doc`: `type BaseContract = typeof baseContract`. |
+| F-5 | `supervisor.md` records the leaf lane table, the lost cycles 1–3 Codex thread, cycle 4 thread, and both separate evaluator sessions. |
+
+### F-2 perturbation evidence
+
+With the committed assertion present, the real initializer was temporarily changed to
+`oc.$meta<Record<never, never>>({}).errors(commonErrorMap)`. Running
+`deno test --allow-read packages/contracts/tests/assertion-budget_test.ts` exited 1:
+
+```text
+base contract initializer remains pinned to NetScript procedure metadata ... FAILED
+[Diff] Actual / Expected
+-   0
++   1
+FAILED | 4 passed | 1 failed
+```
+
+The initializer was restored. The same focused suite then passed 5/5, and the full supplemental
+contracts run passed 16/16 at the content head.
+
+### Public-surface measurements
+
+- `deno task docs:exports-drift`: exit 0 at the content head.
+- Public doc lint before F-1: 12 findings in the frozen `235482767` receipt.
+- Public doc lint after F-1: 12 findings in the attempt-5 receipt.
+- Sorted finding-set comparison: identical; the 12 pairs are recorded under
+  `audit/public-doc-lint-cycle4.txt`.
+
+### Receipt recut and sufficiency
+
+The attempt-4 receipts were moved byte-for-byte, before recutting, into the new append-only
+`receipts/frozen-235482767/` archive. All eight contracted paths were then explicitly recut through
+`run-gate.ts` at `42874803e572a5746834880e387501f0948c7362`; every receipt records
+`gitHead == actualGitHead` at that content head.
+
+| Receipt | Outcome | Attempt | Head attestation |
+| --- | --- | ---: | --- |
+| `check-final.json` | PASS | 5 | `gitHead == actualGitHead == 42874803…` |
+| `lint-final.json` | PASS | 5 | `gitHead == actualGitHead == 42874803…` |
+| `fmt-check-final.json` | PASS | 5 | `gitHead == actualGitHead == 42874803…` |
+| `test-final.json` | SKIPPED (R-1 policy) | 5 | `gitHead == actualGitHead == 42874803…` |
+| `public-doc-lint-final.json` | FAIL (12, baseline-red/delta-0) | 5 | `gitHead == actualGitHead == 42874803…` |
+| `quality-gate-final.json` | PASS | 5 | `gitHead == actualGitHead == 42874803…` |
+| `arch-check-final.json` | PASS | 5 | `gitHead == actualGitHead == 42874803…` |
+| `publish-dry-run-final.json` | PASS | 5 | `gitHead == actualGitHead == 42874803…` |
+
+R-1 forbids another root `test` execution on this host. Because `run-gate.ts` cannot create an
+honest new FAIL without executing the command, the current exact-head receipt records a policy
+`SKIPPED` outcome and points to `frozen-235482767/test-final.json`, which retains the terminal
+host-baseline FAIL. No result was fabricated and root `test` was not retried.
+
+Sufficiency was recomputed over the eight literal paths, not a glob. Gate IDs and invocation IDs are
+unique, every receipt is terminal and exact-head, and the verdict is **INSUFFICIENT** because
+`public-doc-lint` did not pass (`FAIL`) and root `test` did not pass (`SKIPPED` under R-1). The
+machine result is recorded in `audit/evidence-sufficiency-cycle4.json`.

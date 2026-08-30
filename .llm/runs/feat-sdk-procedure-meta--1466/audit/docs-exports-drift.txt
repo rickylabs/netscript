@@ -1,5 +1,5 @@
 Supplemental evidence (outside the named eight receipts)
-Content head: 235482767edd8a9793c9d6bf6f766441c51ef313
+Content head: 42874803e572a5746834880e387501f0948c7362
 Command: deno task docs:exports-drift
 Exit code: 0
 
