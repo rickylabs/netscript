@@ -145,3 +145,67 @@ Back to the **same author thread** `01a0515c` via `agentic:codex-resume` — sam
 sender, no fresh author. AF-1 first, then AF-2 measured against it, then AF-3. Recut all eight
 receipts at the new content head. **No IMPL-EVAL** until the exact-head doc/JSR/export gates and root
 `test` are green or a genuine scoped blocker is returned.
+
+---
+
+# Tier-A completion — cycles 2 and 3
+
+| Field | Value |
+| --- | --- |
+| Cycle-2 content head | `bb1a489ace2c162c1caca065fc2762d7807330d0` |
+| Cycle-3 content head | `23548276...` (`docs(contracts): complete public symbol inventory`) |
+| Evidence head | `fc81e652019c9cebf9bdc7958414082473b3b06d` — local == remote == PR head, clean |
+| Author | same thread `01a0515c` throughout; never a second sender, never a fresh author |
+| **Final verdict** | **`PASS`** — all Tier-A findings closed; three items carried to IMPL-EVAL as rulings, not defects |
+
+## Verified independently, not relayed
+
+| Claim | How | Holds |
+| --- | --- | --- |
+| AF-1 probe is non-tautological | `procedure-meta-inference_test.ts` builds the **unannotated** `oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap)` and `Equal<>`-pins inferred `~orpc.meta`/`errorMap` to the public aliases. Nothing annotates it, so both sides cannot collapse | yes |
+| AF-2 delta ≤ 0 | re-ran the exact 16-entrypoint argv: **12** at head, **12** on `main` — delta **0** | yes |
+| Reached without AP-14 or removing `BaseContractErrors` | all three remaining contracts-side names are genuinely upstream (`ContractBuilder`, `Schema`, `MergedErrorMap`) | yes |
+| AF-3 quiet-load | 4,248 passed / **1** failed; the `watchFs` inotify red cleared, only the zombie-liveness red remains — exactly what D-26 predicts | yes |
+| #1350 channel survived the `CommonErrorMap` widening | the doctest pins error data against `ContractSchemaOutput<typeof NotFoundErrorSchema>` — the exported Zod schema, **independent** of `CommonErrorMap` — so it would have gone red had output types moved | yes |
+| Cycle 3 is docs-only | `git diff c2ae8c42..HEAD -- packages/` → **0 lines**; no export removed, renamed, or hidden | yes |
+| Docs drift gate green | ran `deno task docs:exports-drift` myself at the new head → **exit 0**; CI run `33299010706` on `fc81e6520` **success** | yes |
+| Catalog untouched | `git diff 21d51622..HEAD -- .llm/tools` → **0** | yes |
+| Attempt-4 receipts | eight files, distinct `gateId`s and `invocationId`s, `gitHead == actualGitHead == 235482767` on every one, no waiver | yes |
+
+## Why AF-2's equal count is a real improvement, not a wash
+
+Base and head both report 12, but the **set** differs. At base the contracts family was
+`baseContract → oc` (1) plus `BaseContractRoute`/`BaseContractOutputRoute → BaseContractErrors` (2);
+at head it is `baseContract → ContractBuilder`/`Schema` (2) plus `BaseContractErrors →
+MergedErrorMap` (1). Equal cost — but every remaining contracts-side finding is now an **irreducible
+upstream reference**, where the base was hiding a NetScript-owned type behind a private marker. The
+leaf ends with no NetScript-owned type private, at zero net cost.
+
+## Three items for the IMPL-EVAL to rule on — none are defects
+
+1. **`commonErrorMap` is an exported mutable singleton** backing every contract in the workspace.
+   `Readonly<>` stops TypeScript consumers; nothing stops a JavaScript one. It was published to
+   satisfy a doc-lint delta, not for a stated consumer need. Cycle 3 documents it as
+   read-only-by-contract rather than changing it. Is a published mutable error-map value an
+   acceptable public surface?
+2. **Public surface grew by six exports** beyond the plan's Design section —
+   `NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement`, `BaseContractMeta`,
+   `BaseContractErrors`, `CommonErrorMap`, `commonErrorMap`. Three came from the coordinator-authorized
+   doc-lint correction. Every one is now documented with an ownership and compatibility rule.
+3. **Two terminal FAIL receipts, both with proven external causes.** `public-doc-lint` is
+   baseline-red on `main` at delta 0 (D-23); root `test` fails solely on
+   `hybrid-launcher_test.ts`, which cannot pass on a host with 7,733 PID-1-owned zombies because
+   `:167` tests liveness with `Deno.kill(pid, 0)` and a zombie answers (D-26). Sufficiency is
+   honestly `INSUFFICIENT`. **Whether a baseline-red and a host-baseline red block this slice is the
+   evaluator's ruling, not mine and not the author's.**
+
+Plus the gate-set proposal from D-27: `docs-exports-drift` is green on `main`, detects this leaf's
+surface growth exactly, and is absent from the contracted eight. Proposed, not applied.
+
+## What the author did well, recorded because it is rare
+
+It reported a measurement that contradicted its own brief's stated goal (cycle 1's +1 residual)
+instead of presenting 14 → 13 as success; it produced a can-fail demonstration with the exact
+`TS2344` rather than asserting the guard worked; and when told a red was a host baseline it recorded
+it as an out-of-scope blocker rather than skipping, narrowing, or "hardening" the test. Every number
+it gave me survived independent re-measurement.

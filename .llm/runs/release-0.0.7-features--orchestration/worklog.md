@@ -5971,3 +5971,82 @@ is a fresh separate session on `formal_impl_evaluation` (Fable 5 · medium for C
 
 NAS/session operational evidence (host paths, rollout file, socket, thread id) is recorded here for
 continuity and is **committed locally only — not pushed**.
+
+## 2026-08-30 — #1466 slice 1 closed at Tier-A `PASS`; IMPL-EVAL dispatched
+
+Three repair cycles on **one** author thread — `01a0515c`, never a second sender, never a fresh
+author. Full review in `slices/tier-a-review-1466-repair.md`.
+
+| Cycle | Content head | What it closed |
+| --- | --- | --- |
+| 1 | `3c3f9b7c` | SDK doctest re-pin; `BaseContractErrors` exported; doc-lint 14 → 13 |
+| 2 | `bb1a489a` | AF-1 inference probe; `commonErrorMap`/`CommonErrorMap` published; doc-lint **13 → 12 = base** |
+| 3 | `23548276` | six symbols documented; `docs:exports-drift` green; CI docs-site **success** |
+
+Evidence head `fc81e652` — local == remote == PR head, clean, still OPEN draft.
+
+### The finding that justified the whole review
+
+The cycle-1 re-pin `Assert<Equal<BaseMeta, BaseContractMeta>>` was a **tautology**: `baseContract` is
+annotated `ContractBuilder<…, BaseContractMeta>` and upstream declares
+`'~orpc': ContractBuilderDef<…, TMeta>`, so both sides read the same annotation. I proved it instead
+of arguing it — a probe annotating position 4 as `Meta1` over an initializer producing `Meta2`
+type-checks at **exit 0**. So A-item T-2's "pin position 4 exactly" was pinned by **nothing**:
+the annotation declares position 4, and only assignability checks the initializer against it.
+
+`procedure-meta-inference_test.ts` now builds the **unannotated** expression and `Equal<>`-pins the
+inferred meta and error map. Verified non-tautological structurally, and the author demonstrated the
+`TS2344` on perturbation.
+
+That finding then paid for itself: because the annotation was no longer load-bearing for T-2, the
+adapter boundary could be reworked, and doc-lint reached **delta 0** (12 = 12 vs `main`) without
+re-exporting a single upstream type and without withdrawing `BaseContractErrors`. Equal count, better
+composition — every remaining contracts-side finding is now an irreducible upstream reference, where
+the base was hiding a NetScript-owned type.
+
+### Two reds survive, both with proven external causes
+
+`public-doc-lint` is baseline-red on `main` (D-23, delta 0). Root `test` is 4,248 / **1**, failing
+only `hybrid-launcher_test.ts` — which cannot pass on a host with 7,733 PID-1-owned zombies because
+`:167` tests liveness with `Deno.kill(pid, 0)` and a zombie answers (D-26). Sufficiency is honestly
+`INSUFFICIENT`. Whether either blocks the slice is the evaluator's ruling.
+
+### D-27 is the lesson worth keeping
+
+The docs-site check had been red on **every** head of this branch since the first content commit, and
+nobody saw it, because `docs:exports-drift` is not in the plan's eight-receipt set — while
+`public-doc-lint`, which *is* in the set, is baseline-red and cannot signal a regression by
+construction. A gate that is red at the base is not merely unsatisfiable, it is **uninformative**.
+Run every candidate gate at the base before contracting it. Adding `docs-exports-drift` is
+**proposed**, not applied.
+
+### IMPL-EVAL dispatched
+
+| Field | Value |
+| --- | --- |
+| Lane | `formal_impl_evaluation` — native opposite-family for Codex-authored work |
+| Requested route | Claude · Anthropic · **Fable 5 · medium** |
+| Observed route | `model: claude-fable-5`, `effort: medium`, `permissionMode: bypassPermissions` — read from the session's own transcript record, **matched** |
+| Session | `00ec0e55-66cd-4cd2-814e-bc5975afeab3`, name `formal impl evaluation`, `--remote-control ns1466-impleval` |
+| Worktree | `/home/agent/projects/netscript/worktrees/ns1466-impleval` — **detached** at `fc81e652`, deliberately not the author's (D-19) |
+| Brief | `slices/impl-eval-1466.md` |
+| Generator ≠ evaluator | Codex authored, Claude evaluates — holds |
+
+The brief routes three rulings the implementation lane may not make for itself — whether two
+externally-caused terminal FAILs block the slice, whether a published **mutable singleton**
+`commonErrorMap` is an acceptable public surface, and whether `docs-exports-drift` joins the
+contracted set — and requires the evaluator to re-measure my numbers rather than accept them, and to
+break the new probe rather than trust it.
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | IMPL-EVAL in flight at `fc81e652` |
+| #1664 | parked at `20337441788b`, no retry authorized |
+| #1387 | queued; depends on #1466's metadata vocabulary |
+| #1730 | queued |
+
+No merge, publish, ready-flip, relabel, milestone change, issue close, `#1348` or cluster-state
+mutation. PR #1731 still carries a stale `status:plan` while the phase is IMPL — relabelling is
+withheld from this lane and belongs to the coordinator.
