@@ -4595,3 +4595,74 @@ started. Killing the turn would destroy uncommitted work and repeat the error th
 three consecutive turns earlier, so the park is armed for the next idle boundary instead. The overrun
 is bounded: it is on its own branch, competes with nothing on the merge front, and no #1368 work has
 been merged or readied.
+
+## 2026-08-30 — #1758 leased `e2e:cli` terminal (baseline-blocked); PR body reconciled at `f4ca7c32`
+
+### The mandatory gate ran and is recorded exactly
+
+Bare `deno task e2e:cli` at the leased head `50710a44`: **exit 1 — 27 gates, 26 passed, 1 failed**.
+
+Sole failure `generated.quality-negative`: `TS2345`, `'DehydratedState' is not assignable to parameter
+of type 'Partial<DehydratedState>'`, in the **generated** project's
+`packages/fresh/src/application/query/hydration.ts` — open issue **#1734**, internals lane, fix PR
+**#1736** still draft.
+
+Attribution measured, not asserted: this leaf changes **0** files under
+`packages/fresh/src/application/` and **0** in `hydration.ts`; its only `packages/fresh` edits are
+`define-fresh-app.ts` and its test; the failing file's last commit `4d438ce1` long predates the
+branch. **Baseline-blocked — not waived, not retried, not reworded.**
+
+Everything else passed, including `runtime.aspire-restore` and
+`behavior.plugin-doctor-missing-module`, and **no AppHost or container ever started** — so the failure
+is a type-check on generated sources, not a runtime fault.
+
+### Lease discharged cleanly
+
+| Check | Result |
+| --- | --- |
+| `agentic:leak-check` | `survivors: []`, `probes.aspire` ok, `probes.docker` ok |
+| `docker ps -a` / volumes | **0** / **0** |
+| `aspire ps` | no running AppHost |
+| Owned scratch | `.llm/tmp/cli-e2e` removed — **612 MB**, two project trees and two logs |
+
+Removing the scratch mattered: `leak-check` reports containers and Aspire, not disk, so a "clean"
+leak report can still sit on top of half a gigabyte of owned leftovers. Exact owned cleanup includes
+what the tool does not look at.
+
+### PR body reconciled — the row-7 correction
+
+The body had drifted materially and is now corrected, **body-only, no head movement** (local == remote
+== PR head == `f4ca7c32`, tree clean):
+
+- **Heads distinguished** rather than one "final head": product/convergence `65f95b83`, AC3 chunk
+  receipt `50710a44`, `e2e:cli` receipt `50710a44`, current evidence head `f4ca7c32`.
+- **"No production bundle was run and no chunk was inspected" is gone**, replaced by the real
+  client-island bundle proof with the exact chunk and source-map scan, the inspected chunk's SHA-256
+  and byte count, and the string-stripped re-scan showing **0** executable `setCacheProvider(` calls.
+- **"This lane did not run browser/Vite, `e2e:cli`…" is gone**, replaced by both discharged runtime
+  obligations including the 27-gate receipt and its #1734 attribution.
+- Superseded delta receipt `ca46f565` explicitly marked not-to-be-cited.
+- **The IMPL-EVAL DoD box was unticked**, with an inline note: cycle 1 `PASS_IMPL` at `83b7109c` is
+  real, but renewed currency for `f4ca7c32` is still running, so no renewed verdict is claimed. A
+  ticked box there would have asserted an evaluation that does not yet exist.
+- A new **unticked** DoD line records the `e2e:cli` gate as baseline-blocked with full attribution —
+  previously no box captured it at all, so the checklist implied a completeness the evidence did not
+  support.
+
+`status:impl` retained; readiness withheld on #1734.
+
+### Renewed delta evaluator in flight, with a sharper invariant
+
+Dispatched at `f4ca7c32` on `eval/delta-receipt-1462-final2`. The brief frames the test correctly:
+comparing raw commit ranges is meaningless here because four `main` merges dominate them. Comparing
+the **leaf's own patch** instead — `13878a80..83b7109c` versus `3e5cbabf..f4ca7c32` — the file set is
+the **same 11 non-generated files plus exactly one**: the coordinator-authorized closure parity file.
+The evaluator is asked to reproduce or refute that framing, judge whether the added line is
+semantically right rather than merely green, and to say plainly if it believes a fresh IMPL-EVAL cycle
+is required.
+
+### #1368
+
+Parked target unchanged; the leaf has advanced to `9c9d2196` while its thread stayed continuously
+busy. The park lands at its next genuine idle boundary; nothing from it is merged, readied, or on the
+merge front.
