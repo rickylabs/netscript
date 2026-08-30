@@ -4195,3 +4195,55 @@ reading it.
 F3 (correlation precedence open and resolved inconsistently between compensator and engine), F4
 (engine-as-bus `send` uninstrumented), and F5 (ceiling/gate completeness) also dispatched. Repair is
 plan-only; S2 stays blocked until cycle 2 — the final permitted plan cycle.
+
+## 2026-08-30 — #1758 Tier-A final sign-off `1c5fa004`; full suite green; final delta receipt + CI running
+
+### Running the full suite locally was the right call
+
+```
+deno task test → exit 0 · 4261 passed / 0 failed / 19 ignored / 4280 total
+```
+
+The two prior CI cycles cost real time, and the second failed on a test **no scope this leaf ran could
+see**: `netscript-web-runtime-closure_test.ts` lives in `packages/cli`, while every gate the leaf ran
+was scoped to `packages/sdk`, `packages/fresh`, and the generated-asset cascade. The scoped gates were
+uniformly green while the repository was red.
+
+That is the general failure this leaf keeps re-teaching in different clothing: **a scope narrow enough
+to be fast is narrow enough to miss the consumer you did not know about.** The full suite is the only
+instrument that closes it, and at ~3.5 minutes it is far cheaper than a third red CI cycle.
+
+### Three consumers, three different instruments
+
+| Consumer of the SDK export map | Found by |
+| --- | --- |
+| CLI assets barrel (`agent-docs.generated.ts`) | supervisor running `check:assets-barrel`, a gate the plan never listed |
+| MCP export corpus | the plan's own cascade, once corrected by PLAN-EVAL F2 |
+| `NETSCRIPT_WEB_RUNTIME_EXPORTS` parity constant | **CI's full suite** — invisible to every scoped gate |
+
+None was found by the plan. The lesson is now specific enough to act on: a new published export
+subpath propagates to consumers that are **not enumerable by recall**; they must be derived from the
+tooling and confirmed by a full-suite run.
+
+### Final sign-off and the receipts that follow
+
+Tier-A signed at **`1c5fa004`** (artifact-only on `b322bf04`), pushed. The record states the ordering
+that made this cheap: three integrations — `f8b4f804` → `952cc106` → `a5520e70` — each a **merge**
+with the evidence chain intact, and the shared-asset cascade regenerated **once**, at the final base.
+Holding the regeneration through two intermediate bases is why one cycle was spent instead of three.
+
+**Final delta receipt dispatched** at `1c5fa004` (route `claude-fable-5` · medium, matched; background
+`482227f2`; branch `eval/delta-receipt-1462-final`). The earlier `MECHANICAL_PASS` at `f1ff5557` is
+explicitly **superseded** and the evaluator is told not to cite it.
+
+Its brief is deliberately harder than the first one, because **the delta is no longer purely
+mechanical**: it now contains one product line — the `./presets` entry in the parity constant. The
+evaluator is asked to confirm that line is the *only* non-generated product change, to judge whether
+it is **semantically right rather than merely green** against the constant's stated cache-provider-closure
+purpose, to check order parity explicitly, and — the question that matters — to say plainly whether the
+`PASS_IMPL` still holds or whether this addition reaches far enough to require a fresh IMPL-EVAL cycle.
+That is a legitimate outcome and it was named as one rather than steered away from.
+
+`status:ready-merge` applied to PR #1758 and issue #1462, exactly one `status:` each. A `ci` run is in
+flight at `1c5fa004`; if its mirror step skipped on the label boundary again, the remedy is the tool's
+own — rerun with the label stable.
