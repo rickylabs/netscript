@@ -140,20 +140,33 @@ real instrumentation from <code>@netscript/telemetry</code>, not the scaffold he
 
 ### Query or export a detached AppHost
 
-Generated workspaces include task routes that do not require you to discover or remember the
-dashboard URL:
+Generated workspaces include task routes that query traces and logs without requiring you to discover or remember the dashboard URL:
 
 ```bash
+# Query traces or logs for a specific resource
 deno task aspire:otel -- traces <resource>
 deno task aspire:otel -- logs <resource>
+
+# Query with timestamp search filter (ISO format or date)
+deno task aspire:otel -- traces <resource> --search "timestamp:>=2026-08-30"
+
+# Export collected telemetry to a structured zip archive
 deno task aspire:export -- -o telemetry.zip
 ```
 
 Generate traffic before querying traces; a healthy but idle AppHost legitimately returns an empty
 array. The tasks forward all arguments, try Aspire's automatic detached discovery first, and retry
-with the matching `dashboardUrl` from `aspire ps --format Json` if needed. If bare Aspire reports
-`The dashboard is not available`, use these task routes—the collector and dashboard data may still
-be healthy.
+with the matching `dashboardUrl` from `aspire ps --format Json` if needed. Note that bare `aspire otel`
+exits with code `12` when executed against an unreachable or unstarted dashboard; the task wrappers catch this
+and resolve the running dashboard automatically.
+
+**Dashboard endpoint resolution precedence (D-17):**
+When resolving the telemetry dashboard endpoint, NetScript evaluates sources in strict order:
+1. Explicit CLI argument (`--dashboard-url`).
+2. `NETSCRIPT_TELEMETRY_ENDPOINT` environment variable.
+3. `ASPIRE_DASHBOARD_PORT` environment variable (e.g. `18888`).
+4. Running AppHost instance discovered via `aspire ps --format Json` (`dashboardUrl`).
+5. Default fallback endpoint constant (`http://localhost:18888`).
 
 ## Step 3 — Add your own spans in a job handler
 
