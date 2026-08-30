@@ -2575,3 +2575,19 @@
   port published on DinD `127.0.0.1:32773` refused connection from ai-agents. Both probe containers
   were removed; Docker and Aspire returned to exact zero. A parallel infrastructure audit is
   locating a safe NAS topology correction or the fastest existing off-host gate.
+
+## 2026-08-30T18:04:24Z — NAS topology repaired; Aspire Phase B locally released
+
+- The host operator recreated `netscript-dind` with `/home/agent` mounted at the identical absolute
+  path, then proved DinD can resolve NetScript worktrees. Published service ports are reachable from
+  `ai-agents` through `netscript-dind:<published-port>` rather than `127.0.0.1`; a Redis PING at
+  `netscript-dind:36379` returned `+PONG`. D-42 and D-43 are therefore resolved.
+- Re-proved the grant baseline: Docker 28.5.2 reported zero containers and, after removing the
+  positively attributable anonymous Redis acceptance-probe volume, zero volumes; `aspire ps
+  --format Json` returned `[]`. The sole serialized runtime lease was granted to the Aspire
+  supervisor for local S3/S7/S8 Phase B, with exact owned cleanup back to zero required.
+- Hosted integration run `33326591443` at `9303daf61` independently passed static, desktop, and 36
+  gates in each runtime suite before both suites exposed the same S10 adapter defect: Aspire 13.5.3
+  `describe --follow --format Json` emits one `ResourceJson` per NDJSON line, while the parser expects
+  a snapshot `{resources:[...]}` envelope. #1736 is not causal. S10 owns a bounded real-fixture/parser
+  correction plus hidden runtime-report artifact upload repair before the exact-head proof reruns.

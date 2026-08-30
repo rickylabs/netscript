@@ -1540,3 +1540,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   path and DinD-published loopback ports are unreachable from ai-agents. Cleanup returned Docker and
   Aspire to zero. An infrastructure audit is running in parallel; do not restart ai-agents or
   disrupt live workers to repair topology.
+
+## Resume checkpoint — 2026-08-30T18:04:24Z
+
+- D-42/D-43 are fixed by the host operator: `netscript-dind` now sees `/home/agent` at the identical
+  path, and DinD-published ports are reached as `netscript-dind:<port>`, not `127.0.0.1`. Exact
+  pre-lease baseline was Docker containers `0`, volumes `0`, and Aspire applications `[]`.
+- The Aspire supervisor holds the sole serialized local runtime lease for S3/S7/S8 Phase B and must
+  clean every owned AppHost, container, and volume back to zero. Other orchestrators remain active
+  on static/independent work and may queue, but not overlap, runtime leases.
+- Hosted run `33326591443` at combined head `9303daf61` proved the environment and isolated one S10
+  contract bug: 13.5 follow-mode NDJSON is one resource per line, not a `{resources:[]}` envelope.
+  Repair #1760 with a real 13.5 fixture and fail-closed parser tests, include hidden runtime reports
+  in artifact uploads, rebuild the combined proof, and rerun. #1736 remains an independent S1 merge
+  prerequisite and was not the cause of this runtime failure.

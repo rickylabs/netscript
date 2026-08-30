@@ -1371,3 +1371,17 @@ implementation thread.
 - Therefore another local Phase-B lease would deterministically repeat the failure. The accepted
   paths remain a NAS compose correction (identical bind plus shared/reachable namespace) or
   existing CI/off-host runtime gates. All static and retarget preparation continues in parallel.
+
+## 2026-08-30 — host topology repair supersedes the D-42/D-43 local-runtime prohibition
+
+- The prior D-55 evidence was valid for the old container topology, but the host operator has now
+  recreated DinD with an identical `/home/agent` bind and proved cross-container service access via
+  `netscript-dind:<published-port>`. The stale rule "local Phase B deterministically fails" is no
+  longer true; local Phase B is preferred again under the single serialized runtime lease.
+- `127.0.0.1` remains the wrong address from `ai-agents` for a DinD-published service. All probes and
+  generated acceptance harnesses must distinguish the Docker API endpoint
+  `tcp://netscript-dind:2375` from application endpoints at `netscript-dind:<published-port>`.
+- The first combined hosted run did not invalidate the topology fix: it passed 36 gates per runtime
+  suite and failed in NetScript's S10 parser before convergence because Aspire 13.5 follow-mode emits
+  direct `ResourceJson` NDJSON lines. Treat that as a bounded adapter/evidence repair, not an infra
+  regression and not a reason to return to unconditional CI fallback.
