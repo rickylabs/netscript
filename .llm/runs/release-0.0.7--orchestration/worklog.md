@@ -2872,3 +2872,20 @@
 - The post-D100 owned runtime cleanup is exact zero. The canonical Git registry currently reports
   108 worktrees; this is recorded as an ownership-audit queue item, never a broad deletion target
   while supervisors and implementation threads are live.
+
+## 2026-08-30T21:54:30Z — independent S6 audit rejected topology-specific fault injection
+
+- A read-only independent audit of product head `60985a98f`, D-99/D-100 receipts, shipped helper
+  semantics, and the owned relay proved that neither `docker pause` variant is portable acceptance.
+  The listener helper returns Healthy on TCP connect; paused container userspace can leave its
+  kernel TCP stack accepting on direct-host CI, while NAS additionally has a hop-B process that can
+  accept before upstream dial. D-100 relay paused-state teardown remains useful NAS hardening only.
+- The bounded cross-topology acceptance correction is scratch-fixture-only: inject dynamically
+  ported, owner-scoped TCP and fake-RESP endpoints through the existing pre-start readiness fixture;
+  attach distinct E2E-only health keys to the live PostgreSQL/Garnet resources using the exact
+  shipped helpers; then prove Healthy -> Unhealthy plus `aspire wait` exit 18 -> Healthy by closing
+  and reopening those controlled endpoints. Real backing-service keys must remain Healthy before
+  and after, ownership mismatches fail closed, and recovery runs in `finally`.
+- Aspire aborted the non-portable D-100 acceptance attempt and cleaned Aspire/Docker to exact zero.
+  Existing 56 green runtime gates and all accepted DeepSeek evidence carry. A fresh SOL/high review
+  remains mandatory after the corrected fixture is frozen; no runtime lease transfers before then.

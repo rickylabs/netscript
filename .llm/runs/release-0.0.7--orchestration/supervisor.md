@@ -1458,3 +1458,11 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   repair and focused S6 listener proof from host zero before #1747 receives the next full lease.
 - Worktree cleanup is a read-only ownership audit first. With 108 registered worktrees and multiple
   live sessions, no path may be removed merely because its age or name appears stale.
+
+## 2026-08-30T21:54:30Z — S6 portable-fault correction
+
+- Aspire must replace Docker pause/stop experimentation with the independently ratified scratch
+  endpoint fixture. D-100 relay work stays infrastructure-only. Run static fixture tests before one
+  serialized focused runtime gate; exact cleanup remains mandatory.
+- On green: freeze product/evidence, dispatch fresh SOL/high focused review, then formal IMPL-EVAL.
+  Only after S6 is terminal may #1747 receive the next full runtime lease.

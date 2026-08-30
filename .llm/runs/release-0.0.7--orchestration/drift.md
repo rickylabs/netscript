@@ -1560,3 +1560,14 @@ implementation thread.
 - Historical DeepSeek verdicts are immutable accepted evidence. A prospective default-model change
   must preserve their deserialization and provenance, never reinterpret them as stale or request a
   rerun.
+
+## 2026-08-30 — container pause is not a portable TCP listener fault
+
+- Closing NAS relay hop B when a source container is paused is correct relay hygiene, but it changes
+  only this host topology. Direct Docker may continue completing TCP handshakes through the paused
+  container network namespace, so the connect-only shipped listener helper can remain Healthy.
+- Do not use Docker lifecycle or network mutation as the final cross-topology receipt. The runtime
+  gate must control its own dynamic scratch endpoints, attach separate E2E health keys through the
+  exact shipped helpers, and leave the real service checks intact. That proves health scheduling and
+  helper semantics without relying on a relay, firewall, network alias, or DCP lifecycle behavior.
+- D-97/D-100 remain infrastructure receipts. Neither may be represented as S6 product acceptance.

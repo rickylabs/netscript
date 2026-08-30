@@ -1785,3 +1785,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
   host zero before the single focused listener retry.
 - `git worktree list` currently reports 108 registered worktrees. Do not bulk-remove them: audit
   ownership against live supervisors/threads and delete only proven terminal stale registrations.
+
+## Resume delta — 2026-08-30T21:54:30Z
+
+- S6 product head is `60985a98f` on current main, but its Docker-pause mechanism is rejected as
+  portable evidence. D-100 relay paused-state teardown can prove NAS infrastructure only; a direct
+  Docker host may still complete TCP handshakes into a paused container.
+- Implement the independent audit's bounded scratch-only fault endpoints in the existing readiness
+  fixture: dynamic owner-scoped TCP/RESP listeners, distinct test keys wired through the shipped
+  health helpers, exact Healthy/Unhealthy-exit-18/Healthy cycle, real backing-key continuity, and
+  unconditional recovery. Remove Docker mutation/permission from the product gate. Preserve 56
+  green results and accepted evaluator receipts; require SOL/high review after freeze.
+- Host state after aborting D-100 is Aspire `[]`, Docker `[]`.
