@@ -12,11 +12,11 @@
 
 ## Current State
 
-The evaluator-artifact head is preserved and the bounded FAIL_FIX repair is in its RED slice. The
-new suite crosses the real `QueryHydrationScript` serializer: the success query passes, while four
-paused-mutation cases fail at the current guard. The default prior-failure path independently
-reproduces `failureReason: {}` before hydration. Public types, exports, and the `^5.101.0` range
-remain unchanged.
+The evaluator-artifact head is preserved beneath committed RED slice `8dac327d0b21d4fcdabea7adce69e785c1b2a4fb`.
+The bounded repair now passes all 11 focused tests: the real `QueryHydrationScript` serializer,
+paused mutations with/without variables, a paused retry with wire `failureReason: {}`, error-field
+revival, both exact dependency versions, and the evaluator attack set. Public types, exports, and
+the `^5.101.0` range remain unchanged.
 
 ## Completed
 
@@ -32,13 +32,13 @@ remain unchanged.
 
 ## In Progress
 
-- S4 RED commit for the serialized hydration regression.
+- S5 private JSON-shape normalization and error revival, ready to commit.
 
 ## Next Steps
 
-1. Commit the S4 RED slice on top of evaluator artifact `ed8a8e9ca9be2e72da4a00bff830caf260ee94ea`.
-2. Implement private JSON-shape normalization and error revival without public-surface changes.
-3. Commit final artifacts, rerun exact-head receipts, explicit-refspec push, and update PR #1736.
+1. Commit the S5 repair slice.
+2. Commit final run-state artifacts, then rerun every required gate at that immutable head.
+3. Explicit-refspec push, verify exact remote/PR head, update the PR body, and post `[PHASE: IMPL]`.
 
 ## Key Decisions
 
@@ -53,6 +53,7 @@ remain unchanged.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-fresh-query-hydration-readonly-state--1734/*` | new | Harness evidence only. |
+| `packages/fresh/tests/query-hydration-roundtrip_test.tsx` | new | Real serializer and JSON-boundary regression coverage. |
 | `packages/fresh/tests/query-hydration-version-compat_test.ts` | new | RED child-check regression. |
 | `packages/fresh/tests/type-fixtures/query-hydration-5.102.8-deno.json` | new | Exact 5.102.8 no-lock config. |
 | `packages/fresh/tests/type-fixtures/query-hydration-5.101.0-deno.json` | new | Exact 5.101.0 no-lock config. |
@@ -63,7 +64,7 @@ remain unchanged.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | preliminary full PASS | root check; 4,246/0 tests; 2,045-file lint/fmt |
+| Static | focused repair PASS | 11/11 focused tests; 3-file check/lint/fmt |
 | Fitness | preliminary full PASS | quality scan allowCount 7; arch check; Fresh publish dry-run |
 | Runtime | N/A | no lease |
 | Consumer | PASS | exact 5.101.0 and 5.102.8 no-lock checks |

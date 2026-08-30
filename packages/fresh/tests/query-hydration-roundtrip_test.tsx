@@ -54,7 +54,7 @@ Deno.test('query hydration JSON round trip restores a paused mutation', async ()
   serverClient.mount();
   const mutation = serverClient.getMutationCache().build(serverClient, {
     mutationKey: ['save-draft'],
-    mutationFn: async (value: string) => value.length,
+    mutationFn: (value: string) => Promise.resolve(value.length),
   });
   const pending = mutation.execute('draft');
 
@@ -79,7 +79,7 @@ Deno.test('query hydration JSON round trip restores a paused mutation without va
   serverClient.mount();
   const mutation = serverClient.getMutationCache().build<void, Error, void, unknown>(serverClient, {
     mutationKey: ['save-without-input'],
-    mutationFn: async () => undefined,
+    mutationFn: () => Promise.resolve(undefined),
   });
   const pending = mutation.execute();
 
@@ -109,13 +109,13 @@ Deno.test('query hydration JSON round trip revives a paused mutation prior failu
   let attempts = 0;
   const mutation = serverClient.getMutationCache().build(serverClient, {
     mutationKey: ['retry-draft'],
-    mutationFn: async (value: string) => {
+    mutationFn: (value: string) => {
       attempts += 1;
       if (attempts === 1) {
         onlineManager.setOnline(false);
-        throw failure;
+        return Promise.reject(failure);
       }
-      return value.length;
+      return Promise.resolve(value.length);
     },
     retry: 1,
     retryDelay: 0,
@@ -154,7 +154,7 @@ Deno.test('query hydration preserves fields from a serialized error record', asy
   serverClient.mount();
   const mutation = serverClient.getMutationCache().build(serverClient, {
     mutationKey: ['serialized-error'],
-    mutationFn: async (value: string) => value.length,
+    mutationFn: (value: string) => Promise.resolve(value.length),
   });
   const pending = mutation.execute('draft');
 
@@ -168,18 +168,46 @@ Deno.test('query hydration preserves fields from a serialized error record', asy
       name: 'TypeError',
       stack: 'serialized stack',
     };
+    wireMutationState.error = {
+      message: 'serialized current error',
+      name: 'RangeError',
+    };
 
     const browserClient = new QueryClient();
     hydrateFromDehydrated(browserClient, wireState);
 
-    const hydratedFailure = browserClient.getMutationCache().getAll()[0]?.state.failureReason;
+    const hydratedMutationState = browserClient.getMutationCache().getAll()[0]?.state;
+    const hydratedFailure = hydratedMutationState?.failureReason;
     assertInstanceOf(hydratedFailure, Error);
     assertEquals(hydratedFailure.message, 'serialized failure');
     assertEquals(hydratedFailure.name, 'TypeError');
     assertEquals(hydratedFailure.stack, 'serialized stack');
+    assertInstanceOf(hydratedMutationState?.error, Error);
+    assertEquals(hydratedMutationState.error.message, 'serialized current error');
+    assertEquals(hydratedMutationState.error.name, 'RangeError');
   } finally {
     onlineManager.setOnline(true);
     await pending;
     serverClient.unmount();
   }
+});
+
+Deno.test('query hydration revives serialized query error fields', () => {
+  const serverClient = new QueryClient();
+  serverClient.setQueryData(['failed-query'], 'stale data');
+  const wireState = roundTripThroughHydrationScript(dehydrateQueryClient(serverClient));
+  const wireQuery = requireRecord(wireState.queries[0], 'wire query');
+  const wireQueryState = requireRecord(wireQuery.state, 'wire query state');
+  wireQueryState.error = { message: 'serialized query error' };
+  wireQueryState.fetchFailureReason = { message: 'serialized fetch failure' };
+  wireQueryState.status = 'error';
+
+  const browserClient = new QueryClient();
+  hydrateFromDehydrated(browserClient, wireState);
+
+  const hydratedState = browserClient.getQueryCache().getAll()[0]?.state;
+  assertInstanceOf(hydratedState?.error, Error);
+  assertEquals(hydratedState.error.message, 'serialized query error');
+  assertInstanceOf(hydratedState.fetchFailureReason, Error);
+  assertEquals(hydratedState.fetchFailureReason.message, 'serialized fetch failure');
 });
