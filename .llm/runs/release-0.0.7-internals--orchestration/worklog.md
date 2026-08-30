@@ -3346,3 +3346,39 @@ truthful both times when the tooling was not.
 
 Mitigation carried forward: the relaunch brief instructs the author to commit at every slice boundary,
 so any future turn ending costs at most one slice of uncommitted work rather than an unbounded amount.
+
+## 2026-08-30 — host condition corrected: PID 1 is `tini`, zombies 0; stale root-test refusal retired
+
+The ~7.7k unreapable PID-1 zombie condition that this lane carried into every #1732 and #1734 brief
+is **no longer true**, and I verified that rather than accepting the correction:
+
+| Probe | Result |
+| --- | --- |
+| `/proc/1/comm` | `tini` — a real reaping init |
+| Zombie count (`ps -eo stat` → `^Z`) | **0** |
+| Zombies grouped by ppid | none |
+| Total processes | 113 |
+| `ulimit -n` / `pid_max` | 524288 / 4194304 |
+
+So the standing instruction "root `deno task test` is not a usable verdict source on this host" is
+**stale as a current reason** and must not be preserved as a live refusal. The gate table's row 6
+(`Root test — NOT FIRED`) was honest when written and is now out of date.
+
+**What I am doing about it, and the boundary.** The refusal is retired by *measurement*, not by
+assertion: root `deno task test` — which is exactly the structured wrapper
+`.llm/tools/run-deno-test.ts -- --allow-all` — is being re-run at the evidence head
+`6605625ab50850da40e71b6f0a77bb704c675751`, in a **detached throwaway worktree outside the leaf** so
+it cannot contend with the author's still-running turn or mutate the product.
+
+Only the **evidence** changes. The product commits (`5b84eaea`, `6e82aad1`, `0d25cce4`) stay
+immutable; no source, test, or fixture is touched to make this gate pass. If the root run surfaces a
+red, it will be classified honestly as either (a) resolved-by-host — a failure whose only cause was
+the zombie exhaustion, now passing — or (b) a **genuine baseline red**, pre-existing at `main` and
+outside this leaf's scope, reclassified explicitly rather than folded into the leaf's verdict. The
+two failures previously attributed to the host, `codex-follow_test` and `hybrid-launcher_test`, both
+live under `.llm/tools/agentic/**`, outside the scope diff, and neither touches `packages/aspire` or
+`packages/cli` — so if they now pass, that confirms the host attribution was correct; if they still
+fail, the earlier attribution was wrong and that is a finding about this lane's own reasoning, not
+about the leaf.
+
+A red that is genuinely pre-existing gets proved against `main` before it is called pre-existing.
