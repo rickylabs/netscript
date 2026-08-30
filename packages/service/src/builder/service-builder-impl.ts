@@ -15,7 +15,12 @@ import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import { createHonoTracingMiddleware } from '@netscript/telemetry/hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
+import type {
+  ContractPolicyAuthorizerPort,
+  ProcedurePolicyResolver,
+} from '../auth/contract-policy.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
+import type { AuthorizerPort } from '../auth/types.ts';
 import {
   createHealthHandler,
   createLivenessHandler,
@@ -42,7 +47,7 @@ import type {
   ShutdownHook,
 } from '../types.ts';
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
-import { type RpcWiringOptions, wireRpc } from './service-rpc.ts';
+import { resolveRpcWiringPaths, type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
 
 interface DeferredRoute {
@@ -450,9 +455,10 @@ export class ServiceBuilderImpl<
   private installAuth(): void {
     if (this.authInstalled) return;
     this.authInstalled = true;
+    const policyResolver = this.bindContractPolicy();
 
     if (this.authnOptions) {
-      this.app.use('*', createAuthnMiddleware(this.authnOptions));
+      this.app.use('*', createAuthnMiddleware({ ...this.authnOptions, policyResolver }));
     }
 
     if (this.authzOptions) {
@@ -462,9 +468,21 @@ export class ServiceBuilderImpl<
           ...this.authzOptions,
           protect: this.authnOptions?.protect,
           allowAnonymous: this.authnOptions?.allowAnonymous,
+          policyResolver,
         }),
       );
     }
+  }
+
+  private bindContractPolicy(): ProcedurePolicyResolver | undefined {
+    const authorizer = this.authzOptions?.authorizer;
+    if (!authorizer || !isContractPolicyAuthorizer(authorizer)) return undefined;
+
+    return authorizer.bind({
+      ...resolveRpcWiringPaths(this.rpcOptions ?? undefined),
+      rpcAliases: this.rpcOptions?.rpcAliases,
+      deprecatedRpcRoutes: this.rpcOptions?.deprecatedRpcRoutes,
+    });
   }
 
   private installDeferredRoutes(): void {
@@ -535,4 +553,10 @@ export class ServiceBuilderImpl<
       this.shutdownHooks,
     );
   }
+}
+
+function isContractPolicyAuthorizer(
+  authorizer: AuthorizerPort,
+): authorizer is ContractPolicyAuthorizerPort {
+  return 'bind' in authorizer && typeof authorizer.bind === 'function';
 }

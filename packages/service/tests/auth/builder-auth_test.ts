@@ -1,5 +1,7 @@
 import { assertEquals } from '@std/assert';
-import { createService } from '../../mod.ts';
+import { implement, os } from '@orpc/server';
+import { baseContract, SuccessSchema } from '@netscript/contracts';
+import { createContractAuthorizer, createService } from '../../mod.ts';
 import { createScopeAuthorizer } from '../../src/auth/scope-authorizer.ts';
 import { createStaticCredentialAuthenticator } from '../../src/auth/static-credential-authenticator.ts';
 import type { Principal } from '../../src/auth/types.ts';
@@ -111,4 +113,58 @@ Deno.test('builder injects a principal only when the Hono auth context has one',
 
   assertEquals(anonymousContext, { tenant: 'tenant-a' });
   assertEquals(Object.hasOwn(anonymousContext, 'principal'), false);
+});
+
+Deno.test('builder binds one contract policy resolver to actual REST and RPC mounts', async () => {
+  const contract = {
+    renamedStatus: baseContract
+      .route({ method: 'GET', path: '/status' })
+      .output(SuccessSchema)
+      .meta({ access: { authentication: 'none' } }),
+    readItem: baseContract
+      .route({ method: 'GET', path: '/items/{id}' })
+      .output(SuccessSchema)
+      .meta({
+        access: {
+          authentication: 'required',
+          authorization: { scopes: ['users:read'] },
+        },
+      }),
+  };
+  const implemented = implement(contract);
+  const router = os.router({
+    renamedStatus: implemented.renamedStatus.handler(() => ({ success: true })),
+    readItem: implemented.readItem.handler(() => ({ success: true })),
+  });
+  const app = createService(router, { name: 'contract-policy-builder' })
+    .withRPC({
+      apiPath: '/rest',
+      rpcPath: '/transport',
+      rpcAliases: ['/legacy-rpc'],
+    })
+    .withAuthn({ authenticator })
+    .withAuthz({ authorizer: createContractAuthorizer(contract) })
+    .build();
+
+  const publicRest = await app.request('/rest/status');
+  const publicRpc = await app.request('/transport/renamedStatus');
+  const publicAlias = await app.request('/legacy-rpc/renamedStatus');
+  const missingCredential = await app.request('/rest/items/42');
+  const missingScope = await app.request('/transport/readItem', {
+    headers: { authorization: 'Bearer write' },
+  });
+  const allowed = await app.request('/rest/items/42', {
+    headers: { authorization: 'Bearer read' },
+  });
+
+  assertEquals(publicRest.status, 200);
+  assertEquals(publicRpc.status, 200);
+  assertEquals(publicAlias.status, 200);
+  assertEquals(missingCredential.status, 401);
+  assertEquals(missingScope.status, 403);
+  assertEquals(await missingScope.json(), {
+    error: 'FORBIDDEN',
+    message: 'authz.missing-scope:users:read',
+  });
+  assertEquals(allowed.status, 200);
 });
