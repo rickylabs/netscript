@@ -135,3 +135,22 @@ cancel sibling lanes) or from a re-granted host lease after the NAS is provision
 | Owned cleanup + zero proof                  | `agentic:leak-check` survivors `[]`; `agentic:teardown` preview empty; run-owned scaffold dir removed; `aspire ps` → `[]`, `docker ps -a` → empty. **Lease released.**                                                                                                                                                                                                                     |
 | Merge handoff                               | #1735 (S2), #1738 (S4), #1740 (S5) remain human-merge candidates; S5's runtime verdict is BLOCKED on #1736 like S1/S4 — recommended order: merge #1736 → rebase S1/S4/S5 → one CI `e2e-cli` dispatch per head → merge. No merge/relabel by this session.                                                                                                                                   |
 | Next lease request (Phase B)                | Recommended **S3 Phase B (telemetry envelopes)** first: its Phase A is PASS with no pending review, and its first step (isolated `aspire start` of the generated fixture) doubles as the outstanding Docker-27.5.1/remote-dind probe. S7 Phase B is the alternative (cycle-2 PASS). S6 Phase B waits for the Tier-A review at `564d465c`, which is static work started in this checkpoint. |
+
+## Phase-B lease request — S3 (#1715 / PR #1741) — prepared 2026-08-30
+
+- **Ask:** grant the next single serialized host runtime lease to **S3 Phase B** (telemetry envelope
+  capture), one isolated AppHost, owned cleanup to proven zero before release.
+- **Why S3 first:** Phase A is IMPL-EVAL PASS with no pending review; the capture contract is fully
+  specified in the branch README; its first `aspire start --isolated` is also the outstanding probe
+  for Docker 27.5.1 (< 28 minimum) and remote-dind endpoint proxying that the S5 run never reached
+  (D-33). S7 Phase B is the alternative; S6 Phase B waits for IMPL-EVAL cycle 2.
+- **Ready to dispatch:** brief `slices/s3/phase-b-brief.md` (starts with `use harness` +
+  `## SKILL`); worktree to create at `worktrees/007-aspire-s3` from
+  `origin/test/aspire-13-5-s3-fixture-recapture` @ `fe4f496bd`; launch via
+  `deno task
+  agentic:launch-codex-slice --user node --provider openai --model gpt-5.6-sol --effort medium
+  --expect-base fe4f496b …`
+  (short SHA), thread id + rollout + resume command recorded in `slices/s3/codex-thread-ids.md`.
+- **Exit rule if Docker-version-specific:** receipt preserved, zero proven, lease released,
+  `sandboxctl` upgrade of the dind sandbox surfaced as the human infrastructure boundary; all static
+  Aspire work continues.
