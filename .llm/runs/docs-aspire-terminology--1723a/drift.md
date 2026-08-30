@@ -24,3 +24,10 @@ whose `provenance.json` `sourceCommit` is embedded in `packages/mcp/src/publish-
 The Aspire lane verified the useful negative: regenerating `agent-tools.generated.ts` alone does
 **not** move publish-assets, so the trigger is specifically an agent-docs corpus regeneration, not any
 input path.
+
+## D-4 · Scoped inventory is 18 occurrences in 13 files, not 14
+
+The implementation brief says “18 occurrences, 14 files,” but its enumerated locations and the
+required pre-edit `git grep` both resolve to 18 occurrences across 13 files. `CONTRIBUTING.md` has no
+matching occurrence, as already established in `research.md` §3. The enumerated occurrences remain
+the authority; no extra row was inferred or edited to manufacture a fourteenth file.
