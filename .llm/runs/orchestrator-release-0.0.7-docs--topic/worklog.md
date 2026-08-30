@@ -2280,3 +2280,54 @@ A supervisor-dispatched exact-head IMPL-EVAL is running, briefed that **a green 
 `symbolCoverage` claim is enforceable, not that it is true** — the substantive check is whether
 `cron`'s `complete` declaration actually holds, and whether any package was adopted at the weaker
 mode to dodge a genuine undocumented export.
+
+## 2026-08-30 — #1783 (aspire `/public`) Tier-A PASS; infra lease respected
+
+### Infrastructure
+
+Coordinator update: DinD mount visibility and cross-container ports are fixed —
+`DOCKER_HOST=tcp://netscript-dind:2375`, published ports via `netscript-dind:<port>` rather than
+`127.0.0.1`. **The sole host runtime lease is held by the Aspire supervisor for Phase B.** This lane
+started no Aspire or Docker work and has none queued: every docs slice here is static, so the lease
+is not on its critical path. The evaluator brief for #1783 carries an explicit "do not start Aspire or
+Docker" instruction so a sub-agent cannot take the lease by accident.
+
+### #1783 — a stale review, answered with the file list rather than a dismissal
+
+An `augmentcode` thread claimed the derived assets were missing. It was **accurate against
+`018a5bb53`** — the prose-only first commit — and **stale against head `b1a930364`**, which carries
+the assets in their own commit precisely so `provenance.json`'s `sourceCommit` points at the prose
+commit rather than at an orphan regeneration.
+
+Answered with the full 12-file scope, the four asset paths, and the provenance identity
+(`sourceCommit` `018a5bb53` == `HEAD^`), then resolved. A stale finding still deserves the evidence,
+not a dismissal — and the reply invites reopening if an asset really is missing.
+
+### Tier-A — PASS, and the substantive check was the new claim
+
+The slice replaced a false claim with a **stronger** one, which is where to look hardest. The page
+now says the four symbols are *"published **exclusively** through `@netscript/aspire/public`"*.
+
+**My first verification of that claim looked like a contradiction**: grepping for non-`/public`
+exports returned a hit for all four. Chasing it rather than reporting it showed the hits are
+`src/domain/mod.ts` and `src/ports/mod.ts` — **internal barrels absent from `deno.json`'s export
+map**, whose published targets are only `mod.ts`, `config.ts`, `schema.ts`, `types.ts`,
+`constants.ts`, `src/application/mod.ts`, `src/adapters/mod.ts`, `src/testing/mod.ts` and
+`src/public/mod.ts`. The exclusivity claim is **true**; my probe had not distinguished an internal
+barrel from a published entrypoint.
+
+That is the third probe of mine this session to produce a false signal — after the unasserted mapping
+`replace()` and the `deno doc --json` symbol query. The pattern is consistent: I write a quick check,
+it returns a clean-looking answer, and the answer is an artifact of the check rather than the code.
+Each was caught only by chasing a result that felt wrong. The cheap defence is to make a probe prove
+itself on a known-positive case before trusting its negatives.
+
+Verified at head: rewritten aggregate paragraph is accurate; all four symbols documented;
+**zero `packages/aspire` source changes**; **`AUTHORITATIVE_MAPPING` untouched**; provenance
+`018a5bb53` == `HEAD^`; 13 gates exit 0; `deno.lock` unchanged; tree clean.
+
+Umbrella safety confirmed in **both** the body and the commit messages: `Closes #1782`,
+`Part of #1777`, no closing keyword targeting #1777.
+
+Supervisor-dispatched exact-head IMPL-EVAL running, briefed to attack the exclusivity claim and to
+run the modal-verb sweep this lane has now needed on three consecutive slices.
