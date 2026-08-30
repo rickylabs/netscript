@@ -458,6 +458,12 @@ descendants `unproven`), foreign-control non-mutation PASS; static reporter-fix 
 thread `01a053ef…`; rerun after S8. | | S3 IMPL-EVAL cycle 4 (phase B) **PASS** at `6c699ab66` |
 `slices/s3/evaluate-cycle-4.md` (session `dfc30c9e…`). S3 Phase B complete; converging onto main
 `52a881c5` + hosted tiers → merge-candidate handover (coordinator lands). | | S1 gate correction
-pushed `e0d70e404979` | Thread `01a05401…`: live second-endpoint proof + negative stale case (RED
-wrapper exit 1 → GREEN 29/0), check 170/0, arch/quality green. Refrozen; hosted tiers queued behind
-the serial chain (chain-2); delta IMPL-EVAL on runtime green — run 33328727942 not reused. |
+pushed `e0d70e404074` (corrected: an earlier row carried the author comment's invalid 40-char
+expansion `e0d70e404979…`; authoritative head is `e0d70e40407458bebcf02cc408bea6b49107f42b`) |
+Thread `01a05401…`: live second-endpoint proof + negative stale case (RED wrapper exit 1 → GREEN
+29/0), check 170/0, arch/quality green. Refrozen; hosted tiers queued behind the serial chain
+(chain-2); delta IMPL-EVAL on runtime green — run 33328727942 not reused. | | S1 correction Tier-A
+(delta) at true head `e0d70e404074` | Scope: `verify-live-db-endpoint.ts` + `runtime-gates.ts` +
+tests + 13.5.3 describe fixture + run artifacts; inequality throw replaced by live second-endpoint
+proof; delta tests 29/0; e2e-root check 170/0; workflows untouched. Hosted tiers queued (chain-2,
+keyed to `e0d70e40407458bebcf02cc408bea6b49107f42b`). |
