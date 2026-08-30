@@ -181,3 +181,64 @@ by the restart.
 After the repair lands: fresh Tier-A over the delta at the new exact head, then the mandatory fresh
 opposite-family IMPL-EVAL in a session this lane owns. No runtime lease is required for this leaf —
 the six-path CLI ceiling touches no Aspire, Docker, or scaffold-runtime surface.
+
+## Tier-A PASS at `61b8bf52b50a3cc3e98b67b367d1a1e4a2022807` — sign-off committed
+
+The S5 repair landed at `c1e21c1b` (product path 2 + `worklog.md`, exactly two files, no seventh path
+and no test-behaviour change), and the supervisor sign-off is the artifact-only commit `61b8bf52`.
+Both T-1 and T-2 are resolved. The full re-derivation is in the leaf's own `worklog.md` at the
+evaluated head; the load-bearing points:
+
+- **T-1 resolved.** The over-width `@std/path` line-2 finding is gone. The remaining four findings
+  were re-attributed by running the same scoped format against a pristine base archive and comparing
+  **source lines**: three are base-owned on identical lines, and the fourth is leaf-owned because the
+  regression-test file does not exist at base. The generator's 9 → 18 line shift is exactly +9, the
+  cost of expanding one import line into ten — an independent consistency check on the attribution
+  rather than a restatement of it.
+- **T-2 resolved.** The corrected sentence was verified against the file, not the claim: the original
+  S2 case name `'plugin doctor fails when a saga is authored after generate plugins'` is present
+  **verbatim** at head alongside the four added cases, with `createDoctorHarness` shared.
+
+Exact-head gates, all independently re-run: focused suite exit `0` (5 passed / 0 failed); scoped type
+check exit `0`, zero diagnostics; scoped lint under the root rule set exit `0`, zero findings;
+`deno.lock` byte-unchanged by raw `git diff --exit-code`; no thread id, rollout path, or daemon handle
+in committed artifacts; `review-threads PASS threads=0 unanswered=0`.
+
+**A disclosed fact the evaluator was told to confirm rather than assume:** the root `deno.json`
+excludes `packages/cli/` from both `fmt` and `lint`, so the leaf's scoped runs used a scratch config
+with that exclusion removed and are *stricter* than CI. The residual leaf-owned format finding in the
+regression test therefore cannot fail CI. It was still worth correcting, because T-1 was about the
+honesty of the attribution, not about a merge blocker.
+
+### IMPL-EVAL dispatched — identity and route recorded before the evaluator mutates anything
+
+| Field | Value |
+| --- | --- |
+| Gate | IMPL-EVAL cycle 1, PR #1739 (#1673) |
+| **Evaluated head** | `61b8bf52b50a3cc3e98b67b367d1a1e4a2022807` — equal across local, `origin`, and PR `headRefOid`; tree clean |
+| Product head | `c1e21c1b0823d1bd057d252e59f7bee5fbbdfc89` (ancestor; delta to evaluated head is artifact-only) |
+| Implementation head | `e5123a0e4f3d6844dbc173d5b09249a24e637fb8` |
+| Immutable base | `13878a80a50c55b9662099fed64555f2310ae4a3` |
+| Requested route | **canonical** `formal_impl_evaluation` — native Claude `claude-fable-5` · effort `medium` · `--remote-control` |
+| Observed route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--model","claude-fable-5"]` — **matched** |
+| Background id | `9db66b8a` |
+| Claude session id | `9db66b8a-b7f2-47f9-b3d4-ef8e53c2d7e2` |
+| PID | `97958` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-eval-1673` (dedicated worktree; sole session there) |
+| Verdict branch | `eval/impl-eval-1673-cycle-1`, cut at the evaluated head, upstream NONE |
+| Registry `bridgeSessionId` | `session_01NKoRnBpTaUJWVJZcGeK3Zc` (non-empty, sessions-registry form) |
+| Remote Control URL | `https://claude.ai/code/session_01NKoRnBpTaUJWVJZcGeK3Zc` |
+| Independence | fresh session; separate from the Codex author `01a051d0-9b22-7181-a3fb-c2a48eab61b6` **and** from this topic supervisor, which signed Tier-A; opposite-family to the `gpt-5.6-sol` implementer |
+| Verdict | _pending — immutable pushed verdict required_ |
+
+**Route note.** `lane-policy.md` renders `formal_impl_evaluation` as **Fable 5 · medium for Codex
+work**. No owner amendment applies to this gate, so the canonical route is used — not the Opus
+override an earlier leaf in this lane carried under an explicit coordinator amendment. The two are
+recorded distinctly so they are not later conflated.
+
+The evaluator was given a dedicated worktree rather than the leaf's, so the leaf branch stays pristine
+at the evaluated head while the verdict is written on its own branch. The brief states plainly that
+this supervisor's Tier-A is an **input to verify, not a substitute for its judgment**, and names this
+lane's five recorded analytical errors — the wrong-file green, file-level attribution hiding a
+line-level fact, evidence written from a claim, the #1112 generated-derivative cascade, and the
+supervisor `timeout` that killed a live author turn — so nothing is inherited.
