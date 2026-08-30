@@ -644,3 +644,26 @@
 - **Rule for this run:** never wrap `launch-codex-slice` / `codex-resume` in `timeout`; run them
   backgrounded and wake on the rollout (`task_complete` / `turn_aborted`) or the worktree head. Use
   `codex-status --sessions <n>` larger than the default when more than 5–8 threads are live.
+
+## D-39 — 2026-08-30 — host quota and Docker resolved; D-25a / D-34 / D-37 blockers closed
+
+- **Coordinator environment authority update 2 (09:27Z), re-proven read-only by this supervisor at
+  09:27:48Z:** `netscript-dind` → `10.4.12.19`; project mise `DOCKER_HOST=tcp://netscript-dind:2375`
+  → Docker client/server **28.5.2**; `aspire doctor` → `✅ Docker v28.5.2: running`, **5 passed / 3
+  warnings / 0 failed** (only cert warnings remain); `fs.inotify.max_user_instances` = **1024**; PID
+  1 `tini`, 0 zombies; `aspire ps` → `[]`; dind `docker ps -a` → empty.
+- **Fresh gate:** `.llm/tools/agentic/codex/codex-follow_test.ts` at S5 head `aa822069` → **3 passed
+  / 0 failed** (`slices/s5/receipts/codex-follow-rerun-aa822069-quota1024.json`). With D-37's
+  `hybrid-launcher_test.ts` 10/10, both root-suite reds that S5's evidence table carried as infra
+  are now green on this host; the coordinator's own lifecycle rerun is 13/13 incl. `watch-run`
+  heartbeat exit 2.
+- **Narratives superseded:** D-25 (zombies, already retired by D-36), D-25a (inotify ceiling),
+  D-31's Docker < 28 line, D-33's "Docker-27.5.1 question", D-34's "raise the ceiling before the
+  lease", D-37's "only remaining host quota blocker". **No host quota blocker remains for Phase-B
+  runtime.** What still gates Phase B is process, not environment: one serialized host lease at a
+  time, explicitly granted by the coordinator, with exact owned cleanup back to Aspire/Docker zero.
+  The remote-dind endpoint-proxy path is still unexercised (no AppHost has booted on this host yet)
+  — the first Phase-B lease proves it.
+- **Queue effect:** S3 Phase B is **grantable now** (`slices/s3/phase-b-brief.md`, worktree
+  `007-aspire-s3` @ `fe4f496b`); not started — no lease has been granted since the S3 release. S8
+  continues static on thread `01a051e6…`.
