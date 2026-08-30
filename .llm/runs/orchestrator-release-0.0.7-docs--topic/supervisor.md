@@ -575,3 +575,52 @@ Remote Control bridge is made for this session.
 
 D-2 (#1728's undocumented error) stays parked. D-3 (release-note surfaces) is not drafted, per the
 coordinator's instruction to wait for the consumer canary payload to be fixed.
+
+## #1745 leaf — Tier-A PASS, PR #1746 open, IMPL-EVAL dispatched, 2026-08-30
+
+| Field                    | Value                                                                 |
+| ------------------------ | --------------------------------------------------------------------- |
+| PR                       | **#1746** (draft), direct-to-main, `Closes #1745`                      |
+| Immutable evaluated head | `96501e1072fda5eb055fcad2186a69c47e735f09`                             |
+| Commits                  | `18ab8a6a` pages · `c9bb3115` regen · `9f5c6a7e` Tier-A round trip · `96501e10` regen |
+| Taxonomy                 | `type:docs`, `area:docs`, `priority:p1`, `status:impl`, `ci:skip-e2e`, `ci:skip-scaffold`, milestone 0.0.7 |
+| Tier-A verdict           | **PASS** after one round trip — comment `5467249057`                   |
+| IMPL-EVAL session        | Claude · Fable 5 · medium · bypassPermissions, Remote Control `session_01PZZasJmBodbovJZJM4JJN7`, tmux `ns007-impl-eval-1745`, cwd = leaf worktree |
+| Family separation        | opposite-family to the Codex author thread `01a05164-…`; fresh session, never used for generation |
+
+### Tier-A found two defects; neither was fixed by the reviewer
+
+**T-1 (blocking).** The paragraph introducing the host/editor table ended on a colon, with the
+`--with-docs` paragraph sitting between it and the table — the colon led the reader into unrelated
+content. **T-2 (advisory).** "Host detection installs the matching files" still implied the canonical
+bundle was detection-dependent; it is written before any host branch. Both returned to the author
+thread via `codex exec resume` on the same thread and fixed in `9f5c6a7e`. The reviewer authored
+nothing.
+
+**Checked and cleared, recorded so it is not re-litigated:** "Every host receives the canonical
+bundle" is exactly true — `resolveHosts` never returns an empty set, falling back to `["claude"]`.
+It reads like a defect and is not one.
+
+### Gates were re-derived, not read
+
+All eight re-run by this lane at both `c9bb3115` and `96501e10`; `check:assets-barrel` left the tree
+unchanged both times. Root `fmt:check`/`lint` were **not** run and are **not** cited — root
+`fmt.include` is `packages/**`+`plugins/**` TS/TSX and `docs/site` excludes `*.md`/`*.vto`, so no
+formatter governs these three files. The lane's rule-4 check paid off again.
+
+Corpus verified by **content**: the regenerated `prose.json.gz` decompresses to 8 occurrences of
+`.agents/skills` and no longer contains "three ready-made", so the regen carries prose rather than
+only moving `sourceCommit` (`067193acf` → `9f5c6a7ea`).
+
+### Operational hygiene
+
+The launcher path needed correcting twice before the evaluator was real: a `nohup`-ed interactive
+`claude` produced a live PID and an empty log, and a `| tee` pipeline denied it a TTY and produced an
+empty pane. Neither was reported as a running evaluator. Only the tmux session with `pipe-pane`
+logging produced an attached session with a Remote Control URL, and that is what is recorded above.
+A live PID is not evidence of a working session.
+
+Leaf run evidence (`drift.md`, `worklog.md`, `codex-thread-ids.md` updates) stays **local and
+uncommitted** per NAS policy. The scaffold commit `2e2c3364` already carries the run dir on the
+pushed branch, consistent with every other leaf in this repo; published history was not rewritten to
+remove it.
