@@ -70,13 +70,13 @@ export async function stopAndProbe(
   const commands = [stopCommand(appHost, false), ...(cleanup ? [stopCommand(appHost, true)] : [])];
   const transcripts = [];
   for (const command of commands) {
-    transcripts.push(await run(command[0] ?? 'aspire', command.slice(1)));
+    transcripts.push(await capture(command[0] ?? 'aspire', command.slice(1)));
   }
-  const idsOutput = await run('docker', ['ps', '-aq']);
+  const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
   const ids = idsOutput.stdout.split(/\s+/).filter(Boolean);
   const containers: unknown[] = [];
   for (const id of ids) {
-    const inspection = await run('docker', ['inspect', id]);
+    const inspection = await requireSuccess('docker', ['inspect', id]);
     const parsed: unknown = JSON.parse(inspection.stdout);
     if (!Array.isArray(parsed)) throw new Error(`docker inspect ${id} did not return an array`);
     containers.push(...parsed);
@@ -100,6 +100,14 @@ export async function stopAndProbe(
       }`,
     );
   }
+  const terminalStop = transcripts.at(-1);
+  if (!terminalStop || terminalStop.code !== 0) {
+    throw new Error(
+      `Aspire stop did not complete: ${
+        terminalStop?.stderr || terminalStop?.stdout || 'no transcript'
+      }`,
+    );
+  }
 }
 
 export function stopCommand(appHost: string, force: boolean): readonly string[] {
@@ -114,7 +122,7 @@ export function stopCommand(appHost: string, force: boolean): readonly string[] 
   ];
 }
 
-async function run(
+async function capture(
   command: string,
   args: readonly string[],
 ): Promise<{ readonly code: number; readonly stdout: string; readonly stderr: string }> {
@@ -128,9 +136,14 @@ async function run(
     stdout: new TextDecoder().decode(output.stdout),
     stderr: new TextDecoder().decode(output.stderr),
   };
-  if (!output.success) {
+  return result;
+}
+
+async function requireSuccess(command: string, args: readonly string[]) {
+  const result = await capture(command, args);
+  if (result.code !== 0) {
     throw new Error(
-      `${command} ${args.join(' ')} failed (${output.code}): ${result.stderr || result.stdout}`,
+      `${command} ${args.join(' ')} failed (${result.code}): ${result.stderr || result.stdout}`,
     );
   }
   return result;

@@ -2,7 +2,7 @@ import type { ListenerReadinessExpectation } from './listener-readiness-gates.ts
 import {
   type ListenerHealthReport,
   readListenerHealthReport,
-} from './verify-listener-readiness.ts';
+} from './evidence/listener-readiness.ts';
 
 const UNHEALTHY_DESCRIPTION = /listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
 const REPORT_DEADLINE_MS = 30_000;
