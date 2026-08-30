@@ -370,4 +370,8 @@ Gemini conversation. | | S11 docs_audit fix cycle 1 landed | `b8d66f6f`
 `docs(aspire): apply S11 docs_audit cycle-1 fixes` (same Gemini conversation, 3 turns, DONE,
 pushed). Audit cycle 2 resumed on the same Sol thread `01a052fc…` at `b8d66f6f` (worktree moved). |
 | Issue normalization (S11) | #1723 `status:plan` → `status:impl`; #1642 `status:triage` →
-`status:impl` (milestone 0.0.7) — match PR #1771's phase; exactly one `status:` each. |
+`status:impl` (milestone 0.0.7) — match PR #1771's phase; exactly one `status:` each. | | S11
+docs_audit cycle 2 | **`AUDIT: FAIL_FIX`** — 7/12 closed; open H2/H3/H5/H6/M3/M5 (D-62). Two-failure
+escalation reached: fix cycle 2 dispatched on the same Gemini conversation (H2/H3/H6/M3 + H5 honest
+framing); **coordinator authorization requested for audit cycle 3**; M5 (`mmdc`) handled by the
+supervisor. |

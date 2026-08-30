@@ -1164,3 +1164,27 @@
   two-failure escalation applies. Structural dependency surfaced: S11's "current generated output"
   claims cannot be true before S1's 13.5.3 pin lands — the brief requires either today's 13.4.6
   output or an explicit "target after the pin bump" framing.
+
+## D-62 — 2026-08-30 — S11 docs_audit cycle 2 `FAIL_FIX` → two-failure escalation; supervisor decision and coordinator ask
+
+- Cycle 2 (same Sol thread `01a052fc…`, head `b8d66f6f`; `slices/s11/docs-audit/report-cycle-2.md`;
+  PR #1771 comment): **closed** H1 schemas/token, H4 npm/self-update, H7 Phase-B contracts, M1 MCP
+  form/vocab, M2 CLI reference, M4 internal wording, and the wrapper half of H6; checks 4 and 5
+  PASS. **Open:** H2 stale receipt names in the S11 worklog; H3 timing "typically" from two runs,
+  `--isolated` scope beyond help (S2 V3: host port 14428 reused across isolated starts),
+  "parallel-safe/free infra ports" claims; **H5** the docs must show 13.5.3 but the exact head
+  generates 13.4.6 (S1 unmerged) — reverting to 13.4.6 satisfies "current output" but not the S11
+  requirement, and the reference page still claims the 13.5 Browsers pin; **H6** the moved MCP chain
+  is false: the shipped resolver has four sources (explicit `--endpoint`,
+  `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, default) — the five-step `aspire_ps`
+  chain is S13's _future_ D-17 behaviour; M3 disposition table wrong on 12 rows; M5 `mmdc` not
+  executable (environment).
+- **Supervisor decision (escalation owner):** one bounded fix cycle 2 on the same generator for
+  H2/H3/H6/M3 (evidence-backed, no judgment calls), **H5 resolved by honest framing** — current
+  generated output stays 13.4.6 with a clearly labelled "target after the 13.5.3 pin" block, and
+  S11's version prose is finalized in S1's convergence step (S1 owns the pin; add a row to S1's
+  convergence brief); M5 handled by the supervisor as an environment fix. **Audit cycle 3 is not
+  started automatically** (doc-audit lane) — it needs the coordinator's authorization; requested.
+- Structural lesson for the plan: S11 was approved ahead of S1; its "prose must match shipped
+  behaviour" dependency is real — the honest framing keeps the PR truthful at any head, and the S13
+  D-17 prose lands with S13, not S11.
