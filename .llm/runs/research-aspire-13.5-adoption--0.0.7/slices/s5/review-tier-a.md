@@ -42,3 +42,37 @@ the `aspire describe`-derived E2E probes are correct and tested. Two findings ar
 
 Steer posted as PR #1740 comment (2026-08-30 ~03:05 CEST); runner stopped (SIGTERM, runner only);
 the child's in-flight continuation turn reads the comment. Slice 7 expected. Fix brief also sent by `codex-resume` on the same thread (supervisor is the sender after the runner stop).
+
+## Cycle 2 — head `1634a3c3c` (amend of `8152245b2`, run-dir only: `context-pack.md` + `worklog.md`) — **sign-off**
+
+Slice 7 `fix(aspire): honest S5 literal grep — exclude generated barrels, deprecate remaining
+default-port constants`:
+
+- `.llm/tools/generate-cli-assets-barrel.ts` + test: **fully reverted** (`git diff origin/main..HEAD`
+  on both files is empty); barrels regenerated.
+- `check-aspire-host-ports_test.ts` literal grep now excludes `*.generated.ts` (matching the checker's
+  `isGeneratedSource`); drift entry replaced with the exclusion rationale.
+- `AUTH_API_DEFAULT_PORT = 8094`, `TRIGGERS_API_DEFAULT_PORT = 8093` restored with `@deprecated`
+  JSDoc naming the 0.0.8 removal draft (draft extended to all default-port exports); exports kept;
+  `deprecated-default-port_test.ts` added for auth and triggers; no `WORKERS_API_DEFAULT_PORT`
+  exists in `plugins/workers/src`.
+- `configure-flow-b-job.ts` formatted.
+
+Gates executed by the reviewer at `8152245b2` (carry to `1634a3c3c`, zero code delta):
+
+| Gate | Result |
+| --- | --- |
+| literal grep excl. generated | exactly the three `constants.ts` + three deprecation tests |
+| runtime reads of `*_API_DEFAULT_PORT` (non-test, non-export) | 0 |
+| new lint-ignore / `as unknown as` / `any` | 0 |
+| `check:aspire-host-ports` | OK, no pinned host ports |
+| `check:assets-barrel` | PASS |
+| `quality:scan` / `arch:check` | ok, 0 findings / exit 0 |
+| `run-deno-check` (plugins, cli/src, cli/e2e, tools) | 0 diagnostics |
+| unit suites | 482 passed / 0 failed / 12 ignored |
+| raw fmt on `configure-flow-b-job.ts` | clean |
+| `scaffold.plugins --cleanup` | 17/17 |
+
+No blocking finding. Notes for the evaluator: `packages/cli` files flagged by raw
+`deno fmt --no-config --single-quote` were already non-conforming on `origin/main` (7 files) —
+not S5's. **Tier-A verdict: sign-off to IMPL-EVAL at `1634a3c3c`.**
