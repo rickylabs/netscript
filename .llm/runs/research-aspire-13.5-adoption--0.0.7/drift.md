@@ -935,3 +935,6 @@
   `gen:mcp-export-corpus`, `gen:publish-assets`, `agentic:dogfood-skills` — at each hop, since S9
   regenerates the same barrels main's docs changes feed). Until then the stack continues on its
   current base; S10 (in flight) is not rebased.
+- **D-50 addendum:** `main` → `a5520e70` (#1755). Convergence discipline unchanged: the
+  S5→S6→S8→{S9,S10} stack stays on its base until #1734 lands, then rebases bottom-up with the regen
+  chain at each hop; S9/S10 gate ordering reconciled at that point. No rebase now.

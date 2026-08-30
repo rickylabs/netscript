@@ -92,8 +92,8 @@ historical; all of those evaluator sessions are `offline` and none was resumed.
 
 ## Merge handoff (coordinator lands after the pre-merge gate)
 
-Main is `952cc106` (S2 merged). Stack convergence point: rebase S5 after #1734 lands, then S6 → S8 →
-S9 → S10 bottom-up with the regen chain at each hop (D-50).
+Main is `a5520e70` (#1755 after S2's #1735). Stack convergence point: rebase S5 after #1734 lands,
+then S6 → S8 → S9 → S10 bottom-up with the regen chain at each hop (D-50).
 
 `handoff-ready-prs.md`: **#1738** (Closes #1716) and **#1740** (Closes #1717, #1370, #979) pass
 close-gate independently of S3 Phase B; caveats = #1734 baseline for #1740's runtime verdict, S6/S8
