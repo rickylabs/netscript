@@ -9,8 +9,19 @@ export interface TelemetryEndpointEnvironment {
   readonly ASPIRE_DASHBOARD_PORT?: string;
 }
 
+/** Injectable runtime-edge port for reading a running AppHost dashboard URL. */
+export interface AspirePsDashboardPort {
+  /** Return the running AppHost dashboard URL, or undefined when no match is available. */
+  readDashboardUrl(): string | undefined;
+}
+
 /** Source that selected a telemetry endpoint. */
-export type TelemetryEndpointSource = 'explicit' | 'netscript_env' | 'aspire_port' | 'default';
+export type TelemetryEndpointSource =
+  | 'explicit'
+  | 'netscript_env'
+  | 'aspire_port'
+  | 'aspire_ps'
+  | 'default';
 
 /** Resolved endpoint and its discovery source. */
 export interface ResolvedTelemetryEndpoint {
@@ -23,6 +34,7 @@ export interface ResolvedTelemetryEndpoint {
 export function resolveTelemetryEndpoint(
   explicit: string | undefined,
   environment: TelemetryEndpointEnvironment = {},
+  aspirePs?: AspirePsDashboardPort,
 ): ResolvedTelemetryEndpoint {
   const option = validUrl(explicit);
   if (option) return { endpoint: option, source: 'explicit' };
@@ -36,6 +48,8 @@ export function resolveTelemetryEndpoint(
       source: 'aspire_port',
     };
   }
+  const runningDashboard = validUrl(aspirePs?.readDashboardUrl());
+  if (runningDashboard) return { endpoint: runningDashboard, source: 'aspire_ps' };
   return { endpoint: DEFAULT_TELEMETRY_ENDPOINT, source: 'default' };
 }
 

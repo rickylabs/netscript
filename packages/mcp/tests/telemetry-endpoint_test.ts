@@ -21,18 +21,24 @@ Deno.test('telemetry endpoint precedence is explicit, env, Aspire port, default'
     httpsFallback: 'https://localhost:19999',
     source: 'aspire_port',
   });
-  assertEquals(resolveTelemetryEndpoint(undefined, {}, {
-    readDashboardUrl: () => 'https://localhost:42501/?resource=dashboard',
-  }), {
-    endpoint: 'https://localhost:42501',
-    source: 'aspire_ps',
-  });
-  assertEquals(resolveTelemetryEndpoint(undefined, {}, {
-    readDashboardUrl: () => undefined,
-  }), {
-    endpoint: 'http://localhost:18888',
-    source: 'default',
-  });
+  assertEquals(
+    resolveTelemetryEndpoint(undefined, {}, {
+      readDashboardUrl: () => 'https://localhost:42501/?resource=dashboard',
+    }),
+    {
+      endpoint: 'https://localhost:42501',
+      source: 'aspire_ps',
+    },
+  );
+  assertEquals(
+    resolveTelemetryEndpoint(undefined, {}, {
+      readDashboardUrl: () => undefined,
+    }),
+    {
+      endpoint: 'http://localhost:18888',
+      source: 'default',
+    },
+  );
 });
 
 Deno.test('Aspire port outranks aspire ps and aspire ps outranks default', () => {

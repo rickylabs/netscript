@@ -13,14 +13,14 @@
 
 ### Public Surface
 
-- `resolveTelemetryEndpoint` remains the single endpoint policy function; no new package export map
-  or root export is introduced.
+- `resolveTelemetryEndpoint` remains the single endpoint policy function and is exported from the
+  existing package root so generated consumers can reuse the policy rather than copy it.
 - Scaffold outputs change only at the named telemetry example, Windows env, and consumer CI files.
 
 ### Domain Vocabulary
 
 - `TelemetryEndpointSource` gains `aspire_ps`.
-- `TelemetryEndpointPort` is the injected discovery seam; absence is a normal outcome.
+- `AspirePsDashboardPort` is the injected discovery seam; absence is a normal outcome.
 - `AspirePsDashboardReader` is the infrastructure adapter around the Aspire CLI process boundary.
 
 ### Ports
@@ -61,12 +61,18 @@ source and generated-carrier freshness gates.
 | 2026-08-30 | bootstrap | PLAN-EVAL disposition | Epic exhausted two evaluator cycles, then coordinator ratified D-1…D-17 and dispatched S13; leaf PLAN-EVAL is N/A under the authorized escalation path. |
 | 2026-08-30 | bootstrap | host preflight | Deno 2.9.5, .NET 10.0.400, Aspire 13.5.3; `aspire ps` returned `[]`; `docker ps -a` returned no containers. |
 | 2026-08-30 | 1 | RED-first contract | Structured test wrapper exited 1 before executing tests: missing Aspire-ps adapter, resolver lacks the third injected-port argument and `aspire_ps` source. This is the intended pre-implementation failure. |
+| 2026-08-30 | 2 | D-17 implementation | Added the injected dashboard port and runtime-edge `AspirePsDashboardReader`; wired query, doctor, MCP server, and CLI composition through the one resolver. |
 
 ## Gate Results
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | RED focused contracts | `run-deno-test.ts` over 7 focused test files | EXPECTED_FAIL (exit 1) | 9 type errors identify the missing adapter/port/source; stderr SHA-256 `c005517a…`. |
+| MCP tests | `run-deno-test.ts -- --allow-all packages/mcp/tests` | PASS | 139 passed, 0 failed. |
+| MCP check | `run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 117 files; no findings. |
+| MCP lint/fmt | structured lint/fmt wrappers for `packages/mcp` | PASS | 116 files; no findings. |
+| Framework quality | `deno task quality:scan` | PASS | No findings; existing allowance count 7. |
+| Architecture | `deno task arch:check` | PASS | No failures; existing repository warnings retained. |
 
 Runtime gates are N/A by explicit scope.
 
@@ -74,6 +80,12 @@ Runtime gates are N/A by explicit scope.
 
 - Issue #1724 remains the sole closing issue; epic #1712 is reference-only. Draft PR will be opened
   after this commit at the required S10 base. No contract or scope readjustment was needed.
+
+## Reconcile — slice 2
+
+- D-17 remains unchanged: explicit option → NetScript env → Aspire dashboard port → injected
+  `aspire ps` adapter → named default. The adapter selects a running AppHost by canonical path and
+  treats the authoritative empty array as unavailable. Domain code performs no process or file IO.
 
 ## Handoff Notes
 
