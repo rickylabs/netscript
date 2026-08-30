@@ -98,17 +98,22 @@ a process seam. A thin plugin may only wire the core primitive.
 | 2026-08-30T12:57:16Z | S1    | Design               | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                           |
 | 2026-08-30T13:10:51Z | S1    | Supervisor review    | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                            |
 | 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1    | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate. |
+| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2    | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                    |
+| 2026-08-30T13:53:27Z | S2    | Red-before proof     | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                     |
 
 ## Decisions
 
-| Decision                           | Reason                                                                                                                            | Source                                       |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Retain/emit all five cascade spans | Complete measures the engine's persisted completion transition; the other four measure real bridge/compensator work or rejection. | issue #1368, PLAN-EVAL F1, plan D1–D4/D9     |
-| Attribute set owns cross-plane key | Telemetry vocabulary stays out of runtime domain code.                                                                            | doctrine layering, plan D5–D6                |
-| Lock two correlation precedences   | Publisher key wins for cross-plane ID; definition rule wins for saga key; downstream spans consume both engine-selected values.   | PLAN-EVAL F3, plan D6–D8                     |
-| Explicit W3C handoff               | Handle span ends before bridge dispatch.                                                                                          | engine code, streams-core precedent, plan D7 |
-| Compensator owns compensation span | Covers direct/missing/nested/error paths and actual cascade size.                                                                 | runtime ownership doctrine, plan D3–D4       |
-| Plugin change is wiring only       | Core owns the convention; plugin composes it.                                                                                     | Archetype 5 thinness law                     |
+| Decision                                                      | Reason                                                                                                                                                                                                                                                                                                                                                                                                                                | Source                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Retain/emit all five cascade spans                            | Complete measures the engine's persisted completion transition; the other four measure real bridge/compensator work or rejection.                                                                                                                                                                                                                                                                                                     | issue #1368, PLAN-EVAL F1, plan D1–D4/D9     |
+| Attribute set owns cross-plane key                            | Telemetry vocabulary stays out of runtime domain code.                                                                                                                                                                                                                                                                                                                                                                                | doctrine layering, plan D5–D6                |
+| Lock two correlation precedences                              | Publisher key wins for cross-plane ID; definition rule wins for saga key; downstream spans consume both engine-selected values.                                                                                                                                                                                                                                                                                                       | PLAN-EVAL F3, plan D6–D8                     |
+| Explicit W3C handoff                                          | Handle span ends before bridge dispatch.                                                                                                                                                                                                                                                                                                                                                                                              | engine code, streams-core precedent, plan D7 |
+| Compensator owns compensation span                            | Covers direct/missing/nested/error paths and actual cascade size.                                                                                                                                                                                                                                                                                                                                                                     | runtime ownership doctrine, plan D3–D4       |
+| Plugin change is wiring only                                  | Core owns the convention; plugin composes it.                                                                                                                                                                                                                                                                                                                                                                                         | Archetype 5 thinness law                     |
+| Compensation request fields are optional with no fallback     | `correlationId`, `correlationKey`, and parent context remain optional for source compatibility. The composed bridge always supplies engine-selected values. When absent on a direct/external request, the compensator does not derive them from the message, definition rule, or default; telemetry leaves them absent, and a registered handler requiring a missing saga key fails validation rather than receiving an invented key. | PLAN-EVAL cycle 2 F3b                        |
+| Compensation cascade size is recorded through instrumentation | Start the compensate span before handler execution with no size, then call a typed `SagaInstrumentation` recorder after the handler returns. Runtime code never calls raw `setAttribute`, and handler duration remains measured.                                                                                                                                                                                                      | PLAN-EVAL cycle 2 F3 minor, plan D3/D5       |
+| Complete span reports transition truth, not saga success      | Emit whenever engine `completed` is true even without a store. Record the resolved persisted status exactly; mixed terminal cascades may produce `failed` or `compensating`. Span presence only says a complete effect participated in resolution.                                                                                                                                                                                    | PLAN-EVAL cycle 2 F1 residual                |
 
 ## Drift
 
@@ -119,6 +124,7 @@ a process seam. A thin plugin may only wire the core primitive.
 | RTK executable absent despite repo preference                                          | minor       | yes                |
 | Initial S1 plan omitted the MCP export corpus gate and over-assigned the runtime gate  | significant | yes                |
 | PLAN-EVAL found no-op complete ownership and an invalid mechanical red-before contract | significant | yes                |
+| Release surface baseline and docs export counts sit outside the product ceiling        | minor       | yes                |
 
 ## Gate Results
 
@@ -129,6 +135,8 @@ a process seam. A thin plugin may only wire the core primitive.
 | Baseline publish dry-run | package `publish:dry-run`                             | PASS   | exit 0, 111 files                                                                           |
 | Baseline doc lint        | root `doc:lint`                                       | FAIL   | measured existing nine private-type findings, zero missing JSDoc; plan requires no increase |
 | S1 artifact/lock checks  | `deno fmt --check`, `git diff --check`, raw lock diff | PASS   | Six artifacts formatted; diff checks exit 0; `deno.lock` unchanged                          |
+| PLAN-EVAL cycle 2        | separate evaluator verdict `81c5f874`                 | PASS   | `PASS_PLAN`; implementation authorized                                                      |
+| S2 measured negative     | structured test wrapper                               | PASS   | raw exit 1; 0 passed / 2 failed; both failures are assertions; test-only commit `2146443c`  |
 
 ### Fitness Gates
 
@@ -153,11 +161,10 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D1–D10, especially explicit trace handoff, the unsupported spawn error
-  span, the expected MCP corpus movement, and the supervisor-only Flow-B runtime acceptance gate.
-- S2 must be a failing-test-only commit. Do not edit product source until its raw nonzero exit and
-  exact `N passed / 2 failed` assertion counts are recorded against the locked baseline. The test
-  must compile using `createSagaRuntime`, a recording tracer, and `new SagaCompensator({ clock })`;
-  a type-check/load/crash failure or zero failed tests does not satisfy S2.
-- PLAN-EVAL cycle 2 must verify option (a): `saga.cascade.complete` is engine-owned around the
-  persisted completion transition, while Flow-B proves only the real handle-to-compensator edge.
+- PLAN-EVAL is cleared. S2 compiled against the locked surface and failed exactly at the two
+  required assertions; product implementation may proceed in slice order.
+- S3 must add the typed telemetry/context contract and tests before S4 consumes it. S4 must preserve
+  the optional/no-fallback compensation request decision and the typed post-handler cascade-size
+  recorder above.
+- The expected MCP corpus and release public-surface baseline staleness are supervisor sequencing
+  handoffs. Do not regenerate them. Flow-B runtime remains author-must-not-run.

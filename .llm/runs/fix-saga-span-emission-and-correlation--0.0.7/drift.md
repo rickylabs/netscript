@@ -68,3 +68,21 @@ documentation.
 - **Evidence:** Plan D1/D6/D8/D9 now lock engine-owned completion and single-resolution correlation
   transport; the S2 contract requires two assertion failures from a baseline-compatible composed
   runtime; direct engine-as-bus dispatch is explicitly non-scope; `docs:readme:check` is gate 17.
+
+## 2026-08-30 — PLAN-EVAL found two out-of-ceiling signature consumers
+
+- **What:** Cycle 2 found that `.llm/tools/release/baselines/public-surfaces.json` snapshots the
+  exported signatures changed by this leaf, while `docs/site/reference/plugin-sagas-core/index.md`
+  carries manually maintained per-subpath export counts that can become stale if S3 adds exported
+  symbols.
+- **Source:** PLAN-EVAL verdict commit `81c5f874` over plan commit `f5994260`.
+- **Expected:** Every generated/signature consumer is either within the locked ceiling or named as a
+  stop/report handoff; outside-ceiling documentation is not edited silently.
+- **Actual:** The release baseline is a full-suite-only, non-blocking consumer and the docs page has
+  no enforcing tool. Neither path was in the approved 19-path ceiling.
+- **Severity:** minor
+- **Action:** accept and hand off
+- **Evidence:** The plan ceiling-completeness table now records the release baseline as expected to
+  classify the optional-field surface change additive/minor and forbids regeneration here. The docs
+  export counts remain outside scope and are reported for the docs lane; this author will not edit
+  either path.

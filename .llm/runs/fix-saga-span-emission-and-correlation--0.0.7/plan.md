@@ -72,13 +72,14 @@ discovery to `drift.md`, make no such edit, and return to the coordinator.
 
 ### Ceiling Completeness Checks
 
-| Consumer/check               | Ceiling consequence                                                                                                                                                                                                              |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI assets barrel            | Its writer reads package names and export-map keys; no key changes are planned, so no generated path enters the ceiling.                                                                                                         |
-| MCP export corpus            | Its writer records normalized exported symbol signatures; the planned constants and structural type changes are expected to make the checked-in corpus stale. The corpus remains outside the ceiling and gate 16 is stop/report. |
-| Dependency-closure parity    | Its verifier only tracks `@netscript/fresh`, `@netscript/sdk`, and `@netscript/telemetry` specifiers, so the sagas-core symbol changes do not add a path.                                                                        |
-| `docs:exports-drift`         | Its authoritative mapping has no `plugin-sagas-core` entry, so the README/API work does not add a path.                                                                                                                          |
-| Structural span implementors | The only non-production `SagaTelemetrySpan` implementors are the two telemetry test doubles already inside the ceiling; no additional product path is required.                                                                  |
+| Consumer/check                  | Ceiling consequence                                                                                                                                                                                                                                                          |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI assets barrel               | Its writer reads package names and export-map keys; no key changes are planned, so no generated path enters the ceiling.                                                                                                                                                     |
+| MCP export corpus               | Its writer records normalized exported symbol signatures; the planned constants and structural type changes are expected to make the checked-in corpus stale. The corpus remains outside the ceiling and gate 16 is stop/report.                                             |
+| Dependency-closure parity       | Its verifier only tracks `@netscript/fresh`, `@netscript/sdk`, and `@netscript/telemetry` specifiers, so the sagas-core symbol changes do not add a path.                                                                                                                    |
+| `docs:exports-drift`            | Its authoritative mapping has no `plugin-sagas-core` entry, so the README/API work does not add a path.                                                                                                                                                                      |
+| Structural span implementors    | The only non-production `SagaTelemetrySpan` implementors are the two telemetry test doubles already inside the ceiling; no additional product path is required.                                                                                                              |
+| Release public-surface baseline | `.llm/tools/release/baselines/public-surfaces.json` snapshots the signatures this leaf changes. Optional request fields make the expected classification additive/minor. It is a full-suite-only consumer, remains outside the ceiling, and is not regenerated in this lane. |
 
 ## Scope
 
@@ -128,6 +129,11 @@ discovery to `drift.md`, make no such edit, and return to the coordinator.
   correlation ID is `message.correlationKey ?? resolvedSagaCorrelationKey`. Engine results, cascade
   inputs, and compensation requests carry those exact values; bridge and compensator never run
   either precedence rule again.
+- The engine emits `saga.cascade.complete` whenever its derived `completed` flag is true, including
+  storeless runtimes where durable persistence returns early. Its status attribute is the resolved
+  persisted status, which can be `failed` or `compensating` for mixed terminal cascades; span
+  presence means a complete effect participated in transition resolution, not that the saga
+  succeeded.
 - Flow-B must add a generated saga whose handler returns `sagaCompensate`, publish it from the
   existing active callback with `getTraceContext()`, and give the workers background resource the
   `sagas-api` endpoint. The HTTP `correlationId` and the generated saga payload field used by its
@@ -138,13 +144,13 @@ discovery to `drift.md`, make no such edit, and return to the coordinator.
 
 ## Factory Liveness and Ownership
 
-| Factory                   | Owner and measured operation                   | Contract                                                                                                                  |
-| ------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `saga.cascade.send`       | Bridge; nested publish/handle dispatch         | success/error around the real downstream call                                                                             |
-| `saga.cascade.schedule`   | Bridge; scheduler dispatch                     | success/error, including missing scheduler                                                                                |
-| `saga.cascade.complete`   | Engine; persisted completion transition        | direct child of `saga.handle`; surrounds completed-status/completedAt persistence and records saga status/result presence |
-| `saga.cascade.compensate` | Compensator; registered compensation execution | success/skipped/error and returned cascade size                                                                           |
-| `saga.cascade.spawn`      | Bridge; defensive rejected attempt             | error-only; never claims a child lifecycle                                                                                |
+| Factory                   | Owner and measured operation                   | Contract                                                                                                                                                                           |
+| ------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `saga.cascade.send`       | Bridge; nested publish/handle dispatch         | success/error around the real downstream call                                                                                                                                      |
+| `saga.cascade.schedule`   | Bridge; scheduler dispatch                     | success/error, including missing scheduler                                                                                                                                         |
+| `saga.cascade.complete`   | Engine; resolved completion transition         | emitted whenever `completed` is true, with or without a store; direct child of `saga.handle`; records result presence and resolved persisted status without asserting saga success |
+| `saga.cascade.compensate` | Compensator; registered compensation execution | success/skipped/error and returned cascade size                                                                                                                                    |
+| `saga.cascade.spawn`      | Bridge; defensive rejected attempt             | error-only; never claims a child lifecycle                                                                                                                                         |
 
 The README table documents these owners and explicitly labels spawn error-only. Flow-B exercises and
 documents the engine-handle to compensator edge; it relies on the engine-owned interpretation of
