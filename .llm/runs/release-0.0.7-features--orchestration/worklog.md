@@ -8446,3 +8446,35 @@ is the correct point to fold #1739's contribution in, not now.
 
 **The live Slice 5 IMPL-EVAL was not touched.** It continues on the same worktree/head/base it was
 dispatched against (`00cfde5d7`); this measurement required no interaction with it.
+
+## #1387 Slice 5 terminal — DeepSeek concurs; tooling note; Slice 6 dispatched
+
+DeepSeek V4 Flash 0731 · max returned **ACCEPTED_WITH_FINDINGS at `c2cbfbf0b`** in one clean pass (96
+turns, chat output this time — not a recovered file), matching my own Tier-A independently. It re-ran
+the full 101-test suite and a cold scoped check itself, and ran LD-8's exact counterfactual (removing
+the throw would make the negative test's `assertThrows` fail, proving the test is coupled to the
+throw rather than decorative). Three non-blocking findings: E-1 (the plan-named service JSR audit has
+no durable receipt — a run-wide tooling gap, not this slice's), E-2 (the LD-7 middleware test alone
+wouldn't distinguish the real single-`bind()` code from a hypothetical two-`bind()` regression
+producing identical resolvers — a test-sensitivity note, not a defect, since the actual code satisfies
+LD-7 directly), E-3 (unrelated Slice 2 archival note). Committed `0dc715633`; PR comment `5471370266`.
+
+### Sender-liveness tooling correction
+
+Before dispatching Slice 6 I probed the completed Slice 5 thread's sender record and found it still
+present in `codex-status`'s output — my grep-based probe had returned a false positive. Checking the
+JSON directly showed `state: "idle"`, `lastActivity: "turn complete"`, `failure: null`, and a
+`lastArtifact` matching the exact expected final commit: genuinely complete, not a live writer. **A
+completed thread stays listed in `codex-status` indefinitely; presence alone is not the liveness
+signal, `state` is.** Corrected the sender-ownership memory so this stops being a silent trap. The
+eviction itself was still correctly justified (dead `ownerPid` plus now-confirmed idle state).
+
+### Slice 6 dispatched
+
+OpenAPI access projection, behavior-only, three-file ceiling, base `0dc715633`, thread
+`01a05495-c450-7300-9eb6-2bd33d57d7c8`, `gpt-5.6-sol · high`, dry-run clean. Brief states LD-9's exact
+mapping verbatim (none→`security:[]`, required→bearer+scopes+`x-netscript-roles` for roles,
+optional→`[{}, {bearerAuth:[]}]` despite LD-8 runtime rejection — deliberately visible in docs
+regardless of runtime support) and points at research finding 10's `traverseContractProcedures`
+inspection command rather than prescribing oRPC's traversal API from memory, since getting that wrong
+would mislead the implementer more than leaving it to inspect.
