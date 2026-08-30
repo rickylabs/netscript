@@ -116,10 +116,10 @@ the primary coordinator ratifies and publishes the issue graph.
 - **Worktree:** `/home/agent/projects/netscript/worktrees/007-aspire`
 - **Branch:** `research/aspire-13.5-0.0.7` @ `42ea3fcc` (remote-authoritative).
 - **Slice worktrees (recreated on the NAS):**
-  - `/home/agent/projects/netscript/worktrees/007-aspire-s5` — `fix/aspire-13-5-s5-literal-ports`
-    @ `0bd8ba83`, upstream deliberately unset.
-  - `/home/agent/projects/netscript/worktrees/007-aspire-s6` — `feat/aspire-13-5-s6-health-checks`
-    @ `1fa5aeec` (survived migration).
+  - `/home/agent/projects/netscript/worktrees/007-aspire-s5` — `fix/aspire-13-5-s5-literal-ports` @
+    `0bd8ba83`, upstream deliberately unset.
+  - `/home/agent/projects/netscript/worktrees/007-aspire-s6` — `feat/aspire-13-5-s6-health-checks` @
+    `1fa5aeec` (survived migration).
   - `/home/agent/projects/netscript/worktrees/007-aspire-s7-eval` — detached @ `eb6f188ce`.
 - **Standing constraints for this session:** Aspire runs in parallel and is **not** a global canary
   barrier. No merge, no publish, no relabel, no issue close, no central-state mutation — those stay
@@ -129,8 +129,22 @@ the primary coordinator ratifies and publishes the issue graph.
 
 ## Lane bindings in force (this recovery)
 
-| Lane                                    | Route                                              |
-| --------------------------------------- | -------------------------------------------------- |
-| Topic supervisor / Tier-A slice review  | Claude · Anthropic · Opus 5 · high (this session)  |
-| S5 repair implementation                | Codex · OpenAI · GPT-5.6 Sol · medium              |
-| S7 IMPL-EVAL cycle 2                    | Claude · Anthropic · Fable 5 · medium              |
+| Lane                                   | Route                                             |
+| -------------------------------------- | ------------------------------------------------- |
+| Topic supervisor / Tier-A slice review | Claude · Anthropic · Opus 5 · high (this session) |
+| S5 repair implementation               | Codex · OpenAI · GPT-5.6 Sol · medium             |
+| S7 IMPL-EVAL cycle 2                   | Claude · Anthropic · Fable 5 · medium             |
+
+## NAS supervisor restart — 2026-08-30 (checkpoint 2)
+
+- **Requested identity:** Claude · Anthropic · **Fable 5 · medium** (owner-accepted Aspire
+  supervisor route; supersedes the checkpoint-1 Opus 5 high identity).
+- **Observed identity:** model id `claude-fable-5` reported by the runtime; session
+  `session_01Jusn3woxeK5xhCdj6ccooR` (<https://claude.ai/code/session_01Jusn3woxeK5xhCdj6ccooR>).
+  Effort is not introspectable from inside the turn; Remote Control is user-side (`/rc`).
+- **Host/worktree/branch:** unchanged (`ai-agents`,
+  `/home/agent/projects/netscript/worktrees/007-aspire`, `research/aspire-13.5-0.0.7`); slice
+  worktrees `007-aspire-s5` @ `aa822069`, `007-aspire-s6` @ `564d465c`, eval worktrees
+  `007-aspire-s5-eval`, `007-aspire-s7-eval` (detached, historical).
+- **Host runtime prerequisites:** `aspire doctor` → `.NET SDK not found` (1 failed), Docker client
+  27.5.1 < 28.0; runtime leases cannot be exercised on this host until provisioned (D-31).

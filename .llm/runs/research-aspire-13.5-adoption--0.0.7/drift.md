@@ -165,8 +165,8 @@
 ## D-18 — 2026-08-30 — S5 does not close #1365 (OF-3a drift)
 
 - **What:** Ratified OF-3a / #1717 box 6 had S5's PR close #1365, #1370, #979. At IMPL-EVAL PASS
-  (`slices/s5/evaluate-cycle-2.md` F-2) the #1365 acceptance boxes for docs-site embedding
-  (S11), "discarding a publish result fails type-check/lint" (declined by locked D-14), and
+  (`slices/s5/evaluate-cycle-2.md` F-2) the #1365 acceptance boxes for docs-site embedding (S11),
+  "discarding a publish result fails type-check/lint" (declined by locked D-14), and
   restart/duplicate/out-of-order/OTEL-correlation proofs are not met by S5.
 - **Action:** PR #1740 references `Part of #1365` with the remaining scope listed; #1370 and #979
   keep closing keywords. Coordinator to either amend #1365's boxes (D-14 decision) or route the
@@ -176,14 +176,14 @@
 
 - **What:** Issue #1718 (line 44) and plan D3 locked host/port resolution at check time via
   `getEndpoint('tcp').property(EndpointProperty.Host|Port)` ("13.4+ thenable chain"). S6 IMPL-EVAL
-  cycle 1 compiled a generated AppHost against S2's restored 13.5.3 `.aspire/modules/aspire.mts`
-  and found `property()` yields `EndpointReferenceExpression` handles; the value API is
+  cycle 1 compiled a generated AppHost against S2's restored 13.5.3 `.aspire/modules/aspire.mts` and
+  found `property()` yields `EndpointReferenceExpression` handles; the value API is
   `getEndpoint('tcp').host()` / `.port()`. `HealthCheckResult.data` is `Record<string, string>`.
 - **Action:** intent unchanged (live host/port per invocation, no credentials); projection call and
   `data` typing corrected in S6 slice 6. **Process:** a consumer type-check of a generated AppHost
-  against the restored 13.5.3 modules is now a mandatory Tier-A + IMPL-EVAL gate for every
-  generator slice (S4/S5 to be re-checked retroactively by the supervisor). Severity: significant
-  (would have shipped rejecting health checks).
+  against the restored 13.5.3 modules is now a mandatory Tier-A + IMPL-EVAL gate for every generator
+  slice (S4/S5 to be re-checked retroactively by the supervisor). Severity: significant (would have
+  shipped rejecting health checks).
 
 ## D-20 — 2026-08-30 — S5 is red on live CI; its IMPL-EVAL PASS is void
 
@@ -225,11 +225,11 @@
 - **What:** `.llm/tools/agentic/lib/agentic-lib.ts` defaults the WSL identity to user `codex`. On
   the NAS the Linux user is `node`, so every agentic Codex command aborted with
   `Cannot run WSL command locally as requested user "codex"`.
-- **Action:** all agentic Codex invocations on the NAS pass `--user node`
-  (`NETSCRIPT_WSL_USER` is not readable by `agentic:codex-status`, which runs without
-  `--allow-env`). The daemon itself survived the migration: app-server `0.151.0`, control socket
-  `/home/agent/.codex/app-server-control/app-server-control.sock`, `remoteControlEnabled: true`.
-  Not an Aspire-scope defect; recorded so later slices do not rediscover it.
+- **Action:** all agentic Codex invocations on the NAS pass `--user node` (`NETSCRIPT_WSL_USER` is
+  not readable by `agentic:codex-status`, which runs without `--allow-env`). The daemon itself
+  survived the migration: app-server `0.151.0`, control socket
+  `/home/agent/.codex/app-server-control/app-server-control.sock`, `remoteControlEnabled: true`. Not
+  an Aspire-scope defect; recorded so later slices do not rediscover it.
 
 ## D-22 — 2026-08-30 — stray `aspire ps` core dump in the supervisor worktree
 
@@ -253,10 +253,10 @@
   `01b5b9b43a008d21c2dc49fc035358a63f9582156b4af81083f427a9860e7b89`. Verified at the branch head:
   the committed constant is still the pre-edit `2549…` and no `*.generated.ts` was touched between
   `0bd8ba83` and the current head. `check-test` is green — F-1…F-4 themselves landed correctly.
-- **Cause:** repair slice 4 edited `.llm/tools/validation/check-aspire-host-ports.ts`, and `.llm/tools`
-  sources are embedded in the agent-tools corpus. The repair brief's slice-5 gate list said
-  "`check:assets-barrel` **if any generated asset moved**", which understates the coupling — *any*
-  `.llm/tools` source edit moves that barrel. **This is a supervisor brief defect**, not an
+- **Cause:** repair slice 4 edited `.llm/tools/validation/check-aspire-host-ports.ts`, and
+  `.llm/tools` sources are embedded in the agent-tools corpus. The repair brief's slice-5 gate list
+  said "`check:assets-barrel` **if any generated asset moved**", which understates the coupling —
+  _any_ `.llm/tools` source edit moves that barrel. **This is a supervisor brief defect**, not an
   implementation error; S6's brief already carried the correct unconditional form.
 - **Action:** the same author thread (`01a0515b-8f4a-7412-a151-42d5fb4258d7`) is steered to run
   `gen:assets-barrel`, commit only the authoritative regenerated barrels, **re-cut the slice-5 gate
@@ -272,10 +272,10 @@
 - **Severity:** minor (evidence provenance; phase B only).
 - **What:** the cycle-2 IMPL-EVAL `PASS` carries one non-blocking note: `ASPIRE_DCP_APPHOST_PATH`
   has no receipt provenance, and process `cwd` is not ownership evidence.
-- **Action:** the S7 phase-B lease brief must capture a **real** orphaned descendant's
-  `environ` / `cmdline` / `cwd` / `fd` set and cite it as the receipt behind the ownership
-  classification, rather than resting on the synthetic fixture. Folded into the lease queue; does
-  not affect the phase-A verdict.
+- **Action:** the S7 phase-B lease brief must capture a **real** orphaned descendant's `environ` /
+  `cmdline` / `cwd` / `fd` set and cite it as the receipt behind the ownership classification,
+  rather than resting on the synthetic fixture. Folded into the lease queue; does not affect the
+  phase-A verdict.
 
 ## D-25 — 2026-08-30 — NAS container PID 1 is not reaping; 7.7k zombies produce false process-survival reds
 
@@ -289,11 +289,11 @@
   The coordinator attributes the hybrid-launcher **cancellation-survivor root test** red to exactly
   this. **Classification: environment artifact, not a code defect.**
 - **Standing rule for this run:** do not re-run or chase that root test, and do not attribute it to
-  any Aspire slice. **Scoped product gates are judged independently of it** — a slice's verdict rests
-  on its own scoped wrappers, `quality:scan`, `arch:check`, `check:assets-barrel`, and its targeted
-  suites, never on the root process-survival suite while this condition holds.
-- **Carried into evaluator briefs:** every Aspire IMPL-EVAL brief from this point must name this
-  red as known-infra so the evaluator does not return `FAIL_FIX` on it.
+  any Aspire slice. **Scoped product gates are judged independently of it** — a slice's verdict
+  rests on its own scoped wrappers, `quality:scan`, `arch:check`, `check:assets-barrel`, and its
+  targeted suites, never on the root process-survival suite while this condition holds.
+- **Carried into evaluator briefs:** every Aspire IMPL-EVAL brief from this point must name this red
+  as known-infra so the evaluator does not return `FAIL_FIX` on it.
 - **Owner action (agent-blocked):** the container needs a reaping init (or a restart) on the host.
   Secondary risk: ~7.8k processes is within reach of PID/thread limits, which would start failing
   unrelated spawns. This is a human/host action — flagged, not attempted.
@@ -305,14 +305,14 @@
   `check:agent-docs-prose` were green at the pushed head, Tier-A re-ran them, and an independent
   IMPL-EVAL re-ran them; CI still failed on "Publish asset freshness". Their brief had barred
   regenerating `packages/mcp/src/publish-assets.generated.ts` on a lane rule claiming it "embeds
-  `packages/mcp/README.md` only" — a false premise, so the gate never reached the list and no
-  amount of independent review could catch it. Repair was one line, `'sourceCommit'`.
+  `packages/mcp/README.md` only" — a false premise, so the gate never reached the list and no amount
+  of independent review could catch it. Repair was one line, `'sourceCommit'`.
 - **Input set** (`.llm/tools/generate-publish-assets.ts:34-40`):
   `.llm/assets/agent-docs/{prose.json.gz,provenance.json}`,
   `packages/cli/src/kernel/assets/{agent-tools,agent-docs,embedded,skills}.generated.ts`,
   `packages/plugin/src/kernel/assets/embedded.generated.ts`.
 - **Verified for S5 (negative result, taken at the exact head):** S5's `59728705` regenerates
-  `agent-tools.generated.ts`, which *is* on that input list, yet `deno task check:publish-assets`
+  `agent-tools.generated.ts`, which _is_ on that input list, yet `deno task check:publish-assets`
   **exits 0** at `f0de60a1`. Run in a throwaway detached worktree so the author's tree was never
   touched. **S5 needs no publish-assets commit.**
 - **Refined rule:** the trigger is not "an input path changed" but "an input whose content actually
@@ -323,8 +323,8 @@
 - **Action:** `gen:publish-assets` + `check:publish-assets` join `gen:assets-barrel` +
   `check:assets-barrel` as **unconditional** slice gates for every corpus-touching slice — S9
   (corpora/skills), S13, and the S7 playbook rows are the exposed ones. Generalises D-23: the brief
-  rule is **"any generated asset whose *inputs* your diff touches"**, never a memorised file list.
-  A conditional phrasing ("if any generated asset moved") is what let both D-23 and #1746 through.
+  rule is **"any generated asset whose _inputs_ your diff touches"**, never a memorised file list. A
+  conditional phrasing ("if any generated asset moved") is what let both D-23 and #1746 through.
 
 ## D-27 — 2026-08-30 — Mermaid `%%` comments do not reach the rendered SVG (terminology rows are diagram-safe)
 
@@ -332,11 +332,12 @@
 - **Question:** the docs lane asked whether changing the `.NET Aspire` string in the `%%` comment at
   `docs/site/_diagrams/aspire-resource-graph.mmd:2` would move the rendered artifact and hand this
   run a spurious diagram diff.
-- **Evidence:** `docs/site/assets/diagrams/aspire-resource-graph.svg` (21,680 bytes) contains **zero**
-  occurrences of `.NET Aspire`, of the comment line text, of `%%`, and of `Theme-neutral` — all four
-  `%%` header lines are absent. Only generic `aria-roledescription="flowchart-v2"` metadata; no
-  embedded source digest, no timestamp. `diagrams:check` (`docs/site/_diagrams/render.ts`) renders to
-  a temp SVG and byte-compares against the committed one, so a comment-only edit renders identically.
+- **Evidence:** `docs/site/assets/diagrams/aspire-resource-graph.svg` (21,680 bytes) contains
+  **zero** occurrences of `.NET Aspire`, of the comment line text, of `%%`, and of `Theme-neutral` —
+  all four `%%` header lines are absent. Only generic `aria-roledescription="flowchart-v2"`
+  metadata; no embedded source digest, no timestamp. `diagrams:check`
+  (`docs/site/_diagrams/render.ts`) renders to a temp SVG and byte-compares against the committed
+  one, so a comment-only edit renders identically.
 - **Limitation stated:** proven from the committed artifact, not from an executed A/B render —
   `mmdc` cannot run in this container (`Permission denied`, noexec scratch, and mermaid-cli needs
   headless Chromium).
@@ -349,8 +350,9 @@
 - Addendum to **D-25**. S5's exact-head `deno task test` run surfaced a **second** host-process
   failure alongside the zombie one: `codex-follow_test.ts` could not create an inotify watcher —
   `Too many open files`, against a host maximum of **128 inotify instances**.
-- Both failures reproduce on a clean local retry and **both pass on CI's clean runner** (`check-test`
-  green at `aa822069`), which independently confirms they are host-local rather than code defects.
+- Both failures reproduce on a clean local retry and **both pass on CI's clean runner**
+  (`check-test` green at `aa822069`), which independently confirms they are host-local rather than
+  code defects.
 - Mechanism is distinct from the zombie count but shares the cause: an over-subscribed container.
   The zombie backlog (7,734 procs) and the watcher-instance ceiling are two faces of the same
   resource pressure, and the watcher ceiling is the **leading indicator** — it bites long before PID
@@ -376,7 +378,7 @@
   claims instead of adopting them, and confirmed `review-threads … unanswered=0`.
 - **Follow-ups — all coordinator-owned, none require an S5 code change:**
   - **F-A (medium, gates merge).** No runtime verdict exists at the final head: `e2e-cli` was
-    *skipped by classification* at every repair head, and the only `scaffold.runtime` evidence is
+    _skipped by classification_ at every repair head, and the only `scaffold.runtime` evidence is
     run `33286544110` at `0bd8ba832` (26/27, red on the #1734 baseline; PR #1736 still open). The
     repair diff is runtime-monotonic, so this is not a new S5 risk — but the sign-off condition
     "runtime verdict = CI `scaffold.runtime` on this head" is unmet. Coordinator dispatches
@@ -397,7 +399,7 @@
     session:** creating a GitHub issue is central-state mutation, which this run's mandate reserves
     to the coordinator. Surfaced as an explicit ask instead.
 - **Lesson worth promoting (evaluator's, endorsed):** a `pull_request`-triggered `e2e-cli` run that
-  is *skipped at classification* is **not** runtime evidence. "Runtime verdict = CI on this head"
+  is _skipped at classification_ is **not** runtime evidence. "Runtime verdict = CI on this head"
   must be re-earned per head via an explicit workflow dispatch with the run id recorded. This is the
   same class of error as D-23/D-26 — a gate believed covered that never actually executed.
 
@@ -412,10 +414,11 @@
   - `deno task check:assets-barrel` → exit 0 (no regeneration needed)
   - `deno task check:publish-assets` → exit 0
 - **The specific risk that had to be cleared:** S5's F-4 hardened `check-aspire-host-ports.ts` from
-  per-line to **full-text** matching, which can newly catch multiline `withHttpEndpoint({ port: … })`
-  and `ctx.port(a,\n b)` shapes. S6 is a generator slice that emits endpoint code, so the hardened
-  gate was the plausible break. It scans clean — S6 emits no pinned host port. Checking this before
-  the force-push, rather than after CI, is the direct application of the D-23/D-26 lesson.
+  per-line to **full-text** matching, which can newly catch multiline
+  `withHttpEndpoint({ port: … })` and `ctx.port(a,\n b)` shapes. S6 is a generator slice that emits
+  endpoint code, so the hardened gate was the plausible break. It scans clean — S6 emits no pinned
+  host port. Checking this before the force-push, rather than after CI, is the direct application of
+  the D-23/D-26 lesson.
 - **Applied:** `1fa5aeec` → `564d465c`, force-pushed with
   `--force-with-lease=…:1fa5aeec13d965ddd20806fa373f090e427cf5f4`. Draft state and base branch
   unchanged. Rewriting published commits is normally barred for implementation lanes; this is the
@@ -440,3 +443,70 @@
 - **Same failure family as D-23/D-26 and the evaluator's `skipped ≠ pass` lesson:** a gate that is
   listed but cannot execute is as misleading as a gate that is omitted. Three lanes have now hit
   "believed covered, never executed" in three different shapes.
+
+## D-31 — 2026-08-30 — S5 F-A host runtime lease cannot be exercised on the NAS `ai-agents` container
+
+- **Severity:** significant (environment, not product). **Lease granted, preflight FAILED, no
+  runtime started, lease returned unused.**
+- **What was granted:** the coordinator's first serialized host runtime lease, scoped to S5 F-A
+  only: one-pass `deno task e2e:cli` (`scaffold.runtime --cleanup`) from
+  `/home/agent/projects/netscript/worktrees/007-aspire-s5` at exact head `aa822069`.
+- **Preflight facts (all read-only, 2026-08-30T08:3xZ):**
+  - S5 worktree clean at `aa822069e10f…`, equal to `origin/fix/aspire-13-5-s5-literal-ports`.
+  - Zero-state re-proven: `aspire ps --format Json --nologo --non-interactive` → `[]` exit 0;
+    `docker ps -a` on `tcp://netscript-dind:2375` → header only.
+  - `aspire doctor --non-interactive` → **`Summary: 3 passed, 4 warnings, 1 failed`**. The failure
+    is **`.NET SDK not found`** (`dotnet` is on no PATH entry; no `~/.dotnet`, `/usr/share/dotnet`,
+    `/usr/lib/dotnet`, `/opt/dotnet`; `.mise.toml` pins only `deno` and `aspire`;
+    `mise ls-remote dotnet` returns nothing). `aspire start` for the generated AppHost cannot boot
+    without the SDK, so the suite would fail at the AppHost step by construction.
+  - Second prerequisite gap: `Docker client version 27.5.1 is below minimum required 28.0.0` (Aspire
+    warning, flagged `← active`).
+  - Third, unproven layer: containers live in the remote `netscript-dind` sandbox (`10.4.12.16`)
+    while this container is `10.4.12.18`, so published container ports are **not** on `localhost`.
+    Every runtime gate in `packages/cli/e2e/src/application/gates/scaffold/*` probes `127.0.0.1` /
+    `localhost`, and DCP endpoint proxying against a remote Docker host has never been exercised
+    here. Even with the SDK installed, a green is not assured.
+  - S2's runtime probes (V1–V12, `slices/s2/review-tier-a.md`) were taken **pre-migration on WSL**
+    (`netscript-aspire-13-5-s2/.llm/tmp` paths). No `scaffold.runtime` run has ever executed on the
+    NAS; the only NAS "runtime" evidence to date is the zero-state proof itself.
+- **Why the supervisor did not self-remedy:** installing a .NET 10 SDK and a Docker ≥ 28 client are
+  host-provisioning actions on a container already flagged over-subscribed (D-25/D-25a: 7.7k
+  zombies, inotify ceiling) — the same class the run classifies as "human/host action — flagged, not
+  attempted". A user-local `dotnet-install.sh` would also be an unpinned toolchain outside
+  `.mise.toml`, i.e. a second source of truth for a version the repo pins in 14 places.
+- **Why the run was not attempted anyway:** a suite that must fail at AppHost boot yields an
+  environment red, not the F-A runtime verdict; D-23/D-26/D-28 already record that a gate which did
+  not really execute is not evidence. Burning the lease on a known-red would also create scaffold
+  dirs and Postgres containers to tear down for nothing.
+- **Options for the coordinator (one decision):**
+  1. **CI dispatch (the F-A wording in D-28):**
+     `gh workflow run e2e-cli.yml --ref
+     fix/aspire-13-5-s5-literal-ports` — the runner installs
+     .NET 10 + Aspire CLI 13.4.6 (the exact toolchain `main` pins) with local Docker;
+     `scaffold-runtime` uses the `e2e-scaffold-runtime-global` mutex with
+     `cancel-in-progress: false`, so it **queues** behind other lanes rather than cancelling them.
+     Record the run id as the F-A receipt. Not executed by this session: expensive-gate dispatch is
+     coordinator-owned.
+  2. **Provision the NAS** (host action): .NET 10 SDK on PATH (ideally pinned in `.mise.toml`),
+     Docker client ≥ 28, then re-prove `aspire doctor` 0 failed and one throwaway `-p` container
+     reachable on `localhost` before re-granting the lease. This unblocks S6/S3/S7 Phase-B too,
+     which need the same stack.
+  3. **Retarget the host lease** to the WSL host that ran S2, if it still exists.
+- **Consequence for the queue:** every Phase-B workstream (S6 listener-unreachable fixture, S3
+  telemetry envelopes, S7 live #1429 reproduction) is blocked by the same prerequisites; leases
+  granted against this host will fail preflight identically until option 2 is done.
+
+## D-32 — 2026-08-30 — `e2e:cli` is not in the durable gate catalog
+
+- `.llm/tools/gates/catalog.ts` (`GATE_CATALOG`) allowlists check/lint/test/quality/docs gates but
+  **not** `e2e:cli`, so `run-gate.ts` cannot wrap the runtime suite and no atomic
+  `.llm/tmp/gate-receipts/<job>/` receipt can be produced for it locally.
+- Durable evidence for a local runtime run is therefore the runner's own report:
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report <path>.json` (the same
+  file CI uploads as `e2e-cli-scaffold-runtime-report`), copied into `slices/s5/receipts/` with its
+  SHA-256 and the exact head. The plain `deno task e2e:cli` form writes no report and is not a
+  receipt.
+- Adding an `e2e-scaffold-runtime` catalog entry is a natural **S10 (#1722)** row (E2E gate
+  upgrades), not something to slip in under a lease. Recorded here so the next lease holder does not
+  rediscover it.
