@@ -3329,3 +3329,51 @@ documented externally, not demonstrated by the committed test run.** It will exe
 time once S3 makes the child assertion pass, and that is when its green becomes meaningful.
 
 S3 onward continues under the revised ceiling and corrected gate ordering.
+
+## 2026-08-30 — #1462 S3 landed at `1dd64dae`; root graph goes 19 → 0 browser-unsafe edges
+
+### A process change that unblocked a repeating loss
+
+The #1462 turn was killed three consecutive times, each time with completed work uncommitted — 11
+dirty paths, then 21, then nothing durable. The work was never wrong; the ordering was. Every cycle
+did the full implementation and left committing until after the gate table, so every kill discarded
+the whole slice.
+
+Fixed by inverting the order: the resume opened with **"STOP AND COMMIT FIRST"** — commit and push
+before any gate, then verify — plus a standing instruction to prefer small committed steps over one
+large finish. The very next turn committed within a minute. **An unverified commit that exists beats
+verified work that keeps evaporating**, and the gates simply land as their own evidence commit.
+
+The supervisor also handed over the state it had already verified, so the author did not re-derive it:
+21 dirty paths all inside the ceiling, and `deno check --unstable-kv` on the new preset entry and the
+root exiting 0 — i.e. the tree was demonstrably committable.
+
+### S3 is committed and the fix is proven at graph level
+
+`1dd64dae`, pushed, 21 files, no path outside the ceiling. Includes the F2 regeneration
+(`.llm/assets/agent-docs/prose.json.gz`, `provenance.json`), the F4 doc pages, the F3 reference page,
+both MCP derivatives, and the new 95-line `packages/sdk/src/presets/mod.ts`.
+
+| Check | Result |
+| --- | --- |
+| S2 regression at S3 head | exit 0 · **1 passed / 0 failed** |
+| `deno.lock` | byte-unchanged vs `origin/main` |
+
+**The green now includes the graph assertion, executing for the first time** — at base it never ran,
+because the test threw on the child assertion first. Measured independently with the test's own
+predicate over `deno info --json`:
+
+| Graph | Base | S3 head |
+| --- | --- | --- |
+| `packages/sdk/mod.ts` | **19** browser-unsafe edges (KV modules, 2 `node:` edges, 5 logger modules) | **0** |
+| `packages/sdk/src/presets/mod.ts` | — (entry did not exist) | **0** |
+
+So the root is not merely side-effect-free: it no longer reaches `@netscript/kv`, `node:`, or the
+logger **at all**. That is the acceptance criterion "production client chunks contain no server KV
+adapter" demonstrated structurally rather than asserted.
+
+The honesty note stands and was passed to the author for its evidence block: the graph half's
+red-before is documented by supervisor measurement, **not** by the committed test run, because the
+test short-circuits at base. Its first execution is this green.
+
+Gate table next, in the corrected order.
