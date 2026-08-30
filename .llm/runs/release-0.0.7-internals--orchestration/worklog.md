@@ -4051,3 +4051,38 @@ stop and name it rather than guess.
 
 `#1747` withheld at `c1e03922`, `status:ci-fail`, pending #1734's bounded repair and a full one-pass
 `scaffold.runtime`. `#1734` parked at `eb765629`. Neither has blocked #1533 at any point.
+
+## 2026-08-30 — main `a5520e70`; #1533 re-anchor deferred to its documented convergence point (I6)
+
+`origin/main` = `a5520e70b43fa792c36451270742240e0f2aa889` (#1755, canonical agent skills tree),
+following `952cc106` (#1748). Re-verified corpus neutrality against the leaf base `13878a80` rather
+than accepting it:
+
+- `.ts` files changed under `packages/**` + `plugins/**`: **2**, both generated —
+  `agent-docs.generated.ts`, `publish-assets.generated.ts`
+- changed `@example` lines: **0**
+
+So the 348-candidate corpus and the 27/21/116/0/1 census are unaffected by either main move, and the
+bounded option-1 repairs proceed against the existing base.
+
+### Where the re-anchor belongs, and why it is not "whenever main moves"
+
+The plan names no literal "convergence point", but its slice table does: **I6 — *Run final
+scoped/full gates and prepare IMPL-EVAL handoff*, with all applicable gates GREEN.** That is the
+integration head, and it is the correct place to rebase for a reason specific to these two main
+commits: both touched **generated assets** (`agent-docs.generated.ts`, `publish-assets.generated.ts`)
+which `check:assets-barrel` and `check:publish-assets` guard at I6. Running those gates on a stale
+base can pass locally and still conflict at merge — a green that means nothing.
+
+Rebasing earlier would churn the branch mid-repair and force a census re-measure for no signal, on a
+corpus that provably did not move. Rebasing later than I6 would mean the final gate evidence names a
+head that is not the integration head — the same defect this run already carries from leaf #1644,
+where a verdict named `4d9fb1967` while the branch had moved on.
+
+**Decision: re-anchor onto live `main` at the start of I6, before the final gate run**, so the gate
+receipts and the IMPL-EVAL evaluated head are the same object that merges. The author is told to
+re-run the narrowed gate immediately after the rebase and confirm it is still green, since a rebase
+that changes generated assets is exactly the kind of move that can silently alter a corpus selection.
+
+`#1747` withheld at `c1e03922` (`status:ci-fail`) pending #1734's bounded repair and a full one-pass
+`scaffold.runtime`; `#1734` parked at `eb765629`. Neither blocking.
