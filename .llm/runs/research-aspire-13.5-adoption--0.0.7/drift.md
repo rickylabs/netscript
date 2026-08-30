@@ -1264,3 +1264,14 @@
 - **Brief rule going forward (all lanes):** implementation briefs state explicitly that the
   generator must not launch evaluator/audit sessions or write `evaluate*.md`; it ends with
   `DONE`/`BLOCKED` and leaves evaluation to the supervisor.
+
+## D-66 — 2026-08-30 — S13 IMPL-EVAL cycle 1 `PASS` (phase A complete) at `d3f71c0b`
+
+- Supervisor-dispatched Claude · Fable 5 · medium session `b03fc914…` (`slices/s13/evaluate.md`; PR
+  #1779 comment 16:46:16Z): D-17 implemented exactly as ratified (order, `source`, injectable
+  `aspire ps` port, no domain IO, no bare `18888` in generated code, README line matches); all
+  S13-owned manifest rows cleaned, manifest regenerates byte-identical; parity `--phase 2`
+  implemented with tests for both phases while phase 1 stays default and `ci.yml` is untouched —
+  flip deferred until S1/S9/S11 land on `main`. Non-mutation verified. The generator's self-arranged
+  sessions (D-65) inherited nothing. S13 phase A settled; the Aspire 0.0.7 static queue is now
+  exhausted (S12/S6b are 0.0.8 after canary B).
