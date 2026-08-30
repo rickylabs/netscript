@@ -2638,3 +2638,45 @@ lineage prose. All required gates green at the final head including the now-real
 `close-gate` re-run after the metadata correction: **PASS**. `mergeStateStatus: CLEAN`, `mergeable:
 MERGEABLE`, issue #1788 9/9 boxes checked, single `status:ready-merge` on both PR and issue. Ready for
 an exact merge packet.
+
+### #1793/PR #1794: next #1777 slice, dispatched to Codex, IMPL-EVAL PASS, merge-ready
+
+After #1790 merged as main `96d44758d`, measured real current `docs:exports-drift` findings (not the
+months-old table) and found five packages — `watchers`, `runtime-config`, `prisma-adapter-mysql`,
+`auth-workos`, `auth-better-auth` — each with an identical one-line defect: their reference page
+documents the package's single root export in prose but never in the specific `## Exports` table-row
+shape the checker's `parseDocContent()` requires. Filed as issue #1793.
+
+Dispatched to Codex (`gpt-5.6-sol`, low effort — light_implementation lane, matching the mechanical,
+no-mid-slice-decision shape) via `agentic:launch-codex-slice`. Two dispatch-infra notes for future
+slices on this NAS deployment:
+- The tool's default `wslHome()` (`/home/codex`) doesn't exist on this box; pass an explicit `--dest`
+  under a path that does (used `/home/agent/.codex/<slug>-brief.md`).
+- Hit `duplicate_sender_risk` against the reused leaf worktree from a stale #1790-era sender record
+  (thread dead: absent from `codex-status`, owner PID absent from `/proc`, rollout ended cleanly).
+  Archived and evicted per [[agentic-sender-ownership-stale-block]] before relaunching.
+
+Codex delivered cleanly: PR #1794, commit `514f47565`, all required gates green, differentiated
+per-package `symbolCoverage` (not a copy-pasted default) — `runtime-config` alone claims `mode:
+'complete'`. Tier-A independently re-verified that claim symbol-for-symbol via `deno doc --json`
+(20/20, zero gaps) before trusting it.
+
+IMPL-EVAL: Fable 5 hit the same monthly-spend HTTP 429 as the earlier #1785 incident; fell back to
+the sanctioned DeepSeek V4 Flash 0731 OpenRouter route per the standing routing update. **PASS** —
+independently verified every package's mode/reason against real `deno doc` output (all omissions
+real, zero invented justifications), all 13 gates green, scope confined to the two generated
+carriers, provenance ancestor-valid.
+
+**New close-gate failure mode found and fixed**: `mirror-acceptance-evidence` matches a PR's
+`box:` evidence text against an issue's checkbox text as one exact string. Issue #1793's Acceptance
+bullets were hard-wrapped across two markdown lines (a body-authoring habit carried over from every
+other issue this session), so the tool's parsed box text was truncated at the line break and never
+matched the PR's single-line evidence key — a silent, metadata-only failure with no relation to the
+actual work. Fixed by rewriting the four Acceptance bullets as single unwrapped lines (exact
+byte-for-byte match to the PR's `box:` text, verified before pushing), re-running close-gate: PASS.
+**Lesson for every future issue body in this queue: keep Acceptance (and any other
+`mirror-acceptance-evidence`-targeted) checkbox text on one line — do not hard-wrap it.**
+
+Final state: PR #1794 head `514f47565be0d3a9b24444ef06493090ea106769`, `mergeStateStatus: CLEAN`,
+`mergeable: MERGEABLE`, all CI green, issue #1793 7/7 boxes checked, sole `status:ready-merge` on
+both. Ready for an exact merge packet.
