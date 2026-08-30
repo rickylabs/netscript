@@ -2855,3 +2855,20 @@
   completion prose and must be rewritten in place before merge. Exact CI plus independent re-audit
   remain active. All existing DeepSeek verdicts remain valid and will not be rerun; #1791 changes
   only prospective routing.
+
+## 2026-08-30T21:50:37Z — docs #1790 shipped and all lanes received main `96d44758d`
+
+- Independent re-audit proved exact remote head `75538c723188bcd8994dcc74531138ec1d0a1c39`
+  merge-safe: current main was its ancestor, PR DoD 7/7, #1788 scope/acceptance 9/9, zero review
+  threads, authoritative MCP corpus 35 packages/270 subpaths/7,623 symbols, byte-identical pages and
+  evaluator content, and refreshed post-issue-edit close-gate plus full current CI green.
+- Merged PR #1790 with immutable-head matching as main
+  `96d44758d8f9405f759771284e0f300a6b176156`; #1788 closed. Both issue and PR were normalized to
+  sole `status:shipped`. The owner-accepted DeepSeek receipts carried unchanged and were not rerun.
+- The canonical repository fast-forwarded, every topic supervisor received the new main for its
+  next evidence-freeze boundary, and docs was ordered directly into its next serial issue. Feature
+  Slice 6 was found terminal at `2d3c148d1` and its supervisor was actively recovered into review
+  and next-slice dispatch instead of being allowed to idle.
+- The post-D100 owned runtime cleanup is exact zero. The canonical Git registry currently reports
+  108 worktrees; this is recorded as an ownership-audit queue item, never a broad deletion target
+  while supervisors and implementation threads are live.

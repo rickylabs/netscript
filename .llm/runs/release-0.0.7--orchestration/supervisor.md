@@ -1447,3 +1447,14 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Features: Slice 6 remains live after terminal Slice 5. Fixes: #1781 is statically frozen and may
   request runtime only after Aspire's #1747 lease. Internals: #1792 continues the prospective
   GLM/Qwen implementation; no historical DeepSeek receipt may be rerun or invalidated.
+
+## 2026-08-30T21:50:37Z — post-#1790 dispatch correction
+
+- Authoritative main is `96d44758d8f9405f759771284e0f300a6b176156`. Each lane integrates it at
+  the next evidence-freeze boundary; no lane restarts a completed DeepSeek evaluation.
+- Docs owns the immediate next docs issue after shipped #1790. Features must consume Slice 6
+  terminal carrier `2d3c148d1`, review it, and dispatch the next serial slice. Internals continues
+  #1792; fixes preserves #1781's prepared lease packet. Aspire owns only the bounded relay-watcher
+  repair and focused S6 listener proof from host zero before #1747 receives the next full lease.
+- Worktree cleanup is a read-only ownership audit first. With 108 registered worktrees and multiple
+  live sessions, no path may be removed merely because its age or name appears stale.

@@ -1772,3 +1772,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
   CI and independent re-audit are the other remaining merge gates.
 - Existing DeepSeek evaluations are explicitly owner-valid. The GLM/Qwen migration in #1791/#1792
   is prospective and never triggers retroactive evaluator reruns.
+
+## Resume delta — 2026-08-30T21:50:37Z
+
+- Main is `96d44758d8f9405f759771284e0f300a6b176156`: docs PR #1790/#1788 shipped after exact-head
+  `75538c723` passed the authoritative corpus gate, refreshed post-metadata close-gate, all current
+  CI, immutable-head merge, and lifecycle normalization. Its accepted DeepSeek evidence carried by
+  byte identity and was not rerun.
+- All five topic supervisors have the new main instruction. Docs must dispatch its next serial
+  issue; features is consuming terminal Slice 6 artifact `2d3c148d1`; internals #1792 remains live;
+  fixes #1781 remains runtime-ready behind Aspire; Aspire is repairing the relay watcher from exact
+  host zero before the single focused listener retry.
+- `git worktree list` currently reports 108 registered worktrees. Do not bulk-remove them: audit
+  ownership against live supervisors/threads and delete only proven terminal stale registrations.
