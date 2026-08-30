@@ -58,6 +58,8 @@ the capture provenance in that fixture folder's README, then update the parity e
 | 2026-08-30 | 1 | RED gate | Expected FAIL names exactly the four phase-A rows missing 13.5.3; telemetry remains `pending-lease`. |
 | 2026-08-30 | 1 | reconcile | Draft PR #1741 opened with closing keyword, epic reference, requested labels/milestone, and S1 trail comment; no new review comments yet. |
 | 2026-08-30 | 2 | implementation | Copied S2 V5 `aspire ps` JSON, applied documented deterministic redaction, and parameterized probes across 13.4.6/13.5.3. |
+| 2026-08-30 | 2 | reconcile | PR #1741 body and S2 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending. |
+| 2026-08-30 | 3 | implementation | Added redacted 13.5.3 banner/describe cases beside retained 13.4.6 cases in MCP and CLI E2E consumers. |
 
 ## Decisions
 
@@ -86,12 +88,19 @@ the capture provenance in that fixture folder's README, then update the parity e
 | Slice 2 excluded lint | scoped lint wrapper | EXPECTED_REFUSAL | Root config excludes `.llm`; wrapper refused all 12 dropped files (exit 2). |
 | Slice 2 raw lint | `deno lint --no-config .../probes_test.ts` | PASS | Required config-excluded-file fallback; 1 file checked. |
 | Slice 2 raw fmt | `deno fmt --no-config --single-quote --line-width=100 --check <owned files>` | PASS | 3 owned files checked. |
+| Slice 3 initial check/test | scoped wrappers | FAIL_THEN_FIXED | Exported test fixture needed an explicit isolated-declaration type; no cast or ignore added. |
+| Slice 3 check | scoped check wrapper on `packages/mcp`, `packages/cli/e2e` with desktop-native fixture excluded | PASS | 278 files, 0 findings. |
+| Slice 3 tests + parity | structured test wrapper on four focused tests | PASS | 52/52; phase-A parity is green. |
+| Slice 3 lint | scoped lint wrapper with desktop-native fixture excluded | PASS | 277/277 processed, 0 findings. |
+| Slice 3 fmt | scoped fmt wrapper with desktop-native fixture excluded | PASS | 277/277 processed, 0 findings. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-3/F-5/F-10/F-19 | NOT_RUN | Slice 5 | Pending implementation. |
+| Slice 3 `quality:scan` | PASS | Repository task, 0 findings | 7 pre-existing bounded allowances; none touched. |
+| Slice 3 `arch:check` | PASS | Repository task, exit 0 | Existing warnings only; no new FAIL. |
 
 ### Runtime Gates
 

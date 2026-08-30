@@ -129,11 +129,11 @@ Deno.test('readPinnedAppPort reports an unreadable appsettings rather than guess
 // ---------------------------------------------------------------------------
 // The allocated-port path parses `aspire describe --format Json`, so the parse is tested
 // without a running AppHost. This fixture is not invented: it is the real shape captured from
-// a live NetScript AppHost (Aspire 13.4.6) — DCP-suffixed `name`, human `displayName`, a
+// live NetScript AppHosts (Aspire 13.4.6 and 13.5.3) — DCP-suffixed `name`, human `displayName`, a
 // `dashboardUrl` deep-link, a declared `urls[]`, `relationships[]` stubs, and an `environment`
 // block carrying sibling services' URLs.
 // ---------------------------------------------------------------------------
-const DESCRIBE_FIXTURE = JSON.stringify({
+const DESCRIBE_RESOURCES = {
   resources: [
     {
       name: 'users-abcdwxyz',
@@ -158,13 +158,28 @@ const DESCRIBE_FIXTURE = JSON.stringify({
       },
     },
   ],
-});
+};
 
-Deno.test("the app endpoint comes from the resource's declared urls[]", () => {
-  assertEquals(appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'dashboard'), [
-    'http://localhost:34120',
-  ]);
-});
+const DESCRIBE_FIXTURES: readonly {
+  readonly version: string;
+  readonly output: string;
+}[] = [
+  { version: '13.4.6', output: JSON.stringify(DESCRIBE_RESOURCES) },
+  {
+    version: '13.5.3',
+    output: `Aspire CLI 13.5.3\n${JSON.stringify(DESCRIBE_RESOURCES)}`,
+  },
+];
+
+const DESCRIBE_FIXTURE = DESCRIBE_FIXTURES[0].output;
+
+for (const fixture of DESCRIBE_FIXTURES) {
+  Deno.test(`${fixture.version}: the app endpoint comes from the resource's declared urls[]`, () => {
+    assertEquals(appUrlsFromDescribeOutput(fixture.output, 'dashboard'), [
+      'http://localhost:34120',
+    ]);
+  });
+}
 
 // This is the sharp edge. A recursive scrape of the resource node also picks up the Aspire
 // dashboard deep-link and every sibling URL in `environment`. Probing one of those would not
