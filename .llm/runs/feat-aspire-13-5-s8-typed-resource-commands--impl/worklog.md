@@ -23,6 +23,13 @@ Phase-B lease and the implementation agent does not self-certify.
   (three unique failure shapes). The failures prove the raw/rendered Aspire 13.4 seam remains and
   `<db>-cli`/`excludeFromMcp()` emission is absent. Receipt:
   `receipts/01-red-generator-tests.json`.
+- 2026-08-30: pushed slice 1 commit `42c4ef51f6f12cd9ba4644c4843895e227d31cec` with the
+  explicit refspec; opened stacked draft PR #1754 and posted its RED evidence trail.
+- 2026-08-30: slice 2 emits typed `migrate`/`seed`/`reset` commands, validates reset confirmation
+  before connection or process IO, routes execution through the emitted tool runner, owns D-6 via
+  `DbCliModeExcludeFromMcp`, and removes the 13.4 process-command seam. `s8-s2-generator-green`
+  passed 34/34; focused `deno check --unstable-kv` passed for both generators and tests. The durable
+  receipt is intentionally run after this slice commits so it attests the implemented HEAD.
 
 ## Push trail
 

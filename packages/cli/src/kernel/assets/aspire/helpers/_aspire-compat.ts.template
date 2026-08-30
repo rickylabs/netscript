@@ -141,6 +141,7 @@ export const DEFAULT_PERMISSIONS: readonly string[] = [
 ] as const;
 
 export const RESOURCE_DEFAULTS = {
+  DbCliModeExcludeFromMcp: true,
   Runtime: 'deno',
   ServiceEntrypoint: 'src/main.ts',
   AppEntrypoint: 'main.ts',
