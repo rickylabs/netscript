@@ -49,21 +49,12 @@ export type WorkersStreamDB = Readonly<{
 export function createWorkersStreamDB(
   options: { baseUrl?: string } = {},
 ): WorkersStreamDB {
-  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
-
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/workers/executions', baseUrl),
+      url: buildStreamUrl('/workers/executions', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
     state: workersStreamSchema,
   }) as WorkersStreamDB;
-}
-
-function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
-  if (baseUrl === undefined) {
-    throw new Error('Workers StreamDB requires the Aspire-discovered streams service URL.');
-  }
-  return baseUrl;
 }

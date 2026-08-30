@@ -43,11 +43,9 @@ export interface AuthStreamDB {
  * ```
  */
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {
-  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
-
   const streamDb = createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/auth/sessions', baseUrl),
+      url: buildStreamUrl('/auth/sessions', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
@@ -60,11 +58,4 @@ export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStre
     preload: () => streamDb.preload(),
     close: () => streamDb.close(),
   };
-}
-
-function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
-  if (baseUrl === undefined) {
-    throw new Error('Auth StreamDB requires the Aspire-discovered streams service URL.');
-  }
-  return baseUrl;
 }

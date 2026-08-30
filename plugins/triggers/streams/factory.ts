@@ -52,7 +52,6 @@ export type TriggersStreamDBOptions = Readonly<{
 export function createTriggersStreamDB(
   options: TriggersStreamDBOptions = {},
 ): TriggersStreamDB {
-  const baseUrl = requiredStreamsBaseUrl(options.baseUrl);
   const state = createStateSchema<TriggersStreamDefinition>({
     triggerEvent: {
       schema: TriggerStreamEntitySchema,
@@ -63,17 +62,10 @@ export function createTriggersStreamDB(
 
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/triggers/events', baseUrl),
+      url: buildStreamUrl('/triggers/events', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
     state,
   });
-}
-
-function requiredStreamsBaseUrl(baseUrl: string | undefined): string {
-  if (baseUrl === undefined) {
-    throw new Error('Triggers StreamDB requires the Aspire-discovered streams service URL.');
-  }
-  return baseUrl;
 }
