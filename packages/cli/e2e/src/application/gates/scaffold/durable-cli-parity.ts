@@ -1,4 +1,13 @@
 import type { PluginCli, PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
+import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
+
+const appHost = Deno.args[0];
+if (!appHost) throw new Error('apphost argument is required');
+
+const workersUrls = await resolveResourceUrlsFromAppHost(appHost, 'workers-api');
+const sagasUrls = await resolveResourceUrlsFromAppHost(appHost, 'sagas-api');
+Deno.env.set('WORKERS_API_URL', firstResourceUrl(workersUrls, 'workers-api'));
+Deno.env.set('SAGAS_API_URL', firstResourceUrl(sagasUrls, 'sagas-api'));
 
 const workersSpecifier = '@netscript/plugin-workers/cli';
 const sagasSpecifier = '@netscript/plugin-sagas/cli';
@@ -48,6 +57,12 @@ await poll('saga instance', async () => {
 });
 
 console.info(`durable CLI parity passed for correlation ${correlationId}`);
+
+function firstResourceUrl(urls: readonly string[], resourceName: string): string {
+  const url = urls[0];
+  if (!url) throw new Error(`Aspire resource ${resourceName} declared no URL.`);
+  return url;
+}
 
 async function run(cli: PluginCli, args: PluginCliArgs): Promise<PluginCliResult> {
   const command = cli.commands().find((candidate) => candidate.name === args.command);

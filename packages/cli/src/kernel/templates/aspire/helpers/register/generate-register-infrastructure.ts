@@ -140,6 +140,9 @@ export function generateRegisterInfrastructure(
       lines.push(`    secret: true,`)
       lines.push(`  });`)
       lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      if (entry.Port !== undefined) {
+        lines.push(`    port: ${entry.Port},`)
+      }
       lines.push(`    password: ${id}_password,`)
       lines.push(`  })`)
     } else if (entry.Engine === 'Mssql') {
@@ -150,6 +153,9 @@ export function generateRegisterInfrastructure(
       lines.push(`    secret: true,`)
       lines.push(`  });`)
       lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      if (entry.Port !== undefined) {
+        lines.push(`    port: ${entry.Port},`)
+      }
       lines.push(`    password: ${id}_password,`)
       lines.push(`  })`)
     } else {
@@ -424,7 +430,7 @@ function garnetExecutableSetup(
     `  const ${id} = await builder.addExecutable('${name}', 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
   )
   lines.push(
-    `    .withEndpoint({ name: 'tcp', targetPort: ${CACHE_DEFAULT_PORT}, scheme: 'tcp' });`,
+    `    .withEndpoint(${cacheEndpointOptions(entry.Port)});`,
   )
   lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
   lines.push(

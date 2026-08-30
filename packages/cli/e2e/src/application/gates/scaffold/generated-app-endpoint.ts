@@ -198,20 +198,28 @@ export function declaredHttpUrls(resource: Record<string, unknown>): string[] {
  * @throws {@link AppEndpointPendingError} if the resource is absent or exposes no HTTP endpoint.
  * Other parse errors are terminal and are reported unchanged.
  */
-export function appUrlsFromDescribeOutput(describeOutput: string, appName: string): string[] {
-  const resource = findResource(JSON.parse(extractJson(describeOutput)), appName);
+export function resourceUrlsFromDescribeOutput(
+  describeOutput: string,
+  resourceName: string,
+): string[] {
+  const resource = findResource(JSON.parse(extractJson(describeOutput)), resourceName);
   if (!resource) {
     throw new AppEndpointPendingError(
-      `resource ${appName} was not present in aspire describe output`,
+      `resource ${resourceName} was not present in aspire describe output`,
     );
   }
   const urls = declaredHttpUrls(resource);
   if (urls.length === 0) {
     throw new AppEndpointPendingError(
-      `resource ${appName} still declared no HTTP endpoint in its aspire describe urls[]`,
+      `resource ${resourceName} still declared no HTTP endpoint in its aspire describe urls[]`,
     );
   }
   return urls;
+}
+
+/** Backward-compatible app-specific spelling for the generic resource URL parser. */
+export function appUrlsFromDescribeOutput(describeOutput: string, appName: string): string[] {
+  return resourceUrlsFromDescribeOutput(describeOutput, appName);
 }
 
 /**
@@ -222,9 +230,9 @@ export function appUrlsFromDescribeOutput(describeOutput: string, appName: strin
  * An AppHost that has not started yet and an endpoint that has not been registered are transient;
  * both throw {@link AppEndpointPendingError}. Other command and parse failures are terminal.
  */
-export async function resolveAppUrlsFromAppHost(
+export async function resolveResourceUrlsFromAppHost(
   appHost: string,
-  appName: string,
+  resourceName: string,
 ): Promise<string[]> {
   const output = await new Deno.Command('aspire', {
     args: ['describe', '--apphost', appHost, '--format', 'Json', '--non-interactive', '--nologo'],
@@ -245,7 +253,15 @@ export async function resolveAppUrlsFromAppHost(
     }
     throw new Error(`aspire describe failed with code ${output.code}: ${stderr || stdout}`);
   }
-  return appUrlsFromDescribeOutput(stdout, appName);
+  return resourceUrlsFromDescribeOutput(stdout, resourceName);
+}
+
+/** Backward-compatible app-specific spelling for generic live resource URL resolution. */
+export async function resolveAppUrlsFromAppHost(
+  appHost: string,
+  appName: string,
+): Promise<string[]> {
+  return await resolveResourceUrlsFromAppHost(appHost, appName);
 }
 
 /**

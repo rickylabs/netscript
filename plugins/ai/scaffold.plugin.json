@@ -42,7 +42,6 @@
   "officialSource": {
     "canonicalName": "ai",
     "pluginDir": "ai",
-    "backgroundPort": 8095,
     "requiresDb": false,
     "requiresKv": false,
     "permissions": ["--allow-net", "--allow-env", "--allow-read"]

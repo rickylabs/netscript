@@ -181,6 +181,8 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
   }
 
   #aspireCommonArgs(request: DeployTargetRequest): string[] {
+    // Aspire 13.5 publish/deploy share these flags. `--yes` is destroy-only;
+    // compose teardown delegates to Docker and therefore never receives it.
     const args: string[] = [];
     if (request.environment) args.push('--environment', request.environment);
     if (request.nonInteractive) args.push('--non-interactive');
