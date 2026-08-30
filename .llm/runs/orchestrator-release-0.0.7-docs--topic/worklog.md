@@ -2680,3 +2680,39 @@ byte-for-byte match to the PR's `box:` text, verified before pushing), re-runnin
 Final state: PR #1794 head `514f47565be0d3a9b24444ef06493090ea106769`, `mergeStateStatus: CLEAN`,
 `mergeable: MERGEABLE`, all CI green, issue #1793 7/7 boxes checked, sole `status:ready-merge` on
 both. Ready for an exact merge packet.
+
+### #1795/PR #1796: heading-only fix, dual independent evaluators, label-race with OpenHands
+
+Measured real current drift on main `5197e70b7` and found the smallest remaining #1777 case yet:
+`plugin-ai-core`'s reference page already had a fully correct two-entry export table, just under an
+unrecognized `## Entrypoints` heading instead of `## Exports`. Filed as #1795 with single-line
+Acceptance checkboxes from the start (applying the #1793 lesson).
+
+Dispatched to Codex (`gpt-5.6-sol`, low). Hit the same `duplicate_sender_risk` on the reused leaf
+worktree from the just-completed #1793/#1794 thread — third occurrence of the same pattern this
+session; evicted per [[agentic-sender-ownership-stale-block]] after confirming staleness, relaunched.
+
+Codex delivered PR #1796, commit `58018d600`: the heading rename plus one `AUTHORITATIVE_MAPPING`
+entry (`mode: 'entrypoints-only'`, naming 5 specific missing `contracts/v1` symbols). Tier-A
+independently recomputed the real-exports-minus-documented set via `deno doc --json` and confirmed
+the claimed 5-symbol gap is *exactly* right — not approximately, exactly: `{AiContractSchema,
+AiContractSchemaResult, JsonSchema, ReasoningChunk, ToolParameters}`, no more, no fewer.
+
+IMPL-EVAL dispatched to DeepSeek (Fable still monthly-limited): **PASS**, independently reproduced the
+same exact 5-symbol gap. An **independent OpenHands DeepSeek job also ran unprompted** on this PR and
+reached the same **PASS** — a second, unsolicited confirmation.
+
+**New label-race discovered**: after this session set `status:ready-merge`, an external OpenHands
+automation flipped the PR's status label to `status:impl-eval` before CI read it, causing the exact
+same "mirror skipped — label not ready-merge" close-gate failure as the #1793 cycle, but from a
+different actor. A `status:augment-review` label also appeared (from Augment's own review pass, which
+completed with no suggestions) and had to be cleared. Fixed by re-applying sole `status:ready-merge`
+and rerunning only the failed jobs on the same CI run (never a new push — the product head never
+moved). **Lesson: label state on a PR is not exclusively this session's to set — other automations
+(OpenHands, Augment) can write `status:` labels concurrently. Always re-check the live label set
+immediately before relying on a CI run's label read, and prefer `gh run rerun --failed` on the
+existing run over a fresh push when only metadata needed correcting.**
+
+Final state: PR #1796 head `58018d6001e6ddf7669248aee0f4b283f55ed6a0` unchanged throughout the whole
+cycle, `mergeStateStatus: CLEAN`, `mergeable: MERGEABLE`, all CI green, issue #1795 4/4 boxes mirrored
+checked, sole `status:ready-merge` on both. Ready for an exact merge packet.
