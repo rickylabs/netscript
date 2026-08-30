@@ -225,4 +225,9 @@ released; **attempt 3 neither requested nor launched**. Only run artifacts commi
 Unhealthy-but-Running, db-cli `--help`, `migrate --timeout`) are AppHost gates and therefore share
 the D-43 environment block on this NAS. | | Issue normalization | **#1720** `status:triage` →
 `status:impl` to match PR #1754 (same rule the coordinator applied to #1280 and #863); milestone
-0.0.7 and taxonomy preserved; exactly one `status:` label. #863 already `status:impl`. |
+0.0.7 and taxonomy preserved; exactly one `status:` label. #863 already `status:impl`. | | S8 Phase
+A closed out | Thread `01a051e6…` ended `DONE` at `9dd06647` (product head `5b6f8a0a`). Exact-head
+gates green (fork re-run); Tier-A signed off; PR #1754 sign-off comment posted; IMPL-EVAL cycle 1
+launched as `claude -p` session `657b1ab5…` in `007-aspire-s8-eval` @ `9dd06647`; handoff
+`slices/s8/handoff-phase-a.md` (phase A only; Phase-B receipts environment-blocked; not a merge
+candidate). Runtime zero throughout. |
