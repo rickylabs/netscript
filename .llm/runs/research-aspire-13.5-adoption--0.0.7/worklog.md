@@ -416,4 +416,7 @@ S13 thread DONE; self-eval non-authoritative | Thread `01a05348-6d4d…` closed 
 (PR #1779 draft, base S10′, 8 slices). It dispatched its own Claude "IMPL-EVAL" sessions and
 recorded PASS — treated as non-authoritative (D-65); supervisor Tier-A gate fork running; harness
 IMPL-EVAL brief filled (head `ba989e9a`, PR #1779). #1724 → `status:impl`. Eval worktree
-`007-aspire-s13-eval` @ `ba989e9a`. |
+`007-aspire-s13-eval` @ `ba989e9a`. | | S13 Tier-A cycle 1 | Gates at `ba989e9a`: all green except
+**T-1 `check:mcp-export-corpus` FAIL** (stale corpus after the D-17 export change). Fix routed to
+the same thread (regen-only commit; D-65 rule restated: no self-dispatched evaluation). Sign-off +
+supervisor IMPL-EVAL follow at the fixed head. |
