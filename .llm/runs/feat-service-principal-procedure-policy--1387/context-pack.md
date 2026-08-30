@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slice 5 stopped for rescope before product edits (D-9) |
+| Current phase  | `impl` — Slice 5 content complete; awaiting Tier-A / IMPL-EVAL |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -32,13 +32,18 @@ would have been materially misled about run position despite the commit trail, p
 documents, and receipt archives all being current. Update this file at each slice boundary going
 forward, not only at Slice 1.
 
-Slice 5 was released but stopped before product edits under **D-9**. The required runtime factory
-cannot be made public inside the locked ceiling: both explicit package entrypoints
-(`packages/service/src/auth/mod.ts` and `packages/service/mod.ts`) need a named
-`createContractAuthorizer` value export, and neither is among the ten authorized files. A private
-internal import would not satisfy the Design checkpoint or consumer API. Slice 4's ten top-level
-receipts were verified and moved byte-identically to `receipts/slice-4-9cc8c4c5f/`; the top level is
-empty pending a future, owner-amended Slice 5 attempt.
+The owner accepted **D-9** and amended Slice 5's ceiling with only the two service entrypoints needed
+to publish `createContractAuthorizer`. Slice 5 is now implemented at immutable content head
+`c2cbfbf0b3c355682732be5805f0f180498576db`. Contract metadata is authoritative; the match-aware
+legacy authorizer runs only for a matched procedure whose metadata is absent, and an absent fallback
+match denies. One builder-bound resolver uses the actual REST/RPC mounts and aliases for both authn
+and authz. Optional authentication throws during factory construction with a stable namespaced
+error.
+
+All seven durable receipts at the receipt root attest the Slice 5 content head and pass. The exact
+service audit also passes with only the sanctioned oRPC slow-type info, the generated MCP export
+corpus contains the root and `./auth` factory entries, and `deno.lock` remains byte-identical. Slice
+5 has not been self-certified: supervisor Tier-A and a fresh opposite-family IMPL-EVAL remain next.
 
 ## Completed
 
@@ -53,14 +58,20 @@ empty pending a future, owner-amended Slice 5 attempt.
 - Cut and verified the named durable receipts at the immutable content head, including command
   arguments, duration, and work-bearing output.
 - Proved `deno.lock` byte-identical and every named generated carrier unchanged.
+- Implemented Slice 5 contract traversal, REST/RPC/alias matching, LD-6 fallback precedence,
+  scope/role decisions, and construction-time optional-auth rejection.
+- Bound one resolver into both middleware stages from the builder's effective RPC wiring options;
+  standalone scope authorizers now expose match-aware composition without losing `AuthorizerPort`
+  compatibility.
+- Regenerated the ceiling-exempt MCP export corpus through its checked-in generator; it grew by only
+  the two expected public `createContractAuthorizer` entries.
 
 ## Next Steps
 
-1. Owner/supervisor adjudicates D-9 and, if accepted, adds only
-   `packages/service/src/auth/mod.ts` and `packages/service/mod.ts` to Slice 5 for the two named value
-   exports before re-releasing implementation.
-2. Do not begin Slice 6; complete and separately evaluate Slice 5 first.
-3. Continue Slices 6–9, each with its own Tier-A review and separate opposite-family IMPL-EVAL.
+1. Supervisor performs substantive Slice 5 Tier-A review at `c2cbfbf0b`; no author
+   self-certification substitutes for it.
+2. Dispatch a fresh opposite-family Slice 5 IMPL-EVAL only after this implementation lane stops.
+3. Do not begin Slice 6 until Slice 5 is accepted; then continue Slices 6–9 under their own ceilings.
 4. The owner amends #1387's compile-time router-rename acceptance line before the final close-gate;
    the implementation PR must state the accepted substitution.
 5. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the full leaf and
@@ -97,21 +108,20 @@ All product edits stayed inside the six-file ceiling:
 
 ## Gates
 
-| Gate                      | Historical Slice 1 result                                                        |
-| ------------------------- | -------------------------------------------------------------------------------- |
-| Scoped check/lint/fmt     | PASS over contracts and SDK; 114 files, zero findings                            |
-| Contracts + SDK tests     | PASS, 93/93                                                                      |
-| Contracts JSR audit       | PASS; one sanctioned slow-type info                                              |
-| SDK JSR audit             | PASS; only the two known baseline warnings                                       |
-| Export drift              | PASS via the exact `docs:exports-drift` task and durable `docs:accuracy` receipt |
-| Quality gate              | PASS, including architecture and dependency checks                               |
-| Publish dry run           | PASS; full workspace dry run completed                                           |
-| Lock/generated carriers   | PASS; byte-identical / no tracked movement                                       |
-| E2E/Aspire/Docker/browser | NOT_RUN by the explicit no-lease boundary                                        |
+| Gate                      | Slice 5 result                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| Scoped check/lint/fmt     | PASS over 48 service TS/TSX files; zero diagnostics/findings                    |
+| Service tests             | PASS, 101/101                                                                   |
+| Quality gate              | PASS, including quality scan, dependency checks, and doctrine fitness           |
+| Service JSR audit         | PASS; dry-run OK with one sanctioned oRPC slow-type info                        |
+| Publish dry run           | PASS; full workspace simulation completed                                       |
+| MCP export corpus         | PASS from a real catalog receipt; 7,654 symbols, expected factory entries added |
+| Lock                      | PASS; SHA-256 remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+| E2E/Aspire/Docker/browser | NOT_RUN by the explicit no-lease boundary                                       |
 
-The durable named set is `receipts/evidence-set.json`; it records `SUFFICIENT` for its declared
-automated surface. Tier-A acceptance remains a supervisor judgment, not an author
-self-certification.
+The current `receipts/evidence-set.json` is `SUFFICIENT` for its seven declared automated gates,
+and every constituent receipt has the expected `1387-s5-*` invocation ID, positive duration, and
+`gitHead == actualGitHead == c2cbfbf0b...`. Tier-A acceptance remains a supervisor judgment.
 
 ## Drift and Debt
 
@@ -124,7 +134,6 @@ self-certification.
 
 ## Commits
 
-The branch history contains a separate bounded plan-repair commit, a six-file Slice 1 product
-commit, and a following evidence/carrier commit. Treat Git and the draft PR as the authority for
-their identifiers; this context carrier intentionally does not claim that a SHA is eternally
-current.
+Slice 5's immutable content commit is `c2cbfbf0b3c355682732be5805f0f180498576db`. The following
+evidence carrier holds only run documentation and the verified receipt set. Treat Git and the draft
+PR as the authority for the evidence carrier's identifier; this file cannot name its own commit SHA.

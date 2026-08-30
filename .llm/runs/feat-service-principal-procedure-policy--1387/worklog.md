@@ -400,3 +400,63 @@ comparison was byte-identical for all ten files and the receipt root has no top-
 
 **Next step:** owner/supervisor ceiling adjudication. If D-9 is accepted, add only the two entrypoint
 files for named value exports and re-release Slice 5. Do not begin Slice 6.
+
+## Slice 5 — contract-policy adapter and middleware binding
+
+D-9 was owner-approved before this dispatch: the only ceiling amendment was the named value export
+of `createContractAuthorizer` from `packages/service/src/auth/mod.ts` and `packages/service/mod.ts`.
+Implementation changed 11 of the 12 authorized service files; `contract-policy.ts` required no
+behavior edit. The checked-in generator also refreshed the MCP export corpus under the plan's
+explicit generated-carrier exception. No other product or generated file changed.
+
+### Behavior delivered
+
+- Contract traversal compiles procedure-local access metadata once during factory construction.
+  `authentication: 'optional'` throws there with the stable
+  `[netscript.service.contract-policy]` namespace; the required negative test is named exactly
+  `createContractAuthorizer rejects optional authentication during construction`.
+- The bound resolver matches REST method/path templates, RPC router keys, RPC mount aliases, and
+  deprecated RPC route-prefix mappings using the builder's actual wiring configuration. It does not
+  assume `/api` or `/api/rpc` when custom paths were configured.
+- The builder passes the same resolver object to authentication and authorization middleware. A
+  declared-public procedure bypasses both stages; a required procedure outside legacy default
+  prefixes is authenticated and authorized.
+- Contract metadata wins under LD-6. A match-aware fallback is consulted only for a matched
+  procedure with absent metadata; no fallback match denies. The disagreement test defines fallback
+  decisions opposite both the declared-public and missing-scope outcomes and proves zero fallback
+  calls.
+- `createScopeAuthorizer` now implements `MatchAwareAuthorizerPort`, distinguishes no-match from a
+  matched deny, and preserves its standalone `authorize()` behavior and assignability to the plain
+  `AuthorizerPort` seam.
+- Tests cover custom REST/RPC dispatch, aliases, deprecated routes, service-side rename continuity,
+  no-policy fallback, missing scope, disagreement precedence, and the public root export through a
+  real builder request flow.
+
+The immutable content head is `c2cbfbf0b3c355682732be5805f0f180498576db`.
+
+### Slice 5 evidence
+
+| Gate / proof | Result | Durable evidence |
+| --- | --- | --- |
+| Scoped check | PASS, 48 files / 0 diagnostics | `1387-s5-check`, 1,344 ms |
+| Scoped lint | PASS, 48 files / 0 findings | `1387-s5-lint`, 477 ms |
+| Scoped format | PASS, 48 files / 0 findings | `1387-s5-fmt-check`, 412 ms |
+| Service tests | PASS, 101/101 | `1387-s5-test`, 4,244 ms |
+| Quality gate | PASS | `1387-s5-quality-gate`, 7,272 ms |
+| Publish dry run | PASS, full workspace simulation | `1387-s5-publish-dry-run`, 28,587 ms |
+| MCP export corpus | PASS, real catalog receipt; 7,654 symbols | `1387-s5-mcp-export-corpus`, 6,063 ms |
+| Service JSR audit | PASS; dry-run OK, one sanctioned oRPC slow-type info | Exact direct package audit |
+
+Every receipt above was independently checked for its expected invocation ID, positive
+`durationMs`, `outcome: PASS`, and
+`gitHead == actualGitHead == c2cbfbf0b3c355682732be5805f0f180498576db`. The recomputed
+`receipts/evidence-set.json` is `SUFFICIENT` with no reasons. Receipt success was not inferred from
+a shell loop or stale top-level files.
+
+The MCP corpus generator added the expected `createContractAuthorizer` entries for the service root
+and `./auth` subpath. `deno.lock` is byte-identical at SHA-256
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+E2E, Aspire, Docker, and browser gates were not run and no runtime lease was acquired. Slice 6 was
+not started. This author stops with Slice 5 awaiting substantive supervisor Tier-A review and a
+separate opposite-family IMPL-EVAL; the green evidence is not an author self-certification.
