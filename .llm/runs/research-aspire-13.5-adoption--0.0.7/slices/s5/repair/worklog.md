@@ -301,3 +301,32 @@ Aspire, Docker, AppHost, generated runtime, or `e2e:cli` process was started.
 - Slice 5 cannot be certified green because configured `deno task test` remains red on the isolated
   agentic-runtime zombie-reaping test above. Tier-A review and IMPL-EVAL remain separate and have
   not been performed by this lane.
+
+## Follow-up 1 — generated asset freshness
+
+Supervisor CI evidence showed that the slice-5 `check:assets-barrel` N/A classification above was
+wrong: `.llm/tools/validation/check-aspire-host-ports.ts` participates in the embedded agent-tools
+corpus even though no generated file had previously moved. The authoritative generator changed
+only `packages/cli/src/kernel/assets/agent-tools.generated.ts`, including bundle hash
+`01b5b9b43a008d21c2dc49fc035358a63f9582156b4af81083f427a9860e7b89`. Commit `59728705`
+contains only that generated file; no barrel was hand-edited.
+
+### Exact content-head gate evidence
+
+Tested SHA: `59728705221024905e528c17daf7b6919957b3b1`
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `deno task check` | 0 | 2,938 files checked in 25 batches; 0 diagnostics. |
+| `deno task test` | 1 | 4,283 passed, 1 failed, 19 ignored. The sole failure is the previously isolated host-only `hybrid-launcher_test.ts` zombie assertion; descendant `489495` is defunct with `PPID=1`. No test was changed, skipped, ignored, or narrowed. |
+| `deno task lint` | 0 | 2,051 files processed in 36 batches; 0 findings. |
+| `deno task quality:scan` | 0 | Repository scan has 0 findings; 7 bounded pre-existing allowances. |
+| `deno task arch:check` | 0 | Doctrine scan has 0 failures; existing warnings only. |
+| `deno task check:assets-barrel` | 0 | Regenerated and compared all seven authoritative barrels; no diff. |
+
+`git status --porcelain=v1` was empty after the gate set, and `deno.lock` remained unchanged. The
+PR's prior `check-test` job is green at the repair head; exact-final-head CI remains the remote
+authority for the environment-sensitive root test. This evidence table is committed separately
+because the supervisor explicitly required the preceding generator commit to contain only the
+authoritative barrel. No Aspire, Docker, AppHost, CLI E2E, label, milestone, readiness, merge, or
+issue-state action was taken.
