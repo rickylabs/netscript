@@ -5805,3 +5805,18 @@ context and a large warm cache. Resume prompt names exactly which rows remain (8
 row-16 judgment call and the two specific pre-existing-finding verifications the original brief
 required, and explicitly instructs it not to end the turn before writing the verdict, committing,
 pushing, and posting the PR comment.
+
+### #1739 resume attempt failed identically; third attempt is a fresh, pre-loaded, anti-silence session
+
+Resume (session `942976e6-...`, `--resume`) produced **only 2 turns and empty output**, immediately
+hitting the same "no visible output" nudge with no real work done — cost $0.09, confirms this is a
+transport-level quirk with this route under `--resume`, not something a nudge fixes. Verified clean
+again before proceeding: no commit, no PR comment.
+
+Third attempt: a **fresh** (non-resume) session, with the confirmed rows 2-7 evidence pasted directly
+into the prompt so it doesn't re-derive them, explicit numbered instructions for rows 8-16 with exact
+commands and expected outcomes, an explicit "always write visible text after every tool call" rule
+targeting the observed failure mode, and an explicit closing checklist (write verdict → commit → push →
+`gh pr comment`) so completion isn't left implicit. Running now.
+
+Running total OpenRouter DeepSeek spend this leaf: **$2.27** across two incomplete attempts.
