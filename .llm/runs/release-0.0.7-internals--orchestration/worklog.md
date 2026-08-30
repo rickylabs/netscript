@@ -3604,3 +3604,36 @@ Current host facts are stated positively in the brief — `tini`/0 zombies so ro
   using the launcher and wants a real fix, not a per-call env var.
 - The `node_repl` MCP server fails to start for new Codex threads
   (`MCP startup failed: No such file or directory`); `codex_apps` starts fine and the turn proceeds.
+
+## 2026-08-30 — #1533 supervision: `codex-status` absence is not a turn boundary
+
+On resuming supervision I read #1533 as having finished its launch turn without artifacts: the run
+dir held only the brief and `codex-thread-ids.md`, there were no commits, and **`codex-status` did
+not list the thread at all**. I wrote a continuation brief and sent it.
+
+**It was rejected** — `thread-store conflict: thread 01a05209-… already has an active writer` — and
+the rejection was correct. The launch turn was still running the whole time: launcher pid `351967`
+alive at 4m03s, `/home/agent/.codex/thread-writer-locks/01a05209-….lock` present, and on the very
+next poll `codex-status` listed the thread as `working` again. The reasoning stream shows it mid-
+research (`Inspecting deno doc JSON for symbol details`).
+
+So the resume cost nothing — the writer lock is exactly what prevents a second steering message from
+racing an author mid-turn — but the inference was wrong, and it is the **second time this session**
+I have read a transient `codex-status` gap as a turn boundary (the first was #1732, same shape).
+
+**`codex-status` absence is not evidence of a finished turn.** It is a sampling artifact. The
+reliable signals, in order:
+
+1. the thread's `.lock` file under `~/.codex/thread-writer-locks/`;
+2. the launcher/`app-server-message-cli` process by **pid** (`kill -0 <pid>`), not by `pgrep -f`
+   pattern — that pattern matched my own watcher command line earlier this session and deadlocked it;
+3. the commit graph.
+
+Watchers are now armed on those signals: `watch-run.ts` over the run dir (`research.md`, `plan.md`,
+`worklog.md`) with a 1500s heartbeat, plus a condition loop keyed on the launcher **pid**.
+
+This is the fifth variation of one error this session: **the observation surface was mistaken for
+the thing observed.** Wrapper exit codes described wrappers; `pgrep -f` matched the watcher; a
+`timeout` killed what it was bounding; a stale ledger described a superseded measurement; now a
+status sampler described its own sampling. In every case the fix was the same — go to the artifact
+that cannot lie about itself.
