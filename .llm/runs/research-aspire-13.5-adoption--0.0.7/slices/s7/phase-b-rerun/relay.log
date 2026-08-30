@@ -1,3 +1,5 @@
 [relay] watching owner=s7-rerun dind=netscript-dind(10.4.12.22) since=2026-08-30T19:09:42.848Z pid=3368905
 [relay] postgres-0e5c6d1c 127.0.0.1:20800 => hopA relay-s7-rerun-20800 (10.4.12.22:20800) => hopB 127.0.0.1:20800@ai-agents
 [relay] redis-amduaucj 127.0.0.1:32783 => hopA relay-s7-rerun-32783 (10.4.12.22:32783) => hopB 127.0.0.1:32783@ai-agents
+[relay] postgres-79fb6680 127.0.0.1:11990 => hopA relay-s7-rerun-11990 (10.4.12.22:11990) => hopB 127.0.0.1:11990@ai-agents
+[relay] redis-dxynzvqj 127.0.0.1:32784 => hopA relay-s7-rerun-32784 (10.4.12.22:32784) => hopB 127.0.0.1:32784@ai-agents
