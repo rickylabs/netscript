@@ -174,6 +174,81 @@ Deno.test('bridge records scheduled persistence success and missing-scheduler er
   assertEquals(failure.ended, true);
 });
 
+Deno.test('bridge preserves a handler-supplied scheduled correlation key', async () => {
+  const tracer = new RecordingTracer();
+  const scheduler = new RecordingScheduler();
+  const runtime = createSagaRuntime({
+    native: {
+      instrumentation: new SagaInstrumentation({ tracer }),
+      scheduler,
+    },
+  });
+  const definition = defineSaga('schedule-correlation-precedence')
+    .state<SagaState>({})
+    .on('start', () => [
+      schedule({
+        type: 'later',
+        payload: {},
+        correlationKey: 'handler-chosen' as SagaCorrelationKey,
+      }, 10),
+    ])
+    .build() as SagaDefinition;
+
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await runtime.publish({
+      type: 'start',
+      payload: {},
+      correlationKey: 'upstream-42' as SagaCorrelationKey,
+    });
+  } finally {
+    await runtime.stop('schedule precedence test complete');
+  }
+
+  const span = tracer.spans.find(
+    (candidate) => candidate.name === SagaSpanNames.CASCADE_SCHEDULE,
+  );
+  assert(span);
+  assertEquals(span.attributes[SagaAttributes.CORRELATION_ID], 'upstream-42');
+  const scheduledMessage = scheduler.messages[0].message;
+  assert('type' in scheduledMessage);
+  assertEquals(scheduledMessage.correlationKey, 'handler-chosen');
+  assertEquals(scheduledMessage.traceparent, span.context.traceparent);
+});
+
+Deno.test('send transports upstream correlation when the DSL supplies no child key', async () => {
+  const tracer = new RecordingTracer();
+  const runtime = createSagaRuntime({
+    native: { instrumentation: new SagaInstrumentation({ tracer }) },
+  });
+  const definition = defineSaga('send-correlation-transport')
+    .state<SagaState>({})
+    .on('start', () => [send('next', {})])
+    .on('next', () => [])
+    .build() as SagaDefinition;
+
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await runtime.publish({
+      type: 'start',
+      payload: {},
+      correlationKey: 'upstream-42' as SagaCorrelationKey,
+    });
+  } finally {
+    await runtime.stop('send correlation transport test complete');
+  }
+
+  const handles = tracer.spans.filter((span) => span.name === SagaSpanNames.HANDLE);
+  assertEquals(handles.length, 2);
+  assertEquals(handles[1].attributes[SagaAttributes.CORRELATION_ID], 'upstream-42');
+  assertEquals(
+    handles[1].attributes[SagaAttributes.SAGA_CORRELATION_KEY],
+    'upstream-42',
+  );
+});
+
 Deno.test('bridge records unsupported structural spawn as error-only', async () => {
   const tracer = new RecordingTracer();
   const runtime = createSagaRuntime({
@@ -258,6 +333,36 @@ Deno.test('SagaCompensator rejects a registered handler when engine correlation 
   assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.ERROR);
   assertEquals(span.status, 'error');
   assertEquals(span.ended, true);
+});
+
+Deno.test('SagaCompensator preserves message trace context when no span context exists', async () => {
+  const compensator = new SagaCompensator({ clock: new TestSagaClock() });
+  let observedTraceparent: string | undefined;
+  const definition = defineSaga('compensation-message-trace')
+    .state<SagaState>({})
+    .on('undo', () => [])
+    .compensate('undo', (_saga, _message, context) => {
+      observedTraceparent = context.traceparent;
+      return [];
+    })
+    .build() as SagaDefinition;
+
+  await compensator.compensate({
+    definition,
+    instanceId: 'compensation-message-trace:42' as SagaInstanceId,
+    state: {},
+    message: {
+      type: 'undo',
+      payload: {},
+      traceparent: `00-${'b'.repeat(32)}-${'c'.repeat(16)}-01`,
+    },
+    correlationKey: 'domain-42' as SagaCorrelationKey,
+  });
+
+  assertEquals(
+    observedTraceparent,
+    `00-${'b'.repeat(32)}-${'c'.repeat(16)}-01`,
+  );
 });
 
 Deno.test('SagaCompensator records thrown and nested-deferred compensation as errors', async () => {

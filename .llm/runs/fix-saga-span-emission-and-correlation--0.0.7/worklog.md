@@ -104,6 +104,7 @@ a process seam. A thin plugin may only wire the core primitive.
 | 2026-08-30T14:14:44Z | S4    | Runtime emission         | Added all five operation-owned callers, normalized one instrumentation dependency through core/plugin composition, and preserved engine-selected correlation/direct-parent context through compensation cascades.                           |
 | 2026-08-30T14:23:57Z | S5    | Docs/consumer proof      | Documented all six span contracts and added a generated Flow-B compensation fixture plus validator checks for direct parenting and exact callback/payload correlation equality. Runtime execution remains supervisor-only.                  |
 | 2026-08-30T14:28:11Z | S6    | Merge-readiness evidence | Re-ran all allowed exact-head gates. Static, architecture, publish, focused tests, quality, and three check-only derivative gates pass; MCP corpus is the expected attributed STOP; two unrelated baseline gates remain measured negatives. |
+| 2026-08-30T14:40:34Z | S7    | IMPL-EVAL repair red     | Cycle-1 F2/F3 regression tests compile and fail only by assertion: raw exit 1, 10 passed / 2 failed. Scheduled dispatch overwrites `handler-chosen` with `upstream-42`; noop compensation drops the handled message traceparent.            |
 
 ## Decisions
 
