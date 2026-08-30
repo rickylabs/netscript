@@ -2064,3 +2064,60 @@ Exclude — and refreshes every live count and pin statement. The changelog map 
 
 This is the cost of writing a changelog while its milestone is still merging, and it is why the
 section is framed **provisional** rather than complete.
+
+## 2026-08-30 — docs lane allocation fully shipped; #1761 merged
+
+| PR | Issue | Merge SHA | State |
+| --- | --- | --- | --- |
+| #1746 | #1745 | `f8b4f804` | shipped |
+| #1748 | #1000 | `952cc106` | shipped |
+| #1755 | #1749 | `a5520e70` | shipped |
+| #1761 | #1757 | `a5f506dd` | shipped |
+
+Epic **#1723 remained OPEN through all four** — no PR ever carried a closing keyword on it, which was
+the failure most likely to happen silently.
+
+`main`: `13878a80` → `a5f506dd` across this session. The docs allocation
+`[1000, 1551, 1723, 1745, 1749]` (+ owner-admitted `1757`) is now **fully closed except #1723**,
+which stays source-blocked: the Aspire pin is still `13.4.6` and S1 #1727 is open.
+
+### #1761 needed four heads, and the reason is worth keeping
+
+`15c262e4` → `3befc1e2` (wording repair) → `cac095e1` (triage currency) → `c1700128` (run-evidence
+correction). Only the second was a real defect; the other two were **currency debt** created by a
+milestone merging underneath an in-flight slice.
+
+The defect: B1 said the installed scanner *"needs environment and network permissions"*. A PLAN-EVAL
+cycle **and** a separate-session IMPL-EVAL both passed it, both correctly verifying the *declared*
+permission set had widened — and neither asked whether "needs" described a runtime *requirement*. An
+external Augment review caught it. The final evaluation was briefed to sweep all eleven bullets for
+that class and came back clean, re-deriving each fact rather than inheriting the stopped pass's hint.
+
+**The generalisable rule: a declaration is not a requirement.** Two independent passes verified the
+same true fact and neither tested the word attached to it, because no brief asked them to.
+
+### Process notes from this stretch
+
+1. **An evaluator was deliberately stopped mid-run** rather than allowed to certify `cac095e1`
+   seconds before an evidence repair superseded it. Its partial output was explicitly marked
+   non-authoritative in the successor brief, and the fresh pass re-derived B3 independently. A
+   half-finished sweep quoted as evidence is how a false pass gets manufactured.
+2. **Acceptance boxes are mirrored, not hand-ticked.** Corrected mid-session: the PR body carries a
+   fenced `acceptance-evidence` block, and `close-gate` runs `mirror-acceptance-evidence.ts`, which
+   validates the mapping and ticks with provenance — but only once `status:ready-merge` is live. This
+   lane had hand-ticked on #1749 and #1755, bypassing `validateEvidenceMapping`.
+3. **Four stale-state assertions reached PR bodies this session, three of them mine** — "no checkbox
+   is ticked" while the mirror had already ticked five; "readiness is withheld" after I had promoted
+   the PR; two stale head/count claims. Every one had the same mechanism: changing a state and
+   leaving prose describing the old one, usually inside an edit that was correcting someone else's
+   stale claim. Re-query before asserting; do not treat the body as a document you remember.
+4. **Two-dot diffs produced two false catastrophes** (an apparent 8,103-line revert; an apparent
+   fabricated-evidence accusation from a 29-commit-stale worktree). Standing rule: when a result
+   looks catastrophic, suspect the baseline before the branch.
+
+### Next candidate shopped from milestone 27
+
+Milestone 27 has **61 open issues and zero unallocated**. Every docs-labelled one is either
+source-blocked (#1723), another lane's in-flight work (#1721, #1533), or not a docs slice
+(#1365, #1360). So the next docs work is a **proposal**, not a free ticket — recorded in the
+supervisor handoff.
