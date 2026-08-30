@@ -4973,3 +4973,42 @@ written against the superseded head `be3d1546`. Rule going forward: **never edit
 armed sender points at.** Write a new file and arm a new sender; the old file is immutable once armed.
 A short correction crediting the completed work, accepting the send-path decision explicitly so it is
 not second-guessed, and reducing scope to F4/F5/F6 is armed on the same idle rule.
+
+### #1368 — author's 4b67a14c supersedes my send-path ruling; retraction sent
+
+The author landed `4b67a14c` "preserve cascade correlation semantics", which resolves F2's send path
+better than either option I authorized. Instead of justifying the stamp, it stops writing the domain
+key at all: `#handleAndDispatch` takes the correlation id as a separate parameter, `SagaEngine.handle`
+widens to `number | { attempt?, correlationId? }` (numeric form retained for source compatibility),
+`#handleEntry` resolves `suppliedCorrelationId ?? message.correlationKey ?? correlationKey`, and the
+nested send message carries no domain key. A rule-less downstream saga keeps `<sagaId>:<type>` while
+its spans stay joined upstream. This also clears the evaluator's AP-3/AP-8 plane-conflation violation,
+which neither of my options addressed.
+
+**My reasoning error.** I checked the `send` variant's type, found no `correlationKey` field, and
+concluded the stamp was correct as written. That inference was sound but I stopped one question too
+early: "nothing can be overwritten" does not imply "writing it is right". The evaluator had explicitly
+offered a third branch — "transport the cross-plane id without overloading the domain key" — and I
+treated its two-option framing as exhaustive after ruling out the shim. The author took the branch I
+discarded.
+
+**Sender discipline failed twice, and the second one reached the author.**
+1. I rewrote a staged message file while a sender armed on that path was waiting; idle fired
+   mid-rewrite. The amended-but-superseded copy went out. Rule recorded: an armed sender's file is
+   immutable — write a new file and arm a new sender.
+2. Worse, I then armed a correction whose send-path paragraph became wrong within minutes, because the
+   author was committing faster than my sender's idle poll. It fired at 14:59:00, seconds before I
+   killed it, telling the author not to change a line they had already improved. `pkill -f` also
+   matched my own shell command string and self-killed the turn (exit 144) — use the job's PID, never
+   a pattern that matches the invoking command.
+
+Corrected rule for a fast-moving author: **re-verify the author's head inside the sender immediately
+before delivery, and abort if it moved past the head the message was written against.** A time-delayed
+message is a claim about a head, and heads move.
+
+A third message is armed retracting the bad instruction, explicitly accepting `4b67a14c`, and asking
+only for what remains: source-compat/JSR/doc-lint confirmation for the widened published
+`SagaEngine.handle` signature, a worklog note that the leaf-authored test literal changed because the
+transport changed rather than to manufacture green, and F5 confirmation. Verified already done in
+`4b67a14c`: F4 explicit behavior-change line, F6 drift entries with base-proof for plan gates 12/17,
+F7 composition note, and the send-path semantics paragraph.
