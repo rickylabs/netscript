@@ -3160,3 +3160,65 @@ rollout (`agent-docs-prose`, `docs:exports-drift`, `crash for an unrelated reaso
 active-writer conflict, and **no `timeout` wrapper** — the prohibition now holds in practice, not just
 in the record. Scope is the plan and its run artifacts only; S2 stays blocked until PLAN-EVAL cycle 2
 passes.
+
+## 2026-08-30 — #1462 plan revised at `9a0f5876`; PLAN-EVAL cycle 2 dispatched
+
+### A supervisor error worth keeping: mtime is not a liveness proof
+
+The repair turn died at 11:06:36Z when this session's `codex-resume` client was killed. Eighteen
+seconds later the rollout mtime looked fresh and `codex-status` said `working`, so this lane recorded
+that "the turn survived a client kill" and drew a distinction between a `timeout` (kills the process
+group) and a task-stop (kills only the client). **That was wrong.** Seven minutes on, the rollout was
+frozen at exactly that timestamp and the daemon said `stalled`: the 11:06:36Z write had been the
+turn's *last*, not evidence of progress.
+
+Two rules replace the retracted claim, and the record was amended rather than quietly fixed:
+
+1. **A recent mtime proves the process was alive recently, not that it is alive now.** Liveness needs
+   a **delta** — two rollout-size samples separated by real time, requiring growth. Judging from one
+   fresh timestamp is the same error class as attributing a fmt finding at file level: true at a
+   coarser granularity than the claim. This lane has now made that mistake in two unrelated domains,
+   which is what makes it worth writing down as a pattern rather than an incident.
+2. **`codex-status` state lags** — it reported `working` for a turn that had stopped writing. State is
+   a hint; rollout growth is the fact.
+
+Recovery cost nothing: the repair had only narrated its approach, ownership of every surviving
+`codex-resume`/`launch-codex-slice` process was checked by parent chain first (the sole survivor was
+the Aspire lane's, again), and the thread was resumed with all six fixes restated.
+
+### The revision discharges all four blocking findings
+
+`9a0f5876`, pushed, verified mechanically rather than from the commit message:
+
+| Finding | Landed as |
+| --- | --- |
+| F1 | S2 re-locked as a fresh child **with the Deno runtime intact** — import root `defineServices`, read `hasCacheProvider()` from `src/query/mod.ts`, require `false`; today's red is the observed `true`. The plan now states explicitly that a `window` alias "is not evidence". |
+| F2 | Both `.llm/assets/agent-docs/prose.json.gz` and `provenance.json` added to the ceiling, "regenerate only through `gen:agent-docs-prose`", with the gate cycle ordered before the publish-assets rows. |
+| F3 | Gate row 13 — `deno task docs:exports-drift`, PASS after S3, tied to the `./presets` reference entrypoint row. |
+| F4 | All three published pages (`web-layer/query-bridge.md`, `web-layer/server.md`, `services-sdk/sdk.md`) added to the ceiling. |
+
+**The author improved on what was asked.** Cycle 1 required it to *state* whether this host can run
+the Lume site build. It instead **ran** it — `deno task check:agent-docs-prose`, exit 0, 638 files
+built, freshness `true` — and recorded the measurement. That is precisely the reasoned-vs-measured
+distinction F2 was about, applied without being told.
+
+### PLAN-EVAL cycle 2 — the final permitted plan cycle
+
+| Field | Value |
+| --- | --- |
+| Plan commit evaluated | `9a0f5876` (revision of `1bf9c567`) |
+| Requested / observed route | canonical `formal_plan_evaluation` — `claude-fable-5` · medium · `--remote-control` — **matched** |
+| Background id / session | `441f4997` / `441f4997-9fac-4188-b83f-2ef9cb515f25` |
+| PID | `749616` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-planeval2-1462` (dedicated; sole session) |
+| Verdict branch | `eval/plan-eval-1462-cycle-2`, upstream NONE |
+| Remote Control URL | `https://claude.ai/code/session_01PWQgLbsYfa28uzLpwoAG2d` |
+| Independence | fresh; separate from the author, this supervisor, and the cycle-1 evaluator |
+
+The brief tells it the supervisor has already confirmed each fix is **present**, so the cycle is spent
+on **sufficiency** instead: does the re-locked S2 red actually fail today for the stated reason, is the
+gate ordering right, is D4's closure mechanism now decidable, and does the committed graph assertion
+genuinely *prove* absence of a server edge rather than sample for one. It is also told to verify the
+`check:agent-docs-prose` measurement is reproducible — the whole F2 finding turned on the difference
+between a reasoned gate and a measured one. And it is told this is the final permitted cycle, so a
+finding must be genuinely blocking to be recorded as blocking.
