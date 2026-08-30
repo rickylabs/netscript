@@ -288,4 +288,8 @@ scoped recheck only). S8 Phase-B obligations (exact `db init --name init`, resou
 for #863 gate 1; hand S6/root-README/canary receipts forward) recorded in D-49. | | D-44/D-45
 completion | #1712 Definition-of-done release condition now names the ratified D-45 baseline; #863
 carries a D-44 split comment (stays open for S6 probe + root-README clean-machine canary evidence).
-All coordinator-ordered rewrites applied; S9 correction commit in flight on thread `01a0523a…`. |
+All coordinator-ordered rewrites applied; S9 correction commit in flight on thread `01a0523a…`. | |
+S9 pre-Phase-B correction landed | `0d81cf64`
+`fix(e2e): ratify the 14-tool 13.5.3 MCP baseline; get_integration_docs documented-unobserved (D-45)`
+pushed; PR #1759 comment 5468788905; thread turn complete. Scoped supervisor recheck (fork gates +
+diff read) in progress — no new ordinary evaluation per the ruling. |
