@@ -1188,3 +1188,11 @@
 - Structural lesson for the plan: S11 was approved ahead of S1; its "prose must match shipped
   behaviour" dependency is real — the honest framing keeps the PR truthful at any head, and the S13
   D-17 prose lands with S13, not S11.
+- **D-62 addendum — M5 root cause (supervisor):** `diagrams:check` fails on this host for two
+  environment reasons, neither content-related: (1) the npm cache lives on `/ephemeral`, a
+  `tmpfs … noexec` mount, so `npx`-materialised `mmdc` reports `Permission denied`; (2) with an
+  exec-capable cache (`npm_config_cache=/home/agent/.npm-cache-exec`) `mmdc` runs but puppeteer
+  cannot launch a browser in `ai-agents` (no Chromium) → "16 diagram(s) failed to render". The
+  diagram source/SVG parity verdict for S11 must come from CI (`docs` workflow) or a host with
+  Chromium; recorded as environment, not a slice defect. Infra note: `/ephemeral` `noexec` also
+  broke the supervisor's scratchpad scripts earlier — a second symptom of the same mount policy.

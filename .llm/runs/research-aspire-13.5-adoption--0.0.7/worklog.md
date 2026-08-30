@@ -374,4 +374,6 @@ pushed). Audit cycle 2 resumed on the same Sol thread `01a052fc…` at `b8d66f6f
 docs_audit cycle 2 | **`AUDIT: FAIL_FIX`** — 7/12 closed; open H2/H3/H5/H6/M3/M5 (D-62). Two-failure
 escalation reached: fix cycle 2 dispatched on the same Gemini conversation (H2/H3/H6/M3 + H5 honest
 framing); **coordinator authorization requested for audit cycle 3**; M5 (`mmdc`) handled by the
-supervisor. |
+supervisor. | | M5 environment verdict | `diagrams:check` unrunnable here: `/ephemeral` npm cache is
+`noexec` (mmdc Permission denied) and, with an exec-capable cache, puppeteer has no Chromium (16
+diagrams fail). Parity verdict must come from CI. Not a content finding. |
