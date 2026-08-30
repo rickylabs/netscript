@@ -15,8 +15,10 @@
 The supervisor-dispatched formal IMPL-EVAL at `d5ba40eb` returned `FAIL_FIX`. B1 found that the
 documentation's universal claim omitted the generator's enclosing `Enabled !== false` guard; B2
 found that the PR body treated an implementation-lane internal review as the formal verdict. The
-bounded repair narrows the claim everywhere, retains the exact message templates, regenerates the
-complete derived chain, and awaits a fresh supervisor-dispatched evaluation at the repaired head.
+bounded repair narrows the claim everywhere, retains the exact message templates, and regenerates
+the complete derived chain. All 13 author gates pass at repaired asset head `14d5aefd`; a
+run-artifact-only evidence commit and one explicit-refspec push precede the fresh
+supervisor-dispatched evaluation.
 
 ## Completed
 
@@ -32,14 +34,13 @@ complete derived chain, and awaits a fresh supervisor-dispatched evaluation at t
 
 ## In Progress
 
-- S3 conditionality/run-history repair, followed by S4 derived regeneration and S5 gate-evidence
-  handoff.
+- S5 run-artifact-only gate-evidence handoff, PR-body correction, and one explicit-refspec push.
 
 ## Next Steps
 
-1. Land the repair and derived-only commits, run the full gate list, and record real exit codes.
+1. Commit this final gate evidence without changing prose or generated assets.
 2. Push once by explicit refspec and update PR #1772 without changing labels or readiness state.
-3. Hand the repaired head to Tier-A and a fresh supervisor-dispatched formal IMPL-EVAL.
+3. Hand the new exact head to Tier-A and a fresh supervisor-dispatched formal IMPL-EVAL.
 
 ## Key Decisions
 
@@ -55,7 +56,8 @@ complete derived chain, and awaits a fresh supervisor-dispatched evaluation at t
 - `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md` — public claim narrowed; exact
   message templates unchanged.
 - Run artifacts — formal failure history, conditionality drift, repair slices, and resumable state.
-- Four generator-owned publication assets — pending regeneration from the S3 source commit.
+- Four generator-owned publication assets — regenerated in derived-only S4 `14d5aefd` from S3
+  `e4f47289b`.
 
 ## Gates
 
@@ -63,7 +65,8 @@ complete derived chain, and awaits a fresh supervisor-dispatched evaluation at t
 - Original S1 source gates: nine commands exit 0.
 - Formal IMPL-EVAL at `d5ba40eb`: `FAIL_FIX` on B1/B2 despite all 13 technical gates reproducing
   green.
-- Repaired-head gates: pending S3/S4.
+- Repaired asset-head gates: all 13 requested commands exit 0 at `14d5aefd`; a final exact-head
+  rerun follows the S5 evidence commit.
 
 ## Open Questions
 
@@ -76,4 +79,6 @@ complete derived chain, and awaits a fresh supervisor-dispatched evaluation at t
 
 ## Commits
 
-- See PR #1772's commit list and per-slice comments.
+- S3 `e4f47289b7c1dd7d199f32130098c917e0b24bc3` — conditionality and run-history repair.
+- S4 `14d5aefd9ad40f584e63eab905278be460be7b01` — four derived assets only.
+- S5 — pending gate-evidence commit; see PR #1772 after push.

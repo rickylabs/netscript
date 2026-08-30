@@ -32,8 +32,8 @@ supervisor dispatch, though its load-bearing reasoning was independently re-deri
 
 ### Cycle 2 — repaired head
 
-Target: the pushed repaired head after the conditionality prose/run-artifact commit, complete
-derived regeneration, and final gate-evidence reconciliation.
+Target: the pushed repaired head after S3 `e4f47289b` (conditionality/run history), S4
+`14d5aefd` (four regenerated assets only), and the final run-artifact gate-evidence reconciliation.
 
 Verdict: `PENDING`. Tier-A review and a fresh supervisor-dispatched formal IMPL-EVAL occur only
 after the implementation thread reports the new pushed SHA. This artifact does not predict or
@@ -43,7 +43,7 @@ self-certify that verdict.
 
 | Finding | Repair | Status |
 | ------- | ------ | ------ |
-| B1 | Qualify every repeated claim to processors that are not explicitly disabled; retain both exact message templates. | Implemented in S3; regenerated assets and fresh verdict pending. |
+| B1 | Qualify every repeated claim to processors that are not explicitly disabled; retain both exact message templates. | Implemented in S3; complete derived chain regenerated in S4; fresh verdict pending. |
 | B2 | Remove the formal-PASS claim from the PR body, record cycle-1 `FAIL_FIX`, and leave cycle-2 supervisor verdict pending. | Run history reconciled; PR update follows the pushed repaired head. |
 
 ## Verdict

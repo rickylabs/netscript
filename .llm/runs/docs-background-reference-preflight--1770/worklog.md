@@ -64,6 +64,8 @@ technical wording should be re-verified against its owning generator before edit
 | 2026-08-30 | S1 | Implement | Added one startup-footgun entry covering both exact message templates, pre-registration timing, and both fatal configuration causes. |
 | 2026-08-30 | Formal IMPL-EVAL | Evaluate | Supervisor-dispatched evaluation at `d5ba40eb` returned `FAIL_FIX`: B1 found the unqualified universal claim despite the enclosing `Enabled !== false` guard; B2 found the PR body presented an implementation-lane internal review as the formal verdict. |
 | 2026-08-30 | S3 | Repair | Verified the guard directly, narrowed every repeated claim, retained the exact message templates, reconciled the run history, and prepared a fresh derived-only regeneration. |
+| 2026-08-30 | S4 | Regenerate | Regenerated all four publication assets from S3 `e4f47289b`; derived-only commit `14d5aefd` records `sourceCommit: e4f47289b`. |
+| 2026-08-30 | S5 | Gate evidence | Re-ran the complete 13-command gate list at `14d5aefd`; every command exited 0. Reproduced the clean-main README baseline red and prepared the supervisor handoff. |
 
 ## Decisions
 
@@ -117,6 +119,36 @@ commit.
 
 `git diff --word-diff=porcelain d5ba40eb -- deploy-local-aspire.md` confirms the repair changes
 only the conditionality clause; both quoted message templates remain unchanged.
+
+### S4 repaired asset-head gates
+
+| Command | Exit | Result |
+| ------- | ---- | ------ |
+| `deno task --cwd docs/site check:source-format` | 0 | PASS |
+| `deno task --cwd docs/site build` | 0 | PASS |
+| `deno task --cwd docs/site check:links` | 0 | PASS |
+| `deno task --cwd docs/site check:caveats` | 0 | PASS |
+| `deno task docs:links` | 0 | PASS |
+| `deno task docs:accuracy` | 0 | PASS |
+| `deno task docs:snippets` | 0 | PASS |
+| `deno task docs:exports-drift` | 0 | PASS |
+| `deno task check:agent-docs-prose` | 0 | PASS |
+| `deno task check:assets-barrel` | 0 | PASS |
+| `deno task check:publish-assets` | 0 | PASS |
+| `deno task check:mcp-export-corpus` | 0 | PASS |
+| `deno check --unstable-kv packages/cli/src/kernel/assets/agent-docs.generated.ts packages/mcp/src/publish-assets.generated.ts` | 0 | PASS |
+
+Additional evidence:
+
+- Clean detached `origin/main` at `3e5cbabf`: `deno task docs:readme:check` exited 1 solely because
+  `packages/bench/README.md` is missing `## Install`; this reproduces the pre-existing baseline.
+- `git status --porcelain` after generation and all gates: empty.
+- `deno.lock` remains identical to `origin/main`, blob
+  `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2`.
+- `git diff --name-only origin/main...HEAD -- '*.mmd' '*.svg'`: empty, so `diagrams:check` is N/A;
+  Chromium is also unavailable in this environment.
+- S4 `14d5aefd9ad40f584e63eab905278be460be7b01` contains exactly the four generated assets, and
+  `provenance.json.sourceCommit` is the immediately preceding S3 commit `e4f47289b`.
 
 ## Handoff Notes
 
