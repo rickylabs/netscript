@@ -3744,3 +3744,61 @@ exact-green — `scaffold.runtime` exited 1 with the sole failure attributed to 
 not qualify for the coordinator's exact-green path, and its DoD box stays unticked. The comment also
 notes `origin/main` has moved to `f8b4f804`, so resolution option 1 now implies a fresh integration
 rather than a bare re-run at the old base.
+
+## 2026-08-30 — #1758 merged onto `f8b4f804` at `d1f8afe9`; held for #1748; a fourth cascade gate found missing
+
+### The integration is a real merge and the evidence chain survived
+
+`d1f8afe9`, pushed, clean. **Verified it merged rather than rebased**, because a rebase would have
+orphaned every receipt SHA: `HEAD` has two parents (`72ab6411` and `f8b4f804`), and all eight
+evidence-chain commits — `9a0f5876`, `ddf66a6f`, `1dd64dae`, `1ccddd6e`, `bfad0c15`, `83b7109c`,
+`72cd2ecd`, `72ab6411` — remain ancestors. Worth checking explicitly: `git log --oneline` displays the
+merged head directly above main, which *looks* exactly like a rebase.
+
+At the merged head, measured against **new** main: ceiling containment clean, `deno.lock`
+byte-unchanged, and `check:agent-docs-prose`, `check:publish-assets`, `check:mcp-export-corpus`,
+`docs:exports-drift` all exit 0.
+
+### `check:assets-barrel` — the fourth cascade gate, never in this leaf's table, and genuinely red
+
+Attributed rather than assumed: it **PASSES at main `f8b4f804`** and **FAILS at the merged head**, so
+it is leaf-caused. The cause is exact:
+
+```
+packages/cli/src/kernel/assets/agent-docs.generated.ts
+  EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: + './presets'
+  sha256: changed
+```
+
+The leaf's new **published `./presets` subpath** must propagate into the CLI's embedded agent-docs
+export list. Grepping the plan for `assets-barrel` returns **zero hits** — the gate was never in the
+table, so it was never run, and it was red before the merge too. Nobody looked.
+
+This is the #1112 cascade **still incomplete after PLAN-EVAL F2**. F2 correctly found the missing
+`check:agent-docs-prose` half and the two `.llm/assets/agent-docs/*` outputs; `check:assets-barrel` is
+the fourth gate of that family and slipped through plan, plan-eval cycle 1, plan-eval cycle 2,
+Tier-A, and IMPL-EVAL alike. The lesson stands sharper than before: **derive the cascade from the
+tooling, not from a remembered list** — a list is exactly what failed here, twice.
+
+### Ordering hold applied
+
+Per the coordinator: **#1748 is the active corpus landing and merges before #1758.** Regenerating
+against `f8b4f804` now would go stale the instant #1748 lands, producing another failed freshness
+cycle. So the author was told to stop at the merge — which stays — and to regenerate exactly **once**,
+onto #1748's merge SHA when it is reported.
+
+Prepared now, without regenerating: the `check:assets-barrel` gate row, and a **bounded ceiling
+addition** for `packages/cli/src/kernel/assets/agent-docs.generated.ts` as a *mechanical generated
+output* — produced solely by its gen task, confined to regenerated content, recorded in `drift.md`.
+That is bookkeeping forced by a gate the plan already implies, which is why it is a supervisor call;
+unlike #1673's F1 expansion into `plugins/ai` product code, which was architectural and correctly went
+to the coordinator.
+
+The author was told explicitly **not** to touch the acceptance-evidence block: the mirror skipped on a
+label race, the mapping is verbatim-correct, and editing sound evidence to chase a red is how a leaf
+ends up worse than it started.
+
+### Labels
+
+PR #1758 `status:ci-fail`, issue #1462 `status:impl` — exactly one `status:` each, verified by count
+after the phase-eval automation re-added `impl-eval` once already.
