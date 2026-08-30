@@ -4909,3 +4909,33 @@ scope; F3 measure-then-decide on the `sagaFail` traceparent path; F4 README + PR
 F5 artifact refresh; F6 drift entry for the two baseline-red gates. Corpus regeneration is authorized
 but deliberately sequenced **after** this repair, since F2 moves signatures and would move the corpus
 again. Send held until the thread showed two consecutive zero-growth samples.
+
+### #1368 row-7 surface repair (coordinator finding, body/text only, no head movement)
+
+Both flagged surfaces were false and are now corrected at live head `be3d1546`.
+
+**Issue #1368 target item 1** claimed all five cascade spans start "at the real dispatch site (the
+`SagaBusBridge` cascade path)". Derived actual ownership from code rather than from the design prose:
+`send`/`schedule`/`spawn` on `SagaBusBridge` (l.251/281/299), `saga.cascade.compensate` on
+`SagaCompensator` (l.74/211), `saga.cascade.complete` on `SagaEngine` (l.303) immediately after
+`resolvePersistedStatus(...)`. So the wording was wrong for **two** of five, not one — the coordinator
+named `complete`; `compensate` had also been SagaCompensator-owned since the locked design. Item 1
+amended in place to the accepted boundary, naming all three owners and the persisted-status reason.
+
+**PR #1764 body** was still S1-era: it asserted "no product or test code has changed" against 17
+changed product paths, left S2–S6 unticked though all had landed, and reported phase `plan-eval`.
+Rewritten truthfully: slice SHAs, the independently reproduced evidence, and an explicit
+"why this is not ready to merge" block carrying F2 as blocking plus F3–F6, the pending corpus
+regeneration, the Flow-B `NOT_RUN` with its D-42/D-43 host blocker, and a statement that skipped
+checks on a draft are not green results. DoD now ticks only the four boxes that are literally true and
+adds an unticked F2 box. `gh pr edit` was refused for lacking `read:org`; used the REST PATCH instead.
+
+Status label moved `status:impl-eval` → `status:impl` on both, exactly one `status:`, milestone 0.0.7.
+No mirror, no ready-merge, no head movement.
+
+Head reconciliation: the author has since pushed `be3d1546` ("lock saga carry-forward semantics"),
+artifact-only — F2's two lines are untouched, so the regression is live at the pushed head. That
+commit's own D6/D8 rows describe publisher-supplied-value-survives and "no fallback or local
+precedence", which argue **for** the F2 fix; the mismatch is in the code's direction, not the
+doctrine's. Folded that into the staged repair brief, along with the corrected head reference and a
+clause reserving the PR body and issue text to me so the author's edits cannot collide with this repair.
