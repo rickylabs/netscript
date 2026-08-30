@@ -3689,3 +3689,58 @@ genuine mapping error.
 reads labels live. The order is therefore: merged head green → re-apply `status:ready-merge` → re-run
 CI → close-gate observes ticked boxes. Applying the label earlier would contradict the `ci-fail` state
 the owner asked to hold.
+
+## 2026-08-30 — #1462 main integration in flight; a rescope pre-analyzed before it can stall the leaf
+
+The author is merging `origin/main@f8b4f804` (122 dirty paths — main's `#1746`/`#1735` content),
+rollout growing steadily.
+
+### What actually made the freshness gate red
+
+Main's delta `13878a80..f8b4f804` is 119 files and touches **the same generated assets this leaf
+regenerates**:
+
+| Path | In #1462's ceiling? |
+| --- | --- |
+| `.llm/assets/agent-docs/prose.json.gz` | yes |
+| `.llm/assets/agent-docs/provenance.json` | yes |
+| `packages/mcp/src/publish-assets.generated.ts` | yes |
+| **`packages/cli/src/kernel/assets/agent-docs.generated.ts`** | **no** |
+
+So the two lanes regenerated the same prose bundle from different doc trees. That is a real
+integration, exactly as the owner classified it — not rerun noise.
+
+### The rescope this will probably force, analyzed before it arrives
+
+Traced which tool writes what rather than waiting to be told:
+
+- `gen:agent-docs-prose` (`build-agent-docs-bundle.ts`) writes **only** `prose.json.gz` and
+  `provenance.json` — both inside the ceiling.
+- `generate-publish-assets.ts:37` also writes **`packages/cli/src/kernel/assets/agent-docs.generated.ts`**,
+  which is **not** in the ceiling.
+
+Before the merge this never mattered: the leaf's own gate table recorded that only
+`packages/mcp/src/publish-assets.generated.ts` changed and that *"the CLI asset was unchanged, which
+is recorded rather than inferred otherwise"* — a precise observation that now pays off, because it
+establishes the file was genuinely untouched by this leaf's content. After merging main, which itself
+updated that file, the leaf's four site-page edits will very likely make it stale again.
+
+Supervisor ruling, prepared now so the leaf does not stall on it: if — and only if —
+`gen:publish-assets` requires writing `packages/cli/src/kernel/assets/agent-docs.generated.ts`, that
+path is authorized as a **mechanical generated output**, on three conditions: it is produced solely by
+`gen:publish-assets` and never hand-edited, the change is confined to regenerated content, and it is
+recorded in `drift.md` as a ceiling addition with this reason. A **generated** file forced by a gate
+the plan already requires is bookkeeping, not design — which is why this is a supervisor call, unlike
+#1673's F1 expansion into `plugins/ai` product code, which was genuinely architectural and correctly
+went to the coordinator.
+
+Anything beyond that single generated path remains rescope-and-stop.
+
+### #1739 authority framing corrected
+
+The earlier handoff there was titled "Human merge handoff". Merges are **coordinator-owned**, so a
+correction comment was posted: the evidence is unchanged, only the decision owner. #1739 is still not
+exact-green — `scaffold.runtime` exited 1 with the sole failure attributed to open #1734 — so it does
+not qualify for the coordinator's exact-green path, and its DoD box stays unticked. The comment also
+notes `origin/main` has moved to `f8b4f804`, so resolution option 1 now implies a fresh integration
+rather than a bare re-run at the old base.
