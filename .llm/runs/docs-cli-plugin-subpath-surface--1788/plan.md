@@ -119,4 +119,3 @@ verification, provenance equality, and `deno.lock` comparison.
 
 - Any mismatch between export maps, `deno doc --json`, and the brief is a stop condition.
 - Any generated output beyond the expected four files requires investigation before commit.
-

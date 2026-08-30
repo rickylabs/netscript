@@ -25,4 +25,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 - The owner directed this implementation lane not to dispatch its own evaluator. PLAN-EVAL is N/A
   for the reason recorded in `worklog.md`; the supervisor owns the later Tier-A review and
   separate-session IMPL-EVAL.
-
