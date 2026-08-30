@@ -1919,3 +1919,18 @@
   killed (1 hop-A removed), scratch removed via container, volume prune; **final zero confirmed
   21:29:26Z.** Current main advanced again to `73bf2efa9` (#1739 shipped) — S6's convergence
   intersection must be re-verified against this new tip before the merge packet.
+- **D-99 — bounded fixture correction implemented and pushed: `docker pause`/`unpause` on the
+  resource's own container replaces `aspire resource stop`/`start`.** Root cause per coordinator and
+  confirmed by my D-98 evidence: `aspire resource stop` suspends Aspire's own health-check
+  evaluation for that resource and freezes `healthReports` at its last value, so the fixture's
+  expected `Unhealthy` transition never fires — the resource must stay started (health check
+  actively evaluated) while the container's own process is suspended. Implemented in
+  `listener-unreachable-fixture.ts`: read `properties["container.id"]` from `aspire describe`
+  topology, `docker pause <id>` (keep resource started, matches existing
+  `docker-resource-cleaner.ts` invocation style), poll for `Unhealthy` + the existing regex, the
+  same `aspire wait --status healthy --timeout 10` exit-18 assertion, `docker unpause <id>` in the
+  `finally` (recovery), same receipt shape/fields — no change to `verify-listener-readiness.ts`,
+  `listener-readiness-gates.ts`, or any other file. Scoped lint/fmt clean; rebased onto the newest
+  main tip `73bf2efa9f5f` (0 intersection, exact prior scope preserved); pinned push accepted → head
+  **`c9f1fe40c781…`**. Not yet runtime-verified — one bounded lease authorized next to re-run the
+  isolated single gate before touching the full suite or the merge packet.
