@@ -29,5 +29,11 @@
 - `docs/site/tutorials/*` and `deploy.md`: normalised Aspire terminology and links to `aspire.dev`.
 - `docs/site/*.vto` and `README.md`: normalised Aspire terminology and links.
 
+### S5: Terminology sweep (#1000) & diagram review (2026-08-30)
+- Completed exhaustive scan of all 113 owned `doc:*` files: verified zero occurrences of `.NET Aspire` remain across `docs/site/` (outside internal `_plan/` archive), root `README.md`, and package READMEs.
+- `docs/site/_diagrams/aspire-resource-graph.mmd`: updated comments to "Aspire", verified graph node definitions and committed SVG asset.
+- `packages/aspire/README.md`: normalised introductory overview to "Aspire".
+
+
 
 
