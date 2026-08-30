@@ -43,7 +43,7 @@ Deno.test('generatePluginService opts KV-backed plugin services into Redis adapt
   const output = generatePluginService(kvBackedProvider, {
     pluginName: 'background',
     kind: 'background',
-    servicePort: 8091,
+    servicePort: 9181,
   });
 
   assertStringIncludes(output, "import '@netscript/kv/redis';");
@@ -54,7 +54,7 @@ Deno.test('generatePluginService does not add Redis adapter import for API-only 
   const output = generatePluginService(apiKindProvider, {
     pluginName: 'api-sample',
     kind: 'api',
-    servicePort: 8094,
+    servicePort: 9184,
   });
 
   assert(output.length > 0);
@@ -65,7 +65,7 @@ Deno.test('generatePluginProcessorEntrypoint carries the selected KV adapter', (
   const output = generatePluginProcessorEntrypoint(kvBackedProvider, {
     pluginName: 'background',
     kind: 'background',
-    servicePort: 8091,
+    servicePort: 9181,
   });
 
   assertStringIncludes(output, "import '@netscript/kv/redis';");

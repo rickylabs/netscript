@@ -19,17 +19,32 @@ export type FetchSagasRuntimeApiClientOptions = Readonly<{
 
 /** Fetch-backed adapter for the sagas OpenAPI projection. */
 export class FetchSagasRuntimeApiClient implements SagasRuntimeApiClient {
-  readonly #baseUrl: string;
+  readonly #baseUrl?: string;
   readonly #fetcher: typeof fetch;
 
-  /** Create a client targeting the conventional local sagas API by default. */
+  /** Create a client targeting an explicit or Aspire-discovered sagas API. */
   constructor(options: FetchSagasRuntimeApiClientOptions = {}) {
-    this.#baseUrl = (options.baseUrl ?? 'http://127.0.0.1:8092/api/v1/sagas').replace(/\/$/, '');
+    const discoveredUrl = options.baseUrl ??
+      Deno.env.get('services__sagas-api__https__0') ??
+      Deno.env.get('services__sagas-api__http__0') ??
+      Deno.env.get('SAGAS_API_URL') ??
+      Deno.env.get('NETSCRIPT_SAGAS_URL');
+    this.#baseUrl = discoveredUrl === undefined
+      ? undefined
+      : `${discoveredUrl.replace(/\/$/, '')}/api/v1/sagas`.replace(
+        '/api/v1/sagas/api/v1/sagas',
+        '/api/v1/sagas',
+      );
     this.#fetcher = options.fetcher ?? fetch;
   }
 
   /** Request a sagas route and decode a successful JSON response. */
   async request(path: string, request: SagasRuntimeRequest = {}): Promise<unknown> {
+    if (this.#baseUrl === undefined) {
+      throw new Error(
+        'Sagas API endpoint was not discovered. Configure an Aspire service reference or SAGAS_API_URL.',
+      );
+    }
     const url = new URL(`${this.#baseUrl}/${path.replace(/^\//, '')}`);
     for (const [name, value] of Object.entries(request.query ?? {})) {
       if (value !== undefined) url.searchParams.set(name, String(value));

@@ -1,7 +1,6 @@
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate } from './gate-factory.ts';
-import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 
 const LEGACY_DASHBOARD_TRACES_URL = 'https://localhost:18888/api/telemetry/traces';
 
@@ -12,20 +11,14 @@ export function createOtelGates(): readonly GateDefinition[] {
       'Fire webhook for OTEL trace capture',
       GATE_PHASE.BEHAVIOR,
       (context) => [
-        'curl',
-        '-sf',
-        '-X',
-        'POST',
-        `http://127.0.0.1:${
-          pluginPort(context.request.options.projectName, 'triggers-api')
-        }/api/v1/webhooks/inbound/generic`,
-        '-H',
-        'Content-Type: application/json',
-        '-d',
-        JSON.stringify({
-          message: 'e2e-otel-gate',
-          timestamp: new Date().toISOString(),
-        }),
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        '--allow-net=localhost,127.0.0.1',
+        new URL('./probe-plugin-resource.ts', import.meta.url).pathname,
+        context.project.appHost,
+        'triggers-api',
+        'trigger-webhook',
       ],
     ),
     commandGate(
@@ -41,7 +34,6 @@ export function createOtelGates(): readonly GateDefinition[] {
         context.project.projectRoot,
         context.project.appHost,
         context.project.repoRoot,
-        `http://127.0.0.1:${pluginPort(context.request.options.projectName, 'streams')}`,
       ],
       undefined,
       'capture',
@@ -61,7 +53,7 @@ export function createOtelGates(): readonly GateDefinition[] {
         '--unsafely-ignore-certificate-errors=localhost',
         'packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts',
         context.project.projectRoot,
-        String(pluginPort(context.request.options.projectName, 'streams')),
+        context.project.appHost,
       ],
     ),
     commandGate(
@@ -90,18 +82,13 @@ export function createOtelGates(): readonly GateDefinition[] {
         'run',
         '--allow-run',
         '--allow-read',
-        `--allow-net=127.0.0.1:${pluginPort(context.request.options.projectName, 'triggers-api')}`,
+        '--allow-net=localhost,127.0.0.1',
         new URL('./validate-aspire-task-traces.ts', import.meta.url).pathname,
         context.project.projectRoot,
         'workers',
-        String(pluginPort(context.request.options.projectName, 'triggers-api')),
       ],
     ),
   ];
-}
-
-function pluginPort(projectName: string, resourceName: string): number {
-  return allocateScaffoldDefaultPort(projectName, `plugin:${resourceName}`);
 }
 
 // Retained temporarily as a compatibility export for downstream gate builders

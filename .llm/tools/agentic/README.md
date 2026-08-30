@@ -187,8 +187,8 @@ same phase/head.
 
 **When:** an authorized manual rerun or non-phase cloud task genuinely needs a direct trigger. The
 tool validates the dispatch-prompt contract (it must begin with `use harness` and carry a `## SKILL`
-chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status transitions
-instead. Dispatch exactly one trigger per intended run.
+chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status
+transitions instead. Dispatch exactly one trigger per intended run.
 
 ```bash
 # Dry-run (no token, no network) — see the exact comment that would post:
@@ -467,18 +467,26 @@ failure.
 
 ## The Claude surface — `claude/`
 
-`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks; it appends Claude Code
-events to `.llm/tmp/claude/hooks/<run-id>/events.jsonl` and is careful never to disturb `deno.lock`.
-`sync-claude-skills.ts` **generates** `.claude/skills/` from `.agents/skills/` — the mirrors are
-generated, never hand-edited. `validate-claude-surface.ts` (the `agentic:check-claude` gate) checks
-the whole surface in one pass:
+`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks. Both `PreToolUse` and
+`Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a nested turn cwd cannot change
+which checked-in logger runs. Claude defines that variable as the session launch root; it does not
+follow `EnterWorktree`, and this hook deliberately writes the event log back to that launch root at
+`.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude script/task invocation falls back
+to `Deno.cwd()` only when the variable is absent.
+
+The configured process reads exactly `CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, and
+`CLAUDE_SESSION_ID`, writes only below the launch-root hook-log subtree, and needs no runtime read
+permission. `--no-lock` keeps the hook from disturbing `deno.lock`; `--no-prompt` prevents a future
+TTY-attached invocation from prompting. `sync-claude-skills.ts` **generates** `.claude/skills/` from
+`.agents/skills/` — the mirrors are generated, never hand-edited. `validate-claude-surface.ts` (the
+`agentic:check-claude` gate) checks the whole surface in one pass:
 
 ```console
 $ deno task agentic:check-claude --pretty
 OK CLAUDE.md: contains @AGENTS.md
 OK .claude/settings.json: valid JSON
 OK .gitignore: ignores .claude/settings.local.json
-OK .claude/skills: agentic:sync-claude OK: 17 skill(s), 21 mirrored file(s)
+OK .claude/skills: agentic:sync-claude OK: 18 skill(s), 22 mirrored file(s)
 OK claude hook lock check: deno.lock unchanged after 3 hook runs
 ```
 

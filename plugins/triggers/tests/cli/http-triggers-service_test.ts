@@ -81,6 +81,7 @@ Deno.test('HTTP triggers service calls authoritative enable and disable routes',
 
 Deno.test('HTTP triggers service reports unreachable and non-success responses', async () => {
   const unreachable = new HttpTriggersService({
+    baseUrl: 'http://triggers.test/api/v1',
     fetch: () => Promise.reject(new Error('connection refused')),
   });
   await assertRejects(
@@ -90,6 +91,7 @@ Deno.test('HTTP triggers service reports unreachable and non-success responses',
   );
 
   const rejected = new HttpTriggersService({
+    baseUrl: 'http://triggers.test/api/v1',
     fetch: () =>
       Promise.resolve(Response.json({ message: 'Trigger is disabled.' }, { status: 409 })),
   });

@@ -9,7 +9,10 @@ export const TRIGGERS_PLUGIN_VERSION: string = PLUGIN_PACKAGE_VERSION;
 /** Default HTTP service name for trigger ingress and management APIs. */
 export const TRIGGERS_API_SERVICE_NAME = 'triggers-api' as const;
 
-/** Default HTTP port for trigger ingress and management APIs. */
+/**
+ * @deprecated Not a runtime fallback; removed in 0.0.8 — see
+ * "chore(plugins): remove deprecated default-port compatibility exports in 0.0.8".
+ */
 export const TRIGGERS_API_DEFAULT_PORT = 8093 as const;
 
 /** Literal type for the triggers plugin id. */

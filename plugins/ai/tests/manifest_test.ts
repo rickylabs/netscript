@@ -27,7 +27,7 @@ Deno.test('ai manifest is a thin utility with no bundled service', () => {
   assertEquals(aiPlugin.contributions.backgroundProcessors ?? [], []);
 });
 
-Deno.test('ai package and scaffold manifest declare no service surface', async () => {
+Deno.test('ai package and scaffold manifest declare no runtime service or port', async () => {
   const packageConfig: unknown = JSON.parse(
     await Deno.readTextFile(new URL('../deno.json', import.meta.url)),
   );
@@ -50,5 +50,16 @@ Deno.test('ai package and scaffold manifest declare no service surface', async (
   assertEquals(parsed.manifest.officialSource?.serviceEntrypoint, undefined);
   assertEquals(parsed.manifest.officialSource?.serviceConfigKey, undefined);
   assertEquals(parsed.manifest.officialSource?.servicePort, undefined);
-  assertEquals(parsed.manifest.officialSource?.backgroundPort, 8095);
+
+  const officialSource = manifestJson && typeof manifestJson === 'object'
+    ? Reflect.get(manifestJson, 'officialSource')
+    : undefined;
+  assertExists(officialSource);
+  assertEquals(
+    typeof officialSource === 'object' &&
+      officialSource !== null &&
+      Reflect.get(officialSource, 'backgroundPort'),
+    undefined,
+  );
+  assertEquals(JSON.stringify(manifestJson).includes('8095'), false);
 });

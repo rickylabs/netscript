@@ -5,7 +5,7 @@ import { FetchHealthProbe, resolveProbeUrl } from './fetch-health-probe.ts';
 
 const baseSpec: HealthProbeSpec = {
   path: '/health',
-  port: 8080,
+  port: 9180,
   timeoutMs: 2_000,
   intervalMs: 1_000,
   retries: 5,
@@ -13,7 +13,7 @@ const baseSpec: HealthProbeSpec = {
 };
 
 Deno.test('resolveProbeUrl derives http://host:port/path when no url is given', () => {
-  assertEquals(resolveProbeUrl(baseSpec, '127.0.0.1'), 'http://127.0.0.1:8080/health');
+  assertEquals(resolveProbeUrl(baseSpec, '127.0.0.1'), 'http://127.0.0.1:9180/health');
 });
 
 Deno.test('resolveProbeUrl prefers an explicit url over derived host/port/path', () => {
@@ -36,7 +36,7 @@ Deno.test('probe is healthy when the observed status equals expectStatus', async
   const outcome = await probe.probe(baseSpec);
 
   assertEquals(outcome, { healthy: true, status: 200 });
-  assertEquals(seen, ['http://127.0.0.1:8080/health']);
+  assertEquals(seen, ['http://127.0.0.1:9180/health']);
 });
 
 Deno.test('probe is unhealthy when the status differs from expectStatus', async () => {

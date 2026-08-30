@@ -45,7 +45,11 @@ type PluginServiceBootstrap = {
 export default async function createWorkersService(
   ctx: PluginServiceContext,
 ): Promise<RunningService> {
-  const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8091');
+  const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
+  if (portValue === undefined) {
+    throw new Error('Workers API requires the host-provided PORT environment variable.');
+  }
+  const port = Number.parseInt(portValue, 10);
   const runtime = await createWorkersServiceRuntime();
   await registerPluginJobs(runtime);
   const generated = await registerGeneratedJobDefinitions(runtime);

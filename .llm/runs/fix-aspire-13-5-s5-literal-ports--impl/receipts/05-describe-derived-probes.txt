@@ -1,0 +1,25 @@
+# Slice 5 — Aspire describe-derived plugin and E2E probes
+
+Date: 2026-08-30
+
+- `deno check --unstable-kv` over the changed CLI/E2E probe modules and plugin runtime entrypoints:
+  PASS / exit 0.
+- Targeted CLI E2E, auth CLI, streams service, and triggers service tests: PASS / exit 0;
+  57 tests passed plus 9 nested trigger smoke steps, 0 failed.
+- `git grep -nE '809[1-4]|4437|127\.0\.0\.1:80' -- packages/cli/e2e`: PASS / no output.
+- Raw config-excluded checks for the new checked probe module:
+  `deno fmt --no-config --single-quote --line-width 100` and
+  `deno lint --no-config`: PASS / exit 0.
+- `deno task quality:scan`: PASS / exit 0; no findings, seven baseline allowances.
+- `deno task arch:check`: PASS / exit 0; baseline doctrine and catalog warnings only.
+- Aspire AppHost was not started; the lane has no runtime lease. The full runtime verdict remains
+  CI `scaffold.runtime` after the PR is ready.
+
+Implementation evidence:
+
+- Runtime and OTEL gates invoke a checked probe that resolves each resource from
+  `aspire describe --format Json` and consumes only the resource's `urls[].url` values.
+- Durable workers/sagas CLI parity resolves both resource URLs before setting their supported
+  endpoint environment variables.
+- Plugin service entrypoints, CLI adapters, stream factories, and E2E helpers no longer infer a
+  fixed local port when service discovery is absent.

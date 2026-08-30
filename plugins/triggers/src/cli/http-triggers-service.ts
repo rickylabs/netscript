@@ -1,5 +1,4 @@
 import type { TriggerEvent, TriggerEventStatus } from '@netscript/plugin-triggers-core/domain';
-import { TRIGGERS_API_DEFAULT_PORT } from '../constants.ts';
 
 /** Persisted event filters accepted by the triggers service. */
 export type TriggerEventQuery = Readonly<{
@@ -52,25 +51,31 @@ export type HttpTriggersServiceOptions = Readonly<{
 
 /** HTTP adapter for the running triggers service contract. */
 export class HttpTriggersService implements TriggersServiceClient {
-  readonly #baseUrl: string;
+  readonly #baseUrl?: string;
   readonly #fetch: TriggersFetch;
 
-  /** Create a service adapter targeting the standard local triggers API. */
+  /** Create a service adapter targeting an explicit or Aspire-discovered triggers API. */
   constructor(options: HttpTriggersServiceOptions = {}) {
-    this.#baseUrl = (options.baseUrl ?? `http://127.0.0.1:${TRIGGERS_API_DEFAULT_PORT}/api/v1`)
-      .replace(/\/$/, '');
+    const discoveredUrl = options.baseUrl ??
+      Deno.env.get('services__triggers-api__https__0') ??
+      Deno.env.get('services__triggers-api__http__0') ??
+      Deno.env.get('TRIGGERS_API_URL') ??
+      Deno.env.get('NETSCRIPT_TRIGGERS_URL');
+    this.#baseUrl = discoveredUrl === undefined
+      ? undefined
+      : `${discoveredUrl.replace(/\/$/, '')}/api/v1`.replace('/api/v1/api/v1', '/api/v1');
     this.#fetch = options.fetch ?? fetch;
   }
 
   async listTriggers(enabled?: boolean): Promise<readonly TriggerRuntimeState[]> {
-    const url = new URL(`${this.#baseUrl}/triggers/triggers`);
+    const url = this.#apiUrl('/triggers/triggers');
     if (enabled !== undefined) url.searchParams.set('enabled', String(enabled));
     const page = await this.#request<Readonly<{ triggers: readonly TriggerRuntimeState[] }>>(url);
     return page.triggers;
   }
 
   async listEvents(query: TriggerEventQuery = {}): Promise<TriggerEventPage> {
-    const url = new URL(`${this.#baseUrl}/events`);
+    const url = this.#apiUrl('/events');
     if (query.triggerId !== undefined) url.searchParams.set('triggerId', query.triggerId);
     if (query.status !== undefined) url.searchParams.set('status', query.status);
     if (query.limit !== undefined) url.searchParams.set('limit', String(query.limit));
@@ -80,9 +85,18 @@ export class HttpTriggersService implements TriggersServiceClient {
   async setEnabled(id: string, enabled: boolean): Promise<TriggerEnabledResponse> {
     const verb = enabled ? 'enable' : 'disable';
     return await this.#request<TriggerEnabledResponse>(
-      new URL(`${this.#baseUrl}/triggers/triggers/${encodeURIComponent(id)}/${verb}`),
+      this.#apiUrl(`/triggers/triggers/${encodeURIComponent(id)}/${verb}`),
       { method: 'POST' },
     );
+  }
+
+  #apiUrl(path: string): URL {
+    if (this.#baseUrl === undefined) {
+      throw new Error(
+        'Triggers API endpoint was not discovered. Configure an Aspire service reference or TRIGGERS_API_URL.',
+      );
+    }
+    return new URL(`${this.#baseUrl}${path}`);
   }
 
   async #request<T>(url: URL, init?: RequestInit): Promise<T> {
