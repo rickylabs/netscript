@@ -93,6 +93,8 @@ gets the same explicit default. A browser/shared author imports `defineServices`
 | 2026-08-30 | S3    | Compatibility     | Updated the SDK README and all four owned published pages with the root/cache migration, focused presets import, explicit custom-server registration, and Fresh coverage.          |
 | 2026-08-30 | S3    | Checkpoint        | Committed and pushed `1dd64dae`; posted the structured S3 implementation comment on draft PR #1758.                                                          |
 | 2026-08-30 | S4    | Reconciliation    | Reconciled the pushed S3 SHA, final gate table, compatibility handoff, and pending independent IMPL-EVAL without changing product code.                       |
+| 2026-08-30 | Review | Tier-A sign-off   | Supervisor sign-off `83b7109c` independently reproduced the graph, test, doc, surface, publish, quality, and lock claims at author head `bfad0c15`.             |
+| 2026-08-30 | Review | IMPL-EVAL cycle 1 | Separate opposite-family evaluator returned `PASS_IMPL` at `83b7109c`; four low findings, zero blocking. F-1/F-3 are reconciled here and in the PR body; F-2/F-4 remain coordinator follow-ups. |
 
 ## Decisions
 
@@ -114,7 +116,10 @@ availability note: the requested `rtk` executable is absent (`command not found`
 output filtering only, not evidence selection. S3 stayed inside the locked ceiling. Two
 implementation-time corrections are recorded in `drift.md`: a workspace publish dry-run exposed two
 root cache-entry types still required by Fresh, and generic Markdown formatting damaged Vento source
-syntax before the owned pages were restored and edited narrowly.
+syntax before the owned pages were restored and edited narrowly. IMPL-EVAL F-1 additionally found
+that the committed graph test substituted a stricter workspace-resolved predicate for the plan's
+two named SDK files; both forms measure 0 at head, and the substitution plus F-2/F-4 coordinator
+follow-ups are now recorded in `drift.md`.
 
 ## Gate Results
 
@@ -168,9 +173,10 @@ syntax before the owned pages were restored and edited narrowly.
 ## Handoff notes
 
 S3 implementation, compatibility prose, generated derivatives, and gate evidence are pushed at
-`1dd64dae`. S4 contains run-artifact reconciliation only. The draft PR must remain draft and retain
-its current labels/status until the mandatory separate opposite-family IMPL-EVAL and coordinator
-review complete; this implementation session does not self-certify or change issue acceptance.
+`1dd64dae`. S4 and later evidence corrections contain run-artifact reconciliation only. Separate
+opposite-family IMPL-EVAL returned `PASS_IMPL` at supervisor sign-off head `83b7109c`. The PR body is
+being refreshed from the accepted artifacts before readiness; draft state, labels, issue text, and
+issue acceptance remain coordinator-owned.
 
 ## Supervisor Tier-A sign-off — `bfad0c15`
 

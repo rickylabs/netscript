@@ -46,7 +46,27 @@ requirements.
 - `check:publish-assets` named only `packages/mcp/src/publish-assets.generated.ts` stale after the
   agent-docs bundle changed; the authorized CLI generated asset did not change. The implementation
   records the tool's artifact-derived result rather than repeating the plan's broader expectation.
-- Repo-wide `surface:diff` remains a measured negative with 559 undeclared major changes spanning
-  many packages. The SDK claim is therefore proved at finer granularity by decoding the regenerated
-  MCP export corpus: `./presets` is new, its curated closure excludes `QueryClientPort`, and the root
-  no longer exposes server cache values while preserving the two required cache-entry types.
+- Repo-wide `surface:diff` remains a measured negative: base `13878a80` has 542 undeclared major
+  changes and measured head `1ccddd6e` has 552. The +10 delta is entirely SDK-scoped (45 -> 55).
+  The SDK claim is proved at finer granularity by decoding the regenerated MCP export corpus:
+  `./presets` is new, its curated closure excludes `QueryClientPort`, and the root no longer exposes
+  server cache values while preserving the two required cache-entry types.
+
+## 2026-08-30 — IMPL-EVAL cycle 1 predicate substitution and follow-ups
+
+- Severity: evidence bookkeeping plus coordinator follow-ups; no product rescope. Separate
+  IMPL-EVAL returned `PASS_IMPL` at evaluated head `83b7109c`.
+- The locked S2 plan predicate named `cache-query.ts`, `kv-cache-store.ts`, and `@netscript/kv`.
+  During PLAN-EVAL M1 the committed test substituted a workspace-resolved predicate that rejects
+  `/packages/kv/`, `jsr:@netscript/kv`, every `node:` specifier, and `/packages/logger/` modules,
+  plus raw `@netscript/kv` and `node:` dependency edges. This is stricter for transitive server
+  edges and measures 0 for both root and presets at head; the evaluator separately confirmed the
+  original named-file predicate also measures 0. The substitution is recorded rather than hidden.
+- Coordinator follow-up F-2: `defineFreshApp()` unconditionally installs `cacheQuery`, so a custom
+  provider registered before that call is overwritten. Plan D5 explicitly locked and PLAN-EVAL
+  accepted this shape. A follow-up should either document that custom providers register after
+  `defineFreshApp()` or guard default registration with `hasCacheProvider()`; this leaf does neither.
+- Coordinator follow-up F-4: the CLI scaffold still emits the now-inert
+  `import '@netscript/sdk/cache';` and tests that emitted line. Generated apps still cache through
+  `defineFreshApp()`. Dropping the dead import and assertion requires a separate follow-up issue and
+  remains outside this leaf's ceiling; no CLI file or issue was changed here.
