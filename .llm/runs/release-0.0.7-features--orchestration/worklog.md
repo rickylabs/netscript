@@ -8136,3 +8136,33 @@ session performs IMPL-EVAL.
 IMPL-EVAL per this lane's established pattern (Slice 3 itself was gated on Slice 2's). #1664 remains
 parked; no runtime lease is held or sought. I am not idling on a routine checkpoint — this is reported
 because it blocks the only next step in this queue, not because it is a scheduled report.
+
+## #1387 Slice 3 IMPL-EVAL — coordinator-authorized bounded routing deviation
+
+**Verbatim coordinator authorization:** "COORDINATOR AUTHORIZATION — #1387 Slice 3 only: Fable quota
+termination is no verdict; OpenRouter/AGY routes are unavailable on NAS. Dispatch one fresh
+separate-session Opus 5 medium terminal IMPL-EVAL through the checked-in agentic job interface. Record
+bounded routing deviation verbatim: Fable 5 monthly spend exhausted, openrouter.env absent, AGY
+unauthenticated; invariants preserved (Codex generator != Claude evaluator, fresh session). Evaluate
+exact current Slice-3 product/evidence heads, independently remeasure Tier-A/negative cases, and on
+PASS release Slice 4 immediately. This is not a policy-wide waiver and does not count as a failed
+eval."
+
+**Scope note, stated for the record:** this authorization is bounded to #1387 Slice 3 only, per its
+own text. It does not amend `lane-policy.md` and does not license this lane to substitute Opus 5 for
+any other native/OpenRouter/AGY route without a fresh, equally explicit ruling.
+
+### Dispatch
+
+| Field | Value |
+| --- | --- |
+| Route | Anthropic Claude · **Opus 5 · medium**, fresh separate session |
+| Launcher | `.llm/tools/agentic/claude/claude-print.ts` — the checked-in agentic job interface, same tool used for every prior Fable evaluator dispatch |
+| Worktree | `ns1387-impleval-s3`, detached, already at the evidence head |
+| Certified content head | `c297064aa76ca1b2b790f399adfb899e95c03920` |
+| Evidence head | `248b2f062322106c2bf57e6ddd3d4e32e0b446d6` |
+| Brief | `slices/impl-eval-1387-s3.md`, unchanged from the Fable/DeepSeek dispatch attempts |
+| Invariant | Codex generator ≠ Claude evaluator, preserved — same as every prior IMPL-EVAL in this run |
+
+No brief content changed for the route swap; the evaluator identity is the only variable. On PASS,
+Slice 4 is dispatched immediately per the coordinator's instruction, without a separate checkpoint.
