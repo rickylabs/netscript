@@ -399,4 +399,7 @@ and reported its terminal message as S13's. Verified by rollout `cwd`: S13 =
 `01a05348-6d4d-7413-a7d4-da98df0c720e` (running, no commit yet). Watch re-armed on the exact path;
 rule: monitors key on full thread ids only. | | Main advanced (coordinator) | `de57fab0` (#1772
 docs, #1770 shipped). Inert for the code stack (0 overlap); S11 overlaps on 5 files → prose
-reconcile queued after polish (D-64). |
+reconcile queued after polish (D-64). | | S11 docs_polish | **`POLISH: DONE`** (`44a57a64`, Fable
+session `e9fa058c…`, edit-only, docs + regenerated carrier; PR #1771 `[PHASE: DOCS-POLISH]`
+comment). Report lists deliberately-left items for the supervisor (see `slices/s11/docs-polish.md`
+§Deliberately left). #1772 prose reconcile launched on the Gemini conversation (D-64). |
