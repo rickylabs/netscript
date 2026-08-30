@@ -5429,3 +5429,39 @@ worktree. Its recovered worker is alive — confirmed via `/proc/<pid>/cwd`, not
 — and S2A is complete and pushed: `0d620b61` red-before alone, then `e5d820b3`
 "fix(cli): scaffold a bound Fresh data screen". Three paths touched, all inside the locked 12
 (ceiling items 1, 2, 6). Clean red-before/green separation.
+
+### #1764 IMPL-EVAL cycle 3 (delta) — `PASS_IMPL`; Flow-B is the sole remaining blocker
+
+Verdict `14889037` on `eval/impl-eval-1368-cycle-3`, evaluated head `60e0b198`, posted to PR #1764.
+All five judgments pass:
+
+1. The by-name correction is **genuine, not a weakening**. The evaluator re-measured the file green at
+   a detached base (2/0), confirmed the base→head delta is the single 4-line hunk, and accepted the
+   `findIndex` + `>= 0` guard as sound given the `started[]`/`spans[]` lockstep. It added something I
+   had not: by-name **cardinality remains pinned** in the authoritative core suite
+   (`handles.length === 2`), which itself selects by name — so the dropped count assertion loses only a
+   new-span-kind canary, deliberately and with owner authorization (F-b).
+2. Both whole-tree suites green and matching my numbers exactly: `plugins/sagas` 51/0/1,
+   `packages/plugin-sagas-core` 84/0/3.
+3. **Corpus attribution proven arithmetically rather than asserted** — leaf +90 bytes / 0 symbols; main
+   alone 7614 → 7623; merged = main + 90. That is a stronger proof than the attribution I offered, and
+   it is the right way to settle a base64+gzip carrier I said I could not line-inspect.
+4. Ceiling exactly 19, scope not widened, `deno.lock` byte-identical to both base and main.
+5. Flow-B truthfully `NOT_RUN`, claimed nowhere, still gating `status:ready-merge`.
+
+**F-a was mine and is closed.** The evaluator noted the leaf worklog carried no row for `f0b01dac` or
+the merge — I had recorded them in the orchestration log but not the run's own artifact. Added both
+rows with evidence at `735ed2a66` and pushed. F-c (`SagaEngine.handle` JSDoc gap) is carried, correctly
+outside the delta.
+
+PR body rewritten: status line moved to the current head, F-A moved to a Resolved section with the
+before/after counts, and the three genuinely-satisfied DoD boxes ticked. Flow-B is stated as the sole
+remaining blocker with the owner's CI/off-host requirement and the D-42/D-43 reason.
+
+**Label choice, stated because neither option is clean:** moved to `status:impl` on PR and issue.
+`status:impl-eval` would falsely imply an evaluation is pending — none is, and cycle 3 was the last
+authorized. `status:ready-merge` would be false while Flow-B is unmet. `status:impl` is the
+least-wrong: the remaining work is executing a gate. Happy to be overridden.
+
+**#1357 continues undisturbed** — worker alive (pid verified by `/proc/<pid>/cwd`), S2A pushed at
+`e5d820b3f`, clean tree, three ceiling paths.
