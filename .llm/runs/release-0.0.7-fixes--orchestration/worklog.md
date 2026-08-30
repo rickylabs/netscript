@@ -3278,3 +3278,54 @@ PASS, before the publish-assets rows; `docs:exports-drift` PASS after S3).
 the internals lane — so resolution option 1 from the handoff (land #1734, re-run `scaffold.runtime`)
 is already progressing on its own. `origin/main` is still `13878a80`, so #1673's evidence stays
 current and no gate needs re-running. PR #1739 is unchanged at `status:impl-eval`.
+
+## 2026-08-30 — #1462 S2 landed at `ddf66a6f`; both halves of the red verified independently
+
+Test file alone (111 lines) plus run artifacts. **No product change** — the red-only discipline held.
+
+### The child assertion is red for the right reason
+
+Re-run by the supervisor at this head, not read from a receipt:
+
+```
+exit 1 · passed 0 · failed 1
+Expected root defineServices import to leave hasCacheProvider() false; observed true
+```
+
+That is the actual #1462 defect. Critically it is **not** the Deno-global crash that PLAN-EVAL F1
+found in the previous S2 shape: the test keeps the runtime intact (zero occurrences of
+`delete globalThis.Deno`), so the red comes from the defect rather than from runtime surgery.
+
+### M1 landed in full, including the item I suspected was missing
+
+All three discriminators are implemented: resolved specifiers (`/packages/kv/`, `jsr:@netscript/kv`),
+**raw dependency specifiers** (`dependency.specifier === '@netscript/kv'`, `node:` prefixes — the item
+I initially suspected absent and confirmed present by reading the loop), and the purity discriminators
+(`node:` and `/packages/logger/`).
+
+### A gap the test's own structure creates — and how it was closed
+
+The graph assertion runs **after** the child-process assertion. The child fails today, so the test
+throws before the graph loop is ever reached: **the graph half never executes at base**, and this run
+therefore produces no red-before evidence for it. Left alone, someone could later cite "S2 was red" as
+though it covered both assertions, which is precisely the over-claim class this lane keeps finding.
+
+Closed by measuring it directly rather than reasoning about it. Re-implementing the test's own
+predicate against `deno info --json` for `packages/sdk/mod.ts` at this head:
+
+```
+ROOT: 19 browser-unsafe edges at base
+  packages/kv/adapters/*, packages/kv/application/*, …
+  node: edges = 2 · logger modules = 5
+```
+
+So the graph assertion **is** genuinely red at base, matching M1's measured prediction (the evaluator
+reported `node:async_hooks` plus four logger modules; the small count difference is because this
+measurement counts dependency edges as well as module specifiers). Both halves of S2's red now rest on
+evidence: the child assertion demonstrated by the test run, the graph assertion by direct measurement.
+
+This is recorded so the eventual IMPL-EVAL is not misled: **the graph assertion's red-before is
+documented externally, not demonstrated by the committed test run.** It will execute for the first
+time once S3 makes the child assertion pass, and that is when its green becomes meaningful.
+
+S3 onward continues under the revised ceiling and corrected gate ordering.
