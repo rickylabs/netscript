@@ -28,3 +28,8 @@
   in; its final postgres report is Unhealthy (not Healthy as the steering text stated), while the
   web report supplies the real pending-to-Healthy transition. Focused verdict: 14/14 evidence tests
   plus green scoped check/lint/fmt; no runtime, evaluator, or CI dispatch.
+- Off-host Phase-B cycle 3: Actions run `33328308643` exposed omitted nullable `ResourceJson.State`
+  on `prisma-studio` and `sagas-api`. `DescribeResourceLine` now models the complete nullable root
+  DTO, missing/null state is explicit pending `Unknown`, missing/null reports are empty, and later
+  observations replace pending state. Focused verdict: 17/17 evidence tests plus green scoped
+  check/lint/fmt; no runtime, evaluator, or CI dispatch.

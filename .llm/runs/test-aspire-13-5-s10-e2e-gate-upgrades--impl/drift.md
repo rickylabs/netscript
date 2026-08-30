@@ -48,3 +48,12 @@ instead ends postgres at `Running`, `healthStatus: Unhealthy`, and
 omitted status to `Healthy`. The fixture remains an unmodified copy: tests prove pending parsing,
 last-seen Healthy convergence on the web report, and fail-closed non-convergence on postgres rather
 than manufacturing evidence or weakening the health gate.
+
+## D-07 — Initial follow parser modeled observations instead of the nullable DTO boundary
+
+Three hosted runs successively exposed wrapper, nullable report-status, and nullable resource-state
+assumptions. The cycle-3 correction replaces field-by-field patching with a `DescribeResourceLine`
+contract covering all nullable root `ResourceJson` properties from Aspire v13.5.3. Gate behavior
+interprets only identity, state, health status, and health reports; all other DTO fields are optional
+and ignored. The stable `displayName`-first identity preference remains deliberate because real
+Aspire instance `name` values carry generated suffixes while suite expectations use display names.

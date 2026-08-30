@@ -10,6 +10,29 @@ const ASPIRE_13_5_3_CAPTURE = new URL(
   'aspire-describe-follow-13.5.3-capture.ndjson',
   FIXTURES,
 );
+const RESOURCE_JSON_NULLABLE_FIELDS: readonly string[] = [
+  'name',
+  'displayName',
+  'resourceType',
+  'uid',
+  'state',
+  'waitingFor',
+  'stateStyle',
+  'creationTimestamp',
+  'startTimestamp',
+  'stopTimestamp',
+  'source',
+  'exitCode',
+  'healthStatus',
+  'dashboardUrl',
+  'relationships',
+  'urls',
+  'volumes',
+  'properties',
+  'environment',
+  'healthReports',
+  'commands',
+];
 
 Deno.test('doctor receipt preserves warnings and accepts a zero-failure host', async () => {
   const fixture = JSON.parse(
@@ -47,6 +70,113 @@ Deno.test('describe follow parses bare Aspire 13.5 ResourceJson lines with last-
     ['workers', 'Running'],
   ]);
   assertEquals(evaluateDescribeFollow(stream, ['postgres', 'workers']), parsed);
+});
+
+Deno.test('describe follow accepts every nullable ResourceJson field omitted', () => {
+  const complete: Record<string, unknown> = {
+    name: 'dto-resource-instance',
+    displayName: 'dto-resource',
+    resourceType: 'Executable',
+    uid: 'resource-uid',
+    state: 'Running',
+    waitingFor: ['dependency'],
+    stateStyle: 'success',
+    creationTimestamp: '2026-08-30T00:00:00Z',
+    startTimestamp: '2026-08-30T00:00:01Z',
+    stopTimestamp: null,
+    source: 'deno',
+    exitCode: null,
+    healthStatus: 'Healthy',
+    dashboardUrl: 'https://localhost.invalid/?resource=dto-resource',
+    relationships: [{ type: 'Reference', resourceName: 'dependency' }],
+    urls: [{ name: 'http', url: 'http://localhost.invalid' }],
+    volumes: [{ source: '/data', target: '/data', mountType: 'bind' }],
+    properties: { key: null },
+    environment: { KEY: null },
+    healthReports: { self: { status: 'Healthy' } },
+    commands: { restart: { displayName: 'Restart', state: 'Enabled' } },
+  };
+
+  for (const field of RESOURCE_JSON_NULLABLE_FIELDS) {
+    const candidate = structuredClone(complete);
+    delete candidate[field];
+    const resource = parseDescribeFollow(`${JSON.stringify(candidate)}\n`).resources[0];
+    if (!resource) throw new Error(`omitting ${field} removed the resource`);
+    assertEquals(
+      resource.name,
+      field === 'displayName' ? 'dto-resource-instance' : 'dto-resource',
+      `identity after omitting ${field}`,
+    );
+    assertEquals(resource.state, field === 'state' ? 'Unknown' : 'Running', field);
+    assertEquals(resource.statePending, field === 'state', field);
+    if (field === 'healthReports') assertEquals(resource.healthReports, {});
+  }
+
+  const explicitNulls = parseDescribeFollow(
+    '{"displayName":"nullable-resource","state":null,"healthStatus":null,"healthReports":null}\n',
+  ).resources[0];
+  assertEquals(explicitNulls?.state, 'Unknown');
+  assertEquals(explicitNulls?.statePending, true);
+  assertEquals(explicitNulls?.healthReports, {});
+});
+
+Deno.test('describe follow parses hosted nullable-state resource shapes as pending', async () => {
+  const stream = await Deno.readTextFile(
+    new URL('aspire-describe-follow-13.5.3-nullable-state.ndjson', FIXTURES),
+  );
+  assertEquals(
+    parseDescribeFollow(stream).resources.map((resource) => [
+      resource.name,
+      resource.state,
+      resource.statePending,
+    ]),
+    [
+      ['prisma-studio', 'Unknown', true],
+      ['sagas-api', 'Unknown', true],
+    ],
+  );
+  assertThrows(
+    () => evaluateDescribeFollow(stream, ['prisma-studio', 'sagas-api']),
+    Error,
+    'did not converge: prisma-studio=Unknown, sagas-api=Unknown',
+  );
+  const laterRunning = `${stream}{"displayName":"prisma-studio","state":"Running"}\n`;
+  assertEquals(
+    evaluateDescribeFollow(laterRunning, ['prisma-studio']).resources[0]?.state,
+    'Running',
+  );
+  assertEquals(
+    evaluateDescribeFollow(laterRunning, ['prisma-studio']).resources[0]?.statePending,
+    false,
+  );
+});
+
+Deno.test('describe follow rejects invalid ResourceJson gate fields precisely', () => {
+  const cases: readonly { readonly line: string; readonly message: string }[] = [
+    {
+      line: '[]',
+      message: 'describe line 1 is not an object',
+    },
+    {
+      line: '{"displayName":"prisma-studio","state":7}',
+      message: 'describe line 1 prisma-studio state must be a string, null, or omitted',
+    },
+    {
+      line: '{"displayName":"sagas-api","healthStatus":7}',
+      message: 'describe line 1 sagas-api healthStatus must be a string, null, or omitted',
+    },
+    {
+      line: '{"displayName":"workers","healthReports":[]}',
+      message: 'describe line 1 workers healthReports is not an object',
+    },
+    {
+      line: '{"state":"Running"}',
+      message: 'describe line 1 resource 1 omitted identity (displayName/name/resourceName)',
+    },
+  ];
+  for (const example of cases) {
+    assertThrows(() => parseDescribeFollow(`${example.line}\n`), Error, example.message);
+  }
 });
 
 Deno.test('describe follow treats omitted and null health-report statuses as pending', async () => {
@@ -161,7 +291,7 @@ Deno.test('describe follow rejects an unknown JSON line shape precisely', () => 
   assertThrows(
     () => parseDescribeFollow('{"message":"not a resource"}\n'),
     Error,
-    'describe line 1 is neither wrapped resources[] nor a bare resource object',
+    'describe line 1 resource 1 omitted identity (displayName/name/resourceName)',
   );
 });
 

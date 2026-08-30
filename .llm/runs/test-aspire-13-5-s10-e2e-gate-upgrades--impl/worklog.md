@@ -126,3 +126,25 @@
 - Focused validation: check exit 0 (185 files), lint exit 0 (178 files; unrelated nested
   `desktop-native` fixture excluded), fmt exit 0 (185 files), and evidence tests exit 0 (14/14).
   No Aspire, Docker, runtime-suite, evaluator, or CI-dispatch command ran.
+
+## Phase-B DTO-complete describe-follow fix — cycle 3
+
+- 2026-08-30: hosted proof run `33328308643` reached 36 passing gates in the postgres tier and 37
+  in sqlite before `runtime.aspire-start` encountered `ResourceJson` lines whose nullable `State`
+  was omitted (`prisma-studio` and `sagas-api`). This is the third serialization-boundary mismatch.
+- Contract: Aspire v13.5.3
+  `src/Shared/Model/Serialization/ResourceJson.cs` declares every root `ResourceJson` property
+  nullable. `DescribeResourceLine` now models the complete root DTO as optional/null fields with a
+  required usable identity union; only gate-relevant state/health fields are interpreted.
+- RED: added a two-line hosted-shape fixture and a table-driven omission matrix for all 21 nullable
+  root fields. The focused test wrapper exited 1 with three diagnostics because
+  `DescribeResourceObservation` did not yet expose a pending-state discriminator.
+- Implementation: missing/null state becomes `Unknown` with `statePending: true`; missing/null
+  health reports become `{}`. Later concrete state still wins by resource identity. Non-object
+  lines/reports and wrong non-null state/status/health-status types retain line/resource/report
+  qualified errors. Stable `displayName` preference is retained so suffixed Aspire instance names
+  continue matching gate resource names.
+- Focused validation: check exit 0 (185 files), lint exit 0 (178 files; unrelated nested
+  `desktop-native` fixture excluded), fmt exit 0 (185 files), and evidence tests exit 0 (17/17).
+  PLAN-EVAL is N/A by owner direction for this mechanical correction. No Aspire, Docker,
+  runtime-suite, evaluator, or CI-dispatch command ran.
