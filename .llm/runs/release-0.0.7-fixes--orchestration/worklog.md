@@ -2420,3 +2420,66 @@ The lesson is about the *detector*, not the incident: mtime staleness alone prod
 as `state` alone produces false turn-boundaries. The watcher now distinguishes them properly — it
 reports ALIVE on rollout growth, exits on a head move, and only declares death after four consecutive
 minutes with no growth.
+
+## 2026-08-30 — amended plan terminal at `13402d3f`; focused PLAN-EVAL dispatched
+
+### The amendment is a faithful expression of the ruling
+
+Verified path-by-path rather than counted: the plan's eleven authorized paths are an **exact match**
+to the coordinator's authorization — the prior six CLI paths, `installed-runtime-registry-generator_test.ts`,
+and the four `plugins/ai` paths — with no drift in either direction.
+
+Both items this lane flagged rather than silently allowed came back resolved as directed:
+
+- **`runtime-registry-source-report.ts` is not created.** "Parsing and validation stay in path 2", so
+  no unauthorized new CLI file was invented on the author's own authority.
+- **The integration test is retained with the interpretation recorded in `drift.md`**, explicitly
+  labelled as resting on the supervisor's reading so PLAN-EVAL or the coordinator can overturn it
+  before S7 at low cost.
+
+`plugins/workers/*`, `plugins/sagas/*`, and `plugins/triggers/*` are removed. F4 is deferred with a
+reasoned argument rather than a bare deferral: a workers manifest can later advertise
+`inspectionProtocol: 1` and feed its existing selector into the same target/path/source report without
+the host learning workers policy — so the protocol needs no redesign for the deferred work. Non-scope
+explicitly bars issue and acceptance-text mutation, noting AC2 already distinguishes definitions from
+factories.
+
+**The stale workers DoD box is gone.** The close-gate had found it in the PR body at line 93; the
+author removed it during the same amendment, so the queued correction was never needed. Re-checked
+against the live PR body, not assumed.
+
+Terminal state confirmed before dispatch: local == `origin` == PR #1739 `headRefOid` == `13402d3f`,
+tree clean, author gone from the daemon. Dispatching against an unpushed head would have handed the
+evaluator a commit it could not fetch.
+
+### PLAN-EVAL cycle 1 — identity and route recorded before the evaluator mutates anything
+
+| Field | Value |
+| --- | --- |
+| Gate | PLAN-EVAL cycle 1, PR #1739 (#1673) |
+| **Plan commit evaluated** | `13402d3fbfba1c166fcf5c636a1b2ef59eb0b543` — local == `origin` == PR `headRefOid` |
+| Previous plan revision | `349d5915` (pre-ruling, 24-path ceiling) — supplied as a diff baseline |
+| Immutable base | `13878a80a50c55b9662099fed64555f2310ae4a3` |
+| Requested route | **canonical** `formal_plan_evaluation` — native Claude `claude-fable-5` · effort `medium` · `--remote-control` |
+| Observed route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--model","claude-fable-5"]` — **matched** |
+| Background id | `044800a7` |
+| Claude session id | `044800a7-8261-470f-b1c8-4eda951bd45b` |
+| PID | `280089` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-planeval-1673` (dedicated worktree; sole session there) |
+| Verdict branch | `eval/plan-eval-1673-cycle-1`, cut at the plan commit, upstream NONE |
+| Registry `bridgeSessionId` | `session_01CdWJ3a27GKvn879RALeB2o` (non-empty, sessions-registry form) |
+| Remote Control URL | `https://claude.ai/code/session_01CdWJ3a27GKvn879RALeB2o` |
+| Independence | fresh session; separate from the Codex author `01a051d0` and from this supervisor; opposite-family to the `gpt-5.6-sol` implementer |
+| Verdict | _pending — immutable pushed verdict required_ |
+
+**The brief is deliberately narrow, per the shipping order.** It opens by stating that F1 and the
+design response are settled and must not be re-audited, and that the evaluator judges one thing:
+whether the re-locked plan faithfully and implementably expresses the ruling, and whether its evidence
+obligations are real. If it believes the ruling itself is wrong it says so in one marked paragraph and
+evaluates the plan anyway. It is told the two mechanical facts this supervisor already verified — the
+exact 11-path match and the correctly-absent report file — so the cycle is not spent re-deriving them.
+
+It is also asked to **rule on the supervisor's interpretation** of
+`installed-runtime-registry-integration_test.ts` under "existing test paths may be amended". That
+reading is this supervisor's, was recorded as such by the author, and a plan evaluator is the right
+place to confirm or reject it.
