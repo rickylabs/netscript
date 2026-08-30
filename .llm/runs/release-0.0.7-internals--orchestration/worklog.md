@@ -5283,3 +5283,19 @@ evaluator's independent account is correct and mine was not.
     repo-wide, not solely directed at this one action.
 - Monitor `btrs34c7m` armed on transcript `"type":"result"`, process exit, or guard/credential error
   string, whichever comes first.
+
+## D-90 — Own monitor produced a false-terminal signal on the DeepSeek dispatch; caught before acting
+
+The DeepSeek evaluator monitor fired "TERMINAL: guard/credential error detected" ~40s after launch.
+**It was wrong.** The match was `NotCapable` appearing inside a `tool_result` JSON blob — the
+evaluator legitimately reproducing the absent-`CLAUDE_PROJECT_DIR` fallback matrix the brief asked
+for (attack point 2), where `NotCapable` is the *expected, desired* output of one of its own test
+cases, not a real guard denial. Verified before acting: `kill -0 <pid>` showed the process **still
+running**, transcript still growing (523 → 983 lines), and the real error-signature grep
+(`^evaluator model request denied|OPENROUTER_API_KEY is missing`, anchored to line start so it can't
+match embedded JSON text) found nothing.
+
+*Seventh instrument defect this stretch, and structurally the same as the others: a filter whose
+match said less than I initially read into it.* Caught this one in under a minute by checking real
+liveness before reporting or acting on the monitor's claim — the discipline from D-81/D-82 (validate
+a probe before trusting its silence or its output) held. Re-armed with the anchored pattern.
