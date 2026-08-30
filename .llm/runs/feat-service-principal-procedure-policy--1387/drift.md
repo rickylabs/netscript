@@ -262,3 +262,33 @@ identified.
 **Action:** rescope-required. No Slice 3 product file was edited, no Slice 3 gate or receipt was run,
 and no Slice 3 commit, push, or PR comment was created. Per the brief, the top-level Slice 2 receipt
 set was moved append-only to `receipts/slice-2-f9b32b4f/` before this stop.
+
+## D-8 — `traceHeaders` can contain an own property whose value is `undefined`
+
+**Severity:** significant · **Class:** public/runtime contract · **Shape:** typed-context runtime
+composition
+
+**Observed.** At content head `04b882ab52444ac1428dcc74b5a2022355d77dde`,
+`buildRpcContext` reads `traceparent` and `tracestate` as `string | undefined`, enters the trace
+branch when either value is present, and assigns both values to one object. A direct runtime probe
+with only `traceparent` supplied produced:
+
+```text
+{"traceHeaders":{"traceparent":"00-probe-parent-01"},"hasTracestate":true,"tracestateType":"undefined"}
+```
+
+The JSON rendering omits the undefined value, while `Object.hasOwn(traceHeaders, "tracestate")`
+proves the property is present and its runtime value is genuinely `undefined`.
+
+**Expected.** E-3 permits tightening the implementation annotation to
+`Readonly<Record<string, string>>` only if every emitted trace-header value is actually a string.
+If an emitted value can be undefined, the published `ServiceHandlerContext.traceHeaders` contract
+must be adjudicated outside Slice 3's four-file ceiling.
+
+**Actual.** The current runtime does not satisfy the published
+`Readonly<Record<string, string>>` value contract. Reclassifying that public field requires
+`packages/service/src/types.ts`, which is outside the Slice 3 ceiling.
+
+**Action:** rescope-required under E-3. No Slice 3 product or test file was edited, no Slice 3 gate
+or receipt was run, and `deno.lock` remains byte-unchanged from the starting hash
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
