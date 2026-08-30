@@ -1385,3 +1385,16 @@ implementation thread.
   suite and failed in NetScript's S10 parser before convergence because Aspire 13.5 follow-mode emits
   direct `ResourceJson` NDJSON lines. Treat that as a bounded adapter/evidence repair, not an infra
   regression and not a reason to return to unconditional CI fallback.
+
+## 2026-08-30 — direct DinD reachability is not identical to DCP loopback reachability
+
+- The host acceptance probe used a port published on a reachable DinD interface. Aspire DCP uses a
+  stricter contract: its remote-Docker ports are bound to the DinD host's `127.0.0.1`, and DCP in
+  `ai-agents` also resolves the resulting endpoint as its own `127.0.0.1`. Treating the successful
+  `netscript-dind:<port>` probe as complete DCP proof was therefore too broad.
+- Real 13.5 `describe` evidence showed a healthy container with PostgreSQL health failing only at
+  `127.0.0.1:<published-port>`. The bounded correction is an operational two-hop relay scoped to a
+  single runtime lease, not a NetScript product rewrite and not a waiver back to CI-only testing.
+- Lease cleanup must never be issued by a non-owner. The first #1736 local run was externally
+  stopped by its supervisor during `database.init`; the 87 ms stop-to-JSON-RPC-loss sequence proves
+  causation. Hosted exact-product-head green evidence supersedes that invalid local receipt.

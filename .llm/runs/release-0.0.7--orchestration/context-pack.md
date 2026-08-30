@@ -1554,3 +1554,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
   Repair #1760 with a real 13.5 fixture and fail-closed parser tests, include hidden runtime reports
   in artifact uploads, rebuild the combined proof, and rerun. #1736 remains an independent S1 merge
   prerequisite and was not the cause of this runtime failure.
+
+## Resume checkpoint — 2026-08-30T18:18:00Z
+
+- D-42 is fixed. Direct ai-agents access to all-interface DinD publications works at
+  `netscript-dind:<port>`, but Aspire DCP binds its remote-Docker publications to the DinD host's
+  loopback and consumes `127.0.0.1:<port>` for health and connection strings. That final namespace
+  boundary requires the now-proven owner-scoped two-hop relay; do not mark local Phase B green from
+  the raw hostname probe alone.
+- The Aspire supervisor owns the relay tool and sole runtime lease. It must track exact AppHost,
+  container, relay PID, and port ownership, prohibit cross-supervisor cleanup, and return Aspire,
+  containers, volumes, and relay processes to zero between S3, S7, and S8.
+- #1736 product/runtime head `d2c7f16c` is fully green in hosted run `33327199769`; PR/evaluator
+  carrier `662be2e9` differs only by worklog evidence. Final cycle-4 evaluation is running with no
+  cycle 5. The earlier local JSON-RPC loss was caused by an external supervisor stop and is invalid
+  as product evidence.
+- S10's direct-ResourceJson follow parser fix is pushed at `73b37ac89`; combined proof head
+  `6e6163a21` is executing run `33327294781`. The hidden failed-report artifact fix belongs to S9
+  #1759, but publication waits on a workflow-scoped credential and does not block runtime proof.

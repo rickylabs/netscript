@@ -2591,3 +2591,22 @@
   `describe --follow --format Json` emits one `ResourceJson` per NDJSON line, while the parser expects
   a snapshot `{resources:[...]}` envelope. #1736 is not causal. S10 owns a bounded real-fixture/parser
   correction plus hidden runtime-report artifact upload repair before the exact-head proof reruns.
+
+## 2026-08-30T18:18:00Z — real Phase-B refined the DinD address contract
+
+- The identical-path repair is fully effective, and direct agent probes can reach ports published
+  on all DinD interfaces through `netscript-dind:<port>`. Real Aspire 13.5 DCP execution exposed a
+  narrower remaining case: DCP deliberately publishes its container ports on the Docker host's
+  `127.0.0.1` and its own health checks consume that localhost endpoint. From `ai-agents`, that
+  loopback is a different namespace, so PostgreSQL health remained red even though the container
+  and bind mount were healthy. The host repair therefore resolved D-42 and direct D-43 probes, but
+  did not by itself make DCP's loopback contract remote-DinD-safe.
+- The Aspire supervisor proved a reversible two-hop relay end to end: expose the DinD-loopback port
+  on DinD's service interface, then forward the matching ai-agents loopback port to
+  `netscript-dind:<port>`. An owner-scoped relay tool is being checked into the Aspire operational
+  harness with lease-token/PID tracking and exact cleanup; S3/S7/S8 remain serialized under it.
+- A #1736 local runtime failure was separately invalidated as supervisor interference: the exact
+  AppHost was stopped externally while `database.init` was active, and JSON-RPC dropped 87 ms after
+  that stop. No product or Aspire defect was inferred. Hosted run `33327199769` at product head
+  `d2c7f16c` subsequently passed static, desktop, PostgreSQL, and SQLite/Garnet jobs; final cycle-4
+  IMPL-EVAL is live over carrier `662be2e9` with the evidence-only head distinction explicit.
