@@ -8621,3 +8621,34 @@ did not recur a third time.
 IMPL-EVAL dispatched: native Fable 5 attempted first per policy default (the single required
 evaluation, falling through to the sanctioned DeepSeek route on the now-expected quota exhaustion
 rather than treating that as a second evaluation).
+
+## #1387 Slice 8 terminal PASS; PR body truthfulness repaired; Slice 9 next
+
+DeepSeek returned **PASS at `ce9bd3e8b`**, no blocking findings, matching my Tier-A exactly. It
+independently re-ran all seven contracted gates plus a direct MCP JSR audit (exit 0, three existing
+warnings) — the plan-named audit gate has no durable receipt in this run's tooling (the same
+convention-only gap noted since Slice 1), and the evaluator's own re-run is the confirmation that it
+is genuinely non-blocking, not merely asserted.
+
+**Filename collision caught before committing.** The evaluator wrote its record to `evaluate.md` —
+the same filename **Slice 2's** evaluator used. Copying it in directly would have overwritten Slice
+2's evidence. Confirmed the leaf's committed `evaluate.md` was still Slice 2's content, then saved
+the new file as `evaluate-slice-8.md`, matching every other slice's naming convention.
+
+### PR body was genuinely stale — fixed
+
+The evaluator's own observation checked out: PR #1762's `## Slices` checklist, `## Definition of
+Done`, and the whole narrative still read as if only Slice 1 had landed, with S2–S8 all unchecked
+even though every one is Tier-A ACCEPTED with its own IMPL-EVAL verdict. Rewrote the body: updated
+Summary/Scope/Remaining-scope prose, checked S2–S8, replaced the Slice-1-only validation section with
+a per-slice rollup table (content head, Tier-A verdict, IMPL-EVAL verdict), added the D-4/D-7/D-8/D-9
+drift summary and the #1787/#1789 follow-up pointers, and updated Definition of Done to reflect what
+is actually true now versus what still gates the final close. **Protected wording preserved
+verbatim** — `Refs #1387` partial, the exact "No GitHub auto-close phrase... incorrectly mark #1387
+complete" sentence, and empty `closingIssuesReferences`, all verified after the edit.
+
+**Tooling note.** `gh pr edit --body-file` failed with a token-scope GraphQL error unrelated to the
+edit itself (`login`/`name`/`slug` fields `gh` queries alongside the mutation). Worked around with
+`gh api repos/.../pulls/1762 -X PATCH -F body=@<file>` directly against the REST API — note `-F`
+(capital, for `@file` raw-content references), not `-f`. No head movement; verified via a fresh
+`gh pr view` immediately after.
