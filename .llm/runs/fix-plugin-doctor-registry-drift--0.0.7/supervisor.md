@@ -24,6 +24,6 @@ does not act as Tier-A supervisor or evaluator in this run.
 
 ## Recorded lane/eval overrides
 
-None. The launcher-requested and observed implementation route match. PLAN-EVAL is `N/A` for the
-bounded defect because issue #1673 supplies the contract, negative regression, scope boundaries,
-and gate constraints; final IMPL-EVAL remains mandatory.
+None. The launcher-requested and observed implementation route match. Separate opposite-family
+PLAN-EVAL cycle 1 returned harness `PASS` / PR `APPROVED` at plan commit `13402d3f`; its binding
+amendments govern S7–S10. Final IMPL-EVAL remains mandatory.

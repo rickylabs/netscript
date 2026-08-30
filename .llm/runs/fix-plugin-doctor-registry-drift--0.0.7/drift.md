@@ -74,3 +74,8 @@ the coordinator subsequently replaced the first S6 24-path proposal with the rul
 - **Gate impact:** `scaffold.runtime` is required but supervisor-coordinated under the singleton
   runtime lease. Its durable evidence is the runner `--report` JSON; cleanup is leak-check followed
   by proven-resource teardown and an Aspire/Docker-zero terminal state.
+
+## 2026-08-30 — Integration-test interpretation overturned by PLAN-EVAL
+
+Interpretation overturned by PLAN-EVAL; the real AI health regression and layer-3 byte snapshot are
+relocated to authorized path 6, and `installed-runtime-registry-integration_test.ts` remains untouched.

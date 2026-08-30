@@ -1,22 +1,18 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
+import { copy, walk } from '@std/fs';
+import { dirname, fromFileUrl, join, relative, toFileUrl } from '@std/path';
 import { defineConfig } from '@netscript/config';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
-import {
-  netscriptJsrSpecifier,
-} from '../../../../kernel/constants/jsr-specifiers.ts';
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { DiagnosticEvidencePort } from '@netscript/mcp';
 import { createInstalledRuntimeRegistryGenerator } from '../../generate/plugins/installed-runtime-registry-generator.ts';
 import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
 import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
-import {
-  doctorPlugin,
-  type PluginDoctorDependencies,
-} from './doctor-plugin-use-case.ts';
+import { doctorPlugin, type PluginDoctorDependencies } from './doctor-plugin-use-case.ts';
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../..', import.meta.url));
 
@@ -150,6 +146,31 @@ Deno.test('plugin doctor bounds healthy output when no runtime registry target e
   }
 });
 
+Deno.test('plugin doctor stays healthy when AI generation excludes the skill-loader factory', async () => {
+  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-doctor-registry-ai-' });
+  try {
+    await writeAiProject(projectRoot);
+
+    const fs = new DenoFileSystem();
+    const generate = createGenerator(fs);
+    await generate({ dryRun: false, projectRoot });
+
+    const toolsRegistry = await fs.readFile(
+      join(projectRoot, '.netscript/generated/plugin-ai/tools.registry.ts'),
+    );
+    assertEquals(toolsRegistry.includes('ai/tools/skill-loader.ts'), false);
+    const beforeDoctor = await snapshotProjectFiles(projectRoot);
+
+    const { command, output } = createDoctorHarness(projectRoot, fs, generate);
+    await command.parse(['--project-root', projectRoot]);
+
+    assertStringIncludes(output.join('\n'), 'ai/tools/e2e-tool.ts');
+    assertEquals(await snapshotProjectFiles(projectRoot), beforeDoctor);
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
 function createGenerator(fs: DenoFileSystem): GenerateInstalledPluginRegistries {
   return createInstalledRuntimeRegistryGenerator({
     fs,
@@ -170,11 +191,12 @@ function createDoctorHarness(
   const dependencies: PluginDoctorDependencies = {
     fs,
     process: new DenoProcess(),
-    loadConfig: () => Promise.resolve(defineConfig({
-      name: 'registry-drift-fixture',
-      databases: { config: [] },
-      plugins: [],
-    })),
+    loadConfig: () =>
+      Promise.resolve(defineConfig({
+        name: 'registry-drift-fixture',
+        databases: { config: [] },
+        plugins: [],
+      })),
     loadJsrExportMap: () => Promise.resolve(new Set(['./services'])),
     inspectRuntimeRegistries: generate,
   };
@@ -191,37 +213,120 @@ function createDoctorHarness(
 
 async function writeProject(projectRoot: string): Promise<void> {
   await writeProjectConfig(projectRoot);
-  await write(join(projectRoot, 'appsettings.json'), `${JSON.stringify({
-    NetScript: {
-      Plugins: {
-        sagas: {
-          Entrypoint: netscriptJsrSpecifier('plugin-sagas', '/services'),
+  await write(
+    join(projectRoot, 'appsettings.json'),
+    `${
+      JSON.stringify({
+        NetScript: {
+          Plugins: {
+            sagas: {
+              Entrypoint: netscriptJsrSpecifier('plugin-sagas', '/services'),
+            },
+          },
         },
-      },
-    },
-  })}\n`);
+      })
+    }\n`,
+  );
 }
 
 async function writeProjectConfig(projectRoot: string): Promise<void> {
   const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
     readonly imports: Readonly<Record<string, string>>;
   };
-  await write(join(projectRoot, 'deno.json'), `${JSON.stringify({
-    catalog: SCAFFOLD_WORKSPACE_CATALOG,
-    imports: {
-      ...rootConfig.imports,
-      '@netscript/plugin/cli': toFileUrl(
-        join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
-      ).href,
-      '@netscript/plugin-sagas/runtime': toFileUrl(
-        join(REPOSITORY_ROOT, 'plugins/sagas/src/runtime/mod.ts'),
-      ).href,
-    },
-  })}\n`);
+  await write(
+    join(projectRoot, 'deno.json'),
+    `${
+      JSON.stringify({
+        catalog: SCAFFOLD_WORKSPACE_CATALOG,
+        imports: {
+          ...rootConfig.imports,
+          '@netscript/plugin/cli': toFileUrl(
+            join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
+          ).href,
+          '@netscript/plugin-sagas/runtime': toFileUrl(
+            join(REPOSITORY_ROOT, 'plugins/sagas/src/runtime/mod.ts'),
+          ).href,
+        },
+      })
+    }\n`,
+  );
+}
+
+async function writeAiProject(projectRoot: string): Promise<void> {
+  const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
+    readonly imports: Readonly<Record<string, string>>;
+  };
+  await write(
+    join(projectRoot, 'deno.json'),
+    `${
+      JSON.stringify({
+        catalog: SCAFFOLD_WORKSPACE_CATALOG,
+        imports: {
+          ...rootConfig.imports,
+          '@netscript/plugin/cli': toFileUrl(
+            join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
+          ).href,
+        },
+        workspace: ['./plugins/*'],
+      })
+    }\n`,
+  );
+  await copy(join(REPOSITORY_ROOT, 'plugins/ai'), join(projectRoot, 'plugins/ai'));
+  await write(
+    join(projectRoot, 'appsettings.json'),
+    `${
+      JSON.stringify({
+        NetScript: {
+          Plugins: {
+            ai: { Entrypoint: netscriptJsrSpecifier('plugin-ai', '/services') },
+          },
+        },
+      })
+    }\n`,
+  );
+  await write(
+    join(projectRoot, 'ai/tools/e2e-tool.ts'),
+    `
+export default {
+  descriptor: { name: 'e2e-tool' },
+  schema: {},
+  execute: async () => ({ state: 'output-available', output: { ok: true } }),
+};
+`,
+  );
+  await write(
+    join(projectRoot, 'ai/tools/skill-loader.ts'),
+    `
+export function createSkillLoaderTool(skills: unknown) {
+  return { skills };
+}
+`,
+  );
+  await write(
+    join(projectRoot, 'ai/agents/assistant.ts'),
+    'export default function assistant() { return {}; }\n',
+  );
+}
+
+async function snapshotProjectFiles(
+  projectRoot: string,
+): Promise<Readonly<Record<string, readonly number[]>>> {
+  const paths: string[] = [];
+  for await (const entry of walk(projectRoot, { includeDirs: false, followSymlinks: false })) {
+    if (entry.isFile) paths.push(entry.path);
+  }
+  paths.sort((left, right) => left.localeCompare(right));
+  const snapshot: Record<string, readonly number[]> = {};
+  for (const path of paths) {
+    snapshot[relative(projectRoot, path).replaceAll('\\', '/')] = [...await Deno.readFile(path)];
+  }
+  return snapshot;
 }
 
 async function writeSaga(projectRoot: string, id: string): Promise<void> {
-  await write(join(projectRoot, 'sagas', `${id}.ts`), `
+  await write(
+    join(projectRoot, 'sagas', `${id}.ts`),
+    `
 function defineSaga(sagaId: string) {
   return {
     id: sagaId,
@@ -232,7 +337,8 @@ function defineSaga(sagaId: string) {
   };
 }
 export default defineSaga('${id}');
-`);
+`,
+  );
 }
 
 async function write(path: string, text: string): Promise<void> {

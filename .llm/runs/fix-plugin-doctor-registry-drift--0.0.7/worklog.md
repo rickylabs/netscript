@@ -432,3 +432,52 @@ are withdrawn. Any runtime failure, including exit 134/inotify, is a real findin
 Stop after committing/pushing this amendment, updating PR evidence, and posting the structured plan
 correction. Fresh PLAN-EVAL is next. Do not start S7, run the leased runtime gate, mutate lifecycle or
 issue state, or self-certify.
+
+## PLAN-EVAL Cycle 1 — PASS
+
+Separate opposite-family PLAN-EVAL evaluated plan commit `13402d3f` and returned harness `PASS` / PR
+`APPROVED` (verdict commit `7db40ca0` on `eval/plan-eval-1673-cycle-1`). Implementation is authorized
+from S7. Binding amendments are incorporated without an S6 re-lock:
+
+- PE-5 overturns the integration-test interpretation. The real AI health case and complete
+  file-byte snapshot live in authorized path 6; the existing integration test is untouched.
+- PE-2 requires S8's plain inspect report builder and per-target, same-fixture deep equality between
+  inspect `sourceFiles` and `compileAiRegistry(...).files`, including order.
+- PE-9 records the expected path-2 F-1 file-size `WARN`: the file is already 478 lines, the
+  coordinator forbids the split parser file, and `arch:check` fails only on `fail` totals. This is
+  known drift, not a hidden gate failure or a new debt entry.
+- PE-10 uses the neutral `Runtime registry inspection` wrapper title in S9; the protocol error prefix
+  provides disambiguation.
+- Sweep-1 preserves `EmptyPluginRegistryError` when generator-authoritative selected sources total
+  zero across all targets.
+- PE-8 records `check:mcp-export-corpus` as a reproducible raw task in S10 because it is not in the
+  gate catalog.
+
+## S7 — Real AI Healthy Regression, Red Before Product Work
+
+### Scope
+
+- Changed only authorized test path 6 plus run artifacts.
+- Added a local AI project helper using workspace `./plugins/*`, a copied repository AI plugin,
+  `plugin-ai` appsettings, one ready tool, the discoverable `skill-loader.ts` factory, and one agent.
+- Normal generation is real (`DenoFileSystem` + `DenoProcess`) and proves the generated tools
+  registry excludes `skill-loader.ts` before doctor runs.
+- The test snapshots every regular project file as exact bytes after generation, expects doctor to
+  stay healthy, then asserts the complete snapshot is unchanged.
+- `installed-runtime-registry-integration_test.ts` remains untouched.
+
+### Red-before evidence
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused structured doctor suite | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --pretty -- --allow-all packages/cli/src/public/features/plugins/doctor/doctor-plugin-registry-drift_test.ts` | exit `1`; `passed=5 failed=1`; sole failure `plugin doctor stays healthy when AI generation excludes the skill-loader factory`, raising `RemoteError` at the healthy assertion. |
+
+The failure occurs with no S8/S9 product change and reproduces F1 exactly: generation correctly
+excludes a discoverable factory, then legacy dry-run evidence expects it and makes doctor unhealthy.
+No assertion is weakened or bypassed. S8 must not amend this test to manufacture green.
+
+### Reconcile
+
+The PR remains draft with `Closes #1673`; no issue, acceptance box, label, readiness state, or runtime
+resource was mutated. PLAN-EVAL findings are incorporated into the current plan/worklog/context and
+the next allowed slice is S8 only.
