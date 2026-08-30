@@ -55,7 +55,7 @@
 | #  | Finding                                                                                                                                                                                                                                                   | How to verify                                                                                                                          |
 | -- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | 1  | Six span factories exist; only `startHandleSpan` has a production caller.                                                                                                                                                                                 | `rg -n "start(Handle\|Cascade).*Span" packages/plugin-sagas-core` and inspect `src/runtime/saga-engine.ts`                             |
-| 2  | `SagaBusBridge` stores optional instrumentation but never uses it; its switch is the real send/schedule/complete/spawn dispatch seam.                                                                                                                     | `packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts`                                                                           |
+| 2  | `SagaBusBridge` stores optional instrumentation but never uses it; its switch is the real send/schedule/spawn dispatch seam, but `case 'complete'` only returns. Completion bookkeeping is owned by `SagaEngine.#handleEntry/#persistTransition`.         | `packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts`, `src/runtime/saga-engine.ts`                                             |
 | 3  | `SagaCompensatorOptions` has only `id` and `clock`; missing handlers return `compensated: false`, and nested compensation throws before an observable span exists.                                                                                        | `packages/plugin-sagas-core/src/runtime/saga-compensator.ts`                                                                           |
 | 4  | `saga.handle` is finished inside the engine before results reach the bridge. Ambient active context therefore cannot guarantee `handle -> cascade`.                                                                                                       | `packages/plugin-sagas-core/src/runtime/saga-engine.ts`                                                                                |
 | 5  | Streams already expose a structural `spanContext()` and serialize it with `formatTraceparent`; this is the local precedent for explicit W3C handoff without importing OTel types into runtime domain code.                                                | `packages/plugin-streams-core/src/telemetry/instrumentation.ts`                                                                        |
@@ -69,7 +69,10 @@
 
 All five cascade span names stay and must be emitted.
 
-- `send`, `scheduled`, and `complete` are successful bridge dispatch/bookkeeping seams.
+- `send` and `scheduled` are successful bridge dispatch seams.
+- `complete` is live, but not at the bridge: the bridge branch is a no-op. Its truthful span owner
+  is the engine around the persisted completed-status/`completedAt` transition, as corrected by
+  PLAN-EVAL cycle 1.
 - `compensate` belongs around compensation execution in `SagaCompensator`, including missing-handler
   `skipped` and nested-defer/error outcomes. Emitting it only in the bridge would miss direct
   compensator calls and would place ownership outside the operation being measured.
@@ -88,9 +91,10 @@ The convention is split deliberately across three layers:
 
 1. `SagaAttributes.CORRELATION_ID` owns the canonical `netscript.correlation.id` vocabulary in the
    telemetry attribute set.
-2. Runtime seams resolve and propagate the value. For current messages, the resolved saga
-   correlation key is the cross-plane ID fallback, so both attributes carry the same value without
-   becoming aliases semantically.
+2. The engine resolves and propagates both values once. Saga-domain correlation keeps the existing
+   precedence `definition.correlate(message) ?? message.correlationKey ?? '<sagaId>:<type>'`.
+   Cross-plane correlation uses publisher `message.correlationKey` when present, otherwise the
+   resolved saga key. Downstream bridge/compensator seams consume these values and never recompute.
 3. Span factories assemble both attributes. Runtime code passes typed inputs and does not call
    `setAttribute()` with a raw string.
 
@@ -100,9 +104,10 @@ message/domain model would not guarantee every span emits it.
 
 ## Published Surface and Generated Derivatives
 
-The change is additive but published: `SagaAttributesMap`, saga cascade input types,
-`SagaTelemetrySpan`, `SagaEngineHandleResult`, `SagaCompensationRequest`/`Result`, and
-`SagaCompensatorOptions` are exported through existing package subpaths. No export-map key changes.
+The change is published and includes structural signature movement: `SagaAttributesMap`, saga
+cascade input types, `SagaTelemetrySpan`, `SagaEngineHandleResult`,
+`SagaCompensationRequest`/`Result`, and `SagaCompensatorOptions` are exported through existing
+package subpaths. No export-map key changes.
 
 The derivative cascade was derived from the writer implementations rather than recalled:
 

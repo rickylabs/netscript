@@ -51,3 +51,20 @@ documentation.
 - **Action:** fix
 - **Evidence:** The corrected plan adds measured baseline/expected-stale MCP corpus evidence and
   marks Flow-B runtime proof `REQUIRED, supervisor-coordinated, author-must-not-run`.
+
+## 2026-08-30 — PLAN-EVAL corrected completion ownership and red-before mechanics
+
+- **What:** Cycle 1 found that the planned bridge-owned `saga.cascade.complete` span would wrap only
+  `return;`, and that constructing a compensator with a future instrumentation option would make S2
+  fail during type checking instead of at the two behavioral assertions.
+- **Source:** PLAN-EVAL verdict commit `7b96c498` over plan commit `742d870d`.
+- **Expected:** Every retained factory surrounds a real operation, and the red-before proves the
+  defect using only the locked baseline's type surface.
+- **Actual:** Complete work is owned by the engine's persisted transition, while the original S2
+  sketch depended on a not-yet-existing constructor field. The same review also exposed divergent
+  engine/compensator correlation precedence and an unacknowledged engine-direct bus path.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Plan D1/D6/D8/D9 now lock engine-owned completion and single-resolution correlation
+  transport; the S2 contract requires two assertion failures from a baseline-compatible composed
+  runtime; direct engine-as-bus dispatch is explicitly non-scope; `docs:readme:check` is gate 17.

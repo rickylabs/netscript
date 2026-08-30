@@ -17,7 +17,8 @@
   cascade context, and optional structural W3C span-context extraction; retain all six span
   factories.
 - Existing `@netscript/plugin-sagas-core/runtime`: add optional instrumentation/context fields to
-  compensator options/requests/results and engine results. Changes are additive; no subpath changes.
+  compensator options plus explicit correlation/context fields to requests/results and engine
+  results. Published structural signatures move; no export-map key or subpath changes.
 - Existing `@netscript/plugin-sagas/runtime`: no new symbol; the durable runtime factory only wires
   the core dependency into the default compensator.
 
@@ -38,7 +39,9 @@
 - `SagaInstrumentation` — owns span construction, shared saga/correlation attributes, finish
   behavior, and context extraction; runtime never imports OTel implementation types.
 - `SagaCompensator` — receives injected `SagaInstrumentation` and owns the compensation operation
-  span.
+  span. The bridge supplies the normalized instrumentation plus engine-selected execution context
+  per call so a baseline-compatible `new SagaCompensator({ clock })` remains observable in the
+  composed runtime.
 
 ### Constants
 
@@ -76,6 +79,8 @@
 - Aspire-backed Flow-B execution — requires a coordinator-held runtime lease and is not authorized
   in this leaf.
 - Shared generated assets — no regeneration; stop/report if a check finds staleness.
+- Direct `SagaEngine.dispatchCascaded()` use as a public bus — the production composition root
+  routes through the bridge, while this compatibility path has no originating handle context.
 
 ### Contributor Path
 
@@ -87,30 +92,33 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Progress Log
 
-| Time                 | Slice | Step                 | Notes                                                                                                                                                       |
-| -------------------- | ----- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30T12:57:16Z | S1    | Re-baseline/research | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline. |
-| 2026-08-30T12:57:16Z | S1    | Design               | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                    |
-| 2026-08-30T13:10:51Z | S1    | Supervisor review    | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                     |
+| Time                 | Slice | Step                 | Notes                                                                                                                                                              |
+| -------------------- | ----- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-30T12:57:16Z | S1    | Re-baseline/research | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.        |
+| 2026-08-30T12:57:16Z | S1    | Design               | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                           |
+| 2026-08-30T13:10:51Z | S1    | Supervisor review    | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                            |
+| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1    | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate. |
 
 ## Decisions
 
-| Decision                           | Reason                                                              | Source                                           |
-| ---------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------ |
-| Retain/emit all five cascade spans | Each represents a real operation or attempted unsupported dispatch. | issue #1368, bridge/compensator code, plan D1–D4 |
-| Attribute set owns cross-plane key | Telemetry vocabulary stays out of runtime domain code.              | doctrine layering, plan D5–D6                    |
-| Explicit W3C handoff               | Handle span ends before bridge dispatch.                            | engine code, streams-core precedent, plan D7     |
-| Compensator owns compensation span | Covers direct/missing/nested/error paths and actual cascade size.   | runtime ownership doctrine, plan D3–D4           |
-| Plugin change is wiring only       | Core owns the convention; plugin composes it.                       | Archetype 5 thinness law                         |
+| Decision                           | Reason                                                                                                                            | Source                                       |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Retain/emit all five cascade spans | Complete measures the engine's persisted completion transition; the other four measure real bridge/compensator work or rejection. | issue #1368, PLAN-EVAL F1, plan D1–D4/D9     |
+| Attribute set owns cross-plane key | Telemetry vocabulary stays out of runtime domain code.                                                                            | doctrine layering, plan D5–D6                |
+| Lock two correlation precedences   | Publisher key wins for cross-plane ID; definition rule wins for saga key; downstream spans consume both engine-selected values.   | PLAN-EVAL F3, plan D6–D8                     |
+| Explicit W3C handoff               | Handle span ends before bridge dispatch.                                                                                          | engine code, streams-core precedent, plan D7 |
+| Compensator owns compensation span | Covers direct/missing/nested/error paths and actual cascade size.                                                                 | runtime ownership doctrine, plan D3–D4       |
+| Plugin change is wiring only       | Core owns the convention; plugin composes it.                                                                                     | Archetype 5 thinness law                     |
 
 ## Drift
 
-| Drift                                                                                 | Severity    | Logged in drift.md |
-| ------------------------------------------------------------------------------------- | ----------- | ------------------ |
-| Owner-locked baseline differs from newly advanced local `origin/main`                 | minor       | yes                |
-| Owner-assigned Codex S1 route differs from generic deep-research route                | minor       | yes                |
-| RTK executable absent despite repo preference                                         | minor       | yes                |
-| Initial S1 plan omitted the MCP export corpus gate and over-assigned the runtime gate | significant | yes                |
+| Drift                                                                                  | Severity    | Logged in drift.md |
+| -------------------------------------------------------------------------------------- | ----------- | ------------------ |
+| Owner-locked baseline differs from newly advanced local `origin/main`                  | minor       | yes                |
+| Owner-assigned Codex S1 route differs from generic deep-research route                 | minor       | yes                |
+| RTK executable absent despite repo preference                                          | minor       | yes                |
+| Initial S1 plan omitted the MCP export corpus gate and over-assigned the runtime gate  | significant | yes                |
+| PLAN-EVAL found no-op complete ownership and an invalid mechanical red-before contract | significant | yes                |
 
 ## Gate Results
 
@@ -148,4 +156,8 @@ a process seam. A thin plugin may only wire the core primitive.
 - PLAN-EVAL should inspect D1–D10, especially explicit trace handoff, the unsupported spawn error
   span, the expected MCP corpus movement, and the supervisor-only Flow-B runtime acceptance gate.
 - S2 must be a failing-test-only commit. Do not edit product source until its raw nonzero exit and
-  exact counts are recorded against the locked baseline.
+  exact `N passed / 2 failed` assertion counts are recorded against the locked baseline. The test
+  must compile using `createSagaRuntime`, a recording tracer, and `new SagaCompensator({ clock })`;
+  a type-check/load/crash failure or zero failed tests does not satisfy S2.
+- PLAN-EVAL cycle 2 must verify option (a): `saga.cascade.complete` is engine-owned around the
+  persisted completion transition, while Flow-B proves only the real handle-to-compensator edge.
