@@ -60,6 +60,8 @@ the capture provenance in that fixture folder's README, then update the parity e
 | 2026-08-30 | 2 | implementation | Copied S2 V5 `aspire ps` JSON, applied documented deterministic redaction, and parameterized probes across 13.4.6/13.5.3. |
 | 2026-08-30 | 2 | reconcile | PR #1741 body and S2 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending. |
 | 2026-08-30 | 3 | implementation | Added redacted 13.5.3 banner/describe cases beside retained 13.4.6 cases in MCP and CLI E2E consumers. |
+| 2026-08-30 | 3 | reconcile | PR #1741 body and S3 trail comment updated; no supervisor/evaluator verdict observed, so review remains pending. |
+| 2026-08-30 | 4 | implementation | Documented the sole 13.4.6 dashboard capture, exact phase-B GETs, lease boundary, filenames, and parity promotion step. |
 
 ## Decisions
 
@@ -93,6 +95,8 @@ the capture provenance in that fixture folder's README, then update the parity e
 | Slice 3 tests + parity | structured test wrapper on four focused tests | PASS | 52/52; phase-A parity is green. |
 | Slice 3 lint | scoped lint wrapper with desktop-native fixture excluded | PASS | 277/277 processed, 0 findings. |
 | Slice 3 fmt | scoped fmt wrapper with desktop-native fixture excluded | PASS | 277/277 processed, 0 findings. |
+| Slice 4 phase-A parity | structured test wrapper on compat parity | PASS | 1/1; `pending-lease` remains absent and enforced. |
+| Slice 4 telemetry README fmt | raw owned-file format check | PASS_AFTER_FIX | One list wrap corrected; 1/1 checked. |
 
 ### Fitness Gates
 
@@ -101,6 +105,8 @@ the capture provenance in that fixture folder's README, then update the parity e
 | F-3/F-5/F-10/F-19 | NOT_RUN | Slice 5 | Pending implementation. |
 | Slice 3 `quality:scan` | PASS | Repository task, 0 findings | 7 pre-existing bounded allowances; none touched. |
 | Slice 3 `arch:check` | PASS | Repository task, exit 0 | Existing warnings only; no new FAIL. |
+| Slice 4 `quality:scan` | PASS | Repository task, 0 findings | No package code changed. |
+| Slice 4 `arch:check` | PASS | Repository task, exit 0 | Existing warnings only; no new FAIL. |
 
 ### Runtime Gates
 

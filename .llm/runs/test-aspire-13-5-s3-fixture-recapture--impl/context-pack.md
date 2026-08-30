@@ -12,9 +12,9 @@
 
 ## Current State
 
-Draft PR #1741 contains pushed slices 1–2. Slice 3 now adds S2-derived 13.5.3 banner/describe cases
-beside retained 13.4.6 cases across MCP and CLI E2E. No runtime has started, and dashboard telemetry
-remains absent by design.
+Draft PR #1741 contains pushed slices 1–3. Slice 4 documents the dashboard telemetry lease boundary,
+exact phase-B GETs, expected filenames, and parity promotion step. No runtime has started, and the
+13.5.3 telemetry envelope remains absent by design.
 
 ## Completed
 
@@ -22,15 +22,17 @@ remains absent by design.
 - Slice 1 RED receipt at `receipts/01-parity-red.json`.
 - Draft PR #1741 with labels, milestone 0.0.7, and S1 commit-trail comment.
 - Slice 2 commit `b8b1c3b6f` pushed with its PR trail comment.
+- Slice 3 commit `2e4e3e785` pushed with its PR trail comment; focused tests and doctrine gates pass.
 
 ## In Progress
 
-- Slice 3 commit/push and PR trail comment; scoped tests and doctrine gates pass.
+- Slice 4 documentation/parity validation.
 
 ## Next Steps
 
-1. Commit, push, and comment slice 3.
-2. Record the executable phase-B telemetry deferral.
+1. Run slice 4 parity and owned-document formatting checks.
+2. Commit, push, and comment slice 4.
+3. Run the full phase-A gate set and draft the #413 comment.
 
 ## Key Decisions
 
@@ -53,6 +55,7 @@ remains absent by design.
 | `packages/mcp/tests/fixtures/README.md` | new | Describe capture provenance. |
 | `packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts` | changed | Both describe shapes exercise endpoint selection. |
 | `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts` | changed | Both banners exercise topology evidence. |
+| `packages/mcp/tests/fixtures/telemetry/README.md` | new | Lease-backed phase-B capture contract. |
 
 ## Gates
 
@@ -60,7 +63,7 @@ remains absent by design.
 | --- | --- | --- |
 | Static | S1 expected RED; S2/S3 scoped gates PASS | worklog gate table |
 | Fitness | slice 3 quality/architecture PASS | `quality:scan`, `arch:check` |
-| Runtime | N/A phase A | lease boundary |
+| Runtime | N/A phase A | telemetry README + drift entry |
 | Consumer | pending | export corpus gate |
 
 ## Open Questions
