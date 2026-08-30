@@ -598,3 +598,90 @@ The branch delta contains exactly the eleven authorized product/test paths plus 
 acceptance boxes, labels, milestone, and readiness state remain coordinator-owned and untouched. S10
 may land as author evidence now so the supervisor can sequence the required runtime gate; no author
 IMPL-EVAL or self-certification follows.
+
+## Supervisor Tier-A sign-off — `a073e0b1` (post-F1 repair)
+
+Reviewer is the fixes topic supervisor: not the author, not either evaluator. Every check was
+re-derived independently — by re-running the command, from the commit's own file list, or from a
+pristine base worktree — never read out of the author's receipts.
+
+**Tier-A PASSES at this head.** The mandatory fresh opposite-family IMPL-EVAL (cycle 2 of 2) and the
+supervisor-coordinated `scaffold.runtime` report remain outstanding before readiness.
+
+### The green is product-caused, proven across three real committed heads
+
+| Head | State | Focused suite |
+| --- | --- | --- |
+| `e24e7ce1` | regression only, no product change | exit 1 · 5 passed / **1 failed** |
+| `8dcb578f` | AI side reports its selection; **host unchanged** | exit 1 · 5 passed / **1 failed** |
+| `4e1fed64` | host consumes the inspect report | exit 0 · **6 passed / 0 failed** |
+
+Publishing the report changed nothing. The green appears only when the host consumes it. This is a
+stronger demonstration than the base-archive hybrid used earlier in this leaf, because all three
+points are real heads rather than a constructed tree.
+
+### Exact-head gates re-run at `a073e0b1`
+
+| Gate | Result |
+| --- | --- |
+| Head identity | local == `origin` == PR #1739 `headRefOid`; tree clean |
+| Product ceiling | no path outside the authorized **eleven** |
+| `deno.lock` | byte-unchanged vs `origin/main` |
+| Focused regression suite | exit 0 · **6 passed / 0 failed** |
+| Related doctor/generator suites | exit 0 · 54 passed / 0 failed |
+| AI plugin CLI suites | exit 0 · 12 passed / 0 failed |
+| Scoped type check (10 ceiling `.ts`) | exit 0 |
+| Scoped lint (root rules, `packages/cli` exclusion removed) | exit 0 · 10 files · 0 findings |
+| `check:mcp-export-corpus` / `check:publish-assets` | exit 0, both measured negatives |
+| `deno publish --dry-run` (cli) | Success |
+| `doc:lint` (cli) | 0 errors across three entrypoints |
+| `quality:gate` | exit 0 |
+
+### Contract verified in the source, not from the slice comments
+
+- **Fail-closed is structural.** `inspectionProtocolDeclared` is
+  `Object.hasOwn(generator, 'inspectionProtocol')` — *presence*-based. A manifest declaring
+  `inspectionProtocol: 2` or `"1"` therefore still takes the inspect path and **fails validation**
+  rather than quietly reverting to the manifest walk. `fail()` is a `never`-returning throw, and both
+  `catch` blocks route into it — a non-JSON stdout, and an unreadable reported source, the latter with
+  an explicit comment that this preserves fail-closed instead of leaking a filesystem-shaped error
+  through the doctor surface.
+- **Legacy behaviour is genuinely untouched** when no protocol is advertised.
+- **Claims stay bounded.** Dry-run entries carry `sourceAuthority: 'generator' | 'manifest'`, so
+  healthy output states which authority produced the evidence rather than implying one.
+- **PE-2** — plain `inspectAiRegistries` builder, with per-target deep equality of the report's
+  `sourceFiles` against `compileAiRegistry(...).files` (membership *and* order), plus a layer-1
+  no-writes snapshot. The divergence PE-2 warned about is closed by construction.
+- **PE-5** — the regression lives in path 6; `installed-runtime-registry-integration_test.ts` is
+  untouched by this leaf.
+- **PE-8** — `check:mcp-export-corpus` recorded as raw reproducible evidence, explicitly not a catalog
+  receipt.
+- **PE-10** — neutral title `'Runtime registry inspection'`.
+- **Sweep-1** — `EmptyPluginRegistryError` retained, now guarding both paths.
+
+### Two reds this leaf declines to fix — both re-derived, both genuinely baseline
+
+1. **Scoped fmt on `public-command-dependencies.ts`.** This could **not** be dismissed on file
+   identity, because the leaf did modify that file. Attributed at line granularity: the head finding
+   is at **line 1** (an `import {` `deno fmt` wants collapsed); a pristine `origin/main` archive
+   produces the **identical finding at the identical line 1**; and the leaf's only change to the file
+   is at **line 317**. Base-owned, compared at the granularity of the claim.
+2. **`doc:lint --root plugins/ai` exits 1 with 17 findings** (16 private-type refs, 1 other). Verified
+   by running the same command in a **pristine detached worktree at base `13878a80a`**: exit 1, 17
+   errors, 16 private-type refs, 1 other — identical totals. The leaf touches no AI public entrypoint
+   (`.`, `./adapter-cli`, `./public`, `./plugin`, `./adapter`, `./scaffold`, `./contracts` are all
+   unchanged). Baseline fitness debt, correctly recorded as such rather than presented as a passing
+   leaf verdict.
+
+### PE-9's WARN arrived exactly as predicted
+
+`WARN A8/AP-1/F-1: file is 673 lines (cap 500) … installed-runtime-registry-generator.ts`. Path 2 grew
+478 → 673 because the coordinator forbade splitting the parser into its own file. It is a `WARN`,
+`arch:check` fails only on `fail` totals, `quality:gate` exited 0, and the expectation was written
+into the plan *before* it happened. A predicted, recorded consequence — not unrecorded drift.
+
+### Not done here, by design
+
+No readiness flip, no merge, no relabel beyond phase truth, no issue edit, no acceptance-box tick, and
+no runtime gate. `scaffold.runtime` is supervisor-coordinated and is sequenced separately under the
+serialized singleton lease, with the sandbox returned to Aspire/Docker zero afterwards.
