@@ -1225,6 +1225,45 @@
       "admissionPredicate": "high-value-coherent",
       "targetMilestone": "0.0.7",
       "movedAt": "2026-08-30T09:12:09.000Z"
+    },
+    {
+      "number": 1642,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Owner explicitly admitted the detached non-TTY/dashboard-token documentation into 0.0.7 and Aspire S11 closes it.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1642",
+        "https://github.com/rickylabs/netscript/pull/1771"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T14:21:34.000Z"
+    },
+    {
+      "number": 1770,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "The newly discovered fatal background-reference preflight path requires truthful public documentation and generated-agent asset parity in 0.0.7.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1770",
+        "https://github.com/rickylabs/netscript/pull/1772"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T14:05:00.000Z"
+    },
+    {
+      "number": 1774,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "A cwd-relative checked-in Claude hook command creates repeated false failures across active harness supervisors and evaluators.",
+      "evidence": ["https://github.com/rickylabs/netscript/issues/1774"],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-30T14:26:00.000Z"
     }
   ]
 }

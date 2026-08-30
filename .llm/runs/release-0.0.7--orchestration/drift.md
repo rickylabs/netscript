@@ -1326,3 +1326,17 @@ implementation thread.
 - The same verdict ratified Aspire S13's endpoint precedence and accepted the Phase-B topology
   diagnosis. Static S13 work may advance; local Phase-B runtime remains prohibited until identical
   bind paths and reachable published ports are proven.
+
+## 2026-08-30 — live GitHub leaves outran the persisted cluster ledger
+
+- The resumed supervisors advanced or opened ten leaves while the central cluster file retained
+  older heads and omitted the new PRs. A partial head-only edit would still have left intake,
+  inventory, DAG membership, generated status, and ownership internally contradictory, so the
+  coordinator repaired the complete validator-controlled set atomically.
+- Reconciliation corrected two semantic drifts, not just timestamps: #1740 does not close #1365,
+  and #1616 remains a fixes-owned issue even though internals created the clean plan checkpoint.
+  The latter must cross lanes as an explicit handoff; no topic ownership was silently rewritten.
+- Current candidate truth also changed after independent review: #1763's bounded repair is sound but
+  lacks renewed Tier-A/evaluation, while #1764 still contains a reproduced product regression and
+  cannot advance on paperwork-only corrections. These are recorded as gates, not waived as stale
+  supervisor prose.

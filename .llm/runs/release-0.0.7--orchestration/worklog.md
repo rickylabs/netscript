@@ -2495,3 +2495,21 @@
   No lease will be burned before those two probes pass; topology-independent Aspire work continues.
 - #1642 was already assigned to milestone 0.0.7 when checked live, so the requested milestone move
   was already satisfied and no redundant GitHub mutation was made.
+
+## 2026-08-30T14:28:00Z — atomic live-leaf reconciliation and renewed shipping gates
+
+- Reconciled the central ledger against Git and current GitHub state instead of historical session
+  paths. Ten live leaves were absent from cluster state, six recorded heads were stale, #1740
+  incorrectly claimed closure of #1365, and #1664 still carried an obsolete phase. Intake,
+  inventory, dependency DAG, lane queues, leaf records, and generated status were updated as one
+  validator-bound transition rather than allowing partial control-plane truth.
+- Preserved #1616 in its frozen `fixes` ownership. The internals supervisor's clean plan-only
+  bootstrap at PR #1773 is a handoff checkpoint, not authority to silently reassign the accepted
+  topic; product implementation proceeds only under the fixes queue.
+- Current exact candidate heads are #1763 `1c836918` (bounded guard repair complete, fresh Tier-A
+  and evaluator still required), #1764 `be3d1546` (real correlation-identity regression remains),
+  #1772 `0e9fc593` (repair pushed, old evaluation stale), and #1736 local `40ab61a7` over remote
+  evaluator carrier `eb765629` (owner-authorized cycle-3 repair awaiting fresh exact-head gates).
+- Added newly admitted #1642, #1770, and #1774 consistently to intake, inventory, DAG, lane queues,
+  and committed issue scope. The DAG edge `#1722 -> #1642` records the S10/S11 stack dependency;
+  independent docs and internals work remains parallel rather than globally serialized.

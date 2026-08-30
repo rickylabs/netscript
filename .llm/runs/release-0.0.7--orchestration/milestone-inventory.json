@@ -5,7 +5,7 @@
   "capturedAt": "2026-08-30T13:51:57.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
-  "targetIssueCount": 110,
+  "targetIssueCount": 113,
   "issues": [
     {
       "number": 1093,
@@ -1279,6 +1279,36 @@
         "https://github.com/rickylabs/netscript/pull/1761",
         "PR #1761 exact head c1700128e38dd923cd57298c171b5976ec690a83 passed the complete seven-row coordinator gate and a fresh separate-session native Fable 5 IMPL-EVAL, merged as a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81 at 2026-08-30T13:36:41Z, and closed #1757 at 13:36:42Z; both items are status:shipped.",
         "The live v0.0.6..a5520e70 triage reconciles all 37 commits as 17 Include / 20 Exclude, and the repaired scanner wording distinguishes declared env/net permissions from optional env access and conditional network use."
+      ]
+    },
+    {
+      "number": 1642,
+      "title": "docs(aspire): expose detached non-TTY start state and dashboard-token discovery",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1642",
+        "Owner explicitly admitted #1642 to 0.0.7 as part of Aspire S11 / PR #1771."
+      ]
+    },
+    {
+      "number": 1770,
+      "title": "docs(aspire): the fatal background-reference preflight error is undocumented",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1770",
+        "Direct-to-main PR #1772 is the bounded documentation and generated-asset leaf."
+      ]
+    },
+    {
+      "number": 1774,
+      "title": "fix(agentic): make Claude hook logging independent of turn cwd",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1774",
+        "The false Module-not-found hook reproduced in multiple active 0.0.7 supervisor/evaluator sessions and wastes every nested-cwd tool/stop event."
       ]
     }
   ]

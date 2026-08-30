@@ -1478,3 +1478,19 @@ continues concurrently because serial ordering is per orchestrator, not global.
   Docker version, quotas, or host lifecycle. Continue all static/topology-independent slices and
   grant no Phase-B lease until identical-path mount and loopback reachability probes pass.
 - #1642 already belongs to milestone 0.0.7. Exact main is still `3e5cbabf...`; runtime is zero.
+
+## Resume checkpoint — 2026-08-30T14:28:00Z
+
+- Central inventory, intake, DAG, cluster state, lane queues, and generated status now include every
+  reconciled live leaf. Do not revive historical paths or inferred closure mappings: Git/current
+  GitHub are authoritative. In particular #1740 closes #979/#1370/#1717, not #1365.
+- #1763 is at pushed repair `1c836918` and needs fresh Tier-A plus a separate exact-head evaluator.
+  #1764 is at `be3d1546` and remains product-red until explicit scheduled/send correlation identity
+  and trace fallback are repaired and tested. #1772 is pushed at `0e9fc593` and needs renewed audit,
+  evaluation, and CI. #1736's cycle-3 repair is local `40ab61a7` over remote `eb765629` and must not
+  be merged until exact-head gates and the separately leased evaluator pass.
+- #1616 remains owned by fixes. Internals may preserve its clean plan-only PR #1773 checkpoint, then
+  must hand it to fixes without changing topic ownership. #1774 is the internals follow-up for
+  cwd-independent Claude hook logging.
+- Exact main remains `3e5cbabf...`; preserve runtime zero and serialize only host runtime leases,
+  never the independent topic queues.
