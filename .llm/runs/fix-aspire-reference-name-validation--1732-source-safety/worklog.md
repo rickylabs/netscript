@@ -108,14 +108,38 @@ composed config boundary → final static gates.
 | PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                    |
 | PLAN-EVAL cycle 2                                             |    — | `FAIL_FIX`; owner-verified mechanical corrections applied and gate released; no cycle 3       |
 
+## Final Static Gate Table
+
+The fired gates below are repeated without source changes after the slice-4 evidence commit. Root
+`deno task test` remains **NOT FIRED**, and no runtime substitute is used.
+
+| #  | Gate                        | Exit | Final evidence contract                                                                                                                                                                     |
+| -- | --------------------------- | ---: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | Focused tests               |    0 | PASS — 143 passed, 0 failed across `config_test.ts` and both background-generator test files                                                                                                |
+| 2  | Focused check               |    0 | PASS — all 7 changed TypeScript source/test/fixture files selected; zero findings                                                                                                           |
+| 3  | Focused lint                |    0 | PASS — Aspire 3/3 plus CLI 4/4 selected and processed; zero findings                                                                                                                        |
+| 4  | Focused format              |    0 | PASS — Aspire 3/3 plus CLI 4/4 selected and processed; zero findings                                                                                                                        |
+| 5  | Root structured check       |    0 | PASS — 2,929 files, 25 batches, zero failed batches/findings                                                                                                                                |
+| 6  | Root test                   |    — | **NOT FIRED** — owner instruction due host PID-1 zombie exhaustion; no green claimed                                                                                                        |
+| 7  | Root structured lint        |    0 | PASS — 2,044/2,044 files processed, no dropped coverage or findings                                                                                                                         |
+| 8  | Root structured format      |    0 | PASS — 2,044/2,044 files processed, zero findings                                                                                                                                           |
+| 9  | Code-quality scan           |    0 | PASS — no findings or allowance failures; `allowCount` remains exactly 7                                                                                                                    |
+| 10 | Doctrine / architecture     |    0 | PASS — dependency and doctrine checks complete; existing warnings only, no failures                                                                                                         |
+| 11 | Asset barrel                |    0 | PASS — canonical generator produced no owned generated-asset diff                                                                                                                           |
+| 12 | Aspire doc-lint comparison  |    1 | EXPECTED BASELINE — zero combined errors/missing JSDoc; only existing per-entrypoint private-type-reference exits                                                                           |
+| 13 | Aspire JSR audit comparison |    1 | EXPECTED BASELINE — four existing F-JSR-2 failures plus one F-JSR-7 warning; dry-run OK; no new finding                                                                                     |
+| 14 | Generated-source semantics  |    0 | PASS — focused tests parse/execute every matrix row and preserve the raw key; JSON schema remains 9,988 bytes at SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881` |
+
 ## Handoff Notes
 
 - Slice 2 published head: `6e82aad1d4e0f4e14a5e4d6ed1395b6169505099` (copied from `git log`).
-- Slice 3 is green and ready to publish. The rule remains absent from `src/domain/mod.ts`, package
-  barrels, export maps, and exported symbol types.
+- Slice 3 published head: `0d25cce469a784596101d331445b176be34cdbd6` (copied from `git log`).
+- The rule remains absent from `src/domain/mod.ts`, package barrels, export maps, and exported
+  symbol types.
 - Aspire grammar was **not executed against Aspire in this leaf**. The source/docs-derived rule is
   protected by load-bearing literal escaping plus user-text-free ordinal bindings in the
   implementation order.
 - Plan-release head: `f1d7d9d8f738b4907e1c770051ee1f59abaacc4a` (copied from `git log`).
-- The RED commit SHA is copied from `git log` into the PR slice comment after publication because a
-  Git commit cannot contain its own object ID.
+- Final pushed evidence head is the commit containing this table; its exact immutable SHA is copied
+  from `git log` into the PR slice-4 comment and handoff because a Git commit cannot contain its own
+  object ID.

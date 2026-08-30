@@ -9,8 +9,8 @@
   scaffold-produced name.
 - **Actual:** An exact grammar changes observable scaffold/config acceptance.
 - **Severity:** significant
-- **Action:** owner approved an observable fail-fast correction; preserve it in plan/PR and require
-  separately certified PLAN-EVAL before implementation.
+- **Action:** owner approved an observable fail-fast correction, preserved it in plan/PR, and
+  released implementation after independently verifying the final PLAN-EVAL mechanical findings.
 - **Evidence:** `research.md` findings 3–7.
 
 ## 2026-08-30 — RTK unavailable

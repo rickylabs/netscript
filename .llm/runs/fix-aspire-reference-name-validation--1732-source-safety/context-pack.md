@@ -6,16 +6,17 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-aspire-reference-name-validation--1732-source-safety` |
 | Branch         | `fix/aspire-reference-name-validation`                     |
-| Current phase  | `implementation` — slice 3 green                           |
+| Current phase  | `implementation` — final static evidence reconciliation    |
 | Archetype      | `6 — CLI / Tooling` (dominant surface)                     |
 | Scope overlays | none                                                       |
 
 ## Current State
 
-Slices 2 and 3 are green. Source-safe emission is load-bearing beneath an exact private Aspire
-resource-name rule applied through a background-object `superRefine`. The full focused matrix passes
-143/143. The generated JSON schema is byte-for-byte unchanged from the slice-2 baseline, and the
-private rule is not re-exported or exposed through a public type.
+Slices 2 and 3 are pushed and green. Source-safe emission is load-bearing beneath an exact private
+Aspire resource-name rule applied through a background-object `superRefine`. The full focused matrix
+passes 143/143, the generated JSON schema is byte-for-byte unchanged, and the private rule is not
+re-exported or exposed through a public type. The complete static gate set has been populated for a
+final-head rerun after this artifact reconciliation commit.
 
 ## Completed
 
@@ -42,12 +43,16 @@ private rule is not re-exported or exposed through a public type.
   shared `ReferenceFields`, record-key schemas, or published JSON-schema output.
 - Confirmed identical `z.toJSONSchema(AppSettingsSchema)` serialization before/after: 9,988 bytes,
   SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881`.
+- Published slice 2 at `6e82aad1d4e0f4e14a5e4d6ed1395b6169505099` and slice 3 at
+  `0d25cce469a784596101d331445b176be34cdbd6`.
+- Completed the authorized static set provisionally: all fired code/repo gates pass; doc-lint and
+  JSR audit match their recorded nonzero baselines; root test remains NOT FIRED.
 
 ## Next Steps
 
-1. Commit and push slice 3 with its focused receipts.
-2. Run the ratified 14-row static gate set at the final product head.
-3. Reconcile run artifacts and the draft PR without triggering IMPL-EVAL.
+1. Commit and push this final evidence reconciliation.
+2. Repeat every fired static gate without source changes at that exact pushed head.
+3. Update the draft PR body/comment and stop for owner-dispatched IMPL-EVAL.
 
 ## Files Changed
 
@@ -56,8 +61,9 @@ private rule is not re-exported or exposed through a public type.
 
 ## Gates
 
-The full focused suite passes 143/143; slice-3 scoped check/lint/format all pass with complete
-selection coverage. Root test remains explicitly `NOT FIRED`; no runtime/E2E gate has run.
+All fired focused/root/code-quality/architecture/asset gates pass. Doc-lint and JSR audit retain
+only their recorded existing findings. Root test remains explicitly `NOT FIRED`; no runtime/E2E gate
+has run. The complete 14-row table is in `worklog.md`.
 
 ## Open Questions
 
@@ -75,5 +81,8 @@ selection coverage. Root test remains explicitly `NOT FIRED`; no runtime/E2E gat
 ## Commits
 
 - `2176041116f3eb40c2d035f1e22d20c024e8a0dc` — initial narrowed plan artifact.
+- `5b84eaea5ad80a0ac21936cfc60deec89897fc0c` — visible RED matrix.
+- `6e82aad1d4e0f4e14a5e4d6ed1395b6169505099` — source-safe background emission.
+- `0d25cce469a784596101d331445b176be34cdbd6` — private Aspire grammar lock.
 - The complete artifact/published head SHA is copied from final `git log` into the draft PR phase
   comment and final handoff.
