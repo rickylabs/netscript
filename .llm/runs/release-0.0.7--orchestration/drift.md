@@ -1522,3 +1522,16 @@ implementation thread.
   report contradicted itself about prior-report reuse, covered only 5/14 entrypoints freshly, cited
   superseded heads, and left issue Scope boxes unchecked, even though its product diff and
   mergeability were clean. Exact-head evidence and checklists must agree before coordinator merge.
+
+## 2026-08-30 — prospective model-policy migration does not invalidate terminal evidence
+
+- The owner promoted #1774's substantive DeepSeek/high verdict and then explicitly ruled all
+  existing DeepSeek evaluations valid without rerun. The new GLM/Qwen defaults apply only to newly
+  dispatched evaluations after #1791 lands; retroactive regeneration would burn time without
+  changing product evidence and is forbidden.
+- OpenRouter's live catalog names the requested plan model `qwen/qwen3.8-flash`, not a separate
+  `Qwen3.8-Flash-Next` slug. Tooling must use the canonical id, preserve old ids only for persisted
+  record compatibility, and avoid claiming OpenHands `max` effort until that adapter can attest it.
+- #1739 demonstrates why green core CI is not sufficient: a later review can add real unanswered
+  threads and correctly make close-gate red. Those bounded findings require code/tests and thread
+  resolution, but not a wholesale rerun of an owner-accepted evaluator receipt.

@@ -21,6 +21,25 @@
 | PLAN-EVAL session         | Claude `2439b19d-5df7-4920-9fce-fa5831ec4fdf`; opposite family                                                  |
 | PLAN-EVAL cycle           | 2 of 2: `APPROVED` at plan head `331f7c664`                                                                     |
 
+## Live NAS control-plane correction — 2026-08-30
+
+- Canonical coordinator repository is `/home/agent/projects/netscript/repo`; the durable harness is
+  `/home/agent/projects/netscript/worktrees/007-primary/.llm/runs/release-0.0.7--orchestration`.
+  `/home/codex` is compatibility-only and older `/home/codex/repos/...` entries below are
+  historical.
+- The primary coordinator remains this exact Remote Control thread on GPT-5.6-SOL/high, never max.
+  Five current native Claude Remote Control topic supervisors are `netscript-007-features-r2`,
+  `netscript-007-fixes-r2`, `netscript-007-internals-r2`, `netscript-007-docs-r2`, and
+  `netscript-007-aspire-r2`. Preserve their topic ownership; serial queues apply inside each one,
+  never globally across them.
+- Current main is `a3ddcbb598f81180437e06f743e24d6ef137b101`. Docker is the isolated
+  `tcp://netscript-dind:2375` sandbox, client/server 28.5.2, with `/home/agent` mounted identically;
+  direct publications use `netscript-dind:<port>`. Runtime leases remain globally serialized and
+  must clean Aspire, containers, volumes, AppHosts, and relays to exact zero.
+- Prospective open-model routing is GLM 5.3 Flash/max for default/hybrid and IMPL-EVAL, Qwen 3.8
+  Flash/max for conditional PLAN-EVAL. Existing terminal DeepSeek evaluations remain valid by owner
+  ruling and must not be rerun. Issue #1791 owns the checked-in policy migration.
+
 The coordinator identity was recovered and transcript-verified at `2026-08-14T22:41:15Z` rather than
 inferred from a child thread. Its `session_meta` identifies Codex Desktop/OpenAI, its persistent
 goal names the 0.0.7 milestone coordinator mandate, it created this canonical harness run, and it

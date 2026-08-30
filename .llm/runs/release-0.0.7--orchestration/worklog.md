@@ -2784,3 +2784,31 @@
   clean, but scope boxes, head provenance, current-head comment, and 9/14 entrypoint coverage were
   incomplete. Corrections and CI are active. Independent read-only audits were also dispatched for
   PRs #1747 and #1758 so their narrow blockers can be removed without idling the merge train.
+
+## 2026-08-30T23:18:00Z — #1775 shipped; prospective evaluator routing isolated from old receipts
+
+- The owner accepted the substantive DeepSeek/high `PASS` for #1774 as the final qualifying receipt
+  and explicitly ruled that existing DeepSeek evaluations remain valid without rerun. PR #1775
+  merged with `--match-head-commit 58b04be6c`; main advanced to
+  `a3ddcbb598f81180437e06f743e24d6ef137b101`, #1774 closed, and both issue/PR lifecycle labels were
+  normalized to sole `status:shipped`.
+- The new open-model policy is prospective only: GLM 5.3 Flash (`z-ai/glm-5.3-flash`) at `max` for
+  default/hybrid and formal IMPL-EVAL routing; Qwen 3.8 Flash (`qwen/qwen3.8-flash`) at `max` for
+  conditional PLAN-EVAL. The requested “Flash-Next” wording resolves to OpenRouter's live canonical
+  Qwen id; historical DeepSeek/Minimax/Qwen-Max identifiers remain readable but are no longer
+  canonical defaults. Issue #1791 and branch `chore/agentic-open-evaluator-routing` own this bounded
+  tooling change from exact main; GPT-5.6-SOL/high implementation is live.
+- Main's #1775 delta changes the agentic README consumed by docs #1790. Its old green carrier
+  `c11f75768` is therefore held: docs must integrate exact main and authoritatively regenerate
+  agent-doc prose, asset barrel, and publish assets before a new current-head merge packet. The
+  prior 14-entrypoint substantive receipt carries only by byte identity; no evaluator rerun is
+  authorized.
+- Independent audit of fixes PR #1739 found zero current-main path intersection and green core CI,
+  but close-gate correctly exposed two new valid Augment threads: malformed advertised inspection
+  declarations could fall back instead of fail closed, and a thrown process launch could bypass the
+  stable protocol-failure prefix. A focused post-evaluation amendment and regressions are active;
+  the accepted DeepSeek verdict is not rerun.
+- The live runtime census remains exact zero: `aspire ps --format json == []`, Docker containers
+  `0`, volumes `0`. S6 v2 has reconstructed the required runtime-module boundary and listener
+  semantics in commits `a3e4b0f07` and `b34722425`; two generator/test paths remain in progress
+  before static gates and the first serialized DinD Phase-B lease.

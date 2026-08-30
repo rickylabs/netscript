@@ -1724,3 +1724,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
   left all five #1788 Scope boxes open, and freshened only 5/14 entrypoints while saying prior
   evidence was not reused. Merge is held until all 14 receive one coherent exact-head synthesis,
   bodies/comments/checklists are rewritten in place, and current-head CI completes.
+
+## Resume delta — 2026-08-30T23:18Z
+
+- Authoritative main is `a3ddcbb598f81180437e06f743e24d6ef137b101` after #1775 shipped. The owner
+  accepts its existing DeepSeek/high evaluation and all prior terminal DeepSeek receipts; do not
+  rerun them because of the prospective routing-policy change.
+- Issue #1791 owns the prospective default change: GLM 5.3 Flash/max for default, hybrid, and formal
+  implementation evaluation; Qwen 3.8 Flash/max for conditional plan evaluation. Preserve legacy
+  preset deserialization. The canonical OpenRouter Qwen id is `qwen/qwen3.8-flash`; there is no
+  separately catalogued `-next` id.
+- #1739 is held only for two new valid fail-closed review amendments and its resulting close-gate;
+  core exact-head CI and zero-intersection current-main audit are already green. #1790 must
+  regenerate its agent-doc carriers because #1775 changed their README input. Neither leaf needs a
+  repeated DeepSeek evaluation.
+- S6 v2 remains the runtime priority. After its static reconstruction completes, require exact host
+  zero, run its one serialized DinD/relay Phase-B lease, clean to zero, then give #1747 the next
+  runtime slot. Docs, fixes, features, and internals continue independently.
