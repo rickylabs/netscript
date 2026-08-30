@@ -2892,3 +2892,121 @@ the issue will look untriaged when the leaf lands.
 No merge, publish, ready-flip, relabel, issue close, milestone change, central-cluster-state
 mutation, or release-writer lease. NAS worktree, thread, route identity, daemon proof, and resume
 commands stay in the local operational record, outside this repository.
+
+## 2026-08-30 — #1734 IMPL-EVAL cycle 2 `FAIL_FIX`; owner boundary fired; leaf parked; #1732 continues
+
+### Cycle 2 verdict
+
+`FAIL_FIX` at evaluated head `3b3044f7af178e740b577a80f83e785c1fd6ee7f`; verdict commit
+`eb765629206092f97b3dd8f76a64fa0c3769bcb8`, whose sole file is `impl-eval-cycle-2.md`.
+
+Cycle-1's F1 is **genuinely repaired** on the real transport, and so is the `{}`-from-`Error` case.
+RED was real, both range ends compile against the versions they name, the public contract and the
+`^5.101.0` range are untouched, no forbidden construct was added, and the revive resists
+prototype/shape attacks with no partial hydration and no input mutation. Two bounded defects remain,
+both inside `reviveSerializedError` — the function the R2 repair introduced:
+
+- **F1 (major)** — the revive rejects non-`Error`, non-record rejection values. A `mutationFn` that
+  rejects with a string, number, boolean, or array yields a `failureReason` that JSON preserves
+  faithfully and that `hydrate()` consumes; it hydrated on `main`, and at this head the entire state
+  is rejected, dropping every success query with it. Reproduced through the real
+  `renderToString(<QueryHydrationScript/>)` transport against both base and head.
+- **F2 (minor)** — a plain-object rejection value is silently collapsed to the synthetic fallback
+  `Error`, losing every original field, on the **in-memory** path as well as the wire, where the
+  "serialized" premise does not hold. Unstated and untested.
+
+### A gate of mine that missed it — recorded, not buried
+
+My Tier-A listed "`error` as array / string / number rejected" as evidence the revive was correctly
+**narrow**. That judgement was wrong; it is exactly cycle-2 F1. I attacked the guard for having
+become too *permissive* — the obvious risk when loosening validation — and never tested the opposite
+direction, whether it had become too *strict* against values that hydrated on `main`. Corrected
+publicly on the PR rather than left standing as an unqualified Tier-A `PASS` next to a `FAIL_FIX`.
+
+The transferable lesson, and it is the third variation of the same one in this leaf: **loosening a
+validator has two failure directions, and checking only the direction you were worried about is not
+checking it.** #1734 existed because a check was green only for the lockfile pin; cycle-1 F1 because
+a check was green only pre-serialization; cycle-2 F1 because a repair was checked only for
+over-permissiveness. Each time, the untested direction is where the defect was.
+
+### Owner boundary — no cycle 3
+
+Cycle 2 is the **second consecutive terminal IMPL-EVAL failure** for this leaf. Per the escalation
+rule carried into it, this lane did **not** authorize or launch a cycle 3 and did **not** freeze.
+**Only #1734 is parked**, pending the owner verdict; internals continues on its next serial issue.
+
+State preserved exactly, and verified rather than assumed:
+
+| Check | Result |
+| --- | --- |
+| Head local == remote == PR | `eb765629206092f97b3dd8f76a64fa0c3769bcb8` |
+| Evaluator diff vs evaluated head outside `.llm/` | **empty** — artifact-only boundary held |
+| `impl-eval.md` (cycle 1) | bit-identical (`git diff --quiet` → 0) |
+| PR #1736 | still **draft**, labels unchanged |
+| Issue #1734 | open, milestone `0.0.7`, untouched |
+
+Nothing merged, published, readied, relabelled, or closed. The leaf worktree was fast-forwarded
+(`--ff-only`) to the verdict head so local == remote == PR; no rewrite, no force. The evaluator
+session was stopped once its verdict was pushed; its worktree is kept as evidence.
+
+Park and the owner decision are recorded on the PR as comment `5467331760`.
+
+### The owner decision, stated exactly
+
+Both findings are bounded to `hydration.ts` with one RED round-trip test, and the evaluator states no
+change to `query-types.ts`, `query/mod.ts`, or the dependency range is required. So the question is
+which route to authorize, not whether a fix exists:
+
+1. authorize a cycle-3 repair on the existing leaf; or
+2. **rescope** — land the cycle-1 F1 repair, which is verified good, and split the
+   `reviveSerializedError` value-shape question into its own issue; or
+3. park longer / revert the R2 revive to a pass-through, trading type honesty for a smaller
+   behavioural delta.
+
+Lane recommendation, offered for ratification and **not acted on**: **(2)**. The serialized-shape
+repair the issue is actually about is proven correct at this head; what remains is a new question
+about how error-shaped values cross the boundary — raised by the repair brief, not by the original
+issue, and deserving its own acceptance criteria rather than a third cycle bolted onto this one.
+
+### #1732 — compatibility gate answered, plan in progress
+
+The author correctly hit the brief's mandatory stop: an exact Aspire grammar lock would reject
+`a--b`, `a-`, and over-64-character names that the current scaffold can produce. I re-derived that
+at `13878a80a5` rather than accepting it — the scaffold pattern does admit all three (executed), and
+`NAME_MAX_LENGTH` (64) is applied to the **project** name and `workspace-writer`, but **not** to
+`serviceName`, which is pattern-checked only.
+
+Two things I found that changed the decision:
+
+- **The source-safe half is nearly free.** `generate-register-background.ts` already routes error
+  messages through `JSON.stringify` and already derives identifiers via `safeIdentifier(...)`. The
+  only remaining raw interpolations are the single-quoted string literals
+  (`builder.addExecutable('${name}', …)`, `_services.get('${ref}')`).
+- **Reusing `SCAFFOLD_VALIDATION.NAME_PATTERN` would be a trap.** It is `[a-z]`-only, while Aspire's
+  default policy allows ASCII letters. Adopting it would lock out uppercase names the platform
+  accepts — a rule stricter than the platform, i.e. exactly the self-inflicted breaking change the
+  brief warned against.
+
+**Decision authorized: do both, escaping first as the load-bearing property, grammar lock layered on
+top.** The ordering is the argument: the grammar is *documentation-derived, not executed* — this leaf
+holds no runtime lease and cannot verify it by running Aspire. If a documentation-derived grammar is
+the only defence and it is wrong in the loose direction, the original syntax-error defect survives;
+with escaping underneath, a wrong grammar degrades to a wrong error message, never to unparseable
+generated TypeScript. That assumption and risk are required in `plan.md` and the PR body.
+
+Compatibility position approved and required to be stated, not assumed: the newly rejected values are
+**not runnable Aspire resource names today**, so this moves an existing failure earlier with a better
+message rather than removing working behaviour — named as a deliberate fail-fast correction, never as
+a no-op. Hyphenated names keep working and the raw `services__<ref>__http__0` key contract does not
+move.
+
+`PLAN-EVAL` is **not** `N/A` here — the compatibility decision earns a real gate. It is queued
+behind this lane's evaluator serialization and will run in a separate opposite-family session. The
+author was told to record `PLAN-EVAL: pending` and not to launch, simulate, or self-certify it.
+
+### Host drift worth carrying upstream
+
+`rtk` is **not installed on this host** (`command not found`), despite `AGENTS.md` and every brief in
+this lane mandating it for read-heavy commands. The author found it, I confirmed it, and I told it to
+call the underlying commands directly rather than try to install anything. This is repo-wide guidance
+that silently does not apply on the migrated plane — it needs a real fix, not a per-brief workaround.
