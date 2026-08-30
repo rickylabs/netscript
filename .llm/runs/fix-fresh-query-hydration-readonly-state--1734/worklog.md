@@ -251,3 +251,63 @@ Base reference for the record: remote `main` is `3e5cbabfcd0a8c1aea5383fa7e1c4f1
 (#1728)`), not current main.
 
 **The carrier is sealed. Cycle-3 IMPL-EVAL judges this head.**
+
+## 2026-08-30 — Supervisor cycle-4 Tier-A at `1fa320082` + local runtime lease released at exact zero
+
+### Exact-head static/Tier-A — every gate run by the supervisor in a detached worktree
+
+| Gate | Raw exit | Result |
+| --- | ---: | --- |
+| Root `deno task test` | **0** | **4,294 passed · 0 failed · 19 ignored · 0 unique failures** |
+| Scoped check / lint / fmt (`packages/fresh`, ts+tsx) | **0 / 0 / 0** | 0 findings |
+| `check:assets-barrel` | **0** | |
+| `quality:scan` | **0** | `allowCount` at baseline |
+| `arch:check` | **0** | inherited warnings only |
+| Cycle-4 RED → GREEN (`query-hydration-roundtrip_test.tsx`) | 1 → **0** | 11 pass/3 fail → **14 pass / 0 fail** |
+| Full `packages/fresh/tests/` | **0** | **22 passed / 0 failed** |
+
+**Supersedes the stale rows above** that recorded root test RED on `codex-follow_test` /
+`hybrid-launcher_test`; those belong to the retired ~7.7k-zombie host condition. Root test is green
+here. Earlier rows are left in place, dated and superseded, so the original decisions stay auditable.
+
+### The repair is total by construction, not by enumeration
+
+`reviveSerializedError(value: unknown): Error` — the signature admits **no representable rejection**,
+so the allowlist that failed three cycles running is gone rather than extended. `try/catch` guards both
+`value instanceof Error` and the prototype inspection (a revoked proxy can throw on either); message
+construction goes through a dedicated `serializedErrorMessage` builder instead of bare `String(value)`
+— the exact construct that threw past the cycle-3 guard. `{ cause: value }` preserves the original.
+Both call sites consume it unconditionally: mutation `failureReason` **and** query
+`fetchFailureReason`, closing the "query error twins" case structurally.
+
+Rebased onto `main` `24f6642f`. Cumulative product scope: `hydration.ts` plus tests and version-compat
+fixtures under `packages/fresh` — no public type, export, or dependency-range change.
+
+### Local runtime gate — topology FAIL, not a product verdict; lease released at exact zero
+
+The one authorized local run reached **37 PASS / 1 FAIL**, failing at `database.init` after 101,016 ms
+with *JSON-RPC connection lost while starting `netscript-db-postgres`*. That is the known D-55
+remote-DinD bind/loopback topology defect, **not** a verdict on this repair. `cleanup.aspire-stop`
+passed.
+
+**Zero-state proof after release:**
+
+| Probe | Result |
+| --- | --- |
+| `aspire ps` | no running AppHost |
+| Containers | **0** (`fb3f75f3c295`, `9a270b7be38d`, `61d6cfc72aec` removed) |
+| Volumes | **0** — anonymous `c853aa389cbb…` (created 18:05:34Z by this run) confirmed gone: *"no such volume"* |
+| Scoped `agentic:leak-check` | `probes.aspire ok`, `probes.docker ok`, **`survivors: []`** |
+| `.llm/tmp/cli-e2e` scratch | removed |
+
+Lease returned to the Aspire lane. **No retry:** the acceptance proof now comes from a hosted
+exact-head `e2e-cli.yml` dispatch, which runs on GitHub-hosted runners and therefore consumes no host
+lease.
+
+### Supervisor error, recorded
+
+The local run happened because **my** cycle-4 brief instructed it, and my gate-host countermand was
+queued for a turn boundary that had not arrived — the author reached the runtime step inside the same
+turn and correctly followed the standing instruction. Queuing a correction behind a writer lock is
+only safe when the corrected step is *after* the boundary; here it was not. A superseding instruction
+that cannot reach the worker in time is not a correction, it is a hope.
