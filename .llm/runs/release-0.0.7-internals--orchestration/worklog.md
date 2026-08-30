@@ -4635,3 +4635,66 @@ Leaf is at `069913e7` (cycle-3 verdict), clean, local == remote == PR. It **need
 merge-base and `24f6642f` touches **zero** files under `packages/fresh`, so the two-file product
 surface cannot conflict — but the rebase is still performed because the owner directed exact-main
 currency and the runtime gate must run against the integration head.
+
+## 2026-08-30 — OWNER PRIORITY: #1734 becomes the foreground internals leaf (Aspire 13.5 critical path)
+
+#1734's merge unlocks Aspire S1/S4/S5 runtime verdicts and `#1747`/`#1758`/`#1739`, so it is now the
+critical path and runs without routine pauses.
+
+### #1734 cycle-4 live identity
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a0515b-4d2f-7a91-b71e-43d0b209337c` (canonical sender, **resumed**) |
+| Route | `openai · gpt-5.6-sol · high` — requested and observed |
+| State | `working`, writer lock held |
+| Rollout | `/home/agent/.codex/sessions/2026/08/30/rollout-2026-08-30T08-28-53-01a0515b-4d2f-7a91-b71e-43d0b209337c.jsonl` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1736` |
+| Steering | `codex exec resume 01a0515b-4d2f-7a91-b71e-43d0b209337c -- "<follow-up>"` |
+| Watcher | Monitor `b1f0vdkzo` — per-commit + turn-end, keyed on the lock file and commit graph |
+| Brief | `cycle4-brief.md` staged at `88dac4eb`; owner ruling recorded first at `8df50991` |
+
+**Remote Control:** this leaf's Codex sender is app-server-attached, not Claude Remote Control; the
+supervisor's own RC bridge is `session_01AQCc1qsArwb7CPELZwYDfq`. Per this run's standing rule, no
+mobile-visible Codex Remote Control is claimed for leaf threads — the recorded app-server thread is
+the steering surface.
+
+### Sender recovery — third distinct shape of the same trap, each needing the opposite response
+
+`launch-codex-slice` refused with `duplicate_sender_risk` and `operatorAction: resume existing session
+01a0515b`. I did **not** loop launches or reach for the stale-registry path. Both liveness checks ran
+first:
+
+| Probe | Result |
+| --- | --- |
+| `ownerPid 253297` (registry record) | **dead** |
+| Writer lock for `01a0515b` | none |
+| Live process in the worktree | none |
+| **Rollout files for `01a0515b`** | **2 present** |
+
+The rollouts are decisive: **a dead sender process does not make its thread unresumable.** The
+coordinator terminated the stalled process; the thread survived. Resume succeeded cleanly — no
+backup, no registry deletion, nothing destructive.
+
+Three shapes today, opposite responses each time:
+1. `01a04fa4` — **no rollout** → stale id, must not resume.
+2. Fresh launch after that → `duplicate_sender_risk` because the **canonical sender was alive**.
+3. `01a0515b` — **dead process, live rollouts** → resume, must not relaunch.
+
+Reading "process dead" as "thread gone" would have deleted a working registry entry.
+
+### #1774 preserved at a clean checkpoint — nothing destroyed
+
+Amendment after `FAIL_PLAN` is committed and pushed: `2e5f50f0 docs(harness): amend issue 1774 plan
+after cycle 1`, **dirty=0, local == remote**, author idle, no lock held. Its four required fixes
+(launch-root semantics, decoy contract, host-path file set, `wslHome()` tracked as **#1776**) are in
+the plan text. Its cycle-2 PLAN-EVAL is **deferred, not cancelled** — the single per-topic evaluator
+slot goes to #1734's cycle 4 under the owner's priority. The leaf resumes from this checkpoint with no
+rework.
+
+### Drive plan for #1734, no routine pauses
+
+RED (three authorized cases through the real transport) → rebase onto current `main` → exact-head
+Tier-A + static gates → **coordinator-granted `scaffold.runtime`** as one unsplit command with cleanup
+proven to `aspire` empty / Docker 0 → **exactly one** final IMPL-EVAL cycle 4. **No cycle 5:** on
+failure the leaf parks or rescopes.
