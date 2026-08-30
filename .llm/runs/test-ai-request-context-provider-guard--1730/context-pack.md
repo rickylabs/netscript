@@ -21,7 +21,7 @@
 | Tier-A | `ACCEPTED` at `1baabbd6` (S1–S4) and at `1c836918` (R1) — PR comments `5469233540`, `5469372450` |
 | IMPL-EVAL | cycle 1 `FAIL_FIX` (`6977debd`) → **cycle 2 `PASS`, terminal** (`899e30ad`); failure count 1 of 2 |
 | Receipts | **seven, cut and field-audited** at `1c836918`, `gitHead == actualGitHead`, distinct `requestHash` |
-| CI | run `33317991712` **attempt 3 `completed/success`**; review threads PASS |
+| CI | **Merge requires CI and `close-gate` terminal green at the *current* PR head** — resolve and check it live, never from a run id written here. A run recorded in this file is history for the carrier it ran against, not a statement about the live head. |
 | Lifecycle | PR #1763 not draft, `MERGEABLE`/`CLEAN`, `Closes #1730`, both labels sole `status:ready-merge`, issue boxes 5/0 mirror-ticked |
 
 S1–S4 are Tier-A accepted. IMPL-EVAL cycle 1 returned `FAIL_FIX` for one bounded hole — the loop guard
@@ -39,6 +39,20 @@ stacked above content head `1c836918`, and each is *proven* product-neutral rath
 `PASS` therefore carries forward unchanged; no re-evaluation is owed for a carrier commit. That proof
 is the price of the carry-forward and is restated here so a resumer does not mistake a moved PR head
 for moved content.
+
+**Superseded carrier runs — history, not current status.** Each carrier gets its own CI run, and a run
+only ever attests the carrier it ran against:
+
+| Carrier | CI run | Outcome | Status |
+| --- | --- | --- | --- |
+| `899e30ad` | `33317991712` | `completed/success` at attempt 3 | **superseded** |
+| `eb6b9f29` | `33318967520` | `completed/success` | **superseded** |
+
+Attempt 3 on the first of those is itself worth remembering: `close-gate` had reported `success`
+earlier in that same run, then **failed** on re-run against the corrected surfaces — the sole failing
+step was `Answered review-thread gate`, a review thread that arrived after the first pass. A green gate
+is only evidence about the state it observed; mutating the body, the labels, or the thread set
+invalidates it, and only a rerun re-establishes it.
 
 **Three distinct roles, never interchangeable:** the **product head** (`1c836918`) is what the receipts
 and verdict certify; the **evaluator carrier** (`899e30ad`) is where the terminal verdict was written;
