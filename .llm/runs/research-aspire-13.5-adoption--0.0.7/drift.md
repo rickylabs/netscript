@@ -1572,3 +1572,15 @@
   `status:impl-eval` 17 s after labeling — removed; PR and #1715 both sole `status:ready-merge`; its
   later run skips. Close-gate rerun on ci run 33329453582 pending; on green the S3 merge packet goes
   to the coordinator (merge stays coordinator-landed).
+- **D-80 — S7 Phase-B rerun terminal pre-runtime (coordinator ruling): bootstrap-order defect in the
+  supervisor-authored scratch sequence, not DinD/bind/port and not S7 product code.** The rerun
+  brief (like S3's attempt-3 brief) ran root `deno install` → restore/start without the canonical
+  `deno task db:generate` (the hosted `database.codegen` gate, standalone/no-Aspire), so the root
+  install/type-check step resolved `database/<engine>/schema/.generated/**` before it existed — same
+  class as D-75 O-1. Terminal receipt + exact-zero inventory preserved (host zero confirmed live:
+  containers 0, volumes 0, aspire `[]`, relay armed idle). One bounded harness/fixture correction
+  authorized (`slices/s7/phase-b-bootstrap-correction-brief.md`): insert `db:generate` in the
+  ratified position (or the canonical minimal S7 fixture), prove RED/current-order + cheap GREEN
+  bootstrap without any AppHost, Tier-A for changed harness paths, refreeze, then ONE new serialized
+  Phase-B attempt from host zero → IMPL-EVAL. All other CI/static chains keep moving (S4 close-gate
+  rerun, S5→proof chain, S1 queued).
