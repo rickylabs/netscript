@@ -8195,3 +8195,44 @@ verification, not copy; and the two #1789 findings named as explicitly out of ce
 
 Sender record evicted under the full procedure before dispatch (dead pid, thread absent across three
 probes, thread record preserved as `codex-thread-ids-1387-s3c.md`).
+
+## Routing update — sanctioned DeepSeek evaluator now available; Slice 3/4 sequencing note
+
+**Verbatim coordinator instruction:** "ROUTING UPDATE: sanctioned OpenRouter DeepSeek evaluator is
+now available at the standard mode-600 credential path; never print/cat/commit it. If the temporary
+Opus Slice-3 evaluator has NOT produced a terminal verdict, stop only that evaluator cleanly and
+replace it with a fresh DeepSeek V4 Flash 0731 formal_impl_evaluation at policy effort via checked-in
+Agentic. If it already terminaled, preserve it but obtain the sanctioned DeepSeek final verdict before
+releasing Slice 4."
+
+**Credential verified present without reading it.** `stat` on
+`/home/agent/.config/netscript-agentic/openrouter.env`: mode `600`, size 93 bytes. Not printed, not
+catted, not committed — confirmed by path/mode/size only.
+
+**Opus 5 had already produced a terminal verdict** (`ACCEPTED_WITH_FINDINGS` at `c297064aa`,
+committed `2d7d1b79a`) before this update arrived, so it is preserved unchanged per the instruction's
+own branching.
+
+### Sequencing note — Slice 4 was already dispatched before this update arrived
+
+The instruction says to obtain the DeepSeek verdict **before** releasing Slice 4. Slice 4's dispatch
+(thread `01a05449`, commit `268d71b59`) already happened, under the prior explicit instruction to
+"on PASS release Slice 4 immediately" once Opus terminaled. This update supersedes that release
+condition retroactively, and I cannot un-release a dispatch already sent to a working thread. Stated
+plainly rather than silently reconciled: **Slice 4 is running ahead of a gate this update now
+requires.** It continues running — Codex threads are not safely interruptible mid-turn without losing
+work, and no coordinator instruction asked me to stop it — but I am holding Slice 4 at its current
+Tier-A/evidence boundary and will not advance it (no Tier-A sign-off, no Slice 5 dispatch, no PR
+comment beyond what it posts on its own stop) until DeepSeek's verdict on Slice 3 is in. If DeepSeek
+disagrees with Opus in a way that would have blocked release, Slice 4's work is reviewed against that
+outcome before anything downstream of it is certified.
+
+### Dispatch
+
+| Field | Value |
+| --- | --- |
+| Route | OpenRouter · **DeepSeek V4 Flash 0731 · max** (policy effort per `lane-policy.md` row 46) |
+| Launcher | `deno task agentic:claude-openrouter` — `.llm/tools/agentic/claude/openrouter-run.ts`, checked-in agentic interface |
+| Worktree | `ns1387-impleval-s3`, reused — confirmed clean, still at evidence head `248b2f062` before dispatch |
+| Certified content head | `c297064aa76ca1b2b790f399adfb899e95c03920` |
+| Brief | `slices/impl-eval-1387-s3.md`, unchanged |
