@@ -7223,3 +7223,75 @@ Both remaining leaves are based on `main` and independent of each other. **Integ
 makes that explicit as its `S0` precondition (verify #1466 merged, rebase, re-run the base-gate
 census), which is **now satisfiable** for the first time: the metadata vocabulary is on `main` as of
 `3e5cbabf`.
+
+## 2026-08-30 — #1387 PLAN-EVAL `FAIL_PLAN`; leaf PARKED clean per WIP correction
+
+### Verdict
+
+Session `5d9ccfad` (Claude **Fable 5 · medium**, `formal_plan_evaluation`, own detached worktree
+`ns1387-planeval`, route verified from its transcript) returned **`FAIL_PLAN`**, cycle **1 of 2**,
+pushed evidence-only at `a72af9a4`. Branch head `a72af9a4`; PR **#1762** stays **draft**,
+`status:plan`, live `closingIssuesReferences` **`[]`**.
+
+The checklist rows all pass — research current, LD-1…LD-12 locked with rationale, open-decision sweep
+clean, 11-risk register, deferred scope explicit, JSR surface scan green. **What fails is the gate
+set**, in two ways this lane has now seen repeatedly.
+
+### F-1 — the stale baselines my S0 census found, ruled blocking
+
+`plan.md` contracts `contracts 8, SDK 69`. Re-derived at the rebased base: **16** and **77**, because
+#1466 landed its contracts metadata suite and SDK propagation tests. The evaluator confirmed the
+numbers independently and made them blocking: as written, **Slice 1's Tier-A stop would compare
+against 8/69 and report a false signal on the very first slice**.
+
+I surfaced this in S0 and deliberately did **not** patch it into the locked plan — amending a plan is
+not the supervisor's to do, and the numbers were the evaluator's to verify. That was the right call:
+it came back as a required fix with a precise restatement (`371 → 387` total) rather than as a silent
+edit nobody reviewed.
+
+### F-2 — the #1769 shape again, and worse here
+
+Four base-green gates are sensitive to this leaf and sit **outside** the contracted set:
+`mcp-export-corpus`, `docs-tagline`, `publish-assets`, `agent-docs-prose`. Three regenerate **product
+files outside every slice ceiling**, so the plan's own rule — *"required file outside the listed
+ceiling means stop and rescope"* — **would fire on the first public-surface slice**.
+
+That is the same class as D-27/D-37/D-38 and issue **#1769**, but caught *before* implementation
+rather than after a ready-flip. The gate-set work filed in #1769 is not merely tidy-up: this plan
+would have stalled on it.
+
+### Parked — clean, and not repaired
+
+Per the coordinator's WIP correction, the topic runs **one merge-front**, and that is #1730. So:
+
+- **No implementation dispatched**, and **no plan-repair cycle dispatched**. A `FAIL_PLAN` normally
+  returns once to the author; that return is deferred, not skipped.
+- The verdict is **preserved on the branch** at `a72af9a4`, not summarized away.
+- Worktree `007-leaf-1387` clean at the pushed head; evaluator worktree `ns1387-planeval` idle.
+
+**What the next cycle owes** — five required fixes, ready to hand to an author unchanged:
+
+1. **F-1** restate `G-TEST-*` as contracts 16 / service 90 / plugin 68 / SDK 77 / MCP 136 (371 → 387)
+   with a re-measurement note at `3e5cbabf`; **append** the corrected census to `research.md`, do not
+   rewrite it.
+2. **F-2** contract `mcp-export-corpus` at Slices 2/4/7 and `docs-tagline` + `publish-assets` +
+   `agent-docs-prose` + `assets-barrel` at Slice 9 and the final run; probe `agent-docs-prose` at base
+   and record it; either add the generated outputs to the staling slices' ceilings or declare `gen:*`
+   regeneration ceiling-exempt in one explicit sentence.
+3. **F-3** add `packages/service/src/builder/service-rpc.ts` to Slice 3's ceiling.
+4. + 5. the remaining two required fixes as written in `plan-eval.md` § Required fixes.
+
+Nothing about the plan's substance was rejected — the binding constraint held (LD-2 extends
+`NetScriptProcedureMeta` additively; no parallel policy vocabulary), and LD-3's dependency direction
+survived review.
+
+### Lane state
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **SHIPPED** |
+| #1730 | **sole merge-front, active** — S3 pushed (`5845d533`), S4 in flight; author merged `main` at its convergence point |
+| #1387 / PR #1762 | **PARKED** at `a72af9a4`, `FAIL_PLAN` preserved, repair cycle deferred |
+| #1664 | parked at `20337441788b` |
+
+No new features leaf until one closes.
