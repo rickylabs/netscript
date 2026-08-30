@@ -12,3 +12,13 @@ https://github.com/rickylabs/netscript/actions/runs/33329737311
   scaffold CI lane visibility: skipped
 https://github.com/rickylabs/netscript/actions/runs/33330090487
 [S5] dispatched run 33330090487 on fix/aspire-13-5-s5-literal-ports 19:09:54Z
+[S5] run 33330090487 exit=0 19:17:26Z
+[e12ae79e6a98] success
+  classify changes: success
+  scaffold-static (deno-only): success
+  desktop-native-linux (deb + signed updater): success
+  scaffold-runtime (aspire + docker + postgres): success
+  scaffold-runtime-sqlite (aspire + sqlite + garnet): success
+  scaffold CI lane visibility: skipped
+https://github.com/rickylabs/netscript/actions/runs/33330455111
+[PROOF] dispatched run 33330455111 on ci/aspire-13-5-runtime-proof 19:17:37Z

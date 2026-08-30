@@ -491,4 +491,9 @@ landed + proof ref updated | S9 `892b636f4` "tolerate headless Aspire MCP dashbo
 (`dashboardAvailable` tri-state; -32603 on exactly the dashboard tools = documented degraded
 outcome; tool surface still asserted). Reordered below the workflow-scope commit: fix pushed onto
 `d81a8fe19`; `918a958cd` re-stacked locally, unpushed. Proof ref fast-forwarded with the fix ahead
-of the chain's proof dispatch. |
+of the chain's proof dispatch. | | **S4 MERGE PACKET — exact-green** | PR #1738 head
+`b2a0529fa19b5726` (7/7 identity rebase onto `52a881c5`), base `main`, ready, sole
+`status:ready-merge` on PR+#1716, `Closes #1716`, boxes 6/6 + mirror mapping valid. e2e run
+33329737311 SUCCESS all tiers at the exact head; ci run 33328754543 rerun SUCCESS incl. close-gate;
+review-threads PASS (0). Head checks 13 success / 15 skipped / 2 `cancelled` (residue of superseded
+pile-up run 33328751758, D-79 — not verdicts). Coordinator lands. |
