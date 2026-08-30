@@ -3377,3 +3377,58 @@ red-before is documented by supervisor measurement, **not** by the committed tes
 test short-circuits at base. Its first execution is this green.
 
 Gate table next, in the corrected order.
+
+## 2026-08-30 — #1462 gate evidence at `1ccddd6e`; Tier-A finds one attribution overstatement
+
+### The gate table is thorough and the corrected ordering was executed exactly
+
+`1ccddd6e`, evidence-only, pushed; author terminal (no rollout growth). The F2 correction landed as
+intended — for all three cascades the author ran **precheck (expected stale, exit 1) → generate →
+recheck (PASS)**: MCP corpus, agent-docs prose, and publish-assets. M3's whole-suite requirement ran
+at **82 passed / 0 failed**, and the author correctly recorded that *the graph phase executed for the
+first time there and found no forbidden edge* — the honesty note this lane passed down was applied
+rather than smoothed over.
+
+A real compatibility break was also caught and fixed inside the gate run: the workspace publish
+dry-run initially failed six Fresh checks caused by removing root `CachedEntry`/`CacheEntry`, resolved
+with **type-only** compatibility exports that restore the types without restoring a server edge — and
+the graph measurement below confirms no edge came back.
+
+### Two declined reds re-derived, one confirmed and one corrected
+
+| Claim | Verdict |
+| --- | --- |
+| Full SDK `doc:lint` is baseline | **Confirmed.** exit 1 · 3 errors / 3 private-type refs / 0 missing JSDoc at **both** base `13878a80a` and head. "No new unique diagnostic" is accurate. |
+| `surface:diff` is repo baseline | **Corrected — see T-1.** |
+
+**T-1 — the `surface:diff` row overstates attribution and its number does not reproduce.** The worklog
+says "Repo baseline reports **559** undeclared major change(s)". Measured on both sides:
+
+| Metric | Base `13878a80a` | Head `1ccddd6e` | Delta |
+| --- | --- | --- | --- |
+| `surface:diff` total undeclared major | **542** | **552** | **+10** |
+| `MAJOR @netscript/sdk` entries | **45** | **55** | **+10** |
+
+Two faults. The head number is 552, not 559 — possibly measured before the type-only correction, which
+the author must state. More importantly **542 is the baseline**, so describing the head total as "repo
+baseline" folds this leaf's own +10 into the baseline it is measured against.
+
+The substance is sound: the leaf's entire surface impact is the SDK's +10, exactly the intended
+removal of root cache exports plus `./presets`, and the author did enumerate it SDK-granularly. Only
+the sentence is wrong — which is the **#1673 T-2 class recurring**, in a leaf whose brief explicitly
+carried that lesson forward. Evidence must be written from the artifact, and a total is not a
+baseline.
+
+Correction dispatched: rewrite the row to state base 542, head 552, +10 entirely SDK-scoped (45 → 55)
+with the enumerated surface delta, and name the head measured. Evidence-only; no product path.
+
+### Structural proof of the fix, re-derived
+
+| Graph | Base | Head |
+| --- | --- | --- |
+| `packages/sdk/mod.ts` | **19** browser-unsafe edges (KV modules, 2 `node:`, 5 logger) | **0** |
+| `packages/sdk/src/presets/mod.ts` | — | **0** |
+
+The SDK root no longer reaches `@netscript/kv`, `node:`, or the logger at all. `deno.lock`
+byte-unchanged. Acceptance criterion "production client chunks contain no server KV adapter" is
+demonstrated structurally.
