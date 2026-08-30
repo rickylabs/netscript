@@ -17,7 +17,7 @@ Route: Claude · Anthropic · Fable 5 · medium (native opposite-family evaluato
 - Contract of record: issue #1717 (+ #1365 sagas publisher, #1370 contributions, #979 plugin API host ports; S2 V3 comment on infrastructure host ports); locked decisions D-14 (sagas compat export, no core type change) and D-16 (infrastructure host ports opt-in) in `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md` on `origin/research/aspire-13.5-0.0.7` (`git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md`).
 - Supervisor Tier-A notes: `git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/review-tier-a.md`.
 - S2 receipts referenced by S5: `origin/test/aspire-13-5-s2-runtime-verification` `.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/` (`02-capture-db-allocation-*`, `02-aspire-describe-*.json`).
-- Known baseline (not S4's): `packages/fresh/src/application/query/hydration.ts` TS2345 on `origin/main` (#1734 / PR #1736) fails generated-project `deno task check`; classify it explicitly if any CI gate is red for that reason.
+- Known baseline (not S5's): `packages/fresh/src/application/query/hydration.ts` TS2345 on `origin/main` (#1734 / PR #1736) fails generated-project `deno task check`; classify it explicitly if any CI gate is red for that reason.
 
 ## What to verify (run the gates yourself; verdicts from executed evidence, not the generator's claims)
 
