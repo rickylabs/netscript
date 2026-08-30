@@ -8348,3 +8348,26 @@ D-6/D-5 archiving and catalog lessons, and a "resume-docs discipline" instructio
 updates its own leaf worklog rather than leaving that for the next evaluator to catch.
 
 Sender record evicted under the full procedure before dispatch.
+
+## #1387 Slice 5 — D-9 rescope stop, coordinator ruling, re-dispatched
+
+Thread `01a05468` stopped correctly before any product or test edit: `createContractAuthorizer`
+cannot be published from within Slice 5's original ten-file ceiling — `deno doc --filter
+createContractAuthorizer packages/service/mod.ts` returns `Node ... was not found!`, and no export
+surface exists in either package entrypoint. **Verified independently** — grep confirms zero export
+of the symbol anywhere in the tree, and Slices 6–9's ceilings were checked in full: neither
+`packages/service/mod.ts` nor `src/auth/mod.ts` appears on any later slice either. This is a genuine
+plan gap, not a brief error — the ceiling was carried faithfully from `plan.md`.
+
+**Same shape as D-4/F-3, twice already ratified in this exact plan.** Slice 2 and Slice 4 both
+already needed these identical two files on their own ceilings for the identical reason — publishing
+that slice's new symbols. Brought to the coordinator rather than self-authorized, consistent with how
+every ceiling amendment in this run has been handled; **approved**. Amended `plan.md`'s Slice 5
+ceiling to add both files, scoped to one named value export plus Slice 4's already-published types;
+recorded the owner resolution in `drift.md` under D-9. Committed `de4089573`, pushed.
+
+Re-dispatched: thread `01a05474-18dc-7ba0-a084-8fc62ccecfcf`, base `de4089573`, dry-run clean
+(`upstream: NONE`, `dirty: 0`). The corrected brief states the fix directly — "you do not need to
+rediscover this" — so the new thread spends its budget on the behaviour, not on re-deriving D-9.
+
+Sender record evicted under the full procedure before dispatch.
