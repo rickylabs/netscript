@@ -704,3 +704,71 @@ contract in the workspace. `Readonly<>` stops TypeScript consumers; nothing stop
 Cycle 3 documents it as read-only-by-contract rather than changing the value — flagged here so the
 IMPL-EVAL rules on whether a published mutable error-map value is an acceptable public surface, since
 it was introduced to satisfy a doc-lint delta rather than for a consumer need.
+
+## D-28 — sender ownership treats "ever had a thread id" as "session is alive"
+
+**Observed.** `agentic:launch-codex-slice` refused to start the #1466 cycle-4 thread at
+`/home/agent/projects/netscript/worktrees/007-leaf-1731`:
+
+```json
+{"stage":"sender-ownership","ok":false,"code":"duplicate_sender_risk",
+ "message":"worktree already has a sender; resume session 01a0515c-28c8-7131-8197-e808f7b7e10f",
+ "operatorAction":"resume existing session 01a0515c-28c8-7131-8197-e808f7b7e10f"}
+```
+
+The guard is right to exist — a second sender on one live thread is the failure it prevents, and this
+lane has held that discipline through three cycles. But the session it named was **dead**, and the
+guard cannot tell.
+
+**Both liveness inputs measured, not assumed.** `launch-codex-slice.ts:376-379` builds the
+observation as:
+
+```ts
+ownerProcessAlive: ownership.isProcessAlive(existing.ownerPid),
+sessionActive: Boolean(existing.sessionId),
+```
+
+- `ownerPid` is `255768`. `/proc/255768` **does not exist** — the launcher process died with the host
+  agent-plane restart. `ownerProcessAlive` is `false`.
+- Thread `01a0515c` is **absent** from `agentic:codex-status --user node` (5 live Codex sessions, none
+  is this one). Its rollout `rollout-2026-08-30T08-29-49-01a0515c….jsonl` ends on `task_complete` for
+  turn `01a05183` — cycle 3 finished cleanly, then the thread was lost with the daemon. Nothing was
+  in flight and the worktree is clean at `74483f02`.
+
+So by `decideSenderOwnership`'s own semantics the record is `stale`, and `stale` is a state the
+launcher already knows how to handle — it releases the record and proceeds (`:391`). It never got
+there, because **`sessionActive` is not a liveness check at all**: it is
+`Boolean(existing.sessionId)`, permanently `true` for any record that ever recorded a thread id.
+
+**The consequence is not cosmetic.** Once a worktree's author thread dies — daemon restart, host
+reboot, crash — that worktree becomes **permanently unlaunchable** through the sanctioned tool, and
+the operator action the tool prints (`resume existing session 01a0515c…`) is impossible to perform,
+because the session no longer exists in any daemon. The guard degrades from "prevent a rival sender"
+to "refuse all senders, forever", and it does so precisely in the recovery scenario where relaunching
+is the only correct move. Every lane on this host inherits this after any daemon restart.
+
+Note the second-order shape: `isProcessAlive` is `Deno.kill(pid, 0)` — the same primitive D-26 proved
+unreliable on this host, where a zombie answers. Here it happened to return the truthful `false`; the
+false input was the one that never consulted the runtime at all.
+
+**Action taken.** The stale record was archived to supervisor-owned scratch
+(`stale-sender-record-007-leaf-1731.json`, contents preserved verbatim here) and evicted from
+`~/.config/netscript-agentic/runtime/senders/`, after both liveness conditions were independently
+proven false and the rollout was confirmed terminal. That reproduces exactly the `stale` branch the
+tool would have taken had `sessionActive` been computed truthfully. `--allow-route-mismatch` was
+**not** used — it addresses route identity, not ownership, and forcing past a safety guard with an
+unrelated flag would have been the wrong instrument.
+
+```json
+{"schemaVersion":"1.0","worktree":"/home/agent/projects/netscript/worktrees/007-leaf-1731",
+ "ownerPid":255768,"leaseToken":"b3694154-3e7d-411e-ac28-f15978b9cd57","state":"active",
+ "acquiredAt":"2026-08-30T06:29:49.131Z","updatedAt":"2026-08-30T06:29:49.455Z",
+ "sessionId":"01a0515c-28c8-7131-8197-e808f7b7e10f"}
+```
+
+**Proposed fix — repo tooling, out of this leaf's scope, belongs with D-24/D-25.** Compute
+`sessionActive` from the runtime rather than from record shape: ask the daemon whether `sessionId` is
+a live thread (`codex-status` already enumerates exactly that) and treat an absent thread as not
+active. Optionally add an explicit `--release-stale-sender` path so recovery does not require an
+operator to hand-edit the durable store, and stop relying on `Deno.kill(pid, 0)` for liveness per
+D-26. Filed here for the coordinator; this lane does not edit `.llm/tools/`.

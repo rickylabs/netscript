@@ -6050,3 +6050,107 @@ break the new probe rather than trust it.
 No merge, publish, ready-flip, relabel, milestone change, issue close, `#1348` or cluster-state
 mutation. PR #1731 still carries a stale `status:plan` while the phase is IMPL — relabelling is
 withheld from this lane and belongs to the coordinator.
+
+## 2026-08-30 — restart recovery: PR #1731 reconciled, IMPL-EVAL `FAIL_FIX` received, cycle 4 dispatched
+
+Supervisor restarted. Git and live GitHub are authoritative; the pre-restart in-memory state is
+historical. Reconciliation before any action.
+
+### PR #1731 head reconciliation — classified, not merged
+
+| Question | Answer | How |
+| --- | --- | --- |
+| Topic head | `d701bc6a`, **6 ahead** of `origin/orchestrator/release-0.0.7-features` (`78430faf`) — local-only orchestration evidence, by design | `git rev-parse`, `git log origin/…..HEAD` |
+| `main` | `13878a80a`, unchanged since the last entry | `git fetch` + `rev-parse` |
+| `origin/feat/sdk-procedure-meta` | `74483f028` | `git rev-parse` |
+| Leaf worktree `007-leaf-1731` | was `fc81e652` | `git worktree list` |
+| Relationship | **strict fast-forward descendant** — `git merge-base --is-ancestor fc81e652 74483f028` exits 0. Zero divergence, no rebase, no force-push, nothing to merge. | measured |
+| The one commit | `74483f02 docs(harness): #1466 IMPL-EVAL slice 1 verdict FAIL_FIX (Fable 5 medium)` | `git log fc81e652..74483f028` |
+| Its diff | **one file, +183, evidence-only**: `.llm/runs/feat-sdk-procedure-meta--1466/evaluate.md`. Zero product, test or receipt bytes. | `git diff --stat` |
+
+So the leaf checkout was never divergent — it was **one commit behind on evaluator-only evidence**,
+authored by the IMPL-EVAL session's own detached worktree `ns1466-impleval` (itself at `74483f02`).
+Preserving evaluator evidence therefore meant a **fast-forward**, never a reset and never a
+force-push. Done: `007-leaf-1731` is now `74483f02` = `origin` = PR `headRefOid`, clean, 0 dirty.
+Product content head is unchanged at `235482767`; `fc81e652` remains the head Tier-A passed.
+
+### The verdict that changes the bounded scope
+
+`FAIL_FIX`, failure **1 of 2**. Three rulings, five findings. The rulings close questions this lane
+raised and may not answer for itself, so they are now settled inputs, not open items:
+
+- **R-1** — both terminal FAIL receipts are **non-blocking**. `public-doc-lint` is baseline-red on
+  `main` at 12 and the leaf is delta-0 (D-23 upheld, with the three-way finding set now recorded so
+  no future evaluator re-derives it). Root `test` is the D-26 host-zombie baseline; the evaluator
+  independently proved the slice-relevant obligations green (`packages/contracts` 15/0, the three
+  type fixtures exit 0). **No further root-`test` retries.**
+- **R-2** — the exported mutable `commonErrorMap` is **not acceptable as published**. This is the
+  blocking finding. My D-27 second-order note flagged it for exactly this ruling; the ruling went
+  against the cycle-3 "read-only by contract" framing, and correctly so.
+- **R-3** — `docs:exports-drift` is accepted as **named supplemental evidence** for slices 2–3. It is
+  **not** a plan amendment; the catalog entry is a coordinator follow-up. My D-27 proposal is
+  therefore partly adopted and partly deferred — recorded as such, not claimed as accepted.
+
+The finding that most repays reading is **F-2**: the evaluator broke the cycle-2 inference probe I
+accepted at Tier-A. Perturbing the *real* initializer at `contract-primitives.ts:159` to
+`oc.$meta<Record<never, never>>({})` leaves the fixture, the SDK doctest **and the probe** all at
+exit 0 — because the probe rebuilds the contracted expression instead of observing `baseContract`'s
+initializer. My Tier-A finding was that the cycle-1 re-pin was a tautology; that was right, and the
+replacement I accepted closes a narrower hole than D-5 claims. The residual is bounded (under
+`isolatedDeclarations` the annotation is the published declaration and the runtime value is `{}`
+either way, so nothing consumer-visible moves) but it is real, and D-5 overstates it. Cycle 4 pins
+the initializer as source text and amends D-5 honestly.
+
+### Dispatch — new thread, because the old one is provably gone
+
+The cycle-1→3 author thread `01a0515c` is **absent** from the live daemon and its rollout ends on
+`task_complete`. It cannot be resumed, so the "same thread, never a second sender" discipline is
+satisfied by a **new** thread rather than violated by one. Getting there required evicting a stale
+ownership record — see **D-28**, a real defect in the checked-in launcher that makes any worktree
+permanently unlaunchable once its author thread dies. Both liveness conditions were proven false
+before I touched the store, and the record is preserved verbatim in D-28.
+
+| Field | Value |
+| --- | --- |
+| Brief | `slices/impl-1466-repair-4-impleval.md` — bounded to **F-1…F-5 exactly**, plus archive-then-recut |
+| Launcher | `deno task agentic:launch-codex-slice` (dry-run clean first: `use harness`=true, `## SKILL`=true, git-safety `upstream: NONE` / `dirty: 0` / head `74483f02`) |
+| Requested route | Codex · OpenAI · **`gpt-5.6-sol` · medium** — `normal_implementation` (`lane-policy.md:27`) |
+| Observed route | `provider=openai · model=gpt-5.6-sol · effort=medium` — **matched** (launcher route verdict) |
+| Thread | `01a051d1-e622-74c1-8b2f-1ad80a540c29` |
+| Rollout | `/home/agent/.codex/sessions/2026/08/30/rollout-2026-08-30T10-38-25-01a051d1-e622-74c1-8b2f-1ad80a540c29.jsonl` |
+| NAS worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1731` |
+| Branch / base | `feat/sdk-procedure-meta` @ `74483f02`, upstream unset by design; push by explicit refspec only |
+| Runtime | `approval=never · sandbox=dangerFullAccess` |
+| Staged brief | `/home/agent/ns1466-repair4-brief.md` (9,442 bytes) |
+| Steering | `codex exec resume 01a051d1-e622-74c1-8b2f-1ad80a540c29 -- "<follow-up>"` — same thread, same worktree, never a second sender (D-25: `codex-resume` cannot pin or verify the route, so route identity is fixed at launch) |
+| Prior thread record | preserved as `slices/codex-thread-ids-1466-repair-c1c3.md` before the launcher rewrote `codex-thread-ids.md` |
+
+**Route choice.** Cycle 4 is mechanical — withdraw one export, retype one alias, add one source-text
+assertion, one header line, two doc rows, one `supervisor.md`, then recut. No mid-slice design
+decision survives the evaluator's ruling, which prescribes each fix precisely. `medium` is held
+rather than stepped down to `fast_iteration` because the binding constraint is a **measurement**
+(doc-lint must stay at 12 with an identical finding set after withdrawing a public export), and
+getting that wrong silently is the expensive failure.
+
+### Supervisor identity — Remote Control proof
+
+| Field | Value |
+| --- | --- |
+| Process | PID `5495`, cwd `/home/agent/projects/netscript/worktrees/007-features` |
+| argv | `claude --remote-control netscript-0.0.7 features supervisor --dangerously-skip-permissions --mcp-config /tmp/netscript-hybrid-91510a0f775b1148/mcp.json` |
+| Route | native Claude Opus 5 · high · Remote Control — requested = observed |
+| Sibling supervisors (untouched) | internals `5498`, fixes `5501`, docs `5519`, aspire `5530` |
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **active** — cycle-4 repair in flight on thread `01a051d1` at `74483f02` |
+| #1664 | parked at `20337441788b`; no retry authorized |
+| #1387 | queued, serial; depends on #1466's metadata vocabulary |
+| #1730 | queued (S-1 executable-guard gap) |
+
+Unchanged and withheld: merge, publish, ready-flip, relabel (#1731 still carries a stale
+`status:plan` — coordinator's), milestone change, issue close, `#1348`/cluster-state mutation,
+expensive-gate lease. Tier-A is mine; IMPL-EVAL cycle 2 is a fresh separate `formal_impl_evaluation`
+session (Fable 5 · medium), dispatched only after Tier-A and an exact-content-head recut.
