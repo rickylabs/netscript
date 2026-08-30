@@ -1066,3 +1066,20 @@
   branch refs (after they rebase over S1) and retain run/job ids as the Phase-B receipts. Until then
   the exact missing capability is not a workflow but the **#1734 fix and the S1 pin on `main`**.
   Readiness is not flipped to trigger CI.
+
+## D-57 — 2026-08-30 — S11 convergence rebase hit substantive prose conflicts; routed to the generator
+
+- Rebasing `docs/aspire-13-5-s11-public-docs-refresh` (`93713837`, 6 commits) onto S10′ `a46ea16d`
+  in a throwaway produced two **non-generated** conflicts: (1) `docs/site/explanation/aspire.md` —
+  one line where main's #1748 wording ("carry from Aspire's .NET AppHost:") meets S11's rewording
+  (mechanical: keep main); (2) `docs/site/reference/ai/skills.md` — main's #1746/#1755 bundle
+  paragraph (canonical `.agents/skills/help.md`, derived-mirror sentence) vs S11's replacement
+  paragraph (upstream workflow skills + a 14-tool MCP list) whose text also names
+  **`describe_resource`**, not an Aspire MCP tool — a factual error caught before the audit.
+- Per the doc-audit lane (fixes by the same generator) the supervisor aborted its rebase and resumed
+  the same Gemini conversation with `slices/s11/rebase-brief.md` (keep main's facts, re-add S11's
+  additions with the exact 14 names, regenerate carriers, re-run docs gates, lease-pinned force-push
+  of its own draft branch). docs_audit runs on the rebased head.
+- Supervisor slip recorded: the first attempt to write this entry ran from a removed worktree
+  directory and silently failed; an AGY resume launched with an empty prompt in that window was
+  stopped before it did anything (S11 worktree verified clean at `93713837`).
