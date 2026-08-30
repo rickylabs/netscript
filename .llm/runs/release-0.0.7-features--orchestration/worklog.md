@@ -7829,3 +7829,69 @@ carries `ownerPid 3304466`, which is the killed wrapper and is **absent from `/p
 record that is currently correct. The two-condition test (dead pid **and** thread absent across
 debounced `codex-status` probes) is not belt-and-braces; the pid condition is the weaker one and can
 be satisfied by a healthy dispatch. **Do not evict this record until the thread reaches terminal.**
+
+## #1387 Slice 2 — Tier-A ACCEPTED_WITH_FINDINGS; IMPL-EVAL dispatched
+
+| Head role | SHA |
+| --- | --- |
+| **Content** | `f9b32b4f7a029d9226584b9c170eb44357e10fdb` |
+| **Evidence** | `be22d4b6a91623b35273db4ce9a0ab28c5b748b6` — product-neutral, `git diff --stat <content>..<evidence> -- packages plugins docs templates` empty |
+| Base | `5ae8270ce` |
+| Pushed | `5ae8270ce..be22d4b6a` on `feat/service-principal-procedure-policy` |
+| PR comment | #1762 `issuecomment-5470736368` |
+
+### The author died mid-slice; the work survived
+
+Thread `01a053fe` authored the entire diff, then **terminated without `task_complete`** while polling
+a reviewer it had dispatched **outside its brief** — its last five messages are all "the reviewer is
+still working", and the rollout stops mid-wait at 19:01:27Z. The work was complete and uncommitted
+across exactly the ten ceiling files. The supervisor committed the author's bytes unchanged and ran
+Tier-A, which is the supervisor's role regardless. The only non-author edit is one run-artifact label
+(`light_implementation` → `complex_implementation`) corrected to match the route actually dispatched.
+
+**This is worth generalising: a dead author is not a lost slice.** The failure mode to guard against
+is a supervisor who re-implements; the correct move is to preserve, attribute, and scrutinise harder
+— which is why the IMPL-EVAL brief tells the evaluator that an author who never self-certified is a
+reason for *more* scrutiny, not less.
+
+### Gates at the content head — all `gitHead == actualGitHead`
+
+`check` 532 ms, `lint` 647 ms, `fmt:check` 456 ms, `test` **159 passed / 0 failed**, `arch:check`
+**FAIL=0 repo-wide**, `doc:lint --root packages/service` 0 errors, `publish:dry-run` 28 210 ms;
+`docs:exports-drift` PASS and `check:mcp-export-corpus` PASS (sha256 `510632b1…`, 7 628 symbols).
+Evidence set **SUFFICIENT, zero reasons**. Slice 1's eight receipts were frozen byte-identical under
+`receipts/slice-1-2ddd6048/` — sha256-verified — before any recut.
+
+**The 532 ms `check` is warm cache, not replay.** Its own stdout records `filesSelected: 198`, and the
+identical selection ran cold through `run-deno-check.ts` before the commit with 0 diagnostics.
+`publish:dry-run` does not cache and took 28 s. This is the refinement to the duration heuristic:
+ask whether the gate *can* cache, then read its output for the work.
+
+### Findings
+
+- **F-1 (non-blocking).** `service-builder-impl.ts` trips the 500-line doctrine WARN at 542 lines.
+  **Pre-existing** — already 530 at base and on `main`; this slice widened it by 12. Splitting it is
+  far outside a signature-only ceiling.
+- **F-2 (non-blocking).** The `service` docs page is `entrypoints-only` coverage mode, so
+  `docs:exports-drift` passing does **not** imply reference prose for `ServiceHandlerContext`.
+- **Tooling gap.** `docs:exports-drift` and `check:mcp-export-corpus` have **no gate-catalog entry**,
+  so `run-gate.ts` cannot receipt them — yet plan row 13 contracts the corpus at *every* slice. A
+  contracted gate that cannot produce a durable receipt is the same shape as D-3 and should be closed
+  in `.llm/tools/gates/catalog.ts`, not worked around per-slice.
+
+### Two `run-gate.ts` invocation traps hit and recorded
+
+1. **`--gate` is required and names a catalog key**; forwarded args *append* to the catalog argv. That
+   is the mechanism behind the earlier `deno task test deno task test` duplication.
+2. A wrapper loop over gates **exits 0 even when every gate throws**. My first two attempts wrote no
+   receipts at all and the shell still reported success; the stale Slice 1 receipts were still on disk
+   and would have read as current if I had trusted the exit code. Only reading `argv` + `gitHead` off
+   each receipt caught it — the same rule the briefs carry, now demonstrated on the supervisor.
+
+### Evaluator
+
+Separate session, opposite family (Codex authored → Claude evaluates), Fable 5 · medium, in its own
+detached worktree `ns1387-impleval-s2` at the evidence head. Brief:
+`slices/impl-eval-1387-s2.md`. It is told to re-run the product-neutrality diff itself rather than
+trust the supervisor's claim, and to rule on whether F-1, F-2 and the tooling gap are correctly
+classified as non-blocking.
