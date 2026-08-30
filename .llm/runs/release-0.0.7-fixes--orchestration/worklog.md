@@ -5177,3 +5177,41 @@ Belongs in `.llm/tools/`, not a leaf.
 
 Monitor re-armed with a threshold matched to the workload: 60-second samples, stall declared only after
 8 consecutive minutes of zero growth. #1357 remains at `de57fab0`, 0 commits, clean tree, mid-S1.
+
+### #1357 S1 terminal at `402c552f`; PR #1781 opened; PLAN-EVAL cycle 1 dispatched
+
+**First commit: `402c552f` "docs(harness): plan ui:add data-screen triad"** — 7 harness artifacts, zero
+product code, exactly the S1 discipline briefed. Author terminal: zero rollout growth, launcher exited,
+local == remote == `402c552f`.
+
+S1 answers all six design questions I posed rather than deferring them:
+
+- **D10/D12 — the #1360 risk is resolved, not dodged.** The island passes `initialDataUpdatedAt: cachedAt`
+  through the existing Fresh API, so **#1360 is not a landing dependency**; #1360 keeps both canonical
+  showcase variants and the migration note, with ownership explicitly non-overlapping. This was the one
+  dependency I judged capable of blocking acceptance, and it is answered with a mechanism rather than a
+  promise. The PLAN-EVAL brief asks the evaluator to verify it against the real API surface, because if
+  D10 is false the acceptance cannot be met as written.
+- **D8/D9** — one island convention (route-tree `routes/**/(_islands)/`), existing top-level `islands/`
+  output supported and deliberately **not** migrated.
+- **D13/D14** — `UI_DATA_SCREEN_FILE_ROLES` consumed by `--help` *and* asserted against planned output,
+  plus a negative golden that must fail on the counter-only/empty-loader shapes.
+- **D15** — confirms #1356's existing `app` option; adds only `dryRun?: boolean`.
+- **D16** — `e2e:cli run scaffold.runtime` REQUIRED, supervisor-coordinated, `NOT_RUN`, with the cluster
+  lease and D-42/D-43 AppHost block both named. Not presented as passing anywhere.
+- **D17** — no in-leaf shared-carrier regeneration; a stale cascade check is a stop-and-report handoff.
+
+Ceiling: 12 paths, all `packages/cli` plus one `docs/site` how-to.
+
+PR **#1781** opened as draft with `Closes #1357`, labels `type:fix, area:cli, area:fresh,
+priority:p1, status:plan-eval` (exactly one `status:`), milestone 0.0.7. Issue moved to
+`status:plan-eval`.
+
+PLAN-EVAL cycle 1 dispatched on the native opposite-family Fable 5 route into `007-eval-1357` /
+`eval/plan-eval-1357-cycle-1` at `402c552f`. Dispatch preconditions checked first: plan complete
+(context-pack phase is `plan-eval` handoff with no unlanded author slice) and author idle.
+
+The brief points the evaluator hardest at **ceiling completeness**, carrying #1368's F-A lesson forward
+explicitly: enumerate *behavioural* consumers — tests asserting generated-file counts, `--help` text,
+CLI surface snapshots, e2e suite registries — not just structural ones. That is the defect class that
+cost #1368 a terminal cycle, and `ui:add` emission has exactly the same shape of consumer.
