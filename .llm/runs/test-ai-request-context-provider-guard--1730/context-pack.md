@@ -6,55 +6,54 @@
 | --- | --- |
 | Run ID | `test-ai-request-context-provider-guard--1730` |
 | Branch | `test/ai-request-context-provider-guard` |
-| Current phase | `IMPL-EVAL repair R1 — content ready; exact-head receipt re-cut pending` |
+| Current phase | **`TERMINAL — merge-ready; awaiting coordinator merge`** |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
 ## Current State
 
-S1–S4 remain Tier-A accepted. The separate-session IMPL-EVAL evidence commit `6977debd` returned
-`FAIL_FIX` for one bounded hole: the loop guard ignored `ChatClientCallOptions`. R1 now records the
-second `stream()` argument and projects every call-option field except `signal`; mutation B2 makes
-the named guard red, then reverts to a 9/9 green focused suite. The test is 498 LOC. The optional
-model-ID path is documented as incidentally owned by the existing basic single-text-turn loop test.
+**This leaf is complete. Nothing is pending in it.**
 
-## Completed
+| Field | Value |
+| --- | --- |
+| **Content head** | **`1c836918abde397b320941f70063d83f25f6c355`** — the tree all seven receipts attest |
+| **Evaluator carrier head** | **`899e30ad`** — `evaluate.md` only (cycle-2 verdict); `6977debd` likewise (cycle-1). **Zero product bytes** in either. |
+| Tier-A | `ACCEPTED` at `1baabbd6` (S1–S4) and at `1c836918` (R1) — PR comments `5469233540`, `5469372450` |
+| IMPL-EVAL | cycle 1 `FAIL_FIX` (`6977debd`) → **cycle 2 `PASS`, terminal** (`899e30ad`); failure count 1 of 2 |
+| Receipts | **seven, cut and field-audited** at `1c836918`, `gitHead == actualGitHead`, distinct `requestHash` |
+| CI | run `33317991712` **attempt 3 `completed/success`**; review threads PASS |
+| Lifecycle | PR #1763 not draft, `MERGEABLE`/`CLEAN`, `Closes #1730`, both labels sole `status:ready-merge`, issue boxes 5/0 mirror-ticked |
 
-- Read the required harness, tools, PR, RTK, doctrine, and JSR instructions.
-- Re-baselined issue #1730 and the named test/loop/bridge surfaces against current `origin/main`;
-  after a moving-base race, rebased and repeated the full candidate census at `952cc106`.
-- Selected the authoritative Archetype 4 / Keep verdict.
-- Locked the exhaustive provider-bound field list and test-only product ceiling.
-- Baseline-ran every candidate gate. All are green except pre-existing doc-lint (128 private refs,
-  0 missing JSDoc, exit 1), which is contracted as a delta.
-- Recorded `PLAN-EVAL: N/A` with a mechanical-scope justification.
-- Added the deterministic three-attempt retry/continuation recording provider in the owned test.
-- Added the all-request, all-provider-bound-field absence assertion plus positive context identity.
-- Demonstrated mutation B red in the named guard (0/1), restored `loop.ts`, and proved 9/9 green.
-- Recorded the owner-provided independent acceptance of S2 without repeating its demonstration.
-- Renamed/documented the Anthropic test as direct adapter-serialization coverage; the TanStack seam
-  remains the mutation-A detector.
-- Kept `request_context_test.ts` at 495 LOC; no product, lock, docs, README, or generated carrier
-  moved.
-- Merged current `main` exactly once without conflict; chose merge to preserve pushed slice hashes
-  and their structured PR comments.
-- Confirmed there is no prior top-level #1730 receipt set to archive.
-- Read the immutable IMPL-EVAL record first and repaired only F-1 through the existing test seam.
-- Demonstrated mutation B2 red in the named guard (0/1, 1115 ms), restored product source, and
-  proved the focused test file green (9/9, 212 ms).
-- Corrected the durable prior-head receipt audit: the publish receipt is the root workspace task,
-  attempt 2 at 30,719 ms, not a 150 ms package-cwd run.
+S1–S4 are Tier-A accepted. IMPL-EVAL cycle 1 returned `FAIL_FIX` for one bounded hole — the loop guard
+ignored `ChatClientCallOptions`. R1 records the second `stream()` argument and projects every
+call-option field except `signal`; mutation **B2** makes the named guard red and reverts to 9/9. The
+test is **498 LOC against a 500 cap — the next change to this file must split it**. The model-ID path
+is documented as incidentally owned by the existing single-text-turn loop test. Cycle 2 searched for a
+third provider-bound escape and found none.
+
+### Carrier-only ruling — why the evaluator verdict still holds at `899e30ad`
+
+A verdict certifies a **content** head. `899e30ad` and this correction are **evidence-only carriers**
+stacked above content head `1c836918`, and each is *proven* product-neutral rather than assumed:
+`git diff --stat 1c836918..<carrier> -- packages plugins docs templates` is **empty**. The cycle-2
+`PASS` therefore carries forward unchanged; no re-evaluation is owed for a carrier commit. That proof
+is the price of the carry-forward and is restated here so a resumer does not mistake a moved PR head
+for moved content.
 
 ## In Progress
 
-- Commit R1's test and durable evidence state, then replace and field-audit the named receipts.
+**Nothing.** R1 is committed at `1c836918`, the seven named receipts are cut and field-audited at that
+head, both Tier-A reviews are posted on PR #1763, and IMPL-EVAL cycle 2 returned a terminal `PASS`.
 
 ## Next Steps
 
-1. Run the bounded green gates, prove the product/lock/carrier hygiene, and commit R1.
-2. Cut the seven explicitly named top-level receipts at the immutable R1 head and audit each
-   receipt's `argv`, `cwd`, `attempt`, `durationMs`, `gitHead`, and `actualGitHead`.
-3. Push by explicit refspec, post one structured repair-slice comment, and stop for Tier-A.
+1. **Coordinator merge** of PR #1763 at carrier head `899e30ad` (content `1c836918`). Nothing in this
+   leaf blocks it.
+2. After merge: `status:shipped` on PR and issue is the coordinator's close step.
+
+There is **no** outstanding implementation, receipt, gate or review work in this leaf. Any instruction
+in an earlier revision of this pack to commit R1, re-cut receipts, or stop for Tier-A is **complete** —
+that stale text was an `augmentcode` review finding on PR #1763 and this section is its correction.
 
 ## Key Decisions
 
@@ -79,8 +78,8 @@ model-ID path is documented as incidentally owned by the existing basic single-t
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | RE-CUT_PENDING | R1 content state must be committed before replacement receipt execution. |
-| Fitness | R1 shape PASS | 498 LOC; exact-head quality/delta evidence pending receipts. |
+| Static | **PASS at `1c836918`** | `check` 8,090 ms · `lint` 6,420 · `fmt-check` 1,907 · `test` 3,615 · `quality-gate` 7,836 · `publish-dry-run` 28,664 — all exit 0. `doc-lint` is the **contracted base-red delta** (base 20 / head 20), never a pass. All seven `gitHead == actualGitHead`, distinct `requestHash`. |
+| Fitness | **PASS at `1c836918`** | 498/500 LOC (next change must split); JSR audit 2 findings at head **and** base — no increase, both base-inherited; `deno.lock` byte-unchanged; no generated carrier moved; zero product outside `packages/ai/tests` over the merge base. |
 | Runtime | R1 PASS | B2 named mutation-red 0/1; restored focused suite 9/9; product diff empty |
 | Consumer | N/A | No public-surface change |
 
