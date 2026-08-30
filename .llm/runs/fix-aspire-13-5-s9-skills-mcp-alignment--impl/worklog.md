@@ -66,6 +66,10 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | 1 | RED | Focused test failed on the intentionally missing MCP smoke module (`TS2307`). |
 | 2026-08-30 | 1 | static receipt | One no-AppHost MCP session captured 13.5.3 identity, doctor, and a truthful 14-tool surface; zero-state checks remained clean. |
 | 2026-08-30 | 1 | implementation | Added injectable JSON-RPC transport/evaluator, exact semantic receipt and redacted transcript, durable lifecycle wrapper, explicit runtime skip, both-tier suite ordering, and agent-init prerequisite. |
+| 2026-08-30 | 1 | delivery | Pushed gate commits `83ae1a43` and `06a0e5e1`; opened stacked draft PR #1759 and posted one implementation trail comment per commit. |
+| 2026-08-30 | 2 | skill alignment | Updated the canonical Aspire skill to 13.5.3 evidence, generated `.agents`/`.claude` mirrors and CLI embedded assets, and kept the observed 14-tool mismatch explicit. |
+| 2026-08-30 | 2 | agent init | Selected the four non-colliding upstream workflow skills explicitly and proved canonical NetScript `aspire/SKILL.md` remains hash-stable. |
+| 2026-08-30 | 2 | corpora | Regenerated CLI assets, MCP export corpus, publish assets, and the consumer dogfood bundle; added a deterministic dogfood check gate. |
 
 ## Decisions
 
@@ -81,6 +85,8 @@ or the canonical generator source and run the documented generators.
 | `rtk` unavailable on host | minor | yes |
 | 13.5.3 static MCP lacks locked `get_integration_docs` | significant | yes |
 | First scoped-check wrapper flag was redundant/invalid | minor | yes |
+| Requested AGENTS guidance authority moved to a template generator source | minor | yes |
+| HTTPS credential lacked workflow scope for the workflow-only commit | minor | yes |
 
 ## Gate Results
 
@@ -91,6 +97,12 @@ or the canonical generator source and run the documented generators.
 | Explicit runtime-absent path | SKIPPED as designed | durable lifecycle receipt contains the concrete missing `aspire-start.json` reason |
 | `quality:scan` | PASS | zero findings |
 | `arch:check` | PASS | exit 0; pre-existing repository warnings only |
+| Focused agent-init tests | PASS | 23 passed, 0 failed; includes explicit skill selection and canonical hash preservation |
+| Slice-2 scoped check | PASS | 8 touched TypeScript inputs, zero diagnostics |
+| Slice-2 raw lint/fmt | PASS | 9 config-excluded files; repo single-quote/100-column formatting options used |
+| Slice-2 `quality:scan` | PASS | zero findings |
+| Slice-2 `arch:check` | PASS | exit 0; pre-existing repository warnings only |
+| Dogfood generation/check | PASS | exact Aspire MCP entry, four workflow skills, relative local paths, and no stale CLI 0.0.2 pin |
 
 ## Handoff Notes
 

@@ -77,6 +77,7 @@
     "agentic:leak-check": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/leak-check.ts",
     "agentic:teardown": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/teardown.ts",
     "agentic:dogfood-skills": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/dogfood-skills.ts",
+    "agentic:dogfood-skills:check": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/dogfood-skills.ts --check",
     "agentic:antigravity-evidence": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/antigravity-evidence-cli.ts",
     "agentic:provider-canary": "deno run --no-lock --allow-run --allow-env .llm/tools/agentic/runtime/cli/provider-canary.ts",
     "agentic:rollout-canary": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/rollout-canary-cli.ts",

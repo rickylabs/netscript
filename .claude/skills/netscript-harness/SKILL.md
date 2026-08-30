@@ -95,6 +95,13 @@ When the opening diff is docs-only, proactively apply `ci:skip-e2e` to the draft
 the docs-only change must exercise the full CI surface. Record the selection in the opening phase
 comment so the evaluator can verify that the cheap lane is intentional.
 
+## Human Review Surface
+
+Keep user-facing plans, issues, PRs, benchmark reports, and handoffs compact. Lead with the
+decision, measured evidence, total footprint, risk, and next action. Link raw evidence instead of
+copying run machinery or phase ledgers into the review surface. If the original goal is not obvious
+on one screen, consolidate and simplify before asking for coordination or review.
+
 ## Agent Delegation Contract
 
 Lane assignments and model bindings are configuration. The tiered A–E model, the selection rules
