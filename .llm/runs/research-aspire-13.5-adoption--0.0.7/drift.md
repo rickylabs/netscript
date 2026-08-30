@@ -1968,3 +1968,12 @@
   to a fresh Codex GPT-5.6 Sol thread (matches the standing rule that supervisor-authored changes to
   scaffold-adjacent generator/fixture wiring get an independent implementation + review pass, not
   hand-authored in the supervisor lane) — see the dispatch record following this entry.
+- **D-101 dispatch:** synthetic-listener-fixture implementation brief sent on the same S6 thread
+  `01a05474-cad4-7912-87c9-2e0045b30ac4` (new-launch attempt correctly blocked by
+  `duplicate_sender_risk` — resumed instead, per the D-86 sender-ownership lesson). Worktree
+  `007-aspire-s6-v2` freed of a stale local-branch-name collision first: the original
+  `007-aspire-s6` worktree (superseded since D-91, clean at the pre-transplant head `01f27d4d4`) was
+  detached and its now-orphaned `feat/aspire-13-5-s6-health-checks` branch ref deleted so `-v2`'s
+  branch could be correctly renamed to match; `007-aspire-s6-v2` confirmed clean at `60985a98f`
+  immediately before dispatch. Awaiting the controller-mechanism implementation, generator-splice,
+  tests, and gates; supervisor runs the lease-backed verification after.
