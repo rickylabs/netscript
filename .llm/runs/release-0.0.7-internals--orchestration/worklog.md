@@ -4591,3 +4591,47 @@ governed assets, re-verify `check:assets-barrel` + `check:publish-assets`, and c
 
 Internals continues independently: **#1774** amending after `FAIL_PLAN`, **#1776** filed for the
 `wslHome()` defect, **#1734** escalated at the owner boundary, **#1747** withheld solely on it.
+
+## 2026-08-30 — OWNER RULING: #1734 option 2 approved (total private reviver), cycle 4 is the last
+
+Recorded atomically before any dispatch.
+
+**Authorized:** replace the rejection-value **allowlist** with a **total private reviver**; RED-first
+real-transport tests for (a) omitted mutation `failureReason`, (b) query error twins, (c)
+non-throwing message construction; rebase onto current `main` `24f6642f`; exact-head Tier-A + static
+gates **plus coordinator-owned `scaffold.runtime`**; then **exactly one** final separate-session
+focused **IMPL-EVAL cycle 4**.
+
+**Explicitly out of scope:** public types, exports, dependency range, and any wider hydration change.
+
+**Terminal rule:** if cycle 4 fails, **park or rescope — do not recurse.**
+
+### Why this ruling is the right shape, recorded so the reasoning survives
+
+Three cycles failed with one shape: `reviveSerializedError` enumerated an **open** value domain —
+anything a `mutationFn` can reject with — inside an allowlist guard, so each cycle fixed the member it
+was shown and the next member surfaced. Cycle 1: green only pre-serialization. Cycle 2:
+non-`Error`/non-record values. Cycle 3: `undefined` from a bare `Promise.reject()`, symbols,
+functions, plus `String(value)` throwing past the guard on a hostile array. My own Tier-A repeated the
+shape once by verifying only the direction I was worried about.
+
+A **total** reviver removes the question rather than answering it a fourth time: with no rejected
+domain, "which values are accepted" stops being a thing anyone can get wrong. The three authorized
+RED cases target exactly the failure modes the allowlist produced — an omitted key, the query/mutation
+twin paths, and message construction that must not throw.
+
+### Sender state
+
+The previous canonical sender `01a0515b` was terminated by the coordinator after a 14-minute futex
+stall (PID proof taken, stale lock removed). **No live sender holds `007-leaf-1736`** and no writer
+lock exists, so cycle 4 starts a fresh thread rather than resuming a dead id — the inverse of the
+earlier `no rollout found` trap, where the recorded id was stale but the canonical sender was alive
+and a fresh launch returned `duplicate_sender_risk`. Verified both ways before acting.
+
+### Rebase
+
+Leaf is at `069913e7` (cycle-3 verdict), clean, local == remote == PR. It **needs** the rebase onto
+`24f6642f`. Worth noting the rebase is mechanically safe for this leaf: `main` between the leaf's
+merge-base and `24f6642f` touches **zero** files under `packages/fresh`, so the two-file product
+surface cannot conflict — but the rebase is still performed because the owner directed exact-main
+currency and the runtime gate must run against the integration head.
