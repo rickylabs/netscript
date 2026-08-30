@@ -6,8 +6,8 @@ import type { AspireConfig } from '../config-section-types.ts';
  */
 export const AspireConfigSchema: z.ZodType<AspireConfig | undefined> = z
   .object({
-    /** Path to a legacy AppHost project directory or modern TS AppHost entrypoint file */
-    appHost: z.string().default('./dotnet/AppHost'),
+    /** TypeScript AppHost entrypoint path. Defaults to the generated NetScript AppHost. */
+    appHost: z.string().default('./aspire/apphost.mts'),
     /** Dashboard port */
     dashboardPort: z.number().default(18888),
   })

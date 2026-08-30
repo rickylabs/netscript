@@ -105,8 +105,8 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
         pluginDir: 'streams',
         serviceEntrypoint: 'services/src/main.ts',
         serviceConfigKey: 'streams',
-        servicePort: 4437,
-        backgroundPort: 4437,
+        servicePort: 9438,
+        backgroundPort: 9438,
         permissions: ['--allow-net'],
       },
     }),
@@ -117,7 +117,7 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
     concurrencyEnvVar: 'WORKER_CONCURRENCY',
     defaultConcurrency: 2,
     serviceConfigKey: 'workers-api',
-    servicePort: 8091,
+    servicePort: 9181,
     dependencies: ['streams'],
     pluginReferences: [],
   });
@@ -127,7 +127,7 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
     concurrencyEnvVar: 'SAGA_CONCURRENCY',
     defaultConcurrency: 2,
     serviceConfigKey: 'sagas-api',
-    servicePort: 8092,
+    servicePort: 9182,
     dependencies: ['streams'],
     pluginReferences: ['workers-api'],
   });
@@ -139,7 +139,7 @@ export async function writeOfficialPluginManifests(sourceRoot: string): Promise<
     defaultEntrypoint: 'src/runtime/trigger-processor.ts',
     backgroundEntrypoint: 'src/runtime/trigger-processor.ts',
     serviceConfigKey: 'triggers-api',
-    servicePort: 8093,
+    servicePort: 9183,
     dependencies: ['streams'],
     pluginReferences: ['workers-api'],
   });

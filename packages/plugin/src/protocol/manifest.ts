@@ -97,7 +97,7 @@ export interface PluginManifestOfficialSource {
   readonly serviceConfigKey?: string;
   /** Generated service port. */
   readonly servicePort?: number;
-  /** Generated background worker port. */
+  /** Generated background worker port. Zero requests host allocation. */
   readonly backgroundPort: number;
   /** Whether the plugin source requires database wiring. */
   readonly requiresDb?: boolean;
@@ -221,7 +221,7 @@ const officialSourceSchema: z.ZodType<PluginManifestOfficialSource> = z.object({
   doctorEntrypoint: z.string().min(1).optional(),
   serviceConfigKey: z.string().min(1).optional(),
   servicePort: z.number().int().nonnegative().optional(),
-  backgroundPort: z.number().int().nonnegative(),
+  backgroundPort: z.number().int().nonnegative().default(0),
   requiresDb: z.boolean().optional(),
   requiresKv: z.boolean().optional(),
   permissions: z.array(z.string().min(1)).readonly().optional(),
@@ -247,8 +247,7 @@ const linkingSchema: z.ZodType<PluginManifestLinking> = z.object({
 
 const ATOMIC_SERVICE_SHAPE_ERROR =
   'PLUGIN_OFFICIAL_SOURCE_SERVICE_SHAPE_INCOMPLETE: officialSource.serviceEntrypoint, ' +
-  'officialSource.serviceConfigKey, and ' +
-  'officialSource.servicePort must be provided together or all omitted.';
+  'and officialSource.serviceConfigKey must be provided together or both omitted.';
 
 /** Validation issue exposed by the plugin installer manifest schema. */
 export interface PluginInstallerManifestSchemaIssue {
@@ -286,13 +285,17 @@ export const PluginInstallerManifestSchema: PluginInstallerManifestValidator = z
   officialSource: officialSourceSchema.optional(),
   linking: linkingSchema.optional(),
 }).strict().superRefine((manifest, context) => {
-  const serviceFields = [
+  const serviceIdentityFields = [
     manifest.officialSource?.serviceEntrypoint,
     manifest.officialSource?.serviceConfigKey,
-    manifest.officialSource?.servicePort,
   ];
-  const presentFields = serviceFields.filter((value) => value !== undefined).length;
-  if (presentFields !== 0 && presentFields !== serviceFields.length) {
+  const presentFields = serviceIdentityFields.filter((value) => value !== undefined).length;
+  const portWithoutService = manifest.officialSource?.servicePort !== undefined &&
+    presentFields === 0;
+  if (
+    (presentFields !== 0 && presentFields !== serviceIdentityFields.length) ||
+    portWithoutService
+  ) {
     context.addIssue({
       code: 'custom',
       path: ['officialSource'],

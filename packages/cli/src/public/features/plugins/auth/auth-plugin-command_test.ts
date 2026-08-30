@@ -35,13 +35,13 @@ const HEALTHY_MODULE_PROCESS: ProcessPort = {
 
 Deno.test('auth backend set reconciles .env and show reports the active backend', async () => {
   const fs = new MemoryFileSystemAdapter();
-  await fs.writeFile('/workspace/.env', '# keep me\nPORT=8094\nNETSCRIPT_AUTH_BACKEND=workos\n');
+  await fs.writeFile('/workspace/.env', '# keep me\nPORT=9184\nNETSCRIPT_AUTH_BACKEND=workos\n');
 
   assertEquals(await setAuthBackend('/workspace', 'kv-oauth', fs), 'kv-oauth');
   assertEquals(await showAuthBackend('/workspace', fs), 'kv-oauth');
   assertEquals(
     await fs.readFile('/workspace/.env'),
-    '# keep me\nPORT=8094\nNETSCRIPT_AUTH_BACKEND=kv-oauth\n',
+    '# keep me\nPORT=9184\nNETSCRIPT_AUTH_BACKEND=kv-oauth\n',
   );
 });
 
@@ -92,7 +92,7 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
     preset: 'github',
     clientId: 'client-id',
     clientSecret: 'client-secret',
-    redirectUri: 'http://localhost:8094/api/v1/auth/callback',
+    redirectUri: 'http://localhost:9184/api/v1/auth/callback',
     kvOAuthKey,
   }, fs);
 
@@ -215,7 +215,13 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
     '--stream-url',
     'http://streams.test/auth/sessions',
   ]);
-  await command.parse(['session', 'revoke', 'active-1']);
+  await command.parse([
+    'session',
+    'revoke',
+    'active-1',
+    '--auth-url',
+    'http://auth.test/api/v1/auth',
+  ]);
   assertEquals(output, [
     'kv-oauth',
     'Session\tUser\tProvider\tState\tExpires',
@@ -294,7 +300,13 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
     '--stream-url',
     'http://streams.test/auth/sessions',
   ]);
-  await command.parse(['session', 'revoke', id]);
+  await command.parse([
+    'session',
+    'revoke',
+    id,
+    '--auth-url',
+    'http://auth.test/api/v1/auth',
+  ]);
 
   assertMatch(output[1], new RegExp(id));
   assertEquals((await session({ sessionId: id }, { registry })).authenticated, false);

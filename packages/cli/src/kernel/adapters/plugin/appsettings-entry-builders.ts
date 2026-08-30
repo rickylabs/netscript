@@ -111,7 +111,6 @@ function buildBasePluginEntry(
   const entry: PluginEntry = {
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
-    Port: scaffoldResult.servicePort,
     ...(scaffoldResult.hostPort !== undefined
       ? { HostPort: scaffoldResult.hostPort }
       : {}),

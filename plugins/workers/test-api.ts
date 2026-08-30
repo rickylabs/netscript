@@ -10,7 +10,14 @@
  * @module
  */
 
-const API_BASE = Deno.env.get('WORKERS_API_URL') ?? 'http://localhost:8091';
+const API_BASE = Deno.env.get('services__workers-api__https__0') ??
+  Deno.env.get('services__workers-api__http__0') ??
+  Deno.env.get('WORKERS_API_URL');
+if (API_BASE === undefined) {
+  throw new Error(
+    'Workers test API endpoint was not discovered. Configure an Aspire service reference or WORKERS_API_URL.',
+  );
+}
 
 interface TestResult {
   name: string;

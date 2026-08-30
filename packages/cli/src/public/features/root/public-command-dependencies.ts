@@ -314,6 +314,7 @@ export function createPublicCommandDependencies(
           process,
           loadJsrExportMap: fetchJsrExportMap,
           inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectRuntimeRegistries: generatePluginRegistries,
         }),
     },
     authSessionHttp: new FetchAuthSessionHttp(),

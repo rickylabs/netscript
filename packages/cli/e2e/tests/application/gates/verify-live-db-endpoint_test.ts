@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import {
   compareDatabaseEndpointPorts,
+  compareSecondReceiptWithLiveTopology,
   correlateUsersTelemetry,
   matchesDatabaseHealthContract,
   pollUsersTelemetryCorrelation,
@@ -13,6 +14,40 @@ const realHealthResponse = await Deno.readTextFile(
 const unhealthyHealthResponse = await Deno.readTextFile(
   new URL('./fixtures/users-health-unhealthy-response.json', import.meta.url),
 );
+const aspire1353Describe = JSON.parse(
+  await Deno.readTextFile(
+    new URL('./fixtures/aspire-13.5.3-describe-postgres.json', import.meta.url),
+  ),
+);
+
+Deno.test('second receipt accepts the live Aspire 13.5 persistent allocation', () => {
+  assertEquals(
+    compareSecondReceiptWithLiveTopology(
+      'postgres://localhost:10538',
+      aspire1353Describe,
+      'postgres',
+    ),
+    {
+      ok: true,
+      receiptPostgresUrl: 'postgres://localhost:10538',
+      livePostgresUrl: 'postgres://localhost:10538',
+    },
+  );
+});
+
+Deno.test('second receipt rejects a literal endpoint absent from the live second start', () => {
+  const result = compareSecondReceiptWithLiveTopology(
+    'postgres://localhost:5432',
+    aspire1353Describe,
+    'postgres',
+  );
+
+  assertEquals(result.ok, false);
+  assertEquals(
+    result.error,
+    'second receipt Postgres URL "postgres://localhost:5432" did not match live second-start Postgres URL "postgres://localhost:10538"',
+  );
+});
 
 Deno.test('database endpoint ports match across URL and keyword dialects', () => {
   assertEquals(

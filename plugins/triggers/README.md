@@ -31,7 +31,7 @@ binds them to a NetScript host.
   acknowledgement, so slow handlers never block the sender and crashes replay from the stored event.
 - **Concurrent by default** — the processor fans out with a default concurrency of 10
   (`TRIGGER_CONCURRENCY`) for bursty workloads.
-- **Triggers API included** — the `triggers-api` service (default port `8093`) backs trigger and
+- **Triggers API included** — the `triggers-api` service uses an Aspire-allocated endpoint and backs trigger and
   event introspection over a versioned contract.
 - **An operations CLI** — `list`, `add-webhook`, `add-scheduled`, `add-file-watch`, `fire`,
   `preview`, `test`, `events`, and `enable`/`disable` cover authoring and operating triggers.
@@ -45,7 +45,7 @@ flowchart LR
     E --> P["Processor<br/>idempotency · retry · DLQ"]
     P --> J["Handler actions<br/>(enqueue jobs, …)"]
     M["triggersPlugin manifest"] --> H["NetScript host"]
-    H --> A["triggers-api<br/>:8093"]
+    H --> A["triggers-api<br/>Aspire-allocated endpoint"]
 ```
 
 ## Install
@@ -82,7 +82,7 @@ Install the plugin, then list the trigger definitions it manages:
 
 ```bash
 $ netscript plugin install trigger --name triggers
-Installed trigger plugin "triggers" on port 8093.
+Installed trigger plugin "triggers" on port <allocated-port>.
 Created 5 plugin files.
 Regenerated 12 Aspire helper files.
 
@@ -105,7 +105,7 @@ import {
 
 console.log(TRIGGERS_PLUGIN_ID); // "triggers"
 console.log(TRIGGERS_API_SERVICE_NAME); // "triggers-api"
-console.log(TRIGGERS_API_DEFAULT_PORT); // 8093
+console.log(TRIGGERS_API_DEFAULT_PORT); // compatibility-only numeric value
 console.log(triggersPlugin.name); // "@netscript/plugin-triggers"
 ```
 
@@ -117,7 +117,7 @@ console.log(triggersPlugin.name); // "@netscript/plugin-triggers"
 | `./cli`      | The trigger command group (`list`, `add-webhook`, `fire`, `events`, …)                                                    |
 | `./runtime`  | The processor runtime (`createRuntimeTriggerProcessor`) with KV-backed event store, idempotency, and dead-letter adapters |
 | `./public`   | The typed trigger surface hosts re-export                                                                                 |
-| `./services` | The Triggers API service composition (`triggers-api`, port `8093`)                                                        |
+| `./services` | The Triggers API service composition (`triggers-api`, Aspire-allocated port)                                             |
 | `./streams`  | Durable-stream factory for trigger entities                                                                               |
 | `./aspire`   | The trigger Aspire contribution for the AppHost                                                                           |
 | `./scaffold` | The plugin-owned scaffolder `netscript plugin install trigger` executes                                                   |

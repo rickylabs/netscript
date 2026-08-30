@@ -1,0 +1,45 @@
+# S8 configured lint correction — validation evidence
+
+## Evaluator finding
+
+- Read the separate-session IMPL-EVAL cycle-1 record from
+  `origin/research/aspire-13.5-0.0.7` at `392b2470671975550f9810caef082adfbb9b142e`.
+- F-1 reproduced before the fix: `deno task lint` exited `1` with four findings in
+  `plugins/auth/src/public/mod.ts` and `plugins/triggers/src/public/mod.ts` —
+  `no-unused-vars` and `verbatim-module-syntax` for the two deprecated default-port imports.
+
+## Configured repository lint (CI quality-lint command)
+
+Command: `deno task lint`
+
+Raw exit: `0`
+
+Raw structured verdict:
+
+```json
+{"source":{"mode":"command","cwd":"/home/codex/repos/netscript-aspire-13-5-s5","exitCode":0},"selection":{"filesSelected":2047,"batches":36,"failedBatches":0},"coverage":{"filesSelected":2047,"filesProcessed":2047,"droppedFiles":[],"refusals":[]},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+The auth and triggers public modules now re-export their compatibility constants directly from
+`../constants.ts` without creating local import bindings. Sagas already used a direct re-export;
+streams and workers have no public default-port import or export.
+
+## Deprecation-contract and plugin unit gates
+
+- Focused auth + triggers deprecation-contract tests: raw exit `0`; 2 passed, 0 failed. Both tests
+  import `publicPort` from `src/public/mod.ts` and assert the unchanged values (`8094` / `8093`).
+- Full auth unit suite: raw exit `0`; 24 passed, 0 failed.
+- Full triggers unit suite: raw exit `0`; 39 passed with 9 nested steps, 12 intentionally ignored
+  live E2Es, 0 failed.
+
+## Doctrine gates
+
+- `deno task quality:scan`: raw exit `0`; repository scan `ok: true`, zero findings, seven existing
+  allowances.
+- `deno task arch:check`: raw exit `0`; all package/plugin doctrine blocks report `FAIL=0`; existing
+  warnings and informational findings remain baseline.
+
+## Scope
+
+- No public export or value changed; D-14 is preserved.
+- No runtime, AppHost, CLI, generated-asset, lock-file, or unrelated source change.
