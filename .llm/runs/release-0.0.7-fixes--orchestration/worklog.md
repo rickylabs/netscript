@@ -5250,3 +5250,29 @@ conclusion itself was verified true against the base surface. Ceiling lands back
 Sender carries the head-verification guard I promised after the #1368 stale-correction incident: it
 aborts rather than delivering if the head has moved off `402c552f`. Labels moved to `status:plan` on
 both PR and issue.
+
+### #1357 plan repair `53e696b5` verified; PLAN-EVAL cycle 2 (final) dispatched
+
+Repair landed artifact-only, pushed, author idle. All four corrections re-derived by me, not accepted
+on report:
+
+- Ceiling is **12 paths** with `packages/cli/e2e/suites/scaffold/capability-suites.ts` added as item 12.
+- `docs/site/web-layer/how-to/customize-fresh-ui.md` **dropped** from the ceiling — my ruling was to
+  defer the docs edit rather than relax D17, since D17 keeps shared generated carriers under supervisor
+  ownership and this leaf's value is the emission fix, not the how-to.
+- Cascade rows and gate row 16 now state the green expectation as a **consequence** — "stays green
+  because the locked ceiling writes no generated-corpus member" — rather than as a bare assertion. The
+  author also moved `check:assets-barrel` to `NOT_RUN` with "Do not run: it writes before diffing",
+  picking up the write-before-diff hazard this lane recorded earlier.
+- `drift.md` carries the three falsified-but-unowned docs as known-stale, owned elsewhere.
+- D10 corrected to `optional (?: number)`; the boundary conclusion was already verified true.
+
+PLAN-EVAL cycle 2 dispatched at `53e696b5` into `eval/plan-eval-1357-cycle-2`, native opposite-family
+Fable 5, a **fresh** evaluator explicitly told not to rubber-stamp cycle 1 and invited to overturn any
+of its five PASS areas. The brief asks four things: are cycle 1's findings closed rather than relocated;
+does a third pass over behavioural consumers find anything (a third miss would be expensive, and #1368
+is the cautionary case); did dropping a ceiling path strand references elsewhere in the plan; and is the
+docs deferral recorded honestly rather than quietly dropped.
+
+Labels back to `status:plan-eval` on PR #1781 and issue #1357. This is the final plan cycle — terminal
+`PASS_PLAN` or `FAIL_PLAN`.
