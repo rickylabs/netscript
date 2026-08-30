@@ -184,3 +184,74 @@ is therefore the leaf's own, not inherited evidence.
   and intentionally untouched because S5 authorizes only product path 2 and forbids test changes.
 - Runtime gates remained unauthorized and were not run. No architecture debt entry was created.
 - This implementation author does not provide a sign-off or IMPL-EVAL verdict.
+
+## Supervisor Tier-A sign-off — `c1e21c1b0823d1bd057d252e59f7bee5fbbdfc89`
+
+Reviewer is the fixes topic supervisor: not the author, not the evaluator. Every check below was
+re-derived independently — from the commit's own file list, from a pristine `git archive` of base
+`13878a80a`, or by re-running the command — never read out of the author's receipts.
+
+**T-1 and T-2 are both resolved. Tier-A PASSES at this head.** A fresh, separate, opposite-family
+IMPL-EVAL is still mandatory before any readiness transition.
+
+### T-1 — resolved, and the attribution independently re-derived at line granularity
+
+The S3-added `@std/path` import is now in the formatter's multi-line form, and the over-width line-2
+finding is gone from the head's fmt output. The remaining four findings were re-attributed by running
+the same scoped format on a pristine base archive and comparing **source lines**, not file names:
+
+| Finding path | Head first hunk | Base first hunk | Ownership |
+| --- | --- | --- | --- |
+| `root/public-command-dependencies.ts` | line 1, `import {` from `@netscript/plugin/sdk` | line 1, identical source line | base-owned |
+| `plugins/doctor/doctor-plugin-use-case.ts` | line 19, `import {` for `jsr-export-map-loader-port.ts` | line 19, identical source line | base-owned |
+| `generate/plugins/installed-runtime-registry-generator.ts` | line 18, `type GenerateInstalledPluginRegistries,` | line 9, identical source line | base-owned |
+| `plugins/doctor/doctor-plugin-registry-drift_test.ts` | line 9, `import {` for `jsr-specifiers.ts` | **file absent at base** | leaf-owned |
+
+The generator's 9 → 18 shift is exactly +9 lines, which is precisely the cost of expanding the
+one-line import into ten. That arithmetic is an independent consistency check on the attribution,
+not a restatement of it.
+
+Leaving the leaf-owned test finding unfixed is correct: S5 authorizes product path 2 only and forbids
+test changes, and the author states that reason in one line rather than attributing the finding
+elsewhere — which is exactly what T-2 asked for.
+
+### T-2 — resolved; the corrected sentence was verified against the artifact
+
+The worklog now says the S2 case was refactored in S3 to share `createDoctorHarness` with four added
+cases, that its name and all four assertions survive with none weakened or removed, and that its
+format finding is the leaf's own rather than inherited. Verified against the file itself, not against
+the claim: the original case name
+`'plugin doctor fails when a saga is authored after generate plugins'` is present **verbatim** at this
+head, alongside the four added cases, and `createDoctorHarness` is shared across them.
+
+### Gates re-run at this exact head
+
+| Check | Result |
+| --- | --- |
+| Head identity | local == `origin` == PR #1739 `headRefOid` == `c1e21c1b`; tree clean |
+| Product ceiling | delta `02da4e1c..c1e21c1b` is exactly two files — authorized product path 2 and `worklog.md`; **no seventh path, no test-behaviour change** |
+| Focused suite | independently re-run: exit `0`, **5 passed / 0 failed** |
+| Scoped type check | six ceiling files, exit `0`, zero diagnostics |
+| Scoped lint | six ceiling files under the root rule set, exit `0`, zero findings |
+| Scoped format | exit `1`, four findings — three base-owned at line granularity, one leaf-owned and scope-deferred |
+| `deno.lock` | byte-unchanged vs `origin/main` (raw `git diff --exit-code`) |
+| Run-artifact hygiene | no thread id, rollout path, daemon handle, or observability path in the committed artifacts |
+| Review threads | `review-threads PASS threads=0 unanswered=0` |
+
+### Context the evaluator should have: these scoped gates are stricter than the repo's own
+
+The root `deno.json` excludes `packages/cli/` from **both** `fmt` and `lint`. Passing the six ceiling
+files to `deno fmt --check` under the root config returns `No target files found`. The author's scoped
+runs therefore used a scratch config with that exclusion removed — disclosed in the gate table, not
+concealed — and are a **stricter** bar than CI applies.
+
+The practical consequence, stated so it is not mistaken for a hidden risk: the residual leaf-owned
+format finding in the regression test **cannot fail CI**, because the repo's configured formatter
+never sees `packages/cli/`. It was worth correcting anyway, since T-1 was about the honesty of the
+attribution rather than about a merge blocker.
+
+### Not done here, by design
+
+No readiness flip, relabel, issue edit, acceptance-box tick, or merge. Those are coordinator-owned.
+No `e2e:cli`, Aspire, Docker, or browser gate ran, and no host runtime lease was requested or held —
+this leaf's six-path CLI ceiling touches none of that surface.
