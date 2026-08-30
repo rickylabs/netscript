@@ -1852,3 +1852,16 @@
      the exact-`a93df413e` merge packet. No rebase, no new eval unless the head moves or a gate
      fails. Currently blocked only on S6's Phase B (thread `01a05474…`, still executing the
      corrected reconstruction); no runtime attempted yet for #1747.
+- **D-96 — S6 v2 static reconstruction frozen exact-green; Phase-B lease acquired.** Caught a live
+  concurrent-write race: the resumed transplant thread was still active in `007-aspire-s6-v2` while
+  the supervisor ran Tier-A/push in parallel, producing a second silent rebase pass and a trailing
+  cosmetic amend. Diffed the two heads (306fe8547 → 31f44f70c: 3 files, 7 lines, worklog/receipt
+  text only, no code) before pushing either — confirmed harmless, thread terminated (PIDs
+  3948028/3947910/3947957), final head **`31f44f70c`** pushed pinned to
+  `feat/aspire-13-5-s6-health-checks`. Diff scope re-verified against the _current_ main tip
+  (`a3ddcbb598f8` — the earlier apparent 4-file scope creep was staleness from one unrelated main
+  commit landing mid-flight, confirmed byte-identical, rebased away). Invariants re-verified at the
+  frozen head: S1 behavior-gate title exact match, `verify-live-db-endpoint.ts` 0-line diff,
+  `runtime-gates.ts` 305 lines, `runtime/` 11 children. Static gates: 99/0 tests, e2e check 178
+  files/0 failed batches, raw lint/fmt clean on touched paths, host-ports OK, quality ok, arch:check
+  only pre-existing warnings. Host confirmed zero; Phase-B DinD/relay lease acquired.
