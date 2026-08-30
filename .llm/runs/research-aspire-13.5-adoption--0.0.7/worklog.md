@@ -430,4 +430,7 @@ FAIL_FIX → owner decision. Preparing: off-host runtime-proof ref feasibility, 
 playbook, dispatch capability check (D-67). | | Off-host proof ref | Built + validated at
 `f5b8d89e9` (local tag `aspire-13-5-runtime-proof`); push refused for missing `workflow` scope
 (D-68). Owner unblock: `gh auth refresh -s workflow` or push the tag; then dispatch `e2e-cli.yml`.
-D-58 playbook written (`retarget-playbook-d58.md`). |
+D-58 playbook written (`retarget-playbook-d58.md`). | | Off-host runtime proof dispatched | Proof
+ref `ci/aspire-13-5-runtime-proof` @ `9303daf61` (descendant of S1 `ee379457`, workflows
+byte-identical); **run 33326591443** dispatched 17:55:18Z; watching. S3/S7/S8 Phase B → OpenHands
+per PR after S1 convergence. |

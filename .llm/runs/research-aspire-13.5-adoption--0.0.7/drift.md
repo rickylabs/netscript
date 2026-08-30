@@ -1316,3 +1316,21 @@
   re-earned later per D-41/D-58. Alternative: the owner pushes the commit directly
   (`git push origin aspire-13-5-runtime-proof:refs/heads/ci/aspire-13-5-runtime-proof` from any
   worktree of this repo — the objects are already in the shared store).
+- **D-68 resolution (coordinator credential-safe path):** remote
+  `refs/heads/ci/aspire-13-5-runtime-proof` created via the refs API at exact S1 head
+  `ee379457e87bf0f02ab6a9851c4d2b7fe1d06f35`; the combined proof head was rebuilt with
+  `.github/workflows` pinned byte-exact to S1 (`git diff ee379457..HEAD -- .github/workflows` = 0
+  lines; the only prior delta was S9's `06a0e5e1` receipt-upload globs + `retention-days`, preserved
+  on S9's own branch for its convergence) → **`9303daf61f447891304396c7effe11172a34e714`**
+  (descendant of `ee379457`), pushed with the repo-only token (no workflow change after ref
+  creation), tag `aspire-13-5-runtime-proof` updated. **Dispatched `e2e-cli.yml` → run `33326591443`
+  (`workflow_dispatch`, sha `9303daf61`, 2026-08-30T17:55:18Z,
+  https://github.com/rickylabs/netscript/actions/runs/33326591443).** Evidence-only: the run covers
+  S6 listener health, S9 `agent.aspire-mcp-smoke`, S10 `runtime.resource-command` and the generic
+  scaffold runtime/sqlite tiers at 13.5.3 (S1 pins) with the #1736 hydration fix applied;
+  exact-merge-head verdicts are re-earned per D-41/D-58.
+- **Infra audit route (coordinator):** S3 telemetry envelopes, S7 kill-CLI/foreign-AppHost, S8
+  `runtime.typed-db-phase-b` are not in the suite arrays → after S1 convergence, dispatch their
+  checked-in Phase-B briefs **one PR at a time via `agentic:dispatch-openhands`** on #1741, #1744,
+  #1754, preserving exact-head receipts + generic e2e artifacts. No safe live NAS topology fix
+  exists without external `ai-agents` recreation — local leases stay off.
