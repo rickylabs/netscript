@@ -5821,3 +5821,11 @@ confirmed `working` throughout.
 - Not seizing or contending for the lease. Queuing #1758's e2e:cli behind `007-leaf-1357`'s current
   hold, per "queue at the next serialized runtime lease" — this means wait for a free turn, not
   force one.
+
+## D-112 — #1758: e2e:cli lease freed, launched at converged head
+
+Lease `/ephemeral/tmp/netscript-e2e-scaffold-runtime.lease` released by `007-leaf-1357`; confirmed
+genuinely free (`docker ps` empty, no AppHost) before launching. `deno task e2e:cli` launched pid
+`459495` at head `94620577d`, confirmed genuinely progressing (real gate sequence: schema
+generation passed, database codegen started). This is the fresh verdict the #1734 fix retires the
+stale `26/1` classification for — first real e2e:cli run at this leaf's current converged head.
