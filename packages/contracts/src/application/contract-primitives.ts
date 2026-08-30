@@ -92,10 +92,11 @@ const commonErrorMap: CommonErrorMap = {
 export type BaseContractMeta = NetScriptProcedureMeta & Record<never, never>;
 
 /**
- * Error map carried by every route built from {@link baseContract}.
+ * NetScript-owned error map carried by every route built from {@link baseContract}.
  *
  * `baseContract` applies `.errors(...)`, so each route's error map is the base vocabulary merged
- * onto an empty map. Mirrors the `BaseErrors` alias used by the first-party
+ * onto an empty map. This public alias names the adapter boundary without re-exporting the upstream
+ * oRPC builder types it composes. It mirrors the `BaseErrors` alias used by the first-party
  * `@netscript/plugin-*-core` contract definitions.
  */
 export type BaseContractErrors = MergedErrorMap<Record<never, never>, typeof commonErrorMap>;

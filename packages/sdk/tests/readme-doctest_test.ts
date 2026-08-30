@@ -1,5 +1,6 @@
 import {
   baseContract,
+  type BaseContractMeta,
   CursorPaginationInputSchema,
   type NotFoundErrorSchema,
   SuccessSchema,
@@ -44,7 +45,7 @@ type _BaseNotFoundShapePreserved = Assert<
 
 type BaseMeta = typeof baseContract['~orpc']['meta'];
 type _BaseMetaIsNotAny = Assert<Equal<IsAny<BaseMeta>, false>>;
-type _EmptyBaseMetaSlotPreserved = Assert<Equal<BaseMeta, Record<never, never>>>;
+type _BaseMetaSlotPreserved = Assert<Equal<BaseMeta, BaseContractMeta>>;
 
 const typedErrorContract = {
   list: baseContract
