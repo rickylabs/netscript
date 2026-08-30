@@ -6807,3 +6807,62 @@ correctness and is structurally blind to the repo-level generated-artifact surfa
 touches.** The fix is not another one-off addition; it is that any slice touching `docs/` or a package
 README must carry the generated-carrier gates — corpus, publish assets, assets barrel, export-surface
 corpus, tagline — in its contracted set from the start. Proposed for the coordinator, not applied.
+
+## Two corrections from the stopped evaluator — one of them is mine
+
+Session `b247bef9` stopped cleanly (nothing committed or pushed, worktree clean) and returned its
+completed measurements. Two change the record.
+
+### 1. My attempt-10 `public-doc-lint` receipt is DEFECTIVE — verified
+
+```text
+attempt 10 argv:  ["deno","doc","--lint"]          exit 1, durationMs 7
+                  stderr: "the following required arguments were not provided: <source_file>"
+attempt  9 argv:  19 elements, all 16 entrypoints   exit 1, durationMs 161
+```
+
+When I re-cut the eight receipts at `75b78220` I invoked
+`run-gate.ts --gate public-doc-lint` **without the plan's 16 entrypoint arguments**, so the catalog's
+bare `deno doc --lint` ran, failed in 7 ms with a **usage error**, and recorded `exit 1`. Every
+archived receipt (attempts 1/4/5/8/9) carries the 19-element argv `plan.md:233` contracts.
+
+**So my statement that `public-doc-lint` was "FAIL exit 1, baseline-red, delta 0, R-1 unchanged" at
+`75b78220` was not backed by that receipt.** The set identity at that head is real — the evaluator
+re-derived 12 = 12 with the exact R-1 set, and so did I earlier at other heads — but the *receipt*
+attests a command that never linted anything.
+
+**Why I missed it when I had caught the identical class before.** Earlier I caught
+`deno task test deno task test` because a gate I expected to *pass* failed. Here I expected
+`public-doc-lint` to **fail** — it is the contracted baseline-red gate — so `exit 1` looked exactly
+like the correct answer and I did not read the argv. **An expected-red gate hides invocation defects,
+because the receipt says what you were expecting to see.** The guard is to check `argv` and
+`durationMs`, not just `exitCode`: 7 ms could never be a 16-entrypoint doc-lint run.
+
+The re-cut after integration must pass the explicit 16-entrypoint argv, and every future recut of this
+gate must be verified on argv length, not outcome.
+
+### 2. The corpus staleness is 100% branch-owned — my earlier hypothesis was wrong
+
+I speculated that the bundle's `sourceCommit 265dd8760` / `2026-08-24` timestamp meant the staleness
+partly predated this branch. **Measured on `origin/main` `f8b4f804`: `{"fresh":true,"stalePaths":[]}`.**
+Main is fresh. The provenance date only records when the bundle was last regenerated; nothing on main
+since then touched a corpus input.
+
+This branch edited `docs/site/reference/contracts/index.md`, which **is** a corpus input. So the
+staleness is entirely #1731's, with no inherited component. Corrected here rather than left standing.
+
+### Inherited from `b247bef9`, so the successor does not re-derive it
+
+At content head `75b78220`, measured by that session: tagline **246 B**, `over=0`, judged faithful to
+the ownership claim with nothing material lost; `git diff 9ab779ce..75b78220 -- . ':!.llm/runs'` is
+**`packages/contracts/README.md` only, +3/−3**; `public-doc-lint` **12 = 12 with the exact R-1 set**;
+all eight receipts `gitHead == actualGitHead`, `test` **4258/0/19** PASS; five archives verified
+append-only via `git log --diff-filter=MD` (empty on each); package suites **94/94**; `quality:gate`,
+`docs:exports-drift`, workspace and per-member `publish --dry-run` all green. Its G-1 decoy probe was
+**not** run and root `test` was killed mid-flight — both open for the successor.
+
+It also reported the **close-gate** job failing at "Referenced issue acceptance gate", which is
+expected: the acceptance mirror has not run and cannot until `status:ready-merge`.
+
+Its own recommendation matches mine independently: add `docs-tagline` **and** `agent-docs-prose` to
+the checked set — "the third D-27-class miss on this leaf".
