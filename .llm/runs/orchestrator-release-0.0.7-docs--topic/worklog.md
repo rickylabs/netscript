@@ -2121,3 +2121,36 @@ Milestone 27 has **61 open issues and zero unallocated**. Every docs-labelled on
 source-blocked (#1723), another lane's in-flight work (#1721, #1533), or not a docs slice
 (#1365, #1360). So the next docs work is a **proposal**, not a free ticket — recorded in the
 supervisor handoff.
+
+## Provisional 0.0.7 changelog — top-up queue
+
+The `## 0.0.7` section shipped in #1761 is **provisional** and pinned to
+`v0.0.6..a5520e70` (37 commits). Every commit that lands on `main` after that pin accrues here until
+the release captain calls the pre-cut top-up. **This queue is a ledger, not a PR** — no top-up-only
+branch, PR or public canary is opened for it, because a changelog top-up has no independent
+acceptance and would burn a canary slot on prose that the release cut will consume anyway.
+
+Each row carries a triage decision made the same way the shipped table was: consumer observability,
+verified from the diff rather than the commit subject.
+
+| Commit | PR / issue | Decision | Reason (verified) |
+| --- | --- | --- | --- |
+| `3e5cbabf` | #1731 → closes #1466 | **INCLUDE** | `packages/contracts` gains a NetScript-owned procedure-metadata vocabulary on its **published** surface: `src/public/mod.ts` newly exports `NetScriptProcedureMeta` and `NetScriptAuthenticationRequirement` from the new `src/domain/procedure-meta.ts`, alongside `BaseContractErrors`, `BaseContractMeta` and `CommonErrorMap`. The metadata is deliberately independent of oRPC public types and propagates to direct clients, generated clients and query factories without casts. Crucially it does **not** erase the concrete error channel repaired by #1350 — that preservation is the point of the change and must be stated, not just the addition. `docs/site/reference/contracts/index.md` and `packages/contracts/README.md` moved with it. |
+
+**Draft bullet for the top-up** (wording to be re-verified against source at top-up time, not
+copied forward blind):
+
+> Contracts export a NetScript-owned procedure-metadata vocabulary — `NetScriptProcedureMeta` and
+> `NetScriptAuthenticationRequirement` — that reaches direct clients, generated clients and query
+> factories without casts, and that leaves the concrete contract-error channel intact.
+
+**Rules this queue inherits from the shipped section:**
+
+1. Triage from diffs, never from commit subjects — the shipped table's own cycle-1 `FAIL_PLAN` was
+   caused by five commits excluded on a subject-derived reason that was false for the shipped bundle.
+2. Never describe a *declaration* as a *requirement*, or a type-level rejection as a runtime one.
+   That distinction is what an external review had to teach this lane on B1.
+3. A removal is never described as an improvement.
+4. The section stays provisional until the release captain runs the top-up; the GitHub release
+   **introduction** remains maintainer-authored and is not this lane's to write.
+
