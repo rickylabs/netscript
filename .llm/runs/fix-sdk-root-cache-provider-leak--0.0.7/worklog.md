@@ -170,6 +170,26 @@ follow-ups are now recorded in `drift.md`.
 - E2E CLI, Aspire, Docker, real browser/Vite, and release/canary gates: prohibited or N/A exactly as
   recorded in `plan.md`.
 
+## Acceptance evidence mapping for issue #1462
+
+The PR body carries the machine-readable fenced mapping. Each entry below is derived from the named
+artifact; issue boxes remain coordinator-owned and are not mutated by this lane.
+
+| Issue acceptance box | Concrete artifact evidence |
+| --- | --- |
+| Browser/Vite import of the `defineServices` entry leaves `hasCacheProvider()` false. | `packages/sdk/tests/query/define-services-browser-import_test.ts`, committed alone at `ddf66a6f`: intact-runtime red exit 1, 0/1, observed `true`, no Deno-global crash; green at product commit `1dd64dae`: exit 0, 1/0, with both root and presets observing `false`. |
+| Browser `queryOptions().queryFn()` calls an injected typed client and never loads `@netscript/kv`. | `packages/sdk/tests/query/query-factory_test.ts` includes `queryOptions remains a direct service query when no server cache is registered`, exercising two calls through the injected typed client. The 70/0 whole SDK suite passed, and the committed entry-graph assertion proves root 19 -> 0 unsafe edges and presets 0, excluding resolved/raw KV. |
+| Production client chunks contain no server KV adapter. | No bundled chunk was inspected. The committed `deno info --json` assertion and independent evaluator reproduction prove the root graph changed from 19 unsafe edges to 0 and the presets graph is 0, excluding `/packages/kv/`, raw/JSR `@netscript/kv`, every `node:` edge, and logger modules. Those modules are unreachable from either published entry and therefore unavailable to a bundler from those entries; this is graph-level, not chunk-inspection, evidence. |
+| `defineFreshApp`/server bootstrap still registers the provider explicitly. | `packages/fresh/src/runtime/server/define-fresh-app.test.ts`; evaluator run exit 0, 11/0. Its fresh child proves importing the module leaves the provider absent and calling `defineFreshApp()` registers it. |
+| Server cache miss/hit/invalidation tests remain green. | Evaluator rerun of the whole `packages/sdk/tests/` suite: exit 0, 70/0; Fresh server suite including query-cache invalidation: 17/0; provider diagnostic: 1/0. |
+
+No runtime gate is owed for this leaf. The locked plan records `e2e:cli`/scaffold runtime as NOT RUN
+and prohibited because no CLI/scaffold source is owned and no runtime lease exists; Aspire is N/A
+and prohibited because no service topology changes; Docker is N/A and prohibited because no
+container surface or lease exists; and a real browser/Vite run is NOT RUN and prohibited locally.
+No runtime lease was requested. The intact-runtime child plus committed and independently reproduced
+module graphs are not mislabeled as a browser or bundled-chunk execution.
+
 ## Handoff notes
 
 S3 implementation, compatibility prose, generated derivatives, and gate evidence are pushed at
