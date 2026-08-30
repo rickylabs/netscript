@@ -5335,3 +5335,25 @@ evaluator sessions, worth surfacing to the coordinator regardless of the model s
   Not investigated yet — noted so it isn't mistaken for supervisor-initiated activity.
 - **Next action:** attempt a cheap `--resume <session>` nudge asking the session to synthesize and
   write its already-gathered findings now, before considering a full costly restart.
+
+## D-92 — #1774 DeepSeek retry (attempt 2) dispatched with output-first protocol
+
+Per coordinator instruction: not a resume of the empty session — a fresh dispatch, same preset
+(`claude-evaluator-deepseek-v4-flash-0731`, effort max), unchanged heads. Brief cut from 183 to 67
+lines and restructured around one rule: **write `impl-eval-cycle-2.md` incrementally, one checklist
+item at a time, committing as it goes** — rather than gathering all evidence in-session and
+attempting one large final synthesis, which is the supervisor's working theory for why attempt 1
+produced `stop_reason: end_turn` with empty text after 104 turns and $9.59. The PR comment is gated
+on the artifact already containing an explicit `VERDICT: …` line, and the evaluator is told to
+downgrade to a bounded honest verdict rather than keep investigating if it's running long.
+
+Reused the existing `007-eval-1774-deepseek` worktree (confirmed clean, `git status --porcelain`
+empty, HEAD still `8a1ec2750`) rather than re-cloning. Dispatched fresh (no `--resume`), pid verified
+via `/proc/<pid>/cwd`.
+
+**Validation this time will check the artifact file and the PR comment directly, not the process
+result field** — attempt 1's `result: ""` with `is_error: false` would have looked identical to a
+success if I had trusted the field alone.
+
+Unrelated, noted but not yet acted on: an OpenHands agent is running against PR #1775
+(`run_id 33333056325`), not triggered by this supervisor.
