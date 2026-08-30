@@ -171,3 +171,16 @@
 - **Action:** PR #1740 references `Part of #1365` with the remaining scope listed; #1370 and #979
   keep closing keywords. Coordinator to either amend #1365's boxes (D-14 decision) or route the
   remainder to S11 + a sagas follow-up. Severity: minor (scope honesty, no code impact).
+
+## D-19 — 2026-08-30 — S6 endpoint projection API corrected against restored 13.5.3 module
+
+- **What:** Issue #1718 (line 44) and plan D3 locked host/port resolution at check time via
+  `getEndpoint('tcp').property(EndpointProperty.Host|Port)` ("13.4+ thenable chain"). S6 IMPL-EVAL
+  cycle 1 compiled a generated AppHost against S2's restored 13.5.3 `.aspire/modules/aspire.mts`
+  and found `property()` yields `EndpointReferenceExpression` handles; the value API is
+  `getEndpoint('tcp').host()` / `.port()`. `HealthCheckResult.data` is `Record<string, string>`.
+- **Action:** intent unchanged (live host/port per invocation, no credentials); projection call and
+  `data` typing corrected in S6 slice 6. **Process:** a consumer type-check of a generated AppHost
+  against the restored 13.5.3 modules is now a mandatory Tier-A + IMPL-EVAL gate for every
+  generator slice (S4/S5 to be re-checked retroactively by the supervisor). Severity: significant
+  (would have shipped rejecting health checks).

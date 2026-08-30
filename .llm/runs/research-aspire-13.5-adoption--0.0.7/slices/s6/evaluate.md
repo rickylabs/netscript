@@ -1,0 +1,144 @@
+# Evaluation: S6 — Aspire 13.5 listener-readiness health checks (phase A)
+
+Allowed result values: `PASS`, `FAIL`, `N/A`, `PENDING_SCRIPT`, `DEBT_ACCEPTED`, `NOT_RUN`.
+Anti-pattern status values: `CLEAR`, `VIOLATION`, `DEBT_ACCEPTED`, `N/A`.
+
+## Metadata
+
+| Field          | Value |
+| -------------- | ----- |
+| Run ID         | `feat-aspire-13-5-s6-health-checks--impl` (generator run dir on the S6 branch) |
+| Target         | issue #1718 / draft PR #1743 · `packages/cli` Aspire AppHost generation + CLI E2E |
+| Evaluated head | `78d0ded2849eb28eddb60c409bfd68284d7e419b` on `feat/aspire-13-5-s6-health-checks` (== `origin/feat/aspire-13-5-s6-health-checks`) |
+| Base           | S5 head `0bd8ba832625655aa42d1a803a8b5b1aca021c37` (`merge-base HEAD origin/fix/aspire-13-5-s5-literal-ports` == base; S5 commits untouched) |
+| Archetype      | `6 — CLI / Tooling` |
+| Scope overlays | `none` |
+| Evaluator      | Claude · Anthropic · Fable 5 · medium — independent IMPL-EVAL session, worktree `/home/codex/repos/netscript-aspire-13-5-s6-eval` (detached at head), 2026-08-30. Generator: Codex · GPT-5.6 Sol. |
+| Phase          | **Phase A only** — live `healthReports` receipts and `runtime.health.listener-unreachable` execution are lease-backed phase B and were not required. |
+
+## Process Verification
+
+| Check | Result | Evidence |
+| ----- | ------ | -------- |
+| Plan-Gate passed before implementation | `PASS` | `PLAN-EVAL: N/A` recorded in `worklog.md` progress log (bootstrap row, 04:16) before slice 1 RED; justified by the ratified locked contract in #1718. |
+| Design section exists in worklog | `PASS` | `worklog.md` `## Design` with Public Surface / Domain Vocabulary / Ports / Constants / Archetype-6 inventory / Commit Slices / Deferred Scope / Contributor Path. |
+| Commit slices match design plan | `PASS` | 5 commits after `0bd8ba832`: `54fdf19fe` helpers RED→green → `feb1e7aad` generator emission → `c33766718` barrel regen → `92de34d9b` E2E split + wait gates + phase-B fixture → `78d0ded28` gates/drafts; matches the 5-row Commit Slices table. Every commit touches `.llm/runs/` (6/2/2/3/5 run files). |
+| Each slice has a passing gate | `PASS` | All named slice gates re-executed by the evaluator (see Static/Fitness/Consumer). |
+| No speculative seams (unused files) | `PASS` | `listener-unreachable-fixture.ts` is registered via `createListenerReadinessGates` → `scaffold-capability-gates.ts:22` and `capability-suites.ts:107` (`GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE`); all moved `runtime/*` probes are imported. |
+| Constants used for finite vocabularies | `PASS` | `LISTENER_READINESS_TIMEOUT_MS = 2_000`; `GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE`; `ASPIRE_RESOURCE.*`; `_listener`/`_resp` suffixes derived in one place each (`generate-register-infrastructure.ts:200,515`; `listener-readiness-gates.ts`). |
+| Per-slice PR trail | `PASS` (minor) | 4 per-slice comments on #1743 for commits 1–4; the docs-only handoff commit `78d0ded28` has no comment (PR body slice S5 unchecked). Pushes recorded as explicit `HEAD:refs/heads/...` refspecs in `worklog.md`. |
+
+## Static Gates
+
+| Gate | Command or check | Result | Evidence | Notes |
+| ---- | ---------------- | ------ | -------- | ----- |
+| Configured lint | `.llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)\|…)"` (invoked directly — `deno task lint` reported `(cached, inputs unchanged)`) | `PASS` | `filesSelected:2047, filesProcessed:2047, failedBatches:0, totalOccurrences:0`, exit 0 | |
+| Scoped typecheck | `.llm/tools/run-deno-check.ts --root packages/cli/src/kernel/templates/aspire --root packages/cli/e2e --ext ts,tsx` | `PASS` | `filesSelected:213, batches:2, failedBatches:0, totalOccurrences:0` | Repo-side TS only; see Consumer Gates for the generated-project compile. |
+| Raw lint (config-excluded `packages/cli`) | `deno lint --no-config <26 changed cli .ts files>` | `PASS` | `Checked 26 files`, exit 0 | |
+| Raw format (config-excluded `packages/cli`) | `deno fmt --check --no-config --single-quote --line-width 100 <26 files>` | `PASS` | `Checked 26 files`, exit 0 | `generate-register-infrastructure.ts` was fully re-formatted (no-semicolon → semicolon), inflating the diff to 381 lines; cosmetic, in a config-excluded file. |
+| New `deno-lint-ignore` / `as unknown as` / `any` | `git diff 0bd8ba832..HEAD \| grep '^+' \| grep -E …` | `PASS` | 0 new; the single hit is the pre-existing `as unknown as CacheConsumerBuilder` carried inside the regenerated barrel string. | |
+| Helper + generator + E2E tests | `.llm/tools/run-deno-test.ts -- --allow-all packages/cli/src/kernel/templates/aspire packages/cli/e2e/tests` | `PASS` | `passed:462, failed:0`, exit 0, 14 s | Includes the 6 helper cases (local server / closed port / 2000 ms black hole / `+PONG` / `-NOAUTH` / garbage), per-kind emission, credential grep, listener-readiness parser/registry tests. |
+| Doc lint / Publish dry-run | — | `N/A` | No docs, no `packages/aspire` / published surface change (`git diff --stat` shows only `packages/cli/**` + run dir). | |
+
+## Fitness Gates
+
+| Gate | Function | Result | Evidence | Violations |
+| ---- | -------- | ------ | -------- | ---------- |
+| F-1 | File-size lint | `PASS` | `runtime-gates.ts` 812 → 305 lines; `runtime/behavior-gates.ts` 304; largest new file `listener-unreachable-fixture.ts` 211. | none new |
+| F-2 | Helper-reinvention scan | `PASS` | Helpers wrap `node:net` `createConnection` only; no client library, no dependency change (`deno.lock` untouched). | |
+| F-3 | Layering check | `PASS` | Socket IO lives only in the emitted `_aspire-compat.mts` and E2E fixture scripts; generator has no `node:net`/`createConnection` (grep 0). | |
+| F-5 | Public surface audit | `PASS` | No `packages/aspire` or CLI command surface change; only generated-project helper exports. | |
+| F-6/F-7/F-8/F-9/F-15 | JSR / doc-score / lib / permissions / re-export | `N/A` | No published surface touched; jsr-audit N/A with evidence above. E2E gate commands declare exact `--allow-run=aspire`, `--allow-write`. | |
+| F-10 | Test-shape audit | `PASS` (with finding) | Helper test executes the real template module against real local sockets — good; but it stubs `.aspire/modules/aspire.mts` with a **looser** `HealthCheckResult` (`data?: Readonly<Record<string, unknown>>`) than 13.5.3's `data?: Record<string, string>`, so the contract mismatch in Finding 2 is invisible to the suite. Generator tests assert the exact (wrong, see Finding 1) `property(EndpointProperty.Host)` form. | see Findings |
+| F-16 | Folder-cardinality lint | `DEBT_ACCEPTED` (stale entry) | Scaffold gate dir: 48 → 43 direct files / 45 children (cap 12) — reduced, not resolved; new `runtime/` dir 11 children (within cap). `arch:check` exit 0, `FAIL=0`. Existing entry `scaffold-runtime-a8-f16-1333` not updated (Finding 4). | |
+| F-19 | Scoped source gate runners | `PASS` | Wrappers above. | |
+| `quality:scan` | `deno task quality:scan` | `PASS` | exit 0, `findings: []`, `allowCount: 7` (unchanged). | |
+| `arch:check` | `deno task arch:check` | `PASS` | exit 0, `FAIL=0`; only carried-in WARNs. | |
+
+## Runtime Gates
+
+| Gate | Validation | Result | Evidence |
+| ---- | ---------- | ------ | -------- |
+| `runtime.health.listener-unreachable` | stop → Unhealthy/exit 18 → start → Healthy | `NOT_RUN` | Phase B (runtime lease). Fixture code present and registered, not executed — accepted per brief. |
+| Live `healthReports` `<r>_listener`/`_resp` = Healthy | `aspire wait` + `aspire describe` | `NOT_RUN` | Phase B. **Note:** with the generated code at this head, phase B cannot go green (Finding 1). |
+
+## Consumer Gates
+
+| Consumer | Validation | Result | Evidence |
+| -------- | ---------- | ------ | -------- |
+| Asset barrel | `deno task check:assets-barrel` | `PASS` | exit 0; `embedded.generated.ts` reproduces; `generate-register-infrastructure-1.ts.template` byte-identical because the emission lives in generator code, not the slot template (verified in generated output below). |
+| `scaffold.plugins` | `deno task e2e:cli run scaffold.plugins --cleanup --format pretty` | `PASS` | `Summary: passed=17 failed=0 skipped=0`, exit 0. |
+| Generated AppHost compiles against 13.5.3 | `netscript-dev init s6tsc --db postgres --cache …` (local CLI at head) + copy of S2's restored `aspire/.aspire/modules/{aspire,base,transport}.mts` (SDK `13.5.3`, `aspire.config.json` from S2) + S2's `node_modules`; `./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json` | **`FAIL`** | exit 2. Baseline (not S6): 2× `TS2307 Cannot find module 'zod'` — identical to S2's pre-install receipt `01-tsc-noemit.raw.txt`. **New in S6 (7 errors):** `.helpers/register-infrastructure.mts(72,61)`, `(72,67)`, `(88,34)`, `(88,40)`: `Type 'EndpointReferenceExpression' is not assignable to type 'string'` / `'string \| number'`; `.helpers/_aspire-compat.mts(232,13)`, `(257,5)`, `(270,5)`: `Type 'Readonly<Record<string, unknown>>' is not assignable to type 'Record<string, string>'`. |
+| Generated emission per kind | grep of generated `.helpers/register-infrastructure.mts` | `PASS` (shape) | `builder.addHealthCheck('postgres_listener', …)` + `await postgres_server.withHealthCheck('postgres_listener')`; `builder.addHealthCheck('redis_resp', …)` + `await redis.withHealthCheck('redis_resp')`; Deno KV/SQLite/none/External emit nothing (generator test `does not emit listener checks for SQLite, external resources, or Deno KV`). |
+
+## Contract verification (against the real 13.5.3 module, not prose)
+
+Source of truth: S2's restored `.aspire/modules/aspire.mts` (4,493,632 bytes, SDK `13.5.3`, restored by Aspire CLI `13.5.3+b5f1433`), at `netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/aspire/`. The S2 receipt `01-restored-module-grep.raw.txt` on `origin/test/aspire-13-5-s2-runtime-verification` only greps `withHttpHealthCheck` — it does **not** contain `addHealthCheck`/`HealthStatus`/`EndpointProperty`, so the brief's pointer is not sufficient evidence on its own; the module itself was read.
+
+| Contract item | 13.5.3 module | S6 head | Verdict |
+| ------------- | ------------- | ------- | ------- |
+| `HealthStatus` member casing | `export enum HealthStatus { Unhealthy = "Unhealthy", Degraded = "Degraded", Healthy = "Healthy" }` (l.620) | `HealthStatus.Healthy/Unhealthy/Degraded` | match |
+| `addHealthCheck` signature | `addHealthCheck(name: string, check: () => Promise<HealthCheckResult>)` (l.10518) | `builder.addHealthCheck('<key>', async () => …)` | match |
+| `withHealthCheck` signature | `withHealthCheck(key: string)` (l.16055 container) | `.withHealthCheck('<key>')` | match |
+| `HealthCheckResult.data` | `data?: Record<string, string>` (l.1020) | `Readonly<Record<string, unknown>>` with numeric `port`, `elapsedMs` | **mismatch** (TS2322 ×3) |
+| Host/port at check time | `EndpointReference.host(): Promise<string>`, `.port(): Promise<number>` (l.4764/4768, also on `EndpointReferencePromise`); `property(EndpointProperty)` returns `EndpointReferenceExpressionPromise` → **`EndpointReferenceExpression` object** (`toJSON/endpoint/property/valueExpression`), not a value (l.4717, 5068) | `const host = await X.getEndpoint('tcp').property(EndpointProperty.Host)` passed as `host: string` | **mismatch** (TS2322 ×4); at runtime `createConnection({ host: <object>, port: NaN })` throws → the check can never report Healthy |
+| One socket, `setTimeout(2000)`, destroy on connect/data/error/timeout, no retry | — | `_aspire-compat.ts.template` `createListenerReadinessCheck`/`createRespPingCheck`: single `createConnection`, `settled` guard, `socket.destroy()` in `finish`, `socket.setTimeout(LISTENER_READINESS_TIMEOUT_MS)`, no loop | match |
+| Healthy description `<kind> listener ready on <host>:<port>`; Unhealthy `data: { code, host, port, elapsedMs }`; Degraded only `-NOAUTH` | — | as specified (`listenerFailure`, `respFailure`, `listenerData`; `-NOAUTH` → `Degraded`, `auth required — readiness only`) | match (modulo `data` value types above) |
+| No credentials in probe | — | generator tests assert no `password`/`username`/`<name>_password` in each health-check block; evaluator grep of the generated block: 0 hits | match |
+| `healthReports` shape parsed by E2E | S2 `02-v5-aspire-describe-final.json`: `healthReports` is an object keyed by check name with `{status, description?}` | `readListenerHealthReport` requires object-valued reports with string `status` | match |
+
+## Anti-Pattern Check
+
+| AP | Status | Evidence | Notes |
+| ----- | ------ | -------- | ----- |
+| AP-1 | `CLEAR` | `runtime-gates.ts` 812 → 305; no file > 500 lines touched. | Registry split performed. |
+| AP-2 | `CLEAR` | Helpers add policy (timeout, result mapping, RESP parse) over `node:net`; not a rename. | |
+| AP-3–AP-9 | `N/A` | No interfaces/inheritance/DI/factory changes. | |
+| AP-10 | `CLEAR` | No defensive try/catch added in handlers; fixture `finally` is the required recovery path. | |
+| AP-11 | `CLEAR` | Generator is pure (no `node:net`/IO); IO at emitted runtime edge and E2E scripts. | |
+| AP-12 | `CLEAR` | `setTimeout` is the socket's own idle timeout in the runtime-edge helper, per contract. | |
+| AP-13 | `CLEAR` | `console.info` only in E2E scripts (not published). | |
+| AP-14–AP-17 | `N/A` | | |
+| AP-18 | `CLEAR` | Generator tests are semantic block assertions, not whole-output snapshots. | |
+| AP-19 | `CLEAR` | E2E commands declare `--allow-run=aspire` / `--allow-write` explicitly. | |
+| AP-20–AP-24 | `N/A` | | |
+| AP-25 | `CLEAR` | See AP-11. | |
+
+## Arch-Debt Delta
+
+| Metric | Count | Evidence |
+| ----- | ----- | -------- |
+| New entries | 0 | `git diff --stat 0bd8ba832..HEAD -- .llm/harness/debt/` empty. |
+| Resolved entries | 0 | — |
+| Deepened violations | 0 | F-1/F-16 metrics improved (812→305 lines; 48→43 direct files). |
+| Unrecorded violations | 0 | — |
+| Stale entries | 1 | `scaffold-runtime-a8-f16-1333` — its **Target** ("before the next scaffold runtime gate or probe is added") has now been hit and its **Gate** (behavior/probe split into role-named modules + bounded subdirectory) was substantially performed by `92de34d9b`, but the entry's Status/measurements were not updated; `plan.md` § Arch-Debt Implications itself required `update`. Recorded only in `drift.md` + PR body. |
+
+## Findings
+
+| Severity | Finding | Evidence | Required action |
+| -------- | ------- | -------- | --------------- |
+| **high** | Generated health-check callbacks pass `EndpointReferenceExpression` objects, not host/port values. `await X.getEndpoint('tcp').property(EndpointProperty.Host\|Port)` resolves to an expression handle in 13.5.3; the value API is `getEndpoint('tcp').host()` / `.port()` (both on `EndpointReference` and `EndpointReferencePromise`). Result: `tsc --noEmit` on the generated AppHost fails (4× TS2322 at `register-infrastructure.mts:72,88`) and at runtime `createConnection({ host: <object>, port: NaN })` throws `ERR_SOCKET_BAD_PORT`/invalid-arg inside the executor → every `<r>_listener`/`<r>_resp` check rejects; phase B cannot reach Healthy. Issue #1718 line 44 and plan D3 locked this mechanism ("13.4+ thenable chain") — the *intent* (live host/port per invocation) stands; the projection call is wrong. | Consumer gate "Generated AppHost compiles against 13.5.3": exit 2; module lines 4717/4764/4768/5068. Generator tests (`generate-register-infrastructure_test.ts:66,70,117,121`) assert the wrong form. | **fix** (`FAIL_FIX`): emit `const endpoint = await X.getEndpoint('tcp'); const host = await endpoint.host(); const port = await endpoint.port();` (or equivalent value-resolving call) inside the callback; update the four generator assertions; append a `drift.md` entry amending D3 / #1718 l.44 with the module evidence. |
+| **high** | `HealthCheckResult.data` typed/populated as `Record<string, unknown>` with numeric `port`/`elapsedMs`; 13.5.3 declares `data?: Record<string, string>`. Generated `_aspire-compat.mts` fails typecheck (3× TS2322 at 232/257/270). | Same consumer gate; module l.1020. | **fix**: type `listenerData` as `Record<string, string>` and stringify `port`/`elapsedMs` (contract keys unchanged); update helper assertions accordingly. |
+| medium | Helper unit test stubs `.aspire/modules/aspire.mts` with a looser `HealthCheckResult` than 13.5.3, and the run recorded "structured check … 0 diagnostics" as contract proof — but no gate type-checks the *generated* helper/registration against the real module, which is exactly where both high findings live. | `aspire-compat-health-checks_test.ts:27-40`; worklog slice-1/2 gate rows. | **fix**: make the stub mirror 13.5.3's `HealthStatus` enum + `HealthCheckResult` (`data?: Record<string,string>`) verbatim, or add a `tsc --noEmit` style consumer check (a `deno check` of the rendered template against a typed stub is sufficient in phase A). Record in worklog. |
+| medium | `scaffold-runtime-a8-f16-1333` not updated although its Target was hit and its Gate largely executed by this PR; plan required `update`. | Arch-Debt Delta above. | **debt bookkeeping**: append a dated S6 status line (812→305 lines; 48→43 direct files / 45 children; `runtime/` 11 children; entry stays open for the residual F-16 fan-out). |
+| low | `generate-register-infrastructure.ts` re-formatted wholesale (semicolons) alongside the feature change, making the generator diff 381 lines for ~40 lines of emission logic. | `git diff --stat`. | none required (file is config-excluded and now matches repo fmt settings); note for reviewers. |
+| low | Handoff commit `78d0ded28` has no per-slice PR comment; PR body slice S5 box unchecked. | PR #1743 comments (4). | post the slice-5 comment when the fix commit lands. |
+
+Boundaries verified (no finding): no S8 commands / `excludeFromMcp`, no version pins (`aspire.config.json` sdk stays `13.4.6` in scaffold output — S1 owns pins), no `packages/fresh`, no `packages/aspire`, no docs/skills, no runtime started, no S5 commit edits (merge-base == S5 head), `deno.lock` unchanged. Draft PR body carries `Closes #1718`, `Closes #1280`, `Part of #1712`; base = `fix/aspire-13-5-s5-literal-ports` with the stacking + phase-B lease stated; labels `type:feat, area:cli, area:aspire, priority:p1, epic:aspire-13-5, status:impl` (exactly one `status:`); milestone `0.0.7`. S6b 0.0.8 draft and #1366/#863 comment drafts exist in the run dir and read as scoped.
+
+Known baseline classification: the generated-project `deno task check` TS2345 in `packages/fresh/src/application/query/hydration.ts` (#1734 / PR #1736) was not encountered in any gate this evaluation ran (no CI gate was consulted; `scaffold.plugins` passed); no S6 gate is red for that reason.
+
+## Lessons for Promotion
+
+| Lesson | Pattern | Applies to | Confidence |
+| ------ | ------- | ---------- | ---------- |
+| A locked issue line that names an SDK call is not evidence of the call's return type | Verify every SDK projection named in a contract table against the restored module (`deno doc`/grep of `.aspire/modules/aspire.mts`) before locking a plan decision; add "awaited type = value" to Drift Watch checks. | Archetype 6 generator slices targeting external SDKs | high |
+| Generated-code tests must type-check against the real consumer surface | A test that stubs the SDK module with a looser type passes while the shipped generated file fails `tsc`. Keep one gate that compiles the rendered template against the real (or verbatim-mirrored) SDK types. | Archetype 6 template/generator work | high |
+
+## Verdict
+
+| Field | Value |
+| ----- | ----- |
+| Verdict | **`FAIL_FIX`** |
+| Rationale | The plan, archetype, scope, helper socket contract, key naming, credential isolation, E2E wait/fixture code, PR hygiene, and every repo-side gate (lint 2047/0, check 213/0, tests 462/0, `quality:scan` `[]`, `arch:check` FAIL=0, `check:assets-barrel` 0, `scaffold.plugins` 17/17) are green. But phase A is not *correct*: compiled against the real 13.5.3 module, the generated AppHost fails with 7 new TS2322 errors — the emitted callbacks hand `EndpointReferenceExpression` handles (not host/port values) to `createConnection`, and `HealthCheckResult.data` carries numbers where the SDK requires strings. The first defect guarantees the checks reject at runtime, so the phase-B `Healthy` receipts this PR is waiting on cannot be produced from this head. Fix is bounded (generator projection → `endpoint.host()`/`.port()`, helper `data` stringification, test stub/assertion updates, drift entry amending D3/#1718 l.44, debt-entry status line); no rescope. Eval cycle 1 of 2. |

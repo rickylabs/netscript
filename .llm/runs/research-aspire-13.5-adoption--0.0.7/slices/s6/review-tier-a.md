@@ -44,3 +44,14 @@ time) → `c33766718` barrel regen → `92de34d9b` `runtime-gates.ts` split into
 | `scaffold.plugins --cleanup` | 17/17 |
 
 No blocking finding. **Tier-A verdict: sign-off to IMPL-EVAL (phase A) at `78d0ded28`.**
+
+## IMPL-EVAL cycle 1 (session `9e348b1d`, head `78d0ded28`) — `FAIL_FIX`
+
+- H-1 emission uses `property(EndpointProperty.Host|Port)` → expression handles, not values
+  (`.host()`/`.port()` is the 13.5.3 value API); H-2 `HealthCheckResult.data` must be
+  `Record<string, string>`; M-1 test stub looser than 13.5.3 and no consumer type-check; M-2
+  arch-debt bookkeeping; L-1 wholesale reformat; L-2 missing slice-5 comment.
+- **Tier-A miss:** I verified emission shape and official prose, not compilation against the real
+  restored module. Checklist updated (D-19): compile a generated AppHost against S2's restored
+  `.aspire/modules` for every generator slice; S5's head to be re-checked the same way.
+- Fix brief sent on the thread (slice 6). Cycle 2 follows.
