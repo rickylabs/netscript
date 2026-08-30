@@ -84,8 +84,8 @@ and runs the resulting graph.
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Aspire version trains" } }}
-The generated scaffold config above targets the <code>13.4.6</code> baseline; workspaces adopting the <code>13.5.3</code> train configure <code>sdk.version</code> to <code>13.5.3</code>, hosting packages to <code>13.5.3</code>, and <code>Aspire.Hosting.Browsers</code> to <code>13.5.3-preview.1.26425.3</code>.
+{{ comp callout { type: "note", title: "Target after the 13.5.3 pin" } }}
+The generated scaffold config above targets the <code>13.4.6</code> baseline emitted by the current CLI head. Target workspaces adopting the <code>13.5.3</code> train configure <code>sdk.version</code> to <code>13.5.3</code>, hosting packages to <code>13.5.3</code>, and <code>Aspire.Hosting.Browsers</code> to <code>13.5.3-preview.1.26425.3</code> (the CLI and AppHost SDK must remain on the same release train).
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral, not pinned" } }}
@@ -95,9 +95,9 @@ The generated <code>https</code> profile asks Kestrel for <strong>ephemeral port
 dashboard to <code>:18888</code> or the collector to <code>:4318</code>. Two consequences: (1)
 <strong>trust the URL <code>aspire start</code> prints</strong>, not a memorized port — the
 examples in this essay use <code>:18888</code>/<code>:4318</code> as the conventional Aspire
-defaults, but your run may differ; (2) <code>aspire start --isolated</code> gets its own free
-infra ports <em>and</em> isolated secrets under an isolated run folder, so several apphosts can run
-side by side without colliding on the base dashboard. Point telemetry backends at the endpoint the
+defaults, but your run may differ; (2) <code>aspire start --isolated</code> configures
+randomized ports and isolated user secrets, allowing apphosts to run without colliding on
+the default dashboard port (note that container resource host ports are not guaranteed unique across isolated starts without explicit port configuration). Point telemetry backends at the endpoint the
 run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yourself to fix it.
 {{ /comp }}
 

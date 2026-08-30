@@ -12,10 +12,9 @@ surface reported by `deno doc`. For the full index of packages and plugins retur
 
 > **Generated AppHost runtime behavior.** The TypeScript AppHost this package generates emits
 > **ephemeral ports** (`0`) for the dashboard, OTLP, and resource-service endpoints, so
-> `aspire start --isolated` (an upstream Aspire CLI flag) yields non-colliding, parallel-safe ports
-> and isolated secrets. Generated frontend **app** resources also call `withBrowserLogs()` by default
-> (the AppHost pins `Aspire.Hosting.Browsers` `13.5.3-preview.1.26425.3`), forwarding browser console output into the Aspire
-> dashboard with no opt-in.
+> `aspire start --isolated` (an upstream Aspire CLI flag) configures randomized ports
+> and isolated user secrets (note that container resource host ports are not guaranteed unique across isolated starts without explicit port configuration). Frontend **app** resources also configure `withBrowserLogs()` when the `Aspire.Hosting.Browsers` package is present, forwarding browser console output into the Aspire
+> dashboard.
 >
 > **13.5 AppHost configuration contracts:**
 > - **Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`):** Backing infrastructure

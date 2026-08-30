@@ -161,12 +161,11 @@ failure query `aspire ps --format Json` for the matching AppHost path and retry 
 dashboard; the task wrappers catch this and resolve the running instance automatically.
 
 For AI agents and external tools connecting through the NetScript MCP telemetry server (`@netscript/mcp`),
-endpoint resolution follows a structured precedence chain across options, environment variables, and running instances:
-1. Explicit `--dashboard-url` option.
+endpoint resolution follows a structured precedence chain across options, environment variables, and defaults:
+1. Explicit `--endpoint` option.
 2. `NETSCRIPT_TELEMETRY_ENDPOINT` environment variable.
 3. `ASPIRE_DASHBOARD_PORT` environment variable (e.g. `18888`).
-4. Running AppHost instance discovered via `aspire ps --format Json` (`dashboardUrl`).
-5. Fallback endpoint (`http://localhost:18888`).
+4. Default fallback endpoint (`http://localhost:18888`).
 
 ## Step 3 — Add your own spans in a job handler
 

@@ -18,12 +18,12 @@
 - Authored `docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md` closing #1642.
 - Documented `aspire start --format Json` and `aspire ps --format Json` schemas (`pid`, `appHostPath`, `dashboardUrl` with token redacted, `logFilePath`, `resources`).
 - Documented `ASPIRE_CLI_START_TIMEOUT` environment variable vs `aspire wait --timeout <seconds>`, parallel execution with `--isolated`, and forceful teardown via `aspire stop --force`.
-- Cited S2 runtime verification receipts (`03-v2-cold-start-timing.time.txt`, `03-v3-isolated-starts.raw.txt`, `03-v4-detached-dashboard.raw.txt`) and S10 gate receipts.
+- S2 runtime verification references (`02-runtime-lifecycle.md`, `02-aspire-start-1.json`, `02-aspire-ps-1.json`, `aspire-13.5-verification.md`) [historical reference superseded: public pages cite standard documentation and avoid internal receipt names].
 - Wired xref and how-to index links; `deno task docs:links` passes clean (103 docs, 0 broken links).
 
 ### S4: Observability, skills, reference, tutorials, vto templates, README, CONTRIBUTING (2026-08-30)
-- `docs/site/observability/how-to/add-opentelemetry.md`: documented `aspire:otel --search timestamp:>=`, `aspire:export` archive layout, exit 12 on bare `aspire otel` without running dashboard, and D-17 endpoint resolution precedence.
-- `docs/site/reference/ai/skills.md`: documented upstream Aspire workflow skills co-existence alongside NetScript's diagnostic skill (OF-1a) and the 14-tool Aspire MCP baseline (D-15, D-45).
+- `docs/site/observability/how-to/add-opentelemetry.md`: documented `aspire:otel --search timestamp:>=`, `aspire:export` archive layout, exit 12 on bare `aspire otel` without running dashboard, and endpoint resolution precedence.
+- `docs/site/reference/ai/skills.md`: documented upstream Aspire workflow skills co-existence alongside NetScript's diagnostic skill and the 14-tool Aspire MCP baseline.
 - `docs/site/cli-reference.md`: added Aspire orchestration CLI reference table (`restore`, `start`, `ps`, `describe` / `resources` alias, `stop --force`, `docs api search`).
 - `docs/site/glossary.md`: normalised Aspire definition.
 - `docs/site/tutorials/*` and `deploy.md`: normalised Aspire terminology and links to `aspire.dev`.
@@ -46,7 +46,7 @@
 - **H1 / H2 / H3 (`detached-start-agents-ci.md`):** Replaced JSON example schemas with exact captured schemas from real S2 receipts (`02-aspire-start-1.json` and `02-aspire-ps-1.json`: `appHostPid`, `cliPid`, `logFile`/`logFilePath`, `status`, `sdkVersion`, `dashboardUrl`; no `pid`, no `state`, no nested `resources`). Redaction note conditional on auth token presence (`?t=...`). Removed nonexistent receipt references and S10 assertions. Updated cold start timing to 24.80–38.62 s. Clarified `--non-interactive` vs `--nologo`, `aspire wait <resource>`, and `--isolated` port/secrets scoping.
 - **H4 (`deploy-local-aspire.md`):** Corrected npm package name to `@microsoft/aspire-cli`. Documented `aspire update --self` installation-method awareness and kept single-train rule.
 - **H5 (`explanation/aspire.md`, `deploy-local-aspire.md`):** Updated `aspire.config.json` snippet to reflect current scaffold output (13.4.6 baseline with PostgreSQL, Redis, and Browsers packages) with an explicit note on the 13.5.3 target configuration.
-- **H6 (`add-opentelemetry.md`):** Clarified that generated task wrappers (`aspire:otel`/`aspire:export`) resolve via forwarding and `aspire ps` retry. Documented the 5-step MCP telemetry resolver precedence chain under `@netscript/mcp` and removed internal `D-17` label.
+- **H6 (`add-opentelemetry.md`):** Clarified that generated task wrappers (`aspire:otel`/`aspire:export`) resolve via forwarding and `aspire ps` retry. Documented the MCP telemetry resolver precedence chain under `@netscript/mcp` and removed internal `D-17` label.
 - **H7 (`reference/aspire/index.md`):** Rephrased 13.5 contracts to generated/configuration contracts with live verification pending. Scoped `excludeFromMcp()` strictly to MCP tool surface omission.
 - **M1 (`reference/ai/skills.md`):** Added concrete `aspire agent mcp --dashboard-url <url>` form (with optional `--api-key`). Removed `OF-1 (a)` and `ratified` from public prose. Kept exact 14-tool baseline.
 - **M2 (`cli-reference.md`):** Clarified `aspire ps` token condition and `aspire stop --force` definition per `aspire stop --help`.
@@ -54,6 +54,15 @@
 - **M4 (Prose Hygiene):** Verified 0 occurrences of decision IDs (`D-17`, `OF-1`), internal test receipt references, or `/home/agent` paths across all public doc pages.
 - **M5 (Diagrams Gate):** Recorded `diagrams:check` execution in run dir (Mermaid CLI `mmdc` unavailable; committed SVGs verified by Lume build).
 - Re-ran `gen:agent-docs-prose`, `gen:publish-assets`, `gen:assets-barrel` and verified `check:agent-docs-prose`, `check:publish-assets`, `docs:links`, Lume build.
+
+### Docs Audit Cycle-2 Fixes (2026-08-30)
+- **H2 (`worklog.md`):** Updated historical receipt citations to real S2 files (`02-runtime-lifecycle.md`, `02-aspire-start-1.json`, `02-aspire-ps-1.json`, `aspire-13.5-verification.md`) and marked superseded; removed S10 runtime-receipt assertions.
+- **H3 (`detached-start-agents-ci.md`, `explanation/aspire.md`, `reference/aspire/index.md`):** Updated cold start timing to cite 2 recorded runs (38.62 s and 24.80 s from S2 V2); updated `--isolated` description to exact help definition (randomized ports and isolated user secrets) and explicitly noted container host ports are not guaranteed unique across isolated starts; removed all "parallel-safe ports" / "free infra ports" claims.
+- **H5 (`explanation/aspire.md`, `reference/aspire/index.md`):** Clarified callout as "Target after the 13.5.3 pin" (D-62) and confirmed current head generates 13.4.6 baseline; removed reference page claim that generated AppHost pins 13.5 Browsers package at this head.
+- **H6 (`add-opentelemetry.md`):** Documented exact 4-step MCP resolver precedence chain (`--endpoint` flag, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, default `http://localhost:18888`) per `packages/mcp/src/domain/telemetry-endpoint.ts` without un-shipped `aspire ps` discovery.
+- **M3 (`manifest-disposition.md` & PR body):** Generated disposition table derived by construction from `git diff --name-only a46ea16d..HEAD` (10 edited rows, 111 verified clean rows with proving grep commands).
+- **M5 (`diagrams:check`):** Executed `deno task diagrams:check` from `docs/site`; verified static SVGs via Lume site build.
+- Re-generated prose and publish assets (`gen:agent-docs-prose`, `gen:publish-assets`, `gen:assets-barrel`) and verified all quality gates.
 
 
 

@@ -66,7 +66,7 @@ When no AppHost is running, `aspire ps --format Json` returns an empty array (`[
 
 ## Startup timeout budget vs `aspire wait`
 
-Aspire cold starts involve container provisioning (Postgres, Redis), AppHost TypeScript compilation, and health probe convergence. In CI environments or heavy host loads, cold starts typically require 25–39 seconds (measured across local 13.5.3 test runs at 24.80–38.62 s).
+Aspire cold starts involve container provisioning (Postgres, Redis), AppHost TypeScript compilation, and health probe convergence. In the two recorded 13.5.3 runs, cold start took 38.62 s and a second run 24.80 s (S2 V2); budget accordingly with `ASPIRE_CLI_START_TIMEOUT`.
 
 NetScript provides two complementary timeout controls:
 
@@ -84,16 +84,15 @@ NetScript provides two complementary timeout controls:
 
 ## Parallel isolation with `--isolated`
 
-When multiple CI workers or agent implementation loops run concurrently on a shared host, hardcoded ports and shared secrets can collide. Passing `--isolated` to `aspire start`:
+When multiple CI workers or agent implementation loops run concurrently on a shared host, passing `--isolated` to `aspire start`:
 
-- Selects randomized dashboard and endpoint ports.
-- Isolates user secrets and run state into a dedicated directory.
+- Generates randomized ports and isolated user secrets per `aspire start --help`.
 
 ```bash
 aspire start --isolated --format Json --non-interactive
 ```
 
-For full host port randomization across containerized infrastructure services, NetScript workspaces can additionally configure `DcpPublisher__RandomizePorts=true` in the environment.
+Note that host ports of container resources are not guaranteed unique across isolated starts. For explicit host port randomization across containerized infrastructure services, NetScript workspaces can configure `DcpPublisher__RandomizePorts=true` in the environment.
 
 ## Cleanup and teardown
 
