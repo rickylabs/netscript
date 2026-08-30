@@ -278,4 +278,11 @@ handoff written (`slices/s9/handoff-phase-a.md`). | | S10 (#1722) dispatched —
 `launch-codex-slice --user node --dest /home/agent/aspire-13-5-s10-brief.md --expect-base 9dd06647 …`
 → thread `01a052a5-21d9-7d80-b4b1-c267be7e112a`, route openai · gpt-5.6-sol · medium matched,
 worktree `007-aspire-s10` on `test/aspire-13-5-s10-e2e-gate-upgrades` @ `9dd06647`. Brief forbids
-any AppHost start. |
+any AppHost start. | | D-44 / D-45 applied (coordinator-ordered central-state edits) | **PR #1754**
+body: `Closes #863` → `Part of #863` (gate-1 ownership note) via REST (`gh pr edit` needs
+`read:org`). **#1721** acceptance assertion 2 + receipt schema + Part B wording + acceptance box
+rewritten to the 14-required / `documentedUnobserved` contract. **#1759** DoD line rewritten.
+**#1712** pillar 5 + MCP summary line rewritten. S9 thread `01a0523a…` resumed with
+`slices/s9/pre-phase-b-brief.md` (schema/tests/skill wording + F-3b + F-4b + M2, one bounded commit;
+scoped recheck only). S8 Phase-B obligations (exact `db init --name init`, resource + probe detail
+for #863 gate 1; hand S6/root-README/canary receipts forward) recorded in D-49. |
