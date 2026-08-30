@@ -100,6 +100,7 @@ would not change the implementation contract. IMPL-EVAL remains mandatory.
 | 2026-08-30 21:38 | S4 | Full local gates | 165-file check/lint/fmt coverage and 491 tests green; workflow YAML parsed; no-hardcoded guard and skill sync/check green. |
 | 2026-08-30 21:40 | S4 | Live canaries | Both new Claude/OpenRouter presets passed with matched route identity, `max` argv effort, 1024-token budget, non-empty response, and tools/reasoning/streaming evidence. |
 | 2026-08-30 21:41 | S1-S3 | Product sign-off commit | `601a53e04` — routing, canaries, workflows, parity/docs, skills, and lint-gate remediation committed atomically. |
+| 2026-08-30 21:44 | Publication | Connector fallback | HTTPS token lacked workflow scope; GitHub connector published tree-identical product `1e659932f4` and evidence `9937705b5d` commits without force. |
 
 ## Gate Results
 
@@ -128,6 +129,13 @@ would not change the implementation contract. IMPL-EVAL remains mandatory.
 | ------ | ----- | ---------- |
 | `a8d9248e3` | Research, locked plan/design, PLAN-EVAL N/A record | Bootstrap/research/plan complete |
 | `601a53e04` | S1-S3 product/config/workflows/docs/skills plus full-lint remediation | Full generator gate set and both live canaries PASS |
+
+Published GitHub mapping (connector-authored commit metadata changes hashes; trees are identical):
+
+| Local commit | Published commit | Tree |
+| ------------ | ---------------- | ---- |
+| `601a53e04` | `1e659932f4` | `de5127fe74b044c05c531aa992ff893b5623f00a` |
+| `fe2416919` | `9937705b5d` | `038df88d417893753ad26aca61f0ffe0016329e9` |
 
 ## Handoff Notes
 

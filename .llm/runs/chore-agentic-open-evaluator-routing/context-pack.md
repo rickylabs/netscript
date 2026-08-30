@@ -39,6 +39,8 @@ silent success when it produced nothing.
   budget, non-empty marker, and tools/reasoning/streaming evidence.
 - Remaining: commit/push exact head, run fresh separate-session GLM/max IMPL-EVAL, address any
   findings, and hand off without merging.
+- Publication: the HTTPS PAT lacked workflow scope, so the GitHub connector published tree-identical
+  commits without force. Current published evidence head before this record: `9937705b5d`.
 
 ## Key locked decisions
 
