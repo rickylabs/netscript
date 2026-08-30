@@ -6631,3 +6631,66 @@ to fix it would reproduce that defect one layer up.
 | #1387 | **active** — research/plan slice in flight |
 | #1730 | queued, brief written |
 | #1664 | parked at `20337441788b` |
+
+## 2026-08-30 — #1731 CI was genuinely RED; my green report was wrong; tagline repaired
+
+### The reporting error, first
+
+I reported *"`Code quality` **success**, `Phase eval PR` **success**, `ci` in progress"* and treated
+the remaining run as pending noise. That was wrong in a way worth naming precisely: **`Code quality`
+is a separate workflow; `quality` is also a job inside the `ci` run**, and it is the job that failed.
+I read the workflow-level list, saw a success row whose name matched what I expected, and did not
+open the job list of the run that was still in flight. Run `33311482503` → job `99257258418`
+`quality` → step **`JSR tagline length`** → **failure**; the run's final conclusion is **`failure`**.
+
+A run still `in_progress` can already contain a failed job. "Not finished" is not "not failing", and
+a same-named workflow is not the same thing as a job inside another workflow. I should have opened
+the jobs rather than matched on a name.
+
+### The defect — branch-introduced, reproduced exactly
+
+```text
+JSR tagline length gate — cap 250 bytes
+  checked=36 over=1
+  ✗ packages/contracts/README.md — 271 B (over by 21)
+```
+
+Attribution measured at the base, not assumed: `origin/main` `13878a80a` runs the same gate at
+**over=0**, and its contracts tagline is **235 B**. Slice 1 inserted
+`NetScript-owned procedure metadata, ` into that sentence, taking it to **271 B**. Branch-introduced,
+and it is a real consumer-facing defect: the tagline becomes the JSR package description, so 21 bytes
+over the cap means the description is truncated on the registry page.
+
+**This is a gate the contracted eight-receipt set never covered** — `docs-tagline` is not among them,
+and it is green at base and branch-sensitive, which is exactly the D-27 class: the set was blind to a
+gate that could only fail for this branch's reasons. Recorded so the next evidence-set selection
+includes it.
+
+### Repair — minimal delta, claim preserved
+
+The instruction was ≤250 UTF-8 bytes **without losing the contract claim**. The claim at stake is the
+one slice 1 added: this package owns procedure metadata. Candidates that dropped `NetScript-owned`
+were rejected for weakening exactly what #1466 established; a candidate landing on **250 B exactly**
+was rejected for having zero margin.
+
+Landed at **246 B, margin 4**, trimming only stylistic words — `The`, `-backed`, `handlers`, `typed`
+— and keeping every semantic element of `main`'s tagline plus the metadata ownership claim:
+
+> Contract-first vocabulary for NetScript boundaries: an oRPC base contract with the standard error
+> map, NetScript-owned procedure metadata, Zod pagination and error schemas, and CRUD/query/transform
+> builders that keep services and clients in sync.
+
+New content head **`75b78220`**. Local reruns before commit: `docs:tagline:check` **over=0**,
+`docs:exports-drift` **PASS**, `deno fmt --check` on the edited file **exit 0**.
+
+### Consequences accepted rather than worked around
+
+- **The terminal `PASS` no longer has exact-head currency.** It certified `e34505f1` / content heads
+  `42874803`, `2863d29e`, `9ab779ce`. The content head has moved to `75b78220`, so renewed exact-head
+  evaluator currency is owed before `status:ready-merge`. **Rerunning CI on `32a698e1` would not have
+  fixed anything** — the defect is in the tree, not the run.
+- **PR #1731 and issue #1466 moved `status:impl-eval` → `status:impl`**, the truthful phase for a
+  branch with a red gate and a repair in flight. The PR stays **non-draft**: converting to draft would
+  make CI skip the matrix, and the matrix is what must prove the repair.
+- Slice-3's receipt set archived to `receipts/frozen-9ab779ce/` (8 files) before recutting — the fifth
+  append-only archive.
