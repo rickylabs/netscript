@@ -2402,3 +2402,30 @@
   `13:08:59Z`; #1749 closed at `13:09:01Z`; both are `status:shipped`.
 - Final shared-asset base is now `a5520e70...`. #1731 and #1758 are released to their independent
   supervisors for current-main rebase/regeneration and fresh exact-head gates/evaluation.
+
+## 2026-08-30T13:36:42Z — #1761 terminal seven-row PASS, preserved evaluator report, and merge
+
+- Reconciled PR #1761 exact head `c1700128e38dd923cd57298c171b5976ec690a83` after the Augment
+  review's real permission-semantics finding was repaired. The changelog and run evidence now
+  distinguish a widened declared permission set from runtime behavior: env denial is caught and
+  anonymous operation continues; network is reached only for a `quality-allow` issue lookup.
+- Coordinator pre-merge gate: (1) current `close-gate` success; (2) all five #1757 Acceptance boxes
+  checked and acceptance mirror revalidated at this head, with four unchecked Scope boxes correctly
+  classified as non-acceptance; (3) prohibited-pattern diff clean outside `.llm/runs/**`; (4)
+  applicable named checks terminal success (`check-test`, `quality`, classification, lane
+  visibility), with docs-only E2E/scaffold/public-surface skips N/A; (5) decisive 37-commit ledger
+  independently matched 17 Include / 20 Exclude and scanner source semantics; (6) changed-file audit
+  found only `packages/cli/CHANGELOG.md` plus thirteen run artifacts; (7) repaired body/DoD matched
+  the exact head, provisional boundary, release-intro boundary, and ready state.
+- Fresh separate native Fable 5 session returned exact-head `PASS`, with no blockers or required
+  body edits. The evaluator report had intentionally remained untracked in the leaf while exact-head
+  merge readiness was being preserved; it is now copied into the durable run at
+  `.llm/runs/docs-changelog-0-0-7--1757/impl-eval-final.md`, SHA-256
+  `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`. Durable PR summary:
+  https://github.com/rickylabs/netscript/pull/1761#issuecomment-5469007019.
+- CI run `33314032803` is terminal green, including close-gate job `99265315596`, check-test
+  `99265346412`, quality `99265346382`, and core lane visibility `99265443431`; review-thread gate
+  passed with the single Augment thread answered/outdated and zero unanswered.
+- Coordinator squash-merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
+  `13:36:41Z`; #1757 closed at `13:36:42Z`; both are `status:shipped`. The provisional changelog
+  remains explicitly subject to a release-cut top-up as later 0.0.7 payload lands.

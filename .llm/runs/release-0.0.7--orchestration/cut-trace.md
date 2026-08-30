@@ -108,3 +108,26 @@ artifact-pinned production E2E.
   main is the merge SHA.
 - This is the final docs sequence base. #1731 and #1758 are released against `a5520e70...` for
   mechanical asset regeneration and fresh exact-head evidence; no earlier asset receipt survives.
+
+## 2026-08-30T13:36:41Z — #1761 lands the provisional 0.0.7 CLI changelog
+
+- PR #1761 reached exact head `c1700128e38dd923cd57298c171b5976ec690a83` after an Augment
+  review caught a substantive wording defect: the first draft treated the scanner's widened
+  declared `env`/`net` permission set as a runtime requirement. The repaired changelog now states
+  the true boundary: environment access is optional, and network access occurs only while resolving
+  a `quality-allow` issue. Contradictory run evidence was corrected before the final verdict.
+- The terminal seven-row gate passed on that exact head: current close-gate and CI success; all five
+  #1757 Acceptance boxes checked and revalidated (its four Scope boxes are not close-gate
+  acceptance); no prohibited additions outside `.llm/runs/**`; applicable named checks terminal
+  success with docs-only skips N/A; independent verification of the 37-row live ledger (17 Include,
+  20 Exclude) and scanner repair; changelog-plus-run-artifacts changed-file boundary; and a truthful
+  PR body/DoD including provisional status and the release-cut top-up requirement.
+- A fresh separate-session native Fable 5 IMPL-EVAL returned `PASS` at exact head `c1700128...`,
+  with no blocking findings or required body edits. The full report is preserved at
+  `.llm/runs/docs-changelog-0-0-7--1757/impl-eval-final.md` (SHA-256
+  `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`); the durable merge
+  coordinates and evaluation summary are https://github.com/rickylabs/netscript/pull/1761#issuecomment-5469007019.
+- The coordinator squash-merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
+  `2026-08-30T13:36:41Z`; #1757 closed at `13:36:42Z`. PR and issue are terminal
+  `status:shipped`, and exact current `main` is the merge SHA. The changelog is deliberately
+  provisional and must be topped up after the remaining 0.0.7 consumer payload lands.

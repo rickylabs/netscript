@@ -1277,3 +1277,14 @@ implementation thread.
 - The atomic reconciliation updates inventory, intake, DAG, lane ownership, leaves, counts, and
   narrative checkpoints together. #1733 stays a duplicate exclusion, and no terminal inventory
   cleanup item is promoted into committed active scope merely to make counts match.
+
+## 2026-08-30 — #1761 exact-head evaluator report required post-merge preservation
+
+- The final separate-session Fable 5 evaluator assessed exact PR head `c1700128...` and produced a
+  terminal `PASS`. Its report remained untracked in the leaf worktree before merge because adding an
+  evaluator-only commit would have moved the exact head already certified by the seven-row gate.
+- This was not treated as permission to lose the verdict. After coordinator merge, the byte-exact
+  report was copied into the leaf's canonical run path on the central orchestration branch and
+  pinned by SHA-256 `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`.
+  The evaluated product head remains `c1700128...`; the preservation commit is harness evidence,
+  not a new product or PR-head verdict.

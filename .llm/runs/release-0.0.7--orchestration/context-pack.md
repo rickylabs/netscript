@@ -1419,3 +1419,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - OpenHands runs `33312864635`/`33312881075` were cancelled `NONE`, explicitly non-gating.
 - Exact main and the final shared-asset base are `a5520e70...`. Only #1731 and #1758 remain released
   from this serialization point; both must regenerate and recut exact-head evidence after rebasing.
+
+## Resume checkpoint — 2026-08-30T13:36:42Z
+
+- #1761 exact head `c1700128e38dd923cd57298c171b5976ec690a83` passed the full coordinator
+  seven-row gate after the Augment-discovered declared-vs-runtime scanner-permission defect and its
+  contradictory run evidence were repaired. The live changelog ledger covers 37 commits through
+  `a5520e70` as 17 Include / 20 Exclude, and its provisional release-cut top-up boundary is explicit.
+- A fresh separate native Fable 5 IMPL-EVAL returned exact-head `PASS`, no blockers or required body
+  edits. Its formerly untracked exact report is now durably preserved at
+  `.llm/runs/docs-changelog-0-0-7--1757/impl-eval-final.md` with SHA-256
+  `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`; the merge-coordinate
+  summary is https://github.com/rickylabs/netscript/pull/1761#issuecomment-5469007019.
+- The coordinator merged #1761 as `a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81` at
+  `13:36:41Z`; #1757 closed one second later and both are `status:shipped`. Exact main is
+  `a5f506dd...`. This docs merge neither blocks nor globally serializes independent topic queues.

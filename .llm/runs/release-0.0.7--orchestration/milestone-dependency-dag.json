@@ -695,6 +695,13 @@
       "issueNumber": 1753,
       "lane": "internals",
       "title": "fix(harness): detect live milestone PR leaves missing or stale in cluster state"
+    },
+    {
+      "id": "issue:1757",
+      "kind": "issue",
+      "issueNumber": 1757,
+      "lane": "docs",
+      "title": "docs(cli): the changelog stops at 0.0.6 and no gate enforces it"
     }
   ],
   "edges": [
@@ -935,6 +942,12 @@
       "to": "issue:1749",
       "kind": "requires",
       "evidence": ["#1749 was the bounded quickstart tree follow-up discovered while verifying #1745; PR #1755 merged as a5520e70b43fa792c36451270742240e0f2aa889 and closed it, satisfying this dependency."]
+    },
+    {
+      "from": "issue:1749",
+      "to": "issue:1757",
+      "kind": "requires",
+      "evidence": ["#1757's live 37-row changelog triage explicitly includes and classifies #1755's a5520e70 merge, so the final docs-asset predecessor had to land before PR #1761 could freeze its exact live range."]
     },
     {
       "from": "issue:1713",
@@ -1259,7 +1272,8 @@
         "issue:1365",
         "issue:1370",
         "issue:1717",
-        "issue:1719"
+        "issue:1719",
+        "issue:1757"
       ]
     },
     {

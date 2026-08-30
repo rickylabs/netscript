@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "a5520e70b43fa792c36451270742240e0f2aa889",
+  "currentMainSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -200,7 +200,7 @@
       "orchestratorAgentId": "topic-docs-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "pr1746_pr1748_pr1755_merged_shipped_docs_asset_sequence_complete_1723_source_blocked",
+        "state": "pr1746_pr1748_pr1755_pr1761_merged_shipped_docs_changelog_current_1723_source_blocked",
         "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
         "branch": "orchestrator/release-0.0.7-docs",
         "requestedModel": "claude-opus-5",
@@ -214,7 +214,7 @@
         "bridgeSessionId": "session_016g86jW5sMJE9z9EHHGPByH",
         "remoteControlUrl": "https://claude.ai/code/session_016g86jW5sMJE9z9EHHGPByH",
         "topicHeadSha": "b35420eed07046f197a47766be7411832a85a39c",
-        "queueState": "1746_1748_1755_merged_shipped_and_shared_asset_sequence_complete; 1723_remaining_s11_blocked_until_aspire_s1_s10_land",
+        "queueState": "1746_1748_1755_1761_merged_shipped; provisional_0_0_7_changelog_current_through_a5520e70_and_requires_release_cut_top_up; 1723_remaining_s11_blocked_until_aspire_s1_s10_land",
         "tmuxSession": "netscript-007-docs-r2",
         "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
@@ -227,7 +227,8 @@
         1551,
         1723,
         1745,
-        1749
+        1749,
+        1757
       ]
     },
     {
@@ -863,6 +864,12 @@
       "state": "closed",
       "closedAt": "2026-08-30T13:09:01.000Z",
       "mergeCommitSha": "a5520e70b43fa792c36451270742240e0f2aa889"
+    },
+    {
+      "number": 1757,
+      "state": "closed",
+      "closedAt": "2026-08-30T13:36:42.000Z",
+      "mergeCommitSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81"
     },
     {
       "number": 1280,
@@ -3337,6 +3344,43 @@
       "mergeCommitSha": "a5520e70b43fa792c36451270742240e0f2aa889",
       "mergedAt": "2026-08-30T13:08:59.000Z",
       "nextGate": "terminal merged; final shared-asset base releases #1731/#1758"
+    },
+    {
+      "id": "docs-cli-provisional-0-0-7-changelog",
+      "lane": "docs",
+      "phase": "merged",
+      "baseBranch": "main",
+      "headSha": "c1700128e38dd923cd57298c171b5976ec690a83",
+      "currentPrHeadSha": "c1700128e38dd923cd57298c171b5976ec690a83",
+      "issueNumbers": [1757],
+      "branch": "docs/changelog-0-0-7",
+      "prNumber": 1761,
+      "implementationState": "Augment found that the first changelog wording miscast widened declared env/net permissions as runtime requirements; the leaf corrected the changelog and contradictory run evidence, reconciled all 37 live commits as 17 Include / 20 Exclude, passed a fresh native exact-head Fable 5 IMPL-EVAL and the complete coordinator seven-row gate, then merged and closed #1757 status:shipped",
+      "planEvaluationState": "pass_cycle_2_before_bounded_implementation",
+      "implementationEvaluationState": "native_fable_5_fresh_exact_head_pass",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "c1700128e38dd923cd57298c171b5976ec690a83",
+      "implementationEvaluationArtifact": ".llm/runs/docs-changelog-0-0-7--1757/impl-eval-final.md",
+      "implementationEvaluationArtifactSha256": "eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f",
+      "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1761#issuecomment-5469007019",
+      "preMergeGate": {
+        "state": "PASS",
+        "evaluatedHeadSha": "c1700128e38dd923cd57298c171b5976ec690a83",
+        "rows": [
+          "1_close_gate_and_current_ci_terminal_success_run_33314032803",
+          "2_issue_1757_five_acceptance_boxes_checked_and_revalidated_scope_boxes_non_gating",
+          "3_prohibited_pattern_diff_clean_excluding_run_artifacts",
+          "4_applicable_named_checks_terminal_success_docs_only_skips_n_a",
+          "5_37_commit_17_include_20_exclude_ledger_and_scanner_permission_repair_independently_verified",
+          "6_docs_changed_file_audit_changelog_plus_run_artifacts_only",
+          "7_body_dod_currency_provisional_release_boundary_and_ready_state_match_shipped_head"
+        ]
+      },
+      "ciWorkflowRunId": 33314032803,
+      "ciState": "success",
+      "mergeCommitSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
+      "mergedAt": "2026-08-30T13:36:41.000Z",
+      "nextGate": "terminal merged; provisional changelog requires a release-cut top-up after remaining 0.0.7 payload lands"
     }
   ],
   "evaluatorLeases": [
@@ -4946,5 +4990,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
       "verifiedAt": "2026-08-30T10:00:33.000Z"
     },
-  "updatedAt": "2026-08-30T13:09:42.000Z"
+  "updatedAt": "2026-08-30T13:36:42.000Z"
 }

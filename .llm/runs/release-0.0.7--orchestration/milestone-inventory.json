@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-30T09:51:00.000Z",
+  "capturedAt": "2026-08-30T13:36:42.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
-  "targetIssueCount": 109,
+  "targetIssueCount": 110,
   "issues": [
     {
       "number": 1093,
@@ -1264,6 +1264,18 @@
         "https://github.com/rickylabs/netscript/issues/1000",
         "PR #1748 exact head 9b79d90ef729519e4007010d10851304661a4d61 passed the complete coordinator seven-row gate plus native Fable 5 IMPL-EVAL, merged as 952cc106aafea61570d24247695ac23f5d810026 at 2026-08-30T12:55:05Z, and closed #1000 at 2026-08-30T12:55:06Z; both items are status:shipped.",
         "Redundant OpenHands run 33311911918 was cancelled with verdict NONE and was explicitly non-gating."
+      ]
+    },
+    {
+      "number": 1757,
+      "title": "docs(cli): the changelog stops at 0.0.6 and no gate enforces it",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1757",
+        "https://github.com/rickylabs/netscript/pull/1761",
+        "PR #1761 exact head c1700128e38dd923cd57298c171b5976ec690a83 passed the complete seven-row coordinator gate and a fresh separate-session native Fable 5 IMPL-EVAL, merged as a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81 at 2026-08-30T13:36:41Z, and closed #1757 at 13:36:42Z; both items are status:shipped.",
+        "The live v0.0.6..a5520e70 triage reconciles all 37 commits as 17 Include / 20 Exclude, and the repaired scanner wording distinguishes declared env/net permissions from optional env access and conditional network use."
       ]
     }
   ]
