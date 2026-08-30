@@ -94,3 +94,76 @@ carries no waiver.
 evaluated; slice 3 has not either) and the close-gate. Merge, ready-flip, relabel to
 `status:ready-merge`, issue close, acceptance-box ticking and restoring a closing keyword all remain
 outside this lane and outside this verdict.
+
+---
+
+# Part 2 — pushed exact head, final evidence, verdict confirmed
+
+Author terminal: thread `01a05215` `idle`, launcher exited, per-slice PR comment posted
+("## Slice 3 — publish and compat…"). Evidence head **`e19de923`**
+(`test(harness): record #1466 slice 3 publish evidence`), local == `origin` == PR head, clean.
+Content head remains **`9ab779ce`**.
+
+## Receipts at the content head
+
+All eight, `attempt 9`, `gitHead == actualGitHead == 9ab779ce96`, named explicitly:
+`check` · `lint` · `fmt-check` · **`test`** · `quality-gate` · `arch-check` · `publish-dry-run` all
+**PASS exit 0**; `public-doc-lint` **FAIL exit 1** (baseline-red, delta 0, set identity verified by me
+at this head). `deno.lock` **byte-unchanged**. Sufficiency `INSUFFICIENT` for exactly one reason —
+`public-doc-lint` — the terminal expected state for this leaf.
+
+**Four archives, all 8 files, append-only:** `frozen-c9a391811`, `frozen-235482767`,
+`frozen-42874803`, `frozen-2863d29e`.
+
+## Slice-3 publish evidence — its own obligation, independently reviewed
+
+- Workspace `publish:dry-run` PASS; per-member `@netscript/contracts` (4 entrypoints, 21 files) and
+  `@netscript/sdk` (12 entrypoints, 60 files) both `Success Dry run complete`.
+- `isolatedDeclarations: true` inherited from root with **no member override** — the executable
+  publish bar, shown rather than asserted.
+- SDK's only `@netscript/*` pin is exact: `jsr:@netscript/service@0.0.6`. Contracts has none.
+- **The two SDK JSR WARNs were reported, not adjusted** — exactly as the brief required. I established
+  attribution at the base independently (topic drift **D-36**): `packages/sdk/src` has **13 immediate
+  children on `origin/main` and 13 at this head with an identical listing**, so `F-DOCT-5 cardinality`
+  is pre-existing debt at delta 0; `F-JSR-7 slow-types` is WARN on SDK only because that member lacks
+  the sanctioned annotation `@netscript/contracts` carries, and `slowTypes.ok` is `true` for both.
+  Neither is introduced by #1466. Both are pre-existing architecture questions for the coordinator,
+  correctly **not** fixed inside a slice whose plan says "no feature expansion".
+
+## AF-1 evidence — matches my independent run
+
+The author's `audit/af1-annotation-span-slice3.txt` records the decoy forgery going red
+(`deno check` exit 0, `deno lint` exit 0, pin exit 1 / 4 passed 1 failed as the sole failure) and
+restoration to 16/0 with the pattern unchanged. I ran the same attack myself at this head before
+reading the file; the results agree.
+
+## G-7 landed at this stop
+
+`receipts/frozen-42874803/test-final.attempt5-skipped.json` restored from `dd201816`, SHA-256
+`0d5d2c3d…` identical on source and restoration. The archive's deliberate mixed heads are now
+documented in `worklog.md`: seven attempt-5 receipts at `42874803`, the attempt-7 `test` PASS at
+`ff4e81cc` (attesting the head it ran at, product proven byte-identical), and the attempt-5 `SKIPPED`
+record explaining why a `test` result was absent at that content head. Evidence head `e34505f1`.
+
+## Verdict — confirmed
+
+**`ACCEPTED`** at content head `9ab779ce`, evidence head `e34505f1`.
+
+Nothing in Part 2 changes the Part 1 finding. **All three implementation slices are Tier-A accepted.**
+
+## Dispatched immediately: final all-slices IMPL-EVAL
+
+| Field | Value |
+| --- | --- |
+| Session | `8d9946e6`, `--remote-control ns1466-impleval-final` |
+| Route | Claude · **Fable 5 · medium**, `formal_impl_evaluation` — native opposite-family for Codex work |
+| Worktree | `ns1466-impleval-final`, **detached at `e34505f1`**, its own — never an author's (D-19) |
+| Brief | `slices/impl-eval-1466-final.md` |
+| Scope | **all three slices together** — S2 and S3 have never been formally evaluated; only S1 has a verdict |
+
+The brief makes S2's metadata propagation the centre of gravity ("a type that no test can make fail
+is not a contract"), requires the evaluator to attack the anchored pin and hunt a working forgery
+against it, and routes four rulings: whether #1466 is complete across all three slices, whether the
+leaf is close-gate ready, whether a **permanently baseline-red** `public-doc-lint` is an acceptable
+standard to merge on, and whether S2/S3 regressed S1. It forbids restoring the closing keyword or
+flipping ready **even on `PASS`** — that transition and the merge are human decisions.
