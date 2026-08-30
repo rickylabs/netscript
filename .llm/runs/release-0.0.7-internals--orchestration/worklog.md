@@ -5504,3 +5504,36 @@ safety; root test / surface validator if budget allows). Backgrounded per host b
   confirming "Qwen3.8-Flash-Next" resolves to the plain `qwen/qwen3.8-flash` id as instructed. Unlike
   two earlier chat claims this run that falsely asserted GLM was already a sanctioned default, this
   instruction's technical premises check out.
+
+## D-99 — Routing leaf (issue #1791) dispatched: Codex Sol/high, thread 01a05481
+
+- Issue #1791 created: `chore(agentic): make GLM 5.3 Flash the default open evaluator/hybrid model,
+  Qwen 3.8 Flash for PLAN-EVAL`. Milestone `0.0.7`, labels `type:chore, area:agentic, area:tooling,
+  status:research, priority:p1` — exactly one `status:`. `Refs #1774`, PLAN-EVAL recorded N/A per
+  owner decision (prospective infra/config, not a design decision).
+- Worktree `007-leaf-routing`, branch `chore/agentic-open-evaluator-routing`, created off
+  `origin/main` at `a3ddcbb598` (immediately post-#1775-merge). **Upstream deliberately unset**
+  before launch — the launcher's git-safety check refuses to launch against a worktree carrying
+  *any* upstream, by design, so every push inside the session must use an explicit refspec.
+- Bootstrap commit `bc1b2f88b` (context pack + brief). Brief validated against the handoff contract
+  (`use harness` first line + `## SKILL` chapter, `stagedBytes: 9536`).
+- **NAS launcher gotchas hit and fixed, matching the standing memory
+  (`agentic-suite-nas-user-node.md`):** `--user node` required (else `buildWslCommand` hard-fails
+  comparing against the literal user `codex`); `--dest` needed an explicit `/home/agent/...` path
+  (`/home/codex` no longer exists post-restart); `--expect-base` compares the **short** SHA
+  (`bc1b2f88b`, not the 40-char form); the real (non-dry-run) launch additionally needed
+  `--allow-write` for the sender-ownership directory, which the dry-run path doesn't touch.
+- **Dry-run passed clean** before the real launch: `gitSafety: {upstream: "NONE", dirty: 0}`,
+  `requestedRoute: {provider: openai, model: gpt-5.6-sol, effort: high}` — the exact
+  `complex_implementation` binding verified against `routing-policy.ts` line ~121-126
+  (`condition: large_or_cross_cutting_slices`), not an invented route.
+- **Real launch confirmed live**, not merely requested: thread
+  `01a05481-a2ff-7632-809a-e478889e626e`, `modelProvider: "openai"`, `model: "gpt-5.6-sol"`,
+  `reasoningEffort: "high"`, `cwd` correctly the leaf worktree, `sandbox: dangerFullAccess`,
+  `instructionSources` correctly resolving that worktree's `AGENTS.md`. First agent message
+  correctly restates the PLAN-EVAL-N/A / mandatory-separate-IMPL-EVAL contract before any source
+  edit — the brief was understood, not skimmed.
+- Backgrounded via `nohup`; the launcher process itself stays attached streaming JSON-RPC events for
+  the first turn, so it is not a fire-and-forget dispatch — treating it the same as other Codex
+  sessions this run: watch/status/resume, never a second concurrent send.
+- **#1758 remains parked** behind this leaf per the serial internals queue, exactly as instructed.
