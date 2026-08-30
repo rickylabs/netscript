@@ -251,4 +251,7 @@ dispatches | Tier-A sign-off at `e11de98d` (PR #1759 comment); IMPL-EVAL cycle 1
 docs_audit cycle 1 | **`AUDIT: FAIL_FIX`** (1 high, 4 medium, 1 low — prose precision vs receipts;
 structural checks PASS). Read-only respected. Same generator thread `01a0523a…` resumed with the fix
 brief (log `s9-docs-audit-fix-1.log`); IMPL-EVAL cycle 1 (`7f042a12…`) still running on `e11de98d`.
-D-46. |
+D-46. | | S9 IMPL-EVAL cycle 1 | **`FAIL_FIX`** at `e11de98d` (session `7f042a12…`): F-1 citation
+path (= audit M4, in the running docs-fix turn), F-2 failure receipt drops `toolsObserved`, F-3/F-4
+low, F-5 → Phase-B brief, F-6 supervisor disclosure. Non-mutation verified. F-2..F-4 queued for the
+same thread after its current turn (D-47). Runtime zero. |

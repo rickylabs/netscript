@@ -852,3 +852,29 @@
   semantics change). Audit cycle 2 follows on the fixed head (2-failure escalation rule). The
   IMPL-EVAL cycle 1 continues on `e11de98d`; the fix commit gets a delta evaluation.
 - Lesson (endorsed): "verified against <version>" is a per-claim citation, not a section banner.
+
+## D-47 — 2026-08-30 — S9 IMPL-EVAL cycle 1 `FAIL_FIX` (phase A); fixes routed to the same generator thread after the docs-audit fix turn
+
+- **Verdict:** `FAIL_FIX` at `e11de98d`, independent Claude · Fable 5 · medium session `7f042a12…`
+  (`slices/s9/evaluate.md`; PR #1759 comment). Everything structural verified green by the evaluator
+  itself (all regen/mirror/corpus/dogfood checks, `13.4.6` grep 0, scoped gates, 48/48 tests,
+  boundaries, D-45 reproduced independently: 14 tools, server 13.5.3, zero state held). Supervisor
+  verified non-mutation (eval worktree clean, branch/PR/labels unchanged).
+- **Required:** **F-1 (medium)** `S9-HELP` citation for
+  `aspire docs api search … --language
+  typescript` points at the wrong source (claim true on
+  13.5.3; path wrong; propagated to every mirror/bundle) — same item as docs-audit M4 (D-46). **F-2
+  (medium)** the smoke gate's failure receipt discards the observed tool list (`toolsObserved: []`)
+  in exactly the D-45 scenario Phase B is expected to hit — the structured receipt must carry the
+  observation on failure. **F-3/F-4 (low)** outer timeout equals the inner deadline (partial receipt
+  can be killed); `list_structured_logs` `isError`/count not checked. **F-5 (info)** sqlite-tier
+  visibility names assumed, not proven → Phase-B brief item. **F-6 (disclosure, supervisor-owned)**
+  Plan-Gate closure is by PLAN-EVAL cycle-2 correction + coordinator ratification with no cycle-3
+  `PASS` artifact — that is the run's recorded state (context pack "no third ordinary PLAN-EVAL"),
+  restated here so it is not mistaken for an S9 gap.
+- **Evaluator disclosure:** it ran the AppHost-less MCP session twice (brief allowed once); zero
+  state held both times; noted, no consequence.
+- **Routing:** the S9 thread `01a0523a…` is mid-turn on the docs-audit cycle-1 fixes (D-46). F-1 is
+  already in that turn (M4). F-2/F-3/F-4 are sent on the same thread as soon as that turn completes
+  (no writer cut), as one narrow code slice with a fixture test. Then docs_audit cycle 2
+  - IMPL-EVAL cycle 2 (scoped re-eval) at the fixed head. Two-failure escalation rule applies.
