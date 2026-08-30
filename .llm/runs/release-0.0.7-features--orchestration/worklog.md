@@ -8551,3 +8551,24 @@ raw operation from Slice 6), states the "bounded — no credential solicitation/
 real requirement rather than style, and flags that `mcp-export-corpus` will very likely **move** here
 (new exported types), unlike Slice 6 where staying flat was the correct signal — the opposite
 expectation from the prior slice, stated explicitly so it isn't mistaken for drift.
+
+## #1387 Slice 7 — integrated, verified, certified; IMPL-EVAL dispatched
+
+Reviewed Slice 7's own output myself, not the author's summary. `OperationAccessSummary` is a new,
+deliberately narrow type — authentication tri-state, scheme names, scopes, roles, no credential
+values or principal data — directly derivable later from Slice 6's OpenAPI output but not derived
+here. `access` is genuinely optional in both TypeScript interfaces and both JSON-schema required-
+field arrays. A real typed literal (`operationAccessExample: OperationAccessSummary`, not an `as`
+cast) proves constructibility. Both flow files gained only a type import and the optional field —
+confirmed zero logic change by reading the full diffs, not the claim. Corpus moved 7 654 → 7 655,
+exactly the one new exported type. All five ceiling files touched plus the corpus carrier and Slice
+6's archive move; `deno.lock` unchanged; eight receipts all `gitHead == actualGitHead`; evidence set
+SUFFICIENT; 136/136 tests.
+
+**Verdict: ACCEPTED at `897a06cd7170ca021da1836b3cbcbf790cf97a2f`.** No findings. `tier-a-slice-7.md`
+committed as evidence head `f60c85199`. PR comment `5471598908`.
+
+IMPL-EVAL dispatched: native Fable 5 attempted first per policy default. Brief adds one check beyond
+Tier-A's own review — confirming `OperationAccessSummary` is a genuine projection rather than a
+structural copy of `packages/service`'s internal `ProcedureAccessPolicy`, since the plan requires MCP
+not import from `packages/service` for this boundary.
