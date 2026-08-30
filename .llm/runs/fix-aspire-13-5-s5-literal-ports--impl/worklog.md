@@ -61,6 +61,8 @@ required, and expose cross-resource URLs through resource-reference environment 
 | 2026-08-30 | 1 | RED contract | Extended checker and added exact S5 grep invariant. |
 | 2026-08-30 | 1 | push | `e83659d78` pushed with the explicit required refspec; draft PR #1740 opened. |
 | 2026-08-30 | 2 | D-14 implementation | Removed sagas runtime fallback; retained four deprecated exports. |
+| 2026-08-30 | 2 | push | `24817a404` pushed with JSR and consumer-import evidence. |
+| 2026-08-30 | 3 | contribution wiring | Four contributions allocate ports and publish resource references. |
 
 ## Decisions
 
@@ -89,6 +91,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | host-port allocation | FAIL (expected RED) | `receipts/01-aspire-host-ports-red.raw.txt` | Names all current contribution fallbacks/URLs. |
+| contribution allocation | PASS / exit `0` | `receipts/03-contributions.txt` | 957 files; no contribution fallback/URL findings. |
 
 ### Runtime Gates
 

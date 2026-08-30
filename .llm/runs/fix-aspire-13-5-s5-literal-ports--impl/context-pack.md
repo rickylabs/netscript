@@ -12,12 +12,14 @@
 
 ## Current State
 
-Slice 1 is pushed and draft PR #1740 is open. Slice 2 implements the locked D-14 sagas contract.
+Slices 1-2 are pushed on draft PR #1740. Slice 3 removes contribution and generated-consumer
+fallback ports.
 
 ## Completed
 
 - Required issue, parent research/plan, doctrine, skills, and S2 receipt intake.
 - RED fitness contract committed and pushed as `e83659d78`.
+- D-14 sagas slice committed and pushed as `24817a404` with JSR evidence.
 
 ## In Progress
 

@@ -1,8 +1,4 @@
-import {
-  SAGAS_API_DEFAULT_PORT,
-  SAGAS_API_SERVICE_NAME,
-  SAGAS_PLUGIN_VERSION,
-} from '../constants.ts';
+import { SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_VERSION } from '../constants.ts';
 import { projectFileUrl } from '../runtime/project-registry-module.ts';
 
 const SAGAS_PLUGIN_PACKAGE_NAME = '@netscript/plugin-sagas' as const;
@@ -108,10 +104,11 @@ export class SagasAspireContribution {
     builder: SagasAspireBuilder,
     ctx: SagasContributionContext,
   ): readonly SagasAspireResource[] {
+    const apiPort = ctx.port(SAGAS_API_SERVICE_NAME);
     const api = builder.addDenoService(SAGAS_API_SERVICE_NAME, {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/sagas/services/src/main.ts',
-      port: ctx.port(SAGAS_API_SERVICE_NAME, SAGAS_API_DEFAULT_PORT),
+      port: apiPort,
       permissions: SAGAS_API_PERMISSIONS,
       env: {
         SAGAS_PLUGIN_VERSION,
@@ -132,7 +129,7 @@ export class SagasAspireContribution {
   /** Declare environment values used by sagas Aspire resources. */
   declareEnv(ctx: SagasContributionContext): Record<string, SagasEnvSource | string> {
     return {
-      SAGAS_API_URL: `http://localhost:${SAGAS_API_DEFAULT_PORT}`,
+      SAGAS_API_URL: { kind: 'resource', resource: SAGAS_API_SERVICE_NAME, key: 'url' },
       SAGAS_ADAPTER: 'native',
       SAGAS_DURABILITY_TIER: 't1',
       SAGAS_REGISTRY_MODULE: projectFileUrl(
@@ -144,10 +141,11 @@ export class SagasAspireContribution {
   }
 
   /** Declare health checks used by plugin doctor commands. */
-  declareHealthChecks(_ctx: SagasContributionContext): readonly SagasHealthCheckSpec[] {
+  declareHealthChecks(ctx: SagasContributionContext): readonly SagasHealthCheckSpec[] {
+    const apiPort = ctx.port(SAGAS_API_SERVICE_NAME);
     return [{
       resource: SAGAS_API_SERVICE_NAME,
-      url: `http://localhost:${SAGAS_API_DEFAULT_PORT}/health`,
+      url: `http://localhost:${apiPort}/health`,
       expect: 200,
       timeoutMs: 3000,
     }];
