@@ -6694,3 +6694,47 @@ New content head **`75b78220`**. Local reruns before commit: `docs:tagline:check
   make CI skip the matrix, and the matrix is what must prove the repair.
 - Slice-3's receipt set archived to `receipts/frozen-9ab779ce/` (8 files) before recutting — the fifth
   append-only archive.
+
+## 2026-08-30 — repair pushed at `87d53cec`; renewed evaluator and CI both running; #1387 parallel
+
+| Field | Value |
+| --- | --- |
+| **Content head** | **`75b782205d`** — the tagline repair; one file, one paragraph |
+| **Evidence head (PR head)** | **`87d53cec`** — all eight receipts at the content head, `attempt 10` |
+| Receipts | 7 **PASS** + `public-doc-lint` **FAIL** (baseline-red on `main`, delta 0, R-1 unchanged) |
+| Sufficiency | `INSUFFICIENT` for exactly one external reason — the terminal expected state |
+| `deno.lock` | byte-unchanged |
+| Archives | five, append-only: `c9a391811`, `235482767`, `42874803` (9 — includes the restored attempt-5 `SKIPPED`, G-7), `2863d29e`, `9ab779ce` |
+| PR / issue phase | **`status:impl`** on both — truthful while a repair is under verification |
+| PR draft state | **non-draft, deliberately** — draft makes CI skip the matrix, and the matrix must prove the repair |
+
+### Renewed evaluator dispatched — scoped as *currency*, not a redo
+
+| Field | Value |
+| --- | --- |
+| Session | `b247bef9`, `--remote-control ns1466-impleval-currency` |
+| Route | requested = observed = **`claude-fable-5` · medium** (read from the session's own transcript) |
+| Worktree | `ns1466-impleval-currency`, detached at `87d53cec`, its own |
+| Brief | `slices/impl-eval-1466-currency.md` |
+
+The brief is deliberately **not** a from-scratch re-evaluation. The prior terminal `PASS` was correct
+and is not reopened; what moved is the content head. So it verifies what the repair could have
+touched plus the standing invariants, and asks three questions: does the `PASS` carry forward to
+`75b78220`; is the repaired tagline both under the cap **and faithful to the contract claim** (the one
+substantive risk in a byte-trim); and should `docs-tagline` join the contracted receipt set given it
+caught a consumer-facing defect that eight contracted gates missed.
+
+It is told to confirm `git diff 9ab779ce..75b78220` is exactly the one README paragraph — a cheap,
+decisive check that nothing else rode along.
+
+### CI
+
+The evidence push re-triggered the workflows at `87d53cec`; no `gh run rerun` was needed and no
+extra push was made. Watching to completion — the `quality` **job inside `ci`** is the one that
+matters, which is the distinction the earlier false-green report missed.
+
+### #1387 in parallel
+
+Research/plan thread `01a052a3` working in `007-leaf-1387`, committed `625447f1` (local; branch not
+yet pushed). Running `run-deno-check.ts` across `packages/contracts` + `packages/service` — reading
+the real seam rather than the issue text, which is what the brief asked for.
