@@ -4139,3 +4139,35 @@ a default rather than a flourish.
 Sequencing held as directed: enforcement landed **first** on the proven-green pre-rebase head
 (`e1ea9d3a ci(docs): enforce JSDoc example imports`), then the re-anchor — never enforcement folded
 into a rebase, and never enforcement over a red corpus.
+
+## 2026-08-30 — #1533 push boundary: diagnosed precisely, not assumed
+
+The leaf's local head `65c2f99cf2b05debc00539ba1de58f3047115513` is ahead of remote
+`303be12eab5e54ada654d55f60e8cfbf1921ea73`, and the branch now touches
+`.github/workflows/ci.yml`. The obvious inference was a **PAT `workflow`-scope** rejection —
+`gh auth status` confirms the token carries `'repo'` only.
+
+**That inference was wrong as the primary cause, and I tested rather than reported it.**
+
+| Probe | Result |
+| --- | --- |
+| `git push --dry-run` (plain) | **rejected — non-fast-forward** |
+| `git push --dry-run --force-with-lease=…:303be12e` | **exit 0, accepted** `+ 303be12e...65c2f99c (forced update)` |
+
+The blocker is that the **coordinator-authorized I6 rebase rewrote history**, so the remote tip is no
+longer an ancestor. A rebase requires `--force-with-lease`; a plain push was always going to fail and
+its failure says nothing about credentials.
+
+**What is still genuinely unproven:** GitHub enforces the `workflow` scope at *receive* time, which a
+`--dry-run` does not reach. So the dry-run's exit 0 does **not** clear the scope boundary — it only
+clears fast-forwardness. The two failures look identical from a distance and have completely
+different remedies: one needs `--force-with-lease`, the other needs a token change no agent in this
+lane can make.
+
+I am recording both states separately rather than collapsing them into "the push is blocked", because
+that phrasing would have sent someone to refresh a token that may be fine, or to force-push against a
+scope wall that force cannot breach.
+
+The lease-scoped push itself is left to the author, which owns the branch and is mid-I6; if it hits
+the scope wall it reports, and the exact local commit is preserved either way. No force-push has been
+executed by this lane.
