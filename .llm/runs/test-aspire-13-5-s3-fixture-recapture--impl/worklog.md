@@ -56,6 +56,8 @@ the capture provenance in that fixture folder's README, then update the parity e
 | --- | --- | --- | --- |
 | 2026-08-30 | 1 | design | Required reading re-baselined; `PLAN-EVAL: N/A` recorded before implementation. |
 | 2026-08-30 | 1 | RED gate | Expected FAIL names exactly the four phase-A rows missing 13.5.3; telemetry remains `pending-lease`. |
+| 2026-08-30 | 1 | reconcile | Draft PR #1741 opened with closing keyword, epic reference, requested labels/milestone, and S1 trail comment; no new review comments yet. |
+| 2026-08-30 | 2 | implementation | Copied S2 V5 `aspire ps` JSON, applied documented deterministic redaction, and parameterized probes across 13.4.6/13.5.3. |
 
 ## Decisions
 
@@ -78,6 +80,12 @@ the capture provenance in that fixture folder's README, then update the parity e
 | --- | --- | --- | --- |
 | PLAN-EVAL | N/A | N/A | Mechanical, ratified scope with locked evidence and gates. |
 | Slice 1 parity RED | `deno task test .llm/tools/validation/check-compat-fixtures_test.ts` via gate runner | EXPECTED_FAIL | Receipt `receipts/01-parity-red.json`; four required rows missing. |
+| Slice 2 teardown check | scoped check wrapper on `.llm/tools/agentic/teardown` | PASS | 12 files, 0 findings. |
+| Slice 2 teardown tests | structured test wrapper on `probes_test.ts` | PASS | 3/3 tests. |
+| Slice 2 teardown fmt | scoped fmt wrapper | PASS | 12 files, 0 findings. |
+| Slice 2 excluded lint | scoped lint wrapper | EXPECTED_REFUSAL | Root config excludes `.llm`; wrapper refused all 12 dropped files (exit 2). |
+| Slice 2 raw lint | `deno lint --no-config .../probes_test.ts` | PASS | Required config-excluded-file fallback; 1 file checked. |
+| Slice 2 raw fmt | `deno fmt --no-config --single-quote --line-width=100 --check <owned files>` | PASS | 3 owned files checked. |
 
 ### Fitness Gates
 
