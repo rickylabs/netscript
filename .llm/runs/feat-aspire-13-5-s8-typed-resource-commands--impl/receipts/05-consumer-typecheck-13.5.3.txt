@@ -32,7 +32,7 @@ Restore (single attempt; no retry):
     Restoring SDK code...
     SDK code restored successfully for apphost.mts.
   exit code: 0
-  inotify exit-134 condition: not observed
+  D-39 host state: max_user_instances=1024; no historical inotify waiver applies
 
 Restored modules:
   .aspire/modules/aspire.mts sha256: 7cd4cf8319360b4ddbe8fb8f5481e3e5907610883c40179840fa249a86600487

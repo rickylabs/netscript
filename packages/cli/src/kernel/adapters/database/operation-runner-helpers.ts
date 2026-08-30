@@ -21,7 +21,7 @@ export const TERMINAL_RESOURCE_STATES: ReadonlySet<string> = new Set([
   'Stopped',
 ]);
 
-const DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = '300';
+const DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = 300;
 const ASPIRE_CLI_START_TIMEOUT_ENV = 'ASPIRE_CLI_START_TIMEOUT';
 const NO_RUNNING_APPHOST_LINE =
   /^[ \t]*(?:error:[ \t]*)?No AppHost is currently running(?:[ \t]|[.'"]|$)/m;
@@ -51,7 +51,7 @@ export function buildDbCliEnv(
   interactive?: boolean,
 ): Record<string, string> {
   const env: Record<string, string> = {
-    ASPIRE_CLI_START_TIMEOUT: resolveAspireCliStartTimeout(),
+    ASPIRE_CLI_START_TIMEOUT: String(resolveDbCliTimeoutSeconds()),
     NETSCRIPT_PRISMA_OPERATION: operation,
     NETSCRIPT_PRISMA_TARGET: configKey,
   };
@@ -64,9 +64,15 @@ export function buildDbCliEnv(
   return env;
 }
 
-function resolveAspireCliStartTimeout(): string {
+/** Resolve the bounded database readiness budget from the established CLI timeout input. */
+export function resolveDbCliTimeoutSeconds(): number {
   const configured = Deno.env.get(ASPIRE_CLI_START_TIMEOUT_ENV);
-  return configured && configured.length > 0 ? configured : DB_CLI_ASPIRE_START_TIMEOUT_SECONDS;
+  if (!configured) return DB_CLI_ASPIRE_START_TIMEOUT_SECONDS;
+  const timeoutSeconds = Number(configured);
+  if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 1) {
+    throw new Error(`${ASPIRE_CLI_START_TIMEOUT_ENV} must be a positive whole number.`);
+  }
+  return timeoutSeconds;
 }
 
 export function buildAspireArgs(

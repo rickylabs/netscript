@@ -15,6 +15,7 @@ import {
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
+import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 
 Deno.test('runtime behavior gates register the dynamic route probe id', () => {
@@ -71,6 +72,79 @@ Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', ()
     maxRetries: 2,
   });
 });
+
+Deno.test('runtime prefers the typed database command and retains restart fallback', () => {
+  const gate = createRuntimeGates(DATABASE.POSTGRES).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected a command gate.');
+  const command = gate.command(s8RuntimeContext());
+
+  assertEquals(command.at(-1), DATABASE.POSTGRES);
+  assertEquals(command[2].includes('`${database}-cli`'), true);
+  assertEquals(command[2].includes('"migrate", "--timeout", "60"'), true);
+  assertEquals(command[2].includes('using restart fallback'), true);
+  assertEquals(command[2].includes('"stop"'), true);
+  assertEquals(command[2].includes('"start"'), true);
+});
+
+Deno.test('typed database Phase-B gate is defined but not registered in Phase A', () => {
+  const gate = createTypedDbPhaseBGate();
+  if (gate.kind !== 'command') throw new Error('Expected a command gate.');
+  const context = s8RuntimeContext();
+
+  assertEquals(gate.cwd(context), '/workspace/app');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire,deno',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts',
+    '/workspace/app/aspire/apphost.mts',
+    '/workspace/app',
+    '/repo/packages/cli/bin/netscript.ts',
+    DATABASE.POSTGRES,
+  ]);
+  assertEquals(
+    createRuntimeGates(DATABASE.POSTGRES).some((entry) =>
+      entry.id === GATE.RUNTIME_TYPED_DB_PHASE_B
+    ),
+    false,
+  );
+});
+
+function s8RuntimeContext(): RunContext {
+  return {
+    request: {
+      suiteId: 'scaffold.runtime',
+      options: {
+        repoRoot: '/repo',
+        cliEntrypoint: 'packages/cli/bin/netscript.ts',
+        smokeRoot: '/workspace',
+        projectName: 'generated',
+        database: DATABASE.POSTGRES,
+        packageSource: 'local',
+        plugins: [],
+        samples: true,
+        cache: true,
+        cleanup: true,
+        format: 'pretty',
+        commandTimeoutMs: 900_000,
+        httpTimeoutMs: 30_000,
+      },
+    },
+    project: {
+      repoRoot: '/repo',
+      cliEntrypoint: 'packages/cli/bin/netscript.ts',
+      smokeRoot: '/workspace',
+      projectName: 'generated',
+      appHost: '/workspace/app/aspire/apphost.mts',
+      projectRoot: '/workspace/app',
+    },
+  };
+}
 
 Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_START);
