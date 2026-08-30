@@ -64,6 +64,9 @@ new ownership shortcut.
 | 2026-08-30T03:05:31Z | bootstrap | research/design | Read issues, S2 receipts, S3 fixture, skills, harness workflow, doctrine, and current teardown code.                                           |
 | 2026-08-30T03:05:31Z | plan      | PLAN-EVAL       | N/A: the owner-ratified issue and dispatch lock all decisions, five slices, boundaries, and gates; no material planning decision remains open. |
 | 2026-08-30T03:07:56Z | 1         | RED receipt     | Durable test receipt: 7 passed, 1 failed; orphan process expectation received `[]`.                                                            |
+| 2026-08-30T03:09:21Z | 1         | push            | Pushed `593a33c` with the explicit head refspec; opened draft PR #1744 and posted commit evidence.                                             |
+| 2026-08-30T03:15:52Z | 2         | gate            | Descendant tracking passed 33/33 with all evidence modes, both ps fixtures, foreign/MCP guards, and false-positive coverage.                   |
+| 2026-08-30T03:15:52Z | 2         | reconcile       | #1719/#1429 remain open; PR #1744 stays draft at `status:impl`, stacked on S3; Phase B remains lease-backed. No new comments changed the plan. |
 
 ## Decisions
 
@@ -88,17 +91,19 @@ new ownership shortcut.
 
 ### Fitness Gates
 
-| Gate                     | Result  | Evidence            | Notes                 |
-| ------------------------ | ------- | ------------------- | --------------------- |
-| no-cast/no-ignore review | NOT_RUN | pending diff review | Required by dispatch. |
+| Gate                     | Result  | Evidence            | Notes                                                                         |
+| ------------------------ | ------- | ------------------- | ----------------------------------------------------------------------------- |
+| no-cast/no-ignore review | NOT_RUN | pending diff review | Required by dispatch.                                                         |
+| Slice 2 focused review   | PASS    | diff scan           | No new `any`, cast, or lint-ignore; classification remains pure behind ports. |
 
 ### Runtime Gates
 
-| Gate                      | Result          | Evidence                              | Notes                                                              |
-| ------------------------- | --------------- | ------------------------------------- | ------------------------------------------------------------------ |
-| Phase A unit fixtures     | NOT_RUN         | pending                               | No AppHost start permitted.                                        |
-| Slice 1 RED               | FAIL (expected) | `receipts/01-red-orphan-process.json` | Exact #1429 visibility regression; exit 1 at baseline `fe4f496bd`. |
-| Phase B live reproduction | N/A             | deferred procedure                    | Requires supervisor-provided runtime lease.                        |
+| Gate                        | Result          | Evidence                               | Notes                                                              |
+| --------------------------- | --------------- | -------------------------------------- | ------------------------------------------------------------------ |
+| Phase A unit fixtures       | NOT_RUN         | pending                                | No AppHost start permitted.                                        |
+| Slice 1 RED                 | FAIL (expected) | `receipts/01-red-orphan-process.json`  | Exact #1429 visibility regression; exit 1 at baseline `fe4f496bd`. |
+| Slice 2 descendant tracking | PASS            | `receipts/02-descendant-tracking.json` | 33 passed, 0 failed; receipt head `593a33c`.                       |
+| Phase B live reproduction   | N/A             | deferred procedure                     | Requires supervisor-provided runtime lease.                        |
 
 ### Consumer Gates
 

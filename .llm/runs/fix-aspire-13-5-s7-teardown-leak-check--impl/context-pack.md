@@ -14,22 +14,26 @@
 
 Baseline is exactly S3 head `fe4f496bd`. Required issues, comments, S2 V6/V7 receipts, current
 teardown code/tests, playbook, and harness/doctrine instructions have been read. Slice 1 has a
-durable, assertion-level RED receipt.
+durable, assertion-level RED receipt. Descendant discovery/classification is implemented and its
+focused suite is green.
 
 ## Completed
 
 - Harness bootstrap, research, locked plan, and Design checkpoint.
 - PLAN-EVAL recorded N/A because the ratified dispatch leaves no unresolved design choice.
 - Synthetic S2-shaped PPID-1 fixture plus failing #1429 leak-check regression.
+- Process discovery from bounded `ps`/`/proc` probes with DCP label, exact AppHost argv, and
+  descriptor-to-Unix-socket evidence.
+- Positive path ownership, foreign worktree reporting, and both Aspire MCP command guards.
 
 ## In Progress
 
-- Slice 1 commit/push and stacked draft PR creation.
+- Slice 2 commit/push and PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push slice 1, open the stacked draft PR, and post slice evidence.
-2. Implement descendant classification in slice 2.
+1. Commit/push slice 2 and post its evidence.
+2. Implement the explicit `--force-persistent` gate.
 
 ## Key Decisions
 
@@ -40,18 +44,20 @@ durable, assertion-level RED receipt.
 
 ## Files Changed
 
-| Path                                                      | Status | Notes                       |
-| --------------------------------------------------------- | ------ | --------------------------- |
-| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/` | new    | Harness state and evidence. |
+| Path                                                                 | Status  | Notes                                              |
+| -------------------------------------------------------------------- | ------- | -------------------------------------------------- |
+| `.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/`            | new     | Harness state and evidence.                        |
+| `.llm/tools/agentic/teardown/{ports,probes,ownership,leak-check}.ts` | changed | Process discovery, evidence, ownership, reporting. |
+| `.llm/tools/agentic/teardown/*_test.ts`                              | changed | Versioned/foreign/MCP/process safety regressions.  |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                  |
-| ----------- | -------------- | --------------------------------------------------------- |
-| Static      | NOT_RUN        | planned after implementation                              |
-| Fitness     | NOT_RUN        | planned quality/architecture gates                        |
-| Runtime     | RED captured   | `receipts/01-red-orphan-process.json`: 7 passed, 1 failed |
-| Consumer    | NOT_RUN        | assets barrel in slice 5                                  |
+| Gate family | Current status | Evidence                                                    |
+| ----------- | -------------- | ----------------------------------------------------------- |
+| Static      | NOT_RUN        | planned after implementation                                |
+| Fitness     | NOT_RUN        | planned quality/architecture gates                          |
+| Runtime     | Slice 2 PASS   | `receipts/02-descendant-tracking.json`: 33 passed, 0 failed |
+| Consumer    | NOT_RUN        | assets barrel in slice 5                                    |
 
 ## Open Questions
 

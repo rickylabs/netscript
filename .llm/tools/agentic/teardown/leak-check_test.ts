@@ -12,6 +12,8 @@ const files: FilePort = {
     ),
 };
 
+const emptyProcesses = { code: 0, stdout: '', stderr: '' };
+
 Deno.test('report never hides foreign or unproven survivors', () => {
   const registry = emptyRunResources('/home/codex/repos/fix-1046');
   const report = buildLeakReport(
@@ -100,6 +102,7 @@ Deno.test('successful Aspire probe survives unavailable Docker', async () => {
       if (command[0] === 'docker') {
         return Promise.reject(new Deno.errors.NotFound('docker absent'));
       }
+      if (command[0] === 'ps') return Promise.resolve(emptyProcesses);
       return Promise.resolve({
         code: 0,
         stdout: JSON.stringify([{ appHostPath: '/foreign/apphost.ts', appHostPid: 1 }]),
@@ -189,6 +192,14 @@ Deno.test('13.5.3 orphaned PPID-1 Aspire descendants are reported', async () => 
       return Promise.resolve(process?.cwd ?? path);
     },
     readText(path) {
+      if (path === '/proc/net/unix') {
+        const lines = processes.flatMap((process) =>
+          process.socketPaths.map((socketPath: unknown, index: number) =>
+            `0000000000000000: 00000002 00000000 00010000 0001 01 ${process.pid}${index} ${socketPath}`
+          )
+        );
+        return Promise.resolve(lines.join('\n'));
+      }
       const match = path.match(/^\/proc\/(\d+)\/(stat|cmdline|environ|net\/unix)$/);
       const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
       if (!process) return Promise.reject(new Deno.errors.NotFound(path));
@@ -206,6 +217,22 @@ Deno.test('13.5.3 orphaned PPID-1 Aspire descendants are reported', async () => 
         return Promise.resolve(process.environment.replaceAll(' ', '\0'));
       }
       return Promise.resolve(process.socketPaths.join('\n'));
+    },
+    listNames(path) {
+      const match = path.match(/^\/proc\/(\d+)\/fd$/);
+      const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
+      if (!process) return Promise.reject(new Deno.errors.NotFound(path));
+      return Promise.resolve(
+        process.socketPaths.map((_path: unknown, index: number) => String(index)),
+      );
+    },
+    readLink(path) {
+      const match = path.match(/^\/proc\/(\d+)\/fd\/(\d+)$/);
+      const process = match ? processes.find((row) => row.pid === Number(match[1])) : undefined;
+      if (!process || !match || !process.socketPaths[Number(match[2])]) {
+        return Promise.reject(new Deno.errors.NotFound(path));
+      }
+      return Promise.resolve(`socket:[${process.pid}${match[2]}]`);
     },
   };
   const sliceDir = await Deno.makeTempDir();
