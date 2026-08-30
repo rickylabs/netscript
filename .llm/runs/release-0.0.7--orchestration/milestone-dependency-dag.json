@@ -934,7 +934,7 @@
       "from": "issue:1745",
       "to": "issue:1749",
       "kind": "requires",
-      "evidence": ["#1749 is the bounded quickstart tree follow-up discovered while verifying #1745's canonical cross-host skills contract."]
+      "evidence": ["#1749 was the bounded quickstart tree follow-up discovered while verifying #1745; PR #1755 merged as a5520e70b43fa792c36451270742240e0f2aa889 and closed it, satisfying this dependency."]
     },
     {
       "from": "issue:1713",

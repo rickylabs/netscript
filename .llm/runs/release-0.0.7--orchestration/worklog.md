@@ -2385,3 +2385,20 @@
   Each must integrate current main, regenerate rather than hand-resolve the corpus, and recut its
   own exact-head gates/evaluation where the head moves. DAG topology remains unchanged because this
   is generated-asset serialization, not a new issue dependency edge.
+
+## 2026-08-30T13:09:42Z — #1755 terminal seven-row PASS and final asset base landed
+
+- Reconciled exact head `91bf721c6f6f6a20c55077a6aaa72e5316734abb` after the third serial
+  corpus integration. Seven-row PASS: (1) current close-gate plus acceptance mirror; (2) all eight
+  #1749 boxes checked with evidence; (3) non-run prohibited-pattern diff clean; (4) all applicable
+  named checks terminal success and explicit docs-only skips N/A; (5) canonical `.agents/skills/`
+  tree and derived `.claude/skills/` omission independently verified; (6) docs changed-file audit
+  found prose/run artifacts plus declared generated carriers only; (7) body sequencing, currency,
+  corrected host-mirror rationale, and DoD all matched the exact shipped head.
+- Native exact-head Fable 5 delta IMPL-EVAL passed. Targeted mirror/close-gate rerun job
+  `99262079245` succeeded. Redundant OpenHands runs `33312864635` and `33312881075` were coordinator-
+  cancelled with verdict `NONE`; neither is gating evidence.
+- Coordinator squash-merged #1755 as `a5520e70b43fa792c36451270742240e0f2aa889` at
+  `13:08:59Z`; #1749 closed at `13:09:01Z`; both are `status:shipped`.
+- Final shared-asset base is now `a5520e70...`. #1731 and #1758 are released to their independent
+  supervisors for current-main rebase/regeneration and fresh exact-head gates/evaluation.

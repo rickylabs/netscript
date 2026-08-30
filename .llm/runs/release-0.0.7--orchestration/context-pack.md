@@ -1407,3 +1407,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Shared-asset successors #1755, #1731, and #1758 are released. Their supervisors must rebase onto
   current main, regenerate the assets mechanically, and recut exact-head evidence/evaluation as
   applicable; no pre-#1748 shared-asset receipt survives a moved head.
+
+## Resume checkpoint — 2026-08-30T13:09:42Z
+
+- #1755 completed the serial docs asset chain. Exact head
+  `91bf721c6f6f6a20c55077a6aaa72e5316734abb` passed all seven coordinator rows, native exact-head
+  Fable 5 IMPL-EVAL, and targeted mirror/close-gate job `99262079245` (`SUCCESS`) after body
+  sequencing/currency and host-mirror rationale were corrected. It merged as
+  `a5520e70b43fa792c36451270742240e0f2aa889` at `13:08:59Z`; #1749 closed at `13:09:01Z`;
+  both are `status:shipped`.
+- OpenHands runs `33312864635`/`33312881075` were cancelled `NONE`, explicitly non-gating.
+- Exact main and the final shared-asset base are `a5520e70...`. Only #1731 and #1758 remain released
+  from this serialization point; both must regenerate and recut exact-head evidence after rebasing.

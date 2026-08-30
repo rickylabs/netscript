@@ -91,3 +91,20 @@ artifact-pinned production E2E.
 - The shared-asset predecessor is now satisfied. #1755, #1731, and #1758 are released to their
   independent supervisors for current-main rebase/regeneration and fresh exact-head verification;
   this is not permission to reuse their pre-merge asset receipts or evaluator verdicts.
+
+## 2026-08-30T13:08:59Z — #1755 completes the docs asset sequence
+
+- PR #1755 rebased onto #1748's shared tip, corrected its body sequencing/currency and host-mirror
+  rationale, regenerated the four carriers once from the merged prose, and reached exact head
+  `91bf721c6f6f6a20c55077a6aaa72e5316734abb`. Its seven-row gate was terminal PASS: current
+  close-gate/mirror; zero unticked #1749 acceptance; clean prohibited-pattern diff; applicable
+  named checks terminal success with docs-only skips N/A; canonical quickstart tree claim verified;
+  no hand-written package/plugin source; and corrected body/DoD sequencing matched the exact head.
+- Native exact-head Claude Fable 5 delta IMPL-EVAL returned `PASS`. Targeted close-gate mirror rerun
+  job `99262079245` completed `SUCCESS`. Redundant OpenHands runs `33312864635` and `33312881075`
+  were cancelled with `NONE`; they were non-gating and raised/cleared nothing.
+- The coordinator squash-merged #1755 as `a5520e70b43fa792c36451270742240e0f2aa889` at
+  `2026-08-30T13:08:59Z`; #1749 closed at `13:09:01Z`. Both are `status:shipped` and exact current
+  main is the merge SHA.
+- This is the final docs sequence base. #1731 and #1758 are released against `a5520e70...` for
+  mechanical asset regeneration and fresh exact-head evidence; no earlier asset receipt survives.
