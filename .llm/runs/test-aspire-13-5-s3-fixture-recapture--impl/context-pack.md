@@ -12,23 +12,25 @@
 
 ## Current State
 
-Draft PR #1741 is open from slice 1. Slice 2 now contains the redacted S2-derived 13.5.3 `aspire ps`
-fixture and dual-version teardown probe cases. No runtime has started.
+Draft PR #1741 contains pushed slices 1–2. Slice 3 now adds S2-derived 13.5.3 banner/describe cases
+beside retained 13.4.6 cases across MCP and CLI E2E. No runtime has started, and dashboard telemetry
+remains absent by design.
 
 ## Completed
 
 - Re-baseline, research, plan, Design checkpoint, and justified `PLAN-EVAL: N/A`.
 - Slice 1 RED receipt at `receipts/01-parity-red.json`.
 - Draft PR #1741 with labels, milestone 0.0.7, and S1 commit-trail comment.
+- Slice 2 commit `b8b1c3b6f` pushed with its PR trail comment.
 
 ## In Progress
 
-- Slice 2 commit/push and PR trail comment; all proving gates pass, while supervisor review remains pending.
+- Slice 3 commit/push and PR trail comment; scoped tests and doctrine gates pass.
 
 ## Next Steps
 
-1. Commit, push, and comment slice 2.
-2. Implement S2-derived describe/banner cases.
+1. Commit, push, and comment slice 3.
+2. Record the executable phase-B telemetry deferral.
 
 ## Key Decisions
 
@@ -46,13 +48,18 @@ fixture and dual-version teardown probe cases. No runtime has started.
 | `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.5.3.json` | new | Redacted S2 V5 snapshot. |
 | `.llm/tools/agentic/teardown/__fixtures__/README.md` | new | Capture provenance. |
 | `.llm/tools/agentic/teardown/probes_test.ts` | changed | Both Aspire versions exercise the same normalization. |
+| `packages/mcp/tests/service-endpoint-source-fixtures.ts` | changed | Redacted describe fixtures for both versions. |
+| `packages/mcp/tests/service-endpoint-sources_test.ts` | changed | Both banners exercise the adapter. |
+| `packages/mcp/tests/fixtures/README.md` | new | Describe capture provenance. |
+| `packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts` | changed | Both describe shapes exercise endpoint selection. |
+| `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts` | changed | Both banners exercise topology evidence. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S1 expected RED; S2 check/test/fmt and raw excluded lint PASS | worklog gate table |
-| Fitness | pending | slice 5 |
+| Static | S1 expected RED; S2/S3 scoped gates PASS | worklog gate table |
+| Fitness | slice 3 quality/architecture PASS | `quality:scan`, `arch:check` |
 | Runtime | N/A phase A | lease boundary |
 | Consumer | pending | export corpus gate |
 
