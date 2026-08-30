@@ -1,3 +1,12 @@
+use harness
+
+## SKILL
+
+Read `AGENTS.md`, `.agents/skills/netscript-harness/SKILL.md`, `.agents/skills/aspire/SKILL.md`,
+`.agents/skills/netscript-tools/SKILL.md`, and `.agents/skills/netscript-pr/SKILL.md` before acting.
+You are the Codex · GPT-5.6 Sol · medium implementation thread for this slice; the supervisor holds
+the serialized host runtime lease for this phase only.
+
 # S8 Phase B — execute `runtime.typed-db-phase-b` live (lease-backed, same thread)
 
 You are the S8 implementer for #1720 / PR #1754 (thread `01a051e6-90d4-7e50-a91e-ac4bd23b880c`,

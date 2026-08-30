@@ -1,3 +1,12 @@
+use harness
+
+## SKILL
+
+Read `AGENTS.md`, `.agents/skills/netscript-harness/SKILL.md`, `.agents/skills/aspire/SKILL.md`,
+`.agents/skills/netscript-tools/SKILL.md`, and `.agents/skills/netscript-pr/SKILL.md` before acting.
+You are the Codex · GPT-5.6 Sol · medium implementation thread for this slice; the supervisor holds
+the serialized host runtime lease for this phase only.
+
 # S7 Phase B — #1429 live reproduction + foreign-AppHost re-test (lease-backed)
 
 You are the S7 implementer for #1719 / PR #1744 (worktree
