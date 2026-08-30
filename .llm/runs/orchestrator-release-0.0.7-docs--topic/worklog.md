@@ -1597,3 +1597,62 @@ accelerate the chain, but that is that lane's work and is not taken here.
 
 No commit to either leaf; no head moved. PR-surface correction only. Both leaves remain at
 `status:ready-merge`, unmerged, with the human merge queue.
+
+## 2026-08-30 — environment update 2; #1723 manifest regenerated; queue still blocked
+
+**Update 2 superseded update 1 within five minutes.** Re-proven locally rather than accepted:
+
+| Value | Update 1 (09:22Z, my measurement) | Update 2 (verified 09:27Z+) |
+| --- | --- | --- |
+| `netscript-dind` | `10.4.12.16` | **`10.4.12.19`** |
+| Docker client/server | server 27.5.1 | **28.5.2 / 28.5.2** |
+| `fs.inotify.max_user_instances` | 128 | **1024** |
+| `docker ps -a` / `aspire ps` | not checked | **both empty** |
+
+Two consequences stated precisely rather than loosely: the below-28 doctor caveat is **moot, not
+downgraded** — the server is 28.5.2, so the condition does not arise, and carrying "it's only a
+warning" forward would imply a constraint that no longer exists. And D-37 / the watchFs quota
+blocker are **resolved**, restoring `watch-run` (heartbeat exit 2, no allocation failure) as the
+correct token-free supervisor wake instead of polling.
+
+**I had published the superseded numbers minutes earlier**, on PR #1748. Corrected there with an
+explicit before/after table rather than a silent edit — the same discipline applied to the expired
+zombie claim. Being fast to publish an environment fact means being fast to retract it.
+
+**Owned cleanup is at zero and required no action.** `docker ps -a` empty, `aspire ps` reports no
+running AppHost, `agentic:leak-check` exit 0 with `survivors: []` at both leaf heads. This lane is
+docs-only and never started a container; reporting "cleanup performed" would overstate it.
+
+### Serial queue advanced on the one actionable part of #1723
+
+#1723's scope header instructs regenerating its manifest **before starting**. That is the only part
+of the issue not gated on S1–S10, so it was done now — the next slice starts with a confirmed row
+set instead of re-deriving one. Run at `main` `13878a80` in a **detached throwaway worktree** so
+nothing was written into the research lane's run dir; worktree removed, `git worktree list` clean.
+
+**No drift in any `doc:*` class.** `doc:public-page` 102 → 102 and **set-identical** (`diff` empty,
+not merely equal counts); `doc:aspire-dedicated` 4, `doc:root` 3, `doc:site-infra` 2,
+`doc:diagram-source` 2 — **113 total, exactly the header's figure**. #1748's 102-row accounting
+therefore remains complete against current main and no deferred row needs re-planning.
+
+**Path defect in #1723.** Its header names `tools/aspire-surface-manifest.ts`, which does not exist;
+the tool is at `.llm/runs/research-aspire-13.5-adoption--0.0.7/tools/` on `research/aspire-13.5-0.0.7`.
+Same class as #1745's non-existent `init-agent.ts` path. Flagged on the issue rather than silently
+substituted.
+
+**Three net-new rows, none adding S11 work**: `packages/cli/src/kernel/assets/agent/guidance.md.template`
+(`template:other`), an Aspire helper `generator-test`, and an `archival:rfc`. Each checked
+individually for `.NET Aspire`, Learn links and `13.4.x`/`13.5.x` literals — **all zero**. The
+`template:other` row matters most because it post-dates #1748's sweep; it is clean.
+
+**An unexpected corroboration.** At pre-sweep `main`, 17 files contain ".NET Aspire". #1748 edits 13
+and leaves 3 pre-existing — 16, not 17. The seventeenth is
+`packages/mcp/src/publish-assets.generated.ts`, the generated carrier that embeds corpus prose and
+stops containing the string once the corpus is regenerated. 13 + 3 + 1 = 17 exactly. The manifest
+reached the corpus→publish-assets dependency from a completely different direction than the CI
+failure that originally taught it — the strongest confirmation yet that the corrected rule 5 is
+right.
+
+**Queue posture unchanged: blocked.** `main` `13878a80`, pin still 13.4.6, and #1727/#1718/#1720/
+#1741/#1722/#1740 all OPEN. Host capability is not the dependency — these slices *merging* is. When
+#1727 lands, the version-snippet bucket is dispatchable as one slice against the confirmed row set.
