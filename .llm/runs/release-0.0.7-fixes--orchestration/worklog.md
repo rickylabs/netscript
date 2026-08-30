@@ -2118,3 +2118,87 @@ slice, not a Claude workflow — it is framework source under `packages/sdk/`, a
 export surface, so the #1112 generated-derivative cascade (`check:mcp-export-corpus`,
 `check:publish-assets`, JSR audit, publish dry-run) is mandatory in its gate set from the start rather
 than argued N/A by reasoning.
+
+## 2026-08-30 — coordinator F1 ruling; environment authority update; a delivery that silently failed
+
+### Coordinator ruling on F1 — recorded as received, not reinterpreted
+
+The F1 repair is a **narrow, generic, optional, manifest-advertised generator inspection protocol** —
+explicitly *not* manifest excludes, and *not* AI selection logic copied into the CLI. A manifest
+advertises `inspectionProtocol: 1`; the CLI invokes **the same external generator** through the
+injected `ProcessPort` in a read-only inspect mode and uses its reported selection as the expected
+set; the CLI validates schema/version, declared registry paths, duplicates, and source files; a
+**declared** protocol that fails is **fail-closed with no silent fallback**; an absent protocol keeps
+legacy behaviour.
+
+The seam already exists — `installed-runtime-registry-generator.ts:412` invokes the generator through
+`dependencies.process.exec` — so this extends current machinery rather than inventing a transport.
+
+Three requirements are non-negotiable: inspection and compile share the **same pure selector**; **no
+writes in inspect mode**, proven rather than asserted; and a **real AI `skill-loader` healthy
+regression**. Workers/profile adoption (evaluator finding F4) is explicitly follow-up scope. The
+focused PLAN-EVAL stays, because the process contract is genuinely architectural.
+
+Ceiling: **five added paths only**, resolved against the tree —
+`plugins/ai/scaffold.runtime.json`, `plugins/ai/src/cli/ai-registry-compiler.ts`,
+`plugins/ai/src/cli/generate-runtime-registries.ts`, `plugins/ai/src/cli/ai-registry-compiler.test.ts`,
+and `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts`.
+Existing adapter/evidence/doctor/test paths may be amended within the prior six-path ceiling; anything
+else is rescope-and-stop.
+
+This **supersedes** the open-design instruction this lane had already sent, which asked the author to
+weigh three directions and propose its own ceiling. The superseding is stated explicitly in the
+steering message so the author does not act on both.
+
+### A steering delivery that failed while its wrapper exited 0
+
+The ruling was **not** delivered on the first attempt. `agentic:codex-resume` returned exit 0 while
+the underlying send was rejected:
+
+```
+thread-store conflict: thread 01a051d0-… already has an active writer
+Error: thread/resume failed (code -32600)
+```
+
+Confirmed by grep: neither `inspectionProtocol` nor `same pure selector` appears in the target
+rollout. This is the **second** sighting of this trap in this lane — the pre-migration worklog already
+recorded a resume returning exit 0 over a failed dispatch — but now with the cause identified:
+
+**Resuming a Codex thread that is mid-turn fails with a thread-store active-writer conflict, and the
+wrapper exits 0 regardless.** Steering is deliverable only when the thread is not `working`. Delivery
+is proven only by grepping the target rollout for a phrase unique to the message — never by an exit
+code and never by a `--pretty` success line.
+
+The lane is waiting on the author's current turn to end, then delivers and re-proves from the rollout.
+No rival send was made into the owned worktree.
+
+### Environment authority update — the runtime position is withdrawn
+
+`netscript-dind` is fully operational after the restart: `/etc/hosts` resolves it, the project `mise`
+config sets `DOCKER_HOST=tcp://netscript-dind:2375`, and Docker **server** 27.5.1 responds. Aspire
+doctor's below-28 result is a **warning only**, not a failure and not a dispatch blocker. PID 1 is
+`tini` with 0 zombies.
+
+**This lane had no gate to re-run.** The instruction to re-run anything previously waived or scored
+red for zombies was checked against both the topic run dir and the leaf run dir: no gate here was ever
+waived or classified on zombie or inotify grounds, so there is no stale verdict to replace. Recorded
+as a checked negative rather than passed over in silence.
+
+**What it does change is #1673's verification plan.** This lane's earlier position — that #1673 needed
+no runtime lease and that the host could not produce a runtime verdict anyway — is now half wrong and
+is withdrawn. It was correct for the original six-CLI-file ceiling. It is not correct after the
+coordinator expanded the ceiling into `plugins/ai`: `scaffold.runtime` is the one real end-to-end
+proof that F1 is fixed rather than merely unit-tested, because the e2e plugin-suite builder defaults
+`aiMcp = true` and `behavior.plugin-doctor-missing-module` requires doctor healthy first. That is
+precisely the gate IMPL-EVAL predicted would go red at the pre-fix head.
+
+`scaffold.runtime` is therefore added to the leaf's plan as a **required, supervisor-coordinated**
+gate. The author does not run it: the host runtime lease is a cluster-wide singleton, so this lane
+obtains and sequences it once the implementation is ready, then cleans up exactly what it owns
+(`agentic:leak-check`, then `agentic:teardown --apply`, `--owned-root` for anything started outside
+the worktree).
+
+The shared `fs.inotify.max_user_instances` ceiling (128) is the only remaining host quota blocker and
+is shared across every lane. An Aspire abort with exit 134 / `IOException: configured user limit … on
+inotify instances` is a **quota collision to retry against** — it is not evidence about the change
+under test and must never be recorded as a product red.
