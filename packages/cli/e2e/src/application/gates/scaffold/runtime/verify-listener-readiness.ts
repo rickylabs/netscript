@@ -87,7 +87,11 @@ async function runAspire(args: readonly string[]): Promise<string> {
   return stdout;
 }
 
-function resourceMatches(resource: Readonly<Record<string, unknown>>, expected: string): boolean {
+/** Match a resource's `displayName`/`name`/`resourceName` against a base or ID-suffixed name. */
+export function resourceMatches(
+  resource: Readonly<Record<string, unknown>>,
+  expected: string,
+): boolean {
   for (const key of ['displayName', 'name', 'resourceName']) {
     const candidate = resource[key];
     if (

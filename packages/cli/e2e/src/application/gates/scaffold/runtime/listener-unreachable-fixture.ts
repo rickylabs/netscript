@@ -2,6 +2,7 @@ import type { ListenerReadinessExpectation } from './listener-readiness-gates.ts
 import {
   type ListenerHealthReport,
   readListenerHealthReport,
+  resourceMatches,
 } from './verify-listener-readiness.ts';
 
 const UNHEALTHY_DESCRIPTION = /listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
@@ -190,7 +191,7 @@ function readResourceContainerId(topology: unknown, resourceName: string): strin
     ? topology.resources
     : [];
   for (const candidate of resources) {
-    if (!isRecord(candidate) || candidate.name !== resourceName) continue;
+    if (!isRecord(candidate) || !resourceMatches(candidate, resourceName)) continue;
     const properties = candidate.properties;
     const id = isRecord(properties) ? properties['container.id'] : undefined;
     if (typeof id !== 'string' || id.length === 0) {

@@ -78,7 +78,7 @@ export function createListenerReadinessGates(
       (context) => [
         'deno',
         'run',
-        '--allow-run=aspire',
+        '--allow-run=aspire,docker',
         '--allow-write',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts`,
         context.project.appHost,
