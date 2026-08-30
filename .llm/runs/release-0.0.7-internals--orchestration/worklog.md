@@ -3562,3 +3562,45 @@ corrected final evidence table.
 Remaining steps are coordinator/human: draft→ready, green CI (guarded on `draft == false`, so current
 `skipping` checks are not an evidence source), `status:ready-merge`, merge. **This lane did not merge,
 ready-flip, or close anything.** #1734 stays parked at its two-failure owner boundary.
+
+## 2026-08-30 — next internals leaf dispatched: #1533 JSDoc `@example` compile gate
+
+`#1747` reached terminal ready-for-merge, so the serial queue advanced immediately.
+
+| Field | Value |
+| --- | --- |
+| Issue | **#1533** (`area:docs` + `area:tooling`, `type:test`, `priority:p2`, milestone `0.0.7`) |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1533` |
+| Branch | `test/jsdoc-example-compile-gate` @ `13878a80a50c55b9662099fed64555f2310ae4a3` (live `main`), no upstream |
+| Run dir | `.llm/runs/test-jsdoc-example-compile-gate--1533/` |
+| Thread | `01a05209-d8f9-7021-bb65-7661f746a511` |
+| Rollout | `/home/agent/.codex/sessions/2026/08/30/rollout-2026-08-30T11-39-32-01a05209-d8f9-7021-bb65-7661f746a511.jsonl` |
+| Route | requested **openai · gpt-5.6-sol · high** — observed identical, **matched** |
+| Steering | `codex exec resume 01a05209-d8f9-7021-bb65-7661f746a511 -- "<follow-up>"` |
+| Phase | bootstrap → research → plan, **stops at the plan gate** |
+
+**Effort `high`, not `medium`**, and the reason is scope uncertainty rather than code size: nobody can
+state how many `@example` blocks fail until the gate exists, so the slice carries a genuine
+policy decision (repair / baseline / split) that must be settled *in the plan* before the number is
+known. The brief says a plan deferring that decision to implementation will fail its gate.
+
+The brief hands the author this lane's disproof of the stale "gate lands red on four files" ledger
+entry **and instructs it to re-verify rather than inherit it** — including the one genuine surviving
+defect (`packages/contracts/schemas/pagination.ts` uses `baseContract` and `UserSchema` with no
+import). Same discipline this lane has been applying to itself all session: a ledger entry is a claim
+with a citation, and the citation must be re-run against the thing it names.
+
+Current host facts are stated positively in the brief — `tini`/0 zombies so root `deno task test`
+**is** usable, inotify 1024, DinD 28.5.2 operational — with runtime gates excluded by the
+**coordinator's serialized expensive-gate lease**, not by environment.
+
+### Host drift observed at launch (non-blocking, carried up)
+
+- **`/home/codex` no longer exists.** `launch-codex-slice` stages its brief at
+  `wslHome()/<slug>-brief.md`, which defaults to `/home/${wslUser()}` = `/home/codex` regardless of
+  `--user node`, so the launch fails with `No such file or directory`. Worked around with
+  `NETSCRIPT_WSL_HOME=/home/agent`. Earlier lane notes claiming `/home/codex` symlinks to
+  `/home/agent` are **stale** — `/home` now contains only `agent` and `node`. This affects every lane
+  using the launcher and wants a real fix, not a per-call env var.
+- The `node_repl` MCP server fails to start for new Codex threads
+  (`MCP startup failed: No such file or directory`); `codex_apps` starts fine and the turn proceeds.
