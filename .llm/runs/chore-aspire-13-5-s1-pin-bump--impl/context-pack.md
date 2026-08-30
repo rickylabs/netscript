@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `chore-aspire-13-5-s1-pin-bump--impl` |
 | Branch | `chore/aspire-13-5-s1-pin-bump` |
-| Current phase | S1 convergence gate correction complete — supervisor refreeze pending |
+| Current phase | S1 bounded review fix complete — push and supervisor refreeze pending |
 | Archetype | `6 — CLI/tooling` |
 | Scope overlays | none |
 
@@ -17,6 +17,9 @@ passed 67 gates and failed only because the live DB endpoint gate still required
 persistent allocations to differ. The bounded correction now accepts Aspire 13.5 stable allocation
 reuse while proving the second receipt matches a fresh live topology, the live users environment
 uses that endpoint, `/health` is ready, and telemetry remains correlated.
+Review comment `r3890336485` then identified that the phase-2 peer-version check still used substring
+matching. The bounded repair now compares parsed version tokens exactly, so `13.5.30` cannot satisfy
+the required `13.5.3` pin.
 
 ## Completed
 
@@ -31,14 +34,16 @@ uses that endpoint, `/health` is ready, and telemetry remains correlated.
 - Test-first Tier-A repair completed: 6/6 parity tests plus scoped check/lint/fmt and repaired GREEN receipt.
 - Test-first convergence correction completed: RED on the missing comparison function, GREEN
   29/29, package E2E check, scoped lint/fmt, architecture, and quality gates all exit 0.
+- Test-first exact-token review fix completed: semantic RED reproduced the `13.5.30` false positive;
+  GREEN passes 9/9 focused tests and the parity task exits 0.
 
 ## In Progress
 
-- One convergence correction commit is ready to push; supervisor refreeze and hosted tier rerun remain external.
+- One bounded review-fix commit is ready to push; supervisor refreeze and hosted tier rerun remain external.
 
 ## Next Steps
 
-1. Push the convergence correction and post the structured PR implementation comment.
+1. Push the exact-token review fix and post the structured PR implementation comment.
 2. Supervisor refreezes the new head and reruns the hosted tiers.
 
 ## Key Decisions

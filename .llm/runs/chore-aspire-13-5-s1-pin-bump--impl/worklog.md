@@ -166,6 +166,26 @@ An exploratory whole-`packages/cli/e2e` lint selection exited 2 because the pre-
 `fixtures/desktop-native` config cannot resolve its `zod` catalog outside the root workspace. It
 reported no lint finding and is not the owned-file lint verdict above.
 
+### S1 exact-token review fix gates
+
+Review comment `r3890336485` identified that phase-2 compat-fixture classification used substring
+matching. A semantic RED test at baseline HEAD `c4cbda2541…` reproduced the false acceptance of
+`13.5.30` for required pin `13.5.3`; the exact-token comparison then made that case fail closed while
+retaining an exact-match positive case.
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| RED focused test wrapper | 1 | 6 passed, 1 failed; longer peer token was incorrectly accepted |
+| GREEN focused test wrapper | 0 | 9 passed, 0 failed |
+| Validation check wrapper | 0 | 18 files, 0 diagnostics |
+| Validation lint wrapper | 2 | Coverage refusal: root config excludes all 18 `.llm/**` files; not claimed as PASS |
+| Validation format wrapper | 0 | 18 files, 0 findings |
+| `deno task check:aspire-version-parity` | 0 | Phase 1 checked 812 entries with 0 failures |
+
+An exploratory forced lint processed all 18 validation files and reported 23 pre-existing findings
+across 12 paths. The repository's intentional `.llm/**` lint exclusion and the wrapper's fail-closed
+coverage refusal are preserved rather than weakening lint policy for this bounded fix.
+
 ## Handoff Notes
 
 - Supervisor should inspect parity classification semantics and the exact atomic pin diff first.

@@ -57,7 +57,13 @@ interface EvaluateOptions {
 }
 
 const STALE_PATTERNS = [/13\.[0-4]\.[0-9]+/g, /Aspire 13\.[0-4]/g] as const;
-const VERSION_LITERAL_PATTERN = /13\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?/g;
+const VERSION_LITERAL_PATTERN =
+  /(?<![0-9A-Za-z.])13\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?![0-9A-Za-z.-])/g;
+
+export const EXACT_ASPIRE_VERSION_TOKEN_MATCH = (
+  candidate: string,
+  expectedVersion: string,
+): boolean => candidate.trim() === expectedVersion.trim();
 
 const PHASE_ONE_EXACT_VERSIONS: Readonly<Record<string, readonly string[]>> = {
   'packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts': ['13.5.3', '13.5.0'],
@@ -89,6 +95,12 @@ function unexpectedPhaseOneVersions(path: string, source: string): string[] {
         .filter((version) => !allowed.includes(version)),
     ),
   ];
+}
+
+function containsExactAspireVersionToken(source: string, expectedVersion: string): boolean {
+  return [...source.matchAll(VERSION_LITERAL_PATTERN)]
+    .map((match) => match[0])
+    .some((candidate) => EXACT_ASPIRE_VERSION_TOKEN_MATCH(candidate, expectedVersion));
 }
 
 function isPhaseOneFailClass(className: string): boolean {
@@ -168,7 +180,7 @@ export async function evaluateAspireVersionParity(
     }
 
     if (options.phase === 2 && row.class === 'compat-fixture') {
-      const hasExpectedVersion = source.includes(options.expectedVersion);
+      const hasExpectedVersion = containsExactAspireVersionToken(source, options.expectedVersion);
       findings.push(parityFinding(
         row,
         hasExpectedVersion ? 'info' : 'fail',

@@ -1,6 +1,10 @@
 import { assertEquals } from 'jsr:@std/assert@1';
 
-import { evaluateAspireVersionParity, parseManifest } from './check-aspire-version-parity.ts';
+import {
+  evaluateAspireVersionParity,
+  EXACT_ASPIRE_VERSION_TOKEN_MATCH,
+  parseManifest,
+} from './check-aspire-version-parity.ts';
 
 const manifest = `path\tclass\towner\tdisposition
 scaffold.ts\tscaffold-constants\tS1\tenforce
@@ -106,6 +110,42 @@ Deno.test('phase 2 fails a compat fixture that lacks the current train literal',
   assertEquals(report.ok, false);
   assertEquals(report.findings[0].status, 'fail');
   assertEquals(report.findings[0].reason, 'compat fixture is missing the required 13.5.3 literal');
+});
+
+Deno.test('phase 2 rejects a longer compat peer token that only contains the required pin', async () => {
+  const report = await evaluateAspireVersionParity({
+    rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
+    phase: 2,
+    expectedVersion: '13.5.3',
+    readText: () => Promise.resolve("const versions = ['13.4.6', '13.5.30'];"),
+  });
+
+  assertEquals(report.ok, false);
+  assertEquals(report.findings[0].status, 'fail');
+  assertEquals(report.findings[0].reason, 'compat fixture is missing the required 13.5.3 literal');
+});
+
+Deno.test('phase 2 accepts an exact compat peer token', async () => {
+  const report = await evaluateAspireVersionParity({
+    rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
+    phase: 2,
+    expectedVersion: '13.5.3',
+    readText: () => Promise.resolve("const versions = ['13.4.6', '13.5.3'];"),
+  });
+
+  assertEquals(report.ok, true);
+  assertEquals(report.findings[0].status, 'info');
+  assertEquals(report.findings[0].reason, 'compat fixture contains the required 13.5.3 literal');
+});
+
+Deno.test('exact Aspire version comparison never accepts longer or suffixed tokens', () => {
+  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.3', '13.5.3'), true);
+  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH(' 13.5.3 ', '13.5.3'), true);
+  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.30', '13.5.3'), false);
+  assertEquals(
+    EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.3-preview.1.26425.3', '13.5.3'),
+    false,
+  );
 });
 
 Deno.test('missing archival paths remain non-failing but missing required paths fail closed', async () => {
