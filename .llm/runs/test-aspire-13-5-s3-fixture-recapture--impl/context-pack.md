@@ -12,23 +12,23 @@
 
 ## Current State
 
-Phase A is initialized from baseline `13878a80a`. Required issue, research, S2 shape evidence, current
-fixtures, harness, doctrine, tools, PR, JSR, and Aspire instructions have been read. Slice 1's
-intentional RED parity gate fails on exactly the four required phase-A rows; no runtime has started.
+Draft PR #1741 is open from slice 1. Slice 2 now contains the redacted S2-derived 13.5.3 `aspire ps`
+fixture and dual-version teardown probe cases. No runtime has started.
 
 ## Completed
 
 - Re-baseline, research, plan, Design checkpoint, and justified `PLAN-EVAL: N/A`.
 - Slice 1 RED receipt at `receipts/01-parity-red.json`.
+- Draft PR #1741 with labels, milestone 0.0.7, and S1 commit-trail comment.
 
 ## In Progress
 
-- Slice 1 RED receipt, first commit/push, and draft PR creation.
+- Slice 2 commit/push and PR trail comment; all proving gates pass, while supervisor review remains pending.
 
 ## Next Steps
 
-1. Commit/push slice 1 and open the metadata-complete draft PR.
-2. Implement S2-derived fixtures in order.
+1. Commit, push, and comment slice 2.
+2. Implement S2-derived describe/banner cases.
 
 ## Key Decisions
 
@@ -43,12 +43,15 @@ intentional RED parity gate fails on exactly the four required phase-A rows; no 
 | --- | --- | --- |
 | `.llm/tools/validation/check-compat-fixtures_test.ts` | new | Phase-A parity gate. |
 | `.llm/runs/test-aspire-13-5-s3-fixture-recapture--impl/` | new | Harness state. |
+| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.5.3.json` | new | Redacted S2 V5 snapshot. |
+| `.llm/tools/agentic/teardown/__fixtures__/README.md` | new | Capture provenance. |
+| `.llm/tools/agentic/teardown/probes_test.ts` | changed | Both Aspire versions exercise the same normalization. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | expected RED recorded | `receipts/01-parity-red.json` |
+| Static | S1 expected RED; S2 check/test/fmt and raw excluded lint PASS | worklog gate table |
 | Fitness | pending | slice 5 |
 | Runtime | N/A phase A | lease boundary |
 | Consumer | pending | export corpus gate |
