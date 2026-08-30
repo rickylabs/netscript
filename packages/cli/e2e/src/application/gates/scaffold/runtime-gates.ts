@@ -12,8 +12,8 @@ import { resolve } from '@std/path';
 import { commandGate } from './gate-factory.ts';
 import { generatedAppName } from './runtime/generated-app-name.ts';
 import {
-  ASPIRE_RESTART_SCRIPT,
   ASPIRE_START_SCRIPT,
+  ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT,
   AUTH_SMOKE_ENV_SCRIPT,
 } from './runtime/runtime-scripts.ts';
 import {
@@ -209,14 +209,15 @@ export function createRuntimeGates(
     ),
     commandGate(
       GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB,
-      'Restart resident AppHost after database preparation',
+      'Exercise typed database command with restart fallback',
       GATE_PHASE.RUNTIME,
       (context) => [
         'deno',
         'eval',
-        ASPIRE_RESTART_SCRIPT,
+        ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT,
         context.project.appHost,
         context.project.projectRoot,
+        database,
       ],
     ),
     commandGate(

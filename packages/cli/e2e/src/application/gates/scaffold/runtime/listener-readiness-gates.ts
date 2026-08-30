@@ -4,6 +4,7 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../../domain/cli-surface.ts';
+import { resolve } from '@std/path';
 import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../../domain/run-context.ts';
@@ -88,6 +89,31 @@ export function createListenerReadinessGates(
       (context) => context.project.projectRoot,
     ),
   ];
+}
+
+/** Build the lease-backed S8 receipt gate without registering it in a Phase-A suite. */
+export function createTypedDbPhaseBGate(): GateDefinition {
+  return commandGate(
+    GATE.RUNTIME_TYPED_DB_PHASE_B,
+    'Verify typed database commands and bounded unhealthy wait',
+    GATE_PHASE.RUNTIME,
+    (context) => [
+      'deno',
+      'run',
+      '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+      '--allow-read',
+      '--allow-write',
+      '--allow-run=aspire,deno',
+      `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts`,
+      context.project.appHost,
+      context.project.projectRoot,
+      context.project.cliEntrypoint.startsWith('jsr:')
+        ? context.project.cliEntrypoint
+        : resolve(context.project.repoRoot, context.project.cliEntrypoint),
+      context.request.options.database,
+    ],
+    (context) => context.project.projectRoot,
+  );
 }
 
 /** Failure/recovery resources for the selected runtime tier. */

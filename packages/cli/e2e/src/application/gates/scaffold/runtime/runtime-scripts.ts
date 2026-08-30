@@ -51,6 +51,26 @@ export const ASPIRE_RESTART_SCRIPT = [
   ASPIRE_START_SCRIPT,
 ].join('\n');
 
+/** Prefer the S8 typed migration command; retain the full restart for older/failing surfaces. */
+export const ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT = [
+  'const database = Deno.args[2];',
+  'if (!database) throw new Error("database argument is required");',
+  'const typed = await new Deno.Command("aspire", {',
+  '  args: [',
+  '    "resource", `${database}-cli`, "migrate", "--timeout", "60",',
+  '    "--apphost", Deno.args[0], "--non-interactive", "--nologo",',
+  '  ],',
+  '  stdout: "inherit",',
+  '  stderr: "inherit",',
+  '}).spawn().status;',
+  'if (typed.success) {',
+  '  console.info(`typed ${database}-cli migrate completed; resident AppHost preserved`);',
+  '} else {',
+  '  console.warn(`typed database command exited ${typed.code}; using restart fallback`);',
+  ASPIRE_RESTART_SCRIPT,
+  '}',
+].join('\n');
+
 export const AUTH_SMOKE_ENV_SCRIPT = [
   'const projectRoot = Deno.args[0];',
   'const repoRoot = Deno.args[1];',

@@ -29,11 +29,11 @@ import {
   buildExecutableDisplayName,
   findExecutableStatus,
   findRunningAppHost,
+  resolveDbCliTimeoutSeconds,
   TERMINAL_RESOURCE_STATES,
 } from './operation-runner-helpers.ts';
 
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
-const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 const WAIT_TIMEOUT_EXIT_CODES: ReadonlySet<number> = new Set([17, 18]);
 
 interface DbOperationRunnerOptions {
@@ -65,7 +65,7 @@ export class DbOperationRunner {
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
     this.lifecycleLock = options.lifecycleLock ?? new FileAppHostLifecycleLock();
     this.pollIntervalMs = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
-    this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.timeoutMs = options.timeoutMs ?? resolveDbCliTimeoutSeconds() * 1_000;
     this.sleep = options.sleep ??
       ((ms: number) => new Promise((resolve) => setTimeout(resolve, ms)));
     this.writeOperationRequest = options.writeOperationRequest ??

@@ -108,6 +108,7 @@ export const GATE = {
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
   RUNTIME_CAPTURE_DB_ALLOCATION_FIRST: 'runtime.capture-db-allocation-first',
   RUNTIME_ASPIRE_RESTART_AFTER_DB: 'runtime.aspire-restart-after-db',
+  RUNTIME_TYPED_DB_PHASE_B: 'runtime.typed-db-phase-b',
   RUNTIME_CAPTURE_DB_ALLOCATION_SECOND: 'runtime.capture-db-allocation-second',
   RUNTIME_WAIT_DATABASE: 'runtime.wait.database',
   RUNTIME_WAIT_POSTGRES: 'runtime.wait.postgres',

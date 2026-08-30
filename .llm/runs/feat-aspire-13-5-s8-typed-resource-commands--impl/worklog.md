@@ -56,6 +56,24 @@ Phase-B lease and the implementation agent does not self-certify.
   the untypeable bitwise expression without a cast (drift D-03). Final TypeScript 5.9.3 compile
   exited 0 with empty output. No Zod allowance was needed. The scratch was moved to trash and the
   worktree contains no scratch residue. Receipt: `receipts/05-consumer-typecheck-13.5.3.txt`.
+- 2026-08-30: pushed slice 5 commit `c0d47238` with the explicit refspec and posted its D-19 PR
+  trail. Supervisor steering then superseded the historical host classification with D-39:
+  inotify limit 1024, Docker 28.5.2 client/server, PID 1 `tini`, and zero zombies. Restore/watch and
+  lifecycle reds are real findings; D-42/D-43 remote-DinD topology is the only runtime limitation.
+- 2026-08-30: slice 6 replaces the unconditional runtime-suite restart with typed
+  `<db>-cli migrate --timeout 60` and retains the restart only as a failure fallback. It defines an
+  unregistered Phase-B receipt gate for typed help, migrate, reset-without-confirm, bounded
+  unhealthy wait, recovery, and resident-AppHost count evidence. `ASPIRE_CLI_START_TIMEOUT` now
+  configures both the emitted environment and adapter readiness budget with positive-integer
+  validation, enabling a bounded 10-second #863 receipt without changing the 300-second default.
+- 2026-08-30: Phase-A slice-6 evidence passed: focused type-check; 25 E2E gate tests; adapter tests
+  (7 groups / 10 runner steps); scoped check on 34 files; configured E2E lint/fmt on 16 files; raw
+  lint/fmt on all changed `packages/cli` TypeScript; configured lint; `quality:scan`; `arch:check`;
+  `check:assets-barrel`; seam/prohibition grep; and `scaffold.plugins` 17/17. The first combined
+  lint/fmt wrapper correctly refused config-excluded adapter files, so the final wrapper verdict
+  covers E2E and the required raw commands cover adapter source. No Phase-B gate was executed.
+- 2026-08-30: final static host observation remained `aspire ps = []`, empty `docker ps -a`,
+  inotify instances 1024, PID 1 `tini`, and zero zombies. No AppHost or container was started.
 
 ## Push trail
 
@@ -67,3 +85,4 @@ appended after each push and mirrored in the draft PR comment trail.
 - `1fa1cb75b3e3776ed1d0bd9dd9da046203264c20` — slice 2 typed generator, pushed explicitly.
 - `ab0908b8a4f39ee0bdd7d8cc31b2051004dd5e76` — slice 3 regenerated assets, pushed explicitly.
 - `1efd1a175d75cb5bb167b0998e0ce559f037255f` — slice 4 resident routing and bounded wait, pushed explicitly.
+- `c0d47238` — slice 5 Aspire 13.5.3 consumer restore/type-check receipt, pushed explicitly.
