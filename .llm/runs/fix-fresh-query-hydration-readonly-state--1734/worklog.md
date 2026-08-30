@@ -311,3 +311,38 @@ queued for a turn boundary that had not arrived — the author reached the runti
 turn and correctly followed the standing instruction. Queuing a correction behind a writer lock is
 only safe when the corrected step is *after* the boundary; here it was not. A superseding instruction
 that cannot reach the worker in time is not a correction, it is a hope.
+
+## 2026-08-30 — CORRECTION: the local `database.init` FAIL was supervisor-caused, not topology
+
+**Supersedes the attribution in the entry above.** I recorded the local run's `database.init` failure
+as "the known D-55 remote-DinD bind/loopback topology defect". **That attribution is wrong.**
+
+Coordinator timeline, to the millisecond:
+
+| Time | Event |
+| --- | --- |
+| 18:06:46.537 | **supervisor issued `aspire stop`** while the gate was still live |
+| 18:06:46.999 | AppHost canceled |
+| 18:06:47.026 | JSON-RPC connection dropped |
+
+The *JSON-RPC connection lost while starting `netscript-db-postgres`* error is **my stop signal
+arriving ~0.5 s earlier**, not a bind/loopback defect. Correct classification: a
+**coordinator/supervisor lease-protocol race** — I acted on an URGENT stop instruction while a
+reassignment correction granting the lease to this leaf was in flight, and the two crossed.
+
+**Consequences for the ledger:**
+
+- The local run is **invalid as evidence in either direction**. It is not a topology failure, not a
+  product verdict, and not a partial pass — it is an externally interrupted run. The 37 PASS that
+  preceded the interruption prove only that the run got that far.
+- **D-55 is not implicated by this run.** Citing it here would have propagated a false environmental
+  finding into a leaf that had nothing to do with it, and into any lane later reading this worklog to
+  decide whether local runtime is viable.
+- **No code change and no local rerun.** The repair is untouched; the hosted exact-head run
+  **33327199769** at `d2c7f16c624c5028cd837595d01ab3b516cb1c23` (`headSha` verified equal to the PR
+  head) remains the **sole authoritative** `scaffold.runtime` acceptance proof.
+
+I had written that I "cannot cleanly separate my stop from that failure and do not claim exoneration",
+which was the right instinct — but I then recorded the topology attribution as fact in the gate table
+anyway. Hedging in prose while asserting in the ledger is not honest recording; the ledger is what
+future readers act on.
