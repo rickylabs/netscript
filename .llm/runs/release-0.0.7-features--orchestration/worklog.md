@@ -6283,3 +6283,68 @@ itself, including looking for a forgery my trailing-comment attempt did not find
 
 The lane stays serial: nothing else dispatches while an evaluator is in flight. Both queued briefs
 are staged so dispatch is immediate at terminal handoff and needs no further preparation.
+
+## 2026-08-30 — host reaper fixed: D-26 premise void, root `test` re-run, #1731 metadata corrected
+
+### The host defect behind D-26 and R-1 is gone — measured, not assumed
+
+| Probe | Then (D-26/R-1) | Now |
+| --- | --- | --- |
+| PID 1 | not reaping | `tini -- ttyd …`, `/proc/1/comm` = `tini` |
+| Zombies (`ps -eo stat=` `^Z`) | ~7,733–7,979 | **0** |
+| PID-1-owned zombies | thousands | **0** |
+| `fs.inotify.max_user_instances` | 128 | **still 128** |
+
+R-1's condition — *"no further root-`test` retries on this host (they cannot move it)"* — was
+explicitly premised on that defect: `hybrid-launcher_test.ts:167` tests liveness with
+`Deno.kill(pid, 0)` and a zombie answers, so the assertion could not pass regardless of any code
+change. **The premise is void, so the condition no longer binds.** Retrying can now move the number,
+which makes the archived FAIL and the cycle-4 `SKIPPED` receipt both stale as the current record.
+
+Note the half that did **not** change: inotify is still 128, so **D-29 stands** — `watch-run.ts` is
+still inoperable and supervision still falls back to polling. The host fix repaired the reaper, not
+the watcher.
+
+Root `deno task test` is re-running at content head `42874803` in a supervisor-owned worktree. The
+receipt itself must be re-cut **in the leaf by an author**, not by me — measuring is supervision,
+cutting a contracted receipt is implementation.
+
+### The evaluator was ruling on a dead premise, and was told
+
+IMPL-EVAL cycle 2 (`b13a38f6`) was dispatched with a brief that said *"Do not retry root `test`
+(R-1)"*. That instruction became false mid-flight. I withdrew it by cross-session message rather than
+letting the session spend its ruling on a fact that no longer holds, and reframed its ruling 1: not
+*"does a `SKIPPED` receipt satisfy the gate"* but *"now that the gate is runnable again, must the leaf
+cut a real `test` receipt before this slice can be terminal"*. I also told it explicitly that R-1's
+`public-doc-lint` half is **unaffected and stands** — only the root-`test` half loses its premise —
+and that it must re-measure rather than take my numbers.
+
+### PR #1731 metadata was false and is now truthful
+
+The body still read *"This first slice contains the re-baselined research and locked implementation
+plan only; no product code has been implemented"* and *"Product gates: not run; no implementation
+exists"* — flatly untrue at a head that has landed S1, run eight receipts, and been through an
+IMPL-EVAL and two repair cycles.
+
+| Field | Before | After |
+| --- | --- | --- |
+| `status:` on PR #1731 | `status:plan` (frozen mid-lifecycle) | `status:impl-eval` |
+| `status:` on issue #1466 | `status:plan` | `status:impl-eval` |
+| Issue reference | **`Closes #1466`** | **`Refs #1466` — partial, slice 1 of 3**, no closing keyword |
+| Slice checkboxes | all unchecked | S1 checked at `42874803e`; **S2 and S3 marked NOT RUN** |
+| Validation | "not run; no implementation exists" | the eight-receipt table, the doc-lint delta-0 explanation, and the superseded root-`test` note |
+| Remaining scope | absent | explicit section naming S2, S3, and a terminal IMPL-EVAL `PASS` |
+| Draft | draft | **still draft — not marked ready** |
+
+The closing-keyword removal is the one that mattered most. `Closes #1466` on a PR delivering one of
+three slices would have auto-closed the issue on merge with two thirds of its acceptance unmet —
+exactly the failure mode `AGENTS.md` calls non-negotiable, in the opposite direction from the usual
+one (the usual defect is a missing keyword stranding an issue open; this was a present keyword that
+would have closed an issue that is not done).
+
+`gh pr edit` could not be used — the token carries only `repo` scope and the label mutation requires
+`read:org` for fields it queries. The REST endpoints (`gh api -X DELETE/POST …/labels`) need only
+`repo` and were used instead. Worth knowing before assuming label automation is broken.
+
+**Readiness remains withheld and is not a judgement call:** the body-level scope is incomplete and
+slices 2–3 are NOT RUN, so `status:ready-merge` and a ready-flip are wrong at any evaluator verdict.
