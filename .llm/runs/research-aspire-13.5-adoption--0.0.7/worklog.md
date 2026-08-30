@@ -356,4 +356,8 @@ thread); retry succeeded: thread `01a052fc-75a3-7ac1-9276-0ac7e90091c8`, route o
 `9d6afebf`; output `slices/s11/docs-audit/report.md` + PR #1771 comment. Runtime lease released by
 the coordinator at 14:03:49Z; D-55 still bars local Phase B. | | Close-gate rule recorded (D-58) |
 Stacked leaves show empty `closingIssuesReferences` while based on topic branches; rule + merge
-order recorded; appended to the S8/S9/S10 handoffs. |
+order recorded; appended to the S8/S9/S10 handoffs. | | Converged-head CI evidence | #1740 @
+`56bf4255` (base main): 8 pass / 0 fail, CLEAN. Stacked drafts #1743 `01f27d4d`, #1754 `f2395465`,
+#1759 `d81a8fe1`, #1760 `a46ea16d`, #1771 `9d6afebf`: **all checks skipping by draft/topic-base
+policy** (0 pass / 0 fail) — CI evidence for each leaf arrives only after the D-58 retarget to
+`main`; the retarget step therefore also re-earns CI at the exact head. |
