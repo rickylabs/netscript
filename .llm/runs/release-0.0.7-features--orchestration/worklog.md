@@ -8502,3 +8502,24 @@ The evaluator brief adds one judgment point beyond Tier-A's own review: whether 
 a real design question (the feature's whole purpose is to set `security`, so overwriting on
 disagreement is plausibly correct by the same spirit as LD-6, but the current test doesn't cover that
 exact conflict) left to the evaluator's judgment rather than pre-decided.
+
+## Main advance to `96d44758d` (#1790) — measured, zero intersection
+
+**#1790** (`docs(cli,plugin): document published subpath surfaces` — the actual merged PR; `#1788` is
+only the run-directory naming, not a separate PR, confirmed via `gh pr view 1788` returning "Could
+not resolve to a PullRequest"). Full file list: eleven `.llm/runs/docs-cli-plugin-subpath-surface--1788/`
+artifacts, two doc pages (`docs/site/reference/{cli,plugin}/index.md`), and two shared carriers —
+`packages/cli/src/kernel/assets/agent-docs.generated.ts` and `packages/mcp/src/publish-assets.generated.ts`.
+
+**#1387's leaf touches** (re-measured against its fork point): `packages/contracts`, `packages/mcp`,
+`packages/plugin`, `packages/sdk`, `packages/service`. Zero overlap with `packages/cli` or
+`docs/site`. Within `packages/mcp`, #1790 touches `publish-assets.generated.ts` — **a different
+carrier** than the one #1387 touches (`export-surface-corpus.generated.ts`). **Zero file-level
+intersection at all**, stronger than the #1739 case, which at least shared one carrier.
+
+**Ruling: no integration, no regeneration required now.** No authoritative carrier needs
+regeneration because none of #1387's product paths appear in #1790's diff and neither shared-carrier
+type actually overlaps at the file level. Existing Tier-A/IMPL-EVAL evidence for Slices 1–6 stands
+unchanged; the live Slice 6 IMPL-EVAL was not touched. Main integration remains deferred to #1387's
+own pre-merge/close-gate boundary, where both #1739's and #1790's contributions will be folded
+together in one regeneration pass rather than piecemeal now.
