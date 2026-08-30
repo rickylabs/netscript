@@ -8103,3 +8103,36 @@ Re-dispatched on that route at the same evidence head, same brief. **The escalat
 one, not an improvisation** — recorded here because a changed evaluator identity must never be silent:
 generator ≠ evaluator still holds (Codex authored, non-Codex evaluates), and the verdict will name its
 own route.
+
+### Evaluator escalation exhausted the documented chain — genuine infra blocker, escalating
+
+OpenRouter, the documented next fallback, is **not configured**: `openrouter-run.ts` reports
+`OPENROUTER_API_KEY is missing and /home/agent/.config/netscript-agentic/openrouter.env could not be
+read` — the file does not exist, and no `OPENROUTER_API_KEY` is in the environment. This is not a
+quota limit on that route; it is unset credentials.
+
+`lane-policy.md`'s final fallback for a blocked OpenRouter route is **"a fresh Antigravity CLI (`agy`)
+Gemini 3.6 Flash high session"**. I checked what exists for that: `.llm/tools/agentic/codex/agy-live.ts`
+only **parses** AGY rollout status for the cross-runtime status view; the only invocation surface is
+`.llm/tools/agentic/runtime/adapters/antigravity-adapter.ts`'s `AntigravityEvidenceAdapter`, which is a
+**fixed, bounded, read-only canary probe** (four hardcoded prompts, 60 s cap) built for docs-authoring
+evidence checks — not a general-purpose "send this brief, get a verdict back" launcher, and it has no
+receipt or verdict-parsing contract.
+
+**I am not hand-rolling a raw `agy --print` invocation for a formal evaluator gate.** AGENTS.md is
+explicit that the agentic suite is "the only interface... never ad-hoc `wsl.exe`/PowerShell
+orchestration", and the same principle holds for AGY: inventing an unreceipted, unparsed invocation
+path for a formal IMPL-EVAL verdict is exactly the ad-hoc orchestration the doctrine forbids, and a
+verdict from it would have no evidence trail to certify against.
+
+**Escalating rather than self-authorizing.** Two things are needed from the coordinator: either
+(a) provision `OPENROUTER_API_KEY` / `openrouter.env` so the documented DeepSeek V4 Flash 0731 · max
+route actually works, or (b) rule on an alternative evaluator identity for this cycle, since the
+checked-in suite has no working launcher at the end of the documented chain. Content is unaffected:
+Slice 3's Tier-A verdict (`ACCEPTED` at `c297064aa`) stands on its own evidence regardless of which
+session performs IMPL-EVAL.
+
+**Nothing else in the serial queue is independent of this.** Slice 4 dispatch is gated on Slice 3's
+IMPL-EVAL per this lane's established pattern (Slice 3 itself was gated on Slice 2's). #1664 remains
+parked; no runtime lease is held or sought. I am not idling on a routine checkpoint — this is reported
+because it blocks the only next step in this queue, not because it is a scheduled report.
