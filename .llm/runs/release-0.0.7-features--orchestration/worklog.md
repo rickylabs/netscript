@@ -8794,3 +8794,45 @@ Flash / Qwen3.8-Flash-Next routing cannot take effect until the evaluator allowl
 updated** — that update is a distinct, small, reviewable infra change (`OPEN_EVALUATOR_MODEL_IDS` in
 `models.ts`, following its own "MONTHLY MAINTENANCE" comment), owned by whoever maintains
 `.llm/tools/agentic/`, not by this feature lane.
+
+## STOP — Slice 9 DeepSeek dispatch voided; Slice 9 evaluation parked pending #1792
+
+**Verbatim coordinator instruction:** "STOP: the owner's DeepSeek-valid ruling preserves existing
+receipts; it does not authorize new DeepSeek fallbacks after the GLM/Qwen default. Cancel the
+just-launched Slice 9 DeepSeek task immediately and record it cancelled/nonqualifying. Do not wait
+for or adopt its verdict. #1792 already contains the required shared allowlist/toolchain change and
+is exact-green ready-merge; until it lands, use the direct OpenRouter GLM 5.3 Flash max route or park
+only Slice 9 evaluation while continuing non-eval work. Do not patch shared routing in the feature
+branch."
+
+**Correction to my own prior action.** I had read the "existing DeepSeek receipts remain valid, do
+not rerun" ruling too broadly — as license to keep using DeepSeek for any slice with no prior
+evaluation, rather than only for slices already evaluated before the GLM/Qwen default took effect.
+The coordinator's clarification is narrower and I accept it.
+
+**Dispatch voided.** The background task had already exited by the time this instruction arrived (it
+completes synchronously; there was no live process left to interrupt). Per the instruction, its
+result was **not read, cited, or adopted** — I checked only that the JSON stream contained a `result`
+event, at the structural level, without opening its content, then discarded the transcript file.
+Confirmed no file residue in its worktree (`ns1387-impleval-s9` clean). **Recorded here as cancelled
+and nonqualifying — it certifies nothing.**
+
+**#1792 verified, not merely trusted.** `chore(agentic): route open evaluation to GLM 5.3 Flash and
+Qwen 3.8 Flash` — OPEN, `mergeable: MERGEABLE`, all checks SUCCESS/SKIPPED, touches
+`.llm/tools/agentic/config/models.ts` and the full surrounding routing/evaluator-protocol surface
+(70 files). This is exactly the allowlist fix identified in my prior report. Confirmed real and green,
+not yet merged.
+
+**Not attempting a direct-OpenRouter route.** Building a credible ad hoc evaluator outside the
+harness's own agentic-session tooling — one with genuine file access and gate-running capability,
+matching what every other IMPL-EVAL in this run has actually done — is a materially different and
+riskier undertaking than a model-string swap, and the instruction offers parking as an explicit
+alternative. Choosing to park rather than improvise a weaker evaluation mechanism for #1387's final
+slice.
+
+**Slice 9 evaluation is parked.** Tier-A stands ACCEPTED at `3cb08103ff9c25ff3ec580301b5936586b13d37e`
+— unaffected. `#1387`'s close-gate remains blocked on IMPL-EVAL, which is now blocked on #1792
+landing (or an explicit ruling to attempt the direct-route path). Checked this lane's own serial
+queue for other non-eval work: #1466/PR #1731 and #1730 are both already shipped earlier in this run;
+#1664 remains parked with no retry authorized. **No other independent slice exists in this lane right
+now** — there is genuinely no non-eval work to continue on while #1387 waits.
