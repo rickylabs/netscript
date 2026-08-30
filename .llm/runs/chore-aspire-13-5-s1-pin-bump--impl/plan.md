@@ -51,3 +51,15 @@
 ## Deferred scope
 
 - Phase-2 CI activation (S13), deferred manifest owners, docs/skills/corpora, fixture recapture, generator emission changes, runtime canary admission, and all host Aspire CLI changes.
+
+## 2026-08-30 convergence correction
+
+Hosted run `33328727942` proved the S1 train except for the pre-13.5 assumption that consecutive
+persistent Postgres allocations must differ. Aspire 13.5 intentionally persists deterministic
+proxyless endpoint assignments for persistent resources, so this bounded follow-up replaces that
+inequality with a fresh second-start topology comparison. The gate still requires both saved
+receipt authorities, the live users `DATABASE_URL` authority, users `/health`, generated CRUD, and
+users telemetry correlation. A pure comparison test rejects stale/literal receipt endpoints.
+
+Sources: https://github.com/microsoft/aspire/wiki/13.5-Change-log and
+https://aspire.dev/app-host/persistent-containers/.

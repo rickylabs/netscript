@@ -58,3 +58,19 @@
   covers all seven pin-bearing phase-1 files, including accepted 13.5.0, Browsers preview, and cache
   suffix variants. All 66 currently missing paths are archival and remain non-failing.
 - **Evidence:** 6/6 repaired parity tests; `receipts/parity-phase1-green.json`.
+
+## 2026-08-30 — Aspire 13.5 persistence invalidates the allocation-inequality gate
+
+- **What:** `behavior.live-db-endpoint` rejected equal first/second Postgres URLs even though the
+  second start was healthy and all surrounding database, service, telemetry, and cleanup gates
+  passed.
+- **Source:** hosted run `33328727942`; Aspire 13.5 change log; persistent-resource documentation.
+- **Expected:** The pre-S1 gate expected a new host port on every AppHost start.
+- **Actual:** Aspire 13.5 persists deterministic proxyless endpoint assignments for persistent
+  resources, so a stable local endpoint across AppHost restarts is expected.
+- **Severity:** significant
+- **Action:** repair — remove the inequality and instead compare the second receipt with a fresh
+  live second-start topology, verify the live users database authority and `/health`, and preserve
+  telemetry correlation. Negative tests reject stale/literal endpoints with both values named.
+- **Evidence:** https://github.com/microsoft/aspire/wiki/13.5-Change-log;
+  https://aspire.dev/app-host/persistent-containers/; 29/29 focused tests.
