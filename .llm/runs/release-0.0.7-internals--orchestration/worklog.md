@@ -5961,3 +5961,25 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   `behavior.app-reference` PASS in 43.669s) corroborated at the job level: all 5 relevant CI jobs
   independently confirmed `success` via `gh run view`.
 - **Ready for owner merge. Supervisor does not merge.**
+
+## D-119 — Near-miss: I nearly reproduced #1751's own failure mode against its own session
+
+- `ps aux | grep "01a054ff-9028"` (the thread id) found nothing, and the rollout hadn't been written
+  to in ~3.5 minutes, so I concluded the session was idle and sent a `codex-resume` steer.
+- **That check was flawed, not the session.** The thread id never appears in the launcher's or
+  `app-server-message-cli.ts`'s own command line (it's assigned internally by the app-server) — so
+  the grep pattern could never have matched a live process either way. A broader search found both
+  processes genuinely still running: launcher pid `566773`, app-server-message-cli pid `566900`,
+  confirmed via their full command lines. The session was never idle.
+- The resume attempt was correctly rejected: `thread-store conflict: already has an active writer`
+  (code `-32600`). **Verified the real exit code this time rather than trusting the first read**:
+  `REAL_EXIT=1` — this specific rejection path propagates non-zero correctly, unlike the silent-0
+  case #1751's own brief documents from an earlier encounter. Worth recording as a data point for
+  #1751's own research: not every rejection path is silent; the bug may be narrower than "all
+  rejections exit 0", which the leaf's own research phase should characterize precisely rather than
+  assume uniform.
+- **No harm done**: the rejected resume never established a session, so the original thread's own
+  turn continued completely undisturbed. This is recorded as a near-miss, not a incident — but it is
+  a direct first-hand demonstration of exactly the liveness-detection pitfall #1751 exists to fix,
+  caught by re-verifying before concluding rather than accepting the first negative result.
+- Not sending another resume. Arming a proper turn-complete watch and holding.
