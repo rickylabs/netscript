@@ -5309,3 +5309,24 @@ writes before it diffs; commit-by-slice with explicit refspec and one PR comment
 issue text reserved to me.
 
 Sender again carries the head-verification abort guard. Labels moved to `status:impl` on both.
+
+### #1357 S2A in flight; supervisor monitor killed externally and relaunched
+
+S2 dispatched and delivered. Author landed the **red-before alone**: `0d620b61`
+"test(cli): specify data-screen scaffold semantics", test-only, `web-scaffold_test.ts` +267/-13
+(ceiling path 2). Product fix in progress uncommitted — `web-scaffold.ts` +219/-54.
+
+My S2A push monitor was **killed externally** (task status `killed`, not by me — the second such
+host-side process kill this session). Audited immediately: the **author turn is ALIVE** and its state is
+unchanged (`local=0d620b61`, `remote=53e696b5`, 1 dirty file), so only my own watcher died. Relaunched
+it. No repair or relaunch of the leaf was warranted or performed.
+
+Deliberately did **not** run the suite while the author holds the worktree. Testing mid-write races
+their edits and yields a mixed-state result that proves nothing; the red-before is only attributable
+when measured from the commit itself against unchanged product code, which I will do once the slice is
+pushed.
+
+Liveness discipline applied correctly this time: with the rollout showing zero growth over 20 s I
+checked the **process**, not the byte count, before drawing any conclusion — the inverse of the earlier
+false-stall call. Growth silence plus a live turn is a reasoning pause; growth silence plus a dead
+process is a failure.
