@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------------- |
 | Run ID         | `fix-saga-span-emission-and-correlation--0.0.7`                  |
 | Branch         | `fix/saga-span-emission-and-correlation`                         |
-| Current phase  | `gate` — author complete; refreshed Tier-A and IMPL-EVAL pending |
+| Current phase  | `gate` — cycle-1 repair complete; refreshed Tier-A/eval pending  |
 | Archetype      | `3 - Runtime/Behavior`; `5 - Plugin Package` composition overlay |
 | Scope overlays | runtime + telemetry + consumer proof                             |
 
@@ -25,7 +25,10 @@ clean and its focused suite passes 31/31. S5 documents the contract and adds the
 Flow-B compensation fixture plus direct-parent/correlation validator proof; its focused static and
 5-test gates pass. S6 exact-head evidence is complete: allowed static, architecture, quality,
 publish, tests, and three non-mutating derivative gates pass; MCP corpus staleness is the expected
-attributed STOP and was not regenerated.
+attributed STOP and was not regenerated. IMPL-EVAL cycle 1 ran against a pre-S5/S6 head, but its
+live F2/F3 regressions were reproduced by assertions at `bd89e523`; S7 preserves explicit scheduled
+child keys and legacy compensation-handler message trace context, with the full allowed gate set
+green at the repaired tree.
 
 ## Completed
 
@@ -68,14 +71,17 @@ attributed STOP and was not regenerated.
 - Confirmed the MCP export corpus is stale because existing exported signatures moved; retained the
   supervisor-attributed STOP and made no generated write. Recorded the inherited plugin doctor
   module-tag audit failure without expanding the ceiling.
+- Reproduced IMPL-EVAL cycle-1 F2/F3 at `bd89e523` with 10 passed / 2 failed assertions, then fixed
+  scheduled child-key precedence and noop compensation handler trace context. The repaired focused
+  suite passes 12/12 and the whole core surface passes 84/0/3 ignored.
 
 ## In Progress
 
-- Supervisor-owned refreshed Tier-A review and separate-session IMPL-EVAL for the final head.
+- Supervisor-owned refreshed Tier-A review and separate-session IMPL-EVAL for the repaired head.
 
 ## Next Steps
 
-1. Preserve the final author head for refreshed Tier-A and separate-session IMPL-EVAL.
+1. Preserve the repaired author head for refreshed Tier-A and separate-session IMPL-EVAL.
 2. Preserve MCP corpus regeneration and the leased Flow-B runtime for supervisor coordination.
 3. Do not flip draft state, relabel, merge, or mirror issue acceptance boxes from the author lane.
 

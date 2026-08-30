@@ -114,3 +114,20 @@ documentation.
 - **Action:** accept measured baseline; do not edit outside ceiling
 - **Evidence:** Raw base-to-head diff for `plugins/sagas/doctor.ts` exits 0; plugin audit reports
   one `F-JSR-2 module-tag` failure and two warnings.
+
+## 2026-08-30 — IMPL-EVAL found bridge child-key precedence regression
+
+- **What:** Cycle 1 measured that scheduled dispatch overwrote a handler-supplied child
+  `correlationKey` with the upstream cross-plane ID. It also identified a compensation-handler
+  trace-context regression under noop instrumentation.
+- **Source:** IMPL-EVAL cycle 1 verdict `72be7d12`, findings F2 and F3.
+- **Expected:** Engine-selected values feed telemetry and explicit parent handoff without silently
+  replacing a child message's domain identity or deleting trace context already present at the
+  handler boundary.
+- **Actual:** `withScheduledContext` was parent-wins, and the compensator replaced the base
+  message-trace fallback with only the optional new span context.
+- **Severity:** significant
+- **Action:** fix within the locked bridge, compensator, test, README, and run-artifact ceiling.
+- **Evidence:** Repair red at `bd89e523` exits 1 with 10 passed / 2 failed assertions. The fix makes
+  explicit scheduled keys child-wins, documents the existing `send()` fallback, and restores message
+  trace context only for the handler—not for span parenting or correlation precedence.

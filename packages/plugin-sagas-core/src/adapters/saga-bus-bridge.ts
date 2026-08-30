@@ -359,9 +359,8 @@ function withScheduledContext(
     ...scheduled,
     message: Object.freeze({
       ...scheduled.message,
-      correlationKey: correlationId
-        ? correlationId as SagaCorrelationKey
-        : scheduled.message.correlationKey,
+      correlationKey: scheduled.message.correlationKey ??
+        (correlationId as SagaCorrelationKey | undefined),
       traceparent: parent?.traceparent ?? scheduled.message.traceparent,
       tracestate: parent?.tracestate ?? scheduled.message.tracestate,
     }),

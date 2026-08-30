@@ -115,8 +115,8 @@ export class SagaCompensator {
         message: request.message,
         attempt: request.attempt ?? 1,
         now: this.#clock.now(),
-        traceparent: spanContext?.traceparent,
-        tracestate: spanContext?.tracestate,
+        traceparent: spanContext?.traceparent ?? request.message.traceparent,
+        tracestate: spanContext?.tracestate ?? request.message.tracestate,
       };
       const cascaded = handler(saga, request.message, context);
       if (span) {

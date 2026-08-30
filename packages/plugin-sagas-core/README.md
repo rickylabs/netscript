@@ -160,6 +160,11 @@ for the cross-plane ID; a saga's `.correlate()` rule wins for the domain key. Ca
 those two engine-selected values unchanged. Explicit W3C trace context makes each cascade span a
 direct child of the operation that produced it, including compensation-generated cascades.
 
+For scheduled child messages, an explicit child `correlationKey` wins; the upstream cross-plane ID
+is used only when the child omitted one. The current `send()` DSL has no child-correlation option,
+so the bridge seeds its nested message with the upstream cross-plane ID. A rule-less downstream saga
+therefore uses that value as its domain key; a downstream `.correlate()` rule still wins.
+
 `saga.cascade.complete` is emitted whenever a handler returns a complete effect, including a
 storeless runtime. Its `netscript.saga.status` is the resolved persisted status—not a success flag.
 For mixed terminal effects it can be `failed` or `compensating`; the span also records whether the
@@ -168,7 +173,9 @@ complete effect supplied a result.
 Direct `SagaCompensator` callers may omit the optional correlation and parent fields for source
 compatibility. The compensator does not invent fallbacks from the message, a correlation rule, or a
 default. A missing handler is observable as `skipped`; a registered handler without an
-engine-resolved `correlationKey` fails validation.
+engine-resolved `correlationKey` fails validation. This no-fallback rule applies to correlation and
+span parenting; when no instrumentation span context exists, the compensation handler still sees the
+handled message's existing `traceparent`/`tracestate` for backward compatibility.
 
 ## Public surface
 

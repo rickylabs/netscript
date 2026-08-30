@@ -105,6 +105,7 @@ a process seam. A thin plugin may only wire the core primitive.
 | 2026-08-30T14:23:57Z | S5    | Docs/consumer proof      | Documented all six span contracts and added a generated Flow-B compensation fixture plus validator checks for direct parenting and exact callback/payload correlation equality. Runtime execution remains supervisor-only.                  |
 | 2026-08-30T14:28:11Z | S6    | Merge-readiness evidence | Re-ran all allowed exact-head gates. Static, architecture, publish, focused tests, quality, and three check-only derivative gates pass; MCP corpus is the expected attributed STOP; two unrelated baseline gates remain measured negatives. |
 | 2026-08-30T14:40:34Z | S7    | IMPL-EVAL repair red     | Cycle-1 F2/F3 regression tests compile and fail only by assertion: raw exit 1, 10 passed / 2 failed. Scheduled dispatch overwrites `handler-chosen` with `upstream-42`; noop compensation drops the handled message traceparent.            |
+| 2026-08-30T14:44:02Z | S7    | IMPL-EVAL repair green   | Child-key precedence and legacy handler trace context repaired. Focused 12/12, targeted 27/27, whole core 84/0/3 ignored, plugin 7/7; static/quality/publish/derivative gates match plan and MCP remains the attributed STOP.               |
 
 ## Decisions
 
@@ -119,6 +120,8 @@ a process seam. A thin plugin may only wire the core primitive.
 | Compensation request fields are optional with no fallback     | `correlationId`, `correlationKey`, and parent context remain optional for source compatibility. The composed bridge always supplies engine-selected values. When absent on a direct/external request, the compensator does not derive them from the message, definition rule, or default; telemetry leaves them absent, and a registered handler requiring a missing saga key fails validation rather than receiving an invented key. | PLAN-EVAL cycle 2 F3b                        |
 | Compensation cascade size is recorded through instrumentation | Start the compensate span before handler execution with no size, then call a typed `SagaInstrumentation` recorder after the handler returns. Runtime code never calls raw `setAttribute`, and handler duration remains measured.                                                                                                                                                                                                      | PLAN-EVAL cycle 2 F3 minor, plan D3/D5       |
 | Complete span reports transition truth, not saga success      | Emit whenever engine `completed` is true even without a store. Record the resolved persisted status exactly; mixed terminal cascades may produce `failed` or `compensating`. Span presence only says a complete effect participated in resolution.                                                                                                                                                                                    | PLAN-EVAL cycle 2 F1 residual                |
+| Preserve explicit child domain keys                           | Scheduled messages keep a handler-supplied `correlationKey`; the upstream correlation ID is only the fallback. `send()` has no child-key surface, so its nested message intentionally uses the upstream ID and a downstream correlate rule remains authoritative.                                                                                                                                                                     | IMPL-EVAL cycle 1 F2, plan D8                |
+| Preserve legacy handler trace context without span fallback   | Compensation span parenting still uses only the supplied engine context. If noop instrumentation yields no new span context, the handler retains the handled message's existing traceparent/tracestate; this does not recompute correlation or parent a telemetry span.                                                                                                                                                               | IMPL-EVAL cycle 1 F3                         |
 
 ## Drift
 
@@ -282,3 +285,33 @@ the **persisted** status, which may be `failed`/`compensating`).
 No readiness flip, merge, relabel, issue edit, or acceptance-box tick. Gate 18 (Flow-B consumer
 runtime) remains REQUIRED, supervisor-coordinated, **author-must-not-run** — recorded `NOT_RUN` as
 boundary compliance, not as a pass.
+
+## IMPL-EVAL cycle 1 repair
+
+Cycle 1 evaluated the supervisor sign-off at `456e5590`, before S5/S6 landed. Its missing-slice F1
+is superseded by `8d3317a3` and `ff161a44`; its measured bridge-precedence F2 and handler-trace F3
+were reproduced at repair-red commit `bd89e523` and fixed in S7.
+
+| Gate                                            | Repair result                                                                               |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Focused `saga-cascade-spans_test.ts`            | exit 0 · **12 passed / 0 failed**                                                           |
+| Targeted telemetry + two runtime contract files | exit 0 · **27 passed / 0 failed**                                                           |
+| Whole `packages/plugin-sagas-core`              | exit 0 · **84 passed / 0 failed / 3 ignored**                                               |
+| Plugin targeted runtime                         | exit 0 · **7 passed / 0 failed**                                                            |
+| Core structured check / fmt / lint              | exit 0 · 112 selected · no findings                                                         |
+| `quality:gate` / `arch:check`                   | exit 0 · no new findings                                                                    |
+| Core/plugin publish dry-runs                    | exit 0 / exit 0                                                                             |
+| Core doc lint                                   | baseline exit 1 · 9 private-type · 0 missing-JSDoc · 0 other                                |
+| Core/plugin JSR audit                           | core exit 0; plugin baseline exit 1 only on unchanged out-of-ceiling `doctor.ts` module tag |
+| Agent docs / publish assets / barrel check-only | exit 0 / exit 0 / exit 0                                                                    |
+| MCP export corpus                               | expected exit 1 stale STOP; **not regenerated**                                             |
+| README                                          | in-scope 1/1 conformant; global baseline exit 1 only on out-of-ceiling `packages/bench`     |
+| Flow-B validator unit                           | exit 0 · **5 passed / 0 failed**                                                            |
+| Flow-B consumer runtime                         | `NOT_RUN` · REQUIRED supervisor-owned lease gate                                            |
+| Raw lock/shared generated/ceiling checks        | exit 0 · lock unchanged; no shared generated diff; repair paths inside ceiling              |
+
+The repaired precedence is explicit: a scheduled child's supplied domain key wins, while the
+upstream correlation ID remains its fallback. `send()` has no child-key option in the published DSL,
+so its nested message intentionally receives the upstream ID; this is documented and tested. The
+compensator's message trace fallback affects only the handler context under noop instrumentation—it
+does not parent a span or derive correlation.
