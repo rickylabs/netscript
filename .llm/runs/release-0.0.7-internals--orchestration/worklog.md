@@ -3512,3 +3512,53 @@ written once, against a settled verdict.
 
 IMPL-EVAL `03818ee7` is still working (head/main/RED test re-execution). #1734 remains parked at its
 two-failure owner boundary — untouched.
+
+## 2026-08-30 — #1747 TERMINAL: IMPL-EVAL cycle 1 `PASS`; all lane gates closed; handed off for human merge
+
+Head `c1e03922ad02416ea31219df94422f062ac33690`, local == remote == PR, worktree clean, PR draft /
+`MERGEABLE` / `CLEAN`, milestone `0.0.7`, `status:impl` on both PR and issue.
+
+### IMPL-EVAL cycle 1 — `PASS`
+
+Native `claude-fable-5` / medium, job `03818ee7`, own detached worktree at the evaluated head.
+Verdict commit `c1e03922` (sole file `impl-eval.md`), comment `5467915824`. Boundary verified rather
+than trusted: diff versus the evaluated head outside `.llm/runs/` is **empty**, the brief I staged in
+its worktree was **not** committed, and both `plan-eval*.md` remain bit-identical to `e3f227c2`.
+Session stopped once its verdict was pushed; the leaf was fast-forwarded (`--ff-only`) to it.
+
+It earned the PASS: a **43-name matrix** across all three name positions against the leaf's own 15;
+every one of those names driven through **every user-controlled emission site simultaneously** with a
+dynamic `import()` of the emitted module, all 43 parsing and loading — including every
+grammar-*rejected* spelling, which is the actual proof that escaping is load-bearing beneath a
+documentation-derived grammar; a ten-processor shadowing attack; and a comment-position sweep showing
+zero emitted comment lines carry user text. It also took the fixture angles I had explicitly **not**
+covered — two-space `}` in an emitted body, a missing `.set(...)`, `Enabled: false`, `workers-api`
+prefix collision — and closed each. And it declined the expensive-gate lease rather than taking a
+runtime verdict it was not granted.
+
+### review-threads and close gate
+
+`review-threads` **PASS** (`threads=0 unanswered=0`, exit 0).
+
+The close gate initially **failed honestly**: 5 acceptance boxes on #1732, **0** evidence entries
+anywhere. I posted **one** fenced `acceptance-evidence` block (comment `5467922369`) with five
+`box-index` entries, then re-executed `acceptanceCheckboxes` + `parseAcceptanceEvidence` +
+`validateEvidenceMapping` against live data: **5 boxes / 5 entries / 0 warnings / PASS**.
+
+Posting it once, *after* the verdict, was deliberate — the mirror concatenates body plus every
+comment, so a provisional block plus a corrected one would have duplicated every box, which is the
+exact failure that cost leaf #1653 a `FAIL_FIX`. Boxes are left **unchecked**: checking them belongs
+to `mirror-acceptance-evidence.ts` at `status:ready-merge`, which is coordinator-owned.
+
+### Handoff
+
+Recorded as comment `5467925856`, with the honest residue carried up rather than buried: the grammar
+was never executed against Aspire (needs the serialized expensive-gate lease); two pre-existing
+`main`-equal root-test reds remain; the sibling generators still interpolate names raw through the
+same weak `safeIdentifier` and **need a follow-up issue this lane does not open**; and `plan.md`
+still records the plan-time "NOT FIRED" decision, deliberately left as dated history against the
+corrected final evidence table.
+
+Remaining steps are coordinator/human: draft→ready, green CI (guarded on `draft == false`, so current
+`skipping` checks are not an evidence source), `status:ready-merge`, merge. **This lane did not merge,
+ready-flip, or close anything.** #1734 stays parked at its two-failure owner boundary.
