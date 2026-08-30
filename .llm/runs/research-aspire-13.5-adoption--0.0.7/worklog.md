@@ -496,4 +496,9 @@ of the chain's proof dispatch. | | **S4 MERGE PACKET — exact-green** | PR #173
 `status:ready-merge` on PR+#1716, `Closes #1716`, boxes 6/6 + mirror mapping valid. e2e run
 33329737311 SUCCESS all tiers at the exact head; ci run 33328754543 rerun SUCCESS incl. close-gate;
 review-threads PASS (0). Head checks 13 success / 15 skipped / 2 `cancelled` (residue of superseded
-pile-up run 33328751758, D-79 — not verdicts). Coordinator lands. |
+pile-up run 33328751758, D-79 — not verdicts). Coordinator lands. | | S7 rerun terminal receipt
+sealed; correction dispatched | Head `b16fcd093a71`: honest ABORTED-in-preparation receipt
+(`phase-b-11..19`; `deno install` → `Module not found …/.generated/zod/crud.ts`; no AppHost, zero
+preserved; PR comment 19:18:19Z). D-80 bootstrap-correction brief now on the same thread
+(`bj1oyj4h0`): db:generate in ratified position, RED/GREEN bootstrap proof (no lease), Tier-A on
+changed harness paths, refreeze; ONE serialized attempt follows from host zero. |
