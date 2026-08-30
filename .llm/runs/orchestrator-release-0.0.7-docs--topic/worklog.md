@@ -2154,3 +2154,79 @@ copied forward blind):
 4. The section stays provisional until the release captain runs the top-up; the GitHub release
    **introduction** remains maintainer-authored and is not this lane's to write.
 
+
+## 2026-08-30 — #1772 shipped; exports-drift coverage gap sized and dispatched
+
+| PR | Issue | Merge SHA |
+| --- | --- | --- |
+| #1746 | #1745 | `f8b4f804` |
+| #1748 | #1000 | `952cc106` |
+| #1755 | #1749 | `a5520e70` |
+| #1761 | #1757 | `a5f506dd` |
+| #1772 | #1770 | `de57fab0` |
+
+Five docs PRs shipped. **Epic #1723 remained OPEN through every one.**
+
+### #1772 cost five heads, and only one was a defect
+
+`99ba2bf3` → `d5ba40eb` → `e4f47289` (B1 repair) → `14d5aefd` → `0e9fc593` → `c987d110` (report
+carrier) → `6d275b2c` (supersession carrier). One real defect; **five body/evidence blockers found by
+coordinator audit that this lane's own Tier-A passed**:
+
+1. An untracked `impl-eval-final.md` while the body cited it — evidence a reader could not open.
+2. The mandatory `[PHASE: IMPL-EVAL] [VERDICT: PASS]` comment never posted.
+3. "At the current head `0e9fc593`" written in the same edit that introduced the two-head distinction.
+4. Canonical `evaluate.md` still recording `FAIL_FIX` current and the repaired head `PENDING`.
+5. A **41-character SHA** — a typo never checked for length in a body whose whole purpose was
+   distinguishing two heads precisely.
+
+All five are one class: the **product** was verified thoroughly and the **evidence surface** was
+assumed. Concretely absent from Tier-A: is the worktree clean; does every artifact the body cites
+exist in-tree; does every run artifact agree with the verdict; is the required phase comment posted;
+does every 40-char SHA in the body resolve. That checklist now runs before any readiness claim.
+
+The one real defect was **the same class as #1761's**: a conditional behaviour written as
+unconditional (`preflights every declared reference`, false for `Enabled: false` processors). Caught
+externally both times, after internal passes verified the mechanism and never tested the quantifier.
+
+### Next work sized properly — and the first probe was worthless again
+
+Milestone 27 has zero unallocated issues, so the next slice was a proposal. Candidate: `docs:exports-drift`
+polices **8 of 30** packages.
+
+**The measurement took three attempts, and assertions are what made the third trustworthy:**
+
+1. Attempt 1 (earlier session): unasserted `str.replace()` silently matched nothing; the run
+   evaluated the original eight and reported "no drift". Discarded.
+2. Attempt 2: asserted the marker — and it **failed**, because the declaration on `main` is
+   `readonly PackageMapping[]`, not `PackageMapping[]`. My marker came from the 29-commit-stale topic
+   worktree. The stale-baseline error again, caught this time by the assertion.
+3. Attempt 3: correct marker, plus an entry-count assertion that itself failed first (my counting
+   regex did not match single-line entries). Fixed, then the checker rejected the probe outright:
+   `symbolCoverage must be an object` — revealing that adoption is a **policy declaration**, not a
+   row edit.
+
+Final measured result on `de57fab0`, under the weakest policy (`entrypoints-only`, so a **floor**):
+
+- **21** packages have a published reference page and no gate
+- **108** drift findings across **15** of them; **92** are `OMITS exported entrypoint`
+- Worst: `plugin-sagas-core` 19, `plugin-workers-core` 17, `fresh` 16, `ai` 13, `plugin-triggers-core` 12
+- **6 are already clean**: `aspire`, `cli`, `cron`, `database`, `kv`, `logger`
+
+User-visible: a JSR consumer reads `docs/site/reference/ai/index.md` and never learns
+`@netscript/ai/anthropic` exists.
+
+**Filed as a wave, not a slice**, because `PackageMapping.symbolCoverage` requires a per-package
+`mode` + `reason` the gate enforces — 21 editorial decisions plus 108 repairs.
+
+- **#1777** — umbrella, no closing keyword from any single PR.
+- **#1778** — slice 1, dispatched: adopt the six already-clean packages. Zero documentation repair;
+  it proves the adoption pattern before the repair-bearing slices. Explicitly instructed to **drop**
+  any package rather than weaken its policy to pass, and that no `docs/site/**` file may change.
+
+Related closed issue **#1108** delivered the checker and the initial eight; this is follow-on, and its
+`symbolCoverage` design is the contract every new entry must satisfy.
+
+**Brief change carried forward:** the author thread has skipped the PR body on three consecutive
+slices, each time leaving the supervisor to write it. #1778's brief makes the body an explicit
+deliverable with a named per-package table, rather than absorbing the gap a fourth time.
