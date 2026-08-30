@@ -109,7 +109,7 @@ non-Deno runtimes are not sandboxed and need their interpreter installed.
 ## Before you start
 
 This track assumes the same local toolchain as the main ladder: a recent
-[Deno](https://deno.com/) and the [.NET Aspire](https://learn.microsoft.com/dotnet/aspire/) CLI on
+[Deno](https://deno.com/) and the [Aspire](https://aspire.dev) CLI on
 your `PATH`, plus Docker running so Aspire can provision Postgres and Redis. This track uses
 Postgres (the default; swap `--db postgres` for `mysql`, `mssql`, or `sqlite` when you scaffold). If NetScript is brand
 new to you, walk the [Storefront tutorial](/tutorials/storefront/) first — it

@@ -1,0 +1,11 @@
+[
+  {
+    "appHostPath": "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/aspire/apphost.mts",
+    "appHostPid": 996807,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 996784,
+    "dashboardUrl": "https://localhost:42501",
+    "logFilePath": "/home/codex/.aspire/logs/cli_20260829T224113223_detach-child_ab597237a8e94a3da5e1b93d68629e3c.log"
+  }
+]

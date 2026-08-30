@@ -124,6 +124,14 @@ export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike
   : never;
 
 /**
+ * Procedure metadata carried by a contract procedure node.
+ */
+export type ProcedureMetaFromNode<TNode> = TNode extends {
+  readonly '~orpc': { readonly meta: infer TMeta };
+} ? TMeta
+  : Record<never, never>;
+
+/**
  * Per-call service client context.
  */
 export interface ServiceClientContext {

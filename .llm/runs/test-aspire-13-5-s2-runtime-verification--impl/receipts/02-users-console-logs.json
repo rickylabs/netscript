@@ -1,0 +1,166 @@
+{
+  "logs": [
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:35:58.754Z",
+      "content": "Waiting for resource 'postgres' to enter the 'Running' state.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:35:58.765Z",
+      "content": "Waiting for resource 'aspire-13-5-postgres-db' to enter the 'Running' state.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:07.398Z",
+      "content": "Waiting for resource 'postgres' to become healthy.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:07.398Z",
+      "content": "Waiting for resource 'aspire-13-5-postgres-db' to become healthy.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:11.063Z",
+      "content": "Waiting for resource ready to execute for 'postgres'.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:11.280Z",
+      "content": "Finished waiting for resource 'postgres'.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:14.102Z",
+      "content": "Waiting for resource ready to execute for 'aspire-13-5-postgres-db'.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:14.102Z",
+      "content": "Finished waiting for resource 'aspire-13-5-postgres-db'.",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:14.165Z",
+      "content": "[sys] Starting process...: Cmd = /home/codex/.deno/bin/deno, Args = [\"run\", \"--minimum-dependency-age=0\", \"--node-modules-dir=none\", \"--allow-net\", \"--allow-env\", \"--allow-read\", \"--allow-sys\", \"src/main.ts\"]",
+      "isError": false
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "╭ Warning",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│  Ignored build scripts for packages:",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│  npm:prisma@7.9.1",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│  npm:@prisma/engines@7.9.1",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│  Lifecycle scripts are only supported when using a `node_modules` directory.",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│  Enable it in your deno config file:",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "│  \"nodeModulesDir\": \"auto\"",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.360Z",
+      "content": "╰─",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.366Z",
+      "content": "Warning The following peer dependency issues were found:",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.366Z",
+      "content": "└─┬ @tanstack/ai-preact@0.10.4",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.366Z",
+      "content": "  └── peer @tanstack/ai@^0.41.0: resolved to 0.39.1",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.366Z",
+      "content": "",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.366Z",
+      "content": "These packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.366Z",
+      "content": "Learn more: https://docs.deno.com/go/peer-deps",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.396Z",
+      "content": "error: Module not found \"file:///home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres/schema/.generated/zod/crud.ts\".",
+      "isError": true
+    },
+    {
+      "resourceName": "users",
+      "timestamp": "2026-08-29T22:36:15.396Z",
+      "content": "    at file:///home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/contracts/versions/v1/users.contract.ts:11:62",
+      "isError": true
+    }
+  ]
+}

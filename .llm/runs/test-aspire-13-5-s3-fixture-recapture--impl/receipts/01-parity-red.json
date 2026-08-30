@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "s3-slice1-parity-red",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/validation/check-compat-fixtures_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-aspire-13-5-s3",
+  "gitHead": "13878a80a50c55b9662099fed64555f2310ae4a3",
+  "actualGitHead": "13878a80a50c55b9662099fed64555f2310ae4a3",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex-gpt-5.6-sol",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "248e727bd61984b0cfa8e1b60b9270f3affcd3a61186f48cd97d03b2c99cf2fa",
+  "lifecycleId": "codex-gpt-5.6-sol:s3-slice1-parity-red:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-30T01:30:34.442Z",
+  "startedAt": "2026-08-30T01:30:34.451Z",
+  "finishedAt": "2026-08-30T01:30:37.230Z",
+  "durationMs": 2779,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 1209,
+    "sha256": "dabc50104fceb79498900b9ec3bd2b5025e28f2882c044d0c831e82c24e745af",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/validation/check-compat-fixtures_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-aspire-13-5-s3\",\"exitCode\":1,\"durationMs\":2452,\"summary\":{\"passed\":0,\"failed\":1,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   [\\n-     \\\".llm/tools/agentic/teardown/probes_test.ts: missing required 13.5.3 case\\\",\\n-     \\\"packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts: missing required 13.5.3 case\\\",\\n-     \\\"packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts: missing required 13.5.3 case\\\",\\n-     \\\"packages/mcp/tests/service-endpoint-source-fixtures.ts: missing required 13.5.3 case\\\",\\n-   ]\\n+   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/validation/check-compat-fixtures_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"every compat-fixture row keeps 13.4.6 and carries its phase-appropriate 13.5.3 case\",\"file\":\"./.llm/tools/validation/check-compat-fixtures_test.ts\",\"line\":38}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 155,
+    "sha256": "e9ab95dbb1966836376e29aaf198805c400b1845bea6355bc5871935fa46cec6",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/validation/check-compat-fixtures_test.ts'\n",
+    "truncated": false
+  }
+}

@@ -1,0 +1,11 @@
+stdout:
+stderr:
+Scanning for running AppHosts...
+❌ Could not fetch telemetry data from the dashboard. The dashboard is not available.
+ℹ️ Ensure the AppHost is running with the dashboard enabled.
+📄 See logs at /home/codex/.aspire/logs/cli_20260829T224008_0d4a219b.log
+🔍 See AppHost logs at /home/codex/.aspire/logs/cli_20260829T223522991_detach-child_baf9c6aa80c047878563358895f3f683.log
+timing:
+Command exited with non-zero status 12
+__ELAPSED_SECONDS=0.34
+__MAX_RSS_KB=81572
