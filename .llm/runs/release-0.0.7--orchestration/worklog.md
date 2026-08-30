@@ -2693,3 +2693,33 @@
   Docs #1785 separately received a provider HTTP 429 rather than a content verdict and was directed
   to converge onto current main and use the documented opposite-family evaluator fallback while
   continuing its independent #1777 queue.
+
+## 2026-08-30T20:04:00Z — false-green runtime captures rejected; exact merge queue restored
+
+- S5 attempts 3–5 were deliberately rejected as evidence. Attempt 3 reused one AppHost and 13.4.6;
+  attempt 4 proved two 13.5.3 AppHosts but failed database codegen; attempt 5 fixed codegen but both
+  generated configs still had `plugins: []`, so it could not prove #1717's healthy-plugin-resource
+  row. Every attempt returned Aspire, Docker containers/volumes, and relays to zero. The unchecked
+  acceptance row was restored and #1717/#1740 were demoted from false `status:ready-merge` to
+  `status:impl`. A zero-runtime canonical install probe has now enumerated the required first-party
+  plugin resources; no attempt 6 may start until its full static inventory/health preflight is sealed.
+- S1's bounded exact-token correction landed at `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2`.
+  The delta from full-runtime head `c4cbda254` changes only the validator/test and two run artifacts;
+  product/runtime paths are byte-identical, so hosted matrix `33331429495` is carried forward by
+  explicit coordinator identity ruling. Exact-head core CI is green except the intentionally stale
+  close-gate metadata. Fable delta evaluation quota-failed without a verdict; one fresh Opus 5
+  medium quota fallback is live at the same detached exact head.
+- Docs #1785 earned a fresh independent Opus 5 `PASS` on product/derived head `b7c8560ea`, carried
+  by the old report head `b8095e905`. The evaluator rederived 26 rows/25 distinct logger symbols,
+  zero missing/invented/kind mismatches, zero surviving correlation claims, and 13 green gates. It
+  required PR-body SHA provenance correction only. Docs carried the new report as `b7bd92387`, is
+  applying the exact body fix and current CI, and independently dispatched #1788 from #1777.
+- The otherwise near-merge #1764 Flow-B lease first ran without the mandatory DCP two-hop relay.
+  Healthy DinD containers were unreachable through ai-agents loopback, so the supervisor preserved
+  the D-43 red, stopped the exact AppHost, removed the exact survivor, and proved zero. Product head
+  `c20cba7d4` is byte-identical to PR/evidence carrier `5b526e4bc`; the sole added file is a worklog.
+  A corrected run is now armed with the proven owner-scoped relay tool and exact cleanup contract.
+- The read-only merge audit restored orphan PR #1747/#1732 to the Aspire queue: prior static and
+  IMPL-EVAL evidence is green, its stale runtime red predates the shipped #1736 baseline repair, and
+  its delta has zero path intersection with intervening main. Static convergence precedes one exact
+  full-runtime receipt after the current serialized lease.

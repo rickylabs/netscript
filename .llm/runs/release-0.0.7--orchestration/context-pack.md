@@ -1635,3 +1635,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Aspire supervisor transport is the same Remote Control session, switched from quota-exhausted
   Fable 5 to Sonnet 5. This is not a plan reset. Docs #1785's repaired-head Fable evaluator ended
   on HTTP 429, not a verdict; docs is converging current main and using its approved fallback.
+
+## Resume delta — 2026-08-30T20:04Z
+
+- S5 is not merge-ready. Attempts 3–5 are setup/fixture-invalid; #1717's concurrent plugin row is
+  unchecked and #1717/#1740 are `status:impl`. Host is zero after them. Static canonical plugin
+  inventory is being sealed before any attempt 6; the current sole runtime lease belongs to fixes.
+- S1 is `32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2`. Carry full runtime
+  `33331429495` from parent `c4cbda254` by audited product-path identity; require exact validator
+  gates, live Opus delta verdict, thread/DoD/status, and rerun close-gate. Never commit the staged
+  reverse diff in duplicate worktree `007-aspire-s1-conv`.
+- Docs #1785 has fresh Opus `PASS` on `b7c8560ea`; evaluator carrier `b7bd92387` is correcting only
+  current SHA/body provenance and finishing CI. Merge immediately after the exact packet. #1788 is
+  independently active for the next #1777 reference slice.
+- Fixes #1764 product `c20cba7d4`, PR carrier `5b526e4bc`, has zero product delta and zero main-path
+  intersection. Its first Flow-B attempt is invalid D-43 evidence because no relay was armed; exact
+  cleanup returned zero. Corrected relay-backed Flow-B owns the serialized host lease now.
+- After the lease: S5 plugin-bearing receipt, then S8 typed-seed diagnostic; #1747 static convergence
+  remains parallel and its exact full runtime follows in the Aspire queue. Do not grant S7 runtime.

@@ -1451,3 +1451,23 @@ implementation thread.
   Aspire supervisor's same Remote Control session moved to Sonnet 5 without resetting accepted
   scope. Evaluator HTTP 429s likewise do not increment the two-terminal-content-failure ceiling;
   use an approved opposite-family fallback and keep independent slices moving.
+
+## 2026-08-30 — topology proof is necessary but does not waive fixture semantics
+
+- Two isolated AppHosts and healthy database/cache containers do not prove a plugin acceptance row
+  when the generated `netscript.config.ts` says `plugins: []`. Keep the S5 row unchecked and its
+  lifecycle metadata at `status:impl` until both roots contain the named first-party plugin graph
+  and every required plugin resource is healthy concurrently. Repeated infrastructure success is
+  not a substitute for the claimed fixture.
+- Direct `netscript-dind:<port>` reachability applies to probes from ai-agents. DCP and generated
+  clients still consume their localhost publication contract and require the proven owner-scoped
+  two-hop relay. #1764's first Flow-B lease omitted that relay and is infrastructure-red, not a
+  sagas product defect. Any retry must start the relay before AppHost creation and clean by exact
+  owner token rather than broad process/container filters.
+- A validation-only head advance may carry a prior expensive runtime matrix only after an explicit
+  changed-path identity audit. S1 satisfies that rule at `32e418c58`: no product/runtime path
+  changed from `c4cbda254`, while the exact validator gates and fresh delta verdict remain required.
+- Fable quota exhaustion affected docs, Aspire, features, and internals concurrently. Each Opus 5
+  substitute is a one-topic recorded exception preserving Codex-generator/Claude-evaluator and
+  fresh-session invariants; it is not a content failure and does not silently amend the default
+  routing policy.
