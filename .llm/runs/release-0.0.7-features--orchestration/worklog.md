@@ -7804,3 +7804,28 @@ is non-probative when the gate never ran (that is exactly how D-3 escaped Slice 
 The brief also tells the thread to trust its own measurement over either report: the supervisor
 measured **3 × `TS2339`** in the single failing file, while the prior thread reported `TS2416` plus
 21 × `TS2322`, which did not reproduce.
+
+### Dispatch confirmed live — thread `01a053fe-a6fd-7ba3-953f-e5938605a8e9`
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a053fe-a6fd-7ba3-953f-e5938605a8e9` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-leaf-1387` |
+| Route | requested = observed = `openai · gpt-5.6-sol · high`, verdict **matched** |
+| Runtime | approval=never · sandbox=dangerFullAccess |
+| State | `working`, last artifact = base commit `5ae8270ce` |
+| Rollout | `sessions/2026/08/30/rollout-2026-08-30T20-46-32-01a053fe….jsonl` |
+| Steering | `codex exec resume 01a053fe-…` — same thread only, never a second send at this worktree |
+
+**Tooling lesson: do not wrap `launch-codex-slice` in `timeout`.** The launcher blocks *after* the
+thread exists, so my `timeout 900` sent SIGTERM (exit 143) to the wrapper only. The daemon-attached
+thread was unaffected and is working — which is exactly what daemon attachment is for — but the
+transcript first showed a bare `Terminated`, which reads like a failed dispatch. **A killed launcher
+is not a failed launch; confirm against `codex-status` before concluding either way.**
+
+**Refinement to the stale-record test, learned here.** The sender record now at `senders/ad03b605….json`
+carries `ownerPid 3304466`, which is the killed wrapper and is **absent from `/proc`** — yet its
+`sessionId` is the **live, working** thread. So *"ownerPid absent"* alone would have condemned a
+record that is currently correct. The two-condition test (dead pid **and** thread absent across
+debounced `codex-status` probes) is not belt-and-braces; the pid condition is the weaker one and can
+be satisfied by a healthy dispatch. **Do not evict this record until the thread reaches terminal.**
