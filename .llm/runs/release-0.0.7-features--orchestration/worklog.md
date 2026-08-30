@@ -6574,3 +6574,60 @@ decision**.
 | #1664 | parked at `20337441788b`; runtime question now testable again on the DinD sandbox (D-31), no retry authorized |
 | #1387 | queued, brief written (`slices/research-plan-1387.md`) |
 | #1730 | queued, brief written (`slices/impl-1730.md`) |
+
+## 2026-08-30 — coordinator holds merge authority; #1731 flipped ready; #1387 dispatched
+
+Authority correction received and applied: merges are **not** human-only — the primary coordinator
+owns merge authority after the milestone pre-merge gate. The withholding recorded in the previous
+entry is superseded.
+
+### Ready-flip executed at an unmoved head
+
+| Step | Result |
+| --- | --- |
+| `impl-eval:skip` applied | label exists as *"Skip automatic ready-for-review IMPL-EVAL with attributed evidence"* — the attribution is posted, not implied |
+| Attribution comment | `#1731#issuecomment-5468677253` — terminal verdict, session `8d9946e6`, route, worktree, evaluated head, record path, generator ≠ evaluator, failure count 1 of 2 |
+| Ready-flip | `gh pr ready 1731` → `draft: false` |
+| **Head after flip** | **`32a698e18594aa31154a5b7c88886875b3e1140f` — unmoved.** Nothing was pushed to trigger CI. |
+| OpenHands runner | **`skipped`** — `impl-eval:skip` took effect, so no second evaluator ran on the same head |
+
+The flip itself re-triggered the workflows at the same SHA, so no `gh run rerun` was needed; that
+remains the tool if a later label read needs refreshing, and a push is still the wrong instrument
+because it would move the evaluated head away from the terminal verdict.
+
+**CI at `32a698e1`:** `Code quality` **success**, `Phase eval PR` **success**, `ci` in progress
+(this is the matrix carrying root `test` off-host — the last open condition from the cycle-2
+addendum). `e2e-cli` and `public-surface-diff` skipped, as expected for this change class.
+
+`status:ready-merge` is **withheld until `ci` is green**, per the terminal verdict's Ruling B item 5,
+and the acceptance mirror is gated behind that label by design —
+`mirror-acceptance-evidence.ts --dry-run` reports it will skip until the label is live.
+
+### #1387 dispatched without waiting on the merge
+
+| Field | Value |
+| --- | --- |
+| Leaf | `feat/service-principal-procedure-policy`, worktree `007-leaf-1387`, base `origin/main` `13878a80a` |
+| Brief | `slices/research-plan-1387.md` — **research and locked plan only, no product code** |
+| Route | Codex · `gpt-5.6-sol · high` (`complex_implementation`) — dry-run clean, `upstream: NONE`, `dirty: 0` |
+| Issue metadata | `status:triage` → **`status:research`**, the truthful phase |
+
+**Why this can start before #1466 merges.** `packages/contracts/src/domain/procedure-meta.ts` is
+**not on `main`** — it lives only on the unmerged branch. That blocks *implementation*, not research:
+the slice produces `research.md`, `plan.md` and PR scaffolding, reads the vocabulary from the branch,
+and the brief requires the plan to state the dependency explicitly and forbid the implementation
+slice from starting before #1466 lands.
+
+The binding constraint is carried in the brief: **#1387's policy declaration must extend
+`NetScriptProcedureMeta`**, never introduce a second metadata vocabulary. #1387's own headline defect
+is *policy living in a second place that can drift from the contract*; inventing a parallel vocabulary
+to fix it would reproduce that defect one layer up.
+
+### Lane state
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **ready for review** at `32a698e1`, terminal `PASS`, awaiting `ci` green → `status:ready-merge` → coordinator merge |
+| #1387 | **active** — research/plan slice in flight |
+| #1730 | queued, brief written |
+| #1664 | parked at `20337441788b` |
