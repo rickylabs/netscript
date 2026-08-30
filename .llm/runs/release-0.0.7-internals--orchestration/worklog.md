@@ -5573,3 +5573,25 @@ confirmed `working` throughout.
 - **Confirmed per instruction: existing #1774 DeepSeek receipts remain valid** — the new routing
   policy is prospective and does not retroactively apply to or invalidate #1774's already-shipped
   evaluation (consistent with D-97/D-98).
+
+## D-103 — Main advanced to 96d44758d (#1788/#1790, docs); zero intersection with routing leaf, no stop
+
+- Verified: `origin/main` now `96d44758d8f9405f759771284e0f300a6b176156`
+  (`docs(cli,plugin): document published subpath surfaces (#1790)`), one commit past the prior check.
+- Diffed the new main range (`73bf2efa9..96d44758d`) against the routing leaf's own current changed
+  set (`a3ddcbb598..HEAD`, 60+ files across `.llm/tools/agentic/**`, skills, workflows, root docs).
+  **Zero file-level overlap.** The new main commits touch only
+  `.llm/assets/agent-docs/prose.json.gz`, `provenance.json`,
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+  `packages/mcp/src/publish-assets.generated.ts`, two `docs/site/reference/**` pages, and their own
+  isolated `docs-cli-plugin-subpath-surface--1788` run dir — none of which the routing leaf touches.
+- Per instruction ("report any real intersection; do not stop at a routine checkpoint"): **no real
+  intersection found, not stopping.** Session continues uninterrupted; reconciliation with this exact
+  main head still queued for the evidence-freeze boundary (D-102), where a fast-forward-style rebase
+  is now expected to be conflict-free for these two commits specifically.
+- **Worth flagging as a pattern, not acted on:** the four files main's docs PR touched
+  (`prose.json.gz`/`provenance.json`/`agent-docs.generated.ts`/`publish-assets.generated.ts`) are
+  exactly the same class of generated-carrier files that produced real merge conflicts for #1758/#1462
+  earlier today. If the routing leaf's own scope later grows to touch anything doc-generation-adjacent
+  before merge, this same conflict class could recur — worth checking for at the actual freeze point,
+  not assumed absent just because it's absent today.
