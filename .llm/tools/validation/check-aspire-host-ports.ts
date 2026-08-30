@@ -21,7 +21,7 @@
 import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
 
-const DEFAULT_ROOTS = ['packages/cli/src'] as const;
+const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'] as const;
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template', '.json']);
 const ALLOW_MARKER = 'aspire-host-port-ok:';
 const GENERATED_STATE_DIR = /[\\/](?:\.data|\.git|node_modules)(?:[\\/]|$)/;
@@ -46,6 +46,15 @@ const LITERAL_HOST_PORT = /withHttpEndpoint\(\s*\{[^}]*\bport:\s*\d/;
 const ENTRY_PORT_KEY = /\b(?:Host)?Port:\s*\S/;
 const JSON_PORT_KEY = /"(?:Host)?Port"\s*:\s*\d/;
 const CONDITIONAL_WRITE = /\?/;
+
+/** Plugin contribution paths participate in AppHost composition. */
+const PLUGIN_CONTRIBUTION = /^plugins\/[^/]+\/src\/aspire\/[^/]+-contribution\.ts$/;
+
+/** A contribution supplying a fallback defeats Aspire's run-time allocation. */
+const CONTRIBUTION_PORT_FALLBACK = /\bctx\.port\([^)]*,[^)]*\)/;
+
+/** Loopback URLs with an embedded port bypass the resource-reference contract. */
+const LOOPBACK_PORT_URL = /https?:\/\/(?:localhost|127\.0\.0\.1):(?:\d+|\$\{[^}]*PORT[^}]*\})/;
 
 /** Files that compose resource entries for the scaffolded `appsettings.json`. */
 const SCAFFOLD_ENTRY_FILES = [
@@ -84,6 +93,10 @@ function isTestPath(path: string): boolean {
   return value.includes('/tests/') || value.includes('_test.') || value.includes('/fixtures/');
 }
 
+function isGeneratedSource(path: string): boolean {
+  return normalized(path).includes('.generated.');
+}
+
 function allowanceReason(line: string): string | undefined {
   const index = line.indexOf(ALLOW_MARKER);
   if (index === -1) return undefined;
@@ -105,6 +118,7 @@ export function scanContent(
   const normalizedPath = normalized(path);
   const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalizedPath);
   const checksGeneratedJson = normalizedPath.endsWith('/aspire/appsettings.json');
+  const checksContribution = PLUGIN_CONTRIBUTION.test(normalizedPath);
 
   content.split('\n').forEach((text, index) => {
     const hitsEndpoint = LITERAL_HOST_PORT.test(text);
@@ -112,7 +126,15 @@ export function scanContent(
       ENTRY_PORT_KEY.test(text) &&
       !CONDITIONAL_WRITE.test(text);
     const hitsGeneratedJson = checksGeneratedJson && JSON_PORT_KEY.test(text);
-    if (!hitsEndpoint && !hitsEntry && !hitsGeneratedJson) return;
+    const hitsContributionFallback = checksContribution && CONTRIBUTION_PORT_FALLBACK.test(text);
+    const hitsContributionUrl = checksContribution && LOOPBACK_PORT_URL.test(text);
+    if (
+      !hitsEndpoint &&
+      !hitsEntry &&
+      !hitsGeneratedJson &&
+      !hitsContributionFallback &&
+      !hitsContributionUrl
+    ) return;
 
     const line = index + 1;
     const reason = allowanceReason(text);
@@ -134,7 +156,11 @@ export function scanContent(
       path,
       line,
       text: text.trim(),
-      message: hitsEndpoint
+      message: hitsContributionFallback
+        ? 'Plugin contribution supplies a fallback port. Use `ctx.port(resource)` so Aspire allocates it.'
+        : hitsContributionUrl
+        ? 'Plugin contribution embeds a loopback port. Use a resource reference or the allocated `ctx.port(resource)` value.'
+        : hitsEndpoint
         ? 'Generated `withHttpEndpoint` pins a literal host port. Drive it from the ' +
           'resource entry (`HostPort`) so `aspire start --isolated` can allocate.'
         : 'Scaffold writes a literal host port into appsettings.json. Leave it unset so ' +
@@ -166,7 +192,7 @@ export async function scanHostPorts(
     ) {
       const path = normalized(relative('.', entry.path));
       if (![...SOURCE_EXTENSIONS].some((suffix) => path.endsWith(suffix))) continue;
-      if (path.includes('/node_modules/') || isTestPath(path)) continue;
+      if (path.includes('/node_modules/') || isTestPath(path) || isGeneratedSource(path)) continue;
 
       scannedFiles += 1;
       const result = scanContent(path, await Deno.readTextFile(entry.path));
@@ -184,7 +210,7 @@ if (import.meta.main) {
       'Usage:',
       '  deno run --allow-read check-aspire-host-ports.ts [root ...] [--pretty]',
       '',
-      'Roots default to packages/cli/src. Pass a generated project root to validate the scaffold',
+      'Roots default to packages/cli/src and plugins. Pass a generated project root to validate the scaffold',
       'that consumers actually received.',
     ].join('\n'));
     Deno.exit(0);
