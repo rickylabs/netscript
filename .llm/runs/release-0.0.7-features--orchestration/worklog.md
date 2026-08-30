@@ -7455,3 +7455,64 @@ cycle-2 `PASS` carries forward unchanged and **no re-evaluation is owed**.
 ### Awaiting coordinator merge
 
 `origin/main` `de57fab0`, measured inert for this leaf. Nothing in this lane blocks the merge.
+
+## 2026-08-30 — #1730 SHIPPED; #1387 released and dispatched on `24f6642f`
+
+### #1730 shipped — verified, not accepted
+
+PR #1763 **`MERGED`** at `2026-08-30T15:47:10Z`; merged head **`c80933f7b948`** (the exact head handed
+over) → merge commit **`24f6642f040617de573c7cef1140eed1ac0efd6d`**, now `origin/main`. Issue #1730
+**`CLOSED` / `COMPLETED`**; PR and issue both **`status:shipped`**.
+
+Both merges this session closed cleanly on the exact head handed to the coordinator — no drift between
+handoff and merge.
+
+### #1387 reconciled onto the new `main`
+
+| Field | Value |
+| --- | --- |
+| Branch | `feat/service-principal-procedure-policy`, PR **#1762**, OPEN **draft** |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1387` |
+| Rebased onto | `origin/main` **`24f6642f`** → `0a1e6337`, clean |
+| **First commit** | **`c638b8756ea096053f363e9c271c169753c41a3f`** — S0 re-verification, pushed |
+| S0 preconditions | `NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement`, `BaseContractMeta` present on `main`; metadata shape unchanged from the research |
+| Census at the new base | contracts **16** · service 90 · plugin 68 · sdk **77** · mcp 136 — identical to the earlier measurement, so both `main` advances were inert for this leaf |
+
+Rebase is correct on this branch and was correct to refuse on #1731: this one carries plan artifacts
+only, so no receipt, archive or verdict cites a SHA it would rewrite.
+
+### Dispatch — bounded, design unchanged
+
+| Field | Value |
+| --- | --- |
+| **Codex thread** | **`01a0535d-3d1a-7830-b91c-4eb0ebb872b1`** |
+| Rollout | `~/.codex/sessions/2026/08/30/rollout-2026-08-30T17-50-14-01a0535d-…jsonl` |
+| Route | requested = observed = `openai · gpt-5.6-sol · high`, verdict **matched** |
+| Runtime | `approval=never · sandbox=dangerFullAccess` |
+| Base | `c638b875`, upstream unset by design; explicit-refspec push only |
+| Brief | `slices/impl-1387-r1.md` |
+| Watcher | `.llm/tools/harness/watch-run.ts` on the leaf run dir (token-free; D-29 resolved, inotify 1024) |
+| Supervisor Remote Control | PID `5495`, `claude --remote-control netscript-0.0.7 features supervisor`, Opus 5 · high |
+
+**Scope: the five PLAN-EVAL required fixes, then Slice 1 only.** PLAN-EVAL adjudicated **LD-11** and
+**LD-8 ACCEPTED**, and the coordinator released the leaf under that accepted adapter boundary — so the
+brief states plainly that the **design is accepted and not to be changed**, and that the five fixes are
+gate-set, ceiling and text corrections. The evaluator's own re-evaluation scope confirms a full fresh
+PLAN-EVAL is not required unless design text changes.
+
+The binding constraint travels with the brief: extend `NetScriptProcedureMeta.access` additively with
+optional readonly `authorization.scopes` / `authorization.roles` — **no parallel `{ public }` policy,
+no second metadata vocabulary**, because that is #1387's own headline defect one layer up.
+
+F-2 is carried explicitly as the **#1769 class**: three generated outputs sit outside every slice
+ceiling, so without contracting the carrier gates the plan's own rescope rule fires on the first
+public-surface slice.
+
+### Queue
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | SHIPPED |
+| #1730 / PR #1763 | **SHIPPED** |
+| #1387 / PR #1762 | **active** — plan repair + Slice 1 on thread `01a0535d` |
+| #1664 | parked at `20337441788b` |
