@@ -1,0 +1,135 @@
+# Evaluation: Aspire 13.5 S3 fixture re-capture — phase A (PR #1741)
+
+Allowed result values: `PASS`, `FAIL`, `N/A`, `PENDING_SCRIPT`, `DEBT_ACCEPTED`, `NOT_RUN`.
+Anti-pattern status values: `CLEAR`, `VIOLATION`, `DEBT_ACCEPTED`, `N/A`.
+
+## Metadata
+
+| Field          | Value                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| Run ID         | `test-aspire-13-5-s3-fixture-recapture--impl`                                                                 |
+| Target         | Issue #1715 phase A · draft PR #1741 · epic #1712                                                             |
+| Evaluated head | `a964a212028810b0d6bb191701992028791b207a` (`test/aspire-13-5-s3-fixture-recapture`; remote head verified equal via `git fetch` → `FETCH_HEAD`; PR `headRefOid` equal) |
+| Base           | `13878a80a50c55b9662099fed64555f2310ae4a3` (`origin/main`)                                                    |
+| Archetype      | `2 - Integration` (fixtures/tests only)                                                                       |
+| Scope overlays | `none`                                                                                                        |
+| Evaluator      | Claude · Anthropic · Fable 5 · medium — separate native opposite-family session, worktree `/home/codex/repos/netscript-aspire-13-5-s3-eval` (detached at head), 2026-08-30. Generator: Codex · GPT-5.6 Sol (thread `01a05045-3929-7fd2-b889-60bde60b3849`). |
+| Phase scope    | Phase A only. Dashboard telemetry envelopes are deferred to lease-backed phase B and are **not** required for `PASS`. |
+
+## Process Verification
+
+| Check                                  | Result | Evidence                                                                                                                                                                                                                       |
+| -------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plan-Gate passed before implementation | PASS   | `plan.md` S3-D4 records `PLAN-EVAL: N/A` with justification; `worklog.md` progress row 1 (`design`) records it before the RED gate. Mechanical, ratified scope — N/A is justified.                                               |
+| Design section exists in worklog       | PASS   | `worklog.md` `## Design` with Public Surface / Domain Vocabulary / Ports / Constants / Commit Slices / Deferred Scope / Contributor Path.                                                                                        |
+| Commit slices match design plan        | PASS   | 5 commits `c6afffd1a` → `b8b1c3b6f` → `2e4e3e785` → `37f0487f1` → `a964a2120` match the 5-row Commit Slices table in order (parity RED → ps fixture → describe/banner → telemetry README → gates + #413 draft); `git show --stat` per commit confirms file ownership per slice. |
+| Each slice has a passing gate          | PASS   | S1 RED receipt `receipts/01-parity-red.json` (gitHead `13878a80a`, exit 1, exactly the four required rows); S2–S5 gates re-executed by the evaluator (see Static Gates).                                                          |
+| No speculative seams (unused files)    | PASS   | Every added file is consumed: `aspire-ps-13.5.3.json` by `probes_test.ts`; `ASPIRE_DESCRIBE_FIXTURES` by `service-endpoint-sources_test.ts`; READMEs are provenance docs; `413-comment-draft.md` is a handoff artifact.          |
+| Constants used for finite vocabularies | PASS   | `COMPAT_FIXTURES` table with `CompatFixtureState = 'required' \| 'pending-lease'`; version literals `13.4.6`/`13.5.3` are the manifest's own vocabulary.                                                                          |
+| Generator ≠ evaluator                  | PASS   | Codex GPT-5.6 Sol implementation thread vs this Fable 5 session; `supervisor.md` routes table.                                                                                                                                  |
+| Commit trail (push + per-slice comment)| PASS   | PR #1741 has five `[PHASE: IMPL] [SLICE: S1..S5]` comments each naming its SHA and gates; remote branch head equals `a964a2120`.                                                                                                 |
+| Brief carries `## SKILL` chapter       | PASS   | `slices/s3/brief.md` on `origin/research/aspire-13.5-0.0.7` has `## SKILL`.                                                                                                                                                     |
+| Tier-A slice review recorded           | PASS   | `slices/s3/review-tier-a.md` exists locally in the supervisor worktree (sign-off at `a964a2120`; not yet pushed to `origin/research/aspire-13.5-0.0.7`). Note: it records the 13.4.6 describe case as "kept"; this evaluation's coverage probe (H-1) shows the case content was rewritten. |
+
+## Contract Verification (issue #1715 / D-13 / dispatch brief)
+
+| Item | Result | Evidence |
+| --- | --- | --- |
+| Parity test covers every `compat-fixture` manifest row | PASS | `aspire-surface-manifest.tsv` on the research branch has exactly 5 `compat-fixture` rows (lines 129, 370, 397, 677, 680); `COMPAT_FIXTURES` lists the same 5 paths. |
+| Parity RED on base | PASS | Evaluator reproduced: throwaway worktree at `13878a80a` + head test file → `deno test` exit 1, failures = exactly the four `required` rows. Matches `receipts/01-parity-red.json`. |
+| Parity green at head | PASS | `deno test --allow-read .llm/tools/validation/check-compat-fixtures_test.ts` at `a964a2120` → `ok | 1 passed`. |
+| `pending-lease` fails closed | PASS | Evaluator injected the literal `13.5.3` into `telemetry-live-fixture_test.ts` at head (throwaway worktree) → exit 1 with `phase-B fixture landed; change pending-lease to required`; reverted. |
+| `aspire-ps-13.5.3.json` byte-derived from S2 | PASS | S2 `02-v5-aspire-ps-final.json` key set `{appHostPath, appHostPid, status, sdkVersion, cliPid, dashboardUrl, logFilePath}` in the same order; fixture identical modulo README-documented redaction (paths/PIDs/port → the 13.4.6 stable values, `logFilePath` → `cli_REDACTED.log`); `sdkVersion` `13.5.3`, `status` `running`. |
+| 13.5.3 `describe` shape vs S2 | PASS (with low finding) | Top-level `{ resources: [...] }`, `{ name, url }` URL entries, string env values, `healthReports`/`commands` objects all match `02-v5-shape-comparison.md`. Fixture omits `creationTimestamp`, `startTimestamp`, `source`, `exitCode`, `stopTimestamp` from S2's 18-key set; README does not enumerate the omission (finding L-2). |
+| Banner line `Aspire CLI 13.5.3` | FAIL → finding M-1 | No S2 receipt contains any `Aspire CLI 13.5` banner (`git grep` over the S2 run dir: 0 hits; S2 captured with `--nologo`; the adapter itself passes `--nologo` at `aspire-cli-endpoint-source.ts:101,184`). The banner is inherited 13.4.6 test convention, not captured 13.5.3 bytes — acceptable as noise-tolerance, but `generated-app-endpoint_test.ts:132` now claims the fixture is "the real shape captured from live NetScript AppHosts (Aspire 13.4.6 and 13.5.3)", which overstates provenance. |
+| Fixture folder READMEs: command, date 2026-08-29, CLI 13.5.3, receipt path | PASS | `.llm/tools/agentic/teardown/__fixtures__/README.md` and `packages/mcp/tests/fixtures/README.md` state all four. |
+| No `*13.4.6*` file deleted/modified | PASS | `git diff --diff-filter=DM --name-only 13878a80a..HEAD \| grep 13.4.6` → empty. |
+| 13.4.6 case kept beside 13.5.3 in all five consumers | FAIL → finding H-1 | Literal `13.4.6` retained in all five files, but the **content** of the 13.4.6 describe case in `service-endpoint-source-fixtures.ts` was rewritten: `billing-abcdefgh` gained `displayName: 'billing'` and both versions now share one enriched object. Line coverage on `aspire-cli-endpoint-source.ts` from `service-endpoint-sources_test.ts`: base covers lines 237 and 239 (`resourceName` DCP-suffix fallback); head leaves 237–239 uncovered. The retained compat case no longer exercises the fallback it used to prove. |
+| No adapter behaviour change / `packages/telemetry` untouched | PASS | `git diff --name-only` shows no `packages/telemetry`, no `packages/mcp/src`, no `packages/fresh`, no `.agents`/`docs`/`deno.json`/`deno.lock`. |
+| No fabricated 13.5.3 telemetry envelope | PASS | `git grep -l 'aspire-13\.5\.3-(resources\|spans\|fixture)'` at head → none; research-branch `plan.md` contains no telemetry envelope (only D-17 resolver text); `packages/mcp/tests/fixtures/telemetry/README.md` states the deferral, the two exact `GET <dashboardUrl>/api/telemetry/{resources,spans}` requests, the health-check trigger, filenames, and the parity promotion step. |
+| No new `deno-lint-ignore` / `as unknown as` / `any` | PASS | grep over the added lines of the product diff → none. |
+| PR body / labels / milestone | PASS | Body has `Closes #1715`, `Part of #1712`, phase-B stated explicitly, draft; labels `type:test epic:aspire-13-5 area:telemetry area:tooling area:mcp priority:p1 status:impl` (exactly one `status:`); milestone `0.0.7`. |
+| Boundaries (no runtime, capture, pins, fresh, skills/docs) | PASS | Diff stat: 22 files, all under the run dir, `.llm/tools/{agentic/teardown,validation}`, `packages/mcp/tests`, `packages/cli/e2e`. |
+
+## Static Gates (executed by the evaluator at `a964a2120`)
+
+| Gate | Command or check | Result | Evidence | Notes |
+| ---- | ---------------- | ------ | -------- | ----- |
+| Configured lint | `deno run … .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)\|…)"` (invoked directly — `deno task lint` returned "(cached, inputs unchanged)") | PASS | 2043 files, 0 findings, exit 0 | |
+| Scoped typecheck | `run-deno-check.ts --root packages/mcp --root packages/telemetry --root .llm/tools/agentic/teardown --root packages/cli/e2e --ext ts,tsx --exclude '^packages/cli/e2e/fixtures/desktop-native/'` | PASS | 391 files, 0 occurrences | |
+| Scoped lint | `run-deno-lint.ts` same roots minus `.llm/tools/agentic/teardown` | PASS | 378/378 processed, 0 findings | |
+| Raw lint (config-excluded) | `deno lint --no-config check-compat-fixtures_test.ts probes_test.ts` | PASS | exit 0 | |
+| Scoped format | `run-deno-fmt.ts` four roots `--ext ts,tsx` | PASS | 390/390, 0 findings | |
+| Raw format (config-excluded `.llm` files) | `deno fmt --no-config --single-quote --line-width=100 --check` on the 4 generator-listed files | PASS | Checked 4 files | |
+| Format — new Markdown under `packages/mcp` | `deno fmt --check packages/mcp/tests/fixtures/README.md packages/mcp/tests/fixtures/telemetry/README.md` | FAIL | `fixtures/README.md:10-11` list-item wrap; exit 1 | Finding L-1. Not in CI's `fmt:check` (ts/tsx only); repo-quality hygiene. |
+| Unit tests | `run-deno-test.ts -- --allow-all packages/mcp packages/telemetry .llm/tools/agentic/teardown generated-app-endpoint_test.ts service-env-evidence_test.ts check-compat-fixtures_test.ts` | PASS | 263 passed / 0 failed, exit 0 | Matches `receipts/05-unit-tests.json`. |
+| Doc lint | n/a | N/A | No docs-site change | |
+| Publish dry-run | n/a | N/A | No package surface change; export corpus guards it | |
+| Link/path check | READMEs' receipt paths resolve via `git show origin/test/aspire-13-5-s2-runtime-verification:…` | PASS | both receipts read | |
+
+## Fitness Gates
+
+| Gate | Function | Result | Evidence | Violations |
+| ---- | -------- | ------ | -------- | ---------- |
+| F-3/F-5/F-10/F-19 | `deno task quality:scan` | PASS | `ok:true`, `findings:[]`, 7 pre-existing allowances untouched | none |
+| F-3/F-5 | `deno task arch:check` | PASS | exit 0; pre-existing `export default` WARNs only | none |
+| F-5/F-6 | `deno task check:mcp-export-corpus` | PASS | 35 packages / 270 subpaths / 7,614 symbols; sha256 `88011e6e459097ba4c74111063dbef13a95823702bd37447f358bc19375cc262` unchanged | none |
+| F-10 | Test-shape audit | FAIL | coverage regression on `resourceName` fallback (H-1) | 1 |
+| others | | N/A | fixture/test-only change | |
+
+## Runtime Gates
+
+| Gate | Validation | Result | Evidence |
+| ---- | ---------- | ------ | -------- |
+| AppHost / dashboard capture | phase B, lease-backed | N/A | Phase-A boundary; deferral documented in telemetry README + `drift.md`. |
+| PR CI | `gh pr checks 1741` | NOT_RUN | Every job `skipping` (draft). The known `packages/fresh/.../hydration.ts` TS2345 baseline (#1734) therefore never surfaced; not attributable to S3. |
+
+## Consumer Gates
+
+| Consumer | Validation | Result | Evidence |
+| -------- | ---------- | ------ | -------- |
+| MCP export corpus | `check:mcp-export-corpus` | PASS | unchanged corpus (above) |
+| Teardown probes | `probes_test.ts` both versions | PASS | included in 263/263 |
+| CLI E2E describe consumers | `generated-app-endpoint_test.ts`, `service-env-evidence_test.ts` | PASS | included in 263/263 |
+
+## Anti-Pattern Check
+
+| AP | Status | Evidence | Notes |
+| --- | --- | --- | --- |
+| AP-1 | CLEAR | parity helper is a 57-line test-local table | |
+| AP-16 | CLEAR | role-named `__fixtures__` / `fixtures/telemetry` folders with READMEs | |
+| AP-25 | CLEAR | tests consume checked-in JSON only; no runtime side effects | |
+| AP-2…AP-15, AP-17…AP-24 | N/A | out of scope for fixture-only work | |
+
+## Arch-Debt Delta
+
+| Metric | Count | Evidence |
+| --- | --- | --- |
+| New entries | 0 | `arch-debt.md` untouched in diff |
+| Resolved entries | 0 | |
+| Deepened violations | 0 | no `packages/*/src` change |
+| Unrecorded violations | 0 | |
+
+## Findings
+
+| Severity | Finding | Evidence | Required action |
+| --- | --- | --- | --- |
+| high (H-1) | The retained 13.4.6 describe compat case was rewritten, not kept: `billing-abcdefgh` now carries `displayName: 'billing'` and the pretty-printed 13.4.6 literal was replaced by a shared object. This silently removed the only test of `resourceName`'s DCP-suffix fallback (`aspire-cli-endpoint-source.ts:237-239`). | `deno test --coverage` on `service-endpoint-sources_test.ts`: base covers L237, L239; head leaves L237–239 red. Manifest row 677 requires the "inline 13.4.6 fixture case kept as compat". | **fix** — restore fallback coverage in the retained 13.4.6 case: either keep the original 13.4.6 literal verbatim and add the 13.5.3 fixture as a separate object, or drop `displayName` from `billing` in the shared object (S2 shape allows the key to be absent from the adapter's perspective). Re-run the coverage probe and the 263-test set. |
+| medium (M-1) | Provenance overstatement: `generated-app-endpoint_test.ts:132` says the fixture is "the real shape captured from live NetScript AppHosts (Aspire 13.4.6 and 13.5.3)", but the 13.5.3 case is the 13.4.6 resources plus a synthetic `Aspire CLI 13.5.3\n` banner. No S2 receipt contains a banner (captured with `--nologo`; adapter passes `--nologo`). | `git grep 'Aspire CLI 13.5' origin/test/aspire-13-5-s2-runtime-verification -- <s2 run dir>` → 0 hits. | **fix** — reword the comment and `packages/mcp/tests/fixtures/README.md` to state the banner line is a synthetic noise-tolerance prefix (13.4.6 convention) and that the 13.5.3 case reuses the S2-verified unchanged shape; do not claim a live-13.5.3 capture for that file. |
+| low (L-1) | `packages/mcp/tests/fixtures/README.md` fails repo-config `deno fmt --check` (lines 10–11 list-item wrap). | evaluator command above, exit 1 | **fix** — `deno fmt packages/mcp/tests/fixtures/README.md`. |
+| low (L-2) | Describe README does not name the S2 keys intentionally omitted from the inline snapshot (`creationTimestamp`, `startTimestamp`, `source`, `exitCode`, `stopTimestamp`). | `02-v5-shape-comparison.md` 18-key list vs fixture 13 keys | **fix** — one sentence listing the omitted keys. |
+| observation | `slices/s3/review-tier-a.md` is local-only (not on `origin/research/aspire-13.5-0.0.7`); `deno task lint` was cache-served and had to be invoked via the wrapper directly. | listing above | supervisor: push the Tier-A review; none for generator. |
+
+## Lessons for Promotion
+
+| Lesson | Pattern | Applies to | Confidence |
+| --- | --- | --- | --- |
+| "Keep the compat case" means keep its bytes | Parity greps on a version literal cannot detect a rewritten old case; when a fixture is versioned, add the new version as a new literal and leave the old literal untouched, then diff line coverage of the adapter as the evaluator check. | Archetype 2 compat fixtures | high |
+| ts-only fmt wrappers miss authored Markdown | New README/provenance docs under `packages/**` need a direct `deno fmt --check <file>` since `fmt:check` targets `ts,tsx`. | all | medium |
+
+## Verdict
+
+| Field | Value |
+| --- | --- |
+| Verdict | `FAIL_FIX` |
+| Rationale | Plan and scope are valid and phase A is otherwise complete: parity RED/green and the `pending-lease` fail-closed arm reproduced independently; the 13.5.3 `ps` fixture is byte-derived from S2 with documented redaction; no telemetry envelope fabricated; every executed gate is green (lint 2043/0, check 391/0, tests 263/263, quality:scan 0, arch:check 0, export corpus unchanged); PR trail, labels, milestone, closing keyword correct. It fails on H-1: the retained 13.4.6 describe case in `service-endpoint-source-fixtures.ts` was reshaped and lost the adapter's `resourceName` fallback coverage (verified by line coverage base vs head), which contradicts the "13.4.6 case kept" contract; M-1 overstates 13.5.3 capture provenance for a banner that no S2 receipt contains. Fix H-1/M-1 (+ L-1/L-2) in a follow-up slice on the same PR; phase B remains deferred and is not required for `PASS`. |

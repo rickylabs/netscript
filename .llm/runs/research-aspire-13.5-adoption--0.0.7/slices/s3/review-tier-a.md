@@ -43,3 +43,14 @@
 
 No blocking finding. **Tier-A verdict: sign-off to IMPL-EVAL (phase A) at `a964a2120`.** The PR
 stays draft until phase B lands under the lease.
+
+## IMPL-EVAL cycle 1 (session `81638614`, head `a964a2120`) — `FAIL_FIX`
+
+- H-1: the retained 13.4.6 `describe` compat case in `service-endpoint-source-fixtures.ts` was
+  reshaped (shared object, `displayName` added), silently removing the adapter's `resourceName`
+  DCP-suffix fallback test. **Tier-A miss** — I verified "no `*13.4.6*` file touched" by filename
+  and did not diff the inline 13.4.6 case; checklist updated: diff every inline compat case
+  against `origin/main`.
+- M-1: 13.5.3 describe case = 13.4.6 data + synthetic banner, with a "captured live" provenance
+  comment. L-1 README fmt; L-2 omitted-key list.
+- Fix brief sent on the thread (slice 6). Cycle 2 follows at the slice-6 head.
