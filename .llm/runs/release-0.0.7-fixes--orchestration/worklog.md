@@ -2994,3 +2994,46 @@ IMPL-EVAL's F-1 lockfile note), and the resource-hygiene proof.
 
 **#1673 is terminal for this lane.** No merge, no publish, no issue-box ticking, no `ready-merge`.
 Advancing to #1462 per the serial queue.
+
+## 2026-08-30 — #1462 dispatched; fixes queue advanced
+
+#1673 is terminal for this lane, so the serial queue advances without waiting on any other
+orchestrator.
+
+**#1462** (`priority:p1`, `type:fix`, `area:sdk` + `area:fresh`): importing `defineServices` from the
+SDK root auto-registers the server KV cache provider, so browser code silently takes the server cache
+path and pulls `@netscript/kv` toward the client bundle.
+
+| Field | Value |
+| --- | --- |
+| Leaf worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1462` |
+| Branch | `fix/sdk-root-cache-provider-leak` @ `13878a80a`, **upstream NONE** |
+| Codex thread | `01a05238-5b47-7cd1-a83c-80c27c55a397` |
+| Requested / observed route | openai · `gpt-5.6-sol` · high — **matched** |
+| Attachment | confirmed from `agentic:codex-status` (`working`, correct worktree), not from the launcher's exit code |
+
+The defect was re-proved on the current tree before dispatch rather than taken from the issue text —
+the issue reports `@netscript/sdk@0.0.5` and the package is now `0.0.6`:
+
+```
+hasCacheProvider() from packages/sdk/mod.ts           -> true
+hasCacheProvider() from packages/sdk/src/query/mod.ts -> false
+```
+
+with the chain confirmed at `mod.ts:46` → `src/cache/mod.ts:22` (top-level `setCacheProvider`), and no
+`./presets` subpath in the exports map, so `defineServices` is reachable **only** through the leaking
+root. The sharpest detail handed to the author: `mod.ts` line 24 already documents "use
+`@netscript/sdk/cache` only from server-side code" while line 46 re-exports it — the code breaks the
+boundary the file itself states.
+
+**Scope is S1 (research + locked plan) and S2 (red-before) only, and PLAN-EVAL is required — not
+`N/A`.** Unlike #1673's bounded contract, this design is genuinely open and moves a **published export
+surface**, so the plan must argue which of the three "Expected" moves dominates rather than merely
+showing one works, and state the compatibility consequence for consumers who rely on the current
+implicit registration. The #1112 generated-derivative cascade (`check:mcp-export-corpus`,
+`check:publish-assets`, JSR audit, publish dry-run) is mandatory in the gate set **from the start**,
+not argued N/A by reasoning.
+
+Two lessons carried into the brief from this lane's own record: evidence must be written from the
+artifact rather than the claim about it, and base-vs-head comparisons must be made at the granularity
+of the claim.
