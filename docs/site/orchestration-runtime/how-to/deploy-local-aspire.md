@@ -8,7 +8,7 @@ oldUrl: /how-to/deploy-local-aspire/
 
 # Deploy locally with Aspire
 
-**Goal:** run your whole NetScript workspace on one machine under .NET Aspire — scaffold the
+**Goal:** run your whole NetScript workspace on one machine under Aspire — scaffold the
 AppHost, bring up the resource graph (Postgres, Redis, every service and background processor),
 and watch it from the Aspire dashboard. This is the **local** orchestration companion to the
 [Deploy](/orchestration-runtime/how-to/deploy/) recipe (which covers shipping to a remote target); for *why* the
@@ -30,7 +30,7 @@ with no Aspire up and it fails — there is no Postgres for it to reach. See
   rows: [
     { name: "A scaffolded workspace", type: "netscript init", desc: "Created WITHOUT --no-aspire, so the aspire/ AppHost folder exists. See the CLI reference for init flags." },
     { name: "Docker daemon running", type: "container engine", desc: "Aspire provisions Postgres and Redis as local Docker containers. No daemon = the default workflow does not start." },
-    { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external .NET Aspire CLI, run from inside aspire/ — not netscript subcommands." },
+    { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external Aspire CLI, run from inside aspire/ — not netscript subcommands." },
     { name: "A reachable port range", type: "ports", desc: "Dashboard :18888 (HTTPS) / :18889 (HTTP), OTLP :4318, and randomized high-range ports (49152–65535) allocated per project at scaffold time for services, plugin APIs, and frontend apps." }
   ]
 }) }}
@@ -172,6 +172,17 @@ from inside <code>aspire/</code>. <code>netscript db</code> commands run from th
 <li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Run it with no Aspire up and it fails fast — bring the graph up
 first.</li>
+<li><strong>A declared background reference cannot resolve.</strong> For each background processor
+that is not explicitly disabled, the generated AppHost preflights every declared service and plugin
+reference before registration. Each such declaration is required configuration, so it fails fast
+when the resource is missing or when the resource exists but has no <code>http</code> endpoint; this
+is a startup configuration error, not a processor failing under load. Service references use the
+message template
+<code>Background processor configuration error: '&lt;processor&gt;' could not resolve service
+reference '&lt;ref&gt;' HTTP endpoint.</code> Plugin references use the distinct template
+<code>Background processor configuration error: '&lt;processor&gt;' could not resolve plugin
+reference '&lt;ref&gt;' HTTP endpoint.</code> The generated code substitutes the configured processor
+and reference names for <code>&lt;processor&gt;</code> and <code>&lt;ref&gt;</code>.</li>
 <li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and
 OTLP <code>:4318</code>; services and plugin APIs claim their assigned high-range ports (49152–65535) allocated at scaffold time. A stale prior run holding a port blocks boot — check the dashboard
 resource list (or your process table) and free it.</li>

@@ -98,7 +98,7 @@ run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yoursel
 {{ /comp }}
 
 Two facts about the AppHost are worth internalizing because they contradict assumptions people
-carry from .NET Aspire:
+carry from Aspire's .NET AppHost:
 
 1. **It uses an isolated TypeScript/Node runtime.** `aspire.config.json` declares `language: "typescript/nodejs"`
    and `appHost.path: "apphost.mts"`. The AppHost runs on an isolated Node.js runtime inside
