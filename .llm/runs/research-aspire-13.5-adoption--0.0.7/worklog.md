@@ -480,4 +480,6 @@ rebased: only its 12 own commits replayed (`85bd4967`-era S3 lineage dropped; fi
 replaying old S3 commits aborted safely, remote untouched) → **`6f73dcae778a`** on `9710a2898d4f`,
 range-diff `=` 12/12, pinned push; PR #1744 base → `main`. Loopback probe re-run post-host-update:
 dind-loopback publishes still refused at `netscript-dind:<port>` (explicit publishes answer) → D-74
-two-hop relay stays mandatory for the Phase-B rerun. |
+two-hop relay stays mandatory for the Phase-B rerun. | | S4 hosted run GREEN | Run 33329737311
+exit=0 (all tiers) at converged `b2a0529fa19b` on `52a881c5` — S4 #1738 becomes the next
+merge-candidate; close packet in progress. Chain continues → S5 → proof → S1. |
