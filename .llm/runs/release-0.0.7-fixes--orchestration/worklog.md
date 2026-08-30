@@ -5791,3 +5791,17 @@ launcher — no credential path printed, read, or committed by me.
 
 **#1764 remains separately queued** — TC-6/TC-7/TC-9 unproven, its bounded plan unrun, waiting on the
 singleton runtime lease. Not touched or advanced in this entry.
+
+### #1739 OpenRouter DeepSeek evaluator stopped mid-task; resumed, not restarted
+
+First DeepSeek turn (session `942976e6-...`) confirmed rows 2-7 of the gate table PASS internally, but
+stopped producing visible output partway into row 8 — `stop_reason: end_turn`, `result: ""`, no
+resource/quota error this time. Verified clean before acting: no commit on `eval/impl-eval-1739-cycle-3`
+(still at Tier-A `fcba13423`), no PR comment posted, tree clean. Cost so far: $2.18, 191k input tokens
+(1.85M from cache).
+
+Resumed the same session via `--resume` rather than restarting cold, since it already holds full
+context and a large warm cache. Resume prompt names exactly which rows remain (8-15), restates the
+row-16 judgment call and the two specific pre-existing-finding verifications the original brief
+required, and explicitly instructs it not to end the turn before writing the verdict, committing,
+pushing, and posting the PR comment.
