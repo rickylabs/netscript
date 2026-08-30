@@ -1653,3 +1653,13 @@
   current FIXES #1764 lease, then metadata/close-gate). S9: `bf06551ba` "fail closed on the exact
   Aspire dashboard payload" already landed and reported on PR #1759 (19:43:20Z) — correction
   complete, no further action pending a hosted re-verify.
+- **D-85 — S1 shipped** (`798e901afaef65b000cd78a4a2dd9c3aa122220e`, then docs advanced main to
+  `bc33c2aa319c`); #1713 closed, sole `status:shipped`. **S7 disposition delta IMPL-EVAL PASS** at
+  `a560d7e10` via the sanctioned OpenRouter DeepSeek V4 Flash 0731 · max relay preset (Fable quota
+  exhausted, no new Opus exception per routing update): the deterministic synthetic coverage of the
+  historical re-parented contained-cwd/contentRoot descendant class is real and correctly enforces
+  containment + age threshold + inactive-run, never PPID-only; #1429 closure via S7's PR is
+  justified. Issue #1719's first acceptance row amended in place (no more claiming the naive
+  "leak-check reports it / apply removes it" text literally — now states the dual-path requirement
+  actually met). Posted on PR #1744; S7 disposition resolved, no third runtime attempt needed for
+  this criterion.
