@@ -83,8 +83,38 @@ input caps the result count server-side before truncation applies.
 | `execute_command`             | **`command`**, `args`                                 | `exitCode`, `durationMs`, `outputTail`, `truncated`, `timedOut`                                                                                                   |
 | `record_drift`                | **`resource`**, **`summary`**, `details`              | `recorded`, `resource`, `receipt`                                                                                                                                 |
 | `list_api_services`           | —                                                     | Service status, URLs, optional operation count, conflicts, and verbatim discovery source outcomes                                                                 |
-| `list_service_operations`     | **`service`**, `filter`, `limit`                      | Bounded operation rows and `truncated` metadata                                                                                                                    |
-| `get_operation_schema`        | **`service`**, **`operation`**, `view`                | Projected schema view, operation identity, unauthenticated `curlExample`, and `authNote`                                                                            |
+| `list_service_operations`     | **`service`**, `filter`, `limit`                      | Bounded operation rows with optional `access`, plus `truncated` metadata                                                                                            |
+| `get_operation_schema`        | **`service`**, **`operation`**, `view`                | Projected schema view, operation identity, optional `access`, access-aware `curlExample`, and `authNote`                                                            |
+
+### Operation access summary
+
+`list_service_operations` and `get_operation_schema` share the same optional access result shape:
+
+```json
+{
+  "authentication": "required",
+  "securitySchemes": ["bearerAuth"],
+  "scopes": ["catalog:read"],
+  "roles": ["reader"]
+}
+```
+
+This bounded `OperationAccessSummary` reports declared access facts only. `authentication` is
+`none`, `optional`, or `required`; each list allows at most 50 non-empty strings, and each string is
+bounded to 2,000 characters. It never contains a principal, token, cookie, secret, or credential
+value.
+
+| Retained OpenAPI operation | Tool result |
+| --- | --- |
+| No own `security` property | `access` is absent, preserving the undeclared state |
+| `security: []` | `authentication: 'none'`; schemes and scopes are empty |
+| `security: [{}, { bearerAuth: [] }]` | `authentication: 'optional'`; `bearerAuth` is listed |
+| `security: [{ bearerAuth: ['catalog:read'] }]` | `authentication: 'required'`; scheme and scopes are listed |
+| Required operation with `x-netscript-roles` | Roles are copied into the bounded `roles` list |
+
+`get_operation_schema` produces different credential-free guidance for undeclared, public,
+optional, and required operations. Only the required template includes the literal placeholder
+`Authorization: Bearer <credential>`; no real credential is requested or echoed.
 
 **Truncation semantics.** After a flow succeeds, `truncateResult` recursively bounds the result
 using `DEFAULT_TRUNCATION_POLICY` — arrays are capped at 50 elements and strings at 2,000 UTF-16
