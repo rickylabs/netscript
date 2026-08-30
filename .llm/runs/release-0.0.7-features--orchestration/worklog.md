@@ -8019,3 +8019,39 @@ E-3 is now scoped honestly: tighten `buildRpcContext`'s internal `traceHeaders` 
 the runtime guarantees `string`; if it can genuinely produce `undefined` then the *published* type is
 wrong, which is out of ceiling — stop and report rather than widen a public type to make an annotation
 compile.
+
+### Slice 3 stopped again on E-3/D-8 — a false binary in my brief, corrected
+
+Thread `01a0542b` reached terminal `task_complete`, changed no product file, ran no gate, committed
+its drift entry (`8e1d639d2`), posted the PR rescope report, and verified the PR body's protected
+wording, empty `closingIssuesReferences`, clean worktree, and byte-identical `deno.lock`. Textbook
+stop.
+
+**Its measurement is correct and I confirmed it in the source.** `buildRpcContext` does
+`ctx.traceHeaders = { traceparent, tracestate }` unconditionally, so when only `traceparent` is present
+`tracestate` becomes an **own property valued `undefined`**, contradicting the published
+`Readonly<Record<string, string>>`. Recorded by the author as **D-8**.
+
+**But it stopped because my brief gave it only two doors**, both of which lead out of the ceiling or to
+a lie: tighten the internal annotation, or change the public type in `types.ts`. There is a third, and
+it is the correct one — **fix the runtime so it never emits an `undefined`-valued key**. Build
+`traceHeaders` from the headers actually present; the published `Record<string, string>` then becomes
+true, the internal `| undefined` can go, and the entire change lives in `service-builder-impl.ts`,
+Slice 3's own file #1. **No ceiling amendment, no owner ruling.**
+
+**Lesson — the second one of this slice, same root.** When a brief enumerates the options for
+resolving a contract mismatch, it constrains what the author will consider. I framed E-3 as
+"annotation vs. published type" and never named "the runtime is what's wrong", so a capable author
+followed the frame into a stop. *Both* Slice 3 stops trace to my briefs, not to the authors: first an
+obligation its ceiling could not discharge, now a false binary. **State the measurement and the
+ceiling; do not pre-enumerate the fixes.**
+
+I also found, while checking, that `buildRpcContext` **mutates the caller's object** — it assigns
+`ctx.db`, `ctx.traceHeaders` and `ctx.principal` onto the factory's return value. That is exactly the
+defect Slice 3 exists to fix and it was still untouched, since the lane stopped before any composition
+work began. The corrected brief now names it explicitly and asks for a non-mutation proof against a
+frozen factory result.
+
+Re-dispatched from `8e1d639d2` after the full eviction procedure (`ownerPid 3519642` absent from
+`/proc`, session absent across three debounced probes, backup, single literal path, thread record
+preserved as `codex-thread-ids-1387-s3b.md`).
