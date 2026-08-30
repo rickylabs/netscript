@@ -3186,3 +3186,101 @@ wave 3, but that same context pack just proved unreliable on the adjacent claim,
 orchestrator exists. Claiming it unilaterally risks crossing topic ownership, which this lane is
 required to preserve. Flagged for the coordinator with the research above already done, so whoever
 owns it starts unblocked.
+
+## 2026-08-30 — restart recovery; #1734 boundary held; #1732 plan gate released and implementation resumed
+
+### Controller re-attachment (this session)
+
+| Field | Value |
+| --- | --- |
+| Claude session | `eef77fc1-8224-483d-990f-00fd0145b629` |
+| PID | `5498`, ppid `5454` (launcher `hybrid-launcher.ts` via `agentic:claude-hybrid --cwd .../007-internals`) |
+| Launch flags | `claude --remote-control "netscript-0.0.7 internals supervisor" --dangerously-skip-permissions --mcp-config /tmp/netscript-hybrid-*/mcp.json` |
+| Remote Control | attached — bridge `session_01AQCc1qsArwb7CPELZwYDfq`, https://claude.ai/code/session_01AQCc1qsArwb7CPELZwYDfq |
+| Route | `claude-opus-5` / high; `/proc/5498/environ` carries **no** `ANTHROPIC_BASE_URL` or provider override → **native Anthropic**, not a gateway session |
+| Topic head at re-attachment | `c10a8e70f493703ce8abcd1e7a8898e8ded550a9`, clean |
+
+Host plane has migrated: the run record's `/home/codex/repos/*` paths no longer exist. Live worktrees
+are under `/home/agent/projects/netscript/worktrees/` (`/home/codex` symlinks to `/home/agent`).
+Every `agentic:*` call needs `--user node` on this host, or `buildWslCommand` hard-fails.
+
+### #1734 / PR #1736 — owner boundary held, nothing touched
+
+Verified rather than assumed, and **no** cycle 3, repair, or evaluator was launched:
+
+| Check | Result |
+| --- | --- |
+| Head local == remote | `eb765629206092f97b3dd8f76a64fa0c3769bcb8` |
+| Worktree | clean |
+| PR #1736 | OPEN, **draft**, labels unchanged (`type:fix`, `area:fresh`, `priority:p1`, `status:impl`) |
+| Issue #1734 | open, milestone `0.0.7`, untouched |
+| Process holding the leaf | **none** (`/proc/19469` was this session's own transient shell; it exited, and `/proc/19469/exe` no longer resolves) |
+
+The leaf stays parked pending the owner verdict on the three routes already stated (repair / rescope /
+revert R2). Internals did not wait on it.
+
+### #1732 / PR #1747 — both cycle-2 findings re-verified, then released
+
+The parked gate is released on **option (2)**: accept the two corrections, go to the RED slice, and
+let **IMPL-EVAL** be the gate. No PLAN-EVAL cycle 3 — both findings are mechanical plan-text
+corrections with stated satisfying conditions, which does not meet the "genuinely complex" bar that
+would earn another gate.
+
+**I re-derived both before authorizing**, because this leaf's own record contains two gates lost to
+accepting a framing unverified:
+
+- **F1 confirmed by direct read** of `prepare-flow-b-fixture.ts` l.212-252 — the marker
+  `'  // --- workers ---'`, the anchor `"    backgroundProcessors.set('workers', workers);"`, and the
+  injected `workers.withEnvironment('services__users__http__0', …)` are all present exactly as
+  reported, and `runtime-gates.ts:197` wires the fixture into `scaffold.runtime`.
+- **F2 confirmed by execution**, not by reading: `JSON.stringify` leaves U+2028 unescaped; the
+  generated module fails to import in **comment** position and imports cleanly in **string-literal**
+  position. The plan's headline guarantee is false at that one enumerated site.
+
+Authorized scope, and deliberately nothing wider — the E2E fixture update contract (F1) and the
+comment-site correction (F2), plus cycle 2's four advisories. D1-D5, the archetype, the platform
+grammar, the private-module placement, the compatibility position, and the gate set are ratified as
+they stand.
+
+**F2 resolved to option (a)** — `// --- processor <ordinal> ---`, no user text in comment position —
+rather than (b). Option (b) invents a second escaping mechanism at exactly one site, needing its own
+tests and maintenance; (a) makes the guarantee *structurally* true and adds no churn class the file
+does not already carry, since the authorized bindings are already ordinals (`bg_<i>`). Leaning on D2
+or the scaffold validator to keep non-ASCII out was rejected: that inverts the
+escaping-underneath-grammar ordering the plan is built on and that this lane authorized.
+
+Authorization recorded as PR comment `5467679467`.
+
+### Implementation resumed — preserved author, no second thread
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a0517d-6d65-7530-8079-595cf6b036f8` (**preserved** author, resumed from idle) |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1732` |
+| Branch / head at dispatch | `fix/aspire-reference-name-validation` @ `e3f227c2151dcde3db0599af6dd37c61cbd76ba9`, local == remote == PR |
+| Source at dispatch head | **none** — diff versus `main` outside `.llm/runs/` empty |
+| Delivery | `agentic:codex-resume --message-file`, dry-run first; confirmed `working` / "turn started", **no** thread-store conflict |
+| Rollout | `/home/agent/.codex/sessions/2026/08/30/rollout-2026-08-30T09-06-09-01a0517d-6d65-7530-8079-595cf6b036f8.jsonl` |
+| Steering | `codex exec resume 01a0517d-6d65-7530-8079-595cf6b036f8 -- "<follow-up>"` |
+
+**Route drift, recorded rather than smoothed over.** The dispatch record for this leaf states
+Sol · **medium**, "confirmed matched against observed thread identity". `codex-status` now reports
+this thread as `gpt-5.6-sol` · **high**. I am recording the observed value rather than repeating the
+earlier matched claim; the discrepancy is either a mid-run effort change or a per-thread reporting
+gap in `codex-status`, and I have not resolved which. It does not change the authorization — high is
+not below the lane floor for this slice — but the earlier "matched" line should not be trusted as-is.
+
+### One mandate term with no referent in this run
+
+The recovery mandate names a "narrow ContractBuilder" correction. **`ContractBuilder` does not exist**
+— no hit anywhere in `packages/`, `plugins/`, or this run's artifacts. The bounded, coordinator-owned
+corrections this run actually carries are F1's fixture **update contract** and the F2 **reference-name**
+comment-site correction, which is what was authorized. Flagged so the term is not propagated as if it
+named real scope; the ledger-is-not-evidence lesson from the #1533 blocker applies to mandates too.
+
+### Standing constraints unchanged
+
+No merge, publish, ready-flip, relabel, issue close, milestone change, central-cluster-state
+mutation, or release-writer lease. No Aspire, Docker, browser, `e2e:cli`, or `scaffold.runtime`.
+Root `deno task test` remains unusable on this host (~7.7k unreapable PID-1 zombies); `rtk` remains
+not installed.
