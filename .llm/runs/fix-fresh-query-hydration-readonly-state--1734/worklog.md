@@ -188,3 +188,52 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 The root-test command is intentionally recorded as RED, not green. Both failures are outside the
 scope diff and reproduce in a focused run of those two `.llm/tools/agentic/**` test modules on this
 shared host. No foreign long-lived supervisor process was stopped to manufacture a green result.
+
+## 2026-08-30 — Supervisor Tier-A sealing sign-off at `40ab61a7ef43633bf946af06f7f15c7e1fd567fd`
+
+Recorded by the internals topic orchestrator after the cycle-3 sender was terminated (futex-stall,
+no children, no output, 14+ minutes; PID proof taken before termination and before its stale thread
+lock was removed). The leaf head was clean at termination, so nothing was lost.
+
+**This entry seals the carrier.** The rows above stating that final sealing and root test were
+pending, and the earlier rows recording root test RED on `codex-follow_test` /
+`hybrid-launcher_test`, are **superseded** — not deleted, so the earlier decisions stay auditable.
+Those failures belonged to the host zombie condition (~7.7k unreapable PID-1 zombies), which is
+**retired**: PID 1 is now `tini` with **0 zombies** and `fs.inotify.max_user_instances` is 1024.
+
+### Exact-head sealing set — every gate run by the supervisor in a detached throwaway worktree
+
+| Gate | Command | Raw exit | Result |
+| --- | --- | ---: | --- |
+| Root test | `.llm/tools/run-deno-test.ts -- --allow-all` | **0** | **4,258 passed · 0 failed · 19 ignored · 4,277 total · 0 unique failures** |
+| Scoped check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | **0** | 0 findings |
+| Scoped lint | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` | **0** | 0 findings |
+| Scoped fmt | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | **0** | 0 findings |
+| Asset barrel | `deno task check:assets-barrel` | **0** | |
+| Quality scan | `deno task quality:scan` | **0** | `ok:true`, `allowCount` at baseline |
+| Architecture | `deno task arch:check` | **0** | inherited warnings only |
+| Focused repair suites | `query-hydration-roundtrip_test.tsx` / `packages/fresh/tests/` | **0 / 0** | **11 passed · 0 failed** / **19 passed · 0 failed** |
+
+Root test being **green** at this head is the substantive change from every prior cycle in this leaf:
+the two failures previously recorded as unavoidable host noise no longer occur, so no result here is
+excused by an infrastructure caveat.
+
+### Not run, and why
+
+Aspire, Docker, browser, `e2e:cli`, `scaffold.runtime` — **NOT_RUN**, excluded by the
+coordinator-owned serialized expensive-gate lease, which this leaf does not hold. The bare
+`scaffold.runtime` rerun is the coordinator's, after this lands and after exact runtime zero.
+
+### State
+
+`local == remote == PR == 40ab61a7ef43633bf946af06f7f15c7e1fd567fd`, worktree clean, PR #1736 draft.
+Scope versus the parked head `eb765629206092f97b3dd8f76a64fa0c3769bcb8`, outside run artifacts, is
+exactly `packages/fresh/src/application/query/hydration.ts` and
+`packages/fresh/tests/query-hydration-roundtrip_test.tsx` — no `query-types.ts`, no `query/mod.ts`,
+no dependency-range change, zero forbidden constructs.
+
+Base reference for the record: remote `main` is `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c`.
+`8b1e42f7` is an **older ancestor** (`fix(cli): fail fast on unresolved background references
+(#1728)`), not current main.
+
+**The carrier is sealed. Cycle-3 IMPL-EVAL judges this head.**
