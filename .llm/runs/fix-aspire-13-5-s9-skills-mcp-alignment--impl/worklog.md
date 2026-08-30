@@ -70,6 +70,8 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | 2 | skill alignment | Updated the canonical Aspire skill to 13.5.3 evidence, generated `.agents`/`.claude` mirrors and CLI embedded assets, and kept the observed 14-tool mismatch explicit. |
 | 2026-08-30 | 2 | agent init | Selected the four non-colliding upstream workflow skills explicitly and proved canonical NetScript `aspire/SKILL.md` remains hash-stable. |
 | 2026-08-30 | 2 | corpora | Regenerated CLI assets, MCP export corpus, publish assets, and the consumer dogfood bundle; added a deterministic dogfood check gate. |
+| 2026-08-30 | 2 | delivery | Pushed commit `418eb4b9` and posted the required slice-2 implementation comment on draft PR #1759. |
+| 2026-08-30 | 3 | acceptance | Added the supervisor-dispatched Codex Sol prose-audit request and reran the complete static, generator, fitness, and focused test set. |
 
 ## Decisions
 
@@ -103,8 +105,18 @@ or the canonical generator source and run the documented generators.
 | Slice-2 `quality:scan` | PASS | zero findings |
 | Slice-2 `arch:check` | PASS | exit 0; pre-existing repository warnings only |
 | Dogfood generation/check | PASS | exact Aspire MCP entry, four workflow skills, relative local paths, and no stale CLI 0.0.2 pin |
+| Final focused tests | PASS | 48 passed, 0 failed across MCP smoke, suite registry, and agent-init contracts |
+| Final scoped check | PASS | 11 files across MCP gate and agent-init roots, zero diagnostics |
+| `13.4.6` active-surface grep | PASS | zero hits in the required active skill/mirror/embedded roots; no archival rows edited |
+| Final generated-surface checks | PASS | assets barrel, Claude sync/validation, MCP corpus, and publish assets reproduce cleanly |
+| Final `quality:scan` / `arch:check` | PASS | zero quality findings; doctrine exit 0 with pre-existing warnings only |
+| Static MCP expected delta | BLOCKED | observed 14 baseline tools and no `get_integration_docs`; truthful receipt cannot prove locked `+get_integration_docs` |
 
 ## Handoff Notes
 
 - Supervisor/evaluator should inspect lifecycle cleanup, partial receipt persistence, redaction, and
   explicit skip registration before generated prose.
+- The external docs audit request is `docs-audit-request.md`; this implementation session did not
+  dispatch or self-certify it.
+- Phase A is pushed and locally green except for the upstream static MCP acceptance mismatch recorded
+  in `drift.md` and `receipts/aspire-13.5.3-mcp-tools-static.json`.
