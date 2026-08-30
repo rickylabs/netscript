@@ -166,3 +166,37 @@ ORIGIN_HEAD=f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2
 
 At the final source state, the focused runtime/suite-registry tests passed 41/41 and the structured
 check, lint, and formatting wrappers each passed across all five changed E2E TypeScript files.
+
+## Seed-failure observability — run 33330455111 / job 99308020561
+
+The coordinator classified the PostgreSQL `database.seed` exit-16 result as masked by S8 output
+handling: the colored Deno task banner did not satisfy `startsWith('Task ')`, became the stored
+error, and prevented the following actionable seed stderr from reaching the typed command result.
+This is a small, owner-specified mechanical correction, so PLAN-EVAL is N/A; the owner also
+explicitly prohibited PLAN-EVAL, IMPL-EVAL, runtime, AppHost, containers, CI dispatch, and any seed
+diagnostic in this slice.
+
+RED receipt `receipts/seed-observability-red.json` failed 0/1 as intended. The exact fixture emits
+an ANSI-decorated `Task db:seed:postgres deno task db:seed` banner followed by
+`Seed cause: required fixture users.json was not found.` Exit code 16 was preserved, while the
+error file incorrectly contained the task banner instead of the cause.
+
+The emitted `run-tool` runtime edge now applies Node's standard `stripVTControlCharacters` before
+banner matching, retains up to three actionable stderr lines, keeps the first line in the existing
+`message` field, adds `actionableStderr` to the result contract, and writes the bounded actionable
+details to the typed-command error file. This keeps process/file IO in the emitted edge and adds no
+generator IO, cast, `any`, lint ignore, or hidden runtime behavior. The embedded asset barrel was
+regenerated.
+
+Final focused tests passed 8/8 (`receipts/seed-observability-final-tests.json`). Structured check
+passed three files with zero diagnostics. Because the CLI test/template roots are deliberately
+excluded by configured lint/fmt, the wrappers refused zero processed files and the required exact
+raw fallback passed lint/format for the two test files; typed-stdin lint and format comparison
+passed the `.template` source. `quality:gate` passed: `quality:scan` reported no findings and
+`arch:check` reported FAIL=0 with its existing warning inventory. The pre-commit
+`check:assets-barrel` diff contained only the intended regenerated embedded asset; its clean-head
+verdict follows the commit. Full evidence: `receipts/seed-observability-static-gates.txt`.
+
+No seed diagnosis was attempted. After S7 returns the host to zero, the supervisor owns exactly one
+cheap typed-seed diagnostic under the serialized lease; only its newly exposed cause may justify a
+later repair.

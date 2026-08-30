@@ -56,3 +56,14 @@ members after the scratch restored configured SDK 13.4.6 under CLI 13.5.3. The c
 occurred before runtime startup, so `runtime.typed-db-phase-b` did not execute. No retry or
 workaround was attempted. Cleanup and the independent leak reporter proved zero run-owned
 survivors; the supervisor relay process was left untouched.
+
+## D-07 — ANSI task banners masked typed-command failure details
+
+Coordinator proof run 33330455111, job 99308020561 reached PostgreSQL seed and failed exit 16, but
+the typed resource command surfaced only the colored Deno task banner. The emitted runtime edge
+trimmed and compared raw stderr with `startsWith('Task ')`; ANSI controls therefore bypassed the
+banner filter and stopped capture before the real error line. A RED black-box template test
+reproduces that exact sequence. The repair strips terminal controls before classification, keeps
+the existing first-line message, additively exposes bounded actionable stderr, and persists it for
+the typed command. The actual seed cause remains intentionally unknown until the supervisor's one
+lease-backed diagnostic; this static slice does not speculate or repair beyond observability.

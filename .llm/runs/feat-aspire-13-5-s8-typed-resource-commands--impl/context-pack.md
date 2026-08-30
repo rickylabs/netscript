@@ -18,6 +18,10 @@
 - Phase-B one-pass verdict: exit 1, passed=26 failed=1 skipped=0 at
   `generated.quality-negative`; `runtime.typed-db-phase-b` was not reached. Cleanup and leak-check
   proved `aspire ps = []`, empty Docker containers/volumes, and zero run-owned survivors.
+- Coordinator proof run 33330455111 / job 99308020561 later reached `database.seed` and exposed an
+  S8 observability defect: ANSI task banners masked actionable stderr. The static RED/GREEN repair
+  strips terminal controls before banner matching and persists bounded actionable stderr. No seed
+  diagnostic or runtime was run here; the supervisor owns the one later lease-backed diagnostic.
 
 Primary code surfaces are the db-cli-mode and register-tools generators/templates, Aspire runtime
 asset templates, database Aspire command executor/operation runner and their tests, and the CLI
