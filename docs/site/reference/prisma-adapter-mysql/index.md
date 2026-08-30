@@ -63,6 +63,12 @@ The package exposes a single root entrypoint (`@netscript/prisma-adapter-mysql` 
 Prisma calls `connect()` and owns the resulting [`PrismaMySqlConnectedAdapter`](#connected-adapter)
 until `$disconnect()`. A direct `connect()` caller owns that result and must call `dispose()`.
 
+## Exports
+
+| Export | Path |
+| --- | --- |
+| `@netscript/prisma-adapter-mysql` | `./mod.ts` |
+
 ## Adapter factory
 
 | Symbol | Kind | Signature | Description |
