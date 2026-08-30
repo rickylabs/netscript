@@ -1,0 +1,6 @@
+[2mScanning for running AppHosts...[0m
+[38;5;11m📦[0m Found running AppHost: /home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-d99/s6d99/aspire/apphost.mts
+[38;5;9m🛑[0m Sending stop signal to /home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-d99/s6d99/aspire/apphost.mts...
+[2mStopping /home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-d99/s6d99/aspire/apphost.mts...[0m
+
+[38;5;2m✅[0m /home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-d99/s6d99/aspire/apphost.mts stopped successfully.

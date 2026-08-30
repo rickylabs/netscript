@@ -1,0 +1,16 @@
+{
+  "owner": "s6-final",
+  "pid": 4189955,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T21:41:49.119Z",
+  "relays": [
+    {
+      "port": 24855,
+      "container": "relay-s6-final-24855",
+      "source": "postgres-8708cd5e",
+      "startedAt": "2026-08-30T21:42:11.042Z"
+    }
+  ],
+  "closed": "2026-08-30T21:47:02.779Z"
+}

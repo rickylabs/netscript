@@ -1,0 +1,5 @@
+[relay] watching owner=s6-d100 dind=netscript-dind(10.4.12.22) since=2026-08-30T21:50:41.699Z pid=41529
+[relay] postgres-8af53546 127.0.0.1:30399 => hopA relay-s6-d100-30399 (10.4.12.22:30399) => hopB 127.0.0.1:30399@ai-agents
+[relay] garnet-sjbpdwuu 127.0.0.1:32826 => hopA relay-s6-d100-32826 (10.4.12.22:32826) => hopB 127.0.0.1:32826@ai-agents
+[relay] relay-s6-d100-32826 torn down — upstream port 32826 no longer published
+[relay] cleanup: closed 1 listener(s), removed 1 hop-A container(s)

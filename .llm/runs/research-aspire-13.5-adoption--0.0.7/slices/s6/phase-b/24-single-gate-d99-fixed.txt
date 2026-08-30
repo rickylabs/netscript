@@ -1,0 +1,21 @@
+[0m[32mTask[0m [0m[36me2e:cli[0m deno run --allow-all packages/cli/e2e/cli.ts 'gate' 'scaffold.runtime' 'runtime.health.listener-unreachable' '--smoke-root' '/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-d99' '--name' 's6d99' '--format' 'pretty'
+Running scaffold.runtime
+> runtime.health.listener-unreachable: Backing-service listeners fail unhealthy and recover
+  FAILED 319ms
+    Command exited 1; expected 0.
+    [0m[1m[31merror[0m: Uncaught (in promise) NotCapable: Requires run access to "docker", run again with the --allow-run flag
+        .output();
+    [0m[31m     ^[0m
+        [0m[2m[38;5;245mat [0m[0m[2m[38;5;245mspawnInner[0m[0m[2m[38;5;245m ([0m[0m[2m[38;5;245mext:deno_process/40_process.js[0m[0m[2m[38;5;245m:[0m[0m[2m[38;5;245m1[0m[0m[2m[38;5;245m:[0m[0m[2m[38;5;245m8525[0m[0m[2m[38;5;245m)[0m
+        [0m[2m[38;5;245mat [0m[0m[2m[38;5;245mCommand.output[0m[0m[2m[38;5;245m ([0m[0m[2m[38;5;245mext:deno_process/40_process.js[0m[0m[2m[38;5;245m:[0m[0m[2m[38;5;245m1[0m[0m[2m[38;5;245m:[0m[0m[2m[38;5;245m10478[0m[0m[2m[38;5;245m)[0m
+        at [0m[1m[3mrequireDockerSuccess[0m ([0m[36mfile:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts[0m:[0m[33m211[0m:[0m[33m6[0m)
+        at [0m[1m[3mverifyListenerFailureRecovery[0m ([0m[36mfile:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts[0m:[0m[33m65[0m:[0m[33m13[0m)
+        at async [0m[36mfile:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts[0m:[0m[33m254[0m:[0m[33m3[0m
+Summary: passed=0 failed=1 skipped=0
+[0m[1m[31merror[0m: Uncaught (in promise) RemoteError: CLI E2E gate failed
+      if (!report.ok) throw new RemoteError(1, 'CLI E2E gate failed');
+[0m[31m                            ^[0m
+    at [0m[1m[3mCommand.<anonymous>[0m ([0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/[0m[0m[36mpackages/cli/e2e/src/presentation/cli/commands/gate-command.ts[0m:[0m[33m29[0m:[0m[33m29[0m)
+    at async [0m[1m[3mCommand.execute[0m ([0m[36mhttps://jsr.io/@cliffy/command/1.2.1/command.ts[0m:[0m[33m2431[0m:[0m[33m5[0m)
+    at async [0m[1m[3mCommand.parseCommand[0m ([0m[36mhttps://jsr.io/@cliffy/command/1.2.1/command.ts[0m:[0m[33m2246[0m:[0m[33m14[0m)
+    at async [0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/[0m[0m[36mpackages/cli/e2e/cli.ts[0m:[0m[33m12[0m:[0m[33m3[0m

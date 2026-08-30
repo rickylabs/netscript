@@ -1,0 +1,8 @@
+[2mStarting Aspire AppHost in the background...[0m
+{
+  "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-d99/s6d99/aspire/apphost.mts",
+  "appHostPid": 4146187,
+  "cliPid": 4146170,
+  "dashboardUrl": "https://localhost:36921",
+  "logFile": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T213315008_detach-child_c88ece9bb42c4efe9f2c417c6ded6f5a.log"
+}

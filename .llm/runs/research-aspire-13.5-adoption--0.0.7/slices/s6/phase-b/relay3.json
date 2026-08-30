@@ -1,0 +1,16 @@
+{
+  "owner": "s6-d99",
+  "pid": 4145242,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T21:33:04.362Z",
+  "relays": [
+    {
+      "port": 27529,
+      "container": "relay-s6-d99-27529",
+      "source": "postgres-2c2be309",
+      "startedAt": "2026-08-30T21:33:25.250Z"
+    }
+  ],
+  "closed": "2026-08-30T21:39:23.959Z"
+}

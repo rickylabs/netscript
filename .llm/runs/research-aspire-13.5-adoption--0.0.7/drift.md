@@ -1934,3 +1934,37 @@
   main tip `73bf2efa9f5f` (0 intersection, exact prior scope preserved); pinned push accepted → head
   **`c9f1fe40c781…`**. Not yet runtime-verified — one bounded lease authorized next to re-run the
   isolated single gate before touching the full suite or the merge packet.
+- **D-101 — architecture pivot (prospective, before implementation): scratch-fixture-only synthetic
+  listener/RESP endpoints replace any container/Docker-lifecycle manipulation for
+  `runtime.health.listener-unreachable`.** Final independent audit superseded both prior attempts
+  (D-99 `docker pause`, and the interim `docker stop`/`start` suggestion): `docker stop`/`start`
+  risks DCP suspending or replacing the tracked resource and is not certifiable either. The smallest
+  cross-topology-portable acceptance is to stop depending on any real backing container/Docker state
+  at all. **Plan:** extend `prepare-readiness-fixture.ts` (existing precedent: it already injects a
+  synthetic `readiness-dead-port` app resource into the generated `register-apps.mts` via
+  `generateRegisterApps` as a library call and marker-based text insertion — E2E-harness-only, no
+  `packages/cli/src/kernel/templates/` source edits) to additionally inject **owner-scoped,
+  controllable local TCP and fake-RESP listeners** and attach them as **extra, distinct test-only
+  health-check keys** on the live `postgres` and `garnet` resources in generated
+  `register-infrastructure.mts`, using the exact shipped
+  `createListenerReadinessCheck`/`createRespPingCheck` factories (`_aspire-compat.ts.template`: both
+  are bare `net.createConnection` probes — `createListenerReadinessCheck` resolves Healthy on the
+  TCP `connect` event alone, `createRespPingCheck` requires an actual `+PONG` reply — this is the
+  exact reason a relay/proxy masks the former but not the latter) — all on dynamic ports the fixture
+  itself opens/binds before `aspire start` and can close/reopen on demand during the test.
+  `listener-unreachable-fixture.ts` then drives the controller directly (same process family, no
+  Docker, no container/resource lifecycle command): prove both the real backing keys and the
+  injected keys start Healthy; close the injected listener for one key; poll for that exact injected
+  key to go Unhealthy; `aspire wait` on the resource for exit 18; reopen; poll recovery; and
+  **separately verify the real backing keys stayed Healthy the entire time** (proving the real
+  database/cache was never touched). Fail closed on any ownership mismatch (never manipulate a real
+  backing socket); `finally` always reopens; zero Docker permission/mutation needed at all. Preserve
+  the `resourceMatches` ID-suffix fix and the separate real-key continuity receipts already
+  implemented. **D-97/D-100 relay hardening is kept as infrastructure coverage** (proven true and
+  useful: this run's stop cascade correctly triggered the relay's own teardown,
+  `receipts/slices/s6/phase-b/44-relay-proof-zero.txt`) **but is not, and was never going to be, the
+  portable acceptance evidence** for this gate. Current D-100 lease closed as relay-proof-only (not
+  certified); host re-verified exact zero. This is now dispatched as a bounded implementation slice
+  to a fresh Codex GPT-5.6 Sol thread (matches the standing rule that supervisor-authored changes to
+  scaffold-adjacent generator/fixture wiring get an independent implementation + review pass, not
+  hand-authored in the supervisor lane) — see the dispatch record following this entry.
