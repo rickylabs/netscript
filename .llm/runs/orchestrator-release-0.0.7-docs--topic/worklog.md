@@ -2716,3 +2716,41 @@ existing run over a fresh push when only metadata needed correcting.**
 Final state: PR #1796 head `58018d6001e6ddf7669248aee0f4b283f55ed6a0` unchanged throughout the whole
 cycle, `mergeStateStatus: CLEAN`, `mergeable: MERGEABLE`, all CI green, issue #1795 4/4 boxes mirrored
 checked, sole `status:ready-merge` on both. Ready for an exact merge packet.
+
+### #1797/PR #1798: plugin-streams-core heading fix, second OpenHands label-race, exact-green re-confirmed
+
+Same class of defect as #1795: `plugin-streams-core`'s reference page already had a correct,
+complete four-row export table under `## Entrypoints`, invisible to the checker for heading-name
+reasons only. Filed as #1797, dispatched to Codex, delivered as PR #1798 (commit `0342ef845`).
+Branched independently from current main `5197e70b7` (no dependency on #1796's mapping insertion).
+
+Tier-A independently verified the `entrypoints-only` reason's per-entrypoint symbol counts via
+`deno doc --json` (root 51, sse 33, telemetry 33, testing 4) — my own quick regex-based extraction
+undercounted the SSE omissions by one (`StreamSseErrorPayloadV1`); the DeepSeek IMPL-EVAL's more
+careful extraction confirmed the PR's own count (21 SSE omissions, decomposing exactly into the
+1+1+3+16 the reason names) was right. **Lesson reinforced: a quick manual regex check is for
+sanity, not final judgment — trust the dedicated evaluator's more careful pass over a fast
+supervisor spot-check when they disagree on exact counts, provided the overall direction matches.**
+IMPL-EVAL: PASS (DeepSeek V4 Flash 0731).
+
+**Same OpenHands label-race as the #1795 cycle recurred identically**: after this session restored
+sole `status:ready-merge`, an external automation flipped the PR back to `status:impl-eval` before
+the rerun CI read it, producing a second transient close-gate failure with no relation to the actual
+change. A coordinator audit landed mid-race and observed the PR with **no** `status:` label at all
+and #1797 showing 4 unchecked boxes — a snapshot taken between this session's second label-restore
+and the rerun's completion. Re-verified immediately after: `mergeStateStatus: CLEAN`, `mergeable:
+MERGEABLE`, all 8 non-skipped checks PASS including `close-gate`, issue #1797 4/4 boxes checked, PR
+sole `status:ready-merge`, and `mirror-acceptance-evidence --dry-run` independently confirms **no
+changes** at the unchanged head `0342ef845a6d310f02c1c3fc9bdfb40ab047038f`. **This is now the second
+occurrence of the exact same OpenHands label-race pattern — worth flagging to the coordinator as a
+recurring infra friction point for this docs queue, not a one-off.**
+
+**Owner routing update received**: prospectively, for slices with no existing valid evaluation, use
+GLM 5.3 Flash at highest effort for default/IMPL-EVAL, and Qwen3.8-Flash-Next at highest effort for
+PLAN-EVAL when PLAN-EVAL is actually warranted (still reserved for critical/complex topics only).
+This does not retroactively invalidate any already-PASSed DeepSeek evaluation in this queue,
+including #1798's — those receipts remain valid and are not rerun. Applies starting with the next
+freshly-dispatched slice.
+
+Final state: PR #1798 head `0342ef845a6d310f02c1c3fc9bdfb40ab047038f`, terminal green, ready for an
+exact merge packet.
