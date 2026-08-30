@@ -343,3 +343,20 @@
 - **Answer given:** the terminology row is safe to sweep; it does not need to be deferred, and it
   does not interact with the manifest's "diagrams:render if S6/S8 add nodes" condition (which is
   separately proven NO for S6 — 2 `addContainer` emissions before and after).
+
+## D-25a — 2026-08-30 — second symptom of the same host pressure: inotify instance exhaustion
+
+- Addendum to **D-25**. S5's exact-head `deno task test` run surfaced a **second** host-process
+  failure alongside the zombie one: `codex-follow_test.ts` could not create an inotify watcher —
+  `Too many open files`, against a host maximum of **128 inotify instances**.
+- Both failures reproduce on a clean local retry and **both pass on CI's clean runner** (`check-test`
+  green at `aa822069`), which independently confirms they are host-local rather than code defects.
+- Mechanism is distinct from the zombie count but shares the cause: an over-subscribed container.
+  The zombie backlog (7,734 procs) and the watcher-instance ceiling are two faces of the same
+  resource pressure, and the watcher ceiling is the **leading indicator** — it bites long before PID
+  exhaustion does.
+- **Standing rule extended:** classify BOTH `hybrid-launcher_test.ts` cancellation-survivor and
+  `codex-follow_test.ts` inotify failures as known-infra. Do not chase, do not suppress, do not
+  attribute to a slice — but **do** report them in the evidence table, as S5's author correctly did.
+- Owner action unchanged and still agent-blocked: the container needs a reaping init (or a restart);
+  raising `fs.inotify.max_user_instances` would relieve the watcher ceiling. Both are host actions.

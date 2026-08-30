@@ -9,8 +9,8 @@
   working tree clean at review time).
 - **Repair range:** `0bd8ba83..1adbdabb` — `d2b25725` (F-1), `46264f7c` (F-2), `79255394` (F-3),
   `f3b3e75e` (F-4), `1adbdabb` (evidence).
-- **Status:** **PROVISIONAL — not signed off.** Blocked on T-1 below. Re-review at the exact green
-  head before sign-off.
+- **Final head reviewed:** `aa822069` (content head `2e8c6f4f`; `aa822069` is run-dir evidence only).
+- **Status:** **SIGNED OFF.** T-1 resolved; CI green at the exact head, `mergeStateStatus` CLEAN.
 
 ## Verdict per locked defect
 
@@ -29,7 +29,7 @@ no runtime started.
 
 ## Findings
 
-### T-1 — `DEFAULT_STREAMS_PORT` missed the locked D-14 deprecation treatment (minor, blocking this review only)
+### T-1 — `DEFAULT_STREAMS_PORT` missed the locked D-14 deprecation treatment — **RESOLVED at `2e8c6f4f`**
 
 `packages/plugin-streams-core/src/domain/constants.ts:2` still reads:
 
@@ -52,6 +52,19 @@ constants). Left as-is it is the seam through which a literal drifts back in.
 **Required:** give it the same `@deprecated` + named-0.0.8-removal treatment as its three siblings,
 or state in the worklog why the streams constant is deliberately exempt.
 
+**Resolution — verified.** `2e8c6f4f docs(streams): deprecate default port export` now reads:
+
+```ts
+/**
+ * @deprecated Not a runtime fallback; removed in 0.0.8 — see
+ * "chore(plugins): remove deprecated default-port compatibility exports in 0.0.8".
+ */
+export const DEFAULT_STREAMS_PORT = 4437;
+```
+
+Same wording pattern as `plugins/sagas/src/constants.ts`, value unchanged, no runtime read
+introduced, no consumer re-pointed. D-14 is now applied uniformly across all four constants.
+
 ### T-2 — stale `agent-tools.generated.ts` barrel (already steered; see D-23)
 
 Tracked as **D-23**. `quality` / "Generated asset freshness" is the single failing step at
@@ -67,11 +80,34 @@ steered to regenerate, re-cut slice-5 evidence at the new exact head, and drive 
   root cancellation-survivor process-survival test a **known-infra red**. It is not attributable to
   S5 and must not be re-run or chased. **Scoped product gates are judged independently of it.**
 
-## Sign-off conditions
+## Sign-off conditions — all met
 
-1. Authoritative `gen:assets-barrel` output committed; `check:assets-barrel` exits 0.
-2. T-1 resolved (deprecation applied, or a recorded exemption rationale).
-3. Exact-head evidence table re-cut and a green CI run at that same head on #1740.
-4. Then: this Tier-A review is finalized, and a **fresh independent session** runs IMPL-EVAL.
+1. **Met.** `59728705` committed the authoritative `gen:assets-barrel` output — only
+   `agent-tools.generated.ts`, 2 insertions / 2 deletions, landing the CI-expected
+   `01b5b9b43a008d21c2dc49fc035358a63f9582156b4af81083f427a9860e7b89`. No hand-edits.
+2. **Met.** T-1 resolved at `2e8c6f4f` (above).
+3. **Met.** Evidence table re-cut at content head `2e8c6f4f`, and CI is green at head `aa822069`
+   with `mergeStateStatus` **CLEAN**: `build`, `check-test`, `code-quality`, `quality`,
+   `close-gate`, `core CI lane visibility`, and both `classify` jobs all pass.
+4. **Next.** IMPL-EVAL cycle 3 dispatched to a fresh independent Claude · Fable 5 · medium session;
+   brief at `slices/s5/impl-eval-brief-cycle-3.md`.
 
-Only after that is S5 terminal human-merge-ready. This session does not merge, relabel, or close.
+### Local `deno task test` exit 1 — correctly classified, not a defect
+
+The author's exact-head table records `deno task test` as exit 1: 4,282 passed, 2 failed, 19
+ignored, with a clean retry reproducing the same two. Both are **host-process failures, not S5
+regressions**, and the author changed, skipped, ignored, and narrowed nothing:
+
+- `hybrid-launcher_test.ts` — a test-owned worker descendant survived cancellation as a PID-1
+  zombie. This is exactly **D-25**.
+- `codex-follow_test.ts` — could not create an inotify watcher, `Too many open files` against a host
+  maximum of 128 instances. A second symptom of the same over-subscribed container.
+
+CI, on a clean runner, is green on every job including `check-test` — which independently confirms
+both are host-local. Reporting them honestly rather than suppressing them is the correct behaviour
+and I am counting it in the slice's favour.
+
+**Verdict: Tier-A signed off.** S5 is ready for the independent IMPL-EVAL. It is **not** yet
+terminal human-merge-ready — that requires the cycle-3 `PASS`. This session does not merge,
+relabel, or close, and notes for the coordinator that `status:ready-merge` + `impl-eval:skip` are
+still live on #1740 from the voided cycle-2 verdict.
