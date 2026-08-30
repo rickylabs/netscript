@@ -26,8 +26,8 @@ silent success when it produced nothing.
 
 ## Current state
 
-- Phase: post-review hardening implemented; generator gates and stricter live canaries complete;
-  fresh exact-head IMPL-EVAL pending publication.
+- Phase: exact-green handoff; post-review hardening, generator gates, stricter live canaries, and
+  fresh exact-head IMPL-EVAL are complete.
 - Generator: Codex/OpenAI `gpt-5.6-sol` high, thread `01a05481-a2ff-7632-809a-e478889e626e`, route
   matched.
 - Worktree: `/home/agent/projects/netscript/worktrees/007-leaf-routing`.
@@ -40,18 +40,17 @@ silent success when it produced nothing.
 - Live canaries: stricter GLM and Qwen probes passed at matched `max` argv identity with a
   1024-token budget, visible non-empty assistant response, and tools/reasoning/streaming evidence
   (GLM 5/82/86; Qwen 6/109/113).
-- IMPL-EVAL: full `PASS` at `d9722b0b1`, merge-head refresh `PASS` at `1f5bda258`, and final
-  exact-head refresh `PASS` at published source head `6fe9f3b326309e17595d079a97d8106db488430f`.
-  Final session `6b75ca52-691b-4cae-9235-bae987fc4a90` requested OpenRouter / GLM / max and observed
-  `Z.AI` / `z-ai/glm-5.3-flash`, real reasoning/tool activity, non-empty completion, and
-  `CLAUDE_EFFORT=max` inside the child. These evaluations deliberately dogfood the changed route and
-  are not route-independent.
+- IMPL-EVAL: fresh review-fixed exact-head session `ec1cfcda-7207-4719-a976-5e16c0914e8d` returned
+  `PASS` at published head `ba70c6c90098129821cad342d0f005a38d37bb77` against current main
+  `5197e70b716eafb82fbb12ddb9a910c248ddb86a`. It requested OpenRouter / GLM / max and observed
+  `Z.AI` / `z-ai/glm-5.3-flash` plus `CLAUDE_EFFORT=max`, then independently reproduced 493/493
+  tests. This evaluation deliberately dogfoods the changed route and is not route-independent.
 - Prior exact-head evaluations remain historical evidence. Two later Augment medium findings were
-  accepted as in-scope and fixed, so their head currency does not cover the new source state.
-- Remaining: publish the review fixes, reply/resolve both threads, obtain a fresh exact-head
-  separate-session IMPL-EVAL PASS, then update the exact-green packet without merging.
+  accepted, fixed, replied to, and resolved; only the fresh `ba70c6c90` PASS is current acceptance.
+- Remaining: publish the final evaluator artifacts, update the exact-green PR packet, and leave the
+  PR unmerged for the supervisor.
 - Publication: the HTTPS PAT lacked workflow scope, so the GitHub connector published tree-identical
-  commits without force. Current published evidence head before this record: `9937705b5d`.
+  commits without force. Current evaluated published head before this record: `ba70c6c90`.
 
 ## Key locked decisions
 
@@ -66,5 +65,5 @@ silent success when it produced nothing.
 
 ## Next steps
 
-1. Leave PR #1792 unmerged and hand the supervisor the exact-green packet, distinguishing the
-   evaluated product head from the later artifact-only head.
+1. Leave PR #1792 unmerged and hand the supervisor the exact-green packet, distinguishing evaluated
+   head `ba70c6c90` from the later artifact-only head.

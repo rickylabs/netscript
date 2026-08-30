@@ -113,3 +113,19 @@ Append-only. No implementation drift recorded yet.
   convergence to `5197e70b7`. It does not count as the leaf's final verdict; that role belongs to
   the fresh exact-head GLM/max IMPL-EVAL dispatched after this restoration and the current main
   convergence.
+
+## 2026-08-30 — Post-review evaluator transport required three attempts
+
+- **What:** The mandatory fresh post-review IMPL-EVAL did not produce a verdict on its first two
+  launches. Session `cdf06638-b578-4981-9c3d-7697f9507169` lost currency when the branch advanced;
+  session `cccbef73-de8a-49bb-a8a0-1c1620cda959` received SIGTERM before a final response despite
+  genuine tool use and a stable head.
+- **Expected:** One exact-head GLM/max Claude-print turn returns a qualifying verdict.
+- **Actual:** Both attempts were correctly treated as non-qualifying. The formal launcher has no
+  evaluator timeout and emitted no model-guard denial; the termination source was external to the
+  route-policy check. A shorter third prompt on the then-current published head completed normally.
+- **Severity:** evidence-lifecycle delay only; no product change.
+- **Disposition:** Session `ec1cfcda-7207-4719-a976-5e16c0914e8d` evaluated exact head
+  `ba70c6c90098129821cad342d0f005a38d37bb77`, independently reproduced 493/493 tests, and returned
+  `PASS`. Requested and observed route evidence was OpenRouter / Z.AI, `z-ai/glm-5.3-flash`, effort
+  `max`; dogfood dependency is explicit.
