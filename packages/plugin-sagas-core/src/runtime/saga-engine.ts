@@ -292,23 +292,51 @@ export class SagaEngine implements SagaBusPort {
 
       try {
         const cascaded = handler(saga, message, context);
-        const completed = cascaded.some((item) => item.kind === 'complete');
+        const completion = cascaded.find(
+          (item): item is CascadedMessage<'complete'> => item.kind === 'complete',
+        );
+        const completed = completion !== undefined;
         const state = cloneState(saga.state);
         const status = resolvePersistedStatus(cascaded, loaded?.metadata.status);
         const outcome = telemetryOutcomeFromStatus(status);
+        const completeSpan = completion
+          ? this.#instrumentation.startCascadeCompleteSpan({
+            sagaId: entry.sagaId,
+            instanceId,
+            correlationId,
+            correlationKey,
+            parent: spanContext,
+            status,
+            resultPresent: completion.result !== undefined,
+          })
+          : undefined;
 
-        await this.#persistTransition({
-          definition: entry.definition,
-          instanceId,
-          correlationKey,
-          loaded,
-          previousState,
-          state,
-          message,
-          completed,
-          status,
-          now: context.now,
-        });
+        try {
+          await this.#persistTransition({
+            definition: entry.definition,
+            instanceId,
+            correlationKey,
+            loaded,
+            previousState,
+            state,
+            message,
+            completed,
+            status,
+            now: context.now,
+          });
+          if (completeSpan) {
+            this.#instrumentation.finishSpan(completeSpan, outcome);
+          }
+        } catch (error) {
+          if (completeSpan) {
+            this.#instrumentation.finishSpan(
+              completeSpan,
+              SagaTelemetryOutcomes.ERROR,
+              error,
+            );
+          }
+          throw error;
+        }
 
         this.#instrumentation.recordStateAfter(span, {
           [SagaAttributes.STATUS]: status,

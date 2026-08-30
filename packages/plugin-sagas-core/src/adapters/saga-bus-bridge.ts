@@ -1,4 +1,9 @@
-import type { CascadedMessage, SagaDefinition, SagaMessage } from '../domain/mod.ts';
+import type {
+  CascadedMessage,
+  SagaCorrelationKey,
+  SagaDefinition,
+  SagaMessage,
+} from '../domain/mod.ts';
 import { SagasError } from '../domain/mod.ts';
 import type {
   SagaBusPort,
@@ -21,7 +26,11 @@ import type {
 } from '../runtime/saga-compensator.ts';
 import type { SagaEngine } from '../runtime/saga-engine.ts';
 import type { SagaSchedulerPort } from '../runtime/saga-scheduler.ts';
-import type { SagaInstrumentation } from '../telemetry/mod.ts';
+import {
+  type SagaInstrumentation,
+  SagaTelemetryOutcomes,
+  type SagaTraceParent,
+} from '../telemetry/mod.ts';
 
 /** Resolver used when a fail/compensate cascade needs saga state context. */
 export type SagaBridgeCompensationResolver = (
@@ -128,15 +137,10 @@ export class SagaBusBridge implements SagaBusPort {
   ): Promise<void> {
     switch (message.kind) {
       case 'send':
-        await this.#handleAndDispatch({
-          type: message.target.id,
-          payload: message.payload,
-          idempotencyKey: message.idempotencyKey,
-          concurrencyKey: message.concurrencyKey,
-        });
+        await this.#dispatchSend(message, compensation);
         return;
       case 'scheduled':
-        await this.#schedule(message);
+        await this.#dispatchScheduled(message, compensation);
         return;
       case 'complete':
         return;
@@ -147,7 +151,8 @@ export class SagaBusBridge implements SagaBusPort {
         await this.#compensate(message, compensation);
         return;
       case 'spawn':
-        throw SagasError.notImplemented('Spawn cascades are unsupported.');
+        await this.#dispatchSpawn(message, compensation);
+        return;
       default:
         throw SagasError.notImplemented(
           `Unhandled saga cascade effect kind "${
@@ -169,6 +174,10 @@ export class SagaBusBridge implements SagaBusPort {
         instanceId: result.instanceId,
         state: result.state,
         message: result.message,
+        correlationId: result.correlationId,
+        correlationKey: result.correlationKey,
+        parent: result.spanContext,
+        instrumentation: this.#instrumentation,
       };
       for (const cascaded of result.cascaded) {
         await this.#dispatchOne(cascaded, request);
@@ -204,15 +213,20 @@ export class SagaBusBridge implements SagaBusPort {
       );
     }
 
+    const executionRequest: SagaCompensationRequest = {
+      ...request,
+      instrumentation: this.#instrumentation ?? request.instrumentation,
+    };
     let result: SagaCompensationResult;
     if (message.kind === 'fail') {
-      result = await this.#compensator.compensateFailure(request, message);
+      result = await this.#compensator.compensateFailure(executionRequest, message);
     } else {
       result = await this.#compensator.compensateCascaded(
-        request.definition,
-        request.instanceId,
-        request.state,
+        executionRequest.definition,
+        executionRequest.instanceId,
+        executionRequest.state,
         message,
+        executionRequest,
       );
     }
 
@@ -220,10 +234,75 @@ export class SagaBusBridge implements SagaBusPort {
       ...request,
       state: result.state,
       message: result.message,
+      correlationId: result.correlationId,
+      correlationKey: result.correlationKey,
+      parent: result.spanContext,
+      instrumentation: executionRequest.instrumentation,
     };
     for (const cascaded of result.cascaded) {
       await this.#dispatchOne(cascaded, nextRequest);
     }
+  }
+
+  async #dispatchSend(
+    message: CascadedMessage<'send'>,
+    execution?: SagaCompensationRequest,
+  ): Promise<void> {
+    const span = this.#instrumentation?.startCascadeSendSpan({
+      ...cascadeContext(execution),
+      targetJobId: message.target.id,
+      idempotencyKey: message.idempotencyKey,
+      retryMaxAttempts: message.retry?.maximumAttempts,
+      concurrencyKey: message.concurrencyKey,
+      queueName: message.queue,
+    });
+    try {
+      const child = span && this.#instrumentation?.spanContext(span);
+      await this.#handleAndDispatch({
+        type: message.target.id,
+        payload: message.payload,
+        idempotencyKey: message.idempotencyKey,
+        concurrencyKey: message.concurrencyKey,
+        correlationKey: execution?.correlationId as SagaCorrelationKey | undefined,
+        traceparent: child?.traceparent,
+        tracestate: child?.tracestate,
+      });
+      if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
+    } catch (error) {
+      if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
+      throw error;
+    }
+  }
+
+  async #dispatchScheduled(
+    message: CascadedMessage<'scheduled'>,
+    execution?: SagaCompensationRequest,
+  ): Promise<void> {
+    const span = this.#instrumentation?.startCascadeScheduleSpan({
+      ...cascadeContext(execution),
+      scheduledFor: message.scheduledFor,
+    });
+    try {
+      const child = span && this.#instrumentation?.spanContext(span);
+      await this.#schedule(withScheduledContext(message, execution?.correlationId, child));
+      if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);
+    } catch (error) {
+      if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
+      throw error;
+    }
+  }
+
+  #dispatchSpawn(
+    message: CascadedMessage<'spawn'>,
+    execution?: SagaCompensationRequest,
+  ): Promise<void> {
+    const span = this.#instrumentation?.startCascadeSpawnSpan({
+      ...cascadeContext(execution),
+      childSagaId: message.sagaId,
+    });
+    const error = SagasError.notImplemented('Spawn cascades are unsupported.');
+    if (span) this.#instrumentation?.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
+    return Promise.reject(error);
   }
 }
 
@@ -251,5 +330,40 @@ function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): 
     concurrencyKey: options.concurrencyKey ?? message.concurrencyKey,
     traceparent: options.traceparent ?? message.traceparent,
     tracestate: options.tracestate ?? message.tracestate,
+  });
+}
+
+function cascadeContext(request?: SagaCompensationRequest): Readonly<{
+  sagaId?: string;
+  instanceId?: string;
+  correlationId?: string;
+  correlationKey?: string;
+  parent?: SagaTraceParent;
+}> {
+  return {
+    sagaId: request?.definition.id,
+    instanceId: request?.instanceId,
+    correlationId: request?.correlationId,
+    correlationKey: request?.correlationKey,
+    parent: request?.parent,
+  };
+}
+
+function withScheduledContext(
+  scheduled: CascadedMessage<'scheduled'>,
+  correlationId: string | undefined,
+  parent: SagaTraceParent | undefined,
+): CascadedMessage<'scheduled'> {
+  if (!('type' in scheduled.message) || (!correlationId && !parent)) return scheduled;
+  return Object.freeze({
+    ...scheduled,
+    message: Object.freeze({
+      ...scheduled.message,
+      correlationKey: correlationId
+        ? correlationId as SagaCorrelationKey
+        : scheduled.message.correlationKey,
+      traceparent: parent?.traceparent ?? scheduled.message.traceparent,
+      tracestate: parent?.tracestate ?? scheduled.message.tracestate,
+    }),
   });
 }

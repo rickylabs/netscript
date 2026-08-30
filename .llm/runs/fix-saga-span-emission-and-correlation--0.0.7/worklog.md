@@ -92,15 +92,16 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ## Progress Log
 
-| Time                 | Slice | Step                   | Notes                                                                                                                                                                                                     |
-| -------------------- | ----- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30T12:57:16Z | S1    | Re-baseline/research   | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                               |
-| 2026-08-30T12:57:16Z | S1    | Design                 | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                  |
-| 2026-08-30T13:10:51Z | S1    | Supervisor review      | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                   |
-| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1      | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                        |
-| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2      | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                           |
-| 2026-08-30T13:53:27Z | S2    | Red-before proof       | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                            |
-| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4. |
+| Time                 | Slice | Step                   | Notes                                                                                                                                                                                                             |
+| -------------------- | ----- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30T12:57:16Z | S1    | Re-baseline/research   | Confirmed five zero-caller factories, compensation gap, explicit-parent need, plugin composition seam, writer-derived derivative cascade, and JSR baseline.                                                       |
+| 2026-08-30T12:57:16Z | S1    | Design                 | Locked all factory outcomes, correlation ownership, product path ceiling, slices, and gate expectations.                                                                                                          |
+| 2026-08-30T13:10:51Z | S1    | Supervisor review      | Added the fourth derivative gate from its writer, measured its clean baseline, and made the leased Flow-B runtime gate supervisor-only.                                                                           |
+| 2026-08-30T13:37:34Z | S1    | PLAN-EVAL cycle 1      | Read verdict `7b96c498`; corrected complete ownership, assertion-only S2 red contract, correlation precedence/transport, direct-engine non-scope, and README gate.                                                |
+| 2026-08-30T13:53:27Z | S1    | PLAN-EVAL cycle 2      | Verdict `PASS_PLAN` at evaluator commit `81c5f874`; plan gate cleared with implementation notes recorded below.                                                                                                   |
+| 2026-08-30T13:53:27Z | S2    | Red-before proof       | Commit `2146443c`; structured wrapper raw exit 1, 0 passed / 2 failed, both assertion failures against unchanged product code.                                                                                    |
+| 2026-08-30T14:03:38Z | S3    | Telemetry/W3C contract | Added the canonical cross-plane attribute, typed cascade context, structural W3C extraction, and engine-selected correlation/context transport. Kept production factory callers out of this slice for S4.         |
+| 2026-08-30T14:14:44Z | S4    | Runtime emission       | Added all five operation-owned callers, normalized one instrumentation dependency through core/plugin composition, and preserved engine-selected correlation/direct-parent context through compensation cascades. |
 
 ## Decisions
 
@@ -131,16 +132,19 @@ a process seam. A thin plugin may only wire the core primitive.
 
 ### Static Gates
 
-| Gate                     | Command or check                                      | Result | Notes                                                                                       |
-| ------------------------ | ----------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------- |
-| Baseline publish dry-run | package `publish:dry-run`                             | PASS   | exit 0, 111 files                                                                           |
-| Baseline doc lint        | root `doc:lint`                                       | FAIL   | measured existing nine private-type findings, zero missing JSDoc; plan requires no increase |
-| S1 artifact/lock checks  | `deno fmt --check`, `git diff --check`, raw lock diff | PASS   | Six artifacts formatted; diff checks exit 0; `deno.lock` unchanged                          |
-| PLAN-EVAL cycle 2        | separate evaluator verdict `81c5f874`                 | PASS   | `PASS_PLAN`; implementation authorized                                                      |
-| S2 measured negative     | structured test wrapper                               | PASS   | raw exit 1; 0 passed / 2 failed; both failures are assertions; test-only commit `2146443c`  |
-| S3 core check            | structured check wrapper, package root                | PASS   | exit 0; 112 selected modules, zero findings                                                 |
-| S3 telemetry tests       | structured test wrapper, three focused suites         | PASS   | exit 0; 7 passed / 0 failed                                                                 |
-| S3 package format/lint   | structured format and lint wrappers, package root     | PASS   | exit 0; 112 files processed by each, zero findings                                          |
+| Gate                     | Command or check                                       | Result | Notes                                                                                       |
+| ------------------------ | ------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| Baseline publish dry-run | package `publish:dry-run`                              | PASS   | exit 0, 111 files                                                                           |
+| Baseline doc lint        | root `doc:lint`                                        | FAIL   | measured existing nine private-type findings, zero missing JSDoc; plan requires no increase |
+| S1 artifact/lock checks  | `deno fmt --check`, `git diff --check`, raw lock diff  | PASS   | Six artifacts formatted; diff checks exit 0; `deno.lock` unchanged                          |
+| PLAN-EVAL cycle 2        | separate evaluator verdict `81c5f874`                  | PASS   | `PASS_PLAN`; implementation authorized                                                      |
+| S2 measured negative     | structured test wrapper                                | PASS   | raw exit 1; 0 passed / 2 failed; both failures are assertions; test-only commit `2146443c`  |
+| S3 core check            | structured check wrapper, package root                 | PASS   | exit 0; 112 selected modules, zero findings                                                 |
+| S3 telemetry tests       | structured test wrapper, three focused suites          | PASS   | exit 0; 7 passed / 0 failed                                                                 |
+| S3 package format/lint   | structured format and lint wrappers, package root      | PASS   | exit 0; 112 files processed by each, zero findings                                          |
+| S4 core/plugin checks    | structured check wrappers, core and plugin roots       | PASS   | exit 0; 112 core and 84 plugin modules, zero findings                                       |
+| S4 targeted tests        | structured test wrapper, locked core/plugin targets    | PASS   | exit 0; 31 passed / 0 failed                                                                |
+| S4 core/plugin fmt/lint  | structured format/lint wrappers, core and plugin roots | PASS   | exit 0; 112 core and 84 plugin files, zero findings                                         |
 
 ### Fitness Gates
 
@@ -167,8 +171,10 @@ a process seam. A thin plugin may only wire the core primitive.
 
 - PLAN-EVAL is cleared. S2 compiled against the locked surface and failed exactly at the two
   required assertions; product implementation may proceed in slice order.
-- S3 now supplies the typed telemetry/context contract, engine-selected transport, and tests. S4
-  must add the five production emission owners while preserving the optional/no-fallback
-  compensation request decision and typed post-handler cascade-size recorder above.
+- S3 supplies the typed telemetry/context contract and S4 now supplies all five production owners.
+  Compensation request fields remain optional, absent values are never derived, and post-handler
+  cascade size is recorded only through the typed instrumentation method.
+- S5 is next: update the package README and Flow-B fixture/validator unit proof without invoking the
+  supervisor-owned runtime gate.
 - The expected MCP corpus and release public-surface baseline staleness are supervisor sequencing
   handoffs. Do not regenerate them. Flow-B runtime remains author-must-not-run.

@@ -18,9 +18,10 @@ the missing MCP export-corpus check and made the leased Flow-B runtime proof exp
 supervisor-coordinated/author-must-not-run. PLAN-EVAL cycle 2 returned `PASS_PLAN` at evaluator
 commit `81c5f874`. S2 then landed as the isolated test-only commit `2146443c`: the
 baseline-compatible test compiled and produced raw exit 1 with 0 passed / 2 failed, both at the
-required assertions. S3 now adds the typed telemetry/W3C contract and engine-selected correlation
-transport; its focused check, format, lint, and 7-test gate are green. Production factory callers
-remain reserved for S4.
+required assertions. S3 added the typed telemetry/W3C contract and engine-selected correlation
+transport. S4 now emits all five cascade spans at their operation owners and normalizes one
+instrumentation instance through core/plugin composition. The locked S4 check/format/lint gates are
+clean and its focused suite passes 31/31.
 
 ## Completed
 
@@ -43,17 +44,25 @@ remain reserved for S4.
   context, optional structural W3C extraction, and engine result transport for the resolved
   correlation ID/key and handle parent.
 - Proved S3 with 112-module check/format/lint coverage and 7 focused passing telemetry tests.
+- Added engine-owned completion emission for storeless/stored and mixed-terminal outcomes.
+- Added bridge-owned send/schedule/rejected-spawn emission with success/error finishing and explicit
+  parent/correlation propagation.
+- Added compensator-owned success/skipped/error emission, typed post-handler cascade-size recording,
+  optional correlation/context fields with no fallback, and compensation-result parent replacement.
+- Normalized one instrumentation instance through `createSagaRuntime` and the durable plugin's
+  default compensator; proved S4 with 31 focused passing tests.
 
 ## In Progress
 
-- S3 commit and push.
+- S4 commit and push.
 
 ## Next Steps
 
-1. Commit and push the green S3 contract slice, then update the implementation PR comment.
-2. In S4, add the five operation-owned production emission seams and composition wiring.
-3. Enforce optional compensation request fields with no fallback precedence and use a typed
-   instrumentation recorder for post-handler cascade size.
+1. Commit and push the green S4 runtime/composition slice, then update the implementation PR
+   comment.
+2. In S5, document the span contract and extend the Flow-B generated compensation fixture and
+   validator unit proof.
+3. Do not run the leased Flow-B runtime; preserve that required gate for supervisor sequencing.
 
 ## Key Decisions
 
@@ -70,13 +79,15 @@ remain reserved for S4.
 
 ## Files Changed
 
-| Path                                                                                                         | Status   | Notes                                         |
-| ------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------- |
-| `.llm/runs/fix-saga-span-emission-and-correlation--0.0.7/*.md`                                               | new      | Harness state/evidence                        |
-| `packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts`                                      | new      | S2 red-before contract                        |
-| `packages/plugin-sagas-core/src/telemetry/{attributes,instrumentation,otel-saga-telemetry}.ts`               | modified | S3 typed telemetry/W3C contract               |
-| `packages/plugin-sagas-core/src/runtime/saga-engine.ts`                                                      | modified | Engine-selected correlation/context transport |
-| `packages/plugin-sagas-core/tests/telemetry/{instrumentation,otel-saga-telemetry,saga-engine-spans}_test.ts` | modified | S3 contract tests                             |
+| Path                                                                                                          | Status   | Notes                                          |
+| ------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
+| `.llm/runs/fix-saga-span-emission-and-correlation--0.0.7/*.md`                                                | new      | Harness state/evidence                         |
+| `packages/plugin-sagas-core/tests/telemetry/saga-cascade-spans_test.ts`                                       | new      | S2 red-before contract                         |
+| `packages/plugin-sagas-core/src/telemetry/{attributes,instrumentation,otel-saga-telemetry}.ts`                | modified | S3 typed telemetry/W3C contract                |
+| `packages/plugin-sagas-core/src/runtime/saga-engine.ts`                                                       | modified | Engine-selected correlation/context transport  |
+| `packages/plugin-sagas-core/tests/telemetry/{instrumentation,otel-saga-telemetry,saga-engine-spans}_test.ts`  | modified | S3 contract tests                              |
+| `packages/plugin-sagas-core/src/{adapters/saga-bus-bridge,runtime/{create-saga-runtime,saga-compensator}}.ts` | modified | S4 operation owners and composition            |
+| `plugins/sagas/src/runtime/create-durable-saga-runtime{,_test}.ts`                                            | modified | Thin default-compensator instrumentation proof |
 
 ## Gates
 
@@ -88,6 +99,7 @@ remain reserved for S4.
 | Consumer    | baseline measured | MCP corpus check exit 0 now; post-change stale expected and supervisor-sequenced |
 | S2 negative | PASS              | raw exit 1; 0 passed / 2 failed assertions; commit `2146443c`                    |
 | S3 static   | PASS              | 112 checked/formatted/linted; 7 focused tests passed                             |
+| S4 static   | PASS              | core/plugin checks and format/lint clean; 31 focused tests passed                |
 
 ## Open Questions
 
