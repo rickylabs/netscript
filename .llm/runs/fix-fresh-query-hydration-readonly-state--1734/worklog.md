@@ -67,6 +67,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | 2026-08-30T08:38:40+02:00 | S5 | implementation | Replaced predicates that claimed wire records were upstream states with private normalizers that construct real `MutationState`/`QueryState` values. JSON-dropped optional data fields become `undefined`; plain error records become `Error` instances with retained string fields. Public types/exports remain untouched. |
 | 2026-08-30T08:38:40+02:00 | S5 | focused gate | Required compat, hydration, and transport suites pass 11/11. The committed guard-attack test rejects all eight evaluator categories, additional non-record values in both lists, and non-array top-level lists without partial hydration or input mutation. Focused check/lint/fmt pass over 3 files. |
 | 2026-08-30T08:38:40+02:00 | S5 | reconcile | PR #1736 remains draft at `status:impl`; F1 is the only authorized repair. No public-surface stop condition or rescope trigger fired. |
+| 2026-08-30T08:52:35+02:00 | S6 | sealing gate | Focused/check/lint/fmt/quality/arch pass at product head `a1dc5fce65058ab47cd49c5af13d91c145f0d1cf`. Root test fired three times and is RED each time on the same two unrelated agentic host tests: 4,251 passed / 2 failed / 19 ignored. The Fresh repair tests remain green. |
 
 ## Decisions
 
@@ -140,3 +141,41 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 - S3 results above are the pre-receipt pass. After the S3 artifact commit is pushed, the complete
   owner-required receipt set is rerun without further file changes and posted to PR #1736 at the
   exact final 40-character head.
+
+## FAIL_FIX Repair Handoff
+
+- **Product head:** `a1dc5fce65058ab47cd49c5af13d91c145f0d1cf` (`fix(fresh): normalize serialized hydration state`).
+- **Final branch head:** the S6 run-artifact commit containing this handoff; its exact 40-character
+  SHA is copied from `git log` into the PR body and `[PHASE: IMPL]` comment after the commit exists.
+- **R2 decision:** revive a plain serialized error record into a real `Error`. This satisfies
+  TanStack's `Error | null` fields without a cast or dishonest predicate; string `message`, `name`,
+  and `stack` survive when present, while `{}` receives `Serialized hydration error`.
+- **Supervisor probe:** reproduced. A default-dehydrated mutation paused after one failed attempt
+  reached `failureCount === 1`, held the original `Error` in memory, and rendered through
+  `QueryHydrationScript` with `failureReason: {}` plus absent `context`/`data`.
+- **Public boundary:** `query-types.ts`, `query/mod.ts`, and `packages/fresh/deno.json` have no scope
+  diff; the stop condition did not fire.
+
+### FAIL_FIX Gate Table
+
+| Gate | Command | Result | Evidence |
+| --- | --- | --- | --- |
+| RED transport regression | structured wrapper over `query-hydration-roundtrip_test.tsx` before S5 | EXPECTED FAIL, exit 1 | 1 passed / 4 failed; each paused-mutation case rejected index 0 |
+| Focused Fresh suites | `run-deno-test.ts -- --allow-all` over compat, hydration, round-trip | PASS, exit 0 | 11 passed / 0 failed; includes exact 5.101.0 + 5.102.8 |
+| Eight guard attacks | committed `query-hydration_test.ts` attack table | PASS, exit 0 | all eight categories reject with indexed `TypeError`; no input mutation or partial hydration |
+| Focused check | `run-deno-check.ts --file` over repair source/tests | PASS, exit 0 | 3 files / 0 diagnostics |
+| Focused lint | `run-deno-lint.ts --file` over repair source/tests | PASS, exit 0 | 3 files / 0 findings |
+| Focused format | `run-deno-fmt.ts --file` over repair source/tests | PASS, exit 0 | 3 files / 0 findings |
+| Root check | `deno task check` | PASS, exit 0 | 2,930 files / 25 batches / 0 diagnostics |
+| Root test | `deno task test` (three attempts; third with `DENO_JOBS=1`) | **FAIL, exit 1** | 4,251 passed / 2 failed / 19 ignored; `codex-follow_test` hits host `Too many open files`, `hybrid-launcher_test` observes a surviving cancellation child |
+| Root lint | `deno task lint` | PASS, exit 0 | 2,046 files / 0 findings |
+| Root format | `deno task fmt:check` | PASS, exit 0 | 2,046 files / 0 findings |
+| Quality scan | `deno task quality:scan` | PASS, exit 0 | 0 findings; `allowCount: 7` |
+| Architecture | `deno task arch:check` | PASS, exit 0 | Fresh `FAIL=0/WARN=3/INFO=1`, unchanged inherited baseline |
+| Forbidden constructs | `rg` over hydration repair source/tests | PASS (no match) | no `any`, `as unknown as`, suppression, lint-ignore, or quality allowance |
+| Public contract/range | scope diff over `query-types.ts`, `query/mod.ts`, Fresh `deno.json` | PASS (empty) | public readonly state, exports, and `^5.101.0` unchanged |
+| Runtime lease gates | Aspire/Docker/browser/`scaffold.runtime`/`e2e:cli` | NOT RUN (owner restriction) | explicitly outside this lane; absence is not a finding |
+
+The root-test command is intentionally recorded as RED, not green. Both failures are outside the
+scope diff and reproduce in a focused run of those two `.llm/tools/agentic/**` test modules on this
+shared host. No foreign long-lived supervisor process was stopped to manufacture a green result.

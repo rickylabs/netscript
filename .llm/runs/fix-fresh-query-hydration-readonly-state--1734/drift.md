@@ -41,3 +41,13 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** update `supervisor.md` to the live path; preserve commit history and base unchanged.
 - **Evidence:** raw `git rev-parse HEAD` returned `ed8a8e9ca9be2e72da4a00bff830caf260ee94ea` before S4.
+
+## 2026-08-30 — Shared-host agentic tests exhaust watcher/cancellation resources
+
+- **What:** The required root test fires but fails on two `.llm/tools/agentic/**` host-lifecycle tests.
+- **Source:** three structured `deno task test` attempts at the unchanged S5 product tree, including an isolated run and `DENO_JOBS=1`.
+- **Expected:** Entire root suite green.
+- **Actual:** Each attempt reports 4,251 passed / 2 failed / 19 ignored. `codex-follow_test.ts` cannot create `Deno.watchFs` (`Too many open files`, host inotify instance limit 128); `hybrid-launcher_test.ts` observes its stubborn worker after cancellation. The same two fail when run alone.
+- **Severity:** significant gate-environment drift; not product rescope.
+- **Action:** record the command RED and leave foreign supervisor sessions untouched. The exact-head evaluator/CI must rerun on a host with watcher capacity; do not describe this receipt as green.
+- **Evidence:** `worklog.md` FAIL_FIX gate table; no scope diff under `.llm/tools/agentic/**`.
