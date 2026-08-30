@@ -121,6 +121,14 @@ Deno.test("page --island emits a persistent data-screen plan and route registrat
     await fs.readFile(ROUTER_PATH),
     "'admin.status': createRouteReference",
   );
+  // Regression: a runtime scaffold.runtime run against a real project caught the emitted
+  // `return <QueryIsland>...</QueryIsland>;` as a single line the generated project's own
+  // `deno fmt --check` then rejected. The template must always emit the multi-line JSX form
+  // deno fmt itself produces, independent of component name length.
+  assertStringIncludes(
+    await fs.readFile(`${APP_ROOT}/routes/admin/status/(_islands)/StatusIsland.tsx`),
+    "  return (\n    <QueryIsland>\n      <StatusData {...props} />\n    </QueryIsland>\n  );",
+  );
 });
 
 Deno.test("page --island dry-run plans the memory dialect through the init fallback without writes", async () => {
@@ -271,6 +279,14 @@ Deno.test("standalone islands use the route-tree convention and query mode binds
   assertStringIncludes(queryIsland, "useIslandQuery");
   assertStringIncludes(queryIsland, ".list.queryOptions(");
   assertStringIncludes(queryIsland, ".list.clientKey(");
+  // Regression: a runtime scaffold.runtime run against a real project caught the emitted
+  // `return <QueryIsland>...</QueryIsland>;` as a single line the generated project's own
+  // `deno fmt --check` then rejected. The template must always emit the multi-line JSX form
+  // deno fmt itself produces, independent of component name length.
+  assertStringIncludes(
+    queryIsland,
+    "  return (\n    <QueryIsland>\n      <QueryPanelData />\n    </QueryIsland>\n  );",
+  );
 });
 
 Deno.test("semantic golden rejects the old counter and empty-loader emission", () => {

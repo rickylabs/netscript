@@ -205,7 +205,7 @@ function dataIslandTemplate(
     resolve(dir, "(_islands)", `${name}Island.tsx`),
     binding.path,
   );
-  return `import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${module}';\nimport { load${name}Data } from '../(_shared)/query-loaders.ts';\n\ntype Props = NonNullable<InferDefinePageLayerLoaderProps<typeof load${name}Data>>;\n\nfunction ${name}Data(props: Props) {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(props.input),\n    queryKey: ${query}.list.clientKey(props.input),\n    initialData: props.initialData,\n    initialDataUpdatedAt: props.cachedAt,\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}Island(props: Props) {\n  return <QueryIsland><${name}Data {...props} /></QueryIsland>;\n}\n`;
+  return `import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${module}';\nimport { load${name}Data } from '../(_shared)/query-loaders.ts';\n\ntype Props = NonNullable<InferDefinePageLayerLoaderProps<typeof load${name}Data>>;\n\nfunction ${name}Data(props: Props) {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(props.input),\n    queryKey: ${query}.list.clientKey(props.input),\n    initialData: props.initialData,\n    initialDataUpdatedAt: props.cachedAt,\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}Island(props: Props) {\n  return (\n    <QueryIsland>\n      <${name}Data {...props} />\n    </QueryIsland>\n  );\n}\n`;
 }
 function queryIslandTemplate(
   binding: Binding,
@@ -213,7 +213,7 @@ function queryIslandTemplate(
   name: string,
 ): string {
   const query = binding.queries;
-  return `import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${specifier(path, binding.path)}';\n\nconst input = ${binding.input};\n\nfunction ${name}Data() {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(input),\n    queryKey: ${query}.list.clientKey(input),\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}() {\n  return <QueryIsland><${name}Data /></QueryIsland>;\n}\n`;
+  return `import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${specifier(path, binding.path)}';\n\nconst input = ${binding.input};\n\nfunction ${name}Data() {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(input),\n    queryKey: ${query}.list.clientKey(input),\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}() {\n  return (\n    <QueryIsland>\n      <${name}Data />\n    </QueryIsland>\n  );\n}\n`;
 }
 function signalTemplate(name: string): string {
   return `import { useSignal } from '@preact/signals';\n\nexport default function ${name}() {\n  const count = useSignal(0);\n  return <button type="button" onClick={() => count.value++}>{count}</button>;\n}\n`;
