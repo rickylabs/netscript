@@ -8523,3 +8523,31 @@ type actually overlaps at the file level. Existing Tier-A/IMPL-EVAL evidence for
 unchanged; the live Slice 6 IMPL-EVAL was not touched. Main integration remains deferred to #1387's
 own pre-merge/close-gate boundary, where both #1739's and #1790's contributions will be folded
 together in one regeneration pass rather than piecemeal now.
+
+## #1387 Slice 6 terminal; resume-docs recurrence closed; Slice 7 dispatched
+
+DeepSeek V4 Flash 0731 concurred: **ACCEPTED_WITH_FINDINGS at `11e83f064`**, matching my Tier-A
+independently — re-ran a cold `deno check` and the full 102-test suite itself, confirmed
+`traverseContractProcedures` is a genuine named export rather than trusting the import. It also
+resolved the one open design question Tier-A left to judgment: overwriting a user-supplied `security`
+field on a metadata-bearing operation is **intentional** — LD-6's specific-over-general precedence
+applies to generated docs the same as runtime enforcement. PR comment `5471507103`.
+
+**F-1 recurred, closed again.** The leaf's own `worklog.md`/`context-pack.md` were still frozen at
+"Slice 5 awaiting Tier-A" even after Slice 6 landed and was accepted — the same class the Slice 4
+evaluator first caught, now caught a second time by the Slice 6 evaluator. Fixed thoroughly this time
+rather than just patched: rewrote the Gates table to carry both Slice 5 and Slice 6 side by side, the
+Commits section to name both content heads, and made the "recurring" framing explicit in the file
+itself so a third instance is less likely. Committed `ae90bb264`, product-neutral against the
+certified `11e83f064`.
+
+### Slice 7 dispatched
+
+MCP access result contract — type/schema only, five-file ceiling, base `ae90bb264`, thread
+`01a054af-ed14-7933-a1b9-4e5a6b61ef5d`, `gpt-5.6-sol · high`, dry-run clean. Brief points at the
+concrete existing shapes to extend rather than duplicate (`ServiceOperationSummary`,
+`get_operation_schema`'s existing `authNote`, `IndexedOpenApiOperation.operation`'s already-retained
+raw operation from Slice 6), states the "bounded — no credential solicitation/echo" constraint as a
+real requirement rather than style, and flags that `mcp-export-corpus` will very likely **move** here
+(new exported types), unlike Slice 6 where staying flat was the correct signal — the opposite
+expectation from the prior slice, stated explicitly so it isn't mistaken for drift.
