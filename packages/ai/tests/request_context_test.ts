@@ -169,7 +169,10 @@ Deno.test({
 });
 
 Deno.test({
-  name: 'request context: never reaches the Anthropic provider wire request',
+  // This covers direct Anthropic adapter serialization only. The TanStack seam
+  // test below owns bridge/modelOptions leakage because this adapter drops
+  // model options it does not support.
+  name: 'request context: Anthropic adapter omits context from direct wire serialization',
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {

@@ -6,18 +6,17 @@
 | --- | --- |
 | Run ID | `test-ai-request-context-provider-guard--1730` |
 | Branch | `test/ai-request-context-provider-guard` |
-| Current phase | `impl — S2 complete, Tier-A review pending` |
+| Current phase | `impl — S3 complete; convergence and S4 pending` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
 ## Current State
 
-S2 is complete on top of S1 content head `fd5d0447`. The loop-level guard records the failed initial
-attempt, successful retry, and post-tool continuation beneath `withRetryingChatClient`; every
-recorded request keeps the identical `CONTEXT` reference while its provider-bound
-`messages/system/tools/options` projection remains sentinel-free. Mutation B failed the named test,
-the product mutation was restored, and the focused suite returned green. The run is stopped at the
-owner-required Tier-A boundary before S3.
+S1 and S2 were accepted before this fresh implementation thread began. S3 now narrows the Anthropic
+wire test to its actual boundary: direct adapter serialization. Its comment explicitly assigns
+bridge/`modelOptions` leakage (mutation A) to the TanStack seam test because the Anthropic adapter
+drops unsupported model options. The focused suite is green 9/9 and the test remains below F-10 at
+495 LOC. The branch still needs its one documented `main` convergence before final S4 receipts.
 
 ## Completed
 
@@ -32,18 +31,22 @@ owner-required Tier-A boundary before S3.
 - Added the deterministic three-attempt retry/continuation recording provider in the owned test.
 - Added the all-request, all-provider-bound-field absence assertion plus positive context identity.
 - Demonstrated mutation B red in the named guard (0/1), restored `loop.ts`, and proved 9/9 green.
-- Kept `request_context_test.ts` at 492 LOC; no product, lock, docs, README, or generated carrier
+- Recorded the owner-provided independent acceptance of S2 without repeating its demonstration.
+- Renamed/documented the Anthropic test as direct adapter-serialization coverage; the TanStack seam
+  remains the mutation-A detector.
+- Kept `request_context_test.ts` at 495 LOC; no product, lock, docs, README, or generated carrier
   moved.
 
 ## In Progress
 
-- S2 explicit-refspec push, structured IMPL comment, and fresh Tier-A handoff.
+- S3 commit, explicit-refspec push, structured IMPL comment, then the documented `main`
+  convergence point before S4.
 
 ## Next Steps
 
-1. Stop for separate Tier-A substantive review of S2.
-2. S3: rename and document the Anthropic adapter-wire test so it states its actual coverage.
-3. Rerun the S3 focused proving gate and stop again for Tier-A before S4.
+1. Commit/push/comment S3.
+2. Integrate `origin/main` once and record the chosen strategy.
+3. Land the final evidence artifact state, then cut and audit named exact-head S4 receipts.
 
 ## Key Decisions
 
@@ -66,14 +69,14 @@ owner-required Tier-A boundary before S3.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Base classified | `research.md` / `worklog.md`; final S4 pending |
-| Fitness | Base classified | `quality:gate` PASS; JSR/doc-lint baselines recorded |
+| Static | S3 focused PASS | Focused structured test 9/9 and format PASS; final S4 pending. |
+| Fitness | S3 shape PASS | 495 LOC; `quality:gate` and full exact-head set pending S4. |
 | Runtime | S2 PASS | Named mutation-red 0/1; restored focused suite 9/9; product diff empty |
 | Consumer | N/A | No public-surface change |
 
 ## Open Questions
 
-- None in the plan. Fresh Tier-A review of S2 is the only continuation gate.
+- None in the locked plan.
 
 ## Drift and Debt
 

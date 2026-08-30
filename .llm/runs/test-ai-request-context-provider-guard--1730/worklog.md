@@ -74,6 +74,8 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 | 2026-08-30T13:45Z | S2 | implementation | Added an inner recording client under `withRetryingChatClient`; attempt 1 fails before output, attempt 2 emits the tool call, and attempt 3 is the post-tool continuation. |
 | 2026-08-30T13:46Z | S2 | mutation proof | Mutation B made the named guard fail 0/1; restored `loop.ts` byte-for-byte and reran the focused suite green 9/9. |
 | 2026-08-30T13:47Z | S2 | hygiene | Focused format PASS (1 file), test file 492 LOC, `deno.lock` working/tree blob both `a1522e6e`, and raw status showed no generated carrier movement. |
+| 2026-08-30T13:58Z | S3 | coverage boundary | Chose the locked rename/document path: the Anthropic test now states that it covers direct adapter serialization, while its comment delegates bridge/`modelOptions` leakage to the TanStack seam. This is truthful because the adapter drops unsupported model options and therefore cannot detect mutation A. |
+| 2026-08-30T13:58Z | S3 | proving gate | Focused structured test wrapper PASS, 9/9, `durationMs=1211`; focused format PASS; test file remains below F-10 at 495 LOC. |
 
 ## Decisions
 
@@ -111,6 +113,14 @@ that could force rework (field list, retry fixture, Anthropic treatment) are loc
 | Gate | Result | Notes |
 | --- | --- | --- |
 | Final exact-head static gates | NOT_RUN | S4 |
+
+### S3 Anthropic adapter-serialization boundary
+
+| Gate | Result | Notes |
+| --- | --- | --- |
+| Focused tests | PASS | Structured wrapper: 9/9, exit 0, `durationMs=1211`. |
+| Focused format | PASS | Structured wrapper selected/processed 1 file with 0 findings. |
+| Test-shape review | PASS | 495 LOC; renamed test claims direct Anthropic adapter serialization only, and the adjacent comment explicitly assigns mutation-A bridge/`modelOptions` coverage to the TanStack seam test. |
 
 ### Fitness Gates
 
@@ -166,9 +176,14 @@ focused wrapper after restoration: exit 0; 9 passed, 0 failed; durationMs 214
   or reviewer finding changed the locked slice. Per the owner instruction for partial work, the
   post-push PR update will replace the premature `Closes #1730` with `Refs #1730 — partial`, mark
   only the S2 slice complete, and leave every Definition-of-Done/acceptance box untouched.
+- **S3:** The owner supplied independent Tier-A acceptance of S2 at intake. PR #1763 remains draft
+  with `Refs #1730 — partial`; issue #1730 remains open and unchanged. No new PR or issue comment
+  altered the locked S3 choice. The test was renamed/documented rather than extended because the
+  Anthropic adapter intentionally drops unsupported model options, so the TanStack seam is the
+  correct mutation-A detector.
 
 ## Handoff Notes
 
-- Tier-A should inspect the request snapshots, strict positive context identity assertion, all-four-
-  field negative projection, deterministic three-attempt sequence, and captured mutation-red output.
-- S3 must not start until the separate Tier-A supervisor substantively approves S2.
+- S2 was independently accepted before this fresh thread began; its mutation demonstration was not
+  repeated.
+- Tier-A should inspect the S3 test name/comment boundary and the final S4 receipt field audit.
