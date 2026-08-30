@@ -6239,3 +6239,28 @@ reached this point cleanly — or (b) teaching the bounded script to clear the r
 migration state before `database.init`, which needs product-level Prisma knowledge I have not verified
 is safe to improvise. Not attempting either without direction, given the lease and #1747's position in
 the queue.
+
+### #1781: CI terminal success, PR/issue finalized; two redundant evaluator runs cancelled and not adopted
+
+Verified `e2e-cli.yml` run `33342040720` independently: exact head match, all four jobs
+`success` — `scaffold-static`, `desktop-native-linux`, `scaffold-runtime-sqlite`, and critically
+`scaffold-runtime (aspire + docker + postgres)`, the full suite with real Chrome, including
+`behavior.app-reference`. PR body updated: the two runtime findings summarized with commits, the
+on-host 80/1 result, and the off-host terminal SUCCESS; DoD box 11 ticked with the CI evidence; issue
+acceptance-evidence block extended with box 11 citing both the on-host and off-host runs. Mirror
+dry-run then real: `APPLIED: #1357`, all 11 boxes now `[x]`.
+
+Flipped non-draft, sole `status:ready-merge` applied to both PR and issue.
+
+**Automation spawned two redundant evaluator runs** (`33342580281`, `33342601221`) on the
+ready-for-review transition, despite the already-valid Fable/DeepSeek evidence. Coordinator cancelled
+both. Verified independently rather than trusted: both `conclusion=cancelled`, nothing adopted from
+either. The label had reverted to `status:impl-eval` as a side effect — restored sole
+`status:ready-merge` on the PR (issue was unaffected).
+
+Rerunning close-gate needed care: the first pass I saw (`11s`, within run `33342565909`) predated the
+label churn, so it wasn't trustworthy evidence under the currently-restored label. Waited for that
+whole workflow run to finish naturally (a job can't be rerun mid-flight), then reran **only the
+close-gate job** by its `databaseId` — not a full workflow rerun, not the evaluator. Genuinely fresh
+attempt confirmed by its own `started_at` timestamp, well after the label restoration:
+**`close-gate: success`**.
