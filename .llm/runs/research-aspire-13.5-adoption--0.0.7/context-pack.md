@@ -106,9 +106,9 @@ not in the durable gate catalog (**D-32**).
 
 **Checkpoint 3:** after coordinator provisioning (dotnet 10.0.400 + node 24.20.0 via mise) the S5
 attempt ran: 26/27, red only on baseline #1734 (D-33); host back at zero, lease released. The
-AppHost boot path and Docker 27.5.1 (< 28 minimum, warning) remain **unexercised** on this host —
-the first Phase-B lease answers that question. Recommended next lease: S3 Phase B — **after** the
-host inotify ceiling is raised (D-34).
+AppHost boot path is still unexercised on this host; Docker 27.5.1 (< 28) is a **warning only, not a
+dispatch blocker** (D-37); `netscript-dind` is the authoritative, operational sandbox. Recommended
+next lease: S3 Phase B — **after** the host inotify ceiling is raised (D-34).
 
 Three phase-B workstreams are queued behind a single serialized lease and must run one at a time,
 each returning the host to proven zero before the next starts: **S6** (listener-unreachable fixture

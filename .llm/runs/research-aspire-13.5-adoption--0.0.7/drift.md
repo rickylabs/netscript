@@ -607,3 +607,22 @@
   nothing else is required from the host side for S3 Phase B.
 - Briefs already dispatched with the D-25 wording (S8 thread `01a051e6…`) are unaffected: the
   wording only told the thread to report and not chase such reds, which remains correct.
+
+## D-37 — 2026-08-30 — zombie-waived gate re-run green on the repaired host; dind authoritative; Docker < 28 = warning only
+
+- **Environment authority (coordinator):** `netscript-dind` restarted and fully operational —
+  verified here: `getent hosts netscript-dind` → `10.4.12.16`, `docker version` client/server
+  27.5.1, `docker info` containers 0; project mise sets `DOCKER_HOST=tcp://netscript-dind:2375`. All
+  Aspire/Docker work uses this sandbox with exact owned cleanup. The `aspire doctor` "Docker client
+  27.5.1 < 28.0" line is **a warning only — not a failure and not a dispatch blocker** (supersedes
+  the D-31/D-33 framing of it as an open risk).
+- **Re-run of the gate previously classified red on zombies (D-25), at S5 exact head `aa822069`, PID
+  1 `tini`, 0 zombies:** `.llm/tools/agentic/claude/hybrid-launcher_test.ts` → **10 passed / 0
+  failed** (`slices/s5/receipts/hybrid-launcher-rerun-aa822069-tini.json`, SHA-256 `bdf43aa5…e033`).
+  The D-25 classification is closed by a fresh green, not by waiver.
+- **Still red, still the inotify ceiling:** `.llm/tools/agentic/codex/codex-follow_test.ts` → 2
+  passed / 1 failed, `Too many open files (os error 24)` at `Deno.watchFs`
+  (`slices/s5/receipts/codex-follow-rerun-aa822069-tini.json`, SHA-256 `ba2253c3…c75a`). This is
+  D-25a, the **only** remaining host quota blocker (`fs.inotify.max_user_instances` = 128); it gates
+  Phase-B runtime and this one watcher test, nothing else.
+- Worktree `007-aspire-s5` stayed clean; Aspire `[]`, dind empty after the runs.
