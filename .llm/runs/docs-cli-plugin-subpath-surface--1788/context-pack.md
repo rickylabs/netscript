@@ -12,9 +12,9 @@
 
 ## Current State
 
-CLI prose is complete and passes source format plus per-entrypoint symbol accounting. Plugin still
-has 126 page-wide missing unique symbols with mixed existing coverage. PLAN-EVAL is recorded N/A
-and the four-slice implementation shape is locked.
+Both pages now account for their subpath symbols and pass source-format plus source-derived symbol
+comparisons. The first generated commit is complete; final plugin-derived regeneration and full
+gates remain. PLAN-EVAL is recorded N/A.
 
 ## Completed
 
@@ -22,16 +22,18 @@ and the four-slice implementation shape is locked.
   maps, source declaration locations, and generator chain read.
 - CLI and plugin entrypoints enumerated with `deno doc --json`.
 - CLI page corrected: 23/23 scaffolding and 29/29 testing symbols accounted.
+- CLI assets regenerated from `495750d35` in an exactly-four-file generated commit.
+- Plugin page corrected: 221/221 unique subpath symbols accounted; two stale non-export rows removed.
 
 ## In Progress
 
-- Slice 1 sign-off commit, then Slice 2 CLI-derived asset regeneration.
+- Slice 3 prose/run-artifact sign-off commit, then Slice 4 final regeneration and gates.
 
 ## Next Steps
 
-1. Complete CLI page and regenerate its four assets.
-2. Complete plugin page while preserving existing accurate coverage.
-3. Regenerate final assets, run all gates, push explicit refspec, and open the requested PR.
+1. Commit plugin prose/run artifacts and regenerate the final four assets.
+2. Run all requested gates and baseline comparison.
+3. Push the explicit refspec and open the requested PR.
 
 ## Key Decisions
 
@@ -47,13 +49,15 @@ and the four-slice implementation shape is locked.
 | --- | --- | --- |
 | `.llm/runs/docs-cli-plugin-subpath-surface--1788/*` | new | Harness identity, research, plan, design, drift, and resumable state |
 | `docs/site/reference/cli/index.md` | changed | Corrected claim, added one missing symbol and explicit re-export accounting |
+| `docs/site/reference/plugin/index.md` | changed | Added missing/partial subpath surfaces, re-export accounting, and removed stale rows |
+| Four derived docs assets | changed | First regeneration committed; final regeneration pending |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static docs | PASS (partial) | CLI `check:source-format` exit 0 |
-| Fitness/source accuracy | PASS (partial) | CLI `deno doc --json` accounting exit 0 |
+| Static docs | PASS (partial) | Both page source-format checks exit 0 |
+| Fitness/source accuracy | PASS (partial) | CLI 23/23 + 29/29; plugin 221/221, zero stale rows |
 | Runtime | N/A | Docs-only; Aspire/Docker prohibited |
 | Consumer/generated | NOT_RUN | Pending regeneration |
 
@@ -63,7 +67,7 @@ and the four-slice implementation shape is locked.
 
 ## Drift and Debt
 
-- Drift: measured plugin coverage differs by entrypoint; one-PR sizing decision recorded.
+- Drift: measured plugin coverage differs by entrypoint; two stale non-export rows removed; one-PR sizing decision recorded.
 - Debt: none created or changed.
 
 ## Commits

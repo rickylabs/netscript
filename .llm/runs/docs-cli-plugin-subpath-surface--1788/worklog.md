@@ -59,6 +59,11 @@ matching section with owned symbols and explicit re-export notes before regenera
 | 2026-08-30 | 1 | implementation | Corrected the nonexistent-page claim, documented `CacheBackendChoice`, and named testing re-exports. CLI accounting is 23/23 scaffolding and 29/29 testing. |
 | 2026-08-30 | 1 | gate | `check:source-format` exited 0. RTK was unavailable, so the authoritative rerun was direct. |
 | 2026-08-30 | 1 | reconcile | #1788 remains open at `status:impl`, milestone 0.0.7; #1777 remains reference-only. No scope or metadata adjustment needed. |
+| 2026-08-30 | 2 | generation | Regenerated exactly four derived assets from prose commit `495750d35`; provenance matched that commit and generators exited 0. |
+| 2026-08-30 | 2 | reconcile | Generated commit contains only the four expected assets; no lock or source drift. |
+| 2026-08-30 | 3 | implementation | Added 126 genuinely absent plugin symbols, explicit grouped re-export accounting, and removed two stale non-export rows. |
+| 2026-08-30 | 3 | gate | `check:source-format` and plugin symbol accounting both exited 0; 221/221 unique subpath symbols are represented and no table symbol is outside the package export surfaces. |
+| 2026-08-30 | 3 | reconcile | Scope remains docs-only and one-PR sizing remains appropriate. No source-level defect was found. |
 
 ## Decisions
 
@@ -80,6 +85,9 @@ matching section with owned symbols and explicit re-export notes before regenera
 | --- | --- | --- | --- |
 | CLI source format | `deno task --cwd docs/site check:source-format` | PASS (exit 0) | Direct rerun after unavailable RTK proxy. |
 | CLI symbol accounting | `deno doc --json` for both CLI subpaths compared with page symbols/re-export notes | PASS (exit 0) | 23/23 scaffolding; 29/29 testing. |
+| CLI asset generation | `gen:agent-docs-prose`; `gen:assets-barrel`; `gen:publish-assets` | PASS (all exit 0) | Exactly four expected assets; provenance `495750d35`. |
+| Plugin source format | `deno task --cwd docs/site check:source-format` | PASS (exit 0) | Page format accepted. |
+| Plugin symbol accounting | Twelve `deno doc --json` entrypoints compared with page tables/re-export notes | PASS (exit 0) | 221/221 unique symbols; zero non-export table rows. |
 
 Remaining gates are `NOT_RUN` until the plugin page and final generated assets are complete.
 

@@ -37,3 +37,16 @@ Drift is append-only.
 - **Severity:** minor.
 - **Action:** accept for this run and record real exit codes from direct commands.
 - **Evidence:** `worklog.md` progress/gate results.
+
+## 2026-08-30 — plugin CLI table contained two stale non-exports
+
+- **What:** `PluginItemScaffolder` and `PluginScaffoldResult` were documented in the plugin CLI
+  subpath table but are not exported by the root or any current plugin subpath.
+- **Source:** Root plus twelve per-entrypoint `deno doc --json` symbol sets compared with page table
+  rows.
+- **Expected:** Existing plugin summaries could be retained where accurate.
+- **Actual:** These two rows were not accurate and could not count toward current surface coverage.
+- **Severity:** minor.
+- **Action:** remove the two stale rows in the same docs-only page repair.
+- **Evidence:** `docs/site/reference/plugin/index.md`; plugin symbol-accounting check exits 0 with
+  zero missing symbols and zero table-only symbols.

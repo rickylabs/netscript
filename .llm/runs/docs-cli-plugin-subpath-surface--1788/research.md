@@ -19,6 +19,7 @@
 | 4 | Plugin coverage is not uniformly absent. `config`, `abstracts`, `loader`, `sdk`, and `testing` are substantively covered; `adapter`, `protocol`, `scaffold`, `contract-base`, and `service` are absent; `cli` and `templates` are partial. | Per-entrypoint symbol comparison recorded in the implementation lane output and summarized in `plan.md` |
 | 5 | Existing root/config/CLI/SDK symbols recur on several plugin subpaths. They should be called out as re-exports rather than described repeatedly. | Declaration locations in each `deno doc --json` symbol record |
 | 6 | `docs/site/**` feeds the rendered site corpus, then the compressed agent-docs assets, the CLI barrel, and MCP publish assets. | `.llm/tools/docs/build-agent-docs-bundle.ts`, `.llm/tools/generate-cli-assets-barrel.ts`, `.llm/tools/generate-publish-assets.ts`, root `deno.json` tasks |
+| 7 | The plugin CLI table contained two stale non-exports: `PluginItemScaffolder` and `PluginScaffoldResult`. Neither appears in the root or any subpath `deno doc --json` surface. | Compare all current table symbols against root plus twelve subpath symbol sets |
 
 ## jsr-audit surface scan
 
@@ -28,4 +29,3 @@
 ## Open questions
 
 - None. The source/page comparison resolves the plugin completeness judgment and the split decision.
-
