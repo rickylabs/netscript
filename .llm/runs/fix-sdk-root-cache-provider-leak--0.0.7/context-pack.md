@@ -12,14 +12,15 @@
 
 ## Current state
 
-After separate IMPL-EVAL and Tier-A acceptance, CI at `72ab6411` found shared generated assets stale
-because #1746 advanced `origin/main` to `f8b4f804`. The branch merged that exact main head without
-rebasing. All three conflicts were generated outputs already named in the locked ceiling. The
-agent-docs and publish-assets cascades produced measured stale prechecks followed by green generator
-and freshness checks; the MCP corpus was already fresh and remained byte-equivalent after its named
-generator. Focused merged-tree validation passes: SDK tests 70/70, Fresh bootstrap 11/11, nine-file
-check/lint/fmt with zero findings, docs export drift, and raw lock hygiene. The PR acceptance block,
-issue boxes, labels, and draft state remain coordinator-owned and unchanged.
+After separate IMPL-EVAL and Tier-A acceptance, the branch has integrated the final shared-asset
+sequence through #1755/main `a5520e70` without rebasing. The final merge conflicted only in the four
+coordinator-named generated outputs, which were regenerated through their named tasks. #1755's
+quickstart skills tree, #1748's Aspire terminology, and this leaf's SDK cache-provider migration
+prose coexist. Focused merged-tree validation passes: SDK tests 70/70, Fresh bootstrap 11/11,
+nine-file check/lint/fmt with zero findings, docs export drift, both entry graphs at zero unsafe
+edges, and raw lock comparison to `a5520e70`. The prior `ca46f565`/`f1ff5557` mechanical receipt is
+superseded; renewed currency is coordinator-owned. The PR acceptance block, issue boxes, labels, and
+draft state remain coordinator-owned and unchanged.
 
 S1 research/design remains against `origin/main` `13878a80a50c55b9662099fed64555f2310ae4a3`.
 PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `1bf9c567`: the archetype, doctrine, three-move design,
@@ -75,11 +76,11 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 
 ## In progress
 
-- Commit and explicit-refspec push of the final #1748 merged-main derivative refresh.
+- Commit and explicit-refspec push of the final #1755 merged-main derivative refresh.
 
 ## Next steps
 
-1. Push the final #1748 integration-refresh merge commit by explicit refspec.
+1. Push the final #1755 integration-refresh merge commit by explicit refspec.
 2. Leave the close-gate label-timing rerun, draft state, labels, issue text, and acceptance boxes to
    the coordinator.
 
@@ -118,8 +119,8 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 | Focused tests        | PASS               | 82 passed / 0 failed, including the entire SDK test directory and Fresh bootstrap test.       |
 | Type/lint/format     | PASS               | Nine owned TS files selected; zero diagnostics/findings and full coverage.                    |
 | Published surface   | PASS / NEGATIVE RECORDED | Preset doc + JSR + publish pass; at measured head `1ccddd6e`, base was 542 undeclared major changes and head was 552, with the +10 entirely SDK-scoped. |
-| Generated cascade   | PASS               | Post-#1748 agent-docs, assets-barrel, publish-assets, and MCP corpus final checks are fresh.    |
-| Lock hygiene        | PASS               | Raw `git diff --exit-code -- deno.lock` returned 0.                                           |
+| Generated cascade   | PASS               | Post-#1755 agent-docs, assets-barrel, publish-assets, and MCP corpus final checks are fresh.    |
+| Lock hygiene        | PASS               | Raw comparison to main `a5520e70` returned 0 for `deno.lock`.                                 |
 
 ## Open questions
 
@@ -143,4 +144,4 @@ None. S4 is evidence reconciliation only; mandatory IMPL-EVAL remains coordinato
 - S2 red-before: `ddf66a6f` (test and red evidence only).
 - S3 implementation: `1dd64dae` (product, docs, generated derivatives, and gate evidence).
 - S4 evidence reconciliation and integration refreshes: retained in branch history; the final
-  #1748 merge/evidence commit is pending this commit.
+  #1755 merge/evidence commit is pending this commit.

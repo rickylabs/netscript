@@ -116,3 +116,17 @@ requirements.
 - `gen:assets-barrel` changed only the authorized
   `packages/cli/src/kernel/assets/agent-docs.generated.ts`, including the SDK `./presets` inventory
   entry. No additional generated path was forced, so the rescope-and-stop condition did not fire.
+
+## 2026-08-30 — final post-#1755 derivative refresh
+
+- Severity: required final integration refresh inside the expanded ceiling; no design or product
+  rescope.
+- The branch merged #1755 at `a5520e70b43fa792c36451270742240e0f2aa889` without rebasing. The
+  four conflicts were exactly the shared generated outputs named by the coordinator. Incoming-main
+  versions were used as generator inputs, preserving #1755's quickstart skills tree and #1748's
+  Aspire terminology while the owned SDK migration pages remained intact.
+- Agent-docs, assets-barrel, and publish-assets prechecks were stale and passed after their named
+  generators. MCP export-corpus was already fresh; its generator and final check reproduced the
+  same hash. No additional output path was forced.
+- The prior `MECHANICAL_PASS` receipt `ca46f565`, evaluated at `f1ff5557`, is superseded by this
+  integration and is intentionally not treated as currency for the new head.

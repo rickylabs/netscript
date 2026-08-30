@@ -413,3 +413,38 @@ write the artifacts, not from a remembered list of gate names.** A list is what 
 No readiness flip, merge, relabel, issue edit, or acceptance-box tick from this step. The
 acceptance-evidence block is untouched: the earlier close-gate failure was a mirror label-timing race,
 not a mapping defect.
+
+## Final integration refresh after #1755 — `origin/main` `a5520e70`
+
+The branch merged GitHub-confirmed #1755 commit
+`a5520e70b43fa792c36451270742240e0f2aa889` without rebasing. All four conflicts were the expected
+shared generated outputs: the agent-docs prose/provenance pair, the authorized CLI agent-docs barrel,
+and the MCP publish asset. Each was restored to the incoming-main version before its named generator
+ran. `docs/site/quickstart.vto` remained byte-identical to current main, preserving #1755's canonical
+agent-skills tree; the owned SDK pages retained #1748's Aspire terminology and this leaf's explicit
+cache-provider migration prose. No resolution or generated leaf delta escaped the locked ceiling plus
+the coordinator-authorized CLI output.
+
+| Gate | Result | Artifact-derived evidence |
+| --- | --- | --- |
+| Agent-docs precheck | EXPECTED STALE (exit 1) | Lume built 639 files and rendered 227 HTML files; the checker named `prose.json.gz` and `provenance.json` stale and measured target SHA `17f33216cfa54e0e04f1d4b3ff63209964ff410608f28cf87c61aa7bb5a985ea`. |
+| Agent-docs generation/final | PASS (exit 0) | `gen:agent-docs-prose` produced that SHA; the final Lume-backed check returned `fresh: true` after the same 639-file/227-HTML build. |
+| Assets-barrel precheck | EXPECTED STALE (exit 1) | The task-generated comparison changed only `packages/cli/src/kernel/assets/agent-docs.generated.ts`; its embedded SDK export inventory retained/gained `./presets` while incorporating #1755's prose bundle. |
+| Assets-barrel generation/final | PASS (exit 0) | `gen:assets-barrel` was the only writer; final `check:assets-barrel` passed and no other barrel output changed. |
+| Publish-assets precheck | EXPECTED STALE (exit 1) | The checker named only `packages/mcp/src/publish-assets.generated.ts` stale after prose regeneration. |
+| Publish-assets generation/final | PASS (exit 0) | `gen:publish-assets` completed and final `check:publish-assets` passed; the CLI publish asset did not change. |
+| MCP export-corpus precheck | MEASURED PASS (exit 0) | The corpus was already fresh rather than stale: 35 packages, 271 subpaths, 7,668 symbols, SHA `76b5d30e12b5306530efa900bf817a8ac3a2f4854e381e232aca367e4efdbc57`. |
+| MCP export-corpus generation/final | PASS (exit 0) | The named generator and final check reproduced the same counts and SHA. |
+| Export/reference drift | PASS (exit 0) | `docs:exports-drift` retained SDK entrypoint coverage and reported `Exports & Symbols drift check: PASS`. |
+| Whole SDK test directory | PASS (exit 0) | Structured wrapper: 70 passed / 0 failed / 0 ignored. |
+| Fresh bootstrap test | PASS (exit 0) | Structured wrapper: 11 passed / 0 failed / 0 ignored. |
+| Nine-file scoped check | PASS (exit 0) | 9 selected in one batch; zero diagnostics and zero failed batches. |
+| Nine-file scoped lint | PASS (exit 0) | 9 selected/processed; zero findings, dropped files, or refusals. |
+| Nine-file scoped format | PASS (exit 0) | 9 selected/processed; zero findings, dropped files, or refusals. |
+| Published-entry graph proof | PASS (exit 0) | The committed predicate was re-run on the post-#1755 graph and measured 0 browser-unsafe edges from `packages/sdk/mod.ts` and 0 from `packages/sdk/src/presets/mod.ts`. |
+| Lock hygiene | PASS (exit 0) | Raw `git diff --exit-code a5520e70b43fa792c36451270742240e0f2aa889 -- deno.lock` returned 0. |
+
+The MCP precheck is recorded as the measured PASS it actually produced, not as the planned stale
+negative. The earlier `MECHANICAL_PASS` delta receipt at `ca46f565`/head `f1ff5557` is superseded by
+this integration and is not cited as current-head evidence; renewed evaluator currency remains
+coordinator-owned. The fenced acceptance-evidence block remains unchanged.
