@@ -7167,3 +7167,59 @@ unticked after the edit.**
    evaluated head away from the verdict.
 4. The mirror ticks the six boxes from the block; `close-gate` clears.
 5. Hand the coordinator the exact SHA with backing run/job IDs. Merge is the coordinator's.
+
+## 2026-08-30 — #1466 SHIPPED. PR #1731 merged; lane continues on #1730 and #1387
+
+### Merge facts, verified from GitHub rather than accepted
+
+| Field | Value |
+| --- | --- |
+| PR #1731 | **`MERGED`** at `2026-08-30T13:41:17Z`, `headRefOid` **`e325b7fe212f7cf7e0985c634af19e2bd4d5ea22`** |
+| Issue #1466 | **`CLOSED`**, `stateReason: COMPLETED`, `closedAt 13:41:18Z` — one second later, by the closing keyword |
+| Labels | both now **`status:shipped`** |
+| `origin/main` | **`3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c`** — `feat(sdk): define NetScriptProcedureMeta without erasing contract errors (#1731)` |
+
+### One reconciliation fact worth recording
+
+`git merge-base --is-ancestor e325b7fe origin/main` returns **false**. The merge was a **squash or
+rebase merge**, not a merge commit, so **none of this leaf's SHAs exist in `main`'s history** —
+`d5f3bf4c`, `dbd3eafa`, `ce73a038`, `b39faa1c`, `e325b7fe` are reachable only through the PR and this
+run's artifacts.
+
+That matters for provenance: every receipt, archive and verdict on this leaf is addressed by a content
+head that `main` cannot resolve. Anyone tracing "which commit did receipt X attest" must go to PR
+#1731, not to `git log main`. It also retroactively justifies the two refusals to rebase — had the
+branch been rebased mid-run, the receipts would have pointed at SHAs that never existed anywhere.
+
+**The content did land** — verified directly on `origin/main`, not inferred from the merge status:
+
+- `packages/contracts/src/domain/procedure-meta.ts` **present**
+- `commonErrorMap` **not** exported from `src/public/mod.ts` (**0** matches) — R-2/F-1 withdrawal held
+- contracts tagline **246 B** — the JSR-cap repair held
+- `ProcedureMeta` present in `packages/sdk/src/ports/mod.ts` — S2 propagation held
+
+### Follow-ups filed (previously ratified, previously unfiled)
+
+| Issue | Covers | Milestone |
+| --- | --- | --- |
+| **#1767** | **H-1** identifier rebinding + **H-2** annotation-span brittleness — one issue, same guard and same file, so no duplicate scope | `0.0.8` |
+| **#1768** | **H-4** base-inherited SDK JSR WARNs (`src` cardinality 13>12; slow-types level) | `Backlog / Triage` |
+| **#1769** | **R-3** *plus* the `docs-tagline` / `agent-docs-prose` catalog additions and touched-path gate-set derivation — filed **once**, since R-3 and Ruling 3 target the same catalog/matrix surface | `0.0.8` |
+
+All carry the namespaced taxonomy and an explicit milestone. #1731's body now links them instead of
+describing them as unfiled.
+
+### Lane state — deliberately not serialized behind #1731
+
+| Leaf | State |
+| --- | --- |
+| #1466 / PR #1731 | **SHIPPED** |
+| #1730 | **active** — S2 (the guard implementation) dispatched; plan `fd5d0447` locked |
+| #1387 | plan pushed (`5c82200b`, PR #1762); PLAN-EVAL owed |
+| #1664 | parked at `20337441788b` |
+
+Both remaining leaves are based on `main` and independent of each other. **Integration of current
+`main` happens at each leaf's own documented convergence point**, not on every advance — #1387's plan
+makes that explicit as its `S0` precondition (verify #1466 merged, rebase, re-run the base-gate
+census), which is **now satisfiable** for the first time: the metadata vocabulary is on `main` as of
+`3e5cbabf`.
