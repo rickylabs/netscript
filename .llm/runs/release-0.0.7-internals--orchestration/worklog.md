@@ -4350,3 +4350,61 @@ Job `0be8e970`, native Fable 5 / medium, artifact-only, currently verifying D1�
 `scaffold.runtime` placement and the `href`-throw site. The plan chose the harder honest option —
 **seed the product scaffold, not an injected fixture** — which makes it a public-surface change, and
 that is exactly what the evaluator was pointed at.
+
+## 2026-08-30 — #1734 sender recovery, push, and cycle-3 IMPL-EVAL dispatch
+
+### Stalled-sender recovery (coordinator-performed, verified here)
+
+The canonical #1734 sender `01a0515b-4d2f-7a91-b71e-43d0b209337c` stalled: no children, no output,
+clean head, **futex-stuck for 14+ minutes**. The coordinator terminated it and removed its stale
+thread lock **after PID proof**. Independently confirmed on this side before touching anything:
+
+| Probe | Result |
+| --- | --- |
+| `~/.codex/thread-writer-locks/01a0515b*` | **0** — lock removed |
+| `app-server-message-cli` holding `007-leaf-1736` | **none** |
+| Leaf head / worktree | `40ab61a7`, **dirty=0** |
+
+The ordering matters and is worth keeping: **PID proof first, then terminate, then remove the lock.**
+Removing a lock whose holder is alive is how two senders end up writing one thread — and this leaf,
+having already spent two terminal cycles, is the worst possible place to discover that. Earlier in
+this same leaf a `no rollout found` on a stale id nearly led me to launch a fresh thread, which
+returned terminal `duplicate_sender_risk`; the canonical sender was live all along. Same lesson from
+the opposite direction.
+
+### Push and Tier-A currency
+
+```
+git push origin HEAD:refs/heads/fix/fresh-query-hydration-readonly-state
+   eb765629..40ab61a7  (fast-forward)   EXIT 0
+```
+
+No credential boundary here — unlike #1533, this branch touches no `.github/workflows/**` file, so
+the `repo`-scope PAT is sufficient. **local == remote == PR == `40ab61a7`**, draft preserved.
+
+Tier-A currency confirmed: my GREEN verification was run at **exactly** this head — roundtrip
+`11 passed / 0 failed`, `packages/fresh/tests/` `19 passed / 0 failed`, and scoped `check`,
+`check:assets-barrel`, `quality:scan`, `arch:check` all raw exit **0**. Scope versus the parked head
+is exactly `hydration.ts` + its new test.
+
+### Cycle-3 IMPL-EVAL dispatched
+
+Job `fff83fce`, native `claude-fable-5` / medium, own detached worktree at `40ab61a7`, zero
+provider-override env vars, artifact-only (`impl-eval-cycle-3.md` + one verdict comment; both prior
+verdicts stay bit-identical).
+
+The brief states plainly that **this leaf's entire history is one failure shape** — verifying the
+direction you were worried about and assuming the adjacent one — and names all three instances
+including my own Tier-A. It requires the evaluator to attack **both** directions and say which
+assertion covers which: over-permissiveness (`null`, `undefined`, functions, symbols, class
+instances, `Object.create(null)`, prototype pollution, with the cycle-2 attack suite still
+rejecting) **and** over-strictness against `main` through the real
+`renderToString(<QueryHydrationScript/>)` transport. It is also told, since this is the final
+authorized cycle, **not to soften a failure to avoid escalation**.
+
+### Lane state
+
+All three internals senders reached terminal. `#1533` idle at `4cdee82f` with F1–F4 closed and #1766
+corrected 21→20, awaiting its cycle-2 IMPL-EVAL behind #1734 in the single evaluator slot. `#1616`
+handed to **fixes** (ownership correction recorded — internals opened it in error and implemented
+nothing) with a clean plan checkpoint and a completed `FAIL_FIX` PLAN-EVAL. `#1774` queued.
