@@ -3632,3 +3632,60 @@ was applied — so its live read will observe `status:ready-merge`.
 
 Recorded because the failure mode is subtle: a local gate that returns FAIL for a structural reason
 looks identical to a real product failure, and retrying it would never have changed the answer.
+
+## 2026-08-30 — #1758 CI terminal RED at `72ab6411`; two failures of different kinds
+
+Readiness rolled back: PR #1758 → **`status:ci-fail`**, issue #1462 → **`status:impl`**, exactly one
+`status:` on each. The draft flip stands; the labels tell the truth about the state.
+
+**A taxonomy violation was created and immediately caught.** After the rollback, PR #1758 briefly
+carried **two** `status:` labels — `status:impl-eval` alongside `status:ci-fail` — because the
+phase-eval automation re-applies `impl-eval` on its own, and the `status:ready-merge` delete returned
+404 since the automation had already displaced it. This is the identical trap this lane recorded on
+#1729: *always re-read the label set after a readiness flip*. Re-read, removed the stray, verified
+exactly one `status:` on both objects by counting rather than eyeballing.
+
+### Failure 1 — `Generated asset freshness` (quality job). Real, and owned by this leaf.
+
+`#1746` merged and moved shared generated assets; `origin/main` is now **`f8b4f804`** (was
+`13878a80a`). The branch's regenerated derivatives are stale against it. Per the owner's direction
+this is a **required integration refresh, not rerun noise**.
+
+Dispatched: **merge** `f8b4f804` (not rebase — the gate receipts must keep commit correspondence, the
+same reason #1729 merged), resolve only inside the locked ceiling with any outside path being a
+rescope-and-stop, regenerate the owned derivatives through their `gen:` tasks in the locked
+precheck → generate → recheck order, re-run the focused gates at the merged head, and commit-and-push
+first.
+
+### Failure 2 — `Referenced issue acceptance gate` (close-gate job). **Not a mapping defect.**
+
+The owner's instruction was to "repair/revalidate the exact acceptance mapping". Revalidated — and the
+mapping is **correct**, so there is nothing to repair. Diagnosed from the CI log rather than the job
+summary:
+
+```
+acceptance-mirror APPLIED: no changes
+notice: Mirror skipped because live PR labels do not include status:ready-merge
+```
+
+The mirror step **succeeded by skipping**. Its live label read at 12:26:47 happened a moment before
+`status:ready-merge` landed, so it declined to mirror; the close-gate then legitimately found five
+unticked boxes. Independently confirmed that the mapping itself is sound: the five `box:` strings
+match issue #1462's acceptance lines **verbatim**, the block carries `issue: 1462`, and every entry
+has an `evidence:` field — the parser's stated requirements.
+
+So this failure is a **label-timing race**, and the fix is the tool's own prescribed remedy: apply the
+label, then re-run CI so its live reads observe it. The author was told explicitly **not** to touch the
+evidence block, because editing correct evidence to chase a red is how a leaf ends up with worse
+evidence than it started with.
+
+That distinction is why the log was worth reading: a mirror step that "succeeds" while skipping is
+indistinguishable from one that mirrored, and the close-gate's downstream failure looks identical to a
+genuine mapping error.
+
+### Sequencing note for the re-run
+
+`status:ready-merge` must be present **before** the CI run that is expected to pass, since the mirror
+reads labels live. The order is therefore: merged head green → re-apply `status:ready-merge` → re-run
+CI → close-gate observes ticked boxes. Applying the label earlier would contradict the `ci-fail` state
+the owner asked to hold.
