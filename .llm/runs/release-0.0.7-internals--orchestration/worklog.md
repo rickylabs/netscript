@@ -4841,3 +4841,43 @@ a unit-test verdict.
    prose. **Hedging in prose while asserting in the ledger is not honest recording** — the ledger is
    what future readers act on. Corrected in the leaf worklog, the internals worklog, and the cycle-4
    evaluator brief before dispatch.
+
+## 2026-08-30 — #1774 PLAN-EVAL cycle 2 `PASS`; bounded implementation dispatched
+
+Verdict `2cfc0b4c9` at evaluated head `2e5f50f0`, artifact-only (empty product diff), cycle-1
+`plan-eval.md` bit-identical. Evaluator stopped once its verdict was pushed.
+
+All four cycle-1 required fixes discharged. The one that mattered was checked the right way: the
+evaluator **grepped the whole run dir for the wrong claim** and confirmed no reader-facing text still
+says `CLAUDE_PROJECT_DIR` "follows each worktree", with only the drift entry's historical *Expected*
+line remaining — correct by design. Verifying the **absence** of a false premise everywhere is
+stronger than confirming the corrected one in a single place, and that false premise was what the
+entire repair rested on.
+
+### The non-blocking nit is the interesting finding
+
+`research.md:59-63` carries a Markdown table misalignment from the cycle-1 amendment, and the PR
+body's *"structured format check — pass, 4 files / 0 findings"* therefore covered **four of five**
+changed files. The misalignment is trivial; **the receipt silently covering a subset is not.** That is
+the same false-green class this milestone keeps producing — the ANSI colour undercount (24 vs 165),
+the empty-selection `deno check` exit 0, the stale census, the sealing rows that contradicted their
+host. Folded into the dispatch with the generalizable instruction: **count all changed files in
+future format receipts**, because the defect is the receipt's scope, not the table.
+
+### Implementation dispatched — bounded
+
+Thread `01a05331` (Sol · medium), delivered, lock held. Scope: S3 **RED first** (nested-cwd fixture
+failing before the repair; `PreToolUse` **and** `Stop` each proven individually; temp-dir decoy via
+`Deno.makeTempDir` with `try/finally`, never under `worktrees/`, asserting both the RED marker-present
+and GREEN marker-absent expectations) → `${CLAUDE_PROJECT_DIR}` resolution with the `Deno.cwd()`
+fallback only when absent → gate-5 host-path assertion over the enumerated six-file owned set →
+`agentic:check-claude` plus the mandatory `validate-claude-surface.ts`.
+
+Constraints carried: no Aspire/Docker/`e2e:cli`/`scaffold.runtime` — the sole host runtime lease is the
+Aspire lane's and local runtime stays at exact zero; CI wiring isolated into a final commit so the
+branch stays pushable under the `repo`-only PAT; **no rebase** — `main` `52a881c58` is inert for this
+surface (0 files under `.claude/**` or `.llm/tools/agentic/**`), verified rather than assumed.
+
+Watcher `bv2r41hxb` armed on commits, turn end, **and rollout-growth stall** — the signal that
+distinguishes a hung worker from a quiet one, learned the hard way today when a 45-second sample read
+as a stall and a 60-second one showed 118 KB of progress.
