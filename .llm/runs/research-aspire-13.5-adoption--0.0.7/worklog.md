@@ -390,4 +390,7 @@ checks 1–5 PASS; all prose findings CLOSED. Leaf stopped per ruling; dispositi
 coordinator decides. | | D-63 ruling applied | PR #1771 body: exact disposition (8 edited rows + new
 #1642 page + 113 verified-clean, 0 deferred, proving scans, base `a46ea16d`) embedded via REST.
 Gemini M3 worklog correction running. **S13 released** — `launch-codex-slice` dispatched on
-`chore/aspire-13-5-s13-stale-surface-cleanup` @ `a46ea16d`. Runtime zero. |
+`chore/aspire-13-5-s13-stale-surface-cleanup` @ `a46ea16d`. Runtime zero. | | S11 M3 landed; polish
+launched; S13 live | Gemini docs-only commit `8149c7a4` (worklog 8/113, DONE). Fable docs_polish
+dispatched at `8149c7a4`. S13 thread `01a05348-6d4d-7413-a7d4-da98df0c720e` (openai · gpt-5.6-sol ·
+medium, matched) on `007-aspire-s13` @ `a46ea16d`. Runtime zero. |
