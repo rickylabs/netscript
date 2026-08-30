@@ -132,3 +132,17 @@ the entire `b4ca8a1d3` runtime-module split.
 
 The original S6 history above is intentionally preserved as audit context. The reconstruction-v2
 worklog section and receipt are authoritative for this corrected branch.
+
+## D-101 scratch-only synthetic listener fixture
+
+Starting from fetched PR tip `60985a98f`, the E2E harness replaces resource stop/Docker pause with
+an Aspire-managed controller task that owns fixed localhost TCP/RESP listeners. A revisioned atomic
+state file plus acknowledgement controls close/reopen; no product generator is edited. The
+pre-start fixture calls the real app/infrastructure generators as libraries and splices test-only
+health registrations at generator-derived markers.
+
+Database dispatch has one source: `listenerFaultExpectations(database)` beside
+`createListenerReadinessGates(database)`. Postgres exercises synthetic Postgres+Garnet checks;
+SQLite and MySQL/MSSQL overrides exercise Garnet only. Focused static evidence is 52/52 tests plus
+zero-diagnostic nine-file check/lint/fmt, clean quality scan, and exit-0 architecture check. The
+supervisor still owns all lease-backed runtime verification.

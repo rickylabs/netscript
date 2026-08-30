@@ -75,3 +75,16 @@ documentation.
 - **Evidence:** focused structured tests 53/53; five-file structured check 0 diagnostics; lint/fmt
   PASS; generated asset reproduced; `quality:gate` exit 0; host runtime inventory reported zero
   Aspire resources and zero Docker containers.
+
+## 2026-08-31 — D-101 supersedes resource lifecycle and Docker-pause fault injection
+
+- **What:** Commits `fbaa0bb89`/`60985a98f` attempted to make a real backing listener unreachable
+  by pausing its container and resolving the ID-suffixed resource name.
+- **Expected:** The listener fixture deterministically exercises the shipped TCP/RESP health-check
+  factories without changing real backing-resource health or relying on host topology.
+- **Actual:** A paused container still accepts bare TCP handshakes at the kernel; resource stop
+  freezes Aspire's health evaluation; container stop is not portable DCP behavior.
+- **Severity:** significant.
+- **Action:** D-101 replaces the mechanism with harness-owned synthetic listeners controlled by an
+  Aspire-managed task and preserves real-key continuity in the receipt. No Docker permission or
+  lifecycle command remains in this path.

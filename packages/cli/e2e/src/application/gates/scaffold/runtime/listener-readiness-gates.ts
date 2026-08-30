@@ -4,10 +4,14 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../../domain/cli-surface.ts';
-import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../../domain/run-context.ts';
+import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import { commandGate } from '../gate-factory.ts';
+import {
+  TEST_ONLY_GARNET_HEALTH_KEY,
+  TEST_ONLY_POSTGRES_HEALTH_KEY,
+} from './listener-fault-controller.ts';
 
 const DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS = 300;
 const MSSQL_LISTENER_WAIT_TIMEOUT_SECONDS = 600;
@@ -17,6 +21,12 @@ export interface ListenerReadinessExpectation {
   readonly resource: string;
   readonly healthCheckKey: string;
   readonly timeoutSeconds: number;
+}
+
+/** Closed D-101 ownership contract for one synthetic listener and its real backing check. */
+export interface ListenerFaultExpectation extends ListenerReadinessExpectation {
+  readonly realHealthCheckKey: string;
+  readonly controllerListener: 'postgres' | 'garnet';
 }
 
 /** Resolve the named custom health report attached to a runtime backing service. */
@@ -69,7 +79,6 @@ export function listenerReadinessWaitCommand(
 export function createListenerReadinessGates(
   database: DatabaseEngine = DATABASE.POSTGRES,
 ): readonly GateDefinition[] {
-  const expectations = listenerUnreachableExpectations(database);
   return [
     commandGate(
       GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE,
@@ -78,39 +87,55 @@ export function createListenerReadinessGates(
       (context) => [
         'deno',
         'run',
-        '--allow-run=aspire,docker',
+        '--allow-read',
         '--allow-write',
+        '--allow-run=aspire',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts`,
         context.project.appHost,
         context.project.projectRoot,
-        JSON.stringify(expectations),
+        database,
       ],
       (context) => context.project.projectRoot,
     ),
   ];
 }
 
-/** Failure/recovery resources for the selected runtime tier. */
-export function listenerUnreachableExpectations(
+/** Return the only two health checks the fault fixture is allowed to manipulate. */
+export function listenerFaultExpectations(
   database: DatabaseEngine,
-): readonly ListenerReadinessExpectation[] {
-  const databaseExpectation = databaseListenerExpectation(database);
-  const garnetExpectation = listenerReadinessExpectation(ASPIRE_RESOURCE.GARNET);
-  if (!garnetExpectation) throw new Error('Garnet listener readiness contract is missing.');
-  return databaseExpectation ? [databaseExpectation, garnetExpectation] : [garnetExpectation];
-}
-
-function databaseListenerExpectation(
-  database: DatabaseEngine,
-): ListenerReadinessExpectation | undefined {
+): readonly ListenerFaultExpectation[] {
+  const garnet: ListenerFaultExpectation = {
+    resource: ASPIRE_RESOURCE.GARNET,
+    healthCheckKey: TEST_ONLY_GARNET_HEALTH_KEY,
+    realHealthCheckKey: 'garnet_resp',
+    controllerListener: 'garnet',
+    timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+  };
   switch (database) {
     case DATABASE.POSTGRES:
-      return listenerReadinessExpectation(ASPIRE_RESOURCE.POSTGRES);
+      return [{
+        resource: ASPIRE_RESOURCE.POSTGRES,
+        healthCheckKey: TEST_ONLY_POSTGRES_HEALTH_KEY,
+        realHealthCheckKey: 'postgres_listener',
+        controllerListener: 'postgres',
+        timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+      }, garnet];
     case DATABASE.MYSQL:
-      return listenerReadinessExpectation(ASPIRE_RESOURCE.MYSQL);
     case DATABASE.MSSQL:
-      return listenerReadinessExpectation(ASPIRE_RESOURCE.MSSQL);
     case DATABASE.SQLITE:
-      return undefined;
+      return [garnet];
+  }
+}
+
+/** Parse the closed database axis used by D-101 subprocess arguments. */
+export function parseListenerFaultDatabase(value: string): DatabaseEngine {
+  switch (value) {
+    case DATABASE.POSTGRES:
+    case DATABASE.MYSQL:
+    case DATABASE.MSSQL:
+    case DATABASE.SQLITE:
+      return value;
+    default:
+      throw new Error(`unsupported listener-fault database: ${value}`);
   }
 }

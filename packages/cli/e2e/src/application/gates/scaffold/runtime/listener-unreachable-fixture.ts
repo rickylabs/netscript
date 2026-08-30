@@ -1,20 +1,43 @@
-import type { ListenerReadinessExpectation } from './listener-readiness-gates.ts';
+import type { DatabaseEngine } from '../../../../domain/extension-axes.ts';
+import {
+  LISTENER_FAULT_ACK_FILE,
+  LISTENER_FAULT_STATE_FILE,
+  type ListenerFaultState,
+  parseListenerFaultState,
+  TEST_ONLY_GARNET_HEALTH_KEY,
+  TEST_ONLY_POSTGRES_HEALTH_KEY,
+} from './listener-fault-controller.ts';
+import {
+  type ListenerFaultExpectation,
+  listenerFaultExpectations,
+  parseListenerFaultDatabase,
+} from './listener-readiness-gates.ts';
 import {
   type ListenerHealthReport,
   readListenerHealthReport,
-  resourceMatches,
 } from './verify-listener-readiness.ts';
 
-const UNHEALTHY_DESCRIPTION = /listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
 const REPORT_DEADLINE_MS = 30_000;
 const REPORT_POLL_MS = 1_000;
+const CONTROLLER_ACK_DEADLINE_MS = 5_000;
+const CONTROLLER_ACK_POLL_MS = 50;
 
 interface ListenerRecoveryReceipt {
   readonly resource: string;
   readonly healthCheckKey: string;
+  readonly realHealthCheckKey: string;
+  readonly baseline: {
+    readonly testOnly: ListenerHealthReport;
+    readonly realBacking: readonly ListenerHealthReport[];
+  };
   readonly unhealthy: ListenerHealthReport;
   readonly waitExitCode: number;
   readonly recovered: ListenerHealthReport;
+  readonly realKeyContinuity: {
+    readonly duringFailure: readonly ListenerHealthReport[];
+    readonly afterWait: readonly ListenerHealthReport[];
+    readonly afterRecovery: readonly ListenerHealthReport[];
+  };
 }
 
 interface AspireResult {
@@ -25,53 +48,43 @@ interface AspireResult {
 }
 
 /**
- * Exercise pause → Unhealthy/exit-18 → unpause → Healthy for each selected backing service.
+ * Exercise D-101's harness-owned close → Unhealthy/exit-18 → reopen → Healthy flow.
  *
- * Why not `aspire resource <name> stop`: on 13.5.3 a persistent-lifetime backing container
- * (the scaffold default) survives `stop` — the container keeps running and its listener stays
- * reachable — and `stop` also suspends Aspire's own health-check evaluation for that resource,
- * so `healthReports` simply freezes at its last known value instead of ever transitioning to
- * `Unhealthy`. The resource must stay started (so Aspire keeps actively evaluating its attached
- * health check) while the underlying container's listener becomes genuinely unreachable — that
- * is a container-level process suspension (`docker pause`/`unpause`), not an Aspire resource
- * lifecycle change.
+ * The backing Postgres/Garnet resources never stop or pause. An Aspire-managed E2E task owns two
+ * synthetic listeners and applies revisioned file commands, so the fixture exercises the exact
+ * shipped TCP/RESP health factories without Docker, signals, relays, or resource lifecycle calls.
  */
 export async function verifyListenerFailureRecovery(
   appHost: string,
   projectRoot: string,
-  expectations: readonly ListenerReadinessExpectation[],
+  database: DatabaseEngine,
 ): Promise<readonly ListenerRecoveryReceipt[]> {
+  const expectations = listenerFaultExpectations(database);
+  for (const expectation of expectations) assertOwnedListenerFaultExpectation(expectation);
+
+  const baselineTests = await Promise.all(
+    expectations.map((expectation) => pollHealthyReport(appHost, expectation, expectations)),
+  );
+  const baselineReal = await requireRealBackingHealthy(appHost, expectations);
+  await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+
   const receipts: ListenerRecoveryReceipt[] = [];
-  for (const expectation of expectations) {
-    let paused = false;
-    let containerId: string | undefined;
-    let unhealthy: ListenerHealthReport | undefined;
-    let waitExitCode: number | undefined;
-    try {
-      containerId = readResourceContainerId(
-        JSON.parse(
-          (await requireAspireSuccess([
-            'describe',
-            '--apphost',
-            appHost,
-            '--format',
-            'Json',
-            '--non-interactive',
-            '--nologo',
-          ])).stdout,
-        ),
-        expectation.resource,
-      );
-      await requireDockerSuccess(['pause', containerId]);
-      paused = true;
-      unhealthy = await pollReport(
+  let primaryFailure: unknown;
+  let cleanupFailure: unknown;
+  try {
+    for (let index = 0; index < expectations.length; index += 1) {
+      const expectation = expectations[index];
+      await commandController(projectRoot, closedState(expectation));
+      const unhealthy = await pollReport(
         appHost,
         expectation,
+        expectations,
         (report) =>
           report.status === 'Unhealthy' &&
           report.description !== undefined &&
-          UNHEALTHY_DESCRIPTION.test(report.description),
+          expectedUnhealthyDescription(expectation).test(report.description),
       );
+      const duringFailure = await requireRealBackingHealthy(appHost, expectations);
 
       const wait = await runAspire([
         'wait',
@@ -85,36 +98,46 @@ export async function verifyListenerFailureRecovery(
         '--non-interactive',
         '--nologo',
       ]);
-      waitExitCode = wait.code;
-      if (waitExitCode !== 18) {
+      if (wait.code !== 18) {
         throw new Error(
-          `aspire wait ${expectation.resource} exited ${waitExitCode}, expected 18: ${
+          `aspire wait ${expectation.resource} exited ${wait.code}, expected 18: ${
             wait.stderr || wait.stdout
           }`,
         );
       }
-    } finally {
-      if (paused && containerId) {
-        await requireDockerSuccess(['unpause', containerId]);
-      }
-    }
+      const afterWait = await requireRealBackingHealthy(appHost, expectations);
 
-    if (!unhealthy || waitExitCode === undefined) {
-      throw new Error(`${expectation.resource} did not produce complete unhealthy evidence`);
+      await commandController(projectRoot, reopenedState(expectation));
+      const recovered = await pollHealthyReport(appHost, expectation, expectations);
+      const afterRecovery = await requireRealBackingHealthy(appHost, expectations);
+      receipts.push({
+        resource: expectation.resource,
+        healthCheckKey: expectation.healthCheckKey,
+        realHealthCheckKey: expectation.realHealthCheckKey,
+        baseline: { testOnly: baselineTests[index], realBacking: baselineReal },
+        unhealthy,
+        waitExitCode: wait.code,
+        recovered,
+        realKeyContinuity: { duringFailure, afterWait, afterRecovery },
+      });
     }
-    const recovered = await pollReport(
-      appHost,
-      expectation,
-      (report) => report.status === 'Healthy',
-    );
-    receipts.push({
-      resource: expectation.resource,
-      healthCheckKey: expectation.healthCheckKey,
-      unhealthy,
-      waitExitCode,
-      recovered,
-    });
+  } catch (error) {
+    primaryFailure = error;
+  } finally {
+    try {
+      await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+    } catch (error) {
+      cleanupFailure = error;
+    }
   }
+  if (primaryFailure && cleanupFailure) {
+    throw new AggregateError(
+      [primaryFailure, cleanupFailure],
+      'listener recovery failed and the controller could not reopen every listener',
+    );
+  }
+  if (primaryFailure) throw primaryFailure;
+  if (cleanupFailure) throw cleanupFailure;
 
   const receiptDir = `${projectRoot}/.netscript/e2e`;
   const receiptPath = `${receiptDir}/listener-unreachable-receipt.json`;
@@ -124,26 +147,77 @@ export async function verifyListenerFailureRecovery(
   return receipts;
 }
 
+function closedState(
+  expectation: ListenerFaultExpectation,
+): Pick<ListenerFaultState, 'postgresOpen' | 'garnetOpen'> {
+  assertOwnedListenerFaultExpectation(expectation);
+  return expectation.controllerListener === 'postgres'
+    ? { postgresOpen: false, garnetOpen: true }
+    : { postgresOpen: true, garnetOpen: false };
+}
+
+function reopenedState(
+  expectation: ListenerFaultExpectation,
+): Pick<ListenerFaultState, 'postgresOpen' | 'garnetOpen'> {
+  assertOwnedListenerFaultExpectation(expectation);
+  return { postgresOpen: true, garnetOpen: true };
+}
+
+/** Fail closed unless a target is one of D-101's two hardcoded test-only checks. */
+export function assertOwnedListenerFaultExpectation(
+  expectation: ListenerFaultExpectation,
+): void {
+  const ownedPostgres = expectation.controllerListener === 'postgres' &&
+    expectation.resource === 'postgres' &&
+    expectation.healthCheckKey === TEST_ONLY_POSTGRES_HEALTH_KEY &&
+    expectation.realHealthCheckKey === 'postgres_listener';
+  const ownedGarnet = expectation.controllerListener === 'garnet' &&
+    expectation.resource === 'garnet' &&
+    expectation.healthCheckKey === TEST_ONLY_GARNET_HEALTH_KEY &&
+    expectation.realHealthCheckKey === 'garnet_resp';
+  if (!ownedPostgres && !ownedGarnet) {
+    throw new Error('listener fault fixture refused a non-test-only health-check target');
+  }
+}
+
+function expectedUnhealthyDescription(expectation: ListenerFaultExpectation): RegExp {
+  return expectation.controllerListener === 'postgres'
+    ? /tcp listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/
+    : /RESP listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
+}
+
+async function pollHealthyReport(
+  appHost: string,
+  expectation: ListenerFaultExpectation,
+  continuity: readonly ListenerFaultExpectation[],
+): Promise<ListenerHealthReport> {
+  return await pollReport(
+    appHost,
+    expectation,
+    continuity,
+    (report) => report.status === 'Healthy',
+  );
+}
+
 async function pollReport(
   appHost: string,
-  expectation: ListenerReadinessExpectation,
+  expectation: ListenerFaultExpectation,
+  continuity: readonly ListenerFaultExpectation[],
   accepts: (report: ListenerHealthReport) => boolean,
 ): Promise<ListenerHealthReport> {
   const deadline = Date.now() + REPORT_DEADLINE_MS;
   let last = 'report absent';
   while (Date.now() < deadline) {
+    let topology: unknown;
     try {
-      const topology = JSON.parse(
-        (await requireAspireSuccess([
-          'describe',
-          '--apphost',
-          appHost,
-          '--format',
-          'Json',
-          '--non-interactive',
-          '--nologo',
-        ])).stdout,
-      );
+      topology = JSON.parse(await describe(appHost));
+    } catch (error) {
+      last = error instanceof Error ? error.message : String(error);
+      await delay(REPORT_POLL_MS);
+      continue;
+    }
+    assertRealBackingHealthy(topology, continuity);
+    try {
       const report = readListenerHealthReport(
         topology,
         expectation.resource,
@@ -154,11 +228,89 @@ async function pollReport(
     } catch (error) {
       last = error instanceof Error ? error.message : String(error);
     }
-    await new Promise((resolve) => setTimeout(resolve, REPORT_POLL_MS));
+    await delay(REPORT_POLL_MS);
   }
   throw new Error(
     `${expectation.resource} healthReports.${expectation.healthCheckKey} missed its 30s transition; last=${last}`,
   );
+}
+
+async function requireRealBackingHealthy(
+  appHost: string,
+  expectations: readonly ListenerFaultExpectation[],
+): Promise<readonly ListenerHealthReport[]> {
+  return assertRealBackingHealthy(JSON.parse(await describe(appHost)), expectations);
+}
+
+function assertRealBackingHealthy(
+  topology: unknown,
+  expectations: readonly ListenerFaultExpectation[],
+): readonly ListenerHealthReport[] {
+  return expectations.map((expectation) => {
+    const report = readListenerHealthReport(
+      topology,
+      expectation.resource,
+      expectation.realHealthCheckKey,
+    );
+    if (report.status !== 'Healthy') {
+      throw new Error(
+        `${expectation.resource} real backing health ${expectation.realHealthCheckKey} changed to ${report.status}`,
+      );
+    }
+    return report;
+  });
+}
+
+async function commandController(
+  projectRoot: string,
+  desired: Pick<ListenerFaultState, 'postgresOpen' | 'garnetOpen'>,
+): Promise<ListenerFaultState> {
+  const statePath = `${projectRoot}/${LISTENER_FAULT_STATE_FILE}`;
+  const current = parseListenerFaultState(await Deno.readTextFile(statePath));
+  const next: ListenerFaultState = {
+    revision: current.revision + 1,
+    ...desired,
+  };
+  await writeJsonAtomically(statePath, next);
+
+  const acknowledgementPath = `${projectRoot}/${LISTENER_FAULT_ACK_FILE}`;
+  const deadline = Date.now() + CONTROLLER_ACK_DEADLINE_MS;
+  while (Date.now() < deadline) {
+    try {
+      const acknowledged = parseListenerFaultState(await Deno.readTextFile(acknowledgementPath));
+      if (acknowledged.revision === next.revision) {
+        if (
+          acknowledged.postgresOpen !== next.postgresOpen ||
+          acknowledged.garnetOpen !== next.garnetOpen
+        ) {
+          throw new Error(`listener controller acknowledged revision ${next.revision} incorrectly`);
+        }
+        return acknowledged;
+      }
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+    await delay(CONTROLLER_ACK_POLL_MS);
+  }
+  throw new Error(`listener controller did not acknowledge revision ${next.revision} within 5s`);
+}
+
+async function writeJsonAtomically(path: string, value: unknown): Promise<void> {
+  const temporary = `${path}.tmp-${Deno.pid}`;
+  await Deno.writeTextFile(temporary, `${JSON.stringify(value, null, 2)}\n`);
+  await Deno.rename(temporary, path);
+}
+
+async function describe(appHost: string): Promise<string> {
+  return (await requireAspireSuccess([
+    'describe',
+    '--apphost',
+    appHost,
+    '--format',
+    'Json',
+    '--non-interactive',
+    '--nologo',
+  ])).stdout;
 }
 
 async function requireAspireSuccess(args: readonly string[]): Promise<AspireResult> {
@@ -185,71 +337,20 @@ async function runAspire(args: readonly string[]): Promise<AspireResult> {
   };
 }
 
-/** Read `properties["container.id"]` for a named resource from `aspire describe` topology. */
-function readResourceContainerId(topology: unknown, resourceName: string): string {
-  const resources = isRecord(topology) && Array.isArray(topology.resources)
-    ? topology.resources
-    : [];
-  for (const candidate of resources) {
-    if (!isRecord(candidate) || !resourceMatches(candidate, resourceName)) continue;
-    const properties = candidate.properties;
-    const id = isRecord(properties) ? properties['container.id'] : undefined;
-    if (typeof id !== 'string' || id.length === 0) {
-      throw new Error(`${resourceName} omitted properties["container.id"]`);
-    }
-    return id;
-  }
-  throw new Error(`${resourceName} not found in describe topology`);
-}
-
-async function requireDockerSuccess(args: readonly string[]): Promise<void> {
-  const output = await new Deno.Command('docker', {
-    args: [...args],
-    stdout: 'piped',
-    stderr: 'piped',
-  })
-    .output();
-  if (!output.success) {
-    throw new Error(
-      `docker ${args.join(' ')} failed (${output.code}): ${
-        new TextDecoder().decode(output.stderr).trim()
-      }`,
-    );
-  }
-}
-
-function parseExpectations(value: string): readonly ListenerReadinessExpectation[] {
-  const parsed: unknown = JSON.parse(value);
-  if (!Array.isArray(parsed) || parsed.length === 0) {
-    throw new Error('listener readiness expectations must be a non-empty array');
-  }
-  return parsed.map((entry, index) => {
-    if (
-      !isRecord(entry) ||
-      typeof entry.resource !== 'string' ||
-      typeof entry.healthCheckKey !== 'string' ||
-      typeof entry.timeoutSeconds !== 'number'
-    ) {
-      throw new Error(`listener readiness expectation ${index} is invalid`);
-    }
-    return {
-      resource: entry.resource,
-      healthCheckKey: entry.healthCheckKey,
-      timeoutSeconds: entry.timeoutSeconds,
-    };
-  });
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+function delay(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 if (import.meta.main) {
   const appHost = Deno.args[0];
   const projectRoot = Deno.args[1];
-  const expectations = Deno.args[2];
+  const database = Deno.args[2];
   if (!appHost) throw new Error('AppHost path argument is required');
   if (!projectRoot) throw new Error('project root argument is required');
-  if (!expectations) throw new Error('listener readiness expectations are required');
-  await verifyListenerFailureRecovery(appHost, projectRoot, parseExpectations(expectations));
+  if (!database) throw new Error('database argument is required');
+  await verifyListenerFailureRecovery(
+    appHost,
+    projectRoot,
+    parseListenerFaultDatabase(database),
+  );
 }

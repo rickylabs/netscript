@@ -47,3 +47,10 @@ reconstruction while preserving the original S6 audit record.
 The owner explicitly prohibited runtime, AppHost, container, evaluator, and CI-dispatch activity
 for this reconstruction. Accordingly, the implementation thread completed only the static gate
 matrix and generated-consumer type-check; it did not start or delegate an evaluator session.
+
+## D-101 implementation-lane override
+
+The owner selected Codex GPT-5.6 Sol at medium effort for the bounded E2E-harness-only D-101 slice
+starting from fetched PR-branch tip `60985a98f`. Product implementation is restricted to
+`packages/cli/e2e/`; run-artifact updates remain the harness evidence exception. The supervisor
+retains lease-backed runtime verification and separate-session evaluation.

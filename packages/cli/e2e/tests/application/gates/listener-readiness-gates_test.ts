@@ -5,10 +5,11 @@ import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../src/domain/ext
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import {
   createListenerReadinessGates,
+  listenerFaultExpectations,
   listenerReadinessExpectation,
   listenerReadinessWaitCommand,
-  listenerUnreachableExpectations,
 } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
+import { assertOwnedListenerFaultExpectation } from '../../../src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts';
 import { readListenerHealthReport } from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
 
 Deno.test('listener readiness maps database and RESP resources to stable report keys', () => {
@@ -81,31 +82,60 @@ Deno.test('listener wait command verifies the named report after Aspire wait', (
   ]);
 });
 
-Deno.test('failure/recovery gate selects database plus Garnet, and SQLite only Garnet', () => {
-  assertEquals(listenerUnreachableExpectations(DATABASE.POSTGRES).map((entry) => entry.resource), [
-    'postgres',
-    'garnet',
+Deno.test('failure/recovery gate owns exactly the synthetic Postgres and Garnet checks', () => {
+  assertEquals(listenerFaultExpectations(DATABASE.POSTGRES), [
+    {
+      resource: 'postgres',
+      healthCheckKey: 'test_only_postgres_listener',
+      realHealthCheckKey: 'postgres_listener',
+      controllerListener: 'postgres',
+      timeoutSeconds: 300,
+    },
+    {
+      resource: 'garnet',
+      healthCheckKey: 'test_only_garnet_resp',
+      realHealthCheckKey: 'garnet_resp',
+      controllerListener: 'garnet',
+      timeoutSeconds: 300,
+    },
   ]);
-  assertEquals(listenerUnreachableExpectations(DATABASE.SQLITE).map((entry) => entry.resource), [
-    'garnet',
-  ]);
+  for (const database of [DATABASE.SQLITE, DATABASE.MYSQL, DATABASE.MSSQL]) {
+    assertEquals(listenerFaultExpectations(database), [{
+      resource: 'garnet',
+      healthCheckKey: 'test_only_garnet_resp',
+      realHealthCheckKey: 'garnet_resp',
+      controllerListener: 'garnet',
+      timeoutSeconds: 300,
+    }]);
+  }
+  assertThrows(
+    () =>
+      assertOwnedListenerFaultExpectation({
+        ...listenerFaultExpectations(DATABASE.POSTGRES)[0],
+        healthCheckKey: 'postgres_listener',
+      }),
+    Error,
+    'refused a non-test-only health-check target',
+  );
 
-  const gate = createListenerReadinessGates(DATABASE.POSTGRES)[0];
+  const gate = createListenerReadinessGates()[0];
   if (gate.kind !== 'command') throw new Error('Expected listener failure/recovery command gate.');
   assertEquals(gate.id, GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE);
   const command = gate.command(runContext());
   assertEquals(command.slice(0, 5), [
     'deno',
     'run',
-    '--allow-run=aspire',
+    '--allow-read',
     '--allow-write',
-    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts',
+    '--allow-run=aspire',
   ]);
-  assertEquals(command.at(-2), '/workspace/app');
   assertEquals(
-    command.at(-1),
-    '[{"resource":"postgres","healthCheckKey":"postgres_listener","timeoutSeconds":300},{"resource":"garnet","healthCheckKey":"garnet_resp","timeoutSeconds":300}]',
+    command.at(-4),
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts',
   );
+  assertEquals(command.at(-3), '/workspace/app/aspire/apphost.mts');
+  assertEquals(command.at(-2), '/workspace/app');
+  assertEquals(command.at(-1), DATABASE.POSTGRES);
 });
 
 function runContext(): RunContext {

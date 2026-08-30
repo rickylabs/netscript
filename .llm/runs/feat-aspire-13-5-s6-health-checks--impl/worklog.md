@@ -250,3 +250,62 @@ Reconstruction commits at this checkpoint are `a5a445c1a` (semantic carry), `719
 (complete module split plus shipped-main conflict reconciliation), and `fb67d3077` (gate formatting
 and fresh 13.5.3 consumer receipt). `verify-live-db-endpoint.ts` remains byte-for-byte untouched
 relative to shipped main.
+
+## D-101 scratch-only synthetic listener fixture
+
+### Design
+
+- **Public surface:** no product/public API changes. The E2E-only seam exports a controller state
+  type, the two reserved listener ports/health keys, a controller used by focused tests, and pure
+  generated-helper splice functions.
+- **Domain vocabulary:** `ListenerFaultState` is the revisioned desired state for the Postgres TCP
+  listener and fake Garnet RESP listener. `ListenerFaultTarget` is a closed, hardcoded pair of
+  test-only and real backing health keys; arbitrary resource/key input is forbidden.
+- **Ports:** the controller owns Deno TCP listeners. The fixture controls it through an atomic
+  `.netscript/e2e/listener-fault-controller/state.json` file and waits for a revision-matched
+  `ack.json`. This avoids a third fixed port, Docker, process signals, and transport/relay
+  assumptions while giving the fixture an explicit applied-state acknowledgement.
+- **Constants:** `18998` is reserved for `test_only_postgres_listener`; `18999` is reserved for
+  `test_only_garnet_resp`. The generated AppHost checks use `localhost` exactly.
+- **Commit slices:** (1) RED controller/splice/ownership tests plus the D-101 design record;
+  (2) controller and pre-start generator splices, proved by focused socket/splice tests;
+  (3) failure/recovery orchestration and continuity receipt, proved by focused fixture/suite tests;
+  (4) scoped static/fitness gates and final harness/PR evidence.
+- **Deferred scope:** the implementation thread does not run Aspire, AppHost, containers, the
+  lease-backed runtime suite, an evaluator, or CI. The supervisor owns live verification.
+- **Contributor path:** start with `runtime/prepare-readiness-fixture.ts` for generated-project
+  wiring, `runtime/listener-fault-controller.ts` for the long-lived task, and
+  `runtime/listener-unreachable-fixture.ts` for runtime evidence collection.
+
+PLAN-EVAL is N/A: the owner supplied a ratified, closed architecture and explicit acceptance/gate
+contract. D-101 replaces the now-rejected resource-stop/docker-pause attempts without reopening an
+implementation decision.
+
+Critical review guard applied before the first D-101 commit: pre-start injection and runtime
+verification both reuse `listenerFaultExpectations(database)`, the database dispatch owned beside
+`createListenerReadinessGates(database)`. Postgres selects the synthetic Postgres+Garnet pair;
+SQLite and the MySQL/MSSQL overrides select Garnet only and never require a Postgres marker.
+
+### D-101 implementation evidence
+
+- RED: the structured focused run exited 1 with five expected missing-export/module diagnostics
+  for the not-yet-created controller, splice functions, and database-aware expectation builder.
+- The Aspire-managed `listener-fault-controller` task binds `localhost:18998` for bare TCP and
+  `localhost:18999` for fake RESP. Its atomic control file is revisioned and every applied revision
+  is acknowledged before the fixture polls Aspire health.
+- Generator-derived infrastructure markers are exactly
+  `await postgres_server.withHealthCheck('postgres_listener');` and
+  `await garnet.withHealthCheck('garnet_resp');`. The 13.5 TypeScript API registers callbacks with
+  `builder.addHealthCheck(...)` and attaches their keys with the existing resource promise's
+  `.withHealthCheck(...)` method.
+- The review guards landed before commit: bare-TCP accepted connections now drain to EOF and reap
+  their server-side descriptors; real-socket tests bind and connect through `localhost`; fixed
+  production ports remain 18998/18999.
+- GREEN: the five-root structured focused suite passed 52/52 results. It covers full
+  Postgres+Garnet injection, Garnet-only SQLite/MySQL/MSSQL dispatch, missing-marker and duplicate
+  registration failures, generated task insertion, exact ownership rejection, controller
+  close/reopen behavior, RESP PONG, and connection reaping.
+- Scoped structured gates over nine touched TypeScript files: check PASS with zero diagnostics,
+  lint PASS with zero findings, format PASS with zero findings. `quality:scan` passed with
+  `findings=[]`; `arch:check` exited 0 with carried-in warnings only.
+- Runtime/AppHost/container/evaluator/CI commands remain NOT_RUN by owner boundary.

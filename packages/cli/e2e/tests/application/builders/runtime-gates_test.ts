@@ -397,6 +397,22 @@ Deno.test('runtime gates skip database resource wait for sqlite', () => {
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
 });
 
+Deno.test('readiness fixture receives the selected database axis before Aspire starts', () => {
+  for (const database of [DATABASE.POSTGRES, DATABASE.SQLITE, DATABASE.MYSQL, DATABASE.MSSQL]) {
+    const gate = createRuntimeGates(database).find((entry) =>
+      entry.id === GATE.RUNTIME_READINESS_FIXTURE
+    );
+    if (gate?.kind !== 'command') {
+      throw new Error('Expected readiness fixture gate to be a command gate.');
+    }
+    const command = gate.command({
+      project: { projectRoot: '/workspace/app' },
+    } as RunContext);
+    assertEquals(command.at(-2), '/workspace/app');
+    assertEquals(command.at(-1), database);
+  }
+});
+
 Deno.test('runtime service health gate asserts only the selected sqlite adapter', () => {
   const gate = createRuntimeBehaviorGates(DATABASE.SQLITE).find((entry) =>
     entry.id === GATE.BEHAVIOR_SERVICE_HEALTH

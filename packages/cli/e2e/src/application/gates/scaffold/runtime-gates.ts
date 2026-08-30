@@ -175,6 +175,7 @@ export function createRuntimeGates(
         '--allow-write',
         'packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts',
         context.project.projectRoot,
+        database,
       ],
     ),
     commandGate(
