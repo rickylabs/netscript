@@ -45,14 +45,15 @@ final-head rerun after this artifact reconciliation commit.
   SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881`.
 - Published slice 2 at `6e82aad1d4e0f4e14a5e4d6ed1395b6169505099` and slice 3 at
   `0d25cce469a784596101d331445b176be34cdbd6`.
-- Completed the authorized static set provisionally: all fired code/repo gates pass; doc-lint and
-  JSR audit match their recorded nonzero baselines; root test remains NOT FIRED.
+- Completed the authorized static set: all leaf-focused code/repo gates pass; doc-lint and JSR audit
+  match their recorded nonzero baselines. The later-fired root suite exits 1 only on two failures
+  reproduced at `main` and outside this leaf's scope.
 
 ## Next Steps
 
-1. Commit and push this final evidence reconciliation.
-2. Repeat every fired static gate without source changes at that exact pushed head.
-3. Update the draft PR body/comment and stop for owner-dispatched IMPL-EVAL.
+1. Commit and push this final evidence correction.
+2. Update the draft PR evidence/comment and advance its sole lifecycle label to `status:impl`.
+3. Stop for owner-dispatched IMPL-EVAL.
 
 ## Files Changed
 
@@ -61,9 +62,18 @@ final-head rerun after this artifact reconciliation commit.
 
 ## Gates
 
-All fired focused/root/code-quality/architecture/asset gates pass. Doc-lint and JSR audit retain
-only their recorded existing findings. Root test remains explicitly `NOT FIRED`; no runtime/E2E gate
+All leaf-focused check/test/lint/format, code-quality, architecture, and asset gates pass. Doc-lint
+and JSR audit retain only their recorded existing findings. The root test was later **FIRED** by the
+owner in a detached throwaway worktree at `6605625ab50850da40e71b6f0a77bb704c675751`: exit 1 after
+179,100 ms, with 4,308 passed, 2 failed, 19 ignored, and 4,329 total. Both failures reproduce at
+`main` `13878a80a50c55b9662099fed64555f2310ae4a3` and are outside the leaf diff. No runtime/E2E gate
 has run. The complete 14-row table is in `worklog.md`.
+
+The earlier host condition is retained as history but is superseded as of 2026-08-30. The host now
+reports PID 1 as `tini`, zero zombies, 113 total processes, and `ulimit -n` of 524,288. The prior
+attribution of `hybrid-launcher_test` to zombie exhaustion was wrong for this file and is withdrawn:
+its old failure cause is no longer decidable; only its current equality at `main` and this head is
+established.
 
 ## Open Questions
 

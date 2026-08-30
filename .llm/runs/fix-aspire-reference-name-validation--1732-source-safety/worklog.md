@@ -88,47 +88,73 @@ composed config boundary → final static gates.
 
 ## Gate Results
 
-| Gate                                                          | Exit | Result                                                                                        |
-| ------------------------------------------------------------- | ---: | --------------------------------------------------------------------------------------------- |
-| `deno task doc:lint --root packages/aspire --pretty` baseline |    1 | RED BASELINE — zero missing JSDoc/combined errors; existing private-type-reference findings   |
-| `audit-jsr-package.ts --root packages/aspire --text` baseline |    1 | RED BASELINE — four existing F-JSR-2 failures, one F-JSR-7 warning; dry-run OK                |
-| Root `deno task test`                                         |    — | **NOT FIRED** by owner instruction; no false green substituted                                |
-| First wrapper invocation                                      |    1 | REFUSAL — type-check stopped before TAP selection; fixed test typing and did not count as RED |
-| Focused RED wrapper                                           |    1 | EXPECTED RED — 67 passed, 32 failed, 99 total, 32 unique failures                             |
-| Slice-2 generator tests                                       |    0 | PASS — 59 passed, 0 failed                                                                    |
-| Slice-2 scoped check                                          |    0 | PASS — four files selected, zero findings                                                     |
-| Slice-2 scoped lint                                           |    0 | PASS — four selected and processed, zero findings                                             |
-| Slice-2 scoped format                                         |    0 | PASS — four selected and processed, zero findings                                             |
-| Slice-2 combined RED transition                               |    1 | EXPECTED RED — 74 passed, 25 failed; grammar lock is the only remaining failure class         |
-| Slice-3 focused tests                                         |    0 | PASS — 143 passed, 0 failed                                                                   |
-| Slice-3 scoped check                                          |    0 | PASS — three files selected, zero findings                                                    |
-| Slice-3 scoped lint                                           |    0 | PASS — three selected and processed, zero findings                                            |
-| Slice-3 scoped format                                         |    0 | PASS — three selected and processed, zero findings                                            |
-| Slice-3 JSON-schema comparison                                |    0 | PASS — identical byte count and SHA-256 before/after composed validation                      |
-| PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                    |
-| PLAN-EVAL cycle 2                                             |    — | `FAIL_FIX`; owner-verified mechanical corrections applied and gate released; no cycle 3       |
+| Gate                                                          | Exit | Result                                                                                          |
+| ------------------------------------------------------------- | ---: | ----------------------------------------------------------------------------------------------- |
+| `deno task doc:lint --root packages/aspire --pretty` baseline |    1 | RED BASELINE — zero missing JSDoc/combined errors; existing private-type-reference findings     |
+| `audit-jsr-package.ts --root packages/aspire --text` baseline |    1 | RED BASELINE — four existing F-JSR-2 failures, one F-JSR-7 warning; dry-run OK                  |
+| Historical root-test decision                                 |    — | **SUPERSEDED 2026-08-30** — honestly NOT FIRED while the earlier PID-1 zombie condition applied |
+| First wrapper invocation                                      |    1 | REFUSAL — type-check stopped before TAP selection; fixed test typing and did not count as RED   |
+| Focused RED wrapper                                           |    1 | EXPECTED RED — 67 passed, 32 failed, 99 total, 32 unique failures                               |
+| Slice-2 generator tests                                       |    0 | PASS — 59 passed, 0 failed                                                                      |
+| Slice-2 scoped check                                          |    0 | PASS — four files selected, zero findings                                                       |
+| Slice-2 scoped lint                                           |    0 | PASS — four selected and processed, zero findings                                               |
+| Slice-2 scoped format                                         |    0 | PASS — four selected and processed, zero findings                                               |
+| Slice-2 combined RED transition                               |    1 | EXPECTED RED — 74 passed, 25 failed; grammar lock is the only remaining failure class           |
+| Slice-3 focused tests                                         |    0 | PASS — 143 passed, 0 failed                                                                     |
+| Slice-3 scoped check                                          |    0 | PASS — three files selected, zero findings                                                      |
+| Slice-3 scoped lint                                           |    0 | PASS — three selected and processed, zero findings                                              |
+| Slice-3 scoped format                                         |    0 | PASS — three selected and processed, zero findings                                              |
+| Slice-3 JSON-schema comparison                                |    0 | PASS — identical byte count and SHA-256 before/after composed validation                        |
+| PLAN-EVAL cycle 1                                             |    — | `FAIL_FIX`; bounded plan repair authorized, implementation remains blocked                      |
+| PLAN-EVAL cycle 2                                             |    — | `FAIL_FIX`; owner-verified mechanical corrections applied and gate released; no cycle 3         |
 
 ## Final Static Gate Table
 
-The fired gates below are repeated without source changes after the slice-4 evidence commit. Root
-`deno task test` remains **NOT FIRED**, and no runtime substitute is used.
+The gates below are the final evidence set. The owner later fired the root structured test wrapper
+in a detached throwaway worktree at evidence head `6605625ab50850da40e71b6f0a77bb704c675751`; no
+runtime substitute is used.
 
-| #  | Gate                        | Exit | Final evidence contract                                                                                                                                                                     |
-| -- | --------------------------- | ---: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1  | Focused tests               |    0 | PASS — 143 passed, 0 failed across `config_test.ts` and both background-generator test files                                                                                                |
-| 2  | Focused check               |    0 | PASS — all 7 changed TypeScript source/test/fixture files selected; zero findings                                                                                                           |
-| 3  | Focused lint                |    0 | PASS — Aspire 3/3 plus CLI 4/4 selected and processed; zero findings                                                                                                                        |
-| 4  | Focused format              |    0 | PASS — Aspire 3/3 plus CLI 4/4 selected and processed; zero findings                                                                                                                        |
-| 5  | Root structured check       |    0 | PASS — 2,929 files, 25 batches, zero failed batches/findings                                                                                                                                |
-| 6  | Root test                   |    — | **NOT FIRED** — owner instruction due host PID-1 zombie exhaustion; no green claimed                                                                                                        |
-| 7  | Root structured lint        |    0 | PASS — 2,044/2,044 files processed, no dropped coverage or findings                                                                                                                         |
-| 8  | Root structured format      |    0 | PASS — 2,044/2,044 files processed, zero findings                                                                                                                                           |
-| 9  | Code-quality scan           |    0 | PASS — no findings or allowance failures; `allowCount` remains exactly 7                                                                                                                    |
-| 10 | Doctrine / architecture     |    0 | PASS — dependency and doctrine checks complete; existing warnings only, no failures                                                                                                         |
-| 11 | Asset barrel                |    0 | PASS — canonical generator produced no owned generated-asset diff                                                                                                                           |
-| 12 | Aspire doc-lint comparison  |    1 | EXPECTED BASELINE — zero combined errors/missing JSDoc; only existing per-entrypoint private-type-reference exits                                                                           |
-| 13 | Aspire JSR audit comparison |    1 | EXPECTED BASELINE — four existing F-JSR-2 failures plus one F-JSR-7 warning; dry-run OK; no new finding                                                                                     |
-| 14 | Generated-source semantics  |    0 | PASS — focused tests parse/execute every matrix row and preserve the raw key; JSON schema remains 9,988 bytes at SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881` |
+| #  | Gate                        | Exit | Final evidence contract                                                                                                                                                                                                                                                                                                                           |
+| -- | --------------------------- | ---: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | Focused tests               |    0 | PASS — 143 passed, 0 failed across `config_test.ts` and both background-generator test files                                                                                                                                                                                                                                                      |
+| 2  | Focused check               |    0 | PASS — all 7 changed TypeScript source/test/fixture files selected; zero findings                                                                                                                                                                                                                                                                 |
+| 3  | Focused lint                |    0 | PASS — Aspire 3/3 plus CLI 4/4 selected and processed; zero findings                                                                                                                                                                                                                                                                              |
+| 4  | Focused format              |    0 | PASS — Aspire 3/3 plus CLI 4/4 selected and processed; zero findings                                                                                                                                                                                                                                                                              |
+| 5  | Root structured check       |    0 | PASS — 2,929 files, 25 batches, zero failed batches/findings                                                                                                                                                                                                                                                                                      |
+| 6  | Root test                   |    1 | **FIRED** — 4,308 passed, 2 failed, 19 ignored, 4,329 total, 2 unique failures in 179,100 ms. Pre-existing `.llm/tools/agentic/claude/hybrid-launcher_test.ts:102` and `packages/fresh-ui/tests/registry/markdown-renderer.test.ts:142` failures reproduce at `main` `13878a80a50c55b9662099fed64555f2310ae4a3`; the leaf's own suites are green. |
+| 7  | Root structured lint        |    0 | PASS — 2,044/2,044 files processed, no dropped coverage or findings                                                                                                                                                                                                                                                                               |
+| 8  | Root structured format      |    0 | PASS — 2,044/2,044 files processed, zero findings                                                                                                                                                                                                                                                                                                 |
+| 9  | Code-quality scan           |    0 | PASS — no findings or allowance failures; `allowCount` remains exactly 7                                                                                                                                                                                                                                                                          |
+| 10 | Doctrine / architecture     |    0 | PASS — dependency and doctrine checks complete; existing warnings only, no failures                                                                                                                                                                                                                                                               |
+| 11 | Asset barrel                |    0 | PASS — canonical generator produced no owned generated-asset diff                                                                                                                                                                                                                                                                                 |
+| 12 | Aspire doc-lint comparison  |    1 | EXPECTED BASELINE — zero combined errors/missing JSDoc; only existing per-entrypoint private-type-reference exits                                                                                                                                                                                                                                 |
+| 13 | Aspire JSR audit comparison |    1 | EXPECTED BASELINE — four existing F-JSR-2 failures plus one F-JSR-7 warning; dry-run OK; no new finding                                                                                                                                                                                                                                           |
+| 14 | Generated-source semantics  |    0 | PASS — focused tests parse/execute every matrix row and preserve the raw key; JSON schema remains 9,988 bytes at SHA-256 `87e3911b745954f91dba8c05456e36a92ff965cbab3f03b8350e24b09766e881`                                                                                                                                                       |
+
+### Root-test evidence correction — 2026-08-30
+
+The earlier NOT-FIRED decision remains an auditable historical fact: at that time the owner directed
+this lane not to run the root suite because the host carried roughly 7,700 unreapable PID-1-owned
+zombies. That operating condition is now **superseded**. The current host reports `/proc/1/comm` as
+`tini`, zero zombies (including zero grouped by parent PID), 113 total processes, and `ulimit -n` of
+524,288.
+
+The owner supplied a current root-wrapper run from a detached throwaway worktree at
+`6605625ab50850da40e71b6f0a77bb704c675751` using `.llm/tools/run-deno-test.ts -- --allow-all`: exit
+1 after 179,100 ms, with 4,308 passed, 2 failed, 19 ignored, 4,329 total results, and 2 unique
+failures. `codex-follow_test` now passes. The two remaining failures are pre-existing baseline reds
+outside this leaf's scope:
+
+| Failure                                                                                                                     | Evidence-head result | `main` result                                                            |
+| --------------------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------ |
+| `.llm/tools/agentic/claude/hybrid-launcher_test.ts:102` — `fixture did not publish its descendant pid`                      | FAIL                 | FAIL at `13878a80a50c55b9662099fed64555f2310ae4a3` (9 passed / 1 failed) |
+| `packages/fresh-ui/tests/registry/markdown-renderer.test.ts:142` — Rollup native `failed to map segment from shared object` | FAIL                 | FAIL at `13878a80a50c55b9662099fed64555f2310ae4a3` (1 passed / 1 failed) |
+
+The earlier record attributed the `hybrid-launcher_test` red to zombie exhaustion. That attribution
+was wrong for this file: with the host fixed, the test still fails with a different message and now
+fails identically at `main`. The old failure mode's cause is no longer decidable. The provable
+current claim is narrower: both remaining root-suite failures reproduce at `main`, are not caused by
+this leaf, and the leaf's own focused suites are green.
 
 ## Handoff Notes
 

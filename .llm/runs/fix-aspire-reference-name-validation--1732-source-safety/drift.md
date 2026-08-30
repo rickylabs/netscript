@@ -61,3 +61,31 @@
 - **Action:** deliberately defer. #1732 changes only the background generator; the supervisor owns
   upstream follow-up. Do not touch sibling files or open an issue from this lane.
 - **Evidence:** PR #1747 Drift / Debt section and repaired plan's Deliberately Untouched section.
+
+## 2026-08-30 — Host zombie condition resolved; root evidence corrected
+
+- **What:** The earlier host carried roughly 7,700 unreapable PID-1-owned zombies, so the owner
+  directed this lane not to fire the root test. That historical refusal was honest but is now
+  superseded.
+- **Source:** Current host inspection reports `/proc/1/comm` as `tini`, zero zombies (including zero
+  by parent PID), 113 total processes, and `ulimit -n` of 524,288.
+- **Expected:** Once the host limitation cleared, the final evidence table would use a measured root
+  wrapper result instead of carrying the refusal forward.
+- **Actual:** The owner fired `.llm/tools/run-deno-test.ts -- --allow-all` at
+  `6605625ab50850da40e71b6f0a77bb704c675751`: exit 1 in 179,100 ms; 4,308 passed, 2 failed, 19
+  ignored, 4,329 total, and 2 unique failures. Both remaining failures reproduce at `main`
+  `13878a80a50c55b9662099fed64555f2310ae4a3` and are outside this leaf's scope.
+- **Severity:** evidence correction; no product drift.
+- **Action:** Record row 6 as FIRED/exit 1, retain the old NOT-FIRED decision as dated history, and
+  attribute only the two currently reproducible failures to their established pre-existing
+  baselines.
+- **Evidence:** Both failures reproduce at the evidence head and `main`:
+  - `.llm/tools/agentic/claude/hybrid-launcher_test.ts:102` —
+    `fixture did not publish its
+    descendant pid`.
+  - `packages/fresh-ui/tests/registry/markdown-renderer.test.ts:142` — Rollup native
+    `failed to map segment from shared object`. Leaf-focused suites remain green.
+- **Correction:** The earlier record attributed the `hybrid-launcher_test` red to zombie exhaustion.
+  That attribution was wrong for this file. With the host fixed, it still fails at this head and at
+  `main`, now with a different message. The old failure mode's cause is no longer decidable, so no
+  host-causation claim is retained.
