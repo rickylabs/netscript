@@ -8371,3 +8371,49 @@ Re-dispatched: thread `01a05474-18dc-7ba0-a084-8fc62ccecfcf`, base `de4089573`, 
 rediscover this" — so the new thread spends its budget on the behaviour, not on re-deriving D-9.
 
 Sender record evicted under the full procedure before dispatch.
+
+## #1387 Slice 5 — integrated, verified, certified; IMPL-EVAL dispatched
+
+Recovered thread `01a05474` per the coordinator's active-supervision instruction: watched the leaf
+run dir token-free through two writes (content commit, then evidence commit), confirmed the thread
+reached a genuine stop via `codex-status`, then reviewed the output myself rather than trusting the
+author's own summary.
+
+### Independent verification, not the author's word
+
+- **Ceiling**: computed the exact set-difference between the twelve authorized files and the actual
+  diff programmatically — zero extras, `contract-policy.ts` correctly untouched (behavior-only slice,
+  no type change needed).
+- **LD-8 timing**: read `createContractAuthorizer`'s body — `compileProcedures` runs synchronously
+  before the function returns, so the optional-authentication throw is genuinely at construction, not
+  deferred to first request.
+- **LD-6 as an ordering property**: traced `authorize()`'s control flow — the fallback branch is
+  reachable only `if (!resolution.policy)`, so when metadata exists the fallback is never referenced
+  in the code, matching the test's `fallbackCalls === 0` assertion after two metadata-governed
+  decisions.
+- **LD-6's "deny regardless of denyByDefault"**: confirmed by reading the exact quote from research's
+  Fail-closed migration census that this implements ("deny regardless of the fallback's standalone
+  denyByDefault option") against the code path that ignores the fallback's own default entirely on a
+  `{matched: false}` result.
+- **LD-7**: traced `installAuth()` — `bindContractPolicy()` is called once, the same resolver object
+  passed to both `createAuthnMiddleware` and `createAuthzMiddleware`. Confirmed the middleware test's
+  `resolverCalls === 2` / `authenticatorCalls === 0` / `authorizerCalls === 0` genuinely proves a
+  declared-public procedure never reaches either underlying port.
+- **`createScopeAuthorizer`'s return-type widening**: confirmed `MatchAwareAuthorizerPort extends
+  AuthorizerPort`, so this is a covariant, backward-compatible change — not the breaking one the brief
+  warned against.
+- Nine receipts... seven receipts, all `gitHead == actualGitHead` at content head, evidence set
+  SUFFICIENT, 101/101 tests, `deno.lock` byte-identical, evidence carrier product-neutral.
+
+**Verdict: ACCEPTED at `c2cbfbf0b3c355682732be5805f0f180498576db`.** One non-blocking observation
+(F-1): the resolver is consulted twice per authorized request — once for the middleware short-circuit,
+once inside `authorize()` — harmless but worth noting if this path becomes hot. `tier-a-slice-5.md`
+committed as evidence head `00cfde5d7`. PR comment `5471334577`.
+
+### Evaluator routing — native attempted first, per "prospective routing changes only"
+
+Fable 5 · medium hit the identical account-wide spend limit after one turn, confirming the quota is
+still exhausted and not slice-specific. Falling through to **DeepSeek V4 Flash 0731 · max** — the
+sanctioned, now-standard fallback per the coordinator's own instruction that existing valid receipts
+need no rerun and only *prospective* routing is at issue. No fresh ruling needed; this is now the
+documented path.
