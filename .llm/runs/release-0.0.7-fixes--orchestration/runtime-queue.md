@@ -20,18 +20,39 @@ lane that currently holds the runtime lease. Integrating or rerunning them from 
 a live leaseholder and cross a lane boundary. **Not adopted.** Flagged to the coordinator rather than
 silently actioned or silently skipped.
 
-## This lane's serial runtime order, once Aspire returns exact zero
+## READY — all four leaves integrated onto main `9710a2898` and refrozen
 
-| # | PR | Issue | State | Runtime work required |
+Lease is with the **Aspire supervisor** for the 13.5 Phase-B re-prove. Nothing runtime has been
+started here. Every leaf below is integrated, gated green, pushed, and frozen at an exact head, so each
+runs the instant the lease frees — no preparation remains.
+
+| Order | PR | Issue | **Ready exact head** | Command to run under lease |
 | --- | --- | --- | --- | --- |
-| 1 | **#1764** | #1368 | `status:impl`, `PASS_IMPL` cycle 3 | **Flow-B** (`runtime.flow-b-fixture`) at exact head. Sole remaining blocker. Request per `flow-b-request-1764.md`. |
-| 2 | **#1758** | #1462 | `status:impl`, parked on #1734 — **now unparked** | Integrate exact main `52a881c588`, then rerun bare `deno task e2e:cli`. Its 26/1 receipt is now a **stale** classification, not a standing blocker; the rerun must produce a fresh verdict, not inherit the old one. Renewed evaluator currency needed after. |
-| 3 | **#1739** | #1673 | `status:impl-eval` | Integrate exact main, then the `scaffold.runtime` rerun that its single unticked acceptance box turns on. |
-| 4 | **#1781** | #1357 | `status:impl`, Tier-A PASS, **IMPL-EVAL c1 `PASS_IMPL`** | `scaffold.runtime --cleanup` including the new `scaffold.ui-data-screen` gate. Now the sole blocker; the leaf is otherwise merge-ready. |
+| 1 | **#1764** | #1368 | **`5b526e4bc`** | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — must show gate **`runtime.flow-b-fixture`** executing, with TC-6/TC-7 (`saga.handle` + `saga.compensate` carry one shared `netscript.correlation.id`) and TC-9 parent edges |
+| 2 | **#1758** | #1462 | **`aab3376cc`** | `deno task e2e:cli` (bare) — fresh verdict required; the 26/1 receipt is a **stale** classification now that #1734 is fixed |
+| 3 | **#1739** | #1673 | **`9900007f7`** | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — for its single unticked acceptance box |
+| 4 | **#1781** | #1357 | **`487eaf141`** | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — must show the new gate **`scaffold.ui-data-screen`** executing |
 
-Order rationale: #1764 is closest to merge (one gate from ready), #1758 and #1739 both need an
-integrate-then-rerun cycle, and #1781 is still pre-evaluator. Serial within this orchestrator only —
-one runtime holder at a time, and never concurrent with another lane's lease.
+Refreeze evidence at those heads, all clean-tree:
+
+| PR | Suites | Checks | Lock | Ceiling |
+| --- | --- | --- | --- | --- |
+| #1764 `5b526e4bc` | `plugins/sagas` 51/0/1 · `plugin-sagas-core` 84/0/3 | arch, corpus, publish-assets, core JSR all 0 | unchanged | 19 |
+| #1758 `aab3376cc` | `packages/sdk` 79/0 | arch, agent-docs-prose, publish-assets, corpus all 0 | unchanged | 19 |
+| #1739 `9900007f7` | generate feature 25/0 | arch, corpus, publish-assets all 0 | unchanged | 11 |
+| #1781 `487eaf141` | `packages/cli` 1388/0 · e2e 171/0 | arch, agent-docs-prose, publish-assets, corpus, CLI JSR all 0 | unchanged | 12 |
+
+Integration was **inert for every leaf** — `comm` of main's changed paths against each leaf's owned
+paths returned empty in all four cases — so the `PASS_IMPL` verdicts on **#1764** (`14889037`) and
+**#1781** (`2991113a6`) carry forward as MECHANICAL_PASS rather than needing a re-cut.
+
+### Carrier regeneration has a dependency order
+
+#1758's merge conflicted on four generated carriers. Resolved through generators only, but the first
+pass ran them in the wrong order and left `check:publish-assets` **exit 1** despite every generator
+exiting 0. Correct order is **`gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`**;
+the later generators rewrite inputs the earlier one consumes. A generator's exit 0 is not evidence of
+freshness — only the `check:` variant run afterwards is.
 
 ## Standing rules for each rerun
 
