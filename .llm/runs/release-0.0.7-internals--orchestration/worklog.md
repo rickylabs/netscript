@@ -5607,3 +5607,48 @@ confirmed `working` throughout.
 - **Ownership confirmed unchanged**: internals remains sole owner of #1758, to reconcile
   `a391cbaa0` once the routing leaf (#1792) reaches terminal. No action taken now; no duplicate
   evaluator dispatched. #1774's DeepSeek receipts remain valid and untouched by this.
+
+## D-105 — Routing leaf (#1791/PR #1792): IMPL-EVAL PASS confirmed, main-convergence, bounded test fix
+
+- **IMPL-EVAL terminal PASS confirmed real**, not merely claimed: `evaluate.md` at evaluated head
+  `d9722b0b17a478af3db5bdafad87391a2ccbfd67`, evaluator session `ab4ca47b-...` on the implemented
+  route itself (GLM 5.3 Flash · max, disclosed dogfooding, generator ≠ evaluator satisfied via
+  Codex Sol thread `01a05481`). Full gate table independently re-verified by the evaluator: 491
+  agentic tests, 165-file check/lint/fmt with genuine (non-excluded) lint coverage, policy/doc
+  parity, skill sync, legacy-preset deserialization, `deno.lock` hygiene — all PASS.
+- **All three requested S4 bookkeeping items were already completed by the generator itself**
+  before I acted (commit `122faa829` added the D9 drift entry; PR #1792 already carried the S1-S4
+  exact-green evidence comment with both live-canary results redacted) — my own live-canary reruns
+  (see below) were therefore unnecessary duplicate work, caught only after already spending the
+  calls. Lesson: check existing artifacts/comments before re-executing an instructed action.
+- **My own canary reruns, kept as a supervisor-side data point, not acted on as a defect:** GLM
+  passed cleanly (exit 0, real capability attestation). Qwen failed 3/3 times with `SIGTERM`
+  (exit 143) at almost exactly 30 seconds — matching `provider-canary-adapter.ts`'s
+  `CANARY_TIMEOUT_MS = 30_000` — despite the underlying route genuinely working in every attempt
+  (matched identity, non-empty response, full capability attestation in the evidence payload
+  itself). The generator's own recorded run shows a clean exit 0 for the same preset. Read as
+  latency variability against a tight fixed timeout, not a reproducible product defect; not
+  reopening the verdict over it.
+- **Main convergence (`96d44758d`) merged cleanly**, no conflicts (confirmed zero file-overlap in
+  D-103 held): merge commit `1f5bda258`. **Product-byte identity proven explicitly**, per
+  instruction — diffed the exact 56 files this leaf ever touched (`a3ddcbb598..d9722b0b`, excluding
+  `.llm/runs/**`) between the evaluated head and the merged head: **zero diff, exit 0**. The
+  IMPL-EVAL PASS carries forward by proof, not re-evaluation. Re-ran agentic tests (491/491),
+  check (165/165), fmt (165/165), `deno.lock` unchanged — all green at the merged head, confirming
+  no regression from the main pull.
+- **CI then surfaced a real, narrow defect the merge exposed**: root `deno task test` collected
+  **zero tests repo-wide** (`totalResults: 0`, `exitCode: 1`) — a TypeScript compile failure in
+  `.github/scripts/openhands-comment-trigger.test.ts` referencing `OPENROUTER_MODEL_IDS.qwen` and
+  `.deepseekV4Flash0731`, both removed by this leaf's own config change, with no other repair. Not a
+  merge-induced regression from main — a pre-existing test consumer this leaf's own scope missed.
+- **Bounded correction applied directly by the supervisor, explicitly authorized and waivered**
+  (not redispatched to Codex, given its narrow two-line mechanical scope): `qwen` →
+  `planEvaluator`, `deepseekV4Flash0731` → `implEvaluator`, matching the current
+  `OPENROUTER_MODEL_IDS` shape. Focused test 16/16; full root suite re-verified
+  **4,361 passed / 0 failed / 19 ignored / 4,380 total**. Commit `6fe9f3b32`, pushed, local ==
+  remote confirmed. The waiver is recorded in the commit message itself, not just here: this is the
+  one exception to the byte-identity carry-forward claim, named explicitly rather than silently
+  absorbed into it.
+- Redundant leftover file `evaluate-merged-head-prompt.md` (drafted by the still-active generator
+  toward a rerun the owner explicitly prohibited) left **uncommitted**, per instruction, rather than
+  deleted — does no harm untracked.
