@@ -1224,3 +1224,10 @@
   `closingIssuesReferences` = {#1723, #1642}, parent stack landed.
 - S13 dispatch is sequenced behind S11 by the coordinator; it is content-independent of S11 and can
   be released by ruling.
+- **D-63 ruling (coordinator): ACCEPTED.** Bounded, audit-free M3 disposition: the same Gemini
+  session corrects the worklog count (10/111 → 8/113) in one docs-only commit; the supervisor
+  embedded the exact disposition/proving evidence and base `a46ea16d` in the PR #1771 body via REST;
+  no docs_audit cycle 4; the staged Fable polish launches once the worklog commit lands. **S13
+  released in parallel** (content-independent of S11; resolver precedence ratified) — does not wait
+  for M3/polish. S11 stays draft/stacked with S1 convergence and CI diagram parity as merge
+  prerequisites.
