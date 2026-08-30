@@ -3544,3 +3544,45 @@ Wrong: the evaluator had just committed `256cb1c3`, and its job directory held `
 the liveness checklist: for a Claude background evaluator the authoritative signals are its **worktree
 head** and **job-directory contents**, not the process table or the agents listing — the mirror of the
 rollout-growth rule for Codex threads.
+
+## 2026-08-30 — #1462 F-1/F-3 landed; readiness gates run; one honesty nuance surfaced
+
+`72cd2ecd` — verified: the "plan artifacts only" sentence is gone, all four slices are ticked with
+SHAs, the F-1 predicate-substitution drift row is recorded, and the `83b7109c..72cd2ecd` delta is
+**evidence-only** with no product path.
+
+| Gate | Result |
+| --- | --- |
+| `review-threads` | **PASS** · 0 threads, 0 unanswered |
+| close-gate — PR body boxes | **zero unticked** — F-3's refresh discharged them |
+| close-gate — issue boxes | five pending, resolvable by the gate's own remedy (structured PR evidence + `status:ready-merge`) |
+
+### #1462 owes no runtime gate — a real difference from #1739
+
+Its plan records `e2e:cli` / scaffold runtime as **NOT RUN / prohibited** ("no CLI/scaffold source is
+owned and the leaf has no runtime lease"), Aspire as **N/A / prohibited**, and Docker likewise. No
+lease was requested and none is needed, because the ceiling touches none of that surface. So unlike
+#1673 — which is parked on a `scaffold.runtime` box that genuinely did not pass — nothing structural
+blocks #1462 from readiness once its acceptance evidence is mirrored.
+
+### The nuance worth naming: acceptance criterion 3
+
+#1462's AC3 is "Production client chunks contain no server KV adapter." This leaf **did not inspect a
+bundled chunk**, and its own plan prohibits a real Vite build in this lane — the plan says so plainly,
+noting the intact-runtime import behaviour and the static graph "are necessary evidence but are not
+mislabeled as a real browser gate".
+
+What exists is a **module-graph proof** that the entry cannot reach `@netscript/kv`, `node:`, or the
+logger at all, so no bundler could include them. That is stronger than a chunk sample in one respect —
+it proves unreachability rather than absence in one build — and weaker in another: it is not literally
+a chunk inspection.
+
+The author was told to write that distinction explicitly and **not** to produce wording that reads as
+"chunks were inspected"; and, if it judges the box unevidenceable pre-merge, to propose the
+`[post-merge]` marker instead of overstating — the mechanism #1729 used for a structurally impossible
+pre-merge check. Choosing the honest framing here is the same discipline that kept #1739's
+`scaffold.runtime` box unticked.
+
+Acceptance-evidence block dispatched. Readiness normalization and the merge handoff follow once it
+lands; `status:ready-merge`, the draft flip, and issue-box ticking remain with this lane's supervisor
+or the coordinator, never the author.
