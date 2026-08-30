@@ -60,6 +60,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'mcp',
+    packagePath: 'packages/mcp',
+    docPath: 'docs/site/reference/mcp/index.md',
+    packageName: '@netscript/mcp',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all three entrypoints while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.',
+    },
+  },
+  {
     name: 'watchers',
     packagePath: 'packages/watchers',
     docPath: 'docs/site/reference/watchers/index.md',

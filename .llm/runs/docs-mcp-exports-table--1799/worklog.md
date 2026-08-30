@@ -20,4 +20,9 @@ by exported-symbol evidence.
 ## Progress
 
 - Research and Design checkpoint recorded before implementation.
-
+- Added the exact three-row export table and an `entrypoints-only` mapping justified by measured
+  root/CLI/OpenAPI-projection omissions.
+- Regenerated `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`, all exit 0.
+- Pre-commit gate attempt: all attempted gates passed except `check:assets-barrel` (exit 1), whose
+  tracked-file check correctly detected the uncommitted regenerated barrel. The full required set
+  will be rerun at the pushed implementation head.
