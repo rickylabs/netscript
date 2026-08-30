@@ -8236,3 +8236,19 @@ outcome before anything downstream of it is certified.
 | Worktree | `ns1387-impleval-s3`, reused — confirmed clean, still at evidence head `248b2f062` before dispatch |
 | Certified content head | `c297064aa76ca1b2b790f399adfb899e95c03920` |
 | Brief | `slices/impl-eval-1387-s3.md`, unchanged |
+
+### DeepSeek attempt 1 — no verdict, empty final output
+
+Session `e77eeea2-e995-430b-af31-344e8d49a8a9`, 34 turns, $0.93, `stop_reason: end_turn`,
+`is_error: false`. It read all three test files and both source files, reasoning correctly in its
+thinking blocks about non-mutation and the `traceHeaders` conditional spread — then **emitted no
+final text**. The harness auto-nudged once ("your previous response had no visible output; please
+continue and produce a user-visible response") and the session still terminated with `"result": ""`.
+
+**This is not treated as a verdict.** A clean exit code and `is_error: false` describe the process,
+not the content — the same distinction this lane has enforced on gate receipts (`exitCode` alone
+never proves a result) now applies to an evaluator's own output. No PASS/FAIL/ACCEPTED text exists to
+reconcile against Opus's verdict, so nothing changes for Slice 3 or the Slice 4 hold yet.
+
+Retrying once at the same clean worktree/head before escalating, per this lane's 1-of-2 budget before
+treating a route as blocked.
