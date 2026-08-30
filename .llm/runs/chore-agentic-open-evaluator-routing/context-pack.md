@@ -26,28 +26,30 @@ silent success when it produced nothing.
 
 ## Current state
 
-- Phase: implementation, generator gates, live canaries, and exact-head IMPL-EVAL complete.
+- Phase: post-review hardening implemented; generator gates and stricter live canaries complete;
+  fresh exact-head IMPL-EVAL pending publication.
 - Generator: Codex/OpenAI `gpt-5.6-sol` high, thread `01a05481-a2ff-7632-809a-e478889e626e`, route
   matched.
 - Worktree: `/home/agent/projects/netscript/worktrees/007-leaf-routing`.
 - Live catalog re-check at `2026-08-30T21:11:02Z`: both selected IDs present; only the plain Qwen
   Flash ID exists; GLM reports mandatory reasoning with `max` supported/default.
 - PLAN-EVAL: N/A by owner decision, recorded in `worklog.md` before implementation.
-- Implemented: typed routing/canary contract; OpenHands routing; docs/skills parity; full 165-file
-  check/lint/fmt and 491-test gate all green.
-- Live canaries: both GLM and Qwen presets passed at matched `max` argv identity with a 1024-token
-  budget, non-empty marker, and tools/reasoning/streaming evidence.
+- Implemented: typed routing/canary contract; visible-assistant-only canary marker validation with a
+  512 KiB bounded reasoning-heavy capture; phase-matched OpenHands labels; docs/skills parity; full
+  165-file check/lint/fmt and 493-test gate all green.
+- Live canaries: stricter GLM and Qwen probes passed at matched `max` argv identity with a
+  1024-token budget, visible non-empty assistant response, and tools/reasoning/streaming evidence
+  (GLM 5/82/86; Qwen 6/109/113).
 - IMPL-EVAL: full `PASS` at `d9722b0b1`, merge-head refresh `PASS` at `1f5bda258`, and final
   exact-head refresh `PASS` at published source head `6fe9f3b326309e17595d079a97d8106db488430f`.
   Final session `6b75ca52-691b-4cae-9235-bae987fc4a90` requested OpenRouter / GLM / max and observed
   `Z.AI` / `z-ai/glm-5.3-flash`, real reasoning/tool activity, non-empty completion, and
   `CLAUDE_EFFORT=max` inside the child. These evaluations deliberately dogfood the changed route and
   are not route-independent.
-- Exact-green packet: evaluator artifacts are published in the run-artifact-only branch head
-  carrying this record; PR comment `5471524652` contains the redacted structured canary results and
-  S1-S4 gate summary. A later ready-for-review automation made the PR non-draft and temporarily
-  returned it to `status:impl-eval`; it remains unmerged.
-- Remaining: supervisor handoff only; do not merge from this run.
+- Prior exact-head evaluations remain historical evidence. Two later Augment medium findings were
+  accepted as in-scope and fixed, so their head currency does not cover the new source state.
+- Remaining: publish the review fixes, reply/resolve both threads, obtain a fresh exact-head
+  separate-session IMPL-EVAL PASS, then update the exact-green packet without merging.
 - Publication: the HTTPS PAT lacked workflow scope, so the GitHub connector published tree-identical
   commits without force. Current published evidence head before this record: `9937705b5d`.
 

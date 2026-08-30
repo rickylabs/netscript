@@ -139,7 +139,10 @@ Deno.test('live adapter reduces private JSONL to counts and enforces read-only r
   const output = [
     JSON.stringify({ type: 'tool_use', name: 'read_only_pwd' }),
     JSON.stringify({ type: 'reasoning', summary: 'bounded' }),
-    JSON.stringify({ type: 'message_delta', text: 'PROVIDER_CANARY_OK' }),
+    JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'text', text: 'PROVIDER_CANARY_OK' }] },
+    }),
   ].join('\n');
   const adapter = new ProviderCanaryAdapter(
     { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
@@ -176,6 +179,69 @@ Deno.test('live adapter reduces private JSONL to counts and enforces read-only r
   assert(!JSON.stringify(result).includes(opaque), 'credential entered canary result');
   assert(!captured.options?.args.includes(opaque), 'credential entered canary argv');
   assertEquals(JSON.stringify([...parent]), before, 'parent environment changed');
+});
+
+Deno.test('live adapter requires the marker in visible assistant content', async () => {
+  const parent = new Map<string, string>([
+    ['PATH', '/usr/bin'],
+    ['OPENROUTER_API_KEY', crypto.randomUUID()],
+  ]);
+  const output = [
+    JSON.stringify({ type: 'reasoning', summary: 'I should reply PROVIDER_CANARY_OK' }),
+    JSON.stringify({
+      type: 'tool_use',
+      name: 'read_only_pwd',
+      input: { expectedReply: 'PROVIDER_CANARY_OK' },
+    }),
+    JSON.stringify({ type: 'result', result: '' }),
+  ].join('\n');
+  const adapter = new ProviderCanaryAdapter(
+    { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
+    () => ({
+      output: () =>
+        Promise.resolve({
+          code: 0,
+          stdout: new TextEncoder().encode(output),
+          stderr: new Uint8Array(),
+        }),
+    }),
+  );
+
+  const result = await adapter.run(route());
+  assertEquals(result.status, 'blocked');
+  assertEquals(result.evidence?.response, 'empty');
+  assert(result.diagnostics.some((entry) => entry.message.includes('empty')));
+});
+
+Deno.test('live adapter retains visible output after a large reasoning prelude', async () => {
+  const parent = new Map<string, string>([
+    ['PATH', '/usr/bin'],
+    ['OPENROUTER_API_KEY', crypto.randomUUID()],
+  ]);
+  const output = [
+    JSON.stringify({ type: 'reasoning', summary: 'x'.repeat(70 * 1024) }),
+    JSON.stringify({ type: 'tool_use', name: 'read_only_pwd' }),
+    JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'text', text: 'PROVIDER_CANARY_OK' }] },
+    }),
+  ].join('\n');
+  const adapter = new ProviderCanaryAdapter(
+    { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
+    () => ({
+      output: () =>
+        Promise.resolve({
+          code: 0,
+          stdout: new TextEncoder().encode(output),
+          stderr: new Uint8Array(),
+        }),
+    }),
+  );
+
+  const result = await adapter.run(route());
+  assertEquals(result.status, 'passed');
+  assertEquals(result.evidence?.response, 'non_empty');
+  assertEquals(result.evidence?.eventCounts.tools, 1);
 });
 
 Deno.test('Codex canary requires the named profile and uses ephemeral read-only execution', async () => {

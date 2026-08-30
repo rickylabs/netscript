@@ -293,6 +293,12 @@ jobs:
               throw new Error(`Evaluator model labels are mutually exclusive: ${selectedLabels.join(', ')}`);
             }
             const selectedLabel = selectedLabels[0] ?? '';
+            const expectedModelLabel = phase === 'plan' ? 'eval:model:qwen' : 'eval:model:glm';
+            if (selectedLabel && selectedLabel !== expectedModelLabel) {
+              throw new Error(
+                `${selectedLabel} cannot select the ${phase.toUpperCase()} evaluator; expected ${expectedModelLabel}`,
+              );
+            }
             const model = selectedLabel
               ? modelLabels.get(selectedLabel)
               : phase === 'plan'

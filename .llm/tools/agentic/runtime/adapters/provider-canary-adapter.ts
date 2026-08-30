@@ -22,7 +22,7 @@ const CANARY_PROMPT = [
   'Do not edit files or start another agent.',
 ].join(' ');
 const CANARY_TIMEOUT_MS = 30_000;
-const CANARY_CAPTURE_BYTES = 64 * 1024;
+const CANARY_CAPTURE_BYTES = 512 * 1024;
 export const PROVIDER_CANARY_MAX_OUTPUT_TOKENS = 1024;
 
 interface CanaryAttestation {
@@ -86,6 +86,24 @@ function includesCapability(value: unknown, capability: 'tools' | 'reasoning'): 
     : encoded.includes('reasoning') || encoded.includes('thinking');
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasVisibleAssistantMarker(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (value.type === 'result') {
+    return typeof value.result === 'string' && value.result.includes('PROVIDER_CANARY_OK');
+  }
+  if (value.type !== 'assistant' || !isRecord(value.message)) return false;
+  const content = value.message.content;
+  return Array.isArray(content) &&
+    content.some((block) =>
+      isRecord(block) && block.type === 'text' && typeof block.text === 'string' &&
+      block.text.includes('PROVIDER_CANARY_OK')
+    );
+}
+
 function observeOutput(
   credential: 'available' | 'absent',
   output: CanaryCommandOutput | null,
@@ -129,7 +147,7 @@ function observeOutput(
       streaming: events.length > 1 ? events.length : 0,
     },
     ...attestation,
-    responseNonEmpty: events.some((event) => JSON.stringify(event).includes('PROVIDER_CANARY_OK')),
+    responseNonEmpty: events.some(hasVisibleAssistantMarker),
   };
 }
 

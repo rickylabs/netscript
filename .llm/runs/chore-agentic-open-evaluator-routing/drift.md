@@ -83,3 +83,21 @@ Append-only. No implementation drift recorded yet.
 - **Action:** accept and record. Historical persisted model/preset deserialization remains intact;
   label-manifest history is not a persisted routing-state contract.
 - **Evidence:** `.github/labels.yml`, OpenHands phase-dispatch tests, IMPL-EVAL finding 1.
+
+## 2026-08-30 — Late review findings reopened implementation after exact-head PASS
+
+- **What:** Augment review posted two medium findings after the first exact-green packet: the live
+  canary searched all serialized events for its marker, and OpenHands model-label overrides were not
+  phase constrained.
+- **Expected:** Only visible assistant output can satisfy the GLM non-empty-response contract; PLAN
+  always selects Qwen Flash and IMPL/default always selects GLM Flash.
+- **Actual:** Reasoning/tool input could echo the marker, and a leftover opposite-phase label could
+  override the required pairing. Earlier live runs were genuine, but the enforcement gaps were real.
+- **Severity:** significant; both findings are inside issue #1791 acceptance despite an initial
+  follow-up-only reply.
+- **Action:** reopen implementation. Restrict marker detection to assistant text/final result
+  events; raise bounded capture from 64 KiB to 512 KiB so long reasoning does not hide the visible
+  tail; add false-positive and large-prelude regressions; reject cross-phase OpenHands labels with
+  tests.
+- **Evidence:** PR threads `PRRT_kwDOSxcnO86dkbLP` and `PRRT_kwDOSxcnO86dkbLS`; 493-test structured
+  suite; hardened live GLM/Qwen canaries in `worklog.md`.

@@ -33,6 +33,8 @@ function selectModel(phase: 'plan' | 'impl', labels: string[]): string {
   const selected = labels.filter((label) => label.startsWith('eval:model:'));
   if (selected.some((label) => !MODELS.has(label))) throw new Error('unknown evaluator label');
   if (selected.length > 1) throw new Error('conflicting evaluator labels');
+  const expectedLabel = phase === 'plan' ? 'eval:model:qwen' : 'eval:model:glm';
+  if (selected.length && selected[0] !== expectedLabel) throw new Error('phase-mismatched label');
   return selected.length
     ? MODELS.get(selected[0])!
     : phase === 'plan'
@@ -109,7 +111,16 @@ Deno.test('phase evaluator model labels are exact, optional, and mutually exclus
     selectModel('impl', []),
     `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
   );
-  for (const [label, model] of MODELS) assertEquals(selectModel('impl', [label]), model);
+  assertEquals(
+    selectModel('plan', ['eval:model:qwen']),
+    `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`,
+  );
+  assertEquals(
+    selectModel('impl', ['eval:model:glm']),
+    `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
+  );
+  assertThrows(() => selectModel('plan', ['eval:model:glm']));
+  assertThrows(() => selectModel('impl', ['eval:model:qwen']));
   assertThrows(() => selectModel('impl', ['eval:model:not-real']));
   assertThrows(() => selectModel('impl', ['eval:model:glm', 'eval:model:qwen']));
 });
@@ -168,6 +179,8 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, 'No evaluator was claimed or dispatched.');
   assertStringIncludes(phase, 'Zero-spend stale evaluator event');
   assertStringIncludes(phase, 'name: selectedLabel');
+  assertStringIncludes(phase, "const expectedModelLabel = phase === 'plan'");
+  assertStringIncludes(phase, 'cannot select the ${phase.toUpperCase()} evaluator');
   assertStringIncludes(phase, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(runner, "steps.request.outputs.eval_phase != ''");
   assertStringIncludes(runner, "steps.request.outputs.eval_phase == ''");
