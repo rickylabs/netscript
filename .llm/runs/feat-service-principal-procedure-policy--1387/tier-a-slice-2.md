@@ -78,3 +78,34 @@ contracted gate that cannot produce a durable receipt is exactly the shape of D-
 
 **ACCEPTED_WITH_FINDINGS.** Contracted gate set is green at `f9b32b4f7…`; ceiling respected; the
 slice is signature/generic-only as ruled. F-1 and F-2 are observations that do not block Slice 3.
+
+## Post-verdict addendum
+
+The separate-session IMPL-EVAL (Fable 5, opposite family) returned **ACCEPTED_WITH_FINDINGS** at
+content head `f9b32b4f7…`, re-running the product-neutrality diff, a cold scoped check, the tests,
+`arch:check` and both non-receipted gates itself rather than trusting this report. Its verdict is
+`evaluate.md`.
+
+It raised **E-1**, which was a real evidence defect and is now fixed: three Slice 1 receipts
+(`docs-accuracy`, `quality-gate`, `test-contracts-sdk`) were still at the **top level** of
+`receipts/` beside the Slice 2 set, where a reader scanning by filename would take them as current.
+All three were preserved byte-identical under `receipts/slice-1-2ddd6048/` — sha256-verified before
+removal — and only the stale top-level copies were deleted. **Archiving the previous slice is not
+enough if the stale copy also stays where the current one lives.**
+
+`exports-drift` and `mcp-export-corpus` now have gate-catalog entries (`gates:test` 67/0), closing
+the durability gap this report flagged. Three supplementary receipts were cut at the evidence
+carrier `04d22e7e1`, which is product-neutral to the certified content head:
+
+| Gate | Outcome | Duration |
+| --- | --- | --- |
+| `quality-gate` | PASS | 7 215 ms |
+| `exports-drift` | PASS | 2 569 ms |
+| `mcp-export-corpus` | PASS | 6 000 ms |
+
+Evaluator findings **E-2** (`TCustom` is a phantom parameter until a consumer position exists) and
+**E-3** (`traceHeaders` value type differs between the internal annotation and the published type)
+are carried into the Slice 3 brief. **E-4** is a stated gap rather than a defect: the claim that the
+author's bytes were committed unchanged is not independently verifiable now that the uncommitted
+worktree is gone. That is correct, and worth keeping visible — what *is* verifiable is that every
+product edit is in-ceiling, signature-only, and green under the full gate set.
