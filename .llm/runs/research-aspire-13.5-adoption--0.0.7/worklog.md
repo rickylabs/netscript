@@ -212,3 +212,15 @@ cancel sibling lanes) or from a re-granted host lease after the NAS is provision
 | Cleanup           | Thread: exact stop, leak-check `[]`, teardown preview empty, scratch removed. Supervisor 09:50:21Z: leak-check `[]`, teardown preview empty, `aspire ps` `[]`, containers 0, volumes 0, runtime procs 0. My leak-check's regenerated `leak-report.md` in the S3 worktree restored (no supervisor mutation of the slice branch). **Lease released; no third attempt.**    |
 | Tier-A `9525f1ae` | Run artifacts only; no dashboard URL/token; AppHost identity (PID 383334, exact path) consistent with live surveillance; scratch-correction verification quoted; failure evidence verbatim. **Accepted.**                                                                                                                                                                |
 | Queue effect      | Phase-B AppHost gates for S3/S6/S7 on this NAS are environment-blocked until the infrastructure boundary in D-43 is resolved (same-netns + identical-path bind, local Docker, or off-host/CI). Static work (S8, then S9–S13 static parts) continues.                                                                                                                     |
+
+| S3 Phase B finalized (coordinator) | Terminal classification
+**`BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`** (D-42/D-43). Final verification 2026-08-30T09:52:55Z:
+`aspire ps` → `[]`; containers 0; volumes 0; exact `aspire`/`dcp`/AppHost processes 0. Lease
+released; **attempt 3 neither requested nor launched**. Only run artifacts committed on
+`research/aspire-13.5-0.0.7`; the S3 branch holds its own receipt commits `2b0d33bd`, `9525f1ae`
+(pushed by the thread). | | S8 intake corrected | Leaf = **#1720 + #863** (both 0.0.7,
+`status:impl`), PR **#1754** draft on base `feat/aspire-13-5-s6-health-checks`, closing set
+`Closes #1720`, `Closes #863`, `Part of #1712`; dependency `issue:1718 → S8`; accepted slices only
+(typed db resource commands, bounded wait, `excludeFromMcp`); Phase-B receipts (#863
+Unhealthy-but-Running, db-cli `--help`, `migrate --timeout`) are AppHost gates and therefore share
+the D-43 environment block on this NAS. |

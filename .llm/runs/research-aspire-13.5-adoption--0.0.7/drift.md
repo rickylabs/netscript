@@ -771,3 +771,7 @@
   these lands, **every lease-backed AppHost gate on this NAS is environment-blocked** and must not
   be requested.
 - **IMPL-EVAL:** still owed with the actual envelopes; not dispatched for a blocked receipt.
+
+- **D-43 addendum (2026-08-30T09:52:55Z):** terminal classification for S3 Phase B is
+  `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY`; final zero verification: Aspire `[]`, containers 0,
+  volumes 0, runtime processes 0. Attempt 3 not requested, not authorized.
