@@ -1203,3 +1203,24 @@
   cycles; **diagram parity must pass in CI before merge** (added to S11's merge preconditions). On
   PASS: Fable polish immediately, then S13 under the ratified precedence. On FAIL: stop the leaf,
   surface exact blockers + disposition.
+
+## D-63 — 2026-08-30 — S11 docs_audit cycle 3 (final) `FAIL_FIX` on M3 only; leaf stopped, disposition surfaced
+
+- Cycle 3 (Sol thread `01a052fc…`, head `dc92bad4`; `slices/s11/docs-audit/report-cycle-3.md`):
+  **checks 1–5 PASS**; H1–H7, M1, M2, M4 CLOSED on fresh 13.5.3 help/docs + S2/S9 receipts; H5
+  CLOSED under the ratified current-vs-target framing; M5 CLOSED as the accepted environment
+  limitation (CI parity before merge). **Open: M3 only** — the linked `manifest-disposition.md` is
+  now range-accurate (8 edited, 113 verified-clean, 0 deferred, exact path sets, `.NET Aspire` scan
+  zero), but the PR body does not itself carry the row-level proof and the S11 worklog line 63 says
+  "10/111" (contradicted by the exact range). Base text and SHA correct.
+- **Per the coordinator's ruling (no cycle 4) the leaf is stopped here.** Recommended disposition:
+  treat M3 as an **acceptance-artifact hygiene** item, not a prose defect — one bounded, audit-free
+  correction: (a) the generator (same Gemini conversation) corrects the worklog count to 8/113 in a
+  docs-only commit; (b) the PR body embeds (or links with the exact counts) the disposition table —
+  the supervisor can apply (b) via the REST body edit; verification is mechanical
+  (`git diff --name-only a46ea16d..HEAD` ∩ manifest rows = the 8 EDITED rows). Then the staged Fable
+  `docs_polish` runs, S11 stays draft (stacked on S10′), and merge preconditions remain: S1
+  convergence reconciles the version prose (H5), diagram parity green in CI (M5), D-58 retarget +
+  `closingIssuesReferences` = {#1723, #1642}, parent stack landed.
+- S13 dispatch is sequenced behind S11 by the coordinator; it is content-independent of S11 and can
+  be released by ruling.
