@@ -21,6 +21,8 @@ const REPORT_DEADLINE_MS = 30_000;
 const REPORT_POLL_MS = 1_000;
 const CONTROLLER_ACK_DEADLINE_MS = 5_000;
 const CONTROLLER_ACK_POLL_MS = 50;
+const HEALTHY_WAIT_TIMEOUT_SECONDS = 10;
+export const HEALTHY_WAIT_TIMEOUT_EXIT_CODE = 17;
 
 interface ListenerRecoveryReceipt {
   readonly resource: string;
@@ -31,7 +33,8 @@ interface ListenerRecoveryReceipt {
     readonly realBacking: readonly ListenerHealthReport[];
   };
   readonly unhealthy: ListenerHealthReport;
-  readonly waitExitCode: number;
+  readonly healthyWaitTimeoutExitCode: number;
+  readonly healthyWaitTimeoutDiagnostic: string;
   readonly recovered: ListenerHealthReport;
   readonly realKeyContinuity: {
     readonly duringFailure: readonly ListenerHealthReport[];
@@ -40,15 +43,18 @@ interface ListenerRecoveryReceipt {
   };
 }
 
-interface AspireResult {
+export interface AspireWaitResult {
   readonly code: number;
-  readonly success: boolean;
   readonly stdout: string;
   readonly stderr: string;
 }
 
+interface AspireResult extends AspireWaitResult {
+  readonly success: boolean;
+}
+
 /**
- * Exercise D-101's harness-owned close → Unhealthy/exit-18 → reopen → Healthy flow.
+ * Exercise D-101's harness-owned close → Unhealthy/wait-timeout → reopen → Healthy flow.
  *
  * The backing Postgres/Garnet resources never stop or pause. An Aspire-managed E2E task owns two
  * synthetic listeners and applies revisioned file commands, so the fixture exercises the exact
@@ -92,19 +98,17 @@ export async function verifyListenerFailureRecovery(
         '--status',
         'healthy',
         '--timeout',
-        '10',
+        String(HEALTHY_WAIT_TIMEOUT_SECONDS),
         '--apphost',
         appHost,
         '--non-interactive',
         '--nologo',
       ]);
-      if (wait.code !== 18) {
-        throw new Error(
-          `aspire wait ${expectation.resource} exited ${wait.code}, expected 18: ${
-            wait.stderr || wait.stdout
-          }`,
-        );
-      }
+      const healthyWaitTimeoutDiagnostic = requireHealthyWaitTimeout(
+        expectation.resource,
+        HEALTHY_WAIT_TIMEOUT_SECONDS,
+        wait,
+      );
       const afterWait = await requireRealBackingHealthy(appHost, expectations);
 
       await commandController(projectRoot, reopenedState(expectation));
@@ -116,7 +120,8 @@ export async function verifyListenerFailureRecovery(
         realHealthCheckKey: expectation.realHealthCheckKey,
         baseline: { testOnly: baselineTests[index], realBacking: baselineReal },
         unhealthy,
-        waitExitCode: wait.code,
+        healthyWaitTimeoutExitCode: wait.code,
+        healthyWaitTimeoutDiagnostic,
         recovered,
         realKeyContinuity: { duringFailure, afterWait, afterRecovery },
       });
@@ -145,6 +150,30 @@ export async function verifyListenerFailureRecovery(
   await Deno.writeTextFile(receiptPath, `${JSON.stringify(receipts, null, 2)}\n`);
   console.info(`listener failure/recovery receipt: ${receiptPath}`);
   return receipts;
+}
+
+/** Require Aspire's documented timeout result for a running resource that remains unhealthy. */
+export function requireHealthyWaitTimeout(
+  resource: string,
+  timeoutSeconds: number,
+  wait: AspireWaitResult,
+): string {
+  const expectedDiagnostic =
+    `Timed out waiting for resource '${resource}' to be healthy after ${timeoutSeconds}s.`;
+  const output = [wait.stderr, wait.stdout].filter((value) => value.length > 0).join('\n');
+  const hasExactDiagnostic = [wait.stderr, wait.stdout].some((stream) =>
+    stream.split(/\r?\n/u).some((line) => line.trim().replace(/^❌\s*/u, '') === expectedDiagnostic)
+  );
+  if (
+    wait.code !== HEALTHY_WAIT_TIMEOUT_EXIT_CODE ||
+    !hasExactDiagnostic
+  ) {
+    throw new Error(
+      `aspire wait ${resource} exited ${wait.code}, expected exit ${HEALTHY_WAIT_TIMEOUT_EXIT_CODE} ` +
+        `with diagnostic "${expectedDiagnostic}": ${output || '(no output)'}`,
+    );
+  }
+  return expectedDiagnostic;
 }
 
 function closedState(

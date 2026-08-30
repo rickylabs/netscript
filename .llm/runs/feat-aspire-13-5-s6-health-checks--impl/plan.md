@@ -45,7 +45,8 @@ CI-run failure/recovery acceptance code.
   service kinds without reading credential parameters.
 - Regenerate the infrastructure template snapshot and embedded asset barrel.
 - Make backing-service wait gates assert the named `healthReports` entry is Healthy.
-- Register the stop → Unhealthy/exit-18 → start → Healthy Phase-B fixture without running it locally.
+- Register the harness-owned close → Unhealthy → healthy-wait timeout (exit 17) → reopen → Healthy
+  Phase-B fixture without running it locally (D-101 architecture with D-102 exit contract).
 - Draft the S6b issue and #1366/#863 comments in the run directory.
 
 ## Non-Scope

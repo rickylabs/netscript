@@ -36,8 +36,8 @@ retains Phase-B runtime execution, slice review, and the next IMPL-EVAL.
 - Split the 812-line runtime registry into lifecycle/behavior/script concerns and grouped runtime
   probes, reducing `runtime-gates.ts` to 305 lines and direct scaffold files from 48 to 43.
 - Added describe-derived checks for `<resource>_listener`/`<resource>_resp` object-valued reports.
-- Registered (without running) the lease-backed stop → Unhealthy → exit 18 → start → Healthy
-  recovery fixture and JSON receipt path.
+- Registered (without running) the recovery fixture and JSON receipt path; D-101 later replaced its
+  lifecycle mechanism, and D-102 corrected the running/unhealthy wait-timeout contract to exit 17.
 - Passed 46 focused E2E tests and the 17-gate `scaffold.plugins` suite.
 - Committed/pushed slice 4 as `92de34d9bc440a7ede229daed7bd2b449e6b1a83` with its PR trail.
 - Drafted the S6b 0.0.8 issue and the #1366/#863 comments for supervisor posting.
@@ -153,3 +153,13 @@ the gate run left `deno.lock` and the worktree unchanged. Post-D-101 measurement
 `runtime-gates.ts` and 12 immediate `runtime/` children (the reconstructed pre-D-101 baseline was
 305/11). The remaining actions are this evidence-only commit/push and the required PR #1743 phase
 comment; runtime and evaluation remain supervisor-owned.
+
+## D-102 healthy-wait timeout correction
+
+The coordinator's Aspire 13.5.3 ruling corrects the synthetic listener fixture from the stale
+terminal-state exit 18 assumption to the running/unhealthy timeout contract: exit 17 plus
+`Timed out waiting for resource '<resource>' to be healthy after <timeoutSeconds>s.`. The receipt
+now records `healthyWaitTimeoutExitCode` and `healthyWaitTimeoutDiagnostic`. No listener,
+controller, port, transition, or resource-lifecycle behavior changed. Static evidence is green:
+55/55 focused tests, two-file structured check/lint/format, clean quality scan, and exit-0
+architecture check. Runtime and evaluator work remain coordinator-owned.

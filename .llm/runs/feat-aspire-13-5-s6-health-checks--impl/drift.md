@@ -88,3 +88,21 @@ documentation.
 - **Action:** D-101 replaces the mechanism with harness-owned synthetic listeners controlled by an
   Aspire-managed task and preserves real-key continuity in the receipt. No Docker permission or
   lifecycle command remains in this path.
+
+## 2026-08-31 — D-102 corrects the healthy-wait timeout exit contract
+
+- **What:** D-101 retained the earlier fixture's exit-18 assertion after replacing resource
+  lifecycle failure with a harness-owned listener fault that leaves the resource running.
+- **Source:** Coordinator D-102 ruling grounded in Aspire 13.5.3 authoritative docs and the live
+  Postgres single-gate receipt at
+  `.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s6/phase-b/postgres-single-gate.log`.
+- **Expected:** A resource that stays `Running`/`Unhealthy` through `aspire wait --status healthy
+  --timeout 10` returns exit 17 and the exact timeout diagnostic. Exit 18 is reserved for a
+  failed/terminal resource.
+- **Actual:** The synthetic listener transition and real-key continuity behaved correctly, but the
+  fixture rejected documented exit 17 because it still required 18.
+- **Severity:** bounded contract correction.
+- **Action:** require exit 17 plus the exact timeout sentence, rename the receipt fields to identify
+  a healthy-wait timeout, and leave listener/controller/resource lifecycle behavior unchanged.
+- **Evidence boundary:** focused static tests only in this implementation lane; the coordinator
+  owns the fresh zero-state Postgres lease and subsequent SQLite progression.

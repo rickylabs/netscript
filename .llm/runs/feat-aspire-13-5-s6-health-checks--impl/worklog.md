@@ -91,7 +91,7 @@ its runtime expectation to the readiness gate without touching credentials.
 | 2026-08-30 04:46 +02:00 | 4 | RED | Focused E2E test run exited 1 on moved `generated-app-name.ts` paths and a stale quickstart script import. No Aspire command or runtime was executed. |
 | 2026-08-30 04:48 +02:00 | 4 | green | Focused check/lint/test: 23 files linted, four test roots checked, and 46/46 tests passed for report parsing, wait commands, recovery registration/order, and moved probes. |
 | 2026-08-30 04:51 +02:00 | 4 | consumer/fitness | `quality:scan` findings `[]`, `arch:check` `FAIL=0`, and `scaffold.plugins` passed 17/17 with cleanup. The lease-backed recovery fixture remained unexecuted. |
-| 2026-08-30 04:51 +02:00 | 4 | reconcile | Registered the Phase-B stop/unhealthy/exit-18/start/healthy fixture behind the runtime suite and recorded JSON receipt output, but honored the no-lease boundary by running construction/parser tests only. No plan readjustment. |
+| 2026-08-30 04:51 +02:00 | 4 | reconcile | Registered the original Phase-B recovery fixture and JSON receipt output; its lifecycle mechanism was later replaced by D-101 and its timeout exit contract corrected by D-102. No runtime was executed in this implementation lane. |
 | 2026-08-30 04:53 +02:00 | 4 | commit/push | Committed `92de34d9bc440a7ede229daed7bd2b449e6b1a83` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 body/trail updated. |
 | 2026-08-30 04:55 +02:00 | 5 | coordination drafts | Drafted the 0.0.8 S6b protocol-readiness issue plus bounded comments for #1366 and #863. Files are committed for the supervisor to post; no issue/comment mutation was performed by this lane. |
 | 2026-08-30 04:56 +02:00 | 5 | final static | Configured lint passed 2,047 files; scoped check selected 29 files with zero diagnostics; wrapper exclusion of four `packages/cli` files was covered by raw no-config lint/fmt on 27 concrete owned files; focused suite passed 99/99. |
@@ -333,3 +333,27 @@ The reconstruction-v2 measurements above remain the correct pre-D-101 module-spl
 (305-line `runtime-gates.ts`, 11 `runtime/` children). The final D-101 tree measures 306 lines and
 12 children because this bounded slice adds exactly one controller gate registration and the new
 `listener-fault-controller.ts` module.
+
+## D-102 healthy-wait timeout contract correction
+
+PLAN-EVAL is N/A by coordinator ruling: Aspire 13.5.3 and the live Postgres receipt settle the
+exit-code contract, and this slice changes no architecture or runtime transition. The bounded
+slice updates the fixture assertion/receipt wording, adds a pure unit seam for exit 17 plus the
+exact timeout diagnostic, records D-102 drift, and runs focused static gates only. The controller,
+health transitions, fixed ports 18998/18999, and running-resource behavior remain frozen.
+
+- RED: the new focused fixture test exited 1 with two missing-export diagnostics for the timeout
+  contract constant and assertion seam.
+- GREEN: the focused D-101/D-102 suite passed 55/55 results across six roots. The three new cases
+  accept exit 17 with the exact documented sentence, reject terminal-state exit 18, and reject exit
+  17 when that sentence is absent or changed.
+- Receipt evidence now names `healthyWaitTimeoutExitCode` and
+  `healthyWaitTimeoutDiagnostic`; assertion failures repeat the required diagnostic verbatim.
+- Scoped structured check/lint/format selected both changed TypeScript files with zero diagnostics,
+  findings, refusals, or dropped files.
+- `quality:scan` passed with `findings=[]` and allowance count 7; `arch:check` exited 0 with
+  carried-in warnings only.
+- Reconcile: PR #1743 has no comment newer than the D-101 implementation report; D-102 remains a
+  bounded correction with Tier-A review, independent evaluation, and fresh runtime lease pending.
+- Runtime/AppHost/containers/evaluators/CI remain NOT_RUN. The coordinator retains Tier-A review,
+  independent evaluation, and the fresh zero-state Postgres lease.
