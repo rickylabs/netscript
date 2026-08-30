@@ -5048,3 +5048,46 @@ no `codex exec` process. Cycle 2 is terminal — `PASS_IMPL` or `FAIL_IMPL`, no 
 needing relaunch — all senders had already reported completion and the gate sweep exited 0. The only
 live `codex exec` on the host belongs to the **Aspire lane** (thread `01a052fc`, worktree
 `007-aspire-s11-audit`); left untouched. Leaf and eval worktrees intact, both clean.
+
+### #1368 IMPL-EVAL cycle 2 — `FAIL_IMPL` (terminal). Blocker is real and I should have caught it.
+
+Verdict `9e087618` on `eval/impl-eval-1368-cycle-2`, evaluated head `22f6fa61`, posted to PR #1764.
+Every supervisor row reproduced except the one that mattered.
+
+**F-A (blocking) — independently confirmed by me, not taken on trust.**
+`plugins/sagas/tests/telemetry/publish-trace-linkage_test.ts` is deterministically red at head and
+green at base:
+- head `22f6fa61`, whole `plugins/sagas`: exit 1, **50 passed / 1 failed / 1 ignored**, failure
+  `Expected 2 to equal 1` in `'publishSagaMessage propagates API trace headers as saga.handle parent
+  context'`.
+- base `f8b4f804`, same file in a throwaway detached worktree: exit 0, **2 passed / 0 failed**.
+
+Cause: the test's saga definition returns `[{ kind: 'complete' }]`, and `assertEquals(tracer.started
+.length, 1)` at l.62 pins the pre-leaf world where `complete` emitted no span. The leaf's entire
+purpose — issue target item 1 — is that `saga.cascade.complete` now emits from `SagaEngine`. So the
+test encodes exactly the behaviour the approved plan set out to change. The file is **untouched by the
+leaf** (no commit in `f8b4f804..HEAD` touches it) and sits **outside the locked 19-path ceiling**, so
+correcting it needs a coordinator ceiling amendment. It is a one-assertion fix at l.62, ideally
+selecting the `saga.handle` span by name rather than by index.
+
+**This is my miss, and the shape of it matters.** I ran the whole `packages/plugin-sagas-core` tree but
+only the *targeted* `create-durable-saga-runtime_test.ts` for `plugins/sagas` — I mirrored the author's
+scope instead of applying the same whole-package rule to both sides of the composition. Root
+`deno task test` includes the file and PR CI is skipping on the draft, so this would have turned main
+red on merge. It is the #1112 lesson in a new costume: the consumer that breaks is found by running
+the suite, not by enumerating consumers. F-B records the same gap upstream — the plan's
+ceiling-completeness analysis and both PLAN-EVALs enumerated span consumers **structurally** and so
+could never have seen a *behavioural* span-counting assertion.
+
+Evaluator judgments on the five questions I posed: corpus evidence **sufficient** (the `--check`
+recompute-and-compare is stronger than line inspection — a better answer than the one I hedged
+toward); `handle` widening backward-compatible by typecheck probe; the changed test literal is a
+**strengthening**, not manufactured green; the churn is net-zero across all product paths; and the leaf
+**cannot** go ready-merge with Flow-B `NOT_RUN` — it must run green under lease, CI, or off-host first.
+All seven cycle-1 findings verified genuinely resolved, F2/F3 by direct measurement.
+F-C (info): `SagaEngine.handle` JSDoc does not document the widened `execution` parameter.
+
+Both evaluator cycles are now spent. The leaf cannot self-certify out of this: proceeding needs a
+coordinator ruling on (1) a ceiling amendment for the one test file, and (2) how to re-certify once
+repaired, since the two permitted IMPL-EVAL cycles are exhausted. Escalating rather than choosing
+either for myself. `status:impl` retained; nothing mirrored, ticked, or readied.
