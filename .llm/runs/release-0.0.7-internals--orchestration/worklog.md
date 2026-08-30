@@ -3093,3 +3093,96 @@ open. Flagged for the coordinator.
 `rtk` still not installed; root `deno task test` still not a usable signal (~7.7k unreapable PID-1
 zombies). The evaluator observed no host-caused failure in its own run and said so rather than
 implying the host was clean.
+
+## 2026-08-30 — #1732 PLAN-EVAL cycle 2 `FAIL_FIX`; plan gate parked; next-queue blocker found to be false
+
+### Cycle 2 verdict — `FAIL_FIX` at `e0186bbd4`
+
+Verdict commit `e3f227c2151dcde3db0599af6dd37c61cbd76ba9`, artifact-only (diff outside `.llm/` versus
+the amended head is empty), cycle-1 `plan-eval.md` bit-identical, own verdict comment posted. Session
+stopped after its verdict was pushed.
+
+It confirmed the amendment worked — **cycle 1's F1 and F2 are genuinely closed, not reworded around**
+— and endorsed the approach, grammar, constant separation, compatibility position, scope, and gate
+set. Two new bounded plan-text corrections remain:
+
+- **F1 (major)** — `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts`
+  hardcodes the generated text shape (the `// --- workers ---` marker, the
+  `backgroundProcessors.set('workers', workers);` anchor, and an injected `workers.withEnvironment`
+  call). Slice 2 changes all three, so the fixture throws — and it is wired into the
+  `scaffold.runtime` suite that `AGENTS.md` names as the required pre-merge gate, so the break would
+  surface **only at merge-readiness, after IMPL-EVAL**. The plan never names the file.
+- **F2 (minor, real mechanism gap)** — `JSON.stringify` escapes `\n`/`\r` but **not** U+2028/U+2029,
+  which are ECMAScript LineTerminators that end a `//` comment. The comment-label site is the one
+  enumerated position where the plan's headline guarantee is false.
+
+Cycle 2 also recorded that cycle 1's "no test pins the old identifier text" sweep covered only unit
+tests and missed the E2E fixture — named as a cycle-1 miss rather than glossed.
+
+### Owner boundary — no cycle 3
+
+Cycle 2 was the **last granted plan cycle**. This lane did not authorize or launch a cycle 3 and did
+not freeze. **Only the #1732 plan gate is parked.** Head `e3f227c2151dcde3db0599af6dd37c61cbd76ba9`,
+local == remote == PR; PR draft with labels unchanged; issue untouched; **no source exists** — the
+diff versus `main` outside `.llm/runs/` is empty. Park and decision recorded as PR comment
+`5467501755`.
+
+Decision put to the owner: (1) grant one more plan cycle; (2) accept the two corrections and go
+straight to the RED slice, letting IMPL-EVAL and Tier-A be the gate; (3) rescope so the comment-label
+change is dropped and the E2E fixture anchor survives. Lane recommendation, **not acted on**: (2) —
+the two evaluations converged rather than diverged, both findings are mechanical with stated
+satisfying conditions, and the residual risk is exactly what a RED slice would surface empirically.
+The honest counter-argument for (1) is recorded alongside it: cycle 2 still found real defects cycle
+1 missed, so the plan has not yet demonstrated convergence to clean. That is the owner's call.
+
+### Next-queue preparation — and a stale ledger entry corrected
+
+With two leaves at owner boundaries, I moved to prepare the next internals item rather than idle.
+
+`#1429` is **not available** — it is already `status:impl` and covered by the Aspire lane's
+`fix/aspire-13-5-s7-teardown-leak-check` (PR #1744). Not this lane's to take.
+
+`#1533` (JSDoc `@example` compile gate) is the next internals item, and this run's own context pack
+records it as blocked: "PLAN-EVAL B1 found three more defective files, so #1533's gate would go red
+on four" — four `packages/contracts` `@example` blocks said to "import from a non-exporting root",
+measured with `deno doc --filter <symbol> packages/contracts/mod.ts` returning exit 1.
+
+**That blocker is false, and I nearly propagated it.** I re-ran the recorded command at current
+`main` `13878a80a5`, reproduced exit 1 on five of six symbols, and began reasoning about whether the
+leaf should repair the files or baseline them — until I read the examples themselves. They do not
+import from the root. They import from `@netscript/contracts/query` and
+`@netscript/contracts/transform`, which are **real published export subpaths**
+(`packages/contracts/deno.json` exports `.`, `./crud`, `./query`, `./transform`), and every symbol
+resolves from the subpath its example actually names:
+
+| Symbol | From the entrypoint the example names | Exit |
+| --- | --- | --- |
+| `createTransformer` | `transform.ts` | 0 |
+| `FilterConditionSchema`, `buildPrismaWhere` | `query.ts` | 0 |
+| `PaginationInputSchema`, `createPaginatedOutput` | `query.ts` | 0 |
+| `paginatedQuery` | `query.ts` | 0 |
+
+The original measurement asked the root for symbols the examples never claimed were on the root.
+
+One half of the old finding **does** survive, for a different reason: `schemas/pagination.ts`'s
+example uses `baseContract` and `UserSchema` with **no import for either**, so it genuinely would not
+compile. That is a real defect of exactly the class #1533 exists to catch — and it is evidence the
+gate is worth building, not a blocker to building it.
+
+So #1533's framing changes: it is not "repair four broken import specifiers first". It is "build the
+gate, then find out how many examples actually fail to compile" — a number nobody can state until the
+gate exists, and whose first landing needs a fix-or-baseline position decided on real output.
+
+**The lesson, and it is the fourth instance of the same shape this session:** the ledger is not
+evidence. It is a claim with a citation, and the citation has to be re-run against the thing it
+names, not merely re-executed. I re-executed the recorded command faithfully and still got the wrong
+answer, because the command itself was aimed at the wrong entrypoint. Re-running a stale measurement
+reproduces a stale conclusion.
+
+### Ownership question I am not deciding alone
+
+#1533 carries `area:docs` as well as `area:tooling`. This lane's context pack claims it as internals
+wave 3, but that same context pack just proved unreliable on the adjacent claim, and a docs topic
+orchestrator exists. Claiming it unilaterally risks crossing topic ownership, which this lane is
+required to preserve. Flagged for the coordinator with the research above already done, so whoever
+owns it starts unblocked.
