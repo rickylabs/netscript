@@ -366,4 +366,6 @@ green (427/0); pushed with lease; PR notes posted. | | S13 staged, not dispatche
 ready on S10′; dispatch sequenced after S11 audit/polish (coordinator). #1642 already on milestone
 0.0.7 (applied per the ruling). Runtime zero. | | S11 docs_audit cycle 1 | **`AUDIT: FAIL_FIX`** (7
 high / 5 medium, D-61) — claim-correctness findings; structure green. Fix cycle 1 routed to the same
-Gemini conversation. |
+Gemini conversation. | | S11 docs_audit fix cycle 1 landed | `b8d66f6f`
+`docs(aspire): apply S11 docs_audit cycle-1 fixes` (same Gemini conversation, 3 turns, DONE,
+pushed). Audit cycle 2 resumed on the same Sol thread `01a052fc…` at `b8d66f6f` (worktree moved). |
