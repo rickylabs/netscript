@@ -299,3 +299,52 @@ pass and created a duplicate author.
    cover neighbouring ground. Corrected on resume with an explicit instruction: if an existing test
    asserts the *silent* behaviour now being made fatal, update it deliberately and say so — never
    quietly delete a contradicting expectation.
+
+## D-1732-CS — central `milestone-cluster-state.json` drift observed 2026-08-30 (read-only; NOT fixed here)
+
+Observed at central `updatedAt` `2026-08-30T08:34:27.000Z` while resolving lane ownership for the
+next internals leaf. Central state is coordinator-owned; this lane **read** it and changed nothing.
+
+1. **`lanes[internals].controller.topicHeadSha` is not a real object.** It records
+   `c10a8e70f493409075c5f7acfd9671ca111f4799`; `git cat-file -t` on it fails
+   ("could not get object info"). The actual topic head at that moment was
+   `c10a8e70f493703ce8abcd1e7a8898e8ded550a9` — same 8-char prefix, divergent suffix. This is the
+   **fabricated-SHA-suffix** failure mode this lane has already been bitten by once (a leaf failed a
+   cycle-1 gate on it). Copy SHAs, never retype them. The rest of the controller record —
+   `sessionId`, `pid` `5498`, `bridgeSessionId`, requested/observed model and effort — matches this
+   session exactly and is correct.
+
+2. **#1732 / PR #1747 has no leaf entry.** No element of `leaves[]` carries issue `1732` or
+   `prNumber` `1747`; the pair survives only as a substring of the internals `queueState` string. So
+   the lane's single active implementation leaf is invisible to any consumer that reads `leaves[]`
+   — including WIP accounting against `activeImplementationSlicesPerLane: 2`.
+
+3. **`queueState` is the origin of the "narrow ContractBuilder" phrase.** It reads
+   `1732_pr1747_narrow_contract_builder_repair_active`. `ContractBuilder` exists nowhere in
+   `packages/`, `plugins/`, or this run's artifacts — the token is a flattening of the two real
+   bounded corrections: F1's fixture update **contract** and the F2 correction at the generated
+   `builder.addExecutable(...)` reference-name seam. Both are exactly what this lane authorized, so
+   the intent survived, but the compressed token reads like a class name and should not be
+   propagated as if it named a symbol.
+
+**Recommended upstream (coordinator-owned):** re-copy `topicHeadSha` from `git rev-parse`, add a
+`leaves[]` entry for the #1732 leaf, and expand the `queueState` token. This lane does not mutate
+central state and has not.
+
+## D-1732-QUEUE — #1533 / #1557 / #1601 are unfiled, so this lane did not claim them
+
+This run's `context-pack.md` lists `jsdoc-example-compile-gate` (#1533) as internals wave 3 and
+`fresh-defer-test-capability` (#1557/#1601) as wave 4. Central state does not agree: all three are
+present in `committedIssues` but **none has a `leaves[]` entry**, and no lane owns them.
+
+Per the settled rule that **lane ownership is decided by `milestone-cluster-state.json`, not by area
+labels**, this lane did **not** open a leaf for any of them on its own authority — #1533 additionally
+carries `area:docs` alongside `area:tooling` while a docs topic orchestrator exists. Assignment is
+requested from the coordinator; the #1533 research is already done (see the worklog entry disproving
+the stale four-defective-files blocker), so whoever receives it starts unblocked.
+
+The internals leaves that *are* filed are unavailable: `fresh-readonly-dehydrated-state` (#1734) is
+`blocked` at the owner boundary, `aspire-13-5-s7-teardown-leak-check` (#1429/#1719) is `blocked`
+behind an S3 merge, and the remaining `aspire-13-5-*` leaves are being driven by the dedicated Aspire
+supervisor in its own worktrees. So internals has exactly one workable leaf right now — #1732 — and
+it is active.
