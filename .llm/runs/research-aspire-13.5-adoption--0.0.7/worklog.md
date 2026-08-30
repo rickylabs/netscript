@@ -536,4 +536,8 @@ review-threads) proceeds; then the S1 merge packet. | | S1 current-main hold exe
 intersection `arch-debt.md` carries only S1's OF-2a Browsers-preview entry; delta tests 40/0,
 e2e-root check 0 failed, quality ok; `arch:check` green), pinned push. Run 33330714604 preserved as
 pre-convergence evidence. Current-main runtime proof queued as chain-4 (after S5b).
-Mirror/labels/ready already done; close-gate re-verifies at the new head. |
+Mirror/labels/ready already done; close-gate re-verifies at the new head. | | S5 full runtime GREEN
+| Run 33331022935 SUCCESS all tiers at `bf7223a6c3305c`. Packet remainder: the current-head
+two-concurrent-isolated-start receipt (next host lease, after S7's primary-resumed cleanup reaches
+zero) → evidence block → sole ready-merge → close-gate. Chain-4 dispatching S1's current-main proof
+at `c4cbda25`. |
