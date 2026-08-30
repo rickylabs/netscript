@@ -1353,3 +1353,11 @@
   (workflows still pinned to S1) and re-dispatch — this is S10 Phase-B attempt 1 = FAIL_FIX, not an
   S1/#1736 finding. Receipts (static/desktop artifacts + failed-step extracts):
   `receipts/offhost-run-33326591443/`.
+- **D-70 — host fix confirmed; D-42/D-43 probes PASS; sole Aspire runtime lease granted.**
+  Coordinator baseline at grant: containers=0, volumes=0, `aspire ps`=`[]`, Docker 28.5.2,
+  `netscript-dind`=`10.4.12.22`. Re-proven locally: probe 1 (identical-path bind of
+  `/home/agent/projects/netscript/worktrees/007-aspire-s10` into an alpine container) → 24 entries,
+  `deno.json` visible; probe 2 (`-p 0.0.0.0::8080` echo container) → `curl netscript-dind:32768` =
+  `ok`, `127.0.0.1:32768` refused. Owned probe removed; containers/volumes back to 0. Local Phase B
+  (S3 → S7 → S8, serial) resumes under `DOCKER_HOST=tcp://netscript-dind:2375` with
+  `aspire start --isolated --non-interactive`; lease returns to exact zero before release.
