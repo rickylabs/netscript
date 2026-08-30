@@ -3,12 +3,7 @@ import { assert, assertEquals, assertExists } from '@std/assert';
 const triggersApi = Deno.env.get('services__triggers-api__https__0') ??
   Deno.env.get('services__triggers-api__http__0') ??
   Deno.env.get('TRIGGERS_API_URL');
-if (triggersApi === undefined) {
-  throw new Error(
-    'Triggers E2E endpoint was not discovered. Configure an Aspire service reference or TRIGGERS_API_URL.',
-  );
-}
-export const TRIGGERS_API: string = triggersApi;
+export const TRIGGERS_API: string = triggersApi ?? '';
 export const WEBHOOKS_BASE: string = `${TRIGGERS_API}/api/v1/webhooks`;
 export const REST_BASE: string = `${TRIGGERS_API}/api/v1/triggers`;
 export const EXPORT_WEBHOOK_SECRET: string = Deno.env.get('WEBHOOK_EXPORT_SECRET') ??
@@ -27,7 +22,14 @@ export function webhookE2eTest(
     ignore: !webhookE2eEnabled(),
     sanitizeOps: false,
     sanitizeResources: false,
-    fn,
+    fn: async () => {
+      if (triggersApi === undefined) {
+        throw new Error(
+          'Triggers E2E endpoint was not discovered. Configure an Aspire service reference or TRIGGERS_API_URL.',
+        );
+      }
+      await fn();
+    },
   });
 }
 

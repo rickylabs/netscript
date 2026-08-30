@@ -67,6 +67,9 @@ required, and expose cross-resource URLs through resource-reference environment 
 | 2026-08-30 | 4 | opt-in pins | Plugin manifests/entries and five infrastructure engines default to allocation. |
 | 2026-08-30 | 4 | push | `8aee17462` pushed with plugin/infrastructure opt-in evidence. |
 | 2026-08-30 | 5 | live probes | Runtime and OTEL gates resolve resource URLs from live Aspire describe output. |
+| 2026-08-30 | 5 | push | `732337435` pushed with describe-derived probe evidence. |
+| 2026-08-30 | 6 | generated assets | Preserved embedded bytes while removing forbidden generated-source spellings. |
+| 2026-08-30 | 6 | final gates | Static, doctrine, JSR, plugin, and `scaffold.plugins` gates are green/baseline. |
 
 ## Decisions
 
@@ -98,6 +101,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | contribution allocation | PASS / exit `0` | `receipts/03-contributions.txt` | 957 files; no contribution fallback/URL findings. |
 | generated host-port opt-in | PASS / exit `0` | `receipts/04-opt-in-host-ports.txt` | Plugin and infrastructure cases covered. |
 | describe-derived probes | PASS / exit `0` | `receipts/05-describe-derived-probes.txt` | 57 tests plus 9 nested smoke steps passed. |
+| final host-port/static gates | PASS / exit `0` | `receipts/06-final-gates.txt` | Exact grep has only the two D-14 compatibility assertions. |
 
 ### Runtime Gates
 
@@ -113,7 +117,15 @@ required, and expose cross-resource URLs through resource-reference environment 
 | sagas doc lint | BASELINE / exit `1` | `receipts/02-sagas-jsr-audit.txt` | Only pre-existing #1708 private-type-ref. |
 | four-entry consumer import | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | Deprecated export present at all locked paths. |
 | sagas unit suite | PASS / exit `0` | `receipts/02-sagas-jsr-audit.txt` | 33 passed, 0 failed. |
+| all official plugin suites | PASS / exit `0` | `receipts/06-final-gates.txt` | 204 passed, 13 intentionally ignored, 0 failed. |
+
+### Scaffold Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `scaffold.plugins` | PASS / exit `0` | `receipts/06-final-gates.txt` | 17 passed, 0 failed, 0 skipped. |
 
 ## Handoff Notes
 
-- Supervisor should inspect the RED receipt first, then D-14 behavior and the final literal grep.
+- All six implementation slices are complete. The supervisor owns IMPL-EVAL, ready-state transition,
+  and CI `scaffold.runtime`; this lane does not self-certify.

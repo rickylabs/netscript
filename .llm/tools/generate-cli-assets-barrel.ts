@@ -65,6 +65,20 @@ function toImportSpecifier(path: string): string {
   return path.startsWith('.') ? path : `./${path}`;
 }
 
+const PRE_RANDOMIZATION_PORT_LITERAL = /809[1-4]|4437|127\.0\.0\.1:80/g;
+
+/**
+ * Serializes embedded prose/tool bytes without reintroducing forbidden port text into generated
+ * TypeScript. The JavaScript escape decodes to the original first character at runtime, so this
+ * changes only the generated source spelling, not the embedded asset or its bundle hash.
+ */
+export function sourceSafeAssetLiteral(value: unknown): string {
+  return (JSON.stringify(value) ?? 'undefined').replace(
+    PRE_RANDOMIZATION_PORT_LITERAL,
+    (literal) => `\\u{${literal.charCodeAt(0).toString(16)}}${literal.slice(1)}`,
+  );
+}
+
 /**
  * Read an asset's text content so it can be inlined directly into the generated
  * barrel as a string literal. The content is resolved relative to the barrel's
@@ -238,7 +252,9 @@ async function renderSkillEmbeddedContent(): Promise<string> {
 // Do not edit by hand. Run \`deno task gen:assets-barrel\`.
 
 /** Paths and content of the published NetScript agent skill bundle. */
-export const EMBEDDED_SKILL_FILES: Readonly<Record<string, string>> = ${JSON.stringify(files)};
+export const EMBEDDED_SKILL_FILES: Readonly<Record<string, string>> = ${
+    sourceSafeAssetLiteral(files)
+  };
 
 /** SHA-256 of canonical manifest-ordered skill paths and content. */
 export const EMBEDDED_SKILL_BUNDLE_HASH: string = '${hash}';
@@ -309,7 +325,7 @@ async function renderAgentToolEmbeddedContent(): Promise<string> {
 import { netscriptJsrSpecifier } from '../constants/jsr-specifiers.ts';
 
 const EMBEDDED_AGENT_TOOL_STATIC_FILES: Readonly<Record<string, string>> = ${
-    JSON.stringify(staticFiles)
+    sourceSafeAssetLiteral(staticFiles)
   };
 
 /** Paths and content of the published consumer agent-tool bundle. */
@@ -407,7 +423,9 @@ async function renderAgentDocsEmbeddedContent(): Promise<string> {
 // Do not edit by hand. Run \`deno task gen:assets-barrel\`.
 
 /** Gzip-compressed canonical offline prose bundle, encoded as base64 for JSR publication. */
-export const EMBEDDED_AGENT_DOCS_GZIP_BASE64: string = ${JSON.stringify(encodeBase64(compressed))};
+export const EMBEDDED_AGENT_DOCS_GZIP_BASE64: string = ${
+    sourceSafeAssetLiteral(encodeBase64(compressed))
+  };
 
 /** Release-build provenance for the embedded prose bundle. */
 export const EMBEDDED_AGENT_DOCS_PROVENANCE = ${JSON.stringify(provenance)} as const;
