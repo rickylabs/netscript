@@ -1,5 +1,5 @@
 import { parse as parseJsonc } from '@std/jsonc';
-import { basename, dirname, fromFileUrl, isAbsolute, join, resolve, SEPARATOR } from '@std/path';
+import { basename, dirname, fromFileUrl, isAbsolute, join, relative, resolve, SEPARATOR } from '@std/path';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
@@ -80,17 +80,25 @@ export function createInstalledRuntimeRegistryGenerator(
       const targets = manifest.runtimeRegistries;
       if (!generator || !targets?.length) continue;
 
-      const itemCount = await countRegistrableItems(
-        input.projectRoot,
-        targets,
-        dependencies.fs,
+      const discoveredTargets = await Promise.all(targets.map(async (target) => ({
+        sourceFiles: await discoverRegistrableSourceFiles(
+          input.projectRoot,
+          target,
+          dependencies.fs,
+        ),
+        target,
+      })));
+      const itemCount = discoveredTargets.reduce(
+        (count, target) => count + target.sourceFiles.length,
+        0,
       );
       if (itemCount === 0) throw new EmptyPluginRegistryError(installed.name);
 
-      generated.push(...targets.map((target) => ({
+      generated.push(...discoveredTargets.map(({ sourceFiles, target }) => ({
         path: target.registryPath,
         plugin: installed.name,
-        registrableItems: itemCount,
+        registrableItems: sourceFiles.length,
+        ...(input.dryRun ? { sourceFiles } : {}),
       })));
       if (input.dryRun) continue;
 
@@ -360,33 +368,38 @@ function readRuntimeManifest(value: unknown, plugin: string): RuntimeRegistryMan
   }
 }
 
-async function countRegistrableItems(
+async function discoverRegistrableSourceFiles(
   projectRoot: string,
-  targets: readonly RuntimeRegistryTarget[],
+  target: RuntimeRegistryTarget,
   fs: FileSystemPort,
-): Promise<number> {
-  let count = 0;
-  for (const target of targets) {
-    count += await countDirectory(projectRoot, target, fs);
-    for (const pluginDir of target.pluginDirs ?? []) {
-      count += await countDirectory(projectRoot, pluginDir, fs);
+): Promise<readonly string[]> {
+  const files = new Set(await discoverDirectoryFiles(projectRoot, target, fs));
+  for (const pluginDir of target.pluginDirs ?? []) {
+    for (const file of await discoverDirectoryFiles(projectRoot, pluginDir, fs)) {
+      files.add(file);
     }
   }
-  return count;
+  return [...files].sort((left, right) => left.localeCompare(right));
 }
 
-async function countDirectory(
+async function discoverDirectoryFiles(
   projectRoot: string,
   directory: RuntimeRegistryDirectory,
   fs: FileSystemPort,
-): Promise<number> {
+): Promise<readonly string[]> {
   const absolute = join(projectRoot, directory.dir);
-  if (!await fs.exists(absolute)) return 0;
+  if (!await fs.exists(absolute)) return [];
   const suffixes = directory.fileSuffixes ?? ['.ts'];
   const excluded = new Set(directory.exclude ?? []);
-  return (await fs.readDir(absolute)).filter((entry) =>
-    entry.isFile && !excluded.has(entry.name) && suffixes.some((suffix) => entry.name.endsWith(suffix))
-  ).length;
+  return (await fs.readDir(absolute))
+    .filter((entry) =>
+      entry.isFile && !excluded.has(entry.name) && suffixes.some((suffix) => entry.name.endsWith(suffix))
+    )
+    .map((entry) => normalizeProjectPath(relative(projectRoot, join(absolute, entry.name))));
+}
+
+function normalizeProjectPath(path: string): string {
+  return path.replaceAll('\\', '/');
 }
 
 async function runGenerator(options: {

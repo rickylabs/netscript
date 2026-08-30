@@ -20,6 +20,8 @@ import {
   JsrExportMapHttpError,
   type JsrExportMapLoader,
 } from './jsr-export-map-loader-port.ts';
+import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
+import { checkRuntimeRegistryDrift } from './runtime-registry-drift.ts';
 
 export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
 export const CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK = 'configured-module-exports-manifest';
@@ -79,6 +81,8 @@ export interface PluginDoctorDependencies {
   readonly loadJsrExportMap?: JsrExportMapLoader;
   /** Inspect the running Aspire AppHost for configured resource truth. */
   readonly inspectAppHost?: AppHostInspector;
+  /** Inspect manifest-declared runtime registries without regenerating them. */
+  readonly inspectRuntimeRegistries?: GenerateInstalledPluginRegistries;
 }
 
 /** One named resource observed from a running AppHost. */
@@ -118,6 +122,7 @@ export async function doctorPlugin(
     pluginSpecs.map((spec) => checkConfiguredModule(input.projectRoot, spec, dependencies)),
   );
   const serviceChecks = await checkServiceEntrypoints(input.projectRoot, dependencies);
+  const runtimeRegistryReport = await diagnoseRuntimeRegistries(input.projectRoot, dependencies);
   const appHostReport = dependencies.inspectAppHost
     ? await diagnoseAppHost(input.projectRoot, config, dependencies.inspectAppHost)
     : undefined;
@@ -125,7 +130,7 @@ export async function doctorPlugin(
     const serviceReport = serviceChecks.some((entry) => entry.check.status === 'error')
       ? workspaceChecksReport(serviceChecks)
       : undefined;
-    return [appHostReport, serviceReport].filter(isPluginDoctorReport);
+    return [appHostReport, runtimeRegistryReport, serviceReport].filter(isPluginDoctorReport);
   }
 
   let plugins: Record<string, RegisteredPluginConfig>;
@@ -155,7 +160,30 @@ export async function doctorPlugin(
   const unmatchedServiceReport = unmatchedServiceChecks.length > 0
     ? workspaceChecksReport(unmatchedServiceChecks)
     : undefined;
-  return [appHostReport, ...reports, unmatchedServiceReport].filter(isPluginDoctorReport);
+  return [appHostReport, runtimeRegistryReport, ...reports, unmatchedServiceReport].filter(
+    isPluginDoctorReport,
+  );
+}
+
+async function diagnoseRuntimeRegistries(
+  projectRoot: string,
+  dependencies: PluginDoctorDependencies,
+): Promise<PluginDoctorReport | undefined> {
+  if (!dependencies.inspectRuntimeRegistries) return undefined;
+  try {
+    const registries = await dependencies.inspectRuntimeRegistries({
+      dryRun: true,
+      projectRoot,
+    });
+    const checks = await checkRuntimeRegistryDrift({ fs: dependencies.fs, projectRoot, registries });
+    return { pluginName: 'workspace', status: aggregateStatus(checks), checks };
+  } catch (error) {
+    return workspaceErrorReport(
+      'runtime-registry:inspection',
+      'Manifest-declared runtime registry inspection',
+      error,
+    );
+  }
 }
 
 async function diagnoseAppHost(

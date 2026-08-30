@@ -9,6 +9,8 @@ export interface GeneratedPluginRegistry {
   readonly path: string;
   readonly plugin: string;
   readonly registrableItems: number;
+  /** Manifest-discovered project source files, present for read-only inspection. */
+  readonly sourceFiles?: readonly string[];
 }
 
 /** Authoritative installed-plugin registry generation use case. */

@@ -6,10 +6,10 @@ does not act as Tier-A supervisor or evaluator in this run.
 | Field | Value |
 | --- | --- |
 | Model | Tier-A supervisor identity pending external handoff; implementation author is OpenAI GPT-5.6 Sol |
-| Session | Implementation thread `01a04fd2-563e-7250-9173-f6befd6db8f2`; supervisor session pending |
-| Host | `YogaBook9i` · WSL2 Linux · user `codex` |
-| Checkout | `/home/codex/repos/netscript-007-leaf-plugin-doctor` |
-| Worktree | `/home/codex/repos/netscript-007-leaf-plugin-doctor` |
+| Session | Fresh Codex implementation thread on migrated host; runtime session identifier is not exposed to the implementation author; supervisor session pending |
+| Host | `ai-agents` · Linux · user `node` |
+| Checkout | `/home/agent/projects/netscript/worktrees/007-leaf-1673` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1673` |
 | Branch | `fix/plugin-doctor-registry-drift` |
 | Baseline | `13878a80a50c55b9662099fed64555f2310ae4a3` (`origin/main`, 2026-08-30) |
 | Run ID | `fix-plugin-doctor-registry-drift--0.0.7` |

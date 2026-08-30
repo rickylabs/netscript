@@ -12,11 +12,11 @@
 
 ## Current State
 
-Issue #1673 is re-baselined at `origin/main` `13878a80a`. The late-saga regression has been authored
-and run against unchanged product code: the structured wrapper exited `1` only because
-`assertRejects` observed doctor incorrectly succeed (`passed=0 failed=1`). The exact six-path
-product ceiling and all gates remain locked. Product implementation has not started; independent
-IMPL-EVAL remains pending.
+Issue #1673 is re-baselined at `origin/main` `13878a80a`. S3 now implements manifest-backed,
+bidirectional runtime-registry comparison across exactly the six locked product/test paths. The
+focused structured suite is green (`passed=5 failed=0`), the related suite is green
+(`passed=47 failed=0`), and exact-file type-checking reports zero diagnostics. S4 final-head gates
+and independent IMPL-EVAL remain pending.
 
 ## Completed
 
@@ -30,17 +30,22 @@ IMPL-EVAL remains pending.
   identity created.
 - Red-before regression: generated a registry, added `sagas/late-saga.ts`, did not regenerate, and
   captured `AssertionError: Expected function to reject.` from the focused structured test.
+- Dry-run generator evidence now exposes normalized `sourceFiles` per manifest registry target.
+- Doctor now detects missing entries, reverse orphan imports, and imported-but-unused bindings, and
+  names the exact manifest-backed healthy/no-target evidence ceiling.
+- Production composition supplies the existing generator closure while focused legacy doctor seams
+  remain source-compatible because inspection is optional at the dependency interface.
 
 ## In Progress
 
-- Slice-2 regression commit/push and PR evidence comment.
+- Slice-3 commit/push, PR body progress, and structured PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push the red-before regression slice.
-2. Implement within the six-path ceiling, then add reverse/aligned assertions and run focused green.
-3. Run selected scoped gates and collect final-head receipts.
-4. Push final implementation/evidence commits, comment phase evidence, and stop for Tier-A.
+1. Commit/push S3 with the focused and related green evidence.
+2. Update the draft PR's S2/S3 progress and post the S3 structured comment.
+3. Run gates 1–10 plus the two measured cascade checks at the final implementation head.
+4. Commit/push S4 evidence, finalize the PR body/comment, and stop for Tier-A.
 
 ## Key Decisions
 
@@ -54,15 +59,16 @@ IMPL-EVAL remains pending.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/*.md` | new | Harness lifecycle and evidence artifacts. |
+| six locked `packages/cli` product/test paths | changed/new | Internal discovery evidence, comparison policy, orchestration, production wiring, and semantic regression coverage. |
+| `.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/*.md` | updated | S3 evidence and migrated-host implementation identity. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS (authoring completeness only) | `research.md`, `plan.md`, `worklog.md`; PLAN-EVAL N/A, not self-certification |
-| Static | RED_BASELINE | focused test exit `1`; expected assertion failure proves current doctor stayed green |
-| Fitness | NOT_RUN | implementation not started |
+| Static | PASS_S3 | focused `5/5`, related `47/47`, exact-file check zero diagnostics |
+| Fitness | NOT_RUN | S4 final-head quality/doctrine and JSR gates pending |
 | Runtime | N/A | prohibited live surfaces |
 | Consumer | NOT_RUN | focused temp-workspace regression planned |
 
@@ -79,4 +85,6 @@ IMPL-EVAL remains pending.
 ## Commits
 
 - Bootstrap: `d37b278b6` (pushed; draft PR #1739 opened).
-- Red-before regression: pending commit.
+- Red-before regression: `c947b8fa4` (pushed; S2 PR comment posted).
+- Bidirectional comparison and production wiring: the S3 commit containing this context update;
+  exact SHA is recorded in the PR comment after push.
