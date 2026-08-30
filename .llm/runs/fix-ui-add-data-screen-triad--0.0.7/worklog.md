@@ -356,3 +356,60 @@ remains exactly the locked 12 paths.
 - Do not treat base-red lint/fmt commands as implementation regressions; require split wrapper full
   coverage and compare like-for-like.
 - Do not run or mark `scaffold.runtime` passing in the author session.
+
+## Supervisor Tier-A — exact-head sign-off at `b8846d6b3` (2026-08-30)
+
+Artifact-only supervisor commit. Every result re-derived by me in a detached worktree on a clean tree,
+never copied from the author's report.
+
+### Head identity
+
+Product head `dbb62c065`; S2D evidence `b8846d6b3`; base `de57fab0`; local == remote.
+PLAN-EVAL cycle 2 `PASS_PLAN` at `53e696b5`.
+
+### Slice evidence — red-before measured against unchanged product code in every case
+
+| Slice | Red-before | Green | Whole `packages/cli` |
+| --- | --- | --- | --- |
+| S2A `0d620b619` → `e5d820b3f` | exit 1, **1 / 7 failed** (role plan, prerequisite-with-zero-writes, dry-run plan, `appRoutes` registration, 3-vs-4 file count, collision preflight, force-replace) | exit 0, 8 / 0 | **1379 / 0** |
+| S2B `22e737fc3` → `0cc9b7ad7` | exit 1, **17 / 4 failed** | exit 0, 21 / 0 | **1384 / 0** |
+| S2C `7ed5b94c6` → `dbb62c065` | e2e exit 1, **167 / 3 failed** | 170 / 0 | **1386 / 0** |
+
+Each red-before is a separate commit touching test files only, so every green is product-caused.
+
+### Gates at `b8846d6b3`
+
+`arch:check` 0 · `check:agent-docs-prose` 0 · `check:publish-assets` 0 · `check:mcp-export-corpus` 0 ·
+CLI JSR audit 0 · whole `packages/cli` **1386 / 0** · `deno.lock` byte-unchanged vs `de57fab0` ·
+product ceiling **exactly 12 paths** · tree clean after the sweep.
+
+`check:assets-barrel` deliberately `NOT_RUN` — it writes before it diffs; the three read-only cascade
+checks stand in its place and all pass.
+
+Lint/fmt are **N/A by configuration**, not passing: root `deno.json` excludes `packages/cli/` from both,
+and `packages/cli/deno.json` sets neither, so scoped runs return "No target files found". The plan
+measured this at base (gate row 6: BASE RED exit 2, partial exclusion, 6 dropped). Recorded as N/A
+rather than green, and no config was edited to manufacture one.
+
+### The two findings that mattered, both closed
+
+- **Gate selection (PLAN-EVAL c1 blocker).** A gate defined but not selected is silently dropped.
+  Verified at the blob: `SCAFFOLD_UI_DATA_SCREEN: 'scaffold.ui-data-screen'` at `cli-surface.ts:78`,
+  **selected into `RUNTIME_GATES` at `capability-suites.ts:54`**, with definition, registration, tests
+  and selection all present.
+- **Help↔role coupling (D13, advisory in both plan cycles).** Verified in code rather than from the
+  design note: the test calls `testCommand(fs).getHelp()` and `assertHelpMatchesPlan` parses
+  `Data-screen roles: …` out of the **rendered** help, comparing against independently planned file
+  roles, with a negative case rejecting the stale three-part advertisement. Help→plan, not
+  constant→constant.
+
+### Outstanding
+
+`deno task e2e:cli run scaffold.runtime --cleanup` including the new `scaffold.ui-data-screen` gate is
+**`NOT_RUN`** and REQUIRED. It is queued on the singleton host lease, currently held by another lane
+(live `relay-s7-phase-b-*` containers). It is **not** topology-blocked: D-42/D-43 are resolved. Nothing
+runtime was started.
+
+### Verdict
+
+**Tier-A PASS at `b8846d6b3`.** Cleared for separate-session IMPL-EVAL.
