@@ -433,3 +433,32 @@ all still pass, which is what makes this mechanical rather than a re-cut.
 
 IMPL-EVAL cycle 1 `PASS_IMPL` (`2991113a6`) therefore carries forward to this head.
 `scaffold.runtime --cleanup` remains the sole outstanding gate, queued on the singleton host lease.
+
+## Main convergence + Tier-A re-verification at `07441ca3d` (2026-08-30)
+
+Merged current main `73bf2efa9` (merge, not rebase; #1739/#1673 shipped in this advance). **Zero true
+intersection** verified against the authoritative 12-path ceiling from `plan.md` before merging — the
+155-file main delta (`9710a2898..73bf2efa9`) touches none of them. Clean merge, 0 conflicts.
+**Patch-identity proven**: all 12 ceiling paths `git diff --quiet` identical between pre-merge
+`487eaf141` and post-merge head.
+
+Cascade checks unaffected: `check:mcp-export-corpus`, `check:publish-assets`,
+`check:agent-docs-prose`, `arch:check` all exit 0 — no carrier regeneration needed.
+
+Static Tier-A re-run at `07441ca3d`:
+
+| Check | Result |
+| --- | --- |
+| Whole `packages/cli` | exit 0, **1410 / 0** (was 1388 pre-merge; +22 are main's own new tests) |
+| `packages/cli/e2e/tests` | exit 0, **175 / 0** (was 171; +4 are main's own new tests) |
+| CLI JSR audit | exit 0; two pre-existing `F-DOCT-5` cardinality WARNs (unrelated directories) and one `F-JSR-7` slow-types WARN, no FAIL |
+| `deno.lock` vs `de57fab0` | byte-unchanged |
+| Ceiling | 12 paths, all patch-identical |
+| Tree | clean |
+
+**IMPL-EVAL `PASS_IMPL` (`2991113a6`) carries forward as MECHANICAL_PASS** — this is the same
+inert-convergence pattern already proven this session on #1764 and #1739: zero-intersection merge with
+patch-identity means the evaluated product state is unchanged, so no new evaluator cycle is required.
+
+Sole remaining gate: `scaffold.runtime --cleanup` including `scaffold.ui-data-screen`. `NOT_RUN`, queued
+on the singleton host lease, currently held by Aspire. Request prepared, not started.
