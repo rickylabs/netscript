@@ -1,0 +1,91 @@
+{
+  "pkg": {
+    "name": "@netscript/contracts",
+    "version": "0.0.6",
+    "description": "NetScript contract primitives, common schemas, CRUD generators, query helpers, and transform helpers.",
+    "root": "packages/contracts"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./crud": "./crud.ts",
+    "./query": "./query.ts",
+    "./transform": "./transform.ts"
+  },
+  "files": {
+    "total": 26,
+    "loc": 2946,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 733
+      },
+      {
+        "path": "crud.ts",
+        "bytes": 757
+      },
+      {
+        "path": "query.ts",
+        "bytes": 606
+      },
+      {
+        "path": "transform.ts",
+        "bytes": 383
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 116,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./crud": true,
+      "./query": true,
+      "./transform": true
+    },
+    "descriptionLen": 101
+  },
+  "surface": {
+    ".": {
+      "exported": [],
+      "rawCount": 1
+    },
+    "./crud": {
+      "exported": [],
+      "rawCount": 1
+    },
+    "./query": {
+      "exported": [],
+      "rawCount": 3
+    },
+    "./transform": {
+      "exported": [],
+      "rawCount": 1
+    }
+  },
+  "tests": {
+    "fileCount": 6,
+    "files": [
+      "tests/procedure-meta_test.ts",
+      "tests/contracts_test.ts",
+      "tests/procedure-meta-independence_test.ts",
+      "tests/assertion-budget_test.ts",
+      "tests/errors_test.ts",
+      "tests/schema-types_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-7 slow-types",
+      "level": "INFO",
+      "message": "Checking for slow types in the public API... — sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [
+      "Checking for slow types in the public API..."
+    ],
+    "rawTail": "\nChecking for slow types in the public API...\nSimulating publish of @netscript/contracts@0.0.6 with files:\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/README.md (5.97KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/crud.ts (757B)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/crud/create-crud-contract.ts (16.88KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/deno.json (1.01KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/mod.ts (733B)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/query.ts (606B)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/schemas/filters.ts (6.4KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/schemas/pagination.ts (7.27KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/application/contract-primitives.ts (6.74KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/application/paginated-query.ts (6.5KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/application/transform-helpers.ts (5.45KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/application/zod-helpers.ts (4.24KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/diagnostics/inspection.ts (1.03KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/domain/constants.ts (1.17KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/domain/errors.ts (3.13KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/domain/procedure-meta.ts (1021B)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/domain/result.ts (431B)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/domain/schema-types.ts (3.65KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/domain/schemas.ts (7.96KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/public/mod.ts (2.31KB)\n   file:///home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/transform.ts (383B)\nSuccess Dry run complete\n"
+  }
+}

@@ -6,10 +6,12 @@
 - Evaluator head integrated: `1df5ff3e44ff1e5deff899b932b5922040a674e4`
 - PLAN-EVAL cycle 2: `PASS`
 - Active slice: 1 — contracts vocabulary + builder soundness
-- Slice state: implementation committed and pushed at `c9a391811`; the complete eight-receipt set
-  is preserved in the migration checkpoint with five PASS and three terminal FAIL receipts
-- Commit/push/PR slice comment: implementation head and receipt outcomes are durable; bounded repair
-  remains pending after NAS resume
+- Slice state: bounded repair content committed at `3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d`;
+  attempt-2 receipts recut at that exact content head
+- Pre-repair receipts: archived unchanged under `receipts/frozen-c9a391811/` by
+  `9649b349cda5372838df20f4f17811d79c77e1e6`
+- Current receipt verdict: six PASS, two terminal FAIL (`test`, `public-doc-lint`); explicit named-set
+  sufficiency is `INSUFFICIENT`
 
 ## Implemented locally
 
@@ -19,20 +21,26 @@
 - Real-export exact-equality and negative fixtures, runtime metadata storage test, contracts
   assertion-budget scanner, and contracts-side doc-JSON independence test.
 - Contracts README and module/JSDoc ownership and additive-compatibility documentation.
+- SDK doctest exact-equality guard now references public `BaseContractMeta` and was proven capable
+  of failing by a temporary stale expectation (`TS2344`).
+- `BaseContractErrors` is now public as a NetScript-owned adapter alias; upstream oRPC types remain
+  unexported per AP-14.
 
 ## Gate state
 
-- PASS: focused contracts check, 14/14 tests, lint, TS format, `quality:gate`, separate
-  `arch:check`, contracts JSR audit.
-- FAIL: exact full-export contracts doc lint, solely 11 sanctioned oRPC `private-type-ref`
-  diagnostics; zero missing JSDoc. See `drift.md` D-1.
-- Durable receipts: present for all eight contracted gate IDs at `c9a391811`. Three are deliberately
-  red: check/test share the SDK README doctest `BaseMeta` mismatch; public doc lint reports the
-  private-type boundary findings. Expensive gates and slices 2–3 remain NOT RUN.
+- PASS receipts at `3c3f9b7c`: `check`, `lint`, `fmt-check`, `quality-gate`, `arch-check`, and
+  `publish-dry-run`.
+- FAIL receipt: root `test` passed 4246, failed 2, ignored 19. Failures are outside the leaf:
+  `codex-follow_test.ts` hit `Too many open files`, and `hybrid-launcher_test.ts` observed a worker
+  descendant surviving cancellation. The focused repaired SDK doctest passed 3/3.
+- FAIL receipt: exact 16-entrypoint `public-doc-lint` reports 13 `private-type-ref` findings. The
+  measured comparison is base `13878a80a` = 12, pre-repair `f9056f879` = 14, repaired `3c3f9b7c` =
+  13. Fresh alias findings for `MergedErrorMap` and `commonErrorMap` leave delta +1; see D-1.
+- Supplemental contracts JSR audit passes with one sanctioned oRPC slow-types INFO; it is outside
+  the named eight receipts.
+- Expensive gates and slice 2 remain NOT RUN.
 
 ## Resume point
 
-Recreate the worktree from the pushed branch on the NAS and verify the migration checkpoint contains
-all eight receipt JSON files. Resume the already-bounded SDK/doctest and adapter-boundary repair;
-regenerate the exact-head evidence set, then hand it to Tier-A and separate-session IMPL-EVAL. Do not
-start slice 2 before slice 1 is green and signed off.
+Tier-A must review the landed repair and the two terminal FAIL findings. IMPL-EVAL remains a separate
+session and has not been run. Do not start slice 2 before slice 1 is signed off.

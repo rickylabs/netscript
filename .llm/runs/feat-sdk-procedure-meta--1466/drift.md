@@ -67,3 +67,40 @@ before the bounded repair and Tier-A sign-off. The eight exact-head JSON receipt
 committed and pushed even though three are terminal FAIL receipts. This is evidence preservation,
 not a gate waiver or self-certification. The NAS resume must regenerate the receipts after repair;
 it must not treat the preserved red set as current proof.
+
+## D-3 — base reconciliation is inert for the repaired surface
+
+- Date: 2026-08-30
+- Slice: 1 repair
+- Severity: informational
+- Status: reconciled; no rebase or merge performed
+
+The fixed plan base is `21d516224fe35e92957f0998ee848bbf2024eda0`; current `origin/main` is
+`13878a80a`, three commits ahead. The coordinator measured both the commit log and diff for
+`packages/contracts` plus `packages/sdk` as empty across that range. The drift is therefore inert
+for this repair, and holding the base fixed preserves comparability between the pre-repair and
+attempt-2 receipts. No rebase or merge of `main` was performed.
+
+## D-4 — attempt-1 archive and attempt-2 receipt recut
+
+- Date: 2026-08-30
+- Slice: 1 repair
+- Severity: operational
+- Status: landed for Tier-A review
+
+Commit `9649b349cda5372838df20f4f17811d79c77e1e6` moved the eight attempt-1
+receipts unchanged to `receipts/frozen-c9a391811/`. They remain append-only terminal evidence for
+pre-repair head `c9a391811` and are not current proof.
+
+After repair commit `3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d`, all eight contracted paths were
+recut through `run-gate.ts` with `--attempt 2`. Every receipt records
+`gitHead == actualGitHead == 3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d`; gate IDs and invocation IDs
+are unique. Six receipts PASS. `public-doc-lint` is terminal FAIL with the 13-finding measurement in
+D-1. `test` is terminal FAIL after 4246 passed / 2 failed / 19 ignored because two out-of-scope
+agentic-tooling tests failed (`Too many open files` in `codex-follow_test.ts`; a surviving worker
+descendant in `hybrid-launcher_test.ts`). The focused SDK doctest passes 3/3, so the original
+`TS2344` repair is cleared even though the root catalog test receipt is red.
+
+Sufficiency recomputed over the eight explicit files is **INSUFFICIENT** solely because those two
+receipts did not pass. The supplemental contracts JSR audit passes with one sanctioned oRPC
+slow-types INFO and is explicitly excluded from the named set.

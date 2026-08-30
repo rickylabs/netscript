@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "1466-test-final",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
+  "gitHead": "3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d",
+  "actualGitHead": "3c3f9b7c999d2fa9ec9d31c0b4f455ae890f4b0d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:300877",
+  "attempt": 2,
+  "schemaVersion": 1,
+  "requestHash": "cd1ce077523c7f9e05665b07cca50b063888ad6d009aed152a091e4f99bd9c85",
+  "lifecycleId": "worker:300877:1466-test-final:2",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-30T06:36:05.893Z",
+  "startedAt": "2026-08-30T06:36:05.894Z",
+  "finishedAt": "2026-08-30T06:39:49.398Z",
+  "durationMs": 223504,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 1608,
+    "sha256": "d108af5b385a02d78bc34ce33bc3c5641d8c4a31de37aa469168ad81043753a1",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1731\",\"exitCode\":1,\"durationMs\":223371,\"summary\":{\"passed\":4246,\"failed\":2,\"ignored\":19,\"totalResults\":4267,\"uniqueFailures\":2},\"failures\":[{\"message\":\"AssertionError: Values are not equal: error: Uncaught (in promise) Error: Too many open files (os error 24)\\n    at new FsWatcher (ext:runtime/40_fs_events.js:<line>:<column>)\\n    at Object.watchFs (ext:runtime/40_fs_events.js:<line>:<column>)\\n    at main (file://<cwd>/.llm/tools/agentic/codex/codex-follow.ts:<line>:<column>)\\n    at async file://<cwd>/.llm/tools/agentic/codex/codex-follow.ts:<line>:<column>\\n\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   1\\n+   0\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/agentic/codex/codex-follow_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"codex follow streams an appended terminal event and exits without polling sleeps\",\"file\":\"./.llm/tools/agentic/codex/codex-follow_test.ts\",\"line\":22}]},{\"message\":\"AssertionError: Values are not equal: worker descendant 301646 survived cancellation\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   true\\n+   false\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/agentic/claude/hybrid-launcher_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"exact MCP permissions cancel a stubborn worker group without an orphan\",\"file\":\"./.llm/tools/agentic/claude/hybrid-launcher_test.ts\",\"line\":102}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}
