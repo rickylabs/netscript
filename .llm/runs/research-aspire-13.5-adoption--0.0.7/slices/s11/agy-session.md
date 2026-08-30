@@ -24,3 +24,7 @@
   flags first, prompt attached as `--prompt=…` (log `s11-agy-launch-2.log`).
 - Attempts 3 (3.6-low) and 4 (3.7-low) were stopped by the owner before doing work (worktree reset,
   run dir removed). **Attempt 5 = `gemini-3.7-flash-high`** (log `s11-agy-launch-5.log`).
+- **Terminal:** conversation `c3589df4-89f5-4fcc-b31c-7ac4b6de2795`, 891 s, six commits pushed
+  (`93713837`), PR #1771 draft. AGY status `ERROR — The stream was interrupted` after the closing
+  summary (no `DONE` line). Steering if needed:
+  `agy --conversation c3589df4-89f5-4fcc-b31c-7ac4b6de2795 -p '<follow-up>'` from the S11 worktree.
