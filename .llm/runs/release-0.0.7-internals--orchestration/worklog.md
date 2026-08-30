@@ -5684,3 +5684,45 @@ confirmed `working` throughout.
   `codex-resume` discipline.
 - Explicitly deferred per instruction: no DeepSeek rerun, no PLAN-EVAL. Exactly one fresh
   separate-session exact-head IMPL-EVAL on GLM 5.3 Flash / max is queued for after the fix lands.
+
+## D-107 — Routing leaf converged to main 5197e70b7; two Augment fixes verified correct; final GLM/max IMPL-EVAL dispatched
+
+- **Independently verified both coordinator SHA claims before acting**: `origin/main` fetched to
+  `5197e70b716eafb82fbb12ddb9a910c248ddb86a` (matches exactly); branch/main intersection re-measured
+  as 4 files, not zero as first claimed — but confirmed these are the leaf's *inherited* copy from
+  the prior main-merge (`git diff 96d44758d HEAD` on those 4 paths is empty — no independent branch
+  edit), so the real merge was a straightforward three-way update, confirmed by actually attempting
+  it: clean, no conflicts, merge commit `1c76cdd81`.
+- **Substantively reviewed the two Augment-review fix commits (`cb14c8ca6`/republished `3872c5db8`)
+  before trusting them, not just accepting the coordinator's description:**
+  - `provider-canary-adapter.ts`: new `hasVisibleAssistantMarker()` checks only `type: 'result'`
+    (`result` field) or `type: 'assistant'` (`message.content[].text`) — correctly excludes
+    thinking/tool-input events. `CANARY_CAPTURE_BYTES` raised 64KiB→512KiB. Two new regression
+    tests read and confirmed correct: marker-in-reasoning-and-tool-input-but-empty-result correctly
+    asserts `status: 'blocked'`, `response: 'empty'`; marker-after-70KiB-reasoning-prelude correctly
+    asserts `status: 'passed'`, `response: 'non_empty'`.
+  - `openhands-phase-eval.yml`: `expectedModelLabel` computed from `phase`, throws if
+    `selectedLabel` present and mismatched — closes exactly the bypass Augment identified. Both
+    wrong-phase cases (`glm`+`plan`, `qwen`+`impl`) asserted to throw in the paired test file.
+  - Both fixes judged substantively correct and adequately tested, not merely present.
+- **Provenance handling for `evaluate-merged-head.md`, a genuine back-and-forth worth recording
+  plainly:** deleted it as apparently-obsolete (D-106); coordinator ruled deletion weakens
+  provenance and required byte-for-byte restoration from `3872c5db8` (sha256 `ba987f627d…`,
+  verified matching) in a new, non-history-rewriting commit, with a drift.md note marking its
+  `PASS` historical/superseded rather than current. Restored as instructed, commit `ba70c6c90`.
+- **Caught and removed two successive stale/invalid partial-attempt artifacts** left by an
+  autonomous process outside supervisor control (not something I dispatched): the second one,
+  `evaluate-review-fixes-prompt.md`, named main SHA `5197e70b7998d8c3e3504bf14d4b9ed2fb8520d5` —
+  which shares only the short prefix with the real, independently-verified
+  `5197e70b716eafb82fbb12ddb9a910c248ddb86a`. Concrete confirmation of exactly the failure mode the
+  coordinator warned about; reinforces never trusting a SHA from a draft artifact over one's own
+  `git rev-parse`.
+- **Full Tier-A re-verified at the converged head** (confirmed only docs files changed between the
+  tested `1c76cdd81` and final `ba70c6c90`, so the result carries forward): agentic 493/493, root
+  4,363 passed / 0 failed / 19 ignored / 4,382 total, `deno.lock` unchanged.
+- **Final evaluator prompt staged under the gitignored `.llm/tmp/`** (not the tracked run
+  directory, avoiding the exact class of leftover-artifact problem hit twice already), naming both
+  SHAs exactly as freshly verified via `git rev-parse`. Dispatched via `agentic:claude-openrouter`
+  (the print-turn transport this leaf's own prior evaluations used — consistent dogfooding of the
+  exact route this leaf implements), `z-ai/glm-5.3-flash`, effort `max`, credential sourced without
+  printing it. Confirmed genuinely running (pid alive, real init events in the transcript).
