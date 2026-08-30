@@ -74,7 +74,7 @@ Deno.test('builder auth leaves health public under guarded api prefix', async ()
   assertEquals(response.status, 200);
 });
 
-Deno.test('builder injects Hono principal into oRPC context', () => {
+Deno.test('builder injects a principal only when the Hono auth context has one', () => {
   const principal: Principal = {
     subject: 'user:context',
     scopes: ['users:read'],
@@ -82,7 +82,9 @@ Deno.test('builder injects Hono principal into oRPC context', () => {
     scheme: 'custom',
     claims: {},
   };
-  const builder = createService({}, { name: 'auth-context' });
+  const factoryResult = Object.freeze({ tenant: 'tenant-a' });
+  const builder = createService({}, { name: 'auth-context' })
+    .withContext(() => factoryResult);
   const context = (builder as unknown as {
     buildRpcContext(
       c: { get(key: string): unknown; req: { header(name: string): string | undefined } },
@@ -93,5 +95,20 @@ Deno.test('builder injects Hono principal into oRPC context', () => {
     req: { header: () => undefined },
   }, false);
 
-  assertEquals(context.principal, principal);
+  assertEquals(context, { tenant: 'tenant-a', principal });
+  assertEquals(factoryResult, { tenant: 'tenant-a' });
+  assertEquals(Object.hasOwn(factoryResult, 'principal'), false);
+
+  const anonymousContext = (builder as unknown as {
+    buildRpcContext(
+      c: { get(key: string): unknown; req: { header(name: string): string | undefined } },
+      traceContext: boolean,
+    ): Record<string, unknown>;
+  }).buildRpcContext({
+    get: () => undefined,
+    req: { header: () => undefined },
+  }, false);
+
+  assertEquals(anonymousContext, { tenant: 'tenant-a' });
+  assertEquals(Object.hasOwn(anonymousContext, 'principal'), false);
 });

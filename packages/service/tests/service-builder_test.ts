@@ -1,5 +1,17 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertNotStrictEquals, assertRejects } from '@std/assert';
 import { createService } from '../mod.ts';
+
+interface RpcContextBuilder {
+  buildRpcContext(
+    context: { get(key: string): unknown; req: { header(name: string): string | undefined } },
+    traceContext: boolean,
+  ): Record<string, unknown>;
+}
+
+const emptyRequestContext = {
+  get: (_key: string) => undefined,
+  req: { header: (_name: string) => undefined },
+};
 
 function clientOrigin(hostname: string, port: number): string {
   const host = hostname === '0.0.0.0' ? '127.0.0.1' : hostname;
@@ -34,6 +46,34 @@ Deno.test('custom health checks affect health status', async () => {
   assertEquals(response.status, 503);
   assertEquals(body.status, 'unhealthy');
   assertEquals(body.checks[0].name, 'dependency');
+});
+
+Deno.test('RPC context composes custom fields and database without mutating factory output', () => {
+  const factoryResult = Object.freeze({
+    tenant: 'tenant-a',
+    tags: Object.freeze(['custom']),
+  });
+  const database = { client: 'primary' };
+  const builder = createService({}, { name: 'context-composition' })
+    .withContext(() => factoryResult)
+    .withDatabase(database) as unknown as RpcContextBuilder;
+
+  const context = builder.buildRpcContext(emptyRequestContext, false);
+
+  assertNotStrictEquals(context, factoryResult);
+  assertEquals(context, {
+    tenant: 'tenant-a',
+    tags: ['custom'],
+    db: database,
+  });
+  assertEquals(factoryResult, { tenant: 'tenant-a', tags: ['custom'] });
+  assertEquals(Object.hasOwn(factoryResult, 'db'), false);
+
+  const withoutDatabase = (createService({}, { name: 'context-without-database' })
+    .withContext(() => factoryResult) as unknown as RpcContextBuilder)
+    .buildRpcContext(emptyRequestContext, false);
+
+  assertEquals(Object.hasOwn(withoutDatabase, 'db'), false);
 });
 
 Deno.test('onShutdown hooks run once in LIFO order on stop', async () => {

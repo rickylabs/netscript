@@ -7,12 +7,20 @@ import {
   createNotFoundHandler,
   createOpenAPIHandler,
   createOpenAPISpec,
+  createService,
 } from '../mod.ts';
 
 interface OpenAPIParameter {
   readonly in?: string;
   readonly name?: string;
   readonly schema?: { readonly type?: string };
+}
+
+interface RpcContextBuilder {
+  buildRpcContext(
+    context: { get(key: string): unknown; req: { header(name: string): string | undefined } },
+    traceContext: boolean,
+  ): Record<string, unknown>;
 }
 
 Deno.test('createOpenAPIHandler coerces a docs-shaped numeric query parameter', async () => {
@@ -52,6 +60,34 @@ Deno.test('createOpenAPIHandler coerces a docs-shaped numeric query parameter', 
   assertEquals(result.matched, true);
   assertEquals(result.response?.status, 200);
   assertEquals(await result.response?.json(), { cycleId: 1 });
+});
+
+Deno.test('RPC context includes only configured trace headers with string values', () => {
+  const builder = createService({}, { name: 'trace-context' }) as unknown as RpcContextBuilder;
+  const requestContext = (headers: Readonly<Record<string, string>>) => ({
+    get: (_key: string) => undefined,
+    req: { header: (name: string) => headers[name] },
+  });
+
+  const parentOnly = builder.buildRpcContext(
+    requestContext({ traceparent: '00-parent-span-01' }),
+    true,
+  );
+  assertEquals(parentOnly.traceHeaders, { traceparent: '00-parent-span-01' });
+  assertEquals(Object.hasOwn(parentOnly.traceHeaders as object, 'tracestate'), false);
+
+  const stateOnly = builder.buildRpcContext(requestContext({ tracestate: 'vendor=value' }), true);
+  assertEquals(stateOnly.traceHeaders, { tracestate: 'vendor=value' });
+  assertEquals(Object.hasOwn(stateOnly.traceHeaders as object, 'traceparent'), false);
+
+  const disabled = builder.buildRpcContext(
+    requestContext({ traceparent: '00-parent-span-01', tracestate: 'vendor=value' }),
+    false,
+  );
+  assertEquals(Object.hasOwn(disabled, 'traceHeaders'), false);
+
+  const withoutHeaders = builder.buildRpcContext(requestContext({}), true);
+  assertEquals(Object.hasOwn(withoutHeaders, 'traceHeaders'), false);
 });
 
 Deno.test('createNotFoundHandler returns service-scoped not found response', async () => {

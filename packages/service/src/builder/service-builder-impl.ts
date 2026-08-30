@@ -16,7 +16,6 @@ import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logge
 import { createHonoTracingMiddleware } from '@netscript/telemetry/hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
-import type { Principal } from '../auth/types.ts';
 import {
   createHealthHandler,
   createLivenessHandler,
@@ -36,6 +35,7 @@ import type {
   ServeOptions,
   ServiceApp,
   ServiceHandler,
+  ServiceHandlerContext,
   ServiceMiddleware,
   ServiceRouteMethod,
   ServiceRouter,
@@ -260,35 +260,31 @@ export class ServiceBuilderImpl<
 
   /**
    * Builds the per-request oRPC context: custom factory output plus the optional
-   * database handle and distributed-trace headers.
+   * database handle, distributed-trace headers, and authenticated principal.
    */
-  private buildRpcContext(c: Context, traceContext: boolean): object {
-    const ctx: TCustom & {
-      db?: DbContext;
-      traceHeaders?: Readonly<Record<string, string | undefined>>;
-      principal?: Principal;
-    } = this.contextFactory(c);
-
-    // Add database to context if configured via withDatabase()
-    if (this.database) {
-      ctx.db = this.database;
-    }
-
-    // Add trace context headers for distributed tracing propagation
+  private buildRpcContext(
+    c: Context,
+    traceContext: boolean,
+  ): ServiceHandlerContext<TCustom> {
+    let traceHeaders: Readonly<Record<string, string>> | undefined;
     if (traceContext) {
       const traceparent = c.req.header('traceparent');
       const tracestate = c.req.header('tracestate');
       if (traceparent || tracestate) {
-        ctx.traceHeaders = { traceparent, tracestate };
+        traceHeaders = {
+          ...(traceparent ? { traceparent } : {}),
+          ...(tracestate ? { tracestate } : {}),
+        };
       }
     }
 
     const principal = c.get('principal');
-    if (principal) {
-      ctx.principal = principal;
-    }
-
-    return ctx;
+    return {
+      ...this.contextFactory(c),
+      ...(this.database ? { db: this.database } : {}),
+      ...(traceHeaders ? { traceHeaders } : {}),
+      ...(principal ? { principal } : {}),
+    };
   }
 
   /**
