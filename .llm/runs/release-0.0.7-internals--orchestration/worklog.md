@@ -5457,3 +5457,32 @@ safety; root test / surface validator if budget allows). Backgrounded per host b
   keeping the same effort `max` and the same corrected carrier head `58b04be6c`.
 - Redispatching now with an explicit size bound. No PR/label/DoD action was pending on this attempt
   (nothing to unwind).
+
+## D-97 — #1774 OWNER OVERRIDE: effort-high cycle-2 PASS promoted as qualifying; no further evaluator spend
+
+- **Owner override received**, superseding the effort-max binding requirement: the completed
+  `impl-eval-cycle-2.md` (DeepSeek V4 Flash 0731 · **high**, task `kxgcyv94j`, `VERDICT: PASS`,
+  commit `58b04be6c`) is promoted to the qualifying verdict. No further evaluator dispatch.
+- **Failure record, kept as history only, not reopened for recovery:**
+  - `k8hva2jfq` (effort max, attempt 1): `result_too_large` — worker output exceeded the 256KB
+    transport cap. Root cause: my own brief asked for exhaustive per-item command output at max
+    effort. Scratch worktrees `/ephemeral/tmp/opencode/eval-1774-max/{red-0e568f824,
+    green-49f12f67d, head-58b04be6c}` confirm the worker did real re-verification work before the
+    output-size failure; per owner instruction, this is **not** being mined for a recoverable partial
+    report — the promoted cycle-2 verdict supersedes it.
+  - Second dispatch (compact retry, effort max, bounded to 12KB output): `worker_failed: OpenCode
+    worker exited 143`. Coordinator confirmed this was their own action — **PID `3953072` stopped by
+    the coordinator**, not a transport crash. Recorded so this is not later misread as an unexplained
+    failure.
+  - **Net spend across all evaluator attempts for #1774:** $9.59 (attempt 1, empty) + $0.40
+    (attempt 2, empty) + delegate cycle-2 (effort high, PASS, promoted) + delegate cycle-3 attempt
+    (effort max, result_too_large) + one stopped compact retry. Three distinct transports tried
+    (Claude-print ×2, hybrid/OpenCode ×3); only the hybrid/OpenCode transport ever delivered a
+    verdict, and it did so on the first try at effort `high`.
+- **New toolchain leaf queued for after #1774 reaches terminal, before #1758 resumes:** a Sol/high
+  Codex implementation leaf (per `CLAUDE.md`'s framework-code-stays-on-Codex boundary — this
+  supervisor does not implement it) updating central models/presets/routing/docs/tests to make
+  `z-ai/glm-5.3-flash` · max the default for `formal_impl_evaluation` and `qwen/qwen3.8-flash` for
+  necessary PLAN-EVAL. Explicitly **prospective and separate** — does not retroactively gate #1774.
+  This is the proper-process route for exactly the change two prior chat instructions tried to apply
+  ad hoc (D-89, D-94); recorded as vindication of declining those, not as a reversal of that decision.
