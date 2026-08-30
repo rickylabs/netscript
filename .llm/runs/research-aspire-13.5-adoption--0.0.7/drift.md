@@ -1231,3 +1231,15 @@
   released in parallel** (content-independent of S11; resolver precedence ratified) — does not wait
   for M3/polish. S11 stays draft/stacked with S1 convergence and CI diagram parity as merge
   prerequisites.
+
+## D-64 — 2026-08-30 — `main` → `de57fab0` (#1772 docs, #1770 shipped): inert for the code stack; S11 owes a prose reconcile
+
+- Delta `3e5cbabf..de57fab0` = #1772 "document background reference preflight": 16 files —
+  `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md` + regenerated agent-docs /
+  publish-asset carriers. **Overlap with S3/S5/S6/S7/S8/S9/S10: 0 files** → main currency is inert
+  for the code stack; no rebase (D-50 discipline: the stack stays on `3e5cbabf` until the next
+  convergence point). **Overlap with S11: 5 files** (the same page S11 rewrote + the carriers).
+  S11's polish session is live, so nothing is touched now; S11 owes a prose reconcile that preserves
+  #1772's background-reference-preflight paragraph — routed to the same Gemini conversation after
+  polish, and executed together with S11's next convergence hop (the stack's next move or the D-58
+  retarget), regenerating carriers with the checked-in tooling.

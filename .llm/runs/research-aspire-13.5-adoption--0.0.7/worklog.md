@@ -397,4 +397,6 @@ medium, matched) on `007-aspire-s13` @ `a46ea16d`. Runtime zero. | | Monitor pre
 S13 watch built on a rollout glob (`*01a05348*`) matched the coordinator's thread `01a05348-4133…`
 and reported its terminal message as S13's. Verified by rollout `cwd`: S13 =
 `01a05348-6d4d-7413-a7d4-da98df0c720e` (running, no commit yet). Watch re-armed on the exact path;
-rule: monitors key on full thread ids only. |
+rule: monitors key on full thread ids only. | | Main advanced (coordinator) | `de57fab0` (#1772
+docs, #1770 shipped). Inert for the code stack (0 overlap); S11 overlaps on 5 files → prose
+reconcile queued after polish (D-64). |
