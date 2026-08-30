@@ -447,3 +447,7 @@ hop-A removed); **18:29:29Z containers=0 volumes=0 aspire=[]**
 `s7-phase-b`; S8 queued. | | S10 cycle 2 pushed `67827e8baaff` | "treat nullable health reports as
 pending": pending/`Unknown` state, real 18-line 13.5.3 capture fixture
 (`aspire-describe-follow-13.5.3-capture.ndjson`), +tests. Proof rebuild + redispatch in progress. |
+| S5 #1740 converged on main | Redo after the corrected mis-push: 17 commits rebased onto `52a881c5`
+(range-diff `=` 17/17; one generated-carrier conflict `agent-docs.generated.ts` resolved by
+regeneration) + regen commit → **`e12ae79e6a98`**, pinned push, **run 33328889522**. S4
+`b2a0529fa19b` run 33328751758; S1 `38c3e9e181bf` run 33328727942. |
