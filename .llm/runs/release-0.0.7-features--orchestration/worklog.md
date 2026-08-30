@@ -8417,3 +8417,32 @@ still exhausted and not slice-specific. Falling through to **DeepSeek V4 Flash 0
 sanctioned, now-standard fallback per the coordinator's own instruction that existing valid receipts
 need no rerun and only *prospective* routing is at issue. No fresh ruling needed; this is now the
 documented path.
+
+## Main advance to `73bf2efa9` (#1739) — measured, zero product-path intersection
+
+**Full file list of #1739** (`fix(cli): detect generated plugin registry source drift`): eleven
+`.llm/runs/fix-plugin-doctor-registry-drift--0.0.7/` artifacts, six `packages/cli/` files, three
+`plugins/ai/` files, and one shared carrier —
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`.
+
+**#1387's leaf touches** (measured via `git diff --name-only` against its own fork point
+`24f6642f0`): `packages/contracts`, `packages/mcp` (only the same generated corpus carrier),
+`packages/plugin`, `packages/sdk`, `packages/service`.
+
+**Intersection: exactly one file, and it is a generated carrier, not source** — the export-surface
+corpus. `packages/cli` and `plugins/ai` are untouched by #1387 in every slice so far; #1387 never
+touches CLI or AI-plugin product code. `#1387`'s scoped gates (`check`/`lint`/`test --include
+^packages/service/`) never traverse `packages/cli` or `plugins/ai` at all, so #1739's fix cannot
+change any of #1387's own gate *results* — the two leaves are provably independent on every
+dimension except the shared derived asset.
+
+**Ruling: no integration required now.** Per this lane's standing rule — integrate when drift can
+change a *result*, proven by measurement, not on schedule or path overlap alone — a shared *generated*
+carrier with no source overlap does not meet that bar while #1387 is mid-flight and nowhere near its
+own merge-readiness gate (Slice 5 of 9). **Existing Tier-A/IMPL-EVAL evidence for Slices 1–5 needs no
+rerun**; nothing in it depended on `packages/cli`/`plugins/ai` state. The corpus will be regenerated
+fresh from whatever `main` is current when #1387 actually integrates before its own close-gate — that
+is the correct point to fold #1739's contribution in, not now.
+
+**The live Slice 5 IMPL-EVAL was not touched.** It continues on the same worktree/head/base it was
+dispatched against (`00cfde5d7`); this measurement required no interaction with it.
