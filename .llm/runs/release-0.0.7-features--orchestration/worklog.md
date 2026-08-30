@@ -8309,3 +8309,42 @@ immediately to **DeepSeek V4 Flash 0731 · max** over OpenRouter, same clean wor
 (`ns1387-impleval-s4`), same evidence head, unchanged brief. This follows the documented fallback
 chain directly; no fresh ruling needed since the DeepSeek route's availability was a general
 infrastructure fix, not scoped to Slice 3.
+
+## #1387 Slice 4 terminal ACCEPTED_WITH_FINDINGS; leaf resume-docs gap fixed; Slice 5 dispatched
+
+### DeepSeek's Slice 4 verdict was recoverable, not lost, despite empty chat output
+
+The dispatch showed the same "no visible output" symptom as Slice 3's first attempt — 85 turns,
+$3.98, empty final result, harness nudge unanswered. **This time the model had written its verdict to
+a file** (`evaluate-slice-4-deepseek.md`) rather than surfacing it as chat text — a different failure
+mode of the same underlying quirk. Checked the worktree before retrying and found it, rather than
+burning a second $4 dispatch on an already-answered question.
+
+**Verdict: ACCEPTED_WITH_FINDINGS at `9cc8c4c5f`**, matching my own supervisor Tier-A independently.
+It removed the `@ts-expect-error` directive from a scratch copy of the test and re-ran `deno check`
+itself, reproducing `TS2741` exactly — proving the fallback-typing invariant is genuinely enforced,
+not merely commented as enforced. It decompressed the corpus at both heads and diffed entry sets
+directly rather than trusting the symbol count alone.
+
+### F-1 was real: the leaf's own docs were stale
+
+`worklog.md` and `context-pack.md` both still read "stopped after Slice 1" while Slices 2–4 landed and
+were each independently accepted — a fresh session trusting `context-pack.md` alone would have been
+materially misled about run position, even with the commit trail and per-slice Tier-A documents
+current. **Verified myself before fixing**, not taken on the evaluator's word: both files did say
+exactly that. Caught up both files through Slice 4, condensing each slice's drift/finding history in
+one place, and added a "next steps" open-follow-ups table listing #1787/#1789 so a future session
+doesn't have to reconstruct why they're deferred. PR comment `5471133288`; leaf commit `61ee0a25c`.
+
+### Slice 5 dispatched
+
+Contract-policy adapter and middleware binding — the **behaviour** for Slice 4's types. Ten-file
+ceiling, base `61ee0a25c`, thread `01a05468-3cec-70e2-ac7b-d5ed4411c137`, `gpt-5.6-sol · high`,
+dry-run clean. Brief states LD-6/LD-7/LD-8 as locked decisions rather than design space, and gives
+LD-8's exact binding-time clarification (construction of `createContractAuthorizer`, not first
+request) with the plan's mandated exact test name. Explicitly requires the required-scoped test
+coverage named in the plan (REST/RPC, no-policy, missing-scope, disagreement, rename-continuity), the
+D-6/D-5 archiving and catalog lessons, and a "resume-docs discipline" instruction so this slice
+updates its own leaf worklog rather than leaving that for the next evaluator to catch.
+
+Sender record evicted under the full procedure before dispatch.
