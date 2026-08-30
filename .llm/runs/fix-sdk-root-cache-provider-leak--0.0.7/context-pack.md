@@ -12,15 +12,15 @@
 
 ## Current state
 
-After separate IMPL-EVAL and Tier-A acceptance, the branch has integrated the final shared-asset
-sequence through #1755/main `a5520e70` without rebasing. A CI parity failure then identified a third
-consumer of the SDK export map: the CLI web-runtime closure's source constant. The coordinator-named
-test contains only the live-manifest assertion, so the amended ceiling substitutes its sibling source
-module pending coordinator confirmation, leaves the test untouched, and adds only the manifest-order
-`./presets` row. The focused closure suite passes 6/6; SDK tests pass 70/70; Fresh bootstrap passes
-11/11; all four derivative checks and docs export drift pass; both entry graphs remain at zero unsafe
-edges; and `deno.lock` is byte-identical to `a5520e70`. The PR acceptance block, issue boxes, labels,
-and draft state remain coordinator-owned and unchanged.
+After separate IMPL-EVAL and Tier-A acceptance, the branch has integrated #1731/#1761 main
+`3e5cbabf` by no-ff merge `435c6f69`. The five predicted shared-carrier conflicts took main's
+versions and were regenerated only through their named tasks. The README artifact retains both
+#1731's procedure-metadata/contract typing prose and this leaf's cache-provider migration. D4 remains
+the exact locked 68-type closure with no widening. Final-base validation passes: closure parity 6/6,
+SDK 78/78 including the README doctest, Fresh 11/11, all four regenerated derivative checks, docs
+export drift, ten-file type-check, contracted lint/fmt, quality/doctrine, both graphs at zero unsafe
+edges, and raw lock comparison to `3e5cbabf`. Measurements at `1c5fa004` are exploratory only. The
+PR acceptance block, issue boxes, labels, and draft state remain coordinator-owned and unchanged.
 
 S1 research/design remains against `origin/main` `13878a80a50c55b9662099fed64555f2310ae4a3`.
 PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `1bf9c567`: the archetype, doctrine, three-move design,
@@ -78,12 +78,13 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 
 ## In progress
 
-- Commit and explicit-refspec push of the SDK runtime-closure parity correction and evidence.
+- Commit and explicit-refspec push of the post-#1731/#1761 generated convergence and evidence.
 
 ## Next steps
 
-1. Push the closure parity correction by explicit refspec and refresh PR Validation only.
-2. Leave evaluator currency, the close-gate rerun, draft state, labels, issue text, and acceptance boxes to
+1. Push the final convergence by explicit refspec and refresh PR Validation only.
+2. Leave production chunk proof, `e2e:cli`, evaluator currency, the close-gate rerun, draft state,
+   labels, issue text, and acceptance boxes to
    the coordinator.
 
 ## Key decisions
@@ -118,11 +119,11 @@ structured PR comment is posted; the worktree was clean before this S4 artifact-
 | Agent-docs host      | PASS               | `check:agent-docs-prose` exit 0; 638-file Lume build; corpus `fresh: true`.                  |
 | S2 behavioral red    | EXPECTED RED       | Structured exit 1; 0 passed / 1 failed; root provider observed `true`.                       |
 | S2 graph assertion   | PASS               | Executed for the first time at S3 green; both graphs contained zero forbidden edges.          |
-| Focused tests        | PASS               | 82 passed / 0 failed, including the entire SDK test directory and Fresh bootstrap test.       |
-| Type/lint/format     | PASS               | Nine owned TS files selected; zero diagnostics/findings and full coverage.                    |
+| Focused tests        | PASS               | Final-base closure 6/6, SDK 78/78, and Fresh bootstrap 11/11.                                 |
+| Type/lint/format     | PASS               | Ten-file check and contracted nine-file lint/fmt have zero diagnostics/findings.              |
 | Published surface   | PASS / NEGATIVE RECORDED | Preset doc + JSR + publish pass; at measured head `1ccddd6e`, base was 542 undeclared major changes and head was 552, with the +10 entirely SDK-scoped. |
-| Generated cascade   | PASS               | Post-#1755 agent-docs, assets-barrel, publish-assets, and MCP corpus final checks are fresh.    |
-| Lock hygiene        | PASS               | Raw comparison to main `a5520e70` returned 0 for `deno.lock`.                                 |
+| Generated cascade   | PASS               | Post-`3e5cbabf` four-stage stale→generate→fresh cascade passes.                                |
+| Lock hygiene        | PASS               | Raw comparison to main `3e5cbabf` returned 0 for `deno.lock`.                                 |
 
 ## Open questions
 
@@ -145,5 +146,5 @@ None. S4 is evidence reconciliation only; mandatory IMPL-EVAL remains coordinato
 - Revised plan: `9a0f5876` (`PASS_PLAN` cycle 2).
 - S2 red-before: `ddf66a6f` (test and red evidence only).
 - S3 implementation: `1dd64dae` (product, docs, generated derivatives, and gate evidence).
-- S4 evidence reconciliation and integration refreshes: retained in branch history; the final
-  #1755 merge/evidence commit is pending this commit.
+- S4 evidence reconciliation and integration refreshes: retained in branch history; post-#1731/#1761
+  merge `435c6f69`, with its generated/evidence commit pending.

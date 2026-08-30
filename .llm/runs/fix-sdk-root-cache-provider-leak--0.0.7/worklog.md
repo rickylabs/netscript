@@ -555,3 +555,37 @@ code with a false provenance trail.
 A renewed delta receipt at this head — the `MECHANICAL_PASS` at `f1ff5557` is **superseded** by two
 further integrations and must not be cited — then `status:ready-merge` applied immediately before a
 fresh CI run so the mirror's live label read observes it.
+
+## Final convergence on main `3e5cbabf` (#1731 + #1761)
+
+The branch merged main with `--no-ff` at `435c6f69`. Generated conflicts were cleared with main's
+versions and regenerated through the locked dependency chain. The SDK README auto-merge was checked
+from the artifact: #1731's declaration-safe procedure-metadata/contract typing guidance and this
+leaf's `./presets` plus explicit cache-provider migration are both present. Measurements previously
+made at supervisor head `1c5fa004` are exploratory only and are not cited as final-base evidence.
+
+The first agent-doc generator attempt occurred before Git had committed the conflicted merge and
+therefore stamped the old head. It was discarded. The two carriers were restored to the committed
+main-side merge versions, after which the complete stale→generate→fresh sequence was recut at
+`435c6f69`.
+
+| Gate | Result | Artifact-derived evidence |
+| --- | --- | --- |
+| Agent-docs precheck → generate → recheck | EXPECTED STALE (exit 1) → PASS → PASS (exit 0) | The precheck named `prose.json.gz` and `provenance.json`; final Lume build generated 639 files / 227 HTML files and reported `fresh: true`, SHA `996f01dc9f344adffa7da15797c0be46f18db9a87acaaa31070fddfef307164a`. |
+| Assets-barrel precheck → generate → recheck | EXPECTED STALE (exit 1) → PASS → PASS (exit 0) | The generated CLI agent-doc carrier incorporated the new prose provenance and retained the SDK `./presets` export row. |
+| Publish-assets precheck → generate → recheck | EXPECTED STALE (exit 1) → PASS → PASS (exit 0) | The checker named only `packages/mcp/src/publish-assets.generated.ts` stale. |
+| MCP corpus precheck → generate → recheck | EXPECTED STALE (exit 1) → PASS → PASS (exit 0) | Final corpus: 35 packages, 271 subpaths, 7,677 symbols, SHA `b7881733d086976b0ad4cfe2d838313987fb36ca4de25d3ee234a056106b5f78`. |
+| D4 curated preset closure | PASS (exit 0) | Baseline 69 types; required and actual closure 68 after excluding only `QueryClientPort`; `CreateServiceClientOptions` present; no missing/extra name, wildcard, ports runtime value, or post-baseline procedure-meta widening. |
+| Export/reference drift | PASS (exit 0) | `docs:exports-drift` reported `Exports & Symbols drift check: PASS`. |
+| Closure parity test | PASS (exit 0) | Structured wrapper: 6 passed / 0 failed / 0 ignored. |
+| Whole SDK suite | PASS (exit 0) | Structured wrapper: 78 passed / 0 failed / 0 ignored, including the merged README doctest and #1731 tests. |
+| Fresh bootstrap test | PASS (exit 0) | Structured wrapper: 11 passed / 0 failed / 0 ignored. |
+| Ten-file scoped type-check | PASS (exit 0) | All 10 selected files compiled with `--unstable-kv`; zero diagnostics or failed batches. |
+| Nine-file scoped lint/format | PASS (exit 0 each) | Both wrappers processed all 9 contracted SDK/Fresh files with zero findings, drops, or refusals. The repository still excludes `packages/cli/` from these contracts; its closure source passed raw no-config lint. |
+| Quality/doctrine gate | PASS (exit 0) | Repository quality scan found no findings; architecture gate reported no doctrine failures. Existing warnings remain non-blocking. |
+| Published-entry graph proof | PASS (exit 0) | Fresh `deno info --json` measurements after the SDK graph changed: root 0 and presets 0 browser-unsafe edges. |
+| Lock hygiene | PASS (exit 0) | Raw `git diff --exit-code 3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c -- deno.lock` returned 0. |
+| Resource hygiene | PASS | Committed `leak-report.md` says Aspire probe OK, Docker probe OK, and no surviving Aspire resources found. |
+
+No acceptance-evidence text, runtime lease/gate, label, issue field, draft state, or issue checkbox was
+changed. Production chunk proof, `e2e:cli`, and renewed evaluator currency remain coordinator-owned.

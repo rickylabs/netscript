@@ -148,3 +148,22 @@ requirements.
 - This leaf caused the propagation by adding a published SDK subpath. The closure constant is the
   third export-map consumer found, after the CLI embedded agent-docs inventory and the MCP export
   corpus. No other closure, topology, CLI, or runtime path was changed.
+
+## 2026-08-30 — post-#1731/#1761 main integration refresh
+
+- Severity: coordinator-required final-base integration; no product rescope.
+- The branch merged `origin/main` `3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c` with `--no-ff` at
+  merge commit `435c6f69`. The five conflicts were exactly the shared generated carriers named by
+  the coordinator. Each took main's version to complete the merge, then was regenerated solely by
+  its named task; no generated file was hand-merged.
+- `packages/sdk/README.md` auto-merged without conflict. Artifact comparison confirms both intents:
+  #1731's declaration-safe procedure-metadata/contract typing prose and this leaf's browser-safe
+  preset plus explicit cache-provider migration all remain. No manual rewrite was necessary.
+- D4 did not drift after #1731 changed ports/query types. The decidable baseline comparison still
+  finds 69 baseline port types, a required/actual 68-type preset closure after excluding only
+  `QueryClientPort`, `CreateServiceClientOptions` present, no missing or unexpected closure name,
+  no wildcard, no ports runtime export, and no widening to post-baseline procedure-meta names.
+- The earlier supervisor mismatch is now coordinator-confirmed: the closure source module is the
+  authorized expectation owner and its parity test remains unchanged.
+- The supervisor-produced `leak-report.md` is committed as run evidence. It contains no thread,
+  session, rollout, or daemon handle and reports no surviving Aspire resources.
