@@ -1740,3 +1740,68 @@ applied: #1749 admitted to 0.0.7; both issue and PR carry **exactly one** `statu
 and the final DoD box is deliberately unticked pending the evaluator. That is the gate doing its job,
 not a defect. A separate-session IMPL-EVAL (Claude · Fable 5) is running; boxes get ticked with
 evidence only after it passes.
+
+## 2026-08-30 — #1755 handed off; queue advanced to #1757
+
+### #1755 — terminal green, handed to the human merge queue
+
+| Gate at `2c844565` | Result |
+| --- | --- |
+| Exact-head IMPL-EVAL (separate session, Claude · Fable 5) | **PASS**, no blocking findings |
+| Tier-A (supervisor, at pushed head) | PASS |
+| `check-test`, `quality`, `code-quality`, `classify`, lane visibility | success |
+| `close-gate` — CI **and** local | **PASS**, provenance head-matched, `#1749` from body keyword |
+| `review-threads` | PASS, threads=0 |
+| State | MERGEABLE / CLEAN, non-draft, milestone 0.0.7, one `status:` |
+
+All eight of #1749's acceptance boxes ticked **with an evidence table attached to the issue**. The
+IMPL-EVAL report is published verbatim on the PR. CI was refreshed by label transition +
+`gh run rerun`; the head never moved.
+
+`status:impl-eval` reappeared twice alongside `status:ready-merge` — the Codex thread setting its own
+phase label as it finished. Removed both times; settled at exactly one `status:`.
+
+**Where the evaluator improved the work rather than rubber-stamping it:** it agreed with omitting
+`.claude/skills/` but rejected the PR's stated reason. Host-neutrality does not hold —
+`resolveHosts` falls back to `["claude"]`, so the quickstart's own bare command *does* produce the
+mirror, and the tree already lists `.mcp.json` from that same branch. The decision survives on
+better ground: the mirror is a byte-identical derived copy of the row already shown, and listing it
+would invite patching the mirror. Right conclusion, wrong reason — recorded as such.
+
+### Queue advanced: allocation drained, so the next issue had to be found and filed
+
+Coordinator allocation is `[1000, 1551, 1723, 1745, 1749]` — every entry now shipped-to-ready or
+source-blocked (#1723). Computed the unallocated set across all four lanes: **65 open 0.0.7 issues,
+99 allocated, 0 unallocated.** Nothing to pick up; advancing meant filing.
+
+**#1757 filed** — `packages/cli/CHANGELOG.md` stops at `## 0.0.6` with zero `0.0.7` content, while
+**33 commits** (19 `feat`/`fix`) have landed since the `v0.0.6` tag. Verified via
+`git show origin/main:…`, not from this worktree. The sharper half: **no gate reads it** —
+`git grep -l CHANGELOG` over `.llm/tools/` and `.github/workflows/` returns nothing, so it is the one
+user-facing document that can silently fall a whole release behind, and it did. A follow-up gate is
+named in the issue and deliberately not absorbed.
+
+The **release introduction is explicitly not taken**: `github-release.ts:18-23` records it as
+"MANUAL BY DESIGN … a maintainer writes it … generated prose is not a substitute". Release-captain
+work; surfaced, not absorbed. Version bumps likewise stay with the release cut.
+
+Leaf dispatched **detached** (thread launching), worktree `007-leaf-1757`, branch
+`docs/changelog-0-0-7` from `origin/main`, Codex · `gpt-5.6-sol` · medium.
+
+### Two self-corrections worth keeping
+
+1. **I nearly reported two PRs for false gate evidence.** `deno task docs:exports-drift` exits 1 in
+   *this* worktree, and #1748/#1755 both claim it exit 0. Before acting I checked `origin/main`: the
+   task exists there and is absent on the topic branch, which is **29 commits behind**. The gate rows
+   are truthful; the stale checkout was mine. This lane's own memory says to reconcile via
+   `git show origin/main:<path>` because the topic worktree is a checkpoint, not a mirror — I broke
+   my own rule and it nearly produced a false accusation against two clean PRs.
+2. **A measurement I ran was worthless and I discarded it rather than reporting it.** Probing how
+   much drift an expanded `AUTHORITATIVE_MAPPING` would surface, the string replacement silently
+   failed to match and the 21 added packages were never evaluated — the run reported coverage for the
+   original 8 only. Caught because the output listed the wrong package set. An unasserted `replace()`
+   produces a confident, empty result; assert the edit took effect before trusting a probe.
+
+`AUTHORITATIVE_MAPPING` covering only 8 of the packages with published reference pages is real and
+still a candidate, but it belongs to **closed #1108**'s territory and needs proper sizing before it
+is filed as new scope. Not filed on an unverified number.
