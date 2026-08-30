@@ -8768,3 +8768,29 @@ evidence head `c4bd64232`. Brief asks the evaluator to independently reproduce t
 base-red and verify the fix's receipts scope correctly, and states plainly that this is #1387's final
 implementation slice — asks for an explicit statement on whether the documentation is adequate for
 close, not just whether it passes.
+
+### GLM 5.3 Flash blocked at a security allowlist, not a slug error — fell back to DeepSeek, no infra self-patch
+
+The dispatch was **denied**, not merely quota-limited: `evaluator model request denied:
+model=z-ai/glm-5.3-flash`, `[claude-code:unrecognized_model]`. Traced the exact mechanism —
+`.llm/tools/agentic/claude/evaluator-model-guard.ts` runs a credential-blind HTTP proxy in front of
+every formal-evaluator child session, checking the requested model against a **fixed allowlist**,
+`OPEN_EVALUATOR_MODEL_IDS` in `.llm/tools/agentic/config/models.ts`. That tuple is currently exactly
+`[minimax/minimax-m3, deepseek/deepseek-v4-flash-0731, qwen/qwen3.8-max]` — no GLM entry at all, old
+or new, and no Qwen variant besides `qwen3.8-max`. This is a deliberate security control (a
+credential-blind proxy specifically built to prevent an evaluator child session from reaching an
+unreviewed model), not stale config or a slug typo — the slug itself was confirmed correct.
+
+**Did not self-patch this.** `models.ts` is shared, repo-wide, cross-lane infrastructure — not scoped
+to `#1387`'s ceiling, not scoped to this topic's leaf, and not something a feature-implementation
+branch should carry a security-allowlist change on. Even setting that aside, editing it inside the
+`#1387` leaf worktree would only take effect for that one branch's checkout; the fix, if made, belongs
+in its own reviewed change to wherever this config canonically lands, not smuggled into a feature PR.
+
+**Fell back to the already-allowlisted DeepSeek V4 Flash 0731 · max** to keep shipping per the
+instruction to "keep shipping independently now; do not wait on another lane" — this is the seventh
+consecutive slice using that proven route, and it needs no fresh ruling. **The prospective GLM 5.3
+Flash / Qwen3.8-Flash-Next routing cannot take effect until the evaluator allowlist itself is
+updated** — that update is a distinct, small, reviewable infra change (`OPEN_EVALUATOR_MODEL_IDS` in
+`models.ts`, following its own "MONTHLY MAINTENANCE" comment), owned by whoever maintains
+`.llm/tools/agentic/`, not by this feature lane.
