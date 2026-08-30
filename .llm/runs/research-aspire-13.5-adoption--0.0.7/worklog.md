@@ -223,4 +223,6 @@ released; **attempt 3 neither requested nor launched**. Only run artifacts commi
 `Closes #1720`, `Closes #863`, `Part of #1712`; dependency `issue:1718 → S8`; accepted slices only
 (typed db resource commands, bounded wait, `excludeFromMcp`); Phase-B receipts (#863
 Unhealthy-but-Running, db-cli `--help`, `migrate --timeout`) are AppHost gates and therefore share
-the D-43 environment block on this NAS. |
+the D-43 environment block on this NAS. | | Issue normalization | **#1720** → to match PR #1754
+(same rule the coordinator applied to #1280 and #863); milestone 0.0.7 and taxonomy preserved;
+exactly one . #863 already . |
