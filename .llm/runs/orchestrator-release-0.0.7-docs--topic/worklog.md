@@ -1337,3 +1337,170 @@ for immediate dispatch on coordinator allocation.
   `packages/cli/CHANGELOG.md` stops at 0.0.6; the user-facing payload is in no canary yet.
 - Nothing filed, nothing merged, no labels or milestones touched. D-1 proposed to the coordinator;
   lane stays event-driven at exhausted allocation `[1551]`.
+
+## 2026-08-30 — restart recovery: two live leaves reconciled, #1746 driven to ready-merge
+
+Resumed after a context break. Git and live GitHub were treated as authoritative; the context pack
+was stale (it predates both leaves and still described the lane as EXHAUSTED / PARKED).
+
+**Supervisor identity re-proved.** The recorded session `fcf04b0f-3c2f-4844-9508-84c52ce8298c` is
+gone. This is a **new** session, not a resume: PID `5519`, Claude session
+`1d06dd31-be07-405a-9762-e641197e285f`, bridge `session_016g86jW5sMJE9z9EHHGPByH`, Remote Control
+URL `https://claude.ai/code/session_016g86jW5sMJE9z9EHHGPByH`, tmux `netscript-007-docs-r2:@16.%16`,
+registry `~/.claude/sessions/5519.json`. Attachment proved by the non-empty `bridgeSessionId` in the
+registry entry whose `pid`/`cwd` match the live process, plus `--remote-control` in argv. Launched by
+`hybrid-launcher.ts`, so argv carries **no** `--model`/`--effort` — the route identity is not
+independently observable from argv on this host, unlike the previously recorded session. Recorded as
+such rather than claimed.
+
+### Exact heads at reconciliation
+
+| Ref | SHA |
+| --- | --- |
+| `origin/main` | `13878a80a50c55b9662099fed64555f2310ae4a3` |
+| PR #1746 `docs/agentic-cross-host-skills` | `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` |
+| PR #1748 `docs/aspire-terminology-sweep` (on arrival) | `6b91eb2597d924a176b3d883aa7c34e556cde4e4` |
+
+### #1746 — the stale evaluator, and what actually remained
+
+`impl-eval-delta-2.md` stood at the exact head with `FAIL_FIX`, **PR-surface only** (B-1: the body
+denied a file that was in the diff, DoD box 3 was false, Validation was dated to a superseded head
+and omitted `check:publish-assets`). All five of B-1's required actions had since been applied to
+the live PR, but **no evaluator had read the corrected surface** — a `FAIL_FIX` was the standing
+exact-head verdict against a PR that had already been fixed.
+
+One fresh separate-session IMPL-EVAL was obtained on the canonical route for Codex-authored work
+(`formal_impl_evaluation` → native opposite-family, Claude · Fable 5). Verdict **`PASS` at
+`84a5fd11`**, B-1 discharged on all five items. The evaluator declined to accept cycle 2's own
+"re-evaluation is a body read" shortcut: it re-derived the gate set from generator inputs and re-ran
+ten gates itself, all exit 0. Report: `impl-eval-exact-head.md` in the leaf run dir (untracked).
+Observed identity `claude-fable-5`; the evaluator explicitly reported that effort is not observable
+from inside the session and confirmed **model but not effort** — recorded as stated, not upgraded.
+
+Review-thread gate `PASS threads=1 unanswered=0`. CI terminal and green at the exact head.
+
+### #1748 — an exact-head `FAIL_FIX` that was real, not stale
+
+Unlike #1746, this leaf's exact-head evaluator verdict was a genuine `FAIL_FIX` with two blocking
+findings, both re-verified live before acting:
+
+- **B-1** `docs/site/explanation/aspire.md:100-101` — the terminology sweep dropped ".NET" and left
+  "assumptions people carry from Aspire". The two facts that follow (isolated TypeScript/Node
+  runtime; derived graph) are precisely the contrast with a C#/.NET AppHost, so the edit turned a
+  contrast into a near-tautology. Exactly the "scar" the run's brief forbade.
+- **B-2** the run dir had no `supervisor.md` — `lane-policy.md:250` classes such a run as **not
+  activated**.
+
+The OpenHands cloud evaluator returned `PASS` on the same head and raised neither. Recorded because
+it is the reusable lesson: a cloud `PASS` does not clear a native opposite-family `FAIL_FIX`, and
+concurring verdicts are not additive evidence when one of them never looked.
+
+### Author work — new Codex thread, and the lease that nearly forced the wrong call
+
+Repair dispatched through the agentic tooling, not ad hoc. Three NAS-host obstacles, all recorded:
+
+1. `launch-codex-slice` stages the brief with `cat <src> > <dest>`; passing `--brief` equal to
+   `--dest` **truncated the source to 0 bytes**. Author the brief at a distinct path and stage to
+   `/home/agent/`.
+2. `/home/codex` no longer exists (it was a symlink to `/home/agent` before the restart), so the
+   launcher's default staging path dies at the `stage` step. Explicit `--dest` rather than
+   recreating the symlink.
+3. The launcher refused with `duplicate_sender_risk`, directing a resume of thread `01a05185`. That
+   block is computed as `Boolean(existing.sessionId)` from a durable record and **never consults the
+   daemon** — it is not evidence the thread is alive. Liveness was proved independently: owner PID
+   `524013` dead, and `01a05185` absent from the daemon's session list. The stale lease was then
+   released through `LocalSenderOwnershipAdapter.release()` using the record's own `leaseToken`
+   (`279b009f-…`), never `rm`, after a guard confirmed the owner was dead.
+
+| Field | Value |
+| --- | --- |
+| Repair thread | `01a051d4-6d87-77c3-bdd7-e4a54401f2f4` (new; original impl was `01a05185-5b95-7ba1-aedc-04a69014f50e`) |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1723a` |
+| Requested route | Codex · OpenAI · `gpt-5.6-sol` · medium (`normal_implementation`) |
+| Observed route | matched |
+| Runtime | `approval=never`, `sandbox=dangerFullAccess`, app-server `0.151.0` with `--remote-control` |
+| Steering | `codex exec resume 01a051d4-6d87-77c3-bdd7-e4a54401f2f4 -- "<follow-up>"` |
+| Brief | `/home/agent/docs-1723a-repair-brief.md` |
+
+Result: **S3 `3301f593b76a2878fd9a5a2978ad6c7a53861134`** (prose repair + `supervisor.md` + drift
+D-7/D-8 + worklog) and **S4 `22e79dccf5f7cc8bb766d9eb1bd11d5bd8c9e525`** (four derived assets only),
+pushed by explicit refspec.
+
+**Tier-A performed by this lane at the pushed head, not taken from the author's report.** Product
+diff is exactly one line — "carry from Aspire" → "carry from Aspire's .NET AppHost".
+`git grep '\.NET Aspire'` outside `_plan`/`.llm` returns exactly the three pre-existing hits, so the
+repair did not smuggle the product name back into the surface #1000 exists to clean. Both `13.4.6`
+literals unchanged. `provenance.json` `sourceCommit` is `3301f593b` — the S3 prose commit that
+immediately precedes the regeneration, so no orphan regeneration. `deno.lock` untouched. Product
+tree clean; the only dirt is the two untracked evaluator evidence files.
+
+A fresh separate-session IMPL-EVAL was then dispatched at `22e79dcc` on the same canonical route.
+
+### #1746 readiness — performed truthfully, and stopped short of merging
+
+- Filed **#1749** for the bounded `quickstart.vto` follow-up (advisory 7 on both the Tier-A and
+  IMPL-EVAL passes): `type:docs`, `area:docs`, `priority:p3`, `status:triage`, milestone
+  **`Backlog / Triage`**. Not 0.0.7 — the docs allocation is frozen at `[1551]` and closed, and a
+  parked lane must not self-admit new scope into a frozen milestone. Re-milestoning is the
+  coordinator's call.
+- Issue #1745 `status:plan` → `status:ready-merge`; PR #1746 `status:impl-eval` →
+  `status:ready-merge`. Exactly one `status:` label on each.
+- CI re-triggered **by the supported label transition, without moving the head**: `close-gate`'s
+  acceptance-evidence step reads labels **live at execution time** and skips itself when
+  `status:ready-merge` is absent (`ci.yml:74-78`), so `gh run rerun 33298857537` re-executes it with
+  the label now present. A push would have moved the head and voided the exact-head `PASS`.
+  Note `gh pr edit` fails on this token (`read:org` not granted); PR labels go through the REST
+  issues endpoint.
+
+**Not merged.** Merge authority rests with the coordinator, and the standing instruction is a
+hand-off to the human merge queue.
+
+### Both leaves closed out to ready-merge — final state
+
+| | PR #1746 | PR #1748 |
+| --- | --- | --- |
+| Exact head | `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` | `22e79dccf5f7cc8bb766d9eb1bd11d5bd8c9e525` |
+| Exact-head IMPL-EVAL | **`PASS`**, separate session, Claude · Fable 5 | **`PASS`**, separate session, Claude · Fable 5 |
+| Tier-A | prior passes carried; body re-verified | performed here at the pushed head |
+| Review threads | `PASS threads=1 unanswered=0` | `PASS threads=0 unanswered=0` |
+| CI | terminal green, attempt 2 | terminal green, attempt 3 |
+| Closes | #1745 | #1000 (epic #1723 referenced, **no** keyword) |
+| Label | `status:ready-merge` | `status:ready-merge` |
+| Merged | **no** — handed to the human merge queue | **no** — handed to the human merge queue |
+
+Both evaluators reported `claude-fable-5` as observed model and both stated that **effort is not
+introspectable from inside the session**. Recorded as model-confirmed / effort-unconfirmed rather
+than written up as a full route match. The same limitation applies to this supervisor session:
+launched by `hybrid-launcher.ts`, its argv carries no `--model`/`--effort`, so route identity here is
+asserted by configuration, not proved by process inspection — unlike the previously recorded docs
+session whose argv did carry both.
+
+**Issue hygiene, on explicit owner direction.** #1000 was normalized in place before hand-off:
+legacy `documentation` label removed, colon taxonomy applied (`type:docs`, `area:docs`,
+`area:aspire`, `priority:p3`), milestone moved `Backlog / Triage` → **0.0.7**, exactly one `status:`
+retained (`status:ready-merge`). The earlier #1748 phase comment had said this lane would leave the
+milestone to the coordinator; the owner then ruled directly. The correction is stated on the PR
+rather than left for someone to notice the contradiction between two comments. Epic **#1723 remains
+OPEN** and is referenced without a closing keyword.
+
+#1749 filed to `Backlog / Triage` for the `quickstart.vto` follow-up — deliberately **not** 0.0.7,
+since that is new scope rather than the normalization of an issue a 0.0.7 PR already closes.
+
+**Lessons this recovery paid for**
+
+1. **A stale `FAIL_FIX` is not a failing PR, and a `PASS` is not transferable across a head.** #1746
+   carried an exact-head `FAIL_FIX` whose every required action had already been applied; #1748
+   carried an exact-head `FAIL_FIX` that was entirely real. The verdicts looked identical from the
+   label. Only reading both reports against the live surface separated them.
+2. **Concurring verdicts are not additive when one did not look.** OpenHands returned `PASS` on the
+   #1748 head where the native evaluator found two blocking defects. Counting it as agreement would
+   have shipped a broken sentence and an unactivated run.
+3. **The gate list is the attack surface, not the gate run.** Both evaluators were told explicitly to
+   derive gates from generator inputs and to distrust the brief's own list. Both did, and the #1746
+   omission was not repeated on #1748.
+4. **`duplicate_sender_risk` is a lease record, not a liveness probe.** It is computed as
+   `Boolean(existing.sessionId)` and never consults the daemon. Prove liveness independently and
+   release through the adapter with the record's own token.
+5. **Re-run, never re-push, to refresh CI on a verified head.** `close-gate` reads labels live, so a
+   label transition plus `gh run rerun` re-executes the acceptance mirror while the head — and the
+   exact-head verdict attached to it — survives.
