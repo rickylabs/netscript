@@ -1,7 +1,7 @@
 # Context pack: GLM 5.3 Flash / Qwen 3.8 Flash default open-model routing
 
-Run ID: `chore-agentic-open-evaluator-routing`. Branch `chore/agentic-open-evaluator-routing`.
-Issue #1791. Base `main` at `a3ddcbb598f81180437e06f743e24d6ef137b101` (immediately after #1774/#1775
+Run ID: `chore-agentic-open-evaluator-routing`. Branch `chore/agentic-open-evaluator-routing`. Issue
+#1791. Base `main` at `a3ddcbb598f81180437e06f743e24d6ef137b101` (immediately after #1774/#1775
 merged). PLAN-EVAL: N/A per owner decision — infrastructure/config work, not a design decision.
 
 ## Why now
@@ -10,11 +10,11 @@ merged). PLAN-EVAL: N/A per owner decision — infrastructure/config work, not a
 verdict (native Fable 5 spend-limited; DeepSeek V4 Flash 0731 via Claude-print transport twice ended
 with an empty completion; the hybrid/OpenCode transport eventually delivered PASS at effort `high`,
 promoted by owner override since the binding required `max`). The owner has selected a new default
-open-model pairing to replace this fragile chain, verified live against the OpenRouter catalog before
-this leaf was authorized:
+open-model pairing to replace this fragile chain, verified live against the OpenRouter catalog
+before this leaf was authorized:
 
-- `z-ai/glm-5.3-flash` — EXISTS in the live catalog. New default for `formal_impl_evaluation` and the
-  hybrid delegation default, at effort `max`.
+- `z-ai/glm-5.3-flash` — EXISTS in the live catalog. New default for `formal_impl_evaluation` and
+  the hybrid delegation default, at effort `max`.
 - `qwen/qwen3.8-flash` — EXISTS in the live catalog. New conditional PLAN-EVAL OpenRouter route, at
   effort `max`. No `-next`-suffixed variant exists; that wording resolves to this plain id.
 
@@ -26,19 +26,22 @@ silent success when it produced nothing.
 
 ## Current state
 
-- Phase: implementation and generator gates complete; exact-head IMPL-EVAL pending.
-- Generator: Codex/OpenAI `gpt-5.6-sol` high, thread
-  `01a05481-a2ff-7632-809a-e478889e626e`, route matched.
+- Phase: implementation, generator gates, live canaries, and exact-head IMPL-EVAL complete.
+- Generator: Codex/OpenAI `gpt-5.6-sol` high, thread `01a05481-a2ff-7632-809a-e478889e626e`, route
+  matched.
 - Worktree: `/home/agent/projects/netscript/worktrees/007-leaf-routing`.
 - Live catalog re-check at `2026-08-30T21:11:02Z`: both selected IDs present; only the plain Qwen
   Flash ID exists; GLM reports mandatory reasoning with `max` supported/default.
 - PLAN-EVAL: N/A by owner decision, recorded in `worklog.md` before implementation.
-- Implemented: typed routing/canary contract; OpenHands routing; docs/skills parity; full
-  165-file check/lint/fmt and 491-test gate all green.
+- Implemented: typed routing/canary contract; OpenHands routing; docs/skills parity; full 165-file
+  check/lint/fmt and 491-test gate all green.
 - Live canaries: both GLM and Qwen presets passed at matched `max` argv identity with a 1024-token
   budget, non-empty marker, and tools/reasoning/streaming evidence.
-- Remaining: commit/push exact head, run fresh separate-session GLM/max IMPL-EVAL, address any
-  findings, and hand off without merging.
+- IMPL-EVAL: `PASS` from fresh session `ab4ca47b-00db-49e3-a969-6f779c024a6e` on exact published
+  head `d9722b0b17a478af3db5bdafad87391a2ccbfd67`. Requested OpenRouter / GLM / max; observed `Z.AI`
+  / `z-ai/glm-5.3-flash` with real reasoning/tool activity and non-empty completion; `max` is
+  launcher-argv attested. This deliberately dogfoods the changed route and is not independent.
+- Remaining: publish the artifact-only evaluator packet and hand off without merging.
 - Publication: the HTTPS PAT lacked workflow scope, so the GitHub connector published tree-identical
   commits without force. Current published evidence head before this record: `9937705b5d`.
 
@@ -55,8 +58,6 @@ silent success when it produced nothing.
 
 ## Next steps
 
-1. Commit and push the implementation/docs/evidence slices; update PR phase records.
-2. Launch a fresh separate GLM/max session at the exact pushed head. This intentionally dogfoods
-   the route implemented by this leaf and must not be described as route-independent evidence.
-3. Require a qualifying IMPL-EVAL `PASS`, record requested/observed identity and session ID, then
-   deliver the exact-green packet without merging.
+1. Publish the artifact-only evaluation packet and post the S1-S4 PR evidence comment.
+2. Leave PR #1792 unmerged and hand the supervisor the exact-green packet, distinguishing the
+   evaluated product head from the later artifact-only head.

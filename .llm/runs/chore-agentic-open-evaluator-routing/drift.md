@@ -66,7 +66,20 @@ Append-only. No implementation drift recorded yet.
 - **Expected:** Explicit-refspec push of local commits.
 - **Actual:** GitHub rejected the HTTPS push before updating the branch (`workflow` scope absent).
 - **Severity:** significant publication block, no source or security compromise.
-- **Action:** used the installed GitHub connector to create blobs/trees and two fast-forward commits,
-  then advanced the existing branch without force. Verified the published evidence tree
+- **Action:** used the installed GitHub connector to create blobs/trees and two fast-forward
+  commits, then advanced the existing branch without force. Verified the published evidence tree
   `038df88d417893753ad26aca61f0ffe0016329e9` exactly equals local `fe2416919^{tree}`. Record both
   hash mappings in `worklog.md`; evaluate only the final published head.
+
+## 2026-08-30 — Retired OpenHands labels removed from the manifest
+
+- **What:** Locked plan decision D9 said the retired Minimax/DeepSeek evaluator labels would remain
+  defined as historical/deprecated, while the implementation removed them from `.github/labels.yml`.
+- **Expected:** Retired label definitions remain visible but are never selected for new dispatch.
+- **Actual:** Only the current `eval:model:qwen` and `eval:model:glm` labels remain in the manifest;
+  an old label presented to the dispatcher is rejected as unknown. No live GitHub label was deleted.
+- **Severity:** minor; the implemented behavior is stricter than planned and preserves the
+  user-facing acceptance contract that old routes cannot be selected for new work.
+- **Action:** accept and record. Historical persisted model/preset deserialization remains intact;
+  label-manifest history is not a persisted routing-state contract.
+- **Evidence:** `.github/labels.yml`, OpenHands phase-dispatch tests, IMPL-EVAL finding 1.
