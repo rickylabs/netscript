@@ -42,7 +42,7 @@ every follow stream throws. This is deterministic, not flaky.
    cite the Aspire source line in the commit body.
 2. Unit tests for `parseDescribeFollow`/`evaluateDescribeFollow` covering: bare-object NDJSON
    lines (the 13.5.3 follow shape), the wrapped `{resources:[…]}` shape, and the last-seen
-   convergence semantics. Put them next to the existing e2e unit tests for this evidence module.
+   convergence semantics. Put them in `packages/cli/e2e/tests/application/gates/aspire-structured-evidence_test.ts` (existing home of these tests) and write the failing (RED) fixture first — a captured-style line such as `{"name":"postgres","displayName":"postgres","state":"Running","health":"Healthy"}` — then make it pass.
 3. Audit `resource-command.ts` and `listener-readiness.ts` for the same wrapper assumption on
    any `--follow` stream and fix identically if present.
 4. Validate with the wrappers only (no runtime): `run-deno-check.ts` / `run-deno-lint.ts` /

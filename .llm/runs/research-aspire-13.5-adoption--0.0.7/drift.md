@@ -1384,3 +1384,23 @@
   Docker). (c) S3's Codex thread `01a05045…` rollout lived under `/home/codex` (removed) — S3 Phase
   B will need a fresh thread; S7's worktree `007-aspire-s7` no longer exists (recreate from
   `2f721bf3`).
+- **D-69 progress (not resolved until runtime proves it):** S10 repair landed at
+  `73b37ac896d588a3932f3fc5e2e6a8d855f8d4ae` ("fix(e2e): accept bare describe follow resources":
+  parser accepts wrapped `resources[]` and bare `ResourceJson` lines, precise error otherwise; RED
+  fixture `fixtures/aspire-describe-follow-13.5.3.ndjson` derived from the DTO, not a capture; +3
+  tests). Cherry-picked onto `9303daf61` → proof descendant
+  **`6e6163a2134b8ab3956889450d4dd0924ae8922f`** (workflow tree still byte-identical to S1; scoped
+  `deno check` 193 files / 0 failed batches; `aspire-structured-evidence_test.ts` PASS) → pushed to
+  `ci/aspire-13-5-runtime-proof`, **run 33327294781** dispatched 2026-08-30T18:10:21Z.
+- **D-72 — bounded topology preflight (lease, 18:10:24Z) stopped pre-runtime on a scaffold defect.**
+  Scratch `netscript init --db postgres` from the S3 head (`85bd4967`, pre-S1), scratch
+  `aspire/aspire.config.json` moved to the 13.5.3 train, `aspire restore` OK;
+  `aspire start
+  --isolated --non-interactive --format Json` → exit 2 in 5 s: AppHost TypeScript
+  check `.helpers/_aspire-compat.mts(10,19)` / `.helpers/config-schema.mts(4,19)`
+  `TS2307: Cannot find
+  module 'zod'` — `zod` is imported by the generated helpers but not restored
+  into `aspire/node_modules`. No container, volume, or AppHost was created; host stayed at exact
+  zero (`receipts/preflight-topology-181024Z/`). The DCP loopback question (D-71b) is therefore
+  still unanswered by a real AppHost; internals' #1736 run (main + #1736, 13.4.6 SDK) is the only
+  live data point and it failed `database.init` with the D-55 signature.

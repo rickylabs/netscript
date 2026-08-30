@@ -1,0 +1,2 @@
+[38;5;9m❌[0m [1;38;5;9mNo AppHost is currently running for 'aspire/apphost.mts'. Use 'aspire run' to start it first.[0m
+[38;5;15m📄[0m See logs at ]8;id=1709007733;file:///home/agent/projects/netscript/.aspire/logs/cli_20260830T181031_ec79c725.log\/home/agent/projects/netscript/.aspire/logs/cli_20260830T181031_ec79c725.log]8;;\

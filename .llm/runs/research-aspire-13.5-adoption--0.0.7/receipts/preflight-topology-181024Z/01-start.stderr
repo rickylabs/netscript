@@ -1,0 +1,8 @@
+[2mStarting Aspire AppHost in the background...[0m
+[38;5;9m❌[0m [1;38;5;9mFailed to start the AppHost.[0m
+[38;5;12mℹ️[0m Recent AppHost startup output:
+.helpers/_aspire-compat.mts(10,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+.helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+[38;5;9m❌[0m [1;38;5;9mAppHost process exited with code 2.[0m
+[38;5;15m📄[0m See logs at ]8;id=1270571518;file:///home/agent/projects/netscript/.aspire/logs/cli_20260830T181025_9a294d64.log\/home/agent/projects/netscript/.aspire/logs/cli_20260830T181025_9a294d64.log]8;;\
+[38;5;12m🔍[0m See AppHost logs at ]8;id=1136340681;file:///home/agent/projects/netscript/.aspire/logs/cli_20260830T181025117_detach-child_ebdee5a80f1f45fcb860a35a33a9e7e5.log\/home/agent/projects/netscript/.aspire/logs/cli_20260830T181025117_detach-child_ebdee5a80f1f45fcb860a35a33a9e7e5.log]8;;\
