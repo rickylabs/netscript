@@ -1243,3 +1243,7 @@
   #1772's background-reference-preflight paragraph — routed to the same Gemini conversation after
   polish, and executed together with S11's next convergence hop (the stack's next move or the D-58
   retarget), regenerating carriers with the checked-in tooling.
+- **D-64 addendum:** `main` → `24f6642f` (#1763, `packages/ai/tests/request_context_test.ts` + its
+  run dir): 0 changed-path overlap with S3/S5/S6/S7/S8/S9/S10/S11 and S13's live head `7e9891fa` →
+  inert; nothing integrated, no worker disturbed; stack stays on `3e5cbabf` until the next
+  convergence point.
