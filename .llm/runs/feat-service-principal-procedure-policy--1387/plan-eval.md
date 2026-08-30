@@ -272,3 +272,114 @@ sections; a full fresh PLAN-EVAL is not required unless the design text changes.
   DinD sandbox is not authorization.
 - `agent-docs-prose` was deliberately not probed by this session (requires a `docs/site` build); the
   plan owner must probe it as part of fix 2.
+
+---
+
+# PLAN-EVAL cycle 2 (bounded re-evaluation of the cycle-1 required fixes)
+
+- Plan evaluator session: Anthropic Claude / Fable 5 / medium — fresh `formal_plan_evaluation`
+  session, 2026-08-30, worktree `worktrees/ns1387-planeval2` (detached). Not the cycle-1 session,
+  not the Codex generator thread, not the Slice 1 implementer, not `007-leaf-1387`.
+- Scope honoured as fixed by cycle 1: row 4 + carrier rows of § Named Validation Contract, § Product
+  Ceiling for Slices 2/3/4/7/9, the LD-8/LD-11 text additions, the appended census in `research.md`.
+  LD-1…LD-7/9/10/12, archetype/overlays, risk register, non-scope, jsr-audit scan: not reopened.
+  Slice 1's implementation (supervisor Tier-A `ACCEPTED`) was not reviewed; it is cited below only
+  as evidence about the *gate contract*, which is in scope.
+
+## Immutable identity (re-derived)
+
+| Item                          | Value                                                                                                                                                       |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Evaluated head                | `c0d61e648adaf6db86ee834b88a37857d9438dc8` = `origin/feat/service-principal-procedure-policy` = PR #1762 `headRefOid` (draft, base `main`)                    |
+| Merge base with `origin/main` | `24f6642f040617de573c7cef1140eed1ac0efd6d` (`origin/main` itself has moved on to `2a65a8cd`; branch not rebased past `24f6642f` — fine for this evaluation) |
+| Plan-repair commit            | `e452f1679` "docs(harness): repair #1387 plan gate contract"; `plan.md` +35/−8, `research.md` **+10/−0**                                                     |
+| Product diff `24f6642f..HEAD` | Slice 1 only: 6 files (`packages/contracts/src/domain/procedure-meta.ts`, 3 contracts tests/fixtures, 2 SDK tests/fixtures)                                  |
+| Base measurement worktree     | temporary detached worktree at `24f6642f` under the job tmp dir (removed after use); `deno.lock` untouched                                                   |
+
+## Fix-by-fix verification
+
+| Fix | Required by cycle 1                                                                                          | Applied? | Re-derived evidence                                                                                                                                                                                                                                                                                                                       |
+| --- | ------------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-1 | Row 4 = contracts 16 / service 90 / plugin 68 / SDK 77 / MCP 136 (387); note re-measured after S0; append census | **Real** | Row 4 now reads exactly that; note under the table names `24f6642f` and the pre-#1466 origin of 8/69. Re-derived by this session at `24f6642f` with `run-deno-test.ts`: **16 / 90 / 68 / 77 / 136, all exit 0** — I accepted neither the plan's nor the supervisor's figure. `research.md` § "Post-S0 corrected census (append-only)" carries the same numbers. |
+| F-2 | Contract carriers; probe `agent-docs-prose`; ceilings amended or explicit `gen:*` exemption sentence          | **Applied as prescribed — but the prescription was insufficient; see F-2′** | Rows 13–17 added; `mcp-export-corpus` in the Slice 2/4/7 stops; four carriers in the Slice 9 stop; explicit exemption paragraph under § Product Ceiling naming the corpus file, `PUBLISH_ASSET_OUTPUTS`, `.llm/assets/agent-docs/{prose.json.gz,provenance.json}`, and the `check:assets-barrel` barrels (all verified to exist; all five `check:*` tasks exist in `deno.json`). `agent-docs-prose` probed at base by the plan owner and **re-probed by this session at `24f6642f`: exit 0, 639 files, rendered output OK, `"fresh":true`, `stalePaths:[]`, tracked tree clean**. `check:mcp-export-corpus`, `check:publish-assets`, `docs:tagline:check`, `check:assets-barrel` all exit 0 at base. |
+| F-3 | `service-rpc.ts` + `FetchHandler.handle` widening into Slice 2                                                | **Real** | Slice 2 ceiling gains `packages/service/src/builder/service-rpc.ts`; Slice 2 charter text names both widenings ("to `object`"). Slice 3 ceiling and charter unchanged (behaviour-only, four files).                                                                                                                                       |
+| F-4 | Owner amends the issue's compile-time-rename line before close-gate; PR body states substitution             | **Real** | Paragraph after the LD table: owner/supervisor amends before close-gate; implementation PR body states substitution + rationale; implementer does not edit the issue.                                                                                                                                                                       |
+| F-5 | `optional` rejection raised at `createContractAuthorizer()` construction; Slice 5 negative test named          | **Real** | Paragraph after the LD table pins construction during contract traversal, "not on the first request or later in `build()`"; Slice 5 names `createContractAuthorizer rejects optional authentication during construction`.                                                                                                                  |
+
+`research.md` append check: `git diff --numstat 0a1e6337f..HEAD -- research.md` = `10 0` and zero
+`-` lines in the diff body — independently confirmed as a pure append (one new `###` subsection
+before "Open questions for PLAN-EVAL"; the cycle-1 truncated-table cosmetic was left as-is, which is
+acceptable).
+
+## F-2′ — The corpus contract points are wrong: `mcp-export-corpus` is already red at the branch head (blocking)
+
+This is the cycle-1 question "will the carrier contracting prevent the rescope-rule trip on the
+first public-surface slice?" — and the answer, measured rather than reasoned, is **no; it has
+already tripped**.
+
+- `deno task check:mcp-export-corpus` at base `24f6642f`: **exit 0**.
+- The same command at head `c0d61e64`: **exit 1** — `MCP export-surface corpus is stale; run deno
+  task gen:mcp-export-corpus`. Regenerating in a scratch copy changes only the corpus blob
+  (`uncompressedBytes 2138501 → 2138580`, +79 bytes, new sha256); the regeneration was discarded, not
+  committed, by this session.
+- The only product change between those two trees is Slice 1. Cause: the corpus records each public
+  symbol's **signature and JSDoc** (`generate-export-surface-corpus.ts` `renderSignature`/
+  `renderJsDoc`), not just the symbol list. Slice 1 widened `NetScriptProcedureMeta` (additive
+  `access.authorization`), which changes the rendered signature of an exported contracts type.
+  Cycle-1's F-2 (and therefore the repair) modelled the gate as sensitive to *symbol growth* and
+  contracted it only at the three slices that add symbols (2/4/7). That model was wrong: every slice
+  that touches an exported declaration or its JSDoc in contracts/service/plugin/sdk/mcp stales it —
+  Slice 1 (done), and plausibly 3, 5, 6, 8 (JSDoc on public ports/adapters) as well as 2/4/7.
+- Consequence under the plan's own rules: the exemption paragraph authorises regeneration only "in
+  the slice that staled them", and Slice 1 neither regenerated nor was contracted for the gate. The
+  `worklog.md` Slice 1 line "the MCP export corpus … had no tracked movement from the content head"
+  is true and non-probative — the tracked file did not move *because nobody ran the gate*. Slice 2's
+  contracted `mcp-export-corpus` would therefore start red for a reason outside Slice 2's ceiling
+  exemption, which is precisely the stop-and-rescope trigger F-2 was meant to remove.
+
+This is not a design defect and not a Slice 1 acceptance question (out of my scope); it is a gate
+contract defect in a section cycle 1 explicitly reopened. Cycle 1's prescription was under-specified;
+I record that plainly rather than attribute it to the plan owner, who did exactly what was asked.
+
+**Required fix (one contract line + one regen commit):**
+
+1. In `plan.md` § Named Validation Contract row 13 and in every slice's Tier-A stop (Slices 1–9),
+   contract `mcp-export-corpus` — it is cheap (<1 min, `deno doc` over five packages) and sensitive to
+   any public signature/JSDoc change, so per-slice is the only honest contract point. Keep the
+   Slice 9 four-carrier contract as is.
+2. Amend the § Product Ceiling exemption sentence so the corpus regeneration is committed "in the
+   slice that staled it, or — for the Slice 1 staleness recorded in PLAN-EVAL cycle 2 — in a
+   supervisor-signed `chore(harness)`/`chore(mcp)` regeneration commit before Slice 2 starts". No
+   hand edits; `gen:mcp-export-corpus` output only; `deno.lock` unchanged.
+3. Record the Slice 1 staleness in `drift.md` (severity `minor`, gate-contract class, #1769 shape).
+
+## Sufficiency of the repaired gate set for Slices 2–9
+
+- Rows 4, 14, 15, 17 and the Slice 9 carrier set are correct and base-green as measured here; the
+  `agent-docs-prose` base probe is now on record twice (owner + this session) with a fresh bundle.
+- Row 13 is correct in *command* and *base result* but wrong in *contract points* (F-2′). With fix 1
+  applied, the remaining generated-carrier blind spot closes: the four Slice 9 carriers are
+  README/docs-input driven and Slices 1–8 do not touch READMEs or `docs/site`.
+- F-3's Slice 2 ceiling is sufficient for Slice 3 to stay behaviour-only; the widening target
+  (`object`) is compatible with `quality:scan` and `F-AUTH-CAST`.
+- Nothing else in the reopened sections is cosmetic; F-1, F-3, F-4, F-5 are real.
+
+## Verdict
+
+`FAIL_PLAN` — cycle 2 of 2. Per `verdict-definitions.md` / `plan-protocol.md` this is the second
+`FAIL_PLAN`, so the unresolved item **escalates to the owner**. The escalated item is narrow and
+mechanical (F-2′: three edits, one regeneration commit); no design text changes. The owner may
+accept the amended contract on the diff without a further evaluation cycle, or request a bounded
+cycle 3 limited to row 13, the per-slice stop lines, the exemption sentence, and the `drift.md`
+entry. Slice 2 must not start until the corpus regeneration commit has landed and been
+supervisor-signed, because its first contracted gate is otherwise red on arrival.
+
+## Notes
+
+- No product code, `deno.lock`, PR body, label, milestone, issue, or acceptance box was modified.
+  The one scratch regeneration of the corpus file was reverted with `git checkout --` before this
+  file was written; `git status` shows only this artifact.
+- No runtime lease held or acquired; no `e2e:cli`, Aspire, Docker, or browser gate run. The
+  `agent-docs-prose` probe is a `docs/site` static build, not a runtime gate.
+- All base measurements were taken in a temporary detached worktree at `24f6642f`, removed
+  afterwards.
