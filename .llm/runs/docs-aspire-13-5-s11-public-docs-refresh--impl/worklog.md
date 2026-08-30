@@ -34,6 +34,24 @@
 - `docs/site/_diagrams/aspire-resource-graph.mmd`: updated comments to "Aspire", verified graph node definitions and committed SVG asset.
 - `packages/aspire/README.md`: normalised introductory overview to "Aspire".
 
+### S6: Regeneration + Gates (2026-08-30)
+- Generated and verified agent doc prose: `deno task gen:agent-docs-prose` & `deno task check:agent-docs-prose` (fresh, 0 stale paths).
+- Generated and verified publish assets: `deno task gen:publish-assets` & `deno task check:publish-assets` (0 findings).
+- Verified internal doc links: `deno task docs:links` (103 docs, 0 broken links).
+- Executed Lume site build: `deno task --cwd docs/site build` (642 files generated, 228 HTML pages verified).
+- Executed workspace quality gates: `deno task check` (0 occurrences), `deno task lint` (0 findings), `deno task fmt:check` (0 findings).
+- All 113 `doc:*` manifest rows evaluated, 0 deferred.
+
+### Convergence Rebase onto S10' a46ea16d (2026-08-30)
+- Rebased branch onto `a46ea16d` following Aspire stack rebase onto main `3e5cbabf` (D-54).
+- Preserved main's merged prose in `docs/site/explanation/aspire.md` (`carry from Aspire's .NET AppHost:`).
+- Preserved canonical `.agents/skills/help.md` playbook description in `docs/site/reference/ai/skills.md`; added upstream workflow skills (OF-1a) and exact 14-tool Aspire MCP baseline without `describe_resource`.
+- Re-ran asset generators and verified all quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume build).
+- Verified 0 occurrences of `describe_resource` and 0 `.NET Aspire` regressions across public docs.
+- Force-pushed to `origin:docs/aspire-13-5-s11-public-docs-refresh` with lease (`088ca090`).
+
+
+
 
 
 
