@@ -4358,3 +4358,50 @@ PLAN-EVAL cycle 2 dispatched at `f5994260` — the **final** permitted plan cycl
 cycle is spent on **sufficiency**, and carries the sibling leaf's three-for-three warning: a new
 exported symbol propagates to consumers a plan cannot enumerate by recall, including full-suite-only
 consumers.
+
+## 2026-08-30 — #1758: exploratory runtime evidence at `1c5fa004`, then main moved again (#1731)
+
+### The lease run and CI both completed — and are now exploratory only
+
+At head `1c5fa004`, under the granted lease:
+
+| Evidence | Result |
+| --- | --- |
+| Bare `deno task e2e:cli` | **26 passed / 1 failed** |
+| Sole failing gate | `generated.quality-negative` — `TS2345` in the generated project's `hydration.ts`, i.e. **open issue #1734**, internals-owned |
+| CI at `1c5fa004` | **completed / success — fully green, close-gate included** |
+
+The green close-gate is worth recording: it confirms the sequencing fix worked. `status:ready-merge`
+was applied *before* the run, the mirror's live read observed it, mirrored the acceptance evidence,
+and the gate passed — where the previous attempt's mirror had skipped on a label-timing race.
+
+**Both are now reclassified EXPLORATORY,** per the coordinator, because `origin/main` advanced to
+`3e5cbabf` (#1731). They are retained as evidence that the shape works, not as the merge gate. The
+final runtime gate and evaluator will be recut after convergence. The #1734 failure was reported
+exactly and **not waived**.
+
+### Cleanup returned the sandbox to zero, verified
+
+`docker ps -a` 0 · `docker volume ls` 0 · `aspire ps` none · `agentic:leak-check` `survivors: []` with
+both probes `ok`. One untracked artifact remained — `leak-report.md`, produced by the leak check
+itself — and was handed to the author to commit or remove rather than left loose.
+
+### Fourth integration dispatched, with the conflict map pre-computed
+
+`#1731` owns contracts/SDK, so the overlap was analysed before dispatch rather than discovered by the
+author mid-merge:
+
+- It touches **none** of the exact files #1462 modifies — `mod.ts`, `deno.json`, `src/cache/mod.ts`,
+  `src/presets/mod.ts`, and the closure constant are all untouched.
+- It **does** touch `packages/sdk/README.md`, which this leaf also edits — a real textual conflict
+  where both #1731's contract-errors prose and the cache-provider migration prose must survive.
+- It touches `src/ports/mod.ts`, `src/ports/query-factory.ts`, `src/ports/service-client.ts` and
+  `src/query/mod.ts`. The leaf does not edit these, but its preset entry re-exports dependent SDK
+  types under D4's closure rule — so an upstream ports change can silently break or widen that
+  closure. The author must **re-verify D4** rather than assume it survived.
+- It touches all four shared carriers again, which are to be resolved **mechanically via generators**,
+  never hand-merged.
+
+Readiness rolled back to `status:impl` on both objects while the integration runs. Both
+`status:ready-merge` deletes returned 404 — the phase-eval automation had already displaced the label,
+the same behaviour recorded on #1729 — so the label set was re-read and counted rather than assumed.
