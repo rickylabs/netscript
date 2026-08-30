@@ -4086,3 +4086,56 @@ that changes generated assets is exactly the kind of move that can silently alte
 
 `#1747` withheld at `c1e03922` (`status:ci-fail`) pending #1734's bounded repair and a full one-pass
 `scaffold.runtime`; `#1734` parked at `eb765629`. Neither blocking.
+
+## 2026-08-30 — #1533 bounded repair green, enforcement on, I6 re-anchored onto `3e5cbabf`
+
+### Bounded 28 repaired — verified by me, not accepted
+
+At the repair head I ran the gate task myself:
+
+```
+jsdoc examples: PASS members=35 files=2020 examples=349 candidates=348 checked=348
+  exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0
+enforcedFailureCensus={"badSpecifier":0,"unfenced":0,"malformed":0}
+deferredCensus={"unboundName":116,"typeError":21}
+```
+
+**`exempt=0` is the number that mattered.** The 28 were genuinely repaired, none excused — and the
+deferred census still read 116/21, so no deferred-class example was quietly repaired or laundered
+into the enforced pass. Reporting the deferred census on a **passing** run is the design property
+that makes this honest: a green gate that still prints 137 known-unrepaired examples cannot be
+mistaken for a clean corpus.
+
+Spot-checked the repairs as real rather than hollowed: `./generated/client` → `@database`,
+`@netscript/database/adapters` split into the declared `/adapters/postgres` and `/adapters/mssql`
+subpaths, `./router.ts` → `@app/router.ts`, the bare fence labelled `text` (which is why `non_ts`
+moved 0→1 as `malformed` moved 1→0). 29 files, +255/−88.
+
+### Follow-ups filed with classifier-owned lists
+
+**#1765** (116 unbound-name convention) and **#1766** (21 published-API type errors), both milestone
+`0.0.8`, each carrying the classifier-emitted per-example list verbatim. I deliberately did not
+hand-derive them: my own parse gave 92/49 because the classifier ranks unbound-name above other type
+errors and my script did not. Filing public issues on numbers that disagree with the gate would have
+made the follow-ups useless as evidence.
+
+### I gave the author a false premise, and the stop condition caught it
+
+I told it the rebase target changed "only two generated `.ts` files and zero `@example` lines". True
+of `a5520e70`; **false** of `3e5cbabf`, which merged #1731 after I wrote it — 20 `.ts` files under
+`packages/**`, real `packages/contracts` source, and **+2 `@example` blocks** in
+`src/domain/procedure-meta.ts`.
+
+The author caught it independently and recorded it as expected-vs-actual drift at `severity:
+significant`, rather than absorbing my claim. Post-rebase at `e1ea9d3a`: **35 members / 2021 files /
+351 examples / 350 candidates**, enforced census **zero**, deferred census **exactly 116/21**, raw
+exit 0. Neither deferred number moved, so #1765/#1766 remain accurate as filed.
+
+**The safeguard, not my accuracy, is what held.** The same brief carried "re-run the gate after the
+rebase and stop if either deferred number moves" — that instruction is now the third of my errors in
+this leaf it has caught. Writing an explicit stop condition into every brief has earned its place as
+a default rather than a flourish.
+
+Sequencing held as directed: enforcement landed **first** on the proven-green pre-rebase head
+(`e1ea9d3a ci(docs): enforce JSDoc example imports`), then the re-anchor — never enforcement folded
+into a rebase, and never enforcement over a red corpus.
