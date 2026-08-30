@@ -1385,3 +1385,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   independent docs slice. Features: one empty-output DeepSeek attempt is transport failure, not a
   verdict; complete the single sanctioned retry and keep later slices queued, never globally
   blocked.
+
+## 2026-08-30T20:41:01Z — post-S5 active queue
+
+- Aspire: S5 is shipped in main `2a1248d33`. Discard the interrupted old-head S8 diagnostic as
+  evidence, converge S8/Tier-A/remote head first, then run exactly one typed-seed diagnostic from
+  host zero. Continue S6/S9/S10/S11/S13/#1747 static convergence in parallel.
+- Internals: recover #1774 with the same sanctioned OpenRouter DeepSeek model through checked-in
+  hybrid/opencode after two claude-wrapper empty completions. Empty output is transport failure, not
+  `PASS` or `FAIL_FIX`; advance the next leaf if the third transport cannot emit a verdict.
+- Docs: #1790 is `status:impl`, not ready. Resolve current-main generated-asset conflicts by
+  authoritative regeneration, remove EOF whitespace findings, mirror #1788 evidence, then recut
+  exact-head Tier-A/delta evaluation and CI.
+- Fixes/features remain independent. #1764 TC-6/7/9 stays runtime-open; no 79/1 topology receipt or
+  stopped pre-runtime script may close it. Feature Slice 4 retains its own sanctioned DeepSeek eval.

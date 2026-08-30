@@ -2744,3 +2744,20 @@
   child `3751092` plus relay watcher exited; the owned census returned Aspire `[]`, containers `0`,
   volumes `0`, relays `0`. Lease transferred immediately to Aspire S5 for its sixth and first
   canonical plugin-bearing two-root receipt under the corrected DinD/relay topology.
+
+## 2026-08-30T20:41:01Z — S5 shipped after real concurrent plugin proof
+
+- Corrected #1717's impossible same-path concurrency row in place to retain its fixed-port intent
+  under Aspire's path-keyed instance identity. Attempts 6 and 7 were preserved as honest red/setup
+  evidence. Attempt 8 used two byte-identical generated copies, official plugin registry generation,
+  separate owner-scoped relays, simultaneous Aspire 13.5.3 AppHosts, and exact health descriptions;
+  all workers/sagas/triggers/streams resources and APIs were Healthy in both copies.
+- Teardown receipts and an independent census returned Aspire `[]`, containers `0`, volumes `0`, and
+  relay/AppHost processes `0`. After sole `status:ready-merge`, zero unchecked boxes/threads, exact
+  CI and close-gate green, merged PR #1740 with `--match-head-commit 1c2cf2ef5`; main is
+  `2a1248d33d55a9529d1e4822d9c850bc6caa4c16`. Normalized #1717/#1740 to sole `status:shipped`.
+- Interrupted the already-started S8 diagnostic because its head was 10 commits behind the new main;
+  cleaned its exact AppHost and Docker resources to zero and required convergence before any new
+  runtime evidence. Demoted conflicting docs PR #1790 to `status:impl` pending regeneration and
+  exact evidence. Kept #1774 open after two DeepSeek wrapper runs emitted no verdict; same-model
+  hybrid transport recovery is active.

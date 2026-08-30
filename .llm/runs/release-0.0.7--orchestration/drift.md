@@ -1487,3 +1487,20 @@ implementation thread.
   static tooling search to idle the runtime train.
 - The authoritative main is now `bc33c2aa319c057dda6525d91cb8adcae56b3d77`, containing shipped S1
   and docs #1785. Any lane still using `74e3d451e` or describing S1 as pending is stale.
+
+## 2026-08-30 — same project semantics, fixture health, and evaluator output are distinct gates
+
+- Aspire 13.5.3 keys a live CLI instance by exact AppHost path. `--isolated` randomizes ports and
+  secrets but does not permit two live instances at one path. S5's concurrency acceptance therefore
+  uses byte-identical copies at distinct absolute paths; sequential replacement is never equivalent.
+- A plugin-present fixture is not necessarily a runnable plugin fixture. S5 attempt 7 correctly
+  stayed red because `--no-samples` omitted the generated saga registry. The official
+  `netscript generate plugins` path with default samples produced it, and attempt 8 then proved the
+  literal-port fix with every required resource healthy. Hand-created registry files are invalid
+  evidence.
+- A successful evaluator process with `result: ""` is not a verdict, even after extensive correct
+  reasoning. #1774's two claude-wrapper runs are transport receipts only. Reusing the same
+  sanctioned model through a different checked-in OpenRouter transport does not create a third
+  content cycle.
+- Main is now `2a1248d33d55a9529d1e4822d9c850bc6caa4c16`. Runtime evidence captured by S8 before
+  integrating this merge is stale regardless of whether its narrow probe happened to finish green.

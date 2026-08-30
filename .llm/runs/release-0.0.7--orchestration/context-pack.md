@@ -1676,3 +1676,28 @@ continues concurrently because serial ordering is per orchestrator, not global.
   `tcp://netscript-dind:2375`, direct publications at `netscript-dind:<port>`, and the checked-in
   owner-scoped two-hop relay whenever DCP or generated clients consume loopback. Cleanup must return
   AppHosts, containers, volumes, and relays to exact zero.
+
+## Resume delta — 2026-08-30T20:41:01Z
+
+- Aspire S5 PR #1740 shipped at exact head `1c2cf2ef5bd89fa46e736ceb6ea7b556e2a5c049` as main
+  `2a1248d33d55a9529d1e4822d9c850bc6caa4c16`; #1717/#1740 are closed and sole `status:shipped`.
+  Attempt 6 honestly proved same-AppHost-path replacement, so #1717 was narrowed in place to two
+  concurrent byte-identical copies at distinct absolute paths. Attempt 7 proved the concurrency
+  architecture but exposed a fixture missing the generated saga registry. Final attempt 8 used the
+  official plugin generator, ran both 13.5.3 AppHosts concurrently, observed healthy
+  workers/sagas/triggers/streams plus APIs in both, and cleaned AppHosts, relays, containers, and
+  volumes to exact zero. Exact-head CI/close-gate, issue/PR checklists, and review-thread gates
+  passed.
+- The first post-S5 S8 typed-seed diagnostic started before its new-main convergence message was
+  consumed. It was stopped as stale evidence and cleaned to exact zero. S8 must rebase from
+  `f06209d393` onto `2a1248d33`, prove patch identity/Tier-A and remote equality, then receive a new
+  single diagnostic lease; no old-head output may be carried.
+- #1774's first sanctioned DeepSeek run re-measured the full attack matrix but ended after 104 turns
+  with an empty result and no artifact/comment. The output-first retry also ended empty after
+  writing only a pending skeleton. Neither is a content verdict or evaluation failure. Preserve both
+  as transport receipts and retry the same OpenRouter DeepSeek model through the checked-in
+  hybrid/opencode transport before any route decision; keep other internals work moving.
+- Docs #1790 was demoted from a false `status:ready-merge`: it conflicts with current generated
+  assets, has stale 068d/40f evaluation evidence, no exact-head CI, unchecked #1788 boxes, and two
+  whitespace findings. Rebase/regenerate, mirror evidence, recut Tier-A plus a fresh delta verdict,
+  then rerun CI.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "bc33c2aa319c057dda6525d91cb8adcae56b3d77",
+  "currentMainSha": "2a1248d33d55a9529d1e4822d9c850bc6caa4c16",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -38,6 +38,7 @@
         "credentialHandling": "mode 600; source only through the checked-in Agentic launcher; never print, copy, or commit the key",
         "sanctionedPreset": "claude-evaluator-deepseek-v4-flash-0731",
         "requiredLeaf": "#1774/#1775 fresh fallback evaluation; the historical Opus verdict is not the sanctioned final receipt",
+        "transportRecovery": "two same-model claude-wrapper dispatches ended with empty results and no completed verdict (the second left only a pending skeleton); a fresh same-model OpenRouter hybrid/opencode transport is required before any route escalation",
         "verifiedAt": "2026-08-30T20:19:28.000Z"
       }
     },
@@ -5213,7 +5214,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "bc33c2aa319c057dda6525d91cb8adcae56b3d77",
+    "gitHead": "2a1248d33d55a9529d1e4822d9c850bc6caa4c16",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -5250,11 +5251,11 @@
     "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2; identical /home/agent bind visibility is fixed; direct all-interface publications are reachable at netscript-dind:<port>; DCP loopback-only publications require the proven owner-scoped two-hop relay; exact current inventories containers=0 and volumes=0; host Docker remains outside agent authority",
     "aspireMcpHelpers": "not counted as AppHost runtimes; no Aspire applications are active",
     "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD client/server 28.5.2; fs.inotify.max_user_instances 1024",
-    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; D-42 fixed and direct DinD service routing proven; real DCP loopback contract needs the proven two-hop relay; current inventories Aspire=0, Docker containers=0, Docker volumes=0; the fixes expanded targeted runner was stopped before runtime and the sole serialized local Phase-B lease transferred to Aspire S5 attempt 6; cross-supervisor cleanup is prohibited",
+    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; D-42 fixed and direct DinD service routing proven; real DCP loopback contract needs the proven two-hop relay; current inventories Aspire=0, Docker containers=0, Docker volumes=0; S5 attempt 8 completed green and cleaned exactly before merge; the stale-base S8 diagnostic was stopped and cleaned before evidence use, and S8 must converge on current main before a fresh lease; cross-supervisor cleanup is prohibited",
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-30T20:19:28.000Z"
+    "verifiedAt": "2026-08-30T20:41:01.000Z"
   },
-  "updatedAt": "2026-08-30T20:19:28.000Z"
+  "updatedAt": "2026-08-30T20:41:01.000Z"
 }
