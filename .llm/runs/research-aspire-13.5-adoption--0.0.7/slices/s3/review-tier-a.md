@@ -54,3 +54,16 @@ stays draft until phase B lands under the lease.
 - M-1: 13.5.3 describe case = 13.4.6 data + synthetic banner, with a "captured live" provenance
   comment. L-1 README fmt; L-2 omitted-key list.
 - Fix brief sent on the thread (slice 6). Cycle 2 follows at the slice-6 head.
+
+## Cycle 2 — head `fe4f496bd` (slice 6) — **sign-off to IMPL-EVAL cycle 2**
+
+- Inline 13.4.6 cases diffed against `origin/main`: `service-endpoint-source-fixtures.ts`,
+  `generated-app-endpoint_test.ts`, `service-env-evidence_test.ts`, `telemetry-live-fixture_test.ts`
+  remove **zero** 13.4.6 lines; `probes_test.ts` folds the 13.4.6 case into a
+  `for (const aspireVersion of ['13.4.6', '13.5.3'])` loop with identical assertions (kept).
+- 13.5.3 describe case is now a bannerless redacted projection of S2's
+  `02-v5-aspire-describe-final.json` (`users` resource) with honest provenance comments
+  (`generated-app-endpoint_test.ts:169`, fixtures README listing omitted keys); READMEs pass
+  repo-config `deno fmt --check`.
+- Gates at `fe4f496bd`: configured `deno task lint` exit 0; `quality:scan` ok; `arch:check` 0;
+  `check:mcp-export-corpus` unchanged; tests 282/0; check 0 diagnostics; raw lint/fmt clean.
