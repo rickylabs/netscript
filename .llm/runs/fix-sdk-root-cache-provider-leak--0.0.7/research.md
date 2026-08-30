@@ -37,6 +37,8 @@ deepen architecture debt.
 | 8  | The public README teaches root `defineServices`; the generated site reference twice says the cache subpath auto-registers. Those statements would become false without migration prose.                                                                                                                   | `packages/sdk/README.md:76`; `docs/site/reference/sdk/index.md:79-82,267`                                                                              |
 | 9  | The only non-generated root-import example for a cache implementation is stale after cache removal from the root.                                                                                                                                                                                         | `packages/sdk/src/cache/kv-cache-store.ts:41` imports `KvCacheStore` from `@netscript/sdk`                                                             |
 | 10 | The issue has five unchecked acceptance boxes. In particular, it requires both browser isolation and preserved explicit Fresh bootstrap registration; a focused subpath by itself is insufficient.                                                                                                        | GitHub issue #1462 body fetched on 2026-08-30                                                                                                          |
+| 11 | Three additional published pages teach the behavior being removed: query-bridge documents import-time registration and the old provider message, server attributes Fresh registration to a re-export side effect, and the SDK guide says importing `/cache` auto-registers.                               | `docs/site/web-layer/query-bridge.md:100,305-323`; `docs/site/web-layer/server.md:89`; `docs/site/services-sdk/sdk.md:186`                             |
+| 12 | `check:publish-assets` does not consume `docs/site`; `check:agent-docs-prose` builds the Lume site and compares the checked-in prose/provenance pair, and only the regenerated gzip then makes both publish-assets outputs stale.                                                                         | Root tasks plus `.llm/tools/docs/build-agent-docs-bundle.ts` and `.llm/tools/generate-publish-assets.ts`                                               |
 
 ## Public-surface inspection (`deno doc` first)
 
@@ -61,12 +63,12 @@ inferring it from filenames.
 | 3. Make server bootstrap register explicitly | Preserves Fresh server behavior and makes ownership visible at the composition root.                                                             | Does not protect browser/root imports by itself.                                                        | Necessary, but alone does not dominate move 2.                                                                              |
 
 **Locked choice: all three.** Moves 2 + 3 are the minimum implied by acceptance. Adding move 1 is an
-additive, doctrine-aligned subpath that gives browser/shared code a minimal graph and a durable
-place for the preset without loading unrelated root responsibilities. No single alternative
-dominates the combined choice: omitting move 2 leaves existing root consumers unsafe; omitting move
-3 breaks Fresh servers; omitting move 1 saves one export but leaves callers without the focused
-boundary named by the issue. The cost of move 1 is a new stable surface and its generated/doc
-derivatives, which are explicitly owned below rather than treated as free.
+additive, doctrine-aligned subpath that gives browser/shared code a graph with no server-cache/KV
+edge and a durable place for the preset without loading unrelated root responsibilities. No single
+alternative dominates the combined choice: omitting move 2 leaves existing root consumers unsafe;
+omitting move 3 breaks Fresh servers; omitting move 1 saves one export but leaves callers without
+the focused boundary named by the issue. The cost of move 1 is a new stable surface and its
+generated/doc derivatives, which are explicitly owned below rather than treated as free.
 
 The root must **remove** the cache re-export, not merely make `src/cache/mod.ts` pure. A pure cache
 barrel would stop registration but would keep `KvCacheStore` and its dynamic `@netscript/kv` edge
@@ -90,9 +92,10 @@ This is a pre-1.0 but real compatibility change:
 
 A migration note is owed. `packages/sdk` has no package `CHANGELOG.md`; creating a new unpublished
 changelog convention is broader than this fix. The owned migration note will therefore live in the
-published `packages/sdk/README.md`, and the public SDK site reference will be updated to the same
-explicit-registration contract. The PR summary must call out the break for 0.0.7 rather than label
-it patch-compatible.
+published `packages/sdk/README.md` and all four affected public site pages
+(`reference/sdk/index.md`, `web-layer/query-bridge.md`, `web-layer/server.md`, and
+`services-sdk/sdk.md`). The PR summary must call out the break for 0.0.7 rather than label it
+patch-compatible.
 
 ## jsr-audit surface scan
 
@@ -114,15 +117,39 @@ negative result is evidence, not a reason to rewrite the release baseline in thi
 The published export and reference prose feed checked-in generated assets. The plan owns the source
 change and the exact derivative outputs:
 
-| Gate              | Generator/check                                                         | Owned derivative                                                                                             |
-| ----------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| MCP export corpus | `deno task gen:mcp-export-corpus` / `deno task check:mcp-export-corpus` | `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`                         |
-| Publish assets    | `deno task gen:publish-assets` / `deno task check:publish-assets`       | `packages/mcp/src/publish-assets.generated.ts`; `packages/cli/src/kernel/assets/publish-assets.generated.ts` |
+| Stage                  | Generator/check                                                         | Owned derivative                                                                                             |
+| ---------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| MCP export corpus      | `deno task gen:mcp-export-corpus` / `deno task check:mcp-export-corpus` | `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`                         |
+| Agent-docs prose       | `deno task gen:agent-docs-prose` / `deno task check:agent-docs-prose`   | `.llm/assets/agent-docs/prose.json.gz`; `.llm/assets/agent-docs/provenance.json`                             |
+| Embedded publish asset | `deno task gen:publish-assets` / `deno task check:publish-assets`       | `packages/mcp/src/publish-assets.generated.ts`; `packages/cli/src/kernel/assets/publish-assets.generated.ts` |
 
-After product changes, each check is expected to fail once as a measured stale-derivative negative,
-then its generator is run, the named output is reviewed/committed, and the check must pass. A coarse
-“generated assets changed” claim is insufficient; base-vs-head review must inspect the SDK entry and
-registration prose inside each derivative.
+The dependency order is measured, not inferred: owned site prose first makes
+`check:agent-docs-prose` stale; `gen:agent-docs-prose` rewrites the gzip/provenance pair; that
+regenerated gzip then makes `check:publish-assets` stale. Each negative is recorded before its
+generator, and each check must pass afterward. The independent export-map change also requires
+`docs:exports-drift` to prove the `./presets` reference row and the MCP corpus stale/generate/pass
+sequence.
+
+This host can run the Lume stage. On the unchanged plan branch, `deno task check:agent-docs-prose`
+exited 0, built 638 site files, reported rendered output OK, and returned `fresh: true` with no
+stale paths. That is host-capability/baseline evidence only; S3 must still record the expected stale
+negative after the owned prose edits, generation, and final pass.
+
+## PLAN-EVAL cycle 1 measurements
+
+- The deleted-`globalThis.Deno` S2 shape crashes before provider state can be observed with
+  `ReferenceError: Deno is not defined` at `isWarmupPhase` (`ext:deno_node/internal/options.ts`)
+  while Node compatibility loads. With Deno intact, a fresh root-import child observes `true`, while
+  direct preset import observes `false`; the intact-runtime boolean mismatch is the locked red.
+- `deno info --json` currently shows `cache-query.ts` and `kv-cache-store.ts` in the root graph and
+  neither in the direct preset graph. The committed regression will mechanically reject those two
+  modules and `@netscript/kv` from both final entry graphs.
+- The six direct preset type references cascade. The measured finite closure is the type-only
+  surface enumerated by `src/ports/mod.ts`, excluding `QueryClientPort` because it carries the
+  pre-existing `QueryClient` private-reference debt; no runtime ports value is re-exported.
+- A neighbouring Fresh-root server-adapter reachability edge is recorded as PLAN-EVAL cycle 1 F9. It
+  remains out of this leaf's ceiling for coordinator follow-up and is not used to weaken this leaf's
+  root/preset graph assertions.
 
 ## Open questions
 
