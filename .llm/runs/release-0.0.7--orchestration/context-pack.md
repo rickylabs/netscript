@@ -1361,7 +1361,7 @@ continues concurrently because serial ordering is per orchestrator, not global.
 
 ## Live continuation — five closure handoffs; no global queue barrier
 
-- Human merge queue: #1746@`84a5fd11` closes #1745; #1748@`22e79dcc` closes #1000;
+- Coordinator merge queue: #1746@`84a5fd11` closes #1745; #1748@`22e79dcc` closes #1000;
   #1747@`c1e03922` closes #1732; #1735@`fffbb0c4` closes #1714; #1755@`2c844565` closes
   #1749. All five are non-draft/CLEAN with independent exact-head PASS, terminal required checks,
   close/acceptance gates, and zero unanswered current review threads. #1714's stale label was
@@ -1376,3 +1376,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
   the only current NAS Phase-B topology block.
 - #1734 remains parked pending the owner's explicit authorization for its third and final bounded
   correction/evaluation cycle. This does not pause any other topic.
+
+## Resume checkpoint — 2026-08-30T12:33:50Z
+
+- Coordinator merge authority is authoritative; the earlier `human-only` wording was false and is
+  superseded. Exact first-parent order is #1735 head `fffbb0c473dec14aedd858127b9a3ce4afee74a2`
+  -> merge `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `12:27:43Z` -> closes #1714,
+  then #1746 head `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` -> merge
+  `f8b4f804cc5fe77054d4f220974eae66becf090c` at `12:30:25Z` -> closes #1745. Both
+  PRs/issues are `status:shipped`; exact current main is `f8b4f804...`.
+- #1735 had a procedural row-7 miss only: stale draft/pending-evaluator prose remained in its body
+  at merge while all substantive gates/evidence were valid. The body was rewritten in place and the
+  correction comment is https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739.
+- Next merge authority is withheld: #1747 needs mandatory exact-head `scaffold.runtime`; #1748 must
+  correct the false every-published-surface claim and refresh the shared asset; #1755 stays third in
+  that serial shared-asset sequence. Other topic queues remain independent.
+- DAG topology is unchanged. Closed #1745 releases #1749; closed #1714 satisfies the S2 predecessor
+  for #1715/#1716/#1719/#1721 without waiving any successor-specific gate.

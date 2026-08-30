@@ -44,3 +44,27 @@ artifact-pinned production E2E.
   `Canary 0.0.7-canary.1 publish + pinned production E2E passed`. The ephemeral branch was removed.
 - The publication hold was therefore released. PR #1710 merged only afterward at main merge
   `3b32d1628584749af4dd6e97fd331c24e84f0b9e`, preserving the canary's immutable membership.
+
+## 2026-08-30T12:27:43Z–12:30:25Z — coordinator merge authority resumed; two leaves landed
+
+- The prior `human-only` merge wording was false. The milestone coordinator owns merge authority
+  under the milestone-cluster contract and, after the recorded per-PR gates, merged these exact
+  heads in first-parent order:
+  1. PR #1735 head `fffbb0c473dec14aedd858127b9a3ce4afee74a2` squash-merged as
+     `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `2026-08-30T12:27:43Z`, closing #1714.
+  2. PR #1746 head `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` squash-merged as
+     `f8b4f804cc5fe77054d4f220974eae66becf090c` at `2026-08-30T12:30:25Z`, closing #1745.
+- PRs #1735/#1746 and issues #1714/#1745 are now terminal `status:shipped`; exact current `main` is
+  `f8b4f804cc5fe77054d4f220974eae66becf090c`.
+- PR #1735 carried one transparent procedural miss: pre-merge checklist row 7 was not completed,
+  because three PR-body Harness lines still said draft/pending evaluator even though the exact-head
+  evaluator, close gate, acceptance, prohibited-pattern, thread, and substantive evidence gates
+  were valid. The body was rewritten in place immediately after merge and the correction was posted
+  at https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739. No shipped product or
+  evidence claim changed; the miss remains recorded so later merges wait for all seven rows.
+- The dependency DAG topology remains unchanged. Closing #1745 releases its `requires` successor
+  #1749; closing #1714 satisfies the S2 predecessor for #1715/#1716/#1719/#1721. Runtime and other
+  leaf-specific gates still govern those successors independently.
+- The next shared-asset order is intentionally withheld: #1747 still lacks the mandatory exact-head
+  `scaffold.runtime`; #1748 must correct its false every-published-surface claim and refresh the
+  shared asset; #1755 is third in that same asset sequence.

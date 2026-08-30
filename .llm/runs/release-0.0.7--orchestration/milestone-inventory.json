@@ -961,7 +961,8 @@
       "lane": "docs",
       "evidence": [
         "https://github.com/rickylabs/netscript/issues/1745",
-        "Current-main audit after #1729 proves three public pages still teach the superseded Claude-only installation contract."
+        "Current-main audit after #1729 proves three public pages still teach the superseded Claude-only installation contract.",
+        "PR #1746 head 84a5fd1164b2ee9cb564d10fb3854ee015a7ab17 merged as f8b4f804cc5fe77054d4f220974eae66becf090c at 2026-08-30T12:30:25Z, closed #1745, and normalized both items to status:shipped."
       ]
     },
     {
@@ -1056,7 +1057,8 @@
       "lane": "internals",
       "evidence": [
         "https://github.com/rickylabs/netscript/issues/1714",
-        "https://github.com/rickylabs/netscript/pull/1735"
+        "https://github.com/rickylabs/netscript/pull/1735",
+        "PR #1735 head fffbb0c473dec14aedd858127b9a3ce4afee74a2 merged as 625447f1b521e7fb0208fcfcc4ad3ea86cf52e21 at 2026-08-30T12:27:43Z, closed #1714, and normalized both items to status:shipped; the post-merge row-7 body correction is issuecomment-5468694739."
       ]
     },
     {

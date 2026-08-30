@@ -2327,7 +2327,8 @@
   evaluator verdict, required checks/close gate, complete acceptance evidence, and zero unanswered
   current review threads. Corrected #1714's stale `status:impl-eval` label to exactly
   `status:ready-merge`; #1755's final repo-wide check/test rerun passed in 8m21s. Merges remain the
-  human-only boundary and will auto-close all five leaves through their PR body keywords.
+  coordinator-authority boundary and will auto-close all five leaves through their PR body
+  keywords. The earlier `human-only` wording was incorrect and is superseded below.
 - Recycled every topic queue without a global barrier. Features is finishing #1731 slice 3 and its
   final all-slices evaluator; fixes is implementing the remaining #1739 host slice before exact-head
   gates/evaluation; internals received #1533's first bounded PLAN-EVAL amendment and continues on
@@ -2340,3 +2341,24 @@
   against that retired blocker; only D-42/D-43 remote-DinD path/localhost topology blocks Phase B.
 - #1734 remains the sole owner boundary after two terminal IMPL-EVAL failures. No third cycle has
   been dispatched; all independent lanes continue.
+
+## 2026-08-30T12:33:50Z — coordinator landed #1735 then #1746; three shared-asset leaves withheld
+
+- Exercised the coordinator merge authority defined by `milestone-run.md`, correcting the prior
+  false claim that merges were human-only. PR #1735 exact head `fffbb0c473dec14aedd858127b9a3ce4afee74a2`
+  merged first as `625447f1b521e7fb0208fcfcc4ad3ea86cf52e21` at `12:27:43Z` and closed
+  #1714. PR #1746 exact head `84a5fd1164b2ee9cb564d10fb3854ee015a7ab17` merged second as
+  `f8b4f804cc5fe77054d4f220974eae66becf090c` at `12:30:25Z` and closed #1745. Both
+  PRs and both issues are now exactly `status:shipped`; `origin/main` equals the second merge.
+- #1735 substantive gates were valid, but pre-merge row 7 was procedurally missed: three PR-body
+  Harness lines still described the earlier draft/pending-evaluator state. The coordinator rewrote
+  those lines in place immediately post-merge and posted the transparent correction at
+  https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739. This does not retroactively
+  call row 7 green; it records the miss and repair while preserving the valid exact-head evaluator,
+  close-gate, acceptance, prohibited-pattern, and thread evidence.
+- Merge authority remains withheld from #1747 until the mandatory exact-head `scaffold.runtime`
+  exists. #1748 is withheld until its false every-published-surface PR claim is corrected and the
+  shared asset is refreshed. #1755 is third in the same shared-asset sequence, so it cannot move
+  ahead of #1748's correction.
+- DAG structure was not rewritten: #1745's closure releases #1749, and #1714's closure satisfies
+  the S2 dependency for #1715/#1716/#1719/#1721; every successor retains its own gates.
