@@ -450,4 +450,9 @@ pending": pending/`Unknown` state, real 18-line 13.5.3 capture fixture
 | S5 #1740 converged on main | Redo after the corrected mis-push: 17 commits rebased onto `52a881c5`
 (range-diff `=` 17/17; one generated-carrier conflict `agent-docs.generated.ts` resolved by
 regeneration) + regen commit → **`e12ae79e6a98`**, pinned push, **run 33328889522**. S4
-`b2a0529fa19b` run 33328751758; S1 `38c3e9e181bf` run 33328727942. |
+`b2a0529fa19b` run 33328751758; S1 `38c3e9e181bf` run 33328727942. | | S10 cycle 3 → proof run
+33328972788 | S10 `fbda6a5bdcd0` "make describe follow parser DTO-complete" (+132 test lines,
+nullable-state fixture) cherry-picked onto the live proof head → **`d0023b834`** (workflows == S1),
+run 33328972788 dispatched 18:45:25Z. S7 Phase B: honest FAIL on its reporter (re-parented
+descendants `unproven`), foreign-control non-mutation PASS; static reporter-fix cycle dispatched on
+thread `01a053ef…`; rerun after S8. |
