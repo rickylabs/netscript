@@ -243,4 +243,8 @@ without timeout (D-38). | | S9 Phase A landed | Thread `01a0523a…` → PR **#1
 branch) at `e11de98d`, 4 slices with trail comments; closed `BLOCKED:` because the static 13.5.3 MCP
 capture shows the 14-tool baseline without the plan-locked `get_integration_docs` (**D-45**,
 undecidable statically; Phase B decides; amendment recommended). #1721 normalized to `status:impl`.
-Runtime zero throughout (watch armed). Tier-A gate set running at `e11de98d`. |
+Runtime zero throughout (watch armed). Tier-A gate set running at `e11de98d`. | | S9 Tier-A +
+dispatches | Tier-A sign-off at `e11de98d` (PR #1759 comment); IMPL-EVAL cycle 1 launched as
+`claude -p` session `7f042a12…` in `007-aspire-s9-eval`; docs_audit single Sol pass launched via
+`launch-codex-slice` (thread `01a05265-594b-7c20-8ae9-56f6d4a19344`, detached read-only worktree
+`007-aspire-s9-audit`, output `slices/s9/docs-audit/report.md` + PR comment). Runtime zero. |
