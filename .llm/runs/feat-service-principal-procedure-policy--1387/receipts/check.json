@@ -1,6 +1,6 @@
 {
   "gateId": "check",
-  "invocationId": "1387-s3-check",
+  "invocationId": "1387-s4-check",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/service/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "c297064aa76ca1b2b790f399adfb899e95c03920",
-  "actualGitHead": "c297064aa76ca1b2b790f399adfb899e95c03920",
+  "gitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "actualGitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:3594711",
+  "runnerIdentity": "worker:3781817",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "71ecb432f5eec9297eb3eb4c5a004907ac5db84a1e64fe409b19b13f55b36abf",
-  "lifecycleId": "worker:3594711:1387-s3-check:1",
+  "requestHash": "7dd27df5ee622a62ba75e53c1af9bd65e09179ff987679b8de5280b46236ab03",
+  "lifecycleId": "worker:3781817:1387-s4-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T19:49:15.052Z",
-  "startedAt": "2026-08-30T19:49:15.055Z",
-  "finishedAt": "2026-08-30T19:49:18.004Z",
-  "durationMs": 2949,
+  "claimedAt": "2026-08-30T20:23:52.717Z",
+  "startedAt": "2026-08-30T20:23:52.719Z",
+  "finishedAt": "2026-08-30T20:23:53.209Z",
+  "durationMs": 490,
   "exitCode": 0,
   "stdout": {
     "bytes": 302,
-    "sha256": "9f1e5173db48dd11fe947f39c1ec71e8a2cb14618bf92bf8d278c503654d4a11",
-    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":45,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "f6e369e3c1eedfdad5dde29f177a0de8c58343553ed7ba37ac67b2e46804d5be",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":46,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {

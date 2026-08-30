@@ -1,6 +1,6 @@
 {
   "gateId": "lint",
-  "invocationId": "1387-s3-lint",
+  "invocationId": "1387-s4-lint",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/service/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "c297064aa76ca1b2b790f399adfb899e95c03920",
-  "actualGitHead": "c297064aa76ca1b2b790f399adfb899e95c03920",
+  "gitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "actualGitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:3594712",
+  "runnerIdentity": "worker:3781812",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "46baa861e0aff3c2270046a6a66e3136c2aae51e4b029255c6d11e911f060659",
-  "lifecycleId": "worker:3594712:1387-s3-lint:1",
+  "requestHash": "d45199eb4e52e5e41fd88805b7e9ebb8cbe609ed0fd6897889bb33ca98125c1c",
+  "lifecycleId": "worker:3781812:1387-s4-lint:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T19:49:15.060Z",
-  "startedAt": "2026-08-30T19:49:15.062Z",
-  "finishedAt": "2026-08-30T19:49:15.610Z",
-  "durationMs": 548,
+  "claimedAt": "2026-08-30T20:23:52.823Z",
+  "startedAt": "2026-08-30T20:23:52.825Z",
+  "finishedAt": "2026-08-30T20:23:53.385Z",
+  "durationMs": 560,
   "exitCode": 0,
   "stdout": {
     "bytes": 352,
-    "sha256": "a09277c27b8a9919bd5a0044cb09e474831ba9c68bc425df0032bc46c71346b9",
-    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0},\"selection\":{\"filesSelected\":45,\"batches\":1,\"failedBatches\":0},\"coverage\":{\"filesSelected\":45,\"filesProcessed\":45,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "cb870999494341d4d5e7971f5e232e0841fb70e8c09d815eafd9bd27dd6561e7",
+    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0},\"selection\":{\"filesSelected\":46,\"batches\":1,\"failedBatches\":0},\"coverage\":{\"filesSelected\":46,\"filesProcessed\":46,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {
