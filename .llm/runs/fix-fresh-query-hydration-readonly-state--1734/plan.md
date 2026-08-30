@@ -141,3 +141,22 @@ dropped from pending-query JSON. No public type, export, or dependency-range dec
 
 - Any need to edit `query-types.ts`, `query/mod.ts`, or the declared query-core range is significant
   drift and stops implementation for owner review.
+
+## IMPL-EVAL Cycle 2 FAIL_FIX Amendment — rejection value preservation
+
+Cycle 3 is bounded to `reviveSerializedError` and the existing real-transport round-trip suite.
+The RED slice drives string, number, boolean, array, and plain-object rejection values through
+`renderToString(<QueryHydrationScript/>)`, alongside a success query. It asserts both validator
+directions: JSON-preserved values that hydrated on `main` must not reject the state, and the original
+rejection value must remain reachable rather than being silently discarded.
+
+R2 remains type-honest without widening the public contract: a non-null JSON-preserved rejection
+value is wrapped in a real `Error` whose `cause` is the original value. Plain records still supply
+string `message`, `name`, and `stack` to the wrapper when present, while `cause` preserves all record
+fields. Cause preservation is preferred over copying enumerable keys onto `Error`, because copying a
+transport record onto a live object creates unnecessary prototype-sensitive assignment behavior.
+Values that the JSON transport cannot preserve (`undefined`, functions, symbols, bigint, and
+non-plain host objects) remain invalid; this cycle does not broaden the public wire contract.
+
+The stop condition remains unchanged: any required edit to `query-types.ts`, `query/mod.ts`, or the
+declared query-core range is a rescope and halts implementation.

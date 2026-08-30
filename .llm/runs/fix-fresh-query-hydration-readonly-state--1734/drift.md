@@ -51,3 +51,18 @@ Drift is append-only.
 - **Severity:** significant gate-environment drift; not product rescope.
 - **Action:** record the command RED and leave foreign supervisor sessions untouched. The exact-head evaluator/CI must rerun on a host with watcher capacity; do not describe this receipt as green.
 - **Evidence:** `worklog.md` FAIL_FIX gate table; no scope diff under `.llm/tools/agentic/**`.
+
+## 2026-08-30 — Cycle-3 owner brief materialized as an untracked run artifact
+
+- **What:** `cycle3-brief.md`, an exact copy of the owner-authorized cycle-3 prompt, was present as an
+  untracked file before this session changed source.
+- **Source:** initial raw `git status --short` at
+  `eb765629206092f97b3dd8f76a64fa0c3769bcb8`.
+- **Expected:** the owner brief described the inherited worktree as clean.
+- **Actual:** local and remote heads matched exactly, but the brief file was untracked inside the
+  authorized leaf run directory.
+- **Severity:** minor artifact-state drift; no product or scope drift.
+- **Action:** preserve the brief as cycle-3 run evidence in the RED slice; do not delete it or treat
+  the initial worktree as clean.
+- **Evidence:** the file content is byte-for-byte the current owner brief; initial status listed no
+  other change.

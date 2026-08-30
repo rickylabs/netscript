@@ -148,6 +148,68 @@ Deno.test('query hydration JSON round trip revives a paused mutation prior failu
   }
 });
 
+const rejectionCases: readonly [string, unknown][] = [
+  ['string', 'offline'],
+  ['number', 503],
+  ['boolean', true],
+  ['array', ['offline', 503]],
+  ['plain object', { status: 503, body: 'unavailable' }],
+];
+
+for (const [label, rejection] of rejectionCases) {
+  Deno.test(`query hydration preserves ${label} rejection and sibling query`, async () => {
+    onlineManager.setOnline(true);
+    const serverClient = new QueryClient();
+    serverClient.mount();
+    serverClient.setQueryData(['still-present', label], `query-${label}`);
+    let attempts = 0;
+    const mutation = serverClient.getMutationCache().build(serverClient, {
+      mutationKey: ['reject-with', label],
+      mutationFn: () => {
+        attempts += 1;
+        if (attempts === 1) {
+          onlineManager.setOnline(false);
+          return Promise.reject(rejection);
+        }
+        return Promise.resolve('recovered');
+      },
+      retry: 1,
+      retryDelay: 0,
+    });
+    const pending = mutation.execute(undefined);
+
+    try {
+      await waitForMutationState(
+        () => mutation.state.isPaused && mutation.state.failureCount === 1,
+        `paused ${label} rejection`,
+      );
+      const wireState = roundTripThroughHydrationScript(dehydrateQueryClient(serverClient));
+      const wireMutation = requireRecord(wireState.mutations[0], `${label} wire mutation`);
+      const wireMutationState = requireRecord(
+        wireMutation.state,
+        `${label} wire mutation state`,
+      );
+      assertEquals(wireMutationState.failureReason, rejection);
+
+      const browserClient = new QueryClient();
+      hydrateFromDehydrated(browserClient, wireState);
+
+      assertEquals(
+        browserClient.getQueryData(['still-present', label]),
+        `query-${label}`,
+      );
+      assertEquals(browserClient.getMutationCache().getAll().length, 1);
+      const hydratedFailure = browserClient.getMutationCache().getAll()[0]?.state.failureReason;
+      assertInstanceOf(hydratedFailure, Error);
+      assertEquals(hydratedFailure.cause, rejection);
+    } finally {
+      onlineManager.setOnline(true);
+      await pending;
+      serverClient.unmount();
+    }
+  });
+}
+
 Deno.test('query hydration preserves fields from a serialized error record', async () => {
   onlineManager.setOnline(false);
   const serverClient = new QueryClient();

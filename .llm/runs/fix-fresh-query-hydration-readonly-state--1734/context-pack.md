@@ -6,18 +6,19 @@
 | --- | --- |
 | Run ID | `fix-fresh-query-hydration-readonly-state--1734` |
 | Branch | `fix/fresh-query-hydration-readonly-state` |
-| Current phase | `gate` |
+| Current phase | `implement` (cycle-3 bounded FAIL_FIX repair) |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` (contract-only) |
 
 ## Current State
 
-The evaluator-artifact head is preserved beneath committed RED slice `8dac327d0b21d4fcdabea7adce69e785c1b2a4fb`
-and product repair `a1dc5fce65058ab47cd49c5af13d91c145f0d1cf`. All 11 focused tests pass:
-the real `QueryHydrationScript` serializer, paused mutations with/without variables, a paused retry
-with wire `failureReason: {}`, error-field revival, both exact dependency versions, and the
-evaluator attack set. Public types, exports, and the `^5.101.0` range remain unchanged. The root
-test is host-red on two unrelated `.llm/tools/agentic/**` tests; all other required static gates pass.
+Cycle-2 evaluator artifact `eb765629206092f97b3dd8f76a64fa0c3769bcb8` is preserved unchanged.
+Cycle 3 is owner-authorized and bounded to `reviveSerializedError` plus the existing real-transport
+round-trip test. The S7 RED test drives string, number, boolean, array, and plain-object rejection
+values through `renderToString(<QueryHydrationScript/>)`: 6 pass / 5 fail at the inherited product
+head, with four indexed hydration rejections and one independent plain-record field-loss failure.
+Production source remains untouched at this checkpoint. The old shared-host root-test waiver is
+retired; cycle 3 must produce a fresh exact-head root-test result.
 
 ## Completed
 
@@ -30,16 +31,20 @@ test is host-red on two unrelated `.llm/tools/agentic/**` tests; all other requi
 - Focused tests/check/lint/fmt, quality scan (`allowCount: 7`), and arch check pass.
 - Root check/test/lint/fmt, quality scan, arch check, and Fresh publish dry-run pass.
 - Fresh doc-lint and JSR audit remain at their recorded inherited baselines.
+- Cycle-3 skills/doctrine/run-artifact intake completed at exact local/remote/PR head equality.
+- S7 real-transport rejection-value RED reproduced with both failure directions visible.
 
 ## In Progress
 
-- S6 run-artifact handoff and exact-head rerun.
+- S8 private `reviveSerializedError` correction.
 
 ## Next Steps
 
-1. Commit final run-state artifacts, then rerun every required gate at that immutable head.
-2. Explicit-refspec push and verify exact local/remote/PR equality.
-3. Update the PR body and post the single `[PHASE: IMPL]` repair comment; keep draft/labels intact.
+1. Commit the S7 RED slice without changing production source.
+2. Preserve supported JSON rejection values through a type-honest `Error.cause` wrapper and turn
+   all real-transport assertions green.
+3. Seal run artifacts, run every requested gate at the immutable final head, push with the explicit
+   refspec, and update the draft PR without changing labels or dispatching IMPL-EVAL.
 
 ## Key Decisions
 
@@ -48,6 +53,7 @@ test is host-red on two unrelated `.llm/tools/agentic/**` tests; all other requi
 | Keep `^5.101.0` | plan D1 | Support entire range. |
 | Keep public `DehydratedState` unchanged | plan D2 | No mutable widening or upstream leak. |
 | Revive serialized error records | plan D5 | Restore real `Error` values; retain string fields where present. |
+| Preserve JSON rejection values | cycle-3 amendment | Wrap them in `Error` and retain the original value in `cause`; no public widening. |
 
 ## Files Changed
 
@@ -65,7 +71,7 @@ test is host-red on two unrelated `.llm/tools/agentic/**` tests; all other requi
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | partial | focused/check/lint/fmt pass; root test host-red on 2 unrelated agentic tests |
+| Static | cycle-3 RED | real-transport suite: expected exit 1, 6 passed / 5 failed; final-head gates pending |
 | Fitness | preliminary full PASS | quality scan allowCount 7; arch check; Fresh publish dry-run |
 | Runtime | N/A | no lease |
 | Consumer | PASS | exact 5.101.0 and 5.102.8 no-lock checks |
@@ -77,7 +83,8 @@ test is host-red on two unrelated `.llm/tools/agentic/**` tests; all other requi
 ## Drift and Debt
 
 - Drift: historical Fresh doc-lint resolution no longer matches current 45-diagnostic baseline;
-  a transient F-16 warning from colocated test placement was fixed before commit.
+  a transient F-16 warning from colocated test placement was fixed before commit; the owner brief
+  materialized as an untracked run artifact and is preserved in S7.
 - Debt: no new debt; inherited findings remain outside issue #1734.
 
 ## Commits

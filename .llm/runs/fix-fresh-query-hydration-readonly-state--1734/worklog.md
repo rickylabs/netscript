@@ -40,6 +40,8 @@
 | S4 | Pin the shipped JSON hydration regression at the evaluator-artifact head (RED) | focused structured round-trip test, expected FAIL | new Fresh round-trip test + run plan/worklog |
 | S5 | Normalize JSON-compatible hydration state and revive serialized errors | focused suites + eight guard attacks | `hydration.ts`, focused tests, run dir |
 | S6 | Record and publish exact-final-head static evidence | complete owner-required static suite | run dir |
+| S7 | Prove JSON-preserved rejection values are rejected or collapsed (RED) | real-transport focused test, expected FAIL | round-trip test + run dir |
+| S8 | Preserve JSON rejection values through a type-honest `Error.cause` wrapper | focused/scoped/root static gates | `hydration.ts`, round-trip test, run dir |
 
 ### Deferred Scope
 
@@ -68,6 +70,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | 2026-08-30T08:38:40+02:00 | S5 | focused gate | Required compat, hydration, and transport suites pass 11/11. The committed guard-attack test rejects all eight evaluator categories, additional non-record values in both lists, and non-array top-level lists without partial hydration or input mutation. Focused check/lint/fmt pass over 3 files. |
 | 2026-08-30T08:38:40+02:00 | S5 | reconcile | PR #1736 remains draft at `status:impl`; F1 is the only authorized repair. No public-surface stop condition or rescope trigger fired. |
 | 2026-08-30T08:52:35+02:00 | S6 | sealing gate | Focused/check/lint/fmt/quality/arch pass at product head `a1dc5fce65058ab47cd49c5af13d91c145f0d1cf`. Root test fired three times and is RED each time on the same two unrelated agentic host tests: 4,251 passed / 2 failed / 19 ignored. The Fresh repair tests remain green. |
+| 2026-08-30T14:33:04Z | S7 | cycle-3 RED | At inherited head `eb765629206092f97b3dd8f76a64fa0c3769bcb8`, the real transport suite exited 1 with 6 passed / 5 failed. String, number, boolean, and array cases threw the same indexed hydration `TypeError`; the plain-object case hydrated but failed because the revived `Error.cause` was `undefined`, proving field loss independently. Production source remained untouched. |
 
 ## Decisions
 
@@ -77,6 +80,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | Preserve public readonly type | Private validation can restore sound assignability. | plan D2/D3; doctrine A1/A2 |
 | Revive serialized error records | Upstream requires `Error \| null`; a JSON record cannot honestly satisfy that type without normalization. | FAIL_FIX R2; plan D5 |
 | Remove query-state `data` ownership check | Query `data` admits `undefined` and JSON drops it just like mutation `data`; status/counters remain load-bearing. | FAIL_FIX R1; plan D6 |
+| Preserve JSON rejection values in `Error.cause` | It keeps TanStack's declared `Error \| null` boundary honest, preserves primitive/array/record values, and avoids prototype-sensitive field copying. | Cycle-2 F1/F2; cycle-3 plan amendment |
 
 ## Drift
 
@@ -93,6 +97,7 @@ shape changes belong beside `hydrateFromDehydrated` and must preserve the packag
 | Baseline reproduction | exact no-lock check with temporary 5.102.8 pin | FAIL (expected) | TS2345 at `hydration.ts:43`; package range restored |
 | S1 RED regression | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-version-compat_test.ts` | FAIL (expected), exit 1 | 0 passed / 1 failed; child check reports only TS2345 at `hydration.ts:43` |
 | S4 JSON-transport RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 1 passed / 4 failed / 5 total; four paused-mutation paths reject index 0; default prior-failure wire value independently asserted equal to `{}` before hydration |
+| S7 cycle-3 rejection-value RED | `run-deno-test.ts -- --allow-all packages/fresh/tests/query-hydration-roundtrip_test.tsx` | FAIL (expected), exit 1 | 6 passed / 5 failed / 11 total; four indexed `TypeError` failures prove over-rejection, one `Error.cause === undefined` assertion proves plain-record field loss |
 | S5 focused suites | `run-deno-test.ts -- --allow-all ...version-compat... ...query-hydration... ...roundtrip...` | PASS, exit 0 | 11 passed / 0 failed; includes real serializer round trips and the eight guard-attack categories |
 | S5 focused check | `run-deno-check.ts --file ...` | PASS, exit 0 | 3 files, 0 diagnostics |
 | S5 focused lint | `run-deno-lint.ts --file ...` | PASS, exit 0 | 3 files, 0 findings |
