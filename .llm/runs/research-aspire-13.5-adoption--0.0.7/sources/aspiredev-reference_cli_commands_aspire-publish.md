@@ -12,15 +12,17 @@ aspire publish [options] [[--] <additional arguments>...]
 
 ## Description
 
-The `aspire publish` command publishes resources by serializing them to disk. When this command is run, Aspire executes publishing pipeline steps that have been registered in the app model (for example, by environment resources). These steps serialize resources so that they can be consumed by deployment tools.
+The `aspire publish` command publishes resources by serializing them to disk. When this command is
+run, Aspire executes publishing pipeline steps that have been registered in the app model (for
+example, by environment resources). These steps serialize resources so that they can be consumed by
+deployment tools.
 
 <Include relativePath="reference/cli/includes/project-search-logic-description.md" />
 
 The command performs the following steps to run an Aspire AppHost:
 
-- Creates or updates the rooted `aspire.config.json` file and records the
-  selected AppHost there. Legacy `.aspire/settings.json` files are still read
-  during migration.
+- Creates or updates the rooted `aspire.config.json` file and records the selected AppHost there.
+  Legacy `.aspire/settings.json` files are still read during migration.
 - Installs or verifies that Aspire's local hosting certificates are installed and trusted.
 - Builds the AppHost project and its resources.
 - Starts the AppHost and its resources.
@@ -28,9 +30,14 @@ The command performs the following steps to run an Aspire AppHost:
 
 ## Pipeline summary output
 
-After the pipeline finishes, `aspire publish` prints a result summary and a step-by-step breakdown. The summary shows how many steps succeeded, the total pipeline duration, and a `Steps Summary:` table.
+After the pipeline finishes, `aspire publish` prints a result summary and a step-by-step breakdown.
+The summary shows how many steps succeeded, the total pipeline duration, and a `Steps Summary:`
+table.
 
-The `Steps Summary:` table lists pipeline steps in their execution hierarchy. Top-level steps appear at the left edge of the step-name column, and child steps are indented under their parent steps. Each row includes the step duration, final status, step name, and, when the terminal is wide enough, a timeline bar that shows when the step started and finished relative to the whole pipeline.
+The `Steps Summary:` table lists pipeline steps in their execution hierarchy. Top-level steps appear
+at the left edge of the step-name column, and child steps are indented under their parent steps.
+Each row includes the step duration, final status, step name, and, when the terminal is wide enough,
+a timeline bar that shows when the step started and finished relative to the whole pipeline.
 
 ```text title="Output"
 ------------------------------------------------------------
@@ -49,7 +56,11 @@ Steps Summary:
 ------------------------------------------------------------
 ```
 
-The `Step timeline:` header shows the start and end of the overall pipeline duration. The ruler divides that duration into equal intervals, and each step row uses a bar to show the step's relative start and end times. Very short steps can appear as a single point marker (`╴`). If the terminal isn't wide enough to preserve readable step names, Aspire omits the timeline columns and keeps the hierarchical step list.
+The `Step timeline:` header shows the start and end of the overall pipeline duration. The ruler
+divides that duration into equal intervals, and each step row uses a bar to show the step's relative
+start and end times. Very short steps can appear as a single point marker (`╴`). If the terminal
+isn't wide enough to preserve readable step names, Aspire omits the timeline columns and keeps the
+hierarchical step list.
 
 ## Options
 
@@ -57,17 +68,20 @@ The following options are available:
 
 - **`--`**
 
-  Delimits arguments to `aspire publish` from arguments for the AppHost. All arguments after this delimiter are passed to the AppHost.
+  Delimits arguments to `aspire publish` from arguments for the AppHost. All arguments after this
+  delimiter are passed to the AppHost.
 
 - <Include relativePath="reference/cli/includes/option-project.md" />
 
 - **`-o, --output-path`**
 
-  The output path for the generated artifacts. Defaults to the AppHost directory's `aspire-output` folder if not specified.
+  The output path for the generated artifacts. Defaults to the AppHost directory's `aspire-output`
+  folder if not specified.
 
 - **`--pipeline-log-level`**
 
-  Set the minimum log level for pipeline logging. Valid values are: `trace`, `debug`, `information`, `warning`, `error`, `critical`. The default is `information`.
+  Set the minimum log level for pipeline logging. Valid values are: `trace`, `debug`, `information`,
+  `warning`, `error`, `critical`. The default is `information`.
 
 - **`-e, --environment`**
 

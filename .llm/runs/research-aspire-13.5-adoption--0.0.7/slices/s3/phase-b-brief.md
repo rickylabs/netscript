@@ -20,9 +20,9 @@ authorization for exactly one isolated AppHost at a time and nothing else.
 - Host: NAS `ai-agents`; Deno 2.9.5, Aspire CLI 13.5.3, dotnet 10.0.400 + node 24.20.0 through
   `/home/agent/.local/bin/mise exec --` (the `mise` shell function is broken; use the binary).
   `DOCKER_HOST=tcp://netscript-dind:2375` (remote dind `10.4.12.19`, Docker client/server 28.5.2;
-  this container is `10.4.12.18`, so container ports are not on `localhost`). `aspire doctor` 0 failed,
-  inotify 1024 (D-39), and the AppHost/DCP path against the remote dind has **never been exercised on this host** (D-33).
-  Your first `aspire start` is therefore also that probe.
+  this container is `10.4.12.18`, so container ports are not on `localhost`). `aspire doctor` 0
+  failed, inotify 1024 (D-39), and the AppHost/DCP path against the remote dind has **never been
+  exercised on this host** (D-33). Your first `aspire start` is therefore also that probe.
 - Contract for the capture is the branch's own `packages/mcp/tests/fixtures/telemetry/README.md`
   "Pending Aspire 13.5.3 capture (phase B)": start the exact 13.5.3 AppHost, wait for required
   resources, trigger the scaffolded `health-check` worker job,
@@ -46,10 +46,9 @@ authorization for exactly one isolated AppHost at a time and nothing else.
    and `aspire restore` it.
 3. `aspire start --isolated` in that scratch AppHost (one AppHost only). Register it in the run
    resource registry (`.llm/tools/agentic/teardown/run-resources.ts`) so `agentic:leak-check` /
-   `agentic:teardown` can prove ownership. **If start fails
-   on endpoint proxying to the remote dind or any other host condition:** stop, keep the exact error output as a
-   receipt, tear down to zero, and report — do not work around it, do not retry, do not touch
-   Docker.
+   `agentic:teardown` can prove ownership. **If start fails on endpoint proxying to the remote dind
+   or any other host condition:** stop, keep the exact error output as a receipt, tear down to zero,
+   and report — do not work around it, do not retry, do not touch Docker.
 4. `aspire wait` the required resources; trigger the `health-check` worker job (per README); capture
    the two envelopes from the dashboard URL reported by `aspire ps`; save them + fixture + test
    case; flip the parity row; run the scoped gates listed in Phase A (`packages/mcp`,

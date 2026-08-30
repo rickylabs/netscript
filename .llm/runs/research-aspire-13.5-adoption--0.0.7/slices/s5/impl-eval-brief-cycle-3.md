@@ -2,19 +2,23 @@ use harness
 
 ## SKILL
 
-- netscript-harness — evaluator protocol (`.llm/harness/evaluator/protocol.md`, `verdict-definitions.md`); you are the **independent IMPL-EVAL** for Codex-authored work. You never continue implementation and never self-certify.
-- netscript-doctrine — `packages/cli`, `packages/plugin-streams-core`, `plugins/*` are framework code: `quality:scan` + `arch:check`, no `any`, no casts, no new `deno-lint-ignore`.
+- netscript-harness — evaluator protocol (`.llm/harness/evaluator/protocol.md`,
+  `verdict-definitions.md`); you are the **independent IMPL-EVAL** for Codex-authored work. You
+  never continue implementation and never self-certify.
+- netscript-doctrine — `packages/cli`, `packages/plugin-streams-core`, `plugins/*` are framework
+  code: `quality:scan` + `arch:check`, no `any`, no casts, no new `deno-lint-ignore`.
 - netscript-tools — scoped wrappers, gate receipts, raw git verification, lock hygiene.
 - netscript-pr — closing-keyword and label rules (you verify them; you do not change them).
-- aspire — Aspire 13.5 service discovery and dynamic endpoint allocation. **No AppHost start, no host CLI change, no Docker — you hold no runtime lease.**
+- aspire — Aspire 13.5 service discovery and dynamic endpoint allocation. **No AppHost start, no
+  host CLI change, no Docker — you hold no runtime lease.**
 
 ## Context
 
 Formal **IMPL-EVAL cycle 3** for **S5 of the Aspire 13.5 epic** (#1712): **#1717 — remove runtime
-literal ports from plugin contributions, infrastructure, and E2E probes**. PR **#1740**, base `main`.
-Route: Claude · Anthropic · Fable 5 · medium — native opposite-family evaluator of Codex · GPT-5.6
-Sol work, per `.llm/harness/workflow/lane-policy.md`. Separate session from the generator, from the
-supervisor, and from the S7 evaluator.
+literal ports from plugin contributions, infrastructure, and E2E probes**. PR **#1740**, base
+`main`. Route: Claude · Anthropic · Fable 5 · medium — native opposite-family evaluator of Codex ·
+GPT-5.6 Sol work, per `.llm/harness/workflow/lane-policy.md`. Separate session from the generator,
+from the supervisor, and from the S7 evaluator.
 
 **Why cycle 3 exists.** Cycle 2 returned `PASS` and the PR was labelled `status:ready-merge` +
 `impl-eval:skip`. That verdict is **void** — see drift **D-20**. At reconciliation the PR was red:
@@ -25,7 +29,8 @@ repair range as the focus — do not assume any part of the earlier PASS still h
 
 - Evaluate **exactly** head `aa822069` on `fix/aspire-13-5-s5-literal-ports`.
 - Original wave: `0bd8ba832` and below. Repair range: `0bd8ba83..aa822069`.
-- Your worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s5-eval` (detached at that head; product files are read-only to you).
+- Your worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s5-eval` (detached at that
+  head; product files are read-only to you).
 - Generator run dir: `.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/`
   (`worklog.md` with `## Design` + gate tables, `drift.md`).
 - Supervisor Tier-A review: `slices/s5/repair/review-tier-a.md` — treat its findings as claims to

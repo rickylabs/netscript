@@ -269,7 +269,13 @@ human-only. Supervisor obligation: hand over any **exact-green** candidate (exec
 at the exact head, close-gate satisfied, stack below it landed) and continue without waiting for
 merge completion. Current exact-green candidates: **none** (S2 #1735 unchanged CLEAN but its runtime
 verdict predates #1734 handling — coordinator's call; S4/S5 owe runtime at exact head per the audit;
-S6/S8/S9 stacked + Phase B blocked). | | S9 IMPL-EVAL cycle 2 | `PASS`, `FAIL`, `N/A`,
-`PENDING_SCRIPT`, `DEBT at`f6ca9695`(session`b8a63574…`); F-1/F-2 closed; F-3b/F-4b low →
-pre-Phase-B slice (D-48). Non-mutation verified. docs_audit cycle 2 pending. S10 dispatched (below).
-|
+S6/S8/S9 stacked + Phase B blocked). | | S9 IMPL-EVAL cycle 2 | **`PASS` — phase A only**
+at`f6ca9695`(session`b8a63574…`); F-1/F-2 closed; F-3b/F-4b low → pre-Phase-B slice (D-48).
+Non-mutation verified. docs_audit cycle 2 pending. S10 dispatched (below). | | S9 docs_audit cycle
+2 + handoff | `AUDIT: FAIL_FIX` on M2 only (S2-V9 timing citation → `.time.txt`); second consecutive
+audit failure → **lane escalation**; folded into the coordinator-ruled pre-Phase-B slice. Phase-A
+handoff written (`slices/s9/handoff-phase-a.md`). | | S10 (#1722) dispatched — static Phase A |
+`launch-codex-slice --user node --dest /home/agent/aspire-13-5-s10-brief.md --expect-base 9dd06647 …`
+→ thread `01a052a5-21d9-7d80-b4b1-c267be7e112a`, route openai · gpt-5.6-sol · medium matched,
+worktree `007-aspire-s10` on `test/aspire-13-5-s10-e2e-gate-upgrades` @ `9dd06647`. Brief forbids
+any AppHost start. |

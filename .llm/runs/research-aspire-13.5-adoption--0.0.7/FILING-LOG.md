@@ -44,4 +44,6 @@
 - #1642: will be closed by the S11 PR (#1723) (ok)
 - #1000: will be closed by the S11 PR (#1723) (ok)
 - #1280 relabel/milestone: ok
-- 2026-08-30 — #1742 filed: Garnet executable host port 6379 (S5 IMPL-EVAL F-5 follow-up), labels type:fix area:cli area:aspire priority:p2 epic:aspire-13-5 status:triage, milestone Backlog / Triage.
+- 2026-08-30 — #1742 filed: Garnet executable host port 6379 (S5 IMPL-EVAL F-5 follow-up), labels
+  type:fix area:cli area:aspire priority:p2 epic:aspire-13-5 status:triage, milestone Backlog /
+  Triage.

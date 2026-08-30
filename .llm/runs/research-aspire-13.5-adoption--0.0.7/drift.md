@@ -895,3 +895,12 @@
 - **Routing:** F-3b/F-4b fold into the **pre-Phase-B slice** on the same S9 thread together with the
   D-45 contract amendment once the coordinator rules — one narrow commit, then a scoped re-check.
   docs_audit cycle 2 (same audit thread) is still running at `f6ca9695`.
+- **D-46 addendum — docs_audit cycle 2 at `f6ca9695`: `AUDIT: FAIL_FIX` on one residual.** H1, M1,
+  M3, M4, L1 closed and verified (mirrors/embedded/consumer SHA-identical; no new overclaim;
+  docs:links, Lume build, wording/specifier scans PASS). **M2 open:** the 13.065 s restore figure
+  now cited under the S2-V9 key names `03-v9-….raw.txt`, which carries no duration; the duration
+  lives in the sibling `.time.txt` (`elapsed_ms: 13065`). One-line receipt-path fix. This is the
+  **second consecutive audit failure → doc-audit lane escalation**: no third audit cycle is
+  dispatched by this supervisor on its own; the M2 fix is folded into the coordinator-ruled
+  **pre-Phase-B slice** (D-45 amendment + F-3b/F-4b + M2) on the same S9 thread, followed by one
+  combined audit cycle 3 + scoped IMPL-EVAL re-check when the coordinator authorizes it.

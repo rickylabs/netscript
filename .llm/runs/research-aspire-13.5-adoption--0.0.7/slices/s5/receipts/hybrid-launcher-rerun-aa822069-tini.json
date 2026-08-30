@@ -1,1 +1,15 @@
-{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all",".llm/tools/agentic/claude/hybrid-launcher_test.ts"],"cwd":"/home/agent/projects/netscript/worktrees/007-aspire-s5","exitCode":0,"durationMs":1693,"summary":{"passed":10,"failed":0,"ignored":0,"totalResults":10,"uniqueFailures":0},"failures":[]}
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    ".llm/tools/agentic/claude/hybrid-launcher_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s5",
+  "exitCode": 0,
+  "durationMs": 1693,
+  "summary": { "passed": 10, "failed": 0, "ignored": 0, "totalResults": 10, "uniqueFailures": 0 },
+  "failures": []
+}

@@ -1,1 +1,27 @@
-{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all",".llm/tools/agentic/codex/codex-follow_test.ts"],"cwd":"/home/agent/projects/netscript/worktrees/007-aspire-s5","exitCode":1,"durationMs":839,"summary":{"passed":2,"failed":1,"ignored":0,"totalResults":3,"uniqueFailures":1},"failures":[{"message":"AssertionError: Values are not equal: error: Uncaught (in promise) Error: Too many open files (os error 24)\n    at new FsWatcher (ext:runtime/40_fs_events.js:<line>:<column>)\n    at Object.watchFs (ext:runtime/40_fs_events.js:<line>:<column>)\n    at main (file://<cwd>/.llm/tools/agentic/codex/codex-follow.ts:<line>:<column>)\n    at async file://<cwd>/.llm/tools/agentic/codex/codex-follow.ts:<line>:<column>\n\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/agentic/codex/codex-follow_test.ts:<line>:<column>","count":1,"tests":[{"name":"codex follow streams an appended terminal event and exits without polling sleeps","file":"./.llm/tools/agentic/codex/codex-follow_test.ts","line":22}]}]}
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    ".llm/tools/agentic/codex/codex-follow_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s5",
+  "exitCode": 1,
+  "durationMs": 839,
+  "summary": { "passed": 2, "failed": 1, "ignored": 0, "totalResults": 3, "uniqueFailures": 1 },
+  "failures": [
+    {
+      "message": "AssertionError: Values are not equal: error: Uncaught (in promise) Error: Too many open files (os error 24)\n    at new FsWatcher (ext:runtime/40_fs_events.js:<line>:<column>)\n    at Object.watchFs (ext:runtime/40_fs_events.js:<line>:<column>)\n    at main (file://<cwd>/.llm/tools/agentic/codex/codex-follow.ts:<line>:<column>)\n    at async file://<cwd>/.llm/tools/agentic/codex/codex-follow.ts:<line>:<column>\n\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/agentic/codex/codex-follow_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "codex follow streams an appended terminal event and exits without polling sleeps",
+          "file": "./.llm/tools/agentic/codex/codex-follow_test.ts",
+          "line": 22
+        }
+      ]
+    }
+  ]
+}
