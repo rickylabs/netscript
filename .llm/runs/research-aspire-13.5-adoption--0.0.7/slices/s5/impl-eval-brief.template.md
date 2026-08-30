@@ -12,7 +12,7 @@ use harness
 Formal IMPL-EVAL for **S5 of the Aspire 13.5 epic** — issue #1717, draft PR #1740 (closes #1717, #1365, #1370, #979), epic #1712.
 Route: Claude · Anthropic · Fable 5 · medium (native opposite-family evaluator of Codex · GPT-5.6 Sol work), per `.llm/harness/workflow/lane-policy.md`.
 
-- Evaluate **exactly** head `<HEAD>` on branch `fix/aspire-13-5-s5-literal-ports` (base `origin/main` `8b1e42f72`). Your worktree: `<EVAL_WORKTREE>` (detached at that head; read-only for product files).
+- Evaluate **exactly** head `<HEAD>` on branch `fix/aspire-13-5-s5-literal-ports` (base `origin/main` `13878a80a`). Your worktree: `<EVAL_WORKTREE>` (detached at that head; read-only for product files).
 - Generator run dir (in the tree): `.llm/runs/fix-aspire-13-5-s5-literal-ports--impl/` (`supervisor.md`, `worklog.md` incl. Design + gate tables, `context-pack.md`, `drift.md`, `receipts/parity-phase1-{red,green}.json`).
 - Contract of record: issue #1717 (+ #1365 sagas publisher, #1370 contributions, #979 plugin API host ports; S2 V3 comment on infrastructure host ports); locked decisions D-14 (sagas compat export, no core type change) and D-16 (infrastructure host ports opt-in) in `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md` on `origin/research/aspire-13.5-0.0.7` (`git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md`).
 - Supervisor Tier-A notes: `git show origin/research/aspire-13.5-0.0.7:.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/review-tier-a.md`.
