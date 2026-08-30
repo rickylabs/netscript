@@ -1644,3 +1644,12 @@
   is to scaffold one project with the relevant plugin set, confirm `aspire describe`'s static
   resource list names the expected plugin resources, only then request the lease for the real
   receipt (two `aspire start --isolated` of that one project).
+- **D-84 — orphan PR #1747 (`Closes #1732`) converged onto current main, no runtime.** 12/12
+  patch-identical rebase (`13878a80a` → `74e3d451e5dc`), zero path intersection confirmed
+  (`comm -12` empty) — matches the coordinator's audit. Head
+  **`a93df413e376678b33e109167c5bf37c1308323d`**, pinned push; static Tier-A: scoped tests 143/0,
+  `packages/cli` check 0 failed batches, `quality:scan` ok. Label `status:ci-fail` →
+  `status:impl-eval` (exact-head full runtime queued after S8's typed-seed diagnostic and the
+  current FIXES #1764 lease, then metadata/close-gate). S9: `bf06551ba` "fail closed on the exact
+  Aspire dashboard payload" already landed and reported on PR #1759 (19:43:20Z) — correction
+  complete, no further action pending a hosted re-verify.
