@@ -4303,3 +4303,58 @@ un-reworded; the acceptance-evidence entry already states plainly that no bundle
 inspected, and calls its evidence module-graph rather than chunk-inspection.
 
 All probe fixtures were removed; the leaf tree is clean at `1c5fa004`.
+
+## 2026-08-30 — runtime lease consumed for #1758; #1368 plan repaired and at its final gate
+
+### Lease preflight re-proved independently before consuming it
+
+The grant cites a 13:39Z preflight. This lane re-measured rather than accepting it, because a lease
+spent against a dirty host produces an environment red rather than a verdict:
+
+| Check | Result |
+| --- | --- |
+| `docker ps -a` | **0** containers |
+| `docker volume ls` | **0** volumes |
+| `aspire ps` | no running AppHost |
+| `aspire doctor` | 4 passed, 3 warnings, **0 failed** |
+| Leaf head | `1c5fa004`, tree clean |
+
+Bare `deno task e2e:cli` is running at that exact head — the mandatory merge-readiness suite with
+cleanup, per root `AGENTS.md`, now applicable because the leaf owns `packages/cli` dependency-closure
+source. The prior `N/A` was correctly identified as stale.
+
+### A promising vehicle for AC3 that the earlier probes did not reach
+
+The four failed probes all built **bare Vite outside a real project**. The generated scaffold project
+is different in kind: `local-source-fixture.ts` *"merges local workspace package imports into
+generated-project config targets"*, so a generated project's `deno.json` can map `@netscript/sdk` to
+this workspace — and Fresh's Vite plugin runs under Deno and honours that import map, which plain
+`npm:vite` did not.
+
+That means a **local-source generated project** may be able to bundle *this leaf's* SDK root, which is
+exactly what AC3 requires and what the standalone fixtures could not do. It will be attempted after
+the mandatory suite finishes, so the two do not contend for the sandbox. If it works, AC3 gets literal
+chunk evidence; if it fails, the blocker report stands and gains one more measured attempt.
+
+### #1368 — all three blocking findings discharged, final plan cycle dispatched
+
+`f5994260`, pushed. Verified against the artifacts:
+
+- **F1** — `saga.cascade.complete` is relocated from the bridge to the **engine**, around the persisted
+  completion transition, as a direct child of `saga.handle` recording status and result presence. That
+  is the evaluator's option (a), and it is the right one: the bridge's `case 'complete': return;` had
+  nothing to measure, while the engine genuinely owns completion.
+- **F2** — gate 1 now requires the file to **compile** on `f8b4f804` and both tests to reach
+  **assertion** failure at `N passed / 2 failed`, with the explicit sentence *"a compile/load/crash red
+  or zero failed tests is invalid."* That is the generalized rule from this lane's two red-before
+  near-misses, written into the gate itself rather than left as guidance.
+- **F3** — D5–D8 lock the correlation precedence and require the bridge and compensator to **consume**
+  engine-selected values rather than recompute them, with the Flow-B fixture equality to
+  `flowBCorrelationId`.
+
+PLAN-EVAL cycle 2 dispatched at `f5994260` — the **final** permitted plan cycle — route
+`claude-fable-5` · medium (matched), background `b97e5c36`, dedicated worktree, verdict branch
+`eval/plan-eval-1368-cycle-2`. The brief tells it the fixes are already confirmed *present* so the
+cycle is spent on **sufficiency**, and carries the sibling leaf's three-for-three warning: a new
+exported symbol propagates to consumers a plan cannot enumerate by recall, including full-suite-only
+consumers.
