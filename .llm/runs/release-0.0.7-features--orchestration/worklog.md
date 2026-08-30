@@ -8252,3 +8252,14 @@ reconcile against Opus's verdict, so nothing changes for Slice 3 or the Slice 4 
 
 Retrying once at the same clean worktree/head before escalating, per this lane's 1-of-2 budget before
 treating a route as blocked.
+
+### Slice 4 author stopped clean at its Tier-A boundary — held per the sequencing note
+
+Thread `01a05449` finished: content head `9cc8c4c5f84acef262bca2cec9169ebbaa410eb5`, evidence head
+`3ee15ca913b37bc354c4670e8b6bfef05dc1d34c`, both pushed by explicit refspec, PR comment
+`5471067478` posted by the author under its own brief instructions. All contracted gates report PASS
+per its own account, `deno.lock` unchanged.
+
+**Per the sequencing note above, this is acknowledged but not certified.** I am not running Slice 4's
+Tier-A review, not verifying its receipts, and not touching its PR comment until DeepSeek's verdict on
+Slice 3 is in hand. The work is safe where it is — pushed, PR still draft, no downstream action taken.
