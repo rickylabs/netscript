@@ -5847,3 +5847,41 @@ a complaint — the sanctioned fallback route worked on the third try.
 `scaffold.runtime` (or Flow-B specifically for #1764) under the singleton lease, still held by Aspire.
 #1758 needs a bare `e2e:cli` rerun, also lease-gated. Queue order unchanged: #1764 → #1758 → #1739 →
 #1781.
+
+### #1739/#1673 merge-readiness packet — coordinator ruling executed step by step
+
+Executed the merge ruling in the exact order given, verifying each step independently rather than
+trusting the tool's own success message:
+
+1. **Carrier commit.** Cherry-picked evaluator verdict `54c72a970` (artifact-only, `impl-eval.md`
+   only) onto `fix/plugin-doctor-registry-drift`, product head attribution preserved as `fcba13423` in
+   the verdict text. New carrier `2b5682342`, pushed.
+2. **PR body rewrite** — four precise replacements, not a blanket rewrite: the DoD summary line, the
+   validation-section `scaffold.runtime` line (exact wording per ruling: "bounded
+   `behavior.package-backed-plugin-doctor` passes 2/2 at receipt `package-backed-doctor-9900007f7.json`;
+   full suite NOT_RUN/blocked by unrelated baseline Chromium gate and is not claimed"), the row-16 DoD
+   line (checked, evaluator caveat preserved verbatim in an HTML comment rather than summarized away),
+   and the `acceptance-evidence` YAML block — all five entries refreshed to cite carrier `2b5682342` and
+   the specific reconfirming rows, replacing stale mid-development S-slice SHAs.
+3. **Carrier-update PR comment** posted, naming both the evaluated head and the new carrier explicitly.
+4. **Draft flipped** to ready for review.
+5. **Sole `status:ready-merge`** applied — and had to be **reapplied**: an automation reverted PR #1739
+   to `status:impl-eval` between my label set and the mirror dry-run (matching AGENTS.md's documented
+   "phase-eval automation re-adds status:impl-eval"). Caught by checking live state rather than trusting
+   the prior action, not assumed to have held.
+6. **Live audit correction received mid-flight**: issue #1673 itself — a separate entity from PR #1739
+   — was still `status:impl-eval` with all 5 acceptance boxes unchecked; my first mirror dry-run had
+   only reported the PR-label gate and I hadn't checked the issue's own label. Set sole
+   `status:ready-merge` on #1673 directly.
+7. **Mirror dry-run, then real** — `mirror-acceptance-evidence.ts --repo rickylabs/netscript --pr 1739`.
+   First dry-run: skipped (PR label had reverted, per step 5). Second dry-run after both labels
+   confirmed live: ready, no skip notice. Real run: `APPLIED: #1673`. **Verified independently** by
+   re-fetching the issue body — all 5 boxes now `[x]`, mirrored, never hand-edited.
+8. **Evaluator not retriggered**, per correction — confirmed `OpenHands Agent` run `33335164756` shows
+   `conclusion=cancelled`, not touched by me.
+9. **close-gate rerun.** The workflow run active since the carrier push (`33335152037`) had `close-gate`
+   fail on its first pass — expected, since that read predates both label fixes. Waited for the whole
+   run to finish naturally (`check-test` 7m59s, `quality` pass) rather than rerun mid-flight, then
+   `gh run rerun 33335152037 --failed` to rerun only the failed job. Running now.
+
+No head movement in any of this — carrier stays `2b5682342` throughout, exactly as ruled.
