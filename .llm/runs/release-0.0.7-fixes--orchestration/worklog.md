@@ -5276,3 +5276,36 @@ docs deferral recorded honestly rather than quietly dropped.
 
 Labels back to `status:plan-eval` on PR #1781 and issue #1357. This is the final plan cycle — terminal
 `PASS_PLAN` or `FAIL_PLAN`.
+
+### #1357 PLAN-EVAL cycle 2 — terminal `PASS_PLAN`; S2 implementation dispatched
+
+Verdict `886f0860` on `eval/plan-eval-1357-cycle-2`, evaluated head `53e696b5`, posted to PR #1781.
+
+Both cycle-1 findings confirmed **closed rather than relocated**: the full gate chain — id
+(`cli-surface.ts`), definition (`ui-data-screen-gates.ts`), registration
+(`scaffold-capability-gates.ts`), tests, and `RUNTIME_GATES` selection (`capability-suites.ts`) — is
+now entirely in-ceiling, with `scaffold-suite-builder.ts` untouched; and **no ceiling path feeds any
+generated carrier**, verified against the actual inputs of all four gen/check tools rather than by
+reading the plan's own table. A fresh behavioural-consumer sweep — old-emission strings, help prose,
+invocation assertions, the registry `--force` gate, emitted-samples, quickstart drift markers,
+gate-list/count assertions — found **no thirteenth path**. All five cycle-1 PASS areas independently
+re-verified, including the D10 optional-field correction and a byte-identical `deno.lock` hash.
+
+Two carry-forwards, neither needing a respin, both handed to the author as constraints rather than
+left to be rediscovered:
+
+- Plan rows 5–7 still say "9 existing ceiling TS files"; the repaired ceiling has **10**. The evaluator
+  re-ran the structured check across all 10 — exit 0, 0 failures — so only the count text is wrong.
+- Acceptance box 6's "documented" is deliverable **only** through the command's own `--help`, because
+  `cli-reference.md:104` stays falsified until the deferred docs land. The author must say so
+  explicitly and must not manufacture coverage by reaching into deferred docs. Close-gate mirroring
+  will need to carry that caveat.
+
+S2 dispatched with the lane's paid-for non-negotiables made explicit: red-before alone with raw counts;
+**whole package suites on both sides of any composition**, naming #1368's untouched count-asserting
+consumer as the reason; 12-path ceiling hard; never execute `scaffold.runtime` (define and select only,
+D16 + D-42/D-43); never regenerate a shared carrier and never run `check:assets-barrel` because it
+writes before it diffs; commit-by-slice with explicit refspec and one PR comment per slice; PR body and
+issue text reserved to me.
+
+Sender again carries the head-verification abort guard. Labels moved to `status:impl` on both.
