@@ -1464,3 +1464,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - No PR merged and main did not move; exact main remains `3e5cbabf...`. The observed GitHub milestone
   count was 80 open / 82 closed at `13:51:57Z`, but that PR-inclusive count is intentionally not
   frozen as a control-plane invariant.
+
+## Resume checkpoint — 2026-08-30T14:21:34Z
+
+- The former #1734 owner boundary is cleared. The owner explicitly authorized cycle 3 as the third
+  and final exceptional repair. Internals is resuming the preserved #1736 author at `eb765629` with
+  the accepted hydration-only ceiling; fresh exact-head gates and a separate-session IMPL-EVAL are
+  mandatory before coordinator merge. Shared scaffold-runtime dependents remain unwaived.
+- Aspire S13 is ratified with precedence: explicit option → `NETSCRIPT_TELEMETRY_ENDPOINT` →
+  `ASPIRE_DASHBOARD_PORT` → `aspire ps` dashboard discovery → compatibility default, with source
+  attribution and no bare generated `18888`. Dispatch remains after S9/S11.
+- Phase-B local runtime remains blocked by the accepted remote-DinD topology finding, not by Aspire,
+  Docker version, quotas, or host lifecycle. Continue all static/topology-independent slices and
+  grant no Phase-B lease until identical-path mount and loopback reachability probes pass.
+- #1642 already belongs to milestone 0.0.7. Exact main is still `3e5cbabf...`; runtime is zero.

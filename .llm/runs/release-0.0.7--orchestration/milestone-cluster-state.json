@@ -2675,7 +2675,7 @@
     {
       "id": "app-service-client-wiring",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
       "currentPrHeadSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
@@ -3145,14 +3145,16 @@
       "branch": "fix/fresh-query-hydration-readonly-state",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1736",
       "prNumber": 1736,
-      "implementationState": "second consecutive terminal IMPL-EVAL failure; owner boundary parked while internals continues #1732",
-      "implementationEvaluationState": "terminal_cycle_2_fail_owner_boundary",
+      "implementationState": "owner explicitly authorized the third and final exceptional cycle; preserved author resumes from evaluator carrier eb765629 with the accepted hydration-only repair ceiling while independent internals work continues",
+      "implementationEvaluationState": "cycle_3_owner_authorized_repair_dispatching",
       "implementationEvaluationVerdict": "FAIL_FIX",
       "implementationEvaluatedProductHeadSha": "3b3044f7af178e740b577a80f83e785c1fd6ee7f",
       "evaluationArtifactHeadSha": "eb765629206092f97b3dd8f76a64fa0c3769bcb8",
       "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1736#issuecomment-5467324070",
-      "blocker": "owner-only boundary after two consecutive terminal IMPL-EVAL failures; no cycle 3 without explicit authorization",
-      "nextGate": "owner chooses bounded primitive-and-structured-error normalization repair or parks #1734; no cycle 3 without explicit authorization"
+      "ownerAuthorization": "Authorize #1734 cycle 3.",
+      "ownerAuthorizedAt": "2026-08-30T14:21:34.000Z",
+      "blocker": null,
+      "nextGate": "resume the preserved author at eb765629 for only the accepted hydration.ts correction, then fresh exact-head targeted/Tier-A gates and separate-session IMPL-EVAL; after merge, serialize the blocked scaffold.runtime reruns for #1747/#1758/#1739 from exact runtime zero"
     },
     {
       "id": "plugin-doctor-registry-drift",
@@ -5057,5 +5059,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
       "verifiedAt": "2026-08-30T10:00:33.000Z"
     },
-  "updatedAt": "2026-08-30T13:51:57.000Z"
+  "updatedAt": "2026-08-30T14:21:34.000Z"
 }

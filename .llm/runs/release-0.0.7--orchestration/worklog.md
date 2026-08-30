@@ -2477,3 +2477,21 @@
   or main movement; exact main remains `3e5cbabf...`.
 - Observed GitHub milestone snapshot at `13:51:57Z`: 80 open / 82 closed including PRs. It is
   recorded as observation only because concurrent issue/PR transitions may change it.
+
+## 2026-08-30T14:21:34Z — owner ratifications unblock #1734 cycle 3 and Aspire S13
+
+- The owner submitted the exact verdict `Authorize #1734 cycle 3.` in the live Aspire Remote
+  Control session. The coordinator propagated it directly to internals: resume the preserved #1736
+  author from evaluator carrier `eb765629`, keep the third and final exceptional repair strictly
+  inside the accepted `hydration.ts` correction, and require fresh exact-head targeted/Tier-A plus
+  separate-session IMPL-EVAL before merge. #1747/#1758/#1739 retain their own gates and may rerun
+  the shared scaffold-runtime proof only after #1734 lands and the host is at exact runtime zero.
+- The owner ratified Aspire S13's resolver precedence exactly: explicit option →
+  `NETSCRIPT_TELEMETRY_ENDPOINT` → `ASPIRE_DASHBOARD_PORT` → live `aspire ps --format Json`
+  `dashboardUrl` with source `aspire_ps` → compatibility `DEFAULT_TELEMETRY_ENDPOINT` with source
+  `default`; generated code must contain no bare `18888`. S13 remains sequenced after S9/S11.
+- The Phase-B infrastructure finding remains accepted and blocking for local runtime: ai-agents and
+  netscript-dind need identical absolute-path worktree mounts plus shared/reachable networking.
+  No lease will be burned before those two probes pass; topology-independent Aspire work continues.
+- #1642 was already assigned to milestone 0.0.7 when checked live, so the requested milestone move
+  was already satisfied and no redundant GitHub mutation was made.

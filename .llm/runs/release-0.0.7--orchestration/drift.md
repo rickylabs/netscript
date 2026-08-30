@@ -1313,3 +1313,16 @@ implementation thread.
   look unfinished. The coordinator corrected the issue text rather than reversing the reviewed
   boundary, then closed from exact historical evidence. This is acceptance-record repair, not
   retroactive product scope, a new merge, or permission to rewrite gate history.
+
+## 2026-08-30 — owner cleared the exceptional #1734 cycle while preserving the evaluation policy
+
+- The milestone policy normally stops a leaf after two consecutive terminal IMPL-EVAL failures and
+  surfaces an owner decision. #1734 reached that exact boundary after cycle 2 and remained parked;
+  dependent PRs reproduced its unchanged-main failure but did not waive or retry around it.
+- At `2026-08-30T14:21:34Z` the owner explicitly authorized a third and final exceptional cycle.
+  This is a leaf-specific authorization, not a global relaxation: the preserved author keeps the
+  accepted hydration-only repair ceiling, and fresh exact-head gates plus an independent evaluator
+  remain required. Future leaves still stop after two terminal failures unless separately decided.
+- The same verdict ratified Aspire S13's endpoint precedence and accepted the Phase-B topology
+  diagnosis. Static S13 work may advance; local Phase-B runtime remains prohibited until identical
+  bind paths and reachable published ports are proven.
