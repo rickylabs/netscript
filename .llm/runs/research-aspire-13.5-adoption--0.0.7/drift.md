@@ -802,3 +802,35 @@
   `status:ready-merge`, not this PASS.
 - **Queue effect:** S8 phase A is settled (Tier-A + IMPL-EVAL). Serial queue advances to the next
   static-provable slice; Phase-B receipts for S3/S6/S7/S8 all wait on the D-43 boundary.
+
+## D-45 — 2026-08-30 — 13.5.3 `aspire agent mcp` exposes the 14-tool baseline; `get_integration_docs` (documented) not observed
+
+- **Observed (S9 static receipt, `receipts/aspire-13.5.3-mcp-tools-static.json` on the S9 branch,
+  10:38:42Z):** one AppHost-less stdio session with CLI/server `13.5.3` → `tools/list` = exactly the
+  14 tools of the committed 13.4.6 baseline; `toolsMissing: ["get_integration_docs"]`;
+  `baselineDiff.added: []`; `doctor` cli-version pass. Pre/post `aspire ps` `[]`, dind empty.
+- **Documented (research C16, `sources/aspiredev-get-started_aspire-mcp-server.md` l.109):**
+  `get_integration_docs — Gets documentation for a specific integration package`, listed
+  unconditionally beside `list_integrations`. The 13.4.6 baseline already recorded it as "documented
+  for 13.5, not present at 13.4.6"; the plan (D-12, sub-issue 09 assertion 2) locked
+  `+get_integration_docs` as the expected diff with `missing → fail`.
+- **Two admissible explanations, undecidable statically:** (a) the tool is emitted only with an
+  AppHost in scope / after `select_apphost` + `refresh_tools` (the server's tool list is dynamic by
+  design — `refresh_tools` exists exactly for that); (b) aspire.dev documents a tool that 13.5.3
+  does not ship. Only the Phase-B live run on the isolated AppHost (D-12 receipt) separates them.
+- **Thread's handling (correct):** receipt preserved verbatim, 15-tool gate retained so a live run
+  fails honestly, no evidence rewritten; Phase A closed
+  `BLOCKED: … omitted locked
+  get_integration_docs` rather than claiming green.
+- **Recommended contract amendment (coordinator ratifies before S9 Phase B; default if silent):**
+  keep the 14 baseline tools as `missing → fail`; classify `get_integration_docs` as
+  **`documented-unobserved → warning`** carrying the observed list, until a live receipt observes it
+  (then promote to required) or upstream confirms its absence (then drop it from the expected set
+  and record an upstream-doc drift). The skill tool table documents the **observed** 14 and marks
+  `get_integration_docs` as documented-but-unobserved at 13.5.3, citing this receipt. Rationale:
+  S9's job is to prove NetScript's MCP alignment against the shipped server, not to fail on an
+  upstream documentation gap; D-12's "prose alone does not close" is preserved because the live
+  receipt is still mandatory.
+- **Queue effect:** S9 Phase A gates/Tier-A proceed at `e11de98d`; the amendment (if ratified) is a
+  small follow-up slice on the same thread before Phase B. Phase B itself shares the D-43
+  environment block.

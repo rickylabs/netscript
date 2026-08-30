@@ -239,4 +239,8 @@ candidate). Runtime zero throughout. | | S8 IMPL-EVAL cycle 1 | **`PASS` — pha
 `007-aspire-s9` @ `9dd06647` (branch `fix/aspire-13-5-s9-skills-mcp-alignment`, upstream none).
 Brief `slices/s9/brief.md`: no AppHost; one AppHost-less stdio MCP session allowed for the static
 tool-surface receipt; Phase B (D-12 live smoke) lease-backed and D-43-blocked. Launcher backgrounded
-without timeout (D-38). |
+without timeout (D-38). | | S9 Phase A landed | Thread `01a0523a…` → PR **#1759** (draft, base S8
+branch) at `e11de98d`, 4 slices with trail comments; closed `BLOCKED:` because the static 13.5.3 MCP
+capture shows the 14-tool baseline without the plan-locked `get_integration_docs` (**D-45**,
+undecidable statically; Phase B decides; amendment recommended). #1721 normalized to `status:impl`.
+Runtime zero throughout (watch armed). Tier-A gate set running at `e11de98d`. |
