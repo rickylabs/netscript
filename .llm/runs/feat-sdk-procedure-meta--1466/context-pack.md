@@ -7,15 +7,23 @@
 
 | Field | Value |
 | --- | --- |
-| Branch | `feat/sdk-procedure-meta`, PR **#1731**, OPEN **draft** |
-| Slice-3 content head | **`9ab779ce96f0ae282afe96ad3efaa5146a2bf428`** |
-| Evidence head | The evidence-only commit containing this context pack; resolve with `git rev-parse HEAD` |
-| Slice-3 start head | `bbff7cf906b4e4d96c49865cada900ea55894d2b` (verified local origin and PR head) |
-| Base | `21d516224`; no rebase and no force-push |
-| PLAN-EVAL | cycle 2 `PASS` |
-| Slice-1 IMPL-EVAL | cycle 2 `PASS`; evidence and archives frozen |
-| Current stop | **Slice 3 implemented and evidenced; stop for supervisor Tier-A** |
-| Issue reference | **`Refs #1466` — partial.** No closing keyword until final all-slices IMPL-EVAL and the close-gate. |
+| Branch | `feat/sdk-procedure-meta`, PR **#1731**, OPEN, **not draft** |
+| **Content head** | **`d5f3bf4c`** — the tree all eight receipts attest |
+| **Evidence head** | `dbd3eafa` — receipts/audit on top; no product delta from the content head |
+| **Evaluator-carrier head** | `ce73a038` — currency verdict; touches only `evaluate.md` (+111/−0) |
+| Base | **`a5520e70`** (`main`, after #1748 `952cc106` and #1755) — two `--no-ff` merges, never a rebase |
+| Verdicts | PLAN-EVAL `PASS` · S1 IMPL-EVAL `FAIL_FIX` → `PASS` + addendum · S2/S3 Tier-A `ACCEPTED` · **final all-slices IMPL-EVAL `PASS`** · **currency renewal `PASS` at `d5f3bf4c`** |
+| Receipts | eight at the content head, **attempt 12**, all `gitHead == actualGitHead`; 7 PASS + ruled `public-doc-lint` FAIL; root `test` **4275/0/19** |
+| Archives | **seven**, append-only |
+| Labels | one `status:` plus `impl-eval:skip` (attributed); body carries `Closes #1466` |
+
+**All three slices are complete and the leaf is merge-ready on evidence.** What remains is close-gate
+form: `status:ready-merge`, the acceptance mirror ticking #1466's six boxes from the PR body's fenced
+`acceptance-evidence` block, and the coordinator's merge.
+
+**Do not conflate the three heads.** A verdict certifies a *content* head; evidence-only commits above
+it do not invalidate it, but each must be *proven* to touch no product byte. The evaluator did not
+assess its own carrier commit.
 
 ## Slice state
 

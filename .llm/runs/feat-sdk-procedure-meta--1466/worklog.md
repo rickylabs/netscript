@@ -589,3 +589,82 @@ Sufficiency `INSUFFICIENT` for exactly one external reason, the terminal expecte
 **Currency.** The terminal `PASS` certified content heads `42874803`/`2863d29e`/`9ab779ce`; the head
 has moved, so a renewed exact-head evaluator pass is owed before `status:ready-merge`. Rerunning CI on
 the old head would have proven nothing — the defect was in the tree, not the run.
+
+## Post-verdict rebaseline — `75b78220` → `b01ffcd8` → `d5f3bf4c` (closes C-1)
+
+Written by the features topic supervisor to close currency-renewal finding **C-1**: these facts
+existed only in the topic orchestration run, `audit/evidence-sufficiency-post-*.json` and commit
+messages, so a resumer following this run's read order would have believed the head was `75b78220`.
+Evidence-only; **no recut, no product change**.
+
+### Two CI reds after the ready-flip — both branch-owned, both repaired
+
+1. **`JSR tagline length`** (run `33311482503`, job `99257258418`). `packages/contracts/README.md`
+   measured **271 B against a 250 B cap**. Attribution measured, not assumed: `main` `13878a80a` ran
+   the same gate at **over=0** with a **235 B** tagline, so slice 1's insertion of
+   `NetScript-owned procedure metadata, ` is what crossed it. Consumer-facing — that paragraph becomes
+   the JSR package description, so 21 bytes over means the registry truncates it. Repaired to
+   **246 B** (margin 4) at content head `75b78220`, trimming only `The`, `-backed`, `handlers`,
+   `typed` and keeping the ownership claim.
+2. **`Agent docs corpus freshness`** (run `33312063301`, job `99258835145`).
+   `prose.json.gz` / `provenance.json` stale. `main` `f8b4f804` measured **`fresh:true`**, so this was
+   entirely branch-owned: the branch edits `docs/site/reference/contracts/index.md` and
+   `packages/contracts/README.md`, both corpus inputs.
+
+**Neither gate is in the contracted eight.** Both are green at base and branch-sensitive — the third
+and fourth instances of the D-27 class on this leaf. See `drift.md` D-37/D-38.
+
+### Two `--no-ff` merges of `main`, never a rebase
+
+| Step | Base | Content head |
+| --- | --- | --- |
+| tagline repair | — | `75b78220` |
+| merge `main` `952cc106` (#1748) | regenerated cascade | `b01ffcd8` |
+| merge `main` `a5520e70` (#1755) | four carriers conflicted | **`d5f3bf4c`** |
+
+Rebase was refused both times: **seven** append-only receipt archives and the review/verdict artifacts
+cite content-head SHAs a rebase rewrites.
+
+The second merge **conflicted in four generated carriers** — `prose.json.gz`, `provenance.json`,
+`agent-docs.generated.ts`, `publish-assets.generated.ts`. Generated artifacts were **not hand-merged**:
+`main`'s side was taken to resolve, then all four generators re-run so committed output is tooling
+output. Hand-resolving a compressed corpus or a generated barrel produces a file no generator would
+emit — plausible-looking and unreproducible.
+
+### The defective receipt — a supervisor error, preserved not hidden
+
+Re-cutting at `75b78220` I invoked `run-gate.ts --gate public-doc-lint` **without the plan's explicit
+16 entrypoints**, so the catalog's bare form ran:
+
+| attempt | argv | durationMs | what it actually was |
+| --- | --- | --- | --- |
+| 10 | **3** | **7** | usage error — "required arguments were not provided: `<source_file>`" |
+| 11 / 12 | **19** | 164 / 178 | a real doc-lint run |
+
+It was missed because that gate is *expected* to fail, so `exit 1` looked correct. **An expected-red
+gate hides invocation defects.** The guard is `argv` and `durationMs`, never `exitCode` alone — 7 ms
+could not be a 16-entrypoint run. The attempt-10 receipt is retained unchanged in
+`receipts/frozen-75b78220/` as the record of the defect; it is not evidence.
+
+### Evidence at content head `d5f3bf4c`
+
+Eight receipts, **attempt 12**, every `gitHead == actualGitHead`: `check`, `lint`, `fmt-check`,
+**`test` (4275 passed / 0 failed / 19 ignored)**, `quality-gate`, `arch-check`, `publish-dry-run`
+**PASS**; `public-doc-lint` **FAIL** — ruled baseline-red.
+
+**On the doc-lint wording, corrected:** the head and `main` sets are **not literally identical**. Both
+count **12**, **9 are common**, and they differ by the accepted **3-for-3 R-1 substitution** —
+`main`-only `BaseContractOutputRoute→BaseContractErrors`, `BaseContractRoute→BaseContractErrors`,
+`baseContract→oc`; head-only `BaseContractErrors→MergedErrorMap`, `baseContract→ContractBuilder`,
+`baseContract→Schema`. The correct claim is **count delta 0, exact known R-1 substitution reverified,
+9 unchanged + 3 expected replacements, no unreviewed additions**. Earlier "set identical" phrasing in
+this run conflated head-to-head comparison (genuinely identical) with head-to-`main` (a substitution).
+
+Seven append-only archives; `deno.lock` byte-unchanged; all shared-asset carrier checks green.
+
+### Currency renewal
+
+Session `2f492178` (Fable 5 · medium) ruled **`PASS`** at `d5f3bf4c` — the terminal all-slices verdict
+carries forward. It re-derived every invariant against the **new** `main`, and completed the **G-1
+decoy probe** that both stopped predecessor sessions (`b247bef9`, `a103dbb6`) had missed: the forgery
+passes `check` and `lint` and the pin goes **red**. Failure count unchanged at 1 of 2.

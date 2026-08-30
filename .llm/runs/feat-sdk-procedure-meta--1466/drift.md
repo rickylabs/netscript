@@ -266,3 +266,89 @@ cut under run, content, and (for the older host-defect sets) host conditions tha
 superseded. They remain append-only historical evidence; no archived outcome is rewritten or
 reinterpreted. Slice 3 archives the slice-2 top-level set under `receipts/frozen-2863d29e/` before
 cutting its own eight receipts at the new content head.
+
+## D-37 — `docs-tagline` was outside the contracted set and caught a consumer-facing defect
+
+`packages/contracts/README.md`'s JSR tagline reached **271 B against a 250 B cap** because slice 1
+inserted `NetScript-owned procedure metadata, ` into it. Branch-owned, measured: `main` `13878a80a`
+ran the same gate at **over=0** with a **235 B** tagline.
+
+Consumer-facing: the first bold paragraph becomes the **JSR package description**, so 21 bytes over
+means the registry stores it truncated. `docs-tagline` is **not** among the plan's eight contracted
+receipts, is green at base, and is branch-sensitive — so eight contracted gates passed while a
+user-visible defect shipped to a ready-flip. Repaired to **246 B**; the currency evaluator ruled the
+trim faithful to the ownership claim.
+
+## D-38 — the shared-asset cascade is a unit, and it too was outside the contracted set
+
+`check:agent-docs-prose` failed at `87d53cec`: `prose.json.gz` / `provenance.json` stale. `main`
+`f8b4f804` measured **`fresh:true`**, so entirely branch-owned — this branch edits
+`docs/site/reference/contracts/index.md` and `packages/contracts/README.md`, both corpus inputs.
+
+Two things generalise:
+
+1. **The cascade conflicts as a unit.** Merging `main` `a5520e70` conflicted in **four** carriers at
+   once (`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`, `publish-assets.generated.ts`).
+   Any leaf touching a corpus input owes `agent-docs-prose` **and** `assets-barrel`,
+   `mcp-export-corpus`, `publish-assets` together, not individually.
+2. **Generated artifacts are never hand-merged.** Resolution was to take `main`'s side wholesale and
+   re-run all four generators. Hand-resolving a compressed corpus or a generated barrel yields a file
+   no generator would emit — plausible-looking, unreproducible, and green against nothing.
+
+With D-27 and D-37 this is the **fourth** instance of one class: *the contracted set is scoped to
+package correctness and is structurally blind to the repo-level generated-artifact surface a docs edit
+touches.* The currency evaluator's Ruling 3 adopts the fix for future leaves — derive the contracted
+set from the touched-path classes rather than fixing it at planning time.
+
+## D-39 — an expected-red gate hides invocation defects
+
+Re-cutting `public-doc-lint` at `75b78220`, `run-gate.ts` was invoked **without** the plan's explicit
+16 entrypoints, so the catalog's bare `deno doc --lint` ran and exited 1 in **7 ms** with
+*"the following required arguments were not provided: `<source_file>`"*. That receipt was pushed and
+cited as evidence.
+
+The failure was not the wrong flag; it was **how the receipt was read**. This gate is *contracted to
+fail* — it is the baseline-red one — so `exit 1` matched expectation and the argv was never checked.
+The same class had been caught earlier in the run only because the gate involved (`test`) was expected
+to **pass**, so its failure was surprising.
+
+**Rule:** verify a receipt by `argv` **and** `durationMs`, never `exitCode` alone. A 7 ms
+16-entrypoint doc-lint is impossible on its face. Attempts 11/12 carry the 19-element argv at
+164/178 ms; the defective attempt-10 receipt is retained unchanged in `receipts/frozen-75b78220/` as
+the record of the defect rather than replaced.
+
+## D-40 — "set identical" was the wrong claim for `public-doc-lint` head vs `main`
+
+Run prose repeatedly said the head and `main` doc-lint **sets** were identical. They are not.
+
+Measured at `d5f3bf4c` vs `a5520e70`: **12 vs 12**, **9 common**, and a **3-for-3 substitution** —
+`main`-only `BaseContractOutputRoute→BaseContractErrors`, `BaseContractRoute→BaseContractErrors`,
+`baseContract→oc`; head-only `BaseContractErrors→MergedErrorMap`, `baseContract→ContractBuilder`,
+`baseContract→Schema`.
+
+The error was conflating two comparisons: **head-to-head** across `42874803`/`2863d29e`/`9ab779ce`,
+where the sets *are* identical, and **head-to-`main`**, where they are a substitution. The correct
+wording, now used in the PR body and here: **count delta 0, exact known R-1 substitution reverified,
+9 unchanged + 3 expected replacements, no unreviewed additions.**
+
+This matters beyond phrasing: "identical" would make an unreviewed substitution invisible, since a
+count match with a *different* member is exactly a regression wearing a passing number. The
+substitution wording forces the three replacements to be named and reviewed.
+
+## D-41 — content head, evidence head, and evaluator-carrier head are three distinct things
+
+This branch now carries three heads that must not be conflated:
+
+| Head | SHA | What it is |
+| --- | --- | --- |
+| **Content** | `d5f3bf4c` | the tree all eight receipts attest; the only head whose product bytes matter |
+| **Evidence** | `dbd3eafa` | receipts + audit committed on top; `git diff d5f3bf4c..dbd3eafa -- packages plugins docs templates` is **empty** |
+| **Evaluator carrier** | `ce73a038` | the currency verdict; touches **exactly** `evaluate.md`, +111/−0, and **zero** product, receipt or archive bytes (verified) |
+
+**Carry-forward rule.** A verdict certifies a *content* head. Evidence-only commits stacked above it —
+receipts, audits, verdicts — do not invalidate it, provided each is proven to touch no product byte.
+That proof is the price of the carry-forward and must be recorded, not assumed.
+
+**The evaluator did not assess its own commit.** Session `2f492178` evaluated content head
+`d5f3bf4c` at evidence head `dbd3eafa`; `ce73a038` is where it *wrote* the verdict and postdates the
+tree it judged. Claiming otherwise would assert a self-certification the harness forbids.
