@@ -3637,3 +3637,48 @@ the thing observed.** Wrapper exit codes described wrappers; `pgrep -f` matched 
 `timeout` killed what it was bounding; a stale ledger described a superseded measurement; now a
 status sampler described its own sampling. In every case the fix was the same — go to the artifact
 that cannot lie about itself.
+
+## 2026-08-30 — #1533 research landed at `a1a4328ba4706f3fe8e7c541e43763975a8df485`; plan still open
+
+Commit is **run artifacts only** — 8 files, all under `.llm/runs/`. `git diff 13878a80..a1a4328b -- .
+':!.llm/runs'` is **empty**, so no source leaked ahead of the plan gate despite the commit subject
+reading `test(docs): rebaseline JSDoc example gate`, which is misleading for a research commit.
+
+### The author re-derived my inherited claims instead of trusting them, and both survived
+
+This is what the brief asked for and it did it by execution:
+
+- **The stale ledger claim is confirmed false.** All symbols named by the four cited contracts
+  examples resolve on the subpath the example actually names — `PaginationInputSchema`,
+  `createPaginatedOutput`, `FilterConditionSchema`, `buildPrismaWhere`, `paginatedQuery`,
+  `createTransformer` — verified with `deno doc --filter` against `query.ts` and `transform.ts`.
+- **The one genuine defect is confirmed, with a sharper mechanism than I had.** I had established
+  that `schemas/pagination.ts` uses `baseContract` and `UserSchema` with no import. The author
+  compiled it: a temporary source carrying the exact example block, checked with
+  `deno check --unstable-kv`, reports **TS2304 for both bindings, exit 1** — and it removed the probe
+  after measuring rather than leaving scratch behind.
+- It also reproduced the issue's motivating claim directly: `deno doc --lint packages/contracts/query.ts`
+  → `Checked 1 file`, **exit 0**, while that same example is uncompilable. That is the gate's reason
+  for existing, measured rather than quoted.
+- Useful new fact neither the issue nor I had: the live denominator is **35 publishable workspace
+  members** across `packages/**` and `plugins/**`, with `packages/bench` and `packages/cli/e2e` the
+  two explicit `publish:false` exclusions.
+
+### Plan deliberately not yet submitted
+
+`plan.md` is a 4-line seed whose own text says it exists so the activated run has every mandatory
+artifact and **must not** go to PLAN-EVAL until the design checkpoint and locked decisions are
+complete. That is the correct instinct and I am not going to rush it — the fix-or-baseline policy is
+the whole point of this gate, and a plan that arrives early without it would burn the cycle.
+
+Watchers re-armed on `plan.md` growth, a new commit, or launcher-pid exit.
+
+### Hygiene item carried up, not blocked on
+
+`launch-codex-slice` writes `codex-thread-ids.md` into the slice run dir — thread id, rollout path
+under `~/.codex/sessions/`, and the resume command — and the author committed it. This lane's own
+standing rule is that thread/rollout/daemon identity stays in the local operational record, **outside**
+the repository. It is already established practice here (earlier internals slices carry the same
+file), so this is pre-existing repo-wide drift rather than a novel leak by this leaf, and I am not
+blocking the gate on it. Flagged for the coordinator: either the launcher should stop writing it into
+a committed path, or the rule should be retired as unenforced.
