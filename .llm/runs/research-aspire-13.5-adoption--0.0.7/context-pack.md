@@ -87,7 +87,13 @@ historical; all of those evaluator sessions are `offline` and none was resumed.
 | S8–S11, S13 | #1720–#1724                                | —           | —                           | Queued. S8 dispatch waits for the settled S6 head; S9 expects the 14-tool MCP set (D-15); S13 needs the D-17 telemetry-resolver ratification.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | S12, S6b    | #1725, #1726 (0.0.8)                       | —           | —                           | After canary B.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
-## Runtime lease — S5 F-A lease executed and released; Phase-B leases next (2026-08-30)
+## Human-merge handoff
+
+`handoff-ready-prs.md`: **#1738** (Closes #1716) and **#1740** (Closes #1717, #1370, #979) pass
+close-gate independently of S3 Phase B; caveats = #1734 baseline for #1740's runtime verdict, S6/S8
+stacked on the S5 branch, issue `status:` labels lag the PRs.
+
+## Runtime lease — S3 Phase B held (2026-08-30)
 
 Both zero-state proofs were taken on the NAS host before any runtime work was contemplated:
 
