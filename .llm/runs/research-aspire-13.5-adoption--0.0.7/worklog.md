@@ -520,4 +520,10 @@ ready/close-gate follows a PASS. Chain-3 (S5b full runtime) now unblocked. | | S
 fronts green | S1 delta IMPL-EVAL running (session `6c9f010f…`, worktree `007-aspire-s1-eval` @
 `e0d70e404074`; hosted receipt run 33330714604 all-green attached in the brief). S5: core CI
 33330647399 SUCCESS (close-gate/quality/check-test); full-runtime run **33331022935** dispatched at
-`bf7223a6c3305c` (chain-3). |
+`bf7223a6c3305c` (chain-3). | | S7 stall report — verified live, not stalled | Coordinator saw a
+stall at 19:31:19Z after `agentic:leak-check`; inspection at ~19:32:40Z: client 3447411 +
+code-mode-host child alive, rollout fresh `output_text` at 19:32:39Z; host = mid-reproduction by
+design (run CLI killed, orphans awaiting owned teardown, control AppHost sole in `aspire ps`). No
+interrupt issued (a cut would lose the cleanup turn). Hard-stall detector armed: rollout idle >4 min
+or client death → same-thread recovery (scoped leak receipt, stop control via exact `--apphost`,
+remove only S7-owned + relays, prove zero, no second start). |
