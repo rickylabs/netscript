@@ -1563,3 +1563,12 @@
   restart, waits) then S9's `agent.aspire-mcp-smoke` FAIL, MCP -32603 "The Aspire Dashboard is not
   available in the running AppHost"; cleanup passed — dashboard/MCP discovery, S9 ownership,
   diagnosis in progress; no unchanged retry.
+- **D-78 progress:** exact-head hosted run **33329358883 SUCCESS on all tiers** at `338922a20db6`.
+  Acceptance mirror **APPLIED** to #1715 (4/4 boxes, provenance comment 19:05:12Z, bodySha256
+  `1c0dca95…`) after two corrections: (a) the evidence block had to use the
+  `entries:`/`box-index:`/`evidence:` grammar of `.llm/tools/validation/acceptance-evidence.ts` (the
+  `acceptance:`/`criterion:` shape is S7's handoff-doc style, not the parser's — the earlier dry-run
+  had skipped before parsing, hiding this); (b) `openhands-phase-eval.yml` swapped the PR to
+  `status:impl-eval` 17 s after labeling — removed; PR and #1715 both sole `status:ready-merge`; its
+  later run skips. Close-gate rerun on ci run 33329453582 pending; on green the S3 merge packet goes
+  to the coordinator (merge stays coordinator-landed).
