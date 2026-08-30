@@ -17,16 +17,40 @@
  * @module
  */
 
-import { OpenAPIGenerator } from '@orpc/openapi';
+import type { NetScriptProcedureMeta } from '@netscript/contracts';
+import { type OpenAPI, OpenAPIGenerator } from '@orpc/openapi';
+import { traverseContractProcedures } from '@orpc/server';
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
 import type { ServiceHandler, ServiceRouter } from '../types.ts';
-import { isOrpcRouter } from './orpc-router.ts';
+import { isOrpcRouter, type OrpcRouter } from './orpc-router.ts';
 import { SCALAR_MIN_JS } from './scalar.generated.ts';
 
 const DEFAULT_OPENAPI_SERVER_URL = '/api';
 const DEFAULT_SCALAR_TITLE = 'API Documentation';
 const DEFAULT_SCALAR_THEME = 'kepler';
 const SCALAR_JS_CACHE_CONTROL = 'public, max-age=31536000, immutable';
+const BEARER_SECURITY_SCHEME = 'bearerAuth';
+const OPENAPI_METHODS = [
+  'get',
+  'put',
+  'post',
+  'delete',
+  'options',
+  'head',
+  'patch',
+  'trace',
+] as const;
+
+type ProcedureAccess = NonNullable<NetScriptProcedureMeta['access']>;
+type NetScriptOpenAPIOperation = OpenAPI.OperationObject & {
+  /** Roles are a NetScript extension because OpenAPI security schemes cannot express them. */
+  'x-netscript-roles'?: readonly string[];
+};
+
+interface ProcedureAccessIndex {
+  readonly byOperationId: ReadonlyMap<string, ProcedureAccess>;
+  readonly byRoute: ReadonlyMap<string, ProcedureAccess>;
+}
 
 /**
  * Configuration for OpenAPI spec generation.
@@ -59,6 +83,92 @@ const openApiGenerator = new OpenAPIGenerator({
   schemaConverters: [new ZodToJsonSchemaConverter()],
 });
 
+function routeKey(method: string, path: string): string {
+  return `${method.toLowerCase()} ${path}`;
+}
+
+function indexProcedureAccess(router: OrpcRouter): ProcedureAccessIndex {
+  const byOperationId = new Map<string, ProcedureAccess>();
+  const byRoute = new Map<string, ProcedureAccess>();
+
+  traverseContractProcedures({ router, path: [] }, ({ contract, path }) => {
+    const meta: NetScriptProcedureMeta = contract['~orpc'].meta;
+    const access = meta.access;
+    if (!access?.authentication) {
+      return;
+    }
+
+    const route = contract['~orpc'].route;
+    const operationId = route.operationId ?? path.join('.');
+    const operationPath = route.path ?? `/${path.join('/')}`;
+    const operationMethod = route.method ?? 'POST';
+
+    byOperationId.set(operationId, access);
+    byRoute.set(routeKey(operationMethod, operationPath), access);
+  });
+
+  return { byOperationId, byRoute };
+}
+
+function projectProcedureAccess(
+  spec: OpenAPI.Document,
+  index: ProcedureAccessIndex,
+): void {
+  let needsBearerScheme = false;
+
+  for (const [path, pathItem] of Object.entries(spec.paths ?? {})) {
+    if (!pathItem) {
+      continue;
+    }
+
+    for (const method of OPENAPI_METHODS) {
+      const operation = pathItem[method] as NetScriptOpenAPIOperation | undefined;
+      if (!operation) {
+        continue;
+      }
+
+      const access =
+        (operation.operationId ? index.byOperationId.get(operation.operationId) : undefined) ??
+          index.byRoute.get(routeKey(method, path));
+      if (!access) {
+        continue;
+      }
+
+      switch (access.authentication) {
+        case 'none':
+          operation.security = [];
+          break;
+        case 'optional':
+          operation.security = [{}, { [BEARER_SECURITY_SCHEME]: [] }];
+          needsBearerScheme = true;
+          break;
+        case 'required': {
+          operation.security = [{
+            [BEARER_SECURITY_SCHEME]: [...(access.authorization?.scopes ?? [])],
+          }];
+          if (access.authorization?.roles) {
+            operation['x-netscript-roles'] = [...access.authorization.roles];
+          }
+          needsBearerScheme = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (needsBearerScheme) {
+    spec.components = {
+      ...spec.components,
+      securitySchemes: {
+        ...spec.components?.securitySchemes,
+        [BEARER_SECURITY_SCHEME]: spec.components?.securitySchemes?.[
+          BEARER_SECURITY_SCHEME
+        ] ?? { type: 'http', scheme: 'bearer' },
+      },
+    };
+  }
+}
+
 /**
  * Creates an OpenAPI specification endpoint handler.
  *
@@ -88,6 +198,7 @@ export function createOpenAPISpec<T extends ServiceRouter>(
       },
       servers: config.servers ?? [{ url: DEFAULT_OPENAPI_SERVER_URL }],
     });
+    projectProcedureAccess(spec, indexProcedureAccess(router));
     return c.json(spec);
   };
 }
