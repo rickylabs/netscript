@@ -5985,3 +5985,45 @@ session, and an evidence contract requiring the gate to be shown executing.
 Sequence from here, once the lease frees: run the prepared command → mirror box 11 → set
 `status:ready-merge` → rerun CI/close-gate at exact carrier → merge packet. Not waiting on another
 topic lane in the meantime.
+
+### Main `96d44758d` reconciled across all three lease-queued leaves — one real intersection found
+
+Docs-only main advance (#1790/#1788), 6 non-run-artifact files: two `docs/site` pages plus **four
+shared generated carriers** (`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`,
+`publish-assets.generated.ts`).
+
+**Correctly re-derived owned-path lists before computing intersection**, since a shortcut cost me a
+false start: my first attempt diffed `#1764` against its ancient base `f8b4f804`, which — because
+`735ed2a66` sits alongside `9710a2898` in the merge graph rather than after it — produced a **38-path
+polluted list**, not the real 19. Caught before acting on it by noticing the count didn't match the
+19 I'd verified repeatedly earlier this session, and re-derived correctly from `9710a2898..<head>`
+(a genuine ancestor relationship, confirmed via `git merge-base --is-ancestor`) for both #1764 and
+#1758.
+
+**True intersection, per leaf:**
+- **#1764**: zero.
+- **#1357**: zero (confirmed against the same authoritative 12-path list used for its own convergence
+  minutes earlier).
+- **#1758**: **real intersection — the report the coordinator asked for.** Two of the four shared
+  carriers (`agent-docs.generated.ts`, `publish-assets.generated.ts`) are paths this leaf's own prior
+  merge already resolved once this session, so the new main advance re-touches them.
+
+**Resolution:**
+- #1764: one conflict, the corpus carrier it already owns as ceiling item 4 — resolved via
+  `gen:mcp-export-corpus` alone. Refreeze: `plugins/sagas` 55/0/1 (+4, main's own tests),
+  `plugin-sagas-core` 84/0/3, lock unchanged. Head `50f77f5e1`, pushed.
+- #1357: zero conflicts; main's own commit had already regenerated the carriers it touches
+  identically, so nothing further needed. Cascade checks all exit 0 unchanged. Head `6b5f3fe70`,
+  pushed.
+- #1758: five conflicts (all four shared carriers plus the corpus). Resolved by taking main's side and
+  regenerating **in the established dependency order** — `gen:agent-docs-prose` → `gen:assets-barrel` →
+  `gen:mcp-export-corpus` → `gen:publish-assets` — the same order this session already proved matters
+  after an earlier out-of-order attempt left one check red despite every generator exiting 0. All
+  three read-only checks exit 0 on the first correctly-ordered pass this time. Refreeze:
+  `packages/sdk` 79/0, `arch:check`/all three cascade checks exit 0, lock unchanged. Head `a391cbaa0`,
+  pushed.
+
+No new IMPL-EVAL required for any of the three — all inert-or-carrier-only convergence, matching the
+MECHANICAL_PASS pattern already established. Serial queue keeps moving: #1764 and #1758 remain
+lease-queued, #1781/#1357 remains lease-queued for its `scaffold.ui-data-screen` proof; nothing waited
+on another topic lane.
