@@ -1869,3 +1869,71 @@ still OPEN — S2 shipping verification receipts does not move the pin. Re-check
 than inferred from "an Aspire slice merged".
 
 None of #1746/#1748/#1755 has merged yet; all three still OPEN with `mergeStateStatus` recomputing.
+
+## 2026-08-30 — #1746 merged; #1748 integration-refreshed onto f8b4f804
+
+`#1746` merged at `f8b4f804`, closing `#1745` (CLOSED/COMPLETED). Coordinator confirmed merges run
+through its pre-merge gate — this lane's earlier "ready for a **human** to merge" phrasing is
+retracted; merge authority sitting outside this lane is unchanged.
+
+### #1748 rebased, not merged, and deliberately so
+
+Both PRs regenerate the same four agent-doc carriers, so the branch was reset to `main`, prose
+replayed, and assets regenerated fresh. A hand-resolved corpus was never attempted: the carriers are
+generator output and one is gzipped binary — wrong in a way review cannot catch. Pre-rebase head
+`22e79dcc` preserved as tag `backup/1748-pre-rebase`.
+
+New shape on `f8b4f804`: `e222a1d7` prose → `ece85406` prose repair + `supervisor.md` → `9b79d90e`
+assets only. `provenance.json` `sourceCommit` `ece85406a` == the immediately preceding prose commit.
+
+**Proof the regeneration actually took:** before it, `git grep '\.NET Aspire'` returned a **fourth**
+hit — `packages/mcp/src/publish-assets.generated.ts`, carrying pre-sweep corpus prose from `main`.
+After regeneration it is gone and the count is back to the three pre-existing. That is a stronger
+check than a timestamp or a gate exit code.
+
+Gates: 13 green. One red — `docs:readme:check` on `packages/bench/README.md` ("missing '## Install'").
+Reproduced on a **clean `origin/main` checkout** before claiming it: pre-existing baseline, the file
+is byte-identical to main, this diff does not touch `packages/bench`. The IMPL-EVAL verified it
+independently and concurred. CI at `9b79d90e` is fully terminal green including `check-test`.
+
+### Two false PR-body claims, one of them mine
+
+1. **DoD box 1** claimed zero ".NET Aspire" across *published surfaces*. False: `@netscript/aspire`
+   is JSR-published at 0.0.6 and its README still carries the term. Corrected to scope the claim to
+   the S11 `doc:public-page` manifest plus root `README.md` and `docs/site/**`, naming **S13 #1724**
+   as that README's owner.
+2. **The Summary's opening sentence** still said "across every published surface", contradicting the
+   corrected Scope. I fixed the Scope and DoD box but **missed the Summary** — the coordinator caught
+   it and corrected it directly. Recorded as a miss: correcting two of three places a claim appears
+   leaves the document contradicting itself, which is worse than leaving it uniformly wrong, because
+   a reader cannot tell which sentence is authoritative.
+
+### The delta IMPL-EVAL corrected an error in my own brief
+
+`PASS` at `9b79d90e`; the prior `PASS` carries forward. It established the prose patches are
+**byte-identical** across the rebase, so every earlier judgement rests on unchanged content.
+
+It also caught that my brief asserted "no `.mmd` in the rebased diff" — **wrong**; the comment-only
+`aspire-resource-graph.mmd` edit *is* in the diff. The `diagrams:check` carry-over survives, but on
+different grounds: the gate byte-compares committed **SVGs**, the diff has zero `.svg`, the `.mmd`
+change is comment-only, and both are byte-identical across the rebase. The body now records the
+false grounds and the accurate ones rather than quietly swapping the argument.
+
+Body brought to currency without moving the head: Validation re-dated, `sourceCommit`
+`3301f593b` → `ece85406a`, DoD box 4 re-grounded, an Integration section added, and all three
+IMPL-EVALs listed. The one-line rebase drift entry was **not** committed — it would move the head and
+void the exact-head verdict, so the record lives in the body and here instead.
+
+### #1757 — `PASS_PLAN` at cycle 2
+
+No blocking findings. The evaluator decoded the embedded tool sources out of
+`agent-tools.generated.ts` at `v0.0.6` and `13878a80` and diffed the real contents to confirm the
+five barrel commits now carry true reasons — it did not take the repair summary's word. It found B11
+carries **five** breaking facts, not the three cycle 1 named, and advised *against* strengthening
+B1's "surfaces" to "fails" because the check wrapper's non-zero exit is selection-mode-gated; cycle 1
+had overstated that. Implementation steered with the required baseline reconciliation for `625447f1`
+(verified pure run-artifacts).
+
+**Route drift:** the resumed `01a0522a` thread reports effort **high** where the requested route is
+**medium**. `codex-resume.ts` accepts no `--effort`, so a resume does not carry the original identity
+forward. Recorded rather than passed over — lane policy requires observed identity to be reported.
