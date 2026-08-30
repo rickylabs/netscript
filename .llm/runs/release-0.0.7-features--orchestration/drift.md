@@ -946,3 +946,57 @@ lesson says it must, rather than trusting a prior ruling — it should treat eve
 and take only the live set at the final content head as the current claim. The infrastructure
 waivers are gone; the archives are the record of when they existed, not an argument that they still
 apply.
+
+## D-34 — `runtime repair codex-remote` is not a sender-eviction path, and must not be forced into one
+
+**Context.** A variable-derived `rm "$D/$K.json"` was correctly denied by the coordinator. Deriving a
+deletion target from shell variables in a store keyed by SHA-256 filenames is exactly the shape where
+one wrong expansion deletes another lane's lease. The rule now stands: **resolve read-only, prove
+ownership, then delete only a literal validated path.**
+
+**What the sanctioned command actually does.** `deno task agentic:runtime repair codex-remote
+--worktree <path>` was tried first, dry-run, and refused:
+
+```json
+{"status":"blocked","changed":false,"state":"disconnected",
+ "diagnostics":[{"code":"active_session","category":"safety",
+ "message":"Codex remote repair refused because active sessions or child commands were observed"}]}
+```
+
+Reading `codex-remote-repair.ts:79-88`, `repairRefusal` fires on
+`observation.activeSessionIds.length` / `activeChildCommands.length` — **daemon-global**, not scoped
+to the named worktree. Sibling lanes (`007-leaf-1673`, `007-aspire-s5`) were live, so the refusal is
+correct and would persist for as long as any lane anywhere is working.
+
+**The important part: it is the wrong instrument regardless.** `repair codex-remote` repairs the
+**daemon / remote-control connection** — socket, app-server anchoring, version skew. It does not know
+about `~/.config/netscript-agentic/runtime/senders/`. Forcing it would mutate shared daemon state that
+is actively serving other lanes, to fix a per-worktree ownership record it does not manage. A refusal
+one is tempted to override is worth reading twice: here the override would have been both useless and
+dangerous.
+
+**So the D-28 gap is confirmed sharper than first filed.** There is no checked-in eviction path for a
+stale sender-ownership record. The launcher's own `stale` branch would handle it if `sessionActive`
+were computed from the runtime (D-28), and the runtime controller does not cover the store at all.
+Until one exists, recovery is a hand-edit — which is precisely why it needs the read-only-resolve /
+prove / literal-path discipline rather than a convenience variable.
+
+**Procedure used, and to be reused.**
+
+1. `ls` the store read-only; do not compute the filename to act on it.
+2. `cat` the candidate; the record **self-describes** its `worktree` and `sessionId`. Match both
+   against the intended target — a hash collision or a mis-derived key cannot survive this check,
+   because the payload names its own owner.
+3. Prove `ownerPid` absent from `/proc`, the thread absent from `agentic:codex-status` across
+   **three** probes (transient absences are real — one was observed earlier this session), and no
+   launcher or app-server process running for that worktree.
+4. Try `agentic:runtime repair codex-remote --dry-run` first; record its verdict either way.
+5. Copy the record to supervisor-owned scratch, then `rm` **one fully literal path**, no variables.
+6. Verify the store count decreased by exactly one.
+
+Applied for the completed slice-2 thread `01a051f8-ab0a-7443-921f-17e48be6bc35`, record
+`236f2a7b…json`, `ownerPid 249559` (absent), store **11 → 10**, nothing else touched.
+
+**Fourth occurrence in this lane in one session.** D-28's proposed fix — compute `sessionActive` from
+the daemon, and add an explicit `--release-stale-sender` — is now a measured operational cost, not a
+theoretical tidy-up, and belongs with D-24, D-25 and D-29's tooling follow-ups.
