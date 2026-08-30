@@ -1337,3 +1337,15 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   shipped, with no unowned docs leaf available. Aspire S11 remains owned by the same Aspire research
   supervisor per the epic contract. Docs is therefore deliberately exhausted/parked, not a global
   barrier.
+
+## 2026-08-30T18:39:00Z — two merges release the convergence front
+
+- The coordinator merged exact-green docs PR #1783 as `38439740f`, normalized #1782/#1783 to sole
+  `status:shipped`, and directed docs straight into the #1777 logger-reference slice.
+- The coordinator merged exact-green Fresh PR #1736 as `52a881c58842`, normalized #1734/#1736 to
+  sole `status:shipped`, and released Aspire S1/S4/S5 plus the fix/runtime leaves that cited #1734.
+  Aspire owns the prepared S1 rebase/runtime/delta-evaluator convergence packet; no owner decision
+  remains at that boundary.
+- S3 Phase B is terminal success at `1611c5868`. S7 now owns the sole host runtime lease for its
+  explicitly authorized two-AppHost foreign-control test. S3 review/evaluation, S10 static/parser
+  proof, and every non-runtime topic lane continue in parallel.

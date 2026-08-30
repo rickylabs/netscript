@@ -1398,3 +1398,17 @@ implementation thread.
 - Lease cleanup must never be issued by a non-owner. The first #1736 local run was externally
   stopped by its supervisor during `database.init`; the 87 ms stop-to-JSON-RPC-loss sequence proves
   causation. Hosted exact-product-head green evidence supersedes that invalid local receipt.
+
+## 2026-08-30 — the relay converted the Phase-B blocker into product evidence
+
+- The owner-scoped two-hop relay proved the complete DCP contract, not merely a synthetic Docker
+  probe: PostgreSQL and workers became healthy, `aspire wait` passed, and real 13.5.3 resources and
+  spans were captured. S3's first successful local Phase B therefore supersedes the CI-fallback
+  posture for S3/S7/S8 while keeping the single host lease and exact owned cleanup mandatory.
+- Two scaffold observations (missing generated Zod CRUD during an otherwise unrelated web start,
+  and a minimal workers fixture without `streams`) did not invalidate S3's approved worker-trigger
+  and telemetry-envelope acceptance. They are recorded as observations and must not silently widen
+  S3; any repair requires its own owned slice.
+- The shared #1734 baseline blocker is gone from main at `52a881c58842`. Any S1/S4/S5 or fix leaf
+  that still reports #1734 as its blocker is stale and must integrate current main before spending
+  another runtime lease.

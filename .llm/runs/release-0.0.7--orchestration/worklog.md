@@ -2610,3 +2610,24 @@
   that stop. No product or Aspire defect was inferred. Hosted run `33327199769` at product head
   `d2c7f16c` subsequently passed static, desktop, PostgreSQL, and SQLite/Garnet jobs; final cycle-4
   IMPL-EVAL is live over carrier `662be2e9` with the evidence-only head distinction explicit.
+
+## 2026-08-30T18:39:00Z — docs and Fresh blockers shipped; Aspire local Phase B is real
+
+- PR #1783 passed its independent IMPL-EVAL, mirrored all #1782 acceptance evidence, resolved its
+  sole review thread, and completed exact-head close-gate, quality, check-test, code-quality, and
+  docs-build checks. It merged as `38439740f248ef2ba5f173dad96b2edaa829392c`; #1782 auto-closed,
+  and both records now carry the sole lifecycle label `status:shipped`. Docs immediately dispatched
+  the next logger-reference coverage slice rather than waiting on another topic lane.
+- PR #1736 earned final cycle-4 `PASS` at evaluator carrier `be949ebd3` over byte-identical product
+  and hosted-runtime head `d2c7f16c6`. The evaluator reproduced RED 11/3 to GREEN 14/0, root
+  4,294/0/19, Fresh 22/0, both TanStack range ends, hostile-value and envelope attacks, and hosted
+  run `33327199769`. Current CI run `33328161675` and close-gate job `99301885933` passed; the docs
+  merge advanced main through a disjoint 13-path delta with zero intersection against the PR's
+  18-path delta. PR #1736 merged as `52a881c58842f521b7b253b9781a0b56ae897069`; #1734 closed and
+  both records are sole `status:shipped`.
+- Aspire S3 Phase B completed locally at pushed head `1611c5868`: PostgreSQL/workers waits passed,
+  the worker trigger was accepted, byte-exact 13.5.3 resources/spans were captured, 427/427 tests
+  and every static/tooling gate passed, and owned cleanup returned Aspire, containers, volumes, and
+  relays to zero. S7 then acquired the serialized lease for its explicitly two-AppHost
+  foreign-control reproduction. S3 evaluation, S10 parser proof, and S1 exact-main convergence
+  continue independently.

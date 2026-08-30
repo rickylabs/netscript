@@ -1572,3 +1572,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - S10's direct-ResourceJson follow parser fix is pushed at `73b37ac89`; combined proof head
   `6e6163a21` is executing run `33327294781`. The hidden failed-report artifact fix belongs to S9
   #1759, but publication waits on a workflow-scoped credential and does not block runtime proof.
+
+## Resume checkpoint — 2026-08-30T18:39:00Z
+
+- Exact main is `52a881c58842f521b7b253b9781a0b56ae897069` after coordinator merges of docs
+  PR #1783 (`38439740f`) and Fresh PR #1736. Issues #1782 and #1734 are closed; both PR/issue pairs
+  have sole `status:shipped` lifecycle labels.
+- #1736's final cycle-4 evaluator is terminal `PASS` at carrier `be949ebd3` over product/runtime
+  head `d2c7f16c6`; current CI `33328161675`, close-gate `99301885933`, hosted PostgreSQL and
+  SQLite/Garnet run `33327199769`, and the exact-main disjointness audit are green. No cycle 5 exists.
+- Aspire S3 local Phase B is terminal success at `1611c5868`, including real 13.5.3 resources/spans
+  capture, 427/427 tests, and exact cleanup. S7 now owns the serialized runtime lease for its
+  explicitly authorized two-AppHost foreign-control reproduction; no other runtime lane may overlap.
+  S1 must immediately rebase #1727 onto exact main, run both hosted runtime tiers, collect warm
+  restore timing, and obtain a fresh delta IMPL-EVAL. S4/#1738 and S5/#1740 are likewise no longer
+  blocked by #1734 and must resume in the Aspire supervisor's own serial queue.
+- Docs has moved to the #1777 logger-reference gap; features #1387, fixes #1357, and the next
+  internals leaf remain active independently. Docs, internals, and Aspire are not global barriers.
