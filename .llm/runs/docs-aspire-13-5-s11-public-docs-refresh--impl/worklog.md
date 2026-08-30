@@ -67,6 +67,12 @@
 ### Docs Audit Cycle-3 Outcome (2026-08-30)
 - **M3 Acceptance Artifact (D-63):** Content claim-correct; corrected manifest disposition count in worklog to the exact range-derived figures matching `manifest-disposition.md` and `git diff --name-only a46ea16d..HEAD` (8 edited manifest rows, 113 verified-clean rows, 0 deferred across 121 total S11-owned rows).
 
+### Reconcile with main #1772 (2026-08-30)
+- Ported background reference preflight documentation from main `de57fab0` (#1772) into `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md` verbatim in meaning, while preserving Aspire 13.5 prose corrections (`@microsoft/aspire-cli`, installation-aware `aspire update --self`, current-13.4.6 / target-13.5.3 framing).
+- Re-generated agent docs prose and publish assets (`gen:agent-docs-prose`, `gen:publish-assets`, `gen:assets-barrel`).
+- Verified all quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume site build).
+
+
 
 
 

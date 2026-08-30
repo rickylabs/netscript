@@ -4,8 +4,9 @@
 - Worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s11`
 - Base: `a46ea16d` (`test/aspire-13-5-s10-e2e-gate-upgrades`)
 - PR: #1771 (stacked on S10)
-- Scope: 6 slices covering manifest sweep, dedicated Aspire pages, #1642 detached start how-to, observability/skills/reference/README/CONTRIBUTING update, terminology normalisation (#1000), diagram review, asset generation/gates, convergence rebase, and docs_audit cycle-1 fixes.
+- Scope: 6 slices covering manifest sweep, dedicated Aspire pages, #1642 detached start how-to, observability/skills/reference/README/CONTRIBUTING update, terminology normalisation (#1000), diagram review, asset generation/gates, convergence rebase, docs_audit fixes, and main #1772 reconcile.
 - Manifest coverage: 121 of 121 S11-owned manifest rows evaluated and recorded in `manifest-disposition.md` (0 deferred).
-- Status: Docs audit cycle-1 fixes applied (H1–H7, M1–M5). All quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume site build) verified green.
+- Status: Reconciled with main #1772. All quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume site build) verified green.
+
 
 
