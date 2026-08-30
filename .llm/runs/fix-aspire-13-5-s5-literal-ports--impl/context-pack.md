@@ -12,9 +12,9 @@
 
 ## Current State
 
-Slices 1-6 are pushed on draft PR #1740. Supervisor Tier-A review requested the bounded slice-7
-evidence correction; slice 7 is complete at the branch head with full local validation recorded in
-the run receipt and PR commit trail.
+Slices 1-7 are pushed on draft PR #1740. Separate-session IMPL-EVAL cycle 1 returned `FAIL_FIX` for
+one configured-lint defect in the auth/triggers public modules. Slice 8 removes those two dead
+import bindings while preserving direct deprecated re-exports; its requested local gates are green.
 
 ## Completed
 
@@ -28,15 +28,18 @@ the run receipt and PR commit trail.
 - Tier-A fixes revert grep-driven generated-source/numeric respelling, align the generated exclusion,
   and deprecate the retained auth/triggers compatibility constants under the shared 0.0.8 draft.
 - Slice-7 full gates are green/baseline; receipt: `receipts/07-tier-a-fixes.txt`.
+- Slice 8 resolves evaluator finding F-1 with direct auth/triggers public re-exports and a green
+  configured repository lint receipt: `receipts/08-configured-lint.txt`.
 
 ## In Progress
 
-- Implementation lane complete; independent supervisor rereview is next.
+- Slice 8 is ready to commit, push, and hand back for independent IMPL-EVAL cycle 2.
 
 ## Next Steps
 
-1. Independent Fable 5 supervisor rereviews slice 7 and owns IMPL-EVAL.
-2. Runtime validation remains CI `scaffold.runtime` after the supervisor-controlled ready transition.
+1. Push slice 8 and post its immutable SHA + lint receipt on PR #1740.
+2. Independent Fable 5 supervisor owns IMPL-EVAL cycle 2.
+3. Runtime validation remains CI `scaffold.runtime` after the supervisor-controlled ready transition.
 
 ## Key Decisions
 
@@ -53,7 +56,7 @@ the run receipt and PR commit trail.
 | `.llm/tools/validation/check-aspire-host-ports_test.ts` | changed | RED contribution and literal-grep tests. |
 | `.llm/runs/fix-aspire-13-5-s5-literal-ports--impl/` | new | Harness evidence and resumability. |
 | `.llm/tools/generate-cli-assets-barrel.ts` | changed | Tier-A revert restores content-agnostic serialization. |
-| `plugins/auth`, `plugins/triggers` | changed | Deprecated compatibility contracts and surface-only tests. |
+| `plugins/auth`, `plugins/triggers` | changed | Deprecated compatibility contracts; direct public re-exports without dead bindings. |
 
 ## Gates
 
@@ -64,6 +67,7 @@ the run receipt and PR commit trail.
 | Runtime | CI deferred | S2 live receipts + future CI `scaffold.runtime` |
 | Consumer | auth/sagas/triggers publish and doc baselines re-proven | slice 7 receipt |
 | Scaffold | `scaffold.plugins` 17/17 | slice 7 receipt |
+| Configured lint | 2,047 files / 36 batches / zero findings | slice 8 receipt |
 
 ## Open Questions
 
@@ -77,5 +81,5 @@ the run receipt and PR commit trail.
 ## Commits
 
 - Slices 1-6: `e83659d78`, `24817a404`, `aae91586b`, `8aee17462`, `732337435`, `13375bfc0`.
-- Slice 7 is the current branch-head commit; see `receipts/07-tier-a-fixes.txt` and the PR comment
-  for its immutable SHA.
+- Slice 7: `1634a3c3c`; see `receipts/07-tier-a-fixes.txt` and the PR comment.
+- Slice 8 is pending its immutable commit SHA; see `receipts/08-configured-lint.txt`.

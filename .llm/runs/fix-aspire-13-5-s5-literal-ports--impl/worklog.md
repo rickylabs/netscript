@@ -47,6 +47,7 @@
 | 5 | Describe-derived E2E probes | E2E unit/static gates | CLI E2E scaffold gates |
 | 6 | Generated assets and merge evidence | full requested gate set except runtime | generated/run artifacts |
 | 7 | Tier-A evidence correction | honest grep + full slice-6 gate set | generator, compatibility constants/tests, run artifacts |
+| 8 | IMPL-EVAL configured-lint correction | configured repository lint + focused doctrine/unit gates | auth/triggers public modules, run artifacts |
 
 ### Deferred Scope
 
@@ -79,6 +80,9 @@ required, and expose cross-resource URLs through resource-reference environment 
 | 2026-08-30 | 7 | Tier-A fixes | Reverted grep-driven source respelling; aligned generated exclusions; deprecated auth/triggers constants. |
 | 2026-08-30 | 7 | full gates | Static, asset, doctrine, plugin, JSR, and `scaffold.plugins` gates are green/baseline. |
 | 2026-08-30 | 7 | handoff | Explicit branch refspec and PR evidence comment carry the immutable slice SHA. |
+| 2026-08-30 | 8 | evaluator finding | F-1 reproduced: configured repository lint found two dead default-port import bindings. |
+| 2026-08-30 | 8 | direct re-exports | Auth/triggers retain deprecated public constants without local import bindings. |
+| 2026-08-30 | 8 | configured gates | Repository lint, quality, architecture, and auth/triggers unit suites are green/baseline. |
 
 ## Decisions
 
@@ -103,6 +107,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | --- | --- | --- | --- |
 | S5 literal grep | exact issue command | FAIL / raw exit `1` | RED-first test lists shipped literals. |
 | corrected S5 literal grep | excludes `*.generated.ts` | PASS / exit `0` | Six compatibility-contract hits only. |
+| configured repository lint (S8) | `deno task lint` | PASS / exit `0` | 2,047 files, 36 batches, zero findings. |
 
 ### Fitness Gates
 
@@ -134,6 +139,7 @@ required, and expose cross-resource URLs through resource-reference environment 
 | affected plugin JSR dry-runs | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | Auth/sagas/triggers green with baseline dynamic-import warnings only. |
 | affected plugin doc surfaces | BASELINE | `receipts/07-tier-a-fixes.txt` | No missing JSDoc; existing private-type-ref diagnostics only. |
 | all official plugin suites (S7) | PASS / exit `0` | `receipts/07-tier-a-fixes.txt` | 215 passed, 13 intentionally ignored, 0 failed. |
+| auth/triggers public compatibility (S8) | PASS / exit `0` | `receipts/08-configured-lint.txt` | Public-port imports resolve; full suites have zero failures. |
 
 ### Scaffold Gates
 
@@ -144,5 +150,5 @@ required, and expose cross-resource URLs through resource-reference environment 
 
 ## Handoff Notes
 
-- All seven implementation slices are complete. The supervisor owns the slice-7 rereview, IMPL-EVAL, ready-state transition,
-  and CI `scaffold.runtime`; this lane does not self-certify.
+- All eight implementation slices are complete locally. The supervisor owns IMPL-EVAL cycle 2,
+  ready-state transition, and CI `scaffold.runtime`; this lane does not self-certify.

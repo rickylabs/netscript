@@ -6,7 +6,6 @@
 
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import {
-  TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
   TRIGGERS_PLUGIN_VERSION,
@@ -88,8 +87,8 @@ const triggersManifest: PluginManifest = definePlugin(
 /** Plugin manifest for NetScript triggers. */
 export const triggersPlugin: PluginManifest = triggersManifest;
 
+export { TRIGGERS_API_DEFAULT_PORT } from '../constants.ts';
 export {
-  TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
   TRIGGERS_PLUGIN_VERSION,
