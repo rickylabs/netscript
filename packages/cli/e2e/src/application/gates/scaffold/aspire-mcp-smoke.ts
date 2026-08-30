@@ -43,6 +43,7 @@ export const ASPIRE_MCP_SMOKE_TIMEOUTS: AspireMcpTimeouts = {
   toolCallMs: 30_000,
   wholeGateMs: 120_000,
 };
+export const ASPIRE_MCP_SMOKE_OUTER_TIMEOUT_MS = ASPIRE_MCP_SMOKE_TIMEOUTS.wholeGateMs + 20_000;
 
 /** Register the structured Aspire MCP smoke after runtime waits and before cleanup. */
 export function createAspireMcpSmokeGate(): CommandGateDefinition {
@@ -68,7 +69,7 @@ export function createAspireMcpSmokeGate(): CommandGateDefinition {
       generatedAppName(context),
       context.request.suiteId.replaceAll('.', '-'),
     ],
-    timeoutMs: ASPIRE_MCP_SMOKE_TIMEOUTS.wholeGateMs,
+    timeoutMs: ASPIRE_MCP_SMOKE_OUTER_TIMEOUT_MS,
     failureClass: 'assertion',
     skip: {
       exitCode: ASPIRE_MCP_SMOKE_SKIP_EXIT_CODE,

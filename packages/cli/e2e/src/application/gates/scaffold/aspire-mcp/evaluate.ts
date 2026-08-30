@@ -14,6 +14,7 @@ import {
   matchingAppHosts,
   realPath,
   resourceEvidence,
+  structuredLogEvidence,
 } from './evidence.ts';
 import { partialReceipt, redactTranscript } from './receipt.ts';
 import {
@@ -34,11 +35,22 @@ export async function runAspireMcpSmoke(
   let toolsListMs = 0;
   let exit: AspireMcpExit = { code: null, signal: null, graceful: false };
   let transcript: readonly unknown[] = [];
+  let serverInfo: AspireMcpSmokeReceipt['serverInfo'] = { name: '', version: '' };
+  let toolsObserved: readonly string[] = [];
+  let toolsMissing: readonly string[] = ASPIRE_MCP_EXPECTED_TOOLS;
+  let toolsExtra: readonly string[] = [];
+  let baselineDiff: AspireMcpSmokeReceipt['baselineDiff'] = { added: [], removed: [] };
+  let doctor: AspireMcpSmokeReceipt['doctor'] = {
+    cliVersion: '',
+    currentVersion: '',
+    summary: { passed: 0, warnings: 0, failed: 0 },
+  };
+  let structuredLogs: AspireMcpSmokeReceipt['structuredLogs'] = { entryCount: 0, isError: false };
   const wholeDeadline = performance.now() + dependencies.timeouts.wholeGateMs;
   const stageTimeout = (timeoutMs: number): number =>
     Math.max(1, Math.min(timeoutMs, Math.round(wholeDeadline - performance.now())));
   try {
-    const initialized = await timed(
+    serverInfo = await timed(
       'initialize',
       stageTimeout(dependencies.timeouts.initializeMs),
       async () => {
@@ -48,10 +60,10 @@ export async function runAspireMcpSmoke(
         return serverInfo;
       },
     );
-    assertVersion('serverInfo.version', initialized.version, input.scaffoldPin);
+    assertVersion('serverInfo.version', serverInfo.version, input.scaffoldPin);
     assertVersion('aspire --version', input.cliVersion, input.scaffoldPin);
 
-    const toolsObserved = await timed(
+    toolsObserved = await timed(
       'tools/list',
       stageTimeout(dependencies.timeouts.toolsListMs),
       async () => {
@@ -61,10 +73,9 @@ export async function runAspireMcpSmoke(
         return tools;
       },
     );
-    const toolsMissing = ASPIRE_MCP_EXPECTED_TOOLS.filter((name) => !toolsObserved.includes(name));
-    if (toolsMissing.length > 0) {
-      throw new Error(`Aspire MCP tools missing: ${toolsMissing.join(', ')}`);
-    }
+    toolsMissing = ASPIRE_MCP_EXPECTED_TOOLS.filter((name) => !toolsObserved.includes(name));
+    toolsExtra = toolsObserved.filter((name) => !ASPIRE_MCP_EXPECTED_TOOLS.includes(name));
+    baselineDiff = diffAspireMcpTools(toolsObserved, ASPIRE_MCP_BASELINE_TOOLS);
 
     const apphosts = appHostEvidence(
       await call(primary, 'list_apphosts', {}, stageTimeout(dependencies.timeouts.toolCallMs)),
@@ -81,11 +92,14 @@ export async function runAspireMcpSmoke(
       );
     }
 
-    const doctor = doctorEvidence(
+    doctor = doctorEvidence(
       await call(primary, 'doctor', {}, stageTimeout(dependencies.timeouts.toolCallMs)),
     );
     if (doctor.cliVersion !== 'pass') throw new Error('Aspire MCP doctor cli-version did not pass');
     assertVersion('doctor currentVersion', doctor.currentVersion, input.scaffoldPin);
+    if (toolsMissing.length > 0) {
+      throw new Error(`Aspire MCP tools missing: ${toolsMissing.join(', ')}`);
+    }
 
     const resources = resourceEvidence(
       await call(primary, 'list_resources', {}, stageTimeout(dependencies.timeouts.toolCallMs)),
@@ -114,7 +128,14 @@ export async function runAspireMcpSmoke(
     if (logCount(usersLogs) < 1) {
       throw new Error(`${input.serviceResource} returned no console logs`);
     }
-    await call(primary, 'list_structured_logs', {}, stageTimeout(dependencies.timeouts.toolCallMs));
+    structuredLogs = structuredLogEvidence(
+      await call(
+        primary,
+        'list_structured_logs',
+        {},
+        stageTimeout(dependencies.timeouts.toolCallMs),
+      ),
+    );
     const described = await dependencies.describeResources();
     const describeListsExcluded = expectedMcpExcluded.every((name) => described.includes(name));
     const visibilityOk = observedMcpVisible.length === expectedVisible.length &&
@@ -161,13 +182,13 @@ export async function runAspireMcpSmoke(
       cliVersion: input.cliVersion,
       scaffoldPin: input.scaffoldPin,
       entryPoint: input.entryPoint,
-      serverInfo: initialized,
+      serverInfo,
       appHost: { path: expectedPath, inScope: true, selected: true },
       toolsExpected: ASPIRE_MCP_EXPECTED_TOOLS,
       toolsObserved,
       toolsMissing,
-      toolsExtra: toolsObserved.filter((name) => !ASPIRE_MCP_EXPECTED_TOOLS.includes(name)),
-      baselineDiff: diffAspireMcpTools(toolsObserved, ASPIRE_MCP_BASELINE_TOOLS),
+      toolsExtra,
+      baselineDiff,
       doctor,
       visibility: {
         expectedVisible,
@@ -178,6 +199,7 @@ export async function runAspireMcpSmoke(
         ok: visibilityOk,
       },
       redaction: { secretParamsNull, plaintextLeak },
+      structuredLogs,
       lifecycle: { initializeMs, toolsListMs, exit },
       dashboardOnlyTools: dashboardTools,
       transcript: input.transcript,
@@ -189,7 +211,15 @@ export async function runAspireMcpSmoke(
     exit = await primary.close().catch(() => exit);
     transcript = primary.transcript();
     await dependencies.persist(
-      partialReceipt(input, dependencies, initializeMs, toolsListMs, exit),
+      partialReceipt(input, dependencies, initializeMs, toolsListMs, exit, {
+        serverInfo,
+        toolsObserved,
+        toolsMissing,
+        toolsExtra,
+        baselineDiff,
+        doctor,
+        structuredLogs,
+      }),
       redactTranscript(transcript, input),
     );
     throw error;

@@ -3,7 +3,10 @@ import {
   ASPIRE_MCP_BASELINE_TOOLS,
   ASPIRE_MCP_DASHBOARD_TOOLS,
   ASPIRE_MCP_EXPECTED_TOOLS,
+  ASPIRE_MCP_SMOKE_OUTER_TIMEOUT_MS,
+  ASPIRE_MCP_SMOKE_TIMEOUTS,
   type AspireMcpSmokeDependencies,
+  type AspireMcpSmokeReceipt,
   type AspireMcpTransport,
   diffAspireMcpTools,
   runAspireMcpSmoke,
@@ -20,6 +23,11 @@ interface RecordedFixture {
   readonly structuredLogs: unknown;
   readonly dashboardTools: readonly string[];
   readonly transcript: readonly unknown[];
+}
+
+interface PersistedEvidence {
+  readonly receipt: AspireMcpSmokeReceipt;
+  readonly transcriptEntries: readonly unknown[];
 }
 
 const fixture: RecordedFixture = JSON.parse(
@@ -49,7 +57,7 @@ function transport(
 function dependencies(
   primary: AspireMcpTransport,
   dashboard: AspireMcpTransport,
-  persisted: unknown[] = [],
+  persisted: PersistedEvidence[] = [],
 ): AspireMcpSmokeDependencies {
   let index = 0;
   return {
@@ -131,6 +139,42 @@ Deno.test('Aspire MCP smoke records the exact baseline delta and both-tier visib
   assertEquals(receipt.visibility.observedMcpExcluded, ['postgres-cli']);
   assertEquals(receipt.visibility.describeListsExcluded, true);
   assertEquals(receipt.visibility.ok, true);
+  assertEquals(receipt.structuredLogs, { entryCount: 0, isError: false });
+});
+
+Deno.test('Aspire MCP outer timeout leaves room to persist an inner-deadline receipt', () => {
+  assert(ASPIRE_MCP_SMOKE_OUTER_TIMEOUT_MS > ASPIRE_MCP_SMOKE_TIMEOUTS.wholeGateMs);
+  assert(
+    ASPIRE_MCP_SMOKE_OUTER_TIMEOUT_MS >
+      ASPIRE_MCP_SMOKE_TIMEOUTS.initializeMs + ASPIRE_MCP_SMOKE_TIMEOUTS.toolsListMs +
+        ASPIRE_MCP_SMOKE_TIMEOUTS.toolCallMs,
+  );
+});
+
+Deno.test('14-tool assertion failure persists the complete observed surface and doctor', async () => {
+  const persisted: PersistedEvidence[] = [];
+  await assertRejects(
+    () =>
+      runAspireMcpSmoke(
+        input(),
+        dependencies(
+          transport(fixture.tools, { list_apphosts: fixture.apphosts, doctor: fixture.doctor }),
+          transport([], {}),
+          persisted,
+        ),
+      ),
+    Error,
+    'get_integration_docs',
+  );
+  assertEquals(persisted.length, 1);
+  const receipt = persisted[0].receipt;
+  assertEquals(receipt.toolsObserved, fixture.tools);
+  assertEquals(receipt.toolsObserved.length, 14);
+  assertEquals(receipt.toolsMissing, ['get_integration_docs']);
+  assertEquals(receipt.toolsExtra, []);
+  assertEquals(receipt.baselineDiff, { added: [], removed: [] });
+  assertEquals(receipt.serverInfo, fixture.initialize.serverInfo);
+  assertEquals(receipt.doctor.summary, { passed: 6, warnings: 4, failed: 0 });
 });
 
 Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secrets', async () => {
@@ -144,7 +188,7 @@ Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secr
 });
 
 Deno.test('Aspire MCP timeout rejects after persisting a partial receipt', async () => {
-  const persisted: unknown[] = [];
+  const persisted: PersistedEvidence[] = [];
   const stalled: AspireMcpTransport = {
     initialize: () => new Promise(() => undefined),
     listTools: () => Promise.resolve([]),
