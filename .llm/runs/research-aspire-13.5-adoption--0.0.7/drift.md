@@ -1554,3 +1554,12 @@
   Zero proof clean (leak-check survivors `[]`); relay `s8-phase-b` torn down, host zero 18:54:49Z.
   **Rerun after S6/S8 converge on main with S1's pins — per the parent-gates rule, no retry
   unchanged.**
+- **D-79 — hosted `e2e-cli.yml` dispatches cancel each other (concurrency group): serialize.** S4
+  run 33328751758 (both runtime tiers) and S5 run 33328889522 (sqlite tier) ended `cancelled`, as
+  did the proof run 33328972788's postgres tier — cancellations by my own subsequent dispatches, not
+  failures. **Rule: one hosted e2e dispatch at a time; queue = S3 (33329358883, running) → S4 → S5 →
+  proof rerun.** S1's run 33328727942 completed before the pile-up (D-77 67/1). Proof run
+  33328972788 sqlite tier: 53 gates PASS (S10's DTO-complete parser cleared `runtime.aspire-start`,
+  restart, waits) then S9's `agent.aspire-mcp-smoke` FAIL, MCP -32603 "The Aspire Dashboard is not
+  available in the running AppHost"; cleanup passed — dashboard/MCP discovery, S9 ownership,
+  diagnosis in progress; no unchanged retry.
