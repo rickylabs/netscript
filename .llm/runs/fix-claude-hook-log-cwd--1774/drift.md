@@ -42,3 +42,20 @@ Drift is append-only.
 - **Evidence:** Amended `plan.md` narrows D1/Goal/Non-Scope and the decoy proof; PR #1775 acceptance
   evidence makes the same limitation explicit. Worktree-following output is deferred, and #1776
   separately tracks the unrelated `wslHome()` default defect.
+
+## 2026-08-30 — Fetched main advanced beyond the handoff SHA
+
+- **What:** The implementation handoff named `52a881c58842f521b7b253b9781a0b56ae897069` as current
+  inert `main`, while a fresh fetch resolved `origin/main` to
+  `9710a2898d4f0536752ab303b737e70411a4c399`.
+- **Source:** Raw `git fetch origin main` and `git rev-parse origin/main` during S3 bootstrap.
+- **Expected:** The named main SHA would still be the remote tip and would be inert under
+  `.claude/**` and `.llm/tools/agentic/**`.
+- **Actual:** The remote moved. Diffing the branch base through the fetched tip found only teardown
+  fixture/probe changes under `.llm/tools/agentic/teardown/**`; the owned hook surface
+  (`.claude/**`, `.llm/tools/agentic/claude/**`, `deno.json`, and the agentic README) has zero
+  drift.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** No rebase was performed, as explicitly required; the implementation continues on the
+  plan-evaluated base.

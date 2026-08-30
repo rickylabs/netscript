@@ -87,14 +87,17 @@ a new cwd/worktree case without changing production code.
 
 ## Progress Log
 
-| Time       | Slice     | Step       | Notes                                                                                                                     |
-| ---------- | --------- | ---------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-30 | Bootstrap | Activated  | Loaded required authorities; verified branch/baseline; pushed first commit and opened draft PR #1775.                     |
-| 2026-08-30 | Research  | Re-derived | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output pushed in `research.md`. |
-| 2026-08-30 | Plan      | Locked     | Combined settings/logger repair, granular permissions, RED→GREEN fixture, gate set, and sibling-defect deferral recorded. |
-| 2026-08-30 | Plan      | PR sync    | Updated draft body/comment and moved exactly one lifecycle label to `status:plan-eval`; REST fallback recorded in drift.  |
-| 2026-08-30 | PLAN-EVAL | Cycle 1    | `FAIL_PLAN` at `26102943`; evaluator artifact committed at `842816a2`; implementation remained stopped.                   |
-| 2026-08-30 | Plan      | Amendment  | Corrected launch-root semantics and pinned decoy, host-path, and #1776 contracts for cycle 2.                             |
+| Time       | Slice     | Step        | Notes                                                                                                                     |
+| ---------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-30 | Bootstrap | Activated   | Loaded required authorities; verified branch/baseline; pushed first commit and opened draft PR #1775.                     |
+| 2026-08-30 | Research  | Re-derived  | Both configured events pass at root and fail from nested cwd with `Module not found`; raw output pushed in `research.md`. |
+| 2026-08-30 | Plan      | Locked      | Combined settings/logger repair, granular permissions, RED→GREEN fixture, gate set, and sibling-defect deferral recorded. |
+| 2026-08-30 | Plan      | PR sync     | Updated draft body/comment and moved exactly one lifecycle label to `status:plan-eval`; REST fallback recorded in drift.  |
+| 2026-08-30 | PLAN-EVAL | Cycle 1     | `FAIL_PLAN` at `26102943`; evaluator artifact committed at `842816a2`; implementation remained stopped.                   |
+| 2026-08-30 | Plan      | Amendment   | Corrected launch-root semantics and pinned decoy, host-path, and #1776 contracts for cycle 2.                             |
+| 2026-08-30 | PLAN-EVAL | Cycle 2     | `PASS` at `2e5f50f0`; artifact-only verdict committed at `2cfc0b4c9`; both evaluator files remain bit-identical.          |
+| 2026-08-30 | S3        | RED fixture | Added live-settings coverage; root and decoys pass, while nested `PreToolUse` and `Stop` each fail before repair.         |
+| 2026-08-30 | S3        | Fmt nit     | Applied the cycle-2 `research.md` table fix and formatted all five files changed by this slice.                           |
 
 ## Decisions
 
@@ -108,42 +111,48 @@ a new cwd/worktree case without changing production code.
 
 ## Drift
 
-| Drift                                            | Severity    | Logged in drift.md |
-| ------------------------------------------------ | ----------- | ------------------ |
-| Owner-selected Codex medium planning session     | minor       | yes                |
-| `gh pr edit` over-fetched scopes; REST fallback  | minor       | yes                |
-| Active-worktree premise corrected to launch root | significant | yes                |
+| Drift                                              | Severity    | Logged in drift.md |
+| -------------------------------------------------- | ----------- | ------------------ |
+| Owner-selected Codex medium planning session       | minor       | yes                |
+| `gh pr edit` over-fetched scopes; REST fallback    | minor       | yes                |
+| Active-worktree premise corrected to launch root   | significant | yes                |
+| Fetched `origin/main` moved but hook surface inert | minor       | yes                |
 
 ## Gate Results
 
 ### Plan Gate
 
-| Gate                                                   | Result | Evidence                                               | Notes                         |
-| ------------------------------------------------------ | ------ | ------------------------------------------------------ | ----------------------------- |
-| Research current                                       | READY  | `research.md` raw root/nested output at exact baseline | Await evaluator confirmation. |
-| Decisions/open sweep/slices/risks/gates/deferred scope | READY  | Amended `plan.md`                                      | Await cycle-2 PLAN-EVAL.      |
-| jsr-audit                                              | N/A    | Non-package/plugin tooling                             | No published surface.         |
+| Gate                                                   | Result | Evidence                                               | Notes                        |
+| ------------------------------------------------------ | ------ | ------------------------------------------------------ | ---------------------------- |
+| Research current                                       | PASS   | `research.md` raw root/nested output at exact baseline | Cycle-2 evaluator confirmed. |
+| Decisions/open sweep/slices/risks/gates/deferred scope | PASS   | Amended `plan.md`; verdict `2cfc0b4c9`                 | Plan gate cleared.           |
+| jsr-audit                                              | N/A    | Non-package/plugin tooling                             | No published surface.        |
 
 ### Static Gates
 
-| Gate                     | Command or check                       | Result  | Notes                                       |
-| ------------------------ | -------------------------------------- | ------- | ------------------------------------------- |
-| Focused RED/GREEN        | Structured test wrapper                | NOT_RUN | Implementation prohibited before PLAN-EVAL. |
-| Check/lint/fmt/root test | Structured wrappers/tasks in `plan.md` | NOT_RUN | Implementation phase gates.                 |
+| Gate                    | Command or check                       | Result  | Notes                                                       |
+| ----------------------- | -------------------------------------- | ------- | ----------------------------------------------------------- |
+| Focused RED fixture     | Structured test wrapper                | RED     | Exit 1; 7 passed, 2 failed: nested `PreToolUse` and `Stop`. |
+| Decoy assertions        | Focused raw test                       | PASS    | Exit 0; both event decoys reached marker/exit assertions.   |
+| Changed-file formatting | Structured fmt wrapper                 | PASS    | Exit 0; all five S3 files included.                         |
+| Check/lint/root test    | Structured wrappers/tasks in `plan.md` | NOT_RUN | S4/S5 implementation gates.                                 |
 
 ### Fitness Gates
 
-| Gate                                         | Result  | Evidence                                 | Notes                                  |
-| -------------------------------------------- | ------- | ---------------------------------------- | -------------------------------------- |
-| Claude surface validator                     | NOT_RUN | `deno task agentic:check-claude` planned | Mandatory after changes.               |
-| No host path / no `any` / permission minimum | NOT_RUN | Fixture + focused review planned         | Executable assertions, not prose-only. |
+| Gate                              | Result  | Evidence                                 | Notes                              |
+| --------------------------------- | ------- | ---------------------------------------- | ---------------------------------- |
+| Claude surface validator          | NOT_RUN | `deno task agentic:check-claude` planned | Mandatory after changes.           |
+| No host path / permission minimum | PASS    | S3 fixture assertions                    | Exact owned-file/config contracts. |
+| No `any`                          | NOT_RUN | S5 source scan planned                   | Full owned surface after repair.   |
 
 ### Runtime Gates
 
-| Gate                                                 | Result  | Evidence                 | Notes                 |
-| ---------------------------------------------------- | ------- | ------------------------ | --------------------- |
-| Actual launch-root/nested/temp-decoy child processes | NOT_RUN | S3/S4 fixture            | Both events required. |
-| Aspire/Docker/browser/scaffold                       | N/A     | Scope and lease boundary | Must not run.         |
+| Gate                                 | Result  | Evidence                 | Notes                          |
+| ------------------------------------ | ------- | ------------------------ | ------------------------------ |
+| Actual launch-root child processes   | PASS    | S3 fixture: both events  | Exit 0 and active-root record. |
+| Actual nested-cwd child processes    | RED     | S3 fixture: both events  | Exit 1, `Module not found`.    |
+| Reachable temp-decoy child processes | PASS    | S3 fixture: both events  | Marker present; exit 73.       |
+| Aspire/Docker/browser/scaffold       | NOT_RUN | Scope and lease boundary | Must remain not run.           |
 
 ### Consumer Gates
 
@@ -153,9 +162,7 @@ a new cwd/worktree case without changing production code.
 
 ## Handoff Notes
 
-- One cycle-2 PLAN-EVAL must be performed by a separate native Claude/Fable session dispatched by
-  the supervisor; this Codex session does not evaluate its own amendment.
-- Inspect cycle-1 F1–F4 against amended D1/D8/D9, the launch-root-only Non-Scope, the exact six-file
-  host-path assertion, and the #1776 handoff pointer. Everything else in D1–D10 stands.
+- Cycle-2 PLAN-EVAL passed in the separate evaluator session; implementation is authorized.
+- S3 must remain an independent pushed RED commit before S4 changes the configured handlers.
 - #1776 owns the deferred `wslHome()` `/home/codex` launcher defect for milestone 0.0.8.
-- Do not implement or edit the evaluator-owned `plan-eval.md` in this session.
+- Do not edit either evaluator-owned plan-eval file or launch/simulate IMPL-EVAL in this session.

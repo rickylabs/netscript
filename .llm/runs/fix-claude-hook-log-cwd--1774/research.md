@@ -56,17 +56,17 @@ invocation reached the logger.
 
 ## Findings
 
-| # | Finding | How to verify |
-| --- | --- | --- |
-| 1 | `PreToolUse` and `Stop` carry the identical relative shell-form command. | `.claude/settings.json` |
-| 2 | The logger writes `.llm/tmp/claude/hooks/<run-id>/events.jsonl` relative to `Deno.cwd()`, so changing only the executable path would still misplace output. | `.llm/tools/agentic/claude/claude-hook-log.ts` (`outDir`) |
-| 3 | Claude Code exports `CLAUDE_PROJECT_DIR` as the session launch root and substitutes `${CLAUDE_PROJECT_DIR}` in command/args. It does not follow `EnterWorktree`; official guidance prefers exec form when a hook references a path placeholder. | [Claude Code hooks reference](https://code.claude.com/docs/en/hooks#reference-scripts-by-path); cycle-1 PLAN-EVAL verification |
-| 4 | Installed Claude Code is `2.1.251`, which supports the documented exec-form command/args surface. | `claude --version` |
-| 5 | The current hook needs only three environment reads (`CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID`) and writes only beneath the session launch root's hook-log directory. It does not need runtime read permission. | Granular permission probe below; logger source |
-| 6 | `.llm/tools/agentic/claude/validate-claude-surface.ts` is the mandatory Claude-surface gate and currently checks JSON, skill sync, and that three root-cwd logger runs leave `deno.lock` unchanged. It does not cover nested cwd or configured-command fidelity. | `CLAUDE.md`; validator source |
-| 7 | There is no focused hook test today. Existing Claude launcher tests are separate and do not exercise `.claude/settings.json`. | `find .llm/tools/agentic/claude`; focused `rg Deno.test` |
-| 8 | `/home/codex` is absent, while `wslHome()` still defaults through `wslUser() === "codex"` to `/home/codex`; the existing unit test explicitly preserves that historical default. | `test ! -e /home/codex`; `agentic-lib.ts`; `agentic-lib_test.ts` |
-| 9 | No relevant open architecture-debt entry covers Claude hook path resolution. | focused scan of `.llm/harness/debt/arch-debt.md` |
+| # | Finding                                                                                                                                                                                                                                                          | How to verify                                                                                                                  |
+| - | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | `PreToolUse` and `Stop` carry the identical relative shell-form command.                                                                                                                                                                                         | `.claude/settings.json`                                                                                                        |
+| 2 | The logger writes `.llm/tmp/claude/hooks/<run-id>/events.jsonl` relative to `Deno.cwd()`, so changing only the executable path would still misplace output.                                                                                                      | `.llm/tools/agentic/claude/claude-hook-log.ts` (`outDir`)                                                                      |
+| 3 | Claude Code exports `CLAUDE_PROJECT_DIR` as the session launch root and substitutes `${CLAUDE_PROJECT_DIR}` in command/args. It does not follow `EnterWorktree`; official guidance prefers exec form when a hook references a path placeholder.                  | [Claude Code hooks reference](https://code.claude.com/docs/en/hooks#reference-scripts-by-path); cycle-1 PLAN-EVAL verification |
+| 4 | Installed Claude Code is `2.1.251`, which supports the documented exec-form command/args surface.                                                                                                                                                                | `claude --version`                                                                                                             |
+| 5 | The current hook needs only three environment reads (`CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID`) and writes only beneath the session launch root's hook-log directory. It does not need runtime read permission.                              | Granular permission probe below; logger source                                                                                 |
+| 6 | `.llm/tools/agentic/claude/validate-claude-surface.ts` is the mandatory Claude-surface gate and currently checks JSON, skill sync, and that three root-cwd logger runs leave `deno.lock` unchanged. It does not cover nested cwd or configured-command fidelity. | `CLAUDE.md`; validator source                                                                                                  |
+| 7 | There is no focused hook test today. Existing Claude launcher tests are separate and do not exercise `.claude/settings.json`.                                                                                                                                    | `find .llm/tools/agentic/claude`; focused `rg Deno.test`                                                                       |
+| 8 | `/home/codex` is absent, while `wslHome()` still defaults through `wslUser() === "codex"` to `/home/codex`; the existing unit test explicitly preserves that historical default.                                                                                 | `test ! -e /home/codex`; `agentic-lib.ts`; `agentic-lib_test.ts`                                                               |
+| 9 | No relevant open architecture-debt entry covers Claude hook path resolution.                                                                                                                                                                                     | focused scan of `.llm/harness/debt/arch-debt.md`                                                                               |
 
 ## Permission probe
 
@@ -87,12 +87,12 @@ with `${CLAUDE_PROJECT_DIR}`, never a host path.
 
 ## Option analysis
 
-| Option | Worktree portability | Cost / defect coverage | Research verdict |
-| --- | --- | --- | --- |
-| Settings only | Strong when it uses `${CLAUDE_PROJECT_DIR}` | Loads the correct script, but current logger still writes relative to turn cwd. | Reject as incomplete. |
-| Hook script only | Can anchor output after it starts | Cannot repair a relative entrypoint that Deno fails to load. | Reject as impossible alone. |
-| New wrapper | Can change cwd and launch the logger | Adds another executable/config seam and a helper whose only job is path indirection. | Reject under A6/A7. |
-| Exec-form settings + logger launch-root output | Uses Claude's documented session launch-root contract; does not follow `EnterWorktree` | Smallest complete repair for #1774's nested-cwd defect; settings selects the launch checkout and script anchors output there. | Preferred for the plan. |
+| Option                                         | Worktree portability                                                                   | Cost / defect coverage                                                                                                        | Research verdict            |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| Settings only                                  | Strong when it uses `${CLAUDE_PROJECT_DIR}`                                            | Loads the correct script, but current logger still writes relative to turn cwd.                                               | Reject as incomplete.       |
+| Hook script only                               | Can anchor output after it starts                                                      | Cannot repair a relative entrypoint that Deno fails to load.                                                                  | Reject as impossible alone. |
+| New wrapper                                    | Can change cwd and launch the logger                                                   | Adds another executable/config seam and a helper whose only job is path indirection.                                          | Reject under A6/A7.         |
+| Exec-form settings + logger launch-root output | Uses Claude's documented session launch-root contract; does not follow `EnterWorktree` | Smallest complete repair for #1774's nested-cwd defect; settings selects the launch checkout and script anchors output there. | Preferred for the plan.     |
 
 ## Fixture shape
 
@@ -115,8 +115,8 @@ both events plus worktree discrimination.
 
 ## jsr-audit surface scan (package/plugin waves)
 
-N/A: this is repository-owned Claude hook tooling and does not change a published package or
-plugin surface.
+N/A: this is repository-owned Claude hook tooling and does not change a published package or plugin
+surface.
 
 ## Scope conclusion
 
@@ -131,5 +131,5 @@ plugin surface.
 
 ## Open questions
 
-None that would force implementation rework. The plan must lock the combined settings/script
-repair, granular permissions, unchanged RED→GREEN fixture, and the exact structured gate set.
+None that would force implementation rework. The plan must lock the combined settings/script repair,
+granular permissions, unchanged RED→GREEN fixture, and the exact structured gate set.
