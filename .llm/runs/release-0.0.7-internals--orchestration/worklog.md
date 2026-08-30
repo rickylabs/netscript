@@ -3883,3 +3883,70 @@ is plausible, and that is precisely the case D14 exists to route to rescope rath
 exemptions. I will compare the committed I3 census against these numbers, and specifically check that
 the census commit **precedes** the repair commit in real history — a census recomputed after repairs
 would satisfy D14's letter and defeat its purpose.
+
+## 2026-08-30 — #1747 runtime gate FIRED under coordinator lease: exit 1, gate 4 NOT satisfied
+
+Lease granted exclusively for PR #1747 at exact head `c1e03922ad02416ea31219df94422f062ac33690`.
+Single one-pass command, not split:
+
+```
+~/.local/bin/mise exec -- deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+RAW EXIT: 1 · passed=26 failed=1 skipped=0
+```
+
+### A first attempt that produced no verdict
+
+The literal `mise exec -- …` form exited **127**, `bash: command not found` — `mise` is a broken shell
+function in non-interactive bash here. **Nothing ran.** Reported as a launcher failure, not a red;
+calling exit 127 a gate result would have been a false verdict against the leaf. Re-fired unchanged
+through `~/.local/bin/mise`.
+
+### The failure
+
+`generated.quality-negative` (*Prove every generated quality surface with deliberate failures*),
+FAILED 59,990 ms, `Command exited 1; expected 0`, root cause `TS2345` at
+`packages/fresh/src/application/query/hydration.ts:43` — `DehydratedState` not assignable to
+`Partial<DehydratedState>` because `mutations` is `readonly unknown[]`. That is **#1734** verbatim,
+whose fix is parked in **PR #1736**.
+
+Attribution proved, not asserted: `git diff 13878a80..c1e03922 -- packages/fresh` is **empty**; this
+PR's whole scope is seven files under `packages/aspire` and `packages/cli`.
+
+**But a pre-existing cause does not convert an unsatisfied gate into a satisfied one.** Gate 4 is
+**not** satisfied, and the coordinator recorded it as a real pre-merge blocker.
+
+### A claim of mine I withdrew publicly
+
+My first verdict comment (`5468717950`) said the suite "executed through the runtime fixture stages
+without a fixture error," offered as reassurance about this PR's `prepare-flow-b-fixture.ts` rewrite.
+**Wrong framing, withdrawn in `5468721384`.** The run stopped at `generated.quality-negative`
+**before** the downstream flow-B fixture executed. The fixture never ran, so no-failure is not
+evidence of success — it is no evidence at all. **A check that did not run is not a check that
+passed.** The F1 fixture repair is therefore still unproven under the runtime gate.
+
+That is the same error class I have been cataloguing all session, and the second time in two turns it
+was mine: the first was concluding "one defect survives" from a disproved mechanism, this is reading
+an unreached test as a passing one.
+
+### Status moved and head preserved
+
+PR **#1747** and issue **#1732**: `status:ready-merge` → **`status:ci-fail`**, exactly one `status:`
+label each, via REST (`gh pr edit` lacks `read:org` on this token). Head **unchanged** at
+`c1e03922ad02416ea31219df94422f062ac33690`, worktree clean, no product file modified.
+**Not merged, and not to be merged until #1734 unblocks and the full one-pass suite succeeds.**
+
+### Owned cleanup — final zero proof, lease released
+
+| Probe | Result |
+| --- | --- |
+| `aspire ps` | No running AppHost |
+| containers / volumes | **0 / 0** |
+| networks | `bridge host none` only |
+| `aspire-managed` / `dcp-controller` / `dotnet` runtime processes | **none** — the grep matches were another lane's brief *text* and my own shells |
+| `.llm/tmp/cli-e2e` | **534 MB removed**, 0 entries |
+| leaf worktree | 0 changed files, head unmoved |
+
+Runtime lease **released** after that proof. Pre-existing gate receipts under `.llm/tmp/` were left
+untouched; only my own run scratch was deleted.
+
+`#1533` continued throughout without a runtime lease and was never blocked by this.
