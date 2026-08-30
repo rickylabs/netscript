@@ -27,7 +27,7 @@ run, with the sole README-standard red independently reproduced on clean current
 - Proved the changelog feeds neither the agent-docs corpus nor publish-assets generators.
 - Selected the docs overlay, gates, one commit slice, and formal PLAN-EVAL.
 - Repaired cycle-1 findings by re-triaging embedded `agent init` tools and locking an eleven-bullet map.
-- Repaired cycle-2 findings by disclosing all five SDK/contracts breaks and the installed scanner's new permission requirement.
+- Repaired cycle-2 findings by disclosing all five SDK/contracts breaks and the installed scanner's widened permission **declaration** (`read` -> `read,env,net`). An Augment review later established that describing it as a *requirement* was false — env access is optional and network access is conditional — and `3befc1e2` corrected the changelog wording accordingly.
 - Recorded the authorized post-escalation `PASS_PLAN` and reconciled all four post-snapshot commits.
 - Added `## 0.0.7` from the locked eleven-row map without a release introduction or version bump.
 

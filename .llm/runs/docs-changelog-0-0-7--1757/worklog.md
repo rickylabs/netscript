@@ -63,7 +63,7 @@ repeat the same consumer-observability test, and add plain bullets without inter
 | `01e09604` | Include | Generated workspace quality runner gains `--skip-apphost`, while installed tool wrappers gain atomic report output and generated-directory exclusions. |
 | `dd472102` | Exclude | Harness evidence/verdict diagnostics only. |
 | `0b3ed5d5` | Include | `plugin auth session list` now requires an explicit streams URL instead of assuming localhost. |
-| `473e8d75` | Include | The shipped `agent init` scanner adds public-API quality rules and fail-closed allowance-owner verification, including its required env/network permission. |
+| `473e8d75` | Include | The shipped `agent init` scanner adds public-API quality rules and fail-closed allowance-owner verification, and its declared permission set widens from `read` to `read,env,net`. The declaration is not a runtime requirement: `optionalGitHubToken` catches an env denial and runs anonymously, and the network call happens only when a `quality-allow` issue must be resolved. |
 | `da574111` | Include | Generated database workspaces now emit provider-specific helpers, truthful seeds, and defined missing-row behavior. |
 | `7737d890` | Exclude | Repository quality-scan coverage enforcement only. |
 | `e090f894` | Exclude | Positioning/comparison docs; no shipped behavior change. |

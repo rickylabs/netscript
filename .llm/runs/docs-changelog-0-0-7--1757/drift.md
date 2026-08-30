@@ -101,3 +101,28 @@
   explicitly historical evidence. The changelog prose remains untouched and provisional.
 - **Evidence:** `worklog.md ## Commit Triage`; `git diff-tree --name-only 952cc106`;
   `git diff-tree --name-only a5520e70`; focused prose diffs under `README.md` and `docs/site/**`.
+
+## 2026-08-30 — Superseded evidence corrected after the wording repair
+
+- **What:** `worklog.md`'s `473e8d75` triage row and `context-pack.md`'s Completed entry both still
+  described the scanner's widened permission *declaration* as a runtime *requirement*, contradicting
+  the repaired changelog wording in `3befc1e2`.
+- **Source:** coordinator review of the run artifacts after the repair landed.
+- **Expected:** run evidence agrees with the shipped prose.
+- **Actual:** two artifacts asserted "required env/network permission" after the changelog had
+  stopped claiming it.
+- **Severity:** minor (evidence-only; no product file affected)
+- **Action:** corrected both in place to say *declared*, with the optional-env / conditional-net facts
+  stated. The historical claim is not preserved verbatim because it was simply false; the drift entry
+  is the record.
+- **Evidence:** `.llm/tools/quality/scan-code-quality.ts:768-777` (`optionalGitHubToken` catches the
+  env denial); `createGitHubAllowanceIssueResolver` is the sole network call and is reached only when
+  resolving a `quality-allow` issue.
+
+## 2026-08-30 — `impl-eval.md` is superseded, not current
+
+- **What:** `impl-eval.md` records a `PASS` at `15c262e4`. That head is superseded by `3befc1e2`
+  (wording repair) and `cac095e1` (triage currency).
+- **Action:** treat it as historical. It must not be cited as the current verdict; the renewed
+  exact-head IMPL-EVAL supersedes it. Its finding that the *declaration* changed remains correct —
+  what it did not test was whether "needs" described a runtime requirement.
