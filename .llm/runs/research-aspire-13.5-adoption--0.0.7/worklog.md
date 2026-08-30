@@ -551,4 +551,7 @@ sole `status:ready-merge` on PR+#1713, `Closes #1713`, boxes 6/6. Runtime: `e2e-
 carried forward per audited zero-intersection delta — no re-run needed. Delta IMPL-EVAL PASS
 (`r3890336485`, session `9f1820c9…` Opus 5, after a Fable-quota deviation transparently recorded);
 review comment resolved; review-threads PASS (0 unanswered); close-gate rerun 33332251837 in flight.
-Coordinator lands the merge. |
+Coordinator lands the merge. | | S1 close-gate correction | First rerun 33332251837 FAIL: PR body
+had 2 more unchecked DoD lines (runtime-tiers-green, Tier-A/IMPL-EVAL-complete) beyond the one
+already ticked. Both ticked; live body verified zero `- [ ]` lines. Second close-gate rerun in
+flight — packet withheld until SUCCESS. |
