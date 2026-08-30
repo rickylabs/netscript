@@ -8715,3 +8715,56 @@ concurring/PASS verdicts.
 No other independent slice is queued in this lane right now — #1387 is the sole active leaf, and
 Slice 9 genuinely blocks nothing else until it lands (Slices 1–8 are all terminal; #1664 stays parked
 with no retry authorized). Continuing to watch Slice 9 rather than idling.
+
+## #1387 Slice 9 — reconciled, verified, certified (evidentiary gap found and closed); GLM 5.3 Flash IMPL-EVAL dispatched
+
+### Reconciliation
+
+Waited out two premature completion signals — the thread was still genuinely `working` both times
+(watcher confirmed via `worklog.md` writes and `codex-status`, not assumed). Reconciled only once
+the thread was truly idle: local, remote, and worktree all matched cleanly at `861bed05b` — content
+`582e82322` (documentation) → `3cb08103f` (a one-line generated-asset refresh) → `861bed05b`
+(Tier-A evidence commit).
+
+### Content review
+
+Sampled the tutorial in full and the service README's largest diff against the *actual* shipped code,
+not the plan's description of it. Confirmed genuinely: the path-matcher defect (research finding 14)
+is fixed — `.meta({access:...})` + `createContractAuthorizer()` is primary, `createScopeAuthorizer`
+retained and correctly repositioned as the legacy fallback; LD-8's error string is quoted verbatim
+from the real `contract-authorizer.ts` constant; LD-6's precedence includes a correct nuance beyond my
+brief's own wording ("a fallback can neither make a declared public procedure private nor weaken
+declared scopes or roles"); LD-11's accepted substitution is used throughout, not the issue's original
+compile-time wording.
+
+### A real evidentiary gap, found and closed rather than trusted
+
+The author's own diagnosis was half right: the bare unscoped `deno task check` (2941 files) hits a
+genuine, pre-existing `TS2551` on `packages/service/src/primitives/health.ts:184`
+(`Deno.openKv`) — **independently reproduced at the current head**, and confirmed unrelated to Slice
+9 (`packages/service` alone checks clean, 0 diagnostics; Slice 9 touches zero service source). But the
+author concluded from this that the catalog `check` gate ID couldn't be used at all, and substituted
+**unreceipted prose** ("Direct structured wrapper at final head") for `check`/`lint`/`fmt` instead.
+That conclusion doesn't hold — every one of Slices 1–8 scoped this exact gate via `--include`, which
+narrows the selection away from the unscoped default. Recut all three as real receipts in a temporary
+detached worktree at the exact content head (`gitHead == actualGitHead == 3cb08103f`): all three PASS,
+344/343/343 files, 0 findings — confirming the author's prose claim, now as durable evidence.
+
+A commit-message mishap along the way: an embedded double-quoted phrase inside a `-m` string broke
+bash argument parsing, and `git commit` silently failed while `git add` had already staged everything
+— caught immediately by checking `git log`/`git status` rather than trusting the command's exit,
+fixed by writing the message to a file and using `-F`.
+
+**Verdict: ACCEPTED at `3cb08103ff9c25ff3ec580301b5936586b13d37e`.** Evidence set recomputed to
+SUFFICIENT (zero reasons, 12 receipts) after the fix. `tier-a-slice-9.md` committed as evidence head
+`b5e3eef4f`, context-pack phase update at `c4bd64232`. PR comment `5471939460`.
+
+### GLM 5.3 Flash IMPL-EVAL dispatched — first use of the new route
+
+Per the owner's routing clarification, this genuinely new, unevaluated slice uses **GLM 5.3 Flash ·
+max** over OpenRouter (`z-ai/glm-5.3-flash`, the slug confirmed by web search against OpenRouter's own
+pricing page before dispatch, not guessed). Own detached worktree `ns1387-impleval-s9` at the latest
+evidence head `c4bd64232`. Brief asks the evaluator to independently reproduce the KV-batching
+base-red and verify the fix's receipts scope correctly, and states plainly that this is #1387's final
+implementation slice — asks for an explicit statement on whether the documentation is adequate for
+close, not just whether it passes.
