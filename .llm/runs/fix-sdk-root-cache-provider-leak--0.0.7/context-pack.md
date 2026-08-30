@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `fix-sdk-root-cache-provider-leak--0.0.7` |
 | Branch         | `fix/sdk-root-cache-provider-leak`        |
-| Current phase  | S3 implementation checkpoint              |
+| Current phase  | S4 evaluator handoff                      |
 | Archetype      | `2 — Integration`                         |
 | Scope overlays | none                                      |
 
@@ -25,11 +25,12 @@ committed the regression test alone at `ddf66a6f`. Its intact-runtime fresh chil
 `defineServices`, then observed `hasCacheProvider() === true`; the structured runner exited 1 with 0
 passed and 1 failed. The failure was the product defect, not an unrelated runtime crash.
 
-S3 now makes the SDK root/cache entry modules load-time pure, adds the curated browser-safe
+S3 at `1dd64dae` makes the SDK root/cache entry modules load-time pure, adds the curated browser-safe
 `@netscript/sdk/presets` entry, and registers the default provider only when `defineFreshApp()` is
 called. The final focused suite passes 82/82. The committed graph phase, which was unreachable after
 the S2 behavioral red, executed for the first time at S3 green and proved both root and presets free
-of KV, logger, raw `@netscript/kv`, and every resolved/raw `node:` edge.
+of KV, logger, raw `@netscript/kv`, and every resolved/raw `node:` edge. S3 is pushed and its
+structured PR comment is posted; the worktree was clean before this S4 artifact-only reconciliation.
 
 ## Completed
 
@@ -65,13 +66,13 @@ of KV, logger, raw `@netscript/kv`, and every resolved/raw `node:` edge.
 
 ## In progress
 
-- S3 commit/push/comment checkpoint.
+- S4 run-artifact-only commit/push/comment checkpoint.
 
 ## Next steps
 
-1. Commit and push S3, then post its structured PR comment.
-2. Reconcile S4 run artifacts with the landed S3 SHA; make no product changes.
-3. Push and comment S4, then hand off for the mandatory separate IMPL-EVAL/review sequence.
+1. Commit and push this S4 evidence reconciliation, then post its structured PR comment.
+2. Hand off commit range through S4 to the mandatory separate opposite-family IMPL-EVAL.
+3. Leave draft state, labels, issue text, and acceptance boxes coordinator-owned.
 
 ## Key decisions
 
@@ -129,3 +130,7 @@ None. S4 is evidence reconciliation only; mandatory IMPL-EVAL remains coordinato
 
 - Initial plan: `1bf9c567` (`FAIL_PLAN` cycle 1). See the draft PR commit list + phase comments for
   the revised S1 commit and cycle-2 handoff.
+- Revised plan: `9a0f5876` (`PASS_PLAN` cycle 2).
+- S2 red-before: `ddf66a6f` (test and red evidence only).
+- S3 implementation: `1dd64dae` (product, docs, generated derivatives, and gate evidence).
+- S4 evidence reconciliation: pending this artifact-only commit.

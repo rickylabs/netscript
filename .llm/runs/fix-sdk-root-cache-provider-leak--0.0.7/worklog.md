@@ -91,6 +91,8 @@ gets the same explicit default. A browser/shared author imports `defineServices`
 | 2026-08-30 | S3    | GREEN             | Whole focused suite passed 82/82. The S2 graph phase ran for the first time and proved root/presets exclude KV, logger, raw `@netscript/kv`, and all resolved/raw `node:` edges.       |
 | 2026-08-30 | S3    | Public derivatives | Regenerated the MCP export corpus, agent-docs prose/provenance, then publish assets in tooling dependency order; each pre-generation stale check was recorded before the final pass. |
 | 2026-08-30 | S3    | Compatibility     | Updated the SDK README and all four owned published pages with the root/cache migration, focused presets import, explicit custom-server registration, and Fresh coverage.          |
+| 2026-08-30 | S3    | Checkpoint        | Committed and pushed `1dd64dae`; posted the structured S3 implementation comment on draft PR #1758.                                                          |
+| 2026-08-30 | S4    | Reconciliation    | Reconciled the pushed S3 SHA, final gate table, compatibility handoff, and pending independent IMPL-EVAL without changing product code.                       |
 
 ## Decisions
 
@@ -165,6 +167,7 @@ syntax before the owned pages were restored and edited narrowly.
 
 ## Handoff notes
 
-S3 implementation, compatibility prose, generated derivatives, and gate evidence are ready for the
-slice checkpoint. S4 is run-artifact reconciliation only: record the S3 commit/push/comment SHA and
-prepare the separate IMPL-EVAL handoff without changing product code.
+S3 implementation, compatibility prose, generated derivatives, and gate evidence are pushed at
+`1dd64dae`. S4 contains run-artifact reconciliation only. The draft PR must remain draft and retain
+its current labels/status until the mandatory separate opposite-family IMPL-EVAL and coordinator
+review complete; this implementation session does not self-certify or change issue acceptance.
