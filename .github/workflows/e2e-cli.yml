@@ -329,8 +329,10 @@ jobs:
             .llm/tmp/e2e-report-scaffold-runtime*.json
             .llm/tmp/e2e-report-scaffold-runtime*.ndjson
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
+            .llm/tmp/gate-receipts/scaffold-runtime/agent.aspire-mcp-smoke*
           include-hidden-files: true
           if-no-files-found: ignore
+          retention-days: 30
 
   scaffold-runtime-sqlite:
     name: scaffold-runtime-sqlite (aspire + sqlite + garnet)
@@ -415,8 +417,10 @@ jobs:
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.json
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.ndjson
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
+            .llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*
           include-hidden-files: true
           if-no-files-found: ignore
+          retention-days: 30
 
   desktop-native-linux:
     name: desktop-native-linux (deb + signed updater)
