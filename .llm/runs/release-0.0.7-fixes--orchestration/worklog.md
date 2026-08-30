@@ -2550,3 +2550,38 @@ binding item with its slice, restates the unchanged boundaries, and repeats that
 required but supervisor-coordinated and must never be author-run.
 
 Exact-head gates run from `gates-1673.sh` once the implementation slices land.
+
+## 2026-08-30 — S7 landed at `e24e7ce1`; red-before verified independently
+
+Pushed; local == remote. Every PLAN-EVAL binding item assigned to S7 was checked against the artifact
+rather than taken from the commit message:
+
+| Binding item | Verified |
+| --- | --- |
+| **PE-5** relocation | The new case lives in **path 6** (`doctor-plugin-registry-drift_test.ts`); `installed-runtime-registry-integration_test.ts` appears **zero** times in the commit's file list, so it was not amended. The ceiling is now exactly the enumerated eleven with no interpretation outstanding. |
+| **PE-11** stale line | `supervisor.md` now reads "PLAN-EVAL cycle 1 returned harness `PASS` / PR `APPROVED` at plan commit `13402d3f`" — the `N/A` claim is gone. |
+| **PE-9** F-1 WARN | `plan.md:316` states the expected doctrine `WARN` on path 2 with the reasoning: the coordinator forbids the split parser file, `arch:check` fails only on `fail` totals, and the existing doctor use case already carries the same WARN. |
+| Environment correction | `plan.md:302` records Docker 28.5.2 / inotify 1024 and explicitly states there is **no** below-28 warning and **no** expected inotify collision — the pre-excuse this lane withdrew is absent. |
+
+### The red-before is real, and red for the right reason
+
+Re-derived by running the focused suite at the S7 head, not read from the author's receipt:
+
+```
+exit 1 · passed 5 · failed 1
+failing case: "plugin doctor stays healthy when AI generation excludes the skill-loader factory" (line 149)
+RemoteError: Plugin doctor failed: workspace
+```
+
+That is **F1 reproduced as a test**: doctor reporting failure on a correctly generated AI project
+carrying the `skill-loader` factory. The five pre-existing cases still pass, so the new case did not
+disturb them. This is exactly what PE-4 predicted — the assertion can only go green once the
+generator's selection becomes the expected set, which is the product change itself.
+
+The discipline that mattered on this leaf from the start now holds twice: the original S2 red-before
+for the missing-entry direction, and this one for the false-failure direction. Both were verified by
+the supervisor from a re-run rather than from a receipt.
+
+S8 next, carrying the PE-2 binding amendment: the inspect-report ≡ compile-`files` equivalence
+assertion per declared target, with the report builder extracted to a plain
+`inspectAiRegistries(files, targets)` so the equivalence is assertable without a subprocess.
