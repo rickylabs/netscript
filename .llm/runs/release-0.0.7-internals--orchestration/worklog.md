@@ -5772,3 +5772,33 @@ confirmed `working` throughout.
   evaluation used its own new GLM 5.3 Flash / max route exclusively, appropriately dogfooding what
   it implements.
 - **Ready for owner merge. Supervisor does not merge.**
+
+## D-110 — #1758 resumed: converged with main 5197e70b7, generated carriers regenerated, Tier-A green
+
+- GitHub reported `mergeable=CONFLICTING` on #1758 (1 commit behind main). Dry-run confirmed exactly
+  the same 4 generated-carrier files as before (`prose.json.gz`, `provenance.json`,
+  `agent-docs.generated.ts`, `publish-assets.generated.ts`); confirmed these are inherited-carrier
+  drift from successive main merges, not an independent SDK-scope edit (`git diff` of #1758's own
+  merge-base to HEAD on those 4 paths was non-empty but traces to a prior main merge, not this
+  leaf's product).
+- **Built directly on this leaf's own prior-documented findings rather than re-deriving them**: its
+  `worklog.md` already recorded the exact correct regenerator dependency order
+  (`gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`) discovered through a prior
+  stale-carrier failure, and confirmed the #1734 fix (shipped by this same session earlier today)
+  retires this leaf's previously-stale `26/1` `e2e:cli` classification.
+- Merged main cleanly, resolved the 4 conflicts by taking main's carriers, regenerated in the
+  documented order, **caught my own `| tail` exit-code trap again** on the first pass (naive
+  `echo "EXIT=$?"` after piped output reported false `0`s), redid with real capture and found
+  `check:assets-barrel` genuinely non-trivial: exit 1, a real diff adding `'./presets'` (this leaf's
+  own new SDK export subpath) to `EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS` — resolved by committing the
+  regenerated carriers (they were correctly regenerated but not yet committed), then all three
+  `check:*` gates verified genuinely green with real exit capture.
+- Merge commit `7072e85ba`; regeneration commit `94620577d`. Verified: SDK tests 79/79 (matches this
+  leaf's own prior documented baseline exactly), `check:mcp-export-corpus` exit 0, `arch:check`
+  exit 0, `deno.lock` byte-unchanged, and main's own new docs pages (#1793) confirmed present and
+  intact alongside this leaf's product — both survive together as required.
+- Pushed; local == remote == `94620577db9532cb281160c0734cfe8fe33e1115`. GitHub `mergeable` status
+  transiently `UNKNOWN` immediately post-push (expected recompute delay); re-checking.
+- Next: confirm mergeable/CI, then resolve the queued bare `deno task e2e:cli` rerun (owner
+  instruction: the leaf's old `26/1` receipt is stale post-#1734, needs a fresh verdict at this
+  head, serialized behind whatever runtime lease currently holds).
