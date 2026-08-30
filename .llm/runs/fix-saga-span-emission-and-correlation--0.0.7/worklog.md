@@ -178,3 +178,81 @@ a process seam. A thin plugin may only wire the core primitive.
   supervisor-owned runtime gate.
 - The expected MCP corpus and release public-surface baseline staleness are supervisor sequencing
   handoffs. Do not regenerate them. Flow-B runtime remains author-must-not-run.
+
+## Supervisor Tier-A sign-off — `7517ae50`
+
+Reviewer is the fixes topic supervisor: not the author, not either plan evaluator. Every check was
+re-derived independently.
+
+**Tier-A PASSES.** A fresh, separate, opposite-family IMPL-EVAL is still mandatory, and one gate is a
+deliberate stop-and-report rather than a pass (below).
+
+### The red-before flipped, and it flipped honestly
+
+| Head | Focused `saga-cascade-spans_test.ts` |
+| --- | --- |
+| `2146443c` (red-before, no product change) | exit 1 · **0 passed / 2 failed**, both `AssertionError` |
+| `7517ae50` (product landed) | exit 0 · **9 passed / 0 failed** |
+
+The test grew from 2 cases to 9, so the important question is whether the original red was weakened.
+It was not: both original case names survive **verbatim** — *"Saga runtime emits a compensation cascade
+span"* and *"Saga handle span carries the cross-plane correlation id"* — along with their assertions
+(`expected saga.cascade.compensate to be started`, and the `order-42` correlation value).
+
+The seven added cases are the conditions made executable rather than merely recorded:
+
+- *"SagaCompensator records missing handlers as skipped **without deriving correlation**"* — F3b's
+  no-fallback rule
+- *"SagaCompensator rejects a registered handler when **engine correlation context is absent**"* — F3b
+- *"compensation and returned cascades **consume engine-selected** correlation and parents"* — D8
+- *"bridge records **send failures** at the downstream operation"* — F4's uninstrumented `send`
+- plus scheduled-persistence, unsupported-spawn, and thrown/nested-deferred compensation cases
+
+### Exact-head gates at `7517ae50`
+
+| Gate | Result |
+| --- | --- |
+| Head identity | local == `origin` == PR #1764 `headRefOid`; tree clean |
+| Ceiling containment | **13 changed product paths, all inside the locked 19** — none outside |
+| `deno.lock` | byte-unchanged vs `f8b4f804` |
+| Focused cascade-spans suite | exit 0 · 9 passed / 0 failed |
+| Whole `packages/plugin-sagas-core` | exit 0 · **81 passed / 0 failed / 3 ignored** |
+| Plugin targeted (`create-durable-saga-runtime_test.ts`) | exit 0 · 7 passed / 0 failed |
+| Scoped type check | exit 0 |
+| Scoped lint (root rules) | exit 0 · 11 files |
+| Scoped fmt | no findings |
+| `check:agent-docs-prose` / assets-barrel (check-only) / `check:publish-assets` | all exit 0 |
+| `quality:gate` | two pre-existing `export default` WARNs, outside the ceiling |
+
+**A supervisor error corrected in place.** The first ceiling check flagged
+`plugins/sagas/src/runtime/create-durable-saga-runtime{,_test}.ts` as violations. They are **not** —
+they are items 8 and 15 of the locked ceiling, and the plan's Target line reads
+"`packages/plugin-sagas-core`, thin `plugins/sagas` wiring". The gate runner's pattern was too narrow;
+re-checked against the plan's actual 19-path list, containment is clean.
+
+### `check:mcp-export-corpus` — stop-and-report, and it is genuinely leaf-caused
+
+The gate is **NONZERO** at this head. Attributed rather than assumed: the same command in a pristine
+worktree at base `f8b4f804` exits **0**, so the staleness is **caused by this leaf**, not inherited
+from a stale base.
+
+The plan predicted exactly this (gate 16: *"expect nonzero stale-corpus result; stop/report for
+supervisor sequencing and do not regenerate"*), and the author correctly **did not regenerate**. No
+new exported symbol was added — the corpus moves because of **signature** changes to existing exports,
+consistent with D8's explicit request/result signature change.
+
+Regeneration stays owner-sequenced while the shared-asset sequence is live. This is recorded as a
+**deliberate stop, not a pass and not a waiver.**
+
+### Conditions carried from PLAN-EVAL cycle 2
+
+Both are recorded in the worklog and made executable in tests: **F3b** (optional fields, and the
+compensator applying **no fallback precedence** when they are absent) and **F1 residual**
+(`saga.cascade.complete` emits whenever `completed` is true regardless of store presence, carrying the
+**persisted** status, which may be `failed`/`compensating`).
+
+### Not done here
+
+No readiness flip, merge, relabel, issue edit, or acceptance-box tick. Gate 18 (Flow-B consumer
+runtime) remains REQUIRED, supervisor-coordinated, **author-must-not-run** — recorded `NOT_RUN` as
+boundary compliance, not as a pass.
