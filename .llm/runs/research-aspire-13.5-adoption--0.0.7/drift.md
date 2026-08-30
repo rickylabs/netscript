@@ -1987,3 +1987,11 @@
   before any runtime step. Delivered via detach-then-resume (the client held an active writer at
   send time — same D-38 pattern); no commits existed yet on this thread's new work, so nothing
   needed correcting after the fact.
+- **D-101 correction (FD leak + address consistency):** relayed two bounded findings onto the same
+  S6 thread, again via detach-then-resume (active writer at send time), before any
+  synthetic-listener commit landed: (1) `ListenerFaultController#acceptPostgres` accumulates
+  accepted `Deno.TcpConn`s without reaping them on client disconnect — add an EOF/drain handler with
+  `finally` delete+close (mirroring `#serveResp`) plus a focused regression proving the tracked set
+  drains; (2) controller tests bind/probe `127.0.0.1` while the injected health checks/runtime
+  controller use `localhost` — add an exact-`localhost` test or align the addresses to catch an
+  IPv4/IPv6 resolution mismatch. Fixed reserved ports preserved; no runtime or DeepSeek rerun.
