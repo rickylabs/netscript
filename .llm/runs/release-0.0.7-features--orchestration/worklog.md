@@ -6154,3 +6154,77 @@ Unchanged and withheld: merge, publish, ready-flip, relabel (#1731 still carries
 `status:plan` — coordinator's), milestone change, issue close, `#1348`/cluster-state mutation,
 expensive-gate lease. Tier-A is mine; IMPL-EVAL cycle 2 is a fresh separate `formal_impl_evaluation`
 session (Fable 5 · medium), dispatched only after Tier-A and an exact-content-head recut.
+
+## 2026-08-30 — #1466 cycle 4 landed; Tier-A `ACCEPTED_WITH_FINDINGS`; cycle 5 correction dispatched
+
+Cycle-4 author `01a051d1` landed and pushed: local == `origin` == PR head
+`dd2018166e70c2b638e106d6c52e2bb16e5a23a2`, clean. Two commits — product fix `42874803`, evidence
+`dd201816`. Full review in `slices/tier-a-review-1466-repair-4.md`.
+
+### What I re-measured rather than accepted
+
+| Claim | My independent measurement | Agrees? |
+| --- | --- | --- |
+| doc-lint delta 0 vs `main` | `main` 12, head 12; **9 identical**, `main`-only `{BaseContractRoute→BaseContractErrors, BaseContractOutputRoute→BaseContractErrors, baseContract→oc}`, head-only `{BaseContractErrors→MergedErrorMap, baseContract→ContractBuilder, baseContract→Schema}` | yes — exactly R-1's recorded three-way set |
+| F-2 pin actually fails | perturbation B → **RED**; perturbation + correct text planted in a trailing comment → **still RED** | yes, and it cannot be forged by a comment |
+| F-4 row is right | `deno doc --filter BaseContract` → `typeof baseContract`; row matches | yes, checked against the tool not the diff |
+| withdrawal is consumer-safe | zero `commonErrorMap` matches outside `packages/contracts/`; `check` exit 0 both roots | yes |
+| contracts suite | **16 passed / 0 failed** (15 + the new pin) | yes |
+| `docs:exports-drift` | **PASS**, exit 0 | yes |
+| eight receipts exact-head | all `gitHead == actualGitHead == 42874803e`; both frozen archives intact at 8 files | yes |
+
+The two claims that could have been quietly wrong were the two worth attacking: that F-1's withdrawal
+does not move R-1's pinned set, and that the F-2 pin really fails. Both hold — the second verified by
+breaking it two ways, because the *previous* guard on this leaf was accepted at Tier-A and then shown
+by the evaluator to guard nothing.
+
+### The `test` receipt is `SKIPPED`, and that is the right call
+
+R-1 forbade further root-`test` retries on this host, so cycle 4 archived the terminal FAIL to
+`frozen-235482767/` and cut `test-final.json` with `outcome: SKIPPED` and a reason citing R-1. The
+author declined to fabricate a number or to retry into the same host defect — the behaviour this lane
+wants. The residual (root `test` never ran at `42874803`, a head that both withdraws a public export
+and adds a test) is covered by `check` exit 0 across both roots, the focused contracts suite, and the
+proven absence of workspace consumers. **Whether a `SKIPPED` receipt satisfies the contracted set is
+an evaluator ruling** and is routed to IMPL-EVAL rather than taken by me.
+
+### AF-1 — the file written to close F-5 misreported its own route
+
+`supervisor.md` recorded `Sol · high` / `complex_implementation` for **both** repair cycles. Measured:
+the original slice-1 implementation ran `complex_implementation` · high; repair cycles 1–3
+(`01a0515c`) and cycle 4 (`01a051d1`) all ran `normal_implementation` · Sol · **medium**. Every repair
+cycle was filed under a lane and effort none of them used.
+
+That file exists so other supervisors can discover a run's operating identity without chat memory,
+and the IMPL-EVAL reads it next. A run-identity artifact that misreports its own route is the same
+error class this leaf was corrected for one cycle ago — evidence written from the claim rather than
+the artifact — and it sits exactly on D-25's blind spot, where route identity cannot be verified after
+the fact. Cheaper to fix now than to spend an evaluator cycle on it.
+
+### Cycle 5 — bounded, evidence-only
+
+| Field | Value |
+| --- | --- |
+| Brief | `slices/impl-1466-repair-5-identity.md` — one file, no product, no recut |
+| Thread | `01a051e0-d587-7d50-be8b-02307f5c6e64` |
+| Route | requested = observed = `openai · gpt-5.6-sol · medium`, verdict **matched** |
+| Worktree / base | `/home/agent/projects/netscript/worktrees/007-leaf-1731` @ `dd201816` |
+| Content head | unchanged at `42874803` — the same evidence-head pattern as `fc81e652` and `74483f02`, so the eight receipts stay valid and nothing is recut |
+
+**D-28 recurred exactly as recorded.** The sender-ownership record for this worktree again named a
+dead thread (`ownerPid 26951` gone, `01a051d1` absent from the daemon across three debounced probes),
+and again blocked the launch. Archived and evicted as before. This is now twice in one lane in one
+session; the tooling fix is not optional maintenance.
+
+### Next
+
+IMPL-EVAL cycle 2 brief is written (`slices/impl-eval-1466-cycle2.md`) and dispatches the moment
+cycle 5 lands: fresh separate `formal_impl_evaluation` session, Claude · Fable 5 · medium, its own
+detached worktree. It re-measures my numbers rather than accepting them, must break the F-2 pin
+itself, and carries the three rulings this lane may not make — the `SKIPPED` receipt, whether AF-1's
+class is closed, and what remains before #1466 can close.
+
+**Recorded so it cannot vanish: #1466 slices 2 and 3 are NOT RUN** (SDK declaration propagation;
+publish and compatibility evidence). PR #1731 carries `Closes #1466`, so a `PASS` on slice 1 does not
+make the leaf closeable. Whether slices 2–3 return to this lane before or after #1387 is the
+coordinator's call; this lane will not self-authorize them.

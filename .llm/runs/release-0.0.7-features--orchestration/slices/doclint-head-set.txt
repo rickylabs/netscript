@@ -1,0 +1,12 @@
+BaseContractErrors -> MergedErrorMap
+BaseContractOutputRoute -> AnySchema
+BaseContractOutputRoute -> ContractProcedureBuilderWithOutput
+BaseContractOutputRoute -> Schema
+BaseContractRoute -> AnySchema
+BaseContractRoute -> ContractProcedureBuilderWithInputOutput
+CrudRoute -> AnySchema
+DurableStreamProducerOptions["instrumentation"] -> StreamsInstrumentation
+QueryClientPort -> QueryClient
+baseContract -> ContractBuilder
+baseContract -> Schema
+createNetScriptQueryClient -> QueryClient
