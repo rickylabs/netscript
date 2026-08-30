@@ -146,3 +146,10 @@ Database dispatch has one source: `listenerFaultExpectations(database)` beside
 SQLite and MySQL/MSSQL overrides exercise Garnet only. Focused static evidence is 52/52 tests plus
 zero-diagnostic nine-file check/lint/fmt, clean quality scan, and exit-0 architecture check. The
 supervisor still owns all lease-backed runtime verification.
+
+Implementation commit `3a20d00be1a65cb20d8ecae1658c27cad672e98d` is explicitly pushed to the
+PR branch. Its exact-head rerun also passed raw lint/format on all nine touched TypeScript files;
+the gate run left `deno.lock` and the worktree unchanged. Post-D-101 measurements are 306 lines for
+`runtime-gates.ts` and 12 immediate `runtime/` children (the reconstructed pre-D-101 baseline was
+305/11). The remaining actions are this evidence-only commit/push and the required PR #1743 phase
+comment; runtime and evaluation remain supervisor-owned.

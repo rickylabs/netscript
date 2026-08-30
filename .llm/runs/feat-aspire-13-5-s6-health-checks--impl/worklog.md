@@ -309,3 +309,27 @@ SQLite and the MySQL/MSSQL overrides select Garnet only and never require a Post
   lint PASS with zero findings, format PASS with zero findings. `quality:scan` passed with
   `findings=[]`; `arch:check` exited 0 with carried-in warnings only.
 - Runtime/AppHost/container/evaluator/CI commands remain NOT_RUN by owner boundary.
+
+### D-101 exact-head static verification
+
+The D-101 implementation commit `3a20d00be1a65cb20d8ecae1658c27cad672e98d` was pushed with the
+explicit refspec `HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`. A clean-tree rerun against
+that exact commit produced the following final evidence:
+
+| Gate | Result | Exact-head evidence |
+| ---- | ------ | ------------------- |
+| focused controller/splice/readiness/suite tests | PASS | Structured wrapper: 52/52 results across five roots. |
+| scoped check | PASS | Structured wrapper: nine files selected, one batch, zero diagnostics. |
+| scoped lint | PASS | Structured wrapper: nine selected/processed, zero findings or refusals. |
+| scoped format | PASS | Structured wrapper: nine selected/processed, zero findings or refusals. |
+| raw scoped lint | PASS | `deno lint` checked the same nine files. |
+| raw scoped format | PASS | `deno fmt --check` checked the same nine files. |
+| quality scan | PASS | `findings=[]`; allowance count remains 7. |
+| architecture | PASS | Exit 0; carried-in repository warnings only. |
+| lock hygiene | PASS | No `deno.lock` change; worktree clean after all gates. |
+| runtime/AppHost/containers/evaluators/CI | NOT_RUN | Explicit D-101 implementation-thread boundary. |
+
+The reconstruction-v2 measurements above remain the correct pre-D-101 module-split receipt
+(305-line `runtime-gates.ts`, 11 `runtime/` children). The final D-101 tree measures 306 lines and
+12 children because this bounded slice adds exactly one controller gate registration and the new
+`listener-fault-controller.ts` module.
