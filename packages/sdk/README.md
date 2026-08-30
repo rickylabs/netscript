@@ -73,7 +73,7 @@ the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in 
 ## Quick example
 
 ```ts
-import { defineServices } from '@netscript/sdk';
+import { defineServices } from '@netscript/sdk/presets';
 import { ordersContract } from './contracts/orders.ts';
 
 // One contract map wires clients, server query factories, and frontend query utils.
@@ -92,8 +92,29 @@ const ordersQuery = queries.orders;
 const ordersQueryUtils = queryUtils.orders;
 ```
 
-Drop to a focused subpath when an app only needs part of the surface — `./client`, `./query`, and
-`./query-client` carry the three pieces individually.
+Use the side-effect-free `./presets` subpath for `defineServices` in browser/shared modules. Drop to
+`./client`, `./query`, and `./query-client` when an app only needs one of the three pieces.
+
+### Server cache registration
+
+Calling provider-backed query methods requires one explicit registration at the server composition
+root. NetScript-managed Fresh apps do this inside `defineFreshApp()`; custom servers do it directly:
+
+```typescript
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
+
+setCacheProvider(cacheQuery);
+```
+
+Importing either `@netscript/sdk` or `@netscript/sdk/cache` is load-time pure and does not register
+the provider.
+
+#### Migration from implicit registration
+
+Existing custom server bootstraps that relied on importing the SDK root or `./cache` for its side
+effect must add the explicit call above. Existing Fresh bootstraps that call `defineFreshApp()` keep
+the default provider without another change. Cache engine symbols such as `KvCacheStore` and
+`cacheQuery` now come from `@netscript/sdk/cache`, not the root.
 
 ### Two query dialects — pick one per data layer
 
@@ -224,12 +245,13 @@ and Linux apply on relaunch.
 
 | Entry            | What it gives you                                                                 |
 | ---------------- | --------------------------------------------------------------------------------- |
-| `.`              | `defineServices` plus re-exports of the full surface below                        |
+| `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
+| `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
 | `./client`       | `createServiceClient`, `isDefinedError`                                           |
 | `./discovery`    | `getServiceUrl`, `getServiceInfo`, `getPostgresConnection`, `getKvConnection`, …  |
 | `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
 | `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
-| `./cache`        | `KvCacheStore`, `cacheQuery`, cache-provider wiring                               |
+| `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
 | `./collections`  | `createQueryCollection` — live client-side collections                            |
 | `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
@@ -253,7 +275,8 @@ The always-current symbol list is
 
 Runs on Deno 2.x on the server and in the browser: the client, query-client, and collections
 surfaces run in islands, while discovery and KV-backed caching read `Deno.env` / `Deno.openKv` and
-belong on the server (use `--unstable-kv` where KV types are checked).
+belong on the server (use `--unstable-kv` where KV types are checked). Importing the root no longer
+exports or registers the cache engine; use `./cache` plus explicit registration in custom servers.
 
 ## License
 

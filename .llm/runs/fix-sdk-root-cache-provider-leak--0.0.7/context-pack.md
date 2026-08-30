@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `fix-sdk-root-cache-provider-leak--0.0.7` |
 | Branch         | `fix/sdk-root-cache-provider-leak`        |
-| Current phase  | S2 red-before handoff                     |
+| Current phase  | S3 implementation checkpoint              |
 | Archetype      | `2 — Integration`                         |
 | Scope overlays | none                                      |
 
@@ -20,10 +20,16 @@ committed graph assertion, a finite curated-entry closure, an order-independent 
 affected site pages, and the full agent-docs/publish derivative chain. No test or product file has
 been written.
 
-PLAN-EVAL cycle 2 returned `PASS_PLAN` at plan commit `9a0f5876`, authorizing implementation. S2 now
-contains only the new regression test plus run evidence. Its intact-runtime fresh child imports the
-root `defineServices`, then observes `hasCacheProvider() === true`; the structured runner exits 1
-with 0 passed and 1 failed. The failure is the product defect, not an unrelated runtime crash.
+PLAN-EVAL cycle 2 returned `PASS_PLAN` at plan commit `9a0f5876`, authorizing implementation. S2
+committed the regression test alone at `ddf66a6f`. Its intact-runtime fresh child imported the root
+`defineServices`, then observed `hasCacheProvider() === true`; the structured runner exited 1 with 0
+passed and 1 failed. The failure was the product defect, not an unrelated runtime crash.
+
+S3 now makes the SDK root/cache entry modules load-time pure, adds the curated browser-safe
+`@netscript/sdk/presets` entry, and registers the default provider only when `defineFreshApp()` is
+called. The final focused suite passes 82/82. The committed graph phase, which was unreachable after
+the S2 behavioral red, executed for the first time at S3 green and proved both root and presets free
+of KV, logger, raw `@netscript/kv`, and every resolved/raw `node:` edge.
 
 ## Completed
 
@@ -47,19 +53,25 @@ with 0 passed and 1 failed. The failure is the product defect, not an unrelated 
 - Recorded structured RED: exit 1, 0 passed / 1 failed, observed provider `true`.
 - Embedded the final graph assertion in that test: both root and presets must exclude resolved KV,
   logger, every `node:` module, raw `@netscript/kv`, and raw `node:` dependencies.
+- Removed the root cache barrel and the cache barrel's import-time registration.
+- Added `./presets` with 7 direct preset exports and the locked 68-type closure; no
+  `QueryClientPort`, ports wildcard, or ports runtime value is exported.
+- Added explicit Fresh composition-root registration and an order-independent fresh-child test.
+- Updated the SDK README and all four owned site pages with compatibility/migration guidance.
+- Regenerated and verified the MCP export corpus, agent-docs prose/provenance, and MCP publish asset
+  in dependency order, recording every stale precheck and final pass.
+- Passed the final 82-test suite, nine-file structured check/lint/fmt, docs export drift, targeted
+  preset doc lint, JSR audit, package/workspace publish dry-runs, and raw lock hygiene.
 
 ## In progress
 
-- S2 commit/push/comment checkpoint.
+- S3 commit/push/comment checkpoint.
 
 ## Next steps
 
-1. Commit and push S2, then post its structured PR comment before any product edit.
-2. Implement S3 strictly inside the locked ceiling.
-3. Run the focused regression green and the whole SDK test directory, plus the order-independent
-   Fresh registration child test.
-4. Run the locked docs/export/generated cascade in order and record measured negatives as such.
-5. Prove `deno.lock` unchanged with raw Git before the S3 checkpoint.
+1. Commit and push S3, then post its structured PR comment.
+2. Reconcile S4 run artifacts with the landed S3 SHA; make no product changes.
+3. Push and comment S4, then hand off for the mandatory separate IMPL-EVAL/review sequence.
 
 ## Key decisions
 
@@ -92,11 +104,16 @@ with 0 passed and 1 failed. The failure is the product defect, not an unrelated 
 | JSR surface scan     | BASELINE RECORDED  | Audit exit 0 with two warnings; full doc-lint and direct preset entry are measured negative. |
 | Agent-docs host      | PASS               | `check:agent-docs-prose` exit 0; 638-file Lume build; corpus `fresh: true`.                  |
 | S2 behavioral red    | EXPECTED RED       | Structured exit 1; 0 passed / 1 failed; root provider observed `true`.                       |
-| S2 graph assertion   | COMMITTED, DORMANT | Runs after the behavioral assertion turns green in S3.                                       |
+| S2 graph assertion   | PASS               | Executed for the first time at S3 green; both graphs contained zero forbidden edges.          |
+| Focused tests        | PASS               | 82 passed / 0 failed, including the entire SDK test directory and Fresh bootstrap test.       |
+| Type/lint/format     | PASS               | Nine owned TS files selected; zero diagnostics/findings and full coverage.                    |
+| Published surface   | PASS / NEGATIVE RECORDED | Preset doc + JSR + publish pass; repo surface baseline remains a measured 559-major negative. |
+| Generated cascade   | PASS               | MCP corpus, agent-docs prose/provenance, and publish-assets final checks are fresh.            |
+| Lock hygiene        | PASS               | Raw `git diff --exit-code -- deno.lock` returned 0.                                           |
 
 ## Open questions
 
-None. S3 follows the locked plan and evaluator refinements M1-M3.
+None. S4 is evidence reconciliation only; mandatory IMPL-EVAL remains coordinator/evaluator work.
 
 ## Drift and debt
 

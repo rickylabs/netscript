@@ -85,7 +85,12 @@ gets the same explicit default. A browser/shared author imports `defineServices`
 | 2026-08-30 | S1    | Plan revision     | Re-locked intact-runtime red, committed graph proof, finite preset type closure, order-independent Fresh proof, four-page prose ownership, and the complete derivative cascade.   |
 | 2026-08-30 | S1    | PLAN-EVAL cycle 2 | `PASS_PLAN` at `9a0f5876`; evaluator measured every cycle-1 repair sufficient on this host and authorized implementation beginning at S2.                                         |
 | 2026-08-30 | S2    | RED               | Added the regression test alone. With the Deno runtime intact, the fresh child reached the target assertion and observed root import -> `hasCacheProvider() === true`.            |
-| 2026-08-30 | S2    | Graph proof       | The same committed test rejects resolved KV/logger modules, raw `@netscript/kv`, and every resolved or raw `node:` edge for both root and presets graphs.                         |
+| 2026-08-30 | S2    | Graph proof       | Committed the later graph phase. The S2 behavioral assertion stopped the test before this phase ran; a separate supervisor measurement found 19 unsafe base edges, including two `node:` edges and five logger modules. |
+| 2026-08-30 | S3    | SDK surfaces      | Removed the root cache barrel edge, made `./cache` load-time pure, added the curated `./presets` entry, and retained only the root cache types required by existing Fresh consumers. |
+| 2026-08-30 | S3    | Fresh composition | Moved default registration into `defineFreshApp()` and proved in a fresh child that module import is inert while calling the composition root installs the provider.              |
+| 2026-08-30 | S3    | GREEN             | Whole focused suite passed 82/82. The S2 graph phase ran for the first time and proved root/presets exclude KV, logger, raw `@netscript/kv`, and all resolved/raw `node:` edges.       |
+| 2026-08-30 | S3    | Public derivatives | Regenerated the MCP export corpus, agent-docs prose/provenance, then publish assets in tooling dependency order; each pre-generation stale check was recorded before the final pass. |
+| 2026-08-30 | S3    | Compatibility     | Updated the SDK README and all four owned published pages with the root/cache migration, focused presets import, explicit custom-server registration, and Fresh coverage.          |
 
 ## Decisions
 
@@ -104,7 +109,10 @@ PLAN-EVAL cycle 1 found two evidence-design mismatches: deleting `globalThis.Den
 the intended assertion, and the generated-doc cascade omitted the Lume-derived prose/provenance
 pair. The revised S1 plan corrects both without changing the accepted product design. Tool
 availability note: the requested `rtk` executable is absent (`command not found`); this affects
-output filtering only, not evidence selection.
+output filtering only, not evidence selection. S3 stayed inside the locked ceiling. Two
+implementation-time corrections are recorded in `drift.md`: a workspace publish dry-run exposed two
+root cache-entry types still required by Fresh, and generic Markdown formatting damaged Vento source
+syntax before the owned pages were restored and edited narrowly.
 
 ## Gate Results
 
@@ -122,6 +130,32 @@ output filtering only, not evidence selection.
 | PLAN-EVAL cycle 2               | Separate opposite-family evaluator                            | PASS_PLAN                     | Plan commit `9a0f5876`; implementation authorized from S2.                    |
 | S2 RED                          | Focused structured test                                       | EXPECTED RED (exit 1)         | 0 passed / 1 failed; observed provider `true`, with no unrelated child crash. |
 
+### S3 implementation gates
+
+| Gate | Command/check | Result | Artifact-derived evidence |
+| ---- | ------------- | ------ | ------------------------- |
+| Regression + full owned suite | Structured test wrapper over `packages/sdk/tests/`, provider test, and Fresh bootstrap test | PASS (exit 0) | 82 passed / 0 failed / 0 ignored. The graph phase executed for the first time here and found no forbidden edge. |
+| Scoped check | Structured check wrapper on the nine owned product/test TS files | PASS (exit 0) | 9 selected; zero diagnostics or failed batches. |
+| Scoped lint | Structured lint wrapper on the same nine files | PASS (exit 0) | 9 selected/processed; zero findings or coverage refusals. |
+| Scoped format | Structured format wrapper on the same nine files | PASS (exit 0) | 9 selected/processed; zero findings or coverage refusals. |
+| Site source format | `deno task --cwd docs/site check:source-format` | PASS (exit 0) | `Docs source format: OK`. |
+| Code quality | `deno task quality:scan` | PASS (exit 0) | No leaf finding. |
+| Doctrine | `deno task arch:check` | PASS WITH EXISTING WARNINGS (exit 0) | No new SDK/Fresh failure; existing repository warnings remained separate. |
+| Targeted preset docs | `deno doc --lint packages/sdk/src/presets/mod.ts` | PASS (exit 0) | Checked one file with zero diagnostics. |
+| Full SDK doc lint | SDK doc-lint task | MEASURED NEGATIVE (exit 1) | Same three unique private-ref files as base, zero missing JSDoc; no new unique diagnostic. |
+| JSR audit | SDK JSR audit wrapper | PASS WITH 2 WARNINGS (exit 0) | 13 entries including `./presets`; only the existing source-cardinality and slow-type warnings; package dry-run OK. |
+| SDK publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/sdk` | PASS (exit 0) | Package accepted the 13-entry surface. |
+| Workspace publish dry-run | `deno task publish:dry-run` | PASS after correction (exit 0) | First run exposed six Fresh checks caused by removed root `CachedEntry`/`CacheEntry` types; type-only compatibility exports resolved them without restoring a server edge. Final dry run completed successfully. |
+| Export/reference drift | `deno task docs:exports-drift` | PASS (exit 0) | SDK entrypoint coverage includes `./presets`; zero omitted entrypoint groups. |
+| MCP corpus precheck | `deno task check:mcp-export-corpus` before generation | EXPECTED STALE (exit 1) | Generator named `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` stale. |
+| MCP corpus final | Generate, inspect decoded SDK delta, then recheck | PASS (exit 0) | 35 packages, 271 subpaths, 7,668 symbols; SDK gained `./presets`, root lost server cache values, and root `defineServices` remained. |
+| Agent-docs precheck | `deno task check:agent-docs-prose` before generation | EXPECTED STALE (exit 1) | Lume built 638 files and rendered 227 HTML files, then reported stale `prose.json.gz` and `provenance.json`. |
+| Agent-docs final | Generate, then `deno task check:agent-docs-prose` | PASS (exit 0) | Lume built 638 files; rendered output OK; `fresh: true`, no stale paths; bundle SHA `6a71e9f57e459f18ce74eafa4d69757aa764dc284598da1f1464ee2746865134`. |
+| Publish-assets precheck | `deno task check:publish-assets` after prose regeneration | EXPECTED STALE (exit 1) | Tool named only the MCP publish asset stale; the CLI asset was unchanged, which is recorded rather than inferred otherwise. |
+| Publish-assets final | Generate, inspect changed output, then recheck | PASS (exit 0) | Only `packages/mcp/src/publish-assets.generated.ts` changed; final freshness check passed. |
+| Public surface | `deno task surface:diff` plus decoded SDK corpus comparison | MEASURED NEGATIVE (exit 1) | Repo baseline reports 559 undeclared major changes across many packages. SDK-granular artifact comparison proves new `./presets`, 75 curated entries, `QueryClientPort` absent, and 21 root cache exports removed while `CachedEntry`/`CacheEntry` remain type-only. |
+| Lock hygiene | Raw `git diff --exit-code -- deno.lock`; raw `git diff --check` | PASS (exit 0) | `deno.lock` byte-unchanged and no whitespace errors. |
+
 ### Gates not applicable/run in S1
 
 - Product check/test/lint/fmt, generated freshness, publish dry-run, and surface diff: not run
@@ -131,6 +165,6 @@ output filtering only, not evidence selection.
 
 ## Handoff notes
 
-S2 is ready to commit as the regression test and run evidence alone. S3 may begin only after that
-commit is pushed and its structured PR comment is posted. The graph portion is intentionally dormant
-behind the behavioral red until S3 removes the import-time provider registration.
+S3 implementation, compatibility prose, generated derivatives, and gate evidence are ready for the
+slice checkpoint. S4 is run-artifact reconciliation only: record the S3 commit/push/comment SHA and
+prepare the separate IMPL-EVAL handoff without changing product code.
