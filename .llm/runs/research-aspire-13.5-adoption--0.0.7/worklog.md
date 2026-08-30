@@ -369,3 +369,5 @@ high / 5 medium, D-61) — claim-correctness findings; structure green. Fix cycl
 Gemini conversation. | | S11 docs_audit fix cycle 1 landed | `b8d66f6f`
 `docs(aspire): apply S11 docs_audit cycle-1 fixes` (same Gemini conversation, 3 turns, DONE,
 pushed). Audit cycle 2 resumed on the same Sol thread `01a052fc…` at `b8d66f6f` (worktree moved). |
+| Issue normalization (S11) | #1723 `status:plan` → `status:impl`; #1642 `status:triage` →
+`status:impl` (milestone 0.0.7) — match PR #1771's phase; exactly one `status:` each. |
