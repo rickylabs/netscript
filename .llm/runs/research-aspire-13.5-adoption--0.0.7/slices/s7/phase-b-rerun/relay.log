@@ -3,3 +3,4 @@
 [relay] redis-amduaucj 127.0.0.1:32783 => hopA relay-s7-rerun-32783 (10.4.12.22:32783) => hopB 127.0.0.1:32783@ai-agents
 [relay] postgres-79fb6680 127.0.0.1:11990 => hopA relay-s7-rerun-11990 (10.4.12.22:11990) => hopB 127.0.0.1:11990@ai-agents
 [relay] redis-dxynzvqj 127.0.0.1:32784 => hopA relay-s7-rerun-32784 (10.4.12.22:32784) => hopB 127.0.0.1:32784@ai-agents
+[relay] cleanup: closed 4 listener(s), removed 4 hop-A container(s)

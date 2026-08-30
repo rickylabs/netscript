@@ -531,4 +531,9 @@ bounded item, comment-only) | Evaluator (session `6c9f010f…`) verified the cor
 `e0d70e404074`: identity 4+1 reproduced, hosted run 33330714604 green both tiers → acceptance MET,
 timing measured — sole gap: cold/warm numbers not in a PR comment (F1). Supervisor posted the timing
 comment; readiness chain (evidence block → mirror → sole ready-merge → ready → close-gate rerun →
-review-threads) proceeds; then the S1 merge packet. |
+review-threads) proceeds; then the S1 merge packet. | | S1 current-main hold executed |
+`e0d70e404074` → converged **`c4cbda25410c`** on `74e3d451e` (product 5/5 identical; sole
+intersection `arch-debt.md` carries only S1's OF-2a Browsers-preview entry; delta tests 40/0,
+e2e-root check 0 failed, quality ok; `arch:check` green), pinned push. Run 33330714604 preserved as
+pre-convergence evidence. Current-main runtime proof queued as chain-4 (after S5b).
+Mirror/labels/ready already done; close-gate re-verifies at the new head. |
