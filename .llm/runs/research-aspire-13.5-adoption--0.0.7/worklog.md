@@ -486,4 +486,9 @@ merge-candidate; close packet in progress. Chain continues → S5 → proof → 
 staged | #1738/#1716 sole `status:ready-merge`; mirror mapping valid (boxes already 6/6);
 review-threads PASS (0); e2e run 33329737311 green at `b2a0529fa19b5726`; ci run 33328754543
 full-rerun in progress for live-label close-gate. Note: 2 `cancelled` check-runs at the head are
-residue of the superseded pile-up run 33328751758 (D-79), not verdicts. |
+residue of the superseded pile-up run 33328751758 (D-79), not verdicts. | | S9 mcp-smoke fix
+landed + proof ref updated | S9 `892b636f4` "tolerate headless Aspire MCP dashboards"
+(`dashboardAvailable` tri-state; -32603 on exactly the dashboard tools = documented degraded
+outcome; tool surface still asserted). Reordered below the workflow-scope commit: fix pushed onto
+`d81a8fe19`; `918a958cd` re-stacked locally, unpushed. Proof ref fast-forwarded with the fix ahead
+of the chain's proof dispatch. |
