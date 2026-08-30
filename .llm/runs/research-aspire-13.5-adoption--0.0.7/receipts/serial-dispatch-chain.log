@@ -22,3 +22,12 @@ https://github.com/rickylabs/netscript/actions/runs/33330090487
   scaffold CI lane visibility: skipped
 https://github.com/rickylabs/netscript/actions/runs/33330455111
 [PROOF] dispatched run 33330455111 on ci/aspire-13-5-runtime-proof 19:17:37Z
+[PROOF] run 33330455111 exit=1 19:22:41Z
+[4ad9ad4c47bc] failure
+  classify changes: success
+  desktop-native-linux (deb + signed updater): success
+  scaffold-static (deno-only): success
+  scaffold-runtime-sqlite (aspire + sqlite + garnet): failure
+  scaffold-runtime (aspire + docker + postgres): failure
+  scaffold CI lane visibility: skipped
+[chain] done 19:22:42Z

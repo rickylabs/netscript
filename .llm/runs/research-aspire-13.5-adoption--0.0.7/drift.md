@@ -1584,3 +1584,21 @@
   bootstrap without any AppHost, Tier-A for changed harness paths, refreeze, then ONE new serialized
   Phase-B attempt from host zero → IMPL-EVAL. All other CI/static chains keep moving (S4 close-gate
   rerun, S5→proof chain, S1 queued).
+- **D-81 — proof run 33330455111 at `4ad9ad4c4` (S10 cycle-3 + S9 tolerance): both runtime tiers
+  FAIL, two distinct causes.** (a) sqlite: `agent.aspire-mcp-smoke` fails with a **byte-identical**
+  stderr to the pre-fix run
+  (`tools/call failed: {"code":-32603,"message":"The Aspire Dashboard is
+  not available … The dashboard must be enabled to use MCP tools …"}`):
+  the throw site is the stdio transport, S9's catch guards only `list_structured_logs`, and the
+  wording implies **all** MCP tool calls are dashboard-gated in the headless CI AppHost — the
+  earlier `list_resources` call is uncovered. Fix shape is therefore a contract decision (enable the
+  dashboard in the suite's start vs. degrade the whole smoke), not per-tool tolerance. (b) postgres:
+  reached further than ever (S10's parser + S9 shape all green through 40 gates) and newly exposed
+  `database.seed` FAIL exit 16 (`aspire resource postgres-cli seed` → `Task db:seed:postgres` failed
+  in 1.8 s; AppHost log runner-local, not uploaded — the S9 `include-hidden-files` commit remains
+  unpushed/workflow-scoped). (c) The proof carrier base (old main `2a65a8cd` + old S1 `ee379457`) is
+  now historically stale — S3/S4 shipped and S1 moved to `e0d70e404074` on `52a881c5`+.
+  Recommendation for the coordinator: retire this proof ref after S1 ships and re-carry S6/S9/S10
+  runtime proofs on their own converged branches (D-58 order) instead of patching the stale combined
+  head. No unchanged retry dispatched. S1 hosted run 33330714604 in flight (chain-2); S5b queued
+  (chain-3); S7 correction turn running.
