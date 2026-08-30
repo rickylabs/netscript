@@ -5367,3 +5367,20 @@ idle. So the accurate statement is narrower: the listing did not show it *while 
 working*, and `runtime status --worktree` reported `sessions: 0` at that moment. That is still a real
 monitoring hazard — a lane checking only `codex-status` mid-run sees nothing and may conclude a healthy
 worker is dead — but it is not the total absence I described. Recorded as the narrower, true claim.
+
+### OWNER RULING on #1764 (recorded verbatim, 2026-08-30)
+
+Owner authorizes, for PR #1764 / issue #1368:
+
+1. **The single assertion correction selecting the `saga.handle` span by name rather than positional
+   index** — the hardening variant, not the minimal `1` → `2` count change I had recommended.
+2. **Exactly one delta-scoped IMPL-EVAL cycle 3**, over that assertion and the resulting green suite.
+3. **Carry forward cycle-2 verified rows.** Do not widen product scope.
+4. **Flow-B remains mandatory before ready/merge**, and must run in CI or off-host if local topology is
+   still blocked (D-42/D-43).
+5. Reconcile current main `24f6642f` at the safe slice boundary.
+
+This supersedes option A as I framed it in `decision-packet-1764.md`: the owner took the hardening
+variant I had flagged as "more than one assertion and I did not assume authorization for it". Ceiling
+item 20 is therefore `plugins/sagas/tests/telemetry/publish-trace-linkage_test.ts` with a by-name
+selection, not a count bump. The leaf is unparked for exactly this work and nothing else.
