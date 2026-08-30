@@ -76,3 +76,24 @@ Gates executed by the reviewer at `8152245b2` (carry to `1634a3c3c`, zero code d
 No blocking finding. Notes for the evaluator: `packages/cli` files flagged by raw
 `deno fmt --no-config --single-quote` were already non-conforming on `origin/main` (7 files) —
 not S5's. **Tier-A verdict: sign-off to IMPL-EVAL at `1634a3c3c`.**
+
+## IMPL-EVAL cycle 1 (session `9be37c7f`, head `1634a3c3c`) — `FAIL_FIX`
+
+- F-1 (implementation): configured `deno task lint` (CI `quality-lint`) exits 1 — dead
+  `*_API_DEFAULT_PORT` imports in `plugins/auth/src/public/mod.ts:9` and
+  `plugins/triggers/src/public/mod.ts:9` (`no-unused-vars`, `verbatim-module-syntax`). **Tier-A
+  miss**: my gate set ran scoped wrappers + raw `--no-config` lint but not the configured root
+  `deno task lint`; added to the Tier-A checklist for every remaining slice.
+- F-2/F-3 (close-gate, supervisor-owned at ready): #1365 docs box deferred to S9/S11 and the
+  D-14 "type-check" box need explicit evidence wording; #1717 runtime boxes (`--isolated` collision
+  receipt, `scaffold.runtime` both tiers) are CI/lease-backed.
+- F-4 (low): #1717 grep-box wording vs. reality (three constants files + generated exclusion) —
+  drift recorded; evidence block will state it.
+- F-5 (low, pre-existing, out of S5 contract): `garnetExecutableSetup` passes `--port 6379` to the
+  Garnet executable — host-binding collision for two `--isolated` starts in Executable/Auto
+  fallback mode. → arch-debt / follow-up issue draft (supervisor).
+- F-6 (low): raw fmt flags are pre-existing on `main`. F-7 (low): `manifest.ts` `backgroundPort`
+  `.default(0)` relaxation, tests updated — accepted.
+
+Fix brief sent on the thread (slice 8: explicit `export { … } from '../constants.ts'`, dead
+import removed, configured-lint receipt). Cycle 2 IMPL-EVAL follows at the slice-8 head.
