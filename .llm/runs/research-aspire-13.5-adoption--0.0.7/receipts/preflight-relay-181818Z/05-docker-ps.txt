@@ -1,0 +1,4 @@
+relay-preflight-32775 Up 2 seconds 
+relay-preflight-29584 Up 3 seconds 
+postgres-49f8e6d4 Up 5 seconds 127.0.0.1:29584->5432/tcp
+redis-vqsbwdpb Up 5 seconds 127.0.0.1:32775->6379/tcp

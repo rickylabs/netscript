@@ -1,0 +1,22 @@
+{
+  "owner": "preflight",
+  "pid": 3109568,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T18:18:19.154Z",
+  "relays": [
+    {
+      "port": 29584,
+      "container": "relay-preflight-29584",
+      "source": "postgres-49f8e6d4",
+      "startedAt": "2026-08-30T18:18:31.634Z"
+    },
+    {
+      "port": 32775,
+      "container": "relay-preflight-32775",
+      "source": "redis-vqsbwdpb",
+      "startedAt": "2026-08-30T18:18:32.070Z"
+    }
+  ],
+  "closed": "2026-08-30T18:20:10.654Z"
+}

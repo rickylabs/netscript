@@ -1,0 +1,7 @@
+{
+  "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/aspire/apphost.mts",
+  "appHostPid": 3109671,
+  "cliPid": 3109652,
+  "dashboardUrl": "https://localhost:39979",
+  "logFile": "/home/agent/projects/netscript/.aspire/logs/cli_20260830T181820169_detach-child_0455f70e26a24e208350162fe2c3f23c.log"
+}

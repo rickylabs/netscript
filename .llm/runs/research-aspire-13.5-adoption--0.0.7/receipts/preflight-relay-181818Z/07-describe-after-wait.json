@@ -1,0 +1,522 @@
+{
+  "resources": [
+    {
+      "name": "netscript-db-postgres-ejhcakfw",
+      "displayName": "netscript-db-postgres",
+      "resourceType": "Executable",
+      "state": "NotStarted",
+      "source": "deno",
+      "dashboardUrl": "https://localhost:39979/?resource=netscript-db-postgres-ejhcakfw",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "preflight-topology-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "preflight-topology-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "preflight-topology-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "preflight-topology-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": null,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/database/postgres",
+        "resource.appArgs": null,
+        "resource.appArgsSensitivity": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "postgres-49f8e6d4",
+      "displayName": "postgres",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:18:27+00:00",
+      "startTimestamp": "2026-08-30T18:18:29.481086+00:00",
+      "source": "docker.io/library/postgres:18.3",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39979/?resource=postgres-49f8e6d4",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:29584"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/.data/postgres",
+          "target": "/var/lib/postgresql",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "8b63114b2d7c83e4b85e4e5e52609d3a6b6c0a13d57fbf4bdc10557f740d8bba",
+        "container.image": "docker.io/library/postgres:18.3",
+        "container.lifetime": "Persistent",
+        "container.ports": [
+          5432
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": [],
+        "resource.connectionString": null
+      },
+      "environment": {
+        "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+        "POSTGRES_PASSWORD": null,
+        "POSTGRES_USER": "postgres",
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "postgres-password",
+      "displayName": "postgres-password",
+      "resourceType": "Parameter",
+      "state": "Running",
+      "source": "Parameters:postgres-password",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39979/?resource=postgres-password",
+      "relationships": [],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.source": "Parameters:postgres-password",
+        "Value": null
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "delete-parameter": {
+          "displayName": "Delete parameter",
+          "description": "Delete parameter value",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "DeleteFromUserSecrets",
+              "label": "Delete from user secrets",
+              "description": "Delete a value that is saved in [user secrets](https://aka.ms/aspire/user-secrets).",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            }
+          ]
+        },
+        "set-parameter": {
+          "displayName": "Set parameter",
+          "description": "Set parameter value",
+          "state": "Enabled",
+          "sortOrder": 0,
+          "argumentInputs": [
+            {
+              "name": "Value",
+              "label": "postgres-password",
+              "inputType": "SecretText",
+              "required": true,
+              "placeholder": "Enter value for postgres-password",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "SaveToUserSecrets",
+              "label": "Save to user secrets",
+              "description": "Save value to [user secrets](https://aka.ms/aspire/user-secrets) for future use.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "Value"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "preflight-topology-db",
+      "displayName": "preflight-topology-db",
+      "resourceType": "PostgresDatabaseResource",
+      "state": "Running",
+      "startTimestamp": "2026-08-30T18:18:29.481086+00:00",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39979/?resource=preflight-topology-db",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "postgres-49f8e6d4"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "resource.connectionString": null,
+        "resource.parentName": "postgres-49f8e6d4"
+      },
+      "environment": {},
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        },
+        "preflight-topology-db_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {}
+    },
+    {
+      "name": "preflight-topology-web-browser-logs",
+      "displayName": "preflight-topology-web-browser-logs",
+      "resourceType": "BrowserLogs",
+      "state": "NotStarted",
+      "creationTimestamp": "2026-08-30T18:18:26.1202637+00:00",
+      "source": "preflight-topology-web",
+      "dashboardUrl": "https://localhost:39979/?resource=preflight-topology-web-browser-logs",
+      "relationships": [
+        {
+          "type": "Parent",
+          "resourceName": "preflight-topology-web-wdagcrej"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "Active session count": 0,
+        "Active sessions": "None",
+        "Browser": "chrome",
+        "Browser sessions": "[]",
+        "resource.parentName": "preflight-topology-web-wdagcrej",
+        "resource.source": "preflight-topology-web",
+        "Total sessions launched": 0,
+        "User data mode": "Shared"
+      },
+      "environment": {},
+      "healthReports": {},
+      "commands": {
+        "configure-tracked-browser": {
+          "displayName": "Configure tracked browser",
+          "description": "Choose the browser, profile, user data mode, and scope used by tracked browser sessions.",
+          "state": "Enabled",
+          "sortOrder": 1,
+          "argumentInputs": [
+            {
+              "name": "scope",
+              "label": "Scope",
+              "inputType": "Choice",
+              "required": true,
+              "value": "resource",
+              "options": {
+                "resource": "This resource only (preflight-topology-web)",
+                "global": "All BrowserLogs resources"
+              }
+            },
+            {
+              "name": "browser",
+              "label": "Browser",
+              "description": "Choose an installed Chromium-based browser or enter an executable path.",
+              "inputType": "Choice",
+              "required": true,
+              "options": {},
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "userDataMode",
+              "label": "User data mode",
+              "inputType": "Choice",
+              "required": true,
+              "options": {
+                "Shared": "Shared",
+                "Isolated": "Isolated"
+              },
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true
+              }
+            },
+            {
+              "name": "profile",
+              "label": "Profile",
+              "description": "Choose a Chromium profile from the Aspire-managed browser hive, or enter a profile directory/name.",
+              "inputType": "Choice",
+              "allowCustomChoice": true,
+              "dynamicLoading": {
+                "alwaysLoadOnStart": true,
+                "dependsOnInputs": [
+                  "browser",
+                  "userDataMode"
+                ]
+              }
+            },
+            {
+              "name": "saveToUserSecrets",
+              "label": "Save to AppHost user secrets",
+              "description": "Save these settings to [user secrets](https://aka.ms/aspire/user-secrets) so future AppHost runs use them.",
+              "enableDescriptionMarkdown": true,
+              "inputType": "Boolean",
+              "value": "true"
+            }
+          ]
+        },
+        "open-tracked-browser": {
+          "displayName": "Open tracked browser",
+          "description": "Open the app in a tracked browser session and stream browser logs to this resource.",
+          "state": "Enabled",
+          "sortOrder": 0
+        }
+      }
+    },
+    {
+      "name": "preflight-topology-web-wdagcrej",
+      "displayName": "preflight-topology-web",
+      "resourceType": "Executable",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:18:27+00:00",
+      "startTimestamp": "2026-08-30T18:18:26.51+00:00",
+      "source": "deno",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39979/?resource=preflight-topology-web-wdagcrej",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "http",
+          "url": "http://localhost:43301"
+        }
+      ],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3110290,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/apps/preflight-topology-web",
+        "resource.appArgs": [
+          "task",
+          "dev"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "OTEL_BLRP_SCHEDULE_DELAY": "1000",
+        "OTEL_BSP_SCHEDULE_DELAY": "1000",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:40587",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "true",
+        "OTEL_METRIC_EXPORT_INTERVAL": "1000",
+        "OTEL_METRICS_EXEMPLAR_FILTER": "trace_based",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=wdagcrej",
+        "OTEL_SERVICE_NAME": "preflight-topology-web",
+        "OTEL_TRACES_SAMPLER": "always_on",
+        "PORT": "36827",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcp7XMqC1/preflight-topology-web-wdagcrej/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {
+        "preflight-topology-web_http_/health_200_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "prisma-studio-ssngwpde",
+      "displayName": "prisma-studio",
+      "resourceType": "Executable",
+      "state": "\u001B[0m\u001B[32mTask\u001B[0m \u001B[0m\u001B[36mdb:studio\u001B[0m deno run -A --minimum-dependency-age=0 npm:prisma@^7.4.2 studio --config prisma.config.ts --port 5555",
+      "stateStyle": "error",
+      "creationTimestamp": "2026-08-30T18:18:36+00:00",
+      "startTimestamp": "2026-08-30T18:18:35.76+00:00",
+      "stopTimestamp": "2026-08-30T18:18:38.136727+00:00",
+      "source": "deno",
+      "exitCode": 1,
+      "dashboardUrl": "https://localhost:39979/?resource=prisma-studio-ssngwpde",
+      "relationships": [
+        {
+          "type": "Reference",
+          "resourceName": "preflight-topology-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "preflight-topology-db"
+        },
+        {
+          "type": "Reference",
+          "resourceName": "preflight-topology-db"
+        },
+        {
+          "type": "WaitFor",
+          "resourceName": "preflight-topology-db"
+        }
+      ],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": 3112172,
+        "executable.workDir": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/database/postgres",
+        "resource.appArgs": [
+          "run",
+          "--allow-run",
+          "--allow-write",
+          "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/aspire/.helpers/run-tool.mts",
+          "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/database/postgres/.netscript-prisma-studio.error",
+          "db:studio"
+        ],
+        "resource.appArgsSensitivity": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "environment": {
+        "ConnectionStrings__preflight-topology-db": "Host=localhost;Port=29584;Username=postgres;Password=e6cadce9976e495c8526bfb069c86140;Database=preflight-topology-db",
+        "DATABASE_URL": "Host=localhost;Port=29584;Username=postgres;Password=e6cadce9976e495c8526bfb069c86140;Database=preflight-topology-db",
+        "POSTGRES_URI": "Host=localhost;Port=29584;Username=postgres;Password=e6cadce9976e495c8526bfb069c86140;Database=preflight-topology-db",
+        "PREFLIGHT_TOPOLOGY_DB_DATABASENAME": "preflight-topology-db",
+        "PREFLIGHT_TOPOLOGY_DB_HOST": "localhost",
+        "PREFLIGHT_TOPOLOGY_DB_JDBCCONNECTIONSTRING": "jdbc:postgresql://localhost:29584/preflight-topology-db",
+        "PREFLIGHT_TOPOLOGY_DB_PASSWORD": null,
+        "PREFLIGHT_TOPOLOGY_DB_PORT": "29584",
+        "PREFLIGHT_TOPOLOGY_DB_URI": "postgresql://postgres:e6cadce9976e495c8526bfb069c86140@localhost:29584/preflight-topology-db",
+        "PREFLIGHT_TOPOLOGY_DB_USERNAME": "postgres",
+        "SSL_CERT_DIR": "/ephemeral/tmp/aspire-dcp7XMqC1/prisma-studio-ssngwpde/certs:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    },
+    {
+      "name": "redis-vqsbwdpb",
+      "displayName": "redis",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-30T18:18:27+00:00",
+      "startTimestamp": "2026-08-30T18:18:29.392121+00:00",
+      "source": "docker.io/library/redis:7",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:39979/?resource=redis-vqsbwdpb",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:40233"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/agent/projects/netscript/worktrees/007-aspire-s3/.llm/tmp/preflight-topology/preflight-topology/.data/redis",
+          "target": "/data",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "6b77554f364c3c768f8c0256931cc3261b0cfcc9d19ac0cbfa3d1d94b1227bdb",
+        "container.image": "docker.io/library/redis:7",
+        "container.lifetime": "Session",
+        "container.ports": [
+          6379
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": []
+      },
+      "environment": {
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {},
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource",
+          "state": "Enabled",
+          "sortOrder": 2
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource",
+          "state": "Enabled",
+          "sortOrder": 1
+        }
+      }
+    }
+  ]
+}

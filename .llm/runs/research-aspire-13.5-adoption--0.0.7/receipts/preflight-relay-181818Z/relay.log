@@ -1,0 +1,4 @@
+[relay] watching owner=preflight dind=netscript-dind(10.4.12.22) since=2026-08-30T18:18:19.154Z pid=3109568
+[relay] postgres-49f8e6d4 127.0.0.1:29584 => hopA relay-preflight-29584 (10.4.12.22:29584) => hopB 127.0.0.1:29584@ai-agents
+[relay] redis-vqsbwdpb 127.0.0.1:32775 => hopA relay-preflight-32775 (10.4.12.22:32775) => hopB 127.0.0.1:32775@ai-agents
+[relay] cleanup: closed 2 listener(s), removed 2 hop-A container(s)

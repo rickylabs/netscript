@@ -1437,3 +1437,24 @@
   `fix/aspire-13-5-s9-skills-mcp-alignment` (worktree `007-aspire-s9`), `Refs #1721`. **Not pushed**
   — the session credential lacks `workflow` scope; publication is the coordinator's. S10 untouched.
   The combined proof head keeps the S1 workflow tree.
+- **D-74 — owner-scoped two-hop loopback relay closes the DCP address gap; first healthy AppHost on
+  `ai-agents`.** Re-probe: a dind-loopback-published port is refused at `netscript-dind:<p>` and
+  `10.4.12.22:<p>` from `ai-agents`, but reachable at `127.0.0.1:<p>` from a `--network host` helper
+  inside the dind's netns → relay = hop A `alpine/socat` container on the dind host network
+  (`bind=10.4.12.22:<p>` → `127.0.0.1:<p>`) + hop B Deno listener on `ai-agents` (`127.0.0.1:<p>` →
+  `netscript-dind:<p>`), same port at every hop so DCP and generated clients keep their localhost
+  contract. Tool: `tools/loopback-relay.ts` (`watch`/`cleanup`, owner label
+  `netscript.relay.owner=<token>`, registry JSON with PIDs/container names, SIGTERM cleanup; only
+  containers created after `--since` are relayed). Proof (lease, 18:18:18–18:20:13Z,
+  `receipts/preflight-relay-181818Z/`): AppHost pid 3109671 start exit 0 in 9 s; relay attached
+  `postgres-49f8e6d4 127.0.0.1:29584` and `redis-vqsbwdpb 127.0.0.1:32775`; `aspire describe` →
+  `postgres_check: Healthy`, `preflight-topology-db_check: Healthy`, web `/health` Healthy (the
+  `aspire wait` exit 17 targeted `netscript-db-postgres-*`, a command-only resource that stays
+  `NotStarted` — wrong target, not a failure). Owned cleanup: `aspire stop` 0; persistent
+  `postgres-49f8e6d4` (created 18:18:28Z) removed; relay cleanup removed 2 hop-A containers;
+  **containers 0, volumes 0, `aspire ps` `[]`, relay gone.** D-42 also confirmed fixed with the
+  default `DataPath` bind mounts in place. **S3 local Phase B is unblocked** under this protocol
+  (supervisor runs the relay under the lease; the slice thread never touches `relay-*`).
+- **S3 sender record:** `01a05200…` owner PID 296398 dead, absent from `codex-status`; record
+  archived to `slices/s3/evicted-sender/` and evicted per the stale-branch procedure (its rollout
+  still exists on disk, so a same-thread resume is attempted first).
