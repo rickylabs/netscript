@@ -4835,3 +4835,40 @@ a data-screen triad and emits a counter — is the same "signal that does not ma
 `PASS_IMPL` awaiting a coordinator decision, #1462/#1758 is parked at `f4ca7c32` with full evidence,
 and #1368/#1764 is at Tier-A PASS with an evaluator in flight. Reported, not edited — central state is
 coordinator-owned.
+
+## 2026-08-30 — coordinator direction recorded: #1734 cycle 3 authorized; #1368 corpus regeneration authorized
+
+### #1758 — the wait now has a bounded end, and no shortcut is permitted
+
+The concern this lane surfaced — that #1758 was parked on a blocker which was itself parked after two
+terminal evaluator failures — is resolved by the owner authorizing **#1734 cycle 3**, which internals
+is relaunching now. #1758 therefore remains parked **only until that bounded repair lands**.
+
+Explicitly ruled out: **no `status:close-gate-override` and no acceptance rewrite.** Two of the three
+options this lane had put forward for the analogous #1739 case are therefore off the table for #1758,
+and the remaining path is the honest one — land #1734, integrate, rerun the suite green, then recut
+Tier-A, the evaluator, and close-gate.
+
+That is the right call and it matches what the evidence already says: #1758's own DoD carries two
+deliberately unticked boxes (green bare `e2e:cli`, fresh final evaluator), and neither can be ticked
+by relabelling. The park stands at `f4ca7c32`, `status:impl`.
+
+### #1368 — corpus regeneration authorized, with an ordering that matters
+
+The shared-asset sequence is complete on `main` after #1755, so the constraint that made
+`check:mcp-export-corpus` a stop-and-report is lifted. The planned **mechanical** regeneration is
+authorized at the current leaf — but the ordering is explicit and not interchangeable:
+
+1. **Evaluator findings first**, then reconciled;
+2. **then** the mechanical corpus regeneration;
+3. **then** recut exact-head evidence and evaluation.
+
+Regenerating before the findings are reconciled would move the head under the evaluator and invalidate
+the very verdict being waited on — the same stale-head trap that cost #1758 three recut cycles. So the
+regeneration stays queued behind the verdict, not run opportunistically now that it is permitted.
+
+IMPL-EVAL cycle 1 is still in flight at `456e5590`; no artifact and no pushed verdict branch yet. The
+evaluator has been observed checking out `2146443c` and `f8b4f804` to reproduce the red-before and base
+measurements independently, which is the behaviour the brief asked for.
+
+#1368 remains the sole fixes merge-front. **#1357 stays queued and undispatched.**
