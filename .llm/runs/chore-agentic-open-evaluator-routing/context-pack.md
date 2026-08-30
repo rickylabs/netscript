@@ -37,13 +37,16 @@ silent success when it produced nothing.
   check/lint/fmt and 491-test gate all green.
 - Live canaries: both GLM and Qwen presets passed at matched `max` argv identity with a 1024-token
   budget, non-empty marker, and tools/reasoning/streaming evidence.
-- IMPL-EVAL: `PASS` from fresh session `ab4ca47b-00db-49e3-a969-6f779c024a6e` on exact published
-  head `d9722b0b17a478af3db5bdafad87391a2ccbfd67`. Requested OpenRouter / GLM / max; observed `Z.AI`
-  / `z-ai/glm-5.3-flash` with real reasoning/tool activity and non-empty completion; `max` is
-  launcher-argv attested. This deliberately dogfoods the changed route and is not independent.
+- IMPL-EVAL: full `PASS` at `d9722b0b1`, merge-head refresh `PASS` at `1f5bda258`, and final
+  exact-head refresh `PASS` at published source head `6fe9f3b326309e17595d079a97d8106db488430f`.
+  Final session `6b75ca52-691b-4cae-9235-bae987fc4a90` requested OpenRouter / GLM / max and observed
+  `Z.AI` / `z-ai/glm-5.3-flash`, real reasoning/tool activity, non-empty completion, and
+  `CLAUDE_EFFORT=max` inside the child. These evaluations deliberately dogfood the changed route and
+  are not route-independent.
 - Exact-green packet: evaluator artifacts are published in the run-artifact-only branch head
   carrying this record; PR comment `5471524652` contains the redacted structured canary results and
-  S1-S4 gate summary. PR/issue are at `status:augment-review` and the PR remains draft/unmerged.
+  S1-S4 gate summary. A later ready-for-review automation made the PR non-draft and temporarily
+  returned it to `status:impl-eval`; it remains unmerged.
 - Remaining: supervisor handoff only; do not merge from this run.
 - Publication: the HTTPS PAT lacked workflow scope, so the GitHub connector published tree-identical
   commits without force. Current published evidence head before this record: `9937705b5d`.

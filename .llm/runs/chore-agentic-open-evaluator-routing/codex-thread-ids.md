@@ -31,3 +31,14 @@ _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._
 - **Dependency disclosure:** this session deliberately dogfoods the route changed by the leaf; it is
   separate/opposite-family evaluation evidence, not route-independent evidence
 - **Verdict:** `PASS`
+
+## Exact-head currency refreshes
+
+- Merge-head session `7352a19f-013d-438e-8671-c238e46998ff`: `PASS` at
+  `1f5bda25803e93d9ec109340563a2bd6a5e7a1c2` after current-main merge; requested OpenRouter /
+  `z-ai/glm-5.3-flash` / `max`, observed provider `Z.AI` and exact model with launcher effort.
+- Final-head session `6b75ca52-691b-4cae-9235-bae987fc4a90`: `PASS` at exact published source head
+  `6fe9f3b326309e17595d079a97d8106db488430f`; requested OpenRouter / `z-ai/glm-5.3-flash` / `max`,
+  observed provider `Z.AI`, exact model, reasoning/tools/non-empty completion, and
+  `CLAUDE_EFFORT=max` inside the child.
+- Both refreshes deliberately dogfood this leaf's route and are not route-independent evidence.
