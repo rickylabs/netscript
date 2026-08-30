@@ -33,8 +33,9 @@ authority and refreshing every derived publication asset.
 - Add one proportionate troubleshooting entry to
   `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md`.
 - Quote the templated service-reference and plugin-reference messages exactly.
-- Explain that the preflight happens before processor registration and fails fast for either a
-  missing resource or a resource without an `http` endpoint.
+- Explain that, for each processor that is not explicitly disabled, the preflight happens before
+  processor registration and fails fast for either a missing resource or a resource without an
+  `http` endpoint.
 - Commit prose and run artifacts first, then regenerate the agent-docs and publish-asset chain in a
   separate derived-only commit.
 
@@ -49,8 +50,8 @@ authority and refreshing every derived publication asset.
 
 - `docs/site/**` feeds the rendered `_site`, the compressed agent-docs corpus and provenance, the
   CLI embedded agent-docs barrel, and MCP publish assets.
-- `provenance.json.sourceCommit` must record the S1 prose commit, so regeneration cannot happen
-  until S1 exists.
+- `provenance.json.sourceCommit` must record the immediately preceding prose/run-artifact commit,
+  so each regeneration must follow that source commit directly.
 - `docs:readme:check` must be reproduced on a clean `origin/main` checkout to prove its known
   `packages/bench/README.md` failure is baseline red.
 
@@ -60,9 +61,10 @@ authority and refreshing every derived publication asset.
 | -- | -------- | --------- |
 | D1 | Place the entry in `deploy-local-aspire.md`, inside the existing startup-footguns callout. | The failure aborts the scaffolded AppHost during `aspire start`; this is where a reader already running the AppHost looks. The background-processing how-tos address worker/task behavior after configuration, not AppHost boot. |
 | D2 | Present both messages as templates using `'<processor>'` and `'<ref>'`, explicitly saying those placeholders are substituted in generated code. | The source constructs the strings from `name` and `ref`; this is searchable without fabricating a concrete message that the generator may never emit. |
-| D3 | Frame the behavior as required-configuration fail-fast, before processor registration. | This matches the source comment and order of the generated preflight relative to `addExecutable()`. |
+| D3 | For processors that are not explicitly disabled, frame the behavior as required-configuration fail-fast before processor registration. | The `Enabled !== false` guard encloses both the preflight and `addExecutable()`; inside that block, this matches the source comment and emitted order. |
 | D4 | Name both indistinguishable resolution causes: missing resource or no `http` endpoint. | Optional chaining collapses both cases to the same fatal missing endpoint, exactly as the source comment specifies. |
 | D5 | Use two commits: S1 prose/run evidence, then S2 generator outputs only. | The generator records current HEAD as `sourceCommit`, so S1 must immediately precede regeneration. |
+| D6 | Repair the conditionality in a prose/run-artifact commit, then regenerate in a new derived-only commit. | This preserves the same provenance invariant without changing the verified message templates or reopening scope. |
 
 ## Open-Decision Sweep
 
@@ -80,6 +82,7 @@ No unresolved decision would force rework in this slice.
 | ---- | ---------- |
 | Inventing an error variant | Quote both source-built templates exactly and label placeholders honestly. |
 | Misframing a boot/configuration error as load failure | State the preflight occurs before processor registration. |
+| Stating conditional behavior as universal | Qualify every behavioral claim with the enclosing `Enabled !== false` processor guard. |
 | Updating only remembered generated files | Run all three checked-in generators and inspect the resulting diff. |
 | Wrong provenance commit | Commit S1 before `gen:agent-docs-prose` and compare `sourceCommit` to S1. |
 | Baseline red misattributed to this slice | Run `docs:readme:check` in a detached clean worktree at `origin/main`. |
@@ -104,8 +107,9 @@ No unresolved decision would force rework in this slice.
 
 Run every command from the slice brief and record the real exit code in `worklog.md`. In addition,
 verify `git grep -c "background reference" -- docs/site` is positive, compare generated provenance
-to S1, reproduce the README baseline red on clean `origin/main`, confirm no diagram files changed,
-confirm `deno.lock` is unchanged, and report raw `git status --porcelain` after generation/gates.
+to the immediately preceding prose commit, reproduce the README baseline red on clean
+`origin/main`, confirm no diagram files changed, confirm `deno.lock` is unchanged, and report raw
+`git status --porcelain` after generation/gates.
 
 ## Dependencies
 

@@ -1,5 +1,11 @@
 # PLAN-EVAL — docs-background-reference-preflight--1770
 
+> Historical classification: this was an implementation-lane internal opposite-family plan review,
+> not the milestone supervisor's formal evaluator dispatch. The supervisor-dispatched formal
+> IMPL-EVAL at `d5ba40ebd74da447d2a85885828fbd301240a065` independently re-derived the
+> load-bearing placement, template, timing, cause, and provenance reasoning and found it sound on
+> the merits; see `impl-eval.md` and `evaluate.md` for the formal history.
+
 - Plan evaluator session: native Anthropic Claude Fable 5, medium (requested) / native Anthropic
   Claude Fable 5, medium (observed) — session `017op5BRKMFMRHGH3TRdnBM3`, background job
   `d32bb113`, 2026-08-30. Fresh opposite-family session; generator was Codex GPT-5.6 Sol medium
@@ -60,6 +66,9 @@ Load-bearing spot-checks against
   - `Background processor configuration error: '${name}' could not resolve plugin reference '${ref}' HTTP endpoint.`
 - Source comment verbatim: "A declared reference is required configuration, so missing resources
   and resources without an HTTP endpoint are equally fatal." — supports D3/D4 framing.
+- Formal evaluation later identified the qualifier this internal review missed: the emitted
+  preflight and registration both sit inside `Enabled !== false`, so that required-configuration
+  framing applies only to processors that are not explicitly disabled.
 - Endpoint lookups: `_services.get('${ref}')?.getEndpoint('http')` and
   `_plugins.get('${ref}')?.getEndpoint('http')` — the endpoint name is literally `http`.
 
