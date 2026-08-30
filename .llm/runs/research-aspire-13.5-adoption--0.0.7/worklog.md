@@ -554,4 +554,9 @@ review comment resolved; review-threads PASS (0 unanswered); close-gate rerun 33
 Coordinator lands the merge. | | S1 close-gate correction | First rerun 33332251837 FAIL: PR body
 had 2 more unchecked DoD lines (runtime-tiers-green, Tier-A/IMPL-EVAL-complete) beyond the one
 already ticked. Both ticked; live body verified zero `- [ ]` lines. Second close-gate rerun in
-flight — packet withheld until SUCCESS. |
+flight — packet withheld until SUCCESS. | | **S1 MERGE PACKET — exact-green (confirmed)** | PR #1727
+head `32e418c586e7`, base `main`, ready, sole `status:ready-merge` on PR+#1713, `Closes #1713`, DoD
+0 unchecked, boxes 6/6. Close-gate SUCCESS (33332251837, second rerun after the DoD correction);
+checks 7 success/23 skipped/0 red. Runtime carried forward (33330714604 + 33331429495, both
+all-tiers SUCCESS); delta IMPL-EVAL PASS (Opus 5, r3890336485 resolved); review-threads PASS.
+Coordinator lands. |
