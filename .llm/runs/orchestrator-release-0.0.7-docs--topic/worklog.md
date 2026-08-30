@@ -1552,3 +1552,48 @@ decomposition are recorded and only implementation is waiting.
 **Posture: event-driven on #1723.** Dependency release and re-intake are the coordinator's call. The
 moment S1 **#1727** lands, the version-snippet bucket becomes actionable as a single slice and is the
 natural next dispatch.
+
+## 2026-08-30 — environment authority update applied; one published claim retracted
+
+Owner environment-authority update received and **re-verified on the host rather than taken on
+report**, per this lane's standing rule:
+
+| Claim | Verification |
+| --- | --- |
+| PID 1 is `tini`, zombies 0 | `/proc/1` → `tini -- ttyd …`; `ps -eo stat` → 0 zombies |
+| `netscript-dind` resolves | `/etc/hosts` → `10.4.12.16 netscript-dind` |
+| Docker responds | `DOCKER_HOST=tcp://netscript-dind:2375 docker version` → **27.5.1** |
+| Below-28 doctor result | warning only, not a failure or dispatch blocker |
+| inotify ceiling | `max_user_instances` = **128**, 17 in use — the standing Phase-B quota blocker |
+
+**A published claim was retracted.** PR #1748's Drift section asserted "this host's PID 1 is not
+reaping processes, so any gate asserting no surviving child process is a false red at present." That
+was honest when written and is now false. It is struck through and dated on the PR rather than
+deleted, so the earlier classification stays auditable. A refusal reason that has expired must not
+ride into a merge as though it were current — the PR was already at `status:ready-merge`, which is
+exactly when a stale infrastructure excuse is most likely to go unread.
+
+**The waived lifecycle gate was re-run and the fresh result used.** `agentic:leak-check` at the exact
+heads of both leaves: exit 0, `survivors: []`, `aspire` and `docker` probes both `ok`. No owned
+resource to reclaim; no cleanup performed, because none was warranted.
+
+**What the update did not unblock, stated because the distinction is the point.** `diagrams:check`
+remains unrunnable at `22e79dcc`: `mmdc` unavailable, `npx @mermaid-js/mermaid-cli@10.9.1` exits 126,
+and no system or bundled Chromium exists. That block is **Chromium absence**, not the zombie or
+Docker conditions the update resolved. Claiming the update cleared it would have been false. The
+carry-over from `6b91eb25` stands on its own merits: the gate is a pure byte-comparison of committed
+SVGs and `git diff --name-only 6b91eb25..22e79dcc` contains zero `.mmd` and zero `.svg` paths, read
+directly rather than remembered — unlike the `check:publish-assets` omission on #1746, where the
+input relationship itself had been misremembered.
+
+**Corroboration, not duplication.** The fixes/Aspire lane independently reached the same host finding
+and measured the root suite at `4308 passed / 2 failed`, both failures reproducing at `main`
+`13878a80`. Not re-run here; that lane's measurement is not this lane's to repeat.
+
+**Queue impact: none.** #1723 stays blocked. Its dependency is S1–S10 *merging*, not host capability
+— `main` still pins Aspire 13.4.6 and every S-slice is open. A healthy Docker sandbox does not land
+#1727. It may unblock the Aspire lane's own runtime verification (PR #1735, S2 receipts), which would
+accelerate the chain, but that is that lane's work and is not taken here.
+
+No commit to either leaf; no head moved. PR-surface correction only. Both leaves remain at
+`status:ready-merge`, unmerged, with the human merge queue.
