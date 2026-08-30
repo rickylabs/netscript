@@ -2632,3 +2632,45 @@ red-before now applies to its fix.
 Next slice is the host side, carrying the remaining minors: PE-10's neutral inspection error title and
 Sweep-1's retained `EmptyPluginRegistryError` (S9), then PE-8's raw-command receipt for
 `check:mcp-export-corpus` (S10).
+
+## 2026-08-30 — host slice in flight; singleton runtime lease formally requested
+
+### Lease request — `scaffold.runtime` for #1673, addressed to the coordinator
+
+This lane does **not** self-grant. Requesting the singleton expensive-gate lease, with the state that
+makes it grantable recorded so the decision needs no re-derivation:
+
+| Field | Value |
+| --- | --- |
+| Requesting lane / leaf | fixes · #1673 · PR #1739 · `fix/plugin-doctor-registry-drift` |
+| Gate | `scaffold.runtime` (plan gate 16 — REQUIRED, supervisor-coordinated, author-must-not-run) |
+| Slot state | `expensiveGates` shows **0 active/held**; `limits.globalExpensiveGates` is 1, so the slot is free |
+| Lease owner | `codex-root-0.0.7` — grant authority, not this lane |
+| Environment | DinD client/server **28.5.2**, `netscript-dind` 10.4.12.19, `fs.inotify.max_user_instances` **1024**, `docker ps -a` and `aspire ps` both **zero** |
+| Scope requested | one isolated `scaffold.runtime` verdict at the exact implementation head, Aspire/Docker cleanup mandatory, sandbox returned to zero |
+| Cleanup commitment | `agentic:leak-check` first, then `agentic:teardown --apply` scoped to proven resources, `--owned-root` for anything started outside the worktree; durable receipt is the runner `--report` JSON, since `e2e:cli` is not in `.llm/tools/gates/catalog.ts` |
+
+**Why this gate is not ceremonial here.** IMPL-EVAL cycle 1 predicted CI's `scaffold.runtime` would go
+red at the pre-fix head: the e2e plugin-suite builder defaults `aiMcp = true`
+(`plugin-suite-builder.ts:16`) and `behavior.plugin-doctor-missing-module` requires doctor healthy
+first. That makes this suite the one end-to-end proof that F1 is genuinely fixed rather than
+unit-tested. The lane proceeds with every non-runtime gate meanwhile, so the request blocks nothing.
+
+### Two central-state observations, reported not touched
+
+1. **Stale active evaluator leases in this lane.** `evaluatorLeases` still lists
+   `reset-gate-05-scaffold-generated-output-correctness-plan-eval-cycle-1` (`blocked`) and
+   `prisma-mysql-honest-example-plan-eval-cycle-2` (`running`) as active, though both leaves merged
+   long ago. With `limits.activeEvaluatorsPerLane: 1` the recorded state implies this lane is at
+   capacity while it actually has **zero** evaluators running. This lane's real practice — one
+   evaluator at a time — is unchanged; the ledger is what drifted.
+2. **#1673 / PR #1739 remains absent from `milestone-cluster-state.json`**, so none of this leaf's
+   evaluators, gates, or heads appear in central state at all. Previously reported; repeated here
+   because the lease request above will also have no home in the ledger until the leaf is registered.
+
+### Host slice in flight
+
+The author is modifying exactly the authorized CLI paths — `generate-installed-plugin-registries.ts`,
+`installed-runtime-registry-generator.ts`, `installed-runtime-registry-generator_test.ts`,
+`runtime-registry-drift.ts`, `doctor-plugin-use-case.ts`, and `doctor-plugin-registry-drift_test.ts`.
+All six are inside the eleven; nothing outside has been touched.
