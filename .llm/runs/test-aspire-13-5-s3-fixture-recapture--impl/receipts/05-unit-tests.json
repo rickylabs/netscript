@@ -1,0 +1,42 @@
+{
+  "gateId": "test",
+  "invocationId": "s3-final-unit-tests",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/mcp",
+    "packages/telemetry",
+    ".llm/tools/agentic/teardown",
+    "packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts",
+    "packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts",
+    ".llm/tools/validation/check-compat-fixtures_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-aspire-13-5-s3",
+  "gitHead": "37f0487f13ca1316b09e92753cb74857f79edb13",
+  "actualGitHead": "37f0487f13ca1316b09e92753cb74857f79edb13",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex-gpt-5.6-sol",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "e8ed01f0365b7ab207b9fcd5e7002dce597f89f45c50800c694f7600d0ebbbae",
+  "lifecycleId": "codex-gpt-5.6-sol:s3-final-unit-tests:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T01:42:51.871Z",
+  "startedAt": "2026-08-30T01:42:51.878Z",
+  "finishedAt": "2026-08-30T01:43:38.464Z",
+  "durationMs": 43496,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 545,
+    "sha256": "5cea6a56163b11659bb40eea89c8e5c6a76b683439a0046cdf449ce60d1b80f2",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/mcp\",\"packages/telemetry\",\".llm/tools/agentic/teardown\",\"packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts\",\"packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts\",\".llm/tools/validation/check-compat-fixtures_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-aspire-13-5-s3\",\"exitCode\":0,\"durationMs\":43225,\"summary\":{\"passed\":263,\"failed\":0,\"ignored\":0,\"totalResults\":263,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 386,
+    "sha256": "8be8a53715a1fd8beceda67eb97696307aba60e8c921b705a06de889c4f95b3e",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/mcp' 'packages/telemetry' '.llm/tools/agentic/teardown' 'packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts' 'packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts' '.llm/tools/validation/check-compat-fixtures_test.ts'\n",
+    "truncated": false
+  }
+}
