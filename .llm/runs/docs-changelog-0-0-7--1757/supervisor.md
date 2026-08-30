@@ -8,7 +8,7 @@
 | Checkout | `/home/agent/projects/netscript/worktrees/007-leaf-1757` |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1757` |
 | Branch | `docs/changelog-0-0-7` (no upstream by design) |
-| Baseline | `13878a80a50c55b9662099fed64555f2310ae4a3` (evaluated content pin; `origin/main` later advanced) |
+| Baseline | `13878a80a50c55b9662099fed64555f2310ae4a3` (historical PLAN-EVAL snapshot); live triage pin `a5520e70b43fa792c36451270742240e0f2aa889` |
 | Run ID | `docs-changelog-0-0-7--1757` |
 
 ## Routes in force

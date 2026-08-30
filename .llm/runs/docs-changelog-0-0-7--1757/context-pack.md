@@ -12,40 +12,41 @@
 
 ## Current State
 
-Research and the locked 33-row triage are complete at the fixed `13878a80` baseline. After two
+The independently evaluated snapshot contains 33 rows through historical pin `13878a80`. After two
 recorded `FAIL_PLAN` verdicts, the coordinator authorized a fresh post-escalation evaluation, which
-returned `PASS_PLAN` after independently checking the embedded tools, all triage rows, and all
-eleven bullets. `origin/main` then advanced to `f8b4f804`; both later commits were mechanically
-triaged as Exclude, and the evaluated content pin was retained. The changelog is implemented and
-all five required gates have run: four exit 0; `docs:readme:check` exits 1 for a single pre-existing
-bench README defect independently reproduced on clean current `origin/main`.
+returned `PASS_PLAN` after independently checking the embedded tools, all snapshot rows, and all
+eleven bullets. Live triage currency now covers 37 commits through `a5520e70`: the four post-snapshot
+commits are all specifically reconciled as Exclude, producing 17 Include / 20 Exclude without
+reopening the locked map. The changelog remains provisional and implemented; required gates have
+run, with the sole README-standard red independently reproduced on clean current `origin/main`.
 
 ## Completed
 
 - Verified branch, SHA, issue/milestone/labels, changelog baseline, version boundary, and token.
-- Inspected actual diffs for ambiguous commits and recorded all 33 decisions.
+- Inspected actual diffs for ambiguous commits and recorded all 37 decisions through `a5520e70`.
 - Proved the changelog feeds neither the agent-docs corpus nor publish-assets generators.
 - Selected the docs overlay, gates, one commit slice, and formal PLAN-EVAL.
 - Repaired cycle-1 findings by re-triaging embedded `agent init` tools and locking an eleven-bullet map.
 - Repaired cycle-2 findings by disclosing all five SDK/contracts breaks and the installed scanner's new permission requirement.
-- Recorded the authorized post-escalation `PASS_PLAN` and reconciled both post-pin commits.
+- Recorded the authorized post-escalation `PASS_PLAN` and reconciled all four post-snapshot commits.
 - Added `## 0.0.7` from the locked eleven-row map without a release introduction or version bump.
 
 ## In Progress
 
-- Commit/push/PR handoff after final diff and boundary review.
+- Commit/push/PR-body currency handoff after final diff and boundary review.
 
 ## Next Steps
 
-1. Commit once, push by explicit refspec, and open the implementation-status PR.
-2. Hand off to the coordinator for Tier-A review and a separate IMPL-EVAL.
+1. Commit once and push by explicit refspec.
+2. Update PR #1761's triage totals, exact-head acceptance evidence, and gate table.
+3. Hand off to the coordinator for a renewed exact-head IMPL-EVAL.
 
 ## Key Decisions
 
 | Decision | Source | Notes |
 | --- | --- | --- |
-| Include 17 / exclude 16 | Commit diffs, issue #1757, PLAN-EVAL cycle 1 | Rule includes tools embedded and installed by `agent init`. |
-| Keep the `13878a80` content pin | PLAN-EVAL moving-baseline procedure and focused post-pin diffs | Two later commits are separately reconciled as Exclude; the PR must remain provisional. |
+| Live Include 17 / Exclude 20 through `a5520e70` | Commit diffs, issue #1757, PLAN-EVAL cycle 1, currency reconciliations | Rule includes tools embedded and installed by `agent init`; all four post-snapshot commits are excluded. |
+| Preserve `13878a80` only as historical evaluation evidence | PLAN-EVAL reports and focused post-snapshot diffs | Live triage pin is `a5520e70`; the PR remains provisional. |
 | No derived regeneration | Generator source | Changelog is not an input. |
 | No release intro/version bump | Release tool and skill | Release-captain boundary. |
 

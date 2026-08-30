@@ -81,3 +81,23 @@
 - **Severity:** minor
 - **Action:** accept the owner-authorized resumed thread for this bounded repair and record the drift; do not describe the stale initial "matched" record as the resumed identity.
 - **Evidence:** `codex-thread-ids.md`; `.llm/tools/agentic/codex/codex-resume.ts:35-44,46-60,65-108,141-148`; `impl-eval.md:28-31,171-175`.
+
+## 2026-08-30 — Main advanced twice during the currency slice
+
+- **What:** After the earlier reconciliation through `f8b4f804`, `origin/main` advanced first to
+  `952cc106aafea61570d24247695ac23f5d810026` and then to
+  `a5520e70b43fa792c36451270742240e0f2aa889`.
+- **Source:** `git ls-remote origin refs/heads/main`, `git log --oneline f8b4f804..origin/main`, and
+  focused diffs for both commits.
+- **Expected:** Reconcile each new commit under the locked consumer-observability rule without
+  reopening the eleven-bullet map unless a shipped behavior changed.
+- **Actual:** `952cc106` normalizes Aspire terminology and prerequisite links across public prose,
+  changes one diagram comment, and regenerates agent-doc carriers. `a5520e70` adds the
+  already-shipped `.agents/skills/` directory to the quickstart tree and regenerates the same
+  carriers. Neither changes hand-written package/plugin behavior.
+- **Severity:** minor
+- **Action:** add two specific Exclude rows, move the live triage pin to `a5520e70`, update live
+  totals to 37 commits (17 Include / 20 Exclude), and preserve older plan/evaluator SHAs as
+  explicitly historical evidence. The changelog prose remains untouched and provisional.
+- **Evidence:** `worklog.md ## Commit Triage`; `git diff-tree --name-only 952cc106`;
+  `git diff-tree --name-only a5520e70`; focused prose diffs under `README.md` and `docs/site/**`.

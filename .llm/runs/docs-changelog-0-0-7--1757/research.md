@@ -2,6 +2,10 @@
 
 ## Re-baseline
 
+> Historical research snapshot: the facts in this section were derived for PLAN-EVAL at
+> `13878a80`. Live triage currency is maintained in `worklog.md` and now covers 37 commits through
+> `a5520e70`.
+
 - Carried-in source: issue #1757 and the slice brief.
 - Re-derived against `origin/main` at `13878a80a50c55b9662099fed64555f2310ae4a3` on 2026-08-30.
 - `HEAD`, `origin/main`, and the merge-base are the same SHA; `v0.0.6..origin/main` contains exactly

@@ -20,7 +20,7 @@
 - **Include** — behavior, generated output, CLI/plugin behavior, or published API a consumer can observe.
 - **Exclude** — harness, CI-only, repository tooling, run artifacts, internal refactor, future RFC,
   corpus-only refresh, or prose that does not ship a behavior change.
-- **Provisional** — accurate for the fixed baseline, explicitly requiring a top-up before release cut.
+- **Provisional** — accurate through the current triage pin, explicitly requiring a top-up before release cut.
 
 ### Ports
 
@@ -29,8 +29,10 @@
 
 ### Constants
 
-- Baseline: `v0.0.6..13878a80a50c55b9662099fed64555f2310ae4a3`.
-- Expected commit count: 33.
+- Live triage baseline: `v0.0.6..a5520e70b43fa792c36451270742240e0f2aa889`.
+- Expected live commit count: 37.
+- Historical PLAN-EVAL content snapshot: `v0.0.6..13878a80a50c55b9662099fed64555f2310ae4a3`
+  (33 commits).
 - Release-artifact boundary: no introduction, notes file, version bump, cut, or publish.
 
 ### Commit Slices
@@ -49,7 +51,9 @@
 For a later top-up, compare the then-current release baseline to the last commit represented here,
 repeat the same consumer-observability test, and add plain bullets without internal identifiers.
 
-## Commit Triage — pinned `v0.0.6..13878a80`
+## Commit Triage — live `v0.0.6..a5520e70` (37 commits)
+
+### Independently evaluated snapshot — historical `v0.0.6..13878a80`
 
 | Commit | Decision | Reason |
 | --- | --- | --- |
@@ -87,24 +91,35 @@ repeat the same consumer-observability test, and add plain bullets without inter
 | `8b1e42f7` | Include | Generated background processor registration fails fast when declared service/plugin HTTP references cannot resolve. |
 | `13878a80` | Include | `agent init` installs canonical cross-host skills and writes accurate project guidance into `AGENTS.md`. |
 
-Summary: **17 included, 16 excluded**. The decision rule is consumer observability on the shipped
-baseline, never the conventional-commit prefix.
+Historical snapshot summary: **17 included, 16 excluded**. The decision rule is consumer
+observability on the shipped baseline, never the conventional-commit prefix.
 
-### Post-evaluation baseline reconciliation
+### Post-evaluation baseline reconciliation — live through `a5520e70`
 
-The changelog content remains pinned to the evaluated 33-commit range ending at
-`13878a80a50c55b9662099fed64555f2310ae4a3`. At implementation time `origin/main` was
-`f8b4f804cc5fe77054d4f220974eae66becf090c`; both later commits were checked under the same
-consumer-observability rule and do not change the locked eleven-bullet map.
+The eleven-bullet map was independently evaluated against the historical 33-commit snapshot ending
+at `13878a80a50c55b9662099fed64555f2310ae4a3`. Live `origin/main` is now pinned for triage at
+`a5520e70b43fa792c36451270742240e0f2aa889`; all four later commits were checked under the same
+consumer-observability rule and do not change the locked map.
 
 | Commit | Decision | Reason |
 | --- | --- | --- |
 | `625447f1` | Exclude | Aspire 13.5.3 verification receipts: the architecture-debt ledger and `.llm/runs/**` run/receipt artifacts only; no consumer-visible surface. |
 | `f8b4f804` | Exclude | Explanatory agent-tooling docs plus their generated corpus and publish assets; documents already-shipped behavior without changing consumer behavior. |
+| `952cc106` | Exclude | Public Aspire terminology and prerequisite-link normalization, a comment-only diagram edit, and regenerated agent-doc carriers; no hand-written package/plugin behavior changed. |
+| `a5520e70` | Exclude | Quickstart prose now shows the already-generated `.agents/skills/` tree entry, accompanied only by regenerated agent-doc carriers; no consumer behavior changed. |
 
-The live 35-commit range therefore reconciles to **17 included, 18 excluded**, while the
-implementation deliberately retains the independently evaluated `13878a80` content pin. The PR
-must state both that pin and the provisional top-up requirement.
+The live 37-commit range through `a5520e70` therefore reconciles to **17 included, 20 excluded**.
+The earlier `13878a80` references in the locked plan and evaluator reports remain explicitly
+historical point-in-time evidence; the PR and live run state use `a5520e70` as the current triage
+pin and retain the provisional top-up requirement.
+
+### Historical-reference audit
+
+The following artifacts intentionally preserve older counts and SHAs because they are immutable or
+point-in-time phase evidence, not live currency statements: `plan.md`, `plan-eval-brief.md`,
+`plan-eval-cycle-1.md`, `plan-eval.md`, `plan-eval-cycle-2.md`, and `impl-eval.md`. Their embedded
+`33`/`35` counts and `13878a80`/`625447f1`/`f8b4f804` references describe the exact baselines those
+plans and evaluations inspected. Live currency is the 37-row table above through `a5520e70`.
 
 ## Progress Log
 
@@ -115,10 +130,11 @@ must state both that pin and the provisional top-up requirement.
 | 2026-08-30 | 1 | PLAN-EVAL cycle 1 | `FAIL_PLAN`: shipped `agent init` tool deltas were under-triaged and draft bullet wording/mapping was not locked. Repaired to 17/16 with an eleven-bullet map. |
 | 2026-08-30 | 1 | PLAN-EVAL cycle 2 | `FAIL_PLAN`: B11 omitted two declared breaking changes and B1 omitted the scanner's new permission requirement. Both clauses repaired; two-failure limit reached, so implementation is blocked pending owner authorization for cycle 3 or a written waiver. |
 | 2026-08-30 | 1 | PLAN-EVAL post-escalation | `PASS_PLAN`: independent source verification confirmed all 33 triage decisions and all eleven locked bullets; implementation authorized after mechanical baseline reconciliation. |
-| 2026-08-30 | 1 | Baseline reconciliation | `origin/main` advanced by two commits to `f8b4f804`; both are excluded above, and the evaluated `13878a80` content pin is retained. |
+| 2026-08-30 | 1 | Baseline reconciliation | `origin/main` first advanced by two commits to `f8b4f804`; both were excluded above while the evaluated `13878a80` snapshot remained historical evidence. |
 | 2026-08-30 | 1 | Implementation | Added `## 0.0.7` from the locked eleven-row map with no release introduction or version bump. |
 | 2026-08-30 | 1 | IMPL-EVAL at `15c262e4` | Separate-session evaluator returned `PASS`, but verified the scanner's declared permission change without testing whether the changelog's word "needs" described a runtime requirement; this verdict is superseded by the repair below. |
 | 2026-08-30 | 1 | B1 wording repair | Augment review correctly distinguished the bundle declaration from runtime behavior. Source verification showed environment access is optional and network access occurs only when resolving a `quality-allow` issue; changed only B1's parenthetical and recorded the medium-requested/high-observed resume-route drift in `drift.md`. |
+| 2026-08-30 | 1 | Triage currency reconciliation | `origin/main` moved twice more, through `952cc106` to `a5520e70`; both diffs are documentation plus regenerated carriers, so they are excluded and live currency is 37 commits (17 Include / 20 Exclude). The changelog prose was not reopened. |
 
 ## Gate Results
 
@@ -128,7 +144,7 @@ must state both that pin and the provisional top-up requirement.
 | PLAN-EVAL cycle 2 | FAIL_PLAN | `plan-eval.md` | Repaired two wording-completeness findings; harness loop limit reached. |
 | PLAN-EVAL post-escalation | PASS_PLAN | `plan-eval-cycle-2.md` | Coordinator-authorized independent evaluation; implementation may proceed after reconciliation. |
 | `deno task docs:links` | PASS (exit 0) | `broken-links=0 broken-anchors=0 orphans=0` | Required link-integrity gate. |
-| `deno task docs:readme:check` | BASELINE RED (exit 1) | `packages/bench/README.md`: missing `## Install` | Reproduced with the same exit and sole finding in a clean archive of current `origin/main` at `f8b4f804cc5fe77054d4f220974eae66becf090c`; unrelated to this changelog diff. |
+| `deno task docs:readme:check` | BASELINE RED (exit 1) | `packages/bench/README.md`: missing `## Install` | Reproduced with the same exit and sole finding in a clean archive of current `origin/main` at `a5520e70b43fa792c36451270742240e0f2aa889`; unrelated to this changelog diff. |
 | `deno task check:publish-assets` | PASS (exit 0) | No stale publish asset reported | Required even though the changelog is not a generator input. |
 | `deno task check:assets-barrel` | PASS (exit 0) | Generator completed; generated-file diff check clean | Required even though the changelog is not a generator input. |
 | `deno task check:agent-docs-prose` | PASS (exit 0) | Site build/render checks passed; corpus reported `fresh: true`, `stalePaths: []` | Confirms no agent-docs prose regeneration is needed. |
@@ -142,6 +158,16 @@ must state both that pin and the provisional top-up requirement.
 | B1 repair: `git diff --exit-code -- deno.lock` | PASS (exit 0) | No diff | Lock remains unchanged. |
 | B1 repair: `git diff --exit-code -- packages/cli/deno.json` | PASS (exit 0) | No diff | Version file remains unchanged at `0.0.6`. |
 | B1 repair: `deno task docs:readme:check` | BASELINE RED (exit 1) | `packages/bench/README.md`: missing `## Install` | Same sole pre-existing finding previously reproduced in a clean `origin/main` archive; this repair does not touch `packages/bench/`. |
+| Currency: `deno task docs:links` | PASS (exit 0) | `broken-links=0 broken-anchors=0 orphans=0` | 37-row reconciliation rerun. |
+| Currency: `deno task docs:snippets` | PASS (exit 0) | `PASS scanned=581 ... checked=22 exempt=14 ... malformed=0` | 37-row reconciliation rerun. |
+| Currency: `deno task check:publish-assets` | PASS (exit 0) | No stale publish asset reported | No asset regeneration required. |
+| Currency: `deno task check:assets-barrel` | PASS (exit 0) | Generated-file diff check clean | No derived asset churn. |
+| Currency: `deno task check:agent-docs-prose` | PASS (exit 0) | Corpus reported `fresh: true`, `stalePaths: []` | No agent-docs prose regeneration required. |
+| Currency: `deno task docs:accuracy` | PASS (exit 0) | Accuracy/discoverability scan passed | Tier-A parity rerun. |
+| Currency: `deno task docs:exports-drift` | PASS (exit 0) | Exports and symbols drift check passed | Tier-A parity rerun. |
+| Currency: `git diff --exit-code -- deno.lock` | PASS (exit 0) | No diff | Lock remains unchanged. |
+| Currency: `git diff --exit-code -- packages/cli/deno.json` | PASS (exit 0) | No diff | Version remains `0.0.6`. |
+| Currency: `deno task docs:readme:check` | BASELINE RED (exit 1) | `packages/bench/README.md`: missing `## Install` | Same sole finding reproduced in a clean archive of `origin/main` at `a5520e70b43fa792c36451270742240e0f2aa889`; this slice does not touch `packages/bench/`. |
 
 ### Explicit N/A gates
 
@@ -155,7 +181,7 @@ must state both that pin and the provisional top-up requirement.
 
 ## Handoff Notes
 
-- The changelog is provisional at the evaluated `13878a80` pin and requires a top-up before the
+- The changelog is provisional through the live `a5520e70` triage pin and requires a top-up before the
   0.0.7 release cut.
 - Tier-A review and a separate IMPL-EVAL are intentionally deferred to the coordinator after this
   implementation handoff.
