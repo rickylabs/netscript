@@ -4872,3 +4872,40 @@ evaluator has been observed checking out `2146443c` and `f8b4f804` to reproduce 
 measurements independently, which is the behaviour the brief asked for.
 
 #1368 remains the sole fixes merge-front. **#1357 stays queued and undispatched.**
+
+## #1368 IMPL-EVAL cycle 1 — FAIL_FIX reconciled (2026-08-30)
+
+Verdict `72be7d12` on `eval/impl-eval-1368-cycle-1`, route native opposite-family Fable 5 · medium,
+evaluated head `456e5590`. **Every one of the nine supervisor claims reproduced** — red-before 0/2,
+head 9/0, whole package 81/0/3, plugin 7/0, ceiling, byte-unchanged `deno.lock`, and the
+`check:mcp-export-corpus` head-red/base-green attribution. It also confirmed stop-and-report on the
+corpus was correct ordering, since no PR CI job runs that check.
+
+Two blocking findings; they reconcile differently.
+
+**F1 (mid-plan head) — stale, not wrong, and the fault is mine.** F1 said S5/S6 had not landed. True
+of `456e5590`. The author has since landed S5 as `8d3317a3` (Flow-B fixture + validator + validator
+test + README) and S6 as `ff161a44`. I verified both by diff. The evaluator was measuring a head the
+author had already moved past **because I dispatched IMPL-EVAL while the author was still working** —
+the run's own `context-pack.md` said the next slice was pending and I read Tier-A's green tests as
+completeness. Green tests at S4 say nothing about the plan being complete. This is the same stale-head
+trap that cost #1758 three recut cycles, and the evaluator promoted the exact check I skipped: read
+`context-pack.md` phase + slice table before requesting the final evaluator. No product work; F1 is
+answered by a re-cut at the true terminal head.
+
+**F2 (correlationKey overwrite) — real and still live at `ff161a44`.** Independently confirmed at the
+current head: `withScheduledContext` (l.362-364) is parent-wins, so a caller-supplied
+`correlationKey` is replaced by the upstream id; `#dispatchSend` (l.266) stamps
+`correlationKey: execution?.correlationId` onto the nested message. I corroborated the base claim
+directly — `saga-bus-bridge.ts` at `f8b4f804` contains **no occurrence of `correlationKey` at all**,
+so the base stamped nothing and the rule-less downstream identity change is genuinely leaf-introduced.
+Tier-A missed it because the head test covers only the no-user-key case.
+
+Ceiling re-checked after S5: 17 product paths, all inside the locked 19 (13/14 unused).
+
+Repair dispatched to author thread `01a052b6-…` as cycle 1 of 2: F2 user-wins invariant on both paths
+plus a regression test per path, with a stop-and-report clause if the invariant needs new product
+scope; F3 measure-then-decide on the `sagaFail` traceparent path; F4 README + PR behavior-change line;
+F5 artifact refresh; F6 drift entry for the two baseline-red gates. Corpus regeneration is authorized
+but deliberately sequenced **after** this repair, since F2 moves signatures and would move the corpus
+again. Send held until the thread showed two consecutive zero-growth samples.
