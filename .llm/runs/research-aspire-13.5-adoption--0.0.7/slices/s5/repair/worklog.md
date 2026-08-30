@@ -242,3 +242,62 @@ asset or lockfile changed, and no runtime process was started.
 - The locked F-4 review disposition remains current. Thread resolution and independent evaluation
   remain supervisor work; this lane will attach the immutable repair commit and gate evidence but
   will not self-certify or mutate PR state.
+
+## Slice 5 — gates and evidence
+
+### Configured gates
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `deno task lint` | 0 | 2,051 files processed, 0 findings. |
+| `deno task check` | 0 | 2,938 files checked in 25 batches, 0 diagnostics. |
+| `deno task test` | 1 | 4,282 passed, 2 failed, 19 ignored. Failures were unrelated `.llm/tools/agentic` host-process tests: `codex-follow_test.ts` hit `Deno.watchFs` `Too many open files (os error 24)` and `hybrid-launcher_test.ts` observed worker descendant `402798` survive cancellation. |
+
+The root test failure is a merge-readiness blocker even though it is outside the four S5 repairs; no
+test was skipped, de-catalogued, ignored, or changed.
+
+### Failure isolation
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| Structured runner over `codex-follow_test.ts` and `hybrid-launcher_test.ts` | 1 | 11 passed, 2 failed: watcher EMFILE recurred and worker descendant `440927` survived. |
+| `deno test --allow-all .llm/tools/agentic/codex/codex-follow_test.ts` | 0 | 3 passed, 0 failed in isolation; confirms its configured-run EMFILE was load-sensitive. |
+| `deno test --allow-all .llm/tools/agentic/claude/hybrid-launcher_test.ts` | 1 | 9 passed, 1 failed; worker descendant `444272` survived cancellation. |
+| `ps -o pid=,ppid=,pgid=,stat=,etime=,cmd= -p 402798,440927,444272` | 0 | All three test-owned `sleep` descendants are defunct (`Z`), reparented to PID 1. `Deno.kill(pid, 0)` therefore continues to report them alive until PID 1 reaps them. |
+| Initial process/resource diagnostic (`ps`, `pgrep`, `ulimit -n`) | 0 | File limit is 524,288; foreign active agent sessions were observed and left untouched. |
+| Inotify diagnostic (`/proc/sys/fs/inotify/*`, inotify FD count, descendant `ps`) | 0 | Host maximum is 128 instances; the first isolated descendant was already a PID-1 zombie. |
+| `deno eval --allow-read ... Deno.watchFs(...)` | 1 | Diagnostic invocation used an unsupported Deno 2.9 `eval` permission flag; non-verdict. |
+| `deno eval 'const watcher = Deno.watchFs(...); ...'` | 0 | A fresh standalone watcher opened successfully after the configured run. |
+
+This lane does not own `.llm/tools/agentic/claude/hybrid-launcher*`, cannot reap PID-1-owned
+zombies, and is prohibited from weakening or narrowing the configured test gate. The independent
+supervisor must obtain a clean-host green run or route that separate agentic-runtime defect.
+
+### S5-scoped and final gates
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| Structured test wrapper over the 7 changed repair test files | 0 | 29 passed, 0 failed. |
+| `run-deno-check.ts --root plugins/ai --root plugins/auth --root plugins/sagas --root plugins/triggers --root plugins/workers --root packages/cli --root .llm/tools/validation --ext ts,tsx` | 0 | 1,244 files, 11 batches, 0 diagnostics. |
+| Scoped plugin-root lint wrapper | 0 | 342 files processed, 0 findings. |
+| Scoped plugin-root fmt-check wrapper | 0 | 342 files processed, 0 findings. |
+| Lint wrapper over the 2 owned CLI files and 2 owned validation-tool files with temporary no-exclude repository rules | 0 | 4 files processed, 0 findings. |
+| Fmt-check wrapper over the same 4 owned files with temporary no-exclude repository rules | 0 | 4 files processed, 0 findings. |
+| `deno task check:aspire-host-ports` | 0 | 957 files scanned; no pinned host ports. |
+| `deno task quality:scan` | 0 | 0 findings; 7 bounded pre-existing allowances. |
+| `deno task arch:check` | 0 | Doctrine `FAIL=0`; existing warnings only. |
+| Runtime-literal `git grep` over plugins, CLI source, and CLI E2E | 0 | Exactly six D-14-compatible deprecated constant/test lines; no unexpected literal. |
+| `check:assets-barrel` | N/A | No generated asset moved or changed in the repair commits. |
+
+The temporary `.llm/tmp/s5-repair-final-quality.json` was removed. `deno.lock` is unchanged. No
+Aspire, Docker, AppHost, generated runtime, or `e2e:cli` process was started.
+
+### Final disposition
+
+- F-1 through F-4 are implemented, pushed in ordered append-only commits, and covered by focused
+  green tests and per-slice quality/architecture gates.
+- Direct replies with immutable commit evidence were posted to the F-2, F-3, and F-4 review
+  threads. Threads were not self-resolved.
+- Slice 5 cannot be certified green because configured `deno task test` remains red on the isolated
+  agentic-runtime zombie-reaping test above. Tier-A review and IMPL-EVAL remain separate and have
+  not been performed by this lane.
