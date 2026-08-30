@@ -5017,3 +5017,39 @@ rollout-growth stall.
   corrections above, and flags that the author's gate table certifies the **pre-rebase**
   `1d3451845af400cc3bd4aec650bf7ec0bcda18d1` — content-identical, but a differing SHA is a
   provenance note the evaluator is told to weigh rather than ignore.
+
+## D-81 — #1774 IMPL-EVAL blocked: both sanctioned evaluator routes unavailable (bounded failure, coordinator decision required)
+
+- Job `e3785c3b` never ran. `state.json` shows `state: "blocked"`, detail: *"You've hit your monthly
+  spend limit … keep using Fable 5 or switch models to continue."* No evaluation was produced.
+- **My monitor's liveness probe was also a broken instrument.** It tested
+  `claude agents | grep -q e3785c3b`, but `claude agents` requires a TTY and errored on every cycle
+  (`use 'claude agents --json'`). The "no longer listed" event was produced by a *failing command*,
+  not by evidence. It reached the right conclusion for the wrong reason.
+  - *Third instrument defect this stretch, after the fabricated lease SHA and the `| tail` exit-code
+    capture. Common root: I asserted a probe was measuring something without first proving the probe
+    works. A probe must be validated against a known-positive and a known-negative before its silence
+    or its output is treated as evidence.*
+- **Route exhaustion, per `lane-policy.md` line 46 (`formal_impl_evaluation`):**
+  1. **Native opposite-family Fable 5 · medium** (primary for Codex work) — **BLOCKED**, monthly
+     spend limit.
+  2. **OpenRouter DeepSeek V4 Flash 0731 · max**, the sanctioned
+     `condition: 'third_opinion_or_native_limit'` binding in `routing-policy.ts` with
+     `evaluatorModelPolicy: 'open_only'` — **UNAVAILABLE**: `OPENROUTER_API_KEY` is unset and the
+     credential file `~/.config/netscript-agentic/openrouter.env` does not exist.
+  3. AGY Gemini 3.6 Flash · high (listed only "if OpenRouter is limited") — same missing transport
+     credential, and line 58 records a prohibition on Gemini over evaluator transports.
+- **Scope of the limit, measured not assumed:** a trivial `claude-sonnet-5` background probe
+  (`24ee44d2`) returned `done — replied with PROBE_OK`. The spend limit is therefore **Fable-5
+  specific**, not account-wide; other Claude-family models remain callable.
+- **Why I did not simply substitute Opus 5 / Sonnet 5.** They would satisfy every invariant the
+  policy protects (line 94): opposite-family to the Codex implementer, generator ≠ evaluator, fresh
+  separate session. But the `formal_impl_evaluation` fallback column names DeepSeek, **not** Opus or
+  Sonnet — those appear as token-limit fallbacks for the `review_codex*` lanes only. `CLAUDE.md` is
+  explicit that routing is data and must not be invented. An IMPL-EVAL executed on an unsanctioned
+  evaluator model is challengeable and could void the gate, so the substitution is a coordinator
+  ruling, not a supervisor improvisation.
+- **State preserved, nothing destroyed.** Blocked job stopped; probe stopped; evaluator worktree
+  `007-eval-1774-impl` remains detached at `51a7bafe1`, dirty 0; brief finalized at 118 lines.
+  #1774 is at Tier-A GREEN with PR #1775 MERGEABLE/CLEAN. The lane is parked **only** on the
+  evaluator route, not on the product.
