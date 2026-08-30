@@ -5465,3 +5465,50 @@ least-wrong: the remaining work is executing a gate. Happy to be overridden.
 
 **#1357 continues undisturbed** — worker alive (pid verified by `/proc/<pid>/cwd`), S2A pushed at
 `e5d820b3f`, clean tree, three ceiling paths.
+
+### #1357 S2A reviewed and accepted; S2B dispatched. #1764 Flow-B queued, not run.
+
+**S2A review at `e5d820b3f`** — every number re-derived by me in a detached scratch worktree, never
+taken from the author's report, and run there specifically so it could not race the live worker:
+
+| Check | Result |
+| --- | --- |
+| Red-before at `0d620b619` (test-only, unchanged product) | exit 1, **1 passed / 7 failed** — seven semantic failures: role plan, prerequisite-with-zero-writes, dry-run plan, plain-page `appRoutes` registration, 3-vs-4 file count, collision preflight, force-replace |
+| Green at `e5d820b3f` | exit 0, **8 passed / 0 failed** |
+| **Whole `packages/cli`** | exit 0, **1379 passed / 0 failed** |
+| `deno check --unstable-kv` | 0 occurrences |
+| `deno.lock` vs `de57fab0` | byte-unchanged |
+| Ceiling | 3 paths — items 1, 2, 6 — inside the locked 12 |
+
+The whole-package run is the point: it is the gate whose absence produced #1368's F-A, and applying it
+here at 1379/0 is what makes this slice's green trustworthy rather than merely reported.
+
+**Lint/fmt are N/A by configuration, not passing.** Root `deno.json` excludes `packages/cli/` from both
+`fmt` and `lint`, and `packages/cli/deno.json` sets neither, so scoped runs return "No target files
+found". I nearly recorded that as three failures before reading the actual output rather than the exit
+code. The plan had already measured this — gate row 6 records BASE RED exit 2 with partial exclusion
+and 6 dropped, and its risk register says not to report a mixed scope as green. Told the author to state
+it as N/A explicitly and **not** to edit lint/fmt config to manufacture a green.
+
+S2B dispatched (ceiling 3–6: public options, help, result reporting, help↔role negative seam), carrying
+the review numbers, both PLAN-EVAL carry-forwards, and the D13 requirement that the help test render
+**real** command help rather than compare constant to constant. Sender is idle-gated with a head-verify
+abort.
+
+**#1764 Flow-B: queued, nothing started.** The request artifact is written at exact head `735ed2a66`
+with the gate identity (`runtime.flow-b-fixture`, selected at `capability-suites.ts:88`), the one-pass
+command, and an evidence contract that requires the gate to be **shown executing** — a green overall
+exit with Flow-B skipped is explicitly a fail for this purpose.
+
+**Infrastructure update folded in, and it supersedes my own premise.** D-42/D-43 are resolved: DinD
+mount visibility and cross-container ports are fixed, `DOCKER_HOST=tcp://netscript-dind:2375`, and
+published ports are reached at **`netscript-dind:<port>`, never `127.0.0.1`** — which was exactly the
+D-43 failure. Flow-B is therefore now a **queued local runtime request** with off-host as fallback, not
+an off-host-only request. The owner's "CI or off-host" ruling was conditioned on local being blocked,
+so a lease-backed local green is equally valid evidence. The blocker is now solely the **singleton host
+runtime lease, currently held by the Aspire supervisor for Phase B** — queued behind it; no Aspire, no
+Docker, nothing started. Memory record corrected with the old D-42/D-43 text struck through rather than
+deleted.
+
+**Ledger durability:** verified `origin/orchestrator/release-0.0.7-fixes` had not diverged
+(behind=0), then pushed 20 commits fast-forward, no force. Remote now at the current ledger.
