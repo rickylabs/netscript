@@ -1,7 +1,6 @@
 const MAX_ATTEMPTS = 10;
 const RETRY_DELAY_MS = 2_000;
-const triggersPort = Number(Deno.args[2]);
-const WEBHOOK_URL = `http://127.0.0.1:${triggersPort}/api/v1/webhooks/inbound/generic`;
+import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
 
 /** Extract the first non-empty JSON array from generated task output. */
 export function parseNonEmptyTraceArray(output: string): unknown[] {
@@ -80,11 +79,16 @@ async function resolveResourceCandidates(
 }
 
 async function main(): Promise<void> {
-  if (!Number.isInteger(triggersPort)) throw new Error('triggers API port argument is required');
   const [projectRoot, resourceDisplayName = 'workers'] = Deno.args;
   if (!projectRoot) throw new Error('generated project root is required');
+  const appHost = `${projectRoot}/aspire/apphost.mts`;
+  const triggersUrl = firstResourceUrl(
+    await resolveResourceUrlsFromAppHost(appHost, 'triggers-api'),
+    'triggers-api',
+  );
+  const webhookUrl = new URL('/api/v1/webhooks/inbound/generic', triggersUrl).toString();
   const candidates = await resolveResourceCandidates(projectRoot, resourceDisplayName);
-  await generateTraffic();
+  await generateTraffic(webhookUrl);
 
   let lastStdout = '';
   let lastStderr = '';
@@ -149,9 +153,9 @@ async function main(): Promise<void> {
   );
 }
 
-async function generateTraffic(): Promise<void> {
+async function generateTraffic(webhookUrl: string): Promise<void> {
   for (let request = 1; request <= 5; request++) {
-    const response = await fetch(WEBHOOK_URL, {
+    const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -166,7 +170,13 @@ async function generateTraffic(): Promise<void> {
       );
     }
   }
-  console.info(`Generated 5 telemetry traffic requests via ${WEBHOOK_URL}.`);
+  console.info(`Generated 5 telemetry traffic requests via ${webhookUrl}.`);
+}
+
+function firstResourceUrl(urls: readonly string[], resourceName: string): string {
+  const url = urls[0];
+  if (!url) throw new Error(`Aspire resource ${resourceName} declared no URL.`);
+  return url;
 }
 
 function collectMatchingResourceNames(value: unknown, displayName: string): string[] {

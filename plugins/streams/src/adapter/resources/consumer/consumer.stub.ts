@@ -45,7 +45,7 @@ export const %%SCHEMA_EXPORT%% = defineStreamSchema({
 export function %%DB_EXPORT%%(options: { readonly baseUrl?: string } = {}) {
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('%%STREAM_PATH%%', options.baseUrl ?? 'http://localhost:4437'),
+      url: buildStreamUrl('%%STREAM_PATH%%', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
