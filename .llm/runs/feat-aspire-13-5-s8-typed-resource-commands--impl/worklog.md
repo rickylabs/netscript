@@ -195,7 +195,11 @@ raw fallback passed lint/format for the two test files; typed-stdin lint and for
 passed the `.template` source. `quality:gate` passed: `quality:scan` reported no findings and
 `arch:check` reported FAIL=0 with its existing warning inventory. The pre-commit
 `check:assets-barrel` diff contained only the intended regenerated embedded asset; its clean-head
-verdict follows the commit. Full evidence: `receipts/seed-observability-static-gates.txt`.
+verdict passed after the commit. Full evidence: `receipts/seed-observability-static-gates.txt`.
+
+Clean product head `63e291f62103447f7a0f5dfc009aaa1e51956358` then passed the focused tests
+8/8 and `check:assets-barrel` with durable receipts `seed-observability-tests-head.json` and
+`seed-observability-assets-head.json`. The only following delta is this run-evidence update.
 
 No seed diagnosis was attempted. After S7 returns the host to zero, the supervisor owns exactly one
 cheap typed-seed diagnostic under the serialized lease; only its newly exposed cause may justify a
