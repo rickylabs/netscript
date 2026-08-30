@@ -229,3 +229,69 @@ Corrected `supervisor.md` to distinguish the original slice-1 `complex_implement
 the repair cycles' `normal_implementation` route, record the actual checkout, and mark the
 PLAN-EVAL worktree as historical (pre-migration). This is evidence-only; content head
 `42874803e572a5746834880e387501f0948c7362` is unchanged.
+
+## Slice 1 closed — IMPL-EVAL cycle 2 `PASS`; supervisor evidence repair (G-2/G-3/G-5) and root-`test` recut
+
+Written by the features topic supervisor (Claude Opus 5 · high). Evidence-only: **no product change,
+content head stays `42874803`** (`git diff 42874803..HEAD -- packages plugins docs templates` empty).
+
+### Verdict
+
+IMPL-EVAL cycle 2, session `b13a38f6-8b39-4b28-9a91-0420d5b2d743` (Fable 5 · medium, own detached
+worktree `ns1466-impleval-c2`), returned **`PASS`** at `369928cf`. Failure count for this leaf's
+IMPL-EVAL loop is unchanged at 1 of 2. F-1…F-5 all closed and re-derived by the evaluator rather than
+accepted; doc-lint 12 = 12 with the exact R-1 set; `docs:exports-drift` exit 0; contracts 16/16; all
+receipts `gitHead == actualGitHead`; both archives byte-intact and append-only; `deno.lock` unchanged.
+
+### Supervisor items the evaluator assigned (G-2, G-3, G-5) — done here
+
+- **G-3 — `context-pack.md` rewritten.** The old one still described the cycle-3 head `235482767`,
+  still called `commonErrorMap` **public**, and still said IMPL-EVAL had not run. A resumer reading it
+  alone would have reintroduced the exact premise F-1 was raised to kill. It now carries the content
+  head, both verdicts, the withdrawn export, the doc-lint set-identity condition, the NOT-RUN state of
+  slices 2 and 3, and the corrected host facts.
+- **G-5 — `supervisor.md` provenance corrected.** It now states plainly that it was **reconstructed at
+  cycle 4** to close F-5 rather than "written at run start" — a run-identity file that overstates its
+  own provenance is the defect it exists to prevent. It also carries all four author threads (original
+  slice `01a04f84`, repair `01a0515c`, cycle 4 `01a051d1`, cycle 5 `01a051e0`), both IMPL-EVAL
+  sessions, and the Tier-A reviewer. The original thread id was verified against the launcher record
+  `slices/1466/codex-thread-ids.md`, not copied from the verdict prose.
+- **G-2 — per-slice PR comment** posted on #1731 with this head and the gate table.
+
+### Root `test` re-run and receipt recut — R-1's premise is gone
+
+Full detail in `audit/root-test-post-host-fix.txt`; topic drift **D-30**.
+
+PID 1 is now `tini` and the zombie count is **0** (was ~7,900). D-26's mechanism —
+`Deno.kill(pid, 0)` succeeding on an unreaped zombie at `hybrid-launcher_test.ts:167` — cannot fire.
+Root `deno task test` now returns **4250 passed / 0 failed / 19 ignored, exit 0**, with **no change
+to the test**, which confirms the D-26 diagnosis rather than overturning it.
+
+R-1's condition *"no further root-`test` retries on this host"* was premised on that defect, not on
+policy, so it is void. The cycle-4 `SKIPPED` receipt was the honest form **at the time** and is
+superseded, not retroactively faulted. `test-final.json` is now `outcome: PASS`, `exitCode 0`,
+attempt 7.
+
+**Set-integrity note, stated rather than left to be discovered:** `test-final.json` attests
+`ff4e81cc` (the evidence head) while the other seven attest `42874803` (the content head). The gate
+genuinely ran at `ff4e81cc` and a receipt must attest the head it ran at. Product is byte-identical
+between the two heads, proven by an empty `git diff … -- packages plugins docs templates`. Using
+`--git-head 42874803 --allow-git-head-mismatch` would have produced `gitHead != actualGitHead` and
+broken the invariant the evaluator checks; attesting the true head and proving content identity
+separately is the sounder form.
+
+Sufficiency recomputed over the eight named receipts: **`INSUFFICIENT` with exactly one reason** —
+`public-doc-lint`, R-1's baseline-red / delta-0 finding, external to this leaf — **down from two**.
+`audit/evidence-sufficiency-slice1-final.json`.
+
+R-1's `public-doc-lint` half is untouched by the host fix and still binds: every future head of this
+branch must keep the count at **12** with the identical finding set.
+
+### What is NOT done — slice 1 is one of three
+
+Slices **2** (SDK declaration propagation, carries **G-1**) and **3** (publish and compatibility
+evidence, carries **G-4**) are **NOT RUN**. PR #1731 therefore says `Refs #1466 — partial, slice 1 of
+3` and carries **no closing keyword**; both PR and issue sit at exactly one `status:impl-eval`. The PR
+stays **draft**. No ready-flip, no merge, and no restored closing keyword until all three slices land,
+the final all-slices separate-session IMPL-EVAL passes, and the close-gate passes — including root
+`test` green off this host on the CI matrix at the final head.
