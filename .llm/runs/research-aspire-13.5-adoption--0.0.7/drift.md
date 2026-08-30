@@ -590,3 +590,20 @@
 - Also this checkpoint: the coordinator released the S3 Phase-B lease unused because the shared
   inotify ceiling is hit (D-34). Standing rule until infrastructure repairs the quota and a fresh
   serialized lease is granted: **no Phase-B runtime; Aspire/DinD stay at zero; S8 static only.**
+
+## D-36 — 2026-08-30 — D-25 zombie prerequisite retired; Phase-B blocker is the inotify ceiling only
+
+- **Coordinator probe (2026-08-30T09:08Z), verified read-only by this supervisor:** container PID 1
+  is `tini`; `ps -eo stat= | grep -c '^Z'` → **0**; 115 processes total (was 7,844 with 7,734
+  zombies at D-25); `aspire ps` → `[]`; dind `docker ps -a` → empty.
+- **Effect:** the D-25 "reap the zombies" host prerequisite (restated in D-34/D-35 and in
+  evaluator/implementer briefs as known infra) is **retired** and must not be carried forward.
+  `hybrid-launcher_test.ts` cancellation-survivor reds can no longer be attributed to zombie
+  pressure; if one recurs it is a fresh finding, not known infra.
+- **Remaining Phase-B blocker:** the shared inotify-instance ceiling only
+  (`fs.inotify.max_user_instances` = **128**, D-25a/D-34; hit by `aspire restore` during the S6
+  evaluation) plus ordinary branch dependencies (S6 Phase B after S5/S1 land; S7 Phase B stacked on
+  S3). A fresh serialized lease is granted by the coordinator after infrastructure raises the quota;
+  nothing else is required from the host side for S3 Phase B.
+- Briefs already dispatched with the D-25 wording (S8 thread `01a051e6…`) are unaffected: the
+  wording only told the thread to report and not chase such reds, which remains correct.
