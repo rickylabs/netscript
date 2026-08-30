@@ -444,4 +444,6 @@ run 33327294781 pending. | | S3 attempt 3 runtime closed; lease → S7 | S3 capt
 `3e39df1ee`/`28815d35b` on branch (push pending in thread tail). Relay `s3-attempt-3` torn down (3
 hop-A removed); **18:29:29Z containers=0 volumes=0 aspire=[]**
 (`slices/s3/phase-b/zero-after-relay.txt`). S7 Phase B launched on a fresh thread under relay owner
-`s7-phase-b`; S8 queued. |
+`s7-phase-b`; S8 queued. | | S10 cycle 2 pushed `67827e8baaff` | "treat nullable health reports as
+pending": pending/`Unknown` state, real 18-line 13.5.3 capture fixture
+(`aspire-describe-follow-13.5.3-capture.ndjson`), +tests. Proof rebuild + redispatch in progress. |
