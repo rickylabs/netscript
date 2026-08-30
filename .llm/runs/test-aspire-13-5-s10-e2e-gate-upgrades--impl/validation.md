@@ -50,3 +50,16 @@ Phase B remains prohibited in this cycle. No AppHost was started, no container w
 
 The fixture is an exact 18-line Aspire 13.5.3 capture. No Aspire, Docker, runtime-suite, evaluator,
 or CI-dispatch command was run in this cycle.
+
+## Phase-B DTO-complete describe-follow fix — cycle 3
+
+| Gate                          | Verdict                | Evidence                                                         |
+| ----------------------------- | ---------------------- | ---------------------------------------------------------------- |
+| Focused RED                   | expected fail, exit 1  | three diagnostics: pending resource-state discriminator absent   |
+| Scoped check                  | pass, exit 0, 185 files | wrapper: 2 batches / 0 diagnostics                               |
+| Scoped lint                   | pass, exit 0, 178 files | wrapper: 0 findings; unrelated `desktop-native` fixture excluded |
+| Scoped fmt                    | pass, exit 0, 185 files | wrapper: 2 batches / 0 findings                                  |
+| Structured-evidence test file | pass, exit 0, 17/17    | focused test wrapper                                             |
+
+No Aspire, Docker, runtime-suite, evaluator, PLAN-EVAL, or CI-dispatch command was run in this
+cycle.

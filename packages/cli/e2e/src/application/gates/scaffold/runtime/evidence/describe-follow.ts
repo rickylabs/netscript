@@ -2,7 +2,6 @@ import { join } from '@std/path';
 import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operation-runner-helpers.ts';
 
 const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
-const RESOURCE_NAME_FIELDS: readonly string[] = ['displayName', 'name', 'resourceName'];
 
 /** One object-valued Aspire health report, including the DTO's nullable pending state. */
 export type DescribeHealthReport =
@@ -17,10 +16,45 @@ export type DescribeHealthReport =
     readonly description?: string;
   };
 
+interface DescribeResourceNullableFields {
+  readonly name?: string | null;
+  readonly displayName?: string | null;
+  readonly resourceName?: string | null;
+  readonly resourceType?: string | null;
+  readonly uid?: string | null;
+  readonly state?: string | null;
+  readonly waitingFor?: readonly string[] | null;
+  readonly stateStyle?: string | null;
+  readonly creationTimestamp?: string | null;
+  readonly startTimestamp?: string | null;
+  readonly stopTimestamp?: string | null;
+  readonly source?: string | null;
+  readonly exitCode?: number | null;
+  readonly healthStatus?: string | null;
+  readonly dashboardUrl?: string | null;
+  readonly relationships?: readonly unknown[] | null;
+  readonly urls?: readonly unknown[] | null;
+  readonly volumes?: readonly unknown[] | null;
+  readonly properties?: Readonly<Record<string, unknown>> | null;
+  readonly environment?: Readonly<Record<string, string | null>> | null;
+  readonly healthReports?: Readonly<Record<string, DescribeHealthReport>> | null;
+  readonly commands?: Readonly<Record<string, unknown>> | null;
+}
+
+/** Nullable Aspire ResourceJson line with at least one usable identity field. */
+export type DescribeResourceLine =
+  & DescribeResourceNullableFields
+  & (
+    | { readonly displayName: string }
+    | { readonly name: string }
+    | { readonly resourceName: string }
+  );
+
 /** Last-seen resource observation in an Aspire describe stream. */
 export interface DescribeResourceObservation {
   readonly name: string;
   readonly state: string;
+  readonly statePending: boolean;
   readonly healthStatus?: string;
   readonly healthReports: Readonly<Record<string, DescribeHealthReport>>;
 }
@@ -59,7 +93,7 @@ export function evaluateDescribeFollow(
   const selected = expectedResources.map((name) => observations.get(normalizeName(name))).filter(
     (entry): entry is DescribeResourceObservation => entry !== undefined,
   );
-  const pending = selected.filter((entry) => !isReadyState(entry.state));
+  const pending = selected.filter((entry) => entry.statePending || !isReadyState(entry.state));
   if (pending.length > 0) {
     throw new Error(
       `describe resources did not converge: ${
@@ -186,17 +220,12 @@ export async function captureDescribeFollow(
 
 function resources(value: unknown, lineIndex: number): DescribeResourceObservation[] {
   const root = record(value, `describe line ${lineIndex + 1}`);
+  const wrapped = Reflect.has(root, 'resources');
   const source = Reflect.get(root, 'resources');
-  const candidates = Array.isArray(source)
-    ? source
-    : RESOURCE_NAME_FIELDS.some((key) => Reflect.has(root, key))
-    ? [root]
-    : undefined;
-  if (!candidates) {
-    throw new Error(
-      `describe line ${lineIndex + 1} is neither wrapped resources[] nor a bare resource object`,
-    );
+  if (wrapped && !Array.isArray(source)) {
+    throw new Error(`describe line ${lineIndex + 1} resources is not an array`);
   }
+  const candidates = wrapped && Array.isArray(source) ? source : [root];
   return candidates.map((entry, resourceIndex) => resource(entry, lineIndex, resourceIndex));
 }
 
@@ -205,22 +234,73 @@ function resource(
   lineIndex: number,
   resourceIndex: number,
 ): DescribeResourceObservation {
-  const source = record(value, `describe line ${lineIndex + 1} resource ${resourceIndex + 1}`);
-  const name = firstString(source, RESOURCE_NAME_FIELDS);
-  if (!name) {
-    throw new Error(`describe line ${lineIndex + 1} resource ${resourceIndex + 1} omitted name`);
-  }
-  const state = firstString(source, ['state', 'status', 'resourceState']);
-  if (!state) throw new Error(`${name} omitted state`);
-  const healthStatus = firstString(source, ['healthStatus']);
-  const reportsValue = Reflect.get(source, 'healthReports');
-  const reports = reportsValue === undefined ? {} : healthReports(reportsValue, name, lineIndex);
+  const line = describeResourceLine(value, lineIndex, resourceIndex);
+  const name = describeResourceIdentity(line);
+  const statePending = line.state === undefined || line.state === null;
   return {
     name: normalizeName(name),
-    state,
-    ...(healthStatus ? { healthStatus } : {}),
-    healthReports: reports,
+    state: statePending ? 'Unknown' : line.state,
+    statePending,
+    ...(line.healthStatus === undefined || line.healthStatus === null
+      ? {}
+      : { healthStatus: line.healthStatus }),
+    healthReports: line.healthReports ?? {},
   };
+}
+
+function describeResourceLine(
+  value: unknown,
+  lineIndex: number,
+  resourceIndex: number,
+): DescribeResourceLine {
+  const resourceLabel = `describe line ${lineIndex + 1} resource ${resourceIndex + 1}`;
+  const source = record(value, resourceLabel);
+  const identity = resourceIdentity(source, resourceLabel);
+  const fieldLabel = `describe line ${lineIndex + 1} ${identity.value}`;
+  const state = nullableString(source, 'state', fieldLabel);
+  const healthStatus = nullableString(source, 'healthStatus', fieldLabel);
+  const reportsValue = Reflect.get(source, 'healthReports');
+  const healthReportsValue = reportsValue === undefined
+    ? undefined
+    : reportsValue === null
+    ? null
+    : healthReports(reportsValue, identity.value, lineIndex);
+  const nullableFields = {
+    ...(state === undefined ? {} : { state }),
+    ...(healthStatus === undefined ? {} : { healthStatus }),
+    ...(healthReportsValue === undefined ? {} : { healthReports: healthReportsValue }),
+  };
+  if (identity.field === 'displayName') {
+    return { displayName: identity.value, ...nullableFields };
+  }
+  if (identity.field === 'name') return { name: identity.value, ...nullableFields };
+  return { resourceName: identity.value, ...nullableFields };
+}
+
+function resourceIdentity(
+  source: Record<string, unknown>,
+  label: string,
+):
+  | { readonly field: 'displayName'; readonly value: string }
+  | { readonly field: 'name'; readonly value: string }
+  | { readonly field: 'resourceName'; readonly value: string } {
+  const displayName = nonEmptyString(Reflect.get(source, 'displayName'));
+  if (displayName) return { field: 'displayName', value: displayName };
+  const name = nonEmptyString(Reflect.get(source, 'name'));
+  if (name) return { field: 'name', value: name };
+  const resourceName = nonEmptyString(Reflect.get(source, 'resourceName'));
+  if (resourceName) return { field: 'resourceName', value: resourceName };
+  throw new Error(`${label} omitted identity (displayName/name/resourceName)`);
+}
+
+function describeResourceIdentity(line: DescribeResourceLine): string {
+  const displayName = nonEmptyString(line.displayName);
+  if (displayName) return displayName;
+  const name = nonEmptyString(line.name);
+  if (name) return name;
+  const resourceName = nonEmptyString(line.resourceName);
+  if (resourceName) return resourceName;
+  throw new Error('DescribeResourceLine identity invariant failed');
 }
 
 function healthReports(
@@ -277,10 +357,20 @@ function extractJson(output: string): string {
   return output.slice(index);
 }
 
-function firstString(source: Record<string, unknown>, keys: readonly string[]): string | undefined {
-  for (const key of keys) {
-    const value = Reflect.get(source, key);
-    if (typeof value === 'string') return value;
+function nullableString(
+  source: Record<string, unknown>,
+  key: string,
+  label: string,
+): string | null | undefined {
+  const value = Reflect.get(source, key);
+  if (value === undefined || value === null || typeof value === 'string') return value;
+  throw new Error(`${label} ${key} must be a string, null, or omitted`);
+}
+
+function nonEmptyString(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
   }
   return undefined;
 }
