@@ -772,3 +772,34 @@ a live thread (`codex-status` already enumerates exactly that) and treat an abse
 active. Optionally add an explicit `--release-stale-sender` path so recovery does not require an
 operator to hand-edit the durable store, and stop relying on `Deno.kill(pid, 0)` for liveness per
 D-26. Filed here for the coordinator; this lane does not edit `.llm/tools/`.
+
+## D-29 — the doctrine-mandated token-free run watcher does not run on this host
+
+**Observed.** `AGENTS.md` ("Supervisor wake (token-free)") instructs supervisors not to poll and to
+background `.llm/tools/harness/watch-run.ts <run-dir>` instead. Run against the #1466 leaf run dir it
+dies immediately inside `Deno.watchFs`:
+
+```text
+at new FsWatcher (ext:runtime/40_fs_events.js:1:437)
+at Object.watchFs (ext:runtime/40_fs_events.js:1:1078)
+at main (.llm/tools/harness/watch-run.ts:65:24)
+```
+
+**Cause — already diagnosed, now biting the supervisor tier.** `fs.inotify.max_user_instances` is
+**128** on this host and `watchFs` allocates one inotify *instance* per watcher. This is the same
+root cause D-26 established for `codex-follow_test.ts`, and the same correction applies: it is not
+the fd rlimit (`ulimit -n` is 524288), it is a **root-only sysctl**. With several supervisors, their
+sub-agents, and thousands of stuck processes on one host, 128 instances are exhausted, so the tool
+the doctrine names as the supervision primitive is unavailable to the lanes that need it most —
+precisely when many lanes run at once.
+
+**Consequence.** "Do not poll" is currently unimplementable through the sanctioned tool. This lane
+supervises the cycle-4 author with (a) the launcher's own streamed turn, which exits at
+`task_complete` and is the terminal signal, and (b) a 60 s poll of `agentic:codex-status` that exits
+on `idle`/`ABSENT` or on a >900 s activity age. Polling is the fallback, adopted because the
+token-free path is broken, and is recorded here rather than passed off as the normal procedure.
+
+**Disposition.** Host-level fix (raise `fs.inotify.max_user_instances`, fix PID-1 reaping) is already
+escalated to the owner under D-26 and is outside features scope. A tooling-level fix — fall back to a
+poll loop when `watchFs` throws `EMFILE`, instead of exiting non-zero — belongs with D-24, D-25 and
+D-28 as repo-tooling follow-ups for the coordinator. This lane does not edit `.llm/tools/`.
