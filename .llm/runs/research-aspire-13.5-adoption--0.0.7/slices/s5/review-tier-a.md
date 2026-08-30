@@ -111,3 +111,9 @@ import removed, configured-lint receipt). Cycle 2 IMPL-EVAL follows at the slice
 
 `./public` surfaces now `export { X_API_DEFAULT_PORT } from '../constants.ts'` explicitly; no
 import binding left. Cycle-2 IMPL-EVAL brief: `slices/s5/impl-eval-brief-cycle-2.md`.
+
+## Retroactive consumer type-check (D-19, 2026-08-30)
+
+Generated AppHost from S5 head `0bd8ba832` (postgres + redis + service) compiled against S2's
+restored 13.5.3 modules: `tsc --noEmit` exit 2 with only the two pre-existing `zod` TS2307
+baseline errors — **zero S5-attributable errors**. Receipt: `slices/s5/receipts/consumer-typecheck-13.5.3.txt`.

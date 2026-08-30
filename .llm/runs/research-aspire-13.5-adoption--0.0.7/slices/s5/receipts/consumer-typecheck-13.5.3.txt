@@ -1,0 +1,9 @@
+# S5 retroactive consumer type-check (supervisor, 2026-08-30)
+head: 0bd8ba832 (fix/aspire-13-5-s5-literal-ports)
+init: deno run -A packages/cli/bin/netscript.ts init s5tsc --db postgres --cache --cache-backend redis --service --no-git --ci --yes (exit 0)
+modules: copy of S2 restored aspire/.aspire/modules/{aspire,base,transport}.mts (SDK 13.5.3) + aspire.config.json + S2 node_modules symlink
+command: ./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json
+exit: 2 — only the 2 pre-existing TS2307 'zod' baseline errors (identical to S2 01-tsc-noemit.raw.txt); zero S5-attributable errors
+
+.helpers/_aspire-compat.mts(10,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+.helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
