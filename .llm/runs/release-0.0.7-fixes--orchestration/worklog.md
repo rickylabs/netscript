@@ -5128,3 +5128,24 @@ an explicit `--dest` under `/home/agent` fixes it. `--dry-run` surfaced both wit
 
 #1764 decision packet written to `decision-packet-1764.md` with a **verified** one-assertion amendment
 and a recommendation of a delta-scoped third cycle.
+
+### Main advance `24f6642f` (PR #1763) — inert for both fixes leaves, no integration performed
+
+Diff `de57fab0..24f6642f` is 8 files: seven `#1730` run artifacts under
+`.llm/runs/test-ai-request-context-provider-guard--1730/` plus one test file,
+`packages/ai/tests/request_context_test.ts`.
+
+Intersection with either leaf's changed-path drift: **zero**.
+- `packages/cli/**`, `templates/**`, `plugin-sagas-core/**`, `plugins/sagas/**` → 0 matches.
+- Generated carriers (`*.generated.*`, `assets/agent-docs`, `publish-assets`) → 0 matches, so unlike
+  `de57fab0` this advance moves no shared derivative at all.
+
+Action taken: **none beyond recording**, which is the correct action. The coordinator's instruction is
+to integrate only where changed-path drift intersects, and it does not. Specifically I did **not**
+re-base `007-leaf-1357`: it has a live Codex worker mid-S1 at base `de57fab0` holding an active sender
+lease, and moving its base under it would invalidate the exact-base contract in its brief
+(`--expect-base de57fab0`) and destroy in-flight research for no benefit. Integration onto current main
+is a decision for the S1/S2 boundary, not a mid-slice interruption.
+
+#1764 remains parked and untouched at the owner boundary; `24f6642f` is inert for it too. Its standing
+obligation to integrate from `f8b4f804` before merge is unchanged and unaffected.
