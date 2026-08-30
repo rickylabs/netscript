@@ -2246,3 +2246,56 @@ Two paths were flagged rather than silently allowed:
 
 Recording the interpretation as an interpretation is the point: an unmarked reading of someone else's
 ruling is indistinguishable from an authorization, which is the failure class this leaf exists to fix.
+
+## 2026-08-30 — environment authority update 2; this lane's gate narratives corrected
+
+The environment changed **again** between the two authority updates, so the record I wrote hours ago
+is now stale in two specific places. Superseding it here rather than editing it, and naming exactly
+what is wrong so nobody quotes the old numbers.
+
+### Re-proven locally, in-container, at this checkpoint
+
+| Fact | Verified value |
+| --- | --- |
+| `netscript-dind` | `10.4.12.19` via `/etc/hosts`; container id `a833c3a529e2` |
+| `DOCKER_HOST` | `tcp://netscript-dind:2375` (project `mise`) |
+| Docker client / server | **28.5.2 / 28.5.2** |
+| `docker ps -a` | 0 containers — sandbox at zero |
+| `fs.inotify.max_user_instances` | **1024** (`max_user_watches` 762026) |
+
+The dind container was **recreated** between update 1 and update 2 — the container id changed from
+`a8e78d139681` to `a833c3a529e2` — which is why both the IP and the Docker version moved. Worth
+naming, because otherwise the two updates read as contradicting each other rather than describing two
+different container instances.
+
+Owner authority also reports D-37 and the `watchFs` quota blocker resolved, a fresh lifecycle rerun at
+**13/13 PASS** including `codex-follow` streaming, and `watch-run` reaching its expected heartbeat
+exit 2 with no allocation failure.
+
+### Two narratives this lane wrote earlier are now wrong
+
+1. **"Aspire doctor's below-28 result is a warning only."** Moot. Docker is **28.5.2**, above Aspire
+   13.5's 28.0 minimum, so there is no below-28 result to excuse. Do not carry the warning framing
+   forward.
+2. **"The shared `fs.inotify.max_user_instances` ceiling (128) is the only remaining host quota
+   blocker."** Resolved — it is **1024**. An Aspire abort with exit 134 /
+   `IOException: configured user limit … on inotify instances` is no longer an expected condition, so
+   it must not be pre-excused in a plan's risk register. If it occurs now it is a real finding to
+   investigate, not a quota collision to retry against.
+
+**There is no known environment blocker for Phase-B runtime.** The earlier claim that this host could
+not produce a runtime verdict is fully withdrawn — that was true of a different container instance.
+
+### Consequence for #1673
+
+`scaffold.runtime` stays a **required, supervisor-coordinated** gate for the F1 repair, and it is now
+straightforwardly runnable rather than lease-and-hope. Unchanged: the host runtime lease is a
+cluster-wide singleton and stays **serialized**; this lane obtains and sequences it once S7 lands, the
+author never runs it; and the sandbox is returned to **Aspire/Docker zero** by exact owned cleanup
+(`agentic:leak-check`, then `agentic:teardown --apply` on proven resources, `--owned-root` for
+anything started outside the worktree). `e2e:cli` is still absent from
+`.llm/tools/gates/catalog.ts`, so the durable receipt remains the runner's `--report` JSON.
+
+The steering already delivered to the author contains the superseded inotify risk-register
+instruction. A correction is queued and goes out on the same thread as soon as its current turn ends —
+not as a rival send, and not by editing what was already delivered.
