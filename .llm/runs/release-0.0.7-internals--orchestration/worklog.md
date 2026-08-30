@@ -2774,3 +2774,121 @@ produced in cycle 1 — copy SHAs, never retype them.
 No merge, publish, ready-flip, relabel, issue close, milestone change, central-cluster-state
 mutation, or release-writer lease. Serial ordering is preserved **inside** internals only; other
 topics are unaffected by this lane's queue.
+
+## 2026-08-30 — #1734 repair delivered; Tier-A PASS at `3b3044f7a`; IMPL-EVAL cycle 2 launched; #1732 started
+
+### Repair delivered
+
+Three slices on top of the verdict commit, RED visible, pushed clean, local == remote == PR head:
+
+| Commit | Content |
+| --- | --- |
+| `8dac327d0b21d4fcdabea7adce69e785c1b2a4fb` | RED — JSON-transport regression tests |
+| `a1dc5fce65058ab47cd49c5af13d91c145f0d1cf` | fix — normalize serialized hydration state |
+| `3b3044f7af178e740b577a80f83e785c1fd6ee7f` | run artifacts / handoff (evaluated head) |
+
+Scope outside `.llm/runs/` is exactly the three authorized `packages/fresh` files. The cycle-1 verdict
+artifact was preserved, not rebased away.
+
+**R2 resolved as recommended, not by default**: a plain serialized error record is revived into a real
+`Error` (`message` / `name` / `stack` preserved; `{}` becomes `Serialized hydration error`). That
+yields the `Error | null` upstream declares with **no cast**, which is what kept the change free of
+`any` / `as unknown as` / suppressions. The stop-and-report condition did not fire — the public
+export surface is untouched.
+
+The author **reproduced the supervisor probe rather than trusting it**, confirming the
+`failureReason: {}` case independently. That was the point of asking.
+
+### Tier-A — PASS at `3b3044f7af178e740b577a80f83e785c1fd6ee7f`
+
+Recorded as PR comment `5467294121`. What I executed rather than accepted:
+
+- **RED re-executed** in a throwaway worktree at the test-only commit `8dac327d0`: exit 1, 1 passed /
+  4 failed, all four raising `Invalid dehydrated mutation at index 0` from the un-repaired guard. At
+  head the same three suites are 11/0 exit 0, including both exact-version fixtures. A real RED→GREEN
+  transition, independently reproduced.
+- **My own attack on the new guard**, not the author's table. The central risk of this repair is that
+  loosening validation to accept the wire shape makes the guard *too permissive*, so that is what I
+  attacked: valid-at-0 / invalid-at-1 throws with an indexed error and leaves the client at **zero**
+  entries (no partial hydration); the caller's input is not mutated; and `error` as an array, string,
+  number, `undefined`, or class instance is still rejected — the revive accepts **plain records
+  only**. Every load-bearing structural check survives. What was dropped is exactly the `hasOwn`
+  requirements on fields JSON legitimately omits.
+- **Receipt honesty**: all **8** SHAs cited in the PR body resolve to real commits. The
+  fabricated-suffix failure from cycle 1 did not repeat.
+- Focused check / lint / fmt clean; `quality:scan` `ok:true`, `findings: []`, `allowCount: 7`;
+  `arch:check` exit 0 with Fresh at its inherited `FAIL=0 WARN=3 INFO=1`.
+
+### Host condition — recorded, not laundered, and not charged to the leaf
+
+Root `deno task test` is **not a usable verdict source on this host** and was deliberately not
+re-run. The machine carries **7,734 PID-1-owned zombie processes** that no agent can reap, exhausting
+per-process descriptors and PID slots (`ulimit -n` is 524288, so this is not a low-limit problem).
+That is the cause of the two failures the author reported red — `codex-follow_test` hitting
+`Too many open files` and `hybrid-launcher_test` observing a surviving cancellation child. Both live
+under `.llm/tools/agentic/**`, outside the scope diff, and neither touches `packages/fresh`.
+
+The author recorded that red instead of manufacturing a green, and stopped no foreign process to get
+one. That is the correct behaviour and is explicitly not a finding. The `packages/fresh` product
+gates were judged independently against the known `main` baseline. Both the repair brief and the
+cycle-2 evaluator brief say so in terms, so an infrastructure red cannot be mistaken for a leaf
+defect in either direction.
+
+### IMPL-EVAL cycle 2 launched
+
+Fresh, separate, opposite-family session in its **own** evaluator worktree detached at the exact
+evaluated head. Route read from the job registry rather than argv and confirmed native: `Fable 5`,
+effort `medium`, no third-party provider env. Artifact-only — it may write
+`impl-eval-cycle-2.md`, must preserve cycle 1 bit-identical, and posts its own
+`[PHASE: IMPL-EVAL] [VERDICT: …]` comment, which an earlier leaf's brief omitted and had to repair
+afterwards.
+
+**Cycle 2 stays at Fable 5 · medium**, not the Fable 5 · low that a Sol·medium repair slice would
+pair with. The artifact under evaluation is the whole leaf, authored on Sol · high, and it is now
+*larger* than what cycle 1 saw. Reviewing down after a FAIL is the wrong direction.
+
+The brief tells the evaluator where to attack — that the loosened guard is the central risk, that the
+revive is a real behaviour change versus pre-fix and its consumer-visible consequence is its call not
+mine, and that a `PASS` with no attack narrative is not a `PASS`.
+
+### Escalation rule carried into cycle 2
+
+Cycle 2 is the second evaluation of this leaf after one prior FAIL. If it returns a **second
+consecutive terminal failure**, this lane does **not** freeze and does **not** spend a third cycle on
+its own authority: it surfaces the exact owner decision to the coordinator — repair again, rescope,
+or park — with the two verdicts and the evidence. On `PASS`, the leaf advances to human-merge
+handoff; humans merge, this lane never does.
+
+### #1732 started immediately — not queued behind #1734's evaluation
+
+Serial ordering inside internals governs the **evaluator** queue, not implementation. #1734 is with an
+evaluator, so #1732 starts now rather than idling behind it, and no other lane is waited on.
+
+- Worktree created at **live `main` `13878a80a50c55b9662099fed64555f2310ae4a3`**, re-fetched at
+  dispatch; branch `fix/aspire-reference-name-validation`, no upstream, clean. No PR yet — the author
+  opens it draft.
+- Route `normal_implementation`, **Sol · medium**, requested from lane policy and confirmed matched
+  against observed thread identity. Not `high`: the code change is small. Not `low`: the slice turns
+  on a genuine compatibility decision, which is precisely the "research or decision-taking mid-slice"
+  the effort guidance puts at medium — and the brief already forces a stop-and-report plan gate on
+  the branch where that decision could become a breaking public-config change.
+- **I re-verified the defect surface at this base rather than trusting the pre-migration note**:
+  `packages/aspire/config.ts:466-467` still has unconstrained `z.array(z.string())`;
+  `generate-register-infrastructure.ts:424` still interpolates a name raw into a single-quoted
+  TypeScript string literal; and there are still **zero** `z.string().regex` hits across
+  `packages/aspire` and `packages/cli`, so the "no existing convention" finding holds and whatever
+  the author chooses sets the precedent.
+- The host-zombie condition and the no-root-`deno task test` instruction are in this brief too, along
+  with an explicit "do not kill any process you did not start" — other lanes share this host.
+
+### One thing outside this lane's authority
+
+**#1732 is labelled `status:triage`.** Moving it is a relabel, which this lane may not do. The author
+is told to leave it and to label the PR correctly instead. It needs someone with relabel rights, or
+the issue will look untriaged when the leaf lands.
+
+### Standing constraints unchanged
+
+No merge, publish, ready-flip, relabel, issue close, milestone change, central-cluster-state
+mutation, or release-writer lease. NAS worktree, thread, route identity, daemon proof, and resume
+commands stay in the local operational record, outside this repository.
