@@ -30,4 +30,3 @@ None. Symbol coverage was resolved from real `deno doc --json` evidence before i
 ## Deferred scope
 
 Package source, symbol-table expansion, and the other #1777 packages.
-

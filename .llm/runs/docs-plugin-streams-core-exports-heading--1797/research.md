@@ -21,4 +21,3 @@ Conclusion: `entrypoints-only` is the honest policy. Expanding symbol tables is 
 ## Open questions
 
 None.
-

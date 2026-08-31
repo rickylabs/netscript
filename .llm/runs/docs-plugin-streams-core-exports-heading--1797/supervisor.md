@@ -8,4 +8,3 @@
 - Implementation lane: `light_implementation`
 - Evaluation lane: separate supervisor-owned opposite-family session after handoff
 - PLAN-EVAL: N/A — mechanical heading/mapping adoption; symbol coverage is directly evidence-checkable.
-
