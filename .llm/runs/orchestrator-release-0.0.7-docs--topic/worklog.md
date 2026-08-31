@@ -2862,3 +2862,25 @@ stays at `status:impl`. Head at parking: `da5b3aa792809df0290d2d91c7be124e0ff7b0
 
 Three PRs now parked awaiting GLM: #1803 (#1801), #1806 (#1804), #1808 (#1807) — all Tier-A verified
 clean, ready to evaluate the instant #1792 lands.
+
+### #1809/PR #1811: ai package heading rename + missing /skills row, eval parked, backtick lesson held
+
+`ai`'s reference page had a two-part defect: `## Export map` heading not recognized (same class as
+#1795/#1797/#1807), plus one genuinely missing row (`@netscript/ai/skills` -> `./src/skills/mod.ts`,
+a real deno.json export absent from the otherwise-correct table). Codex fixed both: renamed the
+heading, added the missing row with an accurate Purpose description (verified against `deno doc` —
+correctly describes parsing/loading/tag-and-semantic-matching/in-memory-content-source, matching the
+module's 16 real exports), and added an `AUTHORITATIVE_MAPPING` entry (`entrypoints-only`, category-
+level reason). Tier-A spot-verified: 282 total real exports across 13 entrypoints, 72 genuine gaps,
+and specifically confirmed `/skills` has 15/16 real exports undocumented — matching the reason's
+"`/skills` has no dedicated symbol section" claim.
+
+**The explicit backtick-preservation warning added to this brief (after three consecutive
+occurrences) worked** — all four `acceptance-evidence` box strings matched the issue exactly on the
+first attempt, no fix needed this cycle.
+
+Reprobed `z-ai/glm-5.3-flash` — still rejected. Evaluation parked; PR #1811 stays at `status:impl`.
+Head at parking: `6d5516422955d13dd291ff53254efc8b683e70a5`.
+
+Four PRs now parked awaiting GLM: #1803 (#1801), #1806 (#1804), #1808 (#1807), #1811 (#1809) — all
+Tier-A verified clean.
