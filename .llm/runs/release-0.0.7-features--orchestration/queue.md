@@ -41,3 +41,35 @@ No issue is idle; each row names the lane and the one thing that moves it.
 2. **A browser-capable lane.** Two separate issues now need it: #1590, and #1664's remaining
    `behavior.service-client-refetch` question, where the SDK/helper layer has been **exonerated by
    measurement** and the failure is downstream in Fresh/Preact render propagation.
+
+---
+
+## Release sequencing — canary5 gate, recorded 2026-08-31
+
+**canary5 is gated on #1349 Slices 2–3 only.** Aspire 13.5 is reserved for **canary6** and must not
+merge before the canary5 tag. This lane's priority order follows that directly:
+
+| Priority | Work | State |
+| --- | --- | --- |
+| **1 — canary5 gate** | #1349 **Slice 2** — private adapter, prepared-call epoch logic, stable-v1 adapter | committed `49a59f488`, draft PR **#1841**, MERGEABLE |
+| **1 — canary5 gate** | #1349 **Slice 3** — validation/failures, cache & query behaviour, Desktop runtime rejection, docs proof | in progress on the same branch, base `49a59f488` |
+| 2 — independent | #1762 | **exact-green, merge-ready** at `e3852dfb5` |
+| 2 — independent | #1664 | 71/72; hydration cause measured; owner decision pending |
+| 3 — independent | #1452 Slice 2 | draft PR **#1842**; no-dependency ruling verified |
+| 3 — independent | #1590, #1592 S2 + #1451 | plan / PLAN-EVAL phase |
+
+**Why Slices 2–3 are the gate.** Slice 1 (merged, `58a4a10e`) published the accepted public
+contribution types but nothing consumed them at runtime — a types-accepted-but-unconsumed window the
+plan-eval explicitly flagged as something that must not publish. Slice 2 makes them real through the
+private adapter and epoch semantics; Slice 3 closes validation, cache/query behaviour, Desktop runtime
+rejection, and the docs proof. Until both land, the published surface and the shipped behaviour
+disagree, which is precisely the coherence canary5 must not carry.
+
+**Sequencing constraint that is not optional:** Slice 3 extends Slice 2's own `prepared-call.ts` and
+`client/service-client.ts`. They cannot run concurrently; the serialization is measured file overlap,
+not caution. Slice 3 therefore commits on top of `49a59f488` on the same branch, and **#1841 becomes
+the combined S2+S3 PR** rather than two stacked reviews.
+
+**On landing Slice 3:** promote #1841 non-draft — that both unlocks the heavy CI lanes (`ci.yml` gates
+them on `draft == false`) and auto-dispatches the separate-session IMPL-EVAL, so no manual evaluator
+dispatch is needed and no duplicate is created.
