@@ -9264,3 +9264,55 @@ delta; re-evaluating unchanged product code would have been waste.
 `deno.lock` byte-identical, evidence head `d7cf2419c`. PR **promoted non-draft**, `Fixes #1387` live in
 `closingIssuesReferences`, **MERGEABLE**. Exact CI running on `d7cf2419c` (quality + ci + phase-eval).
 `BLOCKED` is only pending checks.
+
+## #1762 `check-test` red — diagnosed, and a correction to what I previously asserted
+
+**I was wrong earlier, and so was the final evaluator.** Both of us recorded that the repo-wide
+`TS2551` on `packages/service/src/primitives/health.ts:184` was "pre-existing on `main`, untouched by
+the leaf". **It is not pre-existing.** I tested it directly: clean `main` at `7908399af` runs the
+identical repo-wide `deno task check` with **exit 0, 0 occurrences**. The leaf fails it
+deterministically (reproduced twice). Correcting that on the record, because a merge packet resting
+on "pre-existing, ignore it" would have been resting on a false claim.
+
+### What it actually is — batch composition, not leaf code
+
+Evidence chain, each step measured rather than inferred:
+
+| Test | Result |
+| --- | --- |
+| `health.ts` byte-identical to `main`? | **Yes** |
+| root `deno.json`, `packages/service/deno.json` identical to `main`? | **Yes, both** |
+| `deno check --unstable-kv health.ts` **alone** | **exit 0, clean** |
+| Scoped 5-package check (434 files) | **PASS, 0 diagnostics** |
+| Clean `main` repo-wide | **exit 0, 0 occurrences** |
+| Clean `main` + 4 inert files (same 2974 count as leaf) | **exit 0, 0 occurrences** |
+| Leaf repo-wide (2974 files) | **exit 1, 1 occurrence**, twice — deterministic |
+
+`--unstable-kv` is passed to **every** batch (`run-deno-check.ts:369`), so the flag is not the
+variable. Files are `localeCompare`-sorted and chunked at 120. The leaf's added `packages/service/src/auth/`
+files shift which 120-file batch `health.ts` lands in, and in that particular grouping `deno check`
+stops applying the unstable-KV lib to it. Matching the file *count* on main does not reproduce it —
+only the specific *composition* does.
+
+**So the leaf's code is innocent, but the CI red is real and is the leaf's to carry.** It is not a
+flake and it will not clear itself.
+
+### Why I am not fixing it here
+
+`packages/service/src/primitives/health.ts` is on **no slice's ceiling**, and editing it would be a
+rescope of a leaf that is otherwise complete and twice-evaluated. The actual defect is in
+`.llm/tools/run-deno-check.ts`'s batching — shared cross-lane harness tooling, the same class as D-1
+and the D-5 catalog gap, and equally not something to patch from inside a feature branch.
+
+**This is a concrete coordinator boundary**, and the only one currently blocking the shipping front.
+Three viable resolutions, none of which is mine to pick unilaterally:
+
+1. **Fix the batching** in `run-deno-check.ts` (e.g. keep workspace members in the same batch, or
+   raise `--batch-size` above the workspace file count) — a small, reviewable tooling change in its
+   own PR, which would also protect every future leaf from the same trap.
+2. **Scope CI's `check` gate** the way every slice's Tier-A already does (`--include`), so it checks
+   the packages under change rather than the whole repo in arbitrary groupings.
+3. **Accept and label** — but I would argue against silently skipping a repo-wide type check to ship.
+
+Per the merge-sequence correction, #1762 is **held** pending Docs #1798 anyway; this needs resolving
+before the single final integration and hand-off, not after.
