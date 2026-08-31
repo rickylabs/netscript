@@ -105,16 +105,32 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
     }, ['ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_BASE_URL']),
   });
 
+/** Presets selectable for new launches and exhaustive current-route canaries. */
 export const OPENROUTER_PRESET_IDS = [
-  'claude-fanout-minimax-m3',
-  'claude-evaluator-minimax-m3',
-  'claude-evaluator-deepseek-v4-flash-0731',
-  'claude-evaluator-qwen-3-8-max',
+  'claude-evaluator-qwen-3-8-flash',
+  'claude-evaluator-glm-5-3-flash',
   'claude-design-glm-5-2',
   'codex-design-glm-5-2',
   'codex-long-medium-grok-4-5',
 ] as const;
-export type OpenRouterPresetId = typeof OPENROUTER_PRESET_IDS[number];
+export type ActiveOpenRouterPresetId = typeof OPENROUTER_PRESET_IDS[number];
+
+/** Retired preset ids accepted only at persisted-state deserialization boundaries. */
+export const LEGACY_OPENROUTER_PRESET_IDS = [
+  'claude-fanout-minimax-m3',
+  'claude-evaluator-minimax-m3',
+  'claude-evaluator-deepseek-v4-flash-0731',
+  'claude-evaluator-qwen-3-8-max',
+] as const;
+export type LegacyOpenRouterPresetId = typeof LEGACY_OPENROUTER_PRESET_IDS[number];
+export const PERSISTED_OPENROUTER_PRESET_IDS: readonly [
+  ...typeof OPENROUTER_PRESET_IDS,
+  ...typeof LEGACY_OPENROUTER_PRESET_IDS,
+] = [
+  ...OPENROUTER_PRESET_IDS,
+  ...LEGACY_OPENROUTER_PRESET_IDS,
+] as const;
+export type OpenRouterPresetId = typeof PERSISTED_OPENROUTER_PRESET_IDS[number];
 export const OPENROUTER_AGENTIC_TURN_STATUSES = [
   'supported',
   'unsupported',
@@ -128,21 +144,19 @@ export type OpenRouterReasoningTraceStatus = typeof OPENROUTER_REASONING_TRACE_S
 export const OPENROUTER_INCOMPATIBILITIES = ['codex-native-namespace-tool'] as const;
 export type OpenRouterIncompatibility = typeof OPENROUTER_INCOMPATIBILITIES[number];
 export const OPENROUTER_PRESET_MODELS: readonly [
-  typeof OPENROUTER_MODEL_IDS.minimax,
-  typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
-  typeof OPENROUTER_MODEL_IDS.qwen,
-  typeof OPENROUTER_MODEL_IDS.glm,
+  typeof OPENROUTER_MODEL_IDS.planEvaluator,
+  typeof OPENROUTER_MODEL_IDS.implEvaluator,
+  typeof OPENROUTER_MODEL_IDS.designGlm,
   typeof OPENROUTER_MODEL_IDS.grok,
 ] = [
-  OPENROUTER_MODEL_IDS.minimax,
-  OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
-  OPENROUTER_MODEL_IDS.qwen,
-  OPENROUTER_MODEL_IDS.glm,
+  OPENROUTER_MODEL_IDS.planEvaluator,
+  OPENROUTER_MODEL_IDS.implEvaluator,
+  OPENROUTER_MODEL_IDS.designGlm,
   OPENROUTER_MODEL_IDS.grok,
 ];
 
 export interface OpenRouterPreset {
-  readonly id: OpenRouterPresetId;
+  readonly id: ActiveOpenRouterPresetId;
   readonly profileId: Extract<ProviderProfileId, 'claude-openrouter' | 'codex-openrouter'>;
   readonly model: typeof OPENROUTER_PRESET_MODELS[number];
   readonly effort: Effort;
@@ -157,86 +171,65 @@ export interface OpenRouterPreset {
   readonly incompatibility: OpenRouterIncompatibility | null;
 }
 
-export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterPreset>> = Object
-  .freeze({
-    'claude-fanout-minimax-m3': Object.freeze({
-      id: 'claude-fanout-minimax-m3',
-      profileId: 'claude-openrouter',
-      model: OPENROUTER_MODEL_IDS.minimax,
-      effort: 'high',
-      purpose: 'workflow-fanout',
-      agenticTurn: 'supported',
-      transport: 'anthropic-messages',
-      reasoningTrace: 'present',
-      incompatibility: null,
-    }),
-    'claude-evaluator-minimax-m3': Object.freeze({
-      id: 'claude-evaluator-minimax-m3',
-      profileId: 'claude-openrouter',
-      model: OPENROUTER_MODEL_IDS.minimax,
-      effort: 'high',
-      purpose: 'evaluation',
-      agenticTurn: 'supported',
-      transport: 'anthropic-messages',
-      reasoningTrace: 'present',
-      incompatibility: null,
-    }),
-    'claude-evaluator-deepseek-v4-flash-0731': Object.freeze({
-      id: 'claude-evaluator-deepseek-v4-flash-0731',
-      profileId: 'claude-openrouter',
-      model: OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
-      effort: 'max',
-      purpose: 'evaluation',
-      agenticTurn: 'supported',
-      transport: 'anthropic-messages',
-      reasoningTrace: 'present',
-      incompatibility: null,
-    }),
-    'claude-evaluator-qwen-3-8-max': Object.freeze({
-      id: 'claude-evaluator-qwen-3-8-max',
-      profileId: 'claude-openrouter',
-      model: OPENROUTER_MODEL_IDS.qwen,
-      effort: 'max',
-      purpose: 'evaluation',
-      agenticTurn: 'supported',
-      transport: 'anthropic-messages',
-      reasoningTrace: 'present',
-      incompatibility: null,
-    }),
-    'claude-design-glm-5-2': Object.freeze({
-      id: 'claude-design-glm-5-2',
-      profileId: 'claude-openrouter',
-      model: OPENROUTER_MODEL_IDS.glm,
-      effort: 'xhigh',
-      purpose: 'creative-design',
-      agenticTurn: 'supported',
-      transport: 'anthropic-messages',
-      reasoningTrace: 'absent',
-      incompatibility: null,
-    }),
-    'codex-design-glm-5-2': Object.freeze({
-      id: 'codex-design-glm-5-2',
-      profileId: 'codex-openrouter',
-      model: OPENROUTER_MODEL_IDS.glm,
-      effort: 'xhigh',
-      purpose: 'creative-design',
-      agenticTurn: 'unsupported',
-      transport: 'responses',
-      reasoningTrace: 'unverified',
-      incompatibility: 'codex-native-namespace-tool',
-    }),
-    'codex-long-medium-grok-4-5': Object.freeze({
-      id: 'codex-long-medium-grok-4-5',
-      profileId: 'codex-openrouter',
-      model: OPENROUTER_MODEL_IDS.grok,
-      effort: 'medium',
-      purpose: 'long-running-medium',
-      agenticTurn: 'unverified',
-      transport: 'responses',
-      reasoningTrace: 'unverified',
-      incompatibility: null,
-    }),
-  });
+export const OPENROUTER_PRESETS: Readonly<Record<ActiveOpenRouterPresetId, OpenRouterPreset>> =
+  Object
+    .freeze({
+      'claude-evaluator-qwen-3-8-flash': Object.freeze({
+        id: 'claude-evaluator-qwen-3-8-flash',
+        profileId: 'claude-openrouter',
+        model: OPENROUTER_MODEL_IDS.planEvaluator,
+        effort: 'max',
+        purpose: 'evaluation',
+        agenticTurn: 'supported',
+        transport: 'anthropic-messages',
+        reasoningTrace: 'present',
+        incompatibility: null,
+      }),
+      'claude-evaluator-glm-5-3-flash': Object.freeze({
+        id: 'claude-evaluator-glm-5-3-flash',
+        profileId: 'claude-openrouter',
+        model: OPENROUTER_MODEL_IDS.implEvaluator,
+        effort: 'max',
+        purpose: 'evaluation',
+        agenticTurn: 'supported',
+        transport: 'anthropic-messages',
+        reasoningTrace: 'present',
+        incompatibility: null,
+      }),
+      'claude-design-glm-5-2': Object.freeze({
+        id: 'claude-design-glm-5-2',
+        profileId: 'claude-openrouter',
+        model: OPENROUTER_MODEL_IDS.designGlm,
+        effort: 'xhigh',
+        purpose: 'creative-design',
+        agenticTurn: 'supported',
+        transport: 'anthropic-messages',
+        reasoningTrace: 'absent',
+        incompatibility: null,
+      }),
+      'codex-design-glm-5-2': Object.freeze({
+        id: 'codex-design-glm-5-2',
+        profileId: 'codex-openrouter',
+        model: OPENROUTER_MODEL_IDS.designGlm,
+        effort: 'xhigh',
+        purpose: 'creative-design',
+        agenticTurn: 'unsupported',
+        transport: 'responses',
+        reasoningTrace: 'unverified',
+        incompatibility: 'codex-native-namespace-tool',
+      }),
+      'codex-long-medium-grok-4-5': Object.freeze({
+        id: 'codex-long-medium-grok-4-5',
+        profileId: 'codex-openrouter',
+        model: OPENROUTER_MODEL_IDS.grok,
+        effort: 'medium',
+        purpose: 'long-running-medium',
+        agenticTurn: 'unverified',
+        transport: 'responses',
+        reasoningTrace: 'unverified',
+        incompatibility: null,
+      }),
+    });
 
 /** Returns a finite provider profile by id. */
 export function getProviderProfile(id: ProviderProfileId): ProviderProfile {

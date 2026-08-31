@@ -45,7 +45,7 @@ import {
   wslUser,
 } from './agentic-lib.ts';
 import { assert, assertEquals, assertThrows } from '@std/assert';
-import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { LEGACY_OPENROUTER_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { formatReleasePrCreationError } from '../../release/cut.ts';
 
 const here = new URL('.', import.meta.url).pathname;
@@ -334,7 +334,7 @@ Deno.test('parseRepoSlug rejects malformed slugs', () => {
 // --- buildOpenHandsComment ------------------------------------------------
 Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   const body = buildOpenHandsComment({
-    model: `openrouter/${OPENROUTER_MODEL_IDS.qwen}`,
+    model: `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
     outputMode: 'pr-comment',
     iterations: 800,
     provider: 'openrouter',
@@ -343,7 +343,7 @@ Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   });
   const first = body.split('\n')[0];
   assert(first.startsWith('@openhands-agent'), 'mentions @openhands-agent');
-  assert(first.includes(`model=openrouter/${OPENROUTER_MODEL_IDS.qwen}`), 'carries model');
+  assert(first.includes(`model=openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`), 'carries model');
   assert(first.includes('output=pr-comment'), 'carries output');
   assert(first.includes('iterations=800'), 'carries iterations');
   assert(first.includes('provider=openrouter'), 'carries provider');
@@ -407,7 +407,7 @@ Deno.test('parseOpenHandsStatusComment parses a completed status', async () => {
   const s = parseOpenHandsStatusComment(body);
   assertEquals(s.heading, 'Completed');
   assertEquals(s.verdict, 'completed');
-  assertEquals(s.model, `openrouter/${OPENROUTER_MODEL_IDS.qwen}`);
+  assertEquals(s.model, `openrouter/${LEGACY_OPENROUTER_MODEL_IDS.qwen38Max}`);
   assertEquals(s.provider, 'OPENROUTER');
   assertEquals(s.jobStatus, 'success');
   assert(s.isFinal, 'completed is final');
@@ -689,7 +689,7 @@ function c(
 const OH = '<!-- openhands-agent-summary -->';
 // A real-shaped trigger comment: quotes both template forms.
 const triggerComment = c(
-  `@openhands-agent model=openrouter/${OPENROUTER_MODEL_IDS.qwen} output=pr-comment iterations=800\n\n` +
+  `@openhands-agent model=openrouter/${OPENROUTER_MODEL_IDS.implEvaluator} output=pr-comment iterations=800\n\n` +
     'use harness\n## SKILL\n- jsr-audit\n\nPost `**[PHASE: IMPL-EVAL] ' +
     '[VERDICT: <PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT>]**` and end with ' +
     'OPENHANDS_VERDICT: <verdict>.',

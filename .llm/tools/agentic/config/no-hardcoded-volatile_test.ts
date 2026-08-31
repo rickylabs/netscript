@@ -108,7 +108,7 @@ const TESTS_ALLOWED_TO_PIN_CONTRACT_LITERALS = new Set<string>([
 const README_ILLUSTRATIVE_ALLOWLIST = new Set<string>([
   MODEL_IDS.codexSol,
   config.NATIVE_CANARY_MODEL_ARGS.codex,
-  config.OPENROUTER_MODEL_IDS.qwen,
+  config.OPENROUTER_MODEL_IDS.planEvaluator,
   config.OPENCODE_MODEL_IDS.visionEval,
   OPENCODE_TOOL.openRouterEnvRelativePath,
 ]);

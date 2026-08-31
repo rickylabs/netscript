@@ -7,11 +7,11 @@ import {
   validateHybridDelegationRequest,
 } from './hybrid-delegation.ts';
 
-Deno.test('hybrid contract applies the centralized DeepSeek default and bounded defaults', () => {
+Deno.test('hybrid contract applies the centralized GLM Flash default and bounded defaults', () => {
   const request = validateHybridDelegationRequest({ task: 'implement the focused change' });
   assertEquals(request.model, HYBRID_DELEGATION_DEFAULT_MODEL);
-  assertEquals(request.model, OPENROUTER_MODEL_IDS.deepseekV4Flash0731);
-  assertEquals(request.effort, 'high');
+  assertEquals(request.model, OPENROUTER_MODEL_IDS.implEvaluator);
+  assertEquals(request.effort, 'max');
   assertEquals(request.timeoutMs, HYBRID_DELEGATION_LIMITS.defaultTimeoutMs);
 });
 
