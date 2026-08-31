@@ -6370,3 +6370,27 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   flagged this incorrectly; the heuristic is a prompt to investigate, not a verdict.
 - #1802 Slice 5 RED dispatched in parallel; both leaves remain within their proven-disjoint
   boundaries.
+
+## D-137 — main 7908399af verified genuinely orthogonal; #1802 Slice 5 RED verified genuine
+
+- **main advanced to `7908399affa2c0010aafd5742b12d9edfbba0942`** (#1822). Verified the
+  "orthogonal two-file" characterization rather than trusting it: the diff is **exactly two files**,
+  both run-artifact markdown under `.llm/runs/beta10--orchestrator/visual/`. Zero product source,
+  zero generated corpora, zero overlap with either active leaf. Correctly requires no action now —
+  and unlike the earlier "docs-only" advance (D-135, which actually carried sagas-core product and
+  five generated corpora), this one genuinely is what it was called.
+- **Integration gate noted**: #1798 (`docs(plugin-streams-core)`) is still **OPEN**, so the
+  instructed boundary — integrate only after #1798 merges — has not opened. Both pending main
+  advances (`6bb27e46a` product+corpora, `7908399af` two-file) will be integrated together at
+  #1802's evidence-freeze once that gate clears, with the established regeneration order applied to
+  the corpora from `6bb27e46a`.
+- **#1802 Slice 5 RED landed** (`9c32c6393`), within its declared ceiling: only the new
+  `codex-resume_test.ts` plus run artifacts. **All five prior test blobs re-verified byte-identical**
+  at this commit.
+- **RED verified genuine and for the right reason**: `REAL_EXIT=1`, 1 passed / 1 failed. The failing
+  assertion is `Actual 0 / Expected 1` on
+  `codex resume returns non-zero when the real wrapper receives an active-writer rejection` — i.e.
+  the wrapper currently exits 0 on a recognized rejection, which is **the original #1751 defect
+  reproduced under test**, the same one that silently swallowed a countermand earlier in this run.
+  The positive control passes, so the test cannot pass vacuously.
+- #1753 idle at `d5bfc9d6c` (GREEN landed, verified in D-136). Dispatching #1802 Slice 6 GREEN next.
