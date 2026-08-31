@@ -8913,3 +8913,50 @@ requires proof that `createChatClient` actually selects the new mapper only unde
 doesn't rediscover and then ignore it.
 
 **#1387's Slice 9 evaluation remains parked** pending #1792, unaffected by this new leaf.
+
+## #1591 — reconciled and Tier-A ACCEPTED; a genuinely new tooling gap found (D-1)
+
+Confirmed the thread's own report (state genuinely `idle`, `turn complete`, matching artifact) before
+acting. Stopped the now-superseded watcher via `TaskStop`. Reconciled: local, remote, and PR (#1805,
+draft, `Fixes #1591`, correct labels/milestone) all consistent at `ff7d2de60`.
+
+### Content review
+
+Exactly the three ceiling files touched. The mapping matches the wire shape verified against the
+official reference before dispatch. Grepped the diff for any response/streaming touch
+(`output`/`function_call`/`call_id`/`toTanstackChatClient`) per the coordinator's instruction to check
+against the discriminated-output schema — **zero hits beyond the pre-existing import line**: this
+slice genuinely stayed on the request side only, respecting the explicit out-of-scope boundary drawn
+in `research.md`. The integration test goes beyond the brief's ask — it stubs `fetch` and asserts the
+actual serialized request body proves mutual field exclusion in both directions, not merely which
+function got selected.
+
+### D-1 — a real, tooling-wide evidence-integrity gap, distinct from anything found in #1387
+
+Cutting `run-gate.ts --gate check -- --include '^packages/ai/'` returned `PASS`/`exitCode 0` with
+**zero-byte stdout** and a `(cached, inputs unchanged)` stderr marker on all three of
+`check`/`lint`/`fmt-check`. **This is worse than the previously known "short duration ≠ replay"
+heuristic** — there the wrapper script still ran and produced real (if cache-warmed) output; here
+Deno's own **task-runner-level** cache skipped invoking the wrapper script entirely, so the receipt's
+`exitCode: 0` / `outcome: PASS` describes nothing that actually happened. Caught only by noticing the
+stdout byte count was zero — a check worth adding to this lane's standing verification habit
+alongside `argv`/`durationMs`.
+
+**Suspected cause:** Deno's task cache appears keyed on task name + matched-file content, not on the
+full forwarded argv — so a differently-`--include`-scoped invocation can false-positive off an earlier
+unscoped run at the same file-content state. Worked around by invoking the underlying wrapper scripts
+directly via `deno run` (bypasses `deno task`'s cache layer): genuinely fresh, 100 files / 0 findings
+each, matching the PR's own claims exactly. Discarded the cached receipts rather than committing them
+as evidence. **Not fixed** — `run-gate.ts`/`catalog.ts` are shared cross-lane tooling outside this
+leaf's ceiling; recorded in `drift.md` for whoever next touches that tooling.
+
+Also independently confirmed `docs:exports-drift` PASS, `check:mcp-export-corpus` PASS with the exact
+sha256 the PR cited, `quality:gate` exit 0 across all 36 packages, and the `test` receipt's own
+150/0 genuinely.
+
+**Verdict: ACCEPTED at `ff7d2de60ef470c312d633b851975d67a6774471`.** Evidence head `ff991165f`.
+PR comment `5472087619`.
+
+**IMPL-EVAL parked, matching #1387's Slice 9** — per the standing ruling, evaluation for this new
+slice also waits on #1792 (the GLM/Qwen allowlist fix) rather than falling back to DeepSeek. PR #1805
+stays draft.
