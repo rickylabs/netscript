@@ -6892,3 +6892,39 @@ The barrel authorization was the right call and the author executed it cleanly.
   catches the two cases it was written against is weak coverage), and whether the barrel diff is
   honest. The #1759 collision and the deliberately-skipped repo-wide run are disclosed up front so
   neither is scored against the leaf nor rediscovered at cost.
+
+## D-155 — #1828 repair landed exactly as authorized; delta IMPL-EVAL cycle 2 dispatched
+
+Author rebuilt on the same thread (no relaunch), fast-forwarded onto the evaluator artifact head
+rather than rebasing it away, and stopped at the boundary.
+
+- `42f2d6acc` — the repair, **one line**:
+  `let timeoutId: number | undefined` → `let timeoutId: ReturnType<typeof setTimeout> | undefined`,
+  plus the EOF-whitespace fix in the leaf's `supervisor.md`.
+- `5605a9505` — evidence, including durable receipts at
+  `.llm/runs/…--1827/receipts/delta-cycle-2-{red,green}.json`.
+- **Config was NOT rolled back** — verified directly from disk at the head:
+  `["deno.ns","deno.unstable","dom"]`. A green obtained by reverting the config would have defeated
+  the whole leaf, so this was checked first rather than assumed.
+- **RED is the right shape**: repo-wide gate, `exitCode 1`, `totalResults 0`,
+  `processFailure.reason = "deno test exited non-zero without a parseable TAP test failure"`, TS2322
+  in the stderr tail. Not a scoped proof, which would have been vacuous for this defect class.
+- **GREEN is a real suite run, not a type-check death**: `exitCode 0`, **4,446 total / 4,427 passed /
+  19 ignored / 0 failed**. This distinction is the whole point — the failing receipt also read
+  "0 failed".
+- **Sibling sweep independently re-derived rather than accepted.** The author reported zero remaining
+  `number`-annotated timer handles under `packages/cli/e2e`. I grepped it myself: every other
+  `number` timeout reference there is a *duration* (`timeoutMs`, `timeoutSeconds`), not a handle.
+  The claim holds.
+- PR body now lists the third product file and states plainly that **exact CI, not the local gates**,
+  found the whole-graph type consequence. The author changed no labels and did not flip readiness.
+- **Delta IMPL-EVAL cycle 2 dispatched** at `5605a9505` on the opposite-family GLM 5.3 Flash / max
+  route from a fresh detached worktree. The brief scopes it to the delta, hands over both my and the
+  author's conclusions **as claims to falsify rather than as findings to inherit**, names the exact
+  RED signature so a `0 passed / 0 failed` report cannot be misread as green in either direction, and
+  re-opens cycle 1's Low vacuous-parity finding for a fresh judgement now that this leaf has shipped
+  one defect its own gates could not see.
+- Two evaluators are briefly concurrent (#1737 and #1828-c2). This is deliberate: P0 #1828 must not
+  wait, and #1737's evaluator was explicitly instructed **not** to launch a repo-wide run, so they do
+  not contend for the expensive gate. Each was told a sibling is running so neither reads timing
+  variance as a defect.
