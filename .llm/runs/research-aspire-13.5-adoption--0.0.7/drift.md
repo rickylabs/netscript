@@ -5282,3 +5282,31 @@
     already shipped one such head), mutation proof that the two new test files go red without the
     repair, a check that `embedded.generated.ts` is a faithful regeneration rather than a hand edit,
     and an explicit judgement on whether the repair is justified **without** the Prisma code.
+
+- **D-222 — #1837 HELD: exact-head CI red, `status:ready-merge` withdrawn, bounded seam repair
+  dispatched.** Run `33441258910` at `6ef9306ef`: **4,506 passed, 4 failed / 3 unique**, all in
+  `runtime/prepare-readiness-fixture.ts`.
+  - **Lifecycle demoted first** (`status:ready-merge` → `status:impl`) before anything else. A red PR
+    still advertised as ready is worse than one that never claimed it, and the close-gate keys off
+    that label.
+  - **Root cause is the defect class this slice already fixed once.** The fixture anchors on
+    user-derived text — `` line.includes(`.withHealthCheck('${key}');`) `` (single-quoted) and
+    `` `  // --- ${name} (task) ---` `` (user text inside a generated comment). The hardening emits via
+    `JSON.stringify` (**double** quotes) and replaced user text with **ordinal** markers. Both are
+    correct; the consumer was coupled to the old shape — precisely what happened to
+    `service-environment_test.ts` earlier, fixed there by anchoring on
+    `plugins.set(${JSON.stringify(name)}, resource)` plus the ordinal marker.
+  - **Failure 2 is a masked test, not merely a broken one:** the missing-Garnet assertion now trips on
+    the *postgres* marker error first, so it no longer proves what it was written to prove. The brief
+    requires reordering so it fails for a missing **Garnet** marker.
+  - Repair brief forbids the tempting shortcuts explicitly — **no reverting to single-quoted emission
+    or user-text comments to make a marker match** — and requires a **generator-derived structural
+    seam** (ask the generator where the seam is rather than reconstructing its formatting), plus
+    **two-directional mutation proof**: revert the seam → three fixture tests red; revert the
+    hardening → source-safety tests red.
+  - Also required: the **whole** helper-generator test directory in one invocation. A per-file pass
+    hid two failures earlier in this slice, and that is exactly how this head reached `ready-merge`
+    with a red consumer.
+  - The stripped `.llm/runs` artifacts must stay stripped; the brief says so, since a fresh run-dir
+    commit would silently undo D-219.
+  - Eleventh dead-sender orphan released before launch (`ownerPid 2088174`).
