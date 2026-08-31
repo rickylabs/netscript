@@ -27,7 +27,9 @@ owner review; the exact six-package graph is unchanged.
 
 ### Public Surface and Package Graph
 
-- Canonical RFC record: `rfcs/0000-database-architecture.md`; its final substantive gate passed.
+- Canonical RFC record: `rfcs/0006-database-architecture.md` (drafted at
+  `rfcs/0000-database-architecture.md`; renumbered and accepted 2026-08-31). Its final substantive
+  gate passed at the draft path.
 - `@netscript/database-contract` (A1): plain identities, manifest/plan/receipt/diagnostic schemas,
   capabilities, ownership, and shared small SPIs; zero provider dependencies.
 - `@netscript/database` (A4): L1 preset/recipe, the L2 `defineDatabase`/target/space/policy
@@ -354,7 +356,7 @@ which is also mirrored in the tagged repository tree.
 | 8  | (unstated) whole-query raw SQL                                      | Moved from `` db.sql.raw`…` `` to `` db.raw.sql`…` `` at `rc.4`; terminators `.returnsRow(spec)` / `.affectedCount()`. `raw-query-demo.ts` does not exist at `rc.1` (HTTP 404) and does at `rc.8`.                                                                                                                                                              | upgrade note `8.0.0-rc.3-to-8.0.0-rc.4` id `raw-moves-to-its-own-lane`; `examples/prisma-8-demo/src/queries/raw-query-demo.ts`                                 |
 | 9  | `@prisma/orm-postgres` publishes 138 export subpath keys            | 138 at the pin, **140** at `8.0.0-rc.8`. The pin figure is left as written and the current figure recorded beside it.                                                                                                                                                                                                                                           | <https://registry.npmjs.org/@prisma/orm-postgres> (`8.0.0-rc.8` `exports`)                                                                                     |
 | 10 | "An exit code is not a result" presented as a NetScript-only lesson | Upstream **now publishes an exit-code contract that agrees**: "an expected structured failure exits 2, a user abort exits 3, and 1 is reserved for internal errors (bugs)", plus a `4`–`99` band for commands that _complete with findings_ (`db verify`, `db sign`, `migration check` exit `4` on a bad answer). Recorded as convergence, not as a dependency. | <https://www.prisma.io/docs/orm/reference/error-reference>                                                                                                     |
-| 11 | Churn characterised as "the seam moved within six days"             | Upstream itemises **22 breaking-change entries across the seven `rc.1 → rc.8` transitions**, including check-constraint, aggregate-typing, config, raw-lane, pagination, temporal, and engine-pin changes.                                                                                                                                                      | `skills/prisma-8/upgrading/app/upgrades/` at `v8.0.0-rc.8` (14 + 0 + 4 + 2 + 4 + 2 + 2 entries)                                                                |
+| 11 | Churn characterised as "the seam moved within six days"             | Upstream itemises **28 breaking-change entries across the seven `rc.1 → rc.8` transitions**, including check-constraint, aggregate-typing, config, raw-lane, pagination, temporal, and engine-pin changes.                                                                                                                                                      | `skills/prisma-8/upgrading/app/upgrades/` at `v8.0.0-rc.8` (14 + 0 + 4 + 2 + 4 + 2 + 2 entries)                                                                |
 
 ### Re-verified UNCHANGED (claims that stand as drafted)
 

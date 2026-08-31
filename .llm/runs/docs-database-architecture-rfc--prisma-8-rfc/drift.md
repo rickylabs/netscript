@@ -235,9 +235,9 @@ documentation.
   file were renamed, ORM pagination was renamed `.take`/`.skip` → `.limit`/`.offset` at `rc.7`, the
   whole-query raw-SQL lane moved from `db.sql.raw` to `db.raw.sql` at `rc.4`, and temporal fields
   now surface as `Temporal.Instant` rather than `Date`. Upstream's own per-transition upgrade notes
-  itemise twenty-two breaking changes across `rc.1 → rc.8`. Separately, upstream has since published
-  an exit-code contract that independently converges on this RFC's own "an exit code is not a
-  result" law.
+  itemise twenty-eight breaking changes across `rc.1 → rc.8`. Separately, upstream has since
+  published an exit-code contract that independently converges on this RFC's own "an exit code is
+  not a result" law.
 - **Severity:** documentation accuracy — no architectural drift. Every correction strengthens the
   adapter-insulation argument the RFC already makes; none weakens or reverses a decision.
 - **Action:** corrected in place. `rfcs/0006-database-architecture.md` gained a
@@ -283,8 +283,10 @@ documentation.
   machine's layout — `repo='/home/codex/repos/netscript-db-rfc'`,
   `deno_bin='/home/codex/.deno/bin/deno'`, and an exported `HOME`/`PATH` under `/home/codex` — so it
   is unrunnable anywhere else and, once merged to `main`, would read as a sanctioned pattern. It
-  also wrote captured stream logs into `.llm/tmp/`. It was the only `.sh` file in any of the 228
-  committed run directories in this tree.
+  also wrote captured stream logs into `.llm/tmp/`. Seven other tracked `.sh` files exist under
+  `.llm/runs/` across 229 committed run directories — four benchmark harnesses, two evidence
+  scripts, and one test fixture — so a shell script in a run dir is not itself anomalous; a script
+  that _launches an agent lane_ outside `.llm/tools/agentic/` is, and this was the only one.
 - **Severity:** repository hygiene — no evidence value lost. The script only _invoked_ the final
   gate; the gate's brief (`briefs/fable-final-evaluator.md`), its verdict (`evaluate.md`), and its
   drift entry are all retained.
@@ -296,7 +298,8 @@ documentation.
 
 ## 2026-08-31 — Artifacts reviewed and deliberately RETAINED
 
-- **What:** The other 43 files were reviewed against the same rules before anything was removed.
+- **What:** The other 42 files in the run directory were reviewed against the same rules before
+  anything was removed.
 - **Actual:** Nothing else met the bar for removal, and three categories were explicitly kept rather
   than trimmed:
   - **Machine-specific paths in `supervisor.md`, `plan-eval.md`, and `briefs/`.** The harness
@@ -313,4 +316,40 @@ documentation.
 - **Scanned and found absent:** credentials, API keys, bearer tokens, connection strings with
   passwords, `.env` content, captured stream/stdout logs, gate-receipt JSON, and leak-check reports.
 - **Severity:** none.
-- **Evidence:** the 43 retained files; `.agents/skills/netscript-harness` § Run Artifacts.
+- **Evidence:** the 42 retained run-directory files; `.agents/skills/netscript-harness` § Run
+  Artifacts.
+
+## 2026-08-31 — Delta IMPL-EVAL findings remediated before merge
+
+- **What:** A fresh delta IMPL-EVAL (`z-ai/glm-5.3-flash`, effort max, separate session) evaluated
+  head `fcea90222` and returned **PASS** with six non-blocking accuracy findings against the
+  repair's own prose. Because factual accuracy is the entire point of this repair, all six were
+  corrected before merge rather than deferred.
+- **Source:** IMPL-EVAL comment on PR #1640
+  (<https://github.com/rickylabs/netscript/pull/1640#issuecomment-5480686823>).
+- **Actual — the six corrections:**
+  - **F-08 (low).** "22 breaking-change entries across `rc.1 → rc.8`" was a bad sum; the
+    per-transition breakdown (14 + 0 + 4 + 2 + 4 + 2 + 2) is **28**. Corrected in the RFC,
+    `worklog.md`, `drift.md`, `context-pack.md`, the PR body, and #313. The error **understated**
+    upstream churn.
+  - **F-09 (low).** The database-tier statement was attributed to `scorecard.md`; it is actually in
+    the project `README.md` at both revisions — `scorecard.md` is the per-feature matrix. Citation
+    corrected in the re-baseline and in the original Motivation bullet that inherited it. The facts
+    were true; the citation was not.
+  - **F-10 (medium).** "the only `.sh` file in any of the 228 committed run directories" was
+    **false**: seven other tracked `.sh` files exist across 229 run directories. Restated
+    accurately. The removal itself never rested on that count — it rests on the cited `AGENTS.md`
+    and harness rules and on the script's own hardcoded `/home/codex` layout.
+  - **F-14 (medium).** `worklog.md` still named `rfcs/0000-database-architecture.md` as the
+    "Canonical RFC record", contradicting this log's own claim that forward-looking artifacts name
+    the accepted path. Corrected to `rfcs/0006-database-architecture.md` with the draft path noted.
+  - **F-24 (low).** "the other 43 files" was off by one: 43 files existed in the run directory at
+    `d63a95e9a`, so **42** are retained. Corrected.
+  - **F-27 (low).** The DoD claimed three unverifiable items were named "in the RFC and
+    `worklog.md`"; the RFC named two (the SIGINT exit code was never claimed in the RFC, so there
+    was nothing to mark there). Wording corrected in both the RFC and the PR body.
+- **Severity:** documentation accuracy. No finding was a blocker, none touched a decision, and none
+  changed the outcome of any gate.
+- **Action:** all six corrected; the corrections are the only delta between the PASS-evaluated head
+  `fcea90222` and the final head. Recorded here rather than silently folded in.
+- **Evidence:** the IMPL-EVAL comment above; this PR's final diff.

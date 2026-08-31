@@ -138,7 +138,7 @@ Eighteen days elapsed between draft (2026-08-13) and acceptance (2026-08-31). An
 ruled **repair, not close**. Four things changed and nothing else did:
 
 1. **Upstream re-baseline.** Prisma 8 is still **not GA** (`prisma` npm `latest` = `8.0.0-rc.12`).
-   Eleven further release candidates landed during the review, with twenty-two upstream-itemised
+   Eleven further release candidates landed during the review, with twenty-eight upstream-itemised
    breaking changes across `rc.1 → rc.8`. Six drafted observations were corrected and seven were
    re-verified byte-identical. Full citation table: `worklog.md` § Acceptance-date upstream
    re-baseline. RFC section: § Upstream re-baseline (2026-08-31).
@@ -146,7 +146,7 @@ ruled **repair, not close**. Four things changed and nothing else did:
    `rfc: 0006`, `status: Accepted`; `rfcs/README.md` updated.
 3. **Tracking epic.** Issue #313 rewritten in place as the clean-break implementation epic and left
    **open**, with its labels and `Backlog / Triage` milestone preserved and no closing keyword.
-4. **Artifact reconciliation.** `workflows/launch-final-fable.sh` removed; the other 43 files
+4. **Artifact reconciliation.** `workflows/launch-final-fable.sh` removed; the other 42 files
    reviewed and deliberately retained. Rationale for both directions: `drift.md` 2026-08-31.
 
 No locked decision (D-01–D-47, `OWNER-DX-01`) was reopened; the owner-ratified clean-break direction

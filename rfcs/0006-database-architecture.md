@@ -152,7 +152,7 @@ It is also not a safe surface to expose directly, and this RFC treats that as a 
   notes warn that respins may break, remove, or rename APIs and the contract format
   ([release][rc1-release]). PostgreSQL is the sole database intended for the 8.0 GA target set —
   MongoDB is Early Access, SQLite a proof of concept, MySQL later, SQL Server absent
-  ([scorecard][rc1-scorecard]).
+  ([README][rc1-readme]; the [scorecard][rc1-scorecard] is the per-feature matrix behind it).
 - `@prisma/orm-postgres`, the one package an application installs, publishes 138 top-level export
   subpath keys at the pin, spanning adapters, control and contract internals, migration tooling,
   query ASTs, runtime, and utilities; re-exporting that surface would convert Early-Access internals
@@ -191,7 +191,7 @@ an adapter can pin to. That is direct evidence for the rule W3 already carries: 
 **each** upstream specifier it consumes, individually, and the manifest records those pins.
 
 **The churn is itemised by upstream itself.** The published package ships machine-readable
-per-transition upgrade notes, and the `rc.1 → rc.8` path contains twenty-two entries across seven
+per-transition upgrade notes, and the `rc.1 → rc.8` path contains twenty-eight entries across seven
 transitions ([`upgrades/`][rc8-upgrades]) — including a runtime `query`/`execute` hard cut, a
 config-file hard cut, the raw-SQL lane move, aggregate result-type changes, and a pagination rename.
 Eighteen days produced more breaking change than most minor releases. This is the cost the adapter
@@ -216,13 +216,14 @@ written: `defineContract(scaffold, callback)` and its literal-preserving callbac
 ([`aggregate/types.ts`][rc1-space-aggregate]); the flattening namespace map
 ([`contract-types.ts`][rc1-namespace-map]); the demo contract module
 ([`contract.ts`][rc1-contract-example]); the ORM filter shape ([`where`][rc1-orm-filter]); the
-no-emit context ([`context.ts`][rc1-no-emit]); and the database-support scorecard
-([scorecard][rc1-scorecard]) — PostgreSQL first, MongoDB Early Access, SQLite a proof of concept,
-MySQL later, SQL Server absent. Two nuances the scorecard file does not carry: `@prisma/orm-sqlite`
-and `@prisma/orm-mongo` now publish at `8.0.0-rc.8`, while `@prisma/orm-mysql` and
-`@prisma/orm-mssql` do not exist on npm at all. A published package is not a maturity claim, and
-NetScript's refusal to certify those targets is a NetScript decision that this changes nothing
-about.
+no-emit context ([`context.ts`][rc1-no-emit]); and the feature-support scorecard
+([scorecard][rc1-scorecard]). The database-tier statement — PostgreSQL the primary target, MongoDB
+early access, SQLite a proof of concept today, MySQL later, SQL Server unmentioned — comes from the
+project README, not the scorecard, and is identical at both revisions ([README][rc1-readme],
+[README][rc8-readme]). Two nuances the scorecard file does not carry: `@prisma/orm-sqlite` and
+`@prisma/orm-mongo` now publish at `8.0.0-rc.8`, while `@prisma/orm-mysql` and `@prisma/orm-mssql`
+do not exist on npm at all. A published package is not a maturity claim, and NetScript's refusal to
+certify those targets is a NetScript decision that this changes nothing about.
 
 **Upstream now publishes an exit-code contract, and it agrees with this design.** The Prisma 8 error
 reference states that "an expected structured failure exits 2, a user abort exits 3, and 1 is
@@ -235,10 +236,11 @@ code is a projection of a typed outcome, never the result itself, and a refusal 
 convergence is evidence for the rule, not a dependency on it — NetScript's codes remain NetScript's,
 and the adapter never forwards an upstream exit code as a NetScript outcome.
 
-One thing this re-baseline did **not** establish, stated rather than glossed: no upstream GA date
+Two things this re-baseline did **not** establish, stated rather than glossed: no upstream GA date
 has been announced that this review could cite, and no Prisma 8 page states a minimum PostgreSQL
-version (the `supported-databases` pages still serve Prisma 7 content). The RC-era floor recorded
-above is therefore carried forward as an RC-era observation, not a GA guarantee.
+version (the `supported-databases` pages return HTTP 200 but still serve Prisma 7 content). The
+RC-era floor recorded above is therefore carried forward as an RC-era observation, not a GA
+guarantee.
 
 ## Guide-level explanation
 
@@ -1374,8 +1376,8 @@ obligations.
 
 **It bets on an Early-Access upstream, and pays for the insulation.** RC1 is not recommended for
 production, its notes warn that respins may break APIs and the contract format, and the seam moved
-within six days of the tag — then kept moving, through twenty-two upstream-itemised breaking changes
-in the eighteen days between this document's draft and its acceptance
+within six days of the tag — then kept moving, through twenty-eight upstream-itemised breaking
+changes in the eighteen days between this document's draft and its acceptance
 ([§ Upstream re-baseline](#upstream-re-baseline-2026-08-31)). One adapter package, one facade
 module, an import allowlist, independent versioning, and a kill switch that costs a provider rather
 than the architecture keep that contained — but they add a boundary a direct dependency would not
