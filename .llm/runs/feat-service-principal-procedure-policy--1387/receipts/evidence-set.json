@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "immutableHead": "df1036c9b128486f52e2f53bcdc3345916e9f39e",
+  "immutableHead": "7e76f68e43e2b45e55ff9f3560ef7e30351853eb",
   "surface": "#1387 final head (Slices 1-9 + 4x main integration)",
   "expectedGateIds": [
     "agent-docs-prose",
