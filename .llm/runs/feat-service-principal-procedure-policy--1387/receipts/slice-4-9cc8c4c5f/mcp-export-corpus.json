@@ -1,0 +1,36 @@
+{
+  "gateId": "mcp-export-corpus",
+  "invocationId": "1387-s4-mcp-export-corpus",
+  "argv": [
+    "deno",
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "actualGitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:3782819",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6eb0ce796dac43783b122f75c9e62c06c29109c3e6111055d753ed7af887698d",
+  "lifecycleId": "worker:3782819:1387-s4-mcp-export-corpus:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T20:24:04.028Z",
+  "startedAt": "2026-08-30T20:24:04.031Z",
+  "finishedAt": "2026-08-30T20:24:10.848Z",
+  "durationMs": 6817,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "2044fdb16f650dc8a808e56b22ad56ab723524684b64d45cacf3ee1d12729a70",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.6\",\"sha256\":\"7678aac3c3339fa66e2c5ec26f60ea6038076257b71639fc07e4d9010cae7eae\",\"uncompressedBytes\":2146214,\"compressedBytes\":311682,\"packageCount\":35,\"subpathCount\":270,\"symbolCount\":7652}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 136,
+    "sha256": "6db409653373f0241da7441455358a20b9229fc8eb6e0311545372c75a6e71d8",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  }
+}

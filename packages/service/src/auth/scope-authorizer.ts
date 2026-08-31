@@ -16,7 +16,12 @@
  * @module
  */
 
-import type { AuthorizerPort, AuthzDecision, AuthzRequest } from './types.ts';
+import type {
+  AuthorizerMatch,
+  AuthzDecision,
+  AuthzRequest,
+  MatchAwareAuthorizerPort,
+} from './types.ts';
 
 /** Ordered scope/role rule evaluated by `createScopeAuthorizer()`. */
 export interface ScopeAuthorizationRule {
@@ -37,29 +42,54 @@ export interface ScopeAuthorizerOptions {
 }
 
 /** Creates an ordered-rule authorizer for scopes and roles. */
-export function createScopeAuthorizer(options: ScopeAuthorizerOptions): AuthorizerPort {
+export function createScopeAuthorizer(options: ScopeAuthorizerOptions): MatchAwareAuthorizerPort {
   const denyByDefault = options.denyByDefault ?? true;
 
+  const authorizeMatch = (request: AuthzRequest): AuthorizerMatch => {
+    const rule = options.rules.find((candidate) => candidate.match(request));
+    if (!rule) {
+      return { matched: false };
+    }
+
+    return {
+      matched: true,
+      decision: authorizeRequirements(
+        request,
+        rule.requireScopes,
+        rule.requireRoles,
+      ),
+    };
+  };
+
   return {
+    authorizeMatch,
     authorize(request: AuthzRequest): AuthzDecision {
-      const rule = options.rules.find((candidate) => candidate.match(request));
-      if (!rule) {
+      const result = authorizeMatch(request);
+      if (!result.matched) {
         return denyByDefault ? deny('authz.no-matching-rule') : { allow: true };
       }
-
-      const missingScope = firstMissing(rule.requireScopes, request.principal.scopes);
-      if (missingScope) {
-        return deny(`authz.missing-scope:${missingScope}`);
-      }
-
-      const missingRole = firstMissing(rule.requireRoles, request.principal.roles);
-      if (missingRole) {
-        return deny(`authz.missing-role:${missingRole}`);
-      }
-
-      return { allow: true };
+      return result.decision;
     },
   };
+}
+
+/** Applies scope and role requirements to one authenticated request. */
+export function authorizeRequirements(
+  request: AuthzRequest,
+  requiredScopes: readonly string[] | undefined,
+  requiredRoles: readonly string[] | undefined,
+): AuthzDecision {
+  const missingScope = firstMissing(requiredScopes, request.principal.scopes);
+  if (missingScope) {
+    return deny(`authz.missing-scope:${missingScope}`);
+  }
+
+  const missingRole = firstMissing(requiredRoles, request.principal.roles);
+  if (missingRole) {
+    return deny(`authz.missing-role:${missingRole}`);
+  }
+
+  return { allow: true };
 }
 
 function firstMissing(

@@ -12,6 +12,7 @@ export type {
   OpenApiObject,
   OpenApiOperationIndex,
 } from './src/domain/openapi/operation-index.ts';
+export type { OperationAccessSummary } from './src/domain/openapi/operation-access.ts';
 export { resolveCanonicalOperation } from './src/domain/openapi/canonical-identity.ts';
 export type {
   AmbiguousOperation,

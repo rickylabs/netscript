@@ -45,6 +45,7 @@ export type {
   TelemetryContribution,
 } from './src/config/mod.ts';
 export type { PluginContext, PluginLogger } from './src/domain/mod.ts';
+export type { Principal, ServiceHandlerContext } from '@netscript/service';
 export { DuplicatePluginError, PluginError, PluginValidationError } from './src/domain/mod.ts';
 export { PluginContribution } from './src/abstracts/mod.ts';
 export type { ContributionAxis } from './src/abstracts/mod.ts';

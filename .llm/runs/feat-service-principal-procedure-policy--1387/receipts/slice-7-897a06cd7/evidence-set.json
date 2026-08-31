@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "897a06cd7170ca021da1836b3cbcbf790cf97a2f",
+  "surface": "#1387 Slice 7 MCP access result contract",
+  "expectedGateIds": [
+    "check",
+    "exports-drift",
+    "fmt-check",
+    "lint",
+    "mcp-export-corpus",
+    "publish-dry-run",
+    "quality-gate",
+    "test"
+  ],
+  "receiptIds": [
+    "1387-s7-check",
+    "1387-s7-exports-drift",
+    "1387-s7-fmt-check",
+    "1387-s7-lint",
+    "1387-s7-mcp-export-corpus",
+    "1387-s7-publish-dry-run",
+    "1387-s7-quality-gate",
+    "1387-s7-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

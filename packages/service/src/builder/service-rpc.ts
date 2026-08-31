@@ -34,6 +34,16 @@ export interface RpcWiringOptions {
 
 const warnedLegacyRpcPaths = new Set<string>();
 
+/** Resolves the effective endpoint paths shared by RPC wiring and policy binding. */
+export function resolveRpcWiringPaths(
+  options?: RpcWiringOptions,
+): { readonly rpcPath: string; readonly apiPath: string } {
+  return {
+    rpcPath: options?.rpcPath ?? '/api/rpc',
+    apiPath: options?.apiPath ?? '/api',
+  };
+}
+
 /**
  * Wires the oRPC RPC and OpenAPI handlers onto the Hono app.
  *
@@ -47,11 +57,10 @@ export function wireRpc(
   app: Hono,
   router: ServiceRouter,
   serviceName: string,
-  buildContext: (c: Context) => Record<string, unknown>,
+  buildContext: (c: Context) => object,
   options?: RpcWiringOptions,
 ): void {
-  const rpcPath = options?.rpcPath ?? '/api/rpc';
-  const apiPath = options?.apiPath ?? '/api';
+  const { rpcPath, apiPath } = resolveRpcWiringPaths(options);
   const debug = options?.debug;
 
   const rpcHandler = createRPCHandler(options?.rpcRouter ?? router, { serviceName, debug });
@@ -93,7 +102,7 @@ function registerRpcPath(
   app: Hono,
   rpcHandler: ReturnType<typeof createRPCHandler>,
   path: string,
-  buildContext: (c: Context) => Record<string, unknown>,
+  buildContext: (c: Context) => object,
   onMatched?: (context: Context) => void,
 ): void {
   app.use(`${path}/*`, async (c: Context, next: () => Promise<void>) => {
