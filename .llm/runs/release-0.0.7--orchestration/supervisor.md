@@ -1531,3 +1531,15 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Every one of the 55 open milestone issues and 27 open milestone PRs has exactly one orchestrator
   label. Supervisors own routine unblock decisions and must surface immutable merge candidates rather
   than wait for owner or coordinator confirmation at ordinary checkpoints.
+
+- Features r2 was rotated only after atomic checkpoint `9ef409dde` because its context reached 100%.
+  The authoritative replacement is `netscript-007-features-r3`, session
+  `4cc4d530-e77d-4d87-943b-9c2896fc709a`, with live Opus 5/xhigh JSONL proof and Remote Control
+  `session_0196jJfQD87X3XQww8dAjCsB`. Never relaunch r2 or split its retained topic ownership.
+
+- Main is now `0274c0a707e36ded3b4470a3911315f963e642d4` after shipped #1800. Docs converges
+  #1806 next. Internals must prioritize P0 #1827 after freeing one of its two author slots; its
+  one-line CLI E2E library parity is the only external blocker to #1762 exact-head CI.
+- #1747 retains the runtime mutex through its same-head durable attempt 2. Attempt 1 had no verdict
+  because the shell ceiling killed it; final flow-B runs only after the full suite passes and all
+  runtime state returns to zero.

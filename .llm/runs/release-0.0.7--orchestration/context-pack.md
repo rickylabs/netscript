@@ -1931,3 +1931,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Milestone ownership is exhaustive at 55 open issues plus 27 open PRs: every item has exactly one
   topic orchestrator. The next canary still waits for coherent feature/fix payload rather than this
   docs-only merge.
+
+- Features continuity is now r3, not the context-exhausted r2 process: Claude session
+  `4cc4d530-e77d-4d87-943b-9c2896fc709a`, tmux `netscript-007-features-r3`, Opus 5/xhigh,
+  Remote Control `session_0196jJfQD87X3XQww8dAjCsB`. Resume source is topic commit `9ef409dde`
+  and its `RESUME.md`; #1762/#1805 ownership and all remaining feature leaves are unchanged.
+
+## Resume delta — 2026-08-31T03:51:00Z
+
+- Current main is `0274c0a707e36ded3b4470a3911315f963e642d4` after exact-green Docs #1800;
+  #1799/#1800 are shipped. #1806 is the next ordered docs convergence front.
+- #1762's blocker is separate P0 issue #1827: restore `deno.unstable` parity in the CLI E2E explicit
+  compiler libraries and add a focused config regression. The checker already passes the flag; do
+  not modify #1762 product code, `health.ts`, or `run-deno-check.ts`. Internals owns the bounded leaf.
+- #1747 attempt 1 is `interrupted_no_verdict`, exact-zero cleaned, and attempt 2 is authorized only
+  in a durable runner at the same head. S9/S10 static convergence continues independently.

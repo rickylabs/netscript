@@ -3099,3 +3099,31 @@
 - Live milestone ownership remains exhaustive: 55 open issues and 27 open PRs, with zero missing or
   duplicate `orchestrator:*` labels. The issue split is Features 14, Fixes 13, Internals 8, Docs 10,
   Aspire 10. All five Opus supervisors received new-main and no-idle steering.
+
+## 2026-08-31T03:43:00Z — Features supervisor rotated before context exhaustion
+
+- The Features r2 supervisor reached 100% context only after pushing atomic checkpoint `9ef409dde`
+  with `RESUME.md`, exact #1762/#1805 heads, active-gate state, and six learned tooling traps. Its
+  exact tmux session was stopped after that checkpoint; no implementation/evaluator work was active.
+- Fresh supervisor r3 is session `4cc4d530-e77d-4d87-943b-9c2896fc709a`, tmux
+  `netscript-007-features-r3`, Remote Control `session_0196jJfQD87X3XQww8dAjCsB`. The live JSONL
+  proves `claude-opus-5` / `xhigh`; the phone URL is active. It was steered to consume #1805,
+  preserve #1762 product code while the check-wrapper repair is isolated, then evaluate
+  #1810/#1814/#1820 serially while independent Features preparation continues.
+
+## 2026-08-31T03:51:00Z — #1800 shipped; exact #1762 config blocker isolated as #1827
+
+- Docs PR #1800 passed exact-head CI run `33354427993`, issue/DoD/thread gates, and independent
+  DeepSeek carry-forward proof at `e122495cb`; the MCP page and authoritative mapping block are
+  byte-identical to the evaluated content. The coordinator merged it as
+  `0274c0a707e36ded3b4470a3911315f963e642d4` and normalized #1799/#1800 to `status:shipped`.
+  Docs now converges #1806 once onto this main.
+- #1762's TS2551 was traced to the initiating CLI E2E root, not the reported service `health.ts`
+  dependency and not a batching/flag defect. `packages/cli/e2e/deno.json` explicitly omits
+  `deno.unstable` although its check task passes `--unstable-kv` and production CLI declares the
+  library. Issue #1827 owns the one-line config parity plus focused regression as a P0 Internals
+  leaf; #1762 product code remains unchanged until #1827 lands.
+- #1747 runtime attempt 1 ended without a verdict when the Claude shell ceiling killed it during
+  `generated.quality-negative`; every preceding recorded gate passed and no final report exists.
+  Four-part cleanup returned exact zero. One same-head retry is authorized in a durable tmux runner;
+  this is transport recovery, not a product retry or overlapping lease.

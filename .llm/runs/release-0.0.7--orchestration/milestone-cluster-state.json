@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "584caa03f474de36b2d6e62e7162ab410c6ccb59",
+  "currentMainSha": "0274c0a707e36ded3b4470a3911315f963e642d4",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -492,23 +492,23 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "pr1731_merged_shipped_s8_static_implementation_active",
+        "state": "r3_rotated_from_atomic_checkpoint_9ef409dde_pr1762_pr1805_active",
         "worktree": "/home/agent/projects/netscript/worktrees/007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
-        "requestedEffort": "high",
+        "requestedEffort": "xhigh",
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
-        "observedEffort": "high",
-        "backgroundAgentId": "6c654229",
-        "sessionId": "6c654229-9c4c-4b88-8321-9310778b7366",
-        "pid": 5495,
-        "bridgeSessionId": "session_01CHWTWUvxjEkHB7TCav7G2H",
-        "remoteControlUrl": "https://claude.ai/code/session_01CHWTWUvxjEkHB7TCav7G2H",
-        "topicHeadSha": "e4e71a0804d5cb65704a27eeecca620b20432825",
-        "queueState": "1466_pr1731_merged_shipped_as_3e5cbabf_after_live_main_seven_row_pass; Aspire S8 #1720/#863 static work continues independently at 1efd1a17; 1387 then 1730",
-        "tmuxSession": "netscript-007-features-r2",
-        "attachmentVerifiedAt": "2026-08-30T08:32:30.000Z",
+        "observedEffort": "xhigh",
+        "backgroundAgentId": "4cc4d530",
+        "sessionId": "4cc4d530-e77d-4d87-943b-9c2896fc709a",
+        "pid": 1289115,
+        "bridgeSessionId": "session_0196jJfQD87X3XQww8dAjCsB",
+        "remoteControlUrl": "https://claude.ai/code/session_0196jJfQD87X3XQww8dAjCsB",
+        "topicHeadSha": "9ef409dde",
+        "queueState": "#1762 exact-head evidence/CI convergence and #1805 exact-head evaluator/CI active; #1810/#1814/#1820 serial evaluations next; all 20 features-owned milestone items retained",
+        "tmuxSession": "netscript-007-features-r3",
+        "attachmentVerifiedAt": "2026-08-31T03:42:57.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
@@ -5142,6 +5142,16 @@
         "dockerCustomNetworks": 0,
         "otherLeaseOwners": 0
       },
+      "attempt": 2,
+      "attempt1": {
+        "state": "interrupted_no_verdict",
+        "lastCompletedGate": "generated.sagas-registry",
+        "interruptedAtGate": "generated.quality-negative",
+        "cause": "Claude shell execution ceiling killed the process before gate-end or final report",
+        "cleanup": "Aspire empty; containers 0; volumes 0; custom networks 0"
+      },
+      "retryGrantedAt": "2026-08-31T03:46:00.000Z",
+      "retryRunner": "dedicated durable tmux runner outside the Claude tool-call timeout",
       "cleanupRequired": true
     }
   ],
@@ -5154,8 +5164,8 @@
     "counts": {
       "features": 14,
       "fixes": 13,
-      "internals": 8,
-      "docs": 10,
+      "internals": 9,
+      "docs": 9,
       "aspire": 10
     },
     "queueRule": "Each supervisor queries its orchestrator:<lane> label as the authoritative queue; serialisation applies within that orchestrator only, and a parked leaf never blocks another lane."

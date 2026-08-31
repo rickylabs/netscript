@@ -1634,3 +1634,12 @@ implementation thread.
 - Topic supervisors must recommend and surface such conflicts immediately; the milestone coordinator
   resolves them and keeps independent work moving. Only a genuinely product-defining, irreversible,
   or safety-sensitive choice crosses the owner boundary.
+
+## 2026-08-31 — a dependency diagnostic can hide the initiating config root
+
+- #1762's check report named `service/health.ts`, suggesting an unstable-KV flag or batch defect.
+  Exact batch inspection showed every command already carried `--unstable-kv`; the initiating CLI
+  E2E root had explicitly replaced its compiler libraries without `deno.unstable`.
+- Diagnose the full dependency path before patching the reported file or the structured wrapper.
+  When a member explicitly declares `compilerOptions.lib`, command flags do not necessarily restore
+  an omitted library. Keep member configs aligned with their production parent and test that parity.
