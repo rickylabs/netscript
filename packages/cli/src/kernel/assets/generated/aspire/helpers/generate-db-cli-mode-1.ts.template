@@ -13,7 +13,6 @@ import type { InfrastructureContext } from './register-infrastructure.mts';
 
 interface DbCliTarget {
   readonly configKey: string;
-  readonly resourceKey: string;
   readonly databaseName: string;
   readonly envKey: string;
   readonly engine: string;
@@ -125,9 +124,15 @@ export async function tryHandleDbCliMode(
           try {
             let databaseUrl = `file:./${target.databaseName}`;
             if (target.engine !== 'Sqlite') {
-              databaseUrl = await builder.getConfiguration().getConnectionString(
-                target.resourceKey,
+              const resolveConnectionString = infrastructure.databaseConnectionStrings.get(
+                target.configKey,
               );
+              if (!resolveConnectionString) {
+                throw new Error(
+                  `No connection-string resolver is registered for database '${target.configKey}'.`,
+                );
+              }
+              databaseUrl = await resolveConnectionString();
             }
             return await executeDbTool(
               appHostDir,

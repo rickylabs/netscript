@@ -114,16 +114,33 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, 'inputType: InputType.Number');
     assertStringIncludes(output, 'inputType: InputType.Boolean');
     assertStringIncludes(output, 'iconName: command.iconName');
-    assertStringIncludes(output, 'builder.getConfiguration().getConnectionString(');
+    assertStringIncludes(
+      output,
+      'infrastructure.databaseConnectionStrings.get(',
+    );
     assertStringIncludes(output, 'return await executeDbTool(');
     assertStringIncludes(output, "'aspire', '.helpers', 'run-tool.mts'");
     assertStringIncludes(output, "const child = spawn(\n    'deno'");
   });
 
+  it('resolves typed commands from the allocated database resource expression', () => {
+    const output = generateDbCliMode({ databases: {} });
+
+    assertStringIncludes(
+      output,
+      'infrastructure.databaseConnectionStrings.get(',
+    );
+    assertStringIncludes(output, 'databaseUrl = await resolveConnectionString()');
+    assertStringIncludes(output, 'target.configKey,');
+    assert(!output.includes('builder.getConfiguration().getConnectionString('));
+  });
+
   it('rejects reset without confirmation before resolving or invoking runtime IO', () => {
     const output = generateDbCliMode({ databases: {} });
     const confirmation = output.indexOf("command.name === 'reset'");
-    const connection = output.indexOf('builder.getConfiguration().getConnectionString(');
+    const connection = output.indexOf(
+      'infrastructure.databaseConnectionStrings.get(',
+    );
     const mutation = output.indexOf('await executeDbTool(');
 
     assert(confirmation > 0);

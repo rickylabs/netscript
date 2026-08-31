@@ -52,3 +52,32 @@ without introducing a parallel plugin or framework mechanism.
 
 Every slice is a separate commit, is pushed with the explicit branch refspec, and receives a draft
 PR trail comment. Phase-B live receipts remain unchecked until a supervisor grants a runtime lease.
+
+## D-216 repair slice
+
+PLAN-EVAL remains N/A under the ratified epic plan and the owner's explicit prohibition on a
+self-dispatched evaluator. The supervisor owns any delta IMPL-EVAL after product bytes move.
+
+1. Preserve the two requested CI ZIPs and job logs under ignored `.llm/tmp/`, verify their artifact
+   digests, and report the exact absence of Prisma `code`/`meta` rather than assigning a guessed
+   Prisma code.
+2. Compare S8 with its exact converged main parent `6c195acaf`, trace the old executable resource
+   injection and new typed callback through the operation runner, generator, and tool runner, and
+   confirm the relevant Aspire 13.5.3 API from primary source.
+3. Add a focused generator regression named for late-bound allocated-resource resolution. Run it
+   against the unfixed generator first and retain the failing assertion as RED proof.
+4. Extend the generated infrastructure context with one internal connection-string resolver map.
+   Container database entries populate it from their concrete resource's
+   `connectionStringExpression().getValueAsync()`; external entries retain the configuration-backed
+   resolver they explicitly model. The typed callback consumes the resolver and passes the result
+   unchanged as both `DATABASE_URL` and the engine-specific variable. SQLite keeps its file URL.
+5. Regenerate the embedded asset snapshot. Run focused tests, scoped check/lint/fmt for every
+   changed TypeScript file, the package architecture/quality gate, the assets-barrel check, and the
+   repository-wide `deno task check`. No Aspire, AppHost, Docker, or runtime E2E command may run.
+6. Commit the repair and run evidence, compare the exact remote head immediately before push, and
+   push only the explicit branch refspec if it is a fast-forward. Post the harness implementation
+   trail without changing labels, lifecycle, milestone, base, S9, or S10.
+
+Doctrine verdict: `packages/cli` remains Archetype 6 / Keep. The generator stays deterministic;
+runtime resolution remains in the emitted AppHost edge, and the change introduces no `any`, cast,
+lint suppression, public export, package metadata change, or architectural debt.
