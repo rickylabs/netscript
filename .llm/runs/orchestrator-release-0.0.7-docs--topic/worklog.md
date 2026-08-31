@@ -2925,3 +2925,39 @@ Head at parking: `97d0801af22b8a0a19e35305ad18ffddb215c8f0`.
 Six PRs now parked awaiting GLM: #1803, #1806, #1808, #1811, #1813, #1816 — all Tier-A verified
 clean. Only `fresh` remains unfiled in the #1777 queue — the most involved candidate (no summary
 table exists at all, 4 entrypoints entirely undocumented anywhere on the page).
+
+### #1817/PR #1818: fresh package Exports table, last #1777 slice implemented, eval parked (7th)
+
+The most involved remaining case: `fresh`'s page had a pre-existing 12-row table (missed in initial
+manual inspection — it sat directly below the intro prose, above `## Root entrypoint`, not under any
+`##`-level heading of its own) that was already accurate but had no recognized `## Exports` heading
+above it, AND was missing 4 of the package's 16 real exports entirely (`/desktop`, `/defer/island`,
+`/ai`, `/ai/sandbox`). Codex added the heading, inserted the 4 missing rows with accurate one-line
+Purpose descriptions grounded in real `deno doc` output for each (verified: desktop's "window binding
+and lifecycle contracts" matches `bindDesktopRpcWindow`/`DesktopRpcBindingStatus`/etc.; ai's
+"durable-chat connections, projections, responses, and proxies" matches `NetScriptChatConnection`/
+`projectChatSnapshot`/`toNetScriptChatResponse`/`createNetScriptChatStreamProxy` precisely), and added
+an `AUTHORITATIVE_MAPPING` entry (`entrypoints-only`, category-level reason: 456 total real exports,
+104 genuine gaps, with `desktop`/`ai`/`ai/sandbox` at 100% missing from any table — confirming the
+"four have no per-symbol tables" claim).
+
+**Operational note — a stalled dispatch was successfully resumed, not merely accepted as-is this
+time**: unlike the #1815 thread (which had silently completed all its work before stalling), this
+`#1817` thread genuinely got sidetracked mid-task by an unrelated "Claude audit trigger" reasoning
+tangent and stalled with **zero** implementation progress. Diagnosed via the rollout's tail (last
+recorded reasoning step, no commit beyond the staged brief) before concluding a resume was actually
+needed rather than treating the stall as hidden completion. Used `codex-resume.ts --thread-id
+<id> --message "..."` (note: this tool does **not** accept `--pretty` — passing it aborts the command
+before sending) to nudge the same thread past the tangent; it picked the assignment back up cleanly
+and delivered the full fix in one more turn. **Lesson: a stalled thread with a completed-looking
+`lastArtifact` (a chore/harness commit) is not proof of task completion — check whether the actual
+required deliverable (implementation commit, PR) exists before deciding whether to accept-as-done or
+resume.**
+
+All required gates green at head `f09cb03d6b6c5e7ccc917885a524ed398c69c3ae`. Reprobed
+`z-ai/glm-5.3-flash` — still rejected. Evaluation parked; PR #1818 stays at `status:impl`.
+
+**All ten packages from #1777's original 108-finding measurement are now either shipped/merge-ready
+or Tier-A-verified-and-parked.** Seven PRs now parked awaiting GLM: #1803, #1806, #1808, #1811,
+#1813, #1816, #1818 — all Tier-A verified clean, ready to evaluate the instant GLM 5.3 Flash is
+provisioned or #1792 lands. No further #1777 implementation slices remain to size or dispatch.
