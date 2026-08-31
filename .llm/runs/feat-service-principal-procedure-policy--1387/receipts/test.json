@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1387-integrated-test",
+  "invocationId": "1387-final-test",
   "argv": [
     "deno",
     "task",
@@ -12,24 +12,24 @@
     "packages/sdk/tests"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
-  "actualGitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
+  "gitHead": "ce0c0ebcb39c35db18a12350cc2683630af84381",
+  "actualGitHead": "ce0c0ebcb39c35db18a12350cc2683630af84381",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1001893",
+  "runnerIdentity": "worker:1026706",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "0b0adf8b7e34078d1b78c8c34c92816cbe39122a7dda70221d1ce663d1a0de67",
-  "lifecycleId": "worker:1001893:1387-integrated-test:1",
+  "requestHash": "872a7a7bb7cbf1b67ab6687c4f7c633372a77a043ea5612ea5a66ea29d0a929c",
+  "lifecycleId": "worker:1026706:1387-final-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T02:29:01.802Z",
-  "startedAt": "2026-08-31T02:29:01.804Z",
-  "finishedAt": "2026-08-31T02:29:16.070Z",
-  "durationMs": 14266,
+  "claimedAt": "2026-08-31T02:34:54.463Z",
+  "startedAt": "2026-08-31T02:34:54.465Z",
+  "finishedAt": "2026-08-31T02:35:08.369Z",
+  "durationMs": 13905,
   "exitCode": 0,
   "stdout": {
     "bytes": 390,
-    "sha256": "61d930094f6c85b395d90f0c154f157013372848c8f5dfaebcba14628dbe01a9",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/service/tests\",\"packages/plugin/tests\",\"packages/mcp/tests\",\"packages/contracts/tests\",\"packages/sdk/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0,\"durationMs\":14150,\"summary\":{\"passed\":404,\"failed\":0,\"ignored\":0,\"totalResults\":404,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "cce88b6c8bc4fa3cb920c020aa74a28b798f148c69267bdbbb2316922a6ec9ba",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/service/tests\",\"packages/plugin/tests\",\"packages/mcp/tests\",\"packages/contracts/tests\",\"packages/sdk/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0,\"durationMs\":13786,\"summary\":{\"passed\":405,\"failed\":0,\"ignored\":0,\"totalResults\":405,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
