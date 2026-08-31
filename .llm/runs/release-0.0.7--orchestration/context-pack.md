@@ -2175,5 +2175,8 @@ continues concurrently because serial ordering is per orchestrator, not global.
   serialized generated-corpus sequence with #1816 then #1818; its independent Prisma 8 RFC worker
   repairs #1640 in parallel under the owner's accepted clean-break direction.
 - The coordinator has reduced the open PR inventory by seven in the active sweep (six merges plus
-  superseded #1522 closure). All 45 remaining milestone issues have exactly one orchestrator owner;
+  superseded #1522 closure). All 46 remaining milestone issues have exactly one orchestrator owner;
   every supervisor has active implementations or exact gates rather than an unowned queue.
+- New issue #1839 owns the measured e2e-cli runtime-concurrency eviction defect under Internals.
+  Aspire keeps the current one-runtime-PR admission rule while #1839 receives a bounded workflow fix;
+  this new owned issue accounts for the inventory remaining at 46 after #1812 closed.
