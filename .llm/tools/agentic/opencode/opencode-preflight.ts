@@ -81,7 +81,7 @@ export function validateOpenCodeMcpAttachment(
   };
 }
 
-async function reserveLoopbackPort(): Promise<number> {
+function reserveLoopbackPort(): number {
   const listener = Deno.listen({ hostname: LOOPBACK_HOST, port: 0 });
   const port = (listener.addr as Deno.NetAddr).port;
   listener.close();

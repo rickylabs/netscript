@@ -1,0 +1,24 @@
+Slice 3 supplemental: AF-1 annotation-span trap
+Date: 2026-08-30
+Content head: 9ab779ce96f0ae282afe96ad3efaa5146a2bf428
+
+Committed change:
+- Added a comment only; the statement-bounded regex is unchanged.
+- The comment says a future `=` or `;` inside the annotation may make the narrow span fail on
+  correct code, and directs the repair to widen that span without dropping the
+  `export const baseContract` declaration anchor.
+
+Adversarial decoy forgery:
+- Temporary real initializer:
+  `oc.$meta<NetScriptProcedureMeta & { readonly extra?: string }>({}).errors(commonErrorMap)`
+- Temporary dead decoy:
+  `const _legacyBase = oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap);`
+- `deno check --unstable-kv packages/contracts/src/application/contract-primitives.ts`: exit 0.
+- `deno lint packages/contracts/src/application/contract-primitives.ts packages/contracts/tests/assertion-budget_test.ts`: exit 0.
+- `deno test --allow-all packages/contracts/tests/assertion-budget_test.ts`: exit 1, 4 passed / 1
+  failed; the anchored initializer pin was the only failure.
+
+Restored state:
+- The perturbation and decoy were removed exactly.
+- `deno test --allow-all packages/contracts`: exit 0, 16 passed / 0 failed.
+- The committed initializer and regex pattern are unchanged from slice 2.

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "4238670173271bca4281eba7db6c2030d046bc73",
+  "surface": "reference-export-drift-gate FAIL_FIX repair",
+  "expectedGateIds": [
+    "arch-check",
+    "check",
+    "docs-accuracy",
+    "docs-source-format",
+    "publish-dry-run",
+    "quality-job",
+    "test"
+  ],
+  "receiptIds": [
+    "reference-export-fix1-arch-check",
+    "reference-export-fix1-check",
+    "reference-export-fix1-docs-accuracy",
+    "reference-export-fix1-docs-source-format",
+    "reference-export-fix1-publish-dry-run",
+    "reference-export-fix1-quality-job",
+    "reference-export-fix1-test-attempt2"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

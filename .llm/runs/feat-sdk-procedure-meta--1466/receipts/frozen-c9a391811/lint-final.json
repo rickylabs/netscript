@@ -1,0 +1,36 @@
+{
+  "gateId": "lint",
+  "invocationId": "1466-lint-final",
+  "argv": [
+    "deno",
+    "task",
+    "lint"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1466",
+  "gitHead": "c9a391811a10d29c06eaf85d30d01fd342ebd47a",
+  "actualGitHead": "c9a391811a10d29c06eaf85d30d01fd342ebd47a",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1104410",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "62e3400a355c5b18ab80629e982cd7156d95d9c605e83fcb37bc5f630a126ad8",
+  "lifecycleId": "worker:1104410:1466-lint-final:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-29T23:16:31.864Z",
+  "startedAt": "2026-08-29T23:16:31.869Z",
+  "finishedAt": "2026-08-29T23:16:52.217Z",
+  "durationMs": 19221,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 350,
+    "sha256": "9641046589807b5215c4724fc3730a50b77b13bc474b4005bf11a73f3c472610",
+    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/codex/repos/netscript-007-features-1466\",\"exitCode\":0},\"selection\":{\"filesSelected\":2048,\"batches\":36,\"failedBatches\":0},\"coverage\":{\"filesSelected\":2048,\"filesProcessed\":2048,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 205,
+    "sha256": "54d0a1b64174af0ded121a2c54bbc25e1cc9ee60a505eec2ce4bae8da320ab8c",
+    "tail": "Task lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\n",
+    "truncated": false
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "quality-root-coverage-s1-red",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/quality/check-root-coverage_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage",
+  "gitHead": "2c9aa89c094be8b77da020044e52b3fb94c4a212",
+  "actualGitHead": "2c9aa89c094be8b77da020044e52b3fb94c4a212",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "444861da63ef694bba671f051d86b7ba5d6757423bc386e9e0e39c66f6084ca6",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s1-red:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T05:52:54.586Z",
+  "startedAt": "2026-08-15T05:52:54.591Z",
+  "finishedAt": "2026-08-15T05:52:55.764Z",
+  "durationMs": 1173,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 2691,
+    "sha256": "20071d4783c8cad62152ab84ee449c5cf2f76c3500c8b0f637fecdb379f1d632",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/quality/check-root-coverage_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-root-coverage\",\"exitCode\":1,\"durationMs\":1031,\"summary\":{\"passed\":0,\"failed\":0,\"ignored\":0,\"totalResults\":0,\"uniqueFailures\":0},\"failures\":[],\"processFailure\":{\"reason\":\"deno test exited non-zero without a parseable TAP test failure\",\"stdout\":{\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"tail\":\"\",\"truncated\":false},\"stderr\":{\"bytes\":1671,\"sha256\":\"4c41a0c7520202bdacf60e517700b962c187ac81385ec4de4456c1dad53fced1\",\"tail\":\"\\u001b[0m\\u001b[1mTS2307 \\u001b[0m[ERROR]: Cannot find module 'file:///home/codex/repos/netscript-007-quality-root-coverage/.llm/tools/quality/check-root-coverage.ts'.\\n    at \\u001b[0m\\u001b[36mfile:///home/codex/repos/netscript-007-quality-root-coverage/.llm/tools/quality/check-root-coverage_test.ts\\u001b[0m:\\u001b[0m\\u001b[33m8\\u001b[0m:\\u001b[0m\\u001b[33m8\\u001b[0m\\n\\n\\u001b[0m\\u001b[1mTS7006 \\u001b[0m[ERROR]: Parameter 'error' implicitly has an 'any' type.\\n  assert(empty.errors.some((error) => error.includes('denominator is empty')));\\n\\u001b[0m\\u001b[31m                            ~~~~~\\u001b[0m\\n    at \\u001b[0m\\u001b[36mfile:///home/codex/repos/netscript-007-quality-root-coverage/.llm/tools/quality/check-root-coverage_test.ts\\u001b[0m:\\u001b[0m\\u001b[33m108\\u001b[0m:\\u001b[0m\\u001b[33m29\\u001b[0m\\n\\n\\u001b[0m\\u001b[1mTS7006 \\u001b[0m[ERROR]: Parameter 'error' implicitly has an 'any' type.\\n  assert(malformed.errors.some((error) => error.includes('quality:scan has no configured roots')));\\n\\u001b[0m\\u001b[31m                                ~~~~~\\u001b[0m\\n    at \\u001b[0m\\u001b[36mfile:///home/codex/repos/netscript-007-quality-root-coverage/.llm/tools/quality/check-root-coverage_test.ts\\u001b[0m:\\u001b[0m\\u001b[33m117\\u001b[0m:\\u001b[0m\\u001b[33m33\\u001b[0m\\n\\n\\u001b[0m\\u001b[1mTS7006 \\u001b[0m[ERROR]: Parameter 'error' implicitly has an 'any' type.\\n  assert(malformed.errors.some((error) => error.includes('quality:scan:repo is missing')));\\n\\u001b[0m\\u001b[31m                                ~~~~~\\u001b[0m\\n    at \\u001b[0m\\u001b[36mfile:///home/codex/repos/netscript-007-quality-root-coverage/.llm/tools/quality/check-root-coverage_test.ts\\u001b[0m:\\u001b[0m\\u001b[33m118\\u001b[0m:\\u001b[0m\\u001b[33m33\\u001b[0m\\n\\nFound 4 errors.\\n\\n\\u001b[0m\\u001b[1m\\u001b[31merror\\u001b[0m: Type checking failed.\\n\\n  \\u001b[33minfo:\\u001b[39m The program failed type-checking, but it still might work correctly.\\n  \\u001b[36mhint:\\u001b[39m Re-run with \\u001b[4m--no-check\\u001b[24m to skip type-checking.\\n\",\"truncated\":false}}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 631,
+    "sha256": "52adce78fa6163995351958bcab724baa03946d0421542d8252f629e0d3c1fbf",
+    "tail": "\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Ignored build scripts for packages:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:lmdb@3.5.5\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:msgpackr-extract@3.0.4\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Lifecycle scripts are only supported when using a `node_modules` directory.\n\u001b[0m\u001b[33m│\u001b[0m  Enable it in your deno config file:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[1m\"nodeModulesDir\": \"auto\"\u001b[0m\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/quality/check-root-coverage_test.ts'\n",
+    "truncated": false
+  }
+}

@@ -1,4 +1,5 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { isOpenHandsCommentCandidate } from '../../../../.github/scripts/openhands-comment-trigger.mjs';
 import { OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 type Event = {
@@ -24,20 +25,21 @@ function decision(event: Event): PhaseDecision {
 }
 
 const MODELS = new Map([
-  ['eval:model:minimax', `openrouter/${OPENROUTER_MODEL_IDS.minimax}`],
-  ['eval:model:deepseek', `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`],
-  ['eval:model:qwen', `openrouter/${OPENROUTER_MODEL_IDS.qwen}`],
+  ['eval:model:qwen', `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`],
+  ['eval:model:glm', `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`],
 ]);
 
-async function selectModel(phase: 'plan' | 'impl', labels: string[]): Promise<string> {
+function selectModel(phase: 'plan' | 'impl', labels: string[]): string {
   const selected = labels.filter((label) => label.startsWith('eval:model:'));
   if (selected.some((label) => !MODELS.has(label))) throw new Error('unknown evaluator label');
   if (selected.length > 1) throw new Error('conflicting evaluator labels');
+  const expectedLabel = phase === 'plan' ? 'eval:model:qwen' : 'eval:model:glm';
+  if (selected.length && selected[0] !== expectedLabel) throw new Error('phase-mismatched label');
   return selected.length
     ? MODELS.get(selected[0])!
     : phase === 'plan'
-    ? `openrouter/${OPENROUTER_MODEL_IDS.minimax}`
-    : `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`;
+    ? `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`
+    : `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`;
 }
 
 function nextStatus(
@@ -103,15 +105,24 @@ Deno.test('phase evaluator event matrix dispatches only deliberate transitions',
   assertEquals(decision({ action: 'synchronize', labels: ['status:impl-eval'] }), 'ignore');
 });
 
-Deno.test('phase evaluator model labels are exact, optional, and mutually exclusive', async () => {
-  assertEquals(await selectModel('plan', []), `openrouter/${OPENROUTER_MODEL_IDS.minimax}`);
+Deno.test('phase evaluator model labels are exact, optional, and mutually exclusive', () => {
+  assertEquals(selectModel('plan', []), `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`);
   assertEquals(
-    await selectModel('impl', []),
-    `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`,
+    selectModel('impl', []),
+    `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
   );
-  for (const [label, model] of MODELS) assertEquals(await selectModel('impl', [label]), model);
-  await assertRejects(() => selectModel('impl', ['eval:model:not-real']));
-  await assertRejects(() => selectModel('impl', ['eval:model:deepseek', 'eval:model:qwen']));
+  assertEquals(
+    selectModel('plan', ['eval:model:qwen']),
+    `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`,
+  );
+  assertEquals(
+    selectModel('impl', ['eval:model:glm']),
+    `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
+  );
+  assertThrows(() => selectModel('plan', ['eval:model:glm']));
+  assertThrows(() => selectModel('impl', ['eval:model:qwen']));
+  assertThrows(() => selectModel('impl', ['eval:model:not-real']));
+  assertThrows(() => selectModel('impl', ['eval:model:glm', 'eval:model:qwen']));
 });
 
 Deno.test('formal verdicts advance or return the harness status deterministically', () => {
@@ -163,10 +174,13 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, 'const marker = phaseEvalMarker(claimKey);');
   assertStringIncludes(phase, '@openhands-agent model=${model}');
   assertStringIncludes(phase, 'head=${livePr.head.sha}');
+  assertStringIncludes(phase, 'Reasoning effort: not attested');
   assertStringIncludes(phase, 'decidePhaseEvaluationCurrency');
   assertStringIncludes(phase, 'No evaluator was claimed or dispatched.');
   assertStringIncludes(phase, 'Zero-spend stale evaluator event');
   assertStringIncludes(phase, 'name: selectedLabel');
+  assertStringIncludes(phase, "const expectedModelLabel = phase === 'plan'");
+  assertStringIncludes(phase, 'cannot select the ${phase.toUpperCase()} evaluator');
   assertStringIncludes(phase, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(runner, "steps.request.outputs.eval_phase != ''");
   assertStringIncludes(runner, "steps.request.outputs.eval_phase == ''");
@@ -176,6 +190,7 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(runner, 'liveLabels: liveLabelData.map(({ name }) => name)');
   assertStringIncludes(runner, 'phase: env.EVAL_PHASE || null');
   assertStringIncludes(runner, 'evaluated_head: env.EVAL_HEAD || null');
+  assertStringIncludes(runner, 'Reasoning effort: not attested');
   assertStringIncludes(runner, 'Check out trusted status transition helper');
   assertStringIncludes(runner, 'applyStatusTransition');
   assertStringIncludes(phase, 'run-name: Phase eval PR #');
@@ -199,7 +214,7 @@ Deno.test('generic OpenHands stays fail-closed to current open evaluator models'
   assert(!workflow.includes("['gemini', 'gemini/gemini-2.5-pro']"));
 });
 
-Deno.test('generic OpenHands delegates comment authorization to the tested policy module', async () => {
+Deno.test('generic OpenHands delegates every literal candidate to trusted policy before spend', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
   assertStringIncludes(workflow, 'id: policy');
   assertStringIncludes(workflow, "if: github.event_name == 'issue_comment'");
@@ -213,23 +228,190 @@ Deno.test('generic OpenHands delegates comment authorization to the tested polic
     workflow,
     "'.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs'",
   );
-  assertStringIncludes(workflow, 'const { authorizeOpenHandsCommentTrigger } = await import(');
-  assertStringIncludes(workflow, 'const decision = await authorizeOpenHandsCommentTrigger(');
+  assertStringIncludes(workflow, 'authorizeOpenHandsCommentTrigger,');
+  assertStringIncludes(workflow, 'buildOpenHandsRefusalReply,');
+  assertStringIncludes(workflow, 'isReportableOpenHandsDenial,');
+  assertStringIncludes(workflow, '} = await import(');
+  assertStringIncludes(workflow, 'decision = await authorizeOpenHandsCommentTrigger(');
   assertStringIncludes(workflow, 'await github.rest.git.createRef({ owner, repo, ref, sha });');
-  assertStringIncludes(workflow, 'No labeled-event generation found for ${expectedStatus}.');
   assertStringIncludes(workflow, 'priorCommentBodies: comments');
   assertStringIncludes(workflow, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(
     workflow,
-    "startsWith(github.event.comment.body, '@openhands-agent')",
+    "contains(github.event.comment.body, '@openhands-agent')",
   );
+  assert(!workflow.includes('github.event.comment.author_association'));
   assertStringIncludes(workflow, "if: needs.authorize.outputs.dispatch == 'true'");
   assertStringIncludes(
     workflow,
     'MANUAL_TRIGGER_LINE: ${{ needs.authorize.outputs.trigger_line }}',
   );
-  assert(!workflow.includes('contains(github.event.comment.body'));
   assert(!workflow.includes("line.includes('@openhands-agent')"));
+
+  const authorizeStart = workflow.indexOf('  authorize:');
+  const agentStart = workflow.indexOf('  agent:');
+  const reportStart = workflow.indexOf('      - name: Report denied manual command');
+  assert(authorizeStart >= 0 && reportStart > authorizeStart && agentStart > reportStart);
+  const authorize = workflow.slice(authorizeStart, agentStart);
+  assertStringIncludes(authorize, 'contents: read');
+  assertStringIncludes(authorize, 'issues: write');
+  assert(!authorize.includes('pull-requests: write'));
+  assertStringIncludes(authorize, 'github-token: ${{ secrets.GITHUB_TOKEN }}');
+  assertStringIncludes(authorize, "core.setOutput('refusal_marker', refusal?.marker ?? '');");
+  assertStringIncludes(authorize, "core.setOutput('refusal_body', refusal?.body ?? '');");
+});
+
+Deno.test('refusal reporter posts exactly once per source-comment marker across repeat delivery', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  const start = workflow.indexOf('            async function reportRefusalOnce(');
+  const end = workflow.indexOf('\n\n            await reportRefusalOnce(', start);
+  assert(start >= 0 && end > start, 'embedded reportRefusalOnce source is present');
+  const source = workflow.slice(start, end).replace(/^ {12}/gm, '');
+  const reportRefusalOnce = new Function(
+    `"use strict"; ${source}; return reportRefusalOnce;`,
+  )() as (input: {
+    listComments: () => Promise<Array<{ body?: string }>>;
+    createComment: (body: string) => Promise<void>;
+    marker: string;
+    body: string;
+  }) => Promise<boolean>;
+
+  const marker = '<!-- openhands-command-refusal:4242 -->';
+  const bodies: string[] = [];
+  const calls: string[] = [];
+  const input = {
+    listComments: () => {
+      calls.push('list');
+      return Promise.resolve(bodies.map((body) => ({ body })));
+    },
+    createComment: (body: string) => {
+      calls.push('post');
+      bodies.push(body);
+      return Promise.resolve();
+    },
+    marker,
+    body: `${marker}\nOpenHands did not start for source comment 4242.`,
+  };
+
+  assertEquals(await reportRefusalOnce(input), true);
+  assertEquals(await reportRefusalOnce(input), false);
+  assertEquals(calls, ['list', 'post', 'list']);
+  assertEquals(calls.filter((call) => call === 'post').length, 1);
+  assertEquals(bodies.length, 1);
+});
+
+Deno.test('manual generation lookup retries 5x1s and exhausts to an attributable denial', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  const lookupStart = workflow.indexOf('            async function findPhaseGeneration(');
+  const lookupEnd = workflow.indexOf(
+    '\n\n            function buildGenerationLookupRefusal(',
+    lookupStart,
+  );
+  assert(lookupStart >= 0 && lookupEnd > lookupStart, 'embedded lookup source is present');
+  const lookupSource = workflow.slice(lookupStart, lookupEnd).replace(/^ {12}/gm, '');
+  const findPhaseGeneration = new Function(
+    `"use strict"; ${lookupSource}; return findPhaseGeneration;`,
+  )() as (
+    loadEvents: () => Promise<Array<{ event: string; label?: { name?: string } }>>,
+    expectedStatus: string,
+    sleep: (milliseconds: number) => Promise<void>,
+  ) => Promise<{ id: number } | undefined>;
+
+  const attempts: number[] = [];
+  const sleeps: number[] = [];
+  const result = await findPhaseGeneration(
+    () => {
+      attempts.push(attempts.length + 1);
+      return Promise.resolve([]);
+    },
+    'status:impl-eval',
+    (milliseconds) => {
+      sleeps.push(milliseconds);
+      return Promise.resolve();
+    },
+  );
+  assertEquals(result, undefined);
+  assertEquals(attempts, [1, 2, 3, 4, 5]);
+  assertEquals(sleeps, [1000, 1000, 1000, 1000, 1000]);
+
+  const refusalStart = workflow.indexOf('            function buildGenerationLookupRefusal(');
+  const refusalEnd = workflow.indexOf('\n\n            let decision;', refusalStart);
+  assert(refusalStart >= 0 && refusalEnd > refusalStart, 'embedded exhaustion refusal is present');
+  const refusalSource = workflow.slice(refusalStart, refusalEnd).replace(/^ {12}/gm, '');
+  const buildGenerationLookupRefusal = new Function(
+    `"use strict"; ${refusalSource}; return buildGenerationLookupRefusal;`,
+  )() as (input: { sourceCommentId: number; expectedStatus: string }) => {
+    marker: string;
+    body: string;
+  };
+  const refusal = buildGenerationLookupRefusal({
+    sourceCommentId: 4242,
+    expectedStatus: 'status:impl-eval',
+  });
+  assertStringIncludes(refusal.marker, '4242');
+  assertStringIncludes(refusal.body, 'source comment 4242');
+  assertStringIncludes(refusal.body, 'status:impl-eval');
+  assertStringIncludes(refusal.body, 'five attempts');
+  assert(!refusal.body.includes('@openhands-agent'));
+  assertEquals(isOpenHandsCommentCandidate(refusal.body), false);
+  const watcherHeuristicTokenRe =
+    /\b(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|FAIL)\b(?!\s*\|)/;
+  assertEquals(watcherHeuristicTokenRe.test(refusal.body), false);
+
+  const agentStart = workflow.indexOf('  agent:');
+  assertStringIncludes(
+    workflow.slice(agentStart),
+    "if: needs.authorize.outputs.dispatch == 'true'",
+  );
+});
+
+Deno.test('generic OpenHands reports wrapped, absent, and unparseable verdict markers distinctly', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  const functionStart = workflow.indexOf('            function verdictOf(text) {');
+  const functionEnd = workflow.indexOf('\n\n            // 1) Summary file', functionStart);
+  assert(functionStart >= 0 && functionEnd > functionStart, 'embedded verdictOf source is present');
+  const functionSource = workflow.slice(functionStart, functionEnd).replace(/^ {12}/gm, '');
+  const verdictOf = new Function(`"use strict"; ${functionSource}; return verdictOf;`)() as (
+    text: string,
+  ) => { verdict: string | null; state: 'parsed' | 'absent' | 'unparseable' };
+
+  assertEquals(verdictOf('OPENHANDS_VERDICT: PASS'), { verdict: 'PASS', state: 'parsed' });
+  assertEquals(verdictOf('## **OPENHANDS_VERDICT: FAIL_FIX**'), {
+    verdict: 'FAIL_FIX',
+    state: 'parsed',
+  });
+  assertEquals(verdictOf('No marker was emitted.'), { verdict: null, state: 'absent' });
+  assertEquals(verdictOf('## OPENHANDS_VERDICT: APPROVED'), {
+    verdict: null,
+    state: 'unparseable',
+  });
+
+  const shellMatcherLine = workflow.split('\n').find((line) =>
+    line.includes("| grep -E '") && line.includes('OPENHANDS_VERDICT')
+  );
+  assert(shellMatcherLine, 'trace step shell verdict matcher is present');
+  const shellPattern = shellMatcherLine.slice(
+    shellMatcherLine.indexOf("grep -E '") + "grep -E '".length,
+    shellMatcherLine.lastIndexOf("'"),
+  );
+  const shellEquivalent = new RegExp(shellPattern.replaceAll('[[:space:]]', '\\s'));
+  assert(shellEquivalent.test('OPENHANDS_VERDICT: PASS'));
+  assert(shellEquivalent.test('## **OPENHANDS_VERDICT: FAIL_FIX**'));
+  assert(!shellEquivalent.test('## OPENHANDS_VERDICT: APPROVED'));
+
+  assertStringIncludes(workflow, 'agent_verdict_state="absent"');
+  assertStringIncludes(workflow, 'agent_verdict_state="unparseable"');
+  assertStringIncludes(workflow, 'agent_verdict_state="parsed"');
+  assertStringIncludes(workflow, 'agent_verdict_state=$agent_verdict_state');
+  assertStringIncludes(workflow, '"agent_verdict_state": os.environ.get(');
+  assertStringIncludes(workflow, "'summary-unparseable'");
+  assertStringIncludes(workflow, "'pr-comment-unparseable'");
+  assertStringIncludes(workflow, 'Agent emitted no OPENHANDS_VERDICT token.');
+  assertStringIncludes(
+    workflow,
+    'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.',
+  );
+  assertStringIncludes(workflow, '(?:#{1,6}[ \\t]+)?');
 });
 
 Deno.test('formal evaluator prompts are trusted read-only harness contracts', async () => {

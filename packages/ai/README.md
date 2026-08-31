@@ -163,6 +163,64 @@ handler yields an `error`-state `ToolResult` rather than throwing; on abort the 
 returns — nothing leaks. An injected `TelemetryPort` turns each run into a `gen_ai.chat` span with
 per-turn spans and tool-call events.
 
+## Request context (never reaches the model)
+
+Some state belongs to one run but must stay invisible to the model — the ids of documents just
+ingested, the tenant or auth subject, a correlation id. `AgentLoopInput.context` is the supported
+channel for it. Anything else you might reach for is a path *to* the provider:
+`GenerationOptions.providerOptions` merges verbatim into the adapter's `modelOptions`, and message
+text is, of course, exactly what the model reads.
+
+```typescript
+import { createAgentLoop } from '@netscript/ai/agent';
+import type { ChatModelProviderPort, ToolRegistryPort } from '@netscript/ai/agent';
+import type { Message } from '@netscript/ai/contracts';
+
+declare const modelProvider: ChatModelProviderPort;
+declare const tools: ToolRegistryPort;
+declare const messages: Message[];
+
+for await (
+  const chunk of createAgentLoop({ modelProvider, tools }).run({
+    model: 'anthropic:claude-sonnet-4-5',
+    messages,
+    context: { documentIds: ['doc_41', 'doc_42'], tenantId: 'acme' },
+  })
+) {
+  if (chunk.type === 'done') break;
+}
+```
+
+The bag is opaque to the engine — it reads no key and serializes it nowhere. It is delivered to
+exactly two places:
+
+| Consumer                | How it arrives                                                                      |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| TanStack AI middleware  | `chat({ context, metadata })` — `metadata` is documented as never forwarded onto the provider wire request |
+| Tool handlers           | `ToolInvocationOptions.context` on a `ToolHandler`; `AiToolInvocationContext.metadata` on a `defineAiTool(...).server()` definition |
+
+```typescript
+import { createToolRegistry, defineAiTool } from '@netscript/ai/tools';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
+
+declare const schema: StandardSchemaV1<unknown, { query: string }>;
+
+const search = defineAiTool('search')
+  .describe('Search the documents attached to this request')
+  .input(schema)
+  .server((input, context) => {
+    // The run's context — the model never saw any of this.
+    const documentIds = context.metadata?.['documentIds'];
+    return { query: input.query, documentIds };
+  });
+
+const registry = createToolRegistry([search]);
+```
+
+`messages`, `system`, `tools`, and `modelOptions` remain the only four things a provider adapter
+puts on the wire; `packages/ai/tests/request_context_test.ts` pins that with a sentinel value
+checked against a stubbed provider transport.
+
 ## MCP client stack
 
 ```typescript
@@ -186,12 +244,54 @@ Remote MCP tools land in the same `ToolRegistryPort` seam as local ones, so the 
 them identically. Pooled tool results surface embedded `ui://` resources as `uiResources` — the
 payload the `@netscript/fresh-ui` MCP widget renders.
 
+Treat remote MCP servers as optional infrastructure: give startup a caller-owned deadline, then
+inspect the synchronous snapshot. Reading `snapshot` performs no network I/O, so request handling
+can select ready servers without waiting on degraded peers.
+
+```typescript
+const startup = AbortSignal.timeout(1_500);
+await pool.connect({ signal: startup });
+
+const { statuses, readyClients } = pool.snapshot;
+for (const status of Object.values(statuses)) {
+  if (status.lastError) {
+    console.warn(`MCP ${status.serverId} is ${status.state}: ${status.lastError}`);
+  }
+}
+
+const search = readyClients.search;
+if (search) {
+  // Healthy peers remain usable even when another server timed out.
+  await search.listTools({ signal: AbortSignal.timeout(500) });
+}
+```
+
+When registering pooled tools, the optional signal passed to `registerMcpTools` bounds discovery
+and later automatic re-sync operations for that registration. It is not reused by registered tool
+calls. Use a registration-lifetime signal rather than a one-shot startup timeout; individual
+transport calls accept their own operation-specific signal.
+
+Retry only the degraded server instead of rebuilding healthy peers:
+
+```typescript
+const degraded = pool.server('search');
+if (degraded) {
+  await degraded.reconnect({ signal: AbortSignal.timeout(1_500) });
+}
+
+await pool.stop({ signal: AbortSignal.timeout(1_000) });
+```
+
+The same `McpConnectOptions` signal convention applies to connect, list, call, resource-read, and
+close operations. A timed-out server retains its last error in `snapshot.statuses`; a late
+connection is closed rather than inserted into `readyClients`.
+
 ## Public surface
 
 | Entry                 | What it gives you                                                                                 |
 | --------------------- | ------------------------------------------------------------------------------------------------- |
 | `.`                   | `createAiRuntime` / `getAiRuntime`, model + embeddings + vision registries, `composeSystemPrompt` |
-| `./contracts`         | Domain types (`Message`, `ToolDescriptor`, `Usage`, …) and the typed error hierarchy              |
+| `./contracts`         | Domain types (`Message`, `ToolDescriptor`, `Usage`, `RequestContext`, …) and the typed error hierarchy |
 | `./ports`             | Capability seams (`TelemetryPort`, `AgentMemoryPort`, `McpTransportPort`, …) with safe defaults   |
 | `./tools`             | `defineAiTool`, `createToolRegistry`, the `renderUiTool` wire contract                            |
 | `./agent`             | `createAgentLoop`, `slidingWindowHistory`, the loop's port seams                                  |

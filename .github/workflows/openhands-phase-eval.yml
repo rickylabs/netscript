@@ -229,9 +229,8 @@ jobs:
               : 'plan';
 
             const modelLabels = new Map([
-              ['eval:model:minimax', 'openrouter/minimax/minimax-m3'],
-              ['eval:model:deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
-              ['eval:model:qwen', 'openrouter/qwen/qwen3.8-max'],
+              ['eval:model:qwen', 'openrouter/qwen/qwen3.8-flash'],
+              ['eval:model:glm', 'openrouter/z-ai/glm-5.3-flash'],
             ]);
             const promptPath = `.llm/tools/agentic/openhands/${phase}-eval-prompt.md`;
             const baseOwner = eventPr.base.repo.owner.login;
@@ -294,11 +293,17 @@ jobs:
               throw new Error(`Evaluator model labels are mutually exclusive: ${selectedLabels.join(', ')}`);
             }
             const selectedLabel = selectedLabels[0] ?? '';
+            const expectedModelLabel = phase === 'plan' ? 'eval:model:qwen' : 'eval:model:glm';
+            if (selectedLabel && selectedLabel !== expectedModelLabel) {
+              throw new Error(
+                `${selectedLabel} cannot select the ${phase.toUpperCase()} evaluator; expected ${expectedModelLabel}`,
+              );
+            }
             const model = selectedLabel
               ? modelLabels.get(selectedLabel)
               : phase === 'plan'
-              ? 'openrouter/minimax/minimax-m3'
-              : 'openrouter/deepseek/deepseek-v4-flash-0731';
+              ? 'openrouter/qwen/qwen3.8-flash'
+              : 'openrouter/z-ai/glm-5.3-flash';
             let generationEvent;
             for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1) {
               const events = await github.paginate(github.rest.issues.listEvents, {
@@ -350,7 +355,7 @@ jobs:
                   owner,
                   repo,
                   issue_number: livePr.number,
-                  body: `${trigger}\n${marker}\n\nTrusted base SHA: ${trustedBaseSha}\nEvaluated head SHA: ${livePr.head.sha}\n\n${prompt}`,
+                  body: `${trigger}\n${marker}\n\nTrusted base SHA: ${trustedBaseSha}\nEvaluated head SHA: ${livePr.head.sha}\nReasoning effort: not attested; the OpenHands adapter does not expose effort identity.\n\n${prompt}`,
                 });
                 return data;
               },
@@ -375,6 +380,7 @@ jobs:
               .addList([
                 `Phase: ${phase}`,
                 `Model: ${model}`,
+                'Reasoning effort: not attested (OpenHands adapter limitation)',
                 `PR: #${livePr.number}`,
                 `Head SHA: ${livePr.head.sha}`,
                 `Generation: ${generationEvent.id}`,

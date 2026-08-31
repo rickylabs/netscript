@@ -22,9 +22,11 @@ import {
   evaluateCurrentHeadImplEvalGate,
   evaluateGitSafety,
   extractVerdict,
+  extractVerdictResult,
   formatGithubTokenAttempt,
   GITHUB_NET_PERMISSION_FLAG,
   type GitInfo,
+  inspectMachineVerdict,
   isMissingGithubNetPermission,
   parseEvalVerdict,
   parseGithubHostsOauthToken,
@@ -42,8 +44,8 @@ import {
   wslHome,
   wslUser,
 } from './agentic-lib.ts';
-import { assert, assertEquals } from '@std/assert';
-import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { assert, assertEquals, assertThrows } from '@std/assert';
+import { LEGACY_OPENROUTER_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { formatReleasePrCreationError } from '../../release/cut.ts';
 
 const here = new URL('.', import.meta.url).pathname;
@@ -332,7 +334,7 @@ Deno.test('parseRepoSlug rejects malformed slugs', () => {
 // --- buildOpenHandsComment ------------------------------------------------
 Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   const body = buildOpenHandsComment({
-    model: `openrouter/${OPENROUTER_MODEL_IDS.qwen}`,
+    model: `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`,
     outputMode: 'pr-comment',
     iterations: 800,
     provider: 'openrouter',
@@ -341,18 +343,61 @@ Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   });
   const first = body.split('\n')[0];
   assert(first.startsWith('@openhands-agent'), 'mentions @openhands-agent');
-  assert(first.includes(`model=openrouter/${OPENROUTER_MODEL_IDS.qwen}`), 'carries model');
+  assert(first.includes(`model=openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`), 'carries model');
   assert(first.includes('output=pr-comment'), 'carries output');
   assert(first.includes('iterations=800'), 'carries iterations');
   assert(first.includes('provider=openrouter'), 'carries provider');
   assert(first.includes('effort=xhigh'), 'carries effort');
   assert(body.includes('use harness'), 'includes the prompt body');
 });
+Deno.test('buildOpenHandsComment emits a validated formal phase and immutable head pair', () => {
+  const head = 'a'.repeat(40);
+  const body = buildOpenHandsComment({
+    model: 'x/y',
+    phase: 'plan',
+    head,
+    prompt: 'use harness\n## SKILL\n- x',
+  });
+  const first = body.split('\n')[0];
+  assert(first.includes('phase=plan'), 'formal command carries phase');
+  assert(first.includes(`head=${head}`), 'formal command carries immutable head');
+});
+Deno.test('buildOpenHandsComment rejects incomplete or malformed formal tuples', () => {
+  const head = 'a'.repeat(40);
+  assertThrows(() =>
+    buildOpenHandsComment({
+      phase: 'impl',
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+  assertThrows(() =>
+    buildOpenHandsComment({
+      head,
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+  assertThrows(() =>
+    buildOpenHandsComment({
+      phase: 'review' as 'plan',
+      head,
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+  assertThrows(() =>
+    buildOpenHandsComment({
+      phase: 'impl',
+      head: 'not-an-immutable-head',
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+});
 Deno.test('buildOpenHandsComment omits unset tokens and strips CRLF', () => {
   const body = buildOpenHandsComment({ model: 'x/y', prompt: 'use harness\r\n## SKILL\r\n' });
   const first = body.split('\n')[0];
   assert(!first.includes('iterations='), 'no iterations token when unset');
   assert(!first.includes('output='), 'no output token when unset');
+  assert(!first.includes('phase='), 'non-formal command has no phase token');
+  assert(!first.includes('head='), 'non-formal command has no head token');
   assert(!body.includes('\r'), 'CRLF stripped from body');
 });
 
@@ -362,7 +407,7 @@ Deno.test('parseOpenHandsStatusComment parses a completed status', async () => {
   const s = parseOpenHandsStatusComment(body);
   assertEquals(s.heading, 'Completed');
   assertEquals(s.verdict, 'completed');
-  assertEquals(s.model, `openrouter/${OPENROUTER_MODEL_IDS.qwen}`);
+  assertEquals(s.model, `openrouter/${LEGACY_OPENROUTER_MODEL_IDS.qwen38Max}`);
   assertEquals(s.provider, 'OPENROUTER');
   assertEquals(s.jobStatus, 'success');
   assert(s.isFinal, 'completed is final');
@@ -644,7 +689,7 @@ function c(
 const OH = '<!-- openhands-agent-summary -->';
 // A real-shaped trigger comment: quotes both template forms.
 const triggerComment = c(
-  `@openhands-agent model=openrouter/${OPENROUTER_MODEL_IDS.qwen} output=pr-comment iterations=800\n\n` +
+  `@openhands-agent model=openrouter/${OPENROUTER_MODEL_IDS.implEvaluator} output=pr-comment iterations=800\n\n` +
     'use harness\n## SKILL\n- jsr-audit\n\nPost `**[PHASE: IMPL-EVAL] ' +
     '[VERDICT: <PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT>]**` and end with ' +
     'OPENHANDS_VERDICT: <verdict>.',
@@ -660,6 +705,57 @@ Deno.test('extractVerdict reads the machine-readable OPENHANDS_VERDICT line (exa
   assertEquals(v?.verdict, 'PASS');
   assertEquals(v?.confidence, 'exact');
   assertEquals(v?.url, 'https://x/m');
+});
+Deno.test('machine verdict inspection accepts heading and emphasis wrappers', () => {
+  for (
+    const [body, verdict] of [
+      ['OPENHANDS_VERDICT: PASS', 'PASS'],
+      ['## OPENHANDS_VERDICT: PASS', 'PASS'],
+      ['### **OPENHANDS_VERDICT: FAIL_FIX**', 'FAIL_FIX'],
+      ['_OPENHANDS_VERDICT: FAIL_DEBT_', 'FAIL_DEBT'],
+      ['> ## **Verdict: OPENHANDS_VERDICT: FAIL_PLAN**', 'FAIL_PLAN'],
+    ] as const
+  ) {
+    assertEquals(inspectMachineVerdict(body), { state: 'parsed', verdict }, body);
+  }
+});
+Deno.test('machine verdict inspection distinguishes absence from unparseable emission', () => {
+  assertEquals(inspectMachineVerdict('Agent completed without a marker.'), {
+    state: 'absent',
+    verdict: null,
+  });
+  assertEquals(inspectMachineVerdict('## OPENHANDS_VERDICT: APPROVED'), {
+    state: 'unparseable',
+    verdict: null,
+  });
+  assertEquals(inspectMachineVerdict('```text\nOPENHANDS_VERDICT: PASS\n```'), {
+    state: 'absent',
+    verdict: null,
+  });
+  assertEquals(inspectMachineVerdict('OPENHANDS_VERDICT: <verdict>'), {
+    state: 'absent',
+    verdict: null,
+  });
+});
+Deno.test('layered extraction reports genuine absence separately from malformed marker output', () => {
+  assertEquals(extractVerdictResult([]), { state: 'absent', extracted: null });
+  assertEquals(
+    extractVerdictResult([
+      c('Evaluation complete.\n\n## OPENHANDS_VERDICT: APPROVED', '2026-07-05T01:00:00Z'),
+    ]),
+    { state: 'unparseable', extracted: null },
+  );
+  const parsed = extractVerdictResult([
+    c('Evaluation complete.\n\n## **OPENHANDS_VERDICT: PASS**', '2026-07-05T01:00:00Z'),
+  ]);
+  assertEquals(parsed.state, 'parsed');
+  assertEquals(parsed.extracted?.verdict, 'PASS');
+  assertEquals(
+    extractVerdict([
+      c('## **OPENHANDS_VERDICT: PASS**', '2026-07-05T01:00:00Z'),
+    ])?.verdict,
+    'PASS',
+  );
 });
 Deno.test('extractVerdict reads the formal PHASE/VERDICT header (exact)', () => {
   const v = extractVerdict([

@@ -178,6 +178,15 @@ export function toTanstackChatClient(
           // `AnyTextAdapter` erases the provider-options type to `any`, so this
           // owned `Record` threads into `modelOptions` without a cast (D3-safe).
           modelOptions,
+          // The owned `RequestContext` reaches TanStack's two provider-invisible
+          // seams and nothing else: `context` is handed to middleware hooks and
+          // server tools, `metadata` to middleware/devtools/the event client —
+          // documented on `TextOptions.metadata` as "Adapters never forward this
+          // field onto the provider wire request". It is deliberately *not*
+          // folded into `messages`, `systemPrompts`, `tools`, or `modelOptions`,
+          // which are the four keys that do reach the provider.
+          context: request.context,
+          metadata: request.context,
         });
         for await (const chunk of streamed) {
           if (external?.aborted) {

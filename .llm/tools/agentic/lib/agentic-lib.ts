@@ -511,12 +511,17 @@ export function parseRepoSlug(slug: string): RepoSlug {
 // OpenHands dispatch comment (pure)
 // ---------------------------------------------------------------------------
 
+/** Formal evaluator phase carried with an immutable PR head. */
+export type OpenHandsDispatchPhase = 'plan' | 'impl';
+
 export interface DispatchOptions {
   model?: string;
   outputMode?: string;
   iterations?: number | string;
   provider?: string;
   effort?: string;
+  phase?: OpenHandsDispatchPhase;
+  head?: string;
   prompt: string;
 }
 
@@ -526,6 +531,18 @@ export interface DispatchOptions {
  * the issue-comment authorization policy.
  */
 export function buildOpenHandsComment(o: DispatchOptions): string {
+  const hasPhase = o.phase !== undefined;
+  const hasHead = o.head !== undefined;
+  if (hasPhase !== hasHead) {
+    throw new Error('Formal OpenHands dispatch requires phase and head together');
+  }
+  if (hasPhase && o.phase !== 'plan' && o.phase !== 'impl') {
+    throw new Error('Formal OpenHands dispatch phase must be plan or impl');
+  }
+  if (hasHead && !/^[0-9a-f]{40}$/.test(o.head!)) {
+    throw new Error('Formal OpenHands dispatch head must be a 40-character lowercase hex SHA');
+  }
+
   const tokens = ['@openhands-agent'];
   if (o.model) tokens.push(`model=${o.model}`);
   if (o.provider) tokens.push(`provider=${o.provider}`);
@@ -534,6 +551,7 @@ export function buildOpenHandsComment(o: DispatchOptions): string {
   if (o.iterations !== undefined && String(o.iterations) !== '') {
     tokens.push(`iterations=${o.iterations}`);
   }
+  if (hasPhase && hasHead) tokens.push(`phase=${o.phase}`, `head=${o.head}`);
   return `${tokens.join(' ')}\n\n${o.prompt.replace(/\r/g, '')}`;
 }
 
@@ -883,13 +901,44 @@ export interface ExtractedVerdict {
   url: string;
 }
 
+export type VerdictMarkerState = 'parsed' | 'absent' | 'unparseable';
+
+export interface MachineVerdictInspection {
+  state: VerdictMarkerState;
+  verdict: string | null;
+}
+
+export interface VerdictExtractionResult {
+  state: VerdictMarkerState;
+  extracted: ExtractedVerdict | null;
+}
+
 /**
  * Machine-readable contract line: `OPENHANDS_VERDICT: <token>` at line start.
- * Tolerates markdown decoration and an evaluator-habit `Verdict:` prefix —
- * observed in prod (PR #475): `**Verdict: OPENHANDS_VERDICT: PASS**`.
+ * Tolerates blockquotes, leading markdown headings/emphasis, and an evaluator-
+ * habit `Verdict:` prefix — observed in prod (PR #475):
+ * `**Verdict: OPENHANDS_VERDICT: PASS**`.
  */
-const MACHINE_VERDICT_RE =
-  /^[\s>*`_]*(?:Verdict[*`_]*\s*:?\s*[*`_]*)?OPENHANDS_VERDICT:\s*[*`_]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)\b/m;
+const MACHINE_VERDICT_LINE_RE =
+  /^[ \t]*(?:>[ \t]*)*(?:#{1,6}[ \t]+)?[*_`]*(?:Verdict[*_`]*[ \t]*:?[ \t]*[*_`]*)?OPENHANDS_VERDICT[ \t]*:[ \t]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[ \t]*$/;
+const MACHINE_VERDICT_MARKER_RE = /OPENHANDS_VERDICT[ \t]*:/;
+
+/** Inspect one output body without conflating a missing marker with a malformed emitted marker. */
+export function inspectMachineVerdict(text: string): MachineVerdictInspection {
+  let inFence = false;
+  let markerSeen = false;
+  for (const line of String(text ?? '').split(/\r?\n/)) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence || line.includes('<')) continue;
+    if (MACHINE_VERDICT_MARKER_RE.test(line)) markerSeen = true;
+    const match = line.match(MACHINE_VERDICT_LINE_RE);
+    if (match) return { state: 'parsed', verdict: match[1] };
+  }
+  return { state: markerSeen ? 'unparseable' : 'absent', verdict: null };
+}
 
 /**
  * Decorated verdict line without the machine marker: `**Verdict**: \`FAIL_FIX\``
@@ -964,28 +1013,55 @@ function heuristicVerdict(body: string): string | null {
  * A higher layer in ANY comment beats a lower layer in a newer one. Trigger and
  * template comments are excluded up front ({@link isTriggerOrTemplateComment}).
  */
-export function extractVerdict(comments: VerdictSourceComment[]): ExtractedVerdict | null {
+export function extractVerdictResult(comments: VerdictSourceComment[]): VerdictExtractionResult {
   const newestFirst = comments
     .filter((c) => !isTriggerOrTemplateComment(c.body))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  let unparseableMarkerSeen = false;
   for (const c of newestFirst) {
-    const m = c.body.match(MACHINE_VERDICT_RE);
-    if (m) return { verdict: m[1], confidence: 'exact', url: c.url };
+    const inspection = inspectMachineVerdict(c.body);
+    if (inspection.state === 'parsed' && inspection.verdict !== null) {
+      return {
+        state: 'parsed',
+        extracted: { verdict: inspection.verdict, confidence: 'exact', url: c.url },
+      };
+    }
+    if (inspection.state === 'unparseable') unparseableMarkerSeen = true;
   }
   for (const c of newestFirst) {
     const m = c.body.match(FORMAL_HEADER_RE);
-    if (m) return { verdict: m[1], confidence: 'exact', url: c.url };
+    if (m) {
+      return {
+        state: 'parsed',
+        extracted: { verdict: m[1], confidence: 'exact', url: c.url },
+      };
+    }
   }
   for (const c of newestFirst) {
     const m = c.body.match(DECORATED_VERDICT_RE);
-    if (m) return { verdict: m[1].toUpperCase(), confidence: 'heuristic', url: c.url };
+    if (m) {
+      return {
+        state: 'parsed',
+        extracted: { verdict: m[1].toUpperCase(), confidence: 'heuristic', url: c.url },
+      };
+    }
   }
   for (const c of newestFirst) {
     if (!c.body.includes(OPENHANDS_MARKER)) continue;
     const v = heuristicVerdict(c.body);
-    if (v) return { verdict: v, confidence: 'heuristic', url: c.url };
+    if (v) {
+      return {
+        state: 'parsed',
+        extracted: { verdict: v, confidence: 'heuristic', url: c.url },
+      };
+    }
   }
-  return null;
+  return { state: unparseableMarkerSeen ? 'unparseable' : 'absent', extracted: null };
+}
+
+/** Compatibility view for callers that only need the extracted verdict, if any. */
+export function extractVerdict(comments: VerdictSourceComment[]): ExtractedVerdict | null {
+  return extractVerdictResult(comments).extracted;
 }
 
 // ---------------------------------------------------------------------------

@@ -2,7 +2,8 @@
   "schemaVersion": 1,
   "runtimeRegistryGenerator": {
     "command": "src/cli/generate-runtime-registries.ts",
-    "args": ["--profile", "scaffold"]
+    "args": ["--profile", "scaffold"],
+    "inspectionProtocol": 1
   },
   "runtimeRegistries": [
     {

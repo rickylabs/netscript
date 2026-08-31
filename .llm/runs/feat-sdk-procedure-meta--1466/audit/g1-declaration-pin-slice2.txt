@@ -1,0 +1,33 @@
+G-1 declaration-bound pin demonstration — slice 2
+Date: 2026-08-30
+
+Committed pattern:
+  /export\s+const\s+baseContract\s*:[^=;]+?=\s*oc\.\$meta<NetScriptProcedureMeta>\(\{\}\)\.errors\(commonErrorMap\);/g
+
+Probe A — perturbation B2 plus the evaluator's dead decoy:
+  base initializer meta -> NetScriptProcedureMeta & { readonly extra?: string }
+  const _legacyBase = oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap);
+  void _legacyBase;
+
+  deno check --unstable-kv packages/contracts/src/application/contract-primitives.ts
+    exit 0
+  deno lint packages/contracts/src/application/contract-primitives.ts
+    exit 0
+  deno test --allow-read packages/contracts/tests/assertion-budget_test.ts
+    exit 1; 4 passed / 1 failed
+    failing test: base contract initializer remains pinned to NetScript procedure metadata
+    equality diff: actual 0, expected 1
+
+Probe B — perturbation B2 without the decoy:
+  deno test --allow-read packages/contracts/tests/assertion-budget_test.ts
+    exit 1; 4 passed / 1 failed
+    failing test: base contract initializer remains pinned to NetScript procedure metadata
+    equality diff: actual 0, expected 1
+
+Restoration proof:
+  deno test --allow-read packages/contracts/tests/assertion-budget_test.ts
+    exit 0; 5 passed / 0 failed
+  git diff --exit-code -- packages/contracts/src/application/contract-primitives.ts
+    exit 0
+
+Every perturbation and the dead decoy were removed before continuing.

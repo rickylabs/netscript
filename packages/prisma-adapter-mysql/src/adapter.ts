@@ -1,10 +1,10 @@
 /**
  * Prisma MySQL Driver Adapter for Deno
  *
- * This adapter allows Prisma to use a Deno-compatible MySQL driver
- * instead of the npm mariadb package which has compatibility issues with Deno.
+ * This adapter allows Prisma to use the dynamically imported npm
+ * `mysql2/promise` driver instead of the npm `mariadb` package.
  *
- * Based on @prisma/adapter-mariadb but adapted for Deno-compatible MySQL access.
+ * It runs on Deno deployments that provide npm resolution and Node-compatible socket APIs.
  *
  * @module
  */
@@ -23,11 +23,34 @@ import { Debug, DriverAdapterError } from '@prisma/driver-adapter-utils';
 import type { Pool, PoolConnection, PoolOptions } from 'mysql2/promise';
 
 import { mapArg, mapColumnType, mapRow, type MySqlFieldInfo } from './conversion.ts';
-import { convertDriverError } from './errors.ts';
+import { convertDriverError, isConnectionError } from './errors.ts';
 import type { MySqlCapabilities, MySqlConnectionConfig, PrismaMySqlOptions } from './types.ts';
 
 const PACKAGE_NAME = '@netscript/prisma-adapter-mysql';
 const debug = Debug('prisma:driver-adapter:deno-mysql');
+
+type ConnectionErrorNotifier = (error: unknown) => void;
+
+function notifyConnectionError(
+  options: PrismaMySqlOptions | undefined,
+  error: unknown,
+): void {
+  if (!options?.onConnectionError || !isConnectionError(error)) {
+    return;
+  }
+
+  try {
+    options.onConnectionError(error as Error);
+  } catch (callbackError) {
+    debug('onConnectionError callback failed: %O', callbackError);
+  }
+}
+
+function createConnectionErrorNotifier(
+  options: PrismaMySqlOptions | undefined,
+): ConnectionErrorNotifier {
+  return (error: unknown): void => notifyConnectionError(options, error);
+}
 
 interface MysqlQueryableClient {
   query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]>;
@@ -93,12 +116,13 @@ interface QueryResultWithMeta {
  * Base queryable class implementing common query logic.
  */
 class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryable {
-  readonly provider = 'mysql' as const;
-  readonly adapterName = PACKAGE_NAME;
+  readonly provider: 'mysql' = 'mysql';
+  readonly adapterName: string = PACKAGE_NAME;
 
   constructor(
     protected client: TClient,
     protected getFields?: () => MySqlFieldInfo[] | undefined,
+    protected readonly notifyConnectionError: ConnectionErrorNotifier = () => {},
   ) {}
 
   /**
@@ -146,9 +170,8 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
       // Map arguments to appropriate MySQL format
       const values = args.map((arg: unknown, i: number) => mapArg(arg, argTypes[i]));
 
-      // deno_mysql uses different methods for different query types:
-      // - query() for SELECT returns rows
-      // - execute() for INSERT/UPDATE/DELETE returns affectedRows
+      // The normalized client uses query() for result-returning statements and
+      // execute() for statements that report affected rows.
 
       const sqlUpper = sql.trim().toUpperCase();
       const isSelect = sqlUpper.startsWith('SELECT') ||
@@ -189,8 +212,8 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
 
   /**
    * Infer field information from row data.
-   * This is a workaround since deno_mysql doesn't expose full field metadata
-   * in the standard query interface.
+   * This fallback is used when the normalized mysql2 wrapper has only row data
+   * and no field metadata.
    */
   protected inferFieldsFromRows(
     rows: Record<string, unknown>[],
@@ -237,6 +260,7 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
    */
   protected onError(error: unknown): never {
     debug('Error in performIO: %O', error);
+    this.notifyConnectionError(error);
     throw new DriverAdapterError(convertDriverError(error));
   }
 }
@@ -253,8 +277,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
     private conn: MysqlQueryableClient,
     options: TransactionOptions,
     private cleanup?: () => void,
+    notifyConnectionError: ConnectionErrorNotifier = () => {},
   ) {
-    super(conn);
+    super(conn, undefined, notifyConnectionError);
     this.options = options;
   }
 
@@ -271,6 +296,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
     try {
       await this.conn.execute('COMMIT');
       this.committed = true;
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
     } finally {
       this.cleanup?.();
     }
@@ -289,6 +317,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
     try {
       await this.conn.execute('ROLLBACK');
       this.rolledBack = true;
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
     } finally {
       this.cleanup?.();
     }
@@ -298,38 +329,30 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
 /**
  * Main MySQL driver adapter for Prisma.
  *
- * This adapter wraps the deno_mysql client and implements Prisma's
- * SqlDriverAdapter interface.
- *
- * @example
- * ```typescript
- * import { PrismaClient } from "@prisma/client";
- * import { PrismaMySqlAdapterFactory } from "@netscript/prisma-adapter-mysql";
- *
- * const adapter = new PrismaMySqlAdapterFactory({
- *   hostname: "localhost",
- *   username: "root",
- *   password: "password",
- *   db: "mydb",
- * });
- *
- * const prisma = new PrismaClient({ adapter });
- * ```
+ * This adapter wraps the normalized mysql2 pool client and implements Prisma's
+ * `SqlDriverAdapter` interface. Applications receive it through
+ * {@linkcode PrismaMySqlAdapterFactory.connect} rather than constructing it directly.
  */
-class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient> implements SqlDriverAdapter {
+export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
+  implements SqlDriverAdapter {
   constructor(
     client: MysqlPoolClient,
     private readonly capabilities: MySqlCapabilities,
-    private readonly options?: PrismaMySqlOptions,
+    private readonly options: PrismaMySqlOptions | undefined = undefined,
   ) {
-    super(client);
+    super(client, undefined, createConnectionErrorNotifier(options));
   }
 
   /**
    * Execute a trusted SQL script.
    */
   async executeScript(script: string): Promise<void> {
-    await this.client.query(script);
+    try {
+      await this.client.query(script);
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
+    }
   }
 
   /**
@@ -390,6 +413,7 @@ class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient> implements SqlD
     // Handle errors from the connection lifecycle
     connectionLifecycle.catch((error: unknown) => {
       debug('%s Connection lifecycle error: %O', tag, error);
+      this.notifyConnectionError(error);
       // If connection wasn't ready yet, reject it
       connectionReady.reject(error);
     });
@@ -403,14 +427,19 @@ class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient> implements SqlD
     };
 
     // Create and return the transaction object
-    return new MySqlTransaction(conn, options, cleanup);
+    return new MySqlTransaction(conn, options, cleanup, this.notifyConnectionError);
   }
 
   /**
    * Dispose of the adapter and close connections.
    */
   async dispose(): Promise<void> {
-    await this.client.close();
+    try {
+      await this.client.close();
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
+    }
   }
 
   /**
@@ -422,23 +451,7 @@ class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient> implements SqlD
 }
 
 /**
- * Factory for creating PrismaMySqlAdapter instances.
- *
- * This implements SqlDriverAdapterFactory and handles connection
- * creation and capability detection.
- *
- * @example
- * ```typescript
- * const adapter = new PrismaMySql({
- *   hostname: "localhost",
- *   username: "root",
- *   password: "password",
- *   db: "mydb",
- *   poolSize: 5,
- * });
- *
- * const prisma = new PrismaClient({ adapter });
- * ```
+ * Query shape accepted by the Prisma MySQL adapter.
  */
 export interface PrismaMySqlQuery {
   /** SQL statement to execute. */
@@ -448,11 +461,23 @@ export interface PrismaMySqlQuery {
   /** Prisma argument metadata for each argument. */
   argTypes: Array<{
     /** Prisma scalar type name. */
-    scalarType: string;
+    scalarType:
+      | 'string'
+      | 'int'
+      | 'bigint'
+      | 'float'
+      | 'decimal'
+      | 'boolean'
+      | 'enum'
+      | 'uuid'
+      | 'json'
+      | 'datetime'
+      | 'bytes'
+      | 'unknown';
     /** Database-specific type name. */
-    dbType: string;
+    dbType?: string;
     /** Whether the argument is a scalar or list. */
-    arity?: 'scalar' | 'list';
+    arity: 'scalar' | 'list';
   }>;
 }
 
@@ -462,8 +487,41 @@ export interface PrismaMySqlQuery {
 export interface PrismaMySqlResultSet {
   /** Column names in result order. */
   columnNames: string[];
-  /** Prisma column type numbers in result order. */
-  columnTypes: number[];
+  /** Prisma 7 column types in result order. */
+  columnTypes: Array<
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 64
+    | 65
+    | 66
+    | 67
+    | 68
+    | 69
+    | 70
+    | 71
+    | 72
+    | 73
+    | 74
+    | 75
+    | 76
+    | 77
+    | 78
+    | 128
+  >;
   /** Result rows in column order. */
   rows: unknown[][];
   /** Last inserted ID when reported by MySQL. */
@@ -491,6 +549,14 @@ export interface PrismaMySqlConnectionInfo {
 }
 
 /**
+ * Options associated with a connected MySQL transaction.
+ */
+export interface PrismaMySqlTransactionOptions {
+  /** Whether Prisma should issue a phantom query for transaction coordination. */
+  usePhantomQuery: boolean;
+}
+
+/**
  * Connected transaction adapter returned by `startTransaction`.
  */
 export interface PrismaMySqlTransactionAdapter {
@@ -499,11 +565,11 @@ export interface PrismaMySqlTransactionAdapter {
   /** Adapter package name. */
   readonly adapterName: string;
   /** Prisma transaction options associated with this transaction. */
-  readonly options: TransactionOptions;
+  readonly options: PrismaMySqlTransactionOptions;
   /** Execute a raw SQL query. */
-  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: SqlQuery): Promise<number>;
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
   /** Commit the transaction. */
   commit(): Promise<void>;
   /** Roll back the transaction. */
@@ -519,16 +585,16 @@ export interface PrismaMySqlConnectedAdapter {
   /** Adapter package name. */
   readonly adapterName: string;
   /** Execute a raw SQL query. */
-  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: SqlQuery): Promise<number>;
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
   /** Execute a trusted SQL script. */
   executeScript(script: string): Promise<void>;
   /** Return connection details used by Prisma. */
   getConnectionInfo(): PrismaMySqlConnectionInfo;
   /** Start a transaction. */
   startTransaction(
-    isolationLevel?: IsolationLevel,
+    isolationLevel?: PrismaMySqlIsolationLevel,
   ): Promise<PrismaMySqlTransactionAdapter>;
   /** Close the underlying driver resources. */
   dispose(): Promise<void>;
@@ -577,7 +643,7 @@ export class PrismaMySqlAdapterFactory {
       }
       client = createMysql2Client(pool);
     } catch (error) {
-      // Check for connection string parsing errors
+      // Add context to pool construction and connection configuration errors.
       if (error instanceof Error && error.message.includes('connect')) {
         throw new Error(
           `Failed to connect to MySQL database: ${error.message}`,
@@ -588,7 +654,7 @@ export class PrismaMySqlAdapterFactory {
 
     // Detect server capabilities
     if (this.#capabilities === undefined) {
-      this.#capabilities = await getCapabilities(client);
+      this.#capabilities = await getCapabilities(client, this.#options);
     }
 
     return new PrismaMySqlAdapter(
@@ -658,7 +724,12 @@ function createMysql2Connection(connection: TypedMysql2PoolConnection): MysqlQue
   };
 }
 
-function toMysql2PoolOptions(config: MySqlConnectionConfig): PoolOptions {
+/**
+ * Translate the public structured connection config to mysql2 pool options.
+ *
+ * This export is an internal source-level test seam and is not re-exported from the package root.
+ */
+export function toMysql2PoolOptions(config: MySqlConnectionConfig): PoolOptions {
   const options: PoolOptions = {
     host: config.hostname,
     port: config.port,
@@ -697,8 +768,9 @@ function hasExecutionMetadata(
 /**
  * Detect MySQL server capabilities.
  */
-async function getCapabilities(
+export async function getCapabilities(
   client: MysqlQueryableClient,
+  options: PrismaMySqlOptions | undefined = undefined,
 ): Promise<MySqlCapabilities> {
   const tag = '[js::getCapabilities]';
 
@@ -714,6 +786,7 @@ async function getCapabilities(
     return capabilities;
   } catch (e) {
     debug(`${tag} Error while checking capabilities: %O`, e);
+    notifyConnectionError(options, e);
     return { supportsRelationJoins: false };
   }
 }

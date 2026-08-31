@@ -1,0 +1,36 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "1466-fmt-check-final",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1466",
+  "gitHead": "c9a391811a10d29c06eaf85d30d01fd342ebd47a",
+  "actualGitHead": "c9a391811a10d29c06eaf85d30d01fd342ebd47a",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1104415",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "2d204328bbfcdcb404d3124e73bb2892614c3d16e3631c447c81d90eb3434a90",
+  "lifecycleId": "worker:1104415:1466-fmt-check-final:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-29T23:16:31.895Z",
+  "startedAt": "2026-08-29T23:16:31.900Z",
+  "finishedAt": "2026-08-29T23:16:41.256Z",
+  "durationMs": 8228,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 299,
+    "sha256": "79aa49baaea3a0e017e331d6b283a39a4e4a3f5b436dfc49d0c4567cc789ff89",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/codex/repos/netscript-007-features-1466\",\"mode\":\"check\",\"summary\":{\"filesSelected\":2048,\"batches\":36,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":2048,\"filesProcessed\":2048,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 231,
+    "sha256": "08f3e7cfb1d83f57b2cc1b3ae21e91f08d4305ce2e5a30b4e9a584029fc6364d",
+    "tail": "Task fmt:check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings\n",
+    "truncated": false
+  }
+}

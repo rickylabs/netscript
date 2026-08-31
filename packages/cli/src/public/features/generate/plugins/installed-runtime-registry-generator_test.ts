@@ -10,7 +10,10 @@ import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-reg
 describe('installed runtime registry generator', () => {
   it('runs a published manifest generator under the project config and canonical target', async () => {
     const fs = new MemoryFileSystem({
-      '/workspace/app/appsettings.json': appsettings('custom-api', 'jsr:@acme/plugin-custom@1.2.3/services'),
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
       '/workspace/app/deno.json': '{}',
       '/workspace/app/custom/item.ts': 'export const item = {};',
     });
@@ -42,12 +45,18 @@ describe('installed runtime registry generator', () => {
       ),
       true,
     );
-    assertEquals(await fs.exists('/workspace/app/.netscript/.runtime-manifests/plugin-custom.json'), false);
+    assertEquals(
+      await fs.exists('/workspace/app/.netscript/.runtime-manifests/plugin-custom.json'),
+      false,
+    );
   });
 
   it('names the installed plugin and rejects a declared empty runtime', async () => {
     const fs = new MemoryFileSystem({
-      '/workspace/app/appsettings.json': appsettings('empty-api', 'jsr:@acme/plugin-empty@1.0.0/services'),
+      '/workspace/app/appsettings.json': appsettings(
+        'empty-api',
+        'jsr:@acme/plugin-empty@1.0.0/services',
+      ),
       '/workspace/app/deno.json': '{}',
     });
     const generate = createInstalledRuntimeRegistryGenerator({
@@ -66,7 +75,10 @@ describe('installed runtime registry generator', () => {
 
   it('dry-run reports canonical paths without executing or writing', async () => {
     const fs = new MemoryFileSystem({
-      '/workspace/app/appsettings.json': appsettings('custom-api', 'jsr:@acme/plugin-custom@1.2.3/services'),
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
       '/workspace/app/custom/item.ts': 'export const item = {};',
     });
     const process = new RecordingProcess(fs);
@@ -79,8 +91,303 @@ describe('installed runtime registry generator', () => {
     const result = await generate({ dryRun: true, projectRoot: '/workspace/app' });
 
     assertEquals(result.length, 1);
+    assertEquals(result[0].sourceAuthority, 'manifest');
     assertEquals(process.calls, []);
     assertEquals(await fs.exists(result[0].path), false);
+  });
+
+  it('uses an advertised generator report without granting writes or changing files', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const before = new Map(fs.files);
+    const process = new RecordingProcess(fs);
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process,
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+    });
+
+    const result = await generate({ dryRun: true, projectRoot: '/workspace/app' });
+
+    assertEquals(result, [{
+      path: '.netscript/generated/plugin-custom/custom.registry.ts',
+      plugin: '@acme/plugin-custom',
+      registrableItems: 1,
+      sourceAuthority: 'generator',
+      sourceFiles: ['custom/item.ts'],
+    }]);
+    assertEquals(fs.files, before);
+    assertEquals(process.calls.length, 1);
+    const args = process.calls[0].args;
+    assertEquals(args.includes('--allow-write'), false);
+    assertEquals(args.includes('--manifest'), false);
+    assertEquals(args.slice(args.indexOf('--inspect')), [
+      '--inspect',
+      '--inspection-protocol',
+      '1',
+      '--manifest-json',
+      args[args.indexOf('--manifest-json') + 1],
+    ]);
+  });
+
+  it('fails closed when an advertised protocol is invalid or its process fails', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const invalidProcess = new RecordingProcess(fs);
+    const invalidGenerate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: invalidProcess,
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 2))),
+    });
+    await assertRejects(
+      () => invalidGenerate({ dryRun: true, projectRoot: '/workspace/app' }),
+      Error,
+      'manifest inspectionProtocol must be the integer 1',
+    );
+    assertEquals(invalidProcess.calls, []);
+
+    const failedGenerate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: new RecordingProcess(fs, { code: 7, stdout: '', stderr: 'selection failed' }),
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+    });
+    await assertRejects(
+      () => failedGenerate({ dryRun: true, projectRoot: '/workspace/app' }),
+      Error,
+      'Generator inspection protocol 1 failed for @acme/plugin-custom: generator exited 7: selection failed',
+    );
+
+    const malformedGenerate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: new RecordingProcess(fs, { code: 0, stdout: 'progress\n{}', stderr: '' }),
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+    });
+    await assertRejects(
+      () => malformedGenerate({ dryRun: true, projectRoot: '/workspace/app' }),
+      Error,
+      'stdout is not one protocol 1 JSON document',
+    );
+  });
+
+  it('fails closed when a declared protocol has an omitted or malformed command, and falls back when no protocol is declared', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+
+    const declaredButOmittedCommand = {
+      runtimeRegistryGenerator: { inspectionProtocol: 1 },
+      runtimeRegistries: [{
+        kind: 'map',
+        dir: 'custom',
+        registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+        fileSuffixes: ['.ts'],
+        exclude: ['mod.ts'],
+      }],
+    };
+    const declaredButNonStringCommand = {
+      runtimeRegistryGenerator: { command: 42, inspectionProtocol: 1 },
+      runtimeRegistries: declaredButOmittedCommand.runtimeRegistries,
+    };
+    for (const manifest of [declaredButOmittedCommand, declaredButNonStringCommand]) {
+      const process = new RecordingProcess(fs);
+      const generate = createInstalledRuntimeRegistryGenerator({
+        fs,
+        process,
+        fetchManifest: () => Promise.resolve(jsonResponse(manifest)),
+      });
+      await assertRejects(
+        () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
+        Error,
+        'Generator inspection protocol 1 failed for @acme/plugin-custom: manifest declares inspectionProtocol but omits or malforms command',
+      );
+      assertEquals(process.calls, []);
+    }
+
+    const legacyProcess = new RecordingProcess(fs);
+    const legacyGenerate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: legacyProcess,
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom'))),
+    });
+    const legacyResult = await legacyGenerate({ dryRun: true, projectRoot: '/workspace/app' });
+    assertEquals(legacyResult, [{
+      path: '.netscript/generated/plugin-custom/custom.registry.ts',
+      plugin: '@acme/plugin-custom',
+      registrableItems: 1,
+      sourceAuthority: 'manifest',
+      sourceFiles: ['custom/item.ts'],
+    }]);
+    assertEquals(legacyProcess.calls, []);
+  });
+
+  it('fails closed with the stable protocol-failure prefix when the generator process itself fails to start', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const throwingProcess: ProcessPort = {
+      exec() {
+        throw new Error('spawn deno ENOENT');
+      },
+    };
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: throwingProcess,
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+    });
+    await assertRejects(
+      () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
+      Error,
+      'Generator inspection protocol 1 failed for @acme/plugin-custom: generator process failed to start: spawn deno ENOENT',
+    );
+  });
+
+  it('rejects invalid report targets, source paths, duplicates, and source files', async () => {
+    const cases: ReadonlyArray<{ readonly report: unknown; readonly message: string }> = [
+      {
+        report: { inspectionProtocol: 2, registries: [] },
+        message: 'inspectionProtocol must equal 1',
+      },
+      {
+        report: { inspectionProtocol: 1, registries: [], extra: true },
+        message: 'document must contain exactly inspectionProtocol, registries',
+      },
+      {
+        report: { inspectionProtocol: 1, registries: [] },
+        message: 'response omitted declared registry path',
+      },
+      {
+        report: {
+          inspectionProtocol: 1,
+          registries: [{ registryPath: 'unknown.registry.ts', sourceFiles: [] }],
+        },
+        message: 'response declared unknown registry path',
+      },
+      {
+        report: {
+          inspectionProtocol: 1,
+          registries: [
+            {
+              registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+              sourceFiles: ['custom/item.ts'],
+            },
+            {
+              registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+              sourceFiles: ['custom/item.ts'],
+            },
+          ],
+        },
+        message: 'response duplicated registry path',
+      },
+      {
+        report: {
+          inspectionProtocol: 1,
+          registries: [{
+            registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+            sourceFiles: ['../escape.ts'],
+          }],
+        },
+        message: 'response source path is invalid',
+      },
+      {
+        report: {
+          inspectionProtocol: 1,
+          registries: [{
+            registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+            sourceFiles: ['custom/item.ts', 'custom/item.ts'],
+          }],
+        },
+        message: 'response duplicated source',
+      },
+      {
+        report: {
+          inspectionProtocol: 1,
+          registries: [{
+            registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+            sourceFiles: ['custom/missing.ts'],
+          }],
+        },
+        message: 'response source is not a regular project file',
+      },
+    ];
+
+    for (const testCase of cases) {
+      const fs = new MemoryFileSystem({
+        '/workspace/app/appsettings.json': appsettings(
+          'custom-api',
+          'jsr:@acme/plugin-custom@1.2.3/services',
+        ),
+        '/workspace/app/deno.json': '{}',
+        '/workspace/app/custom/item.ts': 'export const item = {};',
+      });
+      const generate = createInstalledRuntimeRegistryGenerator({
+        fs,
+        process: new RecordingProcess(fs, {
+          code: 0,
+          stdout: JSON.stringify(testCase.report),
+          stderr: '',
+        }),
+        fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+      });
+      await assertRejects(
+        () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
+        Error,
+        testCase.message,
+      );
+    }
+  });
+
+  it('preserves EmptyPluginRegistryError when an advertised report selects nothing', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: new RecordingProcess(fs, {
+        code: 0,
+        stdout: JSON.stringify({
+          inspectionProtocol: 1,
+          registries: [{
+            registryPath: '.netscript/generated/plugin-custom/custom.registry.ts',
+            sourceFiles: [],
+          }],
+        }),
+        stderr: '',
+      }),
+      fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
+    });
+
+    await assertRejects(
+      () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
+      EmptyPluginRegistryError,
+      '@acme/plugin-custom',
+    );
   });
 
   it('does not substitute an unrelated marked source package for a third-party plugin', async () => {
@@ -116,11 +423,12 @@ function appsettings(name: string, entrypoint: string): string {
   return JSON.stringify({ NetScript: { Plugins: { [name]: { Entrypoint: entrypoint } } } });
 }
 
-function runtimeManifest(name: string): unknown {
+function runtimeManifest(name: string, inspectionProtocol?: unknown): unknown {
   return {
     runtimeRegistryGenerator: {
       command: 'src/cli/generate-runtime-registries.ts',
       args: ['--profile', 'scaffold'],
+      ...(inspectionProtocol === undefined ? {} : { inspectionProtocol }),
     },
     runtimeRegistries: [{
       kind: 'map',
@@ -143,7 +451,10 @@ class RecordingProcess implements ProcessPort {
     options?: { readonly cwd?: string; readonly env?: Readonly<Record<string, string>> };
   }> = [];
 
-  constructor(private readonly fs: MemoryFileSystem) {}
+  constructor(
+    private readonly fs: MemoryFileSystem,
+    private readonly inspectionResult?: ProcessResult,
+  ) {}
 
   async exec(
     command: string,
@@ -151,12 +462,32 @@ class RecordingProcess implements ProcessPort {
     options?: { readonly cwd?: string; readonly env?: Readonly<Record<string, string>> },
   ): Promise<ProcessResult> {
     this.calls.push({ command, args, options });
+    if (args.includes('--inspect')) {
+      if (this.inspectionResult) return Promise.resolve(this.inspectionResult);
+      const manifest = JSON.parse(args[args.indexOf('--manifest-json') + 1]) as {
+        runtimeRegistries: Array<{ dir: string; registryPath: string }>;
+      };
+      return Promise.resolve({
+        code: 0,
+        stdout: JSON.stringify({
+          inspectionProtocol: 1,
+          registries: manifest.runtimeRegistries.map((target) => ({
+            registryPath: target.registryPath,
+            sourceFiles: [`${target.dir}/item.ts`],
+          })),
+        }),
+        stderr: '',
+      });
+    }
     const manifestIndex = args.indexOf('--manifest');
     const manifest = JSON.parse(await this.fs.readFile(args[manifestIndex + 1])) as {
       runtimeRegistries: Array<{ registryPath: string }>;
     };
     for (const target of manifest.runtimeRegistries) {
-      await this.fs.writeFile(`${options?.cwd}/${target.registryPath}`, 'import item from "../../custom/item.ts";');
+      await this.fs.writeFile(
+        `${options?.cwd}/${target.registryPath}`,
+        'import item from "../../custom/item.ts";',
+      );
     }
     return { code: 0, stdout: '', stderr: '' };
   }
@@ -181,7 +512,9 @@ class MemoryFileSystem implements FileSystemPort {
   }
 
   exists(path: string): Promise<boolean> {
-    return Promise.resolve(this.files.has(path) || [...this.files].some(([file]) => file.startsWith(`${path}/`)));
+    return Promise.resolve(
+      this.files.has(path) || [...this.files].some(([file]) => file.startsWith(`${path}/`)),
+    );
   }
 
   stat(path: string): Promise<FileInfo> {

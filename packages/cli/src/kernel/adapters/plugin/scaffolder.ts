@@ -208,7 +208,7 @@ export class PluginScaffolder {
       kind: options.kind,
       port,
       servicePort,
-      hostPort: servicePort,
+      hostPort: options.port,
       configSection: PLUGIN_CONFIG_SECTION_MAP[provider.category],
       configKey: options.pluginName,
       serviceConfigKey: provider.category === 'plugin'

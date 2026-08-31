@@ -65,7 +65,10 @@ Deno.test('loadRegisteredPlugins preserves registry output shape from explicit c
     throw new Error(`Expected only workers plugin, got ${Object.keys(plugins).join(',')}`);
   }
 
-  if (workers.source.kind !== 'package' || workers.source.configuredSpecifier !== '@netscript/plugin-workers') {
+  if (
+    workers.source.kind !== 'package' ||
+    workers.source.configuredSpecifier !== '@netscript/plugin-workers'
+  ) {
     throw new Error('Expected workers to preserve the configured package contract');
   }
 
@@ -149,7 +152,7 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
           canonicalName: 'workers',
           pluginDir: 'workers',
           serviceEntrypoint: 'services/src/main.ts',
-          servicePort: 8091,
+          servicePort: 9181,
           permissions: ['--allow-read'],
           doctorEntrypoint: './src/adapter/plugin.ts',
         },
@@ -241,7 +244,10 @@ Deno.test('loadRegisteredPluginMetadata derives identity from the configured mod
   ) {
     throw new Error('Configured module directory did not determine the service-less workdir');
   }
-  if (plugins['service-less']?.source.kind !== 'local-workdir' || plugins['service-less'].source.rootDir !== pluginRoot) {
+  if (
+    plugins['service-less']?.source.kind !== 'local-workdir' ||
+    plugins['service-less'].source.rootDir !== pluginRoot
+  ) {
     throw new Error('Configured module directory did not determine the service-less rootDir');
   }
 });
@@ -300,7 +306,9 @@ Deno.test('loadRegisteredPluginMetadata falls back when userland scaffold manife
     throw new Error('Expected workers metadata fallback to be derived from the registered spec');
   }
 
-  if (plugins.workers.source.kind !== 'local-workdir' || plugins.workers.source.workdir !== 'workers') {
+  if (
+    plugins.workers.source.kind !== 'local-workdir' || plugins.workers.source.workdir !== 'workers'
+  ) {
     throw new Error(
       'Expected workers fallback source to retain the local workers workdir',
     );

@@ -1,0 +1,36 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "quality-rail-s1-quality-scan",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "actualGitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "e0dd0f9f326142bc6579053891db6d2be14880a09bc961509c1aa267ba1f22a1",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s1-quality-scan:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-14T23:41:07.811Z",
+  "startedAt": "2026-08-14T23:41:07.814Z",
+  "finishedAt": "2026-08-14T23:41:08.624Z",
+  "durationMs": 810,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 1551,
+    "sha256": "4238f72bbc3b0cde2855f1906693576d07d6724730d32e4045dbb1b3173568a0",
+    "tail": "{\"ok\":true,\"mode\":\"repository\",\"scanned\":[\"packages/cli/src\",\"plugins\",\"docs/site\"],\"findings\":[],\"allowCount\":7,\"allowances\":[{\"file\":\"packages/cli/src/public/features/root/public-command-dependencies.ts\",\"line\":363,\"issue\":1276,\"reason\":\"service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":135,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":136,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":158,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":275,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":276,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"plugins/workers/streams/producer.ts\",\"line\":52,\"issue\":1276,\"reason\":\"durable-stream mutation hook upstream type omits the worker execution extension fields\"}],\"allowanceFailures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 237,
+    "sha256": "d84c2c4241246cd0777493d3afdd3c63872a220b1f09f7d0cf29eb9e3c20bccc",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:scan\u001b[0m deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages/cli/src --root plugins --root docs/site --max-allow 7\n",
+    "truncated": false
+  }
+}

@@ -16,6 +16,7 @@
  * @module
  */
 
+import type { RequestContext } from '../contracts/context.ts';
 import type { GenerationOptions } from '../contracts/generation.ts';
 import type { Message } from '../contracts/message.ts';
 import type { ModelId } from '../contracts/model.ts';
@@ -53,6 +54,17 @@ export interface ChatClientRequest {
    * and optional — existing call sites compile unchanged.
    */
   readonly options?: GenerationOptions;
+  /**
+   * Request-local application state for this turn. **Never reaches the model.**
+   *
+   * This is the exact inverse of {@linkcode ChatClientRequest.options}: that
+   * field is a path *to* the provider, this one is deliberately closed to it.
+   * An adapter must not serialize the context into messages, system prompts,
+   * tool descriptors, or `modelOptions`; it may only hand it to seams its
+   * underlying library guarantees are off the wire (the TanStack bridge
+   * forwards it to `chat({ context, metadata })`). Additive and optional.
+   */
+  readonly context?: RequestContext;
 }
 
 /**

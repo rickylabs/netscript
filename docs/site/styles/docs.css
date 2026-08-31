@@ -1284,6 +1284,47 @@ a.ns-card:focus-visible {
   display: block;
 }
 
+.ns-comparison {
+  margin: 1.5rem 0;
+}
+
+.ns-comparison__picker {
+  display: none;
+  align-items: center;
+  gap: var(--ns-space-3, 0.75rem);
+  margin-bottom: var(--ns-space-3, 0.75rem);
+}
+
+.ns-comparison.is-enhanced .ns-comparison__picker {
+  display: flex;
+}
+
+.ns-comparison__picker label {
+  font-weight: 650;
+}
+
+.ns-comparison__picker select {
+  min-width: 12rem;
+  padding: 0.45rem 2rem 0.45rem 0.65rem;
+  border: 1px solid var(--ns-border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--ns-radius-sm, 6px);
+  background: var(--ns-card, var(--ns-bg));
+  color: var(--ns-fg, inherit);
+  font: inherit;
+}
+
+.ns-comparison__summary {
+  min-height: 3rem;
+}
+
+.ns-comparison__summary p {
+  margin: 0;
+}
+
+.ns-comparison .ns-tabbed {
+  margin-top: var(--ns-space-3, 0.75rem);
+}
+
 .ns-nextprev {
   display: flex;
   gap: 1rem;
@@ -1839,6 +1880,7 @@ a.ns-cards-grid__card:focus-visible {
 }
 
 .ns-prose > .ns-tabbed,
+.ns-prose > .ns-comparison,
 .ns-prose > .ns-table-wrap,
 .ns-prose > table,
 .ns-prose > figure,

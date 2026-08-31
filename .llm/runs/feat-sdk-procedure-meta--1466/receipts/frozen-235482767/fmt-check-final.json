@@ -1,0 +1,36 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "1466-fmt-check-final",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
+  "gitHead": "235482767edd8a9793c9d6bf6f766441c51ef313",
+  "actualGitHead": "235482767edd8a9793c9d6bf6f766441c51ef313",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:522777",
+  "attempt": 4,
+  "schemaVersion": 1,
+  "requestHash": "5b0cdb21f1768c7e1da13697ed1f061323dc282af5f3f6a7695d5d71b3b0c4b0",
+  "lifecycleId": "worker:522777:1466-fmt-check-final:4",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T07:14:24.977Z",
+  "startedAt": "2026-08-30T07:14:24.979Z",
+  "finishedAt": "2026-08-30T07:14:25.066Z",
+  "durationMs": 87,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 258,
+    "sha256": "cd844a6d4efde5c1b34825e14a97b7a76882e699bbd27883c1bf186cb6d21514",
+    "tail": "Task fmt:check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings (cached, inputs unchanged)\n",
+    "truncated": false
+  }
+}

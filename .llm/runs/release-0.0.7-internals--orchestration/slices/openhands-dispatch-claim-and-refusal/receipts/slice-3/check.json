@@ -1,0 +1,36 @@
+{
+  "gateId": "check",
+  "invocationId": "openhands-dispatch-s3-check",
+  "argv": [
+    "deno",
+    "task",
+    "check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-openhands-dispatch",
+  "gitHead": "d7fdbb1d9e86e30100781ba420a4340b1a16abc6",
+  "actualGitHead": "d7fdbb1d9e86e30100781ba420a4340b1a16abc6",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:478012",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "c2734fdabb2b04ad5b7801253c09da7d786164a105a4cc930e36b9aac3464b88",
+  "lifecycleId": "worker:478012:openhands-dispatch-s3-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T08:41:45.626Z",
+  "startedAt": "2026-08-15T08:41:45.631Z",
+  "finishedAt": "2026-08-15T08:41:45.730Z",
+  "durationMs": 99,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 264,
+    "sha256": "da5e22dec78d539f3657f7e39cbe2227fb9587dea8a1fe5012418be23de26e8f",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m \u001b[0m\u001b[38;5;245mdeno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\u001b[0m (cached, inputs unchanged)\n",
+    "truncated": false
+  }
+}

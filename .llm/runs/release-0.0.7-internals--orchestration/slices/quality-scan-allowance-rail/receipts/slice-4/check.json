@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "slice-4-final-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--batch-size",
+    "43"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "83f7a18479720ac9e61c796de64593baa081e77f",
+  "actualGitHead": "83f7a18479720ac9e61c796de64593baa081e77f",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2640986",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "676713a3cfbd48937dbb44ce102c31d24d4ba13270dd4a396d1b802c8223248b",
+  "lifecycleId": "worker:2640986:slice-4-final-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:38:27.485Z",
+  "startedAt": "2026-08-15T00:38:27.487Z",
+  "finishedAt": "2026-08-15T00:43:25.437Z",
+  "durationMs": 289294,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 295,
+    "sha256": "7efd992404db7982cf2020ef1aca158dcf998ab6fd95a27a07f0db01e78bb60d",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2919,\"batches\":68,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 238,
+    "sha256": "b070d353ba180117fba1fe35ff9f0c1a0e5e2ded3a1054093ebf92d3449d5796",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--batch-size' '43'\n",
+    "truncated": false
+  }
+}

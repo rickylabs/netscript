@@ -1,0 +1,36 @@
+{
+  "gateId": "fresh-browser",
+  "invocationId": "fresh-browser-1657",
+  "argv": [
+    "deno",
+    "task",
+    "test:browser"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-leaf-design-registry-drift/packages/fresh",
+  "gitHead": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
+  "actualGitHead": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:203710",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "85e7fda951b54533a8fd771efb956c41219586d369037e938c6bdab431eb83b5",
+  "lifecycleId": "worker:203710:fresh-browser-1657:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T06:10:43.106Z",
+  "startedAt": "2026-08-15T06:10:43.113Z",
+  "finishedAt": "2026-08-15T06:11:17.662Z",
+  "durationMs": 33292,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 403,
+    "sha256": "f57da6db48964622dcf6415267ad2d42de9b308f6c9f3a498d9c178a06361a7c",
+    "tail": "\u001b[0m\u001b[38;5;245mrunning 2 tests from ./tests/form-navigation_browser.ts\u001b[0m\nbrowser: document form redirect beats inherited body client nav without runtime errors ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(16s)\u001b[0m\nbrowser: generated Form-C dynamic route resolves path during fresh partial navigation ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(14s)\u001b[0m\n\n\u001b[0m\u001b[32mok\u001b[0m | 2 passed | 0 failed \u001b[0m\u001b[38;5;245m(31s)\u001b[0m\n\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 153,
+    "sha256": "23b4ebdb2c7de794faf4190582df6cd49027e467698641af5858b228b65cb90b",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest:browser\u001b[0m deno test --allow-all ./tests/form-navigation_browser.ts\n\u001b[0m\u001b[32mCheck\u001b[0m tests/form-navigation_browser.ts\n",
+    "truncated": false
+  }
+}

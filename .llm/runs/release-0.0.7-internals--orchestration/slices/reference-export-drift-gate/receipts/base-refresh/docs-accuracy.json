@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "reference-export-base-refresh-docs-accuracy",
+  "argv": [
+    "deno",
+    "task",
+    "docs:accuracy"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "actualGitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:874447",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "b165559f94f0d8d832998073806cb37db36324ad3787fea216b75cf9dd4dc21f",
+  "lifecycleId": "worker:874447:reference-export-base-refresh-docs-accuracy:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T20:51:35.204Z",
+  "startedAt": "2026-08-15T20:51:35.206Z",
+  "finishedAt": "2026-08-15T20:51:39.368Z",
+  "durationMs": 4162,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 277,
+    "sha256": "6697c7628277ab19e6aa705cf3f4a7a93f39cfa0c660c34726cac5de505cf043",
+    "tail": "docs accuracy: PASS (4 saga pages checked for stale claims, 199 published source pages, 181 shipped corpus files, one query dialect exception page, mutation-map columns, 91/91 root/direct public commands from 149 recursive paths, 6 valid @netscript/fresh root imports checked)\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 577,
+    "sha256": "5c84eae8ac33adda151be9910882a4f787efee99e29cab10e4cee274d63cf192",
+    "tail": "Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts\nWarning The following peer dependency issues were found:\n└─┬ @tanstack/ai-preact@0.10.4\n  └── peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n",
+    "truncated": false
+  }
+}

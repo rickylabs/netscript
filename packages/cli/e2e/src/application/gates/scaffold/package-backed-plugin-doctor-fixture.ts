@@ -79,13 +79,11 @@ const appsettings = {
         Enabled: true,
         Entrypoint: `${workersSpecifier}/services`,
         Workdir: '.',
-        Port: 8091,
       },
       streams: {
         Enabled: true,
         Entrypoint: `${streamsSpecifier}/services`,
         Workdir: '.',
-        Port: 4437,
       },
     },
     BackgroundProcessors: {

@@ -29,10 +29,11 @@ import { describeStorageDurability } from './durability.ts';
 /** Connector version, single-sourced from the streams package `deno.json`. */
 const VERSION: string = PLUGIN_PACKAGE_VERSION;
 
-const port = parseInt(
-  Deno.env.get('PORT') ?? Deno.env.get('STREAMS_PORT') ?? '4437',
-  10,
-);
+const portValue = Deno.env.get('PORT') ?? Deno.env.get('STREAMS_PORT');
+if (portValue === undefined) {
+  throw new Error('Streams requires the host-provided PORT environment variable.');
+}
+const port = Number.parseInt(portValue, 10);
 const dataDir = Deno.env.get('STREAMS_DATA_DIR');
 const durability = describeStorageDurability(dataDir);
 if (!durability.durable) {

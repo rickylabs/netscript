@@ -7,6 +7,7 @@ import {
   type AiRegistryTarget,
   compileAiRegistry,
   exportsReadyAiToolDefinition,
+  inspectAiRegistries,
 } from './ai-registry-compiler.ts';
 
 const TOOLS_TARGET: AiRegistryTarget = {
@@ -135,6 +136,47 @@ Deno.test('compileAiRegistry excludes the actual skill-loader stub by source sha
     (files.written.get(TOOLS_TARGET.registryPath) ?? '').includes('skill-loader.ts'),
     false,
   );
+});
+
+Deno.test('inspect report exactly matches compile selection for every target without writes', async () => {
+  const fixture = new Map([
+    [
+      'ai/tools/e2e-tool.ts',
+      `
+export default {
+  descriptor: { name: 'e2e-tool' },
+  schema: {},
+  execute: async () => ({ state: 'output-available', output: { ok: true } }),
+};
+`,
+    ],
+    [
+      'ai/tools/skill-loader.ts',
+      `
+export function createSkillLoaderTool(skills: unknown) {
+  return { skills };
+}
+`,
+    ],
+    ['ai/agents/assistant.ts', 'export default function assistant() { return {}; }\n'],
+  ]);
+  const targets = [TOOLS_TARGET, AGENTS_TARGET] as const;
+  const inspectFiles = new MemoryProjectFiles(fixture);
+  const compileFiles = new MemoryProjectFiles(fixture);
+  const writesBeforeInspect = new Map(inspectFiles.written);
+
+  const report = await inspectAiRegistries(inspectFiles, targets);
+
+  assertEquals(inspectFiles.written, writesBeforeInspect);
+  assertEquals(report.inspectionProtocol, 1);
+  assertEquals(report.registries.map((entry) => entry.registryPath), [
+    TOOLS_TARGET.registryPath,
+    AGENTS_TARGET.registryPath,
+  ]);
+  for (const [index, target] of targets.entries()) {
+    const compiled = await compileAiRegistry(compileFiles, target);
+    assertEquals(report.registries[index].sourceFiles, compiled.files);
+  }
 });
 
 Deno.test('compileAiRegistry never resolves imports from app-owned tool modules', async () => {

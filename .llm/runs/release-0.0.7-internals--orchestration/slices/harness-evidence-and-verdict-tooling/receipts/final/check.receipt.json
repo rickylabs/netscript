@@ -1,0 +1,45 @@
+{
+  "gateId": "check",
+  "invocationId": "harness-evidence-final-check-634b257ea",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--output",
+    ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.report.json"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+  "gitHead": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+  "actualGitHead": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "leaf:harness-evidence-and-verdict-tooling",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "fd38ec16ea62b3532f4e0d505be20cbaa3c5e9f81808bd9834aee534e1cb3d50",
+  "lifecycleId": "leaf:harness-evidence-and-verdict-tooling:harness-evidence-final-check-634b257ea:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T21:26:20.621Z",
+  "childReport": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.report.json",
+  "startedAt": "2026-08-13T21:26:20.633Z",
+  "finishedAt": "2026-08-13T21:26:25.688Z",
+  "durationMs": 5055,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 226,
+    "sha256": "028fcadbcb0b4ea13743a9c505318c3d05248f215b8df0d9f5f191e223da1c1f",
+    "tail": "{\"report\":\".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.report.json\",\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 331,
+    "sha256": "a1d99b5fd905988159f3c1626bf80f52ba45cc9e4e00ce9166078d2295942158",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--output' '.llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.report.json",
+    "bytes": 299,
+    "sha256": "9b3b39c443e835a23336e104164893ebedc1a50c59100ad103dbb7ba833358dc",
+    "modifiedAt": "2026-08-13T21:26:25.673Z"
+  }
+}

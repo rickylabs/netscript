@@ -1,0 +1,58 @@
+{
+  "counts": {
+    "pass": 6,
+    "warning": 4
+  },
+  "checks": [
+    {
+      "name": "cli-version",
+      "status": "pass",
+      "message": "Aspire CLI version 13.5.3 (channel: stable)"
+    },
+    {
+      "name": "operating-system",
+      "status": "pass",
+      "message": "Operating system: Linux Ubuntu 24.04"
+    },
+    {
+      "name": "wsl",
+      "status": "pass",
+      "message": "WSL2 environment detected"
+    },
+    {
+      "name": "dotnet-sdk",
+      "status": "pass",
+      "message": ".NET 10.0.111 installed (x64)"
+    },
+    {
+      "name": "dev-certs",
+      "status": "warning",
+      "message": "HTTPS development certificate is only partially trusted"
+    },
+    {
+      "name": "dev-certs-certutil",
+      "status": "warning",
+      "message": "certutil is not available; browser certificate trust may be incomplete"
+    },
+    {
+      "name": "docker",
+      "status": "pass",
+      "message": "Docker v29.1.3: running (auto-detected (default)) ← active"
+    },
+    {
+      "name": "dcp-ephemeral-certificate",
+      "status": "pass",
+      "message": "Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded"
+    },
+    {
+      "name": "dcp-developer-certificate",
+      "status": "warning",
+      "message": "No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check"
+    },
+    {
+      "name": "vscode-extension",
+      "status": "warning",
+      "message": "VS Code is installed, but the Aspire extension is not installed"
+    }
+  ]
+}
