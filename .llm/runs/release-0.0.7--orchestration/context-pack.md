@@ -2193,3 +2193,13 @@ continues concurrently because serial ordering is per orchestrator, not global.
   tiers pass. Fixes owns the exact-main control and bounded shared readiness correction; Aspire does
   not distort either product delta or waive runtime evidence. After the correction, S7–S13 merge in
   dependency order and canary 6 requires the complete #1712 epic plus release/OIDC/pinned-E2E receipts.
+
+## Resume delta — 2026-08-31T16:03:24Z
+
+- Current main is `6c195acaf3f7e650c4235fc3fbc51232e210e7a4` after Features PR #1762 shipped
+  from immutable head `e3852dfb51108a6a49b30fc1f918e164defb90b2`, closing #1387. Exact core CI,
+  both hosted scaffold runtime tiers, complete acceptance/DoD, GLM PASS carry, unchanged lock, zero
+  threads, and direct current-main ancestry were verified; #1387/#1762 are sole `status:shipped`.
+- Canary 5 now contains the typed principal/procedure-policy feature in addition to its prior public
+  payload. Its remaining coherence gate is still #1349 Slices 2–3. Aspire migration PRs remain active
+  but merge-held until the canary 5 tag, then form the canary 6 migration train.

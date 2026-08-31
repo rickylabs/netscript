@@ -331,3 +331,12 @@ artifact-pinned production E2E.
   zero, and the checked-in release workflow can prove paired publication, OIDC/provenance, and pinned
   production E2E. Docs/internal work cannot become a global barrier, but incomplete Aspire 13.5
   migration work cannot leak into this checkpoint.
+
+## 2026-08-31T16:03:24Z — typed principal/procedure policy joins canary 5 payload
+
+- PR #1762 head `e3852dfb51108a6a49b30fc1f918e164defb90b2` squash-merged as
+  `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`, closing #1387. It adds typed principals, declarative
+  procedure access policy, fail-closed contract authorization, and OpenAPI security projection.
+- Exact core CI, both hosted scaffold runtime tiers, independent GLM PASS carry, complete acceptance,
+  unchanged lock, zero threads, and exact current-main integration passed. It strengthens canary 5;
+  the remaining Aspire 13.5 stack is still reserved for canary 6.

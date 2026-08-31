@@ -3437,3 +3437,14 @@
   `runtime.wait.garnet` 300-second timeout while each SQLite/Garnet tier passed. The coordinator ruled
   this a shared readiness defect pending exact-main control, not either product delta, and assigned a
   bounded Fixes issue with both run/job receipts. Both heads rerun after that shared correction.
+
+## 2026-08-31T16:03:24Z — #1762 typed principal and procedure policy ships
+
+- Features PR #1762 reached immutable head `e3852dfb51108a6a49b30fc1f918e164defb90b2` directly
+  atop live main with exact current-head check-test/quality/close-gate green, both hosted scaffold
+  runtime tiers green, complete 13-row #1387 acceptance and PR DoD, independent GLM PASS carry by
+  product-blob identity, unchanged lock, zero review threads, and clean synthetic merge
+  `9add5b4a5e3b788291a9c0c0dfecdf02eac002d8`.
+- The coordinator squash-merged #1762 as `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`, closing
+  #1387. #1387/#1762 are normalized to sole `status:shipped`. This adds a coherent public auth/policy
+  feature to canary 5 without changing the owner-ratified rule that Aspire 13.5 completes in canary 6.
