@@ -112,3 +112,19 @@ The missing fields do not prevent identifying S8's deterministic connection-path
 callback replaced Aspire's late-bound resource injection with a static AppHost configuration
 lookup. The repair restores resource-expression resolution. No runtime is run locally; CI remains
 the authority for the resulting database behavior.
+
+## D-11 — declared `ReferenceExpression.getValue()` is not a supported callback capability
+
+D-227 correctly repaired the TypeScript spelling but made an invalid equivalence between a
+compile-visible SDK member and a capability implemented by the running AppHost. Run `33447847678`
+proved the distinction: the call dispatches `Aspire.Hosting.ApplicationModel/getValue`, which that
+runtime rejects as unknown. This supersedes D-10's final sentence: Container database commands no
+longer resolve a resource expression in the typed callback at all.
+
+Resolution: preserve the typed command surface while routing its Container operation through the
+existing explicit-start `<db>-cli` executable. Aspire performs graph-time environment injection
+for that resource through `withEnvironment`, `withReference`, and `waitFor`; the runner returns an
+atomic bounded result to the callback. External configuration and SQLite file URLs remain on their
+separate supported paths. Static coverage deliberately omits `getValue` from its minimal SDK
+contract and rejects any emitted in-callback call, preventing another compile-clean capability
+regression. No local runtime or evaluator was dispatched.

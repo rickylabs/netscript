@@ -117,3 +117,23 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   zero.
 - No runtime, AppHost start, Docker, container, or E2E runtime suite ran. The implementation session
   does not dispatch or claim IMPL-EVAL.
+
+## D-231 graph-injected command state
+
+- Resume baseline is the clean local/remote head
+  `a2b227941160bd993b0468cea2a0e12cebc63013`.
+- Run `33447847678` proves `ReferenceExpression.getValue()` is only compile-valid in this context:
+  it dispatches `Aspire.Hosting.ApplicationModel/getValue`, which the live AppHost rejects as an
+  unknown capability. The 13.5.3 command context has no connection-string accessor.
+- Container typed commands now stage their operation and start the existing `<db>-cli` executable.
+  Its graph annotations inject `DATABASE_URL` and the provider variable from the allocated resource
+  through `withEnvironment`, `withReference`, and `waitFor`.
+- The emitted runner writes an atomic result using D-224's bounded detail. The callback reads that
+  record before its generic nonzero-start fallback, preserving the decisive failure text.
+- External keeps `getConnectionString(...)`; SQLite keeps its `file:./...` URL. No `getValue`,
+  `getValueAsync`, guessed capability, cast, `any`, or lint suppression is emitted.
+- New coverage was RED at the baseline (30 passed / 6 failed) and statically requires graph
+  injection while excluding callback capability calls. Final focused helpers pass 256/256; scoped
+  check/lint/fmt, `quality:gate`, and repo-wide check are green with `failedBatches: 0`.
+- No Aspire, Docker, AppHost, `e2e:cli`, runtime suite, PR lifecycle/base/label change, or evaluator
+  dispatch occurred. CI remains the runtime authority.

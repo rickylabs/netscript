@@ -155,6 +155,18 @@ if (import.meta.main) {
       env: request,
       timeoutSeconds,
     });
+    const resultPath = request.NETSCRIPT_DB_RESULT_FILE;
+    if (resultPath) {
+      const message = result.success
+        ? `Database ${operation} completed successfully.`
+        : result.actionableStderr.join('\n') || result.message;
+      const temporaryResultPath = `${resultPath}.tmp`;
+      await Deno.writeTextFile(
+        temporaryResultPath,
+        JSON.stringify({ success: result.success, message }),
+      );
+      await Deno.rename(temporaryResultPath, resultPath);
+    }
     Deno.exit(result.exitCode);
   }
 

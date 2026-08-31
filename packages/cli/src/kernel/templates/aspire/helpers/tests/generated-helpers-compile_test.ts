@@ -4,20 +4,23 @@
  * Compiles emitted helpers against the relevant restored Aspire 13.5.3 SDK contract.
  */
 
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { resolve } from 'jsr:@std/path@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+import { generateDbCliMode } from '../generate-db-cli-mode.ts';
 import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts';
 import { MINIMAL_DATABASE } from './generators-test-support.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
-// Verbatim relevant contract from restored Aspire SDK 13.5.3:
-// base.mts ReferenceExpression.getValue() and aspire.mts PostgresDatabaseResource.
+// Minimal relevant contract derived from the restored Aspire SDK 13.5.3. Container
+// registration deliberately excludes ReferenceExpression.getValue(): that declaration
+// compiles but its runtime capability is unavailable to AppHost callbacks.
 const RESTORED_ASPIRE_SDK_CONTRACT = `
-export interface ReferenceExpression {
-  getValue(): Promise<string | null>;
-}
+export const InputType = {
+  Number: 'Number',
+  Boolean: 'Boolean',
+};
 
 export interface EndpointReference {
   host(): Promise<string>;
@@ -26,14 +29,41 @@ export interface EndpointReference {
 
 export interface AspireResource {
   waitFor(resource: AspireResource): AspireResource;
+  withReference(resource: AspireResource): AspireResource;
   withEnvironment(key: string, value: unknown): AspireResource;
   getEndpoint(name: string): Promise<EndpointReference>;
   withHealthCheck(name: string): Promise<AspireResource>;
-  connectionStringExpression(): Promise<ReferenceExpression>;
+  withExplicitStart(): Promise<AspireResource>;
+  excludeFromMcp(): Promise<AspireResource>;
+  withCommand(
+    name: string,
+    displayName: string,
+    callback: (context: ExecuteCommandContext) => Promise<ExecuteCommandResult>,
+    options: unknown,
+  ): Promise<AspireResource>;
+}
+
+export interface ExecuteCommandResult {
+  readonly success: boolean;
+  readonly message: string;
+}
+
+export interface InteractionArguments {
+  requiredValue(name: string): Promise<string>;
+  value(name: string): Promise<string | null>;
+}
+
+export interface ExecuteCommandContext {
+  arguments(): Promise<InteractionArguments>;
 }
 
 export interface DistributedApplicationBuilder {
-  addExecutable(name: string): AspireResource;
+  addExecutable(
+    name: string,
+    executable?: string,
+    workingDirectory?: string,
+    args?: readonly string[],
+  ): AspireResource;
   addContainer(name: string): Promise<AspireResource>;
   addParameter(name: string, options: { value: string; secret: boolean }): Promise<AspireResource>;
   addPostgres(name: string, options: { password: AspireResource }): Promise<AspireResource>;
@@ -44,6 +74,7 @@ export interface DistributedApplicationBuilder {
 const ASPIRE_COMPAT_CONTRACT = `
 export interface NetScriptConfig {}
 export interface CacheWiring {}
+export const RESOURCE_DEFAULTS = { DbCliModeExcludeFromMcp: true };
 
 export function ensureDatabasePassword(_root: string, _name: string): string {
   return 'fixture-password';
@@ -66,13 +97,26 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
   try {
     await Deno.writeTextFile(`${modulesDir}/aspire.mts`, RESTORED_ASPIRE_SDK_CONTRACT);
     await Deno.writeTextFile(`${helpersDir}/_aspire-compat.mts`, ASPIRE_COMPAT_CONTRACT);
+    const registerInfrastructure = generateRegisterInfrastructure({
+      databases: { main: MINIMAL_DATABASE },
+      caches: {},
+    });
+    assertStringIncludes(registerInfrastructure, "databases.set('main', main)");
+    assert(
+      !registerInfrastructure.includes('connectionStringExpression()'),
+      'compile-clean Container emission must not call an unsupported runtime capability',
+    );
+    assert(!registerInfrastructure.includes('.getValue()'));
+    const dbCliMode = generateDbCliMode({ databases: { main: MINIMAL_DATABASE } });
+    assertStringIncludes(dbCliMode, ".withEnvironment('DATABASE_URL', target.resource)");
+    assertStringIncludes(dbCliMode, 'return await executeDbCliResource(');
+    assert(!dbCliMode.includes('connectionStringExpression()'));
+    assert(!dbCliMode.includes('.getValue()'));
     await Deno.writeTextFile(
       `${helpersDir}/register-infrastructure.mts`,
-      generateRegisterInfrastructure({
-        databases: { main: MINIMAL_DATABASE },
-        caches: {},
-      }),
+      registerInfrastructure,
     );
+    await Deno.writeTextFile(`${helpersDir}/db-cli-mode.mts`, dbCliMode);
     await Deno.copyFile(
       new URL('../../../../assets/aspire/helpers/run-tool.ts.template', import.meta.url),
       `${helpersDir}/run-tool.mts`,
@@ -84,6 +128,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
         '--no-lock',
         '--unstable-kv',
         `${helpersDir}/register-infrastructure.mts`,
+        `${helpersDir}/db-cli-mode.mts`,
         `${helpersDir}/run-tool.mts`,
       ],
       stdout: 'piped',

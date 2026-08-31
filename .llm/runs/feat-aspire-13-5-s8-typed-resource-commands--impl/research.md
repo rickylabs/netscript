@@ -143,3 +143,33 @@ generated registries, restored SDK, and offline database client generation passe
 check/lint and the unmodified negative-quality probe. The probe returned `ok: true`, all ten
 expected quality probe paths, `cleanupCheckExitCode: 0`, and `cleanupLintExitCode: 0`. No AppHost,
 Docker, container, or runtime E2E suite was started.
+
+## D-231 runtime-capability diagnosis
+
+Workflow run `33447847678` at `a2b227941` disproves the D-227 repair at runtime even though the
+generated helper compiles: `database.seed` reports `Unknown capability:
+Aspire.Hosting.ApplicationModel/getValue` and exits 16. The restored Aspire 13.5.3 implementation
+explains the split. `ReferenceExpression.getValue()` is declared in `Resources/base.mts:149`, but
+its body invokes the live RPC capability `Aspire.Hosting.ApplicationModel/getValue` at line 160.
+The generated 13.5.3 `ExecuteCommandContext` surface contains only `services`, `resourceName`,
+`cancellationToken`, `logger`, and `arguments`; it exposes no connection-string accessor. A
+declaration-level compile result is therefore insufficient evidence for callback-time value
+resolution.
+
+The supported Container mechanism is the graph-injected executable already emitted by S8:
+`withEnvironment('DATABASE_URL', target.resource)` plus the engine-specific variable,
+`withReference(target.resource)`, and `waitFor(target.resource)`. This is not a new inferred API:
+the same allocated-resource injection path is used by the generated init/migrate/generate flows,
+and the cited workflow advanced through those operations before the typed seed callback failed.
+For Container typed commands, the callback now stages the operation request and invokes Aspire's
+built-in `resource <db>-cli start` command. Aspire starts the existing explicit-start executable
+with the graph-resolved environment. The emitted runner atomically returns the already-bounded
+D-224 result; the callback reads that result even when the resource start exits nonzero.
+
+External mode continues to use the configuration-backed `getConnectionString(...)` resolver it
+explicitly models. SQLite continues to use `file:./<database>` and the direct child path. No third
+value-resolution method, cast, `any`, lint suppression, dependency, package export, or public
+contract was introduced. The change has no JSR metadata or published-surface effect, so a JSR
+audit is N/A for this delta. Runtime execution is prohibited locally; the existing successful
+workflow operations are the runtime evidence for graph injection, and CI remains the authority for
+the repaired typed seed path.
