@@ -8960,3 +8960,54 @@ PR comment `5472087619`.
 **IMPL-EVAL parked, matching #1387's Slice 9** — per the standing ruling, evaluation for this new
 slice also waits on #1792 (the GLM/Qwen allowlist fix) rather than falling back to DeepSeek. PR #1805
 stays draft.
+
+## #1451 assessed and deferred — genuinely more complex than initially scoped
+
+Before dispatching #1458, researched #1451 (the next p1 candidate) in depth: `JobConfig`
+(`packages/plugin-workers-core/src/config/job-config.ts`) already types/validates description,
+timeout, maxRetries, permissions, tags, retention — most of the issue's ask — but the generator
+(`plugins/workers/src/cli/runtime-registry-generator.ts`'s `appendJobDefinitions`) emits a **fully
+generic** `createJobDefinition()` helper with hardcoded `timeout: 300000, maxRetries: 3, priority: 50`
+etc. for every job, and has **zero access to loaded project config today** — it only receives
+`{ manifestPath, profile, projectRoot }` and scans the filesystem. Closing this gap for real requires:
+new config-loading plumbing inside the generator, a matching strategy between discovered job files
+and configured `JobConfig` entries (by id? by entrypoint path?), a precedence rule between
+`workers.groups[].jobs[]` and the "legacy flat `jobs[]`", and schema additions for `priority`/
+`retryDelay`/`maxConcurrency`/`persist` (none exist in `JobConfig` today, though `RegisterJobInput`'s
+generated literal already has all four — confirming the config schema is what's lagging).
+
+**This crosses into genuinely complex territory** — real open design questions (matching strategy,
+precedence, fallback for unconfigured files), not just mechanical wiring, despite the issue's own
+"0.0.7 seam decision" pre-deciding the high-level architecture. Deferred rather than dispatched
+without a plan; flagging for a future PLAN-EVAL cycle rather than picking up piecemeal.
+
+## #1458 — researched, scoped, and dispatched
+
+Confirmed against the pinned dependency's actual source
+(`@durable-streams/tanstack-ai-transport@0.0.8`, read directly from the Deno npm cache) that this is
+the exact same shape as `#1591`: a thin NetScript wrapper not forwarding an already-typed upstream
+option. `toDurableChatSessionResponse` already accepts `mode?: 'immediate' | 'await'` and
+`waitUntil?: (task: Promise<unknown>) => void`; `toNetScriptChatResponse`/
+`NetScriptChatResponseOptions` expose neither. Verified the exact status-code/failure-propagation
+behavior in both modes directly from the transport's source (`await` → `200` after write, rejects on
+failure; `immediate`/default → `202` before write, failure only `console.error`'d) — matches the
+issue's own description exactly. **PLAN-EVAL: N/A confirmed** — this remains a thin typed forwarding
+seam with no open design question, per the coordinator's steer.
+
+| Field | Value |
+| --- | --- |
+| Branch | `feat/fresh-ai-chat-response-mode` (new, off `main` `5197e70b7`) |
+| Worktree (NAS-local) | `/home/agent/projects/netscript/worktrees/007-leaf-1458` |
+| Codex thread ID | `01a05527-6cd3-7a03-ad75-42b542efe3ac` |
+| Route | requested = observed = `openai · gpt-5.6-sol · high` |
+| Remote Control proof | dry-run clean (`use harness`=true, `## SKILL`=true, git-safety `upstream: NONE` / `dirty: 0` / head `1a887128b`); live thread confirmed via `codex-status`: `state: working`, rollout `sessions/2026/08/31/rollout-2026-08-31T02-10-42-01a05527…jsonl` |
+| Base | `1a887128b` (research/plan commit) |
+| Ceiling | two files: `create-chat-connection.ts`, `create-chat-connection_test.ts` |
+| Tier-A stop | scoped check/lint/fmt (`packages/fresh`); relevant test file(s); `docs:exports-drift`; `deno.lock` hash check |
+| Next steering command | none queued — awaiting the thread's own stop; will reconcile, review, cut/verify receipts (checking for D-1's cache-hit trap specifically, since this run just discovered it), and Tier-A once it reports idle |
+
+Brief carries #1591's D-1 finding forward explicitly (check `stdout.bytes` before trusting a
+`check`/`lint`/`fmt-check` receipt) so this leaf doesn't repeat the same near-miss.
+
+**Both parked leaves — #1387 Slice 9 and #1591 — remain immutable**, no DeepSeek relaunch, evaluation
+gated on #1792 exclusively as ruled.
