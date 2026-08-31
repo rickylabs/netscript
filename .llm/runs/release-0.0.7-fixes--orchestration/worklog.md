@@ -6561,3 +6561,35 @@ Repair is bounded to one line, coordinator-authorized, recorded as `D-INT-1` in 
 and explicitly outside #1368's 19-path ceiling. Repo-wide check at the repaired head: **2970 files,
 0 diagnostics**. No focused test added — the compiler already is that check, and duplicating it would
 be manufactured work.
+
+### #1764 SHIPPED — merged as main `8a925764`; the cross-lane TS2307 red is resolved by it
+
+PR #1764 merged 02:50:31Z at exact head `9f2e6abd2`; issue #1368 CLOSED, sole `status:shipped`.
+Close-gate success (run `33351462185`, job started 02:41:31Z), `ci` success, review threads 0/0.
+
+**The `D-INT-1` integration repair landed with it.** `main:packages/cli/e2e/src/application/gates/
+scaffold/ui-data-screen-gates.ts:5` now reads `./runtime/generated-app-name.ts`. The repo-wide
+`deno task check` TS2307 that #1743+#1781 produced in combination — canary.4 evidence — is
+**resolved by #1764** and must be preserved as such, not re-raised. Every branch cutting from
+`8a925764` or later inherits the fix.
+
+Sequence honestly stated: the red was inherited, not introduced by #1764; the leaf's own product work
+was never touched (0 true intersection, 19/19 ceiling paths byte-identical across both convergences),
+and the existing `PASS_IMPL` `14889037` carried forward as MECHANICAL_PASS with no evaluator rerun.
+
+### Front rotated to #1819 (#1365, p0) as the single active Fixes leaf
+
+Converged onto main `8a925764` myself — clean merge, zero conflicts, head **`7c2a12fa1`**, still
+artifact-only (6 files, all `.llm/runs/`; no product or test path). Author thread `01a05526` re-tasked
+with the primary's narrowed contract.
+
+**My error, recorded.** The first narrowing dispatch was wrapped in `timeout 115` inside a background
+task; the SIGTERM killed the `codex-resume` client mid-turn and the author's turn ended in context
+compaction with no commit. The steer text had been delivered (verified by rollout growth and phrase
+match), but the work was lost. **Never wrap `codex-resume` in a short timeout** — it blocks for the
+whole turn by design. Re-dispatched with `nohup`, no timeout, and delivery re-verified.
+
+#1773 remains strictly read-only until #1819 clears, per the serial correction. Its exact next gate is
+recorded below and it is not silently parked: it carries `status:plan-eval` **without** the `openhands`
+label, so the phase dispatcher's label-pair condition was never met and no evaluator ever ran. Its
+worktree (`112a6a7ba`) is also behind its pushed head (`dec3b3abd`).
