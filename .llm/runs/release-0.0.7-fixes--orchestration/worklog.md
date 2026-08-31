@@ -7138,3 +7138,44 @@ Corrected course: #1773's expensive gate is independent of #1831, so it was wron
 Final current-main convergence still waits for #1831, and the runtime result will carry across it
 **only by exact relevant-blob identity**, the same discipline that let #1365 and #1677 carry their
 evaluator verdicts through three and two convergences respectively.
+
+### #1773 exact-green merge packet at `1c79001e1`
+
+**Hosted runtime terminal SUCCESS.** `e2e-cli.yml` run `33360663739` at exact head `cd24e4955`: all
+four lanes green — `scaffold-static`, `desktop-native-linux`, `scaffold-runtime-sqlite`, and
+`scaffold-runtime (aspire + docker + postgres)`. Because the new gate is ordered *before*
+`behavior.app-reference`, this single run proves both that `behavior.app-dynamic-route` is reachable
+and that the browser gate still passes behind it. No serialized host lease was taken.
+
+**Single final convergence** onto complete main `bd9d463b4` → **`1c79001e1`**. One conflict,
+`packages/cli/src/kernel/assets/embedded.generated.ts` — a generated carrier this leaf legitimately
+owns — resolved strictly by `gen:assets-barrel`, never hand-merged.
+
+**Runtime carry proven by exact relevant-blob identity: 0/19 handwritten relevant blobs differ** from
+the runtime-proven head `cd24e4955`; only the generated barrel moved, `check:assets-barrel` exit 0
+confirms it matches the manifest, and the dynamic-route template is still embedded. `deno.lock`
+byte-identical. Revalidated at the final head: e2e tests 202/0, `deno check` 904 files / 0 diagnostics.
+
+**Metadata**: DoD **19/19** checked — the three runtime rows were ticked only after the hosted result
+existed, never before. Issue #1616 **3/3** boxes tool-mirrored. `Closes #1616` present. Threads 0/0.
+Lifecycle moved stale `status:plan-eval` → `status:impl` + `gate:e2e` → `status:ready-merge`;
+`status:impl-eval` was deliberately skipped because the phase dispatcher fires on it for a non-draft
+PR and would have launched a redundant evaluator.
+
+**close-gate discipline repeated and it mattered again**: the first close-gate ran 05:42:05–19 while
+labels and the mirror landed 05:42:58–59, so its failure was stale. I waited for the whole `ci` run to
+complete (a job cannot be rerun mid-run), reran only close-gate, and verified it started 05:50:32Z —
+after the metadata. Final: **`ci: completed/success`, close-gate success**.
+
+### #1093 launched as the next independent leaf
+
+`packages/plugin` — the core plugin SDK hardcodes official plugins' factories in
+`ast-extractor.ts:4-8` (`defineJob`/`defineSaga`/`defineWebhook`), so a third-party factory gets no AST
+discovery and there is no seam to register one; the failure is silent. Verified at main before
+briefing. Worktree `007-leaf-1093`, branch `fix/plugin-discovery-contribution-seam`, base
+`bd9d463b4`, thread `01a0565a-3f20-7e83-a1ad-22f1fefdc306`, route openai/gpt-5.6-sol/medium.
+Collision-free: #1773 owns `packages/cli`, #1609 owns `packages/fresh`, this owns `packages/plugin`.
+
+**#1481 was considered and deliberately deferred**: it is scoped to `packages/cli` scaffold assets
+(the `(design)` route group), which collides with #1773's ownership of that surface and the embedded
+barrel. It becomes free the moment #1773 merges and is the natural next pick.
