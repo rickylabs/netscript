@@ -757,3 +757,28 @@ root and `packages/cli` both include it. Deno 2.9.5 honours the explicit omissio
 **PR #1828 — `fix(cli-e2e): restore deno.unstable compiler-lib parity` — is open and unmerged.** Until
 it lands, no amount of convergence clears `check-test`, and no product change belongs in this leaf
 (the standing coordinator ruling). Converging changed the base, not the blocker.
+
+## #1828 landed — the blocker is cleared; seventh and final integration
+
+`main` `7aff0e4cbb163191da1537aac47b0654933fc3db` carries the lib-parity fix:
+`packages/cli/e2e/deno.json` `compilerOptions.lib` is now `["deno.ns","deno.unstable","dom"]`.
+
+**Decisive re-measurement at the new seam `61fad6da1ec826381cb97efeaf8183cddefefb7a`:**
+`deno check packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts` → **0 occurrences of `TS2551`**
+(was exactly 1 at every prior seam). The blocker this leaf carried since Slice 9 is gone, and no
+product change was ever made for it — the ordering ruling held.
+
+**Seventh integration**, five carriers, canonical cascade `gen:agent-docs-prose` →
+`gen:assets-barrel` → `gen:mcp-export-corpus` → `gen:publish-assets`, never hand-merged.
+Corpus 7,712 symbols.
+
+Blob carry unchanged: **44 of 45** leaf-owned hand-written blobs byte-identical to the GLM-evaluated
+head `686eedb62`; the 45th remains the previously-proven lossless three-way merge of
+`docs/site/reference/mcp/index.md`.
+
+Gates at the seam, each `gitHead == actualGitHead`: scoped `check` PASS (303 B), scoped `test` PASS
+(390 B), `quality:gate` PASS (44,541 B). `deno.lock` byte-identical.
+
+Hosted `scaffold.runtime` now enabled via `e2e-cli-gate` to cover the service auth/policy dispatch
+this slice introduces — the coverage whose earlier omission was recorded as an error rather than a
+scoping decision.
