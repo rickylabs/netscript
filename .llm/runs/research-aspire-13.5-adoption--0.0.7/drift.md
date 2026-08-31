@@ -4835,3 +4835,27 @@
   - **Owner release ruling recorded:** the migration ships with **canary 6**. Finish all gates and
     exact merge packets now; **do not request or permit coordinator merge until canary5 is tagged.**
     Canary6 is gated on epic #1712 complete plus exact runtime/cleanup/OIDC release receipts.
+
+- **D-205 — S8 `database.seed` diagnosis/repair dispatched at `bc838a0b3`, independent of #1844.**
+  - Context that matters: this was the **first execution of S8's Postgres runtime tier in the whole
+    programme**. `database.init` (23 s), `migration-artifacts` (28 s) and `generate` (6.3 s) all
+    passed; `database.seed` failed in **1813 ms** with
+    `PrismaClientKnownRequestError` on `prisma.user.findFirst()`, resource-command **exit 16**.
+  - **The brief refuses to work from the truncated CI line.** The console output cuts off before the
+    Prisma **code** and **meta**, and that code *is* the diagnosis — `P2021`/`P2022` (missing
+    table/column) means the migration did not apply; `P1001` means connection wiring; `P2002` means
+    seed idempotency. Guessing between those would send the repair in three different directions, so
+    step 1 is to pull the `e2e-cli-scaffold-runtime-report` artifact from run `33404324013` and name
+    the exact code.
+  - **Ownership must be established before repair**, per the coordinator: diff S8's typed `<db>-cli`
+    surface (`operation-runner*.ts`, `generate-db-cli-mode*`, `run-tool.ts.template`, resource-command
+    argv) against `origin/main` on the `seed` path. If `main` reproduces, **split a precise shared
+    issue instead of bending #1754 around it**.
+  - **Runtime boundary held explicitly:** if a live control is needed, the agent must **stop and
+    report what it would run** rather than starting anything — leases are coordinator-granted and
+    serialized, and it holds none. Host is currently at four-part zero after S7 released.
+  - Same five anti-bypass constraints as the S9 repair: no gate skip, no catching the Prisma error, no
+    seeding around it, no tier exclusion, no weakening.
+  - Sixth dead-sender orphan released first (`ownerPid 1028441`).
+  - **#1844 is the sole accurate Garnet issue**; duplicate #1843 closed by the coordinator. S8's seed
+    defect is unrelated and does not wait on it.
