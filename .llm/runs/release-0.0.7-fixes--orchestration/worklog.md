@@ -6986,3 +6986,38 @@ changes `packages/ai/src/adapters/openai-compatible.adapter.ts` plus
 
 Integration order at the final seams is unchanged, and the shared generated carriers remain the
 ordered reconciliation point.
+
+### #1365/#1819 — metadata blockers cleared; product packet unchanged
+
+The independent audit was right that the blockers were **metadata only**. Fixed in place, no product
+history churned:
+
+- **PR body** still described the leaf as "S1 (plan) only" with a "PLAN-EVAL pending" phase and five
+  unchecked DoD boxes. Rewritten: phase is now complete with `PLAN-EVAL: N/A` (coordinator-ruled) and
+  IMPL-EVAL `PASS_IMPL`; all DoD boxes checked with their deciding evidence inline. **One DoD line was
+  rewritten rather than ticked** — "An unresolvable endpoint produces a diagnostic naming every
+  attempted key" was removed by the owner narrowing and is owned by **#1825**; it is recorded as
+  out-of-scope with its owner instead of silently dropped or falsely claimed.
+- **Issue #1365**: stale `status:triage` removed, `status:ready-merge` applied; PR moved
+  `status:plan` → `status:ready-merge`. All **8 acceptance boxes mirrored by
+  `mirror-acceptance-evidence.ts`** (`ok: true`, `changed: [1365]`, headSha `8690db803`) — tool-applied
+  from the PR's `acceptance-evidence` block, never hand-ticked.
+- **`impl-eval:skip` applied before the draft→ready transition**, with an attribution comment naming
+  the verdict, evaluator, evaluated head, and exactly what changed since. Verified it worked: the
+  `Phase eval PR` run's job log shows "Record attributed IMPL-EVAL skip" / "IMPL-EVAL skipped on
+  demand" — no redundant evaluator was launched, which is the #1781 failure avoided.
+
+**Product history deliberately untouched for #1810.** Main advanced to `eaea940bea` (user-facing
+#1810) but that delta is disjoint from this leaf, so the branch is not re-merged; CI evaluates the
+PR merge-ref against current main on its own. The close-gate job failed on the metadata above and is
+queued for rerun once the in-flight `ci` run completes — a job cannot be rerun mid-run.
+
+**Fourth leaf launched** — #1609 (`fix(fresh): managed form silently drops navigation:'document' when
+mode:'client'`), worktree `007-leaf-1609`, branch `fix/fresh-form-navigation-drop`, base
+`dea449911`, thread `01a05617-40a8-7440-8c21-aa535ab0f80e`, route openai/gpt-5.6-sol/medium. Chosen as
+collision-free: it owns `packages/fresh`, disjoint from #1773 (`packages/cli`), #1677 (`packages/ai`),
+and #1365 (sagas/docs/quality). Defect re-verified at main before briefing — the issue names
+`resolveFormEnhancementProps` but the real function is **`applyCollectionStrategy`**, whose
+`if (!strategy || strategy.mode === 'client') return props;` early-return fires before
+`resolveFormNavigationProps` is ever consulted. #1455 was again passed over: it is a published-type
+redesign, the wrong shape this close to the deadline.
