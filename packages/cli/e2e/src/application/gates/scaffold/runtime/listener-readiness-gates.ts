@@ -68,7 +68,7 @@ export function listenerReadinessWaitCommand(
     'deno',
     'run',
     '--allow-run=aspire',
-    `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/listener-readiness.ts`,
+    `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts`,
     context.project.appHost,
     expectation.resource,
     expectation.healthCheckKey,

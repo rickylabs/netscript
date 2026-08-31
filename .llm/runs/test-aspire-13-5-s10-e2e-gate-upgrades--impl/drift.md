@@ -76,3 +76,12 @@ named conflict files and otherwise requires S10 unchanged, so changing
 `listener-readiness-gates.ts` requires a follow-up ruling. The complete main
 `verify-listener-readiness.ts`, including `ListenerHealthReport` and `readListenerHealthReport()`,
 is preserved byte-for-byte.
+
+## D-10 — D-136 resolves both D-133 blockers
+
+The coordinator corrected the stacked-branch ancestry invariant from current-main ancestry to
+reconstructed-S8 ancestry; `bc838a0b3` is the exact merge-base and current main is intentionally
+irrelevant until S8 merges. The coordinator also designated `verify-listener-readiness.ts` as the
+canonical module. All three consumers now use it, the cosmetic evidence relocation is deleted, and
+the preserved D-101 contract test passes. D-08 and D-09 remain as the evidence for the accepted
+stops, not active blockers.

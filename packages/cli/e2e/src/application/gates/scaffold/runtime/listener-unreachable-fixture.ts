@@ -17,7 +17,7 @@ import {
 import {
   type ListenerHealthReport,
   readListenerHealthReport,
-} from './evidence/listener-readiness.ts';
+} from './verify-listener-readiness.ts';
 
 const REPORT_DEADLINE_MS = 30_000;
 const REPORT_POLL_MS = 1_000;

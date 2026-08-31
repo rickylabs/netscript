@@ -2,7 +2,7 @@
 
 - Worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s10`
 - Branch: `test/aspire-13-5-s10-e2e-gate-upgrades`
-- Stack base: S8 `9dd06647`
+- Stack base: reconstructed S8 `bc838a0b3`
 - Draft PR base: `feat/aspire-13-5-s8-typed-resource-commands`
 - Issues: closes #1722; part of #1712; refs #1372 without closing it
 - This host remains static-only: no AppHost start, containers, or runtime suites
@@ -42,3 +42,10 @@
   code invokes `evidence/listener-readiness.ts` instead of the expected
   `verify-listener-readiness.ts` (88 pass / 1 fail). `readListenerHealthReport()` remains exported
   from the complete main file. No force-push occurred; coordinator ruling is required.
+- D-136 resolved both blockers: the correct stacked ancestry assertion is
+  `merge-base HEAD bc838a0b3 == bc838a0b3`, which passes, and the canonical listener module is
+  `runtime/verify-listener-readiness.ts`. All remaining consumers were repointed to it, the cosmetic
+  `runtime/evidence/listener-readiness.ts` relocation was deleted, and the focused D-101/S10 set
+  passes 89/89. Repo-wide check has `failedBatches: 0`; scoped check/lint/fmt, parity, assets,
+  quality, and architecture are green. D-133's blocker entry is retained as historical evidence;
+  it is no longer active.

@@ -182,3 +182,28 @@
   `verify-listener-readiness.ts`, and the two ruled files remain byte-identical to current main.
   The D-101 contract suite is not green because of the command-path mismatch above. No force-push,
   runtime command, PLAN-EVAL, evaluator rerun, Aspire command, or Docker command was attempted.
+
+## D-136 final un-stack ruling
+
+- 2026-08-31: the coordinator corrected the ancestry contract to the actual stacked-PR invariant.
+  `git merge-base HEAD bc838a0b3 == bc838a0b3` passes; S10 remains stacked on reconstructed S8 and
+  does not chase current main. The stale-lineage check again examined 30 commits exclusive to the
+  old `f23954658` lineage and found none in the reconstructed head.
+- Repointed `listenerReadinessWaitCommand()` by one line from the cosmetic
+  `runtime/evidence/listener-readiness.ts` relocation back to canonical
+  `runtime/verify-listener-readiness.ts`. The relocation also had two remaining import consumers,
+  so `listener-unreachable-fixture.ts` and `verify-typed-db-phase-b.ts` now import the same canonical
+  exports; the unreferenced relocated module is deleted. `describe-follow.ts` and
+  `resource-command.ts` are unchanged.
+- Main's canonical `verify-listener-readiness.ts` and shipped `listener-readiness-gates_test.ts`
+  remain byte-for-byte identical to `origin/main`. `ListenerHealthReport` and
+  `readListenerHealthReport()` remain exported. The exact previously failing focused wrapper now
+  passes 89/89, including `listener-readiness-gates_test.ts` and `runtime-gates_test.ts`.
+- Final static verification: changed-file check/lint/fmt selected 3 files and passed with zero
+  failures/findings; repo-wide `deno task check` selected 2,978 files in 25 batches with
+  `failedBatches: 0`; `check:aspire-version-parity` passed with `fail: 0`; `quality:scan` and
+  `arch:check` exited 0. One explicit `gen:assets-barrel` produced no delta and
+  `check:assets-barrel` was diff-clean.
+- No runtime, Aspire, Docker, AppHost, CI dispatch, PLAN-EVAL, evaluator rerun, or PR-base retarget
+  was performed. D-133's local evidence commit remains in history to preserve the accepted stop
+  rationale; this D-136 slice records the final coordinator resolution and green static evidence.
