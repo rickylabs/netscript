@@ -309,13 +309,14 @@ const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,
 );
-const workersConfigAnchor = / {2}if \(config\.BackgroundProcessors\[(["'])workers\1\]\?\.Enabled !== false\) \{/
-  .exec(workersBackgroundBlock)?.[0];
+const workersConfigAnchor =
+  / {2}if \(config\.BackgroundProcessors\[(["'])workers\1\]\?\.Enabled !== false\) \{/
+    .exec(workersBackgroundBlock)?.[0];
 if (!workersConfigAnchor) {
   throw new Error('generated workers resource block did not contain its config lookup');
 }
-const workersExecutableMatch =
-  /const ([A-Za-z_$][\w$]*) = builder\.addExecutable\((["'])workers\2,/.exec(
+const workersExecutableMatch = /const ([A-Za-z_$][\w$]*) = builder\.addExecutable\((["'])workers\2,/
+  .exec(
     workersBackgroundBlock,
   );
 if (!workersExecutableMatch) {

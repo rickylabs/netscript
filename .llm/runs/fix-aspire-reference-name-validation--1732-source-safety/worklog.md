@@ -169,3 +169,29 @@ this leaf, and the leaf's own focused suites are green.
 - Final pushed evidence head is the commit containing this table; its exact immutable SHA is copied
   from `git log` into the PR slice-4 comment and handoff because a Git commit cannot contain its own
   object ID.
+
+## D-127 convergence — 2026-08-31
+
+The coordinator's merge ruling supersedes the ordinal-binding portion of the earlier slice-2 design:
+main's `safeIdentifier(name)` binding and `// --- ${name} ---` marker are retained, while #1747's
+four `JSON.stringify(name)` literal sites remain. The Flow-B fixture now discovers either a
+name-derived or `bg_N`-style JavaScript identifier, captures the formatted set anchor verbatim, and
+injects only missing users/sagas references through that anchor. The earlier evaluator verdict is
+not claimed as coverage for discarded direct-generator ordinal-binding semantics.
+
+Final D-127 evidence:
+
+- Live merge base: `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`, which follows the
+  coordinator-supplied `8a925764276b25ef7cef484db273604f44557cef` by one unrelated docs commit.
+- Focused Aspire, CLI-E2E, and CLI-generator check/lint/fmt wrappers: all exit 0 with every selected
+  file processed and zero findings.
+- Aspire config/name tests: 84 passed, 0 failed.
+- Background generator tests: 54 passed, 0 failed.
+- `deno task quality:gate`: exit 0, quality findings empty, doctrine `FAIL=0`.
+- `deno task check`: exit 0, 2,971 files, 25 batches, zero failed batches/occurrences.
+- Scaffold-only fixture proof: binding `workers`; captured set anchor
+  `backgroundProcessors.set('workers', workers);`; configured block contains both users and
+  sagas-api discovery keys.
+- No Aspire, Docker, AppHost, runtime, or `e2e:cli` command ran. See
+  `d-127-main-convergence.md` for the exact conflict resolution, intermediate refusals/failures,
+  and reproduction JSON.

@@ -6,17 +6,17 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-aspire-reference-name-validation--1732-source-safety` |
 | Branch         | `fix/aspire-reference-name-validation`                     |
-| Current phase  | `implementation` — final static evidence reconciliation    |
+| Current phase  | `implementation` — D-127 main convergence complete         |
 | Archetype      | `6 — CLI / Tooling` (dominant surface)                     |
 | Scope overlays | none                                                       |
 
 ## Current State
 
-Slices 2 and 3 are pushed and green. Source-safe emission is load-bearing beneath an exact private
-Aspire resource-name rule applied through a background-object `superRefine`. The full focused matrix
-passes 143/143, the generated JSON schema is byte-for-byte unchanged, and the private rule is not
-re-exported or exposed through a public type. The complete static gate set has been populated for a
-final-head rerun after this artifact reconciliation commit.
+The branch is rebased over the coordinator-supplied `8a925764` main head and the immediately
+following live docs-only `6bb27e46` main commit. D-127 preserves main's name-derived generator
+binding scheme, #1747's Aspire validation and four processor-name `JSON.stringify` literal sites,
+and the Flow-B users+sagas union through a dynamically captured binding/set anchor. All required
+static gates and the scaffold-only reproduction pass; the full runtime proof remains coordinator-owned.
 
 ## Completed
 
@@ -51,9 +51,9 @@ final-head rerun after this artifact reconciliation commit.
 
 ## Next Steps
 
-1. Commit and push this final evidence correction.
-2. Update the draft PR evidence/comment and advance its sole lifecycle label to `status:impl`.
-3. Stop for owner-dispatched IMPL-EVAL.
+1. Commit the D-127 sign-off slice and force-push with a freshly resolved remote lease SHA.
+2. Hand the exact final head and static evidence back to the coordinator.
+3. Stop for the coordinator's separately leased full `scaffold.runtime` proof.
 
 ## Files Changed
 

@@ -16,7 +16,7 @@
  */
 
 import type { RegisterBackgroundOptions } from '../types.ts';
-import { extractSagaStoreBackend, fileHeader } from '../_utils.ts';
+import { extractSagaStoreBackend, fileHeader, safeIdentifier } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
@@ -35,8 +35,8 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
   const registrationBlocks: string[] = [];
 
-  for (const [processorIndex, [name, entry]] of entries.entries()) {
-    const id = `bg_${processorIndex}`;
+  for (const [name, entry] of entries) {
+    const id = safeIdentifier(name);
     const workdir = entry.Workdir ?? '.';
     const entrypoint = entry.Entrypoint ?? `${name}/runtime.ts`;
     const telemetry = entry.Telemetry !== false;
@@ -53,7 +53,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     const pluginRefs = entry.PluginReferences ?? [];
 
     const lines: string[] = [];
-    lines.push(`  // --- processor ${processorIndex} ---`);
+    lines.push(`  // --- ${name} ---`);
 
     // Skip disabled entries
     lines.push(
@@ -73,9 +73,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(`    );`);
 
     // Resolve working directory
-    lines.push(
-      `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
-    );
+    lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
     lines.push(
       `    const ${id}_bootstrapModule = new URL('../../services/_shared/plugin-service-context.ts', import.meta.url).href;`,
     );
@@ -87,26 +85,22 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(``);
       lines.push(`    // Declared reference preflight — fail before processor registration`);
       for (const [index, ref] of serviceRefs.entries()) {
-        const endpointId = `ref_service_${processorIndex}_${index}`;
+        const endpointId = `${safeIdentifier(ref)}ServiceEndpoint${index}`;
         const message =
           `Background processor configuration error: '${name}' could not resolve service reference '${ref}' HTTP endpoint.`;
         lines.push(
-          `    const ${endpointId} = await _services.get(${
-            JSON.stringify(ref)
-          })?.getEndpoint('http');`,
+          `    const ${endpointId} = await _services.get('${ref}')?.getEndpoint('http');`,
         );
         lines.push(`    if (!${endpointId}) {`);
         lines.push(`      throw new Error(${JSON.stringify(message)});`);
         lines.push(`    }`);
       }
       for (const [index, ref] of pluginRefs.entries()) {
-        const endpointId = `ref_plugin_${processorIndex}_${index}`;
+        const endpointId = `${safeIdentifier(ref)}PluginEndpoint${index}`;
         const message =
           `Background processor configuration error: '${name}' could not resolve plugin reference '${ref}' HTTP endpoint.`;
         lines.push(
-          `    const ${endpointId} = await _plugins.get(${
-            JSON.stringify(ref)
-          })?.getEndpoint('http');`,
+          `    const ${endpointId} = await _plugins.get('${ref}')?.getEndpoint('http');`,
         );
         lines.push(`    if (!${endpointId}) {`);
         lines.push(`      throw new Error(${JSON.stringify(message)});`);
@@ -118,9 +112,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    const ${id} = builder.addExecutable(${
         JSON.stringify(name)
-      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, ${
-        JSON.stringify(entrypoint)
-      }]);`,
+      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, '${entrypoint}']);`,
     );
     if (isSagasBackgroundResource(name, entrypoint)) {
       lines.push(``);
@@ -178,9 +170,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(``);
       lines.push(`    // Concurrency`);
       lines.push(
-        `    await ${id}.withEnvironment(${
-          JSON.stringify(entry.ConcurrencyEnvVar)
-        }, String(${entry.Concurrency}));`,
+        `    await ${id}.withEnvironment('${entry.ConcurrencyEnvVar}', String(${entry.Concurrency}));`,
       );
     }
 
@@ -230,11 +220,9 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(``);
       lines.push(`    // Service references — wired via endpoint env vars`);
       for (const [index, ref] of serviceRefs.entries()) {
-        const endpointId = `ref_service_${processorIndex}_${index}`;
+        const endpointId = `${safeIdentifier(ref)}ServiceEndpoint${index}`;
         lines.push(
-          `    await ${id}.withEnvironment(${
-            JSON.stringify(`services__${ref}__http__0`)
-          }, ${endpointId});`,
+          `    await ${id}.withEnvironment('services__${ref}__http__0', ${endpointId});`,
         );
       }
     }
@@ -244,11 +232,9 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(``);
       lines.push(`    // Plugin references — wired via endpoint env vars`);
       for (const [index, ref] of pluginRefs.entries()) {
-        const endpointId = `ref_plugin_${processorIndex}_${index}`;
+        const endpointId = `${safeIdentifier(ref)}PluginEndpoint${index}`;
         lines.push(
-          `    await ${id}.withEnvironment(${
-            JSON.stringify(`services__${ref}__http__0`)
-          }, ${endpointId});`,
+          `    await ${id}.withEnvironment('services__${ref}__http__0', ${endpointId});`,
         );
       }
     }

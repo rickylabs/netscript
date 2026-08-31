@@ -54,7 +54,7 @@ describe('generateRegisterBackground', () => {
       ...emptyOptions,
       processors: { workers: fixtures.MINIMAL_BACKGROUND },
     });
-    assertStringIncludes(output, 'builder.addExecutable("workers", \'deno\', bg_0_workdir,');
+    assertStringIncludes(output, 'builder.addExecutable("workers", \'deno\', workers_workdir,');
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, 'backgroundProcessors.set("workers"');
   });
@@ -144,11 +144,11 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// Telemetry disabled \u2014 opt out explicitly');
     assertStringIncludes(
       output,
-      "bg_0.withEnvironment('OTEL_DENO', 'false')",
+      "benchmark.withEnvironment('OTEL_DENO', 'false')",
     );
     assertStringIncludes(
       output,
-      "bg_0.withEnvironment('OTEL_TRACES_SAMPLER', 'always_off')",
+      "benchmark.withEnvironment('OTEL_TRACES_SAMPLER', 'always_off')",
     );
   });
 
@@ -159,7 +159,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      'bg_0.withEnvironment("WORKERS_CONCURRENCY", String(4))',
+      "workers.withEnvironment('WORKERS_CONCURRENCY', String(4))",
     );
   });
 
@@ -171,12 +171,12 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
-    assertStringIncludes(output, "bg_0_sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, "workers_sqliteDatabase?.Engine === 'Sqlite'");
     assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
     assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
     assertStringIncludes(output, 'else if (infrastructure.primaryDatabase)');
     assert(
-      output.indexOf("bg_0_sqliteDatabase?.Engine === 'Sqlite'") <
+      output.indexOf("workers_sqliteDatabase?.Engine === 'Sqlite'") <
         output.indexOf('else if (infrastructure.primaryDatabase)'),
       'SQLite background resources must not enter the Aspire reference branch',
     );
@@ -196,7 +196,7 @@ describe('generateRegisterBackground', () => {
     // Single seam over the pre-built primary-cache wiring.
     assertStringIncludes(
       output,
-      'await _withCacheReference(bg_0, infrastructure.primaryCacheWiring)',
+      'await _withCacheReference(triggers, infrastructure.primaryCacheWiring)',
     );
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty no longer imported — endpoint resolution moved to wiring.
@@ -215,7 +215,7 @@ describe('generateRegisterBackground', () => {
     });
 
     assertStringIncludes(output, '_services: Map<string, ExecutableResource>');
-    assertStringIncludes(output, '_services.get("users")?.getEndpoint(\'http\')');
+    assertStringIncludes(output, "_services.get('users')?.getEndpoint('http')");
     assert(!output.includes(" services.get('users')"));
   });
 
@@ -230,7 +230,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      'bg_0.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
+      'sagas.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
   });
 
@@ -245,10 +245,10 @@ describe('generateRegisterBackground', () => {
       processors: { sagas: sagaProcessor },
     });
 
-    assertStringIncludes(output, "await bg_0.withHttpEndpoint({ env: 'PORT' })");
+    assertStringIncludes(output, "await sagas.withHttpEndpoint({ env: 'PORT' })");
     assertStringIncludes(
       output,
-      `await bg_0.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' })`,
+      `await sagas.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' })`,
     );
     assert(
       output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
@@ -271,7 +271,7 @@ describe('generateRegisterBackground', () => {
     );
     assertStringIncludes(
       output,
-      "bg_0.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', bg_0_triggerRegistryModule)",
+      "triggers.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', triggers_triggerRegistryModule)",
     );
   });
 
