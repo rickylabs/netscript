@@ -21,11 +21,16 @@ export interface RegistryCatalogItem {
   readonly description: string;
 }
 
+export interface RegistryCatalogCollection {
+  readonly name: string;
+  readonly items: readonly string[];
+}
+
 export const registryMeta = {
   name: 'fresh-ui-foundation',
   version: '0.1.0',
   packageName: '@netscript/fresh-ui',
-  total: 50,
+  total: 66,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -172,6 +177,97 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     description: 'Compact semantic status seam for tags, counts, and entity state labels.',
   },
   {
+    name: 'avatar',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Identity chip for a person or agent — initials or image with size, presence, and agent variants.',
+  },
+  {
+    name: 'citation-chip',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.',
+  },
+  {
+    name: 'code-block',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Fenced code surface with filename/language header and a copy affordance for assistant messages.',
+  },
+  {
+    name: 'model-selector',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Disclosure-backed model/provider picker for the prompt composer (native <details>).',
+  },
+  {
+    name: 'tool-call-card',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Inline MCP/tool invocation + result as a native <details> disclosure with status badge and IO panel.',
+  },
+  {
+    name: 'chart-block',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.',
+  },
+  {
+    name: 'donut',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.',
+  },
+  {
+    name: 'prompt-input',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send.',
+  },
+  {
+    name: 'message',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Chat message: author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator.',
+  },
+  {
+    name: 'markdown',
+    kind: 'component',
+    layer: 3,
+    description:
+      'Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.',
+  },
+  {
+    name: 'command-palette',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.',
+  },
+  {
+    name: 'search',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.',
+  },
+  {
+    name: 'dropzone',
+    kind: 'component',
+    layer: 2,
+    description:
+      'File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.',
+  },
+  {
     name: 'separator',
     kind: 'component',
     layer: 2,
@@ -307,6 +403,13 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     description: 'Global notification island for redirect-flash feedback.',
   },
   {
+    name: 'chat-render',
+    kind: 'lib',
+    layer: 2,
+    description:
+      'Curated generative-UI block parser: projects fenced chart/donut/table/stats/line markdown into a typed RenderPart[] tree with a reload-fidelity inverse projection.',
+  },
+  {
     name: 'desktop-tray-menu',
     kind: 'component',
     layer: 2,
@@ -341,5 +444,159 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     kind: 'island',
     layer: 2,
     description: 'Hydration-safe content gate that no-ops without the NetScript Deno Desktop RPC binding.',
+  },
+  {
+    name: 'mcp-ui-widget',
+    kind: 'island',
+    layer: 3,
+    description:
+      'Themed sandboxed MCP ui:// widget frame — an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.',
+  },
+  {
+    name: 'render-ui',
+    kind: 'lib',
+    layer: 2,
+    description:
+      'Safe recursive render_ui payload renderer with depth and block-vocabulary guards for Fresh UI generative surfaces.',
+  },
+];
+
+export const registryCollections: readonly RegistryCatalogCollection[] = [
+  {
+    name: 'foundation',
+    items: [
+      'theme-seed',
+      'sheet-styles',
+      'button',
+      'icon-button',
+      'input',
+      'textarea',
+      'checkbox',
+      'switch',
+      'label',
+      'select',
+      'form-field',
+      'card',
+      'panel',
+      'badge',
+      'separator',
+      'alert',
+      'inline-notice',
+      'spinner',
+      'progress',
+      'skeleton',
+      'breadcrumb',
+      'sidebar-shell',
+      'page-header',
+      'filter-form',
+      'stats-grid',
+      'detail-layout',
+      'data-table',
+      'responsive-table',
+      'pagination',
+      'empty-state',
+      'section-divider',
+      'sidebar-toggle',
+      'theme-toggle',
+      'toast-support',
+      'toast',
+      'avatar',
+      'code-block',
+      'chart-block',
+      'donut',
+      'dropzone',
+      'desktop-tray-menu',
+      'desktop-dialog',
+      'desktop-notification',
+      'desktop-window-chrome',
+      'desktop-update-prompt',
+      'desktop-only',
+    ],
+  },
+  {
+    name: 'ai',
+    items: [
+      'theme-seed',
+      'avatar',
+      'citation-chip',
+      'code-block',
+      'chart-block',
+      'model-selector',
+      'tool-call-card',
+      'prompt-input',
+      'message',
+      'command-palette',
+      'search',
+      'markdown',
+      'chat-render',
+      'mcp-ui-widget',
+      'render-ui',
+    ],
+  },
+  {
+    name: 'forms-core',
+    items: [
+      'theme-seed',
+      'button',
+      'icon-button',
+      'input',
+      'textarea',
+      'checkbox',
+      'switch',
+      'label',
+      'select',
+      'form-field',
+    ],
+  },
+  {
+    name: 'surface-core',
+    items: ['theme-seed', 'card', 'panel', 'badge', 'separator'],
+  },
+  {
+    name: 'feedback-core',
+    items: [
+      'theme-seed',
+      'alert',
+      'inline-notice',
+      'spinner',
+      'progress',
+      'skeleton',
+      'toast-support',
+      'toast',
+    ],
+  },
+  {
+    name: 'layout-foundations',
+    items: ['layout-objects'],
+  },
+  {
+    name: 'dashboard-blocks',
+    items: [
+      'theme-seed',
+      'breadcrumb',
+      'sidebar-shell',
+      'sidebar-toggle',
+      'page-header',
+      'filter-form',
+      'stats-grid',
+      'detail-layout',
+      'data-table',
+      'responsive-table',
+      'pagination',
+      'empty-state',
+      'section-divider',
+    ],
+  },
+  {
+    name: 'desktop',
+    items: [
+      'theme-seed',
+      'desktop-tray-menu',
+      'desktop-dialog',
+      'desktop-notification',
+      'desktop-window-chrome',
+      'desktop-update-prompt',
+      'desktop-only',
+    ],
   },
 ];

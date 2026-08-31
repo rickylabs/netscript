@@ -88,7 +88,7 @@ stream, so discovery finds it immediately:
 
 ```bash
 $ netscript plugin install stream --name streams
-Installed stream plugin "streams" on port 4437.
+Installed stream plugin "streams" on port <allocated-port>.
 Created 2 plugin files.
 Regenerated 12 Aspire helper files.
 

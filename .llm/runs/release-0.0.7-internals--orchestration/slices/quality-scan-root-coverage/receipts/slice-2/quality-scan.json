@@ -1,0 +1,36 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "quality-root-coverage-s2-quality-scan",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage",
+  "gitHead": "15d89474069d04dacc978c35af372b8a081d17d7",
+  "actualGitHead": "15d89474069d04dacc978c35af372b8a081d17d7",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "ce83294e5b8caaf3b89bbbc9dfe0e53c372c8e744aeca795a0795712b8bf7e12",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s2-quality-scan:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T06:16:21.137Z",
+  "startedAt": "2026-08-15T06:16:21.140Z",
+  "finishedAt": "2026-08-15T06:16:24.326Z",
+  "durationMs": 3186,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 4092,
+    "sha256": "a8554c72f40626b5f1ae8ef358841ebc9ce1ed4ea3d878350b585f22ebb6d4ce",
+    "tail": "{\"ok\":true,\"census\":{\"workspaceMembers\":37,\"membersInsideBoundary\":37,\"publishableMembersInsideBoundary\":35},\"boundary\":{\"includedParents\":[\"packages/**\",\"plugins/**\"],\"description\":\"The #1542 denominator is limited to workspace members under packages/** and plugins/**.\",\"excludedWorkspaceMembers\":{\"count\":0,\"paths\":[],\"reason\":\"outside packages/** and plugins/**\"}},\"publishableMembers\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"excludedNonPublishableMembers\":[{\"path\":\"packages/bench\",\"reason\":\"publish:false\"},{\"path\":\"packages/cli/e2e\",\"reason\":\"publish:false\"}],\"qualityTasks\":[{\"task\":\"quality:scan\",\"configuredRoots\":[\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]},{\"task\":\"quality:scan:repo\",\"configuredRoots\":[\".llm/tools/fitness\",\".llm/tools/quality\",\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]}],\"doctrine\":{\"configuredRoots\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/bench\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"uncoveredPublishedMembers\":[]},\"scannerTraversal\":{\"observedByChecker\":false,\"traversedPaths\":null,\"note\":\"configuredRoots are configuration coverage only; scanner mode and traversed paths belong to the scanner run report\"},\"errors\":[]}\n{\"ok\":true,\"mode\":\"repository\",\"scanned\":[\"packages\",\"plugins\",\"docs/site\"],\"findings\":[],\"allowCount\":7,\"allowances\":[{\"file\":\"packages/cli/src/public/features/root/public-command-dependencies.ts\",\"line\":363,\"issue\":1276,\"reason\":\"service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":135,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":136,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":158,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":275,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":276,\"issue\":1276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"plugins/workers/streams/producer.ts\",\"line\":52,\"issue\":1276,\"reason\":\"durable-stream mutation hook upstream type omits the worker execution extension fields\"}],\"allowanceFailures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 296,
+    "sha256": "cc262b6ff1baa7f3da364921eb103768ab2dfb15e5b82cfc9d591b1557f481ca",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:scan\u001b[0m deno run --allow-read .llm/tools/quality/check-root-coverage.ts && deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root docs/site --max-allow 7\n",
+    "truncated": false
+  }
+}

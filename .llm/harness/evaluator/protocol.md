@@ -14,14 +14,16 @@ the evaluator session, and no lane self-certifies. The transport is how that inv
   Claude-authored work. The **supervisor** triggers the evaluator; a sub-agent never
   auto-dispatches one. PLAN-EVAL is conditional for complex/decision-heavy work, while IMPL-EVAL
   remains mandatory unless the owner explicitly waives it.
-- **OpenRouter escalation.** Use the bound Minimax M3 high PLAN preset or DeepSeek V4 Flash 0731
-  max IMPL preset only for a genuine third opinion or when the native opposite-family route is
+- **OpenRouter escalation.** Use the bound Qwen 3.8 Flash max PLAN preset or GLM 5.3 Flash max IMPL
+  preset only for a genuine third opinion or when the native opposite-family route is
   quota-blocked. Approved open models only; never send Claude/GPT/Gemini through OpenRouter.
 - **Cloud run.** OpenHands is phase-driven and open-model-only. `openhands` plus `status:plan-eval`
   dispatches PLAN-EVAL; draft→ready dispatches IMPL-EVAL unless `impl-eval:skip` is present. Select
   at most one `eval:model:*` override before the transition. Orchestrators never also post a manual
   trigger for that head. Dispatching a closed model (Claude/GPT/Gemini) through OpenHands is
   prohibited — it burns paid OpenRouter credit.
+  OpenHands cannot currently attest reasoning effort because its adapter does not expose it; report
+  that limitation and never claim `max` for an OpenHands run.
 - **Ordinary (non-formal) review** — the slice review gate, code/PR review — remains
   **opposite-family Claude ⇄ Codex**: a Codex session reviews Claude-authored work, a Claude session
   reviews Codex-authored work, mixed authorship per slice or by both.
@@ -42,8 +44,8 @@ and their `effort` is genuine — not nominal.
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn |
 | --------------------------------- | --------------- | ------------ |
-| `minimax/minimax-m3`              | yes             | supported    |
-| `deepseek/deepseek-v4-flash-0731` | yes             | supported    |
+| `qwen/qwen3.8-flash`              | yes             | supported    |
+| `z-ai/glm-5.3-flash`              | yes             | supported    |
 | `z-ai/glm-5.2` (design lane only) | **none**        | —            |
 
 The missing-reasoning problem is **GLM-specific, not a client-wide gap**: only GLM 5.2 over

@@ -1,0 +1,6 @@
+Waiting for resource 'users' to be healthy...
+
+✅ Resource 'users' is healthy. (0.0s)
+
+__ELAPSED_SECONDS=0.35
+__MAX_RSS_KB=78968

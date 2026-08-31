@@ -1,0 +1,61 @@
+Starting db seed for postgres...
+Getting logs...
+[netscript-db-postgres] Executing command 'start'.
+[netscript-db-postgres] Waiting for resource 'postgres' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'postgres' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'postgres'.
+[netscript-db-postgres] Finished waiting for resource 'postgres'.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Finished waiting for resource 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Successfully executed command 'start'.
+[netscript-db-postgres] Executing command 'stop'.
+[netscript-db-postgres] Successfully executed command 'stop'.
+[netscript-db-postgres] Executing command 'start'.
+[netscript-db-postgres] Waiting for resource 'postgres' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'postgres' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'postgres'.
+[netscript-db-postgres] Finished waiting for resource 'postgres'.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Finished waiting for resource 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Successfully executed command 'start'.
+[netscript-db-postgres] Executing command 'stop'.
+[netscript-db-postgres] Successfully executed command 'stop'.
+[netscript-db-postgres] Executing command 'start'.
+[netscript-db-postgres] Waiting for resource 'postgres' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'postgres' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'postgres'.
+[netscript-db-postgres] Finished waiting for resource 'postgres'.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Finished waiting for resource 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Successfully executed command 'start'.
+[netscript-db-postgres] Executing command 'stop'.
+[netscript-db-postgres] Successfully executed command 'stop'.
+[netscript-db-postgres] Executing command 'start'.
+[netscript-db-postgres] Waiting for resource 'postgres' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'postgres' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'postgres'.
+[netscript-db-postgres] Finished waiting for resource 'postgres'.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to enter the 'Running' state.
+[netscript-db-postgres] Waiting for resource 'aspire-13-5-postgres-db' to become healthy.
+[netscript-db-postgres] Waiting for resource ready to execute for 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Finished waiting for resource 'aspire-13-5-postgres-db'.
+[netscript-db-postgres] Successfully executed command 'start'.
+[netscript-db-postgres] [sys] Starting process...: Cmd = /home/codex/.deno/bin/deno, Args = ["eval", "\nconst request = JSON.parse(await 
+Deno.readTextFile(Deno.args[0]));\nconst operation = request.NETSCRIPT_PRISMA_OPERATION;\nif (typeof operation !== 'string' || !/^[a-z-]+$/.test(operation)) {\n
+throw new Error('Invalid NetScript database operation request.');\n}\nconst task = `db:${operation}:${Deno.args[1]}`;\nconst command = new Deno.Command('deno', 
+{\n  args: ['task', task],\n  env: request,\n  stdin: 'inherit',\n  stdout: 'inherit',\n  stderr: 'inherit',\n});\nconst status = await 
+command.spawn().status;\nDeno.exit(status.code);\n", 
+"/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/aspire/.netscript-db-operation-postgres.json", "postgres"]
+[netscript-db-postgres] Task db:seed:postgres deno task db:seed
+[netscript-db-postgres] Task db:seed deno run -A --minimum-dependency-age=0 ./scripts/seed.ts
+[netscript-db-postgres] ✅ Seeded representative User row.
+db seed completed successfully.
+
+__ELAPSED_SECONDS=3.77
+__MAX_RSS_KB=124452

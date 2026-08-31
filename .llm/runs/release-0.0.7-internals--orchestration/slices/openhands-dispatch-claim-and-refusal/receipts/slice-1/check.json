@@ -1,0 +1,36 @@
+{
+  "gateId": "check",
+  "invocationId": "openhands-dispatch-s1-check",
+  "argv": [
+    "deno",
+    "task",
+    "check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-openhands-dispatch",
+  "gitHead": "4aa04de34c83a47d96b65349b726fa190c491366",
+  "actualGitHead": "4aa04de34c83a47d96b65349b726fa190c491366",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:400059",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "eab87b01ef080ee0b8e44a5af5d3cc24c8561675bc6882accf3d16eb5c5df261",
+  "lifecycleId": "worker:400059:openhands-dispatch-s1-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T08:04:31.584Z",
+  "startedAt": "2026-08-15T08:04:31.589Z",
+  "finishedAt": "2026-08-15T08:10:17.160Z",
+  "durationMs": 331620,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 301,
+    "sha256": "07103b7c1f6253fe92992e12b7de546e210570a806042998977dcbd01a726944",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-openhands-dispatch\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2922,\"batches\":25,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 218,
+    "sha256": "b550dc235e33afbf56a177e20c0614a3e5dd30b15a6398f633c2e2e37429c306",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\n",
+    "truncated": false
+  }
+}

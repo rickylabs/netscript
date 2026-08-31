@@ -71,8 +71,9 @@ engine and the test fixtures:
 
 ## Sub-path exports
 
-The following entrypoints are published alongside the root export. Their reference surface is
-generated separately from their own `deno doc` output.
+The following entrypoints are published alongside the root export. The tables below summarize each
+sub-path's own `deno doc` surface. Symbols that one sub-path re-exports from another are called out
+instead of described twice.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
@@ -126,6 +127,7 @@ In-memory ports and fixture builders for exercising the CLI and scaffold pipelin
 | `buildMinimalPromptAnswers` | `function buildMinimalPromptAnswers(): InitPromptAnswers` | Build a minimal prompt-answer fixture for tests. |
 | `buildEmptyScaffoldResult` | `function buildEmptyScaffoldResult(): ScaffoldResult` | Build an empty scaffold result fixture for tests. |
 | `MemoryFileSystemAdapter` | class | In-memory filesystem adapter for tests. |
+| `CacheBackendChoice` | type alias | Cache backend accepted by init (`"redis" \| "garnet" \| "deno-kv"`). |
 | `DbEngine` | type alias | Database engines that have scaffolded workspace support (`"postgres" \| "mysql" \| "mssql" \| "sqlite"`). |
 | `DbEngineChoice` | type alias | Database engine selection accepted by init, including the no-database option (`DbEngine \| "none"`). |
 | `EditorChoice` | type alias | Optional editor config scaffolded into the workspace root (`"none" \| "zed" \| "vscode"`). |
@@ -140,6 +142,9 @@ In-memory ports and fixture builders for exercising the CLI and scaffold pipelin
 | `InMemoryProcess` | interface | In-memory process port with deterministic queued results. |
 | `RecordedProcessCall` | interface | One recorded in-memory process invocation. |
 | `PromptScript` | interface | Scripted answers used by the in-memory prompt port. |
+
+This entrypoint also re-exports `ScaffoldResult`, `DirEntry`, `FileInfo`, `WalkEntry`, and
+`FileSystemPort`, documented in the scaffolding table above.
 
 ---
 

@@ -14,8 +14,45 @@ export interface MySqlError {
   sqlMessage?: string | null;
   sqlState?: string | null;
   code?: string;
+  fatal?: boolean;
   message?: string;
   cause?: MySqlError;
+}
+
+/** MySQL transport and pool error codes classified as connection failures. */
+export const MYSQL_CONNECTION_ERROR_CODES: ReadonlySet<string> = new Set([
+  'ECONNREFUSED',
+  'ECONNRESET',
+  'ETIMEDOUT',
+  'EPIPE',
+  'EHOSTUNREACH',
+  'ENOTFOUND',
+  'EAI_AGAIN',
+  'PROTOCOL_CONNECTION_LOST',
+  'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR',
+  'PROTOCOL_ENQUEUE_AFTER_QUIT',
+  'PROTOCOL_ENQUEUE_AFTER_DESTROY',
+  'PROTOCOL_SEQUENCE_TIMEOUT',
+  'HANDSHAKE_NO_SSL_SUPPORT',
+  'POOL_CLOSED',
+  'POOL_CLOSED_CONNECTION',
+  'POOL_ENQUEUELIMIT',
+  'POOL_NONEONLINE',
+]);
+
+/**
+ * Return whether a MySQL driver error represents connection establishment,
+ * capacity, pool, or transport failure.
+ */
+export function isConnectionError(error: unknown): boolean {
+  if (!isDriverError(error)) {
+    return false;
+  }
+
+  return error.fatal === true ||
+    error.errno === 1040 ||
+    error.errno === 1203 ||
+    (typeof error.code === 'string' && MYSQL_CONNECTION_ERROR_CODES.has(error.code));
 }
 
 /**

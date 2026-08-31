@@ -138,6 +138,52 @@ const orderSaga = defineSaga('order')
   .build();
 ```
 
+## Telemetry contract
+
+Inject `SagaInstrumentation` through `createSagaRuntime({ native: { instrumentation } })`; the
+composition root gives the engine, bridge, and compensator the same instance. Saga operations emit
+these spans:
+
+When `createNativeBus` receives a prebuilt `native.engine` without an `instrumentation` option, the
+bridge uses its own noop instrumentation instance; pass the same instrumentation explicitly when the
+prebuilt engine and bridge must share telemetry.
+
+| Span                      | Runtime owner | Meaning and outcomes                                                                                       |
+| ------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `saga.handle`             | Engine        | Handler execution; `success` or `error`                                                                    |
+| `saga.cascade.send`       | Bus bridge    | Downstream internal-message dispatch; `success` or `error`                                                 |
+| `saga.cascade.schedule`   | Bus bridge    | Scheduler persistence call; `success` or `error`                                                           |
+| `saga.cascade.spawn`      | Bus bridge    | Defensive rejected attempt; **error-only** because child-saga lifecycle is unsupported                     |
+| `saga.cascade.compensate` | Compensator   | Registered compensation execution; `success`, missing-handler `skipped`, or `error`                        |
+| `saga.cascade.complete`   | Engine        | Participation of a complete effect in transition resolution; outcome follows the resolved persisted status |
+
+Every engine-originated saga span carries `netscript.correlation.id`, the cross-plane convention
+exported as `NetScriptCorrelationAttributes.CORRELATION_ID` by `@netscript/telemetry/attributes`,
+plus the saga-domain `netscript.saga.correlation_key`. The publisher's message correlation key wins
+for the cross-plane ID; a saga's `.correlate()` rule wins for the domain key. Cascade spans consume
+those two engine-selected values unchanged. Explicit W3C trace context makes each cascade span a
+direct child of the operation that produced it, including compensation-generated cascades.
+
+For scheduled child messages, an explicit child `correlationKey` wins; the upstream cross-plane ID
+is used only when the child omitted one. The current `send()` DSL has no child-correlation option,
+so the bridge leaves the nested message's domain key unset and supplies the upstream cross-plane ID
+to the engine separately. A rule-less downstream saga therefore retains its existing
+`<sagaId>:<type>` domain identity while its spans remain joined to the upstream operation.
+
+`saga.cascade.complete` is emitted whenever a handler returns a complete effect, including a
+storeless runtime. Its `netscript.saga.status` is the resolved persisted status—not a success flag.
+For mixed terminal effects it can be `failed` or `compensating`; the span also records whether the
+complete effect supplied a result.
+
+Direct `SagaCompensator` callers may omit the optional correlation and parent fields for source
+compatibility. The compensator does not invent fallbacks from the message, a correlation rule, or a
+default. A missing handler is observable as `skipped`; a registered handler without an
+engine-resolved `correlationKey` fails validation. **Behavior change:** direct callers that invoke a
+registered compensation handler without that key now receive `SAGA_VALIDATION_FAILED`. This
+no-fallback rule applies to correlation and span parenting; when no instrumentation span context
+exists, the compensation handler still sees the handled message's existing
+`traceparent`/`tracestate` for backward compatibility.
+
 ## Public surface
 
 | Entry                     | What it gives you                                                                                          |

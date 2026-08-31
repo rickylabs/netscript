@@ -1,0 +1,48 @@
+{
+  "gateId": "doc-lint",
+  "invocationId": "legacy-port-pin-sweep-doc-lint-6242edabc",
+  "argv": [
+    "deno",
+    "task",
+    "doc:lint",
+    "--root",
+    "packages/cli",
+    "--output",
+    ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/doc-lint.report.json",
+    "--pretty"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
+  "gitHead": "6242edabc3679173c841e2e167f7f5786819e720",
+  "actualGitHead": "6242edabc3679173c841e2e167f7f5786819e720",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2202078",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "2e4019be6183a176c947d7d1ebd191079352d673588161a528b8655aa06da399",
+  "lifecycleId": "worker:2202078:legacy-port-pin-sweep-doc-lint-6242edabc:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T20:52:37.083Z",
+  "childReport": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/doc-lint.report.json",
+  "startedAt": "2026-08-13T20:52:37.087Z",
+  "finishedAt": "2026-08-13T20:52:37.501Z",
+  "durationMs": 414,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 85,
+    "sha256": "cad2dd6cb3cba43ab970c1e3572143e2e75f7230afb12ad6bf2510fdba46e852",
+    "tail": "Wrote .llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/doc-lint.report.json\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 221,
+    "sha256": "bd72850b4e5d082150395fcabd088e412f344967e7818d8df6c1bb8614711b87",
+    "tail": "Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/cli' '--output' '.llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/doc-lint.report.json' '--pretty'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/doc-lint.report.json",
+    "bytes": 1211,
+    "sha256": "d8db58a24bb4e7c840a5df4fe69c2f9f4bc65216d8048c2c86ecfe3943fe6522",
+    "modifiedAt": "2026-08-13T20:52:37.488Z"
+  }
+}

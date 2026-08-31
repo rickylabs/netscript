@@ -4,6 +4,7 @@ import {
   setCacheProvider,
 } from '../../src/cache/cache-provider.ts';
 import { CacheQuery } from '../../src/cache/cache-query.ts';
+import type { CacheEntry } from '../../src/ports/cache-entry.ts';
 import { createCompositeQuery } from '../../src/query/composite-query.ts';
 import { createQueryFactory } from '../../src/query/query-factory.ts';
 import type {
@@ -11,7 +12,7 @@ import type {
   ContractSchema,
   ServiceClient,
 } from '../../src/ports/service-client.ts';
-import { assertEquals, MemoryCacheStore } from '../test-helpers.ts';
+import { assert, assertEquals, MemoryCacheStore } from '../test-helpers.ts';
 
 interface ListInput {
   readonly limit: number;
@@ -38,6 +39,19 @@ type Procedure<TInput, TOutput> = ContractProcedureLike<
 
 const listProcedure = { '~orpc': {} } as Procedure<ListInput, ListOutput>;
 const contract = { list: listProcedure } as const;
+
+class JoinObservedInflightMap extends Map<string, Promise<unknown>> {
+  readonly joined = Promise.withResolvers<void>();
+  observeJoins = false;
+
+  override get(key: string): Promise<unknown> | undefined {
+    const operation = super.get(key);
+    if (this.observeJoins && operation) {
+      this.joined.resolve();
+    }
+    return operation;
+  }
+}
 
 Deno.test('createQueryFactory builds stable action keys and query options', async () => {
   const store = new MemoryCacheStore();
@@ -110,6 +124,108 @@ Deno.test('queryOptions remains a direct service query when no server cache is r
 
   assertEquals((await options.queryFn()).items[0], 'call-1');
   assertEquals((await options.queryFn()).items[0], 'call-2');
+});
+
+Deno.test('published loader runs cache policy before reading persisted metadata', async () => {
+  const store = new MemoryCacheStore();
+  const inflight = new JoinObservedInflightMap();
+  setCacheProvider(new CacheQuery(store, inflight));
+
+  const input = { limit: 20, offset: 0 };
+  let currentItem = 'fetched';
+  let clientCalls = 0;
+  let blockedRefresh: Promise<void> | undefined;
+  const client: ServiceClient<typeof contract> = {
+    list: async (): Promise<ListOutput> => {
+      clientCalls += 1;
+      await blockedRefresh;
+      return { items: [currentItem] };
+    },
+  };
+  const action = createQueryFactory('orders', contract, client).list;
+  const cacheKey: Deno.KvKey = ['cache_query', ...action.key(input)];
+  const load = async (preferFreshOnStale = true) => {
+    const data = await action(input, {
+      staleTime: 10_000,
+      cacheTime: 30_000,
+      preferFreshOnStale,
+    });
+    return await action.getCachedEntry(input) ?? { data, cachedAt: Date.now() };
+  };
+
+  try {
+    const freshTimestamp = Date.now();
+    store.setRaw(
+      cacheKey,
+      { data: { items: ['seeded-fresh'] }, timestamp: freshTimestamp } satisfies CacheEntry<
+        ListOutput
+      >,
+    );
+    const fresh = await load();
+    assertEquals(fresh.data.items[0], 'seeded-fresh');
+    assertEquals(fresh.cachedAt, freshTimestamp);
+    assertEquals(clientCalls, 0);
+
+    await store.delete(cacheKey);
+    const beforeMissingFetch = Date.now();
+    const missing = await load();
+    const afterMissingFetch = Date.now();
+    assertEquals(missing.data.items[0], 'fetched');
+    assertEquals(clientCalls, 1);
+    assert(
+      missing.cachedAt >= beforeMissingFetch,
+      'the missing-entry timestamp must not predate its fetch',
+    );
+    assert(
+      missing.cachedAt <= afterMissingFetch,
+      'the missing-entry timestamp must be captured before the loader resolves',
+    );
+
+    const expiredTimestamp = Date.now() - 40_000;
+    store.setRaw(
+      cacheKey,
+      { data: { items: ['seeded-expired'] }, timestamp: expiredTimestamp } satisfies CacheEntry<
+        ListOutput
+      >,
+    );
+    currentItem = 'expired-refresh';
+    const callsBeforeExpired = clientCalls;
+    const expired = await load(false);
+    assertEquals(expired.data.items[0], 'expired-refresh');
+    assert(expired.cachedAt > expiredTimestamp, 'the expired entry must be replaced');
+    assertEquals(clientCalls - callsBeforeExpired, 1);
+
+    const staleTimestamp = Date.now() - 20_000;
+    store.setRaw(
+      cacheKey,
+      { data: { items: ['seeded-stale'] }, timestamp: staleTimestamp } satisfies CacheEntry<
+        ListOutput
+      >,
+    );
+    currentItem = 'refreshed';
+    const refresh = Promise.withResolvers<void>();
+    blockedRefresh = refresh.promise;
+    inflight.observeJoins = true;
+    const callsBeforeRefresh = clientCalls;
+    const first = load();
+    const second = load();
+
+    await inflight.joined.promise;
+    assertEquals(clientCalls - callsBeforeRefresh, 1);
+    refresh.resolve();
+
+    const [firstEntry, secondEntry] = await Promise.all([first, second]);
+    assertEquals(firstEntry.data.items[0], 'refreshed');
+    assertEquals(secondEntry.data.items[0], 'refreshed');
+    assert(
+      firstEntry.cachedAt > staleTimestamp,
+      'the blocking refresh must replace the stale timestamp',
+    );
+    assertEquals(firstEntry.cachedAt, secondEntry.cachedAt);
+    assertEquals(clientCalls - callsBeforeRefresh, 1);
+  } finally {
+    resetCacheProvider();
+  }
 });
 
 Deno.test('query factories propagate static resource.action cache namespaces', async () => {

@@ -95,6 +95,13 @@ When the opening diff is docs-only, proactively apply `ci:skip-e2e` to the draft
 the docs-only change must exercise the full CI surface. Record the selection in the opening phase
 comment so the evaluator can verify that the cheap lane is intentional.
 
+## Human Review Surface
+
+Keep user-facing plans, issues, PRs, benchmark reports, and handoffs compact. Lead with the
+decision, measured evidence, total footprint, risk, and next action. Link raw evidence instead of
+copying run machinery or phase ledgers into the review surface. If the original goal is not obvious
+on one screen, consolidate and simplify before asking for coordination or review.
+
 ## Agent Delegation Contract
 
 Lane assignments and model bindings are configuration. The tiered A–E model, the selection rules
@@ -143,7 +150,7 @@ routing here — defer to that file. The items below are the parts of the contra
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
   **local-machine run**, PLAN-EVAL and IMPL-EVAL normally use a fresh native opposite-family
   session: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work.
-  Use the phase-bound Minimax/DeepSeek OpenRouter preset only for a genuine third opinion or when
+  Use the phase-bound Qwen 3.8 Flash/GLM 5.3 Flash OpenRouter preset only for a genuine third opinion or when
   the native opposite-family route is quota-blocked. If OpenRouter is then limited, use a fresh AGY
   Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
   cloud-driven work. For cloud PRs, repository automation owns the phase trigger: `openhands` plus

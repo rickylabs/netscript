@@ -20,6 +20,7 @@ import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import {
   generateDatabaseDenoJson,
   generateDatabaseFacadeMod,
+  generateDatabaseSeed,
   generateEngineMod,
   generatePrismaConfig,
 } from '../../templates/database/database-generators.ts';
@@ -146,7 +147,10 @@ export class DatabaseScaffolder {
       }),
     );
     await write(join(databaseRoot, SCAFFOLD_FILES.MOD), generateDatabaseFacadeMod(provider));
-    await write(join(workspaceDir, SCAFFOLD_FILES.MOD), generateEngineMod(provider, { configKey }));
+    await write(
+      join(workspaceDir, SCAFFOLD_FILES.MOD),
+      generateEngineMod(provider, { configKey, databaseName }),
+    );
     await write(
       join(schemaDir, 'schema.prisma'),
       renderTemplateAssetSync(TEMPLATE_KEYS.databaseSchema, templateVars),
@@ -157,7 +161,7 @@ export class DatabaseScaffolder {
     );
     await write(
       join(scriptsDir, 'seed.ts'),
-      renderTemplateAssetSync(TEMPLATE_KEYS.databaseSeed, templateVars),
+      generateDatabaseSeed({ modelName: templateVars.modelName }),
     );
     await write(
       join(scriptsDir, 'fix-zod-imports.ts'),

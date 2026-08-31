@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from 'jsr:@std/assert@1';
 import {
   acceptanceCheckboxes,
+  AcceptanceEvidenceValidationError,
   checkAcceptanceBoxes,
   extractClosingIssues,
   issueSnapshot,
@@ -38,6 +39,39 @@ entries:
     validateEvidenceMapping(8, acceptanceCheckboxes('## Gates\n- [ ] a long box'), parsed.entries)
       .size,
     1,
+  );
+});
+
+Deno.test('empty structured entry lists fail with block-attributed repair guidance', () => {
+  for (const entries of ['entries: []', 'entries:']) {
+    assertThrows(
+      () =>
+        parseAcceptanceEvidence(`\`\`\`acceptance-evidence
+issue: 1561
+${entries}
+\`\`\``),
+      AcceptanceEvidenceValidationError,
+      'Acceptance-evidence block 1 for issue #1561 has no entries; remove the block when the closing issue has no close-gated markdown checkboxes, or add one evidence entry per unchecked checkbox.',
+    );
+  }
+});
+
+Deno.test('zero close-gated boxes fail before per-entry index matching', () => {
+  assertThrows(
+    () =>
+      validateEvidenceMapping(1621, [], [{
+        issue: 1621,
+        boxIndex: 1,
+        evidence: 'focused test receipt',
+        legacy: false,
+      }, {
+        issue: 1621,
+        boxIndex: 2,
+        evidence: 'quality-job receipt',
+        legacy: false,
+      }]),
+    AcceptanceEvidenceValidationError,
+    'Issue #1621 has zero close-gated markdown checkboxes; remove its acceptance-evidence block or convert the issue acceptance list to markdown checkboxes.',
   );
 });
 

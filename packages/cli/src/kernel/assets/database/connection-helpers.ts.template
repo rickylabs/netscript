@@ -1,25 +1,12 @@
-
-function resolveConnectionString(provider: string, envKey: string): string | undefined {
-  const rawValue = Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL');
-  if (!rawValue) {
-    return undefined;
-  }
-
-  return normalizeDatabaseUrl(provider, rawValue);
+/* @netscript-provider:sqlite */
+function normalizeDatabaseUrl(value: string): string {
+  return value;
 }
+/* @netscript-provider:end */
 
-function normalizeDatabaseUrl(provider: string, value: string): string {
-  const trimmed = value.trim();
-  switch (provider) {
-    case 'postgres':
-      return normalizePostgresUrl(trimmed);
-    case 'mysql':
-      return normalizeMysqlUrl(trimmed);
-    case 'mssql':
-      return normalizeMssqlUrl(trimmed);
-    default:
-      return trimmed;
-  }
+/* @netscript-provider:postgres */
+function normalizeDatabaseUrl(value: string): string {
+  return normalizePostgresUrl(value.trim());
 }
 
 function normalizePostgresUrl(value: string): string {
@@ -38,6 +25,38 @@ function normalizePostgresUrl(value: string): string {
   return `postgres://${username}:${password}@${host}:${port}/${database}`;
 }
 
+function parseConnectionParts(value: string): Record<string, string> {
+  const parts: Record<string, string> = {};
+  for (const segment of value.split(';')) {
+    const trimmed = segment.trim();
+    if (!trimmed) continue;
+    const separatorIndex = trimmed.indexOf('=');
+    if (separatorIndex < 0) continue;
+    parts[trimmed.slice(0, separatorIndex).trim().toLowerCase()] = trimmed
+      .slice(separatorIndex + 1)
+      .trim();
+  }
+  return parts;
+}
+
+function readConnectionPart(
+  parts: Record<string, string>,
+  keys: readonly string[],
+  fallback: string,
+): string {
+  for (const key of keys) {
+    const value = parts[key];
+    if (value) return value;
+  }
+  return fallback;
+}
+/* @netscript-provider:end */
+
+/* @netscript-provider:mysql */
+function normalizeDatabaseUrl(value: string): string {
+  return normalizeMysqlUrl(value.trim());
+}
+
 function normalizeMysqlUrl(value: string): string {
   if (/^mysql:\/\//i.test(value)) {
     return value;
@@ -54,10 +73,40 @@ function normalizeMysqlUrl(value: string): string {
   return `mysql://${username}:${password}@${host}:${port}/${database}`;
 }
 
-function normalizeMssqlUrl(value: string): string {
-  if (/^sqlserver:\/\//i.test(value)) {
-    return value;
+function parseConnectionParts(value: string): Record<string, string> {
+  const parts: Record<string, string> = {};
+  for (const segment of value.split(';')) {
+    const trimmed = segment.trim();
+    if (!trimmed) continue;
+    const separatorIndex = trimmed.indexOf('=');
+    if (separatorIndex < 0) continue;
+    parts[trimmed.slice(0, separatorIndex).trim().toLowerCase()] = trimmed
+      .slice(separatorIndex + 1)
+      .trim();
   }
+  return parts;
+}
+
+function readConnectionPart(
+  parts: Record<string, string>,
+  keys: readonly string[],
+  fallback: string,
+): string {
+  for (const key of keys) {
+    const value = parts[key];
+    if (value) return value;
+  }
+  return fallback;
+}
+/* @netscript-provider:end */
+
+/* @netscript-provider:mssql */
+function normalizeDatabaseUrl(value: string): string {
+  return normalizeMssqlUrl(value.trim());
+}
+
+function normalizeMssqlUrl(value: string): string {
+  if (/^sqlserver:\/\//i.test(value)) return value;
   if (/^mssql:\/\//i.test(value)) {
     return `sqlserver://${value.slice('mssql://'.length)}`;
   }
@@ -80,9 +129,7 @@ function normalizeMssqlUrl(value: string): string {
 function buildSqlServerOptions(parts: Record<string, string>): string {
   const options: string[] = [];
   const encrypt = parts['encrypt'];
-  if (encrypt) {
-    options.push(`encrypt=${encodeURIComponent(encrypt.toLowerCase())}`);
-  }
+  if (encrypt) options.push(`encrypt=${encodeURIComponent(encrypt.toLowerCase())}`);
   const trustServerCertificate = parts['trustservercertificate'];
   if (trustServerCertificate) {
     options.push(
@@ -99,9 +146,7 @@ function parseSqlServerEndpoint(value: string): { host: string; port: string } {
 }
 
 function normalizeSqlServerHost(host: string): string {
-  if (host === '127.0.0.1' || host === '::1' || host === '[::1]') {
-    return 'localhost';
-  }
+  if (host === '127.0.0.1' || host === '::1' || host === '[::1]') return 'localhost';
   return host || 'localhost';
 }
 
@@ -109,18 +154,12 @@ function parseConnectionParts(value: string): Record<string, string> {
   const parts: Record<string, string> = {};
   for (const segment of value.split(';')) {
     const trimmed = segment.trim();
-    if (!trimmed) {
-      continue;
-    }
-
+    if (!trimmed) continue;
     const separatorIndex = trimmed.indexOf('=');
-    if (separatorIndex < 0) {
-      continue;
-    }
-
-    const key = trimmed.slice(0, separatorIndex).trim().toLowerCase();
-    const partValue = trimmed.slice(separatorIndex + 1).trim();
-    parts[key] = partValue;
+    if (separatorIndex < 0) continue;
+    parts[trimmed.slice(0, separatorIndex).trim().toLowerCase()] = trimmed
+      .slice(separatorIndex + 1)
+      .trim();
   }
   return parts;
 }
@@ -132,9 +171,8 @@ function readConnectionPart(
 ): string {
   for (const key of keys) {
     const value = parts[key];
-    if (value) {
-      return value;
-    }
+    if (value) return value;
   }
   return fallback;
 }
+/* @netscript-provider:end */

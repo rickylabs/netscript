@@ -36,8 +36,8 @@
     {
       "source": ".llm/tools/quality/scan-code-quality.ts",
       "path": "quality/scan-code-quality.ts",
-      "symptom": "Architecture review needs a focused code-quality scan",
-      "permissions": ["read"]
+      "symptom": "Architecture review needs a fail-closed scan that verifies allowance owners in rickylabs/netscript",
+      "permissions": ["read", "env", "net"]
     },
     {
       "source": ".llm/tools/deps/outdated.ts",

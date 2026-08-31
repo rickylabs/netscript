@@ -25,6 +25,9 @@ and deployed endpoints without a registry or a config file.
   the map key.
 - **Typed service clients** — `createServiceClient` builds a fully inferred oRPC client from a
   shared contract router; input and output types come from the contract, never from you.
+- **Declaration-safe procedure metadata** — `ProcedureMetaFromNode` on `./ports` and `ProcedureMeta`
+  on `./ports` and `./query` recover the exact NetScript-owned metadata carried by direct clients,
+  `defineServices`, and query actions without exposing upstream oRPC types.
 - **Aspire service discovery** — `./discovery` resolves service URLs and database/KV connections
   from orchestrator-injected environment variables, lazily at call time.
 - **Cache-aware query factories** — `createQueryFactories` is the golden path: one call over a
@@ -73,7 +76,7 @@ the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in 
 ## Quick example
 
 ```ts
-import { defineServices } from '@netscript/sdk';
+import { defineServices } from '@netscript/sdk/presets';
 import { ordersContract } from './contracts/orders.ts';
 
 // One contract map wires clients, server query factories, and frontend query utils.
@@ -92,8 +95,29 @@ const ordersQuery = queries.orders;
 const ordersQueryUtils = queryUtils.orders;
 ```
 
-Drop to a focused subpath when an app only needs part of the surface — `./client`, `./query`, and
-`./query-client` carry the three pieces individually.
+Use the side-effect-free `./presets` subpath for `defineServices` in browser/shared modules. Drop to
+`./client`, `./query`, and `./query-client` when an app only needs one of the three pieces.
+
+### Server cache registration
+
+Calling provider-backed query methods requires one explicit registration at the server composition
+root. NetScript-managed Fresh apps do this inside `defineFreshApp()`; custom servers do it directly:
+
+```typescript
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
+
+setCacheProvider(cacheQuery);
+```
+
+Importing either `@netscript/sdk` or `@netscript/sdk/cache` is load-time pure and does not register
+the provider.
+
+#### Migration from implicit registration
+
+Existing custom server bootstraps that relied on importing the SDK root or `./cache` for its side
+effect must add the explicit call above. Existing Fresh bootstraps that call `defineFreshApp()` keep
+the default provider without another change. Cache engine symbols such as `KvCacheStore` and
+`cacheQuery` now come from `@netscript/sdk/cache`, not the root.
 
 ### Two query dialects — pick one per data layer
 
@@ -138,6 +162,20 @@ static `operationId` from `defaultOptions`, or the fixed `composite` fallback; d
 calls accept a static `operationId`, or use a fixed direct-method fallback. Operation ids are
 lowercase, separator-normalized, and capped at 80 characters. They are contract metadata: never
 construct one from query props, tenant/user ids, cache keys, values, or URLs.
+
+Cache telemetry admits at most 256 distinct normalized operation namespaces per process. The first
+new namespace beyond that budget is collapsed to the fixed `overflow` namespace and named once in
+a `cache.namespace.overflow` span event; later over-budget namespaces also collapse to `overflow`
+without retaining or emitting their original ids. Composite construction only normalizes its
+static default. Admission happens when a real cache operation opens a span, so construction alone
+does not consume the process budget.
+
+Topology evidence validation is fail-safe. Missing, unbounded, or malformed provider evidence marks
+the active cache span with `outcome=error` and `topology_complete=false`, but it does not turn an
+otherwise successful loader, write, or invalidation into an application exception. Invalid reports
+are not partially emitted: an invalidation report is staged and merged only after the complete
+report validates. Provider descriptors are likewise validated inside the active span so malformed
+observability data remains visible without preventing the application operation.
 
 `backend_executed` is measured only when the `queryFn` closure is entered. It is `false` for a fresh
 hit, cache-only read, provider failure before the loader, and the losing trace in an in-flight join
@@ -210,17 +248,19 @@ and Linux apply on relaunch.
 
 | Entry            | What it gives you                                                                 |
 | ---------------- | --------------------------------------------------------------------------------- |
-| `.`              | `defineServices` plus re-exports of the full surface below                        |
+| `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
+| `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
 | `./client`       | `createServiceClient`, `isDefinedError`                                           |
 | `./discovery`    | `getServiceUrl`, `getServiceInfo`, `getPostgresConnection`, `getKvConnection`, …  |
 | `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
 | `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
-| `./cache`        | `KvCacheStore`, `cacheQuery`, cache-provider wiring                               |
+| `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
 | `./collections`  | `createQueryCollection` — live client-side collections                            |
 | `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
 | `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
 | `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
+| `./ports`        | structural client/query contracts plus procedure metadata extractors              |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).
@@ -239,7 +279,8 @@ The always-current symbol list is
 
 Runs on Deno 2.x on the server and in the browser: the client, query-client, and collections
 surfaces run in islands, while discovery and KV-backed caching read `Deno.env` / `Deno.openKv` and
-belong on the server (use `--unstable-kv` where KV types are checked).
+belong on the server (use `--unstable-kv` where KV types are checked). Importing the root no longer
+exports or registers the cache engine; use `./cache` plus explicit registration in custom servers.
 
 ## License
 

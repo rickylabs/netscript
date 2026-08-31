@@ -376,7 +376,7 @@ function triggerGroups(): string {
 function generateCreateUserSettingsJob(): string {
   return `${OFFICIAL_SAMPLE_CONFIG_MARKER}
 import { createSagaPublisher } from '@netscript/plugin-sagas/runtime';
-import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
+import { createFailureResult, createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
 import { z } from 'zod';
 
 type UserRegistrationMessage = {
@@ -394,10 +394,16 @@ const handler = defineJobHandler(async (ctx) => {
   const { userId } = CreateUserSettingsPayloadSchema.parse(ctx.payload ?? {});
   console.info('Creating scaffold sample settings', { userId });
 
-  await sagaPublisher.publish({
+  const publishResult = await sagaPublisher.publish({
     type: 'UserSettingsCreated',
     payload: { userId },
   });
+  if (!publishResult.published) {
+    return createFailureResult(
+      \`Saga publish rejected: \${publishResult.reason}\`,
+      { userId, retryable: publishResult.retryable },
+    );
+  }
 
   return createSuccessResult({
     userId,

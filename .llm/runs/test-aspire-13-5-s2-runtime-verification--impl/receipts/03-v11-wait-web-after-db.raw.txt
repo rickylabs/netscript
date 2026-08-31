@@ -1,0 +1,9 @@
+Waiting for resource 'aspire-13-5-postgres-web' to be healthy...
+❌ Timed out waiting for resource 'aspire-13-5-postgres-web' to be healthy after 60s.
+
+📄 See logs at /home/codex/.aspire/logs/cli_20260829T224452_d6c0efb2.log
+🔍 See AppHost logs at /home/codex/.aspire/logs/cli_20260829T224113223_detach-child_ab597237a8e94a3da5e1b93d68629e3c.log
+Command exited with non-zero status 17
+
+__ELAPSED_SECONDS=62.32
+__MAX_RSS_KB=79204

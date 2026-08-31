@@ -1,9 +1,5 @@
 import { App, type FreshConfig, type Middleware, staticFiles as freshStaticFiles } from 'fresh';
-// Server-only: register the KV-backed cache provider so that SDK
-// query-factory and composite-query cache methods work automatically.
-// This import is safe here because defineFreshApp is never bundled for
-// the client environment.
-import '@netscript/sdk/cache';
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
 import {
   type FreshQueryCacheInvalidationOptions,
   registerQueryCacheInvalidationRoute,
@@ -84,9 +80,13 @@ export interface DefineFreshAppOptions<State> {
  *
  * This function keeps the default Fresh bootstrap unchanged while exposing
  * optional adapter seams for app construction, static middleware, lifecycle
- * setup, file-system routes, and request telemetry defaults.
+ * setup, file-system routes, and request telemetry defaults. Calling it
+ * explicitly installs the shared server cache provider; importing this module
+ * alone does not mutate the provider registry.
  */
 export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}): App<State> {
+  setCacheProvider(cacheQuery);
+
   const app = options.app ?? options.createApp?.(options.freshConfig) ??
     new App<State>(options.freshConfig);
 

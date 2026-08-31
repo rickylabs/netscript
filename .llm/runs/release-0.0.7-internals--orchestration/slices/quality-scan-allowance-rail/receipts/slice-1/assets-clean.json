@@ -1,0 +1,36 @@
+{
+  "gateId": "assets-barrel",
+  "invocationId": "quality-rail-s1-assets-clean",
+  "argv": [
+    "deno",
+    "task",
+    "check:assets-barrel"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "actualGitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "69a53119d2dd54d18a2f78925a2c33f0bad627a35bff663e4fd42400e2486934",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s1-assets-clean:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-14T23:42:09.553Z",
+  "startedAt": "2026-08-14T23:42:09.557Z",
+  "finishedAt": "2026-08-14T23:42:10.157Z",
+  "durationMs": 600,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 622,
+    "sha256": "112b4f675ae42f50781a08b52dda9b08317c29d3b1a3b19e39caf9a80aec8cc9",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:assets-barrel\u001b[0m deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mgen:assets-barrel\u001b[0m deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n",
+    "truncated": false
+  }
+}

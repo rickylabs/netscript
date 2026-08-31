@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "slice-4-final-check-binding",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--batch-size",
+    "47"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "71c26445838eb5bca654607947ad247cbea78273",
+  "actualGitHead": "71c26445838eb5bca654607947ad247cbea78273",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2683410",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6db1e8375f94f6e3fe398e6078a578aece56bb3ddd73e80087ca9c840b8faf8b",
+  "lifecycleId": "worker:2683410:slice-4-final-check-binding:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:57:11.499Z",
+  "startedAt": "2026-08-15T00:57:11.501Z",
+  "finishedAt": "2026-08-15T01:00:52.238Z",
+  "durationMs": 214136,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 295,
+    "sha256": "e8f757082e6c6b8d1c31dcca8f9570a990f56b2701c3cd3f273f96a9ee16deab",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2919,\"batches\":63,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 238,
+    "sha256": "1d3aae1909fa6e770e726f0397fd9d170c79e2e86ad5948598545f1c184950bb",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--batch-size' '47'\n",
+    "truncated": false
+  }
+}

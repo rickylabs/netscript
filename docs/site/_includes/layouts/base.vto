@@ -319,6 +319,51 @@
       })();
     </script>
 
+    {{# Comparison selector: every competitor is already in the DOM; switch labelled nodes only. #}}
+    <script>
+      (function () {
+        function setup(root) {
+          var select = root.querySelector("[data-ns-comparison-select]");
+          if (!select) return;
+
+          function activate(key) {
+            Array.prototype.slice.call(root.querySelectorAll("[data-ns-competitor]")).forEach(
+              function (node) {
+                if (node.getAttribute("data-ns-competitor") === key) {
+                  node.removeAttribute("hidden");
+                } else {
+                  node.setAttribute("hidden", "");
+                }
+              },
+            );
+            var option = select.options[select.selectedIndex];
+            var label = option ? option.textContent : "Competitor";
+            Array.prototype.slice.call(root.querySelectorAll("[data-ns-competitor-label]")).forEach(
+              function (node) {
+                node.textContent = label;
+              },
+            );
+          }
+
+          select.addEventListener("change", function () {
+            activate(select.value);
+          });
+          root.classList.add("is-enhanced");
+          activate(select.value);
+        }
+
+        function init() {
+          Array.prototype.slice.call(document.querySelectorAll("[data-ns-comparison]")).forEach(setup);
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init);
+        } else {
+          init();
+        }
+      })();
+    </script>
+
     {{# Code-copy buttons: inject a "Copy" button into every <pre> in .ns-prose and
        copy the code text. No-JS safe — the button is simply absent without script. #}}
     <script>

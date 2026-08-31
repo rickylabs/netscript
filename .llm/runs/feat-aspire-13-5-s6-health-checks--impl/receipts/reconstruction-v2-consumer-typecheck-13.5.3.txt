@@ -1,0 +1,39 @@
+Gate: S6 corrected reconstruction v2 generated-consumer type-check against Aspire SDK 13.5.3
+Date: 2026-08-30
+Result: PASS (exit 0)
+
+Generator source:
+  worktree: /home/agent/projects/netscript/worktrees/007-aspire-s6-v2
+  baseline: 2a1248d33d55 (exactly-shipped main)
+  reconstructed commits at render time:
+    a5a445c1a feat(aspire): reconstruct listener readiness semantics
+    719b298ee test(e2e): reconstruct listener runtime module boundary
+  command: deno run -A packages/cli/bin/netscript-dev.ts init s6-consumer --path <scratch-root> --db postgres --ci --yes --no-git --force
+  generated AppHost: <scratch-root>/s6-consumer/aspire
+
+Restored real Aspire 13.5.3 declaration surface:
+  source convention: existing S7/S8 static-consumer fixture
+  .aspire/modules/aspire.mts sha256: 7cd4cf8319360b4ddbe8fb8f5481e3e5907610883c40179840fa249a86600487
+  .aspire/modules/base.mts sha256: e2ce97fa0ceaf103fd604174473dfcb6e586db9f548d1759e291618514ec656e
+  .aspire/modules/transport.mts sha256: 2fd6593b7390e43e322f26e884f5b56fbad25f7f7dd0695671982bd72e455c17
+
+Compiler:
+  TypeScript 5.9.3 from the restored AppHost node_modules
+  zod 4.4.3 linked from the existing Deno npm cache to satisfy the generated helper import
+
+Command (from the generated aspire directory):
+  ./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json
+
+Observed output:
+  <empty>
+  exit code: 0
+
+Generated-register inspection:
+  - Postgres and RESP checks await getEndpoint('tcp') inside each callback.
+  - Each callback then awaits endpoint.host() and endpoint.port().
+  - Each resource builder attaches the emitted check with withHealthCheck(...).
+  - Helper result data uses Record<string, string>.
+  - No literal host port was emitted.
+
+Static-only boundary:
+  No aspire start, AppHost execution, container operation, evaluator, or CI dispatch was used.

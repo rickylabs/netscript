@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { join } from '@std/path';
 import { HYBRID_DELEGATION_DEFAULT_MODEL } from '../config/models.ts';
-import { HYBRID_DELEGATION_LIMITS, HybridDelegationError } from './hybrid-delegation.ts';
+import { HYBRID_DELEGATION_LIMITS, type HybridDelegationError } from './hybrid-delegation.ts';
 import {
   HybridOpenCodeAdapter,
   hybridWorkerEnvironment,
@@ -110,7 +110,7 @@ Deno.test('adapter uses argv without a shell and reports requested/observed rout
   assertEquals(result.requested, {
     provider: 'openrouter',
     model: HYBRID_DELEGATION_DEFAULT_MODEL,
-    effort: 'high',
+    effort: 'max',
   });
   assertEquals(result.observed, { ...result.requested, source: 'opencode_argv' });
   assertEquals(result.durationMs, 5);

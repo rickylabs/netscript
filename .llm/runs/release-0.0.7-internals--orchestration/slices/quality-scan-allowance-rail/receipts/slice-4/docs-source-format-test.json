@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-source-format-test",
+  "invocationId": "slice-4-final-docs-source-format-test",
+  "argv": [
+    "deno",
+    "task",
+    "test:source-format"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail/docs/site",
+  "gitHead": "71c26445838eb5bca654607947ad247cbea78273",
+  "actualGitHead": "71c26445838eb5bca654607947ad247cbea78273",
+  "timeoutMs": 600000,
+  "runnerIdentity": "worker:2690858",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "09e8d935f9fbe6c7cd412a8ea5d8ebfa76c911ad5290f343e9a0e31212bcd64d",
+  "lifecycleId": "worker:2690858:slice-4-final-docs-source-format-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T01:04:30.158Z",
+  "startedAt": "2026-08-15T01:04:30.160Z",
+  "finishedAt": "2026-08-15T01:04:31.311Z",
+  "durationMs": 1151,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 800,
+    "sha256": "2a030f53795936cf37579ab7e86465bcd25a45232aa5657656d09f98a4b0a297",
+    "tail": "\u001b[0m\u001b[38;5;245mrunning 6 tests from ./_plugins/check-source-format_test.ts\u001b[0m\nrejects raw newlines inside quoted Vento component arguments ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(7ms)\u001b[0m\nrejects Markdown headings in Vento pages without Markdown rendering ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(13ms)\u001b[0m\naccepts multiline component objects whose individual strings stay valid ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(1ms)\u001b[0m\nrejects literal Vento placeholders in any rendered page ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(2ms)\u001b[0m\nallows only the bounded CLI string-template documentation tokens ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(1ms)\u001b[0m\nrejects CLI documentation tokens beyond the bounded allowance ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(1ms)\u001b[0m\n\n\u001b[0m\u001b[32mok\u001b[0m | 6 passed | 0 failed \u001b[0m\u001b[38;5;245m(32ms)\u001b[0m\n\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 632,
+    "sha256": "c9370da63fa764253873abe4a15e0905dc686ca4debd6780901e69a9e197e99f",
+    "tail": "Warning: config file file:///home/codex/repos/netscript-007-quality-rail/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-quality-rail/. Ignoring the parent workspace config.\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest:source-format\u001b[0m deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts\nWarning: config file file:///home/codex/repos/netscript-007-quality-rail/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-quality-rail/. Ignoring the parent workspace config.\n\u001b[0m\u001b[32mCheck\u001b[0m _plugins/check-source-format_test.ts\n",
+    "truncated": false
+  }
+}

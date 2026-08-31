@@ -1,0 +1,201 @@
+# Worklog — harness-evidence-and-verdict-tooling
+
+## Identity
+
+- Worktree: `/home/codex/repos/netscript-007-harness-evidence`
+- Branch: `fix/harness-evidence-and-verdict-tooling`
+- Base: `01e0960494c95ce56eb35892c211a095eb13e6ed`
+- Issues: #1561 + #1563 + #1621
+- Route requested: OpenAI Codex GPT-5.6 Sol, medium
+- Draft PR: #1644 — https://github.com/rickylabs/netscript/pull/1644
+
+## Design
+
+### Public/tooling surface
+
+- `parseAcceptanceEvidence()` and `validateEvidenceMapping()` retain their fail-closed validation
+  roles; the documented fenced block remains the author input.
+- The mirror CLI retains JSON/pretty reporting and non-zero failure semantics.
+- `extractVerdict()` and the OpenHands workflow summary marker retain the exact harness verdict
+  vocabulary; only markdown wrapper tolerance and diagnostic source state change.
+
+### Domain vocabulary
+
+- Evidence target states: `checkbox-targets-present` and `zero-checkbox-targets`.
+- Evidence parse states: `valid`, `empty-list-invalid`, and `malformed`.
+- Verdict marker states: `parsed`, `absent`, and `unparseable`.
+- Exact verdict token set remains `PASS | FAIL_FIX | FAIL_RESCOPE | FAIL_DEBT | FAIL_PLAN | NONE`;
+  workflow evaluators still do not accept GitHub review vocabulary.
+
+### Ports and constants
+
+- No new port or external dependency is introduced.
+- Existing `OPENHANDS_VERDICT_TOKENS`, workflow regex token lists, `READY_LABEL`, and close-gated
+  checkbox extraction remain the finite constants. No provider/model/endpoint value changes.
+
+### RED-first fixtures and slice order
+
+1. S1: add empty-list and zero-checkbox RED fixtures, then implement parser/mapping/reporting
+   changes. Prove with the focused validation test wrapper.
+2. S2: add heading, emphasis, absence, and malformed RED fixtures, then update shared and workflow
+   extractors. Prove with focused agentic/workflow tests.
+3. S3: add the coordinator-authorized checkbox-only/plain-bullet operator guidance to the existing
+   `netscript-pr` machine convention.
+4. S4: run durable `check`, `test`, and `quality-job` once at the acceptance-complete implementation
+   head, package their receipts in one evidence-only child commit, and prepare the held
+   opposite-family IMPL-EVAL handoff without rerunning for that receipt-only head.
+
+### Exact files
+
+- Declared: `.llm/tools/validation/acceptance-evidence.ts`,
+  `.llm/tools/agentic/lib/agentic-lib.ts`, `.github/workflows/openhands-agent.yml`.
+- Coordinator-authorized extension: `.llm/tools/validation/mirror-acceptance-evidence.ts`,
+  `.llm/tools/validation/acceptance-evidence_test.ts`,
+  `.llm/tools/validation/mirror-acceptance-evidence_test.ts`,
+  `.llm/tools/agentic/lib/agentic-lib_test.ts`,
+  `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts`.
+- Final coordinator amendment: control head `33626b1f4752b3a0e53ea21407ff1ddb6af0fcfb`
+  authorizes exactly `.agents/skills/netscript-pr/SKILL.md` as the ninth and final edit surface,
+  superseding the earlier read/use-only decision.
+
+### Deferred scope
+
+Issue templates, general YAML, routing/model policy, publication, package/plugin fitness, and global
+runtime/E2E surfaces are excluded.
+
+### Contributor path
+
+- Evidence behavior: begin with `acceptance-evidence_test.ts`, then read the pure parser/mapping
+  functions, then the mirror CLI boundary test.
+- Verdict behavior: begin with `agentic-lib_test.ts`, then the shared extractor, then the workflow
+  contract test and the two keep-in-sync embedded matchers.
+- Operator convention: read the `netscript-pr` close-gate and evidence-mirroring sections.
+
+### PLAN-EVAL disposition
+
+`PLAN-EVAL: N/A` at `2026-08-13T20:25:27Z`. The composed milestone PLAN-EVAL already locked the
+fail-closed remedies, issue bodies provide exact acceptance behavior, current-main research found no
+material architecture/sequence/public-contract choice, and the leaf has three bounded mechanical
+tooling slices. Implementation remains blocked only on coordinator authorization for the exact
+undeclared paths, not on a design decision.
+
+## Gates
+
+Structured JSON outputs are preserved under `receipts/`; raw root Deno commands and RTK-filtered
+output are not verdict sources.
+
+| Slice | Receipt | Result |
+| --- | --- | --- |
+| S1 RED | `receipts/s1-red.json` | expected type-check failure: the structured validation/report APIs did not exist |
+| S1 focused test | `receipts/s1-green.json` | PASS after Tier-A fix, 19 passed / 0 failed |
+| S1 focused check | `receipts/s1-check.json` | PASS, 0 diagnostics across the four S1 files |
+| S1 focused format | `receipts/s1-fmt.json` | PASS, 4 files / 0 findings |
+| S2 RED | `receipts/s2-red.json` | expected type-check failure: the discriminated verdict-inspection APIs did not exist |
+| S2 focused test | `receipts/s2-green.json` | PASS, 81 passed / 0 failed |
+| S2 focused check | `receipts/s2-check.json` | PASS, 0 diagnostics across the three TypeScript S2 files |
+| S2 focused format | `receipts/s2-fmt.json` | PASS, 3 TypeScript files / 0 findings |
+| S2 focused lint attempt | `receipts/s2-lint.json` | NOT FIRED, exit 2: Deno excluded all 3 explicit hidden-path batches; not claimed as a pass |
+| Pre-guidance check | `receipts/pre-guidance/check.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
+| Pre-guidance test | `receipts/pre-guidance/test.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
+| Pre-guidance quality-job | `receipts/pre-guidance/quality-job.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
+| S4 final check | `receipts/final/check.receipt.json` + `check.report.json` | PASS at implementation head `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; 5,055 ms; 2,919 files / 25 batches / 0 failed batches / 0 diagnostics |
+| S4 final test | `receipts/final/test.receipt.json` + `test.report.json` | PASS at implementation head `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; 223,951 ms; 4,109 passed / 19 ignored / 0 failed |
+| S4 final quality-job | `receipts/final/quality-job.receipt.json` | PASS at implementation head `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; 7,006 ms; `deno task ci:quality`, exit 0 |
+
+S1 first review requested one mirror-boundary fixture. The replacement candidate passed substantive
+Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43`; the supervisor sign-off
+disposition is recorded in the run-artifact-only commit containing this note.
+
+S2 passed substantive Tier-A review at `8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33`; the supervisor
+sign-off disposition is recorded in the run-artifact-only commit containing this note.
+
+## Reconcile notes
+
+- Dispatch: live #1561, #1563, and #1621 are open in milestone 0.0.7; `origin/main` equals the
+  approved baseline.
+- Dispatch drift: approved `netscript-pr` and test edits are absent from the binding file-surface
+  list; coordinator clarification is required before those edits.
+- S0 research reconcile: live issue bodies/comments match the locked coordinator remedy. Added the
+  undeclared mirror CLI to the clarification request because #1561 requires a structured report at
+  the CLI boundary, not merely a more specific thrown parser message.
+- S0 draft reconcile: bootstrap commit `0be658912d167da5bc46b718a862a43e33e5f4c4` pushed by the
+  explicit refspec; draft PR #1644 targets `main`, milestone 0.0.7, with exactly `type:fix`,
+  `area:tooling`, and `status:plan`. Plan/clarification comment id: `5286024710`.
+- Coordinator clarification reconcile: PR #1644 comment `5286066438` authorizes the five exact
+  implementation/test peers listed above, keeps `netscript-pr` read-only, admits no other product
+  path, and requires the leaf to stop at Tier-A plus separate IMPL-EVAL handoff. Implementation may
+  now begin; the PR remains `status:plan` until real implementation lands.
+- S1 pre-review reconcile (`2026-08-13T20:44:05Z`): `entries: []` and block-style empty `entries:`
+  now produce a typed, block-attributed validation failure; the mirror converts expected authoring
+  failures into an explicit `ok:false` report; zero checkbox targets are rejected once before any
+  per-index matching with remove-or-convert guidance. No mutation occurs in dry-run fixtures. The
+  focused test/check/format receipts are green; Tier-A review is the remaining slice gate.
+- S1 Tier-A review (`2026-08-13T20:50:46Z`): `CHANGES_REQUESTED` on candidate
+  `a4a3010427afa43a36ac1c477b854e067162464a`. The typed error/report split, pre-mutation
+  validation, explicit failure verdict, and zero-checkbox ordering were accepted. The reviewer
+  required one mirror-boundary regression for a non-existent index on an otherwise checkbox-bearing
+  issue and separately flagged the coordinator-owned #1561 documentation/closing-keyword conflict.
+- S1 review response (`2026-08-13T20:58:34Z`): added the exact boundary fixture; the mirror resolves
+  to `ok:false`, preserves the index-specific repair diagnostic, and performs zero updates. Focused
+  test/check/format replacement receipts pass at 19/19, zero diagnostics, and zero findings. Tier-A
+  re-review remains required; the skill/closure conflict is recorded in `drift.md`, not widened.
+- S1 Tier-A re-review (`2026-08-13T21:00:39Z`): `PASS` through literal candidate
+  `01db2bd360ea15d8bd9b53fee5fc392678321f43` (PR comment `5286336338`). The reviewer confirmed the
+  unmatched-index boundary resolves to structured `ok:false`, retains actionable diagnostics, and
+  performs zero mutations; replacement receipts are 19/19 tests, zero check diagnostics, and zero
+  format findings. Supervisor sign-off: accepted for S1 behavior and authorized scope only. This
+  does not sign off S2, final gates, IMPL-EVAL, closure reconciliation, or merge readiness.
+- S2 pre-review reconcile (`2026-08-13T21:00:26Z`): the shared extractor now exposes a fence-aware
+  `parsed | absent | unparseable` inspection while retaining `extractVerdict()` compatibility. Bare,
+  heading, emphasis, and blockquote-plus-heading exact lines parse; placeholder/fenced lines stay
+  excluded. Both embedded workflow matchers accept the same wrapper surface, the trace records
+  `agent_verdict_state`, and the final marker/human summary distinguishes no marker from an invalid
+  emitted marker. The workflow test executes the embedded JavaScript matcher and validates the
+  checked-in shell regex. Focused test/check/format receipts are green; Tier-A review remains.
+- S2 Tier-A review (`2026-08-13T21:04:11Z`): `PASS` at literal candidate
+  `8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33` (PR comment `5286371075`). The reviewer confirmed
+  parity across bare/heading/emphasis/blockquote/optional-prefix parsing, exact token and exclusion
+  rules, trace plus summary/comment state propagation, valid comment fallback, compatibility API,
+  and executable workflow fixtures. The excluded-path lint attempt remains honestly NOT FIRED and
+  is not a binding gate. Supervisor sign-off: accepted for S2 behavior and authorized scope only.
+  Final structured gates, coordinator closure reconciliation, and IMPL-EVAL remain pending.
+- Pre-guidance contracted gates (`2026-08-13T21:12:52Z`): durable allowlisted `check`, `test`, and
+  `quality-job` all returned `PASS` with exit 0 at the signed-off implementation head
+  `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`. The quality job retained pre-existing non-blocking
+  `DEPS-NPM-CATALOG` warnings; it is not described as warning-free. Gate inspection found no
+  `deno.lock` or source churn. The coordinator interrupted packaging before any commit, so these
+  receipts are preserved only as pre-guidance history; the same three gates must run once at the
+  later acceptance-complete implementation head.
+- S3 closure reconcile (`2026-08-13T21:16:19Z`): no coordinator response yet resolves the
+  `netscript-pr` read-only decision against the live #1561/#1621 documentation criteria and the
+  binding `Closes` claims. The implementation can be handed to IMPL-EVAL with this conflict
+  explicit, but this leaf does not claim those documentation criteria or merge readiness.
+- S3 coordinator amendment (`2026-08-13T21:22:56Z`): control head
+  `33626b1f4752b3a0e53ea21407ff1ddb6af0fcfb` and PR comment `5286507468` supersede the earlier
+  read-only decision and authorize `.agents/skills/netscript-pr/SKILL.md` as the ninth and final
+  edit surface. The exact #1621 guidance is now present in the existing machine convention; no
+  other skill, source, workflow, tool, or test surface was added.
+- S3 evidence disposition (`2026-08-13T21:22:56Z`): the three receipts generated at
+  `b21424c44bf43077b4caf5702ef58b3e1d0c00b1` remain byte-for-byte preserved under
+  `receipts/pre-guidance/` and are explicitly historical. One new final structured
+  `check`/`test`/`quality-job` cycle will run only after the acceptance-complete guidance commit.
+- Evaluator hold (`2026-08-13T21:22:56Z`): formal native opposite-family IMPL-EVAL must not launch
+  before Saturday 2026-08-15 00:00 Europe/Zurich. No Claude, Fable, OpenRouter, DeepSeek, Minimax,
+  or substitute evaluator is authorized during this leaf turn; stop at the recorded handoff.
+- S3 Tier-A review (`2026-08-13T21:28:29Z`): `PASS` at literal candidate
+  `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`. Topic-orchestrator comments `5286578469` and
+  `5286595841` confirm the exact #1621 rule, its existing machine-convention placement, the amended
+  nine-file contract, remote-head identity, pre-guidance receipt classification, and absence of a
+  tenth implementation surface. The evidence-only commit containing this note is the S3 supervisor
+  sign-off; it does not provide or substitute for IMPL-EVAL.
+- S4 final gate cycle (`2026-08-13T21:30:32Z`): exactly one durable invocation each of `check`,
+  `test`, and `quality-job` returned `PASS` at acceptance-complete implementation head
+  `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`. Check and test wrote fresh structured child reports;
+  the quality job retained known non-blocking `DEPS-NPM-CATALOG` warnings and is not described as
+  warning-free. Git inspection after the cycle found only the five expected final JSON artifacts;
+  `deno.lock` and source files were unchanged.
+- S4 receipt relationship (`2026-08-13T21:31:14Z`): every final receipt records
+  `actualGitHead = 634b257ea1afcedb2d7f1da486d8c9e9432a2a86`. The evidence-only commit containing
+  these receipts and this note is its direct child; its literal SHA is recorded in the final PR
+  handoff comment. Gates are intentionally not rerun for that receipt-only child, avoiding an
+  infinite evidence self-reference loop.

@@ -5,6 +5,7 @@
 import type { DbEngineProvider } from '../../domain/db-engine.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../adapters/templates/template-asset.ts';
+import { renderProviderConnectionHelpers } from './generate-engine-mod.ts';
 
 /** Options for generating `prisma.config.ts`. */
 export interface PrismaConfigOptions {
@@ -30,14 +31,14 @@ export function generatePrismaConfig(
     ? `'file:./${options.databaseName ?? `${options.configKey}.db`}'`
     : "env('DATABASE_URL')";
   const prismaConfigImports = provider.engine === 'sqlite' ? 'defineConfig' : 'defineConfig, env';
+  const connectionHelpers = renderProviderConnectionHelpers(provider);
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedDatabaseGeneratePrismaConfig1, {
     __slot0__: String(provider.displayName),
-    __slot1__: String(provider.engine),
-    __slot2__: String(envKey),
-    __slot3__: String(fallbackUrl),
-    __slot4__: String(provider.engine),
-    __slot5__: String(prismaConfigImports),
+    __slot1__: String(envKey),
+    __slot2__: String(fallbackUrl),
+    __slot3__: String(prismaConfigImports),
+    __slot4__: String(connectionHelpers),
   });
 }
 

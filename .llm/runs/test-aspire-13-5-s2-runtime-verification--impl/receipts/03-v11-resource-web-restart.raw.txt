@@ -1,0 +1,4 @@
+Restarting resource 'aspire-13-5-postgres-web'...
+❌ Failed to restart resource 'aspire-13-5-postgres-web': Failed to stop resource 'aspire-13-5-postgres-web-ujngmpkt'.
+📄 See logs at /home/codex/.aspire/logs/cli_20260829T224602_e4754996.log
+🔍 See AppHost logs at /home/codex/.aspire/logs/cli_20260829T224113223_detach-child_ab597237a8e94a3da5e1b93d68629e3c.log

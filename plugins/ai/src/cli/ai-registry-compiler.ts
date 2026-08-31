@@ -84,6 +84,51 @@ export interface AiRegistryCompileResult {
   readonly written: boolean;
 }
 
+/** One generator-selected source set reported for a declared registry target. */
+export interface AiRegistryInspectionEntry {
+  /** Project-relative path of the declared generated registry. */
+  readonly registryPath: string;
+  /** Project-relative source files selected for that registry, in compiler order. */
+  readonly sourceFiles: readonly string[];
+}
+
+/** Version-1 read-only inspection document emitted by the AI registry generator. */
+export interface AiRegistryInspectionReport {
+  /** Inspection protocol version implemented by this document. */
+  readonly inspectionProtocol: 1;
+  /** Generator-selected source evidence for every declared target. */
+  readonly registries: readonly AiRegistryInspectionEntry[];
+}
+
+/** Select the source files the AI compiler would include, without writing a registry. */
+export async function selectAiRegistrySources(
+  files: ProjectFiles,
+  target: AiRegistryTarget,
+): Promise<readonly string[]> {
+  const discovered = (await listResourceFiles(files, target.dir, target.fileSuffixes))
+    .map((entry) => entry.relativePath.replaceAll('\\', '/'))
+    .filter((path) => isRegistryInput(path, target))
+    .sort((left, right) => left.localeCompare(right));
+  return target.kind === 'ai-tools'
+    ? await selectToolDefinitionModules(files, discovered)
+    : discovered;
+}
+
+/** Build the version-1 AI inspection report from the same selector used by compilation. */
+export async function inspectAiRegistries(
+  files: ProjectFiles,
+  targets: readonly AiRegistryTarget[],
+): Promise<AiRegistryInspectionReport> {
+  const registries: AiRegistryInspectionEntry[] = [];
+  for (const target of targets) {
+    registries.push({
+      registryPath: target.registryPath,
+      sourceFiles: await selectAiRegistrySources(files, target),
+    });
+  }
+  return { inspectionProtocol: 1, registries };
+}
+
 /**
  * Compile one AI runtime-registry target into its generated module.
  *
@@ -96,13 +141,7 @@ export async function compileAiRegistry(
   files: ProjectFiles,
   target: AiRegistryTarget,
 ): Promise<AiRegistryCompileResult> {
-  const discovered = (await listResourceFiles(files, target.dir, target.fileSuffixes))
-    .map((entry) => entry.relativePath.replaceAll('\\', '/'))
-    .filter((path) => isRegistryInput(path, target))
-    .sort((left, right) => left.localeCompare(right));
-  const inputs = target.kind === 'ai-tools'
-    ? await selectToolDefinitionModules(files, discovered)
-    : discovered;
+  const inputs = await selectAiRegistrySources(files, target);
 
   if (inputs.length === 0) {
     return { files: inputs, registryPath: target.registryPath, count: 0, written: false };

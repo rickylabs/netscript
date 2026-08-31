@@ -1,0 +1,6 @@
+.helpers/_aspire-compat.mts(10,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+.helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+Command exited with non-zero status 2
+
+__ELAPSED_SECONDS=6.30
+__MAX_RSS_KB=411168

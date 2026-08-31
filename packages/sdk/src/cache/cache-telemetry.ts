@@ -1,4 +1,5 @@
 import {
+  CacheAttributes,
   type CacheOperation,
   CacheOperations,
   type CacheOutcome,
@@ -73,7 +74,13 @@ const SYSTEM_PATTERN = /^[a-z0-9][a-z0-9._-]*$/;
 const VALID_TIERS = new Set<string>(Object.values(CacheTiers));
 const VALID_OUTCOMES = new Set<string>(Object.values(CacheOutcomes));
 const MAX_CACHE_TIERS = VALID_TIERS.size;
-
+const CACHE_NAMESPACE_BUDGET = 256;
+const CACHE_NAMESPACE_OVERFLOW = 'overflow';
+const CACHE_NAMESPACE_OVERFLOW_EVENT = 'cache.namespace.overflow';
+const CACHE_NAMESPACE_OFFENDING_ID = 'cache.namespace.offending_id';
+const admittedCacheNamespaces = new Set<string>();
+let cacheNamespaceOverflowRecorded = false;
+export type CacheNamespaceAdmission = Readonly<{ namespace: string; overflowId?: string }>;
 /** Normalize a caller-supplied operation identity to bounded cache namespace syntax. */
 export function normalizeCacheNamespace(value: string | undefined, fallback = 'direct'): string {
   const normalize = (candidate: string): string =>
@@ -86,6 +93,26 @@ export function normalizeCacheNamespace(value: string | undefined, fallback = 'd
       .slice(0, CACHE_NAMESPACE_MAX_LENGTH)
       .replace(/\.+$/g, '');
   return normalize(value ?? '') || normalize(fallback) || 'direct';
+}
+
+export function admitCacheNamespace(
+  value: string | undefined,
+  fallback = 'direct',
+): CacheNamespaceAdmission {
+  const normalized = normalizeCacheNamespace(value, fallback);
+  if (admittedCacheNamespaces.has(normalized)) return { namespace: normalized };
+  if (admittedCacheNamespaces.size < CACHE_NAMESPACE_BUDGET) {
+    admittedCacheNamespaces.add(normalized);
+    return { namespace: normalized };
+  }
+  if (cacheNamespaceOverflowRecorded) return { namespace: CACHE_NAMESPACE_OVERFLOW };
+  cacheNamespaceOverflowRecorded = true;
+  return { namespace: CACHE_NAMESPACE_OVERFLOW, overflowId: normalized };
+}
+
+export function resetCacheNamespaceRegistry(): void {
+  admittedCacheNamespaces.clear();
+  cacheNamespaceOverflowRecorded = false;
 }
 
 /** Create the standard OpenTelemetry-backed cache collaborator. */
@@ -117,7 +144,6 @@ export function createCacheSpanAttributes(
   namespace: string,
   descriptor: CacheProviderDescriptor,
 ): CacheSpanAttributes {
-  validateDescriptor(descriptor);
   return createCacheAttributes({
     operation,
     namespace,
@@ -126,6 +152,27 @@ export function createCacheSpanAttributes(
     inflightJoined: false,
     topologyComplete: true,
   });
+}
+
+export function recordCacheSpanPrologue(
+  span: CacheTelemetrySpan,
+  operation: CacheOperation,
+  admission: CacheNamespaceAdmission,
+  descriptor: CacheProviderDescriptor,
+  event: string,
+): void {
+  if (admission.overflowId !== undefined) {
+    span.addEvent(CACHE_NAMESPACE_OVERFLOW_EVENT, {
+      [CacheAttributes.OPERATION]: operation,
+      [CacheAttributes.NAMESPACE]: admission.namespace,
+      [CACHE_NAMESPACE_OFFENDING_ID]: admission.overflowId,
+    });
+  }
+  try {
+    validateDescriptor(descriptor);
+  } catch {
+    recordIncompleteTopology(span, operation, admission.namespace, descriptor, event);
+  }
 }
 
 /** Update the measured loader and in-flight-join facts on a logical span. */
@@ -167,7 +214,7 @@ function recordIncompleteTopology(
   namespace: string,
   descriptor: CacheProviderDescriptor,
   event: string,
-): never {
+): void {
   const attributes = createCacheAttributes({
     operation,
     namespace,
@@ -177,7 +224,6 @@ function recordIncompleteTopology(
   });
   span.setAttributes(attributes);
   span.addEvent(event, attributes);
-  throw new TypeError('Cache provider returned missing or invalid topology evidence');
 }
 
 function validateLookupChain(report: CacheReadTopologyReport): void {
@@ -255,13 +301,14 @@ export function recordCacheLookup(
   try {
     validateLookupChain(report);
   } catch {
-    return recordIncompleteTopology(
+    recordIncompleteTopology(
       span,
       CacheOperations.READ,
       namespace,
       descriptor,
       CacheEvents.LOOKUP,
     );
+    return CacheOutcomes.ERROR;
   }
 
   const lastIndex = report.lookups.length - 1;
@@ -325,6 +372,7 @@ export function recordCacheWrite(
     report.promotions.forEach(validateWriteReport);
   } catch {
     recordIncompleteTopology(span, operation, namespace, descriptor, CacheEvents.WRITE);
+    return;
   }
 
   for (const write of report.writes) {
@@ -343,6 +391,7 @@ export function recordCacheInvalidation(
   descriptor: CacheProviderDescriptor,
   reports: readonly CacheInvalidationTopologyReport[],
 ): void {
+  type Invalidation = CacheInvalidationTopologyReport['invalidations'][0];
   if (reports.length === 0) {
     span.setAttributes(createCacheAttributes({
       operation: CacheOperations.INVALIDATE,
@@ -353,11 +402,10 @@ export function recordCacheInvalidation(
     return;
   }
 
-  const invalidationsByTier = new Map<
-    string,
-    CacheInvalidationTopologyReport['invalidations'][0]
-  >();
+  const invalidationsByTier = new Map<string, Invalidation>();
+  let topologyComplete = true;
   for (const report of reports) {
+    const stagedInvalidations = new Map<string, Invalidation>();
     try {
       if (
         !report.topologyComplete || report.invalidations.length === 0 ||
@@ -370,16 +418,21 @@ export function recordCacheInvalidation(
         if (invalidation.outcome !== undefined) {
           validateOutcome(invalidation.outcome);
         }
-        const existing = invalidationsByTier.get(invalidation.tier);
+        const existing = stagedInvalidations.get(invalidation.tier) ??
+          invalidationsByTier.get(invalidation.tier);
         if (
           existing &&
           (existing.system !== invalidation.system || existing.outcome !== invalidation.outcome)
         ) {
           throw new TypeError('Cache invalidation tier reports must be consistent');
         }
-        invalidationsByTier.set(invalidation.tier, invalidation);
+        stagedInvalidations.set(invalidation.tier, invalidation);
+      }
+      for (const [tier, invalidation] of stagedInvalidations) {
+        invalidationsByTier.set(tier, invalidation);
       }
     } catch {
+      topologyComplete = false;
       recordIncompleteTopology(
         span,
         CacheOperations.INVALIDATE,
@@ -404,7 +457,7 @@ export function recordCacheInvalidation(
     operation: CacheOperations.INVALIDATE,
     namespace,
     ...descriptor,
-    topologyComplete: true,
+    topologyComplete,
   }));
 }
 

@@ -12,7 +12,7 @@
 
 import type { ToolCall, ToolDescriptor, ToolResult } from '../../contracts/tool.ts';
 import { ToolNotFoundError } from '../../contracts/errors.ts';
-import type { ToolHandler } from '../../ports/tool-registry.ts';
+import type { ToolHandler, ToolInvocationOptions } from '../../ports/tool-registry.ts';
 import type {
   AiToolDefinition,
   AiToolExecutionResult,
@@ -33,11 +33,25 @@ function toToolResult(toolCallId: string, result: AiToolExecutionResult): ToolRe
   return { toolCallId, content, state: 'complete' };
 }
 
-/** Bridge a rich definition to a port {@link ToolHandler}. */
+/**
+ * Bridge a rich definition to a port {@link ToolHandler}.
+ *
+ * The caller's {@link ToolInvocationOptions} — the agent loop's abort signal and
+ * the run's `RequestContext` — are mapped onto the definition's
+ * {@link AiToolInvocationContext}, whose `metadata` is documented for exactly
+ * this payload ("tracing, tenant, auth subject, …"). Without this mapping the
+ * loop path would keep dropping both, and `metadata` would stay a documented
+ * field with no supported way to populate it.
+ */
 function bridgeHandler(definition: AiToolDefinition): ToolHandler {
-  return async (call: ToolCall): Promise<ToolResult> => {
+  return async (call: ToolCall, options?: ToolInvocationOptions): Promise<ToolResult> => {
     const rawInput: unknown = call.arguments ? JSON.parse(call.arguments) : {};
-    const result = await definition.execute(rawInput, { toolCallId: call.id });
+    const context: AiToolInvocationContext = {
+      toolCallId: call.id,
+      ...(options?.signal === undefined ? {} : { signal: options.signal }),
+      ...(options?.context === undefined ? {} : { metadata: options.context }),
+    };
+    const result = await definition.execute(rawInput, context);
     return toToolResult(call.id, result);
   };
 }

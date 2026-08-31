@@ -37,6 +37,16 @@ Deno.test('defineConfig: accepts legacy project and TS entrypoint AppHost paths'
   assertEquals(modern.aspire?.appHost, 'aspire/apphost.mts');
 });
 
+Deno.test('defineConfig: defaults Aspire to the generated TypeScript AppHost entrypoint', () => {
+  const config = defineConfig({
+    name: 'modern-default',
+    databases: { config: [] },
+    aspire: {},
+  });
+
+  assertEquals(config.aspire?.appHost, './aspire/apphost.mts');
+});
+
 Deno.test('defineConfig: accepts a deploy.targets.windows target', () => {
   const config = defineConfig({
     name: 'orders',

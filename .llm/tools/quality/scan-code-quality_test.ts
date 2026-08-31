@@ -1,6 +1,35 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
-import { scanCodeQuality } from './scan-code-quality.ts';
+import {
+  type AllowanceIssueResolver,
+  type AllowanceIssueState,
+  createGitHubAllowanceIssueResolver,
+  scanCodeQuality,
+  scanCodeQualityDetailed,
+} from './scan-code-quality.ts';
+
+const OPEN_BACKLOG_OWNER: AllowanceIssueState = {
+  issue: 1276,
+  state: 'open',
+  milestone: 'Backlog / Triage',
+};
+
+function allowanceResolver(
+  states: ReadonlyMap<number, AllowanceIssueState | Error> = new Map([
+    [1276, OPEN_BACKLOG_OWNER],
+  ]),
+  calls: number[] = [],
+): AllowanceIssueResolver {
+  return {
+    resolve(issue: number): Promise<AllowanceIssueState> {
+      calls.push(issue);
+      const state = states.get(issue);
+      if (state instanceof Error) return Promise.reject(state);
+      if (!state) return Promise.reject(new Error(`missing fixture for #${issue}`));
+      return Promise.resolve(state);
+    },
+  };
+}
 
 Deno.test('scanner reports every guarded quality rule and honors reasoned line allowances', async () => {
   const root = await Deno.makeTempDir();
@@ -13,10 +42,12 @@ Deno.test('scanner reports every guarded quality rule and honors reasoned line a
       'type Value = Map<any, string>;',
       'const cast = value as unknown as Value;',
       "if (plugin.name === 'auth') return;",
-      'const allowed: any = value; // quality-allow: upstream untyped boundary',
+      'const allowed: any = value; // quality-allow: #1276 — upstream untyped boundary',
     ].join('\n'),
   );
-  const findings = await scanCodeQuality(['packages/cli/src'], root);
+  const findings = await scanCodeQuality(['packages/cli/src'], root, {
+    allowanceIssueResolver: allowanceResolver(),
+  });
   assertEquals(findings.map((finding) => finding.rule), [
     'explicit-any-ignore',
     'explicit-any',
@@ -280,7 +311,7 @@ Deno.test('scanner CLI fails when an allowance fixture exceeds --max-allow', asy
   const fixture = join(root, 'allowed.ts');
   await Deno.writeTextFile(
     fixture,
-    'const boundary: any = value; // quality-allow: fixture proves budget overflow\n',
+    'const boundary: any = value; // quality-allow: #1276 — fixture proves budget overflow\n',
   );
   const output = await new Deno.Command(Deno.execPath(), {
     cwd: root,
@@ -298,4 +329,309 @@ Deno.test('scanner CLI fails when an allowance fixture exceeds --max-allow', asy
   assertEquals(output.code, 1);
   const result = JSON.parse(new TextDecoder().decode(output.stdout));
   assertEquals(result.allowLimitExceeded, { limit: 0, count: 1 });
+});
+
+Deno.test('allowance records require one linked issue and one specific reason', async () => {
+  const root = await Deno.makeTempDir();
+  const source = join(root, 'packages/cli/src/allowances.ts');
+  await Deno.mkdir(join(root, 'packages/cli/src'), { recursive: true });
+  await Deno.writeTextFile(
+    source,
+    [
+      'const unlinked = value as unknown as string; // quality-allow: legacy reason only',
+      'const missing = value as unknown as string; // quality-allow: #1276 —',
+      'const multiple = value as unknown as string; // quality-allow: #1276 — blocked by #1655',
+      'const delimiter = value as unknown as string; // quality-allow: #1276 - ASCII delimiter',
+    ].join('\n'),
+  );
+
+  const result = await scanCodeQualityDetailed(['packages/cli/src'], root, {
+    allowanceIssueResolver: allowanceResolver(),
+  });
+  assertEquals(result.allowances, []);
+  assertEquals(result.allowanceFailures.map((failure) => failure.kind), [
+    'malformed-registration',
+    'malformed-registration',
+    'malformed-registration',
+    'malformed-registration',
+  ]);
+});
+
+Deno.test('allowance resolver accepts Backlog / Triage owners and deduplicates issue lookups', async () => {
+  const root = await Deno.makeTempDir();
+  const source = join(root, 'packages/cli/src/allowances.ts');
+  await Deno.mkdir(join(root, 'packages/cli/src'), { recursive: true });
+  await Deno.writeTextFile(
+    source,
+    [
+      'const first = value as unknown as string; // quality-allow: #1276 — first bridge',
+      'const second = value as unknown as string; // quality-allow: #1276 — second bridge',
+    ].join('\n'),
+  );
+  const calls: number[] = [];
+
+  const result = await scanCodeQualityDetailed(['packages/cli/src'], root, {
+    allowanceIssueResolver: allowanceResolver(undefined, calls),
+  });
+  assertEquals(result.allowanceFailures, []);
+  assertEquals(result.allowances.map((allowance) => allowance.issue), [1276, 1276]);
+  assertEquals(calls, [1276]);
+});
+
+Deno.test('allowance owners fail closed when closed, unmilestoned, or unavailable', async () => {
+  const root = await Deno.makeTempDir();
+  const source = join(root, 'packages/cli/src/allowances.ts');
+  await Deno.mkdir(join(root, 'packages/cli/src'), { recursive: true });
+  await Deno.writeTextFile(
+    source,
+    [
+      'const closed = value as unknown as string; // quality-allow: #1276 — closed owner',
+      'const unmilestoned = value as unknown as string; // quality-allow: #1655 — no milestone',
+      'const unavailable = value as unknown as string; // quality-allow: #9999 — offline lookup',
+    ].join('\n'),
+  );
+  const resolver = allowanceResolver(
+    new Map<number, AllowanceIssueState | Error>([
+      [1276, { issue: 1276, state: 'closed', milestone: 'Backlog / Triage' }],
+      [1655, { issue: 1655, state: 'open', milestone: null }],
+      [9999, new Error('offline')],
+    ]),
+  );
+
+  const result = await scanCodeQualityDetailed(['packages/cli/src'], root, {
+    allowanceIssueResolver: resolver,
+  });
+  assertEquals(result.allowanceFailures.map((failure) => failure.kind), [
+    'owner-closed',
+    'owner-unmilestoned',
+    'owner-unavailable',
+  ]);
+});
+
+Deno.test('GitHub resolver fails closed offline and at the anonymous rate limit', async () => {
+  const root = await Deno.makeTempDir();
+  const source = join(root, 'packages/cli/src/allowance.ts');
+  await Deno.mkdir(join(root, 'packages/cli/src'), { recursive: true });
+  await Deno.writeTextFile(
+    source,
+    'const boundary = value as unknown as string; // quality-allow: #1276 — network owner\n',
+  );
+  const offline = createGitHubAllowanceIssueResolver({
+    token: null,
+    fetch: () => Promise.reject(new TypeError('network unreachable')),
+  });
+  const rateLimited = createGitHubAllowanceIssueResolver({
+    token: null,
+    fetch: () =>
+      Promise.resolve(
+        new Response('{"message":"API rate limit exceeded"}', {
+          status: 403,
+          headers: { 'content-type': 'application/json', 'x-ratelimit-remaining': '0' },
+        }),
+      ),
+  });
+
+  const offlineResult = await scanCodeQualityDetailed(['packages/cli/src'], root, {
+    allowanceIssueResolver: offline,
+  });
+  const rateResult = await scanCodeQualityDetailed(['packages/cli/src'], root, {
+    allowanceIssueResolver: rateLimited,
+  });
+  assertEquals(offlineResult.allowanceFailures[0].kind, 'owner-unavailable');
+  assertStringIncludes(offlineResult.allowanceFailures[0].message, 'network unreachable');
+  assertEquals(rateResult.allowanceFailures[0].kind, 'owner-unavailable');
+  assertStringIncludes(rateResult.allowanceFailures[0].message, 'HTTP 403');
+});
+
+Deno.test('GitHub resolver supports tokenless forks against the fixed public owner repository', async () => {
+  const root = await Deno.makeTempDir();
+  const source = join(root, 'packages/cli/src/allowance.ts');
+  await Deno.mkdir(join(root, 'packages/cli/src'), { recursive: true });
+  await Deno.writeTextFile(
+    source,
+    'const boundary = value as unknown as string; // quality-allow: #1276 — fork-safe owner\n',
+  );
+  let requestedUrl = '';
+  let authorization: string | null = 'unexpected';
+  const resolver = createGitHubAllowanceIssueResolver({
+    token: null,
+    fetch: (input, init) => {
+      requestedUrl = String(input);
+      authorization = new Headers(init?.headers).get('authorization');
+      return Promise.resolve(
+        Response.json({
+          number: 1276,
+          state: 'open',
+          milestone: { title: 'Backlog / Triage' },
+        }),
+      );
+    },
+  });
+
+  const result = await scanCodeQualityDetailed(['packages/cli/src'], root, {
+    allowanceIssueResolver: resolver,
+  });
+  assertEquals(result.allowanceFailures, []);
+  assertEquals(requestedUrl, 'https://api.github.com/repos/rickylabs/netscript/issues/1276');
+  assertEquals(authorization, null);
+});
+
+Deno.test('public-any reports exported declarations and excludes local-only controls', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'mod.ts'),
+    [
+      'export type Direct = any;',
+      'export type Multiline =',
+      '  | string',
+      '  | any;',
+      'export function load<',
+      '  Value = any,',
+      '>(',
+      '  value: Value,',
+      '): any {',
+      '  return value;',
+      '}',
+      'export interface PublicPort {',
+      '  payload: any;',
+      '}',
+      'export class PublicService {',
+      '  read(input: any): string {',
+      '    return String(input);',
+      '  }',
+      '  private hidden: any;',
+      '}',
+      'export const publicValue: any = source;',
+      'export function bodyOnly(): void { const hidden: any = source; }',
+      'export const prose = "any in a string is not a public type";',
+      '// any in exported API prose is not a type token',
+      'type Local = { payload: any };',
+      'function local(value: any): any { return value; }',
+      'class LocalService { field: any; }',
+    ].join('\n'),
+  );
+
+  const findings = await scanCodeQuality(['packages/example'], root);
+  assertEquals(
+    findings
+      .map((finding) => `${finding.rule}:${finding.file}:${finding.line}`)
+      .filter((finding) => finding.startsWith('public-any:')),
+    [
+      'public-any:packages/example/mod.ts:1',
+      'public-any:packages/example/mod.ts:4',
+      'public-any:packages/example/mod.ts:6',
+      'public-any:packages/example/mod.ts:9',
+      'public-any:packages/example/mod.ts:13',
+      'public-any:packages/example/mod.ts:16',
+      'public-any:packages/example/mod.ts:21',
+    ],
+  );
+});
+
+Deno.test('public-any follows named and star re-exports without exposing sibling locals', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: { '.': './mod.ts' } }),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'mod.ts'),
+    [
+      "export { PublicAlias } from './named.ts';",
+      "export * from './star.ts';",
+    ].join('\n'),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'named.ts'),
+    [
+      'export type PublicAlias = { value: any };',
+      'export type HiddenAlias = { value: any };',
+    ].join('\n'),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'star.ts'),
+    [
+      'export interface StarPort { send(value: any): void; }',
+      'type StarLocal = { value: any };',
+    ].join('\n'),
+  );
+
+  const findings = await scanCodeQuality(['packages/example'], root);
+  assertEquals(
+    findings
+      .map((finding) => `${finding.rule}:${finding.file}:${finding.line}`)
+      .filter((finding) => finding.startsWith('public-any:')),
+    [
+      'public-any:packages/example/named.ts:1',
+      'public-any:packages/example/star.ts:1',
+    ],
+  );
+  assertEquals(
+    findings
+      .filter((finding) => finding.rule === 'public-any')
+      .map((finding) => ({
+        kind: finding.declarationKind,
+        path: finding.exportPath,
+      })),
+    [
+      {
+        kind: 'type',
+        path: 'packages/example/mod.ts -> PublicAlias -> packages/example/named.ts -> PublicAlias',
+      },
+      {
+        kind: 'interface',
+        path: 'packages/example/mod.ts -> * -> packages/example/star.ts -> StarPort',
+      },
+    ],
+  );
+});
+
+Deno.test('public export graph fails closed for an unresolved local edge', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(join(packageRoot, 'mod.ts'), "export * from './missing.ts';\n");
+
+  const findings = await scanCodeQuality(['packages/example'], root);
+  assertEquals(findings.map((finding) => `${finding.rule}:${finding.file}:${finding.line}`), [
+    'public-export-unresolved:packages/example/mod.ts:1',
+  ]);
+});
+
+Deno.test('public-only any tokens require the same verified allowance record', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'mod.ts'),
+    [
+      'export type Allowed = any; // quality-allow: #1276 — upstream public boundary',
+      'export type Malformed = any; // quality-allow: missing issue owner',
+    ].join('\n'),
+  );
+
+  const result = await scanCodeQualityDetailed(['packages/example'], root, {
+    allowanceIssueResolver: allowanceResolver(),
+  });
+  assertEquals(result.findings, []);
+  assertEquals(result.allowances.map((allowance) => allowance.issue), [1276]);
+  assertEquals(result.allowanceFailures.map((failure) => failure.kind), [
+    'malformed-registration',
+  ]);
 });

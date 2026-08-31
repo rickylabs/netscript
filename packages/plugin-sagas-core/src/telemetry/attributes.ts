@@ -26,6 +26,8 @@ export type SagaAttributesMap = Readonly<{
   SAGA_ATTEMPT: 'netscript.saga.attempt';
   SAGA_DURABILITY_TIER: 'netscript.saga.durability_tier';
   SAGA_CORRELATION_KEY: 'netscript.saga.correlation_key';
+  CORRELATION_ID: 'netscript.correlation.id';
+  SAGA_RESULT_PRESENT: 'netscript.saga.result.present';
   TARGET_JOB_ID: 'netscript.job.target.id';
   IDEMPOTENCY_KEY: 'netscript.idempotency.key';
   RETRY_MAX_ATTEMPTS: 'netscript.retry.max_attempts';
@@ -50,6 +52,8 @@ export const SagaAttributes: SagaAttributesMap = Object.freeze({
   SAGA_ATTEMPT: 'netscript.saga.attempt',
   SAGA_DURABILITY_TIER: 'netscript.saga.durability_tier',
   SAGA_CORRELATION_KEY: 'netscript.saga.correlation_key',
+  CORRELATION_ID: 'netscript.correlation.id',
+  SAGA_RESULT_PRESENT: 'netscript.saga.result.present',
   TARGET_JOB_ID: 'netscript.job.target.id',
   IDEMPOTENCY_KEY: 'netscript.idempotency.key',
   RETRY_MAX_ATTEMPTS: 'netscript.retry.max_attempts',

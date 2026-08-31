@@ -1,0 +1,11 @@
+Supplemental evidence (outside the named eight receipts)
+Content head: 42874803e572a5746834880e387501f0948c7362
+Command: deno test --allow-all packages/contracts
+Exit code: 0
+
+Result: 16 passed, 0 failed.
+
+The assertion-budget suite passed 5 tests, including
+`base contract initializer remains pinned to NetScript procedure metadata`. The remaining 11 tests
+cover the contracts root, errors, procedure-metadata independence/inference/runtime storage, and
+schema types.

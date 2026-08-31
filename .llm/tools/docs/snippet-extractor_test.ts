@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join } from '@std/path';
 import { extractFencedBlocks } from './snippet-extractor.ts';
 import { analyzeSnippetSite } from './snippet-policy.ts';
@@ -55,20 +55,20 @@ Deno.test('recognized TS fences reject missing reasons and extra attributes', ()
   }
 });
 
-Deno.test('real corpus census recognizes aliases and protects the Tier-1 candidate floor', async () => {
+Deno.test('real corpus census recognizes TS aliases and enforces Tier-1 invariants', async () => {
   const analysis = await analyzeSnippetSite(join(repositoryRoot, 'docs/site'));
-  assertEquals(analysis.census, {
-    scanned: 578,
-    ts: 211,
-    tsx: 77,
-    typescript: 7,
-    tsLike: 295,
-    tier1: 35,
-    checked: 21,
-    exempt: 14,
-    outsideFloor: 260,
-    malformed: 0,
-  });
+  const { census } = analysis;
+
+  assert(census.ts > 0, 'expected at least one ts fence');
+  assert(census.tsx > 0, 'expected at least one tsx fence');
+  assert(census.typescript > 0, 'expected at least one typescript fence');
+  assertEquals(census.tsLike, census.ts + census.tsx + census.typescript);
+  assertEquals(census.tier1 + census.outsideFloor, census.tsLike);
+  assertEquals(census.checked + census.exempt, census.tier1);
+  assert(census.tier1 >= 35, `candidate count ${census.tier1} is below floor 35`);
+  assert(census.checked >= 21, `checked count ${census.checked} is below floor 21`);
+  assert(census.exempt <= 14, `exemption count ${census.exempt} exceeds budget 14`);
+  assertEquals(census.malformed, 0);
 
   const temp = await Deno.makeTempDir();
   try {

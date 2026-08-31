@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "ns1502-plan-fix1-check-cli-plugin",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--include",
+    "^packages/(cli|plugin)/"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1502",
+  "gitHead": "d71b78c3116db4ec3aaaa0447dd527fcd4867f6f",
+  "actualGitHead": "d71b78c3116db4ec3aaaa0447dd527fcd4867f6f",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2218169",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "bbe4c23b01ca730d7a9e6fa6a63b13756e11d25efb5424fcbaaecab2216ccce2",
+  "lifecycleId": "worker:2218169:ns1502-plan-fix1-check-cli-plugin:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T20:56:54.017Z",
+  "startedAt": "2026-08-13T20:56:54.019Z",
+  "finishedAt": "2026-08-13T20:58:09.228Z",
+  "durationMs": 71003,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 295,
+    "sha256": "1fe0e132db5eb80a8ba507b205ac1b60c3631ccfa349776d6f925e1c2ae01712",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-features-1502\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1033,\"batches\":9,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 230,
+    "sha256": "46d960768a1a5f06330bf57e4d2330feddd16de7ad92bd778a03f981b2716c5d",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(cli|plugin)/'\n",
+    "truncated": false
+  }
+}

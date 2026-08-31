@@ -94,11 +94,10 @@ typed client when no provider exists in the browser. The key, mutation options, 
 helpers remain pure functions over the resource name, action name, and input. Call an explicitly
 provider-backed method from client code and the error tells you so:
 
+The angle-bracket token `<resolved import.meta.url>` stands for the install-specific resolved module URL.
+
 ```text
-[NetScript SDK] Cache provider not initialized. Add `import '@netscript/sdk/cache';` to your server
-entrypoint to register it, or call setCacheProvider(cacheQuery) during server bootstrap. If you see
-this in the browser, a server-only cache method (query, prefetch, getCachedData, getCachedEntry,
-invalidate) was called from client-side code — use queryOptions/mutationOptions/clientKey instead.
+[NetScript SDK] Cache provider not initialized in module <resolved import.meta.url>. Call `setCacheProvider(cacheQuery)` during server bootstrap. `defineFreshApp()` does this for NetScript-managed Fresh apps. If initialization already ran, one possibility is that two `@netscript/sdk` module instances are loaded; check that `@netscript/fresh`, its subpaths, and `@netscript/sdk` resolve to one version. If you see this in the browser, a server-only cache method (query, prefetch, getCachedData, getCachedEntry, invalidate) was called from client-side code — use queryOptions/mutationOptions/clientKey instead.
 ```
 
 ## Two key tiers, deliberately not merged
@@ -292,37 +291,33 @@ forgot.
 Guidance that holds: **props by default; dehydrate when one island needs several prefetched
 queries.** Both paths can preserve server entry age.
 
-## The import that makes any of this work
+## The bootstrap call that makes server caching work
 
 `getCachedEntry` reaches `getCacheProvider()`, and the provider is `null` until something registers
-it. Nothing in a scaffolded app appears to do that — and yet it works, because
-`@netscript/fresh/server` performs a bare side-effect import in the module that defines
-`defineFreshApp`:
+it. NetScript-managed Fresh apps make that registration explicit inside `defineFreshApp()`:
 
 ```ts
 // packages/fresh/src/runtime/server/define-fresh-app.ts
-// Server-only: register the KV-backed cache provider so that SDK
-// query-factory and composite-query cache methods work automatically.
-import '@netscript/sdk/cache';
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
+
+export function defineFreshApp(options = {}) {
+  setCacheProvider(cacheQuery);
+  // construct and configure the Fresh app
+}
 ```
 
-`@netscript/sdk/cache`'s module body calls `setCacheProvider(cacheQuery)` at import time. So merely
-evaluating the `/server` subpath — importing it for anything, not calling `defineFreshApp` —
-registers the KV-backed engine, which is why a page loader can call `getCachedEntry()` with no
-visible wiring anywhere in the app. The scaffold also emits the same import into the generated entrypoint when the app is
-created with caching, so the registration survives even if the bootstrap is later restructured.
+Both `@netscript/sdk` and `@netscript/sdk/cache` are load-time pure. Merely evaluating the SDK root,
+the cache entry, or `@netscript/fresh/server` does not mutate the provider registry. Calling
+`defineFreshApp()` installs the shared engine before it constructs or configures the app, so a page
+loader can call `getCachedEntry()` without additional wiring in a generated Fresh app.
 
-Two consequences follow from it being an import side effect rather than a call you make:
+Two consequences follow from the explicit call:
 
 - **The registration is process-global, not per-app.** `setCacheProvider` writes one module-scoped
   reference. Two Fresh apps in one process share the provider.
-- **The trigger is the import, not the call.** `@netscript/fresh/server` re-exports the module whose
-  body performs the side-effect import, so anything that evaluates that subpath registers the
-  provider — including a module that hand-rolls `new App()` while importing `/server` for something
-  else. What loses the registration is an entry point that never imports the subpath at all, or a
-  test that exercises a loader in isolation: the first `getCachedEntry()` then throws the message
-  above. `import '@netscript/sdk/cache';` in the test setup, or an explicit
-  `setCacheProvider(cacheQuery)`, fixes it; `resetCacheProvider()` clears it again between tests.
+- **The trigger is the call, not the import.** A module that hand-rolls `new App()` must call
+  `setCacheProvider(cacheQuery)` in its own server composition root. A test that exercises a loader
+  in isolation must do the same in setup; `resetCacheProvider()` clears the registry between tests.
 
 ## What to watch for
 
@@ -360,7 +355,7 @@ Two consequences follow from it being an import side effect rather than a call y
   { title: "Data loading and the query cache", body: "QueryIsland, the island hooks, and mutations.", href: "/web-layer/query/" },
   { title: "Request-scoped resources", body: "Read the cache entry once, share it across layers.", href: "/web-layer/resources/" },
   { title: "Typed SDK & client", body: "createServiceClient and the contract the factory is built from.", href: "/services-sdk/sdk/" },
-  { title: "The Fresh page model", body: "defineFreshApp and the server subpath whose evaluation registers the cache.", href: "/web-layer/server/" },
+  { title: "The Fresh page model", body: "defineFreshApp and its explicit server-cache registration.", href: "/web-layer/server/" },
   { title: "Interactive islands", body: "Where island code runs and what it may import.", href: "/web-layer/interactive/" },
   { title: "Live dashboard tutorial", body: "A loader, a dehydrated prefetch, and a hydrated island.", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }
 ] }) }}

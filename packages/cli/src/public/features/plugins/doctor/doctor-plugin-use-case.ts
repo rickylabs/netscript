@@ -16,10 +16,9 @@ import { resolvePluginImportSpecifier } from '../../../../kernel/application/plu
 import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
 import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config-resolvers.ts';
-import {
-  JsrExportMapHttpError,
-  type JsrExportMapLoader,
-} from './jsr-export-map-loader-port.ts';
+import { JsrExportMapHttpError, type JsrExportMapLoader } from './jsr-export-map-loader-port.ts';
+import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
+import { checkRuntimeRegistryDrift } from './runtime-registry-drift.ts';
 
 export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
 export const CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK = 'configured-module-exports-manifest';
@@ -79,6 +78,8 @@ export interface PluginDoctorDependencies {
   readonly loadJsrExportMap?: JsrExportMapLoader;
   /** Inspect the running Aspire AppHost for configured resource truth. */
   readonly inspectAppHost?: AppHostInspector;
+  /** Inspect manifest-declared runtime registries without regenerating them. */
+  readonly inspectRuntimeRegistries?: GenerateInstalledPluginRegistries;
 }
 
 /** One named resource observed from a running AppHost. */
@@ -118,6 +119,7 @@ export async function doctorPlugin(
     pluginSpecs.map((spec) => checkConfiguredModule(input.projectRoot, spec, dependencies)),
   );
   const serviceChecks = await checkServiceEntrypoints(input.projectRoot, dependencies);
+  const runtimeRegistryReport = await diagnoseRuntimeRegistries(input.projectRoot, dependencies);
   const appHostReport = dependencies.inspectAppHost
     ? await diagnoseAppHost(input.projectRoot, config, dependencies.inspectAppHost)
     : undefined;
@@ -125,7 +127,7 @@ export async function doctorPlugin(
     const serviceReport = serviceChecks.some((entry) => entry.check.status === 'error')
       ? workspaceChecksReport(serviceChecks)
       : undefined;
-    return [appHostReport, serviceReport].filter(isPluginDoctorReport);
+    return [appHostReport, runtimeRegistryReport, serviceReport].filter(isPluginDoctorReport);
   }
 
   let plugins: Record<string, RegisteredPluginConfig>;
@@ -134,7 +136,9 @@ export async function doctorPlugin(
       ? await dependencies.loadRegisteredPlugins(input.projectRoot, config)
       : await loadRegisteredPluginMetadata(input.projectRoot, config);
   } catch (error) {
-    return [workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error)];
+    return [
+      workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error),
+    ];
   }
 
   const pluginEntries = Object.entries(plugins);
@@ -155,7 +159,34 @@ export async function doctorPlugin(
   const unmatchedServiceReport = unmatchedServiceChecks.length > 0
     ? workspaceChecksReport(unmatchedServiceChecks)
     : undefined;
-  return [appHostReport, ...reports, unmatchedServiceReport].filter(isPluginDoctorReport);
+  return [appHostReport, runtimeRegistryReport, ...reports, unmatchedServiceReport].filter(
+    isPluginDoctorReport,
+  );
+}
+
+async function diagnoseRuntimeRegistries(
+  projectRoot: string,
+  dependencies: PluginDoctorDependencies,
+): Promise<PluginDoctorReport | undefined> {
+  if (!dependencies.inspectRuntimeRegistries) return undefined;
+  try {
+    const registries = await dependencies.inspectRuntimeRegistries({
+      dryRun: true,
+      projectRoot,
+    });
+    const checks = await checkRuntimeRegistryDrift({
+      fs: dependencies.fs,
+      projectRoot,
+      registries,
+    });
+    return { pluginName: 'workspace', status: aggregateStatus(checks), checks };
+  } catch (error) {
+    return workspaceErrorReport(
+      'runtime-registry:inspection',
+      'Runtime registry inspection',
+      error,
+    );
+  }
 }
 
 async function diagnoseAppHost(
@@ -215,7 +246,9 @@ async function diagnoseAppHost(
           ? 'Running and healthy'
           : status === 'warning'
           ? `Resource "${name}" reports Healthy but has no readiness evidence.`
-          : `Resource "${name}" is ${resource.state ?? 'unknown'} / ${resource.healthStatus ?? 'unknown'}.`,
+          : `Resource "${name}" is ${resource.state ?? 'unknown'} / ${
+            resource.healthStatus ?? 'unknown'
+          }.`,
       };
     });
     return { pluginName: 'apphost', status: aggregateStatus(checks), checks };
@@ -228,11 +261,13 @@ function configuredResourceNames(config: NetScriptConfig): readonly string[] {
   const databaseNames = config.databases.config.flatMap((database) =>
     database.name ? [database.name] : []
   );
-  return [...new Set([
-    ...Object.keys(config.services ?? {}),
-    ...Object.keys(config.apps ?? {}),
-    ...databaseNames,
-  ])].sort();
+  return [
+    ...new Set([
+      ...Object.keys(config.services ?? {}),
+      ...Object.keys(config.apps ?? {}),
+      ...databaseNames,
+    ]),
+  ].sort();
 }
 
 async function diagnosePlugin(
@@ -283,8 +318,12 @@ async function checkConfiguredModule(
     const path = fromFileUrl(importSpecifier);
     if (!await dependencies.fs.exists(path)) {
       return [
-        check(CONFIGURED_MODULE_RESOLVES_CHECK, CONFIGURED_MODULE_RESOLVES_TITLE, 'error',
-          `Configured plugin module "${spec}" does not exist at ${path}.`),
+        check(
+          CONFIGURED_MODULE_RESOLVES_CHECK,
+          CONFIGURED_MODULE_RESOLVES_TITLE,
+          'error',
+          `Configured plugin module "${spec}" does not exist at ${path}.`,
+        ),
         check(
           CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK,
           CONFIGURED_MODULE_EXPORTS_MANIFEST_TITLE,
@@ -302,11 +341,11 @@ async function checkConfiguredModule(
     CONFIGURED_MODULE_RESOLVES_CHECK,
     CONFIGURED_MODULE_RESOLVES_TITLE,
     localModule || probe.status === 'resolved' || probe.status === 'missing' ||
-        probe.status === 'ambiguous'
+      probe.status === 'ambiguous'
       ? 'healthy'
       : 'error',
     localModule || probe.status === 'resolved' || probe.status === 'missing' ||
-        probe.status === 'ambiguous'
+      probe.status === 'ambiguous'
       ? spec
       : formatProbeFailure(spec, probe),
   );
@@ -585,7 +624,9 @@ async function checkPermissions(
       id: 'permissions',
       title: 'Permission metadata',
       status: 'warning',
-      message: `${permissions.join(' ')} (explicit override differs from published default: ${published.join(' ')})`,
+      message: `${permissions.join(' ')} (explicit override differs from published default: ${
+        published.join(' ')
+      })`,
     };
   }
   return {
@@ -628,11 +669,13 @@ async function readPermissionSettings(
 
 function permissionEntries(value: unknown): ReadonlyMap<string, readonly string[]> {
   if (!isRecord(value)) return new Map();
-  return new Map(Object.entries(value).flatMap(([name, entry]) => {
-    if (!isRecord(entry)) return [];
-    const permissions = stringArray(entry.Permissions);
-    return permissions ? [[name, permissions] as const] : [];
-  }));
+  return new Map(
+    Object.entries(value).flatMap(([name, entry]) => {
+      if (!isRecord(entry)) return [];
+      const permissions = stringArray(entry.Permissions);
+      return permissions ? [[name, permissions] as const] : [];
+    }),
+  );
 }
 
 function stringArray(value: unknown): readonly string[] | undefined {
@@ -642,7 +685,8 @@ function stringArray(value: unknown): readonly string[] | undefined {
 }
 
 function samePermissions(left: readonly string[], right: readonly string[]): boolean {
-  return left.length === right.length && left.every((permission, index) => permission === right[index]);
+  return left.length === right.length &&
+    left.every((permission, index) => permission === right[index]);
 }
 
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -699,7 +743,9 @@ async function checkPluginDoctor(
       id: 'plugin-doctor-import',
       title: 'Plugin doctor contribution',
       status: 'error',
-      message: `${error instanceof Error ? error.message : String(error)} Run: netscript plugin sync`,
+      message: `${
+        error instanceof Error ? error.message : String(error)
+      } Run: netscript plugin sync`,
     }];
   }
 }

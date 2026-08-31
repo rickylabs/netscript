@@ -1,0 +1,192 @@
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/fresh-ui",
+    "entrypoints": [
+      "./desktop.ts",
+      "./interactive.ts",
+      "./mod.ts",
+      "./primitives.tsx",
+      "./registry.ts",
+      "./src/ai/render-ui.tsx"
+    ],
+    "exitCode": 1
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 123,
+    "totalPrivateTypeRef": 96,
+    "totalMissingJSDoc": 27,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/fresh-ui",
+      "dir": "packages/fresh-ui",
+      "entrypoints": [
+        {
+          "path": "./desktop.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./interactive.ts",
+          "privateTypeRef": 96,
+          "missingJSDoc": 27,
+          "other": 0,
+          "total": 123
+        },
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./primitives.tsx",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./registry.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/ai/render-ui.tsx",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        }
+      ],
+      "files": [
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/combobox/combobox.types.ts",
+          "privateTypeRef": 15,
+          "missingJSDoc": 18,
+          "other": 0,
+          "total": 33
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/popover/Popover.tsx",
+          "privateTypeRef": 10,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 11
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/popover/popover.types.ts",
+          "privateTypeRef": 10,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 10
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/dialog/Dialog.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/drawer/Drawer.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/sheet/Sheet.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/accordion/Accordion.tsx",
+          "privateTypeRef": 5,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/dialog/dialog.types.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/sheet/sheet.types.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tooltip/tooltip.types.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/accordion/accordion.types.ts",
+          "privateTypeRef": 5,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 5
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tabs/Tabs.tsx",
+          "privateTypeRef": 4,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 5
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tabs/tabs.types.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "/home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/combobox/Combobox.tsx",
+          "privateTypeRef": 1,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 3
+        }
+      ],
+      "combinedTotal": 123,
+      "combinedPrivateTypeRef": 96,
+      "combinedMissingJSDoc": 27,
+      "combinedOther": 0,
+      "combinedExitCode": 1,
+      "entrypointExitCodes": {
+        "./desktop.ts": 0,
+        "./interactive.ts": 1,
+        "./mod.ts": 0,
+        "./primitives.tsx": 0,
+        "./registry.ts": 0,
+        "./src/ai/render-ui.tsx": 0
+      }
+    }
+  ]
+}

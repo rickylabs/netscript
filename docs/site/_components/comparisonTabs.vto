@@ -1,0 +1,66 @@
+{{# Fixed-first framework comparison. Every competitor block is server-rendered; JavaScript only
+   changes which competitor-labelled nodes are visible. Without JavaScript, the selector stays
+   hidden and the first competitor is the complete fallback view. #}}
+{{ set items = competitors || [] }}
+{{ set gid = "nscompare-" + Math.random().toString(36).slice(2, 9) }}
+{{ set oursCode = (ours.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
+<section class="ns-comparison" data-ns-comparison>
+  <div class="ns-comparison__picker">
+    <label for="{{ gid }}-select">Compare NetScript with</label>
+    <select id="{{ gid }}-select" data-ns-comparison-select>
+      {{ for index, item of items }}
+        <option value="{{ item.key }}"{{ if index === 0 }} selected{{ /if }}>{{ item.label }}</option>
+      {{ /for }}
+    </select>
+  </div>
+
+  <div class="ns-comparison__summary" aria-live="polite">
+    {{ for index, item of items }}
+      <p data-ns-competitor="{{ item.key }}"{{ if index !== 0 }} hidden{{ /if }}><strong>{{ item.label }}:</strong> {{ item.summary }}</p>
+    {{ /for }}
+  </div>
+
+  <div class="ns-tabbed">
+    <div class="ns-tabbed__tablist" role="tablist" aria-label="Framework code">
+      <button
+        type="button"
+        class="ns-tabbed__tab is-active"
+        role="tab"
+        id="{{ gid }}-tab-ours"
+        aria-controls="{{ gid }}-panel-ours"
+        aria-selected="true"
+        tabindex="0"
+      >NetScript</button>
+      <button
+        type="button"
+        class="ns-tabbed__tab"
+        role="tab"
+        id="{{ gid }}-tab-theirs"
+        aria-controls="{{ gid }}-panel-theirs"
+        aria-selected="false"
+        tabindex="-1"
+      ><span data-ns-competitor-label>{{ items[0].label }}</span></button>
+    </div>
+    <div
+      class="ns-tabbed__panel"
+      role="tabpanel"
+      id="{{ gid }}-panel-ours"
+      aria-labelledby="{{ gid }}-tab-ours"
+      tabindex="0"
+    >
+      <pre><code class="language-{{ ours.lang }}">{{ oursCode }}</code></pre>
+    </div>
+    <div
+      class="ns-tabbed__panel"
+      role="tabpanel"
+      id="{{ gid }}-panel-theirs"
+      aria-labelledby="{{ gid }}-tab-theirs"
+      tabindex="0"
+    >
+      {{ for index, item of items }}
+        {{ set itemCode = (item.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
+        <div data-ns-competitor="{{ item.key }}"{{ if index !== 0 }} hidden{{ /if }}><pre><code class="language-{{ item.lang }}">{{ itemCode }}</code></pre></div>
+      {{ /for }}
+    </div>
+  </div>
+</section>
