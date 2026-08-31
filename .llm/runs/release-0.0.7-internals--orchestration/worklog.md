@@ -6418,3 +6418,24 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   integrated now. Slice 7 (integration/docs) can proceed without them since it edits only the
   agentic README and run artifacts.
 - #1753 idle at its verified GREEN `d5bfc9d6c`, awaiting its own PR/evaluation step.
+
+## D-139 — #1798 gate opened; #1753 integrated to main 584caa03f and Tier-A green
+
+- **Integration gate opened** — #1798 merged; `origin/main` = `584caa03f474de36b2d6e62e7162ab410c6ccb59`
+  (59 files since #1753's base, carrying all five generated corpora).
+- **#1753 integrated**: merged current main, **clean, zero conflicts**. Merge commit `c3b3b4cb6`,
+  pushed, local == remote verified.
+- **Corpora freshness proven, not assumed from the clean merge** — all four `check:` variants
+  (`agent-docs-prose`, `assets-barrel`, `publish-assets`, `mcp-export-corpus`) exit 0 with real
+  capture. No regeneration needed because #1753 touches no corpus input; had a generator been
+  required, a clean merge alone would not have proven freshness.
+- **Tier-A at the integrated head**: focused harness **27/27**, root full suite **4,432 passed /
+  0 failed / 19 ignored**, scoped `check` exit 0, `arch:check` exit 0, `deno.lock` unchanged vs main.
+- **One real `fmt` finding, investigated rather than waved through or fixed silently**: exit 1 on
+  `.llm/tools/harness/extract-verdict.ts`. Confirmed **pre-existing on `main` itself** — the same
+  single finding reproduces in a clean checkout of `main`, and `git diff` proves #1753 never touched
+  that file. It is therefore not this leaf's defect. **Deliberately not fixing it inside this PR**:
+  an unrelated drive-by edit would widen scope past the declared manifest and muddy the leaf's
+  evidence. Recording it as a standing repo condition worth a separate bounded fix.
+- **#1802 Slice 7** (final integration/docs) dispatched and running; its own main integration is
+  queued for after it lands, at the documented shared-seam point.
