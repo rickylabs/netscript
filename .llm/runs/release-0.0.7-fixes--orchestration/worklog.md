@@ -6954,3 +6954,35 @@ one fixture. IMPL-EVAL remains mandatory. Ruling is the coordinator's.
 **#1806 deliberately not integrated** into #1365: its evidence was just measured at `ecb82ae2e`, and
 integrating now would churn carriers and invalidate freshly-passed gates. It integrates at the final
 pre-merge seam, regenerating once.
+
+### #1805 is the first user-facing main advance during this parallel window — impact assessed per leaf
+
+`0274c0a70 → dea449911`, 28 files. Unlike #1796/#1798/#1800/#1806 this is **not docs-only**: it
+changes `packages/ai/src/adapters/openai-compatible.adapter.ts` plus
+`packages/ai/tests/generation_options_test.ts` and `packages/ai/tests/openai_compatible_test.ts`.
+(The `check-exports-drift.ts` hunk is again a data-only mapping entry.)
+
+**Nothing integrated — assessed read-only, per the no-global-pause instruction.**
+
+- **#1677 (`packages/ai`) — same package, no file collision, but its measured baselines go stale.**
+  Its 2-path ceiling (`adapters/tanstack-chat-client.ts`, `tests/tanstack_chat_client_test.ts`) does
+  not intersect #1805's three files. However #1677's gate baselines are **package-scoped**
+  (`packages/ai`: check 100 files, lint 100 files, "20 package tests counted"), and #1805 adds tests
+  and touches an adapter in that package, so those numbers **will move**. Its *acceptances* survive —
+  gate 1 is behavioral (positive + mutation-control + undefined case) and gates 2–5 are
+  "0 occurrences/findings", both count-independent — so this does **not** invalidate the plan and
+  does not warrant interrupting the author mid-implementation. **At the final seam its baselines must
+  be re-measured, not carried forward.**
+- **#1773 (`packages/cli` scaffold + e2e) — no file collision, but its carried-forward gate-7 count
+  will no longer match main.** The 4,426/0/19 carry was ruled acceptable specifically because every
+  intervening delta was docs/generated-only. #1805 adds tests, so the repo-wide count changes once it
+  is integrated. The plan already survives this by construction: gate 7's acceptance is "require exit
+  0; if current main is red when remeasured, require no additional branch failures with exact
+  base/branch counts" — **exit-0 and no-new-failures, not count equality**. Recording explicitly that
+  the count is expected to move and that equality is not the acceptance.
+- **#1365 (`plugin-sagas-core`, `plugins/sagas`, docs, quality tools) — unaffected.** No intersection
+  with `packages/ai`. Its repo-wide `deno check` acceptance is 0 diagnostics, which is
+  file-count-independent, so the 2,972 figure moving is immaterial.
+
+Integration order at the final seams is unchanged, and the shared generated carriers remain the
+ordered reconciliation point.
