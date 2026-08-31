@@ -111,6 +111,7 @@ derivation contract.
 | 2026-08-31       | S2.2 GREEN    | saga-aware scanner    | Focused scanner suite reached 28/0; repo scan found only three owned fenced docs calls with 7 allowances.         |
 | 2026-08-31       | S2.3 RED      | source derivation     | New test compiled and failed 0/1 on the real canonical-doc versus shipped-source mismatch; `3567b2449`.           |
 | 2026-08-31       | S2.3 GREEN    | safe public examples  | Canonical sample now equals source; four calls consume receipts; docs tests 12/0 and quality scan 0/7.            |
+| 2026-08-31       | S2.4 RED      | derivative freshness  | `check:mcp-export-corpus` failed on the real stale carrier before any generator ran; harness-only RED commit.     |
 
 ## New-Base Gate Results
 
@@ -223,6 +224,14 @@ GREEN evidence after the docs corrections and task wiring:
 - the canonical worker sample is now the exact statically decoded source body, and the storefront
   success-path publish rejection returns a job failure directly rather than entering the provider
   exception handler.
+
+## S2.4 Evidence — Generated Derivatives
+
+RED before any carrier write:
+
+- `deno task check:mcp-export-corpus` — expected exit 1 with the precise stale-corpus diagnostic;
+  the additive core helper export had not yet reached the checked-in MCP corpus.
+- No generator had run and no generated carrier changed before this harness-only RED record.
 
 ## Hard Stops
 

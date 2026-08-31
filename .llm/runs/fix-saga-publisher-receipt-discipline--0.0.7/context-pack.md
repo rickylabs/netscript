@@ -53,7 +53,7 @@ runtime lease is required.
 1. Core helper + core/plugin exports + helper tests + port doc — GREEN.
 2. Discarded-receipt scanner rule + fixtures — GREEN.
 3. Source-sync test/task + four unsafe calls + two reference corrections — GREEN.
-4. Attributed derivatives + full static/package/docs/lock/ceiling handoff.
+4. Attributed derivatives + full static/package/docs/lock/ceiling handoff — RED on stale MCP corpus.
 
 ## New-Base Baseline Highlights
 
@@ -82,5 +82,6 @@ runtime lease is required.
 
 ## Next Action
 
-Regenerate and validate S2.4 derivatives in locked dependency order. Stop at implementation
-complete; the supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.
+Commit the S2.4 harness-only RED, then regenerate and validate derivatives in locked dependency
+order. Stop at implementation complete; the supervisor dispatches separate-session GLM 5.3 Flash ·
+max IMPL-EVAL.
