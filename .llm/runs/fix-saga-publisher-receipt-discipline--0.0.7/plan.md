@@ -102,7 +102,7 @@ the workers template and proves the canonical public sample stays aligned.
 
 ## Locked Product Path Ceiling
 
-No S2 product, test, tool, public-doc, or generated path outside this exact 20-path list may change
+No S2 product, test, tool, public-doc, or generated path outside this exact 21-path list may change
 without an explicit rescope request and an updated harness decision.
 
 ### Core companion and thin re-export
@@ -136,6 +136,7 @@ without an explicit rescope request and an updated harness decision.
 18. `packages/cli/src/kernel/assets/publish-assets.generated.ts` (only if generator-attributed)
 19. `packages/mcp/src/publish-assets.generated.ts` (only if generator-attributed)
 20. `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`
+21. `packages/cli/src/kernel/assets/agent-tools.generated.ts` (generator-attributed scanner carrier)
 
 Explicitly outside the ceiling: every `plugins/workers/**` path; saga publisher endpoint
 implementation/tests/README; SDK/Aspire discovery; CLI adapter/probe code; core/plugin READMEs; and
@@ -172,7 +173,7 @@ No decision remains that would force implementation rework.
 | S2.1 | Core throwing companion + thin re-export    | Rejected receipts become typed `SagasError`; accepted receipt type is preserved; both public entrypoints expose one core implementation.                                     | Gates 2, 3, 5, 6, 8–16, 19, 28            | 1–5                         |
 | S2.2 | Discarded-receipt repository rail           | Bare known saga-publisher `publish`/`publishMany` expressions fail across source, docs, and emitted-template text without flagging unrelated publishers or consumed results. | Gates 17–20                               | 6–7                         |
 | S2.3 | Source-derived sample and public docs truth | Four unsafe calls are gone, canonical sample matches the already-safe scaffold source, stale 8092 claim is removed, and the docs task owns the sync test.                    | Gates 18, 21–24                           | 8–14                        |
-| S2.4 | Generated derivatives + static handoff      | Only attributed generated paths move; public corpus, package/docs checks, ceiling, and lock discipline hold.                                                                 | Gates 1–29; Gate 30 remains lease-blocked | 15–20 plus artifact updates |
+| S2.4 | Generated derivatives + static handoff      | Only attributed generated paths move; public corpus, package/docs checks, ceiling, and lock discipline hold.                                                                 | Gates 1–29; Gate 30 remains lease-blocked | 15–21 plus artifact updates |
 
 There is no workers implementation slice and no workers guard test. Gate 30 is a validation hold,
 not an implementation slice.
@@ -185,7 +186,7 @@ the S1 read-only constraint.
 
 | Order | Gate                   | Exact command/check                                                | New-base measurement                                                                                                    | S2 acceptance                                                                                      |
 | ----- | ---------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 1     | Ceiling + branch       | raw git status/ref/ancestry + explicit changed-path audit          | PASS: `8a925764` is parent/ancestor of `7c2a12fa1`; artifact-only six-file delta; old-ceiling intersection 6/25         | Only 20 locked product paths plus run artifacts; no upstream assumption; lock unchanged.           |
+| 1     | Ceiling + branch       | raw git status/ref/ancestry + explicit changed-path audit          | PASS: `8a925764` is parent/ancestor of `7c2a12fa1`; artifact-only six-file delta; old-ceiling intersection 6/25         | Only 21 locked product paths plus run artifacts; no upstream assumption; lock unchanged.           |
 | 2     | Core check             | structured check wrapper, `packages/plugin-sagas-core`             | PASS, exit 0, 112/112 files                                                                                             | PASS, full selected coverage.                                                                      |
 | 3     | Sagas check            | structured check wrapper, `plugins/sagas`                          | PASS, exit 0, 87/87 files                                                                                               | PASS.                                                                                              |
 | 4     | Workers check          | structured check wrapper, `plugins/workers`                        | PASS, exit 0, 102/102 files                                                                                             | Baseline continuity only; no workers path is touched.                                              |

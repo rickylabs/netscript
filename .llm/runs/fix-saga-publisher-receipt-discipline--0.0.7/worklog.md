@@ -4,7 +4,7 @@
 
 - S1 artifacts and narrowing were accepted; primary accepted `PLAN-EVAL: N/A`.
 - Branch is converged at `9f1f9fb87` with main `6bb27e46a` as its second parent.
-- S2 implementation is authorized through the four locked RED/GREEN slices.
+- S2.1 through S2.4 are implementation-complete under the authorized 21-path ceiling.
 - Separate-session GLM 5.3 Flash · max IMPL-EVAL remains the post-implementation hard stop.
 - Static-only authority remains in force; Gate 30 is lease-blocked.
 
@@ -92,27 +92,28 @@ derivation contract.
 
 ## Progress Log
 
-| Time (UTC)       | Phase         | Step                  | Notes                                                                                                             |
-| ---------------- | ------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| 2026-08-31 00:00 | S1            | activation            | Confirmed original branch/base/no-upstream, clean tree, and lock hash.                                            |
-| 2026-08-31 00:08 | S1            | issue rebaseline      | Found #1740 already removed the fallback and fixed the scaffold sample.                                           |
-| 2026-08-31 00:18 | S1            | baselines             | Measured original three-package and repo/docs/derivative static surfaces.                                         |
-| 2026-08-31 00:27 | S1            | runtime correction    | Discarded unusable host attempt; locked serialized-lease rule.                                                    |
-| 2026-08-31 00:34 | S1            | design                | Locked original helper, diagnostics, sample proof, docs, and derivative plan.                                     |
-| 2026-08-31       | S1 correction | supervisor sync       | Reset exactly to converged `7c2a12fa1`; verified main parent/ancestor and six artifact-only files.                |
-| 2026-08-31       | S1 correction | ceiling intersection  | Explicit 25-path diff found 6/25 main-touched paths, all task/generated derivatives.                              |
-| 2026-08-31       | S1 correction | full rebaseline       | Reran every permitted package/static/docs gate at `8a925764`; classified prohibited write/runtime gates honestly. |
-| 2026-08-31       | S1 correction | narrowing             | Reduced contract to helper/quality rail plus docs/source-sync; locked 20 paths and four slices.                   |
-| 2026-08-31       | S1 correction | policy recommendation | Recommended `PLAN-EVAL: N/A`, pending primary decision; no S2 started.                                            |
-| 2026-08-31       | S2 activation | primary ruling        | Primary accepted `PLAN-EVAL: N/A`; supervisor converged docs-only main at `9f1f9fb87`; S2 authorized.             |
-| 2026-08-31       | S2.1 RED      | helper contract       | Compiling focused test proved 0 passed/3 failed solely because the core publisher export was absent; `2f913f237`. |
-| 2026-08-31       | S2.1 GREEN    | throwing companion    | Added the core helper/re-exports; focused 3/0, core 87/0/3, sagas 55/0/1, with package checks and policy gates.   |
-| 2026-08-31       | S2.2 RED      | quality fixtures      | Scanner test compiled, then produced 26 passed/2 failed because known saga receipt discards were not reported.    |
-| 2026-08-31       | S2.2 GREEN    | saga-aware scanner    | Focused scanner suite reached 28/0; repo scan found only three owned fenced docs calls with 7 allowances.         |
-| 2026-08-31       | S2.3 RED      | source derivation     | New test compiled and failed 0/1 on the real canonical-doc versus shipped-source mismatch; `3567b2449`.           |
-| 2026-08-31       | S2.3 GREEN    | safe public examples  | Canonical sample now equals source; four calls consume receipts; docs tests 12/0 and quality scan 0/7.            |
-| 2026-08-31       | S2.4 RED      | derivative freshness  | `check:mcp-export-corpus` failed on the real stale carrier before any generator ran; harness-only RED commit.     |
-| 2026-08-31       | S2.4 STOP     | ceiling conflict      | Assets generation moved unlisted `agent-tools.generated.ts`; partial outputs restored, explicit rescope needed.   |
+| Time (UTC)       | Phase         | Step                   | Notes                                                                                                             |
+| ---------------- | ------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 2026-08-31 00:00 | S1            | activation             | Confirmed original branch/base/no-upstream, clean tree, and lock hash.                                            |
+| 2026-08-31 00:08 | S1            | issue rebaseline       | Found #1740 already removed the fallback and fixed the scaffold sample.                                           |
+| 2026-08-31 00:18 | S1            | baselines              | Measured original three-package and repo/docs/derivative static surfaces.                                         |
+| 2026-08-31 00:27 | S1            | runtime correction     | Discarded unusable host attempt; locked serialized-lease rule.                                                    |
+| 2026-08-31 00:34 | S1            | design                 | Locked original helper, diagnostics, sample proof, docs, and derivative plan.                                     |
+| 2026-08-31       | S1 correction | supervisor sync        | Reset exactly to converged `7c2a12fa1`; verified main parent/ancestor and six artifact-only files.                |
+| 2026-08-31       | S1 correction | ceiling intersection   | Explicit 25-path diff found 6/25 main-touched paths, all task/generated derivatives.                              |
+| 2026-08-31       | S1 correction | full rebaseline        | Reran every permitted package/static/docs gate at `8a925764`; classified prohibited write/runtime gates honestly. |
+| 2026-08-31       | S1 correction | narrowing              | Reduced contract to helper/quality rail plus docs/source-sync; locked 20 paths and four slices.                   |
+| 2026-08-31       | S1 correction | policy recommendation  | Recommended `PLAN-EVAL: N/A`, pending primary decision; no S2 started.                                            |
+| 2026-08-31       | S2 activation | primary ruling         | Primary accepted `PLAN-EVAL: N/A`; supervisor converged docs-only main at `9f1f9fb87`; S2 authorized.             |
+| 2026-08-31       | S2.1 RED      | helper contract        | Compiling focused test proved 0 passed/3 failed solely because the core publisher export was absent; `2f913f237`. |
+| 2026-08-31       | S2.1 GREEN    | throwing companion     | Added the core helper/re-exports; focused 3/0, core 87/0/3, sagas 55/0/1, with package checks and policy gates.   |
+| 2026-08-31       | S2.2 RED      | quality fixtures       | Scanner test compiled, then produced 26 passed/2 failed because known saga receipt discards were not reported.    |
+| 2026-08-31       | S2.2 GREEN    | saga-aware scanner     | Focused scanner suite reached 28/0; repo scan found only three owned fenced docs calls with 7 allowances.         |
+| 2026-08-31       | S2.3 RED      | source derivation      | New test compiled and failed 0/1 on the real canonical-doc versus shipped-source mismatch; `3567b2449`.           |
+| 2026-08-31       | S2.3 GREEN    | safe public examples   | Canonical sample now equals source; four calls consume receipts; docs tests 12/0 and quality scan 0/7.            |
+| 2026-08-31       | S2.4 RED      | derivative freshness   | `check:mcp-export-corpus` failed on the real stale carrier before any generator ran; harness-only RED commit.     |
+| 2026-08-31       | S2.4 STOP     | ceiling conflict       | Assets generation moved unlisted `agent-tools.generated.ts`; partial outputs restored, explicit rescope needed.   |
+| 2026-08-31       | S2.4 GREEN    | authorized derivatives | Primary authorized path 21; full ordered chain and all static/package/docs/freshness gates passed.                |
 
 ## New-Base Gate Results
 
@@ -234,18 +235,43 @@ RED before any carrier write:
   the additive core helper export had not yet reached the checked-in MCP corpus.
 - No generator had run and no generated carrier changed before this harness-only RED record.
 
-The subsequent ordered GREEN attempt stopped after the second generator. `gen:agent-docs-prose`
-changed only allowed paths 15–16. `gen:assets-barrel` then changed allowed path 17 and unlisted
-`packages/cli/src/kernel/assets/agent-tools.generated.ts`, because that carrier embeds the modified
-quality scanner. All partial generated changes were restored; generators three and four were not
-run. S2.4 remains blocked on an explicit ceiling rescope to 21 paths.
+The first ordered GREEN attempt stopped after the second generator. `gen:agent-docs-prose` changed
+only allowed paths 15–16. `gen:assets-barrel` then changed allowed path 17 and the initially
+unlisted agent-tools carrier, because that carrier embeds the modified quality scanner. All partial
+outputs were restored before the primary authorized that carrier as ceiling path 21.
+
+GREEN after authorization:
+
+- Restored all seven carriers to `HEAD`, then ran the complete sequence exactly once in dependency
+  order: `deno task gen:agent-docs-prose`; `deno task gen:assets-barrel`;
+  `deno task gen:mcp-export-corpus`; `deno task gen:publish-assets`. All exited 0.
+- Exactly six generated files changed: agent-doc prose/provenance, CLI agent-docs/agent-tools, MCP
+  export corpus, and MCP publish assets. All are ceiling paths 15–17 and 19–21; conditional path 18
+  remained unchanged, and no unlisted file moved.
+- Freshness checks all exited 0: `check:agent-docs-prose`, `check:assets-barrel`,
+  `check:mcp-export-corpus`, and `check:publish-assets`. The corpus is
+  `b88bd0d78228519869ba6ac1b9a53787bab145fca28bf92d76164784ac4e8dd5`, with 35 packages, 271
+  subpaths, and 7,679 symbols.
+- Final core check/test/lint/fmt: 114/114; 87 passed/0 failed/3 ignored; 114/114; 114/114. Final
+  sagas check/test/lint/fmt: 87/87; 55/0/1; 87/87; 87/87.
+- Doc-lint retained the exact baselines: core 9 and sagas 27 private references, with zero missing
+  JSDoc/other. Core JSR audit remained PASS with two warnings; sagas retained its single `doctor`
+  module-tag failure plus two warnings. Both publish dry-runs passed.
+- Docs snippet tests passed 12/0; checked snippets passed 582/23/0 malformed; links passed 103/0;
+  accuracy passed with the measured TanStack peer warning. Doctrine and host-port static scans
+  passed without new targeted findings.
+- The supervisor independently verified `quality:scan:repo` at the pre-derivative source head: 0
+  findings, exactly 7 existing allowances, and 0 allowance failures. Generated sources are excluded
+  from that scanner, so regeneration does not alter the verdict.
+- `deno.lock` remained byte-identical at
+  `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+- Gate 30 remains `NOT_RUN — serialized runtime lease required`.
 
 ## Hard Stops
 
-- No product/test code in this correction commit.
 - No worker sample/test edit.
 - No endpoint diagnostic edit.
 - No `netscript init`, scaffold command, any `e2e:cli`, Aspire, Docker, container, or AppHost use.
-- No write-capable derivative command in S1.
 - No dependency/lock change.
+- No PR readiness/label transition before separate-session IMPL-EVAL.
 - Explicit push refspec only.

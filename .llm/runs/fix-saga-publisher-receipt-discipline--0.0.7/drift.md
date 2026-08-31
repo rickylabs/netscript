@@ -194,3 +194,18 @@ initial operating plan.
   authorized, rerun the entire four-generator chain from clean carriers in the locked order. Do not
   silently omit the carrier: that would leave the distributed quality scanner stale.
 - **Evidence:** generator-attributed `git status`, focused carrier diff, and S2.4 worklog entry.
+
+## 2026-08-31 — Primary authorized generated scanner carrier as ceiling path 21
+
+- **What:** The primary accepted the S2.4 stop and expanded the locked ceiling from 20 to 21 paths.
+- **Source:** Supervisor ruling in this thread.
+- **Expected:** Material product scope expansion would require redesign or a new slice.
+- **Actual:** `packages/cli/src/kernel/assets/agent-tools.generated.ts` is mechanically forced by
+  existing ceiling path 6 because the asset embeds the quality scanner source and its bundle hash.
+  Including the carrier does not add product behavior beyond the already-authorized scanner rule; it
+  keeps the distributed copy identical to its source.
+- **Severity:** significant
+- **Action:** add the carrier as generated ceiling path 21, restore all seven carriers to `HEAD`,
+  rerun the complete four-generator dependency chain, and stop again if any generated path outside
+  15–21 moves.
+- **Evidence:** owner authorization, generator attribution recorded above, and updated `plan.md`.

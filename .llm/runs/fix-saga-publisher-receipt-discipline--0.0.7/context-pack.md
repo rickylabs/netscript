@@ -17,11 +17,11 @@
 S1 was accepted and then owner-narrowed. S2.1 through S2.3 are GREEN: the throwing companion passes
 both whole-package suites; the saga-aware scanner passes 28/0; the canonical sample equals the safe
 worker source; and all four docs calls consume their receipts. Repository quality is 0 findings with
-exactly 7 allowances, and docs snippet tests are 12/0. S2.4 is stopped: the assets generator must
-update the unlisted agent-tools carrier because it embeds the changed scanner. The locked
+exactly 7 allowances, and docs snippet tests are 12/0. S2.4 is GREEN after the primary authorized
+the mechanically forced agent-tools carrier and the complete four-generator chain passed. The locked
 implementation contract has two defects only: add the throwing publisher companion plus
 discarded-receipt quality rule, and correct four unsafe documentation calls plus stale fallback
-prose/source-sync coverage. The product ceiling is 20 paths. Every workers product/test path and all
+prose/source-sync coverage. The product ceiling is 21 paths. Every workers product/test path and all
 endpoint-diagnostic work are excluded.
 
 The primary accepted `PLAN-EVAL: N/A` because scope, contract, acceptance, and gates are complete.
@@ -55,8 +55,8 @@ runtime lease is required.
 1. Core helper + core/plugin exports + helper tests + port doc — GREEN.
 2. Discarded-receipt scanner rule + fixtures — GREEN.
 3. Source-sync test/task + four unsafe calls + two reference corrections — GREEN.
-4. Attributed derivatives + full static/package/docs/lock/ceiling handoff — BLOCKED on ceiling path
-   21 (`packages/cli/src/kernel/assets/agent-tools.generated.ts`).
+4. Attributed derivatives + full static/package/docs/lock/ceiling handoff — GREEN under the
+   authorized 21-path ceiling.
 
 ## New-Base Baseline Highlights
 
@@ -75,16 +75,14 @@ runtime lease is required.
 
 ## Hard Constraints
 
-- Artifacts only until this correction commit is pushed.
 - No `plugins/workers/**` edit.
 - No endpoint-resolution/diagnostic edit.
 - No scaffold, `e2e:cli`, Aspire, Docker, container, or AppHost command.
-- No write-capable derivative task in S1.
 - No dependency or lock change.
+- No PR readiness/label transition before separate-session IMPL-EVAL.
 - Explicit push refspec only.
 
 ## Next Action
 
-Obtain explicit authorization to expand the product ceiling from 20 to 21 paths for the generated
-agent-tools carrier. Then rerun the complete derivative chain from clean outputs. Do not dispatch
-IMPL-EVAL while S2.4 is incomplete.
+Implementation is complete. Push the S2.4 GREEN commit and stop for the supervisor-owned,
+separate-session GLM 5.3 Flash · max IMPL-EVAL. Do not mark the PR ready or change lifecycle labels.
