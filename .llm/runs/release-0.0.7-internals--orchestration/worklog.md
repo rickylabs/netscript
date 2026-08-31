@@ -6013,3 +6013,28 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
 - **Verification owed once the evaluator finishes**: confirm the local patch was never committed in
   either worktree, and that `007-leaf-1751`/PR #1802 remain completely untouched by this transport
   workaround.
+
+## D-121 — #1751 F1-F4 amendments landed on the correct worktree; eval gate parked per owner ruling
+
+- **Boundary correction acted on**: the F1-F4 amendments were initially (mistakenly, mid-edit)
+  applied to the evaluator-only worktree `007-eval-1751-plan`, using a heredoc with unquoted
+  backticks that partially corrupted one table row (identifiers silently stripped by bash command
+  substitution inside the unquoted `<<PYEOF`). Caught before commit. Reverted cleanly
+  (`git checkout --`) — evaluator worktree confirmed detached, clean, at `76c24d9e2` (the verdict
+  commit only), no routing/model diff.
+- **Amendments correctly re-applied to the author worktree** (`007-leaf-1751`) via the `Edit` tool
+  (no shell heredoc risk this time), verified for corruption before committing
+  (`grep` for empty-token patterns, none found): D11 added locking the F1 wiring path as
+  `RUNTIME_COMMANDS` extension following the `repair-codex-remote` precedent; `contract.ts`/
+  `planner.ts`/both test files added to the Intended File Manifest; D2 and the staleness truth
+  table amended for F2's provenance-binding requirement; D7 strengthened for F4's re-observation
+  persistence; `research.md` R13 and the manifest's shared-surface notes re-anchored to #1774's
+  shipped state for F3. Committed `c13da3e23`, pushed, local == remote confirmed.
+- **Owner ruling received, taking precedence over a same-turn "coordinator audit" instruction to
+  launch cycle 2 immediately** (the two directly conflicted — owner-level authority resolved it):
+  every qualifying existing DeepSeek evaluation elsewhere remains valid and untouched; new
+  evaluations default to GLM 5.3 Flash/max (IMPL) and Qwen 3.8 Flash/max (PLAN, only when genuinely
+  warranted); **#1751's prospective eval gate is parked until PR #1792 actually lands**, avoiding
+  further guard-patch workarounds. Not dispatching cycle 2 now.
+- **Continuing to ship autonomously per instruction**: selecting the next independent, unblocked
+  internals leaf.
