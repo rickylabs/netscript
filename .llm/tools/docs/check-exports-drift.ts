@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'plugin-triggers-core',
+    packagePath: 'packages/plugin-triggers-core',
+    docPath: 'docs/site/reference/plugin-triggers-core/index.md',
+    packageName: '@netscript/plugin-triggers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all twelve entrypoints and completely inventories the root/public/builders surface, while omitting substantial domain defaults/errors, port defer/clock contracts, adapter/store implementations, config and v1 contract schemas, telemetry types, and testing doubles reported by deno doc.',
+    },
+  },
+  {
     name: 'plugin-auth-core',
     packagePath: 'packages/plugin-auth-core',
     docPath: 'docs/site/reference/plugin-auth-core/index.md',
