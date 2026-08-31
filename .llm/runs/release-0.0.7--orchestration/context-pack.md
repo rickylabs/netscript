@@ -2249,3 +2249,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Docs is now converging #1818 on the cumulative #1816 corpus. Aspire prepares #1835 then #1837 while
   S8 and confirmed Garnet blocker #1844 repair in parallel; Features, Fixes, and Internals retain their
   independent active queues. No owner decision is pending.
+
+## Resume delta — 2026-08-31T21:34:03Z
+
+- Current main is `60ae56af0144644db00b0e2fdc28986919ee12ee` after Aspire PR #1835 shipped
+  from immutable head `1771830ee7a62fa3d48941069e79d7dba0e747f7`, closing #1833. Exact CI,
+  complete acceptance, zero threads, clean four-file synthetic merge, and independent GLM PASS carry
+  by product identity were verified; all operational run artifacts were absent before merge.
+- #1835 does not alter the #1844 Garnet readiness outcome: Fixes proved its changed browser/deploy
+  normalization is equivalent for scaffold names and AppHost health uses endpoint host/port directly.
+  #1844 remains a confirmed, bounded Fixes repair rather than a parked Aspire decision.
+- #1837 was correctly withheld after exact-head CI run `33441258910` reported 4 failures/3 unique
+  groups in readiness-fixture marker contracts. Aspire is actively repairing those structural seams,
+  then must recut focused/full CI and one delta IMPL-EVAL before coordinator merge.
+- The Aspire epic has six of twelve required S1-S11/S13 slices shipped. S8 repair head `f29a0b265`
+  is in delta IMPL-EVAL; its dependency chain then releases S9, S10, S11, and S13. S7 continues in
+  parallel behind the confirmed Garnet readiness repair. No owner-only decision is pending and host
+  runtime inventories are zero.

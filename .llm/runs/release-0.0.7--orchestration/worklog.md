@@ -3510,3 +3510,25 @@
 - The coordinator squash-merged #1816 as `9fbc2317291dbd33c325782bb33d86a99ee5a027`, closing
   #1815. Both are normalized to `status:shipped`; Docs immediately began #1818 convergence on the
   cumulative workers+sagas+publisher corpus rather than parking at the merge checkpoint.
+
+## 2026-08-31T21:34:03Z — Aspire post-canary train starts; #1835 ships and #1837 is repaired, not waived
+
+- Aspire PR #1835 reached exact head `1771830ee7a62fa3d48941069e79d7dba0e747f7` with four
+  intended product files, zero operational run artifacts, independent GLM PASS carried by product
+  identity, complete #1833 acceptance, zero review threads, clean current-main integration, and
+  exact CI green. The coordinator squash-merged it as
+  `60ae56af0144644db00b0e2fdc28986919ee12ee`, closing #1833; both are `status:shipped`.
+- Fixes was notified immediately to test whether the landed normalization changed its Redis/Garnet
+  outcome. It proved the scaffold names normalize identically and the wait uses AppHost-side
+  `endpoint.host()`/`endpoint.port()` rather than Vite browser keys, so #1835 is a recorded negative
+  control, not a guessed cause; #1844's bounded readiness repair continues unchanged.
+- Aspire promoted #1837 without parking, but exact-head CI run `33441258910` found four failures in
+  three unique structured groups after 4,506 passes: the ordinal rewrite invalidated the Postgres
+  listener marker, the Garnet missing-marker assertion failed earlier, and the readiness dead-port
+  fixture insertion seam disappeared. The coordinator withheld merge and dispatched an explicit
+  structural-marker compatibility repair, focused fixture/helper gates, fresh CI, and bounded delta
+  IMPL-EVAL. No unchanged rerun or waiver is authorized.
+- S8 also advanced to substantive repair head `f29a0b265`: typed db commands now resolve through the
+  Aspire resource. Its bounded delta IMPL-EVAL is active with emitted-output and mutation proof;
+  S9/S10/S11/S13 remain dependency-ordered behind S8 rather than idle. Host inventories remain
+  exact zero for Aspire applications and DinD containers.
