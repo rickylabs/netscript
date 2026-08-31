@@ -6583,3 +6583,20 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   improving the evidence.
 - #1828's correction remains active and untouched; #1802 still parked at `de24161b6` with its
   unidentified root-suite failure.
+
+## D-146 — #1828 correction verified: genuine RED→GREEN with byte-identical test blob
+
+- Author rebuilt history on the same thread as required: `4c0db7fea` (RED) → `27285b72a` (GREEN) →
+  `fef770b18` (main merge), rebased onto `a3e0a5aa8`.
+- **Verified in an isolated throwaway worktree at each commit**, rather than trusting the working
+  tree — which is exactly how the earlier false RED slipped through:
+  - RED `4c0db7fea`: e2e lib `["deno.ns","dom"]`, **`REAL_EXIT=1`**, assertion diff showing exactly
+    the missing `"deno.unstable"`. Genuinely red for the right reason.
+  - GREEN `27285b72a`: e2e lib `["deno.ns","deno.unstable","dom"]`, **`REAL_EXIT=0`**.
+  - **Test blob byte-identical across RED→GREEN** — green by the config fix alone, no test
+    loosening.
+- Oracle confirmed correct at both commits: `../../deno.json` = `packages/cli/deno.json`.
+- **Remote still holds the invalid `bbed08071`**; local is `fef770b18`. The replacement must be
+  `--force-with-lease`, never `--force` — instruction reinforced to the author.
+- Note: its main merge used `a3e0a5aa8`, now one advance stale (`dea449911`). Not churning it
+  mid-evidence; it re-integrates once at its final seam.
