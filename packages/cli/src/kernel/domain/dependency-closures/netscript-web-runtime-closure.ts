@@ -33,6 +33,7 @@ export const NETSCRIPT_WEB_RUNTIME_EXPORTS = {
     './collections',
     './discovery',
     './ports',
+    './presets',
     './query',
     './query-client',
     './streams',

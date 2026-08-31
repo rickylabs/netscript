@@ -87,12 +87,11 @@ on:
       model_profile:
         description: Model profile to use when model is empty.
         required: false
-        default: qwen
+        default: glm
         type: choice
         options:
+          - glm
           - qwen
-          - minimax
-          - deepseek
       target_pr:
         description: Optional PR number to inspect/comment on.
         required: false
@@ -365,7 +364,7 @@ jobs:
       issues: write # acknowledge + final status comments
       pull-requests: write # draft PR for non-PR triggers, review-thread replies
     env:
-      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/qwen/qwen3.8-max' }}
+      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/z-ai/glm-5.3-flash' }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
@@ -390,9 +389,8 @@ jobs:
             const eventName = context.eventName;
 
             const modelProfiles = new Map([
-              ['qwen', 'openrouter/qwen/qwen3.8-max'],
-              ['minimax', 'openrouter/minimax/minimax-m3'],
-              ['deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
+              ['glm', 'openrouter/z-ai/glm-5.3-flash'],
+              ['qwen', 'openrouter/qwen/qwen3.8-flash'],
             ]);
 
             const labels = new Set();
@@ -514,9 +512,8 @@ jobs:
 
             const selectedModel = pickModel();
             const allowedModels = new Set([
-              'openrouter/minimax/minimax-m3',
-              'openrouter/deepseek/deepseek-v4-flash-0731',
-              'openrouter/qwen/qwen3.8-max',
+              'openrouter/z-ai/glm-5.3-flash',
+              'openrouter/qwen/qwen3.8-flash',
             ]);
             if (!allowedModels.has(selectedModel)) {
               throw new Error(`OpenHands model is not in the approved open-evaluator allowlist: ${selectedModel}`);
@@ -623,6 +620,7 @@ jobs:
               '',
               `Model: \`${process.env.MODEL}\``,
               `Provider: \`${process.env.PROVIDER}\``,
+              'Reasoning effort: not attested (OpenHands adapter limitation)',
               `Output mode: \`${process.env.OUTPUT_MODE}\``,
               '',
               `Run: ${process.env.RUN_URL}`,
@@ -1408,6 +1406,7 @@ jobs:
               '',
               `Model: \`${env.MODEL || '?'}\``,
               `Provider: \`${env.PROVIDER || '?'}\``,
+              'Reasoning effort: not attested (OpenHands adapter limitation)',
               `Job status: ${env.JOB_STATUS || 'unknown'}`,
               `Verdict source: ${verdictSource}`
                 + (verdictMismatch

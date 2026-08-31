@@ -219,8 +219,8 @@ export interface OpenCodeBoundaryTesting {
 }
 
 /** Pinned OpenCode plugin contract. */
-async function openCodeBoundaryPlugin(): Promise<OpenCodeBoundaryHooks> {
-  return {
+function openCodeBoundaryPlugin(): Promise<OpenCodeBoundaryHooks> {
+  return Promise.resolve({
     'experimental.chat.messages.transform': async (
       _input: Record<string, never>,
       output: { messages: OpenCodeStoredMessage[] },
@@ -229,10 +229,10 @@ async function openCodeBoundaryPlugin(): Promise<OpenCodeBoundaryHooks> {
       for (const receipt of transformations) await appendReceipt(receipt);
       await appendReceipt(historyValidationReceipt(output.messages, transformations));
     },
-    'tool.execute.before': async (
+    'tool.execute.before': (
       _input: { tool: string; sessionID: string; callID: string },
       _output: { args: unknown },
-    ) => {},
+    ) => Promise.resolve(),
     'tool.execute.after': async (
       input: { tool: string; sessionID: string; callID: string; args: unknown },
       _output: { title: string; output: string; metadata: unknown },
@@ -247,17 +247,19 @@ async function openCodeBoundaryPlugin(): Promise<OpenCodeBoundaryHooks> {
         callCount: 1,
       });
     },
-  };
+  });
 }
 
-namespace openCodeBoundaryPlugin {
-  export const testing: OpenCodeBoundaryTesting = {
+const openCodeBoundaryPluginWithTesting: typeof openCodeBoundaryPlugin & {
+  readonly testing: OpenCodeBoundaryTesting;
+} = Object.assign(openCodeBoundaryPlugin, {
+  testing: {
     classifyDiscoverySource: classifyDiscoverySource,
     normalizeOpenCodeHistory: normalizeOpenCodeHistory,
     OpenCodeHistoryNormalizationError: OpenCodeHistoryNormalizationError,
     safeLocalEventId: safeLocalEventId,
     historyValidationReceipt: historyValidationReceipt,
-  };
-}
+  } satisfies OpenCodeBoundaryTesting,
+});
 
-export default openCodeBoundaryPlugin;
+export default openCodeBoundaryPluginWithTesting;
