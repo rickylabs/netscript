@@ -6339,3 +6339,31 @@ Screened the open `type:fix` milestone-0.0.7 triage queue for priority and owner
 candidate — a well-scoped, substantial defect in `plugins/sagas`, directly adjacent to the domain this
 session already has deep context in (`saga-publisher.ts`'s silent `127.0.0.1:8092` fallback and
 unchecked `SagaPublisherResult`). Selected as the next independent fixes leaf.
+
+### Owner routing ruling recorded; #1365 S1 dispatched
+
+**Routing ruling, effective for prospective evaluator dispatches, not applied retroactively.** Every
+qualifying existing DeepSeek verdict remains valid at its recorded exact head — not rerun, not
+invalidated. New evaluations, once routing PR #1792 lands, default to GLM 5.3 Flash max for
+default/IMPL-EVAL and Qwen3.8-Flash max for genuinely critical/complex PLAN-EVAL. Until #1792 lands,
+the prospective eval gate is parked — no new evaluator dispatch attempted — while implementation work
+on other leaves continues. Not hand-editing `lane-policy.md` myself; that's #1792's own change.
+
+**#1365 (priority:p0) S1 dispatched.** Spot-checked one issue citation against the tree before
+committing lease-free time to a full dispatch (`resolveServiceUrl` in `saga-publisher.ts`,
+`SAGAS_API_DEFAULT_PORT = 8092` in `constants.ts` — both confirmed real). Worktree `007-leaf-1365`,
+branch `fix/saga-publisher-receipt-discipline`, base current main `5197e70b7`. Brief front-loads the
+six design questions the issue's own target contract implies rather than leaving them for the author
+to discover: which non-ignorable-result mechanism to pick (citing the in-repo precedent the issue
+names, `stream-url-resolver.ts`'s throw-not-fallback pattern); whether Aspire-detected endpoint failure
+should raise a named diagnostic; whether the discovery-key hyphen/underscore asymmetry is real or a
+false lead; scope boundary against the two other literal-8092 sites; the scaffold sample-job fix, since
+that's the code every new project copies; and the docs correction, deferring to `CLAUDE.md`'s
+documentation-authoring exception rather than assuming either way. Also flagged the ceiling-collision
+risk against #1764's just-shipped saga-telemetry changes explicitly, since both leaves touch
+`plugins/sagas`/`packages/plugin-sagas-core`.
+
+Dry-run validated (brief contract, git-safety, staged content) before the real launch, per the lesson
+from earlier failed launches this session. Thread `01a05526-7165-76a3-9b87-b217d8f45d85`, route
+`openai · gpt-5.6-sol · high` requested. Liveness confirmed by two-sample growth (269 KB/20 s), not
+assumed from launch success alone.
