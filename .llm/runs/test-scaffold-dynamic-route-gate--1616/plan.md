@@ -230,15 +230,24 @@ candidate is `ccd63a085`. Those counts are **carried forward, not remeasured**, 
 - **Delta size**: `git diff --name-only f22348a80..ccd63a085` lists **28 files**.
 - **Composition**: every one is documentation, a `.llm/runs/` run artifact, a `.llm/assets/` agent-doc
   asset, or a `*.generated.*` carrier — except a single file,
-  `.llm/tools/docs/check-exports-drift.ts`, which received **three data-only additions** to
-  `AUTHORITATIVE_MAPPING` (`plugin-ai-core` #1796, `plugin-streams-core` #1798, `mcp` #1800). No
-  control flow changed in it.
+  `.llm/tools/docs/check-exports-drift.ts`, which received **two data-only additions** to
+  `AUTHORITATIVE_MAPPING` (`plugin-ai-core` #1796, `plugin-streams-core` #1798). No control flow
+  changed in it. **Correction (cycle-2 PLAN-EVAL defect D-A):** an earlier revision of this proof
+  said "three" and named `mcp` #1800; that was wrong — no `mcp` entry exists at either head, and the
+  #1800 change inside this interval is the `packages/mcp/src/publish-assets.generated.ts`
+  `sourceCommit` carrier bump only, already covered by the generated-carrier bullet. The error
+  inflated rather than concealed the delta and no inference depended on the count, but the durable
+  record must match the measured diff.
 - **Zero product or test movement**: that same diff filtered to `^(packages|plugins)/`, excluding
   generated carriers, returns **nothing**. No product source, no test source, no scanner, and no
   measurement code moved.
 - **No per-entry test generation**: no test file references `AUTHORITATIVE_MAPPING`, so adding table
   entries cannot change the test count. `check-exports-drift_test.ts` exists but does not enumerate
   the mapping.
+
+The proof above carries the counts to `ccd63a085`; the evaluated head `077d45cd9` differs from it by
+`plan.md` alone (`git diff --name-only ccd63a085..077d45cd9` = this file), which is inert for test
+execution (cycle-2 PLAN-EVAL defect D-B).
 
 Therefore the 4,426 / 0 / 19 result cannot have changed across this interval. Stated plainly so the
 record cannot be misread: **this is carried-forward evidence, not a fresh measurement at
