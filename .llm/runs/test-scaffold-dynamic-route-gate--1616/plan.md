@@ -80,12 +80,13 @@ generation, compile-time path inference, runtime `ctx.path`, or bound href const
 | --- | --- | --- |
 | D1 | Seed the product scaffold, not an injected fixture. | This is #1616 Reading A and proves the actual default consumer artifact. |
 | D2 | Use a single `[id]` route at `/examples/orders/[id]`. | One segment is the minimum real dynamic binding and keeps the example comprehensible; the historical defect was independent of parameter count. |
-| D3 | Assert path and href with semantic text markers. | Compile success alone missed #1576; markers prove distinct runtime values without brittle HTML snapshots. |
-| D4 | Request `/examples/orders/order-42` with `fresh-partial: true`. | This follows the historical failing rendering path and makes the bound href execute. |
-| D5 | Require HTTP 200, rendered id `order-42`, and self href `/examples/orders/order-42`. | These independently cover live binding and href round trip; a 500 or static placeholder fails. |
-| D6 | Put the live probe in the existing runtime behavior sequence after `runtime.wait.app`, adjacent to app-home/reference. | It needs the real generated/built/running application, so a nominally narrow suite would conceal its resource dependency. |
-| D7 | Reuse generated-app endpoint discovery and injectable `fetch`; do not assume a port. | This preserves #952 behavior and enables deterministic lease-free probe tests. |
+| D3 | Assert the path id and href with element-scoped attributes that cannot satisfy each other. | Compile success alone missed #1576, while overlapping body substrings could false-green both runtime assertions. |
+| D4 | For each probe run, generate a nonce that is never the examples-page literal `order-42`; issue a plain GET to `/examples/orders/<nonce>` and a second GET to `/examples/orders/<nonce>?fresh-partial=true`. | Fresh 2 detects partial navigation through the `PARTIAL_SEARCH_PARAM` search parameter; no partial header exists. Both render modes failed before #1602 and both must remain covered. |
+| D5 | Require both responses to be HTTP 200 and to contain `data-order-id="<nonce>"` on the rendered-id element plus `href="/examples/orders/<nonce>"` on the bound self-link. | The id attribute cannot be satisfied by the href attribute or vice versa. Href-only, id-only, and HTTP-500 negative cases lock the distinction. |
+| D6 | Insert the new gate in this exact catalog order: `BEHAVIOR_APP_HOME` → `BEHAVIOR_APP_DYNAMIC_ROUTE` → `BEHAVIOR_APP_REFERENCE`. | It needs the real generated/built/running application and must execute before the critical browser probe, whose failure aborts all downstream gates on a host without Chromium. |
+| D7 | Reuse generated-app endpoint discovery and injectable `fetch`; do not assume a port. Inherit `probe-app-home`'s zero-candidate behavior: exhausting endpoint discovery without a candidate throws and can never pass vacuously. | This preserves #952 behavior, enables deterministic lease-free probe tests, and closes the empty-selection false green. |
 | D8 | No workflow commit. | Existing CI owns the runtime suite; avoiding an unnecessary workflow edit also avoids the PAT boundary. |
+| D9 | Seed `routePatterns.examples.orders.$id.$route = '/examples/orders/[id]'` and `routes.examples.orders.$id.$route = createRouteReference(routePatterns.examples.orders.$id.$route, { id: 'examples.orders.$id', kind: 'page' })`; the stable alias is `generatedRoutes.examples.orders.$id.$route`. | These are the exact key path and metadata id produced by the current Fresh manifest generator for `routes/examples/orders/[id].tsx`. |
 
 ## Open-Decision Sweep
 
@@ -98,6 +99,9 @@ generation, compile-time path inference, runtime `ctx.path`, or bound href const
 | Parameter count and example path | resolved | Single `id`, D2. |
 | CI wiring | resolved | No change, D8. |
 | Published API/JSR scope | resolved | No published API movement; audit N/A. |
+| Marker discrimination | resolved | Non-overlapping element attributes and negative cases, D3/D5. |
+| Probe input and request modes | resolved | Per-run nonce plus plain and query-param partial GETs, D4. |
+| Seed/generator parity | resolved | Exact `$id.$route` key and metadata id with generator-equality test, D9. |
 
 ## File Plan
 
@@ -112,35 +116,54 @@ generation, compile-time path inference, runtime `ctx.path`, or bound href const
 - Extend `router.ts.template` with a stable alias to the generated reference; do not duplicate the
   pattern in another `createRouteReference` call.
 - Extend `routes/examples/index.tsx.template` with the concrete example link.
+- Add `routes/examples/orders/[id].tsx` to the canonical-reference vocabulary in
+  `agent-conventions.ts` and to `public-command-tree_test.ts`'s retained-route list so every init
+  variant proves the route survives.
+- In a temp route tree containing `routes/examples/orders/[id].tsx`, call the current Fresh
+  `resolveNetScriptRouteManifestOptions` / `discoverNetScriptRoutes` and render helpers. Extract the
+  dynamic manifest/reference subtree from both outputs and assert exact equality with the seed,
+  including `examples.orders.$id.$route`, `/examples/orders/[id]`, and metadata id
+  `examples.orders.$id`; this expected value is generator-derived, not a second handwritten model.
 
 ### E2E contract
 
 - Add `GATE.BEHAVIOR_APP_DYNAMIC_ROUTE` in `cli-surface.ts` and order it in
-  `capability-suites.ts` after app-home and before the broader browser reference probe.
+  `capability-suites.ts` exactly between app-home and the browser reference probe.
 - Add `probe-app-dynamic-route.ts`, sharing endpoint resolution and exposing injectable I/O for
-  lease-free tests. Its CLI entry accepts project root, generated app name, and AppHost path.
-- Register its command gate in `runtime-gates.ts`, with localhost/127.0.0.1 network permissions,
-  read permission, and `aspire` permission matching endpoint discovery.
-- Extend writer/template tests, `runtime-gates_test.ts`, `suite-registry_test.ts`, and a focused
-  probe test. Prefer semantic substring/type assertions over full generated-file snapshots.
+  lease-free tests. Its CLI entry accepts project root, generated app name, and AppHost path; it
+  generates one nonce and probes both D4 URLs with that same nonce.
+- Register its command gate in `runtime/behavior-gates.ts`, with localhost/127.0.0.1 network
+  permissions, read permission, and `aspire` permission matching endpoint discovery. `commandGate`
+  is already critical by default; add no redundant critical option.
+- Extend writer/template tests, runtime behavior-gate tests, `suite-registry_test.ts`, and a focused
+  probe test. Assertions are element/attribute-scoped, not whole generated-file or HTML snapshots.
 
 ## Ordered Slices
 
-1. **RED — contract first.** Add the gate id plus failing semantic expectations for the dynamic
-   scaffold asset/seed/router, runtime registration/order, and the probe response contract. Touch
-   `cli-surface.ts`, the existing writer/template/runtime/registry tests, and a new
-   `probe-app-dynamic-route_test.ts` plus the smallest throwing contract seam needed for it to type
-   check. The focused structured test wrapper must report only the named expected failures. Commit
-   and push the RED alone.
+1. **RED — compilable semantic contract.** Add tests that compile against existing callable
+   surfaces and fail only on absent/wrong behavior: `Object.values(GATE)` lacks
+   `behavior.app-dynamic-route`; scaffold seed/writer/router/conventions/retained-route outputs lack
+   the dynamic route/reference; catalog order lacks the new gate. Add the typed dynamic-response
+   validator contract as a real module returning an explicit semantic failure result until GREEN,
+   not an absent import, unconditional throw, or missing-file failure. Its table-driven test includes
+   a valid plain response, a valid partial response, href-only body (must fail path), id-only body
+   (must fail href), and HTTP 500 (must fail status), all using a generated nonce. Touch the existing
+   writer/template/conventions/public-command-tree/runtime-registry tests and new
+   `probe-app-dynamic-route.ts` / `_test.ts`. The focused structured wrapper must compile and report
+   only these named semantic RED failures. Commit and push the RED alone.
 2. **GREEN — scaffold surface.** Add/register/write the dynamic template, seeds, router alias, and
-   examples link; regenerate the embedded asset. Touch the product-scaffold files listed above and
-   their writer/template tests. The page must consume inferred `ctx.path.id` as a string and call
-   the bound route href with it. The focused scaffold tests, scoped check, and asset-barrel gate
-   prove this slice. Commit and push.
-3. **GREEN — runtime gate.** Implement the injectable probe, register/order its critical command
-   gate, and make focused probe/gate/registry tests pass. Touch `probe-app-dynamic-route.ts`,
-   `runtime-gates.ts`, `capability-suites.ts`, and their focused tests. The structured E2E unit
-   wrapper and scoped check prove this slice. Commit and push.
+   examples link; extend canonical conventions and retained-route coverage; regenerate the embedded
+   asset. Touch the product-scaffold files listed above and their tests. The template-text test must
+   prove `[id].tsx` reads `ctx.path.id`, derives the self href from that same value through the bound
+   route, and contains no `ctx.params`, `ctx.url`, or literal id fallback. A separate generator
+   parity test must derive the exact D9 pattern/reference subtree from a temporary
+   `routes/examples/orders/[id].tsx` and assert seed equality. The focused scaffold tests, scoped
+   check, and asset-barrel gate prove this slice. Commit and push.
+3. **GREEN — runtime gate.** Implement the injectable probe, register/order its command gate (which
+   is critical by `commandGate` default), and make focused probe/gate/registry tests pass. Touch
+   `probe-app-dynamic-route.ts`, `runtime/behavior-gates.ts`, `capability-suites.ts`, and their
+   focused tests. The structured E2E unit wrapper and scoped check prove this slice. Commit and
+   push.
 4. **Lease-free hardening.** Run scoped check/lint/fmt, asset-barrel, quality/architecture, focused
    tests, and root tests. Touch only in-scope files if a gate finds a defect, plus run artifacts.
    All non-runtime rows in the validation table prove this slice. Commit and push.
@@ -159,9 +182,12 @@ The exact live #1576 500 is not responsibly reproducible lease-free on fixed `ma
 running generated app and deliberate reintroduction of the old resolver. The independent pre-GREEN
 RED is still meaningful:
 
-- current scaffold semantic tests fail because no dynamic asset/reference exists;
-- suite tests fail because the behavior gate is absent/misordered;
-- the probe unit's response contract rejects 500 and accepts only 200 plus both semantic markers.
+- current scaffold semantic tests compile and fail because emitted outputs lack the dynamic
+  asset/reference, canonical convention, and retained-route entry;
+- suite tests compile and fail because `Object.values(GATE)` lacks the gate and the catalog lacks
+  the required insertion between app-home and app-reference;
+- the compilable response-validator contract returns a semantic failure before GREEN; its table
+  distinguishes valid plain/partial responses from href-only, id-only, and HTTP-500 inputs.
 
 The leased live gate is the final proof that those pieces compose through generation, Vite/Fresh,
 partial HTTP rendering, and cleanup.
@@ -171,7 +197,7 @@ partial HTTP rendering, and cleanup.
 | Anti-pattern | Plan |
 | --- | --- |
 | AP-1 / AP-9 | Keep the probe and template focused; add no convenience abstraction or barrel. |
-| AP-18 | Assert semantic route/path/href facts, not whole-file or HTML snapshots. |
+| AP-18 | Assert generator-derived route facts and element-scoped attributes, not whole-file/HTML snapshots or overlapping substrings. |
 | AP-21 | Preserve the nested Fresh route vocabulary and established E2E folders. |
 | AP-25 | Keep filesystem/network/process effects at writer and gate edges; inject fetch/resolution in unit tests. |
 
@@ -179,16 +205,16 @@ partial HTTP rendering, and cleanup.
 
 | Order | Gate | Command/check | Expected result |
 | --- | --- | --- | --- |
-| 1 | RED | Structured focused tests for writer/templates/probe/runtime registry | Expected named failures committed before GREEN. |
+| 1 | RED | Structured focused tests for seed/writer/router/conventions/retention, response validator, and runtime registry | Tests compile; only named semantic absences/rejections fail. No missing module/file/import is a RED mechanism. |
 | 2 | Focused tests | `run-deno-test.ts` over owned scaffold and E2E tests | All pass after GREEN. |
 | 3 | Scoped type check | `run-deno-check.ts` over changed CLI/E2E TS roots with `--unstable-kv` where workspace code requires it | Pass. |
 | 4 | Scoped lint/fmt | Structured lint/fmt wrappers over changed `.ts/.tsx` roots | Pass without unrelated/generated drift. |
 | 5 | Asset integrity | `deno task check:assets-barrel` | Generated embedded assets match manifest/templates. |
 | 6 | Fitness | `deno task quality:gate` (includes architecture fitness) | Pass; no new/deepened debt. |
-| 7 | Repository regression | `deno task test` through the structured verdict path | Pass; host baseline supports this gate. |
+| 7 | Repository regression | `deno task test` through the structured verdict path | Measured current main `8a925764…`: exit 0, 4,426 passed / 0 failed / 19 ignored in 208.001s. Measured branch `f22348a80…`: exit 0, 4,426 passed / 0 failed / 19 ignored in 198.633s. After implementation require exit 0; if current main is red when remeasured, require no additional branch failures with exact base/branch counts. |
 | 8 | Generated compile | Existing `generated.deno-check` inside runtime | The emitted Form-C page compiles with inferred `ctx.path.id: string`. |
-| 9 | Live dynamic route | Existing runtime sequence, new critical behavior gate | Partial request returns 200 and both dynamic markers. |
-| 10 | Merge readiness (leased) | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Exit 0 with generated/build/request assertions and cleanup. |
+| 9 | Live dynamic route | Existing runtime sequence, new critical behavior gate | Plain GET and `?fresh-partial=true` GET for one per-run nonce each return 200 with `data-order-id="<nonce>"` and `href="/examples/orders/<nonce>"`; zero endpoint candidates fail. |
+| 10 | Merge readiness (leased) | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | `NOT_RUN` in planning; requires coordinator lease. At merge-readiness require exit 0 with generated/build/request assertions and cleanup. |
 
 The frontend overlay's real-browser coverage remains in the same one-pass runtime suite through
 `behavior.app-reference`; the new regression assertion is HTTP-semantic rather than visual. Publish
@@ -207,9 +233,9 @@ the existing CLI documentation debt neither deepened nor closed.
 
 | Risk | Mitigation |
 | --- | --- |
-| Seed and post-generation route shapes diverge | Exercise initial seeds in unit tests and the regenerated consumer in `generated.deno-check`. |
+| Seed and post-generation route shapes diverge | Generator-parity unit test derives the exact D9 subtree from `routes/examples/orders/[id].tsx` and asserts seed equality; `generated.deno-check` proves the regenerated consumer. |
 | Gate accidentally tests a hand-authored fixture | Probe only the untouched app emitted by `scaffold.init`; no preparation/injection step. |
-| Probe passes on a static page | Require the requested id and href derived from that id. |
+| Probe passes on a static/literal page | Generate a nonce distinct from `order-42`; require non-overlapping id/href attributes, and forbid `ctx.params`, `ctx.url`, and literal fallback in the template. |
 | Probe guesses the app port | Reuse AppHost endpoint resolution; test command permissions. |
 | Dynamic example breaks all consumers | Treat it as public scaffold scope, type-check the consumer, and prove it in the full runtime smoke. |
 | Expensive resource conflict | Do not run until coordinator lease; keep cleanup enabled. |
