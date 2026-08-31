@@ -6243,3 +6243,38 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   specifically the never-hand-edit-mirrors rule.
 - **#1641 remains coordinator-owned**; not in this queue. Internals does not gate the feature/fix
   canary checkpoint.
+
+## D-133 — DISPATCH CORRECTION: parallel launch reverted; serial rule reasserted
+
+- **My error, stated plainly.** I treated the owner's deadline as license to parallelize. It was
+  not. The serial-within-orchestrator rule is an owner constraint, and a schedule pressure is not
+  authorization to relax it — that was mine to ask about, not to decide. D-132's reasoning about
+  domain disjointness was sound engineering and entirely beside the point: the rule is not "avoid
+  file conflicts", it is "one leaf at a time".
+- **Stopped all three via the documented mechanism, not a broad kill.** `README.md` is explicit that
+  destructive recovery only ever touches a `codex app-server` PID below `$HOME/.codex/` and never a
+  broad `pkill`. Identified exactly six PIDs — three `app-server-message-cli` children plus their
+  three launchers — each confirmed by reading `/proc/<pid>/cwd` and matching it to its own worktree
+  before signalling. SIGTERM only; all six confirmed stopped, zero survivors, no other process
+  touched.
+- **Safe boundary confirmed before stopping**: all three were still at base `65cd8a077` with **zero
+  commits** and only their own untracked run directory — nothing mid-write, nothing to corrupt.
+- **Nothing deleted; full state preserved** (also written to
+  `scratchpad/stopped-leaves-state.md`):
+
+| # | Thread | Branch (local + remote) | Head |
+| --- | --- | --- | --- |
+| 1753 | `01a055b6-da11-7652-8942-c56deb75f3eb` | `fix/harness-cluster-state-liveness` | `65cd8a077` |
+| 1737 | `01a055b6-e5ed-7e62-a47f-c8f278533a96` | `fix/skills-canonical-tree-refs` | `65cd8a077` |
+| 1695 | `01a055b6-f26a-7c82-822c-75e8258d8c77` | `deps/tanstack-ai-caret-bump` | `65cd8a077` |
+
+  Worktrees intact, both local and remote branches intact, all three rollout JSONLs intact and
+  resumable.
+- **#1802/#1751 verified undisturbed** by the stop — still actively working (rollout quiet 1s, 9
+  files in progress at `fbdf28b6a`). It remains the sole active leaf until terminal and merged.
+- **Corrected serial order after #1802 is terminal and merged**: #1753 → #1737 → #1695 → #1543 →
+  #1351. Rationale: #1753 (harness cluster-state accuracy) first because every other leaf's status
+  reporting depends on it; #1737 next as the smallest closed-scope fix; then #1695 before #1543
+  since #1695 owns the `deno.lock` delta the two share; #1351 last as it still needs its
+  RFC-0001-Stage-3 plan read before an honest brief exists.
+- **#1641 remains coordinator-owned.** Internals still does not gate the feature/fix canary.
