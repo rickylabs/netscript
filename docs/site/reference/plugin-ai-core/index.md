@@ -18,7 +18,7 @@ mirrors an engine type from `@netscript/ai/contracts`, and a compile-time drift 
 (`z.ZodType<EngineType> = schema`) asserts the mirror cannot silently diverge from the domain
 contract.
 
-## Entrypoints
+## Exports
 
 The package publishes two entrypoints. Each is documented against its own `deno doc` surface.
 
