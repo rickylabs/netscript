@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import {
   AstExtractor,
@@ -72,6 +72,72 @@ Deno.test('ExtractorPort contract returns contribution candidates from files', a
     { file: 'sagas/register-user.ts', symbol: 'default', axis: 'sagas' },
     { file: 'triggers/new-user.ts', symbol: 'newUserWebhook', axis: 'triggers' },
   ]);
+});
+
+Deno.test('AstExtractor discovers a synthetic third-party factory from an immutable snapshot', async () => {
+  const builders = [{ callee: 'defineChannelSync', axis: 'channel-syncs' }];
+  const extractor = Reflect.construct(AstExtractor, [{
+    additionalBuilders: builders,
+  }]) as AstExtractor;
+
+  builders[0].axis = 'mutated-after-construction';
+  builders.push({ callee: 'defineLateBuilder', axis: 'late-builders' });
+
+  const contributions = await extractor.extract([
+    {
+      path: 'channel-syncs/sync-general.ts',
+      text: `
+        export const syncGeneral = defineChannelSync('general').build();
+        export const late = defineLateBuilder('late').build();
+      `,
+    },
+  ]);
+
+  assertEquals(contributions, [
+    {
+      file: 'channel-syncs/sync-general.ts',
+      symbol: 'syncGeneral',
+      axis: 'channel-syncs',
+    },
+  ]);
+});
+
+Deno.test('AstExtractor rejects malformed and duplicate builder configuration', () => {
+  assertThrows(
+    () =>
+      Reflect.construct(AstExtractor, [{
+        additionalBuilders: [{ callee: 'define-channel-sync', axis: 'channel-syncs' }],
+      }]),
+    TypeError,
+    'Invalid contribution builder callee "define-channel-sync"',
+  );
+  assertThrows(
+    () =>
+      Reflect.construct(AstExtractor, [{
+        additionalBuilders: [{ callee: 'defineChannelSync', axis: '   ' }],
+      }]),
+    TypeError,
+    'Contribution builder axis for "defineChannelSync" must not be blank',
+  );
+  assertThrows(
+    () =>
+      Reflect.construct(AstExtractor, [{
+        additionalBuilders: [{ callee: 'defineJob', axis: 'other-jobs' }],
+      }]),
+    TypeError,
+    'Duplicate contribution builder callee "defineJob"',
+  );
+  assertThrows(
+    () =>
+      Reflect.construct(AstExtractor, [{
+        additionalBuilders: [
+          { callee: 'defineChannelSync', axis: 'channel-syncs' },
+          { callee: 'defineChannelSync', axis: 'other-channel-syncs' },
+        ],
+      }]),
+    TypeError,
+    'Duplicate contribution builder callee "defineChannelSync"',
+  );
 });
 
 Deno.test('EmitterPort contract emits a registry artifact', async () => {
