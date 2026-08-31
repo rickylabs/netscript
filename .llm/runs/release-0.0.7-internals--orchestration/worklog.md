@@ -7207,3 +7207,95 @@ and this run has already been bitten once by scoped-green/whole-graph-red.
 **Steer delivery is now verified rather than assumed** — both messages dispatched with captured
 `DISPATCH_REAL_EXIT=0`, after the earlier silent `thread-store conflict` drop. The author was also
 told its earlier HOLD never arrived, so it can reconcile any missing context itself.
+
+## D-167 — Reconciliation after an 8-hour gap: #1828 and #1823 merged
+
+Returning to a much-advanced repository (`main` `58a4a10eb`, ~8.5h of drift), Git was treated as
+authoritative over the standing instruction.
+
+- **#1828 MERGED** 14:25:35Z; issue #1827 CLOSED, `status:shipped`. **#1762 is unblocked.**
+- **#1823 MERGED** 05:51:06Z; issue #1753 CLOSED, `status:shipped`.
+- The instruction to add a checked DoD, apply `impl-eval:skip`, restore ready lifecycle, and sequence
+  close-gate on #1828 was **superseded by the merge** and was not executed: there is no pre-merge gate
+  left to satisfy, and editing a merged PR's body would change nothing. Reported rather than
+  performed as busywork.
+- #1830 remains OPEN at `a06e1529f`, exact-head green, sole `status:ready-merge`, now under
+  independent coordinator audit — left alone.
+
+## D-168 — #1832 verified, corrected, gated, and dispatched to IMPL-EVAL
+
+**The authorized resolution works, and I verified the load-bearing facts myself rather than trusting
+an 8-hour-stale artifact:**
+
+| Check | Result |
+| --- | --- |
+| Repo-wide `deno task test` at `27967f366` | **`REAL_EXIT=0`, 4,444 passed / 0 failed / 19 ignored** |
+| All three `TanStack usage:` tests | **`REAL_EXIT=0`, 3 passed / 0 failed** |
+| #1829's three test blocks vs `f59874abd` | **byte-identical, all three** |
+
+Byte-identity was established by extracting each `Deno.test` block from both revisions and comparing
+text — not by eyeballing a diff. The condition was met exactly: **green from adapting the adapter,
+not from relaxing #1829's assertions.**
+
+**Two evidence defects found and corrected.** At `27967f366` the worklog still claimed
+`packages/fresh/deno.json` was "untouched" and "intentionally outside this leaf" while the branch
+modified it, and it still recorded the pre-fix **FAIL** as the outcome. Both were **rewritten in
+place** at `81339e24e` (worklog-only, 85 insertions / 49 deletions), not contradicted by an appended
+note. A leaf whose evidence disagrees with its own diff cannot be evaluated.
+
+**Three files outside the declared scope — checked before judging, not after.** Each was compared
+against `main`, which does not change any of them, so all three are leaf-authored:
+`packages/fresh/deno.json` (a second `@tanstack/ai` pin — leaving it would create the exact
+two-versions-in-one-graph defect the brief forbids), the scaffold `import-resolver.ts` hardcoded
+`ai-mcp@0.2.1`, and the zod-alignment residual list. All are forced by coherence, but they were
+**undeclared**, so I required them stated in the worklog and PR `## Scope` with an explicit warning
+that the zod edit only narrows a residual list and must not drift into #1320's work.
+
+**IMPL-EVAL dispatched** at `81339e24e` on the opposite-family GLM route. The brief aims the evaluator
+at the places most likely to be wrong rather than asking for a re-read — above all the **zod-alignment
+narrowing**, which is correct only if `@ag-ui/core` genuinely left the graph; if it did not, the
+checker now under-reports a real residual, which is a **fail-open change disguised as cleanup**. It is
+also asked to judge whether top-level finish-reason precedence could mask a case where 0.52 reports a
+*different* reason in metadata than a stale top-level field, and to hunt independently for a fourth
+stale `@tanstack/ai*` pin.
+
+## D-169 — Remaining Internals milestone queue assigned with independent parallelism
+
+Surveyed the seven open `orchestrator:internals` issues on milestone 0.0.7 and assigned the two that
+are genuinely independent **now**, rather than dispatching work that would immediately block:
+
+| Issue | Disposition |
+| --- | --- |
+| **#1750** | **DISPATCHED** — agentic task-separator parser fix. Disjoint surface. |
+| **#1751/#1802** | **RESUMED** — parked leaf, flake finding resolved. |
+| #1695/#1832 | active, under IMPL-EVAL |
+| #1737/#1830 | ready-merge, coordinator audit |
+| #1543 | **blocked** — `deno.lock` conflict with #1832; must serialize behind it |
+| #1351 | **blocked** — acceptance requires #1349's contribution descriptors; Features PR #1834 is still OPEN, and it also needs an `@orpc/*` family move that serializes on the lock |
+| #1429 | **not ours** — Aspire-owned (PR #1744, `epic:aspire-13-5`) despite the internals label |
+
+**#1750** was launched with first-hand evidence rather than a restatement of the issue: I hit this
+defect twice today, and the second site — `deno task agentic:codex-resume -- …` → `Unknown argument:
+--` (`rc=2`) — is **not** the hybrid launcher the issue names. So the brief makes a **survey the first
+deliverable**, not the fix: enumerate every `deno task`-exposed agentic entry point with a strict
+parser. Fixing one site and leaving three is the real failure mode here. It also pins the contract
+tightly — discard exactly one *leading* `--`, keep unknown later arguments and non-leading `--`
+fail-closed — so the fix cannot degrade into "ignore tokens we do not recognise", trading a loud
+failure for a silent one.
+
+Its launch was refused with `duplicate_sender_risk`. **Proved staleness before acting**, per the
+standing hazard: session `01a05527-3e16-…` idle **14.6 hours**, no process holding the worktree, and
+— checked, not assumed — its first message shows it is **#1750's own prior thread**. So I resumed
+that thread rather than relaunching or deleting a lease record, which is the tool's own
+`operatorAction`. Its previous turn had produced no commits and no run dir, so nothing was lost; the
+worktree was reset to current `main` and the widened brief supersedes the original.
+
+**#1751** was resumed with the flake resolution handed over rather than left for it to rediscover:
+two clean runs at its own parked head (4,464 / 0 / 19, twice), totals matching the failing run
+exactly, plus the discarded hypothesis (its sender tests use temp dirs and forbid the production
+sender root, so concurrent host launches cannot have raced them). It carries the transferable rule —
+always run the root suite with `--output --pretty` so a failure names itself — and a hard boundary
+away from #1750's launcher/parser surface.
+
+Every dispatch this round was sent with a **captured `DISPATCH_REAL_EXIT`**, after the earlier silent
+`thread-store conflict` drop.
