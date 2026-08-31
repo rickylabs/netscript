@@ -2140,3 +2140,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - #1834 is technically green but its body still says “draft-only.” Features must make the bounded
   truthful wording correction and produce a post-edit close-gate before the coordinator merges it.
   Canary 5 must not cut between #1349 Slice 1 and its runtime-consuming Slices 2–3.
+
+## Resume delta — 2026-08-31T14:40:15Z
+
+- Current main is `58a4a10eb3b73a0e6c9452e4ed6c7def93f45c92` after Features PR #1834 shipped
+  from immutable head `903cd520eda8fcd925c4b5cd8f56e4bb018feeea`. Independent GLM PASS, exact
+  scoped SDK/quality/architecture gates, complete Slice-1 DoD, unchanged lock, zero threads, and a
+  post-truth-edit close-gate were verified; the PR is sole `status:shipped`.
+- #1349 remains open by design. Features must dispatch and finish the private adapter/runtime Slices
+  2–3 immediately; canary 5 is prohibited while the public contract is accepted but not consumed.
+  This is a concrete short coherence gate, not a reason to stall other lane merges.
+- The coordinator continues the open-PR reduction with #1830/#1773/#1640 audits while Docs converges
+  #1813 and Aspire/Fixes continue their own queues independently.

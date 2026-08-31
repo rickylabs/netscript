@@ -3381,3 +3381,17 @@
 - The coordinator squash-merged #1811 as `72599120a435c49e5791e795fd5c84b55f02be03`, closing
   #1809. #1809/#1811 are normalized to sole `status:shipped`; Docs proceeds serially to the already
   PASS-evaluated #1813, then #1816 and #1818 corpus additions.
+
+## 2026-08-31T14:40:15Z — #1834 SDK client-contribution contract Slice 1 ships
+
+- Features PR #1834 reached immutable head `903cd520eda8fcd925c4b5cd8f56e4bb018feeea` with exact
+  scoped SDK gates, whole-branch quality/architecture checks, separate OpenHands GLM PASS, complete
+  Slice-1 DoD, unchanged lockfile, zero review threads, and clean current-main integration.
+- Independent audit caught one stale sentence calling the now-ready PR “draft-only.” The coordinator
+  corrected it to a truthful mergeable-but-not-publishable intermediate and required close-gate
+  attempt 2 (`99526057702`), which started after the edit and passed. The generated-corpus path
+  differences were proven to belong only to main since merge-base `65cd8a077`; the exact merge tree
+  retains current main's cumulative corpus rather than regressing it.
+- The coordinator squash-merged #1834 as `58a4a10eb3b73a0e6c9452e4ed6c7def93f45c92` and
+  normalized the PR to sole `status:shipped`. It deliberately uses `Refs #1349`; Slices 2–3 remain
+  Features-owned and must land before canary 5 because Slice 1 exposes accepted but unconsumed types.

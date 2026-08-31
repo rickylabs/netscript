@@ -276,3 +276,12 @@ artifact-pinned production E2E.
 - Exact-head CI, separate IMPL-EVAL PASS, complete acceptance, zero threads, no corpus loss, and a
   clean post-#1814 synthetic merge were verified. This remains docs membership, not a canary cut
   trigger; #1349's public runtime slices remain the coherence gate.
+
+## 2026-08-31T14:40:15Z — SDK contribution contract Slice 1 lands, canary remains held
+
+- PR #1834 head `903cd520eda8fcd925c4b5cd8f56e4bb018feeea` squash-merged as
+  `58a4a10eb3b73a0e6c9452e4ed6c7def93f45c92`. It adds the upstream-neutral descriptor/helper/error
+  contract, tuple/server-key algebra, context compatibility, and compile proofs for #1349 Slice 1.
+- Independent GLM PASS, scoped SDK and repository gates, zero threads, unchanged lock, clean current
+  integration, and a post-wording-edit close-gate passed. Canary 5 is intentionally held until
+  #1349 Slices 2–3 consume the public types at runtime; all unrelated merges continue.
