@@ -7299,3 +7299,60 @@ away from #1750's launcher/parser surface.
 
 Every dispatch this round was sent with a **captured `DISPATCH_REAL_EXIT`**, after the earlier silent
 `thread-store conflict` drop.
+
+## D-170 — #1830 merged; #1802's parked failure has a named root cause, and a real defect remains
+
+- **#1830 MERGED** 14:43:53Z; issue #1737 CLOSED. Third internals leaf landed this session
+  (#1823, #1828, #1830).
+- **#1834 (Features, sdk-client contribution seam Slice 1) MERGED** 14:40:15Z, but issue **#1349
+  remains OPEN at `status:plan`** — it is multi-slice. So #1351's dependency is *partially* satisfied,
+  not satisfied. #1351 also still serializes on `deno.lock` behind #1832, so it stays queued rather
+  than dispatched. Noted so the next supervisor does not read "#1834 merged" as "#1351 unblocked".
+
+### My flake conclusion on #1802 was incomplete — corrected
+
+An independent audit found the old 1/4483 failure is **genuinely fixed by a host-side PID1/inotify
+correction**, not merely unreproducible: **4,498 passed / 0 failed / 19 ignored**, agentic
+**531/531**. My two clean runs were correct as measurements and correct to reclassify it away from
+"real regression", but "unidentified flake" was the wrong resting place — there was a nameable cause
+and the honest answer was that I had not found it. Recorded as a named root cause, not my guess.
+
+### The real remaining defect — and it explains something I hit today
+
+**The sender record does not persist the launch `profileHome` / `CODEX_HOME`.** Production recovery
+therefore always probes the default `$HOME/.codex`, so a sender created under an isolated profile can
+**never** bind its rollout/thread evidence — recovery looks in the wrong tree, finds nothing, and the
+lease is permanently unrecoverable. That is precisely the failure class this leaf exists to fix, so
+shipping without it would leave the headline defect half-repaired.
+
+This is not abstract: launching sibling leaf **#1750** today was refused with `duplicate_sender_risk`
+naming a session dead for **14.6 hours**, with no way to distinguish "a live agent owns this" from "a
+dead agent left a record behind". I had to prove liveness by hand from `/proc` and rollout mtimes.
+
+Amendment dispatched requiring: persist and resolve **exact activation-profile provenance**,
+**backward-compatible** (pre-field records still load) and **fail-closed** (absent/ambiguous
+provenance must refuse, never silently fall back to `$HOME/.codex` — an unrecoverable lease that says
+so loudly beats one that confidently probes the wrong tree); **two** regressions, a production-path
+success **and** an isolated-profile case that fails without the fix, since a production-only test
+would pass today and prove nothing.
+
+Also required: replace the legacy single `stale` kind — derived from two booleans at
+`sender-ownership.ts:206` (`rolloutTerminal && threadInactive`) and `:210` (`boundAbsence`) — with
+**`blocked` / `repair-required`** vocabulary that names the operator's actual next action. The brief
+states plainly that if both new kinds end up handled identically at every call site, that is a rename
+rather than a model fix and the author must say so instead of shipping cosmetic vocabulary.
+
+### Dispatch hazard recurred and is now handled properly
+
+The amendment **failed to deliver** — `DISPATCH_REAL_EXIT=1`,
+`thread-store conflict: … already has an active writer` (the author was mid-turn, idle 2s). This is
+the second silent-drop of this session. Rather than fire-and-forget again, a **retry loop** is armed:
+it polls the rollout mtime, dispatches only once the thread has been idle ≥90s, captures the real
+exit on every attempt, and stops on the first confirmed delivery. Fire-and-forget steering is the
+actual defect in my own process here — a dropped steer is indistinguishable from a delivered one
+unless the exit is read.
+
+Memory updated: the sender-ownership note now carries both root causes (boolean liveness check **and**
+missing profile provenance) and the correct recovery order — prefer the tool's own `operatorAction`,
+check whether the named session is the slice's *own* prior thread, release via the adapter only if
+genuinely foreign, and never `rm` the record.
