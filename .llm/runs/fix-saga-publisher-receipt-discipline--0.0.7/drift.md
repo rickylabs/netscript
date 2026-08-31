@@ -7,8 +7,8 @@ initial operating plan.
 
 - **What:** The locked base already contains #1740's S5 changes.
 - **Source:** Commit `2a1248d33`; current publisher, sample, CLI client, and probe source.
-- **Expected:** Issue #1365 cites a silent `127.0.0.1:8092` publisher fallback, two additional literal
-  sites, and a scaffold job that discards its receipt.
+- **Expected:** Issue #1365 cites a silent `127.0.0.1:8092` publisher fallback, two additional
+  literal sites, and a scaffold job that discards its receipt.
 - **Actual:** No cited runtime/CLI/probe site falls back to 8092, and the scaffold job already
   discriminates the receipt and returns a failed job result. The publisher's missing-endpoint reason
   remains terse and public docs remain stale/unsafe.
@@ -39,14 +39,14 @@ initial operating plan.
 
 ## 2026-08-31 — #1764 carrier is not integrated at the locked base
 
-- **What:** `9d8bbb4e96e555462cdd8432883a28d493b051eb` descends from the leaf's locked base but is not an
-  ancestor of it.
+- **What:** `9d8bbb4e96e555462cdd8432883a28d493b051eb` descends from the leaf's locked base but is
+  not an ancestor of it.
 - **Source:** `git merge-base` and `git merge-base --is-ancestor`.
 - **Expected:** The brief asked to diff after main integrates the carrier.
 - **Actual:** Main at the owner-locked base predates that carrier. The product source paths do not
-  collide; `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is
-  a mechanical generated collision. `packages/plugin-sagas-core/README.md` also changes on the
-  carrier and is intentionally excluded from this leaf's ceiling.
+  collide; `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is a
+  mechanical generated collision. `packages/plugin-sagas-core/README.md` also changes on the carrier
+  and is intentionally excluded from this leaf's ceiling.
 - **Severity:** significant
 - **Action:** keep the locked base; regenerate the MCP corpus in-ceiling for the leaf, then require
   the merge coordinator to regenerate it once more at the final integrated head. Do not duplicate
@@ -88,3 +88,75 @@ initial operating plan.
 - **Action:** mark every host-runtime gate `NOT_RUN — lease required`; name the exact future command
   but do not run it. PLAN-EVAL and the primary must decide when a leased runtime pass occurs.
 - **Evidence:** `plan.md` validation table; `worklog.md` runtime gates.
+
+## 2026-08-31 — Main convergence changed six paths in the authoritative ceiling
+
+- **What:** The supervisor converged the artifact-only leaf onto main
+  `8a925764276b25ef7cef484db273604f44557cef` at merge head
+  `7c2a12fa1617666a0e17acd81165c25f2325126f`.
+- **Source:** Merge parents/ancestry plus an explicit-path diff using the 25-path ceiling locked in
+  the original S1 plan.
+- **Expected:** The earlier plan treated `5197e70b7` as owner-locked and anticipated a later
+  generated-corpus reconciliation.
+- **Actual:** The owner superseded that base lock. Main touched **6/25** authoritative ceiling
+  paths: `.llm/assets/agent-docs/prose.json.gz`, `.llm/assets/agent-docs/provenance.json`,
+  `deno.json`, `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, and
+  `packages/mcp/src/publish-assets.generated.ts`. No handwritten publisher, quality-scanner, sample,
+  or public-doc source path in the ceiling changed. The merge was conflict-free.
+- **Severity:** significant
+- **Action:** accept the owner-directed convergence, retain all six intersecting paths in the
+  narrowed derivative/task ceiling, and replace every old gate number with a new-base measurement.
+- **Evidence:** `plan.md` Rebaseline and Convergence section and Gate Table.
+
+## 2026-08-31 — Primary narrowed the implementation to two real defects
+
+- **What:** The primary reduced the leaf to receipt enforceability and unsafe documentation.
+- **Source:** Supervisor directive after independent verification of the six S1 design answers.
+- **Expected:** The original issue and first S1 plan included a silent endpoint fallback, a
+  scaffold-success defect, endpoint diagnostics, and workers sample/guard changes.
+- **Actual:** Two issue headline mechanisms were already fixed before this leaf: the runtime has no
+  `127.0.0.1:8092` fallback, and the emitted worker sample already discriminates a rejected receipt
+  before returning success. The remaining implementation defects are (1) the API still permits a
+  caller to discard the result and (2) four public documentation calls still teach that discard. The
+  stale 8092 reference and source-sync gate are coupled documentation corrections.
+- **Severity:** significant
+- **Action:** shrink the ceiling from 25 to 20 paths; remove every `plugins/workers/**` product/test
+  path, endpoint implementation/test/README path, and redundant workers guard. Keep the sample
+  source read-only; prove it through the repository quality rule and source-derived docs test.
+- **Evidence:** narrowed contract and ceiling in `plan.md`; current
+  `plugins/workers/src/cli/official-sample-configuration.ts` receipt branch.
+
+## 2026-08-31 — Rich no-endpoint diagnostic is a proposed follow-up, not leaf scope
+
+- **What:** S1 identified a useful improvement to replace the terse `no-endpoint` rejected reason,
+  but the narrowed owner contract does not authorize it.
+- **Source:** Original design answer 2 and the primary's explicit narrowing.
+- **Expected:** The first plan would make a missing endpoint name all sources tried and explain
+  Aspire detection.
+- **Actual:** Endpoint resolution is already fallback-free, and diagnostic enrichment is a distinct
+  improvement outside the two authorized defects.
+- **Severity:** significant
+- **Action:** propose a separately authorized follow-up. Preserve this complete attempted-source and
+  detection list for that work: `options.baseUrl`; `services__<serviceName>__https__0`;
+  `services__<serviceName>__http__0` (including exact default key `services__sagas-api__http__0`);
+  `SAGAS_API_URL`; `NETSCRIPT_SAGAS_URL`; whether any `services__*` key or truthy `NETSCRIPT_ASPIRE`
+  marker proved Aspire; and whether environment-key enumeration was denied. Do not implement any
+  part of it in #1365 without explicit rescope.
+- **Evidence:** `plugins/sagas/src/runtime/saga-publisher.ts`; prior S1 answer retained in branch
+  history; narrowed `plan.md` deferred scope.
+
+## 2026-08-31 — PLAN-EVAL is now recommended N/A, pending primary ruling
+
+- **What:** Narrowing removed the endpoint, discovery, scaffold, and workers design decisions that
+  previously justified adversarial plan evaluation.
+- **Source:** Harness run-loop conditional PLAN-EVAL policy and the complete owner-supplied narrowed
+  contract.
+- **Expected:** Original S1 parked a mandatory separate-session PLAN-EVAL before S2.
+- **Actual:** Public mechanism, entrypoints, forbidden alternatives, exact docs defects, ceiling,
+  acceptance behavior, and gates are now fully specified. Remaining work is bounded implementation
+  and fixture precision.
+- **Severity:** minor
+- **Action:** recommend `PLAN-EVAL: N/A`; do not treat the recommendation as authority. Stop before
+  S2 until the primary accepts it or dispatches PLAN-EVAL. IMPL-EVAL remains separate-session work.
+- **Evidence:** `plan.md` PLAN-EVAL Recommendation and open-decision sweep.

@@ -2,92 +2,83 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `fix-saga-publisher-receipt-discipline--0.0.7` |
-| Branch | `fix/saga-publisher-receipt-discipline` |
-| Current phase | `plan` |
-| Archetype | `3 — Runtime/Behavior` for core; `5 — Plugin Package` for sagas/workers |
-| Scope overlays | `docs` |
+| Field                            | Value                                            |
+| -------------------------------- | ------------------------------------------------ |
+| Run ID                           | `fix-saga-publisher-receipt-discipline--0.0.7`   |
+| Branch                           | `fix/saga-publisher-receipt-discipline`          |
+| Base                             | `8a925764276b25ef7cef484db273604f44557cef`       |
+| Converged head before correction | `7c2a12fa1617666a0e17acd81165c25f2325126f`       |
+| Current phase                    | corrected `plan` checkpoint; artifacts only      |
+| Archetypes                       | core 3 Runtime/Behavior; plugin 5 Plugin Package |
+| Overlay                          | docs                                             |
 
 ## Current State
 
-S1 research and design are complete against owner-locked base `5197e70b7`. No product or test code
-has been written. The plan selects a companion `publishSagaOrThrow(...)` core helper plus a
-repository discarded-receipt gate, rich missing-endpoint diagnostics, preservation/testing of the
-already-correct scaffold sample, public-doc correction, and generated derivatives. Separate-session
-PLAN-EVAL is the hard stop before S2 and is parked for the primary to dispatch.
+S1 was accepted and then owner-narrowed. No product/test code exists on the branch. The locked
+implementation contract now has two defects only: add the throwing publisher companion plus
+discarded-receipt quality rule, and correct four unsafe documentation calls plus stale fallback
+prose/source-sync coverage. The product ceiling is 20 paths. Every workers product/test path and all
+endpoint-diagnostic work are excluded.
 
-## Completed
+The corrected plan recommends `PLAN-EVAL: N/A` because scope/contract/acceptance/gates are complete;
+the primary has not yet ruled. Do not begin S2 until it does. Gate 30 remains `NOT_RUN`; a
+serialized runtime lease is required.
 
-- Read required harness, doctrine, Deno toolchain, repo-tools, PR, RTK, JSR-audit, and CLI skills.
-- Re-verified every issue citation at the locked base.
-- Classified `plugin-sagas-core` as Archetype 3 and `plugins/sagas`/`plugins/workers` as Archetype 5.
-- Measured whole-package static baselines for all three packages.
-- Derived docs/export asset cascade from the generators themselves.
-- Diffed the #1764 carrier and isolated its single generated-ceiling collision.
-- Locked the implementation path ceiling and S2 slices.
+## Convergence
 
-## In Progress
+- Supervisor reset target: `7c2a12fa1`.
+- Merge parents: accepted S1 artifact commit `2e9460450` and current main `8a9257642`.
+- Original 25-path ceiling intersection from old base to current main: **6/25**.
+- Intersecting paths: two agent-doc assets, root `deno.json`, CLI agent-doc derivative, MCP corpus,
+  and MCP publish-assets derivative.
+- Handwritten publisher/docs/sample intersection: zero.
+- Narrowed ceiling retains the same six derivatives/task paths.
 
-- Commit and explicit-refspec push of S1 harness artifacts only.
+## Locked Decisions
 
-## Next Steps
+1. Add `publishSagaOrThrow` over `SagaPublisherPort`; no required method or fake compile-time type.
+2. Reuse `SagasError`; preserve reason/retryability/cause and exact accepted message type.
+3. Core owns implementation; plugin runtime only re-exports.
+4. Quality rule identifies saga-publisher bindings and standalone awaited `publish`/`publishMany`;
+   it must cover source, docs fences, and the emitted sample template without flagging unrelated
+   publishers.
+5. Workers sample is read-only source truth; no workers guard or product edit.
+6. Source-derived docs test is wired into `docs:snippets:test`.
+7. Endpoint diagnostics are a proposed follow-up recorded in `drift.md`.
 
-1. Primary dispatches a separate opposite-family PLAN-EVAL when its routing change is resolved.
-2. If PLAN-EVAL passes, S2 implements the contract/helper and quality rail first.
-3. S2 implements rich publisher diagnostics and package tests.
-4. S2 locks the already-correct emitted sample with worker/docs derivation tests and fixes all four
-   public-doc discard examples plus the stale 8092 reference.
-5. S2 regenerates in-ceiling derivatives and runs static/whole-package gates.
-6. The exact future runtime command is
-   `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`, but it remains prohibited until
-   the primary grants a serialized runtime lease.
+## S2 Slices (only after primary ruling)
 
-## Key Decisions
+1. Core helper + core/plugin exports + helper tests + port doc.
+2. Discarded-receipt scanner rule + fixtures.
+3. Source-sync test/task + four unsafe calls + two reference corrections.
+4. Attributed derivatives + full static/package/docs/lock/ceiling handoff.
 
-| Decision | Source | Notes |
-| --- | --- | --- |
-| Use `publishSagaOrThrow(...)` plus a discarded-receipt quality rule | Doctrine A1/A2/A5/A13/A14; TypeScript capability; issue option (b) | Companion helper preserves the non-throwing port and external structural implementers. |
-| Keep server discovery keys raw-hyphen | AppHost generator/tests and SDK server resolver | `services__sagas-api__http__0` is the correct server key. |
-| Defer browser full-key parity | SDK browser fallback and scope boundary | The full-key asymmetry is real, but shorthand resolution works and publisher runtime is unaffected. |
-| Preserve S5 sample behavior and add derivation proof | Current generator source | No gratuitous rewrite of already-correct product behavior. |
-| Own public docs in this leaf | `CLAUDE.md` docs exception and docs overlay | Three unsafe prose pages plus two reference pages are in ceiling. |
-| Treat MCP corpus overlap as mechanical | #1764 focused diff | Regenerate in leaf and again at integrated head. |
+## New-Base Baseline Highlights
 
-## Files Changed
+- Core: 112 check/lint/fmt files; 84 passed/0 failed/3 ignored; doc-lint 9 private refs; audit pass
+  with 2 warnings.
+- Sagas: 87 files; 55/0/1; doc-lint 27 private refs; audit baseline red for `doctor` module tag + 2
+  warnings.
+- Workers (continuity only): 102 files; 52/0/0; doc-lint 20; audit baseline red + 3 warnings.
+- Quality: 0 findings, 7 valid allowances. Unsafe saga-publisher doc census: 4; sample: 0.
+- Docs: snippets 11; links 103/0; accuracy pass.
+- Doctrine: core 3W/2I, sagas 8W/2I, workers 9W/2I.
+- MCP corpus: `3a3ff013...d380a`, 35 packages/271 subpaths/7677 symbols.
+- Lock: `edfa0c24...d1820c`.
+- Write-capable agent-doc/assets exact gates: not run in read-only S1; assets underlying `--check`
+  passed. Runtime Gate 30: not run.
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/fix-saga-publisher-receipt-discipline--0.0.7/supervisor.md` | new | Run identity and overrides |
-| `.llm/runs/fix-saga-publisher-receipt-discipline--0.0.7/research.md` | new | Re-baselined evidence |
-| `.llm/runs/fix-saga-publisher-receipt-discipline--0.0.7/plan.md` | new | Locked design, ceiling, slices, and gates |
-| `.llm/runs/fix-saga-publisher-receipt-discipline--0.0.7/worklog.md` | new | Design checkpoint and measured results |
-| `.llm/runs/fix-saga-publisher-receipt-discipline--0.0.7/context-pack.md` | new | Resumable handoff |
-| `.llm/runs/fix-saga-publisher-receipt-discipline--0.0.7/drift.md` | new | Material deviations |
+## Hard Constraints
 
-## Gates
+- Artifacts only until this correction commit is pushed.
+- No `plugins/workers/**` edit.
+- No endpoint-resolution/diagnostic edit.
+- No scaffold, `e2e:cli`, Aspire, Docker, container, or AppHost command.
+- No write-capable derivative task in S1.
+- No dependency or lock change.
+- Explicit push refspec only.
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Static | measured | Three package check/lint/fmt suites pass; known doc-lint baselines recorded |
-| Fitness | measured | Quality and doctrine scanners pass; JSR baseline exceptions quantified |
-| Runtime | `NOT_RUN — lease required` | Primary correction; no runtime evidence retained |
-| Consumer | partial/static | Workers whole-package suite and docs static gates pass; runtime consumer proof is lease-blocked |
+## Next Action
 
-## Open Questions
-
-- No design question remains open. PLAN-EVAL is pending primary dispatch.
-- Runtime merge-readiness remains intentionally unmeasured until a serialized lease is granted.
-
-## Drift and Debt
-
-- Drift: S5 already fixed the fallback/sample behavior; browser normalization is only a partial
-  asymmetry; #1764 is not in the locked base; runtime commands now require a lease.
-- Debt: no new architecture debt entry is planned. Existing saga/workers cardinality, JSR module-tag,
-  private-type doc-lint, and worker thinness debt are baseline-only and must not increase.
-
-## Commits
-
-- S1 artifact commit is recorded by branch history after the explicit-refspec push. No PR exists by
-  owner instruction.
+Primary accepts `PLAN-EVAL: N/A` or dispatches separate PLAN-EVAL. Only then may the implementation
+author begin S2. IMPL-EVAL remains a separate-session post-implementation requirement unless waived.
