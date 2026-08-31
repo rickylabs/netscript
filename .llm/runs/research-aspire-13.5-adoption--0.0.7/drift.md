@@ -4685,3 +4685,33 @@
   - **#1839 escalated** with the cross-lane evidence table and an added acceptance criterion: three or
     more PRs from at least two lanes arriving within a minute must all eventually execute, with no run
     ending `cancelled` while its non-runtime jobs are green.
+
+- **D-199 — CORRECTION to D-195, and the real #1719 box-1 answer: killing the launcher cleans the
+  PROCESS tree but NOT the run's CONTAINERS.** My earlier "no run-owned survivor" reading was wrong.
+  I drew it from `d189-03`'s process fields (`launcherPid: null`, `descendantPids: []`) and did not
+  read the same receipt's `dockerPs` block. The box does need a ruling after all.
+  - **S7 committed `bd3dbc843`** ("test(aspire): capture D-189 live teardown evidence"); worktree
+    clean. The launcher was killed with **SIGKILL** (`/bin/kill -KILL 2455225`), not SIGTERM.
+  - **Container trajectory across the receipts — this is the evidence:**
+
+    | Receipt | Containers present |
+    | --- | --- |
+    | `d189-01` before-kill | **4** — owned `postgres-0e0a2a9f`(persistent=**true**), owned `redis-sgjnfvwe`(persistent=**false**); foreign `postgres-afcfcaeb`(true), foreign `redis-grhyswmp`(false) |
+    | `d189-03` after-kill +250 ms | **4 — all still up.** Process tree gone, containers untouched |
+    | `d189-07` after `teardown --apply` | **2 — exactly the two foreign ones** |
+
+  - **Two conclusions the coordinator needs:**
+    1. **#1429's premise is only half true on 13.5.** Killing the launcher auto-cleans the **process
+       tree**; it does **not** clean the run's containers. And this is **not** the
+       Persistent-lifetime story I expected — the owned **`persistent=false` redis survived too**. So
+       the survivor is not explained by a documented Persistent annotation; DCP simply does not reap
+       containers when the launcher is SIGKILLed.
+    2. **The S7 invariant under test passed cleanly.** `agentic:leak-check` reported the survivors,
+       and `teardown --apply` removed **exactly the two owned** containers while **preserving exactly
+       the two foreign** ones. Box 2 is satisfied on live evidence.
+  - **Box 1 as literally worded is not satisfied by the kill alone** — there *were* run-owned
+    survivors immediately after it. It *is* satisfied if "no run-owned survivor" is read as the state
+    after `leak-check` + `teardown --apply`. That is the ruling needed, and it is now an
+    evidence-backed question rather than the hypothetical Persistent-lifetime one I posed earlier.
+  - Final state confirmed independently: `d189-10` four-part zero verbatim, `d189-11` leak-check exit
+    0.
