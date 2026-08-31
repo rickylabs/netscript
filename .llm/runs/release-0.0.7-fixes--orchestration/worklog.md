@@ -6593,3 +6593,33 @@ whole turn by design. Re-dispatched with `nohup`, no timeout, and delivery re-ve
 recorded below and it is not silently parked: it carries `status:plan-eval` **without** the `openhands`
 label, so the phase dispatcher's label-pair condition was never met and no evaluator ever ran. Its
 worktree (`112a6a7ba`) is also behind its pushed head (`dec3b3abd`).
+
+### Concurrency ruling for #1773: COLLIDES with #1819 on a shared generated carrier → read-only plan pass
+
+The owner authorized parallel non-overlapping fixes, conditioned on files/contracts **and generated
+corpus** not colliding. Checked rather than assumed:
+
+- **Product files: no overlap.** #1773 is entirely `packages/cli/**` (scaffold assets + e2e gates);
+  #1819 is `packages/plugin-sagas-core/**`, `plugins/sagas/**`, `docs/site/**`, plus a quality rule.
+- **Export-surface corpus: no collision.** #1819 adds a public export (`publishSagaOrThrow`) so it
+  regenerates `export-surface-corpus.generated.ts`; #1773's plan explicitly declares **no published
+  API movement**, so it does not touch that corpus.
+- **COLLISION FOUND — `packages/cli/src/kernel/assets/agent-docs.generated.ts`.** That file is written
+  by `generate-cli-assets-barrel.ts` and embeds the docs prose bundle as
+  `EMBEDDED_AGENT_DOCS_GZIP_BASE64`. **#1819 changes `docs/site/**`**, which regenerates the prose and
+  therefore that embedded blob; **#1773 runs `gen:assets-barrel`** to embed its new scaffold template
+  and rewrites the same file. Both leaves write one carrier.
+
+Per the stated condition, #1773 therefore gets a **read-only plan pass**, not concurrent dispatch. It
+is a merge-order dependency rather than a hard incompatibility — whoever merges second must
+regenerate — but that is precisely the class of cross-PR integration failure that produced the
+`D-INT-1` TS2307 red hours ago, and the deadline is not served by repeating it.
+
+**Read-only findings staged** in `planeval-1773-brief.md` (F1 gate-placement ambiguity vs. the
+Chromium-critical break, F2 stale baselines stated as expectations, F3 whether the conditional
+PLAN-EVAL threshold is met, F4 RED honesty). PLAN-EVAL routed to **Qwen 3.8 Flash max**, IMPL-EVAL to
+**GLM 5.3 Flash max**, per the 2026-08-31 ruling; existing DeepSeek receipts stand and are not rerun.
+Nothing dispatched, no head mutated.
+
+#1819 remains the single active leaf: author thread `01a05526` is `working` on the narrowed contract
+at converged head `7c2a12fa1`.
