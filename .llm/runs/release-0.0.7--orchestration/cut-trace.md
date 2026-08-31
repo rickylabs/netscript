@@ -239,3 +239,12 @@ artifact-pinned production E2E.
   identity, merge ref `1fc85e33e5` had exact current-main/head parents, and threads were zero.
 - This is valuable coordinator infrastructure but does not itself make canary 5 meaningful; it is
   recorded in merge-history membership while the checkpoint still waits for coherent public payload.
+
+## 2026-08-31T05:55:31Z — auth-kv-oauth export documentation joins cumulative payload
+
+- PR #1803 head `1947e9e05ee941ba688bd26ca3bf0a76098b57d4` squash-merged as
+  `71d5fb8e079cae74249dd7d314874a3a18e7ab28`, closing #1801. It adds real paths for all eight
+  auth-kv-oauth exports and brings the package under measured export-drift coverage.
+- Exact CI and post-edit close-gate passed; the GLM-evaluated page was unchanged, cumulative corpus
+  gates passed, local synthetic merge `3d7c7ea5e9` had exact live-main/head parents, and threads were
+  zero. It is docs membership in the eventual canary payload, not the reason to cut one by itself.

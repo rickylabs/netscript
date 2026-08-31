@@ -2091,3 +2091,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - #1664's newly exposed multi-client/UI-generator seam has a coordinator ruling: retain fail-closed
   ambiguity by default, add bounded explicit `--client <service>` selection, and prove it in the
   combined hosted E2E rather than hiding the seam by reordering gates.
+
+## Resume delta — 2026-08-31T05:55:31Z
+
+- Current main is `71d5fb8e079cae74249dd7d314874a3a18e7ab28` after Docs PR #1803 shipped from
+  immutable head `1947e9e05ee941ba688bd26ca3bf0a76098b57d4`, closing #1801. Exact CI and the
+  post-body-edit close-gate passed; evaluated page content and the cumulative mapping/corpus gates
+  were preserved; threads were zero.
+- #1823's intervening harness-only merge had zero overlap. Local exact synthetic merge `3d7c7ea5e9`
+  provided current-main/head parent proof when GitHub's cached pull merge ref still named the prior
+  base. #1811 must regenerate from `71d5fb8e`, not its earlier prepared base, to retain all 25 rows.
+- #1828's recovered separate-session GLM verdict is PASS at head `76c66e894`; Internals is moving it
+  through ready lifecycle and exact CI as the P0 prerequisite for #1762.

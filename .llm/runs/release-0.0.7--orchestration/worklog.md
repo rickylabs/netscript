@@ -3311,6 +3311,19 @@
   They may carry exact-head gates only with zero-overlap proof and a fresh live-main synthetic merge
   ref; no gratuitous source rebase/regeneration is required solely for #1823.
 
+## 2026-08-31T05:55:31Z — #1803 auth-kv-oauth export-path coverage ships
+
+- Docs PR #1803 reached immutable head `1947e9e05ee941ba688bd26ca3bf0a76098b57d4` with the
+  evaluated auth-kv-oauth page unchanged, a cumulative 25-row authoritative mapping, canonically
+  regenerated corpora, exact CI run `33361522919` green, complete #1801 acceptance, and zero threads.
+- The coordinator corrected stale body wording that still called IMPL-EVAL pending. Close-gate
+  attempt 2 started at 05:54:14Z after the 05:46:24Z edit and passed. #1823's intervening harness-only
+  merge had zero path overlap; local synthetic merge `3d7c7ea5e991e2a17de967fc34c9cd094d5deca3`
+  proved exact parents `[ee0e626bb945e2d9af58e49bd7bbdf714d0785c3, 1947e9e05ee941ba688bd26ca3bf0a76098b57d4]`.
+- The coordinator squash-merged #1803 as `71d5fb8e079cae74249dd7d314874a3a18e7ab28`;
+  #1801/#1803 are sole `status:shipped`. Docs was immediately redirected to regenerate #1811 from
+  this cumulative corpus rather than its stale pre-#1803 base.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance
