@@ -9103,3 +9103,42 @@ Checked the audited candidate queue: #1451 remains deferred (genuinely complex, 
 plumbing and a matching-strategy design decision — flagged, not silently dropped). #1452 was not yet
 researched. No further immediately-obvious bounded candidate identified without deeper research;
 holding here rather than force a fifth dispatch without the same diligence the prior four received.
+
+## #1452 — researched, sliced, Slice 1 dispatched; Slice 2 flagged for an architecture decision
+
+Researched rather than assumed. The duplicated glue the issue complains about is measurable: the
+scaffold template is **123 lines**, of which the `LazyPluginKv` class is **exactly 69 (56%)** — a
+pure lazy-delegation wrapper implementing `WatchableKv` by deferring `getKv()`. **Both of those are
+`@netscript/kv` types**; the class has zero plugin-specific content.
+
+**The genuine architectural question, found by checking rather than guessing:** publishing the *full*
+`createPluginServiceContext()` from `@netscript/plugin/sdk` (where the `PluginServiceContext`
+contract already lives) requires `@netscript/plugin` to import `@netscript/kv` — and it **does not
+depend on kv today**, verified against its `deno.json`. Every `plugin-*-core` package does; the base
+package deliberately doesn't, and every plugin author pays for its dependency closure. Two more open
+questions compound it: the db-client resolver is a **project-relative** `../../database/mod.ts`
+import no published package can resolve (so its injection shape is a public-API decision), and
+**`appsettings` — named in the issue's acceptance — appears nowhere in the codebase**, searched.
+
+**The issue's own wording permits the clean way out**: "or smaller composable host primitives."
+Publishing `createLazyKv()` from `@netscript/kv` removes 56% of the template, introduces **no new
+dependency edge anywhere**, and requires **no design decision** (the shape is dictated by the
+existing `WatchableKv` interface). That's Slice 1. Slice 2 — the host factory, the dependency-edge
+call, the resolver injection, the undefined appsettings scope — is **deferred and flagged**, with
+`PLAN-EVAL: N/A` explicitly scoped to Slice 1 only and Slice 2 marked as needing a PLAN-EVAL or owner
+ruling before any implementer touches it.
+
+| Field | Value |
+| --- | --- |
+| Branch | `feat/kv-lazy-plugin-context` (new, off `main` `5197e70b7`) |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1452` |
+| Codex thread | `01a0559c-0c08-7d30-a158-b888a7fa798e`, `openai · gpt-5.6-sol · high` |
+| Base | `fb08d2f9d` |
+| Ceiling | `packages/kv` (new module + mod exports + new test), the scaffold template, and the regenerated `embedded.generated.ts` carrier |
+
+Brief requires laziness be **proven by observation** (that `getKv` is not called at construction and
+is called on first use), not merely that operations return correct values — the failure mode a
+happy-path test would miss. D-1's cache-trap finding carried forward again.
+
+**Five leaves now**: `#1387` S9, `#1591`, `#1458`, `#1592` S1 (all Tier-A ACCEPTED, parked pending
+#1792) and `#1452` S1 (implementing).
