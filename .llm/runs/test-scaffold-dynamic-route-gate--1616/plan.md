@@ -211,7 +211,7 @@ partial HTTP rendering, and cleanup.
 | 4 | Scoped lint/fmt | Structured lint/fmt wrappers over changed `.ts/.tsx` roots | Pass without unrelated/generated drift. |
 | 5 | Asset integrity | `deno task check:assets-barrel` | Generated embedded assets match manifest/templates. |
 | 6 | Fitness | `deno task quality:gate` (includes architecture fitness) | Pass; no new/deepened debt. |
-| 7 | Repository regression | `deno task test` through the structured verdict path | Measured current main `8a925764…`: exit 0, 4,426 passed / 0 failed / 19 ignored in 208.001s. Measured branch `f22348a80…`: exit 0, 4,426 passed / 0 failed / 19 ignored in 198.633s. After implementation require exit 0; if current main is red when remeasured, require no additional branch failures with exact base/branch counts. |
+| 7 | Repository regression | `deno task test` through the structured verdict path | **Measured** at main `8a925764…`: exit 0, 4,426 passed / 0 failed / 19 ignored in 208.001s. **Measured** at branch `f22348a80…`: exit 0, 4,426 passed / 0 failed / 19 ignored in 198.633s. These counts are **carried forward** to candidate `ccd63a085`, **not freshly remeasured** — see *Gate-7 baseline carry-forward proof* below. After implementation require exit 0; if current main is red when remeasured, require no additional branch failures with exact base/branch counts. |
 | 8 | Generated compile | Existing `generated.deno-check` inside runtime | The emitted Form-C page compiles with inferred `ctx.path.id: string`. |
 | 9 | Live dynamic route | Existing runtime sequence, new critical behavior gate | Plain GET and `?fresh-partial=true` GET for one per-run nonce each return 200 with `data-order-id="<nonce>"` and `href="/examples/orders/<nonce>"`; zero endpoint candidates fail. |
 | 10 | Merge readiness (leased) | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | `NOT_RUN` in planning; requires coordinator lease. At merge-readiness require exit 0 with generated/build/request assertions and cleanup. |
@@ -219,6 +219,30 @@ partial HTTP rendering, and cleanup.
 The frontend overlay's real-browser coverage remains in the same one-pass runtime suite through
 `behavior.app-reference`; the new regression assertion is HTTP-semantic rather than visual. Publish
 dry-run and JSR audit are N/A because no published package export or declaration surface changes.
+
+### Gate-7 baseline carry-forward proof (supervisor-recorded, coordinator-ruled)
+
+The gate-7 numbers above were measured at branch `f22348a80` / main `8a925764`. The evaluated
+candidate is `ccd63a085`. Those counts are **carried forward, not remeasured**, on this proof:
+
+- **Ancestry**: `git merge-base --is-ancestor f22348a80 ccd63a085` returns true. The measured head is a
+  direct ancestor of the candidate; no rebase or history rewrite intervened.
+- **Delta size**: `git diff --name-only f22348a80..ccd63a085` lists **28 files**.
+- **Composition**: every one is documentation, a `.llm/runs/` run artifact, a `.llm/assets/` agent-doc
+  asset, or a `*.generated.*` carrier — except a single file,
+  `.llm/tools/docs/check-exports-drift.ts`, which received **three data-only additions** to
+  `AUTHORITATIVE_MAPPING` (`plugin-ai-core` #1796, `plugin-streams-core` #1798, `mcp` #1800). No
+  control flow changed in it.
+- **Zero product or test movement**: that same diff filtered to `^(packages|plugins)/`, excluding
+  generated carriers, returns **nothing**. No product source, no test source, no scanner, and no
+  measurement code moved.
+- **No per-entry test generation**: no test file references `AUTHORITATIVE_MAPPING`, so adding table
+  entries cannot change the test count. `check-exports-drift_test.ts` exists but does not enumerate
+  the mapping.
+
+Therefore the 4,426 / 0 / 19 result cannot have changed across this interval. Stated plainly so the
+record cannot be misread: **this is carried-forward evidence, not a fresh measurement at
+`ccd63a085`.**
 
 ## JSR Audit Rubric
 
