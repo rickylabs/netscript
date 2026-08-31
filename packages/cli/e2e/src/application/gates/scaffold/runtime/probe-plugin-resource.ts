@@ -1,4 +1,4 @@
-import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
+import { resolveResourceUrlsFromAppHost } from '../generated-app-endpoint.ts';
 
 type ProbeAction =
   | 'get'

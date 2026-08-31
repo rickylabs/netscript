@@ -7,6 +7,10 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
+function decode(bytes: Uint8Array): string {
+  return new TextDecoder().decode(bytes);
+}
+
 class TrackingApp extends App<Record<string, never>> {
   readonly fsRouteCalls: Array<string | null> = [];
 
@@ -35,6 +39,40 @@ class TelemetryTrackingApp extends App<Record<string, never>> {
     return this;
   }
 }
+
+Deno.test('defineFreshApp installs the cache provider only when called', async () => {
+  const moduleUrl = new URL('./define-fresh-app.ts', import.meta.url).href;
+  const childSource = `
+    const { resetCacheProvider } = await import('@netscript/sdk/cache');
+    const { hasCacheProvider } = await import('@netscript/sdk/query');
+    resetCacheProvider();
+
+    const { defineFreshApp } = await import(${JSON.stringify(moduleUrl)});
+    if (hasCacheProvider() !== false) {
+      throw new Error('importing the Fresh server bootstrap installed a cache provider');
+    }
+
+    defineFreshApp({
+      fsRoutes: false,
+      queryCacheInvalidation: false,
+      staticFiles: false,
+      telemetry: false,
+    });
+    if (hasCacheProvider() !== true) {
+      throw new Error('calling defineFreshApp did not install the cache provider');
+    }
+  `;
+  const child = await new Deno.Command(Deno.execPath(), {
+    args: ['eval', '--quiet', childSource],
+    stderr: 'piped',
+    stdout: 'piped',
+  }).output();
+
+  assert(
+    child.success,
+    `Fresh cache registration child failed (exit ${child.code}):\n${decode(child.stderr)}`,
+  );
+});
 
 Deno.test('defineFreshApp reuses a provided app instance', () => {
   const app = new TrackingApp();

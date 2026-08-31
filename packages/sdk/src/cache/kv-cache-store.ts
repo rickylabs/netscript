@@ -38,7 +38,7 @@ import type {
  *
  * @example
  * ```ts
- * import { KvCacheStore } from '@netscript/sdk';
+ * import { KvCacheStore } from '@netscript/sdk/cache';
  *
  * const store = new KvCacheStore();
  * await store.set(['cache_query', 'users', 'list'], payload, { expireIn: 60_000 });
