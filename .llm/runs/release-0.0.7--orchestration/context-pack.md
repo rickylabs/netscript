@@ -2047,3 +2047,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Aspire #1747 is actively repaired after independent audit proved its current reserved-name output
   invalid and its prior PASS non-carrying. It requires fresh evaluator and hosted scaffold runtime;
   S9/S10/S11/S13 and #1831 continue independently and do not wait for that repair.
+
+## Resume delta — 2026-08-31T05:25:13Z
+
+- Current main is `f59874abd2bc39446b21f5126323e0d2dcbce547` after exact-green Fixes PR #1829
+  shipped from immutable head `2a43f28a6edc63d0b07ce41fb15b5c79235ec3b8`; #1677/#1829 are
+  closed/merged and sole `status:shipped`. The fresh body-aware close-gate was run attempt 2 of
+  `33359964773`, eliminating the earlier vacuous no-DoD pass.
+- Aspire #1831 is now the immediate user-facing merge front and needs only current-main convergence,
+  evidence close-out, ready transition, and fresh exact CI; its separate GLM PASS and product blobs
+  are valid. Features #1814 remains behind it with fresh GLM evaluation in progress/completing.
+- #1823/#1803 bank their validated work until #1831 lands, then each converges once on the complete
+  public base. #1747 repair, #1828 delta evaluation, #1349 implementation, #1773/#1609, and docs
+  evaluations remain parallel. Host runtime inventories remain exact zero.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "052f86595b06b33cf0e205405873cd979cf535d1",
+  "currentMainSha": "f59874abd2bc39446b21f5126323e0d2dcbce547",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -5280,7 +5280,7 @@
     {
       "id": "checkpoint-user-runtime-sdk-ui-canary-4",
       "rationale": "Meaningful user-facing checkpoint after routing infrastructure, Aspire listener-readiness health checks, SDK browser-safe cache-provider isolation, and the working ui:add data-screen triad landed together.",
-      "state": "published_e2e_failed",
+      "state": "complete",
       "contentSha": "65cd8a07787504b5ed94408510d4ab85260bc21a",
       "version": "0.0.7-canary.4",
       "tag": "v0.0.7-canary.4",

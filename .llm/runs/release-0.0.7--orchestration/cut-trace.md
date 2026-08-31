@@ -197,3 +197,23 @@ artifact-pinned production E2E.
   both entry paths on the same merge-order integration defect: stale import
   `scaffold/generated-app-name.ts` in #1781's new gate after #1743 moved the module under
   `scaffold/runtime/`. The immutable failed canary is preserved; #1764 owns the bounded repair.
+
+## 2026-08-31T05:06:06Z–05:25:13Z — public feature/fix checkpoint advances
+
+- PR #1820 head `8a37c4ebbef8e85c960a4a106e22eb2c3880b9f2` squash-merged as
+  `26e1b486f95aec121d71f2f4cd0411dc6069af04` at 05:06:06Z. It publishes `createLazyKv` and
+  adopts it in generated plugin service scaffolds. #1452 deliberately remains open because the
+  host-factory architecture is deferred; the PR's closing-reference set was verified empty.
+- PR #1819 head `de06e17438526bdecc4fce2d84fc697904040a75` squash-merged as
+  `052f86595b06b33cf0e205405873cd979cf535d1` at 05:15:31Z, closing #1365. It makes saga publish
+  receipts non-discardable; endpoint diagnostics remain owned by #1825 and were removed from the
+  title/scope before merge.
+- PR #1829 head `2a43f28a6edc63d0b07ce41fb15b5c79235ec3b8` squash-merged as
+  `f59874abd2bc39446b21f5126323e0d2dcbce547` at 05:25:13Z, closing #1677. It preserves the full
+  upstream nested `TokenUsage` object through the TanStack bridge. A body-only DoD repair was
+  validated by a fresh close-gate attempt before merge.
+- Every merge used an exact current-main/head synthetic merge ref, terminal exact-head core CI,
+  independently verified evaluator/blob evidence, complete issue acceptance where closing, zero
+  review threads, truthful PR-body scope, and terminal lifecycle normalization. The next public
+  front is Aspire #1831, followed by Features #1814 if its fresh verdict passes; only then is the
+  checkpoint considered for canary 5.

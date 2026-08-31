@@ -3247,6 +3247,24 @@
   direct-generator tests, remove product-PR run artifacts, rewrite body truth, Tier-A, fresh GLM
   IMPL-EVAL, hosted `e2e-cli` runtime, and fresh core CI. This is coordinator-owned, not an owner pause.
 
+## 2026-08-31T05:25:13Z — #1829 nested token usage fix ships; public payload grows
+
+- Fixes PR #1829 converged on #1819 main at immutable head
+  `2a43f28a6edc63d0b07ce41fb15b5c79235ec3b8`. Independent audit verified byte identity for the
+  evaluated adapter, 23-leaf sentinel test, and GLM artifact; exact two-path product ceiling; clean
+  lock/generated surface; six evidenced #1677 acceptance boxes; and zero review threads.
+- The final audit caught a vacuous process green: the PR body lacked a checkable Definition of Done.
+  Fixes added eight truthful checked rows without moving the head. CI run `33359964773` attempt 2
+  then re-read the live body and passed close-gate at 05:24:28Z plus core visibility at 05:24:35Z;
+  full check/test, quality, build, and code-quality were already terminal green at the same head.
+- Synthetic merge `08501a52333bd509f4535cdfaf81451b6e712307` had exact parents current main
+  `052f86595b06b33cf0e205405873cd979cf535d1` and the immutable head. The coordinator squash-merged
+  #1829 as `f59874abd2bc39446b21f5126323e0d2dcbce547`; #1677/#1829 are sole `status:shipped`.
+- Aspire #1831 is the next user-facing front: its independent GLM PASS/product evidence is valid,
+  and Aspire is converging it on `f59874abd` with an evidence-only close-out correction and fresh
+  exact CI. #1814 follows if its current GLM verdict passes. This produces a coherent public
+  feature/fix checkpoint before any canary decision rather than another internal-only release.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance
