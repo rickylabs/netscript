@@ -1,13 +1,90 @@
-import { assertEquals, assertMatch } from '@std/assert';
+import { assert, assertEquals, assertMatch, assertThrows } from '@std/assert';
 import { fromFileUrl } from '@std/path';
+import { normalizeTaskArguments } from './lib/task-arguments.ts';
 
 const repo = fromFileUrl(new URL('../../../', import.meta.url)).replace(/\/$/, '');
 const decoder = new TextDecoder();
+
+const STRICT_AGENTIC_TASKS = {
+  'agentic:wsl-foundation': 'wsl/wsl-foundation.ts',
+  'agentic:runtime': 'runtime/cli/agentic-runtime.ts',
+  'agentic:routing-state': 'runtime/cli/routing-state.ts',
+  'agentic:leak-check': 'teardown/leak-check.ts',
+  'agentic:teardown': 'teardown/teardown.ts',
+  'agentic:antigravity-evidence': 'runtime/cli/antigravity-evidence-cli.ts',
+  'agentic:provider-canary': 'runtime/cli/provider-canary.ts',
+  'agentic:rollout-canary': 'runtime/cli/rollout-canary-cli.ts',
+  'agentic:claude-openrouter-gateway': 'claude/remote-model-launcher.ts',
+  'agentic:claude-hybrid': 'claude/hybrid-launcher.ts',
+  'agentic:codex-resume': 'codex/codex-resume.ts',
+  'agentic:codex-status': 'codex/codex-status.ts',
+  'agentic:codex-follow': 'codex/codex-follow.ts',
+  'agentic:codex-watch': 'codex/codex-watch.ts',
+  'agentic:launch-codex-slice': 'codex/launch-codex-slice.ts',
+  'agentic:dispatch-openhands': 'openhands/dispatch-openhands.ts',
+  'agentic:openhands-status': 'openhands/openhands-status.ts',
+  'agentic:gh-pr': 'github/gh-pr.ts',
+  'agentic:gh-watch': 'github/gh-watch.ts',
+  'agentic:gh-token': 'github/gh-token.ts',
+  'agentic:review-threads': 'github/review-threads.ts',
+  'agentic:pr-checks': 'github/pr-checks.ts',
+  'agentic:claude-openrouter': 'claude/openrouter-run.ts',
+  'agentic:opencode': 'opencode/opencode-run.ts',
+  'agentic:opencode-eval': 'opencode/opencode-eval.ts',
+  'agentic:opencode-web': 'opencode/opencode-web.ts',
+} as const;
+
+const PERMISSIVE_AGENTIC_TASKS = [
+  'agentic:sync-claude',
+  'agentic:sync-claude:check',
+  'agentic:check-claude',
+  'agentic:dogfood-skills',
+  'agentic:smoke-claude-remote',
+  'agentic:claude-hook-log',
+] as const;
 
 interface CommandResult {
   readonly code: number;
   readonly output: string;
 }
+
+Deno.test('task arguments accept one leading separator and reject every later separator', () => {
+  assertEquals(normalizeTaskArguments(['--cwd', '/repo']), ['--cwd', '/repo']);
+  assertEquals(normalizeTaskArguments(['--', '--cwd', '/repo']), ['--cwd', '/repo']);
+  assertEquals(normalizeTaskArguments(['--']), []);
+  assertThrows(
+    () => normalizeTaskArguments(['--cwd', '/repo', '--']),
+    Error,
+    'Unknown argument: --',
+  );
+  assertThrows(
+    () => normalizeTaskArguments(['--', '--', '--cwd', '/repo']),
+    Error,
+    'Unknown argument: --',
+  );
+});
+
+Deno.test('survey accounts for every agentic task and every strict entry normalizes argv', async () => {
+  const denoConfig = JSON.parse(await Deno.readTextFile(`${repo}/deno.json`)) as {
+    tasks: Record<string, string>;
+  };
+  const actualTasks = Object.keys(denoConfig.tasks).filter((task) => task.startsWith('agentic:'))
+    .sort();
+  const surveyedTasks = [
+    ...Object.keys(STRICT_AGENTIC_TASKS),
+    ...PERMISSIVE_AGENTIC_TASKS,
+  ].sort();
+  assertEquals(surveyedTasks, actualTasks);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 26);
+  for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
+    assert(
+      denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),
+      `${task} mapping changed`,
+    );
+    const source = await Deno.readTextFile(`${repo}/.llm/tools/agentic/${entry}`);
+    assert(source.includes('normalizeTaskArguments('), `${task} does not normalize task argv`);
+  }
+});
 
 async function runDeno(
   args: readonly string[],
@@ -71,7 +148,7 @@ const directHybridArgs = [
   '.llm/tools/agentic/claude/hybrid-launcher.ts',
 ];
 
-Deno.test('hybrid launcher direct script and deno task forms each launch one proven supervisor', async () => {
+Deno.test('hybrid direct script and deno task forms each launch one simulated proven supervisor', async () => {
   const forms = [
     (cwd: string) => [...directHybridArgs, '--cwd', cwd],
     (cwd: string) => ['task', 'agentic:claude-hybrid', '--', '--cwd', cwd],

@@ -8,6 +8,7 @@ import {
 import { AGENT_KINDS, EFFORTS, PROVIDER_KINDS, type RouteIdentity } from '../contract.ts';
 import { evaluateOpenRouterPresetCanaries } from '../preset-canary.ts';
 import { OPENROUTER_PRESET_IDS, PROVIDER_PROFILE_IDS } from '../provider-profiles.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 export type ProviderCanaryCliOptions =
   | { readonly mode: 'static'; readonly worktree: string }
@@ -70,6 +71,7 @@ export function parseProviderCanaryArgs(
   args: readonly string[],
   cwd: string = Deno.cwd(),
 ): ProviderCanaryCliOptions {
+  args = normalizeTaskArguments(args);
   const values = new Map<string, string>();
   let live = false;
   let all = false;
@@ -118,12 +120,13 @@ export function parseProviderCanaryArgs(
 }
 
 async function main(): Promise<number> {
-  if (Deno.args.includes('--help')) {
-    console.log(usage());
-    return 0;
-  }
   try {
-    const options = parseProviderCanaryArgs(Deno.args);
+    const args = normalizeTaskArguments(Deno.args);
+    if (args.includes('--help')) {
+      console.log(usage());
+      return 0;
+    }
+    const options = parseProviderCanaryArgs(args);
     if (options.mode === 'static') {
       const result = evaluateOpenRouterPresetCanaries(options.worktree);
       console.log(JSON.stringify(result));

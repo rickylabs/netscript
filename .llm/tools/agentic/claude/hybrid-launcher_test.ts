@@ -22,8 +22,12 @@ Deno.test('hybrid launcher parses only absolute cwd and bounded name', () => {
   });
   assertThrows(() => parseHybridLaunchOptions(['--cwd', 'relative']), Error, 'absolute');
   assertThrows(() => parseHybridLaunchOptions(['--model', 'other']), Error, 'unknown');
-  assertThrows(() => parseHybridLaunchOptions(['--cwd', '/repo', '--']), Error, 'unknown');
-  assertThrows(() => parseHybridLaunchOptions(['--', '--', '--cwd', '/repo']), Error, 'unknown');
+  assertThrows(() => parseHybridLaunchOptions(['--cwd', '/repo', '--']), Error, 'Unknown argument');
+  assertThrows(
+    () => parseHybridLaunchOptions(['--', '--', '--cwd', '/repo']),
+    Error,
+    'Unknown argument',
+  );
 });
 
 Deno.test('native Claude environment strips every provider credential override', () => {
