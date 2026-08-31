@@ -5051,3 +5051,30 @@
   - One self-inflicted slip caught and fixed before dispatch: my run-dir glob wrote S10's brief into
     an unrelated `feat-openapi-mcp-evidence-receipts-s10--1136` directory. Removed and rewritten to
     `test-aspire-13-5-s10-e2e-gate-upgrades--impl`.
+
+- **D-214 — S9 and S10 converged onto the new S8 head; BOTH verdicts carry on blob identity. One
+  false "changed" was my own scripting artifact, caught before it cost a needless evaluation.**
+  - **S9: `29eed9ef9` → `a8cf585b0`**; **S10: `265466059` → `21a0bfec6`**. Both clean, both with
+    `git merge-base HEAD d1c6d8b54 == d1c6d8b54` — correctly stacked on the converged S8 head, not on
+    `origin/main`.
+  - **Blob census over each slice's OWN evaluated surface** (its changed non-generated `packages/`
+    files, compared old-head vs new-head):
+    - **S9 — identical 23, changed 0.**
+    - **S10 — identical 25, changed 0.**
+    Under the coordinator's carry rule, **both existing IMPL-EVAL verdicts carry**; no delta
+    evaluation is required for either.
+  - **My first S10 census wrongly reported "changed = 1"** on
+    `packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts`. The file is a
+    **deletion** S10 makes: present at `bc838a0b3`, **absent at both** the old and new S10 heads. My
+    comparison required a non-empty blob hash on both sides, so "absent on both" — which is *identical*
+    — fell through to the changed branch. Re-ran with an absent-aware `git cat-file -e` check:
+    `old=ABSENT new=ABSENT`, and the count resolved to **25 identical, 0 changed**.
+    - Had I not chased it, I would have dispatched a **needless delta IMPL-EVAL** on a file that does
+      not exist at either head. **A blob census must treat absent-on-both as identical**, or every
+      deletion in a slice reads as a change forever.
+  - Also verified that a plain old-head→new-head diff is the **wrong** primitive here: it reports 84
+    changed `packages/` files for both slices, but those are `main`'s advancement between the bases,
+    not the slices' own bytes. The carry decision has to be scoped to each slice's own changed-file
+    set.
+  - **Whole cascade complete: S8 `d1c6d8b54`, S9 `a8cf585b0`, S10 `21a0bfec6`, all on current `main`
+    lineage, all three verdicts intact, zero re-evaluations spent.**
