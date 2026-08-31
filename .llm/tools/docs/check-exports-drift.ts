@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'auth-kv-oauth',
+    packagePath: 'packages/auth-kv-oauth',
+    docPath: 'docs/site/reference/auth-kv-oauth/index.md',
+    packageName: '@netscript/auth-kv-oauth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eight entrypoints were checked with deno doc; the page omits AUTH_SESSION_STATES, AtomicCheck, AtomicMutation, AtomicResult, AuthBackendPort, AuthPrincipalMapperPort, AuthProviderCapability, AuthProviderDescriptor, AuthProviderRegistryPort, AuthSession, AuthSessionCreateInput, AuthSessionCryptoPort, AuthSessionLookup, AuthSessionPrincipalMapping, AuthSessionState, AuthSessionStorePort, AuthenticatorPort, AuthnRequest, AuthnResult, ClientAuthMethod, InteractiveCallbackResult, InteractiveFlowPort, KvEntry, KvKey, KvListOptions, KvOAuthCookieOptions, KvOAuthEncryptedTokens, KvOAuthErrorCode, KvOAuthFetch, KvOAuthJsonValidator, KvOAuthKeyMaterial, KvOAuthPrincipal, KvOAuthRefreshMode, KvOAuthSessionRecord, KvOAuthStoreOptions, KvOAuthTxn, KvSetOptions, KvStore, NormalizePrincipalContext, OAuthCustomFetch, OAuthEndpointProviderConfig, OAuthIssuerProviderConfig, OAuthProviderBaseConfig, OAuthProviderClientAuthConfig, OAuthTokenCustomFetch, Principal, TenantOAuthProviderOptions, WatchEvent, WatchOptions, WatchPrefixOptions, WatchableKv, clientAuth, describeProvider, discoveryRequestOptions, hashToken, and requestOptions.',
+    },
+  },
+  {
     name: 'aspire',
     packagePath: 'packages/aspire',
     docPath: 'docs/site/reference/aspire/index.md',
