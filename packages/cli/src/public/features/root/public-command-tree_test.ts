@@ -3,9 +3,9 @@ import { dirname, extname, isAbsolute, join, relative } from 'jsr:@std/path@^1';
 
 import cliMeta from '../../../../deno.json' with { type: 'json' };
 import {
+  type AppConventionsInput,
   appConventionsReferencedPaths,
   buildAppAgentsMarkdown,
-  type AppConventionsInput,
 } from '../../../kernel/templates/app/agent-conventions.ts';
 import { createPublicCommandTree } from './public-command-tree.ts';
 
@@ -186,8 +186,7 @@ async function scaffoldFixture(
   ]);
 }
 
-const IMPORT_SPECIFIER_PATTERN =
-  /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"]([^'"]+)['"]/g;
+const IMPORT_SPECIFIER_PATTERN = /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"]([^'"]+)['"]/g;
 const EXTERNAL_SPECIFIER_PATTERN = /^[a-z][a-z\d+.-]*:/i;
 
 async function assertExampleImportsResolve(appDir: string): Promise<void> {
@@ -214,7 +213,9 @@ async function assertExampleImportsResolve(appDir: string): Promise<void> {
       }
       assert(
         target.isFile,
-        `Expected emitted import to resolve to a file: ${relative(appDir, sourcePath)} -> ${specifier}`,
+        `Expected emitted import to resolve to a file: ${
+          relative(appDir, sourcePath)
+        } -> ${specifier}`,
       );
     }
   }
@@ -240,7 +241,9 @@ function resolveEmittedTreeImport(
     .sort((left, right) => right.length - left.length)[0];
   if (matchingKey === undefined) {
     throw new Error(
-      `Unresolved emitted import-map specifier: ${relative(appDir, sourcePath)} imports ${specifier}`,
+      `Unresolved emitted import-map specifier: ${
+        relative(appDir, sourcePath)
+      } imports ${specifier}`,
     );
   }
 

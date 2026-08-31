@@ -57,8 +57,7 @@ export const TEMPLATE_KEYS = {
     'app/routes/examples/(_shared)/service-showcase.ts.template',
   appRoutesExamplesSharedServiceShowcaseMemory:
     'app/routes/examples/(_shared)/service-showcase.memory.ts.template',
-  appRoutesExamplesSharedAuthorization:
-    'app/routes/examples/(_shared)/authorization.ts.template',
+  appRoutesExamplesSharedAuthorization: 'app/routes/examples/(_shared)/authorization.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
   appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
   appRoutesExamplesOrdersId: 'app/routes/examples/orders/[id].tsx.template',

@@ -115,9 +115,7 @@ export async function writeNormalizedAppFiles(
   const serviceExampleIslandsDir = serviceExampleDir
     ? join(serviceExampleDir, '(_islands)')
     : undefined;
-  const serviceExampleLibDir = serviceExampleDir
-    ? join(serviceExampleDir, '(_lib)')
-    : undefined;
+  const serviceExampleLibDir = serviceExampleDir ? join(serviceExampleDir, '(_lib)') : undefined;
   const serviceExampleSharedDir = serviceExampleDir
     ? join(serviceExampleDir, '(_shared)')
     : undefined;

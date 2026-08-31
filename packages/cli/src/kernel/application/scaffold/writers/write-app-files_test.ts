@@ -57,7 +57,7 @@ Deno.test('initial route seeds include the generated dynamic order route shape',
 
   assertStringIncludes(
     manifest,
-    'orders: {\n      $id: {\n        $route: \'/examples/orders/[id]\'',
+    "orders: {\n      $id: {\n        $route: '/examples/orders/[id]'",
   );
   assertStringIncludes(
     routes,
@@ -100,10 +100,12 @@ async function importDynamicRouteShape(
   await Deno.writeTextFile(manifestPath, manifestSource);
   await Deno.writeTextFile(routesPath, routesSource);
 
-  const manifest = await import(`${toFileUrl(manifestPath).href}?scope=${crypto.randomUUID()}`) as
-    DynamicRouteModuleShape;
-  const routes = await import(`${toFileUrl(routesPath).href}?scope=${crypto.randomUUID()}`) as
-    DynamicRoutesModuleShape;
+  const manifest = await import(
+    `${toFileUrl(manifestPath).href}?scope=${crypto.randomUUID()}`
+  ) as DynamicRouteModuleShape;
+  const routes = await import(
+    `${toFileUrl(routesPath).href}?scope=${crypto.randomUUID()}`
+  ) as DynamicRoutesModuleShape;
   const reference = routes.routes.examples.orders.$id.$route;
 
   return {

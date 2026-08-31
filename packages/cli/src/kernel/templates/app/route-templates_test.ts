@@ -3,12 +3,7 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import {
-  assert,
-  assertEquals,
-  assertStrictEquals,
-  assertStringIncludes,
-} from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStrictEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateRouteManifestSeed } from '../../application/scaffold/writers/app-route-seeds.ts';
 import { TEMPLATE_MANIFEST } from '../../assets/manifest.ts';
 import {
@@ -31,18 +26,18 @@ import {
   appDesignTokensLibTemplate,
   appDesignTokensRouteTemplate,
   appDesignTokensViewTemplate,
-  appExampleServiceQueryTemplate,
   appExampleServiceOptimisticListMutationTemplate,
+  appExampleServiceQueryTemplate,
   appExampleServiceRouteContractTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
-  appOrderExampleRouteTemplate,
   appHealthRouteTemplate,
   appHealthSharedTemplate,
   appHealthViewTemplate,
   appHomeViewTemplate,
   appIndexRouteTemplate,
   appLayoutTemplate,
+  appOrderExampleRouteTemplate,
   appRouterTemplate,
   appServiceAuthorizationTemplate,
   appServiceExampleHeroTemplate,
@@ -73,7 +68,7 @@ function directAppRouteTargets(source: string): ReadonlyMap<string, string> {
 
   const targets = new Map<string, string>();
   const body = source.slice(start, end);
-  for (const match of body.matchAll(/^  ([A-Za-z][A-Za-z0-9]*): ([^,\n]+),$/gm)) {
+  for (const match of body.matchAll(/^[ ]{2}([A-Za-z][A-Za-z0-9]*): ([^,\n]+),$/gm)) {
     targets.set(match[1], match[2]);
   }
   return targets;
@@ -204,7 +199,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface HomeViewProps {');
-    assertStringIncludes(view, "import { Badge, Button, Card, PageHeader, StatsGrid }");
+    assertStringIncludes(view, 'import { Badge, Button, Card, PageHeader, StatsGrid }');
     assertStringIncludes(view, 'A generated NetScript workspace with app-owned UI copies');
     assertStringIncludes(view, 'href={designHref}');
     assertStringIncludes(view, 'href={compositionHref}');
@@ -224,8 +219,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(view, 'StatsGrid');
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'Deployment readiness');
-    assert(!view.includes('class=\'flex'));
-    assert(!view.includes('class=\'grid'));
+    assert(!view.includes("class='flex"));
+    assert(!view.includes("class='grid"));
   });
 
   it('health route keeps the builder in health.tsx and the probe payload in shared helpers', async () => {
@@ -286,7 +281,10 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'const designHref = appRoutes.design.href();');
     assertStringIncludes(output, 'url.pathname.startsWith(examplesHref)');
     assertStringIncludes(output, "import { Badge, Button } from '@app/components/ui/mod.ts';");
-    assertStringIncludes(output, "<Button\n            type='link'\n            href={dashboardHref}");
+    assertStringIncludes(
+      output,
+      "<Button\n            type='link'\n            href={dashboardHref}",
+    );
     assertStringIncludes(
       output,
       "aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}",
@@ -312,8 +310,14 @@ describe('app route template rendering', () => {
     assertStringIncludes(layout, "import { appRoutes } from '@app/router.ts';");
     assertStringIncludes(layout, 'href: appRoutes.designTokens.href()');
     assertStringIncludes(layout, 'test-project');
-    assertStringIncludes(appDesignIndexRouteTemplate, 'return ctx.redirect(appRoutes.designTokens.href());');
-    assertStringIncludes(tokensRoute, "import DesignTokensView from './(_components)/tokens-view.tsx';");
+    assertStringIncludes(
+      appDesignIndexRouteTemplate,
+      'return ctx.redirect(appRoutes.designTokens.href());',
+    );
+    assertStringIncludes(
+      tokensRoute,
+      "import DesignTokensView from './(_components)/tokens-view.tsx';",
+    );
     assertStringIncludes(tokensRoute, '.withRoute(appRoutes.designTokens)');
     assertStringIncludes(tokensRoute, ".withLayer('tokens', DesignTokensView");
     assertStringIncludes(
@@ -405,8 +409,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'DetailLayout');
     assertStringIncludes(view, 'No accounts match these filters');
-    assert(!view.includes('class=\'flex'));
-    assert(!view.includes('class=\'grid'));
+    assert(!view.includes("class='flex"));
+    assert(!view.includes("class='grid"));
   });
 
   it('example service template wires the selected service client and query helpers', async () => {

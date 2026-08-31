@@ -286,9 +286,7 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const dynamicRouteIndex = runtime.gates.findIndex((gate) =>
     gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE
   );
-  const referenceIndex = runtime.gates.findIndex((gate) =>
-    gate.id === GATE.BEHAVIOR_APP_REFERENCE
-  );
+  const referenceIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE);
   assertEquals(waitIndex < homeIndex, true);
   assertEquals(
     [homeIndex, dynamicRouteIndex, referenceIndex],

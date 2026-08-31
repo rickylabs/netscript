@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `test-scaffold-dynamic-route-gate--1616` |
 | Branch | `test/scaffold-dynamic-route-gate` |
-| Current phase | `implementation — S3 runtime GREEN` |
+| Current phase | `implementation — S4 lease-free hardening` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
 Cycle-2 PLAN-EVAL returned `PASS_PLAN`. S1 RED, S2 scaffold GREEN, and S3 runtime-gate GREEN are
-separate commits; no expensive runtime gate has run.
+separate pushed commits. All lease-free hardening gates are green; no expensive runtime gate ran.
 
 ## Completed
 
@@ -33,15 +33,18 @@ separate commits; no expensive runtime gate has run.
 - Added the injectable HTTP probe, stable gate id, command registration, and exact catalog order.
 - Proved one nonce across plain/partial GETs, mutually exclusive marker failures, status-first 500
   failure, no partial header, and zero-candidate failure semantics.
+- Measured current implementation Gate 7 at 4,440 passed / 0 failed / 19 ignored in 224.976s.
+- Completed changed-file check/lint/fmt with full 16-file coverage, asset integrity, and
+  quality/architecture fitness.
 
 ## In Progress
 
-- Commit and push S3 runtime GREEN before lease-free hardening.
+- Commit and push S4 hardening receipts and bounded formatting fixes.
 
 ## Next Steps
 
-1. Run lease-free hardening; keep scaffold.runtime `NOT_RUN — lease required`.
-2. Record final implementation artifacts and stop for separately dispatched IMPL-EVAL.
+1. Record Gate 10 as `NOT_RUN — lease required` without running it.
+2. Finalize implementation artifacts and stop for separately dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -61,10 +64,10 @@ separate commits; no expensive runtime gate has run.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | GREEN | Scaffold tests 39/39 + 1/1; runtime tests 49/49; scoped checks clean. |
-| Fitness | NOT_RUN | Planned after implementation. |
+| Static | GREEN | Focused 88/88 + convention 1/1; check/lint/fmt clean; root 4,440/0/19. |
+| Fitness | GREEN | Asset barrel and `quality:gate` exit 0; scanner findings 0; doctrine FAIL=0. |
 | Runtime | LEASE_BLOCKED | Probe contract green; live `scaffold.runtime` remains lease-required. |
-| Consumer | GREEN | Default seed/template now own the dynamic route; live composition remains leased. |
+| Consumer | GREEN_UNIT | Default output contracts and retained route pass; live composition remains leased. |
 
 ## Open Questions
 

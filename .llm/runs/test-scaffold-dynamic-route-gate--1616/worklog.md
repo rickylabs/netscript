@@ -37,6 +37,7 @@ the lease. Detailed files, constants, order, gates, and deferred scope are locke
 | 2026-08-31 | S1 RED | Semantic failure | Focused wrapper compiled: 72 passed / 7 failed; filtered conventions wrapper compiled: 0 passed / 1 failed. Failures are missing dynamic seed/asset/gate/catalog/convention behavior plus valid-response rejection; href-only, id-only, and HTTP-500 negatives pass. |
 | 2026-08-31 | S2 GREEN | Scaffold surface | Added the product-owned `[id].tsx` route, generator-compatible seeds, stable router alias, `order-42` examples link, canonical/retained references, and regenerated embedded assets. Focused tests 39/39 plus convention 1/1; scoped check zero diagnostics; asset barrel current. |
 | 2026-08-31 | S3 GREEN | Runtime gate | Implemented the injectable HTTP-semantic probe and critical command gate. Both request modes share one nonce; negative marker/status and zero-candidate cases are covered. Catalog and registration order are exactly app-home → dynamic-route → app-reference. Focused tests 49/49; scoped check clean. |
+| 2026-08-31 | S4 Hardening | Lease-free green | Focused tests 88/88 plus convention 1/1; changed-file check/lint/fmt clean with complete 16-file coverage; asset and quality gates exit 0; root tests 4,440 passed / 0 failed / 19 ignored in 224.976s. `deno.lock` remains byte-identical. |
 
 ## Decisions
 
@@ -76,9 +77,18 @@ though default scaffold output does not. See `drift.md`; scope is unchanged.
 - S3 runtime GREEN: focused probe/gate/registry tests exit 0, 49 passed; scoped check selected
   7 files in 1 batch with 0 diagnostics. Receipts: `receipts/s3-runtime-green.json`,
   `receipts/s3-runtime-check.json`.
+- S4 focused: 88 passed / 0 failed plus filtered convention 1 passed / 0 failed.
+- S4 scoped check: 16 files, 1 batch, 0 diagnostics. Scoped lint: 16/16 processed,
+  0 findings. Scoped fmt: 16/16 processed, 0 findings.
+- S4 asset/fitness: `deno task check:assets-barrel` exit 0; `deno task quality:gate`
+  exit 0, repository scanner findings 0, doctrine `FAIL=0` (existing warnings remain).
+- S4 Gate 7: `deno task test --report-output .../receipts/s4-root-test.json` exit 0;
+  4,440 passed, 0 failed, 19 ignored, 224.976s. This is +14 passing tests and no failure or
+  ignore increase over the carried-forward 4,426 / 0 / 19 branch baseline.
 
 ## Handoff Notes
 
 - Cycle-2 PLAN-EVAL passed; implementation is authorized.
 - S1 RED is complete and must remain its own commit before product GREEN.
 - The supervisor dispatches IMPL-EVAL separately; this session must not launch or simulate one.
+- Gate 10 remains `NOT_RUN — lease required`; no scaffold/runtime command was launched.

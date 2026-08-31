@@ -42,3 +42,12 @@ The probe uses the existing generated-app endpoint resolver and mirrors the neig
 probe's candidate iteration and zero-candidate failure. It adds no retry layer because app-home has
 already established readiness immediately before it. The catalog, registration, permissions, and
 critical default match the locked plan with no drift.
+
+## 2026-08-31 — S4 quality configuration and inherited formatting (minor)
+
+Root lint/fmt intentionally exclude `packages/cli`, so the first scoped wrapper attempt refused
+partial coverage rather than producing a verdict. A run-local detached quality config now applies
+the repository's standard lint/fmt rules to exactly the 16 changed TypeScript files. It exposed one
+pre-existing two-space regex lint finding and five inherited formatting findings inside already
+locked files; those were corrected mechanically. The valid receipts process all 16 files with zero
+findings. Scope and product behavior are unchanged.
