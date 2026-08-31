@@ -61,3 +61,23 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** Slice 2 review gate `git diff --name-only $(git merge-base HEAD origin/main) origin/main` found no SDK/Aspire path.
+
+## 2026-08-31 — Native IMPL-EVAL quota block and policy fallback
+
+- **What:** The recorded native Claude Fable 5 medium IMPL-EVAL route could not start an evaluator turn.
+- **Source:** Native session `87032bd8-4802-4035-9a44-b06de8b9f6b5` exited 1 with HTTP 429 because the provider account had reached its monthly spend limit.
+- **Expected:** A fresh native opposite-family Fable 5 session performs IMPL-EVAL.
+- **Actual:** The lane-policy quota fallback used OpenRouter `z-ai/glm-5.3-flash` with max effort requested. Separate session `38e40773-fe64-4eed-b737-d597e9df575e` independently reproduced RED→GREEN and all gates, wrote `evaluate.md`, and returned `PASS` at launcher exit 0.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `impl-eval-prompt.md`, `evaluate.md`, `supervisor.md`, and the launcher results recorded in `worklog.md`.
+
+## 2026-08-31 — Raw evaluator event stream not retained
+
+- **What:** The OpenRouter wrapper emitted a 2.6 MB token-by-token JSONL stream in the run directory.
+- **Source:** `impl-eval-openrouter.jsonl` generated during formal evaluation.
+- **Expected:** Run artifacts remain compact enough for ordinary PR review.
+- **Actual:** The high-volume transport stream was removed after successful completion; the exact prompt, evaluator-authored verdict, model/session identity, reproduced commands, and exit codes remain in tracked run artifacts.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `impl-eval-prompt.md`, `evaluate.md`, `worklog.md`, and `supervisor.md`.

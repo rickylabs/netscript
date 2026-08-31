@@ -66,6 +66,8 @@ then update the SDK's cited private rule; the cross-package step in
 | 2026-08-31T04:50:00Z | S2 | implementation | Added the private SDK identifier-segment normalizer with Aspire contract-source citation; shorthand and server code untouched. |
 | 2026-08-31T04:52:53Z | S2 | gates | Contract, both package suites, scoped wrappers, repo check, quality scan, and arch check all passed. |
 | 2026-08-31T04:58:00Z | S2 | slice review | Native Claude Opus 5 session `bca46f11-a5c8-4b8e-8bbc-f39f5209cdb7` returned PASS with no blocking findings and independently reproduced every required gate at exit 0. |
+| 2026-08-31T05:00:00Z | eval | native launch blocked | Native Claude Fable 5 medium session `87032bd8-4802-4035-9a44-b06de8b9f6b5` exited 1 before taking a turn because the provider account had reached its monthly spend limit. |
+| 2026-08-31T05:14:46Z | eval | fallback PASS | Policy-authorized OpenRouter `z-ai/glm-5.3-flash` evaluator session `38e40773-fe64-4eed-b737-d597e9df575e` completed at exit 0 and returned `PASS` after independently reproducing RED→GREEN and every requested gate. |
 
 ## Decisions
 
@@ -119,7 +121,16 @@ then update the SDK's cited private rule; the cross-package step in
 | --- | --- | --- | --- |
 | SDK↔Aspire browser full-key contract | PASS, exit 0 | `focused-contract-green.json` | Agreement covers hyphen and other invalid characters; test-only public-subpath import. |
 
+### Formal Evaluation
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Native IMPL-EVAL launch | BLOCKED, exit 1 | Claude session `87032bd8-4802-4035-9a44-b06de8b9f6b5` | HTTP 429 monthly spend limit before any evaluator turn; no verdict was emitted. |
+| OpenRouter IMPL-EVAL fallback | PASS, exit 0 | `evaluate.md`; session `38e40773-fe64-4eed-b737-d597e9df575e` | `z-ai/glm-5.3-flash`; launch requested max effort. Separate from the generator and all slice reviewers. |
+
 ## Handoff Notes
 
 - Inspect the exact negative character class, unchanged shorthand/server guards, and absence of any
   SDK↔Aspire production import first.
+- Formal IMPL-EVAL is `PASS`; PR #1831 intentionally remains draft with `status:impl` because the
+  supervisor owns the ready-for-review transition.

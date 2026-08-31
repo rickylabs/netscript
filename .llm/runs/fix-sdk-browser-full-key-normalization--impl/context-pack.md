@@ -6,16 +6,17 @@
 | --- | --- |
 | Run ID | `fix-sdk-browser-full-key-normalization--impl` |
 | Branch | `fix/sdk-browser-full-key-normalization` |
-| Current phase | `gate` |
+| Current phase | `close` |
 | Archetype | `2 — Integration` |
 | Scope overlays | `frontend` (browser environment-key contract) |
 
 ## Current State
 
 The branch started at baseline `dea449911`; `origin/main` advanced during review without touching
-this slice. Draft PR #1831 is open. The SDK browser builder now applies Aspire's exact resource-name
-identifier normalization through a private helper; shorthand and server code are untouched. Every
-owner-requested local gate is green, and Slice 2 awaits independent review before commit.
+this slice. Draft PR #1831 is open and intentionally remains draft with `status:impl`. The SDK
+browser builder now applies Aspire's exact resource-name identifier normalization through a private
+helper; shorthand and server code are untouched. Every owner-requested local gate is green, both
+slices passed independent review, and separate-session IMPL-EVAL returned `PASS`.
 
 ## Completed
 
@@ -25,16 +26,19 @@ owner-requested local gate is green, and Slice 2 awaits independent review befor
 - `PLAN-EVAL: N/A` recorded before implementation.
 - Slice 1 signed/pushed as `e5dd8dbc5`; draft PR #1831 opened with the requested metadata.
 - Canonical RED captured and all Slice 2 gates passed.
+- Slice 2 signed/pushed as `b05ae25b8`; its independent Opus 5 review returned `PASS`.
+- Native Fable 5 IMPL-EVAL was quota-blocked before a turn; the policy-authorized OpenRouter
+  `z-ai/glm-5.3-flash` fallback independently reproduced all evidence and returned `PASS`.
 
 ## In Progress
 
-- Slice 2: independent opposite-family slice review before sign-off commit.
+- Close-out artifacts, formal PR phase comment, and final artifact-only commit.
 
 ## Next Steps
 
-1. Obtain Slice 2 review PASS, commit, push, and post the slice comment.
-2. Run separate-session native Claude/Fable IMPL-EVAL and address any findings.
-3. Update the draft PR body and final run artifacts without marking ready for review.
+1. Commit and push the final run artifacts.
+2. Post the formal IMPL-EVAL phase comment and update the draft PR body.
+3. Leave the PR draft and `status:impl`; the milestone supervisor owns lifecycle changes.
 
 ## Key Decisions
 
@@ -68,9 +72,12 @@ owner-requested local gate is green, and Slice 2 awaits independent review befor
 
 ## Drift and Debt
 
-- Drift: `rtk` unavailable; exact current Codex identity not exposed.
+- Drift: `rtk` unavailable; exact current Codex model/effort not exposed; native IMPL-EVAL quota
+  blocked and used the policy fallback; the high-volume raw evaluator stream was not retained.
 - Debt: none created or deepened.
 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
+- Formal evaluation applies to product/test head `b05ae25b88de089781ab581e77b3f0567628f780`;
+  the remaining commit contains run artifacts only.
