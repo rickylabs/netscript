@@ -14,9 +14,10 @@
 
 ## Current State
 
-S1 was accepted and then owner-narrowed. S2.1 is GREEN: its RED test commit proved the missing
-throwing boundary, and the core helper plus core/plugin exports now pass both whole-package suites.
-The locked implementation contract has two defects only: add the throwing publisher companion plus
+S1 was accepted and then owner-narrowed. S2.1 and S2.2 are GREEN: the throwing companion passes both
+whole-package suites, and the saga-aware scanner passes 28/0 focused tests while isolating the three
+unsafe fenced docs calls. Its allowance count remains 7; the workers template remains clean. The
+locked implementation contract has two defects only: add the throwing publisher companion plus
 discarded-receipt quality rule, and correct four unsafe documentation calls plus stale fallback
 prose/source-sync coverage. The product ceiling is 20 paths. Every workers product/test path and all
 endpoint-diagnostic work are excluded.
@@ -50,7 +51,7 @@ runtime lease is required.
 ## S2 Slices
 
 1. Core helper + core/plugin exports + helper tests + port doc — GREEN.
-2. Discarded-receipt scanner rule + fixtures.
+2. Discarded-receipt scanner rule + fixtures — GREEN.
 3. Source-sync test/task + four unsafe calls + two reference corrections.
 4. Attributed derivatives + full static/package/docs/lock/ceiling handoff.
 
@@ -81,5 +82,5 @@ runtime lease is required.
 
 ## Next Action
 
-Implement S2.2 through S2.4 with isolated RED then GREEN commits. Stop at implementation complete;
-the supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.
+Implement S2.3 and S2.4 with isolated RED then GREEN commits. Stop at implementation complete; the
+supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.

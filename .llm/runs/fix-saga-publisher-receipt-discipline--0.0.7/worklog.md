@@ -107,6 +107,8 @@ derivation contract.
 | 2026-08-31       | S2 activation | primary ruling        | Primary accepted `PLAN-EVAL: N/A`; supervisor converged docs-only main at `9f1f9fb87`; S2 authorized.             |
 | 2026-08-31       | S2.1 RED      | helper contract       | Compiling focused test proved 0 passed/3 failed solely because the core publisher export was absent; `2f913f237`. |
 | 2026-08-31       | S2.1 GREEN    | throwing companion    | Added the core helper/re-exports; focused 3/0, core 87/0/3, sagas 55/0/1, with package checks and policy gates.   |
+| 2026-08-31       | S2.2 RED      | quality fixtures      | Scanner test compiled, then produced 26 passed/2 failed because known saga receipt discards were not reported.    |
+| 2026-08-31       | S2.2 GREEN    | saga-aware scanner    | Focused scanner suite reached 28/0; repo scan found only three owned fenced docs calls with 7 allowances.         |
 
 ## New-Base Gate Results
 
@@ -178,6 +180,26 @@ GREEN evidence after the helper and two entrypoint exports:
 - both package publish dry-runs, `arch:check:repo`, and the public `deno doc` inspections passed.
 - `quality:scan:repo` remained PASS with 0 findings and 7 valid allowances before the new rule
   slice.
+
+## S2.2 Evidence — Discarded-Receipt Quality Rule
+
+RED was committed before scanner implementation as `6276cee76`:
+
+- `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/quality/scan-code-quality_test.ts --ext ts`
+  — PASS 1/1.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/quality/scan-code-quality_test.ts`
+  — expected exit 1, 26 passed/2 failed; only known saga publisher source/docs/template findings
+  were absent, while the consumed/unrelated control passed.
+
+GREEN evidence with `discarded-saga-publisher-result` active:
+
+- focused scanner check — PASS 1/1; focused tests — PASS 28/0.
+- `deno task quality:scan:repo` — expected interim exit 1 with exactly three findings, all fenced
+  unsafe docs calls owned by S2.3; allowance count remained exactly 7 with no failures.
+- the workers-emitted template was traversed through its TypeScript template text and produced no
+  finding because its receipt is already discriminated. The fourth canonical docs copy is a custom
+  component string rather than a checked fence and is protected by the source-derived sync test in
+  S2.3.
 
 ## Hard Stops
 
