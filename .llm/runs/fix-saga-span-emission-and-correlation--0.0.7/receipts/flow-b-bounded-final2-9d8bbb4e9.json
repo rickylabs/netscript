@@ -1,0 +1,265 @@
+{
+  "ok": false,
+  "suiteId": "scaffold.runtime",
+  "projectRoot": "/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506",
+  "startedAt": "2026-08-30T23:38:01.206Z",
+  "durationMs": 18137,
+  "steps": [
+    {
+      "id": "preflight.deno",
+      "title": "Deno CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "preflight.deno attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "--version"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 7,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 7
+    },
+    {
+      "id": "preflight.aspire",
+      "title": "Aspire CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "preflight.aspire attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "--version"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 47,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 47
+    },
+    {
+      "id": "runtime.aspire-start",
+      "title": "Start generated Aspire AppHost",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "runtime.aspire-start attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const appHost = Deno.args[0];\nconst projectRoot = Deno.args[1];\nif (!appHost) throw new Error(\"apphost argument is required\");\nif (!projectRoot) throw new Error(\"project root argument is required\");\nconst command = new Deno.Command(\"aspire\", {\n  args: [\n    \"start\",\n    \"--apphost\",\n    appHost,\n    \"--isolated\",\n    \"--non-interactive\",\n    \"--nologo\",\n    \"--format\",\n    \"Json\",\n  ],\n  stdout: \"piped\",\n  stderr: \"piped\",\n});\nconst output = await command.output();\nconst stdout = new TextDecoder().decode(output.stdout);\nconst stderr = new TextDecoder().decode(output.stderr);\nif (!output.success) {\n  throw new Error(`aspire start failed with code ${output.code}: ${stderr || stdout}`);\n}\nconst metadata = JSON.parse(extractJson(stdout));\nif (!metadata.dashboardUrl) throw new Error(\"aspire start did not report dashboardUrl\");\nconst stateDir = `${projectRoot}/.netscript/e2e`;\nawait Deno.mkdir(stateDir, { recursive: true });\nawait Deno.writeTextFile(`${stateDir}/aspire-start.json`, JSON.stringify(metadata, null, 2));\nconsole.info(`Aspire dashboard: ${metadata.dashboardUrl}`);\nif (metadata.logFile) console.info(`Aspire log: ${metadata.logFile}`);\n\nfunction extractJson(text) {\n  const trimmed = text.trim();\n  const objectIndex = trimmed.indexOf(\"{\");\n  if (objectIndex < 0) throw new Error(\"aspire start did not emit JSON\");\n  return trimmed.slice(objectIndex);\n}",
+              "/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts",
+              "/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Aspire dashboard: https://localhost:43455\nAspire log: /home/agent/projects/netscript/.aspire/logs/cli_20260830T233801367_detach-child_f75e4a24220c44f3a97591aa0965caf5.log\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 8140,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 8140
+    },
+    {
+      "id": "runtime.wait.postgres",
+      "title": "Wait for postgres",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "runtime.wait.postgres attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "wait",
+              "postgres",
+              "--apphost",
+              "/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts",
+              "--non-interactive",
+              "--nologo"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\u001b[2mWaiting for resource 'postgres' to be healthy...\u001b[0m\n\n\u001b[38;5;2m✅\u001b[0m Resource 'postgres' is healthy. (1.5s)\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1716,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1716
+    },
+    {
+      "id": "database.init",
+      "title": "Initialize generated database",
+      "critical": true,
+      "verdict": "failed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "database.init attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-leaf-1368/packages/cli/bin/netscript-dev.ts",
+              "db",
+              "init",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506",
+              "--db",
+              "postgres",
+              "--name",
+              "init"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "Starting db init for postgres...\n\u001b[2mGetting logs...\u001b[0m\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Executing command 'start'.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Waiting for resource 'postgres' to enter the 'Running' state.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Waiting for resource 'postgres' to become healthy.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 'postgres'.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Finished waiting for resource 'postgres'.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Waiting for resource 'plugin-smoke-20260830-220506-db' to enter the 'Running' state.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Waiting for resource 'plugin-smoke-20260830-220506-db' to become healthy.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 'plugin-smoke-20260830-220506-db'.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Finished waiting for resource 'plugin-smoke-20260830-220506-db'.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Successfully executed command 'start'.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m [sys] Starting process...: Cmd = /home/agent/.local/share/mise/installs/deno/2.9.5/bin/deno, Args = [\"eval\", \"\\nconst request = \nJSON.parse(await Deno.readTextFile(Deno.args[0]));\\nconst operation = request.NETSCRIPT_PRISMA_OPERATION;\\nif (typeof operation !== 'string' || \n!/^[a-z-]+$/.test(operation)) {\\n  throw new Error('Invalid NetScript database operation request.');\\n}\\nconst task = `db:${operation}:${Deno.args[1]}`;\\nconst \ncommand = new Deno.Command('deno', {\\n  args: ['task', task],\\n  env: request,\\n  stdin: 'inherit',\\n  stdout: 'inherit',\\n  stderr: 'inherit',\\n});\\nconst \nstatus = await command.spawn().status;\\nDeno.exit(status.code);\\n\", \n\"/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/.netscript-db-operation-postgres.json\", \"postgres\"]\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m \u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdb:init:postgres\u001b[0m deno task db:init\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m \u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdb:init\u001b[0m deno run -A --minimum-dependency-age=0 scripts/migrate.ts --name=init\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m --- ENV VARS FOR PRISMA MIGRATION ---\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m DATABASE_URL: \nHost=localhost;Port=35153;Username=postgres;Password=ffcd03e793914a26a5882ba6d4de0961;Database=plugin-smoke-20260830-220506-db\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m *_URI: (detected)\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m CI: false\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Provider: postgres\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m -------------------------------------\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m 🔄 Creating migration with name: init\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Datasource \"db\": PostgreSQL database \"plugin-smoke-20260830-220506-db\", schema \"public\" at \"localhost:35153\"\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m \n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Already in sync, no schema change or pending migration was found.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m \n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Loaded Prisma config from prisma.config.ts.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m \n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Prisma schema loaded from schema.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Migration creation returned success but created no migration artifact.\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m This headless session could not create a migration. Run this command in an interactive terminal: netscript db migrate --name init\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Created migrations: (none)\n\u001b[38;5;216m[netscript-db-postgres]\u001b[0m Applied migrations: (none)\n",
+            "stderrTail": "db init failed with exit code 1.\nError: Database operation failed with exit code 1\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "failed",
+          "durationMs": 5881,
+          "failureClass": "assertion",
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "error": "Command exited 1; expected 0.",
+      "durationMs": 5881
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "title": "Stop generated Aspire AppHost",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "cleanup.aspire-stop attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "stop",
+              "--apphost",
+              "/home/agent/projects/netscript/worktrees/007-leaf-1368/.llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts",
+              "--non-interactive",
+              "--nologo"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\u001b[2mScanning for running AppHosts...\u001b[0m\n\u001b[38;5;11m📦\u001b[0m Found running AppHost: .llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts\n\u001b[38;5;9m🛑\u001b[0m Sending stop signal to .llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts...\n\u001b[2mStopping .llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts...\u001b[0m\n\n\u001b[38;5;2m✅\u001b[0m .llm/tmp/cli-e2e/plugin-smoke-20260830-220506/aspire/apphost.mts stopped successfully.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 513,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 513
+    },
+    {
+      "id": "cleanup.docker-created-containers",
+      "title": "Prune suite-created Docker containers",
+      "verdict": "passed",
+      "critical": false,
+      "durationMs": 0,
+      "evidence": [
+        {
+          "kind": "docker",
+          "label": "removed containers",
+          "data": [
+            "380dc3385561",
+            "366cc81a262a",
+            "7a9a77b838da",
+            "46bd021a4175",
+            "c531a5bf57b7",
+            "fab97f913a15"
+          ]
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 0
+        }
+      ],
+      "retried": false
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "skipped": 0
+  }
+}

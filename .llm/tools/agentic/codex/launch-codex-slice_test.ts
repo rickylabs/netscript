@@ -8,7 +8,7 @@ import { launcherExitCode, planLauncherProfile } from './launcher-route.ts';
 
 const requested = {
   provider: 'openrouter',
-  model: OPENROUTER_MODEL_IDS.glm,
+  model: OPENROUTER_MODEL_IDS.designGlm,
   effort: 'xhigh',
 } as const;
 

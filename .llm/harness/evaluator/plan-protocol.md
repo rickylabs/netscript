@@ -10,7 +10,7 @@ On a local-machine run PLAN-EVAL normally uses a fresh **native opposite-family 
 Claude/Fable 5 medium evaluates Codex-authored plans, and native Codex GPT-5.6 Sol high evaluates
 Claude-authored plans. It is triggered by the **supervisor**, never auto-dispatched by a sub-agent.
 
-Use the OpenRouter Minimax M3 high preset only for a genuine third opinion or when the native
+Use the OpenRouter Qwen 3.8 Flash max preset only for a genuine third opinion or when the native
 opposite-family route is quota-blocked. If that escalation is limited, use a fresh Antigravity
 (`agy`) session on the Google subscription with Gemini 3.6 Flash high. OpenHands is not a normal
 local evaluator and is reserved for explicitly cloud-driven work. Record every escalation reason

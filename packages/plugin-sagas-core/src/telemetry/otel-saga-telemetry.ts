@@ -11,7 +11,7 @@ import {
   SpanStatusCode,
   type Tracer,
 } from '@netscript/telemetry';
-import { extractFromTraceContext } from '@netscript/telemetry/context';
+import { extractFromTraceContext, formatTraceparent } from '@netscript/telemetry/context';
 import { createOtelDenoMeter, createOtelSdkSpanLink } from '@netscript/telemetry/otel';
 import { SagaMetricNames } from './attributes.ts';
 import {
@@ -107,6 +107,15 @@ export function createSagaTelemetryMeter(meterPort: MeterPort): SagaTelemetryMet
 
 class OtelSagaTelemetrySpan implements SagaTelemetrySpan {
   constructor(private readonly span: Span) {}
+
+  spanContext() {
+    const context = this.span.spanContext();
+    const tracestate = context.traceState?.serialize();
+    return {
+      traceparent: formatTraceparent(context),
+      ...(tracestate ? { tracestate } : {}),
+    };
+  }
 
   setAttribute(key: string, value: string | number | boolean): void {
     this.span.setAttribute(key, value);

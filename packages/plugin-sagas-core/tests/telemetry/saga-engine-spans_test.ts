@@ -1,8 +1,15 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 
-import { defineSaga, sagaComplete } from '../../mod.ts';
-import type { SagaCorrelationKey, SagaDefinition, SagaState } from '../../src/domain/mod.ts';
+import { defineSaga, sagaComplete, sagaFail } from '../../mod.ts';
+import type {
+  SagaCorrelationKey,
+  SagaDefinition,
+  SagaState,
+  SagaStateEnvelope,
+} from '../../src/domain/mod.ts';
+import type { SagaStoreWriteOptions } from '../../src/ports/mod.ts';
 import { createSagaEngine, createSagaRuntime } from '../../src/runtime/mod.ts';
+import { MemorySagaStore } from '../../src/testing/mod.ts';
 import {
   SagaAttributes,
   SagaInstrumentation,
@@ -43,8 +50,13 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     });
 
     assertEquals(results.length, 1);
-    assertEquals(telemetry.spans.length, 1);
-    const span = telemetry.spans[0];
+    assertEquals(telemetry.spans.length, 2);
+    const span = telemetry.spans.find((candidate) => candidate.name === SagaSpanNames.HANDLE);
+    const complete = telemetry.spans.find(
+      (candidate) => candidate.name === SagaSpanNames.CASCADE_COMPLETE,
+    );
+    assert(span);
+    assert(complete);
     assertEquals(span.name, SagaSpanNames.HANDLE);
     assertEquals(span.kind, 'internal');
     assertEquals(span.parent, { traceparent, tracestate: 'vendor=value' });
@@ -53,6 +65,7 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     assertEquals(span.attributes[SagaAttributes.SAGA_EVENT_TYPE], 'counter.incremented');
     assertEquals(span.attributes[SagaAttributes.SAGA_ATTEMPT], 1);
     assertEquals(span.attributes[SagaAttributes.SAGA_DURABILITY_TIER], 't2');
+    assertEquals(span.attributes[SagaAttributes.CORRELATION_ID], 'counter-1');
     assertEquals(span.attributes[SagaAttributes.SAGA_CORRELATION_KEY], 'counter-1');
     assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.SUCCESS);
     assertEquals(span.events, [
@@ -62,6 +75,21 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     assertEquals(span.status, { status: 'ok', description: undefined });
     assertEquals(span.exceptions.length, 0);
     assertEquals(span.ended, true);
+    assertEquals(complete.parent, span.spanContext());
+    assertEquals(complete.attributes[SagaAttributes.SAGA_ID], 'telemetry-success');
+    assertEquals(
+      complete.attributes[SagaAttributes.SAGA_INSTANCE_ID],
+      'telemetry-success:counter-1',
+    );
+    assertEquals(complete.attributes[SagaAttributes.CORRELATION_ID], 'counter-1');
+    assertEquals(complete.attributes[SagaAttributes.SAGA_CORRELATION_KEY], 'counter-1');
+    assertEquals(complete.attributes[SagaAttributes.STATUS], 'completed');
+    assertEquals(complete.attributes[SagaAttributes.SAGA_RESULT_PRESENT], false);
+    assertEquals(complete.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.SUCCESS);
+    assertEquals(complete.ended, true);
+    assertEquals(results[0].correlationId, 'counter-1');
+    assertEquals(results[0].correlationKey, 'counter-1');
+    assertEquals(results[0].spanContext, span.spanContext());
     assertEquals(telemetry.durations.length, 1);
     assertEquals(telemetry.durations[0].attributes?.[SagaAttributes.SAGA_ID], 'telemetry-success');
     assertEquals(
@@ -72,6 +100,79 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     assert(telemetry.durations[0].value >= 0);
   } finally {
     await engine.stop('saga engine telemetry test complete');
+  }
+});
+
+Deno.test('SagaEngine complete span reports mixed terminal status without claiming success', async () => {
+  const telemetry = new RecordingTelemetry();
+  const engine = createSagaEngine({ instrumentation: telemetry.instrumentation });
+  const definition = defineSaga('telemetry-mixed-terminal')
+    .state<SagaState>({})
+    .on('order.closed', () => [sagaComplete({ orderId: '42' }), sagaFail('payment failed')])
+    .build() as SagaDefinition;
+
+  await engine.register([definition]);
+  await engine.start();
+  try {
+    const results = await engine.handle({
+      type: 'order.closed',
+      payload: {},
+      correlationKey: 'order-42' as SagaCorrelationKey,
+    });
+
+    const complete = telemetry.spans.find(
+      (candidate) => candidate.name === SagaSpanNames.CASCADE_COMPLETE,
+    );
+    assert(complete);
+    assertEquals(results[0].completed, true);
+    assertEquals(complete.attributes[SagaAttributes.STATUS], 'failed');
+    assertEquals(complete.attributes[SagaAttributes.SAGA_RESULT_PRESENT], true);
+    assertEquals(complete.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.ERROR);
+    assertEquals(complete.status, { status: 'error', description: undefined });
+    assertEquals(complete.ended, true);
+  } finally {
+    await engine.stop('mixed terminal telemetry test complete');
+  }
+});
+
+Deno.test('SagaEngine finishes complete and handle spans when completion persistence fails', async () => {
+  const telemetry = new RecordingTelemetry();
+  const engine = createSagaEngine({
+    instrumentation: telemetry.instrumentation,
+    store: new FailingSagaStore(),
+  });
+  const definition = defineSaga('telemetry-complete-persist-error')
+    .state<SagaState>({})
+    .on('order.closed', () => [sagaComplete()])
+    .build() as SagaDefinition;
+
+  await engine.register([definition]);
+  await engine.start();
+  try {
+    await assertRejects(
+      () =>
+        engine.handle({
+          type: 'order.closed',
+          payload: {},
+          correlationKey: 'order-42' as SagaCorrelationKey,
+        }),
+      Error,
+      'persistence unavailable',
+    );
+    const complete = telemetry.spans.find(
+      (candidate) => candidate.name === SagaSpanNames.CASCADE_COMPLETE,
+    );
+    const handle = telemetry.spans.find((candidate) => candidate.name === SagaSpanNames.HANDLE);
+    assert(complete);
+    assert(handle);
+    for (const span of [complete, handle]) {
+      assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.ERROR);
+      assertEquals(span.status?.status, 'error');
+      assertEquals(span.exceptions.length, 1);
+      assertEquals(span.ended, true);
+    }
+  } finally {
+    await engine.stop('completion persistence failure telemetry test complete');
   }
 });
 
@@ -143,11 +244,13 @@ Deno.test('createSagaRuntime threads native instrumentation into the saga engine
       correlationKey: 'work-1' as SagaCorrelationKey,
     });
 
-    assertEquals(telemetry.spans.length, 1);
-    assertEquals(telemetry.spans[0].name, SagaSpanNames.HANDLE);
-    assertEquals(telemetry.spans[0].attributes[SagaAttributes.SAGA_ID], 'telemetry-runtime');
-    assertEquals(telemetry.spans[0].attributes[SagaAttributes.OUTCOME], 'success');
-    assertEquals(telemetry.spans[0].ended, true);
+    assertEquals(telemetry.spans.length, 2);
+    const handle = telemetry.spans.find((span) => span.name === SagaSpanNames.HANDLE);
+    assert(handle);
+    assertEquals(handle.attributes[SagaAttributes.SAGA_ID], 'telemetry-runtime');
+    assertEquals(handle.attributes[SagaAttributes.CORRELATION_ID], 'work-1');
+    assertEquals(handle.attributes[SagaAttributes.OUTCOME], 'success');
+    assertEquals(handle.ended, true);
   } finally {
     await runtime.stop('saga runtime telemetry test complete');
   }
@@ -162,7 +265,14 @@ class RecordingTelemetry {
   readonly instrumentation = new SagaInstrumentation({
     tracer: {
       startSpan: (name, options): SagaTelemetrySpan => {
-        const span = new RecordingSpan(name, options.kind, options.attributes, options.parent);
+        const spanId = (this.spans.length + 1).toString(16).padStart(16, '0');
+        const span = new RecordingSpan(
+          name,
+          options.kind,
+          options.attributes,
+          options.parent,
+          { traceparent: `00-${'a'.repeat(32)}-${spanId}-01` },
+        );
         this.spans.push(span);
         return span;
       },
@@ -192,8 +302,13 @@ class RecordingSpan implements SagaTelemetrySpan {
     readonly kind: SagaTelemetrySpanKind,
     attributes: SagaTelemetryAttributes | undefined,
     readonly parent: SagaTraceParent | undefined,
+    readonly context: SagaTraceParent,
   ) {
     this.attributes = { ...attributes };
+  }
+
+  spanContext(): SagaTraceParent {
+    return this.context;
   }
 
   setAttribute(key: string, value: string | number | boolean): void {
@@ -214,5 +329,14 @@ class RecordingSpan implements SagaTelemetrySpan {
 
   end(): void {
     this.ended = true;
+  }
+}
+
+class FailingSagaStore extends MemorySagaStore {
+  override save<TState extends SagaState>(
+    _envelope: SagaStateEnvelope<TState>,
+    _options?: SagaStoreWriteOptions,
+  ): Promise<void> {
+    return Promise.reject(new Error('persistence unavailable'));
   }
 }

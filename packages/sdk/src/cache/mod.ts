@@ -6,20 +6,14 @@
  * SWR engine, the KV-backed `KvCacheStore`, cache key helpers, cached-entry
  * helpers, and the cache-provider registration seam.
  *
- * Importing this module registers the shared `cacheQuery` provider so
- * `@netscript/sdk/query` factories can execute cache-aware methods without
- * additional setup. Browser bundles should prefer query-client helpers and
- * avoid importing this server-only module.
+ * Importing this module is load-time pure. A custom server composition root
+ * must explicitly call `setCacheProvider(cacheQuery)` before cache-aware query
+ * methods execute. `defineFreshApp()` performs that registration for
+ * NetScript-managed Fresh apps. Browser bundles should prefer query-client
+ * helpers and avoid importing this server-only module.
  *
  * @module
  */
-
-import { setCacheProvider } from './cache-provider.ts';
-import { cacheQuery } from './cache-query.ts';
-
-// Auto-register: server-side code that imports @netscript/sdk/cache
-// gets the KV-backed CacheQuery wired as the global cache provider.
-setCacheProvider(cacheQuery);
 
 export { CacheQuery, cacheQuery } from './cache-query.ts';
 export {
@@ -52,7 +46,7 @@ export type { CacheQueryOptions, QueryParams } from '../ports/query-options.ts';
 export type { QueryKey, QueryKeyPart } from '../ports/query-key.ts';
 export { createActionQueryKey, serializeQueryKeyInput } from '../ports/query-key.ts';
 
-// Re-export the provider API for manual registration and testing.
+// Re-export the provider API for explicit server registration and testing.
 export {
   type CacheProvider,
   getCacheProvider,
