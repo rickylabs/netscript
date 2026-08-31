@@ -217,3 +217,15 @@ artifact-pinned production E2E.
   review threads, truthful PR-body scope, and terminal lifecycle normalization. The next public
   front is Aspire #1831, followed by Features #1814 if its fresh verdict passes; only then is the
   checkpoint considered for canary 5.
+
+## 2026-08-31T05:37:55Z — Aspire browser discovery joins the public checkpoint
+
+- PR #1831 head `ce8888fb495980ff3f4d94ab4a34459eddf9abe9` squash-merged as
+  `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`, closing #1824. It aligns browser full-key discovery
+  with Aspire identifier normalization while preserving shorthand and server-side contracts.
+- Exact CI run `33360661815` passed; close-gate attempt 2 began after the final live body/lifecycle
+  correction. Synthetic merge `bc4061a30f` had exact `[f59874abd, ce8888fb4]` parents, the GLM
+  product/test evidence carried by blob identity, and review threads were zero.
+- The public checkpoint now contains `createLazyKv`, non-discardable saga receipts, complete nested
+  token-usage preservation, and Aspire-compatible browser full keys. Features #1814 is the next
+  preferred public addition; canary 5 remains gated by coherence, not urgency alone.

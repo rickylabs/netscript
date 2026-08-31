@@ -3265,6 +3265,24 @@
   exact CI. #1814 follows if its current GLM verdict passes. This produces a coherent public
   feature/fix checkpoint before any canary decision rather than another internal-only release.
 
+## 2026-08-31T05:37:55Z — #1831 browser full-key normalization ships; convergence wave released
+
+- Aspire PR #1831 reached immutable head `ce8888fb495980ff3f4d94ab4a34459eddf9abe9` on exact main
+  `f59874abd2bc39446b21f5126323e0d2dcbce547`. Independent audit confirmed the pure SDK/Aspire
+  string-contract delta, unchanged lock, valid separate-session GLM PASS with product/test/evaluator
+  blob identity, honest runtime inapplicability, complete DoD, `Closes #1824`, and zero review threads.
+- The ready-label transition and body truth correction postdated CI attempt 1's close-gate, so the
+  coordinator did not consume that stale policy receipt. Run `33360661815` completed exact-head
+  check/test and quality green, then attempt 2 started its close-gate at 05:36:58Z after the body
+  update at 05:35:17Z and passed with terminal core visibility.
+- Synthetic merge `bc4061a30fa7163a7a4717b39b6871f6cc675e56` had exact parents live main and the immutable
+  head. The coordinator squash-merged #1831 as `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`;
+  #1824/#1831 are normalized to sole `status:shipped`.
+- The complete main was immediately released to Features #1814, Fixes #1773, Internals #1823, and
+  Docs #1803 for one final convergence each. Their topic queues continue independently; #1664
+  hosted runtime, #1834 evaluation, #1828 evaluation, #1832 dependency validation, S10/S11/#1747,
+  and the docs evaluation/oldest-PR sweep remain active rather than waiting on this merge wave.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance

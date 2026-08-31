@@ -2060,3 +2060,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - #1823/#1803 bank their validated work until #1831 lands, then each converges once on the complete
   public base. #1747 repair, #1828 delta evaluation, #1349 implementation, #1773/#1609, and docs
   evaluations remain parallel. Host runtime inventories remain exact zero.
+
+## Resume delta — 2026-08-31T05:37:55Z
+
+- Current main is `bd9d463b4480847dcd6f76efe5bc1e53bb926bec` after exact-green Aspire PR #1831
+  shipped from immutable head `ce8888fb495980ff3f4d94ab4a34459eddf9abe9`, closing #1824. The
+  pure SDK/Aspire browser full-key normalization carries a valid separate-session GLM PASS and
+  exact product/test/evaluator blob identity; #1824/#1831 are sole `status:shipped`.
+- CI run `33360661815` passed full check/test and quality at the exact head. Because lifecycle/body
+  edits occurred after attempt 1's close-gate, attempt 2 was deliberately required and passed after
+  the live edit. Merge ref `bc4061a30f` had exact `[f59874abd, ce8888fb4]` parents and zero threads.
+- #1814/#1773/#1823/#1803 are released for their one final current-main convergence and fresh CI.
+  #1664 hosted runtime, #1834, #1828/#1832/#1737, S10/S11/#1747, #1609, and docs evaluations and
+  oldest-PR dispositions remain independently active. No lane-wide pause is authorized.
