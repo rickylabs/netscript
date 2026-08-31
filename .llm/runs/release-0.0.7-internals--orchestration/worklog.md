@@ -6038,3 +6038,16 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   further guard-patch workarounds. Not dispatching cycle 2 now.
 - **Continuing to ship autonomously per instruction**: selecting the next independent, unblocked
   internals leaf.
+
+## D-122 — #1750 dispatch aborted instantly (my own error); serial-queue correction applied; #1751 cycle 2 prioritized
+
+- #1750 launch (thread `01a05527-3e16-7d42-bbda-d8035cfc6534`) crashed in the launcher wrapper on
+  `Deno.writeTextFile(...codex-thread-ids.md)`: `NotFound` — the run directory
+  `.llm/runs/fix-hybrid-launcher-task-separator--1750/` didn't exist yet (my own dispatch error —
+  never created it before launch, unlike prior leaves where the brief's own bootstrap commit or an
+  earlier `mkdir` created it first). The rollout confirms the turn was `interrupted`/aborted 58ms
+  after starting, before any response or file edit. **Nothing to checkpoint or pause — the session
+  holds no state and is already inert.** Not resuming it as-is; will redispatch cleanly (with the
+  run dir pre-created) only after #1751's serial slot clears, per the correction.
+- **Serial-queue correction applied**: #1750 must not advance concurrently with #1751. Prioritizing
+  #1751 cycle 2 now.
