@@ -7021,3 +7021,29 @@ and #1365 (sagas/docs/quality). Defect re-verified at main before briefing — t
 `if (!strategy || strategy.mode === 'client') return props;` early-return fires before
 `resolveFormNavigationProps` is ever consulted. #1455 was again passed over: it is a published-type
 redesign, the wrong shape this close to the deadline.
+
+### #1365/#1819 converged twice to current main; PASS carries by blob identity both times
+
+`eaea940bea` (#1810) integration: sole conflict was the generated MCP export-surface corpus, resolved
+**strictly by generator** (full chain in locked order), and the corpus was the only file the chain
+moved. Head `26553c353`, **full `ci` run completed SUCCESS**, close-gate success.
+
+GitHub then reported `CONFLICTING/DIRTY` against `0e93a6c05` (#1808 docs), i.e. it **could not form
+the synthetic merge ref**, so per the ruling I converged once rather than leaving it unmergeable. Four
+conflicts, all generated carriers, again resolved strictly by generator. Head **`8eaac635d`**.
+
+**Merge-ref requirement satisfied:** `refs/pull/1819/merge` now has **first parent `0e93a6c05`** =
+current main, verified by `git rev-list --parents`.
+
+**Evaluator disposition unchanged across both convergences — no rerun, as directed.** All **14
+handwritten saga-owned paths are byte-identical (0/14 differ)** between the GLM-evaluated head
+`ecb82ae2e` and `8eaac635d`, and `deno.lock` is byte-identical at `edfa0c24…d1820c`. Nothing the
+evaluator judged has moved; only generated carriers did. Carrier checks exit 0 at each head with a
+clean tracked tree; `quality:scan:repo` findings 0; `packages/plugin-sagas-core` 87/0/3.
+
+Close-gate at `8eaac635d`: **success** (started 04:51:22Z, after all metadata fixes). Full `ci` run
+still completing at time of writing.
+
+Anticipated per the ruling: **#1820 is the next merge front**, so #1819 will need one final
+generated-carrier refresh after it lands. The handwritten blob set is expected to stay identical
+through that too, which is the property that lets the PASS carry without an evaluator rerun.
