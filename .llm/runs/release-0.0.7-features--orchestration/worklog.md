@@ -9179,3 +9179,46 @@ which the deadline wants regardless.
 
 Had I not root-caused this, the natural reading of the denial would have been "GLM routing is still
 broken" and I would have escalated a non-existent infrastructure problem back to the coordinator.
+
+## #1762 checkpoint — shipping front, all audit blockers resolved
+
+The GLM task was **not stalled**; it completed at 104 turns / ~21 min with
+**ACCEPTED_WITH_FINDINGS at `ffd380532`**, and its artifact is preserved verbatim at
+`evaluate-slice-9.md` (not overwritten). Every blocker the coordinator's read-only audit named is now
+resolved:
+
+| Audit blocker | Resolution |
+| --- | --- |
+| Generated-corpus conflict with `main` #1764 | Integrated `main` `8a9257642`; sole conflict was the MCP export corpus, regenerated from current inputs → **7709 symbols** |
+| Stale `evidence-set` immutableHead / receipt ids (**F-1**) | Archived the whole Slice 9 set to `receipts/slice-9-3cb08103f/` — **including the four superseded receipts, preserved not discarded** — then cut one coherent nine-gate set. Manifest and directory now agree. |
+| Ledgers missing integrations / final heads (**F-2**) | `worklog.md` + `context-pack.md` now record all three integrations and the re-cuts |
+| Stale PR body / `status:plan` | PR body rewritten in place; issue relabelled `status:plan` → `status:impl` |
+| Issue acceptance wording + unchecked boxes | LD-11 line amended in place with its rationale; a fenced `acceptance-evidence` block now maps **all 13 boxes** to concrete slice evidence |
+
+**Boxes were not hand-ticked.** The close-gate mirrors them from the fenced block — hand-editing
+checkboxes is precisely the failure mode this lane recorded earlier. `Fixes #1387` now registers as a
+live `closingIssuesReferences` entry; PR is **MERGEABLE / CLEAN**.
+
+**The LD-11 amendment, stated plainly.** The issue demanded a negative test proving *"renaming a
+router breaks a contract-declared policy at compile time."* PLAN-EVAL rejected that as incompatible
+with the design it accepted, and I amended it in place: policy is **contract-local**, so it travels
+*with* a renamed procedure. Making a rename *break* policy would require a second key-indexed policy
+map — exactly the defect this issue exists to remove. The substituted proof (metadata follows the
+rename through REST **and** RPC; the stale SDK key fails type-check) is both achievable and stronger.
+
+**Final exact-head gates:** nine contracted gates at one head, each `gitHead == actualGitHead`,
+`evidence-set.json` **SUFFICIENT / zero reasons**, `deno.lock` byte-identical. Final exact-head
+IMPL-EVAL dispatched (`blcx8dfmo`); its brief explicitly asks the evaluator to judge the third
+integration and both F-fixes, and to preserve rather than overwrite the prior verdict.
+
+## Parallelism, per the owner's authorization
+
+`#1805` (#1591) dispatched concurrently (`baoqj3061`) — its `packages/ai` surface is disjoint from
+#1762's service/principal code, it has its own worktree, and **`git diff <content>..<evidence> --
+packages/ai` is empty**, so the integration moved no product source. The shared export corpus is a
+derivative artifact, ordered at integration time, not a concurrent edit.
+
+**Queued, not yet started:** `main` advanced docs-only to `6bb27e46a` (#1796). Deliberately **not**
+integrating it now — that would move the head under the running #1762 evaluator. It is a mechanical
+derivative delta; after the verdict I will integrate, regenerate the corpus, prove product sources
+byte-identical, and carry the accepted product verdict across rather than re-evaluating unchanged code.

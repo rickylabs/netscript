@@ -9,7 +9,7 @@ You certify or reject; you do not fix, commit, push, comment on GitHub, or move 
 | --- | --- |
 | Repo | detached worktree, already checked out at the evidence head |
 | **Content head** | `ff7d2de60ef470c312d633b851975d67a6774471` |
-| **Evidence head** | `ff991165ffc0146718dd1e516e0bddf6dd72ac8f` |
+| **Evidence head** | `1f87b111f` (post-`main`-integration; `packages/ai` verified byte-identical to the certified content head) |
 | Base | `0331014fe` |
 | PR | rickylabs/netscript **#1805**, draft, `Fixes #1591` |
 | Run dir | `.llm/runs/feat-openai-responses-mapper--1591/` (`plan.md`, `research.md`, `tier-a.md`, `drift.md`) |
@@ -43,6 +43,15 @@ You certify or reject; you do not fix, commit, push, comment on GitHub, or move 
 6. **Out-of-scope boundary held.** The Responses API's response/streaming side (discriminated output
    items, `call_id` correlation, `response.output_item.*` events) is explicitly **not** this issue's
    scope. Confirm the diff touches no response-parsing or streaming code.
+
+
+## Note on the integration
+
+This leaf was integrated with current `main` after Tier-A, to bring the post-#1792 evaluator
+allowlist into the worktree (the model guard reads it from the checked-out tree, not from `main`).
+**`git diff <content head>..<evidence head> -- packages/ai` is empty** — the integration touched no
+product source, so the certified content is unchanged. Verify that yourself rather than taking it on
+trust, then judge the slice as normal.
 
 ## Verdict
 

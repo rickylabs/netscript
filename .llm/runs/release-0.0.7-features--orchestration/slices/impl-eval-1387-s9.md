@@ -9,8 +9,8 @@ and do not move any head.
 | Field | Value |
 | --- | --- |
 | Repo | detached worktree, already checked out at the evidence head |
-| **Content head** | `ce0c0ebcb39c35db18a12350cc2683630af84381` |
-| **Evidence head** | `ffd380532ff83ba7d24703952bae3020352c5653` |
+| **Content head** | `236a3d331` |
+| **Evidence head** | `2a26f0254ae585e516ac81e78da5d625ea5d1c55` |
 | Base | `9ce84de2f`; the head now additionally carries **two integrations of `main`** (through `65cd8a077`) — see "Integration" below |
 | PR | rickylabs/netscript **#1762**, draft, `Refs #1387 — partial` |
 | Plan | `.llm/runs/feat-service-principal-procedure-policy--1387/plan.md` § Slice 9; the full Key Decisions (LD-1–LD-12) table; research finding 14 |
@@ -84,6 +84,29 @@ integration too, not just the documentation slice:
   `check:mcp-export-corpus`, `docs:exports-drift` should all pass at this head) and that
   `deno.lock` is byte-identical.
 - Confirm the integration did not silently revert or alter any of Slices 1–9's product changes.
+
+
+## This is a RE-evaluation at a moved head — what changed since the prior verdict
+
+A prior IMPL-EVAL returned `ACCEPTED_WITH_FINDINGS` at `ffd380532`. **Its artifact is preserved at
+`evaluate-slice-9.md`; do not overwrite it** — write yours to `evaluate-slice-9-final.md`.
+
+Since that verdict the head moved for three reasons, all of which you should judge:
+
+1. **A third `main` integration** to `8a9257642` (PR #1764 landed). One carrier conflicted — the MCP
+   export corpus — regenerated from current inputs to **7709 symbols**.
+2. **F-1 fixed.** The prior evaluator found `evidence-set.json` declaring `immutableHead 3cb08103f`
+   and twelve `1387-s9-*` ids while four top-level receipts had been replaced by integrated-head
+   re-cuts. The whole Slice 9 set — **including the four superseded receipts** — was archived to
+   `receipts/slice-9-3cb08103f/`, and a single coherent nine-gate set was cut at one head. Verify the
+   manifest and directory now agree, and that nothing was discarded rather than archived.
+3. **F-2 fixed.** `worklog.md` and `context-pack.md` now record all three integrations and the
+   re-cuts, which they previously omitted. Verify they are accurate, not merely present.
+
+**Judge whether the F-1/F-2 fixes are complete and honest, and whether the third integration
+preserved every Slice 1–9 product change.** The prior verdict's substantive findings on the
+documentation itself (finding 14, LD-6, LD-8, LD-11) were all verified green — you may rely on that
+and focus on what moved, but say so if you disagree.
 
 ## Verdict
 
