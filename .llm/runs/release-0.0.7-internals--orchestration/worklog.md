@@ -6084,3 +6084,15 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   supervisor Tier-A, do not proceed further unattended.
 - **#1750 remains parked**, per the standing serial-queue correction, until #1751 reaches its next
   checkpoint.
+
+## D-125 — #1751 Slice 1 RED verified genuine, thread stopped as instructed
+
+- Commit `c6dd9e363` verified genuinely RED, not merely claimed: focused test run
+  `REAL_EXIT=1`, 16 passed / 11 failed / 27 total. Every currently-failing case defaults to
+  `indeterminate` (the safe pre-implementation default), matching Slice 1's own description exactly
+  — types and truth-table tests only, no classification logic yet.
+- The RED test set already includes the F2-derived provenance cases ("proven absence in the
+  matching session provenance is stale") — confirms the PLAN-EVAL cycle 2 fix reached the actual
+  test suite, not only the plan prose.
+- Thread confirmed idle after this single commit — stopped exactly at the "Slice 1 only" boundary,
+  as instructed. Holding for supervisor Tier-A before authorizing Slice 2.
