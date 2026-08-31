@@ -1863,3 +1863,12 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - All local runtime commands require a primary-issued serialized lease even during research or S1.
   The interrupted #1365 scaffold attempt is not evidence. Host state was recovered to Aspire `[]`,
   containers 0, volumes 0, and non-default networks 0.
+
+## Resume delta — 2026-08-31T00:36:00Z
+
+- Aspire S6 is terminal-ready: PR #1743 at `b6b0bb87c` is non-draft CLEAN/MERGEABLE with sole
+  `status:ready-merge`, attributed `impl-eval:skip`, and exact-head run `33344566953` fully green.
+  Accepted DeepSeek and byte-identical product Phase-B evidence were not rerun.
+- Aspire's next action is static #1747 diagnosis in clean `007-1747-conv` at `2462704c`; never use
+  dirty duplicate `007-leaf-1732`. Request the next lease only after the missing workers fixture is
+  classified and the four-part zero preflight is repeated.

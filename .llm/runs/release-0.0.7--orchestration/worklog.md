@@ -2978,3 +2978,12 @@
   interrupted it, stopped only its exact AppHost, removed its sole owned network, and re-proved all
   runtime state exactly zero. The attempt is non-evidence; the same author thread is restricted to
   static/package baselines until the primary grants a serialized lease.
+
+## 2026-08-31T00:36:00Z — Aspire S6 terminal ready
+
+- Fresh exact-head run `33344566953` completed success at `b6b0bb87c`: close-gate, quality,
+  check-test, and core visibility are all green. PR #1743 is non-draft, CLEAN/MERGEABLE,
+  `status:ready-merge`, and `impl-eval:skip`, with no failed or pending checks.
+- Host remains exact zero after the quickstart lease and after recovery of the unrelated unleased
+  #1365 attempt. Aspire now proceeds directly to static #1747 diagnosis in clean worktree
+  `007-1747-conv`; the dirty duplicate `007-leaf-1732` is historical and must not be used.
