@@ -1,3 +1,4 @@
+import { buildViteEnvVarName } from '@netscript/aspire/application';
 import {
   createBrowserServiceEnvKey,
   createBrowserServiceShortEnvKey,
@@ -36,6 +37,52 @@ Deno.test('service URL lookup prefers full browser key before shorthand', () => 
   });
 
   assertEquals(url, 'http://browser-full.example');
+});
+
+Deno.test('browser service full key matches Aspire identifier normalization', async (t) => {
+  await t.step('normalizes hyphenated resource names', () => {
+    assertEquals(
+      createBrowserServiceEnvKey('sagas-api', 'http', 0),
+      'VITE_services__sagas_api__http__0',
+    );
+    assertEquals(
+      createBrowserServiceEnvKey('workers-api', 'http', 0),
+      'VITE_services__workers_api__http__0',
+    );
+  });
+
+  await t.step('preserves resource names that are already valid', () => {
+    assertEquals(
+      createBrowserServiceEnvKey('orders', 'http', 0),
+      'VITE_services__orders__http__0',
+    );
+  });
+
+  await t.step('normalizes every other invalid identifier character', () => {
+    assertEquals(
+      createBrowserServiceEnvKey('orders.api/v2', 'https', 1),
+      'VITE_services__orders_api_v2__https__1',
+    );
+  });
+});
+
+Deno.test('browser shorthand and server service keys retain their existing contracts', () => {
+  assertEquals(createBrowserServiceShortEnvKey('sagas-api'), 'VITE_SAGAS_API_URL');
+  assertEquals(
+    createServerServiceEnvKey('sagas-api', 'http', 0),
+    'services__sagas-api__http__0',
+  );
+});
+
+Deno.test('SDK browser full key agrees with Aspire output', async (t) => {
+  for (const resourceName of ['sagas-api', 'workers.api/v2']) {
+    await t.step(resourceName, () => {
+      assertEquals(
+        createBrowserServiceEnvKey(resourceName),
+        buildViteEnvVarName(resourceName).full,
+      );
+    });
+  }
 });
 
 Deno.test('service URL lookup falls back from browser full key to shorthand', () => {
