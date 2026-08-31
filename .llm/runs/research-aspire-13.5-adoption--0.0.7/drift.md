@@ -5617,3 +5617,31 @@
     fails **statically** instead of at gate 40 of a runtime suite.
   - Preserved by instruction: D-224 stderr bounds, D-227 emitted-compile static coverage, and the
     External/SQLite modes where `getConnectionString(...)` and the file URL remain correct.
+
+- **D-232 — S8 returned to graph injection at `927d24bed`; the unsupported-capability finding is now
+  grounded in the SDK's own context type, not just an RPC error.**
+  - **The decisive evidence the agent added:** Aspire 13.5.3's generated `ExecuteCommandContext`
+    exposes only **services, resourceName, cancellationToken, logger, arguments** — **no
+    connection-string accessor at all**. That upgrades the diagnosis from "one RPC is unimplemented"
+    to "in-callback connection resolution is absent from the context type", which is why no third
+    method name would ever have worked.
+  - **Mechanism chosen is the one already proven in production on this very branch:** the explicit-start
+    executable annotated with `withEnvironment(..., target.resource)` + `withReference` + `waitFor`.
+    `init`/`migrate`/`generate` use it and pass on **every** run while `seed` failed — the strongest
+    available evidence short of a runtime lease, and the agent correctly cited their passing behaviour
+    as the runtime proof rather than starting anything locally.
+  - **RED before the fix: 30 passed / 6 failed**, including two tests that name the *class* rather than
+    the instance:
+    - `compile-clean Container emission must not call an unsupported runtime capability`
+    - `Container commands must consume Aspire graph-injected environment instead of a callback resolver`
+    GREEN after: focused helper directory **256 passed, 0 failed**.
+  - **Delta eval dispatched** (`a2b227941..927d24bed`) with one question I want answered sharply:
+    whether that new coverage catches **any** future in-callback capability call or only the
+    `getValue` spelling. A test that pins one method name would leave this branch open to a fourth
+    cycle of the same shape.
+  - It must also confirm the D-224 stderr bounds and D-227 emitted-compile coverage both **survive**
+    this delta — three repairs now stack on one branch, and a later one silently undoing an earlier
+    one is the realistic failure mode from here.
+  - Running tally on S8: a carried base PASS plus **four** independently evaluated bounded deltas —
+    seed connection, stderr bound, compile fix, graph injection. Each earlier PASS carried forward
+    rather than re-spent.
