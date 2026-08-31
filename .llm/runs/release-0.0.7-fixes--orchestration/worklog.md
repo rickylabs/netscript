@@ -6655,3 +6655,36 @@ and fail on semantic absence/wrong behavior, never on a missing file or module.
 `packages/cli` scaffold + e2e). The one shared carrier remains
 `packages/cli/src/kernel/assets/agent-docs.generated.ts`; per ruling, **generated-corpus integration
 stays ordered** — whichever merges second regenerates before its exact-head CI.
+
+### #1796 delta proven verdict-safe; #1819 narrowed, converged to `9f1f9fb87`; #1773 held mid-turn
+
+**Delta proof (`8a925764` → `6bb27e46`), 14 files.** Thirteen are docs, run artifacts, or generated
+carriers. The one exception is `.llm/tools/docs/check-exports-drift.ts` — inspected rather than
+waved through: it is a **pure data addition**, one new `plugin-ai-core` entry appended to
+`AUTHORITATIVE_MAPPING`, with **no control-flow or logic change**. Neither leaf's ceiling intersects
+any of the 14. The delta is therefore safe for #1773 to carry a plan verdict across, as ruled.
+
+**Shared carrier moved again**: `prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`, and
+`packages/mcp/src/publish-assets.generated.ts` all changed in this delta. Both leaves must regenerate
+before their final exact-head CI; that obligation is now recorded against both.
+
+**#1819 (#1365) — narrowing delivered and converged.** Author committed `3bfc55840` artifact-only,
+then I integrated main at the safe boundary (author idle, tree clean) → **`9f1f9fb87`**, zero
+conflicts, still artifact-only, pushed. Ceiling narrowed 25 → **20 paths** with every
+`plugins/workers/**` path explicitly excluded, exactly as the primary ordered — no manufactured
+scaffold work. The author computed the pre-narrowing intersection against main honestly as **6/25**,
+all generated carriers.
+
+**Author recommends `PLAN-EVAL: N/A`, explicitly deferring the ruling to the primary** rather than
+self-certifying — the correct posture. Supervisor read: I concur, with one caveat worth stating. The
+narrowed leaf is mechanical (mechanism, entrypoints, forbidden alternatives, defect count, docs sites
+and gate family are all owner-supplied), so a PLAN-EVAL would answer no open decision. The caveat is
+that it still adds **a new public export** (`publishSagaOrThrow`) and **a repo-wide quality rule**
+whose false-positive surface is the whole repository — blast radius beyond the leaf. Both are
+implementation-quality risks that mandatory IMPL-EVAL (GLM 5.3 Flash max) covers, provided the gate
+table keeps `quality:scan:repo` at 0 findings with the new rule active. On that basis N/A is
+defensible and serves the deadline; the ruling is the primary's.
+
+**#1773 (#1616) — deliberately NOT integrated.** Its author `01a05306` is mid-turn running
+`deno task test` for the measured gate-7 baseline. Merging main underneath a live author turn would
+corrupt the very baseline it is measuring, so #1796 integration waits for its next evidence boundary.
