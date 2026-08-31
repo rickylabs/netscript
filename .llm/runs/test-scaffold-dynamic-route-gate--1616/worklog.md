@@ -39,6 +39,7 @@ the lease. Detailed files, constants, order, gates, and deferred scope are locke
 | 2026-08-31 | S3 GREEN | Runtime gate | Implemented the injectable HTTP-semantic probe and critical command gate. Both request modes share one nonce; negative marker/status and zero-candidate cases are covered. Catalog and registration order are exactly app-home → dynamic-route → app-reference. Focused tests 49/49; scoped check clean. |
 | 2026-08-31 | S4 Hardening | Lease-free green | Focused tests 88/88 plus convention 1/1; changed-file check/lint/fmt clean with complete 16-file coverage; asset and quality gates exit 0; root tests 4,440 passed / 0 failed / 19 ignored in 224.976s. `deno.lock` remains byte-identical. |
 | 2026-08-31 | S5 Runtime lease | `NOT_RUN — lease required` | Named command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. No lease was granted, so the command was not launched or simulated. |
+| 2026-08-31 | S6 Handoff | Implementation complete | All six locked slices are pushed. PR #1773 remains draft with its existing labels/milestone. Separate-session GLM 5.3 Flash max IMPL-EVAL is required and remains supervisor-dispatched. |
 
 ## Decisions
 
@@ -93,6 +94,8 @@ though default scaffold output does not. See `drift.md`; scope is unchanged.
 - S1 RED is complete and must remain its own commit before product GREEN.
 - The supervisor dispatches IMPL-EVAL separately; this session must not launch or simulate one.
 - Gate 10 remains `NOT_RUN — lease required`; no scaffold/runtime command was launched.
+- Exact catalog order is confirmed in registration and the suite catalog:
+  `BEHAVIOR_APP_HOME` → `BEHAVIOR_APP_DYNAMIC_ROUTE` → `BEHAVIOR_APP_REFERENCE`.
 
 ## Implementation Gate Table
 

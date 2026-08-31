@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `test-scaffold-dynamic-route-gate--1616` |
 | Branch | `test/scaffold-dynamic-route-gate` |
-| Current phase | `implementation — S5 lease record` |
+| Current phase | `implementation complete — awaiting IMPL-EVAL` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
@@ -39,12 +39,12 @@ separate pushed commits. All lease-free hardening gates are green; no expensive 
 
 ## In Progress
 
-- Commit and push S4 hardening receipts and bounded formatting fixes.
+- None in this implementation session; handoff is complete.
 
 ## Next Steps
 
-1. Finalize implementation artifacts and push the implementation-complete head.
-2. Stop for separately dispatched GLM 5.3 Flash max IMPL-EVAL.
+1. Supervisor dispatches the separate-session GLM 5.3 Flash max IMPL-EVAL.
+2. This implementation session remains stopped; it does not mark the PR ready or alter labels.
 
 ## Key Decisions
 
@@ -71,7 +71,7 @@ separate pushed commits. All lease-free hardening gates are green; no expensive 
 
 ## Open Questions
 
-- None; locked decisions are in `plan.md`.
+- None for implementation. IMPL-EVAL is the next independent decision point.
 
 ## Drift and Debt
 
@@ -80,4 +80,8 @@ separate pushed commits. All lease-free hardening gates are green; no expensive 
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `7ef2181e7eba2f3531bd4e843bc50b927393eba9` — compiling semantic RED.
+- `677f8f04efd5bf9b33418494e6781e1556d70d92` — scaffold GREEN.
+- `a4df2eb38f678fa1e60040a071099d1c1ea41955` — runtime-gate GREEN.
+- `8821303231a35d7d843af99e2ead2f2bfc199b15` — lease-free hardening.
+- `cc465e238dd40770f5f3dc9a8d4d103c6a635f65` — Gate 10 lease boundary.
