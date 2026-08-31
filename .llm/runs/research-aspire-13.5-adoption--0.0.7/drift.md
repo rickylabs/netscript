@@ -5399,3 +5399,33 @@
     does not cover it.
   - Twelfth dead-sender orphan released before launch (`ownerPid 2868588`); upstream unset first, since
     the launcher refuses a worktree with one.
+
+- **D-225 — #1837's seam repair landed at `d23276664` and I verified it against the design rather than
+  the commit message. S8's `generated.quality-negative` reproduces.**
+  - **#1837 repair scope is right:** 2 files, +131/−45 — `prepare-readiness-fixture.ts` and its test.
+    **No generator touched**, so the ordinal-binding and `JSON.stringify` hardening is untouched; the
+    consumer was adapted to the generator, not the reverse.
+  - **Verified each of the coordinator's four requirements in source:**
+    - **Quote-agnostic health-call discovery** (line 169):
+      `/^[ \t]*await[ \t]+([A-Za-z_$][\w$]*)\.withHealthCheck\((?:"…"|'…')\);[ \t]*$/gm` — captures the
+      binding as a **generic JS identifier** and accepts **either** quote style. No reconstructed
+      user-name string.
+    - **Ordinal block markers** (lines 213–214): `'  // --- app '` — the ordinal prefix, **not**
+      `// --- ${name} (task) ---`. The removed user-text comment is genuinely gone from the consumer.
+    - **Fail-closed preserved**: guards remain at lines 63, 74, 98, 189, 207, 211, 218 — each still
+      throws when the seam is genuinely absent.
+    - **Duplicate-registration preserved**: line 56
+      (`test-only listener health checks were already registered`) and line 133
+      (`${name} fixture was already registered`).
+    - The fixture's *own* injected lines at 81/87 still emit single-quoted `.withHealthCheck('…')`, but
+      those use `TEST_ONLY_*` constants and are **emission, not discovery** — correctly unaffected.
+  - Fresh CI running at `d23276664` (`33444052144`); `MERGEABLE` against current main `60ae56af0`.
+    Lifecycle correctly still `status:impl` — it does not return to `ready-merge` until that run is
+    green and the mirror re-validates.
+  - **S8's `generated.quality-negative` REPRODUCED on the recut** — 89369 ms, `passed=27 failed=1`,
+    versus 85110 ms on attempt 1. Consistent, not flake. But `gh run rerun` re-uses the original
+    event's merge ref, so **both attempts are still against old main `9fbc2317`** — the recut did not
+    change base and therefore cannot distinguish "old main" from "S8's repair".
+  - **The D-224 stderr-bound push will resolve both at once**: it creates a *fresh* event (current main
+    `60ae56af0`) **and** lands the richer actionable-stderr, which is exactly what is needed to read a
+    failure whose decisive line the 3-line cap currently truncates. Useful ordering, not a plan.
