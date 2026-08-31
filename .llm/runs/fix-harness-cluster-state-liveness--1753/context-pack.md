@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `fix-harness-cluster-state-liveness--1753` |
 | Branch | `fix/harness-cluster-state-liveness` |
-| Current phase | RED committed next |
+| Current phase | implementation complete; supervisor review pending |
 | Archetype | N/A — internal harness tooling |
 | Scope overlays | none |
 
 ## Current State
 
-Baseline and issue contract are verified. The current validator proves only internal artifact
-consistency. Both injected liveness fixtures now fail behaviorally: the focused structured wrapper
-captured exit 1 with 13 passing tests and the stale-head/missing-leaf tests both observing `ok: true`.
-No validator implementation has been edited.
+The required RED was committed first as `5f41e90dc` and published on draft PR #1823. GREEN now
+reconciles through an injected list/head source, returns compact structured findings, explicitly
+excludes coordinator artifacts and merged leaves, fails closed without a source, and accepts a
+read-only JSON export through `--github-prs`. All final declared gates are green.
 
 ## Completed
 
@@ -24,16 +24,20 @@ No validator implementation has been edited.
 - Confirmed exact requested branch/base and authorized collision-safe boundary.
 - Recorded PLAN-EVAL: N/A with a concrete scoped-fix rationale.
 - Proved both issue regressions RED against injected, network-free fixtures.
+- Opened draft PR #1823 with `Closes #1753`, taxonomy labels, and milestone 0.0.7.
+- Implemented and tested stale head, missing leaf, coordinator exclusion, merged leaf, unavailable
+  source, and read-only export behavior.
+- Captured focused 19/19, full harness 21/21, scoped check/lint/fmt, and diff-check exits at 0.
 
 ## In Progress
 
-- Commit and publish Slice 1 RED before any validator implementation.
+- Commit and explicitly push the GREEN slice, update PR evidence, then stop for supervisor review.
 
 ## Next Steps
 
-1. Commit the failing reproduction before implementation.
-2. Push explicitly and open the draft PR with issue/taxonomy/milestone metadata.
-3. Implement GREEN, run captured gates, push/comment, and stop for supervisor IMPL-EVAL.
+1. Commit and explicitly push the GREEN implementation/evidence slice.
+2. Update draft PR #1823 with exact gate evidence.
+3. Stop without dispatching IMPL-EVAL; the supervisor owns that separate session.
 
 ## Key Decisions
 
@@ -48,15 +52,17 @@ No validator implementation has been edited.
 | Path | Status | Notes |
 | --- | --- | --- |
 | own run directory | new | Harness bootstrap and launch evidence. |
+| `.llm/tools/harness/validate-milestone-cluster.ts` | changed | reconciliation port, findings, and export CLI adapter |
+| `.llm/tools/harness/validate-milestone-cluster_test.ts` | changed | injected RED/GREEN and edge-case coverage |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | EXPECTED FAIL | focused wrapper exit 1; 13 pass / 2 intentional RED failures |
+| Static | PASS | focused 19/19; harness 21/21; check/lint/fmt exit 0 |
 | Fitness | N/A | no package/plugin surface |
 | Runtime | N/A | pure validator logic |
-| Consumer | NOT_RUN | focused harness suite planned |
+| Consumer | PASS | read-only export supplies listing and head reads; no network in tests |
 
 ## Drift and Debt
 
@@ -65,4 +71,5 @@ No validator implementation has been edited.
 
 ## Commits
 
-- See the draft PR commit list and per-slice comments after Slice 1.
+- `5f41e90dc` — required behavioral RED; see draft PR #1823 and its phase comment.
+- GREEN commit pending at the time of this context update.

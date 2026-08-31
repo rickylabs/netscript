@@ -63,6 +63,9 @@ negative cases, and gates fixed by issue #1753 and the supervisor brief.
 | --- | --- | --- | --- |
 | 2026-08-31 | bootstrap | research/plan | Baseline, issue, validator, tests, and live milestone surface inspected; intended files locked. |
 | 2026-08-31 | S1 RED | focused test | Captured exit 1: 13 passed, both new reconciliation tests failed because actual `ok` remained `true`. |
+| 2026-08-31 | S1 publish | commit/PR | RED committed as `5f41e90dc`, explicitly pushed, and opened as draft PR #1823 with `Closes #1753`, taxonomy, and milestone 0.0.7. |
+| 2026-08-31 | S2 GREEN | implementation | Added the injected list/head port, structured findings, explicit artifact exclusion, merged/outage behavior, and read-only export adapter. |
+| 2026-08-31 | S2 gates | final matrix | Focused 19/19 and harness 21/21; scoped check/lint/fmt and diff hygiene all exit 0. |
 
 ## Gate Results
 
@@ -71,7 +74,30 @@ negative cases, and gates fixed by issue #1753 and the supervisor brief.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | S1 behavioral RED | structured test wrapper on `validate-milestone-cluster_test.ts` | EXPECTED FAIL (exit 1) | 13 passed, 2 failed; both stale-head and missing-leaf fixtures observed `ok: true`. |
+| S2 focused GREEN | structured test wrapper on `validate-milestone-cluster_test.ts` | PASS (exit 0) | 19 passed, including all five issue cases and export port coverage. |
+| Milestone harness suite | `deno task harness:milestone:test` | PASS (exit 0) | 21 passed, 0 failed. |
+| Scoped type check | structured check wrapper, two declared files | PASS (exit 0) | 2 selected, 0 failed batches, 0 diagnostics. |
+| Scoped lint attempt | structured lint wrapper, root config | NOT A VERDICT (exit 2) | Root config excluded both `.llm` files; wrapper correctly refused all-excluded coverage. |
+| Scoped lint verdict | structured lint wrapper with `docs/site/deno.json` | PASS (exit 0) | 2 selected and processed, 0 dropped, 0 diagnostics. |
+| Scoped format | structured format wrapper, two declared files | PASS (exit 0) | 2 processed, 0 findings. Initial check found one test-only format change; exact-file `deno fmt` applied it before final rerun. |
+| Diff hygiene | `git diff --check` | PASS (exit 0) | Empty output. |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| GitHub network | N/A | injected fixtures and read-only export adapter | Tests make no live GitHub call. |
+| CLI/Aspire/scaffold E2E | N/A | no affected surface | Internal validator-only change. |
+
+## Post-slice reconcile
+
+- S1: issue #1753 and draft PR #1823 carry `type:fix`, `area:tooling`, `priority:p1`,
+  `orchestrator:internals`, exactly one `status:impl`, and milestone 0.0.7. The PR body contains
+  `Closes #1753` and `Refs #574`; the RED phase comment records the real exit and commit.
+- S2: no scope, label, milestone, lockfile, or parallel-leaf collision adjustment was required.
+  Supervisor-dispatched separate IMPL-EVAL remains the only unfinished review gate.
 
 ## Handoff Notes
 
-- IMPL-EVAL is mandatory, separate, and supervisor-dispatched after the implementation handoff.
+- Inspect `reconcileMilestonePrs` and the five liveness cases first. IMPL-EVAL is mandatory,
+  separate, and supervisor-dispatched after this implementation handoff.
