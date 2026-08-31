@@ -6180,3 +6180,20 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   predating the test run.
 - Dispatching Slice 4 GREEN next — the largest slice, and the one that adds the eviction path, so
   the same ceiling discipline applies to all four Slice 3 test blobs.
+
+## D-130 — #1751 Slice 4 GREEN dispatched (largest slice; adds the eviction path)
+
+- Waited for genuine quiescence before sending — rollout quiet 169s, worktree clean, head still
+  `fbdf28b6a`. The rollout-age check correctly reported "still active" at 43s where the old
+  process-grep would have said idle and produced another rejected send; the switch is holding.
+- Brief hard-constrains all four Slice 3 test blobs by explicit hash plus the Slice 1 blob, with a
+  stop-and-report instruction if the author believes a test is wrong. **One deliberate exception
+  called out**: `contract_test.ts` asserts a fixture list exactly equal to `[...RUNTIME_COMMANDS]`,
+  so D11's new `'repair-sender-lease'` entry *requires* updating it in lockstep — flagged as
+  in-scope and expected, so it is not mistaken for a ceiling violation in either direction.
+- D6 sequencing (token re-read → full probe repeat → atomic `authorized` receipt → CAS remove →
+  finalize `evicted`, abort on unknown/changed) and D7's both-passes-with-timestamps requirement
+  restated as mandatory, since this is the slice that actually creates the destructive path.
+- Instructed to proceed to its stop point without waiting for routine confirmation, then stop for
+  Tier-A. Per the standing instruction I will drive Tier-A and evaluation from there and hand back
+  only a concrete blocker or an immutable ready packet.
