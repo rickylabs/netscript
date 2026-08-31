@@ -6683,3 +6683,152 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   sender lease from the thread stopped during the D-133 serial correction. Followed the tool's own
   `operatorAction` (resume session `01a055b6-e5ed-...`) rather than deleting the lease record;
   verified genuinely idle first (107 min quiet, no live process). Resume sent.
+
+## D-150 — r3 resume: #1828 IMPL-EVAL PASS consumed and shipped to ready-merge; #1802's failure did not reproduce
+
+Supervisor rotation r3 attached (session `c031e37f-c17f-4509-be74-ff4ef6476f5f`, tmux
+`netscript-007-internals-r3`, Remote Control `session_01YVWX2PRQ1DKgri3CQHsnUq`, Opus 5 / high).
+Identity recorded in `supervisor.md`. **No thread was relaunched** — every live leaf and the running
+evaluator were adopted from the checkpoint as recorded.
+
+### #1828 (P0, unblocks Features #1762) — PASS → `status:ready-merge`
+
+- **Adopted the running evaluator rather than redispatching it.** Confirmed pid `1621621` was still
+  live at resume (GLM 5.3 Flash / max, cwd `007-eval-1827`), then let it finish on its own.
+- **Verdict `PASS`** at evaluated head `1c08b8b0afe74c479bd0770c956204e7cad3a5bd`. The evaluator did
+  the thing the brief actually asked for — it re-verified the *rebuild's honesty*, not just the final
+  diff: RED `4c0db7fea` re-run in a throwaway worktree with a **verified-clean tree and pre-fix config
+  on disk** (exit 1, diff naming exactly the missing `deno.unstable`, in CLI-oracle order), GREEN
+  `27285b72a` exit 0, test blob **byte-identical** `9581e7514…` across RED→GREEN, and both invalid
+  commits (`bbed08071`, `86443f47a`) proven unreachable from the head. It also independently
+  reproduced the #1762 unblock mechanism in **both** directions at the real #1762 head `686eedb62`.
+- **One Low, non-blocking finding, carried forward rather than absorbed**: the parity test has a
+  vacuous-pass path — `lib` absent from *both* configs yields `undefined === undefined` → exit 0. It
+  enforces member↔production parity but does not anchor `deno.unstable`'s existence in production.
+  Recorded on the PR; hardening belongs outside this leaf's bounded scope.
+- Artifact commit `83d27ab7b` verified **artifact-only** (`git diff --stat 1c08b8b0a 83d27ab7b` = 1
+  file, `impl-eval.md`); leaf-authored diff versus main remains exactly the two intended files.
+- **Acceptance was mirrored, not hand-ticked.** Posted a fenced `acceptance-evidence` block, then
+  validated the mapping with a real `--dry-run` **before** letting CI act on it. First dry-run
+  correctly self-skipped (`status:ready-merge` absent) — so the label went on first, the second
+  dry-run resolved #1827 with exit 0 and no mapping error, and CI's `close-gate` then ticked all five
+  boxes with provenance. Zero unchecked DoD.
+- **Honest delta recorded rather than reconciled away**: DoD box 4 names "2,974 files". That figure
+  is from the **#1762-integrated** tree; this leaf's own final-freeze cold isolated-`DENO_DIR` check
+  selects **2,971**. Both runs are exit 0 / 25 batches / zero diagnostics; the 3-file delta is
+  #1762's own roots. Both figures are in the evidence block.
+- `gh pr edit` is unusable on this host — the token carries only `repo`, and label edits need
+  `read:org`. Labels applied via `gh api` REST instead. Worth knowing before assuming a label failure
+  is a permissions problem with the *repo*.
+- Review threads **0 / 0 unanswered**. PR flipped ready; fresh CI running at `83d27ab7b`.
+  `close-gate`, `code-quality`, `classify changes`, `dispatch` already green; `check-test`/`quality`
+  in flight.
+
+### #1802 — the unidentified root-suite failure DID NOT REPRODUCE
+
+- Re-ran the **exact same command at the exact same head** `de24161b6` with the structured wrapper
+  and real exit capture, writing a JSON report this time rather than relying on scrollback:
+  **`REAL_EXIT=0`, 4,464 passed / 0 failed / 19 ignored, 4,483 total.**
+- **Totals are identical to the failing run** (4,463 + 1 + 19 = 4,483). No test was added or removed;
+  exactly one test flipped from fail to pass on the same tree with the same command. That is the
+  definition of a **flake**, not a real regression — which materially changes #1802's disposition.
+- **But one non-reproduction is not a diagnosis.** The original run's output was never written to a
+  file, so the failing test's name is unrecoverable from it. A second run is under way with its own
+  JSON report so that if the failure recurs, the wrapper hands over the name and location directly
+  instead of leaving another unnamed finding. **#1802 remains not-a-ship-candidate until this is
+  characterized**, exactly as instructed.
+
+### #1695 — stalled thread resumed, not relaunched
+
+- Diagnosed the stall from the rollout rather than assuming failure: the first turn was
+  **`turn_aborted` / `reason: interrupted`** after 110s (external interrupt during the D-133 serial
+  correction), leaving only the untracked `codex-thread-ids.md`. No work was lost.
+- Resumed thread `01a055b6-f26a-7c82-822c-75e8258d8c77` in place with a corrective steer: restart the
+  slice, `deps:latest` is the sole latest-authority, mandatory real exit capture, single final-freeze
+  merge of current main `0e93a6c0574eb557b1322a4298cee3f7adbeafa2`, explicit lock-delta recording,
+  and a hard disjointness boundary from #1543 (`packages/plugin-workers-core`, `plugins/triggers`).
+- `deno task agentic:codex-resume -- …` **fails with `Unknown argument: --`** — the task separator is
+  forwarded into the script (the defect leaf #1750 exists for exactly this). Invoked the script
+  directly instead.
+
+### #1823 — hold reaffirmed under the new main
+
+- `main` advanced to `0e93a6c0574eb557b1322a4298cee3f7adbeafa2` (Docs #1808). **#1820 is still
+  `OPEN` and `BLOCKED`**, so the seam hold stands unchanged: #1823 stays at `930d37ea4` and will take
+  exactly **one** integration merge onto then-current main after #1820 lands. Deliberately not
+  churned — each premature integration voids the exact-head CI without improving the evidence.
+
+## D-151 — #1828 exact CI RED: a real leaf-caused TS2322; my ready transition was premature and is reverted
+
+**I got this wrong and corrected it.** I consumed the IMPL-EVAL `PASS` and moved #1828 to ready /
+`status:ready-merge` **before exact CI finished**. `check-test` then failed. The verdict was sound
+for what it evaluated; the transition was not, because a PASS is not a substitute for exact CI. The
+PR is back to **draft**, PR and issue both normalized to sole `status:impl-eval` per owner
+instruction, and the correction is posted on the PR rather than quietly fixed.
+
+### The defect is real, deterministic, and this leaf's
+
+- `check-test` at `83d27ab7b` (merge ref `5be2e5875`): gate exit 1 in 47s with **zero tests
+  executed** — the run dies at type-check.
+  `TS2322: Type 'Timeout' is not assignable to type 'number'` at
+  `packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts:279:5`.
+- **Reproduced locally at the exact head with byte-identical stderr** (`REAL_EXIT=1`), so it is
+  deterministic — not the flake class we have been chasing on #1802.
+- **Ruled out a main-advance interaction by evidence, not assumption**: the file's blob is identical
+  (`8edf7b677…`) at the leaf base `a3e0a5aa8` and at current main `0e93a6c0574…`, and `2a1248d33`
+  (the last commit to touch it) is an ancestor of both. The cause is purely this leaf's one-line
+  addition of `deno.unstable` to the E2E lib contract changing the resolved type of `setTimeout`.
+
+### Why the leaf's honest gates could not see it — the transferable lesson
+
+At the failing head, **three scoped reproductions all exit 0**: root-cwd `deno check` of the file,
+member-cwd `deno check` of the file, and a scoped `deno test` of its own `_test.ts`. Only the
+repo-wide `deno test` reproduces, because the defect is a whole-graph type-resolution change. This
+generalizes: **a config change to a `lib` contract cannot be validated by scoped checks.** The
+leaf's recorded gates were not dishonest — they were the wrong instrument, and I accepted them
+without asking whether the instrument could see the defect class the change could produce.
+
+Second trap worth carrying: the failing report reads `summary: 0 passed / 0 failed / 0 ignored`.
+A naive reader sees "0 failed" and calls it green. The signal is `exitCode` plus
+`processFailure.reason` (`deno test exited non-zero without a parseable TAP test failure`).
+
+### Actions taken
+
+- PR converted back to draft; labels normalized to sole `status:impl-eval` on both #1828 and #1827.
+  (A stray `status:impl-eval` appeared alongside `status:impl` during the flip — taxonomy requires
+  exactly one `status:`; normalized.)
+- Bounded repair dispatched **on the existing author thread** `01a055f7-…` — no relaunch. Authorized
+  scope: platform-neutral `ReturnType<typeof setTimeout>`, **no config rollback**, **no #1762 product
+  change**, a sweep for sibling occurrences in `packages/cli/e2e/**`, and the EOF blank-line fix in
+  the leaf's `supervisor.md` flagged by diff-check. The brief hands the author the exact repo-wide
+  RED command *and* the three scoped commands that falsely pass, so it cannot build a vacuous RED.
+- Author's worktree was behind (`1c08b8b0a` vs remote `83d27ab7b`, the evaluator's artifact commit);
+  instructed a `--ff-only` fast-forward, explicitly not a rebase or force-push over the artifact.
+- **OpenHands run `33358519995` cancelled and recorded.** It fired as `issue_comment` on the
+  pre-repair head at 04:51:25Z. It cannot override failing exact CI and must not be mistaken for the
+  repair evaluation, so it was stopped rather than left to post a misleading terminal state.
+- Acceptance boxes on #1827 were mirrored at `83d27ab7b` before CI completed. Left **as-is and
+  declared provisional** — not hand-unticked. Hand-editing in either direction bypasses
+  `validateEvidenceMapping`; the mirror re-validates at the repaired head, and the close-gate cannot
+  pass while `check-test` is red.
+- Delta **IMPL-EVAL cycle 2** queued on the opposite-family GLM route, to be dispatched once the
+  repair is pushed. Cycle 1's `PASS` stands for what it evaluated and is superseded only as a
+  merge-readiness verdict.
+
+## D-152 — #1802's failure did not reproduce in two full runs; reclassified as an unnamed flake
+
+- **Run 1** and **run 2**, same head `de24161b6`, same command, real exit capture, JSON reports
+  written to `/home/agent/observability/ns1802/`: both `REAL_EXIT=0`, **4,464 passed / 0 failed /
+  19 ignored / 4,483 total**, `uniqueFailures: 0`.
+- Totals match the failing run exactly (4,463 + 1 + 19 = 4,483). No test was added or removed — one
+  test flipped fail→pass on an identical tree. That is a flake, not a regression.
+- **The failing test remains unnamed** and that is the honest limit of this result: the original run
+  was never written to a file, so its identity is unrecoverable. Both repeat runs now emit JSON
+  reports, so a third occurrence would name it directly.
+- Checked and discarded the most attractive hypothesis rather than asserting it: the leaf's own
+  sender-ownership tests do **not** read live host state — they use `Deno.makeTempDir()` and
+  explicitly *forbid* the production `~/.config/netscript-agentic/runtime/senders` root. Concurrent
+  agentic launches on this host cannot have raced them.
+- **#1802 is still not a ship candidate.** Two clean runs lower the probability of a real defect; they
+  do not identify what failed. Its independent repo-wide verdict would come from CI, which is
+  currently skipped because the PR is draft — that is a decision to raise, not to take unilaterally.

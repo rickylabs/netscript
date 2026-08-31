@@ -216,3 +216,36 @@ agents with **`--bg`** so the lease is recordable — `--remote-control` alone y
 session with no job entry. Keep mutation/archive scratch **out of** `.llm/tmp/` or clean it
 explicitly: a source tarball there reintroduces forbidden command strings into the corpus scanned by
 `forbidden-commands_test.ts`.
+
+## 2026-08-31 — supervisor rotation r3 (replacement for cleanly exited r2)
+
+Ownership unchanged: `topic-internals-0.0.7`. No thread relaunched; every live leaf/evaluator
+thread recorded in `HANDOFF-CHECKPOINT.md` was **adopted**, not recreated.
+
+| Field                   | Value                                                             |
+| ----------------------- | ----------------------------------------------------------------- |
+| Claude session ID       | `c031e37f-c17f-4509-be74-ff4ef6476f5f`                            |
+| tmux session            | `netscript-007-internals-r3`                                      |
+| Remote Control session  | `session_01YVWX2PRQ1DKgri3CQHsnUq`                                |
+| Route                   | `claude-opus-5`, effort `high` (topic-orchestrator floor met)     |
+| Worktree                | `/home/agent/projects/netscript/worktrees/007-internals`          |
+| Topic branch head       | `b8ac25ddeaddf06599004f647a7401a3e1ce39f6`                        |
+| `origin/main` at resume | `eaea940bea4c19593b97b9895b09f512039f4e13`                        |
+| Authority               | Internals lane only; no merge, release, or central-state mutation |
+
+### Reconciliation at resume (Git authoritative, no mutation)
+
+- `origin/main` = `eaea940bea4c19593b97b9895b09f512039f4e13` — **unchanged** from the checkpoint base.
+- **#1828 / leaf 1827** — remote head `1c08b8b0afe74c479bd0770c956204e7cad3a5bd` matches the
+  checkpoint exactly; PR `OPEN`/draft/`MERGEABLE`/`CLEAN`, base `main`, labels
+  `type:fix`+`area:cli`+`area:tooling`+`priority:p0`+`status:impl`+`orchestrator:internals`.
+  **IMPL-EVAL pid `1621621` confirmed still live** (`deno task agentic:claude-openrouter
+  --model z-ai/glm-5.3-flash --effort max`, cwd `007-eval-1827`). **Adopted, not redispatched.**
+- **#1823 / leaf 1753** — remote head `930d37ea4d4d05e42728a3a59618ff4bd1b9b663` matches; PR ready,
+  `MERGEABLE`/`CLEAN`, sole `status:ready-merge`. **#1820 is still `OPEN` and `BLOCKED`**, so the
+  seam hold stands and no integration is performed.
+- **#1802 / leaf 1751** — worktree clean at `de24161b6b5bdee22fd942f6d776358e52eda2cb`, no live
+  process. Root-suite diagnosis started (see worklog D-150).
+- **#1737 / leaf 1737** — worktree at `d338145da…` with the same 4 dirty files; no process holds the
+  worktree as cwd, but the rollout for thread `01a055b6-e5ed-7e62-a47f-c8f278533a96` was last
+  written ~6 min before resume, so the resumed author is treated as recently active, not dead.

@@ -348,3 +348,41 @@ The internals leaves that *are* filed are unavailable: `fresh-readonly-dehydrate
 behind an S3 merge, and the remaining `aspire-13-5-*` leaves are being driven by the dedicated Aspire
 supervisor in its own worktrees. So internals has exactly one workable leaf right now — #1732 — and
 it is active.
+
+## DR-r3-01 — #1737/#1830 shares a generated carrier with Aspire PR #1759
+
+**Surface:** `packages/cli/src/kernel/assets/skills.generated.ts`.
+
+Internals leaf #1737 (PR #1830) edits `skills/netscript/SKILL.md` and
+`skills/netscript-operate/SKILL.md`; Aspire lane PR #1759
+(`fix/aspire-13-5-s9-skills-mcp-alignment`) edits `skills/aspire/SKILL.md` and `skills/help.md`. The
+**source files are disjoint**, but both regenerate the same shipped barrel, so the two PRs conflict
+textually on it whichever merges second.
+
+Regenerating the barrel is **not optional** for either leaf: `deno task check:assets-barrel` runs
+`git diff --exit-code` over that path, so a leaf that edits `skills/**` and leaves the barrel stale
+lands red by construction.
+
+**Disposition:** not a defect in either leaf and not a reason to block. It is a **shared-carrier
+integration seam**: the conflict resolves by regeneration after whichever PR lands first, and merge
+ordering is the coordinator's. Declared here rather than discovered at merge time. The #1737 author
+is instructed to record it in its own drift and PR body and explicitly **not** to rebase onto or
+resolve against #1759.
+
+## DR-r3-02 — a `lib` contract change cannot be validated by scoped gates (#1828)
+
+#1828's one-line addition of `deno.unstable` to `packages/cli/e2e/deno.json` produced a TS2322 in an
+existing E2E source file that **three separate scoped reproductions could not see** (root-cwd
+`deno check` of the file, member-cwd `deno check` of the file, scoped `deno test` of its own
+`_test.ts` — all exit 0 at the failing head). Only the repo-wide `deno test`, which type-checks the
+whole workspace graph as one program, reproduces it.
+
+**Doctrine consequence:** for any change to a `compilerOptions.lib` (or otherwise
+graph-wide) contract, the *scoped* gate is the wrong instrument and its green is not evidence. The
+repo-wide type-check is the minimum honest gate. Recorded because the leaf's gates were truthful and
+still missed it — the failure was instrument selection, and the supervisor accepted them without
+asking whether the instrument could see the defect class the change could produce.
+
+Secondary trap from the same receipt: the failing report reads
+`summary: 0 passed / 0 failed / 0 ignored`. "0 failed" reads as green to a careless reader. The
+signal is `exitCode` plus `processFailure.reason`.
