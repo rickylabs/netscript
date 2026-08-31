@@ -117,7 +117,7 @@ async function applyRollback(
   context: Context & { readonly command: Extract<RuntimeCommand, { kind: 'rollback' }> },
   writes: RuntimeMutationPorts,
 ): Promise<RuntimeResult> {
-  const { command, prepared, reads } = context;
+  const { command, reads } = context;
   let checkpoint: RuntimeCheckpointState | null;
   try {
     checkpoint = await reads.checkpointReader.readCheckpoint(command.checkpointId);

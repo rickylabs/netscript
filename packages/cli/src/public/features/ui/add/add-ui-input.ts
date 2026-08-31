@@ -5,6 +5,7 @@ export interface UiAddCommandInput {
   readonly registryRoot?: string;
   readonly theme?: string;
   readonly force?: boolean;
+  readonly dryRun?: boolean;
   readonly route?: string;
   readonly island?: boolean;
   readonly query?: boolean;

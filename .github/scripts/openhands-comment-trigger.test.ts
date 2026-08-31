@@ -161,7 +161,7 @@ Deno.test('explicit authenticated first-line command dispatches exactly once', (
 
 Deno.test('agentic dispatcher output round-trips through the production predicate', () => {
   const body = buildOpenHandsComment({
-    model: `openrouter/${OPENROUTER_MODEL_IDS.qwen}`,
+    model: `openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}`,
     provider: 'openrouter',
     effort: 'medium',
     outputMode: 'pr-comment',
@@ -174,7 +174,7 @@ Deno.test('agentic dispatcher output round-trips through the production predicat
 Deno.test('automatic phase command shape remains accepted', () => {
   const head = 'a'.repeat(40);
   const body = [
-    `${OPENHANDS_COMMENT_COMMAND} model=openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731} output=pr-comment iterations=800 phase=impl head=${head}`,
+    `${OPENHANDS_COMMENT_COMMAND} model=openrouter/${OPENROUTER_MODEL_IDS.implEvaluator} output=pr-comment iterations=800 phase=impl head=${head}`,
     '<!-- phase generation metadata -->',
     'Trusted evaluator prompt follows.',
   ].join('\n');

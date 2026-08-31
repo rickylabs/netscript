@@ -3,7 +3,7 @@ import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { type DispatchOpenHandsDependencies, runDispatchOpenHands } from './dispatch-openhands.ts';
 
 const PROMPT = 'use harness\n\n## SKILL\n\n- netscript-harness\n';
-const MODEL = `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`;
+const MODEL = `openrouter/${OPENROUTER_MODEL_IDS.implEvaluator}`;
 
 function args(target: string[], extra: string[] = []): string[] {
   return [
