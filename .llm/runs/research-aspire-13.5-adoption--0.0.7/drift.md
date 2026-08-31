@@ -5517,3 +5517,37 @@
     `  // --- app ` prefix could in principle mislead `lastIndexOf` — unreachable in the shipped path
     since fixture names are code constants; and two-or-more attachments throw the same
     "has no … marker" message, misleading wording that is still fail-closed.
+
+- **D-229 — the emitted-helper compile hypothesis was CORRECT, and confirmed to the exact line.
+  Repair `a2b227941` landed with the structural fix I asked for.**
+  - **Diagnosis receipt, exact:**
+    ```
+    throw: generated check did not recover after quality probes  (generated-quality-probes.ts:144)
+    aspire/.helpers/register-infrastructure.mts(83,69):
+      error TS2339: Property 'getValueAsync' does not exist on type 'ReferenceExpression'.
+    ```
+    Line 144 is precisely the throw D-227 named as the leading candidate among five. Emitted-helper
+    checks against the **complete restored Aspire 13.5.3 SDK**: `run-tool.mts` exit 0,
+    `register-infrastructure.mts` **exit 2**.
+  - **This is the residual the seed repair's own evaluator flagged, biting exactly as predicted:**
+    *"`connectionStringExpression().getValueAsync()` is string-tested but not locally type-checked …
+    CI's generated-workspace compile is the authority there."* An evaluator naming a residual that
+    then materialises is the process working, not failing — and it is why that honesty is worth
+    keeping in briefs.
+  - **The repair:** emission changes from
+    `async () => await (await ${id}.connectionStringExpression()).getValueAsync(),`
+    to an awaited `getValue()` with an explicit `null` check throwing
+    `Aspire did not resolve the connection string for database '<name>'.`
+  - **It also lands the structural gap-closer** — `generated-helpers-compile_test.ts` (**+103**):
+    static type-checking of **emitted** helper output, so a generator that emits non-compiling source
+    now fails statically instead of at gate 27 of a runtime suite. RED-before-repair proven with the
+    same TS2339.
+  - **Delta eval dispatched** (`bbf866d59..a2b227941`) pressing four things a diff read cannot settle:
+    that `getValue()` is genuinely the right 13.5.3 API rather than merely the one that compiles;
+    that **late binding is preserved** and this is a compile fix, not a silent reversion to static
+    lookup; that the new `null`-path error message is **injection-safe for user-supplied names** —
+    this branch's entire purpose is escaping names into generated source, so an unescaped name in a
+    thrown string would regress the slice's own contract; and that the new static test checks
+    **genuinely emitted** output rather than a hand-written sample.
+  - This is S8's **fourth** bounded delta on the branch (seed connection, stderr bound, compile fix),
+    each independently evaluated, with the prior PASSes carried forward rather than re-spent.
