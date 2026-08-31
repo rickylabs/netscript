@@ -7134,3 +7134,76 @@ by reading the dispatch log afterwards. The outcome was safe by luck: the author
 the later **release** steer carried every load-bearing instruction. **Carry forward: always check a
 `codex-resume` dispatch's captured exit — a dropped steer looks identical to a delivered one from the
 supervisor's side.**
+
+## D-163 — the #1828 evaluator "stall" was already complete; checking before acting saved the verdict
+
+A monitor report said the cycle-2 evaluator had stalled: transcript mtime frozen >5m, process alive
+in epoll, artifact absent — and directed me to terminate it and re-dispatch.
+
+**I verified before terminating, and every element of the diagnosis was stale:**
+
+| Claim | Observed |
+| --- | --- |
+| transcript mtime frozen >5m | `idle_s = 0` — actively writing |
+| artifact absent | `impl-eval-cycle-2.md` present, 16,470 bytes |
+| stalled process needing termination | had completed, committed `76c66e894`, and pushed |
+
+Terminating on the report would have destroyed a finished PASS and cost a full re-evaluation cycle on
+a **P0 cross-lane blocker**. The general rule this reinforces: a directive to kill a process is still
+a claim about process state, and process state is cheap to check — `stat` the artifact and read
+`/proc` before sending a signal.
+
+## D-164 — #1828 cycle 2: PASS, bounded, and shipped to ready at `76c66e894`
+
+- **VERDICT: PASS, no blocking findings.** Artifact `76c66e894` verified **artifact-only**
+  (1 file, 244 insertions).
+- The evaluator **bounded its own over-investigation**: the standalone lib-resolution neutrality probe
+  was filed as **Info / no action**, with the genuinely useful observation that isolated probes —
+  even the member lib set with the root `unstable` array — do **not** reproduce the `Timeout` flip;
+  only the multi-member whole-graph gate discriminates. Recorded as non-blocking debt, not a gate.
+- It confirmed every load-bearing fact independently: RED captured with the only gate that can see
+  the defect class, GREEN real and full-counted, repair minimal and platform-neutral under both lib
+  sets, **config fix not rolled back**, scope/lock/#1762 boundaries clean, sibling sweep empty.
+- **Base currency proven, not assumed — and no rebase.** `main` is `71d5fb8e` (#1803, docs-only).
+  Synthetic merge `merge-tree 76c66e894 71d5fb8e` → exit 0, **zero conflicts**, tree `beb7ed955`;
+  changed-file intersection versus merge-base `a3e0a5aa8` is **0 files**. A rebase would have moved
+  the evaluated head to buy nothing. I discarded my own earlier local merge onto `ee0e626bb` (never
+  pushed) once the disjointness was proven.
+- Lifecycle: sole `status:ready-merge` on PR and issue, mirror dry-run validates with all five
+  acceptance boxes ticked, review threads **0 / 0**, PR flipped ready, **exact-head CI dispatched at
+  `76c66e894`**. `classify changes`, `close-gate`, `code-quality`, `dispatch` already green.
+- Cross-lane: this unblocks feature PR #1762, whose CI fails on the exact `Deno.openKv` TS2551 this
+  fixes.
+
+## D-165 — #1823 and #1830 both exact-head green; packets surfaced
+
+- **#1823 at `c2df67bb9`: 6 SUCCESS / 23 SKIPPED / 0 FAILURE**, `check-test` pass 6m52s. Integrated
+  exactly twice (one per released seam) while main moved six times. Packet posted.
+- **#1830 at `a06e1529f`: 9 SUCCESS / 40 SKIPPED / 0 FAILURE**, `check-test` pass 8m37s (repo-wide
+  4,445 / 0). Packet posted.
+- **#1830's browser failure did not reproduce at the unchanged head — flake confirmed by re-run, not
+  by assumption.** The close-gate failure was deterministic and mine, and was fixed by ticking a true
+  PR-body DoD box and re-running at the unchanged head rather than pushing to refresh CI.
+- Both leaves now sole `status:ready-merge` with their issues aligned.
+
+## D-166 — #1832: the escalation resolved into an in-scope fix, and the steer receipt was verified
+
+The author answered the decisive question: **finish reason IS recoverable in TanStack 0.52**, exposed
+via `RUN_FINISHED.metadata.tanstack.finishReason` rather than the top-level field. Evidence: `deno
+doc`, `TanStackRunMetadata`, the installed normalizer's behavior, and a read-only runtime probe
+showing the metadata-carried payload.
+
+That makes my recommended option feasible with a one-line, low-risk change:
+`chunk.finishReason ?? chunk.metadata?.tanstack?.finishReason`. **Authorized without escalation**:
+it is inside the adapter file this leaf already owns and is already resolving, it adapts to a moved
+upstream API — this leaf's actual job — and it leaves #1829's freshly-merged assertions untouched.
+That is ordinary in-scope work, not scope expansion.
+
+Conditions attached: resolve the `AA` test conflict as a **union** so every #1829 case survives
+**byte-unchanged** (and prove it); all **three** `TanStack usage:` tests must pass, not two; run the
+**repo-wide** gate before pushing, because a dependency-family move changes the whole workspace graph
+and this run has already been bitten once by scoped-green/whole-graph-red.
+
+**Steer delivery is now verified rather than assumed** — both messages dispatched with captured
+`DISPATCH_REAL_EXIT=0`, after the earlier silent `thread-store conflict` drop. The author was also
+told its earlier HOLD never arrived, so it can reconcile any missing context itself.
