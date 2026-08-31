@@ -6832,3 +6832,63 @@ A naive reader sees "0 failed" and calls it green. The signal is `exitCode` plus
 - **#1802 is still not a ship candidate.** Two clean runs lower the probability of a real defect; they
   do not identify what failed. Its independent repo-wide verdict would come from CI, which is
   currently skipped because the PR is draft — that is a decision to raise, not to take unilaterally.
+
+## D-153 — #1823 converged onto exact main `26e1b486f` in a single merge; blobs proven identical
+
+`main` advanced to `26e1b486f95aec121d71f2f4cd0411dc6069af04` when **#1820 merged**, releasing the
+seam this leaf was held behind. Integrated **once**, as instructed, and not before.
+
+- **Baseline captured BEFORE the merge, not reconstructed after** — that is what makes the identity
+  comparison independent rather than circular:
+
+| Path | Blob | Post-merge |
+| --- | --- | --- |
+| `.llm/tools/harness/validate-milestone-cluster.ts` | `23d2710ee921700d5d19dd64da515f13f4e42e6d` | **unchanged** |
+| `.llm/tools/harness/validate-milestone-cluster_test.ts` | `1b07155e6620238effed720885ca4772c402ced1` | **unchanged** |
+| `.llm/runs/…--1753/impl-eval.md` | `b3e9f30b20409d52f17e980b3eb37a6448c37583` | **unchanged** |
+
+  Validator, test, and the IMPL-EVAL artifact are all byte-identical across the merge, so the
+  `PASS` carries forward on proven identity rather than on assertion. **No evaluator rerun.**
+- Predicted the merge with `git merge-tree --write-tree` before performing it (exit 0, zero
+  conflicts), then merged for real: `REAL_EXIT=0`, clean. New head
+  `993e57ef54d463d0e2e9ecefa9aba6b8ed91e541`, pushed, local == remote.
+- Gates at the integrated head, every one with real exit capture:
+  - harness test dir **27/27**, 0 failed (matches the pre-integration figure exactly)
+  - focused `validate-milestone-cluster_test.ts` 19/19
+  - scoped `run-deno-check` over `.llm/tools/harness` — 7 files, 0 diagnostics
+  - `arch:check` 0
+  - all four generated-corpus `check:` variants 0 — **re-proved at the new head** rather than
+    inferred from a clean merge; main brought new product source (`packages/kv/application/lazy-kv.ts`)
+    into this tree, which is exactly the case where inferring freshness would be wrong
+  - `git diff --exit-code -- deno.lock` 0
+- PR: ready, sole `status:ready-merge`, `MERGEABLE`, review threads **0 / 0 unanswered**. Fresh
+  exact-head CI running at `993e57ef5`; `classify changes`, `close-gate`, `code-quality` already
+  green. Packet follows on full green.
+
+## D-154 — #1737/#1830 completed exactly within the authorized boundary; IMPL-EVAL dispatched
+
+The barrel authorization was the right call and the author executed it cleanly.
+
+- GREEN commit `84ef7bf740ce5f837fbdd8c7e2f3bae6dca2271b`. Leaf-authored diff versus main is exactly
+  four files: the two `skills/*/SKILL.md` fixes, the new manifest-driven regression test, and the
+  regenerated barrel.
+- **Verified the barrel diff myself rather than accepting the report**: it contains only the two
+  propagated skill-body strings plus the corpus hash line — **no unrelated churn from other lanes**,
+  which was the specific failure mode I told the author to stop on.
+- Independently confirmed the shipped surface is clean: **0 occurrences** of `.claude/skills/` in
+  `skills.generated.ts` at the head.
+- Author receipts, all real exits: RED `rc=1` with exactly two offenders, GREEN `rc=0`,
+  `check:assets-barrel` 0, mirror sync + byte-current 0 (18 skills / 22 files), scoped
+  check/lint/fmt 0, `deno.lock` unchanged.
+- It respected every boundary: stayed draft at `status:impl`, changed no labels, ran no IMPL-EVAL,
+  and **did not launch the repo-wide suite** because of the declared sibling contention — it reported
+  that omission instead of hiding it, which is the behavior I asked for.
+- `## Shared carrier` section present in the PR body and the #1759 collision recorded in the leaf's
+  drift log, per DR-r3-01.
+- **IMPL-EVAL dispatched** on the sanctioned opposite-family GLM 5.3 Flash / max route from a fresh
+  detached worktree `007-eval-1737` at the exact head. The brief points the evaluator at the two
+  things most likely to be wrong rather than asking for a re-read: whether the manifest-driven test
+  is **vacuous** (an empty resolved file set would pass for the wrong reason, and a guard that only
+  catches the two cases it was written against is weak coverage), and whether the barrel diff is
+  honest. The #1759 collision and the deliberately-skipped repo-wide run are disclosed up front so
+  neither is scored against the leaf nor rediscovered at cost.
