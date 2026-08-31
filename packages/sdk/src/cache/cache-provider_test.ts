@@ -8,7 +8,7 @@ Deno.test('uninitialized cache provider error matches the documented module diag
     assertInstanceOf(error, Error);
 
     const modulePrefix = '[NetScript SDK] Cache provider not initialized in module ';
-    const moduleSuffix = ". Add `import '@netscript/sdk/cache';`";
+    const moduleSuffix = '. Call `setCacheProvider(cacheQuery)` during server bootstrap.';
     assert(error.message.startsWith(modulePrefix));
     const suffixIndex = error.message.indexOf(moduleSuffix, modulePrefix.length);
     assert(suffixIndex > modulePrefix.length);
@@ -22,7 +22,7 @@ Deno.test('uninitialized cache provider error matches the documented module diag
       new URL('../../../../docs/site/web-layer/query-bridge.md', import.meta.url),
     );
     const documentedDiagnostic = docs.match(
-      /The angle-bracket token `<resolved import\.meta\.url>` stands for the install-specific resolved module URL\.\n\n```text\n([^\n]+)\n```/,
+      /The angle-bracket token `<resolved import\.meta\.url>` stands for the install-specific resolved module\s+URL\.\n\n```text\n([^\n]+)\n```/,
     );
     assert(documentedDiagnostic !== null);
     assertEquals(documentedDiagnostic[1], normalizedMessage);
