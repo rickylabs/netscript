@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'plugin-streams-core',
+    packagePath: 'packages/plugin-streams-core',
+    docPath: 'docs/site/reference/plugin-streams-core/index.md',
+    packageName: '@netscript/plugin-streams-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.',
+    },
+  },
+  {
     name: 'aspire',
     packagePath: 'packages/aspire',
     docPath: 'docs/site/reference/aspire/index.md',
