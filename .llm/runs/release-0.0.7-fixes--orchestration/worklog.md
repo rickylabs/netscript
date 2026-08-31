@@ -6826,3 +6826,33 @@ is now running.
 verifying volatile config (model ids, versions, endpoints, routing), read it from `origin/main` or a
 freshly-converged worktree, never from a long-lived orchestrator worktree — and never mix a fresh read
 of one file with a stale read of another when claiming the two disagree.
+
+### #1773 dispatch: the staleness was already resolved by the integration merge — but that moved the measured base
+
+**Correction to the coordinator's premise.** #1773's leaf is **not** on an older base any more. When
+the final-integration hold was released I merged main `584caa03f` into it at its evidence boundary
+(thread ended, tree clean), producing head **`ccd63a085`**. That merge is exactly what made its local
+allowlist current — `planEvaluator: 'qwen/qwen3.8-flash'` is present in that worktree — which is why
+the second dispatch was accepted after the first was correctly denied.
+
+**Dispatch is live and correctly routed.** `agentic:claude-openrouter --model qwen/qwen3.8-flash
+--effort max`, running in the pinned #1773 worktree at `ccd63a085`. The only model id appearing
+anywhere in the run stream is `qwen/qwen3.8-flash` — no silent substitution. Preset
+`claude-evaluator-qwen-3-8-flash`-equivalent attestation: `effort: max`, `reasoningTrace: present`.
+No verdict emitted yet.
+
+**Consequence I must surface rather than bury.** The merge moved the head past the plan's measured
+baseline: gate 7 records `Measured current main 8a925764…` and `Measured branch f22348a80…`, but the
+evaluated head is now `ccd63a085` on main `584caa03f`. Lock 6 exists precisely to forbid unmeasured
+baseline claims, so a rigorous evaluator **should** flag this — and with "no third PLAN-EVAL"
+in force, a cycle-2 `FAIL_PLAN` on that ground would strand the leaf.
+
+Mitigating fact, verified: the entire `8a925764 → 584caa03f` span is docs, run artifacts, generated
+carriers, and two pure-data `AUTHORITATIVE_MAPPING` entries — **no product or test code moved**, so
+the measured `deno task test` counts (4,426/0/19) are unlikely to have changed. That is an argument
+the record can carry honestly; it is not a re-measurement.
+
+Options for the primary: (a) let the evaluator judge as-is and accept a baseline caveat, (b) have the
+author re-measure gate 7 at `ccd63a085` before the verdict lands, or (c) treat the docs-only proof
+above as satisfying lock 6. Not choosing unilaterally — the no-third-cycle rule makes this
+irreversible.
