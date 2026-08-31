@@ -4584,3 +4584,44 @@
     precedent (a recorded PASS is not a durable merge signal when live CI is red).
   - S7's lease continues in parallel and is unaffected: 69 receipts written, 4 owned containers up
     (two postgres/redis pairs, consistent with the required foreign-AppHost control).
+
+- **D-194 — control settled it: S9 owns the red gate. Repair dispatched; fresh evaluation
+  pre-authorized.**
+  - **Control result, decisive:** #1747 attempt-2 `scaffold-runtime-sqlite` at `2032d4ed7` —
+    **SUCCESS**. Same suite, same CI, a head without S9's gate changes. S9's identical tier failed.
+    The environment is exonerated and the delta is S9's. I dispatched no repair until this returned,
+    which was the right call — a repair aimed at the wrong owner would have burned a slice and muddied
+    two verdicts.
+  - Repair brief **D-194** dispatched at exact head `042ff3ca5`, naming the three candidate root
+    causes in order of suspicion (workspace identity resolving a `plugin-smoke-*` dir instead of the
+    scaffold's; gate **ordering** — the new `agent.aspire-mcp-smoke` registration moving
+    `runtime.aspire-start` ahead of the config-emitting step; capability/suite wiring routing the
+    sqlite tier through a fixture path that never writes the config) and requiring each be
+    **confirmed or eliminated with evidence** rather than picked.
+  - **Explicitly forbade the five ways to make this green without fixing it:** creating
+    `aspire.config.json`, stubbing the read, try/catching the `NotFound`, skipping the gate on the
+    sqlite tier, or relaxing `local-source-fixture.ts` — with the escape hatch that if the fix
+    genuinely belongs there, it must be argued and shown to still fail when the config is legitimately
+    absent. Regression coverage that is red without the fix is required.
+  - **No local runtime**: S7 holds the serialized lease; S9's proof is static and the runtime verdict
+    comes from CI.
+  - **Fresh GLM IMPL-EVAL is pre-authorized by the coordinator** and will be dispatched automatically
+    once the repair changes evaluated bytes — S9's PASS at `042ff3ca5` does not carry across a repair
+    to gate code (D-20 precedent).
+  - Fifth dead-sender orphan of the run: `ownerPid 1355030` not alive; released via the adapter with
+    the record's own token before launching.
+- **D-195 — S7's lease produced a complete, clean proof set and the host is back at zero.**
+  Receipts `d189-01` … `d189-11` cover the whole brief. The agent thread `01a05841-8da9` is still
+  alive and finishing its commit, so I left it alone rather than committing under it.
+  - **Box 1(a) — answered empirically, and it answers the pending wording question too.**
+    `d189-03-after-kill-250ms.json`: `launcherPid: null`, `descendantPids: []`. The AppHost tree was
+    **automatically cleaned** by killing the launcher, and **no run-owned survivor remained** — so the
+    Persistent-lifetime container ambiguity did not arise on this head. The open #1719 box-1 question
+    may simply not need a ruling; awaiting the agent's own report before recording that conclusion.
+  - **Box 2 — foreign AppHost preserved.** `d189-07-after-apply-foreign-preserved.json` shows the
+    foreign AppHost (cwd `007-aspire-s7-eval/.llm/tmp/s7-d189-foreign`, its own `--apphost` path)
+    **still running after `teardown --apply`**. The invariant held under the real mutation path.
+  - **Four-part zero, verbatim** (`d189-10`): `aspire ps` → `[]`; `docker ps -aq` → empty;
+    `docker volume ls -q` → empty; networks → `bridge`, `host`, `none` only. Independent
+    `agentic:leak-check` (`d189-11`) exit 0, all probes `ok`.
+  - Host confirmed at zero from my side too: `containers=0`, `aspire ps` `[]`.
