@@ -2902,3 +2902,26 @@ Five PRs now parked awaiting GLM: #1803 (#1801), #1806 (#1804), #1808 (#1807), #
 (#1812) — all Tier-A verified clean. Remaining #1777 candidates: `plugin-sagas-core` (same simple
 heading-rename shape per a quick check) and `fresh` (the most involved remaining — no summary table
 exists at all, and 4 entrypoints have no documentation section anywhere on the page).
+
+### #1815/PR #1816: plugin-sagas-core heading fix — dispatch survived a launcher kill, eval parked (6th)
+
+Fifth heading-rename-class fix (`## Entrypoints` -> `## Exports` over an already-correct 19-row
+table). Tier-A verified: root 41/41 and agent 2/2 fully documented (confirming the reason's "complete
+root and agent surfaces" claim exactly), and all four named gap categories (transports, stores,
+telemetry, config) independently confirmed as substantial real gaps (44/49, 48/56, 41/43, 22/24
+missing respectively). All gates green.
+
+**Operational note**: this dispatch's outer Bash/launcher process was killed mid-flight (task
+`bv4do9uig` reported `killed`) — but per [[agentic-sender-ownership-stale-block]]'s corollary, the
+underlying Codex thread survived independently and kept working, producing the full commit and PR
+(#1816) before eventually going `stalled-for-5m` one step short of posting its own wrap-up comment.
+Confirmed via `codex-status` (state progression working -> stalled, `failure: null`) and the PR's own
+completeness (full body, `Closes #1815`, correct acceptance-evidence, correct labels) before treating
+it as done and proceeding straight to Tier-A myself rather than relaunching a duplicate dispatch.
+
+Reprobed `z-ai/glm-5.3-flash` — still rejected. Evaluation parked; PR #1816 stays at `status:impl`.
+Head at parking: `97d0801af22b8a0a19e35305ad18ffddb215c8f0`.
+
+Six PRs now parked awaiting GLM: #1803, #1806, #1808, #1811, #1813, #1816 — all Tier-A verified
+clean. Only `fresh` remains unfiled in the #1777 queue — the most involved candidate (no summary
+table exists at all, 4 entrypoints entirely undocumented anywhere on the page).
