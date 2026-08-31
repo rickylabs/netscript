@@ -6112,3 +6112,24 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   "tests pass" claim — the test file going green while silently modified is the specific false-green
   this leaf's own subject matter (silent rejection) makes salient.
 - #1750 remains parked until #1751 is terminal.
+
+## D-127 — #1751 Slice 2 GREEN verified independently; ceiling provably intact
+
+- **Test ceiling verified before reading any pass claim**: Slice-1 test blob at `dc8361a06` is
+  `74b0ba6118ec4961ed50da639791fe52e3faa09a` — **byte-identical** to the blob recorded at
+  `c6dd9e363` (D-126). The suite went green by implementation alone; the specific false-green of
+  quietly loosening the test to pass did not occur.
+- Real RED→GREEN transition on the unchanged blob: previously exit 1 / 16 pass / 11 fail, now
+  **exit 0 / 27 pass / 0 fail**, all with real exit capture.
+- **F2 provenance rule verified in source, not accepted from prose**: `sender-ownership.ts:192-194`
+  routes `rollout.provenance !== 'matched' || thread.provenance !== 'matched'` to `indeterminate`,
+  and the absence path at `:210` returns `stale` only when `boundAbsence` holds. The
+  isolated-CODEX_HOME false-positive hole cycle 1 found is closed in code.
+- **D4 preserve-only verified in the diff**: the auto-eviction call
+  `await ownership.release(o.worktree, existing.leaseToken)` is **removed** from
+  `launch-codex-slice.ts`, replaced by `existingSenderLaunchBlocker(...)` returning a diagnostic.
+  This is precisely the defect that produced this session's own near-miss (D-119) — launch can no
+  longer destroy a lease it merely failed to prove live.
+- Scope exactly the five declared Slice 2 files, no rescope.
+- Gates: focused launch/adapters **17/17**, full `.llm/tools/agentic` suite **515/515**, all exit 0
+  (515 vs the prior 493 — consistent with the new Slice 1+2 tests, not a suite substitution).
