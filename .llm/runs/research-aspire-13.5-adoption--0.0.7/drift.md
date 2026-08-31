@@ -5024,3 +5024,30 @@
       Box 2 is verified immediately post-S9 or at the final synthetic merge.
   - Boxes 1 and 4 pending the same verification pass; explicitly **not claimed** rather than
     optimistically ticked.
+
+- **D-213 — S8 converged onto exact current `main`; its IMPL-EVAL verdict CARRIES on independently
+  verified blob identity. S9 and S10 dispatched in parallel onto the new S8 head.**
+  - **S8: `bc838a0b3` → `d1c6d8b54`**, pushed, worktree clean. `git merge-base HEAD origin/main ==
+    origin/main` (fully converged onto `6c195acaf`); 14 commits over main (13 own + 1 evidence).
+  - **Verdict carry decided on evidence I computed myself, not on the agent's claim.** The agent
+    reported "every one of the 20 non-generated product blobs is identical"; I re-derived it
+    independently — enumerating `git diff --name-only 8a9257642..bc838a0b3 -- packages/`, excluding
+    generated paths, and comparing `git rev-parse <head>:<path>` on both heads:
+    **identical = 20, changed = 0.**
+    Under the coordinator's rule — carry only when blob identity proves the evaluated bytes exact —
+    **S8's existing IMPL-EVAL verdict carries to `d1c6d8b54`; no delta evaluation is required.**
+    This is exactly why the rule specifies blob hashes rather than range-diff `=`.
+  - **S9 and S10 dispatched in parallel** (siblings off `bc838a0b3`, no file overlap, separate
+    worktrees). Both briefs lead with the ancestry trap, stated explicitly because it is the one
+    mistake that would silently corrupt the stack: they carry **25** commits over the old base —
+    S8's 13 plus 12 of their own — so **`git rebase origin/main` would replay S8's 13 commits a second
+    time**. The correct command is `git rebase --onto d1c6d8b54 bc838a0b3`.
+  - Both briefs also carry the stacked-ancestry assertion in its **correct** form —
+    `merge-base HEAD d1c6d8b54 == d1c6d8b54`, **not** `== origin/main` — the error I made earlier in
+    this programme and which S10 rightly refused to act on.
+  - Same blob-identity table required from each, same abort-on-non-generated-conflict rule, same
+    no-runtime boundary.
+  - Eighth and ninth dead-sender orphans released before launch (`ownerPid 2521443`, `910883`).
+  - One self-inflicted slip caught and fixed before dispatch: my run-dir glob wrote S10's brief into
+    an unrelated `feat-openapi-mcp-evidence-receipts-s10--1136` directory. Removed and rewritten to
+    `test-aspire-13-5-s10-e2e-gate-upgrades--impl`.
