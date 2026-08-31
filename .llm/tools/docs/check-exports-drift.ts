@@ -36,6 +36,30 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'plugin-triggers-core',
+    packagePath: 'packages/plugin-triggers-core',
+    docPath: 'docs/site/reference/plugin-triggers-core/index.md',
+    packageName: '@netscript/plugin-triggers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all twelve entrypoints and completely inventories the root/public/builders surface, while omitting substantial domain defaults/errors, port defer/clock contracts, adapter/store implementations, config and v1 contract schemas, telemetry types, and testing doubles reported by deno doc.',
+    },
+  },
+  {
+    name: 'plugin-auth-core',
+    packagePath: 'packages/plugin-auth-core',
+    docPath: 'docs/site/reference/plugin-auth-core/index.md',
+    packageName: '@netscript/plugin-auth-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.',
+    },
+  },
+  {
     name: 'mcp',
     packagePath: 'packages/mcp',
     docPath: 'docs/site/reference/mcp/index.md',
