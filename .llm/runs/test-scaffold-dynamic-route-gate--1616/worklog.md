@@ -38,6 +38,7 @@ the lease. Detailed files, constants, order, gates, and deferred scope are locke
 | 2026-08-31 | S2 GREEN | Scaffold surface | Added the product-owned `[id].tsx` route, generator-compatible seeds, stable router alias, `order-42` examples link, canonical/retained references, and regenerated embedded assets. Focused tests 39/39 plus convention 1/1; scoped check zero diagnostics; asset barrel current. |
 | 2026-08-31 | S3 GREEN | Runtime gate | Implemented the injectable HTTP-semantic probe and critical command gate. Both request modes share one nonce; negative marker/status and zero-candidate cases are covered. Catalog and registration order are exactly app-home → dynamic-route → app-reference. Focused tests 49/49; scoped check clean. |
 | 2026-08-31 | S4 Hardening | Lease-free green | Focused tests 88/88 plus convention 1/1; changed-file check/lint/fmt clean with complete 16-file coverage; asset and quality gates exit 0; root tests 4,440 passed / 0 failed / 19 ignored in 224.976s. `deno.lock` remains byte-identical. |
+| 2026-08-31 | S5 Runtime lease | `NOT_RUN — lease required` | Named command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. No lease was granted, so the command was not launched or simulated. |
 
 ## Decisions
 
@@ -92,3 +93,18 @@ though default scaffold output does not. See `drift.md`; scope is unchanged.
 - S1 RED is complete and must remain its own commit before product GREEN.
 - The supervisor dispatches IMPL-EVAL separately; this session must not launch or simulate one.
 - Gate 10 remains `NOT_RUN — lease required`; no scaffold/runtime command was launched.
+
+## Implementation Gate Table
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| 1 — semantic RED | PASS (expected RED) | S1 receipts: 72/7 plus 0/1; all failures semantic and compiling. |
+| 2 — focused tests | PASS | S4 receipts: 88/0 plus convention 1/0. |
+| 3 — scoped type check | PASS | 16 files, 1 batch, 0 diagnostics. |
+| 4 — scoped lint/fmt | PASS | 16/16 files processed; 0 lint and 0 format findings. |
+| 5 — asset integrity | PASS | `deno task check:assets-barrel`, exit 0. |
+| 6 — fitness | PASS | `deno task quality:gate`, exit 0; scanner findings 0; doctrine FAIL=0. |
+| 7 — repository regression | PASS | 4,440 passed / 0 failed / 19 ignored in 224.976s. |
+| 8 — generated compile | UNIT_PASS / LIVE_PENDING | Template inference and generator parity pass; live generated workspace belongs to Gate 10. |
+| 9 — live dynamic route | UNIT_PASS / LIVE_PENDING | Both request modes and all marker/status negatives pass unit coverage; live HTTP belongs to Gate 10. |
+| 10 — merge readiness | **NOT_RUN — lease required** | Exact one-pass command named above; no lease held. |

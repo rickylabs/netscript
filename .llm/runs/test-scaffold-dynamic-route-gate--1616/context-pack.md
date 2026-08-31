@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `test-scaffold-dynamic-route-gate--1616` |
 | Branch | `test/scaffold-dynamic-route-gate` |
-| Current phase | `implementation — S4 lease-free hardening` |
+| Current phase | `implementation — S5 lease record` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
@@ -43,8 +43,8 @@ separate pushed commits. All lease-free hardening gates are green; no expensive 
 
 ## Next Steps
 
-1. Record Gate 10 as `NOT_RUN — lease required` without running it.
-2. Finalize implementation artifacts and stop for separately dispatched IMPL-EVAL.
+1. Finalize implementation artifacts and push the implementation-complete head.
+2. Stop for separately dispatched GLM 5.3 Flash max IMPL-EVAL.
 
 ## Key Decisions
 
@@ -66,7 +66,7 @@ separate pushed commits. All lease-free hardening gates are green; no expensive 
 | --- | --- | --- |
 | Static | GREEN | Focused 88/88 + convention 1/1; check/lint/fmt clean; root 4,440/0/19. |
 | Fitness | GREEN | Asset barrel and `quality:gate` exit 0; scanner findings 0; doctrine FAIL=0. |
-| Runtime | LEASE_BLOCKED | Probe contract green; live `scaffold.runtime` remains lease-required. |
+| Runtime | NOT_RUN — LEASE REQUIRED | Exact Gate 10 command recorded; it was not launched. |
 | Consumer | GREEN_UNIT | Default output contracts and retained route pass; live composition remains leased. |
 
 ## Open Questions
