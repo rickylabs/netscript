@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "5197e70b716eafb82fbb12ddb9a910c248ddb86a",
+  "currentMainSha": "65cd8a07787504b5ed94408510d4ab85260bc21a",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -5123,6 +5123,21 @@
       }
     }
   ],
+  "openIssueOwnership": {
+    "capturedAt": "2026-08-31T02:33:27.000Z",
+    "source": "GitHub milestone 27 open issues; exactly one orchestrator:* label per issue",
+    "openIssueCount": 58,
+    "unassigned": 0,
+    "multiplyAssigned": 0,
+    "counts": {
+      "features": 14,
+      "fixes": 14,
+      "internals": 8,
+      "docs": 12,
+      "aspire": 10
+    },
+    "queueRule": "Each supervisor queries its orchestrator:<lane> label as the authoritative queue; serialisation applies within that orchestrator only, and a parked leaf never blocks another lane."
+  },
   "canaryCheckpoints": [
     {
       "id": "checkpoint-foundations",
@@ -5200,6 +5215,20 @@
         "published-JSR CLI scaffold runtime E2E PASS",
         "published-JSR CLI quickstart seven-verdict walk PASS",
         "ephemeral canary branch deleted and green pair recorded"
+      ]
+    },
+    {
+      "id": "checkpoint-user-runtime-sdk-ui-canary-4",
+      "rationale": "Meaningful user-facing checkpoint after routing infrastructure, Aspire listener-readiness health checks, SDK browser-safe cache-provider isolation, and the working ui:add data-screen triad landed together.",
+      "state": "in_progress",
+      "contentSha": "65cd8a07787504b5ed94408510d4ab85260bc21a",
+      "expectedVersion": "0.0.7-canary.4",
+      "publicationWorkflowRunId": 33351037850,
+      "payload": "#1792/#1791 evaluator routing; #1743 closing #1718/#1280 Aspire health checks; #1758 closing #1462 SDK browser safety; #1781 closing #1357 working data-screen generation",
+      "startedAt": "2026-08-31T02:33:22.000Z",
+      "receiptRefs": [
+        "https://github.com/rickylabs/netscript/actions/runs/33351037850",
+        "local publish:readiness PASS at exact content SHA before dispatch"
       ]
     },
     {

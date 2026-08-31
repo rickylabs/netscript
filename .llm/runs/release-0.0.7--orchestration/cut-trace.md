@@ -183,3 +183,13 @@ artifact-pinned production E2E.
   labeled `status:shipped` and closed `COMPLETED` at `13:51:56Z`. GitHub's combined milestone count
   observed one second later was 80 open / 82 closed; that PR-inclusive count is a moving snapshot,
   not a control-plane invariant.
+
+## 2026-08-31T02:26:29Z–02:30:25Z — user-facing checkpoint lands
+
+- #1792 (`107bfe8a`) squash-merged as `0ac06c5f`; #1791 closed.
+- #1743 (`b6b0bb87`) squash-merged as `e17c96ed`; #1718 and #1280 closed.
+- #1758 (`94620577`) squash-merged as `b99acc69`; #1462 closed.
+- #1781 (`a34c37eb`) squash-merged as `65cd8a07`; #1357 closed.
+- All four immutable heads passed current CI/close-gate and review-thread checks immediately before
+  merge. The resulting coherent public payload triggered canary workflow run 33351037850 from exact
+  main `65cd8a07787504b5ed94408510d4ab85260bc21a` after local `publish:readiness` passed.

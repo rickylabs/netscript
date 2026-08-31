@@ -3001,3 +3001,20 @@
 - Routine pauses were cleared without owner escalation: features continues #1452 research,
   internals continues #1751 Slice 2, fixes supervises #1365, Aspire continues #1747 D-117, and docs
   holds only its exact Tier-A heads until #1792 lands.
+
+## 2026-08-31T02:33:27Z — queues made exhaustive; four PRs shipped; canary.4 dispatched
+
+- Added one durable GitHub ownership label to every open milestone issue: 58 issues remain, with
+  Features 14, Fixes 14, Internals 8, Docs 12, and Aspire 10; zero issues are unassigned or multiply
+  assigned. Each live Opus supervisor was given the label query as its authoritative serial queue.
+- Independently ran the immutable-head pre-merge gates and squash-merged #1792 (`0ac06c5f`), #1743
+  (`e17c96ed`), #1758 (`b99acc69`), and #1781 (`65cd8a07`). Their closed issues #1791, #1718,
+  #1280, #1462, and #1357 were normalized to `status:shipped`. #1764 and docs #1796/#1798/#1800
+  became genuine conflicts after main moved and were returned to their supervisors for bounded
+  convergence rather than force-merged.
+- Exact main `65cd8a07787504b5ed94408510d4ab85260bc21a` passed composed `publish:readiness` locally.
+  Canary workflow run 33351037850 was dispatched from that SHA for target 0.0.7. This is a
+  meaningful user-facing payload (Aspire health, SDK browser safety, UI data-screen generation),
+  not an internals/docs-only cut. Topic lanes continue independently while publication runs.
+- Host runtime proof after dispatch: `aspire ps --format Json` = `[]`; Docker containers 0,
+  volumes 0, and non-default networks 0.
