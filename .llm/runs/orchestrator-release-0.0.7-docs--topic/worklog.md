@@ -3097,3 +3097,43 @@ time.
 #1811 merged mid-flight, so re-converged onto `72599120a` to absorb the `ai` row → **27 rows**, with
 all seven shipped docs rows asserted present by name. This is the expected cost of the serial corpus
 seam, not rework: each slice must carry every row merged before it.
+
+### Nine slices shipped; the artifact rule that should have applied from the start
+
+`main` `60ae56af0` carries **28 mapping rows**. Shipped: plugin-ai-core, plugin-streams-core, mcp,
+plugin-auth-core, plugin-triggers-core, auth-kv-oauth, ai, plugin-workers-core, plugin-sagas-core.
+**#1818 (`fresh`) is the tenth and final slice**, ready at `3a2e5575906be923460bf453fe344dda5396a444`.
+
+**AGENTS.md Rules of the NAS #2 — "Handoff/harness dirs are sensitive operational evidence, never
+commit or publish them."** The coordinator caught seven `.llm/runs/**` paths in #1816, including
+`codex-thread-ids.md`. I had been committing run directories on *every* slice in this milestone —
+this was never a #1816-specific slip. Stripped there in one bounded commit with all six product
+blobs SHA-256 verified byte-identical (so the delta PASS carried by identity), and applied from the
+start on #1818, which shipped with **zero** `.llm/runs` paths.
+
+**Consequence I surfaced rather than quietly fixed:** eight already-merged docs PRs put these
+artifacts on `main`. That is a pre-existing exposure and an owner decision — leave as historical, or
+file cleanup. Not mine to act on unilaterally.
+
+**The convergence invariant, finally stated correctly.** I had been treating "page byte-identical to
+the evaluated head" as the safety property. It is not. The correct test is *whether main has touched
+that page since the evaluated head's base*:
+
+- **#1816 (sagas):** main HAD touched it (#1819 changed integration/publisher from 10 to 11 exports
+  and added `publishSagaOrThrow`). Restoring the evaluated page wholesale silently reverted that.
+  Nothing caught it — the page built, linted, and passed every docs gate, because a docs gate cannot
+  distinguish a stale-but-well-formed row from a current one. Repaired by taking the page from
+  current main and applying only the one-line heading rename.
+- **#1818 (fresh):** main had NEVER touched it — `git log <merge-base>..origin/main -- <page>` empty
+  — so the wholesale take was genuinely safe. Same operation, opposite verdict, decided by evidence
+  rather than by pattern.
+
+That is the **fifth** instance of the wholesale-restore class this session (mapping rows twice,
+`ci.yml`'s Aspire step, the sagas page, and the near-miss on #1811's stale base). The rule now:
+**never restore a shared file wholesale during convergence — take current main's copy and apply only
+this change's own edit, then assert the specific recently-merged content survived, by name.**
+
+**Two CI mechanics worth keeping:** `gh pr ready` must precede the push (drafts skip `check-test`/
+`quality`, and marking ready afterwards does not re-trigger — the run looks green on an incomplete
+check set); and `gh run rerun` replays the same commit, so it can never pick up a repaired base —
+only converge-and-push gets a current-base run.
