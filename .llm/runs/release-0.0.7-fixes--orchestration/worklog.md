@@ -6766,3 +6766,34 @@ Executable options, none silently chosen:
    session (hybrid rejects it; `opencode-eval` is vision-only Kimi K3).
 
 Recommendation: option 1. The brief is written and fires immediately on ruling.
+
+### Next independent leaf prepared: #1677 (ai usage-detail passthrough). #1455 deliberately not chosen.
+
+#1773's author turn has ended and the leaf is waiting on the **B3 routing ruling**, so per the
+"do not idle" directive the next leaf is prepared (brief staged, **not launched** — the ordering says
+existing PRs are consumed first).
+
+**Chose #1677 over #1455.** #1677 is a bounded mapping fix against a contract that already declares
+every dropped field, on a surface neither active leaf touches. #1455 (`workers: preserve job payload
+type through definition, registry, and enqueue`) is a **public-type redesign** —
+`JobDefinition<TId, TPayload>`, generated registry type maps, and `enqueueJob`/`triggerJob` binding —
+i.e. published JSR surface movement plus generated-registry churn. That is the wrong shape to start
+the evening before a milestone deadline, and it would need its own PLAN-EVAL.
+
+**Defect re-verified at current main rather than trusted from the issue.** The issue cites
+`src/providers/tanstack-bridge.ts:243/352`; **that path no longer exists**. Current reality:
+`packages/ai/src/adapters/tanstack-chat-client.ts:353` declares `toOwnedUsage`'s parameter as
+`{ promptTokens; completionTokens; totalTokens } | undefined` and returns only those three, so
+everything else is dropped **with no type error** — the narrowing is at the boundary. Call site is
+line 246 (`EventType.RUN_FINISHED`). Meanwhile `packages/ai/src/contracts/usage.ts` already declares
+`PromptTokensDetails.cachedTokens`/`.cacheWriteTokens`, `CompletionTokensDetails.reasoningTokens`,
+`Usage.cost`, `Usage.costDetails`, and `Usage.providerUsageDetails`.
+
+So it is a mapping defect, not a missing feature: **no public contract change is required, therefore
+no export-surface corpus churn** — which is what makes it safely parallel. The brief instructs the
+author to widen the parameter to the real upstream type rather than hand-listing fields (hand-listing
+is precisely how this defect was introduced), to check the sibling
+`mcp/adapters/tanstack-connector.ts` for the same narrowing, and to stop if it needs any path outside
+`packages/ai`.
+
+Brief staged at `/home/agent/observability/netscript-fixes/brief-1677-s1.md`.
