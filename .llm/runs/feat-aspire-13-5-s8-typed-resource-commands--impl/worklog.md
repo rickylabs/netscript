@@ -14,6 +14,32 @@ the implementation agent records the resulting evidence and does not self-certif
 
 ## Progress
 
+- 2026-08-31: D-216 resumed from converged head `d1c6d8b54`. Downloaded and digest-verified the
+  requested workflow artifacts and exact job logs. Both reports stop after the third actionable
+  Prisma stderr line and contain no `code` or `meta`; the run records those fields as absent rather
+  than guessing a Prisma classification. Aspire 13.5.3 source and its TypeScript PostgreSQL fixture
+  confirm S8 substituted static `builder.Configuration` lookup for the old live resource-expression
+  injection.
+- 2026-08-31: added RED regression `resolves typed commands from the allocated database resource
+  expression` before the repair. The focused structured test command exited 1 with the named
+  assertion missing `infrastructure.databaseConnectionStrings.get(target.configKey)`; the wrapper
+  reported 6 passed and 2 failure records (the BDD suite aggregate plus the unique regression
+  failure). No Aspire, AppHost, or container process was started.
+- 2026-08-31: repaired the container connection path by adding an internal
+  `databaseConnectionStrings` resolver map to the generated infrastructure context. PostgreSQL,
+  MySQL, and SQL Server container entries resolve their concrete Aspire resource's
+  `connectionStringExpression()` only when the typed command executes. The callback passes that
+  exact value as `DATABASE_URL` and the engine-specific URI variable. Explicit external
+  connection-string resources remain configuration-backed; SQLite retains its file URL. Removed
+  the now-dead `resourceKey` field. Regenerated `embedded.generated.ts`.
+- 2026-08-31: final focused tests passed 34/34. Structured `deno check --unstable-kv` passed all
+  five changed TypeScript files with `failedBatches: 0`; scoped lint passed 5/5; scoped format
+  passed 4/4 plus the established no-semicolon generator 1/1. Both rendered AppHost helpers linted
+  cleanly. `quality:gate` exited 0 with zero quality findings and doctrine `FAIL=0` (existing warning
+  inventory only). Repository-wide `deno task check` exited 0 across 2,985 files / 25 batches with
+  `failedBatches: 0`. After the implementation commit, `check:assets-barrel` exited 0 from the clean
+  product head; the evidence amendment does not touch generated assets.
+
 - 2026-08-30: activated on `564d465c`; verified clean worktree and exact S6 stack base.
 - 2026-08-30: completed issue, research snapshot, S2/S6 receipt, Doctrine, harness, and focused
   source review. Recorded the absent standalone fallback and receipt-index discrepancy in

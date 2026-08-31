@@ -135,6 +135,10 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'type AspireResource =');
     assertStringIncludes(output, '& Parameters<');
     assertStringIncludes(output, 'readonly databases: Map<string, AspireResource>');
+    assertStringIncludes(
+      output,
+      'readonly databaseConnectionStrings: Map<string, DatabaseConnectionStringResolver>',
+    );
     assertStringIncludes(output, 'type CacheResource = AspireResource | CacheContainerResource;');
     assertStringIncludes(output, 'readonly caches: Map<string, CacheResource>');
     assertStringIncludes(output, 'readonly cacheEndpoints: Map<string, EndpointReference>');
@@ -167,6 +171,14 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'builder.addPostgres("main", {');
     assertStringIncludes(output, 'ensureDatabasePassword(appHostDir, "main")');
     assertStringIncludes(output, 'databases.set("main",');
+    assertStringIncludes(
+      output,
+      'databaseConnectionStrings.set(',
+    );
+    assertStringIncludes(
+      output,
+      'async () => await (await db_0.connectionStringExpression()).getValueAsync(),',
+    );
     assertStringIncludes(output, '(Container)');
   });
 
@@ -176,6 +188,10 @@ describe('generateRegisterInfrastructure', () => {
       caches: {},
     });
     assertStringIncludes(output, 'builder.addConnectionString("ext-db")');
+    assertStringIncludes(
+      output,
+      'await builder.getConfiguration().getConnectionString("ext-db")',
+    );
     assertStringIncludes(output, '(External)');
   });
 

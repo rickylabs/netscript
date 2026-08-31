@@ -62,3 +62,23 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   The supervisor decides whether the byte-identity evidence carries the existing IMPL-EVAL.
 - No runtime, Aspire, Docker, AppHost, E2E runtime suite, product repair, S9/S10 operation, or safety
   tag movement occurred.
+
+## D-216 seed repair state
+
+- Resume head is the converged branch head `d1c6d8b54fdb02f4d913f0c269aea2be4a5dfce0`; exact main
+  parent for the S8 comparison is `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`.
+- Workflow artifacts `9766882209` (run `33415203923`) and `9764891299` (run `33404324013`) were
+  digest-verified. Each ZIP contains only the scaffold runtime JSON report. Both that report and
+  the exact job log omit Prisma `code` and `meta`; D-07 persisted only the first three actionable
+  stderr lines. Do not invent a Prisma classification from the truncated text.
+- Confirmed S8-owned cause: the typed command replaced the old executable's live Aspire resource
+  injection with a static `builder.Configuration` connection-string lookup. Aspire 13.5.3's
+  primary source and TypeScript PostgreSQL fixture identify
+  `connectionStringExpression().getValueAsync()` as the allocated-resource path.
+- Repair contract: generated infrastructure owns a late-bound resolver per non-SQLite database;
+  typed migrate/seed/reset resolve it at execution and pass the exact result into the child env.
+  No public package export, package metadata, dependency, cast, `any`, suppression, or architecture
+  debt changed.
+- RED regression failed before the fix; focused GREEN is 34/34. Scoped check/lint/fmt,
+  `quality:gate`, and repo-wide check are green. No Aspire, Docker, AppHost, or runtime E2E command
+  ran. The supervisor, not this implementation session, owns any delta IMPL-EVAL.

@@ -123,7 +123,11 @@ export function generateRegisterInfrastructure(
     if (mode === 'External') {
       dbBlocks.push(`  // database ${databaseIndex} (External)
   const ${id} = await builder.addConnectionString(${JSON.stringify(name)});
-  databases.set(${JSON.stringify(name)}, ${id});`)
+  databases.set(${JSON.stringify(name)}, ${id});
+  databaseConnectionStrings.set(
+    ${JSON.stringify(name)},
+    async () => await builder.getConfiguration().getConnectionString(${JSON.stringify(name)}),
+  );`)
       continue
     }
 
@@ -228,6 +232,10 @@ export function generateRegisterInfrastructure(
     }
 
     lines.push(`  databases.set(${JSON.stringify(name)}, ${id});`)
+    lines.push(`  databaseConnectionStrings.set(`)
+    lines.push(`    ${JSON.stringify(name)},`)
+    lines.push(`    async () => await (await ${id}.connectionStringExpression()).getValueAsync(),`)
+    lines.push(`  );`)
     dbBlocks.push(lines.join('\n'))
   }
 

@@ -27,6 +27,37 @@ and CLI invocation as `aspire resource <resource> <command> --<argument>`. Consu
 slice 5 will cite the restored 13.5.3 module signatures and line numbers rather than relying on
 prose.
 
+## D-216 seed diagnosis
+
+The exact `e2e-cli-scaffold-runtime-report` ZIPs for workflow runs `33415203923` (artifact
+`9766882209`, SHA-256 `c67b01380db568fb22f0826835f81c015dcba27d28398bf1c2266d800c7fe962`)
+and `33404324013` (artifact `9764891299`, SHA-256
+`cb04b520bf56057fd904d6f2d21855438f593bc3399e0495bde943ad38e5b721`) were downloaded and
+digest-verified. Each ZIP contains only `e2e-report-scaffold-runtime.json`. The corresponding job
+logs were also downloaded. Neither report nor job log contains a Prisma `code` or `meta` field:
+the retained stderr ends after `Invalid prisma.user.findFirst() invocation:`. This is an exact
+absence, not an inferred Prisma classification. D-07's generated runtime edge persists only its
+first three actionable stderr lines, so the later Prisma fields were never serialized into either
+requested artifact.
+
+The reports do prove that `database.init` applied the migration to the generated named database on
+the allocated port immediately before `database.seed`. S8 then takes a different path for the
+typed seed command. Before S8, the explicit-start `<db>-cli` executable received
+`DATABASE_URL=target.resource`, which Aspire resolves from the live database resource. S8's typed
+callback instead calls
+`builder.getConfiguration().getConnectionString(target.resourceKey)` and passes that value into a
+new Deno child process.
+
+Aspire 13.5.3 source confirms `builder.getConfiguration()` is exactly `builder.Configuration` and
+its `getConnectionString(name)` is the static Microsoft configuration lookup for
+`ConnectionStrings:<name>`, returning null when absent. The generated AppHost configuration has no
+such container connection-string entry. Aspire's 13.5.3 polyglot PostgreSQL fixture demonstrates
+the supported late-bound path:
+`db.connectionStringExpression()` followed by `getValueAsync()`. The equivalent concrete database
+resource property exists for PostgreSQL, MySQL, and SQL Server. The repair therefore carries a
+late-bound connection-string resolver from infrastructure registration to the typed callback; it
+does not add a new runtime abstraction or change the public package surface.
+
 ## Existing architecture
 
 `packages/cli` is Doctrine Archetype 6 with a Keep verdict. Pure scaffold generators select

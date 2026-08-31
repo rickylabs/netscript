@@ -18,7 +18,6 @@ export function generateDbCliMode(options: DbCliModeOptions): string {
     const databaseName = entry.DatabaseName ?? name;
     return `    '${name}': {
       configKey: '${name}',
-      resourceKey: '${name}',
       databaseName: '${databaseName}',
       envKey: '${toEnvPrefix(name)}_URI',
       engine: '${entry.Engine}',

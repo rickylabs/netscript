@@ -97,3 +97,18 @@ that exclusion. A temporary standalone config under ignored `.llm/tmp/` copied t
 rules and format settings without the path exclusion, after which both wrappers processed 19/19
 changed TypeScript files with zero findings. The two exit-2 coverage refusals remain evidence, not
 product failures.
+
+## D-10 — D-07 did not retain Prisma structured fields
+
+The D-216 artifact request expected the previously added actionable-stderr capture to expose
+Prisma's `code` and `meta`. Both digest-verified report ZIPs and both exact job logs instead end the
+typed-command detail after the third actionable line, `Invalid prisma.user.findFirst()
+invocation:`. D-07 intentionally bounded the retained details to three lines, so the requested
+Prisma fields are absent from the only uploaded report and cannot be recovered from these runs.
+This run records that evidence literally and does not relabel the failure as P2021, P2022, P1001,
+or P2002 without bytes.
+
+The missing fields do not prevent identifying S8's deterministic connection-path defect: the typed
+callback replaced Aspire's late-bound resource injection with a static AppHost configuration
+lookup. The repair restores resource-expression resolution. No runtime is run locally; CI remains
+the authority for the resulting database behavior.
