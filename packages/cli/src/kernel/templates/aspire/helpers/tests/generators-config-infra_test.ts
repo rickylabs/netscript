@@ -152,9 +152,10 @@ describe('generateRegisterInfrastructure', () => {
       output,
       "import { ContainerLifetime } from '../.aspire/modules/aspire.mts'",
     );
+    assertStringIncludes(output, 'createListenerReadinessCheck');
     assertStringIncludes(
       output,
-      "import { type CacheWiring, ensureDatabasePassword, resolveDataPath } from './_aspire-compat.mts'",
+      "import { type CacheWiring, createListenerReadinessCheck, ensureDatabasePassword, resolveDataPath } from './_aspire-compat.mts'",
     );
   });
 

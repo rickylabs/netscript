@@ -10,11 +10,11 @@ import { HybridMcpServer, type HybridMcpWorker, runHybridMcpStdio } from './hybr
 
 const result: HybridDelegationResult = {
   output: 'bounded result',
-  requested: { provider: 'openrouter', model: HYBRID_DELEGATION_DEFAULT_MODEL, effort: 'high' },
+  requested: { provider: 'openrouter', model: HYBRID_DELEGATION_DEFAULT_MODEL, effort: 'max' },
   observed: {
     provider: 'openrouter',
     model: HYBRID_DELEGATION_DEFAULT_MODEL,
-    effort: 'high',
+    effort: 'max',
     source: 'opencode_argv',
   },
   durationMs: 12,
