@@ -6688,3 +6688,37 @@ defensible and serves the deadline; the ruling is the primary's.
 **#1773 (#1616) — deliberately NOT integrated.** Its author `01a05306` is mid-turn running
 `deno task test` for the measured gate-7 baseline. Merging main underneath a live author turn would
 corrupt the very baseline it is measuring, so #1796 integration waits for its next evidence boundary.
+
+### #1365 rewritten in place; three excluded concerns given real owners (#1824, #1825, #1826)
+
+Primary accepted `PLAN-EVAL: N/A`; implementation dispatched to thread `01a05526` at head
+`9f1f9fb87` with the ceiling, lock-SHA, static-only, and no-self-certify constraints restated, and
+with the explicit instruction that the new scanner rule must leave `quality:scan:repo` at 0 findings
+— a rule that fires on innocent code elsewhere would block every other lane.
+
+**Ownership mapping done by verification, not assertion.** Every excluded concern is now assigned:
+
+| Concern | Owner | Basis |
+| --- | --- | --- |
+| 8092 endpoint fallback | **#1717** (PR #1740, shipped) | Verified: `resolveServiceUrl` returns `undefined`; no fallback in tree |
+| Correlation via persisted state + OTEL | **#1368** (PR #1764, shipped) | Merged as main `8a925764` |
+| `no-endpoint` diagnostic quality | **#1825** (new, 0.0.8) | No existing owner found by search |
+| Browser discovery-key normalization | **#1824** (new, 0.0.8) | No existing owner found by search |
+| Durability/negative coverage | **#1826** (new, 0.0.8) | No existing owner found by search |
+
+**#1824 is a genuine bug I verified in source before filing**, not a speculative split:
+`packages/sdk/src/discovery/browser-env.ts:22` interpolates the resource name unnormalized
+(`VITE_services__sagas-api__http__0`), while `packages/aspire/src/application/
+build-vite-env-var-name.ts` documents the `full` form as replacing invalid identifier characters with
+underscores (`VITE_services__sagas_api__http__0`). For any hyphenated resource the browser full-key
+lookup can never match; only the shorthand alias (`VITE_SAGAS_API_URL`, normalized on both sides)
+keeps discovery working. Server-side is unaffected — `createServerServiceEnvKey` preserves the hyphen
+and matches real Aspire output.
+
+**Issue #1365 rewritten in place**: title drops the false fallback claim, a scope-correction section
+records that two original claims were already fixed (with the code evidence), the owner table above is
+embedded so nothing is silently dropped, and Acceptance is replaced with **8 bounded boxes** covering
+only what this leaf delivers — helper, scanner rule, zero repo-wide false positives, four docs
+corrections, the stale 8092 "fallback port" docs line, the sample-sync test, lock/ceiling integrity,
+and separate-session IMPL-EVAL. Milestone 0.0.8 chosen for all three new issues so nothing lands in
+the 0.0.7 milestone being closed; re-triage is the coordinator's call.
