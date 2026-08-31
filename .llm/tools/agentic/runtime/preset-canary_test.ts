@@ -13,6 +13,12 @@ Deno.test('static canary exhaustively validates every OpenRouter preset launch p
   assertEquals(result.status, 'passed');
   assertEquals(result.rows.map((row) => row.id), [...OPENROUTER_PRESET_IDS]);
   assert(result.rows.every((row) => row.validation === 'passed' && row.launchValid));
+  for (const id of ['claude-evaluator-qwen-3-8-flash', 'claude-evaluator-glm-5-3-flash'] as const) {
+    const row = result.rows.find((candidate) => candidate.id === id);
+    assertEquals(row?.liveEligible, true);
+    assertEquals(row?.attestedEffort, 'max');
+    assertEquals(row?.diagnostics, []);
+  }
   assertEquals(
     result.rows.find((row) => row.id === 'claude-design-glm-5-2')?.liveEligible,
     true,

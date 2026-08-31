@@ -1,0 +1,465 @@
+# Worklog: Aspire 13.5 listener-readiness health checks
+
+## Run Metadata
+
+| Field | Value |
+| ----- | ----- |
+| Run ID | `feat-aspire-13-5-s6-health-checks--impl` |
+| Branch | `feat/aspire-13-5-s6-health-checks` |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `none` |
+
+## Design
+
+### Public Surface
+
+- No published `@netscript/*` export or CLI command changes.
+- Generated AppHost helper exports `createListenerReadinessCheck` and `createRespPingCheck` for
+  generated `register-infrastructure.mts` only.
+- E2E adds internal gate `runtime.health.listener-unreachable`.
+
+### Domain Vocabulary
+
+- `ListenerReadinessCheckOptions` — backing-service kind plus live host/port.
+- `RespPingCheckOptions` — live Redis-compatible host/port.
+- `ListenerHealthReportExpectation` — resource name, report key, and expected status.
+
+### Ports
+
+- No new package port. `node:net` is the emitted Node AppHost runtime edge; `Deno.Command` is the
+  existing CLI E2E process edge.
+
+### Constants
+
+- `LISTENER_READINESS_TIMEOUT_MS` — `2000`.
+- Health report suffixes — `_listener`, `_resp`.
+- `GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE` — Phase-B fixture ID.
+
+### Archetype-6 design inventory
+
+- Five spine abstracts and type parameters: existing `CliCommand<Input, Result>`,
+  `CliCommandGroup`, `CliRoot`, `UseCase<Input, Result>`, and `Registry<TKey, TValue>` are unchanged.
+- Layer-2 abstracts: none introduced.
+- Vertical features, extension registries, composition roots, command names, exit codes, output
+  formats, and public/maintainer dependency surfaces are unchanged.
+- Generated outputs: `_aspire-compat.mts`, `register-infrastructure.mts`, generated template
+  snapshot, and embedded asset barrel.
+- Runtime adapters: existing template asset adapter and E2E command-gate process edge only.
+
+### Commit Slices
+
+| # | Slice | Gate | Files |
+| - | ----- | ---- | ----- |
+| 1 | Prove one-socket TCP/RESP helper contract | focused structured helper test | compat template, helper test, run artifacts |
+| 2 | Prove per-kind emission and credential isolation | focused structured generator tests | infrastructure generator/tests, run artifacts |
+| 3 | Prove generated asset consistency | asset barrel tasks | generated snapshot/barrel, run artifacts |
+| 4 | Prove describe-derived wait assertions and register recovery fixture without executing it | targeted E2E tests/check | E2E runtime split/readiness modules/registry, run artifacts |
+| 5 | Prove Phase-A merge handoff gates and draft coordination text | scoped/configured/fitness/scaffold.plugins gates | run artifacts/drafts |
+
+### Deferred Scope
+
+- Credential/authentication readiness — requires protocol clients; S6b 0.0.8.
+- Live stop/start receipts and two-tier `healthReports` receipts — Phase B runtime lease.
+- Deno KV health-check mismatch — explicitly unchanged in this slice.
+- Docs and skills — S11.
+
+### Contributor Path
+
+Add a finite backing-service kind in `generate-register-infrastructure.ts`, select the TCP or RESP
+helper, assert its exact emitted key/callback/attachment in the co-located generator test, and add
+its runtime expectation to the readiness gate without touching credentials.
+
+## Progress Log
+
+| Time | Slice | Step | Notes |
+| ---- | ----- | ---- | ----- |
+| 2026-08-30 04:16 +02:00 | bootstrap | research/design | Read locked issue, upstream/API sources, S2 receipts, generator/E2E code, doctrine/debt; `PLAN-EVAL: N/A` recorded before implementation. |
+| 2026-08-30 04:20 +02:00 | 1 | RED | Structured helper test: exit 1, six named cases failed because both generated exports were absent. |
+| 2026-08-30 04:24 +02:00 | 1 | green | Structured helper test: exit 0, 8/8 results passed; TCP listener, closed port, 2000 ms black hole, RESP PONG/NOAUTH/garbage all exercised through the emitted template module. |
+| 2026-08-30 04:25 +02:00 | 1 | reconcile | #1718 remains open; no new comments. Closing keywords are reserved for the draft PR body after this commit. No plan readjustment. |
+| 2026-08-30 04:27 +02:00 | 1 | commit/push | Committed `54fdf19fe735fea793e3548825bd3f3015044461` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`. |
+| 2026-08-30 04:29 +02:00 | 1 | PR trail | Opened draft #1743 against `fix/aspire-13-5-s5-literal-ports`; verified milestone/labels/closing keywords and posted the slice-1 implementation comment. |
+| 2026-08-30 04:30 +02:00 | 2 | RED | Structured generator test: exit 1, 16 passed and the TCP/RESP emission cases failed on missing `postgres_listener` and `redis_resp` registrations. |
+| 2026-08-30 04:33 +02:00 | 2 | green | Structured helper/generator suite: exit 0, 53 passed; exact database/cache keys, live endpoint projections, all Garnet arms, Deno KV non-emission, and credential-free callback blocks proved. |
+| 2026-08-30 04:33 +02:00 | 2 | reconcile | Official 13.5 API confirms `getEndpoint` returns an `EndpointReference`; the locked callback form awaits `property(EndpointProperty.Host|Port)` inside each invocation. No plan readjustment. |
+| 2026-08-30 04:35 +02:00 | 2 | commit/push | Committed `feb1e7aadcf4f875cbcd2b878161c3ba9a5d705a` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 body/trail updated. |
+| 2026-08-30 04:36 +02:00 | 3 | regen | `gen:assets-barrel` embedded the emitted helper contract; the infrastructure structural template stayed byte-identical because its existing import/database/cache slots already carry the new emission. |
+| 2026-08-30 04:36 +02:00 | 3 | green | Staged-output `check:assets-barrel` reproduced all generated barrels with no unstaged diff; structured check selected `embedded.generated.ts` with 0 diagnostics. |
+| 2026-08-30 04:36 +02:00 | 3 | reconcile | #1718 remains open and the draft remains stacked. Snapshot verification found no new slot requirement; no plan readjustment. |
+| 2026-08-30 04:38 +02:00 | 3 | commit/push | Committed `c3376671877d50b17a16e237336f58edda34e5bf` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 trail updated. |
+| 2026-08-30 04:43 +02:00 | 4 | debt split | Split runtime lifecycle, behavior gates/scripts, and five runtime probes into a bounded role-named directory before registering the new gate. `runtime-gates.ts` fell from 812 to 305 lines; scaffold direct files fell from 48 to 43 (45 immediate children including directories); runtime has 11 direct files. |
+| 2026-08-30 04:46 +02:00 | 4 | RED | Focused E2E test run exited 1 on moved `generated-app-name.ts` paths and a stale quickstart script import. No Aspire command or runtime was executed. |
+| 2026-08-30 04:48 +02:00 | 4 | green | Focused check/lint/test: 23 files linted, four test roots checked, and 46/46 tests passed for report parsing, wait commands, recovery registration/order, and moved probes. |
+| 2026-08-30 04:51 +02:00 | 4 | consumer/fitness | `quality:scan` findings `[]`, `arch:check` `FAIL=0`, and `scaffold.plugins` passed 17/17 with cleanup. The lease-backed recovery fixture remained unexecuted. |
+| 2026-08-30 04:51 +02:00 | 4 | reconcile | Registered the original Phase-B recovery fixture and JSON receipt output; its lifecycle mechanism was later replaced by D-101 and its timeout exit contract corrected by D-102. No runtime was executed in this implementation lane. |
+| 2026-08-30 04:53 +02:00 | 4 | commit/push | Committed `92de34d9bc440a7ede229daed7bd2b449e6b1a83` and pushed with `git push origin HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`; draft #1743 body/trail updated. |
+| 2026-08-30 04:55 +02:00 | 5 | coordination drafts | Drafted the 0.0.8 S6b protocol-readiness issue plus bounded comments for #1366 and #863. Files are committed for the supervisor to post; no issue/comment mutation was performed by this lane. |
+| 2026-08-30 04:56 +02:00 | 5 | final static | Configured lint passed 2,047 files; scoped check selected 29 files with zero diagnostics; wrapper exclusion of four `packages/cli` files was covered by raw no-config lint/fmt on 27 concrete owned files; focused suite passed 99/99. |
+| 2026-08-30 04:56 +02:00 | 5 | final fitness/consumer | `gen:assets-barrel`/`check:assets-barrel`, `quality:scan` (findings `[]`), `arch:check` (`FAIL=0`), and `scaffold.plugins` (17/17) passed. `scaffold.runtime`, quickstart, AppHost, and resource commands remained NOT_RUN by Phase-A boundary. |
+| 2026-08-30 04:56 +02:00 | 5 | surface review | `packages/aspire` public surface is unchanged; jsr-audit is N/A. No dependency, lock-file, CLI command, host CLI, docs, skills, or S5 commit change. |
+| 2026-08-30 | 5 | commit/push | Committed/pushed slice 5 as `78d0ded2849eb28eddb60c409bfd68284d7e419b`; IMPL-EVAL cycle 1 subsequently returned `FAIL_FIX`. |
+| 2026-08-30 | 6 | evaluator intake | Read the complete cycle-1 record from `origin/research/aspire-13.5-0.0.7` and inspected the exact restored SDK 13.5.3 declarations: `HealthStatus` 619–624, `HealthCheckResult` 1013–1021, endpoint value methods 4696–4701 / 4763–4768. |
+| 2026-08-30 | 6 | RED→green | Updated the real-surface test stub and assertions first; the focused helper/generator suite exposed 11 expected failures (42 pass), then passed 53/53 after switching emitted callbacks to `host()` / `port()` and stringifying result data. |
+| 2026-08-30 | 6 | consumer | Rendered a Postgres AppHost through the local CLI, copied S2's restored 13.5.3 modules/config, and passed `tsc --noEmit -p tsconfig.apphost.json`; receipt: `receipts/06-consumer-typecheck-13.5.3.txt`. No AppHost/runtime/resource command ran. |
+| 2026-08-30 | 6 | migration checkpoint | Re-ran the focused structured test (53/53), five-file structured check (0 diagnostics), four-file no-config lint/fmt, generated-asset reproduction, and `quality:gate` (`findings=[]`, `FAIL=0`). The slice is being committed and pushed as a durable NAS handoff; Phase-B runtime and separate-session IMPL-EVAL remain pending and this checkpoint does not mark the PR ready. |
+
+## Decisions
+
+| Decision | Reason | Source |
+| -------- | ------ | ------ |
+| PLAN-EVAL N/A | Ratified issue has no open implementation decision; separate IMPL-EVAL remains mandatory. | #1718 / harness run-loop |
+| Split E2E registry before new gate | Existing debt has an explicit next-gate stop condition. | `scaffold-runtime-a8-f16-1333` |
+
+## Drift
+
+| Drift | Severity | Logged in drift.md |
+| ----- | -------- | ------------------ |
+| Deno KV has no existing `withHttpHealthCheck` emission | significant | yes |
+| E2E registry debt remains active at S5 head | significant | yes |
+| #1718/D3 endpoint property projection yields expression handles in 13.5.3 | significant | yes |
+
+## Gate Results
+
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| ---- | ---------------- | ------ | ----- |
+| baseline Git | direct `git status --short --branch` | PASS | Clean S5 head before run bootstrap. |
+| focused check | structured check wrapper, helper test | PASS | 1 file selected; 0 diagnostics. |
+| focused test | structured test wrapper, helper test | PASS | exit 0; 8 passed, 0 failed. |
+| focused lint | wrapper + config-excluded fallback | PASS | Wrapper correctly refused root-config exclusion; `deno lint --no-config` checked 1 owned file. |
+| focused format | config-equivalent raw check | PASS | Owned test and template compare clean at single-quote/100-column repo settings. |
+| slice-2 check | structured check wrapper | PASS | 3 generator/test files selected; 0 diagnostics. |
+| slice-2 test | structured test wrapper | PASS | exit 0; 53 passed, 0 failed across helper and generator suites. |
+| slice-2 lint | `deno lint --no-config` | PASS | 3 config-excluded owned TypeScript files checked. |
+| slice-2 format | raw config-excluded format check | PASS | 3 owned TypeScript files match single-quote/100-column repo settings. |
+| slice-4 check | `deno check --unstable-kv` on four focused test roots | PASS | Listener modules, registry split, suite resolution, and moved probe graph type-check. |
+| slice-4 test | structured test wrapper, four focused roots | PASS | 46 passed, 0 failed. |
+| slice-4 lint | `deno lint --no-config` on 23 owned files | PASS | No new lint finding; no cast/`any`/ignore introduced. |
+| slice-4 format | raw config-excluded formatter/check | PASS | 23 owned files match single-quote/100-column repo settings. |
+| final configured lint | `deno task lint` | PASS | 2,047 selected/processed; 0 findings. |
+| final scoped check | structured check wrapper | PASS | 29 selected; 0 failed batches/diagnostics. |
+| final scoped lint/fmt | wrappers + raw config-excluded fallback | PASS | Wrappers processed 25 and refused four root-excluded CLI template files; raw no-config commands checked all 27 concrete owned files cleanly. |
+| final focused test | structured test wrapper, seven roots | PASS | 99 passed, 0 failed across helper, generator, credential, readiness, registry, and moved-probe coverage. |
+| slice-6 focused check | structured check wrapper, five files | PASS | 5 selected; 0 failed batches/diagnostics. |
+| slice-6 focused test | structured test wrapper, three roots | PASS | 53 passed, 0 failed after the 13.5.3 API correction. |
+| slice-6 lint/fmt | `deno lint --no-config`; `deno fmt --check --no-config` | PASS | Four changed source/test TypeScript files checked cleanly. |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| Plan-Gate | N/A | `research.md` / `plan.md` | Ratified locked implementation contract. |
+| `quality:scan` | PASS | exit 0, findings `[]`, allowance count unchanged at 7 | No `any`, casts, lint ignores, or host coupling introduced. |
+| `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; new helper justified under A6/A7. |
+| slice-2 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | Generator stays pure; callback I/O remains emitted at the runtime edge. |
+| slice-2 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
+| slice-3 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | Regenerated barrel carries the owned helper source only. |
+| slice-3 `arch:check` | PASS | exit 0, `FAIL=0` | Existing warnings remain; no new doctrine failure. |
+| slice-4 `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | E2E process/file IO stays in runtime fixture scripts. |
+| slice-4 `arch:check` | PASS | exit 0, `FAIL=0` | Registry monolith is 305 lines; bounded runtime group has 11 files. |
+| final `quality:scan` | PASS | exit 0, findings `[]`, allowance count 7 | No quality-policy regression. |
+| final `arch:check` | PASS | exit 0, `FAIL=0` | Carried-in warnings only; no new doctrine failure. |
+| slice-6 `quality:gate` | PASS | exit 0; findings `[]`; allowance count 7; `FAIL=0` | Re-run at migration checkpoint; carried-in warnings only. |
+| jsr-audit | N/A | no `packages/aspire` public-surface change | Generated CLI/AppHost internals only. |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| AppHost/runtime | NOT_RUN | owner boundary | No runtime lease in Phase A. |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| -------- | ------ | -------- | ----- |
+| generated AppHost | NOT_RUN | pending slices | Runtime start prohibited in Phase A. |
+| generated AppHost 13.5.3 type-check | PASS | `receipts/06-consumer-typecheck-13.5.3.txt` | Local-head render compiles against S2 restored modules; no runtime start. |
+| asset barrel | PASS | `gen:assets-barrel`; `check:assets-barrel` exit 0 | Structural infrastructure template byte-identical; embedded helper refreshed. |
+| `scaffold.plugins` | PASS | exit 0; 17 passed, 0 failed | Non-runtime consumer gate completed with cleanup. |
+
+## Handoff Notes
+
+- Supervisor should inspect socket single-settlement/destruction, credential-free callback blocks,
+  live endpoint resolution, and the E2E registry debt split first.
+- Supervisor-postable S6b/#1366/#863 drafts are in the run directory.
+- Phase B must execute `runtime.health.listener-unreachable`, capture both-tier `healthReports`
+  receipts, and run the lease-backed runtime/quickstart gates before readiness evaluation.
+- This implementation session does not self-certify or mark the PR ready.
+
+## Reconstruction (v2, corrected architecture)
+
+This section preserves the original S6 history above and records the corrected reconstruction onto
+exactly-shipped main `2a1248d33d55`. The coordinator's D-91 audit ruling supersedes and overrules
+the abandoned narrow-exclusion D-92 attempt: S6 includes both the manually re-expressed semantic
+health-check changes from `5d2bd8756`, `31a2fac87`, and `01f27d4d4` and the complete
+`b4ca8a1d3` runtime-module boundary required by `scaffold-runtime-a8-f16-1333`.
+
+### Semantic health-check carry
+
+- Re-expressed the helper/generator semantics in shipped main's source style without carrying
+  `31a2fac87`'s formatting-only churn.
+- Preserved the shipped two-line CommunityToolkit 13.5 / first-party 13.6 compatibility note.
+- Kept S5's opt-in host-port behavior while resolving health endpoints live with
+  `await getEndpoint('tcp')`, `await endpoint.host()`, and `await endpoint.port()` inside each
+  callback.
+- Kept Deno KV, SQLite, external, and local modes outside health-check emission.
+- Regenerated `embedded.generated.ts` from its source asset.
+- Focused structured tests: PASS, 53/53 results.
+- Scoped structured check: PASS, five files selected with zero diagnostics.
+
+### Complete runtime-module split and shipped-main reconciliation
+
+- Applied the full `b4ca8a1d3` E2E module split, including all declared source moves, new runtime
+  modules, suite registrations, command/permission changes, and focused tests.
+- Resolved the extraction conflict by moving behavior declarations out of `runtime-gates.ts`; the
+  S1 gate title and its existing test assertion both read exactly
+  `Users service uses the live second-start Postgres allocation with correlated telemetry`.
+- Preserved S5's port-literal removal, opt-in host ports, and `aspire describe` endpoint discovery.
+  `verify-live-db-endpoint.ts` is untouched.
+- Fresh measurement: `runtime-gates.ts` is 305 lines; `runtime/` has 11 immediate children.
+- Focused listener/runtime/suite/probe tests: PASS, 46/46 results.
+
+### Reconstruction v2 final static evidence
+
+The historical 812→305 and 48→43 measurements retained earlier in this run describe the original
+S6 split. No rejected-attempt line-count note was copied into this run directory. The corrected
+reconstruction was measured again from its own tree: `runtime-gates.ts` is exactly 305 lines,
+`behavior-gates.ts` is 304 lines, and `runtime/` has exactly 11 immediate children.
+
+| Gate | Result | Reconstruction-v2 evidence |
+| ---- | ------ | -------------------------- |
+| helper/generator tests | PASS | 53/53 focused results. |
+| listener/runtime/suite/probe tests | PASS | 46/46 focused results. |
+| combined focused tests | PASS | 99/99 results across seven roots after final formatting. |
+| scoped check | PASS | Structured `deno check --unstable-kv`; 28 selected files, one batch, zero diagnostics. |
+| configured lint | PASS | `deno task lint`; 2,064/2,064 files processed, zero findings. |
+| configured format | PASS | `deno task fmt:check`; 2,064/2,064 files processed, zero findings. |
+| scoped lint wrapper | EXPECTED_REFUSAL | Root configuration excludes five CLI source files; the wrapper processed the other 23. |
+| raw scoped lint | PASS | `deno lint --no-config`; all 28 touched TypeScript files checked. |
+| raw scoped format | PASS | `deno fmt --check --no-config` with the shipped per-path semicolon conventions; 25 + 3 files checked. |
+| source asset barrel | PASS | `deno task gen:assets-barrel` followed by `deno task check:assets-barrel`. |
+| publish asset barrel | PASS | `deno task gen:publish-assets` followed by `deno task check:publish-assets`. |
+| host-port policy | PASS | `deno task check:aspire-host-ports`; 957 files scanned, no pinned host ports. |
+| quality scan | PASS | `deno task quality:scan`; findings `[]`, allowance count unchanged at 7. |
+| architecture | PASS | `deno task arch:check`; exit 0, no doctrine failures; carried-in warnings remain. |
+| generated 13.5.3 consumer | PASS | `receipts/reconstruction-v2-consumer-typecheck-13.5.3.txt`; `tsc --noEmit` exit 0. |
+| runtime/AppHost/containers/evaluators/CI | NOT_RUN | Explicit corrected-reconstruction boundary. |
+
+Reconstruction commits at this checkpoint are `a5a445c1a` (semantic carry), `719b298ee`
+(complete module split plus shipped-main conflict reconciliation), and `fb67d3077` (gate formatting
+and fresh 13.5.3 consumer receipt). `verify-live-db-endpoint.ts` remains byte-for-byte untouched
+relative to shipped main.
+
+## D-101 scratch-only synthetic listener fixture
+
+### Design
+
+- **Public surface:** no product/public API changes. The E2E-only seam exports a controller state
+  type, the two reserved listener ports/health keys, a controller used by focused tests, and pure
+  generated-helper splice functions.
+- **Domain vocabulary:** `ListenerFaultState` is the revisioned desired state for the Postgres TCP
+  listener and fake Garnet RESP listener. `ListenerFaultTarget` is a closed, hardcoded pair of
+  test-only and real backing health keys; arbitrary resource/key input is forbidden.
+- **Ports:** the controller owns Deno TCP listeners. The fixture controls it through an atomic
+  `.netscript/e2e/listener-fault-controller/state.json` file and waits for a revision-matched
+  `ack.json`. This avoids a third fixed port, Docker, process signals, and transport/relay
+  assumptions while giving the fixture an explicit applied-state acknowledgement.
+- **Constants:** `18998` is reserved for `test_only_postgres_listener`; `18999` is reserved for
+  `test_only_garnet_resp`. The generated AppHost checks use `localhost` exactly.
+- **Commit slices:** (1) RED controller/splice/ownership tests plus the D-101 design record;
+  (2) controller and pre-start generator splices, proved by focused socket/splice tests;
+  (3) failure/recovery orchestration and continuity receipt, proved by focused fixture/suite tests;
+  (4) scoped static/fitness gates and final harness/PR evidence.
+- **Deferred scope:** the implementation thread does not run Aspire, AppHost, containers, the
+  lease-backed runtime suite, an evaluator, or CI. The supervisor owns live verification.
+- **Contributor path:** start with `runtime/prepare-readiness-fixture.ts` for generated-project
+  wiring, `runtime/listener-fault-controller.ts` for the long-lived task, and
+  `runtime/listener-unreachable-fixture.ts` for runtime evidence collection.
+
+PLAN-EVAL is N/A: the owner supplied a ratified, closed architecture and explicit acceptance/gate
+contract. D-101 replaces the now-rejected resource-stop/docker-pause attempts without reopening an
+implementation decision.
+
+Critical review guard applied before the first D-101 commit: pre-start injection and runtime
+verification both reuse `listenerFaultExpectations(database)`, the database dispatch owned beside
+`createListenerReadinessGates(database)`. Postgres selects the synthetic Postgres+Garnet pair;
+SQLite and the MySQL/MSSQL overrides select Garnet only and never require a Postgres marker.
+
+### D-101 implementation evidence
+
+- RED: the structured focused run exited 1 with five expected missing-export/module diagnostics
+  for the not-yet-created controller, splice functions, and database-aware expectation builder.
+- The Aspire-managed `listener-fault-controller` task binds `localhost:18998` for bare TCP and
+  `localhost:18999` for fake RESP. Its atomic control file is revisioned and every applied revision
+  is acknowledged before the fixture polls Aspire health.
+- Generator-derived infrastructure markers are exactly
+  `await postgres_server.withHealthCheck('postgres_listener');` and
+  `await garnet.withHealthCheck('garnet_resp');`. The 13.5 TypeScript API registers callbacks with
+  `builder.addHealthCheck(...)` and attaches their keys with the existing resource promise's
+  `.withHealthCheck(...)` method.
+- The review guards landed before commit: bare-TCP accepted connections now drain to EOF and reap
+  their server-side descriptors; real-socket tests bind and connect through `localhost`; fixed
+  production ports remain 18998/18999.
+- GREEN: the five-root structured focused suite passed 52/52 results. It covers full
+  Postgres+Garnet injection, Garnet-only SQLite/MySQL/MSSQL dispatch, missing-marker and duplicate
+  registration failures, generated task insertion, exact ownership rejection, controller
+  close/reopen behavior, RESP PONG, and connection reaping.
+- Scoped structured gates over nine touched TypeScript files: check PASS with zero diagnostics,
+  lint PASS with zero findings, format PASS with zero findings. `quality:scan` passed with
+  `findings=[]`; `arch:check` exited 0 with carried-in warnings only.
+- Runtime/AppHost/container/evaluator/CI commands remain NOT_RUN by owner boundary.
+
+### D-101 exact-head static verification
+
+The D-101 implementation commit `3a20d00be1a65cb20d8ecae1658c27cad672e98d` was pushed with the
+explicit refspec `HEAD:refs/heads/feat/aspire-13-5-s6-health-checks`. A clean-tree rerun against
+that exact commit produced the following final evidence:
+
+| Gate | Result | Exact-head evidence |
+| ---- | ------ | ------------------- |
+| focused controller/splice/readiness/suite tests | PASS | Structured wrapper: 52/52 results across five roots. |
+| scoped check | PASS | Structured wrapper: nine files selected, one batch, zero diagnostics. |
+| scoped lint | PASS | Structured wrapper: nine selected/processed, zero findings or refusals. |
+| scoped format | PASS | Structured wrapper: nine selected/processed, zero findings or refusals. |
+| raw scoped lint | PASS | `deno lint` checked the same nine files. |
+| raw scoped format | PASS | `deno fmt --check` checked the same nine files. |
+| quality scan | PASS | `findings=[]`; allowance count remains 7. |
+| architecture | PASS | Exit 0; carried-in repository warnings only. |
+| lock hygiene | PASS | No `deno.lock` change; worktree clean after all gates. |
+| runtime/AppHost/containers/evaluators/CI | NOT_RUN | Explicit D-101 implementation-thread boundary. |
+
+The reconstruction-v2 measurements above remain the correct pre-D-101 module-split receipt
+(305-line `runtime-gates.ts`, 11 `runtime/` children). The final D-101 tree measures 306 lines and
+12 children because this bounded slice adds exactly one controller gate registration and the new
+`listener-fault-controller.ts` module.
+
+## D-102 healthy-wait timeout contract correction
+
+PLAN-EVAL is N/A by coordinator ruling: Aspire 13.5.3 and the live Postgres receipt settle the
+exit-code contract, and this slice changes no architecture or runtime transition. The bounded
+slice updates the fixture assertion/receipt wording, adds a pure unit seam for exit 17 plus the
+exact timeout diagnostic, records D-102 drift, and runs focused static gates only. The controller,
+health transitions, fixed ports 18998/18999, and running-resource behavior remain frozen.
+
+- RED: the new focused fixture test exited 1 with two missing-export diagnostics for the timeout
+  contract constant and assertion seam.
+- GREEN: the focused D-101/D-102 suite passed 55/55 results across six roots. The three new cases
+  accept exit 17 with the exact documented sentence, reject terminal-state exit 18, and reject exit
+  17 when that sentence is absent or changed.
+- Receipt evidence now names `healthyWaitTimeoutExitCode` and
+  `healthyWaitTimeoutDiagnostic`; assertion failures repeat the required diagnostic verbatim.
+- Scoped structured check/lint/format selected both changed TypeScript files with zero diagnostics,
+  findings, refusals, or dropped files.
+- `quality:scan` passed with `findings=[]` and allowance count 7; `arch:check` exited 0 with
+  carried-in warnings only.
+- Reconcile: PR #1743 has no comment newer than the D-101 implementation report; D-102 remains a
+  bounded correction with Tier-A review, independent evaluation, and fresh runtime lease pending.
+- Runtime/AppHost/containers/evaluators/CI remain NOT_RUN. The coordinator retains Tier-A review,
+  independent evaluation, and the fresh zero-state Postgres lease.
+
+## D-102b ANSI-decorated timeout diagnostic correction
+
+PLAN-EVAL is N/A by coordinator ruling: this bounded Tier-A correction changes only CLI-output
+normalization and preserves D-102's exit-17 contract plus every D-101 runtime behavior. The RED
+test feeds the observed Aspire 13.5.3 shape with CSI sequences before the `❌`, around the diagnostic
+run, and at line end. Implementation must reuse `stripAnsiCode` from `@std/fmt/colors`, then apply
+the existing trim/glyph normalization and exact diagnostic comparison. Runtime, AppHost,
+containers, evaluators, and CI remain coordinator-owned and NOT_RUN.
+
+- RED: the focused fixture suite ran four cases; the three D-102 cases passed and the new
+  ANSI-decorated 13.5.3 case failed at the exact matcher.
+- GREEN: importing `stripAnsiCode` from `@std/fmt/colors` and applying it before trim/glyph removal
+  made all four fixture cases pass without weakening exact equality.
+- The complete focused D-101/D-102/D-102b suite passed 56/56 across six roots.
+- Scoped structured check/lint/format selected both touched TypeScript files with zero diagnostics,
+  findings, refusals, or dropped files.
+- `quality:scan` passed with `findings=[]` and allowance count 7; `arch:check` exited 0 with
+  carried-in warnings only.
+- Exit 17, controller/listener behavior, health transitions, resource lifecycle, and ports
+  18998/18999 remain byte-for-byte unchanged by this slice.
+- Reconcile: PR #1743's latest phase comment is the D-102 implementation report; the supplied
+  Tier-A D-102b finding is fully represented here, with fresh substantive review/runtime lease
+  still coordinator-owned.
+
+## D-110 hidden E2E artifact carrier correction
+
+PLAN-EVAL is N/A by owner ruling: this is a bounded CI carrier correction with an exact workflow
+contract and no architecture or product decision. Run 33341398265 proved both runtime suites green
+at the pre-D-109 head, while `upload-artifact@v5` excluded every `.llm/` output because its default
+is `include-hidden-files: false`.
+
+Re-baseline against reconstructed branch head `300eac3ba94a1670b51e01982aa1658dc402ef3d` confirms
+`defaultRunOptions()` resolves `smokeRoot` to `<repo>/.llm/tmp/cli-e2e` and
+`createSmokeProject()` resolves each project beneath that directory. The exact receipt carrier is
+therefore `.llm/tmp/cli-e2e/**/.netscript/e2e/listener-unreachable-receipt.json`. This slice will
+enable hidden-file upload and replace each runtime job's broad path list with its exact report path
+plus that receipt path. Runtime, workflow dispatch, product semantics, and evaluator activity are
+NOT_RUN and remain coordinator-owned.
+
+- Both runtime artifact steps now set `include-hidden-files: true`.
+- The Postgres job carries only `.llm/tmp/e2e-report-scaffold-runtime*.json` plus the exact receipt
+  path; the SQLite job uses its `-sqlite*.json` report family plus the same receipt path. All four
+  D-107-era broad globs were removed.
+- Exact structural contract check: PASS for both jobs, including rejection of every stale broad
+  pattern.
+- Focused structured workflow-policy tests: PASS, 13/13 results across receipt, draft, event, and
+  Aspire NuGet-cache policy suites.
+- Workflow YAML parse with `@std/yaml` under `deno eval --no-lock`: PASS. `git diff --check`: PASS;
+  no lockfile or product-source change.
+- Reconcile: this slice implements the owner-supplied D-110 correction only. The coordinator owns
+  PR base retargeting, the single exact-head `workflow_dispatch`, and archive inspection.
+
+## D-111 classifier artifact-path contract correction
+
+PLAN-EVAL is N/A by owner ruling: this is a bounded CI-only restoration of an existing classifier
+self-test contract, with no architecture or product decision. At exact D-110 head
+`144988b864d12c4c6d7d292ba1f7107ec7c6129d`, the SQLite workflow assertion still requires
+`.llm/tmp/**/report*.ndjson`, while D-110 removed that pattern. This slice restores the original
+four upload patterns in both runtime jobs and keeps D-110's `include-hidden-files: true`. It does
+not change the classifier test, fixture, receipt, gate logic, health checks, or runtime behavior.
+Runtime, workflow dispatch, PLAN-EVAL, and evaluator activity remain coordinator-owned and NOT_RUN.
+
+- RED at exact D-110 head: the required raw classifier command reproduced 59 passed / 1 failed;
+  `workflow: sqlite runtime uses sibling diff guard and fails closed` failed at line 862 because
+  `.llm/tmp/**/report*.ndjson` was absent.
+- Restored the original four upload patterns, in their original order, in both runtime jobs. Kept
+  `include-hidden-files: true` in both steps; no classifier source or test changed.
+- GREEN required command: `deno test --allow-read --allow-env
+  .github/scripts/ci-classify-changes.test.ts` passed 60/60 with the formerly failing workflow
+  contract green.
+- Structured harness verdict over the same test: PASS, 60/60 results.
+- Exact two-job artifact assertion: PASS; original four patterns and hidden-file upload are present
+  in both blocks. Workflow YAML parse and `git diff --check`: PASS.
+- Lock hygiene: PASS; no `deno.lock`, product source, fixture, receipt, or classifier change.
+- Reconcile: D-111 is the complete owner-supplied correction. The coordinator retains the single
+  exact-head `workflow_dispatch` and direct artifact-archive inspection.
+
+## D-112 non-recursive runtime artifact carrier correction
+
+PLAN-EVAL is N/A by owner ruling: this is a bounded CI-only carrier correction with exact paths and
+an explicit classifier self-test contract. Exact-head run 33342459451 proved the Postgres product
+suite green but the artifact upload failed `EACCES` because D-111's recursive globs, combined with
+`include-hidden-files: true`, traversed the generated project's protected `.data/postgres` tree.
+
+This slice updates the checked-in classifier contract first, then replaces both workflow path lists
+with job-specific top-level report JSON/NDJSON patterns and the single-level
+`.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json` path. It keeps
+`include-hidden-files: true` and does not change gate logic, the fixture, receipt shape/location,
+health checks, exit-code semantics, or product source. Runtime, Docker, workflow dispatch, and all
+evaluator activity remain coordinator-owned and NOT_RUN.
+
+- RED after updating the classifier contract first: 59 passed / 1 failed; the workflow contract
+  rejected the D-111 SQLite block because its safe JSON prefix was absent.
+- Both runtime jobs now carry exactly their job-specific top-level JSON and NDJSON report patterns
+  plus `.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json`. No `**` recursive
+  wildcard remains in either upload path list; `include-hidden-files: true` remains in both.
+- Required raw classifier command: PASS, 60/60 tests. Structured test wrapper: PASS, 60/60.
+- Structured check/lint/format over the changed classifier test: PASS; one file selected and
+  processed, zero diagnostics, findings, refusals, or dropped files.
+- Exact two-job non-recursive artifact assertion: PASS. Workflow YAML parse and
+  `git diff --check`: PASS.
+- Lock hygiene: PASS; no `deno.lock`, product, fixture, receipt, health-check, or runtime change.
+- Reconcile: D-112 is the complete owner-supplied correction. The coordinator retains the single
+  fresh exact-head `workflow_dispatch` and direct inspection of both artifact archives for report,
+  receipt, and no-`EACCES` evidence.

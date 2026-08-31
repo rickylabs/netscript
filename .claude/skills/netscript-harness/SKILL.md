@@ -150,7 +150,7 @@ routing here — defer to that file. The items below are the parts of the contra
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
   **local-machine run**, PLAN-EVAL and IMPL-EVAL normally use a fresh native opposite-family
   session: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work.
-  Use the phase-bound Minimax/DeepSeek OpenRouter preset only for a genuine third opinion or when
+  Use the phase-bound Qwen 3.8 Flash/GLM 5.3 Flash OpenRouter preset only for a genuine third opinion or when
   the native opposite-family route is quota-blocked. If OpenRouter is then limited, use a fresh AGY
   Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
   cloud-driven work. For cloud PRs, repository automation owns the phase trigger: `openhands` plus

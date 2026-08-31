@@ -149,7 +149,11 @@ export function parseVersion(output: string): string | null {
 }
 
 function boundedProbeDiagnostic(output: string): string {
-  const normalized = output.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const printable = [...output].map((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 0x1f || code === 0x7f ? ' ' : character;
+  }).join('');
+  const normalized = printable.replace(/\s+/g, ' ').trim();
   return normalized ? normalized.slice(0, 80) : '<empty>';
 }
 
