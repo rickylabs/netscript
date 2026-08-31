@@ -1907,3 +1907,12 @@ continues concurrently because serial ordering is per orchestrator, not global.
   The meaningful next canary remains gated on coherent user-facing features/fixes, not this docs merge.
 - #1747 must first converge the quote-agnostic worker binding with the users+sagas missing-reference
   union. Its unused runtime lease returned exact zero; no runtime evidence was claimed.
+
+## Resume delta — 2026-08-31T03:23:24Z
+
+- Current main is `7908399affa2c0010aafd5742b12d9edfbba0942`: focused two-file salvage #1822
+  merged after exact GLM/current-CI gates, and superseded PR #780 is now closed unmerged with its
+  owner-approved records safely retained.
+- Merge ordering is #1798 next, then #1762 after one final shared-corpus integration. Active fix,
+  internals, and Aspire product work continues without interruption and integrates after that docs
+  boundary. The next canary remains feature/fix-heavy.

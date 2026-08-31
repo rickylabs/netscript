@@ -1510,3 +1510,12 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   convergence plus the S8/S9/S10 static cascade. No lane waits for the docs merge sequence.
 - The only host runtime lease was returned unused and exact zero. A fresh #1747 lease requires the
   approved semantic union and all static gates first.
+
+## 2026-08-31T03:23:24Z — stale salvage merge and integration order
+
+- Main is `7908399affa2c0010aafd5742b12d9edfbba0942` after exact-green #1822 salvaged the only
+  two surviving #780 records; #780 is closed unmerged. This main change is two orthogonal historical
+  Markdown files and touches no 0.0.7 product or generated corpus.
+- Complete #1798 convergence/CI/merge first. Then #1762 integrates the resulting docs base once,
+  regenerates shared carriers, and recuts final CI. Other product lanes wait for that safe evidence
+  boundary rather than churning their carriers after each docs merge.

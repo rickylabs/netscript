@@ -1616,3 +1616,12 @@ implementation thread.
 - Shared-seam merge fronts remain ordered and the host runtime mutex remains global. This preserves
   evidence integrity while removing avoidable idle time from feature, fix, docs, internals, and
   Aspire queues.
+
+## 2026-08-31 — an orthogonal salvage merge still invalidates merge-base receipts
+
+- #1822 touched only two historical Markdown files, but merging it while #1798 and #1762 CI ran
+  advanced main and made those merge-base receipts non-final. Orthogonality preserves accepted
+  product/evaluator evidence; it does not make a stale merge snapshot current.
+- Recovery order is explicit: converge and merge #1798 first, then integrate #1762 once across the
+  complete docs delta. Future ready-queue merges are serialized at the shared main boundary even
+  while implementation/evaluation remains parallel behind it.

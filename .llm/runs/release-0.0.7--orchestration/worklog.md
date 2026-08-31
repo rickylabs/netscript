@@ -3066,3 +3066,16 @@
   was detected statically. The bounded convergence ruling preserves quote-agnostic binding discovery
   plus main's users+sagas missing-reference union. Runtime will be re-leased only after that semantic
   union and static/repo-wide gates are green.
+
+## 2026-08-31T03:23:24Z — #780 salvage completed and stale prototype closed
+
+- Focused PR #1822 preserved exactly the two owner-approved #780 design-system records, byte-for-byte,
+  with no prototype/IA/screenshots or other stale artifacts. It passed GLM IMPL-EVAL, current-main
+  CI, review-thread, docs-links, format, and exact-diff gates at head `0e431a136`; coordinator merged
+  it as `7908399affa2c0010aafd5742b12d9edfbba0942` and normalized it to `status:shipped`.
+- Original PR #780 was closed unmerged with an evidence comment after its salvage precondition was
+  satisfied; the branch remains historical source evidence. This clears the oldest audited stale PR
+  without reviving superseded RFC 0005 dashboard architecture.
+- Because #1822 moved main while #1798/#1762 CI was active, #1798 now absorbs the orthogonal two-file
+  main delta and merges first. #1762 then integrates the resulting final docs base once, avoiding two
+  shared-corpus regenerations. No evaluation is rerun for this byte-proven orthogonal delta.
