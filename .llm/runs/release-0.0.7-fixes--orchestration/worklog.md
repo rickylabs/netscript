@@ -7215,3 +7215,42 @@ unchanged" with "the runtime environment is unchanged"; only the first was ever 
 - **Exact local synthetic merge is CLEAN** via non-destructive `git merge-tree --write-tree`
   (tree `6e99a3dabd4b4b30aa42bd2b9b9a3ecf0a1dee84`) — computed without touching the branch, so no
   product history was churned for a disjoint merge.
+
+### #1773 merge packet complete at immutable head `bf3aee258`
+
+Second correction accepted and fully re-earned. The sharper rule I now hold: **for a leaf whose
+acceptance includes a runtime gate, any main advance touching the scaffold/e2e surface invalidates
+prior runtime evidence — file-level nonintersection and a clean synthetic merge do not establish
+runtime carry.** My earlier proofs were true but answered the wrong question.
+
+- **Converged once** to current main `62ea359b1`, which **contains the named `58a4a10e`** (verified
+  ancestor). Clean, zero conflicts, `check:assets-barrel` exit 0, lock byte-identical.
+- **Hosted runtime re-earned at `bf3aee258`**: `e2e-cli.yml` run `33404703469`, **completed/success**,
+  all four lanes terminal — Postgres runtime (dynamic route + real browser + cleanup), SQLite, static,
+  desktop. The SQLite lane was cancelled by concurrency on the first attempt; I reran **only that job**
+  rather than the whole suite, and waited for it to reach terminal success rather than reporting the
+  run as green while a lane was cancelled.
+- **Bounded final-head delta IMPL-EVAL `DELTA_CLEAN`** (`z-ai/glm-5.3-flash`, separate session), scoped
+  `1c79001e1..bf3aee258`. It proved the delta set is **exactly** main's advance (102 == 102, identical
+  file sets), all ten lock-defining files byte-identical, and the barrel regenerates byte-clean.
+- **Metadata**: DoD **19/19**; issue #1616 **3/3** re-mirrored by the tool from the new evidence at
+  `bf3aee258` (never hand-restored); sole `status:ready-merge` on both PR and issue; `Closes #1616`;
+  threads 0/0.
+- **close-gate discipline held a third time**: the existing pass predated the metadata edits, so I
+  reran only that job and verified it started **15:10:51Z** against a body last updated **15:10:37Z**.
+  `ci: completed/success`, `MERGEABLE/CLEAN`.
+
+Superseded runs `33360663739` (at `cd24e4955`) and `33362503268` (at `1c79001e1`) are retained in the
+body **only** inside correction sections, each explicitly labelled superseded and not relied upon.
+
+### Other lanes
+
+- **#1093**: S1 accepted; `PLAN-EVAL: N/A` ruled with evidence rather than deferral — the plan locked
+  its public names "unless PLAN-EVAL identifies a collision", so I checked mechanically:
+  `ContributionBuilderPattern` and `AstExtractorOptions` each have **0** existing exports across
+  `packages/`. Surface movement is purely additive, defaults preserved. Implementation dispatched;
+  IMPL-EVAL remains mandatory.
+- **#1609**: PLAN-EVAL died on a **terminal OpenRouter 429** after ~17 min with no verdict. Retried;
+  the retry is alive and handling 429s as transient `api_retry` backoff (attempt 1/10). If it also
+  dies terminally, the sanctioned fallback is a fresh AGY Gemini 3.6 Flash high session — that would
+  be a routing escalation, not a plan defect.
