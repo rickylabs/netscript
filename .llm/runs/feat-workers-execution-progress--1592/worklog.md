@@ -210,3 +210,27 @@ Every receipt `gitHead == actualGitHead == 693b62474`:
 
 `deno.lock` byte-identical `edfa0c24…`. E2E/Aspire/Docker/browser do not apply to this leaf and were
 not run.
+
+## Single final convergence — `main` `bd9d463b4` (post-#1831, complete feature/fix/Aspire base)
+
+Evidence was deliberately **banked** rather than re-converged while `main` moved five times
+(`0e93a6c` → `26e1b486` → `052f8659` → `f59874abd` → `bd9d463b4`). One convergence taken at the end.
+
+| Proof | Result |
+| --- | --- |
+| Merge | **zero conflicts** at this base |
+| Carrier | MCP export corpus regenerated from tooling; `check:mcp-export-corpus` exit 0, 7680 symbols |
+| 10 evaluator-judged hand-written blobs | **byte-identical** to the evaluated head `1baf61f0a3` |
+| Non-`.llm` delta vs `main` | exactly 11 files — the 10 hand-written plus the regenerated carrier |
+| `deno.lock` | byte-identical `edfa0c24…` |
+
+Gates at final head `ff5abc7cf407868c969273d93082362ed51fe331`, each `gitHead == actualGitHead`:
+
+| Gate | Result | stdout | stderr |
+| --- | --- | --- | --- |
+| scoped `check` | PASS | 303 B | 263 B |
+| scoped `lint` | PASS | 355 B | 276 B |
+| scoped `fmt-check` | PASS | 304 B | 302 B |
+| `plugin-workers-core` tests | PASS | 306 B | 164 B |
+| `quality:gate` | PASS | 44,637 B | 950 B |
+| `publish-dry-run` | PASS | 0 B *(stderr channel — normal for this gate)* | **356,885 B** |
