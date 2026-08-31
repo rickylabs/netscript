@@ -78,3 +78,20 @@ Deno.test('scope authorizer can allow by default when explicitly configured', ()
 
   assertEquals(authorizer.authorize(request()), { allow: true });
 });
+
+Deno.test('scope authorizer distinguishes no match from a matched deny', () => {
+  const authorizer = createScopeAuthorizer({
+    rules: [{
+      match: (candidate) => candidate.path === '/api/admin',
+      requireRoles: ['operator'],
+    }],
+    denyByDefault: false,
+  });
+
+  assertEquals(authorizer.authorizeMatch(request()), { matched: false });
+  assertEquals(authorizer.authorize(request()), { allow: true });
+  assertEquals(authorizer.authorizeMatch(request({ path: '/api/admin' })), {
+    matched: true,
+    decision: { allow: false, reason: 'authz.missing-role:operator' },
+  });
+});

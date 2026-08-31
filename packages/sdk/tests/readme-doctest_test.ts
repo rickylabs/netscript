@@ -164,10 +164,14 @@ declare const router: unknown;
 declare const chatStreamSchema: unknown;
 declare const console: { error(...args: readonly unknown[]): void };
 declare function defineServices(config: unknown): {
-  readonly clients: { readonly orders: { readonly get: (input: unknown) => Promise<unknown> } };
-  readonly queries: { readonly orders: { readonly list: (input: unknown) => Promise<unknown> } };
+  readonly clients: { readonly orders: { readonly get: (input: unknown, options?: unknown) => Promise<unknown> } };
+  readonly queries: { readonly orders: { readonly list: (input: unknown, options?: unknown) => Promise<unknown> } };
   readonly queryUtils: { readonly orders: { readonly list: { readonly queryOptions: (input: unknown) => unknown } } };
 };
+declare function defineSdkClientContribution<TContext extends object>(): <TDescriptor extends {
+  readonly responseCache: { readonly mode: string; readonly partition?: (options: { readonly context: Readonly<TContext> }) => string };
+  readonly prepare: (options: { readonly context: Readonly<TContext> }) => unknown;
+}>(descriptor: TDescriptor) => TDescriptor;
 declare function createServiceClient(config: unknown): {
   readonly get: (input: unknown) => Promise<unknown>;
   readonly getById: (input: unknown) => Promise<unknown>;

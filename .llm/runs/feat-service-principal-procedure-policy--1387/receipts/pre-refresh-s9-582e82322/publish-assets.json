@@ -1,0 +1,36 @@
+{
+  "gateId": "publish-assets",
+  "invocationId": "1387-s9-publish-assets",
+  "argv": [
+    "deno",
+    "task",
+    "check:publish-assets"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "582e823223c3c0217dc832d593cad095c6dbf8b7",
+  "actualGitHead": "582e823223c3c0217dc832d593cad095c6dbf8b7",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex-slice-9",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "a0b69a7423dc86e797f4abf5f3d7274d63343245397a39b44fe152e30f0f58f6",
+  "lifecycleId": "codex-slice-9:1387-s9-publish-assets:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-30T23:16:24.862Z",
+  "startedAt": "2026-08-30T23:16:24.864Z",
+  "finishedAt": "2026-08-30T23:16:25.282Z",
+  "durationMs": 418,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 487,
+    "sha256": "d7d19865735b37b20a7ec583c7dd4bbf72f4ca646aebe69aac6ad8d7ddcb4402",
+    "tail": "Task check:publish-assets deno task gen:publish-assets --check\nTask gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'\nerror: Uncaught (in promise) Error: publish assets are stale: packages/mcp/src/publish-assets.generated.ts. Run deno task gen:publish-assets.\n    throw new Error(\n          ^\n    at file:///home/agent/projects/netscript/worktrees/007-leaf-1387/.llm/tools/generate-publish-assets.ts:462:11\n",
+    "truncated": false
+  }
+}
