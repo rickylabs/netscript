@@ -6197,3 +6197,19 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
 - Instructed to proceed to its stop point without waiting for routine confirmation, then stop for
   Tier-A. Per the standing instruction I will drive Tier-A and evaluation from there and hand back
   only a concrete blocker or an immutable ready packet.
+
+## D-131 — PR control plane: #1641 recorded as external coordinator ownership, not lane WIP
+
+- Both open `orchestrator:internals` PRs verified live:
+  - **#1802** (`fix/agentic-sender-lease-recovery`, draft, `status:impl`) — **this lane's product
+    leaf**, #1751. Mine to drive.
+  - **#1641** (`chore/release-0.0.7-orchestration`, draft, `status:impl`) — `chore: coordinate
+    0.0.7 milestone`. **Coordinator-maintained: not lane WIP, not to be edited or merged by this
+    supervisor.** Recorded as external ownership so it is never counted as internals work-in-progress
+    or picked up as an executable leaf.
+- **Checked for a collision I could plausibly have caused rather than assuming none**: this
+  session's own orchestration ledger commits go to `orchestrator/release-0.0.7-internals`, while
+  #1641's head is `chore/release-0.0.7-orchestration` — **distinct branches**, so the ~130 ledger
+  pushes made so far have never touched #1641's head. No cleanup needed, and no accidental edit of
+  a coordinator-owned PR has occurred.
+- Serial focus remains #1802/#1751 (Slice 4 GREEN in flight), then the queue recorded in D-128.
