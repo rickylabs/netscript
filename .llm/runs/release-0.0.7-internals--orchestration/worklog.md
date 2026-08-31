@@ -7356,3 +7356,58 @@ Memory updated: the sender-ownership note now carries both root causes (boolean 
 missing profile provenance) and the correct recovery order — prefer the tool's own `operatorAction`,
 check whether the named session is the slice's *own* prior thread, release via the adapter only if
 genuinely foreign, and never `rm` the record.
+
+## D-171 — The 1/4483 is a reproducible BRANCH-OWNED flake; I was wrong twice and this is the correction
+
+My "unidentified flake" call (D-152) and then my "resolved by a host PID1/inotify fix" relay (D-170)
+were both wrong. An exact-merge audit identified it precisely, and **I confirmed the mechanism
+myself** rather than relaying it:
+
+`.llm/tools/agentic/runtime/adapters/local-sender-lease-repair-adapter_test.ts`, test
+`"a real live child writer preserves its sender record and is boundedly reaped"`:
+
+```
+71:    child.kill('SIGTERM');
+73:      if (!(error instanceof Deno.errors.NotFound)) throw error;
+81:      child.kill('SIGKILL');
+83:      if (!(error instanceof Deno.errors.NotFound)) throw error;
+```
+
+Both cleanup guards admit **only** `Deno.errors.NotFound`. When the child has already exited on its
+own, `kill` throws a **`TypeError: Child process has already terminated`**, which fails both
+`instanceof` checks and is rethrown — failing the test. It is a genuine race, which is exactly why it
+presents as an intermittent 1-in-N failure and why two clean runs "confirmed" nothing.
+
+**This is branch-owned.** It is the leaf's own test, not host flakiness and not main's problem.
+
+### What that says about my own process
+
+Two clean re-runs let me reclassify the failure away from "real regression" — that part was sound.
+But I then let the *absence* of a reproduction stand in for a diagnosis, and later accepted a
+plausible external cause without deriving it. For a **race**, non-reproduction is close to
+uninformative: the correct move was to read the test's cleanup path once, which would have found this
+in minutes. Cheap code reading beats expensive re-running when the symptom is intermittent.
+
+### Amendment updated in place (not yet delivered — retry loop armed)
+
+The queued amendment now carries, in priority order:
+
+1. **The flake repair**: make cleanup **idempotent** — tolerate an already-terminated child **while
+   still awaiting and reaping status**, mirroring production `stopAndReap`. Explicitly forbidden:
+   skipping the reap, swallowing all errors, or deleting the case — the reap is the behavior under
+   test, and a blanket catch would convert a loud flake into a silent hole.
+2. **A protected-ceiling declaration.** This test is one of the six protected blobs
+   (`2e2817d0c…`). The change is **authorized**, but the author must declare it, prove the diff
+   touches only cleanup/teardown with **no assertion weakened**, and re-record the new blob hash so
+   the next audit compares against a declared baseline instead of discovering an unexplained change.
+   Section 4 was reconciled to authorize exactly this one blob and hold the other five byte-identical.
+3. **Stability as a measurement, not a hope**: repeat the focused test and root suite enough times to
+   prove determinism, reporting the count and each exit. A single green is worthless evidence for a
+   race.
+4. Root suite always with `--output --pretty` — the omission that let this go unnamed for so long.
+5. Three archive-only `.git` failures declared out of scope.
+6. The `profileHome`/`CODEX_HOME` provenance work and the `blocked`/`repair-required` vocabulary
+   replacement are **retained unchanged** from the prior ruling.
+
+Delivery is still pending on the active-writer conflict; the retry loop dispatches on idle ≥90s and
+captures a real exit per attempt, so the corrected text lands rather than the superseded one.
