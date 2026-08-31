@@ -204,6 +204,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'plugin-ai-core',
+    packagePath: 'packages/plugin-ai-core',
+    docPath: 'docs/site/reference/plugin-ai-core/index.md',
+    packageName: '@netscript/plugin-ai-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.',
+    },
+  },
+  {
     name: 'config',
     packagePath: 'packages/config',
     docPath: 'docs/site/reference/config/index.md',
