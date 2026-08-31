@@ -511,7 +511,9 @@ Static verification:
 | `quality:gate` | 0; scanner findings 0, doctrine `FAIL=0` with existing warnings |
 | repository structured check | 0; 2,986 files / 25 batches, `failedBatches: 0` |
 
-`check:assets-barrel`, commit SHA, remote fast-forward comparison, push read-back, and clean-tree
-evidence are recorded in the final D-231 receipt after committing. No Aspire, Docker, AppHost,
-`e2e:cli`, or runtime command ran. No PR base, labels, lifecycle state, S9/S10 scope, or dependency
-surface changed.
+The clean product/harness commit is `6b0bcfe1daefe8c65be5cd36dc99f8c6fe3133a0`.
+`check:assets-barrel` exited 0 from that commit and left `git status --short` empty. The exact remote
+fast-forward comparison and push read-back are reported by the implementation session rather than
+creating a self-referential post-push ledger commit. No Aspire, Docker, AppHost, `e2e:cli`, or
+runtime command ran. No PR base, labels, lifecycle state, S9/S10 scope, or dependency surface
+changed.

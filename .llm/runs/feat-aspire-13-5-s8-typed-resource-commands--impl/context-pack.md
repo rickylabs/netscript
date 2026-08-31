@@ -135,5 +135,7 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
 - New coverage was RED at the baseline (30 passed / 6 failed) and statically requires graph
   injection while excluding callback capability calls. Final focused helpers pass 256/256; scoped
   check/lint/fmt, `quality:gate`, and repo-wide check are green with `failedBatches: 0`.
+- Clean product/harness head `6b0bcfe1daefe8c65be5cd36dc99f8c6fe3133a0` passes
+  `check:assets-barrel` diff-clean.
 - No Aspire, Docker, AppHost, `e2e:cli`, runtime suite, PR lifecycle/base/label change, or evaluator
   dispatch occurred. CI remains the runtime authority.
