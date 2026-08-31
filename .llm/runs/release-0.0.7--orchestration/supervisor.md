@@ -1557,3 +1557,14 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   the proven docs/generated-only delta. Docs merges #1806, then prioritizes stale-ready #1803 before
   later corpus leaves. Features resolves #1805's augment label into an identified live review or a
   fresh exact-green close-gate packet.
+
+## 2026-08-31T04:17:37Z — post-#1805 merge fronts
+
+- Main is `dea44991120a2c5da96a89df0f68d69c455c035e`. Features consumes #1810 next,
+  with #1820 evaluation and #1814's bounded ExecutionRecord adapter repair running independently.
+- Docs freezes exact-green #1803 until #1810 lands, then regenerates once and returns it before
+  #1808. Internals keeps #1828 correction and #1823 readiness convergence parallel; Fixes keeps
+  #1365/#1773/#1677 parallel. Aspire advances static #1744/S8/S9/S11/S13 without a runtime lease.
+- The shared hybrid evaluator server is stale before #1792. Use current-main direct OpenRouter
+  launchers for active work, then rotate the shared server only after existing evaluator traffic is
+  terminal and prove GLM/Qwen acceptance from current main.

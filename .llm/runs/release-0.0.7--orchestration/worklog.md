@@ -3159,3 +3159,21 @@
   GLM-evaluated page/mapping, clean regenerated corpus/provenance, and exact delta, then squash-merged
   #1806 as `a3e0a5aa8beebbd1f7a488d564d31980a7d74619`. #1804/#1806 are closed/merged with sole
   `status:shipped`; all supervisors received the new main and Docs began #1803 convergence.
+
+## 2026-08-31T04:17:37Z — first new user-facing feature ships; stale PR audit becomes executable queue
+
+- Features PR #1805 was reconciled onto current main at exact head `a5d92386b1f614693ed9dd8af0da4ea56a9a1db8`.
+  Fresh run `33356029226` passed check-test, quality, close-gate, and lane visibility. The exact GLM
+  IMPL-EVAL PASS carries because all three evaluated AI product/test blobs are byte-identical; the
+  merge ref's first parent was current main, DoD/closing metadata were complete, review threads were
+  zero, and `deno.lock` was unchanged. The coordinator squash-merged #1805 as
+  `dea44991120a2c5da96a89df0f68d69c455c035e`; #1591/#1805 are closed/merged with sole
+  `status:shipped`.
+- The exhaustive open-PR audit found no milestone PR that should be abandoned or closed as a
+  duplicate. Immediate fronts are Features #1810 then #1820, Internals #1823, stale Docs #1803,
+  Aspire #1744, and the #1828→#1762 unblock chain. #1756's evaluated fix chain is recoverable from
+  immutable SHAs `4cdee82f`→`45c4894c` despite its old workflow-scope push failure.
+- Merge ordering gives the immediate user-facing #1810 seam priority, then lets #1803 regenerate
+  its shared corpus once. Implementation/evaluation remains parallel: #1773 has PASS_PLAN and an
+  active author; #1365 IMPL-EVAL and #1677 implementation are live; #1828 is rewriting its invalid
+  root-config RED/GREEN evidence against the correct production CLI oracle.

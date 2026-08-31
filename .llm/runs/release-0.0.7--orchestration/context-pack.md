@@ -1963,3 +1963,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - #1773 may carry its 4,426/0/19 measured baseline across a proven docs/generated-only delta and run
   the final current-toolchain Qwen PLAN-EVAL. #1805 has exact-head GLM PASS and must either identify
   a live augment reviewer or normalize stale metadata and recut close-gate immediately.
+
+## Resume delta — 2026-08-31T04:17:37Z
+
+- Current main is `dea44991120a2c5da96a89df0f68d69c455c035e` after user-facing AI feature
+  #1805 shipped from exact head `a5d92386b`; #1591/#1805 are sole `status:shipped`.
+- #1810 is the immediate next feature merge front after its current-main convergence/fresh CI.
+  Docs #1803 is already exact-green at pre-#1805 head `5992a3e74d` and will regenerate once after
+  #1810 rather than invalidating another feature merge. #1823 is similarly PASS/current-green but
+  waits to integrate once at its final seam.
+- #1828 is actively rewriting the prior wrong root-`deno.json` RED/GREEN history. Its only valid
+  oracle is `packages/cli/deno.json` with order `deno.ns`, `deno.unstable`, `dom`; no evaluator or
+  ready transition occurs before corrected history, current main, cold check, and #1762 root proof.
+- Aspire remains runtime-zero. Static S8 uses the direct current-main OpenRouter route because the
+  live shared hybrid MCP server predates #1792; Internals must rotate that server at a safe evaluator
+  seam, never during active evaluation traffic.
