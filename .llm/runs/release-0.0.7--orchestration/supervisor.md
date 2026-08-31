@@ -1473,3 +1473,16 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Internals solely owns #1758 after #1792. Fixes owns #1781 then #1764 and may not write #1758.
 - Active independent Codex work: features Slice 7, docs #1793, Aspire S6 scratch fixture. Internals
   packages #1792's GLM/max PASS. Existing DeepSeek receipts carry and are never rerun for routing.
+
+## 2026-08-31T02:20:00Z — non-delegable coordinator merge authority and model floor
+
+- The owner explicitly authorizes the active primary 0.0.7 milestone coordinator to merge
+  milestone/inquiry PRs after immutable-head CI, acceptance, review-thread, and lifecycle
+  verification. `/home/agent/AGENTS.md` now records this sole-agent exception. No topic supervisor,
+  implementation agent, evaluator, or child agent inherits merge authority.
+- All five live NetScript Claude topic supervisors are observed `claude-opus-5` with Remote
+  Control: features `6c654229-…` and fixes `84ea13ea-…` at `xhigh`; internals `eef77fc1-…`, docs
+  `1d06dd31-…`, and Aspire `4e08fdff-…` at `high`. The prior hybrid launches inherited Sonnet
+  because they lacked explicit routing; that route is rejected and repaired in place.
+- Merge train order starts with #1792 because its GLM/Qwen routing unlocks the parked prospective
+  evaluator gates. Revalidate immutable heads and current checks after every main mutation.

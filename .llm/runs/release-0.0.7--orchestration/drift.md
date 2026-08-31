@@ -1595,3 +1595,14 @@ implementation thread.
 - Evidence-only path repairs may carry accepted evaluator and product-runtime receipts only when
   the new diff is proved product-byte-identical. S6 D-114 qualifies: exactly two manifest path
   substitutions, direct parity `fail=0`, and no product or runtime gate code changed.
+
+## 2026-08-31 — coordinator-only merge exception and supervisor route repair
+
+- The hybrid launcher accepted no model/effort arguments, so five recovered supervisors inherited
+  the account default Sonnet 5 despite the harness route contract. Corrected in place and verified
+  from each live JSONL: `claude-opus-5`; features/fixes `xhigh`, the other three `high`. Future
+  supervisor launches must pass or immediately assert both values and prove the first assistant
+  response metadata.
+- Owner's standing merge authority applies only to the active primary milestone coordinator. It is
+  never delegated. Every merge still requires immutable head, current required CI, acceptance
+  evidence, answered review threads, clean mergeability, and correct lifecycle labels.

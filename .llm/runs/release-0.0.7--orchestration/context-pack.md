@@ -1872,3 +1872,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Aspire's next action is static #1747 diagnosis in clean `007-1747-conv` at `2462704c`; never use
   dirty duplicate `007-leaf-1732`. Request the next lease only after the missing workers fixture is
   classified and the four-part zero preflight is repeated.
+
+## Resume delta — 2026-08-31T02:20:00Z
+
+- Primary coordinator has explicit, non-delegable owner authority to merge in-scope 0.0.7/inquiry
+  PRs after exact-head, CI, acceptance, thread, and lifecycle verification. Delegated agents never
+  merge. Host `/home/agent/AGENTS.md` contains the exception. Begin with #1792, then revalidate the
+  remaining ready queue after each main update.
+- Observed live Claude routes are Opus 5/xhigh for features `6c654229-…` and fixes
+  `84ea13ea-…`; Opus 5/high for internals `eef77fc1-…`, docs `1d06dd31-…`, and Aspire
+  `4e08fdff-…`. Sonnet is forbidden for these orchestrators.
+- Do not ask the owner for routine slice progression. #1751 Slice 2 and #1452 research were resumed
+  autonomously; docs' parked evaluator backlog unlocks when #1792 reaches main.

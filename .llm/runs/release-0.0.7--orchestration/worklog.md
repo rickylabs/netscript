@@ -2987,3 +2987,17 @@
 - Host remains exact zero after the quickstart lease and after recovery of the unrelated unleased
   #1365 attempt. Aspire now proceeds directly to static #1747 diagnosis in clean worktree
   `007-1747-conv`; the dirty duplicate `007-leaf-1732` is historical and must not be used.
+
+## 2026-08-31T02:20:00Z — owner grants coordinator-only merge authority; supervisors corrected
+
+- Owner clarified that the primary milestone coordinator is the sole exception to the NAS
+  no-agent-merge rule. Host `AGENTS.md` was amended narrowly: delegated/topic/implementation/eval
+  agents still never merge; this coordinator may merge only owner-authorized in-scope PRs after
+  independently verifying exact head, CI, acceptance evidence, review threads, and lifecycle state.
+- Live session metadata proves every supervisor runs Opus 5: features and fixes at xhigh;
+  internals, docs, and Aspire at high. Four canonical topic routes were corrected from inherited
+  Sonnet to Opus; Aspire's former Fable route was raised to the owner-required Opus 5/high minimum.
+  No supervisor remains on Sonnet.
+- Routine pauses were cleared without owner escalation: features continues #1452 research,
+  internals continues #1751 Slice 2, fixes supervises #1365, Aspire continues #1747 D-117, and docs
+  holds only its exact Tier-A heads until #1792 lands.
