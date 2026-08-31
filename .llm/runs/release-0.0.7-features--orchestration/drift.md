@@ -1090,3 +1090,17 @@ fix belongs in `.llm/tools/agentic/`, not in a leaf.
 Also required first: `git branch --unset-upstream` in the leaf — the launcher's push-safety guard
 requires `upstream: NONE` so a bare `git push` cannot corrupt the remote branch. Pushes from this
 lane already use explicit refspecs.
+
+## D-STALE-SENDER-1592b — second eviction, cause identified: never foreground a Codex launch
+
+The first #1814 repair launch (`01a0560f-2014-7d62-8007-37c5fb55ef5a`) was run in the foreground and
+the Bash tool's 2-minute ceiling killed the **launcher wrapper** at 06:25:43. The thread had already
+been created and was working, so the kill did not read as a launch failure — but it took the thread's
+transport with it. Measured 5 minutes later: rollout stale at `06:25:43` ending on `token_count`
+(**not** `task_complete`), absent from `codex-status --user node` across 3 debounced probes, ownerPid
+`1513407` absent from `/proc`. Dead mid-turn, no commit produced.
+
+The recorded lesson said *do not wrap `launch-codex-slice` in `timeout`*; the tool's own default
+ceiling is the same hazard by another name. **Correct form: launch with `run_in_background: true`**,
+which is how the concurrent #1349 cycle-2 launch (`01a05613-156b-7972-b107-24988212d0cb`) survived and
+progressed normally in the same window. Relaunched that way.
