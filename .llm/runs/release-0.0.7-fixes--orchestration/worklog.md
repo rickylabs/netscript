@@ -6493,3 +6493,46 @@ packet; the existing receipts stand at their recorded heads.
 **Serial-queue position.** The merge front is occupied by these two. #1365 is parked at S1-complete
 behind PLAN-EVAL (#1792 unmerged), and #1616 / PR #1773 is parked at the same gate. No third front
 opened — that is the serial rule holding, not idleness.
+
+### AUTHORITATIVE FIXES QUEUE — reconciled from label `orchestrator:fixes` (16 open, milestone 0.0.7)
+
+Queried live; this label supersedes the stale `milestone-cluster-state.json` lane lists, which still
+showed shipped leaves as blocked. Recorded here as the lane's durable serial queue.
+
+| # | Prio | Status | PR | Queue position / blocker |
+| --- | --- | --- | --- | --- |
+| 1357 | p1 | ready-merge | #1781 | **SHIPPED** — merged as main `65cd8a077` 02:30:25Z |
+| 1368 | p1 | ready-merge | #1764 | **CURRENT FRONT** — converged to `f309dfb3b`, packet below |
+| 1365 | p0 | triage | #1819 (draft) | S1 done; contract narrowed by primary; steering composed, unsent |
+| 1462 | p1 | ready-merge | #1758 | **OWNERSHIP CONFLICT — see blocker B1** |
+| 1616 | p2 | triage | #1773 (draft) | plan complete, PLAN-EVAL-ready; executable next |
+| 1360 | p2 | triage | #1664 (draft) | **BLOCKED B2** — implementation lives in a features-lane PR |
+| 1677 | p1 | plan | — | no leaf; executable (needs S1) |
+| 1455 | p1 | triage | — | no leaf; executable (needs S1) |
+| 1093 | p2 | plan | — | no leaf |
+| 1249, 1481, 1544, 1557, 1601, 1609, 1610 | p2 | triage | — | no leaf |
+
+**B1 — #1462 ownership conflict (exact blocker, needs a ruling).** #1462 now carries
+`orchestrator:fixes`, so this queue claims it. But its PR **#1758 was explicitly assigned to the
+internals lane** with a standing prohibition on any write, push, gate, eval, or metadata change by me
+— and #1758 has since **merged into main** (`b99acc697`). I made no #1758 writes. Either the label is
+newly-correct and the prohibition is lifted, or the label is over-broad; I am not guessing, and the
+issue is left untouched. Note it is already merged, so the practical residue is only whether this
+lane owns its close-gate.
+
+**B2 — #1360 is covered by another lane's PR.** #1360 is in this queue but its implementation is
+inside **#1664 `feat/app-service-client-wiring`** (features lane, `closes #1355, #1360`, currently
+blocked). This lane cannot advance #1360 without either taking that PR or splitting the issue.
+
+Executable without a ruling, in order: **#1365** (narrowing steer ready), **#1616 / PR #1773**
+(PLAN-EVAL-ready), then new leaves for **#1677** and **#1455** (both p1, no leaf yet). A blocked leaf
+does not idle the lane — #1616 proceeds while #1365's narrowing turn runs.
+
+**Routing correction worth surfacing.** #1792's merged `lane-policy.md` makes the *native
+opposite-family* session the default evaluator (Fable 5 · medium for Codex-authored work), with
+**Qwen 3.8 Flash max (PLAN) / GLM 5.3 Flash max (IMPL) reserved for a genuine third opinion or a
+native-family quota block** — and `resolveCanonicalFormalEvaluatorRoute()` *throws* unless the
+requested family or explicit fallback reason matches. That is narrower than the verbal "new
+evaluations only use GLM/Qwen". Policy also makes **PLAN-EVAL conditional**: small/mechanical work
+with a complete contract records `PLAN-EVAL: N/A`. I am not self-selecting a route that the machine
+binding would reject; flagged for the coordinator.
