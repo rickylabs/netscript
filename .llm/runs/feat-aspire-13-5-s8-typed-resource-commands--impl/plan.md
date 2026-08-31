@@ -125,3 +125,51 @@ IMPL-EVAL after product bytes move.
 - Risk: generated barrel drift. Mitigation: run generator then the checked-in diff-clean task.
 - Deferred: parser heuristics, runtime reruns, seed-path changes, PR lifecycle/base/labels, and any
   S9/S10 work.
+
+## D-227 generated-helper compile repair
+
+PLAN-EVAL is N/A: the owner supplied the reproducible gate, the competing throw sites, the leading
+hypothesis to test, the required static regression, the verification set, and the exact push
+contract. The work is a bounded generated-source correction inside the existing Archetype-6
+template seam; no architecture or public-surface decision remains open. The supervisor retains the
+separate IMPL-EVAL responsibility and this session will not dispatch or claim it.
+
+### Locked decisions
+
+- Reproduce `generated.quality-negative` from a fresh local-source PostgreSQL scaffold and retain
+  the complete probe stdout/stderr before changing product source.
+- Independently compile `aspire/.helpers/run-tool.mts` and
+  `aspire/.helpers/register-infrastructure.mts` against that scaffold's restored SDK and report
+  exact diagnostics.
+- If the emitted late-bound resolver is invalid, repair the generator/template while preserving
+  execution-time resolution through `connectionStringExpression()` and D-224's bounded
+  actionable-stderr behavior. Use the restored TypeScript SDK's actual value-resolution member;
+  do not weaken the quality probe or generated check/lint tasks.
+- Add a static generator regression that renders and compiles the emitted helper pair in a
+  temporary restored-SDK consumer. Capture its failure against the unfixed template before making
+  it green.
+
+### Slice and proving gates
+
+1. Scaffold locally, run the full negative probe capture, compile both emitted helpers, and record
+   the exact throw and diagnostics in `research.md`/`worklog.md`.
+2. Add the emitted-helper compile regression and retain its RED result against `bbf866d59`.
+3. Repair the emitting template/generator, regenerate `embedded.generated.ts`, and make the focused
+   regression and existing generator tests green.
+4. Run scoped structured check/lint/fmt for changed TypeScript, `quality:gate`, repo-wide
+   `deno task check`, `gen:assets-barrel`, and diff-clean `check:assets-barrel`; commit only owned
+   files, compare the remote branch immediately before push, and push only if fast-forward.
+
+### Risk register and deferred scope
+
+- Risk: a string-only assertion can accept source that the Aspire SDK rejects. Mitigation: the new
+  regression invokes the compiler against a checked-in minimal contract copied from the restored
+  Aspire SDK rather than matching a method name; the manual consumer proof also compiles against
+  the complete restored SDK.
+- Risk: test scaffolding accidentally starts runtime resources. Mitigation: permit only scaffold,
+  restore/package resolution, and `deno` check/test/lint/fmt commands; no Aspire, Docker, AppHost,
+  or E2E runtime suite.
+- Risk: repairing the type error changes late binding or stderr retention. Mitigation: retain the
+  existing semantic generator assertions and D-224 tests alongside the compile regression.
+- Deferred: runtime confirmation of `database.seed`, PR base/lifecycle/labels, rebase, S9/S10 work,
+  and formal IMPL-EVAL dispatch.

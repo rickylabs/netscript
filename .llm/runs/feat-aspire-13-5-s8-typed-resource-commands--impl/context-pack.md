@@ -72,9 +72,9 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   the exact job log omit Prisma `code` and `meta`; D-07 persisted only the first three actionable
   stderr lines. Do not invent a Prisma classification from the truncated text.
 - Confirmed S8-owned cause: the typed command replaced the old executable's live Aspire resource
-  injection with a static `builder.Configuration` connection-string lookup. Aspire 13.5.3's
-  primary source and TypeScript PostgreSQL fixture identify
-  `connectionStringExpression().getValueAsync()` as the allocated-resource path.
+  injection with a static `builder.Configuration` connection-string lookup. D-216 correctly
+  selected `connectionStringExpression()` as the allocated-resource path but copied the C#
+  `GetValueAsync` spelling; D-227 established that the TypeScript member is `getValue()`.
 - Repair contract: generated infrastructure owns a late-bound resolver per non-SQLite database;
   typed migrate/seed/reset resolve it at execution and pass the exact result into the child env.
   No public package export, package metadata, dependency, cast, `any`, suppression, or architecture
@@ -98,3 +98,22 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   label, S9, or S10 action occurred.
 - The supervisor, not this implementation session, owns the required bounded delta IMPL-EVAL after
   push.
+
+## D-227 generated-helper compile state
+
+- Resume baseline is the clean branch head `bbf866d59bf74d55614583898bb632d2ab223b1e`.
+- Full local probe capture established the exact line-144 throw: `generated check did not recover
+  after quality probes`; the emitted diagnostic is TS2339 because TypeScript
+  `ReferenceExpression` has `getValue()`, not `getValueAsync()`.
+- Against the complete restored SDK, emitted `run-tool.mts` compiles and emitted
+  `register-infrastructure.mts` fails only at the invalid member call. The leading hypothesis is
+  confirmed.
+- The generator now awaits `connectionStringExpression().getValue()` at command execution and
+  rejects an unresolved null. Late-bound allocation semantics remain intact; the D-224 run-tool
+  template is unchanged.
+- New static coverage compiles both emitted helpers against the relevant restored SDK contract.
+  RED was 0/1 with TS2339 before the repair; focused GREEN is 254/254. The unmodified generated
+  negative-quality probe passes on a fixed, official-plugin scaffold with both cleanup exit codes
+  zero.
+- No runtime, AppHost start, Docker, container, or E2E runtime suite ran. The implementation session
+  does not dispatch or claim IMPL-EVAL.

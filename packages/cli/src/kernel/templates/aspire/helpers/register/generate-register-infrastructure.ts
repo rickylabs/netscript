@@ -234,7 +234,19 @@ export function generateRegisterInfrastructure(
     lines.push(`  databases.set(${JSON.stringify(name)}, ${id});`)
     lines.push(`  databaseConnectionStrings.set(`)
     lines.push(`    ${JSON.stringify(name)},`)
-    lines.push(`    async () => await (await ${id}.connectionStringExpression()).getValueAsync(),`)
+    lines.push(`    async () => {`)
+    lines.push(
+      `      const connectionString = await (await ${id}.connectionStringExpression()).getValue();`,
+    )
+    lines.push(`      if (connectionString === null) {`)
+    lines.push(
+      `        throw new Error(${
+        JSON.stringify(`Aspire did not resolve the connection string for database '${name}'.`)
+      });`,
+    )
+    lines.push(`      }`)
+    lines.push(`      return connectionString;`)
+    lines.push(`    },`)
     lines.push(`  );`)
     dbBlocks.push(lines.join('\n'))
   }

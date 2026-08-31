@@ -51,12 +51,14 @@ new Deno child process.
 Aspire 13.5.3 source confirms `builder.getConfiguration()` is exactly `builder.Configuration` and
 its `getConnectionString(name)` is the static Microsoft configuration lookup for
 `ConnectionStrings:<name>`, returning null when absent. The generated AppHost configuration has no
-such container connection-string entry. Aspire's 13.5.3 polyglot PostgreSQL fixture demonstrates
-the supported late-bound path:
-`db.connectionStringExpression()` followed by `getValueAsync()`. The equivalent concrete database
-resource property exists for PostgreSQL, MySQL, and SQL Server. The repair therefore carries a
-late-bound connection-string resolver from infrastructure registration to the typed callback; it
-does not add a new runtime abstraction or change the public package surface.
+such container connection-string entry. The D-216 review identified
+`db.connectionStringExpression()` as the supported late-bound path but transcribed the C#
+`GetValueAsync` member into the TypeScript emission. D-227 later corrected the language binding:
+Aspire 13.5.3 TypeScript `ReferenceExpression` exposes
+`getValue(): Promise<string | null>`. The equivalent concrete database resource property exists for
+PostgreSQL, MySQL, and SQL Server. The repair therefore carries a late-bound connection-string
+resolver from infrastructure registration to the typed callback; it does not add a new runtime
+abstraction or change the public package surface.
 
 ## Existing architecture
 
@@ -101,3 +103,43 @@ introduced.
 The affected surface remains the existing generated runtime adapter only. There is no new export,
 package metadata, dependency, permission, command vocabulary, or JSR surface; the planned JSR
 audit is therefore N/A for this delta. Existing CLI debt is not deepened.
+
+## D-227 generated-quality diagnosis
+
+A fresh local-source PostgreSQL scaffold at `bbf866d59` reproduced the failure with complete,
+separate stdout/stderr capture. Stdout was empty. The first line of the 23,763-byte stderr capture,
+which the CI tail omitted, was exactly:
+
+```text
+error: Uncaught (in promise) Error: generated check did not recover after quality probes
+```
+
+The structured check report in that same complete capture isolated the emitted AppHost diagnostic:
+
+```text
+aspire/.helpers/register-infrastructure.mts(83,69): error TS2339: Property 'getValueAsync' does not exist on type 'ReferenceExpression'.
+```
+
+The stack names `runQualityProbes` at `generated-quality-probes.ts:144:11`, so line 144 fired. The
+leading hypothesis was correct. Capture hashes are SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` for empty stdout and
+`1b1f8578727376577bae9fe332205e32f6379437517dca499aaa899bf5a13ad4` for complete stderr.
+
+Independent compilation against the restored Aspire 13.5.3 SDK proved that emitted
+`run-tool.mts` compiles (exit 0), while `register-infrastructure.mts` fails (exit 2) with the same
+single TS2339. The restored TypeScript API declares
+`PostgresDatabaseResource.connectionStringExpression(): Promise<ReferenceExpression>` and
+`ReferenceExpression.getValue(): Promise<string | null>`. `getValueAsync()` is the C# member name,
+not the TypeScript member name. The D-216 string assertion therefore accepted non-compiling source.
+
+The repaired resolver awaits `connectionStringExpression().getValue()` only when the typed command
+executes, rejects an unresolved `null`, and returns the exact allocated connection string. This
+preserves late binding and does not alter `run-tool.mts` or D-224's bounded stderr retention.
+
+The new static regression renders both helper files, supplies the relevant restored 13.5.3 SDK
+contract, and runs `deno check` on the emitted pair. Before the repair it failed 0/1 with the exact
+TS2339 above; after the repair it passes. A fresh fixed scaffold with the official local plugins,
+generated registries, restored SDK, and offline database client generation passed its pre-probe
+check/lint and the unmodified negative-quality probe. The probe returned `ok: true`, all ten
+expected quality probe paths, `cleanupCheckExitCode: 0`, and `cleanupLintExitCode: 0`. No AppHost,
+Docker, container, or runtime E2E suite was started.
