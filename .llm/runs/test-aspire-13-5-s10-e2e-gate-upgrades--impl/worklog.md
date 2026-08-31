@@ -148,3 +148,37 @@
   `desktop-native` fixture excluded), fmt exit 0 (185 files), and evidence tests exit 0 (17/17).
   PLAN-EVAL is N/A by owner direction for this mechanical correction. No Aspire, Docker,
   runtime-suite, evaluator, or CI-dispatch command ran.
+
+## D-133 un-stack attempt onto reconstructed S8
+
+- 2026-08-31: replayed the nine S10 commits from old head
+  `fbda6a5bdcd04f9c7482ea25c2102ca0f7679d2a` onto reconstructed S8
+  `bc838a0b3b9ba50f4ed6cf68aa29c9e4892b07f3`. D-133 resolved the only two conflicts at old
+  commit `4e270e940`: retained the complete upstream/main
+  `verify-listener-readiness.ts` and retained main's `listener-readiness-gates_test.ts`. Both chosen
+  blobs were byte-identical between `bc838a0b3` and current `origin/main`; no other conflict was
+  resolved. The replayed nine-commit head is `00437994d7f769c1145e253535561232469f8f70`.
+- Range-diff maps commits 1-3 and 6-9 exactly. Commits 4-5 differ only where reconstructed S8/main's
+  D-101 listener architecture supersedes the old S10 patch context. The old branch point
+  `f23954658` is not an ancestor, and none of 30 old-lineage commits exclusive of current main is
+  present in the replayed head.
+- Asset regeneration produced no delta; `gen:assets-barrel` and `check:assets-barrel` exited 0.
+  Structured checks passed for `packages/cli` (911 files, 8 batches, 0 failed) and
+  `packages/cli/e2e` (192 files, 2 batches, 0 failed). Repo-wide `deno task check` passed with 2,979
+  files, 25 batches, and `failedBatches: 0`. Scoped E2E lint passed after excluding only the
+  standalone `desktop-native` fixture; E2E and gate-tool formatting passed. Raw no-config lint of
+  the config-excluded changed catalog passed. `quality:scan` and `arch:check` exited 0.
+- Removed the obsolete Aspire surface-manifest row for the already-approved deletion of
+  `wait-for-workers-runtime.ts`; `check:aspire-version-parity` then passed with `fail: 0`.
+- Push is blocked by two coordinator-level verification failures. First, current `origin/main`
+  advanced to `584caa03f474de36b2d6e62e7162ab410c6ccb59`; the fixed D-133 target shares merge-base
+  `8a925764276b25ef7cef484db273604f44557cef`, so `merge-base HEAD origin/main == origin/main` is
+  false. Second, the preserved main D-101 test expects the wait command to invoke
+  `verify-listener-readiness.ts`, while unchanged S10 production code invokes
+  `evidence/listener-readiness.ts`; the focused wrapper passed 88 tests and failed that one exact
+  assertion. D-133 authorizes resolving only the two named files and requires all other S10 work
+  unchanged, so this implementation session did not rewrite the third production file.
+- `ListenerHealthReport` and `readListenerHealthReport()` remain exported from the complete main
+  `verify-listener-readiness.ts`, and the two ruled files remain byte-identical to current main.
+  The D-101 contract suite is not green because of the command-path mismatch above. No force-push,
+  runtime command, PLAN-EVAL, evaluator rerun, Aspire command, or Docker command was attempted.

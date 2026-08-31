@@ -57,3 +57,22 @@ contract covering all nullable root `ResourceJson` properties from Aspire v13.5.
 interprets only identity, state, health status, and health reports; all other DTO fields are optional
 and ignored. The stable `displayName`-first identity preference remains deliberate because real
 Aspire instance `name` values carry generated suffixes while suite expectations use display names.
+
+## D-08 — Current main advanced after the reconstructed S8 coordination point
+
+D-133 fixes the un-stack target at S8 `bc838a0b3`, but the freshly fetched `origin/main` is
+`584caa03f` and has three commits not present at the S8 coordination point. The resulting S10 head
+has merge-base `8a92576427` with current main rather than current main itself. The replay is retained
+locally, but the mandatory ancestry assertion fails and no force-push is permitted without a new
+coordinator base ruling.
+
+## D-09 — Main's preserved D-101 test exposes an unruled production-path mismatch
+
+D-133 retains main's `listener-readiness-gates_test.ts`, which requires
+`listenerReadinessWaitCommand()` to execute `verify-listener-readiness.ts`. Unchanged S10 commit
+`4e270e940` instead changes the production command to `evidence/listener-readiness.ts`; the focused
+suite therefore reports 88 pass / 1 fail. The coordinator ruling authorizes changes only in the two
+named conflict files and otherwise requires S10 unchanged, so changing
+`listener-readiness-gates.ts` requires a follow-up ruling. The complete main
+`verify-listener-readiness.ts`, including `ListenerHealthReport` and `readListenerHealthReport()`,
+is preserved byte-for-byte.

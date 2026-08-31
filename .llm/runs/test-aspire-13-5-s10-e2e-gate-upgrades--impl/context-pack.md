@@ -33,3 +33,12 @@
   DTO, missing/null state is explicit pending `Unknown`, missing/null reports are empty, and later
   observations replace pending state. Focused verdict: 17/17 evidence tests plus green scoped
   check/lint/fmt; no runtime, evaluator, or CI dispatch.
+- D-133 replayed the nine S10 commits from `fbda6a5b` onto reconstructed S8 `bc838a0b3`; local
+  replay head is `00437994d`. The two ruled listener files take main/upstream in full, the stale old
+  lineage is absent, and assets/check/fmt/lint/quality/architecture/parity plus repo-wide check are
+  green. The surface manifest drops the obsolete row for deleted `wait-for-workers-runtime.ts`.
+- Push remains blocked: current main advanced to `584caa03f` and is not an ancestor of fixed target
+  `bc838a0b3`; additionally, main's preserved D-101 test fails because unchanged S10 production
+  code invokes `evidence/listener-readiness.ts` instead of the expected
+  `verify-listener-readiness.ts` (88 pass / 1 fail). `readListenerHealthReport()` remains exported
+  from the complete main file. No force-push occurred; coordinator ruling is required.
