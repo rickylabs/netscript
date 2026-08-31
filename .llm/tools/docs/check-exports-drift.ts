@@ -48,6 +48,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'plugin-sagas-core',
+    packagePath: 'packages/plugin-sagas-core',
+    docPath: 'docs/site/reference/plugin-sagas-core/index.md',
+    packageName: '@netscript/plugin-sagas-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page documents every entrypoint and the complete root and agent surfaces, but omits substantial subpath contracts such as transport codecs, store adapters, telemetry contracts, and config schemas.',
+    },
+  },
+  {
     name: 'ai',
     packagePath: 'packages/ai',
     docPath: 'docs/site/reference/ai/index.md',

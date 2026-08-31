@@ -18,7 +18,7 @@ applications inject their own durability, and tests inject deterministic in-memo
 This is the core that the deployable [`@netscript/plugin-sagas`](/reference/sagas/) plugin binds to a
 NetScript host. Use it directly for custom hosts, libraries, and tests.
 
-## Entrypoints
+## Exports
 
 The package publishes nineteen entrypoints. The root path carries the userland DSL; the remaining
 subpaths expose the layers a host, adapter author, or test harness composes.
