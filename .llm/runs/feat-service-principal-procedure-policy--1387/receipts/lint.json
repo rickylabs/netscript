@@ -1,6 +1,6 @@
 {
   "gateId": "lint",
-  "invocationId": "1387-integrated-lint",
+  "invocationId": "1387-final-lint",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/(contracts|service|plugin|mcp|sdk)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
-  "actualGitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
+  "gitHead": "ffd380532ff83ba7d24703952bae3020352c5653",
+  "actualGitHead": "ffd380532ff83ba7d24703952bae3020352c5653",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1001438",
+  "runnerIdentity": "worker:1112985",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "b561e0fa6e98332682974d1e6e45192e5a7b9526a899e760dc5edb3c1552339c",
-  "lifecycleId": "worker:1001438:1387-integrated-lint:1",
+  "requestHash": "55f23c964873b35da81a02a2e8a823e7443fb5c96872fb140cd87fbb33e401b1",
+  "lifecycleId": "worker:1112985:1387-final-lint:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T02:28:59.657Z",
-  "startedAt": "2026-08-31T02:28:59.659Z",
-  "finishedAt": "2026-08-31T02:29:00.765Z",
-  "durationMs": 1106,
+  "claimedAt": "2026-08-31T02:59:08.401Z",
+  "startedAt": "2026-08-31T02:59:08.403Z",
+  "finishedAt": "2026-08-31T02:59:09.344Z",
+  "durationMs": 941,
   "exitCode": 0,
   "stdout": {
     "bytes": 355,
-    "sha256": "f15a9f35a67deaba548eb23b57901abaad818663f4ff4bfbb5329248a261220a",
-    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0},\"selection\":{\"filesSelected\":431,\"batches\":6,\"failedBatches\":0},\"coverage\":{\"filesSelected\":431,\"filesProcessed\":431,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "d4ce4105420a239156794008379528e69510a16f1c2282a109052ceee2249ec5",
+    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0},\"selection\":{\"filesSelected\":433,\"batches\":6,\"failedBatches\":0},\"coverage\":{\"filesSelected\":433,\"filesProcessed\":433,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {

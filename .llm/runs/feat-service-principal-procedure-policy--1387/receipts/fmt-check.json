@@ -1,6 +1,6 @@
 {
   "gateId": "fmt-check",
-  "invocationId": "1387-integrated-fmt",
+  "invocationId": "1387-final-fmt",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/(contracts|service|plugin|mcp|sdk)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
-  "actualGitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
+  "gitHead": "ffd380532ff83ba7d24703952bae3020352c5653",
+  "actualGitHead": "ffd380532ff83ba7d24703952bae3020352c5653",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1001612",
+  "runnerIdentity": "worker:1113162",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "6d554ec7ac4c475484450dcfcd11a661e0523e8c62848e3e9382af274811515e",
-  "lifecycleId": "worker:1001612:1387-integrated-fmt:1",
+  "requestHash": "903511672fed99db84139fd6530a9a2b047701c32ec34147cbf4c7926b52d93c",
+  "lifecycleId": "worker:1113162:1387-final-fmt:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T02:29:00.846Z",
-  "startedAt": "2026-08-31T02:29:00.848Z",
-  "finishedAt": "2026-08-31T02:29:01.724Z",
-  "durationMs": 876,
+  "claimedAt": "2026-08-31T02:59:09.425Z",
+  "startedAt": "2026-08-31T02:59:09.427Z",
+  "finishedAt": "2026-08-31T02:59:10.099Z",
+  "durationMs": 672,
   "exitCode": 0,
   "stdout": {
     "bytes": 304,
-    "sha256": "6d782791c9f1a7cfb1f0607fa1dc00c01ed519753cb713d1c356df376858d206",
-    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"mode\":\"check\",\"summary\":{\"filesSelected\":431,\"batches\":6,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":431,\"filesProcessed\":431,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
+    "sha256": "9099f9d3091e44b37aec939f3fa3711cc1edb1fb4ecb6b6a7779f681598bcc5d",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"mode\":\"check\",\"summary\":{\"filesSelected\":433,\"batches\":6,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":433,\"filesProcessed\":433,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
     "truncated": false
   },
   "stderr": {

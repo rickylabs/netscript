@@ -1,6 +1,6 @@
 {
   "gateId": "check",
-  "invocationId": "1387-integrated-check",
+  "invocationId": "1387-final-check",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/(contracts|service|plugin|mcp|sdk)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
-  "gitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
-  "actualGitHead": "6a8748e2871464447d83bb322a1f57bf1cefa3f3",
+  "gitHead": "ffd380532ff83ba7d24703952bae3020352c5653",
+  "actualGitHead": "ffd380532ff83ba7d24703952bae3020352c5653",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1001057",
+  "runnerIdentity": "worker:1112768",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "bbc8293526e4639c2626e2d99105fc96cd53e30891a174c1779856453e686c83",
-  "lifecycleId": "worker:1001057:1387-integrated-check:1",
+  "requestHash": "1fdae81c385c7a58e0752dffaefbcd267a073376848f647572705984e2d5cef7",
+  "lifecycleId": "worker:1112768:1387-final-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T02:28:51.185Z",
-  "startedAt": "2026-08-31T02:28:51.187Z",
-  "finishedAt": "2026-08-31T02:28:59.577Z",
-  "durationMs": 8390,
+  "claimedAt": "2026-08-31T02:59:03.015Z",
+  "startedAt": "2026-08-31T02:59:03.017Z",
+  "finishedAt": "2026-08-31T02:59:08.320Z",
+  "durationMs": 5303,
   "exitCode": 0,
   "stdout": {
     "bytes": 303,
-    "sha256": "0c2eada04ad7bbb17ec4990b87d14ae446d62ebf44026be4786d983f2d3f6e47",
-    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":432,\"batches\":4,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "7ea0e8ecbf10f41bff12c0b85ff2b4e0413dc765059d58f99c2fdda45335173b",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":434,\"batches\":4,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {
