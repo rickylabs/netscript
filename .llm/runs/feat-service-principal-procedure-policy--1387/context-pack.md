@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slices 1–9 accepted; integrated to `main` 3x; awaiting final exact-head IMPL-EVAL then close-gate |
+| Current phase  | **close-gate ready** — Slices 1–9 accepted, integrated to `main` 3x, final exact-head IMPL-EVAL `ACCEPTED_WITH_FINDINGS` |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
@@ -37,10 +37,18 @@ head `3cb08103ff9c25ff3ec580301b5936586b13d37e`: all eight adoption-doc ceiling 
 shipped Slices 1–8 behavior, and the tutorial uses contract-local metadata plus
 `createContractAuthorizer()` as its source of truth. The required agent-prose, CLI-barrel, and MCP
 publish carriers were regenerated under the standing exemption; the MCP export corpus stayed at
-7,655 symbols and `deno.lock` stayed byte-identical. The final eleven-receipt evidence set is
-`SUFFICIENT`. Slice 9 is at its Tier-A boundary awaiting substantive supervisor review and a
-separate opposite-family IMPL-EVAL; this author has not self-certified it or attempted the
-supervisor-owned close-gate.
+7,655 symbols at that point and `deno.lock` stayed byte-identical.
+
+**Superseded by three `main` integrations after Slice 9.** The leaf was integrated to `0ac06c5f1`
+(sole source conflict `catalog.ts`, resolved as the **union** of main's `aspire-version-parity` and
+this leaf's `exports-drift`/`mcp-export-corpus` entries), then `65cd8a077` (carrier-only), then
+`8a9257642` (corpus only). **The MCP export corpus is now 7,709 symbols**, regenerated from current
+inputs; `deno.lock` remains byte-identical throughout.
+
+The Slice 9 receipt set was archived to `receipts/slice-9-3cb08103f/` — superseded receipts
+preserved, not discarded — and replaced by a **nine-gate `1387-final-*` set at content head
+`236a3d331`**, `SUFFICIENT` with zero reasons. Slice 9 has since been Tier-A accepted and carries a
+final exact-head IMPL-EVAL of `ACCEPTED_WITH_FINDINGS` at evidence head `2a26f0254`.
 
 **Resume-docs gap, recurring — this file was not the only casualty.** First flagged as F-1 by the
 Slice 4 IMPL-EVAL (this file and `worklog.md` frozen after Slice 1); the same class recurred and was
@@ -94,8 +102,9 @@ certification, not only when an author happens to.**
 
 ## Next Steps
 
-1. Supervisor performs substantive Tier-A review of Slice 9 and records a separate opposite-family
-   IMPL-EVAL outcome outside this author lane.
+1. **Done.** Slice 9 Tier-A accepted; final exact-head IMPL-EVAL `ACCEPTED_WITH_FINDINGS` at
+   `2a26f0254` (`evaluate-slice-9-final.md`; the earlier verdict at `ffd380532` is preserved in
+   `evaluate-slice-9.md`). Remaining: the supervisor-owned close-gate.
 2. Keep `Refs #1387` partial and preserve an empty live closing-issue set until the supervisor-owned
    close-gate is complete.
 3. At the leaf's own pre-merge/close-gate boundary, fold in whatever `main` has advanced to by then
@@ -158,7 +167,7 @@ opposite-family IMPL-EVAL **PASS**. Its 8/8 durable receipts remain archived byt
 Slice 8: content `ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`, `SUFFICIENT` evidence set,
 7/7 durable receipts. Scoped check selected 116 files; lint/fmt selected 115; MCP tests passed
 138/138; corpus freshness, quality/doctrine, and full publish dry run passed. The direct MCP JSR
-audit exited 0 with its three existing warnings. Corpus stayed at 7,655 symbols with a byte-identical
+audit exited 0 with its three existing warnings. Corpus was 7,655 symbols at that slice (now 7,709 after the third `main` integration) with a byte-identical
 carrier; lock stayed byte-identical. The supervisor subsequently released Slice 9 work.
 
 Slice 9: final content `3cb08103ff9c25ff3ec580301b5936586b13d37e`, `SUFFICIENT` evidence set,
