@@ -148,6 +148,8 @@ when the child exit is non-zero.
 | 2026-08-31 | amendment | Profile provenance | Sender records persist the exact activation `CODEX_HOME`; production repair derives its session root from that record. Legacy records still parse but produce unknown evidence without probing a default home. Apply re-observation rejects profile changes. |
 | 2026-08-31 | amendment | Ownership vocabulary | Authorized the protected ownership-test ceiling change. Operator decisions now distinguish `blocked/live_owner`, `blocked/provenance_unknown`, `blocked/ownership_conflict`, and `repair-required/owner_inactive` in both the decision and emitted diagnostic. No assertion was dropped; discriminating assertions were added. |
 | 2026-08-31 | amendment | Focused GREEN | Structured focused suite passed 52/52 with exit 0 after implementation. Final stress, merge, and complete gates remain pending. |
+| 2026-08-31 | amendment | Final-freeze integration | Captured the amended six-test baselines plus `deno.lock`, fetched `origin/main` at `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`, and merged it in `50431f9cd`. Every post-merge blob is byte-identical to its pre-merge capture. |
+| 2026-08-31 | amendment | Stress gate blocked | The required 50-run full-file repetition produced exits 1 at iterations 1, 9, 23, and 40 (46/50 clean). All four failures are `pid.first` actual `dead` versus expected `alive`, not the repaired cleanup exception. A name-filtered diagnostic run made the same fixture defect deterministic. The child uses an unresolved top-level promise, which Deno exits when no pending operation remains, so it is not guaranteed live through observation. No further protected-test change was made without authorization. |
 
 ## Decisions
 

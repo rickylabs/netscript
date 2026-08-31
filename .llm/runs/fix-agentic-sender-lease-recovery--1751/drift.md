@@ -146,3 +146,20 @@ would be documentation-only. Left for Slice 4's author to add if useful, not req
   blocked/repair-required outcomes. Do not modify launcher argument parsing or the README surface
   owned by sibling #1750.
 - **Evidence:** Coordinator scope amendment; focused contract RED then 52/52 GREEN in `worklog.md`.
+
+## 2026-08-31 — stress gate exposed a second protected-test race
+
+- **What:** After the authorized teardown repair, 50 full-file repetitions failed at iterations 1,
+  9, 23, and 40 because the supposedly live child was already dead at its first PID probe.
+- **Expected:** The live-writer test owns a child that remains alive through the preservation
+  assertions, then exercises bounded teardown.
+- **Actual:** Its child waits on `await new Promise(() => {})`, but Deno terminates a process whose
+  top-level await has no pending runtime operation. Startup timing therefore decides whether the PID
+  is alive when observed. Name-filtering the same test makes the failure deterministic.
+- **Severity:** significant protected-test fixture defect; distinct from the repaired
+  already-terminated kill exception.
+- **Action:** Stop before changing the fixture because the coordinator authorized this protected
+  ceiling only for the cleanup-helper repair. A follow-up authorization should replace the inert
+  promise with a bounded parent-controlled pending operation and retain every assertion, while
+  preserving deterministic coverage of the already-terminated cleanup path.
+- **Evidence:** Direct 50-run capture in the implementation session; `worklog.md` stress row.
