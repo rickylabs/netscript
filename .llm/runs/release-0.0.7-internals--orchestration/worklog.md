@@ -6394,3 +6394,27 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   reproduced under test**, the same one that silently swallowed a countermand earlier in this run.
   The positive control passes, so the test cannot pass vacuously.
 - #1753 idle at `d5bfc9d6c` (GREEN landed, verified in D-136). Dispatching #1802 Slice 6 GREEN next.
+
+## D-138 — #1802 Slice 6 GREEN landed (00877bcbd); the original defect is now fixed
+
+- Slice 6 stalled after completing the work, same pattern as Slice 4 — 2 dirty files, quiet 175s,
+  work already green. Verified thoroughly before committing on the author's behalf:
+  - **All six RED test blobs byte-identical** → green by implementation alone.
+  - **Scope exactly the two declared files** (`codex-resume.ts`, new `codex-resume-result.ts`).
+  - **D8 correct in source**: `classifyCodexResumeOutcome` is a pure classifier separated from side
+    effects, detects the rejection signature on **either** stream, and returns
+    `accepted | rejected | failed`; `codexResumeExitCode` maps only `accepted` to 0.
+  - **Output preservation confirmed** — the single wrapper change is at the exit site
+    (`Deno.exit(r.code === 0 ? 0 : 1)` → `Deno.exit(codexResumeExitCode(classify...))`), with
+    `console.log(r.stdout)` / `console.error(r.stderr)` at lines 170-171 untouched. The operator
+    still sees exactly what the child said; only the exit contract changed.
+  - Slice 5 test **2/2**, full agentic suite **528/528**, all real exit capture.
+- **This closes the defect that caused actual harm in this run**: a rejected resume exiting 0 let me
+  believe a countermand had been delivered when it had not (D-119 near-miss, and the earlier
+  swallowed countermand the issue itself cites). The fix is now under test at
+  `codex-resume_test.ts` with a positive control.
+- **Integration gate still closed**: #1798 remains OPEN, so the two pending main advances
+  (`6bb27e46a` product+corpora, `7908399af` two-file) stay queued per instruction rather than
+  integrated now. Slice 7 (integration/docs) can proceed without them since it edits only the
+  agentic README and run artifacts.
+- #1753 idle at its verified GREEN `d5bfc9d6c`, awaiting its own PR/evaluation step.
