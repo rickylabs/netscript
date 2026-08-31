@@ -2827,3 +2827,18 @@ stays at `status:impl` and this session moves to the next independent slice rath
 Head at parking: `251890bcf3fae36def796c5d5471a73a93ea20dd`. Product/implementation is Tier-A PASS
 and ready for GLM evaluation as soon as the route is provisioned — no rework needed then, only the
 evaluation dispatch itself.
+
+### #1804/PR #1806: plugin-auth-core Path-column fix, second exact-match reason, eval parked again
+
+Same defect class as #1801: `plugin-auth-core`'s `## Sub-path exports` table listed all 9 real
+entrypoints correctly but had no Path column, so all 9 rows were "mismatching path" findings. Codex
+added the Path column and an `AUTHORITATIVE_MAPPING` entry (`entrypoints-only`, naming 97 specific
+omitted symbols out of 139 real exports across all 9 entrypoints). Tier-A independently recomputed
+the full union and found the claim **exact**: 97/97, zero invented, zero false claims — second
+consecutive exact-match reason field in this Path-column cluster.
+
+Reprobed `z-ai/glm-5.3-flash` — still rejected as not-approved. Per standing instruction, evaluation
+**parked** again (no DeepSeek fallback); PR #1806 stays at `status:impl`. Head at parking:
+`f3caf61dd09e90f9673aaa1616ce0ee9fbc1a56c`. Tier-A PASS, ready for GLM the moment it's provisioned.
+
+Two PRs now parked awaiting GLM: #1803 (#1801) and #1806 (#1804), both Tier-A verified clean.
