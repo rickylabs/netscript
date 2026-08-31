@@ -2,6 +2,8 @@ import { assert, assertEquals } from '@std/assert';
 import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { CODEX_OPENROUTER_PROFILE_NAME } from '../runtime/adapters/codex-profile-adapter.ts';
 import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
+import { newSenderOwnershipRecord } from '../runtime/sender-ownership.ts';
+import { existingSenderLaunchBlocker } from './launch-codex-slice.ts';
 import { launcherExitCode, planLauncherProfile } from './launcher-route.ts';
 
 const requested = {
@@ -78,4 +80,35 @@ Deno.test('successful sends stay successful without identity but route mismatche
   });
   assertEquals(launcherExitCode(0, mismatch, false), 1);
   assertEquals(launcherExitCode(0, mismatch, true), 0);
+});
+
+Deno.test('launcher blocks instead of evicting stale sender ownership', () => {
+  const worktree = '/home/codex/repos/worktree';
+  const record = newSenderOwnershipRecord({
+    worktree,
+    ownerPid: 93,
+    leaseToken: 'stale-lease',
+    now: '2026-07-10T20:00:00.000Z',
+  });
+  const blocker = existingSenderLaunchBlocker(worktree, {
+    record,
+    ownerProcessAlive: false,
+    sessionActive: false,
+  });
+  assertEquals(blocker?.code, 'duplicate_sender_risk');
+  assertEquals(
+    blocker?.operatorAction,
+    `run deno task agentic:runtime repair sender-lease --worktree ${worktree}`,
+  );
+
+  const foreign = existingSenderLaunchBlocker('/home/codex/repos/other', {
+    record,
+    ownerProcessAlive: false,
+    sessionActive: false,
+  });
+  assertEquals(foreign?.code, 'ownership_conflict');
+  assertEquals(
+    foreign?.operatorAction,
+    'run deno task agentic:runtime repair sender-lease --worktree /home/codex/repos/other',
+  );
 });

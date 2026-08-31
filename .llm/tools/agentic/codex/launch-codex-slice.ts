@@ -73,7 +73,9 @@ import {
   activateSenderOwnership,
   decideSenderOwnership,
   newSenderOwnershipRecord,
+  type SenderOwnershipObservation,
 } from '../runtime/sender-ownership.ts';
+import type { RuntimeDiagnostic } from '../runtime/contract.ts';
 
 interface Options {
   mode: 'launch' | 'dry-run' | 'parse-log';
@@ -93,6 +95,15 @@ interface Options {
   model?: string;
   effort?: string;
   allowRouteMismatch: boolean;
+}
+
+/** Returns the diagnostic that makes launch preserve an existing sender lease. */
+export function existingSenderLaunchBlocker(
+  worktree: string,
+  observation: SenderOwnershipObservation,
+): RuntimeDiagnostic | null {
+  const decision = decideSenderOwnership(worktree, observation);
+  return decision.kind === 'available' ? null : decision.diagnostic;
 }
 
 function printHelp(): void {
@@ -374,22 +385,21 @@ async function main(): Promise<void> {
   // before process spawn. A returned thread remains the worktree owner so the
   // next operator is directed to resume instead of creating a rival thread.
   if (existing) {
-    const decision = decideSenderOwnership(o.worktree, {
+    const blocker = existingSenderLaunchBlocker(o.worktree, {
       record: existing,
       ownerProcessAlive: ownership.isProcessAlive(existing.ownerPid),
       sessionActive: Boolean(existing.sessionId),
     });
-    if (decision.kind === 'blocked') {
+    if (blocker) {
       console.log(JSON.stringify({
         stage: 'sender-ownership',
         ok: false,
-        code: decision.diagnostic.code,
-        message: decision.diagnostic.message,
-        operatorAction: decision.diagnostic.operatorAction,
+        code: blocker.code,
+        message: blocker.message,
+        operatorAction: blocker.operatorAction,
       }));
       Deno.exit(4);
     }
-    await ownership.release(o.worktree, existing.leaseToken);
   }
   const leaseToken = crypto.randomUUID();
   const owner = newSenderOwnershipRecord({

@@ -91,7 +91,11 @@ export interface SenderLeaseStalenessObservation {
 
 export type SenderOwnershipDecision =
   | { readonly kind: 'available' }
-  | { readonly kind: 'stale'; readonly record: SenderOwnershipRecord }
+  | {
+    readonly kind: 'stale';
+    readonly record: SenderOwnershipRecord;
+    readonly diagnostic: RuntimeDiagnostic;
+  }
   | {
     readonly kind: 'blocked';
     readonly record: SenderOwnershipRecord;
@@ -108,7 +112,26 @@ function ownershipDiagnostic(record: SenderOwnershipRecord): RuntimeDiagnostic {
       : 'worktree already has a sender launch in progress',
     operatorAction: record.sessionId
       ? `resume existing session ${record.sessionId}`
-      : 'wait for the existing launch owner to publish its session identity',
+      : `wait for the existing launch owner to publish its session identity or ${
+        repairSenderLeaseAction(record.worktree)
+      }`,
+  };
+}
+
+function repairSenderLeaseAction(worktree: string): string {
+  return `run deno task agentic:runtime repair sender-lease --worktree ${worktree}`;
+}
+
+function staleOwnershipDiagnostic(record: SenderOwnershipRecord): RuntimeDiagnostic {
+  const repair = repairSenderLeaseAction(record.worktree);
+  return {
+    code: 'duplicate_sender_risk',
+    category: 'safety',
+    retryable: false,
+    message: 'worktree has an existing sender lease that launch will not evict',
+    operatorAction: record.sessionId
+      ? `resume existing session ${record.sessionId} or ${repair}`
+      : repair,
   };
 }
 
@@ -128,22 +151,63 @@ export function decideSenderOwnership(
         category: 'safety',
         retryable: false,
         message: 'sender ownership record names a different worktree',
+        operatorAction: record.sessionId
+          ? `resume existing session ${record.sessionId}`
+          : repairSenderLeaseAction(worktree),
       },
     };
   }
   if (observation.ownerProcessAlive || observation.sessionActive) {
     return { kind: 'blocked', record, diagnostic: ownershipDiagnostic(record) };
   }
-  return { kind: 'stale', record };
+  return { kind: 'stale', record, diagnostic: staleOwnershipDiagnostic(record) };
 }
 
 /** Classifies whether three provenance-bound signals can authorize explicit lease repair. */
 export function classifySenderLeaseStaleness(
-  _worktree: string,
-  _observation: SenderLeaseStalenessObservation,
+  worktree: string,
+  observation: SenderLeaseStalenessObservation,
 ): SenderLeaseStaleness {
-  // Slice 1 keeps the new contract fail-closed until Slice 2 implements the locked truth table.
-  return 'indeterminate';
+  const { record, pid, rollout, thread } = observation;
+  if (record.worktree !== worktree || !record.sessionId) return 'indeterminate';
+
+  const rolloutIdentityMismatch =
+    (rollout.sessionId !== undefined && rollout.sessionId !== record.sessionId) ||
+    (rollout.worktree !== undefined && rollout.worktree !== record.worktree);
+  const threadIdentityMismatch = thread.sessionId !== undefined &&
+    thread.sessionId !== record.sessionId;
+  if (rolloutIdentityMismatch || threadIdentityMismatch) return 'indeterminate';
+
+  if (
+    pid.first === 'alive' || pid.second === 'alive' ||
+    rollout.state === 'working' || rollout.state === 'stalled' ||
+    thread.state === 'active'
+  ) {
+    return 'preserve';
+  }
+
+  if (
+    pid.first === 'unknown' || pid.second === 'unknown' ||
+    rollout.state === 'unknown' || thread.state === 'unknown' ||
+    rollout.provenance !== 'matched' || thread.provenance !== 'matched'
+  ) {
+    return 'indeterminate';
+  }
+
+  const pidDebouncedDead = pid.first === 'dead' && pid.second === 'dead' &&
+    Number.isFinite(pid.elapsedMs) && pid.elapsedMs >= SENDER_PID_DEBOUNCE_MS;
+  if (!pidDebouncedDead) return 'indeterminate';
+
+  const rolloutTerminal =
+    (rollout.state === 'idle' || rollout.state === 'dead' || rollout.state === 'refused') &&
+    rollout.sessionId === record.sessionId && rollout.worktree === record.worktree;
+  const threadInactive = thread.state === 'idle' || thread.state === 'not_loaded' ||
+    thread.state === 'absent';
+  if (rolloutTerminal && threadInactive) return 'stale';
+
+  const boundAbsence = rollout.state === 'absent' &&
+    (thread.state === 'absent' || thread.state === 'not_loaded');
+  return boundAbsence ? 'stale' : 'indeterminate';
 }
 
 /** Builds the minimum redacted record persisted before sender process spawn. */
