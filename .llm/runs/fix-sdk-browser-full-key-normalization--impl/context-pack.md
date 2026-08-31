@@ -32,13 +32,19 @@ slices passed independent review, and separate-session IMPL-EVAL returned `PASS`
 
 ## In Progress
 
-- Close-out artifacts, formal PR phase comment, and final artifact-only commit.
+- None. The slice is complete and closed out.
 
 ## Next Steps
 
-1. Commit and push the final run artifacts.
-2. Post the formal IMPL-EVAL phase comment and update the draft PR body.
-3. Leave the PR draft and `status:impl`; the milestone supervisor owns lifecycle changes.
+- None remaining in this slice. Converged onto `main` `f59874abd2bc39446b21f5126323e0d2dcbce547`
+  with the evaluated product blobs preserved byte-identically
+  (`browser-env.ts` `f92db485af0f`, `env-ordering_test.ts` `7d46837d65af`), so the independent
+  supervisor-dispatched GLM `PASS` carries to the converged head. Lifecycle (ready-for-review,
+  `status:ready-merge`) and merge remain coordinator-owned.
+- Residual sibling defects found by that evaluation are tracked separately in
+  [#1833](https://github.com/rickylabs/netscript/issues/1833) — shorthand-key normalization, the
+  deploy-prebuild full-key skip, and widening the cross-package pin corpus. They are explicitly not
+  defects of this slice.
 
 ## Key Decisions
 
@@ -63,7 +69,7 @@ slices passed independent review, and separate-session IMPL-EVAL returned `PASS`
 | --- | --- | --- |
 | Static | PASS | Contract 11/11; SDK 86/86; Aspire 91/91; scoped check/lint/fmt exit 0; root check exit 0 with `failedBatches: 0`. |
 | Fitness | PASS | `quality:scan` and `arch:check` exit 0. |
-| Runtime | N/A | Owner directive; no runtime processes permitted. |
+| Runtime | N/A | **Not applicable by contract shape, not merely deferred.** This slice changes only pure string-building functions (`createBrowserServiceEnvKey`) whose full behaviour is observable from unit tests; it starts no process, opens no socket, and reads no environment at build time. There is no runtime surface for a live gate to exercise, so `scaffold.runtime` would add no evidence. (Independently, host runtime is parked by the upstream Aspire remote-Docker constraint, microsoft/aspire#14878 — but that is not why this row is N/A.) |
 | Consumer | PASS | Cross-package full-key agreement test exit 0. |
 
 ## Open Questions
