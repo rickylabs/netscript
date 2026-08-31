@@ -6096,3 +6096,19 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   test suite, not only the plan prose.
 - Thread confirmed idle after this single commit — stopped exactly at the "Slice 1 only" boundary,
   as instructed. Holding for supervisor Tier-A before authorizing Slice 2.
+
+## D-126 — #1751 Slice 2 GREEN dispatched with explicit test-ceiling protection
+
+- Coordinator accepted Slice 1 RED; proceeding autonomously. Thread verified genuinely idle and
+  worktree clean (`git status --porcelain` = 0) before the single resume send.
+- Slice 2 brief hard-constrains the known failure modes rather than trusting them not to occur:
+  (a) the Slice 1 test file is named a **verified ceiling** — going green must come from
+  implementation alone, and if the author believes a test is wrong they must stop and report rather
+  than edit it; (b) file set restricted to Slice 2's declared five; (c) the amended D2 including the
+  F2 provenance-binding rule must be implemented exactly, with D3's non-evictable list intact;
+  (d) launch stays preserve-only; (e) gate verification must use real exit capture, never a pipeline.
+- **Ceiling recorded for independent verification**: Slice-1 test blob
+  `74b0ba6118ec4961ed50da639791fe52e3faa09a`. After Slice 2 lands I will confirm this exact blob is unchanged rather than accept a
+  "tests pass" claim — the test file going green while silently modified is the specific false-green
+  this leaf's own subject matter (silent rejection) makes salient.
+- #1750 remains parked until #1751 is terminal.
