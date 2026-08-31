@@ -5228,3 +5228,26 @@
     identity with the four files named. Mirror dry-run re-run at `1771830ee`: **clean**. Fresh
     merge-ref CI recut (`33428414441`); the previous run at the old head was auto-cancelled, as
     expected.
+
+- **D-220 — #1835 handed over GREEN at `1771830ee`; #1837 staged and pre-validated behind it.**
+  - **#1835 final state:** `MERGEABLE`/`CLEAN` against main `9fbc231729`; `pr-checks` **PASS** — 21
+    checks, `currentFailures=0`; acceptance-mirror dry-run **clean**; ready · `status:ready-merge` ·
+    `impl-eval:skip`. Handover comment posted with the full carry evidence. This is the first
+    post-canary-5 Aspire leaf.
+  - **#1837 pre-validated rather than promoted blind.** Because #1835's mirror failed on first attempt,
+    I checked #1837's mapping *before* promoting it: **exactly one** evidence block (comment), using
+    `box-index` 1–4 against **exactly four** acceptance boxes on #1836. No duplicate block, and
+    `box-index` sidesteps the exact-text matching that broke #1835's box 2. Neither #1835 defect
+    applies.
+  - **Two close-gate defects fixed on #1835 before promotion**, both of which would have failed the
+    gate and stalled the first merge of the train:
+    1. duplicate `acceptance-evidence` — the body already carried the author's complete block and I
+       added a second in a comment, so **every** box read as duplicate;
+    2. box-2 exact-text mismatch — the body block dropped the backticks around
+       `` `build-windows-prebuild.ts` ``.
+  - **Process lesson worth keeping: run `mirror-acceptance-evidence.ts --dry-run` BEFORE applying
+    `status:ready-merge`, not after.** The dry-run is free, and it is the only thing that surfaced
+    either defect; the gate itself would have surfaced them as a red CI run on a PR already advertised
+    as ready.
+  - Sequencing respected: #1837 waits for #1835 to land, then gets its CLEAN re-verification against
+    post-#1835 main, mirror dry-run, promotion, and a recut merge-ref CI.
