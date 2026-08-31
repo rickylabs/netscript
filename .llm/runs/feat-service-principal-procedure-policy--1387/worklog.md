@@ -717,3 +717,43 @@ resuming close-gate session would have believed `3cb08103f` was final. This entr
 **Both findings are run-artifact bookkeeping only** — no product, documentation, or gate-result
 change. The evaluator classified them as non-blocking and recommended folding them into the close-gate
 commit; that is what this is.
+
+## Convergence onto live `main` `bd9d463b4` — and the blocker restated with exact-head evidence
+
+Moved off `status:ready-merge` (PR **and** issue #1387) before any work: the label outran the
+evidence. The recorded CI run `33354518981` failed `check-test` with `TS2551 Deno.openKv`, and head
+`686eedb62` carried no exact-head CI against live `main`.
+
+### Convergence
+
+Five conflicts, **all generated carriers**. Resolved to `main`'s and regenerated through the canonical
+cascade in dependency order — `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:mcp-export-corpus`
+→ `gen:publish-assets` — never hand-merged. `check:mcp-export-corpus` and `check:assets-barrel` both
+exit 0 at the seam; corpus 7712 symbols.
+
+### Evaluator/product carry
+
+**44 of 45 leaf-owned hand-written blobs are byte-identical** to the evaluated head `686eedb62`.
+
+The 45th, `docs/site/reference/mcp/index.md`, legitimately moved: it is a correct three-way merge of
+two additive doc changes. Verified rather than assumed — the heading sets differ by **exactly one**
+entry, the leaf's own `### Operation access summary`; every `main` heading survives, and the file
+grows 213 → 243 lines. No `main` content was dropped, and the leaf's `access`/`curlExample`
+documentation is intact.
+
+Scoped gates at seam `19d86de881ff24a29d89db5d5882eb74677c8394`, each `gitHead == actualGitHead`:
+`check` PASS (303 B), `lint` PASS (355 B), `fmt-check` PASS (304 B), `test` PASS (390 B).
+`deno.lock` byte-identical.
+
+### The blocker is unchanged, and it is not this leaf's
+
+`deno check packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts` at the seam **still reproduces
+`TS2551`**, exactly once. Cause, measured earlier and re-confirmed: `packages/cli/e2e/deno.json` on
+**live `main`** still sets `compilerOptions.lib = ["deno.ns","dom"]`, omitting `deno.unstable`, while
+root and `packages/cli` both include it. Deno 2.9.5 honours the explicit omission, so the
+`--unstable-kv` flag has no effect. This leaf's `packages/plugin/mod.ts:48` type-only re-export pulls
+`@netscript/service`'s root into that stable-lib graph, reaching `health.ts:184`'s `Deno.openKv`.
+
+**PR #1828 — `fix(cli-e2e): restore deno.unstable compiler-lib parity` — is open and unmerged.** Until
+it lands, no amount of convergence clears `check-test`, and no product change belongs in this leaf
+(the standing coordinator ruling). Converging changed the base, not the blocker.
