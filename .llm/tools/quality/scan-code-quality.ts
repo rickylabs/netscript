@@ -2,6 +2,7 @@ import { dirname, relative, resolve } from 'jsr:@std/path@^1';
 import { extractFencedBlocks } from '../docs/snippet-extractor.ts';
 
 export type QualityRule =
+  | 'discarded-saga-publisher-result'
   | 'explicit-any-ignore'
   | 'unsafe-cast'
   | 'explicit-any'
@@ -860,6 +861,78 @@ interface ScanUnit {
   readonly exemptTsErrorSuppression: boolean;
 }
 
+interface DiscardedSagaPublisherFinding {
+  readonly line: number;
+  readonly text: string;
+}
+
+function sagaPublisherBindings(tokens: readonly SourceToken[]): ReadonlySet<string> {
+  const bindings = new Set<string>();
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+    if (
+      token.kind === 'identifier' && tokens[index + 1]?.value === ':' &&
+      tokens[index + 2]?.value === 'SagaPublisherPort'
+    ) {
+      bindings.add(token.value);
+    }
+    if (
+      token.value === '=' && tokens[index - 1]?.kind === 'identifier' &&
+      tokens[index + 1]?.value === 'createSagaPublisher'
+    ) {
+      bindings.add(tokens[index - 1].value);
+    }
+  }
+  return bindings;
+}
+
+function isStandaloneAwait(tokens: readonly SourceToken[], index: number): boolean {
+  const previous = tokens[index - 1];
+  if (!previous) return true;
+  if ([';', '{', '}'].includes(previous.value)) return true;
+  if (previous.line === tokens[index].line) return false;
+  return !['=', 'return', '(', '[', ',', ':', '?', '=>'].includes(previous.value);
+}
+
+function discardedSagaPublisherResults(
+  source: string,
+  baseLine = 1,
+): DiscardedSagaPublisherFinding[] {
+  const lines = source.split(/\r?\n/);
+  const tokens = tokenizeSource(source);
+  const bindings = sagaPublisherBindings(tokens);
+  const findings: DiscardedSagaPublisherFinding[] = [];
+
+  for (let index = 0; index < tokens.length; index++) {
+    const receiver = tokens[index + 1];
+    const method = tokens[index + 3];
+    if (
+      tokens[index].value !== 'await' || receiver?.kind !== 'identifier' ||
+      !bindings.has(receiver.value) || tokens[index + 2]?.value !== '.' ||
+      (method?.value !== 'publish' && method?.value !== 'publishMany') ||
+      tokens[index + 4]?.value !== '(' || !isStandaloneAwait(tokens, index)
+    ) {
+      continue;
+    }
+    findings.push({
+      line: baseLine + tokens[index].line - 1,
+      text: lines[tokens[index].line - 1]?.trim() ?? '',
+    });
+  }
+
+  for (const token of tokens) {
+    if (
+      token.kind !== 'string' ||
+      (!token.value.includes('createSagaPublisher') && !token.value.includes('SagaPublisherPort'))
+    ) {
+      continue;
+    }
+    findings.push(...discardedSagaPublisherResults(token.value, baseLine + token.line - 1));
+  }
+
+  return findings;
+}
+
 async function scanUnits(file: string, cwd: string): Promise<ScanUnit[]> {
   const sourcePath = relative(cwd, file).replaceAll('\\', '/');
   const source = await Deno.readTextFile(file);
@@ -905,6 +978,12 @@ export async function scanCodeQualityDetailed(
   for (const file of files) {
     for (const unit of await scanUnits(file, cwd)) {
       const normalized = unit.sourcePath.replaceAll('\\', '/');
+      const discardedFindings = new Map(
+        discardedSagaPublisherResults(unit.lines.join('\n')).map((finding) => [
+          finding.line,
+          finding,
+        ]),
+      );
       const tainted = normalized.includes('/features/plugins/')
         ? collectPluginNameIdents(unit.lines)
         : EMPTY_TAINT;
@@ -917,7 +996,7 @@ export async function scanCodeQualityDetailed(
           const locationKey = `${unit.sourcePath}:${unit.lineOffset + index + 1}`;
           if (
             !ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted) &&
-            !publicLocations.has(locationKey)
+            !publicLocations.has(locationKey) && !discardedFindings.has(index + 1)
           ) {
             continue;
           }
@@ -954,6 +1033,17 @@ export async function scanCodeQualityDetailed(
             text: line.trim(),
             ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
           });
+        } else {
+          const discarded = discardedFindings.get(index + 1);
+          if (discarded) {
+            findings.push({
+              rule: 'discarded-saga-publisher-result',
+              file: unit.sourcePath,
+              line: unit.lineOffset + discarded.line,
+              text: discarded.text,
+              ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
+            });
+          }
         }
       }
     }

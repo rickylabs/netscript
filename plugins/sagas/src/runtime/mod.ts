@@ -6,6 +6,7 @@
  */
 
 export { createSagaPublisher, HttpSagaPublisher } from './saga-publisher.ts';
+export { publishSagaOrThrow } from '@netscript/plugin-sagas-core/integration/publisher';
 export { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 export {
   createSagaDeliveryPublisher,

@@ -14,3 +14,4 @@ export type {
   SagaPublisherRejected,
   SagaPublisherResult,
 } from './saga-publisher-port.ts';
+export { publishSagaOrThrow } from './publish-saga-or-throw.ts';
