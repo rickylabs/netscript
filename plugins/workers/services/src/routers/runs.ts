@@ -104,6 +104,8 @@ export const executionHandlers: WorkersHandlers<
       duration: number | null;
       error: string | null;
       result: Record<string, unknown> | null;
+      progressPercent: number | null;
+      progressMessage: string | null;
       attempt: number;
       maxAttempts: number;
       payload?: Record<string, unknown>;
@@ -139,6 +141,8 @@ export const executionHandlers: WorkersHandlers<
         duration: exec.duration,
         error: exec.error,
         result: exec.result,
+        progressPercent: exec.progressPercent,
+        progressMessage: exec.progressMessage,
         attempt: exec.attempt,
         maxAttempts: exec.maxAttempts,
         payload,

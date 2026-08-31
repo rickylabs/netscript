@@ -54,6 +54,21 @@ oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibl
 | `createScalarDocs` | `function createScalarDocs(options: ScalarDocsOptions): ServiceHandler` | Creates a Scalar API documentation UI handler. |
 | `createScalarJs` | `function createScalarJs(): ServiceHandler` | Creates a handler to serve the bundled Scalar JS file. |
 
+When a procedure declares `NetScriptProcedureMeta.access`, `createOpenAPISpec()` preserves the
+operation and projects access as follows:
+
+| Contract declaration | OpenAPI operation |
+| --- | --- |
+| `authentication: 'none'` | `security: []` |
+| `authentication: 'required'` | `security: [{ bearerAuth: scopes }]` |
+| Required `authorization.roles` | `x-netscript-roles: roles` |
+| `authentication: 'optional'` | `security: [{}, { bearerAuth: [] }]` |
+| No authentication declaration | No generated operation-level `security` field |
+
+The generated `bearerAuth` component uses HTTP bearer authentication. Optional access remains
+visible in the generated specification even though the current contract authorizer rejects it at
+construction.
+
 ## Error and routing handlers
 
 | Symbol | Signature | Description |
@@ -87,6 +102,8 @@ oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibl
 | `ServiceRequest` | interface | Minimal request shape exposed to service middleware and handlers. |
 | `ServiceMiddleware` | interface | Middleware function accepted by the service builder. |
 | `ServiceHandler` | interface | Service route handler accepted by the builder route API. |
+| `ServiceHandlerContext<TCustom>` | type alias | Readonly custom context plus optional framework-owned `db`, `traceHeaders`, and `principal` fields. |
+| `Principal` | interface | Authenticated identity with subject, readonly scopes/roles, scheme, and verified claims. |
 | `ServiceHandlerPlugin` | interface | Structural oRPC plugin accepted by service handler factories. |
 | `ServiceErrorHandler` | interface | Error handler used by service applications. |
 | `FetchHandler` | interface | Structural fetch handler used by RPC and OpenAPI service adapters. |
@@ -106,8 +123,72 @@ oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibl
 | Symbol | Signature | Description |
 | --- | --- | --- |
 | `ServiceRouter` | `type ServiceRouter = Record<string, unknown>` | Router definition accepted by the service builder and handler factories. |
-| `ContextFactory` | `type ContextFactory = (context: ServiceContext) => Record<string, unknown>` | Creates per-request service handler context. |
+| `ContextFactory<TCustom>` | `type ContextFactory<TCustom extends object = Record<never, never>> = (context: ServiceContext) => TCustom` | Creates the custom part of each service handler context. |
+| `ServiceHandlerContext<TCustom>` | `type ServiceHandlerContext<TCustom extends object = Record<never, never>> = Readonly<TCustom> & { db?; traceHeaders?; principal?; }` | Context visible after framework fields are composed. `principal` is optional and must be narrowed by handlers that require identity. |
 | `DbContext` | `type DbContext = Record<string, unknown>` | Database context injected into service handler context. |
+
+## Contract-declared authentication and authorization
+
+`@netscript/service/auth` is provider-agnostic. `.withAuthn()` turns a request into the
+service-owned `Principal`; `.withAuthz()` decides whether that principal may invoke the matched
+procedure. The primary policy source is the procedure's own
+`.meta({ access: { authentication, authorization? } })` declaration:
+
+```ts
+import { createService } from '@netscript/service';
+import {
+  createContractAuthorizer,
+  createStaticCredentialAuthenticator,
+} from '@netscript/service/auth';
+import { OrdersContractV1 } from '@example/contracts';
+import { router } from './router.ts';
+
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    local: {
+      subject: 'service:orders',
+      scopes: ['orders:read'],
+      roles: ['service'],
+    },
+  },
+});
+
+const app = createService(router, { name: 'orders' })
+  .withRPC()
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer: createContractAuthorizer(OrdersContractV1) })
+  .build();
+```
+
+Contract enforcement is opt-in: existing unguarded services, scaffolds, and standalone
+`createScopeAuthorizer()` consumers are unchanged. It activates only when an application passes a
+`createContractAuthorizer(contract, { fallback? })` result to `.withAuthz()`.
+
+Contract metadata wins on disagreement. A match-aware fallback, including
+`createScopeAuthorizer()`, is consulted only when a matched procedure has no access metadata. No
+metadata and no matching fallback rule denies, regardless of the fallback's standalone
+`denyByDefault` option. The builder binds one resolver to the actual REST and RPC paths and their
+aliases and shares it between authn and authz, so a declared public procedure is not rejected by an
+earlier authentication stage.
+
+`createScopeAuthorizer()` remains a supported standalone legacy path-prefix authorizer and a
+match-aware migration fallback; it is not deprecated.
+
+`authentication: 'optional'` is declared for future support, currently rejected.
+`createContractAuthorizer()` throws
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
+construction, before any request.
+
+### `@netscript/service/auth` surface
+
+| Symbol | Description |
+| --- | --- |
+| `createContractAuthorizer` | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
+| `createScopeAuthorizer` | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
+| `createStaticCredentialAuthenticator` | Maps configured credentials to principals. |
+| `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
+| `Principal` | Service-owned identity contract. |
+| `ContractPolicyAuthorizerPort` | Authorizer that binds to the builder's REST/RPC projection paths. |
 
 ## Exports
 

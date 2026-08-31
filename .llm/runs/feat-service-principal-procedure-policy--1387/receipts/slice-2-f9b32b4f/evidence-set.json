@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "f9b32b4f7a029d9226584b9c170eb44357e10fdb",
+  "surface": "#1387 Slice 2 typed service context surface",
+  "expectedGateIds": [
+    "arch-check",
+    "check",
+    "doc-lint",
+    "fmt-check",
+    "lint",
+    "publish-dry-run",
+    "test"
+  ],
+  "receiptIds": [
+    "1387-s2-arch",
+    "1387-s2-check",
+    "1387-s2-doc-lint",
+    "1387-s2-fmt",
+    "1387-s2-lint",
+    "1387-s2-publish-dry-run",
+    "1387-s2-tests"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

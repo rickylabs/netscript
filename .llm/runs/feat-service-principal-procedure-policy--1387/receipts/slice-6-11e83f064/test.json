@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "1387-s6-test",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/service/tests"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "11e83f06426469b48a67c2211d954ac916cd6fda",
+  "actualGitHead": "11e83f06426469b48a67c2211d954ac916cd6fda",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:978",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "d8794316f0a84b7b5de2180bcb7ff49d3c61d0394ae70b72c8f3161f2bff9a81",
+  "lifecycleId": "worker:978:1387-s6-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T21:42:43.144Z",
+  "startedAt": "2026-08-30T21:42:43.146Z",
+  "finishedAt": "2026-08-30T21:42:48.931Z",
+  "durationMs": 5785,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 296,
+    "sha256": "58bf36a8892be374745c62a9109309184448294cab0c151d4776cd2567899efa",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/service/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1387\",\"exitCode\":0,\"durationMs\":5669,\"summary\":{\"passed\":102,\"failed\":0,\"ignored\":0,\"totalResults\":102,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 126,
+    "sha256": "19ca1e14e871d76a3f78c6e0ba13855915a31b4fe8a0b8a102c64861e9ccda98",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/service/tests'\n",
+    "truncated": false
+  }
+}

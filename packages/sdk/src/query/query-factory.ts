@@ -4,20 +4,17 @@
  * @module
  */
 
-import { invokeClientProcedure } from './client-proxy.ts';
+import { getServiceClientContributionRuntime } from '../client/service-client.ts';
 import { createActionQueryKey } from '../ports/query-key.ts';
-import type {
-  ActionMethod,
-  ProcedureInput,
-  ProcedureOutput,
-  QueryFactory,
-} from '../ports/query-factory.ts';
+import type { ProcedureInput, ProcedureOutput, QueryFactory } from '../ports/query-factory.ts';
 import type {
   ContractLike,
   ContractProcedureNames,
   ServiceClient,
+  ServiceClientContext,
 } from '../ports/service-client.ts';
 import type { FactoryConfig } from '../ports/query-factory.ts';
+import type { SdkClientServerKeySuffix } from '../ports/query-key.ts';
 import type { QueryParams } from '../ports/query-options.ts';
 import type {
   ActionMutationOptions,
@@ -29,6 +26,44 @@ import type {
 import { getCacheProvider, hasCacheProvider } from '../cache/cache-provider.ts';
 import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/defaults.ts';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function requestContext(options: unknown): Readonly<Record<string, unknown>> {
+  if (!isRecord(options) || !isRecord(options.context)) return Object.freeze({});
+  return options.context;
+}
+
+function appendQuerySuffix(
+  key: readonly unknown[],
+  suffix: readonly unknown[],
+): readonly unknown[] {
+  return suffix.length === 0 ? key : [...key, ...suffix];
+}
+
+function invokeClientProcedureWithOptions<
+  TContract extends ContractLike,
+  TAction extends ContractProcedureNames<TContract>,
+  TContext extends object,
+>(
+  client: ServiceClient<TContract, TContext>,
+  action: TAction,
+  input: ProcedureInput<TContract, TAction>,
+  options: unknown,
+): Promise<ProcedureOutput<TContract, TAction>> {
+  const candidate = Reflect.get(client as object, action);
+  if (typeof candidate !== 'function') {
+    throw new Error(`Procedure "${String(action)}" was not found on the service client.`);
+  }
+  const result = isRecord(options) && 'context' in options
+    ? Reflect.apply(candidate, client, [input, { context: options.context }])
+    : Reflect.apply(candidate, client, [input]);
+  return result as Promise<
+    ProcedureOutput<TContract, TAction>
+  >;
+}
+
 /**
  * Create a query factory for an oRPC contract.
  *
@@ -38,12 +73,17 @@ import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/def
  * @param defaultOptions - Default cache policy for generated actions.
  * @returns Resource-scoped query helpers.
  */
-export function createQueryFactory<TContract extends ContractLike>(
+export function createQueryFactory<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+  TKeySuffix extends SdkClientServerKeySuffix = readonly [],
+>(
   resource: string,
   contract: TContract,
-  client: FactoryConfig<TContract>['client'],
+  client: FactoryConfig<TContract, TContext, TKeySuffix>['client'],
   defaultOptions: QueryParams = {},
-): QueryFactory<TContract> {
+): QueryFactory<TContract, TContext, TKeySuffix> {
+  const contributionRuntime = getServiceClientContributionRuntime(client);
   const {
     staleTime: defaultStaleTime = DEFAULT_QUERY_STALE_TIME,
     cacheTime: defaultCacheTime = DEFAULT_QUERY_CACHE_TIME,
@@ -62,6 +102,11 @@ export function createQueryFactory<TContract extends ContractLike>(
 
   for (const action of actionNames) {
     const operationId = `${resource}.${String(action)}`;
+    const partition = (options: unknown) =>
+      contributionRuntime?.partition([action], requestContext(options)) ?? {
+        serverSuffix: [],
+        querySuffix: [],
+      };
     const actionMethod = async (
       props: ProcedureInput<TContract, typeof action>,
       options: QueryParams = {},
@@ -74,14 +119,14 @@ export function createQueryFactory<TContract extends ContractLike>(
       } = options;
 
       return await getCacheProvider().query(
-        createActionQueryKey(resource, action, props),
+        createActionQueryKey(resource, action, props, partition(options).serverSuffix),
         {
           staleTime,
           cacheTime,
           revalidateOnStale,
           preferFreshOnStale,
           operationId,
-          queryFn: () => invokeClientProcedure(client, action, props),
+          queryFn: () => invokeClientProcedureWithOptions(client, action, props, options),
         },
       );
     };
@@ -92,12 +137,14 @@ export function createQueryFactory<TContract extends ContractLike>(
 
     actionMethod.key = (
       props: ProcedureInput<TContract, typeof action>,
-    ): readonly [string, typeof action, string] => {
+      ...request: readonly unknown[]
+    ) => {
       return createActionQueryKey(
         resource,
         action,
         props,
-      ) as readonly [string, typeof action, string];
+        partition(request[0]).serverSuffix,
+      );
     };
 
     actionMethod.prefetch = (
@@ -112,30 +159,34 @@ export function createQueryFactory<TContract extends ContractLike>(
       } = options;
 
       void getCacheProvider().prefetch(
-        createActionQueryKey(resource, action, props),
+        createActionQueryKey(resource, action, props, partition(options).serverSuffix),
         {
           staleTime,
           cacheTime,
           revalidateOnStale,
           preferFreshOnStale,
           operationId,
-          queryFn: () => invokeClientProcedure(client, action, props),
+          queryFn: () => invokeClientProcedureWithOptions(client, action, props, options),
         },
       );
     };
 
     actionMethod.getCachedData = async (
       props: ProcedureInput<TContract, typeof action>,
+      ...request: readonly unknown[]
     ): Promise<ProcedureOutput<TContract, typeof action> | null> => {
       return await getCacheProvider().getCachedData(
-        createActionQueryKey(resource, action, props),
+        createActionQueryKey(resource, action, props, partition(request[0]).serverSuffix),
         operationId,
       );
     };
 
-    actionMethod.getCachedEntry = async (props: ProcedureInput<TContract, typeof action>) => {
+    actionMethod.getCachedEntry = async (
+      props: ProcedureInput<TContract, typeof action>,
+      ...request: readonly unknown[]
+    ) => {
       return await getCacheProvider().getCachedEntry(
-        createActionQueryKey(resource, action, props),
+        createActionQueryKey(resource, action, props, partition(request[0]).serverSuffix),
         operationId,
       );
     };
@@ -149,11 +200,14 @@ export function createQueryFactory<TContract extends ContractLike>(
       const { staleTime: clientStaleTime = defaultStaleTime } = options;
 
       return {
-        queryKey: [resource, action, { input: props }] as const,
+        queryKey: appendQuerySuffix(
+          [resource, action, { input: props }],
+          partition(options).querySuffix,
+        ),
         queryFn: () =>
           hasCacheProvider()
             ? actionMethod(props, options)
-            : invokeClientProcedure(client, action, props),
+            : invokeClientProcedureWithOptions(client, action, props, options),
         staleTime: clientStaleTime,
       };
     };
@@ -168,7 +222,7 @@ export function createQueryFactory<TContract extends ContractLike>(
       return {
         mutationKey: [resource, action] as const,
         mutationFn: (input: ProcedureInput<TContract, typeof action>) =>
-          invokeClientProcedure(client, action, input),
+          invokeClientProcedureWithOptions(client, action, input, options),
         ...(onSuccess && { onSuccess }),
         ...(onError && { onError }),
         ...(onSettled && { onSettled }),
@@ -182,10 +236,10 @@ export function createQueryFactory<TContract extends ContractLike>(
       return props ? [resource, action, { input: props }] as const : [resource, action] as const;
     };
 
-    factory[action] = actionMethod as ActionMethod<TContract, typeof action>;
+    factory[action] = actionMethod;
   }
 
-  return factory as QueryFactory<TContract>;
+  return factory as QueryFactory<TContract, TContext, TKeySuffix>;
 }
 
 /**

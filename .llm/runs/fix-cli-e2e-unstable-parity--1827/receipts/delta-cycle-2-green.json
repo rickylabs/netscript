@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1827",
+  "exitCode": 0,
+  "durationMs": 170365,
+  "summary": {
+    "passed": 4427,
+    "failed": 0,
+    "ignored": 19,
+    "totalResults": 4446,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

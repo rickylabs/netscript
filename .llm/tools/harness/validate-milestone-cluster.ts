@@ -45,6 +45,36 @@ export interface MilestoneClusterArtifacts {
 export interface ValidationResult {
   readonly ok: boolean;
   readonly errors: readonly string[];
+  readonly findings: readonly ReconciliationFinding[];
+}
+
+export type TopicLane = (typeof TOPIC_LANES)[number];
+export type LiveMilestonePrState = 'open' | 'merged' | 'closed';
+export type LiveMilestonePrRole = 'leaf' | 'coordinator-artifact';
+
+export interface LiveMilestonePr {
+  readonly number: number;
+  readonly issueNumbers: readonly number[];
+  readonly lane: TopicLane | null;
+  readonly baseBranch: string;
+  readonly headSha: string;
+  readonly state: LiveMilestonePrState;
+  readonly role: LiveMilestonePrRole;
+}
+
+export interface MilestonePrSource {
+  listOpenMilestonePrs(repo: string, milestone: string): Promise<readonly LiveMilestonePr[]>;
+  readPrHead(repo: string, prNumber: number): Promise<LiveMilestonePr>;
+}
+
+export interface ReconciliationFinding {
+  readonly kind: 'stale-head' | 'missing-leaf' | 'source-unavailable';
+  readonly issueNumber: number | null;
+  readonly prNumber: number | null;
+  readonly lane: TopicLane | null;
+  readonly recordedHead: string | null;
+  readonly liveHead: string | null;
+  readonly detail?: string;
 }
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -77,6 +107,10 @@ function oneOf<T extends readonly string[]>(value: unknown, allowed: T): value i
 
 function issueNumber(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) > 0;
+}
+
+function topicLane(value: unknown): value is TopicLane {
+  return oneOf(value, TOPIC_LANES);
 }
 
 function duplicateValues<T>(values: readonly T[]): T[] {
@@ -452,6 +486,7 @@ function validateState(
     if (!oneOf(leaf.lane, TOPIC_LANES)) errors.push(`leaf ${id} has an invalid lane`);
     if (!oneOf(leaf.phase, LEAF_PHASES)) errors.push(`leaf ${id} has an invalid phase`);
     if (leaf.baseBranch !== 'main') errors.push(`leaf ${id} must target main directly`);
+    if (!issueNumber(leaf.prNumber)) errors.push(`leaf ${id} needs a positive prNumber`);
     if (!nonEmpty(leaf.headSha)) errors.push(`leaf ${id} needs an immutable headSha`);
     if (
       nonEmpty(leaf.implementerAgentId) && nonEmpty(leaf.evaluatorAgentId) &&
@@ -581,15 +616,189 @@ function validateState(
   }
 }
 
+function unavailableMilestonePrSource(detail: string): MilestonePrSource {
+  const unavailable = () => Promise.reject<never>(new Error(detail));
+  return {
+    listOpenMilestonePrs: unavailable,
+    readPrHead: unavailable,
+  };
+}
+
+/** Build the read-only reconciliation port from a freshly captured PR export. */
+export function milestonePrSourceFromExport(value: unknown): MilestonePrSource {
+  if (!isRecord(value) || value.schemaVersion !== 1) {
+    throw new Error('GitHub PR export must be an object with schemaVersion 1');
+  }
+  if (!nonEmpty(value.repo) || !nonEmpty(value.milestone) || !nonEmpty(value.capturedAt)) {
+    throw new Error('GitHub PR export requires repo, milestone, and capturedAt');
+  }
+  const entries = records(value.pullRequests);
+  if (!Array.isArray(value.pullRequests) || entries.length !== value.pullRequests.length) {
+    throw new Error('GitHub PR export pullRequests must contain objects only');
+  }
+  const pullRequests: LiveMilestonePr[] = [];
+  for (const entry of entries) {
+    const issueNumbers = integers(entry.issueNumbers);
+    if (
+      !issueNumber(entry.number) ||
+      !Array.isArray(entry.issueNumbers) || issueNumbers.length !== entry.issueNumbers.length ||
+      !(entry.lane === null || topicLane(entry.lane)) ||
+      !nonEmpty(entry.baseBranch) || !nonEmpty(entry.headSha) ||
+      !oneOf(entry.state, ['open', 'merged', 'closed'] as const) ||
+      !oneOf(entry.role, ['leaf', 'coordinator-artifact'] as const)
+    ) {
+      throw new Error(`GitHub PR export entry #${String(entry.number ?? '?')} is malformed`);
+    }
+    pullRequests.push({
+      number: entry.number,
+      issueNumbers,
+      lane: entry.lane,
+      baseBranch: entry.baseBranch,
+      headSha: entry.headSha,
+      state: entry.state,
+      role: entry.role,
+    });
+  }
+  for (const duplicate of duplicateValues(pullRequests.map((pullRequest) => pullRequest.number))) {
+    throw new Error(`GitHub PR export PR #${duplicate} is duplicated`);
+  }
+
+  const exportRepo = value.repo;
+  const exportMilestone = value.milestone;
+  function requireIdentity(repo: string, milestone?: string): void {
+    if (repo !== exportRepo || (milestone !== undefined && milestone !== exportMilestone)) {
+      throw new Error(
+        `GitHub PR export identity ${exportRepo}/${exportMilestone} does not match ${repo}/${milestone}`,
+      );
+    }
+  }
+  return {
+    listOpenMilestonePrs: (repo, milestone) => {
+      requireIdentity(repo, milestone);
+      return Promise.resolve(
+        pullRequests.filter((pullRequest) => pullRequest.state === 'open'),
+      );
+    },
+    readPrHead: (repo, prNumber) => {
+      requireIdentity(repo);
+      const pullRequest = pullRequests.find((candidate) => candidate.number === prNumber);
+      return pullRequest
+        ? Promise.resolve(pullRequest)
+        : Promise.reject(new Error(`GitHub PR export has no PR #${prNumber}`));
+    },
+  };
+}
+
+function firstIssueNumber(value: unknown): number | null {
+  return integers(value)[0] ?? null;
+}
+
+async function reconcileMilestonePrs(
+  state: JsonRecord,
+  repo: string,
+  milestone: string,
+  source: MilestonePrSource,
+): Promise<ReconciliationFinding[]> {
+  let openPullRequests: readonly LiveMilestonePr[];
+  try {
+    openPullRequests = await source.listOpenMilestonePrs(repo, milestone);
+  } catch (error) {
+    return [{
+      kind: 'source-unavailable',
+      issueNumber: null,
+      prNumber: null,
+      lane: null,
+      recordedHead: null,
+      liveHead: null,
+      detail: error instanceof Error ? error.message : String(error),
+    }];
+  }
+
+  const findings: ReconciliationFinding[] = [];
+  const leaves = records(state.leaves);
+  const leafByPrNumber = new Map<number, JsonRecord>();
+  for (const leaf of leaves) {
+    if (issueNumber(leaf.prNumber)) leafByPrNumber.set(leaf.prNumber, leaf);
+  }
+
+  for (const leaf of leaves) {
+    if (
+      TERMINAL_LEAF_PHASES.has(String(leaf.phase)) || leaf.baseBranch !== 'main' ||
+      !issueNumber(leaf.prNumber)
+    ) {
+      continue;
+    }
+    let livePullRequest: LiveMilestonePr;
+    try {
+      livePullRequest = await source.readPrHead(repo, leaf.prNumber);
+    } catch (error) {
+      findings.push({
+        kind: 'source-unavailable',
+        issueNumber: firstIssueNumber(leaf.issueNumbers),
+        prNumber: leaf.prNumber,
+        lane: topicLane(leaf.lane) ? leaf.lane : null,
+        recordedHead: nonEmpty(leaf.headSha) ? leaf.headSha : null,
+        liveHead: null,
+        detail: error instanceof Error ? error.message : String(error),
+      });
+      continue;
+    }
+    if (
+      livePullRequest.state === 'open' && nonEmpty(leaf.headSha) &&
+      livePullRequest.headSha !== leaf.headSha
+    ) {
+      findings.push({
+        kind: 'stale-head',
+        issueNumber: firstIssueNumber(leaf.issueNumbers),
+        prNumber: leaf.prNumber,
+        lane: topicLane(leaf.lane) ? leaf.lane : null,
+        recordedHead: leaf.headSha,
+        liveHead: livePullRequest.headSha,
+      });
+    }
+  }
+
+  const laneByIssue = new Map<number, TopicLane>();
+  for (const lane of records(state.lanes)) {
+    if (!topicLane(lane.id)) continue;
+    for (const number of integers(lane.issueNumbers)) laneByIssue.set(number, lane.id);
+  }
+  const seenOpenPrNumbers = new Set<number>();
+  for (const pullRequest of openPullRequests) {
+    if (
+      seenOpenPrNumbers.has(pullRequest.number) || pullRequest.state !== 'open' ||
+      pullRequest.baseBranch !== 'main' || pullRequest.role === 'coordinator-artifact'
+    ) {
+      continue;
+    }
+    seenOpenPrNumbers.add(pullRequest.number);
+    if (leafByPrNumber.has(pullRequest.number)) continue;
+    const issue = pullRequest.issueNumbers[0] ?? null;
+    findings.push({
+      kind: 'missing-leaf',
+      issueNumber: issue,
+      prNumber: pullRequest.number,
+      lane: pullRequest.lane ?? (issue === null ? null : laneByIssue.get(issue) ?? null),
+      recordedHead: null,
+      liveHead: pullRequest.headSha,
+    });
+  }
+  return findings;
+}
+
 export async function validateMilestoneCluster(
   artifacts: MilestoneClusterArtifacts,
+  source: MilestonePrSource = unavailableMilestonePrSource(
+    'GitHub PR reconciliation source was not provided',
+  ),
 ): Promise<ValidationResult> {
   const errors: string[] = [];
+  const findings: ReconciliationFinding[] = [];
   if (!isRecord(artifacts.intake)) errors.push('milestone-intake.json must be an object');
   if (!isRecord(artifacts.inventory)) errors.push('milestone-inventory.json must be an object');
   if (!isRecord(artifacts.dag)) errors.push('milestone-dependency-dag.json must be an object');
   if (!isRecord(artifacts.state)) errors.push('milestone-cluster-state.json must be an object');
-  if (errors.length > 0) return { ok: false, errors };
+  if (errors.length > 0) return { ok: false, errors, findings };
 
   const intake = artifacts.intake as JsonRecord;
   const inventory = artifacts.inventory as JsonRecord;
@@ -603,11 +812,25 @@ export async function validateMilestoneCluster(
   validateDag(errors, dag, activeIssues);
   validateState(errors, state, activeIssues);
 
+  if (nonEmpty(intake.repo) && nonEmpty(state.milestone)) {
+    findings.push(...await reconcileMilestonePrs(state, intake.repo, state.milestone, source));
+  } else {
+    findings.push({
+      kind: 'source-unavailable',
+      issueNumber: null,
+      prNumber: null,
+      lane: null,
+      recordedHead: null,
+      liveHead: null,
+      detail: 'cluster artifacts do not provide a repository and milestone for reconciliation',
+    });
+  }
+
   const rendered = await renderMilestoneStatus(state);
   if (artifacts.status !== rendered) {
     errors.push('milestone-status.md is stale; regenerate it from milestone-cluster-state.json');
   }
-  return { ok: errors.length === 0, errors };
+  return { ok: errors.length === 0 && findings.length === 0, errors, findings };
 }
 
 async function readJson(path: string): Promise<unknown> {
@@ -616,42 +839,65 @@ async function readJson(path: string): Promise<unknown> {
 
 export interface ValidateCliArgs {
   readonly runDir?: string;
+  readonly githubPrsPath?: string;
   readonly error?: string;
 }
 
 /** Parse both direct invocation and `deno task ... -- <run-dir>` arguments. */
 export function parseValidateCliArgs(args: readonly string[]): ValidateCliArgs {
-  const positional = args.filter((arg) => arg !== '--');
-  if (positional.some((arg) => arg.startsWith('-'))) {
-    return { error: `unknown option: ${positional.find((arg) => arg.startsWith('-'))}` };
+  let runDir: string | undefined;
+  let githubPrsPath: string | undefined;
+  const values = args.filter((arg) => arg !== '--');
+  for (let index = 0; index < values.length; index++) {
+    const value = values[index];
+    if (value === '--github-prs') {
+      const path = values[++index];
+      if (!path || path.startsWith('-')) return { error: '--github-prs requires a path' };
+      githubPrsPath = path;
+      continue;
+    }
+    if (value.startsWith('-')) return { error: `unknown option: ${value}` };
+    if (runDir !== undefined) return { error: 'expected exactly one run directory' };
+    runDir = value;
   }
-  if (positional.length !== 1) {
-    return {
-      error: positional.length === 0
-        ? 'missing run directory'
-        : 'expected exactly one run directory',
-    };
-  }
-  return { runDir: positional[0] };
+  return runDir === undefined
+    ? { error: 'missing run directory' }
+    : githubPrsPath === undefined
+    ? { runDir }
+    : { runDir, githubPrsPath };
 }
 
 async function main(): Promise<void> {
   const parsed = parseValidateCliArgs(Deno.args);
   if (!parsed.runDir || parsed.error) {
     if (parsed.error) console.error(`error: ${parsed.error}`);
-    console.error('usage: validate-milestone-cluster.ts <run-dir>');
+    console.error('usage: validate-milestone-cluster.ts <run-dir> [--github-prs <export.json>]');
     Deno.exit(2);
   }
   let result: ValidationResult;
   try {
     const runDir = parsed.runDir;
+    let source = unavailableMilestonePrSource(
+      'GitHub PR reconciliation input is unavailable; pass --github-prs <export.json>',
+    );
+    if (parsed.githubPrsPath) {
+      try {
+        source = milestonePrSourceFromExport(await readJson(parsed.githubPrsPath));
+      } catch (error) {
+        source = unavailableMilestonePrSource(
+          `GitHub PR reconciliation input is unavailable: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
     result = await validateMilestoneCluster({
       intake: await readJson(join(runDir, 'milestone-intake.json')),
       inventory: await readJson(join(runDir, 'milestone-inventory.json')),
       dag: await readJson(join(runDir, 'milestone-dependency-dag.json')),
       state: await readJson(join(runDir, 'milestone-cluster-state.json')),
       status: await Deno.readTextFile(join(runDir, 'milestone-status.md')),
-    });
+    }, source);
   } catch (error) {
     console.error(
       `error: unable to validate milestone cluster: ${

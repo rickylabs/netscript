@@ -36,6 +36,8 @@ export const GATE_CATALOG = {
   'quality-scan': ['deno', 'task', 'quality:scan'],
   'quality-scan-repo': ['deno', 'task', 'quality:scan:repo'],
   'arch-check': ['deno', 'task', 'arch:check'],
+  'exports-drift': ['deno', 'task', 'docs:exports-drift'],
+  'mcp-export-corpus': ['deno', 'task', 'check:mcp-export-corpus'],
   'allowance-budget': [
     'deno',
     'run',

@@ -1,0 +1,36 @@
+{
+  "gateId": "exports-drift",
+  "invocationId": "1387-final-exports-drift",
+  "argv": [
+    "deno",
+    "task",
+    "docs:exports-drift"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "7e76f68e43e2b45e55ff9f3560ef7e30351853eb",
+  "actualGitHead": "7e76f68e43e2b45e55ff9f3560ef7e30351853eb",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1264804",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "a610f1dc67f5eeaa0f321d11823812e52eb5988b0d09411d90cf22be02f518cf",
+  "lifecycleId": "worker:1264804:1387-final-exports-drift:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T03:37:28.644Z",
+  "startedAt": "2026-08-31T03:37:28.647Z",
+  "finishedAt": "2026-08-31T03:37:31.765Z",
+  "durationMs": 3119,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 5273,
+    "sha256": "851bd558732e1c9ba902d5a8e0b4c5dab54ac3c92f2260d950e27b8597e7610d",
+    "tail": "Coverage [plugin-streams-core]: mode=entrypoints-only; reason=\"The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [aspire]: mode=entrypoints-only; reason=\"The page maps the diagnostics root and eight typed config/composition subpaths while curating their primary APIs rather than every exported contract.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [cli]: mode=entrypoints-only; reason=\"The page guarantees the embeddable root plus scaffolding and testing entrypoints, with selected command and fixture tables rather than every CLI option type.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [watchers]: mode=entrypoints-only; reason=\"The page guarantees the root entrypoint and inventories the supported watcher APIs while deliberately classifying exported strategy implementations as internal.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [runtime-config]: mode=complete; reason=\"The single-entrypoint reference inventories every exported loader, accessor, diagnostic, type, constant, and alias reported by deno doc.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [prisma-adapter-mysql]: mode=entrypoints-only; reason=\"The page guarantees the root entrypoint and inventories primary adapter contracts while omitting the lower-level transaction options contract.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [auth-workos]: mode=entrypoints-only; reason=\"The page guarantees the root entrypoint and inventories WorkOS APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [auth-better-auth]: mode=entrypoints-only; reason=\"The page guarantees the root entrypoint and inventories Better Auth APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [cron]: mode=complete; reason=\"The page inventories every exported symbol across the root, ports, adapters, and testing entrypoints.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [database]: mode=entrypoints-only; reason=\"The page guarantees all ten driver, extension, script, tracing, and testing entrypoints while its tables focus on primary contracts and runners.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [fresh-ui]: mode=complete; reason=\"All six published entrypoints are maintained as one complete reference surface.\"; omitted-symbol-groups=0; documented-non-export-groups=1\nCoverage [kv]: mode=entrypoints-only; reason=\"The page guarantees the root, Redis, kvdex, and testing entrypoints while summarizing kvdex compatibility re-exports in prose instead of a complete symbol table.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [logger]: mode=entrypoints-only; reason=\"The page guarantees the core, Hono middleware, and oRPC entrypoints, but inventories selected root primitives rather than both integration symbol surfaces.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [plugin]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [plugin-ai-core]: mode=entrypoints-only; reason=\"The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [config]: mode=complete; reason=\"The config reference is maintained as a complete published-symbol inventory.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [contracts]: mode=complete; reason=\"The contracts reference is maintained as a complete published-symbol inventory.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [queue]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [sdk]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [service]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [telemetry]: mode=complete; reason=\"The telemetry reference curates stable entrypoints and primary APIs while classifying lower-level contracts explicitly.\"; omitted-symbol-groups=1; documented-non-export-groups=0\nExports & Symbols drift check: PASS\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 138,
+    "sha256": "9fcce8efc66180e216e7803987a0a1d3137b88765bf0452e4ee836c59cc19ad3",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdocs:exports-drift\u001b[0m deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts\n",
+    "truncated": false
+  }
+}

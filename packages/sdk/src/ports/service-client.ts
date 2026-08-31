@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { ValidateSdkClientContributions } from './sdk-client-contribution.ts';
+
 /**
  * Minimal structural representation of a standard-schema-compatible type.
  */
@@ -165,17 +167,34 @@ export interface ServiceClientContext {
 /**
  * Optional second argument passed to service-client methods.
  */
-export interface ServiceRequestOptions {
+export interface ServiceRequestOptions<
+  TContext extends object = ServiceClientContext,
+> {
   /** Per-request service client context. */
-  context?: ServiceClientContext;
+  readonly context?: TContext;
 }
+
+/** @internal Required keys used to select the request-options tuple shape. */
+export type RequiredKeys<TContext extends object> = {
+  [K in keyof TContext]-?: Record<never, never> extends Pick<TContext, K> ? never : K;
+}[keyof TContext];
+
+/** Optional or required request-options tuple based on the client context. */
+export type ServiceRequestRest<TContext extends object = ServiceClientContext> =
+  RequiredKeys<TContext> extends never ? [options?: ServiceRequestOptions<TContext>]
+    : [options: { readonly context: TContext }];
 
 /**
  * Typed service-client method derived from a contract procedure.
  */
-export type ServiceClientMethod<TInput, TOutput, TError = Error> = (
+export type ServiceClientMethod<
+  TInput,
+  TOutput,
+  TError = Error,
+  TContext extends object = ServiceClientContext,
+> = (
   input: TInput,
-  options?: ServiceRequestOptions,
+  ...request: ServiceRequestRest<TContext>
 ) => Promise<TOutput> & { __error?: { type: TError } };
 
 /**
@@ -189,8 +208,10 @@ export interface ServiceClientContract<TContract extends ContractLike> {
 /**
  * Recursive callable/router shape for a typed service client.
  */
-export type ServiceClientShape<TContract extends ContractLike> = TContract extends
-  ContractProcedureLike ? ServiceClientMethod<
+export type ServiceClientShape<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+> = TContract extends ContractProcedureLike ? ServiceClientMethod<
     ProcedureInputFromNode<TContract>,
     ProcedureOutputFromNode<TContract>,
     TContract extends {
@@ -213,17 +234,23 @@ export type ServiceClientShape<TContract extends ContractLike> = TContract exten
             : never;
         }[keyof TErrorMap]
         | Error
-      : Error
+      : Error,
+    TContext
   >
   : {
-    [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceClient<TContract[K]> : never;
+    [K in keyof TContract]: TContract[K] extends ContractLike
+      ? ServiceClient<TContract[K], TContext>
+      : never;
   };
 
 /**
  * Typed service client derived from a contract router.
  */
-export type ServiceClient<TContract extends ContractLike> =
-  & ServiceClientShape<TContract>
+export type ServiceClient<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+> =
+  & ServiceClientShape<TContract, TContext>
   & ServiceClientContract<TContract>;
 
 /**
@@ -231,7 +258,10 @@ export type ServiceClient<TContract extends ContractLike> =
  *
  * @typeParam TContract - Contract used by the service.
  */
-export interface CreateServiceClientOptions<TContract extends ContractLike> {
+export interface CreateServiceClientOptions<
+  TContract extends ContractLike,
+  TContributions extends readonly object[] = readonly [],
+> {
   /** Contract definition used for client typing and HTTP method inference. */
   contract: TContract;
   /** Service name registered in Aspire / NetScript config. */
@@ -244,10 +274,24 @@ export interface CreateServiceClientOptions<TContract extends ContractLike> {
   apiPath?: string;
   /** API version segment. */
   apiVersion?: string;
-  /** Reserved override for explicit port selection. */
+  /**
+   * Reserved override for explicit port selection.
+   *
+   * @deprecated Migrate explicit service addressing to discovery configuration; #1351 owns the
+   * transport disposition.
+   */
   port?: number;
-  /** Reserved request timeout in milliseconds. */
+  /**
+   * Reserved request timeout in milliseconds.
+   *
+   * @deprecated Use an `AbortSignal` for request cancellation; #1351 owns the transport
+   * disposition.
+   */
   timeout?: number;
   /** Whether to propagate trace context headers automatically. */
   propagateTraceContext?: boolean;
+  /** Explicit literal tuple of typed SDK client contributions. */
+  contributions?:
+    & TContributions
+    & ValidateSdkClientContributions<TContributions>;
 }
