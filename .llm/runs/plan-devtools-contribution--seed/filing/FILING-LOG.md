@@ -22,7 +22,7 @@
 
 | Draft | Slice | Live | Milestone | Action |
 | --- | --- | --- | --- | --- |
-| DT-RFC | — | **#1468** | `0.0.6` | NEW — RFC 0005 tracking issue |
+| DT-RFC | — | **#1468** | `0.0.6` | NEW — RFC 0005 tracking issue. **Closed by the owner as `DUPLICATE`** at 2026-08-11T20:36:06Z, ~9 min after filing. Left closed — an owner disposition, not a filing error. The RFC's tracking role therefore sits on **#400** |
 | DT-1 | W0-a | **#1469** | `0.0.15` | NEW — disposable probe |
 | DT-2 | W0-b | **#1470** | `0.0.15` | NEW — disposable probe |
 | DT-3 | W1-a | **#1471** | `0.0.15` | NEW — **successor to #412** |
@@ -72,6 +72,11 @@ unowned in the interval.
 - **Supersede:** #412, #424 · **Fold:** #427, #734 · **Close-later:** #507
 - **Re-baseline (AMEND):** #414, #415, #420, #423, #426, #428, #429, #430, #431, #551
 - **Epic:** #400 body rewrite + the `CR-DDX-HOSTAGNOSTIC` resolution
+- **PR #780:** close-later + salvage precondition — `DESIGN-LANGUAGE.md` and `DS-UPLIFT-BACKLOG.md`
+  named by exact branch path for the **#509** lane; `HOME-SPEC.md` / `ROLLOUT-DOCTRINE.md`
+  explicitly *not* salvaged (they encode the per-screen-bespoke doctrine §11.3.3 contradicts).
+  **#509 itself was not edited** — it is on the KEEP list, and moving files into its lane is that
+  lane's call.
 - **Cross-post:** **#929** — the *single* authorized #922-adjacent touch, reporting the `.strict()`
   defect that #890 contract C8's "older CLIs ignore the block" claim rests on. Informational; it
   changes no label, milestone, or scope.
