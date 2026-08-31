@@ -7602,3 +7602,60 @@ real repair, both on a **disposable test-owned sender root**, never the producti
 Audited head recorded as `de24161b`; `main` is now `8f1fcb2b`. The author takes **one** final-freeze
 integration of whatever `main` is when ready and re-verifies both ceilings across it. **Do not merge**
 is carried through explicitly.
+
+## D-176 — #1832 cycle-2 repair verified; #1750 complete and verified; both under IMPL-EVAL
+
+`main` `8f1fcb2b`; canary 5 green pair recorded as final.
+
+### #1832 — both `FAIL_IMPL` findings repaired, and the "fifth lock" question answered
+
+Verified independently at `af2abed22` rather than reading the report:
+
+| Check | Result |
+| --- | --- |
+| `deno task --cwd packages/fresh-ui check` (F1) | **`REAL_EXIT=0`** |
+| `packages/fresh-ui/deno.lock` pre-bump matches | **0** |
+| `docs/architecture/zod-dependency-boundary.md` (F2) | updated |
+| `TanStack usage:` tests | **`REAL_EXIT=0`, 3 passed / 0 failed** |
+| #1829's three test blocks vs `f59874abd` | **byte-identical, all three** |
+
+**Swept every tracked `deno.lock`, which is what I demanded of the author.** The three *product* locks
+are clean (root, `docs/site`, `packages/fresh-ui`). One file still carries six pre-bump matches:
+`.llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.lock`.
+
+**Judgement: correctly left alone.** It is a frozen historical evidence fixture, not a workspace
+member — the root `deno.json` workspace has 5 members and none is under `.llm/`. Bumping it would
+**corrupt recorded evidence** rather than fix a dependency. This is the case where the mechanical rule
+("no pre-bump pins anywhere") gives the wrong answer, so I handed the judgement to the evaluator as a
+claim to falsify rather than a finding to inherit.
+
+Cycle-2 IMPL-EVAL dispatched at the exact head, scoped to the delta only, with cycle 1's passing
+conclusions explicitly out of re-litigation. A repo-wide `deno task test` is running under my
+supervision so the evaluator does not duplicate it.
+
+### #1750 — the survey vindicated the brief
+
+The leaf surveyed **32 tasks / 26 strict parsers and found 21 rejecting a leading `--`**. Requiring a
+survey as the first deliverable was the right call: fixing only the hybrid launcher the issue named
+would have left **twenty** broken entry points, and I would have kept hitting them. It built a shared
+normalizer with an exact-one-leading contract rather than patching sites individually.
+
+**Verified end-to-end myself, on the exact defect that cost this session time twice:**
+
+| Command | Exit | Meaning |
+| --- | ---: | --- |
+| `deno task agentic:codex-resume -- --help` | **0** | the documented form finally works |
+| `deno task agentic:codex-resume -- --bogus-flag` | **2** | unknown later argument still fail-closed |
+| direct script with a **non-leading** `--` | **2** | non-leading separator still rejected |
+
+So the contract holds in both directions — the fix did not degrade into "ignore tokens we do not
+recognise", which was the specific risk I named in the brief.
+
+IMPL-EVAL dispatched. Its brief makes the **survey denominator** the first question and requires the
+evaluator to derive 32/26/21 independently rather than read it from the worklog — a survey that
+silently misses an entry point reproduces the defect in the sites it skipped, and creates false
+confidence while doing so. It is also told not to launch a real Remote Control supervisor for the
+acceptance line, and to say so if it judges tests plus `--dry-run` insufficient.
+
+Two evaluators run concurrently (#1832-c2 and #1750) on disjoint surfaces; neither runs the expensive
+repo-wide gate, so they do not contend.
