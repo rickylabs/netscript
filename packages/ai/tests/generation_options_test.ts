@@ -10,7 +10,7 @@
  * @module
  */
 
-import { assertEquals, assertThrows } from '@std/assert';
+import { assert, assertEquals, assertThrows } from '@std/assert';
 
 import type { GenerationOptions, ReasoningEffort } from '../src/contracts/generation.ts';
 import type { ChatClientEvent } from '../src/ports/chat-client.ts';
@@ -19,7 +19,10 @@ import {
   anthropicGenerationModelOptions,
   validateAnthropicModelOptions,
 } from '../src/adapters/anthropic.adapter.ts';
-import { openAiCompatibleGenerationModelOptions } from '../src/adapters/openai-compatible.adapter.ts';
+import {
+  openAiCompatibleGenerationModelOptions,
+  openAiResponsesGenerationModelOptions,
+} from '../src/adapters/openai-compatible.adapter.ts';
 import {
   openRouterGenerationModelOptions,
   openRouterReasoningModelOptions,
@@ -81,6 +84,28 @@ Deno.test('openai-compatible: off omits reasoning_effort (no disable value on th
     { max_tokens: 64 },
   );
   assertEquals(openAiCompatibleGenerationModelOptions({}), undefined);
+});
+
+// --- OpenAI Responses mapping -----------------------------------------------
+
+Deno.test('openai-responses: effort tier maps to nested reasoning.effort', () => {
+  assertEquals(openAiResponsesGenerationModelOptions({ reasoningEffort: 'high' }), {
+    reasoning: { effort: 'high' },
+  });
+  assertEquals(openAiResponsesGenerationModelOptions({ reasoningEffort: 'low' }), {
+    reasoning: { effort: 'low' },
+  });
+});
+
+Deno.test('openai-responses: off omits reasoning; max tokens maps to max_output_tokens', () => {
+  const offWithLimit = openAiResponsesGenerationModelOptions({
+    reasoningEffort: 'off',
+    maxOutputTokens: 64,
+  });
+  assert(offWithLimit !== undefined);
+  assert(!Object.hasOwn(offWithLimit, 'reasoning'));
+  assertEquals(offWithLimit, { max_output_tokens: 64 });
+  assertEquals(openAiResponsesGenerationModelOptions({}), undefined);
 });
 
 // --- OpenRouter mapping ------------------------------------------------------
