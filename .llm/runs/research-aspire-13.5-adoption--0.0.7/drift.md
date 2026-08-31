@@ -5174,3 +5174,34 @@
        fixes lane was waiting for is met.
   - Recorded the remaining dependency order on the epic: S8 (repair in flight) → S9/S10 → S11
     (converge) → S13 (parity box 2 verifies only once S9 is on `main`).
+
+- **D-218 — #1835 promoted at its EXACT evaluated head; no rebase, no strip. The mirror caught a real
+  duplicate-evidence defect that would have failed the close-gate.**
+  - **Head preserved: `b7d0a60ac`** — the exact head carrying the GLM `PASS`. No rebase for ancestry;
+    GitHub reports `MERGEABLE` against current `main` `8f1fcb2bc`, so none is warranted.
+  - **On "strip non-publishable `.llm/runs` artifacts" — I checked, and there is nothing to strip.**
+    - **No secrets**: scanned the 17-file run dir for `sk-`/`ghp_`/`api_key`/`password=`/`token=`
+      patterns — zero hits.
+    - **Absolute paths are established repo convention, not a leak**: 11 of the files mention
+      `/home/agent/...`, but `origin/main` publishes **229** entries under `.llm/runs`, of which
+      **1380 files** contain `/home/(agent|node|codex)/` paths. Stripping this slice's would make it
+      the outlier, not the norm.
+    - Decisive on its own: **stripping would necessarily rewrite the head** and destroy the exact-head
+      GLM PASS the coordinator directed me to preserve. The two instructions only reconcile because
+      there is nothing non-publishable present.
+  - **The acceptance mirror dry-run FAILED first, and the cause was mine.** The PR **body already
+    carried a complete author-written `acceptance-evidence` block**, and I had added a second one in a
+    comment. The mirror reported every box as **duplicate evidence**, plus one unmatched box.
+    - Second, independent defect in the body block: box 2's text was
+      `build-windows-prebuild.ts injects…` while the issue's box reads
+      `` `build-windows-prebuild.ts` injects… `` — **missing backticks**, so exact-text matching failed.
+    - Fixed both: restored the backticks in the body block, and removed the duplicate block from my
+      comment (leaving a note explaining why). Re-ran: **`acceptance-mirror DRY-RUN: #1833`, clean.**
+    - **Running the dry-run before promotion is what caught this.** Both defects would have failed the
+      close-gate on a `status:ready-merge` PR and stalled the first post-canary-5 merge.
+  - Body metadata corrected: `Phase: impl complete; awaiting supervisor-dispatched IMPL-EVAL` →
+    **impl-eval complete, PASS at `b7d0a60ac`**, and the "do not merge until IMPL-EVAL completes" line
+    replaced with an accurate statement of why `impl-eval:skip` is applied.
+  - `impl-eval:skip` applied **before** the ready flip so it could not auto-dispatch a redundant
+    evaluation; promoted to **ready** + **`status:ready-merge`** (single status). Fresh CI running on
+    the current-main merge ref (`check-test`, `quality` in progress).
