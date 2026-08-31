@@ -11,6 +11,12 @@ import type { ServiceProtocol } from './service-url.ts';
  */
 export type BrowserEnvironment = Record<string, unknown> | undefined;
 
+// Contract source: packages/aspire/src/application/build-vite-env-var-name.ts.
+// The cross-package discovery test pins this exact identifier-segment rule.
+function normalizeViteIdentifierSegment(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_]/g, '_');
+}
+
 /**
  * Build the Aspire-compatible browser environment key for a service endpoint.
  */
@@ -19,7 +25,8 @@ export function createBrowserServiceEnvKey(
   protocol: ServiceProtocol = 'http',
   index = 0,
 ): string {
-  return `VITE_services__${serviceName}__${protocol}__${index}`;
+  const normalizedServiceName = normalizeViteIdentifierSegment(serviceName);
+  return `VITE_services__${normalizedServiceName}__${protocol}__${index}`;
 }
 
 /**
