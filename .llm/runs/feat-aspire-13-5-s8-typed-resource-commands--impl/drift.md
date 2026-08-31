@@ -82,3 +82,18 @@ unrelated import correction. The complete 13-commit reconstructed branch rebased
 cleanly. Final combined CLI/E2E check passed 904 files with zero diagnostics, and the full focused
 set including suite registry passed 98/98. The transient red remains recorded as command-history
 evidence without broadening this behavior-preserving reconstruction.
+
+## D-09 — D-210 base convergence is byte-preserving
+
+The coordinator replaced the superseded D-205 seed diagnostic with exact-base convergence onto
+`origin/main` `6c195acaf`. The 13-commit replay was conflict-free, every range-diff mapping is `=`,
+and every one of the 20 non-generated product blobs changed by S8 is identical between old and new
+heads. The asset generator produced no delta. Therefore no seed repair, listener resolution, or
+other product decision was made in this run.
+
+The structured lint/fmt wrappers initially and correctly refused partial coverage because the
+workspace configuration excludes `packages/cli/`; pointing at the nested E2E member still inherited
+that exclusion. A temporary standalone config under ignored `.llm/tmp/` copied the repository lint
+rules and format settings without the path exclusion, after which both wrappers processed 19/19
+changed TypeScript files with zero findings. The two exit-2 coverage refusals remain evidence, not
+product failures.

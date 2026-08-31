@@ -44,3 +44,21 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   was corrected by the later `origin/main`; S8 made no repair for it.
 - No runtime or evaluator rerun occurred. The evidence-only final head was pushed with a fresh
   exact-SHA force-with-lease and read back from the remote branch.
+
+## D-210 convergence state
+
+- Owner authorized convergence, not repair: exact replay target is
+  `origin/main` `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`.
+- Old head `bc838a0b3b9ba50f4ed6cf68aa29c9e4892b07f3` contained exactly 13 commits over
+  `8a925764276b25ef7cef484db273604f44557cef`.
+- Rebase completed with no conflicts. Rebased product/evidence head before the D-210 ledger is
+  `0cd04b0438c682915d4d9d0a45db2dd7d7f40c52`.
+- All 13 range-diff mappings are `=`. All 20 non-generated changed `packages/` blobs are identical
+  old-to-new; zero product blobs changed. Asset regeneration produced no delta.
+- Combined CLI/E2E check passed 905 files; exact changed-file lint/fmt passed 19/19 after the
+  fail-closed workspace-exclusion attempts; focused tests passed 98/98; Aspire parity reported
+  checked 812 / fail 0; `quality:gate` exited 0.
+- PLAN-EVAL is N/A for the owner-specified mechanical replay. No evaluator was self-dispatched.
+  The supervisor decides whether the byte-identity evidence carries the existing IMPL-EVAL.
+- No runtime, Aspire, Docker, AppHost, E2E runtime suite, product repair, S9/S10 operation, or safety
+  tag movement occurred.
