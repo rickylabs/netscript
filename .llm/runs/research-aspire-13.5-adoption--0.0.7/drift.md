@@ -5251,3 +5251,34 @@
     as ready.
   - Sequencing respected: #1837 waits for #1835 to land, then gets its CLEAN re-verification against
     post-#1835 main, mirror dry-run, promotion, and a recut merge-ref CI.
+
+- **D-221 — #1835 SHIPPED (main `60ae56af0`). #1837 promoted and mirror-clean. S8's seed cause found;
+  delta eval dispatched.**
+  - **#1837 released:** `MERGEABLE`/`CLEAN` against main `60ae56af0` at `6ef9306ef`; body corrected
+    (stale "IMPL-EVAL pending" / "do not merge" lines replaced with the PASS at `01d32c95f` and the
+    12/12 blob-identity carry); `impl-eval:skip` applied **before** the ready flip; promoted to
+    **ready** + **`status:ready-merge`**; acceptance-mirror dry-run **clean** at the stripped head;
+    merge-ref CI recut (`33441258910`).
+  - **S8 found the cause, and the way it handled the missing evidence is the notable part.**
+    - **It refused to invent the Prisma code.** D-216 asked for `code`/`meta` from the artifacts; the
+      agent verified **both digest-checked report ZIPs and both job logs** and found the typed-command
+      detail terminates after three actionable lines at `Invalid prisma.user.findFirst() invocation:`
+      — D-07 deliberately bounded retained stderr to three lines, so the fields are **genuinely
+      absent and unrecoverable from those runs**. It recorded that literally and **declined to
+      relabel the failure `P2021`/`P2022`/`P1001`/`P2002` without bytes.** That is exactly right; a
+      guessed code would have sent the repair somewhere plausible and wrong.
+    - **Cause identified from the code path instead:** the typed `<db>-cli` callback **replaced
+      Aspire's late-bound resource injection with a static AppHost configuration lookup**, so the
+      typed `seed` command resolved a connection that is not the live resource's — while
+      `init`/`migrate`/`generate`, which do not go through that callback, resolved correctly. That is
+      precisely the "seed executes against a different connection" mechanism D-216 named as most
+      testable, and it explains the containment evidence exactly.
+    - Repair `f29a0b265` restores resource-expression resolution: `generate-db-cli-mode.ts` /
+      `-1.ts.template`, `generate-register-infrastructure*.ts`, regenerated `embedded.generated.ts`,
+      plus **+21** and **+16** lines of regression tests.
+  - **Bounded delta IMPL-EVAL dispatched** on `d1c6d8b54..f29a0b265` only — the prior PASS already
+    carried to `d1c6d8b54` on blob identity. The brief requires rendering the **emitted** output
+    before/after (a correct-looking generator diff can still emit wrong source — this programme has
+    already shipped one such head), mutation proof that the two new test files go red without the
+    repair, a check that `embedded.generated.ts` is a faithful regeneration rather than a hand edit,
+    and an explicit judgement on whether the repair is justified **without** the Prisma code.
