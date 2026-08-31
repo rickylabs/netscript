@@ -2239,3 +2239,13 @@ continues concurrently because serial ordering is per orchestrator, not global.
   real S7 runtime run before dependency-ordered canary-6 merges. There is no owner-only wait.
 - Local host runtime inventories were re-proved after the release: `aspire ps` is empty and DinD has
   zero containers. The production proof ran in hosted Actions and did not consume the host lease.
+
+## Resume delta — 2026-08-31T19:01:14Z
+
+- Current main is `9fbc2317291dbd33c325782bb33d86a99ee5a027` after Docs PR #1816 shipped from
+  immutable head `b32c0ffbec8de37012f669b6368c0c0992d79b6a`, closing #1815. Exact current-head
+  CI passed 4,506/0/14, evaluation carried by six-product-blob identity, acceptance/reviews/lifecycle
+  were complete, and all seven non-publishable operational run artifacts were removed before merge.
+- Docs is now converging #1818 on the cumulative #1816 corpus. Aspire prepares #1835 then #1837 while
+  S8 and confirmed Garnet blocker #1844 repair in parallel; Features, Fixes, and Internals retain their
+  independent active queues. No owner decision is pending.

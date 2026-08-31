@@ -3498,3 +3498,15 @@
   resumed #1452/#1590/#1592/#1451/#1664, Fixes continues #1773/#1093/#1609/#1845, Internals adopted
   #1802, Docs serializes #1816 then #1818, and Aspire runs S8 repair plus a genuine S7 runtime proof.
   No topic supervisor is parked on an owner-only decision.
+
+## 2026-08-31T19:01:14Z — #1816 ships and releases the final docs-corpus successor
+
+- Final coordinator audit found seven NAS-prohibited `.llm/runs/**` artifacts on #1816. Docs removed
+  them in one bounded commit while all six evaluated docs/tooling/corpus blobs remained byte-identical.
+  The carried full and delta IMPL-EVAL PASS receipts therefore remained valid.
+- Exact head `b32c0ffbec8de37012f669b6368c0c0992d79b6a` was CLEAN against canary-5 main,
+  had zero review threads, complete DoD and #1815 acceptance, unchanged lockfile, docs/quality gates
+  green, and core CI green with 4,506 passed, zero failed, and 14 ignored tests.
+- The coordinator squash-merged #1816 as `9fbc2317291dbd33c325782bb33d86a99ee5a027`, closing
+  #1815. Both are normalized to `status:shipped`; Docs immediately began #1818 convergence on the
+  cumulative workers+sagas+publisher corpus rather than parking at the merge checkpoint.
