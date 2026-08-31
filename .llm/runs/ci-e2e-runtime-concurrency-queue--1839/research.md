@@ -27,3 +27,11 @@
 - Closed: use the native bounded queue rather than a polling or redispatch mechanism.
 - Evidence pending: run a no-op scratch workflow from at least three throwaway branches and derive
   non-overlap from recorded job timestamps. Do not invoke either real runtime tier.
+
+## Out-of-scope concurrency scan
+
+A read-only scan found the same default one-pending shape (`cancel-in-progress: false` without
+`queue`) in `e2e-cli-prod-local.yml`, `e2e-cli-prod.yml`, `pages.yml`, `release-canary.yml`, and
+`openhands-phase-eval.yml`. Their grouping and desired supersession policies differ, so none was
+changed here; they need separate owner triage before being called defects. `openhands-agent.yml`
+also uses the shape but explicitly documents newest-pending-wins as intentional behavior.

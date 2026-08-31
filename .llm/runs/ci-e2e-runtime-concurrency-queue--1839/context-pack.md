@@ -6,14 +6,16 @@
 | ----- | ----- |
 | Run ID | `ci-e2e-runtime-concurrency-queue--1839` |
 | Branch | `ci/e2e-runtime-concurrency-queue` |
-| Current phase | `plan` |
+| Current phase | `gate` / owner evaluation handoff |
 | Archetype | N/A — CI workflow infrastructure |
 | Scope overlays | none |
 
 ## Current State
 
-Baseline and issue facts are re-derived. GitHub's native `queue: max` is the locked mechanism; no
-workflow implementation has been made yet. PLAN-EVAL is N/A for this complete mechanical contract.
+The workflow implementation and live no-op simulation are complete. Both runtime groups retain
+their global mutex and now use `queue: max`; the header documents bounded pending admission and
+head-stable re-entry. Three simulation runs succeeded serially with zero overlap and no head change.
+The validated workflow content is remote as `e74f8bdc6`; the evidence commit is rebased above it.
 
 ## Completed
 
@@ -21,18 +23,21 @@ workflow implementation has been made yet. PLAN-EVAL is N/A for this complete me
 - Verified exact base/branch and unchanged `deno.lock`.
 - Read issue #1839 and current `e2e-cli.yml` concurrency blocks.
 - Selected the native bounded queue and designed a no-op timestamp simulation.
+- Opened draft PR #1846 with `Closes #1839`, milestone 0.0.7, and final `status:impl` taxonomy.
+- Added/documented `queue: max` on both runtime-tier job groups.
+- Simulated three arrivals within 2 seconds: one ran while two were simultaneously pending; all
+  three later succeeded with non-overlapping job timestamps.
+- Proved each deferred run kept its triggering head SHA and entered without another push.
 
 ## In Progress
 
-- Commit/push harness bootstrap and open the required draft PR.
+- Explicit-refspec evidence push and PR evidence update.
 
 ## Next Steps
 
-1. Add `queue: max` to both runtime groups and document the queue policy.
-2. Run focused static checks.
-3. Execute at least three no-op simulation runs and capture timestamps/conclusions/head SHAs.
-4. Update run artifacts and PR evidence; commit/push by explicit refspec.
-5. Stop at the draft `status:impl` handoff without ready-for-review or IMPL-EVAL.
+1. Commit and push by explicit refspec.
+2. Update PR #1846's body and post the IMPL phase evidence comment.
+3. Stop at the draft `status:impl` handoff without ready-for-review or IMPL-EVAL.
 
 ## Key Decisions
 
@@ -46,19 +51,20 @@ workflow implementation has been made yet. PLAN-EVAL is N/A for this complete me
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/ci-e2e-runtime-concurrency-queue--1839/**` | new | Harness identity, research, plan, and evidence ledger. |
+| `.github/workflows/e2e-cli.yml` | changed | Header policy and two native bounded queue settings. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | planned | focused workflow/YAML validation |
+| Static | PASS | diff, queue/header, scope, and lock assertions exited 0 |
 | Fitness | N/A | workflow-only |
-| Runtime | planned simulation | no real runtime execution |
-| Consumer | planned | GitHub job timestamps and conclusions |
+| Runtime | PASS simulation | three no-op successes, zero overlap; no real runtime execution |
+| Consumer | PASS | live GitHub queue and immutable-head evidence |
 
 ## Open Questions
 
-- None blocking implementation.
+- None. Owner evaluation/review is intentionally pending.
 
 ## Drift and Debt
 
