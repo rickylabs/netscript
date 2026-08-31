@@ -163,82 +163,51 @@ failures and cannot replace their missing per-check split. The `1.1.1`/`1.1.10` 
 demonstrated cause of #1844. This issue should not bump to 2.x or align versions without a
 Docker-less failure/compatibility proof; Aspire 13.5.3 itself defaults to the 1.0 image line.
 
-## Maintained RESP client and runtime-boundary investigation
+## RESP client investigation — superseded by minimal-probe evidence
 
-The current Node compatibility helper is not a Redis client. It opens `node:net`, writes inline
-`PING\r\n`, installs one `data` callback, and accepts only a first chunk beginning `+PONG`. It does
-not accumulate a complete RESP frame, encode an array command, or negotiate RESP3. `NOAUTH` maps to
-`Degraded`, a state that can never satisfy `aspire wait --status healthy`. These are reliability
-defects, but none identifies the #1844 root cause until the named-check split exists.
+The current Node compatibility helper opens `node:net`, writes inline `PING\r\n`, installs one
+`data` callback, and accepts only a first chunk beginning `+PONG`. It does not accumulate a complete
+RESP frame or encode an array command. `NOAUTH` maps to `Degraded`, a state that can never satisfy
+`aspire wait --status healthy`. The single-chunk assumption is an independent correctness defect:
+TCP may deliver `+PO` and `NG\r\n` separately, while the current callback classifies the first chunk
+as `EPROTO`. This does not by itself identify which check failed in the historical hosted runs.
 
-### Runtime boundary
+### Runtime boundary and rejected dependency
 
-| Surface                        | Runtime/evidence                                                                                       | Library conclusion                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| Generated `_aspire-compat.mts` | Node AppHost by design; imports `node:net`, `node:path`, `node:fs`, and `node:child_process` under D-7 | Use a maintained npm Node client. Do not force `@db/redis` into this surface.           |
-| `listener-fault-controller.ts` | Deno `TcpListener` server                                                                              | `@db/redis` is usable by Deno but is a client, so it cannot replace the fixture server. |
-| Future Aspire 13.6/S12 state   | first-party Deno hosting is expected to retire the D-7 copy                                            | Re-evaluate convergence on the JSR client then; it is follow-up scope, not this repair. |
+The generated `_aspire-compat.mts` is intentionally Node-compatible under D-7 and already uses
+`node:net`. `@db/redis` 0.41.2 is Deno-only and is also a client, not a replacement for the Deno
+fixture server. Aspire 13.6/S12 may later remove the D-7 runtime boundary, but runtime convergence
+does not justify a full application client for a one-command liveness probe.
 
-JSR's package page and native `deno info` both resolve `@db/redis` 0.41.2. JSR marks Deno as
-supported and Node/Bun/browser support unknown; its graph uses Deno streams and `Deno.connect`-style
-runtime APIs. That is sufficient to exclude it from today's Node AppHost even though it is the
-natural future Deno-side client.
+Earlier research measured `redis` 6.2.1 at 7.65 MB, `@redis/client` 6.2.1 at 5.94 MB, and `ioredis`
+6.0.0 at 1.44 MB. Those measurements are retained as negative evidence; no dependency is selected.
+The supervisor directly tested `@redis/client` 6.2.1 and observed RESP3 `HELLO` plus connect-time
+`CLIENT SETINFO`; a minimal responder returned `ERR unknown command`, and forcing RESP2 still hung.
+A full client therefore adds handshake failure modes to a check that asks only whether the endpoint
+speaks RESP now.
 
-### Node-client dependency surface
-
-Native Deno inspection was used for graph size/API evidence; the inspection-added lock entries were
-removed immediately and the original lock hash was restored. The repository dependency tool reports
-`ioredis` `^5.11.1` is already used directly at ten source sites and that stable `6.0.0` is
-available.
-
-| Candidate          | Resolved stable inspected 2026-08-31 | Measured graph             | Relevant behavior                                                                                                                                                         | Disposition                                                                                 |
-| ------------------ | ------------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `redis`            | 6.2.1                                | 7 unique packages, 7.65 MB | Official node-redis client; RESP3 configurable; umbrella also installs Bloom/JSON/Search/TimeSeries modules unused by a PING check                                        | Maintained but unnecessarily broad.                                                         |
-| `@redis/client`    | 6.2.1                                | 2 unique packages, 5.94 MB | node-redis core without module packages                                                                                                                                   | Smaller package count, but still much larger on disk and a new client family for this repo. |
-| `ioredis` current  | 6.0.0                                | 7 unique packages, 1.44 MB | Defaults to RESP3, sends `HELLO 3`, and its source explicitly downgrades to RESP2 only for protocol-negotiation rejection; provides connect, command, and socket timeouts | Preferred candidate if product scope is selected.                                           |
-| `ioredis` repo pin | 5.11.1                               | 8 unique packages, 1.01 MB | Existing workspace client family and smallest measured graph, but RESP2-only and one major behind stable                                                                  | Useful compatibility reference, not the new AppHost pin.                                    |
-
-The generated `aspire/package.json` is already an isolated Node package containing runtime and dev
-dependencies. Aspire's TypeScript AppHost documentation confirms that the AppHost-root package
-manager installs that package before TypeScript validation/startup. A static import in the always-
-compiled compatibility helper therefore requires one AppHost dependency. Adding exact `ioredis`
-6.0.0 there would add 1.44 MB/7 packages to every generated AppHost, including no-cache scaffolds.
-That is a measurable but acceptable tooling-only cost compared with the 7.65 MB `redis` umbrella;
-avoiding it would require conditional template topology or a deliberately opaque dynamic import,
-which is more complexity than the dependency it saves.
-
-The one-shot health configuration must override client defaults: `lazyConnect: true`,
-`retryStrategy: null`, `maxRetriesPerRequest: 0`, `enableOfflineQueue: false`,
-`enableReadyCheck: false`, `disableClientInfo: true`, and 2000 ms connect/command/socket timeouts.
-It must install an error listener, call `connect()` then `ping()`, and disconnect in `finally`. This
-keeps protocol parsing/fragmentation/HELLO in maintained code while retaining the existing
-health-result policy and two-second observation bound.
+The locked remedy keeps the narrow `node:net` transport and sends exactly `*1\r\n$4\r\nPING\r\n`. It
+makes one attempt per Aspire health evaluation with one 2000 ms deadline covering connect and read.
+Aspire already repeats the callback, so internal retries would multiply latency and introduce
+timing-dependent verdicts. The probe accumulates at most 256 bytes through the first CRLF, accepts
+only exact `+PONG`, and makes every other result `Unhealthy`; overflow is `EPROTO`. Each failure
+includes host, port, elapsed milliseconds, failure class, and the first 64 received bytes with
+deterministic escaping and an explicit truncation marker.
 
 ### Authentication reachability
 
-`NOAUTH` is not reachable in the checked-in managed E2E/default path:
-
-- `CacheEntry` exposes `Engine`, `Mode`, `ImageTag`, `Port`, `DataPath`, and `ToolVersion`, but no
-  username/password/auth option.
-- The container arm supplies only image, endpoint, and optional bind mount. The executable arm runs
-  `garnet-server --port 6379`; neither supplies `--auth` or `--password`.
-- External mode registers a connection string and does not attach `createRespPingCheck`.
-- Garnet's official security documentation says `NoAuth` is the default and auth requires explicit
-  `--auth Password --password ...` configuration. Existing hosted passes corroborate the default.
-
-Therefore `NOAUTH` did not cause the two observed failures. It remains a concrete correctness bug in
-the check: if a future/custom managed image requires auth, returning `Degraded` creates a permanent
-aggregate wait. The repair must return `Unhealthy`, retain the server error/code/host/port, and fail
-loudly rather than treating unauthenticated reachability as readiness.
+`NOAUTH` is not reachable in the checked-in managed E2E/default path: the cache schema exposes no
+auth input, neither managed arm supplies auth flags, external mode has no RESP check, and Garnet's
+default is `NoAuth`. It therefore does not explain the two observed failures. It is still a concrete
+correctness bug: returning `Degraded` creates a permanent aggregate wait. The repaired probe must
+return `Unhealthy` with `NOAUTH` named and preserve endpoint/elapsed/received-byte evidence.
 
 ### Synthetic listener consequence
 
-The Deno controller currently replies `+PONG` after any chunk containing a newline; it does not
-parse a command or wait for a complete frame. `@db/redis` cannot improve that server role. If the
-maintained Node client becomes the AppHost probe, the fixture must accumulate frames and implement
-only the client's bounded handshake contract: RESP-array `HELLO 3` with a valid map response and
-RESP-array `PING` with `+PONG`, plus deterministic close/error behavior. Focused tests should split
-frames across writes so the fixture and probe cannot regress to TCP-chunk assumptions.
+The Deno controller currently replies `+PONG` after a chunk containing a newline. It already has
+enough vocabulary for the minimal PING probe and remains outside the locked ceiling unless hosted
+evidence proves otherwise. The probe's in-process tests, not a new client on either side, must prove
+split-response behavior and every failure classification.
 
 ## Reliability requirement exposed by the timeout
 
@@ -256,31 +225,32 @@ other socket codes and records host/port. The information loss is in the E2E ver
 aggregate health before it reads `healthReports`, and its parser currently drops report `data` and
 exception detail. A reliable verifier must poll the described resource/report, preserve the full
 named map, classify the four states explicitly, and terminate a stable unreachable/unpublished
-condition on the existing 30-second readiness-fixture observation deadline rather than waiting
-silently for the 300-second outer ceiling. The outer ceiling remains unchanged as a fail-safe.
+condition on a 30-second Garnet deadline rather than waiting silently for the 300-second aggregate
+wall. Terminal `NOAUTH` or protocol errors may fail immediately; startup-transient absence, refusal,
+or timeout may be observed until the deadline.
 
 ## Findings
 
-| #  | Finding                                                                                                                                                                                                                                                                                       | How to verify                                                                                                                        |
-| -- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 1  | `runtime.wait.garnet` resolves the real key `garnet_resp` with a 300-second budget.                                                                                                                                                                                                           | `listener-readiness-gates.ts`: `listenerReadinessExpectation()`; focused test baseline.                                              |
-| 2  | The gate waits for aggregate resource health before reading any named report. A timeout skips the later `describe`, so current failure evidence cannot split the two checks.                                                                                                                  | `verify-listener-readiness.ts`: `verifyListenerReadiness()` and `runAspire()`.                                                       |
-| 3  | The readiness fixture attaches `test_only_garnet_resp` to the same `garnet` resource after the real `garnet_resp` attachment marker.                                                                                                                                                          | `prepare-readiness-fixture.ts`: `injectListenerFaultHealthChecks()`; focused splice test.                                            |
-| 4  | The real Garnet callback resolves its host and port from `garnet.getEndpoint('tcp')` inside every health invocation.                                                                                                                                                                          | `generate-register-infrastructure.ts`: `appendRespReadinessLines()`.                                                                 |
-| 5  | The synthetic Garnet callback instead uses fixed `localhost:18999`; the synthetic Postgres TCP callback uses `localhost:18998`.                                                                                                                                                               | `prepare-readiness-fixture.ts`; `listener-fault-controller.ts`.                                                                      |
-| 6  | The controller implementation accepts RESP and returns `+PONG\r\n`; this rules out only the controller's protocol vocabulary, not hosted reachability or startup.                                                                                                                             | `listener-fault-controller.ts`; existing controller focused test. Per brief, this is already ruled out and is not re-diagnosed here. |
-| 7  | The nested `packages/cli/e2e` workspace is an Archetype-6-owned harness, not a separately published doctrine unit. `packages/cli` currently has doctrine verdict **Keep**.                                                                                                                    | doctrine files 06, 09, and 10; `ARCHETYPE-6-cli-tooling.md`.                                                                         |
-| 8  | `runtime/` already has 12 immediate children. Existing debt `scaffold-runtime-a8-f16-1333` forbids adding a thirteenth; the diagnostic must edit the existing `verify-listener-readiness.ts` rather than add a probe file.                                                                    | direct-child measurement; `.llm/harness/debt/arch-debt.md`.                                                                          |
-| 9  | PR #1773 is live at head `bd239f9160e7b65808bd7c4fc8bbd61c91e3dd99` (merge ref `5d846f212099a81fa9420b68f1e58b06adb56451`) and changes seven `packages/cli/e2e/**` paths. It does not directly edit the proposed two diagnostic files, but its declared ownership makes the collision active. | `git ls-remote origin refs/pull/1773/{head,merge}`; base-to-head name diff.                                                          |
-| 10 | The #1740 `entry.Port` hypothesis does not explain the tier asymmetry statically: both failing heads supply the same unpinned Garnet entry, and undefined produces the pre-change endpoint declaration.                                                                                       | failure-head `workspace-mutator.ts`, suite defaults, #1740 parent/commit generator diff, and current generator test fixture.         |
-| 11 | Both failing Postgres runs and the hosted SQLite comparison select the Garnet container arm; version skew cannot explain the tier asymmetry.                                                                                                                                                  | failure artifacts' created-container receipts; #1773 hosted Postgres/SQLite report artifacts; Auto-arm generator.                    |
-| 12 | The two arms are nevertheless pinned inconsistently (`1.1.1` image versus `1.1.10` tool), while upstream is `2.1.5`; this is latent cross-environment risk, not incident causality.                                                                                                           | repo pins; official dotnet searches; Aspire v13.5.3 image-tag source; Garnet package registry.                                       |
-| 13 | The RESP factory already reports code/host/port; the verifier discards those fields and cannot distinguish unpublished, expected-key unhealthy, or sibling-key blocking states.                                                                                                               | `_aspire-compat.ts.template`; `verify-listener-readiness.ts`; Aspire 13.5 describe receipt.                                          |
-| 14 | The AppHost RESP probe is a hand-rolled single-chunk parser using inline PING; it has framing, encoding, negotiation, and `NOAUTH` liveness defects.                                                                                                                                          | `_aspire-compat.ts.template` plus its focused tests.                                                                                 |
-| 15 | `@db/redis` 0.41.2 is Deno-supported but is not an acceptable D-7 Node AppHost dependency, and it is a client rather than a replacement for the Deno fixture server.                                                                                                                          | JSR runtime compatibility, native dependency graph, compatibility-helper runtime header, controller role.                            |
-| 16 | `ioredis` 6.0.0 is the preferred Node candidate: current stable, existing client family, 1.44 MB graph, maintained RESP3 negotiation/fallback. This remains a conditional design, not a causal repair.                                                                                        | `deps:latest`/`deps:why`, native `deno info`, ioredis option/event-handler source and official docs.                                 |
-| 17 | `NOAUTH` is excluded from the checked-in managed paths because no auth option/flag is emitted and Garnet defaults to `NoAuth`; mapping it to `Degraded` is still a future permanent-wait defect.                                                                                              | cache schema, both managed generator arms, external arm, official Garnet security docs.                                              |
-| 18 | A static maintained-client import fits the isolated generated AppHost package, but necessarily adds its dependency to every compiled AppHost helper graph unless template topology is made conditional.                                                                                       | `render-ts-apphost.ts`, `tsconfig.apphost.json` include pattern, Aspire TypeScript AppHost package-manager docs.                     |
+| #  | Finding                                                                                                                                                                                                                                               | How to verify                                                                                                                        |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1  | `runtime.wait.garnet` resolves the real key `garnet_resp` with a 300-second budget.                                                                                                                                                                   | `listener-readiness-gates.ts`: `listenerReadinessExpectation()`; focused test baseline.                                              |
+| 2  | The gate waits for aggregate resource health before reading any named report. A timeout skips the later `describe`, so current failure evidence cannot split the two checks.                                                                          | `verify-listener-readiness.ts`: `verifyListenerReadiness()` and `runAspire()`.                                                       |
+| 3  | The readiness fixture attaches `test_only_garnet_resp` to the same `garnet` resource after the real `garnet_resp` attachment marker.                                                                                                                  | `prepare-readiness-fixture.ts`: `injectListenerFaultHealthChecks()`; focused splice test.                                            |
+| 4  | The real Garnet callback resolves its host and port from `garnet.getEndpoint('tcp')` inside every health invocation.                                                                                                                                  | `generate-register-infrastructure.ts`: `appendRespReadinessLines()`.                                                                 |
+| 5  | The synthetic Garnet callback instead uses fixed `localhost:18999`; the synthetic Postgres TCP callback uses `localhost:18998`.                                                                                                                       | `prepare-readiness-fixture.ts`; `listener-fault-controller.ts`.                                                                      |
+| 6  | The controller implementation accepts RESP and returns `+PONG\r\n`; this rules out only the controller's protocol vocabulary, not hosted reachability or startup.                                                                                     | `listener-fault-controller.ts`; existing controller focused test. Per brief, this is already ruled out and is not re-diagnosed here. |
+| 7  | The nested `packages/cli/e2e` workspace is an Archetype-6-owned harness, not a separately published doctrine unit. `packages/cli` currently has doctrine verdict **Keep**.                                                                            | doctrine files 06, 09, and 10; `ARCHETYPE-6-cli-tooling.md`.                                                                         |
+| 8  | `runtime/` already has 12 immediate children. Existing debt `scaffold-runtime-a8-f16-1333` forbids adding a thirteenth; the diagnostic must edit the existing `verify-listener-readiness.ts` rather than add a probe file.                            | direct-child measurement; `.llm/harness/debt/arch-debt.md`.                                                                          |
+| 9  | PR #1773 is live at head `bd239f9160e7b65808bd7c4fc8bbd61c91e3dd99` (merge ref `5d846f212099a81fa9420b68f1e58b06adb56451`) and changes seven `packages/cli/e2e/**` paths. Its declared ownership blocks the gate half of the six-path repair ceiling. | `git ls-remote origin refs/pull/1773/{head,merge}`; base-to-head name diff.                                                          |
+| 10 | The #1740 `entry.Port` hypothesis does not explain the tier asymmetry statically: both failing heads supply the same unpinned Garnet entry, and undefined produces the pre-change endpoint declaration.                                               | failure-head `workspace-mutator.ts`, suite defaults, #1740 parent/commit generator diff, and current generator test fixture.         |
+| 11 | Both failing Postgres runs and the hosted SQLite comparison select the Garnet container arm; version skew cannot explain the tier asymmetry.                                                                                                          | failure artifacts' created-container receipts; #1773 hosted Postgres/SQLite report artifacts; Auto-arm generator.                    |
+| 12 | The two arms are nevertheless pinned inconsistently (`1.1.1` image versus `1.1.10` tool), while upstream is `2.1.5`; this is latent cross-environment risk, not incident causality.                                                                   | repo pins; official dotnet searches; Aspire v13.5.3 image-tag source; Garnet package registry.                                       |
+| 13 | The RESP factory already reports code/host/port; the verifier discards those fields and cannot distinguish unpublished, expected-key unhealthy, or sibling-key blocking states.                                                                       | `_aspire-compat.ts.template`; `verify-listener-readiness.ts`; Aspire 13.5 describe receipt.                                          |
+| 14 | The AppHost RESP probe uses inline PING and a single-chunk parser; split TCP delivery can deterministically turn a valid `+PONG` into `EPROTO`.                                                                                                       | `_aspire-compat.ts.template`; required split `+PO` / `NG\r\n` in-process regression test.                                            |
+| 15 | `@db/redis` 0.41.2 is Deno-supported but is not an acceptable D-7 Node AppHost dependency, and it is a client rather than a replacement for the Deno fixture server.                                                                                  | JSR runtime compatibility, native dependency graph, compatibility-helper runtime header, controller role.                            |
+| 16 | A full Redis client is rejected for this probe: `@redis/client` adds `HELLO`/`CLIENT SETINFO`, failed against the supervisor's minimal responder, and forcing RESP2 still hung.                                                                       | Supervisor's direct client experiment; dependency/source research above.                                                             |
+| 17 | `NOAUTH` is excluded from the checked-in managed paths because no auth option/flag is emitted and Garnet defaults to `NoAuth`; mapping it to `Degraded` is still a future permanent-wait defect.                                                      | cache schema, both managed generator arms, external arm, official Garnet security docs.                                              |
+| 18 | The reliable probe requires no new dependency: one RESP2 array PING, bounded CRLF accumulation, exact `+PONG`, and deterministic diagnostic bytes are sufficient.                                                                                     | Locked design plus six required in-process listener cases.                                                                           |
 
 ## Baselines measured at the base commit
 
@@ -296,6 +266,7 @@ scaffold, `e2e:cli`, or generated runtime command was run.
 | Diagnostic-path lint           | PASS            | Structured lint wrapper selected/processed the same 2 files; 0 findings/refusals.                                                                           |
 | Diagnostic-path format         | PASS            | Structured format wrapper selected/processed the same 2 files; 0 findings/refusals.                                                                         |
 | Focused readiness/splice tests | PASS            | Structured test wrapper: 8 passed, 0 failed across `listener-readiness-gates_test.ts` and `prepare-readiness-fixture_test.ts`.                              |
+| Focused probe tests            | PASS            | Probe template/test paths are byte-identical to base; structured wrapper passed 8/8. Baseline still expects `NOAUTH` Degraded and lacks split-reply proof.  |
 | Lock hygiene                   | PASS            | `deno.lock` SHA-256 `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical to base.                                             |
 
 ## JSR-audit surface scan
@@ -309,7 +280,8 @@ scaffold, `e2e:cli`, or generated runtime command was run.
 ## Open questions
 
 1. Which report is unhealthy at failure: `garnet_resp`, `test_only_garnet_resp`, or both? This is
-   safe to defer through S1 but **must be resolved before any repair**.
+   safe to defer through the mandatory probe/gate repair but **must be resolved before claiming
+   historical causality or adding evidence-selected causal scope**.
 2. If the test-only check is unhealthy, is the controller resource running and is `localhost:18999`
    reachable from the AppHost process at the check time?
 3. If the real check is unhealthy, what host/port/data did the callback report, and does it match
@@ -321,8 +293,5 @@ scaffold, `e2e:cli`, or generated runtime command was run.
 6. After the split, does the stable failure remain unchanged for the existing 30-second fixture
    observation window? That measurement selects a fail-fast terminal rule without shortening
    transient healthy startup.
-7. If the real product path is selected, does `ioredis` 6.0.0 negotiate and PING the pinned Garnet
-   1.1.1 image in the hosted Postgres tier? Static protocol support is not a substitute for this
-   compatibility proof.
-8. Which exact frames does the selected client emit against the synthetic listener after its bounded
-   options are applied? Capture this in focused controller tests before the hosted run.
+7. After the reliable probe lands, does hosted `describe` preserve its code, endpoint, elapsed time,
+   and received-byte evidence in the published health report?
