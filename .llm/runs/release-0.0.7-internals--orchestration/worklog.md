@@ -6439,3 +6439,25 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   evidence. Recording it as a standing repo condition worth a separate bounded fix.
 - **#1802 Slice 7** (final integration/docs) dispatched and running; its own main integration is
   queued for after it lands, at the documented shared-seam point.
+
+## D-140 — #1753 IMPL-EVAL dispatched on the now-sanctioned GLM route (no guard patch needed)
+
+- Verified the GLM preset is genuinely live on `main` before dispatching:
+  `OPENROUTER_MODEL_IDS.implEvaluator = 'z-ai/glm-5.3-flash'` and
+  `claude-evaluator-glm-5-3-flash` registered in `provider-profiles.ts`. **No evaluator-only guard
+  patch required this time** — the workaround disclosed in D-120/D-123 is now obsolete because
+  #1792 landed the routing properly. Cleaner evidence chain as a result.
+- Evaluator worktree `007-eval-1753` detached at the integrated head `c3b3b4cb6`, clean.
+- Brief instructs the evaluator to **re-derive rather than inherit** my measurements, and names two
+  things specifically:
+  - The **RED→GREEN test-file change** I investigated and cleared (D-136) is handed over as a
+    question, not a conclusion — with my reasoning stated and an explicit instruction that if any
+    assertion was actually weakened, that is blocking and my judgement was wrong. An evaluator that
+    simply accepts the supervisor's clearance adds nothing.
+  - The **pre-existing `extract-verdict.ts` fmt finding** is disclosed up front with proof it
+    reproduces on clean `main`, so it is not scored against this PR — and so the evaluator does not
+    waste a cycle rediscovering it.
+- Also directed at the substantive risk: whether the reconciler can still return ok on a stale head
+  or missing leaf, particularly whether a GitHub-source error or empty response **fails open** —
+  which would reproduce the original defect in a new form.
+- Dispatched and confirmed genuinely running (real session-init events, no guard denial).
