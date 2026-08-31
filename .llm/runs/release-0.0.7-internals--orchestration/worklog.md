@@ -6525,3 +6525,33 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   correction lands and RED→GREEN is re-established; #1802 independently at its own freeze.
 - #1827 author still mid-turn (29s quiet); the oracle correction remains queued and will deliver at
   turn-end. Not forcing it — a rival send would fork the thread.
+
+## D-144 — #1827 oracle corrected by author; supervisor then caught a FALSE RED before GREEN
+
+- The queued oracle correction landed (in-flight `codex-resume` pid `1422493` completed as I was
+  stopping its now-stale watcher — verified it was a real send to thread `01a055f7`, not an orphan).
+  Author rebuilt history correctly: RED is now `fb5425984` reading `../../deno.json`
+  (= `packages/cli/deno.json`, the canonical oracle), config restored to pre-fix `["deno.ns","dom"]`,
+  and the invalid GREEN `bbed08071` dropped from the branch.
+- **Then verified the corrected RED rather than accepting it, and it was NOT red**: focused test at
+  that head returned `REAL_EXIT=0`, 1 passed / 0 failed. A parity test passing while the gap exists
+  is worthless as evidence.
+- **Root cause found — a working-tree/commit split**:
+  - commit `fb5425984` has e2e lib `["deno.ns","dom"]` (correct for RED)
+  - the **working tree** already had it edited to `["deno.ns","deno.unstable","dom"]`
+    (`git status` shows ` M packages/cli/e2e/deno.json`)
+  - the test reads from disk, so it saw the already-fixed tree and passed.
+  The RED receipt would have been an artifact of an uncommitted edit. This is the same
+  false-green class as the pipeline-exit-code and loosened-test cases caught earlier — different
+  mechanism, identical consequence.
+- **Correction queued with the concrete proof**, requiring: stash the config path so the tree matches
+  the RED commit, re-run and confirm a genuine `rc=1` with the missing-`deno.unstable` diff, only
+  then apply the fix and commit GREEN; force-**with-lease** push the rebuilt history (remote holds
+  the invalid `bbed08071`); **rewrite** the misleading PR/plan/research statements rather than append
+  a contradictory update; integrate `a3e0a5aa8` at final freeze with the four `check:` corpora
+  variants; run the cold isolated-`DENO_DIR` check; and supply the #1762 initiating-root proof.
+- **No IMPL-EVAL will be dispatched until corrected receipts exist** — evaluating against a false
+  RED would launder the defect.
+- Also noted: my `pkill -f "1827-correction.txt"` matched my own shell (exit 144) — the self-match
+  hazard again. It achieved the goal, but a `/proc/<pid>/cmdline`-anchored kill would have been the
+  correct instrument.
