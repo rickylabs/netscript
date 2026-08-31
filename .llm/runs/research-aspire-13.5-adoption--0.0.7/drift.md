@@ -5582,3 +5582,38 @@
       remaining one.
   - S8 now carries **three independently evaluated bounded deltas** on top of a carried base PASS:
     seed connection (`f29a0b265`), stderr bound (`bbf866d59`), compile fix (`a2b227941`).
+
+- **D-231 — the D-224 stderr bound paid for itself immediately: `getValue()` COMPILES but is NOT a
+  runtime capability. Repair redirected to the injection mechanism.**
+  - **Run `33447847678` at `a2b227941`, two results:**
+    1. **`generated.quality-negative` is FIXED** — the suite advanced `passed=27` → **`passed=41`** and
+       reached `database.seed` for the first time in this programme. The compile repair worked.
+    2. **`database.seed` still fails**, with a completely different and decisive error:
+       ```
+       Failed to execute command 'seed' on resource 'postgres-cli':
+         Unknown capability: Aspire.Hosting.ApplicationModel/getValue
+       ```
+  - **This error was only readable because of D-224.** The old 3-line cap ended at
+    `Invalid prisma.user.findFirst() invocation:` and would have truncated this line exactly as it
+    truncated the Prisma `code`/`meta`. Raising the bound turned an opaque exit-16 into a named cause
+    within one cycle — the clearest possible justification for that change.
+  - **Both attempted mechanisms are now dead ends, for *different* reasons**, which is the insight:
+    - `getValueAsync()` — **does not type-check** (TS2339; it exists on `EndpointReference`, not
+      `ReferenceExpression`);
+    - `getValue()` — **type-checks but is not a supported runtime capability** in the command-callback
+      context.
+    So the problem is not a method name. **In-callback connection-string resolution is not a supported
+    operation here at all**, and the brief says so explicitly to stop a third name being tried.
+  - **Redirected to the proven mechanism:** the pre-typed working form injected the value at
+    graph-construction time — `.withEnvironment('DATABASE_URL', target.resource)` with
+    `.withReference(...)`/`.waitFor(...)` — letting Aspire resolve and hand the child an env var. That
+    path is *still in use today* by `init`/`migrate`/`generate`, which pass on every run while `seed`
+    fails. The task is to restore it for the typed commands while keeping S8's typed surface.
+  - If a genuinely supported in-callback capability exists, the agent may use it — but must **prove it
+    is runtime-supported, not merely compiling**. That exact distinction has now cost this branch two
+    cycles, and the brief names it.
+  - **Required new coverage targets this class**: assert the emitted command path uses environment
+    injection rather than an in-callback capability call, so a regression to in-callback resolution
+    fails **statically** instead of at gate 40 of a runtime suite.
+  - Preserved by instruction: D-224 stderr bounds, D-227 emitted-compile static coverage, and the
+    External/SQLite modes where `getConnectionString(...)` and the file URL remain correct.
