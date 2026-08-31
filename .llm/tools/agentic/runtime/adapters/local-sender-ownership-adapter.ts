@@ -8,6 +8,23 @@ import {
 export class LocalSenderOwnershipAdapter {
   constructor(private readonly directory: string) {}
 
+  private async withMutationLock<T>(worktree: string, operation: () => Promise<T>): Promise<T> {
+    await Deno.mkdir(this.directory, { recursive: true, mode: 0o700 });
+    const lock = await Deno.open(`${await this.pathFor(worktree)}.lock`, {
+      create: true,
+      read: true,
+      write: true,
+      mode: 0o600,
+    });
+    await lock.lock(true);
+    try {
+      return await operation();
+    } finally {
+      await lock.unlock();
+      lock.close();
+    }
+  }
+
   async pathFor(worktree: string): Promise<string> {
     const bytes = new TextEncoder().encode(worktree);
     const digest = await crypto.subtle.digest('SHA-256', bytes);
@@ -27,38 +44,48 @@ export class LocalSenderOwnershipAdapter {
   }
 
   async create(record: SenderOwnershipRecord): Promise<boolean> {
-    await Deno.mkdir(this.directory, { recursive: true, mode: 0o700 });
-    try {
-      const file = await Deno.open(await this.pathFor(record.worktree), {
-        createNew: true,
-        write: true,
-        mode: 0o600,
-      });
+    return await this.withMutationLock(record.worktree, async () => {
       try {
-        await file.write(new TextEncoder().encode(`${JSON.stringify(record)}\n`));
-      } finally {
-        file.close();
+        const file = await Deno.open(await this.pathFor(record.worktree), {
+          createNew: true,
+          write: true,
+          mode: 0o600,
+        });
+        try {
+          await file.write(new TextEncoder().encode(`${JSON.stringify(record)}\n`));
+        } finally {
+          file.close();
+        }
+        return true;
+      } catch (error) {
+        if (error instanceof Deno.errors.AlreadyExists) return false;
+        throw error;
       }
-      return true;
-    } catch (error) {
-      if (error instanceof Deno.errors.AlreadyExists) return false;
-      throw error;
-    }
+    });
   }
 
   async replace(record: SenderOwnershipRecord, leaseToken: string): Promise<void> {
-    const current = await this.read(record.worktree);
-    if (!current || current.leaseToken !== leaseToken) throw new Error('sender lease mismatch');
-    const path = await this.pathFor(record.worktree);
-    const temporary = `${path}.${crypto.randomUUID()}.tmp`;
-    await Deno.writeTextFile(temporary, `${JSON.stringify(record)}\n`, { mode: 0o600 });
-    await Deno.rename(temporary, path);
+    await this.withMutationLock(record.worktree, async () => {
+      const current = await this.read(record.worktree);
+      if (!current || current.leaseToken !== leaseToken) throw new Error('sender lease mismatch');
+      const path = await this.pathFor(record.worktree);
+      const temporary = `${path}.${crypto.randomUUID()}.tmp`;
+      await Deno.writeTextFile(temporary, `${JSON.stringify(record)}\n`, { mode: 0o600 });
+      try {
+        await Deno.rename(temporary, path);
+      } catch (error) {
+        await Deno.remove(temporary).catch(() => undefined);
+        throw error;
+      }
+    });
   }
 
   async release(worktree: string, leaseToken: string): Promise<void> {
-    const current = await this.read(worktree);
-    if (!current || current.leaseToken !== leaseToken) throw new Error('sender lease mismatch');
-    await Deno.remove(await this.pathFor(worktree));
+    await this.withMutationLock(worktree, async () => {
+      const current = await this.read(worktree);
+      if (!current || current.leaseToken !== leaseToken) throw new Error('sender lease mismatch');
+      await Deno.remove(await this.pathFor(worktree));
+    });
   }
 
   isProcessAlive(pid: number): boolean {
