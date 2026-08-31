@@ -163,6 +163,83 @@ failures and cannot replace their missing per-check split. The `1.1.1`/`1.1.10` 
 demonstrated cause of #1844. This issue should not bump to 2.x or align versions without a
 Docker-less failure/compatibility proof; Aspire 13.5.3 itself defaults to the 1.0 image line.
 
+## Maintained RESP client and runtime-boundary investigation
+
+The current Node compatibility helper is not a Redis client. It opens `node:net`, writes inline
+`PING\r\n`, installs one `data` callback, and accepts only a first chunk beginning `+PONG`. It does
+not accumulate a complete RESP frame, encode an array command, or negotiate RESP3. `NOAUTH` maps to
+`Degraded`, a state that can never satisfy `aspire wait --status healthy`. These are reliability
+defects, but none identifies the #1844 root cause until the named-check split exists.
+
+### Runtime boundary
+
+| Surface                        | Runtime/evidence                                                                                       | Library conclusion                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Generated `_aspire-compat.mts` | Node AppHost by design; imports `node:net`, `node:path`, `node:fs`, and `node:child_process` under D-7 | Use a maintained npm Node client. Do not force `@db/redis` into this surface.           |
+| `listener-fault-controller.ts` | Deno `TcpListener` server                                                                              | `@db/redis` is usable by Deno but is a client, so it cannot replace the fixture server. |
+| Future Aspire 13.6/S12 state   | first-party Deno hosting is expected to retire the D-7 copy                                            | Re-evaluate convergence on the JSR client then; it is follow-up scope, not this repair. |
+
+JSR's package page and native `deno info` both resolve `@db/redis` 0.41.2. JSR marks Deno as
+supported and Node/Bun/browser support unknown; its graph uses Deno streams and `Deno.connect`-style
+runtime APIs. That is sufficient to exclude it from today's Node AppHost even though it is the
+natural future Deno-side client.
+
+### Node-client dependency surface
+
+Native Deno inspection was used for graph size/API evidence; the inspection-added lock entries were
+removed immediately and the original lock hash was restored. The repository dependency tool reports
+`ioredis` `^5.11.1` is already used directly at ten source sites and that stable `6.0.0` is
+available.
+
+| Candidate          | Resolved stable inspected 2026-08-31 | Measured graph             | Relevant behavior                                                                                                                                                         | Disposition                                                                                 |
+| ------------------ | ------------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `redis`            | 6.2.1                                | 7 unique packages, 7.65 MB | Official node-redis client; RESP3 configurable; umbrella also installs Bloom/JSON/Search/TimeSeries modules unused by a PING check                                        | Maintained but unnecessarily broad.                                                         |
+| `@redis/client`    | 6.2.1                                | 2 unique packages, 5.94 MB | node-redis core without module packages                                                                                                                                   | Smaller package count, but still much larger on disk and a new client family for this repo. |
+| `ioredis` current  | 6.0.0                                | 7 unique packages, 1.44 MB | Defaults to RESP3, sends `HELLO 3`, and its source explicitly downgrades to RESP2 only for protocol-negotiation rejection; provides connect, command, and socket timeouts | Preferred candidate if product scope is selected.                                           |
+| `ioredis` repo pin | 5.11.1                               | 8 unique packages, 1.01 MB | Existing workspace client family and smallest measured graph, but RESP2-only and one major behind stable                                                                  | Useful compatibility reference, not the new AppHost pin.                                    |
+
+The generated `aspire/package.json` is already an isolated Node package containing runtime and dev
+dependencies. Aspire's TypeScript AppHost documentation confirms that the AppHost-root package
+manager installs that package before TypeScript validation/startup. A static import in the always-
+compiled compatibility helper therefore requires one AppHost dependency. Adding exact `ioredis`
+6.0.0 there would add 1.44 MB/7 packages to every generated AppHost, including no-cache scaffolds.
+That is a measurable but acceptable tooling-only cost compared with the 7.65 MB `redis` umbrella;
+avoiding it would require conditional template topology or a deliberately opaque dynamic import,
+which is more complexity than the dependency it saves.
+
+The one-shot health configuration must override client defaults: `lazyConnect: true`,
+`retryStrategy: null`, `maxRetriesPerRequest: 0`, `enableOfflineQueue: false`,
+`enableReadyCheck: false`, `disableClientInfo: true`, and 2000 ms connect/command/socket timeouts.
+It must install an error listener, call `connect()` then `ping()`, and disconnect in `finally`. This
+keeps protocol parsing/fragmentation/HELLO in maintained code while retaining the existing
+health-result policy and two-second observation bound.
+
+### Authentication reachability
+
+`NOAUTH` is not reachable in the checked-in managed E2E/default path:
+
+- `CacheEntry` exposes `Engine`, `Mode`, `ImageTag`, `Port`, `DataPath`, and `ToolVersion`, but no
+  username/password/auth option.
+- The container arm supplies only image, endpoint, and optional bind mount. The executable arm runs
+  `garnet-server --port 6379`; neither supplies `--auth` or `--password`.
+- External mode registers a connection string and does not attach `createRespPingCheck`.
+- Garnet's official security documentation says `NoAuth` is the default and auth requires explicit
+  `--auth Password --password ...` configuration. Existing hosted passes corroborate the default.
+
+Therefore `NOAUTH` did not cause the two observed failures. It remains a concrete correctness bug in
+the check: if a future/custom managed image requires auth, returning `Degraded` creates a permanent
+aggregate wait. The repair must return `Unhealthy`, retain the server error/code/host/port, and fail
+loudly rather than treating unauthenticated reachability as readiness.
+
+### Synthetic listener consequence
+
+The Deno controller currently replies `+PONG` after any chunk containing a newline; it does not
+parse a command or wait for a complete frame. `@db/redis` cannot improve that server role. If the
+maintained Node client becomes the AppHost probe, the fixture must accumulate frames and implement
+only the client's bounded handshake contract: RESP-array `HELLO 3` with a valid map response and
+RESP-array `PING` with `+PONG`, plus deterministic close/error behavior. Focused tests should split
+frames across writes so the fixture and probe cannot regress to TCP-chunk assumptions.
+
 ## Reliability requirement exposed by the timeout
 
 Irrespective of which key the hosted split implicates, the current verifier has four observable
@@ -199,6 +276,11 @@ silently for the 300-second outer ceiling. The outer ceiling remains unchanged a
 | 11 | Both failing Postgres runs and the hosted SQLite comparison select the Garnet container arm; version skew cannot explain the tier asymmetry.                                                                                                                                                  | failure artifacts' created-container receipts; #1773 hosted Postgres/SQLite report artifacts; Auto-arm generator.                    |
 | 12 | The two arms are nevertheless pinned inconsistently (`1.1.1` image versus `1.1.10` tool), while upstream is `2.1.5`; this is latent cross-environment risk, not incident causality.                                                                                                           | repo pins; official dotnet searches; Aspire v13.5.3 image-tag source; Garnet package registry.                                       |
 | 13 | The RESP factory already reports code/host/port; the verifier discards those fields and cannot distinguish unpublished, expected-key unhealthy, or sibling-key blocking states.                                                                                                               | `_aspire-compat.ts.template`; `verify-listener-readiness.ts`; Aspire 13.5 describe receipt.                                          |
+| 14 | The AppHost RESP probe is a hand-rolled single-chunk parser using inline PING; it has framing, encoding, negotiation, and `NOAUTH` liveness defects.                                                                                                                                          | `_aspire-compat.ts.template` plus its focused tests.                                                                                 |
+| 15 | `@db/redis` 0.41.2 is Deno-supported but is not an acceptable D-7 Node AppHost dependency, and it is a client rather than a replacement for the Deno fixture server.                                                                                                                          | JSR runtime compatibility, native dependency graph, compatibility-helper runtime header, controller role.                            |
+| 16 | `ioredis` 6.0.0 is the preferred Node candidate: current stable, existing client family, 1.44 MB graph, maintained RESP3 negotiation/fallback. This remains a conditional design, not a causal repair.                                                                                        | `deps:latest`/`deps:why`, native `deno info`, ioredis option/event-handler source and official docs.                                 |
+| 17 | `NOAUTH` is excluded from the checked-in managed paths because no auth option/flag is emitted and Garnet defaults to `NoAuth`; mapping it to `Degraded` is still a future permanent-wait defect.                                                                                              | cache schema, both managed generator arms, external arm, official Garnet security docs.                                              |
+| 18 | A static maintained-client import fits the isolated generated AppHost package, but necessarily adds its dependency to every compiled AppHost helper graph unless template topology is made conditional.                                                                                       | `render-ts-apphost.ts`, `tsconfig.apphost.json` include pattern, Aspire TypeScript AppHost package-manager docs.                     |
 
 ## Baselines measured at the base commit
 
@@ -239,3 +321,8 @@ scaffold, `e2e:cli`, or generated runtime command was run.
 6. After the split, does the stable failure remain unchanged for the existing 30-second fixture
    observation window? That measurement selects a fail-fast terminal rule without shortening
    transient healthy startup.
+7. If the real product path is selected, does `ioredis` 6.0.0 negotiate and PING the pinned Garnet
+   1.1.1 image in the hosted Postgres tier? Static protocol support is not a substitute for this
+   compatibility proof.
+8. Which exact frames does the selected client emit against the synthetic listener after its bounded
+   options are applied? Capture this in focused controller tests before the hosted run.

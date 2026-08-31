@@ -33,11 +33,17 @@
 - Existing `aspire describe --format Json` subprocess seam for per-check detail.
 - No new application port, network service, file protocol, or dependency.
 
+Conditional post-split product design keeps `createRespPingCheck` as the health-policy seam and
+places a maintained Node `ioredis` client behind it. The client, if unlocked, owns RESP framing,
+HELLO negotiation/fallback, and PING; the callback owns bounded options and the Aspire result.
+
 ### Constants
 
 - `DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS = 300` — locked unchanged.
 - `garnet_resp` and `test_only_garnet_resp` — named evidence keys, locked unchanged.
 - Diagnostic code ceiling — two existing E2E paths; zero product paths.
+- Conditional client candidate — exact `ioredis` 6.0.0 in the isolated generated AppHost package;
+  not added before the split and revised PLAN-EVAL.
 
 ### Locked Path Ceiling
 
@@ -81,6 +87,12 @@ unchanged unpublished or listener-unreachable state gets the existing 30-second 
 window before failing; 300 seconds remains the unchanged outer fail-safe. This design is recorded,
 not implemented: #1773 is still open and PLAN-EVAL remains supervisor-owned.
 
+If the later split selects the real RESP path, the same checkpoint also replaces the raw
+single-chunk probe with a bounded one-shot Node client. `NOAUTH` becomes a named `Unhealthy` result,
+not `Degraded`. The Deno controller remains a fixture server and must speak the selected client's
+HELLO/PING exchange; `@db/redis` is client-only and is deferred with the Aspire 13.6/S12
+convergence.
+
 ### Contributor Path
 
 Start at `verify-listener-readiness.ts`: preserve the failed aggregate wait, capture the matching
@@ -105,46 +117,54 @@ result requires any path outside the locked ceiling, stop and revise the plan.
 | 2026-08-31T20:35Z | S1R   | Version verification     | Official dotnet package/tool searches confirm Aspire 13.5.3 current, Garnet upstream 2.1.5, image pin 1.1.1, tool pin 1.1.10; Aspire v13.5.3 source defaults to image tag 1.0.                                  |
 | 2026-08-31T20:38Z | S1R   | Hosted arm comparison    | Downloaded existing report artifacts only: both failed Postgres runs removed three containers; #1773 hosted SQLite removed one and Postgres three. Both tiers select the 1.1.1 container arm.                   |
 | 2026-08-31T20:40Z | S1R   | Reliability rescope      | Version skew excluded as tier-asymmetry cause and retained as cross-environment risk. Recorded four-state, full-report, 30-second-stability design; no timeout/code/version change.                             |
+| 2026-08-31T21:07Z | S1R2  | Client/runtime research  | Verified the D-7 Node boundary, compared current Node Redis client graphs, selected `ioredis` 6.0.0 conditionally, and excluded `@db/redis` from the AppHost/server roles. No code path was unlocked.           |
+| 2026-08-31T21:08Z | S1R2  | Auth reachability        | Managed cache schema/commands emit no auth; external mode has no RESP check; Garnet defaults to `NoAuth`. `NOAUTH` is non-causal here but its `Degraded` mapping is a permanent-wait defect.                    |
+| 2026-08-31T21:09Z | S1R2  | Lock recovery            | Native dependency inspection added transient resolution entries to `deno.lock`; restored only that known-clean file to HEAD and re-verified the original SHA-256 before artifact edits.                         |
 
 ## Decisions
 
-| Decision                           | Reason                                                                                                                       | Source                                                        |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| No diagnosis in S1                 | Timeout alone cannot select the real versus synthetic check.                                                                 | Leaf brief plus static verifier control flow.                 |
-| Diagnostic before repair           | The two outcomes imply opposite ownership and repair paths.                                                                  | Leaf acceptance contract.                                     |
-| Zero product path ceiling          | Product involvement is unproven; a diagnostic does not need product changes.                                                 | Plan D3/D6 and doctrine boundary.                             |
-| Edit existing verifier only        | Runtime directory is already at 12 immediate children.                                                                       | Debt `scaffold-runtime-a8-f16-1333`; measured tree.           |
-| Keep 300 seconds                   | A larger budget hides an unsatisfied condition and is explicitly forbidden.                                                  | Leaf constraint.                                              |
-| Hosted proof remains authoritative | Local/unit evidence cannot reproduce the Postgres-tier aggregate.                                                            | Leaf proof standard.                                          |
-| #1740 is not a diagnosis           | Its required `entry.Port` tier difference is absent at both failing heads.                                                   | Static tier/config and parent-to-commit generator comparison. |
-| Version skew is not the #1844 fix  | Failed Postgres and passing SQLite/Postgres observations all use image 1.1.1.                                                | Hosted artifact container receipts plus Auto-arm source.      |
-| Preserve version skew as risk      | Docker-less runs use tool 1.1.10 under the same readiness factory.                                                           | Repo pins plus official upstream version searches.            |
-| Fail stable states before 300s     | Existing report data is actionable; 30s is the established fixture transition bound and normal hosted readiness is 1.0-1.8s. | RESP result schema, fixture constants, hosted reports.        |
+| Decision                               | Reason                                                                                                                                   | Source                                                         |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| No diagnosis in S1                     | Timeout alone cannot select the real versus synthetic check.                                                                             | Leaf brief plus static verifier control flow.                  |
+| Diagnostic before repair               | The two outcomes imply opposite ownership and repair paths.                                                                              | Leaf acceptance contract.                                      |
+| Zero product path ceiling              | Product involvement is unproven; a diagnostic does not need product changes.                                                             | Plan D3/D6 and doctrine boundary.                              |
+| Edit existing verifier only            | Runtime directory is already at 12 immediate children.                                                                                   | Debt `scaffold-runtime-a8-f16-1333`; measured tree.            |
+| Keep 300 seconds                       | A larger budget hides an unsatisfied condition and is explicitly forbidden.                                                              | Leaf constraint.                                               |
+| Hosted proof remains authoritative     | Local/unit evidence cannot reproduce the Postgres-tier aggregate.                                                                        | Leaf proof standard.                                           |
+| #1740 is not a diagnosis               | Its required `entry.Port` tier difference is absent at both failing heads.                                                               | Static tier/config and parent-to-commit generator comparison.  |
+| Version skew is not the #1844 fix      | Failed Postgres and passing SQLite/Postgres observations all use image 1.1.1.                                                            | Hosted artifact container receipts plus Auto-arm source.       |
+| Preserve version skew as risk          | Docker-less runs use tool 1.1.10 under the same readiness factory.                                                                       | Repo pins plus official upstream version searches.             |
+| Fail stable states before 300s         | Existing report data is actionable; 30s is the established fixture transition bound and normal hosted readiness is 1.0-1.8s.             | RESP result schema, fixture constants, hosted reports.         |
+| Prefer bounded `ioredis` conditionally | The Node AppHost needs maintained framing/negotiation; current 6.0.0 is 1.44 MB and the repo already standardizes on this client family. | Native dependency inspection and upstream source/docs.         |
+| Keep `@db/redis` out of D-7            | JSR marks only Deno supported, and the Deno controller is a server rather than a client.                                                 | JSR metadata, compatibility header, controller implementation. |
+| Make `NOAUTH` terminal                 | `Degraded` can never satisfy aggregate Healthy; current managed paths cannot emit auth configuration.                                    | Cache schema/generator and Garnet security docs.               |
 
 ## Drift
 
-| Drift                                                                                           | Severity                 | Disposition                                                                                                 |
-| ----------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `rtk` named by repo guidance is not installed on this host.                                     | minor                    | Used focused `rg` and raw Git; no evidence claim depends on filtered output.                                |
-| Broad E2E-root lint cannot produce a verdict because detached fixture catalog resolution fails. | minor baseline           | Recorded as REFUSAL, not PASS/FAIL; focused two-file lint is clean. No source or lock workaround.           |
-| Exact run/job IDs were recovered, but DCP/AppHost logs were runner-local and not uploaded.      | significant evidence gap | Record exact missing paths and require pre-cleanup `describe` plus log upload; still no diagnosis.          |
-| The widened reliability mandate is larger than the S1 diagnostic-only plan.                     | significant rescope      | Updated the same run's Design/plan before code; PLAN-EVAL and a post-split causal ceiling remain mandatory. |
-| PR #1773 remains open although its current hosted runtime checks are green.                     | scheduling blocker       | Treat check success as comparison evidence only; do not overlap its declared E2E ownership.                 |
+| Drift                                                                                           | Severity                      | Disposition                                                                                                 |
+| ----------------------------------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `rtk` named by repo guidance is not installed on this host.                                     | minor                         | Used focused `rg` and raw Git; no evidence claim depends on filtered output.                                |
+| Broad E2E-root lint cannot produce a verdict because detached fixture catalog resolution fails. | minor baseline                | Recorded as REFUSAL, not PASS/FAIL; focused two-file lint is clean. No source or lock workaround.           |
+| Exact run/job IDs were recovered, but DCP/AppHost logs were runner-local and not uploaded.      | significant evidence gap      | Record exact missing paths and require pre-cleanup `describe` plus log upload; still no diagnosis.          |
+| The widened reliability mandate is larger than the S1 diagnostic-only plan.                     | significant rescope           | Updated the same run's Design/plan before code; PLAN-EVAL and a post-split causal ceiling remain mandatory. |
+| PR #1773 remains open although its current hosted runtime checks are green.                     | scheduling blocker            | Treat check success as comparison evidence only; do not overlap its declared E2E ownership.                 |
+| Read-only dependency inspection mutated `deno.lock` resolution entries.                         | recovered tooling side effect | Restored the previously clean lock from HEAD only; final hash is unchanged and no dependency was adopted.   |
 
 ## Gate Results
 
 ### Static Gates
 
-| Gate                    | Command or check                                              | Result           | Notes                                                                                        |
-| ----------------------- | ------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------- |
-| E2E workspace check     | structured check wrapper, root `packages/cli/e2e`, `--ext ts` | PASS             | 185 files, 2 batches, 0 diagnostics.                                                         |
-| E2E workspace format    | structured format wrapper, same root                          | PASS             | 185 selected/processed, 0 findings/refusals.                                                 |
-| E2E workspace lint      | structured lint wrapper, same root                            | REFUSAL (exit 2) | Detached `desktop-native` fixture lacks catalog `zod`; 0 lint findings; no false PASS claim. |
-| Diagnostic-path check   | structured check wrapper on two locked files                  | PASS             | 2 files, 0 diagnostics.                                                                      |
-| Diagnostic-path lint    | structured lint wrapper on two locked files                   | PASS             | 2/2 processed, 0 findings/refusals.                                                          |
-| Diagnostic-path format  | structured format wrapper on two locked files                 | PASS             | 2/2 processed, 0 findings/refusals.                                                          |
-| Rescope artifact format | structured format wrapper on the three run Markdown files     | PASS             | 3/3 processed, 0 findings/refusals.                                                          |
-| Lock hygiene            | base diff plus SHA-256                                        | PASS             | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical.          |
+| Gate                          | Command or check                                              | Result           | Notes                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------- |
+| E2E workspace check           | structured check wrapper, root `packages/cli/e2e`, `--ext ts` | PASS             | 185 files, 2 batches, 0 diagnostics.                                                                      |
+| E2E workspace format          | structured format wrapper, same root                          | PASS             | 185 selected/processed, 0 findings/refusals.                                                              |
+| E2E workspace lint            | structured lint wrapper, same root                            | REFUSAL (exit 2) | Detached `desktop-native` fixture lacks catalog `zod`; 0 lint findings; no false PASS claim.              |
+| Diagnostic-path check         | structured check wrapper on two locked files                  | PASS             | 2 files, 0 diagnostics.                                                                                   |
+| Diagnostic-path lint          | structured lint wrapper on two locked files                   | PASS             | 2/2 processed, 0 findings/refusals.                                                                       |
+| Diagnostic-path format        | structured format wrapper on two locked files                 | PASS             | 2/2 processed, 0 findings/refusals.                                                                       |
+| Rescope artifact format       | structured format wrapper on the three run Markdown files     | PASS             | 3/3 processed, 0 findings/refusals.                                                                       |
+| Lock hygiene                  | base diff plus SHA-256                                        | PASS             | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical.                       |
+| Redis client graph inspection | `deps:latest`, `deps:why`, `deno info`                        | PASS (research)  | `ioredis` 6.0.0: 7/1.44 MB; `redis` 6.2.1: 7/7.65 MB; `@redis/client`: 2/5.94 MB; no lock delta retained. |
 
 ### Version/hosted comparison evidence
 
@@ -196,3 +216,6 @@ started implementation, and has not opened a PR.
 5. Dispatch the canonical hosted Postgres-tier diagnostic only after the two-path instrumentation
    exists; then record both named statuses and stop before repair.
 6. Any product repair requires a revised, separately evaluated plan. Do not increase the timeout.
+7. If the split selects `garnet_resp`, re-lock the generated AppHost package/template/test paths,
+   prove `ioredis` 6.0.0 against Garnet 1.1.1, and make the fixture answer the same HELLO/PING
+   exchange. Do not substitute `@db/redis` into the Node AppHost.

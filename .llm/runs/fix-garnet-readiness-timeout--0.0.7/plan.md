@@ -60,6 +60,11 @@ surface selected by the evidence.
   fail-safe.
 - Re-scope the implicated real-product or test-fixture repair path after the hosted split, then
   complete the hosted proof standard in this lane.
+- If the split reaches the real RESP probe, replace its raw socket protocol implementation with a
+  maintained Node Redis client in the isolated generated AppHost package, and make authentication
+  and protocol failures terminal, named health results.
+- If the split reaches the synthetic fixture, make its Deno listener implement the exact maintained
+  client's negotiation and PING contract before using it as a readiness oracle.
 
 ## Non-Scope
 
@@ -67,6 +72,10 @@ surface selected by the evidence.
 - No repair to the real check or synthetic fixture before the split is observed.
 - No Garnet 2.x bump or 1.x arm-alignment change without a separate Docker-less compatibility
   failure proving that version work belongs to #1844.
+- No `@db/redis` import in the Node AppHost while the D-7 compatibility copy is required; revisit
+  client convergence only with the Aspire 13.6/S12 Deno-hosting adoption.
+- No new hand-rolled AppHost RESP parser unless a measured restore/type-check failure rejects both
+  maintained Node-client candidates.
 - No `packages/cli/src/**`, generated asset, AppHost template, public API, or command change in this
   plan.
 - No local Aspire, Docker, scaffold, `e2e:cli`, container, or runtime-resource operation.
@@ -91,19 +100,24 @@ supervisor sequences them.
 
 ## Locked Decisions
 
-| ID  | Decision                                                                                                                                                     | Rationale                                                                                                                                             |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Capture `aspire describe --format Json` on the failed wait path and report the matching resource's complete `healthReports` map.                             | The aggregate timeout alone cannot distinguish the checks; complete named reports also preserve host/port/error data for follow-up.                   |
-| D2  | Preserve the original wait exit/error and attach the health snapshot as diagnostic context.                                                                  | Diagnostics must not turn an actual timeout into a false success or a different primary failure.                                                      |
-| D3  | Do not hard-code a diagnosis or remove either check.                                                                                                         | The two possible outcomes require opposite repairs.                                                                                                   |
-| D4  | Keep the 300-second budget unchanged.                                                                                                                        | The issue explicitly forbids a blanket increase, which would only hide the unsatisfied check.                                                         |
-| D5  | Add no file and no gate; edit the existing verifier and its existing test module.                                                                            | The runtime directory is at its 12-child ceiling and carries open debt.                                                                               |
-| D6  | Stop code mutation after the hosted split until the implicated repair ceiling is re-locked; retain this dedicated lane.                                      | Product versus fixture ownership cannot be selected safely before per-check evidence, but the widened mandate keeps diagnosis and repair together.    |
-| D7  | Do not treat #1740 as causal from timing alone.                                                                                                              | Both tiers' Garnet entries omit `Port`, so the proposed tier asymmetry is statically absent and the generated endpoint is unchanged for those inputs. |
-| D8  | Model four explicit states: resource absent, health key absent, expected key non-Healthy, and sibling report blocking aggregate health.                      | Those states lead to different ownership and error messages; an aggregate timeout erases the distinction.                                             |
-| D9  | Preserve each report's status, description, data, and exception, and print the blocking key names.                                                           | The RESP factory already exposes code/host/port; reliable evidence must not discard it.                                                               |
-| D10 | A stable unpublished or unreachable observation terminates after the existing 30-second fixture deadline; 300 seconds remains the unchanged outer fail-safe. | Normal hosted Garnet readiness measured 1007-1758 ms, while the existing fault fixture already treats 30 seconds as its transition bound.             |
-| D11 | Do not change Garnet versions in this incident plan.                                                                                                         | Both tiers select the same 1.1.1 container arm; skew is cross-environment risk, not the observed tier-asymmetry cause.                                |
+| ID  | Decision                                                                                                                                                                          | Rationale                                                                                                                                              |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | Capture `aspire describe --format Json` on the failed wait path and report the matching resource's complete `healthReports` map.                                                  | The aggregate timeout alone cannot distinguish the checks; complete named reports also preserve host/port/error data for follow-up.                    |
+| D2  | Preserve the original wait exit/error and attach the health snapshot as diagnostic context.                                                                                       | Diagnostics must not turn an actual timeout into a false success or a different primary failure.                                                       |
+| D3  | Do not hard-code a diagnosis or remove either check.                                                                                                                              | The two possible outcomes require opposite repairs.                                                                                                    |
+| D4  | Keep the 300-second budget unchanged.                                                                                                                                             | The issue explicitly forbids a blanket increase, which would only hide the unsatisfied check.                                                          |
+| D5  | Add no file and no gate; edit the existing verifier and its existing test module.                                                                                                 | The runtime directory is at its 12-child ceiling and carries open debt.                                                                                |
+| D6  | Stop code mutation after the hosted split until the implicated repair ceiling is re-locked; retain this dedicated lane.                                                           | Product versus fixture ownership cannot be selected safely before per-check evidence, but the widened mandate keeps diagnosis and repair together.     |
+| D7  | Do not treat #1740 as causal from timing alone.                                                                                                                                   | Both tiers' Garnet entries omit `Port`, so the proposed tier asymmetry is statically absent and the generated endpoint is unchanged for those inputs.  |
+| D8  | Model four explicit states: resource absent, health key absent, expected key non-Healthy, and sibling report blocking aggregate health.                                           | Those states lead to different ownership and error messages; an aggregate timeout erases the distinction.                                              |
+| D9  | Preserve each report's status, description, data, and exception, and print the blocking key names.                                                                                | The RESP factory already exposes code/host/port; reliable evidence must not discard it.                                                                |
+| D10 | A stable unpublished or unreachable observation terminates after the existing 30-second fixture deadline; 300 seconds remains the unchanged outer fail-safe.                      | Normal hosted Garnet readiness measured 1007-1758 ms, while the existing fault fixture already treats 30 seconds as its transition bound.              |
+| D11 | Do not change Garnet versions in this incident plan.                                                                                                                              | Both tiers select the same 1.1.1 container arm; skew is cross-environment risk, not the observed tier-asymmetry cause.                                 |
+| D12 | Keep the AppHost readiness client Node-native while D-7 is active; do not use `@db/redis` there.                                                                                  | `_aspire-compat.mts` is intentionally executed by Node and JSR marks `@db/redis` supported only on Deno.                                               |
+| D13 | If the real RESP path is implicated, prefer current `ioredis` 6.x over `redis` for the generated AppHost, subject to hosted Garnet 1.1.1 compatibility proof.                     | It is a maintained Node client, is already the repository's Redis-client family, and its measured install graph is 1.44 MB versus 7.65 MB for `redis`. |
+| D14 | Configure the health client as a bounded one-shot: no reconnect, no offline queue, 2-second connect/command/socket limits, explicit error handling, and unconditional disconnect. | A health callback must return one observation; library defaults that retry or queue would recreate the opaque wait at a lower layer.                   |
+| D15 | Treat `NOAUTH` as `Unhealthy`, never `Degraded`, and preserve the server error in health data.                                                                                    | Aggregate `Healthy` can never be satisfied by `Degraded`; auth is absent today, so reaching this path is a configuration/protocol failure.             |
+| D16 | Do not add `@db/redis` to implement the Deno fault controller; it is a client, while the fixture is a server.                                                                     | The controller must parse and answer the selected client's bounded HELLO/PING exchange; a second client dependency cannot supply that server role.     |
 
 ## Open-Decision Sweep
 
@@ -114,6 +128,9 @@ supervisor sequences them.
 | Host/port resolution follow-up | safe to defer until split                                                              | Inspect report `description`/`data` plus controller/DCP logs for the implicated check.                                                                        |
 | #1740 endpoint-port lead       | resolved for static premise; contingent at runtime                                     | No Garnet `Port` differs by tier and unpinned generated output is unchanged. Reopen only if the real check fails with contradictory hosted endpoint evidence. |
 | Garnet version skew            | resolved for this incident; contributory risk only                                     | Hosted Postgres and SQLite use the same 1.1.1 container arm. Do not align/bump without a Docker-less compatibility repro.                                     |
+| Maintained Node client         | preferred conditionally; final lock follows the named split                            | `ioredis` 6.0.0 is the smallest current candidate and manages RESP3 negotiation/fallback; hosted Garnet 1.1.1 proof remains mandatory.                        |
+| `NOAUTH` reachability          | excluded for the checked-in managed paths; retained as a fail-loud contract            | Cache schema/generator expose no auth input, managed commands pass no auth flags, external mode has no RESP check, and Garnet defaults to `NoAuth`.           |
+| Deno controller library        | resolved now                                                                           | `@db/redis` is Deno-compatible but client-only; keep the fixture a bounded server and make its supported handshake explicit.                                  |
 | Timeout budget                 | resolved now                                                                           | No increase.                                                                                                                                                  |
 
 ## Design
@@ -143,6 +160,12 @@ supervisor sequences them.
 - Existing `aspire describe --format Json` subprocess — read-only per-check evidence source.
 - No new port/interface is introduced.
 
+If the split unlocks the product probe, `ioredis` is the external Node adapter behind the existing
+`createRespPingCheck` factory. The factory remains the single health-result policy seam; the client
+owns RESP framing, parsing, HELLO negotiation/fallback, and PING. A fresh client is connected,
+pinged, and disconnected inside each invocation so no mutable connection state crosses Aspire health
+evaluations.
+
 The diagnostic slice retains `aspire wait` and captures `describe` on failure. After the split, the
 reliability slice uses repeated `describe` snapshots as the state source so it can terminate and
 name a stable failure before the aggregate command's opaque wall-clock timeout.
@@ -151,18 +174,22 @@ name a stable failure before the aggregate command's opaque wall-clock timeout.
 
 - Existing `DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS = 300` remains byte-for-byte unchanged.
 - Existing health keys remain `garnet_resp` and `test_only_garnet_resp`.
+- Existing `LISTENER_READINESS_TIMEOUT_MS = 2_000` remains the one-attempt client deadline.
+- Candidate generated AppHost dependency is exact `ioredis` `6.0.0`; it is not added before the
+  split and post-split PLAN-EVAL.
 - The reliability slice reuses the existing fixture values `REPORT_DEADLINE_MS = 30_000` and
   `REPORT_POLL_MS = 1_000` semantically; it does not create a larger timeout.
 
 ## Commit Slices
 
-| # | Slice                                                                                                                      | Proving gate                                                                                                                                                        | Files                                           |
-| - | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| 1 | Record the no-diagnosis S1 research, locked diagnostic plan, measured base gates, collision, and proof standard.           | Artifact review; base static gate table; `deno.lock` byte comparison.                                                                                               | the three run artifacts only                    |
-| 2 | After supervisor sequencing of #1773, preserve per-check health detail on the failed aggregate wait path.                  | Focused structured test/check/lint/fmt; original timeout remains primary and both keys appear in the fixture.                                                       | the two locked E2E paths only                   |
-| 3 | Capture the hosted Postgres-tier split and stop before repair.                                                             | Hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime.json`; per-check snapshot answers the split. | `research.md`, `worklog.md` only                |
-| 4 | After the split and a re-locked ceiling, make the verifier classify and fail stable unpublished/unreachable states loudly. | Focused state-machine/parser tests; normal hosted readiness remains green; a fixture blocker names its key/code/host/port within the 30-second stable deadline.     | two locked E2E paths unless rescope is approved |
-| 5 | Repair the evidence-selected real check or test-only fixture and complete authoritative hosted proof.                      | Postgres hosted pass at fix head plus #1747/#1754 reruns; no bypass, version guess, or timeout increase.                                                            | unknown until split; must be re-locked          |
+| # | Slice                                                                                                                              | Proving gate                                                                                                                                                        | Files                                           |
+| - | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 1 | Record the no-diagnosis S1 research, locked diagnostic plan, measured base gates, collision, and proof standard.                   | Artifact review; base static gate table; `deno.lock` byte comparison.                                                                                               | the three run artifacts only                    |
+| 2 | After supervisor sequencing of #1773, preserve per-check health detail on the failed aggregate wait path.                          | Focused structured test/check/lint/fmt; original timeout remains primary and both keys appear in the fixture.                                                       | the two locked E2E paths only                   |
+| 3 | Capture the hosted Postgres-tier split and stop before repair.                                                                     | Hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime.json`; per-check snapshot answers the split. | `research.md`, `worklog.md` only                |
+| 4 | After the split and a re-locked ceiling, make the verifier classify and fail stable unpublished/unreachable states loudly.         | Focused state-machine/parser tests; normal hosted readiness remains green; a fixture blocker names its key/code/host/port within the 30-second stable deadline.     | two locked E2E paths unless rescope is approved |
+| 5 | Repair the evidence-selected real check or test-only fixture and complete authoritative hosted proof.                              | Postgres hosted pass at fix head plus #1747/#1754 reruns; no bypass, version guess, or timeout increase.                                                            | unknown until split; must be re-locked          |
+| 6 | If the real check is selected, replace raw RESP with the bounded Node client and make the Deno fixture speak that exact handshake. | Focused framing/fragmentation/auth/timeout tests, generated AppHost restore/type-check, then the full hosted proof standard.                                        | candidate paths only; must be re-locked         |
 
 ## Gate Table and Measured Base Baselines
 
