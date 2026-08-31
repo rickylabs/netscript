@@ -3,9 +3,9 @@
 ## Re-baseline
 
 - Carried-in source: issue #1833 and merged #1831 baseline `bd9d463b4`.
-- Re-derived against `origin/main` @ `ee0e626bb945e2d9af58e49bd7bbdf714d0785c3` on 2026-08-31.
-- Current `main` is one harness-only commit ahead of #1831; no files under the owned SDK, Aspire,
-  or CLI deploy-build paths changed. The branch was fast-forward rebased before edits.
+- Re-derived against `origin/main` @ `71d5fb8e079cae74249dd7d314874a3a18e7ab28` on 2026-08-31.
+- Current `main` is two unrelated commits ahead of #1831; no files under the owned SDK, Aspire, or
+  CLI deploy-build paths changed. The final slice is rebased before push.
 
 ## Findings
 
@@ -31,4 +31,3 @@
 ## Open questions
 
 - None. The issue supplies the normalization contract, boundary, corpus, and required gates.
-

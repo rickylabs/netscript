@@ -65,6 +65,10 @@ locked implementation ownership, explicit non-scope, a complete test corpus, and
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-31 | 0 | bootstrap | Rebased clean branch from #1831 baseline to current `origin/main`; loaded harness/doctrine/PR/tools contracts. |
+| 2026-08-31 | 1 | RED | Structured focused wrapper exited 1: 95 failed / 14 passed; 92 unique SDK corpus failures plus the CLI injection-map mismatch. |
+| 2026-08-31 | 1 | implement | SDK shorthand now reuses its existing normalizer; CLI injection now consumes Aspire's key builder. `service-url.ts` remained untouched. |
+| 2026-08-31 | 1 | GREEN | Identical focused command passed 109/109; package-focused suites and all requested gates passed. |
+| 2026-08-31 | 1 | reconcile | Issue #1833 remains open at `status:impl`, milestone `0.0.7`; draft PR #1835 has `Closes #1833`, the requested taxonomy, and no lifecycle-label transition. No new reviewer comments were present before handoff. |
 
 ## Decisions
 
@@ -79,6 +83,7 @@ locked implementation ownership, explicit non-scope, a complete test corpus, and
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Repo-advertised `rtk` binary is unavailable in this shell | minor | yes |
+| Root lint/fmt config excludes all CLI files, requiring the established run-local quality config | minor | yes |
 
 ## Gate Results
 
@@ -86,16 +91,27 @@ locked implementation ownership, explicit non-scope, a complete test corpus, and
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| RED | structured focused tests | NOT_RUN | Tests not written yet. |
-| Check/lint/fmt | structured scoped wrappers | NOT_RUN | Pending slice 1. |
-| Repo check | `deno task check` | NOT_RUN | Pending slice 1. |
+| RED | structured focused tests | FAIL (expected), exit 1 | `red-tests.json`: 95 failed, 14 passed, 92 unique SDK mismatch failures plus CLI mismatch. |
+| Focused GREEN | identical structured focused command | PASS, exit 0 | `green-focused-tests.json`: 109 passed. |
+| SDK tests | structured test wrapper over `packages/sdk/tests` | PASS, exit 0 | `sdk-tests.json`: 183 passed. |
+| Aspire tests | structured test wrapper over `packages/aspire/tests` | PASS, exit 0 | `aspire-tests.json`: 91 passed. |
+| CLI deploy-build tests | structured test wrapper over deploy build feature | PASS, exit 0 | `cli-deploy-build-tests.json`: 9 passed. |
+| Scoped check | structured check wrapper over four changed TypeScript files (`--unstable-kv`) | PASS, exit 0 | `scoped-check.json`: 0 occurrences. |
+| SDK lint / fmt | structured wrappers over two changed SDK files | PASS, exit 0 / 0 | `sdk-lint.json`, `sdk-fmt.json`. |
+| CLI lint / fmt | structured wrappers over two changed CLI files | PASS, exit 0 / 0 | `cli-lint.json`, `cli-fmt.json`; run-local config opts owned CLI files into root-equivalent rules. |
+| Repo check | `deno task check` | PASS, exit 0 | 2,976 files, 25 batches, `failedBatches: 0`. |
+
+Non-verdict setup attempts: the first three scoped wrapper calls exited 1 because `--output` was
+used without `--allow-write`; mixed-root lint/fmt and the first package-config CLI retries exited 2
+on coverage refusal because the root Deno config excludes `packages/cli/`. No source diagnostic was
+reported in those attempts. Corrected commands above are the verdict evidence.
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `quality:scan` | NOT_RUN | pending | Required framework gate. |
-| `arch:check` | NOT_RUN | pending | Required doctrine gate. |
+| `quality:scan` | PASS, exit 0 | repository scan: no findings | Required framework gate. |
+| `arch:check` | PASS, exit 0 | all roots: `FAIL=0`; pre-existing warnings only | Required doctrine gate. |
 
 ### Runtime Gates
 
@@ -107,11 +123,12 @@ locked implementation ownership, explicit non-scope, a complete test corpus, and
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| SDK/Aspire browser key agreement | NOT_RUN | pending | Character sweep planned. |
-| CLI deploy prebuild injection | NOT_RUN | pending | Pure environment-map test planned. |
+| SDK/Aspire browser key agreement | PASS, exit 0 | 109-case focused result plus 183-test SDK suite | Both full and shorthand pinned. |
+| CLI deploy prebuild injection | PASS, exit 0 | 9-test deploy-build suite | Full and shorthand injected; disabled plugin excluded. |
 
 ## Handoff Notes
 
 - IMPL-EVAL must inspect shorthand normalization, exact full-key preservation, CLI enabled-plugin
   filtering, fallback order, and the untouched raw server-key implementation.
-
+- This generator records automated evidence only; substantive supervisor review and separate-session
+  IMPL-EVAL remain pending, so the PR stays draft at `status:impl`.

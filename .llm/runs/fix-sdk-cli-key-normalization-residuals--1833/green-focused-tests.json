@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "packages/sdk/tests/discovery/env-ordering_test.ts",
+    "packages/cli/src/public/features/deploy/build/build-windows-prebuild_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1833",
+  "exitCode": 0,
+  "durationMs": 1705,
+  "summary": {
+    "passed": 109,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 109,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

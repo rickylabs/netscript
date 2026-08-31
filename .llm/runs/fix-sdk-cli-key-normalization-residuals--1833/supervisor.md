@@ -10,7 +10,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Checkout | `/home/agent/projects/netscript/worktrees/007-leaf-1833` |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1833` |
 | Branch | `fix/sdk-cli-key-normalization-residuals` |
-| Baseline | `ee0e626bb945e2d9af58e49bd7bbdf714d0785c3` (`origin/main`, 2026-08-31) |
+| Baseline | `71d5fb8e079cae74249dd7d314874a3a18e7ab28` (`origin/main`, 2026-08-31) |
 | Run ID | `fix-sdk-cli-key-normalization-residuals--1833` |
 
 ## Routes in force
@@ -24,4 +24,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 - Owner directive: do not self-dispatch an evaluator. The supervisor will dispatch IMPL-EVAL after
   this implementation handoff.
-
