@@ -137,3 +137,25 @@ Corrected by opting the non-draft PR into the explicit `e2e-cli-gate` label rath
 local Aspire lease (the local topology is parked). The gate now proves the scaffolded project still
 builds and runs with the 43-line delegating `service-context.ts.template` in place of the former
 123-line inlined `LazyPluginKv`.
+
+
+## Final seam — integrated current `main` `eaea940be` (post-#1810)
+
+The evidence-only push made the branch `CONFLICTING/DIRTY` against the advanced `main`, which is also
+why the `pull_request` CI produced no run for that head: GitHub could not compute a merge ref, so
+there was nothing to check out. Integrated once, at the final seam.
+
+| Proof | Result |
+| --- | --- |
+| Conflict set | exactly one file — `export-surface-corpus.generated.ts`, a generated carrier |
+| Resolution | took `main`'s carrier and **regenerated from tooling**; never hand-edited |
+| Carrier currency | `check:mcp-export-corpus` exit 0 · `check:assets-barrel` exit 0 — both genuine tool output |
+| Six hand-written product blobs | **byte-identical** to the evaluated head `3130fb52b` |
+| Seventh blob (the corpus) | regenerated `1dd90409… → 6e84e995…` — it *was* the conflict, and `main`'s inputs moved; identity cannot and should not hold for a derivative |
+| Product diff vs current `main` | exactly the seven files, no more |
+| `deno.lock` | byte-identical `edfa0c24…` |
+
+Gates re-cut at the seam `8ab11ddee`, each `gitHead == actualGitHead`: scoped check 303-byte stdout,
+lint 352-byte, fmt-check 301-byte, `packages/kv` tests 289-byte, `assets-barrel` exit 0 (zero-byte
+stdout is correct for `gen && git diff --exit-code`; proven clean by an empty product worktree
+afterwards), `docs:exports-drift` PASS.
