@@ -14,6 +14,47 @@ type MutableArtifacts = {
   status: string;
 };
 
+type TestLiveMilestonePr = {
+  readonly number: number;
+  readonly issueNumbers: readonly number[];
+  readonly lane: 'docs' | 'internals' | 'fixes' | 'features';
+  readonly baseBranch: string;
+  readonly headSha: string;
+  readonly state: 'open' | 'merged' | 'closed';
+  readonly role: 'leaf' | 'coordinator-artifact';
+};
+
+type TestMilestonePrSource = {
+  listOpenMilestonePrs(repo: string, milestone: string): Promise<readonly TestLiveMilestonePr[]>;
+  readPrHead(repo: string, prNumber: number): Promise<TestLiveMilestonePr>;
+};
+
+type TestReconciliationFinding = {
+  readonly kind: 'stale-head' | 'missing-leaf' | 'source-unavailable';
+  readonly issueNumber: number | null;
+  readonly prNumber: number | null;
+  readonly lane: 'docs' | 'internals' | 'fixes' | 'features' | null;
+  readonly recordedHead: string | null;
+  readonly liveHead: string | null;
+};
+
+const validateWithLiveSource = validateMilestoneCluster as unknown as (
+  artifacts: MilestoneClusterArtifacts,
+  source: TestMilestonePrSource,
+) => Promise<{ ok: boolean; errors: readonly string[]; findings: readonly TestReconciliationFinding[] }>;
+
+function prSource(pullRequests: readonly TestLiveMilestonePr[]): TestMilestonePrSource {
+  return {
+    listOpenMilestonePrs: () =>
+      Promise.resolve(pullRequests.filter((pullRequest) => pullRequest.state === 'open')),
+    readPrHead: (_repo, prNumber) => {
+      const pullRequest = pullRequests.find((candidate) => candidate.number === prNumber);
+      if (!pullRequest) return Promise.reject(new Error(`PR #${prNumber} is unavailable`));
+      return Promise.resolve(pullRequest);
+    },
+  };
+}
+
 function clone<T>(value: T): T {
   return structuredClone(value);
 }
@@ -179,6 +220,67 @@ Deno.test('valid milestone cluster passes the Step 0 and control-plane contract'
   const result = await validateMilestoneCluster(await validArtifacts());
   assert(result.ok, result.errors.join('\n'));
   assertEquals(result.errors, []);
+});
+
+Deno.test('RED: an allocated leaf with a stale live PR head is a structured finding', async () => {
+  const artifacts = await validArtifacts();
+  const recordedHead = (artifacts.state.leaves as Record<string, unknown>[])[0].headSha as string;
+  const liveHead = 'c'.repeat(40);
+  const result = await validateWithLiveSource(artifacts, prSource([{
+    number: 200,
+    issueNumbers: [101],
+    lane: 'fixes',
+    baseBranch: 'main',
+    headSha: liveHead,
+    state: 'open',
+    role: 'leaf',
+  }]));
+
+  assertEquals(result.ok, false);
+  assertEquals(result.findings, [{
+    kind: 'stale-head',
+    issueNumber: 101,
+    prNumber: 200,
+    lane: 'fixes',
+    recordedHead,
+    liveHead,
+  }]);
+});
+
+Deno.test('RED: an open milestone PR absent from cluster leaves is a structured finding', async () => {
+  const artifacts = await validArtifacts();
+  const recordedHead = (artifacts.state.leaves as Record<string, unknown>[])[0].headSha as string;
+  const missingHead = 'd'.repeat(40);
+  const result = await validateWithLiveSource(artifacts, prSource([
+    {
+      number: 200,
+      issueNumbers: [101],
+      lane: 'fixes',
+      baseBranch: 'main',
+      headSha: recordedHead,
+      state: 'open',
+      role: 'leaf',
+    },
+    {
+      number: 201,
+      issueNumbers: [101],
+      lane: 'fixes',
+      baseBranch: 'main',
+      headSha: missingHead,
+      state: 'open',
+      role: 'leaf',
+    },
+  ]));
+
+  assertEquals(result.ok, false);
+  assertEquals(result.findings, [{
+    kind: 'missing-leaf',
+    issueNumber: 101,
+    prNumber: 201,
+    lane: 'fixes',
+    recordedHead: null,
+    liveHead: missingHead,
+  }]);
 });
 
 Deno.test('RED: missing intake artifact fails closed', async () => {
