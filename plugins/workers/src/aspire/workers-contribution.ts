@@ -10,7 +10,6 @@ import {
 const WORKERS_PLUGIN_VERSION = '0.0.1-alpha.0';
 const WORKERS_API_RESOURCE = 'workers-api';
 const WORKERS_COMBINED_RESOURCE = 'workers-combined';
-const WORKERS_API_DEFAULT_PORT = 8091;
 
 const WORKERS_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -42,10 +41,11 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
     builder: AspireBuilder,
     ctx: ContributionContext,
   ): readonly AspireResource[] {
+    const apiPort = ctx.port(WORKERS_API_RESOURCE);
     const api = builder.addDenoService(WORKERS_API_RESOURCE, {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/workers/services/src/main.ts',
-      port: ctx.port(WORKERS_API_RESOURCE, WORKERS_API_DEFAULT_PORT),
+      port: apiPort,
       permissions: WORKERS_SERVICE_PERMISSIONS,
       env: {
         WORKERS_PLUGIN_VERSION,
@@ -75,7 +75,7 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
 
   /** Declare health checks used by plugin doctor commands. */
   override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
-    const apiPort = ctx.port(WORKERS_API_RESOURCE, WORKERS_API_DEFAULT_PORT);
+    const apiPort = ctx.port(WORKERS_API_RESOURCE);
     return [{
       resource: WORKERS_API_RESOURCE,
       url: `http://localhost:${apiPort}/health`,

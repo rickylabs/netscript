@@ -65,6 +65,7 @@ export const GATE_CATALOG = {
   'emitted-samples': ['deno', 'task', 'check:emitted-samples'],
   'netscript-jsr-specifiers': ['deno', 'task', 'check:netscript-jsr-specifiers'],
   'scaffold-versions': ['deno', 'task', 'check:scaffold-versions'],
+  'aspire-version-parity': ['deno', 'task', 'check:aspire-version-parity'],
   'publish-dry-run': ['deno', 'task', 'publish:dry-run'],
   'audit-critical': ['deno', 'task', 'audit:critical'],
   'clean-worktree': [

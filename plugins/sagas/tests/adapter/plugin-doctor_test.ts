@@ -9,7 +9,7 @@ Deno.test('sagas doctor errors with a remediation when the saga registry is abse
     context: {
       workspaceRoot: '/workspace',
       options: {},
-      config: { SAGAS_API_URL: 'http://localhost:8092' },
+      config: { SAGAS_API_URL: 'http://localhost:9182' },
       dryRun: true,
       fileSystem: {
         exists: () => Promise.resolve(false),

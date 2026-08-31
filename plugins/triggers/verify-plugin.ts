@@ -9,12 +9,7 @@ import {
   runPluginVerificationCli,
   verifyPlugin,
 } from '@netscript/plugin';
-import {
-  TRIGGERS_API_DEFAULT_PORT,
-  TRIGGERS_API_SERVICE_NAME,
-  TRIGGERS_PLUGIN_ID,
-  triggersPlugin,
-} from './mod.ts';
+import { TRIGGERS_API_SERVICE_NAME, TRIGGERS_PLUGIN_ID, triggersPlugin } from './mod.ts';
 import denoJson from './deno.json' with { type: 'json' };
 
 export type { InspectionReport } from '@netscript/plugin';
@@ -32,7 +27,6 @@ export function verifyTriggersPlugin(): PluginVerificationResult {
     services: [{
       name: TRIGGERS_API_SERVICE_NAME,
       entrypoint: './services/src/main.ts',
-      port: TRIGGERS_API_DEFAULT_PORT,
       message: 'expected the triggers-api service contribution',
     }],
     contractVersions: [{

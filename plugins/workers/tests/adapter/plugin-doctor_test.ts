@@ -9,7 +9,7 @@ Deno.test('workers doctor errors with a remediation when the job registry is abs
     context: {
       workspaceRoot: '/workspace',
       options: {},
-      config: { WORKERS_API_URL: 'http://localhost:8091' },
+      config: { WORKERS_API_URL: 'http://localhost:9181' },
       dryRun: true,
       fileSystem: {
         exists: () => Promise.resolve(false),

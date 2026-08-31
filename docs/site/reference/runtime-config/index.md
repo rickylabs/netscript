@@ -14,6 +14,12 @@ version pointer named `current`. Missing files produce empty defaults so service
 continue while operators roll out runtime overrides independently. The package exposes a single
 root entrypoint (`@netscript/runtime-config`); there are no sub-path exports.
 
+## Exports
+
+| Export | Path |
+| --- | --- |
+| `@netscript/runtime-config` | `./mod.ts` |
+
 ## Loaders and watchers
 
 | Symbol | Signature | Description |

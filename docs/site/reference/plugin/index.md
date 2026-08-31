@@ -81,8 +81,9 @@ and template assets live on the sub-path exports listed at the end of this page.
 
 ## Sub-path exports
 
-The following entrypoints are published alongside the root export. Their public surfaces are
-generated separately from their own `deno doc` output and summarized below.
+The following entrypoints are published alongside the root export. The tables below summarize each
+sub-path's own `deno doc` surface. Symbols that one sub-path re-exports from another are called out
+instead of described twice.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
@@ -112,8 +113,13 @@ generated separately from their own `deno doc` output and summarized below.
 | `CONTRIBUTION_AXES` | `variable CONTRIBUTION_AXES` | Supported plugin contribution axes. |
 | `PLUGIN_TYPES` | `variable PLUGIN_TYPES` | Supported plugin categories. |
 
-This entrypoint also re-exports the manifest, contribution, and builder types documented in
-the root sections above.
+This entrypoint also re-exports `PluginBuilder`, `ContributionInput`, `DependencyContext`,
+`PluginBuilderState`, `BackgroundProcessorContribution`, `ContractVersionContribution`,
+`DbSchemaContribution`, `E2eContribution`, `MigrationContribution`, `PluginContributions`,
+`PluginDependencies`, `PluginLifecycleHooks`, `ContributionAxis`, `PluginContext`, `PluginLogger`,
+`PluginType`, `PluginManifest`, `PluginMetadata`, `PluginMetadataValue`, `PluginManifestParser`,
+`RuntimeConfigTopicContribution`, `ServiceContribution`, `StreamTopicContribution`, and
+`TelemetryContribution`, documented in the root sections above.
 
 ### `@netscript/plugin/abstracts`
 
@@ -135,12 +141,60 @@ the root sections above.
 | `PluginSchemaResult` | type alias | Validation result returned by package-owned schema contracts. |
 | `ContributionAxis` | type alias | Supported plugin contribution axes. |
 
+### `@netscript/plugin/adapter`
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `DoctorCheckSpec` | interface | Extra doctor check supplied by a plugin seam. |
+| `DoctorSpec` | interface | Seam data consumed by the mandatory doctor algorithm. |
+| `InfoSpec` | interface | Static capability summary returned by the mandatory info command. |
+| `InstallSpec` | interface | Seam data consumed by the mandatory install algorithm. |
+| `InstallStarterResource` | interface | Starter resource emitted by the mandatory install command. |
+| `InstallStarterSamplesPolicy` | type alias | Behavior for an install starter when the host excludes samples. |
+| `NetScriptPlugin` | interface | Plugin adapter contract consumed by core command logic. |
+| `PluginAdapter` | interface | Adapter object produced by the plugin adapter factory. |
+| `PluginCliEntrypoint` | type alias | CLI entrypoint produced by `createPluginAdapter(plugin).toCli()`. |
+| `PluginCommandConfig` | type alias | Readonly command configuration supplied by the host. |
+| `PluginCommandContext` | interface | Context shared by adapter command algorithms. |
+| `PluginCommandSpec` | interface | Optional plugin-owned command handler. |
+| `PluginCommandValue` | type alias | Primitive value accepted in plugin command configuration. |
+| `PluginResource` | interface | Optional plugin-owned resource command. |
+| `RemoveSpec` | interface | Seam data consumed by the mandatory remove algorithm. |
+| `UpdateSpec` | interface | Seam data consumed by the mandatory update algorithm. |
+| `createDenoFileSystem` | function | Create the default Deno-backed file-system port for adapter commands. |
+| `DEFAULT_PLUGIN_HEALTH_ENDPOINT` | constant | Default health endpoint used by plugin doctor commands. |
+| `DEFAULT_PLUGIN_WORKSPACE_ROOT` | constant | Default workspace root used when no explicit root is supplied. |
+| `resolveWorkspacePath` | function | Resolve a workspace-relative path against a workspace root. |
+| `createPluginAdapter` | function | Create the core adapter for a plugin contract object. |
+| `RunInstallCommandOptions` | interface | Input consumed by the mandatory install command. |
+| `collectInstallArtifacts` | function | Emit starter artifacts from the plugin's install seams. |
+| `createInstallScaffoldEntrypoint` | function | Create a scaffolder protocol entrypoint from the install command. |
+| `runInstallCommand` | function | Run the core-owned plugin install algorithm. |
+| `RunDoctorCommandOptions` | interface | Input consumed by the mandatory doctor command. |
+| `runDoctorCommand` | function | Run the core-owned plugin doctor algorithm. |
+| `PluginInfoReport` | interface | Structured report returned by the mandatory info command. |
+| `RunInfoCommandOptions` | interface | Input consumed by the mandatory info command. |
+| `runInfoCommand` | function | Run the core-owned plugin info algorithm. |
+| `RunUpdateCommandOptions` | interface | Input consumed by the mandatory update command. |
+| `runUpdateCommand` | function | Run the core-owned plugin update algorithm. |
+| `RunRemoveCommandOptions` | interface | Input consumed by the mandatory remove command. |
+| `runRemoveCommand` | function | Run the core-owned plugin remove algorithm. |
+| `RunPluginCliCommandOptions` | interface | Input consumed by the plugin CLI runner. |
+| `runPluginCliCommand` | function | Route a plugin CLI verb to mandatory logic or a plugin-owned handler. |
+| `runPluginScaffoldCli` | function | Run a plugin scaffold entrypoint from the host CLI subprocess protocol. |
+
+This entrypoint also re-exports the root and CLI symbols `DoctorCheck`, `DoctorReport`,
+`PluginCliArgs`, `PluginCliCommand`, `PluginCliResult`, `PluginLogger`, and `FileSystemPort`; the
+protocol symbols `PluginScaffoldEntrypoint`, `ScaffolderContext`, and `ScaffoldResult`; and the
+scaffold symbols `ItemScaffolder`, `ScaffoldArtifact`, `ScaffoldArtifactBody`, `artifactText`,
+`textArtifact`, `StubSource`, `TokenValues`, `defineStub`, and `substituteTokens`. They are
+documented in their owning sections below.
+
 ### `@netscript/plugin/cli`
 
 | Symbol | Signature | Description |
 | --- | --- | --- |
 | `PluginCli` | `class PluginCli` | Abstract base class for plugin-owned CLI command groups. |
-| `PluginItemScaffolder` | `class PluginItemScaffolder` | Abstract base for plugin item scaffolders (the `add <item>` command). |
 | `PluginRuntimeConfigCli` | `class PluginRuntimeConfigCli` | Abstract base for plugin runtime configuration commands. |
 | `mountPluginCli` | `function mountPluginCli(clis)` | Mount plugin CLI command groups into a flat command list. |
 | `runMountedCommand` | `async function runMountedCommand(commands, args: PluginCliArgs): Promise` | Run a mounted command list without depending on Cliffy at package level. |
@@ -150,9 +204,27 @@ the root sections above.
 | `PluginCliArgs` | `interface PluginCliArgs` | Command arguments passed to plugin CLI handlers. |
 | `PluginCliCommand` | `interface PluginCliCommand` | A mounted CLI command handler. |
 | `PluginCliResult` | `interface PluginCliResult` | Result returned by plugin CLI handlers. |
-| `PluginScaffoldResult` | `interface PluginScaffoldResult` | Result returned by plugin item scaffolders. |
 | `DoctorCheck` | `interface DoctorCheck` | Diagnostic entry produced by plugin doctor commands. |
 | `DoctorReport` | `interface DoctorReport` | Aggregate doctor report for a plugin CLI. |
+| `LocalProjectFiles` | class | Deno-backed project file adapter for local plugin CLI execution. |
+| `resolveProjectRoot` | function | Resolve a URL or path to a local project root. |
+| `ProjectFileEntry` | interface | File entry discovered by a plugin CLI filesystem scan. |
+| `ProjectFiles` | interface | Project file operations used by plugin CLI commands. |
+| `renderRegistryModule` | function | Render a static-registry module from discovered items and plugin specifics. |
+| `toRegistryImportSpecifier` | function | Resolve an item's import specifier relative to a generated registry. |
+| `RegistryEmitItem` | interface | Discovered registry item with its project-relative source path. |
+| `RegistryModuleSpec` | interface | Plugin-supplied details used to render a registry module. |
+| `normalizePluginArgv` | function | Normalize raw argv tokens into positional values and simple long flags. |
+| `parsePluginCliArgs` | function | Parse plugin command argv into the shared `PluginCliArgs` contract. |
+| `NormalizedPluginArgv` | interface | Normalized argv tokens after the caller removes its runtime wrapper. |
+| `applyScaffoldPlan` | function | Plan scaffold files and persist them only for a real run. |
+| `ScaffoldPlanResult` | interface | Result of planning or applying a plugin-owned scaffold operation. |
+| `createBaseMetaCommands` | function | Create the shared `status`, `health`, and `info` command set. |
+| `PluginBaseMeta` | interface | Data returned by the shared plugin metadata commands. |
+| `findGeneratedProjectRoot` | function | Find a project root through a project file adapter. |
+| `loadGeneratedProjectRegistry` | function | Load and validate a generated project registry export. |
+| `DefinitionGuard` | type alias | Runtime guard for a generated definition value. |
+| `GeneratedProjectRegistryOptions` | interface | Options for loading a generated registry from a project. |
 
 ### `@netscript/plugin/sdk`
 
@@ -187,12 +259,67 @@ the root sections above.
 | `PluginHostBootstrap` | interface | Result of bootstrapping plugin host state. |
 | `PluginServiceContext` | interface | Context supplied to a plugin service at runtime. |
 
+This entrypoint also re-exports `BackgroundProcessorContribution`, `ContractVersionContribution`,
+`DbSchemaContribution`, `E2eContribution`, `MigrationContribution`, `PluginContributions`,
+`PluginDependencies`, `PluginLifecycleHooks`, `PluginManifest`, `PluginMetadata`,
+`PluginMetadataValue`, `PluginType`, `RuntimeConfigTopicContribution`, `ServiceContribution`,
+`StreamTopicContribution`, `TelemetryContribution`, `PluginContext`, and `PluginLogger` from the
+root/config surface, plus `DoctorCheck` and `DoctorReport` from the CLI surface.
+
 ### `@netscript/plugin/loader`
 
 | Symbol | Signature | Description |
 | --- | --- | --- |
 | `createPluginLogger` | `function createPluginLogger(pluginName: string): PluginLogger` | Create a logger scoped to a plugin service process. |
 | `PluginLogger` | `interface PluginLogger` | Minimal logger shape supplied to plugin service contexts. |
+
+### `@netscript/plugin/protocol`
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `parsePluginManifest` | function | Parse and validate a plugin manifest without executing plugin code. |
+| `PLUGIN_MANIFEST_SCHEMA_VERSION` | constant | Current published schema version for `scaffold.plugin.json`. |
+| `PluginInstallerManifestSchema` | constant | Validator for the published plugin installer manifest. |
+| `PluginInstallerManifest` | interface | Published `scaffold.plugin.json` contract consumed by installers. |
+| `PluginInstallerManifestSchemaIssue` | interface | Validation issue exposed by the installer manifest schema. |
+| `PluginInstallerManifestValidator` | interface | Stable validation surface for the installer manifest schema. |
+| `PluginManifestCapabilities` | interface | Capability summary statically declared by a plugin manifest. |
+| `PluginManifestLinking` | interface | Declarative resource-linking contract for plugins. |
+| `PluginManifestLinkingConsumers` | interface | Named host resources that consume a plugin producer. |
+| `PluginManifestOfficialSource` | interface | Compatibility metadata for first-party source-copy discovery. |
+| `PluginManifestParseError` | interface | Validation failure returned when a manifest cannot be parsed. |
+| `PluginManifestParseIssue` | interface | One validation issue returned by manifest parsing. |
+| `PluginManifestParseResult` | type alias | Result returned by static plugin manifest parsing. |
+| `PluginManifestPostScript` | interface | Script export executed after a plugin-owned scaffold succeeds. |
+| `PluginManifestProvider` | interface | Compatibility metadata for plugin-kind provider registration. |
+| `PluginManifestScaffolder` | interface | Plugin-owned scaffold entrypoint declared by the manifest. |
+| `PluginScaffolderRequiredPermissions` | interface | Deno permissions required by a plugin-owned scaffolder. |
+| `PluginScaffoldEntrypoint` | type alias | Signature implemented by plugin-owned `./scaffold` exports. |
+| `ScaffolderContext` | interface | Context supplied by an installer to a plugin-owned scaffolder. |
+| `ScaffoldResult` | interface | Result returned by a plugin-owned scaffolder. |
+
+This entrypoint also re-exports the root `PluginLogger` type.
+
+### `@netscript/plugin/scaffold`
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `ItemScaffolder` | interface | Unified generator contract for plugin-owned userland items. |
+| `ScaffoldArtifact` | interface | Userland file emitted by a plugin item generator. |
+| `ScaffoldArtifactBody` | interface | Text body owned by a scaffold artifact. |
+| `artifactText` | function | Read the text body from a scaffold artifact. |
+| `textArtifact` | function | Create a text scaffold artifact. |
+| `StubSource` | interface | Type-checked source stub with declared named tokens. |
+| `TokenValues` | type alias | Token values required by a declared stub source. |
+| `defineStub` | function | Declare a type-checked source stub. |
+| `substituteTokens` | function | Substitute named `%%TOKEN%%` markers in a declared source stub. |
+| `RegistryImport` | interface | Import declaration emitted into a generated registry module. |
+| `RegistryModule` | interface | Structured description of a generated registry module. |
+| `RuntimeRegistryModule` | interface | Structured description of a generated runtime registry module. |
+| `defineRegistryModule` | function | Preserve a registry module definition with literal field types. |
+| `defineRuntimeRegistryModule` | function | Preserve a runtime registry definition with literal field types. |
+| `renderRegistrySource` | function | Render a deterministic registry module from structured data. |
+| `renderRuntimeRegistrySource` | function | Render a deterministic runtime registry module from structured data. |
 
 ### `@netscript/plugin/testing`
 
@@ -207,12 +334,60 @@ the root sections above.
 | `MemoryFileSystemAdapter` | class | In-memory file system adapter for plugin tests. |
 | `FileSystemPort` | interface | Minimal file system port used by plugin scaffolding. |
 
+This entrypoint also re-exports the root/config symbols `BackgroundProcessorContribution`,
+`ContractVersionContribution`, `DbSchemaContribution`, `E2eContribution`, `MigrationContribution`,
+`PluginContext`, `PluginContributions`, `PluginDependencies`, `PluginLifecycleHooks`, `PluginLogger`,
+`PluginManifest`, `PluginMetadata`, `PluginMetadataValue`, `PluginType`,
+`RuntimeConfigTopicContribution`, `ServiceContribution`, `StreamTopicContribution`, and
+`TelemetryContribution`; the SDK symbols `EmitterPort`, `ExtractedContribution`,
+`ManifestResolverPort`, `RegistryEmission`, `WalkedFile`, and `WalkerPort`; and the CLI symbols
+`PluginCli`, `PluginCliArgs`, `PluginCliCommand`, and `PluginCliResult`.
+
 ### `@netscript/plugin/templates`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
+| `PLUGIN_SKELETON_TEMPLATE_CONTENT` | constant | Embedded text for every default plugin skeleton template asset. |
 | `PLUGIN_SKELETON_TEMPLATES` | variable | Paths for plugin skeleton template assets. |
 | `PluginSkeletonTemplatePath` | type alias | Plugin skeleton template path. |
+
+### `@netscript/plugin/contract-base`
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `BASE_PLUGIN_ERRORS` | constant | Base oRPC error-map fragment shared by plugin contracts. |
+| `BasePluginErrorCode` | type alias | Literal error codes guaranteed by `BASE_PLUGIN_ERRORS`. |
+| `BasePluginErrorDefinition` | interface | One entry in a plugin contract's oRPC error map. |
+| `InternalErrorData` | interface | Error payload reported for unexpected internal failures. |
+| `PluginCapabilities` | interface | Marketplace-discoverable description of a running plugin. |
+| `PluginCapabilitiesSchema` | constant | Output schema for the mandatory plugin `describe` route. |
+| `PluginCapabilitiesValidator` | interface | Structural validator for plugin capability documents. |
+| `BASE_PLUGIN_CONTRACT_ROUTES` | constant | Mandatory route fragment shared by feature plugin contracts. |
+| `BasePluginContract` | interface | Minimum route surface every plugin contract must satisfy. |
+| `BasePluginDescribeProcedure` | type alias | Mandatory `describe` procedure shape for plugin contracts. |
+| `BasePluginDescribeRoute` | type alias | Explicit type of the base contract's `describe` route. |
+
+### `@netscript/plugin/service`
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createPluginService` | function | Build a plugin service with the mandated middleware and route chain pre-applied. |
+| `PluginDatabaseConfig` | interface | Options forwarded to the service builder's database configuration. |
+| `PluginRawRoute` | interface | Raw HTTP route mounted directly on a plugin service. |
+| `PluginServiceConfig` | interface | Data-only description of a plugin service. |
+| `BoundPluginContract` | interface | Context-bound contract helpers produced by `bindPluginContract`. |
+| `PluginContractAssemblyConfig` | interface | Data required to mount a bound contract under `/vN/<plugin>`. |
+| `PluginContractBinder` | interface | Contract binder used before selecting a request context. |
+| `PluginContractHandlers` | type alias | Handler map derived from a context-bound oRPC contract router. |
+| `PluginContractImplementer` | interface | Contract implementer that binds a concrete request context. |
+| `PluginContractRouteKey` | type alias | Route keys whose values expose oRPC's handler builder. |
+| `PluginContractRouter` | type alias | Route implementer returned by an oRPC contract context binding. |
+| `assemblePluginContractRouter` | function | Assemble a context-bound handler map under a versioned namespace. |
+| `bindPluginContract` | function | Bind an implemented contract and derive typed handlers and a router. |
+
+This entrypoint also re-exports `ContextFactory`, `CorsOptions`, `DbContext`, `HealthCheck`,
+`ServiceConfig`, `ServiceHandler`, `ServiceMiddleware`, `ServiceRouteMethod`, and `ServiceRouter`
+from `@netscript/service`.
 
 ---
 

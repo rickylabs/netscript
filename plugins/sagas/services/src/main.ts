@@ -46,7 +46,11 @@ type PluginServiceBootstrap = {
 export default async function createSagasService(
   ctx: PluginServiceContext,
 ): Promise<RunningService> {
-  const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8092');
+  const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
+  if (portValue === undefined) {
+    throw new Error('Sagas API requires the host-provided PORT environment variable.');
+  }
+  const port = Number.parseInt(portValue, 10);
   const sagaStoreBackend = resolveSagaStoreBackend({
     env: { ...Deno.env.toObject(), ...ctx.env },
     appsettings: serviceAppsettings(ctx),

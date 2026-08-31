@@ -6,7 +6,6 @@
 
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import {
-  TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
   TRIGGERS_PLUGIN_VERSION,
@@ -40,7 +39,6 @@ const triggersManifest: PluginManifest = definePlugin(
   .withService({
     name: TRIGGERS_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',
-    port: TRIGGERS_API_DEFAULT_PORT,
   })
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([
@@ -89,8 +87,8 @@ const triggersManifest: PluginManifest = definePlugin(
 /** Plugin manifest for NetScript triggers. */
 export const triggersPlugin: PluginManifest = triggersManifest;
 
+export { TRIGGERS_API_DEFAULT_PORT } from '../constants.ts';
 export {
-  TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
   TRIGGERS_PLUGIN_VERSION,

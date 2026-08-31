@@ -571,7 +571,7 @@ export async function createPluginOwnedPluginResult(
     kind: plan.kind,
     port: backgroundPort,
     servicePort,
-    hostPort: servicePort,
+    hostPort: plan.port,
     configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
     configKey: plan.provider.category === 'plugin' ? serviceConfigKey : backgroundConfigKey,
     serviceConfigKey,
