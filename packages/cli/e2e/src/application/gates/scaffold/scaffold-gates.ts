@@ -3,7 +3,7 @@ import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
-import { generatedAppName } from './generated-app-name.ts';
+import { generatedAppName } from './runtime/generated-app-name.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
 

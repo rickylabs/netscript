@@ -18,7 +18,7 @@ import {
   terminateBrowserProcess,
   waitForCompletedStableBaseline,
 } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
-import { generatedAppName } from '../../../src/application/gates/scaffold/generated-app-name.ts';
+import { generatedAppName } from '../../../src/application/gates/scaffold/runtime/generated-app-name.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { deriveProcedureInput } from '../../../src/application/gates/scaffold/service-client-input-probe.ts';
 import {
