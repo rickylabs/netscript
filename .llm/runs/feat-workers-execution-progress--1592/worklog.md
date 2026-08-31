@@ -146,3 +146,67 @@ test and the existing streams test.
 - PR #1814's existing IMPL-EVAL PASS is bound to pre-repair head `d2c290c0c`; the supervising
   session must refresh that separate-session verdict after this repair head is pushed.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1814
+
+
+## Final convergence on `main` `26e1b486` and the IMPL-EVAL FAIL_FIX recovery
+
+The separate-session IMPL-EVAL at `1baf61f0a3` returned **`FAIL_FIX`** — and it was right, on a defect
+this supervisor introduced. Recording all four findings and their disposition.
+
+### F1 (HIGH) — the PR body's own negation created a live closing reference
+
+The body read *"Merging this PR must not close #1592."* GitHub's keyword scan does not parse negation,
+so the literal token sequence `close #1592` registered `closingIssuesReferences: [1592]` — meaning the
+merge **would** have closed an issue whose Slice 2 scope is unimplemented, the exact failure the
+sentence was written to prevent. The body then asserted the opposite ("`closingIssuesReferences` is
+correctly empty"), which was a false evidence claim.
+
+Fixed by rewording to *"Merging this PR leaves #1592 open"* — no keyword adjacent to the reference —
+and re-querying the API until it reported empty. **Verified: `closes=[]`.** The identical defect was
+found and fixed in PR #1820 in the same pass; both sentences were written by this lane.
+
+### F2 (LOW) — non-draft while the worklog said stay draft
+
+Recorded rather than reverted: the PR was deliberately promoted non-draft because `ci.yml` gates
+`check-test`, `quality`, `code-quality`, and `close-gate` on `pull_request.draft == false`. As a draft
+it showed `build` + `classify` green and every heavy lane `skipping` — it looked green and proved
+nothing. The worklog's "keep the PR draft" instruction predates that discovery and is superseded.
+
+### F3 (LOW) — the cited `publish:dry-run` receipt did not exist
+
+True. `worklog.md` cited receipt id `pr1814-slice1-repair-publish` while `receipts/` held only
+check/lint/fmt/test/quality-gate. A genuine structured receipt now exists at that exact id.
+
+**A trap worth recording:** its `stdout.bytes` is **0**, which looks exactly like the D-1
+cache-replay signature. It is not. `publish:dry-run` writes to **stderr**, not stdout — this receipt
+carries **356,732 stderr bytes** ending `Success Dry run complete`, and the known-good #1387
+`publish-dry-run` receipt has the same zero-stdout shape with 357,000 stderr bytes. The D-1 rule
+"always check `stdout.bytes`" is necessary but not sufficient: **for this gate the live channel is
+stderr**, and judging it by stdout alone would discard a valid receipt as a replay.
+
+### F4 (INFO) — branch was CONFLICTING
+
+Resolved. Converged **once** onto current `main` `26e1b486f95aec121d71f2f4cd0411dc6069af04`
+(post-#1820) at final seam `693b624744e872802f2aacc4724550cd5d483fb9`. The sole conflict was the
+generated MCP export corpus, resolved by taking `main`'s carrier and regenerating from tooling
+(`check:mcp-export-corpus` exit 0, 7678 symbols); never hand-edited.
+
+**All 10 evaluator-judged hand-written blobs are byte-identical** to the evaluated head `1baf61f0a3`,
+so the evaluation's substantive findings — repaired gate, intact v1 contract, six agreeing declaration
+sites, unchanged runtime behaviour — carry forward untouched.
+
+### Gates at the final seam `693b62474`
+
+Every receipt `gitHead == actualGitHead == 693b62474`:
+
+| Gate | Result | stdout | stderr |
+| --- | --- | --- | --- |
+| scoped `check` | PASS | 303 B | 263 B |
+| scoped `lint` | PASS | 355 B | 276 B |
+| scoped `fmt-check` | PASS | 304 B | 302 B |
+| `plugin-workers-core` tests | PASS | 306 B | 164 B |
+| `quality:gate` | PASS | 44,637 B | 950 B |
+| `publish-dry-run` | PASS | 0 B *(stderr channel)* | **356,732 B** |
+
+`deno.lock` byte-identical `edfa0c24…`. E2E/Aspire/Docker/browser do not apply to this leaf and were
+not run.

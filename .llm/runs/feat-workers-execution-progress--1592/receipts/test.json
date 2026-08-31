@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1592-seam-test",
+  "invocationId": "1592-final-test",
   "argv": [
     "deno",
     "task",
@@ -8,24 +8,24 @@
     "packages/plugin-workers-core/tests"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1592",
-  "gitHead": "da25f50da8a088b2518c056e4fda301728bc17ae",
-  "actualGitHead": "da25f50da8a088b2518c056e4fda301728bc17ae",
+  "gitHead": "693b624744e872802f2aacc4724550cd5d483fb9",
+  "actualGitHead": "693b624744e872802f2aacc4724550cd5d483fb9",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1736848",
+  "runnerIdentity": "worker:1746096",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "e0101c46cd7a8e43856a776f2a0c5a7cd6a6d0a439963bedabd9b2aae1541f7d",
-  "lifecycleId": "worker:1736848:1592-seam-test:1",
+  "requestHash": "e728ae75210324efa39764bb294beb414af3761c0503eafc857f43d10700db98",
+  "lifecycleId": "worker:1746096:1592-final-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T05:06:38.769Z",
-  "startedAt": "2026-08-31T05:06:38.771Z",
-  "finishedAt": "2026-08-31T05:06:40.018Z",
-  "durationMs": 1247,
+  "claimedAt": "2026-08-31T05:07:31.316Z",
+  "startedAt": "2026-08-31T05:07:31.318Z",
+  "finishedAt": "2026-08-31T05:07:32.889Z",
+  "durationMs": 1571,
   "exitCode": 0,
   "stdout": {
     "bytes": 306,
-    "sha256": "888ac8fbdc9215815f53f1774a47bd36b6258c43bf74e66dc0c9c886ce7c6724",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin-workers-core/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1592\",\"exitCode\":0,\"durationMs\":1133,\"summary\":{\"passed\":29,\"failed\":0,\"ignored\":0,\"totalResults\":29,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "ea318b002bd7b454bf0775e8ce2d71bb2d7df55f913d8429b8f4eacdd49ad323",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin-workers-core/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1592\",\"exitCode\":0,\"durationMs\":1430,\"summary\":{\"passed\":29,\"failed\":0,\"ignored\":0,\"totalResults\":29,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
