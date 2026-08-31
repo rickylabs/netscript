@@ -393,3 +393,47 @@ No Aspire, Docker, AppHost, `e2e:cli`, or runtime suite ran. No product behavior
 lifecycle state, S9/S10 branch, or safety tag was changed. The temporary standalone lint/fmt policy
 under ignored `.llm/tmp/` copied the repository's rule/format settings while removing only the
 workspace path exclusion so the wrapper could prove 19/19 coverage; it is not committed.
+
+## D-224 design — bounded actionable stderr
+
+PLAN-EVAL: N/A. This is an owner-specified mechanical observability delta with complete scope,
+constraints, acceptance tests, gates, branch head, and push rules. A separate supervisor-dispatched
+IMPL-EVAL remains required; this implementation session will not self-certify or dispatch it.
+
+- Public surface: no package export or command contract changes. The existing emitted
+  `RunToolResult.actionableStderr` remains additive and `message` remains its first actionable line.
+- Domain vocabulary: an actionable stderr retention window consists of an 8-line head, 24-line
+  tail, 32-line total cap, and 16-KiB serialized UTF-8 ceiling.
+- Ports/adapters: no new port. The existing emitted `run-tool.mts` adapter continues to own process
+  stderr, VT normalization, classification, persistence, and timeout behavior.
+- Constants: line cap, head count, tail count, byte cap, derived per-line byte allowance, and UTF-8
+  truncation marker. No new command names, exit codes, or output formats.
+- Spine/layer-2 abstracts/registries/features: unchanged from the ratified S8 design; this delta
+  introduces none.
+- Semantic tests: keep the D-07 ANSI `Task ` fixture byte-for-byte unchanged; add a black-box
+  structured-tail fixture that is red with the three-line implementation and a multi-byte enormous
+  line fixture that proves the total byte ceiling.
+- Commit slice: one bounded product/test/barrel/evidence commit, proven by the focused test wrapper,
+  changed-file check/lint/fmt wrappers, `quality:gate`, repo-wide check, and asset-barrel check.
+- Deferred scope: runtime/Aspire/Docker/AppHost/E2E, seed connection repair, parser heuristics,
+  lifecycle/base/labels, and unrelated S9/S10 work.
+- Contributor path: adjust the named retention constants in the emitted template, extend the
+  adjacent black-box template test, regenerate the asset barrel, then run the same static gates.
+
+## D-224 implementation evidence
+
+The RED wrapper exited 1 with the unchanged three-line template: the new structured fixture
+retained 3 lines instead of 32, and the enormous UTF-8 line exceeded 16 KiB. The unchanged D-07 ANSI
+banner test passed. The final policy retains 8 head lines plus 24 tail lines, caps total serialized
+detail at 16 KiB through a 511-byte per-line allowance, and preserves both ends of oversized lines
+with more budget assigned to the tail.
+
+Final focused tests passed 55/55. Changed-code check, lint, and fmt wrappers each processed all
+three inputs (test, generated barrel, and a byte-identical `.ts` copy of the source template) with
+zero diagnostics, findings, dropped files, or failed batches. `quality:gate` exited 0 with scanner
+findings 0 and doctrine `FAIL=0`. Repo-wide `deno task check` exited 0 across 2,985 files / 25
+batches with `failedBatches: 0`. The exact decision, RED proof, barrel delta, and command ledger are
+in `d224-actionable-stderr-bound.md`.
+
+PLAN-EVAL remained N/A and no evaluator was dispatched. No runtime, Aspire, Docker, AppHost, or
+`e2e:cli` command ran. The supervisor owns the separate delta IMPL-EVAL after push.

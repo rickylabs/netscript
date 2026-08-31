@@ -78,3 +78,26 @@ seam in the tool-registration template. S8 replaces those internal runtime surfa
 - S6's 13.5.3 consumer receipt records expected module hashes for `aspire.mts`, `base.mts`, and
   `transport.mts`; S8 performs a fresh restore-only verification and preserves only the two known
   `zod` TS2307 allowances.
+
+## D-224 actionable-stderr retention
+
+At `f29a0b265`, the emitted `run-tool.mts` retains only the first three non-empty, non-`Task `
+stderr lines. The capture already strips VT controls before classification and derives `message`
+from the first retained line, but it has no byte ceiling and discards every later structured field.
+The D-216 evidence proves this is load-bearing: Prisma's identifying `code` and `meta` occur after
+the retained three-line preamble, and run `33428877123` likewise begins its retained detail inside
+a file-list prefix rather than at the decisive error.
+
+The bounded generic policy for this delta is 32 lines with 8 head lines and 24 tail lines, plus a
+16 KiB total serialized UTF-8 ceiling. Thirty-two lines accommodates a multi-line JSON-ish error
+and ordinary source context without turning the state field into a log dump. Retaining more tail
+than head preserves late identifiers while the first eight lines keep the original message and
+nearby context. A derived per-line byte allowance guarantees the total ceiling, including newline
+separators, and prevents one enormous line from consuming an unbounded field. Oversized individual
+lines retain a smaller head and larger tail so trailing identifiers in compact JSON-ish output are
+not reduced to another prefix-only failure. No Prisma-specific parser or field heuristic is
+introduced.
+
+The affected surface remains the existing generated runtime adapter only. There is no new export,
+package metadata, dependency, permission, command vocabulary, or JSR surface; the planned JSR
+audit is therefore N/A for this delta. Existing CLI debt is not deepened.
