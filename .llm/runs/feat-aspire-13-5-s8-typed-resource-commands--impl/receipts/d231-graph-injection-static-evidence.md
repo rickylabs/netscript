@@ -37,5 +37,12 @@ branch.
 | `quality:gate` | 0 | scanner clean; doctrine `FAIL=0` |
 | repository check | 0 | 2,986 files; 25 batches; `failedBatches: 0` |
 
-Post-commit asset-barrel, remote, push, and clean-tree evidence is appended after the clean product
-commit. Runtime/Aspire/Docker/AppHost/E2E and evaluator dispatch are intentionally absent.
+## Clean product commit
+
+- Product/harness head: `6b0bcfe1daefe8c65be5cd36dc99f8c6fe3133a0`.
+- `deno task check:assets-barrel`: exit 0 from that clean commit; generator produced no diff.
+- `git status --short`: empty after the asset check.
+- Final remote comparison, push, and read-back are reported by the implementation session because
+  recording a post-push observation in this receipt would itself move the pushed head.
+
+Runtime/Aspire/Docker/AppHost/E2E and evaluator dispatch are intentionally absent.
