@@ -6286,3 +6286,56 @@ Every field independently re-verified, not carried from prior claims:
 
 **Merge packet: PR #1781, `--match-head-commit a34c37eb2d43414385016b8532047796b0f07f87`, closes #1357.**
 No further action available short of the merge itself — handing to coordinator.
+
+### #1764/#1368 EXACT MERGE PACKET (immutable)
+
+Applied `impl-eval:skip` with a full attribution comment BEFORE the draft→ready transition — the
+lesson from #1781's incident, applied proactively this time rather than reactively. A dispatch job DID
+fire (`Phase eval PR`), but its own log confirmed it correctly respected the skip label
+("Record attributed IMPL-EVAL skip" / "IMPL-EVAL skipped on demand") and did no real evaluator work —
+nothing to cancel, nothing adopted.
+
+PR body rewritten from a stale early-history state: the full runtime proof (on-host 79/1 with the
+Chromium-gate explanation; off-host `e2e-cli.yml` run `33342766760` terminal SUCCESS with the four
+otel/Flow-B gate names confirmed present in the job log, not inferred from the aggregate), corpus
+regeneration history, and IMPL-EVAL cycle history. All DoD boxes now genuinely ticked.
+
+**Acceptance-evidence for issue #1368's 10 boxes — one required real investigation, not a guess.** My
+first pass found no evidence for box 9 ("nested-compensation deferral is recorded on the span and
+documented") and was about to report it as a genuine gap — until one more targeted read of
+`saga-compensator.ts` found `compensateCascaded` rejecting nested cascades via
+`SagasError.notImplemented('Nested cascaded compensation is deferred to phase 7d.')`, with
+`#recordRejectedCompensation` starting the `saga.cascade.compensate` span, recording cascade size 0,
+and finishing it `ERROR` carrying that exact error — genuinely span-recorded and documented, not
+implied. Confirmed a real test exercises `compensateCascaded` in the focused suite before citing it.
+The mirror tool's own all-or-nothing validation caught the gap in my first draft immediately (hard
+error on the missing entry) — exactly the discipline it's designed to enforce.
+
+All 10 boxes now `[x]`, mirrored. `status:ready-merge` sole label, non-draft, close-gate reran
+fresh (`00:06:01Z`, well after the mirror) — `success`.
+
+| Check | State |
+| --- | --- |
+| PR head | `9d8bbb4e96e555462cdd8432883a28d493b051eb` |
+| PR draft | `false` |
+| PR mergeable / mergeStateStatus | `MERGEABLE` / `CLEAN` |
+| PR labels | sole `status:ready-merge` plus `impl-eval:skip` (historical record of the attributed skip) |
+| Issue #1368 state / labels | sole `status:ready-merge` |
+| Issue #1368 acceptance boxes | 10/10 `[x]`, mirrored |
+| review-threads | `PASS`, threads=0, unanswered=0 |
+| close-gate | `success` |
+| Evaluator | `PASS_IMPL` `14889037`, valid, not rerun |
+| On-host runtime proof | 79/1, sole red the known NAS Chromium-absence gate; otel/Flow-B gates never reached (critical-break, structural, confirmed twice this cycle) |
+| Off-host runtime proof | `e2e-cli.yml` run `33342766760`, terminal SUCCESS, all four otel/Flow-B gate names confirmed executed in the job log |
+
+**Merge packet: PR #1764, `--match-head-commit 9d8bbb4e96e555462cdd8432883a28d493b051eb`, closes #1368.**
+No further action available short of the merge itself — handing to coordinator.
+
+### Selecting next unblocked fixes leaf: #1365 (priority:p0)
+
+Host lease released after #1764's zero-proof; #1747 stays Aspire-supervisor-owned, not touched.
+Screened the open `type:fix` milestone-0.0.7 triage queue for priority and ownership: `#1719` excluded
+(Aspire-lane's own `[aspire-13-5 S7]` epic issue, not this lane's). `#1365` is the sole `priority:p0`
+candidate — a well-scoped, substantial defect in `plugins/sagas`, directly adjacent to the domain this
+session already has deep context in (`saga-publisher.ts`'s silent `127.0.0.1:8092` fallback and
+unchecked `SagaPublisherResult`). Selected as the next independent fixes leaf.
