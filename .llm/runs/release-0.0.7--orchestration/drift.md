@@ -1625,3 +1625,12 @@ implementation thread.
 - Recovery order is explicit: converge and merge #1798 first, then integrate #1762 once across the
   complete docs delta. Future ready-queue merges are serialized at the shared main boundary even
   while implementation/evaluation remains parallel behind it.
+
+## 2026-08-31 — routine cascade conflicts are coordinator decisions, not owner pauses
+
+- Aspire S9's additive gate union and S10's preservation of current-main listener readiness were
+  bounded integration choices with an evidence-preserving answer. Parking either as an owner ruling
+  unnecessarily stalled four downstream slices.
+- Topic supervisors must recommend and surface such conflicts immediately; the milestone coordinator
+  resolves them and keeps independent work moving. Only a genuinely product-defining, irreversible,
+  or safety-sensitive choice crosses the owner boundary.

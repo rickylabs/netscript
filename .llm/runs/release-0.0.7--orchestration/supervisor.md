@@ -1519,3 +1519,15 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Complete #1798 convergence/CI/merge first. Then #1762 integrates the resulting docs base once,
   regenerates shared carriers, and recuts final CI. Other product lanes wait for that safe evidence
   boundary rather than churning their carriers after each docs merge.
+
+## 2026-08-31T03:36:00Z — #1798 consumed; runtime and product fronts resumed
+
+- Main is `584caa03f474de36b2d6e62e7162ab410c6ccb59` after coordinator-merged #1798. Release
+  #1762 for its one final shared-corpus integration, and release every other topic from the former
+  main hold. Preserve ordered merges, but continue independent implementation/evaluation in parallel.
+- Aspire's S9/S10 conflict rulings are final: additive gate union for S9; current-main
+  listener-readiness file/test retained for S10. #1747 alone holds the runtime mutex at `68c80e743`
+  and must return Aspire, containers, volumes, and custom networks to exact zero.
+- Every one of the 55 open milestone issues and 27 open milestone PRs has exactly one orchestrator
+  label. Supervisors own routine unblock decisions and must surface immutable merge candidates rather
+  than wait for owner or coordinator confirmation at ordinary checkpoints.

@@ -3079,3 +3079,23 @@
 - Because #1822 moved main while #1798/#1762 CI was active, #1798 now absorbs the orthogonal two-file
   main delta and merges first. #1762 then integrates the resulting final docs base once, avoiding two
   shared-corpus regenerations. No evaluation is rerun for this byte-proven orthogonal delta.
+
+## 2026-08-31T03:36:00Z — #1798 shipped; product fronts released; #1747 runtime active
+
+- Docs PR #1798 passed fresh exact-head run `33353830359` at
+  `0d7aba23dbf5624e0528c301aeaef434e929611d`: check-test, quality, close-gate, and all required
+  visibility checks are green; issue #1797 acceptance and PR DoD are complete; review threads are
+  zero; the corrected 14-path delta is unchanged. The coordinator squash-merged it as
+  `584caa03f474de36b2d6e62e7162ab410c6ccb59` and normalized #1797/#1798 to `status:shipped`.
+- #1762 is now released to integrate this final docs base once, regenerate shared carriers, correct
+  its four-integration/thirteen-gate metadata, and recut exact-head CI. Fixes #1365/#1773 and the
+  remaining docs leaves were similarly released from the former main hold; implementation and
+  evaluation remain parallel behind ordered merge seams.
+- The coordinator resolved Aspire's routine S9/S10 conflicts without owner escalation: S9 keeps the
+  additive gate-list union; S10 keeps current main's listener-readiness file/test and drops the
+  conflicting deletion. The #1747 lease was granted at exact head `68c80e743` only after a fresh
+  four-part zero preflight. It owns the sole PostgreSQL scaffold/runtime flow-B pass and must clean
+  Aspire, containers, volumes, and custom networks back to zero.
+- Live milestone ownership remains exhaustive: 55 open issues and 27 open PRs, with zero missing or
+  duplicate `orchestrator:*` labels. The issue split is Features 14, Fixes 13, Internals 8, Docs 10,
+  Aspire 10. All five Opus supervisors received new-main and no-idle steering.

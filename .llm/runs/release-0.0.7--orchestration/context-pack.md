@@ -1916,3 +1916,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Merge ordering is #1798 next, then #1762 after one final shared-corpus integration. Active fix,
   internals, and Aspire product work continues without interruption and integrates after that docs
   boundary. The next canary remains feature/fix-heavy.
+
+## Resume delta — 2026-08-31T03:36:00Z
+
+- Current main is `584caa03f474de36b2d6e62e7162ab410c6ccb59`: Docs #1798 merged from immutable
+  head `0d7aba23d` after fresh CI run `33353830359`, complete issue/PR acceptance, zero threads, and
+  exact-delta revalidation. #1797/#1798 are closed/merged and sole `status:shipped`.
+- #1762 now integrates this final docs base once and regenerates the shared corpus before exact-head
+  CI. #1805 continues independently; Fixes #1365/#1773, Internals #1802/#1753, Docs #1806/#1808,
+  and Aspire's static cascade remain active. No lane may wait at this merge checkpoint.
+- Aspire S9 uses the additive gate-list union; S10 preserves main's listener-readiness file/test and
+  drops the conflicting deletion. #1747 holds the only runtime lease at exact head `68c80e743`, from
+  a proven empty Aspire/DinD baseline, and must return all four runtime inventories to zero.
+- Milestone ownership is exhaustive at 55 open issues plus 27 open PRs: every item has exactly one
+  topic orchestrator. The next canary still waits for coherent feature/fix payload rather than this
+  docs-only merge.
