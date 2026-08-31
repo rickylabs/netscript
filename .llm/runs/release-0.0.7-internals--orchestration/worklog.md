@@ -6278,3 +6278,41 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   since #1695 owns the `deno.lock` delta the two share; #1351 last as it still needs its
   RFC-0001-Stage-3 plan read before an honest brief exists.
 - **#1641 remains coordinator-owned.** Internals still does not gate the feature/fix canary.
+
+## D-134 — Owner authorized bounded parallelism; #1753 resumed after 3-dimension collision proof; Slice 4 stalled-but-complete, committed by supervisor
+
+- **Owner authorized intra-orchestrator parallelism for provably independent slices**, superseding
+  the strict-serial correction in D-133. #1802 remains the integration front; exactly one additional
+  leaf may resume, and only after a collision check.
+- **Collision check run honestly against #1802's LIVE surface, not its declared scope** — the nine
+  uncommitted files were read directly from `git status`, since a declared scope can drift from what
+  a running author is actually touching. Result for #1753:
+  - **File**: #1753 is `.llm/tools/harness/`; #1802 is `.llm/tools/agentic/` — disjoint.
+  - **Contract**: no import edge in either direction, verified both ways.
+  - **Generated corpus**: `.llm/tools/` is not a generated-asset source.
+  - **One near-miss caught**: a grep suggested `contract.ts` coupling. It was a **filename
+    collision** — #1753 imports `.llm/tools/gates/contract.ts`; #1802 edits
+    `.llm/tools/agentic/runtime/contract.ts`. Two different files. Confirmed distinct by `ls` and by
+    checking #1802 does not touch `gates/contract.ts`. Treating that as real coupling would have
+    wrongly parked an independent leaf.
+  - Also caught my own **`pgrep` self-match** again (2 "live" matches were my own grep); resolved by
+    reading `/proc/<pid>/cmdline`. Rollout-age (484s quiet) was the reliable signal.
+- **#1753 resumed** (thread `01a055b6-da11-...`), told explicitly why it was stopped (policy, not
+  quality), and hard-bounded to `.llm/tools/harness/` with a stop-and-report rule if it needs to
+  touch `.llm/tools/agentic/` while #1802 is live there.
+- **#1802 Slice 4 stalled after completing the work but before committing** — 9 dirty files, rollout
+  quiet 314s+. Assessed rather than assumed: all three new modules present and substantial
+  (211/187/191 lines), Slice 3 suite already **10/10 green**.
+- **Verified everything before committing on the author's behalf**, because a stall is exactly when
+  a false-green is easiest to accept:
+  - **All five RED test blobs byte-identical** (Slice 1 + four from Slice 3) → the suite went green
+    by implementation alone, not by loosening tests.
+  - **Scope exactly the nine declared Slice 4 files** — no rescope.
+  - **D6 sequencing correct in source order**: `authorized` receipt persisted (:187) → CAS `evict`
+    (:195) → `evicted` finalized (:204), with an apply-time re-classification that aborts if the
+    lease is no longer stale, and `leaseToken` explicitly redacted from receipts (:75-76).
+  - **D7 dual-pass evidence present**: `observations: { initial: pass(initial, initialAt), apply:
+    pass(apply, applyAt) }` — both passes, each with its own timestamp.
+  - Full agentic suite **526/526**, real exit capture throughout.
+- Committed `1cfae0f39`, pushed, local == remote verified. Attribution of the supervisor commit is
+  stated plainly in the commit message rather than presented as the author's own work.
