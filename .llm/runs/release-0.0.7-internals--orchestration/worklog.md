@@ -6213,3 +6213,33 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   pushes made so far have never touched #1641's head. No cleanup needed, and no accidental edit of
   a coordinator-owned PR has occurred.
 - Serial focus remains #1802/#1751 (Slice 4 GREEN in flight), then the queue recorded in D-128.
+
+## D-132 — Owner deadline: shifted from strict serial to domain-partitioned parallel dispatch
+
+- **Owner set a full-milestone deadline of tomorrow evening.** Strict serial execution of 6
+  remaining leaves would not credibly finish, so I switched to parallel dispatch — but only after
+  proving the parallelism is actually safe rather than assuming it.
+- **Disjointness verified by file domain before dispatching**, not asserted:
+  - #1753 → `.llm/tools/` (harness validator)
+  - #1737 → `skills/netscript*/SKILL.md` + generated `.agents` mirror
+  - #1543 → `packages/plugin-workers-core/deno.json`, `plugins/triggers/deno.json`
+  - #1695 → `packages/ai/deno.json`
+  - #1351 → `packages/sdk/` (transport)
+  Source trees are mutually disjoint. **`deno.lock` is the single shared file**, between #1695 and
+  #1543 — so those two are held serial against each other while the rest run parallel. Each brief
+  names the other's territory explicitly as off-limits.
+- **Dispatched now (3 parallel)**, all off `main` `65cd8a07787504b5ed94408510d4ab85260bc21a`:
+  - #1753 thread `01a055b6-da11-7652-8942-c56deb75f3eb` (Sol/medium)
+  - #1737 thread `01a055b6-e5ed-7e62-a47f-c8f278533a96` (Sol/medium)
+  - #1695 thread `01a055b6-f26a-7c82-822c-75e8258d8c77` (Sol/high — whole-family dependency move,
+    higher tier warranted; brief tells it to stop and say so if it judges PLAN-EVAL necessary)
+- **Held back deliberately**: #1543 (lock conflict with #1695 — dispatch once #1695's lock delta
+  lands) and #1351 (`status:plan`, sdk-client S4, RFC-0001-Stage-3 scope amendment — needs its plan
+  read before a brief can be written honestly; not safe to dispatch blind under deadline pressure).
+- **#1802/#1751 Slice 4 continues undisturbed** on its own thread — verified actively working
+  (9 files in progress) and deliberately not interrupted by this dispatch round.
+- Standing constraints carried into every brief: RED-before-GREEN, real exit capture never a
+  pipeline, declared file list with stop-on-rescope, no self-dispatched evaluators, and for #1737
+  specifically the never-hand-edit-mirrors rule.
+- **#1641 remains coordinator-owned**; not in this queue. Internals does not gate the feature/fix
+  canary checkpoint.
