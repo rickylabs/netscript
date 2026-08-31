@@ -49,3 +49,8 @@
   passes 89/89. Repo-wide check has `failedBatches: 0`; scoped check/lint/fmt, parity, assets,
   quality, and architecture are green. D-133's blocker entry is retained as historical evidence;
   it is no longer active.
+- D-171 consumes the selected database's maximum listener expectation as the describe-follow
+  minimum (300 seconds normally, 600 seconds for MSSQL); the environment may only raise it. A
+  post-database `runtime.aspire-describe` refresh now runs after restart/allocation and before all
+  replayed wait gates, so convergence evidence cannot be stale after the fallback. The protected
+  D-101 module remains untouched. Static validation only; a supervisor-dispatched IMPL-EVAL follows.

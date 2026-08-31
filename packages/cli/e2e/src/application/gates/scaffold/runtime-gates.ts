@@ -56,6 +56,17 @@ function runtimeAppWaitGate(): GateDefinition {
   );
 }
 
+function runtimeConvergenceTimeoutSeconds(database: DatabaseEngine): number {
+  const timeoutSeconds = runtimeResources(database).reduce((maximum, resource) => {
+    const expectation = listenerReadinessExpectation(resource);
+    return expectation ? Math.max(maximum, expectation.timeoutSeconds) : maximum;
+  }, 0);
+  if (!Number.isSafeInteger(timeoutSeconds) || timeoutSeconds <= 0) {
+    throw new Error(`runtime convergence has no positive listener timeout for ${database}`);
+  }
+  return timeoutSeconds;
+}
+
 /** Create runtime and health-check gates for the generated application. */
 export function createRuntimeGates(
   database: DatabaseEngine = DATABASE.POSTGRES,
@@ -155,6 +166,7 @@ export function createRuntimeGates(
         context.project.appHost,
         context.project.projectRoot,
         JSON.stringify([...runtimeResources(database), generatedAppName(context)]),
+        String(runtimeConvergenceTimeoutSeconds(database)),
       ],
     ),
     commandGate(
@@ -202,22 +214,27 @@ export function createRuntimeGates(
         'second',
       ],
     ),
-    ...runtimeResources(database).map(runtimeWaitGate),
-    runtimeAppWaitGate(),
     commandGate(
       GATE.RUNTIME_ASPIRE_DESCRIBE,
-      'Describe generated topology',
+      'Refresh generated topology after database commands',
       GATE_PHASE.RUNTIME,
       (context) => [
         'deno',
         'run',
+        '--allow-env=ASPIRE_CLI_START_TIMEOUT',
         '--allow-read',
+        '--allow-write',
+        '--allow-run=aspire',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts`,
-        'assert',
+        'refresh',
+        context.project.appHost,
         `${context.project.projectRoot}/.netscript/e2e/aspire-describe.ndjson`,
-        generatedAppName(context),
+        JSON.stringify([...runtimeResources(database), generatedAppName(context)]),
+        String(runtimeConvergenceTimeoutSeconds(database)),
       ],
     ),
+    ...runtimeResources(database).map(runtimeWaitGate),
+    runtimeAppWaitGate(),
   ];
 }
 

@@ -204,7 +204,8 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command.includes('capture'), true);
   assertEquals(command.includes('/workspace/app/aspire/apphost.mts'), true);
   assertEquals(command.includes('/workspace/app'), true);
-  assertEquals(command.at(-1)?.includes('postgres'), true);
+  assertEquals(command.at(-2)?.includes('postgres'), true);
+  assertEquals(command.at(-1), '300');
 });
 
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
@@ -618,4 +619,55 @@ Deno.test('runtime gates wait for mssql resource with extended timeout when mssq
       'mssql_listener',
     ],
   );
+
+  const startGate = createRuntimeGates(DATABASE.MSSQL).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_START
+  );
+  if (startGate?.kind !== 'command') {
+    throw new Error('Expected mssql Aspire start gate to be a command gate.');
+  }
+  assertEquals(
+    startGate.command({
+      request: { suiteId: 'scaffold.runtime', options: { projectName: 'generated' } },
+      project: {
+        repoRoot: '/repo',
+        projectRoot: '/workspace/app',
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext).at(-1),
+    '600',
+  );
+});
+
+Deno.test('runtime describe refreshes convergence evidence after database restart fallback', () => {
+  const gate = createRuntimeGates(DATABASE.MSSQL).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_DESCRIBE
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected runtime describe gate to be a command gate.');
+  }
+
+  const command = gate.command({
+    request: { options: { projectName: 'generated' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command.slice(0, 8), [
+    'deno',
+    'run',
+    '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+    'refresh',
+  ]);
+  assertEquals(command.at(-4), '/workspace/app/aspire/apphost.mts');
+  assertEquals(command.at(-3), '/workspace/app/.netscript/e2e/aspire-describe.ndjson');
+  assertEquals(command.at(-2)?.includes('mssql'), true);
+  assertEquals(command.at(-1), '600');
 });

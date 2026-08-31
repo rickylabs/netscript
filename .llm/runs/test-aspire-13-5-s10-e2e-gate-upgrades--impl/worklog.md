@@ -207,3 +207,26 @@
 - No runtime, Aspire, Docker, AppHost, CI dispatch, PLAN-EVAL, evaluator rerun, or PR-base retarget
   was performed. D-133's local evidence commit remains in history to preserve the accepted stop
   rationale; this D-136 slice records the final coordinator resolution and green static evidence.
+
+## D-171 IMPL-EVAL fix — database budget and evidence freshness
+
+- 2026-08-31: the RED-first focused wrapper passed 39 tests and failed four exact assertions: the
+  default start capture omitted its 300-second minimum, MSSQL omitted its 600-second minimum, the
+  post-database refresh command was absent, and wait gates preceded that refresh.
+- The selected database's convergence minimum is now the maximum
+  `ListenerReadinessExpectation.timeoutSeconds` among its runtime resources. This restores 600
+  seconds for MSSQL while retaining 300 seconds elsewhere; `ASPIRE_CLI_START_TIMEOUT` is combined
+  with `Math.max` so operators can raise but not silently lower the contract.
+- `runtime.aspire-describe` is now a bounded `describe --follow` refresh after typed database
+  commands/restart fallback and the second allocation capture, before all describe-backed wait
+  gates. This directly addresses the evaluator's stale-pre-restart-capture finding. The protected
+  D-101 `listener-readiness-gates.ts` module was not edited.
+- GREEN focused validation passed 66/66 across runtime gates, suite ordering, structured evidence,
+  listener readiness, and resource-command coverage. Scoped E2E check selected 191 files in two
+  batches; lint selected 184 files; format selected 191 files; all exited 0 with zero findings.
+- Repository gates exited 0: `deno task check` selected 2,978 files in 25 batches with
+  `failedBatches: 0`; `quality:scan` had no findings beyond seven existing allowances;
+  `arch:check` had `FAIL=0`; and `check:aspire-version-parity` reported `fail: 0`.
+- No runtime, Aspire, Docker, AppHost, CI dispatch, PLAN-EVAL, evaluator dispatch, lifecycle-label
+  change, PR-base retarget, or self-certification was performed. The supervisor owns the fresh
+  IMPL-EVAL.

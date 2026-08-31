@@ -85,3 +85,20 @@ irrelevant until S8 merges. The coordinator also designated `verify-listener-rea
 canonical module. All three consumers now use it, the cosmetic evidence relocation is deleted, and
 the preserved D-101 contract test passes. D-08 and D-09 remain as the evidence for the accepted
 stops, not active blockers.
+
+## D-11 — D-171 restores database-specific convergence budgets and refreshes post-command evidence
+
+S10 originally moved readiness onto one `describe --follow` capture, but the capture timeout read
+only `ASPIRE_CLI_START_TIMEOUT` and therefore silently stopped consuming the selected database's
+`ListenerReadinessExpectation.timeoutSeconds`. That collapsed MSSQL's established 600-second cold-
+start allowance to the 300-second default. The accepted contract is now the maximum listener
+expectation for the selected database: 300 seconds for the ordinary tiers and 600 seconds for
+MSSQL. `ASPIRE_CLI_START_TIMEOUT` may still raise that minimum, but cannot lower it.
+
+The original capture also preceded typed database commands and their restart fallback. Replaying it
+after a fallback could assert observations from the pre-restart topology. `runtime.aspire-describe`
+now refreshes the bounded follow stream after the database command and second allocation capture,
+before every describe-backed wait gate. The initial `runtime.aspire-start` capture remains startup
+evidence; the refreshed receipt is the convergence authority for the post-command topology. This is
+an intentional behavior correction recorded under Operating Rule 5, not a change to the protected
+D-101 listener-readiness module.

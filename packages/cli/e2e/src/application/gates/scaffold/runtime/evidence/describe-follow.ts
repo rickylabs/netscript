@@ -140,6 +140,7 @@ export async function captureAspireStartAndDescribe(
   appHost: string,
   projectRoot: string,
   expectedResources: readonly string[],
+  minimumTimeoutSeconds = 0,
 ): Promise<void> {
   const start = await commandOutput('aspire', [
     'start',
@@ -157,7 +158,7 @@ export async function captureAspireStartAndDescribe(
   const describePath = join(stateDir, 'aspire-describe.ndjson');
   await Deno.mkdir(stateDir, { recursive: true });
   await Deno.writeTextFile(startPath, `${JSON.stringify(metadata, null, 2)}\n`);
-  await captureDescribeFollow(appHost, describePath, expectedResources);
+  await captureDescribeFollow(appHost, describePath, expectedResources, minimumTimeoutSeconds);
   console.info(`Aspire describe evidence: ${describePath}`);
 }
 
@@ -166,9 +167,10 @@ export async function captureDescribeFollow(
   appHost: string,
   describePath: string,
   expectedResources: readonly string[],
+  minimumTimeoutSeconds = 0,
 ): Promise<void> {
   await Deno.writeTextFile(describePath, '');
-  const timeoutSeconds = resolveDbCliTimeoutSeconds();
+  const timeoutSeconds = Math.max(resolveDbCliTimeoutSeconds(), minimumTimeoutSeconds);
   const child = new Deno.Command('aspire', {
     args: [
       'describe',
@@ -395,7 +397,7 @@ function normalizeName(name: string): string {
 }
 
 if (import.meta.main) {
-  const [mode, first, second, third] = Deno.args;
+  const [mode, first, second, third, fourth] = Deno.args;
   if (mode === 'capture') {
     if (!first || !second || !third) {
       throw new Error('capture requires AppHost, project root, and expected-resource JSON');
@@ -404,12 +406,30 @@ if (import.meta.main) {
     if (!Array.isArray(expected) || !expected.every((entry) => typeof entry === 'string')) {
       throw new Error('expected-resource JSON must be a string array');
     }
-    await captureAspireStartAndDescribe(first, second, expected);
+    await captureAspireStartAndDescribe(first, second, expected, timeoutArgument(fourth));
+  } else if (mode === 'refresh') {
+    if (!first || !second || !third) {
+      throw new Error('refresh requires AppHost, stream path, and expected-resource JSON');
+    }
+    const expected: unknown = JSON.parse(third);
+    if (!Array.isArray(expected) || !expected.every((entry) => typeof entry === 'string')) {
+      throw new Error('expected-resource JSON must be a string array');
+    }
+    await captureDescribeFollow(first, second, expected, timeoutArgument(fourth));
   } else if (mode === 'assert') {
     if (!first || !second) throw new Error('assert requires stream path and resource name');
     const observation = assertDescribeResource(await Deno.readTextFile(first), second, third);
     console.info(`${observation.name} converged at ${observation.state}`);
   } else {
-    throw new Error('mode must be capture or assert');
+    throw new Error('mode must be capture, refresh, or assert');
   }
+}
+
+function timeoutArgument(value: string | undefined): number {
+  if (value === undefined) return 0;
+  const timeoutSeconds = Number(value);
+  if (!Number.isSafeInteger(timeoutSeconds) || timeoutSeconds <= 0) {
+    throw new Error('timeout argument must be a positive integer');
+  }
+  return timeoutSeconds;
 }

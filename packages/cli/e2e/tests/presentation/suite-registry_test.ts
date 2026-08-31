@@ -332,8 +332,13 @@ Deno.test('runtime DB mutations run only after the resident AppHost starts', () 
   }
   const seedIndex = gates.findIndex((gate) => gate.id === GATE.DATABASE_SEED);
   const restartIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB);
+  const secondAllocationIndex = gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND
+  );
+  const refreshIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_DESCRIBE);
   const waitIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES);
-  assertEquals(seedIndex < restartIndex && restartIndex < waitIndex, true);
+  assertEquals(seedIndex < restartIndex && restartIndex < secondAllocationIndex, true);
+  assertEquals(secondAllocationIndex < refreshIndex && refreshIndex < waitIndex, true);
 });
 
 Deno.test('runtime suite omits database resource wait for sqlite', () => {
