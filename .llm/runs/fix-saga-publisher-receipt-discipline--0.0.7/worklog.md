@@ -70,7 +70,7 @@
 | S2.1  | core helper, core export, plugin re-export, helper tests, port doc           | generic accepted return and structured rejection throw across both package entrypoints          | ceiling 1–5                 |
 | S2.2  | saga-aware discarded-receipt scanner rule and fixtures                       | bare `publish`/`publishMany` fails in source/docs/template; consumed/unrelated calls stay green | ceiling 6–7                 |
 | S2.3  | source-derived sync test/task plus four call corrections and reference truth | scaffold source remains safe/read-only; docs cannot drift or claim a fallback                   | ceiling 8–14                |
-| S2.4  | attributed derivatives and static handoff                                    | all static/package/docs/corpus gates and lock/ceiling audit hold                                | ceiling 15–20 plus run docs |
+| S2.4  | attributed derivatives and static handoff                                    | all static/package/docs/corpus gates and lock/ceiling audit hold                                | ceiling 15–21 plus run docs |
 
 ### Deferred Scope
 
