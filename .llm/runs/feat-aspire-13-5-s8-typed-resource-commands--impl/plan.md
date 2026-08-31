@@ -224,3 +224,58 @@ dispatch nor claim IMPL-EVAL.
 - Risk: External or SQLite behavior drifts. Mitigation: focused assertions retain the configuration
   lookup and file URL independently of the Container branch.
 - Deferred: runtime execution, PR base/lifecycle/labels, rebase, S9/S10 work, and formal IMPL-EVAL.
+
+## D-233 diagnostic-first migrate repair
+
+PLAN-EVAL is N/A: the owner supplied the exact runtime failure, retained-diagnostic contract,
+generic-classification requirement, regression shape, no-runtime boundary, branch head, and push
+contract. The only behavioral follow-up is explicitly evidence-gated on the diagnostic CI slice.
+A separate opposite-family IMPL-EVAL remains mandatory after the final product head.
+
+### Locked decisions
+
+- Preserve D-224's 32 retained lines, 8/24 head-tail ordering, per-line truncation, and 16-KiB
+  serialized UTF-8 ceiling byte-for-byte.
+- Select the first retained line matching a generic failure shape as the short failure `message`;
+  fall back to the first retained line when no failure-shaped line exists. The heuristic names
+  common error grammar, not tools or vendors.
+- Serialize both `message` and the unchanged `actionableStderr` array in the typed command result.
+  The generated callback still returns Aspire's `{ success, message }` contract, with the promoted
+  error first and the bounded context appended for logs.
+- Make the Phase-B verifier render both stderr and stdout rather than choosing the first non-empty
+  stream.
+- Do not repair migrate semantics until the pushed diagnostic slice makes the actual retained
+  failure visible in CI. If the evidence confirms the authoring/deploy task mismatch, route typed
+  `migrate` to the already-generated non-interactive deploy task without renaming the public typed
+  command.
+
+### Open-decision sweep
+
+- Must resolve after diagnostic CI: the exact migrate failure and whether it is owned by S8.
+- Safe to defer: tool-specific structured parsing, a new public error schema, and any wider
+  migration-command redesign.
+
+### Slices and proving gates
+
+1. Add a RED black-box runner fixture with an informational preamble followed by a failure-shaped
+   line; add the generic message selector, typed `actionableStderr` record, and dual-stream Phase-B
+   failure formatting. Regenerate the embedded barrel, run focused tests and scoped wrappers,
+   commit/push after the required remote check, and use CI as the diagnostic runtime.
+2. Read the new CI artifact/log. If it proves an S8-owned migrate task mismatch, add a focused RED
+   generator regression, make the smallest task-routing repair, and repeat static gates plus CI.
+   If it is outside S8, stop with the exact evidence instead.
+3. Re-run D-224 bounded diagnostics, D-227 emitted-helper compilation, and D-231 graph-injection
+   guards explicitly; run `quality:gate`, repo structured check, and diff-clean asset-barrel check;
+   hand the final head to a separate opposite-family IMPL-EVAL.
+
+### Risk register and deferred scope
+
+- Risk: a broad classifier mistakes an informational line for a failure. Mitigation: use explicit
+  failure grammar, keep the full bounded array, and preserve the first-line fallback.
+- Risk: adding an array to the result record breaks D-231 parsing. Mitigation: extend the parser and
+  compile regression together; keep Aspire's outward result shape unchanged.
+- Risk: a task remap changes interactive CLI behavior. Mitigation: scope any confirmed repair to the
+  emitted typed command task selection; do not alter generated `db:migrate` itself.
+- Deferred: local runtime, Aspire/Docker/AppHost/E2E execution, public package exports, dependencies,
+  PR base/lifecycle/labels, and S9/S10 work. JSR audit is N/A because no export, metadata, or JSDoc
+  surface changes.

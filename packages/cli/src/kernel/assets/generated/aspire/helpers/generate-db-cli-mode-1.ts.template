@@ -35,6 +35,10 @@ interface DbCliCommandResult {
   readonly message: string;
 }
 
+interface DbCliResultRecord extends DbCliCommandResult {
+  readonly actionableStderr: readonly string[];
+}
+
 const DB_CLI_COMMANDS: readonly DbCliCommand[] = [
   { name: 'migrate', displayName: 'Migrate database', iconName: 'DatabaseArrowUp' },
   { name: 'seed', displayName: 'Seed database', iconName: 'DatabaseArrowDown' },
@@ -245,7 +249,7 @@ async function executeDbCliResource(
     );
     const startExitCode = await childExitCode(child);
     const result = await readDbCliResult(resultPath);
-    if (result !== null) return result;
+    if (result !== null) return presentDbCliResult(result);
     if (startExitCode !== 0) {
       return {
         success: false,
@@ -333,7 +337,7 @@ async function waitForDbCliResult(
   };
 }
 
-async function readDbCliResult(resultPath: string): Promise<DbCliCommandResult | null> {
+async function readDbCliResult(resultPath: string): Promise<DbCliResultRecord | null> {
   const text = await readFile(resultPath, 'utf8').catch((error: unknown) => {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return null;
     throw error;
@@ -341,17 +345,36 @@ async function readDbCliResult(resultPath: string): Promise<DbCliCommandResult |
   return text === null ? null : parseDbCliResult(text);
 }
 
-function parseDbCliResult(text: string): DbCliCommandResult {
+function parseDbCliResult(text: string): DbCliResultRecord {
   const parsed: unknown = JSON.parse(text);
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
     throw new Error('Database command result must be an object.');
   }
   const success = Reflect.get(parsed, 'success');
   const message = Reflect.get(parsed, 'message');
-  if (typeof success !== 'boolean' || typeof message !== 'string') {
-    throw new Error('Database command result must contain boolean success and string message.');
+  const actionableStderr = Reflect.get(parsed, 'actionableStderr');
+  if (
+    typeof success !== 'boolean' || typeof message !== 'string' ||
+    !Array.isArray(actionableStderr) ||
+    !actionableStderr.every((line) => typeof line === 'string')
+  ) {
+    throw new Error(
+      'Database command result must contain boolean success, string message, and string diagnostic lines.',
+    );
   }
-  return { success, message };
+  return { success, message, actionableStderr };
+}
+
+function presentDbCliResult(result: DbCliResultRecord): DbCliCommandResult {
+  if (result.success || result.actionableStderr.length === 0) {
+    return { success: result.success, message: result.message };
+  }
+  const messageIndex = result.actionableStderr.indexOf(result.message);
+  const context = result.actionableStderr.filter((_, index) => index !== messageIndex);
+  return {
+    success: false,
+    message: [result.message, ...context].join('\n'),
+  };
 }
 
 function resolveTargets(

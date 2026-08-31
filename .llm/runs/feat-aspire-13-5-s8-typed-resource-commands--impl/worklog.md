@@ -517,3 +517,69 @@ fast-forward comparison and push read-back are reported by the implementation se
 creating a self-referential post-push ledger commit. No Aspire, Docker, AppHost, `e2e:cli`, or
 runtime command ran. No PR base, labels, lifecycle state, S9/S10 scope, or dependency surface
 changed.
+
+## D-233 design — generic failure promotion before migrate repair
+
+PLAN-EVAL: N/A. The owner supplied a complete diagnostic-first contract and made CI the runtime
+authority. No architecture/public-surface decision remains open; the actual migrate repair is
+blocked on the first pushed slice's retained bytes, not on design choice.
+
+- Public surface: no package export or command-name change. Aspire still consumes
+  `{ success, message }`; the internal generated result record additively carries
+  `actionableStderr`.
+- Domain vocabulary: `message` is the first retained failure-shaped line, or the original first
+  retained line as fallback. `actionableStderr` remains D-224's bounded ordered diagnostic.
+- Ports/adapters: no new port. The emitted runner owns process output classification; the existing
+  generated DB CLI adapter parses its result; the E2E Phase-B adapter formats captured streams.
+- Constants: one generic failure-shape expression. D-224's line/byte constants, command names,
+  timeouts, and exit codes are unchanged.
+- Spine/layer-2 abstracts/registries/features: unchanged. The existing CLI kernel/surface split and
+  extension manifests are untouched.
+- Semantic tests: a black-box tool writes an informational preamble followed by a real error and
+  exits nonzero; the persisted typed result must select the error as `message` and retain both lines
+  in `actionableStderr`. The test is required to fail at `927d24bed`.
+- Commit slices: (1) diagnostic promotion + verifier formatting + barrel/evidence; (2) only the
+  migrate repair that CI evidence proves; (3) final evidence/evaluation bookkeeping if required.
+- Deferred scope: all local runtime, public/JSR surface, dependencies, S9/S10, and unrelated debt.
+- Contributor path: adjust the error-shape selector beside D-224 retention, extend the adjacent
+  black-box runner test, update result parsing in the generated DB CLI template, regenerate assets,
+  then run the focused/static gate set.
+
+## D-233 diagnostic slice evidence
+
+The black-box preamble regression was executed before the product repair. Its structured wrapper
+exited 1 with 4 passed / 1 failed: the old request record selected the informational preamble and
+did not expose the retained `actionableStderr` array. This is the required RED-at-`927d24bed`
+proof; its fixture contains no Prisma-specific vocabulary.
+
+The emitted runner now selects the first retained line matching a generic failure grammar and
+falls back to the first retained line. It serializes that concise `message` beside D-224's
+unchanged ordered `actionableStderr`. The generated DB CLI adapter validates the additive record
+and presents the promoted line first followed by the remaining bounded context. The Phase-B
+failure formatter labels and prints both captured streams, so a non-empty stderr can no longer
+mask stdout or vice versa.
+
+Pre-push static evidence:
+
+| Command/gate | Exit/result |
+| --- | --- |
+| focused preamble RED against baseline behavior | 1; 4 passed, 1 failed |
+| full helper + runtime-gate tests | 0; 280 passed, 0 failed |
+| scoped structured check | 0; 4 selected, 1 batch, zero diagnostics |
+| scoped structured lint on non-excluded E2E files | 0; 2/2 processed, no drops/findings |
+| scoped structured fmt on non-excluded E2E files | 0; 2/2 processed, no drops/findings |
+| `quality:gate` | 0; scanner findings 0, doctrine `FAIL=0` with existing warnings |
+
+The full helper run includes D-224's head/tail/byte-bound fixtures, D-227's emitted-helper compile
+test, and D-231's graph-injection and resident-graph guards. The configured lint/fmt wrappers
+correctly refused their first mixed selection because the generated barrel and template-test root
+are intentionally excluded; the final exact non-excluded wrapper selections passed. The
+pre-commit `check:assets-barrel` invocation regenerated the correct snapshot but exited 1 because
+the intended source and generated deltas were not committed yet; its diff-clean verdict is run at
+the clean product commit. A Prisma source inspection temporarily resolved 7.10 packages in
+`deno.lock`; that mechanical inspection-only mutation was restored exactly, and no dependency or
+lockfile delta remains.
+
+No Aspire, Docker, AppHost, `e2e:cli`, or runtime suite ran. The diagnostic slice deliberately does
+not guess or repair the migrate cause. CI on this pushed slice is the first authorized source for
+the newly surfaced retained diagnostic.

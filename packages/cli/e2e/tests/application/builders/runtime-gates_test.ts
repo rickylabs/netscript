@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 
 import {
   ASPIRE_RESOURCE,
@@ -17,6 +17,7 @@ import {
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
+import { formatCommandFailure } from '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts';
 
 Deno.test('runtime behavior gates register the dynamic route probe id', () => {
   const dynamicRouteGateId = 'behavior.app-dynamic-route';
@@ -113,6 +114,19 @@ Deno.test('typed database Phase-B gate stays outside the base runtime gate list'
     ),
     false,
   );
+});
+
+Deno.test('typed database Phase-B failures surface both captured streams', () => {
+  const failure = formatCommandFailure('aspire', ['resource', 'postgres-cli', 'migrate'], {
+    code: 16,
+    success: false,
+    stderr: 'Error: retained typed-command failure',
+    stdout: 'bounded tool context',
+    durationMs: 25,
+  });
+
+  assertStringIncludes(failure, 'stderr:\nError: retained typed-command failure');
+  assertStringIncludes(failure, 'stdout:\nbounded tool context');
 });
 
 function s8RuntimeContext(): RunContext {

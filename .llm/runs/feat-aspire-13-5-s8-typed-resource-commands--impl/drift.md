@@ -128,3 +128,16 @@ atomic bounded result to the callback. External configuration and SQLite file UR
 separate supported paths. Static coverage deliberately omits `getValue` from its minimal SDK
 contract and rejects any emitted in-callback call, preventing another compile-clean capability
 regression. No local runtime or evaluator was dispatched.
+
+## D-12 — D-224 retained context but Aspire masked it behind its leading message
+
+Run `33450804252` proves the graph-injected seed repair: `database.seed` passes and the suite reaches
+58 gates. The next typed migrate failure demonstrates a distinct observability seam. D-224 retains
+bounded stderr, but request mode puts its informational first line at the start of the command
+message; Aspire renders only the leading portion. The uploaded report contains no result record or
+AppHost log, so the later retained failure cannot be recovered from that run.
+
+Resolution is diagnostic-first and generic: promote the first failure-shaped retained line, carry
+the unchanged bounded array separately, and make the Phase-B verifier report both output streams.
+No vendor-specific classifier or local runtime is permitted. The underlying migrate behavior is
+not changed until the pushed diagnostic slice supplies exact CI evidence.

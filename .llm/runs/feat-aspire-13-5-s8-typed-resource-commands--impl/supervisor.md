@@ -66,3 +66,19 @@ Aspire, Docker, an AppHost, or an E2E runtime suite, and it does not self-certif
 This session may scaffold and run static Deno/TypeScript verification only. It may not start
 Aspire, Docker, an AppHost, or an E2E runtime suite. CI remains the runtime authority and this
 implementation session records no IMPL-EVAL verdict.
+
+## D-233 diagnostic and migrate repair session — 2026-09-01
+
+| Field | Value |
+| --- | --- |
+| Model | Codex implementation session; exact model identity is not exposed locally |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-s8-recon` |
+| Branch | `feat/aspire-13-5-s8-typed-resource-commands` |
+| Baseline | `927d24beddfb80ea96f1f3ba4df4fd269325a6f2` |
+| Lane | bounded diagnostic slice, followed only by an evidence-led migrate repair |
+| Evaluator | required separate opposite-family IMPL-EVAL; this session will not self-certify |
+
+This session may inspect the cited CI artifacts, scaffold, and run static Deno/TypeScript gates. It
+may not start Aspire, Docker, an AppHost, or a local E2E runtime suite. CI is the sole runtime
+authority. RTK is unavailable on this host, so focused raw reads are used; wrapper and raw-Git
+verdict sources remain unchanged.
