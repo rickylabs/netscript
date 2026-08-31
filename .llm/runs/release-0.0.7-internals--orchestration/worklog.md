@@ -6600,3 +6600,32 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   `--force-with-lease`, never `--force` — instruction reinforced to the author.
 - Note: its main merge used `a3e0a5aa8`, now one advance stale (`dea449911`). Not churning it
   mid-evidence; it re-integrates once at its final seam.
+
+## D-147 — Hybrid MCP drift: code-side rotation DONE and proven; process-side restart is owner-gated
+
+- **Drift confirmed empirically, not inferred**: called the live `delegate_openrouter` with the
+  sanctioned `z-ai/glm-5.3-flash` and it returned `invalid_request: model is not approved for hybrid
+  delegation`. A validation rejection costs no provider tokens, so this was a free definitive probe.
+- **Root cause verified**: the server (pid `5901`) serves from
+  `worktrees/007-internals`, whose branch `orchestrator/release-0.0.7-internals` is a
+  ledger-only branch that had **never merged main** — it sat **60 commits behind**, predating #1792.
+- **Code-side rotation completed**: merged `origin/main` into the ledger branch (clean, zero
+  conflicts as predicted by `merge-tree`), pushed as `6dfba5c1c`. On-disk state now resolves
+  `implEvaluator → z-ai/glm-5.3-flash`, `planEvaluator → qwen/qwen3.8-flash`, both in
+  `HYBRID_DELEGATION_MODEL_IDS` and `OPEN_EVALUATOR_MODEL_IDS`, with both presets registered in
+  `provider-profiles.ts`.
+- **Process-side restart deliberately NOT forced — this is the honest boundary.** `pid 5901`'s
+  parent is **`pid 5498`, the other Claude Code Remote Control internals session** (the parallel
+  supervisor identified in D-108). The server is that client's **stdio subprocess**:
+  - Killing it would disrupt **another session's** tooling, which the instruction explicitly warned
+    against ("without disrupting an active evaluator").
+  - A stdio MCP server is spawned by its client at startup; killing it mid-session is not a
+    "restart" — it may simply leave the capability dead until that client reconnects. I cannot
+    guarantee respawn from outside, so killing risks strictly worsening the state.
+  - Therefore the remaining step requires the **owning client** to respawn it (session restart or
+    MCP reconnect). Recorded as a bounded owner action rather than silently left stale or forced.
+- **Practical impact is already mitigated**: every evaluator dispatched this session used the direct
+  `agentic:claude-openrouter` launcher from a **leaf worktree on current main**, not the stale MCP
+  server — which is why #1753's IMPL-EVAL ran on the sanctioned GLM route with no guard patch. The
+  stale server is a latent hazard for anything that *does* route through `delegate_openrouter`, not
+  an active blocker for current traffic.
