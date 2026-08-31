@@ -5429,3 +5429,30 @@
   - **The D-224 stderr-bound push will resolve both at once**: it creates a *fresh* event (current main
     `60ae56af0`) **and** lands the richer actionable-stderr, which is exactly what is needed to read a
     failure whose decisive line the 3-line cap currently truncates. Useful ordering, not a plan.
+
+- **D-226 — #1837 CI GREEN at `d23276664`; stderr bound landed at `bbf866d59`; two bounded delta evals
+  dispatched in parallel.**
+  - **#1837: CI `success`, `MERGEABLE`/`CLEAN`** against current main `60ae56af0`. Held at
+    `status:impl` on purpose — the coordinator required a bounded delta IMPL-EVAL because product and
+    test bytes moved after the recorded GLM PASS, so green CI alone does not restore `ready-merge`.
+  - **The stderr change is better than the minimum I asked for.** `bbf866d59` sets
+    `MAX_ACTIONABLE_STDERR_LINES = 32` **plus** `MAX_ACTIONABLE_STDERR_BYTES = 16 * 1024`, a derived
+    per-line ceiling, **head/tail split constants**, and a UTF-8-safe `truncateUtf8`. It took the
+    head-**and**-tail option rather than simply raising N — which is the part that actually addresses
+    the defect, since the Prisma fields were lost precisely because the informative content came
+    *after* the preamble.
+  - **#1837 delta eval** (`6ef9306ef..d23276664`) presses the risk this repair creates: that pressure
+    from a red CI leads to quietly relaxing the **generator** to match the fixture. It must confirm no
+    generator changed, prove discovery is quote- and name-agnostic **by rendering hostile inputs**
+    rather than reading the regex, prove each fail-closed guard still throws, prove the
+    duplicate-registration assertions survive, confirm the **masked Garnet test is unmasked**, and
+    prove mutation in **both** directions.
+  - **S8 delta eval** (`f29a0b265..bbf866d59`) presses the opposite risk — that a looser bound becomes
+    an unbounded field. It must check the arithmetic cannot overflow the total ceiling for 32
+    maximally-sized lines, that `truncateUtf8` cannot split a multi-byte character, that a field
+    beyond line 3 now survives (the motivating case), that a >32-line stderr still retains its
+    **tail**, and that D-07's original ANSI-banner test still passes unchanged.
+  - **S8's fresh runtime event is live at `bbf866d59` (`33444507535`)** — the first S8 runtime run
+    against **current** main, and the first carrying the richer stderr. If
+    `generated.quality-negative` reproduces there, its decisive line should finally be readable
+    instead of truncated mid-path.
