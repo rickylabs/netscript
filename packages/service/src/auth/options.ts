@@ -15,7 +15,7 @@
  * @module
  */
 
-import type { AuthenticatorPort, AuthorizerPort } from './types.ts';
+import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
 
 /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
 export interface AuthnOptions {
@@ -33,4 +33,10 @@ export interface AuthzOptions {
   readonly authorizer: AuthorizerPort;
   /** Fail closed when no decision is reachable. Defaults to `true`. */
   readonly denyByDefault?: boolean;
+}
+
+/** Options for constructing the opt-in contract-policy authorizer. */
+export interface ContractAuthorizerOptions {
+  /** Match-aware legacy authorizer consulted only when matched procedure metadata is absent. */
+  readonly fallback?: MatchAwareAuthorizerPort;
 }

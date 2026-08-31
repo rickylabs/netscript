@@ -20,7 +20,7 @@ the same definitions run in production and in permission-free tests.
 This is the core that the deployable [`@netscript/plugin-workers`](/reference/workers/) plugin binds
 to a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
-## Entrypoints
+## Exports
 
 The package publishes seventeen entrypoints. The root path carries the authoring surface; the
 subpaths expose the runtime layers a host composes.

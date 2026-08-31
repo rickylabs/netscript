@@ -14,6 +14,7 @@
 import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
 import type { AuthnOptions, AuthzOptions } from './options.ts';
+import type { ProcedurePolicyResolution, ProcedurePolicyResolver } from './contract-policy.ts';
 import type { AuthnRequest, Principal } from './types.ts';
 
 /** Default path prefixes guarded by auth middleware. */
@@ -24,16 +25,23 @@ export const DEFAULT_ANONYMOUS_PREFIXES: readonly string[] = ['/health'];
 
 const AUTH_LOGGER = createLogger(['netscript', 'service', 'auth']);
 
+/** Authn middleware options with an optional bound contract-policy resolver. */
+export interface AuthnMiddlewareOptions extends AuthnOptions {
+  /** Shared resolver used to make matched public procedures anonymous. */
+  readonly policyResolver?: ProcedurePolicyResolver;
+}
+
 /** Creates Hono middleware that authenticates guarded requests. */
-export function createAuthnMiddleware(options: AuthnOptions): MiddlewareHandler {
+export function createAuthnMiddleware(options: AuthnMiddlewareOptions): MiddlewareHandler {
   const guard = normalizeGuard(options);
 
   return async (c, next) => {
-    if (!isGuardedPath(c.req.path, guard)) {
-      return await next();
-    }
-
     try {
+      const policy = resolvePolicy(options.policyResolver, c);
+      if (!requiresAuthentication(c.req.path, guard, policy)) {
+        return await next();
+      }
+
       const result = await options.authenticator.authenticate(toAuthnRequest(c));
       if (!result.ok) {
         await logAuthDecision(c, {
@@ -70,6 +78,8 @@ export interface AuthzMiddlewareOptions extends AuthzOptions {
   readonly protect?: readonly string[];
   /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
   readonly allowAnonymous?: readonly string[];
+  /** Shared resolver used to recognize matched public procedures before principal lookup. */
+  readonly policyResolver?: ProcedurePolicyResolver;
 }
 
 /** Creates Hono middleware that authorizes guarded requests. */
@@ -78,21 +88,25 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
   const denyByDefault = options.denyByDefault ?? true;
 
   return async (c, next) => {
-    if (!isGuardedPath(c.req.path, guard)) {
-      return await next();
-    }
-
     const principal = c.get('principal');
-    if (!principal) {
-      await logAuthDecision(c, {
-        stage: 'authz',
-        decision: 'deny',
-        reason: 'missing-principal',
-      });
-      return unauthorized(c, 'missing-principal');
-    }
-
     try {
+      const policy = resolvePolicy(options.policyResolver, c);
+      if (isPublicProcedure(policy)) {
+        return await next();
+      }
+      if (!policy?.matched && !isGuardedPath(c.req.path, guard)) {
+        return await next();
+      }
+
+      if (!principal) {
+        await logAuthDecision(c, {
+          stage: 'authz',
+          decision: 'deny',
+          reason: 'missing-principal',
+        });
+        return unauthorized(c, 'missing-principal');
+      }
+
       const decision = await options.authorizer.authorize({
         principal,
         method: c.req.method,
@@ -125,6 +139,28 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
       return denyByDefault ? forbidden(c, 'authz.error') : await next();
     }
   };
+}
+
+function resolvePolicy(
+  resolver: ProcedurePolicyResolver | undefined,
+  c: Context,
+): ProcedurePolicyResolution | undefined {
+  return resolver?.resolve({ method: c.req.method, path: c.req.path });
+}
+
+function requiresAuthentication(
+  path: string,
+  guard: { readonly protect: readonly string[]; readonly allowAnonymous: readonly string[] },
+  resolution: ProcedurePolicyResolution | undefined,
+): boolean {
+  if (resolution?.matched) {
+    return resolution.policy?.authentication !== 'none';
+  }
+  return isGuardedPath(path, guard);
+}
+
+function isPublicProcedure(resolution: ProcedurePolicyResolution | undefined): boolean {
+  return resolution?.matched === true && resolution.policy?.authentication === 'none';
 }
 
 function normalizeGuard(options: {
