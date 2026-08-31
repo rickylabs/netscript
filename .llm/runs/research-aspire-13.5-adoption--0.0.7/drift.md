@@ -4625,3 +4625,28 @@
     `docker volume ls -q` → empty; networks → `bridge`, `host`, `none` only. Independent
     `agentic:leak-check` (`d189-11`) exit 0, all probes `ok`.
   - Host confirmed at zero from my side too: `containers=0`, `aspire ps` `[]`.
+
+- **D-196 — #1747's docker tier FAILED on `runtime.wait.garnet`; almost certainly NOT #1747's, but
+  not dispatching a repair until a control says so.**
+  - `scaffold-runtime (aspire + docker + postgres)` at `2032d4ed7`: **`passed=46 failed=1`**.
+    `runtime.wait.postgres` **PASSED in 1541 ms**; `runtime.wait.garnet` **FAILED after 300451 ms** —
+    a clean 300 s timeout on
+    `aspire wait garnet --status healthy --timeout 300 --apphost <path>`. Its sqlite tier at the same
+    head passed.
+  - **Why this is unlikely to be #1747's:** #1747 changes reference-name validation
+    (`packages/aspire/config.ts`, `aspire-resource-name.ts`), `JSON.stringify` escaping in
+    `generate-register-background.ts`, and the flow-B fixture parser. `runtime.wait.<resource>` is
+    **S6-family listener-readiness**, already shipped on `main`. Garnet also *registered and started* —
+    the gate is waiting on **health**, not on a missing or misnamed resource, which is what a
+    name-validation defect would produce.
+  - **But there is no baseline, and that is the real finding.** I surveyed the last 25 repo-wide
+    `e2e-cli` runs: **exactly one** has a docker-tier job that reached a conclusion — this one. Every
+    other recent run was `skipped` or `cancelled`. So `runtime.wait.garnet` has **never been observed
+    passing on CI** in recent history. The D-191 eviction and the draft gate together hid this: the
+    lane has been merging against a runtime tier that effectively never executed.
+  - **No repair dispatched.** #1754's docker tier is pending and exercises the same gate at a
+    different head — the same control discipline that correctly assigned the S9 failure. Dispatching
+    now would risk repairing #1747 for a defect it does not own, exactly the error the S9 control
+    prevented.
+  - If #1754 fails identically, this is a **pre-existing, unowned garnet-health defect** that belongs
+    to its own issue and must not be charged to any Aspire slice; if #1754 passes, #1747 owns it.
