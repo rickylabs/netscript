@@ -30,6 +30,7 @@ import type {
   JSONSchema as TanstackJsonSchema,
   ModelMessage,
   StreamChunk,
+  TokenUsage,
   ToolCall as TanstackToolCall,
 } from '@tanstack/ai';
 
@@ -358,18 +359,11 @@ function toFinishReason(
   }
 }
 
-/** Map TanStack real token usage onto the owned {@linkcode Usage} core fields. */
+/** Preserve TanStack real token usage behind the owned {@linkcode Usage} type. */
 function toOwnedUsage(
-  usage: { promptTokens: number; completionTokens: number; totalTokens: number } | undefined,
+  usage: TokenUsage | undefined,
 ): Usage | undefined {
-  if (!usage) {
-    return undefined;
-  }
-  return {
-    promptTokens: usage.promptTokens,
-    completionTokens: usage.completionTokens,
-    totalTokens: usage.totalTokens,
-  };
+  return usage;
 }
 
 /** Extract a plain-text projection of message content (system prompts). */

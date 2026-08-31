@@ -8,18 +8,27 @@ import { createServiceClient } from '../client/service-client.ts';
 import { createQueryFactory } from '../query/query-factory.ts';
 import { createServiceQueryUtils } from '../query-client/create-service-query-utils.ts';
 import type { QueryFactory } from '../ports/query-factory.ts';
+import type { SdkClientServerKeySuffix } from '../ports/query-key.ts';
 import type { QueryParams } from '../ports/query-options.ts';
+import type {
+  SdkClientContributionContext,
+  ValidateSdkClientContributions,
+} from '../ports/sdk-client-contribution.ts';
 import type {
   ContractLike,
   CreateServiceClientOptions,
   ServiceClient,
+  ServiceClientContext,
 } from '../ports/service-client.ts';
 import type { ServiceQueryUtils } from '../ports/service-query-utils.ts';
 
 /**
  * Service definition consumed by `defineServices()`.
  */
-export interface DefineServiceConfig<TContract extends ContractLike> {
+export interface DefineServiceConfig<
+  TContract extends ContractLike,
+  TContributions extends readonly object[] = readonly [],
+> {
   /** Contract definition used for client, query, and query-utils inference. */
   contract: TContract;
   /** Service name registered in Aspire / NetScript config; defaults to the map key. */
@@ -32,9 +41,19 @@ export interface DefineServiceConfig<TContract extends ContractLike> {
   apiPath?: string;
   /** API version segment. */
   apiVersion?: string;
-  /** Reserved override for explicit port selection. */
+  /**
+   * Reserved override for explicit port selection.
+   *
+   * @deprecated Migrate explicit service addressing to discovery configuration; #1351 owns the
+   * transport disposition.
+   */
   port?: number;
-  /** Reserved request timeout in milliseconds. */
+  /**
+   * Reserved request timeout in milliseconds.
+   *
+   * @deprecated Use an `AbortSignal` for request cancellation; #1351 owns the transport
+   * disposition.
+   */
   timeout?: number;
   /** Whether to propagate trace context headers automatically. */
   propagateTraceContext?: boolean;
@@ -42,41 +61,97 @@ export interface DefineServiceConfig<TContract extends ContractLike> {
   options?: QueryParams;
   /** TanStack Query path prefix for service query utils; defaults to the map key. */
   queryPath?: string[];
+  /** Explicit literal tuple of typed SDK client contributions. */
+  contributions?:
+    & TContributions
+    & ValidateSdkClientContributions<TContributions>;
 }
 
 /**
  * Input map accepted by `defineServices()`.
  */
-export type DefineServicesConfigMap = Record<string, DefineServiceConfig<ContractLike>>;
+export type DefineServicesConfigMap = Record<
+  string,
+  DefineServiceConfig<ContractLike, readonly object[]>
+>;
+
+/** @internal Extract the contribution tuple from one service config. */
+export type ContributionsOf<TConfig> = TConfig extends {
+  readonly contributions: infer TContributions extends readonly object[];
+} ? TContributions
+  : readonly [];
+
+/** @internal Extract the contract from one service config. */
+export type ContractOf<TConfig> = TConfig extends {
+  readonly contract: infer TContract extends ContractLike;
+} ? TContract
+  : never;
+
+/** @internal Detect a tuple that forbids generated query helpers. */
+export type HasDirectOnly<TContributions extends readonly object[]> = Extract<
+  TContributions[number] extends { readonly responseCache: infer TResponseCache } ? TResponseCache
+    : never,
+  { readonly mode: 'direct-only' }
+> extends never ? false
+  : true;
+
+/** @internal Detect a tuple that requires cache partitioning. */
+export type HasPartitioned<TContributions extends readonly object[]> = Extract<
+  TContributions[number] extends { readonly responseCache: infer TResponseCache } ? TResponseCache
+    : never,
+  { readonly mode: 'partitioned' }
+> extends never ? false
+  : true;
+
+/** @internal Select the exact server-cache key suffix for a tuple. */
+export type ServerKeySuffixOf<TContributions extends readonly object[]> =
+  HasPartitioned<TContributions> extends true ? readonly ['$netscript.sdk-context', string]
+    : readonly [];
+
+/** @internal Compose the compatibility context with contribution context. */
+export type ClientContextOf<TContributions extends readonly object[]> =
+  & ServiceClientContext
+  & SdkClientContributionContext<TContributions>;
+
+/** @internal Preserve the empty query-utils default when contributions are omitted. */
+export type QueryUtilsContextOf<TContributions extends readonly object[]> = TContributions extends
+  readonly [] ? Record<never, never>
+  : ClientContextOf<TContributions>;
+
+/** @internal Select service keys that permit generated query helpers. */
+export type QueryCompatibleServiceKeys<TServices extends DefineServicesConfigMap> = {
+  [K in keyof TServices]: HasDirectOnly<ContributionsOf<TServices[K]>> extends true ? never : K;
+}[keyof TServices];
 
 /**
  * Service clients produced by `defineServices()`.
  */
 export type DefinedServiceClients<TServices extends DefineServicesConfigMap> = {
-  readonly [K in keyof TServices]: TServices[K] extends DefineServiceConfig<
-    infer TContract extends ContractLike
-  > ? ServiceClient<TContract>
-    : never;
+  readonly [K in keyof TServices]: ServiceClient<
+    ContractOf<TServices[K]>,
+    ClientContextOf<ContributionsOf<TServices[K]>>
+  >;
 };
 
 /**
  * Query factories produced by `defineServices()`.
  */
 export type DefinedServiceQueries<TServices extends DefineServicesConfigMap> = {
-  readonly [K in keyof TServices]: TServices[K] extends DefineServiceConfig<
-    infer TContract extends ContractLike
-  > ? QueryFactory<TContract>
-    : never;
+  readonly [K in QueryCompatibleServiceKeys<TServices>]: QueryFactory<
+    ContractOf<TServices[K]>,
+    ClientContextOf<ContributionsOf<TServices[K]>>,
+    ServerKeySuffixOf<ContributionsOf<TServices[K]>> & SdkClientServerKeySuffix
+  >;
 };
 
 /**
  * Service query utils produced by `defineServices()`.
  */
 export type DefinedServiceQueryUtils<TServices extends DefineServicesConfigMap> = {
-  readonly [K in keyof TServices]: TServices[K] extends DefineServiceConfig<
-    infer TContract extends ContractLike
-  > ? ServiceQueryUtils<TContract>
-    : never;
+  readonly [K in QueryCompatibleServiceKeys<TServices>]: ServiceQueryUtils<
+    ContractOf<TServices[K]>,
+    QueryUtilsContextOf<ContributionsOf<TServices[K]>>
+  >;
 };
 
 /**
@@ -95,7 +170,16 @@ export interface DefinedServices<TServices extends DefineServicesConfigMap> {
  * Create SDK clients, query factories, and query utils from a service map.
  */
 export function defineServices<const TServices extends DefineServicesConfigMap>(
-  services: TServices,
+  services:
+    & TServices
+    & {
+      readonly [K in keyof TServices]: TServices[K] extends {
+        readonly contributions: infer TContributions extends readonly object[];
+      } ? {
+          readonly contributions: TContributions & ValidateSdkClientContributions<TContributions>;
+        }
+        : Record<never, never>;
+    },
 ): DefinedServices<TServices> {
   const clients: Record<string, unknown> = {};
   const queries: Record<string, unknown> = {};

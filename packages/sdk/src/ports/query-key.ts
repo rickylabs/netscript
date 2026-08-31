@@ -14,6 +14,22 @@ export type QueryKeyPart = string | number | boolean | null | undefined;
  */
 export type QueryKey = readonly QueryKeyPart[];
 
+/** Optional server-cache suffix for contribution-partitioned calls. */
+export type SdkClientServerKeySuffix =
+  | readonly []
+  | readonly ['$netscript.sdk-context', string];
+
+/** Canonical full server-cache key for a resource action. */
+export type ActionQueryKey<
+  TAction extends string = string,
+  TSuffix extends SdkClientServerKeySuffix = readonly [],
+> = readonly [
+  resource: string,
+  action: TAction,
+  serializedInput: string,
+  ...suffix: TSuffix,
+];
+
 /**
  * Serialize structured query input into the canonical cache-key segment.
  *
@@ -32,10 +48,19 @@ export function serializeQueryKeyInput(value: unknown): string {
  * @param input - Action input payload.
  * @returns Canonical action query key.
  */
-export function createActionQueryKey(
+export function createActionQueryKey<
+  const TAction extends string,
+  const TSuffix extends SdkClientServerKeySuffix = readonly [],
+>(
   resource: string,
-  action: string,
+  action: TAction,
   input: unknown,
-): readonly [string, string, string] {
-  return [resource, action, serializeQueryKeyInput(input)];
+  suffix?: TSuffix,
+): ActionQueryKey<TAction, TSuffix> {
+  return [
+    resource,
+    action,
+    serializeQueryKeyInput(input),
+    ...(suffix ?? []),
+  ] as ActionQueryKey<TAction, TSuffix>;
 }

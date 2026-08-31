@@ -36,6 +36,66 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'ai',
+    packagePath: 'packages/ai',
+    docPath: 'docs/site/reference/ai/index.md',
+    packageName: '@netscript/ai',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all thirteen entrypoints but does not yet inventory every symbol: /skills has no dedicated symbol section; the root prompt APIs, OpenAI-compatible vision exports, Ollama HttpReachabilityConfig, MCP pool/resource APIs, AgentLoop, newer contract/reasoning symbols, vector-memory and provider-factory ports, and retrieval testing helpers remain incomplete.',
+    },
+  },
+  {
+    name: 'auth-kv-oauth',
+    packagePath: 'packages/auth-kv-oauth',
+    docPath: 'docs/site/reference/auth-kv-oauth/index.md',
+    packageName: '@netscript/auth-kv-oauth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eight entrypoints were checked with deno doc; the page omits AUTH_SESSION_STATES, AtomicCheck, AtomicMutation, AtomicResult, AuthBackendPort, AuthPrincipalMapperPort, AuthProviderCapability, AuthProviderDescriptor, AuthProviderRegistryPort, AuthSession, AuthSessionCreateInput, AuthSessionCryptoPort, AuthSessionLookup, AuthSessionPrincipalMapping, AuthSessionState, AuthSessionStorePort, AuthenticatorPort, AuthnRequest, AuthnResult, ClientAuthMethod, InteractiveCallbackResult, InteractiveFlowPort, KvEntry, KvKey, KvListOptions, KvOAuthCookieOptions, KvOAuthEncryptedTokens, KvOAuthErrorCode, KvOAuthFetch, KvOAuthJsonValidator, KvOAuthKeyMaterial, KvOAuthPrincipal, KvOAuthRefreshMode, KvOAuthSessionRecord, KvOAuthStoreOptions, KvOAuthTxn, KvSetOptions, KvStore, NormalizePrincipalContext, OAuthCustomFetch, OAuthEndpointProviderConfig, OAuthIssuerProviderConfig, OAuthProviderBaseConfig, OAuthProviderClientAuthConfig, OAuthTokenCustomFetch, Principal, TenantOAuthProviderOptions, WatchEvent, WatchOptions, WatchPrefixOptions, WatchableKv, clientAuth, describeProvider, discoveryRequestOptions, hashToken, and requestOptions.',
+    },
+  },
+  {
+    name: 'plugin-triggers-core',
+    packagePath: 'packages/plugin-triggers-core',
+    docPath: 'docs/site/reference/plugin-triggers-core/index.md',
+    packageName: '@netscript/plugin-triggers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all twelve entrypoints and completely inventories the root/public/builders surface, while omitting substantial domain defaults/errors, port defer/clock contracts, adapter/store implementations, config and v1 contract schemas, telemetry types, and testing doubles reported by deno doc.',
+    },
+  },
+  {
+    name: 'plugin-auth-core',
+    packagePath: 'packages/plugin-auth-core',
+    docPath: 'docs/site/reference/plugin-auth-core/index.md',
+    packageName: '@netscript/plugin-auth-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.',
+    },
+  },
+  {
+    name: 'mcp',
+    packagePath: 'packages/mcp',
+    docPath: 'docs/site/reference/mcp/index.md',
+    packageName: '@netscript/mcp',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all three entrypoints while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.',
+    },
+  },
+  {
     name: 'plugin-streams-core',
     packagePath: 'packages/plugin-streams-core',
     docPath: 'docs/site/reference/plugin-streams-core/index.md',

@@ -1,0 +1,38 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "1591-final-fmt",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--include",
+    "^packages/ai/"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1591",
+  "gitHead": "8a6855d8a1cd874351ad96d99056a299f3045b1e",
+  "actualGitHead": "8a6855d8a1cd874351ad96d99056a299f3045b1e",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1420388",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "0a4ff2e1e957b29c3dcc3ecde244c19170746fe21e219b3d3996d625cc7f68e6",
+  "lifecycleId": "worker:1420388:1591-final-fmt:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T04:07:35.421Z",
+  "startedAt": "2026-08-31T04:07:35.423Z",
+  "finishedAt": "2026-08-31T04:07:35.969Z",
+  "durationMs": 546,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 304,
+    "sha256": "f823ef24ca5a7fa65af0027cbde11f1e94dc0e0c8329651abe0e0c8d905b6afb",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1591\",\"mode\":\"check\",\"summary\":{\"filesSelected\":100,\"batches\":1,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":100,\"filesProcessed\":100,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 285,
+    "sha256": "843970fa5c8aecac25bdb91ad8984bcc4c51ac1228998d432fa20b451d344644",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--include' '^packages/ai/'\n",
+    "truncated": false
+  }
+}

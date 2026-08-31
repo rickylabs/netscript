@@ -86,6 +86,8 @@ export type WorkerExecution = Readonly<
     readonly error?: string | null;
     readonly result?: Record<string, unknown> | null;
     readonly workerId?: string | null;
+    readonly progressPercent?: number | null;
+    readonly progressMessage?: string | null;
     readonly attempt?: number;
   }
 >;
@@ -117,6 +119,8 @@ type WorkerExecutionShape = {
   error: z.ZodOptional<typeof ExecutionRecordSchema.shape.error>;
   result: z.ZodOptional<typeof ExecutionRecordSchema.shape.result>;
   workerId: z.ZodOptional<typeof ExecutionRecordSchema.shape.workerId>;
+  progressPercent: z.ZodOptional<typeof ExecutionRecordSchema.shape.progressPercent>;
+  progressMessage: z.ZodOptional<typeof ExecutionRecordSchema.shape.progressMessage>;
   attempt: z.ZodOptional<typeof ExecutionRecordSchema.shape.attempt>;
 };
 
@@ -136,6 +140,8 @@ const WorkerExecutionZodSchema: z.ZodObject<WorkerExecutionShape> = ExecutionRec
   error: true,
   result: true,
   workerId: true,
+  progressPercent: true,
+  progressMessage: true,
   attempt: true,
 }).partial({
   topic: true,
@@ -149,6 +155,8 @@ const WorkerExecutionZodSchema: z.ZodObject<WorkerExecutionShape> = ExecutionRec
   error: true,
   result: true,
   workerId: true,
+  progressPercent: true,
+  progressMessage: true,
   attempt: true,
 });
 /** Stream entity schema for worker executions. */

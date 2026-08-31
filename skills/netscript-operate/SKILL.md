@@ -47,7 +47,7 @@ flags before re-querying telemetry tools.
 
 **A plugin's boundary never runs, or installation succeeded but nothing is wired.** Run
 `netscript plugin doctor` before reading source or hand-probing endpoints. Use
-`.claude/skills/help.md` when you do not yet know whether the symptom belongs to NetScript, Aspire,
+`.agents/skills/help.md` when you do not yet know whether the symptom belongs to NetScript, Aspire,
 or Deno.
 
 ## Docs funnel

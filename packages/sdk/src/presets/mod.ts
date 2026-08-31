@@ -36,11 +36,31 @@ export type {
   CompositeQuery,
   FactoryConfig,
   ProcedureInput,
+  ProcedureMeta,
   ProcedureOutput,
   QueryFactory,
 } from '../ports/query-factory.ts';
-export type { QueryKey, QueryKeyPart } from '../ports/query-key.ts';
+export type {
+  ActionQueryKey,
+  QueryKey,
+  QueryKeyPart,
+  SdkClientServerKeySuffix,
+} from '../ports/query-key.ts';
 export type { CacheQueryOptions, QueryParams } from '../ports/query-options.ts';
+export type {
+  SdkClientCachePartitionOptions,
+  SdkClientContextDeclaration,
+  SdkClientContribution,
+  SdkClientContributionContext,
+  SdkClientContributionId,
+  SdkClientContributionProtocol,
+  SdkClientPrepareOptions,
+  SdkClientProcedureDescriptor,
+  SdkClientRequestPatch,
+  SdkClientResponseCache,
+  SdkClientTransportDescriptor,
+  ValidateSdkClientContributions,
+} from '../ports/sdk-client-contribution.ts';
 export type {
   QueryClientFetchOptions,
   QueryClientFilters,
@@ -85,6 +105,7 @@ export type {
   CreateServiceClientOptions,
   NetScriptProcedureSchemas,
   ProcedureInputFromNode,
+  ProcedureMetaFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
   ServiceClientContext,
@@ -92,4 +113,5 @@ export type {
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
+  ServiceRequestRest,
 } from '../ports/service-client.ts';

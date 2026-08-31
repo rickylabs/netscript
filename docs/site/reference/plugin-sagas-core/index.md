@@ -35,7 +35,7 @@ subpaths expose the layers a host, adapter author, or test harness composes.
 | `@netscript/plugin-sagas-core/stores` | `./src/stores/mod.ts` | 56 | KV-backed instance and applied-key stores, `openSagaRuntimeKv`, and `resolveSagaStoreBackend`. |
 | `@netscript/plugin-sagas-core/middleware` | `./src/middleware/mod.ts` | 30 | Host middleware — `createSagaMiddleware`, `createSSEEventsMiddleware`, `emitSagaEvent`. |
 | `@netscript/plugin-sagas-core/integration/workers` | `./src/integration/workers/mod.ts` | 14 | Explicit workers-port helpers (`triggerJob`, `triggerTask`, `createWorkerTriggers`) that dispatch work **outside** synchronous saga handlers. |
-| `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 10 | Publisher port contracts for submitting saga messages from plugin surfaces. |
+| `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | 11 | Non-throwing publisher contracts plus `publishSagaOrThrow` for an explicit exception boundary. |
 | `@netscript/plugin-sagas-core/telemetry` | `./src/telemetry/mod.ts` | 43 | Telemetry attributes and instrumentation helpers, including an OpenTelemetry tracer factory. |
 | `@netscript/plugin-sagas-core/config` | `./src/config/mod.ts` | 24 | `defineSagaConfig` and the saga runtime configuration schemas. |
 | `@netscript/plugin-sagas-core/contracts/v1` | `./src/contracts/v1/mod.ts` | 29 | Version 1 saga API schemas and contract route types (`sagasContract`, `sagasContractV1`). |
