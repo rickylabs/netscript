@@ -6422,3 +6422,40 @@ the owner routing ruling new evaluations wait for #1792 (still OPEN, CLEAN, unme
 
 `#1781` and `#1764` remain OPEN/CLEAN at their exact handed-off heads (`a34c37eb2`, `9d8bbb4e9`),
 awaiting the coordinator's merge. Not mine to merge.
+
+### #1365 packaged as draft PR #1819; two of the issue's headline mechanisms are already fixed
+
+Opened **draft** PR #1819 at `2e9460450` (`Closes #1365`, milestone 0.0.7, labels type:fix /
+area:docs / area:plugins / area:aspire / priority:p0 / status:plan). Deliberately **not** labeled
+`openhands` + `status:plan-eval`: `openhands-phase-eval.yml` dispatches only on `ready_for_review`,
+on that label pair, or on `status:impl-eval` for a non-draft PR. Verified after the fact — every
+`Phase eval PR` and OpenHands run on the branch is `skipped`/`cancelled`, so the parked eval gate
+held. This is the #1781 redundant-dispatch failure avoided by checking the trigger before acting
+rather than after.
+
+**Supervisor Tier-A finding — issue #1365's body is partly stale, and I verified this against source
+rather than taking the author's word for it:**
+
+1. The issue cites `plugins/sagas/src/runtime/saga-publisher.ts:295-307` ending in
+   ``?? `http://127.0.0.1:${SAGAS_API_DEFAULT_PORT}` ``. At `5197e70b7`, `resolveServiceUrl`
+   (297–308) returns `undefined` when nothing resolves — **no fallback exists** (removed by #1740).
+   `SAGAS_API_DEFAULT_PORT` remains only as a deprecated compatibility export, asserted by
+   `deprecated-default-port_test.ts`; every other 8092 hit is an unrelated fixture, probe test, or
+   docs string.
+2. The issue says the scaffolded sample job discards the receipt. It does not:
+   `official-sample-configuration.ts:397-413` assigns `publishResult`, checks `!published`, and
+   returns `createFailureResult` before `createSuccessResult`.
+
+**What remains is still genuine, and narrower than p0's framing implies:** the API permits discarding
+the receipt (`await publish(m)` type-checks), the docs still *teach* discarding (4 unsafe calls incl.
+the canonical `durable-workflows/sagas.md` example commented "a typed receipt comes back"), the
+rejection is an uninformative `no-endpoint`, and `docs/site/reference/sagas/index.md:49` still calls
+8092 a "fallback port". So the composed silent-success failure is no longer reachable through the
+shipped scaffold, but is fully reachable through user code written the way the docs teach.
+
+Recorded rather than acted on: I did not relabel or reprioritize issue #1365 — that is coordinator-
+owned. Flagging it because a p0 whose two headline mechanisms are already fixed likely warrants a
+priority re-read, and because a plan that "fixed" already-fixed code would have manufactured false
+evidence. The author correctly refused that, and refused the scope creep in Q3/Q4/Q5 too.
+
+Leaf state: **parked at S1-complete**, PLAN-EVAL pending #1792. No new leaf launched.
