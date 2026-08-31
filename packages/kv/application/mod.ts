@@ -24,4 +24,6 @@ export {
 
 export { getRedisConnectionFromEnv } from './auto-detect.ts';
 
+export { createLazyKv } from './lazy-kv.ts';
+
 export { compareKeys, generateVersionstamp, keyHasPrefix, keyToString } from './keys.ts';
