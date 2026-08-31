@@ -4554,3 +4554,33 @@
     no push required to regain a slot), and a five-part acceptance test. Assigned to
     `orchestrator:internals` to start **after** the current runtime queue drains, so the fix does not
     contend with the lane it exists to help. **`e2e-cli.yml` is not edited from the Aspire lane.**
+
+- **D-193 — S9's sqlite runtime tier ran and FAILED; triage in progress, verdict currency at risk.**
+  The one surviving run from the evicted batch produced a real result rather than a cancellation, and
+  it is not green.
+  - **`scaffold-runtime-sqlite` on #1759 `042ff3ca5`: `passed=37 failed=1`.** Sole failure is
+    **`runtime.aspire-start`**, failing in **59 ms** — far too fast to be an AppHost startup problem:
+    ```
+    NotFound: No such file or directory (os error 2): readfile
+      '.../.llm/tmp/cli-e2e/plugin-smoke-20260831-144641/aspire.config.json'
+    ```
+    Raised at `packages/cli/e2e/src/application/gates/scaffold/local-source-fixture.ts:33`
+    (`JSON.parse(await Deno.readTextFile(configPath))`). `cleanup.aspire-stop` still PASSED, so the
+    suite tore down cleanly.
+  - **S9 is a plausible cause and must not be assumed innocent:** its 164-file diff includes
+    `runtime-gates.ts`, `runtime/listener-readiness-gates.ts`, `runtime/runtime-scripts.ts`, and the
+    whole `aspire-mcp/` gate family — the exact area around `runtime.aspire-start`.
+  - **But its `e2e-cli.yml` delta is clean** — I checked rather than suspecting it, since S9 touching a
+    workflow during a concurrency incident invites a wrong inference. The delta is purely additive
+    artifact-upload paths (`gate-receipts/.../agent.aspire-mcp-smoke*`, `retention-days: 30`). **It is
+    not related to the D-191 eviction**, which is caused by group semantics already on `main`.
+  - **Control experiment running:** #1747's attempt-2 sqlite tier is executing the same suite on the
+    same CI at a head that does **not** contain S9's gate changes. If `runtime.aspire-start` fails
+    there too, the fault is environmental/pre-existing; if it passes, it is S9-owned. Waiting for that
+    result before dispatching any repair — dispatching now would risk "fixing" a defect S9 does not
+    own.
+  - **A red runtime gate does not carry a PASS.** If this proves S9-owned, S9's IMPL-EVAL PASS at
+    `042ff3ca5` does not survive the repair head, and a fresh evaluation is required — the D-20
+    precedent (a recorded PASS is not a durable merge signal when live CI is red).
+  - S7's lease continues in parallel and is unaffected: 69 receipts written, 4 owned containers up
+    (two postgres/redis pairs, consistent with the required foreign-AppHost control).
