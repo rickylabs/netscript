@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "236a3d3314711a5bfa5bd4036699a22a8575a367",
+  "surface": "#1387 final integrated head (Slices 1-9 + 3x main integration)",
+  "expectedGateIds": [
+    "assets-barrel",
+    "check",
+    "exports-drift",
+    "fmt-check",
+    "lint",
+    "mcp-export-corpus",
+    "publish-dry-run",
+    "quality-gate",
+    "test"
+  ],
+  "receiptIds": [
+    "1387-final-barrel",
+    "1387-final-check",
+    "1387-final-exports-drift",
+    "1387-final-fmt",
+    "1387-final-lint",
+    "1387-final-corpus",
+    "1387-final-publish",
+    "1387-final-quality",
+    "1387-final-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}
