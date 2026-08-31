@@ -4650,3 +4650,15 @@
     prevented.
   - If #1754 fails identically, this is a **pre-existing, unowned garnet-health defect** that belongs
     to its own issue and must not be charged to any Aspire slice; if #1754 passes, #1747 owns it.
+
+- **D-197 — correction: S7's thread never died. My "orphan" read was a transient status miss.**
+  Thread `01a05841-8da9` is **alive and working** (`activityAgeMs 901`), sender `ownerPid 2376815`
+  alive, and its uncommitted set is still growing (23 → 27 paths). It is finishing its own commit.
+  - I had queued a `codex-resume` nudge on the assumption it had exited. The command failed on
+    argument shape (`codex-resume` takes `--thread-id` + `--message`/`--message-file`, not `--brief`)
+    — which was lucky: sending it would have **interrupted a working agent** mid-commit.
+  - **Lesson worth keeping: one absence from `codex-status` is not death.** The reliable liveness
+    signals are the sender record's `ownerPid` and a changing worktree, and both said alive here. The
+    genuine orphan pattern (five instances this run) always showed `ownerPid` **not** alive. I should
+    check `ownerPid` first and the session list second, not the reverse.
+  - No resume sent; leaving S7 to finish.
