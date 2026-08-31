@@ -4446,3 +4446,63 @@
     #1760 with `e2e-cli-gate` (or `ci:full`) applied, plus `impl-eval:skip` on each to protect the
     existing valid verdicts and stop four redundant evaluator runs. CI then produces the dual-tier
     runtime receipts these boxes name, on hardware the upstream Aspire limitation does not touch.
+
+- **D-189 — S7/#1744 live runtime lease GRANTED and dispatched at exact head `be2c7a3b0`.**
+  Thread `01a05841-8da9-75f1-b7cf-4f6b3a1b88a6` (gpt-5.6-sol · high), cwd `007-aspire-s7`, state
+  `working`, base artifact confirmed `be2c7a3b0`.
+  - **Four-part zero verified immediately before dispatch:** `aspire ps --format Json` → `[]`;
+    `docker ps -aq` → 0; `docker volume ls -q` → 0; no non-default networks. Sole lease holder.
+  - **Dind topology confirmed for the lease:** `DOCKER_HOST=tcp://netscript-dind:2375`, daemon
+    **28.5.2**, `netscript-dind` resolving to `10.4.12.22`. Brief directs published-port access via
+    the **`netscript-dind` hostname**, not `localhost`.
+  - **The brief separates lifecycle from reachability**, which is what makes this lease viable at all:
+    D-146/microsoft/aspire#14878 breaks published-port *reachability*, **not** AppHost *lifecycle*.
+    `start`/`stop`/`ps`, the process tree, and container cleanup all work, so a lifecycle+cleanup proof
+    is obtainable. An unreachable published port is recorded as the documented upstream limitation and
+    explicitly **not** treated as a slice failure.
+  - **Box 1 wording is left to the coordinator, deliberately.** The brief requires the agent to record
+    *exactly* what survives the kill and whether it carries a **Persistent lifetime annotation** —
+    observed surviving `aspire stop` five times already (D-98, D-102, D-103, D-141, D-176) — but
+    forbids it from adjudicating whether that counts as a "run-owned survivor", ticking the box, or
+    weakening it. The lease makes the open question decidable with evidence; it does not decide it.
+  - Also carried into the brief: `/proc/<pid>/cwd` process identity (never self-matching `pgrep -f`,
+    per D-182), stop only by exact `--apphost` path, never `aspire stop --all`, never
+    `aspire agent mcp`, never mutate foreign/unknown-owner resources, `--owned-root` for
+    outside-worktree resources, detached long suites, and four verbatim zero proofs plus an
+    independent `agentic:leak-check` before release.
+  - **Two launcher traps hit, one of them already in my own ledger.** `--` separator is rejected by
+    this task; `--provider/--model/--effort` are mandatory. Then staging failed on
+    `/home/codex/slice-brief.md: No such file or directory` — **exactly D-35**, which records that
+    `/home/codex` is gone on the NAS and `--dest /home/agent/<slug>-brief.md` is required. I should
+    have read my own drift entry before the first attempt rather than after the third.
+  - Dead sender released first: `ownerPid 3193589` not alive, released via
+    `LocalSenderOwnershipAdapter.release()` with the record's own lease token (never `rm`) — the
+    fourth instance of this orphan pattern this run.
+
+- **D-190 — coordinator ruled D-188; all five slices undrafted and the runtime lanes are live on CI.**
+  The draft gate that made these boxes unreachable is cleared.
+  - **Order mattered and was respected:** `impl-eval:skip` + `e2e-cli-gate` were applied to all five
+    **before** any undraft, so the `ready_for_review` event could not auto-dispatch an evaluator
+    against an already-valid verdict.
+  - **Verified it worked rather than assuming it.** The `OpenHands phase evaluation` run on each
+    branch completed with the single step **"Record attributed IMPL-EVAL skip"** — no evaluator was
+    dispatched. Every existing supervisor-dispatched verdict is preserved intact, per the owner's
+    standing no-rerun instruction.
+  - **`gh pr edit --add-label` failed with exit 1 on all five** (the org-scope GraphQL token issue
+    seen earlier this session); the REST `POST /issues/:n/labels` path worked. Worth remembering: the
+    label mutation silently reports failure through `gh pr edit`, so verifying the label landed is not
+    optional.
+  - **`e2e-cli` is scheduled on all five branches** (queued/in_progress). Attributed `impl-eval:skip`
+    rationale comments posted on each PR, stating that the label suppresses a *redundant second*
+    evaluation rather than substituting for a missing one, and that `status:ready-merge` will not be
+    applied by the supervisor.
+  - **One scheduling note for the coordinator, not an objection:** `scaffold-runtime` declares
+    `concurrency: group: e2e-scaffold-runtime-global, cancel-in-progress: false`, so all five
+    serialize globally through one queue. #1744's head will also move when its live lease lands
+    receipts, costing a second run at the authoritative head. Both were accepted rather than
+    re-sequenced, since the ruling was explicit and re-sequencing is not mine to choose.
+  - **S11 box 4 / S9 box 6 ruled inapplicable by trigger** and recorded on #1723 and #1721 with the
+    full rationale: `doc-audit.md` fires on Claude-generated changesets, both were Codex-generated, and
+    the profile's designated auditor (Codex Sol) collides with its own hard opposite-family invariant.
+    The `acceptance-evidence` mapping on PR #1771 was completed to all four boxes. **Box text left
+    unchanged and unweakened** — satisfied by a recorded ruling, not a softened claim.
