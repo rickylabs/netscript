@@ -7464,3 +7464,87 @@ A path that returns without awaiting would pass the test while defeating the ver
 The amendment remains undelivered (active-writer conflict); the retry loop dispatches on idle ≥90s
 with a captured exit per attempt, so the author receives this final version rather than either
 superseded one.
+
+## D-173 — P0 chain complete: #1762 merged; #1832 eval FAIL_IMPL; #1839 dispatched
+
+- **#1762 MERGED** 16:03:24Z — `main` is `6c195acaf` ("feat(service): type principal and declare
+  procedure policy (#1762)"). The cross-lane chain this lane was driving is closed:
+  **#1828 → #1762**. Four internals leaves have merged this session (#1823, #1828, #1830) plus the
+  feature they unblocked.
+
+### #1832 IMPL-EVAL returned `FAIL_IMPL` — and the "stall" was again a completed run
+
+The evaluator's transcript had been idle 70 minutes, which looked like the earlier hang. **Checked
+before acting, again**: the artifact existed, carried a verdict, and was **already committed and
+pushed** (`220f4b503` on the remote). It had finished; only the wrapper process lingered. Relaunching
+per the "bounded heartbeat" rule would have discarded a completed verdict and paid for a second
+evaluation. I reaped the finished wrapper instead. **Twice now, transcript idleness has been a false
+stall signal — the artifact and the remote ref are the reliable indicators, not process liveness.**
+
+**F1 (SIGNIFICANT), independently confirmed by me before relaying:** `packages/fresh-ui/deno.lock`
+still pins the entire pre-bump family (`@tanstack/ai@0.39.0`, `ai-anthropic@0.15.13`,
+`ai-mcp@0.2.1`, `ai-openai@0.15.10`, `ai-preact@0.10.1`), and
+`deno task --cwd packages/fresh-ui check` returns **`REAL_EXIT=1`**. This is a **fourth** stale
+artifact of the same class the leaf already fixed three times — a nested workspace carrying its
+**own** lock that the root regeneration never reached. This is precisely the "is a pin left behind?"
+question I aimed the evaluator at, and it earned its keep.
+
+**F2:** `docs/architecture/zod-dependency-boundary.md` still describes the pre-0.52 graph.
+
+Everything else **passed**: the dependency move, the zod-checker edit (verified fail-closed and
+lock-verified), #1829 preservation, adapter minimality, gate-carry by file identity, and the sibling
+#1543 boundary. Cycle-2 repair dispatched with a retry loop, requiring a **sweep for a fifth** stale
+lock — having been caught once by a nested lock, the leaf must prove there is not another rather than
+assume.
+
+### #1839 dispatched, with its sequencing hazard made explicit
+
+Confirmed the cited configuration at base: both runtime tiers pin a single repo-wide concurrency
+group with `cancel-in-progress: false`, which protects a *running* job and gives a *queued* one
+nothing — so a third arrival evicts the pending entry.
+
+The brief flags the trap in its own acceptance: proving "3+ PRs all execute" with **real** runtime
+runs would contend with the very globally-serialized queue the fix exists to help, which is why the
+issue says to pick it up after that queue drains. The acceptance explicitly permits **simulation**, so
+the brief requires it — a no-op-job harness in the same concurrency shape, asserted from **run
+timestamps** rather than configuration — and forbids consuming real runtime slots without my
+authorization. It also calls out that property 4 (re-entry without moving the head) **disqualifies**
+any "re-dispatch by pushing an empty commit" design, since that would trade a CI defect for an
+evidence defect by invalidating recorded IMPL-EVAL verdicts.
+
+### `check:mcp-export-corpus` main-red — NOT reproducible; not filed
+
+Instructed to adopt and file it as a bounded internals issue. **I could not reproduce it and did not
+file a speculative issue:**
+
+- `deno task check:mcp-export-corpus` at current `main` `6c195acaf`: **`REAL_EXIT=0`**.
+- `main` CI at `6c195acaf`: **success**; **zero failed** `ci.yml` runs on `main` in the last 20.
+- No commit touched the corpus generator or `docs/reference` on `main` since 12:00.
+
+Several earlier `main` runs show `cancelled`, but those are `ci.yml` push-cancellations (a newer push
+superseding an older run) — **not** the `e2e-cli.yml` queue-eviction defect of #1839, and I checked
+rather than counting them as corroboration. Filing an issue I cannot evidence would hand the next
+agent an unactionable ticket. **Request: the failing run ID from the Docs lane**, and I will adopt it
+immediately.
+
+## D-174 — Second protected-ceiling exception authorized for #1751, with a design challenge
+
+The author stopped at the ceiling boundary rather than editing through it, and its case was correct:
+`sender-ownership_test.ts` asserts `.kind === 'stale'` directly, so the vocabulary replacement cannot
+be done honestly without touching it, and keeping `'stale'` as a compatibility branch would preserve
+the very ambiguity being removed. **Authorized**, additive-only, with the new blob hash to be declared
+and the other four ceilings held byte-identical.
+
+**But I challenged its proposed mapping rather than rubber-stamping it.** It proposed *live/active,
+foreign, missing-profile and ambiguous provenance → `blocked`*. That bucket puts "a live agent
+legitimately owns this lease" together with "provenance is missing, so we refuse to decide" — two
+situations demanding different operator actions (**wait/resume** versus **fail-closed refusal, and
+arguably a defective record**). The defect being fixed is *one kind conflating two situations*; a
+mapping like that risks **moving** the ambiguity rather than removing it.
+
+I did not dictate the fix — either a third kind, or a `blocked` carrying a **structured,
+machine-readable** reason consumers can branch on rather than a prose diagnostic. What will be
+rejected is any mapping where two different required operator actions are indistinguishable to a
+caller. Grounded in the concrete case from this session: #1750's launch refusal named a
+14.6-hour-dead session and could not tell me which situation I was in, so I had to prove liveness by
+hand from `/proc`.
