@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1592-test",
+  "invocationId": "1592-int-test",
   "argv": [
     "deno",
     "task",
@@ -8,24 +8,24 @@
     "packages/plugin-workers-core/tests"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1592",
-  "gitHead": "ce6b00fad4d999fb4855f220120744564583504b",
-  "actualGitHead": "ce6b00fad4d999fb4855f220120744564583504b",
+  "gitHead": "aeb616805178b592ecf3408033e244cb25fa3453",
+  "actualGitHead": "aeb616805178b592ecf3408033e244cb25fa3453",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:853254",
+  "runnerIdentity": "worker:1362780",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "d93f1e074fb73f80702912faf1dcd4aac6f52181d8b452e1b81bf418b619e673",
-  "lifecycleId": "worker:853254:1592-test:1",
+  "requestHash": "24ac0f4bc1b3aa16f659ba464ceca5cc67fc5ad43221eb6a92b03d8b439122b5",
+  "lifecycleId": "worker:1362780:1592-int-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T00:41:36.553Z",
-  "startedAt": "2026-08-31T00:41:36.555Z",
-  "finishedAt": "2026-08-31T00:41:37.789Z",
-  "durationMs": 1234,
+  "claimedAt": "2026-08-31T03:54:10.040Z",
+  "startedAt": "2026-08-31T03:54:10.042Z",
+  "finishedAt": "2026-08-31T03:54:11.384Z",
+  "durationMs": 1342,
   "exitCode": 0,
   "stdout": {
     "bytes": 306,
-    "sha256": "17bd7afe49126d5c1971ad631bd97040d04d896eccf8bfb4413576e187bf285c",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin-workers-core/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1592\",\"exitCode\":0,\"durationMs\":1121,\"summary\":{\"passed\":29,\"failed\":0,\"ignored\":0,\"totalResults\":29,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "ab9775d0dbfc766c728130b6c4ed90bdcd0c2f6ecc55e0736d39e42da2f74cc7",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin-workers-core/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1592\",\"exitCode\":0,\"durationMs\":1217,\"summary\":{\"passed\":29,\"failed\":0,\"ignored\":0,\"totalResults\":29,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
