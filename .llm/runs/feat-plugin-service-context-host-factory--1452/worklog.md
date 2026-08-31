@@ -150,8 +150,8 @@ there was nothing to check out. Integrated once, at the final seam.
 | Conflict set | exactly one file — `export-surface-corpus.generated.ts`, a generated carrier |
 | Resolution | took `main`'s carrier and **regenerated from tooling**; never hand-edited |
 | Carrier currency | `check:mcp-export-corpus` exit 0 · `check:assets-barrel` exit 0 — both genuine tool output |
-| Six hand-written product blobs | **byte-identical** to the evaluated head `3130fb52b` |
-| Seventh blob (the corpus) | regenerated `1dd90409… → 6e84e995…` — it *was* the conflict, and `main`'s inputs moved; identity cannot and should not hold for a derivative |
+| Six non-corpus evaluated blobs | **byte-identical** to the evaluated head `3130fb52b`. Five are hand-written (`lazy-kv.ts`, the two KV barrels, `lazy-kv_test.ts`, `service-context.ts.template`); the sixth, `embedded.generated.ts`, is a **generated carrier** whose blob happens not to move because `main` did not touch it. Calling all six "hand-written" was wrong. |
+| Seventh blob — `export-surface-corpus.generated.ts` | the other **generated carrier**; regenerated `1dd90409… → 6e84e995…` because it *was* the conflict and `main`'s inputs moved. Byte-identity cannot and should not hold for a regenerated derivative; currency is proven by `check:mcp-export-corpus` exit 0 instead |
 | Product diff vs current `main` | exactly the seven files, no more |
 | `deno.lock` | byte-identical `edfa0c24…` |
 

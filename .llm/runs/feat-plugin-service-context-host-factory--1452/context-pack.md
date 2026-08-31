@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-plugin-service-context-host-factory--1452` |
 | Branch | `feat/kv-lazy-plugin-context` |
-| Current phase | implement |
+| Current phase | **ready-merge** (Slice 1 complete; Slice 2 deferred behind an architecture ruling) |
 | Archetype | `2 — Integration`; `6 — CLI/Tooling` carrier |
 | Scope overlays | none |
 
@@ -20,9 +20,7 @@ Slice 1 is **implemented, Tier-A ACCEPTED, IMPL-EVAL PASS, and fully gated**. Im
 PR #1820 is non-draft, `status:ready-merge`, `Refs #1452` **partial** with `closingIssuesReferences`
 deliberately empty. Slice 2 (the host factory) remains deferred behind an architecture ruling.
 
-Superseded bootstrap text, kept for provenance: *"The assigned leaf is clean at planning commit
-`fb08d2f9d`, based on current main `5197e70b7`. Research, locked plan, doctrine/archetype review, JSR
-surface scan, and Design checkpoint are complete. Implementation has not started."*
+The superseded bootstrap text is preserved in git history at `7bd87da5c`; it is not restated here.
 
 ## Completed
 
@@ -32,13 +30,16 @@ surface scan, and Design checkpoint are complete. Implementation has not started
 
 ## In Progress
 
-- Slice 1 implementation brief for the light implementation lane.
+- Nothing. Slice 1 is complete, gated, and evaluated; the PR is a surfaced merge candidate awaiting
+  the coordinator. Slice 2 is deferred, not in progress.
 
 ## Next Steps
 
-1. Implement/test `createLazyKv()` inside the file ceiling.
-2. Supervisor reviews the slice, then run scoped/Tier-A gates.
-3. Regenerate the embedded asset carrier, record evidence, commit/push, and open a draft PR.
+1. Coordinator merges PR #1820 at the exact evidence head. This lane does not merge.
+2. Slice 2 stays blocked until the `@netscript/plugin` → `@netscript/kv` dependency-edge ruling, the
+   db-resolver injection shape, and the undefined `appsettings` scope are decided.
+3. Fold the evaluator's deferred finding — `SharedKvConfig` is only implicitly exported and
+   `createLazyKv` is absent from the kv reference page — into Slice 2 or the docs sweep.
 
 ## Key Decisions
 
@@ -47,7 +48,7 @@ surface scan, and Design checkpoint are complete. Implementation has not started
 | `createLazyKv(config?)` in KV application layer | plan LD-1/LD-2 | One new stable root export only |
 | Template imports the primitive | plan LD-4 | No other host composition changes |
 | PLAN-EVAL N/A | plan/worklog | Mechanical, fully specified Slice 1 only |
-| No reviewer dispatch in this lane | owner process boundary | Stop at draft Tier-A handoff |
+| Reviewer dispatch | superseded by coordinator order | The separate-session IMPL-EVAL was dispatched and returned `PASS`; the original "stop at draft Tier-A handoff" boundary no longer applies |
 
 ## Files Changed
 
@@ -88,4 +89,4 @@ non-empty `stdout.bytes` against the known `deno task` cache-replay trap.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments once opened.
+- PR #1820 is open and non-draft; its commit list and per-slice comments are the commit trail.
