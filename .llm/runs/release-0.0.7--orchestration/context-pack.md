@@ -2073,3 +2073,7 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - #1814/#1773/#1823/#1803 are released for their one final current-main convergence and fresh CI.
   #1664 hosted runtime, #1834, #1828/#1832/#1737, S10/S11/#1747, #1609, and docs evaluations and
   oldest-PR dispositions remain independently active. No lane-wide pause is authorized.
+- Oldest open PR #1522 was independently proven superseded by merged #1523 and the #1450 filing
+  ledger; its unique remainder was prohibited operational metadata. The coordinator repaired the
+  ledger's broken main link, closed #1522 unmerged without a shipped status, and deleted its remote
+  branch. #1640 remains the Docs-owned Backlog/Triage RFC disposition, not a silent 0.0.7 move.

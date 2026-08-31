@@ -3283,6 +3283,17 @@
   hosted runtime, #1834 evaluation, #1828 evaluation, #1832 dependency validation, S10/S11/#1747,
   and the docs evaluation/oldest-PR sweep remain active rather than waiting on this merge wave.
 
+## 2026-08-31T05:50:39Z — oldest-PR sweep closes superseded #1522 safely
+
+- Independent current-main audit found PR #1522 outside 0.0.7 with no product delta, closing issue,
+  milestone, non-vacuous DoD, separate docs audit, or post-ready CI. Its useful filing ledger already
+  landed through #1523; its unique remainder exposed obsolete session/worktree/leak metadata that
+  current NAS repository rules prohibit publishing.
+- The coordinator repaired #1450's broken deleted-branch `FILING-LOG.md` link to the existing main
+  blob, documented the supersession on #1522, removed its false `status:ready-merge`, closed it
+  unmerged, and deleted remote branch `docs/devtools-rfc-run-closeout`. This is deliberate archival
+  disposition, not a shipped release payload.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance
