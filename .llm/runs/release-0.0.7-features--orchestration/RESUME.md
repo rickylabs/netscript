@@ -12,16 +12,29 @@
 | Route | Opus 5 · xhigh · supervise-only · never merge |
 | Eval routes | IMPL `z-ai/glm-5.3-flash` · max; PLAN `qwen/qwen3.8-flash` · max. DeepSeek is LEGACY. |
 
-## PR control plane
+## PR control plane — 2026-08-31 ~06:05Z
 
-| PR | Issue | Head | State | Exact next gate |
+| PR | Issue | Head | State | Blocked on |
 | --- | --- | --- | --- | --- |
-| **#1805** | #1591 | `e76e02271` | **EXACT-GREEN MERGE CANDIDATE** — non-draft, CLEAN, one `status:ready-merge`, `Fixes #1591` live, IMPL-EVAL **PASS**, all CI green, 0 review threads | **none — handed to coordinator** |
-| **#1762** | #1387 | `686eedb62` | non-draft, `status:ready-merge`, `Fixes #1387` live, IMPL-EVAL **PASS** at `d7cf2419c`, `close-gate` **PASS** | **HELD** until P0 #1827 merges; then ONE integration of complete `main`, carry the PASS across, recut gates |
-| #1810 | #1458 | `96f9cea99` | non-draft, integrated, gates recut, IMPL-EVAL dispatched | await verdict → tick DoD → `status:ready-merge` → rerun close-gate |
-| #1814 | #1592 **partial** | `d2c290c0c` | non-draft, integrated, gates recut | IMPL-EVAL — next in the serial chain |
-| #1820 | #1452 **partial** | `3130fb52b` | non-draft, integrated, gates recut | IMPL-EVAL — third in the serial chain |
-| #1664 | #1355/#1360 | `a257807d8` | CONFLICTING, parked | **owner boundary — do not revive unilaterally** |
+| **#1814** | #1592 partial | `0dc5ef539` | exact-head CI **green**; 10 blobs identical; disjoint from #1823/#1803 (proven, clean synthetic merge) — **no rebase taken** | eval verdict → tick DoD |
+| **#1762** | #1387 | `3ba369f51` | converged onto live main; `close-gate` + `quality` **green**; DoD added; ledger corrected 3→**6** integrations | **#1828** (`deno.unstable` lib parity) — nothing else |
+| **#1664** | #1355/#1360 | `270c31d4d` | recovered from Aug-15 park; `scaffold-static` green; all 17 acceptance rows verified | `--client` selector slice (dispatched) |
+| **#1834** | #1349 S1 | `903cd520e` | Tier-A ACCEPTED; core CI **green** | eval verdict → tick DoD |
+
+**Shipped this session:** #1805/#1591, #1810/#1458, #1820/#1452 (partial; #1452 correctly left open).
+
+## Live workers (all watched, none stalled)
+
+- #1814 eval — run `33359533524`, agent step 17/32, ~55 min (long but genuinely running; do **not**
+  kill without checking the agent job's step counter).
+- #1834 eval — run `33361000853`, agent step 17/32.
+- #1664 `--client` selector — Codex thread `01a05668-1a29-77c0-9a01-4dd740c59db9`.
+
+## Watcher-filter trap (cost two false wakeups)
+
+A comment filter of `^\*\*\[PHASE: IMPL-EVAL\]` or `OPENHANDS_VERDICT` matches **the dispatch
+prompt** (it quotes the verdict tokens) **and this supervisor's own phase comments**. Poll the
+**workflow run status** instead — that is unambiguous.
 
 ## Corrections to the previous checkpoint — both were wrong, both cost time
 
