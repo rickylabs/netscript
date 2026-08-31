@@ -6928,3 +6928,56 @@ rather than rebasing it away, and stopped at the boundary.
   wait, and #1737's evaluator was explicitly instructed **not** to launch a repo-wide run, so they do
   not contend for the expensive gate. Each was told a sibling is running so neither reads timing
   variance as a defect.
+
+## D-156 — #1823 banked exact-green at `993e57ef5`; final convergence held for #1829
+
+`main` advanced again to `052f86595b06b33cf0e205405873cd979cf535d1` (#1819). Per instruction the
+current result is **banked**, and final convergence waits for #1829's imminent user-facing merge so
+the complete base is integrated **once** rather than chased.
+
+**Banked result — exact head `993e57ef54d463d0e2e9ecefa9aba6b8ed91e541`:**
+
+| Field | Value |
+| --- | --- |
+| CI rollup | **6 SUCCESS / 12 SKIPPED / 0 FAILURE** |
+| `check-test` | **pass**, 8m17s |
+| `quality` | pass, 2m0s |
+| `close-gate` | pass |
+| `code-quality` | pass |
+| `classify changes` | pass |
+| Review threads | 0 / 0 unanswered |
+| Protected blobs | validator `23d2710ee…`, test `1b07155e6…`, eval artifact `b3e9f30b2…` — all unchanged |
+| Labels | sole `status:ready-merge`, PR ready, `MERGEABLE` |
+
+This is a genuine exact-head green, not a merge-ref inference. It is now the fallback of record: if
+the post-#1829 integration turns out clean and blob-identical, the leaf carries this evidence plus
+one recut; if the integration disturbs anything, this banked head is the known-good comparison point.
+
+**Deliberately NOT re-merged now.** `052f86595` is already one advance past the banked head, and
+#1829 is imminent. Integrating on every advance burns a CI cycle per merge and never converges —
+the whole reason the seam discipline exists.
+
+## D-157 — #1695/#1832 opened, and it collides HARD with user-facing #1829
+
+The restarted #1695 slice produced real work, not a pin edit: head `b448df09a`, draft PR **#1832**.
+Leaf-authored surface is `packages/ai/deno.json`, `deno.lock` (152 lines),
+`packages/ai/src/adapters/tanstack-chat-client.ts` (27 lines), and
+`packages/ai/tests/tanstack_chat_client_test.ts` (+99). The adapter changes indicate the 0.39 → 0.48
+family move **did** carry an upstream API change that had to be handled — which is what the brief
+demanded rather than a bump-and-hope.
+
+**Collision found before it could bite — recorded as DR-r3-03.** #1832 and #1829
+(`fix/ai-usage-detail-passthrough`, user-facing, imminent) modify the **same two hand-written
+files**. This is worse than the #1737/#1759 generated-barrel seam: a barrel resolves by
+regeneration, but two independent edits to the same adapter can conflict **semantically**, and a
+clean textual merge would not prove the bumped adapter still preserves #1829's nested-usage
+behavior.
+
+**#1832 holds.** It does not advance toward ready. After #1829 merges it integrates the complete
+base once and must re-verify **#1829's own passthrough coverage against the bumped dependency**, not
+merely re-run its own tests.
+
+Recording the process gap honestly: the disjointness boundary I gave on the #1695 restart named only
+sibling #1543 and was correct as written, but #1829 landed in that file surface afterwards. **A
+collision check taken once at dispatch goes stale** — for a leaf whose entire job is moving a
+dependency family, it has to be re-taken at final freeze. Carrying that forward.

@@ -386,3 +386,30 @@ asking whether the instrument could see the defect class the change could produc
 Secondary trap from the same receipt: the failing report reads
 `summary: 0 passed / 0 failed / 0 ignored`. "0 failed" reads as green to a careless reader. The
 signal is `exitCode` plus `processFailure.reason`.
+
+## DR-r3-03 — #1695/#1832 has a HARD SOURCE collision with user-facing #1829
+
+**Not a generated-carrier seam this time — the same hand-written source files.**
+
+| Path | #1832 (`deps/tanstack-ai-caret-bump`, Internals) | #1829 (`fix/ai-usage-detail-passthrough`) |
+| --- | --- | --- |
+| `packages/ai/src/adapters/tanstack-chat-client.ts` | modified (adapter changes forced by the 0.39 → 0.48 family bump) | modified (nested `TokenUsage` detail passthrough) |
+| `packages/ai/tests/tanstack_chat_client_test.ts` | modified (+99 lines) | modified |
+
+Both PRs edit the **same two files**, and #1829 is user-facing and imminent. This is materially
+worse than DR-r3-01: a generated barrel resolves by regeneration, but two independent hand edits to
+the same adapter can conflict **semantically** as well as textually — #1832 is changing the adapter
+because the upstream API moved, while #1829 is changing its behavior. A clean textual merge would not
+by itself prove the bumped adapter still preserves #1829's nested usage detail.
+
+**Disposition:** #1832 must **not** advance toward ready until #1829 merges. It then integrates the
+complete base once and re-verifies — specifically re-running #1829's own passthrough coverage against
+the bumped dependency, not merely re-running its own tests. Ordering belongs to the coordinator;
+this lane holds.
+
+The brief I sent on the #1695 restart declared disjointness only from sibling #1543
+(`packages/plugin-workers-core`, `plugins/triggers`). That boundary was correct as written and is
+still respected — **#1829 was not on the collision list**, because it is another lane's leaf that
+landed in the same file surface after the boundary was drawn. Recording the gap rather than the
+excuse: a collision check taken once at dispatch goes stale, and for a leaf whose whole job is to
+move a dependency family, the check has to be re-taken at final freeze.
