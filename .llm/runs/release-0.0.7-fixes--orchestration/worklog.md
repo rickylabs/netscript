@@ -7047,3 +7047,33 @@ still completing at time of writing.
 Anticipated per the ruling: **#1820 is the next merge front**, so #1819 will need one final
 generated-carrier refresh after it lands. The handwritten blob set is expected to stay identical
 through that too, which is the property that lets the PASS carry without an evaluator rerun.
+
+### #1819 final carrier convergence complete at `de06e1743` (post-#1820 main `26e1b486f`)
+
+Third and final convergence. Sole conflict was again the generated MCP export-surface corpus,
+resolved **strictly by generator** — the chain moved only that file. Across all three convergences
+(`eaea940bea`, `0e93a6c05`, `26e1b486f`) **every conflict was a generated carrier and none was
+hand-merged**.
+
+- **Blob identity holds: 0/14** handwritten saga-owned paths differ from the GLM-evaluated head
+  `ecb82ae2e`; `deno.lock` byte-identical at `edfa0c24…d1820c`. The `PASS_IMPL` therefore carries
+  without any evaluator rerun, exactly as directed.
+- Re-verified at `de06e1743`: `quality:scan:repo` findings 0 / allowCount 7; `packages/plugin-sagas-core`
+  87/0/3; `docs:snippets:test` 12/0; all three carrier checks exit 0; tracked tree clean.
+- **close-gate: success**; review threads 0/0; acceptance mirror re-run at this head (`changed: []`,
+  already correct at 8/8).
+- **Truth repairs applied**: title is now `fix(sagas): make publish receipts non-discardable` (endpoint
+  diagnostics are excluded to #1825 and the old title implied otherwise); body rewritten so no stale
+  head/main claim survives — zero references to `26553353`/`8eaac635d` remain, and the convergence
+  history is stated once, accurately.
+- `ci` `check-test` was still completing at the time of writing; every other job is success or
+  skipped.
+
+### #1829 queued as the next user-facing merge after #1819
+
+Its synthetic merge ref is stale at `0e93a6c05`. Per the coordinator it converges **once** onto
+then-current main after #1819 lands, preserving byte-identically the two product/test blobs
+(`packages/ai/src/adapters/tanstack-chat-client.ts`, `packages/ai/tests/tanstack_chat_client_test.ts`)
+and the evaluator artifact, then fresh exact CI and merge-ref before any lower-priority internal or
+docs packet. Not converged yet — deliberately, to avoid a churn that would only go stale again when
+#1819 merges.
