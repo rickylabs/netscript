@@ -108,6 +108,7 @@ deno.lock resolved core 0.39.0, Anthropic 0.15.13, MCP 0.2.1, OpenAI 0.15.10
 | --- | --- | --- | --- |
 | 2026-08-31T05:04:12Z | 1 | bootstrap/research | Verified exact base/branch, current `origin/main`, stable targets, upstream APIs/changelogs, call sites, and JSR baseline without merging main. |
 | 2026-08-31T05:11:50Z | 1 | implementation | Moved all four pins, resolved the lock normally with `deno install` RC 0, adapted the 0.52 activity/event types at the existing bridge, and added focused tool-end/AG-UI-usage regressions. |
+| 2026-08-31T05:15:20Z | 1 | final freeze | Fetched and merged `origin/main` `26e1b486f95aec121d71f2f4cd0411dc6069af04` exactly once, then reran the full gate set at merge head `cf1e5091bc5af990fd9a7daf78440d975d9de920`. |
 
 ## Implementation
 
@@ -146,6 +147,16 @@ The remaining closure movement is attributable to the four packages' peer/transi
 including `@tanstack/ai-event-client` `0.11.2` and `@tanstack/ai-utils` `0.4.0`; the old `0.39`
 closure remains where the untouched Fresh package still requires it.
 
+At the integrated head, the leaf delta against `origin/main` is:
+
+```text
+deno.lock | 152 ++++++++++++++++++++++++++++++++++++++------------------------
+1 file changed, 94 insertions(+), 58 deletions(-)
+```
+
+The extra insertion is the exact `npm:@tanstack/ai@0.52.0` resolution used while inspecting the
+new exported surface. The four owned resolution lines remain exactly those shown above.
+
 ## Post-Edit Stable-Version Output
 
 ```text
@@ -167,6 +178,7 @@ Both remaining rows come from untouched `packages/fresh/deno.json`; none of the 
 | Upgrade four pins coherently to the `deps:latest` stable releases | Avoid incompatible 0.x peer families | brief + dependency toolchain |
 | PLAN-EVAL N/A | No material decision remains after research | `plan.md`, plan-gate checklist |
 | Merge main once only at final freeze | Intermediate integration invalidates evidence | owner correction |
+| Adapt core 0.52 at the existing bridge | Compiler identified required activity context, name-less tool-end events, and usage arrays | scoped check + `deno doc` |
 
 ## Drift
 
@@ -175,6 +187,7 @@ Both remaining rows come from untouched `packages/fresh/deno.json`; none of the 
 | Run ID uses launcher `fix-` name instead of brief's stale `deps-` name | minor | yes |
 | `rtk` binary unavailable on this host; raw read-only commands used | minor | yes |
 | Core stable advanced from brief example 0.48.0 to authoritative 0.52.0 | minor | yes |
+| Final `origin/main` advanced beyond the corrected brief hash to `26e1b486f` | minor | yes |
 
 ## Gate Results
 
@@ -191,7 +204,6 @@ Both remaining rows come from untouched `packages/fresh/deno.json`; none of the 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| upgraded package check/test/lint/fmt | see validation plan | NOT_RUN | Run after dependency edit. |
 | upgraded package check | structured check wrapper | PASS (RC 0) | 101 TypeScript files; includes `--unstable-kv`. |
 | upgraded package tests | structured test wrapper | PASS (RC 0) | 149 passed, 0 failed. |
 | upgraded package lint | structured lint wrapper | PASS (RC 0) | 101 files, no findings. |
@@ -217,9 +229,30 @@ Both remaining rows come from untouched `packages/fresh/deno.json`; none of the 
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| current `origin/main` package call sites | NOT_RUN | final integrated check/tests | Intermediate package evidence is green; rerun after the single final merge. |
+| current `origin/main` package call sites | PASS (RC 0) | final integrated check/tests | Current main's OpenAI Responses changes are included; 152 tests pass. |
+
+### Final Integrated-Head Gates
+
+All commands below used `out=$(cmd 2>&1); rc=$?`; no pipeline supplied a verdict.
+
+| Gate | Result | Integrated-head evidence |
+| --- | --- | --- |
+| `deps:latest --filter '@tanstack/ai*'` | PASS (RC 0) | Only the two untouched Fresh rows remain; raw output matches Post-Edit Stable-Version Output above. |
+| structured package check | PASS (RC 0) | 101 files, zero diagnostics, `--unstable-kv`. |
+| structured package tests | PASS (RC 0) | 152 passed, 0 failed. |
+| structured package lint | PASS (RC 0) | 101 files, zero findings. |
+| structured package format | PASS (RC 0) | 101 files, zero findings. |
+| `deno task quality:gate` | PASS (RC 0) | Quality scan, dependency checks, architecture/doctrine checks pass. |
+| JSR package audit | PASS (RC 0) | Same two baseline warnings; 101 files / 21 test files. |
+| package publish dry-run | PASS (RC 0) | Same three existing MCP dynamic-import warnings. |
+| `deno task deps:audit` | PASS (RC 0) | Existing workspace advisories reported at configured low level. |
+| package doc lint | BASELINE FAIL (RC 1) | Unchanged: combined summary zero, same per-entrypoint private-type diagnostics. |
+| lock review | PASS | 152-line leaf delta; exact old/new family lines recorded above. |
+| sibling boundary | PASS | No diff for `packages/plugin-workers-core/deno.json` or `plugins/triggers/deno.json`. |
 
 ## Handoff Notes
 
 - IMPL evaluator should first inspect the four pin/lock lines, the before/after lock evidence, and
   the full post-merge captured-RC gate table.
+- PR #1832 remains in `status:impl`; this implementation session did not dispatch or perform
+  IMPL-EVAL.

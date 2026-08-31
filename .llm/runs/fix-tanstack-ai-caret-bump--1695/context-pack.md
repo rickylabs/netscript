@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-tanstack-ai-caret-bump--1695` |
 | Branch | `deps/tanstack-ai-caret-bump` |
-| Current phase | `implementation / pre-freeze` |
+| Current phase | `implementation complete / awaiting external IMPL-EVAL` |
 | Archetype | `4 - Public DSL / Builder` |
 | Scope overlays | `none` |
 
@@ -15,7 +15,8 @@
 Research and Plan & Design are complete, with `PLAN-EVAL: N/A` recorded before implementation. All
 four pins and the lock are updated. TanStack 0.52's required activity context, name-less tool-end
 event, and AG-UI usage-array changes are handled at the existing chat bridge with focused tests.
-Intermediate gates pass, and `origin/main` has not yet been merged.
+The single final merge of `origin/main` `26e1b486f` is complete. The authoritative integrated-head
+gate set passes except for the unchanged package doc-lint baseline, recorded with RC 1.
 
 ## Completed
 
@@ -28,17 +29,17 @@ Intermediate gates pass, and `origin/main` has not yet been merged.
 - Breaking-change adaptations plus focused regressions.
 - Intermediate structured check (101 files), tests (149), lint, format, quality, JSR, publish, and
   dependency audit evidence.
+- One-time final main integration and authoritative rerun: 101 files check/lint/fmt clean, 152 tests
+  pass, quality/JSR/publish/dependency audits RC 0.
 
 ## In Progress
 
-- Record the implementation slice in a clean commit, then perform the single final merge.
+- External IMPL-EVAL only; implementation work and evidence are complete.
 
 ## Next Steps
 
-1. Commit the in-scope implementation and harness evidence.
-2. Merge current `origin/main` exactly once.
-3. Rerun every captured-RC gate at the integrated head.
-4. Finalize evidence, commit, push by explicit refspec, and open the PR for external IMPL-EVAL.
+1. Supervisor dispatches the separate-session IMPL-EVAL for PR #1832.
+2. A passing evaluator can complete the final DoD checkbox and advance the lifecycle.
 
 ## Key Decisions
 
@@ -62,18 +63,19 @@ Intermediate gates pass, and `origin/main` has not yet been merged.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | intermediate green | `worklog.md` |
-| Fitness | intermediate green except unchanged doc-lint baseline | `worklog.md` |
-| Runtime | intermediate green | 149 package tests |
-| Consumer | pending | post-final-merge integrated gates |
+| Static | integrated green | `worklog.md` |
+| Fitness | integrated green except unchanged doc-lint baseline | `worklog.md` |
+| Runtime | integrated green | 152 package tests |
+| Consumer | integrated green | current-main Responses call sites included |
 
 ## Open Questions
 
-- None that block implementation.
+- None. External IMPL-EVAL remains a required supervisor action.
 
 ## Drift and Debt
 
-- Drift: launcher run-ID correction, unavailable `rtk`, and stable version newer than brief example.
+- Drift: launcher run-ID correction, unavailable `rtk`, stable version newer than brief example, and
+  final main newer than the correction's snapshot.
 - Debt: no new debt planned; existing JSR/doc/cardinality baseline must not worsen.
 
 ## Commits

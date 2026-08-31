@@ -30,3 +30,13 @@
 - **Action:** accept
 - **Evidence:** bootstrap command output.
 
+## 2026-08-31 — final main advanced beyond correction snapshot
+
+- **What:** The final-freeze `origin/main` target was newer than the hash named in the correction.
+- **Source:** captured fetch and direct `git rev-parse origin/main`.
+- **Expected:** `0e93a6c0574eb557b1322a4298cee3f7adbeafa2` from the correction snapshot.
+- **Actual:** `26e1b486f95aec121d71f2f4cd0411dc6069af04` at final freeze.
+- **Severity:** minor
+- **Action:** accept; merged current `origin/main` exactly once as instructed and reran all gates.
+- **Evidence:** merge head `cf1e5091bc5af990fd9a7daf78440d975d9de920` has parents `b448df09a`
+  and `26e1b486f`.
