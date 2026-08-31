@@ -683,6 +683,89 @@ Deno.test('toNetScriptChatResponse gates on authorize and wires the write URL', 
   );
 });
 
+Deno.test('toNetScriptChatResponse forwards completion options without injecting a mode default', async () => {
+  const waitUntil = (_task: Promise<unknown>): void => {};
+
+  await toNetScriptChatResponse({
+    target: baseTarget,
+    source: (async function* () {})(),
+    mode: 'await',
+    waitUntil,
+    toResponse(input) {
+      assertEquals(input.mode, 'await');
+      assertStrictEquals(input.waitUntil, waitUntil);
+      return Promise.resolve(new Response(null, { status: 200 }));
+    },
+  });
+
+  await toNetScriptChatResponse({
+    target: baseTarget,
+    source: (async function* () {})(),
+    toResponse(input) {
+      assertEquals(input.mode, undefined);
+      assertEquals(input.waitUntil, undefined);
+      return Promise.resolve(new Response(null, { status: 202 }));
+    },
+  });
+});
+
+Deno.test('real chat transport reports status and propagates write failures by completion mode', async () => {
+  const controller = new AbortController();
+  const methods: string[] = [];
+  const server = Deno.serve(
+    { port: 0, signal: controller.signal, onListen() {} },
+    async (request) => {
+      methods.push(request.method);
+      await request.body?.cancel();
+      return new Response(null, { status: request.method === 'PUT' ? 201 : 204 });
+    },
+  );
+
+  const writeFailure = new Error('assistant write failed');
+  const failingSource = () =>
+    (async function* () {
+      yield { type: 'TEXT_MESSAGE_CONTENT', delta: 'partial' };
+      throw writeFailure;
+    })();
+
+  try {
+    const { port } = server.addr as Deno.NetAddr;
+    const target = { sessionId: 'completion-mode', baseUrl: `http://127.0.0.1:${port}` };
+
+    const awaited = await toNetScriptChatResponse({
+      target,
+      source: (async function* () {
+        yield { type: 'TEXT_MESSAGE_CONTENT', delta: 'complete' };
+      })(),
+      mode: 'await',
+    });
+    assertEquals(awaited.status, 200);
+
+    await assertRejects(
+      () => toNetScriptChatResponse({ target, source: failingSource(), mode: 'await' }),
+      Error,
+      writeFailure.message,
+    );
+
+    let backgroundTask: Promise<unknown> | undefined;
+    const immediate = await toNetScriptChatResponse({
+      target,
+      source: failingSource(),
+      waitUntil(task) {
+        backgroundTask = task;
+      },
+    });
+    assertEquals(immediate.status, 202);
+    assert(backgroundTask, 'immediate mode should register the background write task');
+    await backgroundTask;
+
+    assertEquals(methods, ['PUT', 'POST', 'PUT', 'POST', 'PUT', 'POST']);
+  } finally {
+    controller.abort();
+    await server.finished.catch(() => undefined);
+  }
+});
+
 Deno.test('toNetScriptChatResponse throws when authorize is given without a request', async () => {
   await assertRejects(
     () =>
