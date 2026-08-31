@@ -6163,3 +6163,20 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   signals here, not a process-name grep** — using those going forward.
 - Serial queue order after #1751 reaches terminal: **#1750** (already staged), then #1753, #1737,
   #1543, then the two `status:plan` items (#1695, #1351). #1429 excluded as Aspire-owned.
+
+## D-129 — #1751 Slice 3 RED verified genuine; safety constraints honored
+
+- Commit `fbdf28b6a`, exactly the four declared test files plus `worklog.md` — no rescope.
+- **Genuinely RED for the right reason**, verified with real exit capture: `REAL_EXIT=1`,
+  0 passed / 10 failed, all failures `Module not found` for `sender-lease-repair.ts`,
+  `local-sender-lease-repair-adapter.ts`, and `codex-thread-read.ts` — the three Slice 4 modules
+  that do not exist yet. Failing on absent implementation, not on broken tests.
+- **Slice-1 test ceiling still byte-identical** (`74b0ba61...`) at this commit — verified again
+  rather than assumed to persist.
+- **Safety constraints honored, checked in the source not the claim**: the production sender root
+  is referenced *only* as a negative assertion (`assert(!path.startsWith(production), ...)`) with a
+  companion `assert(path.startsWith(testRoot))`, and a `stopAndReap` helper bounds spawned children.
+  Live production registry independently confirmed untouched: 42 records, newest mtime `02:27`
+  predating the test run.
+- Dispatching Slice 4 GREEN next — the largest slice, and the one that adds the eviction path, so
+  the same ceiling discipline applies to all four Slice 3 test blobs.
