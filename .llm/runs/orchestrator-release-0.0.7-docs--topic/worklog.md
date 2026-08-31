@@ -2842,3 +2842,23 @@ Reprobed `z-ai/glm-5.3-flash` — still rejected as not-approved. Per standing i
 `f3caf61dd09e90f9673aaa1616ce0ee9fbc1a56c`. Tier-A PASS, ready for GLM the moment it's provisioned.
 
 Two PRs now parked awaiting GLM: #1803 (#1801) and #1806 (#1804), both Tier-A verified clean.
+
+### #1807/PR #1808: plugin-triggers-core heading fix, third exact-match reason, eval parked
+
+Third occurrence of the pure heading-rename defect class (`## Entrypoints` -> `## Exports` over an
+already-correct twelve-row table). Codex's `AUTHORITATIVE_MAPPING` reason uses a category-level
+summary (not an exhaustive symbol list, given 157 omitted symbols) — verified the overall magnitude
+exactly: 270 total real exports across all 12 entrypoints, 157/157 gap, and independently confirmed
+the claim "completely inventories root/public/builders" is literally true (0 missing for each of
+those three entrypoints specifically).
+
+Same backtick-drop defect as before hit boxes 1 and 2 of the `acceptance-evidence` block (leading
+identifiers lost their surrounding backticks); caught and fixed pre-emptively before any CI run, no
+wasted cycle this time — **third time this exact defect has appeared in Codex output this session,
+worth flagging to the coordinator as a systematic implementer-brief gap rather than one-off noise.**
+
+Reprobed `z-ai/glm-5.3-flash` — still rejected. Evaluation parked per standing instruction; PR #1808
+stays at `status:impl`. Head at parking: `da5b3aa792809df0290d2d91c7be124e0ff7b00b`.
+
+Three PRs now parked awaiting GLM: #1803 (#1801), #1806 (#1804), #1808 (#1807) — all Tier-A verified
+clean, ready to evaluate the instant #1792 lands.
