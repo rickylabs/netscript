@@ -303,3 +303,17 @@ artifact-pinned production E2E.
 - Exact CI, GLM PASS carry by page/mapping identity, complete acceptance, zero threads, unchanged
   lock/package sources, cumulative-corpus proof, and post-truth-edit close-gate passed. This remains
   docs membership and does not by itself trigger canary 5.
+
+## Canary 5 dispatch plan — 2026-08-31T14:56:00Z
+
+- Canary 5 will dispatch at the first exact-green main after #1349 Slices 2–3 consume the public SDK
+  contribution types introduced by #1834. Cutting before that would publish an accepted-but-unused
+  contract; no docs, internals, Aspire, or unrelated feature/fix leaf is a global barrier.
+- The checkpoint already includes public AI Responses option mapping, awaited Fresh chat completion,
+  `createLazyKv` plus scaffold adoption, non-discardable saga receipts, nested token-usage fidelity,
+  Aspire browser-key normalization, and durable execution-progress persistence. All other feature/fix
+  PRs that become exact-green before Slices 2–3 will join; none is required merely to inflate payload.
+- Once the coherence gate lands, dispatch only the checked-in canary workflow on immutable main,
+  require the paired package publication, provenance/OIDC receipts, and pinned production E2E, then
+  normalize the release checkpoint in the harness. Do not hand-publish and do not include a partial
+  #1349 contract window.

@@ -2174,6 +2174,6 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - The cumulative export-reference mapping now contains 27 rows with none lost. Docs continues its
   serialized generated-corpus sequence with #1816 then #1818; its independent Prisma 8 RFC worker
   repairs #1640 in parallel under the owner's accepted clean-break direction.
-- The coordinator has reduced the open PR inventory by six in the active sweep (five merges plus
-  superseded #1522 closure). All 46 remaining milestone issues have exactly one orchestrator owner;
+- The coordinator has reduced the open PR inventory by seven in the active sweep (six merges plus
+  superseded #1522 closure). All 45 remaining milestone issues have exactly one orchestrator owner;
   every supervisor has active implementations or exact gates rather than an unowned queue.
