@@ -9222,3 +9222,45 @@ derivative artifact, ordered at integration time, not a concurrent edit.
 integrating it now — that would move the head under the running #1762 evaluator. It is a mechanical
 derivative delta; after the verdict I will integrate, regenerate the corpus, prove product sources
 byte-identical, and carry the accepted product verdict across rather than re-evaluating unchanged code.
+
+## #1762 — final verdict, docs integration carried across, promoted non-draft
+
+**Final exact-head IMPL-EVAL: `ACCEPTED_WITH_FINDINGS` at `2a26f0254`** — "the documentation is
+adequate for the close-gate." 65 turns. It re-verified content against source rather than trusting the
+prior verdict: replicated the tutorial's Steps 1–3 as a scratch type-check (0 diagnostics), traced
+LD-6 both directions in `contract-authorizer.ts`, matched LD-8's error string character-for-character,
+reproduced the bare-check `TS2551` itself and confirmed it pre-exists in main's own `#847`, and
+inventoried **96 receipts with zero head mismatches**. Prior artifact preserved; verdict written to
+`evaluate-slice-9-final.md`.
+
+### It caught that my F-2 fix was only partial — correct, and now properly fixed
+
+I had changed **one line** (the phase row) and left the body claiming 7,655 symbols, an
+"eleven-receipt evidence set", "awaiting IMPL-EVAL", and Next Steps still instructing a Tier-A review
+already performed. The evaluator flagged this as **the third recurrence of the exact class that file
+documents at its own lines 45–51**. Rewritten wholesale this time rather than patched again.
+
+### It also closed a gap I had left open
+
+The nine-gate manifest silently dropped four doc-specific gates (`agent-docs-prose`, `docs-tagline`,
+`publish-assets`, `service-doc-lint`) whose receipts predated the carrier regenerations — currency was
+proven only by the evaluator's own runs, not by receipts. **All four are now receipted**, giving a
+thirteen-gate set.
+
+**One of those four re-cuts initially recorded `FAIL`.** `doc-lint` exited 1 in 454 ms from a *usage
+error* — `--root` is required and the catalog argv omits it. Not a real failure: the same
+exit-code-is-not-evidence trap this run has now hit three times in different forms. Re-cut with
+`--root packages/service` → PASS, 0 errors across three entrypoints.
+
+### Docs-only `main` #1796 carried across, product neutrality proven not asserted
+
+Integrated `6bb27e46a` after the evaluator finished (not before — that would have moved the head under
+it). Intersection was four generated carriers plus one docs page. **Proved the docs page is main's own
+content**: byte-identical to `origin/main`, and `git log origin/main..HEAD -- <file>` shows no
+non-merge leaf commit. So the accepted product verdict carries across a purely mechanical derivative
+delta; re-evaluating unchanged product code would have been waste.
+
+**Final state:** thirteen gates at one head `df1036c9b`, `evidence-set` **SUFFICIENT / zero reasons**,
+`deno.lock` byte-identical, evidence head `d7cf2419c`. PR **promoted non-draft**, `Fixes #1387` live in
+`closingIssuesReferences`, **MERGEABLE**. Exact CI running on `d7cf2419c` (quality + ci + phase-eval).
+`BLOCKED` is only pending checks.
