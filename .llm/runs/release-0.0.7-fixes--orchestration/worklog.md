@@ -6918,3 +6918,39 @@ self-matching pattern". The plan amendment that followed in the same command nev
 that (proof-section count 0, tree clean) before redoing it rather than assuming it had partially
 applied. Correct method, used afterwards: walk `/proc/<pid>/cmdline`, skip `$$`, and exclude
 `shell-snapshots`. No cycle was consumed — the killed run had emitted no verdict.
+
+### All three leaves advanced; two evaluations running concurrently
+
+**#1365 — implementation complete, converged, fully validated at `ecb82ae2e`.** Merged main
+`0274c0a70`; four generated carriers conflicted and were resolved to main then **regenerated** with
+the full four-generator chain in locked order (`gen:agent-docs-prose` → `gen:assets-barrel` →
+`gen:mcp-export-corpus` → `gen:publish-assets`). Only ceiling paths 15, 16, 17, 19 moved — no
+unlisted file. Gates at the converged head, all re-run by me rather than taken on report:
+`quality:scan:repo` **ok, findings 0**, allowCount 7, allowanceFailures 0; `packages/plugin-sagas-core`
+**87 passed / 0 failed / 3 ignored**; quality-tool + sample-sync tests exit 0; `docs:snippets:test`
+**12 passed / 0 failed**; repo-wide `deno check` **2,972 files / 0 diagnostics**; `deno.lock`
+byte-identical at the pinned SHA-256; all three carrier checks exit 0 with a clean tracked tree.
+**IMPL-EVAL dispatched** on `z-ai/glm-5.3-flash --effort max` via the current-main launcher, attested
+in-stream, with an adversarial brief covering ceiling integrity, red-before honesty, whether the
+helper is real rather than theatre, scanner false positives, docs-correction truth, scope discipline,
+and lock integrity.
+
+**#1773 — cycle-2 PLAN-EVAL running** on `qwen/qwen3.8-flash --effort max` at `077d45cd9`, judging
+the seven locks plus the coordinator-ruled gate-7 carry-forward proof.
+
+**#1677 — S1 complete at `d582baf4b`, PR #1829 opened (draft).** The author finished but left
+artifacts uncommitted; my brief omitted an explicit commit/push instruction, so I committed the work
+unmodified and pushed it. Quality is high: a **2-path ceiling** that explicitly locks
+`contracts/usage.ts`, entrypoints, docs, the lock, and the corpus with stop-and-report on churn; the
+upstream `TokenUsage` shape proven via `deno doc` rather than hand-listed; a 23-leaf-field sentinel
+fixture with a mutation-control negative; and the sibling `mcp/adapters/tanstack-connector.ts`
+investigated and cleared as not sharing the defect. Baselines measured at base. The author explicitly
+reserved PLAN-EVAL disposition rather than self-certifying.
+
+**Supervisor recommendation for #1677: `PLAN-EVAL: N/A`.** The ceiling is two paths, the contract
+already declares every field, no public surface moves, and the remaining work is a type-widening plus
+one fixture. IMPL-EVAL remains mandatory. Ruling is the coordinator's.
+
+**#1806 deliberately not integrated** into #1365: its evidence was just measured at `ecb82ae2e`, and
+integrating now would churn carriers and invalidate freshly-passed gates. It integrates at the final
+pre-merge seam, regenerating once.
