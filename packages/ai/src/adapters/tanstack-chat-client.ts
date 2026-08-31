@@ -22,14 +22,16 @@
  * @module
  */
 
-import { chat, EventType } from '@tanstack/ai';
+import { chat, EventType, fromSpecTokenUsage } from '@tanstack/ai';
 import type {
   AnyTextAdapter,
   AnyTool,
   ContentPart as TanstackContentPart,
   JSONSchema as TanstackJsonSchema,
   ModelMessage,
+  SpecTokenUsage,
   StreamChunk,
+  TokenUsage as TanstackTokenUsage,
   ToolCall as TanstackToolCall,
 } from '@tanstack/ai';
 
@@ -185,7 +187,10 @@ export function toTanstackChatClient(
           // field onto the provider wire request". It is deliberately *not*
           // folded into `messages`, `systemPrompts`, `tools`, or `modelOptions`,
           // which are the four keys that do reach the provider.
-          context: request.context,
+          // TanStack 0.52 requires a non-null activity context even when the
+          // caller has no application metadata. Keep the owned optional
+          // contract by supplying an empty, provider-invisible context.
+          context: request.context ?? {},
           metadata: request.context,
         });
         for await (const chunk of streamed) {
@@ -240,7 +245,9 @@ function translateChunk(
     case EventType.TOOL_CALL_END: {
       const entry = pending.get(chunk.toolCallId);
       pending.delete(chunk.toolCallId);
-      const name = entry?.name || chunk.toolCallName || chunk.toolName || '';
+      // Since 0.52, TOOL_CALL_END carries only the id and parsed input; the
+      // name is owned by the preceding TOOL_CALL_START event.
+      const name = entry?.name ?? '';
       const args = entry && entry.args.length > 0
         ? entry.args
         : chunk.input !== undefined
@@ -360,15 +367,19 @@ function toFinishReason(
 
 /** Map TanStack real token usage onto the owned {@linkcode Usage} core fields. */
 function toOwnedUsage(
-  usage: { promptTokens: number; completionTokens: number; totalTokens: number } | undefined,
+  usage: Array<SpecTokenUsage> | TanstackTokenUsage | undefined,
 ): Usage | undefined {
-  if (!usage) {
+  // TanStack 0.52 may expose AG-UI's per-provider/model usage array. Its own
+  // converter preserves the canonical selection rules and any explicit
+  // provider totals before we project the three owned core fields.
+  const normalized = Array.isArray(usage) ? fromSpecTokenUsage(usage) : usage;
+  if (!normalized) {
     return undefined;
   }
   return {
-    promptTokens: usage.promptTokens,
-    completionTokens: usage.completionTokens,
-    totalTokens: usage.totalTokens,
+    promptTokens: normalized.promptTokens,
+    completionTokens: normalized.completionTokens,
+    totalTokens: normalized.totalTokens,
   };
 }
 
