@@ -2884,3 +2884,21 @@ Head at parking: `6d5516422955d13dd291ff53254efc8b683e70a5`.
 
 Four PRs now parked awaiting GLM: #1803 (#1801), #1806 (#1804), #1808 (#1807), #1811 (#1809) — all
 Tier-A verified clean.
+
+### #1812/PR #1813: plugin-workers-core heading fix, exact-match verification, eval parked (5th)
+
+Fourth heading-rename-class fix in this cluster (`## Entrypoints` -> `## Exports` over an already-
+correct 17-row table). Tier-A independently verified: root's 32 exports are 32/32 documented (0
+gap, confirming the reason's "inventories all 32 root exports" claim exactly), overall union is 377
+real exports with 334 genuine gaps (matches Codex's own count), and all 7 named example symbols
+(`JobBuilderState`, `WorkersRuntime`, `PublicDefinitionSchema`, `WorkersContractV1`, `WorkersConfig`,
+`WorkerInstrumentation`, `TestWorkersRuntime`) confirmed real and genuinely undocumented. Acceptance-
+evidence box text matched the issue exactly on the first attempt again.
+
+Reprobed `z-ai/glm-5.3-flash` — still rejected. Evaluation parked; PR #1813 stays at `status:impl`.
+Head at parking: `e937b11b69f650907581549767f371b35b1c9598`.
+
+Five PRs now parked awaiting GLM: #1803 (#1801), #1806 (#1804), #1808 (#1807), #1811 (#1809), #1813
+(#1812) — all Tier-A verified clean. Remaining #1777 candidates: `plugin-sagas-core` (same simple
+heading-rename shape per a quick check) and `fresh` (the most involved remaining — no summary table
+exists at all, and 4 entrypoints have no documentation section anywhere on the page).
