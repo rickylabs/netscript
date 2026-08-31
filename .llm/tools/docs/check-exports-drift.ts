@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'plugin-workers-core',
+    packagePath: 'packages/plugin-workers-core',
+    docPath: 'docs/site/reference/plugin-workers-core/index.md',
+    packageName: '@netscript/plugin-workers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all seventeen entrypoints and inventories all 32 root exports, but omits subpath-only APIs including JobBuilderState, WorkersRuntime, PublicDefinitionSchema, WorkersContractV1, WorkersConfig, WorkerInstrumentation, and TestWorkersRuntime.',
+    },
+  },
+  {
     name: 'ai',
     packagePath: 'packages/ai',
     docPath: 'docs/site/reference/ai/index.md',
