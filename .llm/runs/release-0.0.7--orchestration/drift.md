@@ -1606,3 +1606,13 @@ implementation thread.
 - Owner's standing merge authority applies only to the active primary milestone coordinator. It is
   never delegated. Every merge still requires immutable head, current required CI, acceptance
   evidence, answered review threads, clean mergeability, and correct lifecycle labels.
+
+## 2026-08-31 — topic serialization was interpreted too broadly
+
+- Serial ordering is required only where leaves share a source seam, contract, derived corpus,
+  integration base, or runtime lease. It does not prohibit parallel independent leaves inside one
+  topic orchestrator. The coordinator now requires an explicit collision audit and separate
+  worktrees before granting that concurrency.
+- Shared-seam merge fronts remain ordered and the host runtime mutex remains global. This preserves
+  evidence integrity while removing avoidable idle time from feature, fix, docs, internals, and
+  Aspire queues.

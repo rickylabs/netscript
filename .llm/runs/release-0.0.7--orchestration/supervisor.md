@@ -1486,3 +1486,16 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   because they lacked explicit routing; that route is rejected and repaired in place.
 - Merge train order starts with #1792 because its GLM/Qwen routing unlocks the parked prospective
   evaluator gates. Revalidate immutable heads and current checks after every main mutation.
+
+## 2026-08-31T02:58:00Z — repaired main and concurrency correction
+
+- Authoritative main is `8a925764276b25ef7cef484db273604f44557cef`, the merge of #1764. It
+  includes the bounded one-line repair for the canary.4 merge-order TS2307 and is the base all
+  newly frozen evidence must use. Duplicate PR #1821 is closed unmerged.
+- Topic supervisors may run multiple independent leaves concurrently after an explicit collision
+  audit over source, contracts, generated corpus, and runtime. This supersedes the overly broad
+  one-leaf-per-topic interpretation. Shared integration/merge fronts remain ordered; runtime leases
+  remain one-at-a-time across the host.
+- Immediate fronts: Features #1762; Fixes #1819/#1365; Internals #1802/#1751; Docs #1796 then
+  #1798/#1800 at the shared merge front; Aspire S8 plus its independent static column. Each topic
+  must convert completed work into exact-green PRs instead of pausing at routine checkpoints.

@@ -1884,3 +1884,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
   `4e08fdff-…`. Sonnet is forbidden for these orchestrators.
 - Do not ask the owner for routine slice progression. #1751 Slice 2 and #1452 research were resumed
   autonomously; docs' parked evaluator backlog unlocks when #1792 reaches main.
+
+## Resume delta — 2026-08-31T02:58:00Z
+
+- Current main is `8a925764276b25ef7cef484db273604f44557cef`: #1764 is merged/shipped and
+  includes the exact one-line import repair required after canary.4. Duplicate #1821 is closed
+  unmerged; no topic may wait on it.
+- Owner authorizes bounded intra-topic parallelism when collision audit proves leaves independent.
+  Preserve ordered shared-seam integration and the single global runtime lease, but do not serialize
+  unrelated implementation, research, or evaluation merely because they share an orchestrator.
+- The next public canary waits for a coherent feature/fix-heavy payload. Current shipping fronts are
+  Features #1762, Fixes #1819, Docs #1796, Internals #1802, and Aspire S8. All five supervisors are
+  active Opus 5 with Remote Control; Features/Fixes xhigh and the other three high.

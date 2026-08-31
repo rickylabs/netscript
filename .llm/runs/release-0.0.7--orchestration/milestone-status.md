@@ -65,7 +65,7 @@
 | #1760 | internals | blocked | `a46ea16d0a6bf250abfe06db2cf50820f5f88dfc` | — |
 | #1762 | features | blocked | `a72af9a404373dfde4a5972ded424f544f693274` | — |
 | #1763 | features | merged | `c80933f7b94804319024b77247f653f073b738ed` | — |
-| #1764 | fixes | implementing | `22f6fa6157b736160c6c09af750e2f03489888a2` | Flow-B runtime proof remains mandatory before ready/merge and must run in CI or off-host while local D-42/D-43 topology is unsuitable |
+| #1764 | fixes | merged | `9f2e6abd2487d8f94c9f71541a29d17e20340469` | merged as `8a925764276b25ef7cef484db273604f44557cef`; includes the bounded post-canary import repair and closes #1368 |
 | #1771 | docs | implementing | `44a57a64ee424a0ce691294e6f001e2829c7c39d` | — |
 | #1772 | docs | merged | `6d275b2c9350b084ccf4fa62982e2f20432fe9d0` | — |
 | #1773 | fixes | blocked | `c06d365465d3898dbf26c92f98c6e64ce4155057` | — |
@@ -75,4 +75,3 @@
 - Global expensive gates running: 0
 - Canary checkpoints: 5
 - Release writer: —
-

@@ -3032,3 +3032,20 @@
 - All 29 open milestone PRs now have exactly one `orchestrator:*` label: Features 6, Fixes 3,
   Internals 2, Docs 11, Aspire 7. Older #1522/#1640 are explicitly assigned to Docs outside the
   milestone; #780/#822 entered read-only disposition audit. Silent draft parking is prohibited.
+
+## 2026-08-31T02:58:00Z — main repaired; duplicate closed; bounded intra-topic parallelism enabled
+
+- PR #1764 passed fresh exact-head CI after carrying the one-line `generatedAppName` import repair
+  exposed by canary.4, then merged at `8a925764276b25ef7cef484db273604f44557cef` and closed #1368.
+  PR #1821 was independently proved to contain the identical already-integrated delta and was
+  closed unmerged with evidence rather than consuming a duplicate merge cycle.
+- Owner explicitly authorized parallel leaves inside a topic orchestrator where their source,
+  contract, generated-corpus, and runtime surfaces are independent. All five Opus supervisors were
+  steered with that bounded rule. Shared-seam integration/merge remains ordered, and host runtime
+  remains globally serialized with exact cleanup.
+- Docs #1796 now has a fresh merge-ref against repaired main and active exact-head CI. Features was
+  directed to recover the stalled #1762 GLM evaluation; Fixes activated P0 #1819/#1365; Aspire
+  removed duplicate #1821 from its critical path and resumed S8 plus its independent static column.
+- Runtime remains exact zero: Aspire `[]`, Docker containers 0, volumes 0, and non-default networks
+  0. The next canary is intentionally held for a coherent feature/fix-heavy payload rather than an
+  immediate canary.5 containing only the integration repair.

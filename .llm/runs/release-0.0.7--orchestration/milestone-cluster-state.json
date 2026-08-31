@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "65cd8a07787504b5ed94408510d4ab85260bc21a",
+  "currentMainSha": "8a925764276b25ef7cef484db273604f44557cef",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -18,6 +18,7 @@
     "remoteControlEnabled": true,
     "routeCorrection": "owner-corrected coordinator route is GPT-5.6-SOL/high; max is never authorized",
     "mergeAuthorityCorrection": "coordinator owns milestone merges after the full seven-row pre-merge gate; the prior human-only claim was false. PR #1735 exposed a transparent row-7 procedural miss that was repaired in place immediately post-merge without changing substantive evidence.",
+    "parallelismPolicy": "topic queues are independent and may also run multiple leaves concurrently inside one orchestrator when declared source, contract, generated-corpus, and runtime surfaces are disjoint; shared-seam integration and merges remain ordered, and host runtime stays globally serialized",
     "sharedAssetSequence": {
       "predecessorPr": 1755,
       "predecessorMergeSha": "a5520e70b43fa792c36451270742240e0f2aa889",
@@ -3587,20 +3588,22 @@
     {
       "id": "saga-span-emission-and-correlation",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "22f6fa6157b736160c6c09af750e2f03489888a2",
-      "currentPrHeadSha": "22f6fa6157b736160c6c09af750e2f03489888a2",
+      "headSha": "9f2e6abd2487d8f94c9f71541a29d17e20340469",
+      "currentPrHeadSha": "9f2e6abd2487d8f94c9f71541a29d17e20340469",
       "issueNumbers": [1368],
       "branch": "fix/saga-span-emission-and-correlation",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
       "prNumber": 1764,
-      "implementationState": "owner authorized the single test-only selector correction at 22f6fa61 and exactly one delta-scoped cycle 3 while the independent #1357 worker continues",
-      "implementationEvaluationState": "cycle_3_delta_authorized_pending_assertion_repair",
+      "implementationState": "exact product/evidence head passed its accepted evaluation and required gates; after the #1743/#1781 merge-order interaction broke main, the same branch carried the bounded one-line generatedAppName import-path repair, recut repo-wide check green, and was merged by the primary coordinator",
+      "implementationEvaluationState": "accepted_terminal",
       "ownerAuthorization": "Select the saga.handle span by name rather than positional index and run exactly one delta-scoped IMPL-EVAL cycle 3; carry forward cycle-2 rows and preserve mandatory Flow-B.",
       "ownerAuthorizedAt": "2026-08-30T17:46:16.000Z",
-      "blocker": "Flow-B runtime proof remains mandatory before ready/merge and must run in CI or off-host while local D-42/D-43 topology is unsuitable",
-      "nextGate": "apply only the named-span assertion correction, integrate current main at the safe slice boundary, prove the resulting suite green, then run one delta-scoped cycle 3 and obtain Flow-B before readiness"
+      "mergeCommitSha": "8a925764276b25ef7cef484db273604f44557cef",
+      "mergedAt": "2026-08-31T02:50:31.000Z",
+      "blocker": null,
+      "nextGate": "terminal merged and shipped; canary.4 remains immutable failed evidence and the repaired main is re-proven at the next coherent feature/fix canary checkpoint"
     },
     {
       "id": "aspire-13-5-s11-public-docs-refresh",
