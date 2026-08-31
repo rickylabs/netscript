@@ -3422,3 +3422,18 @@
 - The coordinator squash-merged #1813 as `7ae7fe2dad941ed70e5806965fd964b9746d8fe1`, closing
   #1812. #1812/#1813 are sole `status:shipped`; Docs advances to #1816 then #1818 and keeps the
   independent Prisma 8 RFC repair moving without blocking the corpus queue.
+
+## 2026-08-31T16:00:02Z — owner assigns complete Aspire 13.5 migration to canary 6
+
+- Owner ruling: the complete Aspire 13.5 migration ships in canary 6, not canary 5. Aspire continues
+  every S7–S13/#1747/#1835/#1837 implementation, runtime, evaluation, and exact-CI gate now, but the
+  remaining migration PRs stay unmerged until canary 5 is tagged. This is release staging, not a lane
+  pause; no unrelated lane waits on Aspire.
+- The coordinator accepted #1719 acceptance box 1: the real 13.5 kill receipt proving automatic
+  cleanup/no run-owned survivor satisfies the live half, while deterministic contained historical-
+  survivor coverage satisfies the synthetic half. No fabricated surviving process or another lease
+  is required.
+- #1747 and #1754 independently failed the PostgreSQL scaffold tier at the same
+  `runtime.wait.garnet` 300-second timeout while each SQLite/Garnet tier passed. The coordinator ruled
+  this a shared readiness defect pending exact-main control, not either product delta, and assigned a
+  bounded Fixes issue with both run/job receipts. Both heads rerun after that shared correction.

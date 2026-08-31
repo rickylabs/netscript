@@ -317,3 +317,17 @@ artifact-pinned production E2E.
   require the paired package publication, provenance/OIDC receipts, and pinned production E2E, then
   normalize the release checkpoint in the harness. Do not hand-publish and do not include a partial
   #1349 contract window.
+
+## Canary 6 Aspire 13.5 dispatch plan — 2026-08-31T16:00:02Z
+
+- Owner assigned the complete Aspire 13.5 migration to canary 6. Remaining migration PRs may finish
+  all gates before canary 5, but they merge only after the canary 5 tag so the two release payloads
+  remain coherent and observable.
+- Canary 6 merge admission requires the dependency-ordered S7–S13 stack, #1747, #1835, and #1837 to
+  be exact-green with their already-valid independent verdicts carried only by verified blob/delta
+  identity. The shared Garnet-readiness defect must be fixed and both affected heads rerun; S7's
+  accepted live/synthetic teardown proof requires no additional lease.
+- Dispatch canary 6 only after epic #1712 is complete on immutable main, host runtime cleanup is exact
+  zero, and the checked-in release workflow can prove paired publication, OIDC/provenance, and pinned
+  production E2E. Docs/internal work cannot become a global barrier, but incomplete Aspire 13.5
+  migration work cannot leak into this checkpoint.

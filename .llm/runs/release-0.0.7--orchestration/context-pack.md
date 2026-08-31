@@ -2180,3 +2180,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - New issue #1839 owns the measured e2e-cli runtime-concurrency eviction defect under Internals.
   Aspire keeps the current one-runtime-PR admission rule while #1839 receives a bounded workflow fix;
   this new owned issue accounts for the inventory remaining at 46 after #1812 closed.
+
+## Resume delta — 2026-08-31T16:00:02Z
+
+- Owner release sequencing is explicit: canary 5 remains the #1349 Slices 2–3 coherence checkpoint;
+  the complete Aspire 13.5 migration is reserved for canary 6. Aspire finishes all remaining packets
+  now but coordinator merge admission for those migration PRs opens only after canary 5 is tagged.
+- S7 lease receipts are complete and host cleanup returned to exact zero. #1719 box 1 is coordinator-
+  accepted because live 13.5 automatic cleanup/no survivor plus deterministic historical-survivor
+  coverage exactly satisfies its two-part acceptance wording; no owner decision remains.
+- #1747/#1754 expose the same shared PostgreSQL-tier Garnet-health timeout while their SQLite/Garnet
+  tiers pass. Fixes owns the exact-main control and bounded shared readiness correction; Aspire does
+  not distort either product delta or waive runtime evidence. After the correction, S7–S13 merge in
+  dependency order and canary 6 requires the complete #1712 epic plus release/OIDC/pinned-E2E receipts.
