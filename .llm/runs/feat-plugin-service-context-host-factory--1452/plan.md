@@ -6,6 +6,60 @@ the existing `WatchableKv` interface, the implementation is a mechanical extract
 N/A** — see "Deferred" below; it carries genuine architectural questions and should get a PLAN-EVAL
 or an owner ruling before anyone implements it.
 
+## Harness profile and doctrine state
+
+- `packages/kv`: Archetype 2 — Integration. `createLazyKv()` is the composition helper for the
+  package-owned `WatchableKv` port and existing shared `getKv()` resolver.
+- `packages/cli`: Archetype 6 — CLI/Tooling. This slice changes one exempt asset template and its
+  generated carrier; it introduces no command, spine, layer-2 abstract, registry, port, adapter, or
+  composition-surface change.
+- Scope overlays: none.
+- Current doctrine verdicts: `packages/kv` is **Refactor** for the pre-existing 1,039-line
+  `bridge_test.ts`; `packages/cli` is **Keep**. The new focused `lazy-kv_test.ts` does not deepen the
+  KV debt, and no debt entry is created or closed.
+- Anti-patterns in scope: AP-1 (keep implementation/test focused), AP-2/AP-9 (the helper is justified
+  by removing an identical package-contract wrapper from every generated consumer), AP-11 (no
+  module-load-time KV resolution), AP-18 (semantic scaffold assertion, not a giant snapshot), and
+  AP-22 (the existing application barrel is a package sub-surface already used by the root barrel).
+
+## Open-decision sweep
+
+- **Safe to defer:** whether `@netscript/plugin` may depend on `@netscript/kv`; the database-client
+  resolver injection shape; the absent `appsettings` contract; and the Slice 2 generated-consumer
+  boot proof. None changes the Slice 1 `WatchableKv` forwarding contract.
+- **Must resolve now:** none. Any need to edit `packages/plugin/` or introduce another public
+  parameter/export is a rescope and stops this slice.
+
+## Risk register
+
+| Risk | Mitigation |
+| --- | --- |
+| Eager resolution regresses generated-service startup | Observe that resolution count is zero after `createLazyKv()` and one after the first operation. |
+| Multiple operations resolve more than once | Use a recording resolver/adapter fixture and assert one resolution across two operations. |
+| A forwarding member or async generator changes semantics | Exercise every required `WatchableKv` member and compare arguments/results, including async disposal delegating to `close()`. |
+| Template extraction changes unrelated host composition | Diff the template and require only the import/class/construction substitution. |
+| Embedded asset carrier goes stale | Regenerate with `deno task gen:assets-barrel` and run `check:assets-barrel`. |
+| New public export drifts from docs/JSR requirements | Add an explicit return type and public JSDoc; run KV doc lint, JSR audit, `docs:exports-drift`, and `mcp-export-corpus`. |
+| Validation mutates the lock | Hash `deno.lock` before and after; do not accept lock churn. |
+
+## Gate set
+
+- Scoped structured check/lint/fmt for `packages/kv` and `packages/cli`, with non-empty stdout
+  verified when a receipt is used.
+- `packages/kv` tests and the focused CLI plugin-service template/scaffold test suite.
+- `check:assets-barrel`, `docs:exports-drift`, and `mcp-export-corpus`.
+- Package-wave fitness: KV doc lint/JSR audit plus `quality:scan` and `arch:check`.
+- `deno.lock` SHA-256 equality against the re-baselined starting hash.
+- Runtime/Aspire/Docker/browser and `e2e:cli` gates are explicitly forbidden for this lane.
+
+## Planned JSR surface scan
+
+`createLazyKv(config?: SharedKvConfig): WatchableKv` adds one stable root export without changing
+`deno.json`, subpaths, dependencies, permissions, or publish filters. The implementation must carry
+an explicit return type and complete JSDoc. The main risks are a missing public example/doc entry and
+an unintended second export from the internal module; full-export doc lint and the export drift
+gates cover both.
+
 ## Locked decisions (Slice 1)
 
 - **LD-1.** Publish `createLazyKv(config?: SharedKvConfig): WatchableKv` from `@netscript/kv`. It

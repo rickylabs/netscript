@@ -1,5 +1,18 @@
 # Research — #1452 reusable `PluginServiceContext` host factory
 
+## Re-baseline — 2026-08-31
+
+The carried research was re-checked in the assigned worktree before implementation. The branch is
+clean at planning commit `fb08d2f9d`, whose merge-base is current local and remote `main`
+`5197e70b7`. The template remains 123 lines and still contains the 69-line `LazyPluginKv` class;
+`packages/plugin/deno.json` still has no `@netscript/kv` dependency; and the repository still has no
+`appsettings` contract matching the issue wording. No Slice 2 decision has become safe to infer.
+
+`deno doc` confirms the existing public contracts used by Slice 1:
+`getKv(config?: SharedKvConfig): Promise<WatchableKv>`, with `WatchableKv` owning the forwarding
+surface. The starting `deno.lock` SHA-256 is
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
 ## What the duplicated glue actually is, measured
 
 `packages/cli/src/kernel/assets/plugins/service-context.ts.template` is **123 lines**, emitted into
