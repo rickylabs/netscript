@@ -325,8 +325,9 @@ artifact-pinned production E2E.
   remain coherent and observable.
 - Canary 6 merge admission requires the dependency-ordered S7–S13 stack, #1747, #1835, and #1837 to
   be exact-green with their already-valid independent verdicts carried only by verified blob/delta
-  identity. The shared Garnet-readiness defect must be fixed and both affected heads rerun; S7's
-  accepted live/synthetic teardown proof requires no additional lease.
+  identity. Fixes issue #1844 must clear #1747's single observed Garnet-readiness timeout, while
+  #1754's distinct Prisma seed failure receives its own S8 repair and rerun. S7's accepted
+  live/synthetic teardown proof requires no additional lease.
 - Dispatch canary 6 only after epic #1712 is complete on immutable main, host runtime cleanup is exact
   zero, and the checked-in release workflow can prove paired publication, OIDC/provenance, and pinned
   production E2E. Docs/internal work cannot become a global barrier, but incomplete Aspire 13.5

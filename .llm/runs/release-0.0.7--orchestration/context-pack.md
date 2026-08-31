@@ -2189,10 +2189,12 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - S7 lease receipts are complete and host cleanup returned to exact zero. #1719 box 1 is coordinator-
   accepted because live 13.5 automatic cleanup/no survivor plus deterministic historical-survivor
   coverage exactly satisfies its two-part acceptance wording; no owner decision remains.
-- #1747/#1754 expose the same shared PostgreSQL-tier Garnet-health timeout while their SQLite/Garnet
-  tiers pass. Fixes owns the exact-main control and bounded shared readiness correction; Aspire does
-  not distort either product delta or waive runtime evidence. After the correction, S7–S13 merge in
-  dependency order and canary 6 requires the complete #1712 epic plus release/OIDC/pinned-E2E receipts.
+- #1747 alone exposes a PostgreSQL-tier Garnet-health timeout; Fixes issue #1844 owns exact-main
+  control and the bounded shared-readiness correction. #1754 actually fails earlier at
+  `database.seed` with Prisma exit 16 and never reaches Garnet, so Aspire owns a separate bounded S8
+  diagnosis. Duplicate false-two-head issue #1843 is closed. Neither runtime gate is waived or
+  charged to the wrong product delta. After both paths clear, S7–S13 merge in dependency order and
+  canary 6 requires the complete #1712 epic plus release/OIDC/pinned-E2E receipts.
 
 ## Resume delta — 2026-08-31T16:03:24Z
 

@@ -3433,10 +3433,12 @@
   cleanup/no run-owned survivor satisfies the live half, while deterministic contained historical-
   survivor coverage satisfies the synthetic half. No fabricated surviving process or another lease
   is required.
-- #1747 and #1754 independently failed the PostgreSQL scaffold tier at the same
-  `runtime.wait.garnet` 300-second timeout while each SQLite/Garnet tier passed. The coordinator ruled
-  this a shared readiness defect pending exact-main control, not either product delta, and assigned a
-  bounded Fixes issue with both run/job receipts. Both heads rerun after that shared correction.
+- #1747 failed the PostgreSQL scaffold tier at `runtime.wait.garnet` after 300 seconds while its
+  SQLite/Garnet tier passed. A first report incorrectly claimed #1754 reproduced it; exact log review
+  proved #1754 instead fails earlier at `database.seed` with Prisma exit 16 and never reaches Garnet.
+  The coordinator retained accurate Fixes issue #1844 for an exact-main Garnet control, closed
+  duplicate #1843 with the correction, and assigned #1754's distinct seed failure to bounded S8
+  diagnosis immediately rather than waiting behind #1844.
 
 ## 2026-08-31T16:03:24Z — #1762 typed principal and procedure policy ships
 
