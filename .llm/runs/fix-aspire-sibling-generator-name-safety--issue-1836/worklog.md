@@ -79,6 +79,9 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 | 2026-08-31T08:40:28Z | 0 | bootstrap | Baseline and issue/PR state re-verified; doctrine, harness, PR, tools, and Deno inspection guidance loaded. |
 | 2026-08-31T08:40:28Z | plan | PLAN-EVAL | `N/A` — issue #1836 supplies a complete mechanical contract, exact reference treatment, affected sites, hostile matrix, and gates; no architecture or sequencing decision remains open. |
 | 2026-08-31T08:51:00Z | 1 | RED | Focused structured test wrapper exited 1: 0 passed, 4 failed; every real generated module failed Deno parsing. |
+| 2026-08-31T09:16:53Z | 2 | implementation | Replaced user-derived bindings with `app_<n>`, ordinal plugin-reference, `tool_<n>`, `db_<n>`, and `cache_<n>` bindings; encoded emitted user strings with `JSON.stringify`. |
+| 2026-08-31T09:16:53Z | 2 | GREEN | Focused generator set exited 0: 156 passed, 0 failed. Scoped check exited 0 with `failedBatches: 0`; scoped lint and both style-family format batches exited 0 with no findings. |
+| 2026-08-31T09:16:53Z | 3 | mutation | Name-derived binding mutant exited 1 with 0 passed / 4 failed; independent raw-literal mutant exited 1 with 0 passed / 4 failed. Restored source-safety test exited 0 with 4 passed / 0 failed. |
 
 ## Decisions
 
@@ -103,6 +106,13 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 | ---- | ---------------- | ------ | ----- |
 | Baseline Git state | raw `git status`, `rev-parse`, and `ls-remote` | PASS | Clean branch at live `origin/main` SHA `71d5fb8e0`. |
 | RED hostile generator contract | `run-deno-test.ts -- --allow-all generate-register-source-safety_test.ts` | FAIL (expected) | Exit 1; 0 passed / 4 failed. Apps/plugins/infrastructure rejected raw hostile literals; tools rejected `let class = ...`. |
+| Focused generator suite | structured test wrapper over six generator test files | PASS | Exit 0; 156 passed / 0 failed. |
+| Scoped check | `run-deno-check.ts` over 10 changed TypeScript files | PASS | Exit 0; 10 selected, one batch, `failedBatches: 0`; default `--unstable-kv` active. |
+| Scoped lint | `run-deno-lint.ts` over 10 changed TypeScript files | PASS | Exit 0; 10 selected/processed, no findings or dropped files. CLI is excluded by root lint config, so the scoped config retains recommended plus repository process/node rules without the root exclusion. |
+| Scoped format | `run-deno-fmt.ts` over 10 changed TypeScript files in existing style families | PASS | Exit 0 for both batches; 8 semicolon-style and 2 no-semicolon-style files selected/processed, no findings or drops. |
+| Ordinal-binding mutation | focused hostile generator contract | FAIL (expected) | Exit 1; 0 passed / 4 failed. Apps/tools/infrastructure emitted reserved-word bindings; plugin reference bindings emitted hostile user text. |
+| Literal-escaping mutation | focused hostile generator contract | FAIL (expected) | Exit 1; 0 passed / 4 failed. Raw hostile Workdir/TaskName/DataPath interpolation made every emitted module unparsable. |
+| Restored hostile generator contract | focused hostile generator contract | PASS | Exit 0; 4 passed / 0 failed after both mutants were explicitly restored. |
 
 ### Fitness Gates
 

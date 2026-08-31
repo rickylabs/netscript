@@ -12,11 +12,9 @@
 
 ## Current State
 
-The draft PR is open from the bootstrap commit. The tests-only slice renders every generator with
-reserved words, both normalization-collision pairs, and a quote/backslash/backtick/`${}`/newline
-payload across its emitted string fields. The structured test wrapper produced the required RED:
-exit 1, 0 passed, 4 failed, with Deno parser errors in all four emitted modules. Production files
-remain unchanged.
+The draft PR is open and the tests-only RED slice is pushed. All four production generators now use
+ordinal bindings and JSON-rendered user strings. The focused six-file generator suite passes 156/156,
+and both required mutants fail all four hostile-input contracts before the fixed source is restored.
 
 ## Completed
 
@@ -30,16 +28,20 @@ remain unchanged.
 - Opened draft PR #1837 with the requested labels, milestone `0.0.7`, and `Closes #1836` in Scope.
 - Added the focused hostile-input parse contract and captured semantic RED evidence for all four
   generators.
+- Committed and pushed the tests-only RED slice.
+- Repaired all four generators and updated existing semantic assertions for ordinal bindings and
+  JSON-rendered literals.
+- Captured focused GREEN, scoped check/lint evidence, and both four-of-four mutation failures.
 
 ## In Progress
 
-- Commit and push the tests-only RED slice before production edits.
+- Finish the split scoped format check, then commit and push the implementation slice.
 
 ## Next Steps
 
-1. Commit/push/comment the RED slice.
-2. Repair the four generators using ordinal bindings and JSON literals.
-3. Prove mutations and run all requested gates.
+1. Commit/push/comment the implementation slice.
+2. Run root check, quality, architecture, assets-barrel, and lock-hygiene gates.
+3. Commit/push/comment the final gate evidence and hand off for supervisor-dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -61,7 +63,7 @@ remain unchanged.
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | RED captured | Focused wrapper exit 1; 0 passed / 4 parser failures. |
-| Fitness | planned | AP-18 strategy locked; quality and architecture gates pending. |
+| Fitness | partial GREEN | Mutation proof and scoped static gates pass; root quality and architecture gates pending. |
 | Runtime | N/A | Explicitly forbidden. |
 | Consumer | RED | Every emitted module failed Deno parsing before repair. |
 
@@ -78,3 +80,4 @@ remain unchanged.
 ## Commits
 
 - `e9439de34` — harness bootstrap and locked plan.
+- `953271980` — tests-only hostile-input RED contract.

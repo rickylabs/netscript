@@ -15,7 +15,7 @@
  */
 
 import type { RegisterToolsOptions } from '../types.ts';
-import { fileHeader, safeIdentifier } from '../_utils.ts';
+import { fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
@@ -33,45 +33,59 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
 
   const registrationBlocks: string[] = [];
 
-  for (const [name, entry] of entries) {
-    const id = safeIdentifier(name);
+  for (const [toolIndex, [name, entry]] of entries.entries()) {
+    const id = `tool_${toolIndex}`;
     const taskName = entry.TaskName ?? name;
     const workdir = `${SCAFFOLD_DIRS.TOOLS}/${name}`;
     const databaseKey = entry.Database ?? '';
 
     const lines: string[] = [];
-    lines.push(`  // --- ${name} ---`);
+    lines.push(`  // --- tool ${toolIndex} ---`);
 
     // Skip disabled entries
-    lines.push(`  if (config.Tools['${name}']?.Enabled !== false) {`);
+    lines.push(`  if (config.Tools[${JSON.stringify(name)}]?.Enabled !== false) {`);
 
     // Resolve working directory
     if (name === 'prisma-studio') {
       lines.push(
-        `    const ${id}_workdir = resolvePrismaStudioWorkdir(appHostDir, config, '${databaseKey}');`,
+        `    const ${id}_workdir = resolvePrismaStudioWorkdir(appHostDir, config, ${
+          JSON.stringify(databaseKey)
+        });`,
       );
     } else {
-      lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
+      lines.push(
+        `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
+      );
     }
 
     lines.push(
-      `    const ${id}_errorFile = resolveToolErrorFile(${id}_workdir, '${name}');`,
+      `    const ${id}_errorFile = resolveToolErrorFile(${id}_workdir, ${JSON.stringify(name)});`,
     );
     lines.push(`    await rm(${id}_errorFile, { force: true });`);
 
     // Register via the generated runner so the first stderr line remains
     // available after a failed executable exits.
     lines.push(
-      `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, ${id}_errorFile, '${taskName}']);`,
+      `    let ${id} = await builder.addExecutable(${
+        JSON.stringify(name)
+      }, 'deno', ${id}_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, ${id}_errorFile, ${
+        JSON.stringify(taskName)
+      }]);`,
     );
-    lines.push(`    ${id} = maybeWithProcessCommand(${id}, '${name}', '${taskName}');`);
+    lines.push(
+      `    ${id} = maybeWithProcessCommand(${id}, ${JSON.stringify(name)}, ${
+        JSON.stringify(taskName)
+      });`,
+    );
 
     // Database dependency — named database or primary fallback
     if (entry.Database) {
       lines.push(``);
-      lines.push(`    // Named database dependency: ${entry.Database}`);
+      lines.push(`    // Named database dependency`);
       lines.push(
-        `    ${id} = await attachToolDatabase(${id}, config, infrastructure, '${entry.Database}');`,
+        `    ${id} = await attachToolDatabase(${id}, config, infrastructure, ${
+          JSON.stringify(entry.Database)
+        });`,
       );
     } else {
       lines.push(``);

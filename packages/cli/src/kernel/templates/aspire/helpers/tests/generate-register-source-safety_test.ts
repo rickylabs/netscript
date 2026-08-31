@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertStringIncludes,
-} from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import type {
   AppEntry,
   CacheEntry,
@@ -27,7 +24,7 @@ const RESERVED_AND_COLLIDING_NAMES = [
   'workers_api',
 ] as const;
 
-const HOSTILE_LITERAL = "quote'\"\\slash`tick${value}\nline";
+const HOSTILE_LITERAL = 'quote\'"\\slash`tick${value}\nline';
 const HOSTILE_NAMES = [...RESERVED_AND_COLLIDING_NAMES, HOSTILE_LITERAL] as const;
 
 const LINT_RULE_EXCLUSIONS = [
