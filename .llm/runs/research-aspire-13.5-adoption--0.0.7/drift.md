@@ -4919,3 +4919,30 @@
     `passed=84` (S9) and `passed=86` (S10), against **37** before S9's workspace fix. Distinct
     residuals are now visible per head (`behavior.otel.stream-consumer` on S9,
     `runtime.resource-command` on S10) that no previous run in this programme could reach.
+
+- **D-208 — convergence authorized; ancestry re-checked BEFORE planning it, and S9/S10 are still
+  stacked on S8.** This changes the convergence shape and would have caused conflicts if assumed away.
+  - `git merge-base --is-ancestor bc838a0b3 <head>` returns **YES for both S9 (`29eed9ef9`) and S10
+    (`265466059`)**. They are not independent slices on main; they still carry S8's 13 commits.
+    Counts: S8 **13** own commits over base `8a9257642`; S9 and S10 **25** each (S8's 13 + 12 of their
+    own).
+  - **Therefore convergence must run in true dependency order**, exactly as the coordinator specified,
+    using the D-124 cascade method rather than three independent rebases:
+    1. S8 — `git rebase origin/main` (13 commits) → new S8 head;
+    2. S9 — `git rebase --onto <new-S8-head> bc838a0b3` (12 own commits);
+    3. S10 — `git rebase --onto <new-S8-head> bc838a0b3` (12 own commits).
+    S9 and S10 are siblings off S8 and can converge **in parallel** once S8's new head exists.
+    A naive `rebase origin/main` on S9/S10 would replay S8's 13 commits a second time.
+  - **Verdict carry rule recorded from the ruling:** rerun a bounded delta IMPL-EVAL **only where
+    evaluated product bytes changed**, and carry an existing verdict **only when blob identity proves
+    it remains exact**. Range-diff `=` alone is not sufficient for the product surface — blob hashes
+    are.
+  - **#1744 undrafted onto its authoritative post-lease head `bd3dbc843`** (labels `e2e-cli-gate` +
+    `impl-eval:skip` were retained through the re-draft, so no re-setup was needed). Run
+    `33413374354` is **in progress**, released into a group I first confirmed empty so it evicted no
+    other lane.
+  - **#1744 is also a clean natural experiment for the D-207 hypothesis.** Its base `bd9d463b4`
+    **includes** `#1831` (Aspire browser service-key normalization), unlike the three failing heads on
+    `8a9257642`. If the base hypothesis holds, #1744 should **pass** `database.seed`. If it fails
+    there too, the hypothesis is dead and the cause lies elsewhere.
+  - **Canary6 recorded as a merge-sequencing hold only** — never a hold on work or verification.
