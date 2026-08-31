@@ -5138,6 +5138,24 @@
     },
     "queueRule": "Each supervisor queries its orchestrator:<lane> label as the authoritative queue; serialisation applies within that orchestrator only, and a parked leaf never blocks another lane."
   },
+  "openPrOwnership": {
+    "capturedAt": "2026-08-31T02:45:00.000Z",
+    "milestoneOpenPrCount": 29,
+    "milestoneUnassigned": 0,
+    "milestoneMultiplyAssigned": 0,
+    "counts": {
+      "features": 6,
+      "fixes": 3,
+      "internals": 2,
+      "docs": 11,
+      "aspire": 7
+    },
+    "outsideMilestone": {
+      "docsAssigned": [1522, 1640],
+      "auditPendingAtCapture": [780, 822]
+    },
+    "queueRule": "Every open PR has an explicit owner and exact next gate; drafts may be active, converging, or explicitly dispositioned, never silently parked."
+  },
   "canaryCheckpoints": [
     {
       "id": "checkpoint-foundations",
@@ -5220,14 +5238,22 @@
     {
       "id": "checkpoint-user-runtime-sdk-ui-canary-4",
       "rationale": "Meaningful user-facing checkpoint after routing infrastructure, Aspire listener-readiness health checks, SDK browser-safe cache-provider isolation, and the working ui:add data-screen triad landed together.",
-      "state": "in_progress",
+      "state": "published_e2e_failed",
       "contentSha": "65cd8a07787504b5ed94408510d4ab85260bc21a",
-      "expectedVersion": "0.0.7-canary.4",
+      "version": "0.0.7-canary.4",
+      "tag": "v0.0.7-canary.4",
+      "releaseCommitSha": "dcdd03c79ca938c2d4623108a0727d4ef577ab84",
       "publicationWorkflowRunId": 33351037850,
+      "productionE2eWorkflowRunId": 33351367677,
       "payload": "#1792/#1791 evaluator routing; #1743 closing #1718/#1280 Aspire health checks; #1758 closing #1462 SDK browser safety; #1781 closing #1357 working data-screen generation",
       "startedAt": "2026-08-31T02:33:22.000Z",
+      "completedAt": "2026-08-31T02:42:29.000Z",
+      "failure": "Both published-CLI production paths failed immediately with TS2307 because #1781's ui-data-screen-gates.ts imported scaffold/generated-app-name.ts after #1743 moved the module to scaffold/runtime/generated-app-name.ts. The exact one-line repair is in PR #1764; canary.4 remains immutable evidence and stable is blocked until a later coherent green pair.",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/actions/runs/33351037850",
+        "https://github.com/rickylabs/netscript/actions/runs/33351367677",
+        "https://github.com/rickylabs/netscript/releases/tag/v0.0.7-canary.4",
+        "release/canary-pair failure on 65cd8a07787504b5ed94408510d4ab85260bc21a",
         "local publish:readiness PASS at exact content SHA before dispatch"
       ]
     },

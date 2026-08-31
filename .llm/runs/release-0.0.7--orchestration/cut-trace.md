@@ -193,3 +193,7 @@ artifact-pinned production E2E.
 - All four immutable heads passed current CI/close-gate and review-thread checks immediately before
   merge. The resulting coherent public payload triggered canary workflow run 33351037850 from exact
   main `65cd8a07787504b5ed94408510d4ab85260bc21a` after local `publish:readiness` passed.
+- `0.0.7-canary.4` published, labelled, and noted, but pinned production E2E run 33351367677 failed
+  both entry paths on the same merge-order integration defect: stale import
+  `scaffold/generated-app-name.ts` in #1781's new gate after #1743 moved the module under
+  `scaffold/runtime/`. The immutable failed canary is preserved; #1764 owns the bounded repair.

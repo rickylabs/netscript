@@ -3018,3 +3018,17 @@
   not an internals/docs-only cut. Topic lanes continue independently while publication runs.
 - Host runtime proof after dispatch: `aspire ps --format Json` = `[]`; Docker containers 0,
   volumes 0, and non-default networks 0.
+
+## 2026-08-31T02:42:29Z — canary.4 catches merge-order defect; PR control plane made exhaustive
+
+- `0.0.7-canary.4` published successfully and the cadence tool labelled all four payload PRs plus
+  their five closed issues. Exact pinned production E2E run 33351367677 then failed both the full
+  scaffold and quickstart paths on the same TS2307: #1781 added an import of
+  `scaffold/generated-app-name.ts` after #1743 moved that module under `scaffold/runtime/`.
+- The failed canary and tag are preserved. `release/canary-pair` is correctly failure on content
+  SHA `65cd8a077`; stable is blocked, but independent milestone dispatch continues. No immediate
+  canary.5 is inferred: PR #1764 carries the bounded one-line repair, and a later coherent
+  feature/fix checkpoint will decide the next canary unless the defect becomes release-critical.
+- All 29 open milestone PRs now have exactly one `orchestrator:*` label: Features 6, Fixes 3,
+  Internals 2, Docs 11, Aspire 7. Older #1522/#1640 are explicitly assigned to Docs outside the
+  milestone; #780/#822 entered read-only disposition audit. Silent draft parking is prohibited.
