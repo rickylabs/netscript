@@ -53,7 +53,7 @@ command; and guarantee a printed resume rejection produces a non-zero command ex
 - Propagate the known thread-store resume rejection as exit 1 while preserving its output.
 - Add RED-before-GREEN unit, adapter, CLI, and lifecycle coverage for restart-stale ownership, a
   real live owner/writer that must remain, foreign/unknown ownership, and resume rejection.
-- Update the canonical agentic README only after reconciling #1774's concurrent edit.
+- Update the canonical agentic README against its landed #1774 content (`a3ddcbb59`, shipped, in the base) — an isolated final-slice edit, not a reconciliation with a moving target.
 
 ## Non-Scope
 
@@ -88,7 +88,7 @@ command; and guarantee a printed resume rejection produces a non-zero command ex
 | D2 | Stale requires two dead PID samples separated by `SENDER_PID_DEBOUNCE_MS`, plus an exact inactive/absent rollout, plus `thread/read` reporting `idle`, `not_loaded`, or proven absence — **and** the rollout inventory or thread daemon probed must be bound to the record's own session provenance (its code-home/profile established at activation); an unestablishable or mismatched home yields `indeterminate`, never `stale` (PLAN-EVAL cycle 1 F2). | No single signal evicts. Positive, stalled, contradictory, malformed, unknown, or wrong-home evidence preserves. |
 | D3 | `active` thread state, any alive PID sample, `working`/`stalled` rollout, worktree/thread mismatch, `systemError`, unreadable inventory, missing session identity, or foreign record is non-evictable. | False-positive eviction has cross-lane destructive impact; conservative false-blocking is recoverable. |
 | D4 | Launch never evicts. An existing record returns `duplicate_sender_risk`/`ownership_conflict` with an operator action to resume or run the explicit repair command. | Separates detection from the dangerous mutation and guarantees audit cannot be bypassed. |
-| D5 | Repair is the narrow `agentic:runtime repair sender-lease` subcommand, supports dry-run, accepts no force flag, targets one canonical worktree, and never scans the sender directory. | Reuses the repo-native guarded repair surface and avoids the #1774-conflicted `deno.json`. |
+| D5 | Repair is the narrow `agentic:runtime repair sender-lease` subcommand, supports dry-run, accepts no force flag, targets one canonical worktree, and never scans the sender directory. | Reuses the repo-native guarded repair surface; `agentic:runtime` already exists at the base (#1774 shipped as `a3ddcbb59`), so no `deno.json` edit is needed. |
 | D6 | Apply re-reads the unchanged lease token, repeats all probes, atomically writes an `authorized` redacted receipt, CAS-removes the exact record, then finalizes the receipt as `evicted`. | Makes the decision auditable and bounds time-of-check/time-of-use drift. Unknown or changed state aborts. |
 | D7 | The receipt stores a finite reason (`restart_stale_ownership`), record identity without `leaseToken`, all three evidence summaries **from both the original detection pass and the apply-time re-observation pass, each with its own timestamps**, worktree/session identity, and `authorized \| evicted` outcome (PLAN-EVAL cycle 1 F4: the re-observed probe states must be persisted, not only the original ones, so a contested eviction is reconstructable). | Operators can explain why eviction was permitted without persisting prompts, credentials, or the lease secret. |
 | D8 | Resume outcome is `accepted \| rejected \| failed`. The known `thread-store conflict: already has an active writer` signature forces exit 1 even when the child exits 0; output remains present. | A printed rejection cannot be reported as delivery success. |
@@ -119,12 +119,12 @@ established code-home/profile — is `indeterminate`, not `stale` (PLAN-EVAL cyc
 | Three-signal truth table | resolved now | Locked in D2/D3 and must not be weakened during implementation. |
 | Mutation/audit ordering | resolved now | Locked in D6; an authorization receipt exists before CAS removal. |
 | Repair command placement (CLI surface) | resolved now | Locked in D5 under the existing task; no root task addition. |
-| Repair command internal wiring (contract/planner union vs. CLI-local parse) | resolved now (was unflagged — PLAN-EVAL cycle 1 F1) | D11: extends `RUNTIME_COMMANDS` following the `repair-codex-remote` precedent; `runtime/contract.ts`, `runtime/planner.ts`, both test files, and the `runtime/cli/agentic-runtime.ts` dispatch site are now declared in the Intended File Manifest and Slice 4. |
+| Repair command internal wiring (contract/planner union vs. CLI-local parse) | resolved now (was unflagged — PLAN-EVAL cycle 1 F1) | D11: extends `RUNTIME_COMMANDS` following the `repair-codex-remote` precedent; `runtime/contract.ts`, `runtime/planner.ts`, both test files, and the `runtime/cli/agentic-runtime.ts` dispatch site are declared in the Intended File Manifest, and `worklog.md`'s Slice 4 files row now lists them too (PLAN-EVAL cycle 2 R1 correction — the Slice 4 row previously omitted them despite this sentence claiming otherwise). |
 | Probe provenance for absent/not_loaded evidence under isolated CODEX_HOME profiles | resolved now (PLAN-EVAL cycle 1 F2) | D2 and the truth table amended: absence evidence is admissible as stale-supporting only when bound to the record's own session provenance; an unestablishable or mismatched home classifies `indeterminate`. |
 | Exact upstream rejection taxonomy beyond the witnessed active-writer conflict | safe to defer | Treat other non-zero child results as `failed`; add new structured rejection reasons only from observed evidence. |
 | Cancellation of an upstream message that was already queued despite rejection | safe to defer | Separate upstream capability; truthful non-zero propagation is the accepted #1751 obligation. |
 | Automatic cleanup of pre-thread (`launching`, no session id) records | safe to defer | Required three-signal evidence is unavailable, so this issue intentionally fails closed. |
-| README merge timing with #1774 | safe to defer until final docs slice | Reconcile the current `main`/landed #1774 version before the one small README edit; never overwrite it wholesale. |
+| README edit timing | safe to defer until final docs slice | #1774 shipped (`a3ddcbb59`) and is in the base; edit against that landed content in the final slice, never overwrite it wholesale. |
 
 No open decision would force implementation rework if deferred.
 
@@ -141,7 +141,7 @@ No open decision would force implementation rework if deferred.
 | Test claims exit behavior through a pipeline tail. | Use `Deno.Command.output().code`, or shell `out=$(cmd); rc=$?`; forbid `cmd | tail` in tests/gates. |
 | Real-process lifecycle test flakes. | Use a test-owned child with readiness handshake and bounded cleanup, not arbitrary sleeps or host PIDs. |
 | Tests touch the operator's live sender registry. | Inject temp sender/evidence/session roots; assert production `$HOME/.config/.../senders` is never a test path. |
-| #1774 conflicts in shared files. | No `deno.json` edit. Isolate README to final slice and reconcile after #1774; record any divergence in `drift.md`. |
+| README drifts from the landed #1774 content between plan time and the final slice. | No `deno.json` edit needed (#1774 shipped, already in the base). Isolate the README edit to the final slice against whatever is then current on `main`; record any divergence in `drift.md`. |
 
 ## Anti-Patterns to Resolve or Avoid
 
@@ -255,7 +255,7 @@ non-zero result and the named failing test; GREEN commits rerun the exact comman
 - Existing rollout parser/tail helpers, used behind a strict observation adapter.
 - Codex app-server 0.151.0 `thread/read` request/response contract.
 - Existing `agentic:runtime` CLI/task permissions.
-- #1774 reconciliation before the README slice.
+- #1774 has already shipped (`a3ddcbb59`, in the base); the README slice edits against that landed content directly, no reconciliation step needed.
 
 ## Drift Watch
 
