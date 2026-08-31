@@ -6797,3 +6797,32 @@ is precisely how this defect was introduced), to check the sibling
 `packages/ai`.
 
 Brief staged at `/home/agent/observability/netscript-fixes/brief-1677-s1.md`.
+
+### B3 RETRACTED — it was my error, not repo drift. I read a stale worktree and reported a false blocker.
+
+**What I claimed:** that `lane-policy.md` named `qwen/qwen3.8-flash` and `z-ai/glm-5.3-flash` while
+neither existed in `models.ts` or `routing-policy.ts`, and that the sanctioned route was therefore
+unexecutable — recommending Fable 5 instead.
+
+**What is actually true.** Current main's `.llm/tools/agentic/config/models.ts` defines
+`planEvaluator: 'qwen/qwen3.8-flash'` and `implEvaluator: 'z-ai/glm-5.3-flash'`, and
+`OPEN_EVALUATOR_MODEL_IDS` is exactly those two. #1792 updated the config correctly and the document
+matches it. **There is no doc↔binding drift.** The coordinator's routing ruling was right and my
+recommendation to use Fable was wrong.
+
+**Root cause: this orchestrator worktree was stale at `2f34ac0ed`**, many merges behind main. Every
+config file I "verified" — `models.ts`, `routing-policy.ts`, `provider-profiles.ts` — was the
+pre-#1792 version. I compounded it by reading `lane-policy.md` from `origin/main` (fresh) while
+reading the config from the working tree (stale), so the two genuinely disagreed *in what I was
+looking at*, and I reported that as a repo defect with confidence.
+
+**Corrections applied.** Merged current main into this worktree (now `49cd47fbb`); the config here now
+reads `qwen/qwen3.8-flash`. The failed first dispatch (`qwen/qwen3.8-max`, exit 78,
+`evaluator model request denied`) was the guard behaving **correctly** — that id is no longer in the
+approved set. Re-dispatched on `qwen/qwen3.8-flash --effort max`, which the guard accepted and which
+is now running.
+
+**Rule for this lane, recorded because it cost real time and produced a false escalation:** when
+verifying volatile config (model ids, versions, endpoints, routing), read it from `origin/main` or a
+freshly-converged worktree, never from a long-lived orchestrator worktree — and never mix a fresh read
+of one file with a stale read of another when claiming the two disagree.
