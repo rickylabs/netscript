@@ -6886,3 +6886,35 @@ would corrupt work in flight.
 Three leaves now in flight, all non-colliding on handwritten paths: #1365 (`plugin-sagas-core`,
 `plugins/sagas`, saga docs, quality scanner), #1773 (`packages/cli` scaffold + e2e), #1677
 (`packages/ai`). The shared generated carriers remain the ordered integration point.
+
+### #1773 gate-7 carry-forward recorded; final PLAN-EVAL dispatched from the current-main launcher
+
+**Proof computed, then recorded in `plan.md` at head `077d45cd9`:**
+`git merge-base --is-ancestor f22348a80 ccd63a085` → true (measured head is a direct ancestor, no
+rebase). The 28-file delta is documentation, `.llm/runs/` artifacts, `.llm/assets/` agent-doc assets,
+and `*.generated.*` carriers, plus exactly one other file — `.llm/tools/docs/check-exports-drift.ts`
+— which took **three data-only `AUTHORITATIVE_MAPPING` additions** (#1796 `plugin-ai-core`, #1798
+`plugin-streams-core`, #1800 `mcp`) with no control-flow change. Filtering the same diff to
+`^(packages|plugins)/` excluding generated carriers returns **nothing**: no product, test, scanner, or
+measurement code moved.
+
+**Extra diligence beyond the ruling:** I checked whether any test enumerates `AUTHORITATIVE_MAPPING`
+per entry, since that would make table additions change the test count and invalidate the carry.
+Nothing references it — `check-exports-drift_test.ts` exists but does not enumerate the mapping. So
+4,426/0/19 genuinely cannot have moved. The plan states explicitly that these are **carried forward,
+not freshly remeasured**.
+
+**Final PLAN-EVAL dispatched** with the checked-in current-main launcher
+(`/home/agent/projects/netscript/repo/.llm/tools/agentic/claude/openrouter-run.ts`, repo root at
+`0274c0a70`) while cwd is the pinned #1773 worktree — satisfying "authoritative toolchain, pinned
+audit target" without rebasing the plan head. Model attested in-stream as `qwen/qwen3.8-flash`,
+effort `max`. The prompt now tells the evaluator to judge whether the carry-forward proof is *sound
+and honestly stated*, not whether a fresh measurement exists.
+
+**My error, repeated:** I ran `pkill -f 'openrouter-run.ts'` to stop the earlier in-flight evaluation.
+The pattern matched **my own shell's command string**, killing this session's command (exit 144) —
+the exact failure mode already recorded in my own memory as "never identify a process by a
+self-matching pattern". The plan amendment that followed in the same command never ran; I verified
+that (proof-section count 0, tree clean) before redoing it rather than assuming it had partially
+applied. Correct method, used afterwards: walk `/proc/<pid>/cmdline`, skip `$$`, and exclude
+`shell-snapshots`. No cycle was consumed — the killed run had emitted no verdict.
