@@ -6555,3 +6555,31 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
 - Also noted: my `pkill -f "1827-correction.txt"` matched my own shell (exit 144) — the self-match
   hazard again. It achieved the goal, but a `/proc/<pid>/cmdline`-anchored kill would have been the
   correct instrument.
+
+## D-145 — #1753/#1823 reached exact-head green; integration deferred behind feature #1810
+
+- **IMPL-EVAL `PASS`** at evaluated head `c3b3b4cb6`, artifact committed `5b78e7b0a`. Ran on the
+  sanctioned GLM 5.3 Flash / max route with **no guard patch** — the workaround needed in D-120/D-123
+  is obsolete now that #1792 is merged.
+- Evaluator returned **four minor findings, none blocking**, all recorded rather than absorbed:
+  - **F1** — a live `closed`/`merged` PR on a still-`implementing` leaf is not flagged. The
+    evaluator calls this "the closest surviving relative of the original defect": cluster-state
+    behind reality, the mirror image of what this leaf fixes. Both detections the leaf actually
+    claims were confirmed working. Worth a follow-up issue.
+  - **F2** — live base-branch retarget is read but never cross-checked against the recorded leaf.
+  - **F3** — export freshness unbounded (`capturedAt` never compared to a clock); a plan-sanctioned
+    deferral per `plan.md:48`, so not drift, but the consumer contract bounds nothing.
+  - **F4** — informational.
+- Integrated main `a3e0a5aa8` (clean merge `65a588530`), **proved all four generated corpora fresh**
+  via `check:` variants with real exit capture rather than inferring freshness from a clean merge.
+- Tier-A at the integrated head: harness **27/27**, scoped check 0, `arch:check` 0, `deno.lock`
+  unchanged. DoD ticked with concrete evidence; PR marked ready; both PR and issue normalized to sole
+  `status:ready-merge`; review-threads **0 threads / 0 unanswered**.
+- **Exact-head CI fully green at `65a588530`: 7 SUCCESS / 14 SKIPPED / 0 FAILURE.**
+- **main advanced again to `dea44991120a2c5da96a89df0f68d69c455c035e` (#1805)** immediately after,
+  so `65a588530` is now one advance stale. Per instruction: **preserve the PASS, wait behind feature
+  #1810, then integrate once at the final seam** — deliberately not re-merging now, since each
+  integration invalidates the CI run and re-merging into a moving target burns cycles without
+  improving the evidence.
+- #1828's correction remains active and untouched; #1802 still parked at `de24161b6` with its
+  unidentified root-suite failure.
