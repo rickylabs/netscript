@@ -1,6 +1,6 @@
 {
   "gateId": "check",
-  "invocationId": "1664-int-check2",
+  "invocationId": "1664-final-check",
   "argv": [
     "deno",
     "task",
@@ -9,30 +9,30 @@
     "^packages/(cli|sdk|fresh)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1664",
-  "gitHead": "5882eb49d5cdb16a2d10fd7de2d1dd68c7fc6ec3",
-  "actualGitHead": "5882eb49d5cdb16a2d10fd7de2d1dd68c7fc6ec3",
+  "gitHead": "f7b064b966766026a99d85638d557d76a0efb453",
+  "actualGitHead": "f7b064b966766026a99d85638d557d76a0efb453",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1814105",
+  "runnerIdentity": "worker:1815333",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "234d092b7e46ad5adbe10a689decde20d57a7fe975048bfa998071f36e6cf88a",
-  "lifecycleId": "worker:1814105:1664-int-check2:1",
+  "requestHash": "4cdcc137a6b4bf4888b91d19c8df02821d6bb29f7d8c69d18dfbb19ea3a20a15",
+  "lifecycleId": "worker:1815333:1664-final-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T05:25:13.740Z",
-  "startedAt": "2026-08-31T05:25:13.744Z",
-  "finishedAt": "2026-08-31T05:25:18.116Z",
-  "durationMs": 4371,
+  "claimedAt": "2026-08-31T05:25:28.847Z",
+  "startedAt": "2026-08-31T05:25:28.849Z",
+  "finishedAt": "2026-08-31T05:25:28.938Z",
+  "durationMs": 90,
   "exitCode": 0,
   "stdout": {
-    "bytes": 305,
-    "sha256": "0aa97705feb4744dbad3a366ce31235c128f4df7e3ef7b07c12702fd9a2dc159",
-    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1664\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1211,\"batches\":11,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
     "truncated": false
   },
   "stderr": {
-    "bytes": 259,
-    "sha256": "62799405f774e0aeac8b468a750e618073ed2d09f795cf899cbfc6c7431533de",
-    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(cli|sdk|fresh)/'\n",
+    "bytes": 305,
+    "sha256": "9a758a914ef320607d554c823744b56f4409d131590e97cec84aa4018c406bb4",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m \u001b[0m\u001b[38;5;245mdeno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(cli|sdk|fresh)/'\u001b[0m (cached, inputs unchanged)\n",
     "truncated": false
   }
 }
