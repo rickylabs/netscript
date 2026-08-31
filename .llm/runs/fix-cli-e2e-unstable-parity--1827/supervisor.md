@@ -17,4 +17,3 @@
 | --- | --- | --- |
 | Implementation | OpenAI / `gpt-5.6-sol` / medium | RED→GREEN config-parity slice |
 | IMPL-EVAL | Supervisor-owned separate session | Mandatory final evaluator; not dispatched here |
-
