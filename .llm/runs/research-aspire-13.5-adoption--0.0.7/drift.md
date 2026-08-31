@@ -4662,3 +4662,26 @@
     genuine orphan pattern (five instances this run) always showed `ownerPid` **not** alive. I should
     check `ownerPid` first and the session list second, not the reverse.
   - No resume sent; leaving S7 to finish.
+
+- **D-198 — the runtime-queue contention is CROSS-LANE. The D-192 admission rule is necessary but not
+  sufficient, and I nearly misdiagnosed this as my own agent's doing.**
+  - #1754 was released into the slot freed by #1747's completed run — correct under D-192 — and **both
+    its tiers came back `cancelled` anyway**.
+  - **First hypothesis was wrong and I checked it before acting:** I suspected the S9 repair agent had
+    pushed and triggered a run that evicted #1754. `git ls-remote` shows S9's head **unchanged** at
+    `042ff3ca5`, and its last three e2e-cli runs all predate the release. Not S9.
+  - **Actual evictors are other orchestrator lanes:** `feat/service-principal-procedure-policy`
+    (`33406092450`, `in_progress`) and `feat/app-service-client-wiring` (`33406555744`, `pending`).
+    One running plus one pending from the features lane made #1754 the third arrival in
+    `e2e-scaffold-runtime-global`, discarded on arrival.
+  - **Consequence: a per-lane admission rule can only stop a lane evicting *itself*.** The groups are
+    repository-wide, so any lane's push, ready-flip, or rerun can silently destroy another lane's
+    queued runtime gate — and the victim sees `cancelled` with every non-runtime job green, which
+    reads like flake rather than starvation.
+  - **Deliberately did NOT re-trigger #1754 immediately.** The group is currently full; a retry now
+    would either be evicted itself or **evict the features lane's pending job**. Re-triggering into a
+    contended repo-wide group is churn, not queueing, and doing it at another lane's expense is not a
+    cost this lane gets to impose. Waiting for the group to drain instead.
+  - **#1839 escalated** with the cross-lane evidence table and an added acceptance criterion: three or
+    more PRs from at least two lanes arriving within a minute must all eventually execute, with no run
+    ending `cancelled` while its non-runtime jobs are green.
