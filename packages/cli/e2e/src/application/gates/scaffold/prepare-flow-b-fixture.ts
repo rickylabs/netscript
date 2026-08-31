@@ -13,6 +13,8 @@ if (!cliEntrypoint) {
 }
 const flowBJobId = 'flow-b-callback';
 const flowBJobPath = `${projectRoot}/workers/jobs/${flowBJobId}.ts`;
+const flowBSagaId = 'flow-b-compensation';
+const flowBSagaPath = `${projectRoot}/sagas/${flowBSagaId}-saga.ts`;
 
 const denoConfigPath = `${projectRoot}/deno.json`;
 const denoConfig = JSON.parse(await Deno.readTextFile(denoConfigPath));
@@ -42,6 +44,12 @@ if (mode === 'local' && !sourceRoot) {
 const publishedImports = {
   '@netscript/sdk': `jsr:@netscript/sdk@${publishedVersion}`,
   '@netscript/telemetry': `jsr:@netscript/telemetry@${publishedVersion}`,
+  '@netscript/plugin-sagas/runtime': `jsr:@netscript/plugin-sagas@${publishedVersion}/runtime`,
+  '@netscript/plugin-sagas-core': `jsr:@netscript/plugin-sagas-core@${publishedVersion}`,
+  '@netscript/plugin-sagas-core/config':
+    `jsr:@netscript/plugin-sagas-core@${publishedVersion}/config`,
+  '@netscript/plugin-sagas-core/domain':
+    `jsr:@netscript/plugin-sagas-core@${publishedVersion}/domain`,
 };
 const sharedNpmImports = {
   '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
@@ -55,6 +63,17 @@ const localSourcePackages = [
     'packages/plugin-workers-core/src/contracts/v1/mod.ts',
   ],
   ['@netscript/plugin-workers/services', 'plugins/workers/services/src/main.ts'],
+  ['@netscript/plugin-sagas/runtime', 'plugins/sagas/src/runtime/mod.ts'],
+  ['@netscript/plugin-sagas-core', 'packages/plugin-sagas-core/mod.ts'],
+  ['@netscript/plugin-sagas-core/config', 'packages/plugin-sagas-core/config.ts'],
+  ['@netscript/plugin-sagas-core/domain', 'packages/plugin-sagas-core/src/domain/mod.ts'],
+  [
+    '@netscript/plugin-sagas-core/integration/publisher',
+    'packages/plugin-sagas-core/src/integration/publisher/mod.ts',
+  ],
+  ['@netscript/plugin-sagas-core/runtime', 'packages/plugin-sagas-core/src/runtime/mod.ts'],
+  ['@netscript/plugin-sagas-core/stores', 'packages/plugin-sagas-core/src/stores/mod.ts'],
+  ['@netscript/plugin-sagas-core/telemetry', 'packages/plugin-sagas-core/src/telemetry/mod.ts'],
   ['@netscript/sdk/client', 'packages/sdk/src/client/mod.ts'],
   ['@netscript/telemetry', 'packages/telemetry/mod.ts'],
   ['@netscript/telemetry/attributes', 'packages/telemetry/attributes.ts'],
@@ -157,13 +176,80 @@ await runDeno(
   projectRoot,
   'workers add job',
 );
+const sagasCli = mode === 'published'
+  ? `jsr:@netscript/plugin-sagas@${publishedVersion}/cli`
+  : `${sourceRoot}/plugins/sagas/src/cli/mod.ts`;
+await runDeno(
+  [
+    'run',
+    '-A',
+    '--minimum-dependency-age=0',
+    sagasCli,
+    'add',
+    'saga',
+    flowBSagaId,
+    '--message-type=FlowBCompensationRequested',
+  ],
+  projectRoot,
+  'sagas add saga',
+);
+await Deno.writeTextFile(
+  flowBSagaPath,
+  `import { defineSaga, sagaCompensate } from '@netscript/plugin-sagas-core';
+import type {
+  SagaCorrelationKey,
+  SagaDefinition,
+  SagaMessage,
+} from '@netscript/plugin-sagas-core/domain';
+
+type FlowBCompensationPayload = Readonly<{ correlationId: string }>;
+type FlowBCompensationState = Readonly<{ compensated: boolean }>;
+
+function correlateFlowB(message: SagaMessage): SagaCorrelationKey | undefined {
+  const payload = message.payload;
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) return undefined;
+  const correlationId = payload.correlationId;
+  return typeof correlationId === 'string' && correlationId.length > 0
+    ? correlationId as SagaCorrelationKey
+    : undefined;
+}
+
+export const flowBCompensationSaga = defineSaga('${flowBSagaId}')
+  .state<FlowBCompensationState>({ compensated: false })
+  .correlate(correlateFlowB)
+  .on<'FlowBCompensationRequested', FlowBCompensationPayload>(
+    'FlowBCompensationRequested',
+    (_saga, message) => [
+      sagaCompensate({
+        type: 'FlowBCompensationUndo',
+        payload: { correlationId: message.payload.correlationId },
+      }, 'Flow-B telemetry proof'),
+    ],
+  )
+  .compensate<'FlowBCompensationUndo', FlowBCompensationPayload>(
+    'FlowBCompensationUndo',
+    (saga) => {
+      saga.state = { compensated: true };
+      return [];
+    },
+  )
+  .build() as SagaDefinition;
+
+export default flowBCompensationSaga;
+`,
+);
 const flowBJob = await Deno.readTextFile(flowBJobPath);
 const callbackImports = [
   "import { UsersV1 } from '../../contracts/versions/v1/users.contract.ts';",
   "import { createServiceClient } from '@netscript/sdk/client';",
+  "import { createSagaPublisher } from '@netscript/plugin-sagas/runtime';",
+  "import type { SagaCorrelationKey } from '@netscript/plugin-sagas-core/domain';",
+  "import { getTraceContext } from '@netscript/telemetry/context';",
   "import { getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';",
-].join('\n');
+];
 const callbackBody = [
+  '  const flowBCorrelationId = context.correlationId ?? context.id;',
+  "  await Deno.writeTextFile('.netscript/e2e/flow-b-correlation-id', flowBCorrelationId);",
   '  const channelClient = createServiceClient({',
   '    contract: UsersV1,',
   "    serviceName: 'users',",
@@ -171,28 +257,33 @@ const callbackBody = [
   '  });',
   "  await withSpan(getTracer('@netscript/e2e-flow-b'), 'flow-b.callback', async () => {",
   '    await channelClient.health.check();',
+  '    const traceContext = getTraceContext();',
+  '    const correlationKey = flowBCorrelationId as SagaCorrelationKey;',
+  '    const publish = await createSagaPublisher().publish({',
+  "      type: 'FlowBCompensationRequested',",
+  '      payload: { correlationId: flowBCorrelationId },',
+  '      correlationKey,',
+  '    }, {',
+  '      correlationKey,',
+  '      traceparent: traceContext?.traceparent,',
+  '      tracestate: traceContext?.tracestate,',
+  '    });',
+  '    if (!publish.published) throw new Error(`Flow-B saga publish failed: ${publish.reason}`);',
   '  }, {',
   '    kind: SpanKind.CLIENT,',
   '    attributes: {',
-  "      'netscript.correlation.id': context.correlationId ?? context.id,",
+  "      'netscript.correlation.id': flowBCorrelationId,",
   "      'netscript.flow_b.outcome': 'success',",
   '    },',
   '  });',
 ].join('\n');
 
 let updatedFlowBJob = flowBJob;
-updatedFlowBJob = updatedFlowBJob
-  .replace('  const flowBCorrelationId = context.correlationId ?? context.id;\n', '')
-  .replace(
-    "  await Deno.writeTextFile('.netscript/e2e/flow-b-correlation-id', flowBCorrelationId);\n",
-    '',
-  )
-  .replace(
-    "attributes: { 'netscript.correlation.id': flowBCorrelationId }",
-    "attributes: { 'netscript.correlation.id': context.correlationId ?? context.id }",
-  );
-if (!updatedFlowBJob.includes("from '@netscript/sdk/client'")) {
-  updatedFlowBJob = `${callbackImports}\n${updatedFlowBJob}`;
+const missingCallbackImports = callbackImports.filter((statement) =>
+  !updatedFlowBJob.includes(statement)
+);
+if (missingCallbackImports.length > 0) {
+  updatedFlowBJob = `${missingCallbackImports.join('\n')}\n${updatedFlowBJob}`;
 }
 if (!updatedFlowBJob.includes("'flow-b.callback'")) {
   updatedFlowBJob = updatedFlowBJob.replace(
@@ -235,15 +326,30 @@ const usersReference = [
   '      }',
   '    }',
 ].join('\n');
-const configuredBackgroundBlock = workersBackgroundBlock.includes(
-    'services__users__http__0',
-  )
+const sagasReference = [
+  '    {',
+  "      const sagasEndpoint = await _plugins.get('sagas-api')?.getEndpoint('http');",
+  '      if (sagasEndpoint) {',
+  "        await workers.withEnvironment('services__sagas-api__http__0', sagasEndpoint);",
+  '      }',
+  '    }',
+].join('\n');
+const missingBackgroundReferences = [
+  workersBackgroundBlock.includes('services__users__http__0') ? undefined : usersReference,
+  workersBackgroundBlock.includes('services__sagas-api__http__0') ? undefined : sagasReference,
+].filter((reference): reference is string => reference !== undefined);
+const configuredBackgroundBlock = missingBackgroundReferences.length === 0
   ? workersBackgroundBlock
   : workersBackgroundBlock.replace(
     "    backgroundProcessors.set('workers', workers);",
-    `${usersReference}\n\n    backgroundProcessors.set('workers', workers);`,
+    `${
+      missingBackgroundReferences.join('\n\n')
+    }\n\n    backgroundProcessors.set('workers', workers);`,
   );
-if (!configuredBackgroundBlock.includes('services__users__http__0')) {
+if (
+  !configuredBackgroundBlock.includes('services__users__http__0') ||
+  !configuredBackgroundBlock.includes('services__sagas-api__http__0')
+) {
   throw new Error('workers resource did not contain its expected registration marker');
 }
 await Deno.writeTextFile(

@@ -36,6 +36,114 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'aspire',
+    packagePath: 'packages/aspire',
+    docPath: 'docs/site/reference/aspire/index.md',
+    packageName: '@netscript/aspire',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page maps the diagnostics root and eight typed config/composition subpaths while curating their primary APIs rather than every exported contract.',
+    },
+  },
+  {
+    name: 'cli',
+    packagePath: 'packages/cli',
+    docPath: 'docs/site/reference/cli/index.md',
+    packageName: '@netscript/cli',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the embeddable root plus scaffolding and testing entrypoints, with selected command and fixture tables rather than every CLI option type.',
+    },
+  },
+  {
+    name: 'watchers',
+    packagePath: 'packages/watchers',
+    docPath: 'docs/site/reference/watchers/index.md',
+    packageName: '@netscript/watchers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories the supported watcher APIs while deliberately classifying exported strategy implementations as internal.',
+    },
+  },
+  {
+    name: 'runtime-config',
+    packagePath: 'packages/runtime-config',
+    docPath: 'docs/site/reference/runtime-config/index.md',
+    packageName: '@netscript/runtime-config',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason:
+        'The single-entrypoint reference inventories every exported loader, accessor, diagnostic, type, constant, and alias reported by deno doc.',
+    },
+  },
+  {
+    name: 'prisma-adapter-mysql',
+    packagePath: 'packages/prisma-adapter-mysql',
+    docPath: 'docs/site/reference/prisma-adapter-mysql/index.md',
+    packageName: '@netscript/prisma-adapter-mysql',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories primary adapter contracts while omitting the lower-level transaction options contract.',
+    },
+  },
+  {
+    name: 'auth-workos',
+    packagePath: 'packages/auth-workos',
+    docPath: 'docs/site/reference/auth-workos/index.md',
+    packageName: '@netscript/auth-workos',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories WorkOS APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.',
+    },
+  },
+  {
+    name: 'auth-better-auth',
+    packagePath: 'packages/auth-better-auth',
+    docPath: 'docs/site/reference/auth-better-auth/index.md',
+    packageName: '@netscript/auth-better-auth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root entrypoint and inventories Better Auth APIs plus selected shared auth contracts rather than every re-exported auth-core symbol.',
+    },
+  },
+  {
+    name: 'cron',
+    packagePath: 'packages/cron',
+    docPath: 'docs/site/reference/cron/index.md',
+    packageName: '@netscript/cron',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason:
+        'The page inventories every exported symbol across the root, ports, adapters, and testing entrypoints.',
+    },
+  },
+  {
+    name: 'database',
+    packagePath: 'packages/database',
+    docPath: 'docs/site/reference/database/index.md',
+    packageName: '@netscript/database',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all ten driver, extension, script, tracing, and testing entrypoints while its tables focus on primary contracts and runners.',
+    },
+  },
+  {
     name: 'fresh-ui',
     packagePath: 'packages/fresh-ui',
     docPath: 'docs/site/reference/fresh-ui/index.md',
@@ -57,6 +165,30 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
           'DropzoneRejectedReason',
         ],
       }],
+    },
+  },
+  {
+    name: 'kv',
+    packagePath: 'packages/kv',
+    docPath: 'docs/site/reference/kv/index.md',
+    packageName: '@netscript/kv',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the root, Redis, kvdex, and testing entrypoints while summarizing kvdex compatibility re-exports in prose instead of a complete symbol table.',
+    },
+  },
+  {
+    name: 'logger',
+    packagePath: 'packages/logger',
+    docPath: 'docs/site/reference/logger/index.md',
+    packageName: '@netscript/logger',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees the core, Hono middleware, and oRPC entrypoints, but inventories selected root primitives rather than both integration symbol surfaces.',
     },
   },
   {

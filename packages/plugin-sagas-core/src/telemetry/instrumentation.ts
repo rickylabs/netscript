@@ -1,4 +1,4 @@
-import type { SagaDurabilityTier } from '../domain/mod.ts';
+import type { SagaDurabilityTier, SagaInstanceStatus } from '../domain/mod.ts';
 import {
   SagaAttributes,
   SagaSpanEvents,
@@ -29,6 +29,8 @@ export type SagaTraceLink = Readonly<{
 
 /** Structural span boundary compatible with OpenTelemetry adapters. */
 export interface SagaTelemetrySpan {
+  /** Return serialized W3C context when the tracer exposes it. */
+  spanContext?(): SagaTraceParent | undefined;
   /** Attach a single defined attribute to the span. */
   setAttribute(key: string, value: Exclude<SagaTelemetryAttributeValue, undefined>): void;
   /** Add a named event with optional attributes to the span. */
@@ -97,6 +99,7 @@ export type SagaHandleSpanInput = Readonly<{
   eventType: string;
   attempt: number;
   durabilityTier: SagaDurabilityTier;
+  correlationId?: string;
   correlationKey?: string;
   parent?: SagaTraceParent;
   links?: readonly SagaTraceLink[];
@@ -104,6 +107,11 @@ export type SagaHandleSpanInput = Readonly<{
 
 /** Input attributes for a send cascade span. */
 export type SagaCascadeSendInput = Readonly<{
+  sagaId?: string;
+  instanceId?: string;
+  correlationId?: string;
+  correlationKey?: string;
+  parent?: SagaTraceParent;
   targetJobId?: string;
   idempotencyKey?: string;
   retryMaxAttempts?: number;
@@ -113,20 +121,42 @@ export type SagaCascadeSendInput = Readonly<{
 
 /** Input attributes for a scheduled cascade span. */
 export type SagaCascadeScheduleInput = Readonly<{
+  sagaId?: string;
+  instanceId?: string;
+  correlationId?: string;
+  correlationKey?: string;
+  parent?: SagaTraceParent;
   scheduledFor?: Date;
   delayMs?: number;
 }>;
 
 /** Input attributes for a child saga spawn span. */
 export type SagaCascadeSpawnInput = Readonly<{
+  sagaId?: string;
+  instanceId?: string;
+  correlationId?: string;
+  correlationKey?: string;
+  parent?: SagaTraceParent;
   childSagaId: string;
   childInstanceId?: string;
 }>;
 
 /** Input attributes for a compensation cascade span. */
 export type SagaCascadeCompensateInput = Readonly<{
+  sagaId?: string;
+  instanceId?: string;
+  correlationId?: string;
+  correlationKey?: string;
+  parent?: SagaTraceParent;
   reason?: string;
-  cascadeSize: number;
+  cascadeSize?: number;
+}>;
+
+type SagaCascadeContextInput = Readonly<{
+  sagaId?: string;
+  instanceId?: string;
+  correlationId?: string;
+  correlationKey?: string;
 }>;
 
 /** Input attributes for saga handle duration metrics. */
@@ -193,12 +223,14 @@ export class SagaInstrumentation {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_SEND, {
       kind: 'producer',
       attributes: {
+        ...cascadeAttributes(input),
         [SagaAttributes.TARGET_JOB_ID]: input.targetJobId,
         [SagaAttributes.IDEMPOTENCY_KEY]: input.idempotencyKey,
         [SagaAttributes.RETRY_MAX_ATTEMPTS]: input.retryMaxAttempts,
         [SagaAttributes.CONCURRENCY_KEY]: input.concurrencyKey,
         [SagaAttributes.QUEUE_NAME]: input.queueName,
       },
+      parent: input.parent,
     });
   }
 
@@ -207,9 +239,11 @@ export class SagaInstrumentation {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_SCHEDULE, {
       kind: 'producer',
       attributes: {
+        ...cascadeAttributes(input),
         [SagaAttributes.SCHEDULED_FOR]: input.scheduledFor?.toISOString(),
         [SagaAttributes.DELAY_MS]: input.delayMs,
       },
+      parent: input.parent,
     });
   }
 
@@ -218,9 +252,11 @@ export class SagaInstrumentation {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_SPAWN, {
       kind: 'producer',
       attributes: {
+        ...cascadeAttributes(input),
         [SagaAttributes.CHILD_SAGA_ID]: input.childSagaId,
         [SagaAttributes.CHILD_INSTANCE_ID]: input.childInstanceId,
       },
+      parent: input.parent,
     });
   }
 
@@ -229,15 +265,45 @@ export class SagaInstrumentation {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_COMPENSATE, {
       kind: 'internal',
       attributes: {
+        ...cascadeAttributes(input),
         [SagaAttributes.COMPENSATION_REASON]: input.reason,
         [SagaAttributes.COMPENSATION_CASCADE_SIZE]: input.cascadeSize,
       },
+      parent: input.parent,
     });
   }
 
-  /** Start a span for cascade completion bookkeeping. */
-  startCascadeCompleteSpan(): SagaTelemetrySpan {
-    return this.tracer.startSpan(SagaSpanNames.CASCADE_COMPLETE, { kind: 'internal' });
+  /** Start a span for an engine-resolved completion transition. */
+  startCascadeCompleteSpan(
+    input: Readonly<{
+      sagaId?: string;
+      instanceId?: string;
+      correlationId?: string;
+      correlationKey?: string;
+      parent?: SagaTraceParent;
+      status?: SagaInstanceStatus;
+      resultPresent?: boolean;
+    }> = {},
+  ): SagaTelemetrySpan {
+    return this.tracer.startSpan(SagaSpanNames.CASCADE_COMPLETE, {
+      kind: 'internal',
+      attributes: {
+        ...cascadeAttributes(input),
+        [SagaAttributes.STATUS]: input.status,
+        [SagaAttributes.SAGA_RESULT_PRESENT]: input.resultPresent,
+      },
+      parent: input.parent,
+    });
+  }
+
+  /** Read serialized W3C context from a started span when available. */
+  spanContext(span: SagaTelemetrySpan): SagaTraceParent | undefined {
+    return span.spanContext?.();
+  }
+
+  /** Record the number of cascades returned by a compensation handler. */
+  recordCompensationCascadeSize(span: SagaTelemetrySpan, cascadeSize: number): void {
+    span.setAttribute(SagaAttributes.COMPENSATION_CASCADE_SIZE, cascadeSize);
   }
 
   /** Record a state-before event on a saga span. */
@@ -260,6 +326,8 @@ export class SagaInstrumentation {
     if (error !== undefined) {
       span.recordException(error);
       span.setStatus('error', error instanceof Error ? error.message : String(error));
+    } else if (outcome === SagaTelemetryOutcomes.ERROR) {
+      span.setStatus('error');
     } else {
       span.setStatus('ok');
     }
@@ -335,6 +403,16 @@ function handleAttributes(input: SagaHandleSpanInput): SagaTelemetryAttributes {
     [SagaAttributes.SAGA_EVENT_TYPE]: input.eventType,
     [SagaAttributes.SAGA_ATTEMPT]: input.attempt,
     [SagaAttributes.SAGA_DURABILITY_TIER]: input.durabilityTier,
+    [SagaAttributes.CORRELATION_ID]: input.correlationId,
+    [SagaAttributes.SAGA_CORRELATION_KEY]: input.correlationKey,
+  };
+}
+
+function cascadeAttributes(input: SagaCascadeContextInput): SagaTelemetryAttributes {
+  return {
+    [SagaAttributes.SAGA_ID]: input.sagaId,
+    [SagaAttributes.SAGA_INSTANCE_ID]: input.instanceId,
+    [SagaAttributes.CORRELATION_ID]: input.correlationId,
     [SagaAttributes.SAGA_CORRELATION_KEY]: input.correlationKey,
   };
 }

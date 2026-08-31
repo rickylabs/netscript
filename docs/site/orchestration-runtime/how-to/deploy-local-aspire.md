@@ -172,6 +172,17 @@ from inside <code>aspire/</code>. <code>netscript db</code> commands run from th
 <li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Run it with no Aspire up and it fails fast — bring the graph up
 first.</li>
+<li><strong>A declared background reference cannot resolve.</strong> For each background processor
+that is not explicitly disabled, the generated AppHost preflights every declared service and plugin
+reference before registration. Each such declaration is required configuration, so it fails fast
+when the resource is missing or when the resource exists but has no <code>http</code> endpoint; this
+is a startup configuration error, not a processor failing under load. Service references use the
+message template
+<code>Background processor configuration error: '&lt;processor&gt;' could not resolve service
+reference '&lt;ref&gt;' HTTP endpoint.</code> Plugin references use the distinct template
+<code>Background processor configuration error: '&lt;processor&gt;' could not resolve plugin
+reference '&lt;ref&gt;' HTTP endpoint.</code> The generated code substitutes the configured processor
+and reference names for <code>&lt;processor&gt;</code> and <code>&lt;ref&gt;</code>.</li>
 <li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and
 OTLP <code>:4318</code>; services and plugin APIs claim their assigned high-range ports (49152–65535) allocated at scaffold time. A stale prior run holding a port blocks boot — check the dashboard
 resource list (or your process table) and free it.</li>

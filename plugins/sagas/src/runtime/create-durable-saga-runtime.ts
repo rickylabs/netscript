@@ -7,6 +7,7 @@ import type {
   SagaStorePort,
 } from '@netscript/plugin-sagas-core/runtime';
 import { createSagaRuntime, SagaCompensator } from '@netscript/plugin-sagas-core/runtime';
+import { SagaInstrumentation } from '@netscript/plugin-sagas-core/telemetry';
 import type { KvStore } from '@netscript/kv';
 
 import {
@@ -52,13 +53,17 @@ export async function createDurableSagaRuntime(
   const store = options.projection
     ? new ProjectingSagaStore(resources.store, options.projection)
     : resources.store;
+  const instrumentation = options.native?.instrumentation ??
+    options.native?.engineOptions?.instrumentation ?? new SagaInstrumentation();
   const runtime = createSagaRuntime({
     adapter: 'native',
     native: {
       ...options.native,
       store,
+      instrumentation,
       compensator: options.native?.compensator ?? new SagaCompensator({
         clock: systemSagaClock,
+        instrumentation,
       }),
     },
   });

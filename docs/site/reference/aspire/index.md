@@ -234,7 +234,21 @@ authors writing Aspire composition tests.
 
 ## Production aggregate (`@netscript/aspire/public`)
 
-The production aggregate entrypoint re-exports all public config, schema, types, constants, application composition, adapters, diagnostics, and testing symbols from a single import path. Use `@netscript/aspire/public` when an application or plugin prefers a unified import over individual sub-path specifiers, while reserving the root `@netscript/aspire` entrypoint exclusively for diagnostics (`inspectAspire`).
+The production aggregate entrypoint combines the package's public config, schema, types, constants,
+application composition, adapters, diagnostics, and testing surfaces in a single import path. It
+also exposes domain errors and contracts plus the runtime lifecycle port that have no separate
+published sub-path. Use `@netscript/aspire/public` when an application or plugin prefers a unified
+import over individual sub-path specifiers, while reserving the root `@netscript/aspire` entrypoint
+exclusively for diagnostics (`inspectAspire`).
+
+The following symbols are published exclusively through `@netscript/aspire/public`.
+
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `AspireError` | class | `class AspireError extends Error` | Base error consumers can catch when handling an Aspire package failure. |
+| `DuplicateContributionError` | class | `class DuplicateContributionError extends AspireError` | Error a consumer meets when `ContributionRegistry` receives a second contribution for the same plugin name. |
+| `AspireRuntime` | interface | — | Lifecycle port (`start`, `stop`, and `status`) implemented by adapters that control an Aspire AppHost runtime. |
+| `ReferenceSpec` | interface | — | Resource relationship contract carrying the source, target, and whether startup waits for the target. |
 
 ## Sub-path exports
 
@@ -251,7 +265,7 @@ own `deno doc` surface in the sections above.
 | `@netscript/aspire/application` | `./src/application/mod.ts` | AppHost composition, contribution registry, and resolvers. |
 | `@netscript/aspire/adapters` | `./src/adapters/mod.ts` | SDK-neutral TypeScript builder adapter. |
 | `@netscript/aspire/testing` | `./src/testing/mod.ts` | In-memory builder, contribution base class, and fixtures. |
-| `@netscript/aspire/public` | `./src/public/mod.ts` | Production aggregate re-exporting all public surfaces. |
+| `@netscript/aspire/public` | `./src/public/mod.ts` | Production aggregate plus domain contracts and the runtime lifecycle port not published through separate sub-paths. |
 
 ---
 

@@ -290,14 +290,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
 
       - name: Install Aspire CLI
         if: env.RUN == 'true'
-        env:
-          ASPIRE_CLI_VERSION: "13.4.6"
         run: |
-          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
@@ -306,8 +304,8 @@ jobs:
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            13.4.*) ;;
-            *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
+            13.5.*) ;;
+            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
           esac
 
       - name: Install workspace dependencies
@@ -328,9 +326,10 @@ jobs:
         with:
           name: e2e-cli-scaffold-runtime-report
           path: |
-            .llm/tmp/**/report*.json
-            .llm/tmp/**/report*.ndjson
-            **/e2e-report*.json
+            .llm/tmp/e2e-report-scaffold-runtime*.json
+            .llm/tmp/e2e-report-scaffold-runtime*.ndjson
+            .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
+          include-hidden-files: true
           if-no-files-found: ignore
 
   scaffold-runtime-sqlite:
@@ -377,14 +376,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
 
       - name: Install Aspire CLI
         if: env.RUN == 'true'
-        env:
-          ASPIRE_CLI_VERSION: "13.4.6"
         run: |
-          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
@@ -393,8 +390,8 @@ jobs:
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            13.4.*) ;;
-            *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
+            13.5.*) ;;
+            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
           esac
 
       - name: Install workspace dependencies
@@ -415,9 +412,10 @@ jobs:
         with:
           name: e2e-cli-scaffold-runtime-sqlite-report
           path: |
-            .llm/tmp/**/report*.json
-            .llm/tmp/**/report*.ndjson
-            **/e2e-report*.json
+            .llm/tmp/e2e-report-scaffold-runtime-sqlite*.json
+            .llm/tmp/e2e-report-scaffold-runtime-sqlite*.ndjson
+            .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
+          include-hidden-files: true
           if-no-files-found: ignore
 
   desktop-native-linux:

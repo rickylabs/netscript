@@ -28,7 +28,7 @@ binds them to a NetScript host.
 - **A real operations surface** — the plugin CLI covers the job lifecycle end to end: `add-job`,
   `add-task`, `add-workflow`, `run`, `run-task`, `list-jobs`, `executions`, `logs`, `trigger`,
   `enable`/`disable`, and `compile-registry`.
-- **Workers API included** — the `workers-api` service (default port `8091`) exposes job and
+- **Workers API included** — the `workers-api` service uses an Aspire-allocated endpoint and exposes job and
   execution introspection over a versioned contract, so dashboards and agents query state instead of
   scraping logs.
 - **Durable by default** — `./streams` publishes execution and job entities to durable stream
@@ -41,7 +41,7 @@ binds them to a NetScript host.
 ```mermaid
 flowchart LR
     M["workersPlugin<br/>(manifest: services, schema,<br/>topics, Aspire resources)"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["workers-api<br/>:8091"]
+    H --> A["workers-api<br/>Aspire-allocated endpoint"]
     H --> W["Worker + Scheduler<br/>processes"]
     W --> R["Runtimes<br/>Deno · PowerShell · Python · shell"]
     W --> S["Durable streams<br/>executions · jobs"]
@@ -82,7 +82,7 @@ Install the plugin, then list the jobs it manages:
 
 ```bash
 $ netscript plugin install worker --name workers
-Installed worker plugin "workers" on port 8091.
+Installed worker plugin "workers" on port <allocated-port>.
 Created 4 plugin files.
 Regenerated 12 Aspire helper files.
 
@@ -100,10 +100,10 @@ import { workersPlugin } from '@netscript/plugin-workers';
 
 console.log(workersPlugin.name); // "@netscript/plugin-workers"
 
-// Declared service contributions (the Workers API runs on port 8091).
+// Declared service contributions (the Workers API port is allocated by Aspire).
 const service = workersPlugin.contributions.services?.[0];
 console.log(service?.name); // "workers-api"
-console.log(service?.port); // 8091
+console.log(service?.port); // undefined unless explicitly pinned
 ```
 
 ## Public surface
@@ -113,7 +113,7 @@ console.log(service?.port); // 8091
 | `.`           | `workersPlugin` — the typed `PluginManifest` with every contribution axis  |
 | `./cli`       | The workers command group (`add-job`, `run`, `list-jobs`, `executions`, …) |
 | `./worker`    | The `Worker` consumer and cron `Scheduler` runtime classes                 |
-| `./services`  | The Workers API service composition (`workers-api`, port `8091`)           |
+| `./services`  | The Workers API service composition (`workers-api`, Aspire-allocated port) |
 | `./streams`   | Durable-stream factory for execution and job entities                      |
 | `./aspire`    | The workers Aspire contribution for the AppHost                            |
 | `./contracts` | The versioned workers API contract generated registries bind against       |

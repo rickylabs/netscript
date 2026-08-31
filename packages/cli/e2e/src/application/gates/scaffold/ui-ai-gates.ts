@@ -5,7 +5,7 @@ import type { RunContext } from '../../../domain/run-context.ts';
 import { join } from '@std/path';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
 import { localSourceFixtureScript } from './local-source-fixture.ts';
-import { generatedAppName } from './generated-app-name.ts';
+import { generatedAppName } from './runtime/generated-app-name.ts';
 
 const AI_LOCAL_SOURCE_PACKAGES = [
   { specifier: '@netscript/ai', entrypoint: 'ai/mod.ts' },

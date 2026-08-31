@@ -81,17 +81,23 @@ async function runSyncCheck(): Promise<CheckResult> {
 }
 
 async function runHookLockCheck(): Promise<CheckResult> {
+  const projectRoot = Deno.cwd();
   const lockBefore = await readOptional('deno.lock');
   for (let i = 0; i < 3; i += 1) {
     const command = new Deno.Command(Deno.execPath(), {
       args: [
         'run',
         '--no-lock',
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '.llm/tools/agentic/claude/claude-hook-log.ts',
+        '--no-prompt',
+        '--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID',
+        `--allow-write=${projectRoot}/.llm/tmp/claude/hooks`,
+        `${projectRoot}/.llm/tools/agentic/claude/claude-hook-log.ts`,
       ],
+      env: {
+        CLAUDE_PROJECT_DIR: projectRoot,
+        NETSCRIPT_RUN_ID: 'agentic-check-claude',
+        CLAUDE_SESSION_ID: 'agentic-check-claude',
+      },
       stdin: 'piped',
       stdout: 'piped',
       stderr: 'piped',

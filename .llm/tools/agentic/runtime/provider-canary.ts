@@ -2,6 +2,11 @@
 
 import type { RouteIdentity, RuntimeDiagnostic } from './contract.ts';
 import {
+  compareLaunchIdentity,
+  type LaunchIdentityEvidence,
+  type ObservedLaunchIdentity,
+} from './launch-route-identity.ts';
+import {
   matchOpenRouterPreset,
   type OpenRouterIncompatibility,
   resolveProviderProfile,
@@ -20,6 +25,10 @@ export interface ProviderCanaryObservation {
   readonly malformed: boolean;
   readonly incompatibility: ProviderIncompatibility | null;
   readonly eventCounts: Readonly<Record<ProviderCanaryCapability, number>>;
+  readonly observedIdentity: ObservedLaunchIdentity;
+  readonly identitySource: 'launch_argv_and_profile' | null;
+  readonly outputTokenBudget: number | null;
+  readonly responseNonEmpty: boolean | null;
 }
 
 export interface ProviderCompatibilityEvidence {
@@ -29,6 +38,10 @@ export interface ProviderCompatibilityEvidence {
   readonly provider: RouteIdentity['provider'];
   readonly model: string;
   readonly effort: RouteIdentity['effort'];
+  readonly routeIdentity: LaunchIdentityEvidence;
+  readonly identitySource: ProviderCanaryObservation['identitySource'];
+  readonly outputTokenBudget: number | null;
+  readonly response: 'non_empty' | 'empty' | 'unknown';
   readonly credential: ProviderCanaryObservation['credential'];
   readonly remoteControl: 'available' | 'unavailable' | 'not_applicable';
   readonly experimentalNonAnthropicModel: boolean;
@@ -102,6 +115,11 @@ export function evaluateProviderCanary(
       ? 'supported'
       : 'unsupported',
   ])) as Readonly<Record<ProviderCanaryCapability, ProviderCapabilityStatus>>;
+  const routeIdentity = compareLaunchIdentity({
+    provider: route.provider,
+    model: route.model,
+    effort: route.effort,
+  }, observation.observedIdentity);
   const evidence: ProviderCompatibilityEvidence = {
     profileId: profile.id,
     ...(route.presetId ? { presetId: route.presetId } : {}),
@@ -109,6 +127,14 @@ export function evaluateProviderCanary(
     provider: route.provider,
     model: route.model,
     effort: route.effort,
+    routeIdentity,
+    identitySource: observation.identitySource,
+    outputTokenBudget: observation.outputTokenBudget,
+    response: observation.responseNonEmpty === null
+      ? 'unknown'
+      : observation.responseNonEmpty
+      ? 'non_empty'
+      : 'empty',
     credential: observation.credential,
     remoteControl: route.agent === 'codex'
       ? 'not_applicable'
@@ -147,6 +173,29 @@ export function evaluateProviderCanary(
       'Codex Responses native namespace tools are unsupported by the selected OpenRouter endpoint',
     ));
   }
+  if (routeIdentity.status !== 'matched') {
+    diagnostics.push(diagnostic(
+      'route_conflict',
+      'policy',
+      `provider canary launch identity is ${routeIdentity.status}: ${
+        routeIdentity.mismatches.join(', ') || 'observation incomplete'
+      }`,
+    ));
+  }
+  if (observation.responseNonEmpty !== true) {
+    diagnostics.push(diagnostic(
+      'capability_unsupported',
+      'compatibility',
+      'provider canary did not return the required non-empty success marker',
+    ));
+  }
+  if (customClaude && (observation.outputTokenBudget ?? 0) < 300) {
+    diagnostics.push(diagnostic(
+      'capability_unsupported',
+      'compatibility',
+      'Claude OpenRouter canary output-token budget must be at least 300',
+    ));
+  }
   for (const capability of PROVIDER_CANARY_CAPABILITIES) {
     if (capabilities[capability] !== 'supported') {
       diagnostics.push(diagnostic(
@@ -159,7 +208,9 @@ export function evaluateProviderCanary(
   const processFailed = observation.timedOut ||
     (observation.exitCode !== null && observation.exitCode !== 0);
   const fanOutEligible = observation.credential === 'available' && !processFailed &&
-    !observation.malformed && !incompatibility &&
+    !observation.malformed && !incompatibility && routeIdentity.status === 'matched' &&
+    observation.responseNonEmpty === true &&
+    (!customClaude || (observation.outputTokenBudget ?? 0) >= 300) &&
     PROVIDER_CANARY_CAPABILITIES.every((capability) => capabilities[capability] === 'supported');
   return {
     status: fanOutEligible ? 'passed' : processFailed ? 'failed' : 'blocked',

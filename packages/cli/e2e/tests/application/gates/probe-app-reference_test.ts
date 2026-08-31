@@ -5,7 +5,7 @@ import {
   probeAppReference,
   REFERENCE_EXPECTATIONS,
   REFERENCE_VIEWPORTS,
-} from '../../../src/application/gates/scaffold/probe-app-reference.ts';
+} from '../../../src/application/gates/scaffold/runtime/probe-app-reference.ts';
 
 const EXPECTED_VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },

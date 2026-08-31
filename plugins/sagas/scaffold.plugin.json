@@ -47,8 +47,6 @@
     "backgroundEntrypoint": "sagas/runtime.ts",
     "doctorEntrypoint": "./doctor.ts",
     "serviceConfigKey": "sagas-api",
-    "servicePort": 8092,
-    "backgroundPort": 8092,
     "dependencies": ["streams"],
     "requiresDb": true,
     "requiresKv": true,

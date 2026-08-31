@@ -17,7 +17,7 @@ opinion or native-family quota exhaustion, and OpenHands for explicitly cloud-dr
 ## Workflow
 
 Native Claude sessions authenticated through the Anthropic client are the mobile-visible operator
-surface. Claude sessions launched through `agentic:claude-openrouter` or another custom gateway are
+surface. Claude sessions launched through `agentic:claude-openrouter-gateway` or another custom gateway are
 separate inference-only provider-runner sessions: they may be forked, supervised, and recorded, but
 must never be described as Remote Control or mobile-visible sessions. Claude Code 2.1.196 and newer
 enforce this boundary by rejecting Remote Control when `ANTHROPIC_BASE_URL` is custom; an
@@ -25,8 +25,8 @@ interactive process staying alive is not attachment proof.
 
 `agentic:claude-hybrid` keeps that boundary intact. It starts a native, Anthropic-authenticated
 Remote Control supervisor and gives it the local `netscript-hybrid` MCP tool `delegate_openrouter`.
-A tool call delegates one bounded task to OpenCode/OpenRouter; the sole approved default is
-`deepseek/deepseek-v4-flash-0731`. This is not transparent model substitution: Claude must still
+A tool call delegates one bounded task to OpenCode/OpenRouter; the approved default is
+`z-ai/glm-5.3-flash` at `max`, with `qwen/qwen3.8-flash` also allowed. This is not transparent model substitution: Claude must still
 have enough native quota to take a turn and call the tool. At zero Claude quota, use the
 non-Remote-Control OpenRouter surface or OpenCode directly.
 
@@ -43,10 +43,10 @@ non-Remote-Control OpenRouter surface or OpenCode directly.
 5. Keep wrappers and `.llm/tools` as deterministic fallbacks, not as competing sources of truth.
 6. For implementation slices that need Codex mobile visibility, use the WSL Codex daemon path from
    `.agents/skills/codex-wsl-remote/SKILL.md`.
-7. Use `deno task agentic:claude-openrouter -- --resume <id> --fork-session` for an isolated
+7. Use `deno task agentic:claude-openrouter-gateway -- --resume <id> --fork-session` for an isolated
    alternate-model fork. The launcher rejects Remote Control flags by design.
 8. Use `deno task agentic:claude-hybrid -- --cwd <absolute-path> [--name <label>]` when the user
-   needs native Remote Control plus explicit DeepSeek delegation. Require the launcher's registry
+   needs native Remote Control plus explicit GLM Flash delegation. Require the launcher's registry
    evidence (matching PID and cwd plus a non-empty `bridgeSessionId`) before claiming attachment.
    The requested label need not equal Claude's derived registry name.
 
@@ -98,7 +98,7 @@ outcome.
 ```powershell
 deno task agentic:check-claude
 deno task agentic:smoke-claude-remote -- --pretty
-deno task agentic:claude-openrouter -- --cwd <path> [--resume <id> --fork-session]
+deno task agentic:claude-openrouter-gateway -- --cwd <path> [--resume <id> --fork-session]
 deno task agentic:claude-hybrid -- --cwd <absolute-path> [--name <label>]
 deno task agentic:sync-claude
 ```

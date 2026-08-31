@@ -187,14 +187,14 @@ same phase/head.
 
 **When:** an authorized manual rerun or non-phase cloud task genuinely needs a direct trigger. The
 tool validates the dispatch-prompt contract (it must begin with `use harness` and carry a `## SKILL`
-chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status transitions
-instead. Dispatch exactly one trigger per intended run.
+chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status
+transitions instead. Dispatch exactly one trigger per intended run.
 
 ```bash
 # Dry-run (no token, no network) — see the exact comment that would post:
 deno run --allow-read .llm/tools/agentic/openhands/dispatch-openhands.ts \
-  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.8-max \
-  --output pr-comment --provider openrouter --effort xhigh --dry-run --pretty
+  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.8-flash \
+  --output pr-comment --provider openrouter --effort high --dry-run --pretty
 ```
 
 Set `GH_TOKEN` in-process and drop `--dry-run` to post for real. By default every prompt gets a
@@ -202,6 +202,10 @@ verdict output-contract epilogue so the evaluator posts the machine-readable `OP
 line early (iteration budgets exhaust and late verdicts get lost); pass `--no-verdict-contract` for
 non-eval implementation asks. Exit: `0` ok/dry-run · `1` post failed · `2` usage · `3` prompt
 contract violation · `4` missing token.
+
+OpenHands currently cannot attest reasoning effort because its adapter does not expose that
+identity. The dispatch argument records requested metadata only; workflow comments and summaries
+state the limitation and never claim a `max` effort observation.
 
 ### Read the verdict — `openhands/openhands-status.ts` and `watch-openhands-verdict.ts`
 
@@ -319,19 +323,19 @@ OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly em
 gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
 Native Claude Remote Control remains a different surface.
 
-For interactive OpenRouter work, `agentic:claude-openrouter` starts a loopback-only split gateway.
+For interactive OpenRouter work, `agentic:claude-openrouter-gateway` starts a loopback-only split gateway.
 Exact `/v1/messages` requests receive the configured OpenRouter credential and forced model; other
 Claude API traffic is passed to the configured Anthropic endpoint without the OpenRouter key. The
 Claude child receives neither provider API key and runs with `bypassPermissions`. The key is read
 from `OPENROUTER_API_KEY` or the same configured user env file as OpenCode and is never printed.
 
 ```bash
-# New inference-only DeepSeek session.
-deno task agentic:claude-openrouter -- --cwd /home/me/repo
+# New inference-only GLM 5.3 Flash session at max effort.
+deno task agentic:claude-openrouter-gateway -- --cwd /home/me/repo
 
 # Fork an existing conversation without changing the original.
-deno task agentic:claude-openrouter -- \
-  --cwd /home/me/repo --resume <conversation-id> --fork-session --effort xhigh
+deno task agentic:claude-openrouter-gateway -- \
+  --cwd /home/me/repo --resume <conversation-id> --fork-session --effort max
 ```
 
 This surface is deliberately **not Remote Control/mobile-visible**. Claude Code 2.1.196 and newer
@@ -374,7 +378,7 @@ derive a different registry name.
 > **Quota limitation.** Claude must still have enough native allowance to take a turn and choose to
 > call `delegate_openrouter`. The OpenRouter worker can do the delegated reasoning, but this bridge
 > cannot make a zero-Claude-quota Remote Control session progress. For work that needs no Claude
-> turn, use the non-Remote-Control `agentic:claude-openrouter` surface or OpenCode directly.
+> turn, use the non-Remote-Control `agentic:claude-openrouter-gateway` surface or OpenCode directly.
 
 If launch fails, diagnose the boundary reported by the error: confirm `--cwd` is an existing
 absolute directory, `HOME` is set, native `claude --remote-control` works with the current login,
@@ -404,7 +408,7 @@ the child keeps only `ANTHROPIC_AUTH_TOKEN`, has every rival provider/route key 
 under an isolated `CLAUDE_CONFIG_DIR` — a cached native Claude login cannot override the gateway.
 
 ```bash
-deno task agentic:claude-openrouter --model <openrouter-id> --effort xhigh \
+deno task agentic:claude-openrouter --model <openrouter-id> --effort max \
   --prompt .llm/runs/<run-id>/evaluate-prompt.md [--resume <session>] [--output result.json]
 ```
 
@@ -467,18 +471,26 @@ failure.
 
 ## The Claude surface — `claude/`
 
-`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks; it appends Claude Code
-events to `.llm/tmp/claude/hooks/<run-id>/events.jsonl` and is careful never to disturb `deno.lock`.
-`sync-claude-skills.ts` **generates** `.claude/skills/` from `.agents/skills/` — the mirrors are
-generated, never hand-edited. `validate-claude-surface.ts` (the `agentic:check-claude` gate) checks
-the whole surface in one pass:
+`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks. Both `PreToolUse` and
+`Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a nested turn cwd cannot change
+which checked-in logger runs. Claude defines that variable as the session launch root; it does not
+follow `EnterWorktree`, and this hook deliberately writes the event log back to that launch root at
+`.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude script/task invocation falls back
+to `Deno.cwd()` only when the variable is absent.
+
+The configured process reads exactly `CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, and
+`CLAUDE_SESSION_ID`, writes only below the launch-root hook-log subtree, and needs no runtime read
+permission. `--no-lock` keeps the hook from disturbing `deno.lock`; `--no-prompt` prevents a future
+TTY-attached invocation from prompting. `sync-claude-skills.ts` **generates** `.claude/skills/` from
+`.agents/skills/` — the mirrors are generated, never hand-edited. `validate-claude-surface.ts` (the
+`agentic:check-claude` gate) checks the whole surface in one pass:
 
 ```console
 $ deno task agentic:check-claude --pretty
 OK CLAUDE.md: contains @AGENTS.md
 OK .claude/settings.json: valid JSON
 OK .gitignore: ignores .claude/settings.local.json
-OK .claude/skills: agentic:sync-claude OK: 17 skill(s), 21 mirrored file(s)
+OK .claude/skills: agentic:sync-claude OK: 18 skill(s), 22 mirrored file(s)
 OK claude hook lock check: deno.lock unchanged after 3 hook runs
 ```
 
