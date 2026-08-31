@@ -191,6 +191,101 @@ Deno.test('scanner reports TypeScript findings inside docs/site fences at source
   }]);
 });
 
+Deno.test('scanner rejects discarded results from known saga publisher bindings', async () => {
+  const root = await Deno.makeTempDir();
+  const sourceDir = join(root, 'packages/example/src');
+  await Deno.mkdir(sourceDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(sourceDir, 'publisher.ts'),
+    [
+      'const sagaPublisher = createSagaPublisher<Message>();',
+      'export async function send(message: Message): Promise<void> {',
+      '  await sagaPublisher.publish(message);',
+      '  await sagaPublisher.publishMany(',
+      '    [message],',
+      '  );',
+      '  const receipt = await sagaPublisher.publish(message);',
+      '  if (!receipt.published) return;',
+      '}',
+      'export async function typed(publisher: SagaPublisherPort<Message>, message: Message) {',
+      '  await publisher.publish(message);',
+      '}',
+    ].join('\n'),
+  );
+
+  const findings = await scanCodeQuality(['packages/example/src'], root);
+  assertEquals(
+    findings.map((finding) => `${finding.rule}:${finding.file}:${finding.line}:${finding.text}`),
+    [
+      'discarded-saga-publisher-result:packages/example/src/publisher.ts:3:await sagaPublisher.publish(message);',
+      'discarded-saga-publisher-result:packages/example/src/publisher.ts:4:await sagaPublisher.publishMany(',
+      'discarded-saga-publisher-result:packages/example/src/publisher.ts:11:await publisher.publish(message);',
+    ],
+  );
+});
+
+Deno.test('saga receipt rule scans docs fences and emitted TypeScript templates', async () => {
+  const root = await Deno.makeTempDir();
+  const docsDir = join(root, 'docs/site/guides');
+  const sourceDir = join(root, 'plugins/example/src');
+  await Deno.mkdir(docsDir, { recursive: true });
+  await Deno.mkdir(sourceDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(docsDir, 'sagas.md'),
+    [
+      '# Sagas',
+      '',
+      '```ts',
+      'const publisher = createSagaPublisher<Message>();',
+      'await publisher.publish(message);',
+      '```',
+    ].join('\n'),
+  );
+  await Deno.writeTextFile(
+    join(sourceDir, 'sample.ts'),
+    [
+      'export function emit(): string {',
+      '  return `const sagaPublisher = createSagaPublisher<Message>();',
+      'await sagaPublisher.publish(message);',
+      '`;',
+      '}',
+    ].join('\n'),
+  );
+
+  const findings = await scanCodeQuality(['docs/site', 'plugins/example/src'], root);
+  assertEquals(
+    findings.map((finding) =>
+      `${finding.rule}:${finding.file}:${finding.line}:${
+        finding.fenceOrdinal ?? '-'
+      }:${finding.text}`
+    ),
+    [
+      'discarded-saga-publisher-result:docs/site/guides/sagas.md:5:1:await publisher.publish(message);',
+      'discarded-saga-publisher-result:plugins/example/src/sample.ts:3:-:await sagaPublisher.publish(message);',
+    ],
+  );
+});
+
+Deno.test('saga receipt rule ignores consumed results and unrelated publish APIs', async () => {
+  const root = await Deno.makeTempDir();
+  const sourceDir = join(root, 'packages/example/src');
+  await Deno.mkdir(sourceDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(sourceDir, 'safe.ts'),
+    [
+      'const sagaPublisher = createSagaPublisher<Message>();',
+      'const unrelated = createEventPublisher();',
+      'export async function send(message: Message): Promise<unknown> {',
+      '  const receipt = await sagaPublisher.publish(message);',
+      '  await unrelated.publish(message);',
+      '  return sagaPublisher.publishMany([message]);',
+      '}',
+    ].join('\n'),
+  );
+
+  assertEquals(await scanCodeQuality(['packages/example/src'], root), []);
+});
+
 Deno.test('scanner respects extractor exemptions and scans docs test companions', async () => {
   const root = await Deno.makeTempDir();
   const docsDir = join(root, 'docs/site/reference/example');
