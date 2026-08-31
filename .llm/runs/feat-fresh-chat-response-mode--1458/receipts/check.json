@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "1458-seam-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--include",
+    "^packages/fresh/"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1458",
+  "gitHead": "8b0903462fc12862d81015eac74de776eb112180",
+  "actualGitHead": "8b0903462fc12862d81015eac74de776eb112180",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1485095",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "effa7c9ad56905c4f467eab8b097901b778b1b465f3bf9032c8b0e7b61daaa54",
+  "lifecycleId": "worker:1485095:1458-seam-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T04:19:30.759Z",
+  "startedAt": "2026-08-31T04:19:30.761Z",
+  "finishedAt": "2026-08-31T04:19:40.016Z",
+  "durationMs": 9255,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 303,
+    "sha256": "4609aba7b46c4b2b30ebb3d1db5e699b442086b82c5b30759ed1a540f64e53ec",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1458\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":200,\"batches\":2,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 249,
+    "sha256": "102e7d9b035de819a587914bcf0e42dcbe59f5419caef81c0c1f48a669eea8ab",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/fresh/'\n",
+    "truncated": false
+  }
+}
