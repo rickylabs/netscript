@@ -6536,3 +6536,28 @@ requested family or explicit fallback reason matches. That is narrower than the 
 evaluations only use GLM/Qwen". Policy also makes **PLAN-EVAL conditional**: small/mechanical work
 with a complete contract records `PLAN-EVAL: N/A`. I am not self-selecting a route that the machine
 binding would reject; flagged for the coordinator.
+
+### CROSS-LANE ALERT — `main` is red on repo-wide `deno task check` (TS2307), inherited by every branch
+
+Found while converging #1764. Not a #1764 defect.
+
+`packages/cli/e2e/src/application/gates/scaffold/ui-data-screen-gates.ts:5` imports
+`./generated-app-name.ts`, which does not exist on main. **#1743 moved** that module into
+`scaffold/runtime/`; **#1781 added** the importing file against a base that predated the move. Both
+merged (main `65cd8a077`), so `deno task check` fails repo-wide: TS2307, 3 occurrences, 1 path.
+Evidence: CI run `33351053382`, job `check-test`, gate receipt `outcome: FAIL`, exit 1.
+
+**Neither PR was wrong at its own head**, and neither PR's CI could have caught it — #1781's own
+off-host `e2e-cli.yml` terminal SUCCESS was genuine at `a34c37eb2`. The failure exists only in the
+combination. I shipped #1781, so this is partly mine: a leaf can be exactly-green at its exact head
+and still break main when a sibling moves a file it imports. Exact-head proof does not prove
+post-merge integration, and this lane's merge packets should stop implying that it does.
+
+**Every open PR branched off `65cd8a077` or later will fail `check-test` until this lands somewhere.**
+#1764 now carries the one-line repair (`9f2e6abd2`), but main stays red until something merges. Other
+lanes need to know; flagged to the coordinator rather than fixed across lanes by me.
+
+Repair is bounded to one line, coordinator-authorized, recorded as `D-INT-1` in the leaf's drift.md,
+and explicitly outside #1368's 19-path ceiling. Repo-wide check at the repaired head: **2970 files,
+0 diagnostics**. No focused test added — the compiler already is that check, and duplicating it would
+be manufactured work.
