@@ -2,10 +2,10 @@
 
 ## Current Checkpoint
 
-- S1 artifacts were accepted, then corrected after owner narrowing.
-- Branch is converged at `7c2a12fa1` with main `8a925764` as its second parent.
-- Product/test implementation has not begun; the branch remains six run-artifact files over main.
-- Recommendation is `PLAN-EVAL: N/A`, pending the primary's ruling.
+- S1 artifacts and narrowing were accepted; primary accepted `PLAN-EVAL: N/A`.
+- Branch is converged at `9f1f9fb87` with main `6bb27e46a` as its second parent.
+- S2 implementation is authorized through the four locked RED/GREEN slices.
+- Separate-session GLM 5.3 Flash · max IMPL-EVAL remains the post-implementation hard stop.
 - Static-only authority remains in force; Gate 30 is lease-blocked.
 
 ## Design
@@ -104,6 +104,7 @@ derivation contract.
 | 2026-08-31       | S1 correction | full rebaseline       | Reran every permitted package/static/docs gate at `8a925764`; classified prohibited write/runtime gates honestly. |
 | 2026-08-31       | S1 correction | narrowing             | Reduced contract to helper/quality rail plus docs/source-sync; locked 20 paths and four slices.                   |
 | 2026-08-31       | S1 correction | policy recommendation | Recommended `PLAN-EVAL: N/A`, pending primary decision; no S2 started.                                            |
+| 2026-08-31       | S2 activation | primary ruling        | Primary accepted `PLAN-EVAL: N/A`; supervisor converged docs-only main at `9f1f9fb87`; S2 authorized.             |
 
 ## New-Base Gate Results
 
@@ -148,13 +149,11 @@ do not authorize or justify a workers edit; no workers path is in the narrowed c
 - Merge conflicts: zero, per supervisor and merge state.
 - Branch delta before this correction: six `.llm/runs/**` artifacts only.
 
-## PLAN-EVAL Recommendation
+## PLAN-EVAL Disposition
 
-Recommend `PLAN-EVAL: N/A`, pending primary ruling. The narrowed work has a complete mechanism,
-surface, ceiling, negative scope, acceptance contract, and measured gate set; no design question
-remains for an adversarial planning session. This is not self-authorization: S2 remains stopped
-until the primary accepts N/A or dispatches a separate evaluator. IMPL-EVAL remains required after
-implementation unless explicitly waived.
+`PLAN-EVAL: N/A` accepted by the primary. The complete mechanism, surface, ceiling, negative scope,
+acceptance contract, and measured gates made a separate planning evaluator unnecessary. IMPL-EVAL
+remains mandatory after implementation and is owned by the supervisor.
 
 ## Hard Stops
 

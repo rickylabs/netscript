@@ -160,3 +160,17 @@ initial operating plan.
 - **Action:** recommend `PLAN-EVAL: N/A`; do not treat the recommendation as authority. Stop before
   S2 until the primary accepts it or dispatches PLAN-EVAL. IMPL-EVAL remains separate-session work.
 - **Evidence:** `plan.md` PLAN-EVAL Recommendation and open-decision sweep.
+
+## 2026-08-31 — PLAN-EVAL N/A accepted and docs-only main reconverged
+
+- **What:** The primary accepted `PLAN-EVAL: N/A`; the supervisor merged current docs-only main
+  `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1` at head `9f1f9fb8738c92dd047054cfde096c3722b967bb`.
+- **Source:** Supervisor directive and merge parents.
+- **Expected:** S2 remained stopped pending the primary's procedural ruling.
+- **Actual:** S2 is authorized. The new main interval intersects 4/20 ceiling paths, all generated
+  docs carriers: both agent-doc assets, the CLI agent-doc barrel, and MCP publish assets. No
+  handwritten implementation/test/docs source path moved.
+- **Severity:** minor
+- **Action:** implement the four locked RED/GREEN slices; regenerate all shared carriers in the
+  primary-specified dependency order; stop before supervisor-owned IMPL-EVAL/readiness changes.
+- **Evidence:** explicit 20-path diff and `supervisor.md` route table.

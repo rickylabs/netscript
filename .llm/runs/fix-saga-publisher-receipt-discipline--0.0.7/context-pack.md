@@ -2,15 +2,15 @@
 
 ## Run Metadata
 
-| Field                            | Value                                            |
-| -------------------------------- | ------------------------------------------------ |
-| Run ID                           | `fix-saga-publisher-receipt-discipline--0.0.7`   |
-| Branch                           | `fix/saga-publisher-receipt-discipline`          |
-| Base                             | `8a925764276b25ef7cef484db273604f44557cef`       |
-| Converged head before correction | `7c2a12fa1617666a0e17acd81165c25f2325126f`       |
-| Current phase                    | corrected `plan` checkpoint; artifacts only      |
-| Archetypes                       | core 3 Runtime/Behavior; plugin 5 Plugin Package |
-| Overlay                          | docs                                             |
+| Field                    | Value                                            |
+| ------------------------ | ------------------------------------------------ |
+| Run ID                   | `fix-saga-publisher-receipt-discipline--0.0.7`   |
+| Branch                   | `fix/saga-publisher-receipt-discipline`          |
+| Base                     | `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`       |
+| Converged head before S2 | `9f1f9fb8738c92dd047054cfde096c3722b967bb`       |
+| Current phase            | S2 implementation                                |
+| Archetypes               | core 3 Runtime/Behavior; plugin 5 Plugin Package |
+| Overlay                  | docs                                             |
 
 ## Current State
 
@@ -20,9 +20,9 @@ discarded-receipt quality rule, and correct four unsafe documentation calls plus
 prose/source-sync coverage. The product ceiling is 20 paths. Every workers product/test path and all
 endpoint-diagnostic work are excluded.
 
-The corrected plan recommends `PLAN-EVAL: N/A` because scope/contract/acceptance/gates are complete;
-the primary has not yet ruled. Do not begin S2 until it does. Gate 30 remains `NOT_RUN`; a
-serialized runtime lease is required.
+The primary accepted `PLAN-EVAL: N/A` because scope, contract, acceptance, and gates are complete.
+S2 is authorized through the four locked RED/GREEN slices. Gate 30 remains `NOT_RUN`; a serialized
+runtime lease is required.
 
 ## Convergence
 
@@ -46,7 +46,7 @@ serialized runtime lease is required.
 6. Source-derived docs test is wired into `docs:snippets:test`.
 7. Endpoint diagnostics are a proposed follow-up recorded in `drift.md`.
 
-## S2 Slices (only after primary ruling)
+## S2 Slices
 
 1. Core helper + core/plugin exports + helper tests + port doc.
 2. Discarded-receipt scanner rule + fixtures.
@@ -80,5 +80,5 @@ serialized runtime lease is required.
 
 ## Next Action
 
-Primary accepts `PLAN-EVAL: N/A` or dispatches separate PLAN-EVAL. Only then may the implementation
-author begin S2. IMPL-EVAL remains a separate-session post-implementation requirement unless waived.
+Implement S2.1 through S2.4 with isolated RED then GREEN commits. Stop at implementation complete;
+the supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.

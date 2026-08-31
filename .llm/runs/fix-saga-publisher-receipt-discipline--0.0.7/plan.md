@@ -2,10 +2,10 @@
 
 ## Status
 
-- Phase: corrected S1 plan/design checkpoint; artifacts only.
-- Current base: `8a925764276b25ef7cef484db273604f44557cef`.
-- Converged leaf head supplied by the supervisor: `7c2a12fa1617666a0e17acd81165c25f2325126f`.
-- Implementation remains stopped until the primary rules on the PLAN-EVAL recommendation below.
+- Phase: S2 implementation authorized; `PLAN-EVAL: N/A` accepted by the primary.
+- Current base: `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`.
+- Converged leaf head supplied by the supervisor: `9f1f9fb8738c92dd047054cfde096c3722b967bb`.
+- Implementation proceeds through the four locked RED/GREEN slices only.
 - Runtime authority remains absent. Gate 30 is `NOT_RUN — serialized runtime lease required`.
 
 ## Rebaseline and Convergence
@@ -160,7 +160,7 @@ No decision remains that would force implementation rework.
 
 | Topic                        | Classification | Disposition                                                                  |
 | ---------------------------- | -------------- | ---------------------------------------------------------------------------- |
-| PLAN-EVAL dispatch           | owner ruling   | Recommendation below; primary decides before S2.                             |
+| PLAN-EVAL dispatch           | resolved       | Primary accepted `PLAN-EVAL: N/A`; no evaluator session was required.        |
 | Serialized runtime timing    | safe to defer  | Gate 30 remains explicit `NOT_RUN`; no command may run without a lease.      |
 | Rich no-endpoint diagnostic  | safe to defer  | Proposed follow-up recorded in `drift.md`, requiring explicit authorization. |
 | Browser Vite full-key parity | safe to defer  | Separate SDK/Aspire issue; not causal for the server publisher.              |
@@ -251,10 +251,8 @@ second version.
 
 ## PLAN-EVAL Recommendation
 
-**Recommendation: `PLAN-EVAL: N/A` (pending primary ruling).** The narrowed leaf is now small and
-bounded: the owner supplied the mechanism, public entrypoints, forbidden alternatives, exact defect
-count, docs sites, scope exclusions, acceptance behavior, and gate family. The remaining work is
-mechanical implementation and test-fixture precision, not an unresolved architecture, sequencing, or
-product trade-off. A ceremonial PLAN-EVAL would not answer an open decision. The primary decides
-whether to accept this recommendation; no S2 work begins until that ruling is explicit. IMPL-EVAL
-remains a separate-session requirement after implementation unless the owner waives it.
+**Accepted: `PLAN-EVAL: N/A`.** The primary adopted the recommendation because the narrowed leaf is
+small and bounded: mechanism, public entrypoints, forbidden alternatives, exact defect count, docs
+sites, ceiling, acceptance behavior, and gates are all locked. S2 is authorized. IMPL-EVAL remains
+mandatory in a separate GLM 5.3 Flash · max session dispatched by the supervisor after
+implementation.

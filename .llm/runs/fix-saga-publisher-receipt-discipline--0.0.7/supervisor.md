@@ -11,7 +11,7 @@ file is not activated. Other supervisors cross-peek a run by reading this file.
 | Checkout | `/home/agent/projects/netscript/repo`                                                    |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1365`                                 |
 | Branch   | `fix/saga-publisher-receipt-discipline`                                                  |
-| Baseline | `8a925764276b25ef7cef484db273604f44557cef` (`main`), supervisor-converged at `7c2a12fa1` |
+| Baseline | `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1` (`main`), supervisor-converged at `9f1f9fb87` |
 | Run ID   | `fix-saga-publisher-receipt-discipline--0.0.7`                                           |
 
 ## Routes in force
@@ -19,7 +19,8 @@ file is not activated. Other supervisors cross-peek a run by reading this file.
 | Task lane               | Provider / model / effort             | Role in this run                                                                        |
 | ----------------------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
 | `implementation_author` | Codex / OpenAI / `gpt-5.6-sol` / high | S1 research, doctrine checkpoint, design, measured static baselines, and plan authoring |
-| `plan_evaluation`       | Primary ruling                        | Corrected S1 recommends `PLAN-EVAL: N/A`; no dispatch or S2 before the primary decides  |
+| `plan_evaluation`       | Primary ruling                        | `PLAN-EVAL: N/A` accepted; S2 authorized                                                |
+| `implementation_eval`   | GLM 5.3 Flash · max, separate session | Mandatory after implementation; dispatched by the supervisor                            |
 
 Reference `.llm/harness/workflow/lane-policy.md`; its route table is not duplicated here.
 
@@ -27,8 +28,8 @@ Reference `.llm/harness/workflow/lane-policy.md`; its route table is not duplica
 
 - The primary explicitly assigned this Codex session as the implementation author for S1. That owner
   instruction overrides the ordinary planning-lane author route for this leaf.
-- The primary explicitly reserved PR creation and taxonomy. The corrected plan recommends
-  `PLAN-EVAL: N/A` under conditional harness policy, but the primary must rule before S2.
+- The primary explicitly reserved PR creation, taxonomy, readiness, and evaluator dispatch. It
+  accepted `PLAN-EVAL: N/A`; the implementation author stops before IMPL-EVAL/readiness changes.
 - The primary narrowed implementation to the throwing companion/quality rail and public-doc/source-
   sync correction only. Endpoint diagnostics and every workers product/test edit are prohibited.
 - The primary corrected the runtime policy during S1: until it grants a serialized host-runtime
