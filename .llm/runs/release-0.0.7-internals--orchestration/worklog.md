@@ -7046,3 +7046,91 @@ coordinator.
 
 Instructed to fetch and merge **whatever `main` actually is at that moment** rather than the SHA in
 the message — main has moved four times within the hour, and a brief that hardcodes a base ages badly.
+
+## D-160 — #1823 final convergence executed on `bd9d463b4`; evaluator identity preserved
+
+#1831 merged; `main` = `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`. Took the **one** final convergence.
+
+- Baseline captured **before** the merge again (independent, not reconstructed):
+  validator `23d2710ee…`, test `1b07155e6…`, eval artifact `b3e9f30b2…`.
+- `merge-tree --write-tree` predicted clean (exit 0, zero conflicts); real merge `REAL_EXIT=0`.
+  New head **`c2df67bb92799613c127df6a77b5c9d12f256119`**, pushed once, local == remote.
+- **All three blobs byte-identical after the merge.** Evaluator identity preserved; the IMPL-EVAL
+  `PASS` carries forward on proof, not assertion. No evaluator rerun.
+- Gates at the final head, real exits throughout: harness tests **27/27**, all four generated-corpus
+  `check:` variants 0, `arch:check` 0, `deno.lock` unchanged. Corpora re-proved at the new head
+  rather than inferred — this merge brought new product source (`packages/ai/…`,
+  `packages/plugin-sagas-core/…`) into the tree.
+- PR ready, sole `status:ready-merge`, fresh exact CI running at `c2df67bb9`. Prior banked green at
+  `993e57ef5` (6 SUCCESS / 12 SKIPPED / 0 FAILURE) is retained as the known-good comparison point.
+
+## D-161 — #1830's exact CI: one deterministic defect (mine), one unrelated browser failure
+
+Holding `status:ready-merge` until exact CI was green paid off immediately — CI failed **two** jobs.
+
+**`close-gate` FAIL — deterministic, and mine.** Not an issue box: PR #1830's **own body** carries a
+Definition-of-Done box, `"Separate-session IMPL-EVAL evidence is attached by the supervisor."`, left
+unticked. The claim became true when the IMPL-EVAL landed (`a06e1529f`, PASS, comment posted), so
+ticking it is exactly what the gate's own `Fix:` instructs. Ticked via the API and re-ran the failed
+jobs **without moving the head**, preserving the evaluated head. (Note this box is a *supervisor*
+assertion on the PR body, not an issue acceptance box — the acceptance mirror does not own it, which
+is why hand-ticking is correct here and wrong for issue boxes.)
+
+**`check-test` FAIL — the repo-wide suite PASSED; the failure is the `fresh-browser` gate.** The
+child report is `exitCode 0`, **4,445 passed / 0 failed / 14 ignored**. The job failed at a later
+step: `packages/fresh/tests/form-navigation_browser.ts:106`,
+`browser: generated Form-C dynamic route resolves path during fresh partial navigation`, asserting no
+console errors but receiving `"Failed to load resource: … 404"`.
+
+Attribution checked rather than assumed, and the evidence says **not this leaf**:
+- The `fresh-browser` gate **ran on `main` at `f59874abd` and passed** (`Managed form browser
+  regression: success`).
+- The failing test is unchanged on main since **2026-08-12** (`1ed78f508`, #1602).
+- #1830's product surface is two `SKILL.md` string literals plus their generated barrel projection.
+  There is no mechanism by which that affects a Fresh browser route resolving a 404. The gate ran at
+  all only because the classifier treats `skills.generated.ts` as surface-impacting.
+Re-running the failed jobs at the unchanged head tests reproducibility directly. **Not asserting
+"flake" yet** — one non-reproduction would be evidence, an assumption is not, and this run has
+already taught that lesson once on #1802.
+
+## D-162 — #1832: the collision guard caught a REAL cross-PR regression
+
+This is the finding the hold existed for, and it is worse than a textual conflict.
+
+Integrating `f59874abd` (carrying merged, user-facing **#1829**) conflicts in both files, and
+**#1829's own coverage fails against the bumped dependency**:
+
+```
+--filter 'TanStack usage:'   passed=2  failed=1  total=3   RC=1
+FAIL: TanStack usage: a fully populated upstream object survives the owned boundary
+      expected finishReason "stop", received undefined
+```
+
+The failure occurs **before** `assertCompleteUsage`, so #1829's nested-detail and object-identity
+oracle never executes at all. Cause: TanStack **0.52** restores the finish reason through TanStack
+metadata instead of round-tripping the fixture's direct `RUN_FINISHED.finishReason`.
+
+**A clean textual merge would have hidden this, and #1832's own green would have hidden it too** —
+its tests do not assert #1829's behavior. Only the explicit instruction to run *#1829's* coverage
+against the bumped dependency surfaced it. The author stopped exactly as briefed: nothing patched
+around, committed, pushed, or relabelled; the in-progress merge state is preserved so the resolution
+work is not lost.
+
+Measured dependency movement — and the issue text is **stale**: #1695 says 0.48.0 ships; the registry
+stable channel is **0.52.0**. `@tanstack/ai` 0.39.0 → **0.52.0**, `ai-anthropic` 0.15.13 → 0.18.3,
+`ai-mcp` 0.2.1 → 0.3.8, `ai-openai` 0.15.10 → 0.22.3.
+
+**Escalated with a recommendation, not a menu:** restore round-tripping of `RUN_FINISHED.finishReason`
+in the adapter so #1829's test passes unchanged. `finishReason` is user-visible, #1829 merged hours
+ago, and its test encodes shipped behavior — a dependency bump must not silently drop it. Rewriting
+#1829's assertion is #1829's owner's call and must **not** be taken unilaterally by a deps leaf; that
+is exactly how a regression ships looking green.
+
+### Hazard: a steer can fail silently
+
+The earlier **hold** steer to this thread **did not deliver** — `REAL_EXIT=1`,
+`thread-store conflict: … already has an active writer` (the author was mid-turn). I only learned this
+by reading the dispatch log afterwards. The outcome was safe by luck: the author had not advanced, and
+the later **release** steer carried every load-bearing instruction. **Carry forward: always check a
+`codex-resume` dispatch's captured exit — a dropped steer looks identical to a delivered one from the
+supervisor's side.**
