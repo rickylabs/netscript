@@ -72,3 +72,17 @@ doctrine) applies directly. AP-20/F-8 is the defect and closing fitness rule.
 
 No new or deepened architecture debt is expected. RTK absence on this host is a tooling fallback,
 not product drift, and is recorded in `drift.md`.
+
+## Authorized delta-cycle amendment
+
+Exact CI at evaluator head `83d27ab7b` exposed a whole-workspace type-resolution consequence that
+the scoped gates above cannot reproduce: after adding `deno.unstable`, the resolved return type of
+`setTimeout` made the existing numeric handle annotation in
+`packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts` fail with TS2322.
+The owner authorized only a platform-neutral handle type repair in that file, a sibling-pattern
+scan within `packages/cli/e2e`, and the trailing-blank-line cleanup in `supervisor.md`. The original
+config fix remains locked; #1762-owned files and all other hard non-scope remain unchanged.
+
+The delta RED and GREEN use the repo-wide `run-deno-test.ts -- --allow-all` invocation because a
+single-file check or focused test is structurally incapable of exercising the combined workspace
+graph that changes the timer type. The supervisor owns the subsequent delta IMPL-EVAL cycle.

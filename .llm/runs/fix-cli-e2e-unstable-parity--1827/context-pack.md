@@ -6,7 +6,9 @@ P0, Internals-owned, blocks Features #1762. Branch `fix/cli-e2e-unstable-parity`
 ## Scope
 
 Add `deno.unstable` to `packages/cli/e2e/deno.json` in production order, plus a focused CLI/E2E
-config-lib parity RED→GREEN test.
+config-lib parity RED→GREEN test. The owner-authorized delta repair also makes the existing timeout
+handle in `packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts`
+platform-neutral after exact CI exposed the config change's whole-graph type consequence.
 
 ## Hard non-scope
 
@@ -30,4 +32,11 @@ config-lib parity RED→GREEN test.
   batch to zero.
 - Final scoped check/lint/fmt, check-runner tests, quality gate, all four generated-corpus checks,
   and the isolated-DENO_DIR 2,971-file full check pass. Lock/non-scope proof and remote repair remain.
-- IMPL-EVAL remains supervisor-owned.
+- Exact CI at evaluator head `83d27ab7b` subsequently found TS2322 before test execution because
+  the whole workspace resolves `setTimeout` to `Timeout` under the corrected lib set. Scoped file
+  checks cannot reproduce that combined-graph effect.
+- Delta RED at `83d27ab7b` exits 1 with 0 results and TS2322 in `processFailure`; repair commit
+  `42f2d6acc` uses `ReturnType<typeof setTimeout>`. Delta GREEN exits 0 with 4,446 total results,
+  4,427 passed, 19 ignored, and 0 failed. No sibling numeric timer-handle annotation remains.
+- Repaired-head scoped check/lint/fmt, architecture, quality scan, all four generated-corpus checks,
+  and lock/non-scope proofs pass. Delta IMPL-EVAL remains supervisor-owned.

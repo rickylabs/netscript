@@ -156,3 +156,63 @@ controlled before/after.
 | #1762-owned package roots | `git diff --exit-code a3e0a5aa8beebbd1f7a488d564d31980a7d74619 -- packages/contracts packages/plugin packages/service packages/sdk packages/mcp` | 0 |
 | Leaf product paths | `git diff --name-only a3e0a5aa8beebbd1f7a488d564d31980a7d74619 -- packages plugins` | 0; only `packages/cli/e2e/deno.json` and `packages/cli/e2e/tests/config-lib-parity_test.ts` |
 | Final-freeze main ancestry | `git merge-base --is-ancestor a3e0a5aa8beebbd1f7a488d564d31980a7d74619 HEAD` | 0 |
+
+## Delta cycle 2 — exact-CI TS2322 repair
+
+Exact CI at evaluator artifact head `83d27ab7b` found a deterministic product/type consequence of
+the correct config change. The repo-wide test gate failed during whole-workspace type checking at
+`verify-producer-reconnect.ts:279:5`: unstable libs resolve `setTimeout` to `Timeout`, which was not
+assignable to the existing `number | undefined` handle. Scoped file checks and the focused source
+test pass at the same failing head, so they cannot serve as RED for this combined-graph defect.
+
+### Repo-wide RED
+
+Command (real exit captured without a pipeline):
+
+```bash
+out=$(deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --output /tmp/ns1827-red.json --pretty -- --allow-all 2>&1); rc=$?
+```
+
+- `rc=1`; report `exitCode=1`.
+- Summary: 0 passed, 0 failed, 0 ignored, `totalResults=0` because type checking stopped execution.
+- `processFailure.reason`: `deno test exited non-zero without a parseable TAP test failure`.
+- `processFailure.stderr.tail` contains TS2322: `Type 'Timeout' is not assignable to type 'number'`.
+- Durable report: `receipts/delta-cycle-2-red.json`.
+
+### Repair and sibling scan
+
+Commit `42f2d6acc` changes the handle to
+`ReturnType<typeof setTimeout> | undefined`; the existing `clearTimeout(timeoutId)` accepts that
+type unchanged. It also removes the diff-check-flagged trailing blank line from `supervisor.md`.
+The post-repair scan under all of `packages/cli/e2e` found zero declarations that annotate a
+`setTimeout` or `setInterval` handle as `number`; no sibling repair was needed.
+
+### Identical repo-wide GREEN
+
+The same command shape was rerun with only the output filename changed to
+`/tmp/ns1827-green.json`: `rc=0`, report `exitCode=0`, 4,427 passed, 0 failed, 19 ignored, 4,446
+total results, and no `processFailure`. Durable report: `receipts/delta-cycle-2-green.json`.
+
+### Repaired-head Tier-A
+
+Every command used `out=$(command 2>&1); rc=$?`; no result came through a pipeline.
+
+| Gate | Exact command / scope | Exit | Counts / observation |
+| --- | --- | ---: | --- |
+| Repo-wide test GREEN | `run-deno-test.ts --output /tmp/ns1827-green.json --pretty -- --allow-all` | 0 | 4,446 total; 4,427 passed, 19 ignored, 0 failed |
+| CLI/E2E scoped check | `run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | 0 | 185 files, 2 batches, 0 failed, 0 diagnostics |
+| CLI/E2E scoped lint | `run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx --exclude '^packages/cli/e2e/fixtures/desktop-native/'` | 0 | 178/178 processed, 0 dropped/refused, 0 findings |
+| CLI/E2E scoped format | `run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx` | 0 | 185/185 processed, 0 findings |
+| Architecture | `deno task arch:check` | 0 | repository doctrine roots report no failures |
+| Quality scan | `deno task quality:scan` | 0 | no blocking findings |
+| Generated agent-doc prose | `deno task check:agent-docs-prose` | 0 | fresh; 639 generated site files |
+| Generated assets barrel | `deno task check:assets-barrel` | 0 | fresh |
+| Generated publish assets | `deno task check:publish-assets` | 0 | fresh |
+| Generated MCP export corpus | `deno task check:mcp-export-corpus` | 0 | fresh; 35 packages, 271 subpaths, 7,677 symbols |
+| Lock worktree identity | `git diff --exit-code -- deno.lock` | 0 | byte-unchanged |
+| Delta forbidden roots | diff from `83d27ab7b` over service/contracts/plugin/sdk/mcp, check runner, and lock | 0 | no changes |
+| Diff hygiene | `git diff --check` | 0 | supervisor EOF finding resolved |
+
+The earlier IMPL-EVAL PASS remains valid for its evaluated head, but commit `42f2d6acc` changes the
+product. Per owner direction, the supervisor—not this implementation session—owns delta IMPL-EVAL
+cycle 2 after the corrected evidence is pushed.

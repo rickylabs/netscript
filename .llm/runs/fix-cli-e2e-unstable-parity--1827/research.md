@@ -27,3 +27,13 @@ export, package surface, dependency, version, or publish artifact.
 ## Open questions
 
 None. The supervisor fixed the oracle, exact expected order, scope, RED→GREEN sequence, and gate set.
+
+## Post-implementation exact-CI finding
+
+At evaluator head `83d27ab7b`, the repo-wide test gate type-checked the complete workspace as one
+program and resolved `setTimeout` to Deno's unstable `Timeout` handle in
+`verify-producer-reconnect.ts`. Its existing `number | undefined` annotation then produced TS2322.
+Three narrower probes—the file check from either root and member cwd, and the focused source test—
+all pass at that same failing head, so none is a valid oracle for this consequence. The durable
+delta RED therefore records the repo-wide gate's exit code and `processFailure`, not its zero-test
+summary.

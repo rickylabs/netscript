@@ -50,3 +50,18 @@
 - The Tier-A scoped lint was recut with exactly that nested workspace excluded: 178/178 files
   processed, zero dropped/refused files, zero findings, exit 0. Check and format still covered all
   185 files successfully.
+
+## 2026-08-31 — exact-CI whole-graph timer type consequence (significant)
+
+- Exact CI at evaluator artifact head `83d27ab7b` failed before executing tests: adding the correct
+  `deno.unstable` lib changed the whole-workspace resolved return type of `setTimeout`, exposing an
+  existing `number | undefined` handle annotation in `verify-producer-reconnect.ts` as TS2322.
+- The earlier scoped gates were honest but structurally unable to see this combined-graph type
+  resolution. The correction is to add the exact repo-wide test wrapper as the delta regression
+  gate; this is a lesson about gate shape, not a reason to discount exact CI.
+- Owner-authorized drift from the original two-product-file scope is limited to the existing E2E
+  source file and its platform-neutral `ReturnType<typeof setTimeout>` annotation. No rollback of
+  the config parity fix and no #1762-owned source change occurred.
+- The prior IMPL-EVAL PASS remains the historical verdict for the product it evaluated. Commit
+  `42f2d6acc` changes that product, so the supervisor will dispatch delta IMPL-EVAL cycle 2 after
+  the corrected RED→GREEN evidence is pushed.
