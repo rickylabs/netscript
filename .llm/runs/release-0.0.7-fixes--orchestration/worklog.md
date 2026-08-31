@@ -6459,3 +6459,37 @@ priority re-read, and because a plan that "fixed" already-fixed code would have 
 evidence. The author correctly refused that, and refused the scope creep in Q3/Q4/Q5 too.
 
 Leaf state: **parked at S1-complete**, PLAN-EVAL pending #1792. No new leaf launched.
+
+### IMMUTABLE MERGE PACKET (re-verified 2026-08-31) — PR #1781 and PR #1764, both exact-green
+
+Re-verified end to end at the unchanged handed-off heads. Nothing was mutated to produce this; every
+value below was read, not set.
+
+**PR #1781 / issue #1357 — `fix(cli): ui:add page --island emits a working data screen, not a counter`**
+- exact head `a34c37eb2d43414385016b8532047796b0f07f87` (unchanged since handoff)
+- non-draft, `MERGEABLE` / `CLEAN`, milestone 0.0.7, closing keyword PRESENT
+- sole `status:ready-merge` (+ type:fix, area:cli, area:fresh, priority:p1)
+- review threads `0` total / `0` unanswered (`agentic:review-threads` exit 0)
+- close-gate **success**, run `33342565909`, job started `2026-08-30T23:50:42Z` — after the label
+  restore, so not the stale pre-fix result
+- 0 failed/cancelled runs at head; issue boxes 11/11 checked (mirrored, not hand-ticked)
+- runtime proof: on-host 80/1 (sole red = known NAS Chromium absence) + off-host `e2e-cli.yml` run
+  `33342040720` terminal SUCCESS at the same head, browser gate included
+
+**PR #1764 / issue #1368 — `fix(sagas): emit and correlate cascade spans`**
+- exact head `9d8bbb4e96e555462cdd8432883a28d493b051eb` (unchanged since handoff)
+- non-draft, `MERGEABLE` / `CLEAN`, milestone 0.0.7, closing keyword PRESENT
+- sole `status:ready-merge` (+ type:fix, area:plugins, area:telemetry, priority:p1, and
+  `impl-eval:skip` carrying the attributed reference to the preserved DeepSeek receipt `14889037`)
+- review threads `0` total / `0` unanswered (exit 0)
+- close-gate **success**, run `33343144531`, job started `2026-08-31T00:06:01Z`
+- 0 failed/cancelled runs at head; issue boxes 10/10 checked
+- runtime proof: fresh-project on-host 79/80 + off-host `e2e-cli.yml` run `33342766760` terminal
+  SUCCESS at the same head
+
+Both await the coordinator's merge. **I do not merge.** No evaluator was rerun to produce this
+packet; the existing receipts stand at their recorded heads.
+
+**Serial-queue position.** The merge front is occupied by these two. #1365 is parked at S1-complete
+behind PLAN-EVAL (#1792 unmerged), and #1616 / PR #1773 is parked at the same gate. No third front
+opened — that is the serial rule holding, not idleness.
