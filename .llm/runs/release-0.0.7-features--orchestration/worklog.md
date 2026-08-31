@@ -9011,3 +9011,28 @@ Brief carries #1591's D-1 finding forward explicitly (check `stdout.bytes` befor
 
 **Both parked leaves — #1387 Slice 9 and #1591 — remain immutable**, no DeepSeek relaunch, evaluation
 gated on #1792 exclusively as ruled.
+
+## #1458 — reconciled, Tier-A ACCEPTED; evaluation parked; three parked leaves now immutable
+
+Thread finished, clean, PR #1810 opened at `acb096a94`. Reconciled local/remote/PR consistency before
+review. Exactly the two ceiling files touched plus run-artifact docs.
+
+The implementation matches the plan's locked decisions exactly, and the second test — a real local
+`Deno.serve()` server driving the actual code path — proves failure propagation against the real
+pinned dependency in both directions (await-mode reject, immediate-mode silent-log), stronger than
+the brief's own ask.
+
+**Independently re-verified every gate, as with `#1591`.** The PR body cited a receipt id
+(`leaf-1458-focused-test-final`) with no corresponding committed file — cut all Tier-A receipts
+myself. Checked specifically for `#1591`'s D-1 cache-hit trap; **not present this time** — all three
+`check`/`lint`/`fmt` receipts show genuine non-empty stdout with real 200-file selections. `test`:
+19/19. `docs:exports-drift`: PASS. `deno.lock`: byte-identical, matches the PR's cited hash.
+
+**Verdict: ACCEPTED at `acb096a94e8f2dc182ebc8c73be9ba421e2a6826`.** No findings. Evidence head
+`c438c82db`. PR comment `5472201209`.
+
+**Evaluation parked, per the standing ruling — no DeepSeek relaunch.** Three leaves now sit
+immutable pending #1792: `#1387` Slice 9, `#1591`, `#1458`. All three Tier-A ACCEPTED, all three
+draft PRs, none touched further until GLM 5.3 Flash routing lands or a fresh ruling arrives.
+
+Selecting the next feature from the audited candidate set now.
