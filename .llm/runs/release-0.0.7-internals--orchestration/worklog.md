@@ -6316,3 +6316,31 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   - Full agentic suite **526/526**, real exit capture throughout.
 - Committed `1cfae0f39`, pushed, local == remote verified. Attribution of the supervisor commit is
   stated plainly in the commit message rather than presented as the author's own work.
+
+## D-135 — main advanced to 6bb27e46a; characterized as NOT docs-only, integration queued for evidence-freeze
+
+- Verified `origin/main` = `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`, 48 files changed since
+  `65cd8a077`.
+- **Correction to the "DOCS-ONLY" characterization, stated because it changes what integration
+  requires**: the advance carries real product source, not just documentation —
+  `packages/plugin-sagas-core/src/{runtime,telemetry,adapters}/**` (saga engine, compensator,
+  OTel instrumentation), four `packages/cli/e2e/.../scaffold/*` gate files, and
+  `.llm/tools/docs/check-exports-drift.ts`. It also carries **all four shared generated corpora**
+  (`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`, `publish-assets.generated.ts`)
+  plus `export-surface-corpus.generated.ts`. Calling it docs-only would have justified skipping
+  regeneration, which is exactly the shortcut that produced the #1758 carrier conflicts earlier this
+  milestone.
+- **Zero intersection with either active leaf**, verified by path:
+  - #1802 (`.llm/tools/agentic/**`) — no overlap.
+  - #1753 (`.llm/tools/harness/**`) — no overlap.
+  So neither needs to stop or rebase now; both continue undisturbed.
+- **Integration plan at #1802's evidence-freeze boundary** (after Slice 5/6 land, before final CI):
+  merge `6bb27e46a`, expect conflicts only in the generated carriers, resolve by taking main's
+  version, then regenerate in the dependency order this milestone already established the hard way —
+  `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets` — and verify each with its
+  `check:` variant using real exit capture, since a generator exiting 0 is not evidence the carrier
+  is fresh.
+- **Product-evidence preservation rule applied as stated**: #1802's Slice 1-4 gate evidence stays
+  valid only if its own product sources are byte-identical across the merge. Since the advance does
+  not touch `.llm/tools/agentic/**` at all, that should hold — but it will be **proven by diffing
+  the owned surface across the merge commit**, not assumed from this path analysis.
