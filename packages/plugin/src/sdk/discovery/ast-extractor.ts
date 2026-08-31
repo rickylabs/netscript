@@ -1,17 +1,36 @@
-import type { ExtractedContribution, ExtractorPort } from './ports/extractor-port.ts';
+import type {
+  ContributionBuilderPattern,
+  ExtractedContribution,
+  ExtractorPort,
+} from './ports/extractor-port.ts';
 import type { WalkedFile } from './ports/walker-port.ts';
 
-const CONTRIBUTION_BUILDERS = [
-  { callee: 'defineJob', axis: 'jobs' },
-  { callee: 'defineSaga', axis: 'sagas' },
-  { callee: 'defineWebhook', axis: 'triggers' },
-] as const;
+const TYPESCRIPT_IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+
+const DEFAULT_CONTRIBUTION_BUILDERS: readonly ContributionBuilderPattern[] = Object.freeze([
+  Object.freeze({ callee: 'defineJob', axis: 'jobs' }),
+  Object.freeze({ callee: 'defineSaga', axis: 'sagas' }),
+  Object.freeze({ callee: 'defineWebhook', axis: 'triggers' }),
+]);
+
+/** Options for configuring one {@link AstExtractor} instance. */
+export interface AstExtractorOptions {
+  /** Additional factory-to-axis patterns appended to the official defaults. */
+  readonly additionalBuilders?: readonly ContributionBuilderPattern[];
+}
 
 /** Extractor for exported plugin contribution builder call sites. */
 export class AstExtractor implements ExtractorPort {
+  readonly #builders: readonly ContributionBuilderPattern[];
+
+  /** Create an extractor with immutable per-instance builder configuration. */
+  constructor(options: AstExtractorOptions = {}) {
+    this.#builders = createContributionBuilders(options.additionalBuilders ?? []);
+  }
+
   /** Extract contribution candidates from walked source files. */
   extract(files: readonly WalkedFile[]): Promise<readonly ExtractedContribution[]> {
-    const contributions = files.flatMap((file) => extractFromFile(file));
+    const contributions = files.flatMap((file) => extractFromFile(file, this.#builders));
     return Promise.resolve(
       contributions.sort((left, right) =>
         left.file.localeCompare(right.file) ||
@@ -22,11 +41,36 @@ export class AstExtractor implements ExtractorPort {
   }
 }
 
-function extractFromFile(file: WalkedFile): ExtractedContribution[] {
+function createContributionBuilders(
+  additionalBuilders: readonly ContributionBuilderPattern[],
+): readonly ContributionBuilderPattern[] {
+  const callees = new Set(DEFAULT_CONTRIBUTION_BUILDERS.map((builder) => builder.callee));
+  const snapshots = additionalBuilders.map((builder) => {
+    if (!TYPESCRIPT_IDENTIFIER.test(builder.callee)) {
+      throw new TypeError(`Invalid contribution builder callee "${builder.callee}"`);
+    }
+    if (builder.axis.trim().length === 0) {
+      throw new TypeError(`Contribution builder axis for "${builder.callee}" must not be blank`);
+    }
+    if (callees.has(builder.callee)) {
+      throw new TypeError(`Duplicate contribution builder callee "${builder.callee}"`);
+    }
+
+    callees.add(builder.callee);
+    return Object.freeze({ callee: builder.callee, axis: builder.axis });
+  });
+
+  return Object.freeze([...DEFAULT_CONTRIBUTION_BUILDERS, ...snapshots]);
+}
+
+function extractFromFile(
+  file: WalkedFile,
+  builders: readonly ContributionBuilderPattern[],
+): ExtractedContribution[] {
   const text = stripCommentsAndStrings(file.text);
   const contributions: ExtractedContribution[] = [];
 
-  for (const builder of CONTRIBUTION_BUILDERS) {
+  for (const builder of builders) {
     contributions.push(...extractNamedExports(file.path, text, builder.callee, builder.axis));
     contributions.push(...extractDefaultExports(file.path, text, builder.callee, builder.axis));
   }

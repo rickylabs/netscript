@@ -9,7 +9,7 @@
 | Base           | `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`      |
 | Archetype      | `4 — Public DSL / Builder`                      |
 | Scope overlays | none                                            |
-| Phase          | S1 research/plan only                           |
+| Phase          | S2 implementation in progress                   |
 
 The leaf brief explicitly limits S1 output to `research.md`, `plan.md`, and `worklog.md`; the
 supervisor owns run identity, routing, and PLAN-EVAL disposition. No implementation may begin from
@@ -101,6 +101,8 @@ pipeline (or uses the option-forwarding preset). Adding a factory does not requi
 | 2026-08-31 | S1    | Census           | Found the one package builder table and two explicit CLI official-plugin collections; classified CLI tables out of scope.                                                                                      |
 | 2026-08-31 | S1    | Baselines        | Ran only static package gates. Recorded exact green and pre-existing-red counts in `research.md` and `plan.md`.                                                                                                |
 | 2026-08-31 | S1    | Design lock      | Selected per-instance extractor options, locked the six-path product ceiling, and recorded corpus/CLI handoffs.                                                                                                |
+| 2026-08-31 | S2.1  | RED              | Commit `4659162df`: test-only change compiled across 153 files, then the focused suite failed on real behavior with 5 pass / 2 fail (synthetic factory silently absent; malformed configuration did not throw). |
+| 2026-08-31 | S2.1  | GREEN            | Added frozen official defaults plus immutable per-instance `additionalBuilders`; focused suite passed 7/7 and scoped check/lint/fmt/quality gates stayed clean.                                                  |
 
 ## Decisions
 
@@ -150,6 +152,18 @@ remains explicit; no green wrapper is treated as proof that the pre-existing fin
   third-party descriptor transport is not claimed.
 - MCP corpus: impact confirmed statically; freshness check/regeneration not run because it is
   cross-package and outside the ceiling.
+
+### S2 Slice Evidence
+
+| Slice | State | Command | Result |
+| ----- | ----- | ------- | ------ |
+| S2.1 | RED compile | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` | PASS: 153 files, 2 batches, 0 findings |
+| S2.1 | RED behavior | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/plugin/tests/sdk/walker-ports_test.ts` | expected FAIL: 5 passed, 2 failed, 7 total, 2 unique failures |
+| S2.1 | GREEN behavior | same focused structured test command | PASS: 7 passed, 0 failed |
+| S2.1 | GREEN check | same scoped check command | PASS: 153 files, 2 batches, 0 findings |
+| S2.1 | GREEN lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` | PASS: 153 processed, 0 dropped/refused/findings |
+| S2.1 | GREEN format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` | PASS: 153 processed, 0 findings |
+| S2.1 | GREEN quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/plugin --max-allow 0` | PASS: 0 findings, 0 allowances |
 
 ## Handoff Notes
 
