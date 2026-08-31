@@ -4795,3 +4795,43 @@
       instead of spinning silently.
   - #1744 stays draft and is handled last, by undraft rather than rerun, on its authoritative
     post-lease head `bd3dbc843`.
+
+- **D-203 — the "shared garnet timeout" premise is FALSE. #1754 never reached that gate. Filed the
+  issue with the corrected claim rather than the assumed one.**
+  - The coordinator's ruling assumed "#1747 and #1754 show the same Postgres-tier
+    `runtime.wait.garnet` 300 s timeout". I checked both job logs before filing, and **#1754 does not
+    show it and carries no garnet evidence at all.**
+  - **Gate sequence, from the logs:** `40 database.seed → 41 runtime.capture-db-allocation-first →
+    42 runtime.aspire-restart-after-db → 43 runtime.capture-db-allocation-second →
+    44 runtime.wait.postgres → 45 runtime.wait.garnet → 46 cleanup.aspire-stop`.
+    - **#1747** (`33404321608`/`99529603502`) passed through gate 44 (`runtime.wait.postgres`,
+      **1541 ms**) and failed gate **45** — `runtime.wait.garnet`, **300451 ms**. `passed=46 failed=1`.
+    - **#1754** (`33404324013`/`99545166227`) failed at gate **40**, `database.seed`, and the suite
+      **skipped 41–45** straight to cleanup. `passed=41 failed=1`. It never executed a single
+      `runtime.wait.*` gate — I confirmed by enumerating every gate name in its log.
+  - So `runtime.wait.garnet` is **observed failing once and never observed passing**, with no second
+    data point in either direction. Filing it as a *shared* defect would have manufactured a
+    corroboration that does not exist and pointed `orchestrator:fixes` at a false pattern.
+  - **Filed #1844** (`type:fix`, `area:aspire`, `priority:p1`, **`orchestrator:fixes`**, milestone
+    0.0.7) with the single receipt, an explicit **"Reproduction status"** section correcting the
+    assumption, the gate-sequence proof that #1754 aborted earlier, and the no-baseline survey. Kept
+    the ruling's substance — not charged to either product delta — while fixing its factual basis.
+    Acceptance includes a guard against the lazy fix: raising the timeout is only acceptable if
+    justified against an observed healthy-time distribution.
+  - **#1754 has its own distinct, unrelated failure** needing triage: `database.seed` → `seed` on
+    `postgres-cli` → `PrismaClientKnownRequestError` on `prisma.user.findFirst()`, **exit 16**. That
+    is squarely S8's typed-db-command territory, and it is the first time S8's Postgres tier has ever
+    executed.
+- **D-204 — #1719 box 1 ruled PASS; evidence mirrored honestly.** Posted the `acceptance-evidence`
+  block on #1744 for all three boxes at `bd3dbc843`.
+  - Box 1's evidence states **exactly what the receipts show** rather than restating the ruling's
+    wording: the process tree auto-cleaned at +250 ms, the containers did **not** self-reap, and the
+    no-run-owned-survivor state is reached through the run's own `leak-check` + `teardown --apply`
+    path, ending at verbatim four-part zero. Mirroring a ruling is not licence to describe evidence
+    that does not exist.
+  - Recorded as an epic-level finding rather than inside the box: a launcher `SIGKILL` on 13.5.3
+    cleans processes but not containers, and **not** because of Persistent lifetime — the
+    `persistent=false` redis survived too.
+  - **Owner release ruling recorded:** the migration ships with **canary 6**. Finish all gates and
+    exact merge packets now; **do not request or permit coordinator merge until canary5 is tagged.**
+    Canary6 is gated on epic #1712 complete plus exact runtime/cleanup/OIDC release receipts.
