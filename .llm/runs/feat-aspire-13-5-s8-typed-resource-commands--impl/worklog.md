@@ -273,3 +273,97 @@ Push procedure used a direct `git ls-remote` of the exact feature ref immediatel
 evidence-head update, with the returned SHA supplied verbatim to `--force-with-lease`. Final remote
 read-back matched the committed branch head; the worktree and `git diff --check` were clean, and
 the safety tag remained at the old head.
+
+## D-210 — converge S8 onto exact current main
+
+The owner reclassified the PostgreSQL `database.seed` exit-16 result as branch-base convergence,
+not an S8 repair. This mechanical run therefore records `PLAN-EVAL: N/A`: the owner supplied the
+exact base, replay range, conflict policy, gate set, and lease-safe push contract, and explicitly
+prohibited self-dispatched evaluation and product-behavior changes. The earlier D-205 diagnostic
+brief is retained as launch provenance but was superseded before any diagnostic or runtime action.
+
+Preflight proved old head `bc838a0b3b9ba50f4ed6cf68aa29c9e4892b07f3`, base
+`8a925764276b25ef7cef484db273604f44557cef`, and exactly 13 own commits. A fresh
+`git fetch origin main` resolved `origin/main` to
+`6c195acaf3f7e650c4235fc3fbc51232e210e7a4`. `git rebase origin/main` replayed all 13 commits and
+exited 0 without a conflict, so no generated file, D-101 listener file, or non-generated source
+required a resolution. The rebased product/evidence head before this D-210 ledger was
+`0cd04b0438c682915d4d9d0a45db2dd7d7f40c52`.
+
+The preferred `rtk proxy` wrapper was unavailable on this host and exited 127 before it invoked
+Deno. The direct `deno task gen:assets-barrel` then ran once and exited 0 with no tracked delta.
+`deno task check:assets-barrel` exited 0 and left the tracked tree diff-clean.
+
+### Range-diff mapping at the rebased product/evidence head
+
+| # | Old | New | Status | Subject |
+| ---: | --- | --- | :---: | --- |
+| 1 | `be7854bf5` | `bd55c16af` | `=` | test(aspire): lock typed db resource command seams red |
+| 2 | `c7fd93d0e` | `1acb9bfdf` | `=` | feat(aspire): emit typed database resource commands |
+| 3 | `4d8ed1f1d` | `6906ff734` | `=` | chore(cli): regenerate typed command assets |
+| 4 | `18f234453` | `aae5233dd` | `=` | fix(cli): route database commands through resident Aspire |
+| 5 | `3ae708d87` | `d81a4dd73` | `=` | fix(aspire): verify typed commands against restored SDK |
+| 6 | `83cac6adb` | `9e9656692` | `=` | test(aspire): add typed db phase-b gate and static evidence |
+| 7 | `02c2ed00c` | `68a662fea` | `=` | docs(harness): record S8 clean-head gate evidence |
+| 8 | `2badb77d2` | `4acb571aa` | `=` | test(aspire): record typed db phase-b runtime finding |
+| 9 | `e307fbded` | `7e69ffa01` | `=` | fix(aspire): preserve actionable typed-command stderr |
+| 10 | `09337601c` | `e783af1b2` | `=` | docs(harness): record seed observability clean-head gates |
+| 11 | `19e139cbb` | `b9295496c` | `=` | chore(cli): regenerate assets after S8 reconstruction |
+| 12 | `da963027b` | `74a2360ea` | `=` | style(cli): format reconstructed S8 tests |
+| 13 | `bc838a0b3` | `0cd04b043` | `=` | docs(harness): record S8 reconstruction evidence |
+
+There are no `!` entries to explain. The final range-diff necessarily adds one `>` entry for this
+new D-210 run-ledger commit; the original 13 mappings remain `=`.
+
+### Non-generated product blob identity
+
+| Identity | Old blob at `bc838a0b3` | New blob at `0cd04b043` | Path |
+| --- | --- | --- | --- |
+| identical | `303c40a78743f1aa84e8d2fb4839f072f12b132f` | `303c40a78743f1aa84e8d2fb4839f072f12b132f` | `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` |
+| identical | `1bdebb0c501a0dab2418ba12e46339d73e770bf5` | `1bdebb0c501a0dab2418ba12e46339d73e770bf5` | `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts` |
+| identical | `1a62715478cc99e00afaae9ecb657294ee03dd5b` | `1a62715478cc99e00afaae9ecb657294ee03dd5b` | `packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts` |
+| identical | `f1929ac7d32ee6ee0741f6d7e2fd7678f0a0dd43` | `f1929ac7d32ee6ee0741f6d7e2fd7678f0a0dd43` | `packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts` |
+| identical | `77c197e934a5dc033c5a35f7b8ce6584355ff32d` | `77c197e934a5dc033c5a35f7b8ce6584355ff32d` | `packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts` |
+| identical | `02c4439598ff6ebe648be0313466d85f4c4348e0` | `02c4439598ff6ebe648be0313466d85f4c4348e0` | `packages/cli/e2e/src/domain/cli-surface.ts` |
+| identical | `ee87b899a8c8187f5321ab2ce914c002d9242f29` | `ee87b899a8c8187f5321ab2ce914c002d9242f29` | `packages/cli/e2e/suites/scaffold/capability-suites.ts` |
+| identical | `cd35bdb7e25d720c0820190287a6bd0584049c22` | `cd35bdb7e25d720c0820190287a6bd0584049c22` | `packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` |
+| identical | `54b86682f8688a65d0284a11f9f2265d39d10fac` | `54b86682f8688a65d0284a11f9f2265d39d10fac` | `packages/cli/e2e/tests/presentation/suite-registry_test.ts` |
+| identical | `03cb3e0f00cd7afb3671e46fe80b0a4bfa83b007` | `03cb3e0f00cd7afb3671e46fe80b0a4bfa83b007` | `packages/cli/src/kernel/adapters/database/operation-runner-helpers.ts` |
+| identical | `44de34df10809d3e121587104065db277c2fb470` | `44de34df10809d3e121587104065db277c2fb470` | `packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts` |
+| identical | `5658fb7b26c68d205c93042a6c24ec9dbb144c90` | `5658fb7b26c68d205c93042a6c24ec9dbb144c90` | `packages/cli/src/kernel/adapters/database/operation-runner.ts` |
+| identical | `4f09e83c219e4f62bfbda8891bb878639c68c7dc` | `4f09e83c219e4f62bfbda8891bb878639c68c7dc` | `packages/cli/src/kernel/adapters/database/operation-runner_test.ts` |
+| identical | `a5b67c86021b0a64f6ec654ab982276f60ec38e0` | `a5b67c86021b0a64f6ec654ab982276f60ec38e0` | `packages/cli/src/kernel/assets/aspire/helpers/_aspire-compat.ts.template` |
+| identical | `9f8007110250cdba486948bbc44a0e1d3a1d8828` | `9f8007110250cdba486948bbc44a0e1d3a1d8828` | `packages/cli/src/kernel/assets/aspire/helpers/run-tool.ts.template` |
+| identical | `468940d543c48a32bcb0c7b65ec6802488d71ad1` | `468940d543c48a32bcb0c7b65ec6802488d71ad1` | `packages/cli/src/kernel/templates/aspire/helpers/generate-db-cli-mode.ts` |
+| identical | `9ce2a59c195a3d10108743571ccaa162658fbc11` | `9ce2a59c195a3d10108743571ccaa162658fbc11` | `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts` |
+| identical | `2cd50800ca82458d6a027b4400ca8a6cc8f0c9ab` | `2cd50800ca82458d6a027b4400ca8a6cc8f0c9ab` | `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts` |
+| identical | `d8e7848457a8d0cd1d539c676991d57a7d755e35` | `d8e7848457a8d0cd1d539c676991d57a7d755e35` | `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts` |
+| identical | `639b44c9d96a4e6a17e45a7d7158d4bda69cc526` | `639b44c9d96a4e6a17e45a7d7158d4bda69cc526` | `packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts` |
+
+All 20 non-generated product blobs are identical; zero changed. The generated barrel check also
+produced zero delta. This is evidence for carrying the existing product IMPL-EVAL rather than a
+claim by this implementation session; the supervisor retains that decision.
+
+### Static verification
+
+| Command/gate | Exit/result |
+| --- | --- |
+| `git fetch origin main` | 0; exact `6c195acaf3f7e650c4235fc3fbc51232e210e7a4` |
+| `git rebase origin/main` | 0; 13/13 replayed, no conflicts |
+| `deno task gen:assets-barrel` | 0; no tracked delta |
+| `deno task check:assets-barrel` | 0; diff-clean |
+| `git merge-base HEAD origin/main` versus `git rev-parse origin/main` | 0/0; equal at `6c195acaf3f7e650c4235fc3fbc51232e210e7a4` |
+| `git range-diff 8a9257642..bc838a0b3 origin/main..HEAD` | 0; all 13 mappings `=` |
+| old/new non-generated `packages/` blob report | 0; 20 identical, 0 changed |
+| structured CLI + nested E2E check (`ts,tsx`, wrapper-default `--unstable-kv`) | 0; 905 files, 8 batches, 0 failed batches/diagnostics |
+| nearest-config changed-file lint / fmt attempts | 2 / 2; expected fail-closed partial-exclusion, 9/19 processed, no findings |
+| E2E-config changed-file lint / fmt attempts | 2 / 2; same inherited workspace exclusion, 9/19 processed, no findings |
+| standalone-policy structured lint / fmt on exact changed `.ts` files | 0 / 0; 19/19 processed, zero drops/findings |
+| focused operation-runner, generator/template, runtime/listener, suite-registry tests | 0; 98 passed, 0 failed |
+| `deno task check:aspire-version-parity` | 0; checked 812, `fail=0` |
+| `deno task quality:gate` | 0; scanner findings 0, doctrine `FAIL=0` with existing warning inventory |
+
+No Aspire, Docker, AppHost, `e2e:cli`, or runtime suite ran. No product behavior, PR base, labels,
+lifecycle state, S9/S10 branch, or safety tag was changed. The temporary standalone lint/fmt policy
+under ignored `.llm/tmp/` copied the repository's rule/format settings while removing only the
+workspace path exclusion so the wrapper could prove 19/19 coverage; it is not committed.
