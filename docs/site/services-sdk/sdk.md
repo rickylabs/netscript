@@ -167,7 +167,19 @@ touches discovery; `createQueryFactories` is pure wiring over `{ contract, clien
 
 The L3 alternative builds all three layers from one map:
 `defineServices({ orders: { contract, serviceName: 'orders' } })` returns
-`{ clients, queryFactories, queryUtils }` — the same L2 values, just composed in one call.
+`{ clients, queries, queryUtils }` — the same L2 values, just composed in one call. Import it from
+`@netscript/sdk/presets` in browser/shared modules so the graph contains only the preset and its
+package-owned type closure. The root also exports `defineServices`, but neither entry installs a
+server cache provider.
+
+NetScript-managed Fresh apps register the shared provider when `defineFreshApp()` is called. A
+custom server composition root must do so explicitly:
+
+```ts
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
+
+setCacheProvider(cacheQuery);
+```
 
 ## Service discovery & query client
 
@@ -183,7 +195,7 @@ The L3 alternative builds all three layers from one map:
     { name: "createNetScriptQueryClient(options)", type: "@netscript/sdk/query-client", desc: "A TanStack QueryClient with server-first defaults: staleTime 30s, gcTime 300s, refetchOnWindowFocus false, retry 1." },
     { name: "bridgeInvalidation(resource, action?)", type: "@netscript/sdk/query-client", desc: "Build a client-side invalidation filter ({ queryKey }) for queryClient.invalidateQueries()." },
     { name: "toClientKeyPrefix(resource, action?)", type: "@netscript/sdk/query-client", desc: "Map a server resource/action to a prefix-matchable client query key, e.g. ['orders','list']." },
-    { name: "cacheQuery.setCachedData(key, data, ttl)", type: "@netscript/sdk/cache", desc: "Server-only: fire-and-forget pre-warm of an entity into the KV cache. Importing /cache auto-registers the shared provider." }
+    { name: "cacheQuery.setCachedData(key, data, ttl)", type: "@netscript/sdk/cache", desc: "Server-only: fire-and-forget pre-warm of an entity into the KV cache. Register cacheQuery explicitly at a custom server composition root." }
   ]
 }) }}
 

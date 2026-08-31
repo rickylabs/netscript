@@ -1,6 +1,6 @@
 /** Browser acceptance probe for the generated canonical app reference. */
 
-import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from './generated-app-endpoint.ts';
+import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from '../generated-app-endpoint.ts';
 
 export interface BrowserViewport {
   readonly name: 'desktop' | 'mobile';

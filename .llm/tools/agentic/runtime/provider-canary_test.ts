@@ -1,4 +1,6 @@
 import { ProviderCanaryAdapter } from './adapters/provider-canary-adapter.ts';
+import { PROVIDER_CANARY_MAX_OUTPUT_TOKENS } from './adapters/provider-canary-adapter.ts';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import type { RouteIdentity } from './contract.ts';
 import { evaluateProviderCanary } from './provider-canary.ts';
 import { assert, assertEquals } from '@std/assert';
@@ -9,8 +11,8 @@ function route(values: Partial<RouteIdentity> = {}): RouteIdentity {
     agent: 'claude',
     provider: 'openrouter',
     profileId: 'claude-openrouter',
-    model: 'minimax/minimax-m3',
-    effort: 'high',
+    model: OPENROUTER_MODEL_IDS.implEvaluator,
+    effort: 'max',
     worktree,
     mobileRequired: false,
     ...values,
@@ -23,6 +25,14 @@ const supported = {
   malformed: false,
   incompatibility: null,
   eventCounts: { tools: 1, reasoning: 1, streaming: 3 },
+  observedIdentity: {
+    provider: 'openrouter',
+    model: OPENROUTER_MODEL_IDS.implEvaluator,
+    effort: 'max',
+  },
+  identitySource: 'launch_argv_and_profile',
+  outputTokenBudget: PROVIDER_CANARY_MAX_OUTPUT_TOKENS,
+  responseNonEmpty: true,
 } as const;
 
 Deno.test('complete observed compatibility is the only fan-out-eligible result', () => {
@@ -37,6 +47,9 @@ Deno.test('complete observed compatibility is the only fan-out-eligible result',
   });
   assertEquals(result.evidence?.remoteControl, 'unavailable');
   assertEquals(result.evidence?.experimentalNonAnthropicModel, true);
+  assertEquals(result.evidence?.routeIdentity.status, 'matched');
+  assertEquals(result.evidence?.outputTokenBudget, PROVIDER_CANARY_MAX_OUTPUT_TOKENS);
+  assertEquals(result.evidence?.response, 'non_empty');
 });
 
 Deno.test('absent credentials are structured blocked diagnostics and never fabricated passes', async () => {
@@ -62,11 +75,11 @@ Deno.test('absent credentials are structured blocked diagnostics and never fabri
 Deno.test('preset identity is reported and a mismatched preset fails before spawn', async () => {
   const exact = evaluateProviderCanary(
     route({
-      presetId: 'claude-evaluator-minimax-m3',
+      presetId: 'claude-evaluator-glm-5-3-flash',
     }),
     supported,
   );
-  assertEquals(exact.evidence?.presetId, 'claude-evaluator-minimax-m3');
+  assertEquals(exact.evidence?.presetId, 'claude-evaluator-glm-5-3-flash');
 
   let spawned = false;
   const adapter = new ProviderCanaryAdapter(
@@ -77,8 +90,8 @@ Deno.test('preset identity is reported and a mismatched preset fails before spaw
     },
   );
   const mismatch = await adapter.run(route({
-    presetId: 'claude-evaluator-minimax-m3',
-    model: 'qwen/qwen3.8-max',
+    presetId: 'claude-evaluator-glm-5-3-flash',
+    model: OPENROUTER_MODEL_IDS.planEvaluator,
   }));
   assertEquals(spawned, false);
   assertEquals(mismatch.status, 'blocked');
@@ -126,7 +139,10 @@ Deno.test('live adapter reduces private JSONL to counts and enforces read-only r
   const output = [
     JSON.stringify({ type: 'tool_use', name: 'read_only_pwd' }),
     JSON.stringify({ type: 'reasoning', summary: 'bounded' }),
-    JSON.stringify({ type: 'message_delta', text: 'PROVIDER_CANARY_OK' }),
+    JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'text', text: 'PROVIDER_CANARY_OK' }] },
+    }),
   ].join('\n');
   const adapter = new ProviderCanaryAdapter(
     { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
@@ -147,11 +163,85 @@ Deno.test('live adapter reduces private JSONL to counts and enforces read-only r
   assertEquals(result.evidence?.eventCounts, { tools: 1, reasoning: 1, streaming: 3 });
   assert(captured.options?.args.includes('--permission-mode'));
   assert(captured.options?.args.includes('plan'));
+  assertEquals(
+    captured.options?.args.slice(
+      captured.options.args.indexOf('--effort'),
+      captured.options.args.indexOf('--effort') + 2,
+    ),
+    ['--effort', 'max'],
+  );
+  assertEquals(
+    captured.options?.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS,
+    String(PROVIDER_CANARY_MAX_OUTPUT_TOKENS),
+  );
   assertEquals(captured.options?.env.ANTHROPIC_API_KEY, '');
   assertEquals(captured.options?.env.ANTHROPIC_AUTH_TOKEN, opaque);
   assert(!JSON.stringify(result).includes(opaque), 'credential entered canary result');
   assert(!captured.options?.args.includes(opaque), 'credential entered canary argv');
   assertEquals(JSON.stringify([...parent]), before, 'parent environment changed');
+});
+
+Deno.test('live adapter requires the marker in visible assistant content', async () => {
+  const parent = new Map<string, string>([
+    ['PATH', '/usr/bin'],
+    ['OPENROUTER_API_KEY', crypto.randomUUID()],
+  ]);
+  const output = [
+    JSON.stringify({ type: 'reasoning', summary: 'I should reply PROVIDER_CANARY_OK' }),
+    JSON.stringify({
+      type: 'tool_use',
+      name: 'read_only_pwd',
+      input: { expectedReply: 'PROVIDER_CANARY_OK' },
+    }),
+    JSON.stringify({ type: 'result', result: '' }),
+  ].join('\n');
+  const adapter = new ProviderCanaryAdapter(
+    { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
+    () => ({
+      output: () =>
+        Promise.resolve({
+          code: 0,
+          stdout: new TextEncoder().encode(output),
+          stderr: new Uint8Array(),
+        }),
+    }),
+  );
+
+  const result = await adapter.run(route());
+  assertEquals(result.status, 'blocked');
+  assertEquals(result.evidence?.response, 'empty');
+  assert(result.diagnostics.some((entry) => entry.message.includes('empty')));
+});
+
+Deno.test('live adapter retains visible output after a large reasoning prelude', async () => {
+  const parent = new Map<string, string>([
+    ['PATH', '/usr/bin'],
+    ['OPENROUTER_API_KEY', crypto.randomUUID()],
+  ]);
+  const output = [
+    JSON.stringify({ type: 'reasoning', summary: 'x'.repeat(70 * 1024) }),
+    JSON.stringify({ type: 'tool_use', name: 'read_only_pwd' }),
+    JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'text', text: 'PROVIDER_CANARY_OK' }] },
+    }),
+  ].join('\n');
+  const adapter = new ProviderCanaryAdapter(
+    { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
+    () => ({
+      output: () =>
+        Promise.resolve({
+          code: 0,
+          stdout: new TextEncoder().encode(output),
+          stderr: new Uint8Array(),
+        }),
+    }),
+  );
+
+  const result = await adapter.run(route());
+  assertEquals(result.status, 'passed');
+  assertEquals(result.evidence?.response, 'non_empty');
+  assertEquals(result.evidence?.eventCounts.tools, 1);
 });
 
 Deno.test('Codex canary requires the named profile and uses ephemeral read-only execution', async () => {

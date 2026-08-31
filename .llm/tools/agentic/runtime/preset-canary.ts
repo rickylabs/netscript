@@ -27,6 +27,7 @@ export interface OpenRouterPresetCanaryRow {
   readonly agenticTurn: OpenRouterPreset['agenticTurn'] | null;
   readonly transport: OpenRouterPreset['transport'] | null;
   readonly incompatibility: OpenRouterPreset['incompatibility'] | null;
+  readonly attestedEffort: RouteIdentity['effort'] | null;
   readonly diagnostics: readonly string[];
 }
 
@@ -40,6 +41,10 @@ export interface OpenRouterPresetCanarySuite {
 }
 
 type PresetRegistry = Readonly<Record<string, OpenRouterPreset | undefined>>;
+interface LaunchInspection {
+  readonly diagnostics: readonly string[];
+  readonly attestedEffort: RouteIdentity['effort'] | null;
+}
 
 function route(preset: OpenRouterPreset, worktree: string): RouteIdentity {
   const profile = resolveProviderProfile({
@@ -64,7 +69,7 @@ function route(preset: OpenRouterPreset, worktree: string): RouteIdentity {
   };
 }
 
-function launchDiagnostics(preset: OpenRouterPreset, worktree: string): readonly string[] {
+function inspectLaunch(preset: OpenRouterPreset, worktree: string): LaunchInspection {
   const selected = route(preset, worktree);
   const content = { path: `${worktree}/.llm/tmp/provider-canary-prompt.md` } as const;
   if (selected.agent === 'claude') {
@@ -79,12 +84,19 @@ function launchDiagnostics(preset: OpenRouterPreset, worktree: string): readonly
       nativeExt4: true,
     });
     const guarded = plan.request?.arguments.includes('--enforce-open-evaluator-models') ?? false;
-    return [
-      ...plan.diagnostics.map((entry) => entry.code),
-      ...(plan.request ? [] : ['missing_launch_request']),
-      ...(preset.purpose === 'evaluation' && !guarded ? ['missing_evaluator_model_guard'] : []),
-      ...(preset.purpose !== 'evaluation' && guarded ? ['unexpected_evaluator_model_guard'] : []),
-    ];
+    const effortIndex = plan.request?.arguments.indexOf('--effort') ?? -1;
+    const observedEffort = effortIndex >= 0 ? plan.request?.arguments[effortIndex + 1] : undefined;
+    const effortAttested = observedEffort === preset.effort;
+    return {
+      diagnostics: [
+        ...plan.diagnostics.map((entry) => entry.code),
+        ...(plan.request ? [] : ['missing_launch_request']),
+        ...(preset.purpose === 'evaluation' && !guarded ? ['missing_evaluator_model_guard'] : []),
+        ...(preset.purpose !== 'evaluation' && guarded ? ['unexpected_evaluator_model_guard'] : []),
+        ...(effortAttested ? [] : ['missing_effort_attestation']),
+      ],
+      attestedEffort: effortAttested ? preset.effort : null,
+    };
   }
   const profileHome = `${worktree}/.llm/tmp/codex-openrouter-profile`;
   const git: GitInfo = {
@@ -112,10 +124,13 @@ function launchDiagnostics(preset: OpenRouterPreset, worktree: string): readonly
       path: `${profileHome}/${CODEX_OPENROUTER_PROFILE_FILE}`,
     },
   });
-  return [
-    ...plan.diagnostics.map((entry) => entry.code),
-    ...(plan.request ? [] : ['missing_launch_request']),
-  ];
+  return {
+    diagnostics: [
+      ...plan.diagnostics.map((entry) => entry.code),
+      ...(plan.request ? [] : ['missing_launch_request']),
+    ],
+    attestedEffort: null,
+  };
 }
 
 function validatePreset(
@@ -132,6 +147,7 @@ function validatePreset(
       agenticTurn: null,
       transport: null,
       incompatibility: null,
+      attestedEffort: null,
       diagnostics: ['preset_missing'],
     };
   }
@@ -159,16 +175,17 @@ function validatePreset(
   if (preset.agenticTurn !== 'unsupported' && preset.incompatibility) {
     diagnostics.push('non_unsupported_with_reason');
   }
-  const launch = launchDiagnostics(preset, worktree);
-  diagnostics.push(...launch);
+  const launch = inspectLaunch(preset, worktree);
+  diagnostics.push(...launch.diagnostics);
   return {
     id,
     validation: diagnostics.length ? 'failed' : 'passed',
-    launchValid: launch.length === 0,
+    launchValid: launch.diagnostics.length === 0,
     liveEligible: preset.agenticTurn === 'supported' && !preset.incompatibility,
     agenticTurn: preset.agenticTurn,
     transport: preset.transport,
     incompatibility: preset.incompatibility,
+    attestedEffort: launch.attestedEffort,
     diagnostics,
   };
 }

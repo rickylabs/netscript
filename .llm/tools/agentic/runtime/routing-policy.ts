@@ -7,7 +7,7 @@ import {
   OPENCODE_MODEL_IDS,
   OPENROUTER_MODEL_IDS,
 } from '../config/models.ts';
-import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
+import { type ActiveOpenRouterPresetId, OPENROUTER_PRESETS } from './provider-profiles.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'open', 'other'] as const;
 export type ModelFamily = typeof MODEL_FAMILIES[number];
@@ -64,7 +64,7 @@ export interface CanonicalRoutePolicy {
   readonly model: string;
   readonly effort: RouteIdentity['effort'];
   readonly profileId?: RouteIdentity['profileId'];
-  readonly presetId?: OpenRouterPresetId;
+  readonly presetId?: ActiveOpenRouterPresetId;
   readonly condition?: string;
   readonly effectiveFrom?: string;
   readonly effectiveThrough?: string;
@@ -88,13 +88,8 @@ export interface EffortEscalation {
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
-const FORMAL_PLAN_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-minimax-m3'];
-const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS[
-  'claude-evaluator-deepseek-v4-flash-0731'
-];
-const COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS[
-  'claude-evaluator-qwen-3-8-max'
-];
+const FORMAL_PLAN_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-8-flash'];
+const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-glm-5-3-flash'];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
@@ -283,7 +278,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     provider: 'openrouter',
     profileId: MAJOR_UI_UX_PRESET.profileId,
     presetId: MAJOR_UI_UX_PRESET.id,
-    model: OPENROUTER_MODEL_IDS.glm,
+    model: OPENROUTER_MODEL_IDS.designGlm,
     effort: 'xhigh',
     condition: 'fallback_no_claude_surface',
   },
@@ -351,7 +346,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: FORMAL_PLAN_EVALUATOR_PRESET.model,
     effort: FORMAL_PLAN_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
-    condition: 'third_opinion_or_native_limit',
+    condition: 'open_model_route',
   },
   {
     lane: 'formal_plan_evaluation',
@@ -391,19 +386,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: FORMAL_IMPL_EVALUATOR_PRESET.model,
     effort: FORMAL_IMPL_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
-    condition: 'third_opinion_or_native_limit',
-  },
-  {
-    lane: 'formal_impl_evaluation',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET.profileId,
-    presetId: COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET.id,
-    model: COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET.model,
-    effort: COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET.effort,
-    evaluatorModelPolicy: 'open_only',
-    condition: 'complex_third_opinion_or_native_limit',
+    condition: 'open_model_route',
   },
   {
     lane: 'formal_impl_evaluation',
@@ -522,7 +505,7 @@ export interface FormalEvaluatorAssignment {
   readonly generatorSession: SessionIdentity;
   readonly evaluatorSession: SessionIdentity;
   readonly route?: CanonicalRoutePolicy;
-  /** Complexity selects DeepSeek for small IMPL evals and Qwen for broader/complex IMPL evals. */
+  /** @deprecated Retained for input compatibility; open IMPL routing no longer splits by size. */
   readonly complexity?: 'small' | 'complex';
   /**
    * Explicit escalation/fallback. Absent means the native opposite-family route.
@@ -584,15 +567,10 @@ export function resolveCanonicalFormalEvaluatorRoute(
     throw new Error('generator session family must match the authored slice');
   }
   const lane = assignment.phase === 'plan' ? 'formal_plan_evaluation' : 'formal_impl_evaluation';
-  const complexImpl = assignment.phase === 'impl' && assignment.complexity === 'complex';
   const expectedPreset = assignment.phase === 'plan'
     ? FORMAL_PLAN_EVALUATOR_PRESET
-    : complexImpl
-    ? COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET
     : FORMAL_IMPL_EVALUATOR_PRESET;
-  const expectedOpenRouterCondition = complexImpl
-    ? 'complex_third_opinion_or_native_limit'
-    : 'third_opinion_or_native_limit';
+  const expectedOpenRouterCondition = 'open_model_route';
   const openRouterEscalation = assignment.fallbackReason === 'third_opinion' ||
     assignment.fallbackReason === 'native_quota_limit';
   const agyFallback = assignment.fallbackReason === 'openrouter_limit';
