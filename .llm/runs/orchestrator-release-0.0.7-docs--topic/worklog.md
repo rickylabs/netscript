@@ -3070,3 +3070,30 @@ agent 2/2 fully documented), #1818 (456 union / 104 gap, all four new Purposes v
 against real `deno doc`). Two evaluators independently flagged stale figures carried into my briefs
 from sibling prompts; the artifacts were right and the briefings were mine. Building each prompt
 from the PR's own diff from here.
+
+### #1811 shipped (7 of 10); #1522 closed unmerged by owner disposition
+
+**#1811 `docs(ai)` merged** as `72599120a`. `main` now carries **26 mapping rows**; seven slices
+shipped: plugin-ai-core, plugin-streams-core, mcp, plugin-auth-core, plugin-triggers-core,
+auth-kv-oauth, ai.
+
+**#1522 was CLOSED without merging** — owner disposition, not a lane failure: *"superseded archival
+residue after an independent current-main audit. The durable filing ledger already landed in #1523
+and the complete #1450 ledger now links to the existing main-branch FILING-LOG."* My packet had
+recommended MERGE; the owner's supersession call overrides it. Recording the factual consequence
+without disputing the decision: the two add-only files
+(`.llm/2026-08-11-devtools-contribution-rfc-seed.md`, the run's `leak-report.md`) are **not** on
+main and were judged residue.
+
+**A CI mechanic learned the hard way on #1811.** After pushing, only 2 checks appeared and the
+acceptance mirror sat at 0/4. Cause: the push happened while the PR was still a **draft**, and
+`check-test`/`quality` skip drafts by design (`github.event.pull_request.draft == false`); marking
+ready afterwards does **not** re-trigger them. Close/reopen fired the full workflow without moving
+the head. **Standing rule: `gh pr ready` before the push, never after** — otherwise the run is
+silently partial and looks green on an incomplete check set. Applied to #1813 and it worked first
+time.
+
+**#1813 re-converged twice by design.** Prepared at main `7aff0e4cb` (26 rows after #1803), then
+#1811 merged mid-flight, so re-converged onto `72599120a` to absorb the `ai` row → **27 rows**, with
+all seven shipped docs rows asserted present by name. This is the expected cost of the serial corpus
+seam, not rework: each slice must carry every row merged before it.
