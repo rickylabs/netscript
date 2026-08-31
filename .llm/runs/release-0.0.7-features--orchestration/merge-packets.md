@@ -13,7 +13,7 @@ comment; on control PR #1747 the bot's review predated the label by ~11 h).
 
 ---
 
-## PR #1810 — `#1458` typed chat-response completion mode — **MERGE CANDIDATE, one check outstanding**
+## PR #1810 — `#1458` typed chat-response completion mode — **EXACT-GREEN MERGE CANDIDATE**
 
 | | |
 | --- | --- |
@@ -23,11 +23,13 @@ comment; on control PR #1747 the bot's review predated the label by ~11 h).
 | Closing keyword | `Fixes #1458`, live |
 | IMPL-EVAL | **`OPENHANDS_VERDICT: PASS`** at `520573e1f` / evidence `96f9cea99` (comment `5473613425`) |
 | Carry-forward | `0b60ee766` is a git **ancestor**; both product blobs identical (`06a7ea26…`, `ba2172c0…`); `evaluate.md` preserved byte-for-byte (`5b7d1181…`) |
-| CI | `close-gate` **pass** · `quality` **pass** · `code-quality` **pass** · `build` **pass** · `check-test` **running** |
+| CI | **all green** — `close-gate` · `check-test` · `quality` · `code-quality` · `build` · `classify` |
 | Review threads | **PASS** — 0 threads, 0 unanswered |
 
 Do not churn the head. Obsolete run `33356348595` was cancelled by the coordinator; exact-head run
-`33356709627` is the live one.
+`33356709627` is the live one and is now fully green.
+
+**Ready to merge.** Nothing outstanding on this lane's side.
 
 ---
 
@@ -41,7 +43,9 @@ Do not churn the head. Obsolete run `33356348595` was cancelled by the coordinat
 | IMPL-EVAL | **`OPENHANDS_VERDICT: PASS`** at `3130fb52b`, base `0274c0a7` (comment `5473634548`) |
 | CI | **all green** — `check-test`, `quality`, `code-quality`, `close-gate`, `build` |
 | Review threads | **PASS** — 0 threads, 0 unanswered |
-| **Blocker** | merge-ref first parent is **`0274c0a70`**, one behind current `main` `dea44991`. Same defect that held #1805: the green CI does not describe the current merge snapshot. |
+| Head (after harness-truth correction) | `7bd87da5cd533040c484feec3f00c003c5239562` |
+| `scaffold.runtime` | **required and now running** — opted in via the `e2e-cli-gate` label; `scaffold-static` already **pass**. Previously every scaffold lane reported `skipping`. |
+| Harness truth | corrected at the final head; product blobs proven byte-identical to the evaluated head (14/14), `git diff 3130fb52b..HEAD` is exactly the two harness files |
 
 **Prepared, deliberately not executed:** converge onto the post-#1810 `main` in one pass, with the same
 ancestry + byte proof used for #1805 and #1810, then fresh current-main CI. Held so the seam is taken
