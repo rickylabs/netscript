@@ -177,7 +177,11 @@ describe('generateRegisterInfrastructure', () => {
     );
     assertStringIncludes(
       output,
-      'async () => await (await db_0.connectionStringExpression()).getValueAsync(),',
+      'const connectionString = await (await db_0.connectionStringExpression()).getValue();',
+    );
+    assertStringIncludes(
+      output,
+      `throw new Error("Aspire did not resolve the connection string for database 'main'.");`,
     );
     assertStringIncludes(output, '(Container)');
   });

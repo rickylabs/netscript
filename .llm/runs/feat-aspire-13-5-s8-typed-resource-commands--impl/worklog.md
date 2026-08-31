@@ -14,6 +14,36 @@ the implementation agent records the resulting evidence and does not self-certif
 
 ## Progress
 
+- 2026-09-01: D-227 resumed at the clean requested head `bbf866d59`. The task is a bounded
+  Archetype-6 generated-source diagnosis/repair with a fully specified acceptance contract, so
+  `PLAN-EVAL: N/A`; no evaluator is self-dispatched. Design checkpoint: public commands and package
+  exports remain unchanged; the existing helper templates and generated quality runner remain the
+  only source/consumer seams; no new port, constant vocabulary, cast, `any`, or lint suppression is
+  permitted. The ordered slice is reproduce/compile, add compile RED, repair, regenerate and run
+  static gates. Contributor path remains the focused Aspire helper generator tests plus the asset
+  barrel generator. Runtime/Aspire/Docker/AppHost/E2E execution is excluded.
+- 2026-09-01: scaffolded a local PostgreSQL consumer and performed Aspire restore/code generation
+  without starting an AppHost. The complete probe capture exited 1 with the exact line-144 throw
+  `generated check did not recover after quality probes`. Its AppHost batch reported
+  `register-infrastructure.mts(83,69): TS2339`, because `ReferenceExpression` has no
+  `getValueAsync`. Independent restored-SDK checks passed `run-tool.mts` (exit 0) and failed
+  `register-infrastructure.mts` (exit 2) with that same diagnostic.
+- 2026-09-01: added a static emitted-helper compile regression. Against the unfixed generator it
+  failed 0/1 and printed TS2339 for `getValueAsync`; this is the retained RED proof. The repair uses
+  the Aspire TypeScript SDK's `getValue(): Promise<string | null>`, rejects null, and otherwise
+  returns the exact late-bound allocated connection string. No run-tool or stderr-bound source was
+  changed.
+- 2026-09-01: a fresh fixed scaffold with all official local plugins, generated registries,
+  restored SDK, and offline database-client generation passed direct compilation of both helpers,
+  generated check/lint, and the unmodified negative-quality probe. The probe exited 0 with all ten
+  probe paths and cleanup check/lint exit codes 0. No Aspire start, AppHost, Docker, container, or
+  E2E runtime suite ran.
+- 2026-09-01: final pre-commit static evidence passed: helper tests 254/254; scoped structured check
+  on three changed TypeScript files with `failedBatches: 0`; scoped lint and formatting on 3/3;
+  `quality:gate` exit 0 with zero quality findings and doctrine `FAIL=0`; repository-wide check on
+  2,986 files / 25 batches with `failedBatches: 0`; `gen:assets-barrel` and diff-clean
+  `check:assets-barrel` exit 0. Formal IMPL-EVAL remains a separate supervisor action.
+
 - 2026-08-31: D-216 resumed from converged head `d1c6d8b54`. Downloaded and digest-verified the
   requested workflow artifacts and exact job logs. Both reports stop after the third actionable
   Prisma stderr line and contain no `code` or `meta`; the run records those fields as absent rather

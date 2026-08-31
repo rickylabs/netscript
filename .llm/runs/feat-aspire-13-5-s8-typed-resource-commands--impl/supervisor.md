@@ -37,3 +37,17 @@ dispatch and the separate evaluator handoff.
 This session is limited to byte-preserving rebase, static verification, harness evidence, and an
 exact-SHA force-with-lease push. It holds no runtime lease and may not start Aspire, Docker,
 AppHost, or `e2e:cli` runtime suites.
+
+## D-227 repair session — 2026-09-01
+
+| Field | Value |
+| --- | --- |
+| Model | OpenAI GPT-5.6 Sol implementation session |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-s8-recon` |
+| Branch | `feat/aspire-13-5-s8-typed-resource-commands` |
+| Baseline | `bbf866d59bf74d55614583898bb632d2ab223b1e` |
+| Lane | bounded generated-helper diagnosis and repair |
+| Evaluator | none dispatched; owner explicitly prohibited self-dispatch |
+
+This session may scaffold a local project and run `deno` tasks/type-checks only. It may not start
+Aspire, Docker, an AppHost, or an E2E runtime suite, and it does not self-certify IMPL-EVAL.
