@@ -112,3 +112,31 @@ in the opposite direction.
 **Standing debt, unaddressed by this repair:** six hand-maintained declarations of one record shape.
 The repair restores consistency; it does not remove the duplication, and the next field added to an
 execution record will break the same way.
+
+
+---
+
+## #1820 — final seam taken; immutable head `b87fd92faf86bb2a616effc6c340568f7ddeaf96`
+
+The evidence-only push made the branch `CONFLICTING/DIRTY` against the advanced `main` — and that is
+also **why no CI ran on it**: GitHub could not compute a merge ref, so the `pull_request` workflow had
+nothing to check out. Only the OpenHands push runner fired. Diagnosed and integrated in one pass.
+
+| Proof | Result |
+| --- | --- |
+| Conflict set | exactly one file — `export-surface-corpus.generated.ts`, a generated carrier |
+| Resolution | took `main`'s carrier, then **regenerated from tooling**; never hand-edited |
+| Carrier currency | `check:mcp-export-corpus` exit 0 · `check:assets-barrel` exit 0 |
+| Six hand-written product blobs | **byte-identical** to evaluated head `3130fb52b` (`cb729fa8…`, `b16f23f7…`, `755881c3…`, `592f9146…`, `e427a76c…`, `67df918b…`) |
+| Seventh blob | the corpus, regenerated `1dd90409… → 6e84e995…`. It *was* the conflict and `main`'s inputs moved — identity cannot hold for a derivative, and asserting it would be false |
+| Product diff vs current `main` | exactly the seven files |
+| **Merge-ref first parent** | **`eaea940be` = current `main`** — the requirement that failed before is now met |
+| Mergeable | **MERGEABLE** (BLOCKED only on running checks) |
+| `deno.lock` | byte-identical `edfa0c24…` |
+
+Gates re-cut at the seam `8ab11ddee`: scoped check 303-byte, lint 352-byte, fmt-check 301-byte, kv
+tests 289-byte, `assets-barrel` exit 0, `docs:exports-drift` PASS. Fresh core CI **and** `e2e-cli`
+(scaffold runtime) now running against the current-main snapshot; `build`, `close-gate`, and
+`code-quality` already pass.
+
+`Refs #1452` partial semantics preserved — `closingIssuesReferences` empty.
