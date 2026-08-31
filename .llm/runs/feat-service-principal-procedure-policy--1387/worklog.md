@@ -680,3 +680,40 @@ No E2E, Aspire, Docker, browser, reviewer dispatch, close-gate, or runtime lease
 author stops at Slice 9's Tier-A boundary. The green evidence is not author self-certification;
 substantive supervisor review and a separate opposite-family IMPL-EVAL remain required before the
 supervisor-owned close-gate.
+
+## Post-Slice-9: two `main` integrations, receipt re-cuts, and the F-1/F-2 fixes
+
+Recorded here because the Slice 9 IMPL-EVAL correctly found these ledgers silent about work that had
+already happened (**F-2**), and the evidence manifest describing a directory it no longer matched
+(**F-1**). Both were real supervisor bookkeeping defects, not evaluator noise.
+
+### Integrations
+
+The leaf was integrated with `main` **three** times at the pre-merge boundary, each carrier-resolved
+by regenerating from tooling rather than hand-merging generated output:
+
+1. → `0ac06c5f1`. Only source conflict was `.llm/tools/gates/catalog.ts`, resolved as the **union** of
+   `main`'s `aspire-version-parity` entry and this leaf's D-5 `exports-drift` / `mcp-export-corpus`
+   entries. All three present.
+2. → `65cd8a077` (after #1743/#1758/#1781 landed). Carrier-only; no source conflict, because the
+   catalog union from (1) had already landed.
+3. → `8a9257642` (after #1764 landed). One carrier: the MCP export corpus, regenerated from current
+   inputs → **7709 symbols**.
+
+### F-1 — evidence manifest no longer described its directory
+
+`evidence-set.json` still declared `immutableHead 3cb08103f` and twelve `1387-s9-*` receipt ids, but
+four top-level receipts had been replaced by integrated-head re-cuts (`6a8748e28`, `ce0c0ebcb`). The
+superseded ones survived only in git history. **Fixed** by archiving the whole Slice 9 set to
+`receipts/slice-9-3cb08103f/` (including the four superseded receipts, preserved rather than
+discarded) and cutting a single coherent final set at one head, so the manifest and the directory
+agree again.
+
+### F-2 — ledgers understated the final head
+
+`worklog.md`, `context-pack.md`, and `drift.md` recorded none of the integrations or re-cuts, so a
+resuming close-gate session would have believed `3cb08103f` was final. This entry closes that gap.
+
+**Both findings are run-artifact bookkeeping only** — no product, documentation, or gate-result
+change. The evaluator classified them as non-blocking and recommended folding them into the close-gate
+commit; that is what this is.

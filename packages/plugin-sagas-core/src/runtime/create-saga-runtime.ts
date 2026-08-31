@@ -16,7 +16,7 @@ import type { SagaCompensator } from './saga-compensator.ts';
 import type { SagaIdempotencyDedupTable } from './saga-idempotency.ts';
 import { type LoggerPort, NoopLogger } from './logger.ts';
 import type { SagaSchedulerPort } from './saga-scheduler.ts';
-import type { SagaInstrumentation } from '../telemetry/mod.ts';
+import { SagaInstrumentation } from '../telemetry/mod.ts';
 
 /** Adapter selected by the saga runtime composition root. */
 export type SagaRuntimeAdapter = 'native';
@@ -83,6 +83,8 @@ const storelessWarningLoggers = new WeakSet<LoggerPort>();
 
 function createNativeBus(options: SagaRuntimeNativeOptions = {}): SagaBusPort {
   const store = options.store ?? options.engineOptions?.store;
+  const instrumentation = options.instrumentation ?? options.engineOptions?.instrumentation ??
+    new SagaInstrumentation();
   if (options.engine === undefined && store === undefined) {
     warnStorelessNativeRuntime(options.logger ?? new NoopLogger());
   }
@@ -90,7 +92,7 @@ function createNativeBus(options: SagaRuntimeNativeOptions = {}): SagaBusPort {
   const engine = options.engine ?? createSagaEngine({
     ...options.engineOptions,
     store,
-    instrumentation: options.instrumentation ?? options.engineOptions?.instrumentation,
+    instrumentation,
   });
   return createSagaBusBridge({
     id: options.id,
@@ -99,7 +101,7 @@ function createNativeBus(options: SagaRuntimeNativeOptions = {}): SagaBusPort {
     compensator: options.compensator,
     resolveCompensation: options.resolveCompensation,
     idempotency: options.idempotency,
-    instrumentation: options.instrumentation,
+    instrumentation,
   });
 }
 

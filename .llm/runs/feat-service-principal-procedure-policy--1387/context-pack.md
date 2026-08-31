@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `feat-service-principal-procedure-policy--1387` |
 | Branch         | `feat/service-principal-procedure-policy`       |
-| Current phase  | `impl` — Slices 1–9 all Tier-A ACCEPTED; Slice 9 awaiting its separate IMPL-EVAL; close-gate next |
+| Current phase  | `impl` — Slices 1–9 accepted; integrated to `main` 3x; awaiting final exact-head IMPL-EVAL then close-gate |
 | Archetype      | contracts: 1; service/plugin: 4                 |
 | Scope overlays | `SCOPE-service` plus package doctrine           |
 
