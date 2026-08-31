@@ -12,7 +12,9 @@ import type {
   ContractLike,
   CreateServiceClientOptions,
   ServiceClient,
+  ServiceClientContext,
 } from '../ports/service-client.ts';
+import type { SdkClientContributionContext } from '../ports/sdk-client-contribution.ts';
 
 function getTraceHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
@@ -38,7 +40,10 @@ function getTraceHeaders(): Record<string, string> {
  * @param options - Service client configuration.
  * @returns Typed service client.
  */
-export function createServiceClient<TContract extends ContractLike>({
+export function createServiceClient<
+  TContract extends ContractLike,
+  const TContributions extends readonly object[] = readonly [],
+>({
   contract,
   serviceName,
   routerName,
@@ -46,7 +51,11 @@ export function createServiceClient<TContract extends ContractLike>({
   apiPath = '/api/rpc',
   apiVersion = 'v1',
   propagateTraceContext = true,
-}: CreateServiceClientOptions<TContract>): ServiceClient<TContract> {
+  contributions,
+}: CreateServiceClientOptions<TContract, TContributions>): ServiceClient<
+  TContract,
+  ServiceClientContext & SdkClientContributionContext<TContributions>
+> {
   const pathSegment = routerName ?? serviceName;
   const rpcPath = buildServiceRpcPath({
     routerName: pathSegment,
@@ -60,7 +69,11 @@ export function createServiceClient<TContract extends ContractLike>({
     rpcPath,
     propagateTraceContext,
     getTraceHeaders,
+    contributions,
   });
 
-  return createORPCClient(link) as ServiceClient<TContract>;
+  return createORPCClient(link) as ServiceClient<
+    TContract,
+    ServiceClientContext & SdkClientContributionContext<TContributions>
+  >;
 }
