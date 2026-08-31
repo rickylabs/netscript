@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1591-test",
+  "invocationId": "1591-final-test",
   "argv": [
     "deno",
     "task",
@@ -8,24 +8,24 @@
     "packages/ai/tests"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1591",
-  "gitHead": "ff7d2de60ef470c312d633b851975d67a6774471",
-  "actualGitHead": "ff7d2de60ef470c312d633b851975d67a6774471",
+  "gitHead": "8a6855d8a1cd874351ad96d99056a299f3045b1e",
+  "actualGitHead": "8a6855d8a1cd874351ad96d99056a299f3045b1e",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:705673",
+  "runnerIdentity": "worker:1420491",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "35f846f42b2573cdafc6f7aa7d41b537a195df1937a2c19ef715cf0ed3321da7",
-  "lifecycleId": "worker:705673:1591-test:1",
+  "requestHash": "e51117714b29ba8e1138ed66b8e2acb0b2b95614b187a11ecea845481b809de8",
+  "lifecycleId": "worker:1420491:1591-final-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-30T23:58:33.968Z",
-  "startedAt": "2026-08-30T23:58:33.970Z",
-  "finishedAt": "2026-08-30T23:58:35.867Z",
-  "durationMs": 1897,
+  "claimedAt": "2026-08-31T04:07:36.051Z",
+  "startedAt": "2026-08-31T04:07:36.053Z",
+  "finishedAt": "2026-08-31T04:07:37.959Z",
+  "durationMs": 1907,
   "exitCode": 0,
   "stdout": {
     "bytes": 291,
-    "sha256": "4f377d5be58ada579df0751374677fec5f90aa02c3d78607ec03207b13a5af45",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/ai/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1591\",\"exitCode\":0,\"durationMs\":1781,\"summary\":{\"passed\":150,\"failed\":0,\"ignored\":0,\"totalResults\":150,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "77c2973e0243fe1802c138f471717e83a677c14f7e9bc39ddf436e5b9e8c3e02",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/ai/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1591\",\"exitCode\":0,\"durationMs\":1793,\"summary\":{\"passed\":150,\"failed\":0,\"ignored\":0,\"totalResults\":150,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
