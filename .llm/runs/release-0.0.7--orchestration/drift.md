@@ -1688,3 +1688,14 @@ implementation thread.
   concluded success while all product steps were skipped by policy; it was removed from the runtime
   evidence list. Evidence summaries must distinguish terminal workflow success from executed gate
   success.
+
+## 2026-08-31 — a carried verdict cannot survive changed safety semantics
+
+- #1747's later fixture/generator rewrite changed four of seven evaluator-owned product blobs and
+  reintroduced reserved-word bindings plus unsafe string emission. A historical PASS and an
+  `impl-eval:skip` label cannot cover those semantics, even when core CI stays green and the body
+  still claims the older ordinal-binding design.
+- Reserved/collision-name acceptance must be proven at the direct generated-source boundary, not
+  only at a config parser. Hosted scaffold runtime is mandatory when local remote-Docker topology
+  prevents the AppHost from reaching daemon-published localhost ports; a policy-skipped workflow is
+  not a substitute.

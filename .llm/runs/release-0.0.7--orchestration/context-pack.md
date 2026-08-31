@@ -2033,3 +2033,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Aspire S9/S10/S11, #1824, Features #1349, Fixes #1677/#1773/#1609, and Docs #1811/#1813 remain
   active in parallel. No lane waits for another topic's evaluator or CI; only shared-carrier merges
   and the host runtime lease are serialized.
+
+## Resume delta — 2026-08-31T05:15:31Z
+
+- Current main is `052f86595b06b33cf0e205405873cd979cf535d1` after exact-green Fixes PR #1819
+  shipped from immutable head `de06e17438526bdecc4fce2d84fc697904040a75`; #1365/#1819 are
+  closed/merged and sole `status:shipped`. #1829 is the next user-facing front and must take this
+  complete base once before fresh CI.
+- #1823/#1803 have banked pre-#1819 exact-green work and wait only for the imminent #1829 user-facing
+  merge before one final current-main convergence. #1814 keeps its GLM/product evidence while
+  #1349 implements independently. #1828 is repaired at `5605a9505`, whole-graph 4,427/0/19, and is
+  in separate GLM delta evaluation before ready transition/exact CI.
+- Aspire #1747 is actively repaired after independent audit proved its current reserved-name output
+  invalid and its prior PASS non-carrying. It requires fresh evaluator and hosted scaffold runtime;
+  S9/S10/S11/S13 and #1831 continue independently and do not wait for that repair.

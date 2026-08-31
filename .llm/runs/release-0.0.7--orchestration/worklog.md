@@ -3226,6 +3226,27 @@
 - Fresh inventory found 52 open milestone issues and zero missing `orchestrator:*` labels. Host
   runtime preflight remains exact zero: Aspire `[]`, containers 0, volumes 0, custom networks 0.
 
+## 2026-08-31T05:15:31Z — #1819 user-facing saga receipt fix ships; #1747 false-ready caught
+
+- Fixes PR #1819 converged once on post-#1820 main at immutable head
+  `de06e17438526bdecc4fce2d84fc697904040a75`. The corrected title no longer claims endpoint
+  diagnostics owned by #1825; the body records the final carrier-only seam. All 14 evaluator-owned
+  handwritten blobs and `impl-eval.md` remained byte-identical to the GLM PASS, while exact run
+  `33359416461` passed close-gate, quality, full check/test, and visibility. Synthetic merge
+  `366e39e3a57298f2f0f079a65be02fd6537b79e2` had exact current-main/head parents and review threads
+  were zero. The coordinator squash-merged #1819 as
+  `052f86595b06b33cf0e205405873cd979cf535d1`; #1365/#1819 are sole `status:shipped`.
+- Fixes #1829 is the next user-facing merge front. Its PASS packet is sound but its merge snapshot
+  predates #1820/#1819; Fixes was directed to preserve the two evaluated product/test blobs and
+  evaluator artifact while converging once on `052f86595`, then recut exact CI.
+- Independent audit rejected Aspire #1747's false-ready state. Current head `68c80e743` accepts
+  reserved names but emits invalid `const class`, `const await`, and self-referential `builder`
+  bindings; it also regressed safe JSON literal emission, differs in four of seven product blobs
+  from the old PASS, and has no hosted scaffold-runtime PASS. Aspire received the bounded repair:
+  restore ordinal/no-user-text and JSON-literal safety, preserve the widened fixture union, restore
+  direct-generator tests, remove product-PR run artifacts, rewrite body truth, Tier-A, fresh GLM
+  IMPL-EVAL, hosted `e2e-cli` runtime, and fresh core CI. This is coordinator-owned, not an owner pause.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance
