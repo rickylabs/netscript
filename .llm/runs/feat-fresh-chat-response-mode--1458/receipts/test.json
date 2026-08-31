@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1458-int-test",
+  "invocationId": "1458-seam-test",
   "argv": [
     "deno",
     "task",
@@ -8,24 +8,24 @@
     "packages/fresh/src/runtime/ai"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1458",
-  "gitHead": "520573e1f550950387a9714c3cc724a0ee8053eb",
-  "actualGitHead": "520573e1f550950387a9714c3cc724a0ee8053eb",
+  "gitHead": "8b0903462fc12862d81015eac74de776eb112180",
+  "actualGitHead": "8b0903462fc12862d81015eac74de776eb112180",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1349593",
+  "runnerIdentity": "worker:1488946",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "7b08f7f22b3e340bd3ef44df800eb7e7064bd0ed8cdc6018bbf38b6d55ba242c",
-  "lifecycleId": "worker:1349593:1458-int-test:1",
+  "requestHash": "21ba146230df14b68015e0a8b95b0297a7fc01a89bd3268823bd5d4dca5a2ec7",
+  "lifecycleId": "worker:1488946:1458-seam-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T03:51:55.899Z",
-  "startedAt": "2026-08-31T03:51:55.902Z",
-  "finishedAt": "2026-08-31T03:51:57.908Z",
-  "durationMs": 2006,
+  "claimedAt": "2026-08-31T04:19:42.005Z",
+  "startedAt": "2026-08-31T04:19:42.009Z",
+  "finishedAt": "2026-08-31T04:19:44.941Z",
+  "durationMs": 2932,
   "exitCode": 0,
   "stdout": {
     "bytes": 301,
-    "sha256": "b099d35192ad402e2bb0bc477068428fd0b0a0cb7b002379566b183e5ad36145",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/fresh/src/runtime/ai\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1458\",\"exitCode\":0,\"durationMs\":1850,\"summary\":{\"passed\":40,\"failed\":0,\"ignored\":0,\"totalResults\":40,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "58957a28cdf117d5e661fc66fa20e5360b85fdd8d8655d286ae75b060f4720e9",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/fresh/src/runtime/ai\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1458\",\"exitCode\":0,\"durationMs\":2751,\"summary\":{\"passed\":40,\"failed\":0,\"ignored\":0,\"totalResults\":40,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
