@@ -9142,3 +9142,40 @@ happy-path test would miss. D-1's cache-trap finding carried forward again.
 
 **Five leaves now**: `#1387` S9, `#1591`, `#1458`, `#1592` S1 (all Tier-A ACCEPTED, parked pending
 #1792) and `#1452` S1 (implementing).
+
+## Serial correction applied — #1762 is the sole front
+
+Coordinator corrected mid-turn: no more than one feature PR convergence/evaluation path active in
+this orchestrator; parallelism belongs across orchestrators, not inside one. Complied at the next
+clean boundary rather than aborting mid-command — the three in-flight integrations
+(#1591/#1458/#1592) had already reached commit+push, so stopping there left no half-integrated tree.
+
+**Stopped:** the #1349 PLAN-EVAL (task `bqykbr99q`, 0 lines produced, nothing lost). The #1591
+IMPL-EVAL had already self-terminated on the denial below. **Front:** #1762 only, its Slice 9
+evaluation still running (`bogxei74n`).
+
+**Parked, each at a clean pushed boundary, none half-done:** #1805 (`1f87b111f`), #1810
+(`b818be147`), #1814 (`a4c6c3595`), #1820 (`03392e186`), #1664 (untouched, owner boundary).
+
+## A real finding that changes evaluation sequencing — the allowlist is read per-worktree
+
+The #1591 evaluation was **denied instantly**: `evaluator model request denied:
+model=z-ai/glm-5.3-flash`, despite #1792 having landed on `main`.
+
+**Root cause, confirmed by direct comparison rather than inference.** The evaluator model guard
+resolves `OPEN_EVALUATOR_MODEL_IDS` from `.llm/tools/agentic/config/models.ts` **in the worktree the
+evaluator runs in**, not from `main`:
+
+- `ns1387-eval-s9` (its leaf had integrated `main` twice) → carries the new
+  `planEvaluator`/`implEvaluator` allowlist → GLM accepted, evaluation running.
+- `ns1591-eval` (its leaf branched off pre-#1792 `main`) → still carries the old
+  `minimax`/`deepseekV4Flash0731`/`qwen3.8-max` tuple → GLM denied at the proxy.
+
+**Consequence: a leaf must integrate post-#1792 `main` before its evaluation can run on the sanctioned
+route at all.** This is not optional sequencing preference — it is a hard precondition. All three
+remaining leaves have now been integrated and verified to carry the new allowlist, so each is
+evaluable the moment it becomes the front. That integration also freshens each packet against `main`,
+which the deadline wants regardless.
+
+Had I not root-caused this, the natural reading of the denial would have been "GLM routing is still
+broken" and I would have escalated a non-existent infrastructure problem back to the coordinator.
