@@ -7,6 +7,7 @@ const BROWSER_VERSION_TIMEOUT_MS = 5_000;
 const BROWSER_OUTPUT_LIMIT_BYTES = 32 * 1024;
 const BASELINE_CONFIRMATION_MS = 500;
 const BASELINE_POLL_MS = 50;
+const OPTIMISTIC_DIAGNOSTICS_MARKER = '__NETSCRIPT_OPTIMISTIC_RENDER_DIAGNOSTICS__';
 const ALREADY_TERMINATED_CHILD_MESSAGE = 'Child process has already terminated';
 const BUILT_IN_BROWSER_SOURCE = 'built-in allowlist';
 const BROWSER_CANDIDATES = [
@@ -44,6 +45,29 @@ export interface SettledRefetchEvidence {
 export interface RequestCompletionCounts {
   readonly requestCount: number;
   readonly completedCount: number;
+}
+
+interface BrowserInstrumentationInstall {
+  readonly queryClientFound: boolean;
+  readonly queryClientPath: string | null;
+}
+
+interface OptimisticRenderDiagnostics {
+  readonly renderedRowText: string | null;
+  readonly mutationState: string | null;
+  readonly renderState: string | null;
+  readonly islandHydrated: boolean;
+  readonly islandInteractive: boolean;
+  readonly hydrationEvidence: string;
+  readonly freshIslandElement: string | null;
+  readonly queryClientFound: boolean;
+  readonly queryClientPath: string | null;
+  readonly listQueryKey: unknown;
+  readonly listCacheData: unknown;
+  readonly listDataUpdatedAt: number | null;
+  readonly cacheEvents: readonly unknown[];
+  readonly onMutateRan: boolean;
+  readonly captureError?: string;
 }
 
 interface StableBaselineOptions {
@@ -266,7 +290,22 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
 
     await client.send('Page.navigate', { url });
     await client.waitFor('Page.loadEventFired');
-    const originalName = await waitForExpression<string>(client, rowNameExpression());
+    const instrumentation = await evaluate<BrowserInstrumentationInstall>(
+      client,
+      installOptimisticInstrumentationExpression(),
+    );
+    let originalName: string;
+    try {
+      originalName = await waitForExpression<string>(client, rowNameExpression());
+    } catch (error) {
+      const diagnostics = await captureOptimisticRenderDiagnostics(
+        client,
+        undefined,
+        instrumentation,
+        false,
+      );
+      throw diagnosticsError('initial Rename row assertion failed', diagnostics, error);
+    }
     await evaluate(client, clickRefreshExpression());
     const baseline = await waitForCompletedStableBaseline(() => ({
       requestCount: listRequestIds.size,
@@ -283,11 +322,22 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
           typeof params.responseStatusCode === 'number';
       },
     );
-    const optimistic = await waitForExpression<boolean>(
-      client,
-      rowContainsExpression(renamedName),
-      (value) => value,
-    );
+    let optimistic: boolean;
+    try {
+      optimistic = await waitForExpression<boolean>(
+        client,
+        rowContainsExpression(renamedName),
+        (value) => value,
+      );
+    } catch (error) {
+      const diagnostics = await captureOptimisticRenderDiagnostics(
+        client,
+        renamedName,
+        instrumentation,
+        true,
+      );
+      throw diagnosticsError('optimistic row assertion failed', diagnostics, error);
+    }
     const mutationStatus = paused.responseStatusCode;
     await client.send('Fetch.continueResponse', { requestId: paused.requestId });
     if (typeof paused.networkId === 'string') {
@@ -557,6 +607,170 @@ function rowNameExpression(): string {
     const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim() === 'Rename');
     return button?.closest('li')?.querySelector('p')?.textContent?.trim();
   })()`;
+}
+
+const QUERY_CLIENT_DISCOVERY_SOURCE = `
+  const findQueryClient = () => {
+    const seen = new WeakSet();
+    const queue = [];
+    for (const element of document.querySelectorAll('*')) {
+      for (const key of Object.getOwnPropertyNames(element)) {
+        if (key.startsWith('__') || key.toLowerCase().includes('preact')) {
+          let value;
+          try { value = element[key]; } catch { continue; }
+          queue.push({ value, path: element.tagName.toLowerCase() + '.' + key, depth: 0 });
+        }
+      }
+    }
+    let visited = 0;
+    while (queue.length > 0 && visited < 5000) {
+      const entry = queue.shift();
+      const value = entry.value;
+      if ((typeof value !== 'object' && typeof value !== 'function') || value === null) continue;
+      if (seen.has(value)) continue;
+      seen.add(value);
+      visited += 1;
+      if (
+        typeof value.getQueryCache === 'function' &&
+        typeof value.getQueryData === 'function' &&
+        typeof value.getQueryState === 'function'
+      ) return { client: value, path: entry.path };
+      if (entry.depth >= 12 || value instanceof Node) continue;
+      let descriptors;
+      try { descriptors = Object.getOwnPropertyDescriptors(value); } catch { continue; }
+      for (const [key, descriptor] of Object.entries(descriptors).slice(0, 80)) {
+        if (!('value' in descriptor)) continue;
+        queue.push({ value: descriptor.value, path: entry.path + '.' + key, depth: entry.depth + 1 });
+      }
+    }
+    return { client: null, path: null };
+  };
+`;
+
+function installOptimisticInstrumentationExpression(): string {
+  return `(() => {
+    ${QUERY_CLIENT_DISCOVERY_SOURCE}
+    const discovery = findQueryClient();
+    const state = {
+      queryClient: discovery.client,
+      queryClientPath: discovery.path,
+      cacheEvents: [],
+    };
+    globalThis.__netscriptOptimisticRenderDiagnostics = state;
+    if (discovery.client) {
+      discovery.client.getQueryCache().subscribe((event) => {
+        const query = event?.query;
+        if (!query || !Array.isArray(query.queryKey)) return;
+        if (query.queryKey[0] !== 'users' || query.queryKey[1] !== 'list') return;
+        const data = query.state?.data;
+        state.cacheEvents.push({
+          type: event.type ?? null,
+          queryKey: query.queryKey,
+          data,
+          dataUpdatedAt: query.state?.dataUpdatedAt ?? null,
+        });
+        if (state.cacheEvents.length > 20) state.cacheEvents.shift();
+      });
+    }
+    return { queryClientFound: discovery.client !== null, queryClientPath: discovery.path };
+  })()`;
+}
+
+function optimisticDiagnosticsExpression(
+  renamedName: string | undefined,
+  interactionObserved: boolean,
+): string {
+  return `(() => {
+    ${QUERY_CLIENT_DISCOVERY_SOURCE}
+    const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim() === 'Rename');
+    const row = button?.closest('li') ?? null;
+    const state = globalThis.__netscriptOptimisticRenderDiagnostics;
+    const discovery = state?.queryClient
+      ? { client: state.queryClient, path: state.queryClientPath }
+      : findQueryClient();
+    const queries = discovery.client?.getQueryCache().getAll() ?? [];
+    const listQuery = queries.find((query) =>
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
+    );
+    const cacheEvents = state?.cacheEvents ?? [];
+    const renamedName = ${renamedName === undefined ? 'null' : JSON.stringify(renamedName)};
+    const onMutateRan = renamedName !== null && cacheEvents.some((event) => {
+      const records = event?.data?.data;
+      return Array.isArray(records) && records.some((record) => record?.name === renamedName);
+    });
+    const mutationMessage = document.querySelector('[data-mutation-state]');
+    const list = row?.closest('ul[data-state]') ?? null;
+    const freshIsland = button?.closest('fresh-island, [data-fresh-island]') ?? null;
+    const islandHydrated = discovery.client !== null;
+    const interactionObserved = ${JSON.stringify(interactionObserved)};
+    return {
+      renderedRowText: row?.querySelector('p')?.textContent?.trim() ?? null,
+      mutationState: mutationMessage?.getAttribute('data-mutation-state') ?? null,
+      renderState: list?.getAttribute('data-state') ?? null,
+      islandHydrated,
+      islandInteractive: interactionObserved,
+      hydrationEvidence: interactionObserved
+        ? 'Rename click produced a paused users.update response in CDP'
+        : islandHydrated
+        ? 'Browser QueryClient was reachable from the hydrated Preact tree, but Rename was not rendered'
+        : 'No browser QueryClient or interactive Rename control was discoverable after Page.loadEventFired',
+      freshIslandElement: freshIsland?.tagName?.toLowerCase() ?? null,
+      queryClientFound: discovery.client !== null,
+      queryClientPath: discovery.path,
+      listQueryKey: listQuery?.queryKey ?? null,
+      listCacheData: listQuery?.state?.data ?? null,
+      listDataUpdatedAt: listQuery?.state?.dataUpdatedAt ?? null,
+      cacheEvents,
+      onMutateRan,
+    };
+  })()`;
+}
+
+async function captureOptimisticRenderDiagnostics(
+  client: CdpClient,
+  renamedName: string | undefined,
+  instrumentation: BrowserInstrumentationInstall | undefined,
+  interactionObserved: boolean,
+): Promise<OptimisticRenderDiagnostics> {
+  try {
+    const diagnostics = await evaluate<OptimisticRenderDiagnostics>(
+      client,
+      optimisticDiagnosticsExpression(renamedName, interactionObserved),
+    );
+    if (diagnostics) return diagnostics;
+    throw new Error('browser diagnostics returned no value');
+  } catch (error) {
+    return {
+      renderedRowText: null,
+      mutationState: null,
+      renderState: null,
+      islandHydrated: instrumentation?.queryClientFound ?? false,
+      islandInteractive: interactionObserved,
+      hydrationEvidence: interactionObserved
+        ? 'Rename click produced a paused users.update response in CDP'
+        : 'Initial Rename row was not rendered; diagnostic snapshot capture failed',
+      freshIslandElement: null,
+      queryClientFound: instrumentation?.queryClientFound ?? false,
+      queryClientPath: instrumentation?.queryClientPath ?? null,
+      listQueryKey: null,
+      listCacheData: null,
+      listDataUpdatedAt: null,
+      cacheEvents: [],
+      onMutateRan: false,
+      captureError: errorMessage(error),
+    };
+  }
+}
+
+function diagnosticsError(
+  message: string,
+  diagnostics: OptimisticRenderDiagnostics,
+  cause: unknown,
+): Error {
+  return new Error(
+    `${message}\n${OPTIMISTIC_DIAGNOSTICS_MARKER}${JSON.stringify(diagnostics)}`,
+    { cause },
+  );
 }
 
 function rowContainsExpression(name: string): string {

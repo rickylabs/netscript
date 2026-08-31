@@ -13,11 +13,12 @@
 
 ## Current State
 
-The bounded implementation and its stale-expectation follow-up are complete. Data-bound page/island
-scaffolds accept an optional `--client <service>` selector matched against the module-declared
-service identity. The follow-up changes only two test expectations: help coverage now asserts the
-complete rendered `--client` option line, and the service capability suite expectation matches the
-shipped gate set without `generated.deno-lint`. No product file changed.
+The earlier selector work and stale-expectation follow-up are complete. The current bounded slice
+instruments the hosted browser probe at both the initial-row and optimistic-row assertions. It adds a
+timeout-only structured JSON payload for DOM state, hydration/interactivity, browser QueryClient
+state, cache events, and in-browser `onMutate` proof. No template, carrier, `packages/fresh`, or
+`packages/sdk` file has changed; the hosted result must name the measured cause before any fix is
+considered.
 
 ## Completed
 
@@ -36,14 +37,16 @@ shipped gate set without `generated.deno-lint`. No product file changed.
 
 ## In Progress
 
-- Create and push the one follow-up commit, then post the before/after counts to PR 1664.
+- Create and push the one instrumentation commit, then read the hosted `scaffold-runtime` evidence.
 
 ## Next Steps
 
-1. Confirm the remote branch still points at follow-up baseline `b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9`.
-2. Create one commit containing the two expectation files, refreshed receipts, and these two run
-   artifacts.
-3. Push through an explicit refspec and post the before/after evidence to PR 1664.
+1. Create one commit containing the browser probe and these two run artifacts.
+2. Push `HEAD:refs/heads/feat/app-service-client-wiring` explicitly.
+3. Read the hosted `e2e-cli` / `scaffold-runtime` failure payload and post the measured cause to the
+   PR.
+4. Change the two showcase island templates, optimistic helper, and regenerated carrier only if the
+   measurement identifies one of those files; otherwise stop at the Fresh/provider rescope boundary.
 
 ## Key Decisions
 
@@ -76,6 +79,13 @@ shipped gate set without `generated.deno-lint`. No product file changed.
 | `.llm/runs/feat-app-service-client-wiring--1664/{worklog.md,context-pack.md}` | modified | Follow-up evidence and handoff |
 | `.llm/runs/feat-app-service-client-wiring--1664/receipts/{check,lint,fmt-check,test}.json` | refreshed | Durable scoped and repo-wide evidence |
 
+### Hosted optimistic-render instrumentation
+
+| Path | Status | Notes |
+| --- | --- | --- |
+| `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts` | modified | Timeout-only bounded CDP/QueryCache evidence |
+| `.llm/runs/feat-app-service-client-wiring--1664/{worklog.md,context-pack.md}` | modified | Design, gates, and hosted handoff |
+
 ## Gates
 
 | Gate family            | Current status | Evidence                                    |
@@ -95,9 +105,24 @@ shipped gate set without `generated.deno-lint`. No product file changed.
 | Scoped check/lint/fmt | PASS — non-empty `stdout.bytes=303/349/298` |
 | Lock integrity | PASS — SHA-256 remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
 
+Hosted attempt 1 ran the PostgreSQL suite to 71 passed / 1 failed but timed out on the initial Rename
+row before the first instrumentation placement, so it emitted no structured marker. The one commit
+is being amended to install immediately after page load and diagnose both row assertions.
+
+### Instrumentation gate delta
+
+| Gate | Result |
+| --- | --- |
+| Focused source-contract test | PASS — 1 passed / 0 failed |
+| Full focused module test | EXPECTED SANDBOX RED — 23 passed / 2 failed; only the known executable permission cases |
+| Scoped check/lint/fmt | PASS — non-empty `stdout.bytes=303/349/298` |
+| Quality/architecture | PASS — `quality:gate` exited 0 |
+| Lock integrity | PASS — SHA-256 remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+
 ## Open Questions
 
-None. Any need to touch a file outside the coordinator-approved ceiling is a rescope stop.
+The hosted payload must decide the cause. Any result pointing at Fresh island hydration or the query
+provider is a rescope stop; inferred causes are not accepted.
 
 ## Drift and Debt
 

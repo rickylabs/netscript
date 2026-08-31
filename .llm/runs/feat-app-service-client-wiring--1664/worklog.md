@@ -179,3 +179,69 @@ coverage cannot produce a false green; it does not alter repository configuratio
   label, acceptance-box, evaluator, readiness, or merge action.
 - Commit trail: the single follow-up commit is the branch head containing this entry; its explicit
   refspec push and before/after PR comment complete the handoff.
+
+## Hosted optimistic-render instrumentation
+
+### Scope and design
+
+- Current-head baseline: `7712e6a06e5394f0aeb748b1b3ecfdf7aeff57d0`; the remote branch matched
+  it before this slice began. No rebase or merge was performed.
+- Archetype 6 plus the frontend overlay remains the selected profile. This diagnostic slice changes
+  only `service-client-browser-probe.ts`; generated islands, helpers, `packages/fresh`, and
+  `packages/sdk` remain byte-identical.
+- `PLAN-EVAL: N/A` — the coordinator supplied the exact failing assertion, the required evidence
+  fields, a strict file ceiling, and a stop/rescope rule. The owner explicitly waived evaluator
+  work.
+- The probe installs a bounded browser-side QueryCache subscription immediately after
+  `Page.loadEventFired`, before either the initial-row assertion or Rename. It retains at most 20
+  matching `users/list` events and does not patch cache methods.
+- The existing 20-second optimistic assertion, paused update response, request count, and settled
+  checks are unchanged. On optimistic timeout only, the thrown error includes the
+  `__NETSCRIPT_OPTIMISTIC_RENDER_DIAGNOSTICS__` JSON marker.
+
+### Structured timeout contract
+
+The timeout object records:
+
+- `renderedRowText`, `mutationState`, and `renderState` from the live DOM;
+- `islandHydrated` from browser QueryClient discovery and `islandInteractive`, backed by the
+  already-observed paused `users.update` response after the CDP Rename click, plus the Fresh island
+  host tag when discoverable;
+- `listQueryKey`, `listCacheData`, and `listDataUpdatedAt` from the browser QueryClient;
+- bounded `cacheEvents` and `onMutateRan`, where the latter requires an event containing the exact
+  optimistic renamed value while the network response is still paused;
+- `captureError` plus the instrumentation-install discovery result if the diagnostic snapshot itself
+  cannot be serialized.
+
+### Validation before hosted execution
+
+| Gate | Result |
+| --- | --- |
+| Focused source-contract test | PASS — 1 passed / 0 failed |
+| Full focused module test | EXPECTED SANDBOX RED — 23 passed / 2 failed; only the two previously measured `/ephemeral/tmp` executable-spawn permission cases |
+| Scoped check (`packages/cli`) | PASS — 918 files, 8 batches, 0 diagnostics; `stdout.bytes=303` |
+| Scoped lint (owned probe) | PASS — 1 selected / 1 processed, 0 findings; `stdout.bytes=349` |
+| Scoped fmt (owned probe) | PASS — 1 selected / 1 processed, 0 findings; `stdout.bytes=298` |
+| `quality:gate` | PASS — quality scan and architecture check exited 0 |
+| Diff hygiene | PASS — `git diff --check` exited 0 |
+| Lock integrity | PASS — SHA-256 remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+
+### Review and next measurement
+
+- Substantive review confirmed the diagnostic subscription is installed before the Rename click,
+  keeps the response paused on failure, cannot turn a missing optimistic row into a pass, and emits
+  the evidence through the command's captured thrown error rather than a live-only console stream.
+- The next action is the single explicit-refspec push. The hosted `e2e-cli` / `scaffold-runtime`
+  result is the authority for the measured cause and for deciding whether a template/helper fix is
+  in scope or the run stops at the Fresh/provider rescope boundary.
+
+### Hosted attempt 1 placement finding
+
+- Workflow `e2e-cli` run `33407916040`, PostgreSQL job `99543222179`, executed the one-pass suite and
+  reported 71 passed / 1 failed.
+- The sole failure occurred before the optimistic assertion: the initial Rename row expression
+  timed out after page load. Because the first instrumentation placement followed that assertion,
+  this attempt emitted no structured marker and cannot name the cause.
+- The bounded correction moves installation before that assertion and gives both initial-row and
+  optimistic-row timeouts the same structured payload. The single commit is amended rather than
+  adding a second commit.
