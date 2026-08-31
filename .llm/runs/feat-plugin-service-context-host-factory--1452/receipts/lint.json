@@ -1,38 +1,38 @@
 {
   "gateId": "lint",
-  "invocationId": "1452-seam-lint",
+  "invocationId": "1452-c5-lint",
   "argv": [
     "deno",
     "task",
     "lint",
     "--include",
-    "^packages/(kv|cli)/"
+    "^packages/(plugin|cli)/"
   ],
-  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1452",
-  "gitHead": "8ab11ddeefa75cd0993c1d2cfa52c21ac2463a9c",
-  "actualGitHead": "8ab11ddeefa75cd0993c1d2cfa52c21ac2463a9c",
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1452-s2",
+  "gitHead": "0dac1b759cbadef3981df28858b6bf9ae455f4d1",
+  "actualGitHead": "0dac1b759cbadef3981df28858b6bf9ae455f4d1",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1632237",
+  "runnerIdentity": "worker:2906538",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "6f75839da9ae1e887807f6eb1deb28e1683ba62709e47e49b22311f81fd91a07",
-  "lifecycleId": "worker:1632237:1452-seam-lint:1",
+  "requestHash": "1c4dc426f4f462d2bf14921a7715ccae5e6c043d6d221d17b94d078f485e6bda",
+  "lifecycleId": "worker:2906538:1452-c5-lint:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T04:42:33.996Z",
-  "startedAt": "2026-08-31T04:42:33.998Z",
-  "finishedAt": "2026-08-31T04:42:34.528Z",
-  "durationMs": 530,
+  "claimedAt": "2026-08-31T18:48:07.510Z",
+  "startedAt": "2026-08-31T18:48:07.512Z",
+  "finishedAt": "2026-08-31T18:48:08.067Z",
+  "durationMs": 555,
   "exitCode": 0,
   "stdout": {
-    "bytes": 352,
-    "sha256": "1fc374bf463ec58ae110b73bcc75da47d7dbee9b81b0b394ffafb6a9704d015e",
-    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452\",\"exitCode\":0},\"selection\":{\"filesSelected\":31,\"batches\":1,\"failedBatches\":0},\"coverage\":{\"filesSelected\":31,\"filesProcessed\":31,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "bytes": 358,
+    "sha256": "e306ff7dc19385851e72e8fac381f5f80126944957f5f104dc15c52dc055de19",
+    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\",\"exitCode\":0},\"selection\":{\"filesSelected\":155,\"batches\":1,\"failedBatches\":0},\"coverage\":{\"filesSelected\":155,\"filesProcessed\":155,\"droppedFiles\":[],\"refusals\":[]},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {
-    "bytes": 265,
-    "sha256": "4de970cb3c62fa4df771c963ff5739a141337d4e86471d5fde90db3a1e954af7",
-    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mlint\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(kv|cli)/'\n",
+    "bytes": 269,
+    "sha256": "d0e7e0f6deb7a7a8e41f4bff447b53d507fdc6a514cbdfdda1e30983d95f0417",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mlint\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(plugin|cli)/'\n",
     "truncated": false
   }
 }
