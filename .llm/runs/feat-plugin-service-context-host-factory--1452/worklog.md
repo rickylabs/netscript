@@ -94,8 +94,28 @@ change.
 
 ## Gate Results
 
-All gates are `NOT_RUN` until implementation lands. Durable/static evidence will be recorded here,
-including non-empty stdout checks for cacheable check/lint/fmt receipts.
+**Corrected 2026-08-31.** This section previously read "All gates are `NOT_RUN` until implementation
+lands." That statement was left behind by the bootstrap and became false the moment Slice 1 landed —
+recording the correction rather than silently overwriting it, because a stale `NOT_RUN` claim in a
+committed harness artifact is exactly the false-done state the evaluator protocol exists to catch.
+
+Actual results at integrated head `186cea472` / evidence head `3130fb52b`, receipts committed under
+`receipts/`:
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| scoped `check` (`^packages/(kv\|cli)/`) | PASS | 303-byte stdout, 31,193 ms |
+| scoped `lint` | PASS | 352-byte stdout |
+| scoped `fmt-check` | PASS | 301-byte stdout |
+| `packages/kv` tests | PASS | 80 passed / 3 ignored / 0 failed, 288-byte stdout |
+| `check:assets-barrel` | PASS | exit 0; zero-byte stdout is correct for `gen && git diff --exit-code`, proven clean by an empty worktree afterwards |
+| `docs:exports-drift` | PASS | — |
+| `check:mcp-export-corpus` | PASS | 7678 symbols, +1 vs `main` = `createLazyKv` exactly |
+| `deno.lock` | unchanged | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+| IMPL-EVAL | PASS | separate session, comment `5473634548` |
+| `scaffold.runtime` | **PENDING (CI)** | required for the template/generated-output change; opted in via `e2e-cli-gate` because local Aspire is topology-parked |
+
+Every check/lint/fmt receipt was verified for non-empty `stdout.bytes` before being trusted.
 
 ## Handoff Notes
 
