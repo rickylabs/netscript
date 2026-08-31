@@ -6461,3 +6461,21 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   or missing leaf, particularly whether a GitHub-source error or empty response **fails open** —
   which would reproduce the original defect in a new form.
 - Dispatched and confirmed genuinely running (real session-init events, no guard denial).
+
+## D-141 — P0 #1827 dispatched immediately; #1802 parked at de24161b6 with an OPEN finding
+
+- **#1802 parked mid-diagnosis, not mid-write** — its exact checkpoint is `de24161b6` (pushed,
+  local == remote). **It is parked with a genuine unresolved finding, which must not be lost**: the
+  root suite at that head is `REAL_EXIT=1`, **4,463 passed / 1 failed / 19 ignored**. The single
+  failure appeared only after merging current main (which carries #1792's routing work into the same
+  `.llm/tools/agentic/` tree). It is NOT yet identified — I was interrupted mid-diagnosis. Its
+  scoped gates are all green (agentic suite 531/531, check 0, fmt 0, `arch:check` 0, `deno.lock`
+  unchanged), so the failure is somewhere outside the scoped surface. **#1802 is not a merge
+  candidate until this is identified and resolved.**
+- Also corrected for the record: my D-135 claim that main "does not touch `.llm/tools/agentic/`"
+  was true of that older main but is **false of `584caa03f`**, which touches 39 files in that tree.
+  The merge auto-resolved and all six test ceilings survived, but the assumption was stale and the
+  post-merge failure is exactly the kind of thing it would have hidden.
+- **P0 #1827 dispatched immediately, before resuming anything else**, as directed.
+- **Two active author sessions, not three** — #1753's author is idle (its work is complete and under
+  IMPL-EVAL), so #1827 takes a genuinely free slot rather than exceeding the cap.
