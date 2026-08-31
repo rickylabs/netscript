@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "6c195acaf3f7e650c4235fc3fbc51232e210e7a4",
+  "currentMainSha": "8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -5300,6 +5300,31 @@
       ]
     },
     {
+      "id": "checkpoint-sdk-runtime-canary-5",
+      "rationale": "Meaningful user-facing checkpoint after the typed SDK client-contribution seam/runtime and the accumulated feature/fix payload landed; complete before admitting the Aspire 13.5 merge train reserved for canary 6.",
+      "state": "complete",
+      "contentSha": "8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d",
+      "version": "0.0.7-canary.5",
+      "tag": "v0.0.7-canary.5",
+      "releaseCommitSha": "8789fb3798e2fc82cff8700deebd6f0ec8fa61b4",
+      "publicationWorkflowRunId": 33424354418,
+      "productionE2eWorkflowRunId": 33424988471,
+      "payload": "typed SDK client-contribution seam/runtime; typed service principal and procedure policy; Fresh chat completion; OpenAI Responses option mapping; nested usage detail; Aspire key normalization; lazy KV publication; saga receipt/span discipline; persisted worker progress; supporting CLI/harness/reference corrections",
+      "startedAt": "2026-08-31T18:19:17.000Z",
+      "completedAt": "2026-08-31T18:41:10.000Z",
+      "receiptRefs": [
+        "https://github.com/rickylabs/netscript/actions/runs/33424354418",
+        "https://github.com/rickylabs/netscript/actions/runs/33424988471",
+        "https://github.com/rickylabs/netscript/releases/tag/v0.0.7-canary.5"
+      ],
+      "localEvidence": [
+        "OIDC publication PASS",
+        "published-JSR CLI scaffold runtime E2E PASS",
+        "published-JSR CLI quickstart seven-verdict walk PASS",
+        "ephemeral canary branch deleted and release/canary-pair green"
+      ]
+    },
+    {
       "id": "checkpoint-runtime-integration",
       "rationale": "Publish when Aspire/saga or ratified Aspire 13.5 work changes generated AppHosts, endpoint discovery, MCP, runtime gates, or telemetry.",
       "state": "planned"
@@ -5311,7 +5336,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "96d44758d8f9405f759771284e0f300a6b176156",
+    "gitHead": "8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -5352,7 +5377,7 @@
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-31T04:00:00.000Z"
+    "verifiedAt": "2026-08-31T18:41:10.000Z"
   },
-  "updatedAt": "2026-08-31T04:17:37.000Z"
+  "updatedAt": "2026-08-31T18:41:10.000Z"
 }

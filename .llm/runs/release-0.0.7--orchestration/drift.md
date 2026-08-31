@@ -1709,3 +1709,16 @@ implementation thread.
   path intersection with newer main but its runtime consumes #1762's service/auth product changes;
   #1816 had four derived-carrier overlaps including a binary artifact. Both require exact-main
   convergence and regenerated evidence rather than either a stale merge or an indefinite wait.
+
+## 2026-08-31 — evaluator transport latency is not a product verdict
+
+- #1841's first hosted evaluator was cancelled without a verdict and its replacement remained in
+  the model step beyond the bounded 45-minute recovery window. Neither outcome was evidence against
+  the implementation. After preserving the immutable head and exact hosted gates, the coordinator
+  used a fresh detached worktree and sanctioned OpenRouter GLM route to obtain an independent PASS.
+- A stalled evaluator must be released at its declared recovery boundary, while a separate-session
+  fallback reruns the evidence it needs and records a structured verdict. Do not keep a complete,
+  exact-green user feature or the release train parked behind a no-verdict transport indefinitely.
+- A canary tag is not a completed canary. Completion requires registry upload, exact-version install,
+  published-CLI scaffold runtime, the seven-verdict quickstart walk, ephemeral-branch cleanup, and a
+  green `release/canary-pair` status on the exact source SHA.

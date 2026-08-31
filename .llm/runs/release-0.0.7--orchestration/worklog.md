@@ -3473,3 +3473,28 @@
   timeout is now `priority:p2`/`status:research`, does not block Aspire or canary 6, and receives two
   trustworthy Postgres observations after #1839 repairs runtime admission; two passes close it as
   non-reproduced, while a recurrence with DCP logs dispatches the bounded readiness repair.
+
+## 2026-08-31T18:41:10Z — #1841 ships and canary 5 records a green publish/E2E pair
+
+- Features Slice 3 was recovered from an out-of-brief local `scaffold.runtime` wait without losing
+  its clean committed product head. The owned DinD containers were returned to zero, immutable head
+  `018a6cc37c1c1ddea81fb3f8dd9eec2e562fd7a7` passed core CI and all four hosted E2E lanes, and a
+  fresh separate-session OpenRouter GLM evaluation returned `PASS` after independently rerunning the
+  SDK, repository, packed-consumer, documentation, architecture, and publish-dry-run gates.
+- The coordinator squash-merged PR #1841 as
+  `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`. #1349 remains open deliberately for its remaining
+  accepted slices; #1841 is normalized to `status:shipped` and its topic branch was removed.
+- Canary 5 published from exact content SHA `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`.
+  Publication run `33424354418` and exact-version production E2E run `33424988471` both passed;
+  the latter executed the full published-JSR scaffold runtime and seven-verdict quickstart walk.
+  GitHub release `v0.0.7-canary.5` is an immutable prerelease and `release/canary-pair` is green.
+- The canary-5 payload is materially user-facing: typed SDK client-contribution seam and runtime,
+  typed service principal/procedure policy, awaited Fresh chat completion, OpenAI Responses option
+  mapping, nested usage-detail preservation, SDK/Aspire key normalization, lazy KV publication,
+  non-discardable saga receipts/cascade spans, and persisted worker progress, plus supporting CLI,
+  harness, and agent-reference corrections.
+- The canary-5 gate is closed. Aspire may now advance its dependency-ordered merge admission toward
+  the owner-reserved canary 6. All five supervisors received fresh executable dispatches: Features
+  resumed #1452/#1590/#1592/#1451/#1664, Fixes continues #1773/#1093/#1609/#1845, Internals adopted
+  #1802, Docs serializes #1816 then #1818, and Aspire runs S8 repair plus a genuine S7 runtime proof.
+  No topic supervisor is parked on an owner-only decision.

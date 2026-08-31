@@ -2223,3 +2223,19 @@ continues concurrently because serial ordering is per orchestrator, not global.
   non-blocking p2 research observation: its attempted exact-main control was cancelled by #1839 and
   proves nothing, while #1744 supplies a green counter-observation. Recheck twice after #1839; do
   not hold Aspire or canary 6 and do not ask the owner for this routine disposition.
+
+## Resume delta — 2026-08-31T18:41:10Z
+
+- Current main is `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d` after Features PR #1841 shipped
+  from immutable head `018a6cc37c1c1ddea81fb3f8dd9eec2e562fd7a7`. Exact core CI, all four hosted
+  E2E lanes, complete acceptance, zero threads, and a fresh separate-session OpenRouter GLM
+  `PASS` were verified before the coordinator merge.
+- `v0.0.7-canary.5` is published and fully green. Publication run `33424354418` and pinned
+  production E2E run `33424988471` passed at the exact source SHA; `release/canary-pair` is green.
+  The public canary-5 coherence gate is complete, so Aspire's post-canary-5 merge admission is open.
+- All five topic supervisors remain active with explicit work. Features resumed #1452/#1590 and the
+  #1592/#1451 cluster; Fixes reconverged #1773 and continues #1093/#1609/#1845; Internals adopted
+  the bounded #1802 repair; Docs converges #1816 then #1818; Aspire is repairing S8 and forcing a
+  real S7 runtime run before dependency-ordered canary-6 merges. There is no owner-only wait.
+- Local host runtime inventories were re-proved after the release: `aspire ps` is empty and DinD has
+  zero containers. The production proof ran in hosted Actions and did not consume the host lease.
