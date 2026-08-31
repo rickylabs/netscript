@@ -2019,3 +2019,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   the harness-only push, prove product identity, and require fresh core CI. #1819 has the analogous
   one-carrier current-main convergence and then waits behind #1820 to avoid repeating the expensive
   feature runtime gate.
+
+## Resume delta — 2026-08-31T05:06:06Z
+
+- Current main is `26e1b486f95aec121d71f2f4cd0411dc6069af04` after exact-green Features PR
+  #1820 shipped from immutable head `8a37c4ebbef8e85c960a4a106e22eb2c3880b9f2`. Fresh core run
+  `33358754843` and carried hosted runtime run `33358058235` passed; review threads and accidental
+  closing references are zero. #1452 remains open as the honest partial-slice parent.
+- Immediate ordered convergence is #1819/#1823/#1803 on the complete #1820 carrier, with #1814
+  taking the same current main before its fresh GLM evaluation. #1828's bounded
+  `ReturnType<typeof setTimeout>` repair is independently whole-graph green locally and still needs
+  push, exact-current-main CI, and a separate GLM delta verdict.
+- Aspire S9/S10/S11, #1824, Features #1349, Fixes #1677/#1773/#1609, and Docs #1811/#1813 remain
+  active in parallel. No lane waits for another topic's evaluator or CI; only shared-carrier merges
+  and the host runtime lease are serialized.

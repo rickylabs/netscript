@@ -1677,3 +1677,14 @@ implementation thread.
 - Owner-authorized intra-topic parallelism is now an explicit standing rule for cross-concern leaves.
   It does not relax collision audits, shared-carrier ordering, immutable merge gates, or the global
   runtime mutex.
+
+## 2026-08-31 — negative closing language is executable GitHub metadata
+
+- A sentence such as "must not close #1452" still contains a GitHub closing keyword and can populate
+  `closingIssuesReferences`, despite expressing the opposite human intent. Partial-slice PR bodies
+  must use non-closing language such as "merging leaves #1452 open" and the coordinator must verify
+  the GraphQL closing-reference set is empty before merge.
+- Workflow success is also not evidence that the substantive job ran. #1820's desktop-native job
+  concluded success while all product steps were skipped by policy; it was removed from the runtime
+  evidence list. Evidence summaries must distinguish terminal workflow success from executed gate
+  success.

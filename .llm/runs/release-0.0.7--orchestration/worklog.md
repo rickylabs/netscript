@@ -3204,6 +3204,28 @@
   of the 53 currently open milestone issues has an `orchestrator:*` owner; supervisors were steered
   to refill implementation slots rather than serialize behind CI or evaluator waits.
 
+## 2026-08-31T05:06:06Z — #1820 user-facing KV primitive ships; convergence fan-out begins
+
+- Features PR #1820 passed its final independent audit at immutable head
+  `8a37c4ebbef8e85c960a4a106e22eb2c3880b9f2`. Synthetic merge
+  `1d6e84380773e43d9ed5ad8db87ec69a967971a6` had exact parents current main
+  `0e93a6c0574eb557b1322a4298cee3f7adbeafa2` and the immutable head; review threads and
+  `closingIssuesReferences` were both empty. Fresh core run `33358754843` passed check-test,
+  quality, close-gate, and visibility. Hosted run `33358058235` supplied the required PostgreSQL,
+  SQLite/Garnet, and scaffold-static receipts at product head `b87fd92f`; all ten carried blobs were
+  byte-identical through the evidence-only final head.
+- The coordinator squash-merged #1820 as
+  `26e1b486f95aec121d71f2f4cd0411dc6069af04` and normalized the PR to `status:shipped`.
+  Issue #1452 intentionally remains open because the accepted slice publishes only `createLazyKv`
+  and defers the architectural host-factory surface.
+- All five supervisors received the new main immediately. Features converges #1814 once; Fixes
+  converges #1819 once with title/body truth repair; Internals converges #1823 while #1828's P0
+  repair continues independently; Docs converges #1803; Aspire continues S9/S10/S11 and #1824.
+  Shared generated carriers remain ordered, but implementation, audit, and evaluation leaves stay
+  parallel under the owner-authorized cross-concern rule.
+- Fresh inventory found 52 open milestone issues and zero missing `orchestrator:*` labels. Host
+  runtime preflight remains exact zero: Aspire `[]`, containers 0, volumes 0, custom networks 0.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance
