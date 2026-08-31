@@ -78,6 +78,7 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 | ---- | ----- | ---- | ----- |
 | 2026-08-31T08:40:28Z | 0 | bootstrap | Baseline and issue/PR state re-verified; doctrine, harness, PR, tools, and Deno inspection guidance loaded. |
 | 2026-08-31T08:40:28Z | plan | PLAN-EVAL | `N/A` — issue #1836 supplies a complete mechanical contract, exact reference treatment, affected sites, hostile matrix, and gates; no architecture or sequencing decision remains open. |
+| 2026-08-31T08:51:00Z | 1 | RED | Focused structured test wrapper exited 1: 0 passed, 4 failed; every real generated module failed Deno parsing. |
 
 ## Decisions
 
@@ -101,6 +102,7 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
 | Baseline Git state | raw `git status`, `rev-parse`, and `ls-remote` | PASS | Clean branch at live `origin/main` SHA `71d5fb8e0`. |
+| RED hostile generator contract | `run-deno-test.ts -- --allow-all generate-register-source-safety_test.ts` | FAIL (expected) | Exit 1; 0 passed / 4 failed. Apps/plugins/infrastructure rejected raw hostile literals; tools rejected `let class = ...`. |
 
 ### Fitness Gates
 
@@ -119,10 +121,9 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| Generated AppHost modules | NOT_RUN | Awaiting test slice | Will be parse-checked in-process without runtime. |
+| Generated AppHost modules | RED | Deno lint parse of four temp `.mts` files | All four invalid before production repair, as required. |
 
 ## Handoff Notes
 
 - Evaluator should inspect the focused hostile-input matrix and rerun both mutation classes before
   accepting gate evidence.
-

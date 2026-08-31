@@ -6,16 +6,17 @@
 | ----- | ----- |
 | Run ID | `fix-aspire-sibling-generator-name-safety--issue-1836` |
 | Branch | `fix/aspire-sibling-generator-name-safety` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The branch is clean at live `main` `71d5fb8e0`. Research confirms the four issue-named generators
-retain unsafe name-derived bindings and raw user-string interpolation. The mechanical plan mirrors
-draft PR #1747's current background-generator repair. PLAN-EVAL is recorded N/A; tests must land RED
-before production edits.
+The draft PR is open from the bootstrap commit. The tests-only slice renders every generator with
+reserved words, both normalization-collision pairs, and a quote/backslash/backtick/`${}`/newline
+payload across its emitted string fields. The structured test wrapper produced the required RED:
+exit 1, 0 passed, 4 failed, with Deno parser errors in all four emitted modules. Production files
+remain unchanged.
 
 ## Completed
 
@@ -26,16 +27,19 @@ before production edits.
   PR for this branch.
 - Audited the four generators' user-string fields and the #1747 ordinal/escaping precedent.
 - Locked the contract, hostile matrix, slice order, and validation plan.
+- Opened draft PR #1837 with the requested labels, milestone `0.0.7`, and `Closes #1836` in Scope.
+- Added the focused hostile-input parse contract and captured semantic RED evidence for all four
+  generators.
 
 ## In Progress
 
-- Bootstrap commit, push, and draft PR creation.
+- Commit and push the tests-only RED slice before production edits.
 
 ## Next Steps
 
-1. Commit and push the run bootstrap; open and label the draft PR with milestone `0.0.7`.
-2. Add the parse-checking hostile-input tests and record their RED output.
-3. Repair the four generators, prove mutations, and run all requested gates.
+1. Commit/push/comment the RED slice.
+2. Repair the four generators using ordinal bindings and JSON literals.
+3. Prove mutations and run all requested gates.
 
 ## Key Decisions
 
@@ -50,15 +54,16 @@ before production edits.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-aspire-sibling-generator-name-safety--issue-1836/` | new | Harness bootstrap artifacts. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts` | new | Four hostile-input Deno parse contracts. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | baseline PASS | Clean raw Git status and remote SHA check. |
+| Static | RED captured | Focused wrapper exit 1; 0 passed / 4 parser failures. |
 | Fitness | planned | AP-18 strategy locked; quality and architecture gates pending. |
 | Runtime | N/A | Explicitly forbidden. |
-| Consumer | pending | Hostile generated-source parse tests are next. |
+| Consumer | RED | Every emitted module failed Deno parsing before repair. |
 
 ## Open Questions
 
@@ -72,5 +77,4 @@ before production edits.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after bootstrap.
-
+- `e9439de34` — harness bootstrap and locked plan.
