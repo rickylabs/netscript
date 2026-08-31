@@ -143,8 +143,8 @@
     "npm:@tanstack/ai-anthropic@~0.18.3": "0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai-mcp@~0.3.8": "0.3.8_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai-openai@~0.22.3": "0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-preact@~0.10.1": "0.10.1_@tanstack+ai@0.39.0__@opentelemetry+api@1.9.1_preact@10.29.2_@opentelemetry+api@1.9.1",
-    "npm:@tanstack/ai@0.39": "0.39.0_@opentelemetry+api@1.9.1",
+    "npm:@tanstack/ai-preact@0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2",
+    "npm:@tanstack/ai-preact@~0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2",
     "npm:@tanstack/ai@0.52": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/ai@0.52.0": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/db@~0.6.8": "0.6.17_typescript@7.0.2",
@@ -607,12 +607,6 @@
     }
   },
   "npm": {
-    "@ag-ui/core@0.0.52": {
-      "integrity": "sha512-Xo0bUaNV56EqylzcrAuhUkQX7et7+SZIrqZZtEByGwEq/I1EHny6ZMkWHLkKR7UNi0FJZwJyhKYmKJS3B2SEgA==",
-      "dependencies": [
-        "zod@3.25.76"
-      ]
-    },
     "@ag-ui/core@0.1.1-canary.beta.0_zod@4.4.3": {
       "integrity": "sha512-zcP3RH5p3HJTZ0kyQxNOL1blnVFTDpaShitR7UMS/thwFdl48V6CAG+WQBcYEu/dfa8mKonRez88N0Ok+nEI+w==",
       "dependencies": [
@@ -2007,16 +2001,16 @@
       "integrity": "sha512-j9w/duqgvSkszp9s9i7Qgf4TqKMDMK4QC8wgtNnJlSqL980M7zk+p6S+GSaWBPeqcA+dZk0BQGM3zdnDNEWUWg==",
       "dependencies": [
         "@anthropic-ai/sdk",
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.0"
+        "@tanstack/ai",
+        "@tanstack/ai-utils"
       ]
     },
-    "@tanstack/ai-client@0.19.1_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-fIIezPYDDzW8BAuvvu9Jbwww3UAwEmyv9WRlrfVKRcIln33iOMRl+jU01+djTKMbP1yQOqVhoIu4VDJJKvgiuQ==",
+    "@tanstack/ai-client@0.29.2": {
+      "integrity": "sha512-SciysncXh5R5MHQ1GoF3kHfaygRFljUO1yVRvH97elR5l7Xjx9VYVB0KLnW7g11SIwxUrpODlLynlxEJSL2USg==",
       "dependencies": [
-        "@tanstack/ai@0.39.0_@opentelemetry+api@1.9.1",
-        "@tanstack/ai-event-client@0.6.8",
-        "@tanstack/ai-utils@0.3.1"
+        "@tanstack/ai",
+        "@tanstack/ai-event-client",
+        "@tanstack/ai-utils"
       ]
     },
     "@tanstack/ai-event-client@0.11.2": {
@@ -2025,65 +2019,42 @@
         "@tanstack/devtools-event-client"
       ]
     },
-    "@tanstack/ai-event-client@0.6.8": {
-      "integrity": "sha512-h7/HLz9u2LF9ba6uKFMnSZkFlkzQONJ5u3Hi+4qGxpsHyvcGRtW6v186jaFLoklndhEwyC49ytkC4eafi7Qq8w==",
-      "dependencies": [
-        "@tanstack/devtools-event-client"
-      ]
-    },
     "@tanstack/ai-mcp@0.3.8_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-bqAJZ6Q3uWCedz/NNe24PZLJ7eerWbb2Q9YYe3yCVs1OYxr9jNg7z9N1bWiquCAkjTe0jI0baBDVBXSjUpBCGA==",
       "dependencies": [
         "@modelcontextprotocol/sdk",
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3"
+        "@tanstack/ai"
       ],
       "bin": true
     },
     "@tanstack/ai-openai@0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-h/pIG+O1JZdrXq2AmCLLyf4Kr3VF8K8Hycj4yN23JIwJ+6HTp8LoAG9w8CRcL8wTGhWpuzDbMgdBExRNg9ZORQ==",
       "dependencies": [
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.0",
+        "@tanstack/ai",
+        "@tanstack/ai-utils",
         "@tanstack/openai-base",
         "openai"
       ]
     },
-    "@tanstack/ai-preact@0.10.1_@tanstack+ai@0.39.0__@opentelemetry+api@1.9.1_preact@10.29.2_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-PRVz8k9O3lYpsSg8jg9dpB4yoxPmCQdcoDFO5EZPWFbz6k52tSMs9TlXAN7pxut5IQqdk5nkcGYp0FHOdQ0jbA==",
+    "@tanstack/ai-preact@0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2": {
+      "integrity": "sha512-odY4lGCqOwwJez3aE9hDmHenP+ZR93ripnLxsGlp4zs7b0xkK3M/RSE02C1rgoK523LMf1eG4xusk0W4SpXyiA==",
       "dependencies": [
-        "@tanstack/ai@0.39.0_@opentelemetry+api@1.9.1",
+        "@tanstack/ai",
         "@tanstack/ai-client",
         "preact"
       ]
     },
-    "@tanstack/ai-utils@0.3.1": {
-      "integrity": "sha512-fgbjd5DohL3k5rTWr/KInauLVYMiHVm0cnmTsNrzL3cr4wWhEld5vmFSrjiwUWACAuONjZa+uBXuS+ZSO8fwDQ=="
-    },
     "@tanstack/ai-utils@0.4.0": {
       "integrity": "sha512-xqvAgPJkIuGk1m+jZKyb7vBTQIaBmUD9EVzlPkDWWMp80n69uwL0TnBZCVk+OwL9goTQiFy648dnBfLsiJgl6A=="
-    },
-    "@tanstack/ai@0.39.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-UxqvTMwhGeUCafX/4nzFJfi1iT8uNJ4rqtB482Fc3knbmuKBO+C8d0CRxHqnPjZqc9r+lCmrv/AwqpeKfZMkaQ==",
-      "dependencies": [
-        "@ag-ui/core@0.0.52",
-        "@opentelemetry/api",
-        "@standard-schema/spec",
-        "@tanstack/ai-event-client@0.6.8",
-        "@tanstack/ai-utils@0.3.1",
-        "partial-json"
-      ],
-      "optionalPeers": [
-        "@opentelemetry/api"
-      ]
     },
     "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-a2a+A+QguzZ3b8D7dqaA94A+CT42WUgxGYfscLrKJ+e2gHuEI8VNFGLq17KFuJI60A481bGpoGZ17fKpJF7q1A==",
       "dependencies": [
-        "@ag-ui/core@0.1.1-canary.beta.0_zod@4.4.3",
+        "@ag-ui/core",
         "@opentelemetry/api",
         "@standard-schema/spec",
-        "@tanstack/ai-event-client@0.11.2",
-        "@tanstack/ai-utils@0.4.0",
+        "@tanstack/ai-event-client",
+        "@tanstack/ai-utils",
         "partial-json"
       ],
       "optionalPeers": [
@@ -2114,8 +2085,8 @@
     "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-fNEKKuve6IJmAEzaGwRNwa8ypXSvjgbyezUZG0VRs8HUXfrdfSwoCVDpDeIEVIfP+a3UiiMUTa7uNyKUkgkVzw==",
       "dependencies": [
-        "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-        "@tanstack/ai-utils@0.4.0",
+        "@tanstack/ai",
+        "@tanstack/ai-utils",
         "openai"
       ]
     },
@@ -4268,8 +4239,8 @@
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
           "npm:@orpc/server@^1.14.6",
           "npm:@preact/signals@2.9.2",
-          "npm:@tanstack/ai-preact@~0.10.1",
-          "npm:@tanstack/ai@0.39",
+          "npm:@tanstack/ai-preact@~0.14.4",
+          "npm:@tanstack/ai@0.52",
           "npm:@tanstack/preact-query@^5.101.0",
           "npm:@tanstack/query-core@^5.101.0",
           "npm:@tanstack/react-db@~0.1.95",

@@ -45,7 +45,15 @@ export type SagaPublisherResult<TMessageType extends string = string> =
   | SagaPublisherReceipt<TMessageType>
   | SagaPublisherRejected<TMessageType>;
 
-/** Explicit publisher boundary implemented by plugin-layer HTTP clients. */
+/**
+ * Non-throwing publisher boundary implemented by plugin-layer HTTP clients.
+ *
+ * Callers must discriminate every returned receipt before continuing. Use
+ * `publishSagaOrThrow(...)` when a rejected single-message receipt should
+ * cross the caller's boundary as a structured `SagasError`; repository
+ * quality policy rejects bare unused `publish(...)` and `publishMany(...)`
+ * results from known saga publishers.
+ */
 export interface SagaPublisherPort<TMessage extends SagaMessage = SagaMessage> {
   /** Stable publisher identifier used in diagnostics. */
   readonly id: string;

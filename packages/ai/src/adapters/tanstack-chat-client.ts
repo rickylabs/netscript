@@ -26,6 +26,7 @@ import { chat, EventType, fromSpecTokenUsage } from '@tanstack/ai';
 import type {
   AnyTextAdapter,
   AnyTool,
+  ChatMiddleware,
   ContentPart as TanstackContentPart,
   JSONSchema as TanstackJsonSchema,
   ModelMessage,
@@ -166,6 +167,22 @@ export function toTanstackChatClient(
 
       // Accumulate streamed tool-call fragments keyed by call id.
       const pending = new Map<string, { name: string; args: string }>();
+      const rawUsageByRunId = new Map<string, TanstackTokenUsage>();
+      const preserveUsageIdentity: ChatMiddleware<Readonly<Record<string, unknown>>> = {
+        name: 'netscript-preserve-usage-identity',
+        onChunk(_context, chunk) {
+          // TanStack 0.52 normalizes canonical usage through AG-UI and rebuilds
+          // it before yielding; retain the adapter's original owned-compatible
+          // object at the last raw-chunk seam.
+          if (
+            chunk.type === EventType.RUN_FINISHED &&
+            chunk.usage !== undefined &&
+            !Array.isArray(chunk.usage)
+          ) {
+            rawUsageByRunId.set(chunk.runId, chunk.usage);
+          }
+        },
+      };
 
       try {
         const resolvedAdapter = typeof adapter === 'function'
@@ -192,12 +209,13 @@ export function toTanstackChatClient(
           // contract by supplying an empty, provider-invisible context.
           context: request.context ?? {},
           metadata: request.context,
+          middleware: [preserveUsageIdentity],
         });
         for await (const chunk of streamed) {
           if (external?.aborted) {
             return;
           }
-          const event = translateChunk(chunk, pending);
+          const event = translateChunk(chunk, pending, rawUsageByRunId);
           if (event) {
             yield event;
           }
@@ -218,6 +236,7 @@ export function toTanstackChatClient(
 function translateChunk(
   chunk: StreamChunk,
   pending: Map<string, { name: string; args: string }>,
+  rawUsageByRunId: Map<string, TanstackTokenUsage>,
 ): ChatClientEvent | null {
   switch (chunk.type) {
     case EventType.TEXT_MESSAGE_CONTENT: {
@@ -257,10 +276,16 @@ function translateChunk(
       return { type: 'tool-call', toolCall };
     }
     case EventType.RUN_FINISHED: {
+      const rawUsage = rawUsageByRunId.get(chunk.runId);
+      rawUsageByRunId.delete(chunk.runId);
       return {
         type: 'finish',
-        usage: toOwnedUsage(chunk.usage),
-        finishReason: toFinishReason(chunk.finishReason),
+        usage: rawUsage ?? toOwnedUsage(chunk.usage),
+        // TanStack 0.52 moved the server-side finish reason into
+        // `metadata.tanstack`; keep the top-level field authoritative when set.
+        finishReason: toFinishReason(
+          chunk.finishReason ?? chunk.metadata?.tanstack?.finishReason,
+        ),
       };
     }
     case EventType.RUN_ERROR: {
@@ -365,22 +390,15 @@ function toFinishReason(
   }
 }
 
-/** Map TanStack real token usage onto the owned {@linkcode Usage} core fields. */
+/** Preserve TanStack real token usage behind the owned {@linkcode Usage} type. */
 function toOwnedUsage(
   usage: Array<SpecTokenUsage> | TanstackTokenUsage | undefined,
 ): Usage | undefined {
   // TanStack 0.52 may expose AG-UI's per-provider/model usage array. Its own
   // converter preserves the canonical selection rules and any explicit
-  // provider totals before we project the three owned core fields.
-  const normalized = Array.isArray(usage) ? fromSpecTokenUsage(usage) : usage;
-  if (!normalized) {
-    return undefined;
-  }
-  return {
-    promptTokens: normalized.promptTokens,
-    completionTokens: normalized.completionTokens,
-    totalTokens: normalized.totalTokens,
-  };
+  // provider totals. Canonical TokenUsage objects already satisfy the owned
+  // structural contract and must retain their nested detail and identity.
+  return Array.isArray(usage) ? fromSpecTokenUsage(usage) : usage;
 }
 
 /** Extract a plain-text projection of message content (system prompts). */

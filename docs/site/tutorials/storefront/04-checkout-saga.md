@@ -287,14 +287,32 @@ const handler = defineJobHandler(async (ctx) => {
     const transactionId = `txn_${Date.now()}`;
 
     // Tell the saga payment succeeded — it advances to paid.
-    await sagaPublisher.publish({ type: 'PaymentCompleted', payload: { orderId, transactionId } });
+    const published = await sagaPublisher.publish({
+      type: 'PaymentCompleted',
+      payload: { orderId, transactionId },
+    });
+    if (!published.published) {
+      return createFailureResult(
+        `Payment succeeded, but saga publish was rejected: ${published.reason}`,
+        { orderId, retryable: published.retryable },
+      );
+    }
 
     return createSuccessResult({ orderId, transactionId, amount });
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
 
     // Tell the saga payment failed — its compensation branch cancels the order.
-    await sagaPublisher.publish({ type: 'PaymentFailed', payload: { orderId, reason } });
+    const published = await sagaPublisher.publish({
+      type: 'PaymentFailed',
+      payload: { orderId, reason },
+    });
+    if (!published.published) {
+      return createFailureResult(
+        `${reason} (orderId: ${orderId}); saga publish rejected: ${published.reason}`,
+        { orderId, retryable: published.retryable },
+      );
+    }
 
     return createFailureResult(`${reason} (orderId: ${orderId})`);
   }

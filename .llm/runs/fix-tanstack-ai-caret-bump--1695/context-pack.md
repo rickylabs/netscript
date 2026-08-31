@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-tanstack-ai-caret-bump--1695` |
 | Branch | `deps/tanstack-ai-caret-bump` |
-| Current phase | `implementation complete / awaiting external IMPL-EVAL` |
+| Current phase | `blocked finding during post-#1829 collision integration` |
 | Archetype | `4 - Public DSL / Builder` |
 | Scope overlays | `none` |
 
@@ -15,8 +15,10 @@
 Research and Plan & Design are complete, with `PLAN-EVAL: N/A` recorded before implementation. All
 four pins and the lock are updated. TanStack 0.52's required activity context, name-less tool-end
 event, and AG-UI usage-array changes are handled at the existing chat bridge with focused tests.
-The single final merge of `origin/main` `26e1b486f` is complete. The authoritative integrated-head
-gate set passes except for the unchanged package doc-lint baseline, recorded with RC 1.
+The prior integration was complete, but the owner subsequently released #1829 and authorized one
+new collision pass. Then-current `origin/main` was fetched as `f59874abd`; its single merge is now
+in progress with the two AI conflicts manually analyzed. #1829's own three-test filter returned RC
+1 (2 pass, 1 fail), so owner instructions require an immediate stop without workaround or push.
 
 ## Completed
 
@@ -34,12 +36,14 @@ gate set passes except for the unchanged package doc-lint baseline, recorded wit
 
 ## In Progress
 
-- External IMPL-EVAL only; implementation work and evidence are complete.
+- Nothing. The worktree intentionally remains in an uncommitted merge-conflict state pending owner
+  and coordinator direction on the genuine #1829/TanStack 0.52 interaction.
 
 ## Next Steps
 
-1. Supervisor dispatches the separate-session IMPL-EVAL for PR #1832.
-2. A passing evaluator can complete the final DoD checkbox and advance the lifecycle.
+1. Owner/coordinator decides how #1829's direct `finishReason` expectation should interact with the
+   TanStack 0.52 event-restoration contract.
+2. Do not resume gates, commit, push, PR lifecycle, or IMPL-EVAL until that decision is supplied.
 
 ## Key Decisions
 
@@ -70,7 +74,8 @@ gate set passes except for the unchanged package doc-lint baseline, recorded wit
 
 ## Open Questions
 
-- None. External IMPL-EVAL remains a required supervisor action.
+- Blocking finding: `TanStack usage: a fully populated upstream object survives the owned boundary`
+  receives `finishReason: undefined` instead of `"stop"` under the bumped dependency (RC 1).
 
 ## Drift and Debt
 
