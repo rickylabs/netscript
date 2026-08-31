@@ -99,6 +99,25 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 `gh-watch.ts` and `gh-token.ts` are the two durable GitHub infra utilities — see **netscript-tools**
 § Supervisor Automation for their exit codes and token-handling rules.
 
+## Runtime-lane admission — one PR at a time (release 0.0.7, until #1839)
+
+The `e2e-cli` runtime tiers are pinned to repository-wide concurrency groups
+(`e2e-scaffold-runtime-global`, `e2e-scaffold-runtime-sqlite-global`). A GitHub concurrency group
+holds **one running plus one pending** entry; a third arrival **evicts the pending one**.
+`cancel-in-progress: false` protects a *running* job, not a *queued* one. Releasing several
+`e2e-cli-gate` PRs at once therefore **discards** the surplus rather than queueing it — observed
+2026-08-31, when a five-PR release left zero surviving docker-tier runs while every non-runtime job
+in the same runs passed.
+
+Operating rule until #1839 lands:
+
+- Admit **one** PR to the runtime lanes at a time. Release the next only after the previous run's
+  `scaffold-runtime` **and** `scaffold-runtime-sqlite` reach a real conclusion (`success`/`failure`).
+- **`cancelled` is not a verdict.** A runtime job that ends `cancelled` while the same run's
+  non-runtime jobs are green means the gate never executed. Re-queue it; never read it as a pass.
+- Re-enter with `gh run rerun --failed`, **never by pushing**. A push moves the head and invalidates
+  the IMPL-EVAL verdict recorded at that head; a rerun re-uses the run and every gate read is live.
+
 ## Supervisor wake — no polling
 
 Wake is event-driven, never a polling loop kept in agent context:
