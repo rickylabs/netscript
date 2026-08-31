@@ -3395,3 +3395,16 @@
 - The coordinator squash-merged #1834 as `58a4a10eb3b73a0e6c9452e4ed6c7def93f45c92` and
   normalized the PR to sole `status:shipped`. It deliberately uses `Refs #1349`; Slices 2–3 remain
   Features-owned and must land before canary 5 because Slice 1 exposes accepted but unconsumed types.
+
+## 2026-08-31T14:43:53Z — #1830 canonical agent skill-tree repair ships
+
+- Internals PR #1830 passed independent exact-current-main audit at immutable head
+  `a06e1529ff39b8e927b41afab508ade74b797e4f`: exact-head check-test/quality/close-gate passed,
+  two independent GLM evaluations returned PASS, all five DoD rows were checked, review threads were
+  zero, the lockfile was unchanged, and the exact merge tree was clean.
+- The auditor regenerated all seven asset barrels with byte-identical results, proved 18 skills/22
+  Claude mirror files current, found no shipped `.claude/skills/` references, and found no secret
+  patterns. The intervening #1834 SDK slice had zero owned-path or generator-input overlap.
+- The coordinator squash-merged #1830 as `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7`, closing
+  #1737. #1737/#1830 are normalized to sole `status:shipped`; Internals continues #1832 and its
+  remaining assigned queue without blocking public feature/fix work.

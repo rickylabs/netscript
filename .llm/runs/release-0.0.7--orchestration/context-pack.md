@@ -2152,3 +2152,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
   This is a concrete short coherence gate, not a reason to stall other lane merges.
 - The coordinator continues the open-PR reduction with #1830/#1773/#1640 audits while Docs converges
   #1813 and Aspire/Fixes continue their own queues independently.
+
+## Resume delta — 2026-08-31T14:43:53Z
+
+- Current main is `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7` after Internals PR #1830 shipped
+  from immutable head `a06e1529ff39b8e927b41afab508ade74b797e4f`, closing #1737. Exact CI, two GLM
+  PASS receipts, five checked DoD rows, zero threads, unchanged lock, clean current integration, and
+  byte-identical regeneration of all seven asset barrels were verified.
+- #1737/#1830 are sole `status:shipped`. The current open milestone inventory has exactly one
+  orchestrator owner per issue and no unowned/multi-owned issues; supervisors must convert their
+  triage/plan inventory into bounded implementation leaves rather than merely reporting assignment.
+- Canary 5 is still held only for #1349 Slices 2–3 to eliminate the accepted-but-unconsumed public
+  contract window. #1762/#1664/#1773 and all docs/Aspire/internals fronts continue independently.

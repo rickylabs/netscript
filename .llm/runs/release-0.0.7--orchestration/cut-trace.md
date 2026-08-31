@@ -285,3 +285,12 @@ artifact-pinned production E2E.
 - Independent GLM PASS, scoped SDK and repository gates, zero threads, unchanged lock, clean current
   integration, and a post-wording-edit close-gate passed. Canary 5 is intentionally held until
   #1349 Slices 2–3 consume the public types at runtime; all unrelated merges continue.
+
+## 2026-08-31T14:43:53Z — canonical skill-tree repair joins internal membership
+
+- PR #1830 head `a06e1529ff39b8e927b41afab508ade74b797e4f` squash-merged as
+  `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7`, closing #1737. It removes residual shipped skill
+  guidance that pointed at the non-canonical Claude tree and regenerates every relevant asset barrel.
+- Exact CI, two GLM PASS receipts, byte-identical regeneration, mirror parity, unchanged lock, zero
+  threads, and clean current integration passed. This is internal payload and does not trigger a
+  public canary cut by itself.
