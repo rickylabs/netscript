@@ -1,0 +1,30 @@
+name: "#1839 runtime queue simulation"
+run-name: "#1839 queue simulation · ${{ github.ref_name }}"
+
+on:
+  push:
+    branches:
+      - "ci/e2e-runtime-queue-sim-1839-*"
+
+permissions: {}
+
+jobs:
+  simulated-runtime:
+    name: simulated-runtime
+    concurrency:
+      group: e2e-runtime-queue-sim-1839
+      cancel-in-progress: false
+      queue: max
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Hold no-op simulated runtime slot
+        env:
+          SIMULATION_REF: ${{ github.ref_name }}
+          SIMULATION_SHA: ${{ github.sha }}
+        run: |
+          printf 'simulation_ref=%s\n' "$SIMULATION_REF"
+          printf 'simulation_sha=%s\n' "$SIMULATION_SHA"
+          printf 'slot_entered_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          sleep 30
+          printf 'slot_released_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
