@@ -1662,3 +1662,18 @@ implementation thread.
   namespace while retaining the identical `/home/agent` mount, or a local daemon in `ai-agents`.
 - Cleanup may still leave an explicitly reported persistent volume after `aspire stop --force`.
   Remove only that exact proven volume, then re-prove all four runtime inventories are zero.
+
+## 2026-08-31 — configured green checks can still omit a contract-required lane
+
+- #1820 was mergeable with core CI green, but its scaffold-template delta had never opted into the
+  repository's additive `e2e-cli` workflow; all scaffold-static/runtime jobs were policy-skipped.
+  A green configured-check summary is therefore insufficient when the slice contract explicitly
+  requires a generated-project runtime receipt. Correct the harness truth, opt into the hosted gate,
+  and require exact-head success before merge.
+- A workflow-file correction can be locally complete yet unpublishable when the active classic token
+  lacks GitHub's `workflow` scope. Preserve the atomic local commit, surface the exact credential
+  boundary, and continue independent work; never split the change into a knowingly-red partial just
+  to bypass the permission.
+- Owner-authorized intra-topic parallelism is now an explicit standing rule for cross-concern leaves.
+  It does not relax collision audits, shared-carrier ordering, immutable merge gates, or the global
+  runtime mutex.

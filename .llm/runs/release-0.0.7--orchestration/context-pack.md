@@ -1978,3 +1978,28 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Aspire remains runtime-zero. Static S8 uses the direct current-main OpenRouter route because the
   live shared hybrid MCP server predates #1792; Internals must rotate that server at a safe evaluator
   seam, never during active evaluation traffic.
+
+## Resume delta — 2026-08-31T04:34:10Z
+
+- Current main is `eaea940bea4c19593b97b9895b09f512039f4e13` after user-facing Features PR
+  #1810 shipped from immutable head `3a1b2fa8df`. Fresh exact-head CI attempt 2 passed close-gate,
+  quality, check-test, and lane visibility; #1458/#1810 are closed/merged with sole
+  `status:shipped`.
+- Owner explicitly reaffirmed bounded intra-orchestrator parallelism for cross-concern work.
+  Features keeps #1814 and #1349 moving while #1820 completes its merge gates; Fixes keeps
+  #1773/#1365/#1677 independent; Internals keeps #1828/#1823 independent; Docs and Aspire retain
+  their own static columns. Shared carriers and merges remain ordered, and runtime remains globally
+  serialized.
+- #1820 is not merge-ready despite core-green CI: its scaffold-template change still needs an
+  explicit `e2e-cli` scaffold-runtime receipt, and its committed context/worklog/drift must be
+  corrected from bootstrap claims to the final evidence. Use the CI opt-in because local Aspire is
+  topology-parked; preserve its accepted GLM product verdict by byte identity.
+- #1823's implementation/evaluator packet is valid. Its active OpenHands run completed successfully;
+  Internals is performing one current-main convergence, product-blob identity proof, and fresh CI.
+- Aspire rulings are final: S13 uses the narrow additive parity-tool union and grants
+  `--allow-run=git` only to the invoking parity task; S7 retains its two honest live-runtime boxes;
+  S8 remains draft at `status:impl-eval` with its existing GLM PASS and no redundant evaluator.
+- Docs #1756 is complete and green locally at `01203d5d8`, but the only available GitHub credential
+  has `repo` without `workflow` scope and SSH is unavailable. Park only that push; continue #1808
+  and the later #1803 convergence. Runtime preflight remains exact zero: Aspire `[]`, containers 0,
+  volumes 0, and custom networks 0.

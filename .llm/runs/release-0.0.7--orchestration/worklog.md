@@ -3177,3 +3177,29 @@
   its shared corpus once. Implementation/evaluation remains parallel: #1773 has PASS_PLAN and an
   active author; #1365 IMPL-EVAL and #1677 implementation are live; #1828 is rewriting its invalid
   root-config RED/GREEN evidence against the correct production CLI oracle.
+
+## 2026-08-31T04:34:10Z — #1810 shipped; hidden gates converted into active work
+
+- The stale prior-head CI request that held the repository arbiter was cancelled, and exact-head
+  run `33356709627` was rerun at attempt 2. It passed close-gate, quality, full repo check/test,
+  managed-form browser regression, and visibility at head `3a1b2fa8df55c7958d678ac6fc3d7c012e249bf2`
+  over base `dea44991120a2c5da96a89df0f68d69c455c035e`. The independent merge audit confirmed zero
+  threads, complete issue/DoD metadata, byte-identical GLM-evaluated product blobs, clean expected
+  delta, and unchanged lock. The coordinator squash-merged #1810 as
+  `eaea940bea4c19593b97b9895b09f512039f4e13` and normalized #1458/#1810 to `status:shipped`.
+- Independent audits refused two false-ready packets. #1820 must add an explicit hosted
+  scaffold-runtime receipt and correct three stale committed continuity files before fresh CI.
+  #1823 must consume its terminal OpenHands success, converge current main once, prove its two
+  evaluated blobs unchanged, and recut CI. Both supervisors received the exact recovery sequence.
+- Aspire received three coordinator rulings without an owner pause: additive S13 parity phase 2
+  over the current tool/tests with task-local git permission; no weakening of #1719's live-runtime
+  acceptance; no redundant S8 evaluator or skip label after its real GLM PASS. S13 reconstruction
+  and independent #1824 implementation are active while runtime-gated leaves remain parked.
+- Docs salvaged #1756 completely: the workflow trigger plus example compiler is 17/17 focused-green
+  and Tier-A green at local commit `01203d5d8`. Push is blocked solely by the provisioned token's
+  missing `workflow` scope; no SSH credential exists. The commit and patch are retained while Docs
+  proceeds to #1808. Host cleanup was re-proved: Aspire `[]`; Docker containers/volumes/custom
+  networks all zero.
+- Owner reaffirmed intra-orchestrator parallelism for independent cross-concern surfaces. Every one
+  of the 53 currently open milestone issues has an `orchestrator:*` owner; supervisors were steered
+  to refill implementation slots rather than serialize behind CI or evaluator waits.
