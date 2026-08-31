@@ -78,6 +78,7 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | hosted dashboard availability | implementation | Hosted proof run `33328972788` established that Aspire 13.5.3 can list the dashboard-backed MCP tools while an isolated headless AppHost returns exact JSON-RPC `-32603` dashboard-unavailable evidence. Added RED-first coverage and a documented degraded receipt outcome without weakening the 14-tool, visibility, redaction, or dashboard-only surface assertions. |
 | 2026-08-30 | hosted dashboard availability cycle 2 | implementation | Hosted proof run `33330455111` supplied the full `-32603` message and showed per-tool degradation was the wrong model. Aspire 13.5.3 source at `b5f143315` proves the CLI selects the scaffold's `https` profile; the profile's `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` prevents `AppHost:DashboardApiKey` generation, while MCP rejects a null API token as dashboard-unavailable. Chose shape A: authenticate only the E2E scratch profile before detached start/restart, keep all MCP calls/assertions mandatory, and annotate the exact error in a failing partial receipt. |
 | 2026-08-30 | coordinator classification amendment | implementation | Reclassified only code `-32603` plus the byte-exact hosted 13.5.3 message on dashboard-gated AppHost calls as a documented degradation. Primary and dashboard-only initialize/tools-list surfaces remain mandatory; accumulated visibility/redaction evidence and the degraded tool name persist. Truncated text, a changed suffix, a wrong code, and the exact payload on `doctor` remain hard failures. Static only: no AppHost, runtime, CI dispatch, or evaluator. |
+| 2026-08-31 | D-148 un-stack | delivery | Rebased the ten S9 commits onto reconstructed S8 `bc838a0b3`; unioned S8 UI/typed-DB and S9 agent-init/Aspire-MCP registrations; retained each job's three narrow artifact paths plus only its matching MCP receipt path, `include-hidden-files: true`, and 30-day retention. No runtime or evaluator was started. |
 
 ## Decisions
 
@@ -87,6 +88,7 @@ or the canonical generator source and run the documented generators.
 | JSR publish audit is N/A for the new gate | `packages/cli/e2e` is unpublished and the gate is not exported by `@netscript/cli` | `packages/cli/e2e/deno.json` / `mod.ts` |
 | Cycle-2 shape A: secure the E2E scratch dashboard | The launch profile is selected, but its anonymous mode suppresses the dashboard API key required by Aspire MCP; changing the scratch config exercises the real call contract without changing product scaffold output | `packages/cli/src/kernel/templates/aspire/generate-aspire-config.ts`; Aspire `v13.5.3` `GuestAppHostProject.cs`, `DistributedApplicationBuilder.cs`, `DashboardUrlsHelper.cs`, `McpToolHelpers.cs`; hosted run `33330455111` |
 | Coordinator amendment: exact payload on dashboard-gated calls is documented degradation | Hosted CI still proves the headless condition; the ratified correction supersedes the earlier shape choice. Matching is fail-closed by tool, code, and full message. | coordinator steering after cycle 2; hosted run `33330455111` |
+| D-148 selective workflow union | The broad report globs belonged to S9's obsolete base and would restore D-112's `.data` traversal regression. Keep S8's narrow paths, add only the two S9 MCP receipt paths and retention. | coordinator D-148 ruling |
 
 ## Drift
 
@@ -130,6 +132,17 @@ or the canonical generator source and run the documented generators.
 | Exact-payload amendment scoped gates | PASS | Check covered 187 TypeScript files; lint/fmt covered 180 files with zero findings under the existing `desktop-native` fixture exclusion. |
 | Exact-payload amendment fitness gates | PASS | `quality:scan` reported zero findings; `arch:check` exited 0 with pre-existing repository warnings only. |
 | Exact-payload amendment resource ownership | PASS (S9) | S9 started no AppHost/container. Read-only inventory found a foreign S5 AppHost at `007-aspire-s5-conv/.llm/tmp/s5-concurrent/**` and five S5-named containers; left untouched. |
+| D-148 asset barrel generation/check | PASS | `gen:assets-barrel` exit 0; `check:assets-barrel` exit 0; working-tree diff remained empty. |
+| D-148 stacked ancestry | PASS | `git merge-base HEAD bc838a0b3` equals full S8 head; old S5 `56bf42556`, S6 `9f97954b6`, S8 `f23954658`, and old head `9dd06647` are not ancestors. |
+| D-148 range-diff | PASS | All ten S9 commits map in order; only ruled union commits 1/2 and generated-corpus commit 3 differ, while commits 4–10 are patch-identical. |
+| D-148 workflow safety | PASS | Each runtime job retains narrow JSON/NDJSON/listener paths, adds one matching `agent.aspire-mcp-smoke*` path, keeps `include-hidden-files: true` and `retention-days: 30`; no `.llm/tmp/**` glob exists. |
+| D-148 scoped check | PASS | Structured wrapper exit 0; 24 changed non-generated TypeScript files, 1 batch, `failedBatches: 0`. |
+| D-148 scoped lint/fmt | PASS | Authoritative no-exclude rules-preserving config runs each covered all 24 files with no dropped files or findings. Initial root-config runs exited 2 as honest coverage refusals and are non-verdicts; temporary config was removed. |
+| D-148 repo-wide check | PASS | Exit 0; 2,981 files, 25 batches, `failedBatches: 0`, zero diagnostics. |
+| D-148 focused registry/suite tests | PASS | Structured test wrapper exit 0; 60 passed, 0 failed across suite registry, runtime gates, UI data-screen registration, and Aspire MCP smoke. |
+| D-148 Aspire version parity | PASS | Exit 0; checked 812 manifest entries and reported `fail: 0`. |
+| D-148 quality gate | PASS | Exit 0; repository quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
+| D-148 runtime/evaluator | NOT RUN by ruling | No Aspire/Docker/runtime command, PLAN-EVAL, or evaluator rerun was dispatched. |
 
 ## Handoff Notes
 
@@ -140,3 +153,5 @@ or the canonical generator source and run the documented generators.
 - Phase A is pushed and locally green except for the upstream static MCP acceptance mismatch recorded
   in `drift.md` and `receipts/aspire-13.5.3-mcp-tools-static.json`.
 - Cycle-1 help captures are non-runtime CLI reads; pre/post Aspire and Docker inventories stayed empty.
+- D-148's rewritten implementation head before this evidence commit is `0c4d9990a`; the final
+  delivery commit and lease-safe push are recorded by the PR commit list and delivery comment.

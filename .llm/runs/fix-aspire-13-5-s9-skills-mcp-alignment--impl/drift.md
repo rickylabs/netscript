@@ -58,3 +58,18 @@
 - **Severity:** minor
 - **Action:** no credential mutation; subsequent non-workflow commits use the required refspec.
 - **Evidence:** PR #1759 commits `83ae1a43` and `06a0e5e1` and their implementation comments.
+
+## 2026-08-31 — D-133 abort and D-148 selective un-stack ruling
+
+- **What:** The first un-stack attempt correctly stopped when S9's workflow receipt commit
+  conflicted with D-112's narrowed artifact-upload lists, which were outside D-133's gate-list-only
+  authorization.
+- **Expected:** Only the two gate-registration unions and upstream generated files were authorized
+  under D-133.
+- **Actual:** D-148 classified S9's workflow change as two additive MCP receipt paths plus retention,
+  while the broad recursive globs were obsolete base content that must not return.
+- **Severity:** minor process drift; no product-scope expansion.
+- **Action:** Rebase onto `bc838a0b3`; retain S8's narrow JSON/NDJSON/listener paths and
+  `include-hidden-files: true`; add the per-job MCP receipt path and `retention-days: 30`; reject
+  every `.llm/tmp/**` recursive glob.
+- **Evidence:** rewritten commits `d81f5fd34`, `06103eeef`, and the D-148 gate rows in `worklog.md`.

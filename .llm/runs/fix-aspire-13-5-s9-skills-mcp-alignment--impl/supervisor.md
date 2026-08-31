@@ -8,7 +8,7 @@
 | Checkout | `/home/agent/projects/netscript/worktrees/007-aspire` |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-aspire-s9` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Baseline | `9dd066472af1cacdb76a8612a3f6e722b0ec8094` on `feat/aspire-13-5-s8-typed-resource-commands` (2026-08-30) |
+| Baseline | reconstructed S8 head `bc838a0b3b9ba50f4ed6cf68aa29c9e4892b07f3` on `feat/aspire-13-5-s8-typed-resource-commands` (D-148, 2026-08-31) |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 
 ## Routes in force
@@ -24,3 +24,7 @@
 The owner supplied the already PLAN-EVAL-repaired supervisor contract and explicitly dispatched
 this S9 implementation worktree. This run inherits that external Plan-Gate; it does not generate or
 evaluate a replacement plan. Phase B and `docs_audit` dispatch remain supervisor-owned.
+
+D-148 explicitly authorized this implementation session to complete the mechanical un-stack,
+rerun the listed non-runtime gates, and force-push with an exact fresh lease. It explicitly forbids
+runtime startup, PLAN-EVAL, an evaluator rerun, and PR-base retargeting.
