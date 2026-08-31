@@ -174,3 +174,23 @@ initial operating plan.
 - **Action:** implement the four locked RED/GREEN slices; regenerate all shared carriers in the
   primary-specified dependency order; stop before supervisor-owned IMPL-EVAL/readiness changes.
 - **Evidence:** explicit 20-path diff and `supervisor.md` route table.
+
+## 2026-08-31 — Assets generator requires an unlisted scanner carrier
+
+- **What:** The locked S2.4 generator sequence produced a change outside the 20-path ceiling.
+- **Source:** `deno task gen:assets-barrel`, run only after `deno task gen:agent-docs-prose` as
+  explicitly ordered by the primary.
+- **Expected:** The generator would change the allowed agent-docs carrier at ceiling path 17 and no
+  other unlisted file.
+- **Actual:** It changed both `packages/cli/src/kernel/assets/agent-docs.generated.ts` and unlisted
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`. The latter is not incidental metadata:
+  it embeds `.llm/tools/quality/scan-code-quality.ts`, so the new `discarded-saga-publisher-result`
+  implementation changes the embedded source and bundle hash. The generator reported a 2-line/2-line
+  carrier diff around the large embedded string. No MCP or publish-assets generator ran after this
+  was detected.
+- **Severity:** blocking
+- **Action:** restore every partial generated output, stop S2.4, and request explicit authorization
+  to add `packages/cli/src/kernel/assets/agent-tools.generated.ts` as ceiling path 21. If
+  authorized, rerun the entire four-generator chain from clean carriers in the locked order. Do not
+  silently omit the carrier: that would leave the distributed quality scanner stale.
+- **Evidence:** generator-attributed `git status`, focused carrier diff, and S2.4 worklog entry.

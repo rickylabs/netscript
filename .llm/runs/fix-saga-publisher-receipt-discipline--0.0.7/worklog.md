@@ -112,6 +112,7 @@ derivation contract.
 | 2026-08-31       | S2.3 RED      | source derivation     | New test compiled and failed 0/1 on the real canonical-doc versus shipped-source mismatch; `3567b2449`.           |
 | 2026-08-31       | S2.3 GREEN    | safe public examples  | Canonical sample now equals source; four calls consume receipts; docs tests 12/0 and quality scan 0/7.            |
 | 2026-08-31       | S2.4 RED      | derivative freshness  | `check:mcp-export-corpus` failed on the real stale carrier before any generator ran; harness-only RED commit.     |
+| 2026-08-31       | S2.4 STOP     | ceiling conflict      | Assets generation moved unlisted `agent-tools.generated.ts`; partial outputs restored, explicit rescope needed.   |
 
 ## New-Base Gate Results
 
@@ -232,6 +233,12 @@ RED before any carrier write:
 - `deno task check:mcp-export-corpus` — expected exit 1 with the precise stale-corpus diagnostic;
   the additive core helper export had not yet reached the checked-in MCP corpus.
 - No generator had run and no generated carrier changed before this harness-only RED record.
+
+The subsequent ordered GREEN attempt stopped after the second generator. `gen:agent-docs-prose`
+changed only allowed paths 15–16. `gen:assets-barrel` then changed allowed path 17 and unlisted
+`packages/cli/src/kernel/assets/agent-tools.generated.ts`, because that carrier embeds the modified
+quality scanner. All partial generated changes were restored; generators three and four were not
+run. S2.4 remains blocked on an explicit ceiling rescope to 21 paths.
 
 ## Hard Stops
 
