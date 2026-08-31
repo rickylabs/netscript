@@ -4946,3 +4946,31 @@
     `8a9257642`. If the base hypothesis holds, #1744 should **pass** `database.seed`. If it fails
     there too, the hypothesis is dead and the cause lies elsewhere.
   - **Canary6 recorded as a merge-sequencing hold only** — never a hold on work or verification.
+
+- **D-209 — #1744 is FULLY GREEN on BOTH tiers — the first complete runtime pass in this entire
+  programme — and it confirms the seed hypothesis while refuting the garnet one.**
+  - Run `33413374354` at `bd3dbc843`: `scaffold-runtime (aspire + docker + postgres)` **success**,
+    `scaffold-runtime-sqlite` **success**. No failing gate on either tier.
+  - **Four data points now, ordered by base age (`bd9d463b4` verified an ancestor of `71d5fb8e0`):**
+
+    | Head | base | behind | `database.seed` | `runtime.wait.garnet` |
+    | --- | --- | ---: | --- | --- |
+    | S8 `bc838a0b3` | `8a9257642` | 21 | **FAIL** | never reached |
+    | S9 `29eed9ef9` | `8a9257642` | 21 | **FAIL** | never reached |
+    | S10 `265466059` | `8a9257642` | 21 | **FAIL** | never reached |
+    | S7 `bd3dbc843` | `bd9d463b4` | 9 | **PASS** | **PASS** |
+    | #1747 `2032d4ed7` | `71d5fb8e0` | 7 | **PASS** | **FAIL** (300 s) |
+
+  - **Seed: hypothesis CONFIRMED.** Every head on the old base `8a9257642` fails; every head on a
+    newer base passes. Four consistent data points, no counter-example. **Convergence is the right
+    remedy, and the coordinator's conditional authorization is satisfied** — no repair to any product
+    delta is warranted for `database.seed`.
+  - **Garnet: hypothesis REFUTED, and this matters for #1844.** Garnet **passed** at the *older* base
+    `bd9d463b4` and **failed** at the *newer* `71d5fb8e0` — the opposite direction. Only two commits
+    separate those bases (`ee0e626bb`, a harness milestone-leaf fix, and `71d5fb8e0`, a docs/exports
+    change); neither can plausibly break garnet readiness. So `runtime.wait.garnet` is far more likely
+    **flaky or environmental** than a systematic regression, and #1744's run supplies the **passing
+    baseline #1844 was filed without**.
+  - I had queued garnet as a possible systematic defect; the natural experiment says otherwise, and
+    the honest move is to record the counter-evidence in #1844 rather than let a p1 issue stand on a
+    single unreproduced timeout.
