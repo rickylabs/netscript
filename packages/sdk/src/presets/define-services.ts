@@ -5,6 +5,7 @@
  */
 
 import { createServiceClient } from '../client/service-client.ts';
+import { getServiceClientContributionRuntime } from '../client/service-client.ts';
 import { createQueryFactory } from '../query/query-factory.ts';
 import { createServiceQueryUtils } from '../query-client/create-service-query-utils.ts';
 import type { QueryFactory } from '../ports/query-factory.ts';
@@ -197,9 +198,11 @@ export function defineServices<const TServices extends DefineServicesConfigMap>(
       port: config.port,
       timeout: config.timeout,
       propagateTraceContext: config.propagateTraceContext,
+      contributions: config.contributions,
     });
 
     clients[key] = client;
+    if (getServiceClientContributionRuntime(client)?.directOnly) continue;
     queries[key] = createQueryFactory(key, config.contract, client, config.options);
     queryUtils[key] = createServiceQueryUtils(client, {
       path: config.queryPath ?? [key],
