@@ -12,9 +12,17 @@
 
 ## Current State
 
-The assigned leaf is clean at planning commit `fb08d2f9d`, based on current main `5197e70b7`.
-Research, locked plan, doctrine/archetype review, JSR surface scan, and Design checkpoint are complete.
-Implementation has not started.
+**Corrected 2026-08-31.** This section was frozen at bootstrap and read "Implementation has not
+started" long after Slice 1 shipped. Actual state:
+
+Slice 1 is **implemented, Tier-A ACCEPTED, IMPL-EVAL PASS, and fully gated**. Immutable head
+`b87fd92faf86bb2a616effc6c340568f7ddeaf96`, integrated onto `main` `eaea940be` at seam `8ab11ddee`.
+PR #1820 is non-draft, `status:ready-merge`, `Refs #1452` **partial** with `closingIssuesReferences`
+deliberately empty. Slice 2 (the host factory) remains deferred behind an architecture ruling.
+
+Superseded bootstrap text, kept for provenance: *"The assigned leaf is clean at planning commit
+`fb08d2f9d`, based on current main `5197e70b7`. Research, locked plan, doctrine/archetype review, JSR
+surface scan, and Design checkpoint are complete. Implementation has not started."*
 
 ## Completed
 

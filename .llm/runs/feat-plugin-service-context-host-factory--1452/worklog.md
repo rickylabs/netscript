@@ -54,7 +54,7 @@ whose contract, behavior, ceiling, and gates are fixed by the existing template 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
 | 1 | Publish and prove `createLazyKv()` | scoped KV check/lint/fmt; KV tests; doc/JSR/quality gates | `packages/kv/application/lazy-kv.ts`, KV barrels, `packages/kv/tests/lazy-kv_test.ts`, run artifacts |
-| 2 | Adopt the primitive in the scaffold and refresh the carrier | focused CLI template tests; scoped CLI check/lint/fmt; asset/export corpus gates | service-context template, `embedded.generated.ts`, run artifacts |
+| 2 | Adopt the primitive in the scaffold and refresh the carrier | focused CLI template tests; scoped CLI check/lint/fmt; asset/export corpus gates | **hand-written:** service-context template. **generated carriers (tool output, never hand-edited):** `embedded.generated.ts`, `export-surface-corpus.generated.ts`. Plus run artifacts. |
 
 ### Deferred Scope
 
@@ -159,3 +159,15 @@ Gates re-cut at the seam `8ab11ddee`, each `gitHead == actualGitHead`: scoped ch
 lint 352-byte, fmt-check 301-byte, `packages/kv` tests 289-byte, `assets-barrel` exit 0 (zero-byte
 stdout is correct for `gen && git diff --exit-code`; proven clean by an empty product worktree
 afterwards), `docs:exports-drift` PASS.
+
+
+## Ceiling vocabulary — correction
+
+The Slice 2 row above previously listed `embedded.generated.ts` beside the service-context template
+without distinguishing them, which reads as though the carrier were hand-written. It is not, and the
+distinction is load-bearing: the hand-written ceiling for this slice is **five** files
+(`packages/kv/application/lazy-kv.ts`, the two KV barrels, `packages/kv/tests/lazy-kv_test.ts`, and
+`service-context.ts.template`). `embedded.generated.ts` and `export-surface-corpus.generated.ts` are
+**generated carriers** produced by `deno task gen:assets-barrel` and `gen:mcp-export-corpus`; they are
+regenerated, never edited, and their currency is proven by `check:assets-barrel` / `check:mcp-export-corpus`
+exiting 0 rather than by review.
