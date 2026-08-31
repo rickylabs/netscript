@@ -5490,3 +5490,30 @@
     this gate first failed at `f29a0b265`, the seed-repair head.
   - Also required: **static coverage that type-checks the emitted helper output**, so a generator
     emitting non-compiling source fails statically instead of at gate 27 of a runtime suite.
+
+- **D-228 — #1837 delta `PASS`; promoted and handed over GREEN at `d23276664`. Second post-canary-5
+  leaf ready.**
+  - **The check that mattered came first:** `git diff 01d32c95f..d23276664 -- packages/cli/src
+    packages/plugins` is **empty** — no generator changed since the PASS commit. A red CI creates
+    pressure to bend the generator toward the fixture, and the evaluator confirmed that did not
+    happen before assessing anything else.
+  - **27 hostile-input probes rendered against the real modules**, including the sharp one: a name
+    **embedding the literal old marker text**
+    (`x';return await q.withHealthCheck('garnet_resp');('`). The render was then piped through
+    **actual `deno fmt --single-quote`** — discovery still binds the right ordinal resource, and the
+    decoy survives inside JSON strings **without** false-matching the line-anchored pattern. That
+    decoy is exactly what would have fooled the old `includes` check.
+  - **Fail-closed and duplicate-registration probed on both quote styles**: marker removal, method
+    rename, doubled attachment (ambiguity guard), health re-injection, missing `return apps;`.
+  - **The masked Garnet test is unmasked, with its root cause named:** pre-repair the test stripped a
+    *single-quoted* line that post-`fmt` source no longer contains (root `deno.json:218
+    singleQuote: true`), so the garnet guard never fired and the postgres error surfaced first.
+  - **Mutation red both directions**; whole helper-generator directory in **one** invocation (14
+    files): **30 passed (218 steps), 0 failed**.
+  - Promoted to `status:ready-merge`; mirror dry-run returns **no changes** because all four #1836
+    acceptance boxes are already ticked (verified: 4 checked). `MERGEABLE`/`CLEAN` against main
+    `60ae56af0`, CI green at the exact head. Handover posted.
+  - **Two residuals recorded rather than silently accepted:** an app name containing the literal
+    `  // --- app ` prefix could in principle mislead `lastIndexOf` — unreachable in the shipped path
+    since fixture names are code constants; and two-or-more attachments throw the same
+    "has no … marker" message, misleading wording that is still fail-closed.
