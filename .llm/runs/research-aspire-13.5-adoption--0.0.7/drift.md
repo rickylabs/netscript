@@ -4741,3 +4741,37 @@
     had run to conclusion in recent history. Every "PASS" in this lane so far rests on static evidence
     plus a runtime tier that was structurally unable to run. That is the real reason this lane is only
     now finding defects.
+
+- **D-201 — S9 cycle-3 `PASS` at `29eed9ef9`; cycle-2 PASS carries. Two corrections, one of them mine.**
+  - **Root cause verified at the generator, not taken on faith.** `scaffoldTsAppHost`
+    (`render-ts-apphost.ts:30,46`) writes the config at
+    `join(targetPath, SCAFFOLD_DIRS.ASPIRE_TS, 'aspire.config.json')` =
+    **`<projectRoot>/aspire/aspire.config.json`**, and `workspace-mutator.ts:172-183` regenerates it
+    to the same place. The CI `NotFound` path is precisely the old
+    `${projectRoot}/aspire.config.json` derivation — a path that never exists.
+  - **MY ERROR, corrected by the evaluator.** I attributed the failing read to
+    `local-source-fixture.ts:33` in the D-194 brief and in my report to the coordinator. **That file
+    reads `deno.json`** (verified: `const configPath = \`${options.projectRoot}/deno.json\``, line 32).
+    I grepped for `readTextFile(configPath)` and took the first source-tree hit without checking
+    *which* `configPath` it was — the real source was the **embedded `ASPIRE_START_SCRIPT` string
+    literal** in `runtime-scripts.ts`, which a source grep does not distinguish from real code.
+    The error was harmless only because the agent verified against the generator instead of trusting
+    my pointer. **Lesson: when the failing code is an embedded script string, grepping the source tree
+    finds impostors.**
+  - **My second candidate was also wrong:** gate *ordering* could never have been the cause, because
+    the config is written at **scaffold time**, not by a runtime-phase gate. Only candidate #1
+    (workspace identity) was ever live.
+  - **Repair confirmed complete at every call site**, including the embedded-fallback compositions:
+    `ASPIRE_RESTART_SCRIPT` has **zero external importers** and is only embedded inside
+    `ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT`, so all fallback paths consume the same 4-arg vector.
+    Fail-closed retained throughout.
+  - **Honest residual disclosed by the evaluator rather than hidden — worth keeping visible.**
+    *Mutation A* (revert the gate-side path derivation) correctly went **red**, 21 passed / 2 failed.
+    *Mutation B* (revert the script-internal `Deno.args[3]` → `args[2]`) **stayed green**:
+    script-internal argument indices are **not unit-pinned**, only gate-side emission is. Mitigated by
+    the pinned argument list, the single shared vector, and the CI runtime tier — but it is a real
+    coverage gap and a future off-by-one inside an embedded script would not be caught statically.
+  - **Rest of S9 untouched:** `git diff 042ff3ca5..29eed9ef9` over `aspire-mcp/` and the agent gate
+    files is **0 lines**; receipt schema, the 15-tool expectation, and the skills/corpora work are
+    byte-identical to the cycle-2 head. `aspire-mcp-smoke_test.ts` + `aspire-dashboard-telemetry_test.ts`
+    17/17; `runtime-gates_test.ts` 23/23.
