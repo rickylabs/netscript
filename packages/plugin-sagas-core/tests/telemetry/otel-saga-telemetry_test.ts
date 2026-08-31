@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertMatch } from '@std/assert';
 import { SpanKind, SpanStatusCode } from '@netscript/telemetry';
 import { InMemorySpanRecorder } from '@netscript/telemetry/testing';
 import { createOtelSdkSpanLink } from '@netscript/telemetry/otel';
@@ -27,9 +27,14 @@ Deno.test('createOtelSagaTracer attaches real SDK fan-in links with saga attribu
       },
     }],
   });
+  const context = span.spanContext?.();
   span.setStatus('ok');
   span.end();
 
+  assertMatch(
+    context?.traceparent ?? '',
+    /^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/,
+  );
   const snapshot = recorder.snapshots()[0];
   assertEquals(snapshot?.kind, SpanKind.CONSUMER);
   assertEquals(snapshot?.status, { code: SpanStatusCode.OK, message: undefined });

@@ -13,6 +13,11 @@ import type {
   SagaStoreWriteOptions,
   SagaTransitionRecord,
 } from '@netscript/plugin-sagas-core/runtime';
+import {
+  SagaInstrumentation,
+  SagaSpanNames,
+  type SagaTelemetrySpan,
+} from '@netscript/plugin-sagas-core/telemetry';
 
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 import {
@@ -70,7 +75,25 @@ Deno.test('createDurableSagaRuntime rejects Prisma backend without client', asyn
 });
 
 Deno.test('createDurableSagaRuntime dispatches returned compensation through its default compensator', async () => {
-  const durable = await createDurableSagaRuntime({ kv: new MemoryKvAdapter() });
+  const spanNames: string[] = [];
+  const instrumentation = new SagaInstrumentation({
+    tracer: {
+      startSpan(name): SagaTelemetrySpan {
+        spanNames.push(name);
+        return {
+          setAttribute(): void {},
+          addEvent(): void {},
+          setStatus(): void {},
+          recordException(): void {},
+          end(): void {},
+        };
+      },
+    },
+  });
+  const durable = await createDurableSagaRuntime({
+    kv: new MemoryKvAdapter(),
+    native: { instrumentation },
+  });
   const calls: string[] = [];
   const definition = defineSaga('default-compensation')
     .state<SagaState>({ status: 'pending' })
@@ -94,6 +117,7 @@ Deno.test('createDurableSagaRuntime dispatches returned compensation through its
     await durable.runtime.register([definition]);
     await durable.runtime.publish({ type: 'Start', payload: {} });
     assertEquals(calls, ['compensate:ord-1', 'cascade:ord-1']);
+    assert(spanNames.includes(SagaSpanNames.CASCADE_COMPENSATE));
   } finally {
     await durable.runtime.stop('default compensation test complete');
     await durable.dispose();
