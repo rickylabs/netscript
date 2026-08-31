@@ -4533,3 +4533,24 @@
     risk by the retry.
   - This also **retroactively justifies the #1744 re-draft on stronger grounds than cost**: had it
     stayed in, it would not merely have consumed a slot twice, it would have evicted a sibling.
+
+- **D-192 — ADMISSION RULE (coordinator ruling, binding for release 0.0.7): one runtime PR at a time.**
+  This is the standing operating rule for this lane until #1839 lands.
+  - **Rule.** At most **one** Aspire PR may hold the `e2e-cli` runtime lanes at any moment. Release the
+    next slice only after the previous run's `scaffold-runtime` **and** `scaffold-runtime-sqlite` jobs
+    have reached a real conclusion (`success`/`failure` — **not** `cancelled`).
+  - **Re-entry is by `gh run rerun --failed`, never by pushing.** A push moves the head and
+    invalidates the recorded IMPL-EVAL verdict at that head; a rerun re-uses the run while every gate
+    read is live. This is what makes the admission rule safe to operate repeatedly.
+  - **`cancelled` is not a verdict.** A runtime job that ends `cancelled` while every non-runtime job
+    in the same run is green means the gate **never executed** — it must be re-queued, never read as a
+    pass or a failure. Recording this explicitly because it is exactly the misreading that would let a
+    slice merge on a gate that never ran.
+  - **Release order for the remainder of 0.0.7:** #1747 (in flight, attempt 2) → #1754 → #1759 →
+    #1760 → **#1744 last**, with its authoritative post-lease head.
+  - **Filed #1839** (`type:fix`, `area:tooling`, `priority:p1`, `orchestrator:internals`, milestone
+    0.0.7) with the exact eviction table, the two group declarations at `e2e-cli.yml:252-254` and
+    `:339-340`, the expected queue semantics (defer, don't discard; distinguishable in the run list;
+    no push required to regain a slot), and a five-part acceptance test. Assigned to
+    `orchestrator:internals` to start **after** the current runtime queue drains, so the fix does not
+    contend with the lane it exists to help. **`e2e-cli.yml` is not edited from the Aspire lane.**
