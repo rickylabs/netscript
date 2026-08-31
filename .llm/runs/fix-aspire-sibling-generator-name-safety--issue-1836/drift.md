@@ -23,3 +23,18 @@ Drift is append-only.
 - **Action:** accept
 - **Evidence:** Focused `rg` and raw Git/Deno commands are used instead.
 
+## 2026-08-31 — Focused gate set produced a false-green handoff
+
+- **What:** The initial implementation gate selected six generator test files but omitted
+  `generators-pipeline_test.ts` and `service-environment_test.ts`, both of which assert on the
+  generated outputs changed by the hardening slice.
+- **Source:** Owner D-183 report and exact full-directory reproduction at head `94a2ef1a0`.
+- **Expected:** All existing consumers of the four generated outputs are included before claiming
+  the implementation green.
+- **Actual:** The selected six-file wrapper passed 156/156 while the full directory exited 1 with
+  28 passed / 2 failed files and 5 failed steps.
+- **Severity:** significant
+- **Action:** repair
+- **Evidence:** Updated both stale consumers after semantic inspection; exact directory command now
+  exits 0 with 30 passed / 218 steps / 0 failed, and the structured directory wrapper reports
+  248/248 results. The validation plan now makes the full directory a required consumer gate.

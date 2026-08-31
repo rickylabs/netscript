@@ -88,6 +88,7 @@ preserving resource-name string arguments and behavior for well-formed inputs.
 | Ordinals change well-formed resource identity. | Assert resource-name literals remain encoded from the original strings; identifiers alone change. |
 | Generated assets or lock state drift. | Run the assets-barrel check and compare `deno.lock` to the baseline; do not regenerate unless the check requires it. |
 | Mutation work leaks into the final tree. | Apply bounded mutations one mechanism at a time, capture failures, restore with explicit patches, then inspect the final diff. |
+| A focused file list misses an existing downstream generated-output contract. | Run the entire Aspire helper-generator test directory before any implementation handoff or green claim. |
 
 ## Anti-Patterns to Resolve or Avoid
 
@@ -118,14 +119,15 @@ preserving resource-name string arguments and behavior for well-formed inputs.
 | ----- | ---- | ---------------- | --------------- |
 | 1 | RED focused tests | Structured test wrapper on the new source-safety test | Nonzero; all four generators expose invalid emitted source. |
 | 2 | Focused tests | Structured test wrapper on Aspire helper generator tests | Exit 0. |
-| 3 | Scoped check | `run-deno-check.ts --unstable-kv` on changed TypeScript files/root | Exit 0, no failed batches. |
-| 4 | Scoped lint | `run-deno-lint.ts` on changed TypeScript files/root | Exit 0, no findings/drops. |
-| 5 | Scoped format | `run-deno-fmt.ts` on changed TypeScript files/root | Exit 0, no findings/drops. |
-| 6 | Mutation proof | Revert ordinals, then escaping, and rerun the focused contract test | Nonzero for each mutant; all four generator cases fail. |
-| 7 | Root check | `deno task check` | Exit 0; `failedBatches: 0`. |
-| 8 | Quality | `deno task quality:scan` | Exit 0. |
-| 9 | Architecture | `deno task arch:check` | Exit 0. |
-| 10 | Assets | `deno task check:assets-barrel` | Exit 0; no regeneration required. |
+| 3 | Directory consumer contract | Exact directory command plus structured wrapper on `helpers/tests/` | Exit 0; zero failed files/steps/results. |
+| 4 | Scoped check | `run-deno-check.ts --unstable-kv` on changed TypeScript files/root | Exit 0, no failed batches. |
+| 5 | Scoped lint | `run-deno-lint.ts` on changed TypeScript files/root | Exit 0, no findings/drops. |
+| 6 | Scoped format | `run-deno-fmt.ts` on changed TypeScript files/root | Exit 0, no findings/drops. |
+| 7 | Mutation proof | Revert ordinals, then escaping, and rerun the focused contract test | Nonzero for each mutant; all four generator cases fail. |
+| 8 | Root check | `deno task check` | Exit 0; `failedBatches: 0`. |
+| 9 | Quality | `deno task quality:scan` | Exit 0. |
+| 10 | Architecture | `deno task arch:check` | Exit 0. |
+| 11 | Assets | `deno task check:assets-barrel` | Exit 0; no regeneration required. |
 
 ## Risks
 
@@ -142,4 +144,3 @@ preserving resource-name string arguments and behavior for well-formed inputs.
 
 - Live `main` advancement, generated asset changes, lockfile changes, or newly discovered string
   fields are recorded before continuing.
-

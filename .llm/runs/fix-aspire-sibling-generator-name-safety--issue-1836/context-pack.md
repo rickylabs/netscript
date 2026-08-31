@@ -6,15 +6,17 @@
 | ----- | ----- |
 | Run ID | `fix-aspire-sibling-generator-name-safety--issue-1836` |
 | Branch | `fix/aspire-sibling-generator-name-safety` |
-| Current phase | `implementation handoff — IMPL-EVAL pending` |
+| Current phase | `corrective implementation handoff — IMPL-EVAL pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The draft PR is open. All four production generators use ordinal bindings and JSON-rendered user
-strings. The focused six-file generator suite passes 156/156, both required mutants fail all four
-hostile-input contracts before restoration, and every requested non-runtime repository gate exits 0.
+The earlier implementation handoff was false-green because its focused test list omitted two
+existing generated-output consumers. The exact full-directory run reproduced 2 failed files / 5
+failed steps. Both failures were stale expectations around intended JSON literals and ordinal
+comments—not behavior regressions. The corrected directory now passes 30 files / 218 steps / 0
+failed (structured wrapper: 248 results / 0 failed), with all non-runtime repository gates green.
 
 ## Completed
 
@@ -34,10 +36,17 @@ hostile-input contracts before restoration, and every requested non-runtime repo
 - Captured focused GREEN, scoped check/lint evidence, and both four-of-four mutation failures.
 - Completed root check (`failedBatches: 0`), quality, architecture, asset-barrel, lock-hygiene, and
   generated-file checks with exit 0.
+- Invalidated the prior focused-only green claim after reproducing the owner-reported directory
+  failure.
+- Proved pipeline resource semantics and plugin #1447 environment ordering/PORT refusal remained
+  correct before editing expectations.
+- Updated the two stale downstream tests without removing or weakening their behavior assertions.
+- Re-ran the exact full directory, structured directory wrapper, scoped wrappers, root check,
+  quality, architecture, and asset gates successfully.
 
 ## In Progress
 
-- Commit and push this final gate-evidence artifact update.
+- Commit the corrective consumer-contract slice and push with an explicit fresh remote lease.
 
 ## Next Steps
 
@@ -58,16 +67,23 @@ hostile-input contracts before restoration, and every requested non-runtime repo
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-aspire-sibling-generator-name-safety--issue-1836/` | new | Harness bootstrap artifacts. |
+| `packages/cli/src/kernel/templates/aspire/helpers/generate-register-apps.ts` | modified | Ordinal app bindings and JSON string literals. |
+| `packages/cli/src/kernel/templates/aspire/helpers/generate-register-plugins.ts` | modified | Ordinal plugin-reference bindings and JSON string literals. |
+| `packages/cli/src/kernel/templates/aspire/helpers/generate-register-tools.ts` | modified | Ordinal tool bindings and JSON string literals. |
+| `packages/cli/src/kernel/templates/aspire/helpers/generate-register-infrastructure.ts` | modified | Ordinal infrastructure bindings and JSON string literals. |
 | `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts` | new | Four hostile-input Deno parse contracts. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts` | modified | Intended ordinal and JSON-rendered source assertions. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts` | modified | Corrected JSON-rendered pipeline source expectations. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts` | modified | Plugin block lookup follows ordinal comments and the semantic map-write boundary. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | RED captured | Focused wrapper exit 1; 0 passed / 4 parser failures. |
-| Fitness | implementation GREEN | Mutation, scoped, root quality, architecture, and asset gates pass; external IMPL-EVAL pending. |
+| Static | correction GREEN | Exact directory: 30/30 files and 218/218 steps; structured wrapper: 248/248 results. |
+| Fitness | corrected implementation GREEN | Mutation evidence preserved; scoped, root quality, architecture, and asset gates pass; external IMPL-EVAL pending. |
 | Runtime | N/A | Explicitly forbidden. |
-| Consumer | RED | Every emitted module failed Deno parsing before repair. |
+| Consumer | GREEN | Hostile modules parse and the full helper-generator directory passes; plugin #1447 parity remains intact. |
 
 ## Open Questions
 
@@ -76,7 +92,8 @@ hostile-input contracts before restoration, and every requested non-runtime repo
 ## Drift and Debt
 
 - Drift: #1747 is open, so the reference fix is read from its branch rather than `main`; `rtk` is
-  unavailable.
+  unavailable; the original focused-only gate set missed two downstream consumer tests and its
+  green handoff was invalidated.
 - Debt: none created or deepened.
 
 ## Commits
@@ -84,3 +101,4 @@ hostile-input contracts before restoration, and every requested non-runtime repo
 - `e9439de34` — harness bootstrap and locked plan.
 - `953271980` — tests-only hostile-input RED contract.
 - `36292dde1` — four-generator repair, semantic test updates, mutation and scoped-gate evidence.
+- `94a2ef1a0` — original gate-evidence handoff, subsequently invalidated by the full-directory failure.
