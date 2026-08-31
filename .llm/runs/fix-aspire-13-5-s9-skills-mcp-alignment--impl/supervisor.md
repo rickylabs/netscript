@@ -8,7 +8,7 @@
 | Checkout | `/home/agent/projects/netscript/worktrees/007-aspire` |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-aspire-s9` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Baseline | reconstructed S8 head `bc838a0b3b9ba50f4ed6cf68aa29c9e4892b07f3` on `feat/aspire-13-5-s8-typed-resource-commands` (D-148, 2026-08-31) |
+| Baseline | newly converged S8 head `d1c6d8b54fdb02f4d913f0c269aea2be4a5dfce0` on `feat/aspire-13-5-s8-typed-resource-commands` (D-213, 2026-08-31) |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 
 ## Routes in force
@@ -28,3 +28,8 @@ evaluate a replacement plan. Phase B and `docs_audit` dispatch remain supervisor
 D-148 explicitly authorized this implementation session to complete the mechanical un-stack,
 rerun the listed non-runtime gates, and force-push with an exact fresh lease. It explicitly forbids
 runtime startup, PLAN-EVAL, an evaluator rerun, and PR-base retargeting.
+
+D-213 explicitly authorizes replaying only the 12 S9 commits onto converged S8 `d1c6d8b54`, taking
+upstream for generated conflicts, regenerating the barrel once, running only the listed non-runtime
+gates, and force-pushing with an immediately fresh exact lease. It forbids product repair,
+runtime/AppHost/Docker/E2E execution, PR-base or lifecycle changes, and self-dispatched evaluation.

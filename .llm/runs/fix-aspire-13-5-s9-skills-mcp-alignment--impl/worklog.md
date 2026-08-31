@@ -92,6 +92,8 @@ or the canonical generator source and run the documented generators.
 | 2026-08-31 | D-148 un-stack | delivery | Rebased the ten S9 commits onto reconstructed S8 `bc838a0b3`; unioned S8 UI/typed-DB and S9 agent-init/Aspire-MCP registrations; retained each job's three narrow artifact paths plus only its matching MCP receipt path, `include-hidden-files: true`, and 30-day retention. No runtime or evaluator was started. |
 | 2026-08-31 | D-194 repair | RED | Added `Aspire lifecycle gates bind aspire.config.json to the AppHost workspace`; the structured test wrapper exited 1 because the start command supplied no AppHost-local config argument. |
 | 2026-08-31 | D-194 repair | implementation | Passed the config path derived from `dirname(appHost)` into initial start and restart fallback, shifted the typed database argument without changing its value, and kept absent/malformed config fail-closed. No runtime resource was started. |
+| 2026-08-31 | D-213 convergence | rebase | Replayed exactly 12 S9 commits from `bc838a0b3..29eed9ef9` onto converged S8 `d1c6d8b54`; resolved three conflicts only in `skills.generated.ts` by taking upstream/S8. No non-generated or listener-contract conflict occurred. |
+| 2026-08-31 | D-213 convergence | evidence | Regenerated the assets barrel, committed the one generated delta as `55791043e`, proved 23/23 non-generated package blobs identical, and completed the required non-runtime gates. |
 
 ## Decisions
 
@@ -164,6 +166,16 @@ or the canonical generator source and run the documented generators.
 | D-194 focused gate tests | PASS | Exit 0; 43 passed, 0 failed across runtime lifecycle and suite registry tests. |
 | D-194 quality gate | PASS | Exit 0; code-quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
 | D-194 repo-wide check | PASS | Exit 0; 2,981 files, 25 batches, `failedBatches: 0`, zero diagnostics. |
+| D-213 asset barrel | PASS | Explicit generation exit 0 produced a 3-add/3-delete `skills.generated.ts` delta; the first check honestly exited 1 before the delta commit; post-commit reproducibility check exited 0. |
+| D-213 stacked ancestry | PASS | `git merge-base HEAD d1c6d8b54` returned `d1c6d8b54fdb02f4d913f0c269aea2be4a5dfce0`, exit 0. |
+| D-213 range-diff | PASS WITH EXPLAINED GENERATED DELTA | 9 of 12 map `=`; commits 3, 5, and 7 map `!` only because their generated `skills.generated.ts` conflict took upstream. Separate `55791043e` deterministically regenerates the aggregate barrel. |
+| D-213 blob identity | PASS | All 23 changed non-generated files under `packages/` have identical old/new blob hashes; 0 changed. Full table is in `d213-converge-onto-s8.md`. |
+| D-213 scoped check | PASS | Exact changed-file structured wrapper exit 0; 21 files, `deno check --unstable-kv`, one batch, zero diagnostics. The initial 206-file broad attempt exited 1 on an ambient `Timeout` interaction and is a recorded non-verdict. |
+| D-213 scoped lint/fmt | PASS | Exact changed-file wrapper runs each processed 21/21 with zero findings under a temporary rules-preserving no-exclude config, then removed it. Initial root-config runs exited 2 on honest coverage refusal. |
+| D-213 focused tests | PASS | Structured wrapper exit 0; 82 passed, 0 failed across runtime-gates, Aspire MCP smoke, suite registry, and agent-init suites. |
+| D-213 Aspire version parity | PASS | Exit 0; phase 1 checked 812 entries and reported `fail=0`. |
+| D-213 quality gate | PASS | Exit 0; code-quality scan clean and doctrine `FAIL=0` with pre-existing warnings only. |
+| D-213 runtime/evaluator | NOT RUN by ruling | No Aspire, Docker, AppHost, `e2e:cli`, PLAN-EVAL, or IMPL-EVAL command was run. |
 
 ## Handoff Notes
 
@@ -180,6 +192,9 @@ or the canonical generator source and run the documented generators.
   from `Deno.readTextFile`; no creation, catch, fallback, or sqlite exclusion was added.
 - D-194 IMPL-EVAL is supervisor-dispatched after the pushed bytes change; this session does not
   request, dispatch, or perform it.
+- D-213 is convergence, not repair: the existing Postgres `database.seed` result was not chased and
+  no product behavior changed. The 23/23 non-generated blob identity result is the carry-forward
+  evidence for the supervisor's evaluator decision.
 - **Post-slice reconcile:** PR #1759 remains the delivery surface on the same branch and base; no
   labels, lifecycle state, issue state, or PR base were changed. The supervisor owns the next
   evaluation transition.

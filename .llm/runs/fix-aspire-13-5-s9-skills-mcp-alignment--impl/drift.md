@@ -85,3 +85,17 @@
   start and restart lifecycle paths; retain strict missing/malformed-config failure.
 - **Evidence:** generator path in `render-ts-apphost.ts`, `createSmokeProject()` path contract,
   commit `d9bd6250c`, static suite indices, and the D-194 RED regression in `worklog.md`.
+
+## 2026-08-31 — D-213 generated-only range divergence
+
+- **What:** Three replayed commits map `!` because their generated `skills.generated.ts` patches
+  conflicted with the newly converged S8 base.
+- **Expected:** Binding conflict rules require the upstream/S8 side for generated files and one
+  deterministic barrel regeneration after the replay.
+- **Actual:** Commits `8d8c5e00b`, `905f787f8`, and `00c2ef168` each conflicted only in
+  `skills.generated.ts`; upstream was taken each time. The final generator produced one 3-line
+  replacement committed as `55791043e`.
+- **Severity:** mechanical/generated; no product behavior drift.
+- **Action:** retain the explicit `!` explanation and the 23-row non-generated blob table; do not
+  repair or redesign source.
+- **Evidence:** `d213-converge-onto-s8.md`; all 23 non-generated `packages/` blobs are identical.

@@ -6,19 +6,17 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `D-194 runtime.aspire-start repair — implementation/gates` |
+| Current phase | `D-213 convergence onto newly converged S8 — delivery` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-All three Phase-A slices are rebased onto reconstructed S8 head `bc838a0b3`. The S9 range contains
-only its ten rewritten implementation commits; stale S5/S6/old-S8 lineage is absent. No AppHost,
-Docker container, or runtime gate was started. The single permitted no-AppHost MCP session preserved
-a significant upstream mismatch: Aspire 13.5.3 exposed 14 baseline tools and omitted
-`get_integration_docs`. D-194 confirmed that S9's dashboard-authentication script read
-`aspire.config.json` from the generated project root instead of beside `aspire/apphost.mts`; the
-minimal path-identity repair and RED-first regression are implemented without runtime execution.
+S9's 12 own commits are replayed onto newly converged S8 head `d1c6d8b54`; the old S8 lineage is not
+replayed. Three generated-only conflicts took upstream/S8 and the barrel was regenerated in
+`55791043e`. Every one of the 23 changed non-generated files under `packages/` has an identical blob
+at old head `29eed9ef9` and the converged head. No AppHost, Docker container, runtime gate, or
+evaluator was started, and no product behavior was changed.
 
 ## Completed
 
@@ -36,10 +34,13 @@ minimal path-identity repair and RED-first regression are implemented without ru
   union that retains S8's narrow paths while adding only the two S9 MCP receipt paths.
 - D-194 root cause is confirmed and the alternative gate-ordering/sqlite-routing hypotheses are
   eliminated with static suite evidence.
+- D-213 converged the 12-commit S9 range onto S8 `d1c6d8b54`, recorded all three generated-only
+  conflict resolutions, regenerated the barrel, and proved the non-generated product surface is
+  blob-identical.
 
 ## In Progress
 
-- Finish D-194 static gates, commit, verify the remote ref, and fast-forward push.
+- Commit the D-213 harness evidence, obtain a fresh exact remote SHA, and force-push with that lease.
 
 ## Next Steps
 
@@ -53,6 +54,7 @@ minimal path-identity repair and RED-first regression are implemented without ru
 | --- | --- | --- |
 | Phase A only | owner dispatch | Never start an AppHost or containers. |
 | External evaluation | harness + supervisor | This session does not self-certify. |
+| D-213 is convergence, not repair | owner dispatch | Do not chase `database.seed`; preserve product blobs and let CI supply runtime evidence. |
 
 ## Files Changed
 
@@ -71,6 +73,7 @@ minimal path-identity repair and RED-first regression are implemented without ru
 | Exact dashboard classification | PASS | 16 focused tests plus scoped check/lint/fmt |
 | D-148 un-stack | PASS | S8 ancestry, 10-commit range map, narrow workflow paths, 60 focused tests, scoped wrappers, repo check, parity, and quality gate |
 | D-194 static repair | PASS | RED-first lifecycle config-path regression; 43 focused tests; 3-file scoped check/lint/fmt; quality gate; repo check with `failedBatches: 0` |
+| D-213 convergence | PASS pending delivery | Exact S8 ancestry; 12-commit mapping; 23/23 non-generated blobs identical; generated barrel reproducible; 21-file scoped gates; 82 tests; parity `fail=0`; quality gate green |
 
 ## Open Questions
 
@@ -83,6 +86,8 @@ minimal path-identity repair and RED-first regression are implemented without ru
 - Significant drift: static Aspire 13.5.3 MCP has only 14 tools; see `drift.md` and the receipt.
 - Process drift: D-133 correctly aborted on an unauthorized workflow conflict; D-148 supplied the
   selective resolution and the resumed rebase completed.
+- Mechanical drift: three D-213 `!` mappings are generated-only and fully explained in
+  `d213-converge-onto-s8.md`.
 - Debt: no new debt accepted.
 
 ## Commits
@@ -90,4 +95,5 @@ minimal path-identity repair and RED-first regression are implemented without ru
 - `d81f5fd34` — MCP smoke receipt gate, including the S8/S9 gate-registration union.
 - `06103eeef` — workflow receipt retention with D-148's narrow selective artifact union.
 - `8d8c5e00b` — Aspire skills, corpora, agent init, and dogfood alignment; generated corpus conflict took upstream before final asset regeneration.
+- `55791043e` — deterministic skills barrel regeneration after D-213 convergence.
 - Draft PR #1759 contains a separate implementation comment for each commit.
