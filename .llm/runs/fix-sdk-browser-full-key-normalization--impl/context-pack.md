@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `fix-sdk-browser-full-key-normalization--impl` |
 | Branch | `fix/sdk-browser-full-key-normalization` |
-| Current phase | `implement` |
+| Current phase | `gate` |
 | Archetype | `2 — Integration` |
 | Scope overlays | `frontend` (browser environment-key contract) |
 
 ## Current State
 
-The branch is based exactly on current `origin/main`. Research confirms the SDK browser full
-key and Aspire full key diverge for invalid resource-name characters; shorthand and server keys are
-separate contracts and remain unchanged. The locked implementation is a private SDK normalizer with
-an Aspire-source citation and a test-only cross-package agreement guard in the SDK suite.
+The branch started at baseline `dea449911`; `origin/main` advanced during review without touching
+this slice. Draft PR #1831 is open. The SDK browser builder now applies Aspire's exact resource-name
+identifier normalization through a private helper; shorthand and server code are untouched. Every
+owner-requested local gate is green, and Slice 2 awaits independent review before commit.
 
 ## Completed
 
@@ -23,16 +23,18 @@ an Aspire-source citation and a test-only cross-package agreement guard in the S
 - Archetype 2 and frontend/browser overlay selected.
 - Doctrine verdicts and relevant debt reviewed.
 - `PLAN-EVAL: N/A` recorded before implementation.
+- Slice 1 signed/pushed as `e5dd8dbc5`; draft PR #1831 opened with the requested metadata.
+- Canonical RED captured and all Slice 2 gates passed.
 
 ## In Progress
 
-- Slice 1: the first review blocker is remediated; rerun RED and request review cycle 2.
+- Slice 2: independent opposite-family slice review before sign-off commit.
 
 ## Next Steps
 
-1. Obtain independent slice review, commit/push, and open the requested draft PR.
-2. Implement the private SDK normalizer and run all required gates.
-3. Run separate-session native Claude/Fable IMPL-EVAL.
+1. Obtain Slice 2 review PASS, commit, push, and post the slice comment.
+2. Run separate-session native Claude/Fable IMPL-EVAL and address any findings.
+3. Update the draft PR body and final run artifacts without marking ready for review.
 
 ## Key Decisions
 
@@ -48,16 +50,17 @@ an Aspire-source citation and a test-only cross-package agreement guard in the S
 | --- | --- | --- |
 | `.llm/runs/fix-sdk-browser-full-key-normalization--impl/*` | new | Harness record. |
 | `packages/sdk/tests/discovery/env-ordering_test.ts` | changed | SDK contract and regression guards. |
+| `packages/sdk/src/discovery/browser-env.ts` | changed | Private Aspire-compatible browser resource-name normalization. |
 | `packages/aspire/tests/helpers_test.ts` | unchanged | Existing Aspire normalization tests remain the authority. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | RED captured | `red-contract.json`, exit 1, 5 passed / 6 failed / 4 unique expected failures; checked run. |
-| Fitness | pending | `quality:scan` and `arch:check` planned. |
+| Static | PASS | Contract 11/11; SDK 86/86; Aspire 91/91; scoped check/lint/fmt exit 0; root check exit 0 with `failedBatches: 0`. |
+| Fitness | PASS | `quality:scan` and `arch:check` exit 0. |
 | Runtime | N/A | Owner directive; no runtime processes permitted. |
-| Consumer | pending | Cross-package agreement test. |
+| Consumer | PASS | Cross-package full-key agreement test exit 0. |
 
 ## Open Questions
 

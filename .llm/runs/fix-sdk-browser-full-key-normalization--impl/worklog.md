@@ -62,6 +62,10 @@ then update the SDK's cited private rule; the cross-package step in
 | 2026-08-31T04:39:00Z | S1 | canonical RED | Checked structured SDK test run exited 1: 5 passed, 6 failed, 4 unique failures; all failures are the intended normalization mismatch. |
 | 2026-08-31T04:44:00Z | S1 | slice review cycle 2 | Native Claude Opus 5 session `b888c0a7-3ef2-48f5-84e0-1ff40accf8d8` found code/RED correct and requested four stale run-artifact references be fixed. |
 | 2026-08-31T04:49:00Z | S1 | slice review cycle 3 | Native Claude Opus 5 session `31eee6bd-356a-4eaa-879e-52cca31419d9` returned PASS with no findings. |
+| 2026-08-31T04:49:09Z | S1 | commit/PR | Signed and pushed `e5dd8dbc5`; opened draft PR #1831 with requested labels and milestone 0.0.7. |
+| 2026-08-31T04:50:00Z | S2 | implementation | Added the private SDK identifier-segment normalizer with Aspire contract-source citation; shorthand and server code untouched. |
+| 2026-08-31T04:52:53Z | S2 | gates | Contract, both package suites, scoped wrappers, repo check, quality scan, and arch check all passed. |
+| 2026-08-31T04:58:00Z | S2 | slice review | Native Claude Opus 5 session `bca46f11-a5c8-4b8e-8bbc-f39f5209cdb7` returned PASS with no blocking findings and independently reproduced every required gate at exit 0. |
 
 ## Decisions
 
@@ -85,15 +89,23 @@ then update the SDK's cited private rule; the cross-package step in
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | RED contract | `run-deno-test.ts ... -- --allow-all packages/sdk/tests/discovery/env-ordering_test.ts` | FAIL (expected), exit 1 | `red-contract.json`: 5 passed, 6 failed, 4 unique expected normalization failures; type checking completed. |
-| Focused package tests | structured test wrapper | NOT_RUN | SDK + Aspire only. |
-| Changed-file check/lint/fmt | structured wrappers | NOT_RUN | Run after implementation. |
-| Repository check | `deno task check` | NOT_RUN | Must report `failedBatches: 0`. |
+| Focused contract GREEN | structured test wrapper on SDK discovery test | PASS, exit 0 | `focused-contract-green.json`: 11 passed, 0 failed. |
+| SDK package tests | structured test wrapper from `packages/sdk` | PASS, exit 0 | `sdk-tests.json`: 86 passed, 0 failed. |
+| Aspire package tests | structured test wrapper from `packages/aspire` | PASS, exit 0 | `aspire-tests.json`: 91 passed, 0 failed. |
+| Changed-file check | `run-deno-check.ts` with two `--file` entries | PASS, exit 0 | `scoped-check.json`: 0 occurrences; default `--unstable-kv`. |
+| Changed-file lint | `run-deno-lint.ts` with two `--file` entries | PASS, exit 0 | `scoped-lint.json`: 0 occurrences. |
+| Changed-file fmt | `run-deno-fmt.ts` with two `--file` entries | PASS, exit 0 | `scoped-fmt.json`: 2 files, 0 failed batches/findings. |
+| Scoped wrapper setup attempt | same three wrappers without output write permission | invocation error, exit 1 each | No gate ran; rerun authoritatively with `--allow-write`, all exit 0 above. |
+| Repository check | `deno task check` | PASS, exit 0 | 2,970 files, 25 batches, `failedBatches: 0`, 0 occurrences. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-2/F-3/F-11..F-19 applicable set | NOT_RUN | `quality:scan` + `arch:check` planned | No new dependency or public surface. |
+| Code-quality scan | PASS, exit 0 | `deno task quality:scan` | 0 findings; 7 existing bounded allowances. |
+| Archetype/doctrine gates | PASS, exit 0 | `deno task arch:check` | Every unit reports `FAIL=0`; warnings are pre-existing and unrelated. |
+| F-2 helper justification | PASS manual | source review | Helper encodes the Aspire browser-key policy; it is pure, private, and directly tested. |
+| F-5/F-6/F-7 public/JSR surface | N/A | research surface scan | No export, manifest, dependency, or public symbol change. |
 
 ### Runtime Gates
 
@@ -105,7 +117,7 @@ then update the SDK's cited private rule; the cross-package step in
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| SDK↔Aspire browser full-key contract | NOT_RUN | Cross-package test planned | Test-only dependency. |
+| SDK↔Aspire browser full-key contract | PASS, exit 0 | `focused-contract-green.json` | Agreement covers hyphen and other invalid characters; test-only public-subpath import. |
 
 ## Handoff Notes
 

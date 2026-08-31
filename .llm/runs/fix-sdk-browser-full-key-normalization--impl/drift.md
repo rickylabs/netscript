@@ -51,3 +51,13 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** raw `git diff --stat HEAD..origin/main`; no overlap with Slice 1 paths.
+
+## 2026-08-31 — Upstream tip advanced again without scope overlap
+
+- **What:** By Slice 2 review, `origin/main` had advanced again to `0e93a6c05`.
+- **Source:** Independent reviewer merge-base comparison.
+- **Expected:** Mid-run upstream changes may land while the reviewed branch stays on its bootstrap baseline.
+- **Actual:** No upstream commit since `dea449911` touches `packages/sdk` or `packages/aspire`; PR #1831 already targets the live `main` tip.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Slice 2 review gate `git diff --name-only $(git merge-base HEAD origin/main) origin/main` found no SDK/Aspire path.
