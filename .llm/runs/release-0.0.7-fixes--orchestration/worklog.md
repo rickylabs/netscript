@@ -6728,3 +6728,41 @@ the 0.0.7 milestone being closed; re-triage is the coordinator's call.
 `#1824` → **orchestrator:aspire** (not this lane; do not work it). `#1825` and `#1826` →
 **orchestrator:fixes**, milestone **0.0.8**. All three stay off the 0.0.7 deadline; none is orphaned.
 This lane's 0.0.7 queue is unchanged — #1819 implementing, #1773 in plan evaluation.
+
+### BLOCKER B3 — the sanctioned evaluator route does not exist in the machine bindings (#1792 doc↔config drift)
+
+Attempted to dispatch #1773's cycle-2 PLAN-EVAL as "Qwen 3.8 Flash max". It cannot be executed as
+named. Evidence, all at main `7908399af`:
+
+- `delegate_openrouter` rejected `qwen/qwen3.8-flash` → `invalid_request: model is not approved for
+  hybrid delegation`.
+- `.llm/tools/agentic/config/models.ts` has **no** `qwen3.8-flash` and **no** `glm-5.3-flash`. It
+  defines `qwen: 'qwen/qwen3.8-max'` and `glm: 'z-ai/glm-5.2'`.
+- `HYBRID_DELEGATION_MODEL_IDS` = **[`deepseek/deepseek-v4-flash-0731`] only** — the hybrid transport
+  cannot run Qwen at all, at any id.
+- `OPEN_EVALUATOR_MODEL_IDS` (formal evaluation) = minimax-m3, deepseek-v4-flash-0731,
+  qwen/qwen3.8-max.
+- `routing-policy.ts` — the authoritative binding, since
+  `resolveCanonicalFormalEvaluatorRoute()` throws on mismatch — still binds
+  `FORMAL_PLAN_EVALUATOR_PRESET = claude-evaluator-minimax-m3`,
+  `FORMAL_IMPL_EVALUATOR_PRESET = claude-evaluator-deepseek-v4-flash-0731`, and
+  `COMPLEX_FORMAL_IMPL_EVALUATOR_PRESET = claude-evaluator-qwen-3-8-max`.
+
+So **#1792 changed `lane-policy.md`'s prose and its canonical-route HTML comments but not the machine
+bindings or `models.ts`.** The document claims to be "the rendered view of `CANONICAL_ROUTE_POLICY`"
+and now contradicts it — the exact single-home-for-volatile-values invariant AGENTS.md protects with a
+guard test. This is worth an issue in its own right regardless of how #1773 is routed.
+
+**Not resolved unilaterally, deliberately.** `plan-eval.md` records "cycle 1 of the two allowed", so
+cycle 2 is the **last** cycle for this leaf; spending it on a contested route is irreversible.
+Executable options, none silently chosen:
+
+1. **Native Claude Fable 5 · medium** — the policy *default* for Codex-authored plans, same route as
+   cycle 1, available now, needs no OpenRouter. The open route is conditioned
+   `third_opinion_or_native_limit` and neither condition currently holds.
+2. **DeepSeek V4 Flash 0731** — the only model the hybrid transport approves, and it is in the formal
+   open-evaluator set.
+3. **`qwen/qwen3.8-max`** — approved for formal evaluation, but I have no transport for it from this
+   session (hybrid rejects it; `opencode-eval` is vision-only Kimi K3).
+
+Recommendation: option 1. The brief is written and fires immediately on ruling.
