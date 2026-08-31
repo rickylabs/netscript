@@ -1,92 +1,86 @@
-# Context Pack: #1452 Slice 1 — lazy KV primitive and scaffold adoption
+# Context Pack: #1452 Slice 2 — structural injected plugin service context factory
 
 ## Run Metadata
 
 | Field | Value |
 | --- | --- |
-| Run ID | `feat-plugin-service-context-host-factory--1452` |
-| Branch | `feat/kv-lazy-plugin-context` |
-| Current phase | **ready-merge** (Slice 1 complete; Slice 2 deferred behind an architecture ruling) |
-| Archetype | `2 — Integration`; `6 — CLI/Tooling` carrier |
+| Run ID | `feat-plugin-service-context-host-factory--1452` (shipped Slice 1 directory reused as directed) |
+| Branch | `feat/plugin-service-context-factory` |
+| Baseline | `7ae7fe2dad941ed70e5806965fd964b9746d8fe1` (`origin/main`) |
+| Current phase | gated; ready for the single commit, explicit-refspec push, and draft PR |
+| Archetype | `4 — Public DSL / Builder` (`packages/plugin` SDK composition factory); `6 — CLI/Tooling` carrier |
 | Scope overlays | none |
 
-## Current State
+## Outcome
 
-**Corrected 2026-08-31.** This section was frozen at bootstrap and read "Implementation has not
-started" long after Slice 1 shipped. Actual state:
+Slice 2 publishes `createPluginServiceContext` from `@netscript/plugin/sdk`. The factory owns lazy
+memoization plus contracts/logger/env assembly over two caller-supplied async resolvers. The CLI
+host retains the project-relative database import and imports `getKv` itself, then injects both.
 
-Slice 1 is **implemented, Tier-A ACCEPTED, IMPL-EVAL PASS, and fully gated**. Immutable head
-`b87fd92faf86bb2a616effc6c340568f7ddeaf96`, integrated onto `main` `eaea940be` at seam `8ab11ddee`.
-PR #1820 is non-draft, `status:ready-merge`, `Refs #1452` **partial** with `closingIssuesReferences`
-deliberately empty. Slice 2 (the host factory) remains deferred behind an architecture ruling.
+The coordinator's dependency ruling is preserved: `packages/plugin/deno.json` is byte-identical to
+baseline and `@netscript/plugin` has no dependency or import edge to `@netscript/kv`.
 
-The superseded bootstrap text is preserved in git history at `7bd87da5c`; it is not restated here.
+## Behavior Proven
 
-## Completed
+- DB and KV resolver counts are zero immediately after factory construction.
+- Both remain zero after awaiting the returned context.
+- Concurrent repeated DB access resolves the database adapter exactly once.
+- Concurrent repeated KV operations resolve the KV adapter exactly once.
+- The existing `PluginServiceContext` shape is unchanged.
+- The generated template imports and calls the SDK factory and supplies both resolvers; the old
+  inline context assembly is absent.
 
-- Re-baselined branch/main/lock state and confirmed no remote branch.
-- Confirmed the exact 69-line template reference class and public KV contracts.
-- Confirmed Slice 2 remains decision-blocked and outside the ceiling.
+## Product Files
 
-## In Progress
-
-- Nothing. Slice 1 is complete, gated, and evaluated; the PR is a surfaced merge candidate awaiting
-  the coordinator. Slice 2 is deferred, not in progress.
-
-## Next Steps
-
-1. Coordinator merges PR #1820 at the exact evidence head. This lane does not merge.
-2. Slice 2 stays blocked until the `@netscript/plugin` → `@netscript/kv` dependency-edge ruling, the
-   db-resolver injection shape, and the undefined `appsettings` scope are decided.
-3. Fold the evaluator's deferred finding — `SharedKvConfig` is only implicitly exported and
-   `createLazyKv` is absent from the kv reference page — into Slice 2 or the docs sweep.
-
-## Key Decisions
-
-| Decision | Source | Notes |
+| Path | Status | Purpose |
 | --- | --- | --- |
-| `createLazyKv(config?)` in KV application layer | plan LD-1/LD-2 | One new stable root export only |
-| Template imports the primitive | plan LD-4 | No other host composition changes |
-| PLAN-EVAL N/A | plan/worklog | Mechanical, fully specified Slice 1 only |
-| Reviewer dispatch | superseded by coordinator order | The separate-session IMPL-EVAL was dispatched and returned `PASS`; the original "stop at draft Tier-A handoff" boundary no longer applies |
+| `packages/plugin/src/sdk/runtime/plugin-service-context-factory.ts` | new | structural injected factory and private lazy KV façade |
+| `packages/plugin/src/sdk/runtime/plugin-service-context-factory_test.ts` | new | observable laziness/memoization proof |
+| `packages/plugin/src/sdk/mod.ts` | changed | one new public SDK export |
+| `packages/cli/src/kernel/assets/plugins/service-context.ts.template` | changed | host adapter injection |
+| `packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts` | changed | semantic delegating-template assertions |
+| `packages/cli/src/kernel/assets/embedded.generated.ts` | regenerated | CLI asset carrier |
+| `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | regenerated | MCP export carrier |
 
-## Files Changed
+Run-artifact updates are limited to `worklog.md`, `context-pack.md`, and append-only `drift.md`.
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `packages/kv/application/lazy-kv.ts` | new | `createLazyKv()` — the published lazy `WatchableKv` primitive |
-| `packages/kv/application/mod.ts` | changed | re-export |
-| `packages/kv/mod.ts` | changed | root export |
-| `packages/kv/tests/lazy-kv_test.ts` | new | laziness proven by observation, not happy path |
-| `packages/cli/src/kernel/assets/plugins/service-context.ts.template` | changed | 123 → 43 lines; delegates to the published primitive |
-| `packages/cli/src/kernel/assets/embedded.generated.ts` | regenerated | carrier, tool output |
-| `packages/mcp/.../export-surface-corpus.generated.ts` | regenerated | carrier, tool output (+1 symbol) |
-| Run-dir artifacts | changed | research/plan/tier-a/worklog/context-pack/receipts |
+## Gate Summary
 
-## Gates
+| Gate | Result |
+| --- | --- |
+| structured check / lint / fmt | **PASS**; all accepted receipts have non-empty stdout (307; plugin 358/307; CLI 352/301 bytes) |
+| focused tests | **PASS**; 5/5, 418 stdout bytes |
+| `check:assets-barrel` | **PASS**; exit 0, legitimate zero stdout, no additional generated delta |
+| `docs:exports-drift` | **PASS** |
+| `check:mcp-export-corpus` | **PASS**; 7,751 vs isolated baseline 7,750 = exactly +1 factory export |
+| `quality:scan` | **PASS** |
+| `arch:check` | **PASS** |
+| `publish:dry-run` | **PASS**; 0 stdout bytes, 343,265 stderr bytes |
+| `deno.lock` | byte-identical `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
 
-**Corrected 2026-08-31.** This table previously read `NOT_RUN / implementation pending` across the
-board. That was false: it was never updated after Slice 1 landed. Actual state at integrated head
-`186cea472`, evidence head `3130fb52b` — every receipt `gitHead == actualGitHead`, each checked for
-non-empty `stdout.bytes` against the known `deno task` cache-replay trap.
+## JSR / Debt
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Static | **PASS** | scoped `check` (`^packages/(kv\|cli)/`) 303-byte stdout, 31,193 ms; `lint` 352-byte; `fmt-check` 301-byte |
-| Fitness | **PASS** | `check:assets-barrel` exit 0 — this gate is `gen && git diff --exit-code`, so zero-byte stdout is legitimately clean, verified by confirming no regenerated-but-uncommitted carrier remains; `docs:exports-drift` PASS; `check:mcp-export-corpus` PASS, 7678 symbols = `main`'s 7677 +1 (`createLazyKv`) |
-| Runtime | **PASS** | Previously recorded `N/A / forbidden` — wrong: the template and generated-output change *does* require `scaffold.runtime` evidence. Opted into the explicit CI gate via `e2e-cli-gate` (local Aspire is topology-parked). Run `33357314826` at head `7bd87da5c`: `scaffold-runtime (aspire + docker + postgres)` **success**, `scaffold-runtime-sqlite (aspire + sqlite + garnet)` **success**, `scaffold-static (deno-only)` **success**. Before the label, every scaffold lane reported `skipping`. |
-| Consumer | **PASS** | `packages/kv` tests 80 passed / 3 ignored / 0 failed, 288-byte stdout; `deno.lock` byte-identical `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
-| IMPL-EVAL | **PASS** | separate-session OpenHands GLM 5.3 Flash · `max` at `3130fb52b`, base `0274c0a7` — comment `5473634548` |
+Pre-existing package audit debt remains outside this slice: four missing entrypoint module tags,
+two folder-cardinality warnings, the sanctioned oRPC slow-type notice, and 15 package-level private
+type diagnostics. The `./sdk` entrypoint has zero doc-lint diagnostics, so the new export contributes
+none.
 
-## Open Questions
+The checked-in baseline MCP carrier lagged its own generator (7,680 checked in vs 7,750 regenerated);
+`drift.md` records that the Slice 2 attributable delta is only the final +1.
 
-- Slice 2 questions are deliberately deferred; none blocks Slice 1.
+## Deferred
 
-## Drift and Debt
+Generic `appsettings` assembly remains unimplemented. Contrary to the stale original brief, an
+auth-specific optional seam exists at `plugins/auth/services/src/init.ts:15`, and CLI/Aspire already
+support `appsettings.json`; the generic `PluginServiceContext` contract has no such member. The
+coordinator directed this slice not to invent one.
 
-- Drift: RTK binary unavailable; focused raw commands are the documented fallback.
-- Debt: existing KV AP-1 test-file debt is not touched or deepened.
+Issue #1452 therefore remains partial. The PR must use `Refs #1452` with no closing keyword.
 
-## Commits
+## Handoff Boundary
 
-- PR #1820 is open and non-draft; its commit list and per-slice comments are the commit trail.
+- One commit only.
+- Push with an explicit refspec.
+- Open a draft PR with no labels and no acceptance boxes.
+- Do not dispatch an evaluator and do not merge. This is the owner's explicit IMPL-EVAL waiver for
+  this session; no evaluator verdict is claimed.

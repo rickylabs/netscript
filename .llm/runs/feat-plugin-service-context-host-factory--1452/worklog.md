@@ -1,5 +1,146 @@
 # Worklog: #1452 Slice 1 — lazy KV primitive and scaffold adoption
 
+## Slice 2 Design — structural injected host factory
+
+Recorded before Slice 2 implementation on 2026-08-31. `PLAN-EVAL: N/A`: the coordinator has
+locked the dependency edge, public location, injection shape, file ceiling, deferred scope, and
+gate set. No architecture or sequencing decision remains open for this mechanical publication.
+
+### Public surface
+
+- `createPluginServiceContext(pluginName, { getDatabaseClient, getKv })` from
+  `@netscript/plugin/sdk`.
+- Its inline readonly options contract has two structurally typed async resolver functions returning
+  `Promise<unknown>`; it imports no database or KV adapter type and adds no second public symbol.
+- The existing `PluginServiceContext` interface is unchanged.
+
+The SDK subpath is the doctrine-aligned placement because it already owns
+`PluginServiceContext` and the surrounding plugin-host runtime contracts. A new root export or
+subpath would split one host-context concept across surfaces.
+
+### Domain vocabulary and ports
+
+- **Database resolver:** caller-owned `() => Promise<unknown>`; the returned context exposes it as
+  the existing `db.getClient()` contract.
+- **KV resolver:** caller-owned `() => Promise<unknown>`; a private structural guard validates the
+  resolved value before the existing lazy KV method façade delegates to it.
+- **Memoized async resolver:** package-owned concurrency-safe promise cache. Construction and
+  awaiting the context resolve neither adapter; the first use resolves once, and repeated or
+  concurrent use reuses the same promise.
+- **Host assembly:** existing contracts (`baseContract` plus empty `versions`), plugin-scoped logger,
+  and captured environment are assembled inside `@netscript/plugin`.
+- **CLI adapters:** the template retains its project-relative database dynamic import and imports
+  `getKv` from `@netscript/kv`; those two functions are the only injected adapters.
+
+### Constants
+
+- None. The slice introduces no finite variant vocabulary or new identifiers.
+
+### Semantic test strategy
+
+- Observe zero DB and KV resolver calls immediately after factory construction and after awaiting
+  the returned context.
+- Invoke each lazy surface repeatedly (including concurrent promise access) and observe exactly one
+  resolver call per surface.
+- Assert returned DB/KV values and the assembled contracts/logger/env fields without importing
+  `@netscript/kv` into the plugin package.
+- Update the CLI generator test to prove the template imports and calls the SDK factory and supplies
+  both resolvers, replacing the obsolete inline-object assertion.
+
+### Commit slice
+
+| # | Slice | Gate | Files |
+| --- | --- | --- | --- |
+| 2 | Publish the structural factory, delegate the scaffold, and regenerate its carrier | focused factory/template tests; scoped plugin+CLI check/lint/fmt; asset/docs/export/quality/architecture/JSR gates | factory module + SDK barrel + factory test; service-context template + generated `embedded.generated.ts`; granted CLI template test; `worklog.md` + `context-pack.md` |
+
+### Deferred scope
+
+- Generic `appsettings` assembly remains unimplemented. Accurate evidence: auth declares an
+  optional `AuthPluginServiceContext.appsettings` seam in `plugins/auth/services/src/init.ts`, and
+  CLI/Aspire already parse and emit `appsettings.json`; however, `PluginServiceContext` has no
+  generic appsettings member and the coordinator explicitly ruled that this slice must not invent
+  one.
+- The issue remains partial after Slice 2; the draft PR references #1452 without a closing keyword.
+- No `@netscript/kv` dependency is added to `packages/plugin/deno.json`.
+
+### Contributor path
+
+Plugin hosts import `createPluginServiceContext` from `@netscript/plugin/sdk`, provide their
+project-owned database and KV resolvers, and leave contracts/logger/env assembly to the package.
+Changes to context shape begin at `plugin-service-context.ts`; changes to construction behavior begin
+at the adjacent factory module and its focused observation test.
+
+## Slice 2 Implementation and Gate Results
+
+Implemented on 2026-08-31 against coordinator-approved baseline `7ae7fe2da`.
+
+### Implementation result
+
+- Published exactly one new SDK symbol, `createPluginServiceContext`, beside the existing
+  `PluginServiceContext` contract. Its resolver options are an inline readonly structural type, so
+  the package imports neither a database adapter nor `@netscript/kv`.
+- Memoized the database and KV resolver promises independently. The focused observation test proves
+  zero resolutions at construction and after awaiting the context, followed by exactly one
+  resolution per adapter after concurrent repeated use.
+- Reduced the scaffold template to 36 lines. It retains the project-relative database import,
+  imports `getKv` in the host template, and injects both into the published factory.
+- Updated the CLI semantic assertion to require the SDK import/call and both injected resolvers,
+  and to reject the old inline assembly imports/body.
+- Regenerated `embedded.generated.ts` and the granted MCP export corpus carrier from tooling.
+
+### Dependency and lock ruling
+
+| Invariant | Result | Evidence |
+| --- | --- | --- |
+| `packages/plugin/deno.json` gains no dependency | **PASS** | worktree and `HEAD` SHA-256 are both `8f0662c9f582db6b0f83c385e990db3f31cf710354c77c5f331e801d711febc9`; diff is empty |
+| No `@netscript/plugin` → `@netscript/kv` edge | **PASS** | plugin source has no KV import; only the CLI template imports `getKv` |
+| `deno.lock` byte-identical | **PASS** | worktree and `HEAD` SHA-256 are both `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+
+### Gate evidence
+
+Durable receipts are under ignored `.llm/tmp/gate-receipts/1452-s2/`. The immutable receipt head is
+the approved baseline; each command ran against the final dirty worktree that is committed as the
+single Slice 2 commit.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| scoped check, plugin + CLI | **PASS** | 1,058 files; `stdout.bytes=307` |
+| plugin lint | **PASS** | 155 files; `stdout.bytes=358` |
+| plugin fmt | **PASS** | 155 files; `stdout.bytes=307` |
+| owned CLI test lint | **PASS** | 1/1 file under a temporary standalone config matching recommended rules; `stdout.bytes=352` |
+| owned CLI test fmt | **PASS** | 1/1 file under a temporary standalone 100-column/single-quote config; `stdout.bytes=301` |
+| focused factory + template tests | **PASS** | 5 passed / 0 failed; `stdout.bytes=418` |
+| `check:assets-barrel` | **PASS** | exit 0; zero stdout is legitimate for `gen && git diff --exit-code`; generator left no additional unstaged carrier delta |
+| `docs:exports-drift` | **PASS** | export/symbol drift check exit 0 |
+| `check:mcp-export-corpus` | **PASS** | 7,751 symbols; isolated baseline generation is 7,750, so the attributable delta is exactly `createPluginServiceContext` |
+| `quality:scan` | **PASS** | no findings; `stdout.bytes=4092` |
+| `arch:check` | **PASS** | no failures; `stdout.bytes=40545` |
+| `publish:dry-run` | **PASS** | `stdout.bytes=0` is expected; authoritative `stderr.bytes=343265` ends with `Success Dry run complete` |
+
+### JSR audit framing
+
+The package-level audit remains non-green for pre-existing debt outside this slice: four missing
+entrypoint `@module` tags (`./abstracts`, `./config`, `./cli`, `./testing`), two folder-cardinality
+warnings (`src`, `src/config/domain`), and the sanctioned oRPC slow-type notice. Full package doc
+lint reports 15 pre-existing `private-type-ref` diagnostics. The `./sdk` entrypoint reports zero
+diagnostics, so the new factory contributes none. No debt is fixed or deepened here.
+
+### Deferred acceptance and evaluator boundary
+
+- Generic `appsettings` assembly remains unimplemented. The accurate evidence is the optional
+  auth-only seam in `plugins/auth/services/src/init.ts:15` plus existing CLI/Aspire configuration
+  support; `PluginServiceContext` itself has no generic member, and this slice does not invent one.
+- The issue remains partial, so the draft PR uses `Refs #1452` without a closing keyword.
+- The owner explicitly directed: no labels, no acceptance boxes, no evaluator dispatch, no merge.
+  Formal IMPL-EVAL is therefore waived for this implementation session and no evaluator verdict is
+  claimed.
+
+### Reconcile note
+
+The branch remains a direct Slice 2 leaf from current `origin/main` `7ae7fe2da`. Slice 1 is already
+shipped as PR #1820. No issue-state, label, milestone, evaluator, or merge mutation is performed;
+the coordinator retains closure authority because generic `appsettings` acceptance is deferred.
+
 ## Run Metadata
 
 | Field | Value |
