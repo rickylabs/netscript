@@ -64,6 +64,20 @@ export type SenderLeaseStaleness = typeof SENDER_LEASE_STALENESS_STATES[number];
 export const SENDER_LEASE_EVICTION_REASONS = ['restart_stale_ownership'] as const;
 export type SenderLeaseEvictionReason = typeof SENDER_LEASE_EVICTION_REASONS[number];
 
+export const SENDER_OWNERSHIP_BLOCK_REASONS = [
+  'live_owner',
+  'ownership_conflict',
+  'provenance_unknown',
+] as const;
+export type SenderOwnershipBlockReason = typeof SENDER_OWNERSHIP_BLOCK_REASONS[number];
+export const SENDER_OWNERSHIP_REPAIR_REASONS = ['owner_inactive'] as const;
+export type SenderOwnershipRepairReason = typeof SENDER_OWNERSHIP_REPAIR_REASONS[number];
+
+export type SenderOwnershipDiagnostic = RuntimeDiagnostic & {
+  readonly ownershipKind: 'blocked' | 'repair-required';
+  readonly ownershipReason: SenderOwnershipBlockReason | SenderOwnershipRepairReason;
+};
+
 /** Privacy-safe durable owner metadata for one canonical worktree. */
 export interface SenderOwnershipRecord {
   readonly schemaVersion: typeof SENDER_OWNERSHIP_SCHEMA_VERSION;
@@ -74,6 +88,8 @@ export interface SenderOwnershipRecord {
   readonly acquiredAt: string;
   readonly updatedAt: string;
   readonly sessionId?: string;
+  /** Exact activation CODEX_HOME. Absent only on backward-compatible legacy records. */
+  readonly profileHome?: string;
 }
 
 export interface SenderOwnershipObservation {
@@ -92,21 +108,25 @@ export interface SenderLeaseStalenessObservation {
 export type SenderOwnershipDecision =
   | { readonly kind: 'available' }
   | {
-    readonly kind: 'stale';
+    readonly kind: 'repair-required';
+    readonly reason: SenderOwnershipRepairReason;
     readonly record: SenderOwnershipRecord;
-    readonly diagnostic: RuntimeDiagnostic;
+    readonly diagnostic: SenderOwnershipDiagnostic;
   }
   | {
     readonly kind: 'blocked';
+    readonly reason: SenderOwnershipBlockReason;
     readonly record: SenderOwnershipRecord;
-    readonly diagnostic: RuntimeDiagnostic;
+    readonly diagnostic: SenderOwnershipDiagnostic;
   };
 
-function ownershipDiagnostic(record: SenderOwnershipRecord): RuntimeDiagnostic {
+function ownershipDiagnostic(record: SenderOwnershipRecord): SenderOwnershipDiagnostic {
   return {
     code: 'duplicate_sender_risk',
     category: 'safety',
     retryable: false,
+    ownershipKind: 'blocked',
+    ownershipReason: 'live_owner',
     message: record.sessionId
       ? `worktree already has a sender; resume session ${record.sessionId}`
       : 'worktree already has a sender launch in progress',
@@ -122,16 +142,31 @@ function repairSenderLeaseAction(worktree: string): string {
   return `run deno task agentic:runtime repair sender-lease --worktree ${worktree}`;
 }
 
-function staleOwnershipDiagnostic(record: SenderOwnershipRecord): RuntimeDiagnostic {
+function repairRequiredDiagnostic(record: SenderOwnershipRecord): SenderOwnershipDiagnostic {
   const repair = repairSenderLeaseAction(record.worktree);
   return {
     code: 'duplicate_sender_risk',
     category: 'safety',
     retryable: false,
+    ownershipKind: 'repair-required',
+    ownershipReason: 'owner_inactive',
     message: 'worktree has an existing sender lease that launch will not evict',
     operatorAction: record.sessionId
       ? `resume existing session ${record.sessionId} or ${repair}`
       : repair,
+  };
+}
+
+function provenanceUnknownDiagnostic(record: SenderOwnershipRecord): SenderOwnershipDiagnostic {
+  return {
+    code: 'ownership_conflict',
+    category: 'safety',
+    retryable: false,
+    ownershipKind: 'blocked',
+    ownershipReason: 'provenance_unknown',
+    message: 'sender lease lacks activation-profile provenance and cannot be classified safely',
+    operatorAction:
+      `inspect the sender record for its original CODEX_HOME; do not repair or relaunch ${record.worktree} until provenance is established`,
   };
 }
 
@@ -145,11 +180,14 @@ export function decideSenderOwnership(
   if (record.worktree !== worktree) {
     return {
       kind: 'blocked',
+      reason: 'ownership_conflict',
       record,
       diagnostic: {
         code: 'ownership_conflict',
         category: 'safety',
         retryable: false,
+        ownershipKind: 'blocked',
+        ownershipReason: 'ownership_conflict',
         message: 'sender ownership record names a different worktree',
         operatorAction: record.sessionId
           ? `resume existing session ${record.sessionId}`
@@ -158,9 +196,27 @@ export function decideSenderOwnership(
     };
   }
   if (observation.ownerProcessAlive || observation.sessionActive) {
-    return { kind: 'blocked', record, diagnostic: ownershipDiagnostic(record) };
+    return {
+      kind: 'blocked',
+      reason: 'live_owner',
+      record,
+      diagnostic: ownershipDiagnostic(record),
+    };
   }
-  return { kind: 'stale', record, diagnostic: staleOwnershipDiagnostic(record) };
+  if (!record.profileHome) {
+    return {
+      kind: 'blocked',
+      reason: 'provenance_unknown',
+      record,
+      diagnostic: provenanceUnknownDiagnostic(record),
+    };
+  }
+  return {
+    kind: 'repair-required',
+    reason: 'owner_inactive',
+    record,
+    diagnostic: repairRequiredDiagnostic(record),
+  };
 }
 
 /** Classifies whether three provenance-bound signals can authorize explicit lease repair. */
@@ -217,9 +273,13 @@ export function newSenderOwnershipRecord(
     ownerPid: number;
     leaseToken: string;
     now: string;
+    profileHome?: string;
   }>,
 ): SenderOwnershipRecord {
-  if (!input.worktree.startsWith('/') || input.ownerPid <= 0 || !input.leaseToken) {
+  if (
+    !input.worktree.startsWith('/') || input.ownerPid <= 0 || !input.leaseToken ||
+    (input.profileHome !== undefined && !input.profileHome.startsWith('/'))
+  ) {
     throw new Error('sender ownership input invalid');
   }
   return {
@@ -230,6 +290,7 @@ export function newSenderOwnershipRecord(
     state: 'launching',
     acquiredAt: input.now,
     updatedAt: input.now,
+    ...(input.profileHome ? { profileHome: input.profileHome } : {}),
   };
 }
 

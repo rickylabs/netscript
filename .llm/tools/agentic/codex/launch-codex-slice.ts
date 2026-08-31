@@ -73,6 +73,7 @@ import {
   activateSenderOwnership,
   decideSenderOwnership,
   newSenderOwnershipRecord,
+  type SenderOwnershipDecision,
   type SenderOwnershipObservation,
 } from '../runtime/sender-ownership.ts';
 import type { RuntimeDiagnostic } from '../runtime/contract.ts';
@@ -98,12 +99,24 @@ interface Options {
 }
 
 /** Returns the diagnostic that makes launch preserve an existing sender lease. */
+export type ExistingSenderLaunchBlocker = RuntimeDiagnostic & {
+  readonly ownershipKind: Exclude<SenderOwnershipDecision, { readonly kind: 'available' }>['kind'];
+  readonly ownershipReason: Exclude<
+    SenderOwnershipDecision,
+    { readonly kind: 'available' }
+  >['reason'];
+};
+
 export function existingSenderLaunchBlocker(
   worktree: string,
   observation: SenderOwnershipObservation,
-): RuntimeDiagnostic | null {
+): ExistingSenderLaunchBlocker | null {
   const decision = decideSenderOwnership(worktree, observation);
-  return decision.kind === 'available' ? null : decision.diagnostic;
+  return decision.kind === 'available' ? null : {
+    ...decision.diagnostic,
+    ownershipKind: decision.kind,
+    ownershipReason: decision.reason,
+  };
 }
 
 function printHelp(): void {
@@ -388,13 +401,16 @@ async function main(): Promise<void> {
     const blocker = existingSenderLaunchBlocker(o.worktree, {
       record: existing,
       ownerProcessAlive: ownership.isProcessAlive(existing.ownerPid),
-      sessionActive: Boolean(existing.sessionId),
+      // A recorded id is identity, not proof of a live writer. Explicit repair re-probes it.
+      sessionActive: false,
     });
     if (blocker) {
       console.log(JSON.stringify({
         stage: 'sender-ownership',
         ok: false,
         code: blocker.code,
+        ownershipKind: blocker.ownershipKind,
+        ownershipReason: blocker.ownershipReason,
         message: blocker.message,
         operatorAction: blocker.operatorAction,
       }));
@@ -407,6 +423,7 @@ async function main(): Promise<void> {
     ownerPid: Deno.pid,
     leaseToken,
     now: new Date().toISOString(),
+    profileHome: profilePlan?.home ?? `${wslHome()}/.codex`,
   });
   if (!await ownership.create(owner)) {
     console.log(JSON.stringify({

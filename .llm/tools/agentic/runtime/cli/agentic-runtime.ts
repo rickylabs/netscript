@@ -172,7 +172,6 @@ function senderLeaseDependencies(home: string): SenderLeaseCliDependencies {
         new LocalSenderLeaseRepairAdapter({
           ownership,
           evidenceDirectory,
-          sessionRoot,
         }),
       );
     },

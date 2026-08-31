@@ -82,13 +82,14 @@ Deno.test('successful sends stay successful without identity but route mismatche
   assertEquals(launcherExitCode(0, mismatch, true), 0);
 });
 
-Deno.test('launcher blocks instead of evicting stale sender ownership', () => {
+Deno.test('launcher distinguishes repair-required ownership without evicting it', () => {
   const worktree = '/home/codex/repos/worktree';
   const record = newSenderOwnershipRecord({
     worktree,
     ownerPid: 93,
     leaseToken: 'stale-lease',
     now: '2026-07-10T20:00:00.000Z',
+    profileHome: '/home/codex/.codex',
   });
   const blocker = existingSenderLaunchBlocker(worktree, {
     record,
@@ -96,6 +97,8 @@ Deno.test('launcher blocks instead of evicting stale sender ownership', () => {
     sessionActive: false,
   });
   assertEquals(blocker?.code, 'duplicate_sender_risk');
+  assertEquals(blocker?.ownershipKind, 'repair-required');
+  assertEquals(blocker?.ownershipReason, 'owner_inactive');
   assertEquals(
     blocker?.operatorAction,
     `run deno task agentic:runtime repair sender-lease --worktree ${worktree}`,
@@ -107,6 +110,8 @@ Deno.test('launcher blocks instead of evicting stale sender ownership', () => {
     sessionActive: false,
   });
   assertEquals(foreign?.code, 'ownership_conflict');
+  assertEquals(foreign?.ownershipKind, 'blocked');
+  assertEquals(foreign?.ownershipReason, 'ownership_conflict');
   assertEquals(
     foreign?.operatorAction,
     'run deno task agentic:runtime repair sender-lease --worktree /home/codex/repos/other',

@@ -116,3 +116,33 @@ would be documentation-only. Left for Slice 4's author to add if useful, not req
 - **Action:** Do not regenerate or commit the corpus in #1751. Record the red gate truthfully for
   supervisor/coordinator disposition; no launcher/parser or agentic README edit is made.
 - **Evidence:** `worklog.md` current-main integration table; `REAL_EXIT=1` direct capture.
+
+## 2026-08-31 — correction: parked-head flake identified and repaired
+
+- **What:** The preceding unidentified-flake entry is superseded. An independent 20-run focused
+  audit reproduced two failures in `local-sender-lease-repair-adapter_test.ts` with `TypeError:
+  Child process has already terminated`.
+- **Expected:** Test cleanup is idempotent when the bounded child exits before `SIGTERM` or
+  `SIGKILL`, while still awaiting its captured status on every path.
+- **Actual:** Both kill guards admitted only `Deno.errors.NotFound` and rethrew the specific
+  already-terminated `TypeError`.
+- **Severity:** significant branch-owned test flake, measured at 2/20 focused repetitions.
+- **Action:** The coordinator authorized a protected-ceiling exception limited to the teardown
+  helper. Match the already-terminated error narrowly, rethrow everything else, and prove the fix
+  with 50/50 focused repetitions plus persisted root-suite reports.
+- **Evidence:** Coordinator audit and the protected-test diff recorded in `worklog.md`.
+
+## 2026-08-31 — scope amendment for activation-profile provenance
+
+- **What:** The original implementation did not persist the launch `profileHome`, so production
+  repair always constructed the default session root and could not recover isolated-profile leases.
+- **Expected:** The sender record binds the exact activation `CODEX_HOME`; legacy records load but
+  fail closed; ownership decisions provide distinct machine-readable operator outcomes.
+- **Actual:** Closing the defect requires narrow additions in the sender contract/adapters and the
+  existing launch/CLI wiring that creates records and constructs the production repair adapter.
+- **Severity:** significant product correction within #1751's headline recovery behavior.
+- **Action:** Add provenance regressions and contract fields, persist the launch profile, resolve
+  repair probes from the record, and replace the operator-facing `stale` kind with structured
+  blocked/repair-required outcomes. Do not modify launcher argument parsing or the README surface
+  owned by sibling #1750.
+- **Evidence:** Coordinator scope amendment; focused contract RED then 52/52 GREEN in `worklog.md`.

@@ -14,8 +14,9 @@ import { LocalSenderOwnershipAdapter } from './local-sender-ownership-adapter.ts
 export interface LocalSenderLeaseRepairAdapterOptions {
   readonly ownership: LocalSenderOwnershipAdapter;
   readonly evidenceDirectory: string;
-  readonly sessionRoot: string;
-  /** Set only when activation metadata independently binds these roots to this record. */
+  /** Test-only override; production resolves the exact root from record.profileHome. */
+  readonly sessionRoot?: string;
+  /** Set only when injected roots are independently bound to this record. */
   readonly provenanceBound?: boolean;
   readonly processAlive?: (pid: number) => boolean;
   readonly debounce?: (milliseconds: number) => Promise<void>;
@@ -60,29 +61,24 @@ async function digest(value: string): Promise<string> {
 export class LocalSenderLeaseRepairAdapter implements SenderLeaseRepairPort {
   private readonly processAlive: (pid: number) => boolean;
   private readonly debounce: (milliseconds: number) => Promise<void>;
-  private readonly readThread: (
-    sessionId: string,
-  ) => Promise<Readonly<{ state: ThreadWriterState }>>;
-
   constructor(private readonly options: LocalSenderLeaseRepairAdapterOptions) {
     this.processAlive = options.processAlive ?? ((pid) => options.ownership.isProcessAlive(pid));
     this.debounce = options.debounce ??
       ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
-    const codexHome = dirname(options.sessionRoot);
-    this.readThread = options.readThread ?? (async (sessionId) => {
-      const { readCodexThreadState } = await import('../../codex/codex-thread-read.ts');
-      return await readCodexThreadState(sessionId, { codexHome });
-    });
   }
 
-  private async rollout(record: SenderOwnershipRecord): Promise<RolloutLeaseEvidence> {
+  private async rollout(
+    record: SenderOwnershipRecord,
+    sessionRoot: string,
+    provenanceBound: boolean,
+  ): Promise<RolloutLeaseEvidence> {
     try {
-      const files = await exactRolloutFiles(this.options.sessionRoot, record.sessionId!);
+      const files = await exactRolloutFiles(sessionRoot, record.sessionId!);
       const exact = files[0];
       if (!exact) {
         return {
           state: 'absent',
-          provenance: this.options.provenanceBound ? 'matched' : 'unknown',
+          provenance: provenanceBound ? 'matched' : 'unknown',
         };
       }
       const content = await Deno.readTextFile(exact.path);
@@ -108,7 +104,7 @@ export class LocalSenderLeaseRepairAdapter implements SenderLeaseRepairPort {
       if (error instanceof Deno.errors.NotFound) {
         return {
           state: 'absent',
-          provenance: this.options.provenanceBound ? 'matched' : 'unknown',
+          provenance: provenanceBound ? 'matched' : 'unknown',
         };
       }
       return { state: 'unknown', provenance: 'unknown' };
@@ -117,10 +113,16 @@ export class LocalSenderLeaseRepairAdapter implements SenderLeaseRepairPort {
 
   private async thread(
     record: SenderOwnershipRecord,
+    codexHome: string,
     provenanceBound: boolean,
   ): Promise<ThreadWriterEvidence> {
     try {
-      const observed = await this.readThread(record.sessionId!);
+      const observed = this.options.readThread
+        ? await this.options.readThread(record.sessionId!)
+        : await (await import('../../codex/codex-thread-read.ts')).readCodexThreadState(
+          record.sessionId!,
+          { codexHome },
+        );
       return {
         state: observed.state,
         provenance: provenanceBound ? 'matched' : 'unknown',
@@ -137,13 +139,27 @@ export class LocalSenderLeaseRepairAdapter implements SenderLeaseRepairPort {
   ): Promise<SenderLeaseStalenessObservation> {
     const current = await this.options.ownership.read(worktree);
     if (
-      !current || current.leaseToken !== record.leaseToken || current.worktree !== record.worktree
+      !current || current.leaseToken !== record.leaseToken ||
+      current.worktree !== record.worktree ||
+      current.profileHome !== record.profileHome
     ) {
       throw new Error('sender lease mismatch');
     }
+    const codexHome = this.options.sessionRoot
+      ? dirname(this.options.sessionRoot)
+      : record.profileHome;
+    const sessionRoot = this.options.sessionRoot ??
+      (record.profileHome ? `${record.profileHome.replace(/\/$/, '')}/sessions` : undefined);
+    const provenanceBound = this.options.sessionRoot
+      ? this.options.provenanceBound === true || record.profileHome === codexHome
+      : Boolean(record.profileHome);
     const first = pidProbe(this.processAlive, record.ownerPid);
     if (first === 'alive') {
-      const thread = await this.thread(record, false);
+      const thread = codexHome ? await this.thread(record, codexHome, false) : {
+        state: 'unknown' as const,
+        provenance: 'unknown' as const,
+        sessionId: record.sessionId,
+      };
       return {
         record: current,
         pid: { first, second: 'unknown', elapsedMs: 0 },
@@ -155,10 +171,19 @@ export class LocalSenderLeaseRepairAdapter implements SenderLeaseRepairPort {
     await this.debounce(SENDER_PID_DEBOUNCE_MS);
     const second = pidProbe(this.processAlive, record.ownerPid);
     const elapsedMs = Math.max(SENDER_PID_DEBOUNCE_MS, performance.now() - started);
-    const rollout = await this.rollout(record);
+    if (!sessionRoot || !codexHome) {
+      return {
+        record: current,
+        pid: { first, second, elapsedMs },
+        rollout: { state: 'unknown', provenance: 'unknown' },
+        thread: { state: 'unknown', provenance: 'unknown', sessionId: record.sessionId },
+      };
+    }
+    const rollout = await this.rollout(record, sessionRoot, provenanceBound);
     const thread = await this.thread(
       record,
-      this.options.provenanceBound === true || rollout.provenance === 'matched',
+      codexHome,
+      provenanceBound || rollout.provenance === 'matched',
     );
     return { record: current, pid: { first, second, elapsedMs }, rollout, thread };
   }

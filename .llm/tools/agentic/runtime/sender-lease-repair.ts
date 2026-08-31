@@ -83,7 +83,8 @@ function unchangedLease(
 ): boolean {
   return observed.worktree === expected.worktree &&
     observed.leaseToken === expected.leaseToken &&
-    observed.sessionId === expected.sessionId;
+    observed.sessionId === expected.sessionId &&
+    observed.profileHome === expected.profileHome;
 }
 
 function result(

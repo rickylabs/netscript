@@ -284,16 +284,20 @@ Deno.test('live sender ownership deterministically blocks a rival and directs re
     sessionActive: true,
   });
   assert(decision.kind === 'blocked');
+  assert(decision.reason === 'live_owner');
+  assert(decision.diagnostic.ownershipKind === 'blocked');
+  assert(decision.diagnostic.ownershipReason === 'live_owner');
   assert(decision.diagnostic.code === 'duplicate_sender_risk');
   assert(decision.diagnostic.operatorAction === 'resume existing session thread-1');
 });
 
-Deno.test('age never makes a live owner stale and dead evidence permits reclaim', () => {
+Deno.test('age never changes a live block and inactive ownership requires repair', () => {
   const record = newSenderOwnershipRecord({
     worktree,
     ownerPid: 42,
     leaseToken: 'lease-old',
     now: '2000-01-01T00:00:00.000Z',
+    profileHome: '/home/codex/.codex',
   });
   assert(
     decideSenderOwnership(worktree, {
@@ -307,8 +311,40 @@ Deno.test('age never makes a live owner stale and dead evidence permits reclaim'
       record,
       ownerProcessAlive: false,
       sessionActive: false,
-    }).kind === 'stale',
+    }).kind === 'repair-required',
   );
+  const repair = decideSenderOwnership(worktree, {
+    record,
+    ownerProcessAlive: false,
+    sessionActive: false,
+  });
+  assert(repair.kind === 'repair-required');
+  assert(repair.reason === 'owner_inactive');
+  assert(repair.diagnostic.ownershipKind === 'repair-required');
+  assert(repair.diagnostic.ownershipReason === 'owner_inactive');
+  assert(
+    repair.diagnostic.operatorAction ===
+      `run deno task agentic:runtime repair sender-lease --worktree ${worktree}`,
+  );
+});
+
+Deno.test('legacy ownership without profile provenance blocks with a structured reason', () => {
+  const legacy = newSenderOwnershipRecord({
+    worktree,
+    ownerPid: 42,
+    leaseToken: 'lease-legacy',
+    now,
+  });
+  const decision = decideSenderOwnership(worktree, {
+    record: legacy,
+    ownerProcessAlive: false,
+    sessionActive: false,
+  });
+  assert(decision.kind === 'blocked');
+  assert(decision.reason === 'provenance_unknown');
+  assert(decision.diagnostic.ownershipKind === 'blocked');
+  assert(decision.diagnostic.ownershipReason === 'provenance_unknown');
+  assert(decision.diagnostic.code === 'ownership_conflict');
 });
 
 Deno.test('atomic local create permits exactly one sender and stores no payload fields', async () => {
@@ -358,5 +394,8 @@ Deno.test('strict record parser rejects unknown fields and cross-worktree owners
     sessionActive: false,
   });
   assert(decision.kind === 'blocked');
+  assert(decision.reason === 'ownership_conflict');
+  assert(decision.diagnostic.ownershipKind === 'blocked');
+  assert(decision.diagnostic.ownershipReason === 'ownership_conflict');
   assert(decision.diagnostic.code === 'ownership_conflict');
 });

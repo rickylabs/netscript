@@ -39,6 +39,10 @@ and generated-project validation are N/A: this is repo-internal tooling, not `pa
   app-server `thread/read` state; `systemError` normalizes to unknown.
 - `SenderLeaseStaleness = 'preserve' | 'stale' | 'indeterminate'` — destructive authorization is
   possible only for `stale`.
+- `SenderOwnershipDecision.kind = 'blocked' | 'repair-required' | 'available'` — the operator-facing
+  launch decision does not reuse the evidence classifier's `stale` term.
+- `SenderOwnershipDecision.reason` and the matching diagnostic fields distinguish `live_owner`,
+  `ownership_conflict`, `provenance_unknown`, and `owner_inactive` for machine-readable routing.
 - `SenderLeaseEvictionReason = 'restart_stale_ownership'` — finite recorded reason for #1751.
 - `SenderLeaseEvictionEvidence` — redacted pre/post receipt with three evidence summaries and
   `authorized | evicted` outcome; excludes prompt, credentials, and `leaseToken`.
@@ -136,9 +140,14 @@ when the child exit is non-zero.
 | 2026-08-31 | 7 | Static gate blocked | Direct capture produced check `REAL_EXIT=0` over 173 files, lint `REAL_EXIT=1` with 14 findings across 9 files outside the declared manifest, and initial format `REAL_EXIT=1` for the Slice 6 `codex-resume.ts` import layout. The authorized in-manifest formatting fix made the repeated format gate `REAL_EXIT=0` over 173 files. |
 | 2026-08-31 | 7 | Blocked handoff | Per the file ceiling, no unrelated lint source was edited. The full agentic test gate, commit, explicit-refspec push, and PR comment were not run because the required lint gate cannot pass within scope. See `drift.md`. |
 | 2026-08-31 | 7 | Landed | Slice 7 documentation and the declared formatting-only source correction landed at `1cf52be67`; the branch later parked at integration commit `de24161b6`. |
-| 2026-08-31 | integration | Parked flake resolved | Supervisor reran the identical root-suite command twice at `de24161b6`, both exit 0 with 4,464 passed / 0 failed / 19 ignored. The earlier 4,463/1/19 result is an unidentified flake; its identity is unrecoverable because that original run had no saved report. Future root runs persist `--output` reports. |
+| 2026-08-31 | integration | Parked flake initially misattributed | Two clean reruns at `de24161b6` initially left the 4,463/1/19 failure unidentified. A later 20-run audit reproduced it twice and identified the protected local repair-adapter test's non-idempotent child cleanup. All future root runs persist `--output` reports. |
 | 2026-08-31 | integration | Current main merged | Captured all six protected tests plus `deno.lock`, fetched `origin/main` as `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7`, and merged it exactly once in `2bf9ca1b2`. All seven post-merge blobs match pre-merge byte-for-byte. |
 | 2026-08-31 | integration | Revalidation | Root suite 4,498/0/19 and agentic suite 531/531 passed; agentic check/lint/fmt and `arch:check` passed; three generated-corpus checks passed; MCP export-corpus freshness alone failed outside this leaf's scope. Every command used direct `out=$(cmd 2>&1); rc=$?` capture, never a pipeline. |
+| 2026-08-31 | amendment | Contract RED | Added the two required profile-provenance regressions and direct operator-decision expectations. The first focused run exited 1 before implementation with 12 compile errors for the absent `profileHome`, `reason`, and `repair-required` contract. |
+| 2026-08-31 | amendment | Flake repair | Authorized the protected local repair-adapter test ceiling change. `stopAndReap` now narrowly accepts only `NotFound` or `TypeError: Child process has already terminated`, retains status capture before kill, and awaits status on every path. No assertion was removed or weakened. |
+| 2026-08-31 | amendment | Profile provenance | Sender records persist the exact activation `CODEX_HOME`; production repair derives its session root from that record. Legacy records still parse but produce unknown evidence without probing a default home. Apply re-observation rejects profile changes. |
+| 2026-08-31 | amendment | Ownership vocabulary | Authorized the protected ownership-test ceiling change. Operator decisions now distinguish `blocked/live_owner`, `blocked/provenance_unknown`, `blocked/ownership_conflict`, and `repair-required/owner_inactive` in both the decision and emitted diagnostic. No assertion was dropped; discriminating assertions were added. |
+| 2026-08-31 | amendment | Focused GREEN | Structured focused suite passed 52/52 with exit 0 after implementation. Final stress, merge, and complete gates remain pending. |
 
 ## Decisions
 
@@ -148,6 +157,24 @@ when the child exit is non-zero.
 | Unknown/foreign/conflicting evidence preserves | False eviction harms another live lane. | Issue obligation 5; Plan D2/D3 |
 | Test subprocess code directly | Pipeline tails mask the command status. | Owner Plan obligation; Plan D9 |
 | PLAN-EVAL required | Safety-critical mutation and TOCTOU reasoning. | Harness Plan-Gate; Plan D10 |
+| Keep `blocked` plus a structured reason | A live owner requires wait/resume, unknown provenance requires fail-closed investigation, a foreign record is an ownership conflict, and an inactive provenance-bound owner requires explicit repair. Separate reason values are carried in the decision and diagnostic so callers can branch without parsing prose. | Coordinator challenge; amendment contract |
+| Preserve internal evidence term `stale` | `SenderLeaseStaleness` remains the exact three-probe authorization result; only the ambiguous operator-facing ownership kind is replaced. This retains a precise safety predicate while giving launch callers actionable outcomes. | Amendment design review |
+| Missing profile provenance never falls back | A legacy record remains loadable, but probing `$HOME/.codex` could confidently inspect the wrong tree; unknown provenance therefore returns fail-closed evidence and a blocked decision. | Coordinator amendment |
+
+### Authorized protected-ceiling changes
+
+- `sender-ownership_test.ts`: original `74b0ba6118ec4961ed50da639791fe52e3faa09a`,
+  amended baseline `978cd23d073035e1d578193a299806a0fe9b77fb`. The diff replaces the removed
+  operator kind expectation and adds reason/diagnostic and legacy-provenance assertions; no assertion
+  was removed or weakened.
+- `local-sender-lease-repair-adapter_test.ts`: original
+  `2e2817d0c27628e0f9e1ca922c47ec35738102ce`, amended baseline
+  `dacfcc6949b627db7dd99f23aa80c6cc4599a6f3`. The diff touches only `stopAndReap`
+  teardown behavior; no test assertion was changed.
+- The other four protected blobs remain `7be38302ac6ed20f29571213d18172283e1aded5`,
+  `d3ca0b51fcb87aeee81e4202e5f527ed569fba12`,
+  `7113e271dfa15e9f2dc53b6922c4d5055e086430`, and
+  `546b5f0185876fd51c9b5ee28b57a19fe37562b7` respectively.
 
 ## Drift
 

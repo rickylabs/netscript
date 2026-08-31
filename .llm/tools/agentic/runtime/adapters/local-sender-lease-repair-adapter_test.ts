@@ -70,7 +70,10 @@ async function stopAndReap(child: Deno.ChildProcess): Promise<void> {
   try {
     child.kill('SIGTERM');
   } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) throw error;
+    if (
+      !(error instanceof Deno.errors.NotFound) &&
+      !(error instanceof TypeError && error.message === 'Child process has already terminated')
+    ) throw error;
   }
   const terminated = await Promise.race([
     status.then(() => true),
@@ -80,10 +83,13 @@ async function stopAndReap(child: Deno.ChildProcess): Promise<void> {
     try {
       child.kill('SIGKILL');
     } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error;
+      if (
+        !(error instanceof Deno.errors.NotFound) &&
+        !(error instanceof TypeError && error.message === 'Child process has already terminated')
+      ) throw error;
     }
-    await status;
   }
+  await status;
 }
 
 Deno.test('changed-token CAS race retains the replacement sender record', async () => {

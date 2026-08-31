@@ -133,7 +133,7 @@ Deno.test('Codex launch refuses an owned worktree before constructing a rival pr
   assertEquals(plan.diagnostics[0]?.operatorAction, `resume existing session ${threadId}`);
 });
 
-Deno.test('Codex launch preserves stale and foreign ownership records', () => {
+Deno.test('Codex launch preserves repair-required and foreign ownership records', () => {
   const command: Extract<RuntimeCommand, { kind: 'launch' }> = {
     kind: 'launch',
     commandId: 'preserve-existing',
@@ -141,7 +141,7 @@ Deno.test('Codex launch preserves stale and foreign ownership records', () => {
     route: codexRoute,
     content,
   };
-  const staleRecord = {
+  const repairRecord = {
     schemaVersion: '1.0',
     worktree,
     ownerPid: 92,
@@ -149,19 +149,20 @@ Deno.test('Codex launch preserves stale and foreign ownership records', () => {
     state: 'launching',
     acquiredAt: '2026-07-10T20:00:00.000Z',
     updatedAt: '2026-07-10T20:00:01.000Z',
+    profileHome: '/home/codex/.codex',
   } as const;
-  const stale = planCodexCommand({
+  const repairRequired = planCodexCommand({
     command,
     git,
     expectedBranch: 'feature',
     nativeExt4: true,
     handoff: inspectCodexHandoff(handoff),
-    ownership: { record: staleRecord, ownerProcessAlive: false, sessionActive: false },
+    ownership: { record: repairRecord, ownerProcessAlive: false, sessionActive: false },
   });
-  assertEquals(stale.request, null);
-  assertEquals(codes(stale.diagnostics), ['duplicate_sender_risk']);
+  assertEquals(repairRequired.request, null);
+  assertEquals(codes(repairRequired.diagnostics), ['duplicate_sender_risk']);
   assertEquals(
-    stale.diagnostics[0]?.operatorAction,
+    repairRequired.diagnostics[0]?.operatorAction,
     `run deno task agentic:runtime repair sender-lease --worktree ${worktree}`,
   );
 
@@ -172,7 +173,7 @@ Deno.test('Codex launch preserves stale and foreign ownership records', () => {
     nativeExt4: true,
     handoff: inspectCodexHandoff(handoff),
     ownership: {
-      record: { ...staleRecord, worktree: '/home/codex/repos/foreign' },
+      record: { ...repairRecord, worktree: '/home/codex/repos/foreign' },
       ownerProcessAlive: false,
       sessionActive: false,
     },

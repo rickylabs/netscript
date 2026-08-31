@@ -114,6 +114,7 @@ export function parseSenderOwnershipRecord(value: unknown): SenderOwnershipRecor
     'acquiredAt',
     'updatedAt',
     'sessionId',
+    'profileHome',
   ]);
   if (Object.keys(entry).some((key) => !allowed.has(key))) {
     throw new Error('sender record contains unknown field');
@@ -126,7 +127,9 @@ export function parseSenderOwnershipRecord(value: unknown): SenderOwnershipRecor
     typeof entry.leaseToken !== 'string' || !entry.leaseToken ||
     !SENDER_OWNERSHIP_STATES.includes(entry.state as never) ||
     typeof entry.acquiredAt !== 'string' || typeof entry.updatedAt !== 'string' ||
-    (entry.sessionId !== undefined && typeof entry.sessionId !== 'string')
+    (entry.sessionId !== undefined && typeof entry.sessionId !== 'string') ||
+    (entry.profileHome !== undefined &&
+      (typeof entry.profileHome !== 'string' || !entry.profileHome.startsWith('/')))
   ) throw new Error('sender record invalid');
   return entry as unknown as SenderOwnershipRecord;
 }
