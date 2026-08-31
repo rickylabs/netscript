@@ -3040,3 +3040,33 @@ exactly — independent evidence the tool measures what it claims.
 (`007-salvage-1756`), and two patches committed here — `1756-workflow-owner-push.patch` (the 8-line
 piece needing `workflow` scope) and `1756-full-salvage.patch` (everything). Needs an owner-scoped
 push; nothing further is required from this lane.
+
+### #1803 SHIPPED — six of ten slices merged
+
+`docs(auth-kv-oauth)` merged as **`71d5fb8e079cae74249dd7d314874a3a18e7ab28`**; issue #1801 closed,
+both `status:shipped`. It landed from exactly the head this lane converged (`1947e9e05`), mid-audit.
+
+`main` now carries **25 mapping rows**. Six slices shipped: `plugin-ai-core` (#1796),
+`plugin-streams-core` (#1798), `mcp` (#1800), `plugin-auth-core` (#1806), `plugin-triggers-core`
+(#1808), `auth-kv-oauth` (#1803).
+
+**Two corrections recorded against my own conduct here.** First, the acceptance-mirror dry-run said
+"live PR labels do not include status:ready-merge" and I re-applied that label — to an already-merged
+PR. The real cause was the correct `status:shipped` transition, which was sitting in the very label
+list I had just printed. Reverted. **The label race is real but is not the default explanation;
+check PR state before assuming it.** Second, I began preparing #1811's convergence against
+`bd9d463b4` while #1803 was still in flight; had that been pushed it would have silently dropped
+#1803's freshly-merged `auth-kv-oauth` row. It was caught before any push — remote head confirmed
+untouched at `6d5516422` — and redone from exact `71d5fb8e0`.
+
+That near-miss is the **fourth** instance of the wholesale/stale-base class this session (mapping
+rows on #1798, `ci.yml`'s Aspire step on #1756, and now twice on mapping rows). The convergence
+recipe now carries two machine assertions rather than one: zero prior rows lost, **and** the
+specific most-recently-merged row explicitly confirmed present by name.
+
+**All ten slices are now evaluated** — the final four returned PASS on GLM 5.3 Flash max: #1811
+(282 union / 72 gap), #1813 (377 union, root 32/32 zero missing), #1816 (373 union, root 41/41 and
+agent 2/2 fully documented), #1818 (456 union / 104 gap, all four new Purposes verified accurate
+against real `deno doc`). Two evaluators independently flagged stale figures carried into my briefs
+from sibling prompts; the artifacts were right and the briefings were mine. Building each prompt
+from the PR's own diff from here.
