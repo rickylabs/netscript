@@ -6133,3 +6133,33 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
 - Scope exactly the five declared Slice 2 files, no rescope.
 - Gates: focused launch/adapters **17/17**, full `.llm/tools/agentic` suite **515/515**, all exit 0
   (515 vs the prior 493 — consistent with the new Slice 1+2 tests, not a suite substitution).
+
+## D-128 — Authoritative internals queue reconciled: 8 open, not 9; #1792 shipped
+
+- **PR #1792 merged** (`0ac06c5f10ac36cc672ed39b9e13640a03c6ea4b`), #1791 shipped; `main` now at
+  that SHA. The GLM 5.3 Flash / Qwen 3.8 Flash evaluator routes are live in the registry, so future
+  evaluations no longer need the evaluator-only local guard patch. Preserved DeepSeek verdicts
+  remain valid and untouched.
+- **Queue count corrected against the live label, not assumed**: `orchestrator:internals` returns
+  **8 open issues, not 9**. Verified there is no closed or unmilestoned ninth (`--state all` also
+  returns exactly these 8). Reporting the measured number rather than reconciling to a stated one.
+
+| # | Status | Notes |
+| --- | --- | --- |
+| 1751 | `status:impl` | **In flight** — Slice 3 RED currently being authored on thread `01a054ff`. |
+| 1429 | `status:impl` | **Not internals-executable**: already in flight as PR #1744 under `epic:aspire-13-5` (Aspire lane owns it). Tracked, not queued here. |
+| 1750 | `status:triage` | Ready; branch/worktree already created, dispatch previously aborted on my own missing-run-dir error (D-122). Redispatch cleanly after #1751. |
+| 1753 | `status:triage` | Harness cluster-state detection. No PR. |
+| 1737 | `status:triage` | CLI/skills doc-target contradiction. No PR. |
+| 1543 | `status:triage` | Undeclared cross-plugin dependency. No PR. |
+| 1695 | `status:plan` | `@tanstack/ai` caret-pin drift. No PR. |
+| 1351 | `status:plan` | sdk-client S4 HTTP/GET-cache policy. No PR. |
+
+- **Own-error correction, again the same class**: I read thread `01a054ff` as idle via
+  `ps aux | grep app-server-message-cli.*007-leaf-1751` and attempted a resume, which was correctly
+  rejected (`already has an active writer`). That grep pattern does not reliably match the live
+  process — the identical flaw behind the D-119 near-miss. The send did not land, so no damage;
+  the author's turn continues undisturbed. **Rollout mtime plus `git log` are the reliable liveness
+  signals here, not a process-name grep** — using those going forward.
+- Serial queue order after #1751 reaches terminal: **#1750** (already staged), then #1753, #1737,
+  #1543, then the two `status:plan` items (#1695, #1351). #1429 excluded as Aspire-owned.
