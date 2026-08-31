@@ -3001,3 +3001,42 @@ concurrent evaluation.
 
 Shipped in this programme so far: **#1796** (main `6bb27e46a`) and **#1798** (main `584caa03f`).
 Packets handed and green: **#1800** `e122495cb`, **#1806** `b89a242a7`.
+
+### #1756 salvage: green-complete but parked at an owner-only push boundary
+
+Recovered the "lost" #1756 work from dangling SHAs `4cdee82f`/`45c4894c`. The coordinator's read was
+exactly right: **nothing was lost — the original push failed on workflow token scope.** I reproduced
+the identical rejection, which confirms it:
+
+```
+refusing to allow a Personal Access Token to create or update workflow
+`.github/workflows/ci.yml` without `workflow` scope
+```
+
+**True delta was 50 files** against merge-base `3e5cbabfc` (the apparent hundreds were just main
+moving forward). Cleanly separable into 49 implementation files + 1 workflow file.
+
+Built the green-complete branch per the coordinator's ruling (A+B together, no knowingly-red partial):
+- `salvage/jsdoc-example-gate` @ **`01203d5d8`**, tagged `salvage/1756-green-complete`
+- Focused suite **17/17**; Tier-A **ALL-PASS**; `deno task check` 0 occurrences; base-relative
+  `diff --check` 0; `deno.lock` unchanged; gate itself PASS on 350 examples with 0 failures
+- Acceptance verified rather than assumed: `ci-classify-changes.ts:66-67` maps `packages/` and
+  `plugins/` to `needs_deno`, which drives the `quality` job's `RUN_DENO` — so the gate fires on
+  exactly the paths #1533 requires
+
+**A regression caught while applying the workflow step.** Checking out the recovered `ci.yml`
+wholesale was **+8/−7**, not +8/−0: it would have silently deleted main's newer *"Aspire version
+parity (phase 1)"* step, disabling another lane's CI gate. Applied the 8 lines surgically against
+current main instead and asserted the Aspire step survived. This is the same wholesale-restore trap
+as the `AUTHORITATIVE_MAPPING` row drop — **third occurrence of that class this session**. Standing
+rule now: never restore a shared file wholesale during convergence; take current main's copy and
+insert only this change's own block, then assert the pre-existing entries survive.
+
+**Corroboration worth keeping:** the gate's deferred census (116 `unboundName` + 20 `typeError`)
+matches already-filed 0.0.8 issues #1765 (116 undeclared aliases) and #1766 (20 non-type-checking)
+exactly — independent evidence the tool measures what it claims.
+
+**Parked state (push only):** commit preserved as a tag, a branch, an intact worktree
+(`007-salvage-1756`), and two patches committed here — `1756-workflow-owner-push.patch` (the 8-line
+piece needing `workflow` scope) and `1756-full-salvage.patch` (everything). Needs an owner-scoped
+push; nothing further is required from this lane.
