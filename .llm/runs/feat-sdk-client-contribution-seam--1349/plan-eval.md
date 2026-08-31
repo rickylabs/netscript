@@ -1,197 +1,109 @@
-# PLAN-EVAL — feat-sdk-client-contribution-seam--1349
+# PLAN-EVAL — feat-sdk-client-contribution-seam--1349 (cycle 2)
 
-- Plan evaluator session: separate dispatched PLAN-EVAL session, 2026-08-31; route recorded by the
-  generator in research.md/plan.md as `qwen/qwen3.8-flash · max` (post-#1792 policy). Identity as
+- Plan evaluator session: separate supervisor-dispatched PLAN-EVAL session, 2026-08-31. Identity as
   observed from inside this session: qwen/qwen3.8-flash; effort attestation is external to me.
+  This file replaces the cycle-1 verdict; cycle 1 is preserved in git history at `1ada3e1c9`.
 - Run: `feat-sdk-client-contribution-seam--1349`
-- Adjudicating plan head: **`4b520ea44`** (branch `feat/sdk-client-contribution-seam`, off main
-  `65cd8a077`)
-- Surface / archetype: `@netscript/sdk` public DSL/builder (`ports`, `client`) + public preset
-  (`presets`), governed by `rfcs/0001-sdk-client-contributions.md` (Status: Accepted) Stage 2
-- Scope overlays: none frontend/service; doctrine `packages/sdk` extension-axis + public-surface laws
+- Adjudicating plan head: **`fcc0f29b1`** (branch `feat/sdk-client-contribution-seam`, baseline
+  `65cd8a077`). Verified: the cycle-2 commit touches only the three run-dir plan artifacts;
+  `packages/`, `plugins/`, and `deno.lock` are untouched.
+- Surface / archetype: `@netscript/sdk` (Archetype 2 — Integration) public contribution contract +
+  private stable-v1 adapter, governed by `rfcs/0001-sdk-client-contributions.md` (Status: Accepted)
+  Stage 2.
 
-## Ground-truth note (changes the frame of this eval)
+## Normative reads (cycle-1 root cause explicitly closed)
 
-The plan and research adjudicate the **amendment text** and never open the two normative artifacts
-that sit in this very tree:
+I read both normative artifacts directly rather than trusting the plan's citations:
 
-1. `rfcs/0001-sdk-client-contributions.md` — the amendment's precedence clause routes to *RFC 0001
-   Stage 2*; the RFC fixes the descriptor shape, helper, error taxonomy, compatibility-default table,
-   ordering law, desktop boundary, and gate list **verbatim**.
-2. `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` — the RFC's **committed**
-   compile-only proof (line 1390–1392 of the RFC: "proves the proposed algebra until implementation
-   replaces its local types with public imports"). It pins the field name `contributions`, the
-   defaults `= ServiceClientContext`, the desktop rejection-by-excess-property, the 16/17 algebra,
-   the server key suffix, and the required-context rest.
+1. `rfcs/0001-sdk-client-contributions.md` — full text (1612 lines).
+2. `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` — full text (503 lines),
+   and I ran its check myself: `deno check --unstable-kv` **passes clean on this head**. The
+   Slice-1 gate command is the RFC's own repository/publish-gate line (RFC:1390-1392) verbatim,
+   including the "until implementation replaces its local types with public imports" migration
+   framing the plan adopts.
 
-Spot-checks of `research.md` against the tree: nine-field `CreateServiceClientOptions`
-(`ports/service-client.ts:234-256`), `ports/mod.ts` doc-vs-export contradiction, absent
-`src/internal/`, `deno.json` exports lacking `./internal`, and — important — **`NetScriptProcedureMeta`
-already exists and is exported from `@netscript/contracts`** (`domain/procedure-meta.ts`,
-`application/contract-primitives.ts:160` already initializes `oc.$meta<NetScriptProcedureMeta>`).
-The RFC's metadata pre-condition is satisfied on main; no contracts-package creep is needed.
+Tree spot-checks of load-bearing plan claims (all confirmed): `CreateServiceClientOptions` has the
+nine closed fields with no `contributions`/`link`; `ServiceClientMethod` is currently
+`<TInput, TOutput, TError = Error>` with `__error` (service-client.ts:176-179);
+`NetScriptProcedureMeta` exists and is exported from `@netscript/contracts`
+(`domain/procedure-meta.ts`, `application/contract-primitives.ts`, `public/mod.ts`);
+`packages/sdk/src/internal/` does not exist; `deno.json` exports contain no `./internal` subpath;
+`ports/mod.ts:7` still carries the "transport seam" sentence (owned by Slice 3 per LD-1); every
+Slice-named file exists (`ports/{query-factory,service-query-utils,query-key,client-link-factory,service-client}.ts`,
+`presets/define-services.ts`, `client/{errors,http-client-link,service-client}.ts`,
+`query/query-factory.ts`, `query-client/{create-service-query-utils,query-client-factory,types}.ts`,
+`desktop/domain/types.ts`, `desktop/application/desktop-rpc-client.ts`); every named fixture
+(`sdk-assignability_type.ts`, `define-services_type.ts`, `service-query-utils-upstream_type.ts`)
+exists; every named task (`doc:lint`, `quality:scan`, `arch:check`, `publish:dry-run`) exists.
 
-## Checklist results
+## Cycle-1 finding adjudication
 
-| Plan-Gate item                          | Result | Evidence / location |
-| --------------------------------------- | ------ | ------------------- |
-| Research present and current            | PASS   | Re-verified against `65cd8a077`; I re-confirmed five load-bearing claims myself. Caveat: research never read RFC 0001/the fixture, which caused the failures below. |
-| Decisions locked                        | **FAIL** | LD-3, LD-6, LD-7 lock decisions that contradict the Accepted RFC and the committed in-tree fixture (F-1, F-2, F-3). |
-| Open-decision sweep                     | **FAIL** | Six rework-forcing decisions left open that the plan did not flag (see sweep). |
-| Commit slices (< 30, gate + files each) | **FAIL** | Slice 1's ceiling omits acceptance-required type files (query-factory/service-query-utils/query-key/define-services/error module); Slices 2–3 name no files or gates (F-4, F-5). |
-| Risk register                           | **FAIL** | Only D-1 (tool cache). No entries for the isolatedDeclarations-vs-deep-recursion mitigation, compile budget, or the ~15-type widening breaking existing consumers/docs (F-6). |
-| Gate set selected                       | **FAIL** | Tier-A stop list omits the RFC's mandated gates: fixture `deno check --unstable-kv`, `deno doc --json` port-absence, packed-consumer negative import, scoped zero-oRPC scan, `deno doc --lint`, `arch:check`, `quality:scan` (F-6). |
-| Deferred scope explicit                 | **FAIL** | The amendment's own "must cover key algebra … local failure taxonomy" items, the query-context generics, and all Docs/consumer-proof obligations are neither sliced nor recorded as deferred (F-4, F-5, F-7). |
-| jsr-audit surface scan (pkg/plugin)     | **FAIL** (re-run required) | LD-8 shows the right instinct, but the rubric was applied to a surface that is not the RFC's ratified one; must be re-applied to the corrected names/arities/defaults before re-slicing (F-1). |
+| Finding | Cycle-2 status | Evidence (verified against RFC/fixture, not just the plan) |
+| ------- | -------------- | ------------------------------------------------------------ |
+| F-1 | **CLOSED** | `plan.md` §"Authority re-baseline" sweeps **all five** rows (§1, §2, §3, §5, §7). `link?:` is explicitly killed (§1 row, LD-3, LD-1, and the #451 tripwire "forbidden in #1349") — #1349 no longer pre-empts #451. LD-3 re-derived from RFC §Public contribution contract / §Tuple type algebra / compatibility table: field name `contributions?` ∩ `ValidateSdkClientContributions<T>` (RFC:672-674), `ServiceClientContext` canonical as client-side default, `Record<never, never>` query-side default, `readonly []` suffix default — each checked against RFC:685-701 row by row. Descriptor/prepare/partition shapes match RFC:411-476 exactly (`{ kind: 'http', origin, rpcPath, secure }`, no method; partition resolver gets context + procedure only). |
+| F-2 | **CLOSED** | LD-6 now reads from the RFC's ordering law (RFC:830-863): tuple order = sequential first-failure reporting only; valid contributions commute; "no `before`/`after`/`requires`/`priority`/numeric `order`/environment field" (RFC:858-859, 571-572). An attempted dependency field is closed-shape `SDK_CONTRIBUTION_INVALID` — the acceptance line resolves as shape invalidity, not a dependency DSL. 16 cap enforced at both boundaries (named `limit:more-than-16`, fixture:150-171/497-503; construction step 1 validates tuple/key limits, RFC:834). |
+| F-3 | **CLOSED** | LD-7 matches RFC:984-991 verbatim in effect: `CreateDesktopServiceClientOptions` gains nothing; excess-property compile rejection (committed fixture:347-352, compiles today) **plus** construction-time `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED` for JS/widened input, "never ignored"; the acceptance line resolves as shape/transport invalidity with no descriptor flag. Generator-level rejection is explicitly the CLI lane's deferred gate (RFC:991, 1383). |
+| F-4 | **CLOSED** | Slice-1 ceiling now covers `ports/query-factory.ts`, `ports/service-query-utils.ts`, `ports/query-key.ts` (`SdkClientServerKeySuffix`, `ActionQueryKey<TAction, TSuffix = readonly []>`), `presets/define-services.ts`, the contribution/error public types, the query-side generics, and the error contract; the amendment's "key algebra + local failure taxonomy" obligations are inside Slice 1, with the throws mapped in Slice 3. Gate 1 is the RFC's fixture command with `--unstable-kv`, re-pointed from local model to public imports as the Slice-1 proof. |
+| F-5 | **CLOSED** | Slice 2 names exactly the RFC's three files (`adapter-ports.ts`, `prepared-call.ts`, `stable-v1-adapter.ts`, RFC:490-493), the direct `PreparedSdkClientCall` channel with optional package-private `unique symbol` (RFC:545-552), unary `context.retry: 1` count-1 + byte-equivalence and A→B reconnect count-2 + abort-no-epoch conformance (RFC:905-929), and the full absence set: four-entrypoint `deno doc --json`, the three rejected packed-consumer specifiers (RFC:1369-1371), non-growing zero-oRPC allowlist (RFC:1372-1373). Slice 3 carries the RFC runtime gates: unknown-boundary duplicate validation, forbidden-header list, cache non-observation, recursive `createServiceQueryUtils` wrapper with the cast fast path limited to the empty-context specialization (RFC:813-820), direct-only runtime omission. |
+| F-6 | **CLOSED** | Risk register R-1…R-8 + D-1 with named mitigations/proving gates, including both cycle-1 misses (deep recursion vs isolatedDeclarations; ~15-surface widening). Final gate set contains every RFC-mandated gate: fixture check, port-absence, packed negative import, zero-oRPC scan, `deno doc --lint`, `arch:check`, `quality:scan`, publish dry-run, JSR audit, doctest, and the scaffold-runtime E2E correctly restricted to merge readiness (RFC:1398-1399). |
+| F-7 | **CLOSED** | Slice 3 owns the Docs/consumer proof: README export table documents the **contribution** surface, the "fork the link" paragraph is deleted rather than replaced with a false seam, the worked example compiles under the README doctest, and one consumer test asserts header-added **and** CLIENT-span-still-emitted — sequenced after Slice 2's composition. The `ports/mod.ts` sentence is owned correction work (LD-1), not silence. |
+| F-8 | **CLOSED** | `supervisor.md` (identity + routes + eval history) and `worklog.md` with a full `## Design` checkpoint exist and are in the adjudicated commit. |
 
-## Per-question adjudication (supervisor's 7 items)
+## Requested upgrades
 
-1. **LD-1 / LD-2 — CORRECT, but the clause was applied selectively.** The amendment banner
-   (2026-08-13) is *later* than the seed-run reconciliation comment (2026-08-08) and states
-   precedence over "conflicting rows"; §3/§5 conflict head-on and acceptance confirms. Verified
-   against the tree. However, §1, §2, and §7 of "Target contract" are the **same contradiction class**
-   and were not swept — see F-1/F-2. The precedence clause covers them; an implementer following the
-   plan's `with?:`/`link?:` and `BaseServiceClientContext` framing would fail the acceptance line the
-   plan itself locks.
-2. **LD-5 — CORRECT reading; make it *ratified* rather than inferred.** RFC §Internal adapter ports
-   defines exactly three package-private ports; step 8 of the composition law puts retry/dedupe/trace/
-   fetch/dispatch inside `ClientTransportPolicyPort`, which "MUST NOT invoke contributors"; §Transport
-   ownership says "Trace propagation is not a contribution" and lists the SDK's sole ownership. "No
-   private fast lane" is honoured as "everything through the port pipeline," built-ins resident in the
-   transport port. The plan's conclusion is the RFC's own architecture — restate LD-5 as an RFC
-   citation, not an interpretive judgement.
-3. **LD-4 — necessary but not sufficient as written.** Negative compile tests prove *cannot supply*
-   only for literal tuples (excess-property checks); widened/`unknown` objects need the RFC's
-   construction-side plain-object shape validation, and *cannot observe* is fundamentally a
-   framework-dataflow property: contributions see only the `SdkClientPrepareOptions` snapshot the SDK
-   builds (context projection, signal, procedure `{path, meta}`, transport `{kind, origin, rpcPath,
-   secure}` — note: no method; and partition resolvers get no input/transport). RFC Runtime gates
-   ("contribution callbacks cannot observe SDK retry/cache/trace fields"; "duplicate validation
-   repeated through `unknown`") are the required evidence. Slice 3 must name those runtime tests, not
-   only taxonomy errors. Also: unrepresentability only holds if the descriptor is built to the RFC's
-   pinned shape (zero extra fields — RFC: no `TypeMarker`, builder, dependency list, priority,
-   environment flag, upstream callback, metadata bag), which is precisely why F-2's LD-6/LD-7 must go.
-4. **LD-6 / LD-7 — INCORRECT; both contradict the Accepted RFC and the committed fixture.** RFC:
-   "version 1 has no `before`, `after`, `requires`, `priority`, or numeric `order` field"; descriptor
-   has "no … dependency list … or environment flag"; "order-independence" is on the RFC's *not-open*
-   list; "Rejected: last writer wins, priorities, and dependency ordering" is a named alternative.
-   LD-6's "contribution declares a dependency on a name" therefore invents a field that the RFC's
-   shape validation must *reject* (`SDK_CONTRIBUTION_INVALID`) — internally self-refuting and
-   unclosable in Slice 3. Correct mapping of the acceptance line: an attempted dependency/order field
-   is an invalid descriptor shape, deterministically rejected and named. LD-7: desktop incompatibility
-   is not a descriptor property — `CreateDesktopServiceClientOptions` does not gain `contributions` at
-   all, and the **already-committed fixture** (lines 347–351) proves rejection via excess-property
-   check with `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED` at construction for JS/widened input. The
-   comment's "type/runtime/generator" triple maps to: type = excess-property, runtime = construction
-   validation (both in this leaf), generator = CLI lane (must be explicitly *not* this leaf).
-5. **The 3-slice split — right shape, wrong Slice 1.** Types-first is contract-first doctrine and the
-   committed fixture makes Slice 1 independently judgeable (it already pins every algebra claim —
-   `deno check --unstable-kv` on the fixture against real imports is the Slice-1 verdict). But Slice 1
-   as scoped cannot satisfy "Client/query context generics … compose to the intersection" (amendment
-   + acceptance): the query-side widening table (QueryFactory/ActionMethod/FactoryConfig/
-   ServiceQueryUtils/all option types + `SdkClientServerKeySuffix`/`ActionQueryKey<TSuffix>`) and the
-   public error/diagnostic contract are type-only and belong in Slice 1's ceiling. **I do NOT judge
-   this plan sound enough to implement Slice 1 from as written.** After the fixes below, Slice 1 is
-   implementable and correctly independent.
-6. **LD-9 — safe, and upgrade "default assumption" to "confirmed".** The three ports are client-side
-   only; RFC: "Server plugin reachability is a service-preset problem, not a client-contribution
-   field"; the optional incoming-plugin default is RFC open-question #7 owned by service presets,
-   #1350 keeps the error channel, #1352 owns the bearer factory and manifest reference. Record §6 as
-   a third *swept contradiction* rather than a conditional assumption; keep the stop-and-report rule.
-7. **Sibling boundaries — clean, with two tripwires to name explicitly.** (a) The RFC's algebra
-   sketch drops `TError` from `ServiceClientMethod`; #1350 stage-1a mandates preserving the concrete
-   error channel "exactly as filed", and the real current type is `<TInput, TOutput, TError = Error>`
-   with `__error`. The RFC's own rule — new parameters appended — gives the correct form
-   `ServiceClientMethod<TInput, TOutput, TError, TContext extends object = ServiceClientContext>`
-   (the plan's LD-3 arity is right; lock it against the sketch). (b) `link?:` (§1) must be dropped or
-   #1349 pre-empts #451's capability design and forces an isolatedDeclarations-breaking export.
+- **LD-5 — CLOSED as citation.** It now states "This is a direct RFC rule, not an inference" and
+  the content matches RFC:538-543: `ClientTransportPolicyPort` owns every attempt/retry/encoding/
+  trace/dispatch action, accepts only prepared output, and MUST NOT invoke contributors;
+  `ProcedureMetadataPort` is the sole upstream-node interpreter.
+- **LD-9 — CLOSED as confirmed.** No longer an assumption: `NetScriptProcedureMeta` exists and is
+  exported on the baseline (I verified in `packages/contracts`), the "server plugin reachability is
+  a service-preset problem" quote is RFC:47, and the stop-and-report rescope tripwire is retained.
+- **`TError` retention — CONFIRMED.** LD-3 pins
+  `ServiceClientMethod<TInput, TOutput, TError = Error, TContext extends object = ServiceClientContext>`
+  — third slot kept, context appended fourth — and states this intentionally corrects the RFC
+  sketch's omission per the RFC's own append rule (RFC:682-683) and #1350's "exactly as filed"
+  boundary. Verified against the real current type (service-client.ts:176). Slice-1 gate 5 asserts
+  it.
 
-## Open-decision sweep (evaluator-run) — every one forces rework if deferred
+## Plan-Gate checklist
 
-1. Field name `contributions?` vs `with?`; `link?` present or absent (F-1).
-2. `ServiceClientContext` stays canonical (RFC defaults table + fixture) vs plan's
-   `BaseServiceClientContext` + deprecated alias (F-1).
-3. `prepare` options are the RFC's five-field snapshot, not the fixture's three-field local model nor
-   the plan's undeclared shape (F-2).
-4. Public error class + 10-code enum + diagnostic interface: names are RFC-pinned; placement in
-   Slice 1 (types) / Slice 3 (throws) must be stated (F-4).
-5. Which slice carries the query-surface widening and server-key suffix types (F-4).
-6. Whether the generator-side desktop rejection is in this leaf (F-3: it is not; record it).
+| Plan-Gate item                          | Result | Evidence |
+| --------------------------------------- | ------ | -------- |
+| Research present and current            | PASS   | `research.md` tree claims re-verified by me on this head; the cycle-1 authority gap it caused is now closed by the plan's explicit five-row re-baseline against the Accepted RFC. |
+| Decisions locked                        | PASS   | LD-1…LD-9 all derive from the RFC/fixture (rows above); rationale stated per decision. |
+| Open-decision sweep                     | PASS   | My own sweep found no unflagged rework-forcing decision. Realization (outer epoch wrapper) locked per RFC preference; every remaining item maps to an RFC open question that the RFC itself leaves to named siblings (#1350/#1351/#1352/#1353/#451/#1093) or post-implementation evidence (budget raise, RFC question 1). |
+| Commit slices                           | PASS   | 3 ordered slices, each with proves/files/gates; all named paths and commands verified to exist. |
+| Risk register                           | PASS   | R-1…R-8 + D-1, mitigations tied to named gates. |
+| Gate set selected                       | PASS   | Archetype 2 static/fitness/runtime/consumer set plus every RFC-mandated gate; expensive E2E merge-readiness-only. |
+| Deferred scope explicit                 | PASS   | §"Deferred scope and tripwires" with sibling owners and stop-and-report boundary. |
+| jsr-audit (package wave)                | PASS   | Re-applied to the RFC-ratified surface: entrypoints fixed, isolated-declaration-safe annotations, no slow-type exception, packed-consumer probe kept as separate gate; surface risks (tuple recursion, ~15 widenings) named before slicing. |
+
+## The gate question
+
+**Is Slice 1 implementable from this plan as written? Yes.** The RFC supplies the normative shapes
+verbatim; the plan supplies the ceiling (every type file), the per-generic defaults cross-checked
+against the RFC compatibility table, the `TError`-preserved arity, the dual 16-cap law, the
+fixture-re-point proof, and a concrete gate command list whose primary check I confirmed compiles
+clean on this head. An implementer executes Slice 1 without re-deriving design decisions. Cycle 1's
+answer was no; that failure mode is closed.
+
+## Non-blocking notes for the implementation lane (not findings)
+
+1. The RFC compatibility table (RFC:685-701) is the authority for per-generic defaults; e.g.
+   `ServiceProcedureMutationOptions` keeps its existing `unknown` for `TMutationContext` before the
+   appended context parameter. Apply from the table directly.
+2. Between Slice 1 (types accepted) and Slice 3 (construction validation), an options-supplied
+   `contributions` tuple is not yet consumed. That is a legal intermediate on a draft branch — the
+   "never silently accepted" law is enforced before merge by Slice-3 gate 1 — but no release or
+   publish may happen at that boundary.
+3. The RFC's compatibility section requires implementation packages to bump versions per the
+   release plan; that is release mechanics owned outside these slices, not an open design decision.
+4. `ports/mod.ts` is touched in Slice 1 (export list) and corrected in Slice 3 (LD-1 sentence);
+   keep the Slice-1 edit to exports only.
 
 ## Verdict
 
-`FAIL_PLAN` — head `4b520ea44`. The amendment-level reasoning (LD-1, LD-2, LD-5, LD-8, LD-9, the
-3-slice shape) is sound and is kept; the failure mode is that the plan treated the amendment's prose
-summary as the ground truth instead of the Accepted RFC it references, and the RFC (plus the
-committed fixture) contradicts three locked decisions and an entire ceiling. This is a plan-text
-revision, not a rescope — cycle 2 can PASS without scope change.
-
-### Required fixes (cycle 2)
-
-- **F-1 (re-baseline LD-3; LD-1/LD-2 unchanged in effect).** Re-derive the public surface from
-  `rfcs/0001` §Public contribution contract, §Tuple type algebra, and the compatibility-defaults
-  table, cross-checked against `sdk-client-contributions-rfc_type.ts`. Concretely: option field is
-  `contributions?` intersected with `ValidateSdkClientContributions<T>` (drop `with?`, drop §1's
-  `link?:` escape hatch — same contradiction class as §3); keep `ServiceClientContext` as the live
-  default on every widened generic (drop `BaseServiceClientContext` and the deprecation-alias plan);
-  descriptor defaults are `TContext extends object = ServiceClientContext` (client) /
-  `Record<never, never>` (query surfaces) per the table. Record §1, §2, §7 of "Target contract" as
-  superseded rows alongside §3/§5 (five contradictions, not two).
-- **F-2 (rewrite LD-6).** Declaration (tuple) order is the composition order; valid contributions
-  commute; order determines only deterministic first-failure reporting; the 16-cap is enforced at
-  *both* type boundary (named `limit:more-than-16` diagnostic — already modeled in the fixture) and
-  construction. No dependency declaration exists in v1: an attempted `dependsOn`/`before`/`after`/
-  `priority`/environment field is `SDK_CONTRIBUTION_INVALID` shape rejection, which is how the
-  acceptance lines "invalid dependency ordering" and "desktop-incompatible contributions" are
-  satisfied.
-- **F-3 (rewrite LD-7).** Desktop: `CreateDesktopServiceClientOptions` gains nothing; excess-property
-  compile rejection + construction-time `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED` for
-  JS/widened `contributions`; cite the committed fixture as the Slice-1 negative proof. State
-  explicitly that generator-level rejection is the CLI lane's gate, not this leaf's.
-- **F-4 (re-scope Slice 1 ceiling).** Add: `ports/query-factory.ts`, `ports/service-query-utils.ts`,
-  `ports/query-key.ts` (`SdkClientServerKeySuffix`, `ActionQueryKey<TSuffix>`),
-  `presets/define-services.ts` (`DefineServiceConfig<TContract, TContributions>` + `port`/`timeout`
-  deprecation JSDoc), the contribution/error public types (`SdkClientContribution`, protocol,
-  prepare/patch/context-declaration/response-cache types, `SdkClientContributionContext`,
-  `ValidateSdkClientContributions`, `SdkClientContributionError` + `SdkClientContributionErrorCode`
-  + diagnostic). Gate: `deno check --unstable-kv` on the RFC fixture *re-pointed from the local model
-  to the public imports* (that migration is the Slice-1 proof), scoped sdk check/lint/fmt/tests,
-  `publish:dry-run`, `arch:check`, `quality:scan`, `deno doc --lint`.
-- **F-5 (finish slices 2–3 definitions).** Slice 2: RFC-named files `adapter-ports.ts`,
-  `prepared-call.ts`, `stable-v1-adapter.ts`; three ports semantics; direct
-  `PreparedSdkClientCall` channel (optional package-private `unique symbol` realization per RFC);
-  byte-identical omission; unary prepare-once conformance (`context.retry: 1`, count 1,
-  byte-equivalence) and reconnect epoch fixture (A→B, count 2, abort starts no epoch). Gate: adapter
-  absence set — `deno doc --json` on root/`./client`/`./ports`/`./desktop`, packed-consumer negative
-  import fixture rejecting the three specifiers, scoped zero-oRPC identity scan with non-growing
-  allowlist. Slice 3: error taxonomy throws + reserved-context/header rejection, forbidden-header list
-  (audited Fetch snapshot + prefix rules), cache modes incl. server five-tuple/TanStack suffix,
-  `createServiceQueryUtils` recursive wrapper, direct-only runtime omission, partition-cache
-  non-observation conformance test.
-- **F-6 (risk register + gates).** Add: deep-recursion vs isolatedDeclarations (mitigation: RFC tail
-  recursion + named conflict markers, fixture-verified cost); 15-surface generic widening breaking
-  consumer/doc snippets (mitigation: RFC compatibility-default fixtures); D-1 kept.
-- **F-7 (docs assignment).** Allocate the issue's Docs/consumer proof to a slice: README export table
-  lists the *contribution* surface (not a transport seam — the amendment supersedes that clause too);
-  delete the "escape hatch = fork the link" paragraph honestly (do not replace it with a lie about an
-  exported link seam); worked example compiles under the docs gate; the consumer-proof test asserts
-  header-added **and** client-span-still-emitted in one test (needs Slice 2 composition — state that).
-  Re LD-1's doc-comment choice: leaving `ports/mod.ts:7` advertising "the transport seam" while the
-  RFC's own doc-implications section owns port API docs — fix the sentence as owned docs work **or**
-  file an explicit debt entry; "leave it silently" is the one option doctrine does not offer.
-- **F-8 (run hygiene, supervisor-facing).** The run dir has no `supervisor.md` and no `worklog.md`
-  Design section — required run-start artifacts for a critical/complex run; create them alongside the
-  cycle-2 revision.
-
-## Notes
-
-- The 2026-08-08 issue comment ("final reconciliation … prepared-header channel … absence gates …
-  type/runtime/generator rejection") is *earlier* than the 2026-08-13 amendment and does not itself
-  bind; every load-bearing item in it is independently ratified by the amendment or RFC body, so
-  fixes above anchor to the RFC and acceptance text, not the comment. No finding rests on the comment
-  having been ignored.
-- D-1 (`run-gate.ts` cached zero-byte receipts certifying nothing): accepted as a real tooling
-  caveat; verify `stdout.bytes` and re-run the wrapper directly.
-- Two-cycle limit noted; this is cycle 1. Expected cycle-2 diff is plan-text only: F-1..F-3 rewrite
-  three LDs, F-4/F-5 repair ceilings and gates, F-6/F-7 add register/docs. No scope movement against
-  #1350/#1351/#1352/#1353/#451 was found.
+`PASS` — head `fcc0f29b1`. All cycle-1 findings verified closed against the Accepted RFC and the
+committed fixture directly; no new rework-forcing decision found. Implementation may proceed,
+slice by slice, with the supervisor's lane assignments and the slice review gate in force. Cycle
+limit reached without escalation.
