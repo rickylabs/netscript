@@ -9,9 +9,9 @@ and do not move any head.
 | Field | Value |
 | --- | --- |
 | Repo | detached worktree, already checked out at the evidence head |
-| **Content head** | `3cb08103ff9c25ff3ec580301b5936586b13d37e` |
-| **Evidence head** | `c4bd642324079f41eebb079fb862ebc5abbdd8ae` |
-| Base | `9ce84de2f` |
+| **Content head** | `ce0c0ebcb39c35db18a12350cc2683630af84381` |
+| **Evidence head** | `ffd380532ff83ba7d24703952bae3020352c5653` |
+| Base | `9ce84de2f`; the head now additionally carries **two integrations of `main`** (through `65cd8a077`) — see "Integration" below |
 | PR | rickylabs/netscript **#1762**, draft, `Refs #1387 — partial` |
 | Plan | `.llm/runs/feat-service-principal-procedure-policy--1387/plan.md` § Slice 9; the full Key Decisions (LD-1–LD-12) table; research finding 14 |
 | Tier-A | `.llm/runs/feat-service-principal-procedure-policy--1387/tier-a-slice-9.md` |
@@ -67,6 +67,23 @@ This is a **documentation** slice — judge accuracy against the actual shipped 
 If this slice is accepted, #1387's implementation is complete; only the close-gate remains. State
 plainly whether you consider the documentation adequate for that close, or whether you found a gap
 that should block it.
+
+
+## Integration — new since the original Slice 9 content
+
+This head is **not** the raw Slice 9 content head. After Slice 9's Tier-A, the leaf was integrated
+with `main` **twice** (to `0ac06c5f1`, then to `65cd8a077` after three more PRs landed). Judge the
+integration too, not just the documentation slice:
+
+- The first integration's only source conflict was `.llm/tools/gates/catalog.ts`, resolved as the
+  **union** of main's `aspire-version-parity` entry and this leaf's D-5 `exports-drift` /
+  `mcp-export-corpus` entries. Verify all three are present and that neither side was dropped.
+- All generated-carrier conflicts (agent-docs prose/provenance, cli agent-docs, mcp export corpus,
+  mcp publish-assets) were resolved by taking `main`'s version and **regenerating from tooling**, never
+  hand-merged. Verify the carriers are actually fresh (`check:assets-barrel`,
+  `check:mcp-export-corpus`, `docs:exports-drift` should all pass at this head) and that
+  `deno.lock` is byte-identical.
+- Confirm the integration did not silently revert or alter any of Slices 1–9's product changes.
 
 ## Verdict
 
