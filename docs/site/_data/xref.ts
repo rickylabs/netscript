@@ -10,6 +10,7 @@
  *   howto:      how-to recipe           (howto:add-a-plugin)
  *   tut:        tutorial chapter/track  (tut:first-workspace)
  *   explain:    explanation essay       (explain:architecture)
+ *   compare:    framework comparison    (compare:frontend)
  *   concept:    concept / mental-model page
  *   ref:        reference unit (ref:sagas -> /reference/sagas/)
  *               and sub-paths           (ref:sagas/presets -> /reference/sagas/presets/)
@@ -189,9 +190,15 @@ export const xref: Record<string, XrefTarget> = {
   "explain:durable-workflows": { href: "/explanation/durability-model/", label: "The durability model" },
   "explain:observability": { href: "/explanation/observability/", label: "Observability" },
   "explain:aspire": { href: "/explanation/aspire/", label: "Orchestration with Aspire" },
+  "explain:compared": { href: "/explanation/compared/", label: "How NetScript's path compares" },
   // v3 NEW / renamed explanation essays
   "explain:plugin-system": { href: "/explanation/plugin-system/", label: "The plugin system" },
   "explain:durability-model": { href: "/explanation/durability-model/", label: "The durability model" },
+
+  // ─── Comparisons (compare:) ───────────────────────────────────────────────
+  "compare:index": { href: "/comparisons/", label: "Comparisons" },
+  "compare:frontend": { href: "/comparisons/frontend/", label: "NetScript vs frontend frameworks" },
+  "compare:backend": { href: "/comparisons/backend/", label: "NetScript vs backend frameworks" },
 
   // ─── Concept / mental-model pages (concept:) ───────────────────────────────
   "concept:contracts": { href: "/explanation/contracts/", label: "Contracts-first" },

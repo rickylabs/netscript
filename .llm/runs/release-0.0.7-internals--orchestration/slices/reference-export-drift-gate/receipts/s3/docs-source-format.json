@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-source-format",
+  "invocationId": "reference-export-s3-docs-source-format",
+  "argv": [
+    "deno",
+    "task",
+    "check:source-format"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export/docs/site",
+  "gitHead": "47ca22abe94b9d2e54d3778edc8944094b227886",
+  "actualGitHead": "47ca22abe94b9d2e54d3778edc8944094b227886",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:490832",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "2c948a585b5ba6298637db1f21dff246f3a99f5b2cd037cf7f8e80adc990f0e1",
+  "lifecycleId": "worker:490832:reference-export-s3-docs-source-format:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T18:13:16.579Z",
+  "startedAt": "2026-08-15T18:13:16.581Z",
+  "finishedAt": "2026-08-15T18:13:16.654Z",
+  "durationMs": 73,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 23,
+    "sha256": "a91dbfc7ba015ebd64902c27740032f3798207dc0ebae57d2526342b219899c5",
+    "tail": "Docs source format: OK\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 549,
+    "sha256": "e213b85f487a989efad13e7a5fc9ed5254f41a214e443e9ea8132796901dd6e1",
+    "tail": "Warning: config file file:///home/codex/repos/netscript-007-reference-export/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-reference-export/. Ignoring the parent workspace config.\nTask check:source-format deno run --no-lock --allow-read _plugins/check-source-format.ts .\nWarning: config file file:///home/codex/repos/netscript-007-reference-export/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-reference-export/. Ignoring the parent workspace config.\n",
+    "truncated": false
+  }
+}

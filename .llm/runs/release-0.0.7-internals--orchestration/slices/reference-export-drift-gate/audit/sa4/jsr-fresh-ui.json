@@ -1,0 +1,194 @@
+{
+  "pkg": {
+    "name": "@netscript/fresh-ui",
+    "version": "0.0.6",
+    "description": "Fresh UI registry seams and interactive foundations for NetScript.",
+    "root": "packages/fresh-ui"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./ai/render-ui": "./src/ai/render-ui.tsx",
+    "./desktop": "./desktop.ts",
+    "./interactive": "./interactive.ts",
+    "./primitives": "./primitives.tsx",
+    "./registry": "./registry.ts"
+  },
+  "files": {
+    "total": 64,
+    "loc": 9137,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 1258
+      },
+      {
+        "path": "src/ai/render-ui.tsx",
+        "bytes": 13013
+      },
+      {
+        "path": "desktop.ts",
+        "bytes": 1191
+      },
+      {
+        "path": "interactive.ts",
+        "bytes": 3576
+      },
+      {
+        "path": "primitives.tsx",
+        "bytes": 874
+      },
+      {
+        "path": "registry.ts",
+        "bytes": 4142
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 164,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./ai/render-ui": true,
+      "./desktop": true,
+      "./interactive": true,
+      "./primitives": true,
+      "./registry": true
+    },
+    "descriptionLen": 66
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "DATA_GRID_CELL_VARIANTS",
+        "DataGrid",
+        "ICON_PATHS",
+        "Icon",
+        "REGISTRY_TOAST_QUERY_KEYS",
+        "cn",
+        "getToast",
+        "stripToastFromUrl",
+        "withToast"
+      ],
+      "rawCount": 9
+    },
+    "./ai/render-ui": {
+      "exported": [
+        "RENDER_UI_BLOCK_CATEGORIES",
+        "RENDER_UI_MAX_DEPTH",
+        "RenderUiBlockCategory",
+        "RenderUiBlockType",
+        "RenderUiFallbackReason",
+        "RenderUiNode",
+        "RenderUiOptions",
+        "RenderUiSurface",
+        "RenderUiSurfaceProps",
+        "renderUiPayload"
+      ],
+      "rawCount": 10
+    },
+    "./desktop": {
+      "exported": [
+        "DESKTOP_CHROME_DISABLED_REASONS",
+        "DESKTOP_CHROME_STATUSES",
+        "DESKTOP_MENU_SOURCES",
+        "DESKTOP_OPERATION_REASONS",
+        "DESKTOP_OPERATION_STATUSES",
+        "DESKTOP_WINDOW_ACTIONS",
+        "createDesktopChrome"
+      ],
+      "rawCount": 7
+    },
+    "./interactive": {
+      "exported": [
+        "ACTION_MENU_ITEM_INTENTS",
+        "Accordion",
+        "ActionMenu",
+        "Combobox",
+        "Dialog",
+        "Drawer",
+        "Popover",
+        "Sheet",
+        "Tabs",
+        "Tooltip"
+      ],
+      "rawCount": 10
+    },
+    "./primitives": {
+      "exported": [
+        "ICON_PATHS",
+        "Icon",
+        "Show",
+        "SrOnly",
+        "VisuallyHidden"
+      ],
+      "rawCount": 5
+    },
+    "./registry": {
+      "exported": [
+        "FRESH_UI_REGISTRY_CONTENT",
+        "FreshUiRegistryCollection",
+        "FreshUiRegistryCssContribution",
+        "FreshUiRegistryFile",
+        "FreshUiRegistryItem",
+        "FreshUiRegistryManifest",
+        "freshUiRegistryManifest"
+      ],
+      "rawCount": 7
+    }
+  },
+  "tests": {
+    "fileCount": 17,
+    "files": [
+      "tests/desktop/desktop-chrome.test.ts",
+      "tests/_fixtures/docs-examples_test.ts",
+      "tests/registry-doc-drift.test.ts",
+      "tests/chat/parse-blocks.test.ts",
+      "tests/registry/render-ui-generated.test.ts",
+      "tests/registry/markdown-pipeline.test.ts",
+      "tests/registry/lib/toast.test.ts",
+      "tests/registry/markdown-renderer.test.ts",
+      "tests/runtime/dialog/dialog.test.ts",
+      "tests/runtime/drawer/drawer.test.ts",
+      "tests/runtime/tabs/tabs.utils.test.ts",
+      "tests/runtime/action-menu/action-menu.test.ts",
+      "tests/runtime/popover/popover.test.ts",
+      "tests/runtime/_internal/collection-navigation.test.ts",
+      "tests/runtime/combobox/combobox.utils.test.ts",
+      "tests/runtime/tooltip/tooltip.test.ts",
+      "tests/runtime/accordion/accordion.test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'lib' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "registry/lib"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 16 immediate children; doctrine cap is 12",
+      "path": ""
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 99 immediate children; doctrine cap is 12",
+      "path": "registry/components/ui"
+    },
+    {
+      "gate": "F-JSR-7 slow-types",
+      "level": "WARN",
+      "message": "Checking for slow types in the public API..."
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [
+      "Checking for slow types in the public API..."
+    ],
+    "rawTail": "   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/accordion/Accordion.tsx (3.67KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/accordion/accordion.types.ts (3.07KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/accordion/use-accordion.ts (9.13KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/action-menu/ActionMenu.tsx (6.34KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/action-menu/action-menu.types.ts (2.28KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/combobox/Combobox.tsx (2.32KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/combobox/combobox.types.ts (2.36KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/combobox/combobox.utils.ts (974B)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/combobox/use-combobox.ts (6.82KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/dialog/Dialog.tsx (2.63KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/dialog/dialog.types.ts (3.02KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/dialog/use-dialog.ts (5.12KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/drawer/Drawer.tsx (2.63KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/drawer/drawer.types.ts (782B)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/drawer/use-drawer.ts (113B)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/popover/Popover.tsx (3.89KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/popover/popover.types.ts (4.39KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/popover/use-popover.ts (7.97KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/sheet/Sheet.tsx (2.56KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/sheet/sheet.types.ts (3.79KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/sheet/use-sheet.ts (5.4KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tabs/Tabs.tsx (1.97KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tabs/tabs.types.ts (1.97KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tabs/tabs.utils.ts (366B)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tabs/use-tabs.ts (5.93KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx (2.71KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tooltip/tooltip.types.ts (2.84KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/fresh-ui/src/runtime/tooltip/use-tooltip.ts (7.45KB)\nSuccess Dry run complete\n"
+  }
+}

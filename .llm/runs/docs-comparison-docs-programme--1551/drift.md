@@ -1,0 +1,280 @@
+# Drift — comparison docs programme #1551
+
+Append-only.
+
+## 2026-08-13 — carried provisional Session baseline corrected before planning
+
+The live #1551 comment's provisional sketch diverges materially from EIS-Chat commit `5191de83f3da97559f21d8891c6c8afdf1cf473a`: route context access, resource ownership, cache-read flow, generated-route aliases, authoritative partial ownership, and local presentation helpers differ. Its LOC/ASC values were estimates.
+
+Disposition: no implementation drift. Research was re-baselined to the immutable source; estimates were discarded; private contents remain excluded; the plan pins exact evidence inputs and exposes absent measurements. No coordinator rescope is required.
+
+## 2026-08-15 — S1 rendered-navigation assertion deferred to its owning slice
+
+Severity: **significant** — plan-acceptance correction. Rescope: **none**. Scope growth: **none**.
+
+The approved plan assigned `docs/site/migration/index.md` and
+`docs/site/migration/nextjs.md` to S3, while S1's manual gate required both
+`/comparisons/` and `/migration/` roots to render under Concepts. Folder-derived
+navigation cannot render the migration root before its S3-owned index exists, so
+that S1 assertion was unsatisfiable from S1's own six-file list. The contradiction
+was in the approved acceptance text, not in the implementation boundary.
+
+Topic orchestrator `topic-docs-0.0.7` ruled that S1 asserts only
+`/comparisons/` and `/comparisons/methodology/` under Concepts. S3 inherits the
+`/migration/` rendered-root assertion and must assert both comparison and migration
+roots after it lands the two migration files. No migration content moves into S1.
+
+Formal PLAN-EVAL cycle 1 returned `PASS` on evaluated head `d35cbca30` without
+detecting this inconsistency. Recording the miss here keeps it visible to later
+IMPL-EVAL rather than burying it in the corrected gate result.
+
+## 2026-08-15 — S1 dangling migration references and link-gate gap corrected
+
+Severity: **significant** — plan-acceptance and gate-coverage correction. Rescope:
+**none**. Scope growth: **none**; the fix strictly reduces what S1 publishes.
+
+S1 commit `3a8c73841` shipped four references to a non-existent `/migration/`
+root: the Concepts root list, the `migration:index` xref, a comparison-index body
+link, and the methodology next-page link. S3 owns the migration pages, so none of
+those references could resolve in S1.
+
+The original S1 gate could not detect the defect. Its site `build` checks source
+format and selected rendered-output semantics, while the rendered internal-link
+checker `check:links` appeared only under the S3 `verify` gate. The repository-level
+`docs:links` source check also passed the dangling rendered targets.
+
+Tier-A review required S1 to remove all four references and amended
+`S1-method-nav` from now on to run
+`rtk proxy deno task --cwd docs/site check:links` immediately after `build`.
+S3 retains ownership of the migration pages, xrefs, navigation, and both-root
+rendered assertion. Formal PLAN-EVAL cycle 1 passed over both the premature
+references and the insufficient S1 link gate; this entry keeps both misses visible
+to later IMPL-EVAL.
+
+## 2026-08-15 — S2 pinned local input is unavailable
+
+Severity: **significant** — implementation precondition missing. Status: **blocked**.
+Rescope: **none**. Scope growth: **none**.
+
+The approved S2 design requires an authorized local EIS-Chat root whose repository
+revision is exactly `5191de83f3da97559f21d8891c6c8afdf1cf473a` before the measurement
+tool reads any file. The available read-only checkouts were at `aeaf2df5…`,
+`5fdff778…`, and `a08ebe55…`; a bounded filesystem search found no checkout at the
+required revision, and the two obvious EIS-Chat object stores did not contain the
+required commit object.
+
+The revision is not lost or rewritten. The topic orchestrator independently
+verified that `git ls-remote origin` on the authorized
+`https://github.com/rickylabs/eis-chat.git` remote reports the pinned commit as
+both `HEAD` and `refs/heads/master`; the local clones are parked on other branches
+and have never fetched that tip.
+
+The missing input follows from the approved plan itself rather than from remote
+availability. `research.md:51` records that the private repository was inspected
+only through authorized GitHub access at the immutable commit and that no checkout
+was made. The S2 tool contract then requires an authorized local root, but no slice
+creates one. Formal PLAN-EVAL cycle 1 passed over that unsatisfied dependency.
+
+S2 stopped before reading consumer files or creating the tool, manifest, or
+measurements. No fetch, checkout, clone, worktree creation, private-source copy, or
+other attempt to materialize the missing revision was made. Truthful aggregate
+reproduction requires an already-authorized local root at the pinned revision; a
+different revision or network-derived estimate cannot satisfy the evidence contract.
+
+## 2026-08-15 — S2 lint gate excludes its own approved files
+
+Severity: **significant** — gate-coverage correction required. Status: **blocked**.
+Rescope: **none**. Scope growth: **none**.
+
+After the coordinator provisioned the exact read-only EIS-Chat input, S2 created the
+approved tool, test, manifest, and derived aggregate. The literal approved lint gate
+selected both `.llm/tools/docs/measure-comparison-surface*.ts` files, but root
+`deno.json` excludes `.llm/` from `deno lint`. Deno therefore reported “No target
+files found”; the structured wrapper correctly refused a false green and exited `2`
+with one excluded batch and no lint occurrences.
+
+A diagnostic rerun using the existing `docs/site/deno.json` via the wrapper's
+documented `--config` option selected both files and exited `0` with zero findings.
+That proves the sources are lint-clean under an existing config, but it cannot be
+substituted for the mandatory command without topic-orchestrator authority. Changing
+root config or adding another config file would exceed the approved S2 file list.
+
+Formal PLAN-EVAL cycle 1 passed over the incompatibility between the S2 file paths
+and its lint command. S2 stopped without a commit, push, PR comment, root-config
+change, or S3 work pending a gate correction.
+
+## 2026-08-15 — S2 lint row ruled not applicable
+
+Severity: **significant** — gate-applicability correction. Status: **resolved for
+S2**. Rescope: **none**. Scope growth: **none**.
+
+Topic orchestrator `topic-docs-0.0.7` independently reproduced the exact lint
+command's raw exit `2` with two selected files and one excluded batch, then ruled
+the row **N/A — not applicable**. Root `deno.json` deliberately excludes `.llm/`
+from lint coverage repo-wide; there is no `.llm/deno.json`, and CI does not lint
+`.llm/tools`. The wrapper therefore worked as designed by failing closed instead
+of reporting a false green. The result is not recorded as passed, skipped, or
+waived.
+
+No alternate config is used as gate evidence, and root lint configuration remains
+unchanged. Formal PLAN-EVAL cycle 1 passed over this incompatibility. The correction
+changes only the applicability of an unsatisfiable gate row; it does not change the
+S2 files, evidence contract, milestone scope, or planned S3 work.
+
+## 2026-08-15 — canonical case comments corrected at the unchanged pin
+
+Severity: **significant** — public evidence correction. Status: **resolved in E0**.
+Rescope: **none**. Scope growth: **none**.
+
+The two canonical #1551 case comments described older inspected snapshots even though the locked
+EIS-Chat pin itself remained current. Read-only verification established that local `HEAD` and
+`origin/master` are still `5191de83f3da97559f21d8891c6c8afdf1cf473a`; no newer product commit
+exists. Commit `834a2b36a5c9ef4acf82f8f1f400522d8dab234b` resolves to the same tree as the
+pin and is evidence-only, not a replacement baseline.
+
+Focused source inspection confirmed the pinned examples already contain the material improvements
+that the old comment prose omitted: generated route contracts, route-bound partials, typed document
+form navigation, cache-seed preservation across partial navigation, layout-faithful deferred states,
+and cold-navigation stabilization. The primary Session route is `94 / 92` physical/nonblank lines
+at the pin, versus the comment's published `119 / 117` claim and the inspected `121 / 119` snapshot.
+The Channel route is `181 / 178`, versus `208 / 204` at the inspected snapshot.
+
+Owner authority required complete in-place replacement of comments `5265826161` and `5265971722`.
+The definitive bodies use minimal current illustrative excerpts, enumerate the inspected surfaces,
+distinguish framework capability from consumer ownership, remove unreproducible ASC/feature/effort
+estimates, and keep the Next.js `16.3.0` comparison tied to primary documentation. They contain no
+business data, credentials, domain models, CSS, fixtures, or wholesale private-source dump.
+
+The S2 manifest, measurement procedure, and measurement JSON already target the unchanged pin and
+remain correct; manufacturing changes to them would reduce reproducibility, so they are deliberately
+untouched. The current implementation does not break the approved equivalence contract, change the
+mechanism-matrix shape, or invalidate the presentation/domain-held-constant premise. This correction
+therefore needs no fresh PLAN-EVAL. S3 remained unstarted throughout.
+
+## 2026-08-15 — S3 Concepts-root assertion requires `_data.ts`
+
+Severity: **significant** — approved slice-boundary correction. Status: **resolved in S3**.
+Rescope: **none**. Scope growth: **none**.
+
+The S1 correction explicitly deferred the assertion that both `/comparisons/` and `/migration/`
+render under Concepts until S3, when the migration pages exist. The approved S3 file list includes
+the migration pages and xrefs but omits `docs/site/_data.ts`, the only source of the Concepts root
+list. At the E0 baseline that list contains `/explanation/` and `/comparisons/` only, so the inherited
+assertion is unsatisfiable without changing `_data.ts`.
+
+Topic-orchestrator authority anticipated this exact divergence and required it to be recorded rather
+than added silently. S3 therefore adds `/migration/` to the existing Concepts roots in `_data.ts`
+alongside the pages that make the route resolve. This changes neither the approved information
+architecture nor milestone scope; it is the minimum file needed to satisfy the already-approved
+two-root acceptance statement. No package, plugin, lockfile, or additional content scope is added.
+
+## 2026-08-15 — IMPL-EVAL cycle 1 evidence/publication repair
+
+Severity: **significant** — blocking evidence-contract repair. Status: **resolved pending Tier-A
+review**. Rescope: **none**. Scope growth: **none**.
+
+Formal IMPL-EVAL cycle 1 returned `FAIL_FIX` on evaluated head `15429cf8487cfe3504ae0443fd435d2a72d4528b`
+and evaluator-only commit `e95f4838038a27a0f209d2ce37c9f53bd4ed4299`. It found that the Channel
+comment labeled `181 / 178` measured without published Channel inputs, the Session comment cited
+evidence through mutable branch refs, the Session manifest lacked three methodology-required
+metadata fields, the draft PR body no longer described the landed work, and the case matrix used
+`Follow-up` instead of the methodology's `Residual owner`. Formal PLAN-EVAL cycle 1 and the prior
+topic-orchestrator Tier-A review both passed over the defects.
+
+The repair keeps Channel evidence with residual owner #1649: the honest count and inline inspection
+procedure remain, but the label is `inspected` and the shared `measured` definition again requires a
+published script, pinned inputs, raw aggregate output, and environment metadata. No Channel evidence
+surface or remeasurement is added. The Session manifest and aggregate add only
+`frameworkVersions`, `featureFlags`, and `inspectedAt`; tool `1.1.0` and its tests carry those fields
+consistently. The six inclusion-class aggregates and immutable EIS-Chat pin remain unchanged. The
+timestamp-normalized digest changes from `b9e96ed2…` to
+`3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2` solely because of the additive
+metadata and tool-version fields.
+
+Immutable evidence linking requires two commits: a document cannot embed the not-yet-known SHA of
+the commit that contains itself. Prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6`
+therefore creates the immutable evidence target; the following docs/run-artifact commit points the
+case page at that target and records the in-place comment edits. This is a sequencing correction,
+not a rescope or scope expansion. Both canonical comments are edited in place with no addendum or
+follow-up, the PR remains draft and partial, and formal IMPL-EVAL cycle 2 remains a separate
+opposite-family gate after topic-orchestrator Tier-A review.
+
+## 2026-08-15 — normalized digest claims do not reproduce
+
+Severity: **minor** — merge-readiness evidence-record correction. Status: **resolved pending Tier-A
+verification**. Rescope: **none**. Scope growth: **none**.
+
+IMPL-EVAL cycle 2 returned `PASS` on repaired source
+`c7ce58a19494024c219e9970deeb3ece878232d6` while identifying that the historical normalized
+SHA-256 claims `b9e96ed2…` and `3d9d2ee…` above do not reproduce from their respective checked-in
+aggregates. An independent retry of the tool's own serialization policy—delete `observedAt`, then
+write `JSON.stringify(value, null, 2) + "\n"`—produced `0be43e05…`, not `3d9d2ee…`. The historical
+entries remain unchanged under append-only discipline so the incorrect claims are visible rather
+than concealed.
+
+The underlying repeatability property remains true. This exact command was run against the
+authorized pinned root:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/docs/measure-comparison-surface.ts --manifest docs/site/comparisons/evidence/session-source-manifest.json --root eis-chat=/home/codex/repos/eis-chat-007-input --observed-at 2026-08-15T03:57:30Z --output .llm/tmp/session-measurements-repro.json
+cmp .llm/tmp/session-measurements-repro.json docs/site/comparisons/evidence/session-measurements.json
+```
+
+`cmp` returned raw exit `0`, proving byte-identical fixed-timestamp regeneration. Current records
+and the PR body use that checkable receipt instead of either normalized digest. No manifest,
+measurement, tool, test, product/docs content, consumer pin, or private input changed.
+
+## 2026-08-15 — agent docs prose bundle was stale after the docs slices
+
+**Severity:** minor; resolved pending Tier-A verification; no rescope and no scope growth.
+
+CI run `31869720549`, job `94976401345`, exposed that the checked-in agent-docs prose bundle still
+recorded source commit `6f9620c0c` and therefore omitted the five rendered comparison/migration
+pages landed by this leaf. Local `deno task check:agent-docs-prose` reproduced the failure at raw
+exit `1`, naming only `prose.json.gz` and `provenance.json` as stale.
+
+The canonical generator returned raw exit `0` and changed only those two authorized generated
+assets. The file-list delta is exactly the five expected pages, with no removals or unexpected
+additions. The durable `agent-docs-prose` gate then returned raw exit `0`; receipt
+`.llm/tmp/gate-receipts/docs-comparison-docs-programme--1551/agent-docs-prose.json`. This is a stale
+generated-asset repair, not a content, evidence, plan, pin, or acceptance change.
+
+## 2026-08-15 — corpus refresh required its deterministic embedded CLI copy
+
+**Severity:** significant contract correction; coordinator-authorized; no milestone rescope and no
+scope growth beyond the derived output.
+
+The original docs-leaf boundary excluded `packages/**`, but
+`.llm/tools/generate-cli-assets-barrel.ts` deterministically embeds the approved agent-docs gzip and
+provenance in `packages/cli/src/kernel/assets/agent-docs.generated.ts`. Refreshing the input bundle
+therefore necessarily made that generated copy stale. The coordinator authorized this one generated
+surface only; `plan.md` now records the exception and **PLAN-EVAL: N/A** because no architecture or
+locked-plan decision changes.
+
+The generator moved only the authorized agent-docs target with the expected 11-insertion /
+6-deletion shape. The exact durable freshness gate initially returned raw exit `1` while the
+intended delta was unstaged, then raw exit `0` after staging; because its final check compares the
+working tree with the index, only the mandated post-commit rerun is authoritative for CI parity.
+
+The prescribed scoped format row was also unsatisfiable: root `deno.json` deliberately excludes
+`packages/cli/` from `fmt`. The wrapper selected seven files, observed Deno excluding the batch, and
+failed closed at raw exit `2`. The topic orchestrator ruled the row **N/A — not applicable**, never
+passed, skipped, or waived. No alternate config, suppression, generated-file hand edit, or root
+configuration change was used.
+
+## 2026-08-15 — embedded CLI refresh required the deterministic MCP publish asset
+
+**Severity:** significant generated-surface correction; coordinator-authorized; no plan rescope and
+no scope growth beyond the derived output.
+
+The refreshed agent-docs gzip, provenance, and embedded CLI copy are direct inputs to
+`.llm/tools/generate-publish-assets.ts`. Their approved changes therefore made
+`packages/mcp/src/publish-assets.generated.ts` stale, which CI run `31870831715`, job
+`94979108152`, reported at the `publish-assets` gate. The topic orchestrator authorized only that
+deterministic generated target plus append-only run records for this third cascade layer.
+
+`deno task gen:publish-assets` returned raw exit `0` and moved only the authorized target with a
+4-insertion / 4-deletion delta. No docs content, measurement evidence, generator source, private
+input, canonical #1551 comment, lockfile, or other generated target changed. The post-commit durable
+receipt is intentionally the authoritative freshness proof because the gate's final diff must
+compare committed bytes with `HEAD`, not merely staged bytes with the index.

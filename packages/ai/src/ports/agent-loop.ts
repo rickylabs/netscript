@@ -10,6 +10,7 @@
  */
 
 import type { AgentChunk } from '../contracts/chunk.ts';
+import type { RequestContext } from '../contracts/context.ts';
 import type { GenerationOptions } from '../contracts/generation.ts';
 import type { Message } from '../contracts/message.ts';
 import type { ModelRef } from '../contracts/model.ts';
@@ -35,6 +36,18 @@ export interface AgentLoopInput {
    * bound provider adapter maps it natively. Optional and additive.
    */
   readonly options?: GenerationOptions;
+  /**
+   * Request-local application state for this run. **Never reaches the model.**
+   *
+   * The loop threads it into every
+   * {@linkcode import('./chat-client.ts').ChatClientRequest} it issues (where
+   * the bridge hands it to provider-invisible seams only) and into every tool
+   * dispatch as
+   * {@linkcode import('./tool-registry.ts').ToolInvocationOptions.context}. Use
+   * it for anything a handler needs but a model must not read — ingested
+   * document ids, tenant/auth subject, correlation ids. Optional and additive.
+   */
+  readonly context?: RequestContext;
 }
 
 /**

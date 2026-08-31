@@ -1,0 +1,1 @@
+{"source":{"mode":"selection","cwd":"/home/codex/repos/netscript-007-harness-evidence"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":2919,"batches":25,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}

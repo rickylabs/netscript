@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "slice-4-final-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "83f7a18479720ac9e61c796de64593baa081e77f",
+  "actualGitHead": "83f7a18479720ac9e61c796de64593baa081e77f",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2651747",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "dfae96e26d2992683d3ddd08f8819ca9e1e01d9f0e2af0dea0fcd7b374bb44c3",
+  "lifecycleId": "worker:2651747:slice-4-final-test:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T00:43:29.966Z",
+  "startedAt": "2026-08-15T00:43:29.968Z",
+  "finishedAt": "2026-08-15T00:48:13.793Z",
+  "durationMs": 276183,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 788,
+    "sha256": "35f94b757e54919419fe5131d32c1223146995d50f32f6aa45378fffe5d5e574",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"exitCode\":1,\"durationMs\":276082,\"summary\":{\"passed\":4108,\"failed\":1,\"ignored\":19,\"totalResults\":4128,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal: quality/scan-code-quality.ts --help failed\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   1\\n+   0\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/packages/cli/src/public/features/agent/init/init-agent_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"installed consumer tools resolve from the project when process CWD differs\",\"file\":\"./packages/cli/src/public/features/agent/init/init-agent_test.ts\",\"line\":581}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 127,
+    "sha256": "d8c71713aba1eb302702bcf55c321886c40fa2beba1801afb19ff811dd358567",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}

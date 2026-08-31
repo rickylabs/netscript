@@ -2,6 +2,8 @@
 
 Generated from schema `1.0` at 2026-07-10T20:27:32.113Z. Baseline: `b438f16d`.
 
+Current open-evaluator routing uses PLAN `qwen/qwen3.8-flash` and IMPL/default `z-ai/glm-5.3-flash`. Model references in the July canary evidence below are retained as historical observations, not current selectors.
+
 ## Executive outcome
 
 Overall status: **conditional_pass**. Promotion recommendation: **promote_with_conditions**.

@@ -17,9 +17,9 @@ locked decisions (`08`), the authoring lane (model/effort per LD-DOCS-LANE), and
 - **Sonnet 4.6** — trivial link-fix/cleanup passes.
 - Authoring agents run **under the harness** (`netscript-harness` + `deno-fresh` + `jsr-audit` where
   the page touches published-surface examples). Output respects doctrine, the publish surface, gates.
-- **Formal validation stays in separate open-model sessions**: PLAN-EVAL uses Minimax M3 high and
-  IMPL-EVAL uses DeepSeek V4 Flash 0731 max. The Claude workflow is the **generator only**; it never
-  self-certifies.
+- **Formal validation stays in separate opposite-family sessions**. Native Claude/Codex is the
+  default; when the approved OpenRouter route is required, PLAN-EVAL uses Qwen 3.8 Flash max and
+  IMPL-EVAL uses GLM 5.3 Flash max. The generator never self-certifies.
 - **Any framework-source change** (e.g. a `*Namespace` type export needed for a sample to compile)
   is a **WSL Codex** daemon-attached slice, NOT the authoring workflow. Authors who hit a
   source-blocker stop and flag it; they do not edit `packages/`/`plugins/`.

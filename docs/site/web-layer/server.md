@@ -85,34 +85,35 @@ whoever wrote the file. Copy it into a second app, add an app-level middleware i
 the failure is a slow asset path or an unreachable explicit route — not an error.
 
 One thing is also silently absent: the SDK's KV cache provider is never registered, so
-`getCachedEntry()` throws at the first loader that calls it. That registration is an import side
-effect — `@netscript/fresh/server` re-exports the module whose body imports `@netscript/sdk/cache` —
-and it is documented in
-[The query bridge](/web-layer/query-bridge/#the-import-that-makes-any-of-this-work). A bare Fresh
-entry point that never imports `@netscript/fresh/server` bypasses it. Calling `defineFreshApp` is not
-itself the trigger; evaluating the `/server` module is.
+`getCachedEntry()` throws at the first loader that calls it. `defineFreshApp()` closes that seam by
+calling `setCacheProvider(cacheQuery)` as its first bootstrap step. Importing
+`@netscript/fresh/server` alone is inert; a bare Fresh entry point that hand-rolls `new App()` must
+make the same explicit registration. See
+[The query bridge](/web-layer/query-bridge/#the-bootstrap-call-that-makes-server-caching-work).
 
 ### The bootstrap order
 
 `defineFreshApp` runs a fixed sequence, and every option is a seam in it:
 
-1. **Obtain the app** — `options.app`, else `options.createApp(options.freshConfig)`, else
+1. **Register the server cache** — call `setCacheProvider(cacheQuery)`. This happens when
+   `defineFreshApp()` is called, not when its module is imported.
+2. **Obtain the app** — `options.app`, else `options.createApp(options.freshConfig)`, else
    `new App(options.freshConfig)`. The first match wins, so passing `app` means `createApp` is never
    called.
-2. **`preConfigure(app)`** — before anything is registered. This is where a route or middleware that
+3. **`preConfigure(app)`** — before anything is registered. This is where a route or middleware that
    must precede the static-file handler goes.
-3. **Static files** — `app.use(staticFiles())` unless `staticFiles` is `false`; pass your own
+4. **Static files** — `app.use(staticFiles())` unless `staticFiles` is `false`; pass your own
    `Middleware` to replace Fresh's.
-4. **Request telemetry** — register a `fresh.request` server span unless `telemetry` is `false`.
+5. **Request telemetry** — register a `fresh.request` server span unless `telemetry` is `false`.
    Static attributes come from `telemetry.attributes`; service-name precedence is
    `telemetry.serviceName`, then `name`, then `fresh-app`.
-5. **App middleware** — `app.use(...options.middleware)`, skipped entirely when the array is empty.
-6. **Query-cache invalidation** — register the JSON-only POST route at
+6. **App middleware** — `app.use(...options.middleware)`, skipped entirely when the array is empty.
+7. **Query-cache invalidation** — register the JSON-only POST route at
    `/_netscript/query-cache/invalidate`, unless `queryCacheInvalidation` is `false`; an object can
    override its path. The middleware above protects this route too.
-7. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
+8. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
    here are inserted ahead of the generated ones.
-8. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
+9. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
    or your own callback when it is a function. `false` skips the step.
 
 The returned value is the `App<State>` itself, so `app.use(...)`, `app.get(...)`, and `app.listen(...)`
@@ -208,11 +209,10 @@ widens with it, along with the `middleware` array's `ctx`.
 - **A custom `fsRoutes` callback never receives a pattern.** Its second parameter exists in the type,
   but the runtime only computes a pattern from the string form — which does not take the callback
   branch. Close over the pattern you want instead of reading the argument.
-- **The KV cache provider is registered by the import, not by the call.** Evaluating
-  `@netscript/fresh/server` — for `defineFreshApp`, `createStreamingResponse`, or anything else on the
-  subpath — registers it. Constructing the app with `new App()` in a module that still imports
-  `/server` keeps the registration; only an entry point that never touches the subpath loses it, and
-  the failure then surfaces in a loader, far from `main.ts`.
+- **The KV cache provider is registered by the call, not by the import.** Calling
+  `defineFreshApp()` installs it before any app hooks run. Importing `@netscript/fresh/server` for a
+  different helper does not. A custom `new App()` bootstrap must explicitly call
+  `setCacheProvider(cacheQuery)` or its first provider-backed loader fails.
 - **Adapter imports with their own ordering rules still go above everything.** The scaffolded
   dashboard puts `import '@netscript/kv/redis';` at the top of `main.ts` because that registration has
   to precede the first `getKv()` call — `defineFreshApp` does not sequence module-level side effects

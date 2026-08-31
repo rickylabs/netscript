@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "quality-root-coverage-s2-test",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/quality/check-root-coverage_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage",
+  "gitHead": "15d89474069d04dacc978c35af372b8a081d17d7",
+  "actualGitHead": "15d89474069d04dacc978c35af372b8a081d17d7",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "569491c728f8cd78d52c07e3a21293c3730c95948286e82562812a5fcfd5cbf9",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s2-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T06:16:07.793Z",
+  "startedAt": "2026-08-15T06:16:07.796Z",
+  "finishedAt": "2026-08-15T06:16:08.242Z",
+  "durationMs": 446,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 314,
+    "sha256": "0d57abe3cc48a50f0d2684e1a4d104481ea9a6b59e498d75412e5eed61c122e3",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/quality/check-root-coverage_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-root-coverage\",\"exitCode\":0,\"durationMs\":354,\"summary\":{\"passed\":9,\"failed\":0,\"ignored\":0,\"totalResults\":9,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 176,
+    "sha256": "923f7116cc0a02bd48992c53b56cb7522ce4741fdf2328a889cfe9e795c16b08",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/quality/check-root-coverage_test.ts'\n",
+    "truncated": false
+  }
+}

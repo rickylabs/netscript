@@ -8,6 +8,12 @@ title: "@netscript/auth-workos"
 WorkOS-backed authenticator and backend adapter for NetScript auth. This page is written against
 the package's public surface reported by `deno doc`.
 
+## Exports
+
+| Export | Path |
+| --- | --- |
+| `@netscript/auth-workos` | `./mod.ts` |
+
 ## Factories
 
 | Symbol | Kind | Description |

@@ -1,0 +1,7 @@
+Task agentic:teardown deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/teardown.ts '--' '--slice-dir' '.llm/runs/test-aspire-13-5-s2-runtime-verification--impl' '--worktree' '/home/codex/repos/netscript-aspire-13-5-s2'
+{
+  "applied": false,
+  "stoppedAppHosts": [],
+  "removedContainers": [],
+  "escalated": []
+}

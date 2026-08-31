@@ -140,6 +140,9 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: '2.9.5'
+      - name: Check documentation exports drift
+        if: env.RUN == 'true'
+        run: deno task docs:exports-drift
       - name: Check documentation snippets
         if: env.RUN == 'true'
         run: deno task docs:snippets

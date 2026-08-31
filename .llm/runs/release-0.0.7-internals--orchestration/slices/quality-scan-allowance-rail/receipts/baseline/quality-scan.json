@@ -1,0 +1,36 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "baseline-quality-scan",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "actualGitHead": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2144037",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "44e4808c443b879d908a9c9f330e5f151484762289b09a02321573ac96d16d9b",
+  "lifecycleId": "worker:2144037:baseline-quality-scan:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T20:33:00.846Z",
+  "startedAt": "2026-08-13T20:33:00.850Z",
+  "finishedAt": "2026-08-13T20:33:01.161Z",
+  "durationMs": 311,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 1437,
+    "sha256": "9587181b5b3ef6e69827368cde596153937587efc3f55110032cb92c527aaad3",
+    "tail": "{\"ok\":true,\"mode\":\"repository\",\"scanned\":[\"packages/cli/src\",\"plugins\",\"docs/site\"],\"findings\":[],\"allowCount\":7,\"allowances\":[{\"file\":\"packages/cli/src/public/features/root/public-command-dependencies.ts\",\"line\":363,\"reason\":\"service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":135,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":136,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":158,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":275,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"plugins/workers/streams/producer.ts\",\"line\":52,\"reason\":\"durable-stream mutation hook upstream type omits the worker execution extension fields\"}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 150,
+    "sha256": "341aba380af33de49a501a6dc230df4d8d8cfb467e74cbaeb95d7959eeeba2a3",
+    "tail": "Task quality:scan deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/cli/src --root plugins --root docs/site --max-allow 7\n",
+    "truncated": false
+  }
+}

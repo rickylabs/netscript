@@ -194,7 +194,7 @@ export function buildServiceEnvironment(
 
   // Service discovery: Aspire-compatible format.
   // Aspire uses the original service name with hyphens preserved:
-  //   services__workers-api__http__0=http://localhost:8091
+  //   services__workers-api__http__0=http://localhost:<allocated-port>
   // NOT underscores (services__workers_api__http__0).
   for (const other of allTargets) {
     if (other.port) {

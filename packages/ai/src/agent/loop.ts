@@ -29,7 +29,7 @@ import type { Usage } from '../contracts/usage.ts';
 import type { ChatModelProviderPort } from '../ports/chat-client.ts';
 import type { TelemetryPort, TelemetrySpan } from '../ports/telemetry.ts';
 import { createNoopTelemetryPort } from '../ports/telemetry.ts';
-import type { ToolRegistryPort } from '../ports/tool-registry.ts';
+import type { ToolInvocationOptions, ToolRegistryPort } from '../ports/tool-registry.ts';
 import { createNoopToolRegistry } from '../ports/tool-registry.ts';
 import type { AgentLoopInput, AgentLoopOptions, AgentLoopPort } from '../ports/agent-loop.ts';
 import type { HistoryStrategy } from './history.ts';
@@ -154,7 +154,13 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
         try {
           for await (
             const event of client.stream(
-              { messages, system: input.system, tools: input.tools, options: input.options },
+              {
+                messages,
+                system: input.system,
+                tools: input.tools,
+                options: input.options,
+                context: input.context,
+              },
               { signal },
             )
           ) {
@@ -239,7 +245,10 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
             yield doneChunk(sawUsage, aggregate);
             return;
           }
-          const result = await executeToolCall(tools, call);
+          const result = await executeToolCall(tools, call, {
+            signal,
+            context: input.context,
+          });
           yield { type: 'tool-result', result };
           working.push(toToolMessage(result, call));
         }
@@ -313,8 +322,19 @@ function doneChunk(sawUsage: boolean, aggregate: MutableUsage): AgentChunk {
   return { type: 'done', usage };
 }
 
-/** Execute one tool call through the injected registry, never throwing. */
-async function executeToolCall(tools: ToolRegistryPort, call: ToolCall): Promise<ToolResult> {
+/**
+ * Execute one tool call through the injected registry, never throwing.
+ *
+ * `options` carries the run's ambient, provider-invisible values: the combined
+ * abort signal, and the run's
+ * {@linkcode import('../contracts/context.ts').RequestContext}. A handler can
+ * therefore read request-local application state that never reached the model.
+ */
+async function executeToolCall(
+  tools: ToolRegistryPort,
+  call: ToolCall,
+  options: ToolInvocationOptions,
+): Promise<ToolResult> {
   const handler = tools.resolveHandler(call.name);
   if (!handler) {
     return {
@@ -325,7 +345,7 @@ async function executeToolCall(tools: ToolRegistryPort, call: ToolCall): Promise
     };
   }
   try {
-    return await handler(call);
+    return await handler(call, options);
   } catch (cause) {
     return {
       toolCallId: call.id,

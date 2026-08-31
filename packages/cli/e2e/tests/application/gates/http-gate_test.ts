@@ -17,7 +17,7 @@ Deno.test('HTTP gate retries transient request failures within the gate deadline
     phase: GATE_PHASE.BEHAVIOR,
     critical: true,
     method: 'GET',
-    url: () => 'http://127.0.0.1:8091/api/v1/workers/jobs',
+    url: () => 'http://127.0.0.1:9181/api/v1/workers/jobs',
   }, http);
 
   const result = await gate.execute(createContext());

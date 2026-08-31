@@ -1,0 +1,45 @@
+{
+  "gateId": "test",
+  "invocationId": "harness-evidence-final-test-634b257ea",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "--report-output",
+    ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.report.json"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+  "gitHead": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+  "actualGitHead": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "leaf:harness-evidence-and-verdict-tooling",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "cb370194f14891c10b7139485b9b3a1b4d3b703d80caaf943ead79c8e641700a",
+  "lifecycleId": "leaf:harness-evidence-and-verdict-tooling:harness-evidence-final-test-634b257ea:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T21:26:20.622Z",
+  "childReport": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.report.json",
+  "startedAt": "2026-08-13T21:26:20.626Z",
+  "finishedAt": "2026-08-13T21:30:18.419Z",
+  "durationMs": 223951,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 227,
+    "sha256": "95428471a64575f4f7cd6b4d8c12737809e6d3bca467a7ed58ed78f61ebde5c3",
+    "tail": "{\"report\":\".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.report.json\",\"summary\":{\"passed\":4109,\"failed\":0,\"ignored\":19,\"totalResults\":4128,\"uniqueFailures\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 246,
+    "sha256": "f7b39bbe7cf1528b03298db2f036020e157a253e1b77b99f67acc90fccff3fff",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '--report-output' '.llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.report.json",
+    "bytes": 270,
+    "sha256": "e29bdfc383f1d08bb7d5be83d26cf26f908e4417b766c94f80d77e4d2a1dea17",
+    "modifiedAt": "2026-08-13T21:30:18.390Z"
+  }
+}

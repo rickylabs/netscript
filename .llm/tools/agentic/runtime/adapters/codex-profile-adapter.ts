@@ -7,8 +7,7 @@ import {
 } from '../provider-profiles.ts';
 
 export const CODEX_OPENROUTER_PROFILE_NAME = 'netscript-openrouter' as const;
-export const CODEX_OPENROUTER_PROFILE_FILE: 'netscript-openrouter.config.toml' =
-  'netscript-openrouter.config.toml';
+export const CODEX_OPENROUTER_PROFILE_FILE = 'netscript-openrouter.config.toml' as const;
 
 export interface CodexProfileReference {
   readonly name: typeof CODEX_OPENROUTER_PROFILE_NAME;

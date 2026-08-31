@@ -1,4 +1,5 @@
 import type { GitInfo } from '../lib/agentic-lib.ts';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { CLAUDE_PRINT_WRAPPER, planClaudeCommand } from './adapters/claude-adapter.ts';
 import {
   CODEX_OPENROUTER_PROFILE_FILE,
@@ -161,8 +162,8 @@ Deno.test('Claude native and OpenRouter routes use model plus isolated child env
       route: route({
         agent: 'claude',
         profileId: 'claude-openrouter',
-        model: 'minimax/minimax-m3',
-        effort: 'high',
+        model: OPENROUTER_MODEL_IDS.planEvaluator,
+        effort: 'max',
       }),
     },
     nativeExt4: true,
@@ -248,9 +249,9 @@ Deno.test('formal evaluator routes alone receive the child-model request guard',
       route: route({
         agent: 'claude',
         profileId: 'claude-openrouter',
-        presetId: 'claude-evaluator-minimax-m3',
-        model: 'minimax/minimax-m3',
-        effort: 'high',
+        presetId: 'claude-evaluator-qwen-3-8-flash',
+        model: OPENROUTER_MODEL_IDS.planEvaluator,
+        effort: 'max',
       }),
       content,
     },

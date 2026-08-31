@@ -4,15 +4,7 @@
  * @module
  */
 
-import { db } from '../mod.ts';
-
+{{__slot0__}}
 if (import.meta.main) {
-  const client = await db.getClient();
-
-  try {
-    await client.$queryRaw`SELECT 1`;
-    console.log('✅ Database seed completed.');
-  } finally {
-    await db.disconnect();
-  }
+{{__slot1__}}
 }

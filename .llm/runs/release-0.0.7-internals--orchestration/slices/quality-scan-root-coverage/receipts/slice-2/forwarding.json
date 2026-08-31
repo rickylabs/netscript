@@ -1,0 +1,38 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "quality-root-coverage-s2-forwarding",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan",
+    "--changed-file",
+    ".llm/tools/quality/check-root-coverage.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage",
+  "gitHead": "15d89474069d04dacc978c35af372b8a081d17d7",
+  "actualGitHead": "15d89474069d04dacc978c35af372b8a081d17d7",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6b835a06e13322e16972f07b6a6f78f06438b980aa04e6df45f7bf8c9aa9d5b7",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s2-forwarding:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T06:16:13.618Z",
+  "startedAt": "2026-08-15T06:16:13.622Z",
+  "finishedAt": "2026-08-15T06:16:13.906Z",
+  "durationMs": 284,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 2708,
+    "sha256": "bdf735db51cd98ba800bd4237f980e5ef4ccf7d835b907b020fefcb6543321f3",
+    "tail": "{\"ok\":true,\"census\":{\"workspaceMembers\":37,\"membersInsideBoundary\":37,\"publishableMembersInsideBoundary\":35},\"boundary\":{\"includedParents\":[\"packages/**\",\"plugins/**\"],\"description\":\"The #1542 denominator is limited to workspace members under packages/** and plugins/**.\",\"excludedWorkspaceMembers\":{\"count\":0,\"paths\":[],\"reason\":\"outside packages/** and plugins/**\"}},\"publishableMembers\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"excludedNonPublishableMembers\":[{\"path\":\"packages/bench\",\"reason\":\"publish:false\"},{\"path\":\"packages/cli/e2e\",\"reason\":\"publish:false\"}],\"qualityTasks\":[{\"task\":\"quality:scan\",\"configuredRoots\":[\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]},{\"task\":\"quality:scan:repo\",\"configuredRoots\":[\".llm/tools/fitness\",\".llm/tools/quality\",\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]}],\"doctrine\":{\"configuredRoots\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/bench\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"uncoveredPublishedMembers\":[]},\"scannerTraversal\":{\"observedByChecker\":false,\"traversedPaths\":null,\"note\":\"configuredRoots are configuration coverage only; scanner mode and traversed paths belong to the scanner run report\"},\"errors\":[]}\n{\"ok\":true,\"mode\":\"changed-files\",\"scanned\":[\".llm/tools/quality/check-root-coverage.ts\"],\"findings\":[],\"allowCount\":0,\"allowances\":[],\"allowanceFailures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 357,
+    "sha256": "c1c744a8e43adb75ee5d0cbb28e195445d9fb969e60ce0f6e70d06b909e8c84b",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:scan\u001b[0m deno run --allow-read .llm/tools/quality/check-root-coverage.ts && deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root docs/site --max-allow 7 '--changed-file' '.llm/tools/quality/check-root-coverage.ts'\n",
+    "truncated": false
+  }
+}

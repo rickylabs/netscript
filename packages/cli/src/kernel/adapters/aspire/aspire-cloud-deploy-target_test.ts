@@ -100,6 +100,37 @@ Deno.test('up uses configured AppHost and outputPath from request config', async
   ]);
 });
 
+Deno.test('down uses the Aspire 13.5 non-interactive destroy contract', async () => {
+  const process = new FakeProcess();
+  const adapter = new AspireCloudDeployTarget({
+    key: 'azure-aks',
+    process,
+    readAppHost: () => Promise.resolve('builder.addAzureKubernetesEnvironment("prod");'),
+  });
+
+  await adapter.down({
+    projectRoot: '/proj',
+    targetConfig: {
+      appHost: 'ops/apphost.mts',
+      outputPath: '.deploy/prod-aks',
+    },
+  });
+
+  assertEquals(process.calls[0], {
+    command: 'aspire',
+    args: [
+      'destroy',
+      '--apphost',
+      '/proj/ops/apphost.mts',
+      '--output-path',
+      '.deploy/prod-aks',
+      '--yes',
+      '--non-interactive',
+    ],
+    cwd: '/proj',
+  });
+});
+
 Deno.test('AppHost validation rejects a mismatched platform before invoking Aspire', async () => {
   const process = new FakeProcess();
   const adapter = new AspireCloudDeployTarget({

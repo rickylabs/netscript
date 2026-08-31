@@ -10,8 +10,9 @@ oldUrl: /how-to/discover-services/
 
 **Goal:** call another plugin's (or another workspace member's) oRPC service from your
 app, end to end — declare the dependency so Aspire injects the callee's URL, then obtain a
-fully typed client from `@netscript/sdk` that resolves that URL at request time. No registry,
-no hardcoded `localhost:<port>`, no codegen.
+fully typed client from `@netscript/sdk` that resolves that URL at request time. The shared
+contract supplies the method inputs, outputs, and declared errors; discovery or transport failures
+remain non-defined failures. No registry, no hardcoded `localhost:<port>`, no codegen.
 
 {{ comp.badge({ status: "alpha" }) }}
 
@@ -35,7 +36,7 @@ import the contract, construct the client — that is the whole recipe.
     { name: "A NetScript workspace", type: "netscript init", desc: "An existing project with at least the caller (an app, plugin, or service) and the callee service already present. Run commands from the workspace root." },
     { name: "The callee service", type: "services/<name>/", desc: "A target service that answers on its own port over /api/rpc/* — e.g. the example users service on its assigned port. See the Add a service recipe to create one." },
     { name: "@netscript/sdk", type: "import alias", desc: "The SDK provides the typed client (createServiceClient / defineServices) and the discovery readers (@netscript/sdk/discovery). It is a workspace dependency of apps and consuming services." },
-    { name: "The shared contract", type: "@<project>/contracts", desc: "Both the service and the caller import the SAME oRPC contract object through the project alias, so the client's input/output types are inferred — never duplicated." },
+    { name: "The shared contract", type: "@<project>/contracts", desc: "Both the service and the caller import the SAME oRPC contract object through the project alias, so the client's input, output, and declared-error types are inferred — never duplicated." },
     { name: "Aspire (for resolved URLs)", type: "aspire start", desc: "Aspire injects the services__<name>__http__<index> env vars that discovery reads. Without it you must set those vars yourself (see pitfalls)." }
   ]
 }) }}
@@ -98,7 +99,8 @@ caller's environment.
 In the caller, import the **same contract object** the service implements and hand it to
 `createServiceClient`. The `serviceName` you pass is the discovery key — it must match the
 name you referenced in Step 1. The client is fully typed from the contract; there is no
-generated client file to import.
+generated client file to import. When its routes are composed from `baseContract`, every method
+also carries the six standard declared errors through the returned promise.
 
 ```ts
 // web/src/clients/users.ts — a typed client for the discovered users service
@@ -111,7 +113,7 @@ export const usersClient = createServiceClient({
   serviceName: 'users',
 });
 
-// Fully inferred input/output — a renamed contract field is a compile error here.
+// Input, output, and declared errors are inferred; a renamed field is a compile error.
 const { items } = await usersClient.list({ limit: 20 });
 ```
 
@@ -134,24 +136,65 @@ default it targets `<resolved-url>/api/rpc/v1/<service>` over HTTP.
 
 ## Step 4 — Call it (and handle typed errors)
 
-The client methods mirror the contract's procedure tree. Wrap calls in the SDK's `safe()`
-helper to get a tuple instead of a throw, and narrow defined errors with `isDefinedError`:
+The client methods mirror the contract's procedure tree. For a `baseContract` route, the defined
+error codes are exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`,
+`RATE_LIMITED`, and `SERVICE_UNAVAILABLE`. Wrap a call in the SDK's `safe()` helper, test the
+literal `isSuccess` discriminant first, and then test `isDefined` on the failure. A plain error,
+transport failure, or other non-defined value must be thrown or surfaced from that second branch;
+it must not fall through to the successful output path.
 
 ```ts
 // web/src/routes/users.ts — typed call with safe-style error handling
-import { isDefinedError, safe } from '@netscript/sdk/client';
+import { safe } from '@netscript/sdk/client';
 import { usersClient } from '../clients/users.ts';
 
-const [error, result] = await safe(usersClient.list({ limit: 20 }));
+type UsersErrorCode =
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'RATE_LIMITED'
+  | 'SERVICE_UNAVAILABLE';
 
-if (error && isDefinedError(error)) {
-  // error.code and error.data are typed from the contract
-  console.error('users.list failed:', error.code, error.data);
-} else {
-  // result.items is the contract's output type
-  return result.items;
+export async function listUsers() {
+  const result = await safe(usersClient.list({ limit: 20 }));
+  if (result.isSuccess) return result.data.items;
+  if (!result.isDefined) throw result.error;
+
+  const code: UsersErrorCode = result.error.code;
+  if (result.error.code === 'NOT_FOUND') {
+    // The code selects NOT_FOUND's schema-derived data shape.
+    console.error(result.error.data.resourceType, result.error.data.resourceId);
+  }
+  throw new Error(`users.list failed: ${code}`, { cause: result.error });
 }
 ```
+
+On the defined branch, `error.data` is selected by `error.code` from the schema declared in the
+contract; it is not an open bag and it is not `any`. `isDefinedError(failure.error)` is the
+predicate form for an already typed failure union. It preserves the defined members present in
+that union rather than promoting arbitrary `unknown` values into contract errors.
+
+### Migrating typed-error handling to 0.0.7
+
+The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
+patch-compatible**. Migrate callers with all of these changes in view:
+
+| Surface | Before 0.0.7 | 0.0.7 and later |
+| --- | --- | --- |
+| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
+| `SafeFailure` arms | `SafeFailure<TError = unknown>` was one failure arm with `isDefined: boolean`. | It is two literal-discriminated arms, `isDefined: false` and `isDefined: true`. Code that typed the property as a general `boolean` or treated failure as one undifferentiated arm must branch on the literal. |
+| Default error type | `SafeFailure` and `SafeResult` defaulted `TError` to `unknown`; `safe<TOutput>` had no `TError` parameter and returned `SafeResult<TOutput>`, inheriting that default. | `SafeFailure`, `SafeResult`, and `safe` now default `TError` to `Error`. |
+| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
+| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
+| `baseContract` error codes | The error-map key space was open, so undeclared codes remained type-valid even though comparisons against them were silently false at runtime. | The key space is exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`. Comparing `error.code` with any other code is now a type error: intentional typo/undeclared-code protection and a breaking tightening. |
+| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in Step 4. |
+
+The tuple form has **not** been removed: both result arms remain tuple-and-object intersections, so
+destructuring still works. The discriminated form is the documented path because it prevents a
+plain or transport error from falling through as successful data and preserves code-specific
+contract error typing. For the concrete payload migration, replace
+`if (failure.data === null)` with `if (failure.data === undefined)`.
 
 ## Many services at once — `defineServices`
 
@@ -209,7 +252,7 @@ run the command sequence from the workspace root:
 
 ```ts
 // web/src/clients/users.ts — the resulting file (contract in, typed client out)
-import { createServiceClient, isDefinedError, safe } from '@netscript/sdk/client';
+import { createServiceClient, safe } from '@netscript/sdk/client';
 import { UsersContractV1 } from '@my-app/contracts';
 
 // serviceName is the discovery key — resolves services__users__http__0 at call time.
@@ -218,13 +261,26 @@ export const usersClient = createServiceClient({
   serviceName: 'users',
 });
 
+type UsersErrorCode =
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'RATE_LIMITED'
+  | 'SERVICE_UNAVAILABLE';
+
 // A typed call with safe-style error handling — no hardcoded URL anywhere.
 export async function firstUsers() {
-  const [error, result] = await safe(usersClient.list({ limit: 20 }));
-  if (error && isDefinedError(error)) {
-    throw new Error(`users.list failed: ${error.code}`);
+  const result = await safe(usersClient.list({ limit: 20 }));
+  if (result.isSuccess) return result.data.items;
+  if (!result.isDefined) throw result.error;
+
+  const code: UsersErrorCode = result.error.code;
+  if (result.error.code === 'VALIDATION_ERROR') {
+    // VALIDATION_ERROR selects { formErrors, fieldErrors } from its contract schema.
+    console.error(result.error.data.formErrors, result.error.data.fieldErrors);
   }
-  return result.items;
+  throw new Error(`users.list failed: ${code}`, { cause: result.error });
 }
 ```
 
@@ -246,7 +302,9 @@ deno task --cwd web dev
 
 With `aspire start` up, `usersClient.list({ limit: 20 })` resolves
 `services__users__http__0`, issues the oRPC call to `<resolved-url>/api/rpc/v1/users`, and returns
-the contract's typed `items`. No registry, no `localhost:<port>`, no generated client file.
+the contract's typed `items` on success. Its declared error union comes from the same contract;
+non-defined runtime failures stay separate. No registry, no `localhost:<port>`, no generated client
+file.
 
 ## Production pitfalls
 

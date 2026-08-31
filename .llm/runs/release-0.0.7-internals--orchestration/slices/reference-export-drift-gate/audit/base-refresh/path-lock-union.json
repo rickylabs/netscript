@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "mergeParents": [
+    "0d4c82d6e4bd327abd88eb8b80e7a7acd20ea4aa",
+    "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb"
+  ],
+  "conflictAndCombinedDiffPaths": [
+    ".llm/assets/agent-docs/prose.json.gz",
+    ".llm/assets/agent-docs/provenance.json",
+    "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "implementationPathCount": 14,
+  "authorizedContractPathCount": 17,
+  "implementationPaths": [
+    ".github/workflows/pages.yml",
+    ".llm/assets/agent-docs/prose.json.gz",
+    ".llm/assets/agent-docs/provenance.json",
+    ".llm/tools/docs/check-accuracy-and-discoverability.ts",
+    ".llm/tools/docs/check-exports-drift.ts",
+    ".llm/tools/docs/check-exports-drift_test.ts",
+    "deno.json",
+    "docs/site/reference/fresh-ui/index.md",
+    "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+    "packages/contracts/schemas/filters.ts",
+    "packages/contracts/schemas/pagination.ts",
+    "packages/contracts/src/application/paginated-query.ts",
+    "packages/contracts/src/application/transform-helpers.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "unexpectedImplementationPaths": [],
+  "unionEvidence": {
+    "main1665Page": "pages/web-layer/query-bridge/index.md",
+    "main1665Markers": [
+      "one possibility is that two",
+      "module instances are loaded"
+    ],
+    "leaf1666Page": "pages/reference/fresh-ui/index.md",
+    "leaf1666Marker": "exact, reason-bearing omission group",
+    "allPresentInCanonicalCorpus": true
+  },
+  "corpus": {
+    "fileCount": 181,
+    "uncompressedBytes": 4770349,
+    "compressedBytes": 1368351,
+    "canonicalSha256": "c1d095a62e72555356d346d78848bff144ce9773c38eb9cd95f2d406b28174b3",
+    "gzipSha256": "46703a024d102c278043e2b48ebab906154c728a9c615d939651842068c52f7c"
+  },
+  "denoLockBlob": "a1522e6ecc98dd4232312385b0cea4e52f5fa4b2",
+  "denoLockMatchesPremergeMainHeadAndWorkingTree": true,
+  "priorEvidenceAppendOnly": true
+}

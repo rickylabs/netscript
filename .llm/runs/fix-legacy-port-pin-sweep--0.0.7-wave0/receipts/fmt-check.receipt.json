@@ -1,0 +1,46 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "legacy-port-pin-sweep-root-fmt-6242edabc",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--output",
+    ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/fmt-check.report.json",
+    "--pretty"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
+  "gitHead": "6242edabc3679173c841e2e167f7f5786819e720",
+  "actualGitHead": "6242edabc3679173c841e2e167f7f5786819e720",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2199571",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "9be4dc3eca4ceab2f124a75f58e3de5e3468eb4e08c9cfda8642a10c05475ffc",
+  "lifecycleId": "worker:2199571:legacy-port-pin-sweep-root-fmt-6242edabc:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T20:52:17.486Z",
+  "childReport": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/fmt-check.report.json",
+  "startedAt": "2026-08-13T20:52:17.492Z",
+  "finishedAt": "2026-08-13T20:52:21.185Z",
+  "durationMs": 3693,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 190,
+    "sha256": "2fc686e9f1d92035de61255c3e904c752f802f69ab805b1a684992a252f0af58",
+    "tail": "{\"report\":\".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/fmt-check.report.json\",\"summary\":{\"filesSelected\":2034,\"batches\":11,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 371,
+    "sha256": "5ca3d79728d3c15730fa421df8356cd059e0d38cd59e9e89c0260b072f75c7ca",
+    "tail": "Task fmt:check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--output' '.llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/fmt-check.report.json' '--pretty'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/fmt-check.report.json",
+    "bytes": 278,
+    "sha256": "8e15761f78af7236cf0362de41d5fb4270a4a89540606907538194619a5bdade",
+    "modifiedAt": "2026-08-13T20:52:21.163Z"
+  }
+}

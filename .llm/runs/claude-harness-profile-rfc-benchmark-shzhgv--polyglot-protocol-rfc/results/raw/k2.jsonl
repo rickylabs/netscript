@@ -1,0 +1,8 @@
+{"kind":"meta","bench":"k2-token-delivery","startedAt":"2026-08-20T07:36:08.404Z"}
+{"kind":"proc-environ","mode":"0400","ownerOnly":true,"uid":"0","differentUserTest":"N/A — single-user container; owner-only mode 0400 means exposure is same-uid only, per proc(5)"}
+{"kind":"constructed-env","clearEnvSupported":true,"allowlistDelivered":true,"inheritedExtras":[],"noInheritedLeak":true,"runtimeSelfSetObserved":["LC_CTYPE"],"canaryLeaked":false,"childKeys":["LC_CTYPE","NETSCRIPT_ATTEMPT","NETSCRIPT_CALLBACK_URL","NETSCRIPT_EXECUTION_ID","NETSCRIPT_PROTOCOL","NETSCRIPT_TASK_ID","NETSCRIPT_TASK_TOKEN","PATH"]}
+{"kind":"same-user-environ-read","tokenVisibleToSameUid":true,"note":"Same-uid processes can read a child env token via /proc — but they can equally read the supervisor KV/state, so env delivery does not widen the same-uid trust domain. Cross-uid is blocked by mode 0400."}
+{"kind":"stdin-frame","label":"python3","n":30,"p50Ms":27.5,"p95Ms":41.7}
+{"kind":"stdin-frame","label":"sh-read","n":30,"p50Ms":2.1,"p95Ms":2.5}
+{"kind":"verdict","criteria":"T0/T1 = env pointer + bootstrap token iff /proc environ exposure is same-user-only","environSameUserOnly":true,"decision":"ADOPT env-pointer + bootstrap token for T0/T1 (constructed allowlisted env, clearEnv proven); stdin-first-frame verified as the T1+ optional and T2 per-dispatch mechanism"}
+{"kind":"summary","finishedAt":"2026-08-20T07:36:09.634Z"}

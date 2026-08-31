@@ -14,6 +14,13 @@ interface DatabaseEndpointPortComparison {
   readonly error?: string;
 }
 
+interface LiveSecondEndpointComparison {
+  readonly ok: boolean;
+  readonly receiptPostgresUrl: string;
+  readonly livePostgresUrl?: string;
+  readonly error?: string;
+}
+
 interface TelemetryLogCandidate {
   readonly traceId?: string;
 }
@@ -42,6 +49,18 @@ interface TelemetryCorrelationResult {
   readonly error?: string;
 }
 
+type HttpFetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
+export interface GeneratedCrudAcceptanceReceipt {
+  readonly representativeId: string | number;
+  readonly missingId: number;
+  readonly projected404Methods: readonly ['get', 'patch', 'delete'];
+}
+
+const MISSING_ROW_ID = 2_147_483_647;
+const CRUD_BY_ID_PATH = '/users/{id}';
+const CRUD_404_METHODS = ['get', 'patch', 'delete'] as const;
+
 const [appHost = '', projectRoot = '', database = 'postgres'] = Deno.args;
 
 if (import.meta.main) await verifyLiveDbEndpoint();
@@ -51,15 +70,22 @@ async function verifyLiveDbEndpoint(): Promise<void> {
 
   const first = await readReceipt('first');
   const second = await readReceipt('second');
-  if (first.postgresUrl === second.postgresUrl) {
-    throw new Error(
-      `consecutive AppHost starts reused the same database allocation: ${first.postgresUrl}`,
-    );
-  }
   assertDatabaseAuthority(first);
   assertDatabaseAuthority(second);
 
-  const usersUrl = await liveHttpUrl('users');
+  const liveTopology = await readLiveTopology();
+  const liveSecondEndpoint = compareSecondReceiptWithLiveTopology(
+    second.postgresUrl,
+    liveTopology,
+    database,
+  );
+  if (!liveSecondEndpoint.ok) throw new Error(liveSecondEndpoint.error);
+  const liveUsersDatabaseUrl = assertLiveUsersDatabaseAuthority(
+    liveTopology,
+    liveSecondEndpoint.livePostgresUrl,
+  );
+
+  const usersUrl = liveHttpUrl(liveTopology, 'users');
   const healthResponse = await fetch(new URL('/health', usersUrl));
   const healthBody = await healthResponse.text();
   if (!healthResponse.ok || !matchesDatabaseHealthContract(healthBody, database)) {
@@ -68,15 +94,122 @@ async function verifyLiveDbEndpoint(): Promise<void> {
     );
   }
 
+  const crud = await verifyGeneratedCrudAcceptance(usersUrl);
+
   const telemetryQuery = await createLiveAspireTelemetryQuery(projectRoot);
   const { traceId } = await pollUsersTelemetryCorrelation(telemetryQuery);
 
   const receiptPath = join(projectRoot, '.netscript', 'e2e', 'live-db-endpoint-receipt.json');
   await Deno.writeTextFile(
     receiptPath,
-    JSON.stringify({ first, second, health: JSON.parse(healthBody), traceId }, null, 2),
+    JSON.stringify(
+      {
+        first,
+        second,
+        liveSecondPostgresUrl: liveSecondEndpoint.livePostgresUrl,
+        liveUsersDatabaseUrl,
+        health: JSON.parse(healthBody),
+        crud,
+        traceId,
+      },
+      null,
+      2,
+    ),
   );
   console.info(`live DB endpoint receipt: ${receiptPath}; traceId=${traceId}`);
+}
+
+/**
+ * Verify the generated database seed and defined missing-row HTTP/OpenAPI contract.
+ * This runs inside the existing live database endpoint gate so all grouped checks
+ * consume the same later `scaffold.runtime` execution.
+ */
+export async function verifyGeneratedCrudAcceptance(
+  usersUrl: string,
+  fetcher: HttpFetcher = fetch,
+): Promise<GeneratedCrudAcceptanceReceipt> {
+  const listUrl = new URL('/api/users?page=1&limit=100', usersUrl);
+  const listResponse = await fetcher(listUrl);
+  const listBody = await responseJson(listResponse, 'generated users list');
+  if (!listResponse.ok || !isRecord(listBody) || !Array.isArray(listBody.data)) {
+    throw new Error(
+      `generated users list did not return paginated data: ${listResponse.status} ${
+        JSON.stringify(listBody)
+      }`,
+    );
+  }
+  const representative = listBody.data.filter(isRecord).find((row) => row.name === 'Seed User');
+  if (
+    !representative ||
+    (typeof representative.id !== 'number' && typeof representative.id !== 'string')
+  ) {
+    throw new Error(
+      `generated users list omitted the representative Seed User row: ${JSON.stringify(listBody)}`,
+    );
+  }
+
+  const openApiResponse = await fetcher(new URL('/api/openapi.json', usersUrl));
+  const openApi = await responseJson(openApiResponse, 'generated users OpenAPI');
+  if (!openApiResponse.ok) {
+    throw new Error(
+      `generated users OpenAPI request failed: ${openApiResponse.status} ${
+        JSON.stringify(openApi)
+      }`,
+    );
+  }
+  assertCrud404Projection(openApi);
+
+  const missingUrl = new URL(`/api/users/${MISSING_ROW_ID}`, usersUrl);
+  await assertDefinedNotFound(fetcher, missingUrl, 'GET');
+  await assertDefinedNotFound(fetcher, missingUrl, 'PATCH', {
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ data: { name: 'Missing User' } }),
+  });
+  await assertDefinedNotFound(fetcher, missingUrl, 'DELETE');
+
+  return {
+    representativeId: representative.id,
+    missingId: MISSING_ROW_ID,
+    projected404Methods: [...CRUD_404_METHODS],
+  };
+}
+
+function assertCrud404Projection(document: unknown): void {
+  const paths = isRecord(document) && isRecord(document.paths) ? document.paths : undefined;
+  const byId = paths && isRecord(paths[CRUD_BY_ID_PATH]) ? paths[CRUD_BY_ID_PATH] : undefined;
+  for (const method of CRUD_404_METHODS) {
+    const operation = byId && isRecord(byId[method]) ? byId[method] : undefined;
+    const responses = operation && isRecord(operation.responses) ? operation.responses : undefined;
+    if (!responses || !('404' in responses)) {
+      throw new Error(`${method.toUpperCase()} ${CRUD_BY_ID_PATH} omitted 404 from OpenAPI`);
+    }
+  }
+}
+
+async function assertDefinedNotFound(
+  fetcher: HttpFetcher,
+  url: URL,
+  method: 'GET' | 'PATCH' | 'DELETE',
+  init: Omit<RequestInit, 'method'> = {},
+): Promise<void> {
+  const response = await fetcher(url, { ...init, method });
+  const body = await responseJson(response, `missing-row ${method}`);
+  if (response.status !== 404 || !isRecord(body) || body.code !== 'NOT_FOUND') {
+    throw new Error(
+      `missing-row ${method} was not a defined NOT_FOUND: ${response.status} ${
+        JSON.stringify(body)
+      }`,
+    );
+  }
+}
+
+async function responseJson(response: Response, label: string): Promise<unknown> {
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`${label} returned non-JSON: ${response.status} ${text}`);
+  }
 }
 
 async function readReceipt(allocation: 'first' | 'second'): Promise<EndpointReceipt> {
@@ -101,6 +234,59 @@ function assertDatabaseAuthority(receipt: EndpointReceipt): void {
     receipt.usersDatabaseUrl,
   );
   if (!comparison.ok) throw new Error(`${receipt.allocation} ${comparison.error}`);
+}
+
+/** Proves that the second receipt names the Postgres endpoint in the live second-start topology. */
+export function compareSecondReceiptWithLiveTopology(
+  receiptPostgresUrl: string,
+  liveTopology: unknown,
+  databaseName: string,
+): LiveSecondEndpointComparison {
+  const postgres = findResource(liveTopology, databaseName);
+  if (!postgres) {
+    return {
+      ok: false,
+      receiptPostgresUrl,
+      error: `live second-start topology omitted Postgres resource ${JSON.stringify(databaseName)}`,
+    };
+  }
+
+  let livePostgresUrl: string;
+  try {
+    livePostgresUrl = tcpUrl(postgres);
+  } catch (error) {
+    return {
+      ok: false,
+      receiptPostgresUrl,
+      error: `live second-start Postgres endpoint was unavailable: ${errorMessage(error)}`,
+    };
+  }
+
+  if (receiptPostgresUrl !== livePostgresUrl) {
+    return {
+      ok: false,
+      receiptPostgresUrl,
+      livePostgresUrl,
+      error: `second receipt Postgres URL ${
+        JSON.stringify(receiptPostgresUrl)
+      } did not match live second-start Postgres URL ${JSON.stringify(livePostgresUrl)}`,
+    };
+  }
+
+  return { ok: true, receiptPostgresUrl, livePostgresUrl };
+}
+
+function assertLiveUsersDatabaseAuthority(
+  liveTopology: unknown,
+  livePostgresUrl: string | undefined,
+): string {
+  const users = findResource(liveTopology, 'users');
+  if (!users) throw new Error('live second-start topology omitted users resource');
+  if (!livePostgresUrl) throw new Error('live second-start topology omitted Postgres URL');
+  const usersDatabaseUrl = environmentValue(users, 'DATABASE_URL');
+  const comparison = compareDatabaseEndpointPorts(livePostgresUrl, usersDatabaseUrl);
+  if (!comparison.ok) throw new Error(`live second-start ${comparison.error}`);
+  return usersDatabaseUrl;
 }
 
 /**
@@ -177,10 +363,13 @@ function validPort(value: string): number | undefined {
   return Number.isInteger(port) && port >= 1 && port <= 65_535 ? port : undefined;
 }
 
-async function liveHttpUrl(name: string): Promise<string> {
-  const topology = JSON.parse(
+async function readLiveTopology(): Promise<unknown> {
+  return JSON.parse(
     extractJson(await runAspire(['describe', '--apphost', appHost, '--format', 'Json'])),
   );
+}
+
+function liveHttpUrl(topology: unknown, name: string): string {
   const resource = findResource(topology, name);
   if (!resource) throw new Error(`live topology omitted ${name}`);
   const urls = resource.urls;
@@ -190,6 +379,10 @@ async function liveHttpUrl(name: string): Promise<string> {
     if (typeof value === 'string' && value.startsWith('http://')) return value;
   }
   throw new Error(`${name} exposed no HTTP URL`);
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function runAspire(args: string[]): Promise<string> {

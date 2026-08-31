@@ -1,0 +1,39 @@
+{
+  "toolCount": 14,
+  "toolNames": [
+    "list_resources",
+    "list_console_logs",
+    "execute_resource_command",
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs",
+    "select_apphost",
+    "list_apphosts",
+    "list_integrations",
+    "doctor",
+    "refresh_tools",
+    "list_docs",
+    "search_docs",
+    "get_doc"
+  ],
+  "callResults": [
+    {
+      "id": 3,
+      "hasError": false,
+      "isError": null
+    },
+    {
+      "id": 4,
+      "hasError": false,
+      "isError": null
+    },
+    {
+      "id": 5,
+      "hasError": false,
+      "isError": null
+    }
+  ],
+  "termination": "natural-after-stdin-close",
+  "startedAt": "2026-08-29T22:47:46.164Z",
+  "completedAt": "2026-08-29T22:47:59.284Z"
+}

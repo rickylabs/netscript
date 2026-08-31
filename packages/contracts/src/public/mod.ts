@@ -1,8 +1,11 @@
 // arch:barrel-ok Root mod.ts delegates to this curated public package surface.
 export { type BaseContract, baseContract } from '../application/contract-primitives.ts';
 export type {
+  BaseContractErrors,
+  BaseContractMeta,
   BaseContractOutputRoute,
   BaseContractRoute,
+  CommonErrorMap,
 } from '../application/contract-primitives.ts';
 export {
   boundedString,
@@ -34,6 +37,10 @@ export {
   type ValidationFailedOptions,
 } from '../domain/errors.ts';
 export type { ErrorResult, OkResult, Result } from '../domain/result.ts';
+export type {
+  NetScriptAuthenticationRequirement,
+  NetScriptProcedureMeta,
+} from '../domain/procedure-meta.ts';
 export type {
   ContractDefaultableSchema,
   ContractNumberSchema,

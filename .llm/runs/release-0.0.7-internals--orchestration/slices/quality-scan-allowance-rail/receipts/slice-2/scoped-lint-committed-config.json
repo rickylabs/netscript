@@ -1,0 +1,46 @@
+{
+  "gateId": "lint",
+  "invocationId": "quality-rail-s2-scoped-lint-committed-config",
+  "argv": [
+    "deno",
+    "task",
+    "lint",
+    "--file",
+    ".llm/tools/quality/scan-code-quality.ts",
+    "--file",
+    ".llm/tools/quality/scan-code-quality_test.ts",
+    "--include",
+    "^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts)$",
+    "--config",
+    "docs/site/deno.json",
+    "--batch-size",
+    "1"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "actualGitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "e72485b70a88f6819c496406b7b27d6c012fbe64cd1cf1f6c17cc6fc43fb09d2",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s2-scoped-lint-committed-config:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T00:06:12.974Z",
+  "startedAt": "2026-08-15T00:06:12.978Z",
+  "finishedAt": "2026-08-15T00:06:13.439Z",
+  "durationMs": 462,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 498,
+    "sha256": "3b2d346e153a41580f43761b8a52081f7a51a22ec0c44924187306934beaaf22",
+    "tail": "{\"source\":{\"mode\":\"command\",\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"exitCode\":1},\"selection\":{\"filesSelected\":2,\"batches\":2},\"summary\":{\"totalOccurrences\":1,\"uniqueOccurrences\":1,\"uniqueRules\":1,\"uniquePaths\":1},\"groups\":[{\"rule\":\"no-import-prefix\",\"message\":\"Inline 'npm:', 'jsr:' or 'https:' dependency not allowed\",\"count\":1,\"paths\":[{\"path\":\"/home/codex/repos/netscript-007-quality-rail/.llm/tools/quality/scan-code-quality.ts\",\"count\":1,\"locations\":[{\"line\":1,\"column\":44}]}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 496,
+    "sha256": "b150ed2586dd7beb50a319f0b397a6593feecd184c6d886cffbf453de5b4ba66",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mlint\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--file' '.llm/tools/quality/scan-code-quality.ts' '--file' '.llm/tools/quality/scan-code-quality_test.ts' '--include' '^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts)$' '--config' 'docs/site/deno.json' '--batch-size' '1'\n",
+    "truncated": false
+  }
+}

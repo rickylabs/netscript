@@ -5,6 +5,7 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
+import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../constants/scaffold/scaffold-aspire.ts';
 import { generateTsAspireConfig } from './generate-aspire-config.ts';
 
 describe('generateTsAspireConfig', () => {
@@ -67,9 +68,18 @@ describe('generateTsAspireConfig', () => {
     };
 
     assert(config.packages);
-    assertEquals(config.packages['Aspire.Hosting.PostgreSQL'], '13.4.6');
-    assertEquals(config.packages['Aspire.Hosting.MySql'], '13.4.6');
-    assertEquals(config.packages['Aspire.Hosting.SqlServer'], '13.4.6');
+    assertEquals(
+      config.packages['Aspire.Hosting.PostgreSQL'],
+      SCAFFOLD_ASPIRE_INTEGRATIONS.POSTGRES.VERSION,
+    );
+    assertEquals(
+      config.packages['Aspire.Hosting.MySql'],
+      SCAFFOLD_ASPIRE_INTEGRATIONS.MYSQL.VERSION,
+    );
+    assertEquals(
+      config.packages['Aspire.Hosting.SqlServer'],
+      SCAFFOLD_ASPIRE_INTEGRATIONS.MSSQL.VERSION,
+    );
     assert(!('sqlite' in config.packages));
   });
 
@@ -81,7 +91,7 @@ describe('generateTsAspireConfig', () => {
     assert(config.packages);
     assertEquals(
       config.packages['Aspire.Hosting.Browsers'],
-      '13.4.6-preview.1.26319.6',
+      SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.VERSION,
     );
   });
 });

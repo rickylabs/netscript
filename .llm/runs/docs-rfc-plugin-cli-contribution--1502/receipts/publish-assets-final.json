@@ -1,0 +1,36 @@
+{
+  "gateId": "publish-assets",
+  "invocationId": "ns1502-s4-final-publish-assets",
+  "argv": [
+    "deno",
+    "task",
+    "check:publish-assets"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1502",
+  "gitHead": "120859d5c762706702cd45a3f2be19664e335e22",
+  "actualGitHead": "120859d5c762706702cd45a3f2be19664e335e22",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2675383",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "5dd3b058dbce6e4906d5ab1bde5d39d08595d94f3cd8b5b957fd565dfb917ee2",
+  "lifecycleId": "worker:2675383:ns1502-s4-final-publish-assets:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:53:23.338Z",
+  "startedAt": "2026-08-15T00:53:23.340Z",
+  "finishedAt": "2026-08-15T00:53:23.664Z",
+  "durationMs": 323,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 250,
+    "sha256": "552a20ca8810fd5e5a7ef115222b1ccba8f8637d0a5fa2ad69270738c9c46b40",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:publish-assets\u001b[0m deno task gen:publish-assets --check\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mgen:publish-assets\u001b[0m deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'\n",
+    "truncated": false
+  }
+}

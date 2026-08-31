@@ -43,7 +43,7 @@ be ready. You need **[Deno](https://deno.com/) 2.x**, the **[Aspire CLI](https:/
 
 ```sh
 deno --version     # Deno 2.x
-aspire --version   # the .NET Aspire CLI
+aspire --version   # the Aspire CLI
 docker info        # prints engine details, not a connection error
 ```
 

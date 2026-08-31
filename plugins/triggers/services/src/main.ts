@@ -226,7 +226,7 @@ export function createTriggersService(
   context: TriggerServiceContextSource,
   options: Readonly<{ port?: number }> = {},
 ): ServiceBuilder<typeof router> {
-  const port = options.port ?? Number(Deno.env.get('PORT') ?? TRIGGERS_API_DEFAULT_PORT);
+  const port = resolveServicePort(options.port);
   const resolveContext = () => typeof context === 'function' ? context() : context;
   const webhookHandler = (c: Context): Promise<Response> => {
     const resolvedContext = resolveContext();
@@ -271,7 +271,7 @@ export async function startTriggersService(
   options: TriggersServiceOptions = {},
 ): Promise<void> {
   let context = createUnavailableTriggersServiceContext();
-  const port = options.port ?? Number(Deno.env.get('PORT') ?? TRIGGERS_API_DEFAULT_PORT);
+  const port = resolveServicePort(options.port);
   await createTriggersService(() => context, { port }).serve();
 
   queueMicrotask(async () => {
@@ -381,8 +381,15 @@ function isWebhookDefinition(
 
 export { TRIGGERS_API_DEFAULT_PORT, TRIGGERS_API_SERVICE_NAME };
 
+function resolveServicePort(explicitPort: number | undefined): number {
+  if (explicitPort !== undefined) return explicitPort;
+  const value = Deno.env.get('PORT');
+  if (value === undefined) {
+    throw new Error('Triggers API requires the host-provided PORT environment variable.');
+  }
+  return Number(value);
+}
+
 if (import.meta.main) {
-  await startTriggersService({
-    port: Number(Deno.env.get('PORT') ?? TRIGGERS_API_DEFAULT_PORT),
-  });
+  await startTriggersService();
 }

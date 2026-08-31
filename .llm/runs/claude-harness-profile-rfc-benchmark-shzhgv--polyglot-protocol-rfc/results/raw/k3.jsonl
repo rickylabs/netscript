@@ -1,0 +1,8 @@
+{"kind":"meta","bench":"k3-loopback","startedAt":"2026-08-20T07:38:39.503Z"}
+{"kind":"server","port":43623}
+{"kind":"deno-scoped","exitCode":0,"reached":true,"unauthorizedGets401":true,"tokenFlow":true,"progressP50Ms":0.49137699999999995,"progressP95Ms":1.0585029999999982}
+{"kind":"deno-wrong-scope","exitCode":1,"denied":true}
+{"kind":"python3-client","exitCode":0,"credStatus":200,"progressP50Ms":0.6707830000323156,"progressP95Ms":1.2865030000739353}
+{"kind":"uds","denoUnixListener":true,"python3ClientOk":true,"denoFetchOverUds":false,"sunLenCaveat":"first attempt at the run-dir path failed with \"path must be shorter than SUN_LEN\" (~108 chars) — deep workspace paths cannot host UDS sockets; any UDS option must allocate short paths (/tmp or XDG_RUNTIME_DIR)","note":"Deno unix listener + python3 UDS client work; but Deno fetch() has no UDS support, so sandboxed deno-type tasks cannot be citizen clients over UDS — TCP loopback is the only transport all task runtimes share."}
+{"kind":"environment-limitation","dockerAspire":"not present in-container; container/Aspire survival untested here — recorded per plan; the TCP loopback + env-pointer pattern is the same one Aspire service-discovery env injection uses, cited in RFC as design argument, not measurement","windows":"not testable on this host; recorded"}
+{"kind":"summary","progressHits":100,"finishedAt":"2026-08-20T07:38:39.862Z"}

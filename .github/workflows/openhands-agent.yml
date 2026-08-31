@@ -1,8 +1,9 @@
 # OpenHands Agent (v2) — cloud agent runner for NetScript.
 #
 # Public manual-comment trigger contract:
-#   - The command token is the first token of the first line, followed only by recognized
-#     `name=value` arguments, in a PR/issue comment from OWNER/MEMBER/COLLABORATOR.
+#   - Any comment containing the literal command token reaches the trusted default-branch policy.
+#     Only a first-line command with recognized `name=value` arguments from an
+#     OWNER/MEMBER/COLLABORATOR may dispatch; every reportable denial gets one controlled reply.
 #   - Any prompt starts on the following line. Quoted commands and prose mentions do not dispatch.
 #   - workflow_dispatch with explicit inputs.
 #   - `fix-me` / `agent:<profile>` labels on issues/PRs; `openhands` directly on issues.
@@ -86,12 +87,11 @@ on:
       model_profile:
         description: Model profile to use when model is empty.
         required: false
-        default: qwen
+        default: glm
         type: choice
         options:
+          - glm
           - qwen
-          - minimax
-          - deepseek
       target_pr:
         description: Optional PR number to inspect/comment on.
         required: false
@@ -139,8 +139,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && contains(github.event.head_commit.message, '[openhands')) ||
       (github.event_name == 'issue_comment' &&
-        startsWith(github.event.comment.body, '@openhands-agent') &&
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+        contains(github.event.comment.body, '@openhands-agent')) ||
       ((github.event_name == 'issues' || github.event_name == 'pull_request') &&
         (github.event.label.name == 'fix-me' ||
          (github.event.label.name == 'openhands' && github.event_name == 'issues') ||
@@ -148,6 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write # one source-comment-keyed refusal via GITHUB_TOKEN
     outputs:
       dispatch: ${{ steps.non_comment.outputs.dispatch || steps.policy.outputs.dispatch }}
       trigger_line: ${{ steps.policy.outputs.trigger_line }}
@@ -179,73 +179,135 @@ jobs:
               process.env.GITHUB_WORKSPACE,
               '.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs',
             );
-            const { authorizeOpenHandsCommentTrigger } = await import(
+            const {
+              authorizeOpenHandsCommentTrigger,
+              buildOpenHandsRefusalReply,
+              isReportableOpenHandsDenial,
+            } = await import(
               pathToFileURL(policyPath).href
             );
-            const decision = await authorizeOpenHandsCommentTrigger(
-              {
-                body: context.payload.comment?.body,
-                authorAssociation: context.payload.comment?.author_association,
-              },
-              async ({ phase, head }) => {
-                if (!context.payload.issue?.pull_request) {
-                  throw new Error('Formal evaluator comment commands require a pull request.');
-                }
-                const owner = context.repo.owner;
-                const repo = context.repo.repo;
-                const issue_number = context.payload.issue.number;
-                const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
-                const events = await github.paginate(github.rest.issues.listEvents, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                const generationEvent = events
+
+            async function findPhaseGeneration(loadEvents, expectedStatus, sleep) {
+              let generationEvent;
+              for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1) {
+                const events = await loadEvents();
+                generationEvent = events
                   .filter((event) => event.event === 'labeled' && event.label?.name === expectedStatus)
                   .at(-1);
-                if (!generationEvent) {
-                  throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
-                }
-                const comments = await github.paginate(github.rest.issues.listComments, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                const currentCommentId = Number(context.payload.comment?.id);
-                // Re-read the live PR and phase immediately before returning claim operations.
-                // A queued stale command is denied by the trusted policy before any provider job.
-                const { data: livePr } = await github.rest.pulls.get({
-                  owner,
-                  repo,
-                  pull_number: issue_number,
-                });
-                const liveLabelData = await github.paginate(
-                  github.rest.issues.listLabelsOnIssue,
-                  { owner, repo, issue_number, per_page: 100 },
-                );
-                return {
-                  generation: generationEvent.id,
-                  operations: {
-                    createRef: async ({ ref, sha }) => {
-                      await github.rest.git.createRef({ owner, repo, ref, sha });
+                if (!generationEvent) await sleep(1000);
+              }
+              return generationEvent;
+            }
+
+            function buildGenerationLookupRefusal({ sourceCommentId, expectedStatus }) {
+              const id = String(sourceCommentId ?? '');
+              if (!/^[1-9][0-9]*$/.test(id)) {
+                throw new Error('sourceCommentId must be a positive integer');
+              }
+              const marker = `<!-- openhands-command-refusal:${id} -->`;
+              const body = [
+                marker,
+                `OpenHands did not start for source comment ${id}.`,
+                `Reason: the labeled-event generation for \`${expectedStatus}\` was not observable after five attempts.`,
+                'Recovery: cycle away from and back to that phase status, then submit a new formal command.',
+              ].join('\n');
+              return { marker, body };
+            }
+
+            let decision;
+            let refusal;
+            try {
+              decision = await authorizeOpenHandsCommentTrigger(
+                {
+                  body: context.payload.comment?.body,
+                  authorAssociation: context.payload.comment?.author_association,
+                },
+                async ({ phase, head }) => {
+                  if (!context.payload.issue?.pull_request) {
+                    throw new Error('Formal evaluator comment commands require a pull request.');
+                  }
+                  const owner = context.repo.owner;
+                  const repo = context.repo.repo;
+                  const issue_number = context.payload.issue.number;
+                  const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+                  const generationEvent = await findPhaseGeneration(
+                    () => github.paginate(github.rest.issues.listEvents, {
+                      owner,
+                      repo,
+                      issue_number,
+                      per_page: 100,
+                    }),
+                    expectedStatus,
+                    (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+                  );
+                  if (!generationEvent) {
+                    const error = new Error(
+                      `Labeled-event generation lookup exhausted for ${expectedStatus}.`,
+                    );
+                    error.code = 'phase-generation-lookup-exhausted';
+                    error.expectedStatus = expectedStatus;
+                    throw error;
+                  }
+                  const comments = await github.paginate(github.rest.issues.listComments, {
+                    owner,
+                    repo,
+                    issue_number,
+                    per_page: 100,
+                  });
+                  const currentCommentId = Number(context.payload.comment?.id);
+                  // Re-read the live PR and phase immediately before returning claim operations.
+                  // A queued stale command is denied by the trusted policy before any provider job.
+                  const { data: livePr } = await github.rest.pulls.get({
+                    owner,
+                    repo,
+                    pull_number: issue_number,
+                  });
+                  const liveLabelData = await github.paginate(
+                    github.rest.issues.listLabelsOnIssue,
+                    { owner, repo, issue_number, per_page: 100 },
+                  );
+                  return {
+                    generation: generationEvent.id,
+                    operations: {
+                      createRef: async ({ ref, sha }) => {
+                        await github.rest.git.createRef({ owner, repo, ref, sha });
+                      },
+                      getRef: async ({ ref }) => {
+                        const existing = await github.rest.git.getRef({ owner, repo, ref });
+                        return { sha: existing.data.object.sha };
+                      },
                     },
-                    getRef: async ({ ref }) => {
-                      const existing = await github.rest.git.getRef({ owner, repo, ref });
-                      return { sha: existing.data.object.sha };
-                    },
-                  },
-                  priorCommentBodies: comments
-                    .filter((comment) => Number(comment.id) !== currentCommentId)
-                    .map((comment) => String(comment.body ?? '')),
-                  currentHead: livePr.head.sha,
-                  liveLabels: liveLabelData.map(({ name }) => name),
-                };
-              },
-            );
+                    priorCommentBodies: comments
+                      .filter((comment) => Number(comment.id) !== currentCommentId)
+                      .map((comment) => String(comment.body ?? '')),
+                    currentHead: livePr.head.sha,
+                    liveLabels: liveLabelData.map(({ name }) => name),
+                  };
+                },
+              );
+            } catch (error) {
+              if (error?.code !== 'phase-generation-lookup-exhausted') throw error;
+              decision = {
+                dispatch: false,
+                triggerLine: '',
+                reason: error.code,
+              };
+              refusal = buildGenerationLookupRefusal({
+                sourceCommentId: context.payload.comment?.id,
+                expectedStatus: error.expectedStatus,
+              });
+            }
+            if (!refusal && isReportableOpenHandsDenial(decision.reason)) {
+              refusal = buildOpenHandsRefusalReply({
+                sourceCommentId: context.payload.comment?.id,
+                authorLogin: context.payload.comment?.user?.login,
+                reason: decision.reason,
+              });
+            }
             core.setOutput('dispatch', String(decision.dispatch));
             core.setOutput('trigger_line', decision.triggerLine);
+            core.setOutput('refusal_marker', refusal?.marker ?? '');
+            core.setOutput('refusal_body', refusal?.body ?? '');
             core.notice(`Manual comment policy: ${decision.reason}`);
             if (['stale-phase-head', 'phase-not-current'].includes(decision.reason)) {
               const recovery = 'Cycle away from and back to the phase status label to create a new deliberate generation.';
@@ -257,6 +319,41 @@ jobs:
                 .write();
             }
 
+      - name: Report denied manual command
+        if: github.event_name == 'issue_comment' && steps.policy.outputs.refusal_marker != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          REFUSAL_MARKER: ${{ steps.policy.outputs.refusal_marker }}
+          REFUSAL_BODY: ${{ steps.policy.outputs.refusal_body }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            async function reportRefusalOnce({ listComments, createComment, marker, body }) {
+              const comments = await listComments();
+              if (comments.some((comment) => String(comment.body ?? '').includes(marker))) {
+                return false;
+              }
+              await createComment(body);
+              return true;
+            }
+
+            await reportRefusalOnce({
+              listComments: () => github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                per_page: 100,
+              }),
+              createComment: (body) => github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body,
+              }),
+              marker: process.env.REFUSAL_MARKER,
+              body: process.env.REFUSAL_BODY,
+            });
+
   agent:
     needs: authorize
     if: needs.authorize.outputs.dispatch == 'true'
@@ -267,7 +364,7 @@ jobs:
       issues: write # acknowledge + final status comments
       pull-requests: write # draft PR for non-PR triggers, review-thread replies
     env:
-      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/qwen/qwen3.8-max' }}
+      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/z-ai/glm-5.3-flash' }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
@@ -292,9 +389,8 @@ jobs:
             const eventName = context.eventName;
 
             const modelProfiles = new Map([
-              ['qwen', 'openrouter/qwen/qwen3.8-max'],
-              ['minimax', 'openrouter/minimax/minimax-m3'],
-              ['deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
+              ['glm', 'openrouter/z-ai/glm-5.3-flash'],
+              ['qwen', 'openrouter/qwen/qwen3.8-flash'],
             ]);
 
             const labels = new Set();
@@ -416,9 +512,8 @@ jobs:
 
             const selectedModel = pickModel();
             const allowedModels = new Set([
-              'openrouter/minimax/minimax-m3',
-              'openrouter/deepseek/deepseek-v4-flash-0731',
-              'openrouter/qwen/qwen3.8-max',
+              'openrouter/z-ai/glm-5.3-flash',
+              'openrouter/qwen/qwen3.8-flash',
             ]);
             if (!allowedModels.has(selectedModel)) {
               throw new Error(`OpenHands model is not in the approved open-evaluator allowlist: ${selectedModel}`);
@@ -525,6 +620,7 @@ jobs:
               '',
               `Model: \`${process.env.MODEL}\``,
               `Provider: \`${process.env.PROVIDER}\``,
+              'Reasoning effort: not attested (OpenHands adapter limitation)',
               `Output mode: \`${process.env.OUTPUT_MODE}\``,
               '',
               `Run: ${process.env.RUN_URL}`,
@@ -855,36 +951,39 @@ jobs:
             verdict="summary-missing"
           fi
 
-          # Layered agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
-          # "Publish final status comment" step. Tier 1 (strict): literal
-          # OPENHANDS_VERDICT: line, one exact token, alone on its own line, outside
-          # code fences. Template text (e.g. "OPENHANDS_VERDICT: <PASS|FAIL_FIX|...>")
-          # cannot match. Tier 2 (decorated): the same marker line after stripping
-          # markdown decoration and an optional "Verdict:" prefix — models bold the
-          # marker in practice (observed: "**Verdict: OPENHANDS_VERDICT: PASS**",
-          # PR #475); lines containing '<' (placeholders) never match.
+          # Agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
+          # "Publish final status comment" step. Accept one exact token on its own
+          # line outside code fences, optionally wrapped by a blockquote, markdown
+          # heading/emphasis, or "Verdict:" prefix. Template text containing '<'
+          # cannot match. Preserve whether an eligible marker was absent or emitted
+          # with an unparseable token/shape.
           agent_verdict="NONE"
+          agent_verdict_state="absent"
           if [ -s "$OPENHANDS_SUMMARY_PATH" ]; then
             unfenced="$(awk '/^[[:space:]]*(```|~~~)/{fence=!fence; next} !fence' "$OPENHANDS_SUMMARY_PATH")"
-            line="$(printf '%s\n' "$unfenced" \
-              | grep -E '^OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
-              | head -n 1 || true)"
-            if [ -z "$line" ]; then
-              line="$(printf '%s\n' "$unfenced" | grep -v '<' | sed -E 's/[*`]+//g' \
-                | grep -E '^[[:space:]]*(Verdict:?[[:space:]]*)?OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
-                | head -n 1 || true)"
+            eligible="$(printf '%s\n' "$unfenced" | grep -v '<' || true)"
+            if printf '%s\n' "$eligible" | grep -Eq 'OPENHANDS_VERDICT[[:space:]]*:'; then
+              agent_verdict_state="unparseable"
             fi
+            line="$(printf '%s\n' "$eligible" \
+              | grep -E '^[[:space:]]*(>[[:space:]]*)*(#{1,6}[[:space:]]+)?[*_`]*(Verdict[*_`]*[[:space:]]*:?[[:space:]]*[*_`]*)?OPENHANDS_VERDICT[[:space:]]*:[[:space:]]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[[:space:]]*$' \
+              | head -n 1 || true)"
             if [ -n "$line" ]; then
-              agent_verdict="$(printf '%s' "$line" | sed -E 's/^.*OPENHANDS_VERDICT:[[:space:]]*//; s/[[:space:]]*$//')"
+              agent_verdict="$(printf '%s' "$line" \
+                | grep -oE 'PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE' \
+                | tail -n 1)"
+              agent_verdict_state="parsed"
             fi
           fi
 
           {
             echo "verdict=$verdict"
             echo "agent_verdict=$agent_verdict"
+            echo "agent_verdict_state=$agent_verdict_state"
             echo "summary_source=$summary_source"
           } >> "$GITHUB_OUTPUT"
-          export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" SUMMARY_SOURCE="$summary_source"
+          export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" \
+            AGENT_VERDICT_STATE="$agent_verdict_state" SUMMARY_SOURCE="$summary_source"
 
           if [ ! -s "$OPENHANDS_SUMMARY_PATH" ]; then
             {
@@ -939,6 +1038,7 @@ jobs:
               "agent_outcome": os.environ["AGENT_OUTCOME"],
               "verdict": os.environ.get("RUN_VERDICT", "unknown"),
               "agent_verdict": os.environ.get("AGENT_VERDICT", "NONE"),
+              "agent_verdict_state": os.environ.get("AGENT_VERDICT_STATE", "absent"),
               "summary_source": os.environ.get("SUMMARY_SOURCE", "none"),
               "model": os.environ["MODEL"],
               "provider": os.environ["PROVIDER"],
@@ -1157,33 +1257,25 @@ jobs:
             const env = process.env;
             const outcome = (v) => v || 'skipped';
 
-            // Layered agent-verdict matcher. KEEP IN SYNC with the awk/grep in
-            // the "Materialize OpenHands trace" step. Tier 1 (strict): literal
-            // line, one exact token, own line, outside code fences. Placeholder/
-            // template text ("OPENHANDS_VERDICT: <PASS|...>", "[VERDICT:
-            // <verdict>]") cannot match, which is the point (observed failure
-            // mode 5). Tier 2 (decorated): same marker line after stripping
-            // markdown decoration and an optional "Verdict:" prefix — models
-            // bold the marker in practice ("**Verdict: OPENHANDS_VERDICT:
-            // PASS**", PR #475); lines containing '<' never match.
+            // Agent-verdict matcher. KEEP IN SYNC with the awk/grep in the
+            // "Materialize OpenHands trace" step. One exact token must occupy its
+            // own line outside code fences; blockquotes, heading/emphasis wrappers,
+            // and an optional "Verdict:" prefix are accepted. Placeholder/template
+            // text containing '<' remains ineligible. The result distinguishes a
+            // genuinely absent marker from an emitted-but-unparseable marker.
             function verdictOf(text) {
               let inFence = false;
-              let decorated = null;
+              let markerSeen = false;
               for (const line of String(text ?? '').split(/\r?\n/)) {
                 if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; continue; }
-                if (inFence) continue;
-                const m = line.match(
-                  /^OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
+                if (inFence || line.includes('<')) continue;
+                if (/OPENHANDS_VERDICT[ \t]*:/.test(line)) markerSeen = true;
+                const match = line.match(
+                  /^[ \t]*(?:>[ \t]*)*(?:#{1,6}[ \t]+)?[*_`]*(?:Verdict[*_`]*[ \t]*:?[ \t]*[*_`]*)?OPENHANDS_VERDICT[ \t]*:[ \t]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[ \t]*$/,
                 );
-                if (m) return m[1];
-                if (!decorated && !line.includes('<')) {
-                  const d = line.replace(/[*`]+/g, '').match(
-                    /^[ \t]*(?:Verdict:?[ \t]*)?OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
-                  );
-                  if (d) decorated = d[1];
-                }
+                if (match) return { verdict: match[1], state: 'parsed' };
               }
-              return decorated;
+              return { verdict: null, state: markerSeen ? 'unparseable' : 'absent' };
             }
 
             // 1) Summary file (terminal artifact — authoritative when present).
@@ -1199,13 +1291,15 @@ jobs:
                 'See the workflow logs for the failing setup step.',
               ].join('\n');
             }
-            const summaryVerdict = verdictOf(summary);
+            const summaryInspection = verdictOf(summary);
+            const summaryVerdict = summaryInspection.verdict;
 
             // 2) Agent-posted comments created after run start (the dispatch
             // contract asks evaluators to post their verdict comment early, so
             // a budget-cut run can still deliver a verdict this way).
             let commentVerdict = null;
             let commentVerdictUrl = null;
+            let commentVerdictState = 'absent';
             const issueNumber = Number(env.ISSUE_NUMBER || '');
             if (issueNumber) {
               try {
@@ -1220,8 +1314,14 @@ jobs:
                   const body = c.body ?? '';
                   if (String(c.id) === env.TRIGGER_COMMENT_ID) continue; // the trigger itself
                   if (body.includes('<!-- openhands-')) continue; // workflow-owned comments
-                  const v = verdictOf(body);
-                  if (v) { commentVerdict = v; commentVerdictUrl = c.html_url; }
+                  const inspection = verdictOf(body);
+                  if (inspection.verdict) {
+                    commentVerdict = inspection.verdict;
+                    commentVerdictUrl = c.html_url;
+                    commentVerdictState = 'parsed';
+                  } else if (inspection.state === 'unparseable' && !commentVerdict) {
+                    commentVerdictState = 'unparseable';
+                  }
                 }
               } catch (error) {
                 core.warning(`Verdict comment scan failed: ${error.message}`);
@@ -1229,8 +1329,21 @@ jobs:
             }
 
             const verdict = summaryVerdict ?? commentVerdict ?? 'NONE';
-            const verdictSource = summaryVerdict ? 'summary-file' : (commentVerdict ? 'pr-comment' : 'none');
+            const verdictSource = summaryVerdict
+              ? 'summary-file'
+              : commentVerdict
+              ? 'pr-comment'
+              : summaryInspection.state === 'unparseable'
+              ? 'summary-unparseable'
+              : commentVerdictState === 'unparseable'
+              ? 'pr-comment-unparseable'
+              : 'none';
             const verdictMismatch = Boolean(summaryVerdict && commentVerdict && summaryVerdict !== commentVerdict);
+            const verdictDiagnostic = verdictSource === 'none'
+              ? 'Agent emitted no OPENHANDS_VERDICT token.'
+              : verdictSource.endsWith('-unparseable')
+              ? 'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.'
+              : null;
 
             // Heading vocabulary is FROZEN — agentic-lib.ts
             // parseOpenHandsStatusComment maps these exact strings.
@@ -1293,11 +1406,13 @@ jobs:
               '',
               `Model: \`${env.MODEL || '?'}\``,
               `Provider: \`${env.PROVIDER || '?'}\``,
+              'Reasoning effort: not attested (OpenHands adapter limitation)',
               `Job status: ${env.JOB_STATUS || 'unknown'}`,
               `Verdict source: ${verdictSource}`
                 + (verdictMismatch
                   ? ` (MISMATCH: summary=${summaryVerdict}, comment=${commentVerdict}; summary file wins)`
                   : ''),
+              ...(verdictDiagnostic ? [`Verdict diagnostic: ${verdictDiagnostic}`] : []),
             ];
             if (commentVerdictUrl) lines.push(`Verdict comment: ${commentVerdictUrl}`);
             lines.push(`Summary source: ${env.SUMMARY_SOURCE || 'none'}`);

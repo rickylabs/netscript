@@ -73,16 +73,16 @@ package's public surface reported by `deno doc`.
 
 ## Sub-path exports
 
-| Export | Purpose |
-| --- | --- |
-| `@netscript/plugin-auth-core` | Root contract, port, schema, stream, and telemetry surface. |
-| `@netscript/plugin-auth-core/domain` | Domain types and schemas. |
-| `@netscript/plugin-auth-core/ports` | Backend, provider, session, and interactive-flow ports. |
-| `@netscript/plugin-auth-core/contracts/v1` | Versioned auth contract. |
-| `@netscript/plugin-auth-core/telemetry` | Auth telemetry attributes and helpers. |
-| `@netscript/plugin-auth-core/streams` | Auth stream schema and event types. |
-| `@netscript/plugin-auth-core/config` | Runtime config schemas and backend resolution helpers. |
-| `@netscript/plugin-auth-core/presets` | Backend preset registry helpers. |
-| `@netscript/plugin-auth-core/testing` | Testing primitives for auth adapters and plugins. |
+| Export | Path | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-auth-core` | `./mod.ts` | Root contract, port, schema, stream, and telemetry surface. |
+| `@netscript/plugin-auth-core/domain` | `./src/domain/mod.ts` | Domain types and schemas. |
+| `@netscript/plugin-auth-core/ports` | `./src/ports/mod.ts` | Backend, provider, session, and interactive-flow ports. |
+| `@netscript/plugin-auth-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Versioned auth contract. |
+| `@netscript/plugin-auth-core/telemetry` | `./src/telemetry/mod.ts` | Auth telemetry attributes and helpers. |
+| `@netscript/plugin-auth-core/streams` | `./src/streams/mod.ts` | Auth stream schema and event types. |
+| `@netscript/plugin-auth-core/config` | `./src/config/mod.ts` | Runtime config schemas and backend resolution helpers. |
+| `@netscript/plugin-auth-core/presets` | `./src/presets/mod.ts` | Backend preset registry helpers. |
+| `@netscript/plugin-auth-core/testing` | `./src/testing/mod.ts` | Testing primitives for auth adapters and plugins. |
 
 Back to the [auth reference hub](/reference/auth/).

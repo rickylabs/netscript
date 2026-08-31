@@ -1,0 +1,13 @@
+{
+  "command": "deno fmt",
+  "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+  "mode": "write",
+  "summary": {
+    "filesSelected": 3,
+    "batches": 1,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "findings": []
+}

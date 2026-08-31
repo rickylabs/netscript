@@ -1,0 +1,12 @@
+Slice 2 supplemental: docs export drift
+Date: 2026-08-30
+Content head: 2863d29e342b135de9e9c41c0508a5032c98261f
+Command: deno task docs:exports-drift
+Exit code: 0
+
+Relevant output:
+Coverage [sdk]: mode=entrypoints-only; reason="This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately."; omitted-symbol-groups=0; documented-non-export-groups=0
+Exports & Symbols drift check: PASS
+
+The command was rerun after the immutable content commit. It confirms the SDK reference remains
+complete for every published entrypoint, including ./ports and ./query.

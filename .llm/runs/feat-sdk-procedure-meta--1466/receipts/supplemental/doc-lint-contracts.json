@@ -1,0 +1,83 @@
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/contracts",
+    "entrypoints": [
+      "./crud.ts",
+      "./mod.ts",
+      "./query.ts",
+      "./transform.ts"
+    ],
+    "exitCode": 1
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 9,
+    "totalPrivateTypeRef": 9,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/contracts",
+      "dir": "packages/contracts",
+      "entrypoints": [
+        {
+          "path": "./crud.ts",
+          "privateTypeRef": 14,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 14
+        },
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 8,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 8
+        },
+        {
+          "path": "./query.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./transform.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        }
+      ],
+      "files": [
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/src/application/contract-primitives.ts",
+          "privateTypeRef": 8,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 8
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-1731/packages/contracts/crud/create-crud-contract.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        }
+      ],
+      "combinedTotal": 9,
+      "combinedPrivateTypeRef": 9,
+      "combinedMissingJSDoc": 0,
+      "combinedOther": 0,
+      "combinedExitCode": 1,
+      "entrypointExitCodes": {
+        "./crud.ts": 1,
+        "./mod.ts": 1,
+        "./query.ts": 0,
+        "./transform.ts": 0
+      }
+    }
+  ]
+}

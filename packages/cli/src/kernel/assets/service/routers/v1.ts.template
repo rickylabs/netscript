@@ -3,6 +3,7 @@
  */
 
 import type { PrismaClient } from '@database';
+import { notFound } from '@netscript/contracts';
 import { v1 } from '@{{projectName}}/contracts';
 
 type {{modelName}}Delegate = PrismaClient['{{modelName | camelCase}}'];
@@ -19,6 +20,13 @@ function {{modelName | camelCase}}Delegate(context: {{modelName}}HandlerContext)
 function orderBy(input: { readonly sortBy?: string; readonly sortOrder: 'asc' | 'desc' }) {
   const field = input.sortBy && SORTABLE_FIELDS.has(input.sortBy) ? input.sortBy : 'id';
   return { [field]: input.sortOrder };
+}
+
+function isPrismaNotFound(error: unknown): boolean {
+  return typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'P2025';
 }
 
 export const {{serviceName | pascalCase}}V1 = {
@@ -51,27 +59,53 @@ export const {{serviceName | pascalCase}}V1 = {
       },
     };
   }),
-  getById: {{serviceName | camelCase}}V1.getById.handler(async ({ input, context }) => {
+  getById: {{serviceName | camelCase}}V1.getById.handler(async ({ input, context, errors }) => {
     const record = await {{modelName | camelCase}}Delegate(context).findUnique({
       where: { id: input.id },
     });
     if (!record) {
-      throw new Error(`{{modelName}} ${input.id} not found`);
+      notFound({
+        errors,
+        resourceId: input.id,
+        message: `{{modelName}} ${input.id} not found`,
+      });
     }
     return record;
   }),
   create: {{serviceName | camelCase}}V1.create.handler(async ({ input, context }) =>
     await {{modelName | camelCase}}Delegate(context).create({ data: input })
   ),
-  update: {{serviceName | camelCase}}V1.update.handler(async ({ input, context }) =>
-    await {{modelName | camelCase}}Delegate(context).update({
-      where: { id: input.id },
-      data: input.data,
-    })
-  ),
-  delete: {{serviceName | camelCase}}V1.delete.handler(async ({ input, context }) =>
-    await {{modelName | camelCase}}Delegate(context).delete({
-      where: { id: input.id },
-    })
-  ),
+  update: {{serviceName | camelCase}}V1.update.handler(async ({ input, context, errors }) => {
+    try {
+      return await {{modelName | camelCase}}Delegate(context).update({
+        where: { id: input.id },
+        data: input.data,
+      });
+    } catch (error) {
+      if (isPrismaNotFound(error)) {
+        notFound({
+          errors,
+          resourceId: input.id,
+          message: `{{modelName}} ${input.id} not found`,
+        });
+      }
+      throw error;
+    }
+  }),
+  delete: {{serviceName | camelCase}}V1.delete.handler(async ({ input, context, errors }) => {
+    try {
+      return await {{modelName | camelCase}}Delegate(context).delete({
+        where: { id: input.id },
+      });
+    } catch (error) {
+      if (isPrismaNotFound(error)) {
+        notFound({
+          errors,
+          resourceId: input.id,
+          message: `{{modelName}} ${input.id} not found`,
+        });
+      }
+      throw error;
+    }
+  }),
 };

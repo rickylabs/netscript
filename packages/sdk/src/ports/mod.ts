@@ -33,6 +33,7 @@ export type {
   CompositeQuery,
   FactoryConfig,
   ProcedureInput,
+  ProcedureMeta,
   ProcedureOutput,
   QueryFactory,
 } from './query-factory.ts';
@@ -84,6 +85,7 @@ export type {
   CreateServiceClientOptions,
   NetScriptProcedureSchemas,
   ProcedureInputFromNode,
+  ProcedureMetaFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
   ServiceClientContext,

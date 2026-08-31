@@ -72,7 +72,6 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
     assertEquals(buildPluginEntry(scaffoldResult, provider, {}), {
       Enabled: true,
       Runtime: "deno",
-      Port: 8123,
       Entrypoint: serviceEntrypoint,
       Workdir: ".",
       RequiresKv: provider.defaultRequiresKv,
@@ -98,7 +97,6 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
       {
         Enabled: true,
         Runtime: "deno",
-        Port: 8123,
         Entrypoint:
           `jsr:${resolved.descriptor.manifest.name}@${resolved.descriptor.manifest.version}/services`,
         Workdir: ".",
@@ -110,6 +108,24 @@ Deno.test("shipped manifests preserve their declared appsettings projections", a
           : {}),
       },
       `${pluginName} published service appsettings projection changed`,
+    );
+
+    assertEquals(
+      buildPluginEntry({ ...scaffoldResult, hostPort: 8123 }, provider, {}),
+      {
+        Enabled: true,
+        Runtime: "deno",
+        HostPort: 8123,
+        Entrypoint: serviceEntrypoint,
+        Workdir: ".",
+        RequiresKv: provider.defaultRequiresKv,
+        RequiresDb: provider.defaultRequiresDb,
+        Permissions: [...provider.defaultPermissions],
+        ...(provider.kind === "saga"
+          ? { Sagas: { Store: { Backend: "kv" } } }
+          : {}),
+      },
+      `${pluginName} explicit host-port projection changed`,
     );
 
     if (provider.category === "background-processor") {

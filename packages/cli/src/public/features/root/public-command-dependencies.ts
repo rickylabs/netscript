@@ -314,6 +314,7 @@ export function createPublicCommandDependencies(
           process,
           loadJsrExportMap: fetchJsrExportMap,
           inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectRuntimeRegistries: generatePluginRegistries,
         }),
     },
     authSessionHttp: new FetchAuthSessionHttp(),
@@ -360,7 +361,7 @@ export function createPublicCommandDependencies(
         const resolved = await resolveManifest(options);
         return {
           ...resolved,
-          manifest: resolved.manifest as unknown as ServiceManifest, // quality-allow: service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port
+          manifest: resolved.manifest as unknown as ServiceManifest, // quality-allow: #1276 — service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port
         };
       },
     },

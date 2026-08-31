@@ -136,34 +136,77 @@ describe('database template generators', () => {
     );
   });
 
-  it('generates Prisma config with Aspire env key and sqlite fallback URL', () => {
-    const sqlite = registry.get('sqlite');
-    const output = generatePrismaConfig(sqlite, {
-      configKey: 'primary-db',
-      databaseName: 'alpha_app.db',
-    });
+  it('emits only the selected provider helpers in engine modules and Prisma config', () => {
+    const cases = [
+      {
+        engine: 'postgres' as const,
+        engineRequired: ['PrismaPg', 'PostgresClient', 'normalizePostgresUrl'],
+        prismaRequired: ['defineConfig, env', "env('DATABASE_URL')", 'normalizePostgresUrl'],
+        forbidden: ['normalizeMysqlUrl', 'normalizeMssqlUrl', 'parseSqlServerEndpoint'],
+      },
+      {
+        engine: 'mysql' as const,
+        engineRequired: ['PrismaMySql', 'MysqlClient', 'normalizeMysqlUrl'],
+        prismaRequired: ['defineConfig, env', "env('DATABASE_URL')", 'normalizeMysqlUrl'],
+        forbidden: ['normalizePostgresUrl', 'normalizeMssqlUrl', 'parseSqlServerEndpoint'],
+      },
+      {
+        engine: 'mssql' as const,
+        engineRequired: ['PrismaMssql', 'MssqlClient', 'normalizeMssqlUrl'],
+        prismaRequired: ['defineConfig, env', "env('DATABASE_URL')", 'normalizeMssqlUrl'],
+        forbidden: ['normalizePostgresUrl', 'normalizeMysqlUrl'],
+      },
+      {
+        engine: 'sqlite' as const,
+        engineRequired: [
+          'PrismaLibSql',
+          'SqliteClient',
+          "resolveConnectionString('PRIMARY_DB_URI', 'file:./alpha_app.db')",
+        ],
+        prismaRequired: [
+          "import { defineConfig } from 'prisma/config'",
+          "'file:./alpha_app.db'",
+        ],
+        forbidden: [
+          'normalizePostgresUrl',
+          'normalizeMysqlUrl',
+          'normalizeMssqlUrl',
+          'parseConnectionParts',
+          'parseSqlServerEndpoint',
+        ],
+      },
+    ] as const;
 
-    assertStringIncludes(output, "Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL')");
-    assertStringIncludes(output, "import { defineConfig } from 'prisma/config'");
-    assertEquals(output.includes('defineConfig, env'), false);
-    assertEquals(output.includes("env('DATABASE_URL')"), false);
-    assertStringIncludes(output, "'file:./alpha_app.db'");
-    assertStringIncludes(output, 'const databaseUrl = resolveDatabaseUrl(');
-    assertStringIncludes(
-      output,
-      'function normalizeDatabaseUrl(provider: string, value: string): string',
-    );
-    assertStringIncludes(output, "schema: 'schema'");
-  });
+    for (const testCase of cases) {
+      const provider = registry.get(testCase.engine);
+      const engineOutput = generateEngineMod(provider, {
+        configKey: 'primary-db',
+        databaseName: 'alpha_app.db',
+      });
+      const prismaOutput = generatePrismaConfig(provider, {
+        configKey: 'primary-db',
+        databaseName: 'alpha_app.db',
+      });
 
-  it('generates Prisma config with the env import and fallback for postgres', () => {
-    const postgres = registry.get('postgres');
-    const output = generatePrismaConfig(postgres, {
-      configKey: 'primary-db',
-    });
-
-    assertStringIncludes(output, "import { defineConfig, env } from 'prisma/config'");
-    assertStringIncludes(output, "env('DATABASE_URL')");
+      for (const symbol of testCase.engineRequired) {
+        assertStringIncludes(engineOutput, symbol);
+      }
+      for (const symbol of testCase.prismaRequired) {
+        assertStringIncludes(prismaOutput, symbol);
+      }
+      for (const symbol of testCase.forbidden) {
+        assertEquals(
+          engineOutput.includes(symbol),
+          false,
+          `${testCase.engine} engine output must not contain ${symbol}`,
+        );
+        assertEquals(
+          prismaOutput.includes(symbol),
+          false,
+          `${testCase.engine} Prisma config must not contain ${symbol}`,
+        );
+      }
+    }
   });
 
   it('normalizes mssql Aspire loopback endpoints to hostname URLs', () => {
@@ -173,35 +216,35 @@ describe('database template generators', () => {
       databaseName: 'netscript',
     });
 
-    assertStringIncludes(output, "case 'mssql':");
-    assertStringIncludes(output, 'normalizeSqlServerHost(host.trim())');
+    assertStringIncludes(output, "const trimmed = value.replace(/^tcp:/i, '');");
+    assertStringIncludes(
+      output,
+      "const [host = 'localhost', port = '1433'] = trimmed.split(',', 2);",
+    );
+    assertStringIncludes(output, 'host: normalizeSqlServerHost(host.trim())');
+    assertStringIncludes(output, "port: port.trim() || '1433'");
     assertStringIncludes(output, "host === '127.0.0.1'");
+    assertStringIncludes(output, "host === '::1'");
+    assertStringIncludes(output, "host === '[::1]'");
     assertStringIncludes(output, "return 'localhost'");
-    assertStringIncludes(output, "import { defineConfig, env } from 'prisma/config'");
+    assertStringIncludes(output, "return host || 'localhost'");
   });
 
-  it('generates engine modules with adapter setup where required', () => {
-    const mssql = registry.get('mssql');
-    const output = generateEngineMod(mssql, { configKey: 'sql-server' });
-
-    assertStringIncludes(output, "import { PrismaMssql } from '@prisma/adapter-mssql'");
-    assertStringIncludes(output, "resolveConnectionString('mssql', 'SQL_SERVER_URI')");
-    assertStringIncludes(output, "Deno.env.set('SQL_SERVER_URI', connectionString);");
-    assertStringIncludes(output, "Deno.env.set('DATABASE_URL', connectionString);");
-    assertStringIncludes(output, 'export function getMssql()');
-    assertStringIncludes(output, 'readonly mssql: MssqlClient');
-  });
-
-  it('constructs the sqlite engine module with the libsql driver adapter', () => {
+  it('constructs sqlite with the libsql adapter and generated typed client', () => {
     const sqlite = registry.get('sqlite');
-    const output = generateEngineMod(sqlite, { configKey: 'primary-db' });
+    const output = generateEngineMod(sqlite, {
+      configKey: 'primary-db',
+      databaseName: 'alpha_app.db',
+    });
 
-    // Prisma 7 requires a driver adapter; the sqlite facade must supply one.
     assertStringIncludes(output, "import { PrismaLibSql } from '@prisma/adapter-libsql'");
-    assertStringIncludes(output, "resolveConnectionString('sqlite', 'PRIMARY_DB_URI')");
+    assertStringIncludes(output, "from './schema/.generated/client.server.ts'");
     assertStringIncludes(output, 'new PrismaLibSql({ url: connectionString })');
     assertStringIncludes(output, 'adapter: new PrismaLibSql(');
-    // Regression guard: must never construct the client with no adapter.
+    assertStringIncludes(
+      output,
+      "Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL') ?? fallback",
+    );
     assertEquals(output.includes('new SqliteClient();'), false);
   });
 

@@ -17,7 +17,193 @@ function countOccurrences(value: string, needle: string): number {
   return value.split(needle).length - 1
 }
 
+function emittedHealthCheckBlock(
+  output: string,
+  key: string,
+  resourceIdentifier: string,
+): string {
+  const startMarker = `builder.addHealthCheck('${key}', async () => {`
+  const endMarker = `await ${resourceIdentifier}.withHealthCheck('${key}');`
+  const start = output.indexOf(startMarker)
+  const end = output.indexOf(endMarker, start)
+  assert(start >= 0, `missing health-check registration ${key}`)
+  assert(end > start, `missing health-check attachment ${key}`)
+  return output.slice(start, end + endMarker.length)
+}
+
 describe('generateRegisterInfrastructure', () => {
+  it('emits live TCP listener checks for every container database engine', () => {
+    const fixtures: readonly {
+      readonly engine: 'Postgres' | 'Mysql' | 'Mssql'
+      readonly name: string
+      readonly kind: string
+    }[] = [
+      { engine: 'Postgres', name: 'postgres', kind: 'postgres' },
+      { engine: 'Mysql', name: 'mysql', kind: 'mysql' },
+      { engine: 'Mssql', name: 'mssql', kind: 'mssql' },
+    ]
+
+    for (const fixture of fixtures) {
+      const output = generateRegisterInfrastructure({
+        databases: {
+          [fixture.name]: {
+            Enabled: true,
+            Engine: fixture.engine,
+            Mode: 'Container',
+            Persistent: false,
+          },
+        },
+        caches: {},
+      })
+      const key = `${fixture.name}_listener`
+      const server = `${fixture.name}_server`
+      const block = emittedHealthCheckBlock(output, key, server)
+
+      assert(!output.includes('EndpointProperty'))
+      assertStringIncludes(output, 'createListenerReadinessCheck')
+      assertStringIncludes(block, `const endpoint = await ${server}.getEndpoint('tcp');`)
+      assertStringIncludes(block, 'const host = await endpoint.host();')
+      assertStringIncludes(block, 'const port = await endpoint.port();')
+      assertStringIncludes(
+        block,
+        `return createListenerReadinessCheck({ kind: '${fixture.kind}', host, port })();`,
+      )
+      assert(!block.toLowerCase().includes('password'))
+      assert(!block.toLowerCase().includes('username'))
+      assert(!block.includes(`${fixture.name}_password`))
+    }
+  })
+
+  it('emits live RESP checks for Redis and every Garnet runtime arm', () => {
+    const fixtures: readonly {
+      readonly engine: 'Redis' | 'Garnet'
+      readonly name: string
+      readonly mode: 'Auto' | 'Container' | 'Executable'
+      readonly registrationCount: number
+    }[] = [
+      { engine: 'Redis', name: 'redis', mode: 'Container', registrationCount: 1 },
+      { engine: 'Garnet', name: 'garnet-container', mode: 'Container', registrationCount: 1 },
+      { engine: 'Garnet', name: 'garnet-executable', mode: 'Executable', registrationCount: 1 },
+      { engine: 'Garnet', name: 'garnet-auto', mode: 'Auto', registrationCount: 2 },
+    ]
+
+    for (const fixture of fixtures) {
+      const output = generateRegisterInfrastructure({
+        databases: {},
+        caches: {
+          [fixture.name]: {
+            Enabled: true,
+            Engine: fixture.engine,
+            Mode: fixture.mode,
+          },
+        },
+      })
+      const identifier = fixture.name.replaceAll('-', '_')
+      const key = `${fixture.name}_resp`
+      const block = emittedHealthCheckBlock(output, key, identifier)
+
+      assertStringIncludes(output, 'createRespPingCheck')
+      assertEquals(
+        countOccurrences(output, `builder.addHealthCheck('${key}', async () => {`),
+        fixture.registrationCount,
+      )
+      assertStringIncludes(block, `const endpoint = await ${identifier}.getEndpoint('tcp');`)
+      assertStringIncludes(block, 'const host = await endpoint.host();')
+      assertStringIncludes(block, 'const port = await endpoint.port();')
+      assertStringIncludes(block, 'return createRespPingCheck({ host, port })();')
+      assert(!block.toLowerCase().includes('password'))
+      assert(!block.toLowerCase().includes('username'))
+    }
+  })
+
+  it('does not emit listener checks for SQLite, external resources, or Deno KV', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        sqlite: {
+          Enabled: true,
+          Engine: 'Sqlite',
+          Mode: 'External',
+          DatabaseName: 'app.sqlite',
+          Persistent: false,
+        },
+        external: {
+          Enabled: true,
+          Engine: 'Postgres',
+          Mode: 'External',
+          Persistent: false,
+        },
+      },
+      caches: {
+        'deno-kv': { Enabled: true, Engine: 'DenoKv', Mode: 'Container' },
+        'deno-kv-auto': { Enabled: true, Engine: 'DenoKv', Mode: 'Auto' },
+        external: { Enabled: true, Engine: 'Redis', Mode: 'External' },
+      },
+    })
+
+    assert(!output.includes('sqlite_listener'))
+    assert(!output.includes('external_listener'))
+    assert(!output.includes('deno-kv_listener'))
+    assert(!output.includes('deno-kv_resp'))
+    assert(!output.includes('deno-kv-auto_listener'))
+    assert(!output.includes('deno-kv-auto_resp'))
+    assert(!output.includes('external_resp'))
+  })
+
+  it('omits database host ports by default and honors an explicit pin', () => {
+    const engines: readonly ('Postgres' | 'Mysql' | 'Mssql')[] = [
+      'Postgres',
+      'Mysql',
+      'Mssql',
+    ]
+    for (const engine of engines) {
+      const unpinned = generateRegisterInfrastructure({
+        databases: {
+          database: {
+            Enabled: true,
+            Engine: engine,
+            Mode: 'Container',
+            Persistent: false,
+          },
+        },
+        caches: {},
+      })
+      const pinned = generateRegisterInfrastructure({
+        databases: {
+          database: {
+            Enabled: true,
+            Engine: engine,
+            Mode: 'Container',
+            Port: 55_432,
+            Persistent: false,
+          },
+        },
+        caches: {},
+      })
+
+      assert(!unpinned.includes('port: 55432'))
+      assertStringIncludes(pinned, 'port: 55432')
+    }
+  })
+
+  it('omits Redis-compatible host ports by default and honors explicit pins', () => {
+    const unpinned = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        redis: { Enabled: true, Engine: 'Redis', Mode: 'Container' },
+      },
+    })
+    const pinned = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: { Enabled: true, Engine: 'Garnet', Mode: 'Executable', Port: 16_379 },
+      },
+    })
+
+    assert(!unpinned.includes('port: 6379'))
+    assertStringIncludes(pinned, 'port: 16379')
+    assertStringIncludes(pinned, 'targetPort: 6379')
+  })
+
   it('uses session lifetime for configured-persistent databases only under isolated starts', () => {
     const output = generateRegisterInfrastructure({
       databases: {
@@ -404,7 +590,10 @@ describe('generateRegisterInfrastructure', () => {
 
       assertStringIncludes(output, `builder.addParameter('${name}-password', {`)
       assertStringIncludes(output, `value: ensureDatabasePassword(appHostDir, '${name}')`)
-      assertStringIncludes(output, `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}('${name}', {`)
+      assertStringIncludes(
+        output,
+        `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}('${name}', {`,
+      )
       assertStringIncludes(output, `password: ${name}_password`)
     }
   })
