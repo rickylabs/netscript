@@ -85,15 +85,16 @@ command; and guarantee a printed resume rejection produces a non-zero command ex
 | ID | Decision | Rationale |
 | --- | --- | --- |
 | D1 | Introduce `PidLivenessEvidence`, `RolloutLeaseEvidence`, `ThreadWriterEvidence`, `SenderLeaseStalenessObservation`, and a `preserve \| stale \| indeterminate` result before behavioral edits. | Names every input and prevents booleans from erasing unknown/mismatch provenance. |
-| D2 | Stale requires two dead PID samples separated by `SENDER_PID_DEBOUNCE_MS`, plus an exact inactive/absent rollout, plus `thread/read` reporting `idle`, `not_loaded`, or proven absence. | No single signal evicts. Positive, stalled, contradictory, malformed, or unknown evidence preserves. |
+| D2 | Stale requires two dead PID samples separated by `SENDER_PID_DEBOUNCE_MS`, plus an exact inactive/absent rollout, plus `thread/read` reporting `idle`, `not_loaded`, or proven absence — **and** the rollout inventory or thread daemon probed must be bound to the record's own session provenance (its code-home/profile established at activation); an unestablishable or mismatched home yields `indeterminate`, never `stale` (PLAN-EVAL cycle 1 F2). | No single signal evicts. Positive, stalled, contradictory, malformed, unknown, or wrong-home evidence preserves. |
 | D3 | `active` thread state, any alive PID sample, `working`/`stalled` rollout, worktree/thread mismatch, `systemError`, unreadable inventory, missing session identity, or foreign record is non-evictable. | False-positive eviction has cross-lane destructive impact; conservative false-blocking is recoverable. |
 | D4 | Launch never evicts. An existing record returns `duplicate_sender_risk`/`ownership_conflict` with an operator action to resume or run the explicit repair command. | Separates detection from the dangerous mutation and guarantees audit cannot be bypassed. |
 | D5 | Repair is the narrow `agentic:runtime repair sender-lease` subcommand, supports dry-run, accepts no force flag, targets one canonical worktree, and never scans the sender directory. | Reuses the repo-native guarded repair surface and avoids the #1774-conflicted `deno.json`. |
 | D6 | Apply re-reads the unchanged lease token, repeats all probes, atomically writes an `authorized` redacted receipt, CAS-removes the exact record, then finalizes the receipt as `evicted`. | Makes the decision auditable and bounds time-of-check/time-of-use drift. Unknown or changed state aborts. |
-| D7 | The receipt stores a finite reason (`restart_stale_ownership`), record identity without `leaseToken`, all three evidence summaries, timestamps, worktree/session identity, and `authorized \| evicted` outcome. | Operators can explain why eviction was permitted without persisting prompts, credentials, or the lease secret. |
+| D7 | The receipt stores a finite reason (`restart_stale_ownership`), record identity without `leaseToken`, all three evidence summaries **from both the original detection pass and the apply-time re-observation pass, each with its own timestamps**, worktree/session identity, and `authorized \| evicted` outcome (PLAN-EVAL cycle 1 F4: the re-observed probe states must be persisted, not only the original ones, so a contested eviction is reconstructable). | Operators can explain why eviction was permitted without persisting prompts, credentials, or the lease secret. |
 | D8 | Resume outcome is `accepted \| rejected \| failed`. The known `thread-store conflict: already has an active writer` signature forces exit 1 even when the child exits 0; output remains present. | A printed rejection cannot be reported as delivery success. |
 | D9 | The known-negative resume test spawns the real wrapper behind a test-owned fake `bash`, then inspects the subprocess code and combined output directly. | Proves the OS-visible exit contract without sending a message and avoids pipeline-status false evidence. |
 | D10 | PLAN-EVAL is required and uses a fresh native Fable 5 medium session. | Eviction and live-writer race decisions are safety-critical and benefit from adversarial review. |
+| D11 | PLAN-EVAL cycle 1 finding F1 (repair-command wiring path was unflagged): resolved as option (a) — extend `RUNTIME_COMMANDS` in `runtime/contract.ts` with `'repair-sender-lease'`, following the `repair-codex-remote` `plan`/`apply` phase precedent exactly, with matching `runtime/planner.ts` logic and `runtime/cli/agentic-runtime.ts` dispatch wiring. | Reuses the existing guarded command-planner architecture (wrap, don't reinvent) rather than a bespoke CLI-local parse; the precedent's exact shape was verified in `contract.ts` before locking. |
 
 ### Staleness truth table
 
@@ -103,11 +104,13 @@ command; and guarantee a printed resume rejection produces a non-zero command ex
 | PID evidence | Rollout evidence | Thread evidence | Result |
 | --- | --- | --- | --- |
 | two debounced dead samples | exact terminal `idle` / `dead` / `refused`, matching session + worktree | `idle` / `not_loaded` / `absent` | `stale` |
-| two debounced dead samples | proven absent from a readable exact inventory | proven absent | `stale` |
-| any other combination | any | any | never `stale` |
+| two debounced dead samples | proven absent from a readable exact inventory bound to the record's own session provenance | proven absent from that same bound provenance | `stale` |
+| any other combination, including an unestablishable or mismatched provenance for either absence claim | any | any | never `stale` (`indeterminate`) |
 
-In particular, `stalled` is never terminal; rollout-absent plus thread-present is conflicting; and a
-launching record without a session id lacks two of the required signals and remains fail-closed.
+In particular, `stalled` is never terminal; rollout-absent plus thread-present is conflicting; a
+launching record without a session id lacks two of the required signals and remains fail-closed; and
+an absence proven only against a default/unbound inventory or daemon — rather than the record's own
+established code-home/profile — is `indeterminate`, not `stale` (PLAN-EVAL cycle 1 F2).
 
 ## Open-Decision Sweep
 
@@ -115,7 +118,9 @@ launching record without a session id lacks two of the required signals and rema
 | --- | --- | --- |
 | Three-signal truth table | resolved now | Locked in D2/D3 and must not be weakened during implementation. |
 | Mutation/audit ordering | resolved now | Locked in D6; an authorization receipt exists before CAS removal. |
-| Repair command placement | resolved now | Locked in D5 under the existing task; no root task addition. |
+| Repair command placement (CLI surface) | resolved now | Locked in D5 under the existing task; no root task addition. |
+| Repair command internal wiring (contract/planner union vs. CLI-local parse) | resolved now (was unflagged — PLAN-EVAL cycle 1 F1) | D11: extends `RUNTIME_COMMANDS` following the `repair-codex-remote` precedent; `runtime/contract.ts`, `runtime/planner.ts`, both test files, and the `runtime/cli/agentic-runtime.ts` dispatch site are now declared in the Intended File Manifest and Slice 4. |
+| Probe provenance for absent/not_loaded evidence under isolated CODEX_HOME profiles | resolved now (PLAN-EVAL cycle 1 F2) | D2 and the truth table amended: absence evidence is admissible as stale-supporting only when bound to the record's own session provenance; an unestablishable or mismatched home classifies `indeterminate`. |
 | Exact upstream rejection taxonomy beyond the witnessed active-writer conflict | safe to defer | Treat other non-zero child results as `failed`; add new structured rejection reasons only from observed evidence. |
 | Cancellation of an upstream message that was already queued despite rejection | safe to defer | Separate upstream capability; truthful non-zero propagation is the accepted #1751 obligation. |
 | Automatic cleanup of pre-thread (`launching`, no session id) records | safe to defer | Required three-signal evidence is unavailable, so this issue intentionally fails closed. |
@@ -165,6 +170,12 @@ No file outside this list is intended. A new need triggers plan/drift review bef
 
 ### Command integration and launch safety
 
+- `.llm/tools/agentic/runtime/contract.ts` — extend `RUNTIME_COMMANDS` with `'repair-sender-lease'`
+  per D11 (PLAN-EVAL cycle 1 F1).
+- `.llm/tools/agentic/runtime/contract_test.ts`
+- `.llm/tools/agentic/runtime/planner.ts` — `plan`/`apply` phase logic for the new command, following
+  the `repair-codex-remote` precedent per D11.
+- `.llm/tools/agentic/runtime/planner_test.ts`
 - `.llm/tools/agentic/runtime/cli/agentic-runtime.ts`
 - `.llm/tools/agentic/runtime/cli/agentic-runtime_test.ts` (new)
 - `.llm/tools/agentic/codex/launch-codex-slice.ts`
@@ -180,12 +191,14 @@ No file outside this list is intended. A new need triggers plan/drift review bef
 
 ### Documentation and run evidence
 
-- `.llm/tools/agentic/README.md` — **shared with #1774; final isolated reconciliation only**.
+- `.llm/tools/agentic/README.md` — **#1774 shipped and is in the base (`a3ddcbb59`, PR #1775);
+  reconcile against that landed content, not a moving target** (PLAN-EVAL cycle 1 F3).
 - `.llm/runs/fix-agentic-sender-lease-recovery--1751/{supervisor,research,plan,worklog,context-pack,drift,plan-eval}.md`
 
 ### Explicitly not edited
 
-- `deno.json` — **shared with #1774; no edit required** because `agentic:runtime` already exists.
+- `deno.json` — no edit required because `agentic:runtime` already exists (verified against current
+  `main`, not #1774's edit).
 - `deno.lock`, `.llm/harness/workflow/lane-policy.md`, routing/model config, sender records, and all
   package/plugin files.
 

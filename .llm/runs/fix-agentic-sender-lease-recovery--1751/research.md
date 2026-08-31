@@ -28,7 +28,7 @@
 | R10 | The multi-turn runner already treats a non-zero resume result as a failed/retryable turn. Correcting the wrapper exit code propagates naturally; no runner-specific workaround is needed. | `.llm/tools/agentic/codex/run-codex-slice.ts:135-205` |
 | R11 | `agentic:runtime` already owns guarded repair commands and has write/env permissions. Adding `repair sender-lease` beneath it avoids a new root task and therefore avoids `deno.json`. | `deno.json:75`; `.llm/tools/agentic/runtime/cli/agentic-runtime.ts:17-21,96-159` |
 | R12 | No open `arch-debt.md` entry concerns sender leases, sender ownership, or resume rejection. This internal `.llm/tools` slice does not touch a package/plugin public export or JSR surface. | Focused `rg` over `.llm/harness/debt/arch-debt.md`; doctrine verdict denominator in `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` |
-| R13 | Leaf #1774 is live in another worktree. The owner identifies `deno.json` and `.llm/tools/agentic/README.md` as shared files. This plan avoids `deno.json`; the README change is isolated to the last slice and must be reconciled after #1774. | `git worktree list --porcelain`; owner brief |
+| R13 | **Re-anchored (PLAN-EVAL cycle 1 F3):** #1774 has since shipped as PR #1775 (`a3ddcbb59`) and is in this leaf's base. `deno.json` and `.llm/tools/agentic/README.md` are ordinary current-`main` files now, not a moving-target shared surface. This plan still avoids editing `deno.json` (verified `agentic:runtime` already exists at the base); the README change is an isolated, final-slice edit against the landed content. | `git log --oneline -1 -- deno.json`; `git merge-base --is-ancestor a3ddcbb59 HEAD` |
 
 ## Signal Contract Research
 
