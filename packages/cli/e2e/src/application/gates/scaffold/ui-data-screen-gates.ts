@@ -2,7 +2,7 @@ import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import { cli, commandGate } from './gate-factory.ts';
-import { generatedAppName } from './generated-app-name.ts';
+import { generatedAppName } from './runtime/generated-app-name.ts';
 
 /** Create the generated-project consumer gate for a data-bound Fresh screen. */
 export function createUiDataScreenGates(): readonly GateDefinition[] {

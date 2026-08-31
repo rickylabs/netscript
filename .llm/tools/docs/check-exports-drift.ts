@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'plugin-streams-core',
+    packagePath: 'packages/plugin-streams-core',
+    docPath: 'docs/site/reference/plugin-streams-core/index.md',
+    packageName: '@netscript/plugin-streams-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.',
+    },
+  },
+  {
     name: 'aspire',
     packagePath: 'packages/aspire',
     docPath: 'docs/site/reference/aspire/index.md',
@@ -201,6 +213,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.',
+    },
+  },
+  {
+    name: 'plugin-ai-core',
+    packagePath: 'packages/plugin-ai-core',
+    docPath: 'docs/site/reference/plugin-ai-core/index.md',
+    packageName: '@netscript/plugin-ai-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.',
     },
   },
   {

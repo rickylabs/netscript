@@ -20,7 +20,7 @@ This is the layer the deployable [`@netscript/plugin-streams`](/reference/stream
 on, and the layer the other NetScript plugins use when they project entities — executions, saga
 instances, sessions — into durable topics.
 
-## Entrypoints
+## Exports
 
 | Export specifier | Module | Exports | Purpose |
 | --- | --- | --- | --- |
