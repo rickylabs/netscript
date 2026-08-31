@@ -7110,3 +7110,31 @@ coordinator, to avoid a conflicting convergence that would immediately go stale.
 Issue #1616 has 3 acceptance boxes, currently unchecked; they will be tool-mirrored once the runtime
 gate returns, since box 2 ("an existing runtime gate exercises that dynamic route end to end") cannot
 be honestly evidenced before then.
+
+### #1773 unparked and normalized; hosted exact-head evidence in flight
+
+Corrected course: #1773's expensive gate is independent of #1831, so it was wrong to hold it.
+
+- **Body normalized.** Stale "Phase: PLAN-EVAL ready" and "Planned merge-readiness command" replaced
+  with the true state (implementation complete, cycle-2 `PASS_PLAN`, `PASS_IMPL`, hosted evidence
+  dispatched). Slice list ticked with receipts. **DoD is 16 checked / 3 unchecked** — the three
+  unchecked are precisely the runtime rows, and they stay unchecked until the hosted result exists.
+  A DoD that claimed them now is exactly the vacuous-green defect the #1829 audit caught.
+- **Attributed `impl-eval:skip`** with a comment naming verdict, evaluator, evaluated head
+  `ef4d3a63f`, and why it carries to `cd24e4955` — the only delta is the evaluator's own protocol
+  artifact, no product/test/config file changed.
+- **Lifecycle moved off stale `status:plan-eval`** → `status:impl` + `gate:e2e`, then non-draft.
+  Deliberately **not** `status:impl-eval`: the phase dispatcher fires on that label for a non-draft PR
+  and `SKIP_IMPL` only guards the `ready_for_review` action, so labeling it would have launched a
+  redundant evaluator. Deliberately **not** `status:ready-merge` either, because the runtime gate is
+  genuinely outstanding.
+- **Hosted evidence at the exact head**: `e2e-cli.yml` run `33360663739` at `cd24e4955` (= branch
+  tip, verified). `scaffold-static` and `desktop-native-linux` already SUCCESS; both runtime lanes in
+  flight. No serialized host lease taken.
+- Closing keyword `Closes #1616` present; review threads 0/0; issue #1616 moved off stale
+  `status:triage` to `status:impl`, milestone 0.0.7. Its 3 acceptance boxes stay unchecked until the
+  hosted gate returns, since box 2 requires exactly that evidence.
+
+Final current-main convergence still waits for #1831, and the runtime result will carry across it
+**only by exact relevant-blob identity**, the same discipline that let #1365 and #1677 carry their
+evaluator verdicts through three and two convergences respectively.
