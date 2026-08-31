@@ -204,3 +204,72 @@ Clean product head `63e291f62103447f7a0f5dfc009aaa1e51956358` then passed the fo
 No seed diagnosis was attempted. After S7 returns the host to zero, the supervisor owns exactly one
 cheap typed-seed diagnostic under the serialized lease; only its newly exposed cause may justify a
 later repair.
+
+## D-122 — post-S6-squash reconstruction onto main
+
+The owner accepted the D-121 abort and authorized one narrow semantic resolution. PLAN-EVAL and
+IMPL-EVAL were explicitly waived for this reconstruction; the existing qualifying verdicts remain
+at their recorded heads. No Aspire, Docker, AppHost, or runtime E2E command ran.
+
+Baseline and replay:
+
+- old head and safety tag: `f06209d393fd212faafd097142449ff346bdd085`;
+- initially fetched `origin/main`: `65cd8a07787504b5ed94408510d4ab85260bc21a`;
+- final `origin/main`: `8a925764276b25ef7cef484db273604f44557cef`; after it advanced,
+  the complete 13-commit reconstructed branch rebased onto it cleanly with no conflicts;
+- exact replay range: `01f27d4d4..f06209d39`, 10 commits;
+- validated product/evidence head before this run-ledger commit:
+  `da963027b431af536cf6c5f5d08e3623f5797ca1`.
+
+Conflict resolutions:
+
+| Old commit | Path | Resolution |
+| --- | --- | --- |
+| `41a51c7a6` | `packages/cli/src/kernel/assets/embedded.generated.ts` | generated; rebase `ours` (main) |
+| `e4ef5bfdb` | same | generated; rebase `ours` (main) |
+| `3aaa3791f` | same | generated; rebase `ours` (main) |
+| `b985447fe` | `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts` | main D-101 file intact plus final S8 `createTypedDbPhaseBGate()` and `resolve`; function byte-identical to old head |
+| `b985447fe` | `packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts` | exact main version |
+| `18923b54e` | listener gate again | retained the already-approved D-101 + S8 gate form |
+| `63e291f62` | `packages/cli/src/kernel/assets/embedded.generated.ts` | generated; rebase `ours` (main) |
+
+Range-diff mapping at the regenerated head retained `=` for commits 1, 2, 7, and 10. Commits 3,
+4, 5, and 9 are `!` because their stale embedded-barrel hunks were deliberately discarded and
+regenerated once at the end. Commits 6 and 8 are `!` because the coordinator ruling retained D-101,
+dropped the superseded listener helpers/tests, and preserved only the architecture-independent
+typed DB gate. The appended regeneration commit is `a70c2d861`; formatter-only normalization of
+two S8 test files is `c312929cc`. After the final-main rebase, those commits are respectively
+`19e139cbbd41516e44565a5f284d02ed980df1e8` and
+`da963027b431af536cf6c5f5d08e3623f5797ca1`.
+
+Lineage checks proved merge-base convergence to `origin/main` and zero stale-hash overlap. The old
+graph contains 17 S5 commits and 6 S6 commits, not 7: `5d2bd8756..01f27d4d4` has six commits, so
+17 + 6 + 10 equals the stated 33-commit old range.
+
+Static reconstruction evidence:
+
+| Command/gate | Exit/result |
+| --- | --- |
+| `gen:assets-barrel` | 0; one-file delta, 4 insertions/4 deletions |
+| first `check:assets-barrel` before committing delta | 1; expected clean-HEAD contract while delta was uncommitted |
+| final `check:assets-barrel` after `19e139cbb` | 0, diff-clean |
+| structured check, `packages/cli` excluding nested E2E | 0; 719 files, 0 diagnostics |
+| structured check, `packages/cli/e2e` on initial main | 1; one inherited-main TS2307 in `ui-data-screen-gates.ts` |
+| final structured check, `packages/cli` + `packages/cli/e2e` | 0; 904 files, 0 diagnostics |
+| exact changed-file structured lint on final main | 0; 19 selected/processed, 0 findings |
+| exact changed-file structured fmt | initial 1 on two semicolon-only files; write 0; final-main check 0 across 19 selected/processed |
+| seven focused generator/operation-runner/runtime/listener tests | 0; 78 passed, 0 failed |
+| `suite-registry_test.ts` on initial main | blocked before tests by the inherited-main missing module, including under `--no-check` |
+| final eight-file focused test set, including suite registry | 0; 98 passed, 0 failed |
+| `quality:gate` | 0; quality scan clean and doctrine `FAIL=0` |
+| `check:aspire-version-parity` | 0; checked 812, `fail=0` |
+
+The initial-main E2E failures were transient branch-base evidence, not an S8 repair. `origin/main`
+advanced to `8a9257642` with the unrelated import correction; after the clean secondary rebase, the
+combined CLI/E2E check and all eight focused test files passed. No product-behavior change was made
+for that failure.
+
+Push procedure used a direct `git ls-remote` of the exact feature ref immediately before each
+evidence-head update, with the returned SHA supplied verbatim to `--force-with-lease`. Final remote
+read-back matched the committed branch head; the worktree and `git diff --check` were clean, and
+the safety tag remained at the old head.

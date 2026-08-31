@@ -67,3 +67,18 @@ reproduces that exact sequence. The repair strips terminal controls before class
 the existing first-line message, additively exposes bounded actionable stderr, and persists it for
 the typed command. The actual seed cause remains intentionally unknown until the supervisor's one
 lease-backed diagnostic; this static slice does not speculate or repair beyond observability.
+
+## D-08 — reconstruction counts and transient initial-main check failure
+
+D-121 counted 7 stale S6 commits, but the reachable old segment from `5d2bd8756` through
+`01f27d4d4` contains 6. Together with 17 stale S5 commits and the corrected 10 S8 commits, this
+matches the stated 33 commits over the old base. The reconstruction has zero stale-hash overlap.
+
+After the first rebase, the structured E2E check exposed a missing relative import already present
+at the initially fetched `origin/main` head: `ui-data-screen-gates.ts` imported
+`./generated-app-name.ts`, while the module was under `./runtime/`. This was outside S8 and was not
+repaired here. Before push, `origin/main` advanced to `8a9257642`, which already contained the
+unrelated import correction. The complete 13-commit reconstructed branch rebased onto that head
+cleanly. Final combined CLI/E2E check passed 904 files with zero diagnostics, and the full focused
+set including suite registry passed 98/98. The transient red remains recorded as command-history
+evidence without broadening this behavior-preserving reconstruction.
