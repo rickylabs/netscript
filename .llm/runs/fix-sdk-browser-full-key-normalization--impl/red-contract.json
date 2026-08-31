@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "packages/sdk/tests/discovery/env-ordering_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1824",
+  "exitCode": 1,
+  "durationMs": 1016,
+  "summary": {
+    "passed": 5,
+    "failed": 6,
+    "ignored": 0,
+    "totalResults": 11,
+    "uniqueFailures": 4
+  },
+  "failures": [
+    {
+      "message": "2 test steps failed.",
+      "count": 2,
+      "tests": [
+        {
+          "name": "browser service full key matches Aspire identifier normalization",
+          "file": "./packages/sdk/tests/discovery/env-ordering_test.ts",
+          "line": 42
+        },
+        {
+          "name": "SDK browser full key agrees with Aspire output",
+          "file": "./packages/sdk/tests/discovery/env-ordering_test.ts",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "message": "Error: Expected VITE_services__sagas_api__http__0, got VITE_services__sagas-api__http__0\n    at assertEquals (file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>)\n    at file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>\n    at innerWrapped (ext:cli/40_test.js:<line>:<column>)\n    at exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n    at Object.outerWrapped [as fn] (ext:cli/40_test.js:<line>:<column>)\n    at TestContext.step (ext:cli/40_test.js:<line>:<column>)\n    at file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>",
+      "count": 2,
+      "tests": [
+        {
+          "name": "normalizes hyphenated resource names",
+          "file": "./packages/sdk/tests/discovery/env-ordering_test.ts",
+          "line": 43
+        },
+        {
+          "name": "sagas-api",
+          "file": "./packages/sdk/tests/discovery/env-ordering_test.ts",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "message": "Error: Expected VITE_services__orders_api_v2__https__1, got VITE_services__orders.api/v2__https__1\n    at assertEquals (file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>)\n    at file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>\n    at innerWrapped (ext:cli/40_test.js:<line>:<column>)\n    at exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n    at Object.outerWrapped [as fn] (ext:cli/40_test.js:<line>:<column>)\n    at TestContext.step (ext:cli/40_test.js:<line>:<column>)\n    at file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "normalizes every other invalid identifier character",
+          "file": "./packages/sdk/tests/discovery/env-ordering_test.ts",
+          "line": 61
+        }
+      ]
+    },
+    {
+      "message": "Error: Expected VITE_services__workers_api_v2__http__0, got VITE_services__workers.api/v2__http__0\n    at assertEquals (file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>)\n    at file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>\n    at innerWrapped (ext:cli/40_test.js:<line>:<column>)\n    at exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n    at Object.outerWrapped [as fn] (ext:cli/40_test.js:<line>:<column>)\n    at TestContext.step (ext:cli/40_test.js:<line>:<column>)\n    at file://<cwd>/packages/sdk/tests/discovery/env-ordering_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "workers.api/v2",
+          "file": "./packages/sdk/tests/discovery/env-ordering_test.ts",
+          "line": 79
+        }
+      ]
+    }
+  ]
+}
