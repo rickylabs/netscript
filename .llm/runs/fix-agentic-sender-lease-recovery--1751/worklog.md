@@ -127,6 +127,10 @@ when the child exit is non-zero.
 | 2026-08-31 | 3 | RED repair lifecycle | Added only the four declared test files for audited restart-stale apply, changed-token CAS, foreign/unknown no-op, strict rollout failure, read-only thread state, CLI dry-run, and a real live child/writer whose record must survive. All sender, evidence, and session paths are test-owned/injected and assert they are not the production sender root; child cleanup is bounded and reaped in `finally`. |
 | 2026-08-31 | 3 | RED gate | Exact targeted structured wrapper exited 1 with `REAL_EXIT=1`: 0 passed, 10 failed, 0 ignored. Every failure names an expected missing Slice 4 module, command, or injected CLI runner; no implementation behavior was added. |
 | 2026-08-31 | 3 | Handoff | Commit/push/comment is followed by a hard stop for Tier-A substantive review. Slice 4 is not started. |
+| 2026-08-31 | 4 | GREEN accepted | Supervisor verified and committed `1cfae0f39` after the implementation turn stalled: all five earlier RED blobs remained byte-identical; Slice 3 went 10/10 green; the full agentic suite went 526/526 green; scope was exactly the nine declared implementation files. |
+| 2026-08-31 | 5 | RED resume known-negative | Added only the real-wrapper subprocess test. Both cases use a test-owned executable fake `bash` under `.llm/tmp`, inspect `Deno.Command(...).output().code` directly, and assert the production sender root is not used. No thread message can be delivered because the fake shell records the invocation instead of executing it. |
+| 2026-08-31 | 5 | RED gate | Exact targeted structured wrapper used `out=$(cmd); rc=$?` and returned `REAL_EXIT=1`: 1 passed, 1 failed, 0 ignored. The positive accepted-child control remains exit 0. `codex resume returns non-zero when the real wrapper receives an active-writer rejection` fails with actual 0 versus expected 1 while the exact rejection text remains present. |
+| 2026-08-31 | 5 | Reconcile/handoff | PR #1802 remains the single leaf PR and no scope or decision changed. Commit/push/comment is followed by a hard stop for Tier-A substantive review; Slice 6 is not started. |
 
 ## Decisions
 
@@ -155,6 +159,10 @@ when the child exit is non-zero.
 | Slice 1 type-check | structured `run-deno-check.ts` over the two owned TS files | PASS | 2 files selected; 0 failed batches and 0 diagnostics. |
 | Slice 1 lint | structured `run-deno-lint.ts` over the two owned TS files with `--config jsr-package-settings.json` | PASS | 2 files selected and processed; 0 findings. The default root config refusal is recorded in `drift.md`. |
 | Slice 1 format | structured `run-deno-fmt.ts` over the two owned TS files | PASS | 2 files selected and processed; 0 findings. |
+| Slice 5 type-check | structured `run-deno-check.ts` over `codex-resume_test.ts` | PASS | 1 file selected; 0 failed batches and 0 diagnostics. |
+| Slice 5 lint | structured `run-deno-lint.ts` over `codex-resume_test.ts` with `--config jsr-package-settings.json` | PASS | 1 file selected and processed; 0 findings. |
+| Slice 5 format | structured `run-deno-fmt.ts` over `codex-resume_test.ts` | PASS | 1 file selected and processed; 0 findings. |
+| Slice 5 scope/diff | authoritative raw Git status plus `git diff --check` | PASS | Only the new test and owned `worklog.md`/`context-pack.md` are changed; no whitespace errors. |
 | Diff hygiene | raw `git diff --check` | PASS | No whitespace errors across the five Slice 1 files. |
 
 ### Fitness Gates
@@ -170,8 +178,8 @@ when the child exit is non-zero.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Sender staleness contract | EXPECTED RED | `run-deno-test.ts -- --allow-all .llm/tools/agentic/runtime/sender-ownership_test.ts` | Exit 1; 16 passed, 11 failed, 0 ignored. Failures are only the 7 new `preserve` and 4 new `stale` expectations against the fail-closed seam. |
-| Sender lifecycle | NOT_RUN | Planned Slices 3-4 | Must use temp roots and test-owned processes only. |
-| Resume known-negative | NOT_RUN | Planned Slices 5-6 | Must capture direct subprocess code and rejection string. |
+| Sender lifecycle | PASS | Supervisor verification at `1cfae0f39` | Slice 3 suite 10/10 and full agentic suite 526/526 after Slice 4. |
+| Resume known-negative | EXPECTED RED | `run-deno-test.ts -- --allow-all .llm/tools/agentic/codex/codex-resume_test.ts` | `REAL_EXIT=1`; 1 passed, 1 failed. Rejected path returns actual 0 rather than expected 1; accepted path remains 0. |
 
 ### Consumer Gates
 
@@ -229,3 +237,33 @@ The grouped failure reasons are the three absent Slice 4 modules
 currently unsupported `repair sender-lease` CLI parse, and the absent injected CLI runner. This is
 the intended pre-implementation RED shape. Structured check, lint, and non-mutating format wrappers
 over the four owned test files each passed with four files selected and zero diagnostics/findings.
+
+## Slice 5 RED Evidence
+
+The exact focused command used real shell exit capture (`out=$(cmd); rc=$?`) and no pipeline. The
+structured result was `REAL_EXIT=1`, 2 total, 1 passed, 1 failed, 0 ignored. The failing test was:
+
+1. `codex resume returns non-zero when the real wrapper receives an active-writer rejection`
+
+The failure is the intended missing Slice 6 behavior: the subprocess code read directly from
+`Deno.Command(...).output().code` was `0`, while the test expects `1`. The exact
+`thread-store conflict: already has an active writer` text was present. The positive control
+`codex resume keeps an accepted child result at exit zero` passed. Both cases spawn the real
+`codex-resume.ts` wrapper with a test-owned executable fake `bash`; its trace proves it received the
+wrapper's `-lc` command, but it never executes Codex or sends a thread message. The fixture root is
+under ignored `.llm/tmp`, asserts it is outside the production sender registry, and is removed in
+`finally`. Structured check, lint, and non-mutating format wrappers each selected the one owned test
+file and passed with zero diagnostics/findings. The committed-ceiling candidate blob is
+`546b5f0185876fd51c9b5ee28b57a19fe37562b7`; the five earlier RED blobs were independently
+rechecked and remain exactly `74b0ba6118ec4961ed50da639791fe52e3faa09a`,
+`7be38302ac6ed20f29571213d18172283e1aded5`,
+`2e2817d0c27628e0f9e1ca922c47ec35738102ce`,
+`d3ca0b51fcb87aeee81e4202e5f527ed569fba12`, and
+`7113e271dfa15e9f2dc53b6922c4d5055e086430`.
+
+During fixture development, the first fake shell was created under the host's no-exec system temp
+mount. Executable lookup fell through to the real shell once and the wrapper targeted the fixed
+fixture UUID; Codex returned `no rollout found for thread id` before accepting or queueing any
+message. The final committed test eliminates that fallback: the fake is under executable, ignored
+`.llm/tmp`, and the spawned wrapper's `PATH` contains only the fake-bin directory. No production
+sender path was read or mutated.

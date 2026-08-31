@@ -6,17 +6,19 @@
 | --- | --- |
 | Run ID | `fix-agentic-sender-lease-recovery--1751` |
 | Branch | `fix/agentic-sender-lease-recovery` |
-| Current phase | `implement` — Slice 1 committed RED boundary, pending Tier-A substantive review |
+| Current phase | `implement` — Slice 5 RED boundary, pending Tier-A substantive review |
 | Archetype | Operational Archetype 6 — CLI / Tooling |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL cycle 2 passed at `c13da3e23`, and the supervisor's required R1/R2 record corrections are
-landed at `6e6564fba`. Slice 1 establishes the finite staleness contract and a committed RED test
-boundary only. The classifier deliberately returns fail-closed `indeterminate`; launch, repair,
-adapter, sender-record, eviction, and resume behavior are unchanged. No sender record was inspected
-or mutated. Work is stopped before Slice 2 for the supervisor's Tier-A substantive review.
+Slices 1-4 are accepted through `1cfae0f39`: classification and preserve-only launch behavior are
+green, and explicit audited repair is green with its earlier RED blobs unchanged. Slice 5 adds only
+the real-wrapper resume rejection test. Its intended RED result is `REAL_EXIT=1`, 1 passed and 1
+failed: an accepted fake child remains exit 0, while the exact active-writer rejection is printed
+but the wrapper incorrectly remains exit 0. The final fixture permits only its fake shell, so no
+thread message or sender-registry operation occurs. Work is stopped before Slice 6 for the
+supervisor's Tier-A substantive review.
 
 ## Completed
 
@@ -28,24 +30,27 @@ or mutated. Work is stopped before Slice 2 for the supervisor's Tier-A substanti
   direct known-negative exit test, seven RED/GREEN slices, and intended file manifest.
 - Completed two separate PLAN-EVAL cycles; cycle 2 is `PASS` in `plan-eval-cycle-2.md`.
 - Landed the supervisor's cycle-2 R1/R2 record corrections before implementation.
-- Added finite PID, rollout, thread, provenance, staleness, and eviction-reason contracts.
-- Added table-driven RED expectations for the full stale conjunction and fail-closed live,
-  foreign, unknown, mismatch, and insufficient-evidence cases.
-- Captured targeted RED evidence: exit 1, 16 passed, 11 failed, 0 ignored; all failures are the new
-  7 `preserve` and 4 `stale` expectations.
-- Captured covered structured check/lint/fmt passes for the two owned TS files.
+- Landed the finite classifier and preserve-only launch behavior in Slice 2; its exact Slice 1
+  boundary is green and unchanged.
+- Landed explicit audited sender-lease repair in Slice 4 with D6/D7 sequencing and all four Slice 3
+  test blobs unchanged; supervisor verification recorded 10/10 focused and 526/526 full green.
+- Added the Slice 5 real-wrapper rejection and accepted-path subprocess cases behind a test-owned
+  fake `bash`; no real message can be delivered.
+- Captured intended Slice 5 RED evidence: exit 1, 1 passed, 1 failed, with the failing rejection
+  path returning actual 0 versus expected 1.
+- Captured scoped structured check/lint/fmt passes for the one Slice 5 test file.
 
 ## In Progress
 
-- Tier-A substantive review of the landed Slice 1 RED boundary. The implementation lane does not
-  self-certify and has not started Slice 2.
+- Tier-A substantive review of the landed Slice 5 RED boundary. The implementation lane does not
+  self-certify and has not started Slice 6.
 
 ## Next Steps
 
-1. Supervisor performs the Tier-A substantive Slice 1 review and records its disposition.
-2. Do not dispatch Slice 2 unless the supervisor accepts the committed RED boundary.
-3. After acceptance, Slice 2 implements the truth table and preserve-only launch behavior, then
-   reruns this exact targeted test command to green.
+1. Supervisor performs the Tier-A substantive Slice 5 review and records its disposition.
+2. Do not dispatch Slice 6 unless the supervisor accepts the committed RED boundary.
+3. After acceptance, Slice 6 adds the pure resume-disposition parser and wrapper propagation while
+   keeping the Slice 5 test blob byte-identical, then reruns the exact targeted command to green.
 
 ## Key Decisions
 
@@ -63,25 +68,23 @@ or mutated. Work is stopped before Slice 2 for the supervisor's Tier-A substanti
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/tools/agentic/runtime/sender-ownership.ts` | modified | Finite three-signal/provenance/result contracts and fail-closed RED seam. |
-| `.llm/tools/agentic/runtime/sender-ownership_test.ts` | modified | Table-driven committed RED classification expectations. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Slice 1 scope and exact gate evidence. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current resumable handoff and Tier-A stop. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/drift.md` | modified | Root lint-exclusion evidence caveat. |
+| `.llm/tools/agentic/codex/codex-resume_test.ts` | new | Real-wrapper negative and accepted-path subprocess controls behind test-owned fake `bash`. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Slice 5 scope and exact RED/static evidence. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current Slice 5 handoff and Tier-A stop. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS for Slice 1 owned files | Structured check/lint/fmt: 2 files processed, zero findings/diagnostics. |
-| Fitness | Plan-Gate PASS; Tier-A Slice 1 review PENDING | `plan-eval-cycle-2.md`; supervisor review is the current stop. |
-| Runtime | EXPECTED RED | Targeted ownership test: exit 1; 16 passed, 11 failed, all failures newly added. |
-| Consumer | N/A / NOT_RUN | No published consumer change; compatibility test planned. |
+| Static | PASS for Slice 5 test file | Structured check/lint/fmt: 1 file processed, zero findings/diagnostics. |
+| Fitness | Plan-Gate PASS; Tier-A Slice 5 review PENDING | `plan-eval-cycle-2.md`; supervisor review is the current stop. |
+| Runtime | EXPECTED RED | Targeted resume test: exit 1; 1 passed, 1 failed; rejected path actual 0 versus expected 1. |
+| Consumer | Positive control PASS | Accepted fake-child path stays exit 0; Slice 6 compatibility gates remain pending. |
 
 ## Open Questions
 
-- No implementation decision is open for Slice 1. Supervisor acceptance of the RED boundary is
-  required before Slice 2.
+- No implementation decision is open for Slice 5. Supervisor acceptance of the RED boundary is
+  required before Slice 6.
 
 ## Drift and Debt
 
@@ -91,5 +94,5 @@ or mutated. Work is stopped before Slice 2 for the supervisor's Tier-A substanti
 
 ## Commits
 
-- Slice 1 is the current committed RED boundary; its exact hash and push evidence are recorded in
-  the structured PR #1802 comment. V3 has no `commits.md`.
+- Slice 4 GREEN is `1cfae0f39`. Slice 5 RED is the next commit; its exact hash and push evidence are
+  recorded in the structured PR #1802 comment. V3 has no `commits.md`.
