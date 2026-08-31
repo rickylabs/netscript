@@ -17,6 +17,16 @@ import {
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 
+Deno.test('runtime behavior gates register the dynamic route probe id', () => {
+  const dynamicRouteGateId = 'behavior.app-dynamic-route';
+
+  assertEquals((Object.values(GATE) as readonly string[]).includes(dynamicRouteGateId), true);
+  assertEquals(
+    createRuntimeBehaviorGates().map((entry) => String(entry.id)).includes(dynamicRouteGateId),
+    true,
+  );
+});
+
 Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
 

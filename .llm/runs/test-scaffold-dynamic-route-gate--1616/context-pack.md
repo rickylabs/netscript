@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `test-scaffold-dynamic-route-gate--1616` |
 | Branch | `test/scaffold-dynamic-route-gate` |
-| Current phase | `plan-eval` |
+| Current phase | `implementation — S1 RED` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Research and planning are complete at live-main baseline `3e5cbabf`. The plan is locked; no
-implementation or expensive runtime gate has run.
+Cycle-2 PLAN-EVAL returned `PASS_PLAN`. S1 is a compilable semantic RED against unchanged scaffold
+behavior; no expensive runtime gate has run.
 
 ## Completed
 
@@ -23,16 +23,20 @@ implementation or expensive runtime gate has run.
 - Re-derived the default scaffold gap, Fresh generation path, #1576 failure, and suite topology.
 - Pushed the research slice at `c06d365465d3898dbf26c92f98c6e64ce4155057`.
 - Locked the product-seed/runtime-gate plan and lease-free RED strategy.
+- Added the typed dynamic-response validator seam and focused tests without changing scaffold
+  behavior, gate registration, or catalog order.
+- Captured S1 RED receipts: 72 passed / 7 failed plus the filtered convention failure.
 
 ## In Progress
 
-- Await separately dispatched PLAN-EVAL.
+- Commit and push S1 RED alone before beginning scaffold GREEN.
 
 ## Next Steps
 
-1. Supervisor dispatches PLAN-EVAL in a separate session.
-2. On `PASS`, implement the committed RED slice before GREEN.
-3. Obtain the expensive-gate lease only for the final one-pass runtime smoke.
+1. Implement S2 scaffold GREEN against the committed RED.
+2. Implement S3 runtime-gate GREEN and exact catalog order.
+3. Run lease-free hardening; keep scaffold.runtime `NOT_RUN — lease required`.
+4. Stop for separately dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -52,14 +56,14 @@ implementation or expensive runtime gate has run.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | BASELINE_PASS | Focused structured tests: 89 passed. |
+| Static | RED | 72 passed / 7 semantic failures; filtered convention test 1 semantic failure. |
 | Fitness | NOT_RUN | Planned after implementation. |
 | Runtime | LEASE_BLOCKED | Explicit owner boundary; no lease held. |
-| Consumer | NOT_RUN | Researching narrow lease-free coverage. |
+| Consumer | RED | Default seed/template/catalog lack the locked dynamic route behavior. |
 
 ## Open Questions
 
-- None before PLAN-EVAL; locked decisions are in `plan.md`.
+- None; locked decisions are in `plan.md`.
 
 ## Drift and Debt
 

@@ -10,6 +10,7 @@ import {
   assertStringIncludes,
 } from 'jsr:@std/assert@^1';
 import { generateRouteManifestSeed } from '../../application/scaffold/writers/app-route-seeds.ts';
+import { TEMPLATE_MANIFEST } from '../../assets/manifest.ts';
 import {
   appAppTemplate,
   appClientTemplate,
@@ -131,6 +132,21 @@ describe('app route template rendering', () => {
     assertStringIncludes(generateRouteManifestSeed(), "$route: '/examples/crud'");
     assertStringIncludes(home, 'href: appRoutes.crudExample.href()');
     assertStringIncludes(examples, 'href: appRoutes.crudExample.href()');
+  });
+
+  it('dynamic order route is registered, aliased, and linked from examples', async () => {
+    const adapter = makeAdapter();
+    const router = await adapter.render(appRouterTemplate, SAMPLE_APP_VARS);
+    const examples = await adapter.render(appExamplesIndexRouteTemplate, SAMPLE_APP_VARS);
+
+    assert(
+      TEMPLATE_MANIFEST.map((asset) => String(asset.path)).includes(
+        'app/routes/examples/orders/[id].tsx.template',
+      ),
+      'dynamic order route template must be registered',
+    );
+    assertStringIncludes(router, 'order: generatedRoutes.examples.orders.$id.$route,');
+    assertStringIncludes(examples, "appRoutes.order.href({ id: 'order-42' })");
   });
 
   it('rejects duplicate direct appRoutes targets', async () => {

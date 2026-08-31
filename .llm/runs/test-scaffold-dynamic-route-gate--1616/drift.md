@@ -22,3 +22,9 @@ resolver choice, or D8. Cycle 2 locks non-overlapping element attributes, a per-
 compilable RED, and app-home → dynamic-route → app-reference ordering. It also adds the cheap
 canonical-conventions and retained-route coverage. Scope, archetype, public-surface decision, lease
 boundary, and no-workflow ruling are unchanged.
+
+## 2026-08-31 — S1 RED execution (none)
+
+The first focused authoring attempt exposed closed-union comparison type errors and was discarded.
+The recorded RED widens observed identifiers to strings, compiles, and fails only on the locked
+semantic absences. No scope, file-plan, doctrine, or gate-boundary drift occurred.

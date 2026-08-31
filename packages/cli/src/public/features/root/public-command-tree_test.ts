@@ -316,3 +316,15 @@ async function readEntryNames(path: string): Promise<string[]> {
   }
   return names.sort();
 }
+Deno.test('app conventions declare the scaffold dynamic route as a canonical reference', () => {
+  const paths = appConventionsReferencedPaths({
+    appName: 'dashboard',
+    dbEngine: 'none',
+    includeExampleService: false,
+  });
+
+  assert(
+    paths.includes('routes/examples/orders/[id].tsx'),
+    'dynamic order route must be part of the canonical scaffold references',
+  );
+});

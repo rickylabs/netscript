@@ -33,6 +33,8 @@ the lease. Detailed files, constants, order, gates, and deferred scope are locke
 | 2026-08-31 | PLAN-EVAL 1 | `FAIL_FIX` | Separate native Fable 5 evaluator approved the plan shape and required four bounded false-green locks; implementation remained blocked. |
 | 2026-08-31 | Rebaseline | Current main | Supervisor merged `8a925764276b25ef7cef484db273604f44557cef` at branch head `f22348a80fec2e8489108404423247b224d208cb`; source diff versus current main is empty. |
 | 2026-08-31 | Plan amendment 2 | Locked | Added element-scoped nonce markers, both Fresh request modes, generator-derived seed parity, exact pre-browser order, semantic-only RED, and measured Gate 7 evidence. |
+| 2026-08-31 | PLAN-EVAL 2 | `PASS_PLAN` | Separate OpenRouter Qwen 3.8 Flash evaluator, attested `xhigh`, authorized implementation with all seven locks enforced. |
+| 2026-08-31 | S1 RED | Semantic failure | Focused wrapper compiled: 72 passed / 7 failed; filtered conventions wrapper compiled: 0 passed / 1 failed. Failures are missing dynamic seed/asset/gate/catalog/convention behavior plus valid-response rejection; href-only, id-only, and HTTP-500 negatives pass. |
 
 ## Decisions
 
@@ -62,10 +64,12 @@ though default scaffold output does not. See `drift.md`; scope is unchanged.
 - Branch Gate 7 at `f22348a80fec2e8489108404423247b224d208cb`: `deno task test` exit 0;
   4,426 passed, 0 failed, 19 ignored; 198.633s.
 - Aspire, Docker, browser, `e2e:cli`, and `scaffold.runtime` remain lease-gated and were not run.
+- S1 RED: `run-deno-test.ts` over five focused scaffold/E2E test files: exit 1; 72 passed,
+  7 failed, 0 ignored. Filtered convention contract: exit 1; 0 passed, 1 failed, 0 ignored.
+  Receipts: `receipts/s1-red-focused.json`, `receipts/s1-red-conventions.json`.
 
 ## Handoff Notes
 
-- PLAN-EVAL is selected and is a hard stop.
-- The supervisor dispatches evaluators separately; this session must not launch or simulate one.
-- Cycle-1 returned `FAIL_FIX`; amended `plan.md` is ready for the separately dispatched cycle-2
-  PLAN-EVAL. Implementation remains blocked until `PASS`.
+- Cycle-2 PLAN-EVAL passed; implementation is authorized.
+- S1 RED is complete and must remain its own commit before product GREEN.
+- The supervisor dispatches IMPL-EVAL separately; this session must not launch or simulate one.

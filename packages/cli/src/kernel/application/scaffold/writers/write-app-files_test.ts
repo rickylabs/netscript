@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateAppTsConfig } from '../../../adapters/templates/app/generate-app-tsconfig.ts';
-import { generateRoutesSeed } from './app-route-seeds.ts';
+import { generateRouteManifestSeed, generateRoutesSeed } from './app-route-seeds.ts';
 import { emitSelectedBackendImports } from './write-app-files.ts';
 
 Deno.test('selected cache backend is carried into the generated app runtime', () => {
@@ -42,4 +42,19 @@ Deno.test('initial route references match the canonical generated leaf shape', (
     routes,
     'tokens: {\n      $route: createRouteReference(routePatterns.design.tokens.$route, {',
   );
+});
+
+Deno.test('initial route seeds include the generated dynamic order route shape', () => {
+  const manifest = generateRouteManifestSeed();
+  const routes = generateRoutesSeed();
+
+  assertStringIncludes(
+    manifest,
+    'orders: {\n        $id: {\n          $route: \'/examples/orders/[id]\'',
+  );
+  assertStringIncludes(
+    routes,
+    'orders: {\n      $id: {\n        $route: createRouteReference(routePatterns.examples.orders.$id.$route, {',
+  );
+  assertStringIncludes(routes, "id: 'examples.orders.$id'");
 });
