@@ -1,9 +1,36 @@
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
+import { buildViteEnvVarName } from '@netscript/aspire/application';
 import { bold, green, red } from '@std/fmt/colors';
 import { join } from '@std/path';
 import type { BuildResult } from '../../../../kernel/domain/deploy/compile-target.ts';
-import type { ResolvedConfig } from '../../../../kernel/domain/resolved-config.ts';
+import type {
+  ResolvedConfig,
+  ResolvedPluginConfig,
+  ResolvedServiceConfig,
+} from '../../../../kernel/domain/resolved-config.ts';
 import type { WindowsBuildOptions } from './build-windows-options.ts';
+
+/** Builds the browser service-discovery environment injected into app prebuilds. */
+export function buildVitePrebuildEnvironment(
+  services: Readonly<Record<string, Pick<ResolvedServiceConfig, 'port'>>>,
+  plugins: Readonly<Record<string, Pick<ResolvedPluginConfig, 'enabled' | 'port'>>>,
+): Record<string, string> {
+  const viteEnv: Record<string, string> = {};
+  for (const [name, service] of Object.entries(services)) {
+    const url = `http://localhost:${service.port}`;
+    const keys = buildViteEnvVarName(name);
+    viteEnv[keys.full] = url;
+    viteEnv[keys.shorthand] = url;
+  }
+  for (const [name, plugin] of Object.entries(plugins)) {
+    if (!plugin.enabled) continue;
+    const url = `http://localhost:${plugin.port}`;
+    const keys = buildViteEnvVarName(name);
+    viteEnv[keys.full] = url;
+    viteEnv[keys.shorthand] = url;
+  }
+  return viteEnv;
+}
 
 export async function runAppPrebuilds(
   config: ResolvedConfig,
@@ -33,24 +60,7 @@ export async function runAppPrebuilds(
         // Build VITE_* env vars for browser service discovery.
         // Mirrors Aspire's WithConfiguredViteHttpReferences — injects service
         // and plugin URLs so Vite bakes correct import.meta.env.* values.
-        const viteEnv: Record<string, string> = {};
-        for (const [name, svc] of Object.entries(config.services)) {
-          const url = `http://localhost:${svc.port}`;
-          // Full format — skip names with hyphens (invalid JS identifiers)
-          if (!name.includes('-')) {
-            viteEnv[`VITE_services__${name}__http__0`] = url;
-          }
-          // Shorthand: VITE_{NORMALISED}_URL (always safe, no hyphens)
-          viteEnv[`VITE_${name.toUpperCase().replace(/-/g, '_')}_URL`] = url;
-        }
-        for (const [name, plugin] of Object.entries(config.plugins)) {
-          if (!plugin.enabled) continue;
-          const url = `http://localhost:${plugin.port}`;
-          if (!name.includes('-')) {
-            viteEnv[`VITE_services__${name}__http__0`] = url;
-          }
-          viteEnv[`VITE_${name.toUpperCase().replace(/-/g, '_')}_URL`] = url;
-        }
+        const viteEnv = buildVitePrebuildEnvironment(config.services, config.plugins);
 
         if (options.verbose) {
           const count = Object.keys(viteEnv).length;
