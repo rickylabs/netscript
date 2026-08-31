@@ -2931,3 +2931,23 @@
   AppHost, backing containers, and owner-labelled relays are expected lease resources, not stale
   leftovers; exact cleanup to Aspire/Docker/relay zero is mandatory before #1747 receives the next
   lease.
+
+## 2026-08-31T00:10:00Z — accepted evaluator evidence preserved; two more leaves ready
+
+- Owner ruling is explicit and prospective-only: every qualifying DeepSeek evaluation already
+  recorded at its exact head remains valid. It must not be rerun, invalidated, or replaced merely
+  because the open-model defaults changed. New default/IMPL evaluation routes to
+  `z-ai/glm-5.3-flash` at max effort; genuinely critical or complex PLAN-EVAL routes to
+  `qwen/qwen3.8-flash` at max effort. PR #1792 is the ready, all-green tooling change that makes
+  those exact ids canonical; until it lands, only prospective evaluator gates may park.
+- Fix PR #1764 is now non-draft, CLEAN/MERGEABLE, `status:ready-merge`, and its second close-gate
+  attempt passed at immutable head `9d8bbb4e96e555462cdd8432883a28d493b051eb`. Its accepted
+  evaluator receipt carried without rerun. Aspire S6 PR #1743 has complete exact-head Phase-B
+  evidence at `32f88f90bb0f710b6edcbf11d332496597ca232e`: PostgreSQL 90/90 and SQLite/Garnet
+  85/85, including controlled Healthy -> Unhealthy -> timeout exit 17 -> Healthy transitions while
+  the real service listeners remained healthy. Metadata and close-gate promotion are the only
+  remaining S6 handoff actions; no evaluator rerun is allowed.
+- The host is at exact runtime zero: `aspire ps` is `[]`, Docker has zero containers, zero volumes,
+  and zero non-default networks. Features #1805 and docs #1803/#1806 are clean draft leaves whose
+  sole parked evidence is prospective GLM evaluation; their supervisors continue immediately into
+  the next feature/docs implementations rather than globally blocking on #1792.

@@ -1571,3 +1571,15 @@ implementation thread.
   exact shipped helpers, and leave the real service checks intact. That proves health scheduling and
   helper semantics without relying on a relay, firewall, network alias, or DCP lifecycle behavior.
 - D-97/D-100 remain infrastructure receipts. Neither may be represented as S6 product acceptance.
+
+## 2026-08-31 — model defaults are prospective, not evidence expiry
+
+- Preserve every qualifying DeepSeek verdict already recorded at an immutable exact head. No lane
+  may turn the GLM/Qwen routing migration into a retroactive reevaluation campaign.
+- Newly dispatched default and IMPL evaluations use `z-ai/glm-5.3-flash` at max effort. Only newly
+  dispatched genuinely critical or complex PLAN-EVAL uses `qwen/qwen3.8-flash` at max effort.
+  While #1792 is not on main, park that new evaluator gate and continue the lane's next independent
+  implementation; never fall back to a redundant DeepSeek run.
+- A green runtime gate plus accepted evaluator evidence still requires honest metadata promotion,
+  but metadata must not manufacture an evaluator rerun. S6 and #1764 are the current examples:
+  exact-head receipts carry, and only acceptance/label/draft/close-gate reconciliation remains.

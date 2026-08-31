@@ -1828,3 +1828,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Features Slice 7 is Tier-A ACCEPTED at `f60c85199` and its new-slice evaluation is active. Fixes
   remains statically ready behind the runtime queue; serial ordering is per orchestrator, never
   global.
+
+## Resume delta — 2026-08-31T00:10:00Z
+
+- Main remains `5197e70b716eafb82fbb12ddb9a910c248ddb86a`. The human-ready CLEAN/MERGEABLE queue is
+  #1758, #1764, #1781, #1792, #1796, #1798, and #1800. Never merge from the harness coordinator;
+  preserve immutable heads and let the human merge operator consume the queue.
+- The owner's final evaluator ruling is durable: all qualifying DeepSeek verdicts already recorded
+  at exact heads remain valid and must not be rerun. GLM 5.3 Flash/max is prospective default/IMPL;
+  Qwen 3.8 Flash/max is prospective critical/complex PLAN-EVAL. Park only a new evaluator gate
+  while #1792 is unmerged; implementation queues continue independently.
+- S6 exact head `32f88f90b` passed run `33343080292` and independent artifact audit: PostgreSQL
+  90/90, SQLite/Garnet 85/85, controlled listener failure/recovery, real listener continuity, and
+  clean artifact upload. Finalize attributed `impl-eval:skip`, issue/PR acceptance, non-draft
+  `status:ready-merge`, and close-gate without reevaluation. #1764 is already complete at
+  `9d8bbb4e9` with close-gate attempt 2 green.
+- Host runtime is exact zero across Aspire, containers, volumes, and non-default Docker networks.
+  #1747 may request the next serialized lease only after its branch-vs-baseline fixture failure is
+  bounded and a fresh exact-zero preflight is repeated.
