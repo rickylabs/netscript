@@ -5310,3 +5310,27 @@
   - The stripped `.llm/runs` artifacts must stay stripped; the brief says so, since a fresh run-dir
     commit would silently undo D-219.
   - Eleventh dead-sender orphan released before launch (`ownerPid 2088174`).
+
+- **D-222a/b — repair relaunched after the launcher correctly refused it, now carrying the
+  coordinator's exact seam design.**
+  - **First launch was REFUSED at `git-safety`, and rightly so:** the worktree had an upstream
+    configured (`origin/fix/aspire-sibling-generator-name-safety`) **and** was dirty — dirty by
+    exactly one file, **the brief I had written into the worktree's run dir**. Two self-inflicted
+    blockers:
+    1. the launcher requires upstream **NONE**;
+    2. writing the brief into a branch whose `.llm/runs` artifacts were deliberately **stripped in
+       D-219** would have re-introduced the very paths the coordinator ordered removed.
+    Fixed both: unset the upstream, deleted the in-worktree run dir, and moved the brief to the
+    session scratchpad. **The brief for an artifact-stripped branch must live outside that branch.**
+  - **Seam design now specified exactly, not left to invention.** The two stale couplings are named —
+    the removed **user-name comments** (`  // --- ${name} (task) ---`) and the **single-quoted**
+    `.withHealthCheck('<key>')` calls — and the replacement is **semantic map-write / health-call
+    boundary discovery**: locate injection points by the registration write into the resource map and
+    the health-check call attached to it, as *structures*, independent of quote style and of any
+    user-name comment.
+  - **Two properties must survive the rewrite**, called out so they are not lost while chasing green:
+    every **fail-closed** `throw new Error(...)` still fires when the seam is genuinely absent, and the
+    **duplicate-registration** assertions still detect a second registration for the same resource.
+  - **CI base recorded:** the failed run `33441258910` was a merge-ref against **old** main
+    `9fbc2317`. The repaired head gets **fresh CI against current main `60ae56af`**; the old run is
+    evidence of the fixture coupling only, not of anything about the current base.
