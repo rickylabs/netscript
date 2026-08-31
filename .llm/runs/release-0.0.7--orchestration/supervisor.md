@@ -1499,3 +1499,14 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Immediate fronts: Features #1762; Fixes #1819/#1365; Internals #1802/#1751; Docs #1796 then
   #1798/#1800 at the shared merge front; Aspire S8 plus its independent static column. Each topic
   must convert completed work into exact-green PRs instead of pausing at routine checkpoints.
+
+## 2026-08-31T03:10:01Z — current merge front
+
+- Main is `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1` after exact-green #1796. Docs now owns #1798
+  as its ordered shared-corpus merge front; #1806 readiness audit may continue concurrently without
+  mutating the corpus.
+- Product fronts remain Features #1762 plus parallel #1805 evaluation, Fixes #1819 plus #1773 plan
+  repair/evaluation, Internals #1802 plus independent harness-only #1753, and Aspire #1747 static
+  convergence plus the S8/S9/S10 static cascade. No lane waits for the docs merge sequence.
+- The only host runtime lease was returned unused and exact zero. A fresh #1747 lease requires the
+  approved semantic union and all static gates first.

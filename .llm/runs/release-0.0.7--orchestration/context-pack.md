@@ -1896,3 +1896,14 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - The next public canary waits for a coherent feature/fix-heavy payload. Current shipping fronts are
   Features #1762, Fixes #1819, Docs #1796, Internals #1802, and Aspire S8. All five supervisors are
   active Opus 5 with Remote Control; Features/Fixes xhigh and the other three high.
+
+## Resume delta — 2026-08-31T03:10:01Z
+
+- Current main is `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`: Docs #1796 merged from exact
+  head `3196187ca` after full fresh CI; #1795 is closed/shipped. Docs advances to #1798 and keeps
+  #1806 readiness preparation parallel without touching shared generated assets.
+- Feature/fix payload acceleration is active: #1762 and #1805 evaluate concurrently on disjoint
+  product surfaces; #1819 and #1773 proceed concurrently with generated-corpus integration ordered.
+  The meaningful next canary remains gated on coherent user-facing features/fixes, not this docs merge.
+- #1747 must first converge the quote-agnostic worker binding with the users+sagas missing-reference
+  union. Its unused runtime lease returned exact zero; no runtime evidence was claimed.

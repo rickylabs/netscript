@@ -3049,3 +3049,20 @@
 - Runtime remains exact zero: Aspire `[]`, Docker containers 0, volumes 0, and non-default networks
   0. The next canary is intentionally held for a coherent feature/fix-heavy payload rather than an
   immediate canary.5 containing only the integration repair.
+
+## 2026-08-31T03:10:01Z — first stale docs carrier shipped; product queues widened safely
+
+- Docs PR #1796 was rebased onto repaired main and regenerated at exact head
+  `3196187ca7018671dcb516105408b4e4c762963d`. The seven-row audit passed: issue #1795 acceptance
+  4/4, zero review threads, accepted DeepSeek docs verdict preserved, docs/source/derivative gates
+  green, and fresh CI run 33352520076 completed check-test/quality/close-gate successfully.
+  Coordinator squash-merged it as `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`; PR and issue are
+  sole `status:shipped`. Docs advanced directly to #1798.
+- Features #1762 resolved its sole generated-corpus conflict and reached a clean current-base head;
+  final product evaluation continues while #1805 evaluates concurrently on a disjoint AI surface.
+  Fixes #1773 converged cleanly and may PLAN-EVAL in parallel with P0 #1819 because CLI scaffold and
+  saga publisher sources are disjoint; generated carriers remain ordered at integration.
+- The #1747 runtime lease started nothing and returned exact zero after current-main generator drift
+  was detected statically. The bounded convergence ruling preserves quote-agnostic binding discovery
+  plus main's users+sagas missing-reference union. Runtime will be re-leased only after that semantic
+  union and static/repo-wide gates are green.
