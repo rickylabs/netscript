@@ -1643,3 +1643,22 @@ implementation thread.
 - Diagnose the full dependency path before patching the reported file or the structured wrapper.
   When a member explicitly declares `compilerOptions.lib`, command flags do not necessarily restore
   an omitted library. Keep member configs aligned with their production parent and test that parity.
+
+## 2026-08-31 — remote Docker startup is not remote Docker endpoint reachability
+
+- Same-path bind visibility and a responsive `DOCKER_HOST=tcp://netscript-dind:2375` are necessary
+  but insufficient for Aspire Phase B when the daemon runs in another network namespace. Docker
+  publishes the selected port on the daemon host; Aspire 13.5.3 currently records and health-checks
+  it as agent-local `localhost`, which is a different host in this topology.
+- The #1747 attempt-2 receipt separates these layers: the PostgreSQL/Garnet/Redis containers were
+  running, while Aspire's PostgreSQL health reported connection refused at `127.0.0.1:19685`.
+  Treat this as endpoint-host/topology infrastructure drift, not a product failure or timeout. Do
+  not repeat the lease until a supported host override or shared network namespace is proven.
+- Official confirmation: microsoft/aspire#14878 documents this exact remote-`DOCKER_HOST`/localhost
+  failure and is a duplicate of #1650, whose maintainer disposition rejects custom Docker-host
+  support. DCP 0.25.13 intentionally binds unqualified publications to `127.0.0.1` on the daemon
+  host. `AppHost__ContainerHostname` and `ASPIRE_ENABLE_CONTAINER_TUNNEL` do not rewrite this
+  host-facing endpoint. The valid NAS correction is `ai-agents` sharing `netscript-dind`'s network
+  namespace while retaining the identical `/home/agent` mount, or a local daemon in `ai-agents`.
+- Cleanup may still leave an explicitly reported persistent volume after `aspire stop --force`.
+  Remove only that exact proven volume, then re-prove all four runtime inventories are zero.

@@ -1946,3 +1946,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
   not modify #1762 product code, `health.ts`, or `run-deno-check.ts`. Internals owns the bounded leaf.
 - #1747 attempt 1 is `interrupted_no_verdict`, exact-zero cleaned, and attempt 2 is authorized only
   in a durable runner at the same head. S9/S10 static convergence continues independently.
+
+## Resume delta — 2026-08-31T04:03:26Z
+
+- Main is `a3e0a5aa8beebbd1f7a488d564d31980a7d74619` after exact-green Docs #1806;
+  #1804/#1806 are shipped. Converge stale-ready #1803 before #1808 because its auth-kv-oauth delta
+  is still absent from main.
+- P0 #1827 is live as draft PR #1828 at bootstrap head `3ef931caa8`; the Codex author must compare
+  CLI E2E libraries to `packages/cli/deno.json` and preserve order `deno.ns`, `deno.unstable`,
+  `dom`. It unblocks #1762 and takes priority over unrelated Internals diagnosis.
+- #1747 attempt 2 is a terminal infrastructure receipt: DinD starts the owned containers and mounts
+  correctly, but Aspire health uses agent-local `127.0.0.1` for a port published on daemon host
+  `netscript-dind`. All preceding gates passed; exact cleanup is zero. Do not retry until supported
+  host rewriting or shared-network topology is proven. Static Aspire work and all other topics keep
+  moving in parallel.
+- #1773 may carry its 4,426/0/19 measured baseline across a proven docs/generated-only delta and run
+  the final current-toolchain Qwen PLAN-EVAL. #1805 has exact-head GLM PASS and must either identify
+  a live augment reviewer or normalize stale metadata and recut close-gate immediately.

@@ -1543,3 +1543,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - #1747 retains the runtime mutex through its same-head durable attempt 2. Attempt 1 had no verdict
   because the shell ceiling killed it; final flow-B runs only after the full suite passes and all
   runtime state returns to zero.
+
+## 2026-08-31T04:00:00Z — active steering after attempt 2
+
+- Attempt 2 supersedes the shell-timeout hypothesis with exact endpoint evidence: stop and clean it,
+  retain no runtime lease, and research a supported `netscript-dind` host override/topology before
+  any retry. Keep S9/S10/S11/S13 static columns active; replace S9's dead/no-op sender rather than
+  resuming it a third time.
+- Internals must keep #1828's author active until the CLI E2E compiler-library parity fix and exact
+  isolated check receipt are pushed. #1802 may resume only in parallel. Features then integrates the
+  merged fix into #1762 without changing #1762 product code.
+- Fixes has no owner boundary on #1773 gate 7: the coordinator accepts carried measurement across
+  the proven docs/generated-only delta. Docs merges #1806, then prioritizes stale-ready #1803 before
+  later corpus leaves. Features resolves #1805's augment label into an identified live review or a
+  fresh exact-green close-gate packet.

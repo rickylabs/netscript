@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "0274c0a707e36ded3b4470a3911315f963e642d4",
+  "currentMainSha": "a3e0a5aa8beebbd1f7a488d564d31980a7d74619",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -162,6 +162,15 @@
           "route": "gpt-5.6-sol/medium",
           "steering": "codex exec resume 01a05164-5ca8-7770-a471-0ce1f00a0171 -- <follow-up>",
           "remoteControlProof": "agentic:codex-status discovers the working thread while the managed NAS Remote Control daemon is running; per-thread phone attachment is pending an explicit supported proof"
+        },
+        {
+          "leaf": "issue1827_cli_e2e_unstable_parity",
+          "threadId": "01a055f7-4afd-7922-bea7-f85136f59ceb",
+          "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1827",
+          "headAtDispatch": "3ef931caa8b67a64c763cd0aaa575964f463e37e",
+          "route": "gpt-5.6-sol/medium",
+          "steering": "deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts --thread-id 01a055f7-4afd-7922-bea7-f85136f59ceb --message <follow-up> --worktree /home/agent/projects/netscript/worktrees/007-leaf-1827",
+          "remoteControlProof": "checked-in agentic runtime thread is visible through the managed NAS Codex Remote Control daemon; implementation remains owned by the Internals Opus supervisor"
         }
       ]
     },
@@ -5335,14 +5344,14 @@
     "terminalTypedErrorWorktreesRemoved": true,
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
-    "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2; identical /home/agent bind visibility is fixed; direct all-interface publications are reachable at netscript-dind:<port>; DCP loopback-only publications require the proven owner-scoped two-hop relay; exact current inventories containers=0 and volumes=0; host Docker remains outside agent authority",
+    "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2; identical /home/agent bind visibility is fixed. #1747 attempt 2 proved Aspire/DCP 0.25.13 still advertises and health-checks remote-daemon publications on agent-local 127.0.0.1, which is unsupported upstream. Required host correction is shared network namespace (ai-agents network_mode service:netscript-dind) or a local daemon. Exact current inventories Aspire=0, containers=0, volumes=0, custom networks=0; host Docker remains outside agent authority",
     "aspireMcpHelpers": "not counted as AppHost runtimes; no Aspire applications are active",
     "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD client/server 28.5.2; fs.inotify.max_user_instances 1024",
     "loadState": "stable after tini PID1 maintenance restart; zombie count 0; current inventories Aspire=0, Docker containers=0, Docker volumes=0; ownership audit reduced registered worktrees from 108 to 70 by removing 38 clean terminal registrations without deleting branches, while 60 live/required and 10 dirty inspection cases were preserved; fixes relinquished maintenance-only #1758 convergence to the sole internals owner",
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-30T22:03:52.000Z"
+    "verifiedAt": "2026-08-31T04:00:00.000Z"
   },
-  "updatedAt": "2026-08-30T22:24:30.000Z"
+  "updatedAt": "2026-08-31T04:03:26.000Z"
 }

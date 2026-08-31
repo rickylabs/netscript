@@ -3127,3 +3127,35 @@
   `generated.quality-negative`; every preceding recorded gate passed and no final report exists.
   Four-part cleanup returned exact zero. One same-head retry is authorized in a durable tmux runner;
   this is transport recovery, not a product retry or overlapping lease.
+
+## 2026-08-31T04:00:00Z — parallel fronts enforced; #1747 yields exact remote-Docker endpoint receipt
+
+- Internals initially acknowledged P0 #1827 but continued an unrelated #1802 root-suite diagnosis.
+  The coordinator interrupted that stall and required immediate parallel dispatch. Draft PR #1828
+  now exists from current main at `3ef931caa8b67a64c763cd0aaa575964f463e37e`; its checked-in Codex
+  author is active. Before its first product commit, the author was corrected to use
+  `packages/cli/deno.json` — not repo-root `deno.json` — as the canonical compiler-library oracle,
+  preserving exact order `deno.ns`, `deno.unstable`, `dom`.
+- #1747 attempt 2 passed every recorded gate through `runtime.aspire-start`, including the generated
+  quality/check/lint/fmt gates, then produced a decisive infrastructure failure at `database.init`.
+  Aspire 13.5.3 described PostgreSQL as `tcp://localhost:19685` and reported both
+  `postgres_check` and `postgres_listener` unhealthy on `127.0.0.1:19685`; the DinD container itself
+  was running and published that port on the separate `netscript-dind` host. The remaining defect is
+  endpoint-host rewriting/network topology, not bind visibility, Docker startup, quota, product code,
+  or a shell timeout. `aspire stop --force` stopped the exact AppHost; its one proven persistent
+  volume was removed after Aspire cleanup reported it, returning Aspire, containers, volumes, and
+  custom networks to exact zero. No further runtime lease is granted until a supported correction is
+  proven; Aspire static slices continue in parallel and the twice-no-op S9 sender is replaced.
+- Fixes' #1773 gate-7 baseline framing was ruled coordinator-side: carry the measured 4,426/0/19
+  counts across the docs/generated-only ancestry to `ccd63a085`, with explicit diff proof and no
+  claim of fresh measurement. The final Qwen 3.8 Flash PLAN-EVAL proceeds while #1365 and #1677
+  continue independently.
+- Docs #1806 is exact-head local-green at `d91b0ec5b`; fresh CI is completing. Once merged, stale-ready
+  #1803 is the next corpus convergence front before #1808 because its auth-kv-oauth change is not on
+  main and is not contained in #1806. Features #1805 has exact-head GLM IMPL-EVAL PASS; its unexplained
+  `status:augment-review` is being resolved or normalized, followed by a fresh close-gate run.
+- Fresh CI run `33355312418` completed terminal green for #1806. The coordinator rechecked the
+  immutable head/base, four issue acceptance boxes, complete PR DoD, zero review threads, byte-identical
+  GLM-evaluated page/mapping, clean regenerated corpus/provenance, and exact delta, then squash-merged
+  #1806 as `a3e0a5aa8beebbd1f7a488d564d31980a7d74619`. #1804/#1806 are closed/merged with sole
+  `status:shipped`; all supervisors received the new main and Docs began #1803 convergence.
