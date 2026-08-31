@@ -1,6 +1,7 @@
 import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
 import type { ToolName } from './tool-types.ts';
 import { CLI_EXECUTION_IDENTITY_JSON_SCHEMA } from './command-executor-port.ts';
+import type { OperationAccessSummary } from './openapi/operation-access.ts';
 import * as exportSurfaceShapes from '../application/export-surfaces/export-surface-tool-contracts.ts';
 import {
   GUIDANCE_CONFIDENCE_LEVELS,
@@ -27,6 +28,27 @@ const objectSchema = (
 const stringProperty = { type: 'string' } as const;
 const limitProperty = { type: 'integer', minimum: 1, maximum: 100 } as const;
 const searchLimitProperty = { type: 'integer', minimum: 1, maximum: 20 } as const;
+const operationAccessValueProperty = { type: 'string', minLength: 1, maxLength: 2000 } as const;
+const operationAccessValuesShape = {
+  type: 'array',
+  maxItems: 50,
+  items: operationAccessValueProperty,
+} as const;
+const operationAccessExample: OperationAccessSummary = {
+  authentication: 'required',
+  securitySchemes: ['bearerAuth'],
+  scopes: ['catalog:read'],
+  roles: ['reader'],
+};
+const operationAccessShape = {
+  ...objectSchema({
+    authentication: { enum: ['none', 'optional', 'required'] },
+    securitySchemes: operationAccessValuesShape,
+    scopes: operationAccessValuesShape,
+    roles: operationAccessValuesShape,
+  }, ['authentication', 'securitySchemes', 'scopes', 'roles']),
+  examples: [operationAccessExample],
+};
 const isObject = (value: unknown): value is Record<string, unknown> => isRecord(value);
 const doctorCountsShape = objectSchema({
   pass: { type: 'integer' },
@@ -334,7 +356,18 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['services', 'sources', 'truncated']),
   list_service_operations: objectSchema({
     service: stringProperty,
-    operations: { type: 'array', maxItems: 49 },
+    operations: {
+      type: 'array',
+      maxItems: 49,
+      items: objectSchema({
+        operation: stringProperty,
+        method: stringProperty,
+        path: stringProperty,
+        summary: stringProperty,
+        tags: { type: 'array', maxItems: 50, items: stringProperty },
+        access: operationAccessShape,
+      }, ['operation', 'method', 'path', 'summary', 'tags']),
+    },
     truncated: { type: 'boolean' },
   }, ['service', 'operations', 'truncated']),
   get_operation_schema: objectSchema({
@@ -346,6 +379,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     schema: { type: 'object' },
     curlExample: stringProperty,
     authNote: stringProperty,
+    access: operationAccessShape,
   }, ['service', 'operation', 'method', 'path', 'view', 'schema', 'curlExample', 'authNote']),
 };
 

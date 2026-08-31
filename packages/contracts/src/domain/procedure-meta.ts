@@ -18,7 +18,10 @@ export type NetScriptAuthenticationRequirement = 'none' | 'optional' | 'required
  * @example
  * ```ts
  * const metadata: NetScriptProcedureMeta = {
- *   access: { authentication: 'required' },
+ *   access: {
+ *     authentication: 'required',
+ *     authorization: { scopes: ['orders:read'], roles: ['operator'] },
+ *   },
  * };
  * ```
  */
@@ -27,5 +30,12 @@ export interface NetScriptProcedureMeta {
   readonly access?: {
     /** Whether callers must provide authentication for the procedure. */
     readonly authentication?: NetScriptAuthenticationRequirement;
+    /** Authorization requirements declared by the procedure contract. */
+    readonly authorization?: {
+      /** Scopes required by the procedure. */
+      readonly scopes?: readonly string[];
+      /** Roles required by the procedure. */
+      readonly roles?: readonly string[];
+    };
   };
 }
