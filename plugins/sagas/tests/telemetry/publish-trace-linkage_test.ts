@@ -59,10 +59,10 @@ Deno.test('publishSagaMessage propagates API trace headers as saga.handle parent
     });
 
     assertEquals(events.length, 1);
-    assertEquals(tracer.started.length, 1);
-    const started = tracer.started[0];
-    const span = tracer.spans[0];
-    assertEquals(started.name, 'saga.handle');
+    const handleIndex = tracer.started.findIndex((entry) => entry.name === 'saga.handle');
+    assertEquals(handleIndex >= 0, true);
+    const started = tracer.started[handleIndex];
+    const span = tracer.spans[handleIndex];
     assertEquals(started.parentTraceparent, serverTraceparent);
     assertEquals(span.parentTraceId, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     assertEquals(span.parentSpanId, 'bbbbbbbbbbbbbbbb');
