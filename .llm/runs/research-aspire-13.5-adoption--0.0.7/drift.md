@@ -4859,3 +4859,29 @@
   - Sixth dead-sender orphan released first (`ownerPid 1028441`).
   - **#1844 is the sole accurate Garnet issue**; duplicate #1843 closed by the coordinator. S8's seed
     defect is unrelated and does not wait on it.
+
+- **D-206 — S9's repair WORKED, and its rerun reproduced S8's `database.seed` failure on an unrelated
+  slice. The seed defect is very likely shared, not S8's.**
+  - **S9 sqlite tier at `29eed9ef9`: `passed=84 failed=1`** — up from **37 passed** before the repair.
+    The workspace-identity fix unblocked 47 further gates, which is the strongest possible
+    confirmation that D-194/D-200 diagnosed the right cause. New residual failure at
+    `behavior.otel.stream-consumer` (FAILED 281 ms) — a *newly reachable* gate, not a regression.
+  - **S9 docker tier at `29eed9ef9`: `passed=42 failed=1`, `database.seed`, FAILED 1873 ms, exit 16.**
+    **Identical gate, identical exit code, identical position** to S8's failure
+    (`33404324013`/`99545166227`, 1813 ms, exit 16).
+  - **S9 shares none of S8's typed `<db>-cli` surface.** Two independent slices failing identically at
+    `database.seed` is the "exact-main control reproduces → split a precise shared issue" branch of
+    the coordinator's ruling, reached faster and with stronger evidence than a main-only control would
+    have given.
+  - **Steered the running S8 thread** (`01a05893-d8e1`) with this evidence rather than letting it spend
+    a cycle proving S8 guilty. Deliberately framed as *verify, don't accept*: it must compare the
+    Prisma **`code` + `meta`** across both artifacts (identical code across unrelated heads is the
+    proof; different codes would mean two defects sharing a gate), confirm S8's surface is **absent**
+    from `29eed9ef9`, and still run the `origin/main` diff so the shared-issue report can describe
+    `seed` independent of S8.
+  - If confirmed shared: **no product bytes move in #1754**, its delta is exonerated, and the agent
+    writes the finding to its run dir for me to file as its own issue.
+  - **This also re-frames the lane's picture.** Of the failures found since the runtime tiers finally
+    started executing, exactly one so far (S9's workspace identity) was a genuine slice defect; the
+    others — garnet readiness (#1844) and now `database.seed` — look like **pre-existing conditions
+    that were invisible while the runtime tiers could never run**.
