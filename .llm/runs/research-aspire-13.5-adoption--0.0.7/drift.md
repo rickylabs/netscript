@@ -5078,3 +5078,45 @@
     set.
   - **Whole cascade complete: S8 `d1c6d8b54`, S9 `a8cf585b0`, S10 `21a0bfec6`, all on current `main`
     lineage, all three verdicts intact, zero re-evaluations spent.**
+
+- **D-215 — MY ERROR, and it invalidated D-209. #1744's "fully green" run was a POLICY SKIP, not a
+  pass. The branch-base hypothesis is refuted; S8-containment is the real discriminator.**
+  - **What went wrong.** Job `99558230687` (#1744 docker tier) has conclusion **`success`**, and I
+    reported it as "the first complete runtime pass in this programme". Its steps say otherwise:
+    `Skipped by policy=success`, then `Checkout=skipped`, `Setup Deno=skipped`,
+    `Install Aspire CLI=skipped`, `Full scaffold runtime E2E=skipped`. It never checked out and never
+    ran the suite. The #1152 classifier correctly judged S7's diff as not requiring the runtime tiers.
+    **A skipped-by-policy job reports `success`.** I read the conclusion instead of the steps.
+  - **Direct analogue to a lesson already in this ledger.** D-192 records that **`cancelled` is not a
+    verdict**. The same is now true in the other direction: **`success` is not a verdict either unless
+    the suite step actually executed.** Both must be checked at the *step* level, not the job level.
+  - **Consequences, all corrected:** D-209's four-point table was wrong — #1744 was never a seed or a
+    garnet data point. I retracted the false garnet "baseline" on **#1844** in writing, restating that
+    garnet has still **never been observed passing**, and withdrawing my suggestion that its priority
+    could drop.
+  - **Refutation confirmed by the cascade itself:** S8 at its converged head **`d1c6d8b54`** — now on
+    `main` `6c195acaf`, *newer* than #1747's base — **still fails `database.seed`** (1811 ms,
+    `passed=41 failed=1`). Branch base is not the cause.
+  - **The real discriminator is S8-containment**, and base was merely collinear with it in my sample:
+
+    | Head | contains S8 typed-db surface | `database.seed` |
+    | --- | --- | --- |
+    | #1747 `2032d4ed7` | **no** | **PASS** |
+    | S8 `bc838a0b3` / `d1c6d8b54` | yes | FAIL / FAIL |
+    | S9 `a8cf585b0` | yes | FAIL |
+    | S10 `21a0bfec6` | yes | FAIL |
+
+    Tested by `git cat-file -e <head>:packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts`.
+    S9 and S10 contain S8's 13 commits, so all three failing heads share exactly one thing S8 has and
+    #1747 lacks. And because S8's own product blobs were **20/20 identical** across convergence, the
+    failure surviving convergence is precisely what this explanation predicts.
+  - **The original D-205 direction was right and I steered it away from the answer.** My D-206/D-207
+    steering told the agent S8 was "almost certainly exonerated" on cross-slice reproduction — but S9
+    and S10 *contain* S8, so they were never independent controls. The only true control in the set is
+    #1747, and it passes.
+  - **Audited the rest:** runs `33404321608`, `33404324013`, `33415203923` all really executed their
+    `Full scaffold runtime E2E` step. Only #1744's was a skip, so no other conclusion in this ledger
+    rests on a phantom run.
+  - **The cascade was not wasted** — all three slices are now on current `main` with every verdict
+    carried and zero product bytes changed — but it was executed on reasoning that did not hold, and
+    that is on me.
