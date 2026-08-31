@@ -85,3 +85,34 @@ would be documentation-only. Left for Slice 4's author to add if useful, not req
   agentic format wrapper passed over 173/173 files with exit 0.
 - **Evidence:** `worklog.md` Slice 7 blocked-gate rows; structured lint `REAL_EXIT=1`, structured
   format rerun `REAL_EXIT=0`.
+
+## 2026-08-31 — parked-head root-suite failure was an unidentified flake
+
+- **What:** One root-suite run at `de24161b6` reported 4,463 passed / 1 failed / 19 ignored, but its
+  output was not persisted, so the failing test name cannot be recovered.
+- **Expected:** A deterministic regression repeats on the identical tree, and every root-suite
+  failure has a durable structured report identifying it.
+- **Actual:** The supervisor ran the identical command twice at the identical head with direct exit
+  capture and saved JSON reports; both returned exit 0 with 4,464 passed / 0 failed / 19 ignored.
+  The totals remained 4,483, proving one result flipped rather than a test being added or removed.
+- **Severity:** minor test/evidence flake; not a #1751 regression.
+- **Action:** Record it as unidentified and do not speculate about its test identity. Every root
+  suite from this point uses `--output <path> --pretty`; the current integrated run follows that
+  rule. The sender-ownership live-host-race hypothesis is rejected because those tests use injected
+  temp roots and explicitly forbid the production sender registry.
+- **Evidence:** Supervisor reruns at `de24161b6`; integrated root report path in `worklog.md`.
+
+## 2026-08-31 — current main carries a stale MCP export-surface corpus
+
+- **What:** After fetching and merging current `origin/main`
+  (`62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7`) exactly once, the requested
+  `deno task check:mcp-export-corpus` freshness gate exits 1.
+- **Expected:** Product export surfaces and their checked-in MCP corpus agree at the integrated
+  head.
+- **Actual:** The checker reports `MCP export-surface corpus is stale; run deno task
+  gen:mcp-export-corpus`. The other three requested generated freshness gates pass. #1751 changes
+  only internal agentic tooling and run artifacts, not package export surfaces or this corpus.
+- **Severity:** significant inherited gate drift, outside this leaf's declared manifest.
+- **Action:** Do not regenerate or commit the corpus in #1751. Record the red gate truthfully for
+  supervisor/coordinator disposition; no launcher/parser or agentic README edit is made.
+- **Evidence:** `worklog.md` current-main integration table; `REAL_EXIT=1` direct capture.

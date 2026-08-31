@@ -135,6 +135,10 @@ when the child exit is non-zero.
 | 2026-08-31 | 7 | Integration/docs drafted | Updated the current agentic README with three-signal provenance-bound staleness, preserve-only launch, explicit audited sender-lease repair, and the non-zero resume rejection contract. No main integration, E2E, Aspire, Docker, or browser gate was run. |
 | 2026-08-31 | 7 | Static gate blocked | Direct capture produced check `REAL_EXIT=0` over 173 files, lint `REAL_EXIT=1` with 14 findings across 9 files outside the declared manifest, and initial format `REAL_EXIT=1` for the Slice 6 `codex-resume.ts` import layout. The authorized in-manifest formatting fix made the repeated format gate `REAL_EXIT=0` over 173 files. |
 | 2026-08-31 | 7 | Blocked handoff | Per the file ceiling, no unrelated lint source was edited. The full agentic test gate, commit, explicit-refspec push, and PR comment were not run because the required lint gate cannot pass within scope. See `drift.md`. |
+| 2026-08-31 | 7 | Landed | Slice 7 documentation and the declared formatting-only source correction landed at `1cf52be67`; the branch later parked at integration commit `de24161b6`. |
+| 2026-08-31 | integration | Parked flake resolved | Supervisor reran the identical root-suite command twice at `de24161b6`, both exit 0 with 4,464 passed / 0 failed / 19 ignored. The earlier 4,463/1/19 result is an unidentified flake; its identity is unrecoverable because that original run had no saved report. Future root runs persist `--output` reports. |
+| 2026-08-31 | integration | Current main merged | Captured all six protected tests plus `deno.lock`, fetched `origin/main` as `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7`, and merged it exactly once in `2bf9ca1b2`. All seven post-merge blobs match pre-merge byte-for-byte. |
+| 2026-08-31 | integration | Revalidation | Root suite 4,498/0/19 and agentic suite 531/531 passed; agentic check/lint/fmt and `arch:check` passed; three generated-corpus checks passed; MCP export-corpus freshness alone failed outside this leaf's scope. Every command used direct `out=$(cmd 2>&1); rc=$?` capture, never a pipeline. |
 
 ## Decisions
 
@@ -197,6 +201,39 @@ when the child exit is non-zero.
 | --- | --- | --- | --- |
 | Compatibility wrappers | NOT_RUN | Planned Slices 6-7 | Existing command flags/task remain stable. |
 | Scaffold/release consumer | N/A | Scope | No generated/published surface. |
+
+### Current-main integration evidence (`2bf9ca1b2`)
+
+The root report is persisted at
+`.llm/tmp/fix-agentic-sender-lease-recovery--1751/integration-2bf9ca1b2/root-suite.json`; the scoped
+agentic report is beside it as `agentic-suite.json`. `.llm/tmp` is ignored and neither report is
+committed. Every exit below was captured directly with `out=$(cmd 2>&1); rc=$?`; no pipeline was
+used.
+
+| Gate | Exit | Result |
+| --- | ---: | --- |
+| Root structured suite (`--output .../root-suite.json --pretty`) | 0 | 4,498 passed / 0 failed / 19 ignored / 4,517 total |
+| Full `.llm/tools/agentic` suite (`--output .../agentic-suite.json --pretty`) | 0 | 531 passed / 0 failed / 0 ignored |
+| Scoped agentic check | 0 | 174 files, 2 batches, 0 failed batches, 0 diagnostics |
+| Scoped agentic lint with `jsr-package-settings.json` | 0 | 174/174 processed, 0 findings |
+| Scoped agentic format | 0 | 174/174 processed, 0 findings |
+| `deno task arch:check` | 0 | No blocking dependency or doctrine findings; existing warnings remain non-fatal |
+| `deno task check:mcp-export-corpus` | 1 | Stale MCP export-surface corpus; out of #1751 scope, not regenerated |
+| `deno task check:assets-barrel` | 0 | Generated asset barrels fresh; no diff left behind |
+| `deno task check:agent-docs-prose` | 0 | `fresh: true`, no stale paths |
+| `deno task check:publish-assets` | 0 | Publish assets fresh |
+| `git diff --exit-code -- deno.lock` | 0 | No lockfile diff; blob stayed `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2` |
+| Raw `git status --short --branch` before artifact edits | 0 | Clean integrated worktree |
+| Raw `git diff --check` before artifact edits | 0 | No whitespace errors |
+
+Protected tests were captured independently before and after the merge and remained:
+
+- `sender-ownership_test.ts` — `74b0ba6118ec4961ed50da639791fe52e3faa09a`
+- `sender-lease-repair_test.ts` — `7be38302ac6ed20f29571213d18172283e1aded5`
+- `local-sender-lease-repair-adapter_test.ts` — `2e2817d0c27628e0f9e1ca922c47ec35738102ce`
+- `codex-thread-read_test.ts` — `d3ca0b51fcb87aeee81e4202e5f527ed569fba12`
+- `agentic-runtime_test.ts` — `7113e271dfa15e9f2dc53b6922c4d5055e086430`
+- `codex-resume_test.ts` — `546b5f0185876fd51c9b5ee28b57a19fe37562b7`
 
 ## Handoff Notes
 

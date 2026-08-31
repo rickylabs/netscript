@@ -6,18 +6,26 @@
 | --- | --- |
 | Run ID | `fix-agentic-sender-lease-recovery--1751` |
 | Branch | `fix/agentic-sender-lease-recovery` |
-| Current phase | `implement` — Slice 7 blocked on out-of-manifest full-agentic lint findings |
+| Current phase | `implement` — current-main integration and revalidation complete; one inherited generated-corpus gate is red |
 | Archetype | Operational Archetype 6 — CLI / Tooling |
 | Scope overlays | none |
 
 ## Current State
 
-Slices 1-6 are accepted through `00877bcbd`; all six protected RED test blobs are unchanged, the
-resume known-negative is green, and the supervisor recorded 528/528 full agentic tests. Slice 7's
-README documentation is drafted. The required full agentic check passes over 173 files and format
-passes over 173 files after an authorized formatting-only fix in `codex-resume.ts`, but lint exits 1
-with 14 findings across 9 files outside this leaf's declared manifest. Work is stopped before the
-full test gate, commit, push, or PR comment pending coordinator rescope or upstream lint repair.
+All seven implementation slices are landed through `1cf52be67`. The branch was parked at
+`de24161b6`; its previously reported single root-suite failure did not reproduce in either of two
+supervisor reruns at that identical head (both 4,464 passed / 0 failed / 19 ignored, exit 0), so it
+is recorded as an unidentified flake whose test identity is unrecoverable because the original run
+had no saved report.
+
+On resume, the six protected test blobs and `deno.lock` were captured before integration. The
+then-current `origin/main` was fetched as `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7` and merged
+exactly once in `2bf9ca1b2114d12547fd988aaaea8a53c9aa95b7`. All seven pre/post blobs are byte-identical.
+The integrated root suite is green with a persisted report (4,498 passed / 0 failed / 19 ignored),
+the agentic suite is 531/531, scoped check/lint/fmt and `arch:check` pass, three of four generated
+freshness checks pass, and `deno.lock` remains unchanged. `check:mcp-export-corpus` alone exits 1
+because the integrated MCP export-surface corpus is stale; it is outside this leaf's authorized
+paths and was not regenerated.
 
 ## Completed
 
@@ -40,22 +48,25 @@ full test gate, commit, push, or PR comment pending coordinator rescope or upstr
 - Captured scoped structured check/lint/fmt passes for the one Slice 5 test file.
 - Landed Slice 6 GREEN at `00877bcbd`; the supervisor verified D8, all six protected blobs, Slice 5
   at 2/2, and the full agentic suite at 528/528.
-- Drafted the final README safety and operator guidance.
-- Captured Slice 7 structured check PASS (173 files, exit 0) and format PASS after the declared-file
-  correction (173 files, exit 0).
+- Landed Slice 7 documentation and the declared formatting correction at `1cf52be67`.
+- Integrated fetched `origin/main` `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7` exactly once.
+- Reverified all six protected test ceilings and `deno.lock` before and after the merge.
+- Persisted the integrated root-suite report under `.llm/tmp/`; all 4,517 results are accounted for.
+- Completed the requested integrated-head gate set without E2E, Aspire, Docker, browser, live
+  sender-registry, or thread-message activity.
 
 ## In Progress
 
-- Slice 7 is blocked because the required structured lint gate reports 14 findings across 9 files
-  outside the approved manifest. No unrelated source edit is authorized.
+- Handoff is blocked only on the inherited stale MCP export-surface corpus gate. No out-of-scope
+  corpus regeneration is authorized in #1751.
 
 ## Next Steps
 
-1. Coordinator chooses either to land the unrelated agentic lint repairs elsewhere or explicitly
-   rescope this leaf's manifest.
-2. Resume Slice 7 only after the full agentic lint command can produce a green covered verdict.
-3. Then run the full agentic suite and raw Git checks, finalize artifacts, commit, explicitly push,
-   post the Slice 7 PR comment, and hand off for evidence freeze/Tier-A/IMPL-EVAL.
+1. Supervisor reviews the current-main integration evidence and the inherited
+   `check:mcp-export-corpus` failure.
+2. The corpus-owning lane regenerates/lands the stale artifact, or the coordinator records its
+   disposition; #1751 must not mutate that generated surface.
+3. Supervisor owns evidence freeze, Tier-A, readiness/labels, and IMPL-EVAL.
 
 ## Key Decisions
 
@@ -73,33 +84,32 @@ full test gate, commit, push, or PR comment pending coordinator rescope or upstr
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/tools/agentic/README.md` | modified | Final operator and safety documentation, not committed. |
-| `.llm/tools/agentic/codex/codex-resume.ts` | modified | Authorized formatting-only correction exposed by the full format gate, not committed. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Slice 6 acceptance and Slice 7 blocker evidence. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current blocked handoff. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/drift.md` | modified | Out-of-manifest lint blocker. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Current-main integration and exact gate evidence. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current handoff state. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/drift.md` | modified | Unidentified flake and inherited corpus-staleness records. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | BLOCKED | Check: 173 files, exit 0. Format: 173 files, exit 0 after in-scope fix. Lint: 173 files, 14 findings across 9 out-of-manifest files, exit 1. |
-| Fitness | Plan-Gate PASS; Slice 7 incomplete | `plan-eval-cycle-2.md`; no Tier-A handoff until required gates pass. |
-| Runtime | PASS at Slice 6 head | Supervisor: Slice 5 2/2 and full agentic 528/528 at `00877bcbd`. Slice 7 full suite not run after lint blocker. |
-| Consumer | PASS at Slice 6 head | Resume output and compatibility behavior verified by supervisor; final docs are drafted. |
+| Static | PASS | Agentic check/lint/fmt: 174 files, exits 0; `arch:check` exit 0; diff/status/lock checks exit 0. |
+| Runtime | PASS | Root 4,498/0/19 and agentic 531/531, both exit 0; root JSON report persisted. |
+| Generated freshness | BLOCKED upstream | MCP export corpus exit 1; assets barrel, agent-docs prose, and publish assets exit 0. |
+| Consumer | PASS | Resume output/exit compatibility and explicit repair behavior remain covered; protected tests unchanged. |
 
 ## Open Questions
 
-- Whether the nine unrelated lint files may be repaired in this leaf is a coordinator rescope
-  decision; current authority forbids editing them.
+- Whether the inherited stale MCP export-surface corpus must be repaired before this PR's evidence
+  freeze is a supervisor/coordinator disposition. Repair is outside this leaf's authorized paths.
 
 ## Drift and Debt
 
-- Drift: owner-provided Codex planning route, unavailable expected `rtk` binary, and the root lint
-  config's `.llm/` exclusion; all minor and recorded in `drift.md`.
+- Drift: owner-provided Codex planning route, unavailable expected `rtk` binary, root lint config's
+  `.llm/` exclusion, the unidentified parked-head root flake, and current-main MCP corpus staleness;
+  all are recorded in `drift.md`.
 - Debt: none created or closed.
 
 ## Commits
 
-- Slice 6 GREEN is `00877bcbd`. Slice 7 has no commit because its required lint gate is blocked.
-  V3 has no `commits.md`.
+- Slice 6 GREEN is `00877bcbd`; Slice 7 is `1cf52be67`; parked integration is `de24161b6`; current
+  main integration is `2bf9ca1b2`. V3 has no `commits.md`.
