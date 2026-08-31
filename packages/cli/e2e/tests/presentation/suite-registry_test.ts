@@ -130,6 +130,11 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_FMT_CHECK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_ADD_AI), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_LOCAL_SOURCE), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN),
+    true,
+    'the generated data-screen gate must be selected into scaffold.runtime',
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_UI_AI_CHECK), true);
   assertEquals(
     runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS),
@@ -168,6 +173,14 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(aiInstallIndex < appsettingsIndex, true);
   assertEquals(appsettingsIndex < runtimeSchemasIndex, true);
   assertEquals(runtimeSchemasIndex < generatedCheckIndex, true);
+  const dataScreenIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN
+  );
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.SCAFFOLD_INIT) < dataScreenIndex,
+    true,
+  );
+  assertEquals(dataScreenIndex < generatedCheckIndex, true);
   assertEquals(
     runtime.gates.findIndex((gate) => gate.id === GATE.GENERATED_SAGAS_REGISTRY) <
       runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE),

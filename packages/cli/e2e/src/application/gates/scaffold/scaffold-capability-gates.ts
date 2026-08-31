@@ -23,6 +23,7 @@ import { createListenerReadinessGates } from './runtime/listener-readiness-gates
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
 import { createServiceEnvironmentGates } from './service-env/service-env-gates.ts';
 import { createUiAiGates } from './ui-ai-gates.ts';
+import { createUiDataScreenGates } from './ui-data-screen-gates.ts';
 
 /** Build the scaffold capability gate list. */
 export function createScaffoldCapabilityGates(
@@ -43,6 +44,7 @@ export function createScaffoldCapabilityGates(
   return [
     ...createPreflightGates(),
     ...createScaffoldGates(state),
+    ...createUiDataScreenGates(),
     ...createPluginContractGates(),
     ...createUiAiGates(),
     ...offlineDatabaseGates,

@@ -51,6 +51,7 @@ const RUNTIME_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
   GATE.SCAFFOLD_INIT,
+  GATE.SCAFFOLD_UI_DATA_SCREEN,
   'scaffold.plugin.worker',
   'scaffold.plugin.saga',
   'scaffold.plugin.trigger',
