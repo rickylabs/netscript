@@ -14,9 +14,9 @@ surface reported by `deno doc`. For the full index of packages and plugins retur
 > **ephemeral ports** (`0`) for the dashboard, OTLP, and resource-service endpoints, so
 > `aspire start --isolated` (an upstream Aspire CLI flag) configures randomized ports and isolated
 > user secrets (the host ports of container resources, however, are not guaranteed unique across
-> isolated starts without explicit port configuration). Frontend **app** resources also configure
-> `withBrowserLogs()` when the `Aspire.Hosting.Browsers` package is present, forwarding browser
-> console output into the Aspire dashboard.
+> isolated starts without explicit port configuration). The scaffold always pins the
+> `Aspire.Hosting.Browsers` package, and generated frontend **app** resources unconditionally
+> configure `withBrowserLogs()`, forwarding browser console output into the Aspire dashboard.
 >
 > **13.5 AppHost configuration contracts:**
 >

@@ -1,6 +1,8 @@
 /** Guards genuinely textual documentation policy against surface drift. */
 
 import { resolve } from '@std/path';
+import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts';
+import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
 
 const root = new URL('../../../', import.meta.url);
 
@@ -25,6 +27,58 @@ export const FORBIDDEN_GOLDEN_PATH_TERMS: readonly string[] = [
   '@contracts',
   '@/lib/',
 ];
+
+const ASPIRE_SCAFFOLD_DOC_PINS = {
+  sdk: SCAFFOLD_VERSIONS.ASPIRE_SDK,
+  postgres: SCAFFOLD_ASPIRE_INTEGRATIONS.POSTGRES,
+  redis: SCAFFOLD_ASPIRE_INTEGRATIONS.REDIS,
+  browsers: SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS,
+} as const;
+
+/** Keep the literal public scaffold sample and prose aligned with the live CLI pins. */
+export function checkAspireScaffoldVersionDocs(
+  explanation: string,
+  deployLocal: string,
+): void {
+  const renderedSample = explanation.replaceAll('\\n', '\n').replaceAll('\\"', '"');
+  const normalizedExplanation = explanation.replace(/\s+/g, ' ');
+  const normalizedDeployLocal = deployLocal.replace(/\s+/g, ' ');
+
+  requireText(
+    renderedSample,
+    `"sdk": {\n    "version": "${ASPIRE_SCAFFOLD_DOC_PINS.sdk}"\n  }`,
+    'docs/site/explanation/aspire.md',
+  );
+  for (
+    const integration of [
+      ASPIRE_SCAFFOLD_DOC_PINS.postgres,
+      ASPIRE_SCAFFOLD_DOC_PINS.redis,
+      ASPIRE_SCAFFOLD_DOC_PINS.browsers,
+    ]
+  ) {
+    requireText(
+      renderedSample,
+      `"${integration.PACKAGE_ID}": "${integration.VERSION}"`,
+      'docs/site/explanation/aspire.md',
+    );
+  }
+  requireText(
+    normalizedExplanation,
+    `The current <code>netscript init</code> scaffold emits <code>${ASPIRE_SCAFFOLD_DOC_PINS.sdk}</code>`,
+    'docs/site/explanation/aspire.md',
+  );
+  requireText(
+    normalizedDeployLocal,
+    `The default scaffold pins the Aspire SDK to <code>${ASPIRE_SCAFFOLD_DOC_PINS.sdk}</code>`,
+    'docs/site/orchestration-runtime/how-to/deploy-local-aspire.md',
+  );
+  forbidText(explanation, '13.4.6', 'docs/site/explanation/aspire.md');
+  forbidText(
+    deployLocal,
+    '13.4.6',
+    'docs/site/orchestration-runtime/how-to/deploy-local-aspire.md',
+  );
+}
 
 /** Apply the golden-path vocabulary policy to one source or shipped-corpus document. */
 export function checkForbiddenGoldenPathTerms(text: string, location: string): void {
@@ -271,6 +325,12 @@ export async function runAccuracyCheck(): Promise<void> {
   const publicDocs = await Promise.all(sagaPagePaths.map((p) => read(p)));
   checkSagaVocabulary(publicDocs, sagaPagePaths);
 
+  const [aspireExplanation, deployLocalAspire] = await Promise.all([
+    read('docs/site/explanation/aspire.md'),
+    read('docs/site/orchestration-runtime/how-to/deploy-local-aspire.md'),
+  ]);
+  checkAspireScaffoldVersionDocs(aspireExplanation, deployLocalAspire);
+
   const cliReference = await read('docs/site/cli-reference.md');
   const commandReferenceSources = await Promise.all(
     COMMAND_REFERENCE_PATHS.map((path) => read(path)),
@@ -301,7 +361,7 @@ export async function runAccuracyCheck(): Promise<void> {
   }
 
   console.log(
-    `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, ${goldenPathDocs.pageCount} published source pages, ${
+    `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, live Aspire scaffold pins, ${goldenPathDocs.pageCount} published source pages, ${
       Object.keys(shippedCorpus.files).length
     } shipped corpus files, one query dialect exception page, mutation-map columns, ${commandReference.documentedCount}/${commandReference.auditedCount} root/direct public commands from ${commandReference.recursiveCount} recursive paths, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
   );

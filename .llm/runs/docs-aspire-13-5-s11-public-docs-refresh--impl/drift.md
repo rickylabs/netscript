@@ -19,3 +19,12 @@
   The broader optional `check:agent-docs-prose` check consequently reports the upstream-retained
   `prose.json.gz` and `provenance.json` as stale; regenerating them would contradict the ruled
   conflict disposition and was not performed.
+
+## D-04 — 2026-08-31 — D-170 docs-version enforcement gap
+
+- **Status:** Repaired narrowly for the current scaffold sample.
+- **Details:** The Phase 1 Aspire parity gate checks scaffold, CI, and root pins but does not read
+  public docs. Broad stale-Aspire-version enforcement (`/13\.[0-4]\.[0-9]+/`) remains owned by S13,
+  so the earlier review could introduce a false 13.4.6 current-baseline claim without any existing
+  gate failing. D-170 extends `docs:accuracy` with a constants-derived check for the two affected
+  public pages and a focused live-page test; it does not pull the broader S13 sweep into S11.

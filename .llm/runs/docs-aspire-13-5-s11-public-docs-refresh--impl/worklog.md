@@ -45,7 +45,7 @@
 ### Docs Audit Cycle-1 Fixes (2026-08-30)
 - **H1 / H2 / H3 (`detached-start-agents-ci.md`):** Replaced JSON example schemas with exact captured schemas from real S2 receipts (`02-aspire-start-1.json` and `02-aspire-ps-1.json`: `appHostPid`, `cliPid`, `logFile`/`logFilePath`, `status`, `sdkVersion`, `dashboardUrl`; no `pid`, no `state`, no nested `resources`). Redaction note conditional on auth token presence (`?t=...`). Removed nonexistent receipt references and S10 assertions. Updated cold start timing to 24.80–38.62 s. Clarified `--non-interactive` vs `--nologo`, `aspire wait <resource>`, and `--isolated` port/secrets scoping.
 - **H4 (`deploy-local-aspire.md`):** Corrected npm package name to `@microsoft/aspire-cli`. Documented `aspire update --self` installation-method awareness and kept single-train rule.
-- **H5 (`explanation/aspire.md`, `deploy-local-aspire.md`):** Updated `aspire.config.json` snippet to reflect current scaffold output (13.4.6 baseline with PostgreSQL, Redis, and Browsers packages) with an explicit note on the 13.5.3 target configuration.
+- **H5 (`explanation/aspire.md`, `deploy-local-aspire.md`):** Recorded a 13.4.6 baseline claim that D-170 later proved false by running the current generator; the corrected evidence is recorded below.
 - **H6 (`add-opentelemetry.md`):** Clarified that generated task wrappers (`aspire:otel`/`aspire:export`) resolve via forwarding and `aspire ps` retry. Documented the MCP telemetry resolver precedence chain under `@netscript/mcp` and removed internal `D-17` label.
 - **H7 (`reference/aspire/index.md`):** Rephrased 13.5 contracts to generated/configuration contracts with live verification pending. Scoped `excludeFromMcp()` strictly to MCP tool surface omission.
 - **M1 (`reference/ai/skills.md`):** Added concrete `aspire agent mcp --dashboard-url <url>` form (with optional `--api-key`). Removed `OF-1 (a)` and `ratified` from public prose. Kept exact 14-tool baseline.
@@ -58,7 +58,7 @@
 ### Docs Audit Cycle-2 Fixes (2026-08-30)
 - **H2 (`worklog.md`):** Updated historical receipt citations to real S2 files (`02-runtime-lifecycle.md`, `02-aspire-start-1.json`, `02-aspire-ps-1.json`, `aspire-13.5-verification.md`) and marked superseded; removed S10 runtime-receipt assertions.
 - **H3 (`detached-start-agents-ci.md`, `explanation/aspire.md`, `reference/aspire/index.md`):** Updated cold start timing to cite 2 recorded runs (38.62 s and 24.80 s from S2 V2); updated `--isolated` description to exact help definition (randomized ports and isolated user secrets) and explicitly noted container host ports are not guaranteed unique across isolated starts; removed all "parallel-safe ports" / "free infra ports" claims.
-- **H5 (`explanation/aspire.md`, `reference/aspire/index.md`):** Clarified callout as "Target after the 13.5.3 pin" (D-62) and confirmed current head generates 13.4.6 baseline; removed reference page claim that generated AppHost pins 13.5 Browsers package at this head.
+- **H5 (`explanation/aspire.md`, `reference/aspire/index.md`):** The cycle claimed the current head generated a 13.4.6 baseline without exercising the generator. D-170 ran `deno run -A packages/cli/bin/netscript-dev.ts init d170-aspire-proof --path <throwaway> --db postgres --no-git --non-interactive` and proved the head emits SDK/PostgreSQL/Redis 13.5.3 plus Browsers 13.5.3-preview.1.26425.3; exact output is recorded below.
 - **H6 (`add-opentelemetry.md`):** Documented exact 4-step MCP resolver precedence chain (`--endpoint` flag, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`, default `http://localhost:18888`) per `packages/mcp/src/domain/telemetry-endpoint.ts` without un-shipped `aspire ps` discovery.
 - **M3 (`manifest-disposition.md` & PR body):** Generated disposition table derived by construction from `git diff --name-only a46ea16d..HEAD` (8 edited manifest rows, 113 verified-clean rows, 0 deferred).
 - **M5 (`diagrams:check`):** Executed `deno task diagrams:check` from `docs/site`; verified static SVGs via Lume site build.
@@ -68,7 +68,7 @@
 - **M3 Acceptance Artifact (D-63):** Content claim-correct; corrected manifest disposition count in worklog to the exact range-derived figures matching `manifest-disposition.md` and `git diff --name-only a46ea16d..HEAD` (8 edited manifest rows, 113 verified-clean rows, 0 deferred across 121 total S11-owned rows).
 
 ### Reconcile with main #1772 (2026-08-30)
-- Ported background reference preflight documentation from main `de57fab0` (#1772) into `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md` verbatim in meaning, while preserving Aspire 13.5 prose corrections (`@microsoft/aspire-cli`, installation-aware `aspire update --self`, current-13.4.6 / target-13.5.3 framing).
+- Ported background reference preflight documentation from main `de57fab0` (#1772) into `docs/site/orchestration-runtime/how-to/deploy-local-aspire.md` verbatim in meaning, while preserving the then-written current-13.4.6 / target-13.5.3 framing. D-170 later corrected that framing after a generator run proved the default scaffold was already pinned to 13.5.3.
 - Re-generated agent docs prose and publish assets (`gen:agent-docs-prose`, `gen:publish-assets`, `gen:assets-barrel`).
 - Verified all quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume site build).
 
@@ -140,9 +140,107 @@ final scoped TypeScript formatter and the docs-site source-format gate both pass
 Aspire, Docker, AppHost, `e2e:cli`, CI dispatch, PLAN-EVAL, evaluator rerun, or PR-base retarget was
 performed.
 
+### D-170 IMPL-EVAL repair (2026-08-31)
 
+#### Evaluator findings resolved on their merits
 
+- **HIGH — scaffold-version truth:** corrected the literal `aspire.config.json` sample and its
+  callout in `docs/site/explanation/aspire.md`, plus the default-scaffold statement in
+  `deploy-local-aspire.md`, to SDK/PostgreSQL/Redis `13.5.3` and Browsers
+  `13.5.3-preview.1.26425.3`.
+- **LOW — previous/next fork:** assigned detached start order `104`, moved runtime overrides to
+  `105`, shifted the following existing pages through `109` to keep every sidebar order unique,
+  and changed runtime overrides' previous link to detached start.
+- **LOW — leaked run jargon:** removed the public `(S2 V2)` suffix while preserving the two
+  measured cold-start values.
+- **LOW — conditional browser-logs claim:** documented that the scaffold always pins
+  `Aspire.Hosting.Browsers` and generated frontend app resources unconditionally call
+  `withBrowserLogs()`.
+- The evaluator's remaining observations were explicitly classified as unverifiable rather than
+  faulted. No claim was changed on that basis because D-170 forbids the runtime needed to produce
+  new evidence; no finding was silently skipped.
 
+The regression recurred because `check:aspire-version-parity` is Phase 1 only and covers scaffold,
+CI, and root pins—not public prose—while the broad `/13\.[0-4]\.[0-9]+/` docs enforcement is deferred
+to S13. `docs:accuracy` now imports `SCAFFOLD_VERSIONS` and `SCAFFOLD_ASPIRE_INTEGRATIONS` directly
+and checks the literal sample and both current-scaffold prose markers. A focused test reads the live
+pages through that check, so a future constant-only pin change fails before stale values can ship.
+
+#### Generator proof
+
+Command (exit `0`):
+
+```text
+deno run -A packages/cli/bin/netscript-dev.ts init d170-aspire-proof --path <throwaway> --db postgres --no-git --non-interactive
+```
+
+Exact emitted `aspire/aspire.config.json`:
+
+```json
+{
+  "appHost": {
+    "path": "apphost.mts",
+    "language": "typescript/nodejs"
+  },
+  "sdk": {
+    "version": "13.5.3"
+  },
+  "profiles": {
+    "https": {
+      "applicationUrl": "https://localhost:0;http://localhost:0",
+      "environmentVariables": {
+        "ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL": "http://localhost:0",
+        "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true",
+        "ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS": "true",
+        "ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:0"
+      }
+    }
+  },
+  "packages": {
+    "Aspire.Hosting.PostgreSQL": "13.5.3",
+    "Aspire.Hosting.Redis": "13.5.3",
+    "Aspire.Hosting.Browsers": "13.5.3-preview.1.26425.3"
+  }
+}
+```
+
+The validated `.llm/tmp/d170-generator-*` scaffold root was recursively removed immediately after
+capture, and its absence was asserted.
+
+#### Static verification
+
+| Command / assertion | Exit | Result |
+| --- | ---: | --- |
+| scaffold-only `netscript-dev init ... --db postgres --no-git --non-interactive` | 0 | exact 13.5.3 config captured; throwaway deleted |
+| focused `check-accuracy-and-discoverability_test.ts` | 0 | 9 passed, 0 failed; live scaffold-pin docs test included |
+| changed-tool structured check | 0 | 2 files, 1 batch, `failedBatches: 0` |
+| changed-tool direct lint (`--no-config`, because root config excludes `.llm/`) | 0 | 2 files checked |
+| changed-tool root-config format check | 0 | 2 files checked |
+| `deno task --cwd docs/site check:source-format` | 0 | public Markdown/Vento source OK |
+| `deno task --cwd docs/site test:source-format` | 0 | 6 passed, 0 failed |
+| `deno task docs:accuracy` | 0 | PASS, including live Aspire scaffold pins |
+| `deno task docs:links` | 0 | 103 docs; 0 broken links, anchors, or orphans |
+| `deno task --cwd docs/site build` | 0 | 642 files generated; 228 HTML files verified |
+| `deno task doc:lint --root packages/cli --pretty` | 0 | 3 entrypoints; combined diagnostics 0 |
+| `deno task doc:lint --root packages/aspire --pretty` | 0 | 9 entrypoints; combined diagnostics 0 |
+| `deno task check` | 0 | Deno input-cache hit because package/plugin inputs are unchanged |
+| uncached repo-wide structured check (same task payload) | 0 | 2,978 files, 25 batches, `failedBatches: 0` |
+| `deno task check:aspire-version-parity` | 0 | `fail: 0` |
+| `git merge-base HEAD c9e3fcbe8` exact assertion | 0 | `c9e3fcbe84bac35c878fb2409ea39f665f37475f` |
+| `git diff --check` and throwaway-absence assertion | 0 | no whitespace errors; no D-170 scaffold remains |
+
+The structured lint wrapper was also probed and exited `2` with an explicit `all-excluded`
+coverage refusal for the `.llm/tools` paths; it was not misreported as a lint verdict. The final
+direct `deno lint --no-config` invocation above checked both files and exited `0`. An exploratory
+`deno fmt --check --no-config` probe exited `1` because Deno's default double-quote style conflicts
+with this repository's single-quote formatter; the authoritative root-config format check exited
+`0`. The first generator capture produced the same JSON but its cleanup wrapper exited `1` because
+`deno eval` no longer accepts `--allow-write`; that one validated temp root was immediately deleted,
+and the clean exit-0 generator proof above was then repeated.
+
+No Aspire process, Docker container, AppHost, runtime E2E, PLAN-EVAL, evaluator dispatch, lifecycle
+label change, PR-base change, or rebase was performed. Static verification is complete; acceptance
+remains with the fresh supervisor-dispatched IMPL-EVAL.
 
 
 

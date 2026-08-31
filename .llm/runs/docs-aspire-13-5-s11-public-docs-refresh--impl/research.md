@@ -5,7 +5,7 @@
 - Base: `c61b1626` (stacked on S10 → S8 → S6 → S5)
 - Epic: #1712 (Aspire 13.5 adoption), sub-issue #1723 (S11)
 - Closes: #1642 (detached/non-TTY start how-to), #1000 (".NET Aspire" → "Aspire" normalisation)
-- Truth Boundary: main is on 13.4.6; this stack introduces 13.5.3-compatible contracts (health checks S6, typed db-cli commands + excludeFromMcp S8, MCP skills S9, E2E gates S10).
+- Truth Boundary: this corrected stack already includes the 13.5.3 scaffold pin from `798e901af`; later slices add the 13.5-compatible contracts (health checks S6, typed db-cli commands + excludeFromMcp S8, MCP skills S9, E2E gates S10).
 - Snippets target Aspire 13.5.3 (Browsers preview `13.5.3-preview.1.26425.3`).
 
 ## Key Facts & Observed Receipts

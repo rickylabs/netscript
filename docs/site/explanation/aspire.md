@@ -80,16 +80,15 @@ and runs the resulting graph.
   {
     label: "aspire/aspire.config.json (generated)",
     lang: "json",
-    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.6\" },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:0;http://localhost:0\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:0\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\",\n        \"ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL\": \"https://localhost:0\"\n      }\n    }\n  },\n  \"packages\": {\n    \"Aspire.Hosting.PostgreSQL\": \"13.4.6\",\n    \"Aspire.Hosting.Redis\": \"13.4.6\",\n    \"Aspire.Hosting.Browsers\": \"13.4.6-preview.1.26319.6\"\n  }\n}"
+    code: "{\n  \"appHost\": {\n    \"path\": \"apphost.mts\",\n    \"language\": \"typescript/nodejs\"\n  },\n  \"sdk\": {\n    \"version\": \"13.5.3\"\n  },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:0;http://localhost:0\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:0\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\",\n        \"ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL\": \"https://localhost:0\"\n      }\n    }\n  },\n  \"packages\": {\n    \"Aspire.Hosting.PostgreSQL\": \"13.5.3\",\n    \"Aspire.Hosting.Redis\": \"13.5.3\",\n    \"Aspire.Hosting.Browsers\": \"13.5.3-preview.1.26425.3\"\n  }\n}"
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Target after the 13.5.3 pin" } }}
-The generated config above shows the <code>13.4.6</code> baseline that the current
-<code>netscript init</code> emits. Workspaces adopting the <code>13.5.3</code> train set
-<code>sdk.version</code> to <code>13.5.3</code>, the hosting packages to <code>13.5.3</code>, and
-<code>Aspire.Hosting.Browsers</code> to <code>13.5.3-preview.1.26425.3</code> — the CLI and the
-AppHost SDK must stay on the same release train.
+{{ comp callout { type: "note", title: "Current 13.5.3 scaffold pins" } }}
+The current <code>netscript init</code> scaffold emits <code>13.5.3</code> for
+<code>sdk.version</code>, <code>Aspire.Hosting.PostgreSQL</code>, and
+<code>Aspire.Hosting.Redis</code>. It emits <code>Aspire.Hosting.Browsers</code> at
+<code>13.5.3-preview.1.26425.3</code>. The CLI and AppHost SDK must stay on the same release train.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral, not pinned" } }}

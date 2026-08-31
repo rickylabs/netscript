@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import {
+  checkAspireScaffoldVersionDocs,
   checkForbiddenGoldenPathTerms,
   checkFreshRootImports,
   checkGoldenPathDocs,
@@ -8,6 +9,20 @@ import {
   checkPublicCommandReference,
   checkSagaVocabulary,
 } from './check-accuracy-and-discoverability.ts';
+
+Deno.test('Aspire scaffold docs track the live CLI version pins', async () => {
+  const [explanation, deployLocal] = await Promise.all([
+    Deno.readTextFile(new URL('../../../docs/site/explanation/aspire.md', import.meta.url)),
+    Deno.readTextFile(
+      new URL(
+        '../../../docs/site/orchestration-runtime/how-to/deploy-local-aspire.md',
+        import.meta.url,
+      ),
+    ),
+  ]);
+
+  checkAspireScaffoldVersionDocs(explanation, deployLocal);
+});
 
 Deno.test('shipped-corpus vocabulary check rejects every golden-path stale term', () => {
   checkForbiddenGoldenPathTerms('apps/storefront/lib/catalog.ts', 'corpus:clean.md');

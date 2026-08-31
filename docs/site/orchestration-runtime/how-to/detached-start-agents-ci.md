@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Detached start for agents and CI
 templateEngine: [vento, md]
-order: 103
+order: 104
 ---
 
 # Detached start for agents and CI
@@ -76,8 +76,8 @@ When no AppHost is running, `aspire ps --format Json` returns an empty array (`[
 ## Startup timeout budget versus `aspire wait`
 
 An Aspire cold start covers container provisioning (Postgres, Redis), AppHost TypeScript
-compilation, and health-probe convergence. In the two recorded 13.5.3 runs, cold start took
-38.62 s and 24.80 s (S2 V2); budget accordingly with `ASPIRE_CLI_START_TIMEOUT`.
+compilation, and health-probe convergence. In two recorded 13.5.3 runs, cold start took
+38.62 s and 24.80 s; budget accordingly with `ASPIRE_CLI_START_TIMEOUT`.
 
 NetScript provides two complementary timeout controls:
 

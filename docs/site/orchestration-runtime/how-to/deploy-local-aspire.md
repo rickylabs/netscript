@@ -54,10 +54,12 @@ on disk before going further:
 ls aspire/apphost.mts aspire/aspire.config.json
 ```
 
-`aspire.config.json` pins `language: "typescript/nodejs"`, `appHost.path: "apphost.mts"`, and the
-Aspire SDK version (`13.5.3` for workspaces adopting the 13.5 train, `13.4.6` on the default
-scaffold). The Aspire CLI and the AppHost SDK must be on the same release train — never mix CLI
-and SDK trains. If you installed the Aspire CLI through npm (`npm install -g @microsoft/aspire-cli`),
+`aspire.config.json` pins `language: "typescript/nodejs"` and `appHost.path: "apphost.mts"`.
+The default scaffold pins the Aspire SDK to <code>13.5.3</code>, PostgreSQL and Redis hosting
+integrations to <code>13.5.3</code>, and the Browsers integration to
+<code>13.5.3-preview.1.26425.3</code>. The Aspire CLI and the AppHost SDK must be on the same release
+train — never mix CLI and SDK trains. If you installed the Aspire CLI through npm
+(`npm install -g @microsoft/aspire-cli`),
 `aspire update --self` is aware of the installation method and directs you to run
 `npm install -g @microsoft/aspire-cli@latest`.
 
