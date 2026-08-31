@@ -2219,3 +2219,7 @@ continues concurrently because serial ordering is per orchestrator, not global.
   carriers, including binary prose. Docs is converging/regenerating/revalidating it before merge and
   will then advance #1818. Internals continues #1802/#1750/#1832 and adopts the main-red MCP corpus
   check; all independent fronts continue in parallel.
+- Fixes has launched #1845 from the exact hosted reproduction. #1844 is coordinator-disposed as a
+  non-blocking p2 research observation: its attempted exact-main control was cancelled by #1839 and
+  proves nothing, while #1744 supplies a green counter-observation. Recheck twice after #1839; do
+  not hold Aspire or canary 6 and do not ask the owner for this routine disposition.

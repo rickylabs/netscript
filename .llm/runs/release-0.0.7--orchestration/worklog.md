@@ -3468,3 +3468,8 @@
 - Internals was instructed to recover bounded evaluator latency, deliver #1802 at the next safe
   writer boundary, and own the main-red MCP export-corpus defect. All five supervisors are active;
   there is currently no owner-only decision parked in a topic lane.
+- #1845's exact brief was delivered directly to Fixes and its bounded research/measurement worker
+  launched. The coordinator also disposed of #1844 without owner escalation: the single Garnet
+  timeout is now `priority:p2`/`status:research`, does not block Aspire or canary 6, and receives two
+  trustworthy Postgres observations after #1839 repairs runtime admission; two passes close it as
+  non-reproduced, while a recurrence with DCP logs dispatches the bounded readiness repair.
