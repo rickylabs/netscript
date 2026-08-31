@@ -3294,6 +3294,23 @@
   unmerged, and deleted remote branch `docs/devtools-rfc-run-closeout`. This is deliberate archival
   disposition, not a shipped release payload.
 
+## 2026-08-31T05:51:06Z — #1823 milestone liveness validator ships
+
+- Internals PR #1823 converged on the complete #1831 main at immutable head
+  `c2df67bb92799613c127df6a77b5c9d12f256119`. Its two owned validator/test blobs remained
+  byte-identical to the GLM-evaluated head, lock/runtime were inapplicable, #1753 acceptance was
+  satisfied, and review threads were zero.
+- The coordinator corrected two stale body lines that still described IMPL-EVAL as pending. Exact
+  CI run `33361440293` passed check/test and quality, then body-aware close-gate attempt 2 started at
+  05:49:23Z after the 05:45:43Z edit and passed.
+- Synthetic merge `1fc85e33e532bc8ccd2f6c1bc8ea0ddd07e5e0e1` had exact parents
+  `[bd9d463b4480847dcd6f76efe5bc1e53bb926bec, c2df67bb92799613c127df6a77b5c9d12f256119]`.
+  The coordinator squash-merged #1823 as `ee0e626bb945e2d9af58e49bd7bbdf714d0785c3`;
+  #1753/#1823 are sole `status:shipped`.
+- This harness-only merge is disjoint from the already-running #1814/#1773/#1803 product/doc heads.
+  They may carry exact-head gates only with zero-overlap proof and a fresh live-main synthetic merge
+  ref; no gratuitous source rebase/regeneration is required solely for #1823.
+
 ## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
 
 - Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance

@@ -2077,3 +2077,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   ledger; its unique remainder was prohibited operational metadata. The coordinator repaired the
   ledger's broken main link, closed #1522 unmerged without a shipped status, and deleted its remote
   branch. #1640 remains the Docs-owned Backlog/Triage RFC disposition, not a silent 0.0.7 move.
+
+## Resume delta — 2026-08-31T05:51:06Z
+
+- Current main is `ee0e626bb945e2d9af58e49bd7bbdf714d0785c3` after Internals PR #1823 shipped
+  from immutable head `c2df67bb92799613c127df6a77b5c9d12f256119`, closing #1753. Exact CI
+  `33361440293` and post-body-edit close-gate attempt 2 passed; merge ref `1fc85e33e5` had exact live
+  main/head parents; evaluated validator/test blobs were byte-identical and threads zero.
+- #1828 is now cross-lane P0 because #1762's stale exact CI exposes the Deno.openKv TS2551 that it
+  fixes. Its first evaluator finished verification but stalled before artifact write; Internals is
+  recovering that owned transport without expanding the delta. #1762 also requires generated
+  convergence, non-vacuous DoD, and hosted runtime after #1828 lands.
+- #1664's newly exposed multi-client/UI-generator seam has a coordinator ruling: retain fail-closed
+  ambiguity by default, add bounded explicit `--client <service>` selection, and prove it in the
+  combined hosted E2E rather than hiding the seam by reordering gates.

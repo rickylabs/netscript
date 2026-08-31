@@ -229,3 +229,13 @@ artifact-pinned production E2E.
 - The public checkpoint now contains `createLazyKv`, non-discardable saga receipts, complete nested
   token-usage preservation, and Aspire-compatible browser full keys. Features #1814 is the next
   preferred public addition; canary 5 remains gated by coherence, not urgency alone.
+
+## 2026-08-31T05:51:06Z — milestone liveness guard lands outside public canary payload
+
+- PR #1823 head `c2df67bb92799613c127df6a77b5c9d12f256119` squash-merged as
+  `ee0e626bb945e2d9af58e49bd7bbdf714d0785c3`, closing #1753. It makes the milestone validator
+  fail closed on stale or missing live PR leaves and emits compact structured findings.
+- Exact CI plus a post-body-edit close-gate attempt passed, evaluated product blobs carried by byte
+  identity, merge ref `1fc85e33e5` had exact current-main/head parents, and threads were zero.
+- This is valuable coordinator infrastructure but does not itself make canary 5 meaningful; it is
+  recorded in merge-history membership while the checkpoint still waits for coherent public payload.
