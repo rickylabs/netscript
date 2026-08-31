@@ -117,3 +117,65 @@ is unchanged; the existing data-screen invocation now supplies the fixture's `us
 - Formal evaluation is intentionally not dispatched by this session under the coordinator ruling.
 - Local implementation and gate work is complete. The remaining handoff actions are the single
   commit, explicit-refspec push, and PR evidence comment.
+
+## Bounded Follow-up: stale expectations at `b37b023f`
+
+### Scope and design
+
+- Current-head baseline: `b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9`; the remote branch matched
+  it before the follow-up began. No rebase or merge was performed.
+- Public surface, domain vocabulary, ports, constants, extension axes, gate order, and product code
+  are unchanged. This is one mechanical expectation slice over exactly two test files.
+- `add-ui-command_test.ts` asserts the complete normalized help option line:
+  `--client <service> - Select the generated service query client for a data-bound page or island`.
+- `suite-registry_test.ts` expects the shipped service-suite gate list without
+  `GATE.GENERATED_DENO_LINT`; runtime-suite coverage for that gate remains asserted separately.
+- `PLAN-EVAL: N/A` remains justified by the locked diagnosis, exact file ceiling, and specified
+  gates. The owner explicitly waived evaluator work for this follow-up.
+
+### Measured delta
+
+| Measurement | Before | After |
+| --- | --- | --- |
+| Repo-wide tests | 4,511 passed / 4 failed (coordinator-supplied intake result) | 4,513 passed / 2 failed / 19 ignored (4,534 total) |
+| Named help expectation | Already green but loose at current head | 1 passed / 0 failed with the full rendered option line asserted |
+| Named suite-registry expectation | 0 passed / 1 failed | 1 passed / 0 failed |
+
+The only remaining repo-wide failures are the coordinator-identified sandbox cases:
+
+1. `browser version probe distinguishes path and process failure classes`
+2. `browser startup reports early status and bounded stderr instead of a target timeout`
+
+Both fail while spawning a fake browser executable under `/ephemeral/tmp` with
+`PermissionDenied ... os error 13`; no other test failed.
+
+### Follow-up gate results
+
+| Gate | Result | Durable evidence |
+| --- | --- | --- |
+| Named help test | PASS — 1 passed / 0 failed | Structured test-wrapper output |
+| Named suite-registry test | PASS — 1 passed / 0 failed | Structured test-wrapper output |
+| Scoped check (`packages/cli`) | PASS — 918 files, 8 batches, 0 diagnostics; `stdout.bytes=303` | `receipts/check.json` |
+| Scoped lint (two owned CLI tests) | PASS — 2 selected / 2 processed, 0 findings; `stdout.bytes=349` | `receipts/lint.json` |
+| Scoped fmt (two owned CLI tests) | PASS — 2 selected / 2 processed, 0 findings; `stdout.bytes=298` | `receipts/fmt-check.json` |
+| Repo-wide tests | EXPECTED SANDBOX RED — 4,513 passed / 2 failed / 19 ignored | `receipts/test.json` |
+| Diff hygiene | PASS — `git diff --check` exited 0 | Local verification |
+| Lock integrity | PASS — SHA-256 stayed `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` | Hash plus empty `deno.lock` diff |
+
+The full `packages/cli` lint diagnostic selected 911 files and surfaced 14 pre-existing findings
+outside the two-file ceiling; it is not used as this slice's verdict and no unrelated file was
+changed. The final lint/format receipts cover exactly the two owned expectation files. The scratch
+config only bypasses the root configuration's intentional `packages/cli/` exclusion so wrapper
+coverage cannot produce a false green; it does not alter repository configuration.
+
+### Drift, doctrine, and reconcile
+
+- Drift: the help test was not failing at current head because separate substring checks already
+  tolerated the shipped option. Tightening them into the complete rendered option-line expectation
+  fulfills the requested coverage without product changes.
+- Doctrine: Archetype 6 remains `Keep`; this expectation-only slice introduces no new imports,
+  layering, folder-shape, public-surface, or debt implication.
+- Reconcile: PR 1664 remains the handoff surface. Per owner instruction, this slice performs no
+  label, acceptance-box, evaluator, readiness, or merge action.
+- Commit trail: the single follow-up commit is the branch head containing this entry; its explicit
+  refspec push and before/after PR comment complete the handoff.

@@ -35,8 +35,10 @@ Deno.test('ui:add help explains the page island query-loader triad', () => {
     help,
     'Use a registry item when the route already exists and you only need an app-owned component',
   );
-  assertStringIncludes(help, '--client <service>');
-  assertStringIncludes(help, 'Select the generated service query client');
+  assertStringIncludes(
+    help,
+    '--client <service> - Select the generated service query client for a data-bound page or island',
+  );
 });
 
 Deno.test('ui:add real help advertises exactly the independently planned data-screen roles', async () => {

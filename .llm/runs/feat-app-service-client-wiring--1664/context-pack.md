@@ -6,18 +6,18 @@
 | ------------- | ------------------------------------------ |
 | Run ID        | `feat-app-service-client-wiring--1664`     |
 | Branch        | `feat/app-service-client-wiring`           |
-| Current phase | `handoff`                                  |
+| Current phase | `bounded follow-up handoff`                 |
 | Baseline      | `270c31d4d6e9bab24597ac8fe077227d5e98dcc7` |
 | Archetype     | `6 - CLI / Tooling`                        |
 | Scope overlay | `frontend`                                 |
 
 ## Current State
 
-The bounded implementation and local validation are complete. Data-bound page/island scaffolds now
-accept an optional `--client <service>` selector matched against the module-declared service
-identity. No-selector single-client discovery follows the existing path; genuine ambiguity remains
-fail-closed and now reports available services and the remedy. The data-screen gate supplies
-`--client users` in its existing position.
+The bounded implementation and its stale-expectation follow-up are complete. Data-bound page/island
+scaffolds accept an optional `--client <service>` selector matched against the module-declared
+service identity. The follow-up changes only two test expectations: help coverage now asserts the
+complete rendered `--client` option line, and the service capability suite expectation matches the
+shipped gate set without `generated.deno-lint`. No product file changed.
 
 ## Completed
 
@@ -29,16 +29,21 @@ fail-closed and now reports available services and the remedy. The data-screen g
   files.
 - Focused tests, CLI package tests, structured static gates, fitness gates, diff hygiene, and lock
   integrity all passed; exact evidence is recorded in `worklog.md`.
+- Follow-up named tests pass independently: 1 passed / 0 failed each.
+- Follow-up repo-wide test result is 4,513 passed / 2 failed / 19 ignored; both failures are the
+  expected sandbox-only browser executable spawn permission cases.
+- Follow-up scoped receipts are non-empty: check/lint/fmt `stdout.bytes=303/349/298`.
 
 ## In Progress
 
-- Create and push the one slice commit, then post its evidence to PR 1664.
+- Create and push the one follow-up commit, then post the before/after counts to PR 1664.
 
 ## Next Steps
 
-1. Confirm the remote branch still points at the recorded baseline.
-2. Create one commit containing the six approved TypeScript files and these two run artifacts.
-3. Push through an explicit refspec and post the slice evidence to PR 1664.
+1. Confirm the remote branch still points at follow-up baseline `b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9`.
+2. Create one commit containing the two expectation files, refreshed receipts, and these two run
+   artifacts.
+3. Push through an explicit refspec and post the before/after evidence to PR 1664.
 
 ## Key Decisions
 
@@ -62,6 +67,15 @@ fail-closed and now reports available services and the remedy. The data-screen g
 | `packages/cli/src/public/features/ui/add/add-ui-command_test.ts` | modified | Command-surface coverage |
 | `packages/cli/e2e/src/application/gates/scaffold/ui-data-screen-gates.ts` | modified | Explicit `users` selection |
 
+### Current bounded follow-up
+
+| Path | Status | Notes |
+| --- | --- | --- |
+| `packages/cli/src/public/features/ui/add/add-ui-command_test.ts` | modified | Exact rendered `--client` option-line contract |
+| `packages/cli/e2e/tests/presentation/suite-registry_test.ts` | modified | Corrected service-suite gate expectation |
+| `.llm/runs/feat-app-service-client-wiring--1664/{worklog.md,context-pack.md}` | modified | Follow-up evidence and handoff |
+| `.llm/runs/feat-app-service-client-wiring--1664/receipts/{check,lint,fmt-check,test}.json` | refreshed | Durable scoped and repo-wide evidence |
+
 ## Gates
 
 | Gate family            | Current status | Evidence                                    |
@@ -72,13 +86,24 @@ fail-closed and now reports available services and the remedy. The data-screen g
 | Fitness                | passed | `quality:gate` exited 0 |
 | Consumer               | bounded update complete | `--client users` added; order unchanged; full runtime suite not run |
 
+### Follow-up gate delta
+
+| Gate | Result |
+| --- | --- |
+| Named stale tests | PASS — 1/0 each |
+| Repo-wide tests | EXPECTED SANDBOX RED — 4,513 passed / 2 failed / 19 ignored; only the two browser-spawn permission cases remain |
+| Scoped check/lint/fmt | PASS — non-empty `stdout.bytes=303/349/298` |
+| Lock integrity | PASS — SHA-256 remains `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+
 ## Open Questions
 
 None. Any need to touch a file outside the coordinator-approved ceiling is a rescope stop.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: the named help test was already green at the follow-up baseline because it loosely checked
+  the flag and description separately; the expectation was tightened to the complete rendered
+  option line as requested. No scope expansion resulted.
 - Debt: no new or deepened doctrine debt identified.
 
 ## Commits

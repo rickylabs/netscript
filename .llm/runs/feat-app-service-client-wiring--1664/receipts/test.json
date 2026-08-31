@@ -1,38 +1,36 @@
 {
   "gateId": "test",
-  "invocationId": "1664-final-test",
+  "invocationId": "1664-stale-expectations-repo-test",
   "argv": [
     "deno",
     "task",
-    "test",
-    "packages/sdk/tests",
-    "packages/cli/tests"
+    "test"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1664",
-  "gitHead": "f7b064b966766026a99d85638d557d76a0efb453",
-  "actualGitHead": "f7b064b966766026a99d85638d557d76a0efb453",
+  "gitHead": "b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9",
+  "actualGitHead": "b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1821709",
+  "runnerIdentity": "worker:2491724",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "8c12d159552a01faedc56fc113dbf734fefc284dae42a2d14d5a43f7c6ef5e33",
-  "lifecycleId": "worker:1821709:1664-final-test:1",
-  "outcome": "PASS",
-  "claimedAt": "2026-08-31T05:26:16.865Z",
-  "startedAt": "2026-08-31T05:26:16.867Z",
-  "finishedAt": "2026-08-31T05:26:22.677Z",
-  "durationMs": 5809,
-  "exitCode": 0,
+  "requestHash": "21ec2659ba9741aa2cc1be91349f67fba2165eafdbeeb18e2b2794dd02bc95ff",
+  "lifecycleId": "worker:2491724:1664-stale-expectations-repo-test:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-31T14:58:49.685Z",
+  "startedAt": "2026-08-31T14:58:49.688Z",
+  "finishedAt": "2026-08-31T15:02:49.381Z",
+  "durationMs": 239694,
+  "exitCode": 1,
   "stdout": {
-    "bytes": 311,
-    "sha256": "9a1346a3e4652f4802d530259af2d0d7f7c3fe3b66d86627db3938467677dcea",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/sdk/tests\",\"packages/cli/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1664\",\"exitCode\":0,\"durationMs\":5686,\"summary\":{\"passed\":80,\"failed\":0,\"ignored\":0,\"totalResults\":80,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "bytes": 3190,
+    "sha256": "7c1927c7b59f0a35d60a56064b74030e88744a1d57a3fe98a09a9c2080575dfd",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1664\",\"exitCode\":1,\"durationMs\":239556,\"summary\":{\"passed\":4513,\"failed\":2,\"ignored\":19,\"totalResults\":4534,\"uniqueFailures\":2},\"failures\":[{\"message\":\"AssertionError: Expected error message to include \\\"version probe timed out after 25 ms\\\", but got \\\"failed to start version probe: Failed to spawn '/ephemeral/tmp/netscript-browser-version-2b66f8469e10f05e/timed-out': Permission denied (os error 13)\\\".\\n    at assertIsError (https://jsr.io/@std/assert/1.0.19/is_error.ts:<line>:<column>)\\n    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:<line>:<column>)\\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"browser version probe distinguishes path and process failure classes\",\"file\":\"./packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts\",\"line\":550}]},{\"message\":\"Error: NETSCRIPT_E2E_BROWSER_EXECUTABLE browser executable \\\"/ephemeral/tmp/netscript-browser-startup-a46af00b269732f9/version-then-fail\\\": failed to start version probe: Failed to spawn '/ephemeral/tmp/netscript-browser-startup-a46af00b269732f9/version-then-fail': Permission denied (os error 13)\\n    at selectBrowserExecutable (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>\\nCaused by: Error: failed to start version probe: Failed to spawn '/ephemeral/tmp/netscript-browser-startup-a46af00b269732f9/version-then-fail': Permission denied (os error 13)\\n    at probeBrowserVersion (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\\n    at async selectBrowserExecutable (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>\\nCaused by: PermissionDenied: Failed to spawn '/ephemeral/tmp/netscript-browser-startup-a46af00b269732f9/version-then-fail': Permission denied (os error 13)\\n    at spawnChildInner (ext:deno_process/40_process.js:<line>:<column>)\\n    at spawnChild (ext:deno_process/40_process.js:<line>:<column>)\\n    at Command.spawn (ext:deno_process/40_process.js:<line>:<column>)\\n    at probeBrowserVersion (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\\n    at async selectBrowserExecutable (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"browser startup reports early status and bounded stderr instead of a target timeout\",\"file\":\"./packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts\",\"line\":620}]}]}\n",
     "truncated": false
   },
   "stderr": {
-    "bytes": 169,
-    "sha256": "5af243b8fac82d04c09aed2b7a8a3e59f19b72e32ee5e2d7f92602a26f0d4c03",
-    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/sdk/tests' 'packages/cli/tests'\n",
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
     "truncated": false
   }
 }

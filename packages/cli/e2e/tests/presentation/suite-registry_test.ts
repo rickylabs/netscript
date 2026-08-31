@@ -62,7 +62,6 @@ Deno.test('capability suites select only their scoped gates', () => {
     GATE.DATABASE_CODEGEN,
     GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
     GATE.GENERATED_SERVICE_CHECK,
-    GATE.GENERATED_DENO_LINT,
   ]);
 });
 
