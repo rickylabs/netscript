@@ -1,9 +1,4 @@
-import {
-  assert,
-  assertEquals,
-  assertStringIncludes,
-  assertThrows,
-} from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import {
@@ -32,11 +27,16 @@ Deno.test('ui:add help explains the page island query-loader triad', () => {
     help,
     'Creates one data-screen unit: typed page route + colocated hydrating island + query loader.',
   );
-  assertStringIncludes(help, 'Use it when a route will load data and hydrate an interactive region.');
+  assertStringIncludes(
+    help,
+    'Use it when a route will load data and hydrate an interactive region.',
+  );
   assertStringIncludes(
     help,
     'Use a registry item when the route already exists and you only need an app-owned component',
   );
+  assertStringIncludes(help, '--client <service>');
+  assertStringIncludes(help, 'Select the generated service query client');
 });
 
 Deno.test('ui:add real help advertises exactly the independently planned data-screen roles', async () => {
@@ -85,12 +85,14 @@ Deno.test('ui:add page --island --dry-run reports the exact plan and writes noth
 
   assertEquals(fs.getFiles(), before);
   assertReportedRoles(output, 'Planned');
-  for (const path of [
-    `${APP_ROOT}/routes/admin/status/index.tsx`,
-    `${APP_ROOT}/routes/admin/status/(_shared)/query-loaders.ts`,
-    `${APP_ROOT}/routes/admin/status/(_islands)/StatusIsland.tsx`,
-    ROUTER_PATH,
-  ]) {
+  for (
+    const path of [
+      `${APP_ROOT}/routes/admin/status/index.tsx`,
+      `${APP_ROOT}/routes/admin/status/(_shared)/query-loaders.ts`,
+      `${APP_ROOT}/routes/admin/status/(_islands)/StatusIsland.tsx`,
+      ROUTER_PATH,
+    ]
+  ) {
     assert(output.some((line) => line.includes(path)), `Missing planned path: ${path}`);
   }
 });
@@ -105,14 +107,57 @@ Deno.test('ui:add page --island reports each generated role and path', async () 
   assertReportedRoles(output, 'Generated');
 });
 
+Deno.test('ui:add --client forwards service selection to page and island scaffolds', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await seedBindableApp(fs);
+  await fs.writeFile(
+    `${APP_ROOT}/lib/client-module.ts`,
+    `export const paymentsName = 'payments';
+export const paymentsQueries = createQueryFactories({
+  service: { contract: paymentsContract, client: paymentsClient },
+}).service;
+`,
+  );
+  await fs.writeFile(
+    '/workspace/shop/contracts/versions/v1/payments.contract.ts',
+    "export const PaymentsCrudContractV1 = createCrudContract({ resource: 'payments' });\n",
+  );
+
+  await testCommand(fs).parse([
+    'page',
+    'payments',
+    '--island',
+    '--client',
+    'payments',
+  ]);
+  await testCommand(fs).parse([
+    'island',
+    'payments-panel',
+    '--query',
+    '--client',
+    'payments',
+  ]);
+
+  const pageLoader = await fs.readFile(
+    `${APP_ROOT}/routes/payments/(_shared)/query-loaders.ts`,
+  );
+  const island = await fs.readFile(
+    `${APP_ROOT}/routes/(_islands)/PaymentsPanel.tsx`,
+  );
+  assertStringIncludes(pageLoader, 'paymentsQueries');
+  assertStringIncludes(island, 'paymentsQueries');
+});
+
 Deno.test('ui:add --force reaches page scaffold replacement', async () => {
   const fs = new MemoryFileSystemAdapter();
   await seedBindableApp(fs);
-  for (const path of [
-    `${APP_ROOT}/routes/orders/index.tsx`,
-    `${APP_ROOT}/routes/orders/(_shared)/query-loaders.ts`,
-    `${APP_ROOT}/routes/orders/(_islands)/OrdersIsland.tsx`,
-  ]) {
+  for (
+    const path of [
+      `${APP_ROOT}/routes/orders/index.tsx`,
+      `${APP_ROOT}/routes/orders/(_shared)/query-loaders.ts`,
+      `${APP_ROOT}/routes/orders/(_islands)/OrdersIsland.tsx`,
+    ]
+  ) {
     await fs.writeFile(path, '// stale\n');
   }
 
