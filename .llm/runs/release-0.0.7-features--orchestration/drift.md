@@ -1061,3 +1061,32 @@ member deserves the same sanctioned-slow-types annotation as contracts, and whet
 cardinality overage should become a recorded debt entry or a split, are **pre-existing architecture
 questions for the coordinator** — filed here rather than fixed inside a slice whose plan says
 "no feature expansion".
+
+## D-STALE-SENDER-1592 — 2026-08-31, stale sender record evicted for `007-leaf-1592`
+
+`agentic:launch-codex-slice` refused the authorized #1814 repair with
+`duplicate_sender_risk` — "worktree already has a sender; resume session
+`01a05536-fa9d-7b51-867e-52139653d812`". That session had already completed, so the printed
+`operatorAction` was impossible. Applied the recorded safe procedure, proving **all three** liveness
+conditions false before touching the store rather than forcing the guard:
+
+| Condition | Measurement |
+| --- | --- |
+| `ownerPid` 817707 in `/proc` | **absent** |
+| Thread in `codex-status --user node` | **absent across 3 debounced probes** |
+| Rollout terminal record | **`task_complete`** — "Implemented and opened draft PR #1814", last write `02:40:10` |
+
+Evicted record, verbatim:
+
+```json
+{"schemaVersion":"1.0","worktree":"/home/agent/projects/netscript/worktrees/007-leaf-1592","ownerPid":817707,"leaseToken":"94c47cc6-323e-4d42-a432-dee6eaef019e","state":"active","acquiredAt":"2026-08-31T00:27:41.373Z","updatedAt":"2026-08-31T00:27:41.698Z","sessionId":"01a05536-fa9d-7b51-867e-52139653d812"}
+```
+
+Archived under `observability/sender-evictions/` before removal. This reproduces the `stale` branch
+`decideSenderOwnership` already implements but never reaches, because `launch-codex-slice.ts` derives
+`sessionActive` from record shape (`Boolean(existing.sessionId)`) rather than a runtime probe. The
+fix belongs in `.llm/tools/agentic/`, not in a leaf.
+
+Also required first: `git branch --unset-upstream` in the leaf — the launcher's push-safety guard
+requires `upstream: NONE` so a bare `git push` cannot corrupt the remote branch. Pushes from this
+lane already use explicit refspecs.

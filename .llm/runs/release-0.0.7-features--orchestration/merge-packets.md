@@ -5,97 +5,77 @@ to act on. Verified live against GitHub and git at the time of writing, not carr
 
 ---
 
-## PR #1805 — `#1591` typed OpenAI Responses generation-options mapper — **EXACT-GREEN MERGE CANDIDATE**
+## PR #1805 — `#1591` — **SHIPPED** as `main` `dea44991120a2c5da96a89df0f68d69c455c035e`
 
-| | |
-| --- | --- |
-| **Merge head (immutable)** | `e76e0227109e322d3e20202bd96592107a6eda2a` |
-| Certified content head | `ff7d2de60ef470c312d633b851975d67a6774471` |
-| Branch | `feat/ai-openai-responses-mapper` |
-| Draft | **no** |
-| Mergeable | **MERGEABLE / CLEAN** |
-| Status label | exactly one — `status:ready-merge`; issue #1591 also `status:ready-merge` |
-| Closing keyword | `Fixes #1591` — live `closingIssuesReferences` resolves to #1591 |
-| Supervisor Tier-A | **ACCEPTED**, no findings |
-| **IMPL-EVAL** | **`OPENHANDS_VERDICT: PASS`** at the exact head, GLM 5.3 Flash · effort `max`, independent read-only session — comment `5473484620` |
-| CI at exact head | `close-gate` **pass** · `check-test` **pass** (8m30s) · `quality` **pass** · `code-quality` **pass** · `build` **pass** · `classify` **pass** |
-| Review-thread gate | **PASS** — `threads=0 unanswered=0` |
-
-### The `status:augment-review` question, answered with evidence
-
-The label was applied at `2026-08-31T03:55:13Z`, 47 s after the IMPL-EVAL PASS comment, and it
-parked an otherwise exact-green PR. **It did not correspond to any live review process:**
-
-- `pulls/1805/reviews` → **0**; `pulls/1805/comments` → **0**.
-- Check-runs on the exact head come from **`github-actions` only** — no `augmentcode[bot]` check-run,
-  no third-party app at all.
-- No `augment review` trigger comment exists on the PR (that comment is how the bot is invoked).
-- **Control case #1747**, the only other PR carrying the label: its `augmentcode[bot]` review was
-  submitted `2026-08-30T09:46:51Z` — **≈11 hours *before*** its `status:augment-review` label was
-  applied at `20:32:50Z`. So the label is a **post-hoc marker of a completed advisory pass**, not an
-  indicator of a pending one.
-
-**Verdict: stale metadata, no live authorized process, therefore no run ID and no ETA.** Normalized
-to `status:ready-merge` and the exact-head close-gate rerun without moving the head — it now passes.
-The advisory pass remains available on demand (comment `augment review`); it is advisory, not a
-required gate.
-
-### IMPL-EVAL findings — all info-only, none blocking
-
-1. `docs:exports-drift` red at this leaf's base `7908399af`. **Not this slice's** — the integration
-   diff for `packages/ai` is empty, and the drift is in `docs/site/reference/telemetry/` on `main`.
-   Independently confirmed fixed on current `main`: the same gate runs **PASS** in three separate
-   leaves integrated at `584caa03f`. Merging #1805 does not carry the red forward.
-2. `check:mcp-export-corpus` is environment-sensitive under `LD_LIBRARY_PATH`. CI unaffected.
-3. Carried D-1: `run-gate.ts` should reject `(cached, inputs unchanged)` PASS receipts. Tooling lane.
+Landed after the current-main seam correction. `status:shipped`. The `status:augment-review` park that
+held it was proven to be stale metadata (no reviews, no `augmentcode[bot]` check-run, no trigger
+comment; on control PR #1747 the bot's review predated the label by ~11 h).
 
 ---
 
-## PR #1762 — `#1387` typed principal and procedure policy — **HELD BY COORDINATOR ORDER**
+## PR #1810 — `#1458` typed chat-response completion mode — **MERGE CANDIDATE, one check outstanding**
 
 | | |
 | --- | --- |
-| Head (frozen) | `686eedb62db189907936dee8a0edc5acf295529a` |
-| Draft | no · `status:ready-merge` · `Fixes #1387` live |
-| Mergeable | MERGEABLE (BLOCKED only on `check-test`) |
-| `close-gate` | **PASS** — see correction below |
-| `check-test` | **red**, owned by P0 #1827, **not** by this leaf |
-| IMPL-EVAL | **`OPENHANDS_VERDICT: PASS`** at `d7cf2419c` (GLM 5.3 Flash), 13/13 receipts verified |
+| **Head** | `3a1b2fa8df55c7958d678ac6fc3d7c012e249bf2` |
+| Merge-ref first parent | **`dea44991`** = current `main` — its CI describes the *current* merge snapshot |
+| Draft / labels | non-draft · exactly one `status:ready-merge` · issue #1458 also `status:ready-merge` |
+| Closing keyword | `Fixes #1458`, live |
+| IMPL-EVAL | **`OPENHANDS_VERDICT: PASS`** at `520573e1f` / evidence `96f9cea99` (comment `5473613425`) |
+| Carry-forward | `0b60ee766` is a git **ancestor**; both product blobs identical (`06a7ea26…`, `ba2172c0…`); `evaluate.md` preserved byte-for-byte (`5b7d1181…`) |
+| CI | `close-gate` **pass** · `quality` **pass** · `code-quality` **pass** · `build` **pass** · `check-test` **running** |
+| Review threads | **PASS** — 0 threads, 0 unanswered |
 
-**Correction to the rotation checkpoint:** `close-gate` was recorded as failing. It **passes**. The CI
-red was a race — the acceptance mirror was mid-apply, so the gate read an issue snapshot from
-`03:22:22Z` in which the boxes were not yet mirrored. Re-evaluated live at the exact head:
-`close-gate PASS rickylabs/netscript#1762`. The CI job was rerun without moving the head and is now
-green.
-
-**Held per coordinator order:** no churn until P0 #1827 (`fix/cli-e2e-unstable-parity`) merges; then a
-single integration of the complete `main`, carry the PASS across, and rerun the exact-head gates. The
-verdict at `d7cf2419c` carries to `686eedb62` on the standing rule — the delta is `main`'s own docs
-content plus regenerated carriers, with **no leaf product source change**.
+Do not churn the head. Obsolete run `33356348595` was cancelled by the coordinator; exact-head run
+`33356709627` is the live one.
 
 ---
 
-## PRs #1810 / #1814 / #1820 — integrated, green, evaluation chain running
+## PR #1820 — `#1452` Slice 1, `createLazyKv` (**partial**) — green, but needs the seam behind #1810
 
-All three were `CONFLICTING/DIRTY` against `main` `584caa03f` at rotation. Each conflicted on exactly
-one file — the generated MCP export corpus — resolved by taking `main`'s carrier and **regenerating
-from tooling**, never hand-merging.
+| | |
+| --- | --- |
+| Head | `3130fb52bd76b52b38ce2c41072a1bbe6cb68ee6` |
+| Mergeable | **MERGEABLE / CLEAN**, non-draft, one `status:ready-merge` |
+| Closing keyword | **none, deliberate** — `Refs #1452`; `closingIssuesReferences` empty. Merging must **not** close #1452 |
+| IMPL-EVAL | **`OPENHANDS_VERDICT: PASS`** at `3130fb52b`, base `0274c0a7` (comment `5473634548`) |
+| CI | **all green** — `check-test`, `quality`, `code-quality`, `close-gate`, `build` |
+| Review threads | **PASS** — 0 threads, 0 unanswered |
+| **Blocker** | merge-ref first parent is **`0274c0a70`**, one behind current `main` `dea44991`. Same defect that held #1805: the green CI does not describe the current merge snapshot. |
 
-| PR | Issue | Integrated head | Evidence head | Closing keyword | Eval |
-| --- | --- | --- | --- | --- | --- |
-| #1810 | #1458 | `520573e1f` | `96f9cea99` | `Fixes #1458` | dispatched, running |
-| #1814 | #1592 **partial** | `aeb616805` | `d2c290c0c` | **none, deliberate** | queued (serial) |
-| #1820 | #1452 **partial** | `186cea472` | `3130fb52b` | **none, deliberate** | queued (serial) |
+**Prepared, deliberately not executed:** converge onto the post-#1810 `main` in one pass, with the same
+ancestry + byte proof used for #1805 and #1810, then fresh current-main CI. Held so the seam is taken
+once, after #1810 lands, rather than twice.
 
-Merging #1814 must **not** close #1592; merging #1820 must **not** close #1452. Both have empty
-`closingIssuesReferences`, verified live.
+Evaluator's deferred finding 2 (`SharedKvConfig` only implicitly exported; `createLazyKv` absent from
+the kv reference page) is folded to Slice 2 / the docs sweep, as it recommends.
 
-**A real blocker found and cleared:** while draft, CI's heavy lanes (`check-test`, `quality`,
-`code-quality`, `close-gate`) were **all skipping** — `ci.yml` gates them on
-`pull_request.draft == false`. All three would have reached the coordinator as "green" merge
-candidates carrying **no real CI**. Each is now non-draft with `impl-eval:skip` applied, so CI runs in
-parallel while the IMPL-EVAL chain stays serial and un-duplicated.
+---
 
-Gates re-cut at each integrated head, every receipt `gitHead == actualGitHead` with **non-empty
-`stdout.bytes`** checked explicitly against the D-1 cache-replay trap. `deno.lock` byte-identical
-(`edfa0c24…`) on all three. PR bodies rewritten to record the integration and the re-cut evidence.
+## PR #1814 — `#1592` Slice 1 (**partial**) — **NOT merge-ready; bounded repair in flight**
+
+`quality` fails at `Publish dry-run` with **3x `TS2345`**. Proven slice-caused: `main`'s `ci.yml` is
+green at `7908399af`, `584caa03f`, and `0274c0a70`, and that job runs `publish:dry-run` on every push.
+
+**Root cause — not what the error text suggests.** `packages/plugin-workers-core` carries **four**
+hand-maintained declarations of the execution-record shape. The slice updated two:
+
+| Declaration | Progress fields |
+| --- | --- |
+| `src/domain/job-definition.ts` (zod `ExecutionRecordSchema` + TS mirror) | updated |
+| `src/state/execution-state.ts:35` | updated |
+| `src/runtime/runtime-types.ts:129` | **stale — 0 occurrences** |
+| `src/registry/registry-types.ts:119` | **stale — 0 occurrences** |
+
+`ExecutionRecordSchema` feeds the **public v1 contract** via `workers.contract-definition.ts:197`, so
+v1 output now requires the fields — but the workers routers import `ExecutionRecord` from
+`@netscript/plugin-workers-core/runtime`, the *stale* copy, and spread it into the response.
+`execution-state.ts:33-35` states the very invariant that broke: *"A fixed, fully-enumerated shape
+keeps spreads precise so the connector handlers type-check against the contract."*
+
+Repair dispatched (Codex `gpt-5.6-sol · high`, thread `01a0560f-2014-7d62-8007-37c5fb55ef5a`,
+confirmed live): add the two nullable fields to the two stale declarations. Two files, no
+`plugins/**` change, and the v1 contract shape is **not** weakened. Fresh gates + eval follow.
+
+**Standing debt:** four duplicate hand-maintained declarations of one record shape is the defect
+class; this repair restores consistency but does not remove the duplication.
