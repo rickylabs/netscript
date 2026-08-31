@@ -5149,3 +5149,28 @@
     release barrier is gone, and each exact-green Aspire merge packet is surfaced immediately toward
     canary 6.
   - Tenth dead-sender orphan released before launch (`ownerPid 2690743`).
+
+- **D-217 — barrier open; merge packet surfaced with TWO leaves ready, not four. Two of the named
+  packets are not green, and I checked rather than forwarding the list.**
+  - **Ready now: #1835 (`b7d0a60ac`) and #1837 (`01d32c95f`).** Both `pr-checks` **PASS** (32 checks,
+    `currentFailures=0`), `MERGEABLE`/`CLEAN`, 8 behind, full `acceptance-evidence` posted, DoD
+    complete, **neither contains S8's typed-db surface** so neither is exposed to the open seed defect.
+    Left at `status:impl-eval` and draft — the ready-flip and merge are coordinator-owned.
+  - **#1744 held: it is NOT green.** Its forced `ci:full` run gave the Postgres tier its **first
+    genuine execution** at that head: `passed=46 failed=1`, failing **`runtime.wait.garnet` at
+    300465 ms** (run `33425247583`, job `99597228455`). S7's own acceptance is fully evidenced and its
+    `database.seed` **passes** — the blocker is #1844 and cannot be fixed from inside the PR.
+  - **#1771 held: not dependency-safe and not mergeable.** `CONFLICTING`/`DIRTY`, 22 behind, **and it
+    contains S8's typed-db surface** (it is stacked on S10). Merging it would land unrepaired S8
+    content *ahead of S8*. Verified by `git cat-file -e`, not assumed.
+  - **Two genuinely new facts from the #1744 run, in opposite directions:**
+    1. **The containment hypothesis gained its real second data point.** #1744 lacks S8 and **passes
+       `database.seed`**. Now 2 passes without S8 (#1747, #1744) against 4+ failures with it.
+    2. **Garnet reproduces — it is not flake.** Two independent heads, 300451 ms and 300465 ms, within
+       **14 ms** of each other, both immediately after `runtime.wait.postgres` passed in ~1.5 s.
+       Observations stand at **2 failures, 0 passes**. Posted to #1844, superseding *both* my earlier
+       comments there — the false "baseline" (a policy skip) and the flake reading that followed it.
+       My suggestion to lower its priority is withdrawn outright; the two-observation threshold the
+       fixes lane was waiting for is met.
+  - Recorded the remaining dependency order on the epic: S8 (repair in flight) → S9/S10 → S11
+    (converge) → S13 (parity box 2 verifies only once S9 is on `main`).
