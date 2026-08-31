@@ -38,7 +38,13 @@ type _OutputRouteMetaRemainsExact = Assert<
 >;
 
 const publicMeta: NetScriptProcedureMeta = {
-  access: { authentication: 'required' },
+  access: {
+    authentication: 'required',
+    authorization: {
+      scopes: ['items:read'],
+      roles: ['operator'],
+    },
+  },
 };
 
 const authenticatedRoute: InputOutputRoute = baseContract
@@ -51,9 +57,18 @@ const validAuthentication: NetScriptAuthenticationRequirement = 'optional';
 // @ts-expect-error TS2322: authentication accepts only the public NetScript literals.
 const invalidAuthentication: NetScriptAuthenticationRequirement = 'sometimes';
 
-baseContract.meta({ access: { authentication: 'none' } });
+baseContract.meta({
+  access: {
+    authentication: 'none',
+    authorization: { scopes: ['items:read'], roles: ['operator'] },
+  },
+});
 // @ts-expect-error TS2322: access metadata must use the public object shape.
 baseContract.meta({ access: 'none' });
+// @ts-expect-error TS2353: access metadata has no parallel public-policy vocabulary.
+baseContract.meta({ access: { public: true } });
+// @ts-expect-error TS2339: declared scopes are immutable.
+publicMeta.access?.authorization?.scopes?.push('items:write');
 
 void authenticatedRoute;
 void validAuthentication;

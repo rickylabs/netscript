@@ -1,0 +1,36 @@
+{
+  "gateId": "exports-drift",
+  "invocationId": "1387-s9-exports-drift",
+  "argv": [
+    "deno",
+    "task",
+    "docs:exports-drift"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "582e823223c3c0217dc832d593cad095c6dbf8b7",
+  "actualGitHead": "582e823223c3c0217dc832d593cad095c6dbf8b7",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex-slice-9",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "689c649da4664fdc45b20628f967ee921993851b444bd24983f12703f62c6a07",
+  "lifecycleId": "codex-slice-9:1387-s9-exports-drift:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T23:16:24.818Z",
+  "startedAt": "2026-08-30T23:16:24.820Z",
+  "finishedAt": "2026-08-30T23:16:27.737Z",
+  "durationMs": 2917,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 1650,
+    "sha256": "7e64ba4ec3070784e285b125b3ee4423270509bb9a119965111355ff2cf8da45",
+    "tail": "Coverage [fresh-ui]: mode=complete; reason=\"All six published entrypoints are maintained as one complete reference surface.\"; omitted-symbol-groups=0; documented-non-export-groups=1\nCoverage [plugin]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [config]: mode=complete; reason=\"The config reference is maintained as a complete published-symbol inventory.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [contracts]: mode=complete; reason=\"The contracts reference is maintained as a complete published-symbol inventory.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [queue]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [sdk]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [service]: mode=entrypoints-only; reason=\"This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.\"; omitted-symbol-groups=0; documented-non-export-groups=0\nCoverage [telemetry]: mode=complete; reason=\"The telemetry reference curates stable entrypoints and primary APIs while classifying lower-level contracts explicitly.\"; omitted-symbol-groups=1; documented-non-export-groups=0\nExports & Symbols drift check: PASS\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 112,
+    "sha256": "6b3227ef695597fbc2c2bf0c3350f5ee5251e894020513f33412a26568c1294f",
+    "tail": "Task docs:exports-drift deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts\n",
+    "truncated": false
+  }
+}

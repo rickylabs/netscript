@@ -142,6 +142,10 @@ export type ExecutionRecord = Readonly<
     readonly error: string | null;
     readonly result: Record<string, unknown> | null;
     readonly workerId: string | null;
+    /** Latest execution progress percentage. */
+    readonly progressPercent: number | null;
+    /** Latest execution progress message. */
+    readonly progressMessage: string | null;
     readonly attempt: number;
     readonly maxAttempts: number;
     readonly payload?: Record<string, unknown>;

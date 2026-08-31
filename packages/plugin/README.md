@@ -29,6 +29,9 @@ plugin code.
   alias and threads a `DependencyContext` into contribution callbacks.
 - **Inspection without execution** — `inspectPlugin` returns a JSON-stable report for a manifest,
   registry, or path target; `verifyPlugin` checks a manifest against declared expectations.
+- **One service identity contract** — `Principal` and `ServiceHandlerContext` are owned by
+  `@netscript/service`; the plugin root and `./service` entrypoint re-export those same types rather
+  than defining plugin-local copies.
 - **Focused subpaths for every consumer** — host tooling, CLI command groups, discovery, abstract
   bases, protocol, templates, and test fixtures each get their own entrypoint, so nobody imports
   more than they need.
@@ -72,11 +75,34 @@ Contribution methods such as `.withService(...)` accumulate plain data; `.build(
 whole manifest at once, so a malformed contribution fails the build with a typed error rather than
 surfacing later inside a host.
 
+## Service identity types
+
+Plugin authors can import service identity types from the plugin surface when a contribution names
+them directly:
+
+```ts
+import type { Principal, ServiceHandlerContext } from '@netscript/plugin';
+
+type BillingContext = ServiceHandlerContext<{ readonly tenantId: string }>;
+
+function requirePrincipal(context: BillingContext): Principal {
+  if (!context.principal) {
+    throw new Error('authenticated principal required');
+  }
+  return context.principal;
+}
+```
+
+These are re-exports of the public `@netscript/service` contracts. The service package remains the
+owner, and `ServiceHandlerContext.principal` remains optional so unguarded handlers and existing
+plugin services are unaffected. Narrow the principal in handlers that require identity; do not add
+a second plugin-specific principal shape.
+
 ## Public surface
 
 | Entry             | What it gives you                                                                                                  |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `.`               | `definePlugin`, `PluginBuilder`, `inspectPlugin`, `verifyPlugin`, the manifest schema, and the typed error classes |
+| `.`               | `definePlugin`, `PluginBuilder`, `inspectPlugin`, `verifyPlugin`, `Principal`, `ServiceHandlerContext`, the manifest schema, and the typed error classes |
 | `./adapter`       | The adapter seam deployable plugins expose and hosts drive                                                         |
 | `./config`        | Configuration surfaces for host tooling                                                                            |
 | `./cli`           | Plugin CLI command-group plumbing and argument parsing                                                             |
@@ -85,6 +111,7 @@ surfacing later inside a host.
 | `./abstracts`     | Abstract bases marking plugin extension points                                                                     |
 | `./testing`       | Fixtures for exercising manifests and adapters in tests                                                            |
 | `./loader`        | The host-side plugin loader entrypoint                                                                             |
+| `./service`       | Plugin service composition plus the service-owned `Principal` and `ServiceHandlerContext` types                     |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin@<version>`](https://jsr.io/@netscript/plugin/doc) (pin `<version>`

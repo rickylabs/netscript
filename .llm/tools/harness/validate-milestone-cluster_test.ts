@@ -1,7 +1,10 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { renderMilestoneStatus } from './render-milestone-status.ts';
 import {
+  type LiveMilestonePr,
   type MilestoneClusterArtifacts,
+  type MilestonePrSource,
+  milestonePrSourceFromExport,
   parseValidateCliArgs,
   validateMilestoneCluster,
 } from './validate-milestone-cluster.ts';
@@ -14,12 +17,32 @@ type MutableArtifacts = {
   status: string;
 };
 
+function prSource(pullRequests: readonly LiveMilestonePr[]): MilestonePrSource {
+  return {
+    listOpenMilestonePrs: () =>
+      Promise.resolve(pullRequests.filter((pullRequest) => pullRequest.state === 'open')),
+    readPrHead: (_repo, prNumber) => {
+      const pullRequest = pullRequests.find((candidate) => candidate.number === prNumber);
+      if (!pullRequest) return Promise.reject(new Error(`PR #${prNumber} is unavailable`));
+      return Promise.resolve(pullRequest);
+    },
+  };
+}
+
 function clone<T>(value: T): T {
   return structuredClone(value);
 }
 
 Deno.test('validate CLI accepts the deno task separator and rejects malformed usage', () => {
   assertEquals(parseValidateCliArgs(['--', '/tmp/run']), { runDir: '/tmp/run' });
+  assertEquals(parseValidateCliArgs(['/tmp/run', '--github-prs', '/tmp/prs.json']), {
+    runDir: '/tmp/run',
+    githubPrsPath: '/tmp/prs.json',
+  });
+  assertStringIncludes(
+    parseValidateCliArgs(['/tmp/run', '--github-prs']).error ?? '',
+    'requires a path',
+  );
   assertStringIncludes(parseValidateCliArgs(['--']).error ?? '', 'missing run directory');
   assertStringIncludes(parseValidateCliArgs(['a', 'b']).error ?? '', 'exactly one');
 });
@@ -164,26 +187,204 @@ async function validArtifacts(): Promise<MutableArtifacts> {
   return { intake, inventory, dag, state, status: await renderMilestoneStatus(state) };
 }
 
+function currentPrSource(artifacts: MilestoneClusterArtifacts): MilestonePrSource {
+  const state = artifacts.state as Record<string, unknown>;
+  const leaf = (state.leaves as Record<string, unknown>[])[0];
+  return prSource([{
+    number: leaf.prNumber as number,
+    issueNumbers: leaf.issueNumbers as number[],
+    lane: leaf.lane as LiveMilestonePr['lane'],
+    baseBranch: leaf.baseBranch as string,
+    headSha: leaf.headSha as string,
+    state: 'open',
+    role: 'leaf',
+  }]);
+}
+
+function validateArtifacts(
+  artifacts: MilestoneClusterArtifacts,
+  source: MilestonePrSource = currentPrSource(artifacts),
+) {
+  return validateMilestoneCluster(artifacts, source);
+}
+
 async function expectRed(
   mutate: (artifacts: MutableArtifacts) => void | Promise<void>,
   expected: string,
 ): Promise<void> {
   const artifacts = await validArtifacts();
   await mutate(artifacts);
-  const result = await validateMilestoneCluster(artifacts as MilestoneClusterArtifacts);
+  const result = await validateArtifacts(artifacts as MilestoneClusterArtifacts);
   assertEquals(result.ok, false);
   assertStringIncludes(result.errors.join('\n'), expected);
 }
 
 Deno.test('valid milestone cluster passes the Step 0 and control-plane contract', async () => {
-  const result = await validateMilestoneCluster(await validArtifacts());
+  const artifacts = await validArtifacts();
+  const result = await validateArtifacts(artifacts);
   assert(result.ok, result.errors.join('\n'));
   assertEquals(result.errors, []);
+  assertEquals(result.findings, []);
+});
+
+Deno.test('RED: an allocated leaf with a stale live PR head is a structured finding', async () => {
+  const artifacts = await validArtifacts();
+  const recordedHead = (artifacts.state.leaves as Record<string, unknown>[])[0].headSha as string;
+  const liveHead = 'c'.repeat(40);
+  const result = await validateArtifacts(
+    artifacts,
+    prSource([{
+      number: 200,
+      issueNumbers: [101],
+      lane: 'fixes',
+      baseBranch: 'main',
+      headSha: liveHead,
+      state: 'open',
+      role: 'leaf',
+    }]),
+  );
+
+  assertEquals(result.ok, false);
+  assertEquals(result.findings, [{
+    kind: 'stale-head',
+    issueNumber: 101,
+    prNumber: 200,
+    lane: 'fixes',
+    recordedHead,
+    liveHead,
+  }]);
+});
+
+Deno.test('RED: an open milestone PR absent from cluster leaves is a structured finding', async () => {
+  const artifacts = await validArtifacts();
+  const recordedHead = (artifacts.state.leaves as Record<string, unknown>[])[0].headSha as string;
+  const missingHead = 'd'.repeat(40);
+  const result = await validateArtifacts(
+    artifacts,
+    prSource([
+      {
+        number: 200,
+        issueNumbers: [101],
+        lane: 'fixes',
+        baseBranch: 'main',
+        headSha: recordedHead,
+        state: 'open',
+        role: 'leaf',
+      },
+      {
+        number: 201,
+        issueNumbers: [101],
+        lane: 'fixes',
+        baseBranch: 'main',
+        headSha: missingHead,
+        state: 'open',
+        role: 'leaf',
+      },
+    ]),
+  );
+
+  assertEquals(result.ok, false);
+  assertEquals(result.findings, [{
+    kind: 'missing-leaf',
+    issueNumber: 101,
+    prNumber: 201,
+    lane: 'fixes',
+    recordedHead: null,
+    liveHead: missingHead,
+  }]);
+});
+
+Deno.test('coordinator artifact PRs are explicitly excluded from missing-leaf findings', async () => {
+  const artifacts = await validArtifacts();
+  const recordedHead = (artifacts.state.leaves as Record<string, unknown>[])[0].headSha as string;
+  const result = await validateArtifacts(
+    artifacts,
+    prSource([
+      {
+        number: 200,
+        issueNumbers: [101],
+        lane: 'fixes',
+        baseBranch: 'main',
+        headSha: recordedHead,
+        state: 'open',
+        role: 'leaf',
+      },
+      {
+        number: 201,
+        issueNumbers: [],
+        lane: null,
+        baseBranch: 'main',
+        headSha: 'd'.repeat(40),
+        state: 'open',
+        role: 'coordinator-artifact',
+      },
+    ]),
+  );
+
+  assert(result.ok, result.errors.join('\n'));
+  assertEquals(result.findings, []);
+});
+
+Deno.test('a merged leaf is excluded from live-head reconciliation', async () => {
+  const artifacts = await validArtifacts();
+  const leaf = (artifacts.state.leaves as Record<string, unknown>[])[0];
+  leaf.phase = 'merged';
+  artifacts.status = await renderMilestoneStatus(artifacts.state);
+  const result = await validateArtifacts(
+    artifacts,
+    prSource([{
+      number: leaf.prNumber as number,
+      issueNumbers: leaf.issueNumbers as number[],
+      lane: leaf.lane as LiveMilestonePr['lane'],
+      baseBranch: 'main',
+      headSha: 'c'.repeat(40),
+      state: 'merged',
+      role: 'leaf',
+    }]),
+  );
+
+  assert(result.ok, result.errors.join('\n'));
+  assertEquals(result.findings, []);
+});
+
+Deno.test('an unavailable PR source fails closed with a structured finding', async () => {
+  const artifacts = await validArtifacts();
+  const result = await validateMilestoneCluster(artifacts);
+
+  assertEquals(result.ok, false);
+  assertEquals(result.errors, []);
+  assertEquals(result.findings[0]?.kind, 'source-unavailable');
+  assertEquals(result.findings[0]?.issueNumber, null);
+  assertEquals(result.findings[0]?.prNumber, null);
+  assertStringIncludes(result.findings[0]?.detail ?? '', 'was not provided');
+});
+
+Deno.test('the read-only PR export provides both listing and head-reading operations', async () => {
+  const pullRequest = {
+    number: 200,
+    issueNumbers: [101],
+    lane: 'fixes',
+    baseBranch: 'main',
+    headSha: 'b'.repeat(40),
+    state: 'open',
+    role: 'leaf',
+  } as const;
+  const source = milestonePrSourceFromExport({
+    schemaVersion: 1,
+    repo: 'rickylabs/netscript',
+    milestone: '0.0.7',
+    capturedAt: '2026-08-31T03:00:00.000Z',
+    pullRequests: [pullRequest],
+  });
+
+  assertEquals(await source.listOpenMilestonePrs('rickylabs/netscript', '0.0.7'), [pullRequest]);
+  assertEquals(await source.readPrHead('rickylabs/netscript', 200), pullRequest);
 });
 
 Deno.test('RED: missing intake artifact fails closed', async () => {
   const artifacts = await validArtifacts();
-  const result = await validateMilestoneCluster({ ...artifacts, intake: null });
+  const malformed = { ...artifacts, intake: null };
+  const result = await validateMilestoneCluster(malformed, currentPrSource(artifacts));
   assertEquals(result.ok, false);
   assertStringIncludes(result.errors.join('\n'), 'milestone-intake.json must be an object');
 });
@@ -306,7 +507,7 @@ Deno.test('release captain requires recomputed exact-main receipt sufficiency', 
     evidence: [],
   };
   artifacts.status = await renderMilestoneStatus(artifacts.state);
-  const result = await validateMilestoneCluster(artifacts);
+  const result = await validateArtifacts(artifacts);
   assert(result.ok, result.errors.join('\n'));
 
   const forged = clone(artifacts);
@@ -316,7 +517,7 @@ Deno.test('release captain requires recomputed exact-main receipt sufficiency', 
     receiptRefs: ['hand-written'],
   };
   forged.status = await renderMilestoneStatus(forged.state);
-  const forgedResult = await validateMilestoneCluster(forged);
+  const forgedResult = await validateArtifacts(forged);
   assertEquals(forgedResult.ok, false);
   assertStringIncludes(forgedResult.errors.join('\n'), 'expectedGateIds must not be empty');
 });
