@@ -6479,3 +6479,31 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
 - **P0 #1827 dispatched immediately, before resuming anything else**, as directed.
 - **Two active author sessions, not three** — #1753's author is idle (its work is complete and under
   IMPL-EVAL), so #1827 takes a genuinely free slot rather than exceeding the cap.
+
+## D-142 — #1827 wrong-oracle defect caught before push; correction queued
+
+- Coordinator flagged RED commit `86443f47a` as invalid. **Verified every claim directly rather than
+  relaying it**, resolving each candidate path empirically from `packages/cli/e2e/tests/`:
+
+| Relative path | Resolves to | `compilerOptions.lib` |
+| --- | --- | --- |
+| `../../deno.json` | `packages/cli/deno.json` | `["deno.ns","deno.unstable","dom"]` ← **correct oracle** |
+| `../deno.json` | `packages/cli/e2e/deno.json` | file under repair |
+| `../../../../deno.json` | repo root `deno.json` | `["dom","deno.ns","deno.unstable"]` ← **wrong** |
+
+- **Two distinct defects found, one of which the coordinator had not named**:
+  1. `config-lib-parity_test.ts:14` reads the root oracle (`../../../../deno.json`) — the flagged
+     defect.
+  2. **The author had additionally made an uncommitted edit to `packages/cli/e2e/deno.json`
+     reordering lib to `["dom","deno.ns","deno.unstable"]`** — the root-derived order, i.e. the wrong
+     fix propagating from the wrong oracle. Caught by checking the working tree, not just the commit.
+- **Good news on blast radius**: the RED commit itself has the config still at `["deno.ns","dom"]`
+  (verified via `git show 86443f47a:packages/cli/e2e/deno.json`), and **nothing was pushed** — the
+  bad state is confined to one local commit plus an uncommitted edit.
+- Correction queued for delivery at turn-end (author was mid-turn; a resume attempt was correctly
+  rejected with `already has an active writer` rather than forcing a rival send). It instructs:
+  revert the uncommitted wrong-order edit, `--amend` the invalid RED in place rather than preserving
+  a bad receipt, repoint the oracle to `../../deno.json`, **rewrite the plan/research claims that
+  currently lock root order as canonical** so wrong evidence does not ship, then rerun RED and GREEN.
+- The watcher re-reads the correction file at send time, so the rewritten (fuller) version will be
+  delivered, not the earlier draft.
