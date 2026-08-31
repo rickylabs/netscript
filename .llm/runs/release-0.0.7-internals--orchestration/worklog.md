@@ -6981,3 +6981,68 @@ Recording the process gap honestly: the disjointness boundary I gave on the #169
 sibling #1543 and was correct as written, but #1829 landed in that file surface afterwards. **A
 collision check taken once at dispatch goes stale** — for a leaf whose entire job is moving a
 dependency family, it has to be re-taken at final freeze. Carrying that forward.
+
+## D-158 — #1737 IMPL-EVAL PASS; I rejected one evaluator finding with evidence rather than absorbing it
+
+Artifact `a06e1529f` (artifact-only), evaluated head `84ef7bf74`. **VERDICT: PASS.**
+
+The evaluator earned the verdict — it re-derived rather than re-read. Notably it **proved the guard
+has teeth** instead of assuming it: injected a mirror ref into a third untouched skill and got
+`rc=1` naming the new offender, and confirmed a missing manifest file fails loudly rather than
+passing silently. It also caught that the test blob changed RED→GREEN and checked the change was
+quote-style fmt only, with every assertion intact — exactly the question I asked it to answer rather
+than inherit.
+
+### The Medium finding is wrong, and rejecting it is the point
+
+The evaluator claimed my declared #1759 shared-carrier collision was **"phantom"**, on the basis that
+`gh pr view 1759 --json files` shows no `*.generated.ts` and no root `skills/`. **That is an
+artifact of API pagination, not of #1759's contents:**
+
+- `gh pr view 1759 --json files` returns exactly **100** paths — the page limit. Page 2 returns **15
+  more**. The whole first page is `.agents/generated/consumer-skills/**`, so the truncation hid
+  precisely the paths at issue.
+- #1759 is a **stacked** PR (base `feat/aspire-13-5-s8-typed-resource-commands`, not `main`), so its
+  own file list is not the set that lands on main either.
+- Both diffs contradict the finding — vs its own base **and** stack-vs-`main` include
+  `packages/cli/src/kernel/assets/skills.generated.ts`, `skills/aspire/SKILL.md`, `skills/help.md`.
+
+**DR-r3-01 stands unchanged.** Recorded the rejection with its evidence on the PR rather than quietly
+keeping my own position. An evaluator that is right about the leaf can still be wrong about the
+context, and "an agent asserted it" is not evidence — the truncation mechanism is the transferable
+lesson: a 100-path page limit silently truncates a large PR's file list, and a stacked PR's file list
+is not what it lands.
+
+### The two Low findings are accepted and filed, not absorbed
+
+1. The guard inspects shipped `SKILL.md` bodies only — an injected offender in `skills/help.md`
+   passes (`rc=0`). Not a live defect (`help.md` is clean) but a live gap, and a pointed one:
+   **`skills/help.md` is one of the files #1759 modifies.**
+2. An emptied `manifest.files` passes vacuously.
+
+Both belong in one follow-up hardening issue, outside this leaf's bounded scope.
+
+### Transition — deliberately not repeating the #1828 mistake
+
+Issue #1737 has **no acceptance checkboxes at all** (sections are Summary / Why p2 / Provenance /
+Target contract / Boundaries), so there is nothing for the mirror to tick and no
+`acceptance-evidence` block is required. PR flipped ready to trigger exact CI, review threads
+**0 / 0 unanswered**, and both PR and issue held at sole `status:impl-eval`. **`status:ready-merge`
+will be applied only after exact CI is green** — the #1828 lesson applied rather than merely
+recorded. Also normalized a stray second status label (`status:triage`) on the issue.
+
+## D-159 — #1832 released to integrate now that #1829 has merged
+
+#1829 merged at 05:25:13Z; `main` = `f59874abd2bc39446b21f5126323e0d2dcbce547`, carrying the nested
+`TokenUsage` passthrough into the very adapter #1832 modifies. The DR-r3-03 guard is lifted and the
+author is released — with the load-bearing condition stated plainly:
+
+**Run #1829's own passthrough tests against the bumped dependency.** #1832's own suite passing proves
+nothing about this interaction, because its tests do not assert #1829's behavior. The author is also
+told that a clean auto-merge is **not** evidence the resolution is correct, and that if #1829's
+coverage fails against the bump it must be **reported, not patched around** — that outcome would mean
+the 0.39 → 0.48 move genuinely changes how usage detail flows, which is a decision for me and the
+coordinator.
+
+Instructed to fetch and merge **whatever `main` actually is at that moment** rather than the SHA in
+the message — main has moved four times within the hour, and a brief that hardcodes a base ages badly.
