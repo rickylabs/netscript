@@ -14,8 +14,9 @@
 
 ## Current State
 
-S1 was accepted and then owner-narrowed. No product/test code exists on the branch. The locked
-implementation contract now has two defects only: add the throwing publisher companion plus
+S1 was accepted and then owner-narrowed. S2.1 is GREEN: its RED test commit proved the missing
+throwing boundary, and the core helper plus core/plugin exports now pass both whole-package suites.
+The locked implementation contract has two defects only: add the throwing publisher companion plus
 discarded-receipt quality rule, and correct four unsafe documentation calls plus stale fallback
 prose/source-sync coverage. The product ceiling is 20 paths. Every workers product/test path and all
 endpoint-diagnostic work are excluded.
@@ -48,7 +49,7 @@ runtime lease is required.
 
 ## S2 Slices
 
-1. Core helper + core/plugin exports + helper tests + port doc.
+1. Core helper + core/plugin exports + helper tests + port doc — GREEN.
 2. Discarded-receipt scanner rule + fixtures.
 3. Source-sync test/task + four unsafe calls + two reference corrections.
 4. Attributed derivatives + full static/package/docs/lock/ceiling handoff.
@@ -80,5 +81,5 @@ runtime lease is required.
 
 ## Next Action
 
-Implement S2.1 through S2.4 with isolated RED then GREEN commits. Stop at implementation complete;
+Implement S2.2 through S2.4 with isolated RED then GREEN commits. Stop at implementation complete;
 the supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.

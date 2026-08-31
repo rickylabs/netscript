@@ -105,6 +105,8 @@ derivation contract.
 | 2026-08-31       | S1 correction | narrowing             | Reduced contract to helper/quality rail plus docs/source-sync; locked 20 paths and four slices.                   |
 | 2026-08-31       | S1 correction | policy recommendation | Recommended `PLAN-EVAL: N/A`, pending primary decision; no S2 started.                                            |
 | 2026-08-31       | S2 activation | primary ruling        | Primary accepted `PLAN-EVAL: N/A`; supervisor converged docs-only main at `9f1f9fb87`; S2 authorized.             |
+| 2026-08-31       | S2.1 RED      | helper contract       | Compiling focused test proved 0 passed/3 failed solely because the core publisher export was absent; `2f913f237`. |
+| 2026-08-31       | S2.1 GREEN    | throwing companion    | Added the core helper/re-exports; focused 3/0, core 87/0/3, sagas 55/0/1, with package checks and policy gates.   |
 
 ## New-Base Gate Results
 
@@ -154,6 +156,28 @@ do not authorize or justify a workers edit; no workers path is in the narrowed c
 `PLAN-EVAL: N/A` accepted by the primary. The complete mechanism, surface, ceiling, negative scope,
 acceptance contract, and measured gates made a separate planning evaluator unnecessary. IMPL-EVAL
 remains mandatory after implementation and is owned by the supervisor.
+
+## S2.1 Evidence — Core Throwing Companion
+
+RED was committed before product changes as `2f913f237`:
+
+- `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core/tests/integration/publisher/publish-saga-or-throw_test.ts --ext ts`
+  — PASS 1/1.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/plugin-sagas-core/tests/integration/publisher/publish-saga-or-throw_test.ts`
+  — expected exit 1, 0 passed/3 failed; every failure was the missing publisher export.
+
+GREEN evidence after the helper and two entrypoint exports:
+
+- focused helper test — PASS 3/0.
+- core whole-package check/test/lint/fmt — PASS 114/114; 87 passed/0 failed/3 ignored; PASS 114/114;
+  PASS 114/114.
+- sagas whole-package check/test/lint/fmt — PASS 87/87; 55 passed/0 failed/1 ignored; PASS 87/87;
+  PASS 87/87.
+- core doc lint retained the exact 9-private-reference baseline; sagas retained 27. Core audit
+  remained PASS with 2 warnings; sagas retained the exact module-tag baseline plus 2 warnings.
+- both package publish dry-runs, `arch:check:repo`, and the public `deno doc` inspections passed.
+- `quality:scan:repo` remained PASS with 0 findings and 7 valid allowances before the new rule
+  slice.
 
 ## Hard Stops
 
