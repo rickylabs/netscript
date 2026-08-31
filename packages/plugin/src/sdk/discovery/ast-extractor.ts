@@ -24,8 +24,8 @@ export class AstExtractor implements ExtractorPort {
   readonly #builders: readonly ContributionBuilderPattern[];
 
   /** Create an extractor with immutable per-instance builder configuration. */
-  constructor(options: AstExtractorOptions = {}) {
-    this.#builders = createContributionBuilders(options.additionalBuilders ?? []);
+  constructor(options?: AstExtractorOptions) {
+    this.#builders = createContributionBuilders(options?.additionalBuilders ?? []);
   }
 
   /** Extract contribution candidates from walked source files. */

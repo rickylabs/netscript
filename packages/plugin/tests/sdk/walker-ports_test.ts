@@ -4,7 +4,6 @@ import {
   AstExtractor,
   FilesystemWalker,
   MemoryManifestResolver,
-  type RegistryEmission,
   RegistryEmitter,
   runWalkerPipeline,
   startWalker,
@@ -172,6 +171,29 @@ Deno.test({
 });
 
 Deno.test({
+  name: 'startWalker preserves official defaults for a no-options consumer',
+  permissions: { read: true, write: true },
+  fn: async () => {
+    const root = await Deno.makeTempDir();
+
+    try {
+      await Deno.writeTextFile(
+        join(root, 'send-email.ts'),
+        `export const sendEmail = defineJob('send-email').build();`,
+      );
+
+      const emissions = await startWalker(root);
+
+      assertEquals(emissions.map((emission) => emission.path), [
+        '.netscript/generated/jobs.registry.ts',
+      ]);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  },
+});
+
+Deno.test({
   name: 'startWalker forwards third-party builder configuration',
   permissions: { read: true, write: true },
   fn: async () => {
@@ -183,12 +205,9 @@ Deno.test({
         `export const syncGeneral = defineChannelSync('general').build();`,
       );
 
-      const emissions: readonly RegistryEmission[] = await Reflect.apply(startWalker, undefined, [
-        root,
-        {
-          additionalBuilders: [{ callee: 'defineChannelSync', axis: 'channel-syncs' }],
-        },
-      ]);
+      const emissions = await startWalker(root, {
+        additionalBuilders: [{ callee: 'defineChannelSync', axis: 'channel-syncs' }],
+      });
 
       assertEquals(emissions.map((emission) => emission.path), [
         '.netscript/generated/channel-syncs.registry.ts',

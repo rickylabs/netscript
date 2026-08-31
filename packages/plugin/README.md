@@ -90,6 +90,27 @@ The always-current symbol list is
 [`deno doc jsr:@netscript/plugin@<version>`](https://jsr.io/@netscript/plugin/doc) (pin `<version>`
 on the pre-release line, as above).
 
+## Extend SDK discovery
+
+External tooling can add a plugin's own contribution factory to one discovery run without changing
+the official defaults:
+
+```typescript
+import { type AstExtractorOptions, startWalker } from '@netscript/plugin/sdk';
+
+const options = {
+  additionalBuilders: [
+    { callee: 'defineChannelSync', axis: 'channel-syncs' },
+  ],
+} satisfies AstExtractorOptions;
+
+const registries = await startWalker('.', options);
+```
+
+The SDK always retains the built-in `defineJob`, `defineSaga`, and `defineWebhook` mappings.
+Additional mappings are snapshotted per extractor instance; malformed identifiers, blank axes, and
+duplicate callees throw a `TypeError` during construction.
+
 ## Docs
 
 - **Plugin reference — builder, contributions, and inspection**:

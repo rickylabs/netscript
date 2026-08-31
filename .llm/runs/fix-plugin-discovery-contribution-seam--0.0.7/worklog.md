@@ -9,7 +9,7 @@
 | Base           | `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`      |
 | Archetype      | `4 — Public DSL / Builder`                      |
 | Scope overlays | none                                            |
-| Phase          | S2 implementation in progress                   |
+| Phase          | S2 implementation complete; IMPL-EVAL pending   |
 
 The leaf brief explicitly limits S1 output to `research.md`, `plan.md`, and `worklog.md`; the
 supervisor owns run identity, routing, and PLAN-EVAL disposition. No implementation may begin from
@@ -103,6 +103,10 @@ pipeline (or uses the option-forwarding preset). Adding a factory does not requi
 | 2026-08-31 | S1    | Design lock      | Selected per-instance extractor options, locked the six-path product ceiling, and recorded corpus/CLI handoffs.                                                                                                |
 | 2026-08-31 | S2.1  | RED              | Commit `4659162df`: test-only change compiled across 153 files, then the focused suite failed on real behavior with 5 pass / 2 fail (synthetic factory silently absent; malformed configuration did not throw). |
 | 2026-08-31 | S2.1  | GREEN            | Added frozen official defaults plus immutable per-instance `additionalBuilders`; focused suite passed 7/7 and scoped check/lint/fmt/quality gates stayed clean.                                                  |
+| 2026-08-31 | S2.2  | RED              | Commit `148a655c4`: test-only change compiled across 153 files, then the focused suite failed on real preset behavior with 7 pass / 1 fail because `startWalker` did not forward the synthetic mapping.          |
+| 2026-08-31 | S2.2  | GREEN            | Forwarded optional extractor options, exported/documented both public types, and added the explicit no-options preset compatibility oracle; focused suite passed 9/9.                                          |
+| 2026-08-31 | S2    | Final gates      | Scoped check/lint/fmt/quality stayed clean; doc-lint and JSR reds did not increase; publish dry-run retained exactly two existing warnings; doctrine warnings improved from 3 to 2.                            |
+| 2026-08-31 | S2    | Handoff          | Recorded additive SDK surface corpus staleness in `drift.md`; did not touch `packages/mcp/**`. Implementation stops for supervisor-dispatched separate-session IMPL-EVAL.                                    |
 
 ## Decisions
 
@@ -146,12 +150,13 @@ remains explicit; no green wrapper is treated as proof that the pre-existing fin
 ### Runtime and Consumer Gates
 
 - Runtime/browser/scaffold/E2E/Aspire/Docker: N/A and forbidden in S1.
-- Focused unit proof: NOT RUN in S1 due the static-only constraint; mandatory in S2 through the
-  structured test wrapper.
+- Focused unit proof: NOT RUN in S1 due the static-only constraint; S2 final result is 9 passed / 0
+  failed through the structured test wrapper.
 - CLI consumers: inspected statically; both remain protected by no-arg compatibility, but automatic
   third-party descriptor transport is not claimed.
 - MCP corpus: impact confirmed statically; freshness check/regeneration not run because it is
-  cross-package and outside the ceiling.
+  cross-package and outside the ceiling. The stale generated path and owner handoff are recorded in
+  `drift.md`; the corpus did not move.
 
 ### S2 Slice Evidence
 
@@ -164,6 +169,24 @@ remains explicit; no green wrapper is treated as proof that the pre-existing fin
 | S2.1 | GREEN lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` | PASS: 153 processed, 0 dropped/refused/findings |
 | S2.1 | GREEN format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` | PASS: 153 processed, 0 findings |
 | S2.1 | GREEN quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/plugin --max-allow 0` | PASS: 0 findings, 0 allowances |
+| S2.2 | RED compile | same scoped check command | PASS: 153 files, 2 batches, 0 findings |
+| S2.2 | RED behavior | same focused structured test command | expected FAIL: 7 passed, 1 failed, 8 total, 1 unique failure |
+| S2.2 | GREEN behavior | same focused structured test command | PASS: 9 passed, 0 failed |
+| S2.2 | Public surface | `deno doc --filter <symbol> packages/plugin/src/sdk/mod.ts` for both new types, `AstExtractor`, and `startWalker` | PASS: documented exported types and explicit optional parameters rendered |
+
+### S2 Final Gate Contracts
+
+| Gate | Final result | Baseline contract |
+| ---- | ------------ | ----------------- |
+| Scoped check | PASS: 153 files, 2 batches, 0 findings | green preserved |
+| Scoped lint | PASS: 153 processed, 0 dropped/refused/findings | green preserved |
+| Scoped format | PASS: 153 processed, 0 findings | green preserved |
+| Code-quality scan | PASS: 0 findings, 0 allowances | green preserved |
+| Full export doc-lint | expected exit 1: 15 private refs, 0 missing JSDoc, 0 other; `./sdk` has 0 | exact non-increase (15/0/0) |
+| JSR package audit | expected exit 1: 4 FAIL, 2 WARN, 1 INFO; no owned-file finding | exact non-increase (4/2/1) |
+| Package publish dry-run | PASS; same two unanalyzable dynamic imports at `generated-project-registry.ts:69` and `manifest-resolver.ts:33` | warning count/locations unchanged |
+| Scoped doctrine | exit 0: 0 FAIL, 2 WARN, 1 INFO | improved from 0/3/1; no new finding |
+| Lock hygiene | SHA-256 `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` | byte-identical |
 
 ## Handoff Notes
 

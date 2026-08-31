@@ -16,3 +16,16 @@
 - **Action:** implement the locked slices within the 6-path ceiling. **Separate-session IMPL-EVAL
   remains mandatory** and is supervisor-dispatched; this leaf does not self-certify. MCP corpus
   staleness stays reported external scope per D6 — do not absorb it.
+
+## 2026-08-31 — additive SDK surface leaves the MCP corpus stale
+
+- **What:** S2 adds the exported `ContributionBuilderPattern` and `AstExtractorOptions` types and
+  optional parameters on `AstExtractor` and `startWalker`. `deno doc` confirms all four published
+  `@netscript/plugin/sdk` surface changes.
+- **Impact:** the generated consumer
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is now stale
+  because its generator serializes package Deno-doc signatures. The corpus file was not regenerated
+  or edited, and no `packages/mcp/**` path moved in this leaf.
+- **Severity:** minor (planned external-scope handoff under D6)
+- **Action:** the supervisor must coordinate the corpus refresh with its owner. This leaf preserves
+  the hard six-path product/test ceiling and stops rather than absorbing that generated change.
