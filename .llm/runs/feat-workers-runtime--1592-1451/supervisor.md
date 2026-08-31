@@ -1,0 +1,70 @@
+# Supervisor — workers runtime plumbing plan
+
+## Run identity
+
+| Field                       | Value                                                                              |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| Run id                      | `feat-workers-runtime--1592-1451`                                                  |
+| Phase                       | Plan Gate                                                                          |
+| Profile                     | Archetype 3 — runtime / behavior / engine change                                   |
+| Affected connector boundary | Archetype 5 — `plugins/workers` remains a thin adapter around core contracts       |
+| Worktree                    | `/home/agent/projects/netscript/worktrees/007-leaf-workers`                        |
+| Branch                      | `feat/workers-runtime-plan`                                                        |
+| Baseline                    | `origin/main` at `9fbc2317291dbd33c325782bb33d86a99ee5a027` (refreshed 2026-08-31) |
+| Issues                      | #1592 Slice 2 and #1451                                                            |
+| Scope                       | Plan artifacts only; no product implementation                                     |
+
+The owner selected a clustered planning run because both gaps meet at the workers runtime boundary.
+Research confirmed that the cluster is useful for a shared architecture and gate analysis, while the
+implementation remains three bounded slices: progress transport, config schema, and config-aware
+generation. The progress and schema slices are independently landable; generation follows schema.
+
+## Lane routing
+
+| Lane                  | Provider / model / effort                                                      | Status                                     |
+| --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
+| Plan author           | Current Codex session; exact model and effort are not exposed to this checkout | Active author                              |
+| Formal plan evaluator | Anthropic / Fable 5 / medium, per `lane-policy.md`                             | Required, separate session, not dispatched |
+
+The owner explicitly prohibited evaluator dispatch in this turn. The next supervisor action is to
+run PLAN-EVAL in a separate session after reviewing this commit.
+
+## Harness controls
+
+- `PLAN-EVAL: REQUIRED`
+- Profile authority: `.llm/harness/archetypes/ARCHETYPE-3-runtime-behavior.md`
+- Package authority: `docs/architecture/doctrine/` and the Archetype 3 verdict recorded in
+  `research.md`
+- Connector authority: the Archetype 5 thin-adapter rules apply to touched `plugins/workers` code
+- Plan Gate deliverables requested by the owner: `research.md`, `plan.md`, `supervisor.md`, and
+  `worklog.md`
+- No implementation, issue/PR mutation, labels, evaluator dispatch, or merge action is authorized
+- Lock and cache mutation is prohibited; `deno.lock` must retain its baseline blob
+
+The standard harness context-pack and drift files are intentionally omitted because the owner named
+the exact four artifacts for this plan-only run. All evidence and deviations needed by the evaluator
+are carried in `research.md`, `plan.md`, and `worklog.md` instead.
+
+## Phase state
+
+| Phase          | State                     | Evidence                                                 |
+| -------------- | ------------------------- | -------------------------------------------------------- |
+| Rebaseline     | Complete                  | Branch equals fetched `origin/main`; clean starting tree |
+| Research       | Complete                  | `research.md`                                            |
+| Plan           | Complete                  | `plan.md`                                                |
+| PLAN-EVAL      | Required / not dispatched | Owner-reserved next step                                 |
+| Implementation | Not started               | Outside this run                                         |
+| IMPL-EVAL      | Not started               | Outside this run                                         |
+
+## Stop conditions
+
+Stop and return to planning if implementation discovers any of the following:
+
+1. A live worker-thread adapter or outbound-message consumer not found by the focused searches in
+   `research.md`.
+2. A seventh execution-record declaration is required for progress transport.
+3. Project policy cannot be loaded inside the installed generator child process under the project
+   import graph.
+4. A configured entry cannot be matched deterministically by normalized entrypoint plus id.
+5. The generator must mutate a second manifest or generated configuration source.
+6. A slice exceeds its file ceiling without a reviewed rescope.
