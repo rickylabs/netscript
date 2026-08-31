@@ -6722,3 +6722,9 @@ only what this leaf delivers — helper, scanner rule, zero repo-wide false posi
 corrections, the stale 8092 "fallback port" docs line, the sample-sync test, lock/ceiling integrity,
 and separate-session IMPL-EVAL. Milestone 0.0.8 chosen for all three new issues so nothing lands in
 the 0.0.7 milestone being closed; re-triage is the coordinator's call.
+
+### Residual triage confirmed (coordinator)
+
+`#1824` → **orchestrator:aspire** (not this lane; do not work it). `#1825` and `#1826` →
+**orchestrator:fixes**, milestone **0.0.8**. All three stay off the 0.0.7 deadline; none is orphaned.
+This lane's 0.0.7 queue is unchanged — #1819 implementing, #1773 in plan evaluation.
