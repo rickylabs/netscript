@@ -7179,3 +7179,39 @@ Collision-free: #1773 owns `packages/cli`, #1609 owns `packages/fresh`, this own
 **#1481 was considered and deliberately deferred**: it is scoped to `packages/cli` scaffold assets
 (the `(design)` route group), which collides with #1773's ownership of that surface and the embedded
 barrel. It becomes free the moment #1773 merges and is the natural next pick.
+
+### CORRECTION — my #1773 runtime-carry claim was wrong; withdrawn and being re-earned
+
+An independent audit refuted it and is right. I proved **0/19 handwritten relevant blobs** identical
+between `cd24e4955` and `1c79001e1` and concluded the hosted `scaffold.runtime` SUCCESS carried. That
+inference is invalid: **blob identity of the leaf's own paths does not preserve runtime validity**,
+because main's own content is part of what a scaffolded project builds and runs. Specifically
+**#1820** changed the generated service-context / embedded asset and **#1831** changed SDK browser
+service-key normalization — both exercised by `scaffold.runtime`. I conflated "the leaf's work is
+unchanged" with "the runtime environment is unchanged"; only the first was ever proven.
+
+**Applied immediately rather than argued:**
+- Both runtime DoD rows un-ticked; a `### Correction` section added to the PR body naming #1820/#1831
+  and stating plainly that nothing is claimed from the superseded run.
+- **All three #1616 acceptance rows un-ticked**, with an inline note recording that they had been
+  mirrored from now-insufficient evidence and will be **re-mirrored from the rerun, not restored by
+  hand**. Un-ticking an unsupported claim is a correction; hand-ticking one would not be.
+- Lifecycle moved back `status:ready-merge` → `status:impl` + `gate:e2e` on both PR and issue.
+- Fresh hosted `scaffold.runtime` dispatched at the exact final head `1c79001e1` — run
+  `33362503268`.
+- Bounded **final-head delta** IMPL-EVAL dispatched (`z-ai/glm-5.3-flash`) rather than reusing the
+  earlier verdict wholesale; it is scoped to `ef4d3a63f..1c79001e1` and asked specifically whether
+  #1820/#1831 reach any of the seven locks, and whether the regenerated barrel still embeds the
+  dynamic-route template (a barrel that dropped it would un-ship the feature while every unit test
+  still passed).
+
+### No further product rebase for #1823/#1803 — proven disjoint, not assumed
+
+`#1823` is harness-only (`ee0e626bb`) and `#1803` docs-only; live main is `71d5fb8e0`.
+
+- Main delta `bd9d463b4..71d5fb8e0` is 24 files; the only non-docs/harness entries are two
+  **generated carriers** (`agent-docs.generated.ts`, `publish-assets.generated.ts`). No product source.
+- **Path intersection with the leaf's 20 changed paths: 0.**
+- **Exact local synthetic merge is CLEAN** via non-destructive `git merge-tree --write-tree`
+  (tree `6e99a3dabd4b4b30aa42bd2b9b9a3ecf0a1dee84`) — computed without touching the branch, so no
+  product history was churned for a disjoint merge.
