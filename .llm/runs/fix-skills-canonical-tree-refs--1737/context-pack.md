@@ -12,25 +12,32 @@
 
 ## Current State
 
-Re-baselined at `eaea940b`. Exactly two shipped skill bodies reference the derived Claude tree. The
-first slice added a manifest-driven regression test and demonstrated RED (`rc=1`) before source edits.
+S1 is committed/pushed and PR #1830 is open. The supervisor explicitly authorized the mandatory
+generated barrel. Both source fixes, the generated projection, and final evidence are ready for the
+GREEN commit; every selected gate passes.
 
 ## Completed
 
 - Harness bootstrap, research, plan, design checkpoint, and PLAN-EVAL N/A assessment.
 - Confirmed live lines and full `skills/` sweep count.
 - Captured RED: both manifest paths reported, 0 passed / 1 failed, exit 1.
+- Committed/pushed S1 as `d338145da`; opened draft PR #1830 with required labels and milestone.
+- Repaired both source references; GREEN rc=0 and full shipped-body match count is 0.
+- Mirror sync/check passed (18 skills / 22 files, both rc=0) with no tracked mirror diff.
+- Generated the barrel with the checked-in task; inspection found only the two propagated strings
+  and deterministic bundle hash.
+- Scoped check/lint/fmt pass after focused formatting of the new regression test.
+- Final captured exits: asset check 0, focused test 0, mirror sync 0, mirror check 0, lock diff 0;
+  shipped-body sweep has 0 matches (`rg` no-match exit 1).
 
 ## In Progress
 
-- S1: commit and push the failing regression test.
+- Commit/push S2, update PR #1830, then stop for supervisor-dispatched IMPL-EVAL.
 
 ## Next Steps
 
-1. Capture RED and commit/push S1.
-2. Open the draft PR with `Closes #1737`, taxonomy, and milestone 0.0.7.
-3. Replace both source references, regenerate/check mirrors, capture GREEN/static/lock evidence.
-4. Commit/push S2 and stop for supervisor-dispatched IMPL-EVAL.
+1. Commit/push S2 and update PR #1830, including its shared-carrier declaration.
+2. Stop for supervisor-dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -50,8 +57,8 @@ first slice added a manifest-driven regression test and demonstrated RED (`rc=1`
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | RED captured | Focused test rc=1 with both expected offenders. |
-| Fitness | RED captured | Canonical ownership invariant fails before repair. |
+| Static | PASS | Focused GREEN, scoped check/lint/fmt, and lock diff pass. |
+| Fitness | PASS | Asset check and mirror sync/check pass; generated diff inspection is clean. |
 | Runtime | N/A | No runtime changes. |
 | Consumer | pending | Canonical-path invariant. |
 
@@ -61,7 +68,7 @@ first slice added a manifest-driven regression test and demonstrated RED (`rc=1`
 
 ## Drift and Debt
 
-- Drift: baseline advanced per supervisor reset; recorded.
+- Drift: baseline advanced; PR #1759 shares the generated barrel and coordinator owns ordering.
 - Debt: none.
 
 ## Commits

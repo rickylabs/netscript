@@ -10,3 +10,17 @@
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `supervisor.md`, `research.md`, and re-baseline commands.
+
+## 2026-08-31 — Shared generated carrier with PR #1759
+
+- **What:** PR #1759 (`fix/aspire-13-5-s9-skills-mcp-alignment`) and this leaf both modify the
+  generated carrier `packages/cli/src/kernel/assets/skills.generated.ts` from disjoint source files.
+- **Source:** Supervisor collision declaration for PR #1759.
+- **Expected:** Source ownership is disjoint: this leaf owns `skills/netscript/SKILL.md` and
+  `skills/netscript-operate/SKILL.md`; #1759 owns `skills/aspire/SKILL.md` and `skills/help.md`.
+- **Actual:** Both source sets project into the same generated TypeScript barrel, creating an
+  expected textual merge conflict whichever PR lands second.
+- **Severity:** minor
+- **Action:** accept; coordinator owns merge ordering, and the second PR resolves by regenerating
+  the barrel after the first lands. This leaf will not rebase onto or coordinate against #1759.
+- **Evidence:** PR #1759 and `packages/cli/src/kernel/assets/skills.generated.ts`.
