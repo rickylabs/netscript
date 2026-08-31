@@ -1,5 +1,30 @@
 # Drift Log: #1732 background reference-name validation / source safety
 
+## 2026-08-31 — D-127 binding convergence was unsafe and is superseded
+
+- **What:** D-127 retained main's name-derived background binding scheme. Independent rendering at
+  `68c80e743` proved reserved names produced invalid declarations and unescaped entry literals
+  produced non-parsing generated source.
+- **Source:** Real-generator RED for `class`, `await`, and quoted `Workdir`; semantic generated-module
+  tests for reserved words, normalization collisions, entry literals, and reference identifiers.
+- **Expected:** The source-safety change makes arbitrary direct-generator input structurally safe.
+- **Actual:** `safeIdentifier` only replaced hyphens; user text remained in identifier positions and
+  several user strings remained in raw single-quoted interpolation.
+- **Severity:** critical semantic regression.
+- **Action:** owner-directed D-165 restores background-local ordinal identifiers and JSON literal
+  emission across every user string, while preserving the Flow-B users+sagas union. The D-127
+  semantic note and prior IMPL-EVAL no longer certify the new head; fresh evaluation is pending.
+- **Evidence:** `d-165-urgent-recovery.md`.
+
+## 2026-08-31 — Main advanced during D-165 verification
+
+- **What:** The owner-supplied live main was `052f86595`; during the repair, PR #1829 advanced
+  `origin/main` to `f59874abd` in unrelated `packages/ai` files.
+- **Severity:** minor convergence drift.
+- **Action:** preserve the recovery work, perform a second conflict-free rebase, and require the
+  final merge base to equal the live `origin/main`. No AI path belongs to this PR diff.
+- **Evidence:** `d-165-urgent-recovery.md` baseline section.
+
 ## 2026-08-30 — Current scaffold is looser than Aspire
 
 - **What:** The current scaffold regex accepts consecutive/trailing hyphens and lacks a service-name

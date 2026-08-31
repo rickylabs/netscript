@@ -21,6 +21,18 @@ const PROCESSOR_NAME = 'notifications';
 const REFERENCE_NAME = 'workers-api';
 const REFERENCE_ENDPOINT = 'http://127.0.0.1:43123';
 const DISCOVERY_KEY = 'services__workers-api__http__0';
+const SOURCE_SAFE_NAMES = [
+  "it's",
+  String.raw`back\slash`,
+  'tick`name',
+  'workers-api',
+  'workers_api',
+  'class',
+  'await',
+  'function',
+  'const',
+  'line\u2028separator',
+] as const;
 
 interface EndpointResource {
   getEndpoint(name: string): Promise<string | undefined>;
@@ -67,11 +79,17 @@ function backgroundEntry(
   };
 }
 
-function configFor(entry: BackgroundProcessorEntry): NetScriptConfig {
+function configForProcessors(
+  processors: Record<string, BackgroundProcessorEntry>,
+): NetScriptConfig {
   return {
     ...EMPTY_CONFIG,
-    BackgroundProcessors: { [PROCESSOR_NAME]: entry },
+    BackgroundProcessors: processors,
   };
+}
+
+function configFor(entry: BackgroundProcessorEntry): NetScriptConfig {
+  return configForProcessors({ [PROCESSOR_NAME]: entry });
 }
 
 function endpointResource(endpoint: string | undefined): EndpointResource {
@@ -107,7 +125,7 @@ function isGeneratedBackgroundModule(value: unknown): value is GeneratedBackgrou
 }
 
 async function loadGeneratedModule(
-  entry: BackgroundProcessorEntry,
+  processors: Record<string, BackgroundProcessorEntry>,
 ): Promise<{ module: GeneratedBackgroundModule; dispose: () => Promise<void> }> {
   const root = await Deno.makeTempDir({ prefix: 'ns-1371-background-' });
   const helpersDir = `${root}/.helpers`;
@@ -151,7 +169,7 @@ async function loadGeneratedModule(
   await Deno.writeTextFile(
     generatedPath,
     generateRegisterBackground({
-      processors: { [PROCESSOR_NAME]: entry },
+      processors,
       version: EMPTY_CONFIG.Version,
       denoDefaults: MINIMAL_DENO_DEFAULTS,
     }),
@@ -179,7 +197,7 @@ async function runGeneratedRegistration(
   plugins: Map<string, EndpointResource>,
   builder: RecordingBuilder,
 ): Promise<Map<string, RecordingResource>> {
-  const loaded = await loadGeneratedModule(entry);
+  const loaded = await loadGeneratedModule({ [PROCESSOR_NAME]: entry });
   try {
     return await loaded.module.registerBackgroundProcessors(
       builder,
@@ -194,6 +212,13 @@ async function runGeneratedRegistration(
   }
 }
 
+async function assertGeneratedModuleLoads(
+  processors: Record<string, BackgroundProcessorEntry>,
+): Promise<void> {
+  const loaded = await loadGeneratedModule(processors);
+  await loaded.dispose();
+}
+
 function configurationError(kind: 'service' | 'plugin'): string {
   return `Background processor configuration error: '${PROCESSOR_NAME}' could not resolve ${kind} reference '${REFERENCE_NAME}' HTTP endpoint.`;
 }
@@ -203,6 +228,57 @@ function assignedValue(resource: RecordingResource, key: string): unknown {
 }
 
 describe('generateRegisterBackground declared references (#1371)', () => {
+  it('parses every source-sensitive processor-name spelling', async () => {
+    await assertGeneratedModuleLoads(
+      Object.fromEntries(SOURCE_SAFE_NAMES.map((name) => [name, backgroundEntry({})])),
+    );
+  });
+
+  it('parses and executes reserved and normalization-collision processor names', async () => {
+    const names = ['class', 'await', 'function', 'const', 'workers-api', 'workers_api'] as const;
+    const processors = Object.fromEntries(names.map((name) => [name, backgroundEntry({})]));
+    const loaded = await loadGeneratedModule(processors);
+    const builder = createRecordingBuilder();
+    try {
+      const registered = await loaded.module.registerBackgroundProcessors(
+        builder,
+        configForProcessors(processors),
+        {},
+        new Map(),
+        new Map(),
+        '/apphost',
+      );
+      assertEquals(builder.registrations, [...names]);
+      assertEquals([...registered.keys()], [...names]);
+    } finally {
+      await loaded.dispose();
+    }
+  });
+
+  it('parses quote, backslash, and backtick entry literals', async () => {
+    await assertGeneratedModuleLoads({
+      [PROCESSOR_NAME]: {
+        ...backgroundEntry({}),
+        Entrypoint: String.raw`bin/it's\`worker.ts`,
+        Workdir: String.raw`work\it's\`dir`,
+        Concurrency: 2,
+        ConcurrencyEnvVar: String.raw`WORK'\KEY\`TICK`,
+      },
+    });
+  });
+
+  for (const kind of ['service', 'plugin'] as const) {
+    it(`parses every source-sensitive ${kind} reference spelling`, async () => {
+      await assertGeneratedModuleLoads({
+        [PROCESSOR_NAME]: backgroundEntry(
+          kind === 'service'
+            ? { ServiceReferences: [...SOURCE_SAFE_NAMES] }
+            : { PluginReferences: [...SOURCE_SAFE_NAMES] },
+        ),
+      });
+    });
+  }
+
   it('JSON-stringifies every processor-name literal site', () => {
     const name = 'quoted"processor';
     const quotedName = JSON.stringify(name);
@@ -232,7 +308,7 @@ describe('generateRegisterBackground declared references (#1371)', () => {
 
     assertEquals(createServerServiceEnvKey(REFERENCE_NAME), DISCOVERY_KEY);
     assertEquals(
-      output.split(`withEnvironment('${DISCOVERY_KEY}'`).length - 1,
+      output.split(`withEnvironment("${DISCOVERY_KEY}"`).length - 1,
       2,
       'service and plugin references must emit the same raw consumer-read key',
     );

@@ -195,3 +195,15 @@ Final D-127 evidence:
 - No Aspire, Docker, AppHost, runtime, or `e2e:cli` command ran. See
   `d-127-main-convergence.md` for the exact conflict resolution, intermediate refusals/failures,
   and reproduction JSON.
+
+## D-165 urgent recovery — 2026-08-31
+
+D-127's name-derived binding decision is superseded by empirical RED evidence. The implementation
+now uses background-only ordinal bindings, JSON-stringifies every user-supplied emitted literal,
+and retains the generic Flow-B binding/set-anchor discovery plus the users+sagas missing-reference
+union. The 74 foreign run-artifact deletions were restored by clean rebases. See
+`d-165-urgent-recovery.md` for the exact RED, repair, static fixture evidence, and gate table.
+
+No runtime, Aspire, Docker, AppHost, evaluator dispatch, lifecycle-label change, or evaluator verdict
+was produced by this session. The previous IMPL-EVAL is void for the new semantic head; fresh
+supervisor-dispatched evaluation and hosted runtime evidence remain pending.

@@ -6,17 +6,19 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-aspire-reference-name-validation--1732-source-safety` |
 | Branch         | `fix/aspire-reference-name-validation`                     |
-| Current phase  | `implementation` — D-127 main convergence complete         |
+| Current phase  | `implementation` — D-165 urgent recovery gated; evaluation pending |
 | Archetype      | `6 — CLI / Tooling` (dominant surface)                     |
 | Scope overlays | none                                                       |
 
 ## Current State
 
-The branch is rebased over the coordinator-supplied `8a925764` main head and the immediately
-following live docs-only `6bb27e46` main commit. D-127 preserves main's name-derived generator
-binding scheme, #1747's Aspire validation and four processor-name `JSON.stringify` literal sites,
-and the Flow-B users+sagas union through a dynamically captured binding/set anchor. All required
-static gates and the scaffold-only reproduction pass; the full runtime proof remains coordinator-owned.
+The branch was rebased over owner-supplied main `052f86595` and then over live `f59874abd` after
+unrelated PR #1829 landed during verification. D-165 supersedes D-127's unsafe name-derived
+background binding decision: generated identifiers are ordinal, every user-supplied emitted string
+is a JSON literal, and semantic tests parse/execute reserved words, normalization collisions, and
+source-sensitive entry/reference strings. The Flow-B users+sagas union still uses a generic binding
+and exact captured set anchor. Required static gates pass; hosted runtime and fresh separate-session
+IMPL-EVAL remain pending.
 
 ## Completed
 
@@ -51,9 +53,10 @@ static gates and the scaffold-only reproduction pass; the full runtime proof rem
 
 ## Next Steps
 
-1. Commit the D-127 sign-off slice and force-push with a freshly resolved remote lease SHA.
-2. Hand the exact final head and static evidence back to the coordinator.
-3. Stop for the coordinator's separately leased full `scaffold.runtime` proof.
+1. Commit the D-165 recovery slice and force-push with a freshly resolved remote lease SHA.
+2. Rewrite PR #1747's body to remove stale runtime/evaluation claims and expose both pending gates.
+3. Hand the exact final head and static evidence back to the coordinator for fresh GLM IMPL-EVAL and
+   separately hosted runtime proof.
 
 ## Files Changed
 
