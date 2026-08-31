@@ -3203,3 +3203,18 @@
 - Owner reaffirmed intra-orchestrator parallelism for independent cross-concern surfaces. Every one
   of the 53 currently open milestone issues has an `orchestrator:*` owner; supervisors were steered
   to refill implementation slots rather than serialize behind CI or evaluator waits.
+
+## 2026-08-31T04:48:28Z — second exact-green PR merged while feature runtime runs
+
+- Docs #1808 passed exact-head run `33357687512`, current-main merge-ref, four issue acceptance
+  boxes, six PR boxes, zero threads, GLM page/mapping identity, complete 24-row cumulative mapping,
+  exact corpus/provenance, lock identity, and 14-path delta. The coordinator squash-merged immutable
+  head `465d42790141921b80f9f1341cfa2c489fccca29` as
+  `0e93a6c0574eb557b1322a4298cee3f7adbeafa2`; #1807/#1808 are sole `status:shipped`.
+- The merge was intentionally taken while #1820's runtime matrix was active because the two PR
+  deltas have zero common paths and #1820 already required a final harness-only amendment/fresh
+  merge-ref CI. This closes a prepared PR without adding a runtime rerun or a product conflict.
+- Internals r2 checkpointed/pushed `b8ac25dde`, explicitly preserving #1828's active evaluator,
+  #1823's hold, and #1802's unidentified 1/4,483 root-suite failure. It exited cleanly. Internals r3
+  launched through the checked-in hybrid runtime, proved Remote Control attachment, then was set to
+  Opus 5/high and verified in live JSONL before adopting existing workers.

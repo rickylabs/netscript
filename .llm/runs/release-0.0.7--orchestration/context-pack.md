@@ -2003,3 +2003,19 @@ continues concurrently because serial ordering is per orchestrator, not global.
   has `repo` without `workflow` scope and SSH is unavailable. Park only that push; continue #1808
   and the later #1803 convergence. Runtime preflight remains exact zero: Aspire `[]`, containers 0,
   volumes 0, and custom networks 0.
+
+## Resume delta — 2026-08-31T04:48:28Z
+
+- Current main is `0e93a6c0574eb557b1322a4298cee3f7adbeafa2` after exact-green Docs PR #1808;
+  #1807/#1808 are shipped. Its 14-path delta has zero intersection with #1820, so #1820 keeps its
+  completed product/runtime evidence and uses a final evidence-only amendment plus a current-main
+  merge-ref/fresh core CI rather than another runtime matrix.
+- Internals r2 exited cleanly after atomic topic checkpoint `b8ac25dde`. Fresh r3 is Claude session
+  `c031e37f-c17f-4509-be74-ff4ef6476f5f`, tmux `netscript-007-internals-r3`, Opus 5/high, with
+  Remote Control `session_01YVWX2PRQ1DKgri3CQHsnUq`. It adopts the existing #1828 evaluator and all
+  Codex threads; none were relaunched.
+- #1820's final audit found stale PR/context/drift claims even after its successful runtime gate.
+  Correct those records after the exact product-head runtime matrix, remove the opt-in label before
+  the harness-only push, prove product identity, and require fresh core CI. #1819 has the analogous
+  one-carrier current-main convergence and then waits behind #1820 to avoid repeating the expensive
+  feature runtime gate.
