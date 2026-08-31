@@ -11,6 +11,9 @@ import { extractContext, withContext } from '@netscript/telemetry/context';
 import {
   createStreamMutationHook,
   toExecutionStreamEntity,
+  type WorkerExecution,
+  type WorkerExecutionRecord,
+  WorkerExecutionSchema,
   WorkerJobSchema,
   type WorkersStreamProducer,
 } from '../../src/streams/mod.ts';
@@ -37,11 +40,16 @@ Deno.test('toExecutionStreamEntity maps execution records to stream entities', (
     error: null,
     result: null,
     workerId: null,
+    progressPercent: 37,
+    progressMessage: 'Processing records',
     attempt: 0,
     maxAttempts: 3,
   };
 
-  assertEquals(toExecutionStreamEntity(execution), {
+  const record: WorkerExecutionRecord = execution;
+  const entity: WorkerExecution = toExecutionStreamEntity(record);
+
+  assertEquals(entity, {
     id: execution.id,
     jobId: 'health-check',
     topic: 'default',
@@ -56,8 +64,11 @@ Deno.test('toExecutionStreamEntity maps execution records to stream entities', (
     error: null,
     result: null,
     workerId: null,
+    progressPercent: 37,
+    progressMessage: 'Processing records',
     attempt: 0,
   });
+  assertEquals(WorkerExecutionSchema.parse(entity), entity);
 });
 
 Deno.test('createStreamMutationHook upserts and deletes execution entities', () => {
@@ -88,6 +99,8 @@ Deno.test('createStreamMutationHook upserts and deletes execution entities', () 
     error: null,
     result: null,
     workerId: null,
+    progressPercent: null,
+    progressMessage: null,
     attempt: 0,
     maxAttempts: 3,
   };
@@ -173,6 +186,8 @@ function executionFixture(overrides: Partial<ExecutionRecord> = {}): ExecutionRe
     error: null,
     result: null,
     workerId: null,
+    progressPercent: null,
+    progressMessage: null,
     attempt: 0,
     maxAttempts: 3,
     ...overrides,

@@ -37,6 +37,8 @@ export type WorkerExecutionRecord = Readonly<
     readonly error?: string | null;
     readonly result?: Record<string, unknown> | null;
     readonly workerId?: string | null;
+    readonly progressPercent?: number | null;
+    readonly progressMessage?: string | null;
     readonly attempt?: number;
     readonly traceparent?: string;
     readonly tracestate?: string;
@@ -104,6 +106,8 @@ export function toExecutionStreamEntity(execution: WorkerExecutionRecord): Worke
     error: execution.error ?? null,
     result: execution.result ?? null,
     workerId: execution.workerId ?? null,
+    progressPercent: execution.progressPercent ?? null,
+    progressMessage: execution.progressMessage ?? null,
     attempt: execution.attempt ?? 0,
   };
 }
