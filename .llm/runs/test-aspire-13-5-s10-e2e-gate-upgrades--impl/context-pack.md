@@ -54,3 +54,10 @@
   post-database `runtime.aspire-describe` refresh now runs after restart/allocation and before all
   replayed wait gates, so convergence evidence cannot be stale after the fallback. The protected
   D-101 module remains untouched. Static validation only; a supervisor-dispatched IMPL-EVAL follows.
+- D-213 replayed the 12 S10 commits from `265466059` onto S8's converged head `d1c6d8b54` with no
+  conflicts; replayed product head `deeb6eb66`. All 12 range-diff pairs are `=`, and every one of
+  the 25 non-generated `packages/` paths changed by S10 has identical old/new blob identity (the
+  deleted worker-wait file is absent at both heads). Barrel regeneration produced no delta. Scoped
+  check/lint/fmt, 94 focused static tests, Aspire parity (`fail=0`), quality scan, and architecture
+  passed. No runtime or self-dispatched evaluator ran. Detailed evidence is in
+  `d213-converge-onto-s8.md`; force-with-lease push remains the final step.

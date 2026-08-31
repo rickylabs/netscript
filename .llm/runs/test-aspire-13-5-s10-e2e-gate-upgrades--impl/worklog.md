@@ -230,3 +230,23 @@
 - No runtime, Aspire, Docker, AppHost, CI dispatch, PLAN-EVAL, evaluator dispatch, lifecycle-label
   change, PR-base retarget, or self-certification was performed. The supervisor owns the fresh
   IMPL-EVAL.
+
+## D-213 convergence onto S8's newly converged head
+
+- PLAN-EVAL is N/A: the coordinator supplied the exact rebase command, immutable commit boundaries,
+  binding stop rules, and the complete verification matrix. This is a re-base, not a re-design or
+  product repair.
+- Replayed all 12 commits from old head `265466059` onto `d1c6d8b54` without conflicts. Replayed
+  product head is `deeb6eb66`; its merge-base with the target is the complete target hash.
+- All 12 `range-diff` pairs are `=`. Every non-generated `packages/` blob changed by S10 is
+  byte-identical between old and replayed heads; the one deleted path is absent at both.
+- The explicit barrel generator and the barrel check exited 0 with no tracked regeneration delta.
+  Structured check passed with no diagnostics; exact changed-file lint and format passed with no
+  findings; focused static/unit tests passed 94/94; parity reports phase 1 `fail=0`; quality and
+  architecture exited 0.
+- Three first wrapper invocations exited 1 only because JSON evidence output lacked `--allow-write`.
+  The combined lint rerun then exited 2 because root config dropped the `.llm` gate catalog despite
+  zero findings; split configuration-complete wrapper runs both exited 0. All failed invocations and
+  reruns are retained in the detailed D-213 ledger.
+- No Aspire, Docker, AppHost, runtime suite, `e2e:cli`, evaluator, PR-base, label, or lifecycle
+  operation was performed. The final action is an exact-SHA force-with-lease push.
