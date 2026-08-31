@@ -4,6 +4,66 @@ export const SENDER_OWNERSHIP_SCHEMA_VERSION = '1.0' as const;
 export const SENDER_OWNERSHIP_STATES = ['launching', 'active', 'idle'] as const;
 export type SenderOwnershipState = typeof SENDER_OWNERSHIP_STATES[number];
 
+export const SENDER_PID_DEBOUNCE_MS = 250 as const;
+export const PID_PROBE_STATES = ['alive', 'dead', 'unknown'] as const;
+export type PidProbeState = typeof PID_PROBE_STATES[number];
+
+export interface PidLivenessEvidence {
+  readonly first: PidProbeState;
+  readonly second: PidProbeState;
+  readonly elapsedMs: number;
+}
+
+export const ROLLOUT_LEASE_STATES = [
+  'working',
+  'stalled',
+  'idle',
+  'dead',
+  'refused',
+  'absent',
+  'unknown',
+] as const;
+export type RolloutLeaseState = typeof ROLLOUT_LEASE_STATES[number];
+
+export const SENDER_SESSION_PROVENANCE_STATES = [
+  'matched',
+  'mismatched',
+  'unknown',
+] as const;
+export type SenderSessionProvenanceState = typeof SENDER_SESSION_PROVENANCE_STATES[number];
+
+export interface RolloutLeaseEvidence {
+  readonly state: RolloutLeaseState;
+  readonly provenance: SenderSessionProvenanceState;
+  readonly sessionId?: string;
+  readonly worktree?: string;
+}
+
+export const THREAD_WRITER_STATES = [
+  'active',
+  'idle',
+  'not_loaded',
+  'absent',
+  'unknown',
+] as const;
+export type ThreadWriterState = typeof THREAD_WRITER_STATES[number];
+
+export interface ThreadWriterEvidence {
+  readonly state: ThreadWriterState;
+  readonly provenance: SenderSessionProvenanceState;
+  readonly sessionId?: string;
+}
+
+export const SENDER_LEASE_STALENESS_STATES = [
+  'preserve',
+  'stale',
+  'indeterminate',
+] as const;
+export type SenderLeaseStaleness = typeof SENDER_LEASE_STALENESS_STATES[number];
+
+export const SENDER_LEASE_EVICTION_REASONS = ['restart_stale_ownership'] as const;
+export type SenderLeaseEvictionReason = typeof SENDER_LEASE_EVICTION_REASONS[number];
+
 /** Privacy-safe durable owner metadata for one canonical worktree. */
 export interface SenderOwnershipRecord {
   readonly schemaVersion: typeof SENDER_OWNERSHIP_SCHEMA_VERSION;
@@ -20,6 +80,13 @@ export interface SenderOwnershipObservation {
   readonly record: SenderOwnershipRecord | null;
   readonly ownerProcessAlive: boolean;
   readonly sessionActive: boolean;
+}
+
+export interface SenderLeaseStalenessObservation {
+  readonly record: SenderOwnershipRecord;
+  readonly pid: PidLivenessEvidence;
+  readonly rollout: RolloutLeaseEvidence;
+  readonly thread: ThreadWriterEvidence;
 }
 
 export type SenderOwnershipDecision =
@@ -68,6 +135,15 @@ export function decideSenderOwnership(
     return { kind: 'blocked', record, diagnostic: ownershipDiagnostic(record) };
   }
   return { kind: 'stale', record };
+}
+
+/** Classifies whether three provenance-bound signals can authorize explicit lease repair. */
+export function classifySenderLeaseStaleness(
+  _worktree: string,
+  _observation: SenderLeaseStalenessObservation,
+): SenderLeaseStaleness {
+  // Slice 1 keeps the new contract fail-closed until Slice 2 implements the locked truth table.
+  return 'indeterminate';
 }
 
 /** Builds the minimum redacted record persisted before sender process spawn. */

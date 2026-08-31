@@ -47,3 +47,19 @@ Drift is append-only.
 R3 (optional — a Risk Register row for the isolated-CODEX_HOME profile-home hazard) is not applied:
 cycle 2 judged the hazard already closed structurally by the amended D2/truth table, and the row
 would be documentation-only. Left for Slice 4's author to add if useful, not required.
+
+## 2026-08-31 — root lint config excludes the internal agentic surface
+
+- **What:** Slice 1's first structured lint invocation selected the two owned `.llm/tools/agentic`
+  files, but Deno's root `lint.exclude` drops `.llm/`; the wrapper correctly refused an
+  all-excluded verdict with exit 2.
+- **Expected:** The plan's scoped lint command processes `.llm/tools/agentic` and returns a real
+  covered verdict.
+- **Actual:** The no-config command cannot cover this internal surface. An explicit checked-in
+  root-local JSON config (`jsr-package-settings.json`) made Deno apply its default lint rules to the
+  same two files; the structured wrapper then processed 2/2 files with zero findings and exit 0.
+- **Severity:** minor tooling/evidence drift; no source or contract decision changes.
+- **Action:** Record both results. Future slices must continue to use an explicit config (or amend
+  the plan/tooling in-scope before claiming a full agentic lint verdict); an all-excluded result is
+  never a pass.
+- **Evidence:** Slice 1 gate table in `worklog.md`.

@@ -116,6 +116,12 @@ when the child exit is non-zero.
 | 2026-08-31 | planning | Design | Locked three-signal fail-closed classification, explicit audited repair, known-negative exit capture, seven RED/GREEN commit slices, and intended file manifest. |
 | 2026-08-31 | planning | Plan-Gate selection | PLAN-EVAL required; native Fable 5 medium opposite-family evaluator selected. Implementation hard-stopped. |
 | 2026-08-31 | planning | Artifact validation | Required artifacts/sections, evaluator-file absence, untracked whitespace, and raw Git scope passed; only this run directory is untracked. |
+| 2026-08-31 | plan-eval | Cycle 1 | Separate evaluator returned `FAIL_PLAN`; F1-F4 were amended in D2/D7/D11 and the declared manifest. |
+| 2026-08-31 | plan-eval | Cycle 2 | `plan-eval-cycle-2.md` returned `PASS` at `c13da3e23`; implementation authorized. |
+| 2026-08-31 | planning | Cycle 2 residuals | Supervisor landed mandatory record corrections R1/R2 at `6e6564fba` before Slice 1 dispatch. |
+| 2026-08-31 | 1 | RED contract/classification | Added the finite PID, rollout, thread, provenance, staleness, and eviction-reason contracts plus table-driven expectations. The classifier remains a fail-closed `indeterminate` seam; no launch, repair, adapter, record, or resume behavior changed. |
+| 2026-08-31 | 1 | RED gate | Targeted structured test wrapper exited 1: 16 passed, 11 failed. All 11 failures are the new contract expectations (7 `preserve`, 4 `stale`); existing and new `indeterminate` cases pass. |
+| 2026-08-31 | 1 | Handoff | Implementation-lane commit/push/comment is followed by a hard stop for Tier-A substantive review. Slice 2 is not dispatched. |
 
 ## Decisions
 
@@ -140,14 +146,17 @@ when the child exit is non-zero.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Branch/base/upstream | authoritative raw Git via `Deno.Command` | PASS | Exact base `5197e70b...`; expected branch; no upstream. |
-| Plan artifact contract | focused Deno file/section validator + `git diff --no-index --check` | PASS | Required sections present; `plan-eval.md` correctly absent for separate evaluator authorship; whitespace clean. |
-| Source check/lint/fmt | planned after implementation | NOT_RUN | No source edit is authorized in this phase. |
+| Plan artifact contract | `plan-eval-cycle-2.md` plus supervisor residual commit `6e6564fba` | PASS | Cycle 2 verdict is `PASS`; mandatory R1/R2 record corrections landed before implementation. |
+| Slice 1 type-check | structured `run-deno-check.ts` over the two owned TS files | PASS | 2 files selected; 0 failed batches and 0 diagnostics. |
+| Slice 1 lint | structured `run-deno-lint.ts` over the two owned TS files with `--config jsr-package-settings.json` | PASS | 2 files selected and processed; 0 findings. The default root config refusal is recorded in `drift.md`. |
+| Slice 1 format | structured `run-deno-fmt.ts` over the two owned TS files | PASS | 2 files selected and processed; 0 findings. |
+| Diff hygiene | raw `git diff --check` | PASS | No whitespace errors across the five Slice 1 files. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Plan-Gate | PENDING | `research.md`, `plan.md`, this `## Design` section | Separate evaluator must write `plan-eval.md`. |
+| Plan-Gate | PASS | `plan-eval-cycle-2.md` at `c13da3e23`; residual correction `6e6564fba` | Cycle 2 authorized implementation; R1/R2 are already corrected. |
 | jsr-audit | N/A | Internal `.llm/tools` surface | No package/plugin public surface. |
 | Package doctrine/quality | N/A | Intended file manifest | No `packages/**` or `plugins/**` edits. |
 
@@ -155,6 +164,7 @@ when the child exit is non-zero.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
+| Sender staleness contract | EXPECTED RED | `run-deno-test.ts -- --allow-all .llm/tools/agentic/runtime/sender-ownership_test.ts` | Exit 1; 16 passed, 11 failed, 0 ignored. Failures are only the 7 new `preserve` and 4 new `stale` expectations against the fail-closed seam. |
 | Sender lifecycle | NOT_RUN | Planned Slices 3-4 | Must use temp roots and test-owned processes only. |
 | Resume known-negative | NOT_RUN | Planned Slices 5-6 | Must capture direct subprocess code and rejection string. |
 
@@ -173,3 +183,20 @@ when the child exit is non-zero.
 - Spot-check the unsafe current auto-release at `launch-codex-slice.ts:376-393` and false-zero
   mapping at `codex-resume.ts:165-168`.
 - Do not run repair or inspect the live sender registry as part of PLAN-EVAL.
+
+## Slice 1 RED Evidence
+
+The committed RED boundary is intentional and precedes Slice 2's behavior implementation.
+
+| Evidence | Result | Detail |
+| --- | --- | --- |
+| Targeted test | EXPECTED RED, exit 1 | 27 total: 16 passed, 11 failed, 0 ignored; two grouped assertion shapes (`indeterminate` vs expected `preserve` for 7 cases, and `indeterminate` vs expected `stale` for 4 cases). |
+| Type-check | PASS | Structured wrapper selected both owned TS files; 0 failed batches/diagnostics. |
+| Lint | PASS | Structured wrapper processed both files with explicit checked-in root-local config; 0 findings. |
+| Format | PASS | Structured wrapper selected and processed both files; 0 findings. |
+
+The failing test names cover the full stale conjunction (terminal and proven-absence forms), each
+negative signal in isolation, alive PID evidence, working/stalled rollout, and an active writer.
+Foreign ownership, unknown signals, provenance/identity mismatch, insufficient debounce, missing
+session identity, and conflicting absence remain fail-closed and already pass as `indeterminate`.
+Tier-A review is pending; the post-slice reconcile/sign-off step and Slice 2 are not started.
