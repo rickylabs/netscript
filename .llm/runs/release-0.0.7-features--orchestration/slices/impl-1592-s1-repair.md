@@ -84,3 +84,37 @@ contract. **Do not** merge `main`, retick PR boxes, change labels, or touch any 
 If `publish:dry-run` still fails after the two declarations agree, **stop and report** the exact
 remaining diagnostic rather than widening the ceiling — a fourth stale copy or a genuine contract
 design problem is a rescope, not something to absorb.
+
+---
+
+# AMENDMENT — cycle 2, ceiling widened from 2 files to 4
+
+Cycle 1 did exactly the right thing: it applied the two declaration fixes, found the ceiling
+insufficient, and **stopped and reported instead of absorbing a rescope**. Keep its uncommitted edits
+to `runtime/runtime-types.ts` and `registry/registry-types.ts` — they are correct and they removed the
+original `runs.ts:20` and `tasks.ts:86` diagnostics.
+
+Two sites remain, and they are the last two. The record shape is hand-maintained in **six** places;
+this repair brings the final two into line:
+
+1. `packages/plugin-workers-core/src/testing/job-fixtures.ts` — `createExecutionRecordFixture`
+   returns `ExecutionRecord` but can yield `progressPercent` as `number | null | undefined`
+   (`TS2322` at `:97`). Give both fields a concrete default of `null` in the frozen literal, and make
+   the fixture options accept `progressPercent?: number | null` / `progressMessage?: string | null`
+   coalesced to `null` — never `undefined`.
+2. `plugins/workers/services/src/routers/runs.ts` — `batchQueryExecutions` (`TS2345` at `:79`) builds
+   its own `matchingExecutions: Array<{…}>` local type by hand-enumerating fields rather than
+   spreading. Add `progressPercent` and `progressMessage` to that local type and populate them from
+   the source record.
+
+**Ceiling is now exactly four files** (the two from cycle 1 plus these two). Nothing else.
+
+**Design decision — do not reverse it.** Keep the fields **required-nullable** on
+`ExecutionRecordSchema`. Making them `.optional()` would be smaller, but it silently weakens a v1
+contract shape that Tier-A and IMPL-EVAL already accepted, and it would leave the uniform
+"every execution reports progress, `null` when absent" guarantee unimplemented. If you conclude the
+required-nullable shape genuinely cannot work, **stop and report** — do not switch designs.
+
+Definition of done is unchanged, and `deno task publish:dry-run` exiting **0** remains the primary
+proof. Commit once, push by explicit refspec, comment on PR #1814, and update `worklog.md` +
+`context-pack.md` in the same commit.

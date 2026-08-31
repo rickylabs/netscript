@@ -13,7 +13,11 @@ comment; on control PR #1747 the bot's review predated the label by ~11 h).
 
 ---
 
-## PR #1810 — `#1458` typed chat-response completion mode — **EXACT-GREEN MERGE CANDIDATE**
+## PR #1810 — `#1458` — **SHIPPED** as `main` `eaea940bea4c19593b97b9895b09f512039f4e13**
+
+_(packet retained below for the record)_
+
+## PR #1810 — as surfaced
 
 | | |
 | --- | --- |
@@ -44,7 +48,7 @@ Do not churn the head. Obsolete run `33356348595` was cancelled by the coordinat
 | CI | **all green** — `check-test`, `quality`, `code-quality`, `close-gate`, `build` |
 | Review threads | **PASS** — 0 threads, 0 unanswered |
 | Head (after harness-truth correction) | `7bd87da5cd533040c484feec3f00c003c5239562` |
-| `scaffold.runtime` | **required and now running** — opted in via the `e2e-cli-gate` label; `scaffold-static` already **pass**. Previously every scaffold lane reported `skipping`. |
+| `scaffold.runtime` | **PASS** — run `33357314826` at head `7bd87da5c`: `scaffold-runtime (aspire + docker + postgres)` **success**, `scaffold-runtime-sqlite (aspire + sqlite + garnet)` **success**, `scaffold-static (deno-only)` **success**. Opted in via `e2e-cli-gate`; before that every scaffold lane reported `skipping`, so this is the first runtime evidence this leaf has ever carried. |
 | Harness truth | corrected at the final head; product blobs proven byte-identical to the evaluated head (14/14), `git diff 3130fb52b..HEAD` is exactly the two harness files |
 
 **Prepared, deliberately not executed:** converge onto the post-#1810 `main` in one pass, with the same
@@ -83,3 +87,28 @@ confirmed live): add the two nullable fields to the two stale declarations. Two 
 
 **Standing debt:** four duplicate hand-maintained declarations of one record shape is the defect
 class; this repair restores consistency but does not remove the duplication.
+
+
+---
+
+## #1814 repair — cycle 1 stopped correctly at the ceiling; ceiling widened to 4 files
+
+The implementer applied both declaration fixes and **refused to absorb the rescope**, exactly as the
+brief required. Result: the original `runs.ts:20` and `tasks.ts:86` diagnostics are **gone**, and two
+sites remain — proving the record shape is hand-maintained in **six** places, not four:
+
+| Remaining | Diagnostic |
+| --- | --- |
+| `packages/plugin-workers-core/src/testing/job-fixtures.ts:97` | `TS2322` — fixture can yield `progressPercent` as `number \| null \| undefined`; the record requires `number \| null` |
+| `plugins/workers/services/src/routers/runs.ts:79` | `TS2345` — `batchQueryExecutions` hand-enumerates its own local result type instead of spreading, so it still omits both fields |
+
+**Rescope decision (mine, recorded rather than silently taken):** widen to four files and **keep the
+fields required-nullable**. The alternative — making them `.optional()` on `ExecutionRecordSchema` —
+is smaller but silently weakens a v1 contract shape that Tier-A and IMPL-EVAL already accepted, and
+abandons the uniform "every execution reports progress, `null` when absent" guarantee. If the
+coordinator prefers the smaller non-breaking option, say so and I will switch; it is a one-line change
+in the opposite direction.
+
+**Standing debt, unaddressed by this repair:** six hand-maintained declarations of one record shape.
+The repair restores consistency; it does not remove the duplication, and the next field added to an
+execution record will break the same way.
