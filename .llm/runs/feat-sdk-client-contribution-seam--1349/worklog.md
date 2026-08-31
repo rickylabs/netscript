@@ -8,7 +8,7 @@
 | Branch         | `feat/sdk-client-contribution-seam`                           |
 | Archetype      | `2 — Integration`                                             |
 | Scope overlays | none                                                          |
-| Phase          | Plan & Design — cycle-2 revision; implementation hard-stopped |
+| Phase          | Slice 1 — implementation and gates complete; draft PR handoff |
 
 ## Design
 
@@ -90,11 +90,16 @@ descriptors never gain transport controls.
 
 ## Progress Log
 
-| Time       | Slice        | Step                  | Notes                                                                                                                                  |
-| ---------- | ------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-31 | Plan cycle 1 | PLAN-EVAL             | Separate evaluator committed `FAIL_PLAN` at plan head `4b520ea44`; implementation remained stopped.                                    |
-| 2026-08-31 | Plan cycle 2 | Authority re-baseline | Read Accepted RFC 0001 and the committed RFC type fixture first; mapped F-1…F-8 to a plan-text-only correction with no scope movement. |
-| 2026-08-31 | Plan cycle 2 | Design checkpoint     | Rewrote `plan.md` and created missing `supervisor.md`/`worklog.md`; no product or lock file touched.                                   |
+| Time       | Slice        | Step                  | Notes                                                                                                                                                                                                              |
+| ---------- | ------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-31 | Plan cycle 1 | PLAN-EVAL             | Separate evaluator committed `FAIL_PLAN` at plan head `4b520ea44`; implementation remained stopped.                                                                                                                |
+| 2026-08-31 | Plan cycle 2 | Authority re-baseline | Read Accepted RFC 0001 and the committed RFC type fixture first; mapped F-1…F-8 to a plan-text-only correction with no scope movement.                                                                             |
+| 2026-08-31 | Plan cycle 2 | Design checkpoint     | Rewrote `plan.md` and created missing `supervisor.md`/`worklog.md`; no product or lock file touched.                                                                                                               |
+| 2026-08-31 | Slice 1      | Public contract       | Added only the RFC-fixed public descriptor/helper/error contract, tuple/key algebra, compatibility defaults, export wiring, and real-surface fixture imports. No adapter or runtime behavior was started.          |
+| 2026-08-31 | Slice 1      | Assertion budget fix  | Kept every RFC fixture assertion and added explicit negative proofs for forbidden ordering/environment/transport fields, exact three/five keys, preserved `TError`, and Desktop rejection.                         |
+| 2026-08-31 | Slice 1      | Final gate recut      | Re-ran the full scoped SDK test wrapper after the assertion-budget fix and re-cut every amended Slice-1 gate at the final product content.                                                                         |
+| 2026-08-31 | Slice 1      | Slice review          | Substantive review found no scope creep, internal/link export, upstream identity, unsafe cast/allowance, or compatibility-default drift. The Slice-1-only types-accepted-but-unconsumed window remains draft-only. |
+| 2026-08-31 | Slice 1      | Reconcile             | Merging this partial slice leaves #1349 open. The draft PR uses `Refs #1349`; readiness labels, acceptance-box changes, evaluator dispatch, and merge remain supervisor-owned.                                     |
 
 ## Decisions
 
@@ -115,40 +120,78 @@ descriptors never gain transport controls.
 
 ## Gate Results
 
-This turn is plan text only. Implementation gates are selected in `plan.md` but intentionally not
-run; PLAN-EVAL is the next gate and must be dispatched by the supervisor in another session.
+Slice 1 is green under the owner-amended gate set. Structured receipts/reports are stored under
+`.llm/tmp/gate-receipts/sdk-1349/` and are intentionally not committed. The accidental broad
+check/lint/fmt task invocations were not used as evidence; the wrappers were rerun directly with
+`--root packages/sdk --ext ts,tsx`.
 
 ### Static Gates
 
-| Gate                 | Command or check                                             | Result | Notes                                               |
-| -------------------- | ------------------------------------------------------------ | ------ | --------------------------------------------------- |
-| Plan artifact scope  | raw git diff/status verification                             | PASS   | Only the three cycle-2 run artifacts are changed.   |
-| Product/lock absence | verify no diff under `packages/`, `plugins/`, or `deno.lock` | PASS   | Product trees and `deno.lock` have no diff.         |
-| Plan-text formatting | `deno fmt --check` on the three owned Markdown artifacts     | PASS   | Focused plan-text check; no product files selected. |
+| Gate                     | Command or check                                                                                                                  | Result | Evidence                                                                                                                        |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| RFC real-surface fixture | `deno check --unstable-kv packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`                                  | PASS   | Exit 0; exact command emitted a non-empty `Check ...` line.                                                                     |
+| Compatibility fixtures   | `deno check --unstable-kv` for `sdk-assignability_type.ts`, `define-services_type.ts`, and `service-query-utils-upstream_type.ts` | PASS   | All three exit 0 with non-empty check output.                                                                                   |
+| Scoped SDK check         | `.llm/tools/run-deno-check.ts --root packages/sdk --ext ts,tsx`                                                                   | PASS   | 91 files, 1 batch, 0 failures/occurrences; stdout 160 bytes and report 386 bytes.                                               |
+| Full scoped SDK test     | `.llm/tools/run-deno-test.ts -- --allow-all packages/sdk`                                                                         | PASS   | 79 passed, 0 failed/ignored; receipt stdout 284 bytes. This is the required post-assertion-fix rerun.                           |
+| Scoped SDK lint          | `.llm/tools/run-deno-lint.ts --root packages/sdk --ext ts,tsx`                                                                    | PASS   | 91/91 processed, 0 findings/refusals; stdout 159 bytes and report 469 bytes.                                                    |
+| Scoped SDK format        | `.llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts,tsx`                                                                     | PASS   | 91/91 processed, 0 findings/refusals; stdout 165 bytes and report 386 bytes.                                                    |
+| Diff/ceiling             | `git diff --check`, status/name sweep, and forbidden-export scan                                                                  | PASS   | Only Slice-1 product files plus this run's `worklog.md`/`context-pack.md`; no `internal`, link, or out-of-ceiling product edit. |
+| Lock hygiene             | `git diff --exit-code -- deno.lock`                                                                                               | PASS   | `deno.lock` remains byte-identical.                                                                                             |
 
 ### Fitness Gates
 
-| Gate                | Result  | Evidence                               | Notes                                         |
-| ------------------- | ------- | -------------------------------------- | --------------------------------------------- |
-| Plan-Gate cycle 2   | NOT_RUN | supervisor-dispatched separate session | Generator must not self-evaluate or dispatch. |
-| F-1…F-12, F-14…F-19 | NOT_RUN | selected in `plan.md`                  | Future implementation only.                   |
+| Gate                     | Result | Evidence                                                  | Notes                                                                                                                                                       |
+| ------------------------ | ------ | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plan-Gate cycle 2        | PASS   | Separate evaluator verdict at `a4535578e`                 | Implementation began only after the committed PASS.                                                                                                         |
+| `deno task quality:scan` | PASS   | Exit 0; no findings, allowance budget remains 7           | Receipt stdout 4,092 bytes.                                                                                                                                 |
+| `deno task arch:check`   | PASS   | Exit 0, `FAIL=0` for SDK and repository                   | Existing SDK `src/` cardinality/doc-architecture warnings remain non-failing baseline; Slice 1 adds no new top-level `src` child.                           |
+| JSR audit                | PASS   | `audit-jsr-package.ts --root packages/sdk --text`, exit 0 | SDK dry-run is `OK`; the audit's banner-derived `slow-types` warning is not an actual dry-run diagnostic. Existing `src/` cardinality warning is unchanged. |
+
+### Gate 4 amendment — measured baseline
+
+Measured verdict on the three `private-type-ref` findings:
+
+| Tree                                   | `totalErrors` |
+| -------------------------------------- | ------------- |
+| clean `main`                           | **3**         |
+| this leaf, with all of Slice 1 present | **3**         |
+
+Same three files in both — `packages/sdk/src/ports/query-client.ts`,
+`packages/sdk/src/query-client/query-client-factory.ts`, and
+`packages/plugin-streams-core/src/application/create-durable-stream.ts`. **Slice 1 introduces zero
+new doc-lint findings.** The third file is not even in `packages/sdk`, so it could never have been
+fixed inside this leaf's package boundary.
+
+The final `deno task doc:lint --root packages/sdk --pretty` rerun reproduces exactly that amended
+baseline: exit 1, `totalErrors=3`, `totalPrivateTypeRef=3`, `totalMissingJSDoc=0`, and those same
+three files. This is PASS under the owner-amended no-new-findings gate.
+
+The SDK publish dry-run passes from `packages/sdk`: exit 0, no real slow-type or portability
+failure, `stderr.bytes=8129`. Its `stdout.bytes=0` is expected because `deno publish --dry-run`
+writes this evidence to stderr; it is not the cache-replay trap.
 
 ### Runtime Gates
 
-| Gate                     | Result  | Evidence                | Notes                    |
-| ------------------------ | ------- | ----------------------- | ------------------------ |
-| Contribution conformance | NOT_RUN | selected per Slices 2–3 | No product code changed. |
+| Gate                                     | Result  | Evidence        | Notes                                                  |
+| ---------------------------------------- | ------- | --------------- | ------------------------------------------------------ |
+| Contribution adapter/runtime conformance | NOT_RUN | Slices 2–3 only | Slice 1 intentionally adds types/public contract only. |
 
 ### Consumer Gates
 
-| Consumer                                            | Result  | Evidence                | Notes                    |
-| --------------------------------------------------- | ------- | ----------------------- | ------------------------ |
-| Type fixture / packed import / README / header+span | NOT_RUN | selected per Slices 1–3 | No product code changed. |
+| Consumer                       | Result | Evidence                                                                                                        | Notes                                                        |
+| ------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| RFC public-import fixture      | PASS   | Exact fixture check plus full SDK test wrapper                                                                  | Local stand-ins were removed without removing an assertion.  |
+| Forbidden descriptor fields    | PASS   | `@ts-expect-error` for `before`, `after`, `requires`, `priority`, `environment`, `link`, `fetch`, and `retry`   | Closed v1 shape remains narrow.                              |
+| Compatibility defaults         | PASS   | Existing three compatibility fixtures plus default client/query-utils assertions                                | Existing call sites compile unchanged.                       |
+| Tuple/key/error/Desktop proofs | PASS   | 16 accepted/17 rejected; exact three/five keys; `TError` third/context fourth; Desktop excess property rejected | All Slice-1 compile-negative/shape assertions remain active. |
 
 ## Handoff Notes
 
-- Read `rfcs/0001-sdk-client-contributions.md` and
-  `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` before the cycle-2 plan.
-- Evaluate the finding-traceability table, LD-3/LD-6/LD-7, all three slice ceilings, gate set, risk
-  register, JSR scan, and this Design checkpoint.
-- Confirm the diff is run-artifact-only and that implementation remains hard-stopped pending `PASS`.
+- Slice 1 is complete and remains a draft-only intermediate: `contributions` is accepted by the
+  public types but is not consumed until the later runtime slices. Do not publish this head.
+- The owner-amended doc-lint gate is satisfied as 3 baseline / 0 new; do not repair the three
+  foreign/pre-existing findings in this leaf.
+- The pushed commit and draft PR are the Slice-1 commit trail. Merging leaves #1349 open; the PR
+  must contain `Refs #1349` and must remain draft.
+- Do not apply readiness labels, tick acceptance boxes, dispatch IMPL-EVAL, or merge. Those actions
+  remain with the supervisor.

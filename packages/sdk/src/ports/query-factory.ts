@@ -12,6 +12,7 @@ import type {
   MutationOptionsResult,
   QueryOptionsWithInitialData,
 } from '../query-client/types.ts';
+import type { ActionQueryKey, SdkClientServerKeySuffix } from './query-key.ts';
 import type {
   ContractLike,
   ContractProcedureNames,
@@ -19,6 +20,8 @@ import type {
   ProcedureMetaFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
+  ServiceClientContext,
+  ServiceRequestRest,
 } from './service-client.ts';
 
 /**
@@ -51,6 +54,8 @@ export type ProcedureMeta<
 export interface ActionMethod<
   TContract extends ContractLike,
   TAction extends ContractProcedureNames<TContract>,
+  TContext extends object = ServiceClientContext,
+  TKeySuffix extends SdkClientServerKeySuffix = readonly [],
 > {
   /** Procedure metadata marker used only by TypeScript inference. */
   readonly __netscriptProcedureMeta?: ProcedureMeta<TContract, TAction>;
@@ -60,7 +65,11 @@ export interface ActionMethod<
    */
   (
     props: ProcedureInput<TContract, TAction>,
-    options?: QueryParams,
+    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
+      ? [options?: QueryParams & TOptions]
+      : ServiceRequestRest<TContext> extends [options: infer TOptions]
+        ? [options: QueryParams & TOptions]
+      : never
   ): Promise<ProcedureOutput<TContract, TAction>>;
 
   /** Invalidate all cached queries for this action. */
@@ -69,19 +78,29 @@ export interface ActionMethod<
   /** Generate the canonical cache key for this action invocation. */
   key: (
     props: ProcedureInput<TContract, TAction>,
-  ) => readonly [string, TAction, string];
+    ...request: ServiceRequestRest<TContext>
+  ) => ActionQueryKey<TAction, TKeySuffix>;
 
   /** Prefetch this action in the background. */
-  prefetch: (props: ProcedureInput<TContract, TAction>, options?: QueryParams) => void;
+  prefetch: (
+    props: ProcedureInput<TContract, TAction>,
+    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
+      ? [options?: QueryParams & TOptions]
+      : ServiceRequestRest<TContext> extends [options: infer TOptions]
+        ? [options: QueryParams & TOptions]
+      : never
+  ) => void;
 
   /** Return cached data without fetching. */
   getCachedData: (
     props: ProcedureInput<TContract, TAction>,
+    ...request: ServiceRequestRest<TContext>
   ) => Promise<ProcedureOutput<TContract, TAction> | null>;
 
   /** Return cached data along with its cache timestamp. */
   getCachedEntry: (
     props: ProcedureInput<TContract, TAction>,
+    ...request: ServiceRequestRest<TContext>
   ) => Promise<CachedEntry<ProcedureOutput<TContract, TAction>> | null>;
 
   // === TanStack Query extensions (RFC 17) ===
@@ -95,12 +114,20 @@ export interface ActionMethod<
    */
   queryOptions: (
     props: ProcedureInput<TContract, TAction>,
-    options?: ActionQueryOptions,
+    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
+      ? [options?: ActionQueryOptions & TOptions]
+      : ServiceRequestRest<TContext> extends [options: infer TOptions]
+        ? [options: ActionQueryOptions & TOptions]
+      : never
   ) => QueryOptionsWithInitialData<ProcedureOutput<TContract, TAction>>;
 
   /** TanStack mutationOptions with typed mutationKey and mutationFn. */
   mutationOptions: (
-    options?: ActionMutationOptions,
+    ...request: ServiceRequestRest<TContext> extends [options?: infer TOptions]
+      ? [options?: ActionMutationOptions & TOptions]
+      : ServiceRequestRest<TContext> extends [options: infer TOptions]
+        ? [options: ActionMutationOptions & TOptions]
+      : never
   ) => MutationOptionsResult<
     ProcedureOutput<TContract, TAction>,
     ProcedureInput<TContract, TAction>
@@ -115,7 +142,11 @@ export interface ActionMethod<
 /**
  * Generated query helpers for a contract resource.
  */
-export type QueryFactory<TContract extends ContractLike> =
+export type QueryFactory<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+  TKeySuffix extends SdkClientServerKeySuffix = readonly [],
+> =
   & {
     /** Resource identifier used for cache grouping. */
     resource: string;
@@ -123,19 +154,25 @@ export type QueryFactory<TContract extends ContractLike> =
     invalidate: () => Promise<void>;
   }
   & {
-    [K in ContractProcedureNames<TContract>]: ActionMethod<TContract, K>;
+    [K in ContractProcedureNames<TContract>]: ActionMethod<TContract, K, TContext, TKeySuffix>;
   };
 
 /**
  * Configuration for a single query factory.
  */
-export interface FactoryConfig<TContract extends ContractLike> {
+export interface FactoryConfig<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+  TKeySuffix extends SdkClientServerKeySuffix = readonly [],
+> {
   /** Contract used to discover resource actions. */
   contract: TContract;
   /** Typed service client matching the contract. */
-  client: ServiceClient<TContract>;
+  client: ServiceClient<TContract, TContext>;
   /** Default cache policy for generated action helpers. */
   options?: QueryParams;
+  /** Server-cache key suffix selected from contribution cache policy. */
+  keySuffix?: TKeySuffix;
 }
 
 /**
