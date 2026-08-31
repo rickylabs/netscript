@@ -2128,3 +2128,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - The next-canary checkpoint now has an additional public feature rather than only internal/docs
   movement. #1834, #1811, and #1830 remain in active final audit, while #1762 is converging after
   #1828 and #1664 is applying the bounded explicit-client correction.
+
+## Resume delta — 2026-08-31T14:35:30Z
+
+- Current main is `72599120a435c49e5791e795fd5c84b55f02be03` after Docs PR #1811 shipped from
+  immutable head `8d7e9a325d0d62dce402b66522398860671013e2`, closing #1809. Exact-head CI,
+  separate IMPL-EVAL PASS, complete DoD, zero threads, and clean current-main integration passed.
+- The authoritative reference mapping is now 26 rows with no loss or duplicates; all 181 generated
+  prose files remain present and all 13 AI exports are covered exactly. #1809/#1811 are sole
+  `status:shipped`; Docs continues serial convergence with PASS-evaluated #1813/#1816/#1818.
+- #1834 is technically green but its body still says “draft-only.” Features must make the bounded
+  truthful wording correction and produce a post-edit close-gate before the coordinator merges it.
+  Canary 5 must not cut between #1349 Slice 1 and its runtime-consuming Slices 2–3.

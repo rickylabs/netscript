@@ -3368,3 +3368,16 @@
 - The coordinator squash-merged #1814 as `7aff0e4cbb163191da1537aac47b0654933fc3db` and
   normalized the PR to sole `status:shipped`. This adds a real public feature to the next canary
   checkpoint while the remaining #1592 slice stays assigned to Features.
+
+## 2026-08-31T14:35:30Z — #1811 AI export reference ships without corpus regression
+
+- Docs PR #1811 reached immutable head `8d7e9a325d0d62dce402b66522398860671013e2` with exact
+  AI package/export coverage, separate structured IMPL-EVAL PASS, exact-head run `33363358975`
+  green, complete issue/PR acceptance, zero review threads, and no blocking review.
+- Mechanical cumulative verification proved the authoritative mapping advanced 25→26 rows with no
+  lost or duplicate rows, retained auth-kv-oauth, kept all 181 generated prose files, and matched all
+  13 real AI exports exactly. #1814's intervening feature merge had zero overlap; synthetic merge
+  `98cd26de956f6d596db41f947dba23c59b690a04` proved exact parents and clean integration.
+- The coordinator squash-merged #1811 as `72599120a435c49e5791e795fd5c84b55f02be03`, closing
+  #1809. #1809/#1811 are normalized to sole `status:shipped`; Docs proceeds serially to the already
+  PASS-evaluated #1813, then #1816 and #1818 corpus additions.

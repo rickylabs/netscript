@@ -267,3 +267,12 @@ artifact-pinned production E2E.
 - Exact-head CI, independent GLM PASS, ten-blob evaluator identity, complete DoD, unchanged lock,
   zero threads, and clean live-main integration were verified. It is a partial `Refs #1592` slice;
   runtime message wiring and ordering/replay stay open and are not misrepresented as complete.
+
+## 2026-08-31T14:35:30Z — AI export reference coverage joins cumulative docs payload
+
+- PR #1811 head `8d7e9a325d0d62dce402b66522398860671013e2` squash-merged as
+  `72599120a435c49e5791e795fd5c84b55f02be03`, closing #1809. It adds exact real-path reference
+  coverage for all 13 AI exports and advances the authoritative package mapping from 25 to 26 rows.
+- Exact-head CI, separate IMPL-EVAL PASS, complete acceptance, zero threads, no corpus loss, and a
+  clean post-#1814 synthetic merge were verified. This remains docs membership, not a canary cut
+  trigger; #1349's public runtime slices remain the coherence gate.
