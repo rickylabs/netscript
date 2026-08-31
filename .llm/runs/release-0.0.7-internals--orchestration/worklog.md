@@ -6051,3 +6051,12 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   run dir pre-created) only after #1751's serial slot clears, per the correction.
 - **Serial-queue correction applied**: #1750 must not advance concurrently with #1751. Prioritizing
   #1751 cycle 2 now.
+
+## D-123 — #1751 PLAN-EVAL cycle 2 dispatched at c13da3e23
+
+- Eval worktree reset cleanly to `c13da3e239b136e465d7aeb7116a803aefa7d6f9` (the amended head),
+  same local-only guard patch reapplied (never committed, per proven cycle-1 technique). Focused
+  brief targets exactly F1-F4 plus a weakening-check on D2/D3/D8/D9, explicitly told to verify the
+  amendment diff itself rather than trust prose claims.
+- Dispatched, confirmed genuinely running (no `evaluator model request denied`, real session-init
+  events). #1750 remains parked per the serial-queue correction until this result is recorded.
