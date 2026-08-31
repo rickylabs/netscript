@@ -7291,3 +7291,33 @@ recurrence with DCP logs dispatches a bounded repair. The control run I already 
 (`33413386485`, main `6c195acaf`) **predates #1839** and is therefore recorded as *informational only*
 — it is not one of the two sanctioned observations, and I will not present it as one whichever way it
 lands.
+
+### STRUCTURAL RISK — #1773 cannot converge to a stable head while main moves faster than its gate
+
+Fourth reconvergence in this cycle. The pattern is now unmistakable and worth naming rather than
+silently absorbing:
+
+| Head | Runtime receipt | Voided by |
+| --- | --- | --- |
+| `cd24e4955` | run `33360663739` SUCCESS | #1828 / #1814 (e2e + scaffold assets) |
+| `1c79001e1` | run `33362503268` SUCCESS | #1828 / #1814 |
+| `bf3aee258` | run `33404703469` SUCCESS | **#1762** (service/auth product code) |
+| `a4f45f64d` | run `33413481476` SUCCESS, 4/4 lanes | **#1841** (22 `packages/sdk` product files) |
+| `bd239f916` | run `33425281612` in flight | — |
+
+Each hosted four-lane run takes roughly 25–30 minutes. Main has been advancing with runtime-relevant
+product changes on a shorter interval than that. **Applying the invariant correctly therefore cannot
+terminate on its own**: every green receipt is voided before the packet can be handed over, and each
+cycle costs a full hosted run plus a delta IMPL-EVAL.
+
+This is not an argument to weaken the invariant — the invariant is right, and #1762 and #1841 both
+genuinely touch code `scaffold.runtime` exercises. It is a scheduling problem: **#1773 can only land if
+its merge follows its green run closely enough that no runtime-relevant merge intervenes**, i.e. it
+needs a merge window rather than another convergence. Recorded for the coordinator; I am continuing to
+re-earn rather than stalling, but flagging that the loop is unbounded without one.
+
+Current cycle: converged onto `8f1fcb2bc` at **`bd239f916`** (clean, zero conflicts,
+`check:assets-barrel` exit 0, lock byte-identical), four-lane hosted run `33425281612` dispatched at
+that exact head, and a bounded delta IMPL-EVAL (`a4f45f64d..bd239f916`) dispatched alongside. Runtime
+DoD rows un-ticked again with #1841 named as the voiding cause. Delta eval 3 had returned `DELTA_CLEAN`
+for the previous head before it was superseded.
