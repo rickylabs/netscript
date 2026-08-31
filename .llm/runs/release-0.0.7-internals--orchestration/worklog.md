@@ -6060,3 +6060,27 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   amendment diff itself rather than trust prose claims.
 - Dispatched, confirmed genuinely running (no `evaluator model request denied`, real session-init
   events). #1750 remains parked per the serial-queue correction until this result is recorded.
+
+## D-124 — #1751 cycle 2 PASS, residuals corrected, Slice 1 dispatched via resumed authoring thread
+
+- **Cycle 2 verified PASS**, independently: `local == remote == ed229bee563fcdd3c976bee2f685aee54e713fce`
+  before the correction; content read in full, not just the verdict line. Genuinely thorough
+  re-check — verified the `repair-codex-remote` precedent claim against real line numbers in
+  `contract.ts`/`planner.ts`/`agentic-runtime.ts`, re-ran the cycle-1 attack scenario against the
+  amended D2 and confirmed `stale` is now unreachable from it, and diffed D3/D8/D9 byte-for-byte
+  against the cycle-1-passed versions to confirm no weakening. Transport patch confirmed absent
+  from every commit (`git log -- config/models.ts` last touched by an unrelated ancient commit);
+  reverted from the working tree.
+- **R1/R2 corrected exactly as scoped, nothing beyond**: `worklog.md` Slice 4 now lists
+  `runtime/contract.ts`, `runtime/planner.ts`, and both test files; `plan.md`'s Open-Decision Sweep
+  sentence no longer claims a false "already in Slice 4" state; all six stale `#1774`-in-flight
+  phrasings (five named by the evaluator plus one more found by grep) re-anchored to shipped state.
+  R3 (optional Risk Register row) explicitly left for Slice 4's author, not applied now — matches
+  the instruction's scope exactly. Recorded in `drift.md`. Commit `6e6564fba`, pushed, verified.
+- Labels flipped PR #1802 and issue #1751 to sole `status:impl`.
+- **Dispatched Slice 1 only**, via `codex-resume` on the original authoring thread `01a054ff-9028-...`
+  (preserving context rather than a fresh session) — confirmed genuinely idle first via a corrected
+  liveness check (learned from the earlier near-miss). Explicit instruction: Slice 1 only, stop for
+  supervisor Tier-A, do not proceed further unattended.
+- **#1750 remains parked**, per the standing serial-queue correction, until #1751 reaches its next
+  checkpoint.
