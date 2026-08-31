@@ -229,11 +229,23 @@ async function countMatchingAppHosts(appHost: string): Promise<number> {
 async function requireAspireSuccess(args: readonly string[]): Promise<CommandResult> {
   const result = await runAspire(args);
   if (!result.success) {
-    throw new Error(
-      `aspire ${args.join(' ')} failed (${result.code}): ${result.stderr || result.stdout}`,
-    );
+    throw new Error(formatCommandFailure('aspire', args, result));
   }
   return result;
+}
+
+/** Format a failed command without allowing one captured stream to mask the other. */
+export function formatCommandFailure(
+  executable: string,
+  args: readonly string[],
+  result: CommandResult,
+): string {
+  const streams = [
+    result.stderr ? `stderr:\n${result.stderr}` : '',
+    result.stdout ? `stdout:\n${result.stdout}` : '',
+  ].filter((stream) => stream.length > 0);
+  const detail = streams.join('\n') || '(no captured output)';
+  return `${executable} ${args.join(' ')} failed (${result.code}):\n${detail}`;
 }
 
 function runAspire(args: readonly string[]): Promise<CommandResult> {

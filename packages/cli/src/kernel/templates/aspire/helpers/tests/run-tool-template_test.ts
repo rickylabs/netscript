@@ -191,7 +191,11 @@ Deno.exit(16);
     const result: unknown = JSON.parse(await Deno.readTextFile(resultPath));
 
     assertEquals(output.code, 16);
-    assertEquals(result, { success: false, message: ACTIONABLE_SEED_ERROR });
+    assertEquals(result, {
+      success: false,
+      message: ACTIONABLE_SEED_ERROR,
+      actionableStderr: [ACTIONABLE_SEED_ERROR],
+    });
     await Deno.stat(`${resultPath}.tmp`).then(
       () => {
         throw new Error('temporary result record was not atomically renamed');
@@ -200,6 +204,63 @@ Deno.exit(16);
         if (!(error instanceof Deno.errors.NotFound)) throw error;
       },
     );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('run-tool promotes a real error after an informational preamble', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-run-tool-preamble-' });
+  const runnerPath = join(root, 'run-tool.mts');
+  const requestPath = join(root, 'migrate.request.json');
+  const resultPath = join(root, 'migrate.result.json');
+  const preamble = 'Loaded command configuration from tool.config.ts.';
+  const failure = 'Error: migration command is not supported in this execution mode.';
+  try {
+    const template = await Deno.readTextFile(
+      new URL('../../../../assets/aspire/helpers/run-tool.ts.template', import.meta.url),
+    );
+    await Promise.all([
+      Deno.writeTextFile(runnerPath, template),
+      Deno.writeTextFile(
+        join(root, 'deno.json'),
+        JSON.stringify({
+          tasks: {
+            'db:migrate:postgres': 'deno run --allow-all migrate-failure.ts',
+          },
+        }),
+      ),
+      Deno.writeTextFile(
+        join(root, 'migrate-failure.ts'),
+        `await Deno.stderr.write(new TextEncoder().encode(${
+          JSON.stringify(`${preamble}\n${failure}\n`)
+        }));
+Deno.exit(16);
+`,
+      ),
+      Deno.writeTextFile(
+        requestPath,
+        JSON.stringify({
+          NETSCRIPT_PRISMA_OPERATION: 'migrate',
+          NETSCRIPT_DB_RESULT_FILE: resultPath,
+        }),
+      ),
+    ]);
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-all', runnerPath, '--request', requestPath, 'postgres'],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const result: unknown = JSON.parse(await Deno.readTextFile(resultPath));
+
+    assertEquals(output.code, 16);
+    assertEquals(result, {
+      success: false,
+      message: failure,
+      actionableStderr: [preamble, failure],
+    });
   } finally {
     await Deno.remove(root, { recursive: true });
   }

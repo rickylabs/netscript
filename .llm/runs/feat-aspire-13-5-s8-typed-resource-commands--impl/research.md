@@ -173,3 +173,29 @@ contract was introduced. The change has no JSR metadata or published-surface eff
 audit is N/A for this delta. Runtime execution is prohibited locally; the existing successful
 workflow operations are the runtime evidence for graph injection, and CI remains the authority for
 the repaired typed seed path.
+
+## D-233 masked migrate diagnosis
+
+Workflow run `33450804252` at `927d24bed` passed `database.seed` and reached 58 passing gates before
+`runtime.typed-db-phase-b` failed. The downloaded `e2e-cli-scaffold-runtime-report` artifact and the
+exact failed-job log agree: Aspire rendered only `Loaded Prisma config from prisma.config.ts.` and
+`Prisma schema loaded from schema.` as the typed-command message. Those lines are informational.
+The report contains no generated result record or AppHost log, so the later retained lines cannot
+be recovered from the uploaded artifact; they must be promoted by a new CI run rather than guessed.
+
+The masking crosses two seams. `run-tool.mts` retains D-224's bounded 8-line head plus 24-line tail,
+but still derives `RunToolResult.message` from index zero. Request mode serializes the bounded lines
+into one multi-line `message`; Aspire then renders only its leading portion. Finally,
+`requireAspireSuccess` chooses `stderr || stdout`, so one non-empty stream can hide the other.
+
+The generic repair is to select the first retained line matching a tool-agnostic failure shape as
+the short `message`, while preserving the entire unchanged bounded array as `actionableStderr` in
+the typed result record. The Phase-B verifier reports both stderr and stdout with labels. This does
+not parse Prisma fields, name Prisma phrases, change D-224's bounds, or discard retained context.
+
+Source inspection establishes one likely underlying class but does not yet authorize a behavioral
+repair: the typed `migrate` command invokes `db:migrate:<engine>`, whose generated task calls the
+interactive migration-authoring runner (`prisma migrate dev`). Generated workspaces separately
+publish `db:deploy:<engine>` backed by `prisma migrate deploy`. The cited CI's retained diagnostic,
+once promoted, decides whether that mismatch is the actual failure. Until then the underlying cause
+remains unreported rather than inferred.

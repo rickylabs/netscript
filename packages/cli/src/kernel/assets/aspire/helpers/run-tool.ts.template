@@ -12,6 +12,8 @@ const MAX_ACTIONABLE_STDERR_LINE_BYTES = Math.floor(
     MAX_ACTIONABLE_STDERR_LINES,
 );
 const TRUNCATION_MARKER = '…';
+const FAILURE_MESSAGE_SHAPE =
+  /\b(?:error|failed|failure|fatal|exception|panic|invalid|cannot|can't|unable|denied|unsupported|not supported|not found|timed? out|exited? with (?:code|status))\b|\b[A-Z]\d{3,}\b/i;
 
 export interface RunToolOptions {
   readonly cwd?: string;
@@ -95,11 +97,12 @@ export async function runTool(
 
   const actionableStderr = [...actionableStderrHead, ...actionableStderrTail];
   const success = status.success && !timedOut;
+  const fallbackFailureMessage = `deno task ${taskName} exited with code ${status.code}`;
   const message = timedOut
     ? `deno task ${taskName} timed out after ${options.timeoutSeconds} seconds`
     : success
     ? `deno task ${taskName} completed successfully`
-    : actionableStderr[0] || `deno task ${taskName} exited with code ${status.code}`;
+    : selectFailureMessage(actionableStderr, fallbackFailureMessage);
   if (!success && options.errorFile) {
     await Deno.writeTextFile(
       options.errorFile,
@@ -108,6 +111,10 @@ export async function runTool(
   }
 
   return { success, message, exitCode: status.code, actionableStderr };
+}
+
+function selectFailureMessage(lines: readonly string[], fallback: string): string {
+  return lines.find((line) => FAILURE_MESSAGE_SHAPE.test(line)) ?? lines[0] ?? fallback;
 }
 
 function truncateUtf8(text: string, maxBytes: number): string {
@@ -159,11 +166,15 @@ if (import.meta.main) {
     if (resultPath) {
       const message = result.success
         ? `Database ${operation} completed successfully.`
-        : result.actionableStderr.join('\n') || result.message;
+        : result.message;
       const temporaryResultPath = `${resultPath}.tmp`;
       await Deno.writeTextFile(
         temporaryResultPath,
-        JSON.stringify({ success: result.success, message }),
+        JSON.stringify({
+          success: result.success,
+          message,
+          actionableStderr: result.actionableStderr,
+        }),
       );
       await Deno.rename(temporaryResultPath, resultPath);
     }
