@@ -40,3 +40,18 @@
 - **Action:** accept; merged current `origin/main` exactly once as instructed and reran all gates.
 - **Evidence:** merge head `cf1e5091bc5af990fd9a7daf78440d975d9de920` has parents `b448df09a`
   and `26e1b486f`.
+
+## 2026-08-31 — private Fresh UI lock and Zod prose join forced scope
+
+- **What:** IMPL-EVAL cycle 1 found a governed nested lock and canonical architecture prose that
+  the root-lock/scoped-gate pass had not updated.
+- **Source:** `impl-eval.md` F1/F2 at evaluator commit `220f4b503`.
+- **Expected:** the root lock, Fresh manifest, scaffold version, and checker fixture fully described
+  the coherent dependency move.
+- **Actual:** `packages/fresh-ui/deno.lock` retained the pre-bump family and failed its frozen check;
+  `docs/architecture/zod-dependency-boundary.md` still named AG-UI as a Zod-v3 parent.
+- **Severity:** significant
+- **Action:** accept as a bounded, mechanically forced repair; regenerate the private lock, rewrite
+  the contradictory prose in place, sweep every tracked lock, and rerun the evaluator's minimum
+  gates. #1320 remains excluded.
+- **Evidence:** cycle-1 repair section in `worklog.md`; frozen Fresh UI check and root test RC 0.

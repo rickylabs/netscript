@@ -6,83 +6,95 @@
 | --- | --- |
 | Run ID | `fix-tanstack-ai-caret-bump--1695` |
 | Branch | `deps/tanstack-ai-caret-bump` |
-| Current phase | `blocked finding during post-#1829 collision integration` |
+| Current phase | `cycle-1 repair complete; awaiting supervisor-dispatched IMPL-EVAL cycle 2` |
 | Archetype | `4 - Public DSL / Builder` |
 | Scope overlays | `none` |
+| Draft PR | `#1832` |
 
 ## Current State
 
-Research and Plan & Design are complete, with `PLAN-EVAL: N/A` recorded before implementation. All
-four pins and the lock are updated. TanStack 0.52's required activity context, name-less tool-end
-event, and AG-UI usage-array changes are handled at the existing chat bridge with focused tests.
-The prior integration was complete, but the owner subsequently released #1829 and authorized one
-new collision pass. Then-current `origin/main` was fetched as `f59874abd`; its single merge is now
-in progress with the two AI conflicts manually analyzed. #1829's own three-test filter returned RC
-1 (2 pass, 1 fail), so owner instructions require an immediate stop without workaround or push.
+The coherent TanStack family move is implemented against stable 0.52 and merged once with
+`f59874abd2bc39446b21f5126323e0d2dcbce547`, preserving #1829's nested TokenUsage behavior. IMPL-EVAL
+cycle 1 returned `FAIL_IMPL` at evaluator commit `220f4b50313fd9116d18288b12fc0ebe3d27346a`
+for two bounded integration artifacts: the stale private Fresh UI lock and stale Zod-boundary prose.
+Both are repaired. The evaluator's minimum gate set, the five-lock sweep, and the final root suite
+are green. No IMPL-EVAL cycle 2 has been run by this implementation session.
 
 ## Completed
 
-- Exact branch/base/current-main verification.
-- Harness/doctrine/archetype/JSR bootstrap and baseline scan.
-- Authoritative `deps:latest` stable-version lookup.
-- Old/new `deno doc`, upstream changelog, call-site, model-ID, and current-main diff audit.
-- Plan-Gate assessment with justified N/A.
-- Coherent four-pin move and normal lock resolution.
-- Breaking-change adaptations plus focused regressions.
-- Intermediate structured check (101 files), tests (149), lint, format, quality, JSR, publish, and
-  dependency audit evidence.
-- One-time final main integration and authoritative rerun: 101 files check/lint/fmt clean, 152 tests
-  pass, quality/JSR/publish/dependency audits RC 0.
+- Authoritative `deps:latest` lookup and coherent direct-family move to core `0.52.0`, Anthropic
+  `0.18.3`, MCP `0.3.8`, and OpenAI `0.22.3`.
+- Fresh's second core pin and AI-Preact peer aligned to prevent two core versions in one graph.
+- TanStack 0.52 activity-context, tool-end, usage-array, canonical-usage identity, and finish-reason
+  metadata changes adapted behind the owned chat bridge.
+- #1829's three usage test blocks retained byte-identical while all three pass.
+- Scaffolded AI-MCP specifier aligned to the new family.
+- Root-lock Zod residual checker narrowed, fail-closed, to the sole kvdex v3 boundary.
+- One-time final main integration and complete post-integration gate pass.
+- IMPL-EVAL cycle 1 consumed without self-evaluation.
+- `packages/fresh-ui/deno.lock` regenerated through its documented `lock:update` task; frozen check
+  now passes.
+- Canonical Zod boundary prose rewritten to the post-0.52 graph and #1320 blocker.
+- Every tracked `deno.lock` enumerated; no pre-bump TanStack entry remains in an active specifier or
+  npm resolution key.
+- Cycle-1 minimum gates and final repository test pass with real captured exits.
 
 ## In Progress
 
-- Nothing. The worktree intentionally remains in an uncommitted merge-conflict state pending owner
-  and coordinator direction on the genuine #1829/TanStack 0.52 interaction.
+- Harness/PR handoff for the completed cycle-1 repair.
 
 ## Next Steps
 
-1. Owner/coordinator decides how #1829's direct `finishReason` expectation should interact with the
-   TanStack 0.52 event-restoration contract.
-2. Do not resume gates, commit, push, PR lifecycle, or IMPL-EVAL until that decision is supplied.
+1. Commit and push the bounded cycle-1 repair by explicit refspec.
+2. Update draft PR #1832 scope and post captured phase evidence.
+3. Stop for supervisor-dispatched IMPL-EVAL cycle 2. Do not change readiness or labels.
 
 ## Key Decisions
 
 | Decision | Source | Notes |
 | --- | --- | --- |
-| Stable targets come only from `deps:latest` | owner + toolchain skill | 0.52.0 / 0.18.3 / 0.3.8 / 0.22.3 |
-| PLAN-EVAL N/A | `plan.md` | Bounded mechanical slice after compatibility research. |
-| IMPL-EVAL external | owner | Supervisor dispatches after PR; this session stops. |
+| Stable targets come only from `deps:latest` | owner + toolchain skill | Never inferred from `deno outdated --latest`. |
+| PLAN-EVAL N/A | plan + cycle-1 evaluator | Upheld as an honest bounded/mechanical dependency adaptation. |
+| #1829 assertions remain authoritative | owner + evaluator | Adapter changed; merged test blocks did not. |
+| Nested Fresh UI lock is forced scope | IMPL-EVAL F1 | Root lock cannot govern the package's private frozen lock. |
+| Zod prose follows the fail-closed checker | IMPL-EVAL F2 | One v3 parent remains; #1320 stays out of scope. |
+| Historical probe evidence remains immutable | all-lock sweep | Its old strings are workspace-link metadata, not active specifiers or npm resolutions. |
+| IMPL-EVAL external | owner | Cycle 2 is supervisor-dispatched after this report. |
 
 ## Files Changed
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/fix-tanstack-ai-caret-bump--1695/*` | new | Harness bootstrap/research/plan evidence; launcher thread IDs preserved. |
-| `packages/ai/deno.json` | modified | Four coherent stable caret pins. |
-| `deno.lock` | modified | Resolved TanStack family closure; exact delta in `worklog.md`. |
-| `packages/ai/src/adapters/tanstack-chat-client.ts` | modified | 0.52 activity/event compatibility. |
-| `packages/ai/tests/tanstack_chat_client_test.ts` | new | Tool-end and usage-array regressions. |
+| Path | Notes |
+| --- | --- |
+| `.llm/runs/fix-tanstack-ai-caret-bump--1695/*` | Plan, worklog, drift, context, and evaluator evidence. |
+| `packages/ai/deno.json` | Four coherent stable caret pins. |
+| `packages/fresh/deno.json` | Second core pin plus compatible AI-Preact peer. |
+| `deno.lock` | Root TanStack family closure. |
+| `packages/fresh-ui/deno.lock` | Private frozen graph regenerated to the same family. |
+| `packages/ai/src/adapters/tanstack-chat-client.ts` | 0.52 activity/event/usage compatibility. |
+| `packages/ai/tests/tanstack_chat_client_test.ts` | Leaf regressions plus byte-unchanged #1829 cases. |
+| `packages/cli/src/kernel/adapters/scaffold/import-resolver.ts` and test | Generated AI-MCP specifier alignment. |
+| `.llm/tools/deps/check-zod-alignment.ts` and test | Removed obsolete AG-UI v3 residual. |
+| `docs/architecture/zod-dependency-boundary.md` | Post-0.52 Zod graph and #1320 condition. |
 
-## Gates
+## Cycle 1 Repair Gates
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Static | integrated green | `worklog.md` |
-| Fitness | integrated green except unchanged doc-lint baseline | `worklog.md` |
-| Runtime | integrated green | 152 package tests |
-| Consumer | integrated green | current-main Responses call sites included |
-
-## Open Questions
-
-- Blocking finding: `TanStack usage: a fully populated upstream object survives the owned boundary`
-  receives `finishReason: undefined` instead of `"stop"` under the bumped dependency (RC 1).
+| Gate | Result |
+| --- | --- |
+| Fresh UI `lock:update` | RC 0; 150 files, 2 batches, 0 failed |
+| `deps:check:zod` | RC 0; sole v3 residual `@olli/kvdex@3.6.7` |
+| `TanStack usage:` filter | RC 0; 3 passed, 0 failed |
+| #1829 block comparison | RC 0; all three byte-identical to `f59874abd` |
+| Fresh UI frozen check | RC 0; 150 files, 2 batches, 0 failed |
+| Five-lock resolution sweep | RC 0; 0 stale active specifiers/resolutions |
+| Root `deno task test` | RC 0; `exitCode=0`, `processFailure` absent, 4,444 passed, 0 failed, 19 ignored |
 
 ## Drift and Debt
 
-- Drift: launcher run-ID correction, unavailable `rtk`, stable version newer than brief example, and
-  final main newer than the correction's snapshot.
-- Debt: no new debt planned; existing JSR/doc/cardinality baseline must not worsen.
+- Significant forced drift: the private Fresh UI lock and canonical Zod prose joined scope after
+  IMPL-EVAL exposed the root-lock/scoped-gate blind spot. Recorded in `drift.md`.
+- #1320 remains deferred; narrowing the residual boundary does not collapse Zod instances.
+- No new architecture debt accepted.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
+- See the draft PR's commit list plus per-slice PR comments; V3 has no `commits.md`.

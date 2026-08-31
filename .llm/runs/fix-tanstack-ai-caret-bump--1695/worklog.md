@@ -536,3 +536,82 @@ API adaptations together.
   TanStack 0.52 moved finish reason into `metadata.tanstack` and normalizes/reconstructs canonical
   usage through AG-UI. The adapter now recovers both values without dropping nested fields or object
   identity, proven by all three byte-unchanged #1829 tests.
+
+## IMPL-EVAL Cycle 1 Repair
+
+Cycle 1 was committed separately at `220f4b50313fd9116d18288b12fc0ebe3d27346a` with verdict
+`FAIL_IMPL`. The evaluator confirmed the dependency move, fail-closed Zod checker, #1829
+preservation, adapter minimality, sibling boundary, and `PLAN-EVAL: N/A`; it required two bounded
+evidence/integration repairs.
+
+### F1 — governed Fresh UI lock
+
+`packages/fresh-ui` carries a private frozen lock that the root-lock update does not govern. It
+still contained the pre-bump family and made the package's frozen check fail. The documented repair
+was run without deleting the lock or using a reload flag:
+
+```text
+deno task --cwd packages/fresh-ui lock:update
+filesSelected=150; batches=2; failedBatches=0; CAPTURED_RC=0
+```
+
+The resulting private-lock delta is:
+
+```text
+packages/fresh-ui/deno.lock | 129 ++++++++++++++++++++++---------------------
+1 file changed, 74 insertions(+), 70 deletions(-)
+```
+
+Its TanStack resolution keys now match the root graph: core `0.39.0 -> 0.52.0`, Anthropic
+`0.15.13 -> 0.18.3`, MCP `0.2.1 -> 0.3.8`, OpenAI `0.15.10 -> 0.22.3`, Preact
+`0.10.1 -> 0.14.4`, client `0.19.1 -> 0.29.2`, event client `0.6.8 -> 0.11.2`, utilities
+`0.3.1 -> 0.4.0`, and OpenAI base `0.9.6 -> 0.10.8`. Normal regeneration also moved the direct
+closure's AG-UI/Zod edge from `@ag-ui/core@0.0.52` on Zod 3 to
+`@ag-ui/core@0.1.1-canary.beta.0` on Zod 4 and selected the current compatible transitive patch
+versions recorded in the lock diff. Those changes are retained as the output of the evaluator-
+required regeneration, not hand-edited away.
+
+### All-lock sweep
+
+A read-only JSON sweep enumerated all five tracked `deno.lock` files and separately inspected
+top-level `specifiers` plus actual `npm` resolution keys for every pre-bump TanStack family member:
+
+| Lock | Pre-bump specifier/resolution | Current TanStack resolution |
+| --- | --- | --- |
+| root `deno.lock` | none | coherent 0.52 family and closure |
+| `packages/fresh-ui/deno.lock` | none | coherent 0.52 family and closure |
+| `docs/site/deno.lock` | none | none |
+| Rust-worker benchmark fixture lock | none | none |
+| runtime-versioned-automation RFC probe lock | none | none |
+
+The sweep returned `locksEnumerated=5`, `activeResolutionFailures=0`, `CAPTURED_RC=0`. The historical
+RFC probe snapshot contains six old strings only inside its frozen `workspace.links` evidence for
+an obsolete absolute-file workspace. It has no TanStack entry in either `specifiers` or `npm`, so
+it does not resolve a pre-bump package. It was intentionally preserved rather than rewriting
+another run's historical evidence.
+
+### F2 — Zod boundary prose
+
+`docs/architecture/zod-dependency-boundary.md` was rewritten in place to match the enforced 0.52
+graph: kvdex is the sole remaining Zod-v3 parent; AG-UI now binds to Zod 4; and #1320's remaining
+single-instance blocker is the kvdex boundary. This synchronizes the canonical prose with the
+already fail-closed checker and does not expand this leaf into #1320.
+
+### Cycle 1 repair receipts
+
+Every verdict command used `out=$(cmd 2>&1); rc=$?`; no pipeline supplied an exit status.
+
+| Command | Result | Evidence |
+| --- | --- | --- |
+| `deno task --cwd packages/fresh-ui lock:update` | PASS, RC 0 | 150 files, 2 batches, 0 failed batches |
+| `deno task deps:check:zod` | PASS, RC 0 | instances `zod@3.25.76,zod@4.4.3`; sole residual `@olli/kvdex@3.6.7` |
+| three `TanStack usage:` tests | PASS, RC 0 | `exitCode=0`; 3 passed, 0 failed |
+| #1829 block comparison to `f59874abd` | PASS, RC 0 | all three exact blocks byte-identical (351/351, 337/337, 268/268 bytes) |
+| `deno task --cwd packages/fresh-ui check` | PASS, RC 0 | frozen lock; 150 files, 2 batches, 0 failed batches |
+| all-lock resolution sweep | PASS, RC 0 | 5 locks; 0 stale specifier/resolution failures |
+| repo-wide `deno task test` | PASS, RC 0 | `exitCode=0`; `processFailure` absent; 4,444 passed, 0 failed, 19 ignored |
+
+Two exploratory byte-extraction commands were discarded before the final proof: the first used an
+unsupported permission flag with `deno eval`, and the second included trailing next-test context
+for the last block. Neither was a test/gate verdict. The final extractor bounded each complete
+`Deno.test(...)` call and returned RC 0 with equal byte counts on both revisions.
