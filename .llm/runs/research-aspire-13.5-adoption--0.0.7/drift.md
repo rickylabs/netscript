@@ -4885,3 +4885,37 @@
     started executing, exactly one so far (S9's workspace identity) was a genuine slice defect; the
     others — garnet readiness (#1844) and now `database.seed` — look like **pre-existing conditions
     that were invisible while the runtime tiers could never run**.
+
+- **D-207 — `database.seed` reproduces on THREE heads, and the failure correlates perfectly with
+  BRANCH BASE rather than slice content. Likely a stale-base problem, not a defect to repair.**
+  - **Third reproduction:** S10 (`265466059`, run `33404326675`/`99553702367`) — `database.seed`
+    FAILED 1310 ms, **exit 16**. With S8 (1813 ms) and S9 (1873 ms), that is three unrelated slices,
+    same gate, same exit code. S8's delta is effectively exonerated.
+  - **The correlation is exact:**
+
+    | Head | merge-base | behind main | `database.seed` |
+    | --- | --- | ---: | --- |
+    | #1747 `2032d4ed7` | `71d5fb8e0` | 7 | **PASSED** (reached gate 45, failed later on garnet) |
+    | S8 `bc838a0b3` | `8a9257642` | 21 | FAILED |
+    | S9 `29eed9ef9` | `8a9257642` | 21 | FAILED |
+    | S10 `265466059` | `8a9257642` | 21 | FAILED |
+
+    Every head on base `8a9257642` fails; the single head on the newer base passes. That points at
+    `main` content landed **between** the bases, not at any slice.
+  - **Candidate identified in the 14-commit gap:** `bd9d463b4` — *fix(sdk): normalize Aspire browser
+    service keys* (#1831), whose follow-up #1833/#1835 handled residual normalization mismatches in
+    the same area. Service-key normalization plausibly reaches the generated database connection
+    string that `seed` consumes. **Explicitly handed over as a candidate to disprove, not a
+    conclusion** — none of the 14 commits touches `*seed*`/`*prisma*` paths directly, so the
+    mechanism is unproven.
+  - **The Prisma `code` remains the decisive fact and is still unread.** `P1001` or a
+    connection-string defect fits the key-normalization mechanism; `P2021`/`P2022` (missing
+    table/column) would point at migration application and largely refute it. The agent must read it
+    from at least two of the three runs' artifacts and say whether they match.
+  - **If the hypothesis holds the remedy is convergence onto current `main`, not a repair inside
+    #1754** — and I told the agent to say so rather than act: base moves and rebases are
+    supervisor-owned and would invalidate recorded evaluations.
+  - **Also from this round — the suites are now running deep**, which is new: sqlite tiers reach
+    `passed=84` (S9) and `passed=86` (S10), against **37** before S9's workspace fix. Distinct
+    residuals are now visible per head (`behavior.otel.stream-consumer` on S9,
+    `runtime.resource-command` on S10) that no previous run in this programme could reach.
