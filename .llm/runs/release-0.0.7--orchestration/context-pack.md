@@ -2103,3 +2103,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
   base. #1811 must regenerate from `71d5fb8e`, not its earlier prepared base, to retain all 25 rows.
 - #1828's recovered separate-session GLM verdict is PASS at head `76c66e894`; Internals is moving it
   through ready lifecycle and exact CI as the P0 prerequisite for #1762.
+
+## Resume delta — 2026-08-31T14:25:35Z
+
+- Current main is `35639e2a97adec52e0f42565fb2a4a7af8cccd0e` after Internals PR #1828 shipped
+  from immutable head `76c66e894548b08a052d285d97b69b0fb6767cfa`, closing #1827. Independent GLM
+  PASS, exact-head CI `33362382914`, a post-body-edit close-gate, zero threads, and exact live-main
+  synthetic merge parents were verified before merge; #1827/#1828 are sole `status:shipped`.
+- #1762 is now unblocked. Features owns immediate current-main convergence, canonical regeneration
+  of its five generated carriers, non-vacuous DoD/ledger completion, hosted auth/policy runtime, and
+  exact CI. No further coordinator or owner decision gates this work.
+- The primary is consuming the ready queue in parallel: #1814, #1834, #1811, then #1830, while all
+  five supervisors continue their independent serial topic queues. Canary 5 remains content-gated
+  until this wave yields a coherent public feature/fix payload; it is not gated by docs or internals.

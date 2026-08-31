@@ -3338,3 +3338,19 @@
   #1823's hold, and #1802's unidentified 1/4,483 root-suite failure. It exited cleanly. Internals r3
   launched through the checked-in hybrid runtime, proved Remote Control attachment, then was set to
   Opus 5/high and verified in live JSONL before adopting existing workers.
+
+## 2026-08-31T14:25:35Z — #1828 compiler-library parity repair ships and releases #1762
+
+- Internals PR #1828 reached immutable head `76c66e894548b08a052d285d97b69b0fb6767cfa` with the
+  bounded `ReturnType<typeof setTimeout>` compatibility repair, unchanged lockfile, independent GLM
+  PASS, zero review threads, and exact-head run `33362382914` green with 4,427 passed, zero failed,
+  and 19 ignored tests.
+- The coordinator repaired the previously vacuous PR body with a six-row checked Definition of Done
+  and moved the lifecycle to ready. Close-gate attempt 2 (`99521765789`) started after that body edit
+  and passed. Local synthetic merge `0277a4c186a644143afe6191028412a7757b14e8` proved exact
+  parents `[71d5fb8e079cae74249dd7d314874a3a18e7ab28,
+  76c66e894548b08a052d285d97b69b0fb6767cfa]`.
+- The coordinator squash-merged #1828 as `35639e2a97adec52e0f42565fb2a4a7af8cccd0e` and
+  normalized #1827/#1828 to sole `status:shipped`. This removes #1762's Deno compiler-library
+  blocker; Features must now converge its generated carriers, run hosted auth/policy runtime, and
+  finish exact-head gates rather than remaining parked.

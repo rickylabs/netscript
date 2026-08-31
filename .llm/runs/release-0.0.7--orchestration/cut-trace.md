@@ -248,3 +248,13 @@ artifact-pinned production E2E.
 - Exact CI and post-edit close-gate passed; the GLM-evaluated page was unchanged, cumulative corpus
   gates passed, local synthetic merge `3d7c7ea5e9` had exact live-main/head parents, and threads were
   zero. It is docs membership in the eventual canary payload, not the reason to cut one by itself.
+
+## 2026-08-31T14:25:35Z — compiler-library parity repair joins the checkpoint
+
+- PR #1828 head `76c66e894548b08a052d285d97b69b0fb6767cfa` squash-merged as
+  `35639e2a97adec52e0f42565fb2a4a7af8cccd0e`, closing #1827. It replaces the environment-sensitive
+  Node timeout type with the portable library-derived return type and restores full CLI E2E type
+  checking required by #1762.
+- Independent GLM PASS, exact-head run `33362382914`, post-body-edit close-gate attempt 2, zero
+  threads, lock identity, and live-main synthetic merge parents were verified. This is an enabling
+  fix; the next canary decision waits for the newly unblocked public feature carriers to land.
