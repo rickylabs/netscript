@@ -7362,3 +7362,46 @@ localizes the render/hydration boundary. Correct shape for an undiagnosed defect
   expected for a type narrowing (a "RED" witness would be a compile failure, which cannot be committed
   as a passing build) — that is for its evaluator to judge, and I will brief it explicitly rather than
   assume either way.
+
+### Garnet version audit → #1849 filed; #1844 lane widened to a reliability mandate
+
+**Version audit (verified against upstream, not assumed):**
+
+| Component | Pinned | Upstream / Aspire default | Verdict |
+| --- | --- | --- | --- |
+| `Aspire.Hosting.Garnet` / `Redis` / CLI / SDK | 13.5.3 | 13.5.3 newest on NuGet | **current** |
+| Garnet container image | `ghcr.io/microsoft/garnet:1.1.1` | Aspire `AddGarnet` default `1.0`; upstream **2.1.5** | behind a major line |
+| `garnet-server` tool | `1.1.10` | same | behind, **and inconsistent with the image** |
+
+The two arms running **different 1.x versions** while `usesRespReadiness` attaches the *same* RESP
+check to both is a latent trap: any behavioural difference is invisible in review and only appears at
+runtime on whichever arm a tier selects. Filed as **#1849** (0.0.8), with the explicit warning that
+2.x runs *ahead* of what `Aspire.Hosting.Garnet 13.5.3` defaults to (`1.0`), so the bump must be
+validated rather than assumed — and that if 13.5.3 cannot support 2.x cleanly, aligning both arms on
+the same latest 1.x is still a strict improvement. Also recorded that #1849 **must not** be used to
+close #1844 by coincidence.
+
+**Hand-rolled RESP probe assessed against doctrine (AGENTS.md rule 3).** `createRespPingCheck` writes
+inline `PING\r\n` and reads a **single** `socket.once('data')` — no framing, despite TCP giving no
+framing guarantee — plus no RESP3 `HELLO`, and `-NOAUTH` resolving to `Degraded`, which
+`aspire wait --status healthy` never accepts. Any of these produces a deterministic never-healthy that
+looks exactly like the observed 300 s wall.
+
+**Client candidate measured and partially tested.** `@redis/client@6.2.1`: **1 direct dep**
+(`cluster-key-slot`, 0 deps) versus `redis` 5 and `ioredis` 6 — two packages total, MIT, first-party
+types, Redis-maintained. It runs under Deno npm compat and failed **cleanly in 23 ms**
+(`ECONNREFUSED`) where the current probe walls for 300 s.
+
+**But the test did not conclude, and I did not pretend otherwise.** Against a minimal RESP stub the
+client returned `ERR unknown command` — v6 negotiates **RESP3 `HELLO`** on connect — and forcing
+`RESP: 2` still hung, so it issues more connect-time commands than PING. A naive swap could therefore
+introduce a Garnet-compat failure, the very bug class being removed. Validation against **real Garnet
+1.1.1 on both arms** is required and needs a runtime observation I hold no lease for; the lane was
+told to request it explicitly rather than conclude from my partial result.
+
+`@db/redis` (JSR, latest 0.41.2) is `runtimeCompat: { deno: true }` — unusable in the Node-compat
+AppHost until Aspire 13.6 brings first-party Deno hosting (D-7; S12 owns adoption). Any adopted Node
+client must carry a greppable replacement marker naming that follow-up.
+
+Test artifacts were run under `/home/agent/observability/` (never in a worktree), and stray processes
+were verified cleaned: 0 remaining, 0 docker containers.
