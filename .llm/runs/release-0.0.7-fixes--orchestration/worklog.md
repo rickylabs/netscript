@@ -7321,3 +7321,44 @@ Current cycle: converged onto `8f1fcb2bc` at **`bd239f916`** (clean, zero confli
 that exact head, and a bounded delta IMPL-EVAL (`a4f45f64d..bd239f916`) dispatched alongside. Runtime
 DoD rows un-ticked again with #1841 named as the voiding cause. Delta eval 3 had returned `DELTA_CLEAN`
 for the previous head before it was superseded.
+
+### #1773 at `bd239f916` — everything green except the delta eval, and the merge window is holding
+
+- **Hosted four-lane run `33425281612`: completed/success** — `scaffold-runtime (aspire + docker +
+  postgres)`, `scaffold-runtime-sqlite`, `scaffold-static`, `desktop-native-linux` all terminal.
+- **Head already contains current main `8f1fcb2bc`** (verified ancestor), and main has not moved since
+  — so for the first time in this cycle the receipt is not racing a merge.
+- `ci: completed/success`; **close-gate success started 18:49:22Z**, after the metadata edits at
+  18:49:07Z — the ordering verified rather than assumed, for the fourth time.
+- DoD **19/19**; issue #1616 **3/3** re-mirrored by the tool at this head; sole `status:ready-merge` on
+  both PR and issue; threads 0/0.
+- **Outstanding: bounded delta IMPL-EVAL (`a4f45f64d..bd239f916`) still running.** Not surfacing the
+  packet as complete until it returns — the coordinator's condition is hosted lanes **and** delta eval.
+
+### #1845 S1 — the lead is dead, and no replacement diagnosis was invented
+
+The measurement settled it: Fresh 2.3.3 **does** discover `routes/**/(_islands)/`, the locked Fresh
+Vite plugin 1.1.2 consumes that discovery in both snapshots and adds one production Rollup entry per
+island, and a read-only invocation of that exact plugin against a retained generated app emitted
+`fresh-island::ServiceShowcaseLab` → `fresh-client-island::ServiceShowcaseLab` with the client snapshot
+importing `routes/examples/users/(_islands)/ServiceShowcaseLab.tsx`.
+
+**So there is no scaffold registration fix to make**, and the plan says so plainly: "This S1 does not
+replace that disproved lead with a new confident diagnosis." That is exactly the discipline the brief
+demanded after three prior wrong diagnoses.
+
+Its ceiling is **conditional** — `define-page/**` only if a reproduction proves layer/layout
+materialization drops island identity; `query/**` only if the marker is emitted and the provider blocks
+hydration — with implementation hard-stopped pending PLAN-EVAL and a package-level reproduction that
+localizes the render/hydration boundary. Correct shape for an undiagnosed defect.
+
+### #1093 and #1609 implementations validated, #1093 IMPL-EVAL dispatched
+
+- **#1093** at `015fa5686`: exactly the 6 ceiling paths, `deno.lock` unchanged, RED `148a655c4`
+  contains **0** product files. IMPL-EVAL dispatched (`z-ai/glm-5.3-flash`), briefed to check the one
+  thing that decides the leaf — whether the test proves a *synthetic third-party* factory is discovered
+  without editing core defaults, or merely adds a fourth entry to a hardcoded list.
+- **#1609** at `f670dbebb`: exactly the 2 ceiling paths, lock unchanged. Its single-commit shape is
+  expected for a type narrowing (a "RED" witness would be a compile failure, which cannot be committed
+  as a passing build) — that is for its evaluator to judge, and I will brief it explicitly rather than
+  assume either way.
