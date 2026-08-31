@@ -6,15 +6,18 @@
 | --- | --- |
 | Run ID | `feat-workers-execution-progress--1592` |
 | Branch | `feat/workers-execution-progress` |
-| Current phase | `gate` |
+| Current phase | `gate — Slice 1 declaration-consistency repair` |
 | Archetype | `3 - Runtime / Behavior` |
 | Scope overlays | `none` |
 
 ## Current State
 
-Slice 1 implementation and its Tier-A gates are complete within the locked ceiling. Product slice
-commit `7270cc7f7` is pushed, and draft PR #1814 targets `main` with the required partial-scope body,
-labels, and `0.0.7` milestone. No evaluator has been dispatched.
+The original Slice 1 implementation is pushed as `7270cc7f7`. The bounded declaration-consistency
+repair now aligns all four newly authorized stale/constructed `ExecutionRecord` shapes while
+preserving the accepted required-nullable v1 contract. Its primary `publish:dry-run` gate and all
+required scoped gates pass; this context pack is included in the repair's single commit. PR #1814
+remains partial (`Refs #1592`). Its existing IMPL-EVAL PASS is bound to pre-repair head `d2c290c0c`,
+so a supervising session must refresh evaluation after the repair lands.
 
 ## Completed
 
@@ -29,16 +32,30 @@ labels, and `0.0.7` milestone. No evaluator has been dispatched.
   code-quality/doctrine gate; verified `deno.lock` remained byte-identical.
 - Committed and pushed the reviewed product slice as `7270cc7f7`; opened draft PR #1814 with
   `Refs #1592` and the required initial metadata.
+- Preserved the correct cycle-1 runtime/registry declaration edits after the original two-file
+  ceiling proved insufficient and the implementer stopped for rescope.
+- Under the cycle-2 four-file amendment, made fixture progress defaults concretely `null` and added
+  the progress pair to `batchQueryExecutions`' hand-maintained local response type/mapping.
+- Passed `publish:dry-run`; scoped check/lint/fmt with 112 selected files and non-empty receipt
+  stdout; package tests 29/29 with 0 ignored; and `quality:gate`.
+- Verified `deno.lock` remains byte-identical at
+  `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
 
 ## In Progress
 
-- Tier-A draft handoff; this leaf stops after posting the required slice comment.
+- Commit the bounded repair once, push by explicit refspec, and post its evidence comment on PR
+  #1814. A fresh IMPL-EVAL for the repair head remains assigned to a later separate supervisor
+  session.
 
 ## Next Steps
 
-1. A supervising session may run the mandatory separate-session IMPL-EVAL later.
-2. Keep the PR draft; do not ready-flip or close #1592 from this partial slice.
-3. Plan the deferred runtime wiring and ordering/coalescing/replay documentation as follow-up scope.
+1. A supervising session must refresh the mandatory separate-session IMPL-EVAL on the repair head;
+   the PASS at `d2c290c0c` becomes stale when this commit lands.
+2. Do not change the PR's current readiness state, labels, checkboxes, or partial `Refs #1592`
+   relationship; do not close #1592.
+3. Treat the supplemental nine `private-type-ref` doc-lint diagnostics in the carried-in
+   stream/contract files as separate rescope; none is in a repair file.
+4. Plan the deferred runtime wiring and ordering/coalescing/replay documentation as follow-up scope.
 
 ## Key Decisions
 
@@ -52,19 +69,22 @@ labels, and `0.0.7` milestone. No evaluator has been dispatched.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| Four locked product files | changed | Domain/state/stream progress fields and transition |
+| Four original locked product files | changed | Domain/state/stream progress fields and transition |
 | `packages/plugin-workers-core/tests/state/execution-state_test.ts` | new | Persistence and mutation-hook proof |
 | `packages/plugin-workers-core/tests/streams/workers-streams_test.ts` | changed | Type/schema/mapper round-trip proof |
-| Harness run artifacts | changed/new | Identity, design, gates, handoff, and drift state |
+| `runtime/runtime-types.ts`, `registry/registry-types.ts` | changed | Required-nullable declarations aligned |
+| `testing/job-fixtures.ts`, workers service `routers/runs.ts` | changed | Concrete-null fixture and batch response alignment |
+| `worklog.md`, `context-pack.md` | changed | Repair scope, gate receipts, and handoff state |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Scoped check/lint/fmt, 29/29 tests, exports drift |
+| Static | PASS | `publish:dry-run`; scoped check/lint/fmt with non-empty receipt stdout; 29/29 tests |
 | Fitness | PASS | `quality:gate` exit 0 plus Tier-A substantive review |
 | Runtime | N/A | Prohibited by owner; no runtime lease |
 | Consumer | PASS | `docs:exports-drift` exit 0 |
+| Supplemental doc lint | OUT OF SCOPE | 9 carried-in private-type diagnostics outside the four repair files |
 
 ## Open Questions
 
@@ -72,7 +92,8 @@ labels, and `0.0.7` milestone. No evaluator has been dispatched.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: cycle 1 correctly stopped when the initial two-file ceiling proved insufficient; cycle 2
+  was explicitly amended to four product files.
 - Debt: no new or deepened debt identified; the package's existing Refactor verdict remains.
 
 ## Commits

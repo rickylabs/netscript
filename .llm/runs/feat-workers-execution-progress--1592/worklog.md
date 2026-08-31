@@ -67,6 +67,10 @@ test and the existing streams test.
 | 2026-08-31 | 1 | Reconcile | #1592 remains intentionally open: this partial slice does not wire `ctx.reportProgress()` or document ordering/coalescing/replay semantics. Draft PR must use `Refs #1592`, never a closing keyword. |
 | 2026-08-31 | 1 | Commit/push | Signed off and pushed product slice commit `7270cc7f7`; remote branch resolved to full SHA `7270cc7f78c488d87d5857d074c9e035ae5c94f2`. |
 | 2026-08-31 | 1 | Draft PR | Opened draft PR #1814 against `main` with `Refs #1592`, exact initial labels (`status:impl`, `type:feat`, `priority:p1`, `area:workers`, `area:streams`), and milestone `0.0.7`. |
+| 2026-08-31 | 1 repair cycle 1 | Implement/stop | Added the required-nullable progress fields to the stale runtime and registry `ExecutionRecord` declarations. `publish:dry-run` then exposed two remaining hand-maintained shapes, so work stopped at the two-file ceiling and was returned for rescope as required. |
+| 2026-08-31 | 1 repair cycle 2 | Implement | Under the coordinator's four-file amendment, defaulted fixture progress values to `null` without permitting `undefined` output and added both fields to the batch-query router's local execution shape/mapping. No fifth product file was touched and the required-nullable v1 contract was preserved. |
+| 2026-08-31 | 1 repair cycle 2 | Gate | `publish:dry-run` passed. Scoped check/lint/fmt receipts selected 112 package files and recorded non-empty stdout; package tests passed 29/29 with 0 ignored; `quality:gate` passed; `deno.lock` remained byte-identical. |
+| 2026-08-31 | 1 repair cycle 2 | Supplemental audit | Full-export `doc:lint` reported nine carried-in `private-type-ref` diagnostics only in the original slice's stream/contract files, none in the four repair files. The explicit repair ceiling prohibits absorbing that separate public-surface work. |
 
 ## Decisions
 
@@ -76,6 +80,7 @@ test and the existing streams test.
 | Reuse `#transition()`/`#save()` | Preserves the existing persistence and mutation-hook publication path | `plan.md` LD-2; `research.md` |
 | No runtime wiring | No trivial existing consumer path was found; new message plumbing is prohibited | `plan.md` LD-4; `research.md` |
 | Archetype 3 | The package owns worker execution state and durable runtime behavior | doctrine `06`; Archetype 3 profile |
+| Required-nullable declarations stay uniform | The accepted v1 contract guarantees a concrete progress pair on every execution, using `null` when absent | #1814 Slice 1 repair amendment |
 
 ## Drift
 
@@ -116,6 +121,19 @@ test and the existing streams test.
 | --- | --- | --- | --- |
 | Export documentation drift | PASS | `docs:exports-drift` exit 0 | No new export path |
 
+### Slice 1 Declaration-Consistency Repair Gates
+
+| Gate | Receipt / command | Result | Evidence |
+| --- | --- | --- | --- |
+| Publish dry-run | `pr1814-slice1-repair-publish` / `deno task publish:dry-run` | PASS | Exit 0; all unit simulations completed with `Success Dry run complete` |
+| Scoped check | `pr1814-slice1-repair-check` / include `^packages/plugin-workers-core/` | PASS | 112 files; `stdout.bytes=387`; 0 diagnostics |
+| Scoped lint | `pr1814-slice1-repair-lint` / include `^packages/plugin-workers-core/` | PASS | 112 files; `stdout.bytes=472`; 0 findings/refusals |
+| Scoped format | `pr1814-slice1-repair-fmt` / include `^packages/plugin-workers-core/` | PASS | 112 files; `stdout.bytes=389`; 0 findings/refusals |
+| Package tests | `pr1814-slice1-repair-test` / `packages/plugin-workers-core/tests/` | PASS | 29 passed; 0 failed; 0 ignored |
+| Code quality + doctrine | `pr1814-slice1-repair-quality` / `deno task quality:gate` | PASS | Exit 0; package remains at its existing 5 WARN / 2 INFO doctrine verdict |
+| Lock hygiene | SHA-256 comparison | PASS | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
+| Supplemental full-export doc lint | `pr1814-slice1-repair-doc-lint` | OUT OF SCOPE | 9 carried-in `private-type-ref` diagnostics in stream/contract files outside the repair ceiling; no repair file reported |
+
 ## Handoff Notes
 
 - Inspect the mutation-hook assertion first: it is the behavioral proof this slice exists to add.
@@ -123,4 +141,8 @@ test and the existing streams test.
   are deferred.
 - IMPL-EVAL remains a later, separate-session supervisor responsibility; this leaf was directed not
   to dispatch its own reviewer and stops at Tier A with a draft PR.
+- The declaration-consistency repair is one bounded commit over exactly four product files plus this
+  worklog and `context-pack.md`; its commit hash and push evidence belong in the PR slice comment.
+- PR #1814's existing IMPL-EVAL PASS is bound to pre-repair head `d2c290c0c`; the supervising
+  session must refresh that separate-session verdict after this repair head is pushed.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1814
