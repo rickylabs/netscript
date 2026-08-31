@@ -294,3 +294,12 @@ artifact-pinned production E2E.
 - Exact CI, two GLM PASS receipts, byte-identical regeneration, mirror parity, unchanged lock, zero
   threads, and clean current integration passed. This is internal payload and does not trigger a
   public canary cut by itself.
+
+## 2026-08-31T14:53:41Z — plugin-workers export reference joins cumulative docs payload
+
+- PR #1813 head `99dc5a70a28a8a4c5a794f79d52dd91ccf762fb2` squash-merged as
+  `7ae7fe2dad941ed70e5806965fd964b9746d8fe1`, closing #1812. It recognizes the existing 17-row
+  plugin-workers-core exports table and advances the authoritative package mapping to 27 rows.
+- Exact CI, GLM PASS carry by page/mapping identity, complete acceptance, zero threads, unchanged
+  lock/package sources, cumulative-corpus proof, and post-truth-edit close-gate passed. This remains
+  docs membership and does not by itself trigger canary 5.

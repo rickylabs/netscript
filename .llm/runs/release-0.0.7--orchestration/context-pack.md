@@ -2164,3 +2164,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
   triage/plan inventory into bounded implementation leaves rather than merely reporting assignment.
 - Canary 5 is still held only for #1349 Slices 2–3 to eliminate the accepted-but-unconsumed public
   contract window. #1762/#1664/#1773 and all docs/Aspire/internals fronts continue independently.
+
+## Resume delta — 2026-08-31T14:53:41Z
+
+- Current main is `7ae7fe2dad941ed70e5806965fd964b9746d8fe1` after Docs PR #1813 shipped from
+  immutable head `99dc5a70a28a8a4c5a794f79d52dd91ccf762fb2`, closing #1812. Exact-head CI,
+  carried GLM PASS by owned-blob identity, complete acceptance, zero threads, and a post-body-edit
+  close-gate passed; #1812/#1813 are sole `status:shipped`.
+- The cumulative export-reference mapping now contains 27 rows with none lost. Docs continues its
+  serialized generated-corpus sequence with #1816 then #1818; its independent Prisma 8 RFC worker
+  repairs #1640 in parallel under the owner's accepted clean-break direction.
+- The coordinator has reduced the open PR inventory by six in the active sweep (five merges plus
+  superseded #1522 closure). All 46 remaining milestone issues have exactly one orchestrator owner;
+  every supervisor has active implementations or exact gates rather than an unowned queue.

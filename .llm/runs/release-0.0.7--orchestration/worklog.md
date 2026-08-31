@@ -3408,3 +3408,17 @@
 - The coordinator squash-merged #1830 as `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7`, closing
   #1737. #1737/#1830 are normalized to sole `status:shipped`; Internals continues #1832 and its
   remaining assigned queue without blocking public feature/fix work.
+
+## 2026-08-31T14:53:41Z — #1813 plugin-workers export reference ships
+
+- Docs PR #1813 reached immutable head `99dc5a70a28a8a4c5a794f79d52dd91ccf762fb2` with the
+  evaluated page/mapping block byte-identical to its GLM PASS head, exact-head CI run `33403911331`
+  green with 4,464 passed/zero failed/14 ignored tests, complete DoD and #1812 acceptance, zero
+  review threads, unchanged lock/package sources, and clean current-main integration.
+- Independent audit proved all 26 current mapping rows were retained and only plugin-workers-core
+  was added, producing 27 cumulative rows. It also caught stale body claims naming an older head,
+  26 rows, pending evaluation, and unmerged #1811. The coordinator corrected those facts and required
+  post-edit close-gate attempt 2 (`99530985766`), which passed.
+- The coordinator squash-merged #1813 as `7ae7fe2dad941ed70e5806965fd964b9746d8fe1`, closing
+  #1812. #1812/#1813 are sole `status:shipped`; Docs advances to #1816 then #1818 and keeps the
+  independent Prisma 8 RFC repair moving without blocking the corpus queue.
