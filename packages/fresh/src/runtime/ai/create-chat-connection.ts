@@ -243,6 +243,10 @@ export interface NetScriptChatResponseOptions {
   readonly source: AsyncIterable<unknown>;
   /** New client messages to persist before the assistant turn (optional). */
   readonly newMessages?: readonly NetScriptChatMessage[];
+  /** Completion mode forwarded to the transport. Defaults to `'immediate'` (transport default) when omitted. */
+  readonly mode?: 'immediate' | 'await';
+  /** Background-task registration forwarded to the transport (e.g. a Worker's `ctx.waitUntil`). */
+  readonly waitUntil?: (task: Promise<unknown>) => void;
   /** The inbound request, required whenever `authorize` is supplied. */
   readonly request?: Request;
   /**
@@ -260,6 +264,8 @@ export interface NetScriptChatResponseOptions {
     readonly headers: Record<string, string>;
     readonly newMessages: readonly unknown[];
     readonly source: AsyncIterable<unknown>;
+    readonly mode?: 'immediate' | 'await';
+    readonly waitUntil?: (task: Promise<unknown>) => void;
   }) => Promise<Response>;
 }
 
@@ -464,6 +470,8 @@ export async function toNetScriptChatResponse(
     headers: resolveChatHeaders(target),
     newMessages: (newMessages ?? []).map(toDurableMessage),
     source,
+    mode: options.mode,
+    waitUntil: options.waitUntil,
   });
 }
 
@@ -543,6 +551,8 @@ function defaultToResponse(input: {
   readonly headers: Record<string, string>;
   readonly newMessages: readonly unknown[];
   readonly source: AsyncIterable<unknown>;
+  readonly mode?: 'immediate' | 'await';
+  readonly waitUntil?: (task: Promise<unknown>) => void;
 }): Promise<Response> {
   return toDurableChatSessionResponse({
     stream: { writeUrl: input.writeUrl, headers: input.headers, createIfMissing: true },
@@ -550,6 +560,8 @@ function defaultToResponse(input: {
       typeof toDurableChatSessionResponse
     >[0]['newMessages'],
     responseStream: input.source,
+    mode: input.mode,
+    waitUntil: input.waitUntil,
   });
 }
 

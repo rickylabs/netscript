@@ -19,7 +19,7 @@ dispatch — all through explicit ports you can swap.
 This is the core that the deployable [`@netscript/plugin-triggers`](/reference/triggers/) plugin binds
 to a NetScript host. Use it directly for custom hosts, libraries, and tests.
 
-## Entrypoints
+## Exports
 
 | Export specifier | Module | Exports | Purpose |
 | --- | --- | --- | --- |

@@ -178,6 +178,12 @@ model context.
 
 ## Sub-path exports
 
+| Export | Path |
+| --- | --- |
+| `@netscript/mcp` | `./mod.ts` |
+| `@netscript/mcp/cli` | `./cli.ts` |
+| `@netscript/mcp/openapi-projection` | `./openapi-projection.ts` |
+
 ### `@netscript/mcp/cli`
 
 The executable composition. It binds the real telemetry query, filesystem docs corpus, Aspire /
