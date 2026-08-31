@@ -6623,3 +6623,35 @@ Nothing dispatched, no head mutated.
 
 #1819 remains the single active leaf: author thread `01a05526` is `working` on the narrowed contract
 at converged head `7c2a12fa1`.
+
+### #1773 unblocked to run parallel with #1819; a cycle-1 PLAN-EVAL already existed and was FAIL_FIX
+
+**Material discovery on picking #1773 up.** Its PR head `dec3b3abd` (which the leaf worktree was
+behind) carried a `plan-eval.md` I had not seen: **PLAN-EVAL cycle 1 already ran** — native
+opposite-family Fable 5, evaluated head `112a6a7ba`, verdict **`FAIL_FIX`**, with implementation
+explicitly blocked until `plan.md` carries four locks and a cycle-2 confirms. Its own note records
+"cycle 1 of the two allowed", so **the Qwen dispatch is cycle 2 and is the last one** — the amendment
+has to land complete. Recorded rather than rerun: this receipt is valid and stands.
+
+The evaluator's shape verdict was *pass* — D1, D2, D6, D7, D8 stand and must not change. Its four
+required fixes are narrow: F1 element-scoped markers (`order-42` is a substring of the href, so one
+marker currently satisfies both assertions), F2 nonce id + template-text proof, F3 lock the partial
+mechanism to `?fresh-partial=true` (Fresh 2 `PARTIAL_SEARCH_PARAM` — no header exists, which the plan
+implied) and probe both modes, F4 lock the seeded key to generator output with an equality test.
+
+**Convergence done by me:** worktree was behind its own remote head, fast-forwarded `112a6a7ba` →
+`dec3b3abd` (ancestor verified before touching it), then merged main `8a925764` clean with zero
+conflicts. Head **`f22348a80`**, pushed.
+
+**Author tasked with seven locks** = the evaluator's F1–F4 plus three primary rulings: gate order
+locked as `APP_HOME` → new HTTP-semantic `behavior.app-dynamic-route` → `APP_REFERENCE` (D6's
+"adjacent" was ambiguous and would have permitted placement behind the critical browser probe, making
+the new gate structurally unreachable on this host); gate 7 replaced with a measured current-main
+baseline plus exact branch result, no host-support claim without a receipt; and every RED must compile
+and fail on semantic absence/wrong behavior, never on a missing file or module.
+
+**Both leaves now have live author turns, both static/artifact-only:** `01a05526` narrowing #1365,
+`01a05306` amending #1616. Surfaces are disjoint (`plugin-sagas-core`/`plugins/sagas`/`docs/site` vs
+`packages/cli` scaffold + e2e). The one shared carrier remains
+`packages/cli/src/kernel/assets/agent-docs.generated.ts`; per ruling, **generated-corpus integration
+stays ordered** — whichever merges second regenerates before its exact-head CI.
