@@ -4715,3 +4715,29 @@
     evidence-backed question rather than the hypothetical Persistent-lifetime one I posed earlier.
   - Final state confirmed independently: `d189-10` four-part zero verbatim, `d189-11` leak-check exit
     0.
+
+- **D-200 — S9 repaired at `29eed9ef9`; root cause confirmed as candidate #1; cycle-3 eval dispatched
+  automatically under the coordinator's pre-authorization.**
+  - **Root cause (author's, and it matches the diff):** S9's dashboard-authentication amendment
+    treated the **generated project root** as the AppHost workspace and read a **non-existent
+    root-level `aspire.config.json`**. The file is co-located with `aspire/apphost.mts`. That is
+    exactly the workspace-identity candidate the D-194 brief listed first, and the author verified it
+    against the generator (`render-ts-apphost.ts`) rather than guessing.
+  - **The repair is genuine, not a bypass** — I checked the diff against the five forbidden shortcuts
+    before dispatching the eval. It does **not** create the file, stub the read, try/catch the
+    `NotFound`, skip a tier, or relax `local-source-fixture.ts`. It derives
+    `join(dirname(context.project.appHost), 'aspire.config.json')`, passes it explicitly as
+    `Deno.args[2]`, and **fails closed** (`if (!configPath) throw`). The `database` argument correctly
+    shifts `args[2]` → `args[3]`. `runtime-gates_test.ts` now asserts the full three-argument tail.
+  - **The eval brief presses the one thing a diff read cannot settle:** whether the argument-index
+    shift is correct at **every** call site across `ASPIRE_START_SCRIPT`, `ASPIRE_RESTART_SCRIPT`, and
+    `ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT`. An off-by-one there fails only at runtime — the exact
+    class of defect this cycle exists to catch, and the class CI would have to catch a third time.
+  - It also asks for **mutation proof** that the new assertions go red without the fix, verification of
+    the generator-emitted path from source, and an explicit statement of whether the cycle-2 PASS
+    carries to `29eed9ef9`.
+  - **A wider lesson worth recording:** S9's cycle-2 PASS was granted at a head whose runtime tier had
+    **never executed** — the draft gate plus D-191/D-198 eviction meant no Aspire slice's runtime tier
+    had run to conclusion in recent history. Every "PASS" in this lane so far rests on static evidence
+    plus a runtime tier that was structurally unable to run. That is the real reason this lane is only
+    now finding defects.
