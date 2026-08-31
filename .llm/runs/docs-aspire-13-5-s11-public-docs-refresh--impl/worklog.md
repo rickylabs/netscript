@@ -72,6 +72,73 @@
 - Re-generated agent docs prose and publish assets (`gen:agent-docs-prose`, `gen:publish-assets`, `gen:assets-barrel`).
 - Verified all quality gates (`check:agent-docs-prose`, `check:publish-assets`, `check:assets-barrel`, `docs:links`, Lume site build).
 
+### D-137 un-stack onto corrected S10 (2026-08-31)
+
+#### Replay
+
+- Old S11 head: `4c37048204045560defcb99a382a3ae26638bb62`.
+- Old S10 branch point: `a46ea16d0`; preflight confirmed exactly 11 S11 commits.
+- Corrected S10 target: `c9e3fcbe84bac35c878fb2409ea39f665f37475f`, equal to the freshly fetched
+  `origin/test/aspire-13-5-s10-e2e-gate-upgrades` head.
+- `git rebase --onto c9e3fcbe8 a46ea16d0` completed with replay head
+  `7444735760ef84030d5b5cfe158c4f1242bc4fdd`.
+
+#### Conflict ledger
+
+| Replayed commit | Conflicted paths | Resolution class |
+| --- | --- | --- |
+| `9d6afebfd` | `.llm/assets/agent-docs/prose.json.gz`, `.llm/assets/agent-docs/provenance.json`, `packages/cli/src/kernel/assets/agent-docs.generated.ts`, `packages/mcp/src/publish-assets.generated.ts` | Rule 1: corrected-S10 upstream side in full |
+| `b8d66f6fa` | Same four generated paths | Rule 1: corrected-S10 upstream side in full |
+| `dc92bad42` | Same four generated paths | Rule 1: corrected-S10 upstream side in full |
+| `44a57a64e` | `.llm/assets/agent-docs/prose.json.gz`, `.llm/assets/agent-docs/provenance.json`, `packages/mcp/src/publish-assets.generated.ts` | Rule 1: corrected-S10 upstream side in full |
+| `4c3704820` | Same four generated paths as `9d6afebfd` | Rule 1: corrected-S10 upstream side in full |
+
+No gate-registration list, D-101 listener contract, or other non-generated source conflict occurred.
+
+#### Range-diff mapping
+
+| Old | Replayed | Mapping |
+| --- | --- | --- |
+| `49a27332f` | `7542eb658` | exact |
+| `fc946a529` | `13ad03770` | exact |
+| `fd58eab16` | `c49c50367` | exact |
+| `7766ef92d` | `68353f169` | exact |
+| `cbdb9ead9` | `dd07cd322` | exact |
+| `9d6afebfd` | `7ae10009d` | subject/order match; ruled generated deltas omitted |
+| `b8d66f6fa` | `4b490520e` | source patch retained; ruled generated deltas omitted |
+| `dc92bad42` | `09aa23181` | source patch retained; ruled generated deltas omitted |
+| `8149c7a49` | `d17dcbbc5` | exact |
+| `44a57a64e` | `3ecb0b3c1` | source patch retained; ruled generated deltas omitted |
+| `4c3704820` | `744473576` | subject/order match; ruled generated deltas omitted |
+
+#### Static verification
+
+| Command / assertion | Exit | Result |
+| --- | ---: | --- |
+| `deno task gen:assets-barrel` | 0 | generated once after the completed rebase; no tracked delta |
+| `deno task check:assets-barrel` | 0 | diff-clean |
+| `git merge-base 744473576 c9e3fcbe8` | 0 | exact `c9e3fcbe8...`; stacked invariant passes |
+| `git rev-list --count c9e3fcbe8..744473576` | 0 | 11 replayed commits |
+| old-lineage reachability audit | 0 | 0 of 36 commits unique to old S5/S6/S8/S10 reachable |
+| `git range-diff --no-patch a46ea16d0..4c3704820 c9e3fcbe8..744473576` | 0 | all 11 mapped as above |
+| changed-source structured check | 0 | 1 file, 1 batch, `failedBatches: 0` |
+| changed-source structured lint | 0 | 1 file, 0 findings |
+| changed-source structured fmt | 0 | 1 TypeScript file, 0 findings after scoped formatting |
+| `deno task --cwd docs/site check:source-format` | 0 | docs Markdown/source format OK |
+| `deno task check` | 0 | 2,978 files, 25 batches, `failedBatches: 0` |
+| `deno task docs:links` | 0 | 103 docs, 0 broken links/anchors |
+| `deno task --cwd docs/site build` | 0 | 642 files generated; 228 HTML files verified |
+| `deno task --cwd docs/site test:source-format` | 0 | 6 passed, 0 failed |
+| `deno task docs:accuracy` | 0 | PASS |
+| `deno task check:publish-assets` | 0 | fresh |
+| `deno task check:aspire-version-parity` | 0 | `fail: 0` |
+| optional `deno task check:agent-docs-prose` | 1 | ruled upstream `prose.json.gz` and `provenance.json` reported stale; no regeneration |
+
+The initial all-Markdown-inclusive format probe exited 2 because the root formatter deliberately
+excludes eight `docs/site/*.md` files. Its temporary formatter-only changes were discarded; the
+final scoped TypeScript formatter and the docs-site source-format gate both pass. No runtime,
+Aspire, Docker, AppHost, `e2e:cli`, CI dispatch, PLAN-EVAL, evaluator rerun, or PR-base retarget was
+performed.
 
 
 
