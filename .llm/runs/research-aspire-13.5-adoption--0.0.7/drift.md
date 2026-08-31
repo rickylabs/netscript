@@ -4506,3 +4506,30 @@
     the profile's designated auditor (Codex Sol) collides with its own hard opposite-family invariant.
     The `acceptance-evidence` mapping on PR #1771 was completed to all four boxes. **Box text left
     unchanged and unweakened** — satisfied by a recorded ruling, not a softened claim.
+
+- **D-191 — CRITICAL operational finding: the five slices do NOT serialize in the runtime queue, they
+  EVICT each other. Simultaneous release destroyed four of five runtime runs.**
+  - Re-drafted **#1744** per the coordinator's queue-optimization ruling; its `e2e-cli` run
+    `33404329358` went `completed/cancelled`, freeing its slot as intended. Labels
+    (`impl-eval:skip`, `e2e-cli-gate`) were **retained** so the later undraft needs no re-setup.
+  - **But checking the other four revealed the real problem.** Their `e2e-cli` runs were *also*
+    cancelled — not by me. Per-job evidence at `2032d4ed7` (#1747, run `33404321608`):
+    `classify changes` **success**, `scaffold-static` **success**, `desktop-native-linux` **success**,
+    and **both** `scaffold-runtime` and `scaffold-runtime-sqlite` **cancelled**. Same pattern on
+    #1754 (`33404324013`) and #1760 (`33404326675`) — both tiers cancelled on each.
+  - **Cause: GitHub concurrency-group eviction, not a defect in the slices.** The docker tier declares
+    `group: e2e-scaffold-runtime-global` (`e2e-cli.yml:253`) and the sqlite tier
+    `group: e2e-scaffold-runtime-sqlite-global` (`:340`). A group holds at most **one running plus one
+    pending**; a third arrival **evicts the pending one**. Releasing five PRs within ~2 seconds meant
+    four were evicted on arrival. `cancel-in-progress: false` prevents a newcomer killing a *running*
+    job — it does **not** protect a *queued* one.
+  - **Net result of the simultaneous release: zero surviving docker-tier runs**, and exactly one
+    surviving sqlite run (S9's, `in_progress`). The coordinator's instruction to "let their exact
+    immutable heads serialize now" rests on an assumption the workflow does not honour: these lanes
+    do not queue five deep.
+  - **Corrected operating procedure: release ONE PR into the runtime lanes at a time**, and trigger
+    the next only when the previous run's runtime jobs have finished. Re-triggering needs no head
+    movement — `gh run rerun` re-uses the run while every gate read is live — so no verdict is put at
+    risk by the retry.
+  - This also **retroactively justifies the #1744 re-draft on stronger grounds than cost**: had it
+    stayed in, it would not merely have consumed a slot twice, it would have evicted a sibling.
