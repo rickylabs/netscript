@@ -6656,3 +6656,30 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   audit stated) — corrected to sole `status:ready-merge`; issue #1753 likewise. Review threads
   **0 / 0 unanswered**.
 - Fresh exact-new-head CI running; packet follows on green.
+
+## D-149 — #1828 P0: corrected remote verified, GLM IMPL-EVAL dispatched; #1823 held behind #1820
+
+- **#1828 corrected remote verified at `1c08b8b0afe74c479bd0770c956204e7cad3a5bd`**, base
+  `eaea940bea`:
+  - **Invalid `bbed08071` confirmed GONE** from the branch (`merge-base --is-ancestor` returns
+    false) — the force-with-lease replacement genuinely happened rather than stacking a fix on top.
+  - **Evidence genuinely rewritten, not contradicted**: the only surviving root-`deno.json` mentions
+    are explicit corrections ("Invalid assumption…", "…is not the production CLI oracle and must not
+    determine this member's order"), while the correct oracle `packages/cli/deno.json` is named
+    across all five artifacts. PR comments carry no live wrong-order claim.
+  - Head state correct: e2e lib `["deno.ns","deno.unstable","dom"]`, test oracle `../../deno.json`,
+    focused test `REAL_EXIT=0`.
+- **GLM IMPL-EVAL dispatched** (pid `1621621`, sanctioned route, no guard patch). The brief requires
+  the evaluator to **independently re-verify the rebuild's honesty**, not just the final diff:
+  re-run the RED commit in a throwaway worktree to confirm it is genuinely red (the earlier RED was
+  false due to a working-tree/commit split), confirm the test blob is byte-identical RED→GREEN, and
+  confirm no artifact still asserts root order as canonical. It is also pointed at a specific
+  vacuous-pass risk I noticed in the test: `DenoConfig` uses optional chaining, so
+  `undefined === undefined` would pass if a file were missing or `lib` absent.
+- **#1823 held at `930d37ea4` behind the #1820 seam per instruction** — current-green, packet
+  deferred, deliberately not churned. Its merge-ref watch (`b2grsfz3q`) remains armed but its result
+  is now moot until #1820 lands; I will recut only the minimum merge-ref CI afterward.
+- **#1737 recovery**: launcher refused with `duplicate_sender_risk` — the worktree still held the
+  sender lease from the thread stopped during the D-133 serial correction. Followed the tool's own
+  `operatorAction` (resume session `01a055b6-e5ed-...`) rather than deleting the lease record;
+  verified genuinely idle first (107 min quiet, no live process). Resume sent.
