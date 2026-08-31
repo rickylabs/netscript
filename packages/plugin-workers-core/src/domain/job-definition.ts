@@ -213,6 +213,8 @@ type ExecutionRecordShape = {
   error: z.ZodNullable<z.ZodString>;
   result: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
   workerId: z.ZodNullable<z.ZodString>;
+  progressPercent: z.ZodNullable<z.ZodNumber>;
+  progressMessage: z.ZodNullable<z.ZodString>;
   attempt: z.ZodDefault<z.ZodNumber>;
   maxAttempts: z.ZodDefault<z.ZodNumber>;
   payload: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
@@ -236,6 +238,8 @@ const ExecutionRecordShapeValue: ExecutionRecordShape = {
   error: z.string().nullable().describe('Error message'),
   result: z.record(z.string(), z.unknown()).nullable().describe('Job result'),
   workerId: z.string().nullable().describe('Worker ID'),
+  progressPercent: z.number().nullable().describe('Execution progress percentage'),
+  progressMessage: z.string().nullable().describe('Execution progress message'),
   attempt: z.number().int().nonnegative().default(0).describe('Attempt number'),
   maxAttempts: z.number().int().positive().default(3).describe('Max attempts'),
   payload: z.record(z.string(), z.unknown()).optional().describe('Job payload'),
@@ -267,6 +271,8 @@ export type ExecutionRecord = Readonly<
     readonly error: string | null;
     readonly result: Record<string, unknown> | null;
     readonly workerId: string | null;
+    readonly progressPercent: number | null;
+    readonly progressMessage: string | null;
     readonly attempt: number;
     readonly maxAttempts: number;
     readonly payload?: Record<string, unknown>;

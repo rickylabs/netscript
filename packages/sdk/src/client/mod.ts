@@ -13,8 +13,31 @@
  */
 
 export { createServiceClient } from './service-client.ts';
-export { isDefinedError, safe } from './errors.ts';
-export type { DefinedError, SafeFailure, SafeResult, SafeSuccess } from './errors.ts';
+export { defineSdkClientContribution } from './sdk-client-contribution.ts';
+export type { SdkClientContributionDefinition } from './sdk-client-contribution.ts';
+export { isDefinedError, safe, SdkClientContributionError } from './errors.ts';
+export type {
+  DefinedError,
+  SafeFailure,
+  SafeResult,
+  SafeSuccess,
+  SdkClientContributionDiagnostic,
+  SdkClientContributionErrorCode,
+} from './errors.ts';
+export type {
+  SdkClientCachePartitionOptions,
+  SdkClientContextDeclaration,
+  SdkClientContribution,
+  SdkClientContributionContext,
+  SdkClientContributionId,
+  SdkClientContributionProtocol,
+  SdkClientPrepareOptions,
+  SdkClientProcedureDescriptor,
+  SdkClientRequestPatch,
+  SdkClientResponseCache,
+  SdkClientTransportDescriptor,
+  ValidateSdkClientContributions,
+} from '../ports/sdk-client-contribution.ts';
 export type {
   ContractLike,
   ContractProcedureLike,
@@ -33,4 +56,5 @@ export type {
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
+  ServiceRequestRest,
 } from '../ports/service-client.ts';

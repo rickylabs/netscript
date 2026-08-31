@@ -40,7 +40,7 @@ task. Use `search_docs` for literal lookup and `get_doc` for exact retrieval.
 | Unexplained hang, vanish, silence, or “Healthy but not responding” | [`help.md`](../help.md) |
 
 When the symptom is unclear—something hangs, vanishes, or silently does nothing—start with
-`.claude/skills/help.md`. It routes from the failure to the first diagnostic command.
+`.agents/skills/help.md`. It routes from the failure to the first diagnostic command.
 
 NetScript's MCP layer is framework-semantic (jobs, sagas, triggers, streams, workers, docs, CLI
 verbs); it rides above Aspire's generic MCP, it does not replace it.

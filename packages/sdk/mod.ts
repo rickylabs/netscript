@@ -65,6 +65,7 @@ export * from './src/query/mod.ts';
 export * from './src/query-client/mod.ts';
 export * from './src/telemetry/mod.ts';
 export type {
+  ActionQueryKey,
   CachedEntry,
   CacheEntry,
   CacheInvalidationReport,
@@ -80,7 +81,9 @@ export type {
   CacheWriteReport,
   CacheWriteTopologyReport,
   QueryClientPort,
+  SdkClientServerKeySuffix,
   ServiceClientContract,
   ServiceClientShape,
   ServiceQueryUtils,
+  ServiceRequestRest,
 } from './src/ports/mod.ts';

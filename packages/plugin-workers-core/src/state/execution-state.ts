@@ -62,6 +62,10 @@ export type ExecutionRecord = Readonly<
     readonly result: Record<string, unknown> | null;
     /** Worker identifier that ran the execution. */
     readonly workerId: string | null;
+    /** Latest execution progress percentage. */
+    readonly progressPercent: number | null;
+    /** Latest execution progress message. */
+    readonly progressMessage: string | null;
     /** Current retry attempt number. */
     readonly attempt: number;
     /** Maximum retry attempts allowed for the execution. */
@@ -167,6 +171,8 @@ export class KvExecutionState {
       error: null,
       result: null,
       workerId: null,
+      progressPercent: null,
+      progressMessage: null,
       attempt: 0,
       maxAttempts: options.maxAttempts ?? 3,
       payload: options.payload,
@@ -189,6 +195,18 @@ export class KvExecutionState {
       status: 'running',
       startedAt: new Date().toISOString(),
       workerId: this.#workerId,
+    });
+  }
+
+  /** Updates an execution's latest progress. */
+  progress(
+    executionId: string,
+    percent: number,
+    message?: string,
+  ): Promise<ExecutionRecord | null> {
+    return this.#transition(executionId, {
+      progressPercent: percent,
+      progressMessage: message ?? null,
     });
   }
 
