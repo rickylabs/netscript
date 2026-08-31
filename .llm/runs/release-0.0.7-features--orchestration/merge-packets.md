@@ -140,3 +140,50 @@ tests 289-byte, `assets-barrel` exit 0, `docs:exports-drift` PASS. Fresh core CI
 `code-quality` already pass.
 
 `Refs #1452` partial semantics preserved — `closingIssuesReferences` empty.
+
+---
+
+## Lane state after #1820 merged — 2026-08-31 ~05:15Z
+
+**Shipped from this lane this session:** #1805/#1591, #1810/#1458, #1820/#1452 (partial — **#1452
+correctly stayed open**, `closingIssuesReferences` empty at merge).
+
+### PR #1814 — `#1592` Slice 1 (**partial**) — evidence banked, holding for #1829
+
+Held deliberately: rather than chase `main` (which moved four times during this leaf's recovery —
+`0e93a6c` → `26e1b486` → `052f8659`), the evaluator and product evidence is **banked** at the current
+head and one convergence will be taken onto the complete feature/fix base after #1829 merges.
+Carriers only will be regenerated; no product history churn.
+
+| | |
+| --- | --- |
+| Evidence head | `5a3f593e47f7e44602abae2d5816f71af32aa178` |
+| Final seam so far | `693b62474` on `main` `26e1b486` |
+| Mergeable | MERGEABLE |
+| Closing keyword | **none** — `closingIssuesReferences` verified **empty** |
+| 10 hand-written blobs | byte-identical to the FAIL_FIX-evaluated head `1baf61f0a3` |
+| Gates at seam | check/lint/fmt/test/`quality:gate`/`publish-dry-run` all PASS, `gitHead == actualGitHead` |
+| CI | `build`, `code-quality`, `quality` pass; `check-test` running; `close-gate` fails **correctly** while the IMPL-EVAL DoD box is honestly unticked |
+
+### The IMPL-EVAL FAIL_FIX was this supervisor's defect, and it was correct
+
+`1baf61f0a3` → `FAIL_FIX` on one finding: the PR body's own **negated** sentence placed a GitHub
+closing keyword immediately before the issue number, registering a live closing reference. Merging
+would have closed #1592 with its Slice 2 scope unimplemented — the precise outcome the sentence was
+written to prevent — while the body simultaneously claimed the references were empty.
+
+**The same defect existed in #1820, also written by this lane.** Both are fixed and verified empty via
+the API. A first correction attempt on #1814 re-armed the matcher by quoting the offending phrase
+verbatim; caught on a residual-token scan before it settled.
+
+**Lesson:** never place `close`/`fixes`/`resolves` adjacent to an issue number in a partial PR — not
+in a negation, not in a quotation, not in an explanation of this very bug. Phrase it as
+"merging leaves #N open".
+
+### A receipt trap that nearly cost a valid gate
+
+The `publish-dry-run` receipt reads `stdout.bytes = 0` — identical to the D-1 cache-replay signature —
+and was very nearly discarded as fake. It is genuine: **`publish:dry-run` writes to stderr**
+(356,732 bytes, ending `Success Dry run complete`), and the known-good #1387 receipt has the same
+zero-stdout shape. D-1's "always check `stdout.bytes`" is necessary but **not sufficient**: for this
+gate the live channel is stderr.
