@@ -9,8 +9,8 @@
 | Branch     | `fix/fresh-partial-nav-ordering`                |
 | Baseline   | `b236f0c5ec62b7fe5485e8628cb1697ab33aca0d`      |
 | Archetype  | 4 — DSL/builder, frontend/browser-runtime scope |
-| Phase      | Slice 1 implementation                          |
-| Gate state | `PLAN-EVAL: PASS`; Slice 1 static gates complete |
+| Phase      | Slice 1 `FAIL_FIX` repair                        |
+| Gate state | `PLAN-EVAL: PASS`; repair gates complete         |
 
 ## Progress log
 
@@ -31,6 +31,9 @@
 | 2026-08-31 | Implemented Slice 1               | Added the inert `./navigation` lifecycle, page/region generations, read-to-EOF stale disposal, history correlation, route subscriptions, and native keyed boundary.   |
 | 2026-08-31 | Strengthened disposal ownership   | Tier-A diff review found a headers-arrived/unread-body edge; registration now begins when the managed response is created, and the EOF-disposal test proves it.       |
 | 2026-08-31 | Completed final static gates      | Fresh package check/lint/fmt/test, focused tests, consumer check, public doc lint, publish dry-run, quality scan, architecture check, and hygiene scans completed.      |
+| 2026-09-01 | Accepted IMPL-EVAL `FAIL_FIX`      | Two HIGH cross-package subpath consumers were stale at `f3b50149e`: the CLI closure registry and generated agent-docs carrier.                                     |
+| 2026-09-01 | Repaired both parity consumers     | Added `./navigation` to the CLI web-runtime export registry and regenerated the agent-docs carrier with `deno task gen:assets-barrel`; no other product file changed. |
+| 2026-09-01 | Completed repair validation        | Named parity test, generated-carrier freshness, scoped check/lint/fmt, quality gate, repo-wide tests, diff hygiene, and lock-byte equality were rechecked.              |
 
 ## Decision checkpoint
 
@@ -63,6 +66,12 @@
 | Structured package lint     | PASS                      | 207/207 files, 0 findings; receipt stdout 355 bytes.                                                                                    |
 | Structured package format   | PASS                      | 207/207 files, 0 findings; receipt stdout 304 bytes.                                                                                    |
 | Structured package test     | PASS                      | 275 passed, 0 failed; receipt stdout 288 bytes.                                                                                         |
+| CLI closure subpath parity  | PASS                      | Named test passed: 1 passed, 0 failed.                                                                                                  |
+| Generated carrier freshness | PASS                      | `check:assets-barrel` exit 0; captured stdout 0 bytes and stderr 570 bytes; no unstaged carrier diff remained.                          |
+| Repair scoped check         | PASS                      | 9 owned CLI/Fresh TypeScript files; 1 batch, 0 findings; receipt stdout 301 bytes.                                                       |
+| Repair scoped lint          | PASS                      | 9/9 owned CLI/Fresh TypeScript files; 0 findings; receipt stdout 349 bytes.                                                             |
+| Repair scoped format        | PASS / BASELINE NOTED     | 8/8 Fresh/generated-CLI files pass; receipt stdout 298 bytes. The source-registry receipt has one inherited finding on an unchanged type-alias line. |
+| Repo-wide test before/after | PASS                      | Before: 4467 passed, 1 parity failure, 19 ignored. After: 4468 passed, 0 failed, 19 ignored; 4487 total results in both runs.             |
 | Navigation public doc lint  | PASS                      | 1 entrypoint checked, 0 findings; expected result is on stderr (15 bytes).                                                             |
 | Full Fresh export doc lint  | BASELINE FAIL / NO NEW    | 45 inherited findings in untouched builders/query/route/streams entrypoints; `./navigation` reports 0.                                |
 | Package publish dry-run     | PASS                      | Exit 0; stdout 0 bytes is normal, stderr 21,094 bytes and ends `Success Dry run complete`; all four new production modules included.   |
@@ -85,6 +94,9 @@
   this host's browser availability as a blocker.
 - No local browser/runtime lease was taken. No label, acceptance box, evaluator dispatch, issue
   closure, ready-for-review transition, or merge action is part of this slice.
+- The evaluator-attributed `defer-island-client-bundle` Rollup failure was not edited or worked
+  around. It did not reproduce in either local repo-wide census; both local runs completed that
+  test without adding a failure.
 
 ## Evidence receipts
 
@@ -94,7 +106,13 @@ retained as `FAIL`: its breakdown proves all 45 findings are confined to four un
 and the new `./navigation` entrypoint has zero findings. The scoped public-doc receipt independently
 passes. This satisfies the plan's zero-new-findings rule without expanding the locked file ceiling.
 
+The repair receipts are under ignored `.llm/tmp/gate-receipts/pr1590-s1-repair/`. The passing
+scoped receipts record non-empty stdout (`check` 301 bytes, `lint` 349 bytes, clean `fmt` 298
+bytes). The broader diagnostic format receipt is retained because it attributes its sole finding
+to an unchanged line in the intentionally root-excluded CLI package.
+
 ## Next authorized transition
 
-Commit Slice 1 once, push by explicit refspec, and open the draft review checkpoint. Merging leaves
-#1590 open; the supervisor owns Slice 2's hosted browser proof and all evaluator lifecycle.
+The repair is committed as the single branch-head commit on `f3b50149e`. Push by explicit refspec
+and post the before/after gate evidence to the draft review checkpoint. The supervisor owns Slice
+2's hosted browser proof and all evaluator lifecycle.

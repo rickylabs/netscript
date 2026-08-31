@@ -266,6 +266,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
     './error',
     './form',
     './interactive',
+    './navigation',
     './query',
     './route',
     './server',
