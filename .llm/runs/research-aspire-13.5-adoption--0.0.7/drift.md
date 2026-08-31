@@ -5334,3 +5334,37 @@
   - **CI base recorded:** the failed run `33441258910` was a merge-ref against **old** main
     `9fbc2317`. The repaired head gets **fresh CI against current main `60ae56af`**; the old run is
     evidence of the fixture coupling only, not of anything about the current base.
+
+- **D-223 — S8's seed repair PASSES its delta IMPL-EVAL, but the runtime run never reached
+  `database.seed`. No runtime confirmation yet.**
+  - **Delta verdict `PASS` at `f29a0b265`** (GLM 5.3 Flash max, bounded to `d1c6d8b54..f29a0b265`),
+    and it is the most thoroughly grounded evaluation of this programme:
+    - **Mechanism confirmed at three points in history**, including the pre-typed *working* form:
+      `.withEnvironment('DATABASE_URL', target.resource)` + `.withReference(...)`/`.waitFor(...)`
+      (late-bound) → S8's `builder.getConfiguration().getConnectionString(target.resourceKey)`
+      (**static** `ConnectionStrings:<name>` lookup, a key that **does not exist** for an allocated
+      `addPostgres` resource — only `addConnectionString` externals populate it) → the repair's
+      per-database `DatabaseConnectionStringResolver` resolving **at command-execution time** via
+      `connectionStringExpression().getValueAsync()`.
+    - **Rendered both generators at both heads and diffed the emitted `.mts`** — emission matches the
+      generator diff exactly.
+    - **Mutation proof:** reverting the five repair files while keeping HEAD's tests turned **6 test
+      steps red**, each on the new assertions; restored 31/31 green.
+    - `gen:assets-barrel` produces **zero tracked delta** — the barrel is a faithful regeneration.
+    - **Re-verified the missing Prisma code with its own bytes**, fetching the 237,687-byte job log
+      rather than trusting the author: no `P\d{4}`, no `meta`, because
+      `MAX_ACTIONABLE_STDERR_LINES = 3` structurally drops lines 4+. The author's refusal to guess a
+      code was correct.
+    - Residual, tracked not gating: `connectionStringExpression().getValueAsync()` is string-tested
+      but not locally type-checked; CI's generated-workspace compile is the authority.
+  - **But the runtime run at `f29a0b265` (`33428877123`) failed EARLIER than seed:**
+    `passed=27 failed=1` at **`generated.quality-negative`** (85110 ms) — roughly gate 27, whereas
+    `database.seed` is gate 40. **The suite never reached the gate the repair targets**, so the fix is
+    evaluated but still runtime-unconfirmed. sqlite tier **success**.
+  - Two reasons not to read that failure as a verdict on the repair yet: the console log **truncates
+    the decisive error** (the stderr region begins mid-path in a file list; the real message is only in
+    the report artifact), and the run was created at 19:08 against the **old** main `9fbc2317`, not
+    current `60ae56af`.
+  - **Recut requested via `gh run rerun --failed`** — the no-push path, so the evaluated head does not
+    move and the delta PASS stays valid. Runtime groups verified **free** (busy=0) before triggering,
+    so no other lane was evicted.
