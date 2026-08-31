@@ -26,3 +26,21 @@
 Primary code surfaces are the db-cli-mode and register-tools generators/templates, Aspire runtime
 asset templates, database Aspire command executor/operation runner and their tests, and the CLI
 scaffold E2E runtime gate modules. Package/framework boundaries outside `packages/cli` are excluded.
+
+## D-122 reconstruction state
+
+- Rebased the exact 10-commit S8 range onto `origin/main` at
+  `65cd8a07787504b5ed94408510d4ab85260bc21a`, then cleanly rebased the complete reconstructed
+  13-commit branch when `origin/main` advanced to
+  `8a925764276b25ef7cef484db273604f44557cef`.
+- Coordinator resolution retained main's D-101 listener architecture and test, adding only S8's
+  byte-identical `createTypedDbPhaseBGate()` plus `resolve`.
+- Generated barrel delta is committed as `19e139cbb`; formatter-only S8 test normalization is
+  committed as `da963027b` after the final-main rebase.
+- Validated product head before the evidence-only reconstruction ledger:
+  `da963027b431af536cf6c5f5d08e3623f5797ca1`.
+- Combined CLI/E2E structured check, exact changed-file lint/fmt, 98 focused tests, quality gate,
+  asset-barrel check, and Aspire parity are green. The earlier unrelated missing relative import
+  was corrected by the later `origin/main`; S8 made no repair for it.
+- No runtime or evaluator rerun occurred. The evidence-only final head was pushed with a fresh
+  exact-SHA force-with-lease and read back from the remote branch.
