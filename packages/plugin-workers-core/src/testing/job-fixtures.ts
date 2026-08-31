@@ -42,7 +42,13 @@ export type JobFixtureDefinition<
   & Omit<BuilderJobDefinition<TId, TPayload, TResult>, 'handler'>;
 
 /** Partial execution record fields used to override fixture defaults. */
-export type ExecutionRecordFixtureOptions = Partial<ExecutionRecord>;
+export type ExecutionRecordFixtureOptions = Readonly<
+  & Omit<Partial<ExecutionRecord>, 'progressPercent' | 'progressMessage'>
+  & {
+    progressPercent?: number | null;
+    progressMessage?: string | null;
+  }
+>;
 
 /** Options for creating a memory-backed workers runtime fixture. */
 export type TestWorkersRuntimeOptions = Omit<WorkersRuntimeOptions, 'jobRegistry' | 'worker'> & {
@@ -94,6 +100,7 @@ export function createExecutionRecordFixture(
   options: ExecutionRecordFixtureOptions = {},
 ): ExecutionRecord {
   const now = new Date(0).toISOString();
+  const { progressPercent, progressMessage, ...overrides } = options;
   return Object.freeze({
     id: '00000000-0000-4000-8000-000000000001',
     concept: 'job',
@@ -109,9 +116,11 @@ export function createExecutionRecordFixture(
     error: null,
     result: {},
     workerId: 'memory-worker',
+    progressPercent: progressPercent ?? null,
+    progressMessage: progressMessage ?? null,
     attempt: 0,
     maxAttempts: 3,
-    ...options,
+    ...overrides,
   });
 }
 
