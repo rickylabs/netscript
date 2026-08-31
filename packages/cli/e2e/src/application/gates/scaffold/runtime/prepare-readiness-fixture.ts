@@ -44,7 +44,7 @@ export async function prepareReadinessFixture(
   );
 }
 
-/** Attach the two test-only checks at markers derived from the real infrastructure generator. */
+/** Attach the two test-only checks at boundaries derived from the real infrastructure generator. */
 export function injectListenerFaultHealthChecks(
   source: string,
   database: DatabaseEngine = DATABASE.POSTGRES,
@@ -57,26 +57,35 @@ export function injectListenerFaultHealthChecks(
   }
 
   const reference = listenerInfrastructureReference();
-  const postgresMarker = healthAttachmentMarker(reference, POSTGRES_REAL_HEALTH_KEY);
-  const garnetMarker = healthAttachmentMarker(reference, GARNET_REAL_HEALTH_KEY);
-  if (!source.includes(garnetMarker)) {
+  assertGeneratedHealthAttachment(reference, GARNET_REAL_HEALTH_KEY);
+  const garnetAttachment = uniqueHealthAttachment(source, GARNET_REAL_HEALTH_KEY);
+  if (!garnetAttachment) {
     throw new Error('generated register-infrastructure helper has no garnet health-check marker');
   }
+  const garnetMarker = garnetAttachment.statement;
   const includePostgres = listenerFaultExpectations(database).some((expectation) =>
     expectation.controllerListener === 'postgres'
   );
-  if (includePostgres && !source.includes(postgresMarker)) {
-    throw new Error('generated register-infrastructure helper has no postgres health-check marker');
+  let withPostgres = source;
+  if (includePostgres) {
+    assertGeneratedHealthAttachment(reference, POSTGRES_REAL_HEALTH_KEY);
+    const postgresAttachment = uniqueHealthAttachment(source, POSTGRES_REAL_HEALTH_KEY);
+    if (!postgresAttachment) {
+      throw new Error(
+        'generated register-infrastructure helper has no postgres health-check marker',
+      );
+    }
+    const postgresMarker = postgresAttachment.statement;
+    const postgresBlock = `${postgresMarker}
+  builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
+  await ${postgresAttachment.resourceBinding}.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`;
+    withPostgres = source.replace(postgresMarker, postgresBlock);
   }
 
-  const postgresBlock = `${postgresMarker}
-  builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
-  await postgres_server.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`;
   const garnetBlock = `${garnetMarker}
   builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: ${GARNET_TEST_LISTENER_PORT} }));
-  await garnet.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`;
+  await ${garnetAttachment.resourceBinding}.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`;
 
-  const withPostgres = includePostgres ? source.replace(postgresMarker, postgresBlock) : source;
   return withPostgres.replace(garnetMarker, garnetBlock);
 }
 
@@ -120,7 +129,7 @@ export function injectReadinessFixtureApps(
     ? ['readiness-dead-port', 'listener-fault-controller']
     : ['readiness-dead-port'];
   for (const name of fixtureNames) {
-    if (injected.includes(`apps.set('${name}'`)) {
+    if (appRegistrations(injected, name).length > 0) {
       throw new Error(`${name} fixture was already registered`);
     }
     injected = injected.replace(RETURN_APPS_MARKER, appBlock(generated, name) + RETURN_APPS_MARKER);
@@ -150,18 +159,59 @@ function listenerInfrastructureReference(): string {
   });
 }
 
-function healthAttachmentMarker(source: string, key: string): string {
-  const marker = source.split('\n').find((line) =>
-    line.trimStart().startsWith('await ') && line.includes(`.withHealthCheck('${key}');`)
+interface HealthAttachment {
+  readonly healthCheckKey: string;
+  readonly resourceBinding: string;
+  readonly statement: string;
+}
+
+const HEALTH_ATTACHMENT_PATTERN =
+  /^[ \t]*await[ \t]+([A-Za-z_$][\w$]*)\.withHealthCheck\((?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)')\);[ \t]*$/gm;
+
+const APP_REGISTRATION_PATTERN =
+  /^[ \t]*apps\.set\((?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'),[ \t]*([A-Za-z_$][\w$]*)\);[ \t]*$/gm;
+
+function healthAttachments(source: string, key: string): readonly HealthAttachment[] {
+  const attachments: HealthAttachment[] = [];
+  for (const match of source.matchAll(HEALTH_ATTACHMENT_PATTERN)) {
+    const healthCheckKey = match[2] ?? match[3];
+    const resourceBinding = match[1];
+    if (healthCheckKey === key && resourceBinding) {
+      attachments.push({ healthCheckKey, resourceBinding, statement: match[0] });
+    }
+  }
+  return attachments;
+}
+
+function assertGeneratedHealthAttachment(source: string, key: string): void {
+  const attachments = healthAttachments(source, key);
+  if (attachments.length !== 1) {
+    throw new Error(`infrastructure generator omitted ${key} attachment marker`);
+  }
+}
+
+function uniqueHealthAttachment(source: string, key: string): HealthAttachment | undefined {
+  const attachments = healthAttachments(source, key);
+  return attachments.length === 1 ? attachments[0] : undefined;
+}
+
+function appRegistrations(source: string, name: string): readonly RegExpMatchArray[] {
+  return [...source.matchAll(APP_REGISTRATION_PATTERN)].filter((match) =>
+    (match[1] ?? match[2]) === name
   );
-  if (!marker) throw new Error(`infrastructure generator omitted ${key} attachment marker`);
-  return marker;
 }
 
 function appBlock(generated: string, name: string): string {
-  const startMarker = `  // --- ${name} (task) ---`;
-  const blockStart = generated.indexOf(startMarker);
-  const nextBlock = generated.indexOf('\n\n  // --- ', blockStart + startMarker.length);
+  const registrations = appRegistrations(generated, name);
+  if (registrations.length !== 1) {
+    throw new Error(`generator did not emit ${name} fixture block`);
+  }
+  const registrationIndex = registrations[0].index;
+  if (registrationIndex === undefined) {
+    throw new Error(`generator did not emit ${name} fixture block`);
+  }
+  const blockStart = generated.lastIndexOf('  // --- app ', registrationIndex);
+  const nextBlock = generated.indexOf('\n\n  // --- app ', registrationIndex);
   const returnIndex = generated.indexOf(RETURN_APPS_MARKER, blockStart);
   const blockEnd = nextBlock >= 0 && nextBlock < returnIndex ? nextBlock + 2 : returnIndex;
   if (blockStart < 0 || blockEnd < 0) {
