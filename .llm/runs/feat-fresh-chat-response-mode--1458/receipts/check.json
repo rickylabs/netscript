@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "1458-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--include",
+    "^packages/fresh/"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1458",
+  "gitHead": "acb096a94e8f2dc182ebc8c73be9ba421e2a6826",
+  "actualGitHead": "acb096a94e8f2dc182ebc8c73be9ba421e2a6826",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:783976",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "9a0c98d0014d87d5ed26db52f5984b0949160659cdffe83603fbe64f30d054be",
+  "lifecycleId": "worker:783976:1458-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T00:20:27.295Z",
+  "startedAt": "2026-08-31T00:20:27.297Z",
+  "finishedAt": "2026-08-31T00:20:27.873Z",
+  "durationMs": 576,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 303,
+    "sha256": "4609aba7b46c4b2b30ebb3d1db5e699b442086b82c5b30759ed1a540f64e53ec",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1458\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":200,\"batches\":2,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 249,
+    "sha256": "102e7d9b035de819a587914bcf0e42dcbe59f5419caef81c0c1f48a669eea8ab",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/fresh/'\n",
+    "truncated": false
+  }
+}
