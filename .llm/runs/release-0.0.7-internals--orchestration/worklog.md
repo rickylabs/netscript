@@ -7548,3 +7548,57 @@ rejected is any mapping where two different required operator actions are indist
 caller. Grounded in the concrete case from this session: #1750's launch refusal named a
 14.6-hour-dead session and could not tell me which situation I was in, so I had to prove liveness by
 hand from `/proc`.
+
+## D-175 — Coordinator's #1802 bounded repair adopted; the "sensitive artifacts" item measured, not assumed
+
+Adopted the dispatch. Everything previously sent stands; two items were new.
+
+### The sensitive-artifact exposure — measured exactly, and it is narrower than "harness artifacts"
+
+Rather than removing run artifacts wholesale (which would break the harness's own recording contract
+under `AGENTS.md`), I scanned the committed set and found the leak is **two files**, not nine:
+
+| File | Exposure |
+| --- | --- |
+| `…--1751/codex-thread-ids.md` | absolute rollout path `/home/agent/.codex/sessions/…/rollout-…-01a054ff-….jsonl`, the **live thread UUID**, brief staging path, worktree path |
+| `…--1751/supervisor.md` | absolute checkout and worktree paths |
+
+`plan.md`, `research.md`, `worklog.md`, `drift.md`, both plan-evals and `context-pack.md` are
+**clean** and are the designed reviewable record — kept. The single `plan.md` hit my scan raised was a
+**false positive**: it is the D7 design row stating credentials and the lease secret must *not* be
+persisted. Reporting it as a leak would have been wrong.
+
+Branch also scanned for artifact-type leakage (`.jsonl`, logs, transcripts, rollouts, `.env`,
+receipts): **none** — 32 files, all legitimate source/test/docs plus the nine markdown artifacts.
+
+Instruction to the author is correspondingly bounded: `git rm --cached` the thread-ids file (keep it
+on disk — steering provenance needs it), redact absolute paths in `supervisor.md` to
+`<repo>`/`<worktree>`, and **do not** clean beyond its own run directory.
+
+### The exposure is systemic, and #1802 is not the place to fix it — filed as #1847
+
+`git ls-files '*/codex-thread-ids.md'` returns **99**, with **no `.gitignore` rule**. Every slice
+reproduces it, because `launch-codex-slice.ts` generates the file into the slice dir. That is
+pre-existing and far outside this leaf; cleaning it inside #1802 would be unbounded scope creep.
+
+Filed **#1847** (`type:chore`, `area:tooling`, `priority:p2`, `status:triage`,
+`orchestrator:internals`, milestone 0.0.7) with the measurement, a bounded repair (gitignore +
+`git rm --cached`, keep the launcher writing locally, redact `supervisor.md` host paths, add a guard
+that fails if either regresses), acceptance in both directions, and an explicit non-scope: **do not
+rewrite git history** — removing exposure going forward is a different and far cheaper decision than
+rewriting a shared repository.
+
+This is also the honest substitute for the `check:mcp-export-corpus` issue I was asked to file and
+**could not evidence**: rather than filing a speculative ticket there, I filed a fully-measured defect
+here. The corpus item still needs the Docs lane's failing run ID.
+
+### Second new gate
+
+A **controlled dry-run/apply smoke** of the repair path is now required alongside the exact
+agentic/root/check/lint/fmt/arch set — dry-run proving it would act without acting, apply proving the
+real repair, both on a **disposable test-owned sender root**, never the production
+`~/.config/netscript-agentic/runtime/senders` tree that the leaf's own tests already forbid.
+
+Audited head recorded as `de24161b`; `main` is now `8f1fcb2b`. The author takes **one** final-freeze
+integration of whatever `main` is when ready and re-verifies both ceilings across it. **Do not merge**
+is carried through explicitly.
