@@ -274,7 +274,7 @@ async function waitForOutputMarker(
   timeoutMs: number,
 ): Promise<boolean> {
   const reader = stream.getReader();
-  let timeoutId: number | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_resolve, reject) => {
     timeoutId = setTimeout(
       () => reject(new Error(`Timed out waiting for ${marker}`)),

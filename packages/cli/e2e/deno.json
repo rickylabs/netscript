@@ -23,6 +23,7 @@
     "isolatedDeclarations": false,
     "lib": [
       "deno.ns",
+      "deno.unstable",
       "dom"
     ]
   },
