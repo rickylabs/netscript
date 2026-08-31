@@ -113,7 +113,9 @@ Actual results at integrated head `186cea472` / evidence head `3130fb52b`, recei
 | `check:mcp-export-corpus` | PASS | 7678 symbols, +1 vs `main` = `createLazyKv` exactly |
 | `deno.lock` | unchanged | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
 | IMPL-EVAL | PASS | separate session, comment `5473634548` |
-| `scaffold.runtime` | **PENDING (CI)** | required for the template/generated-output change; opted in via `e2e-cli-gate` because local Aspire is topology-parked |
+| `scaffold.runtime` | **PASS** | run `33357314826` @ `7bd87da5c` — aspire+docker+postgres **success**, aspire+sqlite+garnet **success**, deno-only **success** |
+| repo `check-test` | **PASS** | full-workspace check + test at `7bd87da5c` |
+| repo `quality` / `code-quality` / `build` / `close-gate` | **PASS** | same head |
 
 Every check/lint/fmt receipt was verified for non-empty `stdout.bytes` before being trusted.
 
@@ -122,3 +124,16 @@ Every check/lint/fmt receipt was verified for non-empty `stdout.bytes` before be
 - Review the template diff for strict import/class/construction-only change.
 - Review the lazy test's observation points before trusting happy-path operation results.
 - Confirm no `packages/plugin/` path and no `deno.lock` bytes changed.
+
+
+## Runtime gate — why it was missing and what it now proves
+
+This leaf originally recorded Runtime as `N/A — forbidden/no runtime lease`. That was wrong twice
+over: the slice changes a **scaffold template** and its **generated carrier**, which is exactly the
+change class `scaffold.runtime` exists to cover, and the PR sat as a draft where CI gates every heavy
+lane on `pull_request.draft == false` — so the gate was not merely unrun, it was invisible.
+
+Corrected by opting the non-draft PR into the explicit `e2e-cli-gate` label rather than by taking a
+local Aspire lease (the local topology is parked). The gate now proves the scaffolded project still
+builds and runs with the 43-line delegating `service-context.ts.template` in place of the former
+123-line inlined `LazyPluginKv`.

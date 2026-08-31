@@ -65,7 +65,7 @@ non-empty `stdout.bytes` against the known `deno task` cache-replay trap.
 | --- | --- | --- |
 | Static | **PASS** | scoped `check` (`^packages/(kv\|cli)/`) 303-byte stdout, 31,193 ms; `lint` 352-byte; `fmt-check` 301-byte |
 | Fitness | **PASS** | `check:assets-barrel` exit 0 — this gate is `gen && git diff --exit-code`, so zero-byte stdout is legitimately clean, verified by confirming no regenerated-but-uncommitted carrier remains; `docs:exports-drift` PASS; `check:mcp-export-corpus` PASS, 7678 symbols = `main`'s 7677 +1 (`createLazyKv`) |
-| Runtime | **PENDING (CI)** | Previously recorded `N/A / forbidden`. Corrected: the template and generated-output change *does* require `scaffold.runtime` evidence. Local Aspire is topology-parked, so the PR is opted into the explicit CI gate via the `e2e-cli-gate` label; exact-head green is required before this PR is surfaced. |
+| Runtime | **PASS** | Previously recorded `N/A / forbidden` — wrong: the template and generated-output change *does* require `scaffold.runtime` evidence. Opted into the explicit CI gate via `e2e-cli-gate` (local Aspire is topology-parked). Run `33357314826` at head `7bd87da5c`: `scaffold-runtime (aspire + docker + postgres)` **success**, `scaffold-runtime-sqlite (aspire + sqlite + garnet)` **success**, `scaffold-static (deno-only)` **success**. Before the label, every scaffold lane reported `skipping`. |
 | Consumer | **PASS** | `packages/kv` tests 80 passed / 3 ignored / 0 failed, 288-byte stdout; `deno.lock` byte-identical `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c` |
 | IMPL-EVAL | **PASS** | separate-session OpenHands GLM 5.3 Flash · `max` at `3130fb52b`, base `0274c0a7` — comment `5473634548` |
 
