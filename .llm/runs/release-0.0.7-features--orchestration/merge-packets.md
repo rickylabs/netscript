@@ -187,3 +187,53 @@ and was very nearly discarded as fake. It is genuine: **`publish:dry-run` writes
 (356,732 bytes, ending `Success Dry run complete`), and the known-good #1387 receipt has the same
 zero-stdout shape. D-1's "always check `stdout.bytes`" is necessary but **not sufficient**: for this
 gate the live channel is stderr.
+
+---
+
+# Two exact-green merge candidates — 2026-08-31 ~06:45Z
+
+## PR #1814 — `#1592` Slice 1 (**partial**)
+
+| | |
+| --- | --- |
+| **Merge head** | `0dc5ef539360fa4fdb695fa99351593af6e53041` |
+| Mergeable | **MERGEABLE / CLEAN** |
+| CI | `close-gate` · `check-test` · `quality` · `code-quality` · `build` — **all pass** |
+| IMPL-EVAL | **`VERDICT: PASS`** (comment `5474439540`) — all four prior FAIL_FIX findings re-verified resolved, byte-identity re-derived by the evaluator rather than accepted |
+| Status label | exactly one — `status:ready-merge` |
+| Closing keyword | **none, deliberate** — `closes=[]`; merging leaves #1592 open |
+| Review threads | 0 / 0 unanswered |
+
+Carry proven file-by-file: 10/10 evaluator-judged blobs identical; every other product file in the
+interval byte-identical to `main`'s own content; the two differing carriers shown to be `main`'s
+version from the converged base and never leaf-authored (`merge-tree` clean).
+
+## PR #1834 — `#1349` Slice 1 of 3 (**partial**, epic #1348)
+
+| | |
+| --- | --- |
+| **Merge head** | `903cd520eda8fcd925c4b5cd8f56e4bb018feeea` |
+| Mergeable | **MERGEABLE / CLEAN** |
+| CI | `close-gate` · `check-test` · `quality` · `code-quality` · `build` — **all pass** |
+| IMPL-EVAL | **`OPENHANDS_VERDICT: PASS`** (comment `5474713374`), no blocking findings |
+| PLAN-EVAL | cycle 2 **PASS** after a cycle-1 `FAIL_PLAN` that caught the plan never opening RFC 0001 or its committed fixture |
+| Status label | exactly one — `status:ready-merge` |
+| Closing keyword | **none, deliberate** — `Refs #1349`, `closes=[]` |
+| Review threads | 0 / 0 unanswered |
+
+**Its close-gate needed a structural fix, not a tick.** The Definition of Done listed only
+*future-slice* items ("Slices 2–3 land…", "Supervisor completes readiness…"), which a partial slice
+can never satisfy — the gate was permanently unsatisfiable. Epic-level items moved to a **Deferred to
+Slices 2–3** section and a real Slice-1 DoD written (LD-1…LD-7, `TError` slot, 16/17 arity law,
+fixture migration, compatibility defaults, gate set). Nothing was ticked that was not true.
+
+This lands the `#1348` epic's structural entry point, which #1352/#1353/#1467 were blocked behind.
+
+---
+
+## Still open, one external blocker each
+
+| PR | Blocked on |
+| --- | --- |
+| **#1762** | **#1828** (`deno.unstable` lib parity) — `MERGEABLE/CLEAN` and close to landing. #1762 then needs only a `check-test` re-run plus its queued hosted `scaffold.runtime`; **no product change**. |
+| **#1664** | `behavior.service-client-refetch`. Now **71/72** runtime gates green after the `--client` repair. The remaining failure is attempt 7's original red, reproduced on **current `main`** rather than the 53-commit-stale base — so D-22's "untestable" objection is retired and the defect is real. Needs a bounded investigation of the optimistic `onSettled`/rollback path: new product work, not integration repair. |
