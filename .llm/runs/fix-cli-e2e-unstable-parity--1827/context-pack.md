@@ -19,13 +19,15 @@ config-lib parity RED→GREEN test.
 
 - Supervisor correction: the production oracle is `packages/cli/deno.json`, whose libs are
   `["deno.ns", "deno.unstable", "dom"]`; repository-root order is not authoritative.
-- The invalid `86443f47a` RED / `bbed08071` GREEN history had already reached the remote before the
-  stop arrived. No further push is authorized.
-- Honest RED was recaptured with the config path clean against `HEAD`: the exact requested
-  `--allow-all` focused command exits 1, 0/1 passed, showing only the missing middle
-  `deno.unstable` relative to the CLI oracle.
-- Next: amend this RED receipt, apply and commit exact GREEN
-  `["deno.ns", "deno.unstable", "dom"]`, then integrate exact main `a3e0a5aa…` at final freeze.
-- Final freeze must recapture GREEN, four generated-corpus checks, the #1762 initiating-root
-  before/after, a fresh isolated full check, lock/non-scope proof, and then force-with-lease push.
+- The invalid remote `86443f47a` RED / `bbed08071` GREEN was rebuilt locally. Honest RED is
+  `4c0db7fea`; exact GREEN is `27285b72a`.
+- Exact main `a3e0a5aa8beebbd1f7a488d564d31980a7d74619` was integrated only at final freeze in
+  `fef770b18`.
+- Honest RED exits 1 with only the missing middle `deno.unstable`; final GREEN exits 0, 1/1 passed.
+- The #1762 initiating-root proof is concrete at feature head `686eedb62`: its agent MCP E2E root
+  resolves through CLI plugin registry -> plugin root -> service root -> health/KV, exits 1 before,
+  and exits 0 after the one-line config change. Its full 2,974-file check changes from one failed
+  batch to zero.
+- Final scoped check/lint/fmt, check-runner tests, quality gate, all four generated-corpus checks,
+  and the isolated-DENO_DIR 2,971-file full check pass. Lock/non-scope proof and remote repair remain.
 - IMPL-EVAL remains supervisor-owned.
