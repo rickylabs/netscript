@@ -145,8 +145,11 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts \
   --thread-id <uuid> --message "<follow-up>" [--worktree <wsl-path>] [--dry-run]
 ```
 
-`--dry-run` prints the exact command and sends nothing. Exit: `0` ok/dry-run · `1` resume failed ·
-`2` usage error.
+`--dry-run` prints the exact command and sends nothing. A real resume exits `0` only when the child
+result is accepted. A recognized rejection — including
+`thread-store conflict: already has an active writer` — remains visible on the same child
+stdout/stderr stream but forces exit `1` even when the child process itself exited `0`. Other child
+failures also exit `1`; usage errors exit `2`.
 
 ### 5. Check live state anytime — `codex/codex-status.ts`
 
@@ -269,13 +272,14 @@ threads never block. The command is read-only and is also enforced in CI's `clos
 
 ### `runtime/cli/agentic-runtime.ts` — the canonical surface
 
-This is the front door to the desired-state controller: inspection, planning, and one guarded
-recovery command.
+This is the front door to the desired-state controller: inspection, planning, and guarded recovery
+commands.
 
 ```bash
 deno task agentic:runtime doctor --json      # inspect-only health
 deno task agentic:runtime status --json      # inspect-only observed state
 deno task agentic:runtime repair codex-remote --worktree <wsl-path> --dry-run --json
+deno task agentic:runtime repair sender-lease --worktree <wsl-path> --dry-run --json
 ```
 
 `doctor` and `status` never write. Controller state and checkpoints are value-free JSON under
@@ -287,6 +291,32 @@ app-server` may receive `SIGTERM`; only the one known
 control socket may be removed; no broad `pkill` or shell-evaluated kill patterns exist. Always
 `--dry-run` first — it inspects and plans without terminating a PID, removing a socket, or writing
 evidence.
+
+`repair sender-lease` is the only eviction path for a durable sender owner; launch itself is
+preserve-only and never removes an existing record. A launch blocked by `duplicate_sender_risk` or
+`ownership_conflict` must be handled by resuming the recorded thread or by running this explicit
+repair against one canonical worktree. There is no sender-directory scan, force flag, or
+elapsed-time shortcut.
+
+Always preview the exact worktree first, then omit `--dry-run` only when the plan reports stale:
+
+```bash
+deno task agentic:runtime repair sender-lease --worktree <wsl-path> --dry-run --json
+deno task agentic:runtime repair sender-lease --worktree <wsl-path> --json
+```
+
+A lease is stale only when all three provenance-bound signals agree: two debounced PID probes show
+the owner dead, the exact rollout is terminal or proven absent, and the thread is non-active or
+proven absent. Absence counts only when the inspected rollout inventory and thread daemon are bound
+to the record's own session provenance. Alive, working, stalled, active, foreign, mismatched,
+unreadable, or otherwise unknown evidence fails closed and preserves the lease.
+
+Apply re-reads the unchanged lease token and repeats every probe. It atomically persists an
+`authorized` receipt containing both timestamped evidence passes, CAS-removes only that exact
+record, then finalizes the receipt as `evicted`. Receipts live under
+`~/.config/netscript-agentic/runtime/evidence/`, record the finite
+`restart_stale_ownership` reason, and redact the lease token. If re-observation changes or any
+evidence becomes unknown, repair aborts without eviction.
 
 ### `runtime/cli/routing-state.ts` — quota fallback, inspected
 
@@ -575,8 +605,12 @@ The invariants worth internalizing:
 - **Push safety.** A worktree branched off an umbrella inherits its upstream, so a bare `git push`
   lands on the umbrella. Launch fails (exit 4) unless `@{u}` is `NONE`; pushes use an explicit
   `HEAD:refs/heads/<branch>` refspec.
-- **One sender per worktree.** A Codex launch has one durable owner per canonical worktree; a live
-  owner refuses a rival with `duplicate_sender_risk`. Elapsed time alone never makes an owner stale.
+- **One sender per worktree.** A Codex launch has one durable owner per canonical worktree and never
+  auto-evicts it; a rival is refused with `duplicate_sender_risk` or `ownership_conflict`. Elapsed
+  time alone never makes an owner stale.
+- **Sender eviction is explicit and auditable.** Only `agentic:runtime repair sender-lease` can
+  remove a provenance-bound stale record, after repeat PID + rollout + thread evidence and a durable
+  redacted authorization receipt. Foreign, mismatched, live, or unknown ownership stays fail-closed.
 - **Fail-closed, anchored repair.** Destructive recovery only ever touches a `codex
   app-server`
   PID below `$HOME/.codex/` and the one known control socket — never a broad `pkill`.

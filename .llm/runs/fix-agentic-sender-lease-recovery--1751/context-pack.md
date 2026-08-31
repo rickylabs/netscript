@@ -6,19 +6,18 @@
 | --- | --- |
 | Run ID | `fix-agentic-sender-lease-recovery--1751` |
 | Branch | `fix/agentic-sender-lease-recovery` |
-| Current phase | `implement` — Slice 5 RED boundary, pending Tier-A substantive review |
+| Current phase | `implement` — Slice 7 blocked on out-of-manifest full-agentic lint findings |
 | Archetype | Operational Archetype 6 — CLI / Tooling |
 | Scope overlays | none |
 
 ## Current State
 
-Slices 1-4 are accepted through `1cfae0f39`: classification and preserve-only launch behavior are
-green, and explicit audited repair is green with its earlier RED blobs unchanged. Slice 5 adds only
-the real-wrapper resume rejection test. Its intended RED result is `REAL_EXIT=1`, 1 passed and 1
-failed: an accepted fake child remains exit 0, while the exact active-writer rejection is printed
-but the wrapper incorrectly remains exit 0. The final fixture permits only its fake shell, so no
-thread message or sender-registry operation occurs. Work is stopped before Slice 6 for the
-supervisor's Tier-A substantive review.
+Slices 1-6 are accepted through `00877bcbd`; all six protected RED test blobs are unchanged, the
+resume known-negative is green, and the supervisor recorded 528/528 full agentic tests. Slice 7's
+README documentation is drafted. The required full agentic check passes over 173 files and format
+passes over 173 files after an authorized formatting-only fix in `codex-resume.ts`, but lint exits 1
+with 14 findings across 9 files outside this leaf's declared manifest. Work is stopped before the
+full test gate, commit, push, or PR comment pending coordinator rescope or upstream lint repair.
 
 ## Completed
 
@@ -39,18 +38,24 @@ supervisor's Tier-A substantive review.
 - Captured intended Slice 5 RED evidence: exit 1, 1 passed, 1 failed, with the failing rejection
   path returning actual 0 versus expected 1.
 - Captured scoped structured check/lint/fmt passes for the one Slice 5 test file.
+- Landed Slice 6 GREEN at `00877bcbd`; the supervisor verified D8, all six protected blobs, Slice 5
+  at 2/2, and the full agentic suite at 528/528.
+- Drafted the final README safety and operator guidance.
+- Captured Slice 7 structured check PASS (173 files, exit 0) and format PASS after the declared-file
+  correction (173 files, exit 0).
 
 ## In Progress
 
-- Tier-A substantive review of the landed Slice 5 RED boundary. The implementation lane does not
-  self-certify and has not started Slice 6.
+- Slice 7 is blocked because the required structured lint gate reports 14 findings across 9 files
+  outside the approved manifest. No unrelated source edit is authorized.
 
 ## Next Steps
 
-1. Supervisor performs the Tier-A substantive Slice 5 review and records its disposition.
-2. Do not dispatch Slice 6 unless the supervisor accepts the committed RED boundary.
-3. After acceptance, Slice 6 adds the pure resume-disposition parser and wrapper propagation while
-   keeping the Slice 5 test blob byte-identical, then reruns the exact targeted command to green.
+1. Coordinator chooses either to land the unrelated agentic lint repairs elsewhere or explicitly
+   rescope this leaf's manifest.
+2. Resume Slice 7 only after the full agentic lint command can produce a green covered verdict.
+3. Then run the full agentic suite and raw Git checks, finalize artifacts, commit, explicitly push,
+   post the Slice 7 PR comment, and hand off for evidence freeze/Tier-A/IMPL-EVAL.
 
 ## Key Decisions
 
@@ -68,23 +73,25 @@ supervisor's Tier-A substantive review.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/tools/agentic/codex/codex-resume_test.ts` | new | Real-wrapper negative and accepted-path subprocess controls behind test-owned fake `bash`. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Slice 5 scope and exact RED/static evidence. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current Slice 5 handoff and Tier-A stop. |
+| `.llm/tools/agentic/README.md` | modified | Final operator and safety documentation, not committed. |
+| `.llm/tools/agentic/codex/codex-resume.ts` | modified | Authorized formatting-only correction exposed by the full format gate, not committed. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Slice 6 acceptance and Slice 7 blocker evidence. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current blocked handoff. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/drift.md` | modified | Out-of-manifest lint blocker. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS for Slice 5 test file | Structured check/lint/fmt: 1 file processed, zero findings/diagnostics. |
-| Fitness | Plan-Gate PASS; Tier-A Slice 5 review PENDING | `plan-eval-cycle-2.md`; supervisor review is the current stop. |
-| Runtime | EXPECTED RED | Targeted resume test: exit 1; 1 passed, 1 failed; rejected path actual 0 versus expected 1. |
-| Consumer | Positive control PASS | Accepted fake-child path stays exit 0; Slice 6 compatibility gates remain pending. |
+| Static | BLOCKED | Check: 173 files, exit 0. Format: 173 files, exit 0 after in-scope fix. Lint: 173 files, 14 findings across 9 out-of-manifest files, exit 1. |
+| Fitness | Plan-Gate PASS; Slice 7 incomplete | `plan-eval-cycle-2.md`; no Tier-A handoff until required gates pass. |
+| Runtime | PASS at Slice 6 head | Supervisor: Slice 5 2/2 and full agentic 528/528 at `00877bcbd`. Slice 7 full suite not run after lint blocker. |
+| Consumer | PASS at Slice 6 head | Resume output and compatibility behavior verified by supervisor; final docs are drafted. |
 
 ## Open Questions
 
-- No implementation decision is open for Slice 5. Supervisor acceptance of the RED boundary is
-  required before Slice 6.
+- Whether the nine unrelated lint files may be repaired in this leaf is a coordinator rescope
+  decision; current authority forbids editing them.
 
 ## Drift and Debt
 
@@ -94,5 +101,5 @@ supervisor's Tier-A substantive review.
 
 ## Commits
 
-- Slice 4 GREEN is `1cfae0f39`. Slice 5 RED is the next commit; its exact hash and push evidence are
-  recorded in the structured PR #1802 comment. V3 has no `commits.md`.
+- Slice 6 GREEN is `00877bcbd`. Slice 7 has no commit because its required lint gate is blocked.
+  V3 has no `commits.md`.

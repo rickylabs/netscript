@@ -131,6 +131,10 @@ when the child exit is non-zero.
 | 2026-08-31 | 5 | RED resume known-negative | Added only the real-wrapper subprocess test. Both cases use a test-owned executable fake `bash` under `.llm/tmp`, inspect `Deno.Command(...).output().code` directly, and assert the production sender root is not used. No thread message can be delivered because the fake shell records the invocation instead of executing it. |
 | 2026-08-31 | 5 | RED gate | Exact targeted structured wrapper used `out=$(cmd); rc=$?` and returned `REAL_EXIT=1`: 1 passed, 1 failed, 0 ignored. The positive accepted-child control remains exit 0. `codex resume returns non-zero when the real wrapper receives an active-writer rejection` fails with actual 0 versus expected 1 while the exact rejection text remains present. |
 | 2026-08-31 | 5 | Reconcile/handoff | PR #1802 remains the single leaf PR and no scope or decision changed. Commit/push/comment is followed by a hard stop for Tier-A substantive review; Slice 6 is not started. |
+| 2026-08-31 | 6 | GREEN accepted | Supervisor verified and committed `00877bcbd`: all six protected test blobs remained byte-identical; D8's pure classifier recognizes either output stream and maps only `accepted` to exit 0; Slice 5 went 2/2 and the full agentic suite went 528/528. |
+| 2026-08-31 | 7 | Integration/docs drafted | Updated the current agentic README with three-signal provenance-bound staleness, preserve-only launch, explicit audited sender-lease repair, and the non-zero resume rejection contract. No main integration, E2E, Aspire, Docker, or browser gate was run. |
+| 2026-08-31 | 7 | Static gate blocked | Direct capture produced check `REAL_EXIT=0` over 173 files, lint `REAL_EXIT=1` with 14 findings across 9 files outside the declared manifest, and initial format `REAL_EXIT=1` for the Slice 6 `codex-resume.ts` import layout. The authorized in-manifest formatting fix made the repeated format gate `REAL_EXIT=0` over 173 files. |
+| 2026-08-31 | 7 | Blocked handoff | Per the file ceiling, no unrelated lint source was edited. The full agentic test gate, commit, explicit-refspec push, and PR comment were not run because the required lint gate cannot pass within scope. See `drift.md`. |
 
 ## Decisions
 
@@ -163,6 +167,10 @@ when the child exit is non-zero.
 | Slice 5 lint | structured `run-deno-lint.ts` over `codex-resume_test.ts` with `--config jsr-package-settings.json` | PASS | 1 file selected and processed; 0 findings. |
 | Slice 5 format | structured `run-deno-fmt.ts` over `codex-resume_test.ts` | PASS | 1 file selected and processed; 0 findings. |
 | Slice 5 scope/diff | authoritative raw Git status plus `git diff --check` | PASS | Only the new test and owned `worklog.md`/`context-pack.md` are changed; no whitespace errors. |
+| Slice 7 full agentic check | structured `run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx` with direct capture | PASS, exit 0 | 173 files selected in 2 batches; 0 failed batches and 0 diagnostics. |
+| Slice 7 full agentic lint | structured `run-deno-lint.ts --root .llm/tools/agentic --ext ts,tsx --config jsr-package-settings.json` with direct capture | BLOCKED, exit 1 | 173 files processed; 14 findings across 9 out-of-manifest files. No finding is in the Slice 6/7 files. |
+| Slice 7 full agentic format | structured `run-deno-fmt.ts --root .llm/tools/agentic --ext ts,tsx` with direct capture | PASS after in-scope fix, exit 0 | Initial run found only `codex-resume.ts`; after formatting that declared file, 173 files processed with 0 findings. |
+| Slice 7 raw Git/test ceilings | authoritative raw Git status, `git diff --check`, and `git hash-object` | PASS | Diff check exit 0; only README, the formatting-only declared source fix, and three run artifacts are modified. All six protected test blobs match. |
 | Diff hygiene | raw `git diff --check` | PASS | No whitespace errors across the five Slice 1 files. |
 
 ### Fitness Gates
@@ -180,6 +188,8 @@ when the child exit is non-zero.
 | Sender staleness contract | EXPECTED RED | `run-deno-test.ts -- --allow-all .llm/tools/agentic/runtime/sender-ownership_test.ts` | Exit 1; 16 passed, 11 failed, 0 ignored. Failures are only the 7 new `preserve` and 4 new `stale` expectations against the fail-closed seam. |
 | Sender lifecycle | PASS | Supervisor verification at `1cfae0f39` | Slice 3 suite 10/10 and full agentic suite 526/526 after Slice 4. |
 | Resume known-negative | EXPECTED RED | `run-deno-test.ts -- --allow-all .llm/tools/agentic/codex/codex-resume_test.ts` | `REAL_EXIT=1`; 1 passed, 1 failed. Rejected path returns actual 0 rather than expected 1; accepted path remains 0. |
+| Slice 6 supervisor verification | PASS | Supervisor evidence at `00877bcbd` | Slice 5 test 2/2 and full agentic suite 528/528; all six test blobs unchanged. |
+| Slice 7 full agentic suite | NOT_RUN | Required lint blocker | Stopped before this gate because a required prior gate cannot be green within the declared manifest. |
 
 ### Consumer Gates
 

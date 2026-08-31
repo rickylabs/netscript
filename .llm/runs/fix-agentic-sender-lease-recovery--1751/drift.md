@@ -63,3 +63,25 @@ would be documentation-only. Left for Slice 4's author to add if useful, not req
   the plan/tooling in-scope before claiming a full agentic lint verdict); an all-excluded result is
   never a pass.
 - **Evidence:** Slice 1 gate table in `worklog.md`.
+
+## 2026-08-31 — Slice 7 full-agentic lint is blocked outside the declared manifest
+
+- **What:** The required structured lint gate over all 173 `.llm/tools/agentic` TypeScript files,
+  using the explicit config required by the earlier lint-exclusion drift, exited 1 with 14 findings
+  across 9 files.
+- **Expected:** Slice 7 requires the full agentic lint gate to pass before commit and push.
+- **Actual:** None of the findings is in the Slice 6/7 manifest. They are in
+  `wsl/wsl-foundation.ts`, `wsl/wsl-foundation-lib.ts`, `claude/remote-model-launcher.ts`,
+  `claude/hybrid-launcher_test.ts`, `opencode/opencode-boundary-plugin.ts`,
+  `opencode/opencode-preflight.ts`, `runtime/controller.ts`,
+  `runtime/adapters/codex-profile-adapter.ts`, and `openhands/phase-eval-workflow_test.ts`.
+- **Severity:** significant gate drift; the required final lint verdict cannot be made green within
+  the approved file ceiling.
+- **Action:** Stop before the full test gate, commit, push, or PR comment. The coordinator must
+  either land the unrelated lint repairs elsewhere and resume this slice, or explicitly rescope the
+  manifest. No unrelated source was edited here.
+- **In-scope correction:** The same gate pass exposed a formatting-only import-layout defect in the
+  already-declared Slice 6 file `codex/codex-resume.ts`; it was formatted, and the repeated full
+  agentic format wrapper passed over 173/173 files with exit 0.
+- **Evidence:** `worklog.md` Slice 7 blocked-gate rows; structured lint `REAL_EXIT=1`, structured
+  format rerun `REAL_EXIT=0`.

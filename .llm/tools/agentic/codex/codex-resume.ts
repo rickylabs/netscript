@@ -31,10 +31,7 @@ import {
   wsl,
   wslUser,
 } from '../lib/agentic-lib.ts';
-import {
-  classifyCodexResumeOutcome,
-  codexResumeExitCode,
-} from './codex-resume-result.ts';
+import { classifyCodexResumeOutcome, codexResumeExitCode } from './codex-resume-result.ts';
 
 interface Options {
   threadId?: string;
