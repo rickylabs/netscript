@@ -5205,3 +5205,26 @@
   - `impl-eval:skip` applied **before** the ready flip so it could not auto-dispatch a redundant
     evaluation; promoted to **ready** + **`status:ready-merge`** (single status). Fresh CI running on
     the current-main merge ref (`check-test`, `quality` in progress).
+
+- **D-219 — artifacts stripped from both leaves; product blobs verified byte-identical, so both
+  verdicts carry. Done as fast-forward deletion commits, no force-push.**
+  - **#1835: `b7d0a60ac` → `1771830ee`.** Removed all 17
+    `.llm/runs/fix-sdk-cli-key-normalization-residuals--1833` paths. **All 4 evaluated `packages/`
+    blobs verified IDENTICAL** to the PASS head (`build-windows-prebuild.ts`,
+    `build-windows-prebuild_test.ts`, `browser-env.ts`, `env-ordering_test.ts`); 0 slice run-dir paths
+    remain in the tree.
+  - **#1837: `01d32c95f` → `6ef9306ef`.** Removed all 6
+    `.llm/runs/fix-aspire-sibling-generator-name-safety--issue-1836` paths. **All 12 evaluated
+    `packages/` blobs verified IDENTICAL**; 0 slice run-dir paths remain.
+  - **Chose a deletion commit over a history rewrite deliberately.** Both run-dir sets are spread
+    across *two* commits on #1835 (`483a521d4` adds 6 files, `b7d0a60ac` adds 11 more alongside the
+    product change), so dropping a commit would have taken product bytes with it. An additive
+    deletion commit strips the tree while leaving every product blob untouched, and it pushes as a
+    **fast-forward — no force-with-lease, no lease race**. The squash-merge NetScript uses yields a
+    clean artifact-free result either way.
+  - Verified blob identity **file-by-file with `git rev-parse <head>:<path>`** on both branches rather
+    than trusting the diff summary — that is the evidence the carry rule requires.
+  - #1835 body updated to state the new head, the strip, and that the verdict carries by product-blob
+    identity with the four files named. Mirror dry-run re-run at `1771830ee`: **clean**. Fresh
+    merge-ref CI recut (`33428414441`); the previous run at the old head was auto-cancelled, as
+    expected.
