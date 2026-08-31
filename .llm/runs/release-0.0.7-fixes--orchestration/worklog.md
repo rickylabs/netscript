@@ -7077,3 +7077,36 @@ then-current main after #1819 lands, preserving byte-identically the two product
 and the evaluator artifact, then fresh exact CI and merge-ref before any lower-priority internal or
 docs packet. Not converged yet — deliberately, to avoid a churn that would only go stale again when
 #1819 merges.
+
+### #1829 shipped; #1773 at PASS_IMPL with one genuine remaining gate
+
+**#1829 / #1677 shipped.** Final audit blocker was that the PR had **no checkable Definition of Done**,
+so close-gate had passed vacuously. Added a truthful 8-box DoD, every box backed by proof rather than
+assertion. **A trap caught while fixing it:** my first close-gate rerun completed at 05:24:28Z but the
+body update landed at 05:25:15Z — that pass had validated the *old* body and would have been a second
+vacuous green. Reran and verified the next one started 05:25:39Z, genuinely after the body write,
+before treating it as valid. This is the same started-at discipline the #1781 close-gate needed.
+
+**#1773 IMPL-EVAL: `PASS_IMPL`**, all seven locks upheld by an evaluator that checked the *array* not
+the prose. Highlights worth keeping: `capability-suites.ts:131-133` is
+`APP_HOME → APP_DYNAMIC_ROUTE → APP_REFERENCE` with index adjacency asserted by a test whose RED
+receipt shows exactly `[78, -1, 79]`; the negatives include an **HTTP 500 carrying both markers**,
+proving status is checked before markers; the evaluator independently confirmed
+`PARTIAL_SEARCH_PARAM = "fresh-partial"` in the cached upstream `@fresh/core` and that
+`_layout.tsx.template` wraps content in `<Partial name='page'>`, so the partial fragment genuinely
+carries the markers. Probe vacuity answered explicitly: **not vacuous** — a static page cannot contain
+a per-run uuid, and the template gate fences off the one theoretical false-green by forbidding
+`ctx.url`/`ctx.params`.
+
+**Exact blocker, and it is real:** unlike #1365 and #1677, this leaf **adds a critical runtime gate**,
+so its own acceptance requires the live suite. Validation row 10 is `NOT_RUN` and is not claimed.
+Rather than request a serialized host lease, I dispatched the **off-host `e2e-cli.yml`** run
+`33360663739` on `test/scaffold-dynamic-route-gate` — it needs no lease and additionally exercises the
+real-browser gate this host structurally cannot run. Four lanes in flight.
+
+**Convergence deliberately withheld** on #1773 and #1609 until #1831's imminent merge, per the
+coordinator, to avoid a conflicting convergence that would immediately go stale.
+
+Issue #1616 has 3 acceptance boxes, currently unchecked; they will be tool-mirrored once the runtime
+gate returns, since box 2 ("an existing runtime gate exercises that dynamic route end to end") cannot
+be honestly evidenced before then.
