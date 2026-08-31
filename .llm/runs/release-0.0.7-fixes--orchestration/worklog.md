@@ -7254,3 +7254,40 @@ body **only** inside correction sections, each explicitly labelled superseded an
   the retry is alive and handling 429s as transient `api_retry` backoff (attempt 1/10). If it also
   dies terminally, the sanctioned fallback is a fresh AGY Gemini 3.6 Flash high session — that would
   be a routing escalation, not a plan defect.
+
+### #1845 launched immediately as a bounded fixes-lane repair
+
+Scaffolded showcase island **never hydrates** — no Fresh island element in the DOM, no query client,
+no `onMutate`. Hosted receipt from PR #1664 at `377811da8` (run `33410348563`), 71/72 with
+`behavior.service-client-refetch` the sole failure.
+
+Worktree `007-leaf-1845`, branch `fix/scaffold-island-hydration`, base `6c195acaf`, thread
+`01a058a1-cd97-7892-8188-6e37d402e584`, route openai/gpt-5.6-sol/**high** (raised from the usual
+medium: three confident diagnoses have already been wrong on this defect).
+
+The brief is written to stop a fourth wrong diagnosis rather than invite one:
+
+- **The four eliminated hypotheses are listed with their disproof** (cache-key mismatch, wrong DOM
+  element, `onMutate` skipping on `previous === undefined`, the optimistic helper layer) and the author
+  is told explicitly not to re-derive them.
+- **The route-local `(_islands)/` lead is framed as a lead, not a diagnosis**, with the S1 deliverable
+  defined as a *measurement* that settles island registration/build from the Fresh registration code
+  and the generated project's own manifest/build output — and an explicit instruction that if the
+  islands *are* registered, the lead is dead and it should say so plainly rather than invent a fifth
+  confident diagnosis.
+- **Proof standard stated**: the authoritative proof is the hosted browser gate returning
+  `islandHydrated: true` with a non-null `freshIslandElement`; a unit test asserting registration is
+  necessary but **not sufficient**. The instrumentation already committed on #1664 regenerates the
+  receipt every hosted run.
+- **Collision warning recorded**: #1773 currently owns `packages/cli` scaffold assets and
+  `packages/cli/e2e/**` and is awaiting merge, so if the fix needs those paths the author must stop and
+  report rather than edit them.
+
+### #1844 deferred per ruling — p2 / status:research, not a canary6 blocker
+
+Labels confirmed `type:fix, area:aspire, status:research, priority:p2`. The two sanctioned Postgres
+observations run **after #1839 fixes runtime admission**; two passes close it non-reproduced, and
+recurrence with DCP logs dispatches a bounded repair. The control run I already had in flight
+(`33413386485`, main `6c195acaf`) **predates #1839** and is therefore recorded as *informational only*
+— it is not one of the two sanctioned observations, and I will not present it as one whichever way it
+lands.
