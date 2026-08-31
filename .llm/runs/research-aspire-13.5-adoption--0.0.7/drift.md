@@ -5645,3 +5645,36 @@
   - Running tally on S8: a carried base PASS plus **four** independently evaluated bounded deltas —
     seed connection, stderr bound, compile fix, graph injection. Each earlier PASS carried forward
     rather than re-spent.
+
+- **D-233 — `database.seed` PASSES. The original defect chain is closed. New failure at
+  `runtime.typed-db-phase-b`, and its error is masked by the same class D-07 fixed.**
+  - **Confirmed from the report artifact: `database.seed` verdict `passed`** at `927d24bed`. The
+    graph-injection repair fixed the failure that started this whole sequence. Gate progression across
+    the last three heads is monotonic: **27 → 41 → 58** passing gates.
+  - **The delta-4 eval PASSED with one weakening recorded rather than waved through:** the new
+    coverage is **"instance-leaning with a curated-contract class backstop"**. The string guards
+    (`connectionStringExpression()`, `.getValue()`) are **spelling-specific**, and the real class gate
+    — the compile test's SDK contract — was changed from D-227's **verbatim** contract to a **minimal
+    derived** mock. A future capability that exists in the real SDK, compiles, and is
+    runtime-unsupported **would slip through if someone added it to the mock**. Curation is now that
+    guard's single point of failure. Not blocking; tracked.
+  - Its **negative control is the sharpest single fact of this sequence**: re-injecting the dead
+    `connectionStringExpression().getValue()` emission and running the gate's own
+    `tsc --noEmit -p tsconfig.apphost.json` gives **exit 0**. Compilation was never the discriminator
+    for this class — which is exactly why a static compile test alone cannot guard it.
+  - **New failure, and it is masked:** `runtime.typed-db-phase-b` fails at
+    `verify-typed-db-phase-b.ts:232`, with the reported cause being
+    `Loaded Prisma config from prisma.config.ts.` / `Prisma schema loaded from schema.` — **Prisma's
+    informational preamble, not an error**. The typed command's `message` took the first non-`Task `
+    lines, so the real cause of exit 16 is hidden. Same defect class as the original `Task ` banner
+    problem, one layer out: the classifier filters *Deno task* banners but not a tool's own info
+    output.
+  - **Repair dispatched** requiring the fix to be **generic — explicitly not Prisma-specific** — since
+    this seam serves every tool, and to **use D-224's now-retained 32 bounded lines** rather than
+    surfacing only the first. It must also verify D-224, D-227 and D-231 all still pass: four repairs
+    now stack on this branch and a later one silently undoing an earlier one is the realistic failure
+    mode from here.
+  - **Judgement on continuing:** five S8 cycles is a lot, but each has found a **distinct, real
+    defect**, every one was independently evaluated, and progress is strictly monotonic. This is a
+    branch being genuinely debugged, not one thrashing — and it is the last thing standing between
+    S9/S10/S11/S13 and their merge packets.
