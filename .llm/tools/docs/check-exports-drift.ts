@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'ai',
+    packagePath: 'packages/ai',
+    docPath: 'docs/site/reference/ai/index.md',
+    packageName: '@netscript/ai',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all thirteen entrypoints but does not yet inventory every symbol: /skills has no dedicated symbol section; the root prompt APIs, OpenAI-compatible vision exports, Ollama HttpReachabilityConfig, MCP pool/resource APIs, AgentLoop, newer contract/reasoning symbols, vector-memory and provider-factory ports, and retrieval testing helpers remain incomplete.',
+    },
+  },
+  {
     name: 'auth-kv-oauth',
     packagePath: 'packages/auth-kv-oauth',
     docPath: 'docs/site/reference/auth-kv-oauth/index.md',
