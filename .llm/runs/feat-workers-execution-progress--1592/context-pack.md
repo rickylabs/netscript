@@ -12,8 +12,9 @@
 
 ## Current State
 
-Slice 1 implementation and its Tier-A gates are complete within the locked ceiling. The branch is
-ready for its single sign-off commit, push, and draft PR; no evaluator has been dispatched.
+Slice 1 implementation and its Tier-A gates are complete within the locked ceiling. Product slice
+commit `7270cc7f7` is pushed, and draft PR #1814 targets `main` with the required partial-scope body,
+labels, and `0.0.7` milestone. No evaluator has been dispatched.
 
 ## Completed
 
@@ -26,17 +27,18 @@ ready for its single sign-off commit, push, and draft PR; no evaluator has been 
   schema/mapping, and focused persistence/mutation-hook/round-trip tests.
 - Passed scoped check/lint/fmt (112 files each), package tests (29/29), exports drift, and the
   code-quality/doctrine gate; verified `deno.lock` remained byte-identical.
+- Committed and pushed the reviewed product slice as `7270cc7f7`; opened draft PR #1814 with
+  `Refs #1592` and the required initial metadata.
 
 ## In Progress
 
-- Sign-off commit, push, and draft PR creation.
+- Tier-A draft handoff; this leaf stops after posting the required slice comment.
 
 ## Next Steps
 
-1. Commit the reviewed Slice 1 implementation and updated run artifacts.
-2. Push `feat/workers-execution-progress`.
-3. Open a draft PR against `main` with `Refs #1592`, the required labels, milestone `0.0.7`, and an
-   explicit statement of the two deferred requirements.
+1. A supervising session may run the mandatory separate-session IMPL-EVAL later.
+2. Keep the PR draft; do not ready-flip or close #1592 from this partial slice.
+3. Plan the deferred runtime wiring and ordering/coalescing/replay documentation as follow-up scope.
 
 ## Key Decisions
 

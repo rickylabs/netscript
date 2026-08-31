@@ -65,6 +65,8 @@ test and the existing streams test.
 | 2026-08-31 | 1 | Gate | Final direct structured-wrapper runs passed: check/lint/fmt selected 112 files, package tests passed 29/29, exports drift passed, quality/doctrine gate exited 0, and `deno.lock` remained byte-identical. Direct wrapper invocation bypassed the known Deno task-cache receipt gap. |
 | 2026-08-31 | 1 | Slice review | Substantive Tier-A review confirmed the method is the same `#transition()` pattern as queue/start, `#save()` remains the sole persistence/hook path, stream types/schema/mapper carry both fields, tests prove persistence plus `updated` hook delivery, and the locked ceiling is intact. |
 | 2026-08-31 | 1 | Reconcile | #1592 remains intentionally open: this partial slice does not wire `ctx.reportProgress()` or document ordering/coalescing/replay semantics. Draft PR must use `Refs #1592`, never a closing keyword. |
+| 2026-08-31 | 1 | Commit/push | Signed off and pushed product slice commit `7270cc7f7`; remote branch resolved to full SHA `7270cc7f78c488d87d5857d074c9e035ae5c94f2`. |
+| 2026-08-31 | 1 | Draft PR | Opened draft PR #1814 against `main` with `Refs #1592`, exact initial labels (`status:impl`, `type:feat`, `priority:p1`, `area:workers`, `area:streams`), and milestone `0.0.7`. |
 
 ## Decisions
 
@@ -121,3 +123,4 @@ test and the existing streams test.
   are deferred.
 - IMPL-EVAL remains a later, separate-session supervisor responsibility; this leaf was directed not
   to dispatch its own reviewer and stops at Tier A with a draft PR.
+- Draft PR: https://github.com/rickylabs/netscript/pull/1814
