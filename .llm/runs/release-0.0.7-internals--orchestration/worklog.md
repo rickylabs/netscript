@@ -6629,3 +6629,30 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   server — which is why #1753's IMPL-EVAL ran on the sanctioned GLM route with no guard patch. The
   stale server is a latent hazard for anything that *does* route through `delegate_openrouter`, not
   an active blocker for current traffic.
+
+## D-148 — #1823 integrated at dea449911 with byte-identity proven; OpenHands PASS consumed
+
+- **OpenHands run `33356460347` terminal: `success`.** Verified it genuinely targets this PR before
+  treating it as a gate — its `headSha` is `a3e0a5aa8` (main) and `headBranch=main`, which initially
+  looked like a mismatch against #1823's head `65a588530`. Checked further: `displayTitle` is
+  `OpenHands runner · issue_comment · 1823` and `event=issue_comment`, so the workflow definition
+  runs from the default branch while the agent checks out the PR head internally. **Resolved by
+  evidence, not assumed** — had it actually been evaluating main, consuming it as a PR gate would
+  have been wrong.
+- **Single integration merge** of `dea44991120a2c5da96a89df0f68d69c455c035e` — clean, zero
+  conflicts. New head `930d37ea4d4d05e42728a3a59618ff4bd1b9b663`, pushed, local == remote.
+- **Byte-identity proven, which is what lets the IMPL-EVAL PASS carry forward without a rerun**:
+
+| File | Blob | Status |
+| --- | --- | --- |
+| `validate-milestone-cluster.ts` | `23d2710ee921700d5d19dd64da515f13f4e42e6d` | unchanged across merge |
+| `validate-milestone-cluster_test.ts` | `1b07155e6620238effed720885ca4772c402ced1` | unchanged across merge |
+
+  Captured the baseline **before** merging rather than reconstructing it after, so the comparison is
+  against a genuinely independent record.
+- All four generated corpora re-verified fresh at the new head via `check:` variants, real exit
+  capture, all 0.
+- Labels normalized: PR #1823 was found at `status:augment-review` (not `status:impl-eval` as the
+  audit stated) — corrected to sole `status:ready-merge`; issue #1753 likewise. Review threads
+  **0 / 0 unanswered**.
+- Fresh exact-new-head CI running; packet follows on green.
