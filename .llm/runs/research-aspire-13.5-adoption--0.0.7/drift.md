@@ -5120,3 +5120,32 @@
   - **The cascade was not wasted** — all three slices are now on current `main` with every verdict
     carried and zero product bytes changed — but it was executed on reasoning that did not hold, and
     that is on me.
+
+- **D-216 — S8 seed repair re-dispatched on the original D-205 terms, now carrying the containment
+  evidence; #1744 forced to a genuine runtime observation with `ci:full`.**
+  - **The brief opens by retracting my own steering.** It tells the agent explicitly that D-206/D-207's
+    "S8 is almost certainly exonerated" was wrong — S9 and S10 **contain** S8's 13 commits and were
+    never independent controls — and that the "fully green" #1744 run I cited was a **policy skip**.
+    An agent that carried my bad framing forward would look in the wrong place; correcting it in the
+    brief is cheaper than letting it burn a cycle.
+  - Evidence supplied: the containment table (only #1747, which lacks S8's typed-db surface, passes
+    seed), the fact that **convergence did not fix it** while S8's **20 product blobs stayed
+    byte-identical**, and a **second failing S8 gate** — S10's sqlite tier fails
+    **`runtime.resource-command`** (`passed=86 failed=1`), which is S8's own typed resource-command
+    gate. Two independent S8 surfaces failing is harder to explain away than one.
+  - **Named the most testable mechanism** rather than leaving it open: `init`/`migrate`/`generate`
+    pass immediately before `seed` fails, so the schema pipeline runs — the story to confirm or refute
+    is that S8's typed `<db>-cli` routing makes `seed` execute against a **different** database or
+    connection than the migration applied to. The Prisma `code` decides it (`P2021`/`P2022` migration,
+    `P1001` connectivity, `P2002` idempotency) and is **still unread** — pulling it from the
+    `33415203923` and `33404324013` artifacts is step 1.
+  - Also pointed the agent at its **own D-07 observability work** (`stripVTControlCharacters`,
+    `actionableStderr`), which exists precisely to surface the stderr the console truncates.
+  - **`ci:full` applied to #1744** while the runtime groups were verified **free** (busy=0), so it
+    evicted nothing. This forces the genuine second no-S8 data point that D-215 showed I never had.
+  - **S10's converged head recorded:** docker `database.seed` (`passed=40 failed=1`), sqlite
+    `runtime.resource-command` (`passed=86 failed=1`).
+  - **Canary 5 published**; pinned production E2E running. Once its green pair closes the pre-Aspire
+    release barrier is gone, and each exact-green Aspire merge packet is surfaced immediately toward
+    canary 6.
+  - Tenth dead-sender orphan released before launch (`ownerPid 2690743`).
