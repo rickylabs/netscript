@@ -6397,3 +6397,28 @@ and continued growth (27 KB/25 s) — not assumed from the resume command's own 
 lane has independently confirmed elsewhere is unreliable for `codex-resume`.
 
 `01a05536` is abandoned, no-state, non-evidence — no further action on it.
+
+### #1365 S1 landed static-only and compliant; PLAN-EVAL parked pending #1792
+
+Thread `01a05526` resumed correctly from the static-only steering and delivered S1 at `2e9460450`
+(pushed to `origin/fix/saga-publisher-receipt-discipline`, base `5197e70b7`, tree clean).
+
+**Static-only compliance verified, not assumed.** Audited every artifact for the forbidden commands;
+the only occurrences of `scaffold.runtime`/`e2e:cli` are *declarative* — gate 30 is recorded
+`NOT_RUN — serialized runtime lease required`, and plan/worklog/context-pack each restate that it must
+not run without a primary-granted lease. No scaffold, AppHost, Docker, or browser command was executed.
+
+**Deliverable is complete and honest.** 30-gate table with baselines measured at `5197e70b7`, including
+pre-existing reds recorded as exact non-increase contracts rather than false green promises: core/sagas/
+workers doc-lint FAIL at 9/23/20 private-type refs, sagas/workers JSR audit FAIL on the existing
+`./doctor` missing `@module`. Locked ceiling is 10 explicit product/test paths across three roots, with
+the workers sample admitted only for an evaluator-approved clarity adjustment whose current
+receipt-discrimination behavior must be preserved. All six design answers present, plus drift.md and a
+handoff note that pre-rejects a green-runtime claim ("no runtime evidence exists for this leaf").
+
+**Hard stop honored.** S1 is artifact-only; no product code. PLAN-EVAL is the gate before S2, and under
+the owner routing ruling new evaluations wait for #1792 (still OPEN, CLEAN, unmerged) — so this leaf is
+**parked at S1-complete**, not advanced and not self-certified. Selecting other leaves per that ruling.
+
+`#1781` and `#1764` remain OPEN/CLEAN at their exact handed-off heads (`a34c37eb2`, `9d8bbb4e9`),
+awaiting the coordinator's merge. Not mine to merge.
