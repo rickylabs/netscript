@@ -39,7 +39,12 @@ shipped Slices 1–8 behavior, and the tutorial uses contract-local metadata plu
 publish carriers were regenerated under the standing exemption; the MCP export corpus stayed at
 7,655 symbols at that point and `deno.lock` stayed byte-identical.
 
-**Superseded by three `main` integrations after Slice 9.** The leaf was integrated to `0ac06c5f1`
+**Superseded — corrected 2026-08-31: there have been SIX leaf-owned `main` integrations, not three.**
+In order: `6a8748e28` (`0ac06c5f1`), `ce0c0ebcb` (`65cd8a077`), `236a3d331` (`8a9257642`),
+`df1036c9b` (`6bb27e46a`), `7e76f68e4` (`584caa03f`), and `19d86de88` (`bd9d463b4`, live main).
+Two further `Merge origin/main` commits are inherited from the ancestor branches
+`feat/framework-prime-time` and `feat/package-quality` and are not this leaf's.
+The stale "three" count is what an audit flagged; it understated the run position. The leaf was integrated to `0ac06c5f1`
 (sole source conflict `catalog.ts`, resolved as the **union** of main's `aspire-version-parity` and
 this leaf's `exports-drift`/`mcp-export-corpus` entries), then `65cd8a077` (carrier-only), then
 `8a9257642` (corpus only). **The MCP export corpus is now 7,709 symbols**, regenerated from current
@@ -167,7 +172,7 @@ opposite-family IMPL-EVAL **PASS**. Its 8/8 durable receipts remain archived byt
 Slice 8: content `ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3`, `SUFFICIENT` evidence set,
 7/7 durable receipts. Scoped check selected 116 files; lint/fmt selected 115; MCP tests passed
 138/138; corpus freshness, quality/doctrine, and full publish dry run passed. The direct MCP JSR
-audit exited 0 with its three existing warnings. Corpus was 7,655 symbols at that slice (now 7,709 after the third `main` integration) with a byte-identical
+audit exited 0 with its three existing warnings. Corpus was 7,655 symbols at that slice (now **7,712** after the sixth `main` integration onto live `bd9d463b4`; 7,709 was the third-integration figure) with a byte-identical
 carrier; lock stayed byte-identical. The supervisor subsequently released Slice 9 work.
 
 Slice 9: final content `3cb08103ff9c25ff3ec580301b5936586b13d37e`, `SUFFICIENT` evidence set,
