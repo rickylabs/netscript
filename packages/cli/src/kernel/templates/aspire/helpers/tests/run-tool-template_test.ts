@@ -145,3 +145,62 @@ Deno.exit(16);
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('run-tool request mode writes the bounded typed-command result record', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-run-tool-result-' });
+  const runnerPath = join(root, 'run-tool.mts');
+  const requestPath = join(root, 'seed.request.json');
+  const resultPath = join(root, 'seed.result.json');
+  try {
+    const template = await Deno.readTextFile(
+      new URL('../../../../assets/aspire/helpers/run-tool.ts.template', import.meta.url),
+    );
+    await Promise.all([
+      Deno.writeTextFile(runnerPath, template),
+      Deno.writeTextFile(
+        join(root, 'deno.json'),
+        JSON.stringify({
+          tasks: {
+            'db:seed:postgres': 'deno run --allow-all seed-failure.ts',
+          },
+        }),
+      ),
+      Deno.writeTextFile(
+        join(root, 'seed-failure.ts'),
+        `await Deno.stderr.write(new TextEncoder().encode(${
+          JSON.stringify(`${ANSI_TASK_BANNER}\n${ACTIONABLE_SEED_ERROR}\n`)
+        }));
+Deno.exit(16);
+`,
+      ),
+      Deno.writeTextFile(
+        requestPath,
+        JSON.stringify({
+          NETSCRIPT_PRISMA_OPERATION: 'seed',
+          NETSCRIPT_DB_RESULT_FILE: resultPath,
+        }),
+      ),
+    ]);
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-all', runnerPath, '--request', requestPath, 'postgres'],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const result: unknown = JSON.parse(await Deno.readTextFile(resultPath));
+
+    assertEquals(output.code, 16);
+    assertEquals(result, { success: false, message: ACTIONABLE_SEED_ERROR });
+    await Deno.stat(`${resultPath}.tmp`).then(
+      () => {
+        throw new Error('temporary result record was not atomically renamed');
+      },
+      (error: unknown) => {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      },
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

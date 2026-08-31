@@ -51,3 +51,18 @@ AppHost, or `e2e:cli` runtime suites.
 
 This session may scaffold a local project and run `deno` tasks/type-checks only. It may not start
 Aspire, Docker, an AppHost, or an E2E runtime suite, and it does not self-certify IMPL-EVAL.
+
+## D-231 runtime-capability repair session — 2026-09-01
+
+| Field | Value |
+| --- | --- |
+| Model | OpenAI GPT-5.6 Sol implementation session |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-s8-recon` |
+| Branch | `feat/aspire-13-5-s8-typed-resource-commands` |
+| Baseline | `a2b227941160bd993b0468cea2a0e12cebc63013` |
+| Lane | bounded generated-command mechanism repair |
+| Evaluator | none dispatched; owner explicitly prohibited self-dispatch |
+
+This session may scaffold and run static Deno/TypeScript verification only. It may not start
+Aspire, Docker, an AppHost, or an E2E runtime suite. CI remains the runtime authority and this
+implementation session records no IMPL-EVAL verdict.

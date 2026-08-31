@@ -171,18 +171,15 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'builder.addPostgres("main", {');
     assertStringIncludes(output, 'ensureDatabasePassword(appHostDir, "main")');
     assertStringIncludes(output, 'databases.set("main",');
-    assertStringIncludes(
-      output,
-      'databaseConnectionStrings.set(',
+    assert(
+      !output.includes('databaseConnectionStrings.set(\n    "main"'),
+      'Container commands must consume Aspire graph-injected environment instead of a callback resolver',
     );
-    assertStringIncludes(
-      output,
-      'const connectionString = await (await db_0.connectionStringExpression()).getValue();',
+    assert(
+      !output.includes('connectionStringExpression()'),
+      'Container registration must not emit a compile-clean runtime capability call',
     );
-    assertStringIncludes(
-      output,
-      `throw new Error("Aspire did not resolve the connection string for database 'main'.");`,
-    );
+    assert(!output.includes('.getValue()'));
     assertStringIncludes(output, '(Container)');
   });
 
@@ -196,6 +193,7 @@ describe('generateRegisterInfrastructure', () => {
       output,
       'await builder.getConfiguration().getConnectionString("ext-db")',
     );
+    assertStringIncludes(output, 'databaseConnectionStrings.set(\n    "ext-db"');
     assertStringIncludes(output, '(External)');
   });
 

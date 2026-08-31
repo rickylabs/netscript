@@ -59,6 +59,7 @@ describe('generateDbCliMode', () => {
     });
 
     assertStringIncludes(output, "'postgres': {");
+    assertStringIncludes(output, "mode: 'Container'");
     assertStringIncludes(output, "envKey: 'POSTGRES_URI'");
     assertStringIncludes(output, "taskSuffix: 'postgres'");
     assertStringIncludes(
@@ -72,6 +73,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "envKey: 'MSSQL_URI'");
     assertStringIncludes(output, "taskSuffix: 'mssql'");
     assertStringIncludes(output, "'sqlite': {");
+    assertStringIncludes(output, "mode: 'External'");
     assertStringIncludes(output, "envKey: 'SQLITE_URI'");
     assertStringIncludes(output, "taskSuffix: 'sqlite'");
     assertStringIncludes(output, 'let resource = await builder.addExecutable(');
@@ -123,7 +125,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "const child = spawn(\n    'deno'");
   });
 
-  it('resolves typed commands from the allocated database resource expression', () => {
+  it('retains the configuration resolver only for External typed commands', () => {
     const output = generateDbCliMode({ databases: {} });
 
     assertStringIncludes(
@@ -133,6 +135,31 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, 'databaseUrl = await resolveConnectionString()');
     assertStringIncludes(output, 'target.configKey,');
     assert(!output.includes('builder.getConfiguration().getConnectionString('));
+  });
+
+  it('runs Container typed commands through the graph-injected executable resource', () => {
+    const output = generateDbCliMode({ databases: {} });
+
+    assertStringIncludes(
+      output,
+      "if (target.mode === 'Container' && target.engine !== 'Sqlite')",
+    );
+    assertStringIncludes(output, 'return await executeDbCliResource(');
+    assertStringIncludes(output, "const child = spawn(\n      'aspire'");
+    assertStringIncludes(
+      output,
+      "'resource',\n        `${target.configKey}-cli`,\n        'start'",
+    );
+    const resultRead = output.indexOf('const result = await readDbCliResult(resultPath);');
+    const nonzeroFallback = output.indexOf('if (startExitCode !== 0)');
+    assert(resultRead !== -1);
+    assert(nonzeroFallback !== -1);
+    assert(resultRead < nonzeroFallback);
+    assertStringIncludes(output, ".withEnvironment('DATABASE_URL', target.resource)");
+    assertStringIncludes(output, '.withReference(target.resource)');
+    assertStringIncludes(output, '.waitFor(target.resource)');
+    assert(!output.includes('connectionStringExpression()'));
+    assert(!output.includes('.getValue()'));
   });
 
   it('rejects reset without confirmation before resolving or invoking runtime IO', () => {

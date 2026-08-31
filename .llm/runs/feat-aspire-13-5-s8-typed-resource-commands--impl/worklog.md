@@ -467,3 +467,51 @@ in `d224-actionable-stderr-bound.md`.
 
 PLAN-EVAL remained N/A and no evaluator was dispatched. No runtime, Aspire, Docker, AppHost, or
 `e2e:cli` command ran. The supervisor owns the separate delta IMPL-EVAL after push.
+
+## D-231 implementation evidence — graph-injected Container commands
+
+PLAN-EVAL is N/A under the owner-supplied mechanism, acceptance coverage, no-runtime boundary, and
+push contract. This implementation session did not dispatch or claim IMPL-EVAL.
+
+Primary-source and workflow evidence:
+
+- Aspire 13.5.3 `ReferenceExpression.getValue()` exists at `Resources/base.mts:149` but invokes
+  `Aspire.Hosting.ApplicationModel/getValue` at line 160. Run `33447847678` rejects that exact
+  capability at runtime.
+- The generated 13.5.3 `ExecuteCommandContext` only exposes `services`, `resourceName`,
+  `cancellationToken`, `logger`, and `arguments`; no supported callback-time connection-string
+  mechanism was found.
+- The existing graph-injected `<db>-cli` executable uses `withEnvironment(..., target.resource)`,
+  `withReference`, and `waitFor`. The same runtime path already carries init/migrate/generate past
+  database setup in the cited workflow, so it is runtime evidence rather than declaration-only
+  evidence.
+
+RED was captured before the product fix with the structured test wrapper: exit 1, 30 passed and 6
+failed. The failures included `compile-clean Container emission must not call an unsupported
+runtime capability` and `Container commands must consume Aspire graph-injected environment instead
+of a callback resolver`. The baseline lacked the Container mode/resource-start branch and still
+emitted `getValue()`.
+
+Implementation removes the Container resolver from infrastructure registration, carries the
+configured mode into the typed target, stages a request, and invokes `aspire resource <db>-cli
+start`. The existing executable receives the allocated URL from Aspire's graph injection. The
+runner atomically writes a bounded result after the task; the callback reads that result before a
+generic nonzero-start fallback, preserving D-224 detail on exit 16. External and SQLite retain
+their configuration and file-URL paths respectively.
+
+Static verification:
+
+| Command/gate | Exit/result |
+| --- | --- |
+| focused helper tests, including expanded D-227 compile test | 0; 256 passed, 0 failed |
+| `gen:assets-barrel` | 0; regenerated only the intended embedded template entry |
+| scoped structured check (`--unstable-kv`) | 0; 7 files, 1 batch, `failedBatches: 0` |
+| scoped structured lint | 0; 7 selected/processed, no dropped files or findings |
+| scoped structured fmt | 0; 6/6 semicolon-policy files and 1/1 generator-policy file |
+| `quality:gate` | 0; scanner findings 0, doctrine `FAIL=0` with existing warnings |
+| repository structured check | 0; 2,986 files / 25 batches, `failedBatches: 0` |
+
+`check:assets-barrel`, commit SHA, remote fast-forward comparison, push read-back, and clean-tree
+evidence are recorded in the final D-231 receipt after committing. No Aspire, Docker, AppHost,
+`e2e:cli`, or runtime command ran. No PR base, labels, lifecycle state, S9/S10 scope, or dependency
+surface changed.

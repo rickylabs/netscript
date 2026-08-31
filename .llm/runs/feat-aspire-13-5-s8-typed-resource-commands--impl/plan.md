@@ -173,3 +173,54 @@ separate IMPL-EVAL responsibility and this session will not dispatch or claim it
   existing semantic generator assertions and D-224 tests alongside the compile regression.
 - Deferred: runtime confirmation of `database.seed`, PR base/lifecycle/labels, rebase, S9/S10 work,
   and formal IMPL-EVAL dispatch.
+
+## D-231 graph-injected typed-command repair
+
+PLAN-EVAL is N/A: the owner supplied the decisive runtime error, the supported prior mechanism,
+the required negative/static coverage, the exact verification set, and the no-runtime/push
+contract. The change is a bounded correction inside the existing Archetype-6 generated command
+edge. No architecture or public-surface decision remains open, and this session will neither
+dispatch nor claim IMPL-EVAL.
+
+### Locked decisions
+
+- Container databases do not resolve a connection string inside a typed-command callback. The
+  callback stages the operation request and starts the already-declared `<db>-cli` executable; its
+  graph-construction-time `.withEnvironment(..., target.resource)`, `.withReference(...)`, and
+  `.waitFor(...)` annotations remain the sole Container connection-string mechanism.
+- The emitted runner writes one bounded result record after the graph-injected child finishes so
+  the typed command can return the real task result. It reuses D-224's bounded actionable stderr;
+  it does not add another unbounded capture.
+- External mode retains its explicit `builder.getConfiguration().getConnectionString(...)`
+  resolver. SQLite retains its `file:./...` URL and direct typed-command child path.
+- Do not call `ReferenceExpression.getValue()`, `getValueAsync()`, or another guessed capability.
+  The 13.5.3 command context exposes no supported connection-string accessor.
+
+### Open-decision sweep
+
+- No must-resolve decisions remain. Runtime execution is intentionally deferred to CI by the
+  owner's no-runtime constraint.
+
+### Slice and proving gates
+
+1. Extend the D-227 emitted-helper regression and focused generator assertions so Container output
+   rejects in-callback resource-expression resolution and requires the graph-injected executable
+   path; run against `a2b227941` and retain the failing result as RED proof.
+2. Remove Container resolver emission, carry database mode into the typed target, stage/start the
+   explicit resource for Container commands, and persist a bounded runner result. Preserve External,
+   SQLite, D-224, and the typed command arguments/result surface.
+3. Regenerate the asset barrel; run focused tests, the existing emitted-helper compile test,
+   scoped structured check/lint/fmt, `quality:gate`, repo-wide `deno task check`, and diff-clean
+   `check:assets-barrel`. Commit only owned files, compare the exact remote ref immediately before
+   push, and push only if fast-forward.
+
+### Risk register and deferred scope
+
+- Risk: staging a request without a completion record can produce a false success. Mitigation: the
+  graph-injected runner atomically writes the bounded result only after the task finishes, and the
+  callback waits for that record within the requested timeout budget.
+- Risk: the repair weakens D-224 diagnostics. Mitigation: the result message is derived from the
+  existing bounded `actionableStderr` array and its 16-KiB cap.
+- Risk: External or SQLite behavior drifts. Mitigation: focused assertions retain the configuration
+  lookup and file URL independently of the Container branch.
+- Deferred: runtime execution, PR base/lifecycle/labels, rebase, S9/S10 work, and formal IMPL-EVAL.

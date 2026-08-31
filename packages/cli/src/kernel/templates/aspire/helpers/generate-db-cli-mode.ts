@@ -21,6 +21,7 @@ export function generateDbCliMode(options: DbCliModeOptions): string {
       databaseName: '${databaseName}',
       envKey: '${toEnvPrefix(name)}_URI',
       engine: '${entry.Engine}',
+      mode: '${entry.Mode ?? 'Container'}',
       taskSuffix: '${engineTaskSuffix(entry.Engine)}',
       workdir: resolve(appHostDir, 'database', '${engineDir(entry.Engine)}'),
       resource: infrastructure.databases.get('${name}') ?? null,
