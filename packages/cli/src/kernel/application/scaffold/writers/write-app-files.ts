@@ -63,6 +63,7 @@ export async function writeNormalizedAppFiles(
     appDesignTokensViewTemplate,
     appExamplesIndexRouteTemplate,
     appExamplesViewTemplate,
+    appOrderExampleRouteTemplate,
     appHealthRouteTemplate,
     appHealthSharedTemplate,
     appHealthViewTemplate,
@@ -90,6 +91,7 @@ export async function writeNormalizedAppFiles(
 
   const routesDir = join(appDir, 'routes');
   const examplesRoutesDir = join(routesDir, 'examples');
+  const orderRoutesDir = join(examplesRoutesDir, 'orders');
   const routeComponentsDir = join(routesDir, '(_components)');
   const routeSharedDir = join(routesDir, '(_shared)');
   const designGroupDir = join(routesDir, '(design)');
@@ -134,6 +136,7 @@ export async function writeNormalizedAppFiles(
 
   await createDir(routesDir);
   await createDir(examplesRoutesDir);
+  await createDir(orderRoutesDir);
   await createDir(routeComponentsDir);
   await createDir(routeSharedDir);
   await createDir(designGroupDir);
@@ -278,6 +281,10 @@ export async function writeNormalizedAppFiles(
   await write(
     join(examplesRoutesDir, 'crud.tsx'),
     await context.templateAdapter.render(appCrudExampleRouteTemplate, appTemplateVars),
+  );
+  await write(
+    join(orderRoutesDir, '[id].tsx'),
+    await context.templateAdapter.render(appOrderExampleRouteTemplate, appTemplateVars),
   );
   await write(
     join(examplesComponentsDir, 'crud-view.tsx'),

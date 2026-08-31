@@ -114,6 +114,7 @@ Deno.test('public init emits resolvable app conventions with and without the exa
     for (
       const retainedRoute of [
         join('routes', 'examples', 'crud.tsx'),
+        join('routes', 'examples', 'orders', '[id].tsx'),
         join('routes', 'examples', 'telemetry', 'index.tsx'),
         join('routes', 'examples', 'users', 'index.tsx'),
       ]

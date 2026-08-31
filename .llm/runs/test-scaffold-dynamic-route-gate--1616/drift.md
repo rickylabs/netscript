@@ -28,3 +28,10 @@ boundary, and no-workflow ruling are unchanged.
 The first focused authoring attempt exposed closed-union comparison type errors and was discarded.
 The recorded RED widens observed identifiers to strings, compiles, and fails only on the locked
 semantic absences. No scope, file-plan, doctrine, or gate-boundary drift occurred.
+
+## 2026-08-31 — S2 scaffold GREEN (none)
+
+The scaffold implementation follows the locked product-seed decision and file plan. The parity
+test compares imported generator and seed subtrees rather than source quote/comma formatting; it
+asserts exact pattern, routePattern, metadata id/kind, and nonce href equality. This is the planned
+semantic subtree equality, not a scope or contract change.

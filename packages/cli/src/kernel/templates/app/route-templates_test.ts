@@ -36,6 +36,7 @@ import {
   appExampleServiceRouteContractTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
+  appOrderExampleRouteTemplate,
   appHealthRouteTemplate,
   appHealthSharedTemplate,
   appHealthViewTemplate,
@@ -146,7 +147,20 @@ describe('app route template rendering', () => {
       'dynamic order route template must be registered',
     );
     assertStringIncludes(router, 'order: generatedRoutes.examples.orders.$id.$route,');
-    assertStringIncludes(examples, "appRoutes.order.href({ id: 'order-42' })");
+    assertStringIncludes(examples, "appRoutes.order.href({ path: { id: 'order-42' } })");
+  });
+
+  it('dynamic order route binds inferred ctx.path and derives its self href from that value', () => {
+    const route = appOrderExampleRouteTemplate;
+
+    assertStringIncludes(route, '.withRoute(appRoutes.order)');
+    assertStringIncludes(route, 'const id: string = ctx.path.id;');
+    assertStringIncludes(route, 'const selfHref = ctx.route.href({ path: { id } });');
+    assertStringIncludes(route, 'data-order-id={id}');
+    assertStringIncludes(route, 'href={selfHref}');
+    assert(!route.includes('ctx.params'));
+    assert(!route.includes('ctx.url'));
+    assert(!route.includes('order-42'));
   });
 
   it('rejects duplicate direct appRoutes targets', async () => {

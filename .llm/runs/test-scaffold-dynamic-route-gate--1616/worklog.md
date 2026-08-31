@@ -35,6 +35,7 @@ the lease. Detailed files, constants, order, gates, and deferred scope are locke
 | 2026-08-31 | Plan amendment 2 | Locked | Added element-scoped nonce markers, both Fresh request modes, generator-derived seed parity, exact pre-browser order, semantic-only RED, and measured Gate 7 evidence. |
 | 2026-08-31 | PLAN-EVAL 2 | `PASS_PLAN` | Separate OpenRouter Qwen 3.8 Flash evaluator, attested `xhigh`, authorized implementation with all seven locks enforced. |
 | 2026-08-31 | S1 RED | Semantic failure | Focused wrapper compiled: 72 passed / 7 failed; filtered conventions wrapper compiled: 0 passed / 1 failed. Failures are missing dynamic seed/asset/gate/catalog/convention behavior plus valid-response rejection; href-only, id-only, and HTTP-500 negatives pass. |
+| 2026-08-31 | S2 GREEN | Scaffold surface | Added the product-owned `[id].tsx` route, generator-compatible seeds, stable router alias, `order-42` examples link, canonical/retained references, and regenerated embedded assets. Focused tests 39/39 plus convention 1/1; scoped check zero diagnostics; asset barrel current. |
 
 ## Decisions
 
@@ -67,6 +68,10 @@ though default scaffold output does not. See `drift.md`; scope is unchanged.
 - S1 RED: `run-deno-test.ts` over five focused scaffold/E2E test files: exit 1; 72 passed,
   7 failed, 0 ignored. Filtered convention contract: exit 1; 0 passed, 1 failed, 0 ignored.
   Receipts: `receipts/s1-red-focused.json`, `receipts/s1-red-conventions.json`.
+- S2 scaffold GREEN: focused writer/template/asset tests exit 0, 39 passed; filtered convention
+  test exit 0, 1 passed; scoped check selected 9 files in 1 batch with 0 diagnostics;
+  `deno task check:assets-barrel` exit 0. Receipts: `receipts/s2-scaffold-green.json`,
+  `receipts/s2-conventions-green.json`, `receipts/s2-scaffold-check.json`.
 
 ## Handoff Notes
 

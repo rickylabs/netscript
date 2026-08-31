@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `test-scaffold-dynamic-route-gate--1616` |
 | Branch | `test/scaffold-dynamic-route-gate` |
-| Current phase | `implementation — S1 RED` |
+| Current phase | `implementation — S2 scaffold GREEN` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Cycle-2 PLAN-EVAL returned `PASS_PLAN`. S1 is a compilable semantic RED against unchanged scaffold
-behavior; no expensive runtime gate has run.
+Cycle-2 PLAN-EVAL returned `PASS_PLAN`. S1 RED is committed separately and S2 now makes the
+product scaffold contract green; no expensive runtime gate has run.
 
 ## Completed
 
@@ -26,17 +26,20 @@ behavior; no expensive runtime gate has run.
 - Added the typed dynamic-response validator seam and focused tests without changing scaffold
   behavior, gate registration, or catalog order.
 - Captured S1 RED receipts: 72 passed / 7 failed plus the filtered convention failure.
+- Emitted `routes/examples/orders/[id].tsx`, seeded the exact generator-compatible route tree,
+  exposed its generated reference through `appRoutes.order`, and linked `order-42` from examples.
+- Proved seed/generator equality, template use of `ctx.path.id`, bound href derivation, and absence
+  of `ctx.params`, `ctx.url`, or a literal fallback.
 
 ## In Progress
 
-- Commit and push S1 RED alone before beginning scaffold GREEN.
+- Commit and push S2 scaffold GREEN before implementing the runtime gate.
 
 ## Next Steps
 
-1. Implement S2 scaffold GREEN against the committed RED.
-2. Implement S3 runtime-gate GREEN and exact catalog order.
-3. Run lease-free hardening; keep scaffold.runtime `NOT_RUN — lease required`.
-4. Stop for separately dispatched IMPL-EVAL.
+1. Implement S3 runtime-gate GREEN and exact catalog order.
+2. Run lease-free hardening; keep scaffold.runtime `NOT_RUN — lease required`.
+3. Stop for separately dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -56,10 +59,10 @@ behavior; no expensive runtime gate has run.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | RED | 72 passed / 7 semantic failures; filtered convention test 1 semantic failure. |
+| Static | PARTIAL_GREEN | Scaffold tests 39/39, convention 1/1, scoped check clean. Runtime RED remains. |
 | Fitness | NOT_RUN | Planned after implementation. |
 | Runtime | LEASE_BLOCKED | Explicit owner boundary; no lease held. |
-| Consumer | RED | Default seed/template/catalog lack the locked dynamic route behavior. |
+| Consumer | GREEN | Default seed/template now own the dynamic route; live composition remains leased. |
 
 ## Open Questions
 
