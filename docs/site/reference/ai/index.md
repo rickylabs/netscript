@@ -24,7 +24,7 @@ import { getModel } from "@netscript/ai";
 const handle = await getModel("anthropic:claude-sonnet-4-5");
 ```
 
-## Export map
+## Exports
 
 The package publishes the following entrypoints. Each is documented against its own `deno doc`
 surface.
@@ -34,6 +34,7 @@ surface.
 | `@netscript/ai` | `./mod.ts` | Composition root (`createAiRuntime` / `getAiRuntime`) and the model registry accessors. |
 | `@netscript/ai/contracts` | `./src/contracts/mod.ts` | Domain vocabulary: messages, content parts, model identity, agent chunks, usage, errors. |
 | `@netscript/ai/ports` | `./src/ports/mod.ts` | Capability port interfaces, their no-op/unconfigured defaults, and the provider registries. |
+| `@netscript/ai/skills` | `./src/skills/mod.ts` | Validated Agent Skills parsing, loading, tag and semantic matching, and an in-memory content source. |
 | `@netscript/ai/anthropic` | `./anthropic.ts` | Anthropic model provider (wraps `@tanstack/ai-anthropic`). |
 | `@netscript/ai/openai-compatible` | `./openai-compatible.ts` | OpenAI-compatible model provider (any base URL / key / model list). |
 | `@netscript/ai/openrouter` | `./openrouter.ts` | OpenRouter model provider with reasoning-effort passthrough. |

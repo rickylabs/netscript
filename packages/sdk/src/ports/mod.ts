@@ -37,9 +37,28 @@ export type {
   ProcedureOutput,
   QueryFactory,
 } from './query-factory.ts';
-export type { QueryKey, QueryKeyPart } from './query-key.ts';
+export type {
+  ActionQueryKey,
+  QueryKey,
+  QueryKeyPart,
+  SdkClientServerKeySuffix,
+} from './query-key.ts';
 export { createActionQueryKey, serializeQueryKeyInput } from './query-key.ts';
 export type { CacheQueryOptions, QueryParams } from './query-options.ts';
+export type {
+  SdkClientCachePartitionOptions,
+  SdkClientContextDeclaration,
+  SdkClientContribution,
+  SdkClientContributionContext,
+  SdkClientContributionId,
+  SdkClientContributionProtocol,
+  SdkClientPrepareOptions,
+  SdkClientProcedureDescriptor,
+  SdkClientRequestPatch,
+  SdkClientResponseCache,
+  SdkClientTransportDescriptor,
+  ValidateSdkClientContributions,
+} from './sdk-client-contribution.ts';
 export type {
   QueryClientFetchOptions,
   QueryClientFilters,
@@ -93,4 +112,5 @@ export type {
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
+  ServiceRequestRest,
 } from './service-client.ts';

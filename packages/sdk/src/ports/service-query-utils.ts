@@ -10,6 +10,7 @@ import type {
   ProcedureInputFromNode,
   ProcedureOutputFromNode,
   ServiceClientMethod,
+  ServiceRequestRest,
 } from './service-client.ts';
 
 /** Operation kinds accepted by service query utility keys. */
@@ -29,8 +30,10 @@ export type ServicePartialInput<TInput> = unknown extends TInput ? unknown
   : TInput extends object ? { readonly [K in keyof TInput]?: ServicePartialInput<TInput[K]> }
   : TInput;
 
-/** Empty oRPC client context used by SDK-created service clients. */
-export type ServiceQueryClientContext = Record<never, never>;
+/** Client context forwarded by SDK-created service query utilities. */
+export type ServiceQueryClientContext<
+  TContext extends object = Record<never, never>,
+> = TContext;
 
 /** Partial matching-key options accepted at router or procedure levels. */
 export interface ServiceOperationKeyOptions<
@@ -55,7 +58,10 @@ export type ServiceOperationKey<
 ];
 
 /** Query-key options for a single service procedure. */
-export type ServiceQueryKeyOptions<TInput> =
+export type ServiceQueryKeyOptions<
+  TInput,
+  TContext extends object = Record<never, never>,
+> =
   & (undefined extends TInput ? {
       /** Procedure input included in the full query key. */
       input?: TInput;
@@ -67,12 +73,14 @@ export type ServiceQueryKeyOptions<TInput> =
   & {
     /** Additional key segments appended to the generated key. */
     queryKey?: readonly unknown[];
-  };
+  }
+  & NonNullable<ServiceRequestRest<TContext>[0]>;
 
 /** Query options accepted by a service procedure utility. */
-export type ServiceProcedureQueryOptions<TInput> = ServiceQueryKeyOptions<TInput> & {
-  /** Empty oRPC client context forwarded to the procedure call. */
-  context?: ServiceQueryClientContext;
+export type ServiceProcedureQueryOptions<
+  TInput,
+  TContext extends object = Record<never, never>,
+> = ServiceQueryKeyOptions<TInput, TContext> & {
   /** Whether the query should run. */
   enabled?: boolean;
   /** Cache freshness window in milliseconds. */
@@ -92,18 +100,22 @@ export interface ServiceProcedureQueryResult<TOutput> {
 }
 
 /** Infinite-query options accepted by a service procedure utility. */
-export interface ServiceProcedureInfiniteOptions<TInput, TPageParam = unknown> {
-  /** Input factory for each page parameter. */
-  input: (pageParam: TPageParam) => TInput;
-  /** Initial page parameter passed to the first query function call. */
-  initialPageParam: TPageParam;
-  /** Empty oRPC client context forwarded to the procedure call. */
-  context?: ServiceQueryClientContext;
-  /** Additional key segments appended to the generated key. */
-  queryKey?: readonly unknown[];
-  /** Whether the query should run. */
-  enabled?: boolean;
-}
+export type ServiceProcedureInfiniteOptions<
+  TInput,
+  TPageParam = unknown,
+  TContext extends object = Record<never, never>,
+> =
+  & {
+    /** Input factory for each page parameter. */
+    input: (pageParam: TPageParam) => TInput;
+    /** Initial page parameter passed to the first query function call. */
+    initialPageParam: TPageParam;
+    /** Additional key segments appended to the generated key. */
+    queryKey?: readonly unknown[];
+    /** Whether the query should run. */
+    enabled?: boolean;
+  }
+  & NonNullable<ServiceRequestRest<TContext>[0]>;
 
 /** Infinite-query options returned by a service procedure utility. */
 export interface ServiceProcedureInfiniteResult<TOutput, TPageParam = unknown> {
@@ -116,23 +128,28 @@ export interface ServiceProcedureInfiniteResult<TOutput, TPageParam = unknown> {
 }
 
 /** Mutation options accepted by a service procedure utility. */
-export interface ServiceProcedureMutationOptions<TInput, TOutput, TMutationContext = unknown> {
-  /** Empty oRPC client context forwarded to the procedure call. */
-  context?: ServiceQueryClientContext;
-  /** Optional mutation key override. */
-  mutationKey?: readonly unknown[];
-  /** Success callback from TanStack Query mutation options. */
-  onSuccess?: (data: TOutput, variables: TInput, context: TMutationContext) => void;
-  /** Error callback from TanStack Query mutation options. */
-  onError?: (error: unknown, variables: TInput, context: TMutationContext | undefined) => void;
-  /** Settled callback from TanStack Query mutation options. */
-  onSettled?: (
-    data: TOutput | undefined,
-    error: unknown | null,
-    variables: TInput,
-    context: TMutationContext | undefined,
-  ) => void;
-}
+export type ServiceProcedureMutationOptions<
+  TInput,
+  TOutput,
+  TMutationContext = unknown,
+  TContext extends object = Record<never, never>,
+> =
+  & {
+    /** Optional mutation key override. */
+    mutationKey?: readonly unknown[];
+    /** Success callback from TanStack Query mutation options. */
+    onSuccess?: (data: TOutput, variables: TInput, context: TMutationContext) => void;
+    /** Error callback from TanStack Query mutation options. */
+    onError?: (error: unknown, variables: TInput, context: TMutationContext | undefined) => void;
+    /** Settled callback from TanStack Query mutation options. */
+    onSettled?: (
+      data: TOutput | undefined,
+      error: unknown | null,
+      variables: TInput,
+      context: TMutationContext | undefined,
+    ) => void;
+  }
+  & NonNullable<ServiceRequestRest<TContext>[0]>;
 
 /** Mutation options returned by a service procedure utility. */
 export interface ServiceProcedureMutationResult<TInput, TOutput, TMutationContext = unknown> {
@@ -143,7 +160,10 @@ export interface ServiceProcedureMutationResult<TInput, TOutput, TMutationContex
 }
 
 /** Streamed-query options accepted by a service procedure utility. */
-export type ServiceProcedureStreamedOptions<TInput> = ServiceProcedureQueryOptions<TInput> & {
+export type ServiceProcedureStreamedOptions<
+  TInput,
+  TContext extends object = Record<never, never>,
+> = ServiceProcedureQueryOptions<TInput, TContext> & {
   /** Streamed-query function options. */
   queryFnOptions?: ServiceStreamedKeyOptions;
 };
@@ -160,62 +180,94 @@ export type ServiceProcedureStreamedResult<TOutput> = ServiceProcedureQueryResul
 
 /** Optional or required single-option tuple based on procedure input optionality. */
 export type ServiceOptionalInputRest<TInput, TOptions> = undefined extends TInput
-  ? [options?: TOptions]
+  ? Record<never, never> extends TOptions ? [options?: TOptions]
+  : [options: TOptions]
   : [options: TOptions];
 
 /** TanStack Query utilities for one service procedure. */
-export interface ServiceProcedureQueryUtils<TInput, TOutput> {
+export interface ServiceProcedureQueryUtils<
+  TInput,
+  TOutput,
+  TContext extends object = Record<never, never>,
+> {
   /** Direct service-client method for the procedure. */
-  readonly call: ServiceClientMethod<TInput, TOutput>;
+  readonly call: ServiceClientMethod<TInput, TOutput, Error, TContext>;
   /** Generate a partial matching key for this procedure. */
   key<TType extends ServiceOperationType>(
     options?: ServiceOperationKeyOptions<TInput, TType>,
   ): ServiceOperationKey<TInput, TType>;
   /** Generate a full query key for this procedure. */
   queryKey(
-    ...options: ServiceOptionalInputRest<TInput, ServiceQueryKeyOptions<TInput>>
+    ...options: ServiceOptionalInputRest<TInput, ServiceQueryKeyOptions<TInput, TContext>>
   ): readonly unknown[];
   /** Generate TanStack Query options for this procedure. */
   queryOptions(
-    ...options: ServiceOptionalInputRest<TInput, ServiceProcedureQueryOptions<TInput>>
+    ...options: ServiceOptionalInputRest<
+      TInput,
+      ServiceProcedureQueryOptions<TInput, TContext>
+    >
   ): ServiceProcedureQueryResult<TOutput>;
   /** Generate a full streamed-query key for this procedure. */
   experimental_streamedKey(
-    ...options: ServiceOptionalInputRest<TInput, ServiceProcedureStreamedOptions<TInput>>
+    ...options: ServiceOptionalInputRest<
+      TInput,
+      ServiceProcedureStreamedOptions<TInput, TContext>
+    >
   ): readonly unknown[];
   /** Generate TanStack streamed-query options for this procedure. */
   experimental_streamedOptions(
-    ...options: ServiceOptionalInputRest<TInput, ServiceProcedureStreamedOptions<TInput>>
+    ...options: ServiceOptionalInputRest<
+      TInput,
+      ServiceProcedureStreamedOptions<TInput, TContext>
+    >
   ): ServiceProcedureStreamedResult<TOutput>;
   /** Generate a full live-query key for this procedure. */
   experimental_liveKey(
-    ...options: ServiceOptionalInputRest<TInput, ServiceQueryKeyOptions<TInput>>
+    ...options: ServiceOptionalInputRest<TInput, ServiceQueryKeyOptions<TInput, TContext>>
   ): readonly unknown[];
   /** Generate TanStack live-query options for this procedure. */
   experimental_liveOptions(
-    ...options: ServiceOptionalInputRest<TInput, ServiceProcedureQueryOptions<TInput>>
+    ...options: ServiceOptionalInputRest<
+      TInput,
+      ServiceProcedureQueryOptions<TInput, TContext>
+    >
   ): ServiceProcedureLiveResult<TOutput>;
   /** Generate a full infinite-query key for this procedure. */
   infiniteKey<TPageParam>(
-    options: ServiceProcedureInfiniteOptions<TInput, TPageParam>,
+    options: ServiceProcedureInfiniteOptions<TInput, TPageParam, TContext>,
   ): readonly unknown[];
   /** Generate TanStack infinite-query options for this procedure. */
   infiniteOptions<TPageParam>(
-    options: ServiceProcedureInfiniteOptions<TInput, TPageParam>,
+    options: ServiceProcedureInfiniteOptions<TInput, TPageParam, TContext>,
   ): ServiceProcedureInfiniteResult<TOutput, TPageParam>;
   /** Generate a full mutation key for this procedure. */
   mutationKey(options?: { mutationKey?: readonly unknown[] }): readonly unknown[];
   /** Generate TanStack mutation options for this procedure. */
   mutationOptions<TMutationContext = unknown>(
-    options?: ServiceProcedureMutationOptions<TInput, TOutput, TMutationContext>,
+    ...options: ServiceRequestRest<TContext> extends [options?: infer TOptions] ? [
+        options?:
+          & ServiceProcedureMutationOptions<
+            TInput,
+            TOutput,
+            TMutationContext,
+            TContext
+          >
+          & TOptions,
+      ]
+      : [
+        options: ServiceProcedureMutationOptions<TInput, TOutput, TMutationContext, TContext>,
+      ]
   ): ServiceProcedureMutationResult<TInput, TOutput, TMutationContext>;
 }
 
 /** TanStack Query utilities derived from a service contract. */
-export type ServiceQueryUtils<TContract extends ContractLike> = TContract extends
-  ContractProcedureLike ? ServiceProcedureQueryUtils<
+export type ServiceQueryUtils<
+  TContract extends ContractLike,
+  TContext extends object = Record<never, never>,
+> = TContract extends ContractProcedureLike ? ServiceProcedureQueryUtils<
     ProcedureInputFromNode<TContract>,
-    ProcedureOutputFromNode<TContract>
+    ProcedureOutputFromNode<TContract>,
+    TContext
   >
   :
     & {
@@ -225,6 +277,7 @@ export type ServiceQueryUtils<TContract extends ContractLike> = TContract extend
       ): ServiceOperationKey<unknown, TType>;
     }
     & {
-      [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceQueryUtils<TContract[K]>
+      [K in keyof TContract]: TContract[K] extends ContractLike
+        ? ServiceQueryUtils<TContract[K], TContext>
         : never;
     };
