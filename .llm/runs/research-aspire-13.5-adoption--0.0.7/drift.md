@@ -4974,3 +4974,30 @@
   - I had queued garnet as a possible systematic defect; the natural experiment says otherwise, and
     the honest move is to record the counter-evidence in #1844 rather than let a p1 issue stand on a
     single unreproduced timeout.
+
+- **D-210 — S8 convergence onto exact current `main` `6c195acaf` dispatched. Proceeding on the natural
+  experiment rather than the artifact read, and saying so.**
+  - The coordinator conditioned convergence on "the artifact diagnosis". The S8 diagnosis thread
+    completed **without writing findings** (only the brief and `codex-thread-ids.md` untracked, head
+    unmoved), so the Prisma `code`/`meta` is still unread.
+  - **I am treating the D-209 natural experiment as satisfying that condition, deliberately and on the
+    record.** Four heads, perfect correlation with branch base, and a **fully green** run at a newer
+    base is direct experimental confirmation of the remedy — stronger evidence than a Prisma code
+    lookup, which would only have named the mechanism. The instruction was also "do not wait for
+    another ruling". If the coordinator wants the mechanism named regardless, that is a cheap
+    follow-up and does not gate convergence.
+  - **Useful corroboration found in S8's own history while checking:** an earlier coordinator proof
+    run (`33330455111`/`99308020561`) *already* hit `database.seed` exit 16 — this failure predates
+    every current head, which is exactly what a stale-base cause predicts and what an
+    S8-introduced cause does not.
+  - **The brief demands a blob-identity table**, not just a range-diff: `git rev-parse HEAD:<path>` at
+    old and new head for every non-generated `packages/` file the branch touches, with an explicit
+    statement of which blobs are identical. That is the evidence the coordinator's carry rule requires
+    — range-diff `=` is not sufficient for the product surface.
+  - Conflict rules carried verbatim from D-121/D-122: generated files take `main`'s side and are
+    regenerated once; **any non-generated source conflict aborts and reports**; anything touching
+    main's shipped D-101 listener contract, `main` wins. That abort rule has already prevented two bad
+    merges in this programme.
+  - S9 and S10 are explicitly out of scope for this slice — they converge onto **S8's new head**
+    afterwards, and leaving them untouched is what keeps that possible.
+  - Seventh dead-sender orphan released first (`ownerPid 2656141`).
