@@ -1,7 +1,7 @@
 import { resolve } from '@std/path';
 import { commandGate } from '../../src/application/gates/scaffold/gate-factory.ts';
 import { createCleanupGates } from '../../src/application/gates/scaffold/runtime-gates.ts';
-import { PROBE_SERVICE_HEALTH_SCRIPT } from '../../src/application/gates/scaffold/runtime-gates.ts';
+import { PROBE_SERVICE_HEALTH_SCRIPT } from '../../src/application/gates/scaffold/runtime/behavior-scripts.ts';
 import { GATE, GATE_PHASE, QUICKSTART, QUICKSTART_TITLE } from '../../src/domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../src/domain/extension-axes.ts';
 import type { GateDefinition } from '../../src/domain/gate-definition.ts';

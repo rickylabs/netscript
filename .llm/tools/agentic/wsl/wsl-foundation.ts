@@ -202,6 +202,7 @@ export async function installAntigravity(
   });
   const execute = deps.execute ?? ((path: string) => runExternal('bash', [path]));
   const installerPath = `${home}/${OWNED_ROOT}/.agy-install-${crypto.randomUUID()}.sh`;
+  let operationError: unknown;
   try {
     await Deno.writeTextFile(installerPath, await fetchText(installer), {
       createNew: true,
@@ -215,14 +216,14 @@ export async function installAntigravity(
     if (!(await pathExists(`${home}/.local/bin/agy`))) {
       await Deno.remove(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
     }
-    throw error;
-  } finally {
-    try {
-      await Deno.remove(installerPath);
-    } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error;
-    }
+    operationError = error;
   }
+  try {
+    await Deno.remove(installerPath);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound) && operationError === undefined) throw error;
+  }
+  if (operationError !== undefined) throw operationError;
 }
 
 async function legacyGeminiOwnership(home: string): Promise<{
@@ -381,10 +382,12 @@ async function installNode(home: string): Promise<void> {
     try {
       await Deno.remove(archivePath);
     } catch {
+      // Best-effort cleanup after extraction.
     }
     try {
       await Deno.remove(staging, { recursive: true });
     } catch {
+      // Best-effort cleanup after extraction.
     }
   }
 }
@@ -412,6 +415,7 @@ async function ensureSymlink(target: string, link: string): Promise<string | nul
     try {
       await Deno.remove(temporary);
     } catch {
+      // Best-effort cleanup before rethrowing the rename failure.
     }
     throw error;
   }

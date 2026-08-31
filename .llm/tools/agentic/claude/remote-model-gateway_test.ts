@@ -14,7 +14,7 @@ const localBase = `${LOOPBACK_HTTP_PROTOCOL}//${LOOPBACK_HOST}:43123`;
 
 function handler(seen: Request[], response = new Response('ok')) {
   return createRemoteModelGatewayHandler({
-    model: OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+    model: OPENROUTER_MODEL_IDS.implEvaluator,
     openRouterApiKey: credential,
   }, {
     fetch: (request) => {
@@ -45,7 +45,7 @@ Deno.test('exact messages route forces model and isolates OpenRouter authenticat
   assertEquals(seen[0].headers.get('authorization'), `Bearer ${credential}`);
   assertEquals(seen[0].headers.has('x-api-key'), false);
   assertEquals(seen[0].headers.has('x-private-hop'), false);
-  assertEquals((await seen[0].json()).model, OPENROUTER_MODEL_IDS.deepseekV4Flash0731);
+  assertEquals((await seen[0].json()).model, OPENROUTER_MODEL_IDS.implEvaluator);
 });
 
 Deno.test('all non-exact routes preserve Claude OAuth and cannot receive OpenRouter auth', async () => {
