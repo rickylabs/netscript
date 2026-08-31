@@ -6344,3 +6344,29 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   valid only if its own product sources are byte-identical across the merge. Since the advance does
   not touch `.llm/tools/agentic/**` at all, that should hold — but it will be **proven by diffing
   the owned surface across the merge commit**, not assumed from this path analysis.
+
+## D-136 — #1753 RED→GREEN verified; test-blob change investigated and cleared (not a false green)
+
+- #1753 landed two commits: `5f41e90dc` (RED) → `d5bfc9d6c` (GREEN). **Boundary respected exactly**:
+  only `.llm/tools/harness/validate-milestone-cluster{,_test}.ts`, zero touches to
+  `.llm/tools/agentic/**` while #1802 is live there.
+- **RED verified genuine** by checking out the RED commit in a throwaway worktree and running it:
+  `REAL_EXIT=1`, 13 passed / 2 failed — the two failures being exactly the stale-head and
+  missing-leaf conditions the issue names. GREEN: `REAL_EXIT=0`, 19/19.
+- **The test blob changed between RED and GREEN** (`c91dffe45` → `1b07155e6`), which is the
+  signature of the false-green this session has been guarding against. **Investigated rather than
+  accepted or rejected on the signature alone.** It is legitimate:
+  - The RED test necessarily declared **local placeholder types** (`TestLiveMilestonePr`,
+    `TestMilestonePrSource`, `TestReconciliationFinding`) and reached the function through
+    `validateMilestoneCluster as unknown as (...)`, because the real exported types did not exist
+    yet at RED time.
+  - GREEN **deleted those placeholders and imported the now-real types** (`LiveMilestonePr`,
+    `MilestonePrSource`, `milestonePrSourceFromExport`), removing the `as unknown as` cast. That
+    strengthens type coupling rather than weakening it.
+  - **Zero assertions or `Deno.test` blocks were removed** (grep of removed lines for
+    `assert|Deno.test` is empty), and **4 tests were added** (15 → 19 total).
+- Conclusion: green by implementation, with the test file's *type plumbing* — not its assertions —
+  updated to bind to the real surface. Recorded because the blob-hash heuristic alone would have
+  flagged this incorrectly; the heuristic is a prompt to investigate, not a verdict.
+- #1802 Slice 5 RED dispatched in parallel; both leaves remain within their proven-disjoint
+  boundaries.
