@@ -134,3 +134,33 @@ documentation.
   makes explicit scheduled keys child-wins, keeps nested sends keyless while transporting the
   cross-plane ID through separate engine execution context, and restores message trace context only
   for the handler—not for span parenting or correlation precedence.
+
+## D-INT-1 — main-integration drift: stale import from a cross-PR file move (NOT #1368 product scope)
+
+**Discovered:** during the `f309dfb3b` convergence, by CI `check-test` on run `33351053382`.
+
+**Defect.** `packages/cli/e2e/src/application/gates/scaffold/ui-data-screen-gates.ts:5` imported
+`./generated-app-name.ts`, which no longer exists. TS2307, 3 occurrences, 1 unique path — the
+repo-wide `deno task check` gate, red.
+
+**Cause — a semantic conflict between two independently-green PRs.** #1743 *moved*
+`generated-app-name.ts` into `scaffold/runtime/`. #1781 *added* `ui-data-screen-gates.ts` importing
+the pre-move path, and was validated (including a terminal off-host `e2e-cli.yml` SUCCESS) at a head
+that did not yet contain #1743's move. Neither PR was wrong at its own head, and neither PR's CI
+could have caught it: the breakage exists only in the *combination*. Both merged, so **`main` itself
+is red on `deno task check`** — this leaf inherited the failure, it did not introduce it.
+
+**Repair (coordinator-authorized, bounded).** One line: the import now resolves to
+`./runtime/generated-app-name.ts`, matching the three sibling gate files (`runtime-gates.ts`,
+`database-gates.ts`, `ui-ai-gates.ts`) that already use that path. Exported symbol `generatedAppName`
+is unchanged, so this is a path correction with no behavioral change.
+
+**No focused regression test added, deliberately.** The check that fires on the wrong path already
+exists and already fired: repo-wide `deno check` produced the exact TS2307 that found this. A new
+test asserting "this import resolves" would duplicate the compiler with no added coverage. The real
+gap is that two individually-green PRs can be red when combined — a merge-queue/integration concern
+outside this leaf's ceiling, not something a unit test here would catch. Recorded for the coordinator.
+
+**Scope boundary.** Outside #1368's 19-path product ceiling and unrelated to saga span emission or
+correlation. Recorded as main-integration drift; the leaf's own product work is untouched and its
+IMPL-EVAL disposition is unaffected.
