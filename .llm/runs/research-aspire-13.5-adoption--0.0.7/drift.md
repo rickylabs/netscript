@@ -5551,3 +5551,34 @@
     **genuinely emitted** output rather than a hand-written sample.
   - This is S8's **fourth** bounded delta on the branch (seed connection, stderr bound, compile fix),
     each independently evaluated, with the prior PASSes carried forward rather than re-spent.
+
+- **D-230 — S8 compile-fix delta `PASS` at `a2b227941`; one real finding filed as #1851.**
+  - **API verified against the restored SDK, not the compiler's word.** The evaluator ran
+    `aspire restore` itself (CLI `13.5.3+b5f14331`) and read declarations: `base.mts:149`
+    `async getValue(cancellationToken?): Promise<string | null>` on `ReferenceExpression`, and
+    **`getValueAsync` appears 0× in `base.mts`** — its 6 occurrences in `aspire.mts` are all on
+    **`EndpointReference`**, a different type. Corroborated by a byte-scan of the official
+    `Aspire.Hosting.CodeGeneration.TypeScript` 13.5.3 NuGet DLL. So `getValue()` is right, and its
+    `string | null` return makes the null guard **required, not cosmetic**.
+  - Emitted output compiles under the gate's exact invocation (`tsc --noEmit -p
+    aspire/tsconfig.apphost.json` **exit 0**; pre-repair emission **exit 2** with the same TS2339).
+    **Late binding preserved** — both calls stay inside the stored `async () => {…}` invoked at
+    command time; in the real SDK `getValue()` issues a live RPC per call.
+  - **The new static test compiles genuinely emitted output**, is red-without-repair, and the
+    evaluator checked the stub omits exactly what the real SDK omits — *"a careless stub could have
+    hidden that; this one didn't."* Helpers suite **254/254**. Barrel diff-clean;
+    `generated-quality-probes.ts:144` **byte-unchanged**, so the gate was fixed rather than weakened.
+  - **The brief's injection-safety question found a real defect**, which is why it was asked: the new
+    thrown message interpolates the database name **unescaped** — hostile render of `he"said${evil}`
+    emits a literal terminated early by the embedded `"`. The name is unvalidated upstream
+    (`Databases: z.record(z.string(), …)` validates values, not keys).
+    - **Correctly ruled non-blocking**: pre-existing and **file-wide** — siblings like
+      `databases.set('${name}', …)` are equally breakable — so the delta regresses nothing, and its
+      new line is actually *safer* than its siblings for `'`-names.
+    - **Filed as #1851** (`type:fix`, `area:cli`, `area:aspire`, `priority:p2`, milestone 0.0.7) with
+      acceptance requiring the emitted module to **parse** under hostile names, mutation proof, and a
+      check of consumers coupled to the old unescaped shape — the #1837 lesson applied forward.
+    - This closes the same class #1732/#1747 and #1836/#1837 fixed elsewhere; this generator was the
+      remaining one.
+  - S8 now carries **three independently evaluated bounded deltas** on top of a carried base PASS:
+    seed connection (`f29a0b265`), stderr bound (`bbf866d59`), compile fix (`a2b227941`).
