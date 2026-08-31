@@ -1,0 +1,4 @@
+[relay] watching owner=s6-c1f425eb9-sqlite-1 dind=netscript-dind(10.4.12.22) since=2026-08-30T22:47:16.808Z pid=352330
+[relay] garnet-cefrepxs 127.0.0.1:32830 => hopA relay-s6-c1f425eb9-sqlite-1-32830 (10.4.12.22:32830) => hopB 127.0.0.1:32830@ai-agents
+[relay] relay-s6-c1f425eb9-sqlite-1-32830 torn down — upstream port 32830 no longer published
+[relay] cleanup: closed 0 listener(s), removed 0 hop-A container(s)

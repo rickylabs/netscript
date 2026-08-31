@@ -1,0 +1,63 @@
+[
+  {
+    "resource": "garnet",
+    "healthCheckKey": "test_only_garnet_resp",
+    "realHealthCheckKey": "garnet_resp",
+    "baseline": {
+      "testOnly": {
+        "resourceName": "garnet",
+        "healthCheckKey": "test_only_garnet_resp",
+        "status": "Healthy",
+        "description": "RESP listener ready on localhost:18999"
+      },
+      "realBacking": [
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:37291"
+        }
+      ]
+    },
+    "unhealthy": {
+      "resourceName": "garnet",
+      "healthCheckKey": "test_only_garnet_resp",
+      "status": "Unhealthy",
+      "description": "RESP listener unreachable: ECONNREFUSED"
+    },
+    "healthyWaitTimeoutExitCode": 17,
+    "healthyWaitTimeoutDiagnostic": "Timed out waiting for resource 'garnet' to be healthy after 10s.",
+    "recovered": {
+      "resourceName": "garnet",
+      "healthCheckKey": "test_only_garnet_resp",
+      "status": "Healthy",
+      "description": "RESP listener ready on localhost:18999"
+    },
+    "realKeyContinuity": {
+      "duringFailure": [
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:37291"
+        }
+      ],
+      "afterWait": [
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:37291"
+        }
+      ],
+      "afterRecovery": [
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:37291"
+        }
+      ]
+    }
+  }
+]

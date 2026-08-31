@@ -1,0 +1,21 @@
+[0m[32mTask[0m [0m[36me2e:cli[0m deno run --allow-all packages/cli/e2e/cli.ts 'run' 'quickstart.walk' '--smoke-root' '/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart' '--name' 's6-quickstart' '--source' 'jsr' '--cli' 'jsr:@netscript/cli@0.0.6' '--cleanup' '--format' 'pretty' '--report' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s6/phase-b/quickstart-report.json' '--log-file' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s6/phase-b/quickstart-events.ndjson'
+Running quickstart.walk
+> quickstart.1-install-cli: Quickstart step 1/7 — install the published CLI
+  PASSED 3630ms
+> quickstart.2-init-workspace: Quickstart step 2/7 — scaffold the workspace
+  PASSED 1898ms
+> quickstart.3-add-service: Quickstart step 3/7 — add and type-check a service after init
+  PASSED 3544ms
+> quickstart.4-aspire-restore-start: Quickstart step 4/7 — restore and start Aspire (bounded; #1227)
+  PASSED 22868ms
+> quickstart.5-database-workflow: Quickstart step 5/7 — initialize, generate, and seed the database
+  PASSED 22300ms
+> quickstart.6-project-check: Quickstart step 6/7 — run the documented project check
+  PASSED 5384ms
+> quickstart.7-service-response: Quickstart step 7/7 — receive an example service response
+  PASSED 29475ms
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 511ms
+> quickstart.pgdata-integrity-after-teardown: Validate resident Postgres PGDATA after Aspire teardown
+  PASSED 909ms
+Summary: passed=10 failed=0 skipped=0

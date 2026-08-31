@@ -4,14 +4,28 @@ EVALUATE ONLY — do not edit, stage, commit, or push.
 
 ## Worktree (read-only, already checked out)
 
-`/home/agent/projects/netscript/worktrees/007-eval-slot` — detached at `042ff3ca5`.
+`/home/agent/projects/netscript/worktrees/007-eval-slot` — detached at `abe0fd6cc`.
+
+## Re-evaluation context — CYCLE 2
+
+Cycle 1 returned `CHANGES_REQUESTED` on a **HIGH** finding: the docs asserted a `13.4.6` baseline as
+what `netscript init` emits, while the generator pins `13.5.3` — and the slice's worklog recorded a
+verification ("confirmed current head generates 13.4.6 baseline") that had never been performed.
+
+The slice has since been remediated. **Verify on the merits, do not assume:**
+- Do **all** affected surfaces now state 13.5.3 (`explanation/aspire.md`, `deploy-local-aspire.md`,
+  `reference/aspire/index.md`), and do the shown package strings match the pinned constants in
+  `scaffold-aspire.ts` / `scaffold-versions.ts` exactly?
+- Is there anything that would **catch a future drift**, or is correctness still only manual?
+- Was the false worklog claim **corrected with the disproving evidence**, or merely deleted?
+- Are there any *remaining* stale version claims anywhere in this slice's doc surface?
 
 ## Slice
 
-**S9 — PR #1759**, "Skills, corpora, and Aspire MCP alignment with an exact-13.5.3 MCP smoke receipt". `Closes #1721`.
+**S11 — PR #1771**, "Public docs + README refresh for Aspire 13.5". `Closes #1723`.
 
-**This is a STACKED slice.** Its base is **S8 at `bc838a0b3`**, not `main`. Evaluate
-`git diff bc838a0b3..HEAD` only. **Do not fault it for being behind `main`.**
+**This is a STACKED slice.** Its base is **S10 at `c9e3fcbe8`**, not `main`. Evaluate
+`git diff c9e3fcbe8..HEAD` only. **Do not fault it for being behind `main`.**
 
 ## Context you must respect
 

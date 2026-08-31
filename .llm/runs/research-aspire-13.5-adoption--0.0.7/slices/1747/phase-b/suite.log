@@ -1,0 +1,94 @@
+[0m[32mTask[0m [0m[36me2e:cli[0m deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.runtime' '--smoke-root' '/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-lease' '--name' 'leaf-1747-rt' '--db' 'postgres' '--cache' '--cleanup' '--format' 'pretty' '--report' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/1747/phase-b/report.json' '--log-file' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/1747/phase-b/events.ndjson'
+Stale E2E suite lease detected at /ephemeral/tmp/netscript-e2e-scaffold-runtime.lease: holder pid 1248451 is dead (holder-process-dead); removing it.
+Running scaffold.runtime
+> preflight.deno: Deno CLI is available
+  PASSED 6ms
+> preflight.aspire: Aspire CLI is available
+  PASSED 57ms
+> scaffold.init: Scaffold generated project
+  PASSED 989ms
+> scaffold.ui-data-screen: Scaffold a generated Fresh data screen
+  PASSED 283ms
+> scaffold.plugin.worker: Install official worker plugin
+  PASSED 931ms
+> scaffold.plugin.saga: Install official saga plugin
+  PASSED 670ms
+> scaffold.plugin.trigger: Install official trigger plugin
+  PASSED 1200ms
+> scaffold.plugin.stream: Install official stream plugin
+  PASSED 690ms
+> scaffold.plugin.auth: Install official auth plugin
+  PASSED 689ms
+> scaffold.plugin.ai: Install official ai plugin
+  PASSED 765ms
+> scaffold.plugin.ai.mcp: Install official AI plugin with MCP skill tool
+  PASSED 685ms
+> scaffold.plugin.ai.lifecycle: Add and self-wire an AI tool through the plugin CLI
+  PASSED 86ms
+> scaffold.plugin-list: List configured plugins
+  PASSED 2557ms
+> scaffold.plugin.ai.appsettings: Reject synthesized service configuration for the AI plugin
+  PASSED 219ms
+> scaffold.ui-add-ai: Install the Fresh UI AI collection
+  PASSED 282ms
+> scaffold.ui-local-source: Map the unpublished AI dependency to the local workspace member
+  PASSED 224ms
+> generated.runtime-schemas: Generate runtime schemas from all configured plugin modules
+  PASSED 804ms
+> database.codegen: Generate database clients (standalone, no Aspire)
+  PASSED 2678ms
+> behavior.project-boundary-dev: Start the generated Fresh dev server below a hostile parent tsconfig
+  PASSED 13019ms
+> behavior.plugins-unhealthy: Reject missing workers and sagas registries
+  PASSED 1614ms
+> generated.plugins-check: Generate plugin registries from discovered manifests
+  PASSED 986ms
+> generated.workers-registry: Compile workers registry through plugin CLI
+  PASSED 134ms
+> generated.sagas-registry: Generate sagas registry through plugin CLI
+  PASSED 77ms
+> behavior.plugin-doctor-missing-module: Reject a configured plugin whose module has been removed
+  PASSED 3211ms
+> runtime.aspire-restore: Restore Aspire TypeScript SDK
+  PASSED 4390ms
+> runtime.service-env-fixture: Declare service environment and regenerate on the consumer path
+  PASSED 1313ms
+> generated.quality-negative: Prove every generated quality surface with deliberate failures
+  PASSED 44243ms
+> generated.deno-check: Run the generated workspace type-check task
+  PASSED 2646ms
+> generated.deno-lint: Run the generated workspace lint task
+  PASSED 158ms
+> generated.deno-fmt-check: Run the generated workspace format-check task
+  PASSED 254ms
+> generated.ui-ai-check: Type-check copied Fresh UI AI files
+  PASSED 79ms
+> generated.ai-namespace-check: Type-check the complete generated AI namespace
+  PASSED 102ms
+> runtime.auth-smoke-env: Wire auth smoke environment
+  PASSED 1635ms
+> runtime.flow-b-fixture: Wire real Flow-B callback fixture
+  PASSED 1703ms
+> runtime.readiness-fixture: Wire dead-port readiness fixture
+  PASSED 78ms
+> runtime.aspire-start: Start generated Aspire AppHost
+  PASSED 8928ms
+> database.init: Initialize generated database
+  FAILED 599900ms
+    Command exited 1; expected 0.
+    Failed to stop database operation resource netscript-db-postgres: [38;5;9m❌[0m [1;38;5;9mNo AppHost is currently running for 'apphost.mts'. Use 'aspire run' to start it first.[0m
+    [38;5;15m📄[0m See logs at ]8;id=948970673;file:///home/agent/projects/netscript/.aspire/logs/cli_20260831T035706_38ea2ab3.log\/home/agent/projects/netscript/.aspire/logs/cli_20260831T035706_38ea2ab3.log]8;;\
+    Error: aspire resource failed with exit code 1: [2mStarting resource 'netscript-db-postgres'...[0m
+    [38;5;9m❌[0m [1;38;5;9mAn unexpected error occurred: The JSON-RPC connection with the remote party was lost before the request could complete.[0m
+    [38;5;15m📄[0m See logs at ]8;id=529132294;file:///home/agent/projects/netscript/.aspire/logs/cli_20260831T034707_d6149b67.log\/home/agent/projects/netscript/.aspire/logs/cli_20260831T034707_d6149b67.log]8;;\
+    [38;5;12m🔍[0m See AppHost logs at ]8;id=1212852347;file:///home/agent/projects/netscript/.aspire/logs/cli_20260831T034657838_detach-child_33bb4bfb90274ac88d34d8e23ea06ef1.log\/home/agent/projects/netscript/.aspire/logs/cli_20260831T034657838_detach-child_33bb4bfb90274ac88d34d8e23ea06ef1.log]8;;\
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 259ms
+Summary: passed=38 failed=1 skipped=0
+[0m[1m[31merror[0m: Uncaught (in promise) RemoteError: CLI E2E suite failed
+      if (!report.ok) throw new RemoteError(1, 'CLI E2E suite failed');
+[0m[31m                            ^[0m
+    at [0m[1m[3mCommand.<anonymous>[0m ([0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-1747-conv/[0m[0m[36mpackages/cli/e2e/src/presentation/cli/commands/run-command.ts[0m:[0m[33m37[0m:[0m[33m29[0m)
+    at async [0m[1m[3mCommand.execute[0m ([0m[36mhttps://jsr.io/@cliffy/command/1.2.1/command.ts[0m:[0m[33m2431[0m:[0m[33m5[0m)
+    at async [0m[1m[3mCommand.parseCommand[0m ([0m[36mhttps://jsr.io/@cliffy/command/1.2.1/command.ts[0m:[0m[33m2246[0m:[0m[33m14[0m)
+    at async [0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-1747-conv/[0m[0m[36mpackages/cli/e2e/cli.ts[0m:[0m[33m12[0m:[0m[33m3[0m

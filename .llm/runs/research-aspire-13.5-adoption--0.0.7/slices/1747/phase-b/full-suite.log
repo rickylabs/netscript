@@ -1,0 +1,83 @@
+[0m[32mTask[0m [0m[36me2e:cli[0m deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.runtime' '--smoke-root' '/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full' '--name' 'leaf-1747-full' '--db' 'postgres' '--cache' '--cleanup' '--format' 'pretty' '--report' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/1747/phase-b/full-report.json' '--log-file' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/1747/phase-b/full-events.ndjson'
+Running scaffold.runtime
+> preflight.deno: Deno CLI is available
+  PASSED 7ms
+> preflight.aspire: Aspire CLI is available
+  PASSED 48ms
+> scaffold.init: Scaffold generated project
+  PASSED 901ms
+> scaffold.plugin.worker: Install official worker plugin
+  PASSED 942ms
+> scaffold.plugin.saga: Install official saga plugin
+  PASSED 757ms
+> scaffold.plugin.trigger: Install official trigger plugin
+  PASSED 865ms
+> scaffold.plugin.stream: Install official stream plugin
+  PASSED 701ms
+> scaffold.plugin.auth: Install official auth plugin
+  PASSED 695ms
+> scaffold.plugin.ai: Install official ai plugin
+  PASSED 781ms
+> scaffold.plugin.ai.mcp: Install official AI plugin with MCP skill tool
+  PASSED 662ms
+> scaffold.plugin.ai.lifecycle: Add and self-wire an AI tool through the plugin CLI
+  PASSED 86ms
+> scaffold.plugin-list: List configured plugins
+  PASSED 1288ms
+> scaffold.plugin.ai.appsettings: Reject synthesized service configuration for the AI plugin
+  PASSED 224ms
+> scaffold.ui-add-ai: Install the Fresh UI AI collection
+  PASSED 288ms
+> scaffold.ui-local-source: Map the unpublished AI dependency to the local workspace member
+  PASSED 221ms
+> generated.runtime-schemas: Generate runtime schemas from all configured plugin modules
+  PASSED 837ms
+> database.codegen: Generate database clients (standalone, no Aspire)
+  PASSED 3480ms
+> behavior.project-boundary-dev: Start the generated Fresh dev server below a hostile parent tsconfig
+  PASSED 13470ms
+> behavior.plugins-unhealthy: Reject missing workers and sagas registries
+  PASSED 1677ms
+> generated.plugins-check: Generate plugin registries from discovered manifests
+  PASSED 972ms
+> generated.workers-registry: Compile workers registry through plugin CLI
+  PASSED 296ms
+> generated.sagas-registry: Generate sagas registry through plugin CLI
+  PASSED 84ms
+> behavior.plugin-doctor-missing-module: Reject a configured plugin whose module has been removed
+  PASSED 3220ms
+> runtime.aspire-restore: Restore Aspire TypeScript SDK
+  PASSED 4377ms
+> runtime.service-env-fixture: Declare service environment and regenerate on the consumer path
+  PASSED 1501ms
+> generated.quality-negative: Prove every generated quality surface with deliberate failures
+  PASSED 51989ms
+> generated.deno-check: Run the generated workspace type-check task
+  PASSED 2622ms
+> generated.deno-lint: Run the generated workspace lint task
+  PASSED 162ms
+> generated.deno-fmt-check: Run the generated workspace format-check task
+  PASSED 238ms
+> generated.ui-ai-check: Type-check copied Fresh UI AI files
+  PASSED 547ms
+> generated.ai-namespace-check: Type-check the complete generated AI namespace
+  PASSED 2293ms
+> runtime.auth-smoke-env: Wire auth smoke environment
+  PASSED 1647ms
+> runtime.flow-b-fixture: Wire real Flow-B callback fixture
+  FAILED 191ms
+    Command exited 1; expected 0.
+    [0m[1m[31merror[0m: Uncaught (in promise) Error: generated register-background.mts did not contain the workers resource block
+      throw new Error('generated register-background.mts did not contain the workers resource block');
+    [0m[31m        ^[0m
+        at [0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-1747-conv/[0m[0m[36mpackages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts[0m:[0m[33m218[0m:[0m[33m9[0m
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 257ms
+Summary: passed=33 failed=1 skipped=0
+[0m[1m[31merror[0m: Uncaught (in promise) RemoteError: CLI E2E suite failed
+      if (!report.ok) throw new RemoteError(1, 'CLI E2E suite failed');
+[0m[31m                            ^[0m
+    at [0m[1m[3mCommand.<anonymous>[0m ([0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-1747-conv/[0m[0m[36mpackages/cli/e2e/src/presentation/cli/commands/run-command.ts[0m:[0m[33m37[0m:[0m[33m29[0m)
+    at async [0m[1m[3mCommand.execute[0m ([0m[36mhttps://jsr.io/@cliffy/command/1.2.1/command.ts[0m:[0m[33m2431[0m:[0m[33m5[0m)
+    at async [0m[1m[3mCommand.parseCommand[0m ([0m[36mhttps://jsr.io/@cliffy/command/1.2.1/command.ts[0m:[0m[33m2246[0m:[0m[33m14[0m)
+    at async [0m[2m[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-1747-conv/[0m[0m[36mpackages/cli/e2e/cli.ts[0m:[0m[33m12[0m:[0m[33m3[0m

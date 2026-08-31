@@ -1,0 +1,172 @@
+[
+  {
+    "resource": "postgres",
+    "healthCheckKey": "test_only_postgres_listener",
+    "realHealthCheckKey": "postgres_listener",
+    "baseline": {
+      "testOnly": {
+        "resourceName": "postgres",
+        "healthCheckKey": "test_only_postgres_listener",
+        "status": "Healthy",
+        "description": "tcp listener ready on localhost:18998"
+      },
+      "realBacking": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ]
+    },
+    "unhealthy": {
+      "resourceName": "postgres",
+      "healthCheckKey": "test_only_postgres_listener",
+      "status": "Unhealthy",
+      "description": "tcp listener unreachable: ECONNREFUSED"
+    },
+    "healthyWaitTimeoutExitCode": 17,
+    "healthyWaitTimeoutDiagnostic": "Timed out waiting for resource 'postgres' to be healthy after 10s.",
+    "recovered": {
+      "resourceName": "postgres",
+      "healthCheckKey": "test_only_postgres_listener",
+      "status": "Healthy",
+      "description": "tcp listener ready on localhost:18998"
+    },
+    "realKeyContinuity": {
+      "duringFailure": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ],
+      "afterWait": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ],
+      "afterRecovery": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ]
+    }
+  },
+  {
+    "resource": "garnet",
+    "healthCheckKey": "test_only_garnet_resp",
+    "realHealthCheckKey": "garnet_resp",
+    "baseline": {
+      "testOnly": {
+        "resourceName": "garnet",
+        "healthCheckKey": "test_only_garnet_resp",
+        "status": "Healthy",
+        "description": "RESP listener ready on localhost:18999"
+      },
+      "realBacking": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ]
+    },
+    "unhealthy": {
+      "resourceName": "garnet",
+      "healthCheckKey": "test_only_garnet_resp",
+      "status": "Unhealthy",
+      "description": "RESP listener unreachable: ECONNREFUSED"
+    },
+    "healthyWaitTimeoutExitCode": 17,
+    "healthyWaitTimeoutDiagnostic": "Timed out waiting for resource 'garnet' to be healthy after 10s.",
+    "recovered": {
+      "resourceName": "garnet",
+      "healthCheckKey": "test_only_garnet_resp",
+      "status": "Healthy",
+      "description": "RESP listener ready on localhost:18999"
+    },
+    "realKeyContinuity": {
+      "duringFailure": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ],
+      "afterWait": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ],
+      "afterRecovery": [
+        {
+          "resourceName": "postgres",
+          "healthCheckKey": "postgres_listener",
+          "status": "Healthy",
+          "description": "postgres listener ready on localhost:30697"
+        },
+        {
+          "resourceName": "garnet",
+          "healthCheckKey": "garnet_resp",
+          "status": "Healthy",
+          "description": "RESP listener ready on localhost:46061"
+        }
+      ]
+    }
+  }
+]

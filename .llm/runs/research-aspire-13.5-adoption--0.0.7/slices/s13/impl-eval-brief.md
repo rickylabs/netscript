@@ -1,78 +1,67 @@
-use harness
+You are an INDEPENDENT IMPL-EVAL evaluator for the NetScript repository, in a SEPARATE session from
+the implementation author (Codex GPT-5.6 Sol). Do not inherit or restate the author's claims.
+EVALUATE ONLY — do not edit, stage, commit, or push.
 
-## SKILL
+## Worktree (read-only, already checked out)
 
-Read `.agents/skills/netscript-harness/SKILL.md`, `.llm/harness/evaluator/protocol.md`,
-`.llm/harness/evaluator/verdict-definitions.md`, `.agents/skills/netscript-doctrine/SKILL.md`, and
-`.agents/skills/netscript-tools/SKILL.md`. You are the **independent IMPL-EVAL evaluator** (Claude ·
-Fable 5 · medium, native opposite-family evaluator of Codex · GPT-5.6 Sol work): a separate session
-from the generator thread and the supervisor; you inherit no verdict and self-certify nothing.
+`/home/agent/projects/netscript/worktrees/007-eval-slot` — detached at
+`9b684e176e274fd51c1be879bb7673871632294f`.
 
-## Context
+## Slice
 
-- Slice: **S13 — stale version-bound surface cleanup, D-17 telemetry resolver, parity phase 2**
-  (#1724, PR **PR** draft, base `test/aspire-13-5-s10-e2e-gate-upgrades`; epic #1712; canary C).
-  Evaluate **exactly** head `d3f71c0b` on `chore/aspire-13-5-s13-stale-surface-cleanup`; base = S10′
-  `a46ea16d` (evaluate only `a46ea16d..d3f71c0b`). Your worktree:
-  `/home/agent/projects/netscript/worktrees/007-aspire-s13-eval` (detached at that head; product
-  files read-only). Supervisor run dir (absolute):
-  `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`
-  — read `sub-issues/13-stale-surface-cleanup.md` (contract), `slices/s13/brief.md`,
-  `slices/s13/review-tier-a.md`, `plan.md` D-13/D-16/D-17, `drift.md` D-39/D-45/D-54/D-55/D-60,
-  `aspire-surface-manifest.tsv` + `tools/aspire-surface-manifest.ts`; the S13 branch's own run dir;
-  PR commit list + per-slice comments.
-- **D-17 is ratified as written (D-60):** `resolveTelemetryEndpoint` precedence explicit option →
-  `NETSCRIPT_TELEMETRY_ENDPOINT` → `ASPIRE_DASHBOARD_PORT` → `aspire ps --format Json`
-  `dashboardUrl` (`source: 'aspire_ps'`, injectable helper) → `DEFAULT_TELEMETRY_ENDPOINT`
-  `http://localhost:18888` (`source: 'default'`); recorded `source` preserved; no bare `18888` in
-  generated code.
-- Environment (D-39): Deno 2.9.5; Aspire CLI 13.5.3 / dotnet 10.0.400 via
-  `/home/agent/.local/bin/mise exec --`; Docker 28.5.2 on `tcp://netscript-dind:2375`. **Static
-  only: no `aspire start`, no containers, no `e2e:cli` runtime**; you may run
-  `aspire ps --format Json --nologo --non-interactive` (read-only) for the empty-list shape;
-  `aspire ps` must stay `[]`. Host AppHost gates are environment-blocked (D-42/D-43/D-55) — not a
-  slice defect.
+**S13 — PR #1779**, "chore(aspire): stale version-bound surface cleanup, D-17 telemetry resolver,
+parity phase 2". `Closes #1724`.
 
-## Note on prior artifacts
+**This is a STACKED slice.** Its base is S10 at `c9e3fcbe84bac35c878fb2409ea39f665f37475f`, **not**
+`main`. Evaluate `git diff c9e3fcbe8..HEAD` — 9 own commits. Do not fault it for being behind `main`.
 
-The generator thread itself spawned two Claude sessions it called "IMPL-EVAL" and wrote
-`.llm/runs/chore-aspire-13-5-s13-stale-surface-cleanup--phase-a/evaluate.md` + `evaluate-prompt.md`
-on the branch, then recorded `PASS` (D-65). Those are **informational only** — you inherit nothing
-from them; you may read them to find what was remediated in `fc0a0c8c`, but every verdict input must
-be re-executed by you.
+## Coordinator-ruled resolutions — verify COMPLIANCE, do not re-litigate
 
-## What to verify (execute yourself)
+1. `SCAFFOLD_COMMUNITY_TOOLKIT` **deleted** from
+   `packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts` — authorized after a proven
+   zero-consumer check (only its own declaration existed on main; content duplicated by the live map).
+2. `SCAFFOLD_ASPIRE_INTEGRATIONS.DENO_KV` **retained** unchanged.
+3. Parity tool/tests: **current-main's base contract preserved** (exact-token matching + all existing
+   tests), with S13's **phase-2** behaviour and focused tests layered **additively** on top. Both
+   sides' cases must survive.
+4. `deno.json`: `--allow-run=git` added **only** to the parity task that invokes git, `--allow-read`
+   retained, **no broader permission widening**.
 
-1. Resolver: implement-vs-contract order and `source` values (unit tests, including the `aspire_ps`
-   step with S2's `02-v5-aspire-ps-final.json` shape and the empty `[]` shape); no IO in domain code
-   (A7/A11 — `aspire ps` read behind an injectable port); README precedence line matches the code.
-2. Templates: telemetry example route template has no bare `18888` and follows env → running AppHost
-   → "dashboard unavailable — run `aspire ps`"; Windows env-file adapters emit
-   `ASPIRE_DASHBOARD_PORT` only when configured; consumer CI template installs
-   `Aspire.Cli --version {{ASPIRE_SDK}}` before `aspire restore`; render a fresh scaffold under your
-   eval worktree's `.llm/tmp/` and confirm (delete the scratch).
-3. Cleanup rows owned by S13 in the manifest (skill toolchain snapshot via `agentic:sync-claude`,
-   `render-ts-apphost.ts:81`, `scaffold-aspire.ts` `SCAFFOLD_COMMUNITY_TOOLKIT`, `ownership.ts`
-   `MCP_COMMAND` if not already S7's), regenerated barrels, and `tools/aspire-surface-manifest.ts`
-   re-run producing no diff.
-4. Parity `--phase 2`: implemented with tests for both phases; **phase 1 still the default and
-   `ci.yml` unchanged** unless S1 (#1727), S9 (#1759) and S11 (#1771) are on `main` — verify the
-   gating statement in the run dir/PR body is true at evaluation time; run the phase-2 sweep in
-   report mode and list any remaining non-archival hit with its owner.
-5. Doctrine/gates: `quality:scan`, `arch:check`, scoped `deno check` / raw lint / raw fmt on changed
-   files, tests for `packages/mcp`, touched `packages/cli` roots, `.llm/tools/validation`;
-   `check:assets-barrel`, `check:publish-assets`, `agentic:sync-claude:check`,
-   `check:emitted-samples`; no new `any`/casts/lint-ignores; archival rows untouched; no `docs/site`
-   prose, no skill behaviour text, no pins.
-6. PR hygiene: draft, base branch, `Closes #1724`, `Part of #1712`, labels `type:chore`,
-   `epic:aspire-13-5`, `area:cli`, `area:agentic`, `area:tooling`, `priority:p2`, `status:impl`,
-   milestone 0.0.7, per-slice comments; #1724 `status:impl`. Report, do not fix.
+## Runtime is legitimately unavailable
 
-## Output
+Runtime is PARKED host-wide by an upstream constraint (microsoft/aspire#14878 — Aspire 13.5.3 does not
+support remote/custom Docker hosts; DCP binds published ports to daemon-local 127.0.0.1). **Do not
+fail the slice for missing runtime receipts.**
 
-Write `evaluate.md` (from `.llm/harness/templates/evaluate.md`, declare the exact head) to
-`/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s13/evaluate.md`
-and post the same verdict as a PR **PR** comment starting with `**[PHASE: IMPL-EVAL]**` and the head
-SHA. Verdict ∈ `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT`; `PASS` = phase A complete (S13
-has no Phase B) — say whether the parity flip is applied or deferred. Do not commit to the S13
-branch, do not mark ready, do not merge, do not relabel, no runtime.
+## What to assess (cite `file:line`)
+
+- The parity implementation `.llm/tools/validation/check-aspire-version-parity.ts`: phase-2 selection,
+  archival-class handling, manifest-freshness logic, report mode. Is the base contract genuinely
+  intact, or silently weakened?
+- Test adequacy in `check-aspire-version-parity_test.ts` — do the tests constrain behaviour, or are
+  they shape-only? Are both base-contract and phase-2 cases actually covered?
+- The D-17 telemetry resolver changes.
+- Stale-surface cleanup correctness: is anything deleted that still has a consumer? (The
+  `SCAFFOLD_COMMUNITY_TOOLKIT` removal is ruled and proven — check the *others*.)
+- The `deno.json` permission change: is `--allow-run=git` actually required by the tool, and is it
+  correctly scoped?
+- Doctrine: no `any`, no unsafe casts, no new lint-ignores, finite vocabularies as constants.
+
+## Required output format
+
+**[PHASE: IMPL-EVAL] [VERDICT: <PASS|CHANGES_REQUESTED>]**
+
+### Compliance with ruled constraints
+one line per constraint 1–4 with `file:line` evidence
+
+### Findings
+numbered; severity + what + where (`file:line`) + why it matters + required action. If none: "None."
+
+### Test adequacy
+short assessment
+
+### Verdict rationale
+3–6 sentences
+
+Under 900 words. Ground every claim in a file you actually read. If you cannot verify something, say
+so explicitly rather than assuming.

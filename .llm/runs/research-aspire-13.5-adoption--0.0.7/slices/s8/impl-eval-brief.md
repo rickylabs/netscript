@@ -1,65 +1,79 @@
-use harness
+You are an INDEPENDENT IMPL-EVAL evaluator for the NetScript repository. You are a SEPARATE session
+from the implementation author (Codex GPT-5.6 Sol). Do not inherit or restate the author's claims.
+EVALUATE ONLY — do not edit, stage, commit, or push anything.
 
-## SKILL
+## Worktree (read-only; already checked out at the exact head)
 
-Read `.agents/skills/netscript-harness/SKILL.md`, `.llm/harness/evaluator/protocol.md`,
-`.llm/harness/evaluator/verdict-definitions.md`, and `.agents/skills/netscript-doctrine/SKILL.md`.
-You are the **independent IMPL-EVAL evaluator** (Claude · Fable 5 · medium, native opposite-family
-route for Codex · GPT-5.6 Sol work): a separate session from the generator thread and the
-supervisor; you inherit no verdict and self-certify nothing.
+`/home/agent/projects/netscript/worktrees/007-s8-impleval` — detached at
+`bc838a0b3b9ba50f4ed6cf68aa29c9e4892b07f3`.
 
-## Context
+## Slice under evaluation
 
-- Slice: **S8 — typed db-cli-mode resource commands, bounded wait, `excludeFromMcp`** (#1720 + #863,
-  PR #1754 draft, base `feat/aspire-13-5-s6-health-checks`). Epic #1712. Evaluate **exactly** head
-  `9dd06647` on `feat/aspire-13-5-s8-typed-resource-commands`; base = S6 `564d465c` (evaluate only
-  `564d465c..9dd06647`). Your worktree:
-  `/home/agent/projects/netscript/worktrees/007-aspire-s8-eval` (detached at that head; product
-  files read-only). Supervisor run dir (absolute):
-  `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`
-  — read `plan.md` (D-6, D-19, S8 row), `slices/s8/brief.md`, `slices/s8/intake.md`,
-  `slices/s8/review-tier-a.md`, `drift.md` D-39/D-42/D-43, the S8 branch's own run dir
-  `.llm/runs/feat-aspire-13-5-s8-typed-resource-commands--impl/` (worklog, drift, receipts), and PR
-  #1754's commit list + per-slice comments.
-- Environment (authoritative, D-39): Deno 2.9.5; Aspire CLI 13.5.3, dotnet 10.0.400, node 24.20.0
-  via `/home/agent/.local/bin/mise exec --` (the `mise` shell function is broken); Docker 28.5.2 on
-  `tcp://netscript-dind:2375`; inotify 1024; PID 1 tini. **Phase A is static: no `aspire start`, no
-  containers, no `e2e:cli` runtime suites** — host AppHost gates are environment-blocked
-  (D-42/D-43); that is not a slice defect and not grounds for FAIL.
+**S8 — PR #1754**, "feat(aspire): typed db-cli-mode resource commands with bounded wait and
+`excludeFromMcp`". `Closes #1720`. `Part of #863`.
 
-## What to verify (execute yourself)
+Per coordinator ruling **D-44, S8 owns GATE 1 ONLY** on #863 (the exact `netscript db init --name
+init` path plus resource/probe detail). Gates 2 and 3 remain open on #863 — **do not fault S8 for
+them**.
 
-1. Contract: generated `<db>-cli` resources carry typed
-   `withCommand(... { commandOptions: {
-   arguments } })` and read `ctx.arguments()`;
-   `.excludeFromMcp()` only on `<db>-cli`, never on a user-facing resource; `withHidden(` never
-   emitted (D-6); no `PROCESS_COMMANDS_FLAG` / "Aspire 13.4" seam left in templates or emitted
-   samples. Render the generator yourself.
-2. CLI adapters (`packages/cli/src/kernel/adapters/database/*`): exact-AppHost detection from
-   `aspire ps --format Json` (`findRunningAppHost`), lifecycle lease, bounded wait with
-   `aspire
-   wait` timeout exit codes 17/18 surfaced (the #863 mechanism), standalone fallback;
-   unit tests cover both paths and the timeout.
-3. Doctrine: A7/A11 (no IO in generators), `quality:scan`, `arch:check`, no new `any` / casts /
-   lint-ignores; jsr-audit N/A unless `packages/aspire` changed.
-4. Gates: scoped `deno check` / raw lint / raw fmt on changed files; `check:assets-barrel`,
-   `check:publish-assets`, `check:aspire-host-ports`, `check:emitted-samples`; tests for
-   templates/aspire, adapters/database, cli/e2e/tests.
-5. **D-19**: the branch receipt (`05-consumer-typecheck-13.5.3.txt`) claims final tsc exit 0 at the
-   slice-5 tree; reproduce at **this head**: `netscript init` a throwaway under your eval worktree's
-   `.llm/tmp/`, set the scratch `aspire.config.json` sdk/packages to 13.5.3, `aspire restore` only,
-   `tsc --noEmit -p tsconfig.apphost.json`; verify module SHA-256s match (`7cd4cf83…` / `e2ce97fa…`
-   / `2fd6593b…`); delete the scratch. Cite `withCommand` / `CommandOptions.arguments` /
-   `ExecuteCommandContext.arguments()` / `excludeFromMcp` by module line.
-6. PR hygiene: draft, base branch, `Closes #1720`, `Closes #863`, `Part of #1712`, labels, milestone
-   0.0.7, per-slice comments; #1720/#863 `status:impl`. Report, do not fix.
+## Surface
 
-## Output
+`git diff origin/main..HEAD` (99 files). S8's own commits are `be7854bf5..bc838a0b3`. The final three
+(`19e139cbb` regenerate assets, `da963027b` format, `bc838a0b3` evidence) come from a
+coordinator-ruled **reconstruction**: S8 was un-stacked from a merged/squashed S6 and replayed onto
+main. **Judge the resulting tree, not the replay mechanics.**
 
-Write `evaluate.md` (from `.llm/harness/templates/evaluate.md`, declare the exact head) to
-`/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s8/evaluate.md`
-and post the same verdict as a PR #1754 comment starting with `**[PHASE: IMPL-EVAL]**` and the head
-SHA. Verdict ∈ `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT`; `PASS` means **phase A only** —
-say so; Phase-B runtime receipts (#863 Unhealthy-but-Running, db-cli `--help`, `migrate --timeout`)
-remain environment-blocked. Do not commit to the S8 branch, do not mark ready, do not merge, do not
-relabel, do not touch Aspire/Docker runtime.
+## Constraints already ruled by the coordinator — verify COMPLIANCE, do not re-litigate
+
+1. main's `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts`
+   D-101 contract must be intact: `listenerFaultExpectations`, `parseListenerFaultDatabase`,
+   test-only health-check keys.
+2. S8's `createTypedDbPhaseBGate()` must be PRESENT and functional.
+3. S8's superseded `listenerUnreachableExpectations` / `databaseListenerExpectation` must be ABSENT.
+4. Generated barrels (`*.generated.ts`) are derivative — assess only consistency with source, not
+   diff noise.
+
+## Runtime is legitimately unavailable
+
+Runtime is PARKED host-wide by an upstream constraint (microsoft/aspire#14878: Aspire 13.5.3 does not
+support remote/custom Docker hosts; DCP binds published ports to daemon-local 127.0.0.1). Phase-B
+runtime receipts therefore CANNOT exist yet. **Do not fail the slice for missing runtime evidence** —
+assess static quality and note runtime as legitimately deferred.
+
+## What to assess (cite `file:line` for every claim)
+
+- Typed db-cli-mode command generation:
+  `packages/cli/src/kernel/templates/aspire/helpers/generate-db-cli-mode.ts`,
+  `assets/aspire/helpers/run-tool.ts.template`,
+  `templates/aspire/helpers/register/generate-register-tools.ts`.
+- Database operation runner: `packages/cli/src/kernel/adapters/database/operation-runner.ts` and
+  `operation-runner-helpers.ts` — bounded wait behaviour, error propagation, preservation of
+  actionable stderr.
+- `excludeFromMcp` ownership correctness.
+- **Test adequacy**: do the tests constrain behaviour, or are they shape-only? See
+  `operation-runner_test.ts`, `generate-db-cli-mode_test.ts`, `run-tool-template_test.ts`,
+  `runtime-gates_test.ts`.
+- Doctrine: no `any`, no unsafe casts, no new lint-ignores, IO confined to gate/runtime edges, finite
+  vocabularies as constants.
+- Any real defect: incorrect escaping, unhandled failure path, silent catch, resource leak, contract
+  drift.
+
+## Required output format
+
+**[PHASE: IMPL-EVAL] [VERDICT: <PASS|CHANGES_REQUESTED>]**
+
+### Compliance with ruled constraints
+one line per constraint 1–4, each with `file:line` evidence
+
+### Findings
+numbered; each = severity + what + where (`file:line`) + why it matters + required action.
+If none: "None."
+
+### Test adequacy
+short assessment
+
+### Verdict rationale
+3–6 sentences
+
+Keep the whole reply under 900 words. Ground every claim in a file you actually read. If you cannot
+verify something, say so explicitly rather than assuming.

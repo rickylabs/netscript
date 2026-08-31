@@ -1,73 +1,73 @@
-use harness
+You are an INDEPENDENT IMPL-EVAL evaluator for the NetScript repository, in a SEPARATE session from
+the implementation author (Codex GPT-5.6 Sol). Do not inherit or restate the author's claims.
+EVALUATE ONLY — do not edit, stage, commit, or push.
 
-## SKILL
+## Worktree (read-only, already checked out)
 
-Read `.agents/skills/netscript-harness/SKILL.md`, `.llm/harness/evaluator/protocol.md`,
-`.llm/harness/evaluator/verdict-definitions.md`, `.agents/skills/netscript-cli/SKILL.md`, and
-`.agents/skills/netscript-tools/SKILL.md`. You are the **independent IMPL-EVAL evaluator** (Claude ·
-Fable 5 · medium, native opposite-family evaluator of Codex · GPT-5.6 Sol work): a separate session
-from the generator thread and the supervisor; you inherit no verdict and self-certify nothing.
+`/home/agent/projects/netscript/worktrees/007-eval-slot` — detached at `265466059`.
 
-## Context
+## Re-evaluation context
 
-- Slice: **S10 — E2E gate upgrades: doctor receipt, `describe --follow` evidence, `stop --force`
-  cleanup, resource-command gate class** (#1722, PR #1760 draft, base
-  `feat/aspire-13-5-s8-typed-resource-commands`; partial for #1372 — reference only). Epic #1712.
-  Evaluate **exactly** head `14daa764` on `test/aspire-13-5-s10-e2e-gate-upgrades`; base = S8
-  `9dd06647` (evaluate only `9dd06647..14daa764`). Your worktree:
-  `/home/agent/projects/netscript/worktrees/007-aspire-s10-eval` (detached at that head; product
-  files read-only). Supervisor run dir (absolute):
-  `/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/`
-  — read `sub-issues/10-e2e-gate-upgrades.md` (the contract), `slices/s10/brief.md`,
-  `slices/s10/review-tier-a.md`, `plan.md`, `drift.md` D-39/D-42/D-43/D-50; the S10 branch's own run
-  dir `.llm/runs/test-aspire-13-5-s10-e2e-gate-upgrades--impl/` (worklog, drift, receipts, `#1372`
-  update draft); S7's teardown contract on
-  `origin/fix/aspire-13-5-s7-teardown-leak-check:.llm/tools/agentic/teardown/probes.ts`; PR #1760
-  commit list + per-slice comments.
-- Environment (D-39): Deno 2.9.5; Aspire CLI 13.5.3, dotnet 10.0.400, node 24.20.0 via
-  `/home/agent/.local/bin/mise exec --`; Docker 28.5.2 on `tcp://netscript-dind:2375`; inotify 1024;
-  tini. **Static only: no `aspire start`, no containers, no `e2e:cli` runtime suites** (host AppHost
-  gates are environment-blocked, D-42/D-43 — not a slice defect). Allowed non-runtime reads:
-  `aspire doctor --format Json --non-interactive --nologo`, `aspire describe --help`,
-  `aspire stop --help`, `aspire resource --help`; `aspire ps` `[]` before/after.
+This is **cycle 2**. Cycle 1 returned `CHANGES_REQUESTED` on two findings:
+1. **Medium** — MSSQL's 600s convergence budget was silently dropped to a uniform 300s, and the
+   asserting test was deleted.
+2. **Medium-low** — wait gates replay a single pre-DB NDJSON capture the restart fallback can
+   invalidate.
 
-## What to verify (execute yourself)
+The slice has since been remediated. **Verify the fixes on their merits — do not assume they work.**
+Specifically check: does the capture timeout now genuinely derive the per-database maximum (so mssql
+regains 600s), is there a restored assertion that would FAIL if it collapsed again, is the decision
+recorded in the slice's `drift.md` per Operating Rule 5, and does the new `refresh` capture mode
+actually address finding 2 or merely appear to?
 
-1. `preflight.aspire`: runs `aspire doctor --format Json --non-interactive --nologo`, persists the
-   JSON through the gate receipt path, fails on any `status: fail`, warns (not fails) on `warning`;
-   reproduce with this host's doctor JSON.
-2. Readiness: `aspire describe --follow --format Json` NDJSON captured into
-   `.netscript/e2e/aspire-describe.ndjson` bounded by the S8 timeout budget; wait gates assert
-   convergence from the stream (last-seen state per resource, object-valued `healthReports` per S6)
-   rather than polling; fixture-driven tests cover convergence, non-convergence/timeout, and
-   malformed lines.
-3. Cleanup: `CLEANUP_ASPIRE_STOP` = `aspire stop --apphost <exact path>` then
-   `aspire stop --force --apphost <exact>` **only** with `--cleanup`; post-stop probe over the S7
-   contract (`com.microsoft.developer.usvc-dev.mountsLabel`, `ASPIRE_DCP_APPHOST_PATH`, `--apphost`
-   argv) asserts zero containers for that AppHost path; receipt records the probe output; never
-   `aspire stop --all`.
-4. Gate class `resource-command` in `cli-surface.ts`: invokes S8's typed
-   `aspire resource <db>-cli <cmd> --<arg>` and background-child `aspire resource <bg> restart`,
-   asserts state via `describe`; registered in `scaffold.runtime` on both tiers after the S8/S9
-   runtime gates and before cleanup; explicit skip receipt when the runtime phase does not run; no
-   new suites.
-5. Doctrine/gates: no product change outside `packages/cli/e2e` (+ README/skill gate table, run
-   dir); `quality:scan`, `arch:check`, `check:assets-barrel`, `check:publish-assets`,
-   `check:emitted-samples`, `check:aspire-host-ports`; scoped `deno check` / raw lint / raw fmt on
-   changed files; `packages/cli/e2e/tests` green; no new `any`/casts/lint-ignores; the `#1372`
-   update draft exists and is truthful about what S10 covers vs. what remains (compensation,
-   streams).
-6. PR hygiene: draft, base branch, `Closes #1722`, `Part of #1712`, `Refs #1372` (no closing
-   keyword), labels `type:test`, `epic:aspire-13-5`, `area:tooling`, `area:cli`, `gate:e2e`,
-   `priority:p1`, `status:impl`, milestone 0.0.7, per-slice comments; #1722 `status:impl`. Report,
-   do not fix.
+## Slice
 
-## Output
+**S10 — PR #1760**, "Structured Aspire 13.5 gate receipts — doctor, describe --follow, stop --force, resource-command class". `Closes #1722`.
 
-Write `evaluate.md` (from `.llm/harness/templates/evaluate.md`, declare the exact head) to
-`/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s10/evaluate.md`
-and post the same verdict as a PR #1760 comment starting with `**[PHASE: IMPL-EVAL]**` and the head
-SHA. Verdict ∈ `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT`; `PASS` = **phase A only** — say
-so; Phase B (`scaffold.runtime --cleanup` green on both tiers with the new receipts, leak = 0)
-remains lease-backed and environment-blocked. Do not commit to the S10 branch, do not mark ready, do
-not merge, do not relabel, no runtime.
+**This is a STACKED slice.** Its base is **S8 at `bc838a0b3`**, not `main`. Evaluate
+`git diff bc838a0b3..HEAD` only. **Do not fault it for being behind `main`.**
+
+## Context you must respect
+
+- The whole Aspire cascade was **reconstructed** after S5/S6 merged to main as squashes; judge the
+  resulting tree, not the replay mechanics.
+- main's shipped **D-101 listener contract** (`listenerFaultExpectations`,
+  `parseListenerFaultDatabase`, test-only health-check keys in
+  `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts`) is
+  load-bearing. Flag anything that weakens or bypasses it.
+- Gate-registration lists (`scaffold-capability-gates.ts`, `capability-suites.ts`) were resolved as
+  **additive unions** by coordinator ruling — multiple slices' gates coexisting there is correct, not
+  duplication.
+- Generated barrels (`*.generated.ts`) are derivative; assess consistency with source only.
+
+## Runtime is legitimately unavailable
+
+Runtime is PARKED host-wide by an upstream constraint (microsoft/aspire#14878 — Aspire 13.5.3 does
+not support remote/custom Docker hosts; DCP binds published ports to daemon-local 127.0.0.1).
+**Do not fail the slice for missing runtime receipts.** Assess static quality and note runtime as
+legitimately deferred.
+
+## What to assess (cite `file:line` for every claim)
+
+- Correctness of this slice's own source changes and their contracts.
+- **Test adequacy**: do the tests constrain real behaviour, or are they shape-only?
+- Doctrine: no `any`, no unsafe casts, no new lint-ignores, IO confined to gate/runtime edges,
+  finite vocabularies as constants.
+- Any real defect: unhandled failure path, silent catch, resource leak, contract drift, incorrect
+  escaping, or a deletion whose consumers still exist.
+
+## Required output format
+
+**[PHASE: IMPL-EVAL] [VERDICT: <PASS|CHANGES_REQUESTED>]**
+
+### Findings
+numbered; severity + what + where (`file:line`) + why it matters + required action. If none: "None."
+
+### Test adequacy
+short assessment
+
+### Verdict rationale
+3–6 sentences
+
+Under 900 words. Ground every claim in a file you actually read. If you cannot verify something, say
+so explicitly rather than assuming.

@@ -1,0 +1,16 @@
+{
+  "owner": "s6-c1f425eb9-postgres-1",
+  "pid": 332837,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T22:43:03.168Z",
+  "relays": [
+    {
+      "port": 30697,
+      "container": "relay-s6-c1f425eb9-postgres-1-30697",
+      "source": "postgres-239f4277",
+      "startedAt": "2026-08-30T22:44:30.969Z"
+    }
+  ],
+  "closed": "2026-08-30T22:46:08.682Z"
+}

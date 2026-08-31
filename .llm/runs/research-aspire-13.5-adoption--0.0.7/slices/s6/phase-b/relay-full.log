@@ -1,0 +1,12 @@
+[relay] watching owner=s6-c1f425eb9-full-1 dind=netscript-dind(10.4.12.22) since=2026-08-30T22:50:26.960Z pid=363607
+[relay] redis-xbdbapyr 127.0.0.1:32831 => hopA relay-s6-c1f425eb9-full-1-32831 (10.4.12.22:32831) => hopB 127.0.0.1:32831@ai-agents
+[relay] postgres-46631a37 127.0.0.1:19462 => hopA relay-s6-c1f425eb9-full-1-19462 (10.4.12.22:19462) => hopB 127.0.0.1:19462@ai-agents
+[relay] garnet-kkwvryyf 127.0.0.1:32832 => hopA relay-s6-c1f425eb9-full-1-32832 (10.4.12.22:32832) => hopB 127.0.0.1:32832@ai-agents
+[relay] relay-s6-c1f425eb9-full-1-32831 torn down — upstream port 32831 no longer published
+[relay] relay-s6-c1f425eb9-full-1-32832 torn down — upstream port 32832 no longer published
+[relay] redis-metbvwzz 127.0.0.1:32833 => hopA relay-s6-c1f425eb9-full-1-32833 (10.4.12.22:32833) => hopB 127.0.0.1:32833@ai-agents
+[relay] garnet-btsewtnq 127.0.0.1:32834 => hopA relay-s6-c1f425eb9-full-1-32834 (10.4.12.22:32834) => hopB 127.0.0.1:32834@ai-agents
+[relay] relay-s6-c1f425eb9-full-1-32833 torn down — upstream port 32833 no longer published
+[relay] relay-s6-c1f425eb9-full-1-32834 torn down — upstream port 32834 no longer published
+[relay] relay-s6-c1f425eb9-full-1-19462 torn down — upstream port 19462 no longer published
+[relay] cleanup: closed 0 listener(s), removed 0 hop-A container(s)

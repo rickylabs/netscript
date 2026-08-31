@@ -1995,3 +1995,2454 @@
   drains; (2) controller tests bind/probe `127.0.0.1` while the injected health checks/runtime
   controller use `localhost` — add an exact-`localhost` test or align the addresses to catch an
   IPv4/IPv6 resolution mismatch. Fixed reserved ports preserved; no runtime or DeepSeek rerun.
+
+- **D-102 — Postgres single-gate run under coordinator-granted lease: `aspire wait` exit-code
+  mismatch (BLOCKER, product-level, not a lease/process issue).** Owner token `s6-lease-postgres`.
+  Exact head verified before the run: local `007-aspire-s6-v2` clean at `929ff72a2908` (evidence-only)
+  on `3a20d00be1a6` (product, "test(e2e): own listener fault injection in the harness") on `60985a98f`;
+  remote `origin/feat/aspire-13-5-s6-health-checks` fetched and confirmed identical. Host proven zero
+  before start (containers=0, volumes=0, no aspire-managed process).
+  - Sequence executed: scaffolded `s6pg` (postgres+garnet, database=postgres) under
+    `.llm/tmp/s6-pg/s6pg`, `deno install`, `db:generate`, `aspire restore`. First `aspire start` was
+    run by hand without first invoking `GATE.RUNTIME_READINESS_FIXTURE`
+    (`prepare-readiness-fixture.ts <projectRoot> postgres`) — the manual scratch build skipped that
+    gate, so the first live topology correctly showed no `test_only_postgres_listener` /
+    `test_only_garnet_resp` keys (a build-sequencing gap on my side, not a product gap). Stopped that
+    AppHost, ran `prepare-readiness-fixture.ts` directly (exit 0), confirmed the splice landed in
+    `aspire/.helpers/register-infrastructure.mts` (`addHealthCheck('test_only_postgres_listener', ...)`
+    / `addHealthCheck('test_only_garnet_resp', ...)` on the existing `postgres_server`/`garnet`
+    builder vars, ports 18998/18999) and in `register-apps.mts` (`listener-fault-controller`
+    executable resource). Restarted Aspire (new AppHost pid); `aspire wait postgres --status healthy`
+    succeeded; `aspire describe` confirmed both test-only keys present and Healthy alongside the real
+    `postgres_listener`/`garnet_resp` keys, and the `listener-fault-controller` resource itself live.
+  - Ran the actual single gate: `listener-unreachable-fixture.ts <apphost> <projectRoot> postgres`.
+    Baseline Healthy poll passed for both test-only keys; real-backing baseline passed; controller
+    commanded closed for the postgres expectation; the fixture's own poll correctly observed
+    `Unhealthy` with the expected description; real-backing keys stayed Healthy during the induced
+    failure (proving the real Postgres container was never touched). It then failed at the following
+    `aspire wait postgres --status healthy --timeout 10 --apphost ...` step:
+    `aspire wait postgres exited 17, expected 18: ❌ Timed out waiting for resource 'postgres' to be
+    healthy after 10s.` The fixture's own exception-safety path reopened the synthetic listener
+    (controller `state.json`/`ack.json` show `revision: 3, postgresOpen: true, garnetOpen: true` after
+    the throw), so no listener/resource was left in a bad state.
+  - **Disposition: this is a genuine implementation-vs-runtime exit-code contract mismatch, not a
+    lease, ownership, or environment problem.** `listener-unreachable-fixture.ts` hard-codes an
+    expectation of exit code 18 from `aspire wait --status healthy` when the target resource is
+    genuinely stuck Unhealthy; against the live 13.5.3 Aspire CLI train used in this lease, the
+    observed exit code for that exact condition (resource confirmed Unhealthy via `describe`,
+    `wait --timeout 10` given, timeout elapses without becoming healthy) is 17, with the message
+    text "Timed out waiting for resource '<name>' to be healthy after <n>s." `aspire wait --help`
+    does not document exit-code semantics; no further product-side guessing/patching was performed
+    under this lease (no unchanged retries, no self-authored fix to implementer-owned product code).
+    **Sole recommendation for the S6 thread: confirm the correct exit code(s) `aspire wait` returns
+    for "confirmed Unhealthy, timed out" versus a plain "never observed health data" timeout on the
+    13.5.3 train (check the Aspire CLI source/changelog rather than re-guess), and either relax the
+    fixture's assertion to accept the actually-documented code or add a small `--status unhealthy`
+    style verification path if the CLI supports one.** Full raw command output preserved at
+    `slices/s6/phase-b/postgres-single-gate.log`.
+  - **SQLite tier and full suites were NOT attempted** — the ratified sequence was "Postgres, then
+    SQLite single-gate, then full suites only after singles," and the Postgres single blocked on a
+    product-level defect rather than a lease/environment condition, so running SQLite next would not
+    have produced a certifiable result and risked masking the same defect a second time (SQLite tier
+    also exercises `garnet`'s `aspire wait ... --status healthy` path through the same fixture code).
+  - **Teardown to exact zero, confirmed:** `aspire stop` (clean stop, AppHost pid gone); relay
+    (`s6-lease-postgres`, pid 211506) sent `SIGTERM`, registry `closed` timestamp recorded, hop-A
+    container removed by the relay's own signal handler; one Postgres container
+    (`postgres-f5022c11`) survived `aspire stop` (Persistent-lifetime resource, consistent with the
+    D-98 finding) and was removed by hand (`docker rm -f`); `docker ps -a` → 0 containers,
+    `docker volume ls` → 0 volumes, no `aspire-managed`/`apphost.mts` process remaining. Scratch
+    `.llm/tmp/s6-pg` removed (root-owned Postgres data files cleared via a throwaway
+    `alpine:3` container mounting the scratch root, then `rm -rf`); `007-aspire-s6-v2` worktree
+    `git status --short` empty. Sibling scratch dirs `cli-e2e` and `s6-v2-consumer-Jg6W7v` under
+    `.llm/tmp/` predate this lease and were left untouched (not owned by `s6-lease-postgres`).
+  - **Lease returned.** Coordinator decision needed before any further Phase-B attempt: whether to
+    send this exit-code finding back to the S6 implementation thread for a fix-and-repush, or to
+    have the coordinator/a fresh reviewer confirm the correct `aspire wait` exit-code contract first.
+
+- **D-102 coordinator ruling + two-part bounded correction dispatched to S6 thread
+  `01a05474-cad4-7912-87c9-2e0045b30ac4`.** Coordinator confirmed against Aspire 13.5.3 authoritative
+  docs: exit 17 ("Timed out waiting for resource '<name>' to be healthy after <n>s.") is the correct
+  contract for a resource that stays Running but remains Unhealthy through the wait timeout; exit 18
+  is reserved for a resource entering a failed/terminal state, which D-101's synthetic listener fault
+  never does by design. Part 1 (exit-code correction) landed at `9852d63ed`
+  ("fix(e2e): require Aspire healthy wait timeout") — `requireHealthyWaitTimeout` now requires exit
+  17 with the exact diagnostic text. Part 2 (Tier-A finding, same thread, same day): the exact-match
+  diagnostic comparison in `requireHealthyWaitTimeout` only stripped a leading `❌` glyph and
+  whitespace; the real 13.5.3 stderr is ANSI-decorated (CSI sequences before the `❌`, around the
+  diagnostic, and at line end), so the exact matcher would falsely reject genuinely correct exit-17
+  output. Dispatched a bounded correction (brief:
+  `slices/s6/d102b-ansi-strip-correction-brief.md`) directing reuse of the already-imported standard
+  helper `stripAnsiCode` from `@std/fmt/colors` (precedent:
+  `packages/cli/src/public/features/ui/ui-app-root-command_test.ts`), applied before the existing
+  glyph/whitespace strip, plus a focused regression using the actual ANSI-decorated stderr shape.
+  Exit-17 semantics, health transitions, synthetic listener architecture, and fixed ports
+  (18998/18999) explicitly out of scope — no PLAN-EVAL, no DeepSeek/OpenRouter rerun. Existing 56
+  green gates and all prior DeepSeek receipts remain valid and were not rerun.
+
+- **D-103 — Postgres single-gate GREEN under fresh coordinator-granted lease.** Owner token
+  `s6-c1f425eb9-postgres-1`, exact head `c1f425eb962ed77ae25e108def18a5d22da2f5ac`
+  ("fix(e2e): strip ANSI from Aspire wait diagnostics", part 2 of the D-102 correction). Coordinator
+  independently proved preflight zero (aspire/containers/volumes/relays empty); I independently
+  reconfirmed the same before starting (worktree clean at exact head, 0 containers, 0 volumes, no
+  aspire/relay process).
+  - Fresh `s6pg2` (postgres+garnet) scaffolded via the local CLI entrypoint
+    (`packages/cli/bin/netscript.ts`, since the published JSR CLI lacks the local-source scaffold
+    path used for this worktree's own code). `deno install`, `db:generate` (with a placeholder
+    `DATABASE_URL` — client generation only, no live DB needed), `RUNTIME_READINESS_FIXTURE` prep
+    (`prepare-readiness-fixture.ts <projectRoot> postgres`), `aspire restore`, `aspire start
+    --isolated`. Confirmed via `aspire describe` that `test_only_postgres_listener` and
+    `test_only_garnet_resp` were correctly spliced onto the real `postgres`/`garnet` resources
+    (mirroring D-102's earlier confirmation) before running the actual gate.
+  - Ran `listener-unreachable-fixture.ts <apphost> <projectRoot> postgres` directly — **exit 0**.
+    Receipt (`slices/s6/phase-b/postgres-recovery-receipt.json`) shows, for both the postgres and
+    garnet synthetic listeners: baseline Healthy → controller-closed Unhealthy (`ECONNREFUSED`
+    descriptions) → `aspire wait --status healthy --timeout 10` correctly exiting **17** with the
+    exact diagnostic (`healthyWaitTimeoutExitCode: 17`, `healthyWaitTimeoutDiagnostic` matches) →
+    controller-reopened Healthy again. **Real backing keys (`postgres_listener`, `garnet_resp`)
+    report Healthy in `realKeyContinuity.duringFailure`/`afterWait`/`afterRecovery` for every phase**
+    — the real Postgres/Garnet containers were never disrupted. Full raw stdout/stderr at
+    `slices/s6/phase-b/postgres-single-gate-2.log`.
+  - **Teardown to exact zero, confirmed:** `aspire stop` (clean, AppHost pid gone); relay
+    (`s6-c1f425eb9-postgres-1`, pid 332837) `SIGTERM`'d, registry `closed` recorded, hop-A container
+    removed by its own signal handler; the Persistent-lifetime `postgres-239f4277` container survived
+    `aspire stop` as expected (same known pattern as D-98/D-102) and was removed by hand;
+    `docker ps -a`/`docker volume ls` → 0/0; no `aspire-managed`/relay process remaining; scratch
+    `.llm/tmp/s6-pg2` removed (root-owned Postgres data cleared via a throwaway `alpine:3` container);
+    `007-aspire-s6-v2` worktree `git status --short` empty. Sibling scratch dirs `cli-e2e` and
+    `s6-v2-consumer-Jg6W7v` predate this lease and were left untouched.
+  - **Postgres tier is GREEN. Lease returned.** Per the ratified sequence, SQLite tier (garnet-only
+    expectation per `listenerFaultExpectations`) is the next step, requiring its own fresh lease from
+    exact zero. Full suites (`scaffold.runtime` / `scaffold.runtime.sqlite`) proceed only after both
+    singles are green.
+
+- **D-104 — SQLite single-gate GREEN under fresh coordinator-granted lease.** Owner token
+  `s6-c1f425eb9-sqlite-1`, exact head `c1f425eb962ed77ae25e108def18a5d22da2f5ac` (same D-102-corrected
+  head as D-103, no product change needed for the sqlite tier). Preflight zero independently
+  reconfirmed (clean worktree at exact head, 0 containers, 0 volumes, no aspire/relay process).
+  - Fresh `s6sq` (sqlite+garnet) scaffolded via the local CLI entrypoint, `deno install`,
+    `db:generate` (SQLite's `prisma.config.ts` defaults to a local `file:./s6sq.db` URL, no env var
+    needed), `RUNTIME_READINESS_FIXTURE` prep (`prepare-readiness-fixture.ts <projectRoot> sqlite`).
+    Confirmed via direct grep of the generated `register-infrastructure.mts` **before** starting
+    Aspire that only `test_only_garnet_resp` (port 18999) was spliced in — no
+    `test_only_postgres_listener`/18998 marker anywhere, matching the database-awareness guard from
+    the earlier D-101 correction (`listenerFaultExpectations(sqlite)` returns garnet-only). `aspire
+    restore`, `aspire start --isolated`; `aspire describe` after boot confirmed the live topology has
+    no postgres resource at all (sqlite tier has none) and `garnet` carries both `garnet_resp` and
+    `test_only_garnet_resp`, both Healthy.
+  - Ran `listener-unreachable-fixture.ts <apphost> <projectRoot> sqlite` directly — **exit 0**.
+    Receipt (`slices/s6/phase-b/sqlite-recovery-receipt.json`) shows the single garnet expectation:
+    baseline Healthy → controller-closed Unhealthy (`ECONNREFUSED`) → `aspire wait garnet --status
+    healthy --timeout 10` exiting **17** with the exact diagnostic → controller-reopened Healthy.
+    **Real `garnet_resp` stayed Healthy in `realKeyContinuity.duringFailure`/`afterWait`/
+    `afterRecovery`** — the real Garnet container was never disrupted. Full raw output:
+    `slices/s6/phase-b/sqlite-single-gate.log`.
+  - **Teardown to exact zero, confirmed:** `aspire stop` (clean, AppHost pid gone); relay
+    (`s6-c1f425eb9-sqlite-1`, pid 352330) `SIGTERM`'d, registry `closed` recorded (relays list empty —
+    sqlite tier's garnet health check resolved without needing the two-hop relay); `docker ps -a`/
+    `docker volume ls` → 0/0 directly after `aspire stop` (no Persistent-lifetime survivor this time,
+    since there is no Postgres resource in the sqlite tier); no `aspire-managed`/relay process
+    remaining. Scratch `.llm/tmp/s6-sqlite` removed; `007-aspire-s6-v2` worktree `git status --short`
+    empty. Sibling scratch dirs `cli-e2e`/`s6-v2-consumer-Jg6W7v` predate this lease, left untouched.
+  - **SQLite tier is GREEN. Lease returned.** Both Phase-B singles (Postgres D-103, SQLite D-104) are
+    now green at the corrected head `c1f425eb962ed77ae25e108def18a5d22da2f5ac`. Per the coordinator's
+    ratified sequence, the full `scaffold.runtime` (Postgres) and `scaffold.runtime.sqlite` suites may
+    now run under a new lease. No existing static gates or DeepSeek evidence were rerun for either
+    single.
+
+- **D-105 — Full `scaffold.runtime` (Postgres) suite result: 80 PASS / 1 FAIL, disposition
+  ratified.** Lease `s6-c1f425eb9-full-1`, exact head `c1f425eb962ed77ae25e108def18a5d22da2f5ac`.
+  `deno task e2e:cli run scaffold.runtime --db postgres --cache --cleanup --format pretty --report
+  ... --log-file ...` — 80 passed, 1 failed, exit 1. **`runtime.health.listener-unreachable` PASSED
+  (67359ms) inside the full suite**, confirming D-101/D-102/D-103 hold under full-suite load, not
+  just the isolated single-gate lease. The sole failure, `behavior.app-reference` ("Render canonical
+  app reference states in desktop and mobile browsers"), threw
+  `Error: No supported headless Chrome/Chromium executable found` from
+  `probe-app-reference.ts:findBrowserExecutable` — no Chrome/Chromium binary exists on this NAS host
+  at any checked path. Coordinator ratified this as the pre-existing NAS M5 environment limitation,
+  not an S6 product regression; no rerun, no browser install. Full evidence retained:
+  `slices/s6/phase-b/full-postgres-report.json` (raw JSON report), `full-postgres-events.ndjson`
+  (162 lines), `full-postgres-suite.log` (178-line pretty transcript).
+  - **Teardown to exact zero, confirmed:** the suite's own `cleanup.aspire-stop` step passed but left
+    one anonymous Docker volume behind (`c0f1b138e4ef...`, created at the exact run timestamp — the
+    only volume-producing activity in this lease, so unambiguously owned); removed by hand
+    (`docker volume rm`). After that: `docker ps -a`/`docker volume ls` → 0/0, no
+    `aspire-managed`/relay process remaining (relay `s6-c1f425eb9-full-1` pid 363607 `SIGTERM`'d,
+    registry `closed` recorded). Scratch `.llm/tmp/s6-full` removed; `007-aspire-s6-v2` worktree
+    `git status --short` empty.
+  - **CLI selector research (coordinator-requested): no include/exclude/skip mechanism exists.**
+    Checked `run-command.ts`, `run-options.ts` (`RawRunOptions`/`mapRunOptions`), and
+    `suites/registry.ts` in full — the `run <suite>` command's only configurable surface is
+    `RunOptions` (repo/cli/smoke-root/name/db/source/plugins/samples/cache/cleanup/format/
+    report/logFile); there is no `--skip`, `--exclude`, `--only`, gate-list override, or env-var
+    filter anywhere in that path. The only per-gate skip mechanism that exists at all is
+    `skipUnsupportedPlatform` in `gate-runner.ts`, driven purely by a gate's own declared
+    `platforms` field (OS platform: darwin/linux/win32) compared to `PlatformPort.current()` — it is
+    not exposed as an external CLI selector and does not apply to a missing-binary/environment
+    condition like absent Chrome. **The CLI's only two supported execution granularities are: the
+    full `run <suite>` (all gates, no selection) and the single `gate <suite> <gate>` command
+    (exactly one named gate).** There is currently no supported way to run `scaffold.runtime.sqlite`
+    while excluding only `behavior.app-reference` from within that suite — either the suite runs
+    whole (which would hit the same missing-Chrome failure if `behavior.app-reference` is also a
+    member of the sqlite suite; needs confirming via `gates scaffold.runtime.sqlite`), or the
+    coordinator accepts the same single-failure disposition for the sqlite suite, or a bounded CLI
+    enhancement (a `--skip <gate-id,...>` flag threaded through `RunOptions`/`gate-runner.ts`) would
+    need to be scoped and dispatched as its own small change — not done under this lease, since no
+    product change was authorized here.
+  - Confirmed via `deno task e2e:cli gates scaffold.runtime.sqlite`: `behavior.app-reference` is also
+    a member of the SQLite suite's gate list. A full `run scaffold.runtime.sqlite` under this exact
+    NAS host would therefore hit the identical missing-Chrome failure for the same pre-existing
+    environment reason — this is expected, not a new finding, and not S6-specific.
+
+- **D-106 — #1747 mechanically converged onto main 5197e70b7 (no runtime lease taken).** Per the
+  coordinator's read-only audit finding the PR's head `a93df413e` seven main commits stale (missing
+  the Aspire 13.5.3 pin bump #1727 and the S5 literal-ports removal #1740, among others), converged
+  `fix/aspire-reference-name-validation` in worktree `007-1747-conv`: `git rebase origin/main`
+  applied cleanly with zero conflicts (12/12 commits replayed); `git range-diff` confirmed the
+  branch's 5 product/docs commits are content-identical to their pre-rebase originals, just replayed
+  on the new base; new merge-base is exactly `origin/main` (`5197e70b716eafb82fbb12ddb9a910c248ddb86a`).
+  No runtime lease was taken or requested for this — purely a local git operation.
+  - Bounded static checks (touched files only, no full-package sweep, no runtime, no evaluator
+    rerun): `deno check --unstable-kv` on `packages/aspire` (46 files) and `packages/cli` (888 files)
+    both zero errors; `deno lint`/`deno fmt --check` on the exact 7 touched files (both packages)
+    zero diagnostics; no `deno.lock`/`package-lock.json` drift in the diff. Focused unit tests for
+    the touched files: `packages/aspire/tests/config_test.ts` (4 passed, 139 steps) and
+    `generate-register-background_test.ts`/`generators-background-app_test.ts` (3 passed, 56 steps) —
+    all green, 0 failed.
+  - Pushed with `--force-with-lease` against the exact known prior remote SHA (`a93df413e`) to
+    `fix/aspire-reference-name-validation`; new head `2462704c9`. PR #1747 existing DeepSeek/IMPL-EVAL
+    evidence preserved untouched — no evaluator rerun performed or requested.
+  - Host runtime lease was **not** taken for this work (git-only), yielded per instruction to
+    fixes-lane #1781 as the next runtime-lease candidate.
+
+- **D-108 — S6 terminal CI success frozen; supervisor slice review; evaluator-routing discrepancy
+  flagged; #1743 retarget-to-main found non-trivial.**
+  - **Frozen receipt:** `workflow_dispatch` run `33340547883` at exact head
+    `c1f425eb962ed77ae25e108def18a5d22da2f5ac` — `conclusion: success` (confirmed via `gh run view`).
+    Coordinator-reported detail: Postgres 90/90, SQLite 85/85, `runtime.health.listener-unreachable`
+    PASS on both tiers (53.928s / 23.122s).
+  - **Supervisor slice review:** S6 Phase B is now functionally complete and green end-to-end
+    (D-101 architecture → D-102/D-102b corrections → D-103/D-104 single-gate GREEN → D-105 full-suite
+    80/81 GREEN with the ratified Chrome-environment exception → this CI run GREEN on both tiers).
+    No open findings against the current head.
+  - **Evaluator-routing discrepancy (flagged, not executed):** the coordinator named "GLM 5.3 Flash"
+    (default/IMPL eval, highest effort) and "Qwen3.8-Flash-Next" (PLAN-EVAL, highest effort) as the
+    new prospective route for slices with no valid evaluation. Neither model exists in the checked-in
+    `.llm/harness/workflow/lane-policy.md` or its machine binding
+    `.llm/tools/agentic/runtime/routing-policy.ts`/`config/models.ts` — the only Qwen entry is
+    `qwen/qwen3.8-max` (not "Flash-Next"), and GLM appears only as 5.2, explicitly scoped to
+    design/UI-UX work, "not an implementation or general-evaluation model." Per AGENTS.md
+    ("Routing is data, not prose... do not restate or invent model routes") and
+    `resolveCanonicalFormalEvaluatorRoute()`'s throw-unless-matched contract, I did not dispatch to
+    either named model. **Separately**, S6's only evaluation on record (Fable 5 cycle-2 IMPL-EVAL,
+    `evaluate-cycle-2.md`) is explicitly `PASS — phase A only` and predates all Phase B work — so by
+    the coordinator's own conditional ("only if S6 has no qualifying final evaluation at all"), S6
+    now qualifies for a fresh IMPL-EVAL pass. Recommendation: either the coordinator updates the
+    checked-in routing data first (a real data change, not a prose override), or authorizes the
+    already-sanctioned fallback route for this cycle (native Fable 5 medium opposite-family, or the
+    existing DeepSeek V4 Flash 0731/Qwen 3.8 Max OpenRouter fallback) rather than an unlisted model.
+    No eval dispatched pending this clarification.
+  - **#1743 retarget-to-main is not a mechanical rebase.** S5 (#1740) merged to main via a **squash
+    merge** (single commit `2a1248d33`, not the S5 branch's actual commit history) — `1c2cf2ef5`
+    (the S5 branch's real final pre-merge head) is confirmed NOT an ancestor of `origin/main`.
+    Separately, `merge-base(S6 HEAD, 1c2cf2ef5)` resolves to `bc33c2aa3`, not to `aa822069` (the S5
+    head S6 was documented as built on) — meaning the S5 branch was itself rewritten/force-pushed
+    after S6 branched from it, the same two-level stacking hazard already diagnosed once this session
+    (D-90). A blind `git rebase --onto origin/main <merge-base>` here risks replaying S6's ~20
+    commits including content already squashed into main under a different SHA, which is exactly the
+    whole-module-refactor collision class D-90 hit and correctly aborted rather than force-resolved.
+    **Not attempted under this turn** — flagging for a dedicated reconstruction pass (mirroring the
+    D-90/D-101 corrected-reconstruction pattern) rather than a blind rebase, per the standing
+    "no unchanged retries / do not force-resolve a genuine collision" discipline.
+
+- **D-107 landed:** CI evidence-carrier fix committed/pushed at `81a85f12e87e14754d2b7d84ee59913bb9eca2fb`
+  ("fix(ci): upload listener unreachable receipts"), bounded exactly to the two `path:` glob
+  additions in `.github/workflows/e2e-cli.yml` (both `scaffold-runtime` and
+  `scaffold-runtime-sqlite` jobs). No other files touched; local/remote heads match; worktree clean.
+  Awaiting coordinator-triggered fresh exact-head `workflow_dispatch` run to confirm both tiers'
+  receipts now appear in the uploaded artifact.
+
+- **D-109 — dedicated #1743 post-S5-squash reconstruction dispatched (not blind-rebased).** Per
+  coordinator decision: dispatched as a separate clean non-runtime Codex slice in a fresh worktree,
+  not folded into the ongoing S6 implementation thread.
+  - **Corrected finding vs. D-108's flag:** direct verification (not the earlier indirect check
+    against the old pre-squash S5 branch tip) shows S6's real git ancestry (`007-1743-recon`, checked
+    out fresh from `origin/feat/aspire-13-5-s6-health-checks` at `81a85f12e`) has
+    `merge-base(HEAD, origin/main) = 96d44758d`, and `origin/main` is only **one** commit ahead
+    (`5197e70b7`) — S6 was already reconstructed directly against a main-based commit (the D-90/D-101
+    corrected-reconstruction v2), not against the old pre-squash S5 branch. This is a mechanical
+    one-commit convergence, not the two-level stacking collision D-90 hit. D-108's flag is
+    superseded by this direct check.
+  - **Worktree/thread setup, safely (D-86-compliant):** the existing `007-aspire-s6-v2` worktree was
+    detached (`git checkout --detach HEAD`, now at `81a85f12e` detached) to free the branch name; a
+    new worktree `007-1743-recon` was created from `origin/main`, then checked out onto
+    `feat/aspire-13-5-s6-health-checks` fresh (`git checkout -B ... origin/...`), upstream tracking
+    unset (required by `launch-codex-slice`'s push-safety check). No two worktrees ever held the same
+    branch simultaneously.
+  - **Dispatch:** `agentic:launch-codex-slice` — brief
+    `slices/s6/d109-post-s5-squash-reconstruction-brief.md`, `--expect-base 81a85f12e`,
+    `--provider openai --model gpt-5.6-sol --effort high` (route matched, verified in
+    `codex-thread-ids.md`). **New thread `01a054f6-6173-7431-a81e-2502a87734cb`** on worktree
+    `007-1743-recon`. Scope: fetch+rebase onto `origin/main`, prove range-diff content-equivalence
+    commit-by-commit for all 11 branch commits (including the D-107 CI-glob fix), confirm full
+    merge-base convergence, bounded static checks only (scoped `deno check`/lint/fmt on touched
+    files, no runtime/Aspire/Docker), push with `--force-with-lease` against the exact known remote
+    SHA. Explicitly no evaluator rerun (native or OpenRouter) — existing Fable 5 IMPL-EVAL cycle-2
+    and Tier-A verdicts for this slice's product commits stand.
+  - Status: dispatched, running in background; awaiting completion report.
+
+- **#1747 sequencing recorded (no action yet):** #1747 (`2462704c9`, D-106) is statically converged
+  only. Its exact-head withheld `scaffold.runtime`/Flow-B runtime proof is queued behind the host
+  lease: fixes #1781 first, then #1764, then #1747's runtime gate. #1747 must **not** be marked
+  ready-merge before that runtime gate runs. No lease currently held by this session.
+
+- **D-109 complete — #1743 fully converged onto main, independently verified.** Thread
+  `01a054f6-6173-7431-a81e-2502a87734cb` (worktree `007-1743-recon`) reported turn complete, idle,
+  clean worktree, artifact commit `300eac3ba` ("fix(ci): upload listener unreachable receipts" — the
+  rebased D-107 tip). Supervisor independently re-verified, not just trusted the thread's report:
+  - `git merge-base HEAD origin/main == origin/main` (`5197e70b716eafb82fbb12ddb9a910c248ddb86a`) —
+    full convergence confirmed directly.
+  - `git range-diff 96d44758d..81a85f12e 5197e70b7..300eac3ba` — all 11 commits map `=`
+    (content-identical, just replayed on the new base), including the D-107 CI-glob fix
+    (`81a85f12e` → `300eac3ba`). No product content lost or altered by the rebase.
+  - `git ls-remote origin refs/heads/feat/aspire-13-5-s6-health-checks` confirms `300eac3ba` is the
+    live remote head — push landed.
+  - Independent re-run of `deno check --unstable-kv` on `packages/cli` (900 files, 8 batches):
+    0 errors — matches the thread's reported bounded static-check result.
+  - No runtime/Aspire/Docker step was run at any point in this slice; no evaluator (native or
+    OpenRouter) was invoked or re-invoked. Existing Fable 5 IMPL-EVAL cycle-2 / Tier-A verdicts for
+    S6's product commits stand unchanged and un-rerun.
+  - PR #1743 is now git-current with `main` (one commit that was ahead is now included) with all
+    Phase-B work (D-101 through D-107) intact. `007-1743-recon` worktree can be retired/reused;
+    `007-aspire-s6-v2` remains detached at the old pre-rebase tip (`81a85f12e`) and should be
+    re-pointed to `feat/aspire-13-5-s6-health-checks`'s new head or retired to avoid confusion in a
+    future turn.
+
+- **D-110 dispatched, #1743 retargeted to main.** Coordinator audit found the real root cause of the
+  missing artifacts: run `33341398265` (head `81a85f12e`) had both `scaffold-runtime`/
+  `scaffold-runtime-sqlite` jobs green (Postgres 90/90, SQLite/Garnet 85/85) but their
+  `Upload E2E report artifact` steps logged `No files were found` for **every** glob, not just the
+  D-107 receipt glob — confirmed via job log:
+  `No files were found with the provided path: .llm/tmp/**/report*.json ...`. Root cause:
+  `actions/upload-artifact@v5` defaults `include-hidden-files: false`, and `.llm` is a dot-prefixed
+  top-level directory, so every path under `.llm/tmp/...` was silently excluded regardless of glob
+  match — D-107's glob fix could never have worked without this. Redundant in-flight run
+  `33341820649` (dispatched at the post-D-109 head before this was known) was cancelled.
+  - Dispatched bounded correction (`slices/s6/d110-include-hidden-files-brief.md`) to the same S6
+    thread (`01a05474-cad4-7912-87c9-2e0045b30ac4`, resumed — not a new thread, consistent with prior
+    D-107/D-102 corrections on this branch): add `include-hidden-files: true` to both runtime upload
+    steps, narrow the path globs to the exact confirmed receipt/report locations. CI-only, no product
+    semantic change, no evaluator rerun.
+  - Retargeted PR #1743's base from `fix/aspire-13-5-s5-literal-ports` to `main` via
+    `gh api -X PATCH repos/rickylabs/netscript/pulls/1743 -f base=main` (the stale base was the actual
+    cause of GitHub's `DIRTY`/`CONFLICTING` mergeability report, despite the reconstructed head
+    genuinely descending from current main per D-109's verified range-diff). Confirmed after
+    retarget: `mergeable: true`, `mergeable_state: blocked` (draft/pending-checks, not a content
+    conflict) — GitHub's own conflict signal is resolved.
+
+- **D-111 dispatched — D-110 broke the classifier self-test contract.** Coordinator caught and
+  cancelled the invalid exact-head run `33342146594`: `classify changes` job failed because D-110
+  narrowed the runtime jobs' upload path patterns, dropping `.llm/tmp/**/report*.ndjson`, which
+  `.github/scripts/ci-classify-changes.test.ts:816` (assertion at line 862,
+  "workflow: sqlite runtime uses sibling diff guard and fails closed") contractually asserts is
+  present. Reproduced locally on the exact S6 worktree/head (`144988b86`):
+  `deno test --allow-read --allow-env .github/scripts/ci-classify-changes.test.ts` → 59 passed / 1
+  failed, matching the CI failure exactly (my earlier local verification of this same test had
+  wrongly run against the unmodified supervisor branch, not the S6 worktree with D-110's diff — a
+  verification-scope mistake, corrected here).
+  - Dispatched `slices/s6/d111-restore-classifier-patterns-brief.md` to the same S6 thread
+    (`01a05474-cad4-7912-87c9-2e0045b30ac4`, resumed): restore the original four upload path
+    patterns in both runtime jobs while **keeping** `include-hidden-files: true` (the real fix for
+    the hidden-directory exclusion) — this satisfies both the classifier's receipt-pattern contract
+    and the actual hidden-path traversal fix simultaneously. Explicit instruction to verify the
+    classifier test passes locally before pushing. No product/gate-logic change, no evaluator rerun.
+  - Redundant/invalid run `33342146594` confirmed cancelled by coordinator; no further action needed
+    on it.
+
+- **D-112 dispatched — D-111 exposed an EACCES traversal into protected Postgres data.** Run
+  `33342459451` (head `235631d63`): classifier/static/desktop/SQLite all succeeded, and the Postgres
+  runtime **product test itself passed** (green), but the `scaffold-runtime` job's
+  `Upload E2E report artifact` step failed with `EACCES` scanning
+  `.llm/tmp/cli-e2e/.../.data/postgres/18/docker` — `include-hidden-files: true` combined with the
+  restored broad recursive globs now descends into the scaffolded project's permission-restricted
+  Postgres data directory (masked previously only because hidden dirs were skipped entirely).
+  Dispatched `slices/s6/d112-safe-artifact-glob-brief.md` to the same S6 thread
+  (`01a05474-cad4-7912-87c9-2e0045b30ac4`, resumed): replace both jobs' path lists with narrow,
+  single-`*`-wildcard patterns that structurally cannot descend into `.data/...`
+  (`.llm/tmp/e2e-report-scaffold-runtime*.json`/`*.ndjson` + sqlite-suffixed variant,
+  `.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json`), keep
+  `include-hidden-files: true`, and update the classifier self-test's assertion to match the new safe
+  patterns instead of the obsolete broad ndjson glob. CI-only, no product/gate-logic change, no
+  evaluator rerun — runtime product evidence from this run stands as valid and accepted.
+  - Runtime priority order confirmed by coordinator: land S6 D-112 and dispatch its off-host
+    verification run first; #1747's fixture finding (below) is diagnosed/repaired only after that.
+
+- **#1747 finding: `runtime.flow-b-fixture` failed pre-AppHost-start (33/34 passed).** Lease
+  `1747-lease-1` at exact head `2462704c9c8f424f0cd6a53fd268bc5effd3591b`: full `scaffold.runtime`
+  suite ran 33 gates green, then `runtime.flow-b-fixture` ("Wire real Flow-B callback fixture")
+  failed: `generated register-background.mts did not contain the workers resource block`
+  (`prepare-flow-b-fixture.ts:218`). Failure occurred entirely in Phase-A generation/static-fixture
+  wiring, **before** `runtime.aspire-start` — no AppHost, no containers were ever created for this
+  attempt, so the suite's own `cleanup.aspire-stop` step and the subsequent independent host check
+  both confirmed exact zero with nothing to tear down beyond the owned relay/scratch (relay
+  `1747-lease-1` pid 672674 `SIGTERM`'d, scratch `.llm/tmp/1747-full` removed, worktree
+  `007-1747-conv` clean). Lease released. **Disposition per coordinator: classify as branch product
+  vs. stale fixture against current main before any runtime retry — do not retry runtime blindly.**
+  #1747's own change touches `generate-register-background.ts` directly (confirmed via the D-106
+  diff), so the Flow-B fixture's expected-shape check
+  (`prepare-flow-b-fixture.ts`'s workers-resource-block parser) may simply be asserting an outdated
+  literal shape that #1747's validation changes legitimately altered — or it may be a genuine
+  regression. Diagnosis deferred until after S6 D-112 lands, per coordinator's stated Aspire serial
+  queue priority. Static-only re-verification (no runtime) is the next step for #1747, followed by a
+  fresh lease request only once the fixture contract question is resolved.
+
+- **D-113 — #1718 quickstart-walk acceptance box: published-JSR onboarding baseline GREEN.** Lease
+  `s6-quickstart-1`, exact S6 head `32f88f90bb0f710b6edcbf11d332496597ca232e`. Discovered
+  `quickstart.walk` hard-requires `--source jsr --cli jsr:@netscript/cli@<version>` — it always tests
+  the currently-**published** CLI (`0.0.6`, confirmed via JSR registry `meta.json`), never local
+  branch source; a `--source local` override attempt failed instantly with zero side effects
+  (`quickstart.walk requires --source jsr...`), confirmed via host-zero recheck before retrying.
+  Per coordinator's structural ruling: #1718's literal quickstart acceptance is the published-JSR
+  public-onboarding baseline, not S6-branch-specific proof (S6's own proof is the exact-head
+  scaffold/fault receipts already captured in D-103/D-104/D-105/CI run 33343080292). Ran
+  `deno task e2e:cli run quickstart.walk --source jsr --cli jsr:@netscript/cli@0.0.6 --cleanup
+  --format pretty` — **10/10 passed, exit 0** (all 7 documented Quickstart steps, cleanup, and
+  post-teardown PGDATA integrity). Receipt: `slices/s6/phase-b/quickstart-suite.log`/
+  `quickstart-report.json`/`quickstart-events.ndjson`.
+  - **Teardown to exact zero, confirmed:** suite's own cleanup left one Persistent-lifetime network
+    (`aspire-persistent-network-31726205-aspire-managed`, created at this run's exact timestamp,
+    unambiguously owned) which `docker network rm` removed on the second attempt (first attempt's
+    listing was a transient read race, not a real re-creation — reconfirmed empty immediately after).
+    Final: 0 containers, 0 volumes, 0 non-default networks, no aspire/relay process. Relay
+    `s6-quickstart-1` (pid 745712) `SIGTERM`'d cleanly. Scratch removed, worktree clean. Lease
+    released.
+
+- **D-114 dispatched — quality parity gate failure is real but bounded manifest drift.** CI run
+  `33344157488`'s `quality` job failed `Aspire version parity (phase 1)` (`fail=2`): S6 moved
+  `capture-db-endpoint-allocation.ts` and `prepare-readiness-fixture.ts` under a new `scaffold/runtime/`
+  subdirectory, but `aspire-surface-manifest.tsv` still lists their old `scaffold/` paths. Confirmed
+  the exact live paths directly in `007-aspire-s6-v2`. Dispatched
+  `slices/s6/d114-manifest-path-repair-brief.md` to the S6 thread: update exactly those two manifest
+  rows' path column, run `deno task check:aspire-version-parity` and confirm `fail=0`, evidence-only —
+  no product/runtime/test code touched, no evaluator rerun.
+  - The same run's `close-gate` job failure is a **stale race**, not a current failure: its
+    `mirror-acceptance-evidence.ts` invocation evaluated at `2026-08-31T00:17:58Z`, which predates
+    both the #1280 heading fix (`00:18:15Z`) and the mirror's successful `APPLIED` run
+    (`00:18:30Z`). A fresh CI run after D-114 lands will read the corrected state.
+
+- **D-114 landed and independently verified.** Commit `b6b0bb87c` ("fix(aspire): update moved
+  parity manifest paths") — diff confirmed to touch exactly the two manifest path substitutions
+  identified, nothing else. `deno task check:aspire-version-parity` re-run directly: `ok:true,
+  fail:0` (812 checked, 18 deferred/pre-existing, 0 new). Remote head confirmed matching. No
+  product/test code, receipt, or evaluation touched.
+
+- **D-115 — S6 / PR #1743 terminal: SUCCESS, ready-merge.** Exact head `b6b0bb87c`. CI run
+  [33344566953](https://github.com/rickylabs/netscript/actions/runs/33344566953): SUCCESS —
+  classify, close-gate, quality, check-test all green (close-gate correctly passed once the
+  #1280 heading fix and acceptance-mirror APPLIED state were live, confirming the earlier
+  `33344157488` close-gate failure was indeed the stale race it was classified as). PR #1743 is
+  non-draft, `mergeable: true`/CLEAN, sole `status:ready-merge` + `impl-eval:skip`, no
+  failed/in-progress checks. Host confirmed exact zero throughout — this entire finalization
+  (D-106 through D-115) was pure git/API/CI work, no runtime lease held. **Coordinator owns the
+  actual merge, per this run's standing hard constraint** — not performed here.
+
+- **#1747 static diagnosis (D-116): root cause found, no runtime used.** Reproduced cleanly in the
+  canonical worktree `007-1747-conv` (clean, exact head `2462704c9`, 0 behind / 12 ahead of main
+  confirmed): scaffolded a throwaway project (`netscript init` + `netscript plugin install workers
+  --name workers`, entirely static — no `aspire restore`/`start`, no Docker) and inspected the
+  generated `register-background.mts` directly: it emits **single-quoted** literals
+  (`config.BackgroundProcessors['workers']`, `builder.addExecutable('workers', ...)`), not the
+  double-quoted `JSON.stringify(name)` form `prepare-flow-b-fixture.ts`'s regex expects. Confirmed
+  definitively via direct comparison: `generate-register-background.ts` (live source, this exact
+  head) contains 4 occurrences of `JSON.stringify(name)` (#1747's own name-escaping fix); the
+  embedded runtime snapshot `packages/cli/src/kernel/assets/embedded.generated.ts` contains **zero**
+  — it is stale, generated from the pre-#1747 source. **Root cause: #1747 edited the live generator
+  template (switching bare `'${name}'` interpolation to `JSON.stringify(name)` for safe
+  quote/backslash/backtick escaping) and also rewrote its own `prepare-flow-b-fixture.ts` parser to
+  expect the new double-quoted shape, but never ran `deno task gen:assets-barrel` to regenerate the
+  embedded snapshot the actual CLI runtime loads from.** This is a missing-regeneration gap within
+  #1747's own two changed halves, not a #1747-vs-main incompatibility and not an S6/other-slice
+  regression — confirmed by the fact that `generate-register-background.ts`'s source and
+  `prepare-flow-b-fixture.ts`'s regex agree with each other; only the embedded barrel is behind.
+  - **Recommended bounded fix:** run `deno task gen:assets-barrel` on the #1747 branch, confirm
+    `deno task check:assets-barrel` is diff-clean (deterministic), then re-verify statically (same
+    scaffold + plugin-install reproduction, still no Aspire/Docker) that the regenerated
+    `register-background.mts` now emits double-quoted literals matching the fixture's regex. Only
+    after that static confirmation would a fresh runtime lease (full `scaffold.runtime` suite) be
+    warranted to prove `runtime.flow-b-fixture` passes end-to-end.
+  - No DeepSeek/evaluator rerun performed or needed for this diagnosis.
+
+- **D-117 dispatched — #1747 embedded-barrel regeneration.** New thread
+  `01a05593-a480-7a12-95b8-ac5576c1cd4a` on worktree `007-1747-conv` (route matched: openai/
+  gpt-5.6-sol/high), `--expect-base 2462704c9`. Scope: `deno task gen:assets-barrel`,
+  `check:assets-barrel` diff-clean, static re-verification (scaffold + plugin install, no Aspire/
+  Docker) that the regenerated `register-background.mts` now emits double-quoted literals, commit
+  exactly the regenerated asset files. No PLAN-EVAL, no evaluator rerun. Only after this lands and is
+  independently re-verified will a fresh runtime lease be requested to prove
+  `runtime.flow-b-fixture` end-to-end.
+
+- **D-118 — D-116 diagnosis was WRONG; real #1747 root cause is a pre-format/post-format quote
+  mismatch.** The D-117 thread (`01a05593-a480-7a12-95b8-ac5576c1cd4a`) correctly **refused to
+  commit**, reporting that `gen:assets-barrel` produced no changes and `check:assets-barrel` was
+  already diff-clean. Independently verified every claim; the thread is right on all counts:
+  - **My D-116 error:** I inferred "stale embedded barrel" from `grep -c "JSON.stringify(name)"`
+    returning 4 (live source) vs 0 (`embedded.generated.ts`). That inference was invalid — the
+    embedded barrel stores the *static* `register-background` **template** (with `{{__slot4__}}`
+    placeholders), never the dynamic generator implementation, so zero occurrences there is the
+    expected, correct state. I drew a conclusion from a grep count without checking what the file
+    actually stores. The barrel was never stale.
+  - **Actual root cause (verified in source):** `generate-register-background.ts` emits
+    `JSON.stringify(name)` → `"workers"` (double quotes), and the generator's own unit test asserts
+    that shape (`generate-register-background_test.ts:400`, `addExecutable("${PROCESSOR_NAME}"`) —
+    but it asserts against the generator's **in-memory return value, pre-format**. Every real write
+    path (`install-plugin.ts:257`, `generate-aspire-command.ts:29`,
+    `public-command-dependencies.ts:323`, `remove-plugin.ts:162`, `install-local-plugin.ts`) then
+    calls `formatGeneratedFiles`, which runs
+    `deno fmt --no-config --line-width 100 --single-quote` (`format-generated-files.ts:17`) over the
+    written files — rewriting every emitted literal back to **single** quotes on disk.
+    `prepare-flow-b-fixture.ts:214` reads the file **from disk** and regexes for
+    `builder\.addExecutable\("workers",` (double quotes), which can therefore never match. Confirmed
+    empirically twice by scaffold-only reproduction (mine and the thread's): on-disk output is
+    `config.BackgroundProcessors['workers']` / `builder.addExecutable('workers', ...)`.
+  - **Classification: branch product defect in #1747's own fixture rewrite**, not stale tooling, not
+    an S6/main incompatibility. #1747 rewrote `prepare-flow-b-fixture.ts`'s parser to match the
+    generator's *unit-test* view rather than the *on-disk, post-`deno fmt`* reality, so the parser
+    contract is internally inconsistent with the pipeline it reads from.
+  - **Fix options (needs coordinator ruling — both exceed the regeneration-only scope the thread was
+    given, which is exactly why it refused rather than improvising):** (a) relax
+    `prepare-flow-b-fixture.ts`'s regex/anchors to accept the formatted single-quote form (smallest,
+    matches on-disk truth, keeps `JSON.stringify` escaping intact in the generator); or (b) change
+    the formatting/generation behavior so emitted literals survive as double quotes (larger blast
+    radius — `--single-quote` is a repo-wide generated-output convention). Recommend (a).
+  - No runtime, Aspire, or Docker was used at any point in this diagnosis; worktree
+    `007-1747-conv` remains clean at `2462704c9`, identical to remote. No evaluator rerun.
+
+- **D-119 dispatched — coordinator ruled option (a), bounded fixture-parser repair.** Resumed the
+  same #1747 thread (`01a05593-a480-7a12-95b8-ac5576c1cd4a`, idle, worktree clean at `2462704c9`).
+  Scope: make the three on-disk parse anchors in `prepare-flow-b-fixture.ts` quote-agnostic
+  (the `addExecutable` regex ~l.214, `workersConfigAnchor` ~l.224, `workersSetAnchor` ~l.232), so
+  the fixture matches the real post-`deno fmt --single-quote` output. Explicitly out of scope:
+  `--single-quote`, `formatGeneratedFiles`, the generator's `JSON.stringify(name)` escaping, and
+  every repo-wide formatting/generation convention.
+  - **Implementation hazard flagged in the brief:** `workersSetAnchor` is used both as an
+    `indexOf` search target *and* as a literal `.replace()` target; `workersConfigAnchor` feeds
+    `lastIndexOf` and the block-slice start offset. A naive regex conversion would break the replace
+    (silent no-op) or corrupt the slice offset, so the brief requires capturing the
+    actually-matched substring for reuse. All existing `throw new Error(...)` guards must stay
+    intact and `workers`-specific.
+  - Verification required before push: focused check/lint/fmt, focused tests, and a static
+    scaffold-only reproduction (no Aspire/Docker) proving the parse path now binds `bg_0`, finds
+    both anchors, and yields a `configuredBackgroundBlock` containing `services__users__http__0`.
+  - No PLAN-EVAL, no evaluator rerun — the accepted IMPL-EVAL verdict for #1747 stands.
+
+- **Main advanced to `0ac06c5f10ac36cc672ed39b9e13640a03c6ea4b`** (PR #1792, evaluator-routing,
+  merged). #1747 is now **1 behind / 12 ahead** of main. Trivial mechanical convergence — to be
+  applied **after** D-119 lands and **before** requesting the runtime lease, so the
+  `runtime.flow-b-fixture` proof executes at a converged head rather than a stale one. Not done
+  mid-thread: the D-119 thread is actively editing `prepare-flow-b-fixture.ts` in that worktree, and
+  rebasing under a live writer is exactly the corruption hazard recorded in D-86.
+  - **Routing note:** #1792 landing means the prospective GLM 5.3 Flash / Qwen3.8-Flash evaluator
+    routes now have checked-in machine bindings. Per the standing owner ruling, every existing
+    qualifying evaluation (including #1747's accepted IMPL-EVAL and S6's DeepSeek/Fable verdicts)
+    remains valid at its recorded head and is **not** rerun or replaced; the new routes apply only
+    to genuinely new evaluations.
+
+- **D-119 in-flight review (supervisor, pre-commit).** Inspected the thread's working diff before it
+  committed. It correctly resolves the hazard the brief flagged: the `addExecutable` regex uses a
+  `(["'])workers\2` backreference (group 2 = the quote, since group 1 is `(bg_\d+)`); the config
+  anchor is recovered via `matchAll(...).at(-1)?.[0]` over the slice *before* the executable index
+  (faithful `lastIndexOf` emulation) and then re-located with `lastIndexOf` on the **actual matched
+  string**, preserving the true block-slice start offset; and `workersSetAnchor` is captured as the
+  **actual matched substring** via `RegExp(...).exec(...)?.[0]`, so the downstream literal
+  `.replace(workersSetAnchor, ...)` still operates on a real string rather than a regex source.
+  Both anchors remain `workers`-specific and bound to the same `bg_\d+` id, and every
+  `throw new Error(...)` guard is retained with its original message. `${workersBinding}`
+  interpolated into the `RegExp` source is safe (matched as `bg_\d+`, no metacharacters). Awaiting
+  the thread's own verification evidence and commit.
+
+- **D-120 — S6/#1743 MERGED; lane queue reconciled; S7 + #1747 converged; S8 un-stack BLOCKED.**
+  Main advanced to `b99acc697` — **`e17c96ed8 feat(aspire): listener-readiness health checks for
+  backing services (S6) (#1743)` is now on main** (squash merge, coordinator-executed). Verified the
+  close-gate chain worked end-to-end: **#1718 and #1280 both auto-CLOSED with `status:shipped`** via
+  the PR body's closing keywords + the acceptance mirror applied in D-115.
+  - **Lane queue reconciled and made durable:** all 12 open `orchestrator:aspire` issues recorded in
+    `lane-queue.md` with dependency shape, per-issue next action, and standing rules. Key structural
+    fact captured there: **S8 → {S9, S10} → {S11, S13} were all transitively stacked on S6**, so S6's
+    merge is the keystone unblock; only S7 and #1747 sit outside that chain.
+  - **Label-hygiene deltas found (flagged, not unilaterally applied — `status:` is the board's
+    single-source signal):** #1719 carries `status:triage` despite an open implementation PR (#1744)
+    → should be `status:impl`; #1712 (epic umbrella) also carries `status:triage` → should reflect
+    the epic's real phase.
+  - **D-119 landed and independently verified** at `bb557ca64` ("fix(cli): parse formatted workers
+    fixture anchors"): scoped to `prepare-flow-b-fixture.ts` + a run-dir note, all **19**
+    `throw new Error` guards retained, focused check/lint/fmt all exit 0. The thread's recorded
+    scaffold-only reproduction (no Aspire/Docker) proves the repaired parse path end-to-end:
+    `workersBinding: "bg_0"`, executable anchor matched as the on-disk single-quote form
+    (`builder.addExecutable('workers',`), config anchor matched at real offset 2232, set anchor
+    captured as the **actual matched substring** (`backgroundProcessors.set('workers', bg_0);`) so
+    the downstream literal `.replace()` operates on real text, and
+    `configuredContainsUsersReference: true`. My pre-commit review of the same diff independently
+    confirmed the backreference numbering and offset preservation.
+  - **#1747 converged onto current main** and pushed: `bb557ca64` → **`0d0f6747e`**, 0 behind /
+    13 ahead, `git range-diff` shows all 13 commits `=` (content-identical). Base is `main`.
+    **Ready for a runtime lease** to prove `runtime.flow-b-fixture` passes in the full
+    `scaffold.runtime` suite — that is the last outstanding gate for #1747.
+  - **S7 (#1744) converged onto current main** and pushed: `a560d7e10` → **`631437404`**, 0 behind /
+    15 ahead, range-diff all 15 commits `=`. Worktree clean, no active thread, no runtime used.
+    S7's remaining DoD is 3 items: acceptance close-gate verification, a **Phase-B runtime lease**
+    (live reproduction + foreign-AppHost receipt), and an **independent IMPL-EVAL cycle 2** (a
+    genuinely *new* evaluation → uses the post-#1792 GLM 5.3 Flash max IMPL route; existing verdicts
+    untouched).
+  - **S8 (#1754) un-stack is a genuine D-90-class collision — NOT a mechanical rebase. Attempted,
+    aborted, fully restored.** S8's branch carries **33 commits** over its merge-base with S6-final
+    (`3e5cbabfc`), decomposing as **17 stale S5 commits + 7 stale S6 commits + 9 of S8's own**. Both
+    S5 and S6 are already in main *as squashes*, and S6's merged content is the **D-101/D-109
+    reconstruction**, materially different from the 7 stale S6 originals S8 still carries. The
+    correct un-stack is `git rebase --onto origin/main 01f27d4d4` (replay only S8's own 9 commits).
+    I attempted exactly that **on a throwaway branch `s8-onto-main-attempt`, never touching the real
+    branch ref**; it conflicted at commit 3/10 (`41a51c7a6 chore(cli): regenerate typed command
+    assets`) on `packages/cli/src/kernel/assets/embedded.generated.ts` — S8 regenerated that barrel
+    from the **old** S6 form while main now holds it regenerated from the **reconstructed** S6 form.
+    Per standing discipline I **aborted rather than force-resolved**, deleted the scratch branch, and
+    verified S8 restored to exactly `f06209d39` with a clean worktree.
+    - **Recommended fix (needs coordinator ruling):** this is a *generated-file* conflict, so the
+      right resolution is not a manual merge — it is to take main's `embedded.generated.ts` during
+      the rebase (`--ours`-side for that path), let all 9 S8 source commits land, then run
+      `deno task gen:assets-barrel` once at the end and commit the regenerated barrel, verifying
+      `check:assets-barrel` is diff-clean. That should be a **dedicated reconstruction slice with
+      range-diff proof**, mirroring the D-109 pattern, not an improvised in-place resolution.
+    - Until S8 lands, S9/S10/S11/S13 stay transitively blocked — but per the standing "never globally
+      idle" rule the lane continued on the independent column (#1747 + S7) throughout this turn.
+  - No runtime lease held, no Aspire/Docker started, and no evaluator rerun at any point in D-120.
+
+- **D-121 dispatched — S8 (#1754) post-S6-merge reconstruction, coordinator-approved dedicated
+  slice.** New thread **`01a055ab-ff9d-7043-9ca9-3e12a2e1b6c8`** on a **dedicated worktree
+  `007-s8-recon`** (route matched: openai/gpt-5.6-sol/high, `--expect-base f06209d39`).
+  - **Safety setup before dispatch:** tagged `aspire-13-5-s8-pre-reconstruction` → `f06209d39`
+    (recoverable anchor, plus the remote still holds that head); created `007-s8-recon` from
+    `origin/main`; **detached the original `007-aspire-s8` worktree first** so no two worktrees ever
+    hold the branch simultaneously (D-86 discipline); checked the branch out in the recon worktree at
+    `f06209d39` with upstream unset (required by the launcher's push-safety check).
+  - **Brief contents:** replay **only S8's own 9 commits** via
+    `git rebase --onto origin/main 01f27d4d4`, dropping the 17 stale S5 + 7 stale S6 commits whose
+    content is already in `main` as squashes. The known `embedded.generated.ts` conflict is
+    pre-disclosed with its exact commit (`41a51c7a6`, 3 of 10) so the thread does not rediscover it
+    blindly. **Resolution rule: generated files (`*.generated.ts`, generated `*.template` snapshots)
+    take `main`'s side, never a hand-merge, because the barrel is regenerated deterministically at
+    the end via one `gen:assets-barrel` run verified by `check:assets-barrel`. A conflict in any
+    NON-generated source file is a genuine semantic collision → abort and report, never
+    force-resolve.**
+  - **Verification required before push:** full convergence (`merge-base == origin/main`),
+    `range-diff` proving S8's 9 own commits are content-equivalent, explicit confirmation the 24
+    stale S5/S6 commits are **absent**, scoped check/lint/fmt, focused tests,
+    `check:aspire-version-parity` `fail=0` (with the D-114 manifest-path precedent noted in case S8's
+    file moves broke rows), and `git ls-remote` immediately before the `--force-with-lease` push.
+  - **No runtime** (no Aspire/Docker/`e2e:cli` runtime suites), **no PLAN-EVAL, no evaluator rerun**,
+    no PR-base retarget (supervisor owns PR metadata), no touching S9/S10/S11/S13.
+  - Main moved again during setup to `65cd8a077`; the brief instructs a fresh `git fetch origin main`
+    so the rebase targets true current main rather than a stale ref.
+
+- **D-121 result — reconstruction correctly ABORTED on a genuine semantic collision; resolution now
+  fully characterized and needs one coordinator ruling.** Thread
+  `01a055ab-ff9d-7043-9ca9-3e12a2e1b6c8` executed the brief exactly: replayed S8's own commits onto
+  `origin/main` (`65cd8a077`), resolved **three** successive `embedded.generated.ts` conflicts by
+  taking `main`'s side (generated-file rule, no hand-merge), then hit a **non-generated source**
+  conflict at 6/10 and **aborted rather than force-resolving**, as mandated. Verified independently:
+  branch restored to exactly `f06209d39`, safety tag unchanged, worktree clean, nothing pushed, no
+  runtime started.
+  - **My arithmetic correction:** `01f27d4d4..f06209d39` is **10** commits, not the 9 I stated in
+    D-120/D-121 (I miscounted the listed subjects). The thread caught this and used the correct
+    endpoint range; the decomposition is therefore 17 stale S5 + 7 stale S6 + **10** S8-own.
+  - **The collision:** `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts`
+    at commit `b985447fe` ("test(aspire): add typed db phase-b gate and static evidence"). S8 was
+    written against S6's **pre-reconstruction** listener contract; `main` now carries the shipped
+    D-101 architecture, which replaced that area outright:
+    | S8 (stale, pre-reconstruction) | `main` (shipped D-101) |
+    | --- | --- |
+    | `listenerUnreachableExpectations(database)` | `listenerFaultExpectations(database)` |
+    | `databaseListenerExpectation(database)` | test-only health-check keys + controller-listener names |
+    | — | `parseListenerFaultDatabase(value)` |
+  - **Key finding that makes this resolvable rather than a design question:** S8's genuinely new
+    export, **`createTypedDbPhaseBGate()`, is architecture-independent** — it does not reference the
+    listener contract at all. It only calls `commandGate(GATE.RUNTIME_TYPED_DB_PHASE_B, …)` and
+    spawns `verify-typed-db-phase-b.ts`, needing just a `resolve` import and
+    `context.request.options.database`. It is merely *co-located* in the conflicting file. So the
+    thread's framing ("where does the S8 Phase-B gate belong in the reconstructed architecture?") has
+    a clean answer: **exactly where it already is — beside `main`'s contract instead of S8's stale
+    one.**
+  - **Caller audit (grep at `f06209d39`) confirms the split is clean:**
+    - S8's stale helpers are referenced **only** by that file itself (l.73) and by S8's own
+      `listener-readiness-gates_test.ts` — nothing else depends on them.
+    - `createTypedDbPhaseBGate` / `RUNTIME_TYPED_DB_PHASE_B` are referenced by
+      `scaffold-capability-gates.ts`, `cli-surface.ts`, `capability-suites.ts` (×2), and
+      `runtime-gates_test.ts` — all additive S8 files with no listener-architecture coupling.
+    - `main`'s version still exports `listenerReadinessExpectation`, `listenerReadinessWaitCommand`,
+      and `createListenerReadinessGates`, and already imports `DATABASE`/`DatabaseEngine`, so every
+      remaining S8 dependency resolves against it.
+  - **Recommended resolution (needs coordinator sign-off because it deliberately drops S8 content):**
+    take `main`'s `listener-readiness-gates.ts` as the base; **append only** S8's
+    `createTypedDbPhaseBGate()` plus its `resolve` import; **drop** S8's superseded
+    `listenerUnreachableExpectations` / `databaseListenerExpectation` and its old
+    `createListenerReadinessGates` body; take `main`'s `listener-readiness-gates_test.ts` (S8's
+    edits there only covered the dropped helpers — its typed-db coverage lives in
+    `runtime-gates_test.ts`, which S8 changes separately and additively). Then resume the standard
+    tail: finish the rebase, one `gen:assets-barrel`, `check:assets-barrel` diff-clean, full
+    verification set, leased push.
+  - Nothing pushed; S8 remains at `f06209d39` with the safety tag intact pending that ruling.
+
+- **D-122 dispatched — coordinator ruled the D-121 collision; same thread resumed.** Sent
+  `slices/s8/d122-resolution-ruling-brief.md` to thread
+  `01a055ab-ff9d-7043-9ca9-3e12a2e1b6c8` (idle, worktree clean at `f06209d39`). Ruling, exactly as
+  scoped by the coordinator: **base = `main`'s `listener-readiness-gates.ts`** (shipped D-101
+  architecture, kept intact); **append only** S8's `createTypedDbPhaseBGate()` + its `resolve`
+  import, body preserved byte-for-byte; **drop** S8's superseded `listenerUnreachableExpectations`,
+  `databaseListenerExpectation`, and old `createListenerReadinessGates` body; take **`main`'s**
+  `listener-readiness-gates_test.ts` (S8's edits there covered only the dropped helpers — its
+  typed-db coverage lives in `runtime-gates_test.ts`, kept); **preserve all other S8 typed-db work
+  unchanged** (`operation-runner*`, `generate-db-cli-mode*`, `run-tool.ts.template`,
+  `verify-typed-db-phase-b.ts`, `scaffold-capability-gates.ts`, `cli-surface.ts`,
+  `capability-suites.ts`, run-dir docs).
+  - **Authorization deliberately bounded:** the brief states this ruling covers *only*
+    `listener-readiness-gates.ts` and its test — **any further non-generated source conflict must
+    abort and report again**. The generated-file rule (take `main`'s side, no hand-merge) continues.
+  - Tail unchanged from D-121: finish rebase → one `gen:assets-barrel` → `check:assets-barrel`
+    diff-clean → full verification set (convergence, range-diff with the expected `!` on the
+    listener-gates commit explained by this ruling, stale-S5/S6-absent confirmation, scoped
+    check/lint/fmt, focused tests, `check:aspire-version-parity` `fail=0`) → leased push against a
+    freshly-read `git ls-remote` SHA. Safety tag `aspire-13-5-s8-pre-reconstruction` must not move.
+  - No runtime, no PLAN-EVAL, no evaluator rerun.
+
+- **D-123 — `main` was BROKEN repo-wide; root-caused and fixed as PR #1821 (p0).** While reconciling
+  the 7-PR control plane I found **#1747's `check-test` failing** (close-gate and quality both
+  passed). Reproduced locally on the converged head: `TS2307`, 3 occurrences, 1 path —
+  `packages/cli/e2e/src/application/gates/scaffold/ui-data-screen-gates.ts:5` imports
+  `'./generated-app-name.ts'`, which does not exist there.
+  - **Verified this is NOT a #1747 defect — `main` itself is broken.** The module lives at
+    `scaffold/**runtime/**generated-app-name.ts`; every other consumer imports it correctly
+    (`database-gates.ts`, `runtime-gates.ts`, `ui-ai-gates.ts`, `runtime/behavior-gates.ts`). Only
+    `ui-data-screen-gates.ts` omits the `runtime/` segment.
+  - **Cause is merge order, and it is my lane's regression:** the import was authored in **#1781**
+    against the pre-S6 layout and merged **after** S6 (#1743) relocated `generated-app-name.ts` into
+    `scaffold/runtime/`. Neither PR is wrong in isolation; the breakage exists only in their
+    composition on `main`. This is exactly the class of collision the S6 file moves also caused in
+    D-114 (parity-manifest paths) — same root, different consumer.
+  - **Blast radius:** `deno task check` fails on `main`, therefore on **every open branch and every
+    lane**, blocking the `check-test` job repo-wide — including the feature/fix canary the
+    coordinator requires Aspire never to block. That made it a p0 unblock rather than a queued item.
+  - **Fix:** one line, `'./generated-app-name.ts'` → `'./runtime/generated-app-name.ts'`. Verified
+    with the exact gate CI runs: **before** `failedBatches: 3, totalOccurrences: 3`; **after**
+    `filesSelected: 2969, failedBatches: 0, totalOccurrences: 0`. Lint + fmt clean. No behavior
+    change — same module resolved, corrected path segment only.
+  - Branch `fix/e2e-ui-data-screen-import-path` @ `6a8cd07aa`, **PR #1821** opened against `main`,
+    labelled `type:fix, area:cli, priority:p0, status:ready-merge`, milestone `0.0.7`. **Coordinator
+    merges** — not merged here. Every Aspire PR's `check-test` stays red until it lands, so #1821 is
+    now the lane's top-priority dependency, ahead of the S8 reconstruction.
+  - No runtime, Aspire, or Docker used. Worktree `007-mainfix` created off `origin/main` for this
+    fix alone.
+
+- **D-123 superseded — #1821 closed as duplicate.** Coordinator confirmed the identical repair
+  already merged via **#1764**; verified directly on current `main` (`8a925764276b25ef7cef484db273604f44557cef`):
+  `ui-data-screen-gates.ts:5` now imports `'./runtime/generated-app-name.ts'`. Closed #1821 with an
+  explanatory comment, removed the `007-mainfix` worktree, and deleted the branch locally and on the
+  remote. Removed from the critical path. The D-123 *diagnosis* still stands as the record of why
+  every lane's `check-test` was red; only my PR was redundant.
+
+- **D-124 — un-stack cascade fully pre-computed (lease-free parallel prep).** With intra-orchestrator
+  parallelism authorized, mapped every remaining stacked slice so each un-stack is a single
+  `rebase --onto` at dispatch time rather than archaeology under deadline. Verified by `merge-base` /
+  `rev-list --count` against each parent's pre-reconstruction head; recorded in `lane-queue.md`:
+  | Slice | PR | Branch point | Own commits | Un-stack |
+  | --- | --- | --- | ---: | --- |
+  | S9 | #1759 | `f23954658` (S8 commit 7) | 10 | `--onto <new-S8-head> f23954658` |
+  | S10 | #1760 | `f23954658` (S8 commit 7) | 9 | `--onto <new-S8-head> f23954658` |
+  | S11 | #1771 | `a46ea16d0` (S10 commit) | 11 | `--onto <new-S10-head> a46ea16d0` |
+  | S13 | #1779 | `a46ea16d0` (S10 commit) | 9 | `--onto <new-S10-head> a46ea16d0` |
+  - **S9/S10 are siblings off the same S8 commit and never touch each other → un-stackable in
+    parallel** in separate worktrees; same for S11/S13 off S10. This is where the authorized
+    parallelism actually pays, and it needs no runtime lease.
+  - Neither S9 nor S10 currently carries S8's last three commits; replaying onto S8's *new* head
+    supplies the complete S8 automatically.
+  - The two conflict-class rules carry forward unchanged (generated → take upstream + regenerate once
+    at the end; non-generated source → abort and report).
+
+- **D-125 — S7 (#1744) close-gate verified statically: it CANNOT complete without a runtime lease.**
+  `Closes #1719`, `Closes #1429`. Acceptance-mirror dry-run is structurally valid for both issues
+  (no mapping errors; it only declines to mutate because `status:ready-merge` is absent, which is
+  correct at this stage). #1429 has **zero** unchecked close-gated boxes. #1719 has three:
+  1. the #1429 reproduction — explicitly requires *"the real 13.5 kill receipt"* (runtime) alongside
+     synthetic/unit coverage (static, already present);
+  2. foreign-AppHost-reported-never-mutated, *"re-tested"* (runtime);
+  3. `Will close (via its PR) #1429` — **already satisfied structurally**, since #1744's body carries
+     the `Closes #1429` keyword.
+  So S7's residual acceptance is genuinely runtime-gated; no amount of static work closes it. Same
+  for #1747, whose sole remaining gate is the `runtime.flow-b-fixture` proof. **Both are queued on a
+  coordinator-granted serialized runtime lease.**
+
+- **D-126 — runtime lease `aspire-1747-flow-b-20260831T0302Z` RETURNED UNUSED: #1747 cannot converge
+  mechanically, so the proof would have run on a head that can never merge.** Preflight four-part
+  zero independently confirmed before anything started. **Nothing was ever started** — no AppHost, no
+  container, no volume, no network, no relay; post-check confirms all four still zero and the
+  worktree clean at `0d0f6747e`. The lease is returned intact rather than spent on invalid evidence.
+  - **What blocked it:** converging #1747 onto current main (`8a92576`) conflicts in
+    `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts` — **#1764 rewrote the
+    exact region D-119 had just repaired.** Aborted the rebase per standing discipline rather than
+    force-resolving; head restored to `0d0f6747e`.
+  - **Empirically verified what main now emits** (scaffold-only probe using *main's* CLI, no
+    Aspire/Docker, probe deleted afterwards):
+    ```
+    51:  // --- workers ---
+    77:    const workers = builder.addExecutable('workers', 'deno', workers_workdir, [
+    139:    backgroundProcessors.set('workers', workers);
+    ```
+    So on main the generator now (a) emits a `// --- workers ---` **comment marker**, and (b) uses the
+    sanitized **name itself as the binding identifier** (`const workers = …`), not the old `bg_N`
+    scheme. Main's fixture matches that exactly, locating the block by the quote-agnostic comment
+    marker.
+  - **Consequence — this is bigger than a merge conflict.** #1747's generator diff is written against
+    the **old `bg_N` generator**, which no longer exists on main; `git grep -c "JSON.stringify(name)"`
+    on main's generator returns **0**. So #1747's product change must be **re-applied onto main's
+    evolved generator**, not merged. Two further observations that should shape the ruling:
+    1. **D-119's fixture repair is now moot.** It fixed #1747's *own* parser rewrite; main's
+       comment-marker parser is quote-agnostic and needs no such repair. The right resolution is to
+       **take main's `prepare-flow-b-fixture.ts` wholesale and drop #1747's changes to that file**.
+    2. **The escaping half may be largely redundant now.** Main uses the name as a **JS binding
+       identifier** (`const workers = …`), so an unsafe name breaks the emitted source regardless of
+       quoting — meaning #1747's **validation** half (`packages/aspire/config.ts`,
+       `aspire-resource-name.ts`, rejecting unsafe names *before* generation) is the load-bearing
+       defense, and `JSON.stringify` quoting is defense-in-depth on top of it.
+  - **Recommendation:** a bounded re-application slice for #1747 — keep the validation half and its
+    tests as-is (they are independent of the generator's shape), re-apply the `JSON.stringify(name)`
+    escaping onto main's *current* generator lines, and **drop #1747's `prepare-flow-b-fixture.ts`
+    changes entirely in favour of main's**. Then re-request the runtime lease at the converged head.
+    Running the flow-b proof before that re-application would certify a head that cannot merge.
+  - S8 static work continued in parallel throughout; no lane was idled by this.
+
+- **D-127 dispatched — #1747 convergence with the coordinator's union ruling.** Sent
+  `slices/1747/d127-converge-onto-main-brief.md` to thread `01a05593…`. The ruling: resolve the
+  single real conflict in `prepare-flow-b-fixture.ts` as a **union** — keep #1747's dynamic,
+  quote-agnostic `workersBinding`/`workersSetAnchor` discovery **and** main #1764's
+  `missingBackgroundReferences` union for users+sagas, replacing the **captured** anchor with
+  `missingBackgroundReferences.join(...)`. Explicit prohibitions carried into the brief: never
+  restore a hardcoded `workers` binding, never reintroduce `bg_N`.
+  - **Technical constraint I had to add beyond the ruling text:** #1747's original discovery regex
+    captured `(bg_\d+)` specifically, which **cannot match main's current emission**
+    (`const workers = builder.addExecutable('workers',`). The brief therefore requires the capture
+    group be a **general JS identifier** (`([A-Za-z_$][\w$]*)`) so the same code works against both
+    the old `bg_N` form and main's name-as-binding form. Without that the "quote-agnostic discovery"
+    the ruling preserves would silently fail to match at all.
+  - Also instructed: re-apply `JSON.stringify(name)` escaping onto **main's current** generator lines
+    (main uses `'${name}'` today) without reverting main's binding-identifier scheme; keep #1747's
+    validation half untouched; take main's side on any trivial conflict; **abort and report** on any
+    other non-generated source conflict. Repo-wide `deno task check` required (the gate that caught
+    D-123), plus a static scaffold-only fixture reproduction. No runtime, no evaluator rerun —
+    existing Fable PASS carries unless semantics change or a gate fails.
+
+- **D-128 — S8 reconstruction VERIFIED and cascade launched in parallel.** S8 pushed at
+  **`bc838a0b3`**, 0 behind main, worktree clean. Independently verified against every D-122 ruling
+  constraint (not merely trusted): stale S5/S6 lineage **absent**; 13 commits = 10 own + regeneration
+  + format + evidence; `createTypedDbPhaseBGate` **preserved**; main's D-101 contract
+  (`listenerFaultExpectations`, `parseListenerFaultDatabase`) **intact**; S8's superseded
+  `listenerUnreachableExpectations` **dropped (0 occurrences)**. PR #1754 retargeted to `main` →
+  now **`mergeable: true`** (was `dirty`/conflicting).
+  - Dispatched **S9 (#1759) and S10 (#1760) un-stacks concurrently** — siblings off the same S8
+    commit `f23954658`, separate worktrees, no collision, exactly the parallelism the coordinator
+    authorized. Each replays only its own commits via `git rebase --onto bc838a0b3 f23954658`, with
+    the same two conflict-class rules that just worked for S8.
+  - **Launcher refused both with `duplicate_sender_risk`** (worktrees carry durable sender records
+    from earlier sessions). Per the recorded lesson this block is *not* evidence of a live thread —
+    verified no live client for either — so I resumed the existing threads instead of forcing new
+    ones: S9 → `01a0523a-d727-7610-9cd4-e4eddbd77aea`, S10 → `01a052a5-21d9-7d80-b4b1-c267be7e112a`.
+
+- **D-129 — S9 (#1759) aborted correctly; the conflict is ADDITIVE-ONLY and will recur across the
+  whole cascade.** The S9 thread (`01a0523a…`) replayed onto `bc838a0b3`, hit non-generated source
+  conflicts while applying its first own commit `eba896250` ("test(cli): add Aspire MCP smoke receipt
+  gate"), and **aborted per the D-128 rule** rather than force-resolving. S9 remains at `bf06551ba`,
+  worktree clean, nothing pushed.
+  - **Conflicting files:** `packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts`
+    and `packages/cli/e2e/suites/scaffold/capability-suites.ts`.
+  - **Characterized precisely — this is NOT an architecture collision like S8's.** It is a pure
+    *additive list* conflict: S9's commit adds **2 lines to each file** (`GATE.SCAFFOLD_AGENT_INIT`,
+    `GATE.AGENT_ASPIRE_MCP_SMOKE`), while the reconstructed S8 independently added
+    `GATE.RUNTIME_TYPED_DB_PHASE_B` to the same gate lists (`capability-suites.ts:109,154`). **Neither
+    side modifies or removes the other's entries** — they simply register different gates in the same
+    two registration lists. A union keeps both and **drops nothing**, so it is the null-risk
+    resolution, materially weaker than the S8 ruling which genuinely dropped superseded content.
+  - **Structural prediction:** S10, S11, and S13 each register their own gates in these same lists,
+    so this identical additive conflict is expected to recur for every remaining cascade slice.
+    Resolving it four times by separate round-trip would be the main threat to the milestone
+    deadline; one standing rule covers all of them.
+  - **Requested (single ruling, cascade-wide):** authorize *additive-only* union resolution for the
+    gate-registration lists — keep **both** sides' entries, preserve existing ordering/grouping, add
+    nothing else — while **every other non-generated source conflict continues to abort and report**.
+    Verification unchanged (no dropped entries; gate-registry tests must pass; the registry/suite
+    tests already assert list membership, so a mis-union fails loudly).
+  - S10 (`01a052a5…`) is **still running** and has progressed past its own commits (artifact
+    `6e084d0b5`), so it is not blocked on this yet; it may hit the same conflict later.
+
+- **Main advanced (docs-only) to `6bb27e46ab1bd4b9534068b2a9eb58039ae287d1`** (#1796). Adopting it as
+  the convergence target for #1747 and the S8-onward cascade. S8 (`bc838a0b3`) is now 1 behind — a
+  trivial docs-only re-converge, to be folded into the next push rather than spending a separate
+  cycle. Per the coordinator's byte-identity rule, accepted evaluations carry across
+  derivative-only regeneration **only** with byte-identity proof of the product content; any
+  regeneration that alters non-derivative bytes forfeits the carry and must be reported.
+
+- **D-130 — S10 (#1760) aborted correctly; its collision is GENUINELY SEMANTIC and would break
+  shipped main.** Thread `01a052a5…` replayed onto `bc838a0b3`, progressed through most of its own
+  commits, then hit non-generated conflicts at commit **`4e270e940`** ("test(e2e): register resource
+  command and receipt gates") and **aborted per the D-128 rule**. S10 restored clean at `fbda6a5bd`,
+  nothing pushed.
+  - **Conflicting files:** `packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts`
+    and `packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts`.
+  - **Why this one is NOT benign:** S10's commit **deletes 120 lines** from
+    `verify-listener-readiness.ts`, removing the `ListenerHealthReport` interface and the
+    `readListenerHealthReport()` function. That was valid in the **pre-D-101** architecture S10 was
+    written against. It is invalid now: **main's shipped D-101 fixture depends on those exports** —
+    `listener-unreachable-fixture.ts:18-20` imports both and uses `ListenerHealthReport` in its
+    receipt types (`testOnly`, `realBacking`). Five files on `main` reference that module
+    (`listener-readiness-gates.ts`, `listener-unreachable-fixture.ts`, `verify-listener-readiness.ts`
+    itself, `runtime-gates_test.ts`, `listener-readiness-gates_test.ts`). **Replaying S10's deletion
+    onto main would break the exact evidence-backed listener architecture that just merged and passed
+    CI (run 33343080292).** This is precisely the failure the abort rule exists to prevent.
+  - **Recommended resolution (needs a ruling):** **drop S10's deletion** — keep `main`'s
+    `verify-listener-readiness.ts` intact — and take **`main`'s** `listener-readiness-gates_test.ts`
+    (S10's 3-line edit there is against the superseded contract). The latter is exactly what the D-122
+    ruling already decided for this same test file in S8's reconstruction, so it is consistent
+    precedent rather than a new judgement. All of S10's *other* work (its gate registrations, receipt
+    gates, `describe --follow` parser, DTO completeness) is preserved unchanged.
+  - **Cascade shape now fully known — the two remaining slices split by conflict class:**
+    | Slice | Conflict class | Resolution |
+    | --- | --- | --- |
+    | S9 #1759 | **additive-only** gate-list union (D-129) | keep both sides' entries; drops nothing |
+    | S10 #1760 | **semantic** — deletes exports main depends on | drop the deletion; keep main's file + test |
+    | S11 #1771, S13 #1779 | expected additive gate-list, same as S9 | same union rule, once ruled |
+  - Both threads behaved correctly: each aborted, restored a clean head, pushed nothing, and reported
+    exact files/commits. No force-resolution anywhere in the cascade.
+
+- **D-131 — S8 reconstruction independently verified green (static, supervisor-run, no lease).**
+  Rather than rely on the thread's own report, re-ran the decisive gates myself on `bc838a0b3`:
+  - Repo-wide type-check (the exact gate CI runs, and the one that caught D-123):
+    `filesSelected: 2972, batches: 25, failedBatches: 0, totalOccurrences: 0`.
+  - `deno task check:aspire-version-parity`: `ok: true, fail: 0` (812 checked; only pre-existing
+    deferred/info rows, none S8-attributable).
+  - Focused gate tests (`runtime-gates_test.ts`, `listener-readiness-gates_test.ts`):
+    **26 passed / 0 failed**, including `failure/recovery gate owns exactly the synthetic Postgres and
+    Garnet checks` — i.e. main's shipped D-101 contract still holds under S8's reconstruction, which
+    is the property most at risk from that un-stack.
+  So the keystone is statically sound at `bc838a0b3`. PR #1754 is retargeted to `main` and remains
+  **draft**, so no full CI has run on the reconstructed head yet (`mergeable: null/unknown`; only a
+  skipped OpenHands run). Leaving draft is a lifecycle decision that also triggers the ready-for-review
+  IMPL-EVAL path — deferred to the coordinator rather than taken unilaterally, since S8's own DoD
+  still carries unrun Phase-B items.
+
+- **Main advanced again to `7908399affa2c0010aafd5742b12d9edfbba0942`** (#1822, orthogonal two-file
+  visual-doc salvage). Per coordinator instruction, integration happens at the **next safe boundary
+  after #1798 merges** — deliberately *not* now, because three slices are mid-flight
+  (#1747 D-127 working at `d3a55503d`; S9/S10 awaiting rulings) and rebasing under live writers is
+  the D-86 corruption hazard. All affected branches are exactly **1 behind** and docs-only, so the
+  integration is trivial whenever the boundary arrives. Runtime remains at four-part zero; no lease
+  held anywhere in this turn.
+
+- **D-132 — #1747 converged onto current main and independently verified GREEN.** Thread
+  `01a05593…` completed D-127; head **`68c80e743`** ("fix(cli): preserve main background binding
+  semantics"), pushed, **0 behind main** (`7908399a`), 14 ahead, worktree clean.
+  - **Every ruling constraint verified by me directly, not taken on report:**
+    | Constraint | Evidence at `68c80e743` |
+    | --- | --- |
+    | #1747 quote-agnostic discovery kept | `const workersExecutableMatch = /const ([A-Za-z_$][\w$]*) = builder\.addExecutable\((["'])workers\2,/` |
+    | generalized beyond `bg_\d+` (my added constraint) | capture group is a **general JS identifier**, so it matches main's `const workers = …` *and* legacy `bg_0` |
+    | config anchor quote-agnostic | `/ {2}if \(config\.BackgroundProcessors\[(["'])workers\1\]\?\.Enabled !== false\) \{/` |
+    | set anchor quote-agnostic + uses discovered binding | `` `    backgroundProcessors\\.set\\((["'])workers\\1, ${workersBinding}\\);` `` |
+    | main #1764 users+sagas union preserved | 5 occurrences of `missingBackgroundReferences`/`sagasReference` |
+    | **no hardcoded `workers` binding, no `bg_N`** | **0 occurrences** of either forbidden form |
+    | #1747's validation half intact | `JSON.stringify(name)` ×4 in the generator; `packages/aspire` +169 lines incl. `config_test.ts` |
+  - **Gates re-run by the supervisor:** repo-wide type-check `filesSelected: 2971, failedBatches: 0,
+    totalOccurrences: 0`; focused tests `4 passed (134 steps) / 0 failed` (aspire config/name
+    validation + both generator suites); `check:aspire-version-parity` `ok: true, fail: 0`.
+  - The thread also correctly propagated main's binding scheme into #1747's generator tests
+    (`bg_0.withEnvironment(...)` → `triggers.withEnvironment(...)`), which is the right direction —
+    adopting main's semantics rather than reverting them.
+  - **#1747 is now static-green at a fully converged head.** Its sole remaining gate is the
+    coordinator-granted runtime lease for the full Postgres `scaffold.runtime` +
+    `runtime.flow-b-fixture` proof. Per the standing ruling the existing Fable PASS carries — the
+    resolution preserved both sides' semantics and every gate passed, so no evaluator rerun is
+    warranted. Requesting that lease.
+
+- **D-134 — #1747 runtime lease at exact head `68c80e743`: attempt 1 INTERRUPTED_NO_VERDICT,
+  attempt 2 running in a detached runner.**
+  - **Attempt 1 (foreground, my error of method):** ran the full Postgres `scaffold.runtime` inside a
+    Claude foreground tool call, which hit the **9m55s shell execution ceiling** and was killed
+    (exit 143) mid-suite. **This is INTERRUPTED_NO_VERDICT, not a FAIL** — no gate-end, no report was
+    written. Before the kill the log recorded **`runtime.flow-b-fixture: PASSED (2084ms)`**, i.e. the
+    exact gate #1747 exists to fix, plus everything upstream of it; the kill landed later
+    (`database.init` was the last line observed).
+  - **Owned resources were left live by the interruption and I cleaned them myself:** 3 containers
+    (`postgres-c55b0461`, `garnet-aubykcxg`, `redis-vcjxbyxf`), 1 volume, 1 custom network, and 2
+    `aspire-managed` processes (AppHost + dashboard), all provably mine (AppHost `--contentRoot`
+    pointed at `.llm/tmp/1747-lease/leaf-1747-rt`). Ran the mandatory `aspire stop --apphost <exact>`
+    (clean), then removed the Persistent-lifetime `postgres-c55b0461`, the anonymous volume, and
+    `aspire-persistent-network-c55b0461-aspire-managed`. **Re-proved four-part zero: containers 0,
+    volumes 0, custom networks 0, no aspire process** — matching the coordinator's independent
+    re-proof.
+  - **Evidence-hygiene mistake, recorded honestly:** attempt 2 reuses the same
+    `slices/1747/phase-b/suite.log` path with `>` redirection, so **attempt 1's log was overwritten**.
+    Attempt 1's `flow-b-fixture: PASSED (2084ms)` line is therefore preserved only in this drift
+    entry and in my session transcript, not as a file receipt. Attempt 2 produces the authoritative
+    receipt; I should have written attempt 1 to a distinct path.
+  - **Attempt 2 (authoritative), runner identity:** launched **before** the retry grant arrived, as a
+    **detached background process outside the Claude tool-call timeout** — exactly the runner shape
+    the coordinator then mandated. Identical command and identical immutable head `68c80e743`:
+    `deno task e2e:cli run scaffold.runtime --smoke-root <worktree>/.llm/tmp/1747-lease
+    --name leaf-1747-rt --db postgres --cache --cleanup --format pretty --report <RUN>/report.json
+    --log-file <RUN>/events.ndjson`, `DOCKER_HOST=tcp://netscript-dind:2375`, stdout+stderr tee'd to
+    `<RUN>/suite.log`. Process identity: bash `1300652` → `deno task` `1300737` → `deno run
+    packages/cli/e2e/cli.ts` `1300760`. **Monitored without killing**; no other runtime overlaps.
+    Started from a re-proved four-part zero.
+
+- **D-135 — S10 un-stack: rebase SUCCEEDED, push correctly withheld on two blockers, one of which is
+  my brief's error.** Thread `01a052a5…` replayed all nine S10 commits onto S8 `bc838a0b3`
+  (local head `aaf5ec639`; stale lineage absent; assets/check/fmt/lint/quality/arch/parity and the
+  repo-wide check all green; obsolete manifest row for the deleted `wait-for-workers-runtime.ts`
+  dropped). It applied the D-133 ruling correctly: **main's `verify-listener-readiness.ts` preserved
+  byte-for-byte, `readListenerHealthReport()` still exported.** It refused to force-push. Both
+  blockers are legitimate:
+  - **Blocker 1 (ancestry) — MY BRIEF WAS WRONG.** I required
+    `git merge-base HEAD origin/main == origin/main`. That is **structurally impossible for a branch
+    stacked on S8**: S10's base is the S8 branch (`bc838a0b3`), and main has since advanced to
+    `584caa03f`, so S10's merge-base with main is necessarily S8's own base, not main's tip. The
+    correct assertion for a stacked slice is `merge-base HEAD <S8-head> == <S8-head>`. The thread was
+    right to stop rather than force-push against a failing mandatory assertion. **Fix: correct the
+    assertion, not the branch** — S10 stays stacked on S8 until S8 merges, exactly as its PR base
+    says.
+  - **Blocker 2 (genuine, needs a ruling) — production/test path mismatch.** S10's unchanged commit
+    `4e270e940` **relocates** the listener-readiness verification module: it adds
+    `runtime/evidence/listener-readiness.ts` (which re-exports the same `ListenerHealthReport` +
+    `readListenerHealthReport` API) and repoints `listener-readiness-gates.ts` at it, while deleting
+    the old path. The D-133 ruling preserved **main's** `verify-listener-readiness.ts` *and* **main's**
+    test, which asserts `listenerReadinessWaitCommand()` executes `verify-listener-readiness.ts`.
+    Result: **88 pass / 1 fail** — main's test points at the old path, S10's production code at the
+    new one. The ruling authorized edits only in the two named files, so the thread would not touch
+    `listener-readiness-gates.ts` to reconcile them. Correct call.
+    - **Recommendation:** keep both modules (main's `verify-listener-readiness.ts` stays, since main's
+      shipped D-101 fixture imports it) **and** allow the one-line repoint in
+      `listener-readiness-gates.ts` back to `verify-listener-readiness.ts`, dropping S10's relocation.
+      That preserves shipped main behaviour, keeps the D-101 contract test green, and costs S10 only
+      a cosmetic file-location change it does not depend on. The alternative — updating main's test to
+      the `evidence/` path — mutates a shipped, CI-verified contract to suit a stacked slice, which is
+      the wrong direction.
+  - **S9 did NOT run:** its worktree is unchanged at `bf06551ba`, and `agentic:codex-status` reports
+    `agents: 0 recent` for that worktree with a near-empty task output — the resume produced no turn.
+    Re-dispatch needed; not a conflict or a refusal, just a no-op launch.
+
+- **D-136 — S10 final ruling dispatched; S9 re-dispatched with the same ancestry correction.**
+  Coordinator accepted the recommendation in full: preserve main's `verify-listener-readiness.ts`
+  **and** its shipped CI-verified test; repoint `listener-readiness-gates.ts` back to that canonical
+  module with a bounded one-line change; drop S10's cosmetic `runtime/evidence/listener-readiness.ts`
+  relocation (keeping its other `evidence/` work — `describe-follow.ts`, `resource-command.ts`).
+  Expected result: focused suite **89/89** rather than 88/1. Final; no evaluator rerun.
+  - **Ancestry assertion corrected for BOTH stacked slices.** My original briefs demanded
+    `merge-base HEAD origin/main == origin/main`, which is structurally impossible for a slice stacked
+    on S8. Corrected to `merge-base HEAD bc838a0b3 == bc838a0b3`, with an explicit instruction not to
+    rebase onto main or chase its tip. I applied the same fix to **S9's** brief before re-dispatching
+    it — S9 would have hit the identical false blocker, so fixing it only in S10 would have wasted
+    another cycle.
+  - **S9 re-dispatched** (its previous resume was a no-op: `agents: 0 recent`, worktree untouched at
+    `bf06551ba`, near-empty task output — not a refusal or conflict).
+
+- **D-134 update — attempt 2 reproduces the #1747 result with a durable receipt.**
+  `runtime.flow-b-fixture: PASSED (1703ms)` (attempt 1 had recorded 2084ms before being killed), and
+  the run has since progressed past `runtime.aspire-start: PASSED (8928ms)` into `database.init` —
+  further than attempt 1 reached. So the D-127 union resolution is **reproducibly green on the exact
+  gate #1747 exists to fix**, this time with a persisted `suite.log`/NDJSON/report rather than only a
+  transcript observation. Suite still running detached; not touched, no other runtime overlapping.
+
+- **D-138 — S9's silent no-ops root-caused: an orphaned sender-ownership record, released properly.**
+  S9's thread `01a0523a-d727-7610-9cd4-e4eddbd77aea` consumed tokens twice (14,012 then 15,953) while
+  producing **no agent message, no commit, and no worktree change** — head stayed `bf06551ba` both
+  times. Diagnosed rather than retried a third time:
+  - Sender record at
+    `~/.config/netscript-agentic/runtime/senders/f152e059…json` showed
+    `ownerPid: 689711`, `leaseToken: 0292bf8f-…`, `sessionId: 01a0523a-…`, acquired
+    **2026-08-30T10:33Z** (~17 h stale).
+  - **Proved the owner dead independently** (the recorded lesson says the `duplicate_sender_risk`
+    block is never itself evidence of liveness): `ps -p 689711` → no such process; no live client
+    matching the session id.
+  - **Released via the adapter's own API using the record's own lease token — not `rm`**, exactly as
+    the lesson requires. First attempt failed with `sender lease mismatch` because
+    `LocalSenderOwnershipAdapter`'s constructor takes an explicit directory and I passed none, so it
+    read a different path; re-ran with
+    `new LocalSenderOwnershipAdapter('$HOME/.config/netscript-agentic/runtime/senders')`, read the
+    record, released with its `leaseToken`, and confirmed `read()` → `null` afterwards.
+  - Re-launched S9 as a **fresh thread** via `launch-codex-slice` at `--expect-base bf06551ba` with
+    the union ruling and the corrected stacked-ancestry assertion.
+  - **Lesson to carry:** a resume that burns tokens but emits nothing and changes nothing is a
+    symptom of an orphaned sender/dead session, not of a refusing agent — check `ownerPid` liveness
+    before re-dispatching a third time.
+
+- **S11/S13 briefs pre-staged** (`slices/s11/`, `slices/s13/` `d137-unstack-onto-s10-brief.md`) with
+  the corrected **stacked** ancestry assertion (`merge-base HEAD <S10-head> == <S10-head>`, explicitly
+  *not* `origin/main`), the branch points (`a46ea16d0`) and own-commit counts (11 / 9) already filled
+  in, and all four ruled conflict classes encoded — generated→upstream, gate lists→additive union,
+  anything touching main's D-101 listener contract→main wins, everything else→abort and report. Only
+  `__S10_HEAD__` remains to substitute once S10 pushes, so both dispatch immediately on that event
+  rather than costing a fresh analysis cycle.
+
+- **Main advanced docs-only to `0274c0a707e36ded3b4470a3911315f963e642d4`** (#1800). All pinned heads
+  verified unchanged and correct: #1747 `68c80e743` (immutable for the lease), S9 `bf06551ba`,
+  S10 `aaf5ec639`. Integration deferred to each slice's documented post-receipt seam.
+
+- **D-139 — S9's fresh thread worked; blocked on a workflow artifact-path union that hides a REAL
+  regression trap.** The relaunched S9 thread (post-D-138 sender release) behaved correctly and
+  confirmed the orphaned-sender diagnosis: it actually ran this time.
+  - **Authorized union applied correctly** on commit `eba896250`: `scaffold-capability-gates.ts`
+    preserved `createAspireMcpSmokeGate()` (S9), `createTypedDbPhaseBGate()` (S8) **and** the upstream
+    UI-data-screen registration; `capability-suites.ts` preserved `GATE.SCAFFOLD_AGENT_INIT`,
+    `GATE.AGENT_ASPIRE_MCP_SMOKE`, `GATE.RUNTIME_TYPED_DB_PHASE_B` **and** `GATE.SCAFFOLD_UI_DATA_SCREEN`.
+    `git diff --check` exit 0. So the additive-union ruling works as intended — all three sources'
+    gates survive.
+  - **Stopped on commit `a6da3c4c5`** with two conflicts in **`.github/workflows/e2e-cli.yml`**
+    artifact-upload path lists, and **correctly refused to extend the ruling**: it reasoned that
+    although they look additive, workflow artifact lists are *not* either of the two gate-registration
+    lists D-133 authorized. Aborted, restored `bf06551ba`, nothing pushed, worktree clean.
+  - **The trap, verified by inspecting S9's own diff:** `a6da3c4c5` adds **only 4 lines, with zero
+    deletions** — `.llm/tmp/gate-receipts/scaffold-runtime/agent.aspire-mcp-smoke*`,
+    `.llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*`, and a
+    `retention-days: 30` on each job. The "broader report globs" the thread saw on the S9 side are
+    **S9's base content**, not S9's change — i.e. the *pre-D-112* workflow. **A blanket "it's
+    additive, just union it" resolution would restore those broad recursive globs and silently
+    reintroduce the `EACCES` traversal into the Postgres `.data` directory that D-107→D-112 took four
+    correction cycles to eliminate.**
+  - **Recommended resolution — a SELECTIVE union, not a blanket one:**
+    1. Keep **S8/main's narrow scoped paths and `include-hidden-files: true`** (the D-112 fix) as the
+       base for both jobs.
+    2. **Add** S9's two `agent.aspire-mcp-smoke*` gate-receipt paths and its `retention-days: 30`.
+    3. **Do not restore** any `.llm/tmp/**/report*.json`-style broad recursive glob.
+    Net effect: S9 gets its MCP smoke receipts uploaded, D-112's EACCES fix stays intact, and no
+    other workflow semantics change.
+  - This is precisely why the abort rule is scoped narrowly: an agent following a blanket union
+    instruction here would have regressed shipped CI without anyone noticing until the next runtime
+    job failed.
+
+- **D-140 — S10 COMPLETE and pushed; S11/S13 cascade launched in parallel.** S10 head
+  **`c9e3fcbe8`**, pushed, worktree clean. Independently verified against every D-136 constraint:
+  | Constraint | Result |
+  | --- | --- |
+  | corrected **stacked** ancestry | `merge-base HEAD bc838a0b3 == bc838a0b3` ✓ (the assertion my earlier brief had wrong) |
+  | main's canonical module preserved | `readListenerHealthReport` still exported from `verify-listener-readiness.ts` ✓ |
+  | gates repointed to canonical module | `listener-readiness-gates.ts:71` executes `verify-listener-readiness.ts` ✓ |
+  | cosmetic relocation dropped | `runtime/evidence/listener-readiness.ts` absent ✓ |
+  | S10's other `evidence/` work retained | `cleanup.ts`, `describe-follow.ts`, `doctor.ts`, `resource-command.ts` all present ✓ |
+  | previously-failing D-101 contract test | **26 passed / 0 failed** — the 88/1 mismatch is resolved ✓ |
+  - **S11 (#1771) and S13 (#1779) launched concurrently** onto `c9e3fcbe8` from the pre-staged D-137
+    briefs (placeholder substituted). Both are siblings off S10 commit `a46ea16d0` in separate
+    worktrees, so they cannot collide. Because the briefs were staged in advance, the cascade moved
+    from "S10 pushed" to "S11+S13 dispatched" without an analysis cycle in between.
+  - Both briefs carry the **corrected stacked ancestry assertion**
+    (`merge-base HEAD c9e3fcbe8 == c9e3fcbe8`, explicitly not `origin/main`) and all four ruled
+    conflict classes, including the rule that anything touching main's shipped D-101 listener
+    contract resolves in main's favour.
+
+- **D-141 — #1747 attempt 2 TERMINAL: 38 passed / 1 failed. Target gate GREEN; the single failure is
+  NOT attributable to #1747. Lease released at proven four-part zero.**
+  - **`runtime.flow-b-fixture: PASSED (1703ms)`** — the exact gate #1747 exists to fix, now on a
+    durable receipt (`slices/1747/phase-b/suite.log` + `report.json` + `events.ndjson`), reproducing
+    attempt 1's interrupted observation (2084ms). The D-127 union resolution is proven at runtime.
+  - **The one failure: `database.init`, FAILED after 599900 ms (~10 min)** with
+    `An unexpected error occurred: The JSON-RPC connection with the remote party was lost before the
+    request could complete`, followed by `No AppHost is currently running for 'apphost.mts'`. For
+    comparison, `database.init` completed in **23962 ms** in the D-105 full run — this is a ~25×
+    timeout, i.e. the operation hung until the AppHost's JSON-RPC channel dropped, not a fast
+    assertion failure.
+  - **Attribution — honestly, this is most likely MY runner configuration, not a product defect and
+    not a #1747 regression.** #1747 changes only (a) Aspire resource-name validation in
+    `packages/aspire`, (b) `JSON.stringify(name)` escaping in the background generator, and (c) the
+    flow-b fixture's parse anchors. None of those can plausibly cause a lost JSON-RPC connection
+    during `netscript db init`. The material difference from the last *successful* full run (D-105,
+    80/81) is that **this run had no owned loopback relay**: I followed the lease instruction "reach
+    published ports at `netscript-dind:<port>`, never `127.0.0.1`" literally and did not arm
+    `loopback-relay.ts`. Per D-71b/D-73 the generated AppHost/DCP still dials `127.0.0.1` internally,
+    which is exactly what the two-hop relay exists to bridge — so a DB operation hanging to timeout is
+    the expected symptom of that gap. **I am not claiming a pass, and I am not classifying this as a
+    #1747 FAIL either;** the correct disposition is `ENVIRONMENT_INCONCLUSIVE` on `database.init`
+    pending a ruling on relay usage.
+  - **Everything before it passed (38 gates)**, including the full scaffold/plugin/generation chain,
+    `generated.quality-negative`, `runtime.aspire-start (8928 ms)`, and the target flow-b gate.
+  - **Cleanup and lease release:** the suite's own `cleanup.aspire-stop` PASSED (259 ms); I then
+    verified and published **four-part zero — containers 0, volumes 0, custom networks 0, no
+    `aspire-managed` process** — and removed the root-owned scratch via a throwaway `alpine:3`
+    container. Head remains pinned at `68c80e743`; worktree clean. **Lease released.**
+  - **Recommendation:** re-grant a short lease to re-run **only** `database.init` onward **with the
+    owned `loopback-relay.ts` armed** (the configuration that produced D-105's 80/81), to convert
+    `ENVIRONMENT_INCONCLUSIVE` into a real verdict. If the coordinator prefers no relay, then the
+    dind port-routing gap needs resolving first, because `database.init` cannot reach the DB without
+    one of the two.
+
+- **D-142 — CORRECTION to D-141's disposition: coordinator supplied the exact root cause. This is the
+  remaining D-43 endpoint-host defect, recorded as an exact infra FAIL receipt — not a timeout, not a
+  product regression.** My D-141 label `ENVIRONMENT_INCONCLUSIVE` was too weak; the evidence is
+  specific and reproducible:
+  - `aspire describe` reported the postgres URL as **`tcp://localhost:19685`**, and both
+    **`postgres_check` and `postgres_listener` were Unhealthy with connection refused to
+    `127.0.0.1:19685`**.
+  - Meanwhile Docker container **`postgres-c55b0461` was Running and published 5432 at the daemon
+    host as `127.0.0.1:19685`**.
+  - **From `ai-agents`, published ports are reachable only as `netscript-dind:<port>`.** So the
+    generated topology advertises a `localhost`/`127.0.0.1` endpoint that is correct *on the daemon
+    host* and unreachable *from where the AppHost and CLI actually run*. `database.init` therefore
+    stalled until the JSON-RPC channel dropped — the hang is the symptom, the endpoint host is the
+    defect.
+  - This confirms my D-141 attribution (relay/routing, not #1747) with a precise mechanism, and it is
+    **the same D-43 endpoint-host class** the relay was originally built to bridge. Recorded against
+    D-43 as the remaining open defect.
+  - **`runtime.flow-b-fixture: PASSED (1703ms)` stands** — #1747's target gate is green at
+    `68c80e743`, and 38 gates passed before the endpoint-host defect stopped the run.
+  - **No further runtime lease will be requested until a supported endpoint-host correction is
+    proven.** Cleanup already published: aspire `[]`, containers 0, volumes 0, custom networks 0;
+    scratch removed; head still pinned `68c80e743`. Lease released.
+
+- **D-143 — S9 status correction: it is NO LONGER a no-op.** The coordinator's note ("S9 has twice
+  returned no-op") describes the state *before* the D-138 sender release. After releasing the
+  orphaned record via the adapter's own lease token and launching a **fresh** thread, S9 **ran
+  correctly** (see D-139): it replayed `eba896250`, applied the authorized additive union in both gate
+  files — preserving `createAspireMcpSmokeGate()` (S9), `createTypedDbPhaseBGate()` (S8) **and** the
+  upstream UI-data-screen registration, plus all four `GATE.*` entries — with `git diff --check`
+  exit 0, then **correctly aborted** on commit `a6da3c4c5` at two `.github/workflows/e2e-cli.yml`
+  artifact-path conflicts because those lists were outside the D-133 authorization.
+  So S9 is **blocked on a ruling, not broken**, and its sender is healthy (the fresh thread owns it).
+  The outstanding decision is the D-139 **selective** union — add S9's two `agent.aspire-mcp-smoke*`
+  receipt paths and `retention-days: 30`, while **keeping** S8/main's narrow paths and
+  `include-hidden-files: true` and **not** restoring the pre-D-112 broad recursive globs.
+
+- **D-144 — S13 sender released + fresh-dispatched; S9 replacement thread recorded; next exact-green
+  PR packet identified.**
+  - **S13:** its sender record (`ownerPid 2774326`, session `01a05348-…`) was **dead**; released via
+    `LocalSenderOwnershipAdapter.release()` with the record's own lease token (not `rm`), confirmed
+    `read()` → `null`, then **fresh-launched** at `--expect-base d3f71c0b7`. Ownership preserved
+    through the adapter throughout.
+  - **S9 replacement identity (as requested):** thread
+    **`01a055f2-a284-7181-aa9e-e998aa980c26`**, worktree
+    **`/home/agent/projects/netscript/worktrees/007-aspire-s9`**, branch
+    `fix/aspire-13-5-s9-skills-mcp-alignment`, base pinned `bf06551ba`, route openai/gpt-5.6-sol/high.
+    It is **healthy and working** — the no-op behaviour ended with the D-138 sender release. Its only
+    blocker is the pending D-139 selective-union ruling on `.github/workflows/e2e-cli.yml`.
+  - **S11:** progressing under live thread (owner pid 1374105 alive); head advanced
+    `4c3704820` → `744473576`, worktree clean.
+  - **Next exact-green PR packet = S8 / #1754.** It is the only Aspire slice whose base is `main`
+    (not a stacked branch) and which is independently verified green by the supervisor:
+    repo-wide `deno task check` **2972 files / 0 failures**, `check:aspire-version-parity`
+    **fail=0**, focused gate tests **26 passed / 0 failed** including the D-101 contract case
+    (D-131). Head `bc838a0b3`; PR retargeted to `main` and no longer conflicting.
+    - **What still gates it (both non-static, neither blocked by the D-43 defect's *product* scope):**
+      (1) `Every issue acceptance/gate box has lease-backed evidence (pending Phase B)` — Phase-B
+      evidence needs a runtime lease, which is now **correctly withheld until the D-43 endpoint-host
+      correction is proven**; (2) `Separate-session Fable 5 IMPL-EVAL completed and accepted` — a
+      *new* evaluation, so under the post-#1792 routing it would go to the GLM 5.3 Flash max IMPL
+      route; existing verdicts elsewhere remain untouched.
+    - It is 4 behind `main` (docs-only advances) — a trivial re-converge to fold in at its
+      post-receipt seam, per the standing instruction.
+    - **Therefore S8's realistic near-term path is the IMPL-EVAL, not the runtime**, since its runtime
+      half is gated on D-43. That evaluation is dispatchable now and does not need a lease.
+
+- **D-145 — S13 aborted correctly; its deletion is SAFE and should be allowed (opposite of the S10
+  ruling, for a principled reason).** The fresh S13 thread (post-D-144 sender release) ran, confirmed
+  **exactly 9 own commits** in `a46ea16d0..HEAD`, and aborted at commit **3/9** `5fac7818d`
+  ("chore(aspire): clean stale generated surfaces"). Branch/remote unchanged at `d3f71c0b7`, worktree
+  clean, nothing pushed. Two conflicts:
+  1. **`aspire-surface-manifest.tsv`** — add/add across many tree-dependent rows. **Generated
+     artifact → rule 1**: take upstream and regenerate at the end. (The thread did not resolve it only
+     because the second conflict forced a full abort.)
+  2. **`packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts`** — S13 **deletes** the
+     upstream constant `SCAFFOLD_COMMUNITY_TOOLKIT` (`CommunityToolkit.Aspire.Hosting.Deno` @
+     `13.5.0`). Non-generated source, not a gate list, doesn't touch the D-101 contract → correctly
+     unruled, so it stopped.
+  - **Investigated exactly as for S10, and the answer inverts:**
+    - `SCAFFOLD_COMMUNITY_TOOLKIT` has **zero consumers** on `main` — `git grep` across the whole tree
+      returns only its own declaration.
+    - Its content is **duplicated by the live, structured map**: `SCAFFOLD_ASPIRE_INTEGRATIONS.DENO_KV`
+      carries the **same** `PACKAGE_ID: 'CommunityToolkit.Aspire.Hosting.Deno'` and the **same**
+      `VERSION: '13.5.0'`, sitting alongside `POSTGRES`/`GARNET`/`BROWSERS` in the same file.
+    - So it is a genuine **dead duplicate**, and removing it is precisely S13's stated purpose
+      ("stale version-bound surface cleanup").
+  - **Contrast that makes both rulings coherent:** S10's deletion was refused because main's *shipped
+    D-101 fixture actively imported* the deleted exports (5 consumers). S13's deletion is safe because
+    **nothing imports it and a live equivalent already exists**. The deciding test in both cases is
+    consumer evidence, not the fact that a diff deletes something.
+  - **Recommended ruling for S13:** (a) **allow** the `SCAFFOLD_COMMUNITY_TOOLKIT` deletion;
+    (b) resolve `aspire-surface-manifest.tsv` as a generated artifact — take upstream, then one
+    `gen:assets-barrel` + the parity gate at the end (`check:aspire-version-parity` will confirm the
+    manifest matches the post-deletion tree, exactly the D-114 mechanism); (c) all other rules
+    unchanged, still abort-and-report on anything else.
+
+- **D-146 — D-43 CLOSED as an upstream/infrastructure constraint, not a NetScript defect. #1747
+  runtime parked without product blame.** Coordinator supplied official-source resolution; recording
+  it as the authoritative receipt for this class:
+  - **Aspire 13.5.3 does not support remote/custom Docker hosts.**
+    **microsoft/aspire#14878** is this exact `DOCKER_HOST` + `localhost` failure and is a **duplicate
+    of #1650**; the maintainer ruling states custom Docker hosts **will not be supported**.
+  - **DCP 0.25.13 binds published ports to the daemon-local `127.0.0.1`** — which is precisely the
+    observed symptom: describe advertised `tcp://localhost:19685` while the container published at the
+    *daemon host's* `127.0.0.1:19685`, unreachable from `ai-agents`.
+  - **Neither `AppHost__ContainerHostname` nor `ASPIRE_ENABLE_CONTAINER_TUNNEL` rewrites host-facing
+    container endpoints**, so there is **no valid repo correction and no valid env override**. This
+    retroactively explains why the owned two-hop `loopback-relay.ts` was necessary in every previously
+    green run (D-71b/D-73, D-105): it was compensating for an unsupported topology, not for a bug in
+    our code.
+  - **Required infrastructure topology (host-only, outside this lane's authority):** `ai-agents` must
+    share `netscript-dind`'s network namespace (`network_mode: service:netscript-dind`) while keeping
+    the identical `/home/agent` mount, or run a local daemon inside `ai-agents`. The coordinator owns
+    surfacing that correction.
+  - **Disposition:** #1747's runtime half is **PARKED with no product blame**. Its target gate
+    `runtime.flow-b-fixture` remains **PASSED (1703ms)** at `68c80e743` with 38 gates green, and the
+    `database.init` stall is now attributed to the upstream constraint above rather than to any
+    NetScript change. **No further runtime lease will be requested** until the topology correction
+    lands. Receipts retained: `slices/1747/phase-b/{suite.log,report.json,events.ndjson}`.
+  - **Correction to my own earlier framing:** in D-141 I suggested re-running with the relay armed to
+    "convert INCONCLUSIVE into a real verdict". That recommendation is now withdrawn — per the
+    upstream ruling the relay is a workaround for an unsupported topology, so a relay-backed pass
+    would not have been a legitimate verdict for a supported configuration. Parking is correct.
+
+- **D-147 — #1642 assessed: genuinely lease-free and ruling-free, but it carries a scope
+  contradiction I will not resolve unilaterally.** It is the only remaining `orchestrator:aspire`
+  item needing neither a runtime lease nor an outstanding ruling (`type:docs`, `area:aspire`,
+  `priority:p2`, milestone **0.0.7**).
+  - **Contradiction:** the issue body's own Boundary section states *"This follow-up owns only the two
+    useful residual documentation surfaces and is **intentionally outside 0.0.7**."* — while the issue
+    is **assigned to milestone 0.0.7**. Under a "full milestone completion by tomorrow evening"
+    target, that difference decides whether it is in scope at all, so it needs a coordinator call
+    rather than my assumption in either direction.
+  - **If ruled in scope, it is immediately actionable and cheap.** Its four acceptance boxes are
+    documentation surfaces I already hold direct empirical evidence for from this run: detached
+    `aspire start --detach` state (PID + log path emission, `aspire list`/`ps` inventory), and
+    dashboard-token discovery. Per CLAUDE.md's recorded documentation-authoring exception, docs
+    authoring may run in this lane rather than requiring a Codex implementation slice, provided it
+    touches no `packages/`/`plugins/` source — which this does not.
+  - **One caveat to flag before it is scheduled:** acceptance box 4 ("Add a runnable documentation or
+    CLI fixture proving both paths") may require a runtime execution to *prove* the paths. Given D-146
+    parks all runtime on this host, that box may be unsatisfiable until the topology correction lands
+    — the same trap as #1718's quickstart clause (D-113). Better to establish that now than to check a
+    box on unproven evidence.
+
+- **Consolidated lane state at this point** (host: four-part zero, **no lease held**):
+  | Slice | State | Blocking on |
+  | --- | --- | --- |
+  | S8 #1754 | ✅ static-green, base=main, verified by supervisor (D-131) | new IMPL-EVAL (no lease needed) + Phase-B evidence (parked by D-146) |
+  | S10 #1760 | ✅ pushed `c9e3fcbe8`, ruling satisfied, 26/0 tests (D-140) | S8 landing |
+  | S11 #1771 | 🔄 running; stacked ancestry already satisfied (`merge-base == c9e3fcbe8`) | in progress |
+  | S9 #1759 | ⏸ correct abort | **D-139 selective workflow-union ruling** |
+  | S13 #1779 | ⏸ correct abort | **D-145 deletion ruling** (deletion proven safe) |
+  | #1747 | ⏸ runtime parked, no product blame; flow-b PASSED | D-146 host topology (coordinator-owned) |
+  | #1744 S7 | ⏸ | runtime lease (parked by D-146) + IMPL-EVAL |
+  | #1642 | ⏸ | **scope call** (body says outside 0.0.7, milestone says 0.0.7) |
+
+- **Main advanced docs-only to `a3e0a5aa8beebbd1f7a488d564d31980a7d74619`** (#1806). No integration
+  performed — deferred to each slice's static seam per standing instruction. **All pinned heads
+  verified intact after the advance:** #1747 `68c80e743` (parked, receipts preserved), S8
+  `bc838a0b3`, S9 `bf06551ba`, S10 `c9e3fcbe8` (pushed), S13 `d3f71c0b7`, S11 `744473576` (in
+  flight). Runtime remains **zero and parked** pending the shared-network-namespace host correction
+  (D-146); no lease held or requested.
+
+- **D-150 — S11 COMPLETE; S13 blocked on a THIRD, unruled conflict set (I aborted, holding myself to
+  the same rule as the threads); S8 IMPL-EVAL blocked by a stale MCP transport.**
+  - **S11 (#1771) ✅ complete and pushed:** head **`6ac0ce5f6`**, correctly stacked
+    (`merge-base HEAD c9e3fcbe8 == c9e3fcbe8`), force-pushed against a freshly-read lease, harness
+    comment posted to the PR. **Every conflict was rule-1 generated-file** (`prose.json.gz`,
+    `provenance.json`, `agent-docs.generated.ts`, `publish-assets.generated.ts` across 5 replayed
+    commits) and took the corrected-S10 upstream side; **no gate-list, no D-101, no other
+    non-generated source conflict**. PR base intentionally left on the S10 branch.
+  - **S13 (#1779): two consecutive thread deaths, then a third conflict class.** Its fresh thread
+    (`01a055f8-…`, ownerPid 1383126) consumed ~50k tokens and **died without committing** —
+    `agents: 0 recent`, ownerPid gone — the same death mode as S9's first thread. After releasing that
+    dead sender via the adapter's own token, I executed the **fully-ruled** rebase directly rather
+    than risk a third death.
+    - Applied both authorized resolutions successfully: `scaffold-aspire.ts` took S13's side
+      (**`SCAFFOLD_COMMUNITY_TOOLKIT` deleted, `DENO_KV` retained**, no markers left), and
+      `aspire-surface-manifest.tsv` took the upstream/generated side.
+    - Then commit **`07aa26386` ("feat(tooling): add Aspire parity phase 2")** produced a **third,
+      unruled conflict set**: `.llm/tools/validation/check-aspire-version-parity.ts` (add/add),
+      `check-aspire-version-parity_test.ts` (add/add), and `deno.json` (task-permission drift —
+      base has `--allow-read`, S13 wants `--allow-read --allow-run=git`).
+    - **I aborted rather than resolve them.** My authorization covered exactly two files; extending it
+      myself would be precisely the over-reach I have refused on every thread this run. Branch
+      restored clean at `d3f71c0b7`, remote unchanged, nothing pushed.
+    - **Assessment for the ruling:** this looks additive-but-real — S13's "parity phase 2" extends a
+      parity tool that **already exists on the S10 base**, and the `deno.json` hunk is a genuine
+      permission widening (`--allow-run=git`) that the phase-2 tool presumably needs. It is not a
+      dead-duplicate deletion like the first conflict, so it deserves an explicit decision rather
+      than an assumed union.
+  - **S8 IMPL-EVAL could not be dispatched — transport blocker, not a routing error.** I resolved the
+    sanctioned route from checked-in config rather than assuming it: preset
+    `claude-evaluator-glm-5-3-flash`, profile `claude-openrouter`, model
+    **`z-ai/glm-5.3-flash`**, **effort `max`**, `reasoningTrace: 'present'` (so the effort is honestly
+    attestable, unlike GLM 5.2). The `delegate_openrouter` call rejected it with
+    `model is not approved for hybrid delegation`. Root cause: **the running `netscript-hybrid` MCP
+    server is served from worktree `007-internals` at `ba251f7e8`, which predates #1792** — its
+    `HYBRID_DELEGATION_MODEL_IDS` contains only `deepseek/deepseek-v4-flash-0731`. **I did not
+    substitute DeepSeek**, because the instruction was explicitly the current-main GLM route and a
+    silent model swap would misattribute the verdict. Needs the hybrid MCP server restarted from a
+    current-main checkout (it belongs to the internals lane's session), or an alternative dispatch
+    path such as `agentic:claude-openrouter`.
+  - A detached evaluator worktree is already staged and waiting at
+    `007-s8-impleval` (detached at `bc838a0b3`), so the eval can start the moment the transport is
+    current.
+
+- **D-151 — #1642 rewritten in place; S7/#1744 reconciled to current main with evaluator PASS carried
+  by exact diff proof.**
+  - **#1642:** body rewritten in place. Removed the stale *"intentionally outside 0.0.7"* line
+    (superseded by the owner's move out of `Backlog / Triage`), and realigned all four acceptance
+    boxes to **S11's shipped scope** — `docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md`,
+    which S11 (#1771) already delivers and wires into the how-to index and `xref` map. Verified S11's
+    page actually covers both surfaces before rewriting: detached-start JSON state + `aspire ps
+    --format Json` (including the documented empty-array/exit-0 contract), and `dashboardUrl` plus the
+    "Redacting dashboard tokens" callout. Box 4 was deliberately scoped to a **documentation-surface**
+    proof (index + `xref` resolution) rather than a live fixture, because gating a docs issue on
+    host-parked runtime would make it unsatisfiable for unrelated reasons — the same trap as #1718's
+    quickstart clause (D-113). Not framed as a follow-up note.
+  - **S7 (#1744) reconciled:** rebased `631437404` → **`45509b919`** onto current main `a3e0a5aa8`;
+    **0 behind, 15 ahead**. `git range-diff` shows **all 15 slice commits `=` (content-identical)**,
+    which is the exact diff proof that the accepted IMPL-EVAL **PASS at `a560d7e10`** carries to this
+    head. Force-pushed against a freshly-read lease.
+  - **Stale claims rewritten to actual receipts** (PR body now has **0 unchecked** DoD boxes):
+    `Phase: IMPL` → `IMPL-EVAL — PASS`; the "Awaiting a separate Fable IMPL-EVAL cycle 2" line
+    replaced with the real verdict (independent read-only session, OpenRouter DeepSeek V4 Flash 0731 ·
+    max — the sanctioned relay preset at that time, native Fable quota unavailable) plus its comment
+    URL and the range-diff carry statement. The Phase-B DoD box now records what was **actually
+    accepted** — `phase-b-live-snapshot_test.ts` against the real historical-shape fixture
+    `process-tree-13.5.3-phase-b-live.json`, plus `probes.ts:190-228` / `ownership.ts:130-134` /
+    `teardown.ts:106,196` — and **explicitly states no runtime lease was used and none is claimed**.
+  - **Status normalized** `status:impl` → `status:impl-eval` (accurate: an IMPL-EVAL PASS exists;
+    exactly one `status:` label retained).
+  - **Merge packet — S7 is NOT yet ready-merge, and the blocker is issue-side, not PR-side.** All 29
+    checks at `45509b919` are *skipped* (draft + path classification), and `mergeable: true /
+    clean`. The real gate is **#1719's acceptance**: of its three unchecked close-gated boxes, one
+    (`Will close (via its PR) #1429`) is already satisfied structurally by the closing keyword, but
+    the other two demand a **live 13.5 kill receipt** and a foreign-AppHost **re-test** — runtime
+    evidence that cannot exist while runtime is parked (D-146). I did **not** check them; doing so
+    would be exactly the false-green pattern the close-gate exists to stop.
+    - **Decision needed:** either reconcile #1719's box text to the evidence the evaluator actually
+      accepted (fixture + containment/ownership analysis), or hold S7 at `status:impl-eval` until the
+      host namespace correction unparks runtime. No runtime lease was requested, per instruction.
+
+- **D-152 — S8 IMPL-EVAL delivered: VERDICT PASS, via the sanctioned current-main GLM route.**
+  Dispatched through the **checked-in `agentic:claude-openrouter` launcher** (not the stale shared MCP
+  server), against the staged detached worktree `007-s8-impleval` at `bc838a0b3`.
+  - **Route, as attested by config:** preset `claude-evaluator-glm-5-3-flash`, profile
+    `claude-openrouter`, model **`z-ai/glm-5.3-flash`**, effort **`max`**, `reasoningTrace: 'present'`.
+    Session log confirms `"model":"z-ai/glm-5.3-flash"` and `cwd` = the eval worktree. Credential was
+    sourced by the launcher only and never printed.
+  - **Transport divergence recorded (per instruction):** the shared `netscript-hybrid` MCP server runs
+    from `007-internals` at `ba251f7e8`, predating #1792, so its allowlist still contains only
+    `deepseek/deepseek-v4-flash-0731`. **I did not restart or mutate that shared server** (it belongs
+    to another lane) and **did not fall back to DeepSeek** — the allowlist lag was routed around via
+    the checked-in launcher, exactly as ruled.
+  - **Verdict: `[PHASE: IMPL-EVAL] [VERDICT: PASS]`** — posted to PR #1754
+    ([comment](https://github.com/rickylabs/netscript/pull/1754#issuecomment-5473645390)). All four
+    ruled constraints **COMPLIANT** with `file:line` evidence: D-101 contract intact
+    (`listener-readiness-gates.ts:105,132,110,120`); `createTypedDbPhaseBGate` present and functional
+    (`:145-167`, exercised by `runtime-gates_test.ts:53-77`); superseded symbols **absent** (zero
+    grep hits); generated barrels consistent with source. The evaluator independently ran three unit
+    files — **16 steps, 0 failures**.
+  - **Three `Low` findings, none blocking:** (1) `run-tool.ts.template:66-75` sends SIGTERM on timeout
+    then awaits `child.status` with no SIGKILL escalation — an unbounded path in a bounded-wait slice;
+    (2) GATE 1's ruled exact path `db init --name init` has no *runtime receipt field* — the shared
+    bounded mechanism (`operation-runner.ts:240-273`) is covered at unit level, but the receipt should
+    include that exact case when Phase-B unparks; (3) cosmetic failure-message asymmetry between the
+    typed and legacy branches (`operation-runner.ts:293-297` vs `:335`).
+  - **Test-adequacy assessment was genuinely critical, not rubber-stamp:** it credited the behavioural
+    depth of `operation-runner_test.ts` and `run-tool-template_test.ts` while naming a real gap — the
+    emitted `db-cli-mode.mts` is never compiled or executed in unit tests, resting instead on the
+    parked `scaffold.runtime` type-check — and it explicitly flagged that its SDK-surface check used a
+    **cached prior-scaffold copy** rather than a fresh restore. That self-disclosure is exactly the
+    honesty standard this harness asks of evaluators.
+  - S8's DoD IMPL-EVAL item is now satisfiable; its remaining Phase-B item stays parked under D-146.
+
+- **D-153 — S9 (#1759) COMPLETE and pushed; the selective union held, no D-112 regression.** Head
+  **`042ff3ca5`**, `merge-base HEAD bc838a0b3 == bc838a0b3` (correct **stacked** ancestry), remote
+  matches, worktree clean. Verified the exact regression risk I flagged in D-139:
+  | Check | Result |
+  | --- | --- |
+  | `include-hidden-files: true` retained | **2** (both runtime jobs) ✓ |
+  | D-112 narrow `e2e-report-scaffold-runtime*` paths retained | **8** occurrences ✓ |
+  | S9's `agent.aspire-mcp-smoke*` receipt paths added | **2** ✓ |
+  | forbidden broad `.llm/tmp/**/report*` glob | **0** ✓ |
+  | forbidden broad `**/e2e-report*.json` glob | **0** ✓ |
+  So S9 gained its MCP smoke receipts **without** restoring the pre-D-112 recursive globs that caused
+  the `EACCES` traversal into the scaffolded Postgres `.data` directory. The selective-union framing
+  was load-bearing: a blanket "it's additive" union here would have silently reverted four correction
+  cycles of shipped-CI work.
+
+- **Cascade COMPLETE — all four stacked slices reconstructed and pushed:**
+  | Slice | PR | Head | Stacked on | Verified |
+  | --- | --- | --- | --- | --- |
+  | S8 | #1754 | `bc838a0b3` | `main` | repo-wide check 0 errors, parity `fail=0`, 26/0 tests, **IMPL-EVAL PASS** (D-152) |
+  | S9 | #1759 | `042ff3ca5` | S8 `bc838a0b3` | selective union verified above |
+  | S10 | #1760 | `c9e3fcbe8` | S8 `bc838a0b3` | D-101 contract intact, 26/0 tests (D-140) |
+  | S11 | #1771 | `6ac0ce5f6` | S10 `c9e3fcbe8` | generated-file conflicts only (D-150) |
+  Only **S13 (#1779)** remains un-reconstructed, blocked on the third-conflict ruling (parity-tool
+  add/add + `deno.json` permission widening).
+
+- **Main advanced user-facing to `dea44991120a2c5da96a89df0f68d69c455c035e`** (#1805). No integration
+  performed — deferred to final static seams per instruction. All Aspire evidence preserved; **no
+  runtime lease held or requested**; host remains at four-part zero.
+
+- **D-154 — S8 lifecycle converged to its actual receipts.** PR #1754 body reconciled and status
+  normalized (`status:impl` → **`status:impl-eval`**, exactly one `status:` retained):
+  - `Phase: impl — separate Fable 5 IMPL-EVAL required` → **`impl-eval — PASS`**.
+  - The IMPL-EVAL DoD box is now **checked** and cites the real receipt: independent read-only session
+    via the sanctioned current-main open-model route (`claude-evaluator-glm-5-3-flash` /
+    `z-ai/glm-5.3-flash` / effort `max` / reasoning trace present), verdict comment linked, four ruled
+    constraints COMPLIANT with `file:line`, 3 unit files re-run by the evaluator (16 steps, 0
+    failures), 3 non-blocking `Low` findings. Recorded explicitly that the original **"Fable 5"
+    wording is stale** — Fable has not been the sanctioned IMPL evaluator route since #1792.
+  - The two remaining unchecked boxes were **rewritten rather than checked**, so the PR states the
+    truth instead of implying slice weakness: Phase-B runtime receipts are **parked, not failed**,
+    with the upstream cause named inline (microsoft/aspire#14878; DCP binds published ports to
+    daemon-local `127.0.0.1`), unblocking only after the host shares `netscript-dind`'s network
+    namespace. I did **not** check them — that would be the false-green pattern the close-gate exists
+    to stop.
+  - S8 remains `draft`, `mergeable: true`, base `main`. Leaving draft is a lifecycle call reserved to
+    the coordinator (it also triggers the automatic ready-for-review IMPL-EVAL path, which here would
+    need an attributed `impl-eval:skip` since a PASS already exists — the #1743 pattern).
+  - S9/S10/S11 remain `status:impl`, which is accurate: they are reconstructed and pushed but carry no
+    IMPL-EVAL of their own yet. I did not advance their labels, since a `status:` change without the
+    corresponding evidence would be exactly the board-lag/false-signal problem the taxonomy forbids.
+
+- **D-155 — all three rulings actioned; independent leaves classified and dispatched; lane label
+  hygiene corrected.**
+  1. **S13 (#1779) narrow-union reconstruction dispatched** (fresh thread, `--expect-base d3f71c0b7`,
+     sender confirmed clear). Brief encodes all four ruled resolutions exactly: keep the proven
+     zero-consumer `SCAFFOLD_COMMUNITY_TOOLKIT` deletion while retaining
+     `SCAFFOLD_ASPIRE_INTEGRATIONS.DENO_KV`; manifest `.tsv` → upstream + regenerate + parity;
+     **current-main parity tool/tests preserved as the BASE CONTRACT with S13's phase-2 behaviour and
+     focused tests layered on top** (both sides' cases must survive); and `deno.json` gets
+     `--allow-run=git` **only on the parity task that invokes git, retaining `--allow-read`**, with
+     explicit "no broader permission widening". A GLM IMPL-EVAL follows once it lands.
+  2. **S7/#1719 — HELD as ruled.** The two genuinely live-runtime acceptance boxes are **left
+     unchecked and unmodified**; I did not weaken or rewrite the live-kill / foreign-AppHost
+     requirements into fixture-only claims. S7 keeps its accepted phase-A PASS and
+     `status:impl-eval`, and is explicitly **not** treated as a global barrier.
+  3. **S8/#1754 — left `draft` at `status:impl-eval`** with its actual GLM PASS recorded in the body.
+     **No `impl-eval:skip` added, no evaluator redispatched.** Its runtime boxes remain explicitly
+     parked with the upstream remote-Docker blocker named inline.
+  - **New independent leaf classified and dispatched — #1824.** Verified its premise in source before
+    acting rather than trusting the report: `browser-env.ts` interpolates the resource name raw, while
+    `build-vite-env-var-name.ts:64` normalizes via `replace(/[^a-zA-Z0-9_]/g,'_')` (its own docstring
+    shows `workers-api` → `VITE_services__workers_api__http__0`), so the browser **full** key can never
+    match for hyphenated resources — masked only by the shorthand alias. Confirmed the **server** path
+    (`service-url.ts:60`) is correctly hyphen-preserving and must **not** be "fixed". Classified
+    `type:fix, area:sdk, area:aspire, priority:p2, status:impl`, milestone `0.0.7`; worktree
+    `007-leaf-1824` off `dea449911`; contract-first brief dispatched requiring a RED test first, reuse
+    of the single normalization rule (no second divergent copy), and a cross-package agreement test so
+    the two implementations cannot silently drift again.
+  - **Stale lifecycle labels corrected** (each verified before changing, not assumed):
+    - **#1732** `status:ci-fail` → `status:impl-eval` — #1747 is now non-draft, `mergeable`, **clean,
+      0 failing checks**, so the ci-fail signal was false.
+    - **#1719** `status:triage` → `status:impl-eval` — it has an open implementation PR (#1744) with an
+      accepted PASS.
+    - **#1712** (epic) `status:triage` → `status:impl` — its children are in impl/impl-eval.
+    Exactly one `status:` label on every item; the lane board no longer lags reality.
+  - **Runtime serialization did not serialize the static leaves:** S13, #1824, S8-eval, S9/S10/S11
+    convergence and label hygiene all progressed with **no lease held** and the host at four-part zero.
+
+- **D-156 — S11/#1771 close-gate pre-audit: two blockers found, one stale-by-design, one
+  environmental. Neither is an S11 quality defect.** Ran the audit ahead of ready-merge so it does not
+  surface as a late blocker.
+  - Acceptance mapping for both closing issues (#1723, #1642) is **structurally valid** — the mirror
+    dry-run reports no mapping errors and picked up my rewritten #1642 body
+    (`bodySha256` updated 04:14:34Z). It declines to mutate only because `status:ready-merge` is
+    absent, which is correct at this stage.
+  - **#1723 box 38 — `Will close (via its PR) #1642`, `Will close (via its PR) #1000`:** #1771 carries
+    `Closes #1642` ✓ but **not** `Closes #1000`. **I did not add it**, because **#1000 is already
+    CLOSED with `status:shipped`**, resolved by **#1748** ("docs(aspire): normalise .NET Aspire to
+    Aspire across public surfaces", merged 2026-08-30). Adding a closing keyword for work another PR
+    already shipped would be exactly the false-attribution the netscript-pr skill forbids. The box's
+    #1000 clause is **stale**: it should be reconciled to point at #1748 rather than demand a keyword
+    on #1771.
+  - **#1723 box 37 — `deno task doc:lint` green; `diagrams:check` green:**
+    - `diagrams:check` **cannot pass on this host**: it exits 1 solely because
+      `@mermaid-js/mermaid-cli@10.9.1` (an npm binary) is not installed. Its own output states
+      diagrams are **committed static SVGs** and rendering is "a separate dev step and is
+      intentionally NOT part of `deno task build`". This is a **tooling-availability** failure, not a
+      content failure — the same environmentally-unsatisfiable class as the missing-Chrome
+      `behavior.app-reference` (D-105) and the published-CLI quickstart clause (D-113).
+    - `doc:lint` is **root-scoped** (`run-deno-doc-lint.ts --root <path>`); a bare `deno task doc:lint`
+      exits 1 printing usage. "Green" therefore has to be asserted against named roots, not as a bare
+      invocation — worth fixing in the box text so it is actually checkable.
+  - **Disposition:** neither blocker reflects S11's work. Both need a coordinator call on #1723's box
+    text — reconcile the #1000 clause to #1748, and either scope `doc:lint` to real roots or mark
+    `diagrams:check` environmentally deferred. I did not edit #1723, add a false keyword, or check any
+    box.
+
+- **Main advanced to `eaea940bea`** (#1810). No integration performed — deferred to each slice's final
+  seam. All six pinned heads verified intact (S8 `bc838a0b3`, S9 `042ff3ca5`, S10 `c9e3fcbe8`,
+  S11 `6ac0ce5f6`, S7 `45509b919`, #1747 `68c80e743`). **In flight:** S13 rebased onto S10
+  successfully (`merge-base == c9e3fcbe8`, head `595276977`, finalising) and #1824 actively
+  implementing. Runtime remains **parked at four-part zero**; no lease held or requested.
+
+- **D-157 — S13 (#1779) COMPLETE and pushed. The full stacked cascade is now reconstructed.** Head
+  **`9b684e176`**, `merge-base HEAD c9e3fcbe8 == c9e3fcbe8` (correct stacked ancestry), remote matches,
+  worktree clean, PR base unchanged. All nine S13 commits preserved. **Independently verified every
+  ruled constraint rather than trusting the report:**
+  | Ruled constraint | Verified result |
+  | --- | --- |
+  | `SCAFFOLD_COMMUNITY_TOOLKIT` deleted | **0** occurrences ✓ |
+  | `SCAFFOLD_ASPIRE_INTEGRATIONS.DENO_KV` retained | present ✓ |
+  | `deno.json` parity task exact form | `deno run --allow-read --allow-run=git .llm/tools/validation/check-aspire-version-parity.ts` ✓ |
+  | **no broader permission widening** | `git diff c9e3fcbe8..HEAD -- deno.json` shows **only that one task line** changed ✓ |
+  | parity gate | `ok: true, fail: 0`, **814** checked ✓ |
+  | parity focused tests (base contract **+** phase 2) | **13 passed / 0 failed** ✓ |
+  | repo-wide `deno task check` | **2982 files, 0 failed batches, 0 occurrences** ✓ |
+  The narrow-union ruling held exactly: current-main's base contract (exact-token matching and all
+  existing tests) preserved, with S13's phase-2 selection, 13.5.3 compatibility case, archival-class
+  handling, manifest freshness and report mode layered additively on top. Manifest regenerated against
+  the post-deletion tree: 815 rows, zero unmatched paths, `manifestFresh: true`.
+
+- **CASCADE COMPLETE — all five stacked Aspire slices reconstructed, verified and pushed:**
+  | Slice | PR | Head | Stacked on | Independent verification |
+  | --- | --- | --- | --- | --- |
+  | S8 | #1754 | `bc838a0b3` | `main` | repo-wide check clean, parity `fail=0`, 26/0 tests, **IMPL-EVAL PASS** |
+  | S9 | #1759 | `042ff3ca5` | S8 | selective union verified; **0** forbidden pre-D-112 globs |
+  | S10 | #1760 | `c9e3fcbe8` | S8 | D-101 contract intact, 26/0 tests |
+  | S11 | #1771 | `6ac0ce5f6` | S10 | generated-file conflicts only |
+  | S13 | #1779 | `9b684e176` | S10 | all four constraints + 3 gates verified above |
+  Every one landed **without a single force-resolved semantic conflict**: each genuine collision was
+  aborted, escalated with consumer evidence, ruled, and only then applied.
+
+- **D-158 — #1723 boxes rewritten to truthful executable contracts; S13 IMPL-EVAL dispatched; S9/S10/S11
+  eval briefs pre-staged so the evaluator slot never idles.**
+  - **Box 38 rewritten in place.** Now states plainly: `Closes #1642` present in #1771's body (it does
+    close it), and **#1000 is NOT a closing target of #1771** — it is already CLOSED and
+    `status:shipped`, resolved by **#1748** (merged 2026-08-30). Recorded as a **satisfied
+    predecessor**, with an explicit instruction that no `Closes #1000` keyword is to be added because
+    that would falsely attribute another PR's shipped work. **I did not add the keyword.**
+  - **Box 37 rewritten to the actual executable contract.** `doc:lint` is now scoped to the **named
+    S11 public-doc roots**, with the reason stated inline: the task is root-scoped
+    (`run-deno-doc-lint.ts --root <path>`) and a bare `deno task doc:lint` only prints usage and exits
+    1, so a bare invocation is **not a valid pass claim**. `diagrams:check` is now recorded as
+    **CI-proven committed-SVG parity under the owner-accepted M5 environment limitation** (local npm
+    Mermaid/Chromium unavailable), citing `docs/site/_diagrams/render.ts`'s own statement that
+    diagrams are committed static SVGs whose rendering is intentionally not part of
+    `deno task build`. **No claim was made that the usage-only command passed.**
+  - **S13 IMPL-EVAL dispatched** on the proven path — `agentic:claude-openrouter`, preset
+    `claude-evaluator-glm-5-3-flash`, model `z-ai/glm-5.3-flash`, effort `max`, against a dedicated
+    detached eval worktree `007-eval-slot` at `9b684e176`. The brief carries the four ruled
+    constraints as *compliance checks* (not re-litigation), flags that S13 is **stacked on S10** so it
+    must not be faulted for lagging `main`, and directs scrutiny at the **other** stale-surface
+    deletions (the `SCAFFOLD_COMMUNITY_TOOLKIT` one is already proven) and at whether `--allow-run=git`
+    is genuinely required and correctly scoped.
+  - **S9/S10/S11 eval briefs pre-staged** in their slice dirs with correct **stacked** bases baked in
+    (S9 `042ff3ca5` on S8 `bc838a0b3`; S10 `c9e3fcbe8` on S8 `bc838a0b3`; S11 `6ac0ce5f6` on S10
+    `c9e3fcbe8`), each instructing evaluation of `git diff <base>..HEAD` only and explicitly telling
+    the evaluator **not** to fault the slice for being behind `main`, **not** to treat the ruled
+    additive gate-list unions as duplication, and **not** to fail on absent runtime receipts. They
+    dispatch back-to-back into the same slot with no analysis gap.
+  - #1824 implementation continues in parallel; runtime remains parked at four-part zero.
+
+- **D-159 — #1824 contract-first RED verified independently; S13 eval running; main advanced to
+  `0e93a6c` (#1808) with no integration.**
+  - **#1824 RED confirmed genuine.** Commit `e5dd8dbc5` ("test(sdk): pin Aspire browser key contract")
+    adds `packages/sdk/tests/discovery/env-ordering_test.ts`. I ran it at that commit — **2 tests /
+    4 steps FAIL, 4 steps pass** — failing exactly the cases the brief required:
+    `normalizes hyphenated resource names`, `normalizes every other invalid identifier character`, and
+    the **cross-package agreement** cases `sagas-api` and `workers.api/v2`. The 4 passing steps are the
+    regression guards for the deliberately-unchanged shorthand and server-side paths. This proves both
+    that contract-first discipline was actually followed (RED before GREEN, not a post-hoc test) and
+    that the reported defect genuinely reproduces — I had verified the premise in source before
+    dispatch, and it now reproduces executably.
+  - **S13 IMPL-EVAL in flight** — evaluator process alive, verdict stream at ~1.5 MB against the
+    dedicated `007-eval-slot` at `9b684e176`.
+  - **Main advanced docs-only to `0e93a6c`** (#1808). **No integration performed** — deferred to each
+    slice's final seam per standing instruction. All pinned heads verified intact: S8 `bc838a0b3`,
+    S9 `042ff3ca5`, S10 `c9e3fcbe8`, S11 `6ac0ce5f6`, S13 `9b684e176`. Runtime remains parked at
+    four-part zero; no lease held or requested.
+
+- **D-160 — S13 IMPL-EVAL: VERDICT PASS. S9 dispatched into the freed slot with no idle gap.**
+  Verdict posted to PR #1779
+  ([comment](https://github.com/rickylabs/netscript/pull/1779#issuecomment-5473899312)). Route:
+  `claude-evaluator-glm-5-3-flash` / `z-ai/glm-5.3-flash` / effort `max`, against `007-eval-slot`
+  detached at `9b684e176`, evaluating `git diff c9e3fcbe8..HEAD` as a **stacked** slice.
+  - **All four ruled constraints COMPLIANT** with `file:line` evidence. Two are worth recording
+    because the evaluator verified them **independently rather than restating my checks**:
+    - It confirmed **`--allow-run=git` is genuinely required**, tracing
+      `runParityGate` → `buildAspireSurfaceManifest` → `Deno.Command('git', ['grep', …])` at
+      `tools/aspire-surface-manifest.ts:418-424`, and that **no other task was widened**
+      (`deno.json:121` single line). That was precisely the question the brief asked it to answer, and
+      it answered it with a call-chain rather than an assertion.
+    - It ran the parity gate itself: phase 1 `ok:true, fail:0, manifestFresh:true` over **814** rows,
+      and confirmed every base branch (`staleMatches`, `isPhaseOneFailClass`, exact-token match,
+      archival-by-owner) survives with **additions only** in the test file — i.e. the narrow-union
+      ruling genuinely held rather than the base being silently rewritten.
+  - **Three findings, none blocking:**
+    1. **Low — stale phase-1 allowlist.** `check-aspire-version-parity.ts:76-80` still allowlists
+       `'13.5.0'` for `scaffold-aspire.ts` after the toolkit pin's deletion; since an allowlist cannot
+       *require* presence, a regression reintroducing a 13.5.0 pin would pass phase 1. Tighten at the
+       convergence-head flip. **This is a genuinely useful catch** — a direct consequence of the
+       deletion we authorized, which neither I nor the implementer had noticed.
+    2. **Low — diagnostics regression** in `templates/workspace/aspire-cli-task.ts`: the shared reader
+       fails closed silently where the old inline `resolveDashboardUrl` surfaced `aspire ps` stderr and
+       JSON-parse detail. Acceptable dedup tradeoff; consider threading a cause through
+       `AspirePsDashboardPort`.
+    3. **Info — phase 2 is report-only and not green** (`--phase 2 --report` → `ok:false`, 14 stale
+       fails such as `skills/aspire/SKILL.md`), matching the documented deferral in the slice's own
+       drift log. Correctly classified as informational, not a failure.
+  - **Slot turned over immediately:** `007-eval-slot` re-detached to **S9 `042ff3ca5`** and S9's
+    pre-staged brief dispatched on the same route. S10 (`c9e3fcbe8`) and S11 (`6ac0ce5f6`) follow in
+    the same slot. #1824 continues in parallel.
+
+- **D-161 — #1824 GREEN and independently verified; new main `26e1b486f` (#1820) noted.**
+  - **#1824 fix landed** at `b05ae25b8` ("fix(sdk): align browser keys with Aspire"). Verified the
+    exact risk the brief was written around — *"reuse the single normalization rule; do not create a
+    second divergent copy"*:
+    - It took the brief's **authorized second option**: the rule is defined once in the SDK as
+      `normalizeViteIdentifierSegment()` with an explicit header comment naming the contract source
+      (`packages/aspire/src/application/build-vite-env-var-name.ts`) and noting that the cross-package
+      test pins it. The regex is **identical** to Aspire's (`/[^a-zA-Z0-9_]/g` → `'_'`), so the two
+      implementations agree by construction and are held together by an executable test rather than by
+      convention.
+    - **RED → GREEN confirmed by me at both commits**: the same suite was **2 failed / 4 failing
+      steps** at `e5dd8dbc5` and is now **6 passed / 0 failed** at `b05ae25b8`.
+    - **Blast radius held exactly:** `git diff` shows `packages/sdk/src/discovery/service-url.ts`
+      **untouched** (the server path correctly preserves hyphens and matches real Aspire server
+      output — "fixing" it would have broken discovery), and **zero** changes to
+      `createBrowserServiceShortEnvKey` (already correct). Only the browser **full**-key builder
+      changed, which is precisely the defect surface.
+  - **New main `26e1b486f95aec121d71f2f4cd0411dc6069af04`** (#1820). No integration performed —
+    merge packets will be prepared against this head as each slice passes, per instruction. Runtime
+    remains at **zero**; no lease held, and none will be requested until an owned supported lease is
+    explicitly needed.
+  - **Evaluator cascade running:** S9 eval in flight (verdict stream ~990 KB) in `007-eval-slot` at
+    `042ff3ca5`; S10 (`c9e3fcbe8`) and S11 (`6ac0ce5f6`) queued behind it with briefs already staged.
+
+- **D-162 — #1824 draft PR confirmed + supervisor-controlled eval dispatched. HARNESS VIOLATION found
+  and quarantined: the generator self-dispatched its own IMPL-EVAL.**
+  - **PR #1831 already existed and is correctly formed** (the slice opened it as briefed): `draft:
+    true`, base `main`, head `b05ae25b8`, body carries **`Closes #1824`**, labels
+    `type:fix, area:sdk, area:aspire, priority:p2, status:impl, orchestrator:aspire`, milestone
+    `0.0.7`. No PR creation was needed — reporting that rather than duplicating it.
+  - **Violation:** the generator's run dir contained `impl-eval-prompt.md` **and**
+    `impl-eval-openrouter.jsonl` — **6,483 lines, model `z-ai/glm-5.3-flash`**, i.e. it actually
+    *dispatched an evaluator for itself*, from **its own worktree**, and even authored a prompt
+    declaring "You are the formal IMPL-EVAL session for issue #1824 and draft PR #1831 … distinct from
+    Codex generator session `01a05611-…`". Two independent problems:
+    1. **Generators must not self-dispatch evaluators** — the evaluator session must be arranged by
+       the supervisor, or the independence the verdict claims is fictional.
+    2. It ran **in the generator's own worktree**, not a clean detached slot, so it could observe
+       uncommitted state.
+    Its prompt also cited stale routing ("fresh native Claude Fable 5 medium") while invoking GLM,
+    and no final verdict was captured. **Artifact quarantined — not counted as the IMPL-EVAL.** I did
+    not delete it; it stays as evidence of what happened.
+  - **Proper evaluation dispatched:** new detached slot `007-eval-slot2` at `b05ae25b8`, supervisor-run
+    via `agentic:claude-openrouter` (`claude-evaluator-glm-5-3-flash` / `z-ai/glm-5.3-flash` / effort
+    `max`). The brief explicitly tells the evaluator the self-dispatched material is inadmissible and
+    to ignore it, and aims it at the one question that actually matters here: **the fix defines
+    `normalizeViteIdentifierSegment()` locally instead of importing from `packages/aspire`, so is the
+    cross-package agreement test strong enough to fail on a one-sided rule change?** It also must
+    confirm the server path and shorthand builder are untouched, and probe edge cases (empty string,
+    leading digit, all-invalid characters).
+  - Running **concurrently** with the S9 eval in `007-eval-slot` — independent surfaces, separate
+    worktrees, no collision, per the authorized intra-orchestrator parallelism.
+
+- **D-163 — S9 IMPL-EVAL: VERDICT PASS. Slot turned straight into S10; two evaluator slots now run
+  concurrently.** Verdict posted to PR #1759
+  ([comment](https://github.com/rickylabs/netscript/pull/1759#issuecomment-5474035502)), evaluated at
+  `042ff3ca5` against its **stacked** base S8 `bc838a0b3`.
+  - **Three `Minor` findings, all real and worth carrying forward** — the evaluator was again
+    genuinely critical rather than confirmatory:
+    1. **Degraded pass is verdict-indistinguishable.** When a dashboard-gated MCP call fails with the
+       byte-exact `-32603` payload, the catch branch returns a receipt whose `visibility.ok` /
+       `redaction.secretParamsNull` may be `false` **and the gate still exits PASS**
+       (`aspire-mcp/evaluate.ts:246-262`). The blast radius is bounded (only that exact payload
+       degrades; the `--dashboard-url` transport must still return exactly the three dashboard tools)
+       and the receipt records `dashboardDegradation` honestly — but **nothing downstream fails on
+       those fields**, since CI only uploads receipts. Recommended follow-up: a CI/gate-consumer
+       assertion on `dashboardDegradation.documented` / `visibility.ok` so a degraded pass is auditable
+       without reading raw JSON.
+    2. **`structuredLogsResult` swallows parse failure (fail-open).** `stdio-transport.ts:148-153`
+       catches both parse attempts and returns `{ isError }`; `evidence.ts:107-112` then yields
+       `entryCount: null` without throwing, so an unparseable `list_structured_logs` payload passes
+       with null evidence — the one stage that neither fails nor asserts a minimum, unlike the
+       console-log probes. Tighten once a live Phase-B receipt establishes the 13.5.3 shape.
+    3. **Dangling timers in `settle()`** — the losing `setTimeout` in the close-path races is never
+       cleared (`stdio-transport.ts:217-225`).
+    None blocking; all recorded for the convergence-head flip.
+  - **No idle gap:** `007-eval-slot` re-detached to **S10 `c9e3fcbe8`** and dispatched immediately.
+    **`007-eval-slot2`** continues the supervisor-controlled **#1824** evaluation at `b05ae25b8`.
+    Both run concurrently on independent surfaces in separate worktrees — the authorized
+    intra-orchestrator parallelism, with runtime still untouched at zero.
+  - S11 (`6ac0ce5f6`) is queued next in slot 1.
+
+- **D-164 — #1824/#1831 IMPL-EVAL: VERDICT PASS (supervisor-dispatched). Two verified sibling defects
+  filed as #1833.** Verdict posted to PR #1831
+  ([comment](https://github.com/rickylabs/netscript/pull/1831#issuecomment-5474049513)), evaluated at
+  `b05ae25b8` against base `main` `dea449911` in the clean detached slot `007-eval-slot2`. The comment
+  records the provenance note explicitly: the generator's **self-dispatched** artifact was quarantined
+  under the separation rule and is not counted; this verdict is supervisor-dispatched.
+  - **"No correctness defect found in the fixed surface."** The evaluator confirmed the pin is
+    *genuine* (it imports the Aspire implementation, so a one-sided change to either regex fails the
+    test) — but then went further and **empirically demonstrated** its limit: a one-sided change that
+    preserves output for the two pinned inputs (e.g. collapsing consecutive underscores) would diverge
+    on `a--b` while the test stays green. That is exactly the question I aimed the brief at, answered
+    with a simulation rather than an assertion.
+  - **I verified both of its sibling findings myself before acting on them**, rather than filing on
+    report:
+    - **Shorthand divergence — CONFIRMED by executing both implementations:**
+      `orders.api` → SDK `VITE_ORDERS.API_URL` vs Aspire `VITE_ORDERS_API_URL`. `VITE_ORDERS.API_URL`
+      is not a valid identifier segment, so Vite never statically replaces it — meaning for such a
+      resource **both** keys miss and the shorthand no longer acts as the safety net that masked the
+      original full-key bug. A real second-order defect.
+    - **Lossy CLI workaround — CONFIRMED in source:**
+      `build-windows-prebuild.ts:39-44` literally reads `// Full format — skip names with hyphens` and
+      drops full-key injection, degrading to shorthand-only coverage for the same root cause.
+  - **Filed [#1833](https://github.com/rickylabs/netscript/issues/1833)** covering all three residuals
+    (shorthand normalization, deploy-prebuild full-key injection, widened cross-package corpus) with
+    the executed evidence inline, labelled `type:fix, area:sdk, area:cli, area:aspire, priority:p2,
+    status:triage, orchestrator:aspire`, milestone `0.0.7`. **Explicitly recorded that none of these
+    is a defect of #1831** — that slice was scoped to the browser full key and was required to leave
+    shorthand and server paths untouched, which it did.
+  - **New integration base recorded: `052f86595b06b33cf0e205405873cd979cf535d1`** (after #1819).
+    No integration performed; independent packets will be cut against this head. Runtime remains at
+    zero.
+
+- **D-165 — #1747 IS NOT MERGE-SAFE. Audit independently confirmed by rendering; recovery dispatched;
+  false lifecycle signals revoked immediately.**
+  - **I reproduced the defects myself at `68c80e743`** rather than accepting the audit on report.
+    Rendering `generateRegisterBackground` with processors named `class`/`await` and a quote-bearing
+    `Workdir` emits:
+    ```
+    const class = builder.addExecutable("class", 'deno', class_workdir, [...]);   // INVALID JS
+    const await = builder.addExecutable("await", 'deno', await_workdir, [...]);   // INVALID JS
+    const await_workdir = resolveWorkspacePath(appHostDir, 'a'b');                // BROKEN LITERAL
+    ```
+  - **Root cause, and my own share of it.** `safeIdentifier()` (`helpers/_utils.ts:26`) only replaces
+    hyphens — no reserved-word guard. The **D-127 ruling I implemented** adopted main's
+    *name-as-binding* scheme and forbade restoring `bg_N`; that instruction is what removed the
+    structural immunity, since an ordinal binding can never be a reserved word. I verified the
+    resulting emission at the time only for `workers`/`triggers`-style names, so the reserved-word and
+    collision classes went untested. The prior IMPL-EVAL also did not catch it. **For a PR whose whole
+    purpose is resource-name safety, this is the exact defect it exists to prevent.**
+  - **Second, independently severe finding the audit did not name:** the branch **DELETES ~74 files**
+    under `.llm/runs/` belonging to **8 unrelated slices** (`docs-mcp-exports-table--1799`,
+    `feat-openai-responses-mapper--1591`, `feat-plugin-service-context-host-factory--1452`,
+    `fix-saga-publisher-receipt-discipline--0.0.7`, …) — confirmed as `D` entries in
+    `git diff --name-status origin/main..HEAD`. Merging would destroy other slices' harness evidence.
+    **Correction to the audit's framing:** the 11 files under this slice's own run dir are *legitimate*
+    harness artifacts and should stay; the real contamination is the 74 foreign **deletions**.
+  - **Immediate lifecycle correction (no waiting):** removed the false **`impl-eval:skip`**, removed
+    `status:augment-review`, set `status:impl`, and **converted the PR back to draft**. Posted a
+    merge-safety hold comment with the rendered evidence
+    ([comment](https://github.com/rickylabs/netscript/pull/1747#issuecomment-5474081810)) so nobody
+    merges on the stale green signals. **The prior PASS is void at this head.**
+  - **Bounded recovery dispatched** (`slices/1747/d165-recovery-brief.md`): restore background-only
+    **ordinal** binding (no user text in the identifier) while keeping `JSON.stringify(name)` for the
+    string argument and config lookups; full JSON literal safety for
+    `Workdir`/`Entrypoint`/`ConcurrencyEnvVar`; **preserve** the users+sagas fixture union with a
+    *generic* `([A-Za-z_$][\w$]*)` binding capture so it works for both ordinal and name-style
+    bindings; restore direct-generator reserved/collision tests that **parse or type-check the emitted
+    output** rather than string-matching (string assertions are precisely what missed `const class`);
+    restore all 74 foreign deletions to match `origin/main`; converge onto `052f86595`; rewrite the
+    body to the truth. No runtime, no self-dispatched evaluator, no lifecycle self-advancement.
+  - S9/S10/S11 and #1831 continue independently and are unaffected by this hold.
+
+- **D-166 — #1831 PASS evidence pinned by blob hash; convergence deliberately HELD until #1829 merges.**
+  - **Evaluated head is `4db69cdb6`** ("docs(harness): record #1824 evaluation"), sitting on the
+    product commit `b05ae25b8`. Verified the eval-record commit is **evidence-only**:
+    `git diff --name-only b05ae25b8..4db69cdb6` touches **only** `.llm/` paths, and
+    `git diff --stat b05ae25b8..4db69cdb6 -- packages/` is **empty**. So the GLM PASS covers exactly
+    the product content that will merge.
+  - **Carry proof captured now, before any rebase moves SHAs** — product blob hashes at the evaluated
+    head:
+    | Blob | Path |
+    | --- | --- |
+    | `f92db485af0f` | `packages/sdk/src/discovery/browser-env.ts` |
+    | `7d46837d65af` | `packages/sdk/tests/discovery/env-ordering_test.ts` |
+    After the post-#1829 convergence I will re-read these two blob hashes; **if they are unchanged the
+    PASS carries by byte-identity**, and if either differs the verdict is void and must be re-earned.
+    This is the same evidence discipline used for S7 (range-diff carry), tightened to blob level
+    because only two product files are in scope.
+  - **#1829 is still `OPEN` (not merged)** — checked directly rather than assuming "imminent" meant
+    landed. Convergence is therefore **not** performed yet; doing it now would burn the single
+    permitted converge-once against an incomplete main. Held until #1829 lands, then: converge once
+    onto the complete then-current main → fresh exact CI/merge-ref → normalize → surface as the next
+    user-facing Aspire fix.
+  - #1747 recovery and the S9/S10/S11 cascade continue independently and are unaffected by this hold.
+
+- **D-167 — S7/#1744 audit: its parked blocker is very likely NOT APPLICABLE. Bounded lease request,
+  not an indefinite park.** Asked to produce "an exact merge packet or a bounded blocker", the honest
+  answer is that S7's blocker may be a misattribution, and that is worth more than either.
+  - **Posture is otherwise clean:** PR `draft`, base `main`, head `45509b919`, `status:impl-eval`,
+    correct labels, **`agentic:review-threads` → `threads: [], unanswered: 0`**, PR-body DoD fully
+    reconciled to real receipts (D-151), and its IMPL-EVAL **PASS carried by range-diff proof** across
+    the convergence.
+  - **The only outstanding gate is #1719 boxes 1–2**, which demand a *live 13.5 kill receipt* and a
+    foreign-AppHost *re-test*. Those were held (correctly) as genuinely-live-runtime, and runtime is
+    parked under D-146.
+  - **But D-146's failure mode does not touch what S7 measures.** Verified in source:
+    - `.llm/tools/agentic/teardown/probes.ts` observes **process trees** via
+      `ps -eo pid=,ppid=,etimes=,args=` (line 177) plus container state and
+      `ASPIRE_DCP_APPHOST_PATH` / `--contentRoot` containment. A grep for
+      `127.0.0.1|localhost|getEndpoint|dashboardUrl|published` in that file returns **nothing** — it
+      never needs to reach a published port.
+    - **D-146 is specifically a published-port reachability defect** (DCP binds to daemon-local
+      `127.0.0.1`, unreachable from `ai-agents`). Its observed symptom was `database.init` stalling on
+      a *connection*.
+    - **`aspire start` itself works under D-146** — proven in this very run: `runtime.aspire-start:
+      PASSED (8928ms)` in the #1747 attempt-2 receipt, with the failure occurring later.
+    - S7's box 1(a) needs only: an AppHost that starts, the launcher killed, then observation of
+      whether the tree auto-cleans and whether a foreign AppHost is preserved. **None of that requires
+      port reachability.**
+  - **Conclusion: S7 is one narrow, bounded lease away from an exact merge packet**, not indefinitely
+    parked behind the host topology fix. I am **not** claiming certainty — it is an inference from
+    source plus the observed `aspire-start` success, and only a run can confirm it — but leaving a
+    carried PASS parked on a blocker that probably does not apply is the worse error.
+  - **Requesting a narrow S7 runtime lease**, scoped strictly to: start an AppHost, kill the launcher,
+    capture the kill receipt (auto-clean / no run-owned survivor / foreign control preserved), run the
+    foreign-AppHost re-test, then teardown to four-part zero. **No `database.init`, no service
+    discovery, no published-port access** — precisely the operations D-146 does not affect. If the
+    attempt hits D-146 anyway, that is itself a clean, reportable result and S7 returns to parked with
+    the blocker then *proven* applicable rather than assumed.
+  - Ordering respected: this does **not** advance main ahead of the #1829 → #1831 user-facing order.
+
+- **D-168 — #1831 converged onto merged main, PASS carried by blob identity, lifecycle corrected after
+  an auto-flip regression.**
+  - **Converged once** onto `f59874abd` (post-#1829): `4db69cdb6` → `8bc696a72`, clean rebase, **0
+    behind**. **The D-166 blob pins held exactly** — `browser-env.ts` `f92db485af0f` and
+    `env-ordering_test.ts` `7d46837d65af` are byte-identical before and after, so the
+    supervisor-dispatched GLM **PASS carries by proof rather than by assertion**. Gates at the
+    converged head: focused tests **6 passed / 0 failed**; repo-wide `deno task check` **2975 files, 0
+    failures**.
+  - **Stale close-out wording corrected** in the slice's context-pack (commit `ce8888fb4`, docs-only —
+    blobs re-verified unchanged afterwards): `In Progress`/`Next Steps` now read "None / complete",
+    with the convergence, blob-carry proof, and the #1833 residual-defect pointer recorded. The
+    `Runtime | N/A` row was rewritten from the weak *"owner directive; no runtime processes
+    permitted"* to the **real reason**: this slice changes only pure string-building functions with no
+    process, socket, or build-time env surface, so `scaffold.runtime` would add no evidence — with a
+    parenthetical noting host parking is *independently* true but **not** why the row is N/A.
+  - **Auto-flip regression caught and reversed.** `gh pr ready` **overwrote** my `status:ready-merge`
+    with `status:impl-eval` and dispatched an automatic evaluator (OpenHands run `33360678603`,
+    `model=openrouter/z-ai/glm-5.3-flash`). Per ruling I **cancelled that run** (confirmed
+    `conclusion: cancelled`), and did **not** run a second evaluator or move the product head.
+  - **Attributed `impl-eval:skip` posted, not a bare label**
+    ([comment](https://github.com/rickylabs/netscript/pull/1831#issuecomment-5474154129)): it names the
+    superseded run, the verdict comment, the evaluated head (`b05ae25b8` → `4db69cdb6`), the
+    **supervisor-dispatched separate session** in slot `007-eval-slot2`, the full route
+    (`claude-evaluator-glm-5-3-flash` / `z-ai/glm-5.3-flash` / `max` / reasoning trace present), and
+    the **blob-identity table** proving the verdict still applies at `ce8888fb4`. Labels now: sole
+    **`status:ready-merge`** + **`impl-eval:skip`**.
+  - **Immutable packet — #1831:** head **`ce8888fb4`**, base `main` `f59874abd`, **0 behind**,
+    non-draft, `mergeable: true`, `Closes #1824`, milestone `0.0.7`, GLM PASS carried by blob identity,
+    zero review threads. #1824 has **no close-gated checkboxes**, so the mirror has nothing to mirror
+    and close-gate has nothing to fail on. Awaiting the in-flight CI to observe the corrected live
+    labels; **coordinator owns the merge**.
+
+- **D-169 — #1747 recovery COMPLETE and independently re-verified by re-rendering the original
+  defects.** Head **`fe87dd2cc`**, **0 behind** `main`, clean, pushed.
+  - **The two proven defects are gone — same render, same inputs, compared directly:**
+    | | before (`68c80e743`) | after (`fe87dd2cc`) |
+    | --- | --- | --- |
+    | reserved-word binding | `const class = builder.addExecutable("class", …)` **invalid JS** | `const bg_0 = builder.addExecutable("class", …)` ✓ |
+    | second reserved word | `const await = …` **invalid JS** | `const bg_1 = …` ✓ |
+    | quote-bearing `Workdir` | `resolveWorkspacePath(appHostDir, 'a'b')` **broken literal** | `resolveWorkspacePath(appHostDir, "a'b")` ✓ |
+    | `Entrypoint` | raw interpolation | `"x/runtime.ts"` JSON-safe ✓ |
+    The binding is ordinal again, so reserved words and collisions are **structurally impossible**
+    rather than merely filtered — while `JSON.stringify(name)` is retained for the resource-name
+    string argument and config lookups, which is what #1747 is actually for.
+  - **Every other repair item verified:**
+    - **Foreign deletions restored: 0** `D` entries under `.llm/runs/` for other slices (was ~74).
+      Other slices' harness evidence is no longer destroyed on merge.
+    - Own run dir retained (12 files) — legitimate harness artifacts.
+    - **Fixture union preserved** — 5 `missingBackgroundReferences`/`sagasReference` occurrences, so
+      D-127's users+sagas union survives alongside the ordinal binding (the capture is generic, so it
+      matches both binding styles).
+    - **Reserved/collision tests restored** — 3 matches in the direct-generator test.
+  - **Gates green at the recovered head:** focused tests **4 passed / 139 steps / 0 failed**;
+    repo-wide `deno task check` **2976 files, 0 failed batches, 0 occurrences**.
+  - **Lifecycle remains honest:** PR is still `draft`, `status:impl`, `impl-eval:skip` removed, with
+    the merge-safety hold comment standing. **The prior PASS stays void** — a fresh
+    supervisor-dispatched GLM IMPL-EVAL and hosted `scaffold.runtime` evidence are still required
+    before any normalization. I have not advanced its lifecycle.
+
+- **D-170/D-171 — S10 and S11 both returned CHANGES_REQUESTED. Both findings confirmed real;
+  remediations dispatched. The evaluator cascade is earning its cost.**
+  - **S11 (#1771) — HIGH, docs accuracy inverted. I verified it in source before posting.**
+    The slice's *entire deliverable* is 13.5 docs accuracy, yet
+    `docs/site/explanation/aspire.md:83` presents a "generated" `aspire.config.json` with
+    `"sdk": { "version": "13.4.6" }` (PostgreSQL/Redis `13.4.6`, Browsers `13.4.6-preview…`) and
+    `:88-89` asserts it "is the baseline that the current `netscript init` emits" —
+    `deploy-local-aspire.md:58` repeats it. **False at this head:**
+    `scaffold-versions.ts:5` → `ASPIRE_SDK: '13.5.3'`; `scaffold-aspire.ts:17-37` → integrations
+    `13.5.3`; `generate-aspire-config.ts:118-127` emits them **unconditionally with no 13.4.6 mode**;
+    the pin commit `798e901af` (#1727) is an ancestor of the stack's base. Worse, the slice's worklog
+    (`worklog.md:61`) records *"confirmed current head generates 13.4.6 baseline"* — **a verification
+    that was never actually performed against the generator.** Nothing caught it because parity is
+    Phase 1 only and doc enforcement is deferred to S13. Without this evaluation the release would
+    have shipped documentation telling users the wrong Aspire version.
+    **Remediation dispatched** (`d170-docs-accuracy-fix.md`): correct every affected surface to
+    13.5.3, **derive from the pinned constants or add a drift-catching check** rather than hand-copy,
+    **prove it by running the generator** and pasting the emitted `aspire.config.json`, and **replace
+    the false worklog claim with the truth plus the command that proves it — not delete it**.
+  - **S10 (#1760) — Medium, MSSQL convergence budget silently dropped.** Base passed
+    `String(expectation.timeoutSeconds)` (**600s** for mssql); this slice **deleted that assertion**
+    (`runtime-gates_test.ts:523-545`) and `runtimeWaitGate` now consumes only `healthCheckKey`, so the
+    budget collapsed to a uniform `resolveDbCliTimeoutSeconds()` **300s**.
+    `ListenerReadinessExpectation.timeoutSeconds` is now consumed by **nothing** on the convergence
+    path. A slow MSSQL cold start fails 300s in where it previously had 600s — loud, but a real
+    regression, and **unrecorded, violating Operating Rule 5**.
+    **Remediation dispatched** (`d171-mssql-budget-fix.md`): restore the budget **in the slice's own
+    files only** (the D-101 module stays coordinator-protected), **restore a real assertion** that
+    fails if it collapses again, and **record the decision in drift** — explicitly noting that keeping
+    a uniform budget deliberately is still a decision that must be written down. Finding 2 (wait gates
+    replaying a pre-DB capture the restart fallback can invalidate) to be addressed on its merits or
+    rebutted with file:line evidence.
+  - Both remediations forbid self-dispatched evaluators and lifecycle self-advancement; fresh
+    supervisor-dispatched IMPL-EVALs follow each. Neither slice's label was advanced.
+
+- **D-172 — MERGED: #1831 landed at `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`; #1824 CLOSED
+  `status:shipped`.** First Aspire-lane leaf shipped from this supervisor's queue end-to-end:
+  classified from `status:triage` → premise verified in source → contract-first RED dispatched →
+  RED confirmed by me at `e5dd8dbc5` → GREEN confirmed at `b05ae25b8` → **supervisor-dispatched** GLM
+  IMPL-EVAL `PASS` (after quarantining the generator's inadmissible self-dispatched evaluation) →
+  converged once onto the complete main with **blob-identity carry proof** → attributed
+  `impl-eval:skip` → merged. New integration base for all subsequent packets: **`bd9d463b4`**.
+  Residual sibling defects it surfaced are tracked separately as **#1833** and were deliberately not
+  folded in.
+
+- **D-173 — S7 converged onto the new main; #1833 selected and dispatched as the next closable leaf.**
+  - **S7 (#1744) converged:** `45509b919` → **`474df925c`** onto `bd9d463b4`, **0 behind**,
+    `git range-diff` shows **all 15 commits `=`** (content-identical), so its accepted IMPL-EVAL PASS
+    continues to carry by exact diff proof. Repo-wide `deno task check`: **2975 files, 0 failures**.
+    Pushed under an exact lease. **This clears every blocker on S7 except #1719's two live-runtime
+    acceptance boxes** — the narrow lease argued in D-167 (process/container observation only, no
+    published-port access) remains the single outstanding ask.
+  - **Next closable leaf selected: #1833.** Chosen because it is the only remaining Aspire item that
+    is simultaneously **independent** (unstacked, base `main`), **static** (pure string functions plus
+    one CLI emission site and a test corpus), and **already evidence-backed** — all three of its
+    findings were verified empirically by me before the issue was even filed. Classified
+    `status:triage` → `status:impl`; worktree `007-leaf-1833` created off `bd9d463b4`; contract-first
+    brief dispatched.
+  - The brief carries the executed proof inline (`orders.api` → SDK `VITE_ORDERS.API_URL` vs Aspire
+    `VITE_ORDERS_API_URL`), and three guardrails learned from the #1824 cycle: **reuse the existing
+    `normalizeViteIdentifierSegment()` rather than adding a third/fourth copy of the rule**;
+    **do not touch `service-url.ts`** (the server path is correctly hyphen-preserving — "fixing" it
+    breaks real discovery) with a regression guard proving it unchanged; and **preserve #1831's merged
+    full-key blobs exactly**, since those shipped under an accepted evaluation.
+  - **All workers moving, none idle:** S10 remediating the MSSQL budget regression (dirty, in
+    progress), S11 remediating the HIGH docs-accuracy defect, #1747 recovered at `fe87dd2cc` awaiting
+    its fresh supervisor-dispatched eval, #1833 implementing, S7 converged and awaiting only the
+    narrow lease. Runtime remains at four-part zero.
+
+- **D-174 — S10 remediation landed and verified; cycle-2 evaluation dispatched.** Head
+  `c9e3fcbe8` → **`265466059`**, pushed, clean, correct stacked ancestry
+  (`merge-base HEAD bc838a0b3 == bc838a0b3`).
+  - **Finding 1 (MSSQL budget) genuinely fixed — verified in source, not taken on report.**
+    `runtime-gates.ts:60-67` now reduces over `runtimeResources(database)` taking
+    `Math.max(maximum, expectation.timeoutSeconds)`, so **mssql regains its 600s** via
+    `listenerReadinessExpectation` — this is exactly remediation option (a) from the brief. The
+    derived value is validated (`Number.isSafeInteger`, `> 0`) and **fails closed** rather than
+    silently defaulting. `minimumTimeoutSeconds` is threaded into `captureDescribeFollow` and applied
+    as `Math.max(resolveDbCliTimeoutSeconds(), minimumTimeoutSeconds)`, so the uniform default can
+    only ever *raise*, never lower, the per-database budget.
+  - **The deleted assertion is restored** (`runtime-gates_test.ts` now carries budget assertions
+    again), and **`drift.md` was updated**, satisfying Operating Rule 5 — the omission the evaluator
+    correctly flagged.
+  - **Finding 2 appears addressed** by a new `refresh` capture mode (re-capture after the DB/restart
+    step) rather than left as a documented rationalisation. I have deliberately **not** graded that
+    myself — it is exactly the kind of "looks addressed" change an independent evaluator should judge.
+  - **Gates green:** focused `runtime-gates_test.ts` + `suite-registry_test.ts` **43 passed / 0
+    failed**; repo-wide `deno task check` **2978 files, 0 failed batches, 0 occurrences**.
+  - **Cycle-2 evaluation dispatched** into the freed slot at `265466059`, with the brief explicitly
+    stating this is cycle 2, naming both cycle-1 findings, and instructing the evaluator to **verify
+    the fixes on their merits rather than assume they work** — including whether the `refresh` mode
+    genuinely addresses finding 2 "or merely appears to", and whether an assertion exists that would
+    actually **fail** if the budget collapsed again.
+
+- **Main advanced twice, neither requiring an Aspire product rebase:** **#1823** merged
+  `ee0e626bb945e2d9af58e49bd7bbdf714d0785c3` (harness-only) and **#1803** docs-only, leaving current
+  main **`71d5fb8e079cae74249dd7d314874a3a18e7ab28`**. Both are disjoint from Aspire product surfaces,
+  so per instruction no slice was rebased solely for them. **The final exact synthetic merge must
+  still use current main** — recorded so that requirement is not lost when the packets are cut.
+
+- **D-175 — S7/#1744 NARROW RUNTIME LEASE taken at exact head `474df925c`.** Independently re-proved
+  four-part zero before starting: containers 0, volumes 0, custom networks 0, no `aspire-managed`
+  process. This is the lease argued for in D-167, granted on that reasoning.
+  - **Scope is deliberately narrow:** start an AppHost, kill the launcher, capture the lifecycle/kill
+    receipt (auto-clean / no run-owned survivor / foreign control preserved), run the foreign-AppHost
+    re-test, then tear down. **No `database.init`, no service discovery, no published-port
+    dependency** — precisely the operations D-146 does not affect, since
+    `teardown/probes.ts` observes process trees (`ps -eo pid=,ppid=,etimes=,args=`) and container
+    state rather than reachable endpoints.
+  - Published ports, where touched at all, are addressed as **`netscript-dind:<port>`**, never
+    `127.0.0.1`.
+  - **If D-146 blocks it anyway that is a clean, reportable result** — S7 then returns to parked with
+    the blocker *proven* applicable rather than assumed, which is itself worth the lease.
+
+- **D-176 — S7 PHASE-B RUNTIME PROOF CAPTURED. The D-167 inference was correct: D-146 does not block
+  S7. Lease released at proven four-part zero.** Receipts committed and pushed at **`be2c7a3b0`**.
+  - **The decisive fact: the AppHost started and ran normally under D-146.** `aspire ps` recorded
+    `status: running`, `appHostPid 1918656`, `cliPid 1918637`, `sdkVersion 13.5.3`, with 2 containers
+    (postgres, redis) live. This confirms the D-167 argument empirically — D-146 breaks published-port
+    *reachability*, not AppHost lifecycle, and S7 measures the latter. **S7 was parked behind a
+    blocker that never applied to it.**
+  - **Procedure followed as S7's own `phase-b-handoff.md` specifies**, including the ratified
+    codegen-before-install order and the full generated-project fixture (not a handwritten minimal
+    AppHost), plus a **second foreign-worktree control AppHost** (`007-aspire-s7-control`).
+    `aspire stop --all` and `aspire agent mcp` were never invoked; both AppHosts were stopped by
+    **exact path**.
+  - **Reproduction result — this is the property #1719 boxes 1–2 demand:** after terminating **only**
+    the leased CLI PID (`cliAliveAfter: false`), `agentic:leak-check` reported 16 survivors and
+    classified them:
+    | Classification | Resources |
+    | --- | --- |
+    | **foreign** | the control AppHost, its container, and its processes — all under `007-aspire-s7-control` |
+    | **owned** | the leased container under `007-aspire-s7` |
+    | **unproven** | 10 processes — *not* claimed as owned |
+    The foreign control was **reported and never included in owned mutations**, and the 10 `unproven`
+    processes prove the "**never PPID alone**" safety property S7 implements — it declines to claim
+    what it cannot positively prove, which is exactly the behaviour that makes `--apply` safe.
+  - **Teardown preview: 0 planned mutations, no `--all`.** (A grep hit for `--all` was a false
+    positive matching `--allow-run` inside the task invocation line, not an emitted flag — checked
+    rather than assumed.)
+  - **Cleanup to four-part zero, proven twice:** `aspire ps` → `[]`, containers 0, volumes 0, custom
+    networks 0, no `aspire-managed` process. One Persistent-lifetime container
+    (`postgres-eecbabeb`) and its network survived `aspire stop` as expected and were removed by hand;
+    both scratch trees (leased + control) removed via throwaway container for root-owned files.
+    **Lease released.**
+  - **S7's remaining gate is now an issue-text question, not a runtime one:** #1719 boxes 1–2 have
+    their live receipts. Whether the captured evidence satisfies their exact wording is a
+    coordinator/close-gate judgement — I did **not** tick them myself.
+
+- **D-177 — #1833 implemented as PR #1835; verified independently; supervisor-dispatched eval running.**
+  Head `b7d0a60ac` on base `main` `71d5fb8e0`. Draft PR **#1835** opened with `Closes #1833`.
+  - **All three residuals verified fixed by execution, not by reading:**
+    1. **Shorthand agreement — I ran both implementations across the hard cases** (`orders.api`,
+       `sagas-api`, `a--b`, `x y`, `1lead`, empty string): **zero divergences**. The pre-fix proof
+       case `orders.api` → `VITE_ORDERS.API_URL` vs `VITE_ORDERS_API_URL` is resolved.
+    2. **Deploy prebuild** now imports **`buildViteEnvVarName` from `@netscript/aspire/application`**
+       — i.e. it consumes the **canonical Aspire implementation directly** rather than any copy, which
+       is stronger than the "reuse the SDK helper" the brief asked for. It also extracts a testable
+       `buildVitePrebuildEnvironment()` with its own dedicated test file, replacing the old
+       `// skip names with hyphens` degradation.
+    3. Corpus widened in `env-ordering_test.ts`.
+  - **Hard constraints held:** `service-url.ts` **untouched** (0 occurrences in the diff — the
+    hyphen-preserving server path is intact), and the change surface is only **4 product files**.
+  - **Gates green:** focused tests **8 passed / 101 steps / 0 failed**; repo-wide `deno task check`
+    **2976 files, 0 failed batches, 0 occurrences**.
+  - **Eval dispatched** in slot `007-eval-slot2` at `b7d0a60ac`. Its brief presses the one question the
+    previous cycle proved matters: **is the widened corpus genuinely sufficient, or merely larger?**
+    The prior evaluation defeated a two-input pin with a change that preserved those inputs, so this
+    brief demands the evaluator *demonstrate* whether the new corpus would fail on a one-sided change
+    (collapsing consecutive underscores, stripping leading digits) rather than assert that it would.
+
+- **D-178 — S10 cycle-2 PASS, #1833 PASS, S11 remediated and re-dispatched. Four PASS-backed heads now
+  stand.**
+  - **S10 (#1760) cycle 2 → `VERDICT: PASS`**
+    ([comment](https://github.com/rickylabs/netscript/pull/1760#issuecomment-5474556317)). The
+    evaluator **traced the 600s end-to-end rather than accepting the fix**: `runtimeConvergenceTimeoutSeconds`
+    (`runtime-gates.ts:69-79`) reduces over `runtimeResources(database)` taking the max
+    `listenerReadinessExpectation(...).timeoutSeconds` and **throws when no positive value exists —
+    fail-loud, not a silent default**; `MSSQL_LISTENER_WAIT_TIMEOUT_SECONDS = 600` is reached via
+    `databaseRuntimeResources` including `ASPIRE_RESOURCE.MSSQL` on the mssql axis. Both cycle-1
+    findings confirmed genuinely fixed. Two residual `Info` notes, explicitly non-actionable —
+    including a correct explanation of why the test no longer asserts `'600'` literally (the budget
+    moved to the capture/refresh gates and is re-pinned there).
+    - **Methodology note:** my first read of this verdict picked the wrong file — `-c2.jsonl` sorts
+      *before* `.jsonl`, so a `sorted(...)[-1]` glob returned **cycle 1**. Caught and re-read the
+      correct file. Recording it because a stale-verdict misread is exactly the kind of error that
+      silently certifies the wrong head.
+  - **#1833 (PR #1835) → `VERDICT: PASS`**
+    ([comment](https://github.com/rickylabs/netscript/pull/1835#issuecomment-5474556428)). Two `Minor`
+    findings, neither blocking: (1) the canonical rule's **docstring is now stale** —
+    `build-vite-env-var-name.ts:24-27` still says "hyphens replaced by underscores" while `:58,63-65`
+    normalizes all invalid characters; it matters because that file is the designated *contract
+    source* the SDK comment points at. (2) **A third sibling namespace survives, out of scope:** the
+    Windows deploy adapters (`env-file-content.ts:206`, `env-file-values.ts:197`,
+    `servy-environment.ts:234`) still build hyphen-only `${NAME}_HTTP` keys, so `orders.api` →
+    `ORDERS.API_HTTP`. Different env namespace (deployed-runtime), correctly excluded from this slice.
+  - **S11 (#1771) remediation verified before re-dispatch:** head `abe0fd6cc`, pushed, clean.
+    `13.4.6` occurrences in `explanation/aspire.md` and `deploy-local-aspire.md` are now **0**;
+    `13.5.3` present. Crucially the **false worklog claim was corrected, not deleted** — `worklog.md`
+    now records that the cycle "claimed the current head generated a 13.4.6 baseline without
+    exercising the generator" and cites the exact disproving command and its output. That is the
+    honest outcome the brief demanded.
+  - **Cycle-2 eval dispatched** for S11 at `abe0fd6cc`, asking whether *all* surfaces are corrected,
+    whether anything now **catches future drift** or correctness remains manual, and whether any stale
+    version claim survives elsewhere in the slice.
+
+- **D-179 — S11 cycle-2 PASS. Every stacked Aspire slice is now PASS-backed. #1747's fresh eval
+  dispatched with hostile-input requirements.**
+  - **S11 (#1771) cycle 2 → `VERDICT: PASS`**
+    ([comment](https://github.com/rickylabs/netscript/pull/1771#issuecomment-5474585100)). It verified
+    that **all three surfaces state 13.5.3 and match the pinned constants exactly** — the doc sample's
+    `sdk`/Postgres/Redis/Browsers strings equal `SCAFFOLD_VERSIONS.ASPIRE_SDK` and
+    `SCAFFOLD_ASPIRE_INTEGRATIONS.*`, and the sample's *shape* matches `generateTsAspireConfig`. It
+    also confirmed a **checker now pins this prose so drift cannot regress silently** — which was the
+    "is there anything that catches future drift, or is correctness still manual?" question I put in
+    the brief.
+    - **The evaluator caught and corrected its own false negative before reporting**: an initial
+      2-test failure turned out to be "a permissions artifact of my invocation, not a defect", re-run
+      with `-A` giving 9/9. Self-correcting rather than reporting a spurious failure is exactly the
+      standard this harness asks for.
+    - One `LOW`, non-blocking: the callout says the scaffold emits `Aspire.Hosting.Redis`, but Redis
+      is emitted **conditionally on the cache backend** (omitted for `deno-kv`). Exact for the default
+      scaffold; optional "(default cache backend)" qualifier.
+  - **Cascade status — all five stacked slices PASS-backed:** S8 `bc838a0b3`, S9 `042ff3ca5`,
+    S10 `265466059` (cycle 2), S11 `abe0fd6cc` (cycle 2), S13 `9b684e176`. Plus S7 `be2c7a3b0` with
+    live Phase-B receipts and #1835 `b7d0a60ac`.
+  - **#1747 fresh evaluation dispatched** at `fe87dd2cc` in slot `007-eval-slot2`. The brief is
+    deliberately adversarial about the specific failure mode that slipped through last time: it states
+    plainly that **the prior PASS is void**, shows the exact invalid output that was shipped past it,
+    names *why* it was missed — **"the prior evaluation reasoned about the code instead of rendering
+    it"** — and **requires the evaluator to execute** hostile-input renders (reserved words, colliding
+    names, and quotes/backslashes/backticks/`${}`/newlines in `Workdir`/`Entrypoint`/
+    `ConcurrencyEnvVar`), confirming the emitted source **parses** rather than merely matching
+    strings. It must also confirm the ordinal binding, universal `JSON.stringify` coverage, that the
+    reserved/collision tests would *fail* on a revert, the fixture union still works with a generic
+    binding capture, and that **no other slice's `.llm/runs/` artifacts are deleted**.
+
+- **D-180 — #1747 fresh IMPL-EVAL: VERDICT PASS. Finding 1 cleared by rebase. Finding 2 reproduced and
+  filed as #1836 (p1).** Verdict posted
+  ([comment](https://github.com/rickylabs/netscript/pull/1747#issuecomment-5474732711)).
+  - **The evaluation did exactly what the void'd one failed to do — it executed.** It rendered
+    `generateRegisterBackground` in-process against three hostile cases (reserved words as *both*
+    processor and reference names; collisions `a-b`+`a_b`, `workers-api`+`workers_api`; and
+    `Workdir`/`Entrypoint`/`ConcurrencyEnvVar` containing quotes, backslashes, backticks, `${}` and
+    newlines), then **parse-checked each with `deno lint` (PARSE: OK ×3) and dynamically imported and
+    executed the emitted modules against stub SDK stubs**. Emitted output was
+    `const bg_0 = builder.addExecutable("class", …)` and
+    `resolveWorkspacePath(appHostDir, "work\\it's\\\"dir")` — ordinal binding, fully escaped, **no
+    user string escaping its literal anywhere**.
+  - **Test adequacy proven by mutation, not inference:** it rebuilt the generator in a symlinked
+    mirror with *both* original defects reverted (`safeIdentifier(name)` binding and `'${workdir}'`
+    interpolation) and confirmed the tests fail. That is the standard the earlier evaluation should
+    have met.
+  - **Finding 1 (Low) was diff noise, and my D-169 check was right.** It verified the branch made
+    **zero** deletions — the 39 apparent `.llm/runs/` deletions were exactly the files *added* by three
+    newer `main` commits (#1803, #1823, #1831), i.e. fork-point drift in the reviewer-facing diff.
+    **Cleared by rebasing onto `main`**: head `fe87dd2cc` → **`2032d4ed7`**, 0 behind, and
+    `git diff --name-status origin/main..HEAD | grep '^D.*\.llm/runs/'` now returns **0**.
+  - **Finding 2 (Medium) is a genuine new discovery, and I reproduced it before filing.** Rendering
+    `generateRegisterApps` with an app named `class` on this head emits
+    **`const class = builder.addExecutable('class', …)`** — the identical non-parsing defect. All four
+    sibling generators (`apps:68,217`, `plugins:185,220`, `tools:37`, `infrastructure:109`) still use
+    `safeIdentifier(name)` (hyphen-only, no reserved-word guard) with raw `'${…}'` interpolation.
+    **Filed as [#1836](https://github.com/rickylabs/netscript/issues/1836)**, `priority:p1`, with the
+    rendered proof, the four sites, both failure modes, and acceptance requiring **parse/type-check of
+    emitted output plus mutation-proof** — because string matching alone is exactly what missed
+    `const class` the first time. Recorded explicitly as **pre-existing on `main`, not a #1747
+    regression**; #1747's evaluation is why it is visible at all.
+
+- **D-181 — #1836 dispatched. S7 lifecycle audit surfaces a genuine wording-vs-reality question on
+  #1719 box 1 that I will not resolve myself.**
+  - **#1836 dispatched** (p1, `status:triage` → `status:impl`, worktree `007-leaf-1836` off
+    `71d5fb8e0`). The brief mirrors the #1747 treatment across all four sibling generators — ordinal
+    bindings, universal `JSON.stringify` — and, critically, **requires the tests to parse or
+    type-check the emitted output and to be proven by mutation**, stating explicitly that *"a string
+    assertion is exactly what let `const class` ship past a prior evaluation."* That lesson is now
+    encoded in the brief rather than left to be rediscovered.
+  - **S7 lifecycle audit — PR #1744 has 0 unchecked DoD boxes**, base `main`, `status:impl-eval`,
+    0 review threads, PASS carried, and now live Phase-B receipts. Its only gate is #1719's
+    acceptance.
+  - **The nuance: my own receipt does not literally satisfy box 1 as worded.** Box 1 requires the
+    result be *"consistent with #1429's own premise that killing the launcher auto-cleans the AppHost
+    tree — requires (a) the real 13.5 kill receipt showing automatic cleanup / **no run-owned
+    survivor** and the foreign control preserved."*
+    | Clause | Observed |
+    | --- | --- |
+    | foreign control preserved | ✅ control AppHost + container + processes all classified `foreign`, never in owned mutations |
+    | AppHost **process tree** auto-cleaned | ✅ **no `owned` process survivors** — the only process rows were `foreign` or `unproven`; `pgrep aspire-managed` → 0 |
+    | "no run-owned survivor" | ❌ **one owned container survived**: `postgres-eecbabeb`, `ownership: owned`, `stale: false`, `ageMs: 82707` |
+  - **My reading, offered as analysis and not as a decision:** the surviving resource is a
+    **Persistent-lifetime** Postgres container, and Persistent containers surviving `aspire stop` is
+    documented Aspire behaviour observed identically in D-102, D-103 and D-141 — not a leak and not a
+    failure of tree auto-clean. So the *substance* of box 1 looks satisfied (the tree auto-cleaned;
+    the foreign control was preserved) while its **literal wording is contradicted** by a by-design
+    Persistent container. Notably S7's own tooling **correctly flagged that survivor as owned rather
+    than hiding it** — which is evidence *for* the slice, not against it.
+  - **I did not tick the box, and I did not reword the issue.** The coordinator ruled these two boxes
+    held precisely so live-kill requirements would not be softened into something weaker; deciding
+    that a Persistent container "doesn't count" is exactly such a softening, and it is a
+    coordinator/close-gate call. **Requesting a ruling:** either (a) box 1's "no run-owned survivor"
+    clause is refined to exclude documented Persistent-lifetime resources, or (b) S7 stays at
+    `status:impl-eval` pending a different demonstration.
+
+- **D-182 — #1836 launch failed twice for infrastructure reasons, not implementation ones; diagnosed
+  and relaunched.**
+  1. **First launch:** `serverOverloaded` — *"Selected model is at capacity"* on `gpt-5.6-sol`. A
+     transient provider condition, not a defect and not a refusal. No work was produced.
+  2. **Resume attempt:** consumed **36,153 tokens** but produced **no message, no commit, no worktree
+     change** (head unchanged, clean). Rather than retry a third time, applied the **D-138 lesson** —
+     *a resume that burns tokens while changing nothing indicates a dead session, not a stubborn
+     agent* — and checked the sender record: `ownerPid 2081107`, **not alive**; no live client for
+     session `01a056f1-…`. The capacity failure had left an orphaned sender behind.
+  3. **Released it via the adapter's own lease token** (never `rm`), confirmed `read()` → `null`, and
+     **relaunched fresh** at `--expect-base 71d5fb8e0`.
+  - This is now the third confirmed instance of the same failure mode (S9 D-138, S13 D-144, #1836
+     here). The diagnostic is reliable enough to state as a rule: **token spend without artifact ⇒
+     check `ownerPid` liveness before re-dispatching.** Each time, releasing the orphan and launching
+     fresh worked where resuming did not.
+
+- **D-183 — #1836 implemented (PR #1837) and the core defect is fixed, BUT it is not green. Caught by
+  my own verification, not by the slice's reported gates.** Head `94a2ef1a0` (RED
+  `953271980` → fix `36292dde1` → evidence `94a2ef1a0`).
+  - **The core fix is genuinely correct — verified by rendering:**
+    `generateRegisterApps` with apps named `class`, `a-b`, `a_b` now emits
+    `const app_0 = builder.addExecutable("class", …)`, `app_1`, `app_2` — **0 invalid bindings**, and
+    `a-b`/`a_b` no longer collide. **`safeIdentifier` count is now 0 in all four sibling generators.**
+  - **Cross-PR safety verified:** `_utils.ts` still exports `safeIdentifier`, and
+    `generate-register-background.ts` (the pre-#1747 version on this base) still type-checks against
+    it — so #1836 does not break the generator #1747 fixes separately. Repo-wide
+    `deno task check`: **2976 files, 0 failures.**
+  - **But the full generator test directory FAILS: `28 passed (213 steps) | 2 failed (5 steps)`.**
+    Two files **not in the slice's changed-file list** assert on generated output and were not updated:
+    `generators-pipeline_test.ts:231` (Tier-1 generator content) and `service-environment_test.ts:242`
+    (`declared plugin environment parity (#1447)`, 4 steps).
+  - **Why the slice missed it — worth recording as a method lesson:** the failures surface **only in a
+    directory-wide run**. `generators-service-plugin_test.ts` executed alone exits 0, so a per-file
+    check looks clean. I hit exactly that ambiguity mid-diagnosis myself and resolved it by running
+    the directory and diffing the attribution.
+  - **Repair dispatched** (`d183-fix-broken-tests.md`) with the key instruction stated first:
+    **determine per failure whether the new output is CORRECT or whether the hardening broke
+    behaviour — do not rewrite expectations until tests pass**, since that would convert a real
+    regression into a green build. If the `#1447` parity contract or PORT-refusal semantics genuinely
+    broke, fix the generator, not the test. Explicitly forbidden from weakening any assertion, and
+    required to keep `safeIdentifier` exported for #1747's benefit.
+
+- **D-184 — #1836 repaired and now genuinely green; eval dispatched.** Head `94a2ef1a0` →
+  **`01d32c95f`** ("test(cli): repair sibling generator consumer contracts"), pushed.
+  - **Full generator directory now `30 passed (218 steps) / 0 failed`** (was `28 passed / 2 failed`),
+    repo-wide `deno task check` **2976 files, 0 failures**.
+  - **I verified the repair did not simply relax assertions to reach green** — the specific risk the
+    brief warned about. Net assertion delta: `generators-pipeline_test.ts` **+4/−4**,
+    `service-environment_test.ts` **+4/−2** — assertions were *added* on net, none removed.
+  - **The repair is substantively correct, not cosmetic.** The old `pluginBlock` helper located a
+    plugin's registration block by its **user-text comment**; the hardening deliberately removed user
+    text from generated comments (comments carrying user text would reinvite the very injection and
+    embedded-newline problems this slice fixes). The replacement anchors on
+    `plugins.set(${JSON.stringify(name)}, resource);` — the stable consumer-visible boundary that
+    still carries the original name as a JSON literal — then walks back to the ordinal block marker,
+    **asserting at both lookup steps** (`generator emitted no plugins.set(...)` /
+    `no ordinal block for`). The `PORT`-refusal assertion survives unchanged apart from quote style.
+    So the test infrastructure was adapted to an intended design property rather than the contract
+    being loosened.
+  - **Eval dispatched** at `01d32c95f`. The brief again requires **execution over inference**, citing
+    plainly that a prior evaluation of the sibling PR "passed a head that emitted non-parsing
+    JavaScript because it reasoned about the code instead of rendering it." It must render **all four**
+    generators against hostile inputs, **parse-check** the output, prove test adequacy **by mutation**,
+    confirm `safeIdentifier` stays exported for #1747's benefit, and — critically — **judge the
+    consumer-test repair itself**, answering explicitly whether the `#1447` parity contract
+    (declared entries, ordering, `PORT` refusal, deprecated `Env` alias) is still genuinely enforced.
+
+- **D-185 — #1836 / PR #1837 IMPL-EVAL `PASS` at `01d32c95f` (GLM 5.3 Flash max, separate session).**
+  The strongest-evidenced verdict of this lane, and it did exactly what the brief demanded:
+  **execution over inference.**
+  - Built its **own independent harness** (`.llm/tmp/eval-1836/render.ts`) and rendered all four
+    generators with reserved words as resource *and* reference names, `a-b`/`a_b` collisions, and a
+    hostile literal (`quote'"\slash` + backtick + `${value}` + newline) in **every** user field.
+    All four **parse clean** under `deno lint`; bindings are ordinals only (`app_N`, `tool_N`,
+    `db_N`, `cache_N`, `plugin_*_N_M`) — no user-derived identifier anywhere.
+  - Went **past** the brief: executed each emitted module against a recording Proxy builder stub, so
+    every hostile literal was checked **byte-identical at the call site** — no `${}` interpolation
+    leaked, colliding names coexist.
+  - **Proved adequacy by mutation, three ways:** apps binding→`safeIdentifier`, apps
+    `JSON.stringify`→raw interpolation, infrastructure binding→`safeIdentifier` — each failed the
+    author's source-safety tests. Both mechanisms are genuinely enforced, not merely asserted.
+  - **Independently confirmed my D-184 reading of the consumer-test repair**, and did so by mutation
+    rather than by agreeing with me: reverting `renderDeclaredEnvironmentLines` in
+    `generate-register-plugins.ts` failed all four `#1447` plugin parity tests. It ruled the locator
+    change *semantically equivalent* — pass-2 blocks contain no `plugins.set(...)`, so `end` always
+    lands in a pass-1 block and `lastIndexOf` recovers that block's own ordinal comment, the same
+    region the old locator extracted. All eight `#1447` cases survive in substance.
+  - Confirmed `safeIdentifier` still exported (`_utils.ts:26`) and consumed by
+    `generate-register-background.ts:19,39` — **#1747 is unaffected**.
+  - **Findings: none blocking.** One non-blocking note: the author's source-safety test asserts
+    literal containment at *one* insertion site per generator
+    (`generate-register-source-safety_test.ts:135`) rather than every site; the evaluator's stub
+    execution closed that gap here. Recorded as a hardening candidate, not a defect.
+  - Closing line worth keeping: "The prior evaluator's failure mode — reasoning about code instead of
+    rendering it — did not recur."
+
+- **D-186 — lifecycle normalized across the whole Aspire lane; 18 items now carry exactly one accurate
+  `status:`.** Every PASS-backed slice moved `status:impl` → **`status:impl-eval`** on both issue and
+  PR, all **kept draft**.
+  - **I re-verified each head against the ledger before flipping rather than trusting the label or a
+    globbed verdict file** — the stale-verdict trap from earlier this run (`sorted(glob)[-1]` picks
+    `impl-eval-verdict.jsonl` over `-c2.jsonl` because `-` sorts before `.`) bit again on first pass:
+    a naive glob reported **S10 and S11 as `CHANGES_REQUESTED`** when both hold cycle-2 `PASS`.
+    Enumerating every verdict file with its mtime caught it.
+  - Confirmed each PR's **live head is exactly the ledger-recorded PASS-backed head** — S7
+    `be2c7a3b0`, S8 `bc838a0b3`, S9 `042ff3ca5`, S10 `265466059`, S11 `abe0fd6cc`, S13 `9b684e176`,
+    #1747 `2032d4ed7`, #1835 `b7d0a60ac`, #1836 `01d32c95f`. No slice has drifted off its evaluation
+    since the verdict landed.
+  - **Deliberately did not flip any PR to ready-for-review.** The ready transition auto-dispatches a
+    redundant OpenHands IMPL-EVAL (the #1831 lesson, D-172) and would move heads under a valid
+    verdict. Ready-flip and merge stay coordinator-owned, per standing rule.
+  - Board is now truthful: the lane reads as ten evaluated slices awaiting a merge decision, not as
+    work still in implementation.
+
+- **D-187 — merge-packet audit of S11's close-gated acceptance found one wrong PR-body claim and one
+  genuinely unsatisfied box.** I verified every box against the live head instead of trusting the PR
+  body, and two things did not survive.
+  1. **`packages/aspire` root-scoped `doc:lint` does NOT exit 0**, contrary to PR #1771's
+     "Root-scoped `doc:lint`: `packages/cli` exit 0; `packages/aspire` exit 0."
+     Measured at S11 head `abe0fd6cc`: `packages/cli` **exit 0**; `packages/aspire` **exit 1**.
+     - **But it is not an S11 regression.** I ran the identical command on `main` `71d5fb8e0`:
+       **exit 1, byte-identical per-entrypoint codes** (`./src/adapters|application|public|testing/mod.ts`
+       and `./types.ts` = 1; `./config.ts`, `./constants.ts`, `./mod.ts`, `./schema.ts` = 0).
+     - The **published surface is clean**: `combinedTotal: 0`, `combinedPrivateTypeRef: 0`,
+       `combinedExitCode: 0`. The process exit-1 comes from **non-exported internal entrypoints**
+       (52 `privateTypeRef` on `./src/public/mod.ts`, 19 on `./types.ts`) that are not part of the
+       publish bar. Pre-existing repo-wide condition, not this slice's.
+     - Evidence must therefore be stated as *parity with main*, not as "exit 0". Claiming exit 0
+       would be a false-green of exactly the kind the close-gate exists to stop.
+  2. **#1723 box 4 — "docs_audit log + docs_polish pass recorded per `doc-audit.md`" — is
+     UNSATISFIED.** No audit artifact exists in
+     `.llm/runs/docs-aspire-13-5-s11-public-docs-refresh--impl/` (contents: `context-pack.md`,
+     `drift.md`, `manifest-disposition.md`, `plan.md`, `research.md`, `supervisor.md`,
+     `worklog.md`), and `doc-audit.md` requires a structured `## Gate log` table per gate.
+     - **The box may be inapplicable rather than failed, and that is a coordinator call.**
+       `doc-audit.md`'s trigger is "any docs changeset **generated by Claude sub-agents**"; S11 was
+       generated by **WSL Codex GPT-5.6 Sol**. Worse, the profile names **Codex GPT-5.6 Sol** as the
+       auditor while imposing a hard **opposite-family, generator-session ≠ audit-session** invariant
+       — so the profile's own auditor identity is unavailable for a Codex-generated changeset.
+     - **Substantive coverage already exists from an opposite-family session:** S11's
+       supervisor-dispatched GLM IMPL-EVAL cycle 1 returned `CHANGES_REQUESTED` on a **HIGH
+       docs-accuracy inversion** (D-171) — precisely the failure class doc-audit exists to catch —
+       and cycle 2 at `abe0fd6cc` returned `PASS` (D-179).
+     - I did **not** tick, rewrite, or weaken the box. Escalated with a recommendation.
+  - Boxes 1–3 of #1723 and all four boxes of #1642 are backed by verified evidence (below); #1642's
+    surface confirmed present at `abe0fd6cc`: page sections at L20/L49, `[]`+exit-0 contract at L74,
+    `dashboardUrl` at L38/L68, "Redacting dashboard tokens" callout at L43, `aspire ps --format Json`
+    reuse at L52/L55, xref `howto:detached-start-agents-ci` at `docs/site/_data/xref.ts:184-185`, and
+    catalog listing at `docs/site/how-to/index.md:126`.
+
+- **D-188 — STRUCTURAL BLOCKER, the critical path to milestone completion. Four slices' acceptance
+  boxes require runtime, and *every* route to that runtime is currently closed to me.** This is one
+  coordinator decision that unlocks S7+S8+S9+S10 together.
+  - **Runtime-dependent unchecked boxes** (surveyed live, not from memory):
+    - **#1719 (S7)** A1 live kill/orphan reproduction, A2 foreign-AppHost report-never-mutate.
+    - **#1720 (S8)** A1 `aspire resource <db>-cli --help` receipt, A2 `migrate --timeout 60` +
+      `reset` refusal, A4 `netscript db init` against Unhealthy-but-Running Postgres, A5
+      `scaffold.runtime` green on both tiers. (A3, A6 are static — grep/generated output.)
+    - **#1721 (S9)** A1 `agent.aspire-mcp-smoke` green in `scaffold.runtime` on both CI tiers.
+      (A2–A5 static; **A6 is another `docs_audit` (Codex Sol) box — same trigger question as
+      #1723 box 4**, see D-187.)
+    - **#1722 (S10)** A1 `scaffold.runtime --cleanup` green on both tiers, A2 persistent-container
+      leak zero with a `docker ps` receipt.
+  - **Route 1 — local/NAS runtime: closed.** microsoft/aspire#14878 — Aspire 13.5.3 does not support
+    remote/custom Docker hosts; DCP binds published ports daemon-local. Parked host-wide.
+  - **Route 2 — GitHub-hosted CI runtime: closed *only by draft state*, and this is the important
+    part.** `e2e-cli.yml` runs both tiers (`scaffold-runtime` aspire+docker+postgres, and
+    `scaffold-runtime-sqlite`) on `ubuntu-latest` with **real local Docker — the upstream limitation
+    does not apply there**. Its `e2e-cli-gate` / `ci:full` opt-in label "triggers the workflow
+    immediately" and `labeled` is in the `on:` types. **But `classify` is hard-gated at
+    `.github/workflows/e2e-cli.yml:91` on `github.event.pull_request.draft == false`**, and every one
+    of these ten PRs is draft. `ci.yml` states the same rule: "Draft PR pushes schedule no jobs."
+    So no label I can apply produces a runtime receipt while the PRs stay draft.
+  - **Route 3 — undraft: not mine.** Ready-flip is coordinator-owned, and it *also* auto-dispatches an
+    OpenHands IMPL-EVAL that would spend a redundant cycle against already-valid supervisor-dispatched
+    verdicts (the #1831 lesson, D-172). `impl-eval:skip` is the documented suppressor, but the
+    coordinator **explicitly forbade it on #1754** — so this needs a fresh ruling rather than my
+    inference.
+  - **`[post-merge]` is the wrong instrument here** and I did not reach for it: these boxes *can* be
+    satisfied pre-merge on CI once undrafted, so marking them post-merge would convert a solvable
+    scheduling problem into a permanent evidence gap.
+  - **Recommendation to the coordinator — one action, four slices:** undraft #1744, #1754, #1759,
+    #1760 with `e2e-cli-gate` (or `ci:full`) applied, plus `impl-eval:skip` on each to protect the
+    existing valid verdicts and stop four redundant evaluator runs. CI then produces the dual-tier
+    runtime receipts these boxes name, on hardware the upstream Aspire limitation does not touch.

@@ -562,3 +562,50 @@ all-tiers SUCCESS); delta IMPL-EVAL PASS (Opus 5, r3890336485 resolved); review-
 Coordinator lands. | | S6 v2 thread client killed early (exit 143), resumed same thread | Rollout
 confirmed 75 lines, no edits, worktree unchanged at `2a1248d33`. Resumed `01a05474…` in place — same
 recurring external-interruption pattern as D-93; no rival launched, no work lost. |
+
+## S6 Phase-B Postgres single-gate lease (D-102) — 2026-08-31
+
+Coordinator-granted sole runtime lease (`s6-lease-postgres`) executed at exact head
+`929ff72a2908`/`3a20d00be1a6`. Manual scratch build initially skipped `RUNTIME_READINESS_FIXTURE`;
+corrected by running `prepare-readiness-fixture.ts` before `aspire start`, then confirmed
+`test_only_postgres_listener`/`test_only_garnet_resp` present and Healthy. The actual single gate
+(`listener-unreachable-fixture.ts`) exercised close→Unhealthy correctly, real backing services stayed
+Healthy throughout, but failed at `aspire wait postgres --status healthy --timeout 10` returning exit
+17 ("Timed out waiting...") where the fixture hard-codes exit 18. Real product-level blocker, not an
+environment/lease issue — see drift D-102 for full detail and the recommendation. SQLite tier and full
+suites deliberately not attempted (blocked by the same code path). Host driven back to exact zero;
+lease returned.
+
+## S6 Phase-B Postgres single-gate GREEN (D-103) — 2026-08-31
+
+Fresh lease `s6-c1f425eb9-postgres-1` at exact head `c1f425eb962ed77ae25e108def18a5d22da2f5ac`
+(D-102's ANSI-strip correction). Postgres single gate (`runtime.health.listener-unreachable`) passed
+exit 0: both postgres and garnet synthetic listeners transitioned Healthy→Unhealthy(exit 17, exact
+diagnostic)→Healthy, real backing keys stayed Healthy throughout every phase. Host driven to exact
+zero (0 containers, 0 volumes, no aspire/relay process); lease returned. Next: SQLite tier from a
+fresh lease, then full suites once both singles are green.
+
+## S6 Phase-B SQLite single-gate GREEN (D-104) — 2026-08-31
+
+Fresh lease `s6-c1f425eb9-sqlite-1` at exact head `c1f425eb962ed77ae25e108def18a5d22da2f5ac`. Confirmed
+generated infrastructure carries only `test_only_garnet_resp` (no synthetic postgres marker) before
+starting Aspire. SQLite single gate (`runtime.health.listener-unreachable`) passed exit 0: garnet
+synthetic listener transitioned Healthy→Unhealthy(exit 17, exact diagnostic)→Healthy, real
+`garnet_resp` stayed Healthy throughout. Host driven to exact zero; lease returned. Both Postgres
+(D-103) and SQLite (D-104) singles are now green at this head — full suites are unblocked pending a
+new lease.
+
+## S6 full scaffold.runtime (Postgres) suite — 80 PASS / 1 FAIL, ratified (D-105) — 2026-08-31
+
+Lease `s6-c1f425eb9-full-1` at head `c1f425eb962ed77ae25e108def18a5d22da2f5ac`. 80/81 gates passed,
+including `runtime.health.listener-unreachable` (green under full-suite load). Sole failure
+`behavior.app-reference`: no headless Chrome/Chromium binary on this NAS host — ratified as the
+pre-existing NAS M5 environment limitation, not an S6 regression; no rerun, no browser install.
+Teardown to exact zero (one anonymous Docker volume left by the suite's own cleanup step was removed
+by hand; lease returned).
+
+CLI selector research: `run <suite>`/`gate <suite> <gate>` are the CLI's only two granularities —
+no `--skip`/`--exclude`/`--only` mechanism exists anywhere in `run-command.ts`/`run-options.ts`/
+`gate-runner.ts`. `behavior.app-reference` is also a member of `scaffold.runtime.sqlite`'s gate list,
+so a full SQLite run would hit the same missing-Chrome failure. Awaiting coordinator regrant/decision
+before starting SQLite.

@@ -1,0 +1,6 @@
+[relay] watching owner=s6-quickstart-1 dind=netscript-dind(10.4.12.22) since=2026-08-31T00:11:11.478Z pid=745712
+[relay] postgres-31726205 127.0.0.1:20856 => hopA relay-s6-quickstart-1-20856 (10.4.12.22:20856) => hopB 127.0.0.1:20856@ai-agents
+[relay] redis-ghtndgjn 127.0.0.1:32857 => hopA relay-s6-quickstart-1-32857 (10.4.12.22:32857) => hopB 127.0.0.1:32857@ai-agents
+[relay] relay-s6-quickstart-1-20856 torn down — upstream port 20856 no longer published
+[relay] relay-s6-quickstart-1-32857 torn down — upstream port 32857 no longer published
+[relay] cleanup: closed 0 listener(s), removed 0 hop-A container(s)

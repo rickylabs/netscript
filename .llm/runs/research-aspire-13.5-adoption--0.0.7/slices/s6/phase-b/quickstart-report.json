@@ -1,0 +1,387 @@
+{
+  "ok": true,
+  "suiteId": "quickstart.walk",
+  "projectRoot": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+  "startedAt": "2026-08-31T00:12:56.165Z",
+  "durationMs": 91385,
+  "steps": [
+    {
+      "id": "quickstart.1-install-cli",
+      "title": "Quickstart step 1/7 — install the published CLI",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.1-install-cli attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "install",
+              "--global",
+              "--allow-all",
+              "--minimum-dependency-age=0",
+              "--no-lock",
+              "--root",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/.quickstart-cli",
+              "--name",
+              "netscript",
+              "jsr:@netscript/cli@0.0.6"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "",
+            "stderrTail": "ript/cli/0.0.6/src/kernel/adapters/templates/app/generate-app-deno-json.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/kernel/adapters/templates/app/generate-app-tsconfig.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/kernel/adapters/templates/app/generate-vite-config.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/kernel/application/scaffold/writers/app-route-seeds.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/kernel/application/scaffold/writers/write-example-service-app-files.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/kernel/templates/app/agent-conventions.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/kernel/adapters/scaffold/directory-copier.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/maintainer/adapters/plugin-import-rewriter.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/0.0.6/src/maintainer/adapters/plugin-file-collector.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/cli.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/docs/docs-flows.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/infrastructure/fetch-telemetry-probe.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/infrastructure/telemetry-query-adapter.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/infrastructure/stdio-transport.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/infrastructure/release-embedded-docs-corpus.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/get-app-status-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/get-recent-errors-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/get-run-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/list-runs-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/get-last-job-result-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/analyze-service-performance-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/flows/analyze-db-bottlenecks-flow.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/infrastructure/aspire-doctor-family.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/infrastructure/project-wiring-doctor-family.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/application/telemetry-aggregation.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/mcp/0.0.6/src/domain/telemetry-summaries.ts\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/aspire/0.0.6/mod.ts\n\u001b[0m\u001b[32mInitialize\u001b[0m zod@4.5.4\n\u001b[0m\u001b[32mInitialize\u001b[0m @opentelemetry/api@1.9.1\n\u001b[0m\u001b[38;5;245mInstalled\u001b[0m 5 \u001b[0m\u001b[38;5;245mpackages\u001b[0m \u001b[0m\u001b[38;5;245min\u001b[0m 3s\n\u001b[0m\u001b[38;5;245mReused\u001b[0m 29 \u001b[0m\u001b[38;5;245mpackages from cache\u001b[0m\n\u001b[0m\u001b[1m\u001b[33m+++++++++++++++++++++++++++++\u001b[0m\n\u001b[0m\u001b[38;5;245mDownloaded\u001b[0m 3 \u001b[0m\u001b[38;5;245mpackages from JSR\u001b[0m\n\u001b[0m\u001b[32m+++\u001b[0m\n\u001b[0m\u001b[38;5;245mDownloaded\u001b[0m 0 \u001b[0m\u001b[38;5;245mpackages from npm\u001b[0m\n\n\u001b[0m\u001b[36mDependencies:\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mjsr:\u001b[0m@netscript/aspire \u001b[0m\u001b[38;5;245m0.0.6\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mjsr:\u001b[0m@netscript/cli \u001b[0m\u001b[38;5;245m0.0.6\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mjsr:\u001b[0m@netscript/mcp \u001b[0m\u001b[38;5;245m0.0.6\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mnpm:\u001b[0m@opentelemetry/api \u001b[0m\u001b[38;5;245m1.9.1\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mnpm:\u001b[0mzod \u001b[0m\u001b[38;5;245m4.5.4\u001b[0m\n\n✅ Successfully installed netscript\n/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/.quickstart-cli/bin/netscript\nℹ️  Add /home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/.quickstart-cli/bin to PATH\n    export PATH=\"/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/.quickstart-cli/bin:$PATH\"\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3630,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3630
+    },
+    {
+      "id": "quickstart.2-init-workspace",
+      "title": "Quickstart step 2/7 — scaffold the workspace",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.2-init-workspace attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "--minimum-dependency-age=0",
+              "jsr:@netscript/cli@0.0.6",
+              "init",
+              "s6-quickstart",
+              "--path",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart",
+              "--db",
+              "postgres",
+              "--ci",
+              "--yes",
+              "--no-git",
+              "--force"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "╔═════════════════════════════════════════════════════════════╗\n║              NetScript — Scaffold New Project               ║\n╚═════════════════════════════════════════════════════════════╝\n\n📁 Creating project \"s6-quickstart\"...\n   \u001b[32m✓\u001b[39m Project root (deno.json, netscript.config.ts, .gitignore, README.md)\n   \u001b[32m✓\u001b[39m Aspire orchestration (TypeScript AppHost, .helpers/, package.json)\n   \u001b[32m✓\u001b[39m Database workspace (postgres)\n   \u001b[32m✓\u001b[39m Frontend app \"s6-quickstart-web\" (Fresh framework)\n   \u001b[32m✓\u001b[39m Contracts (v1 stub)\n   \u001b[32m✓\u001b[39m Plugins (empty registry)\n   \u001b[32m✓\u001b[39m Output formatted (deno fmt)\n\n\u001b[32m✅\u001b[39m \u001b[1mProject scaffolded successfully in 0.7s\u001b[22m\n\n  Created: 183 files, 32 directories\n\nNext steps:\n  1. cd s6-quickstart\n  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace\n  3. aspire restore  # download TypeScript AppHost SDK modules (run once)\n  4. cd ..\n  5. deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed\n  6. netscript db init --name init\n  7. netscript db generate\n  8. netscript db seed\n  9. # Postgres provisioned by Aspire (see \"Databases\" in appsettings.json)\n\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1898,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1898
+    },
+    {
+      "id": "quickstart.3-add-service",
+      "title": "Quickstart step 3/7 — add and type-check a service after init",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.3-add-service attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const commands = [[\"deno\",\"run\",\"-A\",\"--minimum-dependency-age=0\",\"jsr:@netscript/cli@0.0.6\",\"service\",\"add\",\"--name\",\"users\",\"--with-client\",\"--project-root\",\".\"],[\"deno\",\"check\",\"--unstable-kv\",\"services/users\"]];\nfor (const command of commands) {\n  const [executable, ...args] = command;\n  const child = new Deno.Command(executable, { args, stdout: 'inherit', stderr: 'inherit' }).spawn();\n  const status = await child.status;\n  if (!status.success) Deno.exit(status.code);\n}"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Added service \"users\" on port 51471.\nCreated 2 contract files.\nCreated 5 service files.\nRegenerated 13 Aspire helper files.\nCreated typed client helpers at /home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/apps/s6-quickstart-web/lib/users.ts.\n",
+            "stderrTail": "tialize\u001b[0m d3-path@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m is-property@1.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m safer-buffer@2.1.2\n\u001b[0m\u001b[32mInitialize\u001b[0m fast-check@3.23.2\n\u001b[0m\u001b[32mInitialize\u001b[0m perfect-debounce@2.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m giget@3.3.1\n\u001b[0m\u001b[32mInitialize\u001b[0m defu@6.1.7\n\u001b[0m\u001b[32mInitialize\u001b[0m pkg-types@2.3.1\n\u001b[0m\u001b[32mInitialize\u001b[0m rc9@3.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m chokidar@5.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m exsolve@1.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m confbox@0.2.4\n\u001b[0m\u001b[32mInitialize\u001b[0m dotenv@17.4.2\n\u001b[0m\u001b[32mInitialize\u001b[0m ohash@2.0.12\n\u001b[0m\u001b[32mInitialize\u001b[0m fast-deep-equal@3.1.3\n\u001b[0m\u001b[32mInitialize\u001b[0m safe-regex2@5.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m fast-querystring@1.1.2\n\u001b[0m\u001b[32mInitialize\u001b[0m signal-exit@4.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m cross-spawn@7.0.6\n\u001b[0m\u001b[32mInitialize\u001b[0m ajv@8.20.0\n\u001b[0m\u001b[32mInitialize\u001b[0m env-paths@3.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m better-result@2.10.0\n\u001b[0m\u001b[32mInitialize\u001b[0m graphmatch@1.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m grammex@3.1.13\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/debug@7.2.0\n\u001b[0m\u001b[32mInitialize\u001b[0m signal-exit@3.0.7\n\u001b[0m\u001b[32mInitialize\u001b[0m retry@0.12.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @jridgewell/resolve-uri@3.1.2\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-color@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-shape@3.1.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-interpolate@3.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-delaunay@6.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-delaunay@6.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-geo@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-array@3.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-color@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-interpolate@3.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-scale@4.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-time-format@4.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-path@3.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-array@3.0.3\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-format@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-time@3.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-scale@4.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m d3-time@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-geo@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-format@3.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/d3-time-format@2.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @radix-ui/react-slot@1.2.3\n\u001b[0m\u001b[32mInitialize\u001b[0m @radix-ui/react-use-effect-event@0.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m @radix-ui/react-use-layout-effect@1.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m pure-rand@6.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m destr@2.0.5\n\u001b[0m\u001b[32mInitialize\u001b[0m readdirp@5.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m ret@0.5.0\n\u001b[0m\u001b[32mInitialize\u001b[0m fast-decode-uri-component@1.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m path-key@3.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m shebang-command@2.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m which@2.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m require-from-string@2.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m fast-uri@3.1.6\n\u001b[0m\u001b[32mInitialize\u001b[0m json-schema-traverse@1.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m delaunator@5.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/geojson@7946.0.16\n\u001b[0m\u001b[32mInitialize\u001b[0m @radix-ui/react-compose-refs@1.1.2\n\u001b[0m\u001b[32mInitialize\u001b[0m shebang-regex@3.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m isexe@2.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m robust-predicates@3.0.3\n\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Ignored build scripts for packages:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:prisma@7.10.0\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:@prisma/engines@7.10.0\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Run \"\u001b[0m\u001b[1mdeno approve-scripts\u001b[0m\" to run build scripts.\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[32mInitialize\u001b[0m @opentelemetry/semantic-conventions@1.43.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @orpc/otel@1.15.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @opentelemetry/instrumentation@0.221.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @opentelemetry/api-logs@0.221.0\n\u001b[0m\u001b[32mInitialize\u001b[0m import-in-the-middle@3.3.3\n\u001b[0m\u001b[32mInitialize\u001b[0m require-in-the-middle@8.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m es-module-lexer@2.3.2\n\u001b[0m\u001b[32mInitialize\u001b[0m cjs-module-lexer@2.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m module-details-from-path@1.0.4\n\u001b[0m\u001b[32mInitialize\u001b[0m debug@4.4.3\n\u001b[0m\u001b[32mInitialize\u001b[0m ms@2.1.3\n\u001b[0m\u001b[32mCheck\u001b[0m services/users/src/main.ts\n\u001b[0m\u001b[32mCheck\u001b[0m services/users/src/router.ts\n\u001b[0m\u001b[32mCheck\u001b[0m services/users/src/routers/health.ts\n\u001b[0m\u001b[32mCheck\u001b[0m services/users/src/routers/v1.ts\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3544,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3544
+    },
+    {
+      "id": "quickstart.4-aspire-restore-start",
+      "title": "Quickstart step 4/7 — restore and start Aspire (bounded; #1227)",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.4-aspire-restore-start attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-run=aspire",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/packages/cli/e2e/src/application/gates/quickstart/aspire-walk.ts",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+              "180000"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\u001b[2m⚙️ Restoring SDK code...\u001b[0m\n\u001b[38;5;2m✅\u001b[0m SDK code restored successfully for apphost.mts.\n\n\u001b[2mStarting Aspire AppHost in the background...\u001b[0m\n\n     \u001b[1;38;5;2mAppHost\u001b[0m:  apphost.mts                                                                                                            \n                                                                                                                                      \n   \u001b[1;38;5;2mDashboard\u001b[0m:  \u001b]8;id=1057176919;https://localhost:37531\u001b\\https://localhost:37531\u001b]8;;\u001b\\                                                                                                \n                                                                                                                                      \n        \u001b[1;38;5;2mLogs\u001b[0m:  \u001b]8;id=639590220;file:///home/agent/projects/netscript/.aspire/logs/cli_20260831T001309895_detach-child_82c00e5745c4455599bb86c36d69d627.log\u001b\\/home/agent/projects/netscript/.aspire/logs/cli_20260831T001309895_detach-child_82c00e5745c4455599bb86c36d69d627.log\u001b]8;;\u001b\\   \n                                                                                                                                      \n         \u001b[1;38;5;2mPID\u001b[0m:  754920                                                                                                                 \n\n\u001b[38;5;2m✅\u001b[0m AppHost started successfully.\n\n\u001b[2mWaiting for resource 'postgres' to be healthy...\u001b[0m\n\n\u001b[38;5;2m✅\u001b[0m Resource 'postgres' is healthy. (8.9s)\n\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 22868,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 22868
+    },
+    {
+      "id": "quickstart.5-database-workflow",
+      "title": "Quickstart step 5/7 — initialize, generate, and seed the database",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.5-database-workflow attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-run=deno,docker",
+              "--allow-read",
+              "--allow-write",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk.ts",
+              "run",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+              "jsr:@netscript/cli@0.0.6"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "[0m Waiting for resource 'postgres' to become healthy.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 'postgres'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Finished waiting for resource 'postgres'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 's6-quickstart-db' to enter the 'Running' state.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 's6-quickstart-db' to become healthy.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 's6-quickstart-db'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Finished waiting for resource 's6-quickstart-db'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Successfully executed command 'start'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Executing command 'stop'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Successfully executed command 'stop'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Executing command 'start'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 'postgres' to enter the 'Running' state.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 'postgres' to become healthy.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 'postgres'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Finished waiting for resource 'postgres'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 's6-quickstart-db' to enter the 'Running' state.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 's6-quickstart-db' to become healthy.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 's6-quickstart-db'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Finished waiting for resource 's6-quickstart-db'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Successfully executed command 'start'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Executing command 'stop'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Successfully executed command 'stop'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Executing command 'start'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 'postgres' to enter the 'Running' state.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 'postgres' to become healthy.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 'postgres'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Finished waiting for resource 'postgres'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 's6-quickstart-db' to enter the 'Running' state.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource 's6-quickstart-db' to become healthy.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Waiting for resource ready to execute for 's6-quickstart-db'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Finished waiting for resource 's6-quickstart-db'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m Successfully executed command 'start'.\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m [sys] Starting process...: Cmd = /home/agent/.local/share/mise/installs/deno/2.9.5/bin/deno, Args = [\"eval\", \"\\nconst request = \nJSON.parse(await Deno.readTextFile(Deno.args[0]));\\nconst operation = request.NETSCRIPT_PRISMA_OPERATION;\\nif (typeof operation !== 'string' || \n!/^[a-z-]+$/.test(operation)) {\\n  throw new Error('Invalid NetScript database operation request.');\\n}\\nconst task = `db:${operation}:${Deno.args[1]}`;\\nconst \ncommand = new Deno.Command('deno', {\\n  args: ['task', task],\\n  env: request,\\n  stdin: 'inherit',\\n  stdout: 'inherit',\\n  stderr: 'inherit',\\n});\\nconst \nstatus = await command.spawn().status;\\nDeno.exit(status.code);\\n\", \n\"/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/aspire/.netscript-db-operation-postgres.json\", \"postgres\"]\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m \u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdb:seed:postgres\u001b[0m deno task db:seed\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m \u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdb:seed\u001b[0m deno run -A --minimum-dependency-age=0 ./scripts/seed.ts\n\u001b[38;5;222m[netscript-db-postgres]\u001b[0m ✅ Seeded representative User row.\ndb seed completed successfully.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 22300,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 22300
+    },
+    {
+      "id": "quickstart.6-project-check",
+      "title": "Quickstart step 6/7 — run the documented project check",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.6-project-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "task",
+              "check"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "rd-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(_components)/health-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(_components)/home-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(_shared)/health.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_components)/components-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_components)/composition-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_components)/tokens-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_islands)/TokenClipboard.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_shared)/registry.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/(_shared)/tokens.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/_layout.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/components.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/composition.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/(design)/design/tokens.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/_app.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/_layout.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/dashboard.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/examples/(_components)/crud-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/examples/(_components)/examples-view.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/examples/crud.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/examples/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/health.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/routes/index.tsx\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/utils.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m apps/s6-quickstart-web/vite.config.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/mod.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/prisma.config.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/clear-seeded-client.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/fix-zod-imports.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/generate-zod.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/migrate.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/patch-prisma-client.ts\\n\\u001b[0m\\u001b[32mCheck\\u001b[0m database/postgres/scripts/seed.ts\\n\"\n    },\n    {\n      \"files\": [\n        \"aspire/.helpers/_aspire-compat.mts\",\n        \"aspire/.helpers/config-schema.mts\",\n        \"aspire/.helpers/configure-dashboard.mts\",\n        \"aspire/.helpers/db-cli-mode.mts\",\n        \"aspire/.helpers/index.mts\",\n        \"aspire/.helpers/register-apps.mts\",\n        \"aspire/.helpers/register-background.mts\",\n        \"aspire/.helpers/register-infrastructure.mts\",\n        \"aspire/.helpers/register-plugins.mts\",\n        \"aspire/.helpers/register-services.mts\",\n        \"aspire/.helpers/register-tools.mts\",\n        \"aspire/apphost.mts\"\n      ],\n      \"exitCode\": 0,\n      \"stdout\": \"\",\n      \"stderr\": \"Warning: config file file:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/. Ignoring the parent workspace config.\\n\"\n    }\n  ]\n}\n",
+            "stderrTail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 5384,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 5384
+    },
+    {
+      "id": "quickstart.7-service-response",
+      "title": "Quickstart step 7/7 — receive an example service response",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.7-service-response attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const appHost = Deno.args[0];\nconst resourceName = Deno.args[1] ?? \"users\";\nconst database = Deno.args[2];\nif (!appHost) throw new Error(\"apphost argument is required\");\nconst command = new Deno.Command(\"aspire\", {\n  args: [\"describe\", \"--apphost\", appHost, \"--format\", \"Json\"],\n  stdout: \"piped\",\n  stderr: \"piped\",\n});\nconst output = await command.output();\nconst stdout = new TextDecoder().decode(output.stdout);\nconst stderr = new TextDecoder().decode(output.stderr);\nif (!output.success) {\n  throw new Error(`aspire describe failed with code ${output.code}: ${stderr || stdout}`);\n}\nconst topology = JSON.parse(extractJson(stdout));\nconst resource = findResource(topology, resourceName);\nif (!resource) {\n  throw new Error(`resource ${resourceName} was not present in aspire describe output`);\n}\nconst urls = collectHttpUrls(resource);\nif (urls.length === 0) {\n  throw new Error(`resource ${resourceName} did not expose an HTTP endpoint in aspire describe output`);\n}\nconst errors = [];\nfor (const baseUrl of urls) {\n  const healthUrl = new URL(\"/health\", baseUrl).toString();\n  const result = await probe(healthUrl);\n  if (result.ok && aggregateHealthMatches(result.body, database)) {\n    console.info(`service health probe passed: ${healthUrl} -> ${result.status}`);\n    Deno.exit(0);\n  }\n  errors.push(`${healthUrl} -> ${result.status}: ${result.body.slice(0, 200)}`);\n}\nthrow new Error(`service health probe failed for ${resourceName}: ${errors.join(\"; \")}`);\n\nfunction aggregateHealthMatches(body, expectedDatabase) {\n  let health;\n  try {\n    health = JSON.parse(body);\n  } catch {\n    return false;\n  }\n  if (!isRecord(health) || health.status !== \"healthy\" || !Array.isArray(health.checks)) {\n    return false;\n  }\n  if (expectedDatabase === undefined) return true;\n  const databaseChecks = health.checks\n    .filter(isRecord)\n    .map((check) => check.name)\n    .filter((name) => typeof name === \"string\" && name.startsWith(\"database\"));\n  const expectedNames = new Set([\"database\", `database:${expectedDatabase}`]);\n  return databaseChecks.length === 1 && expectedNames.has(databaseChecks[0]);\n}\n\nfunction extractJson(text) {\n  const trimmed = text.trim();\n  if (trimmed.startsWith(\"{\") || trimmed.startsWith(\"[\")) return trimmed;\n  const objectIndex = trimmed.indexOf(\"{\");\n  const arrayIndex = trimmed.indexOf(\"[\");\n  const indexes = [objectIndex, arrayIndex].filter((index) => index >= 0);\n  if (indexes.length === 0) throw new Error(\"aspire describe did not emit JSON\");\n  return trimmed.slice(Math.min(...indexes));\n}\n\nfunction findResource(value, name) {\n  if (!isRecord(value)) return undefined;\n  if (resourceNameMatches(value, name)) return value;\n  for (const child of Object.values(value)) {\n    if (Array.isArray(child)) {\n      for (const item of child) {\n        const match = findResource(item, name);\n        if (match) return match;\n      }\n      continue;\n    }\n    const match = findResource(child, name);\n    if (match) return match;\n  }\n  return undefined;\n}\n\nfunction resourceNameMatches(value, name) {\n  for (const key of [\"name\", \"displayName\", \"resourceName\"]) {\n    const candidate = value[key];\n    if (typeof candidate === \"string\" && candidate.toLowerCase() === name.toLowerCase()) {\n      return true;\n    }\n  }\n  return false;\n}\n\nfunction collectHttpUrls(value) {\n  const urls = new Set();\n  collect(value, urls);\n  return [...urls];\n}\n\nfunction collect(value, urls) {\n  if (typeof value === \"string\") {\n    if (/^https?:\\/\\//i.test(value)) urls.add(value);\n    return;\n  }\n  if (Array.isArray(value)) {\n    for (const item of value) collect(item, urls);\n    return;\n  }\n  if (!isRecord(value)) return;\n  for (const child of Object.values(value)) collect(child, urls);\n}\n\nfunction isRecord(value) {\n  return typeof value === \"object\" && value !== null && !Array.isArray(value);\n}\n\nasync function probe(url) {\n  for (let attempt = 1; attempt <= 30; attempt++) {\n    try {\n      const response = await fetch(url);\n      const body = await response.text();\n      if (response.ok) return { ok: true, status: response.status, body };\n      if (attempt === 30) return { ok: false, status: response.status, body: body.slice(0, 200) };\n    } catch (error) {\n      if (attempt === 30) {\n        return { ok: false, status: 0, body: error instanceof Error ? error.message : String(error) };\n      }\n    }\n    await new Promise((resolve) => setTimeout(resolve, 1_000));\n  }\n  return { ok: false, status: 0, body: \"probe exhausted without a request\" };\n}",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts",
+              "users"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "service health probe passed: http://localhost:35857/health -> 200\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 29475,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 29475
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "title": "Stop generated Aspire AppHost",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "cleanup.aspire-stop attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "stop",
+              "--apphost",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts",
+              "--non-interactive",
+              "--nologo"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\u001b[2mScanning for running AppHosts...\u001b[0m\n\u001b[38;5;11m📦\u001b[0m Found running AppHost: .llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts\n\u001b[38;5;9m🛑\u001b[0m Sending stop signal to .llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts...\n\u001b[2mStopping .llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts...\u001b[0m\n\n\u001b[38;5;2m✅\u001b[0m .llm/tmp/s6-quickstart/s6-quickstart/aspire/apphost.mts stopped successfully.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 511,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 511
+    },
+    {
+      "id": "quickstart.pgdata-integrity-after-teardown",
+      "title": "Validate resident Postgres PGDATA after Aspire teardown",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "quickstart.pgdata-integrity-after-teardown attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-run=docker",
+              "--allow-read",
+              "--allow-write",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk.ts",
+              "verify",
+              "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s6-v2/.llm/tmp/s6-quickstart/s6-quickstart",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "pg_control version number:            1800\nCatalog version number:               202506291\nDatabase system identifier:           7679982207780229163\nDatabase cluster state:               in production\npg_control last modified:             Mon 31 Aug 2026 12:13:40 AM UTC\nLatest checkpoint location:           0/2420440\nLatest checkpoint's REDO location:    0/24203E8\nLatest checkpoint's REDO WAL file:    000000010000000000000002\nLatest checkpoint's TimeLineID:       1\nLatest checkpoint's PrevTimeLineID:   1\nLatest checkpoint's full_page_writes: on\nLatest checkpoint's NextXID:          0:758\nLatest checkpoint's NextOID:          24576\nLatest checkpoint's NextMultiXactId:  1\nLatest checkpoint's NextMultiOffset:  0\nLatest checkpoint's oldestXID:        745\nLatest checkpoint's oldestXID's DB:   1\nLatest checkpoint's oldestActiveXID:  757\nLatest checkpoint's oldestMultiXid:   1\nLatest checkpoint's oldestMulti's DB: 1\nLatest checkpoint's oldestCommitTsXid:0\nLatest checkpoint's newestCommitTsXid:0\nTime of latest checkpoint:            Mon 31 Aug 2026 12:13:40 AM UTC\nFake LSN counter for unlogged rels:   0/3E8\nMinimum recovery ending location:     0/0\nMin recovery ending loc's timeline:   0\nBackup start location:                0/0\nBackup end location:                  0/0\nEnd-of-backup record required:        no\nwal_level setting:                    replica\nwal_log_hints setting:                off\nmax_connections setting:              100\nmax_worker_processes setting:         8\nmax_wal_senders setting:              10\nmax_prepared_xacts setting:           0\nmax_locks_per_xact setting:           64\ntrack_commit_timestamp setting:       off\nMaximum data alignment:               8\nDatabase block size:                  8192\nBlocks per segment of large relation: 131072\nWAL block size:                       8192\nBytes per WAL segment:                16777216\nMaximum length of identifiers:        64\nMaximum columns in an index:          32\nMaximum size of a TOAST chunk:        1996\nSize of a large-object chunk:         2048\nDate/time type storage:               64-bit integers\nFloat8 argument passing:              by value\nData page checksum version:           1\nDefault char data signedness:         signed\nMock authentication nonce:            f08c1d0e96c826e6d163df4cce074fbd54aedffa880bbd91c7f991d75bc44ec8\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 909,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 909
+    },
+    {
+      "id": "cleanup.docker-created-containers",
+      "title": "Prune suite-created Docker containers",
+      "verdict": "passed",
+      "critical": false,
+      "durationMs": 0,
+      "evidence": [
+        {
+          "kind": "docker",
+          "label": "removed containers",
+          "data": [
+            "0db223587852",
+            "665067ec0eca",
+            "24ded2e65956",
+            "51a5bb5ea0ab"
+          ]
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 0
+        }
+      ],
+      "retried": false
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  }
+}

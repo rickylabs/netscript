@@ -1,0 +1,16 @@
+{
+  "owner": "s6-lease-postgres",
+  "pid": 211506,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.22",
+  "since": "2026-08-30T22:21:43.417Z",
+  "relays": [
+    {
+      "port": 17286,
+      "container": "relay-s6-lease-postgres-17286",
+      "source": "postgres-f5022c11",
+      "startedAt": "2026-08-30T22:22:08.210Z"
+    }
+  ],
+  "closed": "2026-08-30T22:28:02.754Z"
+}

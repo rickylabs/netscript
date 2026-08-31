@@ -1,0 +1,1340 @@
+{
+  "ok": false,
+  "suiteId": "scaffold.runtime",
+  "projectRoot": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+  "startedAt": "2026-08-30T23:49:00.766Z",
+  "durationMs": 98360,
+  "steps": [
+    {
+      "id": "preflight.deno",
+      "title": "Deno CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "preflight.deno attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "--version"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 6,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 7
+    },
+    {
+      "id": "preflight.aspire",
+      "title": "Aspire CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "preflight.aspire attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "--version"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 48,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 48
+    },
+    {
+      "id": "scaffold.init",
+      "title": "Scaffold generated project",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.init attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "init",
+              "leaf-1747-full",
+              "--path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full",
+              "--db",
+              "postgres",
+              "--service",
+              "--service-name",
+              "users",
+              "--ci",
+              "--yes",
+              "--no-git",
+              "--force"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "╔═════════════════════════════════════════════════════════════╗\n║              NetScript — Scaffold New Project               ║\n╚═════════════════════════════════════════════════════════════╝\n\n📁 Creating project \"leaf-1747-full\"...\n   \u001b[32m✓\u001b[39m Project root (deno.json, netscript.config.ts, .gitignore, README.md)\n   \u001b[32m✓\u001b[39m Aspire orchestration (TypeScript AppHost, .helpers/, package.json)\n   \u001b[32m✓\u001b[39m Database workspace (postgres)\n   \u001b[32m✓\u001b[39m Frontend app \"leaf-1747-full-web\" (Fresh framework)\n   \u001b[32m✓\u001b[39m Contracts (v1 with users stub)\n   \u001b[32m✓\u001b[39m Example service \"users\" (oRPC handler, Aspire assigns its port)\n   \u001b[32m✓\u001b[39m Plugins (empty registry)\n   \u001b[32m✓\u001b[39m Output formatted (deno fmt)\n\n\u001b[32m✅\u001b[39m \u001b[1mProject scaffolded successfully in 0.2s\u001b[22m\n\n  Created: 209 files, 46 directories\n\nNext steps:\n  1. cd leaf-1747-full\n  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace\n  3. aspire restore  # download TypeScript AppHost SDK modules (run once)\n  4. cd ..\n  5. deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed\n  6. deno run -A packages/cli/bin/netscript-dev.ts db init --name init\n  7. deno run -A packages/cli/bin/netscript-dev.ts db generate\n  8. deno run -A packages/cli/bin/netscript-dev.ts db seed\n  9. # oRPC service \"users\" at the URL shown for it in the Aspire dashboard, path /api/rpc\n  10. # Postgres provisioned by Aspire (see \"Databases\" in appsettings.json)\n\nMaintainer scaffold root: /home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full\nMonorepo root: /home/agent/projects/netscript/worktrees/007-1747-conv\nCopied 28 local packages.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 901,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 901
+    },
+    {
+      "id": "scaffold.plugin.worker",
+      "title": "Install official worker plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.worker attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "worker",
+              "--name",
+              "workers",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+              "--samples",
+              "--force",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/workers"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed worker plugin \"workers\" on port 65424.\nCreated 5 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 942,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 942
+    },
+    {
+      "id": "scaffold.plugin.saga",
+      "title": "Install official saga plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.saga attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "saga",
+              "--name",
+              "sagas",
+              "--project-root",
+              ".",
+              "--samples",
+              "--force",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/sagas"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed saga plugin \"sagas\" on port 51218.\nCreated 5 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 757,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 757
+    },
+    {
+      "id": "scaffold.plugin.trigger",
+      "title": "Install official trigger plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.trigger attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "trigger",
+              "--name",
+              "triggers",
+              "--project-root",
+              ".",
+              "--samples",
+              "--force",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/triggers"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed trigger plugin \"triggers\" on port 57790.\nCreated 6 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 865,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 865
+    },
+    {
+      "id": "scaffold.plugin.stream",
+      "title": "Install official stream plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.stream attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "stream",
+              "--name",
+              "streams",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+              "--samples",
+              "--force",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/streams"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed stream plugin \"streams\" on port 59835.\nCreated 3 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 701,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 701
+    },
+    {
+      "id": "scaffold.plugin.auth",
+      "title": "Install official auth plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.auth attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "auth",
+              "--name",
+              "auth",
+              "--project-root",
+              ".",
+              "--samples",
+              "--force",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/auth"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed auth plugin \"auth\" on port 60536.\nCreated 2 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 695,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 695
+    },
+    {
+      "id": "scaffold.plugin.ai",
+      "title": "Install official ai plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "ai",
+              "--name",
+              "ai",
+              "--project-root",
+              ".",
+              "--samples",
+              "--force",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/ai"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed ai plugin \"ai\" on port 52256.\nCreated 10 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 781,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 781
+    },
+    {
+      "id": "scaffold.plugin.ai.mcp",
+      "title": "Install official AI plugin with MCP skill tool",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai.mcp attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "ai",
+              "--name",
+              "ai",
+              "--project-root",
+              ".",
+              "--samples",
+              "--force",
+              "--mcp",
+              "--local-path",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/ai"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed ai plugin \"ai\" on port 52256.\nCreated 1 plugin files.\nRegenerated 13 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 662,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 662
+    },
+    {
+      "id": "scaffold.plugin.ai.lifecycle",
+      "title": "Add and self-wire an AI tool through the plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai.lifecycle attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/ai/cli.ts",
+              "add",
+              "tool",
+              "e2e-tool",
+              "--workspaceRoot=/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "{\"code\":0,\"message\":\"add tool: 1 artifact(s).\",\"data\":{\"status\":\"applied\",\"createdFiles\":[\"ai/tools/e2e-tool.ts\"],\"modifiedFiles\":[],\"databaseMigrationsAdded\":false,\"uiRegistryItems\":[\"markdown\"]}}\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 86,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 86
+    },
+    {
+      "id": "scaffold.plugin-list",
+      "title": "List configured plugins",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin-list attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "list",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Name\tDisplayName\tType\tEnabled\tWorkdir\tService\tPort\tAxis\tContributions\nai\tAI Chat\tutility\ttrue\tai\t-\t-\t-\t0\nauth\tAuth\tutility\ttrue\tauth\tservices/src/main.ts\t-\t-\t0\nsagas\tSaga Orchestrator\tbackground-processor\ttrue\tsagas\tservices/src/main.ts\t-\tsagas\t0\nstreams\tDurable Streams\tutility\ttrue\tstreams\tservices/src/main.ts\t-\t-\t0\ntriggers\tTrigger Processor\tbackground-processor\ttrue\ttriggers\tservices/src/main.ts\t-\ttriggers\t0\nworkers\tBackground Worker\tbackground-processor\ttrue\tworkers\tservices/src/main.ts\t-\tjobs\t0\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1288,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1288
+    },
+    {
+      "id": "scaffold.plugin.ai.appsettings",
+      "title": "Reject synthesized service configuration for the AI plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai.appsettings attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const config = JSON.parse(await Deno.readTextFile(\"appsettings.json\"));\nconst plugins = config.NetScript?.Plugins ?? {};\nif (Object.hasOwn(plugins, \"ai\")) {\n  throw new Error(\"service-less AI plugin unexpectedly created NetScript.Plugins.ai\");\n}\nconst serialized = JSON.stringify(config);\nif (/plugin-ai[^\"\\s]*\\/services/.test(serialized)) {\n  throw new Error(\"service-less AI plugin unexpectedly synthesized a /services specifier\");\n}\nconsole.info(\"AI service-less appsettings contract verified\");"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "AI service-less appsettings contract verified\n",
+            "stderrTail": "\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n\u001b[0m\u001b[32mInitialize\u001b[0m qs@6.15.3\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 224,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 224
+    },
+    {
+      "id": "scaffold.ui-add-ai",
+      "title": "Install the Fresh UI AI collection",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.ui-add-ai attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "ui:add",
+              "ai",
+              "--app",
+              "leaf-1747-full-web",
+              "--registry-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/fresh-ui",
+              "--force"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed 25 Fresh UI registry items.\nCopied 47 files.\nWrote /home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/apps/leaf-1747-full-web/assets/styles.css.\nMerged 12 deno.json imports.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 288,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 288
+    },
+    {
+      "id": "scaffold.ui-local-source",
+      "title": "Map the unpublished AI dependency to the local workspace member",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.ui-local-source attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const requiredPaths = [\n  \"islands/ui/McpUiWidget.tsx\",\n  \"assets/ui/mcp-ui-widget.css\",\n  \"lib/ai/render-ui.tsx\",\n  \"assets/styles.css\",\n  \"assets/tokens.css\",\n  \"assets/theme-bridge.css\",\n  \"assets/tokens.json\",\n];\nfor (const requiredPath of requiredPaths) {\n  try { await Deno.stat(requiredPath); } catch (error) {\n    if (error instanceof Deno.errors.NotFound) throw new Error(`ui:add ai did not copy ${requiredPath}`);\n    throw error;\n  }\n}\nconst path = \"deno.json\";\nconst config = JSON.parse(await Deno.readTextFile(path));\nconst aiImport = config.imports?.[\"@netscript/ai\"] ?? \"\";\nif (!/^jsr:@netscript\\/ai@\\^?\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$/.test(aiImport)) {\n  throw new Error(`ui:add ai did not merge the expected @netscript/ai dependency; observed: ${JSON.stringify(aiImport)}`);\n}\nconfig.compilerOptions = {\n  ...config.compilerOptions,\n  jsx: \"precompile\",\n  jsxImportSource: \"preact\",\n};\nawait Deno.writeTextFile(path, `${JSON.stringify(config, null, 2)}\n`);\nconsole.info(`verified ${requiredPaths.length} AI/theme artifacts and configured local-source TSX`);\nawait (async function prepareLocalSourceFixture(options) {\n  const configPath = `${options.projectRoot}/deno.json`;\n  const config = JSON.parse(await Deno.readTextFile(configPath));\n  if (!isRecord(config) || !isRecord(config.imports)) {\n    throw new Error('generated deno.json did not contain imports');\n  }\n  const imports = {\n    ...config.imports,\n    ...options.imports,\n    ...resolveLocalSourceImports(options.sourceBase, options.packages)\n  };\n  for (const target of options.targets){\n    const path = `${options.projectRoot}/${target.path}`;\n    const parent = path.slice(0, path.lastIndexOf('/'));\n    if (parent) await Deno.mkdir(parent, {\n      recursive: true\n    });\n    const value = target.includeConfig ? {\n      ...config,\n      imports\n    } : {\n      imports\n    };\n    await Deno.writeTextFile(path, `${JSON.stringify(value, null, 2)}\\n`);\n  }\n})({\"projectRoot\":\".\",\"sourceBase\":\"../../packages\",\"packages\":[{\"specifier\":\"@netscript/ai\",\"entrypoint\":\"ai/mod.ts\"}],\"targets\":[{\"path\":\"deno.json\",\"includeConfig\":true}]});\nfunction isRecord(value) { return value !== null && typeof value === \"object\" && !Array.isArray(value); }\nfunction resolveLocalSourceImports(sourceBase, packages) { const base = sourceBase.replace(/\\/$/, \"\"); return Object.fromEntries(packages.map(({ specifier, entrypoint }) => [specifier, `${base}/${entrypoint}`])); }"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/apps/leaf-1747-full-web",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "verified 7 AI/theme artifacts and configured local-source TSX\n",
+            "stderrTail": "\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 221,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 221
+    },
+    {
+      "id": "generated.runtime-schemas",
+      "title": "Generate runtime schemas from all configured plugin modules",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.runtime-schemas attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "generate",
+              "runtime-schemas",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Schema generation complete: 0 written.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 837,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 837
+    },
+    {
+      "id": "database.codegen",
+      "title": "Generate database clients (standalone, no Aspire)",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "database.codegen attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "\nconst [databaseUrl, providerEnvKey] = Deno.args;\nif (!databaseUrl) throw new Error('database URL argument is required');\nDeno.env.set('DATABASE_URL', databaseUrl);\nif (providerEnvKey) Deno.env.set(providerEnvKey, databaseUrl);\nconst child = new Deno.Command('deno', {\n  args: ['task', 'db:generate'],\n  stdout: 'inherit',\n  stderr: 'inherit',\n}).spawn();\nconst status = await child.status;\nDeno.exit(status.code);\n",
+              "postgres://postgres:postgres@localhost:5432/postgres",
+              "POSTGRES_URI"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/database/postgres",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\n✔ Generated Prisma Client (7.10.0) to ./schema/.generated in 15ms\n\n🔷 Generating Zod schemas from Prisma models...\n\n📦 Ensuring prisma-zod-generator is available...\n✅ Zod schemas generated successfully with filtering applied\n\n\n\u001b[36m🚀 prisma-zod-generator has powered 1 runs on this project!\u001b[0m\n\n✨ Level up with PZG Pro (14-day trial, no card needed):\n   - Server actions & policy automation\n   - SDK publisher, API docs, drift guard\n   - Performance tooling for large teams and more!\n   \u001b[32mhttps://omar-dulaimi.github.io/prisma-zod-generator/pricing\u001b[0m\n\n💬 Need help or want to suggest an idea?\n   \u001b[32mhttps://github.com/omar-dulaimi/prisma-zod-generator/issues\u001b[0m\n\n🙌 Sponsorships literally keep the lights (and tests) running:\n   My current Dell Latitude laptop needs 40+ minutes to finish the full test suite.\n   Helping me upgrade means faster fixes and better tooling for everyone.\n   \u001b[32mhttps://github.com/sponsors/omar-dulaimi\u001b[0m\n\n\n✔ Generated Prisma Client (7.10.0) to ./schema/.generated in 21ms\n\n✔ Generated Prisma Zod Generator to ./schema/.generated/zod in 45ms\n\n\n🔧 Fixing generated Zod schemas for Deno compatibility...\n   Directory: /home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/database/postgres/schema/.generated/zod\n\n📦 Phase 1: Adding .ts extensions to relative imports...\n   ✅ Fixed 75 imports across 30 files\n\n🔄 Phase 1.6: Fixing circular references in schemas...\n   ✅ Fixed circular references in 8 files\n\n🔄 Phase 1.7: Fixing getter patterns with .optional()...\n   ✅ Fixed 22 getter patterns in 6 files\n\n🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...\n   ✅ Fixed isValidDecimalInput in 0 files\n\n💰 Phase 2: Fixing Decimal imports for browser compatibility...\n   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367\n   ✅ Fixed 0 Decimal references across 0 files\n\n🎉 All fixes applied successfully!\n\n🔧 Fixing generated Zod schemas for Deno compatibility...\n   Directory: /home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/database/postgres/schema/.generated/zod\n\n📦 Phase 1: Adding .ts extensions to relative imports...\n   ✅ Fixed 0 imports across 0 files\n\n🔄 Phase 1.6: Fixing circular references in schemas...\n   ✅ Fixed circular references in 8 files\n\n🔄 Phase 1.7: Fixing getter patterns with .optional()...\n   ✅ Fixed 0 getter patterns in 0 files\n\n🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...\n   ✅ Fixed isValidDecimalInput in 0 files\n\n💰 Phase 2: Fixing Decimal imports for browser compatibility...\n   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367\n   ✅ Fixed 0 Decimal references across 0 files\n\n🎉 All fixes applied successfully!\n\nℹ️  No files needed fixing\n🔧 Patching Prisma client in: /home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/database/postgres/schema/.generated\n   📋 Backed up original → client.server.ts\n   ✅ client.ts → isomorphic re-export of browser.ts\n   💎 Added \"export type Decimal = runtime.Decimal\" to prismaNamespaceBrowser.ts\n",
+            "stderrTail": "\u001b[0m @prisma/prisma-schema-wasm@7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/schema-engine-wasm@7.10.0-4.0edf323efd1d98336f3f0a68684b56f689b900d3\n\u001b[0m\u001b[32mInitialize\u001b[0m @prisma/schema-files-loader@7.10.0\n\u001b[0m\u001b[32mInitialize\u001b[0m arg@5.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m argparse@2.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m data-uri-to-buffer@4.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m fetch-blob@3.2.0\n\u001b[0m\u001b[32mInitialize\u001b[0m formdata-polyfill@4.0.10\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/body-parser@1.19.6\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/express-serve-static-core@5.1.3\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/serve-static@2.2.0\n\u001b[0m\u001b[32mInitialize\u001b[0m kleur@3.0.3\n\u001b[0m\u001b[32mInitialize\u001b[0m sisteransi@1.0.5\n\u001b[0m\u001b[32mInitialize\u001b[0m pluralize@8.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m fs-extra@11.3.0\n\u001b[0m\u001b[32mInitialize\u001b[0m node-domexception@1.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m web-streams-polyfill@3.3.3\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/connect@3.4.38\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/range-parser@1.2.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/qs@6.15.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/send@1.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @types/http-errors@2.0.5\n\u001b[0m\u001b[32mInitialize\u001b[0m universalify@2.0.1\n\u001b[0m\u001b[32mInitialize\u001b[0m jsonfile@6.2.1\n\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n\u001b[0m\u001b[38;5;245mInstalled\u001b[0m 37 \u001b[0m\u001b[38;5;245mpackages\u001b[0m \u001b[0m\u001b[38;5;245min\u001b[0m 261ms\n\u001b[0m\u001b[38;5;245mReused\u001b[0m 37 \u001b[0m\u001b[38;5;245mpackages from cache\u001b[0m\n\u001b[0m\u001b[1m\u001b[33m+++++++++++++++++++++++++++++++++++++\u001b[0m\n\u001b[0m\u001b[38;5;245mDownloaded\u001b[0m 0 \u001b[0m\u001b[38;5;245mpackages from JSR\u001b[0m\n\u001b[0m\u001b[38;5;245mDownloaded\u001b[0m 0 \u001b[0m\u001b[38;5;245mpackages from npm\u001b[0m\n\n\u001b[0m\u001b[36mDependencies:\u001b[0m\n\u001b[0m\u001b[32m+\u001b[0m \u001b[0m\u001b[38;5;245mnpm:\u001b[0mprisma-zod-generator \u001b[0m\u001b[38;5;245m2.1.4\u001b[0m\n\n\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Ignored build scripts for packages:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:prisma@7.10.0\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:lmdb@3.5.6\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:@prisma/engines@7.10.0\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:msgpackr-extract@3.0.4\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:prisma-zod-generator@2.1.4\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Run \"\u001b[0m\u001b[1mdeno approve-scripts\u001b[0m\" to run build scripts.\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  The following packages are deprecated:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[38;5;245mnpm:node-domexception@1.0.0 (Use your platform's native DOMException instead)\u001b[0m\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\nLoaded Prisma config from prisma.config.ts.\n\nPrisma schema loaded from schema.\n┌─────────────────────────────────────────────────────────┐\n│  Update available 7.10.0 -> 8.0.0-rc.12                 │\n│                                                         │\n│  This is a major update - please follow the guide at    │\n│  https://pris.ly/d/major-version-upgrade                │\n│                                                         │\n│  Run the following to update                            │\n│    npm i --save-dev prisma@latest                       │\n│    npm i @prisma/client@latest                          │\n└─────────────────────────────────────────────────────────┘\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3480,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3480
+    },
+    {
+      "id": "behavior.project-boundary-dev",
+      "title": "Start the generated Fresh dev server below a hostile parent tsconfig",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "behavior.project-boundary-dev attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-all",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev.ts",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+              "leaf-1747-full-web"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "NetScript dependency closure verified: exact release 0.0.6 (local).\nDeno npm materialization verified: 621 packages, 40968 files.\n\n  VITE v7.2.2  ready in 1901 ms\n\n  ➜  Local:   http://127.0.0.1:5199/\n[leaf-1747-full-web] starting — development\n[leaf-1747-full-web] listening on http://localhost:59787\n[leaf-1747-full-web] health at http://localhost:59787/health\nFresh dev server answered 200 with hostile parent tsconfig\n",
+            "stderrTail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdev\u001b[0m deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native '--host' '127.0.0.1' '--port' '5199' '--strictPort'\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdeps:closure\u001b[0m deno run --allow-read .netscript/verify-dependency-closure.ts\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdeps:verify\u001b[0m deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts\n\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n\u001b[0m\u001b[32mInitialize\u001b[0m @prefresh/vite@2.4.12\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/core@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @prefresh/babel-plugin@0.5.3\n\u001b[0m\u001b[32mInitialize\u001b[0m @prefresh/core@1.5.11\n\u001b[0m\u001b[32mInitialize\u001b[0m @prefresh/utils@1.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @rollup/pluginutils@4.2.1\n\u001b[0m\u001b[32mInitialize\u001b[0m convert-source-map@2.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/code-frame@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-compilation-targets@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-module-transforms@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m json5@2.2.3\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/generator@7.29.8\n\u001b[0m\u001b[32mInitialize\u001b[0m semver@6.3.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/parser@7.29.8\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/types@7.29.8\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/traverse@7.29.8\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helpers@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/template@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m gensync@1.0.0-beta.2\n\u001b[0m\u001b[32mInitialize\u001b[0m estree-walker@2.0.2\n\u001b[0m\u001b[32mInitialize\u001b[0m picomatch@2.3.2\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-validator-identifier@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m js-tokens@4.0.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/compat-data@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m lru-cache@5.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-validator-option@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m browserslist@4.28.8\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-module-imports@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m jsesc@3.1.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-string-parser@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-globals@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m yallist@3.1.1\n\u001b[0m\u001b[32mInitialize\u001b[0m electron-to-chromium@1.5.416\n\u001b[0m\u001b[32mInitialize\u001b[0m baseline-browser-mapping@2.11.20\n\u001b[0m\u001b[32mInitialize\u001b[0m node-releases@2.0.54\n\u001b[0m\u001b[32mInitialize\u001b[0m update-browserslist-db@1.3.2\n\u001b[0m\u001b[32mInitialize\u001b[0m caniuse-lite@1.0.30001810\n\u001b[0m\u001b[32mInitialize\u001b[0m escalade@3.2.0\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/preset-react@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/plugin-transform-react-pure-annotations@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/plugin-transform-react-display-name@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/plugin-transform-react-jsx@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-plugin-utils@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/plugin-transform-react-jsx-development@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/helper-annotate-as-pure@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @babel/plugin-syntax-jsx@7.29.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @remix-run/node-fetch-server@0.12.0\n\u001b[0m\u001b[32mInitialize\u001b[0m esbuild-wasm@0.25.12\n\u001b[0m\u001b[32mInitialize\u001b[0m esbuild@0.25.7\n\u001b[0m\u001b[32mInitialize\u001b[0m @esbuild/linux-x64@0.25.7\nWARN RS - \u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nWARN RS - \u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 13470,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 13470
+    },
+    {
+      "id": "behavior.plugins-unhealthy",
+      "title": "Reject missing workers and sagas registries",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "behavior.plugins-unhealthy attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "doctor",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "ugin-triggers/triggers.registry.ts. Missing generated entry for manifest-discovered source: triggers/daily-maintenance.ts. Missing generated entry for manifest-discovered source: triggers/generic-inbound-webhook.ts. Missing generated entry for manifest-discovered source: triggers/incoming-file-watch.ts. Run: netscript generate plugins\nworkspace\terror\tManifest-declared runtime registry matches source\t.netscript/generated/plugin-workers/job-registry.ts: Generated registry does not exist: .netscript/generated/plugin-workers/job-registry.ts. Missing generated entry for manifest-discovered source: workers/jobs/health-check.ts. Run: netscript generate plugins\nworkers\thealthy\tConfigured module resolves\t./workers/plugin.ts\nworkers\thealthy\tConfigured module exports manifest\t./workers/plugin.ts\nworkers\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-workers@0.0.6/services\nworkers\thealthy\tManifest resolved\tBackground Worker\nworkers\thealthy\tWorkspace directory\tworkers\nworkers\thealthy\tPermission metadata\t--unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run\nworkers\terror\tgenerated job registry exists\tMissing .netscript/generated/plugin-workers/job-registry.ts. Run: deno run -A jsr:@netscript/plugin-workers@0.0.6/cli compile-registry\nworkers\terror\tgenerated job registry is non-empty\tNo generated jobs are registered. Run: deno run -A jsr:@netscript/plugin-workers@0.0.6/cli compile-registry\nworkers\terror\tevery declared job is registered\tRegistry is incomplete for worker processors. Run: deno run -A jsr:@netscript/plugin-workers@0.0.6/cli compile-registry\nsagas\thealthy\tConfigured module resolves\t./sagas/plugin.ts\nsagas\thealthy\tConfigured module exports manifest\t./sagas/plugin.ts\nsagas\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-sagas@0.0.6/services\nsagas\thealthy\tManifest resolved\tSaga Orchestrator\nsagas\thealthy\tWorkspace directory\tsagas\nsagas\thealthy\tPermission metadata\t--unstable-kv --allow-all\nsagas\terror\tgenerated saga registry exists\tMissing .netscript/generated/plugin-sagas/sagas.registry.ts. Run: deno run -A jsr:@netscript/plugin-sagas@0.0.6/cli generate-registry\nsagas\terror\tgenerated saga registry is non-empty\tNo generated sagas are registered. Run: deno run -A jsr:@netscript/plugin-sagas@0.0.6/cli generate-registry\nsagas\terror\tevery declared saga is registered\tRegistry is incomplete for saga runners. Run: deno run -A jsr:@netscript/plugin-sagas@0.0.6/cli generate-registry\ntriggers\thealthy\tConfigured module resolves\t./triggers/plugin.ts\ntriggers\thealthy\tConfigured module exports manifest\t./triggers/plugin.ts\ntriggers\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-triggers@0.0.6/services\ntriggers\thealthy\tManifest resolved\tTrigger Processor\ntriggers\thealthy\tWorkspace directory\ttriggers\ntriggers\thealthy\tPermission metadata\t--unstable-kv --allow-all\nstreams\thealthy\tConfigured module resolves\t./streams/plugin.ts\nstreams\thealthy\tConfigured module exports manifest\t./streams/plugin.ts\nstreams\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-streams@0.0.6/services\nstreams\thealthy\tManifest resolved\tDurable Streams\nstreams\thealthy\tWorkspace directory\tstreams\nstreams\thealthy\tPermission metadata\t--allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi\nauth\thealthy\tConfigured module resolves\t./auth/plugin.ts\nauth\thealthy\tConfigured module exports manifest\t./auth/plugin.ts\nauth\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-auth@0.0.6/services\nauth\thealthy\tManifest resolved\tAuth\nauth\thealthy\tWorkspace directory\tauth\nauth\thealthy\tPermission metadata\t--unstable-kv --allow-net --allow-env --allow-read --allow-sys --allow-ffi\nai\thealthy\tConfigured module resolves\t./ai/plugin.ts\nai\thealthy\tConfigured module exports manifest\t./ai/plugin.ts\nai\thealthy\tManifest resolved\tAI Chat\nai\thealthy\tWorkspace directory\tai\nai\thealthy\tPermission metadata\t--allow-net --allow-env --allow-read\nPlugin doctor failed: workspace, workers, sagas. Follow the remediation commands above.\n",
+            "stderrTail": "Error: Plugin doctor failed: workspace, workers, sagas. Follow the remediation commands above.\n  plugins: workspace, workers, sagas\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1677,
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "durationMs": 1677
+    },
+    {
+      "id": "generated.plugins-check",
+      "title": "Generate plugin registries from discovered manifests",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.plugins-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts",
+              "generate",
+              "plugins",
+              "--project-root",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Plugin registry generation complete: 3 written.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 972,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 972
+    },
+    {
+      "id": "generated.workers-registry",
+      "title": "Compile workers registry through plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.workers-registry attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/workers/src/cli/composition/main.ts",
+              "compile-registry"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Worker job registry compiled.\n{\n  \"registryPath\": \".netscript/generated/plugin-workers/job-registry.ts\",\n  \"jobs\": [\n    \"workers/jobs/health-check.ts\"\n  ]\n}\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 296,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 296
+    },
+    {
+      "id": "generated.sagas-registry",
+      "title": "Generate sagas registry through plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.sagas-registry attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/plugins/sagas/src/cli/mod.ts",
+              "generate-registry"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Saga registry generated.\n{\n  \"registryPath\": \".netscript/generated/plugin-sagas/sagas.registry.ts\",\n  \"sagas\": [\n    \"sagas/user-registration-saga.ts\"\n  ]\n}\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 84,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 84
+    },
+    {
+      "id": "behavior.plugin-doctor-missing-module",
+      "title": "Reject a configured plugin whose module has been removed",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "behavior.plugin-doctor-missing-module attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const command = [\"deno\",\"run\",\"-A\",\"/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts\",\"plugin\",\"doctor\",\"--project-root\",\"/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full\"];\nconst projectRoot = \"/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full\";\nconst modulePath = \"/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/ai/plugin.ts\";\nconst backupPath = `${modulePath}.doctor-negative`;\nconst decoder = new TextDecoder();\nconst runDoctor = () => new Deno.Command(command[0], {\n  args: command.slice(1),\n  cwd: projectRoot,\n  stdout: \"piped\",\n  stderr: \"piped\",\n}).output();\nconst healthy = await runDoctor();\nif (!healthy.success) {\n  throw new Error(`plugin doctor was not healthy before the negative probe:\n${decoder.decode(healthy.stdout)}\n${decoder.decode(healthy.stderr)}`);\n}\nawait Deno.rename(modulePath, backupPath);\ntry {\n  const missing = await runDoctor();\n  if (missing.success) {\n    throw new Error(\"plugin doctor exited zero after a configured module was removed\");\n  }\n  console.info(\"plugin doctor rejected the removed configured module\");\n} finally {\n  await Deno.rename(backupPath, modulePath);\n}"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "plugin doctor rejected the removed configured module\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3220,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3220
+    },
+    {
+      "id": "runtime.aspire-restore",
+      "title": "Restore Aspire TypeScript SDK",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "runtime.aspire-restore attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "restore",
+              "--apphost",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/aspire/apphost.mts",
+              "--non-interactive",
+              "--nologo"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\u001b[2m⚙️ Restoring SDK code...\u001b[0m\n\u001b[38;5;2m✅\u001b[0m SDK code restored successfully for apphost.mts.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 4377,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 4377
+    },
+    {
+      "id": "runtime.service-env-fixture",
+      "title": "Declare service environment and regenerate on the consumer path",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "runtime.service-env-fixture attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-read",
+              "--allow-write",
+              "--allow-run=deno",
+              "--allow-env",
+              "packages/cli/e2e/src/application/gates/scaffold/service-env/configure-service-env.ts",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+              "local",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "declared environment wired for users (discovered, not named): NETSCRIPT_E2E_SERVICE_ENV=declared-wins, NETSCRIPT_E2E_SERVICE_MODE=declared-wins, OTEL_SERVICE_NAME=generated-wins, DATABASE_URL=generated-wins, PORT=refused, DB_PROVIDER=generated-wins, POSTGRES_URI=generated-wins, services__users__http__0=generated-wins\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1501,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1501
+    },
+    {
+      "id": "generated.quality-negative",
+      "title": "Prove every generated quality surface with deliberate failures",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.quality-negative attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-read",
+              "--allow-write",
+              "--allow-run=deno",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "{\"ok\":true,\"probes\":[\"apps/__quality_probe__.ts\",\"apps/__quality_probe__.tsx\",\"services/__quality_probe__.ts\",\"contracts/__quality_probe__.ts\",\"plugins/__quality_probe__.ts\",\"workers/__quality_probe__.ts\",\"sagas/__quality_probe__.ts\",\"triggers/__quality_probe__.ts\",\"streams/__quality_probe__.ts\",\"aspire/.helpers/__quality_probe__.mts\"],\"lintProbe\":\"apps/__quality_any_probe__.ts\",\"cleanupCheckExitCode\":0,\"cleanupLintExitCode\":0}\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 51989,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 51989
+    },
+    {
+      "id": "generated.deno-check",
+      "title": "Run the generated workspace type-check task",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.deno-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "task",
+              "check"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "ers/(_components)/lab-panel.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/managed-form.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/notes-card.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/page-layout.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/summary-card.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/summary-panel.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_islands)/ServiceShowcaseLab.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/optimistic-list-mutation.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/route-contract.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/service-query.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_shared)/authorization.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_shared)/service-showcase.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/index.layout.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/health.tsx\",\n        \"apps/leaf-1747-full-web/routes/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/partials/examples/users/summary.tsx\",\n        \"apps/leaf-1747-full-web/utils.ts\",\n        \"apps/leaf-1747-full-web/vite.config.ts\",\n        \"aspire/.helpers/run-tool.mts\",\n        \"contracts/mod.ts\",\n        \"contracts/versions/v1/mod.ts\",\n        \"contracts/versions/v1/users.contract.ts\",\n        \"database/mod.ts\",\n        \"database/postgres/mod.ts\",\n        \"database/postgres/prisma.config.ts\",\n        \"database/postgres/scripts/clear-seeded-client.ts\",\n        \"database/postgres/scripts/fix-zod-imports.ts\",\n        \"database/postgres/scripts/generate-zod.ts\",\n        \"database/postgres/scripts/migrate.ts\",\n        \"database/postgres/scripts/patch-prisma-client.ts\",\n        \"database/postgres/scripts/seed.ts\",\n        \"netscript.config.ts\",\n        \"plugins/mod.ts\",\n        \"sagas/mod.ts\",\n        \"sagas/plugin.ts\",\n        \"sagas/runtime.ts\",\n        \"sagas/user-registration-saga.ts\",\n        \"sagas/user-registration.config.ts\",\n        \"services/_shared/plugin-service-context.ts\",\n        \"services/users/src/main.ts\",\n        \"services/users/src/router.ts\",\n        \"services/users/src/routers/health.ts\",\n        \"services/users/src/routers/v1.ts\",\n        \"streams/mod.ts\",\n        \"streams/notifications-stream.ts\",\n        \"streams/plugin.ts\",\n        \"tests/scaffold_test.ts\",\n        \"triggers/daily-maintenance.ts\",\n        \"triggers/generic-inbound-webhook.ts\",\n        \"triggers/incoming-file-watch.ts\",\n        \"triggers/mod.ts\",\n        \"triggers/plugin.ts\",\n        \"triggers/runtime.ts\",\n        \"workers/jobs/health-check.ts\",\n        \"workers/mod.ts\",\n        \"workers/plugin.ts\",\n        \"workers/runtime.ts\",\n        \"workers/tasks/validate-payload.ts\"\n      ],\n      \"exitCode\": 0,\n      \"stdout\": \"\",\n      \"stderr\": \"\"\n    },\n    {\n      \"files\": [\n        \"aspire/.helpers/_aspire-compat.mts\",\n        \"aspire/.helpers/config-schema.mts\",\n        \"aspire/.helpers/configure-dashboard.mts\",\n        \"aspire/.helpers/db-cli-mode.mts\",\n        \"aspire/.helpers/index.mts\",\n        \"aspire/.helpers/register-apps.mts\",\n        \"aspire/.helpers/register-background.mts\",\n        \"aspire/.helpers/register-infrastructure.mts\",\n        \"aspire/.helpers/register-plugins.mts\",\n        \"aspire/.helpers/register-services.mts\",\n        \"aspire/.helpers/register-tools.mts\",\n        \"aspire/apphost.mts\"\n      ],\n      \"exitCode\": 0,\n      \"stdout\": \"\",\n      \"stderr\": \"Warning: config file file:///home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/. Ignoring the parent workspace config.\\n\"\n    }\n  ]\n}\n",
+            "stderrTail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2622,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2622
+    },
+    {
+      "id": "generated.deno-lint",
+      "title": "Run the generated workspace lint task",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.deno-lint attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "task",
+              "lint"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\",\n        \"apps/leaf-1747-full-web/routes/examples/telemetry/(_components)/telemetry-view.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/telemetry/(_shared)/telemetry-trace.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/telemetry/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/hero.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/lab-panel.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/managed-form.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/notes-card.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/page-layout.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/summary-card.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/summary-panel.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_islands)/ServiceShowcaseLab.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/optimistic-list-mutation.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/route-contract.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/service-query.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_shared)/authorization.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_shared)/service-showcase.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/index.layout.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/health.tsx\",\n        \"apps/leaf-1747-full-web/routes/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/partials/examples/users/summary.tsx\",\n        \"apps/leaf-1747-full-web/utils.ts\",\n        \"apps/leaf-1747-full-web/vite.config.ts\",\n        \"aspire/.helpers/_aspire-compat.mts\",\n        \"aspire/.helpers/config-schema.mts\",\n        \"aspire/.helpers/configure-dashboard.mts\",\n        \"aspire/.helpers/db-cli-mode.mts\",\n        \"aspire/.helpers/index.mts\",\n        \"aspire/.helpers/register-apps.mts\",\n        \"aspire/.helpers/register-background.mts\",\n        \"aspire/.helpers/register-infrastructure.mts\",\n        \"aspire/.helpers/register-plugins.mts\",\n        \"aspire/.helpers/register-services.mts\",\n        \"aspire/.helpers/register-tools.mts\",\n        \"aspire/.helpers/run-tool.mts\",\n        \"aspire/apphost.mts\",\n        \"contracts/mod.ts\",\n        \"contracts/versions/v1/mod.ts\",\n        \"contracts/versions/v1/users.contract.ts\",\n        \"database/mod.ts\",\n        \"database/postgres/mod.ts\",\n        \"database/postgres/prisma.config.ts\",\n        \"database/postgres/scripts/clear-seeded-client.ts\",\n        \"database/postgres/scripts/fix-zod-imports.ts\",\n        \"database/postgres/scripts/generate-zod.ts\",\n        \"database/postgres/scripts/migrate.ts\",\n        \"database/postgres/scripts/patch-prisma-client.ts\",\n        \"database/postgres/scripts/seed.ts\",\n        \"netscript.config.ts\",\n        \"plugins/mod.ts\",\n        \"sagas/mod.ts\",\n        \"sagas/plugin.ts\",\n        \"sagas/runtime.ts\",\n        \"sagas/user-registration-saga.ts\",\n        \"sagas/user-registration.config.ts\",\n        \"services/_shared/plugin-service-context.ts\",\n        \"services/users/src/main.ts\",\n        \"services/users/src/router.ts\",\n        \"services/users/src/routers/health.ts\",\n        \"services/users/src/routers/v1.ts\",\n        \"streams/mod.ts\",\n        \"streams/notifications-stream.ts\",\n        \"streams/plugin.ts\",\n        \"tests/scaffold_test.ts\",\n        \"triggers/daily-maintenance.ts\",\n        \"triggers/generic-inbound-webhook.ts\",\n        \"triggers/incoming-file-watch.ts\",\n        \"triggers/mod.ts\",\n        \"triggers/plugin.ts\",\n        \"triggers/runtime.ts\",\n        \"workers/jobs/health-check.ts\",\n        \"workers/mod.ts\",\n        \"workers/plugin.ts\",\n        \"workers/runtime.ts\",\n        \"workers/tasks/validate-payload.ts\"\n      ],\n      \"exitCode\": 0,\n      \"stdout\": \"\",\n      \"stderr\": \"Checked 165 files\\n\"\n    }\n  ]\n}\n",
+            "stderrTail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mlint\u001b[0m deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 162,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 162
+    },
+    {
+      "id": "generated.deno-fmt-check",
+      "title": "Run the generated workspace format-check task",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.deno-fmt-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "task",
+              "fmt:check"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\",\n        \"apps/leaf-1747-full-web/routes/examples/telemetry/(_components)/telemetry-view.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/telemetry/(_shared)/telemetry-trace.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/telemetry/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/hero.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/lab-panel.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/managed-form.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/notes-card.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/page-layout.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/summary-card.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_components)/summary-panel.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_islands)/ServiceShowcaseLab.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/optimistic-list-mutation.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/route-contract.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_lib)/service-query.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_shared)/authorization.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/(_shared)/service-showcase.ts\",\n        \"apps/leaf-1747-full-web/routes/examples/users/index.layout.tsx\",\n        \"apps/leaf-1747-full-web/routes/examples/users/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/health.tsx\",\n        \"apps/leaf-1747-full-web/routes/index.tsx\",\n        \"apps/leaf-1747-full-web/routes/partials/examples/users/summary.tsx\",\n        \"apps/leaf-1747-full-web/utils.ts\",\n        \"apps/leaf-1747-full-web/vite.config.ts\",\n        \"aspire/.helpers/_aspire-compat.mts\",\n        \"aspire/.helpers/config-schema.mts\",\n        \"aspire/.helpers/configure-dashboard.mts\",\n        \"aspire/.helpers/db-cli-mode.mts\",\n        \"aspire/.helpers/index.mts\",\n        \"aspire/.helpers/register-apps.mts\",\n        \"aspire/.helpers/register-background.mts\",\n        \"aspire/.helpers/register-infrastructure.mts\",\n        \"aspire/.helpers/register-plugins.mts\",\n        \"aspire/.helpers/register-services.mts\",\n        \"aspire/.helpers/register-tools.mts\",\n        \"aspire/.helpers/run-tool.mts\",\n        \"aspire/apphost.mts\",\n        \"contracts/mod.ts\",\n        \"contracts/versions/v1/mod.ts\",\n        \"contracts/versions/v1/users.contract.ts\",\n        \"database/mod.ts\",\n        \"database/postgres/mod.ts\",\n        \"database/postgres/prisma.config.ts\",\n        \"database/postgres/scripts/clear-seeded-client.ts\",\n        \"database/postgres/scripts/fix-zod-imports.ts\",\n        \"database/postgres/scripts/generate-zod.ts\",\n        \"database/postgres/scripts/migrate.ts\",\n        \"database/postgres/scripts/patch-prisma-client.ts\",\n        \"database/postgres/scripts/seed.ts\",\n        \"netscript.config.ts\",\n        \"plugins/mod.ts\",\n        \"sagas/mod.ts\",\n        \"sagas/plugin.ts\",\n        \"sagas/runtime.ts\",\n        \"sagas/user-registration-saga.ts\",\n        \"sagas/user-registration.config.ts\",\n        \"services/_shared/plugin-service-context.ts\",\n        \"services/users/src/main.ts\",\n        \"services/users/src/router.ts\",\n        \"services/users/src/routers/health.ts\",\n        \"services/users/src/routers/v1.ts\",\n        \"streams/mod.ts\",\n        \"streams/notifications-stream.ts\",\n        \"streams/plugin.ts\",\n        \"tests/scaffold_test.ts\",\n        \"triggers/daily-maintenance.ts\",\n        \"triggers/generic-inbound-webhook.ts\",\n        \"triggers/incoming-file-watch.ts\",\n        \"triggers/mod.ts\",\n        \"triggers/plugin.ts\",\n        \"triggers/runtime.ts\",\n        \"workers/jobs/health-check.ts\",\n        \"workers/mod.ts\",\n        \"workers/plugin.ts\",\n        \"workers/runtime.ts\",\n        \"workers/tasks/validate-payload.ts\"\n      ],\n      \"exitCode\": 0,\n      \"stdout\": \"\",\n      \"stderr\": \"Checked 165 files\\n\"\n    }\n  ]\n}\n",
+            "stderrTail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 238,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 238
+    },
+    {
+      "id": "generated.ui-ai-check",
+      "title": "Type-check copied Fresh UI AI files",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.ui-ai-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "check",
+              "--unstable-kv",
+              "islands/ui/McpUiWidget.tsx",
+              "lib/ai/render-ui.tsx"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/apps/leaf-1747-full-web",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "",
+            "stderrTail": "\u001b[0m\u001b[32mCheck\u001b[0m islands/ui/McpUiWidget.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m lib/ai/render-ui.tsx\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 547,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 547
+    },
+    {
+      "id": "generated.ai-namespace-check",
+      "title": "Type-check the complete generated AI namespace",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.ai-namespace-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "check",
+              "--unstable-kv",
+              "./ai"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "",
+            "stderrTail": "\u001b[0m\u001b[32mCheck\u001b[0m ai/agents/assistant.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/ai.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/components/ui/citation-chip.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m ai/components/ui/markdown-pipeline.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/components/ui/markdown.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m ai/lib/cn.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/lib/public-types.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/mcp/registry.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/models.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/plugin.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/routes/chat-stream.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/routes/chat.tsx\n\u001b[0m\u001b[32mCheck\u001b[0m ai/tools/e2e-tool.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/tools/echo.ts\n\u001b[0m\u001b[32mCheck\u001b[0m ai/tools/skill-loader.ts\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2293,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2293
+    },
+    {
+      "id": "runtime.auth-smoke-env",
+      "title": "Wire auth smoke environment",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "runtime.auth-smoke-env attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "eval",
+              "const projectRoot = Deno.args[0];\nconst repoRoot = Deno.args[1];\nif (!projectRoot) throw new Error(\"project root argument is required\");\nif (!repoRoot) throw new Error(\"repo root argument is required\");\nconst cli = `${repoRoot}/packages/cli/bin/netscript-dev.ts`;\nasync function run(args: string[]): Promise<string> {\n  const result = await new Deno.Command(\"deno\", { args: [\"run\", \"-A\", cli, ...args], cwd: projectRoot }).output();\n  const stdout = new TextDecoder().decode(result.stdout).trim();\n  const stderr = new TextDecoder().decode(result.stderr).trim();\n  if (!result.success) throw new Error(`auth CLI failed: ${args.join(\" \")}: ${stderr}`);\n  return stdout;\n}\nawait run([\"plugin\", \"auth\", \"backend\", \"set\", \"kv-oauth\", \"--project-root\", projectRoot]);\nconst key = await run([\"plugin\", \"auth\", \"secret\", \"generate\", \"kv-oauth-key\"]);\nawait run([\n  \"plugin\", \"auth\", \"provider\", \"set\", \"--preset\", \"github\",\n  \"--client-id\", \"scaffold_runtime_smoke\",\n  \"--client-secret\", \"scaffold_runtime_smoke_secret\",\n  \"--redirect-uri\", \"http://localhost/api/v1/auth/callback\",\n  \"--kv-oauth-key\", key, \"--project-root\", projectRoot,\n]);\nconst configured = JSON.parse(await Deno.readTextFile(`${projectRoot}/appsettings.json`));\nif (configured.Auth?.Backend !== \"kv-oauth\") throw new Error(\"auth backend CLI did not persist appsettings\");\nif (configured.NetScript?.Plugins?.auth?.Environment?.NETSCRIPT_AUTH_PROVIDER_ID !== \"github\") throw new Error(\"auth provider CLI did not persist plugin environment\");",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1647,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1647
+    },
+    {
+      "id": "runtime.flow-b-fixture",
+      "title": "Wire real Flow-B callback fixture",
+      "critical": true,
+      "verdict": "failed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "runtime.flow-b-fixture attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-read",
+              "--allow-write",
+              "--allow-run=deno",
+              "--allow-env",
+              "packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full",
+              "local",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/packages/cli/bin/netscript-dev.ts"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "",
+            "stderrTail": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in promise) Error: generated register-background.mts did not contain the workers resource block\n  throw new Error('generated register-background.mts did not contain the workers resource block');\n\u001b[0m\u001b[31m        ^\u001b[0m\n    at \u001b[0m\u001b[2m\u001b[38;5;245mfile:///home/agent/projects/netscript/worktrees/007-1747-conv/\u001b[0m\u001b[0m\u001b[36mpackages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts\u001b[0m:\u001b[0m\u001b[33m218\u001b[0m:\u001b[0m\u001b[33m9\u001b[0m\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "failed",
+          "durationMs": 191,
+          "failureClass": "assertion",
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "error": "Command exited 1; expected 0.",
+      "durationMs": 191
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "title": "Stop generated Aspire AppHost",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "cleanup.aspire-stop attempt 1",
+          "data": {
+            "command": [
+              "aspire",
+              "stop",
+              "--apphost",
+              "/home/agent/projects/netscript/worktrees/007-1747-conv/.llm/tmp/1747-full/leaf-1747-full/aspire/apphost.mts",
+              "--non-interactive",
+              "--nologo"
+            ],
+            "cwd": "/home/agent/projects/netscript/worktrees/007-1747-conv",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "\u001b[38;5;12mℹ️\u001b[0m No AppHost is currently running for '.llm/tmp/1747-full/leaf-1747-full/aspire/apphost.mts'. Use 'aspire run' to start it first.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 257,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 257
+    }
+  ],
+  "summary": {
+    "passed": 33,
+    "failed": 1,
+    "skipped": 0
+  }
+}
