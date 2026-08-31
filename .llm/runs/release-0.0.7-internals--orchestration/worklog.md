@@ -7411,3 +7411,56 @@ The queued amendment now carries, in priority order:
 
 Delivery is still pending on the active-writer conflict; the retry loop dispatches on idle ≥90s and
 captures a real exit per attempt, so the corrected text lands rather than the superseded one.
+
+## D-172 — The flake is quantified at ~10%, which makes the proof bar arithmetic
+
+20 focused repetitions at the immutable head produced **2 failures (iterations 2 and 14)** — the same
+`TypeError` each time. **~10% per-run failure rate**, and the PID1 repair did **not** eliminate it.
+Roughly one root-suite run in ten was going to fail on this.
+
+### This retroactively condemns my earlier reasoning, precisely
+
+At p ≈ 0.10, two clean runs had a `0.9² = 81%` chance of showing nothing even with the bug fully
+present. My D-152 conclusion was not weak evidence — it was **almost no evidence at all**, and I
+presented it as a reclassification. The correct reading of two clean runs against an intermittent
+symptom is "I have learned essentially nothing", not "probably a flake".
+
+### The proof bar is now computed, not judged
+
+Chance a still-broken build shows zero failures in N runs is `0.9^N`:
+
+| N | still-broken build shows clean |
+| ---: | --- |
+| 20 | **12.2% — not evidence** |
+| 30 | 4.2% |
+| 40 | 1.5% |
+| **50** | **0.5%** |
+
+The amendment requires **50 focused repetitions post-fix with zero failures**, reporting the count and
+per-iteration exits, plus root-suite repetitions at suite level. The focused test is cheap; the
+confidence is worth buying. Twenty would leave better than a 1-in-9 chance of a lucky green — the
+exact trap I already fell into.
+
+### Corrected the geometry of the defect
+
+The reported "line 71 / line 210" are **one helper and its call site**, not two independent bugs:
+`stopAndReap` is defined at ~68 and called from the test's `finally` at ~210. The fix belongs in the
+helper, whose **two** guards (SIGTERM at 71, SIGKILL at 81) are wrong the same way. Told the author to
+fix the helper, not to patch the call site.
+
+### Named the trap in the fix itself
+
+"Tolerate an already-terminated child" must **not** become "catch `TypeError`". `TypeError` is a
+generic JavaScript error; a blanket catch would silently swallow real programming errors in this
+helper forever — a worse and quieter defect than the flake it removes. The amendment requires matching
+the already-terminated condition **narrowly** and rethrowing everything else, exactly as the current
+code correctly rethrows non-`NotFound` errors.
+
+Two invariants to preserve through the change, both easy to break while "fixing" it:
+`const status = child.status;` is captured **before** the kill and must stay that way, and status must
+still be awaited on **every** path — including the one where the kill throws already-terminated.
+A path that returns without awaiting would pass the test while defeating the very behavior under test.
+
+The amendment remains undelivered (active-writer conflict); the retry loop dispatches on idle ≥90s
+with a captured exit per attempt, so the author receives this final version rather than either
+superseded one.
