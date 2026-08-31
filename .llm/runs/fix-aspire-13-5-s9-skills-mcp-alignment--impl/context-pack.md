@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `D-148 stacked un-stack — delivery` |
+| Current phase | `D-194 runtime.aspire-start repair — implementation/gates` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -16,7 +16,9 @@ All three Phase-A slices are rebased onto reconstructed S8 head `bc838a0b3`. The
 only its ten rewritten implementation commits; stale S5/S6/old-S8 lineage is absent. No AppHost,
 Docker container, or runtime gate was started. The single permitted no-AppHost MCP session preserved
 a significant upstream mismatch: Aspire 13.5.3 exposed 14 baseline tools and omitted
-`get_integration_docs`.
+`get_integration_docs`. D-194 confirmed that S9's dashboard-authentication script read
+`aspire.config.json` from the generated project root instead of beside `aspire/apphost.mts`; the
+minimal path-identity repair and RED-first regression are implemented without runtime execution.
 
 ## Completed
 
@@ -32,16 +34,18 @@ a significant upstream mismatch: Aspire 13.5.3 exposed 14 baseline tools and omi
   one prose/regeneration slice with exact non-runtime CLI-help receipts.
 - D-148 completed the S9 un-stack with additive gate-list unions and a selective workflow artifact
   union that retains S8's narrow paths while adding only the two S9 MCP receipt paths.
+- D-194 root cause is confirmed and the alternative gate-ordering/sqlite-routing hypotheses are
+  eliminated with static suite evidence.
 
 ## In Progress
 
-- Commit this D-148 evidence, lease-safe force-push the rewritten branch, and update the PR trail.
+- Finish D-194 static gates, commit, verify the remote ref, and fast-forward push.
 
 ## Next Steps
 
-1. No PLAN-EVAL or evaluator rerun is dispatched; D-148 explicitly waived both.
-2. Runtime remains parked host-wide. A later separately authorized proof may exercise the amended
-   receipt against a headless AppHost.
+1. Do not dispatch PLAN-EVAL or IMPL-EVAL; the supervisor automatically owns the fresh IMPL-EVAL
+   after evaluated bytes change.
+2. Runtime remains parked host-wide; CI supplies the runtime verdict.
 
 ## Key Decisions
 
@@ -66,6 +70,7 @@ a significant upstream mismatch: Aspire 13.5.3 exposed 14 baseline tools and omi
 | Consumer | PASS | generator checks and zero-state dogfood check |
 | Exact dashboard classification | PASS | 16 focused tests plus scoped check/lint/fmt |
 | D-148 un-stack | PASS | S8 ancestry, 10-commit range map, narrow workflow paths, 60 focused tests, scoped wrappers, repo check, parity, and quality gate |
+| D-194 static repair | PASS | RED-first lifecycle config-path regression; 43 focused tests; 3-file scoped check/lint/fmt; quality gate; repo check with `failedBatches: 0` |
 
 ## Open Questions
 

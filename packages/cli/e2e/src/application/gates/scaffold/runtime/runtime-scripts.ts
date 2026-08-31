@@ -5,9 +5,10 @@ import { KV_BACKGROUND_RUNTIME_RESOURCES } from '../../../../domain/cli-surface.
 export const ASPIRE_START_SCRIPT = [
   'const appHost = Deno.args[0];',
   'const projectRoot = Deno.args[1];',
+  'const configPath = Deno.args[2];',
   'if (!appHost) throw new Error("apphost argument is required");',
   'if (!projectRoot) throw new Error("project root argument is required");',
-  'const configPath = `${projectRoot}/aspire.config.json`;',
+  'if (!configPath) throw new Error("aspire config argument is required");',
   'const config = JSON.parse(await Deno.readTextFile(configPath));',
   'const environmentVariables = config.profiles?.https?.environmentVariables;',
   'if (!environmentVariables) throw new Error("aspire.config.json omitted profiles.https.environmentVariables");',
@@ -70,7 +71,7 @@ export const ASPIRE_RESTART_SCRIPT = [
  * the fallback for surfaces that can run neither the typed command nor a targeted restart.
  */
 export const ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT = [
-  'const database = Deno.args[2];',
+  'const database = Deno.args[3];',
   'if (!database) throw new Error("database argument is required");',
   'const typed = await new Deno.Command("aspire", {',
   '  args: [',

@@ -199,12 +199,31 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
 
   assertEquals(command[0], 'deno');
   assertEquals(command[1], 'eval');
-  assertEquals(command.at(-2), '/workspace/app/aspire/apphost.mts');
-  assertEquals(command.at(-1), '/workspace/app');
+  assertEquals(command.slice(-3), [
+    '/workspace/app/aspire/apphost.mts',
+    '/workspace/app',
+    '/workspace/app/aspire/aspire.config.json',
+  ]);
   assertEquals(command[2].includes('"--format"'), true);
   assertEquals(command[2].includes('aspire-start.json'), true);
   assertEquals(command[2].includes('ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS'), true);
   assertEquals(command[2].includes('environmentVariables[dashboardAnonymousKey] = "false"'), true);
+});
+
+Deno.test('Aspire lifecycle gates bind aspire.config.json to the AppHost workspace', () => {
+  const context = s8RuntimeContext();
+
+  for (const gateId of [GATE.RUNTIME_ASPIRE_START, GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB]) {
+    const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) => entry.id === gateId);
+    if (gate?.kind !== 'command') {
+      throw new Error(`Expected ${gateId} to be a command gate.`);
+    }
+
+    const command = gate.command(context);
+    assertEquals(command[3], '/workspace/app/aspire/apphost.mts');
+    assertEquals(command[4], '/workspace/app');
+    assertEquals(command[5], '/workspace/app/aspire/aspire.config.json');
+  }
 });
 
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {

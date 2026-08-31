@@ -58,6 +58,17 @@ Add or amend MCP assertions in the smoke evaluator module, extend the recorded t
 then verify ordering in the suite registry test. Update agent prose only in `skills/aspire/SKILL.md`
 or the canonical generator source and run the documented generators.
 
+### D-194 Repair Design
+
+- **Public surface:** unchanged; only internal lifecycle command arguments change.
+- **Invariant:** `aspire.config.json` belongs to the AppHost workspace and is resolved from the
+  AppHost path, while `.netscript/e2e/aspire-start.json` remains rooted in the generated project.
+- **Ports/constants:** no new port or domain constant; `@std/path` derives the config path at the
+  command-adapter edge.
+- **Commit slice:** repair start/restart config identity and add the deterministic lifecycle gate
+  regression; prove with focused wrapper tests, scoped wrappers, quality gates, and root check.
+- **Deferred:** live runtime proof remains CI/supervisor-owned under the host lease.
+
 ## Progress Log
 
 | Time | Slice | Step | Notes |
@@ -79,6 +90,8 @@ or the canonical generator source and run the documented generators.
 | 2026-08-30 | hosted dashboard availability cycle 2 | implementation | Hosted proof run `33330455111` supplied the full `-32603` message and showed per-tool degradation was the wrong model. Aspire 13.5.3 source at `b5f143315` proves the CLI selects the scaffold's `https` profile; the profile's `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` prevents `AppHost:DashboardApiKey` generation, while MCP rejects a null API token as dashboard-unavailable. Chose shape A: authenticate only the E2E scratch profile before detached start/restart, keep all MCP calls/assertions mandatory, and annotate the exact error in a failing partial receipt. |
 | 2026-08-30 | coordinator classification amendment | implementation | Reclassified only code `-32603` plus the byte-exact hosted 13.5.3 message on dashboard-gated AppHost calls as a documented degradation. Primary and dashboard-only initialize/tools-list surfaces remain mandatory; accumulated visibility/redaction evidence and the degraded tool name persist. Truncated text, a changed suffix, a wrong code, and the exact payload on `doctor` remain hard failures. Static only: no AppHost, runtime, CI dispatch, or evaluator. |
 | 2026-08-31 | D-148 un-stack | delivery | Rebased the ten S9 commits onto reconstructed S8 `bc838a0b3`; unioned S8 UI/typed-DB and S9 agent-init/Aspire-MCP registrations; retained each job's three narrow artifact paths plus only its matching MCP receipt path, `include-hidden-files: true`, and 30-day retention. No runtime or evaluator was started. |
+| 2026-08-31 | D-194 repair | RED | Added `Aspire lifecycle gates bind aspire.config.json to the AppHost workspace`; the structured test wrapper exited 1 because the start command supplied no AppHost-local config argument. |
+| 2026-08-31 | D-194 repair | implementation | Passed the config path derived from `dirname(appHost)` into initial start and restart fallback, shifted the typed database argument without changing its value, and kept absent/malformed config fail-closed. No runtime resource was started. |
 
 ## Decisions
 
@@ -143,6 +156,14 @@ or the canonical generator source and run the documented generators.
 | D-148 Aspire version parity | PASS | Exit 0; checked 812 manifest entries and reported `fail: 0`. |
 | D-148 quality gate | PASS | Exit 0; repository quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
 | D-148 runtime/evaluator | NOT RUN by ruling | No Aspire/Docker/runtime command, PLAN-EVAL, or evaluator rerun was dispatched. |
+| D-194 regression RED | EXPECTED FAIL | Structured test wrapper exit 1; expected AppHost-local config path, actual `undefined`. |
+| D-194 focused runtime-gates test | PASS | Structured test wrapper exit 0; 23 passed, 0 failed. |
+| D-194 scoped check | PASS | Exit 0; 3 changed TypeScript files, 1 batch, `failedBatches: 0`; wrapper invoked `deno check --unstable-kv`. |
+| D-194 scoped lint | PASS | Exit 0; 3 selected/processed files, zero dropped files or findings. |
+| D-194 scoped fmt | PASS | Exit 0; 3 selected/processed files, zero findings. |
+| D-194 focused gate tests | PASS | Exit 0; 43 passed, 0 failed across runtime lifecycle and suite registry tests. |
+| D-194 quality gate | PASS | Exit 0; code-quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
+| D-194 repo-wide check | PASS | Exit 0; 2,981 files, 25 batches, `failedBatches: 0`, zero diagnostics. |
 
 ## Handoff Notes
 
@@ -155,3 +176,10 @@ or the canonical generator source and run the documented generators.
 - Cycle-1 help captures are non-runtime CLI reads; pre/post Aspire and Docker inventories stayed empty.
 - D-148's rewritten implementation head before this evidence commit is `0c4d9990a`; the final
   delivery commit and lease-safe push are recorded by the PR commit list and delivery comment.
+- D-194 leaves the config read fail-closed: a genuinely absent AppHost-local config still throws
+  from `Deno.readTextFile`; no creation, catch, fallback, or sqlite exclusion was added.
+- D-194 IMPL-EVAL is supervisor-dispatched after the pushed bytes change; this session does not
+  request, dispatch, or perform it.
+- **Post-slice reconcile:** PR #1759 remains the delivery surface on the same branch and base; no
+  labels, lifecycle state, issue state, or PR base were changed. The supervisor owns the next
+  evaluation transition.

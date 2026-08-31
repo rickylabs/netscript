@@ -73,3 +73,15 @@
   `include-hidden-files: true`; add the per-job MCP receipt path and `retention-days: 30`; reject
   every `.llm/tmp/**` recursive glob.
 - **Evidence:** rewritten commits `d81f5fd34`, `06103eeef`, and the D-148 gate rows in `worklog.md`.
+
+## 2026-08-31 — D-194 AppHost workspace identity correction
+
+- **What:** S9's dashboard-authentication amendment treated the generated project root as the
+  Aspire AppHost workspace and read a non-existent root-level `aspire.config.json`.
+- **Expected:** The config is co-located with `aspire/apphost.mts` under the AppHost workspace.
+- **Actual:** CI failed before launching Aspire; the control head without the new read passed.
+- **Severity:** behavioral regression, repaired in scope.
+- **Action:** derive the config path from the AppHost directory and pass it explicitly through both
+  start and restart lifecycle paths; retain strict missing/malformed-config failure.
+- **Evidence:** generator path in `render-ts-apphost.ts`, `createSmokeProject()` path contract,
+  commit `d9bd6250c`, static suite indices, and the D-194 RED regression in `worklog.md`.

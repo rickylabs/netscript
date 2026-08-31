@@ -43,3 +43,17 @@
 - Live AppHost smoke, dashboard-only live mode, and observed S8 exclusion: Phase B.
 - Public documentation: S11.
 - Any `excludeFromMcp()` generator change: S8.
+
+## D-194 repair slice
+
+- Plan-Gate: `N/A`. The owner supplied one mechanical failure, the exact forbidden workarounds,
+  acceptance criteria, and verification commands; no architecture or scope decision remains open.
+- Locked repair: pass the AppHost-local `aspire.config.json` path into both Aspire lifecycle script
+  paths while keeping the generated-project root as the receipt/state root.
+- Regression contract: the start gate and restart-fallback gate must bind
+  `<dirname(appHost)>/aspire.config.json`; they must not infer the config from `projectRoot`.
+- Deferred: no suite redesign, config generation change, missing-file fallback, sqlite skip, runtime
+  execution, PR lifecycle change, or evaluator dispatch.
+- Risk: the restart script shares `Deno.args` with the start script. Mitigation: lock the complete
+  argument order in the deterministic lifecycle-gate test and retain the typed database argument
+  assertion.

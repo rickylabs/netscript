@@ -8,7 +8,7 @@ import {
 } from '../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
-import { resolve } from '@std/path';
+import { dirname, join, resolve } from '@std/path';
 import { commandGate } from './gate-factory.ts';
 import { generatedAppName } from './runtime/generated-app-name.ts';
 import {
@@ -190,6 +190,7 @@ export function createRuntimeGates(
         ASPIRE_START_SCRIPT,
         context.project.appHost,
         context.project.projectRoot,
+        join(dirname(context.project.appHost), 'aspire.config.json'),
       ],
     ),
     commandGate(
@@ -218,6 +219,7 @@ export function createRuntimeGates(
         ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT,
         context.project.appHost,
         context.project.projectRoot,
+        join(dirname(context.project.appHost), 'aspire.config.json'),
         database,
       ],
     ),

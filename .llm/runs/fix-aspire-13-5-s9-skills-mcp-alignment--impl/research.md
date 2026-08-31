@@ -28,3 +28,19 @@
 
 - None that can force Phase-A rework. Phase-B runtime observations and the docs audit are explicitly
   deferred to supervisor-owned lanes.
+
+## D-194 runtime.aspire-start repair re-baseline
+
+- CI run `33404325326`, job `99528225703`, failed `runtime.aspire-start` in 59 ms while reading
+  `.llm/tmp/cli-e2e/plugin-smoke-*/aspire.config.json`; the control head `2032d4ed7` passed the
+  same sqlite suite in run `33404321608` attempt 2.
+- `renderTsAppHost()` writes both `apphost.mts` and `aspire.config.json` under the generated
+  project's `aspire/` directory. `createSmokeProject()` records the AppHost as
+  `<projectRoot>/aspire/apphost.mts`.
+- S9 commit `d9bd6250c` added dashboard authentication by reading
+  `<projectRoot>/aspire.config.json`. The pre-S9 script never read that path. This is the confirmed
+  fail-fast cause: the new read used the scaffold project root instead of the AppHost workspace.
+- Static suite materialization eliminated ordering: both runtime tiers place scaffold init and the
+  pre-start fixtures before `runtime.aspire-start`, then describe and `agent.aspire-mcp-smoke` after
+  start. It also eliminated sqlite capability routing: the sqlite tier selects the same start gate
+  and differs only through sqlite defaults and removal of Postgres-only gates.
