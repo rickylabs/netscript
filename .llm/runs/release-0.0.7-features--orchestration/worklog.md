@@ -9316,3 +9316,78 @@ Three viable resolutions, none of which is mine to pick unilaterally:
 
 Per the merge-sequence correction, #1762 is **held** pending Docs #1798 anyway; this needs resolving
 before the single final integration and hand-off, not after.
+
+## Rotation resume — 2026-08-31 ~03:45–04:20Z (Opus 5 · xhigh · supervise-only)
+
+Resumed from `RESUME.md`. Live GitHub and git treated as authoritative; two of the checkpoint's own
+claims turned out to be wrong and are corrected on the record below.
+
+### #1805 → EXACT-GREEN MERGE CANDIDATE (the lane's first this rotation)
+
+IMPL-EVAL returned **`OPENHANDS_VERDICT: PASS`** at `e76e02271` (GLM 5.3 Flash · max, comment
+`5473484620`), three info-only findings.
+
+**The `status:augment-review` park, resolved by measurement rather than assumption.** The label
+appeared 47 s after the PASS and parked an otherwise green PR. Evidence gathered: 0 reviews, 0 review
+comments, no `augmentcode[bot]` check-run (every check-run on the head is `github-actions`), and no
+`augment review` trigger comment. Control case **#1747** — the only other PR with the label — had its
+`augmentcode[bot]` review submitted **≈11 h before** the label was applied, proving the label is a
+post-hoc marker of a *completed* advisory pass, not a pending one. **Verdict: stale metadata, no live
+process, no run id, no ETA.** Normalized to `status:ready-merge` (#1591 already carried it).
+
+**Final current-main seam.** The coordinator caught that `refs/pull/1805/merge` still had first parent
+`7908399af`, so the green CI did not describe the current merge snapshot. Integrated `a3e0a5aa8` at a
+clean seam — **zero conflicts** — with explicit carry-forward proof: `e76e02271` is a git **ancestor**
+of the new head; all three product files **byte-identical** (`14cbf897…`, `f13d3efc…`, `6db3e9a5…`);
+product diff vs current main still exactly those three files; `deno.lock` unchanged. Merge ref
+recomputed to first parent `a3e0a5aa8`. Gates re-cut at `8a6855d8a`; evidence head `a5d92386b`.
+**`docs:exports-drift` now PASSES**, empirically confirming the evaluator's attribution of that red to
+`main`'s base rather than to this slice.
+
+### Two corrections to my own earlier record
+
+1. **#1762 `close-gate` was never failing.** The CI red was a race: the acceptance mirror was mid-apply
+   and the gate read the `03:22:22Z` issue snapshot. Live re-evaluation returns
+   `close-gate PASS rickylabs/netscript#1762`; the rerun job is green without moving the head.
+2. **The `check-test` "batch-composition" theory was wrong.** Root cause is config parity:
+   `packages/cli/e2e/deno.json` sets `lib: ["deno.ns","dom"]`, omitting `deno.unstable`, while root and
+   `packages/cli` both include it. Deno 2.9.5 honors the explicit omission, so `--unstable-kv` has **no
+   effect** — reproduced with and without the flag, byte-identical `TS2551`. Owned by the P0 repair;
+   **no product change belongs in #1762**, and none was made.
+
+### #1810/#1814/#1820 — integrated, and a hidden CI hole closed
+
+All three were `CONFLICTING/DIRTY` against `main`. Each conflicted on exactly one file (the generated
+MCP export corpus), resolved by taking `main`'s and **regenerating from tooling**. Gates re-cut at each
+integrated head; bodies rewritten to record integration and evidence.
+
+**The important find: draft PRs get no real CI.** `ci.yml` gates `check-test`/`quality`/
+`code-quality`/`close-gate` on `pull_request.draft == false`. All three were showing `build` +
+`classify` green with everything else `skipping` — they would have reached the coordinator looking
+green while proving nothing. Promoted non-draft. `impl-eval:skip` was applied first but **did not
+prevent** the `ready_for_review` auto-dispatch; the resulting duplicate on #1810 was cancelled and the
+now-useless labels removed, leaving exactly one eval per PR.
+
+**That immediately paid for itself: #1814 `quality` FAILS** on `publish:dry-run`. Diagnosed to
+`ExecutionRecordSchema` (`job-definition.ts:241-242`) adding `progressPercent`/`progressMessage` as
+**required-nullable**, which flows through `workers.contract-definition.ts:197` into the **public v1
+output schema**, breaking `plugins/workers/services/src/routers/{runs,tasks}.ts`. Proven slice-caused
+(main's `ci.yml` green at three consecutive heads), and it is an unintended **breaking v1 contract
+change**, not merely a type error. The slice's own `streams/schema.ts:89` makes the same field
+optional — an internal inconsistency. Recommended in-ceiling fix recorded on the PR
+(`5473577044`). #1810 and #1820 are `quality`-green.
+
+### #1354/#1355 residual-scope audit, measured on `main` `0274c0a70`
+
+- **#1355 not resolved.** Symbol collisions were fixed (templated names), but the **dead invalidation
+  is still live**: the template keeps `createQueryFactories({ service: {…} }).service`, and
+  `createQueryFactories` uses the **object key** as the resource (`query-factory.ts:222`), so real keys
+  are `['service', …]` while the generated invalidation targets `[routerName, 'list']`. They never
+  match — a silent runtime no-op still shipping in generated user code.
+- **#1354 essentially untouched.** One generated app asset references `withResource`/
+  `withRouteContract`; `generate-group.ts` still registers three commands. No resource-slice verb.
+
+### #1349 PLAN-EVAL
+
+Re-dispatched (`qwen/qwen3.8-flash · max`) in detached `ns1349-planeval` at `4b520ea44`. First attempt
+died on SIGTERM/143; relaunched with `setsid nohup`, confirmed alive and reading the SDK type surface.
