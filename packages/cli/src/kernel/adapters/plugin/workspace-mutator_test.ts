@@ -18,8 +18,8 @@ import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import {
-  netscriptJsrSpecifier,
   NETSCRIPT_RELEASE_VERSION,
+  netscriptJsrSpecifier,
 } from '../../constants/jsr-specifiers.ts';
 import { useLocalWorkspaceImports } from '../../../../tests/support/local-workspace-imports.ts';
 import {
@@ -268,7 +268,10 @@ Deno.test('root-level scaffold runtime imports resolve in both package-source mo
     ...await collectTypeScriptFiles(
       new URL('../../../../../../plugins/workers/contracts', import.meta.url),
     ),
-    new URL('../../../../../../packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts', import.meta.url),
+    new URL(
+      '../../../../../../packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts',
+      import.meta.url,
+    ),
   ];
   const specifierPattern = /(?:from|import)\s+['"](@netscript\/[^'"]+)['"]/g;
   const rootLevelSpecifiers = new Set<string>();
@@ -325,7 +328,10 @@ Deno.test('root-level scaffold runtime imports resolve in both package-source mo
   ) as { imports: Record<string, string> };
   const mcpRootAlias = rootPackageAlias('@tanstack/ai-mcp');
   const expectedMcpTarget = aiDenoJson.imports[mcpRootAlias];
-  assert(expectedMcpTarget !== undefined, `${mcpRootAlias} must be pinned by packages/ai/deno.json`);
+  assert(
+    expectedMcpTarget !== undefined,
+    `${mcpRootAlias} must be pinned by packages/ai/deno.json`,
+  );
 
   for (const mode of ['jsr', 'local'] as const) {
     const resolverImports = resolveNetScriptImports(mode);
@@ -402,7 +408,7 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
       pluginDir: '/project/plugins/billing-worker',
       kind: 'background',
       port: 4400,
-      servicePort: 8091,
+      servicePort: 9181,
       configSection: 'BackgroundProcessors',
       configKey: 'billing-worker',
       serviceConfigKey: 'billing-worker-api',
@@ -420,7 +426,6 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
   assertEquals(config.NetScript.Plugins['billing-worker-api'], {
     Enabled: true,
     Runtime: 'deno',
-    Port: 8091,
     Entrypoint: netscriptJsrSpecifier('plugin-billing-worker', '/services'),
     Workdir: '.',
     RequiresKv: true,
@@ -475,7 +480,7 @@ Deno.test('PluginWorkspaceMutator omits appsettings entries for service-less plu
       pluginDir: '/project/plugins/service-less',
       kind: 'service-less',
       port: 4400,
-      servicePort: 8091,
+      servicePort: 9181,
       configSection: 'Plugins',
       configKey: 'service-less',
       serviceConfigKey: 'service-less-api',
@@ -508,7 +513,7 @@ Deno.test('PluginWorkspaceMutator honors absolute local source service entrypoin
       pluginDir: '/project/plugins/triggers',
       kind: 'trigger',
       port: 4400,
-      servicePort: 8093,
+      servicePort: 9183,
       configSection: 'BackgroundProcessors',
       configKey: 'triggers',
       serviceConfigKey: 'triggers-api',
@@ -533,9 +538,7 @@ Deno.test('PluginWorkspaceMutator honors absolute local source service entrypoin
     {
       Enabled: true,
       Runtime: 'deno',
-      Port: 8093,
-      Entrypoint:
-        '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
+      Entrypoint: '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
       Workdir: '.',
       RequiresKv: true,
       RequiresDb: true,
@@ -570,7 +573,7 @@ Deno.test('PluginWorkspaceMutator keeps package id separate from the instance na
       pluginDir: '/project/plugins/rehearsal-worker',
       kind: 'background',
       port: 4400,
-      servicePort: 8091,
+      servicePort: 9181,
       configSection: 'BackgroundProcessors',
       configKey: 'rehearsal-worker',
       serviceConfigKey: 'rehearsal-worker-api',
@@ -609,7 +612,7 @@ Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga
       pluginDir: '/project/plugins/sagas',
       kind: 'saga',
       port: 4400,
-      servicePort: 8092,
+      servicePort: 9182,
       configSection: 'BackgroundProcessors',
       configKey: 'sagas',
       serviceConfigKey: 'sagas-api',
@@ -856,10 +859,14 @@ Deno.test('first-party control-plane modules are import-safe and preserve applic
   const configuredModules: string[] = [];
   await Deno.writeTextFile(
     resolve(projectRoot, 'deno.json'),
-    JSON.stringify({
-      workspace: [],
-      imports: { '@netscript/config': netscriptJsrSpecifier('config') },
-    }, null, 2) + '\n',
+    JSON.stringify(
+      {
+        workspace: [],
+        imports: { '@netscript/config': netscriptJsrSpecifier('config') },
+      },
+      null,
+      2,
+    ) + '\n',
   );
   await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
   const workspaceMutator = new PluginWorkspaceMutator(new DenoFileSystem());
@@ -899,7 +906,8 @@ Deno.test('first-party control-plane modules are import-safe and preserve applic
     );
 
     const moduleUrl = toFileUrl(resolve(projectRoot, modulePath)).href;
-    const controlPlaneProbeSource = `const permission = await Deno.permissions.query({ name: 'env' });
+    const controlPlaneProbeSource =
+      `const permission = await Deno.permissions.query({ name: 'env' });
 if (permission.state !== 'denied') throw new Error('control-plane env access is not denied');
 const imported = await import(${JSON.stringify(moduleUrl)});
 const manifests = Object.values(imported).filter((value) =>
@@ -947,7 +955,7 @@ for (const name of ${JSON.stringify(plugin.applicationExports)}) {
   if (!Reflect.has(imported, name)) throw new Error(\`missing application export \${name}\`);
 }`,
       ],
-      env: { DURABLE_STREAMS_URL: 'http://127.0.0.1:8090' },
+      env: { DURABLE_STREAMS_URL: 'http://127.0.0.1:9190' },
       stdout: 'piped',
       stderr: 'piped',
     }).output();
@@ -1144,7 +1152,6 @@ Deno.test('first-party generated namespaces have complete imports in JSR and loc
     }
   }
 });
-
 
 Deno.test('PluginWorkspaceMutator writes no ai kind-source jsr pins into local-source projects', async () => {
   const fs = new MemoryFileSystemAdapter();

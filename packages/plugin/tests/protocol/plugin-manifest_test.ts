@@ -192,7 +192,7 @@ Deno.test('parsePluginManifest accepts a provider service without officialSource
   assertEquals(result.manifest.officialSource, undefined);
 });
 
-Deno.test('parsePluginManifest rejects every partial officialSource service triple', () => {
+Deno.test('parsePluginManifest accepts an unpinned service and rejects incomplete identities', () => {
   for (let mask = 1; mask < 7; mask += 1) {
     const result = parsePluginManifest(serviceShapeManifest({
       providerEntrypoint: true,
@@ -201,12 +201,12 @@ Deno.test('parsePluginManifest rejects every partial officialSource service trip
       sourcePort: (mask & 4) !== 0,
     }));
 
-    assertEquals(
-      result.ok,
-      false,
-      `partial officialSource service mask ${mask} unexpectedly parsed`,
-    );
-    if (result.ok) continue;
+    const validUnpinnedService = mask === 3;
+    assertEquals(result.ok, validUnpinnedService, `officialSource service mask ${mask}`);
+    if (result.ok) {
+      assertEquals(result.manifest.officialSource?.servicePort, undefined);
+      continue;
+    }
     assertEquals(
       result.error.issues.some((issue) => issue.message.includes(ATOMIC_SERVICE_SHAPE_ERROR)),
       true,

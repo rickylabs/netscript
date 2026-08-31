@@ -6,7 +6,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "deno run --no-lock --allow-env --allow-read --allow-write .llm/tools/agentic/claude/claude-hook-log.ts"
+            "command": "deno",
+            "args": [
+              "run",
+              "--no-lock",
+              "--no-prompt",
+              "--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID",
+              "--allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks",
+              "${CLAUDE_PROJECT_DIR}/.llm/tools/agentic/claude/claude-hook-log.ts"
+            ]
           }
         ]
       }
@@ -17,7 +25,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "deno run --no-lock --allow-env --allow-read --allow-write .llm/tools/agentic/claude/claude-hook-log.ts"
+            "command": "deno",
+            "args": [
+              "run",
+              "--no-lock",
+              "--no-prompt",
+              "--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID",
+              "--allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks",
+              "${CLAUDE_PROJECT_DIR}/.llm/tools/agentic/claude/claude-hook-log.ts"
+            ]
           }
         ]
       }

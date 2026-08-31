@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "ff4e81cc1eea2145c4ba7edaa54c7a45714a4de7",
+  "contentHead": "42874803e572a5746834880e387501f0948c7362",
+  "surface": "PR #1731 slice 1 final, after IMPL-EVAL cycle-2 PASS and the root-test recut",
+  "expectedGateIds": [
+    "arch-check", "check", "fmt-check", "lint",
+    "public-doc-lint", "publish-dry-run", "quality-gate", "test"
+  ],
+  "receiptIds": [
+    "1466-arch-check-final", "1466-check-final", "1466-fmt-check-final", "1466-lint-final",
+    "1466-public-doc-lint-final", "1466-publish-dry-run-final", "1466-quality-gate-final",
+    "1466-test-final"
+  ],
+  "sufficiency": "INSUFFICIENT",
+  "reasons": [
+    "public-doc-lint did not pass (FAIL) - baseline-red on main, delta 0, set identical per R-1; external to this leaf"
+  ],
+  "notes": [
+    "test-final.json attests ff4e81cc (evidence head); the other seven attest 42874803 (content head). Product is byte-identical between the two - git diff 42874803..ff4e81cc -- packages plugins docs templates is empty.",
+    "The previous SKIPPED test receipt was honest under R-1; R-1's no-retry condition lost its premise when the host init was repaired (PID 1 is now tini, zero zombies). See audit/root-test-post-host-fix.txt and topic drift D-30."
+  ]
+}

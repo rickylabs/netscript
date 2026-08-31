@@ -3,6 +3,8 @@ import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
 } from "../../../../kernel/assets/skills.generated.ts";
+import { EMBEDDED_TEMPLATE_CONTENT } from "../../../../kernel/assets/embedded.generated.ts";
+import { TEMPLATE_KEYS } from "../../../../kernel/assets/manifest.ts";
 import {
   EMBEDDED_AGENT_TOOL_BUNDLE_HASH,
   EMBEDDED_AGENT_TOOL_FILES,
@@ -14,10 +16,10 @@ import type { EditorChoice } from '../../../../kernel/domain/scaffold/workspace-
 import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
 import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
 import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
-import {
-  type AgentHost,
-  type InitAgentInput,
-  type InitAgentResult,
+import type {
+  AgentHost,
+  InitAgentInput,
+  InitAgentResult,
 } from "./init-agent-input.ts";
 
 const START_MARKER = "<!-- netscript-agent:start -->";
@@ -26,7 +28,10 @@ function agentsSection(withDocs: boolean): string {
   const docs = withDocs
     ? " Offline framework and exact-version API docs are installed; start at `.netscript/docs/llms.txt`."
     : " Need offline framework or API guidance? Run `netscript agent init --with-docs`.";
-  return `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nBefore implementing an unfamiliar NetScript API or architecture, call MCP \`find_guidance\` with the task. Use MCP \`search_docs\` for literal lookup and \`get_doc\` for exact retrieval.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.${docs}\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
+  return EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentGuidance].replace(
+    "{{OFFLINE_DOCS_GUIDANCE}}",
+    docs,
+  ).trimEnd();
 }
 const ASPIRE_INIT_TIMEOUT_MS = 60_000;
 const PLAYWRIGHT_SKILL_PATH = ".claude/skills/playwright-cli/SKILL.md";
@@ -54,7 +59,7 @@ export interface InitAgentDependencies {
   readonly cliSpecifier?: string;
 }
 
-/** Install MCP host configuration and agent skills without rewriting unchanged files. */
+/** Install MCP host configuration and canonical agent skills without rewriting unchanged files. */
 export async function initAgent(
   input: InitAgentInput,
   dependencies: InitAgentDependencies,
@@ -114,6 +119,25 @@ export async function initAgent(
       changedFiles,
     );
   }
+  const skillFiles = Object.entries(bundle.files).filter(
+    ([path]) => path !== "manifest.json",
+  );
+  for (const [path, content] of skillFiles) {
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, ".agents", "skills", path),
+      content,
+      changedFiles,
+    );
+  }
+  const agentsPath = join(input.projectRoot, "AGENTS.md");
+  const currentAgents = await dependencies.fs.readText(agentsPath) ?? "";
+  await writeChanged(
+    dependencies.fs,
+    agentsPath,
+    upsertMarkedSection(currentAgents, input.withDocs === true),
+    changedFiles,
+  );
   if (hosts.includes("claude")) {
     await writeHostConfig(
       dependencies.fs,
@@ -124,8 +148,12 @@ export async function initAgent(
       dependencies.cliSpecifier,
       installedDocsRoot,
     );
-    for (const [path, content] of Object.entries(bundle.files)) {
-      if (path === "manifest.json") continue;
+    for (const [path] of skillFiles) {
+      const canonicalPath = join(input.projectRoot, ".agents", "skills", path);
+      const content = await dependencies.fs.readText(canonicalPath);
+      if (content == null) {
+        throw new Error(`Canonical skill was not installed: ${canonicalPath}`);
+      }
       await writeChanged(
         dependencies.fs,
         join(input.projectRoot, ".claude", "skills", path),
@@ -133,14 +161,6 @@ export async function initAgent(
         changedFiles,
       );
     }
-    const agentsPath = join(input.projectRoot, "AGENTS.md");
-    const current = await dependencies.fs.readText(agentsPath) ?? "";
-    await writeChanged(
-      dependencies.fs,
-      agentsPath,
-      upsertMarkedSection(current, input.withDocs === true),
-      changedFiles,
-    );
   }
   if (editor === 'vscode') {
     await writeHostConfig(

@@ -51,6 +51,7 @@ export { AgentMaxStepsExceededError } from './src/agent/errors.ts';
 // Re-export the seams the loop is programmed against, so `@netscript/ai/agent`
 // is a self-contained surface for wiring a loop.
 export type { AgentLoopInput, AgentLoopOptions, AgentLoopPort } from './src/ports/agent-loop.ts';
+export type { RequestContext } from './src/contracts/context.ts';
 export type {
   ChatClientCallOptions,
   ChatClientEvent,
@@ -63,4 +64,8 @@ export type {
   ChatTextEvent,
   ChatToolCallEvent,
 } from './src/ports/chat-client.ts';
-export type { ToolHandler, ToolRegistryPort } from './src/ports/tool-registry.ts';
+export type {
+  ToolHandler,
+  ToolInvocationOptions,
+  ToolRegistryPort,
+} from './src/ports/tool-registry.ts';

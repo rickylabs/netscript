@@ -68,16 +68,24 @@ export function generateRegisterInfrastructure(
     (entry.Mode ?? 'Container') === 'Container' &&
     entry.Persistent === true
   )
+  const usesDatabaseListenerReadiness = dbEntries.some(([, entry]) =>
+    ['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine) &&
+    (entry.Mode ?? 'Container') === 'Container'
+  )
+  const usesRespReadiness = cacheEntries.some(([, entry]) =>
+    ['Redis', 'Garnet'].includes(entry.Engine) &&
+    !['External', 'Local'].includes(entry.Mode ?? 'Container')
+  )
   const sdkValueImports = [
     ...(hasPersistentContainerDatabase ? ['ContainerLifetime'] : []),
-    ...(cacheEntries.some(([, entry]) =>
-        !['External', 'Local'].includes(entry.Mode ?? 'Container')
-      )
+    ...(cacheEntries.some(([, entry]) => !['External', 'Local'].includes(entry.Mode ?? 'Container'))
       ? ['EndpointProperty']
       : []),
   ]
   const compatImports = [
     'type CacheWiring',
+    ...(usesDatabaseListenerReadiness ? ['createListenerReadinessCheck'] : []),
+    ...(usesRespReadiness ? ['createRespPingCheck'] : []),
     ...(dbEntries.some(([, entry]) =>
         ['Postgres', 'Mysql'].includes(entry.Engine) &&
         (entry.Mode ?? 'Container') === 'Container'
@@ -90,13 +98,9 @@ export function generateRegisterInfrastructure(
       )
       ? ['ensureGarnetToolManifest']
       : []),
-    ...(usesDenoKvContainer
-      ? ['generateAccessToken as _generateAccessToken']
-      : []),
+    ...(usesDenoKvContainer ? ['generateAccessToken as _generateAccessToken'] : []),
     ...(usesResolvedDataPath(dbEntries, cacheEntries) ? ['resolveDataPath'] : []),
-    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto')
-      ? ['shouldUseContainerCache']
-      : []),
+    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto') ? ['shouldUseContainerCache'] : []),
   ]
 
   // Build database registration blocks
@@ -140,6 +144,9 @@ export function generateRegisterInfrastructure(
       lines.push(`    secret: true,`)
       lines.push(`  });`)
       lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      if (entry.Port !== undefined) {
+        lines.push(`    port: ${entry.Port},`)
+      }
       lines.push(`    password: ${id}_password,`)
       lines.push(`  })`)
     } else if (entry.Engine === 'Mssql') {
@@ -150,6 +157,9 @@ export function generateRegisterInfrastructure(
       lines.push(`    secret: true,`)
       lines.push(`  });`)
       lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      if (entry.Port !== undefined) {
+        lines.push(`    port: ${entry.Port},`)
+      }
       lines.push(`    password: ${id}_password,`)
       lines.push(`  })`)
     } else {
@@ -184,6 +194,19 @@ export function generateRegisterInfrastructure(
     // Close the server chain with semicolon
     const lastIdx = lines.length - 1
     lines[lastIdx] = lines[lastIdx] + ';'
+
+    if (['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine)) {
+      const healthCheckKey = `${name}_listener`
+      lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`)
+      lines.push(`    const endpoint = await ${id}_server.getEndpoint('tcp');`)
+      lines.push(`    const host = await endpoint.host();`)
+      lines.push(`    const port = await endpoint.port();`)
+      lines.push(
+        `    return createListenerReadinessCheck({ kind: '${entry.Engine.toLowerCase()}', host, port })();`,
+      )
+      lines.push(`  });`)
+      lines.push(`  await ${id}_server.withHealthCheck('${healthCheckKey}');`)
+    }
 
     // Add database child resource if DatabaseName is specified
     if (entry.DatabaseName) {
@@ -309,22 +332,22 @@ export function generateRegisterInfrastructure(
       __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
       __slot2__: String(
         sdkValueImports.length > 0
-          ? `import { ${sdkValueImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
+          ? `import { ${
+            sdkValueImports.join(', ')
+          } } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
           : '',
       ),
       __slot3__: String(
-        `import { ${compatImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
+        `import { ${
+          compatImports.join(', ')
+        } } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
       ),
       __slot4__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
       __slot5__: String(
-        dbBlocks.length > 0
-          ? dbBlocks.join('\n\n')
-          : '  // No databases configured',
+        dbBlocks.length > 0 ? dbBlocks.join('\n\n') : '  // No databases configured',
       ),
       __slot6__: String(
-        cacheBlocks.length > 0
-          ? cacheBlocks.join('\n\n')
-          : '  // No caches configured',
+        cacheBlocks.length > 0 ? cacheBlocks.join('\n\n') : '  // No caches configured',
       ),
       __slot7__: String(primaryDbLine),
       __slot8__: String(primaryCacheLine),
@@ -424,12 +447,15 @@ function garnetExecutableSetup(
     `  const ${id} = await builder.addExecutable('${name}', 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
   )
   lines.push(
-    `    .withEndpoint({ name: 'tcp', targetPort: ${CACHE_DEFAULT_PORT}, scheme: 'tcp' });`,
+    `    .withEndpoint(${cacheEndpointOptions(entry.Port)});`,
   )
   lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
   lines.push(
     `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
   )
+  if (['Redis', 'Garnet'].includes(entry.Engine)) {
+    appendRespReadinessLines(lines, id, name)
+  }
   lines.push(`  caches.set('${name}', ${id});`)
   lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
 
@@ -470,12 +496,26 @@ function redisGarnetContainerSetup(
   lines.push(
     `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
   )
+  if (['Redis', 'Garnet'].includes(entry.Engine)) {
+    appendRespReadinessLines(lines, id, name)
+  }
   lines.push(`  caches.set('${name}', ${id});`)
   lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
 
   const wiring =
     `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false }`
   return { lines, wiring }
+}
+
+function appendRespReadinessLines(lines: string[], id: string, name: string): void {
+  const healthCheckKey = `${name}_resp`
+  lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`)
+  lines.push(`    const endpoint = await ${id}.getEndpoint('tcp');`)
+  lines.push(`    const host = await endpoint.host();`)
+  lines.push(`    const port = await endpoint.port();`)
+  lines.push(`    return createRespPingCheck({ host, port })();`)
+  lines.push(`  });`)
+  lines.push(`  await ${id}.withHealthCheck('${healthCheckKey}');`)
 }
 
 function cacheEndpointOptions(port: number | undefined): string {

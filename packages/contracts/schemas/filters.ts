@@ -3,7 +3,7 @@
  *
  * @example
  * ```typescript
- * import { FilterConditionSchema, buildPrismaWhere } from '@netscript/contracts';
+ * import { FilterConditionSchema, buildPrismaWhere } from '@netscript/contracts/query';
  *
  * const filters = [
  *   { field: 'status', operator: 'equals', value: 'active' },

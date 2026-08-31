@@ -303,7 +303,11 @@ Step by step, in the real code:
 ```ts
 // workers/jobs/create-user-settings.ts — the publish step, verbatim core
 import { createSagaPublisher } from '@netscript/plugin-sagas/runtime';
-import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
+import {
+  createFailureResult,
+  createSuccessResult,
+  defineJobHandler,
+} from '@netscript/plugin-workers-core';
 import { z } from 'zod';
 
 type UserRegistrationMessage = {
@@ -316,7 +320,16 @@ const sagaPublisher = createSagaPublisher<UserRegistrationMessage>();
 
 const handler = defineJobHandler(async (ctx) => {
   const { userId } = CreateUserSettingsPayloadSchema.parse(ctx.payload ?? {});
-  await sagaPublisher.publish({ type: 'UserSettingsCreated', payload: { userId } });
+  const publishResult = await sagaPublisher.publish({
+    type: 'UserSettingsCreated',
+    payload: { userId },
+  });
+  if (!publishResult.published) {
+    return createFailureResult(
+      `Saga publish rejected: ${publishResult.reason}`,
+      { userId, retryable: publishResult.retryable },
+    );
+  }
   return createSuccessResult({ userId, settingsCreated: true, source: 'scaffold-sample' });
 });
 

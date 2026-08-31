@@ -1,0 +1,18 @@
+command: aspire publish --help
+started: 2026-08-30T00:53:35+02:00
+completed: 2026-08-30T00:53:36+02:00
+elapsed_ms: 100
+exit_code: 0
+
+command: aspire deploy --help
+started: 2026-08-30T00:53:36+02:00
+completed: 2026-08-30T00:53:36+02:00
+elapsed_ms: 101
+exit_code: 0
+
+command: aspire destroy --help
+started: 2026-08-30T00:53:36+02:00
+completed: 2026-08-30T00:53:36+02:00
+elapsed_ms: 117
+exit_code: 0
+

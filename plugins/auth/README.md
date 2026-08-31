@@ -21,7 +21,7 @@ them to a NetScript host.
 
 ## Why teams use it
 
-- **One auth API, swappable backends** — the `auth-api` service (default port `8094`) exposes
+- **One auth API, swappable backends** — the `auth-api` service uses an Aspire-allocated endpoint and exposes
   `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract, backed by a
   single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive OAuth/OIDC),
   `workos`, or `better-auth`.
@@ -39,7 +39,7 @@ them to a NetScript host.
 ```mermaid
 flowchart LR
     M["authPlugin manifest"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["auth-api :8094<br/>signin · callback · session · me · signout"]
+    H --> A["auth-api<br/>Aspire-allocated endpoint<br/>signin · callback · session · me · signout"]
     A --> B["Active backend<br/>(NETSCRIPT_AUTH_BACKEND)"]
     B --> K["kv-oauth"]
     B --> W["workos"]
@@ -75,7 +75,7 @@ Install the plugin:
 
 ```bash
 $ netscript plugin install auth --name auth
-Installed auth plugin "auth" on port 8094.
+Installed auth plugin "auth" on port <allocated-port>.
 Created 1 plugin files.
 Regenerated 12 Aspire helper files.
 ```
@@ -105,7 +105,7 @@ console.log(
 | Entry              | What it gives you                                                    |
 | ------------------ | -------------------------------------------------------------------- |
 | `.`                | `authPlugin` plus the `AUTH_*` identity and service constants        |
-| `./services`       | The auth API service composition (`auth-api`, port `8094`)           |
+| `./services`       | The auth API service composition (`auth-api`, Aspire-allocated port) |
 | `./streams`        | Browser-safe durable-stream projection for the `authSession` entity  |
 | `./streams/server` | Server-side session-stream emit helpers                              |
 | `./contracts`      | The versioned auth API contract generated registries bind against    |

@@ -1,0 +1,5 @@
+{"kind":"meta","bench":"k5-stdin-duplex-cancel","reps":30,"startedAt":"2026-08-20T07:39:26.720Z"}
+{"kind":"cancel","label":"go","n":30,"cancelledOutcomes":30,"p50Ms":3.5,"p95Ms":5.8,"maxMs":6.5,"pass":true}
+{"kind":"cancel","label":"python3","n":30,"cancelledOutcomes":30,"p50Ms":30.2,"p95Ms":43.1,"maxMs":88.3,"pass":true}
+{"kind":"verdict","criteria":"T1 in-band control ships iff both testees ack CANCEL <100ms p95 during blocking compute, no special flags","decision":"ADOPT T1 in-band stdin cancel (duplex optional capability)"}
+{"kind":"summary","allPass":true,"finishedAt":"2026-08-20T07:39:41.107Z"}

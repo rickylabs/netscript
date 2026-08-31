@@ -27,8 +27,8 @@ const OWNER_RISK =
 const PROVIDER_COMMANDS = [
   ['claude-anthropic-native', NATIVE_CANARY_MODEL_ARGS.claudeOpus, 'high'],
   ['codex-openai-native', NATIVE_CANARY_MODEL_ARGS.codex, 'medium'],
-  ['claude-openrouter', OPENROUTER_MODEL_IDS.minimax, 'high'],
-  ['codex-openrouter', OPENROUTER_MODEL_IDS.glm, 'xhigh'],
+  ['claude-openrouter', OPENROUTER_MODEL_IDS.implEvaluator, 'max'],
+  ['codex-openrouter', OPENROUTER_MODEL_IDS.designGlm, 'xhigh'],
 ] as const;
 
 class LocalCommandRunner implements RolloutCommandRunner {

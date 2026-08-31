@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "d5f3bf4c15",
+  "surface": "PR #1731 after integrating main a5520e70 (#1755) and regenerating the cascade at the final base",
+  "expectedGateIds": ["arch-check","check","fmt-check","lint","public-doc-lint","publish-dry-run","quality-gate","test"],
+  "receiptIds": ["1466-arch-check-final","1466-check-final","1466-fmt-check-final","1466-lint-final","1466-public-doc-lint-final","1466-publish-dry-run-final","1466-quality-gate-final","1466-test-final"],
+  "sufficiency": "INSUFFICIENT",
+  "reasons": ["public-doc-lint did not pass (FAIL) - baseline-red on main, delta 0, set identical per R-1; external to this leaf"],
+  "notes": [
+    "All eight receipts attempt 12 at content head d5f3bf4c with gitHead == actualGitHead.",
+    "public-doc-lint carries the plan's explicit 19-element argv at 178ms - verified against argv length and duration, not exitCode alone.",
+    "R-1 re-verified against the NEW main a5520e70: head 12, main 12, finding set identical. Delta 0 preserved across two consecutive main advances (952cc106 then a5520e70).",
+    "Two main integrations were done as --no-ff merges, never rebases; the second conflicted in four generated carriers, resolved by taking main's side then re-running all four generators so tooling output is authoritative.",
+    "Seven append-only archives. deno.lock byte-unchanged."
+  ]
+}

@@ -22,7 +22,14 @@ const CANARY_PROMPT = [
   'Do not edit files or start another agent.',
 ].join(' ');
 const CANARY_TIMEOUT_MS = 30_000;
-const CANARY_CAPTURE_BYTES = 64 * 1024;
+const CANARY_CAPTURE_BYTES = 512 * 1024;
+export const PROVIDER_CANARY_MAX_OUTPUT_TOKENS = 1024;
+
+interface CanaryAttestation {
+  readonly observedIdentity: ProviderCanaryObservation['observedIdentity'];
+  readonly identitySource: ProviderCanaryObservation['identitySource'];
+  readonly outputTokenBudget: number | null;
+}
 
 interface CanaryCommandOutput {
   readonly code: number;
@@ -79,10 +86,29 @@ function includesCapability(value: unknown, capability: 'tools' | 'reasoning'): 
     : encoded.includes('reasoning') || encoded.includes('thinking');
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasVisibleAssistantMarker(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (value.type === 'result') {
+    return typeof value.result === 'string' && value.result.includes('PROVIDER_CANARY_OK');
+  }
+  if (value.type !== 'assistant' || !isRecord(value.message)) return false;
+  const content = value.message.content;
+  return Array.isArray(content) &&
+    content.some((block) =>
+      isRecord(block) && block.type === 'text' && typeof block.text === 'string' &&
+      block.text.includes('PROVIDER_CANARY_OK')
+    );
+}
+
 function observeOutput(
   credential: 'available' | 'absent',
   output: CanaryCommandOutput | null,
   timedOut: boolean,
+  attestation: CanaryAttestation,
 ): ProviderCanaryObservation {
   if (!output) {
     return {
@@ -92,6 +118,8 @@ function observeOutput(
       malformed: false,
       incompatibility: null,
       eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
+      ...attestation,
+      responseNonEmpty: false,
     };
   }
   const text = new TextDecoder().decode(output.stdout.slice(0, CANARY_CAPTURE_BYTES));
@@ -118,6 +146,8 @@ function observeOutput(
       reasoning: events.filter((event) => includesCapability(event, 'reasoning')).length,
       streaming: events.length > 1 ? events.length : 0,
     },
+    ...attestation,
+    responseNonEmpty: events.some(hasVisibleAssistantMarker),
   };
 }
 
@@ -125,7 +155,7 @@ function canaryRequest(
   route: RouteIdentity,
   environment: ChildEnvironmentPolicy,
   codexProfile?: CodexProfileReference,
-): AgentProcessRequest {
+): AgentProcessRequest & CanaryAttestation {
   if (route.agent === 'claude') {
     return {
       executable: 'claude',
@@ -133,6 +163,8 @@ function canaryRequest(
         '-p',
         '--model',
         route.model,
+        '--effort',
+        route.effort,
         '--permission-mode',
         'plan',
         '--output-format',
@@ -144,6 +176,13 @@ function canaryRequest(
       timeoutMs: CANARY_TIMEOUT_MS,
       maxCaptureBytes: CANARY_CAPTURE_BYTES,
       environment,
+      observedIdentity: {
+        provider: route.provider,
+        model: route.model,
+        effort: route.effort,
+      },
+      identitySource: 'launch_argv_and_profile',
+      outputTokenBudget: PROVIDER_CANARY_MAX_OUTPUT_TOKENS,
     };
   }
   return {
@@ -161,6 +200,30 @@ function canaryRequest(
     timeoutMs: CANARY_TIMEOUT_MS,
     maxCaptureBytes: CANARY_CAPTURE_BYTES,
     environment,
+    observedIdentity: {
+      provider: route.provider,
+      model: route.model,
+      effort: route.effort,
+    },
+    identitySource: 'launch_argv_and_profile',
+    outputTokenBudget: null,
+  };
+}
+
+function unobserved(
+  credential: ProviderCanaryObservation['credential'] = 'absent',
+): ProviderCanaryObservation {
+  return {
+    credential,
+    exitCode: null,
+    timedOut: false,
+    malformed: false,
+    incompatibility: null,
+    eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
+    observedIdentity: { provider: null, model: null, effort: null },
+    identitySource: null,
+    outputTokenBudget: null,
+    responseNonEmpty: null,
   };
 }
 
@@ -185,49 +248,29 @@ export class ProviderCanaryAdapter {
     codexProfile?: CodexProfileReference,
   ): Promise<ProviderCanaryResult> {
     if (route.presetId && !matchOpenRouterPreset(route)) {
-      return evaluateProviderCanary(route, {
-        credential: 'absent',
-        exitCode: null,
-        timedOut: false,
-        malformed: false,
-        incompatibility: null,
-        eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
-      });
+      return evaluateProviderCanary(route, unobserved());
     }
     const profile = resolveProviderProfile(route);
     if (!profile) {
-      return evaluateProviderCanary(route, {
-        credential: 'absent',
-        exitCode: null,
-        timedOut: false,
-        malformed: false,
-        incompatibility: null,
-        eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
-      });
+      return evaluateProviderCanary(route, unobserved());
     }
     if (profile.agent === 'codex' && profile.endpointKind === 'openrouter' && !codexProfile) {
-      return evaluateProviderCanary(route, {
-        credential: 'absent',
-        exitCode: null,
-        timedOut: false,
-        malformed: false,
-        incompatibility: null,
-        eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
-      });
+      return evaluateProviderCanary(route, unobserved());
     }
     const policy = childEnvironmentPolicyForProfile(profile, route, codexProfile?.home);
     const environment = materializeEnvironment(policy, this.#environment);
     if (!environment) {
-      return evaluateProviderCanary(route, {
-        credential: 'absent',
-        exitCode: null,
-        timedOut: false,
-        malformed: false,
-        incompatibility: null,
-        eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
-      });
+      return evaluateProviderCanary(route, unobserved());
     }
     const request = canaryRequest(route, policy, codexProfile);
+    if (route.agent === 'claude') {
+      environment.CLAUDE_CODE_MAX_OUTPUT_TOKENS = String(PROVIDER_CANARY_MAX_OUTPUT_TOKENS);
+    }
+    const attestation: CanaryAttestation = {
+      observedIdentity: request.observedIdentity,
+      identitySource: request.identitySource,
+      outputTokenBudget: request.outputTokenBudget,
+    };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), request.timeoutMs);
     try {
@@ -241,10 +284,10 @@ export class ProviderCanaryAdapter {
         stderr: 'piped',
         signal: controller.signal,
       }).output();
-      return evaluateProviderCanary(route, observeOutput('available', output, false));
+      return evaluateProviderCanary(route, observeOutput('available', output, false, attestation));
     } catch (error) {
       const timedOut = error instanceof DOMException && error.name === 'AbortError';
-      return evaluateProviderCanary(route, observeOutput('available', null, timedOut));
+      return evaluateProviderCanary(route, observeOutput('available', null, timedOut, attestation));
     } finally {
       clearTimeout(timer);
     }

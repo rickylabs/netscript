@@ -1,0 +1,36 @@
+{
+  "gateId": "assets-barrel",
+  "invocationId": "reference-export-base-refresh-assets-barrel",
+  "argv": [
+    "deno",
+    "task",
+    "check:assets-barrel"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "actualGitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:875487",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "934b02dbe64cbb21e4a32e7bce356154ff992ee94330bf1289555e1cdb54a3f6",
+  "lifecycleId": "worker:875487:reference-export-base-refresh-assets-barrel:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T20:52:00.933Z",
+  "startedAt": "2026-08-15T20:52:00.937Z",
+  "finishedAt": "2026-08-15T20:52:01.860Z",
+  "durationMs": 923,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 570,
+    "sha256": "6fc77d278be69f0dc20503a5435f98da17262e66cfb99a0b1b4cf25f75a8802d",
+    "tail": "Task check:assets-barrel deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts\nTask gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n",
+    "truncated": false
+  }
+}

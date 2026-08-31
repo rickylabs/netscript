@@ -1,15 +1,18 @@
-import { resolve, toFileUrl } from '@std/path';
+import { fromFileUrl, resolve, toFileUrl } from '@std/path';
 
-const DOC_PATH = 'docs/site/durable-workflows/streams.md';
+const DOC_PATH = fromFileUrl(
+  new URL('../../../../../../../docs/site/durable-workflows/streams.md', import.meta.url),
+);
+const SCRATCH_ROOT = fromFileUrl(new URL('../../../../../../../.llm/tmp/', import.meta.url));
 
 /** Execute the official native EventSource example without rewriting its source. */
 export async function runDocumentedStreamExample(streamsBaseUrl: string): Promise<number> {
   const markdown = await Deno.readTextFile(DOC_PATH);
   const source = extractNativeExample(markdown);
   const executable = `${source}\n${PROOF_SUFFIX}`;
-  await Deno.mkdir('.llm/tmp', { recursive: true });
+  await Deno.mkdir(SCRATCH_ROOT, { recursive: true });
   const temporaryRoot = await Deno.makeTempDir({
-    dir: '.llm/tmp',
+    dir: SCRATCH_ROOT,
     prefix: 'streams-native-runtime-',
   });
   const examplePath = resolve(temporaryRoot, 'native-event-source-example.ts');

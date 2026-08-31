@@ -124,6 +124,14 @@ export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike
   : never;
 
 /**
+ * Procedure metadata carried by a contract procedure node.
+ */
+export type ProcedureMetaFromNode<TNode> = TNode extends {
+  readonly '~orpc': { readonly meta: infer TMeta };
+} ? TMeta
+  : Record<never, never>;
+
+/**
  * Per-call service client context.
  */
 export interface ServiceClientContext {
@@ -165,10 +173,10 @@ export interface ServiceRequestOptions {
 /**
  * Typed service-client method derived from a contract procedure.
  */
-export type ServiceClientMethod<TInput, TOutput> = (
+export type ServiceClientMethod<TInput, TOutput, TError = Error> = (
   input: TInput,
   options?: ServiceRequestOptions,
-) => Promise<TOutput>;
+) => Promise<TOutput> & { __error?: { type: TError } };
 
 /**
  * Compile-time marker that preserves the source contract for inference.
@@ -182,8 +190,31 @@ export interface ServiceClientContract<TContract extends ContractLike> {
  * Recursive callable/router shape for a typed service client.
  */
 export type ServiceClientShape<TContract extends ContractLike> = TContract extends
-  ContractProcedureLike
-  ? ServiceClientMethod<ProcedureInputFromNode<TContract>, ProcedureOutputFromNode<TContract>>
+  ContractProcedureLike ? ServiceClientMethod<
+    ProcedureInputFromNode<TContract>,
+    ProcedureOutputFromNode<TContract>,
+    TContract extends {
+      readonly '~orpc': {
+        readonly errorMap: infer TErrorMap extends Record<
+          string,
+          { readonly data?: unknown } | undefined
+        >;
+      };
+    } ?
+        | {
+          [K in keyof TErrorMap]: K extends string
+            ? TErrorMap[K] extends { readonly data?: infer TDataSchema } ? Error & {
+                readonly defined: true;
+                readonly code: K;
+                readonly status: number;
+                readonly data: ContractSchemaOutput<TDataSchema>;
+              }
+            : never
+            : never;
+        }[keyof TErrorMap]
+        | Error
+      : Error
+  >
   : {
     [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceClient<TContract[K]> : never;
   };

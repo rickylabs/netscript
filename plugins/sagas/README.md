@@ -25,14 +25,15 @@ them to a NetScript host.
   resources as typed contribution axes the host turns into running processes.
 - **Compensation built in** — workflows declare forward steps and compensations; saga state is
   persisted so a crash mid-flow resumes instead of stranding half-applied effects.
-- **Saga API included** — the `sagas-api` service (default port `8092`) backs saga and instance
+- **Saga API included** — the Aspire-discovered `sagas-api` service backs saga and instance
   introspection over a versioned contract. Publish durably enqueues for the background runner and
   returns a non-2xx response on enqueue failure or deadline expiry.
 - **An operations CLI** — `list`, `inspect`, `add-saga`, `update-saga`, `remove-saga`,
   `generate-registry`, and `publish` cover authoring and inspection; `inspect` degrades gracefully
   to a local source scan when the Saga API is not running.
-- **Stable identity constants** — `SAGAS_PLUGIN_ID`, `SAGAS_API_SERVICE_NAME`, and
-  `SAGAS_API_DEFAULT_PORT` are exported so hosts and wiring never hard-code literals.
+- **Stable identity constants** — `SAGAS_PLUGIN_ID` and `SAGAS_API_SERVICE_NAME` identify the
+  contribution. `SAGAS_API_DEFAULT_PORT` remains a deprecated compatibility-only export and is not
+  a runtime fallback.
 - **Durable streams + Aspire** — `./streams` publishes saga entities to durable stream topics;
   `./aspire` contributes the saga resources to the AppHost.
 
@@ -41,7 +42,7 @@ them to a NetScript host.
 ```mermaid
 flowchart LR
     M["sagasPlugin<br/>(manifest: service, runtime,<br/>schema, Aspire resources)"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["sagas-api<br/>:8092"]
+    H --> A["sagas-api<br/>Aspire-allocated endpoint"]
     A --> Q["sagas queue<br/>Redis/Garnet or Deno KV"]
     Q --> R["Saga runner<br/>steps + compensations"]
     R --> P["Durable state<br/>(resume after restart)"]
@@ -84,7 +85,7 @@ runtime as unreachable and still scans local saga sources:
 
 ```bash
 $ netscript plugin install saga --name sagas
-Installed saga plugin "sagas" on port 8092.
+Installed saga plugin "sagas" with an Aspire-allocated endpoint.
 Created 4 plugin files.
 Regenerated 12 Aspire helper files.
 
@@ -112,7 +113,7 @@ import {
 
 console.log(SAGAS_PLUGIN_ID); // "sagas"
 console.log(SAGAS_API_SERVICE_NAME); // "sagas-api"
-console.log(SAGAS_API_DEFAULT_PORT); // 8092
+console.log(SAGAS_API_DEFAULT_PORT); // deprecated compatibility value; do not use for discovery
 console.log(sagasPlugin.name); // "@netscript/plugin-sagas"
 ```
 
@@ -124,7 +125,7 @@ console.log(sagasPlugin.name); // "@netscript/plugin-sagas"
 | `./cli`       | The saga command group (`list`, `inspect`, `add-saga`, `publish`, …) |
 | `./runtime`   | The saga execution runtime composition                               |
 | `./public`    | The typed orchestration surface hosts re-export                      |
-| `./services`  | The Saga API service composition (`sagas-api`, port `8092`)          |
+| `./services`  | The Aspire-discovered Saga API service composition (`sagas-api`)     |
 | `./streams`   | Durable-stream factory for saga entities                             |
 | `./aspire`    | The saga Aspire contribution for the AppHost                         |
 | `./contracts` | The versioned saga API contract generated registries bind against    |

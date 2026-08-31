@@ -18,18 +18,18 @@ Deno.test('provider calls require explicit live mode with complete route identit
     '--profile',
     'claude-openrouter',
     '--preset',
-    'claude-evaluator-minimax-m3',
+    'claude-evaluator-glm-5-3-flash',
     '--model',
-    OPENROUTER_MODEL_IDS.minimax,
+    OPENROUTER_MODEL_IDS.implEvaluator,
     '--effort',
-    'high',
+    'max',
     '--worktree',
     worktree,
   ]);
   assertEquals(live.mode, 'live');
   if (live.mode === 'live') {
     assertEquals(live.route.provider, 'openrouter');
-    assertEquals(live.route.presetId, 'claude-evaluator-minimax-m3');
+    assertEquals(live.route.presetId, 'claude-evaluator-glm-5-3-flash');
   }
   for (
     const args of [

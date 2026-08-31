@@ -144,6 +144,11 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_FMT_CHECK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_ADD_AI), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_LOCAL_SOURCE), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN),
+    true,
+    'the generated data-screen gate must be selected into scaffold.runtime',
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_UI_AI_CHECK), true);
   assertEquals(
     runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS),
@@ -182,6 +187,14 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(aiInstallIndex < appsettingsIndex, true);
   assertEquals(appsettingsIndex < runtimeSchemasIndex, true);
   assertEquals(runtimeSchemasIndex < generatedCheckIndex, true);
+  const dataScreenIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN
+  );
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.SCAFFOLD_INIT) < dataScreenIndex,
+    true,
+  );
+  assertEquals(dataScreenIndex < generatedCheckIndex, true);
   assertEquals(
     runtime.gates.findIndex((gate) => gate.id === GATE.GENERATED_SAGAS_REGISTRY) <
       runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE),
@@ -189,6 +202,10 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_AUTH_SMOKE_ENV), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE),
+    true,
+  );
   assertEquals(
     runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTORE) <
       runtime.gates.findIndex((gate) => gate.id === GATE.GENERATED_QUALITY_NEGATIVE),
@@ -285,6 +302,17 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
   assertEquals(waitIndex < homeIndex, true);
+});
+
+Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const describe = ids.indexOf(GATE.RUNTIME_ASPIRE_DESCRIBE);
+    const listenerFixture = ids.indexOf(GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE);
+    const behavior = ids.indexOf(GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST);
+    assertEquals(describe >= 0 && describe < listenerFixture, true, suiteId);
+    assertEquals(listenerFixture < behavior, true, suiteId);
+  }
 });
 
 Deno.test('runtime DB mutations run only after the resident AppHost starts', () => {

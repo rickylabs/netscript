@@ -859,10 +859,16 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
     sqliteJob!.includes('name: e2e-cli-scaffold-runtime-sqlite-report'),
     true,
   );
-  assertEquals(
-    sqliteJob!.includes('.llm/tmp/**/report*.ndjson'),
-    true,
-  );
+  for (
+    const path of [
+      '.llm/tmp/e2e-report-scaffold-runtime-sqlite*.json',
+      '.llm/tmp/e2e-report-scaffold-runtime-sqlite*.ndjson',
+      '.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json',
+      'include-hidden-files: true',
+    ]
+  ) {
+    assertEquals(sqliteJob!.includes(path), true, path);
+  }
 
   const postgresJob = workflowJob(workflow, 'scaffold-runtime');
   assertEquals(typeof postgresJob, 'string');
@@ -874,6 +880,27 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
     postgresJob!.includes('name: e2e-cli-scaffold-runtime-report'),
     true,
   );
+  for (
+    const path of [
+      '.llm/tmp/e2e-report-scaffold-runtime*.json',
+      '.llm/tmp/e2e-report-scaffold-runtime*.ndjson',
+      '.llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json',
+      'include-hidden-files: true',
+    ]
+  ) {
+    assertEquals(postgresJob!.includes(path), true, path);
+  }
+  for (const job of [sqliteJob!, postgresJob!]) {
+    for (
+      const recursivePath of [
+        '.llm/tmp/**',
+        '**/e2e-report*.json',
+        '**/listener-unreachable-receipt.json',
+      ]
+    ) {
+      assertEquals(job.includes(recursivePath), false, recursivePath);
+    }
+  }
   assertEquals(
     sqliteJob!.includes('group: e2e-scaffold-runtime-global\n'),
     false,

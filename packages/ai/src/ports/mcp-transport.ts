@@ -111,11 +111,49 @@ export interface McpToolResult {
   readonly error?: string;
 }
 
+/** One resource payload returned by an MCP server. */
+export interface McpResourceContent {
+  /** Stable resource URI. */
+  readonly uri: string;
+  /** MIME type advertised for the payload, when present. */
+  readonly mimeType?: string;
+  /** Inline text payload, when present. */
+  readonly text?: string;
+  /** Inline base64 payload, when present. */
+  readonly blob?: string;
+  /** Additional protocol fields retained without leaking an SDK type. */
+  readonly [key: string]: unknown;
+}
+
+/** Result of reading one MCP resource URI. */
+export interface McpReadResourceResult {
+  /** Resource payloads returned for the requested URI. */
+  readonly contents: readonly McpResourceContent[];
+}
+
 /** Handler invoked whenever an MCP transport changes state. */
 export type McpStateChangeHandler = (
   state: McpConnectionState,
   previous: McpConnectionState,
 ) => void;
+
+/** Last observed lifecycle status for one server in an MCP transport pool. */
+export interface McpServerStatus {
+  /** Stable id assigned to the MCP server connection. */
+  readonly serverId: string;
+  /** Last synchronously observed lifecycle state. */
+  readonly state: McpConnectionState;
+  /** Message from the last failed pool operation, when degraded. */
+  readonly lastError?: string;
+}
+
+/** Immediate, I/O-free view of pooled MCP server health and ready clients. */
+export interface McpTransportPoolSnapshot {
+  /** Per-server lifecycle status keyed by server id. */
+  readonly statuses: Readonly<Record<string, McpServerStatus>>;
+  /** Ready transport clients keyed by server id. */
+  readonly readyClients: Readonly<Record<string, McpTransportPort>>;
+}
 
 /** Result of opening a low-level MCP client connection. */
 export interface McpClientConnection {
@@ -127,14 +165,18 @@ export interface McpClientConnection {
     args: Readonly<Record<string, unknown>>,
     options?: McpConnectOptions,
   ): Promise<McpToolResult>;
+  /** Read a resource exposed by the connected server. */
+  readResource(uri: string, options?: McpConnectOptions): Promise<McpReadResourceResult>;
   /** Close the client connection and release resources. */
-  close(): Promise<void>;
+  close(options?: McpConnectOptions): Promise<void>;
 }
 
 /** Serializable config handed to a low-level MCP connector. */
 export interface McpConnectorConfig {
   /** Stable id assigned to the MCP server connection. */
   readonly serverId: string;
+  /** Injected fetch implementation for HTTP transports. */
+  readonly fetch?: typeof fetch;
   /** Additional connector-specific values. */
   readonly [key: string]: unknown;
 }
@@ -183,12 +225,17 @@ export interface McpTransportPort {
     args: Readonly<Record<string, unknown>>,
     options?: McpConnectOptions,
   ): Promise<McpToolResult>;
+  /** Read a resource when the concrete transport exposes that capability. */
+  readResource?(
+    uri: string,
+    options?: McpConnectOptions,
+  ): Promise<McpReadResourceResult>;
   /** Subscribe to state changes; returns an unsubscribe function. */
   onStateChange(
     handler: (state: McpConnectionState, previous: McpConnectionState) => void,
   ): () => void;
   /** Close the transport and abort in-flight connect/reconnect work. */
-  stop(): Promise<void>;
+  stop(options?: McpConnectOptions): Promise<void>;
 }
 
 /**

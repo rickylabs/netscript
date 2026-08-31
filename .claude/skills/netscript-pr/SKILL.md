@@ -125,6 +125,9 @@ The machine convention is intentionally narrow:
   - any markdown checkbox anywhere in the issue body whose checkbox text starts with `gate:`.
 - Ordinary planning, dependency, sub-issue, or rollout checklists outside those sections are **not**
   close-gated. If a checklist is acceptance, put it under an acceptance/gate heading.
+- Only markdown checkboxes are close-gated and mirrorable. A plain-bullet `Acceptance` section has
+  no mirrorable targets and therefore takes no `acceptance-evidence` block; convert its bullets to
+  markdown checkboxes before adding a block.
 - A checked acceptance/gate box must carry linked evidence in the issue, PR body, or PR phase comment
   (command output, run URL, CI job, or reviewer/evaluator comment). The automation catches unchecked
   boxes; the coordinator/evaluator verifies the evidence link quality before closing.

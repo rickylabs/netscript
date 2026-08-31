@@ -43,30 +43,20 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
 
       - name: Install Aspire CLI
-        env:
-          # 13.4.6 can orphan stopped NuGet prefetch helpers that deadlock later
-          # restores (microsoft/aspire#18948). This is the first daily build we
-          # verified contains the merged lifecycle fix (microsoft/aspire#18958).
-          ASPIRE_CLI_VERSION: '13.5.0-preview.1.26404.10'
         run: |
-          curl -fsSL https://aspire.dev/install.sh | bash -s -- \
-            --version "$ASPIRE_CLI_VERSION" \
-            --install-path "$HOME/.aspire/bin" \
-            --skip-path
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
-        env:
-          ASPIRE_CLI_VERSION: '13.5.0-preview.1.26404.10'
         run: |
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            "$ASPIRE_CLI_VERSION"|"$ASPIRE_CLI_VERSION"+*) ;;
-            *) echo "Expected Aspire CLI $ASPIRE_CLI_VERSION, got $aspire_version" >&2; exit 1 ;;
+            13.5.*) ;;
+            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
           esac
           aspire doctor --non-interactive --nologo
 

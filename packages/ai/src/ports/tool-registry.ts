@@ -9,13 +9,40 @@
  * @module
  */
 
+import type { RequestContext } from '../contracts/context.ts';
 import type { ToolCall, ToolDescriptor, ToolResult } from '../contracts/tool.ts';
+
+/**
+ * Ambient values the caller (normally the agent loop) supplies for **one**
+ * dispatch, alongside the model-emitted {@linkcode ToolCall}. Nothing here comes
+ * from the model, and nothing here is sent to one.
+ */
+export interface ToolInvocationOptions {
+  /**
+   * Cancellation signal for this dispatch. The agent loop passes the run's
+   * combined signal, so a long-running handler can abandon work when the run is
+   * stopped.
+   */
+  readonly signal?: AbortSignal;
+  /**
+   * The run's {@linkcode RequestContext} — request-local application state the
+   * model never saw. The definition-backed registry lands this on
+   * `AiToolInvocationContext.metadata`, where a server handler reads it.
+   */
+  readonly context?: RequestContext;
+}
 
 /**
  * Executes a resolved {@linkcode ToolCall} and returns its result. Supplied by
  * whoever registers the tool.
+ *
+ * `options` is an optional second parameter, so a handler that only cares about
+ * the call — `(call) => result` — remains assignable unchanged.
  */
-export type ToolHandler = (call: ToolCall) => Promise<ToolResult> | ToolResult;
+export type ToolHandler = (
+  call: ToolCall,
+  options?: ToolInvocationOptions,
+) => Promise<ToolResult> | ToolResult;
 
 /**
  * The tool registry capability seam.
