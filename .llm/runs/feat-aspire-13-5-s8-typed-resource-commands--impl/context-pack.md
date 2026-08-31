@@ -82,3 +82,19 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
 - RED regression failed before the fix; focused GREEN is 34/34. Scoped check/lint/fmt,
   `quality:gate`, and repo-wide check are green. No Aspire, Docker, AppHost, or runtime E2E command
   ran. The supervisor, not this implementation session, owns any delta IMPL-EVAL.
+
+## D-224 actionable-stderr state
+
+- Resume baseline was the clean local/remote head `f29a0b265b435e4c4fd53079b4e8c27c4d34bc3f`.
+- The generated runtime edge now retains 32 actionable lines as an 8-line head plus 24-line tail.
+  Total persisted UTF-8 detail is capped at 16 KiB; the derived 511-byte line allowance preserves
+  both ends of oversized lines and favors their tail.
+- The first actionable line remains `message`; VT stripping still precedes `Task ` filtering; the
+  `actionableStderr` result contract is unchanged and additive.
+- RED failed against the old bound; final focused typed-command tests are 55/55. Scoped
+  check/lint/fmt, `quality:gate`, and repo-wide check are green (`failedBatches: 0`).
+- Only the run-tool source template, its focused test, its generated embedded-barrel entry, and
+  harness evidence changed. No runtime, Aspire, Docker, AppHost, E2E, seed-path, PR lifecycle/base,
+  label, S9, or S10 action occurred.
+- The supervisor, not this implementation session, owns the required bounded delta IMPL-EVAL after
+  push.

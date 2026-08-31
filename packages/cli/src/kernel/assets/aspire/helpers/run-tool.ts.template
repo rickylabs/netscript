@@ -3,7 +3,15 @@
 
 import { stripVTControlCharacters } from 'node:util';
 
-const MAX_ACTIONABLE_STDERR_LINES = 3;
+const MAX_ACTIONABLE_STDERR_LINES = 32;
+const ACTIONABLE_STDERR_HEAD_LINES = 8;
+const ACTIONABLE_STDERR_TAIL_LINES = MAX_ACTIONABLE_STDERR_LINES - ACTIONABLE_STDERR_HEAD_LINES;
+const MAX_ACTIONABLE_STDERR_BYTES = 16 * 1024;
+const MAX_ACTIONABLE_STDERR_LINE_BYTES = Math.floor(
+  (MAX_ACTIONABLE_STDERR_BYTES - (MAX_ACTIONABLE_STDERR_LINES - 1)) /
+    MAX_ACTIONABLE_STDERR_LINES,
+);
+const TRUNCATION_MARKER = '…';
 
 export interface RunToolOptions {
   readonly cwd?: string;
@@ -39,7 +47,8 @@ export async function runTool(
     stderr: 'piped',
   }).spawn();
 
-  const actionableStderr: string[] = [];
+  const actionableStderrHead: string[] = [];
+  const actionableStderrTail: string[] = [];
   let stderrBuffer = '';
   let timedOut = false;
   const decoder = new TextDecoder();
@@ -49,7 +58,15 @@ export async function runTool(
     for (const line of lines) {
       const detail = stripVTControlCharacters(line).trim();
       if (!detail || detail.startsWith('Task ')) continue;
-      if (actionableStderr.length < MAX_ACTIONABLE_STDERR_LINES) actionableStderr.push(detail);
+      const boundedDetail = truncateUtf8(detail, MAX_ACTIONABLE_STDERR_LINE_BYTES);
+      if (actionableStderrHead.length < ACTIONABLE_STDERR_HEAD_LINES) {
+        actionableStderrHead.push(boundedDetail);
+        continue;
+      }
+      if (actionableStderrTail.length === ACTIONABLE_STDERR_TAIL_LINES) {
+        actionableStderrTail.shift();
+      }
+      actionableStderrTail.push(boundedDetail);
     }
   }
   const captureStderr = (async () => {
@@ -76,6 +93,7 @@ export async function runTool(
   if (timeoutId !== undefined) clearTimeout(timeoutId);
   await Promise.all([stdout, captureStderr]);
 
+  const actionableStderr = [...actionableStderrHead, ...actionableStderrTail];
   const success = status.success && !timedOut;
   const message = timedOut
     ? `deno task ${taskName} timed out after ${options.timeoutSeconds} seconds`
@@ -90,6 +108,28 @@ export async function runTool(
   }
 
   return { success, message, exitCode: status.code, actionableStderr };
+}
+
+function truncateUtf8(text: string, maxBytes: number): string {
+  const encoder = new TextEncoder();
+  const encoded = encoder.encode(text);
+  if (encoded.byteLength <= maxBytes) return text;
+
+  const markerBytes = encoder.encode(TRUNCATION_MARKER).byteLength;
+  const contentBytes = maxBytes - markerBytes;
+  const headBytes = Math.floor(contentBytes / 3);
+  const tailBytes = contentBytes - headBytes;
+  let headEnd = headBytes;
+  while (headEnd > 0 && (encoded[headEnd] & 0b1100_0000) === 0b1000_0000) headEnd--;
+  let tailStart = encoded.byteLength - tailBytes;
+  while (
+    tailStart < encoded.byteLength &&
+    (encoded[tailStart] & 0b1100_0000) === 0b1000_0000
+  ) tailStart++;
+  const decoder = new TextDecoder();
+  return `${decoder.decode(encoded.subarray(0, headEnd))}${TRUNCATION_MARKER}${
+    decoder.decode(encoded.subarray(tailStart))
+  }`;
 }
 
 if (import.meta.main) {
