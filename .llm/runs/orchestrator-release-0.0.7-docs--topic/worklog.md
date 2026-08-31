@@ -2961,3 +2961,43 @@ All required gates green at head `f09cb03d6b6c5e7ccc917885a524ed398c69c3ae`. Rep
 or Tier-A-verified-and-parked.** Seven PRs now parked awaiting GLM: #1803, #1806, #1808, #1811,
 #1813, #1816, #1818 — all Tier-A verified clean, ready to evaluate the instant GLM 5.3 Flash is
 provisioned or #1792 lands. No further #1777 implementation slices remain to size or dispatch.
+
+### Durable-state repair + the shared-corpus serial merge programme (2026-08-31)
+
+**The context-pack was materially false** — it declared the lane `EXHAUSTED / PARKED` with "no
+docs-lane issues open" while 10 issues and 11 PRs were live and four PRs were mid-merge. Rewritten
+against live GitHub. Recording the substantive lessons here so they survive a restart:
+
+**1. The mapping-row regression that nearly shipped.** Converging #1798 onto post-#1796 main by
+restoring its `check-exports-drift.ts` wholesale would have **silently deleted the `plugin-ai-core`
+row #1796 had just merged**. Nothing would have caught it: dropping a mapping row only *reduces*
+what `docs:exports-drift` polices, so the file still type-checks and every docs gate still passes.
+Caught by explicitly grepping for the previously-merged row after restore. The recipe is now:
+take the file from current main, insert only this PR's own block, assert all prior rows survive.
+
+**2. `git diff --check` run bare after committing is a no-op.** It compares working tree to index,
+so post-commit it trivially returns 0. I had been citing it as hygiene evidence across the whole
+queue. The coordinator's premerge audit caught it on #1798; re-checking with the correct
+base-relative form then found violations on **#1800, #1803, #1806, #1818** too — meaning two packets
+(#1800, #1803) had been handed over on a false clean claim. Corrected, and the correct form is now
+in the recipe. CI does not enforce this; only the premerge audit does.
+
+**3. Stale merge-refs cannot be fixed by rerun or close/reopen.** After #1764 repaired a TS2307 on
+main, `gh run rerun --failed` replayed the *same* stale merge commit (`12368ec04`), and close/reopen
+raced the merge-ref recompute — CI dispatched before GitHub finished regenerating it. The only
+reliable path to a current-base `check-test` is to converge onto current main and push a new head.
+
+**4. Evaluator guard reads the checked-out tree.** Three GLM dispatches failed with
+`evaluator model request denied` before I understood why: `claude-print.ts` validates the model
+against `OPEN_EVALUATOR_MODEL_IDS` **in the working tree**, and I was launching from a PR head based
+on pre-#1792 main, whose allowlist predates GLM. The model id was always correct. Launch the
+evaluator from a tree containing #1792.
+
+**5. Worktree contention under parallelism.** Converging in the same worktree an evaluation is using
+re-points the tree beneath it; both the #1806 and #1808 evaluators detected this mid-run and
+self-rescued into detached checkouts pinned at the exact commit. Their verdicts are sound, but this
+could have produced a read of a half-switched tree. Now allocating a dedicated worktree per
+concurrent evaluation.
+
+Shipped in this programme so far: **#1796** (main `6bb27e46a`) and **#1798** (main `584caa03f`).
+Packets handed and green: **#1800** `e122495cb`, **#1806** `b89a242a7`.

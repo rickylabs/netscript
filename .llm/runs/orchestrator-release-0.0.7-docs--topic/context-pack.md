@@ -1,107 +1,118 @@
 # Context pack — topic-docs-0.0.7
 
-**Lane status: EXHAUSTED / PARKED for milestone 0.0.7.** Every allocated issue is shipped. Nothing
-is in flight. This file is the resumable record.
+**Lane status: ACTIVE — shipping.** This file was previously and wrongly marked
+`EXHAUSTED / PARKED` with "no docs-lane issues open"; that was stale by an entire work programme.
+Reconciled against live GitHub on 2026-08-31.
 
-## Final state
+## Anchor facts
 
-| Fact                                             | Value                                                                                                                  |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Lane allocation (`milestone-cluster-state.json`) | `[1551]` — closed/completed, `status:shipped`                                                                          |
-| Docs-lane issues still open                      | **none**                                                                                                               |
-| Latest `main` (2026-08-23 reconciliation)        | `9634735bc09123b0e69e7438ea4ec763462aa072` — this lane's last merge `729386c56` is seven commits behind it            |
-| Supervisor                                       | native Claude Opus 5 / high, session `36288ff6-96bf-459b-8b1e-f289eab242e3`, bridge `cse_01PMQqcnqEbKKQQz2ipLNf7K` |
-| Topic branch                                     | `orchestrator/release-0.0.7-docs`, push by explicit refspec only                                                       |
+| Fact | Value |
+| --- | --- |
+| Current `main` | `584caa03f474de36b2d6e62e7162ab410c6ccb59` (merged #1798) |
+| Supervisor | native Claude Opus 5 · high |
+| Topic branch | `orchestrator/release-0.0.7-docs` — push by explicit refspec only |
+| Authoritative queue | every open item labelled `orchestrator:docs` — **10 issues + 11 PRs** live |
+| Merge authority | primary milestone coordinator merges; this supervisor **never** merges |
+| Evaluator route (post-#1792) | OpenRouter · **GLM 5.3 Flash** · `max` for IMPL-EVAL; **Qwen 3.8 Flash** · `max` for PLAN-EVAL when warranted. **No DeepSeek for new dispatches.** Existing DeepSeek receipts remain valid and are never re-run. |
+| Evaluator transport | `deno task agentic:claude-openrouter` → `.llm/tools/agentic/claude/openrouter-run.ts`. **Must be launched from a tree containing #1792**, because `claude-print.ts`'s guard reads `OPEN_EVALUATOR_MODEL_IDS` from the *checked-out* tree; launching from a pre-#1792 PR head yields a false `evaluator model request denied`. |
 
-## What shipped
+## Shipped this programme
 
-**PR #1652** → `e090f894f`. Seeded the comparison programme: methodology page, evidence manifest and
-measurement tool, a deferred Session case study, migration placeholders. Passed formal PLAN-EVAL
-cycle 1 and IMPL-EVAL cycle 2 after a cycle-1 `FAIL_FIX`, plus three derived-asset amendments.
+`#1794` (5 packages) → `#1790` → **#1796** (`plugin-ai-core`, main `6bb27e46a`) → **#1798**
+(`plugin-streams-core`, main `584caa03f`). Umbrella **#1777** stays open until all slices land.
 
-**PR #1660** → `729386c56`. Replaced almost all of it. The owner rejected the shipped surface as a
-protocol rather than an argument. Deleted the 151-line methodology page, the 171-line case study,
-372 lines of private-repository evidence JSON, a 718-line measurement tool with its 276-line test,
-and both migration pages. Shipped two opinionated pages with a competitor selector:
+## Ordered shared-corpus seam — the core sequencing constraint
 
-- `/netscript/comparisons/frontend/` — Next.js · Nuxt · SvelteKit · TanStack Start
-- `/netscript/comparisons/backend/` — Nest.js · Hono · Encore.dev
+Every `docs:exports-drift` slice mutates the **same four derived artifacts**
+(`.llm/assets/agent-docs/{prose.json.gz,provenance.json}`,
+`packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+`packages/mcp/src/publish-assets.generated.ts`) **and** the same
+`AUTHORITATIVE_MAPPING` array. They therefore conflict pairwise and **must merge serially**.
 
-Both verified live at HTTP 200 with correct titles and the selector present; the deleted protocol
-pages return 404.
+**Convergence recipe (do not deviate):**
 
-**Issues.** #1551 closed/completed. #1659 filed and closed/completed, 8/8 acceptance boxes with
-evidence. #1645–#1650 closed `not_planned` as superseded — the protocol backlog went with the
-protocol.
+1. Reset the branch to current `main`.
+2. Restore *only* the PR's own source: its docs page + its run directory.
+3. **Take `check-exports-drift.ts` from current `main` and insert only this PR's own mapping block.**
+   Never restore that file wholesale from the PR — its pre-merge copy will silently **drop rows that
+   landed meanwhile**. A dropped row still type-checks and passes every docs gate, because removing a
+   row only *reduces* what is policed. Assert every previously-merged row is still present afterwards.
+4. Regenerate in order: `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`.
+   Never hand-merge — one artifact is a gzip binary.
+5. Verify `provenance.json.sourceCommit` is a true ancestor of the new head.
+6. Verify the docs page is **byte-identical** to the evaluated head — that is what lets an existing
+   IMPL-EVAL PASS carry forward without a re-run.
+7. Hygiene: `git diff --check $(git merge-base origin/main HEAD) HEAD`.
 
-## The lesson this lane paid for
+## Two methodology errors to not repeat
 
-The first attempt applied **evidence-integrity rigor to a positioning artifact**. That category
-error produced a measurement protocol nobody needed, deleted the most communicative content in the
-run (LOC comparison, ~12–15% route-code saving, ASC 87–93% vs 40–53%) because it was not
-script-reproducible, and yielded pages that were accurate and lifeless. The estimates were recovered
-from GitHub `userContentEdits` and restored as clearly-labelled architectural estimates.
+- **`git diff --check` run bare after committing is a no-op** (working tree vs index) and returns 0.
+  It concealed real trailing-blank-line violations on #1798/#1800/#1803/#1806/#1818 and produced two
+  false "clean" claims in handed packets. Always use the base-relative form above. CI does **not**
+  enforce this; the coordinator's premerge audit does.
+- **`gh run rerun` replays the same commit** and cannot pick up a repaired base. Close/reopen also
+  proved unreliable (it races the merge-ref recompute). The only reliable way to get a current-base
+  `check-test` is to **converge onto current main and push a new head**.
 
-The standard that worked: a positioning page must **argue**, and every claim must be carried by code
-that is verified real. On the second attempt every API shown was confirmed against source and both
-snippets were type-checked in scratch fixtures.
+## Live queue — reconciled from GitHub
 
-## Operating rules earned here
+### Merge packets handed, awaiting coordinator
 
-1. **Never run a mutating gate, generator, or cleanup in an author worktree while its thread is
-   active.** Wait for `task_complete`, zero processes, local `==` remote, clean tree. Tier-A starts
-   read-only.
-2. **Never `git stash drop`/`pop`/`apply` without an explicit `stash@{n}`.** Stashes live in the
-   shared `.git` and `stash@{0}` is usually another lane's. Recover a mistaken drop with
-   `git stash store -m … <sha>`.
-3. **A readiness claim needs the terminal state of the exact-head Actions run**, never an
-   `agentic:pr-checks` snapshot — a snapshot taken seconds after a job completes can miss it.
-4. **Check `fmt.exclude`/`lint.exclude` before prescribing a scoped wrapper.** Three stops in this
-   run came from gates the repository excludes by configuration.
-5. **A docs change invalidates generated layers — and the 2026-08-23 list of them was wrong.**
-   See the CORRECTION below; read that before using this rule. Original text follows.
+| PR | Closes | Exact head | State |
+| --- | --- | --- | --- |
+| **#1800** | #1799 | `e122495cb7c0c61ea965e93323ea446d2be3aa79` | CLEAN, all checks pass, mapping 22 rows |
+| **#1806** | #1804 | `b89a242a737b992a651511a42a6d81f215b067f2` | CLEAN, all checks pass, GLM PASS carried forward |
 
-   **A docs change invalidates three generated layers** — agent-docs bundle → CLI assets barrel →
-   MCP publish assets. Regenerate all three in the same slice; do not let CI discover them one at a
-   time. Precision added 2026-08-23: the three have *distinct* sources, so check which actually
-   fires before demanding a regen. `agent-docs.generated.ts` is fed from
-   `.llm/assets/agent-docs/{prose.json.gz,provenance.json}` (docs/site-derived);
-   `publish-assets.generated.ts` embeds `packages/mcp/README.md` only; `embedded.generated.ts`
-   tracks the CLI scaffold assets. A `packages/<other>/README.md` edit fires none of them.
+### Evaluated PASS, needs convergence onto post-merge main
 
-## If this lane is reactivated
+| PR | Closes | Head | Evaluator |
+| --- | --- | --- | --- |
+| #1803 | #1801 | `842ee3ede` (DIRTY) | GLM 5.3 Flash max — PASS, 56-symbol gap set-equal |
+| #1808 | #1807 | `eafc1bba4` (DIRTY) | GLM 5.3 Flash max — PASS, 270 symbols / gap 157, root+public+builders 0-missing |
 
-Branch from **current `origin/main`**, not from this lane's last merge — as of the 2026-08-23
-reconciliation that is `9634735bc09123b0e69e7438ea4ec763462aa072`; re-read it before dispatch rather
-than trusting this line. `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8` is only the immutable head this
-lane shipped. The preserved Codex author threads are
-`019ffcc9-16c2-7573-b7f6-d627172408e8` (#1652 leaf, merged worktree) and
-`01a0047a-aceb-7b53-9ba1-9191eedaaf1a` (#1660 leaf, worktree
-`/home/codex/repos/netscript-007-docs-vs`) — both idle and intact. One sender per worktree: a new
-leaf needs its own worktree and its own thread.
+### Converged, awaiting evaluation
 
-Merge authority rests with the coordinator, not this lane.
+| PR | Closes | Head |
+| --- | --- | --- |
+| #1811 | #1809 | `6d5516422` |
+| #1813 | #1812 | `e937b11b6` |
+| #1816 | #1815 | `97d0801af` |
+| #1818 | #1817 | `f09cb03d6` — also has 3 pending whitespace fixes |
 
-## CORRECTION to rule 5 — recorded 2026-08-30, paid for by a red CI job
+### Outside-0.0.7 intake (converged, no milestone — they close no 0.0.7 issue)
 
-The 2026-08-23 "precision" was false where it mattered most. It said
-`publish-assets.generated.ts` "embeds `packages/mcp/README.md` only". It does not.
-`.llm/tools/generate-publish-assets.ts` consumes **`.llm/assets/agent-docs/provenance.json`** (among
-others) and embeds its `sourceCommit`, so **every** agent-docs corpus regeneration makes
-`packages/mcp/src/publish-assets.generated.ts` stale.
+| PR | Head | State |
+| --- | --- | --- |
+| #1522 | `49b1c1390` | CLEAN — DevTools RFC closeout; add-only + current-safe FILING-LOG/context merge |
+| #1640 | `d63a95e9a` | CLEAN — Prisma 8 RFC; was 55 commits behind, converged, 44 files byte-identical |
 
-Its full input set, read from the generator rather than remembered:
-`.llm/assets/agent-docs/{prose.json.gz,provenance.json}`,
-`packages/cli/src/kernel/assets/{agent-tools,agent-docs,embedded,skills}.generated.ts`, and
-`packages/plugin/src/kernel/assets/embedded.generated.ts`.
+### Newly assigned, not yet started
 
-**How it cost us.** The #1745 leaf brief used the false rule to *forbid* regenerating the file, and
-therefore left `check:publish-assets` off the gate list. Tier-A re-ran the list; an independent
-IMPL-EVAL re-ran the list; both passed. CI caught it. **A wrong gate list cannot be rescued by
-independent review** — every reviewer inherits the omission. The repair was one line.
+- **#1756** (`303be12ea`, DIRTY) — JSDoc `@example` compile gate for issue **#1533**. Has its own
+  worktree `007-leaf-1533` and a recorded PLAN-EVAL. Reuses #1374's landed machinery
+  (`snippet-compiler`/`snippet-policy`/`snippet-workspace` are directly reusable; only a JSDoc-block
+  sibling extractor plus symbol-injection and the import-specifier rule are new).
+- **#1533** (`status:triage`) — the issue behind #1756.
+- **#1777** — umbrella; keep open until every slice merges.
 
-**The rule that replaces it:** regenerate any asset whose *generator inputs* your diff touches, and
-determine that by reading the generator, never from a remembered file list. When a diff regenerates
-any corpus, run `check:publish-assets` and `check:assets-barrel` **unconditionally**. The Aspire lane
-independently paid for the same lesson in `agent-tools.generated.ts` via a conditional
-`check:assets-barrel`; two lanes, two files, one rule.
+## Known recurring hazards
+
+- **Label race**: an external automation repeatedly flips `status:ready-merge` → `status:impl-eval`
+  mid-run, which makes `close-gate` skip the acceptance mirror. Re-check the live label immediately
+  before relying on any CI run's label read. Has recurred 5+ times.
+- **Worktree contention**: converging in the same worktree an evaluation is using re-points the tree
+  under the evaluator. Both #1806 and #1808 evaluators had to self-rescue into detached checkouts.
+  **Allocate a separate worktree per concurrent evaluation** (`007-conv-*`, `007-eval-*`).
+- **Codex `acceptance-evidence` backtick drop**: implementers repeatedly strip the leading backtick
+  from the first identifier in a `box:` string, which breaks the exact-match mirror. Verify box text
+  character-for-character against the issue before promoting.
+
+## Exact next actions
+
+1. On merge of #1800 → converge **#1803** onto the new main (mapping cumulative + strip its 4 blank
+   lines), recut CI, hand packet. Its PASS carries forward.
+2. Then **#1808** (PASS already held) — same recipe.
+3. Then evaluate **#1811 → #1813 → #1816 → #1818** on GLM 5.3 Flash max, each converged first so the
+   evaluation runs against the head that will actually merge.
+4. **#1522** and **#1640** are converged and green — hand as packets when the coordinator wants them.
+5. Then **#1756/#1533**.
