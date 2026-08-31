@@ -6856,3 +6856,33 @@ Options for the primary: (a) let the evaluator judge as-is and accept a baseline
 author re-measure gate 7 at `ccd63a085` before the verdict lands, or (c) treat the docs-only proof
 above as satisfying lock 6. Not choosing unilaterally — the no-third-cycle rule makes this
 irreversible.
+
+### #1677 launched as the third parallel leaf; #1800 verified docs-only
+
+**#1800 delta (`584caa03f` → `0274c0a70`)**: same pattern as #1796/#1798 — docs, run artifacts,
+generated carriers, plus one **pure data entry** in `check-exports-drift.ts` (`mcp` added to
+`AUTHORITATIVE_MAPPING`, no control flow). Docs/generated-only confirmed by inspection, not by label.
+
+**No integration performed**: neither active leaf is at an evidence seam — #1365's author is mid-turn
+on the S2.4 generator chain, and #1773's Qwen evaluation is still running. Integrating under either
+would corrupt work in flight.
+
+**#1677 launched** — worktree `007-leaf-1677`, branch `fix/ai-usage-detail-passthrough`, base
+`0274c0a70`, thread `01a055f2-52cf-7221-b234-e4f117712eef`, route openai/gpt-5.6-sol/medium
+(requested == observed). S1 research/plan only, artifact-only, static-only, no lease.
+
+**Launcher contract quirks, recorded so the next launch is first-try clean:**
+
+1. The brief **must begin with the literal `use harness`** — the validator rejects otherwise
+   (`must begin with \`use harness\``). A `## SKILL` chapter is separately required.
+2. The leaf worktree must have **no upstream**. `git worktree add -b <branch> origin/main` sets one
+   automatically, and push-safety then refuses ("a bare push could corrupt it"). Run
+   `git branch --unset-upstream` after creating the worktree.
+3. `--expect-base` is compared against the **abbreviated** HEAD, so passing the full 40-char SHA fails
+   even when it is exactly correct. Pass the short form.
+4. `--dest` is a **file path**, not a directory, and must be writable by the launching user —
+   `/home/codex/...` is the default and does not exist for user `node`. Use `/home/agent/ns<N>-brief.md`.
+
+Three leaves now in flight, all non-colliding on handwritten paths: #1365 (`plugin-sagas-core`,
+`plugins/sagas`, saga docs, quality scanner), #1773 (`packages/cli` scaffold + e2e), #1677
+(`packages/ai`). The shared generated carriers remain the ordered integration point.
