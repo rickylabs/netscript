@@ -5456,3 +5456,37 @@
     against **current** main, and the first carrying the richer stderr. If
     `generated.quality-negative` reproduces there, its decisive line should finally be readable
     instead of truncated mid-path.
+
+- **D-227 — S8's stderr bound PASSES its delta eval; `generated.quality-negative` reproduces a third
+  time and is now the single gate blocking every S8 proof. Diagnosis dispatched.**
+  - **Stderr delta `PASS` at `bbf866d59`**, and the evaluator executed rather than reasoned:
+    re-implemented `truncateUtf8` in a scratch script; proved the worst case
+    **32 × 511 + 31 = 16,383 ≤ 16,384**; clamped 32 pathological ~180 KB multibyte lines to a measured
+    **16,309 bytes**; swept **600 cut sizes** against a 4-byte-character payload for **0 splitting
+    violations**; and **replayed the motivating case directly** — the old template persisted **zero**
+    occurrences of `P2022`, the new one retains `code` and `meta` in the tail.
+    - It also found a **second defect the change fixes**: the old code was **unbounded in bytes** — a
+      single ~30 KB line exceeded any ceiling — so the 3-line cap was not even a real bound.
+    - Honest note it volunteered: the structured test's red fires at the line-count assertion *before*
+      the field assertion, so it did not rely on that test and proved the mechanism by manual replay
+      instead. That is the right instinct.
+  - **`generated.quality-negative` failed a third time** — `33444507535` at `bbf866d59` against
+    **current main `60ae56af0`**, 59936 ms, `passed=27 failed=1`. Consistent and **not**
+    base-dependent. The suite stops at ~gate 27, so `database.seed` (gate 40) is **never reached** and
+    the seed repair stays runtime-unconfirmed. This one gate now blocks the proof of everything on
+    S8's branch.
+  - **My expectation that the richer stderr would expose it was wrong**, and worth recording: the
+    D-224 bound governs **typed `<db>-cli` commands through `run-tool`**, while this gate runs
+    `generated-quality-probes.ts` directly. Different capture path entirely.
+  - **Second, distinct observability gap found** in the e2e report: it stores `stderrTail`, but this
+    probe puts its diagnostic at the **head** — the captured text begins mid-path inside an embedded
+    `selection.files` list, so the throw message is cut. The brief therefore forbids guessing which
+    of the five possible throws fired and requires reproducing locally with **full** output.
+  - **Leading hypothesis handed over as testable, not settled:** `aspire/.helpers/run-tool.mts` appears
+    in the emitted file list, and S8's own delta evaluator recorded the residual verbatim —
+    `connectionStringExpression().getValueAsync()` is *string-tested but not locally type-checked*,
+    with "CI's generated-workspace compile is the authority". If the emitted helper no longer
+    compiles, line 144 (`generated check did not recover after quality probes`) fires. Timing fits:
+    this gate first failed at `f29a0b265`, the seed-repair head.
+  - Also required: **static coverage that type-checks the emitted helper output**, so a generator
+    emitting non-compiling source fails statically instead of at gate 27 of a runtime suite.
