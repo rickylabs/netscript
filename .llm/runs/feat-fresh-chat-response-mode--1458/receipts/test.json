@@ -1,38 +1,37 @@
 {
   "gateId": "test",
-  "invocationId": "1458-test",
+  "invocationId": "1458-int-test",
   "argv": [
     "deno",
     "task",
     "test",
-    "packages/fresh/src/runtime/ai/create-chat-connection_test.ts",
-    "packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts"
+    "packages/fresh/src/runtime/ai"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1458",
-  "gitHead": "acb096a94e8f2dc182ebc8c73be9ba421e2a6826",
-  "actualGitHead": "acb096a94e8f2dc182ebc8c73be9ba421e2a6826",
+  "gitHead": "520573e1f550950387a9714c3cc724a0ee8053eb",
+  "actualGitHead": "520573e1f550950387a9714c3cc724a0ee8053eb",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:785082",
+  "runnerIdentity": "worker:1349593",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "bcc79d489d55dcf60ae928760cbf93eb0a2d173365489b44d9918790c786a1b2",
-  "lifecycleId": "worker:785082:1458-test:1",
+  "requestHash": "7b08f7f22b3e340bd3ef44df800eb7e7064bd0ed8cdc6018bbf38b6d55ba242c",
+  "lifecycleId": "worker:1349593:1458-int-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T00:20:39.797Z",
-  "startedAt": "2026-08-31T00:20:39.799Z",
-  "finishedAt": "2026-08-31T00:20:40.703Z",
-  "durationMs": 905,
+  "claimedAt": "2026-08-31T03:51:55.899Z",
+  "startedAt": "2026-08-31T03:51:55.902Z",
+  "finishedAt": "2026-08-31T03:51:57.908Z",
+  "durationMs": 2006,
   "exitCode": 0,
   "stdout": {
-    "bytes": 406,
-    "sha256": "4dea594c8369a43108aa281d7d1086faf05858cae384c79aead4320bfc60d821",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/fresh/src/runtime/ai/create-chat-connection_test.ts\",\"packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1458\",\"exitCode\":0,\"durationMs\":787,\"summary\":{\"passed\":19,\"failed\":0,\"ignored\":0,\"totalResults\":19,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "bytes": 301,
+    "sha256": "b099d35192ad402e2bb0bc477068428fd0b0a0cb7b002379566b183e5ad36145",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/fresh/src/runtime/ai\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1458\",\"exitCode\":0,\"durationMs\":1850,\"summary\":{\"passed\":40,\"failed\":0,\"ignored\":0,\"totalResults\":40,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
-    "bytes": 265,
-    "sha256": "702ad168258cf5145a869b616773fc5452da1a267b7af0f9ec4d569d8a2e2b59",
-    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/fresh/src/runtime/ai/create-chat-connection_test.ts' 'packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts'\n",
+    "bytes": 159,
+    "sha256": "f44acb3dcf123bfc3b62742fdffa06426828e74c712d8c63b3515f07c7d3b3e6",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/fresh/src/runtime/ai'\n",
     "truncated": false
   }
 }
