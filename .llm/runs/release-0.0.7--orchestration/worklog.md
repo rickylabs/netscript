@@ -2951,3 +2951,30 @@
   and zero non-default networks. Features #1805 and docs #1803/#1806 are clean draft leaves whose
   sole parked evidence is prospective GLM evaluation; their supervisors continue immediately into
   the next feature/docs implementations rather than globally blocking on #1792.
+
+## 2026-08-31T00:27:00Z — S6 final CI repaired; feature/docs/internals queues advance
+
+- S6's literal quickstart acceptance ran once against the only supported source, published JSR
+  0.0.6, and passed all 10 gates. The receipt is explicitly baseline onboarding evidence, not
+  branch-specific S6 proof; S6-specific proof remains exact product head `32f88f90b` Phase-B
+  90/90 + 85/85. Cleanup returned Aspire, containers, volumes, non-default networks, and owned
+  relay processes exactly to zero.
+- Promotion exposed a real two-row parity-manifest drift: S6 had moved
+  `capture-db-endpoint-allocation.ts` and `prepare-readiness-fixture.ts` under `scaffold/runtime/`,
+  while the manifest still required their old paths. Bounded evidence-only commit `b6b0bb87c`
+  changes exactly those two path fields; the direct parity gate is `fail=0`. PR #1743 is now
+  non-draft, CLEAN/MERGEABLE-labelled `status:ready-merge` + `impl-eval:skip`; fresh CI run
+  `33344566953` has close-gate green and quality/check-test active. Accepted DeepSeek and
+  byte-identical product runtime evidence carry without rerun.
+- Internals #1751 PLAN-EVAL cycle 2 passed on Qwen 3.8 Flash/max at author head `c13da3e23`;
+  verdict-only commit `ed229bee5` is clean and pushed. The evaluator-only allowlist patch was fully
+  reverted and never committed. Three non-gating harness residuals are being corrected before
+  Slice 1; #1750 remains parked to honor the internals serial queue.
+- Feature #1458 produced product `acb096a94` and Tier-A evidence `c438c82db`; PR #1810 is parked
+  only at prospective GLM IMPL-EVAL while the feature supervisor selects its next leaf. Docs #1808
+  is Tier-A green at `da5b3aa79`; docs #1809 is already implementing. No lane waited globally for
+  evaluator routing.
+- A fixes #1365 author briefly attempted `scaffold.runtime` during S1 without a lease. The auditor
+  interrupted it, stopped only its exact AppHost, removed its sole owned network, and re-proved all
+  runtime state exactly zero. The attempt is non-evidence; the same author thread is restricted to
+  static/package baselines until the primary grants a serialized lease.

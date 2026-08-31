@@ -1583,3 +1583,15 @@ implementation thread.
 - A green runtime gate plus accepted evaluator evidence still requires honest metadata promotion,
   but metadata must not manufacture an evaluator rerun. S6 and #1764 are the current examples:
   exact-head receipts carry, and only acceptance/label/draft/close-gate reconciliation remains.
+
+## 2026-08-31 — runtime lease applies to research baselines too
+
+- A slice author may not invoke full scaffold, browser, Aspire, or Docker gates while gathering S1
+  baselines unless the primary coordinator has granted the sole serialized host lease. Research
+  intent does not make runtime side effects read-only.
+- If an unleased attempt starts, interrupt it, stop only its exact AppHost, remove only its owned
+  resources, prove Aspire/containers/volumes/non-default networks zero, and classify the result as
+  non-evidence. Preserve the author thread and steer it back to static/package gates.
+- Evidence-only path repairs may carry accepted evaluator and product-runtime receipts only when
+  the new diff is proved product-byte-identical. S6 D-114 qualifies: exactly two manifest path
+  substitutions, direct parity `fail=0`, and no product or runtime gate code changed.

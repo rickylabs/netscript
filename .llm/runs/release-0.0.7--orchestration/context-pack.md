@@ -1846,3 +1846,20 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Host runtime is exact zero across Aspire, containers, volumes, and non-default Docker networks.
   #1747 may request the next serialized lease only after its branch-vs-baseline fixture failure is
   bounded and a fresh exact-zero preflight is repeated.
+
+## Resume delta — 2026-08-31T00:27:00Z
+
+- Aspire S6 PR #1743 is non-draft at `b6b0bb87c`, with `status:ready-merge` and attributed
+  `impl-eval:skip`. Product/runtime changes remain byte-identical to exact Phase-B head
+  `32f88f90b`; the new commit changes only two moved paths in the Aspire surface manifest. Direct
+  parity is `fail=0`, fresh close-gate is green, and run `33344566953` is completing quality and
+  check-test. Published-JSR quickstart baseline passed 10/10; exact cleanup is zero.
+- #1751 PLAN-EVAL cycle 2 passed at author `c13da3e23`, verdict `ed229bee5`. The temporary Qwen
+  evaluator allowlist was reverted and never committed. Correct the three named harness residuals,
+  then begin Slice 1; do not start #1750 concurrently and do not run a third PLAN-EVAL.
+- Features #1458 / PR #1810 is Tier-A accepted (`acb096a94` product, `c438c82db` evidence). Docs
+  #1808 is Tier-A accepted and #1809 is live. Their only parked gate is prospective GLM evaluation
+  until #1792 lands; existing DeepSeek receipts remain untouched.
+- All local runtime commands require a primary-issued serialized lease even during research or S1.
+  The interrupted #1365 scaffold attempt is not evidence. Host state was recovered to Aspire `[]`,
+  containers 0, volumes 0, and non-default networks 0.
