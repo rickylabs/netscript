@@ -2,14 +2,14 @@
 
 ## Run Metadata
 
-| Field            | Value                                                                |
-| ---------------- | -------------------------------------------------------------------- |
-| Run ID           | `fix-garnet-readiness-timeout--0.0.7`                                |
-| Branch           | `fix/garnet-readiness-timeout`                                       |
-| Base             | `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`                           |
-| Parent archetype | `6 — CLI / Tooling`                                                  |
-| Scope overlay    | `docs` for S1 artifacts                                              |
-| Constraint       | S1 artifact-only; static, package-level, read-only measurements only |
+| Field            | Value                                                      |
+| ---------------- | ---------------------------------------------------------- |
+| Run ID           | `fix-garnet-readiness-timeout--0.0.7`                      |
+| Branch           | `fix/garnet-readiness-timeout`                             |
+| Base             | `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`                 |
+| Parent archetype | `6 — CLI / Tooling`                                        |
+| Scope overlay    | `docs` for S1 artifacts                                    |
+| Constraint       | Artifact-only while #1773 owns E2E; no local runtime lease |
 
 ## Design
 
@@ -47,6 +47,10 @@
   - `packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts`
 - No new `runtime/` child and no `packages/cli/src/**` path.
 
+The supervisor widened this lane to own the later reliability and causal-repair work. That does not
+unlock paths before the split: the pre-split ceiling above remains binding, and the causal path must
+be re-locked after named hosted evidence selects product versus fixture ownership.
+
 ### Commit Slices
 
 | # | Slice                                                                        | Gate                                                                 | Files                          |
@@ -61,6 +65,21 @@
 - Runtime execution — this leaf has no lease.
 - Timeout changes — forbidden, not deferred.
 - PLAN-EVAL and PR disposition — supervisor-owned.
+
+### Widened reliability checkpoint
+
+The reliable verifier design keeps the first measurement as its hard prerequisite and then names
+four observable states instead of collapsing them into one aggregate timeout:
+
+1. resource never published;
+2. resource published but required health key never published;
+3. required key published but never Healthy; or
+4. required key Healthy while a sibling named check blocks aggregate health.
+
+Every blocking report must retain status, description, data, exception, and health key. A repeated
+unchanged unpublished or listener-unreachable state gets the existing 30-second fixture transition
+window before failing; 300 seconds remains the unchanged outer fail-safe. This design is recorded,
+not implemented: #1773 is still open and PLAN-EVAL remains supervisor-owned.
 
 ### Contributor Path
 
@@ -82,40 +101,60 @@ result requires any path outside the locked ceiling, stop and revise the plan.
 | 2026-08-31T19:05Z | S1    | Design checkpoint        | Locked zero product paths, two future E2E paths, no new file, no timeout increase, and hosted proof standard.                                                                                                   |
 | 2026-08-31T19:06Z | S1    | Aspire evidence returned | Recorded exact run/job/head identities. Both uploaded artifacts contain aggregate timeout only; referenced Aspire logs were runner-local and not uploaded.                                                      |
 | 2026-08-31T19:15Z | S1    | #1740 lead tested        | Both tier paths provision Garnet `Mode: Auto` without `Port`; unpinned generated endpoint is unchanged across #1740. Lead retained only as a contingent real-check runtime question.                            |
+| 2026-08-31T20:32Z | S1R   | Re-baseline/collision    | `origin/main` advanced only by unrelated docs to `9fbc231729`; GitHub reports #1773 open, clean, and still owning `packages/cli/e2e/**` at `bd239f916`. No E2E edit started.                                    |
+| 2026-08-31T20:35Z | S1R   | Version verification     | Official dotnet package/tool searches confirm Aspire 13.5.3 current, Garnet upstream 2.1.5, image pin 1.1.1, tool pin 1.1.10; Aspire v13.5.3 source defaults to image tag 1.0.                                  |
+| 2026-08-31T20:38Z | S1R   | Hosted arm comparison    | Downloaded existing report artifacts only: both failed Postgres runs removed three containers; #1773 hosted SQLite removed one and Postgres three. Both tiers select the 1.1.1 container arm.                   |
+| 2026-08-31T20:40Z | S1R   | Reliability rescope      | Version skew excluded as tier-asymmetry cause and retained as cross-environment risk. Recorded four-state, full-report, 30-second-stability design; no timeout/code/version change.                             |
 
 ## Decisions
 
-| Decision                           | Reason                                                                       | Source                                                        |
-| ---------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| No diagnosis in S1                 | Timeout alone cannot select the real versus synthetic check.                 | Leaf brief plus static verifier control flow.                 |
-| Diagnostic before repair           | The two outcomes imply opposite ownership and repair paths.                  | Leaf acceptance contract.                                     |
-| Zero product path ceiling          | Product involvement is unproven; a diagnostic does not need product changes. | Plan D3/D6 and doctrine boundary.                             |
-| Edit existing verifier only        | Runtime directory is already at 12 immediate children.                       | Debt `scaffold-runtime-a8-f16-1333`; measured tree.           |
-| Keep 300 seconds                   | A larger budget hides an unsatisfied condition and is explicitly forbidden.  | Leaf constraint.                                              |
-| Hosted proof remains authoritative | Local/unit evidence cannot reproduce the Postgres-tier aggregate.            | Leaf proof standard.                                          |
-| #1740 is not a diagnosis           | Its required `entry.Port` tier difference is absent at both failing heads.   | Static tier/config and parent-to-commit generator comparison. |
+| Decision                           | Reason                                                                                                                       | Source                                                        |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| No diagnosis in S1                 | Timeout alone cannot select the real versus synthetic check.                                                                 | Leaf brief plus static verifier control flow.                 |
+| Diagnostic before repair           | The two outcomes imply opposite ownership and repair paths.                                                                  | Leaf acceptance contract.                                     |
+| Zero product path ceiling          | Product involvement is unproven; a diagnostic does not need product changes.                                                 | Plan D3/D6 and doctrine boundary.                             |
+| Edit existing verifier only        | Runtime directory is already at 12 immediate children.                                                                       | Debt `scaffold-runtime-a8-f16-1333`; measured tree.           |
+| Keep 300 seconds                   | A larger budget hides an unsatisfied condition and is explicitly forbidden.                                                  | Leaf constraint.                                              |
+| Hosted proof remains authoritative | Local/unit evidence cannot reproduce the Postgres-tier aggregate.                                                            | Leaf proof standard.                                          |
+| #1740 is not a diagnosis           | Its required `entry.Port` tier difference is absent at both failing heads.                                                   | Static tier/config and parent-to-commit generator comparison. |
+| Version skew is not the #1844 fix  | Failed Postgres and passing SQLite/Postgres observations all use image 1.1.1.                                                | Hosted artifact container receipts plus Auto-arm source.      |
+| Preserve version skew as risk      | Docker-less runs use tool 1.1.10 under the same readiness factory.                                                           | Repo pins plus official upstream version searches.            |
+| Fail stable states before 300s     | Existing report data is actionable; 30s is the established fixture transition bound and normal hosted readiness is 1.0-1.8s. | RESP result schema, fixture constants, hosted reports.        |
 
 ## Drift
 
-| Drift                                                                                           | Severity                 | Disposition                                                                                        |
-| ----------------------------------------------------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
-| `rtk` named by repo guidance is not installed on this host.                                     | minor                    | Used focused `rg` and raw Git; no evidence claim depends on filtered output.                       |
-| Broad E2E-root lint cannot produce a verdict because detached fixture catalog resolution fails. | minor baseline           | Recorded as REFUSAL, not PASS/FAIL; focused two-file lint is clean. No source or lock workaround.  |
-| Exact run/job IDs were recovered, but DCP/AppHost logs were runner-local and not uploaded.      | significant evidence gap | Record exact missing paths and require pre-cleanup `describe` plus log upload; still no diagnosis. |
+| Drift                                                                                           | Severity                 | Disposition                                                                                                 |
+| ----------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `rtk` named by repo guidance is not installed on this host.                                     | minor                    | Used focused `rg` and raw Git; no evidence claim depends on filtered output.                                |
+| Broad E2E-root lint cannot produce a verdict because detached fixture catalog resolution fails. | minor baseline           | Recorded as REFUSAL, not PASS/FAIL; focused two-file lint is clean. No source or lock workaround.           |
+| Exact run/job IDs were recovered, but DCP/AppHost logs were runner-local and not uploaded.      | significant evidence gap | Record exact missing paths and require pre-cleanup `describe` plus log upload; still no diagnosis.          |
+| The widened reliability mandate is larger than the S1 diagnostic-only plan.                     | significant rescope      | Updated the same run's Design/plan before code; PLAN-EVAL and a post-split causal ceiling remain mandatory. |
+| PR #1773 remains open although its current hosted runtime checks are green.                     | scheduling blocker       | Treat check success as comparison evidence only; do not overlap its declared E2E ownership.                 |
 
 ## Gate Results
 
 ### Static Gates
 
-| Gate                   | Command or check                                              | Result           | Notes                                                                                        |
-| ---------------------- | ------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------- |
-| E2E workspace check    | structured check wrapper, root `packages/cli/e2e`, `--ext ts` | PASS             | 185 files, 2 batches, 0 diagnostics.                                                         |
-| E2E workspace format   | structured format wrapper, same root                          | PASS             | 185 selected/processed, 0 findings/refusals.                                                 |
-| E2E workspace lint     | structured lint wrapper, same root                            | REFUSAL (exit 2) | Detached `desktop-native` fixture lacks catalog `zod`; 0 lint findings; no false PASS claim. |
-| Diagnostic-path check  | structured check wrapper on two locked files                  | PASS             | 2 files, 0 diagnostics.                                                                      |
-| Diagnostic-path lint   | structured lint wrapper on two locked files                   | PASS             | 2/2 processed, 0 findings/refusals.                                                          |
-| Diagnostic-path format | structured format wrapper on two locked files                 | PASS             | 2/2 processed, 0 findings/refusals.                                                          |
-| Lock hygiene           | base diff plus SHA-256                                        | PASS             | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical.          |
+| Gate                    | Command or check                                              | Result           | Notes                                                                                        |
+| ----------------------- | ------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------- |
+| E2E workspace check     | structured check wrapper, root `packages/cli/e2e`, `--ext ts` | PASS             | 185 files, 2 batches, 0 diagnostics.                                                         |
+| E2E workspace format    | structured format wrapper, same root                          | PASS             | 185 selected/processed, 0 findings/refusals.                                                 |
+| E2E workspace lint      | structured lint wrapper, same root                            | REFUSAL (exit 2) | Detached `desktop-native` fixture lacks catalog `zod`; 0 lint findings; no false PASS claim. |
+| Diagnostic-path check   | structured check wrapper on two locked files                  | PASS             | 2 files, 0 diagnostics.                                                                      |
+| Diagnostic-path lint    | structured lint wrapper on two locked files                   | PASS             | 2/2 processed, 0 findings/refusals.                                                          |
+| Diagnostic-path format  | structured format wrapper on two locked files                 | PASS             | 2/2 processed, 0 findings/refusals.                                                          |
+| Rescope artifact format | structured format wrapper on the three run Markdown files     | PASS             | 3/3 processed, 0 findings/refusals.                                                          |
+| Lock hygiene            | base diff plus SHA-256                                        | PASS             | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical.          |
+
+### Version/hosted comparison evidence
+
+| Check                               | Result                              | Evidence                                                                                                                                                                               |
+| ----------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aspire integration/CLI/SDK currency | PASS                                | Official `dotnet package search --exact-match --format json` ends at 13.5.3 for Garnet, Redis, CLI, and AppHost SDK.                                                                   |
+| Garnet upstream currency            | PASS                                | Official `dotnet tool search garnet-server --detail` and Microsoft container registry both report 2.1.5 latest.                                                                        |
+| Aspire compatibility default        | PASS                                | Aspire v13.5.3 `GarnetContainerImageTags.Tag` is `1.0`; no 2.x compatibility inference made.                                                                                           |
+| Tier arm comparison                 | PASS                                | Failure artifacts `9763351747`/`9770814732`: three removed containers each. Hosted comparison run `33425281612`: SQLite one, Postgres three; both Garnet waits passed at 1758/1007 ms. |
+| Incident classification             | EXCLUDED causal / CONTRIBUTORY risk | Same 1.1.1 arm across tiers excludes skew as the tier-asymmetry cause; 1.1.1 versus 1.1.10 remains a Docker/Docker-less reliability risk.                                              |
 
 ### Focused Tests
 

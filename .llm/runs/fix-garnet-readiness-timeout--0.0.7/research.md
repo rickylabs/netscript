@@ -7,6 +7,10 @@
 - Re-derived against `origin/main` at `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d` on 2026-08-31.
   `HEAD`, `origin/main`, and their merge base were identical; the worktree was clean before S1
   artifact creation.
+- Widened-mandate re-baseline at 2026-08-31T20:32Z: `origin/main` advanced to
+  `9fbc2317291dbd33c325782bb33d86a99ee5a027` through an unrelated plugin-sagas-core documentation
+  commit. The S1 artifact commit remains based on `8f1fcb2bc`; no target readiness/version path
+  differs between those two main commits.
 - Branch: `fix/garnet-readiness-timeout`.
 - What changed versus the carried-in brief: no defect claim changed. Static inspection found that
   the current failing path cannot preserve the per-check evidence the brief requires, so the split
@@ -114,6 +118,70 @@ inputs, and #1740 does not change the generated Garnet endpoint for those inputs
 not a supported diagnosis or the current prime suspect. Keep it only as a contingent runtime check
 if the split implicates the real check and hosted evidence contradicts the static no-Port path.
 
+## Version currency and arm comparison
+
+The repo-native dependency wrapper was consulted first. `deno task deps:latest --help` confirms that
+it inventories workspace JSR/npm dependencies, not NuGet packages, .NET tools, or container tags.
+The upstream verification below therefore used the official `dotnet package search` /
+`dotnet tool
+search` clients plus primary Aspire/Garnet sources; no registry curl or version
+inference was used.
+
+| Component                       | Checked-in pin                   | Upstream/default verified 2026-08-31                                                      | Evidence                                                                                                                                                                                                                                                                                                   | Disposition                                                            |
+| ------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `Aspire.Hosting.Garnet`         | `13.5.3`                         | NuGet latest stable `13.5.3`                                                              | `SCAFFOLD_ASPIRE_INTEGRATIONS.GARNET`; `dotnet package search Aspire.Hosting.Garnet --exact-match --format json`; [NuGet](https://www.nuget.org/packages/Aspire.Hosting.Garnet/13.5.3)                                                                                                                     | current                                                                |
+| `Aspire.Hosting.Redis`          | `13.5.3`                         | NuGet latest stable `13.5.3`                                                              | `SCAFFOLD_ASPIRE_INTEGRATIONS.REDIS`; exact `dotnet package search`; [NuGet](https://www.nuget.org/packages/Aspire.Hosting.Redis/13.5.3)                                                                                                                                                                   | current                                                                |
+| Aspire CLI / AppHost SDK        | `13.5.3` / `13.5.3`              | latest stable `13.5.3` for both                                                           | `.github/toolchain.env`; `SCAFFOLD_VERSIONS.ASPIRE_SDK`; exact searches for `Aspire.Cli` and `Aspire.AppHost.Sdk`; [CLI](https://www.nuget.org/packages/Aspire.Cli/13.5.3), [SDK](https://www.nuget.org/packages/Aspire.AppHost.Sdk/13.5.3)                                                                | current                                                                |
+| Garnet container arm            | `ghcr.io/microsoft/garnet:1.1.1` | Aspire 13.5.3's `AddGarnet` default is `1.0`; upstream Garnet container latest is `2.1.5` | generator constant; Aspire tag source [`GarnetContainerImageTags.cs`](https://github.com/dotnet/aspire/blob/v13.5.3/src/Aspire.Hosting.Garnet/GarnetContainerImageTags.cs); [Garnet package versions](https://github.com/microsoft/garnet/pkgs/container/garnet/versions?filters%5Bversion_type%5D=tagged) | one major line behind upstream, but newer than Aspire's tested default |
+| Docker-less `garnet-server` arm | `1.1.10`                         | NuGet tool latest stable `2.1.5`                                                          | `SCAFFOLD_VERSIONS.GARNET_TOOL`; `dotnet tool search garnet-server --detail --take 10`; [NuGet tool](https://www.nuget.org/packages/garnet-server)                                                                                                                                                         | one major line behind and inconsistent with the image arm              |
+
+### Do the Postgres and SQLite tiers select different arms?
+
+**No in the hosted paths measured here.** Both suites install the same plugin-provisioned entry
+`{ Enabled: true, Engine: 'Garnet', Mode: 'Auto' }`, with neither `Port`, `ImageTag`, nor
+`ToolVersion`. `Mode: Auto` selects the container arm when `docker info` succeeds. The hosted
+reports supply runtime evidence in addition to that static path:
+
+- Both 300-second Postgres failures removed three suite-created containers after the timeout. For a
+  Postgres scaffold those are the Postgres, default Redis, and named Garnet resources; the Garnet
+  executable arm would not create the third container. Their failure heads generate the explicit
+  `ghcr.io/microsoft/garnet:1.1.1` image.
+- A later hosted comparison at PR #1773 head `bd239f9160e7b65808bd7c4fc8bbd61c91e3dd99`, run
+  [`33425281612`](https://github.com/rickylabs/netscript/actions/runs/33425281612), used one
+  suite-created container on the SQLite tier and three on the Postgres tier. The only container in
+  the SQLite profile is Garnet. `runtime.wait.garnet` passed in 1758 ms on SQLite and 1007 ms on
+  Postgres (jobs
+  [`99597333509`](https://github.com/rickylabs/netscript/actions/runs/33425281612/job/99597333509)
+  and
+  [`99597333333`](https://github.com/rickylabs/netscript/actions/runs/33425281612/job/99597333333)).
+
+**Classification:** version skew is **excluded as the cause of the observed Postgres-versus-SQLite
+tier asymmetry** because both select the same `1.1.1` container arm. The later hosted Postgres pass
+also proves that image/version can satisfy the check, although it does not explain the two earlier
+failures and cannot replace their missing per-check split. The `1.1.1`/`1.1.10` divergence is a
+**contributory cross-environment reliability risk** for Docker versus Docker-less runs, not a
+demonstrated cause of #1844. This issue should not bump to 2.x or align versions without a
+Docker-less failure/compatibility proof; Aspire 13.5.3 itself defaults to the 1.0 image line.
+
+## Reliability requirement exposed by the timeout
+
+Irrespective of which key the hosted split implicates, the current verifier has four observable
+states but reports only the final aggregate timeout:
+
+1. matching resource never appears in `aspire describe`;
+2. resource appears but the required health key never appears;
+3. key appears but remains non-Healthy, with its `description`, `data` (`code`, `host`, `port`,
+   `elapsedMs`), and possible exception explaining what was observed; or
+4. required key is Healthy but another named report blocks aggregate health.
+
+The generated RESP check already distinguishes `ECONNREFUSED`, `ETIMEDOUT`, `EPROTO`, `NOAUTH`, and
+other socket codes and records host/port. The information loss is in the E2E verifier: it waits on
+aggregate health before it reads `healthReports`, and its parser currently drops report `data` and
+exception detail. A reliable verifier must poll the described resource/report, preserve the full
+named map, classify the four states explicitly, and terminate a stable unreachable/unpublished
+condition on the existing 30-second readiness-fixture observation deadline rather than waiting
+silently for the 300-second outer ceiling. The outer ceiling remains unchanged as a fail-safe.
+
 ## Findings
 
 | #  | Finding                                                                                                                                                                                                                                                                                       | How to verify                                                                                                                        |
@@ -128,6 +196,9 @@ if the split implicates the real check and hosted evidence contradicts the stati
 | 8  | `runtime/` already has 12 immediate children. Existing debt `scaffold-runtime-a8-f16-1333` forbids adding a thirteenth; the diagnostic must edit the existing `verify-listener-readiness.ts` rather than add a probe file.                                                                    | direct-child measurement; `.llm/harness/debt/arch-debt.md`.                                                                          |
 | 9  | PR #1773 is live at head `bd239f9160e7b65808bd7c4fc8bbd61c91e3dd99` (merge ref `5d846f212099a81fa9420b68f1e58b06adb56451`) and changes seven `packages/cli/e2e/**` paths. It does not directly edit the proposed two diagnostic files, but its declared ownership makes the collision active. | `git ls-remote origin refs/pull/1773/{head,merge}`; base-to-head name diff.                                                          |
 | 10 | The #1740 `entry.Port` hypothesis does not explain the tier asymmetry statically: both failing heads supply the same unpinned Garnet entry, and undefined produces the pre-change endpoint declaration.                                                                                       | failure-head `workspace-mutator.ts`, suite defaults, #1740 parent/commit generator diff, and current generator test fixture.         |
+| 11 | Both failing Postgres runs and the hosted SQLite comparison select the Garnet container arm; version skew cannot explain the tier asymmetry.                                                                                                                                                  | failure artifacts' created-container receipts; #1773 hosted Postgres/SQLite report artifacts; Auto-arm generator.                    |
+| 12 | The two arms are nevertheless pinned inconsistently (`1.1.1` image versus `1.1.10` tool), while upstream is `2.1.5`; this is latent cross-environment risk, not incident causality.                                                                                                           | repo pins; official dotnet searches; Aspire v13.5.3 image-tag source; Garnet package registry.                                       |
+| 13 | The RESP factory already reports code/host/port; the verifier discards those fields and cannot distinguish unpublished, expected-key unhealthy, or sibling-key blocking states.                                                                                                               | `_aspire-compat.ts.template`; `verify-listener-readiness.ts`; Aspire 13.5 describe receipt.                                          |
 
 ## Baselines measured at the base commit
 
@@ -165,3 +236,6 @@ scaffold, `e2e:cli`, or generated runtime command was run.
    downstream of the split and must not be used to speculate before it.
 5. If the real check is implicated, does hosted `describe` show a host/port that contradicts the
    statically unpinned endpoint path? Only that evidence would reactivate the #1740 lead.
+6. After the split, does the stable failure remain unchanged for the existing 30-second fixture
+   observation window? That measurement selects a fail-fast terminal rule without shortening
+   transient healthy startup.
