@@ -9036,3 +9036,40 @@ immutable pending #1792: `#1387` Slice 9, `#1591`, `#1458`. All three Tier-A ACC
 draft PRs, none touched further until GLM 5.3 Flash routing lands or a fresh ruling arrives.
 
 Selecting the next feature from the audited candidate set now.
+
+## #1592 — deep research revealed a partial-slice shape; Slice 1 dispatched
+
+Investigated in real depth before scoping. Initial read of the issue suggested three-layer complexity
+(schema + runtime + stream, "ordering/coalescing/replay" as an open design question) matching #1451's
+shape — but tracing the actual code found something better: `KvExecutionState`'s `queue`/`start`/
+`complete` all funnel through one `#transition → #save` helper that **already** persists to KV and
+**unconditionally invokes a mutation hook already wired to the durable-stream publish pipeline**
+(`createStreamMutationHook` → `producer.upsert`). Adding a `progress()` method in that exact shape
+needs **zero new publish plumbing** — persistence and stream publication both happen automatically
+through machinery three other methods already exercise.
+
+**What genuinely could not be resolved:** the runtime wiring from `ctx.reportProgress()` (called
+inside a running job) to this new state method. `WorkerOutboundMessage`/`JobProgressMessage`
+(`runtime/messages.ts`) model a `'progress'` message type, but neither `job-dispatcher.ts` nor
+`in-process-job-runner.ts` contains any code reading or acting on ANY outbound message — the protocol
+type exists with no found consumer. Rather than force a ceiling around an unverified assumption (in
+either direction — "it's simple" or "it's complex"), scoped this as an **honest partial slice**:
+persist + publish (fully bounded, precedent-matched, PLAN-EVAL: N/A) now; the runtime-wiring half and
+the "document ordering/coalescing/replay" requirement explicitly deferred, stated plainly in the PR
+body (`Refs #1592 — partial`, no closing keyword) rather than silently dropped or guessed at.
+
+| Field | Value |
+| --- | --- |
+| Branch | `feat/workers-execution-progress` (new, off `main` `5197e70b7`) |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1592` |
+| Codex thread | `01a05536-fa9d-7b51-867e-52139653d812`, `openai · gpt-5.6-sol · high` |
+| Ceiling | four product files (`job-definition.ts`, `execution-state.ts`, `streams/schema.ts`, `streams/producer.ts`) plus a new `execution-state` test file — confirmed none exists today |
+| Base | `7b9ed9f5a` |
+
+Also confirmed no existing test file covers `KvExecutionState` at all — the brief points the
+implementer at this package's own existing testing-fixture conventions rather than inventing a new
+one, and requires the mutation-hook invocation itself be proven (not just persistence), since that's
+the one behavior this slice is actually about. D-1's cache-trap finding carried forward again.
+
+Four parked/active leaves now: `#1387` Slice 9 (parked), `#1591` (parked), `#1458` (parked), `#1592`
+Slice 1 (dispatching now). All evaluation gated on #1792; no DeepSeek relaunch on any of them.
