@@ -127,6 +127,7 @@ export const GATE = {
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
   RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
+  BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',

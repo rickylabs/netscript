@@ -36,6 +36,7 @@ the lease. Detailed files, constants, order, gates, and deferred scope are locke
 | 2026-08-31 | PLAN-EVAL 2 | `PASS_PLAN` | Separate OpenRouter Qwen 3.8 Flash evaluator, attested `xhigh`, authorized implementation with all seven locks enforced. |
 | 2026-08-31 | S1 RED | Semantic failure | Focused wrapper compiled: 72 passed / 7 failed; filtered conventions wrapper compiled: 0 passed / 1 failed. Failures are missing dynamic seed/asset/gate/catalog/convention behavior plus valid-response rejection; href-only, id-only, and HTTP-500 negatives pass. |
 | 2026-08-31 | S2 GREEN | Scaffold surface | Added the product-owned `[id].tsx` route, generator-compatible seeds, stable router alias, `order-42` examples link, canonical/retained references, and regenerated embedded assets. Focused tests 39/39 plus convention 1/1; scoped check zero diagnostics; asset barrel current. |
+| 2026-08-31 | S3 GREEN | Runtime gate | Implemented the injectable HTTP-semantic probe and critical command gate. Both request modes share one nonce; negative marker/status and zero-candidate cases are covered. Catalog and registration order are exactly app-home → dynamic-route → app-reference. Focused tests 49/49; scoped check clean. |
 
 ## Decisions
 
@@ -72,6 +73,9 @@ though default scaffold output does not. See `drift.md`; scope is unchanged.
   test exit 0, 1 passed; scoped check selected 9 files in 1 batch with 0 diagnostics;
   `deno task check:assets-barrel` exit 0. Receipts: `receipts/s2-scaffold-green.json`,
   `receipts/s2-conventions-green.json`, `receipts/s2-scaffold-check.json`.
+- S3 runtime GREEN: focused probe/gate/registry tests exit 0, 49 passed; scoped check selected
+  7 files in 1 batch with 0 diagnostics. Receipts: `receipts/s3-runtime-green.json`,
+  `receipts/s3-runtime-check.json`.
 
 ## Handoff Notes
 

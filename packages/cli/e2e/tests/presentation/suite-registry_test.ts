@@ -278,12 +278,14 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_APP), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
-  const runtimeGateIds = runtime.gates.map((gate) => String(gate.id));
-  const dynamicRouteIndex = runtimeGateIds.indexOf('behavior.app-dynamic-route');
+  const dynamicRouteIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE
+  );
   const referenceIndex = runtime.gates.findIndex((gate) =>
     gate.id === GATE.BEHAVIOR_APP_REFERENCE
   );

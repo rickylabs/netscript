@@ -35,3 +35,10 @@ The scaffold implementation follows the locked product-seed decision and file pl
 test compares imported generator and seed subtrees rather than source quote/comma formatting; it
 asserts exact pattern, routePattern, metadata id/kind, and nonce href equality. This is the planned
 semantic subtree equality, not a scope or contract change.
+
+## 2026-08-31 — S3 runtime GREEN (none)
+
+The probe uses the existing generated-app endpoint resolver and mirrors the neighboring reference
+probe's candidate iteration and zero-candidate failure. It adds no retry layer because app-home has
+already established readiness immediately before it. The catalog, registration, permissions, and
+critical default match the locked plan with no drift.

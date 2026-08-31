@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `test-scaffold-dynamic-route-gate--1616` |
 | Branch | `test/scaffold-dynamic-route-gate` |
-| Current phase | `implementation — S2 scaffold GREEN` |
+| Current phase | `implementation — S3 runtime GREEN` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Cycle-2 PLAN-EVAL returned `PASS_PLAN`. S1 RED is committed separately and S2 now makes the
-product scaffold contract green; no expensive runtime gate has run.
+Cycle-2 PLAN-EVAL returned `PASS_PLAN`. S1 RED, S2 scaffold GREEN, and S3 runtime-gate GREEN are
+separate commits; no expensive runtime gate has run.
 
 ## Completed
 
@@ -30,16 +30,18 @@ product scaffold contract green; no expensive runtime gate has run.
   exposed its generated reference through `appRoutes.order`, and linked `order-42` from examples.
 - Proved seed/generator equality, template use of `ctx.path.id`, bound href derivation, and absence
   of `ctx.params`, `ctx.url`, or a literal fallback.
+- Added the injectable HTTP probe, stable gate id, command registration, and exact catalog order.
+- Proved one nonce across plain/partial GETs, mutually exclusive marker failures, status-first 500
+  failure, no partial header, and zero-candidate failure semantics.
 
 ## In Progress
 
-- Commit and push S2 scaffold GREEN before implementing the runtime gate.
+- Commit and push S3 runtime GREEN before lease-free hardening.
 
 ## Next Steps
 
-1. Implement S3 runtime-gate GREEN and exact catalog order.
-2. Run lease-free hardening; keep scaffold.runtime `NOT_RUN — lease required`.
-3. Stop for separately dispatched IMPL-EVAL.
+1. Run lease-free hardening; keep scaffold.runtime `NOT_RUN — lease required`.
+2. Record final implementation artifacts and stop for separately dispatched IMPL-EVAL.
 
 ## Key Decisions
 
@@ -59,9 +61,9 @@ product scaffold contract green; no expensive runtime gate has run.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PARTIAL_GREEN | Scaffold tests 39/39, convention 1/1, scoped check clean. Runtime RED remains. |
+| Static | GREEN | Scaffold tests 39/39 + 1/1; runtime tests 49/49; scoped checks clean. |
 | Fitness | NOT_RUN | Planned after implementation. |
-| Runtime | LEASE_BLOCKED | Explicit owner boundary; no lease held. |
+| Runtime | LEASE_BLOCKED | Probe contract green; live `scaffold.runtime` remains lease-required. |
 | Consumer | GREEN | Default seed/template now own the dynamic route; live composition remains leased. |
 
 ## Open Questions
