@@ -122,6 +122,11 @@ when the child exit is non-zero.
 | 2026-08-31 | 1 | RED contract/classification | Added the finite PID, rollout, thread, provenance, staleness, and eviction-reason contracts plus table-driven expectations. The classifier remains a fail-closed `indeterminate` seam; no launch, repair, adapter, record, or resume behavior changed. |
 | 2026-08-31 | 1 | RED gate | Targeted structured test wrapper exited 1: 16 passed, 11 failed. All 11 failures are the new contract expectations (7 `preserve`, 4 `stale`); existing and new `indeterminate` cases pass. |
 | 2026-08-31 | 1 | Handoff | Implementation-lane commit/push/comment is followed by a hard stop for Tier-A substantive review. Slice 2 is not dispatched. |
+| 2026-08-31 | 1 | Tier-A acceptance | Coordinator and supervisor accepted the committed RED boundary at `c6dd9e363`; the test blob hash was later reconfirmed unchanged through Slice 2. |
+| 2026-08-31 | 2 | GREEN accepted | Supervisor accepted `dc8361a06`: exact Slice 1 test went 27/27 green by implementation alone; focused launch/adapters were 17/17 and the full agentic suite was 515/515. |
+| 2026-08-31 | 3 | RED repair lifecycle | Added only the four declared test files for audited restart-stale apply, changed-token CAS, foreign/unknown no-op, strict rollout failure, read-only thread state, CLI dry-run, and a real live child/writer whose record must survive. All sender, evidence, and session paths are test-owned/injected and assert they are not the production sender root; child cleanup is bounded and reaped in `finally`. |
+| 2026-08-31 | 3 | RED gate | Exact targeted structured wrapper exited 1 with `REAL_EXIT=1`: 0 passed, 10 failed, 0 ignored. Every failure names an expected missing Slice 4 module, command, or injected CLI runner; no implementation behavior was added. |
+| 2026-08-31 | 3 | Handoff | Commit/push/comment is followed by a hard stop for Tier-A substantive review. Slice 4 is not started. |
 
 ## Decisions
 
@@ -199,4 +204,28 @@ The failing test names cover the full stale conjunction (terminal and proven-abs
 negative signal in isolation, alive PID evidence, working/stalled rollout, and an active writer.
 Foreign ownership, unknown signals, provenance/identity mismatch, insufficient debounce, missing
 session identity, and conflicting absence remain fail-closed and already pass as `indeterminate`.
-Tier-A review is pending; the post-slice reconcile/sign-off step and Slice 2 are not started.
+At the Slice 1 RED boundary, Tier-A review and Slice 2 had not started; the later progress rows above
+record their acceptance and completion.
+
+## Slice 3 RED Evidence
+
+The exact focused command used real shell exit capture (`out=$(cmd); rc=$?`) and did not use a
+pipeline. Its structured result was `REAL_EXIT=1`, 10 total, 0 passed, 10 failed, 0 ignored, with
+the following failing test names:
+
+1. `restart-stale apply persists both evidence passes before exact-token eviction`
+2. `foreign ownership is a no-op before probing or receipt persistence`
+3. `unknown evidence is fail-closed with no receipt or eviction`
+4. `changed-token CAS race retains the replacement sender record`
+5. `strict rollout inventory errors stay unknown rather than proven absent`
+6. `a real live child writer preserves its sender record and is boundedly reaped`
+7. `thread/read request is read-only and normalization preserves systemError as unknown`
+8. `thread/read parser distinguishes a bound not-loaded thread from JSON-RPC absence`
+9. `runtime CLI parses one sender-lease dry-run through the guarded planner command`
+10. `runtime CLI dry-run uses injected roots and reports planned without mutation`
+
+The grouped failure reasons are the three absent Slice 4 modules
+(`sender-lease-repair.ts`, `local-sender-lease-repair-adapter.ts`, and `codex-thread-read.ts`), the
+currently unsupported `repair sender-lease` CLI parse, and the absent injected CLI runner. This is
+the intended pre-implementation RED shape. Structured check, lint, and non-mutating format wrappers
+over the four owned test files each passed with four files selected and zero diagnostics/findings.
