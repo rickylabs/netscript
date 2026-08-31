@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1592-fix-test",
+  "invocationId": "1592-seam-test",
   "argv": [
     "deno",
     "task",
@@ -8,24 +8,24 @@
     "packages/plugin-workers-core/tests"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1592",
-  "gitHead": "4bedaa91c17722fb5e45e7e31912d81378e591cf",
-  "actualGitHead": "4bedaa91c17722fb5e45e7e31912d81378e591cf",
+  "gitHead": "da25f50da8a088b2518c056e4fda301728bc17ae",
+  "actualGitHead": "da25f50da8a088b2518c056e4fda301728bc17ae",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:1652975",
+  "runnerIdentity": "worker:1736848",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "065bd0393d37664347215eee2f89929877b47a58454899a67d103cc64c4daab8",
-  "lifecycleId": "worker:1652975:1592-fix-test:1",
+  "requestHash": "e0101c46cd7a8e43856a776f2a0c5a7cd6a6d0a439963bedabd9b2aae1541f7d",
+  "lifecycleId": "worker:1736848:1592-seam-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T04:48:04.858Z",
-  "startedAt": "2026-08-31T04:48:04.859Z",
-  "finishedAt": "2026-08-31T04:48:06.090Z",
-  "durationMs": 1231,
+  "claimedAt": "2026-08-31T05:06:38.769Z",
+  "startedAt": "2026-08-31T05:06:38.771Z",
+  "finishedAt": "2026-08-31T05:06:40.018Z",
+  "durationMs": 1247,
   "exitCode": 0,
   "stdout": {
     "bytes": 306,
-    "sha256": "651884e6cb9b90261954c9bc97595e84c7c2d726bb73a2808331591a9696a95d",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin-workers-core/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1592\",\"exitCode\":0,\"durationMs\":1113,\"summary\":{\"passed\":29,\"failed\":0,\"ignored\":0,\"totalResults\":29,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "888ac8fbdc9215815f53f1774a47bd36b6258c43bf74e66dc0c9c886ce7c6724",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin-workers-core/tests\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1592\",\"exitCode\":0,\"durationMs\":1133,\"summary\":{\"passed\":29,\"failed\":0,\"ignored\":0,\"totalResults\":29,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {
