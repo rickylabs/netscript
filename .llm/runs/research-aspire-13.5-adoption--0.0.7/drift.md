@@ -5368,3 +5368,34 @@
   - **Recut requested via `gh run rerun --failed`** — the no-push path, so the evaluated head does not
     move and the delta PASS stays valid. Runtime groups verified **free** (busy=0) before triggering,
     so no other lane was evicted.
+
+- **D-224 — raising `MAX_ACTIONABLE_STDERR_LINES`; the 3-line bound has destroyed diagnostics twice.**
+  Dispatched on S8's branch at `f29a0b265` — the constant lives in S8's own D-07 surface
+  (`packages/cli/src/kernel/assets/aspire/helpers/run-tool.ts.template:6`, enforced at line 52), so it
+  belongs with its owner rather than in a parallel leaf that would collide.
+  - **Evidence for the change, both first-hand from this run:**
+    1. the `database.seed` Prisma failure — retained detail ends at
+       `Invalid prisma.user.findFirst() invocation:`, and line 4 onward carrying **`code`** and
+       **`meta`** was structurally dropped. An independent evaluator fetched the full **237,687-byte**
+       job log and confirmed those fields were **never serialized**; the repair had to be justified
+       from code-path evidence alone;
+    2. `generated.quality-negative` on run `33428877123` — the retained stderr begins **mid-path
+       inside a file list**, so the decisive error line is absent from the console entirely.
+  - **Brief keeps the cap rather than removing it.** An unbounded field would trade one failure mode
+    for a worse one. It requires a justified new line limit **plus a total byte ceiling**, so a single
+    enormous line cannot blow the field up.
+  - **Named the real defect in the current strategy:** retaining the *first* N lines is precisely what
+    lost the Prisma fields, because the informative part came **after** the banner-ish preamble. The
+    brief invites a bounded head-and-tail or structured-field preference — but explicitly **forbids
+    Prisma-specific parser heuristics**, since this seam is generic, and allows keeping
+    head-retention if the agent judges the alternative too clever, provided it says why.
+  - Existing behaviour must survive: first actionable line remains `message`, `Task ` banners still
+    filtered, `stripVTControlCharacters` still runs before classification, `actionableStderr` stays
+    additive, barrel regenerated and `check:assets-barrel` diff-clean.
+  - Required test: a fixture whose identifying field sits **beyond line 3**, asserted to survive into
+    the persisted error file, **red without the change** — with D-07's original ANSI-banner test still
+    passing unchanged.
+  - Product bytes move, so a bounded delta IMPL-EVAL follows; the current delta PASS at `f29a0b265`
+    does not cover it.
+  - Twelfth dead-sender orphan released before launch (`ownerPid 2868588`); upstream unset first, since
+    the launcher refuses a worktree with one.
