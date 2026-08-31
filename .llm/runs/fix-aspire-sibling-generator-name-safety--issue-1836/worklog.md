@@ -82,6 +82,7 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 | 2026-08-31T09:16:53Z | 2 | implementation | Replaced user-derived bindings with `app_<n>`, ordinal plugin-reference, `tool_<n>`, `db_<n>`, and `cache_<n>` bindings; encoded emitted user strings with `JSON.stringify`. |
 | 2026-08-31T09:16:53Z | 2 | GREEN | Focused generator set exited 0: 156 passed, 0 failed. Scoped check exited 0 with `failedBatches: 0`; scoped lint and both style-family format batches exited 0 with no findings. |
 | 2026-08-31T09:16:53Z | 3 | mutation | Name-derived binding mutant exited 1 with 0 passed / 4 failed; independent raw-literal mutant exited 1 with 0 passed / 4 failed. Restored source-safety test exited 0 with 4 passed / 0 failed. |
+| 2026-08-31T09:23:26Z | 3 | repository gates | Root check, quality scan, architecture check, and asset-barrel check all exited 0; lock/generated-file hygiene is clean. |
 
 ## Decisions
 
@@ -113,6 +114,12 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 | Ordinal-binding mutation | focused hostile generator contract | FAIL (expected) | Exit 1; 0 passed / 4 failed. Apps/tools/infrastructure emitted reserved-word bindings; plugin reference bindings emitted hostile user text. |
 | Literal-escaping mutation | focused hostile generator contract | FAIL (expected) | Exit 1; 0 passed / 4 failed. Raw hostile Workdir/TaskName/DataPath interpolation made every emitted module unparsable. |
 | Restored hostile generator contract | focused hostile generator contract | PASS | Exit 0; 4 passed / 0 failed after both mutants were explicitly restored. |
+| Root check | `deno task check` | PASS | Exit 0; 2,976 selected files, 25 batches, `failedBatches: 0`, no diagnostics. |
+| Quality scan | `deno task quality:scan` | PASS | Exit 0; repository scan returned `ok: true`, no findings or allowance failures. |
+| Architecture | `deno task arch:check` | PASS | Exit 0; no doctrine failures. Existing repository warning inventory remains, including the pre-existing CLI file-size category. |
+| Asset barrel | `deno task check:assets-barrel` | PASS | Exit 0; generation produced no tracked asset/barrel diff. |
+| Lock hygiene | `git diff --exit-code -- deno.lock` | PASS | Exit 0; lockfile unchanged. |
+| Final worktree hygiene | `git status --short` and generated-file diff | PASS | Clean after implementation commit; no generated asset drift. |
 
 ### Fitness Gates
 
@@ -131,9 +138,10 @@ Extend the focused hostile-input case for that field and keep the Deno parse ass
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| Generated AppHost modules | RED | Deno lint parse of four temp `.mts` files | All four invalid before production repair, as required. |
+| Generated AppHost modules | PASS | Deno lint parse of four temp `.mts` files | All four hostile renders parse after repair; both safeguard mutants fail all four. |
 
 ## Handoff Notes
 
-- Evaluator should inspect the focused hostile-input matrix and rerun both mutation classes before
-  accepting gate evidence.
+- Implementation is ready for the mandatory supervisor-dispatched separate-session IMPL-EVAL.
+- PR must remain draft and retain `status:impl` until that external evaluator completes.
+- No runtime, Aspire, Docker, AppHost, or CLI E2E command was run.

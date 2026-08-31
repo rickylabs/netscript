@@ -6,15 +6,15 @@
 | ----- | ----- |
 | Run ID | `fix-aspire-sibling-generator-name-safety--issue-1836` |
 | Branch | `fix/aspire-sibling-generator-name-safety` |
-| Current phase | `implement` |
+| Current phase | `implementation handoff — IMPL-EVAL pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The draft PR is open and the tests-only RED slice is pushed. All four production generators now use
-ordinal bindings and JSON-rendered user strings. The focused six-file generator suite passes 156/156,
-and both required mutants fail all four hostile-input contracts before the fixed source is restored.
+The draft PR is open. All four production generators use ordinal bindings and JSON-rendered user
+strings. The focused six-file generator suite passes 156/156, both required mutants fail all four
+hostile-input contracts before restoration, and every requested non-runtime repository gate exits 0.
 
 ## Completed
 
@@ -32,16 +32,18 @@ and both required mutants fail all four hostile-input contracts before the fixed
 - Repaired all four generators and updated existing semantic assertions for ordinal bindings and
   JSON-rendered literals.
 - Captured focused GREEN, scoped check/lint evidence, and both four-of-four mutation failures.
+- Completed root check (`failedBatches: 0`), quality, architecture, asset-barrel, lock-hygiene, and
+  generated-file checks with exit 0.
 
 ## In Progress
 
-- Finish the split scoped format check, then commit and push the implementation slice.
+- Commit and push this final gate-evidence artifact update.
 
 ## Next Steps
 
-1. Commit/push/comment the implementation slice.
-2. Run root check, quality, architecture, assets-barrel, and lock-hygiene gates.
-3. Commit/push/comment the final gate evidence and hand off for supervisor-dispatched IMPL-EVAL.
+1. Keep PR #1837 draft with `status:impl`.
+2. Supervisor dispatches the mandatory separate-session IMPL-EVAL.
+3. Address evaluator findings, if any, without self-certification.
 
 ## Key Decisions
 
@@ -63,7 +65,7 @@ and both required mutants fail all four hostile-input contracts before the fixed
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | RED captured | Focused wrapper exit 1; 0 passed / 4 parser failures. |
-| Fitness | partial GREEN | Mutation proof and scoped static gates pass; root quality and architecture gates pending. |
+| Fitness | implementation GREEN | Mutation, scoped, root quality, architecture, and asset gates pass; external IMPL-EVAL pending. |
 | Runtime | N/A | Explicitly forbidden. |
 | Consumer | RED | Every emitted module failed Deno parsing before repair. |
 
@@ -81,3 +83,4 @@ and both required mutants fail all four hostile-input contracts before the fixed
 
 - `e9439de34` — harness bootstrap and locked plan.
 - `953271980` — tests-only hostile-input RED contract.
+- `36292dde1` — four-generator repair, semantic test updates, mutation and scoped-gate evidence.
