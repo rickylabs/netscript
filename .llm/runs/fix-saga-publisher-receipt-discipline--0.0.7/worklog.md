@@ -109,6 +109,8 @@ derivation contract.
 | 2026-08-31       | S2.1 GREEN    | throwing companion    | Added the core helper/re-exports; focused 3/0, core 87/0/3, sagas 55/0/1, with package checks and policy gates.   |
 | 2026-08-31       | S2.2 RED      | quality fixtures      | Scanner test compiled, then produced 26 passed/2 failed because known saga receipt discards were not reported.    |
 | 2026-08-31       | S2.2 GREEN    | saga-aware scanner    | Focused scanner suite reached 28/0; repo scan found only three owned fenced docs calls with 7 allowances.         |
+| 2026-08-31       | S2.3 RED      | source derivation     | New test compiled and failed 0/1 on the real canonical-doc versus shipped-source mismatch; `3567b2449`.           |
+| 2026-08-31       | S2.3 GREEN    | safe public examples  | Canonical sample now equals source; four calls consume receipts; docs tests 12/0 and quality scan 0/7.            |
 
 ## New-Base Gate Results
 
@@ -200,6 +202,27 @@ GREEN evidence with `discarded-saga-publisher-result` active:
   finding because its receipt is already discriminated. The fourth canonical docs copy is a custom
   component string rather than a checked fence and is protected by the source-derived sync test in
   S2.3.
+
+## S2.3 Evidence — Source-Derived Safe Documentation
+
+RED was committed before docs/task changes as `3567b2449`:
+
+- `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/docs/official-saga-publisher-sample-sync_test.ts --ext ts`
+  — PASS 1/1.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read .llm/tools/docs/official-saga-publisher-sample-sync_test.ts`
+  — expected exit 1, 0 passed/1 failed on the real canonical-doc/source mismatch.
+
+GREEN evidence after the docs corrections and task wiring:
+
+- focused source-sync test — PASS 1/0; `deno task docs:snippets:test` — PASS 12/0.
+- `deno task docs:snippets` — PASS, 582 scanned and 23 checked snippets with 0 malformed.
+- `deno task quality:scan:repo` — PASS, 0 findings, exactly 7 allowances, 0 allowance failures.
+- `deno task docs:links` — PASS, 103 docs and 0 broken links/anchors.
+- `deno task docs:exports-drift` and `deno task docs:accuracy` — PASS; accuracy retained only the
+  measured TanStack peer warning.
+- the canonical worker sample is now the exact statically decoded source body, and the storefront
+  success-path publish rejection returns a job failure directly rather than entering the provider
+  exception handler.
 
 ## Hard Stops
 

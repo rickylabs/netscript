@@ -14,13 +14,13 @@
 
 ## Current State
 
-S1 was accepted and then owner-narrowed. S2.1 and S2.2 are GREEN: the throwing companion passes both
-whole-package suites, and the saga-aware scanner passes 28/0 focused tests while isolating the three
-unsafe fenced docs calls. Its allowance count remains 7; the workers template remains clean. The
-locked implementation contract has two defects only: add the throwing publisher companion plus
-discarded-receipt quality rule, and correct four unsafe documentation calls plus stale fallback
-prose/source-sync coverage. The product ceiling is 20 paths. Every workers product/test path and all
-endpoint-diagnostic work are excluded.
+S1 was accepted and then owner-narrowed. S2.1 through S2.3 are GREEN: the throwing companion passes
+both whole-package suites; the saga-aware scanner passes 28/0; the canonical sample equals the safe
+worker source; and all four docs calls consume their receipts. Repository quality is 0 findings with
+exactly 7 allowances, and docs snippet tests are 12/0. The locked implementation contract has two
+defects only: add the throwing publisher companion plus discarded-receipt quality rule, and correct
+four unsafe documentation calls plus stale fallback prose/source-sync coverage. The product ceiling
+is 20 paths. Every workers product/test path and all endpoint-diagnostic work are excluded.
 
 The primary accepted `PLAN-EVAL: N/A` because scope, contract, acceptance, and gates are complete.
 S2 is authorized through the four locked RED/GREEN slices. Gate 30 remains `NOT_RUN`; a serialized
@@ -52,7 +52,7 @@ runtime lease is required.
 
 1. Core helper + core/plugin exports + helper tests + port doc — GREEN.
 2. Discarded-receipt scanner rule + fixtures — GREEN.
-3. Source-sync test/task + four unsafe calls + two reference corrections.
+3. Source-sync test/task + four unsafe calls + two reference corrections — GREEN.
 4. Attributed derivatives + full static/package/docs/lock/ceiling handoff.
 
 ## New-Base Baseline Highlights
@@ -82,5 +82,5 @@ runtime lease is required.
 
 ## Next Action
 
-Implement S2.3 and S2.4 with isolated RED then GREEN commits. Stop at implementation complete; the
-supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.
+Regenerate and validate S2.4 derivatives in locked dependency order. Stop at implementation
+complete; the supervisor dispatches separate-session GLM 5.3 Flash · max IMPL-EVAL.
