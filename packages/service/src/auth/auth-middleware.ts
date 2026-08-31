@@ -3,9 +3,18 @@
  *
  * @example
  * ```ts
- * import { createAuthnMiddleware } from "@netscript/service/auth";
+ * import {
+ *   createService,
+ *   type AuthenticatorPort,
+ *   type ServiceRouter,
+ * } from "@netscript/service";
  *
- * app.use("*", createAuthnMiddleware({ authenticator }));
+ * declare const authenticator: AuthenticatorPort;
+ * declare const router: ServiceRouter;
+ *
+ * const service = createService(router, { name: "users" })
+ *   .withAuthn({ authenticator });
+ * void service;
  * ```
  *
  * @module
