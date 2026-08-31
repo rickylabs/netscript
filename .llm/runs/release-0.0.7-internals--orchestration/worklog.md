@@ -6507,3 +6507,21 @@ stale `26/1` classification for — first real e2e:cli run at this leaf's curren
   currently lock root order as canonical** so wrong evidence does not ship, then rerun RED and GREEN.
 - The watcher re-reads the correction file at send time, so the rewritten (fuller) version will be
   delivered, not the earlier draft.
+
+## D-143 — main a3e0a5aa8 (#1806): deferred integration, zero intersection with either active leaf
+
+- `origin/main` = `a3e0a5aa8beebbd1f7a488d564d31980a7d74619`, 14 files since `0274c0a70`.
+- **Characterization refined**: predominantly docs and run artifacts, but **not purely docs** — it
+  carries four generated corpora (`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`,
+  `publish-assets.generated.ts`) plus one tooling source file (`.llm/tools/docs/check-exports-drift.ts`).
+  Practically: integration will require **verifying corpora freshness with the `check:` variants**,
+  not merely merging cleanly. Noting this now so the final-freeze step is not under-scoped.
+- **Zero intersection with either active leaf**, verified by path:
+  - #1827's surface (`packages/cli/e2e/**`, `packages/cli/deno.json`) — untouched.
+  - #1802's surface (`.llm/tools/agentic/**`) — untouched.
+  So the instruction not to churn #1828 mid-RED/GREEN carries no cost: there is nothing this advance
+  forces either leaf to reconcile now.
+- **Integration deferred to each leaf's own final freeze**, per instruction: #1827 after its oracle
+  correction lands and RED→GREEN is re-established; #1802 independently at its own freeze.
+- #1827 author still mid-turn (29s quiet); the oracle correction remains queued and will deliver at
+  turn-end. Not forcing it — a rival send would fork the thread.
