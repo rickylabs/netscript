@@ -3450,3 +3450,21 @@
 - The coordinator squash-merged #1762 as `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`, closing
   #1387. #1387/#1762 are normalized to sole `status:shipped`. This adds a coherent public auth/policy
   feature to canary 5 without changing the owner-ratified rule that Aspire 13.5 completes in canary 6.
+
+## 2026-08-31T18:19:00Z — coordinator clears every reported supervisor decision wait
+
+- Features' only reported decision wait, #1664 at 71/72 browser gates, was resolved without a waiver
+  or an expansion of its generator ceiling. The measured pre-mutation Fresh island hydration defect
+  now has exact milestone issue #1845 under `orchestrator:fixes`; #1664 remains active and reruns the
+  hosted browser gate to 72/72 after that bounded dependency lands.
+- The coordinator authorized Aspire's S8/S9/S10 exact-main convergence when the artifact diagnosis
+  confirms the base hypothesis, with fresh delta evaluation only for changed evaluated product
+  blobs. Canary 6 remains a merge-sequencing hold, never a work or verification pause.
+- Immediate merge audits rejected two false-ready states rather than parking them: #1773's hosted
+  runtime predates #1762's scaffold-exercised service/auth changes, so Fixes must converge and rerun
+  the exact-head four-lane runtime plus delta evaluation; #1816 overlaps current main in four derived
+  corpus carriers including binary prose, so Docs must converge, regenerate, revalidate, and then
+  advance #1818. Both supervisors received executable instructions, not owner questions.
+- Internals was instructed to recover bounded evaluator latency, deliver #1802 at the next safe
+  writer boundary, and own the main-red MCP export-corpus defect. All five supervisors are active;
+  there is currently no owner-only decision parked in a topic lane.

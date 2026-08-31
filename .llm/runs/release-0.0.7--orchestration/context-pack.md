@@ -2205,3 +2205,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Canary 5 now contains the typed principal/procedure-policy feature in addition to its prior public
   payload. Its remaining coherence gate is still #1349 Slices 2–3. Aspire migration PRs remain active
   but merge-held until the canary 5 tag, then form the canary 6 migration train.
+
+## Resume delta — 2026-08-31T18:19:00Z
+
+- No topic supervisor is waiting on an owner decision. Coordinator-owned waits were converted into
+  executable rulings: #1664 keeps its scope and depends on Fixes issue #1845 for the measured Fresh
+  island hydration defect; Aspire may converge S8/S9/S10 after confirming the base hypothesis and
+  reruns delta evaluation only for changed evaluated product blobs.
+- #1773 is not merge-ready at stale head `bf3aee258`: its hosted runtime predates current main
+  `6c195acaf`, whose #1762 service/auth changes are scaffold-runtime relevant. Fixes is converging it
+  and re-earning the exact-head four-lane receipt plus delta evaluation.
+- #1816 is not merge-ready at stale head `31512e2d9`: current main overlaps its four derived corpus
+  carriers, including binary prose. Docs is converging/regenerating/revalidating it before merge and
+  will then advance #1818. Internals continues #1802/#1750/#1832 and adopts the main-red MCP corpus
+  check; all independent fronts continue in parallel.

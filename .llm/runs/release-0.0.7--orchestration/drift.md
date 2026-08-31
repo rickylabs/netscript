@@ -1699,3 +1699,13 @@ implementation thread.
   only at a config parser. Hosted scaffold runtime is mandatory when local remote-Docker topology
   prevents the AppHost from reaching daemon-published localhost ports; a policy-skipped workflow is
   not a substitute.
+
+## 2026-08-31 — “awaiting coordinator decision” is not a terminal lane state
+
+- A topic supervisor must surface the exact bounded choice and keep independent fronts moving; the
+  primary coordinator must rule immediately when the choice is scope, ownership, convergence, or
+  evidence currency. Only a genuinely owner-only product decision may remain parked.
+- A clean merge tree does not preserve runtime or generated-corpus evidence. #1773 had no direct
+  path intersection with newer main but its runtime consumes #1762's service/auth product changes;
+  #1816 had four derived-carrier overlaps including a binary artifact. Both require exact-main
+  convergence and regenerated evidence rather than either a stale merge or an indefinite wait.
