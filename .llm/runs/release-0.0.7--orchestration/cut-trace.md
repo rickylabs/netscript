@@ -258,3 +258,12 @@ artifact-pinned production E2E.
 - Independent GLM PASS, exact-head run `33362382914`, post-body-edit close-gate attempt 2, zero
   threads, lock identity, and live-main synthetic merge parents were verified. This is an enabling
   fix; the next canary decision waits for the newly unblocked public feature carriers to land.
+
+## 2026-08-31T14:32:20Z — durable job progress joins the public feature payload
+
+- PR #1814 head `0dc5ef539360fa4fdb695fa99351593af6e53041` squash-merged as
+  `7aff0e4cbb163191da1537aac47b0654933fc3db`. It adds a durable progress persist-and-publish method
+  through the existing KV mutation hook without inventing new stream plumbing.
+- Exact-head CI, independent GLM PASS, ten-blob evaluator identity, complete DoD, unchanged lock,
+  zero threads, and clean live-main integration were verified. It is a partial `Refs #1592` slice;
+  runtime message wiring and ordering/replay stay open and are not misrepresented as complete.

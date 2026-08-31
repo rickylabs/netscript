@@ -3354,3 +3354,17 @@
   normalized #1827/#1828 to sole `status:shipped`. This removes #1762's Deno compiler-library
   blocker; Features must now converge its generated carriers, run hosted auth/policy runtime, and
   finish exact-head gates rather than remaining parked.
+
+## 2026-08-31T14:32:20Z — #1814 durable job progress partial ships
+
+- Features PR #1814 passed a fresh independent final audit at immutable head
+  `0dc5ef539360fa4fdb695fa99351593af6e53041`: exact-head run `33361563168` was green,
+  separate GLM 5.3 Flash IMPL-EVAL passed, all ten evaluated handwritten blobs retained identity,
+  the lockfile was unchanged, review threads were zero, and the current-main merge tree was clean
+  with zero path overlap from intervening merges.
+- The PR deliberately uses `Refs #1592` and has no closing reference. This first slice adds the
+  precedent-matched durable persist-and-publish progress method while leaving runtime message
+  wiring and ordering/replay semantics open on #1592; the coordinator did not falsely close it.
+- The coordinator squash-merged #1814 as `7aff0e4cbb163191da1537aac47b0654933fc3db` and
+  normalized the PR to sole `status:shipped`. This adds a real public feature to the next canary
+  checkpoint while the remaining #1592 slice stays assigned to Features.

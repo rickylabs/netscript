@@ -2116,3 +2116,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - The primary is consuming the ready queue in parallel: #1814, #1834, #1811, then #1830, while all
   five supervisors continue their independent serial topic queues. Canary 5 remains content-gated
   until this wave yields a coherent public feature/fix payload; it is not gated by docs or internals.
+
+## Resume delta — 2026-08-31T14:32:20Z
+
+- Current main is `7aff0e4cbb163191da1537aac47b0654933fc3db` after Features PR #1814 shipped
+  from immutable head `0dc5ef539360fa4fdb695fa99351593af6e53041`. Exact-head CI, independent GLM
+  PASS, evaluated-blob identity, complete DoD, unchanged lock, zero threads, and a clean current-main
+  synthetic merge were verified.
+- #1814 is an intentionally partial implementation of #1592 and therefore did not close it. The PR
+  is sole `status:shipped`; #1592 remains Features-owned for runtime wiring and ordering/replay.
+- The next-canary checkpoint now has an additional public feature rather than only internal/docs
+  movement. #1834, #1811, and #1830 remain in active final audit, while #1762 is converging after
+  #1828 and #1664 is applying the bounded explicit-client correction.
