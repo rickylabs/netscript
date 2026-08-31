@@ -4775,3 +4775,23 @@
     files is **0 lines**; receipt schema, the 15-tool expectation, and the skills/corpora work are
     byte-identical to the cycle-2 head. `aspire-mcp-smoke_test.ts` + `aspire-dashboard-telemetry_test.ts`
     17/17; `runtime-gates_test.ts` 23/23.
+
+- **D-202 — serialized queue-advance chain armed; S9's repair push was itself evicted, confirming
+  D-198 in the wild.**
+  - **#1754 got its slot** (run `33404324013`, **attempt 3**): `scaffold-runtime-sqlite` in progress,
+    `scaffold-runtime` pending. This is also the **garnet control** that decides whether #1747's
+    `runtime.wait.garnet` timeout is pre-existing or its own.
+  - **S9's repair push at 15:18:25 auto-triggered a run at `29eed9ef9` — and it was cancelled too**
+    (`33407682395`). A repair landing does not get a runtime verdict for free; it lands straight into
+    the same contended repo-wide group. Every Aspire head so far has been evicted at least once.
+  - **Armed a single serialized chain** (`queue-chain.sh`) rather than hand-releasing each slice:
+    it waits for #1754, then for **each** of #1759 and #1760 waits until **no** `e2e-cli` run is live
+    repo-wide before re-triggering, then waits for that run's runtime jobs to conclude.
+    - The free-group precondition is the part that matters: it keeps this lane from **evicting another
+      lane's queued job** while retrying its own, which is the failure mode D-198 exposed. Politeness
+      here is not courtesy — an eviction war between lanes would produce exactly the `cancelled`
+      results that look like flake.
+    - Bounded (120 × 30 s per wait) so a permanently contended group stops the chain and reports
+      instead of spinning silently.
+  - #1744 stays draft and is handled last, by undraft rather than rerun, on its authoritative
+    post-lease head `bd3dbc843`.
