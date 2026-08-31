@@ -4,8 +4,10 @@ import {
   AstExtractor,
   FilesystemWalker,
   MemoryManifestResolver,
+  type RegistryEmission,
   RegistryEmitter,
   runWalkerPipeline,
+  startWalker,
 } from '../../src/sdk/mod.ts';
 import { createPluginManifestFixture } from '../../src/testing/mod.ts';
 
@@ -166,5 +168,33 @@ Deno.test({
     });
 
     assertEquals(emissions, []);
+  },
+});
+
+Deno.test({
+  name: 'startWalker forwards third-party builder configuration',
+  permissions: { read: true, write: true },
+  fn: async () => {
+    const root = await Deno.makeTempDir();
+
+    try {
+      await Deno.writeTextFile(
+        join(root, 'channel-sync.ts'),
+        `export const syncGeneral = defineChannelSync('general').build();`,
+      );
+
+      const emissions: readonly RegistryEmission[] = await Reflect.apply(startWalker, undefined, [
+        root,
+        {
+          additionalBuilders: [{ callee: 'defineChannelSync', axis: 'channel-syncs' }],
+        },
+      ]);
+
+      assertEquals(emissions.map((emission) => emission.path), [
+        '.netscript/generated/channel-syncs.registry.ts',
+      ]);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
   },
 });
