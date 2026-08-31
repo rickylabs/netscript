@@ -5001,3 +5001,26 @@
   - S9 and S10 are explicitly out of scope for this slice — they converge onto **S8's new head**
     afterwards, and leaving them untouched is what keeps that possible.
   - Seventh dead-sender orphan released first (`ownerPid 2656141`).
+
+- **D-211 — #1844 dispositioned by the coordinator (p2 / `status:research`, not a canary6 blocker);
+  dropped from my active set and not to be surfaced again.** Migration gates continue on #1744's green
+  as sufficient.
+- **D-212 — S13 merge-packet audited at `9b684e176`: two boxes evidenced, and box 2 proven to be a
+  MERGE-ORDER dependency on S9 rather than an S13 defect.**
+  - **Verified at the head, not restated from the PR body** — and the PR body's "green" claims did not
+    all survive that check.
+  - **Box 3 satisfied:** parity checker reports `manifestFresh: true` across **814 checked rows**.
+  - **Box 5 satisfied:** `check:assets-barrel` exit 0 (regeneration diff-clean);
+    `agentic:sync-claude:check` exit 0 — "18 skill(s), 22 mirrored file(s)".
+  - **Box 2 NOT satisfied and cannot be by this PR.** `check:aspire-version-parity --phase 2` returns
+    **`ok: false`**: `checked 814, fail 14, info 10, skipped 1, missing 0`. **All 14 failures carry
+    `"owner": "S9"`** — stale `13.4.6` literals in `.agents/generated/consumer-skills/`
+    (`aspire/SKILL.md`, `help.md`, …), class `skill:dogfood-bundle`.
+    - CI runs the gate at **phase 1** today (`ci.yml:415`), which passes; the phase-2 flip is what
+      waits.
+    - This matches PR #1779's own statement that the flip awaits S1/S9/S11 on `main`. **No change to
+      S13 can turn box 2 green**, so writing evidence for it would have been fabrication.
+    - **Concrete consequence for the coordinator's dependency-ordered merge: S13 closes after S9.**
+      Box 2 is verified immediately post-S9 or at the final synthetic merge.
+  - Boxes 1 and 4 pending the same verification pass; explicitly **not claimed** rather than
+    optimistically ticked.
