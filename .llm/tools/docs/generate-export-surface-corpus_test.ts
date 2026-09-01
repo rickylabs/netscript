@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertMatch } from '@std/assert';
 import {
+  colorInvariantChildEnv,
   createGeneratedAsset,
   type GeneratedExportSurfaceCorpus,
   normalizeDenoDocNode,
@@ -115,3 +116,55 @@ async function realEntries(path: string, packageName: string, subpath: string) {
   };
   return normalizeDenoDocNode(Object.values(document.nodes)[0], packageName, subpath);
 }
+
+Deno.test('colour-forcing variables are neutralized for nested deno children', () => {
+  const previousForce = Deno.env.get('FORCE_COLOR');
+  const previousCliColor = Deno.env.get('CLICOLOR_FORCE');
+  try {
+    Deno.env.set('FORCE_COLOR', '1');
+    Deno.env.set('CLICOLOR_FORCE', '1');
+    const env = colorInvariantChildEnv();
+    assertEquals(env.NO_COLOR, '1');
+    assertEquals(env.FORCE_COLOR, undefined);
+    assertEquals(env.CLICOLOR_FORCE, undefined);
+  } finally {
+    if (previousForce === undefined) Deno.env.delete('FORCE_COLOR');
+    else Deno.env.set('FORCE_COLOR', previousForce);
+    if (previousCliColor === undefined) Deno.env.delete('CLICOLOR_FORCE');
+    else Deno.env.set('CLICOLOR_FORCE', previousCliColor);
+  }
+});
+
+Deno.test('nested deno doc output carries no colour escapes even when the caller forces colour', async () => {
+  const entrypoint = new URL('../../../packages/sdk/mod.ts', import.meta.url).pathname;
+  const runWith = async (env: Record<string, string>): Promise<string> => {
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['doc', '--json', entrypoint],
+      env,
+      clearEnv: true,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.success, true);
+    return new TextDecoder().decode(output.stdout);
+  };
+
+  const previousForce = Deno.env.get('FORCE_COLOR');
+  try {
+    // Simulate a caller whose environment forces colour. The generator's child env must win.
+    Deno.env.set('FORCE_COLOR', '1');
+    const guarded = await runWith(colorInvariantChildEnv());
+    assertEquals(guarded.includes('\\u001b'), false);
+
+    // Control: the same child WITHOUT the guard does emit escapes, so the assertion has teeth.
+    const unguarded = await runWith({ ...Deno.env.toObject() });
+    assert(unguarded.includes('\\u001b'));
+
+    // And the guarded output is identical whether or not the caller forced colour.
+    Deno.env.delete('FORCE_COLOR');
+    assertEquals(await runWith(colorInvariantChildEnv()), guarded);
+  } finally {
+    if (previousForce === undefined) Deno.env.delete('FORCE_COLOR');
+    else Deno.env.set('FORCE_COLOR', previousForce);
+  }
+});
