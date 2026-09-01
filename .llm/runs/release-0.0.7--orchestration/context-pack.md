@@ -2489,3 +2489,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Open milestone inventory is 42 after one shipped issue and two newly recorded bounded defects; all
   retain exactly one topic owner. Host inventory is Aspire `[]` and containers 0. No owner-only
   decision is pending.
+
+## Resume delta — 2026-09-01T21:04:27Z
+
+- Current main is `9fcdee63e72bea7dd44a43e6215f236bc718cd1a` after the coordinator independently
+  verified and merged #1850/#1093 and #1894/#1888. Both issue/PR pairs are terminal
+  `status:shipped`.
+- All topic supervisors are in delivery-only operation: no report-only turns, redundant planning
+  evaluations, duplicate evaluator runs, or retries of already-explained red expensive gates.
+- The next merge-critical packet is P0 #1899 after hosted run `33557955381`. Its repair then moves
+  once into #1858 and #1885 for exact hosted reruns. #1756, #1904/#1895, #1846/#1890/#1889, and
+  Aspire S7/S8/S9-S13 remain independent active delivery streams.
+- Host inventory was re-proven Aspire `[]` and Docker containers 0. No owner-only decision is
+  pending.

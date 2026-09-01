@@ -3857,3 +3857,21 @@
 - Main is `e938ecd31fd1c909f23bb7dd60029a302ce8d428`. New bounded debt/issues increased the open
   milestone inventory to 42 after #1855 closed; every issue still has exactly one topic owner. No
   owner-only decision is pending.
+
+## 2026-09-01T21:04:27Z — delivery-only correction and two immediate merges
+
+- The owner rejected report-heavy coordination with insufficient merge throughput. The coordinator
+  imposed delivery-only operation across all five supervisors: no report-only turns, redundant
+  PLAN-EVAL, duplicate evaluator, or repeated known-red runtime gate. Each active turn must produce
+  a pushed commit, immutable merge packet, or an exact defect with its repair already dispatched.
+- PR #1850 passed exact-head structured CI, zero-thread review, fully mirrored #1093 acceptance, a
+  separate S3 IMPL-EVAL at `2398b9fe5`, and a product-byte carry audit through its current head
+  `99ec975b3`. The coordinator squash-merged it as `159ede0420d588ffbb7f1d05f1715624a7db7520`;
+  #1093 and the PR are closed with `status:shipped`.
+- PR #1894 then completed its exact-head OpenHands IMPL-EVAL PASS at `f0942a6eb`, with current CI
+  PASS, zero review threads, complete #1888 acceptance, and a clean merge. The coordinator
+  squash-merged it as `9fcdee63e72bea7dd44a43e6215f236bc718cd1a`; #1888 and the PR are closed with
+  `status:shipped`.
+- P0 PR #1899's exact hosted run `33557955381` remains active; on green it merges before its repair
+  is integrated into #1858 and #1885. Docs #1756, Features #1904/#1895, Internals #1839/#1846, and
+  Aspire S7/S8/S9-S13 continue without routine owner or coordinator pauses.
