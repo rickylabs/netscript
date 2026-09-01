@@ -7919,3 +7919,52 @@ redundant. Confirmed by process inspection rather than assumption.
 
 Run artifacts untouched. Body/status normalization deliberately deferred until exact-current-main CI
 is green — the #1828 lesson.
+
+## D-183 — #1832 normalized and converged; and the main-red corpus defect is finally EVIDENCED (#1859)
+
+### The two bounded blockers, closed
+
+- **EOF normalization**: `plan.md`, `research.md`, `supervisor.md` each carried a trailing blank line
+  (`\n\n`). Normalized to a single `\n`. **Proved content-only**: with trailing blank lines stripped
+  from both sides, each file's md5 is unchanged — so this is whitespace, not an edit, and **no
+  artifact was removed, redacted, or reorganised.**
+- **Stale Harness prose** rewritten in place: phase is now **complete**, cycle 2 `PASS` at
+  `af2abed22` recorded with its artifact and commit, and the optional augment declared
+  **complete/waived** on the exact-head OpenHands PASS.
+
+Converged onto current `main` `78be0e032` (`merge-tree` clean, real merge clean), new head
+**`d446af9f7`**, pushed. **Blob semantics preserved** — adapter `41c03f1f4…`, its test `dbfe1e6e7…`,
+`packages/fresh-ui/deno.lock` `307510a6b…`, and `impl-eval-cycle-2.md` `bef0697a4…` all unchanged
+across the merge, so the cycle-2 `PASS` carries. `TanStack usage:` 3/0, `fresh-ui check` 0,
+`check:assets-barrel` 0. PR and issue transitioned `augment-review` → sole **`status:ready-merge`**.
+
+### The gate run surfaced a MAIN-side red — and this time I could evidence it
+
+`check:mcp-export-corpus` returned **`REAL_EXIT=1`** at the converged head. Rather than assume it was
+the leaf's, I ran the same check on **clean `main`** — also **`REAL_EXIT=1`**. Then bisected:
+
+| `main` | Change | Exit |
+| --- | --- | ---: |
+| `6c195acaf` | #1762 | **0 (green)** |
+| **`8f1fcb2bc`** | **#1841 typed client contribution runtime** | **1 (red)** |
+| `969e7dfeb` | — | 1 |
+| `78be0e032` | #1818 | 1 |
+
+**#1841 introduced it**: it changed the SDK export surface without regenerating
+`export-surface-corpus.generated.ts`. Regenerating on `main` yields a **4-line diff in one generated
+file** (+224 uncompressed bytes) — consistent with one added surface, not broad drift. I reverted my
+local regeneration and left the clone clean rather than landing an unrequested fix.
+
+**Filed as #1859** (`type:fix`, `area:tooling`, `priority:p1`, milestone 0.0.7) with the full bisect,
+a bounded repair, and a separate observation worth someone's judgement: the corpus went stale on a
+merge and stayed red across **four** subsequent merges without being caught, so if this check is not a
+required merge gate, a follow-up should consider making it one — an after-the-fact check can report
+this class but cannot prevent it.
+
+This is the **reproducible form of the "main-red `check:mcp-export-corpus`" I was asked to adopt and
+declined to file earlier**. That refusal was right at the time: `main` was then `6c195acaf`, which I
+verified green both locally and in CI. The defect landed afterwards. Filing on suspicion would have
+produced an unactionable ticket; filing now produces a bisected one.
+
+**#1832 is not the cause and must not be gated on it** — its CI will inherit this red until #1859
+lands.
