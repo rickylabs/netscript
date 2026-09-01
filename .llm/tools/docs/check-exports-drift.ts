@@ -84,6 +84,30 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'plugin-triggers',
+    packagePath: 'plugins/triggers',
+    docPath: 'docs/site/reference/triggers/index.md',
+    packageName: '@netscript/plugin-triggers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eleven entrypoints were checked with deno doc; the page documents 17 of 150 exported symbols and omits broad trigger CLI command/backend contracts, runtime definitions and action/durability/port contracts, scaffold protocols, service helpers, and stream database/server wiring.',
+    },
+  },
+  {
+    name: 'plugin-workers',
+    packagePath: 'plugins/workers',
+    docPath: 'docs/site/reference/workers/index.md',
+    packageName: '@netscript/plugin-workers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All thirteen entrypoints were checked with deno doc; the page documents 125 of 175 exported symbols and omits CLI job/task/workflow commands and runtime API clients, adapter and doctor contracts, health-check job contracts, generated-registry/runtime helpers, scaffold protocols, and project-file utilities.',
+    },
+  },
+  {
     name: 'ai',
     packagePath: 'packages/ai',
     docPath: 'docs/site/reference/ai/index.md',
@@ -129,6 +153,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.',
+    },
+  },
+  {
+    name: 'plugin-auth',
+    packagePath: 'plugins/auth',
+    docPath: 'docs/site/reference/plugin-auth/index.md',
+    packageName: '@netscript/plugin-auth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All nine entrypoints were checked with deno doc; the page documents 5 of 84 exported symbols and omits versioned auth contracts, schemas, router and session/user inputs and responses, service runtime types, stream event/schema/producer/database helpers, and scaffold and adapter CLI protocols.',
     },
   },
   {

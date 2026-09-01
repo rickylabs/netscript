@@ -71,6 +71,9 @@ evidence determines the only remaining coverage field.
 | 2026-09-01 | research | checker probe | Baseline 32-row checker exited 0; provisional mappings reproduced 14 findings. |
 | 2026-09-01 | research | symbol measurement | All entrypoints measured: triggers 150/17/133, workers 175/125/50, auth 84/5/79. |
 | 2026-09-01 | plan | design checkpoint | Locked three implementation slices and `PLAN-EVAL: N/A` before edits. |
+| 2026-09-01 | S1 | page adoption | Added six missing rows, repaired nine auth paths/rows, and inserted three cumulative mappings (32 → 35). |
+| 2026-09-01 | S1 | regeneration | Ran `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`, all exit 0. |
+| 2026-09-01 | S1 | review | Inspected the focused diff against all three manifests and per-entrypoint symbols; preserved the Vento release expression and all 32 existing mappings. |
 
 ## Decisions
 
@@ -95,6 +98,11 @@ evidence determines the only remaining coverage field.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Baseline export drift | `deno task docs:exports-drift` | PASS (0) | 32-row pre-change baseline. |
+| S1 export drift | `deno task docs:exports-drift` | PASS (0) | All 35 mapped pages have exact entrypoint paths. |
+| S1 generator sequence | three owner-specified generators | PASS (0/0/0) | Derived prose, CLI carrier, and publish carrier updated. |
+| S1 prose convergence | `deno task check:agent-docs-prose` | PASS (0) | Check mode matches regenerated bundle. |
+| S1 publish convergence | `deno task check:publish-assets` | PASS (0) | Publish carrier matches generated inputs. |
+| S1 assets precommit probe | `deno task check:assets-barrel` | expected non-verdict (1) | Task compares the intentionally changed generated carrier to pre-S1 `HEAD`; rerun after commit. |
 | Required final suite | See plan | NOT_RUN | Runs after implementation. |
 
 ### Fitness Gates
@@ -102,6 +110,7 @@ evidence determines the only remaining coverage field.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-5 | PASS (research) | all-entrypoint `deno doc --json` unions | Final mapping gate pending. |
+| F-5 | PASS (S1) | `docs:exports-drift` | Exact entrypoint coverage for 35 mappings. |
 | F-7 | NOT_RUN | site/repo docs gates | Runs after implementation. |
 | F-19 | NOT_RUN | `deno task test` | Runs after checker test change. |
 
@@ -122,4 +131,3 @@ evidence determines the only remaining coverage field.
 
 - Evaluator should independently recompute the three symbol sets, inspect all 35 mapping names,
   and exercise both uncovered and doubly-classified denominator failures.
-

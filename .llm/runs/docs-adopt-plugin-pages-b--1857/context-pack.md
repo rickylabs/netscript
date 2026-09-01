@@ -12,10 +12,11 @@
 
 ## Current State
 
-Current main has 32 mapped package pages and 36 physical reference pages. Fresh research confirms
-three remaining one-package pages need adoption and the auth page is a five-package hub exclusion.
-The PR is #1869, ready for review before the first implementation push and labelled
-`status:impl`; implementation edits have not begun.
+S1 now carries 35 mapped package pages: triggers, workers, and plugin-auth have exact entrypoint
+tables and measured `entrypoints-only` policies. Derived documentation assets were regenerated in
+the required order. The auth page remains the sole unclassified physical reference page until S2
+adds its typed exclusion and exactly-one denominator enforcement. PR #1869 remains
+`status:impl`.
 
 ## Completed
 
@@ -25,15 +26,19 @@ The PR is #1869, ready for review before the first implementation push and label
 - PR #1869 opened with all requested labels and milestone, then marked ready before implementation.
 - Real checker findings and all-entrypoint symbol coverage re-derived.
 - Plan, Design checkpoint, and justified `PLAN-EVAL: N/A` recorded.
+- S1 diff implemented and reviewed against the three live manifests and all-entrypoint symbol
+  measurements; mapping count is 35 with all 32 prior names retained.
+- S1 `docs:exports-drift`, generators, prose check, and publish check pass. The assets-barrel task
+  must be rerun after the expected generated carrier is committed because it compares to `HEAD`.
 
 ## In Progress
 
-- Slice 1 page corrections, mappings, and generated docs corpus.
+- Slice 1 commit/push and PR comment.
 
 ## Next Steps
 
-1. Implement and verify S1; supervisor substantive review, commit, push, and PR comment.
-2. Implement/test S2; supervisor substantive review, commit, push, and PR comment.
+1. Commit/push S1 and post its PR comment; rerun the committed assets-barrel check.
+2. Implement/test S2; review, commit, push, and PR comment.
 3. Run full gates, freeze run evidence, rerun at final pushed head, and update PR body/comment.
 4. Hand off to the separate supervisor-owned IMPL-EVAL without changing `status:impl`.
 
@@ -50,13 +55,17 @@ The PR is #1869, ready for review before the first implementation push and label
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/docs-adopt-plugin-pages-b--1857/*` | new | Harness bootstrap/research/plan/design state. |
+| `docs/site/reference/{triggers,workers,plugin-auth}/index.md` | changed | Exact missing entrypoints and auth path column. |
+| `.llm/tools/docs/check-exports-drift.ts` | changed | Three cumulative measured mappings. |
+| `.llm/assets/agent-docs/*` | changed | Regenerated prose bundle/provenance. |
+| `packages/{cli,mcp}/**/*.generated.ts` | changed | Regenerated embedded carriers. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline PASS; implementation pending | 32-row `docs:exports-drift` exit 0 |
-| Fitness | research PASS; final pending | every entrypoint measured via `deno doc --json` |
+| Static | S1 PASS; S2/final pending | 35-row `docs:exports-drift` exit 0; generators 0/0/0 |
+| Fitness | S1 F-5 PASS; final pending | every entrypoint measured; exact tables accepted |
 | Runtime | N/A | no plugin/package source |
 | Consumer | pending | site and generated corpus gates planned |
 
@@ -72,4 +81,3 @@ The PR is #1869, ready for review before the first implementation push and label
 ## Commits
 
 - See PR #1869 commit list and per-slice comments.
-
