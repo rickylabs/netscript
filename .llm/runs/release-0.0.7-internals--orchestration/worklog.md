@@ -9510,3 +9510,51 @@ closed.
 
 **#1894/#1888** ready-merge, CI running. **#1890/#1879** under IMPL-EVAL. **#1351** author active.
 **#1846** armed behind a live lane.
+
+
+## D-215 - #1351 delivered and under IMPL-EVAL; #1894 acceptance evidence reconciled, not duplicated
+
+### #1351 - the two hard properties were actually built
+
+PR **#1889**, converged onto current `main` at head **`6a1a001ad`**. Author gates 1-9 all PASS: root
+`deno task test` **4,716 passed / 0 failed / 19 ignored**, focused suite **43 passed / 0 failed**,
+scoped check/lint/fmt and `quality:gate` `rc=0`, publish dry-run `rc=0`, doc-lint at the approved
+baseline.
+
+The two properties I named as most likely to go wrong were both addressed substantively:
+
+- **Header-safe dedupe** is proven with **real pending-fetch tests** - same auth+locale coalescing to
+  one pending fetch, distinct auth+locale producing two. That is a test capable of failing, not a
+  shape assertion.
+- **Method secrecy is enforced, not intended**: exact types, runtime snapshots, private storage,
+  documentation probes, and packed-subpath rejection.
+
+**The scope boundary held completely**: zero `@orpc/*` version, manifest, catalog or `deno.lock`
+change - re-verified by me before and **again after** the main convergence, since a merge is exactly
+where dependency churn can leak back in.
+
+Reported honestly rather than buried: **gate 10 (scaffold runtime E2E) failed twice**, both on an
+external Aspire `database.init` 404 for the generated Postgres executable, with cleanup passing and a
+clean leak audit. Handed to the evaluator as a question - *judge whether it is genuinely external or
+attributable to this change; if attributable, that is blocking* - rather than asserted as external.
+
+IMPL-EVAL dispatched with the two decisive properties first and an explicit instruction to **try to
+defeat** the method-secrecy mechanism (widened type, structural cast, re-export, subpath import,
+runtime property walk), since a mechanism a contribution can trivially bypass fails the issue's
+purpose.
+
+### #1894 - the duplicate-block guard I added after #1876 caught me
+
+Adding the acceptance evidence, my script asserted the block was absent before appending - and it
+**fired**: the author had already authored one. Without that guard I would have created the same
+duplicate-block defect that the #1876 audit caught. The lesson from that audit is now encoded as an
+executable precondition rather than an intention.
+
+`status:` label had drifted back to `impl-eval` **for the sixth time this session**, silently blocking
+the mirror. Restored to sole `ready-merge`; mirror dry-run then validates `REAL_EXIT=0`. Close-gate
+re-run armed at the unchanged head.
+
+### Lane state
+
+**#1894/#1888** ready-merge, close-gate rerun armed. **#1890/#1879** IMPL-EVAL running. **#1889/#1351**
+IMPL-EVAL running. **#1846** watcher background-only; lane currently occupied.
