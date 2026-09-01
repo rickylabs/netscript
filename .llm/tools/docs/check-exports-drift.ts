@@ -72,6 +72,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'plugin-sagas',
+    packagePath: 'plugins/sagas',
+    docPath: 'docs/site/reference/sagas/index.md',
+    packageName: '@netscript/plugin-sagas',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All fourteen entrypoints were checked with deno doc; the page documents 56 of 236 exported symbols and omits broad CLI command/backend contracts, runtime delivery/projection/scheduler/publisher details, contract schemas, E2E and scaffold protocols, and server-side stream wiring.',
+    },
+  },
+  {
     name: 'ai',
     packagePath: 'packages/ai',
     docPath: 'docs/site/reference/ai/index.md',
@@ -141,6 +153,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.',
+    },
+  },
+  {
+    name: 'plugin-streams',
+    packagePath: 'plugins/streams',
+    docPath: 'docs/site/reference/streams/index.md',
+    packageName: '@netscript/plugin-streams',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All seven entrypoints were checked with deno doc; the page documents 33 of 55 exported symbols and omits adapter CLI and scaffold protocol types, shared CLI and E2E contracts, the unsupportedStreamOperation helper, and Aspire contribution contracts.',
     },
   },
   {
@@ -321,6 +345,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.',
+    },
+  },
+  {
+    name: 'plugin-ai',
+    packagePath: 'plugins/ai',
+    docPath: 'docs/site/reference/plugin-ai/index.md',
+    packageName: '@netscript/plugin-ai',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All seven entrypoints were checked with deno doc; the page documents 24 of 88 exported symbols and omits adapter CLI and scaffold protocol types, adapter contracts, and much of the versioned AI contract vocabulary including message/content/chunk, model, tool, usage, and schema types.',
     },
   },
   {
