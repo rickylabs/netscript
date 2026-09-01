@@ -45,6 +45,16 @@ Deno.test('ExtractorPort contract returns contribution candidates from files', a
 
   const contributions = await extractor.extract([
     {
+      path: 'plugins.ts',
+      text: `
+        export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+          { callee: 'defineJob', axis: 'jobs' },
+          { callee: 'defineSaga', axis: 'sagas' },
+          { callee: 'defineWebhook', axis: 'triggers' },
+        ] as const;
+      `,
+    },
+    {
       path: 'jobs/send-email.ts',
       text: `
         import { defineJob } from '@netscript/plugin-workers-core';
@@ -73,6 +83,57 @@ Deno.test('ExtractorPort contract returns contribution candidates from files', a
     { file: 'sagas/register-user.ts', symbol: 'default', axis: 'sagas' },
     { file: 'triggers/new-user.ts', symbol: 'newUserWebhook', axis: 'triggers' },
   ]);
+});
+
+Deno.test('AstExtractor discovers a synthetic plugin-owned declaration without options', async () => {
+  const contributions = await new AstExtractor().extract([
+    {
+      path: 'channel-sync/plugin.ts',
+      text: `
+        export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+          { callee: 'defineChannelSync', axis: 'channel-syncs' },
+        ] as const;
+      `,
+    },
+    {
+      path: 'channel-sync/sync-general.ts',
+      text: `
+        import { defineChannelSync } from '@acme/plugin-channel-sync-core';
+        export const syncGeneral = defineChannelSync('general').build();
+      `,
+    },
+  ]);
+
+  assertEquals(contributions, [{
+    file: 'channel-sync/sync-general.ts',
+    symbol: 'syncGeneral',
+    axis: 'channel-syncs',
+  }]);
+});
+
+Deno.test('AstExtractor fails loudly when a contribution factory has no declaration', () => {
+  assertThrows(
+    () =>
+      new AstExtractor().extract([{
+        path: 'examples/example.ts',
+        text: `
+          import { defineExample } from '@acme/plugin-example-core';
+          export const example = defineExample('example').build();
+        `,
+      }]),
+    TypeError,
+    'Contribution factory "defineExample" has no declared axis; run plugin sync/update or pass it through additionalBuilders',
+  );
+});
+
+Deno.test('AstExtractor keeps a walk with no contribution factory calls quiet', async () => {
+  assertEquals(
+    await new AstExtractor().extract([{
+      path: 'mod.ts',
+      text: `export const value = Object.freeze({ ready: true });`,
+    }]),
+    [],
+  );
 });
 
 Deno.test('AstExtractor discovers a synthetic third-party factory from an immutable snapshot', async () => {
@@ -121,14 +182,6 @@ Deno.test('AstExtractor rejects malformed and duplicate builder configuration', 
   assertThrows(
     () =>
       new AstExtractor({
-        additionalBuilders: [{ callee: 'defineJob', axis: 'other-jobs' }],
-      }),
-    TypeError,
-    'Duplicate contribution builder callee "defineJob"',
-  );
-  assertThrows(
-    () =>
-      new AstExtractor({
         additionalBuilders: [
           { callee: 'defineChannelSync', axis: 'channel-syncs' },
           { callee: 'defineChannelSync', axis: 'other-channel-syncs' },
@@ -136,6 +189,23 @@ Deno.test('AstExtractor rejects malformed and duplicate builder configuration', 
       }),
     TypeError,
     'Duplicate contribution builder callee "defineChannelSync"',
+  );
+});
+
+Deno.test('AstExtractor rejects duplicate plugin-owned declarations', () => {
+  assertThrows(
+    () =>
+      new AstExtractor().extract([{
+        path: 'plugins.ts',
+        text: `
+          export const NETSCRIPT_CONTRIBUTION_BUILDERS = [
+            { callee: 'defineExample', axis: 'examples' },
+            { callee: 'defineExample', axis: 'other-examples' },
+          ] as const;
+        `,
+      }]),
+    TypeError,
+    'Duplicate contribution builder callee "defineExample"',
   );
 });
 
@@ -171,15 +241,19 @@ Deno.test({
 });
 
 Deno.test({
-  name: 'startWalker preserves official defaults for a no-options consumer',
+  name: 'startWalker discovers plugin-owned declarations for a no-options consumer',
   permissions: { read: true, write: true },
   fn: async () => {
     const root = await Deno.makeTempDir();
 
     try {
       await Deno.writeTextFile(
+        join(root, 'plugin.ts'),
+        `export const NETSCRIPT_CONTRIBUTION_BUILDERS = [{ callee: 'defineJob', axis: 'jobs' }] as const;`,
+      );
+      await Deno.writeTextFile(
         join(root, 'send-email.ts'),
-        `export const sendEmail = defineJob('send-email').build();`,
+        `import { defineJob } from '@netscript/plugin-workers-core';\nexport const sendEmail = defineJob('send-email').build();`,
       );
 
       const emissions = await startWalker(root);
