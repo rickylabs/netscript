@@ -6057,3 +6057,38 @@
     resumed brief carries the no-strip instruction explicitly.
   - Runtime boundary restated in the brief: the host lease is assigned to #1844, so no Aspire, Docker,
     AppHost or `e2e:cli` from this lane; CI remains the runtime authority.
+
+- **D-247 — S8 convergence blocked on a genuine ACCEPTANCE-vs-MAIN collision. Escalated rather than
+  ruled; the agent aborted correctly a second time.**
+  - **The ruled test conflict resolved exactly as directed.** `bd55c16af` /
+    `generators-tools-db-index_test.ts`: main's emission shape won, and S8's typed-db assertions were
+    carried forward **re-expressed** — `resolveToolErrorFile(tool_0_workdir, "prisma-studio")`, runner
+    args with `tool_0_errorFile` and escaped `"studio"`, `run-tool.mts`,
+    `monitorToolFailure(builder, tool_0, tool_0_errorFile)`, `targetState: 'Finished'`,
+    `publishResourceUpdate(resource, {`, `catch(() => undefined)`. The resolved file came out
+    **byte-identical to main's blob `ca14a5eb1`** — the strongest possible evidence the adaptation was
+    faithful rather than invented. One obsolete S8 test that *forbade* the process-command seam was
+    removed as contradicting the ruling; the agent flagged it rather than deleting it silently, which
+    is the behaviour D-246 asked for.
+  - **Second conflict is not mechanical.** `1acb9bfdf` / `generate-register-tools.ts`: **S8 deletes**
+    the emitted `maybeWithProcessCommand(...)` line; **main retains and hardens** it via #1837
+    (`:76`, `JSON.stringify(name)` / `JSON.stringify(taskName)`).
+  - **Verified against live main `78be0e032` before escalating**, and the collision is real:
+    - `PROCESS_COMMANDS_FLAG` present in **3 files**, including the live generator template;
+    - the `Aspire 13.4` comment has **4 hits**;
+    - **#1720's acceptance box A6 is unchecked** and reads *"`PROCESS_COMMANDS_FLAG` seam and its
+      'Aspire 13.4' comment removed (grep test)."*
+    So S8's acceptance requires removing exactly what main now hardens.
+  - **I did not rule this one, deliberately.** Unlike the test-file conflict there is no precedent that
+    settles it: resolving it changes **shipped main behaviour** (removing a feature-flag seam) and
+    bears directly on an **acceptance box**. D-122 and #1837's seam repair both concerned adapting a
+    *consumer* to a shipped contract; this concerns whether the contract should exist at all.
+  - **Recommendation escalated on #1754: A6 stands, S8's removal wins.** A6 is a **stale-surface**
+    cleanup — the flag and its "Aspire 13.4" comment are 13.4-era — and #1837 hardened the *emission*
+    of that line without taking a position on whether the seam should survive. Hardening and removal
+    are orthogonal: S8 deletes the seam, #1837's hardening of that one line goes with it, and
+    #1837's hardening **elsewhere in the generator is untouched**. The alternative — A6 superseded —
+    requires amending #1720's box with rationale rather than leaving it silently unchecked.
+  - Noted for whoever resumes: `origin/main` moved **twice during this single attempt**
+    (`969e7dfeb` → `78be0e032`), so the replay must **re-fetch at dispatch time** rather than assume a
+    base.
