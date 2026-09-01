@@ -146,3 +146,21 @@ which is exactly why the carry rule is blob identity per file and not "did the r
 Generated carriers (`embedded.generated.ts`, `publish-assets.generated.ts`) are excluded from the
 product column: they need a regeneration check (`gen:assets-barrel` + `check:assets-barrel`), not a
 product verdict.
+
+## Session update — 2026-09-01 late
+
+| PR | Slice | Head | close-gate | Runtime tiers | State |
+| --- | --- | --- | --- | --- | --- |
+| #1744 | S7 | `6f4da15b6` | ✅ SUCCESS | ✅ both | **MERGE-READY** — packet posted |
+| #1754 | S8 | `ce7e82a76` | ✅ SUCCESS | ✅ both (run 33558393544), re-queued by the label event | **MERGE-READY** pending tier re-confirmation |
+| #1771 | S11 | `92568c7db` | rerun queued | n/a (docs) | eval PASS ×5 cycles; evidence applied; `status:ready-merge` |
+| #1779 | S13 | `6424bb942` | not run (draft) | n/a | delta eval PASS; **box 1 blocked on S8+S9+S11** |
+| #1759 | S9 | `e72da5161` | pending | re-running | both prior failures proven ambient (D-287) |
+| #1760 | S10 | `f1d14c98f` | pending | re-running | #1372 updated (box 3 evidenced) |
+| #1747 | — | `b189cb872` | pending | re-running | brace defect fixed + regression test (D-289) |
+
+Close-gate lessons folded in: evidence lives in **exactly one** place (the PR body); the mirror also
+reads every comment (D-285). `status:ready-merge` must be applied **after** the last push, because a
+label automation clears it on a new head (D-292). Evidence scalars are parsed with `JSON.parse`, so a
+backslash — a regex literal, for instance — is a hard parse error: validate the block locally with
+`parseAcceptanceEvidence` + `validateEvidenceMapping` before spending a CI cycle.
