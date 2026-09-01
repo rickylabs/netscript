@@ -8298,3 +8298,56 @@ across six merges) and F-3 (`gen:mcp-export-corpus` has **no clean-tree guard**,
 behind this slice's earlier wrong corpus) filed as **#1867**, milestone 0.0.8, with acceptance in both
 directions and an explicit note that a hard refusal beats a warning — a plausible-looking wrong
 artifact survives review, a failed command does not.
+
+## D-191 — Evaluator audit per control-plane warning; #1802's missing IMPL-EVAL dispatched
+
+Audited **every** active leaf for a real verdict artifact rather than trusting a label. First attempt
+matched an unrelated historical run dir (`chore-deepseek-v4-formal-impl-evaluator--1338`) — a reminder
+that a loose glob over `.llm/runs/**` finds other leaves' artifacts, which is exactly how a false
+"evaluated" reading gets made. Re-ran scoped to each leaf's **own** run directory:
+
+| PR | Own-dir artifact | Verdict | Label | Honest? |
+| --- | --- | --- | --- | --- |
+| #1802 | `plan-eval.md`, `plan-eval-cycle-2.md` only | `FAIL_PLAN` → `PASS` (**plan**, not impl) | `status:impl` | **yes** — no impl-eval claimed |
+| #1846 | `impl-eval.md` | `PASS` | `status:impl` | yes |
+| #1862 | `impl-eval.md` | `PASS` | `status:ready-merge` | yes |
+
+**No leaf currently claims an evaluation it does not have.** But the warned automation gap **did**
+manifest twice in this lane and I corrected it both times without recognising it as systemic until
+now: flipping ready-for-review put `status:impl-eval` on **#1840** and again on **#1862** with no
+evaluator launched, leaving two `status:` labels. Both times I normalized it as a taxonomy slip. It is
+not a slip — it is the control-plane behaviour described, and a supervisor who trusted the label would
+have recorded an evaluation that never ran. Recorded as a standing hazard: **`status:impl-eval` is
+evidence of a label write, never of an evaluator.**
+
+### #1802 had no IMPL-EVAL — now dispatched
+
+Its work is complete (author `task_complete`, idle 46 min) and substantively strong:
+
+- **`stopAndReap` repaired correctly** — both guards tolerate the already-terminated case matched
+  **narrowly** on `error.message === 'Child process has already terminated'`, not a blanket
+  `TypeError`; `const status = child.status` still captured **before** the kill; and `await status`
+  moved **outside** the `!terminated` branch so status is awaited on every path. Both traps I named
+  were avoided.
+- **Vocabulary** implemented with an `ownershipKind: 'blocked' | 'repair-required'` discriminator, and
+  — answering my design challenge — a missing `profileHome` takes an explicit refusal path whose
+  diagnostic reads "do not repair or relaunch … until provenance is established", distinct from a live
+  owner.
+- **Provenance** persisted as `profileHome?: string`, documented "Absent only on backward-compatible
+  legacy records" — backward-compatible and fail-closed as required.
+- **The arithmetic stress bar earned its keep.** The first 50-run attempt was **46/50**, failing at
+  iterations 1, 9, 23, 40 — and the author correctly identified those as a *different* fixture defect
+  (`pid.first` dead vs alive, the child exiting once Deno had no pending operation), not the repaired
+  cleanup. It fixed the fixture with parent-held stdin and reached **50/50, every exit 0**. A 20-run
+  bar would very likely have shown a clean sweep and hidden that second defect.
+
+IMPL-EVAL dispatched on the opposite-family GLM route at `5ac0275c7`, with re-derivation required on
+the stability claim (stating N and per-iteration exits), the narrow-catch invariants, and whether
+`blocked`/`repair-required` genuinely discriminate **to a caller** rather than only in prose.
+
+### #1862
+
+Local duplicate repo-test terminated on instruction — CI's `check-test` at `f7b17acec` is the
+canonical receipt and is still running. Everything else is staged: sole `status:ready-merge`, mirror
+dry-run clean, review threads 0/0, body carrying the verdict, convergence proof and the F-2/F-3
+advisories filed as #1867.
