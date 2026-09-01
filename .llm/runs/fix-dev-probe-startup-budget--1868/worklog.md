@@ -59,7 +59,7 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 | 2026-09-01 | 1 | design | Exact probe/test/run-dir ceiling confirmed; no product file edited before this checkpoint. |
 | 2026-09-01 | 1 | RED | Structured focused test exited 1: 0 passed, 3 failed, 3 total; every case reached the current top-level argument guard. |
 | 2026-09-01 | 1 | commit/reconcile | RED committed as `cd2337d36`; pushed by explicit refspec; draft PR #1883 opened with `Closes #1868`, required taxonomy/milestone, and unticked acceptance. Issue remains open at `status:impl`. |
-| 2026-09-01 | 2 | GREEN | Separate 180 s startup/preflight and 60 s HTTP budgets pass all three focused cases; child status races both phases. |
+| 2026-09-01 | 2 | GREEN | Separate 180 s startup/preflight and 60 s HTTP budgets pass all three focused cases; child status races both phases. Committed as `04420a074`. |
 | 2026-09-01 | 2 | review | Removed a losing one-shot 180 s timer in favor of bounded 250 ms startup races and prevented cleanup from re-killing an already-exited child. |
 
 ## Gate Results
@@ -77,4 +77,4 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 ## Handoff Notes
 
 - Evaluator should inspect phase separation, status races, truthful diagnostics, and confirm `deno.lock` stayed unchanged.
-- Commit trail: RED `cd2337d36`; GREEN SHA will be recorded immediately after the GREEN commit exists.
+- Commit trail: RED `cd2337d36`; GREEN `04420a074`.

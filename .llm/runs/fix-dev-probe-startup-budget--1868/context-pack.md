@@ -12,12 +12,12 @@
 
 ## Current State
 
-RED `cd2337d36` is pushed and draft PR #1883 is open. GREEN separates the startup and HTTP budgets, preserves actual child-exit reporting, and passes all focused structured gates.
+RED `cd2337d36` and GREEN `04420a074` are pushed; draft PR #1883 is open. GREEN separates the startup and HTTP budgets, preserves actual child-exit reporting, and passes all focused structured gates.
 
 ## Next Steps
 
-1. Commit/push GREEN and record its SHA in the run artifacts and PR timeline.
-2. Hand off for mandatory separate-session IMPL-EVAL; leave PR #1883 draft and do not merge.
+1. Hand off for mandatory separate-session IMPL-EVAL.
+2. Leave PR #1883 draft and do not merge.
 
 ## Key Decisions
 

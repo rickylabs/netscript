@@ -9,8 +9,8 @@ Separates the generated dev chain's dependency/startup allowance from the Fresh 
 
 ## Slices
 
-- [x] RED: focused slow-preflight, child-exit, and timeout-reporting regression
-- [x] GREEN: phase-aware startup and HTTP readiness budgets
+- [x] RED: focused slow-preflight, child-exit, and timeout-reporting regression — `cd2337d36`
+- [x] GREEN: phase-aware startup and HTTP readiness budgets — `04420a074`
 - [ ] Mandatory separate-session IMPL-EVAL
 
 ## Validation
