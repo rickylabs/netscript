@@ -24,7 +24,7 @@ export const JSDOC_EXAMPLE_RATCHET = {
   minimumChecked: 348,
   maximumExempt: 0,
   maximumDeferredUnboundName: 116,
-  maximumDeferredTypeError: 20,
+  maximumDeferredTypeError: 14,
 } as const;
 
 /** Return every coverage/deferred ratchet violation without hiding sibling failures. */
