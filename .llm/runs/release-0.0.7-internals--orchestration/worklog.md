@@ -9319,3 +9319,49 @@ second authorises a dispatch.
 **#1876** body de-duplicated and clean, close-gate re-run armed at unchanged head. **#1351** at
 `e4d39cb5b`. **#1879** at `80aaed97c`. **#1888** launched. **#1846** armed behind #1858, static work
 continuing.
+
+
+## D-211 - My replacement gate ALSO had a false positive - and it was #1839's own defect class
+
+Correction: #1858's run `33540720683` is pending behind **#1872**'s active two-tier run
+`33540741559`. Checking that exposed a second, worse bug in my own gate.
+
+### The gate would have fired on jobs that never executed
+
+`ns1846-gate2.sh` required #1858's runtime jobs to be `status != completed`. Reading the actual
+conclusions:
+
+```
+scaffold-runtime (aspire + docker + postgres)      status=completed  conclusion=cancelled
+scaffold-runtime-sqlite (aspire + sqlite + garnet) status=completed  conclusion=cancelled
+```
+
+**Both were `cancelled` - evicted, never executed** - and my gate counted them as done, reporting
+`1858_runtime_pending=0`. Once the lane emptied it would have released #1846 while #1858 still had no
+real run.
+
+**That is precisely the defect #1846 exists to fix**: a runtime job that ends `cancelled` looks
+terminal while providing zero coverage. I wrote a gate that made exactly the mistake the slice is
+about. It is also the same shape as the `0 passed / 0 failed` trap earlier in this run - **a status
+field read as if it were an outcome**.
+
+### Corrected to require real execution
+
+`ns1846-gate3.sh` now requires **both** tier jobs on #1858's **latest** branch run to have conclusion
+in `{success, failure}` - `cancelled` explicitly does not count - **and** zero runtime-tier jobs
+active repo-wide (which subsumes #1872 without needing to name it). Tracking the *latest* run by
+branch also survives a retry creating a new run ID, which pinning `33540720683` would not have.
+
+Current reading: `1858_real_terminal_tier_jobs=0/2 active_runtime_tier_jobs=4` - correctly closed on
+both terms. Stale gate-2 watchers killed; exactly one gate-3 watcher armed, verified by **parentage**
+rather than pattern match after a `pgrep`-style self-match briefly reported a phantom stale watcher.
+
+### Two rules carried forward
+
+- **An automated gate must encode every ordering term, and must read outcomes rather than statuses.**
+  "Completed" is not "ran"; "the lane is free" is not "the lane is mine".
+- No new hosted dispatch will occur until a real #1858 execution exists. #1846 stays disarmed behind
+  both #1872 and #1858.
+
+Static lanes continue: **#1876** close-gate re-run armed at unchanged head (`check-test` still
+running), **#1351**, **#1879**, **#1888** all progressing.
