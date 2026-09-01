@@ -754,3 +754,183 @@ IMPL-EVAL is explicitly waived; this dispatch makes no implementation.
 - Ownership verdict: BLOCKED. Neither “pre-existing” nor “S8-owned” is supported by this run.
 - Reconcile: no issue/PR lifecycle, hosted Phase B, product repair, evaluator, or `evaluate.md`
   action. Evidence-only harness commit and push are the only authorized handoff actions.
+
+## D-248 reconvergence — ruled A6 supersession
+
+PLAN-EVAL: N/A. The coordinator supplied the exact A6 ruling, reconvergence target, conflict
+resolution policy, verification set, no-runtime boundary, push lease, and evaluator handoff. This
+implementation session neither dispatches nor writes an IMPL-EVAL.
+
+The precise supersession rationale is: #1837 hardened the emission of a line whose seam #1720 A6
+removes, so hardening and removal are orthogonal and the deletion supersedes that one hardened line
+only. Main remains authoritative for ordinal bindings, double-quoted `JSON.stringify`-escaped
+source strings, helper signatures, and all sibling-generator behavior.
+
+### Baselines and replay
+
+| Item | SHA / result |
+| --- | --- |
+| Old S8 base | `6c195acaf3f7e650c4235fc3fbc51232e210e7a4` |
+| Old S8 head | `467d0d1fd3feca2639385c12317f4b1cd30b0ecf` |
+| Old own commits | 26 |
+| First fetched `origin/main` | `78be0e032624f12bcb30535d40e3a948b08b9784` |
+| Main advance observed during replay | `233828f0f64a5d522775239f3041862d646a8d00` |
+| Second replay | 25 reconciled commits, zero conflicts |
+| Pre-push main advance | `3b6386e14bd2176de795dad16fe523f5cd1fbcff` (#1840; agentic tooling only) |
+| Final replay | complete 26-commit reconciled range, zero conflicts and no package-content change |
+
+### Five #1837 conflict points and resolutions
+
+1. `generators-tools-db-index_test.ts`: retained main's `tool_0` ordinal and source-safe literal
+   expectations plus S8's error-file/argv/monitor/update assertions; removed the positive A6 seam
+   expectations. The final obsolete negative A6 block was removed rather than retaining forbidden
+   version-bound vocabulary.
+2. `generate-register-tools.ts`: retained main's ordinal bindings, `JSON.stringify` inputs, helper
+   signature, error-file resolution, runner argv, and monitor wiring; deleted only the hardened
+   `maybeWithProcessCommand(...)` emission.
+3. The early `embedded.generated.ts` collision took upstream. The replayed generated-only commit
+   became empty; no synthetic replacement was created.
+4. `generate-register-infrastructure.ts` and `generators-config-infra_test.ts` retained main's
+   `db_0` ordinals, `JSON.stringify` keys, and comment shape while carrying S8's External resolver
+   and then-current Container resolver assertions forward. D-227 evolved the same assertions to
+   `getValue()` plus null rejection without weakening source safety.
+5. D-231 replaced the unsupported Container callback resolver with the graph-injected `<db>-cli`
+   path. Its assertions now explicitly reject a Container resolver, `connectionStringExpression()`,
+   and `.getValue()`, while preserving the External resolver. Later carrier-only collisions also
+   took upstream and were regenerated once at the end.
+
+### S8 assertion carry-forward
+
+- Register-tools: error-file resolution, bounded runner argv, `monitorToolFailure`,
+  `targetState: 'Finished'`, `publishResourceUpdate`, and failure-read catch behavior.
+- Typed DB surface: `migrate`/`seed`/confirmed `reset`, timeout argument, `<db>-cli` resource,
+  MCP exclusion, staged Container request/result path, graph environment/reference/wait wiring,
+  External configuration lookup, and SQLite file URL.
+- Diagnostics: D-224 head/tail retention and UTF-8 bound, D-233 failure promotion and deploy
+  routing, D-235 shared persisted budget and cross-stream observed ordering.
+- E2E/static: readiness wait/status mapping, resident typed routing, standalone fallback,
+  typed Phase-B verifier, and synthetic-listener ownership correction.
+
+### `behavior.workers-executions` ownership
+
+Verdict: not S8-owned; it is a main-side runtime/gate issue. S8 has zero diff from current main in
+`behavior-gates.ts`, `probe-plugin-resource.ts`, `generate-register-plugins.ts`, and
+`plugins/workers/**`. #1837 changed the plugin generator on main, while S8 changes the typed-db
+generator/adapter path. This static differential does not claim the exact main-side defect, but it
+does exclude the S8 delta as owner. No runtime was run to re-diagnose it because Fixes #1858 holds
+the host lease.
+
+### Verification
+
+The final exit-code table, A6 grep counts, range-diff mapping, blob-identity table, ancestry proof,
+and push/readback evidence are appended after the static gates. No Aspire, Docker, AppHost, or
+`e2e:cli` command is permitted in this continuation.
+
+### Static gate results before the final evidence commit
+
+| Verification | Exit | Result |
+| --- | ---: | --- |
+| `deno task gen:assets-barrel` | 0 | regenerated the embedded carrier once after source replay |
+| `deno task check:assets-barrel` after staging the intended carrier | 0 | carrier matches the generated source surface |
+| scoped structured check, 23 changed non-carrier TypeScript files | 0 | 23 selected; `failedBatches: 0` |
+| standalone lint fallback, 23 changed non-carrier TypeScript files | 0 | 23 processed; zero findings or dropped files |
+| scoped formatting, 22 semicolon-policy files | 0 | 22 processed; clean |
+| scoped formatting, inherited #1837 semicolonless generator | 0 | 1 processed with `semiColons: false`; clean |
+| focused ten-file test suite | 0 | 135 passed; 0 failed |
+| repository structured check | 0 | 2,999 selected; 25 batches; `failedBatches: 0` |
+| `deno task check:aspire-version-parity` | 0 | 812 checked; `fail=0` |
+| `deno task quality:gate` | 0 | repository scanner findings 0; every doctrine root `FAIL=0` |
+
+The configured scoped lint/fmt wrappers initially exited 2 because their root policy excluded 13
+selected CLI kernel/template files; they did process the other 10 with no findings. This was a
+fail-closed coverage result, not a product diagnostic. The standalone lint and split format checks
+then proved all 23 files without weakening the repository's inherited semicolon policy. The first
+focused test pass exposed one stale, non-conflicting expectation for
+`databases.set('main', main)`; it was adapted—not deleted—to main's
+`databases.set("main", db_0)` emission, after which all 135 tests passed.
+
+### A6 deletion proof
+
+The scoped command was:
+
+```bash
+for needle in PROCESS_COMMANDS_FLAG "Aspire 13.4" maybeWithProcessCommand; do
+  rg -n --fixed-strings "$needle" \
+    packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts \
+    packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-tools-1.ts.template \
+    packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts \
+    packages/cli/src/kernel/assets/embedded.generated.ts | wc -l
+done
+```
+
+Counts: `PROCESS_COMMANDS_FLAG=0`; `Aspire 13.4=0`; `maybeWithProcessCommand=0`.
+Both staged and unstaged `git diff --check` also exited 0.
+
+### Range-diff disposition
+
+The old 26-commit range is `6c195acaf..467d0d1fd`; the final range remains 26 commits above
+`3b6386e14`. Fourteen commits map `=`, eleven map `!`, the old intermediate generated-only carrier
+commit maps `<`, and the final D-248 reconciliation/evidence commit maps `>`.
+
+Every `!` is accounted for:
+
+| Old → new | Explanation |
+| --- | --- |
+| `bd55c16af` → `30088f3f6` | Red generator assertions were re-expressed for `tool_0` and JSON-safe strings; obsolete positive A6 seam assertions were removed. |
+| `1acb9bfdf` → `46b6de1f0` | The #1837-hardened `maybeWithProcessCommand` line was deleted under A6; all adjacent source-safe tool emission survives. |
+| `9e9656692` → `26024208d` | Main inserted the dynamic-route behavior test before the S8 test hunk; S8's typed Phase-B assertion is unchanged semantically. |
+| `f29a0b265` → `c86c55708` | Infrastructure resolver work was expressed against ordinal/JSON-safe emission; its intermediate carrier edit was deferred. |
+| `bbf866d59` → `7b3e2eb0a` | Only the intermediate generated carrier edit was deferred. |
+| `a2b227941` → `9c7e85067` | Resolver emission and assertions use main's JSON-safe database key and ordinal binding. |
+| `6b0bcfe1d` → `0548feb06` | The unsupported Container resolver was removed against main's shape; External resolution and graph-injected Container assertions survive; carrier edit deferred. |
+| `592a8e688` → `d0e82aced` | Only the intermediate generated carrier edit was deferred. |
+| `a5f1ab7e0` → `379687aba` | Only the intermediate generated carrier edit was deferred. |
+| `9c5fa1b0b` → `d26fe5064` | Only the intermediate generated carrier edit was deferred. |
+| `608f8f2da` → `2ad494d2e` | Only the intermediate generated carrier edit was deferred. |
+
+The old `b9295496c` generated-only commit was empty after upstream carrier selection and maps `<`.
+The new final D-248 commit regenerates the carrier once, removes the obsolete negative A6 test
+block, adapts the surviving compile assertion, and records the coordinator ruling; it maps `>`.
+
+### Non-generated `packages/` blob identity
+
+The table is the union of non-generated package paths changed by the old and final ranges. It
+excludes `embedded.generated.ts` and the three `assets/generated/**` carriers.
+
+| Path | Old head blob | Final blob | Identical |
+| --- | --- | --- | --- |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` | `303c40a78743` | `303c40a78743` | yes |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts` | `1bdebb0c501a` | `1bdebb0c501a` | yes |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts` | `68b169e7ea6c` | `68b169e7ea6c` | yes |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts` | `1a62715478cc` | `1a62715478cc` | yes |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts` | `96126ffb85a2` | `96126ffb85a2` | yes |
+| `packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts` | `77c197e934a5` | `77c197e934a5` | yes |
+| `packages/cli/e2e/src/domain/cli-surface.ts` | `02c4439598ff` | `980c86678a0a` | no |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts` | `ee87b899a8c8` | `9eb327a8704b` | no |
+| `packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | `18791e9b897c` | `964332c48b2a` | no |
+| `packages/cli/e2e/tests/presentation/suite-registry_test.ts` | `54b86682f868` | `3c0fcd800b6a` | no |
+| `packages/cli/src/kernel/adapters/database/operation-runner-helpers.ts` | `03cb3e0f00cd` | `03cb3e0f00cd` | yes |
+| `packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts` | `44de34df1080` | `44de34df1080` | yes |
+| `packages/cli/src/kernel/adapters/database/operation-runner.ts` | `5658fb7b26c6` | `5658fb7b26c6` | yes |
+| `packages/cli/src/kernel/adapters/database/operation-runner_test.ts` | `4f09e83c219e` | `4f09e83c219e` | yes |
+| `packages/cli/src/kernel/assets/aspire/helpers/_aspire-compat.ts.template` | `a5b67c86021b` | `a5b67c86021b` | yes |
+| `packages/cli/src/kernel/assets/aspire/helpers/run-tool.ts.template` | `f500300bc85d` | `f500300bc85d` | yes |
+| `packages/cli/src/kernel/templates/aspire/helpers/generate-db-cli-mode.ts` | `dbfe753c618e` | `dbfe753c618e` | yes |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts` | `ba8f70ac3dbe` | `bbdf50e19267` | no |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts` | `9ce2a59c195a` | `cb4a52df5d07` | no |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts` | `b557917f2233` | `b557917f2233` | yes |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts` | `c6a8d09e9c3c` | `bb083ae4a5f6` | no |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts` | `96df01a5a1b0` | `e36e262f382c` | no |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts` | `d8e7848457a8` | `b97d41d22680` | no |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts` | `bd285cc28965` | `bd285cc28965` | yes |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts` | `e6e3715c6ae5` | `e6e3715c6ae5` | yes |
+
+Sixteen of 25 non-generated blobs are identical. The four E2E non-identities are main's additive
+dynamic-route gate/catalog tests. The five generator/test non-identities are exactly main's
+ordinal/JSON-safe shape, the ruled A6 deletion, and the compile assertion adaptation described
+above. No recorded S8 behavioral assertion was silently dropped.
+
+After the final no-conflict replay, `check:assets-barrel` exited 0, the focused suite exited 0 with
+69 top-level tests plus 66 nested steps and zero failures, all three A6 counts remained zero, and
+`git merge-base HEAD origin/main` equaled `origin/main`. Push/readback evidence necessarily occurs
+after this evidence commit and is reported in the PR handoff rather than rewritten into history.

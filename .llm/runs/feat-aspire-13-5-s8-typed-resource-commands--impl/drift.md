@@ -216,3 +216,29 @@ reported its own cleanup gate PASS because that gate covers the AppHost/containe
 foreign network/anonymous-volume baseline. The raw Docker commands are the higher-fidelity verdict
 for this dispatch. No agent-issued `docker rm`, `docker volume rm`, `docker network rm`, network
 recreation, or relay start occurred. Runtime work stopped immediately after discovery.
+
+## D-248 — #1837 source hardening and #1720 A6 deletion are orthogonal
+
+The coordinator ruled the previously blocked A6 collision. #1837 hardened the emission of a line
+whose seam #1720 A6 removes, so hardening and removal are orthogonal and the deletion supersedes
+that one hardened line only. The supersession is deliberately narrow: main's ordinal bindings,
+`JSON.stringify` source-safe emission, helper signatures, and sibling-generator changes remain
+authoritative everywhere else.
+
+The obsolete `maybeWithProcessCommand(...)` emission, its flag/version support, and the negative
+test block that repeated the removed version-bound vocabulary were deleted. S8's error-file
+resolution, `monitorToolFailure` wiring, `targetState`, `publishResourceUpdate`, runner argv,
+typed `<db>-cli` surface, graph-injected Container behavior, External/SQLite branches, and every
+non-A6 semantic assertion were carried forward against main's emission shape.
+
+The first exact fetched target was `78be0e032624f12bcb30535d40e3a948b08b9784`. The shared
+`origin/main` ref advanced during replay to `233828f0f64a5d522775239f3041862d646a8d00`, so the
+already-reconciled 25-commit result was re-fetched and replayed a second time with zero conflicts.
+Generated `embedded.generated.ts` conflicts always took upstream and the carrier was regenerated
+once after the final replay. `rtk` was unavailable on this host (exit 127 before Deno execution),
+so raw repo-native tasks provide the verdict evidence.
+
+The pre-push ancestry gate then observed one further main advance to
+`3b6386e14bd2176de795dad16fe523f5cd1fbcff` (#1840, agentic launcher task separators only). The
+complete 26-commit reconciled range replayed onto it with zero conflicts and no package-content
+change. This was not a sixth semantic conflict point.
