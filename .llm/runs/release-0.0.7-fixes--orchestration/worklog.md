@@ -7564,3 +7564,30 @@ browser install step at all** — the hosted gate works only because `ubuntu-lat
 `/usr/bin/google-chrome`, the first candidate. The CI browser dependency is therefore **implicit and
 unpinned**. Minimal future shape: honor a `NETSCRIPT_E2E_BROWSER` override plus an explicit
 provisioning step; ownership sits with `packages/cli/e2e`, not `packages/fresh`.
+
+## Control-plane automation gap recorded (2026-09-01)
+
+**Gap:** a draft->ready transition can move a PR to `status:impl-eval` without any evaluator session
+actually being launched. The label therefore does **not** prove evaluation happened, and treating it
+as proof would silently ship unevaluated work.
+
+**Lane rule adopted:** never infer evaluation from a label. A leaf is evaluated only when BOTH exist:
+1. an identifiable evaluator session/thread (dispatch id or background task id), and
+2. a durable verdict artifact — a committed `impl-eval-verdict.md` in the run dir, or a posted PR
+   comment carrying the verdict token.
+
+When the label is present but (1) and (2) are absent, dispatch manually through the checked-in route
+and record the gap on the leaf.
+
+**Applied to #1863 / PR #1865:** evaluator dispatched manually via the checked-in hybrid delegation
+route BEFORE any ready transition; PR is still `draft` + `status:impl`. The evaluator is required to
+write `.llm/runs/fix-flow-b-fixture-plugin-marker--1863/impl-eval-verdict.md` as the durable artifact.
+No status change will be made until that artifact exists and carries a verdict token.
+
+**Related dispatch defect observed:** the hybrid delegation MCP server rejected `z-ai/glm-5.3-flash`
+as "not approved" while that id is simultaneously `OPENROUTER_MODEL_IDS.implEvaluator` **and**
+`HYBRID_DELEGATION_DEFAULT_MODEL` in `.llm/tools/agentic/config/models.ts`, byte-identical in
+`origin/main`, the main checkout, and this worktree. The server was running a stale in-memory config;
+a later identical dispatch succeeded. Worth a guard: the approved-model list should be read at call
+time, or the server restarted on config change, or dispatch failures should name the loaded config
+revision so a stale server is distinguishable from a genuinely unapproved model.
