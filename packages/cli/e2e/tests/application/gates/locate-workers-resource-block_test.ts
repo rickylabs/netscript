@@ -54,6 +54,7 @@ Deno.test('locates workers in real register-background output', () => {
     processors: {
       streams: fixtures.MINIMAL_BACKGROUND,
       workers: fixtures.MINIMAL_BACKGROUND,
+      triggers: fixtures.MINIMAL_BACKGROUND,
     },
     version: '1.0.0',
     denoDefaults: fixtures.MINIMAL_DENO_DEFAULTS,
@@ -67,6 +68,43 @@ Deno.test('locates workers in real register-background output', () => {
   assertEquals(block.split('builder.addExecutable(').length - 1, 1);
   assertEquals(block.split('backgroundProcessors.set(').length - 1, 1);
   assertEquals(block.includes("'streams'"), false);
+  assertEquals(block.includes("'triggers'"), false);
+});
+
+// The background generator still emits the resource-name comment `  // --- workers ---`, so on
+// *today's* output the old comment-keyed locator and the semantic one agree -- meaning no test built
+// from current output can prove the background migration actually happened. This test supplies the
+// discriminator directly: strip the name comment from real generator output, exactly the rename
+// #1837 applied to the plugins generator, and require the locator to still find the block. The old
+// implementation threw on this input; the semantic one does not. Without this, the background
+// migration would be asserted only by tests that pass either way.
+Deno.test('locates the background workers block even with the name comment removed (#1837 rename)', () => {
+  const source = generateRegisterBackground({
+    processors: {
+      streams: fixtures.MINIMAL_BACKGROUND,
+      workers: fixtures.MINIMAL_BACKGROUND,
+      triggers: fixtures.MINIMAL_BACKGROUND,
+    },
+    version: '1.0.0',
+    denoDefaults: fixtures.MINIMAL_DENO_DEFAULTS,
+  });
+
+  // Simulate #1837's source-safe rename against the background generator.
+  const renamed = source
+    .replace('  // --- streams ---', '  // --- processor 0 ---')
+    .replace('  // --- workers ---', '  // --- processor 1 ---')
+    .replace('  // --- triggers ---', '  // --- processor 2 ---');
+  assertEquals(renamed.includes('  // --- workers ---'), false);
+
+  const block = renamed.slice(
+    locateWorkersBackgroundBlock(renamed).start,
+    locateWorkersBackgroundBlock(renamed).end,
+  );
+
+  assertStringIncludes(block, "addExecutable('workers'");
+  assertStringIncludes(block, "backgroundProcessors.set('workers'");
+  assertEquals(block.includes("'streams'"), false);
+  assertEquals(block.includes("'triggers'"), false);
 });
 
 Deno.test('rejects generated output with no workers resource block', () => {
