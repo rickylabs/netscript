@@ -39,21 +39,37 @@ Not stale consumers (correct by construction — they assert the generator's own
 `generators-service-plugin_test.ts`, `generators-background-app_test.ts`, `generators-test-support.ts`,
 `project-config-ops_test.ts:81` (unrelated `// ---` section banner).
 
-### Decision on consumer 2 (recorded)
+### Consumer 2 — CORRECTION (orchestrator, after coordinator audit)
 
-Consumer 2 cannot use the same semantic anchor as consumer 1: `register-background.mts` emits no
-`plugins.set(<name>, resource)` registration, so there is no second independent anchor to pair with the
-creation and no way to bound the span structurally. Inventing an anchor from an unverified assumption
-about background emission would be less safe than the current name-keyed lookup, which *does* work
-against today's generator.
+An earlier revision of this file, and an earlier code comment, claimed consumer 2 could not be made
+semantic because `register-background.mts` has "no `plugins.set(...)` registration anchor to pair with
+the creation". **That claim was false and is retracted.** The coordinator's audit was correct.
 
-Chosen prevention: assert the coupling. `locate-workers-resource-block_test.ts` calls
-`generateRegisterBackground` with the repo's own fixtures and requires `  // --- workers ---` in the
-output, with a failure message naming the consumer that must be migrated in the same change. Verified
-to be a real guard: flipping the generator to an ordinal form makes it fail; generator restored
-byte-identical afterwards.
+`generate-register-background.ts` emits the same two-anchor shape as the plugins generator:
 
-This closes the #1837 recurrence class without widening into generator redesign.
+- creation, `:111` — `const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, [...])`
+- registration, `:237` — `backgroundProcessors.set('${name}', ${id});`
+
+The only differences from the plugins generator are the registry variable (`backgroundProcessors`
+rather than `plugins`) and that the resource identifier is derived via `safeIdentifier(name)` rather
+than the literal `resource`. Neither prevents a semantic locator.
+
+Consumer 2 has therefore been **migrated**, not documented-around, and the coupling guard that existed
+only to justify not migrating it has been removed. `prepare-flow-b-fixture.ts` now contains **zero**
+comment-keyed locators.
+
+The locator was generalized to `locateGeneratedResourceBlock(source, { registry, resourceName,
+generatedFile })`, which is strictly stronger than the first implementation: it captures the resource
+identifier from the creation and **requires the same identifier** in the registration, rejects
+ambiguity (more than one creation anchor) instead of resolving it by position, and still requires the
+resulting span to contain exactly one creation and one registration so it cannot widen across a
+sibling. Quote form is not assumed — the plugins generator emits names via `JSON.stringify` (double
+quotes) and the background generator emits them single-quoted; both are covered and both are now
+exercised by tests built from **real generator output**, not hand-written strings.
+
+Consumer 3 (`prepare-readiness-fixture.ts`) remains prefix-keyed on `'  // --- app '`, which the apps
+generator still emits as `// --- app ${appIndex} ---`. It is tolerant of index changes but is the same
+class; it is out of scope for this leaf and is not claimed to be fixed.
 
 ### Open lead (NOT part of this leaf)
 

@@ -1,5 +1,8 @@
 import { configurePublishedWorkersBlock } from './configure-published-workers-block.ts';
-import { locateWorkersResourceBlock } from './locate-workers-resource-block.ts';
+import {
+  locateWorkersBackgroundBlock,
+  locateWorkersResourceBlock,
+} from './locate-workers-resource-block.ts';
 import { prepareLocalSourceFixture } from './local-source-fixture.ts';
 
 const projectRoot = Deno.args[0];
@@ -299,18 +302,9 @@ await Deno.writeTextFile(flowBJobPath, updatedFlowBJob);
 
 const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-background.mts`;
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
-const workersBackgroundMarker = '  // --- workers ---';
-const workersBackgroundIndex = registerBackground.indexOf(workersBackgroundMarker);
-if (workersBackgroundIndex < 0) {
-  throw new Error('generated register-background.mts did not contain the workers resource block');
-}
-const followingBackgroundIndex = registerBackground.indexOf(
-  '  // --- ',
-  workersBackgroundIndex + workersBackgroundMarker.length,
-);
-const nextBackgroundIndex = followingBackgroundIndex < 0
-  ? registerBackground.length
-  : followingBackgroundIndex;
+const workersBackgroundRange = locateWorkersBackgroundBlock(registerBackground);
+const workersBackgroundIndex = workersBackgroundRange.start;
+const nextBackgroundIndex = workersBackgroundRange.end;
 const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,
