@@ -7746,3 +7746,37 @@ withheld until exact CI is green** — the #1828 lesson applied rather than mere
 
 Two leaves remain in flight: **#1802** (bounded repair, countermand delivered pending) and **#1846 /
 #1839** (RED committed, working).
+
+## D-179 — Preservation leaf #1854 opened; only ONE of the two named strips needed restoring
+
+Owner ruling: **#1847 is invalid** (coordinator will close it) and must not be implemented. Launched a
+bounded preservation leaf from current `main` `4cf519f7d`.
+
+**Measured both named heads rather than restoring both on instruction:**
+
+| PR | Pre-strip head | Run directory | At pre-strip | On `main` | Action |
+| --- | --- | --- | ---: | ---: | --- |
+| #1816 | `16887ad0d` | `…/docs-plugin-sagas-core-exports-heading--1815/` | 7 | **0** | **restored** |
+| #1835 | `b7d0a60ac` | `…/fix-sdk-cli-key-normalization-residuals--1833/` | 17 | **17** | **no action** |
+
+**#1835 needed nothing.** Its 17 artifacts were already restored on `main` by **#1852**, which is
+literally the current `main` HEAD commit (`4cf519f7d chore(harness): restore #1833 run artifacts
+stripped in error`). I verified all 17 are **byte-identical** to their `b7d0a60ac` originals — 0 of 17
+differ — rather than re-adding them and creating a redundant or conflicting change. Restoring both on
+instruction without checking would have produced a no-op at best and a merge conflict at worst.
+
+`16887ad0d` is **not an ancestor of `main`**, which is why #1816's directory never arrived.
+
+**PR #1854** — `9a38591af`, non-draft, sole `status:ready-merge`, milestone 0.0.7,
+`type:chore`/`area:tooling`/`priority:p2`/`orchestrator:internals`:
+
+- **7 files, all additions**, all under the one run directory.
+- **Byte-identity proven**: each restored blob hash compared against `16887ad0d` — **7 identical,
+  0 mismatched**.
+- **Non-scope honoured exactly as ruled**: no product blobs (`git diff --name-only` returns nothing
+  outside that directory), **no redaction** (absolute paths, rollout paths and thread/session
+  identifiers restored exactly as originally committed), **no cleanup guard**, no `.gitignore` rule,
+  and **no modifications or deletions** — `git diff --name-status` is 7 × `A`.
+
+All other internals work continued uninterrupted: #1832 and #1840 are ready with exact CI running,
+#1802's bounded repair is active, #1846 is working.
