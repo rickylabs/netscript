@@ -125,9 +125,10 @@ export function extractVerdict(transcript: string): VerdictExtraction {
       text,
       resultField,
       reportedSuccess,
-      failure:
-        `NO VERDICT TOKEN in ${text.length} chars of evaluator output. Expected one of: ` +
-        `${VERDICT_TOKENS.join(', ')}. An answer that never renders a verdict is a failure to evaluate.`,
+      failure: `NO VERDICT TOKEN in ${text.length} chars of evaluator output. Expected one of: ` +
+        `${
+          VERDICT_TOKENS.join(', ')
+        }. An answer that never renders a verdict is a failure to evaluate.`,
     };
   }
 

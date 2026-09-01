@@ -28,9 +28,9 @@ binds them to a NetScript host.
 - **A real operations surface** — the plugin CLI covers the job lifecycle end to end: `add-job`,
   `add-task`, `add-workflow`, `run`, `run-task`, `list-jobs`, `executions`, `logs`, `trigger`,
   `enable`/`disable`, and `compile-registry`.
-- **Workers API included** — the `workers-api` service uses an Aspire-allocated endpoint and exposes job and
-  execution introspection over a versioned contract, so dashboards and agents query state instead of
-  scraping logs.
+- **Workers API included** — the `workers-api` service uses an Aspire-allocated endpoint and exposes
+  job and execution introspection over a versioned contract, so dashboards and agents query state
+  instead of scraping logs.
 - **Durable by default** — `./streams` publishes execution and job entities to durable stream
   topics, and worker metrics flow through the shared NetScript telemetry conventions.
 - **Aspire-native** — `./aspire` contributes the worker resources to the AppHost, so local
@@ -75,6 +75,43 @@ deno x -A jsr:@netscript/plugin-workers@<version>/cli list-jobs
 
 Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line.
+
+## Generated job policy
+
+`netscript generate plugins` discovers worker modules from the installed plugin's
+`scaffold.runtime.json`, then reads project policy from `netscript.config.ts`. The manifest owns
+discovery metadata only; it is never a second policy store. Validation and defaults remain owned by
+`@netscript/plugin-workers-core/config`, and the registry generator consumes that normalized result.
+
+Policy binds to a discovered module by its normalized project-relative entrypoint. The configured
+source must agree with discovery, and a plugin-owned handler's exported id must agree with its
+configured id; unmatched or conflicting paths, ids, and sources stop generation with a diagnostic.
+Discovered jobs with no config entry retain the generic registry defaults for compatibility.
+
+Grouped jobs are canonical. When `workers.groups[].jobs[]` and legacy `workers.jobs[]` declare the
+same id and entrypoint, the grouped definition wholly shadows the flat definition, including its
+group topic and every policy field. A partial collision—same id at another path or the same path
+with another id—is an error rather than an order-dependent merge.
+
+```typescript
+export default {
+  name: 'orders',
+  databases: { config: [] },
+  workers: {
+    jobsDir: './workers/jobs',
+    groups: [{
+      topic: 'billing',
+      jobs: [{
+        id: 'reconcile-invoices',
+        name: 'Reconcile invoices',
+        entrypoint: './reconcile-invoices.ts',
+        priority: 80,
+        maxConcurrency: 2,
+      }],
+    }],
+  },
+};
+```
 
 ## Quick example
 

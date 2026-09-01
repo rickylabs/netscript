@@ -1,16 +1,17 @@
 import { exists } from 'jsr:@std/fs@^1';
-import { basename, dirname, join, relative } from 'jsr:@std/path@^1';
+import { basename, dirname, join, relative, resolve } from 'jsr:@std/path@^1';
 import { toCamelCase } from 'jsr:@std/text@^1';
+import type { JobConfig, WorkersConfigData } from '@netscript/plugin-workers-core/config';
 
 export interface GenerateRuntimeRegistriesOptions {
   readonly manifestPath: string;
   readonly profile?: string;
   readonly projectRoot: string;
+  /** Core-normalized project workers policy, when the project declares one. */
+  readonly workers?: WorkersConfigData;
 }
 
-interface RuntimeManifest {
-  readonly runtimeRegistries?: readonly RuntimeRegistryTarget[];
-}
+type RuntimeManifest = Readonly<{ runtimeRegistries?: readonly RuntimeRegistryTarget[] }>;
 
 interface RuntimeRegistryTarget {
   readonly kind: 'map' | 'workers-job';
@@ -61,28 +62,38 @@ interface PluginEntry {
   readonly varName: string;
 }
 
+type DiscoveredJob = Readonly<{ path: string; source: 'local' | 'plugin' }>;
+
+interface ConfiguredJob {
+  readonly canonicalPath: string;
+  readonly grouped: boolean;
+  readonly origin: string;
+  readonly policy: JobConfig;
+}
+
 export async function generateRuntimeRegistries(
   options: GenerateRuntimeRegistriesOptions,
 ): Promise<readonly string[]> {
   const manifest = JSON.parse(await Deno.readTextFile(options.manifestPath)) as RuntimeManifest;
   const generated: string[] = [];
-
   for (const rawTarget of manifest.runtimeRegistries ?? []) {
     const target = applyProfile(rawTarget, options.profile);
     const targetDir = join(options.projectRoot, target.dir);
-    if (!await exists(targetDir, { isDirectory: true })) {
-      continue;
-    }
+    const hasConfiguredJobs = target.kind === 'workers-job' && options.workers &&
+      (options.workers.jobs.length > 0 ||
+        options.workers.groups.some((group) => group.jobs.length));
+    const targetDirExists = await exists(targetDir, { isDirectory: true });
+    if (!targetDirExists && !hasConfiguredJobs) continue;
 
-    const files = await discoverRegistryFiles(options.projectRoot, targetDir, {
-      fileSuffixes: target.fileSuffixes,
-      include: target.include,
-      includeWhenPresent: target.includeWhenPresent,
-      exclude: target.exclude,
-    });
-    if (files.length === 0) {
-      continue;
-    }
+    const files = targetDirExists
+      ? await discoverRegistryFiles(options.projectRoot, targetDir, {
+        fileSuffixes: target.fileSuffixes,
+        include: target.include,
+        includeWhenPresent: target.includeWhenPresent,
+        exclude: target.exclude,
+      })
+      : [];
+    if (files.length === 0 && !hasConfiguredJobs) continue;
 
     const registryPath = target.registryPath
       ? join(options.projectRoot, target.registryPath)
@@ -90,7 +101,13 @@ export async function generateRuntimeRegistries(
     await Deno.mkdir(dirname(registryPath), { recursive: true });
     await Deno.writeTextFile(
       registryPath,
-      await generateRuntimeRegistry(options.projectRoot, target, registryPath, files),
+      await generateRuntimeRegistry(
+        options.projectRoot,
+        target,
+        registryPath,
+        files,
+        options.workers,
+      ),
     );
     generated.push(relative(options.projectRoot, registryPath).replaceAll('\\', '/'));
   }
@@ -163,6 +180,7 @@ async function generateRuntimeRegistry(
   target: RuntimeRegistryTarget,
   registryPath: string,
   files: readonly string[],
+  workers: WorkersConfigData | undefined,
 ): Promise<string> {
   const lines = createRegistryHeader(target);
   const registryDir = relative(projectRoot, dirname(registryPath)).replaceAll('\\', '/');
@@ -175,6 +193,9 @@ async function generateRuntimeRegistry(
   });
 
   const pluginEntries = await appendPluginImports(projectRoot, target, registryDir, lines);
+  const configuredPolicies = target.kind === 'workers-job' && workers
+    ? resolveConfiguredJobPolicies(projectRoot, target, files, pluginEntries, workers)
+    : undefined;
   const valueType = target.mapValueType ?? target.typeImport.name;
   if (target.kind === 'workers-job') {
     lines.push('', `const jobHandlers: readonly ${valueType}[] = [`);
@@ -190,12 +211,21 @@ async function generateRuntimeRegistry(
     });
     lines.push('];', '', `export const registry = new Map<string, ${valueType}>([`);
     files.forEach((file, index) => {
-      lines.push(`  [${JSON.stringify(basename(file, '.ts'))}, jobHandlers[${index}]],`);
-    });
-    pluginEntries.forEach((_entry, index) => {
-      const handlerIndex = files.length + index;
+      const path = `${target.dir}/${file}`;
+      const policy = configuredPolicies?.get(path);
       lines.push(
-        `  [jobHandlers[${handlerIndex}].${target.registryKey}, jobHandlers[${handlerIndex}]],`,
+        `  [${JSON.stringify(policy?.id ?? basename(file, '.ts'))}, jobHandlers[${index}]],`,
+      );
+    });
+    pluginEntries.forEach((entry, index) => {
+      const handlerIndex = files.length + index;
+      const policy = configuredPolicies?.get(entry.path);
+      lines.push(
+        policy
+          ? `  [assertJobHandlerId(jobHandlers[${handlerIndex}], ${JSON.stringify(policy.id)}, ${
+            JSON.stringify(entry.path)
+          }), jobHandlers[${handlerIndex}]],`
+          : `  [jobHandlers[${handlerIndex}].${target.registryKey}, jobHandlers[${handlerIndex}]],`,
       );
     });
   } else {
@@ -211,7 +241,13 @@ async function generateRuntimeRegistry(
   }
   lines.push(']);', '');
 
-  appendJobDefinitions(target, files, pluginEntries, lines);
+  appendJobDefinitions(
+    target,
+    files,
+    pluginEntries,
+    configuredPolicies,
+    lines,
+  );
   return lines.join('\n');
 }
 
@@ -285,82 +321,172 @@ function appendJobDefinitions(
   target: RuntimeRegistryTarget,
   files: readonly string[],
   pluginEntries: readonly PluginEntry[],
+  configuredPolicies: ReadonlyMap<string, JobConfig> | undefined,
   lines: string[],
 ): void {
   if (target.kind !== 'workers-job') return;
 
+  let hasConfiguredPolicies = false;
   lines.push('const jobDefinitionEntries: readonly [string, RegisterJobInput][] = [');
   files.forEach((file) => {
-    const jobId = JSON.stringify(basename(file, '.ts'));
-    lines.push(
-      `  [${jobId}, createLocalJobDefinition(${jobId}, './${file}')],`,
-    );
+    const policy = configuredPolicies?.get(`${target.dir}/${file}`);
+    if (policy) {
+      hasConfiguredPolicies = true;
+      lines.push(configuredDefinitionEntry(policy, `./${file}`, 'local'));
+    } else {
+      const jobId = JSON.stringify(basename(file, '.ts'));
+      lines.push(
+        `  [${jobId}, createLocalJobDefinition(${jobId}, './${file}')],`,
+      );
+    }
   });
   pluginEntries.forEach((entry, index) => {
     const handlerIndex = files.length + index;
-    lines.push(
-      `  [jobHandlers[${handlerIndex}].id, createPluginJobDefinition(jobHandlers[${handlerIndex}].id, '${entry.pluginId}', './plugins/${entry.pluginId}/jobs/${entry.file}')],`,
-    );
+    const policy = configuredPolicies?.get(entry.path);
+    if (policy) {
+      hasConfiguredPolicies = true;
+      lines.push(configuredDefinitionEntry(policy, `./${entry.path}`, 'plugin', entry.pluginId));
+    } else {
+      lines.push(
+        `  [jobHandlers[${handlerIndex}].id, createPluginJobDefinition(jobHandlers[${handlerIndex}].id, '${entry.pluginId}', './plugins/${entry.pluginId}/jobs/${entry.file}')],`,
+      );
+    }
   });
   lines.push('];', '');
   lines.push(
     'export const jobDefinitions = new Map<string, RegisterJobInput>(jobDefinitionEntries);',
   );
   lines.push('export const definitions = jobDefinitions;', '');
+  if (hasConfiguredPolicies) {
+    lines.push(
+      'function createConfiguredJobDefinition(policy: RegisterJobInput, entrypoint: string, source: "local" | "plugin", pluginId?: string): RegisterJobInput {\n  return {\n    ...policy,\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n  };\n}',
+      '',
+    );
+  }
   lines.push(
-    'function createLocalJobDefinition(id: string, entrypoint: string): RegisterJobInput {',
+    'function createLocalJobDefinition(id: string, entrypoint: string): RegisterJobInput {\n  return createJobDefinition(id, entrypoint, "local");\n}',
+    '',
+    'function createPluginJobDefinition(id: string, pluginId: string, entrypoint: string): RegisterJobInput {\n  return createJobDefinition(id, entrypoint, "plugin", pluginId);\n}',
+    '',
+    'function createJobDefinition(id: string, entrypoint: string, source: "local" | "plugin", pluginId?: string): RegisterJobInput {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n  };\n}',
+    '',
+    'function toJobName(id: string): string {\n  return id.split("-").filter(Boolean).map((part) =>\n    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`\n  ).join(" ");\n}',
+    '',
   );
-  lines.push('  return createJobDefinition(id, entrypoint, "local");');
-  lines.push('}', '');
-  lines.push(
-    'function createPluginJobDefinition(id: string, pluginId: string, entrypoint: string): RegisterJobInput {',
-  );
-  lines.push('  return createJobDefinition(id, entrypoint, "plugin", pluginId);');
-  lines.push('}', '');
-  lines.push(
-    'function createJobDefinition(id: string, entrypoint: string, source: "local" | "plugin", pluginId?: string): RegisterJobInput {',
-  );
-  lines.push('  return {');
-  lines.push('    id,');
-  lines.push('    name: toJobName(id),');
-  lines.push('    entrypoint,');
-  lines.push('    topic: "default",');
-  lines.push('    source,');
-  lines.push('    ...(pluginId ? { pluginId } : {}),');
-  lines.push('    executionType: "deno",');
-  lines.push('    timezone: "UTC",');
-  lines.push('    timeout: 300000,');
-  lines.push('    maxRetries: 3,');
-  lines.push('    retryDelay: 1000,');
-  lines.push('    maxConcurrency: 1,');
-  lines.push('    priority: 50,');
-  lines.push('    enabled: true,');
-  lines.push('    persist: true,');
-  lines.push('    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],');
-  lines.push('  };');
-  lines.push('}', '');
-  lines.push('function toJobName(id: string): string {');
-  lines.push('  return id.split("-").filter(Boolean).map((part) =>');
-  lines.push('    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`');
-  lines.push('  ).join(" ");');
-  lines.push('}', '');
   const handlerType = target.mapValueType ?? target.typeImport.name;
+  if (pluginEntries.some((entry) => configuredPolicies?.has(entry.path))) {
+    lines.push(
+      `function assertJobHandlerId(handler: ${handlerType}, expectedId: string, path: string): string {\n  if (handler.id !== expectedId) {\n    throw new Error(\`Workers config id "\${expectedId}" does not match discovered plugin handler id "\${String(handler.id)}" at \${path}.\`);\n  }\n  return expectedId;\n}`,
+      '',
+    );
+  }
   lines.push(
-    `function resolveJobHandler(module: Record<string, unknown>, path: string): ${handlerType} {`,
+    `function resolveJobHandler(module: Record<string, unknown>, path: string): ${handlerType} {\n  const candidate = module.default ?? module.handler ?? firstFunctionExport(module);\n  if (typeof candidate !== "function") {\n    throw new Error(\`Worker job module \${path} does not export a function handler.\`);\n  }\n  return candidate as ${handlerType};\n}`,
+    '',
+    'function firstFunctionExport(module: Record<string, unknown>): unknown {\n  return Object.values(module).find((value) => typeof value === "function");\n}',
+    '',
   );
-  lines.push(
-    '  const candidate = module.default ?? module.handler ?? firstFunctionExport(module);',
+}
+
+function resolveConfiguredJobPolicies(
+  projectRoot: string,
+  target: RuntimeRegistryTarget,
+  files: readonly string[],
+  pluginEntries: readonly PluginEntry[],
+  workers: WorkersConfigData,
+): ReadonlyMap<string, JobConfig> {
+  const discovered = new Map<string, DiscoveredJob>();
+  files.forEach((file) => addDiscovered(`${target.dir}/${file}`, 'local'));
+  pluginEntries.forEach((entry) => addDiscovered(entry.path, 'plugin'));
+  const configuredByPath = new Map<string, ConfiguredJob>();
+  const configuredById = new Map<string, ConfiguredJob>();
+  workers.groups.forEach((group, groupIndex) =>
+    group.jobs.forEach((policy, jobIndex) =>
+      addConfiguredJob(policy, `workers.groups[${groupIndex}].jobs[${jobIndex}]`, true)
+    )
   );
-  lines.push('  if (typeof candidate !== "function") {');
-  lines.push(
-    '    throw new Error(`Worker job module ${path} does not export a function handler.`);',
+  workers.jobs.forEach((policy, index) =>
+    addConfiguredJob(policy, `workers.jobs[${index}]`, false)
   );
-  lines.push('  }');
-  lines.push(`  return candidate as ${handlerType};`);
-  lines.push('}', '');
-  lines.push('function firstFunctionExport(module: Record<string, unknown>): unknown {');
-  lines.push('  return Object.values(module).find((value) => typeof value === "function");');
-  lines.push('}', '');
+
+  const matched = new Map<string, JobConfig>();
+  for (const configured of configuredByPath.values()) {
+    const discoveredJob = discovered.get(configured.canonicalPath);
+    if (!discoveredJob) {
+      const available = [...discovered.values()].map((entry) => entry.path).join(', ') || '(none)';
+      throw new Error(
+        `Workers config ${configured.origin} declares id "${configured.policy.id}" at "${configured.policy.entrypoint}", which resolves to unmatched project path "${configured.canonicalPath}". Discovered worker job files: ${available}.`,
+      );
+    }
+    if (configured.policy.source !== discoveredJob.source) {
+      throw new Error(
+        `Workers config ${configured.origin} declares source "${configured.policy.source}" for id "${configured.policy.id}" at "${configured.canonicalPath}", but discovery identified that file as source "${discoveredJob.source}".`,
+      );
+    }
+    matched.set(discoveredJob.path, configured.policy);
+  }
+  return matched;
+
+  function addDiscovered(path: string, source: 'local' | 'plugin'): void {
+    const canonicalPath = canonicalProjectPath(projectRoot, path);
+    discovered.set(canonicalPath, { path, source });
+  }
+
+  function addConfiguredJob(policy: JobConfig, origin: string, grouped: boolean): void {
+    const canonicalPath = configuredProjectPath(projectRoot, workers.jobsDir, policy.entrypoint);
+    const configured = { canonicalPath, grouped, origin, policy } satisfies ConfiguredJob;
+    const samePath = configuredByPath.get(canonicalPath);
+    if (samePath) {
+      if (samePath.policy.id !== policy.id) {
+        throw new Error(
+          `Workers config path "${canonicalPath}" is paired with conflicting ids "${samePath.policy.id}" (${samePath.origin}) and "${policy.id}" (${origin}).`,
+        );
+      }
+      if (!grouped && samePath.grouped) {
+        console.warn(
+          `Workers config ${samePath.origin} wholly shadows flat ${origin} for id "${policy.id}" at "${canonicalPath}".`,
+        );
+        return;
+      }
+      throw new Error(
+        `Workers config contains duplicate policies for id "${policy.id}" at "${canonicalPath}" (${samePath.origin} and ${origin}).`,
+      );
+    }
+
+    const sameId = configuredById.get(policy.id);
+    if (sameId && sameId.canonicalPath !== canonicalPath) {
+      throw new Error(
+        `Workers config id "${policy.id}" is paired with conflicting paths "${sameId.canonicalPath}" (${sameId.origin}) and "${canonicalPath}" (${origin}).`,
+      );
+    }
+    configuredByPath.set(canonicalPath, configured);
+    configuredById.set(policy.id, configured);
+  }
+}
+
+function configuredDefinitionEntry(
+  policy: JobConfig,
+  entrypoint: string,
+  source: 'local' | 'plugin',
+  pluginId?: string,
+): string {
+  const pluginArgument = pluginId ? `, ${JSON.stringify(pluginId)}` : '';
+  return `  [${JSON.stringify(policy.id)}, createConfiguredJobDefinition(${
+    JSON.stringify(policy)
+  }, ${JSON.stringify(entrypoint)}, ${JSON.stringify(source)}${pluginArgument})],`;
+}
+
+function configuredProjectPath(projectRoot: string, jobsDir: string, entrypoint: string): string {
+  const absoluteJobsDir = resolve(projectRoot, jobsDir.replaceAll('\\', '/'));
+  return canonicalProjectPath(
+    projectRoot,
+    resolve(absoluteJobsDir, entrypoint.replaceAll('\\', '/')),
+  );
+}
+
+function canonicalProjectPath(projectRoot: string, path: string): string {
+  const absolute = resolve(projectRoot, path.replaceAll('\\', '/'));
+  return relative(resolve(projectRoot), absolute).replaceAll('\\', '/');
 }
 
 function toRelativeImport(fromDir: string, target: string): string {
