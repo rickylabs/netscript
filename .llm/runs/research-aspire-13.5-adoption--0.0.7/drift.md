@@ -6002,3 +6002,29 @@
     so they replay onto S8's converged head once it exists.
   - **#1844 remains the S7 trigger** — `status:plan`, `orchestrator:fixes`. On merge: pull current
     main into S7 and finish Phase-B/merge without parking.
+
+- **D-245 — host runtime lease REASSIGNED to the #1844 fixes lane. Aspire lane is runtime-frozen; all
+  work continues static/hosted-CI.**
+  - **Baseline verified read-only, and it matches the coordinator's statement exactly:**
+    `aspire ps` **`[]`**, containers **0**, custom networks **0**, volumes **{`d33e5c2e…`}** — the
+    single older foreign volume, untouched.
+  - **#1855 cleanup disposition recorded:** the coordinator removed **only** the newly proven
+    run-owned anonymous volume `90d704b4…` after zero-consumer verification; the older foreign
+    `d33e5c2e…` remains. The destroyed unknown network is **not** to be recreated, and **#1855 stays
+    active** for the leak-check / foreign-network repair — the tooling defect is unchanged by the
+    cleanup of its symptom.
+  - **Hard constraint now in force: no local AppHost from this lane** until #1844 returns
+    `Docker=0`/`Aspire=[]` and the coordinator releases the lease back. Every live dispatch already
+    complies — D-244 (S8 convergence) forbids runtime explicitly, and nothing else of mine starts
+    resources.
+  - **What still moves without runtime:** S8 convergence onto current main; S9/S10 restack once S8's
+    converged head exists; S11 restack behind S10; S13's static parity work; and every hosted CI run,
+    which executes on GitHub runners and is unaffected by the host lease.
+  - **#1747 is the next closable leaf and is nearly there.** Head `2032d4ed7`, ready,
+    `status:impl-eval`, **S8-free** (verified — no `verify-typed-db-phase-b.ts`), **#1732's acceptance
+    boxes are 0 unchecked**, and only **one** DoD box remains: hosted `scaffold.runtime` evidence.
+    Its `database.seed` **passes**; its sole runtime failure was **`runtime.wait.garnet`** — i.e.
+    **#1844 itself**. So the lane currently has two leaves (#1744 and #1747) gated on exactly the
+    defect the reassigned lease is being spent to fix, which is the right place for it.
+  - Main has moved again to **`969e7dfeb`**; both leaves will want a re-run against current main once
+    #1844 lands.
