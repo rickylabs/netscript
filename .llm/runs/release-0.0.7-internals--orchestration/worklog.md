@@ -9243,3 +9243,30 @@ were caught by the evaluator, and both are now named traps in the record.
 **#1351** pushed `e4d39cb5b` (implementation under way). **#1879** pushed `80aaed97c` (widened scope).
 **#1888** launched, not yet pushed. **#1846** auto-release still armed - drain check reports **2**
 active runtime-tier jobs, so the hosted slot has not opened; it fires automatically when it does.
+
+
+## D-209 - #1876 body de-duplicated against the LIVE GitHub body
+
+Correction accepted: my previous "body corrected" claim was again incomplete. Two
+`acceptance-evidence` blocks were live (lines 63-72 and 76-86) and the cycle-1 line was duplicated -
+because I **appended** a block rather than reconciling against what GitHub actually held. The author
+had already authored an evidence block; my append created a second.
+
+Fixed by fetching the **live** body as authoritative rather than patching a local draft:
+
+- removed the **older** block, kept the detailed current-head one (anchored to `5952fdf47`);
+- collapsed the duplicate cycle-1 line, keeping the precise one that names the completeness gap;
+- normalised the blank-line runs left behind.
+
+Verified **on the live body after the PATCH**, not on my local copy: `acceptance-evidence` blocks
+**1**, `IMPL-EVAL cycle 1` lines **1**, mirror dry-run **`REAL_EXIT=0`** with no mapping error, label
+sole `status:ready-merge`, non-draft, head unchanged at `5952fdf47`.
+
+**The transferable lesson, and it is the second time today:** *the live remote body is the only
+authoritative source*. Appending to a PR body without first reading what is there produces duplicates
+that read as authoritative; and claiming "rewritten" after a partial edit is worse than not claiming
+it. Both times the discrepancy was caught by audit rather than by me, so the fix is procedural -
+**read the live body, reconcile, then verify the live body again after writing**.
+
+`close-gate` re-run remains armed on run `33540526217` to fire at the **unchanged head** once
+`check-test` completes; no push, so the evaluated head stays immutable.
