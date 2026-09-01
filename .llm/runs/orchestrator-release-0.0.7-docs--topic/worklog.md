@@ -3212,3 +3212,39 @@ and #1640; **#1866 is invisible to that query** because `orchestrator:docs` is a
 finalization, not at dispatch. Any audit keyed solely on that label silently omits every in-flight
 leaf — exactly the population this check exists to cover. Enumerate active leaves from the lane
 ledger, not from the label.
+
+## 2026-09-01 — Ownership-label reconciliation (coordinator taxonomy correction)
+
+**Correction adopted:** the topic orchestrator label goes on a leaf PR **when it is opened**, not at
+finalization. Applying it at finalization is what made the previous audit blind to every in-flight
+leaf — the failure mode I reported one step earlier, now fixed at its cause rather than worked
+around in the audit query.
+
+**Reconciled all 23 open PRs against the lane ledger. Docs lane needs no additions:**
+
+| PR | Branch | Ownership | Lifecycle (untouched) |
+| --- | --- | --- | --- |
+| #1866 | `docs/adopt-plugin-pages-a` | `orchestrator:docs` (added by coordinator) | `status:impl` |
+| #1756 | `test/jsdoc-example-compile-gate` | `orchestrator:docs` | `status:impl` |
+| #1640 | `docs/database-architecture-rfc` | `orchestrator:docs` | `status:review` |
+
+All three docs leaves in the ledger are open, labelled, and complete. **Zero missing ownership
+labels in this lane; no lifecycle label was changed.**
+
+**Cross-lane finding — one open PR carries no ownership label at all:**
+
+`#1856 fix(fresh): make client-mode collection navigation unrepresentable` (author `rickylabs`,
+draft, base `main`, created 2026-09-01) has **no `orchestrator:` label and no `status:` label**.
+
+Not claimed by docs, on evidence: it touches `packages/fresh/src/application/form/_internal/`
+and `form.test.tsx`, with **0 paths** under `docs/site/` or `.llm/tools/docs/`. Its run dir is
+`fix-fresh-form-navigation-drop--0.0.7`, matching branch `fix/fresh-form-navigation-drop`. It reads
+as fixes-lane or features-lane work. Labelling another lane's leaf would be a false ownership claim,
+so this is **referred to the coordinator, not adopted**. It is currently invisible to every
+orchestrator-keyed audit — exactly the gap this correction closes.
+
+### Standing rule for all future docs dispatch briefs
+
+Every slice brief must instruct the implementer to apply `orchestrator:docs` **in the same
+`gh pr create` that opens the PR**, alongside `type:`/`area:`/`ci:` labels and the milestone. The
+supervisor still owns `status:` transitions; ownership is no longer deferred to finalization.

@@ -13,6 +13,7 @@ Reconciled against live GitHub on 2026-08-31.
 | Topic branch | `orchestrator/release-0.0.7-docs` — push by explicit refspec only |
 | Authoritative queue | every open item labelled `orchestrator:docs` — **10 issues + 11 PRs** live |
 | Merge authority | primary milestone coordinator merges; this supervisor **never** merges |
+| Ownership labelling | `orchestrator:docs` is applied **when the leaf PR is opened** (in the `gh pr create` call), never at finalization — deferring it hides in-flight leaves from every orchestrator-keyed audit. `status:` transitions remain supervisor-owned. |
 | Evaluator route (post-#1792) | OpenRouter · **GLM 5.3 Flash** · `max` for IMPL-EVAL; **Qwen 3.8 Flash** · `max` for PLAN-EVAL when warranted. **No DeepSeek for new dispatches.** Existing DeepSeek receipts remain valid and are never re-run. |
 | Evaluator transport | `deno task agentic:claude-openrouter` → `.llm/tools/agentic/claude/openrouter-run.ts`. **Must be launched from a tree containing #1792**, because `claude-print.ts`'s guard reads `OPEN_EVALUATOR_MODEL_IDS` from the *checked-out* tree; launching from a pre-#1792 PR head yields a false `evaluator model request denied`. |
 
