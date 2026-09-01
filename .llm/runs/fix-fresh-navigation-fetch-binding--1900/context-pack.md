@@ -6,16 +6,16 @@
 | ----- | ----- |
 | Run ID | `fix-fresh-navigation-fetch-binding--1900` |
 | Branch | `fix/fresh-navigation-fetch-binding` |
-| Current phase | `gate` |
+| Current phase | `handoff — local IMPL-EVAL PASS` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-The two-file product slice is implemented. Both transport paths use a callable bound to the browser
-receiver while the raw function remains available for exact restoration. All requested focused
-Fresh gates and mandatory quality/JSR checks pass; only unrelated full-package doc-lint baseline
-residue remains.
+The two-file product slice is implemented and independently evaluated PASS. Both transport paths
+use a callable bound to the browser receiver while the raw function remains available for exact
+restoration. All requested focused Fresh gates and mandatory quality/JSR checks pass; only
+unrelated full-package doc-lint baseline residue remains. Hosted browser proof is supervisor-owned.
 
 ## Completed
 
@@ -26,16 +26,18 @@ residue remains.
 - Implemented receiver binding plus receiver-sensitive intercepted/pass-through regression.
 - Passed structured Fresh check/lint/fmt (207 files), tests (254/254), quality gate, JSR audit,
   publish dry-run, export count, lock hygiene, and drain-never-abort scan.
+- Passed opposite-family Tier-A review and formal IMPL-EVAL in two distinct Claude/Fable sessions.
+- Posted the structured implementation evidence comment on PR #1904.
 
 ## In Progress
 
-- Run evidence update and implementation slice commit.
+- Supervisor-owned hosted `fresh-browser` proof and PR lifecycle handoff.
 
 ## Next Steps
 
-1. Perform the mandatory independent slice review/sign-off and commit/push the slice.
-2. Post the structured implementation comment on PR #1904.
-3. Run independent opposite-family IMPL-EVAL and record its verdict.
+1. Commit/push the evaluator-owned run artifacts.
+2. Post the structured IMPL-EVAL PASS comment for the resulting evidence head.
+3. Leave hosted `fresh-browser` execution and merge-readiness transition to the supervisor.
 
 ## Key Decisions
 

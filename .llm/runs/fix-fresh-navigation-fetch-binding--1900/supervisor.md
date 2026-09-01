@@ -22,3 +22,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 The orchestrator selected the higher-effort implementation route in the staged brief. No lane or
 evaluation override is recorded.
+
+Formal IMPL-EVAL ran in fresh native session
+`24a85855-23ee-4224-b501-b117324a0208` (Claude · Anthropic · Fable 5 · medium), separate from the
+Codex implementation session and Tier-A review session. Verdict: `PASS`.
