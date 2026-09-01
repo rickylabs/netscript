@@ -17,7 +17,7 @@ surface — the manifest value and its metadata constants. Shared manifest inspe
 canonical reference page.
 
 Additional integration entrypoints are published as [sub-path exports](#sub-path-exports):
-`./public`, `./plugin`, `./runtime`, `./scaffolding`, `./aspire`, `./cli`, `./services`,
+`./public`, `./plugin`, `./runtime`, `./scaffold`, `./aspire`, `./cli`, `./services`,
 `./streams`, and `./streams/server`. Their reference detail is documented against their own
 `deno doc` surface.
 
@@ -54,27 +54,12 @@ The following entrypoints are published alongside the root export.
 | `@netscript/plugin-triggers/public` | `./src/public/mod.ts` | Public manifest re-export (identical to the root surface). |
 | `@netscript/plugin-triggers/plugin` | `./src/public/mod.ts` | Plugin lifecycle composition (alias of the public surface). |
 | `@netscript/plugin-triggers/runtime` | `./src/runtime/mod.ts` | Trigger runtime wiring. |
-| `@netscript/plugin-triggers/scaffolding` | `./src/scaffolding/mod.ts` | Handler-first trigger definition scaffolders (webhook, scheduled, file-watch). |
+| `@netscript/plugin-triggers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
 | `@netscript/plugin-triggers/aspire` | `./src/aspire/mod.ts` | Aspire contribution for trigger services and background workers. |
 | `@netscript/plugin-triggers/cli` | `./src/cli/composition/main.ts` | Trigger CLI composition root. |
 | `@netscript/plugin-triggers/services` | `./services/src/main.ts` | Trigger ingress/management HTTP service entrypoint. |
 | `@netscript/plugin-triggers/streams` | `./streams/mod.ts` | Stream integration surface. |
 | `@netscript/plugin-triggers/streams/server` | `./streams/server.ts` | Stream server entrypoint. |
-
-### Scaffolding (`./scaffolding`)
-
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `triggerScaffolder` | `function triggerScaffolder(kind): TriggerDefinitionScaffolder` | Resolve the concrete scaffolder for a trigger kind. |
-| `WebhookTriggerScaffolder` | class | Scaffold a webhook trigger definition module. |
-| `ScheduledTriggerScaffolder` | class | Scaffold a scheduled trigger definition module. |
-| `FileWatchTriggerScaffolder` | class | Scaffold a file-watch trigger definition module. |
-| `TriggerDefinitionScaffolder` | interface | Generate handler-first trigger definition modules. |
-| `TriggerScaffoldInput` | type alias | Input shared by trigger definition scaffolders. |
-| `TriggerScaffoldKind` | type alias | Trigger kinds supported by the F29 scaffolders. |
-| `toTriggerExportName` | `function toTriggerExportName(id: string): string` | Convert a trigger id into a stable TypeScript identifier prefix. |
-| `toTriggerFileStem` | `function toTriggerFileStem(id: string): string` | Convert a trigger id into the project file stem convention. |
-| `renderStringArray` | `function renderStringArray(values): string` | Render an immutable string array expression. |
 
 ### Aspire (`./aspire`)
 
