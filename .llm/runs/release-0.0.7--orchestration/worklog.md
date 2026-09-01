@@ -3829,3 +3829,31 @@
 - Main is `7d18ef104824734932b5eac247637f4b9c770579`. Milestone 0.0.7 has 41 open issues, all with
   exactly one of the five topic-orchestrator owners; 21 PRs remain open. No owner-only decision is
   pending, and all five supervisors were re-steered with the new main and next concrete packet.
+
+## 2026-09-01T20:20:00Z — cleanup safety ships; two runtime blockers become bounded repairs
+
+- Aspire PR #1887 completed an exact-head separate evaluator PASS, exact full repo check/test,
+  quality, close-gate, zero-thread review, and a conflict-free current-main synthetic merge. The
+  coordinator squash-merged it as `e938ecd31fd1c909f23bb7dd60029a302ce8d428`, closing and shipping
+  #1855. S7 #1744 must now re-express its teardown rewrite on this baseline so it preserves the
+  shipped foreign-network detection and owned-volume cleanup semantics.
+- #1858's exact hosted run `33541672224` failed both tiers in the same synthetic-listener recovery
+  fixture, after its scoped Garnet readiness gate passed. The decisive evidence is port 18999 never
+  listening, not a 300-second product timeout. New Fixes-owned P0 #1898 / draft PR #1899 proves the
+  generated readiness fixture collides with positional app identifiers, so
+  `listener-fault-controller` never starts. RED `ad53835ee`, repair `38dab6c79`, and green handoff
+  `09e7b24b5` are present; independent evaluation is active. On PASS it lands first, then integrates
+  into #1858 and #1885 for exact hosted reruns.
+- Aspire S8's remaining hosted failure is separately root-caused: the removed AppHost restart was
+  how background workers learned post-migration state. The supervisor is dispatching a bounded
+  post-#1872 repair that keeps the intended no-restart database command while propagating the new
+  state to background processors. The local DinD receipt remains parked only on the shared-network-
+  namespace host correction; local Aspire and Docker inventories remain zero.
+- Docs #1756 reached a cycle-2 PASS for its main repair, but current-head CI found one exact contract
+  failure after the workflow patch: `.llm/tools/gates/jsdoc-example-workflow_test.ts` still asserted
+  the old placement (4,736 pass / 1 fail). The coordinator rejected the stale-head packet and
+  required a cardinality-preserving test correction, focused RED/green, a fresh exact-head delta
+  evaluator, and corrected close-gate before merge.
+- Main is `e938ecd31fd1c909f23bb7dd60029a302ce8d428`. New bounded debt/issues increased the open
+  milestone inventory to 42 after #1855 closed; every issue still has exactly one topic owner. No
+  owner-only decision is pending.

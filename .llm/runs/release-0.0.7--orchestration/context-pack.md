@@ -2471,3 +2471,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
   one topic owner: Aspire 13, Docs 1, Features 9, Fixes 13, Internals 5. #1842/#1590/#1891,
   #1885, #1756, #1351/#1879/#1888, and #1887/#1747/S8 all remain actively assigned. No owner-only
   decision is pending.
+
+## Resume delta — 2026-09-01T20:20:00Z
+
+- Current main is `e938ecd31fd1c909f23bb7dd60029a302ce8d428` after #1887 shipped the cleanup
+  ownership/volume safety repair and closed #1855. Aspire S7 must rebase its overlapping teardown
+  rewrite onto this exact baseline; S8 no-restart worker-state propagation remains active in a
+  separate slice.
+- P0 #1898 / draft PR #1899 owns the proven readiness-fixture identifier collision that made #1858
+  and later #1885 runtime receipts red even though their scoped behavior advanced. RED and GREEN are
+  committed; independent evaluation is active. Required order: merge #1898, integrate it into #1858
+  and #1885, then run their exact hosted tiers before either can merge.
+- #1756 is not mergeable despite its earlier PASS: current-head CI reports exactly one workflow
+  contract-test failure caused by the post-verdict CI placement patch. Docs owns the bounded test
+  correction and fresh exact-head delta evaluation. Features #1891/#1895, Internals
+  #1351/#1879/#1894, and the remaining Fixes lanes continue independently.
+- Open milestone inventory is 42 after one shipped issue and two newly recorded bounded defects; all
+  retain exactly one topic owner. Host inventory is Aspire `[]` and containers 0. No owner-only
+  decision is pending.
