@@ -30,7 +30,7 @@ slice replays its parent's commits a second time.
 
 | # | Slice | PR | Current head | `--onto` target | Branch point | Own commits |
 | - | ----- | -- | ------------ | --------------- | ------------ | ----------: |
-| 1 | S8 | #1754 | `7c6522951` | `origin/main` | — (behind=3, docs only) | 26 |
+| 1 | S8 | #1754 | `7c6522951` | `origin/main` | — (behind main by docs/RFC commits only) | 26 |
 | 2 | S9 | #1759 | `a8cf585b0` | S8 final | `d1c6d8b54` | 14 |
 | 3 | S10 | #1760 | `21a0bfec6` | S8 final | `d1c6d8b54` | 13 |
 | 4 | S11 | #1771 | `abe0fd6cc` | S10 final | `c9e3fcbe8` | 13 |
@@ -95,7 +95,7 @@ Each row below is the result of a **completed** trial `rebase --onto` in a throw
 
 | Slice | Own | Conflict stops | File(s) | Class | Ruling |
 | ----- | --: | -------------: | ------- | ----- | ------ |
-| S8 top-up | 26 | **0** | — | — | merge-tree probe vs `d2b33a09b` is CLEAN; the 3 new main commits are docs/RFC only |
+| S8 top-up | 26 | **0** | — | — | merge-tree probe is CLEAN against every main observed this session (`d2b33a09b`, `1e53e731a`); the intervening commits are docs/RFC only. Re-probe at dispatch rather than trusting a `behind` count — main moved five times during this reconcile. |
 | S9 | 14 | **1** (commit 3/14) | `packages/cli/src/kernel/assets/embedded.generated.ts` | generated carrier | take upstream, **regenerate once at the end** |
 | S10 | 13 | **2** (commits 2/13, 3/13; same file) | `packages/cli/e2e/…/runtime/verify-typed-db-phase-b.ts` | non-generated — **pre-ruled**, see 2a | canonical `./verify-listener-readiness.ts` wins |
 | S11 | 13 | **0** | — | — | replays clean end-to-end |
