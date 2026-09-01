@@ -264,3 +264,66 @@ its walker test, the package README, the quality scanner and its test, and the r
 corpus. The two CLI no-argument consumers and `start-walker.ts` remained read-only. No manifest,
 `packages/config`, dependency, or lock path moved. `deno.lock` remains byte-identical to
 `origin/main`, SHA-256 `01ff3a232713a35e9bd5c9f34db7669568fadd16273cb9c82389832b10b55cbe`.
+
+## Supervisor verification at the integrated head (2026-09-01)
+
+Measured independently of the implementation session, at merge `fe191a9f5`
+(`origin/main` `82a2527e2` integrated).
+
+### Generated-carrier conflict resolved through its generator, not by hand
+
+Merging main conflicted on
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, because #1862
+regenerated the same carrier on `main` in parallel. Resolved per the standing rule — **regenerated
+via `gen:mcp-export-corpus`, never by picking a side** — then verified:
+`check:mcp-export-corpus` **exit 0**. Symbol count moves `7782` → `7784`, which is this branch's own
+new exports rather than a stale carry.
+
+This also supersedes the concern filed as **#1873**: the corpus is now fresh on this branch and on
+`main` (via #1862). #1873's remaining half — that `check:mcp-export-corpus` runs in **no** workflow
+and can therefore drift again silently — is **not** addressed here and must not be claimed.
+
+### Box 5 guard proven non-vacuous
+
+A green `quality:gate` is not evidence the new rule works — it could be green because the rule never
+fires. Tested directly by planting a violation in a core package:
+
+```ts
+// packages/plugin/src/sdk/discovery/__planted_probe.ts
+export function axisFor(callee: string): string | undefined {
+  if (callee === 'defineExample') return 'examples';
+  return undefined;
+}
+```
+
+| State | `quality:scan` |
+| --- | --- |
+| planted violation present | **exit 1**, finding `plugin-discovery-core-coupling` at `__planted_probe.ts:3` with the offending line quoted |
+| probe removed | **exit 0** |
+
+The planted callee is `defineExample` — deliberately **not** one of today's three — so the rule is
+generic and cannot degrade into a three-name snapshot. Probe deleted; worktree clean.
+
+### Required silent-failure guard implemented as directed
+
+The supervisor review made one condition mandatory: D4's clean break must not reintroduce the silent
+non-discovery that #1093 was filed about. Implemented at `ast-extractor.ts:105-122` — when a file
+imports a contribution factory from plugin core **and** has export call sites for it, but no
+declaration supplies an axis, it throws:
+
+```
+Contribution factory "<callee>" has no declared axis; run plugin sync/update or pass it through additionalBuilders
+```
+
+and it stays quiet when there are no call sites, which is the boundary that was specified.
+
+### Gates at `fe191a9f5`
+
+| Gate | Result |
+| --- | --- |
+| `deno task quality:gate` | **exit 0** |
+| `deno task arch:check` | **exit 0** |
+| `run-deno-test.ts` on `packages/plugin` | **92 passed / 0 failed** |
+| `run-deno-check.ts --root packages/plugin --ext ts` | 153 files, 2 batches, **0 diagnostics** |
+| `deno task check:mcp-export-corpus` | **exit 0** |
+| `deno.lock` | blob **byte-identical** to `origin/main` `82a2527e2` |
