@@ -7055,3 +7055,47 @@
   - Both #1855 and #1851 dispatches are live and genuinely working (29 and 38 tool calls): #1855 is
     researching the Aspire network **label** rather than a name pattern, exactly as briefed, and #1851
     is diffing against #1858's branch to respect the contention warning.
+
+- **D-275 — converged onto `102ef8a10` with all seven carries preserved; found a measurement bug in my
+  own carry script; #1851 closed out as already-fixed; runtime queue constraint accepted.**
+  - **Convergence onto `102ef8a10` (#1848, Fresh partial-nav) — zero conflicts, all seven slices.**
+    Overlap measured **before** rebasing, because the owner's instruction was to preserve S8's 72
+    evaluated blobs: #1848's 24 files intersect **zero** of S8's own set, and zero of every other
+    slice's. New heads — S8 `d0d274c59`, S9 `0f2e81516`, S10 `854543df2`, S11 `433ef7469`,
+    S13 `3be6c7753`, S7 `4c40cff2c`, #1747 `c741574bb`.
+  - **S8's carry re-proven: 72/72 identical. The evaluated bytes are intact**, so the PASS still covers
+    this branch.
+  - **My carry script had a bug, and it is exactly the trap the manifest warns about.** It reported S10
+    as 38 identical / **1 differs**. The "difference" was
+    `wait-for-workers-runtime.ts` — a file S10 **deletes**, absent at *both* heads. `git rev-parse` on a
+    missing path **echoes the literal `<sha>:<path>` string to stdout** (with a nonzero rc), so two
+    heads produce two different strings and a deletion reads as a change **forever**. My own recorded
+    rule says *absent-on-both counts as identical*; the script did not implement it. Corrected with an
+    explicit `git cat-file -e` existence check: **S10's carry is 39/39.** All seven slices carry
+    perfectly. Any earlier figure for a slice that deletes files may have been similarly overstated;
+    the live figures are re-measured correctly.
+  - **#1851 dispatched, returned "no product change" — and the claim checks out.** #1837 (`1f50c98ce`)
+    had already converted `generate-register-infrastructure.ts` to ordinals plus `JSON.stringify`, so
+    the issue was filed against a superseded state. All four acceptance boxes are satisfied by code
+    already on main, including a **mutation proof**: restoring the pre-#1837 blob turns the existing
+    hostile-input test RED, the current blob GREEN. Its parse assertion is genuine — it writes the
+    emitted module and runs `deno lint`, with `deno lint`'s exit-1-on-parse-error behaviour probed
+    rather than assumed. The agent's commit was **empty** and its branch/worktree removed; there is
+    nothing to land. Evidence posted with a closure recommendation, **not** a unilateral close.
+  - **Its one follow-up recommendation was checked and refused.** It flagged
+    `generate-register-background.ts` as still unescaped at six sites and recommended a new slice.
+    **#1747 already fixes it** with the identical #1837 pattern (`bg_${processorIndex}` +
+    `JSON.stringify(name)`); it is simply unmerged, so a session working from `main` could not see it.
+    Dispatching that slice would have duplicated #1747 and contended for the same file. **A finding
+    from an agent that cannot see unmerged work needs checking against the in-flight set before it
+    becomes a task.**
+  - **Runtime queue constraint accepted.** The coordinator cancelled four Aspire e2e runs triggered by
+    my restack pushes — they cannot pass before #1865 and were occupying the global Postgres/SQLite
+    lanes needed for #1865's own combined proof. **Adjusting behaviour, not just acknowledging:** I
+    will hold convergence pushes rather than pushing on every main advance, since each push spends
+    shared runtime lanes on runs that are known-unpassable. Static CI stays active and is unaffected.
+    No Phase-B dispatch until #1865's exact merge SHA is on main.
+  - **#1855 is still working and on the right track:** after a long analysis phase it has planned
+    RED-first tests, box 2 as volume enumeration/attribution and **box 1 as detection + at-risk
+    reporting** rather than claimed prevention — the honest shape the brief asked for.
+  - S9's hosted CI at the converged head is **fail=0** — both static defects confirmed fixed.
