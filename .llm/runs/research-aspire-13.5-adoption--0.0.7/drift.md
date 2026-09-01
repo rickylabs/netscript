@@ -5970,3 +5970,35 @@
     pre-existing foreign network + volume that must survive a full start/stop cycle untouched.
   - Cross-reference recorded: this is precisely the invariant **#1719/#1744 (S7)** exists to prove —
     owned-only mutation — which makes it a finding against the tooling S7 validates, not against S7.
+
+- **D-244 — #1837 SHIPPED (main `1f50c98ce`). S8's listener repair worked: 58→66 / 52→61 gates.
+  Convergence + ownership dispatched.**
+  - **#1836/#1837 merged** as `1f50c98ce`; #1836 closed/shipped. Second post-canary-5 Aspire leaf
+    landed, after #1833/#1835.
+  - **S8 run `33462723847` at `439959045` — real progress:** docker **`passed=66`** (was 58), sqlite
+    **`passed=61`** (was 52). **`runtime.typed-db-phase-b` and `runtime.health.listener-unreachable`
+    are both PAST**, and `database.seed` has passed since `927d24bed`. The D-238 listener-actuator
+    repair did what it claimed, and — worth noting — the sqlite listener gate that D-17 left
+    *unresolved* now passes anyway, so the unanswered ownership question has stopped blocking.
+  - **New failure, identical on both tiers:** `behavior.workers-executions` at **29514 ms** and
+    **29523 ms** — a **9 ms** spread across two different tiers, which reads as a shared wait/timeout
+    rather than tier-specific behaviour.
+  - **`467d0d1fd` confirmed evidence-only** (0 product files), so S8's product state is `439959045`
+    and the seven recorded delta verdicts are unaffected by it.
+  - **Dispatched convergence first, ownership second.** S8 is **7 behind** main with **26 own
+    commits**, and main has since gained **#1837's four-generator hardening**. Converging is required
+    before S9/S10 can restack anyway, and **re-running afterwards is itself the control** for
+    `behavior.workers-executions` — which is why the brief orders it that way rather than diagnosing
+    against a stale base.
+  - The brief flags the specific interaction risk: main's generators now emit **ordinal bindings and
+    `JSON.stringify`-escaped strings**, so any typed-db emission or test assuming the older shape
+    surfaces during this rebase and must be repaired as part of it.
+  - Ownership rules carried: state what the gate asserts, whether any of the eight deltas can reach a
+    **plugin workers-execution** path, and **"not mine, here is why" is a complete answer**. Repair
+    only if provably owned.
+  - **Explicit instruction added: do not strip any `.llm/runs` artifact** — the owner correction is now
+    standing brief text, not just ledger text, so no future slice repeats it.
+  - **S9/S10 restack is queued behind this**: both contain old S8 `d1c6d8b54` but **not** `467d0d1fd`,
+    so they replay onto S8's converged head once it exists.
+  - **#1844 remains the S7 trigger** — `status:plan`, `orchestrator:fixes`. On merge: pull current
+    main into S7 and finish Phase-B/merge without parking.
