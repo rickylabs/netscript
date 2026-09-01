@@ -315,6 +315,11 @@ const workersConfigAnchor =
 if (!workersConfigAnchor) {
   throw new Error('generated workers resource block did not contain its config lookup');
 }
+// #1865's locateWorkersBackgroundBlock locates the block but returns only a SourceRange, so the
+// binding identifier still has to be extracted from within it. Quote-agnostic on purpose: the
+// generator emits JSON.stringify'd names after this slice's source-safety change.
+const workersExecutablePattern =
+  /const ([A-Za-z_$][\w$]*) = builder\.addExecutable\((["'])workers\2,/;
 const workersExecutableMatch = workersExecutablePattern.exec(workersBackgroundBlock);
 if (!workersExecutableMatch) {
   throw new Error('generated register-background.mts did not contain the workers resource block');
