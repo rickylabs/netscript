@@ -9199,3 +9199,47 @@ since `validateEvidenceMapping` never inspects evidence text.
 **#1888** launched. **#1846** auto-release armed on queue drain.
 
 **No outstanding owner boundary and no second terminal IMPL-EVAL failure.**
+
+
+## D-208 - #1876 cycle-2 PASS, converged, body corrected; #1351/#1879 pushed
+
+`main` advanced through #1882/#1886 to **`9ca986fb0`**.
+
+### #1876 - PASS, and the body was stale exactly as flagged
+
+Cycle-2 **`VERDICT: PASS`** (artifact `394ff096e`) closing cycle 1's completeness gap. Converged onto
+`9ca986fb0` at head **`5952fdf47`**; `publish:dry-run` **0**, `arch:check` **0**, completeness
+re-derived (every referencing member declares), scope six manifests plus a **+6-line** lock delta,
+threads **0/0**.
+
+**The body was stale and I had promoted on top of it** - it still read "Owner retains IMPL-EVAL cycle 2
+and the ready transition. This PR remains draft" and carried an unticked cycle-2 DoD box. Both
+corrected in place: the harness section now records cycle 1 `FAIL_IMPL`, cycle 2 `PASS` with head and
+artifact, and the convergence; the DoD box is ticked with its evidence.
+
+Added a 3-entry `acceptance-evidence` block for #1543 - mirror dry-run `REAL_EXIT=0`, no mapping
+error. Box 3 is recorded as **N/A by its own condition** (it applies only "if publishing is affected",
+and `publish:dry-run` returns 0), with an explicit note that **no check was added** because the brief
+forbade it.
+
+**The `status:` label had drifted back to `impl-eval` again - the fifth occurrence this session.** It
+silently blocks the mirror, which self-skips without `ready-merge`. Restored to sole `ready-merge` and
+re-verified the mirror validates. This is now a reliable pattern rather than an anomaly: **after any
+lifecycle transition, re-read the label before trusting any gate that depends on it.**
+
+Close-gate re-run armed to fire at the **unchanged head** once the in-flight CI run completes - no
+push, so the evaluated head stays immutable.
+
+### Recorded for the transferable value: two derivation errors, both mine
+
+The cycle-2 evaluation closed a gap that existed because I twice mis-derived the import set - first
+counting a `definePlugin(...)` **string literal** as an import (inflating it), then using an
+exact-match grep that **under-counted `packages/cli/e2e` to zero** when it has six **sub-path**
+imports. Same shape both times: a pattern chosen for convenience, then trusted as a derivation. Both
+were caught by the evaluator, and both are now named traps in the record.
+
+### Other lanes
+
+**#1351** pushed `e4d39cb5b` (implementation under way). **#1879** pushed `80aaed97c` (widened scope).
+**#1888** launched, not yet pushed. **#1846** auto-release still armed - drain check reports **2**
+active runtime-tier jobs, so the hosted slot has not opened; it fires automatically when it does.
