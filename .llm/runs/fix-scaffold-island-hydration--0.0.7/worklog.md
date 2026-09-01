@@ -9,7 +9,7 @@
 | Base          | `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`                 |
 | Archetype     | `4 - Public DSL / Builder`                                 |
 | Scope overlay | `frontend`                                                 |
-| Phase         | S2 package reproduction — server measured, browser pending |
+| Phase         | S2 package reproduction — hydration proven, 404 attribution pending |
 
 ## Design
 
@@ -79,6 +79,8 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | HTML discriminator            | `GET /examples/users` returned 200 with `Typed query lab`, `Seed User`, `frsh:island:ServiceShowcaseLab`, and its client boot mapping. The client-side branch is selected.                  |
 | 2026-09-01 | S2    | Draft PR                      | Opened draft PR #1885 at `7154c2a91` with the required labels, milestone, closing keyword, plain measurement outcome, and unticked acceptance/DoD boxes.                                  |
 | 2026-09-01 | S2    | Hosted browser scheduling     | Draft PR policy skipped `classify`/`check-test`, so `fresh-browser` did not execute. The in-app browser control runtime is not exposed in this session. No client-path observation exists yet. |
+| 2026-09-01 | S2    | Hosted browser observation    | Run `33539774285` loaded both Fresh client entries with 200 responses, resolved the provider/query client and query hook, ran the hydration effect, and changed the row after click. The package fixture hydrates. |
+| 2026-09-01 | S2    | Assertion correction          | Removed the post-hydration comment-node requirement, split query-client data into pre-click and post-click observations, and added an all-response ledger for the unattributed 404 URL/status/resource type. |
 
 ## Decisions
 
@@ -114,6 +116,11 @@ CLI scaffold templates.
 | S2 focused lint             | Structured lint wrapper over fixture and browser test                                | PASS            | Zero findings.                                                                           |
 | S2 focused format           | Structured format wrapper over fixture and browser test                              | PASS            | Zero findings before final artifact update.                                              |
 | Code quality / doctrine     | `deno task quality:gate`                                                             | PASS            | Quality scan has zero findings; doctrine gate has no failures.                           |
+| S2 browser correction check | Structured check wrapper over `form-navigation_browser.ts`                          | PASS (exit 0)   | One file selected; zero diagnostics.                                                      |
+| S2 browser correction lint  | Structured lint wrapper over `form-navigation_browser.ts`                           | PASS (exit 0)   | One file selected; zero findings.                                                         |
+| S2 browser correction fmt   | Structured format wrapper over `form-navigation_browser.ts`                         | PASS (exit 0)   | One file selected; zero findings.                                                         |
+| S2 browser compile          | Structured test wrapper with `--no-run` over `form-navigation_browser.ts`            | PASS (exit 0)   | Browser module compiled; host still has no runnable Chromium.                             |
+| S2 browser quality          | `deno task quality:gate`                                                            | PASS (exit 0)   | Quality scan and doctrine fitness both completed without failures.                        |
 | S2 served direct control    | Package Vite + raw fetch `/examples/service-direct`                                  | PASS            | Island marker, client boot import, initial row, and query hydration all present.         |
 | S2 served hook-layout route | Package Vite + raw fetch `/examples/service`                                         | PASS            | Layout, layer, row, island marker, client boot import, and query hydration all present.  |
 | Generated-app discriminator | Generated service + Fresh Vite; fetch `/examples/users`                              | PASS (exit 0)   | HTTP 200; lab, seeded row, exact showcase island comment, and client boot mapping present. |
@@ -131,7 +138,7 @@ CLI scaffold templates.
 
 | Consumer              | Current                                                      | Required completion evidence                                                                                                 |
 | --------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| Fresh package fixture | Server marker/tree/boot mapping proven; hydration unmeasured | Managed browser reports marker, module load, render attempt, hydrated query client, interactive click, and no runtime error. |
+| Fresh package fixture | Hydration and interaction proven; one unknown 404 remains to attribute | Hosted rerun names every response with status >= 400; incidental resources may then be classified without inference. |
 | Generated scaffold    | `islandHydrated: false`, `freshIslandElement: null`          | Hosted receipt regenerates with `islandHydrated: true` and non-null `freshIslandElement`.                                    |
 
 Registration-only unit coverage is necessary but not sufficient.

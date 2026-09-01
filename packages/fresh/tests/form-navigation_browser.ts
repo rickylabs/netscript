@@ -266,6 +266,7 @@ Deno.test({
           const clientRequests = [];
           const clientResponses = [];
           const clientRequestFailures = [];
+          const nonSuccessfulResponses = [];
           const isObservedClientAsset = url =>
             url.includes('fresh:client-entry') || url.includes('ServiceShowcaseLab');
           page.on('pageerror', error => runtimeErrors.push(String(error)));
@@ -277,6 +278,13 @@ Deno.test({
           });
           page.on('response', response => {
             const responseUrl = response.url();
+            if (response.status() >= 400) {
+              nonSuccessfulResponses.push({
+                url: responseUrl,
+                status: response.status(),
+                resourceType: response.request().resourceType(),
+              });
+            }
             if (isObservedClientAsset(responseUrl)) {
               clientResponses.push({ url: responseUrl, status: response.status() });
             }
@@ -326,6 +334,9 @@ Deno.test({
               hydratedCache: await lab.getAttribute('data-hydrated-cache'),
               queryClient: await lab.getAttribute('data-query-client'),
               row: await page.locator('#service-showcase-row').textContent(),
+              queryClientData: await page.evaluate(
+                () => globalThis.__serviceShowcaseQueryClientData ?? null
+              ),
             }
             : null;
 
@@ -375,6 +386,7 @@ Deno.test({
             clientRequests,
             clientResponses,
             clientRequestFailures,
+            nonSuccessfulResponses,
             runtimeErrors,
           };
         }`,
@@ -387,6 +399,7 @@ Deno.test({
           readonly hydratedCache: string | null;
           readonly queryClient: string | null;
           readonly row: string | null;
+          readonly queryClientData: string | null;
         } | null;
         readonly rowAfterClick: string | null;
         readonly clientExecution: {
@@ -413,13 +426,15 @@ Deno.test({
           readonly url: string;
           readonly error: string;
         }[];
+        readonly nonSuccessfulResponses: readonly {
+          readonly url: string;
+          readonly status: number;
+          readonly resourceType: string;
+        }[];
         readonly runtimeErrors: readonly string[];
       };
 
       const browserVerdict = {
-        freshIslandMarker: browserEvidence.freshIslandMarker?.startsWith(
-          'frsh:island:ServiceShowcaseLab:',
-        ) ?? false,
         labFound: browserEvidence.labFound,
         hydrated: browserEvidence.beforeClick?.hydrated === 'true',
         hydratedCache: browserEvidence.beforeClick?.hydratedCache === 'true',
@@ -447,11 +462,13 @@ Deno.test({
         queryClientHookAttempted: browserEvidence.clientExecution.queryClientHookAttempts > 0,
         queryClientHookResolved: browserEvidence.clientExecution.queryClientHookResolved,
         queryClientMatchesSingleton: browserEvidence.clientExecution.queryClientMatchesSingleton,
-        queryClientData: browserEvidence.clientExecution.queryClientData,
+        queryClientDataBeforeClick: browserEvidence.beforeClick?.queryClientData,
+        queryClientDataAfterClick: browserEvidence.clientExecution.queryClientData,
         queryHookAttempted: browserEvidence.clientExecution.queryHookAttempts > 0,
         queryHookResolved: browserEvidence.clientExecution.queryHookResolved,
         hydrationEffectRan: browserEvidence.clientExecution.hydrationEffectRan,
         clientRequestFailures: browserEvidence.clientRequestFailures,
+        nonSuccessfulResponses: browserEvidence.nonSuccessfulResponses,
         runtimeErrors: browserEvidence.runtimeErrors,
       };
 
@@ -468,7 +485,6 @@ Deno.test({
             initialRowReached: true,
           },
           browser: {
-            freshIslandMarker: true,
             labFound: true,
             hydrated: true,
             hydratedCache: true,
@@ -488,11 +504,13 @@ Deno.test({
             queryClientHookAttempted: true,
             queryClientHookResolved: true,
             queryClientMatchesSingleton: true,
-            queryClientData: 'Server row',
+            queryClientDataBeforeClick: 'Server row',
+            queryClientDataAfterClick: 'Hydrated row',
             queryHookAttempted: true,
             queryHookResolved: true,
             hydrationEffectRan: true,
             clientRequestFailures: [],
+            nonSuccessfulResponses: [],
             runtimeErrors: [],
           },
         },
