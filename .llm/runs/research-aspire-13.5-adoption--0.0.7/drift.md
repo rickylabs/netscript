@@ -7377,3 +7377,38 @@
       `packages/cli/e2e/tests/application/gates/scaffold/typed-db-background-restart_test.ts`, whose
       name matches the brief's requirement precisely.
     - **S7 re-expression** (`4581e2ab-…`) still reading the two designs before writing.
+
+- **D-284 — S8's post-migration repair is coded, RED/GREEN-proven and pushed at `f855d2428`; landed on
+  its own branch so it spends no runtime slot.**
+  - **The repair does exactly what the diagnosis implied.** On a successful typed migrate the AppHost
+    stays resident — the property S8 exists to deliver — and the script now restarts **only** the
+    KV-backed background runtimes (`aspire resource <name> restart` over
+    `KV_BACKGROUND_RUNTIME_RESOURCES`), so background processors observe the migrated database. The
+    full `ASPIRE_RESTART_SCRIPT` survives strictly as a fallback, on **two** paths: a failed typed
+    migrate, and a failed targeted restart.
+  - **RED proved independently by me, not accepted from the worker.** I reverted
+    `runtime-scripts.ts` to the pre-repair blob and re-ran the new suite: **2 of 3 tests fail**; with
+    the repair, **3 of 3 pass**. The working tree was then restored **byte-identical** to the commit
+    (`git status` → 0 modified). Gates: focused suite 3/0, `runtime-gates_test.ts` **26/0**, scoped
+    `deno check` 915 files exit 0, fmt exit 0.
+  - **The test design is right, and worth noting because it is the part that usually rots.** The three
+    cases assert the **aspire invocations the script actually makes**, not its source text — success
+    restarts only the background runtimes and preserves the AppHost; a failed migrate falls back to the
+    full restart; a failed targeted restart falls back **without retrying the rest**.
+  - **One open risk, recorded rather than glossed.** I could not verify statically that
+    `aspire resource <name> restart` is supported for a background executable in 13.5.3: the CLI's
+    generic help documents `restart`, but the only per-resource command list I captured under the lease
+    was the db-cli's, which advertised `migrate/reset/seed/start` and **no `restart`**. My Phase-B
+    scaffold had no plugins installed, so it could not answer this. **The implementation degrades
+    safely** — a failed targeted restart falls back to the full AppHost restart and logs a warning, so
+    the gate passes either way and the log says which path ran. If it always falls back, the no-restart
+    property is silently lost, which is exactly what that warning line makes visible.
+  - **Pushed to `fix/aspire-s8-workers-post-migration`, deliberately not to #1754.** #1858 still holds
+    the hosted runtime slot (`OPEN/UNSTABLE`), and I verified from the workflow triggers that this is
+    safe rather than assuming it: `ci.yml` fires on push only for `main` and `feat/package-quality`,
+    and `e2e-cli.yml` only on `pull_request` and `v*` tags. A branch push with **no PR triggers
+    nothing** — confirmed `0` open PRs on the branch afterwards. Applying it to #1754 waits for the
+    slot.
+  - S7 re-expression continues in parallel (8 files staged, fixtures carried, #1887 invariants intact
+    on spot-check: zero network removals, label-namespace ownership present, zero name-pattern
+    matches).
