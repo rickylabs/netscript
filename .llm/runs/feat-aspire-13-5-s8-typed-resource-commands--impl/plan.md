@@ -326,3 +326,38 @@ ordering follow-up, the no-runtime boundary, the exact baseline, and the push co
   record bytes.
 - Deferred: formal re-evaluation, all runtime execution, PR lifecycle/labels/base, dependencies,
   public exports, S9/S10, and unrelated merge-readiness blockers.
+
+## D-237 listener-fault ownership control
+
+PLAN-EVAL is not part of this bounded continuation. The owner supplied the ownership-first contract,
+the exact no-runtime boundary, and the permitted branch/head. This implementation session records
+evidence and does not self-certify.
+
+### Locked decisions
+
+- Repair only the typed-db verifier's invalid actuator: reuse D-101's test-only controller and
+  Postgres health key while leaving the real database resource and health evaluator running.
+- Do not repair the SQLite symptom. D-233 can reach its setup indirectly by suppressing the old
+  fallback AppHost restart, but the available S8-free SQLite control never reached this gate and
+  cannot establish causation without a prohibited runtime run.
+- Preserve D-224, D-227, D-231, D-233, and D-235/236. Do not change public exports, generated
+  assets, dependencies, or the lockfile.
+
+### Slice and proving gates
+
+1. Add a source-contract regression that is RED while the typed verifier stops/starts the real
+   resource and does not use the controller's test-only Postgres key.
+2. Export the existing controller command client and reuse it from typed-db phase B; run the focused
+   controller/readiness/builder tests and the complete helper/runtime-builder preservation set.
+3. Run scoped structured check/lint/fmt, `quality:gate`, and static diff checks. Update the run
+   evidence, compare the exact remote ref immediately before a fast-forward-only push, and run no
+   Aspire, Docker, AppHost, or `e2e:cli` command.
+
+### Risk register and deferred scope
+
+- Risk: aggregate resource state might not follow the injected test health key. Mitigation: reuse
+  the already-passing D-101 attached health check and its exact controller/ack protocol.
+- Risk: the new SQLite regression is mischarged to S8. Mitigation: record the indirect D-233
+  reachability and the missing current-main control, but make no SQLite production change.
+- Deferred: current-main SQLite runtime control, SQLite diagnosis/repair, formal IMPL-EVAL, and all
+  unrelated merge-readiness work.

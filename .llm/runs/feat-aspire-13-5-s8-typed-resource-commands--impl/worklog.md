@@ -695,3 +695,39 @@ The 285-test set includes D-224's stderr head/tail and UTF-8 byte fixtures, D-22
 compile test, D-231's graph-injection and capability guards, D-233's generic preamble/stdout
 promotion, and the public-migrate/internal-deploy mapping. No Aspire, Docker, AppHost, `e2e:cli`,
 runtime suite, dependency, lockfile, export, PR lifecycle, or evaluator dispatch occurred.
+
+## D-237 design — ownership before listener repair
+
+PLAN-EVAL is N/A for this owner-directed continuation. The E2E-only public surface remains
+unchanged. The repair reuses D-101's existing controller vocabulary, state/ack protocol, ports, and
+health keys; it introduces no new capability or runtime constant. The regression is a source
+contract because runtime execution is explicitly prohibited.
+
+## D-237 implementation evidence
+
+- Run `33460896691` tested PR merge `6d367146b1` (main `60ae56af0` + S8 `608f8f2da`). Docker's
+  D-101 listener-unreachable gate passed before typed-db phase B failed after stopping Postgres and
+  observing the cached real listener as Healthy. SQLite failed at baseline because the test-only
+  Garnet key was absent; it never issued a controller revision.
+- The S8-free run at `6c195acaf` passed Docker listener-unreachable, but SQLite timed out earlier at
+  Garnet and did not reach the ownership gate. The four D-101 core files are blob-identical across
+  current main, S8 head, and the tested merge.
+- D-233 indirectly reaches SQLite setup: a successful typed deploy suppresses the prior fallback
+  AppHost restart. The earlier head restarted and then passed listener-unreachable; the latest head
+  did not restart and lacked the test-only key. This is reachability/correlation, not causal proof,
+  so no SQLite repair was made.
+- The new typed source-contract test was RED at the baseline: exit 1, 23 passed / 1 failed. The
+  verifier now closes only the synthetic Postgres listener, polls `test_only_postgres_listener`,
+  and reopens it in `finally`; it no longer stops or starts the real database resource.
+
+| Command/gate | Exit/result |
+| --- | --- |
+| focused controller/readiness/runtime-builder tests | 0; 36 passed, 0 failed |
+| full helper + runtime-builder preservation tests | 0; 286 passed, 0 failed |
+| scoped structured check (`--unstable-kv`) | 0; 3 selected, 1 batch, zero diagnostics |
+| scoped structured lint | 0; 3/3 processed, no drops/findings |
+| scoped structured fmt | 0; 3/3 processed, no drops/findings |
+| `quality:gate` | 0; scanner findings 0; doctrine `FAIL=0` with existing warnings |
+
+No Aspire, Docker, AppHost, `e2e:cli`, runtime suite, evaluator dispatch, or `evaluate.md` creation
+occurred.
