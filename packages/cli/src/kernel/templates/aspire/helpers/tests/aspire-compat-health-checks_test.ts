@@ -223,7 +223,10 @@ describe('generated Aspire listener readiness helpers', () => {
   })
 
   it('times out when a RESP server accepts the connection but never replies', async () => {
-    const server = await startServer(() => {})
+    let acceptedSocket: Socket | undefined
+    const server = await startServer((socket) => {
+      acceptedSocket = socket
+    })
     const port = serverPort(server)
     const startedAt = performance.now()
     try {
@@ -238,6 +241,7 @@ describe('generated Aspire listener readiness helpers', () => {
       assertRespFailureData(result.data, 'ETIMEDOUT', '')
       assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true)
     } finally {
+      acceptedSocket?.destroy()
       await closeServer(server)
     }
   })

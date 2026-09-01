@@ -113,6 +113,8 @@ revise the plan.
 | 2026-08-31T21:35Z | S1R3  | Probe contract reversal  | Supervisor client experiment rejected the application-client design. Locked one framed RESP2 PING, split-read accumulation, exact binary verdict, 2-second attempt, 64-byte diagnostics, and six in-process cases. |
 | 2026-08-31T21:36Z | S1R3  | Collision recheck        | #1773 remains open at `bd239f916`; mandatory gate work overlaps its `packages/cli/e2e/**` ownership. Locked six post-sequencing paths and made no code/test edit.                                                  |
 | 2026-08-31T21:38Z | S1R3  | Probe base baseline      | Verified the probe template/test are byte-identical to base and ran the lease-free focused module: 8 passed, 0 failed. Current baseline still expects `NOAUTH` Degraded and has no split-reply case.               |
+| 2026-09-01T05:40Z | S2    | Probe RED                | Tests-only commit `2368e8f85`: focused module 3 passed / 6 failed, exposing inline PING, split-reply `EPROTO`, `NOAUTH` Degraded, and missing received-byte diagnostics.                                           |
+| 2026-09-01T05:42Z | S2    | Probe GREEN              | Minimal one-attempt RESP2 probe passes 11/11 focused results, including split `+PO`/`NG\r\n`, closed-port fast failure, and accept-without-reply 2-second deadline. Asset barrel regenerated canonically.          |
 
 ## Decisions
 
@@ -148,18 +150,21 @@ revise the plan.
 
 ### Static Gates
 
-| Gate                          | Command or check                                              | Result           | Notes                                                                                                                    |
-| ----------------------------- | ------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| E2E workspace check           | structured check wrapper, root `packages/cli/e2e`, `--ext ts` | PASS             | 185 files, 2 batches, 0 diagnostics.                                                                                     |
-| E2E workspace format          | structured format wrapper, same root                          | PASS             | 185 selected/processed, 0 findings/refusals.                                                                             |
-| E2E workspace lint            | structured lint wrapper, same root                            | REFUSAL (exit 2) | Detached `desktop-native` fixture lacks catalog `zod`; 0 lint findings; no false PASS claim.                             |
-| Diagnostic-path check         | structured check wrapper on two locked files                  | PASS             | 2 files, 0 diagnostics.                                                                                                  |
-| Diagnostic-path lint          | structured lint wrapper on two locked files                   | PASS             | 2/2 processed, 0 findings/refusals.                                                                                      |
-| Diagnostic-path format        | structured format wrapper on two locked files                 | PASS             | 2/2 processed, 0 findings/refusals.                                                                                      |
-| Rescope artifact format       | structured format wrapper on the three run Markdown files     | PASS             | 3/3 processed, 0 findings/refusals.                                                                                      |
-| Lock hygiene                  | base diff plus SHA-256                                        | PASS             | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical.                                      |
-| Redis client graph inspection | `deps:latest`, `deps:why`, `deno info`                        | PASS (research)  | `ioredis` 6.0.0: 7/1.44 MB; `redis` 6.2.1: 7/7.65 MB; `@redis/client`: 2/5.94 MB; no lock delta retained.                |
-| Focused probe base tests      | structured test wrapper on compatibility health checks        | PASS             | 8/8; both paths byte-identical to recorded base; existing `NOAUTH` expectation is Degraded and no split reply is tested. |
+| Gate                          | Command or check                                              | Result                      | Notes                                                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| E2E workspace check           | structured check wrapper, root `packages/cli/e2e`, `--ext ts` | PASS                        | 185 files, 2 batches, 0 diagnostics.                                                                                                      |
+| E2E workspace format          | structured format wrapper, same root                          | PASS                        | 185 selected/processed, 0 findings/refusals.                                                                                              |
+| E2E workspace lint            | structured lint wrapper, same root                            | REFUSAL (exit 2)            | Detached `desktop-native` fixture lacks catalog `zod`; 0 lint findings; no false PASS claim.                                              |
+| Diagnostic-path check         | structured check wrapper on two locked files                  | PASS                        | 2 files, 0 diagnostics.                                                                                                                   |
+| Diagnostic-path lint          | structured lint wrapper on two locked files                   | PASS                        | 2/2 processed, 0 findings/refusals.                                                                                                       |
+| Diagnostic-path format        | structured format wrapper on two locked files                 | PASS                        | 2/2 processed, 0 findings/refusals.                                                                                                       |
+| Rescope artifact format       | structured format wrapper on the three run Markdown files     | PASS                        | 3/3 processed, 0 findings/refusals.                                                                                                       |
+| Lock hygiene                  | base diff plus SHA-256                                        | PASS                        | `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`; byte-identical.                                                       |
+| Redis client graph inspection | `deps:latest`, `deps:why`, `deno info`                        | PASS (research)             | `ioredis` 6.0.0: 7/1.44 MB; `redis` 6.2.1: 7/7.65 MB; `@redis/client`: 2/5.94 MB; no lock delta retained.                                 |
+| Focused probe base tests      | structured test wrapper on compatibility health checks        | PASS                        | 8/8; both paths byte-identical to recorded base; existing `NOAUTH` expectation is Degraded and no split reply is tested.                  |
+| Probe slice focused tests     | structured test wrapper on compatibility health checks        | PASS                        | 11/11 after RED 3 pass / 6 fail; all six required RESP cases are lease-free in-process listeners.                                         |
+| Probe slice focused check     | structured check wrapper on the focused test                  | PASS                        | 1 file, 0 diagnostics; wrapper includes `--unstable-kv`.                                                                                  |
+| Probe slice lint/format       | structured wrappers, then explicit `--no-config` checks       | REFUSAL + PASS supplemental | Repository config excludes this template-test path, so wrappers process 0 files and are not PASS; explicit checks process 1 file cleanly. |
 
 ### Version/hosted comparison evidence
 
