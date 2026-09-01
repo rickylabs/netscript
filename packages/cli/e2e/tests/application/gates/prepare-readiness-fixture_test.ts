@@ -2,6 +2,7 @@ import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 import { generateRegisterApps } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-apps.ts';
+import { buildCacheBlock } from '../../../../src/kernel/templates/aspire/generate-appsettings.ts';
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import {
   injectListenerFaultHealthChecks,
@@ -9,6 +10,24 @@ import {
   TEST_ONLY_GARNET_HEALTH_KEY,
   TEST_ONLY_POSTGRES_HEALTH_KEY,
 } from '../../../src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts';
+
+Deno.test('listener fault splice accepts the E2E two-cache Auto generator output', () => {
+  const redis = buildCacheBlock('redis');
+  const garnet = buildCacheBlock('garnet');
+  const source = generateRegisterInfrastructure({
+    databases: {},
+    caches: {
+      [redis.key]: { ...redis.block, Enabled: true },
+      [garnet.key]: { ...garnet.block, Enabled: true, Mode: 'Auto' },
+    },
+    primaryCache: garnet.key,
+  });
+
+  assertEquals(healthAttachmentCount(source, 'redis_resp'), 1);
+  assertEquals(healthAttachmentCount(source, 'garnet_resp'), 2);
+  const injected = injectListenerFaultHealthChecks(source, DATABASE.SQLITE);
+  assertEquals(healthAttachmentCount(injected, TEST_ONLY_GARNET_HEALTH_KEY), 2);
+});
 
 Deno.test('listener fault splice attaches test-only checks at generator-derived markers', () => {
   const source = generatedInfrastructure();
@@ -89,7 +108,7 @@ Deno.test('listener fault splice fails closed on missing markers and double regi
   );
 });
 
-Deno.test('listener fault splice injects Garnet only when Postgres is absent', () => {
+Deno.test('listener fault splice supports one Garnet container attachment without Postgres', () => {
   const source = generateRegisterInfrastructure({
     databases: {},
     caches: {
@@ -148,4 +167,10 @@ function withoutHealthAttachment(source: string, key: string): string {
   const matches = lines.filter((line) => line.includes('.withHealthCheck(') && line.includes(key));
   assertEquals(matches.length, 1, `expected one generated ${key} attachment`);
   return lines.filter((line) => line !== matches[0]).join('\n');
+}
+
+function healthAttachmentCount(source: string, key: string): number {
+  return source.split('\n').filter((line) =>
+    line.includes('.withHealthCheck(') && line.includes(key)
+  ).length;
 }
