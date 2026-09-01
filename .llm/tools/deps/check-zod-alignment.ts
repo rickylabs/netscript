@@ -8,7 +8,6 @@ const ZOD_NAME = 'zod';
 const WORKSPACE_ZOD_SPECIFIER = 'catalog:';
 const ORPC_ZOD_V4_SPECIFIER = '@orpc/zod/zod4';
 const DOCUMENTED_V3_JSR_PARENT = '@olli/kvdex@3.6.7';
-const DOCUMENTED_V3_NPM_PARENT = '@ag-ui/core@0.0.52';
 const AI_MCP_ZOD4_PACKAGES = [
   '@anthropic-ai/sdk@',
   '@modelcontextprotocol/sdk@',
@@ -114,7 +113,7 @@ export function analyzeZodAlignment(input: ZodAlignmentInput): ZodAlignmentRepor
   }
 
   const resolvedInstances = lockZodInstances(lock);
-  const documentedParents = [DOCUMENTED_V3_NPM_PARENT, DOCUMENTED_V3_JSR_PARENT].sort();
+  const documentedParents = [DOCUMENTED_V3_JSR_PARENT];
   if (
     resolvedInstances.length !== 2 ||
     !resolvedInstances.some((instance) => /^zod@3\./.test(instance)) ||
@@ -216,7 +215,7 @@ async function main(): Promise<void> {
     console.log(
       `zod-alignment PASS instances=${
         report.resolvedInstances.join(',')
-      } residual-v3=${DOCUMENTED_V3_NPM_PARENT},${DOCUMENTED_V3_JSR_PARENT}`,
+      } residual-v3=${DOCUMENTED_V3_JSR_PARENT}`,
     );
     return;
   }

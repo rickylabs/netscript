@@ -3,6 +3,7 @@
 import { LocalRuntimeStateAdapter } from '../adapters/local-state-adapter.ts';
 import type { RoutingState } from '../routing-state-machine.ts';
 import { CANONICAL_ROUTE_POLICY } from '../routing-policy.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 export function renderCanonicalEvaluatorRoutes(): string {
   const routes = CANONICAL_ROUTE_POLICY.filter((route) => route.purpose === 'evaluation');
@@ -41,14 +42,21 @@ export async function readRoutingStates(home: string): Promise<readonly RoutingS
 }
 
 async function main(): Promise<number> {
-  if (Deno.args.some((value) => value !== '--json')) {
+  let args: string[];
+  try {
+    args = normalizeTaskArguments(Deno.args);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    return 3;
+  }
+  if (args.some((value) => value !== '--json')) {
     console.error('Usage: deno task agentic:routing-state [--json]');
     return 3;
   }
   try {
     const states = await readRoutingStates(Deno.env.get('HOME') ?? '');
     console.log(
-      Deno.args.includes('--json')
+      args.includes('--json')
         ? JSON.stringify(states, null, 2)
         : `${renderCanonicalEvaluatorRoutes()}\n${renderRoutingStateHuman(states)}`,
     );

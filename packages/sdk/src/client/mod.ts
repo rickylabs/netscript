@@ -2,10 +2,13 @@
  * `@netscript/sdk/client` service client APIs.
  *
  * This subpath creates typed oRPC clients from NetScript service contracts and
- * Aspire service discovery. It also exports the package-owned contract algebra
- * used by query factories, query utils, and type fixtures.
+ * Aspire service discovery. It also defines upstream-neutral, versioned request
+ * contributions whose literal tuples infer per-call context, reserve HTTP header
+ * ownership, declare response-cache safety, and fail with redacted SDK errors.
  *
- * Use `createServiceClient()` when code only needs direct service calls. Use
+ * Use `createServiceClient()` when code only needs direct service calls, and
+ * `defineSdkClientContribution()` to add declared request headers without taking
+ * ownership of transport, retry, fetch, or tracing. Use
  * the root `defineServices()` preset when the same contract should also create
  * query factories and frontend query utilities.
  *

@@ -25,6 +25,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appDashboardViewTemplate: TEMPLATE_KEYS.appRoutesComponentsDashboardView,
   appExamplesIndexRouteTemplate: TEMPLATE_KEYS.appRoutesExamplesIndex,
   appExamplesViewTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsExamplesView,
+  appOrderExampleRouteTemplate: TEMPLATE_KEYS.appRoutesExamplesOrdersId,
   appHealthRouteTemplate: TEMPLATE_KEYS.appRoutesHealth,
   appHealthSharedTemplate: TEMPLATE_KEYS.appRoutesSharedHealth,
   appHealthViewTemplate: TEMPLATE_KEYS.appRoutesComponentsHealthView,

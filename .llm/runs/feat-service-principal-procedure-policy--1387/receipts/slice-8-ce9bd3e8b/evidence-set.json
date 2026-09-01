@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "ce9bd3e8b5b7e06dd21785dfe452efb94a909bf3",
+  "surface": "#1387 Slice 8 MCP/agent access projection",
+  "expectedGateIds": [
+    "check",
+    "fmt-check",
+    "lint",
+    "mcp-export-corpus",
+    "publish-dry-run",
+    "quality-gate",
+    "test"
+  ],
+  "receiptIds": [
+    "1387-s8-check",
+    "1387-s8-fmt-check",
+    "1387-s8-lint",
+    "1387-s8-mcp-export-corpus",
+    "1387-s8-publish-dry-run",
+    "1387-s8-quality-gate",
+    "1387-s8-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

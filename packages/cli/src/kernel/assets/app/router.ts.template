@@ -32,6 +32,7 @@ export const appRoutes = {
   examples: routes.examples.$route,
   serviceExample: routes.examples.serviceExample,
   crudExample: routes.examples.crud.$route,
+  order: generatedRoutes.examples.orders.$id.$route,
   telemetryExample: routes.examples.telemetry,
   design: routes.design.$route,
   designTokens: createRouteReference('/design/tokens', {

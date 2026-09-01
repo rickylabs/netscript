@@ -27,7 +27,7 @@ export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{
   readonly correlationId?: string;
   readonly traceparent?: string;
   readonly tracestate?: string;
-  readonly reportProgress?: (percent: number, message?: string) => void;
+  readonly reportProgress?: (percent: number, message?: string) => void | Promise<void>;
 }>;
 
 /** Function that executes a runtime job. */

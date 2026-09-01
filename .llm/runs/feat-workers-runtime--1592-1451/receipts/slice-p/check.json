@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "slice-p-scoped-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--include",
+    "^(packages/plugin-workers-core|plugins/workers/worker)/"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-workers-p",
+  "gitHead": "78be0e032624f12bcb30535d40e3a948b08b9784",
+  "actualGitHead": "78be0e032624f12bcb30535d40e3a948b08b9784",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:3559325",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "14f83e76e19ed878d7f2513f158e8b1a7cba7bc1f151d87013ef737891e67bd8",
+  "lifecycleId": "worker:3559325:slice-p-scoped-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-01T06:17:09.454Z",
+  "startedAt": "2026-09-01T06:17:09.456Z",
+  "finishedAt": "2026-09-01T06:17:10.111Z",
+  "durationMs": 655,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 308,
+    "sha256": "f297a652093328ca28f2b0256de7fc9ee001f0ec53e6de4d8a665cdfedd0b92a",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-workers-p\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":131,\"batches\":2,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 262,
+    "sha256": "0f826528c0702fab0f137717bf2c68cf9e38accb46114213b5f0142c7900be81",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^(packages/plugin-workers-core|plugins/workers/worker)/'\n",
+    "truncated": false
+  }
+}

@@ -4,7 +4,8 @@
  * Ports define the SDK's public type vocabulary without re-exporting upstream
  * implementation types. They cover cache stores and entries, service-client
  * contract inference, query factories, TanStack Query client width,
- * service-query utils, discovery metadata, and the transport seam.
+ * service-query utils, discovery metadata, and the versioned client-contribution
+ * contract for typed per-call context, owned HTTP headers, and cache safety.
  *
  * Import this subpath when another NetScript package needs to accept or return
  * SDK-compatible shapes without depending on concrete adapters. Runtime

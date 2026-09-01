@@ -33,6 +33,7 @@ import {
   readTokenFromEnv,
   requireValue,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 interface Options {
   source: 'local' | 'remote';
@@ -64,6 +65,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = {
     source: 'local',
     repo: 'rickylabs/netscript',

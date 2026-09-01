@@ -10,6 +10,7 @@ import type {
   SdkClientContributionId,
   SdkClientResponseCache,
 } from '../ports/sdk-client-contribution.ts';
+import { validateSdkClientContributions } from '../internal/client-contributions/prepared-call.ts';
 
 /** Curried descriptor function returned by {@link defineSdkClientContribution}. */
 export interface SdkClientContributionDefinition<TContext extends object> {
@@ -103,6 +104,7 @@ export function defineSdkClientContribution<
       'responseCache'
     >
     & { readonly responseCache: TResponseCache } {
+    validateSdkClientContributions([descriptor]);
     return descriptor;
   }
 

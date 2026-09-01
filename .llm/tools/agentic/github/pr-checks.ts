@@ -1,5 +1,7 @@
 /** Read-only latest-run-per-name pull-request check rollup. */
 
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+
 export const CHECK_CURRENT_PASS = 'current-pass' as const;
 export const CHECK_CURRENT_FAIL = 'current-fail' as const;
 export const CHECK_SUPERSEDED = 'superseded' as const;
@@ -198,6 +200,7 @@ function isStale(run: CheckRun, headSha: string, mergedAt?: string): boolean {
 }
 
 function parseArgs(args: readonly string[]): Options {
+  args = normalizeTaskArguments(args);
   let repo = readEnv('GITHUB_REPOSITORY') ?? '';
   let pr = 0;
   let pretty = false;
@@ -210,7 +213,6 @@ function parseArgs(args: readonly string[]): Options {
       return next;
     };
     switch (arg) {
-      case '--':
       case '--json':
         break;
       case '--repo':

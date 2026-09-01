@@ -3,13 +3,9 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import {
-  assert,
-  assertEquals,
-  assertStrictEquals,
-  assertStringIncludes,
-} from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStrictEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateRouteManifestSeed } from '../../application/scaffold/writers/app-route-seeds.ts';
+import { TEMPLATE_MANIFEST } from '../../assets/manifest.ts';
 import {
   appAppTemplate,
   appClientTemplate,
@@ -30,8 +26,8 @@ import {
   appDesignTokensLibTemplate,
   appDesignTokensRouteTemplate,
   appDesignTokensViewTemplate,
-  appExampleServiceQueryTemplate,
   appExampleServiceOptimisticListMutationTemplate,
+  appExampleServiceQueryTemplate,
   appExampleServiceRouteContractTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
@@ -41,6 +37,7 @@ import {
   appHomeViewTemplate,
   appIndexRouteTemplate,
   appLayoutTemplate,
+  appOrderExampleRouteTemplate,
   appRouterTemplate,
   appServiceAuthorizationTemplate,
   appServiceExampleHeroTemplate,
@@ -71,7 +68,7 @@ function directAppRouteTargets(source: string): ReadonlyMap<string, string> {
 
   const targets = new Map<string, string>();
   const body = source.slice(start, end);
-  for (const match of body.matchAll(/^  ([A-Za-z][A-Za-z0-9]*): ([^,\n]+),$/gm)) {
+  for (const match of body.matchAll(/^[ ]{2}([A-Za-z][A-Za-z0-9]*): ([^,\n]+),$/gm)) {
     targets.set(match[1], match[2]);
   }
   return targets;
@@ -133,6 +130,34 @@ describe('app route template rendering', () => {
     assertStringIncludes(examples, 'href: appRoutes.crudExample.href()');
   });
 
+  it('dynamic order route is registered, aliased, and linked from examples', async () => {
+    const adapter = makeAdapter();
+    const router = await adapter.render(appRouterTemplate, SAMPLE_APP_VARS);
+    const examples = await adapter.render(appExamplesIndexRouteTemplate, SAMPLE_APP_VARS);
+
+    assert(
+      TEMPLATE_MANIFEST.map((asset) => String(asset.path)).includes(
+        'app/routes/examples/orders/[id].tsx.template',
+      ),
+      'dynamic order route template must be registered',
+    );
+    assertStringIncludes(router, 'order: generatedRoutes.examples.orders.$id.$route,');
+    assertStringIncludes(examples, "appRoutes.order.href({ path: { id: 'order-42' } })");
+  });
+
+  it('dynamic order route binds inferred ctx.path and derives its self href from that value', () => {
+    const route = appOrderExampleRouteTemplate;
+
+    assertStringIncludes(route, '.withRoute(appRoutes.order)');
+    assertStringIncludes(route, 'const id: string = ctx.path.id;');
+    assertStringIncludes(route, 'const selfHref = ctx.route.href({ path: { id } });');
+    assertStringIncludes(route, 'data-order-id={id}');
+    assertStringIncludes(route, 'href={selfHref}');
+    assert(!route.includes('ctx.params'));
+    assert(!route.includes('ctx.url'));
+    assert(!route.includes('order-42'));
+  });
+
   it('rejects duplicate direct appRoutes targets', async () => {
     const output = await makeAdapter().render(appRouterTemplate, SAMPLE_APP_VARS);
     assertUniqueDirectAppRouteTargets(output);
@@ -174,7 +199,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface HomeViewProps {');
-    assertStringIncludes(view, "import { Badge, Button, Card, PageHeader, StatsGrid }");
+    assertStringIncludes(view, 'import { Badge, Button, Card, PageHeader, StatsGrid }');
     assertStringIncludes(view, 'A generated NetScript workspace with app-owned UI copies');
     assertStringIncludes(view, 'href={designHref}');
     assertStringIncludes(view, 'href={compositionHref}');
@@ -194,8 +219,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(view, 'StatsGrid');
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'Deployment readiness');
-    assert(!view.includes('class=\'flex'));
-    assert(!view.includes('class=\'grid'));
+    assert(!view.includes("class='flex"));
+    assert(!view.includes("class='grid"));
   });
 
   it('health route keeps the builder in health.tsx and the probe payload in shared helpers', async () => {
@@ -256,7 +281,10 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'const designHref = appRoutes.design.href();');
     assertStringIncludes(output, 'url.pathname.startsWith(examplesHref)');
     assertStringIncludes(output, "import { Badge, Button } from '@app/components/ui/mod.ts';");
-    assertStringIncludes(output, "<Button\n            type='link'\n            href={dashboardHref}");
+    assertStringIncludes(
+      output,
+      "<Button\n            type='link'\n            href={dashboardHref}",
+    );
     assertStringIncludes(
       output,
       "aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}",
@@ -282,8 +310,14 @@ describe('app route template rendering', () => {
     assertStringIncludes(layout, "import { appRoutes } from '@app/router.ts';");
     assertStringIncludes(layout, 'href: appRoutes.designTokens.href()');
     assertStringIncludes(layout, 'test-project');
-    assertStringIncludes(appDesignIndexRouteTemplate, 'return ctx.redirect(appRoutes.designTokens.href());');
-    assertStringIncludes(tokensRoute, "import DesignTokensView from './(_components)/tokens-view.tsx';");
+    assertStringIncludes(
+      appDesignIndexRouteTemplate,
+      'return ctx.redirect(appRoutes.designTokens.href());',
+    );
+    assertStringIncludes(
+      tokensRoute,
+      "import DesignTokensView from './(_components)/tokens-view.tsx';",
+    );
     assertStringIncludes(tokensRoute, '.withRoute(appRoutes.designTokens)');
     assertStringIncludes(tokensRoute, ".withLayer('tokens', DesignTokensView");
     assertStringIncludes(
@@ -375,8 +409,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'DetailLayout');
     assertStringIncludes(view, 'No accounts match these filters');
-    assert(!view.includes('class=\'flex'));
-    assert(!view.includes('class=\'grid'));
+    assert(!view.includes("class='flex"));
+    assert(!view.includes("class='grid"));
   });
 
   it('example service template wires the selected service client and query helpers', async () => {
