@@ -106,14 +106,27 @@
 ## D — `packages/fresh-ui/deno.lock`: a private lock the family sweep missed (CI-caught, real)
 
 **What happened.** After convergence at `73c554a08`, `fresh-ui-quality` failed:
-`Fresh UI private lock is stale`. `packages/fresh-ui` is **not** a root workspace member — it is a
-standalone package with its **own** `deno.lock` — and it declares no `@orpc` dependency itself. Its
-oRPC ranges arrive through the root catalog, which this slice raised, so its private lock still
-requested `@orpc/*@^1.14.6` while the catalog required `^1.15.0`.
+`Fresh UI private lock is stale`. `packages/fresh-ui` keeps its **own** `deno.lock` and runs its
+gates with `--lock=deno.lock --frozen`; it declares no `@orpc` dependency itself, so its oRPC ranges
+arrive through the root catalog this slice raised. Its private lock still requested
+`@orpc/*@^1.14.6` while the catalog required `^1.15.0`.
+
+**Framing correction (delta IMPL-EVAL, low finding — accepted).** An earlier version of this entry
+called `packages/fresh-ui` "not a root workspace member — a standalone package". **That was wrong.**
+It *is* a member: the root workspace uses the glob `packages/*`, and the package appears in both
+locks' 37-member mirrors with a `catalog:` reference in its `package.json`. The supervisor's
+membership check tested for an explicit literal entry and so missed the glob.
+
+The correct defect class is broader and worth stating precisely, because the wrong framing would have
+under-scoped future sweeps: **a second `--lock=deno.lock` lockfile covering the same workspace
+graph.** Such a file mirrors every member's dependency declarations, so it goes stale whenever the
+catalog or any member manifest moves — regardless of whether the package owning it declares the
+dependency itself.
 
 **Why neither the author nor the evaluator caught it.** The family-completeness proof enumerated the
-**32 root-workspace manifest keys** and the root `deno.lock`. A non-member package carrying a private
-lock is outside that enumeration, so a complete-looking sweep was still incomplete. This is the
+**32 root-workspace manifest keys** and the root `deno.lock`. A *second lockfile* over the same graph
+is not a manifest key and is not the root lock, so it fell outside the enumeration entirely — a
+complete-looking sweep was still incomplete. This is the
 blocking instance of the same class as the evaluator's medium finding (caret-pinned literals
 desyncing from the catalog) — that finding described a latent variant; this one was load-bearing.
 
@@ -138,3 +151,25 @@ No package outside that closure changed. Post-fix in the private lock: `@orpc/sh
 **Head impact.** This is content the IMPL-EVAL did not see; its family-completeness verification is
 now known to have had this hole. The head moves off the evaluated `1914a38c6`/`73c554a08`, so a
 bounded delta evaluation is owed before this is presented as a merge packet.
+
+**Delta IMPL-EVAL: PASS** (`delta-impl-eval.md`). It re-derived every load-bearing claim rather than
+accepting this entry's: the convergence merge's root-lock delta is byte-exactly the one
+`jsr:@netscript/config@0.0.6` line with the `@orpc` set untouched; the fresh-ui version-move set (23
+names, machine-diffed and reverse-dependency-checked) sits entirely inside the oRPC closure and
+matches the table above row for row; the frozen check passes with an unchanged lock hash, a single
+`@orpc/shared@1.15.0` and zero `1.14.x` residue.
+
+**Q4 — no third stale surface exists.** The repo-wide sweep for other surfaces of the second-lockfile
+class found none. Two further disclosures worth carrying:
+
+- The regen's diff also contains 7 first-party workspace-mirror lines (6 × `plugin-streams-core@0.0.6`
+  from #1876, 1 × `config@0.0.6` from #1874) with **no** third-party drift; the mirrors match the root
+  lock exactly. The confinement table above is a *version-move* table and remains accurate as such.
+- Fresh-ui's private lock had itself been carrying the two-copy `@orpc/shared` hazard
+  (`1.14.6` + `1.14.8`) until this fix — so the regeneration removed a real duplicate, not just a
+  gate complaint.
+
+**Latent recurrence, filed as follow-up:** `fresh-ui-quality` does not trigger on member-manifest or
+root-`deno.lock` changes, yet the private lock mirrors all 37 members' declarations. A
+member-manifest-only PR can therefore stale it without the gate ever running. This slice was caught
+only because its catalog raise touched root `deno.json`.
