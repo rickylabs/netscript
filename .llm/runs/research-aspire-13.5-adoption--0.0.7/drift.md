@@ -5707,3 +5707,36 @@
     **second stream (stdout)** is retained — "constants unchanged" is not sufficient evidence for a
     combined total; and explicit **verification** that D-224/D-227/D-231 survive rather than the
     author's assertion that they do.
+
+- **D-235 — sanctioned delta-5 eval: `CHANGES_REQUESTED`. The sharp question in the brief found the
+  defect the author's own account could not.**
+  - **The brief refused "constants unchanged" as evidence**, and that is exactly what broke. Retention
+    is applied **per stream independently**, so with both flooded at HEAD the evaluator measured:
+    persisted error file **32,767 B** (64 lines), request-mode result record **33,479 B**, flattened
+    `presentDbCliResult` message **31,865 B** — **2× the ceiling**.
+    D-224's contract says *"Total persisted UTF-8 detail is capped at 16 KiB"* — the **persisted
+    total**, which the old single-stream flood hit exactly at `32×511+31 = 16,383 B`. The author's
+    `drift.md` D-13 claim that the ceiling "remains unchanged" is true **per stream only**; the
+    doubling is unrecorded drift and **no test pins the combined total** (D-224's fixture floods
+    stderr alone).
+    **The lesson, recorded plainly: bounds must be asserted on the artifact the contract describes,
+    not on the inputs that produce it.**
+  - **Everything else confirmed good, independently:** the masking fix is genuinely **generic** —
+    proven with a **Prisma-free** fixture (`Error: cannot open database lock file (E4501).` promoted
+    over a two-line preamble), and the only `PRISMA` strings in the file are pre-existing request
+    keys. `migrate` → `deploy` is the correct **non-interactive deployment** operation where the
+    defect had routed to `migrate dev`, an **authoring** command — proven by fixture (old exit 3, no
+    marker; new exit 0, marker) — with the public label still `migrate` and one `dbTaskOperation`
+    feeding both Container request mode and direct External/SQLite execution. D-224/D-227/D-231 all
+    **verified** intact rather than asserted.
+  - **Repair dispatched** offering two options and requiring the agent to name its choice: **(a)** one
+    shared 16 KiB budget across both streams (preferred), or **(b)** an explicit amended combined
+    contract with the D-224 artifact, `context-pack.md` and `drift.md` all updated to match reality.
+    Either way a **both-streams flood fixture** must pin the **combined persisted total** across the
+    error file, the result record and the flattened message.
+  - Also folded in: the non-gating ordering issue — selection scans **stderr then stdout in retained
+    order, not chronological order**, so a failure-shaped informational stderr line can outrank a real
+    stdout error — to fix only if it can be done without tool-specific heuristics.
+  - **The quarantine is stated to the author directly**, with instruction to **delete `evaluate.md`**,
+    and the sanctioned verdict is posted publicly on #1754 with the quarantine noted so the PR record
+    cannot be read as carrying a self-certified PASS.
