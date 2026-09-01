@@ -85,6 +85,11 @@ adding a second transport path.
 | 2026-09-01 | 4 | compatibility implemented | Documented `port`/`timeout` as accepted deprecated no-ops and added live discovery/dispatch/cancellation proof. |
 | 2026-09-01 | 4 | compatibility gate | Wrong `port` still reached discovery; `timeout: 1` did not abort a slower call; explicit cancellation matched the omitted-options client. |
 | 2026-09-01 | 4 | freeze | Compatibility check/lint/fmt and 9/9 focused tests passed; ready for the one final `main` integration. |
+| 2026-09-01 | final | integrated once | Merged `origin/main` `9ca986fb0` once at merge commit `034007554`; #1886's additive contribution tests auto-merged without semantic conflict. |
+| 2026-09-01 | final | declaration correction | Gate 4 found `./desktop` did not re-export the locked public policy type; exported the existing three policy types and documented every internal result field, then reran Gates 1–4 green/baseline-clean. |
+| 2026-09-01 | final | Gate 10 external failure | Two unsplit scaffold runs each passed 38 steps, then `database.init` failed after ~15 minutes on an Aspire generated Postgres executable `404 NotFound`; cleanup passed both times. |
+| 2026-09-01 | final | resource audit | Harness leak checks after the failures found Aspire/Docker healthy with zero survivors; final report is `leak-report.md`. |
+| 2026-09-01 | final | changed-file audit | The moving `origin/main` advanced to `7d18ef104` after the authorized merge. Audit against immutable integrated base `9ca986fb0` is clean: no dependency config/lock, agentic tooling, or workflow changes. No second integration was taken. |
 
 ## Decisions
 
@@ -158,9 +163,28 @@ adding a second transport path.
 | Compatibility + README suite | PASS (`rc=0`) | structured test wrapper, 9/9 | Live discovery, wrong port, slow call beyond timeout, equal explicit cancellation |
 | No-op public disposition | PASS | README + declaration docs | Both fields remain optional, accepted, deprecated, and explicitly ignored |
 
+### Final 10-Step Validation (after one integration)
+
+| # | Gate | Result | Evidence |
+| --- | --- | --- | --- |
+| 1 | Targeted check | PASS (`rc=0`) | contracts 27 files; SDK 101 files; zero findings |
+| 2 | Focused runtime/type tests | PASS (`rc=0`) | 43 passed, 0 failed across 12 owned test files |
+| 3 | Scoped lint/fmt | PASS (`rc=0`) | contracts 27 and SDK 101 files; zero findings |
+| 4 | Public declaration boundary | PASS after owned correction | all five JSON probes `rc=0`; client/contracts clean; ports and Desktop retain one known private-ref each; policy leak/packed probes pass |
+| 5 | Full doc baseline | PASS against expected baseline (`rc=1`) | SDK exactly 3, contracts exactly 9 private-type-ref; zero missing JSDoc and no count increase |
+| 6 | JSR audit | PASS (`rc=0`) | SDK and contracts dry-run OK; only existing SDK cardinality/slow-type and sanctioned contracts slow-type notes |
+| 7 | Package quality | PASS (`rc=0`) | `quality:gate`; no scanner findings, existing warnings only |
+| 8 | Root static/runtime | PASS (`rc=0`) | check 3008 files; tests 4716 passed/0 failed/19 ignored; lint/fmt 2097 files |
+| 9 | Publish surface | PASS (`rc=0`) | workspace publish dry run completed successfully |
+| 10 | Full consumer smoke | BLOCKED (`rc=1`, twice) | each run: 38 passed, `database.init` failed on Aspire generated Postgres resource 404; `cleanup.aspire-stop` passed; final leak check zero survivors |
+
+Gate 10 is not attributed to #1351: both attempts failed on different generated resource names with
+the same Aspire control-plane `NotFound`, after all scaffold/generation/static SDK consumers passed.
+No CLI/Aspire source was changed and no third retry was attempted.
+
 ## Handoff Notes
 
 - Inspect `src/internal/transport-policy.ts` first: all later wiring must project this decision and
   must not recreate method/cache policy in either link.
-- All implementation decisions are closed. Remaining work is the single final integration and the
-  approved 10-step validation plan; any semantic conflict is drift and must stop the slice.
+- Implementation and evidence are complete for draft handoff. The supervisor/evaluator must judge
+  the repeated external Gate 10 failure; this session does not self-evaluate or widen scope.

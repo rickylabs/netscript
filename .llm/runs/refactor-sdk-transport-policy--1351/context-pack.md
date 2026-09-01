@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `refactor-sdk-transport-policy--1351` |
 | Branch | `refactor/sdk-transport-policy` |
-| Current phase | implement — Slice 4 compatibility complete; final integration pending |
+| Current phase | implementation complete — final evidence handoff |
 | Archetype | `2 — Integration` |
 | Scope overlays | none |
 
@@ -15,7 +15,12 @@
 PLAN-EVAL passed at `871caac96`. Slices 1–4 implement the approved contract, wire one frozen
 decision through the sole HTTP stack, and make the typed Desktop client consume the same resolver
 without changing MessagePort frames. Deprecated `port`/`timeout` behavior is documented and proved
-as no-op. No dependency configuration or lock file changed.
+as no-op. The single final integration merged `origin/main` `9ca986fb0` at `034007554`. Gates 1–9
+pass; Gate 10 failed twice on the same external Aspire Postgres resource `404 NotFound` after 38
+suite steps passed, with cleanup and leak checks green. No dependency configuration or lock file
+changed relative to the immutable integrated base. After validation, another lane advanced the
+moving `origin/main` ref to `7d18ef104`; per the one-integration ruling this branch did not integrate
+again. Its merge base remains the integrated `9ca986fb0`.
 
 ## Completed
 
@@ -38,13 +43,14 @@ as no-op. No dependency configuration or lock file changed.
 
 ## In Progress
 
-- Commit compatibility proof, then take the one final `main` integration.
+- Final evidence commit, explicit-refspec push, and draft PR handoff.
 
 ## Next Steps
 
-1. Commit and push the Slice 4 compatibility proof.
-2. Take the single final `main` integration.
-3. Run and record the approved 10-step validation plan.
+1. Commit and push final declaration/evidence updates.
+2. Leave draft PR #1889 unchanged for supervisor-dispatched IMPL-EVAL.
+3. Re-establish the scaffold runtime gate only after the external Aspire resource lifecycle issue
+   is healthy; do not widen #1351 to fix it.
 
 ## Key Decisions
 
@@ -77,18 +83,19 @@ as no-op. No dependency configuration or lock file changed.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1–4 PASS | structured check/lint/fmt wrappers |
-| Fitness | Slices 1–3 PASS | `quality:gate`; source/doc/packed boundary checks |
-| Runtime | Slice 4 compatibility PASS | structured compatibility/README suite, 9/9 |
-| Consumer | Slice 4 compatibility PASS | wrong-port discovery, no timeout, equal cancellation |
+| Static | PASS | targeted and root structured check/lint/fmt |
+| Fitness | PASS with recorded baseline | quality, JSR, publish, doc baseline 3/9 |
+| Runtime | PASS for owned/full tests | focused 43/43; root 4716 passed, 0 failed |
+| Consumer | BLOCKED externally | scaffold runtime 38 passed then Aspire Postgres resource 404, twice |
 
 ## Open Questions
 
-- None. A locked-decision contradiction is a stop-and-report condition.
+- Gate 10 must be rerun by the supervisor/evaluator when Aspire can retain the generated Postgres
+  executable through `database.init`. This is not an SDK transport-policy decision.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: no implementation drift. Gate 10 infrastructure failure is recorded, not hidden.
 - Debt: none created or deepened; existing doc/cardinality warnings remain out of scope.
 
 ## Commits

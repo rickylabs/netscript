@@ -23,8 +23,11 @@ export type SdkClientPolicyCache = 'no-store' | 'default' | 'force-cache';
 
 /** One immutable transport decision for a logical SDK call epoch. */
 export interface ResolvedCallTransportPolicy {
+  /** Normalized contract procedure shared with contribution preparation. */
   readonly procedure: SdkClientProcedureDescriptor;
+  /** Final contract-derived or explicitly overridden HTTP method. */
   readonly method: SdkClientHttpMethod;
+  /** Cache mode selected from call context, procedure metadata, or the default. */
   readonly cache: SdkClientPolicyCache;
 }
 
@@ -32,23 +35,32 @@ export interface ResolvedCallTransportPolicy {
 export interface ResolvedTransportCacheGroup<
   TCache extends 'force-cache' | 'default',
 > {
+  /** Cache group identity represented by this descriptor. */
   readonly cache: TCache;
+  /** Return whether one resolved call belongs to this group. */
   readonly condition: (call: ResolvedCallTransportPolicy) => boolean;
+  /** Stable-v1 interceptor context projected for the selected group. */
   readonly context: TCache extends 'force-cache' ? Readonly<{ cache: 'force-cache' }>
     : Readonly<Record<never, never>>;
 }
 
 /** Package-private transport policy consumed by every SDK client transport. */
 export interface ResolvedTransportPolicy {
+  /** Resolve one immutable decision for a logical call epoch. */
   readonly resolveCall: (
     path: readonly string[],
     input: unknown,
     context: Readonly<ServiceClientContext>,
   ) => ResolvedCallTransportPolicy;
+  /** Project the final HTTP method for the stable-v1 codec. */
   readonly method: (call: ResolvedCallTransportPolicy) => SdkClientHttpMethod;
+  /** Stable-v1 URL-overflow method owned by NetScript. */
   readonly fallbackMethod: 'POST';
+  /** Stable-v1 maximum encoded GET URL length owned by NetScript. */
   readonly maxUrlLength: 2083;
+  /** Return whether one resolved call may be deduplicated. */
   readonly dedupePredicate: (call: ResolvedCallTransportPolicy) => boolean;
+  /** Ordered stable-v1 cache group descriptors. */
   readonly cacheGroups: readonly [
     ResolvedTransportCacheGroup<'force-cache'>,
     ResolvedTransportCacheGroup<'default'>,
