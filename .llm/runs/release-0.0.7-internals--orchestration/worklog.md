@@ -8351,3 +8351,66 @@ Local duplicate repo-test terminated on instruction — CI's `check-test` at `f7
 canonical receipt and is still running. Everything else is staged: sole `status:ready-merge`, mirror
 dry-run clean, review threads 0/0, body carrying the verdict, convergence proof and the F-2/F-3
 advisories filed as #1867.
+
+
+## D-192 - HARD BLOCK on #1862 was correct: I was wrong, the original author was right
+
+The independent clean-archive audit disproved my PASS. I verified it myself and it holds completely.
+
+### Four errors, stated plainly
+
+1. **The original author's corpus was correct.** I called `bc3f6a2c2...` a "wrong artifact generated
+   against an unclean tree", took over, and replaced it. It was the **clean, no-colour output**. The
+   blob I committed (`19cdf3783...`) is the one carrying ANSI escapes. I overrode a correct author on
+   a fabricated diagnosis.
+2. **My "determinism across four bases" was worthless.** All four runs shared one colour environment.
+   I proved *consistency under identical conditions* and reported it as *invariance*. Different
+   claims; I conflated them and put the stronger one in a merge packet.
+3. **I invented the mechanism.** "Generated concurrently with the repo-wide suite" was a plausible
+   story I never tested, and I filed advisory F-3 partly on it. The real cause - environmental colour -
+   never occurred to me because I never varied the environment.
+4. **I hashed a file the generator had failed to write.** My intermediate "COLOR-INVARIANT: all three
+   identical" came from `git hash-object` after a `gen` run whose exit I discarded with
+   `>/dev/null 2>&1`; that run had crashed on a missing `--allow-env`. **Real exit capture is the one
+   discipline I have enforced on every author this session, and I dropped it on myself.**
+
+A fifth near-miss: my first byte-level escape check searched for the raw ESC byte and found none,
+because the escapes are **JSON-encoded** as backslash-u001b text. That false negative briefly
+"confirmed" the wrong blob was clean. Only decoding the payload and diffing the two versions surfaced
+the truth.
+
+### The real defect and the fix
+
+`deno doc --json` embeds ANSI escapes in emitted type signatures when colour is enabled, and the
+generator's nested children inherited the caller's environment - so the corpus depended on *who ran
+it*.
+
+Fixed at the seam rather than by regenerating: nested `deno doc` and `deno fmt` now run with a
+canonical child env setting `NO_COLOR=1` and **removing** `FORCE_COLOR`/`CLICOLOR_FORCE`. Removal is
+required, not override - verified empirically that `FORCE_COLOR` beats `NO_COLOR` and that even
+`FORCE_COLOR=0` forces colour. The `gen:`/`check:` tasks gained `--allow-env`, which building that env
+needs.
+
+**Regression with a control**, because my first version passed vacuously against an entrypoint with no
+colourisable tokens: it now asserts the guarded child emits no escapes under a colour-forcing caller
+**and** that the unguarded child does.
+
+| Environment | gen exit | blob | escapes |
+| --- | ---: | --- | ---: |
+| NO_COLOR=1 / FORCE_COLOR=1 / CLICOLOR_FORCE=1 / bare | **0** each | `bc3f6a2c2786...` (all four) | **0** |
+
+check:mcp-export-corpus 0 - scoped check 0 - scoped fmt 0 - regression 5/5 - deno.lock unchanged.
+Head `4dec2407c` pushed.
+
+### Disposition
+
+Full retraction posted on the PR rather than a quiet amendment. Cycle-1 `impl-eval.md` **retained as
+historical drift, not deleted**, and explicitly marked invalid evidence - it verified reproducibility
+under one colour environment, which is the blind spot itself. Fresh separate-session IMPL-EVAL
+dispatched at `4dec2407c`, told not to inherit any cycle-1 conclusion, warned about the JSON-encoded
+escape false-negative, and asked whether fixing invariance is even the right altitude versus not
+embedding rendered signatures at all. PR stays `status:impl`; not a merge candidate.
+
+Also completed the coordinator's taxonomy correction: verified all three active internals PRs (#1802,
+#1846, #1862) already carry `orchestrator:internals`, and confirmed **no open PR repo-wide** is
+missing an orchestrator label.
