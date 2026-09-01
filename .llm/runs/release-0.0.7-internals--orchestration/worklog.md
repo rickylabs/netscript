@@ -8239,3 +8239,62 @@ land, then take **one** integration merge onto then-current main, re-prove blob 
 push once, exact CI, packet.
 
 Evaluator is live at 7 minutes with an actively-writing transcript. Watcher armed.
+
+## D-190 — #1862 PASS consumed and converged; and I caused the exact hazard I had just filed
+
+### The verdict
+
+`VERDICT: PASS` at product head `c3a9d8bff`, artifact `492ac5c10`, verified **artifact-only**
+(67 insertions, one file). The evaluator confirmed all six checks including scope
+(`git diff --exit-code` rc=0 on `deno.lock`, `packages/sdk`, `.github`, `.llm/tools`) and judged the
+*shape* of the fix, not just its correctness: regenerating — never editing source or generator logic
+to make a check pass — is the only correct response at this altitude.
+
+### Convergence
+
+The evaluator had already pushed its artifact to the branch, so my cherry-pick would have **duplicated
+that commit**. Caught it on a rejected non-fast-forward push, reset onto the evaluator's own commit
+`492ac5c10` — preserving its authorship rather than my copy — and merged `b66e52cbc` once. New head
+`f7b17acec`. **Both blobs byte-identical across the merge**: corpus `19cdf3783…`, eval artifact
+`5a993504b…`. Corpus check `REAL_EXIT=0`, `deno.lock` unchanged, product scope exactly one file.
+
+### My own process failure, recorded plainly
+
+**I launched two repo-wide test runs in the same worktree** — pid `3650073` alongside the failed push,
+then `3652923` after the reset and merge. The coordinator terminated the duplicate.
+
+Worse, the surviving run is **not a valid final-head receipt**, and the timing proves it:
+
+| Event | Time |
+| --- | --- |
+| `deno task test` (pid `3650083`) started | **08:42:44** |
+| merge to `f7b17acec` committed | **08:42:56** |
+
+The tree changed **12 seconds into the run**. That is precisely the F-3 hazard I filed minutes
+earlier — a long-running process reading a tree that mutates underneath it — and I committed it
+myself while documenting it. Its exit code is untrustworthy for this head regardless of what it says,
+so it is **not** being used as the packet's receipt.
+
+**No relaunch, per instruction and because none is needed**: CI's own `check-test` runs the repo-wide
+suite at the exact head and is the durable, uncontaminated receipt. The local run was always
+redundant with it.
+
+### Lifecycle
+
+`close-gate` initially failed on three unticked acceptance boxes in issue #1859. Handled through the
+**mirror**, not by hand-ticking: added an `acceptance-evidence` block mapping all three with honest
+evidence — box 2 is directly verifiable now; boxes 1 and 3 are proven at the **integrated head**,
+which is the tree that actually lands, with the four-base reproduction as support. Mirror dry-run
+validates `REAL_EXIT=0` with no mapping error.
+
+Also found the PR carrying **two** `status:` labels (`impl-eval` and `ready-merge`) after the
+transition; normalized to sole `status:ready-merge` on PR and issue. Review threads **0 / 0**.
+PR is ready; exact-head CI running.
+
+### Advisories filed, not absorbed — #1867
+
+F-2 (`check:mcp-export-corpus` has **no CI wiring at all**, which is what let #1841 strand main red
+across six merges) and F-3 (`gen:mcp-export-corpus` has **no clean-tree guard**, the exact mechanism
+behind this slice's earlier wrong corpus) filed as **#1867**, milestone 0.0.8, with acceptance in both
+directions and an explicit note that a hard refusal beats a warning — a plausible-looking wrong
+artifact survives review, a failed command does not.
