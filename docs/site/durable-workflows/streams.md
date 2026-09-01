@@ -71,6 +71,19 @@ polling loop anywhere in it. And because the schema is a frozen, typed collectio
 stream carries is enumerable from its definition — `inspectStreamTopic` renders it as a JSON-stable
 report, which is as useful to a CLI doctor or a coding agent as it is to a test.
 
+### Worker execution progress ordering and replay
+
+Worker handlers report progress through an execution-local outbound channel. Calls are persisted in
+invocation order for that execution, including repeated percentages and decreasing values; the
+runtime does not debounce, deduplicate, or coalesce them. A terminal success or failure waits for
+all accepted progress writes to drain, so an unawaited progress call cannot race past completion.
+Progress persistence failures fail the execution instead of being reduced to log messages.
+
+Each accepted transition publishes the existing full execution-record upsert. Durable-stream replay
+therefore remains entity replay: offsets order the retained updates, and reducing by execution id
+materializes the newest record with its last progress value and terminal status. Intermediate
+updates may be visible in the retained log, but this is not a separate progress-history API.
+
 ## Learn → / Do →
 
 {{ comp.featureGrid({ items: [

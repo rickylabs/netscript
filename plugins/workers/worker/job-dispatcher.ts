@@ -142,6 +142,7 @@ export async function processWorkerJob(
         const result = await executeWorkerJob(
           context,
           jobDef,
+          executionId!,
           payload,
           abortController.signal,
           subprocessHeaders,
