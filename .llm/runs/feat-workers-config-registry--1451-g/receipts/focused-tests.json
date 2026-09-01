@@ -6,17 +6,16 @@
     "--reporter=tap",
     "--no-lock",
     "--allow-all",
-    "plugins/workers/tests/cli/runtime-registry-generator_test.ts",
-    "packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts"
+    "plugins/workers/tests/cli/runtime-registry-generator_test.ts"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g",
   "exitCode": 0,
-  "durationMs": 2576,
+  "durationMs": 1909,
   "summary": {
-    "passed": 15,
+    "passed": 6,
     "failed": 0,
     "ignored": 0,
-    "totalResults": 15,
+    "totalResults": 6,
     "uniqueFailures": 0
   },
   "failures": []

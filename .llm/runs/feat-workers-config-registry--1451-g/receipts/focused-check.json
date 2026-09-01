@@ -5,7 +5,7 @@
   },
   "command": "deno check --unstable-kv --no-lock <files>",
   "selection": {
-    "filesSelected": 4,
+    "filesSelected": 1,
     "batches": 1,
     "failedBatches": 0
   },

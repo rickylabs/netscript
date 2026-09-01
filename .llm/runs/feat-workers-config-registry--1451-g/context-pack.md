@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `feat-workers-config-registry--1451-g` |
 | Branch | `feat/workers-config-aware-registry` |
-| Current phase | implementation complete; draft PR #1872 awaiting separate evaluation |
+| Current phase | Tier-A follow-up complete; non-draft PR #1872 in `status:impl-eval` |
 | Archetype | 5 — Plugin Package, with Archetype-6 generator edge |
 | Scope overlays | none |
 
 ## Current State
 
-Slice G is implemented within six product files. The clustered PLAN-EVAL remains authoritative;
-focused acceptance and static/fitness gates pass, subject to the explicitly recorded lock and
-official-sample drift.
+Slice G is implemented within six product files. Tier-A accepted the slice subject to one bounded
+D6 test gap; the isolated POSIX-vs-Windows separator equivalence test and focused gates are now
+complete. Supervisor dispositions own the required lock row and sample follow-up #1874.
 
 ## Completed
 
@@ -23,18 +23,19 @@ official-sample drift.
 - Baseline plugin/CLI doc lint, installed integration, dependency provenance, and lock blob captured.
 - Entry CLI loads config and validates the workers section exactly once at the edge.
 - Generator binds normalized policy to canonical discovery identity and emits full policy literals.
-- Focused acceptance passes 15/15; plugin publish dry-run, quality gate, and architecture gate pass.
+- Original focused acceptance passes 15/15; the follow-up plugin suite passes 6/6 with zero focused
+  check diagnostics and zero format findings.
 
 ## In Progress
 
-- Restore and verify the lock blob, inspect the final diff, then commit/push/open the metadata-complete
-  draft PR.
+- Push the bounded D6 test follow-up and return PR #1872 to supervisor evaluation.
 
 ## Next Steps
 
-1. Run separate-session IMPL-EVAL for draft PR #1872 at the current head.
-2. Hosted owner triages the official-sample drift and runs the runtime smoke at merge readiness.
-3. Supervisor performs close-gate verification and decides #1451 closure.
+1. Supervisor re-reviews the bounded test follow-up at the new head.
+2. Heavy CI and separate-session IMPL-EVAL complete on non-draft PR #1872.
+3. Supervisor performs close-gate verification and decides #1451 closure; sample parity remains in
+   #1874.
 
 ## Key Decisions
 
@@ -55,23 +56,24 @@ official-sample drift.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | focused check 0; tests 15/15; workers lint/fmt 0 |
+| Static | PASS | original tests 15/15; D6 follow-up tests 6/6; focused check 0; follow-up fmt 0 |
 | Fitness | PASS with baseline findings | doc-lint A/B plugin 20 / CLI 0; quality and architecture pass |
 | Runtime | N/A locally | binding owner prohibition |
 | Consumer | PASS | installed registry 10/10; policy flows through startup registration, zero fetch |
 
 ## Open Questions
 
-- Existing official sample authors a plugin-owned entrypoint without `source: 'plugin'`; recorded for
-  supervisor/hosted-smoke triage because the locked Slice G touch set does not permit that file.
+- None for this bounded follow-up. The official sample mismatch is tracked as #1874.
 
 ## Drift and Debt
 
-- Drift: RTK unavailable; direct config dependency mutates Deno's member lock snapshot; root quality
-  config excludes CLI lint/fmt; official sample source disagrees with D6 discovery.
+- Drift: RTK unavailable; supervisor corrected the lock disposition in `2a2e253a1`; root quality
+  config excludes CLI lint/fmt; official sample source mismatch is tracked as #1874; Tier-A found
+  and this follow-up closes the missing isolated D6 separator assertion.
 - Debt: existing `plugins/workers` Refactor entry unchanged.
 
 ## Commits
 
 - Implementation: `236ddcf3a` — config-aware installed job registry Slice G.
-- Draft PR: `https://github.com/rickylabs/netscript/pull/1872`.
+- Lock correction: `2a2e253a1` — required direct config member edge (supervisor-owned).
+- PR: `https://github.com/rickylabs/netscript/pull/1872` (non-draft, evaluation active).

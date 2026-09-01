@@ -3,15 +3,15 @@
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g",
   "mode": "check",
   "summary": {
-    "filesSelected": 3,
+    "filesSelected": 1,
     "batches": 1,
     "failedBatches": 0,
     "findings": 0,
     "ignoredFindings": 0
   },
   "coverage": {
-    "filesSelected": 3,
-    "filesProcessed": 3,
+    "filesSelected": 1,
+    "filesProcessed": 1,
     "droppedFiles": [],
     "refusals": []
   },

@@ -67,6 +67,7 @@ model, then extend semantic generation tests without introducing a second policy
 | 2026-09-01 | G | acceptance | Focused structured tests pass 15/15, including real config entry, malformed/absent config, all policy fields, Windows paths, precedence, collision/source/unmatched errors, plugin intrinsic id, generic fallback, and installed runtime consumption without fetch. |
 | 2026-09-01 | G | fitness | Focused check/lint/fmt pass in governed scopes; doc-lint A/B unchanged at plugin 20 / CLI 0; publish dry-run, quality gate, and architecture gate pass. |
 | 2026-09-01 | G | PR handoff | Pushed implementation commit `236ddcf3a`; opened draft PR #1872 with required labels and milestone 0.0.7. GraphQL confirms `closingIssuesReferences: []`. |
+| 2026-09-01 | G | Tier-A follow-up | Supervisor accepted the slice with one bounded gap: add an isolated D6 POSIX-vs-Windows separator equivalence test. Added exactly one test; focused plugin test/check/fmt gates pass. |
 
 ## Decisions
 
@@ -84,6 +85,7 @@ model, then extend semantic generation tests without introducing a second policy
 | Direct config dependency deterministically changes Deno's per-member lock snapshot | significant | yes |
 | Existing official sample normalizes a plugin-owned path to local source | significant | yes |
 | Root lint/fmt configuration excludes the CLI package | minor | yes |
+| Combined entry coverage did not explicitly compare Windows and POSIX D6 identity | minor | yes |
 
 ## Gate Results
 
@@ -92,7 +94,8 @@ model, then extend semantic generation tests without introducing a second policy
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | baseline installed integration | structured test wrapper | PASS | 9 passed, 0 failed |
-| focused semantic tests | structured test wrapper | PASS | 15 passed, 0 failed; receipt `receipts/focused-tests.json` |
+| focused semantic tests | structured test wrapper | PASS | original Slice G set passed 15/15 |
+| D6 separator follow-up | structured test wrapper | PASS | 6 passed, 0 failed; current receipt `receipts/focused-tests.json` |
 | focused check | structured check wrapper | PASS | zero diagnostics; receipt `receipts/focused-check.json` |
 | workers lint | structured lint wrapper | PASS | zero diagnostics; receipt `receipts/plugin-lint.json` |
 | workers fmt | structured fmt wrapper | PASS | zero findings; receipt `receipts/plugin-fmt.json` |
@@ -109,7 +112,7 @@ model, then extend semantic generation tests without introducing a second policy
 | JSR audit | BASELINE | 1 pre-existing fail, 3 warnings | unchanged files/findings; dry-run OK |
 | quality gate | PASS | `deno task quality:gate` | scanner clean; architecture subgate pass |
 | architecture | PASS | `deno task arch:check` | no new failures; existing warnings only |
-| lock verification | PASS | SHA-256 `01ff3a…`; git blob `ac2ee042…` | byte-identical to base after removing transient Deno member-snapshot row |
+| lock verification | PASS | supervisor commit `2a2e253a1` | required single `@netscript/config` member row retained; supervisor measured frozen install failure without it |
 
 ### Runtime Gates
 
@@ -125,10 +128,11 @@ model, then extend semantic generation tests without introducing a second policy
 
 ## Handoff Notes
 
-- Draft PR: `https://github.com/rickylabs/netscript/pull/1872` (`status:impl`, exact requested
-  taxonomy, milestone 0.0.7, `Refs #1451`, no closing relationship).
+- PR: `https://github.com/rickylabs/netscript/pull/1872` (non-draft, `status:impl-eval`, milestone
+  0.0.7, `Refs #1451`, no closing relationship).
 - Evaluator should inspect that no generator-owned validation/defaults were introduced and that
   `maxConcurrency: 0` survives normalization and generated-module import.
-- Compare post-change doc lint against plugin 20 / CLI 0 and lock blob against `ac2ee042…`.
-- Hosted runtime owner should triage the recorded official-sample source mismatch before running the
-  merge-readiness smoke; no local runtime/Aspire/Docker/browser gate was run.
+- Compare post-change doc lint against plugin 20 / CLI 0; preserve supervisor-owned lock commit
+  `2a2e253a1` without regeneration.
+- Official-sample source mismatch is tracked as #1874; no local runtime/Aspire/Docker/browser gate
+  was run.

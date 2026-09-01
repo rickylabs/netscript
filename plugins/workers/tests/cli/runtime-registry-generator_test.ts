@@ -111,6 +111,42 @@ Deno.test('entry generator loads real config, preserves normalized policy, and g
   });
 });
 
+Deno.test('Windows and POSIX configured entrypoints generate identical policy', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkersManifest(projectRoot);
+    await writeJob(projectRoot, 'create-user-settings.ts');
+    const definitions = new Map<string, Readonly<Record<string, unknown>> | undefined>();
+
+    for (
+      const [label, entrypoint] of [
+        ['posix', 'jobs/create-user-settings.ts'],
+        ['windows', 'jobs\\create-user-settings.ts'],
+      ] as const
+    ) {
+      const workers = WorkersConfigSchema.parse({
+        jobsDir: './workers',
+        jobs: [{
+          id: 'configured-user-settings',
+          name: 'Configured user settings',
+          entrypoint,
+          priority: 77,
+          maxConcurrency: 0,
+          persist: false,
+          tags: ['configured'],
+        }],
+      });
+      await generateRuntimeRegistries(generatorOptions(projectRoot, workers));
+      const module = await importRegistry(projectRoot, `separator-${label}`);
+      definitions.set(label, module.jobDefinitions.get('configured-user-settings'));
+    }
+
+    const posix = definitions.get('posix');
+    assertEquals(posix?.id, 'configured-user-settings');
+    assertEquals(posix?.priority, 77);
+    assertEquals(definitions.get('windows'), posix);
+  });
+});
+
 Deno.test('entry generator preserves generic behavior when config has no workers section', async () => {
   await withTempProject(async (projectRoot) => {
     await writeProjectDenoConfig(projectRoot);

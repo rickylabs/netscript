@@ -61,3 +61,30 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept the repository policy and retain the established file style; do not create
   unrelated whole-file churn. Plugin formatting remains fully covered by the structured wrapper.
+
+## 2026-09-01 — Tier-A corrected the lock disposition and filed sample follow-up
+
+- **What:** Supervisor evidence supersedes two earlier handoff assumptions: the direct
+  `@netscript/config` member row is required for frozen installation, and the sample-source mismatch
+  now has a dedicated issue.
+- **Source:** Tier-A review of PR #1872.
+- **Expected:** The original brief expected a byte-unchanged lock and left the sample mismatch for
+  hosted-smoke triage.
+- **Actual:** `deno install --frozen` exits 1 without the lock row; supervisor commit `2a2e253a1`
+  records the single required row. The sample mismatch is tracked by #1874.
+- **Severity:** significant
+- **Action:** accept the supervisor correction. Preserve `deno.lock` exactly as committed at
+  `2a2e253a1`; do not revert or regenerate it. Leave sample production code untouched under #1874.
+
+## 2026-09-01 — D6 separator behavior lacked an isolated equivalence assertion
+
+- **What:** The broad entry-CLI test used backslash-authored `jobsDir` and entrypoint values, but it
+  did not explicitly compare Windows and POSIX spellings of the same discovered path and generated
+  policy.
+- **Source:** Tier-A review finding on PR #1872.
+- **Expected:** Slice G's locked test list directly pins separator and relative-path equivalence.
+- **Actual:** Normalization behavior existed and was incidentally exercised, while the exact
+  equivalence contract was not isolated against a POSIX control.
+- **Severity:** minor
+- **Action:** close in this follow-up with exactly one test; no production changes. Current focused
+  evidence is 6/6 plugin tests, zero check diagnostics, and zero format findings.
