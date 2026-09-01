@@ -58,35 +58,40 @@ export function injectListenerFaultHealthChecks(
 
   const reference = listenerInfrastructureReference();
   assertGeneratedHealthAttachment(reference, GARNET_REAL_HEALTH_KEY);
-  const garnetAttachment = uniqueHealthAttachment(source, GARNET_REAL_HEALTH_KEY);
-  if (!garnetAttachment) {
-    throw new Error('generated register-infrastructure helper has no garnet health-check marker');
+  const garnetAttachments = healthAttachments(source, GARNET_REAL_HEALTH_KEY);
+  if (garnetAttachments.length === 0) {
+    throw new Error(
+      'generated register-infrastructure helper has no garnet health-check attachment',
+    );
   }
-  const garnetMarker = garnetAttachment.statement;
   const includePostgres = listenerFaultExpectations(database).some((expectation) =>
     expectation.controllerListener === 'postgres'
   );
   let withPostgres = source;
   if (includePostgres) {
     assertGeneratedHealthAttachment(reference, POSTGRES_REAL_HEALTH_KEY);
-    const postgresAttachment = uniqueHealthAttachment(source, POSTGRES_REAL_HEALTH_KEY);
-    if (!postgresAttachment) {
+    const postgresAttachments = healthAttachments(source, POSTGRES_REAL_HEALTH_KEY);
+    if (postgresAttachments.length === 0) {
       throw new Error(
-        'generated register-infrastructure helper has no postgres health-check marker',
+        'generated register-infrastructure helper has no postgres health-check attachment',
       );
     }
-    const postgresMarker = postgresAttachment.statement;
-    const postgresBlock = `${postgresMarker}
-  builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
-  await ${postgresAttachment.resourceBinding}.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`;
-    withPostgres = source.replace(postgresMarker, postgresBlock);
+    withPostgres = injectAtHealthAttachments(
+      source,
+      postgresAttachments,
+      (attachment, indentation) =>
+        `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
+${indentation}await ${attachment.resourceBinding}.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`,
+    );
   }
 
-  const garnetBlock = `${garnetMarker}
-  builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: ${GARNET_TEST_LISTENER_PORT} }));
-  await ${garnetAttachment.resourceBinding}.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`;
-
-  return withPostgres.replace(garnetMarker, garnetBlock);
+  return injectAtHealthAttachments(
+    withPostgres,
+    healthAttachments(withPostgres, GARNET_REAL_HEALTH_KEY),
+    (attachment, indentation) =>
+      `${indentation}builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: ${GARNET_TEST_LISTENER_PORT} }));
+${indentation}await ${attachment.resourceBinding}.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`,
+  );
 }
 
 /** Inject the existing dead-port app plus the Aspire-managed listener controller task. */
@@ -160,8 +165,10 @@ function listenerInfrastructureReference(): string {
 }
 
 interface HealthAttachment {
+  readonly endOffset: number;
   readonly healthCheckKey: string;
   readonly resourceBinding: string;
+  readonly startOffset: number;
   readonly statement: string;
 }
 
@@ -176,8 +183,15 @@ function healthAttachments(source: string, key: string): readonly HealthAttachme
   for (const match of source.matchAll(HEALTH_ATTACHMENT_PATTERN)) {
     const healthCheckKey = match[2] ?? match[3];
     const resourceBinding = match[1];
-    if (healthCheckKey === key && resourceBinding) {
-      attachments.push({ healthCheckKey, resourceBinding, statement: match[0] });
+    const startOffset = match.index;
+    if (healthCheckKey === key && resourceBinding && startOffset !== undefined) {
+      attachments.push({
+        endOffset: startOffset + match[0].length,
+        healthCheckKey,
+        resourceBinding,
+        startOffset,
+        statement: match[0],
+      });
     }
   }
   return attachments;
@@ -185,14 +199,27 @@ function healthAttachments(source: string, key: string): readonly HealthAttachme
 
 function assertGeneratedHealthAttachment(source: string, key: string): void {
   const attachments = healthAttachments(source, key);
-  if (attachments.length !== 1) {
+  if (attachments.length === 0) {
     throw new Error(`infrastructure generator omitted ${key} attachment marker`);
   }
 }
 
-function uniqueHealthAttachment(source: string, key: string): HealthAttachment | undefined {
-  const attachments = healthAttachments(source, key);
-  return attachments.length === 1 ? attachments[0] : undefined;
+function injectAtHealthAttachments(
+  source: string,
+  attachments: readonly HealthAttachment[],
+  injectedBlock: (attachment: HealthAttachment, indentation: string) => string,
+): string {
+  let injected = source;
+  const descendingAttachments = [...attachments].sort((left, right) =>
+    right.startOffset - left.startOffset
+  );
+  for (const attachment of descendingAttachments) {
+    const indentation = attachment.statement.match(/^[ \t]*/u)?.[0] ?? '';
+    injected = `${injected.slice(0, attachment.endOffset)}\n${
+      injectedBlock(attachment, indentation)
+    }${injected.slice(attachment.endOffset)}`;
+  }
+  return injected;
 }
 
 function appRegistrations(source: string, name: string): readonly RegExpMatchArray[] {
