@@ -22,6 +22,7 @@ sections are:
 | `@netscript/fresh/desktop`     | `./src/runtime/desktop/mod.ts`            | Desktop-gated oRPC window binding and lifecycle contracts.       |
 | `@netscript/fresh/builders`    | `./src/application/builders/mod.ts`       | Fluent page and partial builders.                                |
 | `@netscript/fresh/route`       | `./src/application/route/mod.ts`          | Typed route contracts and navigation.                            |
+| `@netscript/fresh/navigation`  | `./src/runtime/navigation/mod.ts`         | Last-intent partial-navigation coordinator and keyed boundaries. |
 | `@netscript/fresh/defer`       | `./src/application/defer/mod.ts`          | Deferred rendering primitives.                                   |
 | `@netscript/fresh/defer/island` | `./src/application/defer/island.ts`      | Client deferred-refresh coordinator and policy contracts.        |
 | `@netscript/fresh/form`        | `./src/application/form/mod.ts`           | Managed forms and validation.                                    |
@@ -266,6 +267,34 @@ helpers.
 | `ShapeOutput`                   | typeAlias | Infer the resolved object output carried by a pagination schema shape.          |
 | `StripLeadingSlash`             | typeAlias | Strip a leading slash from a Fresh route pattern.                               |
 | `ValidatedRouteHref`            | typeAlias | Stable href string returned by validated route navigation helpers.              |
+
+## `@netscript/fresh/navigation`
+
+Client-side partial-navigation ordering. The coordinator makes the latest navigation intent win:
+newer page generations invalidate older page *and* region application, region requests inherit their
+rendered page generation, and a stale `replaceState` is suppressed inside the coordinator rather than
+by the application. Superseded responses are **drained to EOF, never aborted** — physically aborting
+a stale partial surfaces as an unhandled `AbortSignal` overlay under Vite dev.
+
+`KeyedPartial` keys the native Fresh `<Partial>` boundary by name so a remount is identity-safe.
+Applications do not patch `fetch`, `history`, or server HTML markers.
+
+### Functions and components
+
+| Symbol                               | Signature                                                        | Description                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `installPartialNavigationCoordinator` | `installPartialNavigationCoordinator(): PartialNavigationCoordinator` | Install the coordinator for the current document and return its handle.       |
+| `KeyedPartial`                       | `KeyedPartial(props: KeyedPartialProps): ComponentChild`         | Render a native Fresh partial boundary keyed by name for remount safety.          |
+
+### Types
+
+| Symbol                         | Description                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------- |
+| `PartialNavigationCoordinator` | Coordinator handle: applies route changes and disposes, awaiting in-flight EOF.  |
+| `RouteChange`                  | A single navigation intent carrying its page generation.                         |
+| `KeyedPartialProps`            | Props for `KeyedPartial`: partial `name` and `mode`.                             |
+| `ComponentChild`               | Structural child type, avoiding a hard Preact type dependency.                   |
+| `ComponentChildren`            | One or many `ComponentChild` values.                                             |
 
 ## `@netscript/fresh/defer`
 
