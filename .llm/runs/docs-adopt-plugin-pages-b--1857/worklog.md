@@ -80,6 +80,7 @@ evidence determines the only remaining coverage field.
 | 2026-09-01 | S2 | review | Verified the focused diff, exact failure messages, live `36/36` output, and all 32 baseline mapping names by name. |
 | 2026-09-01 | S3 | full gates | All owner-required implementation-head gates passed except the base-relative whitespace check, which identified trailing blank lines in three run artifacts. |
 | 2026-09-01 | S3 | evidence correction | Removed only the three trailing artifact blank lines; final evidence is rerun after the S3 push. |
+| 2026-09-01 | S3 | pushed-head verification | Complete required matrix passed: root tests 4,626 passed/0 failed/19 ignored; base-relative diff, clean status, lock, provenance, and 32-name survival checks all passed. |
 
 ## Decisions
 
@@ -129,6 +130,9 @@ evidence determines the only remaining coverage field.
 | Base-relative whitespace | owner-specified `git diff --check` | FAIL (2) | Found only three trailing blank lines in run artifacts; corrected in S3. |
 | Lock hygiene | compare `deno.lock` with `origin/main` | PASS (0) | Unchanged. |
 | Provenance ancestry | `git merge-base --is-ancestor 1b65f34f7 HEAD` | PASS (0) | Generated input commit is an ancestor. |
+| Final working tree | `git status --porcelain` | PASS (0) | Exact output: empty. |
+| Remote head | compare local `HEAD` with branch ref | PASS (0) | Pushed branch and local head matched. |
+| 32-row survival | literal assertion of all inherited mapping names | PASS (0) | Baseline 32, current 35, missing none. |
 
 ### Fitness Gates
 
@@ -155,3 +159,5 @@ evidence determines the only remaining coverage field.
 
 - Evaluator should independently recompute the three symbol sets, inspect all 35 mapping names,
   and exercise both uncovered and doubly-classified denominator failures.
+- Implementation is complete and the owner-specified gate matrix passes. The separate supervisor
+  owns IMPL-EVAL and lifecycle advancement; leave PR #1869 at `status:impl`.
