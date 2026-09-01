@@ -19,11 +19,18 @@ import {
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
 
-const REPORT_DEADLINE_MS = 30_000;
-const REPORT_POLL_MS = 1_000;
 const CONTROLLER_ACK_DEADLINE_MS = 5_000;
 const CONTROLLER_ACK_POLL_MS = 50;
 const HEALTHY_WAIT_TIMEOUT_SECONDS = 10;
+/**
+ * Cap for the blocking `aspire wait --status healthy` used to observe recovery.
+ *
+ * This is a ceiling, not a schedule: `aspire wait` returns the moment Aspire observes the
+ * transition, so a generous cap costs nothing on a healthy run and only bounds a genuine hang.
+ * It replaces a hand-rolled 30s poll of `aspire describe`, which raced Aspire's own
+ * (unobservable, untimestamped) health-evaluation cycle and was the source of #1898-adjacent flakes.
+ */
+const RECOVERY_WAIT_TIMEOUT_SECONDS = 120;
 export const HEALTHY_WAIT_TIMEOUT_EXIT_CODE = 17;
 
 interface ListenerRecoveryReceipt {
@@ -70,9 +77,11 @@ export async function verifyListenerFailureRecovery(
   const expectations = listenerFaultExpectations(database);
   for (const expectation of expectations) assertOwnedListenerFaultExpectation(expectation);
 
-  const baselineTests = await Promise.all(
-    expectations.map((expectation) => pollHealthyReport(appHost, expectation, expectations)),
-  );
+  const baselineTests: ListenerHealthReport[] = [];
+  for (const expectation of expectations) {
+    await requireResourceHealthy(appHost, expectation.resource, RECOVERY_WAIT_TIMEOUT_SECONDS);
+    baselineTests.push(await readTestOnlyReport(appHost, expectation, expectations, 'Healthy'));
+  }
   const baselineReal = await requireRealBackingHealthy(appHost, expectations);
   await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
 
@@ -83,17 +92,10 @@ export async function verifyListenerFailureRecovery(
     for (let index = 0; index < expectations.length; index += 1) {
       const expectation = expectations[index];
       await commandController(projectRoot, closedState(expectation));
-      const unhealthy = await pollReport(
-        appHost,
-        expectation,
-        expectations,
-        (report) =>
-          report.status === 'Unhealthy' &&
-          report.description !== undefined &&
-          expectedUnhealthyDescription(expectation).test(report.description),
-      );
-      const duringFailure = await requireRealBackingHealthy(appHost, expectations);
 
+      // Detection is Aspire's own blocking wait, not a poll of its cached snapshot: the resource
+      // carries this test-only check, so closing the synthetic listener must stop it reaching
+      // `healthy`. The timeout here is the assertion - we require it to elapse.
       const wait = await runAspire([
         'wait',
         expectation.resource,
@@ -111,10 +113,16 @@ export async function verifyListenerFailureRecovery(
         HEALTHY_WAIT_TIMEOUT_SECONDS,
         wait,
       );
-      const afterWait = await requireRealBackingHealthy(appHost, expectations);
+      // Attribution, once, after Aspire has finished evaluating - so the snapshot is known-fresh
+      // rather than raced. This is what distinguishes "the listener is down" from "the report is
+      // stale", which the previous polling design could not tell apart.
+      const unhealthy = await readTestOnlyReport(appHost, expectation, expectations, 'Unhealthy');
+      const duringFailure = await requireRealBackingHealthy(appHost, expectations);
+      const afterWait = duringFailure;
 
       await commandController(projectRoot, reopenedState(expectation));
-      const recovered = await pollHealthyReport(appHost, expectation, expectations);
+      await requireResourceHealthy(appHost, expectation.resource, RECOVERY_WAIT_TIMEOUT_SECONDS);
+      const recovered = await readTestOnlyReport(appHost, expectation, expectations, 'Healthy');
       const afterRecovery = await requireRealBackingHealthy(appHost, expectations);
       receipts.push({
         resource: expectation.resource,
@@ -219,53 +227,67 @@ function expectedUnhealthyDescription(expectation: ListenerFaultExpectation): Re
     : /RESP listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
 }
 
-async function pollHealthyReport(
+/** Block on Aspire's own wait until it observes the resource healthy; fail loudly if it does not. */
+async function requireResourceHealthy(
   appHost: string,
-  expectation: ListenerFaultExpectation,
-  continuity: readonly ListenerFaultExpectation[],
-): Promise<ListenerHealthReport> {
-  return await pollReport(
+  resource: string,
+  timeoutSeconds: number,
+): Promise<void> {
+  const result = await runAspire([
+    'wait',
+    resource,
+    '--status',
+    'healthy',
+    '--timeout',
+    String(timeoutSeconds),
+    '--apphost',
     appHost,
-    expectation,
-    continuity,
-    (report) => report.status === 'Healthy',
+    '--non-interactive',
+    '--nologo',
+  ]);
+  if (result.code === 0) return;
+  throw new Error(
+    `aspire wait ${resource} --status healthy did not observe healthy within ${timeoutSeconds}s ` +
+      `(exit ${result.code}); this is Aspire's own observation, not a polling deadline: ` +
+      `${result.stderr.trim() || result.stdout.trim()}`,
   );
 }
 
-async function pollReport(
+/**
+ * Read the test-only report once and require an exact status.
+ *
+ * Called only after a blocking `aspire wait` has settled, so the snapshot reflects a completed
+ * evaluation. A mismatch here is a real product failure, never a refresh race.
+ */
+async function readTestOnlyReport(
   appHost: string,
   expectation: ListenerFaultExpectation,
   continuity: readonly ListenerFaultExpectation[],
-  accepts: (report: ListenerHealthReport) => boolean,
+  expected: 'Healthy' | 'Unhealthy',
 ): Promise<ListenerHealthReport> {
-  const deadline = Date.now() + REPORT_DEADLINE_MS;
-  let last = 'report absent';
-  while (Date.now() < deadline) {
-    let topology: unknown;
-    try {
-      topology = JSON.parse(await describe(appHost));
-    } catch (error) {
-      last = error instanceof Error ? error.message : String(error);
-      await delay(REPORT_POLL_MS);
-      continue;
-    }
-    assertRealBackingHealthy(topology, continuity);
-    try {
-      const report = readListenerHealthReport(
-        topology,
-        expectation.resource,
-        expectation.healthCheckKey,
-      );
-      last = `${report.status}: ${report.description ?? '(no description)'}`;
-      if (accepts(report)) return report;
-    } catch (error) {
-      last = error instanceof Error ? error.message : String(error);
-    }
-    await delay(REPORT_POLL_MS);
-  }
-  throw new Error(
-    `${expectation.resource} healthReports.${expectation.healthCheckKey} missed its 30s transition; last=${last}`,
+  const topology = JSON.parse(await describe(appHost));
+  assertRealBackingHealthy(topology, continuity);
+  const report = readListenerHealthReport(
+    topology,
+    expectation.resource,
+    expectation.healthCheckKey,
   );
+  if (report.status !== expected) {
+    throw new Error(
+      `${expectation.resource} healthReports.${expectation.healthCheckKey} is ${report.status}, ` +
+        `expected ${expected} after Aspire settled: ${report.description ?? '(no description)'}`,
+    );
+  }
+  if (expected === 'Unhealthy') {
+    const pattern = expectedUnhealthyDescription(expectation);
+    if (report.description === undefined || !pattern.test(report.description)) {
+      throw new Error(
+        `${expectation.resource} healthReports.${expectation.healthCheckKey} is Unhealthy but its ` +
+          `description did not match ${pattern}: ${report.description ?? '(no description)'}`,
+      );
+    }
+  }
+  return report;
 }
 
 async function requireRealBackingHealthy(
