@@ -11,14 +11,16 @@ end-to-end gate, and Aspire integration surfaces for a durable, change-data stre
 page is written against the plugin public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
-The plugin ships five published entrypoints. The root export (`@netscript/plugin-streams`) carries
-the manifest and the typed topic/producer/consumer authoring helpers; four sub-path exports carry
+The plugin ships seven published entrypoints. The root export (`@netscript/plugin-streams`) carries
+the manifest and the typed topic/producer/consumer authoring helpers; six sub-path exports carry
 the framework integrations:
 
 - [`@netscript/plugin-streams/cli`](#sub-path-cli) — plugin CLI command group.
-- [`@netscript/plugin-streams/scaffolding`](#sub-path-scaffolding) — scaffolder descriptor.
+- `@netscript/plugin-streams/adapter-cli` — executable plugin-adapter CLI entrypoint.
+- [`@netscript/plugin-streams/scaffold`](#sub-path-scaffolding) — scaffolder protocol entrypoint.
 - [`@netscript/plugin-streams/e2e`](#sub-path-e2e) — E2E gate definitions.
 - [`@netscript/plugin-streams/aspire`](#sub-path-aspire) — Aspire AppHost contribution.
+- `@netscript/plugin-streams/services` — executable Durable Streams service.
 
 The schema, producer, telemetry, testing, and diagnostics primitives that the plugin builds on live
 in the separately published
@@ -88,6 +90,16 @@ for their full definitions.
 
 ## Sub-path exports
 
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-streams` | `./mod.ts` | Plugin manifest and typed topic, producer, and consumer authoring helpers. |
+| `@netscript/plugin-streams/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
+| `@netscript/plugin-streams/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
+| `@netscript/plugin-streams/cli` | `./src/cli/composition/main.ts` | Plugin CLI command group. |
+| `@netscript/plugin-streams/e2e` | `./src/e2e/mod.ts` | End-to-end gate definitions. |
+| `@netscript/plugin-streams/aspire` | `./src/aspire/mod.ts` | Aspire AppHost contribution for the Durable Streams service. |
+| `@netscript/plugin-streams/services` | `./services/src/main.ts` | Executable Durable Streams proxy service. |
+
 ### `@netscript/plugin-streams/cli` {#sub-path-cli}
 
 CLI command group for the plugin, mounted under `deno x -A jsr:@netscript/plugin-streams{{ releaseSpecifier }}/cli`.
@@ -101,7 +113,7 @@ The CLI types `PluginCli`, `PluginCliArgs`, `PluginCliCommand`, and `PluginCliRe
 re-exported from [`@netscript/plugin`](/reference/plugin/) and document the base command contract
 `StreamsCli` extends.
 
-### `@netscript/plugin-streams/scaffolding` {#sub-path-scaffolding}
+### `@netscript/plugin-streams/scaffold` {#sub-path-scaffolding}
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
