@@ -129,6 +129,20 @@ Deno.test('typed database Phase-B failures surface both captured streams', () =>
   assertStringIncludes(failure, 'stdout:\nbounded tool context');
 });
 
+Deno.test('typed database Phase-B faults the controller-owned listener without stopping the resource', async () => {
+  const source = await Deno.readTextFile(
+    new URL(
+      '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts',
+      import.meta.url,
+    ),
+  );
+
+  assertStringIncludes(source, 'commandListenerFaultController');
+  assertStringIncludes(source, 'TEST_ONLY_POSTGRES_HEALTH_KEY');
+  assertEquals(source.includes("'resource',\n      database,\n      'stop'"), false);
+  assertEquals(source.includes("'resource',\n        database,\n        'start'"), false);
+});
+
 function s8RuntimeContext(): RunContext {
   return {
     request: {

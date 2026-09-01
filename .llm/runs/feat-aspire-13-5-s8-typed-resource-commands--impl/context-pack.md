@@ -157,3 +157,20 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
 - The complete static helper/runtime-builder suite passes 285/285, explicitly carrying D-224,
   D-227, D-231, D-233, and migrate-to-deploy coverage. Scoped check/lint/fmt and `quality:gate`
   exit 0; repository structured check passes 2,987 files in 25 batches. No runtime command ran.
+
+## D-237 listener ownership state
+
+- The actual latest CI split is Docker D-101 listener-unreachable PASS followed by typed-db phase B
+  FAIL, while SQLite listener-unreachable fails before fault injection because its test-only Garnet
+  health key is absent.
+- An S8-free Docker control at `6c195acaf` passes the D-101 gate. Its SQLite tier never reaches that
+  gate, so a current-main runtime control is still required to attribute the SQLite symptom.
+- D-101's controller, fixture, readiness preparation, and verifier are blob-identical across current
+  main, S8 head, and the tested merge. D-233 nevertheless changes setup indirectly by eliminating
+  the old fallback restart after typed deploy success; that is recorded as reachability only.
+- Typed-db phase B is conclusively S8-owned: it used a real resource stop even though D-101 records
+  that stopping a persistent resource suspends health evaluation and retains the last report. The
+  bounded repair uses the existing synthetic listener controller and test-only Postgres key.
+- The regression was RED at 23/24 before the repair; focused tests pass 36/36 and the complete
+  helper/runtime-builder set passes 286/286 afterward. Scoped check/lint/fmt and `quality:gate` exit
+  0. No runtime command, evaluator dispatch, or `evaluate.md` creation occurred.

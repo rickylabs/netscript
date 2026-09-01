@@ -185,3 +185,20 @@ The generic failure selector also no longer scans stderr as a block before stdou
 carry their observed complete-line capture sequence, so a real earlier stdout error outranks a later
 failure-shaped informational stderr line. Separate OS pipes do not expose a total kernel timestamp;
 the repair intentionally claims observed line-completion order only.
+
+## D-16 — typed-db phase B reused an actuator known not to update health
+
+The S8 verifier stopped the real Postgres resource and waited for its real listener key to become
+Unhealthy. D-101 already documents that `aspire resource stop` suspends health evaluation for a
+persistent container and leaves the last health report cached. Run `33460896691` observed exactly
+that state: the resource was stopped while `postgres_listener` remained Healthy. The repair uses
+D-101's synthetic Postgres listener and attached test-only key, keeping the real resource alive.
+
+## D-17 — typed deploy success changes later listener-fixture setup indirectly
+
+D-233 made the typed migrate/deploy command succeed, so the suite no longer takes its failure-only
+AppHost restart path. The earlier restarting head later passed SQLite listener-unreachable; the
+latest non-restarting head lacked the test-only Garnet report at baseline. This proves reachability
+and correlation, not ownership: the available S8-free SQLite run timed out before this gate. The
+runtime restriction prevents the missing current-main control, so SQLite is recorded and left
+unchanged.

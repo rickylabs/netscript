@@ -82,3 +82,18 @@ This session may inspect the cited CI artifacts, scaffold, and run static Deno/T
 may not start Aspire, Docker, an AppHost, or a local E2E runtime suite. CI is the sole runtime
 authority. RTK is unavailable on this host, so focused raw reads are used; wrapper and raw-Git
 verdict sources remain unchanged.
+
+## D-237 ownership-control session — 2026-09-01
+
+| Field | Value |
+| --- | --- |
+| Model | Codex implementation session; exact model identity is not exposed locally |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-s8-recon` |
+| Branch | `feat/aspire-13-5-s8-typed-resource-commands` |
+| Baseline | `608f8f2da1bda7aea4f0a78ca2f0782a56a4adf5` |
+| Lane | ownership control plus one bounded S8-owned typed-listener repair |
+| Evaluator | none; separate formal IMPL-EVAL remains required and was not dispatched |
+
+This session may inspect CI artifacts and run static Deno/TypeScript gates. It may not start Aspire,
+Docker, an AppHost, or an E2E runtime suite. The typed-db defect is owned and repaired; the SQLite
+symptom remains pending the prohibited current-main runtime control. No `evaluate.md` is created.

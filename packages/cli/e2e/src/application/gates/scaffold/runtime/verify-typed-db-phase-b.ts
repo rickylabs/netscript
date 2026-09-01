@@ -1,4 +1,6 @@
 import { readListenerHealthReport } from './verify-listener-readiness.ts';
+import { TEST_ONLY_POSTGRES_HEALTH_KEY } from './listener-fault-controller.ts';
+import { commandListenerFaultController } from './listener-unreachable-fixture.ts';
 
 const WAIT_TIMEOUT_SECONDS = 10;
 const REPORT_DEADLINE_MS = 30_000;
@@ -90,21 +92,20 @@ export async function verifyTypedDbPhaseB(
     'reset refusal',
   );
 
-  let stopped = false;
+  let listenerFaulted = false;
   let unhealthyStatus = '';
   let boundedFailure: CommandResult | undefined;
   try {
-    await requireAspireSuccess([
-      'resource',
-      database,
-      'stop',
-      '--apphost',
+    await commandListenerFaultController(projectRoot, {
+      postgresOpen: false,
+      garnetOpen: true,
+    });
+    listenerFaulted = true;
+    unhealthyStatus = await waitForListenerUnhealthy(
       appHost,
-      '--non-interactive',
-      '--nologo',
-    ]);
-    stopped = true;
-    unhealthyStatus = await waitForListenerUnhealthy(appHost, database);
+      database,
+      TEST_ONLY_POSTGRES_HEALTH_KEY,
+    );
     boundedFailure = await runCommand(
       'deno',
       [
@@ -133,16 +134,11 @@ export async function verifyTypedDbPhaseB(
       'bounded database wait diagnostic',
     );
   } finally {
-    if (stopped) {
-      await requireAspireSuccess([
-        'resource',
-        database,
-        'start',
-        '--apphost',
-        appHost,
-        '--non-interactive',
-        '--nologo',
-      ]);
+    if (listenerFaulted) {
+      await commandListenerFaultController(projectRoot, {
+        postgresOpen: true,
+        garnetOpen: true,
+      });
     }
   }
 
@@ -176,8 +172,11 @@ export async function verifyTypedDbPhaseB(
   console.info(`typed database Phase-B receipt: ${receiptPath}`);
 }
 
-async function waitForListenerUnhealthy(appHost: string, database: string): Promise<string> {
-  const healthCheckKey = `${database}_listener`;
+async function waitForListenerUnhealthy(
+  appHost: string,
+  database: string,
+  healthCheckKey: string,
+): Promise<string> {
   const deadline = Date.now() + REPORT_DEADLINE_MS;
   let last = 'report absent';
   while (Date.now() < deadline) {
