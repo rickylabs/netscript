@@ -3,8 +3,10 @@
  *
  * Import `defineServices()` from this focused entry when shared or browser
  * modules do not need the SDK root's discovery, telemetry, and OpenAPI exports.
- * The entry is load-time pure and exposes only the preset plus its explicit
- * package-owned type closure.
+ * Each service may attach an explicit literal contribution tuple. Safe tuples
+ * partition full server/TanStack keys; a direct-only tuple keeps its client while
+ * omitting that service from query and query-utils maps. The entry is load-time
+ * pure and exposes only the preset plus its explicit package-owned type closure.
  *
  * @module
  */

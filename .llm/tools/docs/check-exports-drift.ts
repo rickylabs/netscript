@@ -36,6 +36,30 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'plugin-workers-core',
+    packagePath: 'packages/plugin-workers-core',
+    docPath: 'docs/site/reference/plugin-workers-core/index.md',
+    packageName: '@netscript/plugin-workers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all seventeen entrypoints and inventories all 32 root exports, but omits subpath-only APIs including JobBuilderState, WorkersRuntime, PublicDefinitionSchema, WorkersContractV1, WorkersConfig, WorkerInstrumentation, and TestWorkersRuntime.',
+    },
+  },
+  {
+    name: 'plugin-sagas-core',
+    packagePath: 'packages/plugin-sagas-core',
+    docPath: 'docs/site/reference/plugin-sagas-core/index.md',
+    packageName: '@netscript/plugin-sagas-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page documents every entrypoint and the complete root and agent surfaces, but omits substantial subpath contracts such as transport codecs, store adapters, telemetry contracts, and config schemas.',
+    },
+  },
+  {
     name: 'ai',
     packagePath: 'packages/ai',
     docPath: 'docs/site/reference/ai/index.md',

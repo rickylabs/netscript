@@ -1,6 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { Hono } from 'hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../../src/auth/auth-middleware.ts';
+import type { ProcedurePolicyResolver } from '../../src/auth/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, Principal } from '../../src/auth/types.ts';
 
 type AuthTestEnv = {
@@ -191,4 +192,67 @@ Deno.test('authz middleware fails closed when authorizer throws', async () => {
 
   assertEquals(response.status, 403);
   assertEquals(body, { error: 'FORBIDDEN', message: 'authz.error' });
+});
+
+Deno.test('one contract resolver makes a declared public procedure bypass authn and authz', async () => {
+  let resolverCalls = 0;
+  let authenticatorCalls = 0;
+  let authorizerCalls = 0;
+  const resolver: ProcedurePolicyResolver = {
+    resolve: () => {
+      resolverCalls += 1;
+      return {
+        matched: true,
+        policy: { authentication: 'none', requiredScopes: [], requiredRoles: [] },
+      };
+    },
+  };
+  const authenticator: AuthenticatorPort = {
+    authenticate: () => {
+      authenticatorCalls += 1;
+      return { ok: false, reason: 'should-not-run' };
+    },
+  };
+  const authorizer: AuthorizerPort = {
+    authorize: () => {
+      authorizerCalls += 1;
+      return { allow: false, reason: 'should-not-run' };
+    },
+  };
+  const app = new Hono<AuthTestEnv>();
+  app.use('*', createAuthnMiddleware({ authenticator, policyResolver: resolver }));
+  app.use('*', createAuthzMiddleware({ authorizer, policyResolver: resolver }));
+  app.get('/api/public', (c) => c.json({ public: true }));
+
+  const response = await app.request('/api/public');
+
+  assertEquals(response.status, 200);
+  assertEquals(await response.json(), { public: true });
+  assertEquals(resolverCalls, 2);
+  assertEquals(authenticatorCalls, 0);
+  assertEquals(authorizerCalls, 0);
+});
+
+Deno.test('authn middleware guards a matched required procedure outside legacy prefixes', async () => {
+  let authenticatorCalls = 0;
+  const resolver: ProcedurePolicyResolver = {
+    resolve: () => ({
+      matched: true,
+      policy: { authentication: 'required', requiredScopes: [], requiredRoles: [] },
+    }),
+  };
+  const authenticator: AuthenticatorPort = {
+    authenticate: () => {
+      authenticatorCalls += 1;
+      return { ok: false, reason: 'missing-credential' };
+    },
+  };
+  const app = new Hono<AuthTestEnv>();
+  app.use('*', createAuthnMiddleware({ authenticator, policyResolver: resolver }));
+  app.get('/transport/v1/read', (c) => c.json({ reached: true }));
+
+  const response = await app.request('/transport/v1/read');
+
+  assertEquals(response.status, 401);
+  assertEquals(authenticatorCalls, 1);
 });

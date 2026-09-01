@@ -97,3 +97,14 @@ export interface AuthorizerPort {
   /** Authorizes a principal for a request path and method. */
   authorize(request: AuthzRequest): Promise<AuthzDecision> | AuthzDecision;
 }
+
+/** Match-aware authorization result for composing fallback authorizers. */
+export type AuthorizerMatch =
+  | { readonly matched: false }
+  | { readonly matched: true; readonly decision: AuthzDecision };
+
+/** Authorization boundary that distinguishes no matching rule from an explicit decision. */
+export interface MatchAwareAuthorizerPort extends AuthorizerPort {
+  /** Authorizes a matching request or reports that no fallback rule matched. */
+  authorizeMatch(request: AuthzRequest): Promise<AuthorizerMatch> | AuthorizerMatch;
+}

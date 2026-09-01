@@ -20,8 +20,9 @@ projections from a single entity schema.
 - **Base contract** — `baseContract` carries NetScript's common oRPC error map (`NOT_FOUND`,
   `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, `SERVICE_UNAVAILABLE`), so every
   service starts from one shared error vocabulary.
-- **Procedure metadata** — `NetScriptProcedureMeta` describes stable NetScript semantics such as
-  authentication requirements without exposing oRPC's metadata types to consumers.
+- **Procedure metadata** — `NetScriptProcedureMeta.access` is the single contract-local vocabulary
+  for authentication plus optional scope and role requirements, without exposing oRPC's metadata
+  types to consumers.
 - **Pagination schemas** — offset and cursor query/input/meta schemas
   (`OffsetPaginationQuerySchema`, `CursorPaginationMetaSchema`, and friends) with shared
   limit/offset defaults and string-to-number coercion for query parameters.
@@ -58,7 +59,15 @@ import { z } from 'jsr:@zod/zod@4';
 // error map (NOT_FOUND, VALIDATION_ERROR, UNAUTHORIZED, ...) is already applied.
 export const listItems = baseContract
   .route({ method: 'GET', path: '/items' })
-  .meta({ access: { authentication: 'required' } })
+  .meta({
+    access: {
+      authentication: 'required',
+      authorization: {
+        scopes: ['items:read'],
+        roles: ['operator'],
+      },
+    },
+  })
   .input(OffsetPaginationQuerySchema)
   .output(
     z.object({
@@ -71,6 +80,28 @@ export const listItems = baseContract
 const query = OffsetPaginationQuerySchema.parse({ limit: '25' });
 console.log(query); // { limit: 25, offset: 0 }
 ```
+
+## Procedure access metadata
+
+Declare access beside the procedure it governs with `.meta({ access: ... })`. Do not maintain a
+second policy map keyed by a router key or URL: contract-local metadata follows the procedure when
+that procedure is renamed, while a stale SDK reference to the old procedure key fails to
+type-check.
+
+| Field | Declaration |
+| --- | --- |
+| `authentication` | `'none' \| 'optional' \| 'required'` |
+| `authorization.scopes` | Optional readonly list of required scopes |
+| `authorization.roles` | Optional readonly list of required roles |
+
+An absent `access` field is unspecified, not public. The service runtime leaves existing consumers
+unchanged until an application explicitly opts into contract enforcement with
+`createContractAuthorizer(contract, { fallback? })` and passes it to `.withAuthz()`.
+
+`'optional'` is declared for future support, currently rejected. The OpenAPI projection can
+represent the declaration, but `createContractAuthorizer()` throws the stable
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` error
+during construction, before the first request.
 
 ## Public surface
 

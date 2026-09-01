@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "7e76f68e43e2b45e55ff9f3560ef7e30351853eb",
+  "surface": "#1387 final head (Slices 1-9 + 4x main integration)",
+  "expectedGateIds": [
+    "agent-docs-prose",
+    "assets-barrel",
+    "check",
+    "doc-lint",
+    "docs-tagline",
+    "exports-drift",
+    "fmt-check",
+    "lint",
+    "mcp-export-corpus",
+    "publish-assets",
+    "publish-dry-run",
+    "quality-gate",
+    "test"
+  ],
+  "receiptIds": [
+    "1387-final-prose",
+    "1387-final-barrel",
+    "1387-final-check",
+    "1387-final-doclint",
+    "1387-final-tagline",
+    "1387-final-exports-drift",
+    "1387-final-fmt",
+    "1387-final-lint",
+    "1387-final-corpus",
+    "1387-final-pubassets",
+    "1387-final-publish",
+    "1387-final-quality",
+    "1387-final-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}
