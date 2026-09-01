@@ -7099,3 +7099,28 @@
     RED-first tests, box 2 as volume enumeration/attribution and **box 1 as detection + at-risk
     reporting** rather than claimed prevention — the honest shape the brief asked for.
   - S9's hosted CI at the converged head is **fail=0** — both static defects confirmed fixed.
+
+- **D-276 — #1851 closed on verified evidence; post-#1865 dispatch packets staged so the consume is a
+  substitution, not a design step.**
+  - **#1851 closed `completed`** on owner authorization, as *"filed against a state that has since been
+    fixed"* rather than work delivered. #1837 (`1f50c98ce`) had already converted the generator to
+    ordinals plus `JSON.stringify`. The closure rests on evidence I checked rather than relayed: a
+    **mutation proof** (pre-#1837 blob → RED, current blob → GREEN, tree byte-identical afterwards) and
+    a **genuine parse assertion** — the test writes the emitted module and runs `deno lint`, with
+    `deno lint`'s exit-1-on-parse-error behaviour **probed, not assumed**. No PR; the verification
+    commit was empty and its branch removed.
+  - **Its follow-up recommendation stays refused, and the closing comment says so**, so the next reader
+    does not re-raise it: `generate-register-background.ts` is already fixed by **#1747** with the
+    identical #1837 pattern; it is merely unmerged.
+  - **`post-1865-dispatch-packets.md` written** — the consume sequence reduced to substituting one SHA.
+    It carries: the three consume commands; the **overlap check to run *before* rebasing**, because that
+    is what protects S8's carried PASS; the S8-first order with every worktree and `--onto` base named;
+    the four pre-ruled conflict resolutions plus the abort rule; the **corrected** carry comparison with
+    its `git cat-file -e` existence test and the expected per-slice figures; the static gate list per
+    slice, annotated with which two failures are **pre-existing main debt** rather than slice defects;
+    the §4a detached-AppHost Phase-B recipe; and the per-slice merge-packet remainder.
+  - **Recorded in the packet where it cannot be missed:** #863 does **not** close with S8 — S8 delivers
+    gate 1 only, gates 2 and 3 are #1880/#1881, and #863 closes by hand when all three are evidenced.
+  - **All seven slices remain `behind=0` at `102ef8a10`**, so no convergence push was needed this pass —
+    which also means no new Aspire e2e runs were triggered into the lanes #1865's rerun needs.
+  - #1855 is in its RED-first phase, writing tests across four teardown test files.
