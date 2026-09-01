@@ -31,6 +31,20 @@ const HEALTHY_WAIT_TIMEOUT_SECONDS = 10;
  * (unobservable, untimestamped) health-evaluation cycle and was the source of #1898-adjacent flakes.
  */
 const RECOVERY_WAIT_TIMEOUT_SECONDS = 120;
+/**
+ * Budget for observing the healthy -> unhealthy *departure*.
+ *
+ * Aspire's primitives are asymmetric: `aspire wait --status <s>` blocks until a state ARRIVES, and
+ * accepts only healthy/up/down - there is no native wait for "has stopped being healthy". It also
+ * answers from the last completed evaluation, so immediately after we close the listener it still
+ * reports healthy and returns 0. Departure therefore has to be observed from the report, bounded by
+ * a budget that must exceed Aspire's own health-evaluation interval.
+ *
+ * This is deliberately generous: it is a ceiling on how long Aspire may take to notice, not a
+ * schedule we expect to consume. The recovery direction uses the blocking wait and needs no polling.
+ */
+const DEPARTURE_OBSERVE_DEADLINE_MS = 90_000;
+const DEPARTURE_OBSERVE_POLL_MS = 1_000;
 export const HEALTHY_WAIT_TIMEOUT_EXIT_CODE = 17;
 
 interface ListenerRecoveryReceipt {
@@ -93,9 +107,13 @@ export async function verifyListenerFailureRecovery(
       const expectation = expectations[index];
       await commandController(projectRoot, closedState(expectation));
 
-      // Detection is Aspire's own blocking wait, not a poll of its cached snapshot: the resource
-      // carries this test-only check, so closing the synthetic listener must stop it reaching
-      // `healthy`. The timeout here is the assertion - we require it to elapse.
+      // Departure has no native wait (see DEPARTURE_OBSERVE_DEADLINE_MS): observe the report until
+      // Aspire has actually re-evaluated the closed listener. Only then is the follow-up
+      // expect-timeout wait meaningful - without this precondition it answers from the stale
+      // healthy state and returns 0 immediately.
+      const unhealthy = await observeTestOnlyUnhealthy(appHost, expectation, expectations);
+      const duringFailure = await requireRealBackingHealthy(appHost, expectations);
+
       const wait = await runAspire([
         'wait',
         expectation.resource,
@@ -113,12 +131,7 @@ export async function verifyListenerFailureRecovery(
         HEALTHY_WAIT_TIMEOUT_SECONDS,
         wait,
       );
-      // Attribution, once, after Aspire has finished evaluating - so the snapshot is known-fresh
-      // rather than raced. This is what distinguishes "the listener is down" from "the report is
-      // stale", which the previous polling design could not tell apart.
-      const unhealthy = await readTestOnlyReport(appHost, expectation, expectations, 'Unhealthy');
-      const duringFailure = await requireRealBackingHealthy(appHost, expectations);
-      const afterWait = duringFailure;
+      const afterWait = await requireRealBackingHealthy(appHost, expectations);
 
       await commandController(projectRoot, reopenedState(expectation));
       await requireResourceHealthy(appHost, expectation.resource, RECOVERY_WAIT_TIMEOUT_SECONDS);
@@ -250,6 +263,46 @@ async function requireResourceHealthy(
     `aspire wait ${resource} --status healthy did not observe healthy within ${timeoutSeconds}s ` +
       `(exit ${result.code}); this is Aspire's own observation, not a polling deadline: ` +
       `${result.stderr.trim() || result.stdout.trim()}`,
+  );
+}
+
+/**
+ * Wait until Aspire has re-evaluated the check and reports it Unhealthy for the expected reason.
+ *
+ * Bounded by DEPARTURE_OBSERVE_DEADLINE_MS. The failure message names which of the two conditions
+ * occurred - Aspire never re-evaluated, or it re-evaluated and the value is wrong - because the
+ * previous design conflated them and that cost several investigations.
+ */
+async function observeTestOnlyUnhealthy(
+  appHost: string,
+  expectation: ListenerFaultExpectation,
+  continuity: readonly ListenerFaultExpectation[],
+): Promise<ListenerHealthReport> {
+  const pattern = expectedUnhealthyDescription(expectation);
+  const deadline = Date.now() + DEPARTURE_OBSERVE_DEADLINE_MS;
+  let observed = 'no report read';
+  while (Date.now() < deadline) {
+    const topology = JSON.parse(await describe(appHost));
+    assertRealBackingHealthy(topology, continuity);
+    const report = readListenerHealthReport(
+      topology,
+      expectation.resource,
+      expectation.healthCheckKey,
+    );
+    observed = `${report.status}: ${report.description ?? '(no description)'}`;
+    if (report.status === 'Unhealthy' && report.description !== undefined) {
+      if (pattern.test(report.description)) return report;
+      throw new Error(
+        `${expectation.resource} healthReports.${expectation.healthCheckKey} went Unhealthy but its ` +
+          `description did not match ${pattern}: ${report.description}`,
+      );
+    }
+    await delay(DEPARTURE_OBSERVE_POLL_MS);
+  }
+  throw new Error(
+    `${expectation.resource} healthReports.${expectation.healthCheckKey} was still ${observed} after ` +
+      `${DEPARTURE_OBSERVE_DEADLINE_MS}ms; Aspire did not re-evaluate the closed listener within that ` +
+      `budget (this is an observation-freshness timeout, not proof the listener is up)`,
   );
 }
 
