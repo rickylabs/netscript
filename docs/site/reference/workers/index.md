@@ -6,9 +6,9 @@ title: "@netscript/plugin-workers"
 # `@netscript/plugin-workers`
 
 The NetScript background-workers plugin: background jobs, task execution, workflow
-orchestration, a Workers API service, CLI commands, scaffolding, durable streams, and Aspire
-process wiring. This page is written against the package public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
+orchestration, a Workers API service, CLI commands, a `./scaffold` adapter entrypoint, durable
+streams, and Aspire process wiring. This page is written against the package public surface
+reported by `deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The deployable plugin (`@netscript/plugin-workers`) binds the host plugin system to the
@@ -37,7 +37,7 @@ from its own `deno doc` surface.
 | `@netscript/plugin-workers/aspire` | `./src/aspire/mod.ts` | Aspire AppHost contribution and resource ports. |
 | `@netscript/plugin-workers/cli` | `./src/cli/composition/main.ts` | Host-mounted workers CLI command group. |
 | `@netscript/plugin-workers/contracts` | `./contracts/v1/mod.ts` | Versioned oRPC worker service contracts and schemas. |
-| `@netscript/plugin-workers/scaffolding` | `./src/scaffolding/mod.ts` | Job, task, and workflow item scaffolders. |
+| `@netscript/plugin-workers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
 | `@netscript/plugin-workers/services` | `./services/src/main.ts` | Workers API service entrypoint. |
 | `@netscript/plugin-workers/streams` | `./streams/mod.ts` | Browser-facing StreamDB factory and entity schemas. |
 | `@netscript/plugin-workers/streams/server` | `./streams/server.ts` | Server-side durable stream producer wiring. |
@@ -160,23 +160,6 @@ contract helper before any KV write.
 
 See the [background-jobs capability page](/background-processing/workers/#trigger-a-job-from-a-typed-client)
 for the typed-client walkthrough.
-
-### `@netscript/plugin-workers/scaffolding`
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `JobBuilderScaffolder` | class | Scaffold a worker job builder module. |
-| `JobHandlerScaffolder` | class | Scaffold a standalone worker job handler module. |
-| `DenoTaskScaffolder` | class | Scaffold a Deno task definition module. |
-| `PsTaskScaffolder` | class | Scaffold a PowerShell task script. |
-| `PythonTaskScaffolder` | class | Scaffold a Python task script. |
-| `ShellTaskScaffolder` | class | Scaffold a POSIX shell task script. |
-| `WorkflowScaffolder` | class | Scaffold a worker workflow definition module. |
-| `WorkersItemScaffolder` | class | Stub-only contract for generated workers items. |
-| `createWorkersItemScaffolders` | function | Create all first-party workers item scaffolders. |
-| `WORKERS_TASK_SCAFFOLD_RUNTIMES` | variable | Task runtimes covered by first-party workers scaffolding templates. |
-| `WorkersScaffoldInput` | interface | Input accepted by workers item scaffolders. |
-| `WorkersTaskScaffoldRuntime` | type alias | First-party task runtime scaffold kind. |
 
 ### `@netscript/plugin-workers/services`
 
