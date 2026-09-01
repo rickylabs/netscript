@@ -117,6 +117,8 @@ revise the plan.
 | 2026-09-01T05:42Z | S2    | Probe GREEN              | Minimal one-attempt RESP2 probe passes 11/11 focused results, including split `+PO`/`NG\r\n`, closed-port fast failure, and accept-without-reply 2-second deadline. Asset barrel regenerated canonically.                   |
 | 2026-09-01T05:44Z | S3    | Gate RED                 | Tests-only commit `26189429e`: type-check failed because named published-unhealthy diagnostics and retained report `data`/`exception` did not exist; Garnet still expected 300 seconds.                                     |
 | 2026-09-01T05:46Z | S3    | Gate GREEN               | Garnet now polls named `describe` health for 30 seconds, distinguishes resource/key unpublished from published-unhealthy, preserves sibling blockers and full report detail, and fails terminal protocol codes immediately. |
+| 2026-09-01T05:48Z | S4    | Alignment RED            | Tests-only commit `2d2dab529`: 40 passed / 6 failed because container output remained `1.1.1`; the new guard derives the required tag from read-only `SCAFFOLD_VERSIONS.GARNET_TOOL` (`1.1.10`).                            |
+| 2026-09-01T05:50Z | S4    | Alignment GREEN          | One-sided container default changed to `1.1.10`; 46/46 generator tests pass and the durable container/tool drift guard is green. `scaffold-versions.ts` remained read-only.                                                 |
 
 ## Decisions
 
@@ -169,6 +171,9 @@ revise the plan.
 | Probe slice lint/format       | structured wrappers, then explicit `--no-config` checks       | REFUSAL + PASS supplemental | Repository config excludes this template-test path, so wrappers process 0 files and are not PASS; explicit checks process 1 file cleanly. |
 | Gate slice focused tests      | structured test wrapper on four listener modules              | PASS                        | 17/17, including the 5 named-health expectations and existing fixture/controller coverage.                                                |
 | Gate slice static gates       | structured check/lint/fmt wrappers on three locked paths      | PASS                        | 3/3 processed, 0 diagnostics/findings/refusals after focused formatting.                                                                  |
+| Alignment focused tests       | structured test wrapper on two generator modules              | PASS                        | 46/46 after RED 40 pass / 6 fail; dynamic guard ties the image output to the read-only executable pin.                                    |
+| Alignment focused check       | structured check wrapper on three locked paths                | PASS                        | 3 files, 0 diagnostics; wrapper includes `--unstable-kv`.                                                                                 |
+| Alignment lint/format         | structured wrappers plus explicit lint/diff checks            | REFUSAL + PASS supplemental | Root config excludes CLI templates, so wrappers process 0 files; `deno lint --no-config` checks 3 files and `git diff --check` is clean.  |
 
 ### Version/hosted comparison evidence
 

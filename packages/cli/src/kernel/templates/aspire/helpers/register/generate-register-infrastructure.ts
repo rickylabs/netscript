@@ -32,7 +32,7 @@ const CACHE_CONTAINER_IMAGES: Record<
   { readonly image: string; readonly tag: string }
 > = {
   Redis: { image: 'docker.io/library/redis', tag: '7' },
-  Garnet: { image: 'ghcr.io/microsoft/garnet', tag: '1.1.1' },
+  Garnet: { image: 'ghcr.io/microsoft/garnet', tag: '1.1.10' },
 }
 
 /** Default Redis-compatible TCP port. */
