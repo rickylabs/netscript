@@ -74,7 +74,7 @@ Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', ()
   });
 });
 
-Deno.test('runtime prefers the typed database command and retains restart fallback', () => {
+Deno.test('runtime preserves the AppHost after typed migrate and refreshes background runtimes', () => {
   const gate = createRuntimeGates(DATABASE.POSTGRES).find((entry) =>
     entry.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB
   );
@@ -84,6 +84,11 @@ Deno.test('runtime prefers the typed database command and retains restart fallba
   assertEquals(command.at(-1), DATABASE.POSTGRES);
   assertEquals(command[2].includes('`${database}-cli`'), true);
   assertEquals(command[2].includes('"migrate", "--timeout", "60"'), true);
+  // #1720: a background processor started before the migration never runs the health-check
+  // job, so the success path must refresh the KV-backed runtimes without restarting the
+  // AppHost, and keep the full restart as the fallback.
+  assertEquals(command[2].includes('restartBackgroundRuntimes'), true);
+  assertEquals(command[2].includes('"resource", resource, "restart"'), true);
   assertEquals(command[2].includes('using restart fallback'), true);
   assertEquals(command[2].includes('"stop"'), true);
   assertEquals(command[2].includes('"start"'), true);

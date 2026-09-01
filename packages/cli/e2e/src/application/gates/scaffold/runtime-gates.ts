@@ -210,7 +210,7 @@ export function createRuntimeGates(
     ),
     commandGate(
       GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB,
-      'Exercise typed database command with restart fallback',
+      'Exercise typed database command and refresh background runtimes',
       GATE_PHASE.RUNTIME,
       (context) => [
         'deno',
