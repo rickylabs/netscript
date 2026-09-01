@@ -162,6 +162,18 @@ describe('generateDbCliMode', () => {
     assert(!output.includes('.getValue()'));
   });
 
+  it('maps the typed migrate action to the deployment task for every execution path', () => {
+    const output = generateDbCliMode({ databases: {} });
+
+    assertStringIncludes(output, "return operation === 'migrate' ? 'deploy' : operation;");
+    assertStringIncludes(output, 'NETSCRIPT_PRISMA_TASK_OPERATION: dbTaskOperation(operation)');
+    assertStringIncludes(output, '`db:${dbTaskOperation(operation)}:${target.taskSuffix}`');
+    assertStringIncludes(
+      output,
+      "{ name: 'migrate', displayName: 'Migrate database', iconName: 'DatabaseArrowUp' }",
+    );
+  });
+
   it('rejects reset without confirmation before resolving or invoking runtime IO', () => {
     const output = generateDbCliMode({ databases: {} });
     const confirmation = output.indexOf("command.name === 'reset'");

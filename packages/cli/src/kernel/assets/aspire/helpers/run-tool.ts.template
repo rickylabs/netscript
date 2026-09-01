@@ -186,13 +186,18 @@ if (import.meta.main) {
       console.error('Invalid NetScript database operation request.');
       Deno.exit(2);
     }
+    const taskOperation = request.NETSCRIPT_PRISMA_TASK_OPERATION ?? operation;
+    if (!/^[a-z-]+$/.test(taskOperation)) {
+      console.error('Invalid NetScript database task operation request.');
+      Deno.exit(2);
+    }
     const configuredTimeout = request.ASPIRE_CLI_START_TIMEOUT;
     const timeoutSeconds = configuredTimeout ? Number(configuredTimeout) : undefined;
     if (timeoutSeconds !== undefined && (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 1)) {
       console.error('Tool runner request timeout must be a positive whole number.');
       Deno.exit(2);
     }
-    const result = await runTool(`db:${operation}:${taskSuffix}`, {
+    const result = await runTool(`db:${taskOperation}:${taskSuffix}`, {
       env: request,
       timeoutSeconds,
     });

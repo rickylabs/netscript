@@ -23,6 +23,7 @@ interface DbCliTarget {
 }
 
 type DbCliOperation = 'migrate' | 'seed' | 'reset';
+type DbCliTaskOperation = DbCliOperation | 'deploy';
 
 interface DbCliCommand {
   readonly name: DbCliOperation;
@@ -49,6 +50,10 @@ const DB_CLI_COMMANDS: readonly DbCliCommand[] = [
 const DEFAULT_COMMAND_TIMEOUT_SECONDS = 300;
 const RESOURCE_RESULT_GRACE_MS = 30_000;
 const RESOURCE_RESULT_POLL_MS = 100;
+
+function dbTaskOperation(operation: DbCliOperation): DbCliTaskOperation {
+  return operation === 'migrate' ? 'deploy' : operation;
+}
 
 /**
  * Register typed database operation resources in the resident AppHost.
@@ -223,6 +228,7 @@ async function executeDbCliResource(
     requestPath,
     JSON.stringify({
       NETSCRIPT_PRISMA_OPERATION: operation,
+      NETSCRIPT_PRISMA_TASK_OPERATION: dbTaskOperation(operation),
       NETSCRIPT_PRISMA_TARGET: target.configKey,
       ASPIRE_CLI_START_TIMEOUT: String(timeoutSeconds),
       NETSCRIPT_DB_RESULT_FILE: resultPath,
@@ -288,7 +294,7 @@ async function executeDbTool(
       '--allow-write',
       runnerPath,
       errorFile,
-      `db:${operation}:${target.taskSuffix}`,
+      `db:${dbTaskOperation(operation)}:${target.taskSuffix}`,
       String(timeoutSeconds),
     ],
     {

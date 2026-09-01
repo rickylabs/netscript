@@ -154,3 +154,14 @@ Resolution: add an independently bounded stdout diagnostic using D-224's existin
 select the concise message across both retained streams, and flatten message plus context onto one
 Aspire-visible line. D-224's `actionableStderr` order, 8/24 split, 32-line cap, and 16-KiB ceiling
 remain unchanged.
+
+## D-14 — typed runtime migrate invoked migration authoring
+
+Run `33453461545` at `a5f1ab7e0` surfaced the exact retained failure: the headless session could not
+create a migration and instructed the operator to run `netscript db migrate --name
+<migration-name>` in an interactive terminal. The typed runtime command was incorrectly routed to
+`db:migrate:<engine>`, which is the `prisma migrate dev` authoring task.
+
+Resolution: preserve the public Aspire action name `migrate` but map its internal task operation to
+the already-generated `db:deploy:<engine>` task (`prisma migrate deploy`). Apply the same mapping to
+Container request mode and direct External/SQLite execution; seed/reset are unchanged.

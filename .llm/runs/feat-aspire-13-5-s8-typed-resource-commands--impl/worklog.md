@@ -608,3 +608,26 @@ refused the excluded template-test roots; the established standalone-policy wrap
 processed both changed test files with exit 0 and no findings. No local runtime was executed.
 `quality:gate` also exited 0 with zero scanner findings and doctrine `FAIL=0` (existing warnings
 only).
+
+### D-233 surfaced cause and migrate repair
+
+Second diagnostic commit `a5f1ab7e003218cf64774c43bef81f188d48208e` fast-forwarded from the
+exact remote `592a8e6888d3906258c3c24c93c15c1d5f8b7070` after `git ls-remote`; clean-head
+`check:assets-barrel` exited 0. PR trail:
+`https://github.com/rickylabs/netscript/pull/1754#issuecomment-5486543706`.
+
+CI run `33453461545`, PostgreSQL job `99688348865`, surfaced the real exit-16 cause after 58 passing
+gates: `This headless session could not create a migration. Run this command in an interactive
+terminal: netscript db migrate --name <migration-name>`. The SQLite sibling passed. This confirms
+the typed runtime action was incorrectly executing `prisma migrate dev` through
+`db:migrate:<engine>`.
+
+RED-before-repair focused tests exited 1 with 14 passed / 3 failed records. They proved request mode
+ignored a separate task operation and the generated DB adapter lacked a shared migrate-to-deploy
+mapping. The repair keeps the public action label `migrate`, carries `deploy` as the Container task
+operation, and uses the same mapping for direct External/SQLite execution. The focused pair then
+passed 17/17. Final full helper/runtime-gate tests passed 283/283, explicitly retaining the
+D-224/D-227/D-231 coverage. Structured check processed 3/3 changed TypeScript files with zero
+diagnostics; standalone-policy lint and fmt wrappers processed both changed tests with exit 0 and
+no findings. `quality:gate` exited 0 with no scanner findings and doctrine `FAIL=0` (existing
+warnings only). No local runtime was executed.
