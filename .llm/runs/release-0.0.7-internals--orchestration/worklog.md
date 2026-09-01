@@ -8101,3 +8101,49 @@ instruction to stop and report if it gets a third value rather than proceed on i
 
 If it commits a wrong corpus or goes idle without progress, I take over the generator, receipts,
 commit and PR directly — I already hold the verified correct output.
+
+## D-187 — Took over #1862; the author had pushed the WRONG corpus
+
+Takeover executed. The author pushed `d12ef1697` and opened the draft, then stopped advancing. **The
+pushed corpus was the wrong blob** — `bc3f6a2c2…`, not the verified `19cdf3783…` — so the leaf had
+published an artifact that does not satisfy its own check. My corrective steer never delivered; I
+cancelled it on takeover so it could not arrive mid-work and cause a conflicting redo.
+
+### What I did, and what I preserved
+
+- Confirmed the worktree was **free** (0 processes, author idle 69s) before touching it — takeover
+  under a live writer is how a third wrong artifact gets made.
+- Reset onto current `main` `3b6386e14`, then **restored the author's seven run artifacts** from
+  `d12ef1697` (`git checkout d12ef1697 -- .llm/runs/…`). Their work is preserved in full; only the
+  wrong generated file was replaced.
+- Captured **RED at the real base** with the artifacts temporarily stashed so the receipt reflects a
+  clean tree: `REAL_EXIT=1`.
+- Regenerated with **nothing else running in the worktree** — the probable cause of the author's bad
+  output was generating concurrently with the repo-wide suite.
+- **Verified the produced blob against my independently established reference before committing**:
+  `19cdf3783807efbfd092cb857bbb85f296de86a3` — exact match. GREEN check `REAL_EXIT=0`.
+- Pushed with **`--force-with-lease` pinned to the author's exact SHA**, never `--force`, so a
+  concurrent push would have been refused rather than clobbered. Remote corpus blob confirmed
+  `19cdf3783…` after the push.
+
+### Tier-A at the corrected head
+
+`arch:check` 0 · `check:assets-barrel` 0 · `check:agent-docs-prose` 0 · `check:publish-assets` 0 ·
+`packages/mcp` lint 0 · fmt 0 · `deno.lock` byte-unchanged 0. Repo-wide `deno task test` running.
+
+### PR repaired
+
+Full body rewritten with the bisect, the exact before/after corpus numbers, explicit non-scope (no
+`packages/sdk` change, no CI/merge-gate wiring), the determinism evidence, and a **non-vacuous DoD**
+whose only unticked box is exact-head CI. Added the missing `orchestrator:internals` label; exactly
+one `status:` label present.
+
+### Why I did NOT waive the evaluation
+
+A one-file deterministic regeneration is normally a waiver candidate — and the coordinator offered
+"eval **or** waiver". **I authored the final commit**, so waiving would be self-certification of my
+own work. That is the one thing a proportionality argument cannot buy. Dispatched a short independent
+verification instead, whose value is explicitly **reproduction rather than opinion**: regenerate at
+base, compare against `19cdf3783…`, confirm determinism across repeated runs, confirm RED→GREEN and
+scope. It is also asked whether regenerating is the right bounded response at all, or whether it
+papers over #1841 — an opinion worth recording even though fixing #1841 was ruled out of scope.
