@@ -10,7 +10,10 @@ import { createServer, type Server, type Socket } from 'node:net'
 import { fromFileUrl, resolve, toFileUrl } from 'jsr:@std/path@^1'
 
 const compatContent = await Deno.readTextFile(
-  new URL('../../../../assets/aspire/helpers/_aspire-compat.ts.template', import.meta.url),
+  new URL(
+    '../../../../assets/aspire/helpers/_aspire-compat.ts.template',
+    import.meta.url,
+  ),
 )
 
 await Deno.mkdir('packages/cli/.tmp', { recursive: true })
@@ -62,7 +65,9 @@ export interface EndpointReferencePromise extends PromiseLike<EndpointReference>
 )
 const compatPath = `${helpersDir}/_aspire-compat.mts`
 await Deno.writeTextFile(compatPath, compatContent)
-const compatModule = await import(`${toFileUrl(compatPath).href}?test=${crypto.randomUUID()}`)
+const compatModule = await import(
+  `${toFileUrl(compatPath).href}?test=${crypto.randomUUID()}`
+)
 
 afterAll(async () => {
   await Deno.remove(generatedRoot, { recursive: true })
@@ -80,7 +85,9 @@ describe('generated Aspire listener readiness helpers', () => {
 
       assertEquals(result, {
         status: 'Healthy',
-        description: `postgres listener ready on 127.0.0.1:${serverPort(server)}`,
+        description: `postgres listener ready on 127.0.0.1:${
+          serverPort(server)
+        }`,
       })
     } finally {
       await closeServer(server)
@@ -99,7 +106,10 @@ describe('generated Aspire listener readiness helpers', () => {
     })()
 
     assertEquals(result.status, 'Unhealthy')
-    assertEquals(result.description, 'postgres listener unreachable: ECONNREFUSED')
+    assertEquals(
+      result.description,
+      'postgres listener unreachable: ECONNREFUSED',
+    )
     assertEquals(result.data.code, 'ECONNREFUSED')
     assertEquals(result.data.host, '127.0.0.1')
     assertEquals(result.data.port, String(port))
@@ -124,42 +134,146 @@ describe('generated Aspire listener readiness helpers', () => {
     assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true)
   })
 
-  for (
-    const fixture of [
-      { reply: '+PONG\r\n', status: 'Healthy', code: undefined },
-      { reply: '-NOAUTH Authentication required.\r\n', status: 'Degraded', code: 'NOAUTH' },
-      { reply: 'garbage\r\n', status: 'Unhealthy', code: 'EPROTO' },
-    ]
-  ) {
-    it(`maps RESP ${fixture.reply.trim()} to ${fixture.status}`, async () => {
-      const server = await startServer((socket) => {
-        socket.once('data', () => socket.end(fixture.reply))
+  it('sends an array-encoded PING and accepts one-segment +PONG', async () => {
+    let request = ''
+    const server = await startServer((socket) => {
+      socket.once('data', (data) => {
+        request = data.toString('utf8')
+        socket.end('+PONG\r\n')
       })
-      const port = serverPort(server)
-      try {
-        const result = await compatModule.createRespPingCheck({
-          host: '127.0.0.1',
-          port,
-        })()
-
-        assertEquals(result.status, fixture.status)
-        if (fixture.code === undefined) {
-          assertEquals(result, {
-            status: 'Healthy',
-            description: `RESP listener ready on 127.0.0.1:${port}`,
-          })
-        } else {
-          assertEquals(result.data.code, fixture.code)
-          assertEquals(result.data.host, '127.0.0.1')
-          assertEquals(result.data.port, String(port))
-          assertMatch(result.data.elapsedMs, /^\d+$/)
-        }
-      } finally {
-        await closeServer(server)
-      }
     })
-  }
+    const port = serverPort(server)
+    try {
+      const result = await compatModule.createRespPingCheck({
+        host: '127.0.0.1',
+        port,
+      })()
+
+      assertEquals(request, '*1\r\n$4\r\nPING\r\n')
+      assertEquals(result, {
+        status: 'Healthy',
+        description: `RESP listener ready on 127.0.0.1:${port}`,
+      })
+    } finally {
+      await closeServer(server)
+    }
+  })
+
+  it('accumulates a split +PONG reply through CRLF', async () => {
+    const server = await startServer((socket) => {
+      socket.once('data', () => {
+        socket.write('+PO')
+        setTimeout(() => {
+          if (!socket.destroyed) socket.end('NG\r\n')
+        }, 25)
+      })
+    })
+    const port = serverPort(server)
+    try {
+      const result = await compatModule.createRespPingCheck({
+        host: '127.0.0.1',
+        port,
+      })()
+
+      assertEquals(result, {
+        status: 'Healthy',
+        description: `RESP listener ready on 127.0.0.1:${port}`,
+      })
+    } finally {
+      await closeServer(server)
+    }
+  })
+
+  it('reports NOAUTH as Unhealthy with endpoint and received bytes', async () => {
+    const result = await withRespReply('-NOAUTH Authentication required.\r\n')
+
+    assertEquals(result.status, 'Unhealthy')
+    assertMatch(result.description, /RESP listener unhealthy: NOAUTH/)
+    assertRespFailureData(
+      result.data,
+      'NOAUTH',
+      '-NOAUTH Authentication required.\\r\\n',
+    )
+  })
+
+  it('reports garbage as EPROTO with received bytes', async () => {
+    const result = await withRespReply('garbage\r\n')
+
+    assertEquals(result.status, 'Unhealthy')
+    assertMatch(result.description, /RESP listener unhealthy: EPROTO/)
+    assertRespFailureData(result.data, 'EPROTO', 'garbage\\r\\n')
+  })
+
+  it('reports a closed RESP port as ECONNREFUSED without waiting for the deadline', async () => {
+    const server = await startServer()
+    const port = serverPort(server)
+    await closeServer(server)
+    const startedAt = performance.now()
+
+    const result = await compatModule.createRespPingCheck({
+      host: '127.0.0.1',
+      port,
+    })()
+    const elapsedMs = performance.now() - startedAt
+
+    assertEquals(result.status, 'Unhealthy')
+    assertMatch(result.description, /RESP listener unhealthy: ECONNREFUSED/)
+    assertRespFailureData(result.data, 'ECONNREFUSED', '')
+    assertEquals(elapsedMs < 500, true)
+  })
+
+  it('times out when a RESP server accepts the connection but never replies', async () => {
+    const server = await startServer(() => {})
+    const port = serverPort(server)
+    const startedAt = performance.now()
+    try {
+      const result = await compatModule.createRespPingCheck({
+        host: '127.0.0.1',
+        port,
+      })()
+      const elapsedMs = performance.now() - startedAt
+
+      assertEquals(result.status, 'Unhealthy')
+      assertMatch(result.description, /RESP listener unhealthy: ETIMEDOUT/)
+      assertRespFailureData(result.data, 'ETIMEDOUT', '')
+      assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true)
+    } finally {
+      await closeServer(server)
+    }
+  })
 })
+
+interface RespFailureResult {
+  readonly status: string
+  readonly description: string
+  readonly data: Record<string, string>
+}
+
+async function withRespReply(reply: string): Promise<RespFailureResult> {
+  const server = await startServer((socket) => {
+    socket.once('data', () => socket.end(reply))
+  })
+  try {
+    return await compatModule.createRespPingCheck({
+      host: '127.0.0.1',
+      port: serverPort(server),
+    })()
+  } finally {
+    await closeServer(server)
+  }
+}
+
+function assertRespFailureData(
+  data: Record<string, string>,
+  code: string,
+  received: string,
+): void {
+  assertEquals(data.code, code)
+  assertEquals(data.host, '127.0.0.1')
+  assertMatch(data.port, /^\d+$/)
+  assertMatch(data.elapsedMs, /^\d+$/)
+  assertEquals(data.received, received)
+}
 
 async function startServer(
   connectionListener?: (socket: Socket) => void,
