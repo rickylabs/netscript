@@ -7178,3 +7178,42 @@
     checks it rather than discovering it at a merge gate.
   - Verified separately that **#1802 does not collide with #1855's in-flight files** — #1802 is
     `codex/` and `runtime/`, #1855 is `teardown/` — so its branch does not need an emergency rebase.
+
+- **D-279 — #1855 reviewed against its brief and shipped as PR #1887; I reverted one hunk wrongly and
+  put it back.**
+  - **The slice did the hard part right.** Box 1 is delivered as **detection, not prevention**, with the
+    mechanism established rather than asserted: repo code issues no `docker network rm`, and the reap is
+    **DCP's workload-scoped cleanup** when the AppHost's session tears down (dotnet/aspire#9785,
+    dotnet/aspire#13320, microsoft/dcp#213), which cannot be intercepted from inside `aspire stop`. That
+    matches the pre-brief finding I gave it and it did not overstate the fix — the brief's most
+    important instruction.
+  - **Claims verified in the code, not taken on trust:** ownership is keyed on the
+    `com.microsoft.developer.usvc-dev.*` **label namespace** with **zero** `aspire-persistent-network`
+    name-pattern matches; `teardown.ts` contains **zero** network-removal calls; containers are removed
+    with `docker rm -f -v` so a run's anonymous volumes die with them; volumes are attributed
+    **fail-closed** — owned only when *every* mounting container is positively owned.
+  - **Gates all green** at `3b9b74539`: `deno check` 334 files/0 errors; teardown suite **39 passed**;
+    the consumer test 6 passed; fmt 334 files/**0 findings**.
+  - **I reverted a hunk as "unrelated churn" and was wrong.** I removed the slice's reformatting of
+    `.llm/tools/harness/extract-verdict.ts`, assuming scope creep. Then the fmt gate reported
+    `findings: 1` — **on that same file**. Checking a clean worktree at `origin/main 9e3b8bcba` showed
+    `deno fmt --check` **already fails there**: the change was the repo formatter's own output against
+    pre-existing drift, not churn. **My revert introduced the gate failure.** Restored, with the
+    correction recorded in its own commit message rather than quietly squashed.
+    - The lesson worth keeping: *"touches a file outside the obvious scope"* is a **prompt to check**,
+      not a finding. The check is one command — does the gate fail without it?
+  - **`run-codex-slice-lib_test.ts` was correctly kept** — a required consumer update, since the leak
+    report shape gained `volumes`/`networks` probes and `atRiskFromUpstream`.
+  - **The mirror claim held**: `.agents/skills/aspire/SKILL.md` and its `.claude/` mirror both gained 22
+    lines, i.e. regenerated rather than hand-edited. `agentic:sync-claude:check` still exits 1, but on
+    **`netscript-harness`** — the pre-existing main debt already recorded for S13, not this slice's.
+  - **PR #1887 opened** with `ci:skip-e2e`, milestone 0.0.7, `Closes #1855`. The label is deliberate and
+    its removal condition is written into the body: the e2e tiers cannot pass before #1865 and would
+    occupy the lanes #1865's own proof needs.
+  - **Contention ruled and surfaced on both sides.** #1887 and S7 (#1744) conflict on **all seven**
+    teardown files. Ruling: **#1887 merges first** — it is static with green gates, while S7 is
+    runtime-gated behind #1865 and must re-take its #1719 A1/A2 receipts anyway because its head moved.
+    Posted on #1744 with the per-file scale, what S7 will need to re-express, and the point worth
+    adopting rather than re-deriving: S7's *"foreign AppHost reported, never mutated"* invariant now has
+    a documented upstream boundary — **report, do not attempt to prevent** — so a reaped foreign network
+    is not an S7 defect.
