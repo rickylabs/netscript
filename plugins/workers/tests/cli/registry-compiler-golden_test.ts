@@ -1,14 +1,16 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
+import { JobConfigSchema } from '@netscript/plugin-workers-core/config';
+import { z } from 'zod';
 import { compileWorkersRegistry } from '../../src/cli/registry-compiler.ts';
 
 /**
- * Golden byte-identity test for the workers static job registry compiler.
+ * Golden byte-identity and JobConfig key-parity test for the workers registry compiler.
  *
  * Locks the exact emitted module so the thin-wrapper refactor over the shared
  * `@netscript/plugin/cli` registry emitter cannot drift a single byte.
  */
-Deno.test('compileWorkersRegistry emits the golden job registry module', async () => {
+Deno.test('compileWorkersRegistry emits golden output in JobConfig key parity', async () => {
   const files = new MemoryProjectFiles([
     'workers/jobs/example-job.ts',
     'workers/jobs/health-check.ts',
@@ -26,7 +28,36 @@ Deno.test('compileWorkersRegistry emits the golden job registry module', async (
 
   const written = files.written.get('.netscript/generated/plugin-workers/job-registry.ts');
   assertEquals(written, EXPECTED_WORKERS_REGISTRY);
+  assertJobConfigKeysAreEmitted(written);
 });
+
+function assertJobConfigKeysAreEmitted(source: string | undefined): void {
+  if (source === undefined) {
+    throw new Error('The workers registry compiler did not write a registry module.');
+  }
+  if (!(JobConfigSchema instanceof z.ZodObject)) {
+    throw new Error('JobConfigSchema must remain a Zod object for emitted-key parity checks.');
+  }
+
+  const definition = source.match(
+    /function createLocalJobDefinition[\s\S]*?\x20{2}return \{\n(?<fields>[\s\S]*?)\n\x20{2}\};/,
+  );
+  if (definition?.groups?.fields === undefined) {
+    throw new Error('Generated registry is missing the local job definition object.');
+  }
+
+  const emittedKeys = new Set(
+    definition.groups.fields.matchAll(/^\x20{4}([A-Za-z_$][\w$]*)(?:,|:)/gm).map((match) =>
+      match[1]
+    ),
+  );
+  const missingKeys = Object.keys(JobConfigSchema.shape).filter((key) => !emittedKeys.has(key));
+  assertEquals(
+    missingKeys,
+    [],
+    `Generated registry dropped JobConfig keys: ${missingKeys.join(', ')}`,
+  );
+}
 
 const EXPECTED_WORKERS_REGISTRY =
   `import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
@@ -60,9 +91,11 @@ function createLocalJobDefinition(id: string, entrypoint: string): RegisterJobIn
   return {
     id,
     name: toJobName(id),
+    description: undefined,
     entrypoint,
     topic: "default",
     source: "local",
+    schedule: undefined,
     executionType: "deno",
     timezone: "UTC",
     timeout: 300000,
@@ -72,7 +105,10 @@ function createLocalJobDefinition(id: string, entrypoint: string): RegisterJobIn
     priority: 50,
     enabled: true,
     persist: true,
+    permissions: undefined,
     tags: [],
+    metadata: undefined,
+    retention: undefined,
   };
 }
 

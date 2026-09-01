@@ -98,7 +98,20 @@ Deno.test('unknown construction rejects invalid protocol, ids, shapes, and forbi
   assertConstructionCode([new Date()], 'SDK_CONTRIBUTION_INVALID');
   assertConstructionCode([descriptor({ context: [] })], 'SDK_CONTRIBUTION_INVALID');
 
-  for (const extra of ['dependsOn', 'before', 'after', 'order', 'priority', 'environment']) {
+  for (
+    const extra of [
+      'dependsOn',
+      'before',
+      'after',
+      'order',
+      'priority',
+      'environment',
+      'plugins',
+      'interceptors',
+      'clientInterceptors',
+      'adapterInterceptors',
+    ]
+  ) {
     assertConstructionCode([
       descriptor({ [extra]: extra === 'priority' ? 1 : ['test:other'] }),
     ], 'SDK_CONTRIBUTION_INVALID');
@@ -227,6 +240,28 @@ Deno.test('preparation rejects missing context and every invalid header form', a
     );
     assert(error instanceof SdkClientContributionError);
     assertEquals(error.code, 'SDK_HEADER_INVALID');
+  }
+});
+
+Deno.test('preparation rejects malformed patches with the local runtime taxonomy', async () => {
+  for (
+    const patch of [
+      null,
+      [],
+      { headers: { 'x-tenant': 'safe' }, plugins: [] },
+    ]
+  ) {
+    const error = await assertRejects(() =>
+      preparationPort([
+        descriptor({ prepare: () => patch }),
+      ]).prepare(logicalCall({ tenant: 'tenant' }))
+    );
+    assert(error instanceof SdkClientContributionError);
+    assertEquals(error.code, 'SDK_CONTRIBUTION_RUNTIME');
+    assertEquals(error.phase, 'preparation');
+    assertEquals(error.contributionId, 'test:valid');
+    assertEquals(error.procedurePath, 'echo');
+    assertFalse('cause' in error);
   }
 });
 

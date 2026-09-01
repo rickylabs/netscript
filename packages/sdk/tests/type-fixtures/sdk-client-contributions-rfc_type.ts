@@ -262,6 +262,26 @@ defineClosedContribution({
 });
 defineClosedContribution({
   ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream link plugins
+  plugins: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream interceptors
+  interceptors: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream client interceptors
+  clientInterceptors: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream adapter interceptors
+  adapterInterceptors: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
   // @ts-expect-error contributions cannot control retry policy
   retry: 1,
 });
