@@ -1,4 +1,8 @@
-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import {
+  assertEquals,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 import { generateRegisterApps } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-apps.ts';
@@ -67,13 +71,26 @@ Deno.test('listener fault splice attaches test-only checks at generator-derived 
   }
 });
 
-Deno.test('readiness app splice injects the controller once at the generated return marker', () => {
+Deno.test('readiness app splice namespaces fixture bindings in a real generated host', async () => {
   const source = generateRegisterApps({
-    apps: {},
+    apps: {
+      app: {
+        Enabled: true,
+        Runtime: 'deno',
+        Type: 'task',
+        Workdir: 'apps/app',
+        TaskName: 'start',
+        WatchMode: false,
+        RequiresKv: false,
+      },
+    },
     version: 'e2e',
     denoDefaults: { Permissions: [], WatchMode: false },
   });
   const injected = injectReadinessFixtureApps(source);
+
+  assertEquals(duplicateConstBindings(injected), []);
+  await assertGeneratedModuleChecks(injected);
   assertStringIncludes(injected, 'apps.set("readiness-dead-port"');
   assertStringIncludes(injected, 'apps.set("listener-fault-controller"');
   assertThrows(
@@ -174,6 +191,82 @@ function healthAttachmentCount(source: string, key: string): number {
   return source.split('\n').filter((line) =>
     line.includes('.withHealthCheck(') && line.includes(key)
   ).length;
+}
+
+function duplicateConstBindings(source: string): readonly string[] {
+  const bindings = [...source.matchAll(/\bconst\s+([A-Za-z_$][\w$]*)\s*=/gu)].map((match) =>
+    match[1]
+  );
+  return [...new Set(bindings.filter((binding, index) => bindings.indexOf(binding) !== index))];
+}
+
+async function assertGeneratedModuleChecks(source: string): Promise<void> {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-readiness-fixture-' });
+  try {
+    const helpers = `${root}/aspire/.helpers`;
+    const modules = `${root}/aspire/.aspire/modules`;
+    await Deno.mkdir(helpers, { recursive: true });
+    await Deno.mkdir(modules, { recursive: true });
+    await Deno.writeTextFile(`${helpers}/register-apps.mts`, source);
+    await Deno.writeTextFile(
+      `${modules}/aspire.mts`,
+      `export interface ExecutableResource {
+  withEnvironment(key: string, value: string): Promise<void>;
+  withOtlpExporter(options: { protocol: string }): Promise<void>;
+  withHttpEndpoint(options: unknown): Promise<void>;
+  withBrowserLogs(): Promise<void>;
+  withHttpHealthCheck(options: unknown): Promise<void>;
+}
+export interface DistributedApplicationBuilder {
+  addExecutable(name: string, command: string, workdir: string, args: string[]): ExecutableResource;
+}
+export const OtlpProtocol = { HttpProtobuf: 'http-protobuf' } as const;
+`,
+    );
+    await Deno.writeTextFile(
+      `${helpers}/_aspire-compat.mts`,
+      `import type { ExecutableResource } from '../.aspire/modules/aspire.mts';
+export interface NetScriptConfig {
+  Apps: Record<string, { Enabled?: boolean }>;
+  Version: string;
+}
+export function buildOtelEnvVars(
+  _name: string,
+  _version: string,
+  _kind: string,
+): Record<string, string> {
+  return {};
+}
+export function buildViteEnvVarName(_name: string): { full: string; shorthand: string } {
+  return { full: '', shorthand: '' };
+}
+export function resolveWorkspacePath(_root: string, path: string): string {
+  return path;
+}
+export async function withCacheReference(
+  _resource: ExecutableResource,
+  _cache: unknown,
+): Promise<void> {}
+`,
+    );
+    await Deno.writeTextFile(
+      `${helpers}/register-infrastructure.mts`,
+      'export interface InfrastructureContext { readonly primaryCacheWiring?: unknown; }\n',
+    );
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['check', '--no-config', `${helpers}/register-apps.mts`],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(
+      output.code,
+      0,
+      new TextDecoder().decode(output.stderr) || new TextDecoder().decode(output.stdout),
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 }
 
 function assertAutoBranchInjectionPlacement(source: string): void {
