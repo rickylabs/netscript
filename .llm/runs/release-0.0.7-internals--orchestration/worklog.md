@@ -8147,3 +8147,60 @@ verification instead, whose value is explicitly **reproduction rather than opini
 base, compare against `19cdf3783…`, confirm determinism across repeated runs, confirm RED→GREEN and
 scope. It is also asked whether regenerating is the right bounded response at all, or whether it
 papers over #1841 — an opinion worth recording even though fixing #1841 was ruled out of scope.
+
+## D-188 — #1862 Tier-A green; #1846 PASS with a deferred-box hazard to carry
+
+### #1862 — repo-wide gate green at the corrected head
+
+`deno task test` at `c3a9d8bff`: **`REAL_EXIT=0`, 4,624 passed / 0 failed / 19 ignored / 4,643 total**
+(213s). With `arch:check`, the three other corpus `check:` variants, `packages/mcp` lint/fmt and the
+byte-unchanged `deno.lock` already green, Tier-A is complete.
+
+**Ready-transition deliberately withheld** until the independent verification returns. Transitioning
+on a pending gate is precisely the #1828 mistake, and here it would be worse: I authored the commit,
+so that check is the only thing standing between my own work and a self-certified merge. The
+evaluator is live (transcript writing, 5 min in).
+
+### #1846 — `VERDICT: PASS`, and the evaluator earned it
+
+Artifact `e0f5f4db7`, verified **artifact-only** (115 insertions, one file). Notably it disclosed that
+its own `deno eval` JSR fetch transiently added four `@std/yaml` entries to `deno.lock` in its
+worktree — and **did not ship them**. Reporting your own contamination instead of quietly committing
+it is exactly right.
+
+Box coverage is honest and matches the standing ruling: **box 1 DEFERRED / not satisfied / not
+evaluated**, boxes 2, 3 and 4 covered PASS, box 5 partial. It verified box 3 the hard way — the run is
+created at trigger time with its head SHA and admitted in FIFO wait order, so deferral needs no
+redispatch, and it stated plainly that a redispatch-based design "would have been rejected here for
+trading a CI defect for an evidence defect".
+
+Three findings worth carrying:
+
+- **F-1 (minor)**: at the 100-pending bound a new arrival is cancelled at admission, so the header's
+  `cancelled` enumeration holds only *below* the bound. Accepted non-blocking; the practical lane is
+  far below 100.
+- **F-3 (info)**: `queue: max` never *requires* a push, so box 3 holds — but a push to a queued PR
+  still **destroys** its queued entry via the top-level per-ref group. Deferral survives waiting, not
+  pushing.
+- **F-5 (info)**: the same default one-pending shape remains in five other workflows
+  (`e2e-cli-prod-local`, `e2e-cli-prod`, `pages`, `release-canary`, `openhands-phase-eval`).
+  Out of scope here, flagged for owner triage.
+
+### Hazard recorded for whoever transitions #1846
+
+Its `acceptance-evidence` block now marks boxes 1–3 as `DEFERRED — …`. The author corrected it
+properly, and the mirror currently **self-skips** because `status:ready-merge` is absent — verified by
+dry-run (`REAL_EXIT=0`, "Mirror skipped because live PR labels do not include status:ready-merge").
+
+**But the mirror validates mapping completeness, not evidence semantics.** The moment
+`status:ready-merge` is applied, it will process every entry — including ones whose evidence string
+merely *says* "DEFERRED" — and tick those boxes. So before #1846 is ever transitioned, the deferred
+entries must be **removed from the block**, not left as prose disclaimers. Leaving them would let the
+close-gate mark an unproven box satisfied, which is the mirror's purpose inverted.
+
+### #1802 — second ceiling exception landed as authorized
+
+Head `5ac0275c7`, main merged once at `fe51d4a3a`. Ceiling check: `sender-ownership_test.ts` is now
+`978cd23d0…` (was `74b0ba611…`) — **the authorized second exception** for the vocabulary replacement.
+The other four are **byte-identical** (`7be38302a…`, `d3ca0b51f…`, `7113e271d…`, `546b5f018…`).
+Author idle 26 min; assessment to follow.
