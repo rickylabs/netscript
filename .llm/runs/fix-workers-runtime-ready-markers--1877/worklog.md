@@ -29,6 +29,7 @@
 - Commit: `f8073e7e3246b77f7b07a759b9877ac021a91a78`.
 - Predicate: scheduler marker AND any marker from the named runner-mode collection.
 - Diagnostic: separately names a missing scheduler marker and absence of any runner-mode marker.
+- Producer anchor: the in-process passing case reads `plugins/workers/worker/worker.ts` and asserts the exact emitted template before exercising the predicate, so a future producer rename fails this focused suite.
 - Required gates at the final formatted tree:
 
 | Gate | Exit | Evidence |

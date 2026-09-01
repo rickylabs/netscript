@@ -9,3 +9,4 @@
 - Runtime suite: prohibited locally; hosted CI owns it.
 - Lock hygiene: `deno.lock` must remain byte-identical.
 - Draft PR: #1878, kept draft at `status:impl`; supervisor-owned hosted runtime proof and separate-session IMPL-EVAL remain pending.
+- The in-process fixture is mechanically anchored to the exact producer template in `plugins/workers/worker/worker.ts`; the producer remains read-only and outside the diff.

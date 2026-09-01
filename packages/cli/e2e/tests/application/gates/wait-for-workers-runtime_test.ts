@@ -1,4 +1,4 @@
-import { assert, assertFalse } from '@std/assert';
+import { assert, assertFalse, assertStringIncludes } from '@std/assert';
 
 import { hasWorkersRuntimeStartupEvidence } from '../../../src/application/gates/scaffold/wait-for-workers-runtime.ts';
 
@@ -16,7 +16,14 @@ Deno.test('workers runtime evidence accepts the web-worker-pool mode', () => {
   );
 });
 
-Deno.test('workers runtime evidence accepts the in-process runner mode', () => {
+Deno.test('workers runtime evidence accepts the real in-process runner mode', async () => {
+  const workerSource = await Deno.readTextFile(
+    new URL('../../../../../../plugins/workers/worker/worker.ts', import.meta.url),
+  );
+  assertStringIncludes(
+    workerSource,
+    '`[Worker ${this.workerId}] Starting in-process job runner (queue concurrency: ${this.concurrency})...`',
+  );
   assert(
     hasWorkersRuntimeStartupEvidence(
       `${schedulerStarted}\n${inProcessRunnerStarted}`,
