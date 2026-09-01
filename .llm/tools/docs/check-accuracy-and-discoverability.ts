@@ -100,7 +100,7 @@ export async function checkDetachedStartAccuracy(): Promise<void> {
       "Disable shell tracing for the value's whole lifetime, not just its assignment.",
       'set +x                      # no-op when tracing is already off',
       'unset DASHBOARD_URL',
-      'case $- in *x*) xtrace_was_on=1 ;; esac',
+      'xtrace_was_on=; case $- in *x*) xtrace_was_on=1 ;; esac',
       'if [ -n "${xtrace_was_on:-}" ]; then set -x; fi',
       '${DASHBOARD_URL%%\\?*}',
     ]
