@@ -10,6 +10,14 @@ export interface ExtractedContribution {
   readonly axis: string;
 }
 
+/** Source-level factory call pattern that emits contributions for one axis. */
+export interface ContributionBuilderPattern {
+  /** Direct-call factory identifier to discover in exported declarations. */
+  readonly callee: string;
+  /** Registry axis assigned to contributions produced by the factory. */
+  readonly axis: string;
+}
+
 /** Port for extracting plugin contributions from walked files. */
 export interface ExtractorPort {
   /** Extract contribution candidates from walked files. */
