@@ -9,7 +9,6 @@ const aligned: ZodAlignmentInput = {
       '@olli/kvdex@3.6.7': { dependencies: ['npm:zod@^3.24.0'] },
     },
     npm: {
-      '@ag-ui/core@0.0.52': { dependencies: ['zod@3.25.76'] },
       '@anthropic-ai/sdk@0.97.1_zod@4.4.3': { dependencies: ['zod@4.4.3'] },
       '@modelcontextprotocol/sdk@1.29.0_zod@4.4.3': { dependencies: ['zod@4.4.3'] },
       'openai@6.45.0_zod@4.4.3': { dependencies: ['zod@4.4.3'] },

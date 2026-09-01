@@ -36,6 +36,7 @@ import {
   validateGithubToken,
   wslUser,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 type Sub = 'check' | 'store';
 
@@ -63,6 +64,12 @@ function usage(): never {
 }
 
 function parseArgs(args: string[]): Options {
+  try {
+    args = normalizeTaskArguments(args);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    usage();
+  }
   if (args.length === 0) usage();
   const sub = args[0];
   if (sub !== 'check' && sub !== 'store') usage();

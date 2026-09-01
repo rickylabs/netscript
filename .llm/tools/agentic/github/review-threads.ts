@@ -2,6 +2,7 @@
 
 import { GITHUB_GRAPHQL_API_URL } from '../config/endpoints.ts';
 import { resolveGithubToken } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 interface Options {
   repo: string;
@@ -156,6 +157,7 @@ function extractSeverity(body: string): string | null {
 }
 
 function parseArgs(args: readonly string[]): Options {
+  args = normalizeTaskArguments(args);
   let repo = readEnv('GITHUB_REPOSITORY') ?? '';
   let pr = 0;
   let token: string | undefined;
@@ -169,8 +171,6 @@ function parseArgs(args: readonly string[]): Options {
       return next;
     };
     switch (arg) {
-      case '--':
-        break;
       case '--repo':
         repo = value();
         break;

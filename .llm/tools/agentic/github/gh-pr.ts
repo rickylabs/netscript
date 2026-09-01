@@ -56,6 +56,7 @@ import {
   selectLatestCurrentHeadImplEval,
   selectLatestOpenHandsComment,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { readOwnedPublicationBody, stagePublicationBody } from './publication-body.ts';
 
 type Sub = 'create' | 'verdict' | 'merge';
@@ -99,6 +100,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const raw = args[0];
   if (raw === undefined || raw === '--help') {
     printHelp();
