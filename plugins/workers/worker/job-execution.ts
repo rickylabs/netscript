@@ -12,6 +12,7 @@ import type { WorkerDispatchContext, WorkerJobResult } from './worker-options.ts
 export async function executeWorkerJob(
   context: WorkerDispatchContext,
   jobDef: JobDefinition,
+  executionId: string,
   payload: Record<string, unknown> | undefined,
   signal: AbortSignal,
   traceHeaders: Record<string, string>,
@@ -19,7 +20,14 @@ export async function executeWorkerJob(
 ): Promise<WorkerJobResult> {
   const executionType = jobDef.executionType ?? 'deno';
   if (executionType === 'deno') {
-    return await executeDenoJob(context, jobDef, payload, traceHeaders, correlationId);
+    return await executeDenoJob(
+      context,
+      jobDef,
+      executionId,
+      payload,
+      traceHeaders,
+      correlationId,
+    );
   }
   return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders);
 }
@@ -27,6 +35,7 @@ export async function executeWorkerJob(
 async function executeDenoJob(
   context: WorkerDispatchContext,
   jobDef: JobDefinition,
+  executionId: string,
   payload: Record<string, unknown> | undefined,
   traceHeaders: Record<string, string>,
   correlationId?: string,
@@ -49,10 +58,16 @@ async function executeDenoJob(
     tracestate: traceHeaders['tracestate'],
   };
 
-  const result = await context.workerPool.executeJob(message, {
-    ...jobDef,
-    entrypoint,
-  });
+  const result = await context.workerPool.executeJob(
+    message,
+    {
+      ...jobDef,
+      entrypoint,
+    },
+    executionId,
+    (percent, progressMessage) =>
+      context.executionState.progress(executionId, percent, progressMessage).then(() => undefined),
+  );
   const resultData = result.data ? result.data as Record<string, unknown> : undefined;
 
   return {
