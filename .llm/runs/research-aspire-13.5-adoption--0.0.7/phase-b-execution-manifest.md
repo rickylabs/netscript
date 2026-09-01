@@ -240,6 +240,46 @@ Scripts under the scratchpad must be invoked as `bash <path>`: it is mounted **`
 2026-09-01 (#1855); until that lands, verify the foreign set by hand rather than trusting the
 suite's own cleanup gate, which reported PASS while the network was being removed.
 
+## 5a. Merge order — S8 first, and the rest do not go without it
+
+Coordinator ruling: **S8 (#1754) merges before S9–S13**, after consuming the Fixes baseline merge and
+passing its own Phase B. The chain's shape makes this mandatory rather than merely preferred — S9 and
+S10 are based on S8's branch, and S11 and S13 on S10's, so any other order either duplicates S8's
+commits onto main or strands the stack.
+
+Order, with each slice's gating condition:
+
+| # | Slice | PR | Gated on |
+| - | ----- | -- | -------- |
+| 1 | **S8** | #1754 | Fixes baseline merge (#1865 + the workers marker leaf) → consume → **its own Phase B** |
+| 2 | S9 | #1759 | S8 merged; retarget base → `main`; bounded delta eval over its 5 product Δ |
+| 3 | S10 | #1760 | S8 merged; retarget base → `main`; bounded delta eval over its 5 product Δ |
+| 4 | S11 | #1771 | S10 merged; **no delta eval** — carry proven 24/24 blob-identical |
+| 5 | S13 | #1779 | S10 merged **and S9 merged** (its boxes 1–2 need S9's skills corpus on main) |
+| — | S7 | #1744 | independent of the chain; needs #1719 A1/A2 re-taken (its head moved) |
+| — | #1747 | #1747 | independent; only its hosted-runtime DoD box, gated on the same baseline |
+
+**#1865's integrated head `03def015b` is green on both hosted runtime tiers** (run `33534193166`), so
+the consume step is a rebase onto the post-merge main, not a repair.
+
+**Consume/rebase recipe at merge time** — re-fetch first; main has moved on every single pass:
+
+```
+git fetch origin main
+# S8 first, alone:
+cd <s8-worktree> && git rebase origin/main
+#   re-gate: A6 grep (0/0), A3 assertions, check:assets-barrel, scoped deno check
+#   re-prove carry: per-file blob identity over S8's own set vs the evaluated head
+# only after S8 lands on main:
+cd <s9-worktree>  && git rebase --onto <S8-final> <prev-S8-final>
+cd <s10-worktree> && git rebase --onto <S8-final> <prev-S8-final>
+cd <s11-worktree> && git rebase --onto <S10-final> <prev-S10-final>
+cd <s13-worktree> && git rebase --onto <S10-final> <prev-S10-final>
+```
+
+**Do not retarget any PR base to `main` before its parent has actually merged** — a base retarget on an
+unmerged parent makes the diff show the parent's commits as this slice's own.
+
 ## 6. Then
 
 Tier-A delta review → supervisor-dispatched independent IMPL-EVAL (checked-in

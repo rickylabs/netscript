@@ -7016,3 +7016,42 @@
     explicit closure rule — it closes by hand when all three gates are evidenced, never by a closing
     keyword on a PR delivering one of them. That is the concrete guard against S8 stranding the
     remainder, on top of #1720 A4 no longer claiming to close it.
+
+- **D-274 — S8 provenance and label conflict repaired; six of seven PRs now fail only `close-gate`;
+  S8-first merge order recorded.**
+  - **The S8 body was asserting two contradictory things at once, and my own edit caused it.** Ticking
+    the IMPL-EVAL box replaced only the **first line** of a multi-line bullet; lines 2–7 of the previous
+    un-ticked version survived underneath, still reading *"has been dispatched … and will be recorded
+    here with its verdict"*. So the DoD simultaneously claimed the evaluation was complete and pending.
+    Rewritten as one coherent block. **A single-line replace against a multi-line list item is how a
+    body ends up self-contradicting** — worth checking the whole item, not the anchor line.
+  - **Every SHA the box cited had been orphaned by the convergence** — `d11431fec` (the *evaluated*
+    head), `bc838a0b3` (prior accepted PASS) and `439959045` (the carry baseline) are all
+    pre-convergence objects, resolvable in the repository but **not ancestors** of `f6bcbea9f`. A
+    reviewer running `git log` on the branch would have found none of them. The box now labels them as
+    such and names `bc838a0b3`'s current successor `625a272b7`. The verdict is unaffected — that is
+    precisely what the blob-identity carry rule is for.
+  - **Contradictory label pair resolved on #1754**: it carried **`status:impl-eval` + `impl-eval:skip`**
+    at once. With the evaluation complete, `status:impl-eval` was the false half → replaced with
+    **`status:blocked`**, which is accurate: it cannot reach `status:ready-merge` until its Phase-B
+    receipts exist. **`impl-eval:skip` deliberately retained** — its purpose is to stop a ready-flip
+    auto-queuing a redundant evaluator against a valid verdict (the #1831 failure), and removing it
+    would re-open that hole at the exact moment the PR is flipped ready.
+    - The same pair sits on #1759, #1760, #1744 and #1747, where it is **not yet false** because those
+      evaluations have not completed. Left alone and flagged, rather than sweeping five PRs' status
+      labels unilaterally — `status:` is the board's single-source signal.
+    - Note: `gh pr edit --add-label/--remove-label` trips the same **org-scope GraphQL** failure as
+      `--body-file`; the REST label endpoints work.
+  - **CI at the converged heads is now clean except `close-gate`:** #1771 and #1779 at **zero**
+    failures; #1759, #1760, #1744, #1747 at **`close-gate` only**; #1754 additionally carries the two
+    runtime tiers, which are the #1865-gated ones. **S9 is down from four failures to one** — both
+    static defects I found and fixed (TS2322, and the unregistered `agentic:dogfood-skills:check`) are
+    confirmed green by hosted CI, not just locally.
+  - **S8-first merge order recorded in the manifest as §5a**, with each slice's gating condition and a
+    consume/rebase recipe. The order is **mandatory, not preferred**: S9/S10 are based on S8's branch
+    and S11/S13 on S10's, so any other order duplicates S8's commits onto main or strands the stack.
+    Recorded the trap explicitly — **do not retarget a PR base to `main` before its parent has actually
+    merged**, or the diff shows the parent's commits as the slice's own.
+  - Both #1855 and #1851 dispatches are live and genuinely working (29 and 38 tool calls): #1855 is
+    researching the Aspire network **label** rather than a name pattern, exactly as briefed, and #1851
+    is diffing against #1858's branch to respect the contention warning.
