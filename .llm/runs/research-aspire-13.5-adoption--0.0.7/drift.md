@@ -6370,3 +6370,44 @@
     **5 evidenced**. S13 is 32 behind main and restacks after S8 → S9/S10 → S11 settle.
   - Remaining static surface in the lane is now genuinely small: everything else waits on either the
     #1863/#1858 merge SHAs or the Phase-B lease.
+
+- **D-258 — evaluator-provenance audit across every active leaf. All seven have a real evaluator; one
+  needed digging, and the automation gap is recorded.**
+  - **The warning is well founded**: `ready_for_review` moves a PR to `status:impl-eval` **without**
+    launching an evaluator, so the label alone proves nothing. Audited label vs local verdict artifact
+    vs posted phase comment for all seven:
+
+    | PR | label | local verdict artifacts | posted `[PHASE: IMPL-EVAL]` |
+    | --- | --- | ---: | ---: |
+    | #1744 S7 | impl-eval | **0** | 3 |
+    | #1754 S8 | impl-eval | 7 | 10 |
+    | #1759 S9 | impl-eval | 2 | 4 |
+    | #1760 S10 | impl-eval | 2 | 4 |
+    | #1771 S11 | impl-eval | 2 | 3 |
+    | #1779 S13 | impl-eval | 1 | 3 |
+    | #1747 | impl-eval | 1 | 2 |
+
+  - **#1744 showed 0 artifacts and I chased it rather than trusting its three comments.** The zero is
+    an **artefact-location** effect, not a missing evaluation: S7 predates my
+    `slices/<id>/impl-eval-verdict*.jsonl` convention, and its evaluator records live as markdown in
+    `slices/s7/` instead — `evaluate.md`, `evaluate-cycle-2.md`, `eval-session-cycle-2.md`.
+  - **Real evaluator identities confirmed for S7, from those records and the comments themselves:**
+    - cycles 1–2 — *"Claude · Anthropic · Fable 5 · medium, native **opposite-family** IMPL-EVAL of
+      Codex · GPT-5.6 Sol work"*, with a session record for the cycle-2 NAS relaunch;
+    - the `a560d7e10` disposition delta — *"Independent evaluator: OpenRouter DeepSeek V4 Flash 0731 ·
+      max effort (sanctioned relay preset; native quota unavailable), read-only via GitHub API, no
+      mutation."*
+    So S7's PASS rests on genuine separate-session work; **no manual re-dispatch is warranted**, and
+    re-running it would burn a cycle and contradict the standing "existing DeepSeek evaluations remain
+    valid — do not rerun" ruling.
+  - **Every other slice's verdicts are mine, dispatched through the checked-in
+    `agentic:claude-openrouter` route**, each with a local `.jsonl` verdict artifact and a posted phase
+    comment naming the model and effort — S8 alone carries **7** artifacts across its eight bounded
+    deltas.
+  - **Automation gap recorded, and it is the second of its kind in this lane.** First: a
+    `ready_for_review` flip auto-queued a *redundant* evaluator against a valid verdict (#1831, D-172),
+    which is why `impl-eval:skip` is applied before every ready-flip here. Second, now: the same flip
+    can set `status:impl-eval` while launching **nothing**. **The label is a lifecycle marker, not
+    evidence** — in both directions. My standing practice already matches: every verdict in this lane
+    is backed by a supervisor-dispatched session plus an artifact, and one self-produced `evaluate.md`
+    was **quarantined** (D-234) precisely because a generator cannot commission its own.
