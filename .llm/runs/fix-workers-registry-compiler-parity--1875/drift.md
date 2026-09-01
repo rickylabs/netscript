@@ -22,3 +22,18 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept the in-policy fallback; do not authorize paid-credit continuation.
 - **Evidence:** `supervisor.md` route table and Claude session logs.
+
+## 2026-09-01 — Formal evaluator route exhausted prescribed options
+
+- **What:** The prescribed native Fable 5 medium formal evaluator was quota-blocked, and the
+  prescribed OpenRouter GLM 5.3 Flash max fallback could not complete an evaluator artifact.
+- **Source:** Formal IMPL-EVAL launch attempts after candidate
+  `e400cd3f9998c16302c7c74abde440f86b602651` was frozen.
+- **Expected:** Fable 5 medium, falling back to `z-ai/glm-5.3-flash` max.
+- **Actual:** Fable required paid credits; the first GLM launch rejected deferred custom tools; the
+  tool-search-disabled retry stalled and was terminated. A fresh native Opus 5 medium session
+  `impl-eval-1875-native-fallback` completed the evaluation and returned `PASS`.
+- **Severity:** moderate
+- **Action:** accept the transparent model-identity deviation. Separate-session and opposite-family
+  independence were preserved, and the evaluator independently re-ran the focused evidence.
+- **Evidence:** `evaluate.md` metadata, route-deviation table, empirical checks, and verdict.
