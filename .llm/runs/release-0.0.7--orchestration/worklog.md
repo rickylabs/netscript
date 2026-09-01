@@ -3551,3 +3551,21 @@
   already-merged #1816 and #1835 run directories without changing product blobs.
 - The train remains active: Fixes lands #1773, then immediately implements and ships #1844's Garnet
   readiness/alignment repair; Aspire consumes that merge and completes the remaining 13.5 sequence.
+
+## 2026-09-01T05:41:16Z — retention correction lands; #1773 and Aspire source-safety ship
+
+- Recovery PR #1852 restored all 17 `.llm/runs/fix-sdk-cli-key-normalization-residuals--1833/**`
+  paths byte-identically and merged as `4cf519f7d`; no product blob changed.
+- Policy PR #1853 promoted the owner-controlled retention rule to `main` in root `AGENTS.md`, the
+  Harness skill, and the milestone profile. Exact docs-only CI and the review-thread gate passed;
+  it merged as `28c4db2b0`. False issue #1847 is closed as not planned with the ruling in place.
+- PR #1773 restored its 25-file scoped run, passed fresh exact-head core CI (including repo-wide
+  check/test, quality, close-gate, acceptance, and zero threads), and merged as `d9e0f1ebb`, closing
+  #1616. Fixes immediately released #1844 implementation for deterministic RESP readiness plus the
+  Garnet 1.1.10 alignment/drift guard.
+- Aspire PR #1837 restored its six-file scoped run, repaired the structural readiness-fixture seam,
+  retained both independent PASS verdicts by exact product identity, and passed fresh core CI. It
+  merged as `1f50c98ce`, closing #1836. Aspire continues S8 and watches #1844 for immediate S7
+  convergence; neither lane is parked.
+- The earlier #1816 run deletion remains the only known merged context gap. Internals owns one
+  bounded restoration leaf from pre-strip head `16887ad0d`; no product files may enter that PR.

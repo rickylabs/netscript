@@ -333,6 +333,21 @@ artifact-pinned production E2E.
   production E2E. Docs/internal work cannot become a global barrier, but incomplete Aspire 13.5
   migration work cannot leak into this checkpoint.
 
+## 2026-09-01T05:34:09Z–05:41:16Z — harness retention corrected and two product gates ship
+
+- Recovery PR #1852 head `a4e684ee5` restored 17 previously stripped #1835 run artifacts
+  byte-identically and squash-merged as `4cf519f7d`. Policy PR #1853 head `adb3eb69f` then made the
+  owner-controlled `.llm/runs/**` retention rule authoritative on main and squash-merged as
+  `28c4db2b0`; false issue #1847 was closed.
+- Fixes PR #1773 head `550bc44e9` preserved all 25 scoped run artifacts, passed fresh exact-head
+  core CI and its carried four-lane hosted runtime evidence, and squash-merged as `d9e0f1ebb`,
+  closing #1616. The merge releases the shared E2E seam for #1844's Garnet repair.
+- Aspire PR #1837 head `bcb5717e6` preserved its restored six-file run, repaired semantic fixture
+  discovery without weakening source-safety, passed two independent evaluator verdicts and fresh
+  core CI, and squash-merged as `1f50c98ce`, closing #1836.
+- These are merge-history members, not a canary trigger by themselves. Canary 6 still requires the
+  complete Aspire 13.5 payload; Fixes #1844 and Aspire S8/S7 are actively advancing that boundary.
+
 ## 2026-08-31T16:03:24Z — typed principal/procedure policy joins canary 5 payload
 
 - PR #1762 head `e3852dfb51108a6a49b30fc1f918e164defb90b2` squash-merged as

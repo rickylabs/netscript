@@ -2280,3 +2280,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Merge sequence remains execution-focused: merge #1773 after restored-head CI, release #1844 to
   implement and ship the Garnet 1.1.10/readiness alignment, then have Aspire pull current main and
   finish its 13.5 dependency chain for canary 6. Independent topic work continues in parallel.
+
+## Resume delta — 2026-09-01T05:41:16Z
+
+- Current main is `1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08`. Recovery #1852 restored the 17
+  #1835 run artifacts; policy #1853 made owner-controlled run retention authoritative on main;
+  false issue #1847 is closed. The only known already-merged context gap is #1816's seven-file run,
+  assigned to a bounded Internals restoration leaf.
+- Fixes #1773 merged as `d9e0f1ebbf63de351084f4401d86487c9f373f14` with all 25 run files intact and
+  closed #1616. #1844 is actively implementing the fragmented-RESP readiness correction and Garnet
+  1.1.10 alignment/drift guard against the released seam; its first RED commit is landed locally.
+- Aspire #1837 merged as `1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08` with its restored six-file run,
+  structural fixture repair, two independent PASS verdicts, and fresh green core CI, closing #1836.
+  Aspire continues S8 now and will pull #1844 immediately for S7/Phase-B completion.

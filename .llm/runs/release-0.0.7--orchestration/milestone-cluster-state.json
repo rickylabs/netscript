@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "60ae56af0144644db00b0e2fdc28986919ee12ee",
+  "currentMainSha": "1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -2714,7 +2714,7 @@
     {
       "id": "app-service-client-wiring",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
       "currentPrHeadSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
@@ -3652,14 +3652,16 @@
       "lane": "fixes",
       "phase": "blocked",
       "baseBranch": "main",
-      "headSha": "c06d365465d3898dbf26c92f98c6e64ce4155057",
-      "currentPrHeadSha": "c06d365465d3898dbf26c92f98c6e64ce4155057",
+      "headSha": "550bc44e9f0b5622c06f1106bbc68cbb44910d2c",
+      "currentPrHeadSha": "550bc44e9f0b5622c06f1106bbc68cbb44910d2c",
       "issueNumbers": [1616],
       "branch": "test/scaffold-dynamic-route-gate",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1616",
       "prNumber": 1773,
-      "implementationState": "clean harness and plan checkpoint at c06d3654; no product implementation or substantive CI is claimed",
-      "nextGate": "complete plan gate and selected PLAN-EVAL if risk warrants, then red-first implementation and any serialized runtime proof"
+      "implementationState": "dynamic Fresh route scaffold and critical end-to-end runtime gate shipped with all 25 scoped harness artifacts preserved under the owner retention ruling",
+      "mergeCommitSha": "d9e0f1ebbf63de351084f4401d86487c9f373f14",
+      "mergedAt": "2026-09-01T05:38:19.000Z",
+      "nextGate": "terminal merged and shipped; #1616 closed"
     }
   ],
   "evaluatorLeases": [
@@ -5336,7 +5338,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "60ae56af0144644db00b0e2fdc28986919ee12ee",
+    "gitHead": "1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -5379,5 +5381,5 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-08-31T18:41:10.000Z"
   },
-  "updatedAt": "2026-08-31T21:34:03.000Z"
+  "updatedAt": "2026-09-01T05:41:16.000Z"
 }
