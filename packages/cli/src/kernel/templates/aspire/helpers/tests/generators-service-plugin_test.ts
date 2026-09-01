@@ -3,11 +3,7 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import {
-  assert,
-  assertEquals,
-  assertStringIncludes,
-} from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import type { PluginEntry } from '@netscript/aspire/types';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
@@ -289,11 +285,11 @@ describe('generateRegisterPlugins', () => {
       ...emptyOptions,
       plugins: { auth: fixtures.MINIMAL_PLUGIN },
     });
-    assertStringIncludes(output, "builder.addExecutable('auth', 'deno', workdir,");
+    assertStringIncludes(output, 'builder.addExecutable("auth", \'deno\', workdir,');
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, "'--unstable-no-legacy-abort'");
     assertStringIncludes(output, ".withHttpEndpoint({ port: 4400, env: 'PORT' });");
-    assertStringIncludes(output, "plugins.set('auth'");
+    assertStringIncludes(output, 'plugins.set("auth"');
   });
 
   it('emits SQLite FFI exactly once for plugin services', () => {
@@ -341,7 +337,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('auth', config.Version, 'executable')",
+      'buildOtelEnvVars("auth", config.Version, \'executable\')',
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
@@ -355,7 +351,9 @@ describe('generateRegisterPlugins', () => {
 
     assertStringIncludes(
       output,
-      `await resource.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+      `await resource.withHttpHealthCheck({ path: ${
+        JSON.stringify(RESOURCE_DEFAULTS.AppHealthCheckPath)
+      }, endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
     );
     assert(
       output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
@@ -373,7 +371,7 @@ describe('generateRegisterPlugins', () => {
       plugins: { auth: { ...fixtures.UNPINNED_PLUGIN, HealthCheckPath: false } },
     });
 
-    assertStringIncludes(custom, "path: '/ready'");
+    assertStringIncludes(custom, 'path: "/ready"');
     assert(!disabled.includes('withHttpHealthCheck'));
   });
 
@@ -404,10 +402,10 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      '// --- notifications: wire PluginReferences via endpoint env vars ---',
+      '// --- plugin 1: wire PluginReferences via endpoint env vars ---',
     );
-    assertStringIncludes(output, "plugins.get('auth')?.getEndpoint('http')");
-    assertStringIncludes(output, "resource.withEnvironment('services__auth__http__0'");
+    assertStringIncludes(output, 'plugins.get("auth")?.getEndpoint(\'http\')');
+    assertStringIncludes(output, 'resource.withEnvironment("services__auth__http__0"');
   });
 
   it('should wire service references in pass 1 (services already exist)', () => {
@@ -419,8 +417,8 @@ describe('generateRegisterPlugins', () => {
       output,
       '// Service references (wired via endpoint env vars',
     );
-    assertStringIncludes(output, "services.get('users')?.getEndpoint('http')");
-    assertStringIncludes(output, "resource.withEnvironment('services__users__http__0'");
+    assertStringIncludes(output, 'services.get("users")?.getEndpoint(\'http\')');
+    assertStringIncludes(output, 'resource.withEnvironment("services__users__http__0"');
   });
 
   it('should handle RequiresDb dependency', () => {
@@ -506,7 +504,6 @@ describe('generateRegisterPlugins', () => {
     assert(!output.includes('builder.addExecutable('));
     assert(!output.includes('/services'));
   });
-
 });
 // generateRegisterBackground
 // --------------------------------------------------------------------------
