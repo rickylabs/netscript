@@ -5740,3 +5740,27 @@
   - **The quarantine is stated to the author directly**, with instruction to **delete `evaluate.md`**,
     and the sanctioned verdict is posted publicly on #1754 with the quarantine noted so the PR record
     cannot be read as carrying a self-certified PASS.
+
+- **D-236 — S8 took option (a): shared persistence budget at `608f8f2da`. Quarantine complied with.**
+  - Repair `608f8f2da fix(cli): share typed diagnostic persistence budget` computes `sharedLineBytes`
+    (~line 179) from the total `MAX_ACTIONABLE_STDERR_BYTES` divided across the **combined** line
+    count of both streams, rather than applying the ceiling per stream. That is the preferred option,
+    and the right shape: the budget now belongs to the artifact, not to each input.
+  - **`evaluate.md` is gone** — verified `git ls-tree` count **0**. The quarantine instruction was
+    followed rather than argued with.
+  - **Delta-6 eval dispatched, framed to be measured rather than reasoned.** The previous evaluation
+    earned its finding by *measuring bytes*, so this one must check the repair the same way: flood
+    both streams and report the measured size of **all three** artifacts — persisted error file,
+    request-mode result record, flattened `presentDbCliResult` message — each **≤ 16 KiB**.
+  - Three questions the brief adds that a naive "it's capped now" check would miss:
+    1. **the fixture must pin the artifact, not the inputs** — a test asserting constants or
+       per-stream behaviour would leave the defect open, since that is exactly the shape that let it
+       through;
+    2. **degradation under one dominant stream** — with a shared budget, a flooded stderr must not
+       starve a real stdout error out of the record, which was the entire point of retaining stdout;
+    3. **single-stream parity** — D-224's original stderr-only flood should still produce its
+       documented `16,383 B`, or the deviation must be recorded.
+  - Also required: **UTF-8 safety across the new arithmetic** (`sharedLineBytes` must not split a
+    multi-byte character at any division), verification that all five earlier deltas survive, and that
+    the D-224 artifact, `context-pack.md` and `drift.md` now describe the shared budget accurately —
+    **unrecorded drift is what produced this defect in the first place.**
