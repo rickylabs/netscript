@@ -9558,3 +9558,34 @@ re-run armed at the unchanged head.
 
 **#1894/#1888** ready-merge, close-gate rerun armed. **#1890/#1879** IMPL-EVAL running. **#1889/#1351**
 IMPL-EVAL running. **#1846** watcher background-only; lane currently occupied.
+
+### D-216 — reconciliation of #1351/#1879/#1894 against main `e938ecd31` (read-only, pre-verdict)
+
+Main advanced to `e938ecd31` via #1887 while both remaining IMPL-EVALs were mid-flight. Converging a
+leaf whose evaluator is running would move the evaluated head and void the verdict, so the
+reconciliation was done **without touching either head**, via `git merge-tree --write-tree`.
+
+| Leaf | Head | merge onto `e938ecd31` | Predicted tree |
+| --- | --- | --- | --- |
+| #1879 | `1914a38c6` | **clean, rc=0** | `06ad9db7e` |
+| #1351 | `6a1a001ad` | **clean, rc=0** | `dbb0d4fa3` |
+
+**Blob-safety of the incoming delta** (does main's advance touch each slice's evaluated surface?)
+
+- **#1351 — SAFE, zero overlap.** Incoming: `.llm/tools/agentic/teardown/*`, `extract-verdict.ts`,
+  `run-codex-slice-lib_test.ts`, and the `aspire` SKILL mirrors. **Nothing under `packages/sdk`** —
+  the slice's entire product surface. The verdict at `6a1a001ad` carries across the merge unchanged.
+- **#1879 — SAFE, but it *does* touch the owned surface.** Main's advance modifies **`deno.lock`**
+  and **`plugins/workers/deno.json`**, and #1879 is precisely a dependency-manifest/catalog/lock
+  slice, so this was checked line-by-line rather than assumed. Both edits add the single entry
+  `@netscript/config@0.0.6` — a **first-party JSR workspace member**, disjoint from the `@orpc/*`
+  **npm** family this slice bumps to `^1.15.0`. No `@orpc` line, no npm catalog entry, and no
+  fixture import is touched.
+
+**Obligation this creates:** because #1879's lock changes at all, its load-bearing gate
+(`deno why @orpc/shared` single-copy + no-mixed-version audit) must be **re-run at the integrated
+head**, not carried from the pre-merge run. #1351 requires only its zero-dependency-churn re-proof
+and SDK check.
+
+Hazard restated: `merge-tree` proves mergeability and content, **not** that the merge was taken —
+each leaf still gets exactly one real convergence commit after its verdict lands.
