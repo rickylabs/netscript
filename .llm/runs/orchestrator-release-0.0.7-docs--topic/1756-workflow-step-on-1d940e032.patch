@@ -1,0 +1,47 @@
+From 431945fe1f8bbe202c284ed6a0c7119c086d1003 Mon Sep 17 00:00:00 2001
+From: Rickylabs <eric.chautems@gmail.com>
+Date: Mon, 31 Aug 2026 06:26:15 +0200
+Subject: [PATCH] ci(docs): enforce JSDoc example imports in the quality job
+
+Adds the bounded 8-line jsdoc-example-compile gate step to the quality
+job, satisfying #1533's acceptance line that the gate run in CI on
+packages/** and plugins/** changes (classifier maps both to needs_deno,
+which drives this job's RUN_DENO).
+
+Applied surgically against current main rather than restoring the file
+from the recovered SHA: that wholesale restore was +8/-7 and would have
+silently deleted main's newer 'Aspire version parity (phase 1)' step.
+This change is +8/-0 and preserves it; the step-name set-difference
+against main is empty (49 -> 50 steps).
+
+Completes the pair with the salvaged implementation and its regression
+repairs: the focused suite is 18/18 at this head
+(jsdoc-example-workflow_test.ts asserts on this file).
+
+Refs #1533
+---
+ .github/workflows/ci.yml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 17a6d4c5b..b4637a598 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -366,6 +366,14 @@ jobs:
+           .llm/tools/gates/run-gate.ts --gate docs-accuracy --id quality-docs-accuracy
+           --output .llm/tmp/gate-receipts/quality/docs-accuracy.json
+ 
++      - name: JSDoc example import and fence integrity
++        if: env.RUN_DENO == 'true'
++        run: >-
++          deno run --allow-read --allow-write --allow-run --allow-env
++          .llm/tools/gates/run-gate.ts --gate jsdoc-example-compile
++          --id quality-jsdoc-example-compile
++          --output .llm/tmp/gate-receipts/quality/jsdoc-example-compile.json
++
+       - name: Agent docs corpus freshness
+         if: env.RUN == 'true'
+         run: >-
+-- 
+2.39.5
+
