@@ -165,3 +165,23 @@ create a migration and instructed the operator to run `netscript db migrate --na
 Resolution: preserve the public Aspire action name `migrate` but map its internal task operation to
 the already-generated `db:deploy:<engine>` task (`prisma migrate deploy`). Apply the same mapping to
 Container request mode and direct External/SQLite execution; seed/reset are unchanged.
+
+## D-15 — stdout retention doubled D-224's persisted total
+
+D-13 described stdout as independently bounded and incorrectly said D-224's 16-KiB ceiling remained
+unchanged. The constants remained unchanged per stream, but the persisted artifacts concatenate
+both retained streams. At `e4464e9f4`, the new generic flood fixture measured a 32,767-byte error
+file, 33,479-byte request result JSON record, and 32,893-byte flattened message. This is contract
+drift, not a new combined-bound contract.
+
+Resolution uses option (a): retain the D-224 line count, 8/24 head-tail split, 511-byte maximum line
+allowance, tail bias, and UTF-8-safe truncation per stream, then derive a smaller final allowance
+from one shared 16-KiB pool when both streams retain detail. Request serialization additionally
+accounts for its JSON envelope and duplicated promoted message. The same fixture now measures
+16,383 bytes, 16,384 bytes, and 16,061 bytes respectively. D-13's statement that stdout is
+independently bounded is superseded by this shared persisted-total rule.
+
+The generic failure selector also no longer scans stderr as a block before stdout. Retained lines
+carry their observed complete-line capture sequence, so a real earlier stdout error outranks a later
+failure-shaped informational stderr line. Separate OS pipes do not expose a total kernel timestamp;
+the repair intentionally claims observed line-completion order only.
