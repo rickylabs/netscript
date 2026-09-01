@@ -758,3 +758,24 @@ Deno.test('public-only any tokens require the same verified allowance record', a
     'malformed-registration',
   ]);
 });
+
+Deno.test('multi-line template fixture source is data, but interpolated expressions are not', async () => {
+  const root = await Deno.makeTempDir();
+  await Deno.writeTextFile(
+    join(root, 'emitter.ts'),
+    [
+      'export const fixture = `',
+      'export const db: any = {};',
+      '`;',
+      'export const interpolated = `',
+      'const x = ${(value as unknown as Target)};',
+      '`;',
+      'const real: any = 1;',
+    ].join('\n'),
+  );
+  const findings = await scanCodeQuality(['emitter.ts'], root);
+  assertEquals(
+    findings.map((finding) => `${finding.rule}:${finding.line}`),
+    ['unsafe-cast:5', 'explicit-any:7'],
+  );
+});
