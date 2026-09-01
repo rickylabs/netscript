@@ -30,13 +30,13 @@ callback-array rejection fixtures, and an assertion for the previously uncovered
 
 ## In progress
 
-- Commit/push/PR handoff and separate-session IMPL-EVAL.
+- Separate-session IMPL-EVAL for draft PR #1886.
 
 ## Next steps
 
-1. Commit and push the single slice with an explicit refspec.
-2. Open/update the draft PR with the owner-specified metadata and no closing keyword.
-3. Hand off to a separate-session IMPL-EVAL selected by the supervisor.
+1. Run separate-session IMPL-EVAL selected by the supervisor at the final immutable head.
+2. Address any evaluator findings without widening scope.
+3. The supervisor decides close-gate/issue closure; this PR contains no closing keyword.
 
 ## Key decisions
 
@@ -76,4 +76,6 @@ callback-array rejection fixtures, and an assertion for the previously uncovered
 
 ## Commits
 
-- See the draft PR's commit list and per-slice PR comments once opened.
+- Implementation/evidence commit: `102171e89`.
+- Draft PR: https://github.com/rickylabs/netscript/pull/1886.
+- See the draft PR's commit list and per-slice PR comments for the live trail.

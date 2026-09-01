@@ -67,6 +67,8 @@ sequencing, or public-surface decision remains open.
 | 2026-09-01 | slice 1 | focused gates | 13 focused tests passed; RFC compile fixture checked with 0 diagnostics. |
 | 2026-09-01 | slice 1 | full gates | Scoped SDK wrappers, fitness, publish, and lock gates completed; no production or export delta. |
 | 2026-09-01 | slice 1 | reconcile | #1349 remains referenced without a closing keyword; #1348 remains an epic; later ordered slices and header authorship remain untouched. |
+| 2026-09-01 | slice 1 | commit/push | Implementation + run evidence committed as `102171e89` and pushed with explicit refspec to `feat/sdk-client-s3-remaining`. |
+| 2026-09-01 | slice 1 | PR | Draft PR #1886 opened against `main` with the complete owner-specified labels and milestone 0.0.7 (GitHub milestone id 27). |
 
 ## Gate results
 
@@ -92,3 +94,5 @@ sequencing, or public-surface decision remains open.
 - Confirm no `http-client-link.ts`, export-map, `port`, `timeout`, server, or runtime gate change.
 - Automated gate success is not self-certification; a separate-session IMPL-EVAL remains the
   supervisor's next gate.
+- Draft PR: https://github.com/rickylabs/netscript/pull/1886. It references #1349 and #1348 without
+  a closing keyword.
