@@ -6201,3 +6201,41 @@
     top-up rebase at final convergence regardless.
   - `#1858`'s repaired full run **proved generated-quality green**, which independently confirms the
     D-227/D-229 emitted-helper compile repair on the shared baseline.
+
+- **D-252 — S8 reconciliation PUSHED at `854e45cb8`; PR updated; S9/S10 restack shape analysed and it
+  is clean.**
+  - **Pushed** with `--force-with-lease` against the exact prior SHA `467d0d1fd` read by
+    `git ls-remote` immediately beforehand — the rebase rewrote 26 commits, so a lease was required,
+    and a live worker still held the worktree.
+  - **A6 recorded on #1754 with the grep proof and the distinction that matters**: `0` files carrying
+    `PROCESS_COMMANDS_FLAG`; the single remaining `Aspire 13.4` hit is
+    `render-ts-apphost.ts:81` — a **tsconfig-validation** comment, not the seam's — so A6 is satisfied,
+    and that leftover is logged against **S13 (#1724)** rather than widened into S8.
+  - **The agent's own record of what was deleted vs carried forward is exactly the shape D-248
+    demanded**: deleted the `maybeWithProcessCommand(...)` emission, its flag/version support, and the
+    negative test block repeating the removed vocabulary; carried forward — re-expressed against main's
+    emission shape — error-file resolution, `monitorToolFailure`, `targetState`,
+    `publishResourceUpdate`, runner argv, the typed `<db>-cli` surface, graph-injected Container
+    behaviour, External/SQLite branches, and every non-A6 semantic assertion.
+  - **Main moved three times mid-replay** (`78be0e032` → `233828f0f` → `3b6386e14`) and the agent
+    re-fetched and replayed each time with **zero conflicts** after the ruled five; the last was
+    #1840, launcher separators only, with **no package-content change**. It explicitly did **not**
+    misreport that as a sixth semantic conflict — a distinction worth noting, because a replay that
+    keeps re-running can easily look like unresolved churn.
+  - **S9/S10 restack is clean and mechanically identical for both:**
+
+    | Slice | Head | contains old S8 | contains new S8 | own commits | command |
+    | --- | --- | --- | --- | ---: | --- |
+    | S9 | `a8cf585b0` | YES | no | **14** | `git rebase --onto 854e45cb8 d1c6d8b54` |
+    | S10 | `21a0bfec6` | YES | no | **13** | `git rebase --onto 854e45cb8 d1c6d8b54` |
+
+    Both branch at the **old S8 head `d1c6d8b54`**, so a plain `rebase origin/main` would replay S8's
+    commits a second time — the same trap as D-208, and the reason the `--onto` form is recorded here
+    before dispatch.
+  - **Neither S9 nor S10 touches the A6 seam or the #1837-hardened generators** — `0` overlapping files
+    each. So they should **not** hit the five conflict points S8 just resolved, and the restack is
+    expected mechanical. Recorded as a prediction to check against, not an assumption to skip
+    verification on.
+  - **Deferred deliberately:** the restack waits for S8's **final** head after the top-up onto current
+    main plus **#1858** and **#1863** SHAs. Restacking onto `854e45cb8` now would force a second
+    restack immediately afterwards.
