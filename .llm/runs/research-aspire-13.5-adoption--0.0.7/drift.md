@@ -5795,3 +5795,32 @@
     **"Not mine, here is the evidence" is stated as a complete and welcome answer.**
   - Runtime boundary held: if a live control is genuinely required, the agent must **stop and report
     what it would run** rather than start anything.
+
+- **D-238 — the ownership discipline worked exactly as intended: one defect claimed and repaired, one
+  correlated-but-unproven and LEFT ALONE.**
+  - **D-16, owned and repaired (`439959045`):** the S8 verifier **stopped the real Postgres resource**
+    and waited for its **real** listener key to go Unhealthy — but D-101 already documents that
+    `aspire resource stop` **suspends health evaluation** for a persistent container and leaves the
+    **last health report cached**. Run `33460896691` observed exactly that: resource stopped,
+    `postgres_listener` still `Healthy`. The verifier was using an actuator known not to update
+    health. The repair drives D-101's **synthetic** listener and test-only key, keeping the real
+    resource alive.
+  - **D-17, NOT claimed — and this is the part worth keeping.** The sqlite
+    `runtime.health.listener-unreachable` regression correlates with D-233 making deploy succeed, so
+    the suite no longer takes its **failure-only AppHost restart path**: the earlier *restarting* head
+    passed that gate, the later *non-restarting* head lacked the test-only Garnet report at baseline.
+    The agent wrote, in its own words, that this proves **"reachability and correlation, not
+    ownership"**, noted the S8-free control run **timed out** before reaching the gate, and **left
+    sqlite unchanged** rather than repairing on a correlation.
+    That is precisely the discipline the D-237 brief asked for, and the opposite of what happened when
+    I let a correlation drive the convergence cascade in D-207/D-215.
+  - **Control evidence already in hand, worth surfacing:** #1744's forced `ci:full` run
+    (`33425247583`) is **S8-free** and its **sqlite tier passed**. That is not a perfect control —
+    different head and base — but it is a real data point on the "not S8's" side, and better than the
+    timed-out run the agent had available.
+  - **Delta-7 eval dispatched** pressing the load-bearing premise (does `aspire resource stop` really
+    suspend health evaluation — if not, the repair aims at the wrong thing), whether the new actuator
+    is the **sanctioned** D-101 mechanism rather than a second parallel one, and above all whether
+    **the assertion still bites**: a test that now passes by *not testing* the condition would be
+    worse than the failure it replaces. It must also **re-measure** the combined persisted total to
+    confirm D-235/236 survives, and give its own opinion on whether the sqlite disposition is correct.
