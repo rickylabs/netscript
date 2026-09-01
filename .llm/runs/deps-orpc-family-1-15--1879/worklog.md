@@ -154,3 +154,23 @@ Integrated head (line number and exact package key):
 ## Handoff Notes
 
 - Owner retains IMPL-EVAL. Do not run it or flip the draft PR ready.
+
+## Convergence onto main `e938ecd31` (post-verdict)
+
+IMPL-EVAL returned **PASS** at evaluated head `1914a38c6`; the evaluator committed its own artifact
+as `1c1d419a9`. One convergence merge was taken on top of that.
+
+**Why the verdict carries.** The merge introduced exactly one line into `deno.lock` —
+`jsr:@netscript/config@0.0.6`, a first-party JSR workspace member entering `plugins/workers` from
+#1874. The evaluated dependency surface is unchanged across the merge: the `@orpc` resolved set is
+**17 entries, byte-identical** pre- and post-merge, and the root catalog's `@orpc/` lines remain 7.
+
+**Load-bearing gates re-derived at the integrated head** — not carried from the pre-merge run,
+because `deno.lock` changed at all:
+
+| Gate | Result |
+| --- | --- |
+| `deno why @orpc/shared` | `DENO_WHY_REAL_EXIT=0`; **exactly one** resolved copy, `1.15.0` |
+| Lock no-mixed audit | **17 distinct `@orpc/*` names, one version each, 0 mixed** |
+| Frozen install | `FROZEN_REAL_EXIT=0` |
+| Residue | `git status --porcelain` empty |
