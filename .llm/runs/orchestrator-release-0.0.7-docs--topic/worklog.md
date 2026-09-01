@@ -3137,3 +3137,40 @@ this change's own edit, then assert the specific recently-merged content survive
 `quality`, and marking ready afterwards does not re-trigger — the run looks green on an incomplete
 check set); and `gh run rerun` replays the same commit, so it can never pick up a repaired base —
 only converge-and-push gets a current-base run.
+
+### #1777 package programme closed out; #1857 opened on a defect it surfaced
+
+All ten #1777 package slices shipped (main carries 29 mapping rows). Rather than close the umbrella,
+I audited its own acceptance and found clause 1 unmet: **seven plugin reference pages** are neither
+mapped nor carry a recorded exclusion. Measured 55 findings across them on `78be0e032` and filed
+**#1857**, then posted a completion audit on #1777 so its open state reads truthfully instead of
+looking stalled.
+
+**Two of those findings were published falsehoods, not omissions.** `triggers` and `workers` both
+documented a `/scaffolding` sub-path. Before specifying any fix I verified three independent legs —
+because if any were false, deleting the content would have been the wrong call:
+1. neither `deno.json` exports `./scaffolding` (both export `./scaffold` -> `./scaffold.ts`);
+2. `src/scaffolding/` does not exist in either plugin;
+3. every symbol those sections documented (`triggerScaffolder`, `createWorkersItemScaffolders`,
+   `WORKERS_TASK_SCAFFOLD_RUNTIMES`, …) is exported **nowhere** in `plugins/` or `packages/`.
+
+So the sections described a surface that is not shipped. **#1860** removed them and documented the
+real `./scaffold`; merged at `b66e52cbc`. Verified on main afterwards: `INVENTS` 2 -> 0, zero
+`scaffolding` mentions, 5 residual `OMITS` correctly deferred.
+
+**IA determination — `auth` vs `plugin-auth` are not duplicative.** The identical 9-vs-9 finding
+counts were an artifact of both resolving to the same `packageName`, not overlapping content. `auth`
+is a **hub** naming six packages with **zero** specifier rows; `plugin-auth` is a single-package page
+naming two, and they cross-link deliberately. Disposition: adopt `plugin-auth`; **exclude the `auth`
+hub with a recorded rationale** — gating a six-package hub against one `packageName` would be wrong
+by construction, and excluding it leaves no gap because all five other packages it names are already
+gated. I added the point the framing missed: the exclusion must be written into the checker as a
+durable comment, since a silent omission is exactly what clause 1 exists to prevent.
+
+**Slicing to respect the serial corpus seam:** slice A = `sagas`/`streams`/`plugin-ai` (chosen
+because #1860 does not touch those pages, so they cannot conflict with it in flight); slice B =
+`triggers`/`workers`/`plugin-auth` + the `auth` exclusion, queued behind. The brief for A warns that
+the three pages *look* identical in their findings but are not the same defect — `sagas` and
+`plugin-ai` use an unrecognized `## Entrypoints` heading, while `streams` already uses a recognized
+heading and still omits everything, so its fault is structural and must be diagnosed separately.
+Assuming sameness is precisely how the `auth-kv-oauth` Path-column case would have been mis-fixed.
