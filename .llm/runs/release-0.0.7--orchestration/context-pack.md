@@ -2396,3 +2396,15 @@ continues concurrently because serial ordering is per orchestrator, not global.
   converging S8-S13 statically on current main while only Phase B waits for the Fixes chain. Docs
   #1756, Internals #1802/#1543/#1846, and Features #1872/#1354 remain active in parallel.
 - No owner decision is pending. Runtime inventory remains Aspire `[]` and containers 0.
+
+## Resume delta — 2026-09-01T16:52:00Z
+
+- Milestone coverage is 46 open issues plus 20 open PRs; all 46 issues have exactly one topic owner.
+  The coordinator repaired stale lifecycle metadata and dispatched the highest-impact issues that
+  had ownership labels but no visible lane: Features #1874/#1875/#1349, Fixes #1845/#1868/#1455,
+  and Aspire #1855/#1851.
+- #1865 now integrates the #1878 baseline repair at head `03def015b`; its exact hosted two-tier run
+  is active. #1848 has regenerated its combined corpus at `53398a818`, and #1802 is awaiting a
+  mechanically exact-head delta verdict plus terminal `check-test`, not a product repair.
+- #1351 excludes the dependency family bump. Separate #1879 owns a stable-v1.15 lock-only move with
+  frozen-install, single-`@orpc/shared`, and no-mixed-version evidence. No owner decision is pending.

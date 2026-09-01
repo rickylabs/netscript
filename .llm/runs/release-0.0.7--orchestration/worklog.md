@@ -3711,3 +3711,21 @@
 - Docs continues #1756 source/negative-test repair, Internals continues #1802/#1543/#1846, and
   Features continues #1872/#1354 while the ordered #1848 carrier converges. No owner decision is
   pending. Host inventory is still Aspire `[]` and containers 0.
+
+## 2026-09-01T16:52:00Z — complete issue ownership audited; hidden lanes dispatched
+
+- GitHub reports 46 open milestone issues plus 20 milestone PRs. All 46 issues have exactly one
+  topic-orchestrator label; no issue is unowned or multiply owned. Nineteen non-umbrella issues had
+  no visible open implementation/plan PR, so the coordinator dispatched the release-critical gaps
+  rather than accepting label-only ownership.
+- Features now has #1874 and #1875 active beside #1872, with #1874 owning the official-sample
+  blocker, and must start #1349 while #1354 continues. Fixes must run #1845 and #1868 beside the
+  #1878 -> #1865 P0 front, then #1455. Aspire must run static #1855 and #1851 beside S8-S13; Docs
+  stays within 0.0.7 and supports other topic owners with read-only docs audits after #1533.
+- The coordinator corrected twelve stale issue lifecycle labels, made PR #1856 visible in milestone
+  27 with full taxonomy, and marked #1863/#1870/#1865 `status:ci-fail` until the workers baseline is
+  exact-green. Partial closure paths are explicit: #1590 needs its browser slice after #1848, #1452
+  needs its generated consumer-boot follow-on after #1842, and #863 gates 2-3 remain after S8.
+- #1351 is ruled as a transport-policy-only refactor. Internals filed #1879 for the separate
+  stable-v1.15 whole-family lock move with frozen-install and no-mixed-version proof; no oRPC v2
+  migration is admitted. No owner decision is pending.

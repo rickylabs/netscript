@@ -1616,3 +1616,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   `standing by`; Phase B starts immediately after the Fixes baseline merges under the runtime mutex.
 - Internals advances #1802/#1543/#1846 after shipped #1862; Docs advances #1756 and the next
   independent docs leaf. The coordinator verifies each exact packet and merges without owner delay.
+
+## 2026-09-01T16:52:00Z — label ownership is not sufficient lane coverage
+
+- Every open issue has one topic label, but each supervisor must also maintain a visible plan,
+  implementation PR, or explicitly ordered dependency checkpoint. The 19 hidden-lane findings from
+  the audit are now routed into concrete topic queues; release-critical #1874, #1845, #1868, and
+  #1855 dispatch immediately.
+- Features preserves #1349 -> Internals #1351 -> #1352 -> #1353 -> #1467 while running independent
+  #1354. Fixes preserves #1878 -> #1865 -> #1858 and may parallelize #1845/#1868/#1455 on disjoint
+  surfaces. Aspire continues S8-S13 plus static #1855/#1851; shared-file authors remain ordered even
+  when research/evaluation proceeds in parallel.
+- Partial PRs must create their next closure lane before merge handoff when the parent stays open:
+  #1848 -> #1590 browser slice, #1842 -> #1452 generated consumer-boot proof, and S8 -> #863 gates
+  2-3. Docs remains within milestone 27 and may audit other owners' docs without taking ownership.
