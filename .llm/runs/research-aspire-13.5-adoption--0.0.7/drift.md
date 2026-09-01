@@ -6411,3 +6411,31 @@
     evidence** — in both directions. My standing practice already matches: every verdict in this lane
     is backed by a supervisor-dispatched session plus an artifact, and one self-produced `evaluate.md`
     was **quarantined** (D-234) precisely because a generator cannot commission its own.
+
+- **D-259 — ownership-label reconciliation: the lane is already fully labelled. One real finding, and
+  it is not an ownership gap.**
+  - **All seven active Aspire PRs already carry `orchestrator:aspire`** — #1744, #1747, #1754, #1759,
+    #1760, #1771, #1779 — as do the merged leaves #1835, #1837 and the restoration PR #1852. **Nothing
+    was missing, so nothing was added**; inventing a label change to look responsive would have
+    dirtied the audit surface the coordinator is trying to make trustworthy.
+  - **Every backing issue is owned too**: #1719, #1720, #1721, #1722, #1723, #1724, #1732, #1642 all
+    `orchestrator:aspire`. Issues I filed this run are routed to their real owners rather than kept in
+    this lane — **#1839 → `orchestrator:internals`**, **#1844 → `orchestrator:fixes`**, and
+    **#1851 / #1855 → `orchestrator:aspire`** because they are genuinely Aspire-surface defects.
+  - **The one genuine gap is an `epic:` gap, not an ownership one.** **#1747 and #1732 lack
+    `epic:aspire-13-5`** while all six sibling slices carry it, and #1732's body contains no
+    `Part of #1712` reference. So an audit keyed on the **epic** label — not the orchestrator label —
+    omits the reference-name-validation leaf.
+    - **I did not add it.** The coordinator's instruction was ownership labels **without changing
+      lifecycle status**, and `epic:` membership is a scoping claim about whether this leaf is part of
+      the 13.5 epic — a judgement for the epic owner, not a clerical fill-in. Flagging it is the
+      correct action; asserting it is not.
+    - Worth deciding, because #1747 is one of the two leaves closest to merge.
+  - **`#1429` sits with `orchestrator:internals` and that is correct** — *"leak-check cannot see
+    orphaned Aspire process descendant"* is agentic-tooling, not Aspire product — even though **#1744
+    closes it**. A leaf can legitimately close an issue owned by another lane; the ownership label
+    tracks the **defect's** surface, not the closing PR's lane. Noted so a future audit does not
+    "correct" it.
+  - **Practice confirmed for future leaves**: apply `orchestrator:aspire` **at PR open**, not at
+    finalization, so orchestrator-keyed audits see the leaf while it is still active. This lane has
+    been doing that; the record now says so explicitly.
