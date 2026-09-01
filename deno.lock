@@ -4387,6 +4387,7 @@
         "dependencies": [
           "jsr:@david/dax@0.48",
           "jsr:@netscript/kv@0.0.6",
+          "jsr:@netscript/plugin-streams-core@0.0.6",
           "jsr:@netscript/plugin@0.0.6",
           "jsr:@netscript/telemetry@0.0.6",
           "jsr:@standard-schema/spec@1.1.0",
@@ -4585,6 +4586,7 @@
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/contracts@0.0.6",
           "jsr:@netscript/kv@0.0.6",
+          "jsr:@netscript/plugin-streams-core@0.0.6",
           "jsr:@netscript/plugin-triggers-core@0.0.6",
           "jsr:@netscript/plugin-workers-core@0.0.6",
           "jsr:@netscript/plugin@0.0.6",
