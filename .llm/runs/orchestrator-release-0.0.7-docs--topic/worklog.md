@@ -3248,3 +3248,56 @@ orchestrator-keyed audit — exactly the gap this correction closes.
 Every slice brief must instruct the implementer to apply `orchestrator:docs` **in the same
 `gh pr create` that opens the PR**, alongside `type:`/`area:`/`ci:` labels and the milestone. The
 supervisor still owns `status:` transitions; ownership is no longer deferred to finalization.
+
+## 2026-09-01 — #1866 merged (`8e01a347a`); #1857 slice B dispatched
+
+**#1866 merged by coordinator as `8e01a347a`.** Its in-flight GLM 5.3 Flash IMPL-EVAL was terminated
+rather than allowed to finish — the work was already merged, so the verdict could not change any
+decision and the spend would have been pure waste. Both pids had in fact already exited. **No
+completed evaluation was restarted**, per the coordinator's standing instruction.
+
+Verified on the new main: **32 mapping rows**, `plugin-sagas` / `plugin-streams` / `plugin-ai` all
+present. Slice A's Tier-A findings held.
+
+### Slice B measurement — re-probed on `8e01a347a`, NOT reused from the #1857 issue text
+
+Temp mappings inserted, real checker run, probe reverted (tree clean, baseline exit 0 at 32 rows):
+
+| Page | Package | Drift errors | Defect class |
+| --- | --- | ---: | --- |
+| `triggers` | `plugins/triggers` (11 exports) | 1 | omits `/adapter-cli` |
+| `workers` | `plugins/workers` (13 exports) | 4 | omits `/adapter-cli`, `/doctor`, `/jobs/health-check.ts`, `/runtime` |
+| `plugin-auth` | `plugins/auth` (9 exports) | 9 | **7 path mismatches + 2 omissions** |
+| `auth` | — | 9 | omits all 9 — **not a package page** |
+
+**Three corrections to the #1857 issue text, all found by re-measuring:**
+
+1. **Zero `INVENTS` findings remain.** #1860 removed both fabricated `/scaffolding` sections. The
+   issue text still describes them as live.
+2. **`auth` and `plugin-auth` are NOT duplicate pages with identical findings.** The issue text
+   asserted that. `auth/index.md` is a **multi-package hub** whose `## Units` table indexes five
+   packages (`plugin-auth`, `plugin-auth-core`, `auth-kv-oauth`, `auth-workos`,
+   `auth-better-auth`); `plugin-auth/index.md` is the package page and links back to it as "the auth
+   package map". Their finding sets differ in kind, not just in text.
+3. Counts moved (`triggers` 3→1, `workers` 6→4, `plugin-auth` 9→9-of-different-kind) because #1860
+   landed in between.
+
+**IA decision, now settled on evidence: adopt `plugin-auth`, exclude the `auth` hub.** Mapping the
+hub to `@netscript/plugin-auth` would force it to enumerate that one package's nine entrypoints and
+destroy its cross-package purpose.
+
+### Clause closure
+
+`36` published reference pages; `32` mapped. **The 4 unmapped are exactly slice B's scope**, so this
+slice closes #1857's clause and unblocks **#1777**.
+
+Slice B additionally requires a **self-enforcing** check — every reference page in exactly one of
+`AUTHORITATIVE_MAPPING` or a new `EXCLUDED_REFERENCE_PAGES` — in its own revertible commit. Without
+it #1777's acceptance is a point-in-time claim and the next new page is silently unpoliced, which is
+exactly how these four arose.
+
+**Dispatched:** Codex · `gpt-5.6-sol` · effort `high` (`complex_implementation`) on worktree
+`007-leaf-adoptB`, branch `docs/adopt-plugin-pages-b` at `f7ec4a750`. Brief carries the standing
+label-at-open rule. Launcher notes: `--provider` is mandatory, `--dest` must be a **file** path, and
+git-safety refuses a branch that has an upstream — `git branch --unset-upstream` clears it without
+removing the pushed remote branch.
