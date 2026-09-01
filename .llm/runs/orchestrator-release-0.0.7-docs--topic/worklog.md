@@ -3675,3 +3675,52 @@ docs site documents the alias while the skill denies it. Corroborated independen
 gate itself, which defers those exact literals to owner S9.
 
 Ownership, labels, and lifecycle were left untouched on both — advisory only.
+
+## 2026-09-01 — reconciled onto `102ef8a10`; #1848 added two more crossings; #1842 audit
+
+**#1848 crossed the ceiling again.** Its new `packages/fresh/src/runtime/navigation/` surface shipped
+two published `@example` blocks referencing undeclared names (`KeyedPartial`: `orderId`, `order`,
+`OrderSummary`; `mod.ts` `@module`: `currentRoute`), taking `unboundName` 116 → 118. Found by
+set-differencing the deferred dumps, not by reading counts. Repaired both with typed stand-ins,
+importing `ComponentChild` from the published specifier so the component stand-in carries the real
+return type. Census back to **116/15**, ceilings untouched, suite 18/18.
+
+That means the docs lane is now editing another lane's freshly merged source. It is the direct
+consequence of "repair, do not raise" — #1756 cannot land while each incoming merge re-crosses the
+ceiling — and it is flagged on the PR rather than done quietly.
+
+**Union assertions were re-run against the new base, not assumed to survive the rebase.** Zero task
+names and zero gate ids lost; additions exactly the three intended; no duplicate keys. That is the
+check that caught the earlier wholesale-restore, so it now runs on every rebase.
+
+**CI on `fb1061d5d`: `quality` PASSES** (Aspire parity restored, barrel regenerated), `code-quality`,
+`build`, all classifiers green. Remaining red is exactly the two things the missing workflow commit
+causes: `check-test` on `jsdoc-example-workflow_test.ts`, and `close-gate` on the one acceptance box
+deliberately withheld.
+
+**Second evaluator terminated** the moment main advanced, before any verdict — two stopped now
+rather than allowed to attest a head that will not merge. Fresh one dispatched on the final
+integrated head `239f4b53d` (pid 809502); it independently derived the enforced-vs-deferred
+distinction and the specifier-short-circuit trap.
+
+### #1842 audit — a merge-order landmine, verified not predicted
+
+`createPluginServiceContext`'s published `@example` uses
+`import('../../database/mod.ts')`. The gate's specifier rule matches dynamic `import(...)`, and this
+class is **enforced**, not deferred. Pasting their literal example into a published surface in a
+repaired tree produced `failures=1`, exit 1. So whichever of #1842/#1756 merges second turns
+`quality` red.
+
+Checked the obvious fix so they don't have to: `@database` is **not** available to
+`@netscript/plugin` — `JSDOC_SCAFFOLD_ALIAS_RULES` scopes it to contracts/database/
+prisma-adapter-mysql/service. Offered two routes: rewrite the example to depict the resolver
+contract (recommended, and better documentation — their own `service-context.ts.template` already
+does exactly that), or widen the alias rule, which is docs-lane owned but is gate-loosening I will
+not do unasked.
+
+**Reported one inconclusive attempt rather than hiding it:** an integration probe of #1842's head
+with #1756's tooling reports the whole pre-repair backlog (268 errors) because that head lacks the
+~20 JSDoc repairs, so it cannot isolate their contribution. The verified claim is the narrow one.
+
+Also confirmed no `docs:exports-drift` impact — `packages/plugin/deno.json` gains no entrypoint and
+the `plugin` page is `entrypoints-only`.
