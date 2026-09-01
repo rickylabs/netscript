@@ -7659,3 +7659,54 @@ acceptance line, and to say so if it judges tests plus `--dry-run` insufficient.
 
 Two evaluators run concurrently (#1832-c2 and #1750) on disjoint surfaces; neither runs the expensive
 repo-wide gate, so they do not contend.
+
+## D-177 — CORRECTION: D-175's artifact-strip instruction was wrong; fully reverted
+
+**Owner ruling: committed `.llm/runs/**` harness run directories are intentional cross-agent
+context, not publication leakage.** They are never to be deleted, stripped, redacted, reclassified as
+sensitive, or used as grounds to block a PR. Their lifecycle is owner/coordinator business — cleanup
+only after a stable release, only by explicit selection, and the owner may deliberately preserve
+selected runs into later milestones.
+
+**D-175 is wrong and is superseded by this entry.** I instructed #1751's author to `git rm --cached`
+`codex-thread-ids.md` and redact the absolute paths in `supervisor.md`. That was my error; the author
+executed a bad instruction correctly.
+
+### Reverted, byte-identically, before anything reached a remote
+
+Commit `7c2ca18cb` on `fix/agentic-sender-lease-recovery`:
+
+| Artifact | Restoration | Proof |
+| --- | --- | --- |
+| `codex-thread-ids.md` | re-tracked | blob `26c08fb4ecae449e782ed9bba66f08a5150d7ad2` == original at `8e4bb719f` |
+| `supervisor.md` | original absolute paths restored | blob `ce3afebef694a919b99001052103724ff2ec7e2c` == original |
+| `.git/info/exclude` line 18 | removed | `git check-ignore` no longer matches; no `llm/runs` entries remain |
+
+**No content was lost at any point**: the file stayed on disk throughout, and the strip lived only in
+an unpushed local commit, so the public history was never wrong and no rewrite was needed.
+
+Swept all four internals leaves for the same damage — `007-leaf-1695`, `007-leaf-1750`,
+`007-leaf-1839`, `007-leaf-1751` all show **0 deleted run artifacts** versus `main`. The instruction
+reached exactly one leaf and has been undone there.
+
+Issue **#1847** withdrawn and closed `NOT_PLANNED`, with every proposed action explicitly retracted:
+no gitignore rule, no `git rm --cached` of the 99 files, no redaction, no guard.
+
+Countermand dispatched to the #1751 author telling it to keep writing full artifacts — absolute
+paths, rollout paths, thread and session identifiers all stay — to add no ignore rules under
+`.llm/runs/**`, and to correct any worklog or PR text that now describes a strip that has been
+reverted. Everything else in the bounded repair stands unchanged.
+
+### The reasoning error, recorded rather than smoothed over
+
+My **measurement** was sound: 99 tracked files, no ignore rule, real host paths and live session
+UUIDs. My **classification** was not — I matched those facts against a general "operational evidence
+is sensitive" rule without checking it against how this repo actually works, when the evidence was
+sitting in front of me that `.llm/runs/**` is committed repo-wide by design and is the harness's own
+recording mechanism under `AGENTS.md`. I even noted that tension in D-175 and proceeded anyway.
+
+**The transferable rule: a correct measurement plus an unchecked premise produces a confident wrong
+answer,** and it is more dangerous than an uncertain one because the measurement lends it credibility.
+When an instruction asks me to *remove* something, the premise deserves more scrutiny than when it
+asks me to add something — deletion is the direction that destroys context. Saved to durable memory as
+[[harness-run-artifacts-are-never-stripped]].
