@@ -342,8 +342,13 @@ const workersSetIndex = workersSetAnchor
 if (!workersSetAnchor || workersSetIndex < 0) {
   throw new Error('generated workers resource block did not contain its registration marker');
 }
-const workersBlockClose = workersBackgroundBlock.indexOf('\n  }', workersSetIndex);
-if (workersBlockClose < 0) {
+// #1865 narrowed the located range to end exactly at the registration statement
+// (`end = registration.index + registration[0].length`), so the enclosing
+// `if (config.BackgroundProcessors[...])` brace now sits *after* the slice, and scanning for it
+// inside `workersBackgroundBlock` can never succeed. Scan the full source from the range end,
+// where the brace actually is. `workersSetIndex` above still proves the registration marker is
+// inside the slice this function rewrites.
+if (registerBackground.indexOf('\n  }', nextBackgroundIndex) < 0) {
   throw new Error('generated workers resource block did not contain its closing brace');
 }
 const usersReference = [

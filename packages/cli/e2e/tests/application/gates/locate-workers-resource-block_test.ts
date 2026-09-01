@@ -201,3 +201,28 @@ Deno.test('rejects a registration bound to a different identifier', () => {
     'registration anchor',
   );
 });
+
+Deno.test('the located range ends at the registration, so the guard brace is outside it', () => {
+  // Regression for the runtime-only failure "generated workers resource block did not contain its
+  // closing brace". Every fixture test above stops at the locator, so none of them exercised the
+  // brace scan that prepare-flow-b-fixture.ts runs on real output. #1865 narrowed the range to end
+  // at the registration statement; a scan for the guard's closing brace *inside* the slice is
+  // therefore unsatisfiable, and must run against the full source from the range end.
+  const source = generateRegisterBackground({
+    processors: {
+      streams: fixtures.MINIMAL_BACKGROUND,
+      workers: fixtures.MINIMAL_BACKGROUND,
+      triggers: fixtures.MINIMAL_BACKGROUND,
+    },
+    version: '1.0.0',
+    denoDefaults: fixtures.MINIMAL_DENO_DEFAULTS,
+  });
+
+  const range = locateWorkersBackgroundBlock(source);
+  const block = source.slice(range.start, range.end);
+
+  // The defect, stated as an assertion: the brace is genuinely not in the slice.
+  assertEquals(block.indexOf('\n  }'), -1);
+  // The repair, stated as an assertion: it is findable from the range end in the full source.
+  assertEquals(source.indexOf('\n  }', range.end) >= 0, true);
+});
