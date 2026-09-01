@@ -1579,3 +1579,14 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   and #1864 independently while preserving the ordered #1862 -> #1848 -> #1842 carrier chain.
 - The coordinator alone merges verified packets. A lifecycle label is never evidence: premature
   `status:ready-merge` on #1862 was corrected to `status:impl-eval` until its fresh verdict exists.
+
+## 2026-09-01T12:05:00Z — Remote Control recovery and active fronts
+
+- Fresh topic sessions replace only the missing transports: Fixes r4 Opus 5 xhigh, Docs r3 Opus 5
+  high, and Aspire r3 Opus 5 high. Features r3 Opus 5 xhigh and Internals r3 Opus 5 high survive.
+  All five have live Remote Control bridges; accepted ownership is unchanged.
+- Fixes closes the readiness-fixture baseline blocker, then #1865 and #1858. Aspire trial-restacks
+  statically and consumes their exact merge SHAs for Phase B. Features converges #1864 carriers;
+  Internals finishes #1862; Docs continues beyond shipped #1869 without becoming a global barrier.
+- Coordinator merge authority remains active: #1869 and #1861 shipped immediately after independent
+  immutable-head audits. Supervisors surface packets and never wait for routine merge permission.

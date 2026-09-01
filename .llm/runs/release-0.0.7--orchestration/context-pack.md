@@ -2354,3 +2354,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
   current-head CI, fresh independent evaluation, and truthful evidence replacement complete.
   Features #1861/#1864 and Docs slice B continue independently; the #1862 -> #1848 -> #1842 carrier
   order remains binding. No owner decision is pending and the host runtime is clean.
+
+## Resume delta — 2026-09-01T12:05:00Z
+
+- Current main is `1e53e731a69336d206241a9cd42314b15ca65422`. #1869 merged as `1b7effaf9`,
+  closing #1857, and #1861 merged as `1e53e731a`; milestone state is 186 closed / 64 open.
+- Missing Fixes/Docs/Aspire Claude transports were replaced by fresh Opus 5 Remote Control sessions
+  from their durable topic runs. Bridges: Fixes `session_018SSWZkA5iXGaM4M62ek9Hq` (xhigh), Docs
+  `session_01T3Wa3rFPDedjCNtaLqwHpF` (high), Aspire `session_01V4CCixt6nEXmFbYJN3pTy2` (high).
+  Features and Internals survived and were reactivated without changing topic ownership.
+- #1864 needs only current-main generated-carrier convergence and exact-head checks; its evaluated
+  product files are unchanged. #1862 reports a fresh durable cycle-2 PASS at `40cf494c4` and is in
+  independent coordinator audit. Fixes owns the readiness-fixture baseline repair, then #1865 and
+  #1858; Aspire trial-restacks S7-S13 while waiting for those exact merge SHAs.
+- Stable is not cut-ready. Canary 6 still requires the Fixes/Garnet chain, Aspire Phase B, and a
+  coherent user-facing payload. Host runtime remains exactly clean and no owner decision is pending.

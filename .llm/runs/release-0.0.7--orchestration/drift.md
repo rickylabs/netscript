@@ -1748,3 +1748,12 @@ implementation thread.
 - Binding rule: supervisors may stage readiness, but the coordinator verifies the immutable head,
   current required checks, truthful PR/issue acceptance mapping, independent verdict, and review
   threads before merging. Transport progress or lifecycle taxonomy alone never satisfies a gate.
+
+## 2026-09-01 — tmux loss is a transport failure, not a state rollback
+
+- Three mobile-visible topic sessions disappeared because their tmux/Claude processes no longer
+  existed. Their Git branches, PR heads, and tracked harness runs remained authoritative and intact.
+- Recovery creates fresh Remote Control sessions from those durable artifacts and records new
+  identities; it never recreates obsolete job registries or changes accepted topic ownership.
+- Liveness requires all three proofs: live tmux pane, matching Claude session-registry bridge, and
+  concrete turn activity. A mobile card or an old bridge URL alone is not an active orchestrator.

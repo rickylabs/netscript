@@ -3650,3 +3650,25 @@
 - Current host runtime remains Aspire `[]`, containers 0, and custom networks 0. No owner decision
   is pending. Canary 6 remains gated by #1865 -> #1858 -> Aspire S7-S13 Phase B and a coherent
   user-facing feature/fix payload, not by Docs or Internals completion.
+
+## 2026-09-01T12:05:00Z — three missing Remote Control lanes recovered; two more PRs ship
+
+- The Fixes, Docs, and Aspire tmux sessions and native Claude processes were absent, which explains
+  their disappearance from the mobile app. Features and Internals survived but were idle on old
+  prompts. No Git or harness state was lost.
+- Fresh checked-in hybrid Remote Control sessions now own the same topics: Fixes r4 is Opus 5 xhigh
+  (`6b1bf71b…`, bridge `session_018SSWZkA5iXGaM4M62ek9Hq`), Docs r3 is Opus 5 high
+  (`1e88fa17…`, bridge `session_01T3Wa3rFPDedjCNtaLqwHpF`), and Aspire r3 is Opus 5 high
+  (`baff9670…`, bridge `session_01V4CCixt6nEXmFbYJN3pTy2`). Features r3 and Internals r3 retained
+  their original Remote Control identities and were explicitly re-steered. Old Claude jobs remain
+  historical and were not resumed.
+- Docs PR #1869 passed immutable-head independent audit, exact-head IMPL-EVAL, CI, closure, and
+  zero-thread gates; stale body/lifecycle metadata was repaired in place and it merged as
+  `1b7effaf9`, closing #1857. Features PR #1861 passed the same coordinator audit and merged as
+  `1e53e731a`; its partial `Refs #1451` semantics intentionally leave #1451 open.
+- Milestone state after those merges is 186 closed / 64 open. All 46 open issues retain exclusive
+  topic ownership. #1864 is bounded to generated-carrier convergence after #1869; #1862 has a fresh
+  durable PASS at `40cf494c4` and is under current-main audit.
+- The stable cut is not yet near: Fixes is actively correcting the current-main readiness-fixture
+  blocker exposed after #1865 proved Flow-B green; #1858 Garnet and Aspire S7-S13 Phase B remain on
+  the canary-6 critical path. Host inventory is Aspire `[]`, containers 0, custom networks 0.
