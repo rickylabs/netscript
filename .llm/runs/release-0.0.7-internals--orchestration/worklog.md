@@ -8555,3 +8555,70 @@ PR held at `status:impl-eval`; ready-merge only after terminal CI **and** the de
 `close-gate` already passes at the new head; `check-test` running.
 
 #1802 continues independently at `7d20e852f` (PASS, converged, 253/253 agentic tests, ceilings intact).
+
+
+## D-196 - #1802 promoted then blocked on a pre-existing quality finding; #1846 trap removed; #1543 dispatched
+
+### #1802 promoted, then a real CI blocker
+
+Posted its structured IMPL-EVAL PASS packet, flipped ready, sole `status:ready-merge` on PR and issue,
+threads **0/0**, `close-gate` **PASS**. Then `code-quality` failed.
+
+Reproduced locally: **2 `unsafe-cast` findings**, both in `local-sender-ownership-adapter.ts` -
+`includes(entry.state as never)` (line 128) and `return entry as unknown as SenderOwnershipRecord`
+(line 134). Verified **pre-existing on clean `main`** (`REAL_EXIT=1` there too); they surface only
+because this leaf touched the file.
+
+**Dispatched to the author rather than fixed by me.** Line 134 is a **fail-closed validation
+boundary** whose return type the whole recovery path trusts, and after two self-authored errors in the
+#1862 slice, that is not a seam I should hand-edit. The brief carries the diagnosis, a suggested shape
+(membership predicate for 128; type predicate or explicit construction for 134), and one trap worth
+catching: if the result is constructed explicitly, `sessionId`/`profileHome` must remain **absent**
+when absent rather than present-with-`undefined`, because that difference is observable through JSON
+round-trips and the protected tests may depend on it.
+
+### #1846 - non-runtime gates complete, and a live trap removed
+
+Everything not requiring runtime execution is done: IMPL-EVAL PASS with durable artifact, threads
+**0/0**, correct labels and milestone, all mandatory body sections, closing keyword.
+
+**Removed a real trap.** Its `acceptance-evidence` block carried `"DEFERRED - ..."` entries for boxes
+1-3. I checked `validateEvidenceMapping` **in source** rather than by experiment (experimenting would
+have required applying the label): it maps unchecked boxes to entries and **never inspects the
+evidence text**. Those entries would have **ticked four unproven boxes** the instant
+`status:ready-merge` was applied - the close-gate inverted. Block withdrawn, with the reasoning
+recorded in the PR body so nobody re-adds it piecemeal.
+
+Blocking set taken from the gate that actually runs: **9 unchecked, not 5** - the PR's own DoD boxes
+count alongside the issue's. All nine reduce to the single deferred runtime proof.
+
+### #1543 dispatched - and its central question answered before dispatch
+
+#1695 shipped, so the `deno.lock` conflict that held #1543 is gone and it is now dependency-free.
+
+The issue's own first instruction was to determine whether publishing is actually affected, recorded
+as **unverified**. I settled it at base: `deno task publish:dry-run` -> **`REAL_EXIT=0`**. Publishing
+**succeeds**; the undeclared import is silently accepted. By the issue's own wording that makes this a
+**consistency** issue, not release-integrity - so the brief says so, forbids inflating it, and marks
+acceptance box 3 (`if publishing is affected, a check fails...`) **conditional and N/A**, explicitly
+barring a new fitness check.
+
+Also caught that the issue's import-site list is **incomplete** - `plugins/triggers/src/public/mod.ts`
+imports the package too and is not listed - so the brief tells the author to derive the full set rather
+than trust the issue.
+
+### #1862 - CI terminal green; only the delta verdict outstanding
+
+`check-test` **pass** (8m49s), `build`, `close-gate`, `code-quality`, `quality` and all classifiers
+pass at `e8eaf6d0c`; **MERGEABLE / CLEAN**.
+
+Staged and validated: PR body's final DoD box ticked (exact-head CI green is now true), and a
+**10-entry `acceptance-evidence` block** covering every box of the rewritten #1859 - mirror dry-run
+`REAL_EXIT=0` with no mapping error, self-skipping only on the absent label as designed.
+
+#1859's body is already the rewritten four-path version; its 10 boxes are unticked and will be ticked
+**by the mirror**, not by hand, once the label is applied and CI re-runs at the unchanged head.
+
+Holding the ready-merge label and packet until the focused delta evaluation returns - it is live at
+11 minutes with an actively-writing transcript. That is the last gate, and after this slice's history
+I am not declaring readiness ahead of it.
