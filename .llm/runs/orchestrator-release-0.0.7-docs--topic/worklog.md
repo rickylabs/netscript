@@ -3360,3 +3360,20 @@ Prompt carries an explicit **budget-discipline** clause after the coordinator fl
 evaluation running multi-megabyte and near its time bound, and requires the evaluator to **prove the
 new coverage check bites** by deleting an entry and observing a failure — a check that cannot fail
 would be worthless.
+
+### Preparatory repairs while #1869 evaluates
+
+**#1777's acceptance checkboxes were hard-wrapped** across three physical lines each. The
+acceptance mirror exact-matches a PR's ```acceptance-evidence``` `box:` text against the issue's
+checkbox text, so a wrapped box can never match — the identical defect that stalled **#1793**.
+Unwrapped all three to single lines (text unchanged, verified by exact-match replace before
+editing). #1777 is now mirrorable when its closure comes.
+
+**#1756's boundary re-verified, not assumed:** `gh auth status` reports token scopes `'repo'` only —
+still **no `workflow` scope**, so the `ci.yml` step cannot be pushed from this session. Salvage
+commit `01203d5d8` and tag `salvage/1756-green-complete` both confirmed present and intact. Park
+stands; it needs an owner push, not more agent work.
+
+**Note on #1857:** it carries no acceptance checkboxes (written as prose), so `close-gate` on #1869
+reads that PR's own Definition-of-Done list instead. That is why the gate's four failures are DoD
+boxes rather than mirror mismatches.
