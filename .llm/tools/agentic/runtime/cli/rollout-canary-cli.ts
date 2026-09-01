@@ -2,6 +2,7 @@
 
 import { runRolloutCanaries } from './rollout-canary-runner.ts';
 import { renderRolloutReport } from '../rollout-report.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 interface Args {
   readonly worktree: string;
@@ -12,6 +13,7 @@ function usage(): string {
   return 'Usage: deno task agentic:rollout-canary --worktree <native-ext4-path> --output <json-path> [--report <markdown-path>]';
 }
 export function parseRolloutArgs(args: readonly string[]): Args {
+  args = normalizeTaskArguments(args);
   const values = new Map<string, string>();
   for (let index = 0; index < args.length; index += 2) {
     const key = args[index];

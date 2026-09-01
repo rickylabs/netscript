@@ -43,6 +43,7 @@
  */
 
 import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { dirname } from '@std/path';
 import { readCodexRolloutTail, resolveCodexRollout } from './codex-rollout-live.ts';
 
@@ -64,6 +65,7 @@ function defaultSessionsDir(): string {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = {
     mode: 'git',
     sessionsDir: defaultSessionsDir(),

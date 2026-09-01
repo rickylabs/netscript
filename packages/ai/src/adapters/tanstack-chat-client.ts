@@ -22,15 +22,17 @@
  * @module
  */
 
-import { chat, EventType } from '@tanstack/ai';
+import { chat, EventType, fromSpecTokenUsage } from '@tanstack/ai';
 import type {
   AnyTextAdapter,
   AnyTool,
+  ChatMiddleware,
   ContentPart as TanstackContentPart,
   JSONSchema as TanstackJsonSchema,
   ModelMessage,
+  SpecTokenUsage,
   StreamChunk,
-  TokenUsage,
+  TokenUsage as TanstackTokenUsage,
   ToolCall as TanstackToolCall,
 } from '@tanstack/ai';
 
@@ -165,6 +167,22 @@ export function toTanstackChatClient(
 
       // Accumulate streamed tool-call fragments keyed by call id.
       const pending = new Map<string, { name: string; args: string }>();
+      const rawUsageByRunId = new Map<string, TanstackTokenUsage>();
+      const preserveUsageIdentity: ChatMiddleware<Readonly<Record<string, unknown>>> = {
+        name: 'netscript-preserve-usage-identity',
+        onChunk(_context, chunk) {
+          // TanStack 0.52 normalizes canonical usage through AG-UI and rebuilds
+          // it before yielding; retain the adapter's original owned-compatible
+          // object at the last raw-chunk seam.
+          if (
+            chunk.type === EventType.RUN_FINISHED &&
+            chunk.usage !== undefined &&
+            !Array.isArray(chunk.usage)
+          ) {
+            rawUsageByRunId.set(chunk.runId, chunk.usage);
+          }
+        },
+      };
 
       try {
         const resolvedAdapter = typeof adapter === 'function'
@@ -186,14 +204,18 @@ export function toTanstackChatClient(
           // field onto the provider wire request". It is deliberately *not*
           // folded into `messages`, `systemPrompts`, `tools`, or `modelOptions`,
           // which are the four keys that do reach the provider.
-          context: request.context,
+          // TanStack 0.52 requires a non-null activity context even when the
+          // caller has no application metadata. Keep the owned optional
+          // contract by supplying an empty, provider-invisible context.
+          context: request.context ?? {},
           metadata: request.context,
+          middleware: [preserveUsageIdentity],
         });
         for await (const chunk of streamed) {
           if (external?.aborted) {
             return;
           }
-          const event = translateChunk(chunk, pending);
+          const event = translateChunk(chunk, pending, rawUsageByRunId);
           if (event) {
             yield event;
           }
@@ -214,6 +236,7 @@ export function toTanstackChatClient(
 function translateChunk(
   chunk: StreamChunk,
   pending: Map<string, { name: string; args: string }>,
+  rawUsageByRunId: Map<string, TanstackTokenUsage>,
 ): ChatClientEvent | null {
   switch (chunk.type) {
     case EventType.TEXT_MESSAGE_CONTENT: {
@@ -241,7 +264,9 @@ function translateChunk(
     case EventType.TOOL_CALL_END: {
       const entry = pending.get(chunk.toolCallId);
       pending.delete(chunk.toolCallId);
-      const name = entry?.name || chunk.toolCallName || chunk.toolName || '';
+      // Since 0.52, TOOL_CALL_END carries only the id and parsed input; the
+      // name is owned by the preceding TOOL_CALL_START event.
+      const name = entry?.name ?? '';
       const args = entry && entry.args.length > 0
         ? entry.args
         : chunk.input !== undefined
@@ -251,10 +276,16 @@ function translateChunk(
       return { type: 'tool-call', toolCall };
     }
     case EventType.RUN_FINISHED: {
+      const rawUsage = rawUsageByRunId.get(chunk.runId);
+      rawUsageByRunId.delete(chunk.runId);
       return {
         type: 'finish',
-        usage: toOwnedUsage(chunk.usage),
-        finishReason: toFinishReason(chunk.finishReason),
+        usage: rawUsage ?? toOwnedUsage(chunk.usage),
+        // TanStack 0.52 moved the server-side finish reason into
+        // `metadata.tanstack`; keep the top-level field authoritative when set.
+        finishReason: toFinishReason(
+          chunk.finishReason ?? chunk.metadata?.tanstack?.finishReason,
+        ),
       };
     }
     case EventType.RUN_ERROR: {
@@ -361,9 +392,13 @@ function toFinishReason(
 
 /** Preserve TanStack real token usage behind the owned {@linkcode Usage} type. */
 function toOwnedUsage(
-  usage: TokenUsage | undefined,
+  usage: Array<SpecTokenUsage> | TanstackTokenUsage | undefined,
 ): Usage | undefined {
-  return usage;
+  // TanStack 0.52 may expose AG-UI's per-provider/model usage array. Its own
+  // converter preserves the canonical selection rules and any explicit
+  // provider totals. Canonical TokenUsage objects already satisfy the owned
+  // structural contract and must retain their nested detail and identity.
+  return Array.isArray(usage) ? fromSpecTokenUsage(usage) : usage;
 }
 
 /** Extract a plain-text projection of message content (system prompts). */

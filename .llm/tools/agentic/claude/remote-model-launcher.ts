@@ -3,6 +3,7 @@
 import { type CurrentOpenRouterModelId, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { type Effort, EFFORTS } from '../runtime/contract.ts';
 import { resolveOpenRouterApiKey } from '../lib/openrouter-credential.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { startRemoteModelGateway } from './remote-model-gateway.ts';
 
 export interface RemoteModelLaunchOptions {
@@ -57,6 +58,7 @@ function safeText(value: string, flag: string): string {
 
 /** Parses and validates the finite launcher CLI contract. */
 export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteModelLaunchOptions {
+  args = normalizeTaskArguments(args);
   let model: string = OPENROUTER_MODEL_IDS.implEvaluator;
   let cwd = Deno.cwd();
   let effort: Effort = 'max';
@@ -65,7 +67,6 @@ export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteMo
   let forkSession = false;
   for (let index = 0; index < args.length; index++) {
     const argument = args[index];
-    if (argument === '--') continue;
     if (argument === '--model') model = requiredValue(args, index++, argument);
     else if (argument === '--cwd') cwd = requiredValue(args, index++, argument);
     else if (argument === '--effort') effort = requiredValue(args, index++, argument) as Effort;
