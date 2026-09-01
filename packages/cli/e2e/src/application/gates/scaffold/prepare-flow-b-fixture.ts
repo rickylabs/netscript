@@ -303,18 +303,23 @@ await Deno.writeTextFile(flowBJobPath, updatedFlowBJob);
 const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-background.mts`;
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
 const workersBackgroundRange = locateWorkersBackgroundBlock(registerBackground);
-const workersBackgroundIndex = workersBackgroundRange.start;
+// The locator anchors the block on `const <id> = builder.addExecutable('workers', ...)`, but the
+// generator emits the processor's `if (config.BackgroundProcessors[...])` guard *before* that line.
+// Slicing from the locator's start therefore excludes the guard, and every downstream edit here
+// operates on the sliced block. Anchor the start on the processor's own config line instead — it is
+// as unique per processor as the locator's anchor, and needs no comment-marker heuristic.
+const workersConfigPattern =
+  /^ {2}if \(config\.BackgroundProcessors\[(["'])workers\1\]\?\.Enabled !== false\) \{/m;
+const workersConfigMatch = workersConfigPattern.exec(registerBackground);
+if (!workersConfigMatch) {
+  throw new Error('generated workers resource block did not contain its config lookup');
+}
+const workersBackgroundIndex = Math.min(workersConfigMatch.index, workersBackgroundRange.start);
 const nextBackgroundIndex = workersBackgroundRange.end;
 const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,
 );
-const workersConfigAnchor =
-  / {2}if \(config\.BackgroundProcessors\[(["'])workers\1\]\?\.Enabled !== false\) \{/
-    .exec(workersBackgroundBlock)?.[0];
-if (!workersConfigAnchor) {
-  throw new Error('generated workers resource block did not contain its config lookup');
-}
 // #1865's locateWorkersBackgroundBlock locates the block but returns only a SourceRange, so the
 // binding identifier still has to be extracted from within it. Quote-agnostic on purpose: the
 // generator emits JSON.stringify'd names after this slice's source-safety change.
