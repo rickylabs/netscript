@@ -6714,28 +6714,41 @@
   - S13's final box status is therefore: **1 blocked (S9)**, **2 blocked (S9)**, **3 verified**,
     **4 evidenced (D-257)**, **5 verified**.
 
-- **D-266 — three killed watchers explained: a long single `sleep` is reaped, not the background task.
-  A working watch is now held. My stated hypothesis was wrong and the experiment refuted it.**
-  - **What I claimed, and what actually happened.** After three merge watchers died with
-    `status: killed` and **empty** output files, I hypothesised that background tasks are killed at
-    turn boundaries, and said so — adding that if a probe came back `[killed]` the hypothesis was
-    confirmed. It came back **`COMPLETED`**: a probe looping `sleep 5` sixty times ran the **full
-    300 s across a turn boundary**, 60/60 ticks. The hypothesis is **refuted**, and the correct
-    conclusion is the opposite one — background tasks survive turns fine.
-  - **The real variable is the sleep length.** All three dead watchers blocked on `sleep 120` between
-    polls; the surviving probe never slept longer than 5 s. A long single `sleep` is reaped; the task
-    is not. Nothing about the network use or the turn boundary mattered.
-  - **Watcher rebuilt and armed** on the tick-loop shape — `sleep 5` inner loop, expensive `gh` poll
-    gated on `i % 24` for a 120 s cadence, 6 h ceiling — and it is **confirmed running** (pid alive by
-    `/proc/<pid>/cmdline`, not by `pgrep -f`, which self-matches) with its first poll logged:
-    `1865=[OPEN UNSTABLE -] 1858=[OPEN CLEAN -]`.
-  - **Each poll is now tee'd to a log file.** The three killed tasks left empty `.output` files, which
-    is precisely why the cause took three attempts to find — a watcher that dies silently teaches
-    nothing.
-  - **This matters beyond watching.** The same reaping would hit a long-running gate during the
-    serialized Phase-B lease — `scaffold.runtime` on both tiers is exactly the shape of command that
-    would be run in the background and waited on. Worth knowing before the lease, not during it.
-  - Saved as durable memory (`background-tasks-long-sleep-reaped`) so the next session does not spend
-    three attempts rediscovering it.
-  - Gates unchanged throughout: #1865 `OPEN/UNSTABLE` at `f008315d1` (close-gate + both runtime tiers
-    red), #1858 `OPEN/CLEAN`, main `1e53e731a`.
+- **D-266 — background tasks are reaped at ~10–15 minutes of wall-clock. Two hypotheses of mine were
+  wrong before the data settled it; the logged watcher is what produced the answer.**
+  - **Symptom:** four merge watchers died with `status: killed` and **empty** output files, no error.
+  - **Hypothesis 1 (wrong): killed at turn boundaries.** I said so explicitly and named the
+    falsifying outcome. A probe looping `sleep 5` sixty times then ran the **full 300 s to
+    `COMPLETED` across a turn boundary**, 60/60 ticks. Refuted.
+  - **Hypothesis 2 (also wrong): a long single `sleep` is reaped.** All three dead watchers blocked on
+    `sleep 120`; the surviving probe never slept beyond 5 s, so sleep granularity looked like the
+    variable. I recorded that conclusion. Then watcher **v2 — same `sleep 5` tick loop** — was killed
+    after **~12 minutes / 7 polls**. Refuted.
+  - **What the data actually says.** The only task that ever finished was the only one whose intended
+    life was **under the window**:
+
+    | Task | Sleep shape | Intended life | Outcome |
+    | --- | --- | --- | --- |
+    | 3 × watcher | `sleep 120` | 25 min – 6 h | killed, empty output |
+    | probe | `sleep 5` × 60 | **300 s** | **COMPLETED** |
+    | watcher v2 | `sleep 5`, poll/24 | 6 h | killed at **~12 min**, 7 polls logged |
+
+    So the cap is **wall-clock duration**, bounded by measurement between 5 and ~12.5 minutes. The
+    probe survived because it **finished**, not because of how it slept.
+  - **The fix that made this knowable was the log, not the theory.** v2 tee'd every poll to a file, so
+    when it was killed it left seven timestamped polls
+    (`14:32:20` → `14:44:28`, both PRs open throughout) instead of the empty `.output` its three
+    predecessors left. **Three silent deaths taught nothing; one logged death answered it.** Any
+    background task in this environment should tee state, precisely because the harness's own output
+    file is empty on a kill.
+  - **Watcher v3 armed** with a **480 s** ceiling — safely inside the measured-safe range — that exits
+    cleanly with a `STATE` line instead of being killed, and is re-armed on each wake. That yields a
+    usable ~8-minute polling cadence. It is **not** a long-lived watch, and I am not going to describe
+    it as one.
+  - **Carry this into the lease.** The same cap would kill a backgrounded both-tier `scaffold.runtime`
+    long before it finishes. Phase B must either run that gate in the foreground or checkpoint it
+    against a log it can resume reading — budgeted **before** taking the serialized lease, not
+    discovered inside it. This is now the most consequential operational fact in the manifest's
+    execution path.
+  - Corrected the durable memory that carried hypothesis 2. Gates unchanged: #1865 `OPEN/UNSTABLE` at
+    `f008315d1`, #1858 `OPEN/CLEAN`, main `1e53e731a`.
