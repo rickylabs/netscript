@@ -67,6 +67,12 @@ ad-hoc shell orchestration:
 5. Drift is explicit: if implementation reality diverges from plan, docs, or doctrine, record it in
    the harness run drift/worklog artifacts.
 6. Do not delete lock files or caches, and do not run `deno cache --reload`, without approval.
+7. `.llm/runs/**` is intentional, tracked cross-agent context. A scoped run directory may include
+   supervisor/session identity, worktree paths, receipts, and resumable state and must not be
+   stripped, untracked, redacted, or treated as a leak merely for containing that context. Never
+   place secrets or tokens in a run directory. Run-directory cleanup is owner-controlled after a
+   stable release: delete only runs the owner explicitly selects, and preserve any runs the owner
+   chooses to carry into later milestones.
 
 ## Resource hygiene
 
