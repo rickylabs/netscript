@@ -44,6 +44,7 @@ mapping without removing any current-main row.
 | 2026-09-01 | 1 | Research | Confirmed 14/7/7 export maps, diagnosed the distinct parser failures, and measured 236/55/88 symbol unions with 56/33/24 documented real exports. |
 | 2026-09-01 | 1 | Edit | Corrected headings/row structure and inserted only the three requested mapping blocks. |
 | 2026-09-01 | 1 | Reconcile | `origin/main` advanced from `3b6386e14` to `b66e52cbc` via #1860; inspected the incoming diff and retained every upstream mapping name. |
+| 2026-09-01 | 1 | Regenerate | Rebased cleanly, then ran prose → asset barrel → publish assets in the required order; all three generators exited 0. |
 
 ## Decisions
 
@@ -60,7 +61,8 @@ mapping without removing any current-main row.
 ## Gate Results
 
 - Pre-rebase targeted gate: `deno task docs:exports-drift` exited 0 with all three mappings active.
-- Final-head required gate table will be recorded after regeneration and the complete gate pass.
+- The complete required set will run at the generated-assets commit, then repeat after the final
+  evidence commit so the PR table describes the pushed head.
 
 ## PLAN-EVAL
 
