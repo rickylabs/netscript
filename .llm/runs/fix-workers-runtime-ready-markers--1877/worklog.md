@@ -26,7 +26,7 @@
 
 ### GREEN
 
-- Commit: recorded by exact SHA in the follow-up evidence entry after the product commit exists.
+- Commit: `f8073e7e3246b77f7b07a759b9877ac021a91a78`.
 - Predicate: scheduler marker AND any marker from the named runner-mode collection.
 - Diagnostic: separately names a missing scheduler marker and absence of any runner-mode marker.
 - Required gates at the final formatted tree:
