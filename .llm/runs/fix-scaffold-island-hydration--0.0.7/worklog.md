@@ -77,6 +77,8 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | Hosted receipt                | Staged the browser from `about:blank` and added request/load/failure, module/outer/inner render, singleton/provider/query-hook, hydration-effect, click, and runtime-error observations.     |
 | 2026-09-01 | S2    | Generated scaffold            | Created a no-Aspire local-source SQLite scaffold under `.llm/tmp`, initialized/seeded it, and ran only its service and Fresh Vite processes.                                              |
 | 2026-09-01 | S2    | HTML discriminator            | `GET /examples/users` returned 200 with `Typed query lab`, `Seed User`, `frsh:island:ServiceShowcaseLab`, and its client boot mapping. The client-side branch is selected.                  |
+| 2026-09-01 | S2    | Draft PR                      | Opened draft PR #1885 at `7154c2a91` with the required labels, milestone, closing keyword, plain measurement outcome, and unticked acceptance/DoD boxes.                                  |
+| 2026-09-01 | S2    | Hosted browser scheduling     | Draft PR policy skipped `classify`/`check-test`, so `fresh-browser` did not execute. The in-app browser control runtime is not exposed in this session. No client-path observation exists yet. |
 
 ## Decisions
 
@@ -122,6 +124,7 @@ CLI scaffold templates.
 | Gate                      | Result                    | Evidence                                       | Notes                                                                                                 |
 | ------------------------- | ------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Local managed browser     | BLOCKED BEFORE NAVIGATION | Focused wrapper exit 1                         | `playwright-cli` absent; cached Chromium also lacks system libraries. This is not an application red. |
+| Draft PR managed browser  | NOT SCHEDULED             | PR #1885 checks at `7154c2a91`                 | Repository policy skips core CI while draft; the brief forbids marking ready.                         |
 | Hosted `scaffold.runtime` | CARRIED-IN FAIL           | Run `33410348563` on PR #1664 head `377811da8` | 71 passed / 1 failed; sole failure is authoritative target gate.                                      |
 
 ### Consumer proof contract
