@@ -245,6 +245,13 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
         resourceIds: [`worktree:${command.worktree}`],
       });
       break;
+    case 'repair-sender-lease':
+      addAction(builder, command, 'repair_sender_lease', 'state', {
+        effect: command.mode === 'apply' ? 'write' : 'none',
+        reversible: false,
+        resourceIds: [`worktree:${command.worktree}`],
+      });
+      break;
     case 'rollback': {
       const checkpoint = observed.checkpoints.find((entry) =>
         entry.checkpointId === command.checkpointId

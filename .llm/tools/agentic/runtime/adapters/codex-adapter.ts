@@ -144,7 +144,7 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
         sessionActive: false,
       },
     );
-    if (ownership.kind === 'blocked') diagnostics.push(ownership.diagnostic);
+    if (ownership.kind !== 'available') diagnostics.push(ownership.diagnostic);
     if (command.route.sessionId) {
       diagnostics.push(
         diagnostic('active_session', 'safety', 'launch route already names a session'),
