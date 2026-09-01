@@ -3672,3 +3672,24 @@
 - The stable cut is not yet near: Fixes is actively correcting the current-main readiness-fixture
   blocker exposed after #1865 proved Flow-B green; #1858 Garnet and Aspire S7-S13 Phase B remain on
   the canary-6 critical path. Host inventory is Aspire `[]`, containers 0, custom networks 0.
+
+## 2026-09-01T16:20:00Z — stale composers cleared; #1864 and #1592 ship
+
+- A five-lane liveness audit found that coordinator steering text was visible in each Claude
+  composer but had not been submitted. The prior check mistook a live bridge and populated composer
+  for active work. An explicit second carriage return submitted every queued instruction; all five
+  supervisors then entered concrete generation, gate, rebase, or repair work.
+- Features PR #1864 passed exact-head CI, zero-thread review, current-main integration, and
+  independent byte-identity audit. Its permanent packet was rewritten truthfully and it merged as
+  `38f2ce735`. The coordinator also corrected the stale partial semantics: #1814 plus #1864 complete
+  #1592, which is now closed with `status:shipped`; PR #1864 is terminal `status:shipped` too.
+- Fixes converged the circular #1865/#1871 fixture repairs into one tested head: each standalone PR
+  failed the other main-side fixture, while the combined head reports 116 tests green and exact-head
+  hosted CI is running. Aspire stopped foreground polling, rebased S8 to `50617f0bd` with 72/72
+  evaluated blobs identical, and started exact-head gates while continuing the static restack.
+- Internals regenerated #1862 on the integrated tree at `e8eaf6d0c`; exact-head CI and a focused
+  delta verdict are running. Docs is repairing #1756's four source regressions without weakening
+  the new ceilings. Features promoted #1872 and advanced #1848 independently.
+- Milestone state after the merge/closure is 190 closed / 65 open; the increase in admitted work is
+  from newly scoped defects, not reopened shipped items. Host inventory remains Aspire `[]` and
+  containers 0. No owner decision is pending.

@@ -1757,3 +1757,16 @@ implementation thread.
   identities; it never recreates obsolete job registries or changes accepted topic ownership.
 - Liveness requires all three proofs: live tmux pane, matching Claude session-registry bridge, and
   concrete turn activity. A mobile card or an old bridge URL alone is not an active orchestrator.
+
+## 2026-09-01 — visible steering text is not submitted steering
+
+- The coordinator staged instructions in all five Remote Control panes and initially treated the
+  visible text as delivered. The text remained in Claude's multiline composer, so supervisors kept
+  their prior completed/standing-by turns despite apparently fresh instructions.
+- Binding recovery check: after tmux steering, inspect the pane again. A submitted task has an empty
+  composer plus active generation/tool output (or a new concrete completion); text still shown after
+  `❯` requires another carriage return. Session existence, `/rc`, background pollers, and queued text
+  are insufficient productivity proofs.
+- Dependency watching is background-only. Every topic supervisor must advance independent static,
+  metadata, evaluation, or next-slice work while a dependency gate runs; repeated "standing by"
+  polling is a coordinator intervention trigger.

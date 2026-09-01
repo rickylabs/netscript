@@ -1590,3 +1590,15 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   Internals finishes #1862; Docs continues beyond shipped #1869 without becoming a global barrier.
 - Coordinator merge authority remains active: #1869 and #1861 shipped immediately after independent
   immutable-head audits. Supervisors surface packets and never wait for routine merge permission.
+
+## 2026-09-01T16:20:00Z — productive-liveness correction
+
+- A populated Claude composer is not dispatched work. After steering a tmux Remote Control pane,
+  the coordinator must verify the composer is empty and the pane shows active generation/commands;
+  if the pasted block remains after the first carriage return, submit a second one.
+- Features executes #1872 evaluation and the #1848 -> #1842 chain after shipped #1864. Fixes proves
+  the converged #1865/#1871 head, then #1858, while implementing #1850 in 0.0.7 as already ruled.
+  Internals converges/evaluates #1862 and advances #1802. Docs repairs #1756 without raising
+  ceilings. Aspire performs static S7-S13 work continuously and never foreground-polls dependencies.
+- The coordinator independently audits packets and merges exact-green heads; #1864 shipped as
+  `38f2ce735` and its completed parent issue #1592 was closed rather than left as phantom work.

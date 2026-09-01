@@ -2369,3 +2369,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   #1858; Aspire trial-restacks S7-S13 while waiting for those exact merge SHAs.
 - Stable is not cut-ready. Canary 6 still requires the Fixes/Garnet chain, Aspire Phase B, and a
   coherent user-facing payload. Host runtime remains exactly clean and no owner decision is pending.
+
+## Resume delta — 2026-09-01T16:20:00Z
+
+- Current main is `38f2ce7358f80e4075c481b450b52e1a01c5984c`. #1864 merged exact-green and
+  #1592 is closed completed; both carry `status:shipped`. Milestone state is 190 closed / 65 open.
+- All five Claude supervisors are actively executing after the coordinator discovered that prior
+  steering text was only staged in their composers. Future liveness checks must prove a running
+  command/generation or a newly completed concrete artifact, not merely visible text or a live `/rc`
+  bridge.
+- Fixes owns combined #1865/#1871 hosted proof, then #1858. Aspire owns S8 exact-head CI plus static
+  S7-S13 restacks while only Phase B waits for the Fixes SHAs. Internals owns #1862 integrated corpus
+  regeneration/delta evaluation; Docs owns the bounded #1756 source repair; Features owns #1872,
+  #1848, and #1842 in parallel.
+- No owner decision is pending. Host runtime remains Aspire `[]` and containers 0.
