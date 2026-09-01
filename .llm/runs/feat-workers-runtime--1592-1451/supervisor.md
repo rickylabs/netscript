@@ -5,6 +5,15 @@
 | Field                       | Value                                                                              |
 | --------------------------- | ---------------------------------------------------------------------------------- |
 | Run id                      | `feat-workers-runtime--1592-1451`                                                  |
+| Phase                       | Plan Gate                                                                          |
+| Profile                     | Archetype 3 — runtime / behavior / engine change                                   |
+| Affected connector boundary | Archetype 5 — `plugins/workers` remains a thin adapter around core contracts       |
+| Worktree                    | `/home/agent/projects/netscript/worktrees/007-leaf-workers`                        |
+| Branch                      | `feat/workers-runtime-plan`                                                        |
+| Baseline                    | `origin/main` at `9fbc2317291dbd33c325782bb33d86a99ee5a027` (refreshed 2026-08-31) |
+| Issues                      | #1592 Slice 2 and #1451                                                            |
+| Scope                       | Plan artifacts only; no product implementation                                     |
+
 | Phase                       | Slice P implementation gate                                                        |
 | Profile                     | Archetype 3 — runtime / behavior / engine change                                   |
 | Affected connector boundary | Archetype 5 — `plugins/workers` remains a thin adapter around core contracts       |
@@ -23,6 +32,12 @@ generation. The progress and schema slices are independently landable; generatio
 
 | Lane                  | Provider / model / effort                                                      | Status                                     |
 | --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
+| Plan author           | Current Codex session; exact model and effort are not exposed to this checkout | Active author                              |
+| Formal plan evaluator | Anthropic / Fable 5 / medium, per `lane-policy.md`                             | Required, separate session, not dispatched |
+
+The owner explicitly prohibited evaluator dispatch in this turn. The next supervisor action is to
+run PLAN-EVAL in a separate session after reviewing this commit.
+
 | Plan author           | Earlier Codex session; exact model and effort are not exposed to this checkout | Complete                                   |
 | Formal plan evaluator | Anthropic / Fable 5 / medium, per `lane-policy.md`                             | PASS on 2026-08-31                         |
 | Slice P implementer   | Current Codex session; exact model and effort are not exposed to this checkout | Implementation and automated gates complete |
@@ -42,6 +57,13 @@ review followed by the separately owned evaluator lifecycle.
 - Connector authority: the Archetype 5 thin-adapter rules apply to touched `plugins/workers` code
 - Plan Gate deliverables requested by the owner: `research.md`, `plan.md`, `supervisor.md`, and
   `worklog.md`
+- No implementation, issue/PR mutation, labels, evaluator dispatch, or merge action is authorized
+- Lock and cache mutation is prohibited; `deno.lock` must retain its baseline blob
+
+The standard harness context-pack and drift files are intentionally omitted because the owner named
+the exact four artifacts for this plan-only run. All evidence and deviations needed by the evaluator
+are carried in `research.md`, `plan.md`, and `worklog.md` instead.
+
 - Slice P implementation, one commit, explicit-refspec push, and one draft PR are authorized
 - No labels, evaluator dispatch, ready-for-review transition, or merge action is authorized
 - Lock and cache mutation is prohibited; `deno.lock` must retain its baseline blob
@@ -56,6 +78,10 @@ both standard artifacts because this implementation must be resumable and audita
 | Rebaseline     | Complete                  | Branch equals fetched `origin/main`; clean starting tree |
 | Research       | Complete                  | `research.md`                                            |
 | Plan           | Complete                  | `plan.md`                                                |
+| PLAN-EVAL      | Required / not dispatched | Owner-reserved next step                                 |
+| Implementation | Not started               | Outside this run                                         |
+| IMPL-EVAL      | Not started               | Outside this run                                         |
+
 | PLAN-EVAL      | PASS                       | `plan-eval.md`                                           |
 | Implementation | Complete                   | Slice P product diff + focused tests                     |
 | Gate           | Complete                   | `receipts/slice-p/`; doc lint is baseline-relative       |

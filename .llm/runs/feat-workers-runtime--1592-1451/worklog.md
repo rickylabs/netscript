@@ -94,6 +94,8 @@
 - Formal evaluator: required separate Anthropic/Fable 5 medium session, not yet dispatched.
 - No subagents or implementation agents participated.
 
+## Gate evidence
+
 ### 2026-09-01 — Slice P implementation
 
 - Rebased scope onto `main` `78be0e032`; branch and worktree matched the owner-provided identities.
@@ -122,6 +124,53 @@
 | PLAN-EVAL                                                               | REQUIRED — NOT DISPATCHED                                                    |
 | Product files under `packages/` or `plugins/`                           | Must remain unchanged                                                        |
 | `deno.lock`                                                             | Must retain baseline blob                                                    |
+
+## Handoff
+
+The next authorized action is supervisor-run PLAN-EVAL against `research.md` and `plan.md`. An
+implementation session must not begin until the evaluator accepts or the plan is revised and
+re-evaluated.
+
+### 2026-09-01 — Slice C implementation
+
+- Resumed from the separate-session PLAN-EVAL `PASS` in `plan-eval.md` on branch
+  `feat/workers-job-config-schema` at `main` `78be0e032624f12bcb30535d40e3a948b08b9784`.
+- Added exactly the four approved `JobConfig` policy fields and matched the existing generated
+  `RegisterJobInput` literal plus canonical job-definition constraints: priority `50` (`0..100`
+  integer), retry delay `1000ms` (nonnegative integer), max concurrency `1` (nonnegative integer),
+  and persistence `true`.
+- Added the focused config-schema test file. Its five tests cover defaults, explicit values, zero
+  concurrency, both priority bounds, fractional numeric policy values, negative delay and
+  concurrency, group-topic normalization, and the defaults-optional `JobConfigInput` authoring
+  shape.
+- Product ceiling held at exactly two files. The generator remained untouched; Slice G remains the
+  config-aware generation half, so merging leaves #1451 open.
+- No runtime, Aspire, Docker, browser, or E2E gate ran; this lane held no runtime lease.
+
+## Slice C gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused check | PASS | Direct structured wrapper selected 2 files in 1 batch; 0 diagnostics; non-empty output (146 characters), report 390 bytes. |
+| Focused test | PASS | Direct structured wrapper: 5 passed, 0 failed; non-empty output (338 characters). |
+| Focused lint | PASS | Direct structured wrapper selected 2 files in 1 batch; 0 findings; non-empty output (145 characters), report 471 bytes. |
+| Focused format | PASS | Direct structured wrapper selected 2 files in 1 batch; 0 findings; non-empty output (150 characters), report 388 bytes. |
+| `deno doc` for `JobConfig` | PASS | Rendered all four new fields with their public documentation. |
+| Config-subpath doc lint | PASS | `deno doc --lint packages/plugin-workers-core/src/config/mod.ts`: 1 file checked, exit 0. |
+| Full core doc-lint delta | BASELINE-STABLE | Required `--root packages/plugin-workers-core`; 9 carried private-type diagnostics before and after, with 0 on `./src/config/mod.ts`. |
+| JSR surface audit | PASS with carried warnings | Exit 0; existing cardinality and slow-type warnings only, no finding in the two touched files. |
+| Core publish dry-run | PASS | Receipt outcome PASS, exit 0; authoritative `stderr.bytes=15945` (stdout is expectedly empty for this gate). |
+| `deno task quality:scan` | PASS | Exit 0; required Tier-A follow-through completed with no new scanner findings. |
+| `deno task arch:check` | PASS | Exit 0; `plugin-workers-core` remains `FAIL=0` with carried warnings. |
+| Lock blob | PASS | `deno.lock` and `main:deno.lock` both SHA-256 `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`. |
+
+### Slice C reconcile
+
+- Scope remains exactly the approved contract half; Slice G still owns generator consumption.
+- No plan, doctrine, or implementation drift was found, and no architecture debt was created or
+  deepened.
+- The owner prohibited evaluator dispatch and labels for this handoff. No evaluator was launched,
+  cancelled, or otherwise mutated; this implementation session does not claim formal IMPL-EVAL.
 
 ## Slice P gate evidence
 

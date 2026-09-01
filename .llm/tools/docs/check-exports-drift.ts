@@ -26,6 +26,11 @@ export interface PackageMapping {
   symbolCoverage: SymbolCoverage;
 }
 
+export interface ExcludedReferencePage {
+  docPath: string;
+  reason: string;
+}
+
 export interface DenoConditionalExportTarget {
   readonly default?: string;
 }
@@ -33,6 +38,14 @@ export interface DenoConditionalExportTarget {
 export type DenoExportTarget = string | DenoConditionalExportTarget;
 
 export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
+
+export const EXCLUDED_REFERENCE_PAGES: readonly ExcludedReferencePage[] = [
+  {
+    docPath: 'docs/site/reference/auth/index.md',
+    reason:
+      'Multi-package auth hub indexing @netscript/plugin-auth, @netscript/plugin-auth-core, @netscript/auth-kv-oauth, @netscript/auth-workos, and @netscript/auth-better-auth; it is not the reference page for a single package.',
+  },
+];
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
@@ -84,6 +97,30 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'plugin-triggers',
+    packagePath: 'plugins/triggers',
+    docPath: 'docs/site/reference/triggers/index.md',
+    packageName: '@netscript/plugin-triggers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eleven entrypoints were checked with deno doc; the page documents 17 of 150 exported symbols and omits broad trigger CLI command/backend contracts, runtime definitions and action/durability/port contracts, scaffold protocols, service helpers, and stream database/server wiring.',
+    },
+  },
+  {
+    name: 'plugin-workers',
+    packagePath: 'plugins/workers',
+    docPath: 'docs/site/reference/workers/index.md',
+    packageName: '@netscript/plugin-workers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All thirteen entrypoints were checked with deno doc; the page documents 125 of 175 exported symbols and omits CLI job/task/workflow commands and runtime API clients, adapter and doctor contracts, health-check job contracts, generated-registry/runtime helpers, scaffold protocols, and project-file utilities.',
+    },
+  },
+  {
     name: 'ai',
     packagePath: 'packages/ai',
     docPath: 'docs/site/reference/ai/index.md',
@@ -129,6 +166,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.',
+    },
+  },
+  {
+    name: 'plugin-auth',
+    packagePath: 'plugins/auth',
+    docPath: 'docs/site/reference/plugin-auth/index.md',
+    packageName: '@netscript/plugin-auth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All nine entrypoints were checked with deno doc; the page documents 5 of 84 exported symbols and omits versioned auth contracts, schemas, router and session/user inputs and responses, service runtime types, stream event/schema/producer/database helpers, and scaffold and adapter CLI protocols.',
     },
   },
   {
@@ -754,6 +803,47 @@ export function checkSymbolsDrift(
   return errors;
 }
 
+export function validateReferencePageCoverage(
+  referenceDocPaths: readonly string[],
+  mappings: readonly { readonly docPath: string }[],
+  exclusions: readonly ExcludedReferencePage[],
+): string[] {
+  const mappedPaths = new Set(mappings.map((mapping) => mapping.docPath));
+  const excludedPaths = new Set(exclusions.map((exclusion) => exclusion.docPath));
+  const errors: string[] = [];
+
+  for (const docPath of [...referenceDocPaths].sort()) {
+    const mapped = mappedPaths.has(docPath);
+    const excluded = excludedPaths.has(docPath);
+    if (!mapped && !excluded) {
+      errors.push(
+        `Reference Page Coverage Error: ${docPath} is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES`,
+      );
+    } else if (mapped && excluded) {
+      errors.push(
+        `Reference Page Coverage Error: ${docPath} is in both AUTHORITATIVE_MAPPING and EXCLUDED_REFERENCE_PAGES`,
+      );
+    }
+  }
+
+  return errors;
+}
+
+export async function discoverReferencePagePaths(root: string = Deno.cwd()): Promise<string[]> {
+  const referenceRoot = join(root, 'docs/site/reference');
+  const paths: string[] = [];
+  for await (const entry of Deno.readDir(referenceRoot)) {
+    if (!entry.isDirectory) continue;
+    const relativePath = join('docs/site/reference', entry.name, 'index.md');
+    try {
+      if ((await Deno.stat(join(root, relativePath))).isFile) paths.push(relativePath);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+  }
+  return paths.sort();
+}
+
 interface ValidatedMapping {
   mappings: PackageMapping[];
   errors: string[];
@@ -1110,5 +1200,18 @@ export async function checkDrift(mapping: unknown): Promise<number> {
 }
 
 if (import.meta.main) {
+  const referenceDocPaths = await discoverReferencePagePaths();
+  const coverageErrors = validateReferencePageCoverage(
+    referenceDocPaths,
+    AUTHORITATIVE_MAPPING,
+    EXCLUDED_REFERENCE_PAGES,
+  );
+  for (const error of coverageErrors) console.error(error);
+  if (coverageErrors.length > 0) Deno.exit(1);
+
+  console.log(
+    `Reference page coverage: PASS (${referenceDocPaths.length}/${referenceDocPaths.length}; ` +
+      `mapped=${AUTHORITATIVE_MAPPING.length}; excluded=${EXCLUDED_REFERENCE_PAGES.length})`,
+  );
   Deno.exit(await checkDrift(AUTHORITATIVE_MAPPING));
 }
