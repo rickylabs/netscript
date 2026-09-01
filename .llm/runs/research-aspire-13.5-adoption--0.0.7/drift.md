@@ -5853,3 +5853,36 @@
     run passed sqlite, which leans "not S8's", but at a different head and base.
   - Residual recorded: the source-contract test asserts **string shapes rather than behaviour** —
     acceptable only because runtime is prohibited for the delta, and closed by the CI run itself.
+
+- **D-240 — #1837's refinement was ALREADY implemented; SQLite control lease dispatched, with a
+  preflight correction.**
+  - **The #1837 refinement describes work already landed and verified.** At `d23276664`:
+    - discovery is **`APP_REGISTRATION_PATTERN`** (semantic map-write boundary, line 171) and
+      **`HEALTH_ATTACHMENT_PATTERN`** (health-call boundary, line 168), both quote-agnostic and
+      consumed via `matchAll`; block location uses the **ordinal** `'  // --- app '` (line 213), not
+      the removed `// --- ${name} (task) ---`;
+    - the only remaining `withHealthCheck('${…}')` occurrences (lines 81/87) are **emission**, not
+      discovery — they build the injected block from `TEST_ONLY_*` constants and the **discovered**
+      `resourceBinding`, then `replace()` the **actually matched** marker. I checked this rather than
+      trusting a grep count, which on its own looks like a stale coupling and is not one;
+    - fail-closed and duplicate-registration assertions preserved and **probed** by the delta eval;
+    - **fresh CI against current main already ran**: run `33444052144` at `d23276664` completed
+      `success` at 21:59 UTC, *after* #1835 merged to `60ae56af0`, which is still current main.
+      `MERGEABLE`/`CLEAN`, `status:ready-merge`.
+    No re-dispatch: the instruction is satisfied, and re-running it would move a head that is ready.
+  - **Preflight was NOT exactly zero, contrary to the lease grant — and I checked before starting.**
+    `aspire ps` `[]` and containers `0` hold, and `agentic:leak-check` reports **`survivors: []`**.
+    But there is **1 anonymous volume** (`d33e5c2e…`, 16:19 UTC) and **1 custom network**
+    (`aspire-persistent-network-581c13b7-aspire-managed`, 16:37 UTC, creator PID **2743257 not
+    alive**). Both post-date this lane's previous lease release, whose final receipt proved
+    `bridge host none` only at **14:58 UTC** — so they are **foreign / unknown-owner residue**.
+  - **The brief therefore redefines the cleanup proof rather than the rule**: return to the
+    **pre-lease baseline** — containers 0, `aspire ps []`, and those two artifacts **unchanged** —
+    explicitly *not* literal zero. Removing a foreign resource would be a worse outcome than the leak
+    it resembles, and the standing rule forbids it.
+  - Lease constraints carried verbatim: owned worktree only; `aspire start --isolated
+    --non-interactive`; ports via **`netscript-dind`**, never `127.0.0.1`; never `aspire stop --all`;
+    stop by exact `--apphost`; detached long suites; `/proc/<pid>/cwd` identity.
+  - **Scope is one question only** — does SQLite `runtime.health.listener-unreachable` fail on an
+    S8-free head — with **repair explicitly forbidden under the lease**. Hosted typed-db Phase B
+    continues independently on CI.
