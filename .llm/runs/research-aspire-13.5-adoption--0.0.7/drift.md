@@ -6465,3 +6465,90 @@
   - Also carried into the manifest so they cannot be lost: the **blob-identity carry rule** including
     **absent-on-both counts as identical**, the **abort-on-non-generated-conflict** rule, and
     **never infer evaluation from a `status:` label**.
+
+- **D-261 — full S7–S13 reconciliation against live main `d2b33a09b`. Every restack trial-executed;
+  S13's recorded base was wrong and would have duplicated 24 commits.**
+  - **Session identity:** Claude · Anthropic · **Opus 5 · high**, Remote Control attached, NAS
+    `ai-agents`, worktree `/home/agent/projects/netscript/worktrees/007-aspire`, branch
+    `research/aspire-13.5-0.0.7`. Accepted Aspire ownership preserved; no merge, no runtime.
+  - **Precondition naming corrected.** The manifest's precondition read `#1863`; that is the
+    **issue**. The PR is **#1865** (`fix/flow-b-fixture-plugin-marker`). `gh pr view 1863` returns
+    *"Could not resolve to a PullRequest"* — substituting it at dispatch would have produced a
+    non-existent SHA. The owner mandate's "#1865 and #1858" is correct and the manifest now matches.
+  - **Gate status measured, not assumed:** **#1858** is `MERGEABLE`/`CLEAN` with **all 21 checks
+    green** — it waits on the coordinator's merge action, not on work. **#1865** is the real gate:
+    `UNSTABLE`, `close-gate` FAILURE and `scaffold-runtime` FAILURE on **both** tiers. Both Fixes-owned;
+    this lane touched neither.
+  - **S8's head moved and its static acceptance proof did not survive it.** `854e45cb8` →
+    **`7c6522951`**, and `854e45cb8` is **not an ancestor** (force-push). A3/A6 had been proven at the
+    old head, so I retook both at the current one: `PROCESS_COMMANDS_FLAG` → **0** files,
+    `maybeWithProcessCommand` → **0** files, the lone `Aspire 13.4` hit still
+    `render-ts-apphost.ts:81` (tsconfig validation, not the seam — A6 satisfied, leftover owned by
+    S13), and A3's exact-count + placement assertions intact. **A static proof is bound to a head; a
+    force-push voids it.** Worth stating plainly because nothing in the tooling flags it.
+  - **Every restack was trial-executed to completion in throwaway worktrees** — removed afterwards,
+    no PR mutated, `aspire ps []` and 0 containers confirmed before and after. Predictions became
+    measurements:
+
+    | Slice | Own | Stops | File | Class |
+    | --- | --: | --: | --- | --- |
+    | S8 top-up | 26 | **0** | — | 3 new main commits are docs/RFC only |
+    | S9 | 14 | 1 | `embedded.generated.ts` | generated carrier |
+    | S10 | 13 | 2 | `verify-typed-db-phase-b.ts` | D-101 listener path |
+    | S11 | 13 | **0** | — | clean |
+    | S13 | 9 | 1 | `publish-assets.generated.ts` | generated carrier |
+    | S7 | 17 | 1 | `teardown.ts` | #1840 separator contract |
+    | #1747 | 15 | **0** | — | clean |
+
+  - **The S13 base in the committed manifest was wrong.** It recorded S13 as **independent**,
+    `--onto main`, branch point `8a9257642`, **33** own commits. `8a9257642` *is* on main lineage —
+    which is exactly what made the reading look safe — but 24 of the 33 commits between it and S13's
+    head are **rewritten copies of S8's and S10's work**: commits 1–13 are S8's typed-db work
+    including S8's own `.llm/runs/…s8…--impl/` artifacts, and 14–24 are S10's E2E gate work ending at
+    `c9e3fcbe8`. Because they are rewritten (different SHAs), `merge-base --is-ancestor` reports S13
+    does **not** contain the current S8/S10 heads, so an ancestry check alone cannot catch this.
+    Using the recorded base would have replayed 24 commits a second time onto main — **the D-208 trap
+    the manifest warns about one line above the table it was in.**
+  - **Corrected: S13 branches at `c9e3fcbe8` with 9 own commits — the same base S11 uses.** S11 and
+    S13 are siblings off S10, which restores exactly the DAG `lane-queue.md` has recorded all along:
+    **S8 → {S9, S10} → {S11, S13}**. D-260's "independent" reclassification was the error; the
+    original DAG was right. Restack order and the parallel pairs are updated accordingly.
+  - **The correction dissolved a problem I had already started solving.** Off the wrong base, S13
+    appeared to carry three non-generated source conflicts — including 8 stale `prisma_studio_*`
+    marker assertions needing re-expression to main's post-#1837 `tool_0*` ordinals, which I had
+    measured, traced to `1f50c98ce`, and was about to write up as a fourth consumer-adapts-forward
+    instance. Off the correct base S13 **does not touch those files at all**; they belonged to the
+    duplicated S8 commits. Its real conflict count is **one generated carrier**. I only found this
+    because the hypothesis test — "does restacking onto S8's content remove the conflict?" — came back
+    **refuted**, and the refutation was what sent me to check the lineage instead of the content.
+    Recorded because the near-miss is the lesson: I would have shipped a correct-looking ruling for a
+    problem that does not exist, and the wrong base would have survived into dispatch.
+  - **Two genuinely non-generated conflicts remain, and both are pre-ruled rather than aborts** — so a
+    dispatched agent does not stop on collisions already settled by shipped-contract precedent:
+    - **S10 / D-101 listener.** S10 imports `./evidence/listener-readiness.ts`; canonical is
+      `./verify-listener-readiness.ts` plus the fault-controller and unreachable-fixture modules.
+      Existing standing rule applies verbatim — shipped contract wins, consumer adapts forward — so
+      take the parent side at both stops. S10's own later commit
+      `f1e601160 …restore canonical listener readiness module after unstack` intends that exact end
+      state. Verified: the remaining 10 commits then replay clean and
+      `evidence/listener-readiness.ts` is correctly deleted.
+    - **S7 / #1840 task separator.** `3b6386e14` touched `teardown.ts` after S7 was cut — this is why
+      **#1744 flipped to `CONFLICTING/DIRTY`**, having been clean when the last manifest was written.
+      One region, in the `parseArgs` signature, and the two sides are **additive**: main adds
+      `args = normalizeTaskArguments(args)` and drops the hand-rolled `'--'` skip; S7 widens the
+      return type with `forcePersistent`. Ruling: **keep both**. Verified after resolution that S7
+      hand-skips `'--'` in **0** places, so the normalizer solely owns separator handling with no
+      duplicate logic, and commits 4–17 replay clean.
+  - **S7's verdict carry is already computed**, so its delta IMPL-EVAL scope is known before dispatch
+    rather than discovered after: over S7's 112 own files, **110 blob-identical, 2 differ** —
+    `teardown.ts` (the ruling above) and `leak-check.ts` (auto-merged against main). Its existing PASS
+    carries for 110/112; the delta is exactly two files. To be recomputed against the real post-fix
+    head.
+  - **#1719 A1/A2 must now be re-verified.** The manifest said "re-verify only if `bd3dbc843` moves";
+    the S7 restack moves it, so that condition is met and the two live-kill receipts are back in the
+    Phase-B pass rather than carried.
+  - **S11 and #1747 replay with zero conflicts** — #1747 is additionally `CLEAN-MERGE` against main by
+    merge-tree probe, and remains one of the two leaves closest to merge.
+  - Manifest rewritten at `phase-b-execution-manifest.md` with the corrected S13 base, the measured
+    conflict table, and both pre-rulings inline. Nothing here required a lease, a merge, or a label
+    change, and none was made.
