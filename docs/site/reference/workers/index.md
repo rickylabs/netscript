@@ -34,9 +34,13 @@ from its own `deno doc` surface.
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/plugin-workers` | `./mod.ts` | Plugin manifest and inspection helper (documented above). |
+| `@netscript/plugin-workers/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
 | `@netscript/plugin-workers/aspire` | `./src/aspire/mod.ts` | Aspire AppHost contribution and resource ports. |
 | `@netscript/plugin-workers/cli` | `./src/cli/composition/main.ts` | Host-mounted workers CLI command group. |
 | `@netscript/plugin-workers/contracts` | `./contracts/v1/mod.ts` | Versioned oRPC worker service contracts and schemas. |
+| `@netscript/plugin-workers/doctor` | `./doctor.ts` | Static workers adapter used by plugin doctor. |
+| `@netscript/plugin-workers/jobs/health-check.ts` | `./jobs/health-check.ts` | Health-check job definition and its context, handler, and result contracts. |
+| `@netscript/plugin-workers/runtime` | `./bin/runtime.ts` | Generated job-registry loading and registration plus worker, scheduler, and combined-process start helpers. |
 | `@netscript/plugin-workers/scaffold` | `./scaffold.ts` | Plugin scaffold entrypoint types, logger, context, and result contracts. |
 | `@netscript/plugin-workers/services` | `./services/src/main.ts` | Workers API service entrypoint. |
 | `@netscript/plugin-workers/streams` | `./streams/mod.ts` | Browser-facing StreamDB factory and entity schemas. |
