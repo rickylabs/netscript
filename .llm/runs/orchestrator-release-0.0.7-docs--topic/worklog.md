@@ -3519,3 +3519,98 @@ re-measure at whatever base the eventual owner push targets.
 
 Docs queue is empty except #1756/#1533, which are parked on an owner credential and one coordinator
 decision. No docs leaf is awaiting evaluation or convergence.
+
+## 2026-09-01 — #1756 under the coordinator's no-raise ruling: four regressions repaired, one was the gate's own shim
+
+Ruling: **do not raise the ceilings**; treat the four crossings as source regressions and repair
+them, preserving the gate. Ceilings stand untouched at `maximumDeferredUnboundName: 116` /
+`maximumDeferredTypeError: 20`.
+
+Re-converged through three coordinator main advances — `1b7effaf9` → `1e53e731a` → `38f2ce735` →
+`82a2527e2` — re-measuring at each rather than carrying figures forward. #1862's regenerated
+export-surface corpus is carried verbatim, so #1668 is no longer a caveat on this branch.
+
+### Three genuine source regressions, repaired
+
+- `publishSagaOrThrow` (TS2304) — undeclared `publisher`/`message`; typed stand-ins imported from
+  the published `@netscript/plugin-sagas/runtime` specifier.
+- `createContractAuthorizer` (TS2304/TS18004) — five undeclared names, **and** the example implied
+  any authorizer works as `fallback`. It must be `MatchAwareAuthorizerPort`; the probe failed
+  TS2741 until corrected. A published falsehood, not just a compile error.
+- `defineSdkClientContribution` (TS2322) — the `headers` ternary widened its empty branch to
+  `{ 'accept-language'?: undefined }`. A consumer copying it got a type error.
+
+### The fourth was not a documentation defect — and repairing the page would have been the wrong fix
+
+`ServiceHandlerContext` is genuinely generic and its example was correct. `preamble()` injected
+`type X = import(spec).X`, which **drops the declaration's type parameters**, so the example failed
+`TS2315 "Type is not generic"`. Reproduced in isolation before changing anything. Fixing the *page*
+to satisfy a broken shim would have corrupted a correct published surface, so the shim was made
+arity-mirroring with `any` defaults — bare spelling still valid, real constraints still enforced
+where applied.
+
+**A wrong first attempt, caught by measuring the whole census rather than the four targets.**
+Emitting a module-level `import type` regressed `unboundName` 118 → 148. Cause: the preamble is a
+**separate file** the example imports, so only `declare global` reaches the example's scope.
+Reverted.
+
+**And a number I published wrong, corrected loudly.** I claimed the shim had been suppressing 8
+correct examples; that figure came from the discarded experiment. Set-differencing the deferred
+dumps gives **6** (`JsonField`, `InferRoutePatternPath`, `InstallStarterResource`, `PluginResource`,
+`TokenValues`, `ServiceHandlerContext`). `KvStore` and `InfoSpec` were in my earlier list but still
+defer — they carry real type errors — so listing them as resolved would have understated #1766 by
+two. Corrected on the PR and in the body.
+
+Final: `typeError` 22 → **15**, `unboundName` 118 → **116**, zero newly deferred, `ratchetFailures`
+empty, focused suite **18/18**.
+
+### Two CI reds that were never surfaced before, because this branch had never had a green run
+
+The original push was rejected on workflow scope, so no CI had ever executed against it.
+
+1. **`code-quality`** — `explicit-any` at `.llm/tools/docs/snippet-supports.ts:79`. That line is
+   generated fixture text inside a template literal, and the scanner's own comment already says
+   "template/fixture source strings are data, not syntax in the scanned module" — its test just
+   matched only lines *beginning* with a quote. The stand-in cannot drop `any` honestly (it must
+   stay assignable to arbitrary parameter types across 16 example shapes), and indirecting the
+   annotation through an alias would have dodged the regex without changing the meaning. Fixed the
+   detector, kept interpolated `${...}` scanned, and **measured the blast radius**: across
+   `packages`/`plugins`/`.llm/tools`/`docs/site` it suppresses exactly that one finding, reports
+   none new, and leaves allowance accounting identical (7 → 7, 0 failures). Scanner suite 44/44 with
+   a new regression test covering both halves.
+2. **`quality` / Generated asset freshness** — `check:assets-barrel` is the "regenerate then assert
+   an empty diff" form, and the tool changes move `EMBEDDED_AGENT_TOOL_BUNDLE_HASH`. Regenerated
+   (idempotent on a second run) and committed.
+
+### The acceptance mirror could never have ticked #1533
+
+Four of its seven acceptance boxes were **hard-wrapped across two physical lines** — the identical
+defect that stalled #1793 and that I repaired on #1777. Unwrapped all four; verified the body is
+byte-identical under whitespace normalization before writing.
+
+**Both named negative tests were unevidenced and not covered by any automated test**, so I ran them
+rather than asserting them: reintroducing `./api-clients.ts` into `create-service-query-utils.ts`
+and a relative contract import into `packages/sdk/src/desktop/mod.ts` each exit 1 with a diagnostic
+naming file, symbol, example and fence. Re-run after the final rebase; both still fire.
+
+PR body rewritten with a fenced `acceptance-evidence` block covering **six** boxes. The seventh —
+"The gate runs in CI on `packages/**` and `plugins/**` changes" — is **deliberately withheld**,
+because it is not true at a head that lacks the `ci.yml` step. Mirroring it would tick #1533 for
+something the head does not do.
+
+### The one real blocker, handed over three times as main moved
+
+`.llm/tools/gates/jsdoc-example-workflow_test.ts` asserts the CI wiring, so the branch is red by
+exactly one test without the workflow commit: **17/1 without it, 18/0 with it**. `gh auth status`
+still reports scopes `'repo'` only. Everything else is pushed; the 8-line step is handed as a patch
+(`1756-workflow-step-on-7c657f9e0.patch`, sha256 `43dc677ca…`, tag `salvage/1756-workflow-step`),
+re-cut against each new head rather than left stale.
+
+### Docs queue after the audit
+
+Every open 0.0.7 issue was enumerated: **#1533 is the only `orchestrator:docs` item**. The other
+docs-flavoured 0.0.7 issues (#1723, #1721, #1642) are `orchestrator:aspire`; #1360 is
+`orchestrator:fixes`. There is no second independent docs issue to dispatch inside the milestone.
+Fixed one stale lifecycle label in my own lane (#1533 `status:triage` → `status:impl`), and posted
+measured updates to the adjacent 0.0.8 trackers #1765/#1766 whose counts this work changes — those
+are 0.0.8 and were not pulled into the milestone.
