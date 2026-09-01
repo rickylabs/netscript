@@ -8014,3 +8014,43 @@ tightly:
 
 Four leaves now active in parallel on disjoint surfaces: #1802 (`agentic/runtime`), #1846
 (`.github/workflows`), #1859 (`packages/mcp` generated corpus), and #1832 awaiting the corpus unblock.
+
+## D-185 — #1832 SHIPPED; #1859 rebased onto it before generating
+
+### #1832 merged — the TanStack family move is done
+
+**PR #1832 MERGED as `233828f0f`** at 06:04:35Z; **issue #1695 CLOSED**. It is off the waiting list.
+That commit *is* current `main`, so the whole dependency-family arc closed: coherent 0.39→0.52 move
+across four packages, the #1829 cross-PR interaction resolved without touching another lane's
+freshly-merged assertions, two IMPL-EVAL cycles, and a `FAIL_IMPL` repair for the nested `fresh-ui`
+lock.
+
+Internals leaves merged this session: **#1823, #1828, #1830, #1832** — plus feature #1762, which
+#1828 unblocked.
+
+### #1859 was about to generate against a stale base — caught before it did
+
+The leaf worktree was created at `78be0e032`, which #1832's merge superseded. Regenerating there would
+have produced a corpus that **omitted #1832's dependency move and was therefore stale on arrival** —
+the exact defect class this repair exists to fix, reintroduced by the repair itself.
+
+Corrected before any generation happened:
+
+- Leaf reset to **`233828f0f`**. The author had **no commits**, only the untracked run directory, so
+  nothing was lost — `codex-thread-ids.md` intact and verified.
+- **RED re-confirmed at the corrected base**: `REAL_EXIT=1`, corpus stale. The RED receipt must be
+  captured here, not at the old base.
+- Steer dispatched telling the author to verify `git rev-parse HEAD` reads `233828f0f…` **before doing
+  anything else**.
+
+**Retracted my own estimate rather than letting it mislead.** The brief said "~4 lines, +224
+uncompressed bytes" — that was measured at `78be0e032`. Current `main` now also carries #1832, so the
+true delta may be larger, and the author is told explicitly **not to treat 224 as a bound** and to
+record the actual line count and byte delta so the next reader has the real number instead of my
+stale one. The stop-and-report rules were restated in **structural** rather than numeric terms:
+exactly one file may change, never hand-edit the generated artifact, and stop if the diff looks like
+broad regeneration rather than a bounded surface refresh — judging that acceptable is not the author's
+call.
+
+Boundaries unchanged: no root-cause fix in #1841's SDK code, no `packages/sdk`, no merge-gate wiring,
+repo-wide `deno task test` in Tier-A, all run artifacts preserved, draft PR with `Closes #1859`.
