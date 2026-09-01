@@ -5824,3 +5824,32 @@
     **the assertion still bites**: a test that now passes by *not testing* the condition would be
     worse than the failure it replaces. It must also **re-measure** the combined persisted total to
     confirm D-235/236 survives, and give its own opinion on whether the sqlite disposition is correct.
+
+- **D-239 — delta-7 `PASS` at `439959045`. Seven bounded deltas on S8, every one independently
+  evaluated; the sqlite question stays open by agreement.**
+  - **Premise confirmed from D-101's own record**, not the author's restatement: commit `598ed9ca7`
+    — *"simulate listener unreachability via docker pause, **not aspire resource stop**"* — states in
+    its message that `aspire resource stop` **suspends health-check evaluation for a
+    persistent-lifetime container and retains its last `healthReports`**. The `608f8f2da` failure
+    (`last=Healthy` *after a successful stop*) is that cached-report signature exactly.
+  - **No parallel mechanism was invented — proven by blob hash.** `listener-fault-controller.ts`,
+    `prepare-readiness-fixture.ts` and `verify-listener-readiness.ts` are **byte-identical across
+    `origin/main`, `608f8f2da` and HEAD**. The delta reuses the existing D-101 revision/ack client.
+  - **The assertion still bites**, which was my main worry: the test-only key is a **real TCP check on
+    port 18998**, so closing the controller socket makes Aspire's own evaluator report
+    `Unhealthy: listener unreachable: ECONNREFUSED` — the regex the verifier requires. The real
+    container is never stopped. A test that passed by no longer testing the condition would have been
+    worse than the failure it replaced, and it did not happen.
+  - **D-235/236 re-measured at HEAD**: **16,383 / 16,384 / 16,061 B**, matching the recorded numbers
+    exactly. D-227 1/1; D-231/D-233 batch **36 passed (226 steps), 0 failed**.
+  - **SQLite: the evaluator independently agreed it must stay open**, and sharpened the evidence — the
+    failure is `garnet omitted healthReports.test_only_garnet_resp` at the **baseline `Promise.all`,
+    before any controller revision is written**, and the four D-101 blobs are byte-identical across
+    all three heads. Its judgement, worth quoting: *"Repairing on a correlation would risk masking a
+    real AppHost-ordering bug; leaving sqlite unchanged and naming the forbidden runtime control is
+    the honest disposition."*
+  - **The one thing that needs the coordinator: the sqlite control requires a runtime lease.** Every
+    other question on this branch is now answerable statically or by CI. #1744's S8-free `ci:full`
+    run passed sqlite, which leans "not S8's", but at a different head and base.
+  - Residual recorded: the source-contract test asserts **string shapes rather than behaviour** —
+    acceptable only because runtime is prohibited for the delta, and closed by the CI run itself.
