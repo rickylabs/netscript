@@ -55,6 +55,9 @@ Read the focused locator test first, then the locator, then its single call site
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-09-01 | 0 | plan | Ceiling and semantic two-anchor range locked; PLAN-EVAL N/A. |
+| 2026-09-01 | 1 | RED | Structured focused test: exit 1, 0 passed / 3 failed; test-only commit `1d045b04c`. |
+| 2026-09-01 | 2 | GREEN | Identical focused test: exit 0, 3 passed / 0 failed. |
+| 2026-09-01 | 2 | static gates | Three-file structured check/lint/fmt all exit 0; `deno.lock` hash unchanged. |
 
 ## Decisions
 
@@ -67,11 +70,55 @@ Read the focused locator test first, then the locator, then its single call site
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Sibling generator marker inconsistency deferred at the product ceiling. | minor | yes |
+| `quality:scan --help` / `arch:check --help` executed their read-only task bodies rather than help-only output. | minor | yes |
 
 ## Gate Results
 
-Pending implementation.
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Focused RED | Structured test wrapper on `locate-workers-resource-block_test.ts` | EXPECTED FAIL | Exit 1; 0 passed / 3 failed before the locator existed. |
+| Focused GREEN | Same structured test wrapper | PASS | Exit 0; 3 passed / 0 failed. |
+| Check | Structured check wrapper, three owned TS files | PASS | 3 selected; 0 failed batches/diagnostics. |
+| Lint | Structured lint wrapper, three owned TS files | PASS | 3 processed; 0 findings. |
+| Format | Structured format wrapper, three owned TS files | PASS | 3 processed; 0 findings. |
+| Diff hygiene | `git diff --check` | PASS | No whitespace errors. |
+| Lock hygiene | baseline/current `git hash-object deno.lock` | PASS | Both `ac2ee042566bc6b03502c40961c10d624416b061`. |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| F-10 | PASS | Focused three-case test; 91-line test file | Compact semantic fixture, no whole-output snapshot. |
+| F-19 | PASS | Structured wrappers above | Scoped to the three owned TypeScript files. |
+| `quality:scan` | PASS | Read-only task body, exit 0 | Supplemental repo-wide scan triggered while probing help; no findings and not used to widen scope. |
+| `arch:check` | PASS | Read-only task body, exit 0 | Supplemental repo-wide doctrine scan; nested E2E remains non-published. |
+| JSR/public surface | N/A | Research surface scan | No export, dependency, permission, or publish change. |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `scaffold.runtime` | NOT_RUN | Owner constraint | No runtime lease; owner dispatches hosted proof. |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Published CLI/JSR | N/A | Diff review | Fixture-only internal change. |
+
+### Reconcile notes
+
+- S0: Draft PR #1865 opened with `Closes #1863`, milestone 0.0.7, namespaced labels, and truthful
+  unchecked hosted/evaluator DoD items.
+- S1: RED commit pushed and PR phase comment posted with exact structured failure counts.
+- S2: Issue #1863 taxonomy reconciled to exactly one `status:` (`status:impl`) and one priority
+  (`priority:p0`); hosted acceptance and separate-session evaluation remain pending.
 
 ## Handoff Notes
 
+- Inspect `locate-workers-resource-block.ts` first: it requires unique workers creation and
+  registration anchors, valid ordering, and exactly one resource creation/registration in the
+  returned range.
 - Separate-session IMPL-EVAL follows; this generator session does not self-certify.
