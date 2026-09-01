@@ -7780,3 +7780,46 @@ instruction without checking would have produced a no-op at best and a merge con
 
 All other internals work continued uninterrupted: #1832 and #1840 are ready with exact CI running,
 #1802's bounded repair is active, #1846 is working.
+
+## D-180 — Exact CI red on both ready leaves; both diagnosed, neither is an evaluator problem
+
+### #1832 — `close-gate` fail, deterministic and mine
+
+Reproduced locally rather than guessing from CI logs: PR #1832's **own body** carried an unticked
+Definition-of-Done box, `"A separate-session IMPL-EVAL cycle 2 records PASS before merge readiness."`
+That claim became true when cycle 2 returned PASS at `77720bd9b`, so ticking it is what the gate's own
+`Fix:` line instructs. Ticked via API; **local close-gate re-verification now returns `REAL_EXIT=0`.**
+
+Failed jobs will be re-run **at the unchanged head** once the in-flight run completes (a rerun is
+refused while the workflow is still running) — a watcher is armed to trigger it. Never pushing to
+refresh CI: a push moves the head and voids the recorded verdict.
+
+This is the third leaf this session to trip the same box (#1830, #1840, #1832) — a **supervisor
+assertion on a PR body** that only becomes true after the evaluation lands. The acceptance mirror does
+not own PR-body boxes, so hand-ticking is correct here and would be wrong for an issue box.
+
+### #1840 — `code-quality` fail: 4 pre-existing `unsafe-cast` findings the leaf's breadth exposed
+
+Reproduced locally and quantified precisely: **4 findings, all `unsafe-cast`, all in one file** —
+`.llm/tools/agentic/runtime/cli/provider-canary.ts` lines 39/41/43/53, each an
+`X.includes(y as never)` membership check.
+
+**They are pre-existing.** I scanned that same file on clean `main` and it also returns
+`REAL_EXIT=1` with the same findings. The leaf did not introduce them; they surface because its
+normalizer wiring legitimately touched 60 files and the changed-file gate scans what you touch.
+
+Dispatched a bounded fix with the reasoning stated plainly to the author: *you did not introduce
+these, and that does not excuse them* — the repo's rule is that touching a file makes its quality gate
+yours, and the breadth that made this leaf correct is exactly what exposed them. Explicitly forbidden:
+**silencing with an allowance** (the allowance rail is for cases with no honest typed form; four
+`includes` checks are not that, and spending one here sets the wrong precedent), and **narrowing the
+leaf to dodge the scan** (the 26-parser coverage is the whole point). Exactly one file changes;
+behavior must be identical, since this is a typing repair, not a validation change.
+
+**The IMPL-EVAL PASS is not invalidated** and no re-evaluation is required — a typing repair with
+unchanged behavior does not change the evaluated product, and I will confirm that judgement against
+the diff myself rather than spending an evaluator cycle on it.
+
+### #1854 — preservation leaf CI running
+
+Two checks green so far, `check-test`/`quality` pending on a 7-file markdown-only addition.
