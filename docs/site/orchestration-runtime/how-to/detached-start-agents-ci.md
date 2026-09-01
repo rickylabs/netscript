@@ -100,15 +100,28 @@ When a URL must appear in a log, redact the query string, which is where a token
 printf 'dashboard: %s\n' "${DASHBOARD_URL%%\?*}"
 ```
 
-Two rules follow, and they are what keeps a token out of a transcript:
+Three rules follow, and they are what keeps a token out of a transcript:
 
 - **Never `echo` or `cat` the raw `aspire ps --format Json` output in CI.** Select the one field you
   need and discard the rest.
 - **Never pass the URL as a command-line argument** in a logged step — arguments are echoed by most CI
   runners, environment variables and stdin are not.
+- **Disable shell tracing around the assignment.** Under `set -x` (`bash -x`, or a CI runner's debug
+  mode) the shell echoes the expanded command, so the extraction above prints the URL — token included
+  — even though nothing in the snippet calls `echo`. Guard it:
 
-An AppHost that is starting may report `status` other than `running` with `dashboardUrl` absent; poll
-`aspire ps --format Json` until the field appears rather than assuming it is present on the first read.
+  ```bash
+  set +x                      # no-op when tracing is already off
+  DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
+    | deno eval 'const [a] = JSON.parse(await new Response(Deno.stdin.readable).text()); if (a?.dashboardUrl) console.log(a.dashboardUrl);')"
+  set -x                      # only if the job had tracing on
+  ```
+
+  This is the one leak route the other two rules do not cover: it bypasses them by echoing the
+  assignment rather than the value.
+
+Before an AppHost registers, `aspire ps --format Json` returns an empty array — so poll until a record
+appears and carries `dashboardUrl`, rather than assuming the field is readable on the first call.
 
 ## Startup timeout budget versus `aspire wait`
 

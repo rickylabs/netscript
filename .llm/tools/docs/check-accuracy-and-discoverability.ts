@@ -95,7 +95,10 @@ export async function checkDetachedStartAccuracy(): Promise<void> {
       'dashboardUrl',
       'Discovering the dashboard endpoint without printing its token',
       'Treat the value as a **secret**',
+      'Never `echo` or `cat` the raw `aspire ps --format Json` output in CI.',
       'Never pass the URL as a command-line argument',
+      'Disable shell tracing around the assignment.',
+      '${DASHBOARD_URL%%\\?*}',
     ]
   ) {
     requireText(page, marker, DETACHED_START_PAGE);
