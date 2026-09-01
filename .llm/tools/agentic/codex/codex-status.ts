@@ -10,6 +10,7 @@ import {
   wslHome,
   wslUser,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { parseProcessTable } from '../runtime/adapters/local-codex-remote-adapter.ts';
 import { type CodexLiveSnapshot, deriveCodexLiveSnapshot } from './codex-rollout-live.ts';
 import { type AgyAgentSnapshot, deriveAgySnapshot, parseAgyConversationIndex } from './agy-live.ts';
@@ -91,6 +92,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   let worktree: string | undefined;
   let user = wslUser();
   let sessions = 5;

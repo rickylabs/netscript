@@ -55,6 +55,7 @@ import {
   wslHome,
   wslUser,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import {
   compareLaunchIdentity,
   enforceLaunchIdentity,
@@ -125,6 +126,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = {
     mode: 'launch',
     user: wslUser(),
