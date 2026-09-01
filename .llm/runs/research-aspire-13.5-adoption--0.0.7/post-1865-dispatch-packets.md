@@ -42,8 +42,29 @@ onto `main` or strands the stack.
 | — | S7 | `007-aspire-s7` | `git rebase origin/main` (independent) |
 | — | #1747 | `007-1747-conv` | `git rebase origin/main` (independent) |
 
-Current heads to substitute as `<*_PREV>`: S8 `d0d274c59`, S9 `0f2e81516`, S10 `854543df2`,
-S11 `433ef7469`, S13 `3be6c7753`, S7 `4c40cff2c`, #1747 `c741574bb`.
+### Worktree state — already converged locally, pushes deliberately held
+
+The seven worktrees are **already rebased onto `origin/main 9e3b8bcba`** with zero conflicts and
+S8's carry re-proven **72/72**. **Nothing is pushed**: a push triggers Aspire e2e, and those runs
+cannot pass before #1865 while occupying the global Postgres/SQLite lanes its own proof needs — four
+such runs were already cancelled for exactly that reason.
+
+So the post-#1865 step is a **top-up**, not a full replay: each slice is one or two commits behind
+whatever main becomes, not a multi-commit reconstruction.
+
+| Slice | Local head (unpushed) | Pushed head (stale) |
+| ----- | --------------------- | ------------------- |
+| S8 | `1e41de354` | `d0d274c59` |
+| S9 | `1c1068d07` | `0f2e81516` |
+| S10 | `f0406fc92` | `854543df2` |
+| S11 | `67b0e8118` | `433ef7469` |
+| S13 | `8e9a74048` | `3be6c7753` |
+| S7 | `f6ff6e842` | `4c40cff2c` |
+| #1747 | `1328d2190` | `c741574bb` |
+
+Substitute the **local** head as each `<*_PREV>`. The first push of the sequence should be the one
+that carries #1865's merge SHA underneath, so the lanes are spent once, on a run that can actually
+pass.
 
 **Conflict rules — pre-ruled, do not improvise:**
 - `*.generated.ts` → take upstream (`git checkout --ours`), regenerate **once** at the end via

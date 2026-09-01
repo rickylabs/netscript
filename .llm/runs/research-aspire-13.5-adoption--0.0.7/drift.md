@@ -7152,3 +7152,29 @@
   - **#1855 is in implementation**, now touching `ownership.ts` and `probes.ts` alongside four test
     files — and notably **not** `teardown.ts` or `leak-check.ts` source, which is exactly the additive
     shape the brief asked for given S7 rewrites those files.
+
+- **D-278 — converged onto `9e3b8bcba` locally with pushes deliberately held; the post-#1865 step is now
+  a top-up rather than a replay.**
+  - **#1802 (agentic sender-lease recovery) is disjoint from every slice** — overlap measured **before**
+    rebasing, as the carry requires: **0** against S8's evaluated set and 0 against all six others.
+  - **All seven converged locally, zero conflicts**, and **S8's carry re-proven 72/72** at `1e41de354`.
+    Local heads: S9 `1c1068d07`, S10 `f0406fc92`, S11 `67b0e8118`, S13 `8e9a74048`, S7 `f6ff6e842`,
+    #1747 `1328d2190`.
+  - **Nothing pushed, on purpose.** A push triggers Aspire e2e, and those runs cannot pass before #1865
+    while occupying the Postgres/SQLite lanes #1865's own proof needs — four were already cancelled for
+    that reason. Converging *locally* keeps the work moving without spending a lane, and turns the
+    post-#1865 step into a **one-or-two-commit top-up** instead of a multi-commit reconstruction. The
+    first push of the sequence will be the one carrying #1865's merge SHA underneath, so the lanes are
+    spent once, on a run that can actually pass.
+  - **Dispatch packets updated** with both the staged local heads and the stale pushed heads, so
+    whoever fires the sequence substitutes the right `<*_PREV>` and is not misled by what GitHub
+    currently shows.
+  - **#1855 has expanded beyond its briefed shape and needs review when it finishes.** It now touches
+    `teardown.ts` and `leak-check.ts` **source** — the files S7 rewrites, which the brief asked it to
+    treat additively — and also `.agents/skills/aspire/SKILL.md` + `.claude/skills/aspire/SKILL.md`,
+    which are **S9's** surface, plus `run-codex-slice-lib_test.ts`. None of that is necessarily wrong,
+    but it is wider than "ownership/cleanup repair", and the skills pair in particular is a
+    generated-mirror surface that must be regenerated rather than hand-edited. Flagged now so the review
+    checks it rather than discovering it at a merge gate.
+  - Verified separately that **#1802 does not collide with #1855's in-flight files** — #1802 is
+    `codex/` and `runtime/`, #1855 is `teardown/` — so its branch does not need an emergency rebase.
