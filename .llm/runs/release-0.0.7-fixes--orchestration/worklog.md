@@ -7405,3 +7405,27 @@ client must carry a greppable replacement marker naming that follow-up.
 
 Test artifacts were run under `/home/agent/observability/` (never in a worktree), and stray processes
 were verified cleaned: 0 remaining, 0 docker containers.
+
+### OWNER CORRECTION — harness run artifacts are never stripped; strip reverted
+
+I stripped the 25 `.llm/runs/test-scaffold-dynamic-route-gate--1616` paths from #1773
+(`af1c06848`). **The owner corrected this and it is reverted** (`550bc44e9`, already on the remote).
+
+**The policy, recorded durably (also written to persistent memory):** committed `.llm/runs/<run>/`
+directories are **intentional cross-agent context**, not publication leakage. They are never deleted,
+stripped, classified as sensitive, or used to block a PR. Cleanup happens only after a stable release
+and only by owner/coordinator selection, and the owner may deliberately preserve selected runs into
+later milestones. A leaf shipping its own scoped run directory is correct and expected.
+
+**My error:** I executed the strip because an audit framed it as a NAS policy defect. I should have
+recognised that removing the shared context other agents read is an owner-lifecycle decision, not a
+lane-supervisor one, and surfaced it instead of complying. The parallel-agent workflow depends on
+those directories being readable across lanes — I have been reading other leaves' `plan.md`,
+`drift.md`, and evaluator artifacts all cycle, which is precisely the value I was destroying.
+
+**Restoration verified, not assumed:** all **25 artifacts byte-identical to their originals (0/25
+differ)** against pre-strip head `e99e002dc`; the **20 product/test blobs byte-identical (0/20)**
+across both the strip and its reversal; `deno.lock` unchanged. Because no product or test blob moved
+in either direction, the IMPL-EVAL `PASS_IMPL` and the hosted four-lane SUCCESS both still carry by
+product identity — no re-evaluation and no hosted rerun performed or required. PR body corrected to
+record the reversal rather than the strip.
