@@ -31,7 +31,7 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'sagas/plugin.ts',
-        `/** Generated sagas control-plane module. */\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n`,
+        `/** Generated sagas control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineSaga', axis: 'sagas' },\n] as const;\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n`,
       ),
     ];
   },
