@@ -34,7 +34,7 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'workers/plugin.ts',
-        `/** Generated workers control-plane module. */\n\nexport { workersPlugin } from '@netscript/plugin-workers';\n`,
+        `/** Generated workers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineJob', axis: 'jobs' },\n] as const;\n\nexport { workersPlugin } from '@netscript/plugin-workers';\n`,
       ),
     ];
   },
