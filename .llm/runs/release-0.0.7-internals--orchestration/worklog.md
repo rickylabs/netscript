@@ -9589,3 +9589,39 @@ and SDK check.
 
 Hazard restated: `merge-tree` proves mergeability and content, **not** that the merge was taken —
 each leaf still gets exactly one real convergence commit after its verdict lands.
+
+### D-217 — #1846 box-1 exact runtime proof executed (the deferred blocker, now in flight)
+
+The #1846 IMPL-EVAL returned **PASS scoped to boxes 2/3/4** and explicitly blocked merge until box 1
+— the exact three-arrival runtime proof — existed. Its release condition (the Aspire runtime queue
+draining) cleared at `20:12:02Z`, so the proof was executed rather than left parked.
+
+Sequence, per the checked-in `exact-runtime-proof-procedure.md`:
+
+1. **§1 drain re-asserted at execution time**, not carried from the earlier gate3 pass: `e2e-cli`
+   active runs = 0, `DRAIN_API_REAL_EXIT=0`, response preserved. Terminality demanded a
+   `success|failure` conclusion — **`cancelled` excluded**, since treating cancelled as terminal is
+   the defect under test and had already produced one false positive in gate2.
+2. **§2** three branches frozen at `PROOF_BASE_SHA=e0f5f4db7`, one commit and one file each, pushed
+   exactly once. Fail-closed `decide()` preflight, captured exit **0** ×3.
+3. **§3** draft PRs #1901/#1902/#1903 opened; label/milestone events did spawn `e2e-cli` runs, and
+   **every** tier job in **every** one was `skipped` — verified job-by-job rather than inferred from
+   the run-level conclusion, which is what the §3 assertion actually demands.
+4. **§4** all three readied within **4.0 s** (bound 60 s); one run per branch, each `head_sha` equal
+   to its frozen head.
+
+**Result already observable:** A's two tier jobs went `in_progress` while B's and C's sit `pending`
+on their **original runs and original head SHAs**. Under the previous default concurrency the second
+arrival would have evicted the first and the third the second, leaving two of three runtime gates
+unexecuted behind a non-failing workflow state. Deferral, not eviction.
+
+**Deliberate hold:** the §1–§4 evidence commit (`d0910a832`) is rebased onto the remote head but its
+**push is withheld** until the tiers finish. #1846's branch is the proof PRs' base, and the entire
+point of box 1 is that nothing perturbs an in-flight arrival — so the base stays still until the
+evidence is complete.
+
+Still owed: six genuine terminal tier conclusions, serialization asserted from **API job timestamps
+rather than workflow configuration** with per-tier `overlap_count: 0`, and head immutability
+re-proved against run, PR, and raw `ls-remote` refs plus a `synchronize` sweep. A real test failure
+would still be valid evidence that the gate **ran**; it would not be merge readiness, and will be
+reported as such.
