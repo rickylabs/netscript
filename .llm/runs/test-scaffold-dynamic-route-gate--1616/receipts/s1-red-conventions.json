@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--filter",
+    "app conventions declare the scaffold dynamic route",
+    "packages/cli/src/public/features/root/public-command-tree_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1616",
+  "exitCode": 1,
+  "durationMs": 4242,
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: dynamic order route must be part of the canonical scaffold references\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/public/features/root/public-command-tree_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "app conventions declare the scaffold dynamic route as a canonical reference",
+          "file": "./packages/cli/src/public/features/root/public-command-tree_test.ts",
+          "line": 319
+        }
+      ]
+    }
+  ]
+}

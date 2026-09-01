@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "packages/cli/src/kernel/application/scaffold/writers/write-app-files_test.ts",
+    "packages/cli/src/kernel/templates/app/route-templates_test.ts",
+    "packages/cli/src/kernel/adapters/templates/template-asset_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1616",
+  "exitCode": 0,
+  "durationMs": 949,
+  "summary": {
+    "passed": 39,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 39,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}
