@@ -14,6 +14,15 @@
 | Issues                      | #1592 Slice 2 and #1451                                                            |
 | Scope                       | Plan artifacts only; no product implementation                                     |
 
+| Phase                       | Slice P implementation gate                                                        |
+| Profile                     | Archetype 3 — runtime / behavior / engine change                                   |
+| Affected connector boundary | Archetype 5 — `plugins/workers` remains a thin adapter around core contracts       |
+| Worktree                    | `/home/agent/projects/netscript/worktrees/007-leaf-workers-p`                      |
+| Branch                      | `feat/workers-progress-transport`                                                  |
+| Baseline                    | `main` at `78be0e032624f12bcb30535d40e3a948b08b9784` (verified 2026-09-01)        |
+| Issues                      | #1592 Slice 2                                                                      |
+| Scope                       | Independently landable Slice P only                                                |
+
 The owner selected a clustered planning run because both gaps meet at the workers runtime boundary.
 Research confirmed that the cluster is useful for a shared architecture and gate analysis, while the
 implementation remains three bounded slices: progress transport, config schema, and config-aware
@@ -28,6 +37,16 @@ generation. The progress and schema slices are independently landable; generatio
 
 The owner explicitly prohibited evaluator dispatch in this turn. The next supervisor action is to
 run PLAN-EVAL in a separate session after reviewing this commit.
+
+| Plan author           | Earlier Codex session; exact model and effort are not exposed to this checkout | Complete                                   |
+| Formal plan evaluator | Anthropic / Fable 5 / medium, per `lane-policy.md`                             | PASS on 2026-08-31                         |
+| Slice P implementer   | Current Codex session; exact model and effort are not exposed to this checkout | Implementation and automated gates complete |
+| Tier-A slice review   | Supervisor-owned separate review                                                | Pending; `quality:scan` receipt is present |
+| Formal impl evaluator | Supervisor-owned separate session                                               | Not dispatched by owner instruction        |
+
+The owner explicitly prohibited evaluator dispatch, labels, and merge actions in this turn. The
+current session does not self-certify the slice; the next supervisor action is substantive Tier-A
+review followed by the separately owned evaluator lifecycle.
 
 ## Harness controls
 
@@ -45,6 +64,13 @@ The standard harness context-pack and drift files are intentionally omitted beca
 the exact four artifacts for this plan-only run. All evidence and deviations needed by the evaluator
 are carried in `research.md`, `plan.md`, and `worklog.md` instead.
 
+- Slice P implementation, one commit, explicit-refspec push, and one draft PR are authorized
+- No labels, evaluator dispatch, ready-for-review transition, or merge action is authorized
+- Lock and cache mutation is prohibited; `deno.lock` must retain its baseline blob
+
+The earlier plan-only session intentionally omitted `context-pack.md` and `drift.md`. Slice P adds
+both standard artifacts because this implementation must be resumable and auditable.
+
 ## Phase state
 
 | Phase          | State                     | Evidence                                                 |
@@ -55,6 +81,12 @@ are carried in `research.md`, `plan.md`, and `worklog.md` instead.
 | PLAN-EVAL      | Required / not dispatched | Owner-reserved next step                                 |
 | Implementation | Not started               | Outside this run                                         |
 | IMPL-EVAL      | Not started               | Outside this run                                         |
+
+| PLAN-EVAL      | PASS                       | `plan-eval.md`                                           |
+| Implementation | Complete                   | Slice P product diff + focused tests                     |
+| Gate           | Complete                   | `receipts/slice-p/`; doc lint is baseline-relative       |
+| Tier-A review  | Pending                    | Supervisor-owned; quality scan already captured          |
+| IMPL-EVAL      | Not dispatched             | Owner-reserved evaluator lifecycle                       |
 
 ## Stop conditions
 

@@ -96,6 +96,22 @@
 
 ## Gate evidence
 
+### 2026-09-01 — Slice P implementation
+
+- Rebased scope onto `main` `78be0e032`; branch and worktree matched the owner-provided identities.
+- Reused `WorkerOutboundMessage` unchanged. `WorkerPool` now owns an execution-local outbound
+  consumer and promise tail; the outer dispatcher supplies the canonical durable execution id.
+- Progress calls persist FIFO without coalescing. Complete/error consumption drains progress first,
+  and a progress sink rejection fails dispatch even when the handler omitted `await`.
+- Removed the process-global progress callback and corrected the runtime's false Web Worker claim;
+  retained `poolSize`/`workerUrl` only as documented deprecated, ignored compatibility options.
+- Added focused coverage to the existing dispatcher test file (484 lines, below the 500-line test
+  gate) rather than adding a twentieth worker-directory sibling and deepening F-16 debt.
+- Documented FIFO, terminal drain, no coalescing, and entity-upsert replay in the durable-stream
+  reference. Product/test/doc touch count is 8 of the allowed 10.
+
+## Planning gate evidence
+
 | Gate                                                                    | Result                                                                       |
 | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Branch equals fetched `origin/main` before artifacts                    | PASS                                                                         |
@@ -155,3 +171,43 @@ re-evaluated.
   deepened.
 - The owner prohibited evaluator dispatch and labels for this handoff. No evaluator was launched,
   cancelled, or otherwise mutated; this implementation session does not claim formal IMPL-EVAL.
+
+## Slice P gate evidence
+
+Receipts: `.llm/runs/feat-workers-runtime--1592-1451/receipts/slice-p/`.
+
+| Gate | Result | Receipt evidence |
+| --- | --- | --- |
+| Scoped check (`--unstable-kv`) | PASS; 131 files, 0 findings | `check.json`; stdout 308 bytes |
+| Focused dispatcher/pool tests | PASS; 9/9 | `focused-test.json`; stdout 320 bytes |
+| Workers runtime + background stream hook | PASS; 23/23 | `workers-runtime-test.json`; stdout 331 bytes |
+| Scoped lint | PASS; 131 files, 0 findings | `lint.json`; stdout 360 bytes |
+| Touched TypeScript format | PASS; 7 files, 0 findings | `fmt.json`; stdout 303 bytes |
+| `quality:scan` | PASS; 0 findings, allowance budget unchanged | `quality-scan.json`; stdout 4092 bytes |
+| `arch:check` | PASS; no doctrine failures | `arch-check.json`; stdout 41346 bytes |
+| Core doc lint | BASELINE PASS: 9 on `main` → 9; 0 new; missing/other 0 | `core-doc-lint.json`; expected raw exit 1, stdout 5671 bytes |
+| Plugin doc lint | BASELINE PASS: 20 on `main` → 20; 0 new; missing/other 0 | `plugin-doc-lint.json`; expected raw exit 1, stdout 6317 bytes |
+| Core publish dry-run | PASS; existing dynamic-import warning only | `core-publish-dry-run.json`; stderr 16118 bytes |
+| Plugin publish dry-run | PASS; existing dynamic-import warnings only | `plugin-publish-dry-run.json`; stderr 13245 bytes |
+| JSR surface audit | Core exit 0; plugin's unchanged `doctor.ts` module-tag baseline remains | Direct structured audit; no touched-file finding |
+| `deno.lock` | PASS; HEAD and worktree blob `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2` | Raw git/hash-object verification |
+| Runtime/Aspire/Docker/browser/E2E | NOT RUN by owner policy; lane has no runtime lease; assembly E2E is deferred | Explicit run constraint |
+
+All scoped check/test/lint/fmt receipts have non-empty `stdout.bytes`. Publish verdicts are judged
+from non-empty `stderr.bytes`; zero stdout is normal. Doc-lint used the mandatory `--root` argument
+and is interpreted relative to a freshly measured detached-`main` baseline.
+
+## Reconcile note — Slice P
+
+- Scope remains #1592 Slice 2 only; merging leaves #1592 open.
+- No seventh record declaration, `messages.ts`, SDK, registry compiler, or Slice C/G file changed.
+- No plan/doctrine drift and no new debt. The optional new pool test file was unnecessary after the
+  focused tests fit the existing dispatcher test under its size gate.
+- PR/evaluator state was not inspected or advanced before the commit because the draft PR does not
+  yet exist. After push, the implementation phase comment is the only authorized PR mutation.
+
+## Handoff
+
+Slice P implementation and automated gates are complete. The current implementation session does
+not self-certify. After the one commit, explicit-refspec push, and draft PR, the supervisor owns the
+substantive Tier-A review and all evaluator lifecycle actions.
