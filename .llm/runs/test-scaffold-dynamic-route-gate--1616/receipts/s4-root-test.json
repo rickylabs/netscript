@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all"],"cwd":"/home/agent/projects/netscript/worktrees/007-leaf-1616","exitCode":0,"durationMs":224976,"summary":{"passed":4440,"failed":0,"ignored":19,"totalResults":4459,"uniqueFailures":0},"failures":[]}
