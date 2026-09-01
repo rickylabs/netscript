@@ -7255,3 +7255,48 @@
     networks `bridge host none` only, volumes **1** — the known foreign `d33e5c2e…`. **No local lease has
     been taken**, so this is a report, not a cleanup.
   - Hosted CI is now running on all eight heads; S11 and S13 already at **fail=0**.
+
+- **D-281 — #1872 materially changes workers job-registry generation, so S8's regression must be
+  re-measured on post-#1872 main before it is repaired.**
+  - **Seam audits since the last convergence, all clean:** #1876 (`43376c506`) is **manifest-only** —
+    six package-level `deno.json` files plus `deno.lock` — with **zero** overlap against all eight
+    branches, and no slice touches `deno.lock`. S9 and S13 edit the **root** `deno.json`, a different
+    file. So no rebase and **no runtime restart** were warranted, and none was performed.
+  - **#1872 (`7d18ef104`) is a different matter and the owner is right to flag it.** It rewrites
+    `plugins/workers/src/cli/runtime-registry-generator.ts` to be **config-aware**, resolving job
+    policies from `WorkersConfigData`, and changes the conditions under which a registry is emitted at
+    all:
+    ```
+    if (!targetDirExists && !hasConfiguredJobs) continue;
+    if (files.length === 0 && !hasConfiguredJobs) continue;
+    ```
+    Before it, a registry could be skipped when no job files existed — **no jobs registered means the
+    health-check job never executes**, which is precisely S8's failure mode
+    (*"health-check execution has not completed yet"*).
+  - **But that is not a sufficient explanation on its own, and saying so matters.** Baseline main
+    passed the same gate in ~0.4 s **before** #1872 existed, so the registry generation was not broken
+    on main. The S8-vs-main difference must still originate in S8. What #1872 changes is the
+    *experiment*: the generator that produces the registry S8's gate depends on is now materially
+    different.
+  - **Consequence for the repair, recorded before it lands:** the dispatched repair worker is analysing
+    at `71f3cab4d`, whose base predates #1872. Its diagnosis may be partly invalidated. **S8's
+    regression must be re-measured on post-#1872 main before any fix is committed** — otherwise the
+    risk is repairing a symptom that no longer reproduces, or masking one that does. Per the owner's
+    sequencing this happens after #1858 terminalizes; the analysis is staged now so it is not
+    rediscovered then.
+  - **#1747 repaired twice more, both defects mine or consumer-coupling:**
+    1. The block-start regression I introduced (guard excluded by the locator's anchor) — fixed and
+       proven on real generated output, 910-byte gap between guard and locator start.
+    2. `check-test` then failed on **2 of 120** gate tests, both asserting **single-quoted** emission
+       (`addExecutable('workers'`) while this branch routes names through `JSON.stringify`. That is the
+       **#1837 consumer-coupling defect appearing in a consumer of this branch's own change** — the
+       locator is quote-agnostic, only its tests were not. Made them regex-based and quote-agnostic.
+    3. Also found the second locator test's `#1837 rename` simulation had become **vacuous**: this
+       branch performs that rename in the generator, so the string-replace was a no-op and its
+       assertion tautological. Replaced with the real property.
+    Gates: locator suite 8/0, gates suite **120 passed / 0 failed**, fmt clean. `run-deno-lint`
+    exits 2 with `Package 'zod' not found in catalog` — a **pre-existing catalog/tooling refusal**
+    (`coverage refusal: processed-count-unavailable`), not a finding from this change.
+  - **Both dispatched workers were cut off** mid-analysis by a `stop_sequence` on the open-model route
+    after real work (S8 repair: 42 turns; #1887 eval: substantial). Resumed with `--resume` on their
+    own session ids rather than restarted, preserving that work.
