@@ -9455,3 +9455,58 @@ run ID is what makes that work, after the retry created a fresh ID.
 
 **#1351** at `050ef5e6f`, author active. **#1879** converged, root test running, evaluator next.
 **#1888/#1894** under IMPL-EVAL. **#1846** disarmed behind #1858.
+
+
+## D-214 - #1888 PASS and promoted; #1879 green and under eval; #1846 gate re-armed after a correct stop
+
+### #1888 / PR #1894 - `VERDICT: PASS`, promoted
+
+Artifact `f0942a6eb`. Three **Low** findings, none blocking:
+
+- **L-1 (worth a follow-up)**: on the preservation-**failure** path, `metadata.json` is updated with
+  `formal_verdict` and `verdict_artifact_*` **before** the push, so a failed push leaves local metadata
+  claiming a verdict and a dead blob URI while the status comment truthfully reports `NONE` /
+  `artifact-unavailable`. The authoritative surface is truthful and fail-closed, so it does not gate -
+  but recording `verdict_artifact_pushed`, or nulling the fields on failure, is the honest fix.
+- **L-2**: pre-existing wrapper-grammar strictness (`> **Verdict:** OPENHANDS_VERDICT: PASS` parses as
+  `unparseable`) - fails closed, cannot produce a false PASS.
+- **L-3**: the shell half's cardinality logic is string-asserted rather than executed; the evaluator
+  covered it out-of-band with a 13-case matrix and a 15-assertion preserve simulation.
+
+The evaluator did real work rather than reading the diff - verbatim shell simulation of both defect
+paths. Converged onto current `main` at `f0942a6eb`, openhands suite **16 passed / 0 failed**, lock
+unchanged, threads **0/0**, non-draft, sole `status:ready-merge`.
+
+### #1879 - root suite green, evaluator dispatched
+
+Root `deno task test` at the integrated head: **`REAL_EXIT=0`, 4,705 passed / 0 failed / 19 ignored**.
+IMPL-EVAL dispatched at `1914a38c6`, aimed at the load-bearing single-copy proof, family completeness
+(32 keys across the root catalog and 13 manifests), frozen install, the **#1876 key-level union**
+resolution preserving both intents - and, sharpest, **whether the behavioural boundary held**: the
+widened scope made it tempting to fix failing tests by touching product code, and the diff must be
+manifests, catalog, lock, two fixture lines and run artifacts only.
+
+### #1846 - the author stopped correctly a second time, and the gate proved its own design
+
+The armed watcher fired at 18:16:01Z on a genuinely clear gate (#1858's **latest** run `33541672224`
+concluded `failure` on both tiers - a real execution, unlike the earlier `cancelled`). By the time the
+author evaluated its own precondition at 18:16:43Z, `fix/scaffold-island-hydration` had re-occupied
+both lanes, so it **stopped and created nothing**. Second correct stop in a row.
+
+That is the layered design working exactly as intended: **my gate decides when to offer, the leaf's
+gate decides whether to act** - and only the second one is close enough to the moment to be safe. A
+supervisor-side check is always stale by the time it lands.
+
+Re-armed the watcher (its predecessor exits after one release) and appended the attempt history to the
+release message, including one correction for the author: it had read #1858's **older** run
+`33540720683` (`cancelled`); the later run concluded `failure`. Judging a blocking run finished
+requires reading the **latest** run for that branch and requiring `success` or `failure` -
+`cancelled` means it never executed and its turn is not over.
+
+Lane currently reads **4 active** tier jobs on `test/fresh-partial-nav-browser-proof`; gate correctly
+closed.
+
+### Lane state
+
+**#1894/#1888** ready-merge, CI running. **#1890/#1879** under IMPL-EVAL. **#1351** author active.
+**#1846** armed behind a live lane.
