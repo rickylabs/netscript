@@ -102,3 +102,39 @@
 - **Evidence:** Updating only those six dependency catalog constants to `^1.15.0` made the focused
   test pass (2/2) and the full root suite pass (4,639 passed, 0 failed, 19 ignored). No behavioral
   failure remained and no behavioral source was changed.
+
+## D — `packages/fresh-ui/deno.lock`: a private lock the family sweep missed (CI-caught, real)
+
+**What happened.** After convergence at `73c554a08`, `fresh-ui-quality` failed:
+`Fresh UI private lock is stale`. `packages/fresh-ui` is **not** a root workspace member — it is a
+standalone package with its **own** `deno.lock` — and it declares no `@orpc` dependency itself. Its
+oRPC ranges arrive through the root catalog, which this slice raised, so its private lock still
+requested `@orpc/*@^1.14.6` while the catalog required `^1.15.0`.
+
+**Why neither the author nor the evaluator caught it.** The family-completeness proof enumerated the
+**32 root-workspace manifest keys** and the root `deno.lock`. A non-member package carrying a private
+lock is outside that enumeration, so a complete-looking sweep was still incomplete. This is the
+blocking instance of the same class as the evaluator's medium finding (caret-pinned literals
+desyncing from the catalog) — that finding described a latent variant; this one was load-bearing.
+
+**Fix.** Regenerated exactly as the gate prescribes —
+`deno task --cwd packages/fresh-ui lock:update` — `LOCK_UPDATE_REAL_EXIT=0`, type check 150 files /
+0 occurrences. No hand-editing.
+
+**Confinement proven, not asserted.** Every package whose version moved is inside the oRPC closure:
+
+| Package | Before → after | Pulled by |
+| --- | --- | --- |
+| `@orpc/*` (all) | `1.14.6`/`1.14.8` → `1.15.0` | the slice's own move |
+| `@opentelemetry/api-logs`, `@opentelemetry/instrumentation` | `0.220.0` → `0.221.0` | `@orpc/otel@1.15.0` |
+| `type-fest` | `5.7.0` → `5.8.0` | `@orpc/shared@1.15.0` |
+| `import-in-the-middle` | `3.3.1` → `3.3.3` | `@opentelemetry/instrumentation` |
+| `cjs-module-lexer`, `es-module-lexer` | `2.2.0`→`2.2.1`, `2.3.1`→`2.3.2` | `import-in-the-middle` |
+
+No package outside that closure changed. Post-fix in the private lock: `@orpc/shared` resolves to
+**exactly one** copy at `1.15.0`, **zero** residual `1.14.x` entries, and the frozen gate passes —
+`FRESHUI_FROZEN_CHECK_REAL_EXIT=0`.
+
+**Head impact.** This is content the IMPL-EVAL did not see; its family-completeness verification is
+now known to have had this hole. The head moves off the evaluated `1914a38c6`/`73c554a08`, so a
+bounded delta evaluation is owed before this is presented as a merge packet.
