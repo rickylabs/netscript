@@ -34,13 +34,15 @@ export interface SagasStreamDB {
  * @example
  * ```ts
  * import { createSagasStreamDB } from '@netscript/plugin-sagas/streams';
- * const sagasDb = createSagasStreamDB({ baseUrl: 'http://localhost:4437' });
+ *
+ * declare const streamsServiceUrl: string;
+ *
+ * const sagasDb = createSagasStreamDB({ baseUrl: streamsServiceUrl });
  * const sagas = sagasDb.collections.sagaInstance;
  * void sagas;
  * ```
  */
 export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
   const sagaInstanceSchema: z.ZodType<SagaInstance> = z.unknown().transform(
     (value): SagaInstance => SagaInstanceSchema.parse(value),
   );
@@ -54,7 +56,7 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
 
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/sagas/instances', baseUrl),
+      url: buildStreamUrl('/sagas/instances', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },

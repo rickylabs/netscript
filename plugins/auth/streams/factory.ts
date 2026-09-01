@@ -32,17 +32,18 @@ export interface AuthStreamDB {
  * @example
  * ```ts
  * import { createAuthStreamDB } from '@netscript/plugin-auth/streams';
- * const authDb = createAuthStreamDB({ baseUrl: 'http://localhost:4437' });
+ *
+ * declare const streamsServiceUrl: string;
+ *
+ * const authDb = createAuthStreamDB({ baseUrl: streamsServiceUrl });
  * const sessions = authDb.collections.authSession;
  * void sessions;
  * ```
  */
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
-
   const streamDb = createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/auth/sessions', baseUrl),
+      url: buildStreamUrl('/auth/sessions', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
