@@ -229,7 +229,7 @@ describe('generateRegisterInfrastructure', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addContainer('kv', 'ghcr.io/microsoft/garnet:1.1.1')",
+      "builder.addContainer('kv', 'ghcr.io/microsoft/garnet:1.1.10')",
     );
     assertStringIncludes(
       output,

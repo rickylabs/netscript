@@ -7,6 +7,7 @@ import { describe, it } from 'jsr:@std/testing@^1/bdd'
 
 import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts'
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts'
+import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts'
 
 // `generateRegisterInfrastructure` reads templates synchronously, which requires a
 // previously-awaited registry hydration. The tests exercise it directly (outside
@@ -276,7 +277,7 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.1')",
+      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.10')",
     )
     assertStringIncludes(
       output,
@@ -299,6 +300,24 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(
       output,
       "const primaryCacheWiring = cacheWiring.get('garnet') ?? null;",
+    )
+  })
+
+  it('keeps the default Garnet container tag aligned with the executable tool pin', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Container',
+        },
+      },
+    })
+
+    assertStringIncludes(
+      output,
+      `builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}')`,
     )
   })
 
@@ -438,7 +457,7 @@ describe('generateRegisterInfrastructure', () => {
     // Docker present → Redis-compatible Garnet container (default engine kept).
     assertStringIncludes(
       output,
-      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.1')",
+      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.10')",
     )
     // Docker absent → self-provisioned Garnet dotnet-tool executable.
     assertStringIncludes(
