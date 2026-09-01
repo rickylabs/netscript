@@ -158,3 +158,36 @@ The `340afa724` host-lease receipt is **void for this head** and is not claimed.
 only the plugins-side locator; the current head additionally rewrites the locator and migrates the
 background consumer, which is product code the Flow-B fixture executes at runtime. Hosted exact-head
 `scaffold.runtime` is required via the `gate:e2e` label.
+
+## Hosted-runtime trigger: two blockers found (orchestrator, 2026-09-01)
+
+Requested route was "hosted exact-head scaffold runtime through the `gate:e2e` label". Neither half
+of that works as stated; both verified against `.github/workflows/e2e-cli.yml`, not assumed.
+
+**1. `gate:e2e` is not a CI trigger.** It appears nowhere in `e2e-cli.yml`. The opt-in labels are
+`e2e-cli-gate`, `desktop-native-gate`, and `ci:full` (`:31-32`, `:93-95`). `gate:e2e` is a taxonomy
+label only. Every e2e-cli run on this branch so far — `63085cba8`, `5cd4aa4a4`, `8c9c02cc1` — concluded
+**skipped**, confirming nothing was ever triggered.
+
+Applied `ci:full` instead, which short-circuits `run_runtime` unconditionally (`:262`).
+`e2e-cli-gate` alone would defer to `classify`, which may not select the runtime tier for an
+e2e-only diff.
+
+**2. The applicability gate excludes drafts.** `:91` — `github.event.pull_request.draft == false`.
+Run `33479568723`, created by the `ci:full` labeled event at 06:53:27Z at exact head `8c9c02cc1`,
+skipped **every** job including `classify`. The hosted runtime therefore **cannot** run while the PR
+is a draft, whatever labels are applied.
+
+### Consequent ordering constraint
+
+Hosted exact-head runtime proof is only obtainable **after** the ready transition. The required order
+is therefore:
+
+1. independent evaluator verdict (manual dispatch — already running, label-independent);
+2. apply `impl-eval:skip` **before** ready, so `openhands-phase-eval.yml` does not spawn a redundant
+   evaluator on `ready_for_review`;
+3. flip draft -> ready, which fires `e2e-cli.yml` with `ci:full` at the exact head;
+4. verify a run actually **starts and is not skipped** — never infer from the label.
+
+This does not weaken the runtime requirement: the earlier `340afa724` receipt remains void and
+unclaimed, and merge still requires a green hosted `scaffold.runtime` at the final exact head.
