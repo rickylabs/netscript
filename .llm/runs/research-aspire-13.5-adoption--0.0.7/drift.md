@@ -7124,3 +7124,31 @@
   - **All seven slices remain `behind=0` at `102ef8a10`**, so no convergence push was needed this pass —
     which also means no new Aspire e2e runs were triggered into the lanes #1865's rerun needs.
   - #1855 is in its RED-first phase, writing tests across four teardown test files.
+
+- **D-277 — every slice is now `close-gate`-only in CI; acceptance evidence staged after checking that
+  posting a partial block would fail.**
+  - **CI across all seven converged heads is clean apart from `close-gate`:** #1771 and #1779 at
+    **zero** failures, the other five at `close-gate` only — including **#1754**, whose runtime tiers no
+    longer show as failures now that the premature runs were cancelled. That is the cleanest static
+    position this lane has held.
+  - **I checked the mirror tool before drafting evidence blocks, and the check changed the plan.**
+    `validateEvidenceMapping` requires an entry for **every unchecked close-gated box** —
+    *"unchecked box … has no matching evidence entry"* — so a **partial**
+    ```acceptance-evidence``` block **fails validation**. Posting one now for just the evidenced boxes
+    would not have half-worked; it would have failed the gate and looked like a defect in the evidence
+    rather than in my sequencing.
+  - **So the evidence text is staged, not posted** (`staged-acceptance-evidence.md`), box by box across
+    #1720, #1719, #1721, #1723+#1642, #1724 and #1732, marking each as READY / lease-gated /
+    blocked-on-another-slice / pre-existing-main-debt. At ready-flip the block is **assembled** rather
+    than composed under time pressure, and the order of operations is recorded with it: complete block →
+    exactly `status:ready-merge` → `gh run rerun` on the **unchanged head**. Never hand-tick, never push
+    to re-trigger CI.
+  - **Two entries deliberately record that a failure is *not* the slice's**, so a later reader does not
+    treat them as outstanding work: S11's `packages/aspire` `doc:lint` process-exit-1 (byte-identical on
+    `origin/main`) and S13's `agentic:sync-claude:check` (fails on a clean `origin/main` worktree).
+  - **And one records a moving target:** S13's manifest box must be **re-verified after every
+    convergence**, because main legitimately gaining Aspire-mentioning paths moves the row count — it
+    has already gone 815 → 822.
+  - **#1855 is in implementation**, now touching `ownership.ts` and `probes.ts` alongside four test
+    files — and notably **not** `teardown.ts` or `leak-check.ts` source, which is exactly the additive
+    shape the brief asked for given S7 rewrites those files.
